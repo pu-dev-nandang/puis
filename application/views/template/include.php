@@ -824,5 +824,24 @@
         }
     }
 
+    // Adi
+    function loadSelectOptionPaymentType(element,selected) {
+        var url = base_url_js+"api/__getBasePaymentTypeSelectOption";
+        $.get(url,function (data) {
+            for(var i=0;i<data.length;i++){
+                var selc = (data[i].ID==selected) ? 'selected' : '';
+                $(''+element).append('<option value="'+data[i].ID+'" '+selc+'>'+data[i].Abbreviation+'</option>');
+            }
+        });
+    }
 
+    function loadSelectOptionDiscount(element,selected) {
+        var url = base_url_js+"api/__getBaseDiscountSelectOption";
+        $.get(url,function (data) {
+            for(var i=0;i<data.length;i++){
+                var selc = (data[i].ID==selected) ? 'selected' : '';
+                $(''+element).append('<option value="'+data[i].Discount+'" '+selc+'>'+data[i].Discount+'</option>');
+            }
+        });
+    }
 </script>

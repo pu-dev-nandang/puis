@@ -28,7 +28,7 @@ class C_tuition_fee extends Finnance_Controler {
     }
 
     public function tuition_fee(){
-        $content = $this->load->view('page/'.$this->data['department'].'/tuition_fee/tuition_fee',$this->data,true);
+        $content = $this->load->view('page/'.$this->data['department'].'/master/tuition_fee',$this->data,true);
         $this->temp($content);
     }
 

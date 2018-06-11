@@ -180,5 +180,28 @@ class C_finance extends Finnance_Controler {
         echo json_encode($output);
     }
 
+    public function page_set_tagihan_mhs()
+    {
+        $content = $this->load->view('page/'.$this->data['department'].'/set_tagihan/page_set_tagihan_mhs',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function get_tagihan_mhs()
+    {
+        $input = $this->getInputToken();
+
+        $this->load->library('pagination');
+        $config = $this->config_pagination_default_ajax(1000,10,3);
+        $this->pagination->initialize($config);
+        $page = $this->uri->segment(3);
+        $start = ($page - 1) * $config["per_page"];
+
+        $data = $this->m_finance->get_tagihan_mhs($input['ta'],$input['prodi'],$input['PTID'],$config["per_page"], $start);
+        $output = array(
+        'pagination_link'  => $this->pagination->create_links(),
+        'loadtable'   => $data,
+        );
+        echo json_encode($output);
+    }
 
 }
