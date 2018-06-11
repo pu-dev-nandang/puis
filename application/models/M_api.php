@@ -1706,4 +1706,26 @@ class M_api extends CI_Model {
 
     }
 
+    public function __getAttendance($ScheduleID){
+        $SemesterActive = $this->_getSemesterActive();
+        $SemesterID = $SemesterActive['ID'];
+
+        $data = $this->db->query('SELECT attd.ID AS AttendanceID, sd.*, cl.Room, d.NameEng AS DayNameEng FROM db_academic.attendance attd 
+                                            LEFT JOIN db_academic.schedule_details sd ON (sd.ID = attd.SDID)
+                                            LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+                                            LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
+                                            WHERE attd.SemesterID = "'.$SemesterID.'" AND attd.ScheduleID = "'.$ScheduleID.'"
+                                            AND attd.ScheduleID ORDER BY sd.ID ASC')->result_array();
+
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+                $data[$i]['DetailStudents'] = $this->db->query('SELECT * FROM db_academic.attendance_students astd 
+                                                                  WHERE astd.ID = "'.$data[$i]['AttendanceID'].'" ')
+                                                                    ->result_array();
+            }
+        }
+
+        return $data;
+    }
+
 }

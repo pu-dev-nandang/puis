@@ -95,8 +95,8 @@
             ScheduleID : ScheduleID
         };
         var token = jwt_encode(data,'UAP)(*');
-
         loadPage(token);
+
     });
 
 
