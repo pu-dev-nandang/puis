@@ -4,11 +4,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class M_sendemail extends CI_Model {
 
     private $VariableClass= array('text' => null,
-                        'smtp_host' => null,
-                        'smtp_port' => null,
-                        'smtp_user' => null,
-                        'smtp_pass' => null
-                        );
+        'smtp_host' => null,
+        'smtp_port' => null,
+        'smtp_user' => null,
+        'smtp_pass' => null
+    );
 
     public function __construct()
     {
@@ -26,17 +26,17 @@ class M_sendemail extends CI_Model {
 
         if ($this->VariableClass['smtp_host'] != null) {
             $config = array('setting' => array(
-                                        'protocol' => 'smtp',
-                                        'smtp_host' => $this->VariableClass['smtp_host'],
-                                        'smtp_port' => $this->VariableClass['smtp_port'],
-                                        'smtp_user' => $this->VariableClass['smtp_user'], 
-                                        'smtp_pass' => $this->VariableClass['smtp_pass'],
-                                        'mailtype' => 'html',
-                                        'charset' => 'iso-8859-1',
-                                        'wordwrap' => TRUE
-                            ),
-                            'text' => $this->VariableClass['text'],
-              
+                'protocol' => 'smtp',
+                'smtp_host' => $this->VariableClass['smtp_host'],
+                'smtp_port' => $this->VariableClass['smtp_port'],
+                'smtp_user' => $this->VariableClass['smtp_user'],
+                'smtp_pass' => $this->VariableClass['smtp_pass'],
+                'mailtype' => 'html',
+                'charset' => 'iso-8859-1',
+                'wordwrap' => TRUE
+            ),
+                'text' => $this->VariableClass['text'],
+
             );
         }
         else
@@ -44,20 +44,20 @@ class M_sendemail extends CI_Model {
             $sql = "select * from db_admission.email_set as a limit 1";
             $query=$this->db->query($sql, array())->result_array();
             $config = array('setting' => array(
-                                        'protocol' => 'smtp',
-                                        'smtp_host' => $query[0]['smtp_host'],
-                                        'smtp_port' => $query[0]['smtp_port'],
-                                        'smtp_user' => $query[0]['email'], 
-                                        'smtp_pass' => $query[0]['pass'],
-                                        'mailtype' => 'html',
-                                        'charset' => 'iso-8859-1',
-                                        'wordwrap' => TRUE
-                            ),
-                            'text' => $query[0]['text'],
-              
+                'protocol' => 'smtp',
+                'smtp_host' => $query[0]['smtp_host'],
+                'smtp_port' => $query[0]['smtp_port'],
+                'smtp_user' => $query[0]['email'],
+                'smtp_pass' => $query[0]['pass'],
+                'mailtype' => 'html',
+                'charset' => 'iso-8859-1',
+                'wordwrap' => TRUE
+            ),
+                'text' => $query[0]['text'],
+
             );
         }
-        
+
         return $config;
     }
 
@@ -75,7 +75,7 @@ class M_sendemail extends CI_Model {
             <td style="background-color:#fff;padding:0 30px;color:#333;vertical-align:top;border:1px solid #cccccc;">
                 <br>
                 <div style="text-align: center;">
-                    <img src="http://www.podomorouniversity.ac.id/main/resources/assets/img/logo/logo-podomoro-atas.png" style="max-width: 250px;">
+                    <img src="http://siak.podomorouniversity.ac.id/logo_tr.png" style="max-width: 250px;">
                     <hr style="border-top: 1px solid #cccccc;"/>
                     <div style="font-family:Proxima Nova Semi-bold,Helvetica,sans-serif;font-weight:bold;font-size:24px;line-height:24px;color:#607D8B">Registration</div>
                 </div>
@@ -131,39 +131,42 @@ class M_sendemail extends CI_Model {
                     <br>
                     </div>
                     <table style="width:600px;margin:0 auto;background-color:#ebebeb" border="0" cellpadding="0" cellspacing="0">
-                    <tbody>
-                    <tr>
-                    <td></td>
-                    <td style="background-color:#fff;padding:0 30px;color:#333;vertical-align:top">
-                    <br>
-                    <div style="font-family:Proxima Nova Semi-bold,Helvetica,sans-serif;font-weight:bold;font-size:24px;line-height:24px;color:#2196f3">
-                    Podomoro University
-                    </div>
-                    <div style="font-family:Proxima Nova Reg,Helvetica,sans-serif">
-                    <div style="max-width:600px;margin:30px 0;display:block;font-size:14px;text-align:left!important">
-                    '.$text.'
-                    <br><br>Best Regard, <br> IT Podomoro University (it@podomorouniversity.ac.id)
-                    <br><br><br>
-                    <p style="color:#EB6936;"><i>*) Do not reply, this email is sent automatically</i> </p>
-                    </div>
-                    </td>
-                    <td></td>
-                    </tr>
-                    <tr>
-                    <td colspan="3">
-                    <div style="background-color:#fff;border-top:1px solid #ddd; ">';
+                        <tbody>
+                        <tr>
+                            <td></td>
+                            <td style="background-color:#fff;padding:0 30px;color:#333;vertical-align:top;border:1px solid #cccccc;">
+                            <br>
+                            <div style="text-align: center;">
+                                <img src="http://siak.podomorouniversity.ac.id/logo_tr.png" style="max-width: 250px;">
+                                <hr style="border-top: 1px solid #cccccc;"/>
+                                <div style="font-family:Proxima Nova Semi-bold,Helvetica,sans-serif;font-weight:bold;font-size:24px;line-height:24px;color:#607D8B">Alert</div>
+                            </div>
+                            <br/>
+                            <div style="font-family:Proxima Nova Reg,Helvetica,sans-serif">
+                            <div style="max-width:600px;margin:30px 0;display:block;font-size:14px;text-align:left!important">
+                            '.$text.'
+                            <br><br>Best Regard, <br> IT Podomoro University (it@podomorouniversity.ac.id)
+                            <br><br><br>
+                            <p style="color:#EB6936;"><i>*) Do not reply, this email is sent automatically</i> </p>
+                            </div>
+                            </td>
+                            <td></td>
+                            </tr>
+                            <tr>
+                            <td colspan="3">
+                            <div style="background-color:#fff;border-top:1px solid #ddd; ">';
         }
 
         return $this->VariableClass['text'] = $text1;
-        
+
     }
 
     public function sendEmail($to = null,$subject = null,$smtp_host = null,$smtp_port = null,$smtp_user = null,$smtp_pass = null,$text = null, $attach = null)
-    {   
+    {
         $arr = array(
             'status' => 1,
             'msg'=>''
-            );
+        );
         $this->VariableClass['smtp_host'] = $smtp_host;
         $this->VariableClass['smtp_port'] = $smtp_port;
         $this->VariableClass['smtp_user'] = $smtp_user;
@@ -187,8 +190,8 @@ class M_sendemail extends CI_Model {
         }
         if($this->email->send())
         {
-          $arr['status'] = 1;
-          $arr['msg'] = "Email Send";
+            $arr['status'] = 1;
+            $arr['msg'] = "Email Send";
         }
         else
         {
@@ -204,33 +207,33 @@ class M_sendemail extends CI_Model {
         $sql = "select * from db_admission.email_set limit 1";
         $data = array();
         $query=$this->db->query($sql, array())->result();
-        
+
         if ($smtp_host != "" || $smtp_port != "" || $email != "" || $pwd != "") {
             if (count($query) > 0 ) {
                 # update
                 foreach ($query as $key) {
                     $data = array(
-                                    'smtp_host' => $smtp_host,
-                                    'smtp_port' => $smtp_port,
-                                    'email' => $email,
-                                    'pass' => $pwd,
-                                    'text' => $text
-                                  );
-                }
-
-                $this->db->set($data)
-                         ->update('db_admission.email_set');
-            }
-            else
-            {
-                # insert
-                $dataSave = array(
                         'smtp_host' => $smtp_host,
                         'smtp_port' => $smtp_port,
                         'email' => $email,
                         'pass' => $pwd,
                         'text' => $text
-                                );
+                    );
+                }
+
+                $this->db->set($data)
+                    ->update('db_admission.email_set');
+            }
+            else
+            {
+                # insert
+                $dataSave = array(
+                    'smtp_host' => $smtp_host,
+                    'smtp_port' => $smtp_port,
+                    'email' => $email,
+                    'pass' => $pwd,
+                    'text' => $text
+                );
 
                 $this->db->insert('db_admission.email_set', $dataSave);
 
@@ -247,7 +250,7 @@ class M_sendemail extends CI_Model {
             $sql = "select EmailTo from db_admission.email_to as a where Active = 1 and Function = ?";
             $query=$this->db->query($sql, array($function))->result();
             foreach ($query as $key) {
-               $arr_temp[] = $key->EmailTo;
+                $arr_temp[] = $key->EmailTo;
             }
             $email_to = implode($arr_temp, ",");
         }

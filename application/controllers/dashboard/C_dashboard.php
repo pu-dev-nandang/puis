@@ -34,12 +34,24 @@ class C_dashboard extends Globalclass {
         echo $content;
     }
 
-    public function readNotification()
+    public function readNotificationDivision()
     {
         $input = $this->getInputToken();
         $this->load->model('master/m_master');
-        $this->m_master->readNotification($input['IDDivision']);
+        $this->m_master->readNotificationDivision($input['IDDivision']);
         echo json_encode(1);
+    }
+
+    public function testadi()
+    {
+        for ($i=0; $i <= 100 ; $i= $i + 5) {
+            $dataSave = array(
+                'discount' => $i,
+            );
+            $this->db->insert('db_finance.discount', $dataSave);
+        }
+
+        echo 'test';
     }
 
 

@@ -40,7 +40,7 @@ class C_master extends Admission_Controler {
     {
         $input = $this->getInputToken();
         if (strlen($DeadLinePayment) != 19) {
-          $DeadLinePayment = $DeadLinePayment.':00';
+            $DeadLinePayment = $DeadLinePayment.':00';
         }
         $startDate = (strlen($input['startDate']) != 19) ? $input['startDate'].':00' : $input['startDate'];
         $endDate = (strlen($input['endDate']) != 19) ? $input['endDate'].':00' : $input['endDate'];
@@ -53,10 +53,10 @@ class C_master extends Admission_Controler {
                 break;
             case 'delete':
                 $this->m_master->delete_id_table($input['CDID'],'cfg_deadline');
-                break;        
+                break;
             case 'getactive':
                 $this->m_master->getActive_id_active_table($input['CDID'],$input['Active'],'cfg_deadline');
-                break;    
+                break;
             default:
                 # code...
                 break;
@@ -92,14 +92,14 @@ class C_master extends Admission_Controler {
                 break;
             case 'delete':
                 $this->m_master->delete_id_table($input['CDID'],'cfg_cicilan');
-                break;        
+                break;
             case 'getactive':
                 $this->m_master->getActive_id_active_table($input['CDID'],$input['Active'],'cfg_cicilan');
-                break;    
+                break;
             default:
                 # code...
                 break;
-        }        
+        }
     }
 
     public function data_cfg_cicilan()
@@ -108,8 +108,9 @@ class C_master extends Admission_Controler {
         echo json_encode($generate);
     }
 
-    public function sma()
+    public function sma($approval = 0)
     {
+        $this->data['approval'] = $approval;
         $content = $this->load->view('page/'.$this->data['department'].'/master/sma',$this->data,true);
         $this->temp($content);
     }
@@ -141,10 +142,10 @@ class C_master extends Admission_Controler {
 
     public function config_set_email()
     {
-            $getEmailConfig = $this->m_sendemail->loadEmailConfig();
-            $this->data['email'] = $getEmailConfig;
-            $content = $this->load->view('page/'.$this->data['department'].'/master/set_email',$this->data,true);
-            $this->temp($content);
+        $getEmailConfig = $this->m_sendemail->loadEmailConfig();
+        $this->data['email'] = $getEmailConfig;
+        $content = $this->load->view('page/'.$this->data['department'].'/master/set_email',$this->data,true);
+        $this->temp($content);
     }
 
     public function testing_email()
@@ -184,7 +185,7 @@ class C_master extends Admission_Controler {
         $this->data['getColoumn'] = $this->m_master->getColumnTable('db_admission.count_account');
         $this->data['getData'] = $this->m_master->showData('db_admission.count_account');
         echo $this->load->view('page/'.$this->data['department'].'/master/table_master_global',$this->data,true);
-        
+
     }
 
     public function modalform($table)
@@ -213,10 +214,10 @@ class C_master extends Admission_Controler {
                 break;
             case 'delete':
                 $this->m_master->delete_count_account($input['CDID']);
-                break;        
+                break;
             case 'getactive':
                 $this->m_master->getActive_count_account($input['CDID'],$input['Active']);
-                break;    
+                break;
             default:
                 # code...
                 break;
@@ -249,10 +250,10 @@ class C_master extends Admission_Controler {
                 break;
             case 'delete':
                 $this->m_master->delete_email_to($input['CDID']);
-                break;        
+                break;
             case 'getactive':
                 $this->m_master->getActive_email_to($input['CDID'],$input['Active']);
-                break;    
+                break;
             default:
                 # code...
                 break;
@@ -285,10 +286,10 @@ class C_master extends Admission_Controler {
                 break;
             case 'delete':
                 $this->m_master->delete_id_table($input['CDID'],'deadline_register');
-                break;        
+                break;
             case 'getactive':
                 $this->m_master->getActive_id_active_table($input['CDID'],$input['Active'],'deadline_register');
-                break;    
+                break;
             default:
                 # code...
                 break;
@@ -314,10 +315,10 @@ class C_master extends Admission_Controler {
                 break;
             case 'delete':
                 $this->m_master->delete_id_table($input['CDID'],'price_formulir');
-                break;        
+                break;
             case 'getactive':
                 $this->m_master->getActive_id_active_table($input['CDID'],$input['Active'],'price_formulir');
-                break;    
+                break;
             default:
                 # code...
                 break;
@@ -343,10 +344,10 @@ class C_master extends Admission_Controler {
                 break;
             case 'delete':
                 $this->m_master->delete_id_table($input['CDID'],'price_formulir_offline');
-                break;        
+                break;
             case 'getactive':
                 $this->m_master->getActive_id_active_table($input['CDID'],$input['Active'],'price_formulir_offline');
-                break;    
+                break;
             default:
                 # code...
                 break;
@@ -385,10 +386,10 @@ class C_master extends Admission_Controler {
                 break;
             case 'delete':
                 $this->m_master->delete_id_table($input['CDID'],'register_jtinggal_m');
-                break;        
+                break;
             case 'getactive':
                 $this->m_master->getActive_id_activeAll_table($input['CDID'],$input['Active'],'register_jtinggal_m');
-                break;    
+                break;
             default:
                 # code...
                 break;
@@ -414,10 +415,10 @@ class C_master extends Admission_Controler {
                 break;
             case 'delete':
                 $this->m_master->delete_id_table($input['CDID'],'register_income_m');
-                break;        
+                break;
             case 'getactive':
                 $this->m_master->getActive_id_activeAll_table($input['CDID'],$input['Active'],'register_income_m');
-                break;    
+                break;
             default:
                 # code...
                 break;
@@ -469,10 +470,10 @@ class C_master extends Admission_Controler {
                 break;
             case 'delete':
                 $this->m_master->delete_id_table($input['CDID'],'reg_doc_checklist');
-                break;        
+                break;
             case 'getactive':
                 $this->m_master->getActive_id_activeAll_table($input['CDID'],$input['Active'],'reg_doc_checklist');
-                break;    
+                break;
             default:
                 # code...
                 break;
@@ -552,10 +553,10 @@ class C_master extends Admission_Controler {
                 break;
             case 'delete':
                 $this->m_master->delete_id_table($input['CDID'],'register_jacket_size_m');
-                break;        
+                break;
             case 'getactive':
                 $this->m_master->getActive_id_activeAll_table($input['CDID'],$input['Active'],'register_jacket_size_m');
-                break;    
+                break;
             default:
                 # code...
                 break;
@@ -581,10 +582,10 @@ class C_master extends Admission_Controler {
                 break;
             case 'delete':
                 $this->m_master->delete_id_table($input['CDID'],'register_major_school');
-                break;        
+                break;
             case 'getactive':
                 $this->m_master->getActive_id_activeAll_table($input['CDID'],$input['Active'],'register_major_school');
-                break;    
+                break;
             default:
                 # code...
                 break;
@@ -628,20 +629,20 @@ class C_master extends Admission_Controler {
                 break;
             case 'delete':
                 $this->m_master->delete_id_table($input['CDID'],'ujian_perprody_m');
-                break;        
+                break;
             case 'getactive':
                 $this->m_master->getActive_id_activeAll_table($input['CDID'],$input['Active'],'ujian_perprody_m');
-                break;    
+                break;
             default:
                 # code...
                 break;
-        }        
+        }
     }
 
     public function menu_previleges()
     {
-      $content = $this->load->view('page/'.$this->data['department'].'/master/menu_previleges',$this->data,true);
-      $this->temp($content);
+        $content = $this->load->view('page/'.$this->data['department'].'/master/menu_previleges',$this->data,true);
+        $this->temp($content);
     }
 
     public function modal_form_previleges()
@@ -684,7 +685,7 @@ class C_master extends Admission_Controler {
     {
         $input = $this->getInputToken();
         $this->m_master->updateSubMenu($input);
-        
+
     }
 
     public function get_submenu_delete()
@@ -706,11 +707,11 @@ class C_master extends Admission_Controler {
         $data['response'] = 'true'; //mengatur response
         $data['message'] = array(); //membuat array
         $getData = $this->m_master->getUserAdmission($input['Nama']);
-        for ($i=0; $i < count($getData); $i++) { 
+        for ($i=0; $i < count($getData); $i++) {
             $data['message'][] = array(
-             'label' => $getData[$i]['Name'],
-             'value' => $getData[$i]['NIP']
-             );
+                'label' => $getData[$i]['Name'],
+                'value' => $getData[$i]['NIP']
+            );
         }
         echo json_encode($data);
     }
@@ -754,15 +755,18 @@ class C_master extends Admission_Controler {
         $startVA = 1; // increment 8 digit
         $const_VA = '98800202';
         $inc_VA = '';
-        for ($i=0; $i < $selectJMLVA; $i++) { 
-            // sleep(0.5);
-            $inc_VA = $startVA;
-            for ($j=0; $j < (8 - strlen($startVA)); $j++) { 
-                $inc_VA = '0'.$inc_VA;
+        $max_va_adm = 9999999;
+        if ($selectJMLVA < $max_va_adm) {
+            for ($i=0; $i < $selectJMLVA; $i++) {
+                // sleep(0.5);
+                $inc_VA = $startVA;
+                for ($j=0; $j < (8 - strlen($startVA)); $j++) {
+                    $inc_VA = '0'.$inc_VA;
+                }
+                $inc_VA = $const_VA.$inc_VA;
+                $this->m_master->saveGenerateVA($inc_VA);
+                $startVA++;
             }
-            $inc_VA = $const_VA.$inc_VA;
-            $this->m_master->saveGenerateVA($inc_VA);
-            $startVA++;
         }
 
     }
@@ -809,10 +813,10 @@ class C_master extends Admission_Controler {
                 break;
             case 'delete':
                 $this->m_master->delete_id_table($input['CDID'],'price_event');
-                break;        
+                break;
             case 'getactive':
                 $this->m_master->getActive_id_activeAll_table($input['CDID'],$input['Active'],'price_event');
-                break;    
+                break;
             default:
                 # code...
                 break;
@@ -838,10 +842,10 @@ class C_master extends Admission_Controler {
                 break;
             case 'delete':
                 $this->m_master->delete_id_table($input['CDID'],'source_from_event');
-                break;        
+                break;
             case 'getactive':
                 $this->m_master->getActive_id_activeAll_table($input['CDID'],$input['Active'],'source_from_event');
-                break;    
+                break;
             default:
                 # code...
                 break;
@@ -877,10 +881,10 @@ class C_master extends Admission_Controler {
                 break;
             case 'delete':
                 $this->m_master->delete_id_table($input['CDID'],'sales_school_m');
-                break;        
+                break;
             case 'getactive':
                 $this->m_master->getActive_id_activeAll_table($input['CDID'],$input['Active'],'sales_school_m');
-                break;    
+                break;
             default:
                 # code...
                 break;
@@ -898,18 +902,18 @@ class C_master extends Admission_Controler {
         $this->load->library('pagination');
         $config = $this->config_pagination_default_ajax($this->m_master->count_sales_koordinator(),10,5);
 
-         $this->pagination->initialize($config);
-         $page = $this->uri->segment(5);
-         $start = ($page - 1) * $config["per_page"];
-         $this->data['no'] = $start;
-         $this->data['datadb'] = $this->m_master->selectDataSalesKoordinator($config["per_page"], $start,$selectWilayah,$selectSchool,$selectSales,$selectStatus);
+        $this->pagination->initialize($config);
+        $page = $this->uri->segment(5);
+        $start = ($page - 1) * $config["per_page"];
+        $this->data['no'] = $start;
+        $this->data['datadb'] = $this->m_master->selectDataSalesKoordinator($config["per_page"], $start,$selectWilayah,$selectSchool,$selectSales,$selectStatus);
         $content = $this->load->view('page/'.$this->data['department'].'/master/table_sales_koordinator_pagination',$this->data,true);
 
-         $output = array(
-         'pagination_link'  => $this->pagination->create_links(),
-         'sales_koordinator_pagination'   => $content,
-         );
-         echo json_encode($output);
+        $output = array(
+            'pagination_link'  => $this->pagination->create_links(),
+            'sales_koordinator_pagination'   => $content,
+        );
+        echo json_encode($output);
     }
 
     public function fileGet($file)
@@ -922,7 +926,7 @@ class C_master extends Admission_Controler {
             // $this->load->helper('download');
             // $data   = file_get_contents('./document/'.$namaFolder.'/'.$file);
             // $name   = $file;
-             // force_download($name, $data); // script download file
+            // force_download($name, $data); // script download file
             $this->showFile($file);
         }
         else
@@ -933,7 +937,7 @@ class C_master extends Admission_Controler {
 
     private function showFile($file)
     {
-        header("Content-type: application/pdf"); 
+        header("Content-type: application/pdf");
         header("Content-disposition: inline;     
         filename=".basename('document/'.$file));
         header('Expires: 0');
@@ -974,7 +978,7 @@ class C_master extends Admission_Controler {
 
             // isian
             $setY = $setYAwal + 15;
-            $setX = $setXAwal; 
+            $setX = $setXAwal;
 
             $setY = $setY + ($setJarakY * 3);
             $setXisian = 10;
@@ -1083,7 +1087,7 @@ class C_master extends Admission_Controler {
 
             // isian
             $setY = $setYAwal + 15;
-            $setX = $setXAwal; 
+            $setX = $setXAwal;
 
             $setY = $setY + ($setJarakY * 2);
             $setXisian = 10;
@@ -1164,46 +1168,46 @@ class C_master extends Admission_Controler {
 
     public function page_recycle_va()
     {
-      $content = $this->load->view('page/'.$this->data['department'].'/master/page_recycle_va',$this->data,true);
-      $this->temp($content);
+        $content = $this->load->view('page/'.$this->data['department'].'/master/page_recycle_va',$this->data,true);
+        $this->temp($content);
     }
 
     public function loadDataVA_deleted($page)
     {
-         $this->load->library('pagination');
-         $config = $this->config_pagination_default_ajax(999,18,4);
-        
-         $this->pagination->initialize($config);
-         $page = $this->uri->segment(4);
-         $start = ($page - 1) * $config["per_page"];
-         $this->data['start'] =  $start;
-         $this->data['datadb'] = $this->m_master->recycleDataVa($config["per_page"], $start);
-         $content = $this->load->view('page/'.$this->data['department'].'/master/loadDataVa_pagination',$this->data,true);
+        $this->load->library('pagination');
+        $config = $this->config_pagination_default_ajax(999,18,4);
 
-         $output = array(
-         'pagination_link'  => $this->pagination->create_links(),
-         'register_deleted'   => $content,
-         );
-         echo json_encode($output);
+        $this->pagination->initialize($config);
+        $page = $this->uri->segment(4);
+        $start = ($page - 1) * $config["per_page"];
+        $this->data['start'] =  $start;
+        $this->data['datadb'] = $this->m_master->recycleDataVa($config["per_page"], $start);
+        $content = $this->load->view('page/'.$this->data['department'].'/master/loadDataVa_pagination',$this->data,true);
+
+        $output = array(
+            'pagination_link'  => $this->pagination->create_links(),
+            'register_deleted'   => $content,
+        );
+        echo json_encode($output);
     }
 
     public function submit_recycle_va()
     {
         $input = $this->getInputToken();
         // methode update
-         $updateBNI = $this->m_master->updateBiling($input);
-         for ($i=0; $i < count($updateBNI) ; $i++) { 
-             if ($updateBNI[$i]['msg'] != '000') {
-                 // echo json_encode('Update Failed, Koneksi ke Server BNI Terputus');
-                 echo json_encode($updateBNI[$i]['msg']);
-                 return;
-             }
-         }
-        
-         $updateDB = $this->m_master->updateDB_registerDeleted($updateBNI);
-         echo json_encode('Success');
-         // $updateBNI2 = $this->m_master->updateBiling2($input);
-         // print_r($updateBNI2);
+        $updateBNI = $this->m_master->updateBiling($input);
+        for ($i=0; $i < count($updateBNI) ; $i++) {
+            if ($updateBNI[$i]['msg'] != '000') {
+                // echo json_encode('Update Failed, Koneksi ke Server BNI Terputus');
+                echo json_encode($updateBNI[$i]['msg']);
+                return;
+            }
+        }
+
+        $updateDB = $this->m_master->updateDB_registerDeleted($updateBNI);
+        echo json_encode('Success');
+        // $updateBNI2 = $this->m_master->updateBiling2($input);
+        // print_r($updateBNI2);
 
     }
 
@@ -1213,19 +1217,19 @@ class C_master extends Admission_Controler {
         $data['response'] = 'true'; //mengatur response
         $data['message'] = array(); //membuat array
         $getData = $this->m_master->getCalon_mahasiswa($input['Nama']);
-        for ($i=0; $i < count($getData); $i++) { 
+        for ($i=0; $i < count($getData); $i++) {
             $data['message'][] = array(
-             'label' => $getData[$i]['Name'],
-             'value' => $getData[$i]['Name']
-             );
+                'label' => $getData[$i]['Name'],
+                'value' => $getData[$i]['Name']
+            );
         }
         echo json_encode($data);
     }
 
     public function upload_pengumuman()
     {
-      $content = $this->load->view('page/'.$this->data['department'].'/master/upload_pengumuman',$this->data,true);
-      $this->temp($content);
+        $content = $this->load->view('page/'.$this->data['department'].'/master/upload_pengumuman',$this->data,true);
+        $this->temp($content);
     }
 
     public function jalur_prestasi_akademik()
@@ -1263,10 +1267,10 @@ class C_master extends Admission_Controler {
                 break;
             case 'delete':
                 $this->m_master->delete_id_table($input['CDID'],'register_dsn_jpa');
-                break;        
+                break;
             case 'getactive':
                 $this->m_master->getActive_id_activeAll_table($input['CDID'],$input['Active'],'register_dsn_jpa');
-                break;    
+                break;
             default:
                 # code...
                 break;
@@ -1308,10 +1312,10 @@ class C_master extends Admission_Controler {
                 break;
             case 'delete':
                 $this->m_master->delete_id_table($input['CDID'],'register_dsn_jpau');
-                break;        
+                break;
             case 'getactive':
                 $this->m_master->getActive_id_activeAll_table($input['CDID'],$input['Active'],'register_dsn_jpau');
-                break;    
+                break;
             default:
                 # code...
                 break;
@@ -1353,10 +1357,10 @@ class C_master extends Admission_Controler {
                 break;
             case 'delete':
                 $this->m_master->delete_id_table($input['CDID'],'register_dsn_jpok');
-                break;        
+                break;
             case 'getactive':
                 $this->m_master->getActive_id_activeAll_table($input['CDID'],$input['Active'],'register_dsn_jpok');
-                break;    
+                break;
             default:
                 # code...
                 break;
@@ -1375,10 +1379,21 @@ class C_master extends Admission_Controler {
                 break;
             case 'delete':
                 $this->m_master->delete_id_table($input['CDID'],'school');
-                break;        
+                // count
+                $a = $this->m_master->caribasedprimary('db_admission.register','SchoolID',$input['CDID']);
+                if (count($a) > 0) {
+                    $text = 'Dear Team,<br><br>
+                                    Mohon koreksi data calon mahasiswa karena data master sekolah telah di hapus oleh, <br> Nama : 
+                                    '. $this->session->userdata('Name').
+                        '<br>Divisi : '.$this->session->userdata('PositionMain')['Division'];
+                    $to = $this->m_sendemail->getToEmail('Admisi');
+                    $subject = "Koreksi Data Calon Mahasiswa";
+                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                }
+                break;
             case 'getactive':
                 $this->m_master->getActive_id_activeAll_table($input['CDID'],$input['Active'],'school');
-                break;    
+                break;
             default:
                 # code...
                 break;
