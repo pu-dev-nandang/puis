@@ -58,7 +58,7 @@
                 </div>
                 <br>
                 <div id="pageData">
-                    
+
                 </div>
             </div>
         </div>
@@ -78,18 +78,18 @@
         // console.log('test');
         $("#pageData").empty();
         var table = '<table class="table table-striped table-bordered table-hover table-checkable datatable">'+
-        '<caption>VA Registration Available</caption>'+
-        '<thead>'+
+            '<caption>VA Registration Available</caption>'+
+            '<thead>'+
             '<tr>'+
-                '<th style="width: 106px;">NO</th>'+
-                '<th style="width: 15px;">VA Number</th>'+
-                '<th style="width: 15px;">Status</th>'+
-                '<th style="width: 15px;">Created</th>'+
+            '<th style="width: 106px;">NO</th>'+
+            '<th style="width: 15px;">VA Number</th>'+
+            '<th style="width: 15px;">Status</th>'+
+            '<th style="width: 15px;">Created</th>'+
             '</tr>'+
-        '</thead>'+
-        '<tbody>'+
-        '</tbody>'+
-        '</table>';
+            '</thead>'+
+            '<tbody>'+
+            '</tbody>'+
+            '</table>';
         //$("#loadtableNow").empty();
         $("#pageData").html(table);
 
@@ -100,8 +100,8 @@
     }
 
     $(document).on('click','#generate', function () {
-       var selectJMLVA = $("#selectJMLVA").val();
-       processGenerate(selectJMLVA);
+        var selectJMLVA = $("#selectJMLVA").val();
+        processGenerate(selectJMLVA);
     });
 
     function processGenerate(selectJMLVA)
@@ -114,20 +114,20 @@
         var token = jwt_encode(data,"UAP)(*");
         $.post(url,{token:token},function (data_json) {
             setTimeout(function () {
-             loadTbl_VA(loadVA_available);
-             $('#generate').prop('disabled',false).html('Generate VA');  
+                loadTbl_VA(loadVA_available);
+                $('#generate').prop('disabled',false).html('Generate VA');
             },1000);
         });
     }
 
     function loadJMLVa()
     {
-        for (var i = 10; i <= 100; i= i + 10) {
+        for (var i = 10; i <= 1000; i= i + 10) {
             var selected = (i==10) ? 'selected' : '';
             $('#selectJMLVA').append('<option value="'+ i +'" '+selected+'>'+i+'</option>');
         }
         $('#selectJMLVA').select2({
-          // allowClear: true
+            // allowClear: true
         });
     }
 
@@ -142,12 +142,12 @@
                 var status = '';
                 $(".datatable tbody").append(
                     '<tr>'+
-                        '<td>'+no+'</td>'+
-                        '<td>'+response[i].VA+'</td>'+
-                        '<td>'+response[i].StatusVA+'</td>'+
-                        '<td>'+response[i].CreateAT+'</td>'+
-                    '</tr>' 
-                    );
+                    '<td>'+no+'</td>'+
+                    '<td>'+response[i].VA+'</td>'+
+                    '<td>'+response[i].StatusVA+'</td>'+
+                    '<td>'+response[i].CreateAT+'</td>'+
+                    '</tr>'
+                );
                 no++;
             }
         }).done(function() {

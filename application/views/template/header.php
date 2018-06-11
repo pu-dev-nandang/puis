@@ -3,6 +3,13 @@
     .navbar .nav > li.current > a {
         background: #0f1f4b85;
     }
+
+    .notificationdivisi
+    {
+        height: 500px;
+        overflow-y: auto;
+    }
+
 </style>
 
 <!-- Header -->
@@ -43,22 +50,30 @@
                     <span>Announcement</span>
                 </a>
             </li>
+            <li class="dropdown hidden-xs hidden-sm" id = 'NotificationPersonal'>
+
+            </li>
         </ul>
         <!-- /Top Left Menu -->
 
         <!-- Top Right Menu -->
         <ul class="nav navbar-nav navbar-right">
 
-<!--            <li>-->
-<!--                <a href="javascript:void(0);">-->
-<!--                    Dept : <span style="color:yellow;">--><?php //echo ucwords($departement); ?><!--</span>-->
-<!--                </a>-->
-<!--            </li>-->
+            <!--            <li>-->
+            <!--                <a href="javascript:void(0);">-->
+            <!--                    Dept : <span style="color:yellow;">--><?php //echo ucwords($departement); ?><!--</span>-->
+            <!--                </a>-->
+            <!--            </li>-->
+
+            <!-- Messages -->
+            <li class="dropdown hidden-xs hidden-sm" id = 'NotificationDivisi'>
+
+            </li>
             <li class="dropdown <?php if($this->uri->segment(1)=='database'){echo 'current';} ?>">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                     <i class="fa fa-database"></i>
                     <span>Database</span>
-<!--                    <i class="icon-caret-down small"></i>-->
+                    <!--                    <i class="icon-caret-down small"></i>-->
                 </a>
                 <ul class="dropdown-menu">
                     <li class="<?php if($this->uri->segment(2)=='lecturers'){echo 'active';} ?>"><a href="<?php echo base_url('database/lecturers'); ?>">Lecturers</a></li>
@@ -76,64 +91,12 @@
                 </a>
             </li>
 
-            <!-- Messages -->
-            <li class="dropdown hidden-xs hidden-sm" id = 'Notification'>
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                    <i class="fa fa-envelope"></i>
-                    <span class="badge">1</span>
-                </a>
-                <ul class="dropdown-menu extended notification">
-                    <li class="title">
-                        <p>You have 3 new messages</p>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0);">
-                            <span class="photo"><img src="<?php echo base_url('assets/template/'); ?>img/demo/avatar-1.jpg" alt="" /></span>
-                            <span class="subject">
-                <span class="from">Bob Carter</span>
-                <span class="time">Just Now</span>
-              </span>
-                            <span class="text">
-                Consetetur sadipscing elitr...
-              </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0);">
-                            <span class="photo"><img src="<?php echo base_url('assets/template/'); ?>img/demo/avatar-2.jpg" alt="" /></span>
-                            <span class="subject">
-                <span class="from">Jane Doe</span>
-                <span class="time">45 mins</span>
-              </span>
-                            <span class="text">
-                Sed diam nonumy...
-              </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0);">
-                            <span class="photo"><img src="<?php echo base_url('assets/template/'); ?>img/demo/avatar-3.jpg" alt="" /></span>
-                            <span class="subject">
-                <span class="from">Patrick Nilson</span>
-                <span class="time">6 hours</span>
-              </span>
-                            <span class="text">
-                No sea takimata sanctus...
-              </span>
-                        </a>
-                    </li>
-                    <li class="footer">
-                        <a href="javascript:void(0);">View all messages</a>
-                    </li>
-                </ul>
-            </li>
-
             <!-- User Login Dropdown -->
             <li class="dropdown user">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding-top: 8px;padding-bottom: 5px;">
                     <!--<img alt="" src="assets/img/avatar1_small.jpg" />-->
-<!--                    <i class="fa fa-male"></i>-->
-<!--                    <img src="--><?php //echo base_url('images/avatar.png'); ?><!--" class="img-circle" style="max-width: 35px;border: 3px solid #0f1f4b;"/>-->
+                    <!--                    <i class="fa fa-male"></i>-->
+                    <!--                    <img src="--><?php //echo base_url('images/avatar.png'); ?><!--" class="img-circle" style="max-width: 35px;border: 3px solid #0f1f4b;"/>-->
                     <img data-src="http://siak.podomorouniversity.ac.id/includes/foto/<?php echo $this->session->userdata('Photo'); ?>"
                          class="img-circle img-fitter" width="35" height="35" style="max-width: 35px;border: 3px solid #0f1f4b;"/>
                     <span class="username"><?php echo $name; ?></span>
@@ -143,8 +106,8 @@
                     <li><a href="<?php echo base_url('profile/Nandang-Mulyadi'); ?>">
                             <i class="fa fa-user"></i>
                             My Profile</a></li>
-<!--                    <li><a href="pages_calendar.html"><i class="fa fa-calendar"></i> My Calendar</a></li>-->
-<!--                    <li><a href="#"><i class="fa fa-tasks"></i> My Tasks</a></li>-->
+                    <!--                    <li><a href="pages_calendar.html"><i class="fa fa-calendar"></i> My Calendar</a></li>-->
+                    <!--                    <li><a href="#"><i class="fa fa-tasks"></i> My Tasks</a></li>-->
                     <li class="divider"></li>
                     <li><a href="javascript:void(0)" id="useLogOut"><i class="fa fa-power-off"></i> Log Out</a></li>
                 </ul>
@@ -156,10 +119,10 @@
     <!-- /top navigation bar -->
 
     <?php echo $page_departement; ?>
-<!-- <button id = 'test'>aaa</button> -->
+    <!-- <button id = 'test'>aaa</button> -->
 </header> <!-- /.header -->
 
-
+<img src="">
 <!-- Global Modal -->
 <div class="modal fade" id="GlobalModal" role="dialog">
     <div class="modal-dialog" role="document">
@@ -175,9 +138,9 @@
 <div class="modal fade" id="NotificationModal" role="dialog" style="top: 100px;">
     <div class="modal-dialog" style="width: 400px;" role="document">
         <div class="modal-content animated flipInX">
-<!--            <div class="modal-header"></div>-->
+            <!--            <div class="modal-header"></div>-->
             <div class="modal-body"></div>
-<!--            <div class="modal-footer"></div>-->
+            <!--            <div class="modal-footer"></div>-->
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
@@ -187,7 +150,7 @@
     $(document).ready(function () {
         $('.departement ,.departement1').addClass('hide');
         loadAllowDivision();
-        showHTMLMessages();
+        showHTMLMessagesDivision();
         socket_messages();
     });
 
@@ -196,7 +159,7 @@
             '<h4 class="modal-title">Announcement</h4>');
         $('#GlobalModal .modal-body').html('Announcement');
         $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
-                                                '<button type="button" class="btn btn-primary"><i class="fa fa-paper-plane-o right-margin" aria-hidden="true"></i> Publish</button>');
+            '<button type="button" class="btn btn-primary"><i class="fa fa-paper-plane-o right-margin" aria-hidden="true"></i> Publish</button>');
         $('#GlobalModal').modal({
             'show' : true,
             'backdrop' : 'static'
@@ -270,68 +233,71 @@
 
         socket.on( 'update_notifikasi', function( data ) {
 
-          //$( "#new_count_message" ).html( data.new_count_message );
-          //$('#notif_audio')[0].play();
-          if (data.update_notifikasi == 1) {
-            // action
-            showHTMLMessages();
-          }
+            //$( "#new_count_message" ).html( data.new_count_message );
+            //$('#notif_audio')[0].play();
+            if (data.update_notifikasi == 1) {
+                // action
+                showHTMLMessagesDivision();
+            }
 
         }); // exit socket
     }
 
-    function ReadNotif(IDDivision)
+    function ReadNotifDivision(IDDivision)
     {
-        var url = base_url_js+'admission/readNotification';
+        var url = base_url_js+'readNotificationDivision';
         var data = {IDDivision : IDDivision};
         var token = jwt_encode(data,"UAP)(*");
 
-         $.post(url,{token:token},function (data_json) {
+        $.post(url,{token:token},function (data_json) {
             var response = jQuery.parseJSON(data_json);
             if (response == 1) {
                 // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
                 var socket = io.connect( 'http://'+window.location.hostname+':3000' );
-                  socket.emit('update_notifikasi', { 
+                socket.emit('update_notifikasi', {
                     update_notifikasi: '1'
-                  });
+                });
             }
-         });
+        });
 
     }
 
-    function showHTMLMessages()
+    function showHTMLMessagesDivision()
     {
-        var url = base_url_js+'api/__getNotification';
+        var url = base_url_js+'api/__getNotification_divisi';
         $.post(url,function (data_json) {
-            console.log(data_json);
-            $("#Notification").empty();
+            var dataa = data_json['data'];
+            $("#NotificationDivisi").empty();
             var IDDivision = "<?php echo $this->session->userdata('IDdepartementNavigation') ?>";
-            var htmla = '<a href="#" class="dropdown-toggle" data-toggle="dropdown" onclick = "ReadNotif('+IDDivision+')">'+
-                            '<i class="fa fa-envelope"></i>'+
-                            '<span class="badge">'+data_json['count']+'</span>'+
-                        '</a>';
+            var htmla = '<a href="#" class="dropdown-toggle" data-toggle="dropdown" onclick = "ReadNotifDivision('+IDDivision+')">'+
+                '<i class="fa fa-envelope"></i>'+
+                '<span class="badge">'+data_json['count']+'</span>'+
+                '</a>';
             if (data_json['data'].length > 0) {
-                         htmla += '<ul class="dropdown-menu extended notification" style="max-width: 400px;width: 400px;">'+
-                                '<li class="title">'+
-                                    '<p>You have '+data_json['count']+' new messages</p>'+
-                                '</li>';
-                    for (var i = 0; i < data_json['data'].length; i++) {
-                        htmla += '<li>'+
-                                    '<a href="'+data_json['data'][i]['URL']+'" style="padding: 22px;">'+
-                                        '<span class="photo"><img src="'+base_url_js+'images/xx.jpg" alt="" /></span>'+
-                                        '<span class="subject">'+
-                                            '<span class="from">'+data_json['data'][i]['From']+'</span>'+
-                                        '</span>'+
-                                        '<span class="text">'+data_json['data'][i]['Subject']+'</span>'+
-                                        '<span class="time">'+data_json['data'][i]['Created']+'</span>' +
-                                    '</a>'+
-                                '</li>';
-                    }
-                                
-                          htmla +=  '<li class="footer"><a href="#">View all messages</a></li><ul>';
-                $("#Notification").append(htmla);
+                htmla += '<ul class="dropdown-menu extended notificationdivisi" style="max-width: 400px;width: 400px;">'+
+                    '<li class="title">'+
+                    '<p>You have '+data_json['count']+' new messages to Division</p>'+
+                    '</li>';
+                for (var i = 0; i < data_json['data'].length; i++) {
+                    var token = dataa[i]['Token'];
+                    token = jwt_decode(token,"UAP)(*");
+
+                    htmla += '<li>'+
+                        '<a href="'+'<?php echo url_pas ?>'+token['URL']+'" style="padding: 22px;">'+
+                        '<span class="photo"><img src="'+base_url_js+'images/xx.jpg" alt="" /></span>'+
+                        '<span class="subject">'+
+                        '<span class="from">'+token['From']+'</span>'+
+                        '</span>'+
+                        '<span class="text">'+token['subject']+'</span>'+
+                        '<span class="time">'+data_json['data'][i]['Created']+'</span>' +
+                        '</a>'+
+                        '</li>';
+                }
+
+                htmla +=  '<li class="footer"><a href="#">View all messages</a></li><ul>';
+                $("#NotificationDivisi").append(htmla);
             }// exit if
-            
+
         })
     }
 </script>

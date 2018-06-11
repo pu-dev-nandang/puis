@@ -976,6 +976,7 @@ class C_api extends CI_Controller {
         }
     }
 
+
     public function getAllStudents(){
 
         $data = $this->m_api->__getTahunAngkatan();
@@ -1009,7 +1010,7 @@ class C_api extends CI_Controller {
             $data_arr['SemesterID'],
             $data_arr['ProdiCode'],
             $data_arr['IsSemesterAntara']
-            );
+        );
 
         $result = array(
             'Group' => $data_arr['ProdiCode'].'-'.(count($data)+1)
@@ -1160,6 +1161,22 @@ class C_api extends CI_Controller {
         }
     }
 
+//    public function crudStdSemester(){
+//        $token = $this->input->post('token');
+//        $key = "UAP)(*";
+//        $data_arr = (array) $this->jwt->decode($token,$key);
+//
+//        if(count($data_arr)>0) {
+//            if($data_arr['action']=='read'){
+//                $this->db->order_by('ID', 'ASC');
+//                $data = $this->db->get('db_academic.semester')
+//                    ->result_array();
+//
+//                return print_r(json_encode($data));
+//            }
+//        }
+//    }
+
     public function crudTimePerCredit(){
         $token = $this->input->post('token');
         $key = "UAP)(*";
@@ -1223,12 +1240,13 @@ class C_api extends CI_Controller {
                 $data = $this->m_api->__getLecturerDetail($NIP);
                 return print_r(json_encode($data));
             }
+
             else if($data_arr['action']=='readMini'){
                 $NIP = $data_arr['NIP'];
                 $data = $this->db->select('NIP,NIDN,Name,TitleAhead,TitleBehind,PositionMain,Phone,
                                         HP,Email,EmailPU,Password,Address,Photo,Photo_new')
-                            ->get_where('db_employees.employees',array('NIP'=>$NIP),1)
-                            ->result_array();
+                    ->get_where('db_employees.employees',array('NIP'=>$NIP),1)
+                    ->result_array();
 
                 if(count($data>0)){
                     $sp = explode('.',$data[0]['PositionMain']);
@@ -1245,6 +1263,7 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($data[0]));
 
             }
+
         }
 
     }
@@ -1269,7 +1288,7 @@ class C_api extends CI_Controller {
         echo json_encode($generate);
     }
 
-     public function getSMAWilayah()
+    public function getSMAWilayah()
     {
         $token = $this->input->post('token');
         $key = "UAP)(*";
@@ -1419,7 +1438,7 @@ class C_api extends CI_Controller {
         {
             echo json_encode('No Result Data');
         }
-        
+
     }
 
     public function getFormulirOfflineAvailable()
@@ -1434,11 +1453,11 @@ class C_api extends CI_Controller {
         $data['response'] = 'true'; //mengatur response
         $data['message'] = array(); //membuat array
         $getData = $this->m_api->getSchoolbyNameAC($input['School']);
-        for ($i=0; $i < count($getData); $i++) { 
+        for ($i=0; $i < count($getData); $i++) {
             $data['message'][] = array(
-             'label' => $getData[$i]['SchoolName'],
-             'value' => $getData[$i]['ID']
-             );
+                'label' => $getData[$i]['SchoolName'],
+                'value' => $getData[$i]['ID']
+            );
         }
         echo json_encode($data);
     }
@@ -1562,6 +1581,37 @@ class C_api extends CI_Controller {
         echo json_encode(array('count' => $generateCount, 'data'=>$generate));
     }
 
+    public function getBasePaymentTypeSelectOption()
+    {
+        $generate = $this->m_master->showData_array('db_finance.payment_type');
+        echo json_encode($generate);
+    }
+
+    public function getNotification_divisi()
+    {
+        $generateCount = $this->m_master->CountgetNotificationDivisi();
+        $generate = $this->m_master->getNotificationDivisi();
+        //print_r($generate);
+        // $generate = json_encode($generate);
+
+        $output = array(
+
+            'count'  => $generateCount,
+
+            'data'   => $generate,
+
+        );
+
+        echo json_encode($output);
+
+    }
+
+    public function getSMAWilayahApproval()
+    {
+        $generate = $this->m_master->getSMAWilayahApproval();
+        echo json_encode($generate);
+    }
+
     public function crudScore(){
         $data_arr = $this->getInputToken();
 
@@ -1630,6 +1680,13 @@ class C_api extends CI_Controller {
                 return print_r(1);
             }
         }
+    }
+
+    public function getBaseDiscountSelectOption()
+    {
+        $generate = $this->m_master->showData_array('db_finance.discount');
+        echo json_encode($generate);
+
     }
 
 }

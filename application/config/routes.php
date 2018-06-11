@@ -119,6 +119,7 @@ $route['admission/master/modalform_sekolah/save'] = 'page/admission/c_master/sub
 
 
 $route['admission/config/sdaerah/master-sma'] = 'page/admission/c_master/sma';
+$route['admission/config/sdaerah/master-sma/(:any)'] = 'page/admission/c_master/sma/$1';
 $route['admission/config/sdaerah/integration'] = 'page/admission/c_master/sma_integration';
 
 $route['admission/master-sma/table'] = 'page/admission/c_master/sma_table';
@@ -233,7 +234,7 @@ $route['admission/master-config/menu-previleges/previleges_user/delete'] = 'page
 
 
 $route['admission/dashboard'] = 'page/admission/c_admission/dashboard';
-$route['admission/readNotification'] = 'dashboard/c_dashboard/readNotification';
+$route['readNotificationDivision'] = 'dashboard/c_dashboard/readNotificationDivision';
 
 
 // proses
@@ -285,7 +286,7 @@ $route['admission/distribusi-formulir/formulir-offline/selectPIC'] = 'page/admis
 
 
 // ---Finance----
-$route['finance/tuition-fee'] =  'page/finance/c_tuition_fee/tuition_fee';
+$route['finance/master/tagihan-mhs'] =  'page/finance/c_tuition_fee/tuition_fee';
 
 $route['finance/penerimaan-pembayaran/formulir-registration/online'] =  'page/finance/c_finance/formulir_registration_online_page';
 $route['finance/confirmed-verifikasi-pembayaran-registration_online'] =  'page/finance/c_finance/confirmed_verfikasi_pembayaran_registration_online';
@@ -297,6 +298,9 @@ $route['finance/approved/tuition-fee'] =  'page/finance/c_finance/tuition_fee';
 $route['finance/approved/tuition-fee/approve/(:num)'] =  'page/finance/c_finance/tuition_fee_approve/$1';
 $route['finance/approved/tuition-fee/approve_save'] =  'page/finance/c_finance/approve_save';
 $route['finance/approved/tuition-fee/approved/(:num)'] =  'page/finance/c_finance/tuition_fee_approved/$1';
+$route['finance/set-tagihan-mhs/tagihan-mhs'] =  'page/finance/c_finance/page_set_tagihan_mhs';
+$route['finance/get_tagihan_mhs/(:num)'] =  'page/finance/c_finance/get_tagihan_mhs/$1';
+
 
 
 
@@ -392,21 +396,23 @@ $route['api/__getEmployees/(:any)/(:any)'] = 'api/c_api/getEmployeesBy/$1/$2';
 
 $route['api/__crudJadwalUjian'] = 'api/c_api/crudJadwalUjian';
 $route['api/__crudEmployees'] = 'api/c_api/crudEmployees';
-
 $route['api/__crudScore'] = 'api/c_api/crudScore';
-
 
 $route['rest/__checkDateKRS'] = 'api/c_rest/checkDateKRS';
 $route['rest/__getDetailKRS'] = 'api/c_rest/getDetailKRS';
 
-$route['rest/__getKSM'] = 'api/c_rest/getKSM';
-
 $route['rest/__geTimetable'] = 'api/c_rest/geTimetable';
-
+$route['rest/__getKSM'] = 'api/c_rest/getKSM';
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
 $route['api/__getRegionByProv'] = 'api/c_api/getRegionByProv';
 $route['api/__getDistrictByRegion'] = 'api/c_api/getDistrictByRegion';
 $route['api/__getTypeSekolah'] = 'api/c_api/getTypeSekolah';
 $route['api/__getNotification'] = 'api/c_api/getNotification';
+$route['api/__getBasePaymentTypeSelectOption'] = 'api/c_api/getBasePaymentTypeSelectOption';
+$route['api/__getBaseDiscountSelectOption'] = 'api/c_api/getBaseDiscountSelectOption';
 
-
+$route['api/__getSMAWilayahApproval'] = 'api/c_api/getSMAWilayahApproval';
+$route['api/__getNotification_divisi'] = 'api/c_api/getNotification_divisi';
+// for inject //
+$route['testadi'] = 'dashboard/c_dashboard/testadi';
+// for inject //
