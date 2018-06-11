@@ -161,13 +161,16 @@
             var Invoice = $("#cost_"+NPM).val();
             var Discount = $("#discount_"+NPM).val();
 
-            var arr = {
-                    Nama : $(this).attr('Nama'),
-                    Prodi : $(this).attr('Prodi'),
-                    Invoice : Invoice,
-                    Discount : Discount
-            };
-            allVals.push(arr);
+            if (Discount != null){
+                var arr = {
+                        Nama : $(this).attr('Nama'),
+                        Prodi : $(this).attr('Prodi'),
+                        Invoice : Invoice,
+                        Discount : Discount
+                };
+                allVals.push(arr);
+            }
+            
          });
          return allVals;
     }
@@ -176,6 +179,7 @@
         var arrValueCHK = getChecboxNPM();
         console.log(arrValueCHK);
         if (arrValueCHK.length > 0) {
+          
             var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
                 '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>';
 
