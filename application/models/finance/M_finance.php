@@ -710,4 +710,45 @@ class M_finance extends CI_Model {
            $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,$path);
    }
 
+   public function get_tagihan_mhs($ta,$prodi,$PTID,$limit, $start)
+   {
+    $arr = array();
+    $this->load->model('master/m_master');
+    $ta1 = explode('.', $ta);
+    $ta = $ta1[1];
+    $db = 'ta_'.$ta.'.students';
+    $field = 'StatusStudentID';
+    $value = 3;
+    if ($prodi == '') {
+     $sql = 'select a.*,b.EmailPU,c.Cost from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
+             on a.ProdiID = c.ProdiID
+             where a.StatusStudentID = ?  and a.NPM not in (select NPM from db_finance.payment) and c.ClassOf = ? and c.PTID = ? 
+             LIMIT '.$start. ', '.$limit;
+
+     $Data_mhs=$this->db->query($sql, array($value,$ta,$PTID))->result_array();
+    }
+    else
+    {
+      $sql = 'select a.*,b.EmailPU,c.Cost from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
+              on a.ProdiID = c.ProdiID
+              where a.StatusStudentID = ? and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment) and c.ClassOf = ? and c.PTID = ? 
+              LIMIT '.$start. ', '.$limit;
+      $Data_mhs=$this->db->query($sql, array($value,$prodi,$ta,$PTID))->result_array();
+    }
+
+    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+    // $SemesterID = $SemesterID[0]['ID'];
+    $Discount = $this->m_master->showData_array('db_finance.discount');
+    for ($i=0; $i < count($Data_mhs); $i++) { 
+      $array = array('SemesterID' => $SemesterID[0]['ID'], 'SemesterName' => $SemesterID[0]['Name']);
+      $Data_mhs[$i] = $Data_mhs[$i] + $array;
+      $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$Data_mhs[$i]['ProdiID']);
+      $array = array('ProdiEng' => $ProdiEng[0]['NameEng']);
+      $Data_mhs[$i] = $Data_mhs[$i] + $array;
+    }
+    $arr['Data_mhs'] = $Data_mhs;
+    $arr['Discount'] = $Discount;
+    return $arr;
+   }
+
 }

@@ -4,6 +4,40 @@
         <!--=== Navigation ===-->
 
         <ul id="nav">
+            <li class="<?php if($this->uri->segment(2)=='master'){echo "current open";} ?>">
+                <a href="javascript:void(0);">
+                    <i class="fa fa-globe"></i>
+                    Master
+                </a>
+                <ul class="sub-menu">
+                    <li class="<?php if($this->uri->segment(2)=='master' && $this->uri->segment(3) == "tagihan-mhs" ){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/master/tagihan-mhs'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Tagihan Mahasiswa
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="<?php if($this->uri->segment(2)=='approved'){echo "current open";} ?>">
+                <a href="javascript:void(0);">
+                    <i class="fa fa-address-book-o"></i>
+                    Approved
+                </a>
+                <ul class="sub-menu">
+                    <li class="<?php if($this->uri->segment(2)=='approved' && $this->uri->segment(3) == "nilai-rapor" ){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/approved/nilai-rapor'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Nilai Rapor
+                        </a>
+                    </li>
+                    <li class="<?php if($this->uri->segment(2)=='approved' && $this->uri->segment(3) == "tuition-fee" ){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/approved/tuition-fee'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Tuition Fee
+                        </a>
+                    </li>
+                </ul>
+            </li>
             <li class="<?php if($this->uri->segment(2)=='penerimaan-pembayaran'){echo "current open";} ?>">
                 <a href="javascript:void(0);">
                     <i class="fa fa-download"></i>
@@ -38,31 +72,19 @@
                     </li>
                 </ul>
             </li>
-            <li class="<?php if($this->uri->segment(2)=='approved'){echo "current open";} ?>">
+            <li class="<?php if($this->uri->segment(2)=='set-tagihan-mhs'){echo "current open";} ?>">
                 <a href="javascript:void(0);">
-                    <i class="fa fa-address-book-o"></i>
-                    Approved
+                    <i class="fa fa-money"></i>
+                    Set Tagihan Mahasiswa
                 </a>
                 <ul class="sub-menu">
-                    <li class="<?php if($this->uri->segment(2)=='approved' && $this->uri->segment(3) == "nilai-rapor" ){echo "current";} ?>">
-                        <a href="<?php echo base_url('finance/approved/nilai-rapor'); ?>">
+                    <li class="<?php if($this->uri->segment(2)=='set-tagihan-mhs' && $this->uri->segment(3) == "tagihan-mhs" ){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/set-tagihan-mhs/tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
-                        Nilai Rapor
-                        </a>
-                    </li>
-                    <li class="<?php if($this->uri->segment(2)=='approved' && $this->uri->segment(3) == "tuition-fee" ){echo "current";} ?>">
-                        <a href="<?php echo base_url('finance/approved/tuition-fee'); ?>">
-                        <i class="icon-angle-right"></i>
-                        Tuition Fee
+                        Tagihan Mahasiswa
                         </a>
                     </li>
                 </ul>
-            </li>
-            <li class="">
-                <a href="<?php echo base_url('finance/tuition-fee'); ?>">
-                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-                    Tagihan Mahasiswa
-                </a>
             </li>
             <li class="">
                 <a href="#">
