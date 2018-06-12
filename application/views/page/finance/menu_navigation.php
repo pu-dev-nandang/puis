@@ -72,16 +72,16 @@
                     </li>
                 </ul>
             </li>
-            <li class="<?php if($this->uri->segment(2)=='set-tagihan-mhs'){echo "current open";} ?>">
+            <li class="<?php if($this->uri->segment(2)=='tagihan-mhs'){echo "current open";} ?>">
                 <a href="javascript:void(0);">
                     <i class="fa fa-money"></i>
-                    Set Tagihan Mahasiswa
+                    Tagihan Mahasiswa
                 </a>
                 <ul class="sub-menu">
-                    <li class="<?php if($this->uri->segment(2)=='set-tagihan-mhs' && $this->uri->segment(3) == "tagihan-mhs" ){echo "current";} ?>">
-                        <a href="<?php echo base_url('finance/set-tagihan-mhs/tagihan-mhs'); ?>">
+                    <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "tagihan-mhs" ){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/tagihan-mhs/set-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
-                        Tagihan Mahasiswa
+                        Set Tagihan Mahasiswa
                         </a>
                     </li>
                 </ul>

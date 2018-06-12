@@ -1608,4 +1608,11 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $query=$this->db->query($sql, array())->result_array();
         return $query;
     }
+
+    public function getDataMhsBYNPM($NPM,$dbMHS)
+    {
+        $sql = 'select * from ta_'.$dbMHS.'.students as a left join db_academic.auth_students as b on a.NPM = b.NPM  where a.NPM = "'.$NPM.'"';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
+    }
 }

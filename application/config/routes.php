@@ -298,9 +298,9 @@ $route['finance/approved/tuition-fee'] =  'page/finance/c_finance/tuition_fee';
 $route['finance/approved/tuition-fee/approve/(:num)'] =  'page/finance/c_finance/tuition_fee_approve/$1';
 $route['finance/approved/tuition-fee/approve_save'] =  'page/finance/c_finance/approve_save';
 $route['finance/approved/tuition-fee/approved/(:num)'] =  'page/finance/c_finance/tuition_fee_approved/$1';
-$route['finance/set-tagihan-mhs/tagihan-mhs'] =  'page/finance/c_finance/page_set_tagihan_mhs';
+$route['finance/tagihan-mhs/set-tagihan-mhs'] =  'page/finance/c_finance/page_set_tagihan_mhs';
 $route['finance/get_tagihan_mhs/(:num)'] =  'page/finance/c_finance/get_tagihan_mhs/$1';
-
+$route['finance/submit_tagihan_mhs'] =  'page/finance/c_finance/submit_tagihan_mhs';
 
 
 

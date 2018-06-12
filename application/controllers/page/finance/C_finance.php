@@ -204,4 +204,61 @@ class C_finance extends Finnance_Controler {
         echo json_encode($output);
     }
 
+    public function submit_tagihan_mhs()
+    {
+        $msg = '';
+        $Input = $this->getInputToken();
+        $Input = $Input['arrValueCHK'];
+        /*print_r($Input[0]->PTID);
+        die();*/
+        $countSuccess = 0;
+        $countSuccessVA = 1;
+        // create va
+            $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+            for ($i=0; $i < count($Input); $i++) { 
+                // get Deadline
+                $fieldEND = 'bayarBPPEnd';
+                switch ($Input[$i]->PTID) {
+                    case '1':
+                        $fieldEND = '';
+                        break;
+                    case '2':
+                        $fieldEND = 'bayarBPPEnd';
+                        break;
+                    case '3':
+                        $fieldEND = 'bayarEnd';
+                        break;    
+                    default:
+                        $fieldEND = '';
+                        break;
+                }
+
+                if ($fieldEND != '')
+                {
+                    $getDeadlineTagihanDB = $this->m_finance->getDeadlineTagihanDB($fieldEND,$SemesterID[0]['ID']);
+                    $getDataMhsBYNPM = $this->m_master->getDataMhsBYNPM($Input[$i]->NPM,$Input[$i]->ta);
+                    $payment = str_replace("Rp.","", $Input[$i]->Invoice);
+                    $payment = trim(str_replace(",-","", $payment));
+                    $DeadLinePayment = $getDeadlineTagihanDB.' 23:59:00';
+                    $Name = $getDataMhsBYNPM[0]['Name'];
+                    $Email = $getDataMhsBYNPM[0]['EmailPU'];
+                    $VA_number = $this->m_finance->getVANumberMHS($Input[$i]->NPM);
+                    $create_va = $this->m_finance->create_va_Payment($payment,$DeadLinePayment, $Name, $Email,$VA_number,$description = $fieldEND,$tableRoutes = 'db_finance.payment');
+                    if ($create_va['status']) {
+                        // After create va insert data to db_finance.payment  and db_finance.payment_students
+                        $countSuccessVA++;
+                        $aa = $this->m_finance->insertaDataPayment($Input[$i]->PTID,$Input[$i]->semester,$Input[$i]->NPM,$Input[$i]->Invoice,$Input[$i]->Discount);
+                        $ab = $this->m_finance->insertaDataPaymentStudents($aa,$Input[$i]->Invoice,$create_va['msg']['trx_id'],$create_va['msg']['datetime_expired']);
+                    }
+                    else
+                    {
+                        $msg .= 'Tidak bisa Create VA dengan Nama : '.$Name.' dan NPM : '.$Input[$i]->NPM.'<br>';
+                    }
+                }
+                
+            }
+            echo json_encode($msg);
+
+    }
+
 }
