@@ -1715,7 +1715,7 @@ class M_api extends CI_Model {
                                             LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
                                             LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
                                             WHERE attd.SemesterID = "'.$SemesterID.'" AND attd.ScheduleID = "'.$ScheduleID.'"
-                                            AND attd.ScheduleID ORDER BY sd.ID ASC')->result_array();
+                                            AND attd.ScheduleID ORDER BY sd.DayID, sd.StartSessions ASC')->result_array();
 
         if(count($data)>0){
             for($i=0;$i<count($data);$i++){
