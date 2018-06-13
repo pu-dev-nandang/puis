@@ -249,7 +249,7 @@ class M_finance extends CI_Model {
     return $query;
    }
 
-   public function create_va_Payment($payment = null,$DeadLinePayment = null, $Name = null, $Email = null,$VA_number = null)
+   public function create_va_Payment($payment = null,$DeadLinePayment = null, $Name = null, $Email = null,$VA_number = null,$description = 'Pembayaran Uang Kuliah',$tableRoutes = 'db_finance.payment_pre')
    {
        $arr = array();
        $arr['status'] = false;
@@ -257,11 +257,17 @@ class M_finance extends CI_Model {
        if ($payment != null) {
            include_once APPPATH.'third_party/bni/BniEnc.php';
            // FROM BNI
-           $client_id = '00202';
-           $secret_key = '8ef738df0433c674e6663f3f7f5e6b68';
-           $url = 'https://apibeta.bni-ecollection.com/';
+           $this->load->model('master/m_master');
+           $aa = $this->m_master->showData_array('db_va.cfg_bank');
+            $client_id = '00202';
+           // $client_id = $aa[0]['client_id'];
+            $secret_key = '8ef738df0433c674e6663f3f7f5e6b68';
+           // $secret_key = $aa[0]['secret_key'];
+            $url = 'https://apibeta.bni-ecollection.com/';
+           // $url = $aa[0]['url'];
            $getVANumber = $VA_number;
            $datetime_expired = $DeadLinePayment;
+           $payment = str_replace('.', '', $payment);
 
            if ($getVANumber != null) {
                $data_asli = array(
@@ -274,7 +280,7 @@ class M_finance extends CI_Model {
                    'customer_name' => $Name,
                    'customer_email' => $Email,
                    'customer_phone' => '+622129200456',
-                   'description' => 'Pembayaran Uang Kuliah',
+                   'description' => $description,
                    'type' => 'createbilling',
                );
 
@@ -298,7 +304,7 @@ class M_finance extends CI_Model {
                }
                else {
                    $data_response = BniEnc::decrypt($response_json['data'], $client_id, $secret_key);
-                   $this->insert_va_log($data_asli,'db_finance.payment_pre');
+                   $this->insert_va_log($data_asli,$tableRoutes);
                    $arr['status'] = true;
                    $arr['msg'] = $data_asli;
                }
@@ -712,6 +718,7 @@ class M_finance extends CI_Model {
 
    public function get_tagihan_mhs($ta,$prodi,$PTID,$limit, $start)
    {
+    error_reporting(0);
     $arr = array();
     $this->load->model('master/m_master');
     $ta1 = explode('.', $ta);
@@ -719,24 +726,24 @@ class M_finance extends CI_Model {
     $db = 'ta_'.$ta.'.students';
     $field = 'StatusStudentID';
     $value = 3;
+    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
     if ($prodi == '') {
      $sql = 'select a.*,b.EmailPU,c.Cost from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
              on a.ProdiID = c.ProdiID
-             where a.StatusStudentID = ?  and a.NPM not in (select NPM from db_finance.payment) and c.ClassOf = ? and c.PTID = ? 
+             where a.StatusStudentID = ?  and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? 
              LIMIT '.$start. ', '.$limit;
 
-     $Data_mhs=$this->db->query($sql, array($value,$ta,$PTID))->result_array();
+     $Data_mhs=$this->db->query($sql, array($value,$PTID,$SemesterID[0]['ID'],$ta,$PTID))->result_array();
     }
     else
     {
       $sql = 'select a.*,b.EmailPU,c.Cost from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
               on a.ProdiID = c.ProdiID
-              where a.StatusStudentID = ? and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment) and c.ClassOf = ? and c.PTID = ? 
+              where a.StatusStudentID = ? and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? 
               LIMIT '.$start. ', '.$limit;
-      $Data_mhs=$this->db->query($sql, array($value,$prodi,$ta,$PTID))->result_array();
+      $Data_mhs=$this->db->query($sql, array($value,$prodi,$PTID,$SemesterID[0]['ID'],$ta,$PTID))->result_array();
     }
 
-    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
     // $SemesterID = $SemesterID[0]['ID'];
     $Discount = $this->m_master->showData_array('db_finance.discount');
     for ($i=0; $i < count($Data_mhs); $i++) { 
@@ -749,6 +756,46 @@ class M_finance extends CI_Model {
     $arr['Data_mhs'] = $Data_mhs;
     $arr['Discount'] = $Discount;
     return $arr;
+   }
+
+   public function getDeadlineTagihanDB($field,$SemesterID)
+   {
+    $sql = 'select '.$field.' from db_academic.academic_years where SemesterID = ?';
+    $query=$this->db->query($sql, array($SemesterID))->result_array();
+    return $query[0][$field];
+   }
+
+   public function getVANumberMHS($NPM)
+   {
+    $this->load->model('master/m_master');
+    $a = $this->m_master->showData_array('db_va.master_va');
+    $Const_VA = $a[0]['Const_VA'].$NPM;
+    return $Const_VA;
+   }
+
+   public function insertaDataPayment($PTID,$SemesterID,$NPM,$Invoice,$Discount)
+   {
+    $dataSave = array(
+        'PTID' => $PTID,
+        'SemesterID' => $SemesterID,
+        'NPM' => $NPM,
+        'Invoice' => $Invoice,
+        'Discount' => $Discount,
+    );
+      $this->db->insert('db_finance.payment', $dataSave);
+      $insertId = $this->db->insert_id();
+      return  $insertId;
+   }
+
+   public function insertaDataPaymentStudents($ID_payment,$Invoice,$BilingID,$Deadline)
+   {
+    $dataSave = array(
+        'ID_payment' => $ID_payment,
+        'Invoice' => $Invoice,
+        'BilingID' => $BilingID,
+        'Deadline' => $Deadline,
+    );
+      $this->db->insert('db_finance.payment_students', $dataSave);
    }
 
 }

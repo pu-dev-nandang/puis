@@ -135,7 +135,10 @@
 
     $(document).on("click", ".pagination li a", function(event){
       event.preventDefault();
-      var page = $(this).data("ci-pagination-page");
+      var page = $(this).attr("data-ci-pagination-page");
+      if (page == null){
+          page = 1;
+      }
       loadDataS(page);
       // loadData_register_document(page);
     });
