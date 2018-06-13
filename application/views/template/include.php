@@ -32,6 +32,7 @@
 <![endif]-->
 <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
 
+<link rel="stylesheet" href="<?php echo base_url('assets/datepicter/css/bootstrap-datetimepicker.min.css'); ?>">
 
 <style media="screen">
 
@@ -219,6 +220,7 @@
 <script type="text/javascript" src="<?php echo base_url('assets/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js');?>"></script>
 
 <script type="text/javascript" src="<?php echo base_url('assets/inputmask/jquery.inputmask.bundle.min.js');?>"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/datepicter/js/bootstrap-datetimepicker.min.js');?>"></script>
 
 <script type="text/javascript" src="<?php echo base_url('assets/plugins/bootstrap-toggle/js/bootstrap-toggle.min.js');?>"></script>
     

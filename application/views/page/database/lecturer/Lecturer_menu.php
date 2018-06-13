@@ -49,6 +49,7 @@
                 <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="Position" data-toggle="tab">Position</a></li>
             </ul>
             <div class="tab-content">
+
                 <button onclick="ref()">Refresh Attd</button>
                 <!--=== Overview ===-->
                 <hr/>
@@ -73,6 +74,10 @@
 
 
         window.Lecturer_NIP = 0;
+
+        $('input[id$="endTime"]').datetimepicker({
+            format: 'HH:mm'
+        });
 
     });
 
@@ -425,25 +430,72 @@
 
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<h4 class="modal-title">Attendance '+No+'</h4>');
-        $('#GlobalModal .modal-body').html('<input type="text" id="endTime">');
 
+        var body_attd = '<div class="row">' +
+            '                        <div class="col-xs-4">' +
+            '                            <div class="form-group">' +
+            '                                <label>In</label>' +
+            '                                <div id="inputIn" class="input-group">' +
+            '                                    <input data-format="hh:mm:ss" type="text" class="form-control"/>' +
+            '                                    <span class="add-on input-group-addon">' +
+            '                                        <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>' +
+            '                                    </span>' +
+            '                                </div>' +
+            '                            </div>' +
+            '                            <div class="form-group">' +
+            '                                <label>Out</label>' +
+            '                                <div id="inputOut" class="input-group">' +
+            '                                    <input data-format="hh:mm:ss" type="text" class="form-control"/>' +
+            '                                    <span class="add-on input-group-addon">' +
+            '                                      <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>' +
+            '                                    </span>' +
+            '                                </div>' +
+            '                            </div>' +
+            '                        </div>' +
+            '                        <div class="col-xs-8">' +
+            '                            <div class="form-group">' +
+            '                                <label>BAP</label>' +
+            '                                <textarea class="form-control" rows="5"></textarea>' +
+            '                            </div>' +
+            '                        </div>' +
+            '                    </div>'
 
-        $('input[id$="endTime"]').inputmask(
-            "hh:mm:ss", {
-                placeholder: "HH:MM:SS",
-                insertMode: false,
-                showMaskOnHover: false,
-                hourFormat: 12
-            }
-        );
+        $('#GlobalModal .modal-body').html(body_attd);
 
-        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+        $('#inputIn').datetimepicker({
+            pickDate: false
+        });
+
+        $('#inputOut').datetimepicker({
+            pickDate: false
+        });
+
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> ' +
+            '<button class="btn btn-success">Save</button>');
         $('#GlobalModal').modal({
             'show' : true,
             'backdrop' : 'static'
         });
 
 
+    });
+
+    $(document).on('click','.inputReplacementSchedule',function () {
+        var ID = $(this).attr('data-id');
+        var No = $(this).attr('data-no');
+
+        var body_attd = 'ok';
+
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Attendance '+No+'</h4>');
+
+        $('#GlobalModal .modal-body').html(body_attd);
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> ' +
+            '<button class="btn btn-success">Save</button>');
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
     });
 </script>
 
