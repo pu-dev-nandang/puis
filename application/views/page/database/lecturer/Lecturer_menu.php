@@ -49,6 +49,7 @@
                 <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="Position" data-toggle="tab">Position</a></li>
             </ul>
             <div class="tab-content">
+                <button onclick="ref()">Refresh Attd</button>
                 <!--=== Overview ===-->
                 <hr/>
                 <div id="divPage"></div>
@@ -95,8 +96,8 @@
             ScheduleID : ScheduleID
         };
         var token = jwt_encode(data,'UAP)(*');
-
         loadPage(token);
+
     });
 
 
@@ -400,6 +401,49 @@
         $.post(url,{token:token},function (result) {
             toastr.success('Grade Approved','Saved');
         });
+    });
+</script>
+
+<script>
+    function ref() {
+        var data = {
+            NIP : NIP,
+            page : 'InputAttendance',
+            ScheduleID : 1
+        };
+        var token = jwt_encode(data,'UAP)(*');
+
+        loadPage(token);
+    }
+</script>
+
+<!-- Attendance -->
+<script>
+    $(document).on('click','.inputLecturerAttd',function () {
+        var ID = $(this).attr('data-id');
+        var No = $(this).attr('data-no');
+
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Attendance '+No+'</h4>');
+        $('#GlobalModal .modal-body').html('<input type="text" id="endTime">');
+
+
+        $('input[id$="endTime"]').inputmask(
+            "hh:mm:ss", {
+                placeholder: "HH:MM:SS",
+                insertMode: false,
+                showMaskOnHover: false,
+                hourFormat: 12
+            }
+        );
+
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+
     });
 </script>
 

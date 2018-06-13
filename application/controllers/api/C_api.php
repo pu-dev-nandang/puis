@@ -1689,4 +1689,22 @@ class C_api extends CI_Controller {
 
     }
 
+    public function crudAttendance(){
+        $data_arr = $this->getInputToken();
+
+        if(count($data_arr)>0){
+            if($data_arr['action']=='read'){
+                $data = $this->m_api->__getAttendance($data_arr['ScheduleID']);
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='getAttendance'){
+                $data = $this->db->get_where('db_academic.attendance',
+                                    array('ID'=>$data_arr['AttendanceID']),1)
+                                ->result_array();
+
+                return print_r(json_encode($data));
+            }
+        }
+    }
+
 }

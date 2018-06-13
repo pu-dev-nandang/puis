@@ -397,6 +397,7 @@ $route['api/__getEmployees/(:any)/(:any)'] = 'api/c_api/getEmployeesBy/$1/$2';
 $route['api/__crudJadwalUjian'] = 'api/c_api/crudJadwalUjian';
 $route['api/__crudEmployees'] = 'api/c_api/crudEmployees';
 $route['api/__crudScore'] = 'api/c_api/crudScore';
+$route['api/__crudAttendance'] = 'api/c_api/crudAttendance';
 
 $route['rest/__checkDateKRS'] = 'api/c_rest/checkDateKRS';
 $route['rest/__getDetailKRS'] = 'api/c_rest/getDetailKRS';
