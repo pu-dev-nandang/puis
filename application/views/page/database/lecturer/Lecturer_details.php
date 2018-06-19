@@ -1,14 +1,7 @@
 
 
 
-
 <div class="tab-pane active" id="tab_mata_kuliah">
-
-<!--    <div style="text-align: center;">-->
-<!--        <div id="dataImg"></div>-->
-<!--        <h3 id="dataName"></h3>-->
-<!--        <hr/>-->
-<!--    </div>-->
 
     <table class="table table-bordered table-striped">
         <tr>
@@ -116,6 +109,7 @@
             $('#dataProvince').html(resultJson.ProvinceID);
             // $('#dataDistricts').html(resultJson.ProvinceID);
             // $('#dataNationality').html(resultJson.ProvinceID);
+
         });
     }
 </script>
