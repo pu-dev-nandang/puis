@@ -69,22 +69,23 @@
             };
             var token = jwt_encode(data,'UAP)(*');
             $.post(url,{token:token},function (jsonResult) {
-                console.log(jsonResult);
+
                 var htmlTable = '<table class="table table-bordered table-striped" id="dataTableSchedule">' +
                     '        <thead>' +
                     '        <tr style="background-color: #436888;color: #ffffff;">' +
                     '            <th rowspan="2"  style="width: 5%;">Attd</th>' +
                     '            <th rowspan="2"  style="width: 5%;"><i class="fa fa-repeat"></i></th>' +
-                    '            <th colspan="2">Lecturer</th>' +
+                    '            <th colspan="3">Lecturer</th>' +
                     '            <th colspan="2">Students</th>' +
                     '            <th rowspan="2" style="width: 10%;">Action</th>' +
                     '            <th rowspan="2">BAP</th>' +
                     '        </tr>' +
                     '        <tr style="background-color: #436888;color: #ffffff;">' +
-                    '            <th style="width: 15%;">In</th>' +
-                    '            <th style="width: 15%;">Out</th>' +
-                    '            <th style="width: 5%;">P</th>' +
-                    '            <th style="width: 5%;">A</th>' +
+                    '            <th style="width: 25%;">Date</th>' +
+                    '            <th style="width: 5%;">In</th>' +
+                    '            <th style="width: 5%;">Out</th>' +
+                    '            <th style="width: 5%;background: #02ad02;">P</th>' +
+                    '            <th style="width: 5%;background: #d20505;">A</th>' +
                     '        </tr>' +
                     '        </thead>' +
                     '        <tbody id="dataRwSchedule">' +
@@ -101,7 +102,7 @@
 
                     var btnAct = '<div class="btn-group">' +
                         '  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-                        '    Action <span class="caret"></span>' +
+                        '    <i class="fa fa-pencil-square-o" aria-hidden="true"></i> <span class="caret"></span>' +
                         '  </button>' +
                         '  <ul class="dropdown-menu">' +
                         '    <li><a href="javascript:void(0);" class="inputLecturerAttd" data-no="'+a+'" data-id="'+dataAttd['ID']+'">Attendance Lecturer</a></li>' +
@@ -111,15 +112,18 @@
                         '  </ul>' +
                         '</div>';
 
-                    var btnIn = (dataAttd['In'+a]!='' && dataAttd['In'+a]!=null) ? 'btn-del-in' : 'btn-add-in';
+                    var btnDate = (dataAttd['Date'+a]!='' && dataAttd['Date'+a]!=null) ? moment(dataAttd['Date'+a]).format('dddd, DD MMM YYYY') : '-';
 
-                    var btnOut = (dataAttd['Out'+a]!='' && dataAttd['Out'+a]!=null) ? 'btn-del-out' : 'btn-add-out';
+                    var btnIn = (dataAttd['In'+a]!='' && dataAttd['In'+a]!=null) ? dataAttd['In'+a].substr(0,5) : '-';
+
+                    var btnOut = (dataAttd['Out'+a]!='' && dataAttd['Out'+a]!=null) ? dataAttd['Out'+a].substr(0,5) : '-';
 
                     var BAP = (dataAttd['BAP'+a]!='' && dataAttd['BAP'+a]!=null) ? dataAttd['BAP'+a] : '-' ;
 
                     tr.append('<tr>' +
                         '            <td>'+a+'</td>' +
                         '            <td>-</td>' +
+                        '            <td>'+btnDate+'</td>' +
                         '            <td>'+btnIn+'</td>' +
                         '            <td>'+btnOut+'</td>' +
                         '            <td></td>' +
@@ -146,7 +150,7 @@
         var opt = $('#filterAttendance');
         opt.prop('disabled',false)
         $.post(url,{token:token},function (jsonResult) {
-            console.log(jsonResult);
+
             opt.empty();
             opt.append('<option selected disabled>-- Select Schedule --</option>');
             opt.append('<option disabled>----------------------</option>');

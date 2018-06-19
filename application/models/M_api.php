@@ -908,9 +908,16 @@ class M_api extends CI_Model {
     public function __getLecturerDetail($NIP){
 
 //        $data = $this->db->query('SELECT e.* FROM db_employees.employees e WHERE e.NIP="'.$NIP.'" AND e.PositionMain = "14.7"');
-        $data = $this->db->query('SELECT e.* FROM db_employees.employees e WHERE e.NIP="'.$NIP.'" LIMIT 1 ');
+        $data = $this->db->query('SELECT e.* FROM db_employees.employees e 
+                  WHERE e.NIP="'.$NIP.'" LIMIT 1 ')->result_array();
 
-        return $data->result_array()[0];
+        if(count($data)>0){
+            return $data[0];
+        } else {
+            return $data;
+        }
+
+
     }
 
     public function __checkSchedule($dataFilter){

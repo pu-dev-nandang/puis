@@ -1248,7 +1248,15 @@ class C_api extends CI_Controller {
                     ->get_where('db_employees.employees',array('NIP'=>$NIP),1)
                     ->result_array();
 
-                if(count($data>0)){
+
+
+//                $data = $this->db->query('SELECT NIP,NIDN,Name,TitleAhead,TitleBehind,PositionMain,Phone,HP,Email,EmailPU,Password,Address,Photo,Photo_new
+//                                            FROM db_employees.employees
+//                                            WHERE NIP = "'.$NIP.'" LIMIT 1 ')->result_array();
+//
+//                print_r($data);
+
+                if(count($data)>0){
                     $sp = explode('.',$data[0]['PositionMain']);
                     $DiviosionID = $sp[0];
                     $PositionID = $sp[1];
@@ -1258,9 +1266,13 @@ class C_api extends CI_Controller {
 
                     $pos = $this->db->get_where('db_employees.position',array('ID'=>$PositionID),1)->result_array();
                     $data[0]['Position'] = $pos[0]['Position'];
+
+                    return print_r(json_encode($data[0]));
+                } else {
+                    return print_r(json_encode($data));
                 }
 
-                return print_r(json_encode($data[0]));
+
 
             }
 
@@ -1703,6 +1715,43 @@ class C_api extends CI_Controller {
                                 ->result_array();
 
                 return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='getAttdLecturers'){
+                $ID = $data_arr['ID'];
+                $No = $data_arr['No'];
+                $data = $this->db->get_where('db_academic.attendance',
+                            array('ID'=>$ID))->result_array();
+
+                $res = array(
+                    'NIP' => $data[0]['NIP'.$No],
+                    'BAP' => $data[0]['BAP'.$No],
+                    'Date' => $data[0]['Date'.$No],
+                    'In' => $data[0]['In'.$No],
+                    'Out' => $data[0]['Out'.$No],
+                );
+                return print_r(json_encode($res));
+            }
+            else if($data_arr['action']=='UpdtAttdLecturers'){
+
+                $ID = $data_arr['ID'];
+                $No = $data_arr['No'];
+
+                $formUpdate = (array) $data_arr['formUpdate'];
+
+//                print_r($formUpdate);
+
+                $dataUpdate = array(
+                    'NIP'.$No => $formUpdate['NIP'],
+                    'BAP'.$No => $formUpdate['BAP'],
+                    'Date'.$No => $formUpdate['Date'],
+                    'In'.$No => $formUpdate['In'],
+                    'Out'.$No => $formUpdate['Out']
+                );
+
+                $this->db->where('ID', $ID);
+                $this->db->update('db_academic.attendance', $dataUpdate);
+
+                return print_r(1);
             }
         }
     }
