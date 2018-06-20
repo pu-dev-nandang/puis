@@ -798,4 +798,107 @@ class M_finance extends CI_Model {
       $this->db->insert('db_finance.payment_students', $dataSave);
    }
 
+   public function get_created_tagihan_mhs($ta,$prodi,$PTID,$NIM,$limit, $start)
+   {
+    // error_reporting(0);
+    $arr = array();
+    $this->load->model('master/m_master');
+
+    // join dengan table auth terlebih dahulu
+    $PTID = ($PTID == '' || $PTID == Null) ? '' : ' and a.PTID = '.$PTID;
+    $NIM = ($NIM == '' || $NIM == Null) ? 'where a.NPM like "%"' : ' where  a.NPM = '.$NIM;
+    if ($ta == '') {
+      $ta1 = $ta;
+    }
+    else
+    {
+      $ta = explode('.', $ta);
+      $ta1 = $ta[1];
+    }
+
+    if ($ta1 == '') {
+      $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description 
+              from db_finance.Payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+              join db_academic.semester as c on a.SemesterID = c.ID
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' LIMIT '.$start. ', '.$limit;
+      $query=$this->db->query($sql, array())->result_array();
+      
+    }
+    else
+    {
+      $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description 
+              from db_finance.Payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+              join db_academic.semester as c on a.SemesterID = c.ID
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? LIMIT '.$start. ', '.$limit;
+      $query=$this->db->query($sql, array($ta1))->result_array();
+    }
+
+    // get all data to join db ta
+    for ($i=0; $i < count($query); $i++) { 
+      $Year = $query[$i]['Year'];
+      $db = 'ta_'.$Year.'.students';
+      $dt = $this->m_master->caribasedprimary($db,'NPM',$query[$i]['NPM']);
+      if($prodi == '' || $prodi == Null){
+        $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$dt[0]['ProdiID']);
+        $arr[] = array(
+            'PaymentID' => $query[$i]['ID'],
+            'PTID'  => $query[$i]['PTID'],
+            'PTIDDesc' => $query[$i]['Description'],
+            'SemesterID' => $query[$i]['SemesterID'],
+            'SemesterName' => $query[$i]['NameSemester'],
+            'NPM' => $query[$i]['NPM'],
+            'Nama' => $dt[0]['Name'],
+            'EmailPU' => $query[$i]['EmailPU'],
+            'InvoicePayment' => $query[$i]['Invoice'],
+            'Discount' => $query[$i]['Discount'],
+            'StatusPayment' => $query[$i]['Status'],
+            'ProdiID' => $dt[0]['ProdiID'],
+            'ProdiEng' => $ProdiEng[0]['NameEng'],
+            'Year' => $Year,
+            'DetailPayment' => $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']),
+        );
+      }
+      else
+      {
+        $prodi = explode('.', $prodi);
+        $prodi = $prodi[0];
+        if ($prodi == $dt[0]['ProdiID']) {
+          $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$dt[0]['ProdiID']);
+          $arr[] = array(
+              'PaymentID' => $query[$i]['ID'],
+              'PTID'  => $query[$i]['PTID'],
+              'PTIDDesc' => $query[$i]['Description'],
+              'SemesterID' => $query[$i]['SemesterID'],
+              'SemesterName' => $query[$i]['NameSemester'],
+              'NPM' => $query[$i]['NPM'],
+              'Nama' => $dt[0]['Name'],
+              'EmailPU' => $query[$i]['EmailPU'],
+              'InvoicePayment' => $query[$i]['Invoice'],
+              'Discount' => $query[$i]['Discount'],
+              'StatusPayment' => $query[$i]['Status'],
+              'ProdiID' => $dt[0]['ProdiID'],
+              'ProdiEng' => $ProdiEng[0]['NameEng'],
+              'Year' => $Year,
+              'DetailPayment' => $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']),
+          );
+        }
+      }
+      
+    }
+    return $arr;
+   }
+
+   public function updatePaymentApprove($Input)
+   {
+    for ($i=0; $i < count($Input); $i++) { 
+      $dataSave = array(
+              'Status' =>"1",
+              'UpdateAt' => date('Y-m-d H:i:s'),
+              'UpdatedBy' => $this->session->userdata('NIP')
+                      );
+      $this->db->where('ID',$Input[$i]->PaymentID);
+      $this->db->update('db_finance.payment', $dataSave);
+    }
+   }
+
 }
