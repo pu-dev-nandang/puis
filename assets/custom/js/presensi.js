@@ -48,16 +48,24 @@ $(document).on('click','.inputLecturerAttd',function () {
             '                            </div>' +
             '                        </div>' +
             '                        <div class="col-xs-8">' +
+            '                           <div class="form-group">' +
+            '                               <label>Lecturer</label>' +
+            '                               <select class="form-control" id="formLecturer"></select>' +
+            '                           </div>' +
             '                            <div class="form-group">' +
             '                                <label>BAP</label>' +
-            '                                <textarea class="form-control" id="formBAP" rows="9">'+attd_bap+'</textarea>' +
+            '                                <textarea class="form-control" id="formBAP" rows="5">'+attd_bap+'</textarea>' +
             '                            </div>' +
             '                        </div>' +
             '                    </div>';
 
         $('#GlobalModal .modal-body').html(body_attd);
 
-
+        for(var t=0;t<jsonResult.DetailLecturers.length;t++){
+            var lec = jsonResult.DetailLecturers[t];
+            var sc = (attd_nip==lec.NIP) ? 'selected' : '';
+            $('#formLecturer').append('<option value="'+lec.NIP+'" '+sc+'>'+lec.NIP+' - '+lec.Name+'</option>');
+        }
 
         $('#inputIn').datetimepicker({
             pickDate: false
@@ -71,12 +79,6 @@ $(document).on('click','.inputLecturerAttd',function () {
             showOtherMonths:true,
             autoSize: true,
             dateFormat: 'dd MM yy'
-            // minDate: new Date(moment().year(),moment().month(),moment().date()),
-            // onSelect : function () {
-            //     var data_date = $(this).val().split(' ');
-            //     var nextelement = $(this).attr('nextelement')
-            //     nextDatePick(data_date,nextelement);
-            // }
         });
 
         if(jsonResult.Date !=='0000-00-00' && jsonResult.Date != null){
@@ -86,8 +88,6 @@ $(document).on('click','.inputLecturerAttd',function () {
         } else {
 
         }
-
-
 
         $('a.ui-state-default').attr('href','javascript:void(0)');
 
@@ -104,12 +104,13 @@ $(document).on('click','.inputLecturerAttd',function () {
 $(document).on('click','#btnSaveAttdLecturer',function () {
     var ID = $(this).attr('data-id');
     var No = $(this).attr('data-no');
-    var NIP = '<?php echo $NIP; ?>';
+
 
     var formDate = $('#formDate').datepicker("getDate");
     var formIn = $('#formIn').val();
     var formOut = $('#formOut').val();
     var formBAP = $('#formBAP').val();
+    var NIP = $('#formLecturer').val();
 
 
     if(formDate!=null && formDate!='' &&

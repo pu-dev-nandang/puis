@@ -1644,7 +1644,7 @@ class C_api extends CI_Controller {
 
                 $result = array(
                     'Status' => 0,
-                    'Details' => $data[0]
+                    'Details' => $data
                 );
                 if(count($data)>0){
                     if($data[0]['Silabus']!='' && $data[0]['Silabus']!=null &&
@@ -1654,6 +1654,7 @@ class C_api extends CI_Controller {
                         $data[0]['UAS']!='' && $data[0]['UAS']!=null &&
                         $data[0]['Status']=='2'){
                         $result['Status']=1;
+                        $result['Details']=$data[0];
                     }
                 }
 
@@ -1722,12 +1723,29 @@ class C_api extends CI_Controller {
                 $data = $this->db->get_where('db_academic.attendance',
                             array('ID'=>$ID))->result_array();
 
+                $coor = $this->db->query('SELECT em.NIP,em.Name FROM db_academic.schedule s 
+                                            LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                            WHERE s.ID = "'.$data[0]['ScheduleID'].'"
+                                              ')->result_array();
+
+                $teamt = $this->db->query('SELECT em.NIP,em.Name FROM db_academic.schedule_team_teaching stt 
+                                                    LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
+                                                    WHERE stt.ScheduleID = "'.$data[0]['ScheduleID'].'" 
+                                                    ')->result_array();
+
+                if(count($teamt)>0){
+                    for($t=0;$t<count($teamt);$t++){
+                        array_push($coor,$teamt[$t]);
+                    }
+                }
+
                 $res = array(
                     'NIP' => $data[0]['NIP'.$No],
                     'BAP' => $data[0]['BAP'.$No],
                     'Date' => $data[0]['Date'.$No],
                     'In' => $data[0]['In'.$No],
                     'Out' => $data[0]['Out'.$No],
+                    'DetailLecturers' => $coor
                 );
                 return print_r(json_encode($res));
             }
@@ -1786,8 +1804,9 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='getAttdStudents'){
                 $SemesterID = $data_arr['SemesterID'];
                 $ScheduleID = $data_arr['ScheduleID'];
+                $SDID = $data_arr['SDID'];
                 $Meeting = $data_arr['Meeting'];
-                $data = $this->m_api->__getStudensAttd($SemesterID,$ScheduleID,$Meeting);
+                $data = $this->m_api->__getStudensAttd($SemesterID,$ScheduleID,$SDID,$Meeting);
                 return print_r(json_encode($data));
             }
         }
