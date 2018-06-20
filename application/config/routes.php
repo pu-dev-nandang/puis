@@ -100,6 +100,10 @@ $route['database/employees'] = 'page/database/c_database/employees';
 $route['database/mentor-academic'] = 'page/database/c_database/mentor_academic';
 
 
+// --- Presensi ---
+$route['academic/presensi'] = 'page/academic/c_presensi';
+$route['academic/loadPagePresensi'] = 'page/academic/c_presensi/loadPagePresensi';
+
 
 // --- Admission ----
 // --- Master ----

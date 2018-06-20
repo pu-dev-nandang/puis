@@ -1717,7 +1717,8 @@ class M_api extends CI_Model {
         $SemesterActive = $this->_getSemesterActive();
         $SemesterID = $SemesterActive['ID'];
 
-        $data = $this->db->query('SELECT attd.ID AS AttendanceID, sd.*, cl.Room, d.NameEng AS DayNameEng FROM db_academic.attendance attd 
+        $data = $this->db->query('SELECT attd.ID AS AttendanceID, sd.*, cl.Room, d.NameEng AS DayNameEng 
+                                            FROM db_academic.attendance attd 
                                             LEFT JOIN db_academic.schedule_details sd ON (sd.ID = attd.SDID)
                                             LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
                                             LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
@@ -1733,6 +1734,53 @@ class M_api extends CI_Model {
         }
 
         return $data;
+    }
+
+    public function __getStudensAttd($SemesterID,$ScheduleID,$Meeting){
+
+        $dataClassOf = $this->getClassOf();
+
+        $res = [];
+        for($c=0;$c<count($dataClassOf);$c++){
+            $db_ = 'ta_'.$dataClassOf[$c]['Year'];
+            $dataSc = $this->db->query('SELECT sp.*,s.Name,s.NPM FROM '.$db_.'.study_planning sp 
+                                                LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
+                                                WHERE sp.ScheduleID = "'.$ScheduleID.'" 
+                                                AND sp.StatusSystem = "1" ')
+                ->result_array();
+
+
+            if(count($dataSc)>0){
+                for($d=0;$d<count($dataSc);$d++){
+                    $dataSc[$d]['DB_Student'] = $db_;
+
+
+                    $cekAttd = $this->db->query('SELECT * FROM db_academic.attendance attd 
+                                                  RIGHT JOIN db_academic.attendance_students attd_s 
+                                                  ON (attd.ID = attd_s.ID_Attd) 
+                                                  WHERE attd.SemesterID = "'.$SemesterID.'"
+                                                   AND attd.ScheduleID = "'.$ScheduleID.'"
+                                                   AND attd_s.Meeting = "'.$Meeting.'"
+                                                   AND attd_s.NPM = "'.$dataSc[$d]['NPM'].'"
+                                                   ')->result_array();
+
+
+
+                    $dataSc[$d]['P'] = 0;
+                    if(count($cekAttd)>0){
+                        $dataSc[$d]['P'] = 1;
+                    }
+
+                }
+                array_push($res,$dataSc);
+            }
+
+        }
+
+        return $res;
+
+
+
     }
 
 }

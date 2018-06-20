@@ -1753,6 +1753,43 @@ class C_api extends CI_Controller {
 
                 return print_r(1);
             }
+
+            else if($data_arr['action']=='filterPresensi'){
+
+                if($data_arr['CombinedClasses']=='0'){
+
+                    $data = $this->db->query('SELECT s.* FROM db_academic.schedule s 
+                                              LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                              WHERE s.SemesterID = "'.$data_arr['SemesterID'].'" 
+                                              AND CombinedClasses = "0" 
+                                              AND sdc.ProdiID = "'.$data_arr['ProdiID'].'" 
+                                              ORDER BY s.ClassGroup ASC')->result_array();
+
+                    $result = $data;
+
+                } else {
+                    $data_where = array(
+                        'SemesterID' => $data_arr['SemesterID'],
+                        'CombinedClasses' => '1'
+                    );
+                    $data = $this->db->order_by('ClassGroup', 'ASC')
+                        ->get_where('db_academic.schedule',
+                        $data_where)->result_array();
+
+                    $result = $data;
+                }
+
+                return print_r(json_encode($result));
+
+            }
+
+            else if($data_arr['action']=='getAttdStudents'){
+                $SemesterID = $data_arr['SemesterID'];
+                $ScheduleID = $data_arr['ScheduleID'];
+                $Meeting = $data_arr['Meeting'];
+                $data = $this->m_api->__getStudensAttd($SemesterID,$ScheduleID,$Meeting);
+                return print_r(json_encode($data));
+            }
         }
     }
 
