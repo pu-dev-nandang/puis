@@ -18,8 +18,8 @@ $(document).on('click','.inputLecturerAttd',function () {
         var attd_nip = jsonResult.NIP;
         var attd_bap = (jsonResult.BAP!='' && jsonResult.BAP!=null) ? jsonResult.BAP : '';
         // var attd_date = (jsonResult.Date!='' && jsonResult.Date!=null) ? jsonResult.Date : '';
-        var attd_in = (jsonResult.In!='' && jsonResult.In!=null) ? jsonResult.In : '';
-        var attd_out = (jsonResult.Out!='' && jsonResult.Out!=null) ? jsonResult.Out : '';
+        var attd_in = (jsonResult.In!='' && jsonResult.In!=null) ? jsonResult.In : '00:00:00';
+        var attd_out = (jsonResult.Out!='' && jsonResult.Out!=null) ? jsonResult.Out : '00:00:00';
 
 
         var body_attd = '<div class="row">' +
@@ -31,7 +31,7 @@ $(document).on('click','.inputLecturerAttd',function () {
             '                            <div class="form-group">' +
             '                                <label>In</label>' +
             '                                <div id="inputIn" class="input-group">' +
-            '                                    <input data-format="hh:mm:ss" type="text" id="formIn" class="form-control form-attd" value="'+attd_in+'" readonly/>' +
+            '                                    <input data-format="hh:mm:ss" type="text" id="formIn" class="form-control form-attd" value="'+attd_in+'"/>' +
             '                                    <span class="add-on input-group-addon">' +
             '                                        <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>' +
             '                                    </span>' +
@@ -40,7 +40,7 @@ $(document).on('click','.inputLecturerAttd',function () {
             '                            <div class="form-group">' +
             '                                <label>Out</label>' +
             '                                <div id="inputOut" class="input-group">' +
-            '                                    <input data-format="hh:mm:ss" type="text" id="formOut" class="form-control form-attd" value="'+attd_out+'" readonly/>' +
+            '                                    <input data-format="hh:mm:ss" type="text" id="formOut" class="form-control form-attd" value="'+attd_out+'"/>' +
             '                                    <span class="add-on input-group-addon">' +
             '                                      <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>' +
             '                                    </span>' +
@@ -67,11 +67,7 @@ $(document).on('click','.inputLecturerAttd',function () {
             $('#formLecturer').append('<option value="'+lec.NIP+'" '+sc+'>'+lec.NIP+' - '+lec.Name+'</option>');
         }
 
-        $('#inputIn').datetimepicker({
-            pickDate: false
-        });
-
-        $('#inputOut').datetimepicker({
+        $('#inputIn,#inputOut').datetimepicker({
             pickDate: false
         });
 

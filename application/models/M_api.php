@@ -1713,7 +1713,7 @@ class M_api extends CI_Model {
 
     }
 
-    public function __getAttendance($ScheduleID){
+    public function __getDataAttendance($ScheduleID){
         $SemesterActive = $this->_getSemesterActive();
         $SemesterID = $SemesterActive['ID'];
 
@@ -1757,6 +1757,7 @@ class M_api extends CI_Model {
                 $attdStd = ($dataAttd[$s]['M'.$Meeting]!='' && $dataAttd[$s]['M'.$Meeting]!=null) ? $dataAttd[$s]['M'.$Meeting] : '0';
                 $arr = array(
                     'DetailStudent' => $dataStd[0],
+                    'ID_Attd_S' => $dataAttd[$s]['ID'],
                     'DBStudent' => $db_,
                     'Status' => $attdStd,
                     'Description' => $dataAttd[$s]['D'.$Meeting]
@@ -1769,6 +1770,81 @@ class M_api extends CI_Model {
         }
 
         return $result;
+
+    }
+
+    public function __getAttendanceSchedule($AttendanceID){
+        $data = $this->db->get_where('db_academic.attendance',
+            array('ID'=>$AttendanceID),1)
+            ->result_array();
+
+        // Mendapatkan Presensi Students
+        $dataStd = $this->db->get_where('db_academic.attendance_students',
+            array('ID_Attd' => $AttendanceID))->result_array();
+
+        if(count($data)>0){
+            for($s=1;$s<=14;$s++){
+                $data[0]['Name'.$s] = '';
+                $p = '-';
+                $a = '-';
+                if($data[0]['NIP'.$s] != '' && $data[0]['NIP'.$s] != null){
+                    $dataLec = $this->db->select('Name')->get_where('db_employees.employees',
+                        array('NIP' => $data[0]['NIP'.$s]),1)->result_array();
+
+                    $data[0]['Name'.$s] = $dataLec[0]['Name'];
+
+                    $p = 0;
+                    $a = 0;
+                    for($st=0;$st<count($dataStd);$st++){
+                        if($dataStd[$st]['M'.$s]=='2' || $dataStd[$st]['M'.$s]==2){
+                            $a += 1;
+                        } else if ($dataStd[$st]['M'.$s]=='1' || $dataStd[$st]['M'.$s]==1) {
+                            $p += 1;
+                        }
+                    }
+                }
+
+                $data[0]['S_P'.$s] = $p;
+                $data[0]['S_A'.$s] = $a;
+            }
+        }
+
+        return $data;
+
+
+    }
+
+    public function __getdataExchange($ID_Attd,$ScheduleID,$SDID,$Meeting){
+
+        $dataSD = $this->db->query('SELECT * FROM db_academic.schedule_details sd 
+                                        WHERE sd.ID = "'.$SDID.'" LIMIT 1 ')->result_array();
+
+        $dataSEx = $this->db->query('SELECT * FROM db_academic.schedule_exchange se 
+                                              WHERE se.ID_Attd = "'.$ID_Attd.'" ')->result_array();
+
+        $coor = $this->db->query('SELECT em.NIP,em.Name FROM db_academic.schedule s 
+                                            LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                            WHERE s.ID = "'.$ScheduleID.'"
+                                              ')->result_array();
+
+        $teamt = $this->db->query('SELECT em.NIP,em.Name FROM db_academic.schedule_team_teaching stt 
+                                                    LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
+                                                    WHERE stt.ScheduleID = "'.$ScheduleID.'" 
+                                                    ')->result_array();
+
+        if(count($teamt)>0){
+            for($t=0;$t<count($teamt);$t++){
+                array_push($coor,$teamt[$t]);
+            }
+        }
+
+        $res = array(
+            'Lecturer' => $coor,
+            'S_Details' => $dataSD[0],
+            'S_Exchange' => $dataSEx
+        );
+
+        return $res;
 
     }
 
