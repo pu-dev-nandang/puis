@@ -292,13 +292,13 @@ $route['admission/distribusi-formulir/formulir-offline/selectPIC'] = 'page/admis
 // ---Finance----
 $route['finance/master/tagihan-mhs'] =  'page/finance/c_tuition_fee/tuition_fee';
 
-$route['finance/penerimaan-pembayaran/formulir-registration/online'] =  'page/finance/c_finance/formulir_registration_online_page';
+$route['finance/admission/penerimaan-pembayaran/formulir-registration/online'] =  'page/finance/c_finance/formulir_registration_online_page';
 $route['finance/confirmed-verifikasi-pembayaran-registration_online'] =  'page/finance/c_finance/confirmed_verfikasi_pembayaran_registration_online';
-$route['finance/penerimaan-pembayaran/formulir-registration/offline'] =  'page/finance/c_finance/formulir_registration_offline_page';
-$route['finance/approved/nilai-rapor'] =  'page/finance/c_finance/nilai_rapor_page';
+$route['finance/admission/penerimaan-pembayaran/formulir-registration/offline'] =  'page/finance/c_finance/formulir_registration_offline_page';
+$route['finance/admission/approved/nilai-rapor'] =  'page/finance/c_finance/nilai_rapor_page';
 $route['finance/approved/loaddata_nilai_calon_mahasiswa_verified/(:num)'] =  'page/finance/c_finance/loaddata_nilai_calon_mahasiswa_verified/$1';
 $route['finance/approved/submit_approved_nilai_rapor'] =  'page/finance/c_finance/submit_approved_nilai_rapor';
-$route['finance/approved/tuition-fee'] =  'page/finance/c_finance/tuition_fee';
+$route['finance/admission/approved/tuition-fee'] =  'page/finance/c_finance/tuition_fee';
 $route['finance/approved/tuition-fee/approve/(:num)'] =  'page/finance/c_finance/tuition_fee_approve/$1';
 $route['finance/approved/tuition-fee/approve_save'] =  'page/finance/c_finance/approve_save';
 $route['finance/approved/tuition-fee/approved/(:num)'] =  'page/finance/c_finance/tuition_fee_approved/$1';
@@ -307,7 +307,8 @@ $route['finance/get_tagihan_mhs/(:num)'] =  'page/finance/c_finance/get_tagihan_
 $route['finance/submit_tagihan_mhs'] =  'page/finance/c_finance/submit_tagihan_mhs';
 $route['finance/tagihan-mhs/cek-tagihan-mhs'] =  'page/finance/c_finance/page_cek_tagihan_mhs';
 $route['finance/get_created_tagihan_mhs/(:num)'] =  'page/finance/c_finance/get_created_tagihan_mhs/$1';
-$route['finance/submit_created_tagihan_mhs'] =  'page/finance/c_finance/submit_created_tagihan_mhs';
+$route['finance/approved_created_tagihan_mhs'] =  'page/finance/c_finance/approved_created_tagihan_mhs';
+$route['finance/unapproved_created_tagihan_mhs'] =  'page/finance/c_finance/unapproved_created_tagihan_mhs';
 
 
 

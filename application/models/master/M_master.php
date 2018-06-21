@@ -1615,4 +1615,93 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $query=$this->db->query($sql, array())->result_array();
         return $query;
     }
+
+    public function PaymentgetMahasiswaByNPM($NPM)
+    {
+        error_reporting(0);
+        $arr = array();
+        $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description 
+                from db_finance.Payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                join db_academic.semester as c on a.SemesterID = c.ID
+                join db_finance.payment_type as d on a.PTID = d.ID where a.NPM = ? limit 1';
+        $query=$this->db->query($sql, array($NPM))->result_array();
+        
+        $Year = $query[0]['Year'];
+        $db = 'ta_'.$Year.'.students';
+        $dt = $this->m_master->caribasedprimary($db,'NPM',$query[0]['NPM']);
+        $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$dt[0]['ProdiID']);
+        $arr = array(
+            'PaymentID' => $query[0]['ID'],
+            'PTID'  => $query[0]['PTID'],
+            'PTIDDesc' => $query[0]['Description'],
+            'SemesterID' => $query[0]['SemesterID'],
+            'SemesterName' => $query[0]['NameSemester'],
+            'NPM' => $query[0]['NPM'],
+            'Nama' => $dt[0]['Name'],
+            'EmailPU' => $query[0]['EmailPU'],
+            'InvoicePayment' => $query[0]['Invoice'],
+            'Discount' => $query[0]['Discount'],
+            'StatusPayment' => $query[0]['Status'],
+            'ProdiID' => $dt[0]['ProdiID'],
+            'ProdiEng' => $ProdiEng[0]['NameEng'],
+            'Year' => $Year,
+            'DetailPayment' => $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[0]['ID']),
+        );
+
+        return $arr;        
+
+    }
+
+    public function saveNotification($data)
+    {
+        $key = "UAP)(*";
+        $subject = "You have received payment from : ".$data['Nama'].'<br> Type : '.$data['PTIDDesc'];
+        $URL = "finance/notifikasi";
+        $From = $data['EmailPU'];
+        $ToDiv = "9";
+        $ToPeople = "All";
+        $Desc = $data['PTIDDesc'];
+        $Created = date('Y-m-d H:i:s' );
+
+        $data = array(
+                        'subject' => $subject,
+                        'URL'   => $URL,
+                        'From'  => $From,
+                     );
+        $token = $this->jwt->encode($data,$key);
+
+        
+        $saveToDBRegister = $this->saveToNotificationDivisi($token,$Desc,$Created,$ToDiv);
+    }
+
+    public function saveToNotificationDivisi($token,$Desc,$Created,$ToDiv)
+    {
+        $ToDiv = explode(',', $ToDiv);
+        for ($i=0; $i < count($ToDiv); $i++) { 
+            $dataSave = array(
+                    'Token' => $token,
+                    'Desc' => $Desc,
+                    'Created' => $Created
+                            );
+
+            $this->db->insert('db_notifikasi.notification', $dataSave);
+            $insert_id = $this->db->insert_id();
+
+            $dataSave = array(
+                    'ID_notification' => $insert_id,
+                    'Div' => $ToDiv[$i],
+                            );
+
+            $this->db->insert('db_notifikasi.n_div', $dataSave);
+        }
+        
+    }
+
+    public function inserData_test($aaa)
+    {
+        $dataSave = array(
+            'aaa' => $aaa,
+        );
+        $this->db->insert('test.aaa', $dataSave);
+    }
 }

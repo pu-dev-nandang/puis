@@ -244,14 +244,12 @@ class C_finance extends Finnance_Controler {
                     $Name = $getDataMhsBYNPM[0]['Name'];
                     $Email = $getDataMhsBYNPM[0]['EmailPU'];
                     $VA_number = $this->m_finance->getVANumberMHS($Input[$i]->NPM);
-                    $create_va = $this->m_finance->create_va_Payment($payment,$DeadLinePayment, $Name, $Email,$VA_number,$description = $fieldEND,$tableRoutes = 'db_finance.payment');
+                    $create_va = $this->m_finance->create_va_Payment($payment,$DeadLinePayment, $Name, $Email,$VA_number,$description = $fieldEND,$tableRoutes = 'db_finance.payment_students');
                     if ($create_va['status']) {
                         // After create va insert data to db_finance.payment  and db_finance.payment_students
                         $countSuccessVA++;
                         $aa = $this->m_finance->insertaDataPayment($Input[$i]->PTID,$Input[$i]->semester,$Input[$i]->NPM,$payment,$Input[$i]->Discount);
                         $ab = $this->m_finance->insertaDataPaymentStudents($aa,$payment,$create_va['msg']['trx_id'],$create_va['msg']['datetime_expired']);
-
-                        // send email and attachment
                     }
                     else
                     {
@@ -286,12 +284,20 @@ class C_finance extends Finnance_Controler {
         echo json_encode($output);
     }
 
-    public function submit_created_tagihan_mhs()
+    public function approved_created_tagihan_mhs()
     {
         $Input = $this->getInputToken();
         $Input = $Input['arrValueCHK'];
         $this->m_finance->updatePaymentApprove($Input);
         
+    }
+
+    public function unapproved_created_tagihan_mhs()
+    {
+        $Input = $this->getInputToken();
+        $Input = $Input['arrValueCHK'];
+        $proses = $this->m_finance->updatePaymentunApprove($Input);
+        echo json_encode($proses);
     }
 
 }
