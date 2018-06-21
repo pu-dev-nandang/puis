@@ -820,7 +820,7 @@ class M_finance extends CI_Model {
       $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description 
               from db_finance.Payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' LIMIT '.$start. ', '.$limit;
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' order by a.Status asc LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array())->result_array();
       
     }
@@ -829,7 +829,7 @@ class M_finance extends CI_Model {
       $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description 
               from db_finance.Payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? LIMIT '.$start. ', '.$limit;
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? order by a.Status asc LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array($ta1))->result_array();
     }
 
@@ -899,6 +899,61 @@ class M_finance extends CI_Model {
       $this->db->where('ID',$Input[$i]->PaymentID);
       $this->db->update('db_finance.payment', $dataSave);
     }
+   }
+
+   public function updatePaymentunApprove($Input)
+   {
+    $msg = '';
+    for ($i=0; $i < count($Input); $i++) {
+      // check Mahasiswa telah melakukan transaksi atau belum
+       $NPM = $Input[$i]->NPM;
+       $SemesterID = $Input[$i]->semester;
+       $sql = 'select count(*) as total from db_academic.std_krs where SemesterID = ? and NPM = ?';
+       $query=$this->db->query($sql, array($SemesterID,$NPM))->result_array();
+       $count = $query[0]['total'];
+       if ($count == 0) {
+         $dataSave = array(
+                 'Status' =>"0",
+                 'UpdateAt' => null,
+                 'UpdatedBy' => null
+                         );
+         $this->db->where('ID',$Input[$i]->PaymentID);
+         $this->db->update('db_finance.payment', $dataSave);
+       }
+       else
+       {
+        if ($msg == '') {
+          $msg = '<ul>';
+        }
+        $msg .= '<li>Proses UnApprove ditolak, Mohon cek Transaksi KRS pada Mahasiswa dengan NPM : '.$Input[$i]->NPM.'</li>';
+       }
+    }
+
+    return $msg;
+   }
+
+   public function update_payment_MHS($BilingID,$ID_payment)
+   {
+    // update payment_students
+        $dataSave = array(
+                'Status' =>1,
+                'UpdateAt' => date('Y-m-d H:i:s'),
+                        );
+        $this->db->where('BilingID',$BilingID);
+        $this->db->update('db_finance.payment_students', $dataSave);
+
+      $sql = 'select count(*) as total from db_finance.payment where Status = 0 and ID = ?';
+      $query=$this->db->query($sql, array($ID_payment))->result_array();
+      if ($query[0]['total'] == 0) {
+          $dataSave = array(
+                     'Status' =>"1",
+                     'UpdateAt' => date('Y-m-d H:i:s'),
+                     'UpdatedBy' => "0"
+                             );
+             $this->db->where('ID',$ID_payment);
+             $this->db->update('db_finance.payment', $dataSave);
+      }
+        
    }
 
 }

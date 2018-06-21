@@ -10,7 +10,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 
 class C_login extends CI_Controller {
-    public $GlobalVariableAdi = array('url_registration' => 'http://demo.web.podomorouniversity.ac.id/registeronline/');
+    public $GlobalVariableAdi = array('url_registration' => 'http://10.1.10.230/registeronline/');
     function __construct()
     {
         parent::__construct();
@@ -139,7 +139,7 @@ class C_login extends CI_Controller {
                   $routes_table =$BNIdbLog[0]['routes_table'];
                   switch ($routes_table) {
                       case 'db_admission.register':
-                              if ($BNIdbLog[0]['Status'] == 0) {
+                             if ($BNIdbLog[0]['Status'] == 0) {
                                   $getData = $this->m_master->caribasedprimary('db_admission.register','BilingID',$data_asli['trx_id']);
                                   $Email = $getData[0]['Email'];
                                   $RegisterID = $getData[0]['ID'];
@@ -189,6 +189,46 @@ class C_login extends CI_Controller {
                                        $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
                                        $this->m_master->update_va_log($data_asli);
                                    } 
+                                  echo '{"status":"000"}';
+                                  exit;
+                              break;
+                              case 'db_finance.payment_students':
+
+                                  // Get Status sudah bayar atau belum karena BNi hit lebih dari satu kali
+                                  $getData = $this->m_master->caribasedprimary('db_finance.payment_students','BilingID',$data_asli['trx_id']);
+                                  if ($getData[0]['Status'] == 0) {
+                                    // get Informasi Mahasiswa
+                                       $GetPayment = $this->m_master->caribasedprimary('db_finance.payment','ID',$getData[0]['ID_payment']);
+                                       $NPM = $GetPayment[0]['NPM'];
+                                       $data = $this->m_master->PaymentgetMahasiswaByNPM($NPM);
+                                       $PTIDDesc = $data['PTIDDesc'];
+                                       $SemesterName = $data['SemesterName'];
+                                       $Nama = $data['Nama'];
+                                       $EmailPU = $data['EmailPU'];
+                                       $ProdiEng = $data['ProdiEng'];
+
+                                    // Buat Update dan View Node JS untuk notifikasi
+                                    $this->m_finance->update_payment_MHS($data_asli['trx_id'],$getData[0]['ID_payment']); 
+
+                                    // Send Email
+                                    $text = 'Dear '.$Nama.',<br><br>
+                                                Your payment has been received,<br><br>
+                                                Payment Type : '.$PTIDDesc.'<br>
+                                                Prodi : '.$ProdiEng.'<br>
+                                                SemesterName : '.$SemesterName.'<br><br>
+                                                as much as Rp '.number_format($getData[0]['Invoice'],2,',','.').'
+                                                <br>
+                                            ';        
+                                    $to = $EmailPU;
+                                    $subject = "Podomoro University Payment thank you";
+                                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                                    $this->m_master->update_va_log($data_asli);
+
+                                    $this->m_master->saveNotification($data);
+                                    $data = $data + array('link' => $this->GlobalVariableAdi['url_registration']);
+                                    $content = $this->load->view('page/finance/script',$data,true);
+                                    echo $content;
+                                  }
                                   echo '{"status":"000"}';
                                   exit;
                               break;

@@ -18,57 +18,65 @@
                     </li>
                 </ul>
             </li>
-            <li class="<?php if($this->uri->segment(2)=='approved'){echo "current open";} ?>">
+            <li class="<?php if($this->uri->segment(2)=='admission'){echo "current open";} ?>">
                 <a href="javascript:void(0);">
                     <i class="fa fa-address-book-o"></i>
-                    Approved
+                    Admission
                 </a>
                 <ul class="sub-menu">
-                    <li class="<?php if($this->uri->segment(2)=='approved' && $this->uri->segment(3) == "nilai-rapor" ){echo "current";} ?>">
-                        <a href="<?php echo base_url('finance/approved/nilai-rapor'); ?>">
-                        <i class="icon-angle-right"></i>
-                        Nilai Rapor
-                        </a>
-                    </li>
-                    <li class="<?php if($this->uri->segment(2)=='approved' && $this->uri->segment(3) == "tuition-fee" ){echo "current";} ?>">
-                        <a href="<?php echo base_url('finance/approved/tuition-fee'); ?>">
-                        <i class="icon-angle-right"></i>
-                        Tuition Fee
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="<?php if($this->uri->segment(2)=='penerimaan-pembayaran'){echo "current open";} ?>">
-                <a href="javascript:void(0);">
-                    <i class="fa fa-download"></i>
-                    Penerimaan Pembayaran
-                </a>
-                <ul class="sub-menu">
-                    <li class="<?php if($this->uri->segment(2)=='penerimaan-pembayaran' && $this->uri->segment(3) == "formulir-registration" ){echo "open-default";} ?>">
+                    <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "approved" ){echo "open-default";} ?>">
                         <a href="javascript:void(0);">
-                            <i class="icon-angle-right"></i>
-                            Formulir Registration
+                        <i class="icon-angle-right"></i>
+                        Approved
                         </a>
                         <ul class="sub-menu">
-                            <li class="<?php if($this->uri->segment(2)=='penerimaan-pembayaran' && $this->uri->segment(3) == "formulir-registration" && $this->uri->segment(4) == "online"){echo "current";} ?>">
-                                <a href="<?php echo base_url('finance/penerimaan-pembayaran/formulir-registration/online'); ?>">
+                            <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "approved" && $this->uri->segment(4) == "nilai-rapor" && $this->uri->segment(5) == ""){echo "current";} ?>">
+                                <a href="<?php echo base_url('finance/admission/approved/nilai-rapor'); ?>">
                                     <i class="icon-angle-right"></i>
-                                    Online
+                                    Nilai Rapor
                                 </a>
                             </li>
-                            <li class="<?php if($this->uri->segment(2)=='penerimaan-pembayaran' && $this->uri->segment(3) == "formulir-registration" && $this->uri->segment(4) == "offline"){echo "current";} ?>">
-                                <a href="<?php echo base_url('finance/penerimaan-pembayaran/formulir-registration/offline'); ?>">
-                                    <i class="icon-angle-right"></i>
-                                    Offline
+                            <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "approved" && $this->uri->segment(4) == "tuition-fee" ){echo "current";} ?>">
+                                <a href="<?php echo base_url('finance/admission/approved/tuition-fee'); ?>">
+                                <i class="icon-angle-right"></i>
+                                Tuition Fee
                                 </a>
                             </li>
-                        </ul>    
+                        </ul>
                     </li>
-                    <li class="<?php if($this->uri->segment(2)=='penerimaan-pembayaran' && $this->uri->segment(3) == "admission" ){echo "current";} ?>">
-                        <a href="<?php echo base_url('finance/approved/tuition-fee'); ?>">
+                    <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "penerimaan-pembayaran"){echo "open-default";} ?>">
+                        <a href="javascript:void(0);">
                         <i class="icon-angle-right"></i>
-                        Admission
+                        Penerimaan Pembayaran
                         </a>
+                        <ul class="sub-menu">
+                            <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "penerimaan-pembayaran" && $this->uri->segment(4) == "formulir-registration"){echo "open-default";}  ?>">
+                                <a href="javascript:void(0);">
+                                    <i class="icon-angle-right"></i>
+                                    Formulir Registration
+                                </a>
+                                <ul class="sub-menu">
+                                    <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "penerimaan-pembayaran" && $this->uri->segment(4) == "formulir-registration" && $this->uri->segment(5) == "online"){echo "current";} ?>">
+                                        <a href="<?php echo base_url('finance/admission/penerimaan-pembayaran/formulir-registration/online'); ?>">
+                                            <i class="icon-angle-right"></i>
+                                            Online
+                                        </a>
+                                    </li>
+                                    <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "penerimaan-pembayaran" && $this->uri->segment(4) == "formulir-registration" && $this->uri->segment(5) == "offline"){echo "current";} ?>">
+                                        <a href="<?php echo base_url('finance/admission/penerimaan-pembayaran/formulir-registration/offline'); ?>">
+                                            <i class="icon-angle-right"></i>
+                                            Offline
+                                        </a>
+                                    </li>
+                                </ul>  
+                            </li>
+                            <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "penerimaan-pembayaran" && $this->uri->segment(4) == "biaya" ){echo "current";} ?>">
+                                <a href="#">
+                                <i class="icon-angle-right"></i>
+                                BPP,SPP,SKS & ETC
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </li>
