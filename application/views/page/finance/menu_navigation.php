@@ -78,10 +78,16 @@
                     Tagihan Mahasiswa
                 </a>
                 <ul class="sub-menu">
-                    <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "tagihan-mhs" ){echo "current";} ?>">
+                    <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "set-tagihan-mhs"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/set-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
                         Set Tagihan Mahasiswa
+                        </a>
+                    </li>
+                    <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "cek-tagihan-mhs"){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/tagihan-mhs/cek-tagihan-mhs'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Cek Tagihan Mahasiswa
                         </a>
                     </li>
                 </ul>

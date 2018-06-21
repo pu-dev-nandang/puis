@@ -239,6 +239,7 @@ class C_finance extends Finnance_Controler {
                     $getDataMhsBYNPM = $this->m_master->getDataMhsBYNPM($Input[$i]->NPM,$Input[$i]->ta);
                     $payment = str_replace("Rp.","", $Input[$i]->Invoice);
                     $payment = trim(str_replace(",-","", $payment));
+                    $payment = trim(str_replace(".","", $payment));
                     $DeadLinePayment = $getDeadlineTagihanDB.' 23:59:00';
                     $Name = $getDataMhsBYNPM[0]['Name'];
                     $Email = $getDataMhsBYNPM[0]['EmailPU'];
@@ -247,8 +248,10 @@ class C_finance extends Finnance_Controler {
                     if ($create_va['status']) {
                         // After create va insert data to db_finance.payment  and db_finance.payment_students
                         $countSuccessVA++;
-                        $aa = $this->m_finance->insertaDataPayment($Input[$i]->PTID,$Input[$i]->semester,$Input[$i]->NPM,$Input[$i]->Invoice,$Input[$i]->Discount);
-                        $ab = $this->m_finance->insertaDataPaymentStudents($aa,$Input[$i]->Invoice,$create_va['msg']['trx_id'],$create_va['msg']['datetime_expired']);
+                        $aa = $this->m_finance->insertaDataPayment($Input[$i]->PTID,$Input[$i]->semester,$Input[$i]->NPM,$payment,$Input[$i]->Discount);
+                        $ab = $this->m_finance->insertaDataPaymentStudents($aa,$payment,$create_va['msg']['trx_id'],$create_va['msg']['datetime_expired']);
+
+                        // send email and attachment
                     }
                     else
                     {
@@ -259,6 +262,36 @@ class C_finance extends Finnance_Controler {
             }
             echo json_encode($msg);
 
+    }
+
+    public function page_cek_tagihan_mhs()
+    {
+        $content = $this->load->view('page/'.$this->data['department'].'/set_tagihan/page_cek_tagihan_mhs',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function get_created_tagihan_mhs($page = null)
+    {
+        $input = $this->getInputToken();
+        $this->load->library('pagination');
+        $config = $this->config_pagination_default_ajax(1000,10,3);
+        $this->pagination->initialize($config);
+        $page = $this->uri->segment(3);
+        $start = ($page - 1) * $config["per_page"];
+        $data = $this->m_finance->get_created_tagihan_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NIM'],$config["per_page"], $start);
+        $output = array(
+        'pagination_link'  => $this->pagination->create_links(),
+        'loadtable'   => $data,
+        );
+        echo json_encode($output);
+    }
+
+    public function submit_created_tagihan_mhs()
+    {
+        $Input = $this->getInputToken();
+        $Input = $Input['arrValueCHK'];
+        $this->m_finance->updatePaymentApprove($Input);
+        
     }
 
 }
