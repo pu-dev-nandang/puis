@@ -1707,13 +1707,12 @@ class C_api extends CI_Controller {
 
         if(count($data_arr)>0){
             if($data_arr['action']=='read'){
-                $data = $this->m_api->__getAttendance($data_arr['ScheduleID']);
+                $data = $this->m_api->__getDataAttendance($data_arr['ScheduleID']);
                 return print_r(json_encode($data));
             }
             else if($data_arr['action']=='getAttendance'){
-                $data = $this->db->get_where('db_academic.attendance',
-                                    array('ID'=>$data_arr['AttendanceID']),1)
-                                ->result_array();
+
+                $data = $this->m_api->__getAttendanceSchedule($data_arr['AttendanceID']);
 
                 return print_r(json_encode($data));
             }
@@ -1800,13 +1799,46 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($result));
 
             }
-
             else if($data_arr['action']=='getAttdStudents'){
                 $SemesterID = $data_arr['SemesterID'];
                 $ScheduleID = $data_arr['ScheduleID'];
                 $SDID = $data_arr['SDID'];
                 $Meeting = $data_arr['Meeting'];
                 $data = $this->m_api->__getStudensAttd($SemesterID,$ScheduleID,$SDID,$Meeting);
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='addAttdStudents'){
+                $dataUpdate = (array) $data_arr['dataUpdate'];
+//                print_r($dataUpdate);
+                for($u=0;$u<count($dataUpdate);$u++){
+                    $dataObj = (array) $dataUpdate[$u];
+
+                    $d_updt = array(
+                        'M'.$dataObj['Meeting'] => $dataObj['Status'],
+                        'D'.$dataObj['Meeting'] => $dataObj['Description']
+                    );
+
+                    $this->db->where('ID', $dataObj['ID']);
+                    $this->db->update('db_academic.attendance_students', $d_updt);
+                }
+
+                return print_r(1);
+            }
+        }
+    }
+
+    public function crudScheduleExchange(){
+        $data_arr = $this->getInputToken();
+
+        if(count($data_arr)>0){
+            if($data_arr['action']=='readExchange'){
+                $ID_Attd = $data_arr['ID_Attd'];
+                $ScheduleID = $data_arr['ScheduleID'];
+                $SDID = $data_arr['SDID'];
+                $Meeting = $data_arr['Meeting'];
+
+                $data = $this->m_api->__getdataExchange($ID_Attd,$ScheduleID,$SDID,$Meeting);
+
                 return print_r(json_encode($data));
             }
         }
