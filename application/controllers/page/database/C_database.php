@@ -44,13 +44,7 @@ class C_database extends Globalclass {
     }
 
     public function loadpagelecturersDetails(){
-//        $page = $this->input->post('page');
-//        $data['NIP'] = $this->input->post('NIP');
-
         $data_arr = $this->getInputToken();
-
-//        print_r($data_arr);
-
         $this->load->view('page/database/lecturer/'.$data_arr['page'],$data_arr);
     }
 

@@ -77,8 +77,8 @@
                     Rencana Studi
                 </a>
             </li>
-            <li class="">
-                <a href="#">
+            <li class="<?php if($this->uri->segment(2)=='presensi'){echo "current";} ?>">
+                <a href="<?php echo base_url('academic/presensi'); ?>">
                     <i class="fa fa-users"></i>
                     Presensi
                 </a>

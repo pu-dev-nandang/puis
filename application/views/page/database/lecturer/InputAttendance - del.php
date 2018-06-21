@@ -106,7 +106,7 @@
                         '  </button>' +
                         '  <ul class="dropdown-menu">' +
                         '    <li><a href="javascript:void(0);" class="inputLecturerAttd" data-no="'+a+'" data-id="'+dataAttd['ID']+'">Attendance Lecturer</a></li>' +
-                        '    <li><a href="javascript:void(0);" class="" data-no="'+a+'" data-id="'+dataAttd['ID']+'">Attendance Students</a></li>' +
+                        '    <li><a href="javascript:void(0);" class="inputStudentAttd" data-no="'+a+'" data-id="'+dataAttd['ID']+'">Attendance Students</a></li>' +
                         '    <li role="separator" class="divider"></li>' +
                         '    <li><a href="javascript:void(0);" class="inputReplacementSchedule" data-no="'+a+'" data-id="'+dataAttd['ID']+'">Set Replacement Schedule</a></li>' +
                         '  </ul>' +

@@ -134,7 +134,7 @@
                                     '    <span class="caret"></span>' +
                                     '  </button>' +
                                     '  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">' +
-                                    '    <li><a href="javascript:void(0);" class="btnLecturerAction" data-page="InputAttendance" data-id="'+data.ID+'">Attendance</a></li>' +
+                                    '    <li><a href="javascript:void(0);" class="btnLecturerActionAttd" data-page="InputPresensi" data-id="'+data.ID+'">Attendance</a></li>' +
                                     '    <li><a href="javascript:void(0);" class="btnLecturerAction" data-page="InputScore" data-id="'+data.ID+'">Score</a></li>' +
                                     '    <li><a href="javascript:void(0);" class="btnLecturerAction" data-page="InputMaterial" data-id="'+data.ID+'">Material</a></li>' +
                                     '    <li role="separator" class="divider"></li>' +

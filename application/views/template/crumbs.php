@@ -1,3 +1,11 @@
+
+<style>
+    .crumbs {
+        margin: -20px -20px;
+        margin-bottom: 30px;
+    }
+</style>
+
 <div class="crumbs">
     <ul id="breadcrumbs" class="breadcrumb">
         <li>
