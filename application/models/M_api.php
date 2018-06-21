@@ -1736,50 +1736,39 @@ class M_api extends CI_Model {
         return $data;
     }
 
-    public function __getStudensAttd($SemesterID,$ScheduleID,$Meeting){
-
-        $dataClassOf = $this->getClassOf();
-
-        $res = [];
-        for($c=0;$c<count($dataClassOf);$c++){
-            $db_ = 'ta_'.$dataClassOf[$c]['Year'];
-            $dataSc = $this->db->query('SELECT sp.*,s.Name,s.NPM FROM '.$db_.'.study_planning sp 
-                                                LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
-                                                WHERE sp.ScheduleID = "'.$ScheduleID.'" 
-                                                AND sp.StatusSystem = "1" ')
-                ->result_array();
+    public function __getStudensAttd($SemesterID,$ScheduleID,$SDID,$Meeting){
 
 
-            if(count($dataSc)>0){
-                for($d=0;$d<count($dataSc);$d++){
-                    $dataSc[$d]['DB_Student'] = $db_;
+        $dataAttd = $this->db->query('SELECT attd_s.*,ast.Year AS ta FROM db_academic.attendance_students attd_s
+                                          LEFT JOIN db_academic.attendance attd ON (attd.ID = attd_s.ID_Attd)
+                                          LEFT JOIN db_academic.auth_students ast ON (ast.NPM = attd_s.NPM)
+                                          WHERE attd.SemesterID = "'.$SemesterID.'"
+                                          AND attd.ScheduleID = "'.$ScheduleID.'"
+                                          AND attd.SDID = "'.$SDID.'" ')->result_array();
 
+        $result = [];
+        if(count($dataAttd)>0){
+            for($s=0;$s<count($dataAttd);$s++){
+                $db_ = 'ta_'.$dataAttd[$s]['ta'];
+                $dataStd = $this->db->select('ID,Name,NPM,ClassOf')
+                        ->get_where($db_.'.students',array('NPM' => $dataAttd[$s]['NPM']))
+                        ->result_array();
 
-                    $cekAttd = $this->db->query('SELECT * FROM db_academic.attendance attd 
-                                                  RIGHT JOIN db_academic.attendance_students attd_s 
-                                                  ON (attd.ID = attd_s.ID_Attd) 
-                                                  WHERE attd.SemesterID = "'.$SemesterID.'"
-                                                   AND attd.ScheduleID = "'.$ScheduleID.'"
-                                                   AND attd_s.Meeting = "'.$Meeting.'"
-                                                   AND attd_s.NPM = "'.$dataSc[$d]['NPM'].'"
-                                                   ')->result_array();
+                $attdStd = ($dataAttd[$s]['M'.$Meeting]!='' && $dataAttd[$s]['M'.$Meeting]!=null) ? $dataAttd[$s]['M'.$Meeting] : '0';
+                $arr = array(
+                    'DetailStudent' => $dataStd[0],
+                    'DBStudent' => $db_,
+                    'Status' => $attdStd,
+                    'Description' => $dataAttd[$s]['D'.$Meeting]
+                );
 
+                array_push($result,$arr);
 
-
-                    $dataSc[$d]['P'] = 0;
-                    if(count($cekAttd)>0){
-                        $dataSc[$d]['P'] = 1;
-                    }
-
-                }
-                array_push($res,$dataSc);
             }
 
         }
 
-        return $res;
-
-
+        return $result;
 
     }
 
