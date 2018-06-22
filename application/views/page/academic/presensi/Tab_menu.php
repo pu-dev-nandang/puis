@@ -149,6 +149,35 @@
 
 <!-- Schedule Exchange -->
 <script>
+    
+    $(document).on('click','#btnSaveScheduleEx',function () {
+
+        var ID_Attd = $(this).attr('data-id');
+        var formLecturers = $('#formLecturers').val();
+        var formDate = $('#formDate').datepicker("getDate");
+        var formClassroom = $('#formClassroom').val();
+        var formStart = $('#formStart').val();
+        var formEnd = $('#formEnd').val();
+
+        var DayMoment = moment(formDate).day();
+
+        var Status = ($('#formCkStatus').is(':checked')) ? '1' : '0' ;
+
+        var data = {
+            ID_Attd : ID_Attd,
+            NIP : formLecturers,
+            ClassroomID : formClassroom,
+            Date : moment(formDate).format('YYYY-MM-DD'),
+            DayID : (DayMoment==0)? 7 : DayMoment,
+            StartSessions : formStart,
+            EndSessions : formEnd,
+            Status : Status
+        };
+
+        console.log(data);
+
+    });
+    
     $(document).on('click','.inputScheduleExchange',function () {
 
         var filterAttendance = $('#filterAttendance').val();
@@ -167,7 +196,6 @@
         var token = jwt_encode(data,'UAP)(*');
 
         $.post(url,{token:token},function (jsonResult) {
-            console.log(jsonResult);
 
             var Credit = jsonResult.S_Details.Credit;
             var TimePerCredit = jsonResult.S_Details.TimePerCredit;
@@ -206,7 +234,6 @@
                 '                       </div>' +
                 '                   </div> ' +
                 '                   <div class="col-xs-8" style="padding-top:5px;">' +
-                '                       <input class="hide" id="creditTime" value="'+Credit+'|'+TimePerCredit+'" hidden />' +
                 '                       <b>Credit : '+Credit+' | Time : '+TimePerCredit+' minutes/credit</b>' +
                 '                   </div> ' +
                 '                   </div>' +
@@ -222,9 +249,9 @@
                 '            <tr>' +
                 '                <td>Action</td>' +
                 '                <td>' +
-                '                    <div class="checkbox">' +
+                '                    <div class="checkbox" style="padding-top: 0px;">' +
                 '                       <label>' +
-                '                       <input type="checkbox"> Approve' +
+                '                       <input type="checkbox" id="formCkStatus" value="1"> Approve' +
                 '                       </label>' +
                 '                   </div>' +
                 '                </td>' +
@@ -269,7 +296,8 @@
             });;
 
             $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default btn-attd-students" data-dismiss="modal">Close</button> | ' +
-                '<button class="btn btn-danger">Delete Permission</button> <button class="btn btn-success" id="btnSaveAttdStudents" data-no="'+No+'" data-id="'+ID_Attd+'">Save</button>');
+                '<button class="btn btn-danger">Delete Permission</button> ' +
+                '<button class="btn btn-success" id="btnSaveScheduleEx" data-no="'+No+'" data-id="'+ID_Attd+'">Save</button>');
             $('#GlobalModal').modal({
                 'show' : true,
                 'backdrop' : 'static'
@@ -279,30 +307,7 @@
         });
 
     });
-
-    $(document).on('dp.change', 'input.datepicker', function() {
-        alert('changed');
-    });
-
-
-    $(document).on('change','#formStart',function () {
-        setSesiAkhir();
-    });
-
-    function setSesiAkhir() {
-
-        var creditTime = $('#creditTime').val();
-
-        var SesiAwal = $('#formStart').val();
-        var Credit = creditTime.split('|')[0];
-        var TimePerCredit = creditTime.split('|')[1];
-
-        // console.log(ID);
-        // console.log(SesiAwal);
-        if(TimePerCredit!='' && SesiAwal!='' && Credit!='' && typeof SesiAwal != 'undefined'){
-
-        }
-    }
+    
 </script>
 
 <!-- Input Attd Students -->
