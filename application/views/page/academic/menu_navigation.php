@@ -89,12 +89,12 @@
                     Jadwal Ujian
                 </a>
             </li>
-<!--            <li class="">-->
-<!--                <a href="#">-->
-<!--                    <i class="fa fa-area-chart"></i>-->
-<!--                    Nilai-->
-<!--                </a>-->
-<!--            </li>-->
+            <li class="">
+                <a href="#">
+                    <i class="fa fa-area-chart"></i>
+                    Nilai
+                </a>
+            </li>
             <li class="">
                 <a href="#">
                     <i class="fa fa-flag"></i>

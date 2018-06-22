@@ -20,7 +20,7 @@
 
 <link rel="stylesheet" href="<?php  echo base_url('assets/template/css/fontawesome/font-awesome.min.css'); ?>">
 <link rel="stylesheet" href="<?php echo base_url('assets/template/css/fontawesome4/css/font-awesome.min.css'); ?>">
-<link rel="stylesheet" href="<?php echo base_url('assets/plugins/datetimepicker/css/bootstrap-datetimepicker.min.css'); ?>">
+<!--<link rel="stylesheet" href="--><?php //echo base_url('assets/plugins/datetimepicker/css/bootstrap-datetimepicker.min.css'); ?><!--">-->
 
 <link rel="stylesheet" href="<?php echo base_url('assets/plugins/bootstrap-toggle/css/bootstrap-toggle.min.css'); ?>">
 <!--[if IE 7]>
@@ -217,7 +217,7 @@
 <!-- JWT Decode -->
 <script type="text/javascript" src="<?php echo base_url('assets/plugins/');?>jwt/decode/build/jwt-decode.min.js"></script>
 
-<script type="text/javascript" src="<?php echo base_url('assets/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js');?>"></script>
+<!--<script type="text/javascript" src="--><?php //echo base_url('assets/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js');?><!--"></script>-->
 
 <script type="text/javascript" src="<?php echo base_url('assets/inputmask/jquery.inputmask.bundle.min.js');?>"></script>
 <script type="text/javascript" src="<?php echo base_url('assets/datepicter/js/bootstrap-datetimepicker.min.js');?>"></script>
@@ -500,7 +500,6 @@
 
         var url = base_url_js+'api/__getAllMK';
         var option = $(''+element);
-        // console.log(selected);
         $.get(url,function (data) {
             for(var i=0;i<data.length;i++){
 

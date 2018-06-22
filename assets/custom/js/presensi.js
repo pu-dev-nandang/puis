@@ -18,8 +18,8 @@ $(document).on('click','.inputLecturerAttd',function () {
         var attd_nip = jsonResult.NIP;
         var attd_bap = (jsonResult.BAP!='' && jsonResult.BAP!=null) ? jsonResult.BAP : '';
         // var attd_date = (jsonResult.Date!='' && jsonResult.Date!=null) ? jsonResult.Date : '';
-        var attd_in = (jsonResult.In!='' && jsonResult.In!=null) ? jsonResult.In : '00:00:00';
-        var attd_out = (jsonResult.Out!='' && jsonResult.Out!=null) ? jsonResult.Out : '00:00:00';
+        var attd_in = (jsonResult.In!='' && jsonResult.In!=null) ? jsonResult.In.substr(0,5) : '00:00';
+        var attd_out = (jsonResult.Out!='' && jsonResult.Out!=null) ? jsonResult.Out.substr(0,5) : '00:00';
 
 
         var body_attd = '<div class="row">' +
@@ -68,7 +68,8 @@ $(document).on('click','.inputLecturerAttd',function () {
         }
 
         $('#inputIn,#inputOut').datetimepicker({
-            pickDate: false
+            pickDate: false,
+            pickSeconds : false
         });
 
         $("#formDate").datepicker({
@@ -81,8 +82,6 @@ $(document).on('click','.inputLecturerAttd',function () {
             var d = new Date(jsonResult.Date);
 
             $('#formDate').datepicker('setDate',d);
-        } else {
-
         }
 
         $('a.ui-state-default').attr('href','javascript:void(0)');

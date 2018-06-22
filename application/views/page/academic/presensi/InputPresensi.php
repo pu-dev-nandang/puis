@@ -130,9 +130,19 @@
 
                     var NameNip = (dataAttd['NIP'+a]!='' && dataAttd['NIP'+a]!=null) ? '<b>'+dataAttd['Name'+a]+'</b><br/>'+dataAttd['NIP'+a] : '-';
 
+                    var Sc_Ex_Status = dataAttd['ScheduleExchange_Status'+a];
+
+                    var btn_Sc_Ex_Status = '-';
+                    if(Sc_Ex_Status=='1') {
+                        btn_Sc_Ex_Status = '<i class="fa fa-exchange fa-2x" aria-hidden="true" style="color: orangered;"></i>';
+                    } else if (Sc_Ex_Status=='0'){
+                        btn_Sc_Ex_Status = '<i class="fa fa-question-circle fa-2x" aria-hidden="true" style="color: blue;"></i>';
+                    }
+
+
                     tr.append('<tr>' +
                         '            <td>'+a+'</td>' +
-                        '            <td><button class="btn btn-sm btn-default btn-default-warning"><i class="fa fa-clock-o" aria-hidden="true"></i></button></td>' +
+                        '            <td>'+btn_Sc_Ex_Status+'</td>' +
                         '            <td style="text-align: left;">'+NameNip+'</td>' +
                         '            <td style="text-align: right;">' +
                         '               <b>'+btnDate+'</b><br/>' +
