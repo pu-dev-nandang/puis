@@ -1,6 +1,10 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+include_once APPPATH.'vendor/autoload.php';
+use ElephantIO\Client;
+use ElephantIO\Engine\SocketIO\Version1X;
+
 class C_dashboard extends Globalclass {
 
     public function temp($content)
@@ -44,14 +48,22 @@ class C_dashboard extends Globalclass {
 
     public function testadi()
     {
-        for ($i=0; $i <= 100 ; $i= $i + 5) {
+        /*for ($i=0; $i <= 100 ; $i= $i + 5) {
             $dataSave = array(
                 'discount' => $i,
             );
             $this->db->insert('db_finance.discount', $dataSave);
         }
 
-        echo 'test';
+        echo 'test';*/
+        
+
+        $client = new Client(new Version1X('//localhost:3000'));
+
+        $client->initialize();
+        // send message to connected clients
+        $client->emit('update_notifikasi', ['update_notifikasi' => '1']);
+        $client->close();
     }
 
 

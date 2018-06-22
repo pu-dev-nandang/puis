@@ -262,8 +262,9 @@ class C_finance extends Finnance_Controler {
 
     }
 
-    public function page_cek_tagihan_mhs()
+    public function page_cek_tagihan_mhs($page = '')
     {
+        $this->data['NPM'] = $page;
         $content = $this->load->view('page/'.$this->data['department'].'/set_tagihan/page_cek_tagihan_mhs',$this->data,true);
         $this->temp($content);
     }

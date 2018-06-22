@@ -54,9 +54,9 @@
  * NOTE: If you change these, also change the error_reporting() code below
  */
 	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
-	define("url_registration","http://demo.web.podomorouniversity.ac.id/registeronline/", true);
+	define("url_registration","http://localhost/registeronline/", true);
 	define("serverRoot","http://localhost", true);
-	define("url_pas","http://demo.web.podomorouniversity.ac.id/pas/", true);
+	define("url_pas","http://localhost/puis/", true);
 
 /*
  *---------------------------------------------------------------

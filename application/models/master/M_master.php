@@ -1656,7 +1656,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     {
         $key = "UAP)(*";
         $subject = "You have received payment from : ".$data['Nama'].'<br> Type : '.$data['PTIDDesc'];
-        $URL = "finance/notifikasi";
+        $URL = "finance/tagihan-mhs/cek-tagihan-mhs/".$data['NPM'];
         $From = $data['EmailPU'];
         $ToDiv = "9";
         $ToPeople = "All";

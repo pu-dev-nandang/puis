@@ -23,7 +23,7 @@
     </div>
     <div class="col-md-3">
         <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM">
+            <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM" value="<?php echo $NPM ?>">
         </div>
     </div>
     <div class="col-md-3">
@@ -47,6 +47,7 @@
                 <th style="width: 10%;">Semester</th>
                 <th style="width: 20%;">Nama</th>
                 <th style="width: 5%;">NPM</th>
+                <th style="width: 5%;">Year</th>
                 <th style="width: 15%;">Payment Type</th>
                 <th style="width: 15%;">Email PU</th>
                 <th style="width: 10%;">Discount</th>
@@ -70,7 +71,7 @@
         loadData(1);
         loadSelectOptionCurriculum('#selectCurriculum','');
         loadSelectOptionBaseProdi('#selectProdi','');
-        loadSelectOptionPaymentType('#selectPTID','');
+        loadSelectOptionPaymentTypeMHS('#selectPTID','');
         getReloadTableSocket();
         // $("#btn-submit").addClass('hide');
     });
@@ -109,6 +110,9 @@
         $("#btn-submit").addClass('hide');
         $("#btn-submit-unapprove").addClass('hide');
         $("#datatable2").addClass('hide');
+
+        $('#dataResultCheckAll').prop('checked', false); // Unchecks it
+        $("span").removeClass('checked');
 
         var ta = $('#selectCurriculum').val();
         var prodi = $('#selectProdi').val();
@@ -197,6 +201,7 @@
                        '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
                        '<td>'+Data_mhs[i]['Nama']+'</td>' +
                        '<td>'+Data_mhs[i]['NPM']+'</td>' +
+                       '<td>'+Data_mhs[i]['Year']+'</td>' +
                        '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +
                        '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
                        '<td>'+Data_mhs[i]['Discount']+'%</td>' +

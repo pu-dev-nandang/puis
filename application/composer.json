@@ -1,0 +1,17 @@
+{
+    "name": "elephantIO_example_emitter",
+    "version": "3.0.0",
+    "main": "server.js",
+
+    "scripts": {
+        "start": "supervisor --debug server.js"
+    },
+
+    "dependencies": {
+        "socket.io": "~1",
+        "winston": "*"
+    },
+    "require": {
+        "wisembly/elephant.io": "^3.3"
+    }
+}

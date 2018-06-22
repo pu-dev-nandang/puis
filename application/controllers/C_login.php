@@ -7,7 +7,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * Date: 12/20/2017
  * Time: 1:41 PM
  */
-
+include_once APPPATH.'vendor/autoload.php';
+use ElephantIO\Client;
+use ElephantIO\Engine\SocketIO\Version1X;
 
 class C_login extends CI_Controller {
     public $GlobalVariableAdi = array('url_registration' => 'http://10.1.10.230/registeronline/');
@@ -223,11 +225,16 @@ class C_login extends CI_Controller {
                                     $subject = "Podomoro University Payment thank you";
                                     $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
                                     $this->m_master->update_va_log($data_asli);
-
                                     $this->m_master->saveNotification($data);
-                                    $data = $data + array('link' => $this->GlobalVariableAdi['url_registration']);
-                                    $content = $this->load->view('page/finance/script',$data,true);
-                                    echo $content;
+
+                                    // send notifikasi
+                                    $client = new Client(new Version1X('//10.1.10.230:3000'));
+
+                                    $client->initialize();
+                                    // send message to connected clients
+                                    $client->emit('update_notifikasi', ['update_notifikasi' => '1']);
+                                    $client->close();
+                                    
                                   }
                                   echo '{"status":"000"}';
                                   exit;
@@ -236,11 +243,16 @@ class C_login extends CI_Controller {
                           # code...
                           break;
                   }
-
                   
                 }
             }
         }
+    }
+
+    public function testadi2()
+    {
+        $content = $this->load->view('page/finance/script','',true);
+        echo $content;
     }
 
     private function setSession($ID,$NIP){
