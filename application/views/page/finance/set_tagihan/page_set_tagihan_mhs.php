@@ -36,12 +36,13 @@
                 <th style="width: 12%;">Program Study</th>
                 <th style="width: 10%;">Semester</th>
                 <th style="width: 20%;">Nama</th>
-                <th style="width: 5%;">NIM</th>
+                <th style="width: 5%;">NPM</th>
+                <th style="width: 5%;">Year</th>
                 <th style="width: 5%;">Foto</th>
                 <th style="width: 15%;">Email PU</th>
-                <th style="width: 10%;">No HP</th>
-                <th style="width: 10%;">Discount</th>
-                <th style="width: 10%;">Invoice</th>
+                <th style="width: 5%;">No HP</th>
+                <th style="width: 5%;">Discount</th>
+                <th style="width: 20%;">Invoice</th>
             </tr>
             </thead>
             <tbody id="dataRow"></tbody>
@@ -56,7 +57,7 @@
     $(document).ready(function () {
         loadSelectOptionCurriculum('#selectCurriculum','');
         loadSelectOptionBaseProdi('#selectProdi','');
-        loadSelectOptionPaymentType('#selectPTID','');
+        loadSelectOptionPaymentTypeMHS('#selectPTID','');
         // $("#btn-submit").addClass('hide');
     });
 
@@ -85,6 +86,9 @@
     function loadData(page) {
         $("#btn-submit").addClass('hide');
         $("#datatable2").addClass('hide');
+
+        $('#dataResultCheckAll').prop('checked', false); // Unchecks it
+        $("span").removeClass('checked');
 
         var ta = $('#selectCurriculum').val();
         var prodi = $('#selectProdi').val();
@@ -136,6 +140,7 @@
                        '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
                        '<td>'+Data_mhs[i]['Name']+'</td>' +
                        '<td>'+Data_mhs[i]['NPM']+'</td>' +
+                       '<td>'+Data_mhs[i]['ClassOf']+'</td>' +
                        '<td>'+img+'</td>' +
                        '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
                        '<td>'+Data_mhs[i]['HP']+'</td>' +

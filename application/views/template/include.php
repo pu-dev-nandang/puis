@@ -829,12 +829,25 @@
     }
 
     // Adi
-    function loadSelectOptionPaymentType(element,selected) {
+    function loadSelectOptionPaymentTypeAll(element,selected) {
         var url = base_url_js+"api/__getBasePaymentTypeSelectOption";
         $.get(url,function (data) {
             for(var i=0;i<data.length;i++){
                 var selc = (data[i].ID==selected) ? 'selected' : '';
                 $(''+element).append('<option value="'+data[i].ID+'" '+selc+'>'+data[i].Abbreviation+'</option>');
+            }
+        });
+    }
+
+    // Adi
+    function loadSelectOptionPaymentTypeMHS(element,selected) {
+        var url = base_url_js+"api/__getBasePaymentTypeSelectOption";
+        $.get(url,function (data) {
+            for(var i=0;i<data.length;i++){
+                if (data[i].ID == 2 || data[i].ID == 3) {
+                    var selc = (data[i].ID==selected) ? 'selected' : '';
+                    $(''+element).append('<option value="'+data[i].ID+'" '+selc+'>'+data[i].Abbreviation+'</option>');
+                }
             }
         });
     }
