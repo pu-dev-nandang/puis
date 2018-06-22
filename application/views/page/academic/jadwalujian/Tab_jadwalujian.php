@@ -31,19 +31,6 @@
 
     });
 
-    // $(document).on('change','#filterSemester',function () {
-    //     var Semester = $('#filterSemester').val();
-    //     var SemesterID = (Semester!='' && Semester!= null) ? Semester.split('.')[0] : '';
-    //
-    //     $('#selectSemesterSc').html('<select class="form-control" id="filterSemesterSchedule"></select>');
-    //     // $('#filterSemesterSchedule').empty();
-    //     $('#filterSemesterSchedule').append('<option value="" disabled selected>-- Semester --</option>' +
-    //         '                <option disabled>------------</option>');
-    //     loadSelectOPtionAllSemester('#filterSemesterSchedule','',SemesterID,SemesterAntara);
-    //     // filterSchedule();
-    //
-    // });
-
     $(document).on('click','.btn-action',function () {
         var page = $(this).attr('data-page');
         var ScheduleID = (page=='editjadwal') ? $(this).attr('data-id') : '';
@@ -139,5 +126,68 @@
 <script>
     $(document).on('change','.form-filter',function () {
         loadDataScheduleExam();
-    })
+    });
+
+    function loadDataScheduleExam() {
+
+        var filterSemester = $('#filterSemester').val();
+        var filterBaseProdi = $('#filterBaseProdi').val();
+        var filterExam = $('#filterExam').val();
+
+        if(filterSemester!='' && filterSemester!=null && filterBaseProdi!='' && filterBaseProdi!=null && filterExam!='' && filterExam!=null){
+            var filterSemesterSplit = filterSemester.split('.');
+            var filterBaseProdiSplit = filterBaseProdi.split('.');
+
+            var data = {
+                action : 'readSchedule',
+                SemesterID : filterSemesterSplit[0],
+                Type : filterExam,
+                ProdiID : filterBaseProdiSplit[0]
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__crudJadwalUjian';
+
+            $.post(url,{token:token},function (resultJson) {
+                console.log(resultJson);
+                if(resultJson.length>0){
+
+                    for(var i=0;i<resultJson.length;i++){
+                        var dataEx = resultJson[i];
+                        var pengawas = (dataEx.Pengawas2!=null) ? dataEx.Pengawas1+' - '+dataEx.Pengawas1Name+'<br/>'+dataEx.Pengawas2+' - '+dataEx.Pengawas2Name : dataEx.Pengawas1+' - '+dataEx.Pengawas1Name;
+
+                        var btnActionUjian = '<div class="dropdown">' +
+                            '  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">' +
+                            '    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>' +
+                            '    <span class="caret"></span>' +
+                            '  </button>' +
+                            '  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">' +
+                            '    <li><a href="#">Edit</a></li>' +
+                            '    <li><a href="#">Edit Peserta</a></li>' +
+                            '    <li><a href="#">Layout</a></li>' +
+                            '    <li><a href="#">Naskah Soal</a></li>' +
+                            '    <li><a href="#">Lembar Jawaban</a></li>' +
+                            '    <li><a href="#">Berita Acara</a></li>' +
+                            '    <li><a href="#">Daftar Hadir</a></li>' +
+                            '    <li role="separator" class="divider"></li>' +
+                            '    <li><a href="#">Delete</a></li>' +
+                            '  </ul>' +
+                            '</div>';
+
+                        $('#trExam').append('<tr>' +
+                            '<td style="text-align: center;">'+dataEx.CourseDetails.MKCode+'</td>' +
+                            '<td style="text-align: left;">'+dataEx.CourseDetails.MKNameEng+'</td>' +
+                            '<td>'+dataEx.CourseDetails.Coordinator+'</td>' +
+                            '<td>'+pengawas+'</td>' +
+                            '<td>'+btnActionUjian+'</td>' +
+                            '<td>'+dataEx.DayEng+', '+moment(dataEx.ExamDate).format('DD MMMM YYYY')+'</td>' +
+                            '<td>'+dataEx.ExamStart.substr(0,5)+' - '+dataEx.ExamEnd.substr(0,5)+'</td>' +
+                            '<td>'+dataEx.Room+'</td>' +
+                            '</tr>');
+                    }
+
+                }
+            });
+        }
+    }
 </script>

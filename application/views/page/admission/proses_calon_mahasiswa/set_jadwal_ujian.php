@@ -1,5 +1,3 @@
-<script type="text/javascript" src="<?php echo base_url();?>assets/datepicker/bootstrap-datepicker.js"></script>
-<link href="<?php echo base_url();?>assets/datepicker/datepicker.css" rel="stylesheet" type="text/css"/>
 <style type="text/css">
 	.btn-save{
 		background-color: #15a02c;
@@ -23,7 +21,14 @@
 				<div class = "row">		
 					<div class="col-xs-2" style="">
 						Waktu Ujian
-						<input class="form-control" id="datetime_ujian" placeholder="All..." "="">
+<!--						<input class="form-control" id="datetime_ujian" placeholder="All..." "="">-->
+                        <div id="datetimepicker1" class="input-group input-append date">
+                            <input data-format="yyyy-MM-dd hh:mm:ss" class="form-control" id="datetime_ujian" type="text"></input>
+                            <span class="input-group-addon add-on">
+                              <i data-time-icon="icon-time" data-date-icon="icon-calendar">
+                              </i>
+                            </span>
+                        </div>
 					</div>
 					<div class="col-xs-6" style="">
 						Lokasi
@@ -52,9 +57,9 @@
         $('#datetime_ujian').prop('readonly',true);
         var nowDate = new Date();
         var today = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), 0, 0, 0, 0);
-        $('#datetime_ujian').datetimepicker({
+        $('#datetimepicker1').datetimepicker({
         	// startDate: today,
-        	startDate: '+2d',
+        	// startDate: '+2d',
         });
 	});
 

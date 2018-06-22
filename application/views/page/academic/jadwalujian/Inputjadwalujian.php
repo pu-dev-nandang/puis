@@ -55,10 +55,22 @@
             <td>
                 <div class="row">
                     <div class="col-md-4">
-                        <input class="form-control form-datetime" readonly id="formStart">
+<!--                        <input class="form-control form-datetime" readonly id="formStart">-->
+                        <div id="inputStart" class="input-group">
+                            <input data-format="hh:mm" type="text" id="formStart" class="form-control form-attd" value=""/>
+                            <span class="add-on input-group-addon">
+                                <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
+                            </span>
+                        </div>
                     </div>
                     <div class="col-md-4">
-                        <input class="form-control form-datetime" readonly id="formEnd">
+<!--                        <input class="form-control form-datetime" readonly id="formEnd">-->
+                        <div id="inputEnd" class="input-group">
+                            <input data-format="hh:mm" type="text" id="formEnd" class="form-control form-attd" value=""/>
+                            <span class="add-on input-group-addon">
+                                <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
+                            </span>
+                        </div>
                     </div>
                     <div class="col-md-4">
                         <select id="formClassroom" class="form-control"></select>
@@ -107,7 +119,10 @@
         getDataCourse();
         dateInputJadwal();
         loadSelectOptionClassroom('#formClassroom','');
-        $("#formStart,#formEnd").datetimepicker(timeOption);
+        $('#inputStart,#inputEnd').datetimepicker({
+            pickDate: false,
+            pickSeconds : false
+        });;
 
         loadSelectOptionEmployeesSingle('#formPengawas1','');
         loadSelectOptionEmployeesSingle('#formPengawas2','');

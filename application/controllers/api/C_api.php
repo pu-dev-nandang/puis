@@ -1841,6 +1841,54 @@ class C_api extends CI_Controller {
 
                 return print_r(json_encode($data));
             }
+            else if($data_arr['action']=='addSceduleEx'){
+                $dataInsert = (array) $data_arr['dataInsert'];
+
+                // Cek Apakah sudah ada atau belum
+                $dataWhere = array(
+                    'ID_Attd' => $dataInsert['ID_Attd'],
+                    'Meeting' => $dataInsert['Meeting']
+                );
+
+                $dataC = $this->db->get_where('db_academic.schedule_exchange',
+                                $dataWhere,1)->result_array();
+
+                if(count($dataC)>0){
+                    $dataUpdate = array(
+                        'NIP' => $dataInsert['NIP'],
+                        'ClassroomID' => $dataInsert['ClassroomID'],
+                        'Date' => $dataInsert['Date'],
+                        'DayID' => $dataInsert['DayID'],
+                        'StartSessions' => $dataInsert['StartSessions'],
+                        'EndSessions' => $dataInsert['EndSessions'],
+                        'Status' => $dataInsert['Status']
+                    );
+
+                    $this->db->where('ID', $dataC[0]['ID']);
+                    $this->db->update('db_academic.schedule_exchange', $dataUpdate);
+
+                } else {
+                    $this->db->insert('db_academic.schedule_exchange',$dataInsert);
+                }
+
+                return print_r(1);
+
+            }
+            else if($data_arr['action']=='deleteSceduleEx'){
+                $dataWhere = array(
+                    'ID_Attd' => $data_arr['ID_Attd'],
+                    'Meeting' => $data_arr['Meeting']
+                );
+                $dataC = $this->db->get_where('db_academic.schedule_exchange',
+                    $dataWhere)->result_array();
+
+                if(count($dataC)>0){
+                    $this->db->delete('db_academic.schedule_exchange',$dataWhere);
+                }
+
+                return print_r(1);
+
+            }
         }
     }
 

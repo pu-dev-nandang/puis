@@ -1787,6 +1787,7 @@ class M_api extends CI_Model {
                 $data[0]['Name'.$s] = '';
                 $p = '-';
                 $a = '-';
+
                 if($data[0]['NIP'.$s] != '' && $data[0]['NIP'.$s] != null){
                     $dataLec = $this->db->select('Name')->get_where('db_employees.employees',
                         array('NIP' => $data[0]['NIP'.$s]),1)->result_array();
@@ -1804,6 +1805,13 @@ class M_api extends CI_Model {
                     }
                 }
 
+                $dataWhereS_Ex = $this->db->get_where('db_academic.schedule_exchange',
+                                        array(
+                                            'ID_Attd' => $AttendanceID,
+                                            'Meeting'=>$s),1)->result_array();
+                $ScheduleEx_Status = (count($dataWhereS_Ex)>0) ? $dataWhereS_Ex[0]['Status'] : '-';
+
+                $data[0]['ScheduleExchange_Status'.$s] = $ScheduleEx_Status;
                 $data[0]['S_P'.$s] = $p;
                 $data[0]['S_A'.$s] = $a;
             }
@@ -1820,7 +1828,8 @@ class M_api extends CI_Model {
                                         WHERE sd.ID = "'.$SDID.'" LIMIT 1 ')->result_array();
 
         $dataSEx = $this->db->query('SELECT * FROM db_academic.schedule_exchange se 
-                                              WHERE se.ID_Attd = "'.$ID_Attd.'" ')->result_array();
+                                              WHERE se.ID_Attd = "'.$ID_Attd.'" 
+                                              AND se.Meeting = "'.$Meeting.'" LIMIT 1')->result_array();
 
         $coor = $this->db->query('SELECT em.NIP,em.Name FROM db_academic.schedule s 
                                             LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
