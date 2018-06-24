@@ -1513,7 +1513,8 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($data));
             }
             else if($data_arr['action']=='checkCourse'){
-                $data = $this->m_api->_checkCourse($data_arr['ScheduleID']);
+                $data = $this->m_api
+                    ->__checkDataCourseForExam($data_arr['ScheduleID'],$data_arr['Type']);
                 return print_r(json_encode($data));
             }
             else if($data_arr['action']=='add'){
@@ -1524,9 +1525,12 @@ class C_api extends CI_Controller {
                 $insert_id = $this->db->insert_id();
 
                 for($e=0;$e<count($dataStudents);$e++){
+                    $dataM = (array) $dataStudents[$e];
                     $dataInsert = array(
                         'ExamID' => $insert_id,
-                        'MhswID' => $dataStudents[$e]
+                        'MhswID' => $dataM['MhswID'],
+                        'NPM' => $dataM['NPM'],
+                        'DB_Students' => $dataM['DB_Students']
                     );
                     $this->db->insert('db_academic.exam_details',$dataInsert);
                 }
@@ -1544,6 +1548,9 @@ class C_api extends CI_Controller {
                 );
 
                 return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='save2pdfLayout'){
+
             }
         }
     }
