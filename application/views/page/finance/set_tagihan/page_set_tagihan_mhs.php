@@ -264,12 +264,13 @@
                {
                 toastr.success('Data berhasil disimpan', 'Success!');
                }
-
+               loadData(1);
             }).fail(function() {
               toastr.info('No Action...'); 
               // toastr.error('The Database connection error, please try again', 'Failed!!');
             }).always(function() {
                 $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
+                $('#NotificationModal').modal('hide');
             });
              
            }); // exit click function

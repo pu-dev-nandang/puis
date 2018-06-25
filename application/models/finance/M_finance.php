@@ -956,4 +956,54 @@ class M_finance extends CI_Model {
         
    }
 
+   public function delete_id_table($ID,$table)
+   {
+       $sql = "delete from db_finance.".$table." where ID = ".$ID;
+       $query=$this->db->query($sql, array());
+   }
+
+   public function inserData_master_tagihan_mhs($TypePembayaran,$Prodi,$Cost,$ClassOf)
+   {
+    $dataSave = array(
+        'PTID' => $TypePembayaran,
+        'ProdiID' => $Prodi,
+        'ClassOf' => $ClassOf,
+        'Cost' => $Cost,
+    );
+      $this->db->insert('db_finance.tuition_fee', $dataSave);
+   }
+
+   public function editData_master_tagihan_mhs($TypePembayaran,$Prodi,$Cost,$ClassOf,$ID)
+   {
+      $dataSave = array(
+          'PTID' => $TypePembayaran,
+          'ProdiID' => $Prodi,
+          'ClassOf' => $ClassOf,
+          'Cost' => $Cost,
+      );
+      $this->db->where('ID',$ID);
+      $this->db->update('db_finance.tuition_fee', $dataSave);
+   }
+
+   public function updateTagihanMhsList($input)
+   {
+    for ($i=0; $i < count($input); $i++) { 
+      $ID = $input[$i]->id;
+      $Cost = $input[$i]->Cost;
+      $dataSave = array(
+          'Cost' => $Cost,
+      );
+      $this->db->where('ID',$ID);
+      $this->db->update('db_finance.tuition_fee', $dataSave);
+    }
+   }
+
+   public function deleteTagihanMHSByProdiYear($input)
+   {
+    $ProdiID = $input['ProdiID'];
+    $ClassOf = $input['ClassOf'];
+    $sql = "delete from db_finance.tuition_fee where ProdiID = ".$ProdiID.' and ClassOf = "'.$ClassOf.'"';
+    $query=$this->db->query($sql, array());
+   }
+
 }

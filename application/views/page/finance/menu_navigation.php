@@ -98,6 +98,12 @@
                         Cek Tagihan Mahasiswa
                         </a>
                     </li>
+                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "cancel-tagihan-mhs"){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/tagihan-mhs/cancel-tagihan-mhs'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Cancel Tagihan Mahasiswa
+                        </a>
+                    </li>
                 </ul>
             </li>
             <li class="">

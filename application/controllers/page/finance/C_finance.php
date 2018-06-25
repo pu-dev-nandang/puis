@@ -236,25 +236,35 @@ class C_finance extends Finnance_Controler {
                 if ($fieldEND != '')
                 {
                     $getDeadlineTagihanDB = $this->m_finance->getDeadlineTagihanDB($fieldEND,$SemesterID[0]['ID']);
-                    $getDataMhsBYNPM = $this->m_master->getDataMhsBYNPM($Input[$i]->NPM,$Input[$i]->ta);
-                    $payment = str_replace("Rp.","", $Input[$i]->Invoice);
-                    $payment = trim(str_replace(",-","", $payment));
-                    $payment = trim(str_replace(".","", $payment));
-                    $DeadLinePayment = $getDeadlineTagihanDB.' 23:59:00';
-                    $Name = $getDataMhsBYNPM[0]['Name'];
-                    $Email = $getDataMhsBYNPM[0]['EmailPU'];
-                    $VA_number = $this->m_finance->getVANumberMHS($Input[$i]->NPM);
-                    $create_va = $this->m_finance->create_va_Payment($payment,$DeadLinePayment, $Name, $Email,$VA_number,$description = $fieldEND,$tableRoutes = 'db_finance.payment_students');
-                    if ($create_va['status']) {
-                        // After create va insert data to db_finance.payment  and db_finance.payment_students
-                        $countSuccessVA++;
-                        $aa = $this->m_finance->insertaDataPayment($Input[$i]->PTID,$Input[$i]->semester,$Input[$i]->NPM,$payment,$Input[$i]->Discount);
-                        $ab = $this->m_finance->insertaDataPaymentStudents($aa,$payment,$create_va['msg']['trx_id'],$create_va['msg']['datetime_expired']);
+                    // check Deadline Tagihan telah melewati tanggal sekarang atau belum
+                    $chkTgl = $this->m_master->checkTglNow($getDeadlineTagihanDB);
+                    if ($chkTgl) {
+                        $getDataMhsBYNPM = $this->m_master->getDataMhsBYNPM($Input[$i]->NPM,$Input[$i]->ta);
+                        $payment = str_replace("Rp.","", $Input[$i]->Invoice);
+                        $payment = trim(str_replace(",-","", $payment));
+                        $payment = trim(str_replace(".","", $payment));
+                        $DeadLinePayment = $getDeadlineTagihanDB.' 23:59:00';
+                        $Name = $getDataMhsBYNPM[0]['Name'];
+                        $Email = $getDataMhsBYNPM[0]['EmailPU'];
+                        $VA_number = $this->m_finance->getVANumberMHS($Input[$i]->NPM);
+                        $create_va = $this->m_finance->create_va_Payment($payment,$DeadLinePayment, $Name, $Email,$VA_number,$description = $fieldEND,$tableRoutes = 'db_finance.payment_students');
+                        if ($create_va['status']) {
+                            // After create va insert data to db_finance.payment  and db_finance.payment_students
+                            $countSuccessVA++;
+                            $aa = $this->m_finance->insertaDataPayment($Input[$i]->PTID,$Input[$i]->semester,$Input[$i]->NPM,$payment,$Input[$i]->Discount);
+                            $ab = $this->m_finance->insertaDataPaymentStudents($aa,$payment,$create_va['msg']['trx_id'],$create_va['msg']['datetime_expired']);
+                        }
+                        else
+                        {
+                            $msg .= 'Tidak bisa Create VA dengan Nama : '.$Name.' dan NPM : '.$Input[$i]->NPM.'<br>';
+                        }
                     }
                     else
                     {
-                        $msg .= 'Tidak bisa Create VA dengan Nama : '.$Name.' dan NPM : '.$Input[$i]->NPM.'<br>';
+                        $msg = 'Tanggal Deadline telah melewati tanggal sekarang. <br> Data tidak dapat di Proses';
                     }
+
+                    
                 }
                 
             }
@@ -299,6 +309,19 @@ class C_finance extends Finnance_Controler {
         $Input = $Input['arrValueCHK'];
         $proses = $this->m_finance->updatePaymentunApprove($Input);
         echo json_encode($proses);
+    }
+
+    public function cancel_tagihan_mhs()
+    {
+        $content = $this->load->view('page/'.$this->data['department'].'/set_tagihan/page_cancel_tagihan_mhs',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function cancel_created_tagihan_mhs()
+    {
+        $Input = $this->getInputToken();
+        $Input = $Input['arrValueCHK'];
+        // $this->m_finance->updatePaymentApprove($Input);
     }
 
 }
