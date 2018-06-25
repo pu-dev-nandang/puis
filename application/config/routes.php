@@ -319,6 +319,13 @@ $route['loadDataRegistrationTelahBayar'] =  'api/C_global/load_data_registration
 $route['loadDataRegistrationFormulirOffline'] =  'api/C_global/load_data_registration_formulir_offline';
 
 
+// ---- Save to PDF ---
+$route['save2pdf/exam-layout'] =  'c_save_to_pdf/exam_layout';
+$route['save2pdf/draft-questions'] =  'c_save_to_pdf/draft_questions';
+$route['save2pdf/answer-sheet'] =  'c_save_to_pdf/answer_sheet';
+$route['save2pdf/news-event'] =  'c_save_to_pdf/news_event';
+$route['save2pdf/attendance-list'] =  'c_save_to_pdf/attendance_list';
+
 // ====== API ======
 $route['api/__getKurikulumByYear'] = 'api/c_api/getKurikulumByYear';
 $route['api/__getBaseProdi'] = 'api/c_api/getProdi';

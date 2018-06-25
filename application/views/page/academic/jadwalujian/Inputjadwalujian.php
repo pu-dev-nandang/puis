@@ -8,6 +8,9 @@
         color: #333333;
         cursor: text;
     }
+    #tableEditExamStd thead tr th, #tableEditExamStd tbody tr td {
+        text-align: center;
+    }
 </style>
 
 <hr/>
@@ -46,16 +49,26 @@
             <th>Students</th>
             <td>:</td>
             <td style="text-align: left;">
-                <b id="dataTotalStudent" class="label label-primary">-</b> Students | <a href="javascript:void(0);">Edit</a>
+                <div class="row">
+                    <div class="col-xs-5">
+                        <b class="label label-primary"> <span id="dataTotalStudent">0</span> of <span id="OfDataTotalStudent">0</span></b> Students |
+                        <a href="javascript:void(0);" data-classgroup="" id="btnEditExamStudents">Edit</a>
+                    </div>
+                    <div class="col-xs-4" style="text-align: right;">
+                        <label>Row Of Seats : </label>
+                    </div>
+                    <div class="col-xs-3">
+                        <select class="form-control" id="formRowOfSeats"></select>
+                    </div>
+                </div>
             </td>
         </tr>
         <tr>
-            <th>Waktu & Ruang</th>
+            <th>Waktu</th>
             <td>:</td>
             <td>
                 <div class="row">
                     <div class="col-md-4">
-<!--                        <input class="form-control form-datetime" readonly id="formStart">-->
                         <div id="inputStart" class="input-group">
                             <input data-format="hh:mm" type="text" id="formStart" class="form-control form-attd" value=""/>
                             <span class="add-on input-group-addon">
@@ -64,7 +77,6 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-<!--                        <input class="form-control form-datetime" readonly id="formEnd">-->
                         <div id="inputEnd" class="input-group">
                             <input data-format="hh:mm" type="text" id="formEnd" class="form-control form-attd" value=""/>
                             <span class="add-on input-group-addon">
@@ -72,10 +84,14 @@
                             </span>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <select id="formClassroom" class="form-control"></select>
-                    </div>
                 </div>
+            </td>
+        </tr>
+        <tr>
+            <th>Room</th>
+            <td>:</td>
+            <td>
+                <select id="formClassroom" class="form-control" style="max-width: 300px;"></select>
             </td>
         </tr>
         <tr>
@@ -97,6 +113,13 @@
             </td>
         </tr>
         <tr>
+            <td id="trAlertJadwal" class="hide" colspan="3">
+                <div class="alert alert-warning" role="alert">
+                    <b>Group Class sudah dibuatkan <b id="jmlJadwal"></b> Jadwal Ujian</b>
+                </div>
+            </td>
+        </tr>
+        <tr>
             <td colspan="3">
                 <div style="text-align: right;">
                     <button id="btnSave" class="btn btn-primary">Save</button>
@@ -114,7 +137,9 @@
 <script>
     $(document).ready(function () {
 
+        window.dataStudentForExamDisabled = [];
         window.dataStudentForExam = [];
+        window.dataAllStudentForExam = [];
 
         getDataCourse();
         dateInputJadwal();
@@ -122,11 +147,18 @@
         $('#inputStart,#inputEnd').datetimepicker({
             pickDate: false,
             pickSeconds : false
-        });;
+        });
 
         loadSelectOptionEmployeesSingle('#formPengawas1','');
         loadSelectOptionEmployeesSingle('#formPengawas2','');
         $('#formPengawas1,#formPengawas2').select2({allowClear: true});
+
+        for(var op=1;op<=15;op++){
+            var sc = (op==5) ? 'selected' : '';
+            $('#formRowOfSeats').append('<option value="'+op+'" '+sc+'>'+op+'</option>');
+        }
+
+
     });
 
     function dateInputJadwal() {
@@ -196,10 +228,13 @@
         var ExamClassroomID = $('#formClassroom').val();
         var ExamStart = $('#formStart').val();
         var ExamEnd = $('#formEnd').val();
+        var formRowOfSeats = $('#formRowOfSeats').val();
         var Pengawas1 = $('#formPengawas1').val();
         var Pengawas2 = $('#formPengawas2').val();
 
-        if(ScheduleID!=null && data_date_ex!='' && ExamStart!='' && ExamEnd!='' && Pengawas1!=null){
+        if(ScheduleID!=null && data_date_ex!=''
+            && ExamStart!='' && ExamEnd!=''
+            && Pengawas1!=null && dataStudentForExam.length>0){
 
             var SemesterID = $('#formSemesterID').val();
 
@@ -220,6 +255,7 @@
                     ExamClassroomID : ExamClassroomID,
                     ExamStart : ExamStart,
                     ExamEnd : ExamEnd,
+                    RowOfSeats : formRowOfSeats,
                     Pengawas1 : Pengawas1,
                     Pengawas2 : Pengawas2
                 },
@@ -233,9 +269,12 @@
             $.post(url,{token:token},function (jsonResult) {
                 toastr.success('Exam Schedule','Saved')
                 dataStudentForExam = [];
+                dataStudentForExamDisabled = [];
+                dataAllStudentForExam = [];
                 setTimeout(function () {
                     $('#divDetails').html('-');
-                    $('#dataTotalStudent').html('-');
+                    $('#dataTotalStudent').html('0');
+                    $('#OfDataTotalStudent').html('0');
                     $('#btnSave').prop('disabled',false).html('Save');
 
                     $('#formCourse,#formDate,#formDayID,#formStart,#formEnd').val('');
@@ -245,7 +284,7 @@
             });
 
         } else {
-            toastr.warning('Fill All Form Required','Warning!');
+            toastr.warning('Fill All Form Required Or Student Not Selected','Warning!');
         }
 
 

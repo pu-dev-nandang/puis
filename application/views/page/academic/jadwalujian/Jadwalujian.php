@@ -35,7 +35,7 @@
             <table class="table table-bordered" id="tableExam">
                 <thead>
                 <tr style="background: #437e88;color: #ffffff;">
-                    <th style="width: 7%;">MKCode</th>
+                    <th style="width: 7%;">Group</th>
                     <th>Course</th>
                     <th style="width: 15%;">Lecturers</th>
                     <th style="width: 15%;">Pengawas</th>
