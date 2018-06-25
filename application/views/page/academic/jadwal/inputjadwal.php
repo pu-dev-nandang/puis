@@ -51,12 +51,17 @@
                 <td>Kelas Gabungan ?</td>
                 <td>:</td>
                 <td>
-                    <label class="radio-inline">
-                        <input type="radio" name="formCombinedClasses" class="form-jadwal" value="0" checked> Tidak
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="formCombinedClasses" class="form-jadwal" value="1"> Ya
-                    </label>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <label class="radio-inline">
+                                <input type="radio" name="formCombinedClasses" class="form-jadwal" value="0" checked> Tidak
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="formCombinedClasses" class="form-jadwal" value="1"> Ya
+                            </label>
+                        </div>
+                    </div>
+
                 </td>
             </tr>
 
@@ -85,8 +90,27 @@
             <tbody id="bodyAddProdi"></tbody>
             <tr class="hide" id="btnControlProdi">
                 <td colspan="3" class="td-center">
-                    <button class="btn btn-default btn-default-danger" data-remove="0" id="btnRemoveProdi"><i class="fa fa-minus-circle right-margin" aria-hidden="true"></i> Prodi</button> |
-                    <button class="btn btn-default btn-default-success" id="btnAddProdi"><i class="fa fa-plus-circle right-margin" aria-hidden="true"></i> Prodi</button>
+                    <button class="btn btn-default btn-default-danger" data-remove="0" id="btnRemoveProdi"><i class="fa fa-minus-circle right-margin" aria-hidden="true"></i> Remove Prodi</button> |
+                    <button class="btn btn-default btn-default-success" id="btnAddProdi"><i class="fa fa-plus-circle right-margin" aria-hidden="true"></i> Add Prodi</button>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Group Paralel</td>
+                <td>:</td>
+                <td>
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <div class="checkbox" style="margin:0px;">
+                                <label>
+                                    <input type="checkbox" id="formParalel"> Paralel
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-xs-4">
+                            <select class="form-control" id="ClassgroupParalel"></select>
+                        </div>
+                    </div>
                 </td>
             </tr>
 
@@ -166,7 +190,12 @@
                             <a href="javascript:void(0)" id="addTimePerCredit" style="font-size:10px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Tambah <i>Time Per Credit</i></a>
                         </div>
                         <div class="col-xs-4">
-                            <input type="text" readonly class="form-control form-jadwal formSesiAwal form-sesiawal" id="formSesiAwal1" data-id="1" />
+                            <div id="div_formSesiAwal1" data-no="1" class="input-group">
+                                <input data-format="hh:mm" type="text" id="formSesiAwal1" class="form-control form-attd" value="00:00"/>
+                                <span class="add-on input-group-addon">
+                                    <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
+                                </span>
+                            </div>
                         </div>
                         <div class="col-xs-4">
                             <input type="text" class="form-control" id="formSesiAkhir1" style="color: #333;" readonly />
@@ -180,12 +209,11 @@
 
         <hr/>
 
-        <div style="text-align: right;">
+        <div style="text-align: right;margin-bottom: 70px;">
             <button class="btn btn-default btn-default-danger" id="removeNewSesi">Remove Sub Sesi</button>
             <button class="btn btn-default btn-default-success" data-group="1" id="addNewSesi">Add Sub Sesi</button>
             |
             <button class="btn btn-success" id="btnSavejadwal">Save</button>
-<!--            <button class="btn btn-default" onclick="checkSchedule(1,2,'10:41:00','11:01:00')" id="cek">cek</button>-->
         </div>
     </div>
 </div>
@@ -233,28 +261,15 @@
                 $('input[type=radio][name=formCombinedClasses][value=0]').prop('checked',true);
                 $('#btnControlProdi').addClass('hide');
                 $('#divGabugan').addClass('hide');
-                setGroupClass(0);
+                setGroupClass();
             }
         } else {
             $('input[type=radio][name=formCombinedClasses][value=0]').prop('checked',true);
             $('#btnControlProdi').addClass('hide');
             $('#divGabugan').addClass('hide');
-            setGroupClass(0);
+            setGroupClass();
 
         }
-
-    });
-
-    $(document).on('change','.fm-prodi',function () {
-       var divNum = $(this).attr('data-id');
-       var Prodi = $(this).val();
-       if(Prodi!=''){
-           var ProdiID = Prodi.split('.')[0];
-           getCourseOfferings(ProdiID,divNum);
-           if(dataProdi==1){
-               setGroupClass();
-           }
-       }
 
     });
 
@@ -302,30 +317,6 @@
         });
     }
 
-    $(document).on('change','#formMataKuliah1',function () {
-        var data = $(this).val();
-        if(data!=null && data!=''){
-            // data.split('|');
-            // console.log(data);
-            // console.log(data.split('|')[2]);
-            $('#textTotalSKSMK').val(data.split('|')[2]);
-
-            // var cr = $('#formCredit1').val();
-            if(dataSesi==1){
-                $('#formCredit1').val(data.split('|')[2]);
-            }
-        }
-    });
-
-    // $('#formBaseProdi1').change(function () {
-    //     var Prodi  = $(this).val();
-    //     if(Prodi!=''){
-    //         var ProdiID = Prodi.split('.');
-    //         getCourseOfferings(ProdiID[0],'read');
-    //         setGroupClass();
-    //     }
-    // });
-
 </script>
 
 <script>
@@ -356,16 +347,31 @@
         $('#formCoordinator,#formTeamTeaching').select2({allowClear: true});
 
 
-        $(document).on('change','input[type=radio][fm=dtt-form]',function () {
-            loadformTeamTeaching($(this).val(),'#formTeamTeaching');
-        });
+
 
         $('input[type=radio][name=formCombinedClasses]').change(function () {
             loadformCombinedClasses($(this).val());
         });
 
+        $('#div_formSesiAwal'+dataSesi).datetimepicker({
+            pickDate: false,
+            pickSeconds : false
+        })
+            .on('changeDate', function(e) {
+            var d = new Date(e.localDate);
+            var no = $(this).attr('data-no');
+            var TimePerCredit = $('#formTimePerCredit'+no).val();
+            var Credit = $('#formCredit'+no).val();
+            var totalTime = parseInt(TimePerCredit) * parseInt(Credit);
 
-        $("#formSesiAwal"+dataSesi).datetimepicker(timeOption);
+            var sesiAkhir = moment()
+                .hours(d.getHours())
+                .minutes(d.getMinutes())
+                .add(parseInt(totalTime), 'minute').format('HH:mm');
+
+            $('#formSesiAkhir'+no).val(sesiAkhir);
+        });
+
     });
 
 
@@ -419,7 +425,12 @@
                 '                            </select>' +
                 '                        </div>' +
                 '                        <div class="col-xs-4">' +
-                '                            <input type="text" readonly class="form-control form-jadwal formSesiAwal form-sesiawal" id="formSesiAwal'+dataSesi+'" data-id="'+dataSesi+'" />' +
+                '                           <div id="div_formSesiAwal'+dataSesi+'" data-no="'+dataSesi+'" class="input-group">' +
+                '                                <input data-format="hh:mm" type="text" id="formSesiAwal'+dataSesi+'" class="form-control form-attd" value="00:00"/>' +
+                '                                <span class="add-on input-group-addon">' +
+                '                                    <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>' +
+                '                                </span>' +
+                '                            </div>' +
                 '                        </div>' +
                 '                        <div class="col-xs-4">' +
                 '                            <input type="text" class="form-control" id="formSesiAkhir'+dataSesi+'" style="color: #333;" readonly />' +
@@ -432,7 +443,25 @@
             loadSelectOptionClassroom('#formClassroom'+dataSesi,'');
             fillDays('#formDay'+dataSesi,'Eng','');
             loadSelectOptionTimePerCredit('#formTimePerCredit'+dataSesi,'');
-            $("#formSesiAwal"+dataSesi).datetimepicker(timeOption);
+
+            $('#div_formSesiAwal'+dataSesi).datetimepicker({
+                pickDate: false,
+                pickSeconds : false
+            }).on('changeDate', function(e) {
+                var d = new Date(e.localDate);
+                var no = $(this).attr('data-no');
+                var TimePerCredit = $('#formTimePerCredit'+no).val();
+                var Credit = $('#formCredit'+no).val()
+
+                var totalTime = parseInt(TimePerCredit) * parseInt(Credit);
+
+                var sesiAkhir = moment()
+                    .hours(d.getHours())
+                    .minutes(d.getMinutes())
+                    .add(parseInt(totalTime), 'minute').format('HH:mm');
+
+                $('#formSesiAkhir'+no).val(sesiAkhir);
+            });
 
         } else {
             toastr.warning('Form Sub Sesi '+dataSesi+' Harus Diisi','Warning!');
@@ -479,83 +508,6 @@
         });
     });
 
-    $(document).on('click','#btnSaveClassroom',function () {
-
-        var process = true;
-
-        var Room = $('#formRoom').val(); process = (Room=='') ? errorInput('#formRoom') : true ;
-        var Seat = $('#formSeat').val(); var processSeat = (Seat!='' && $.isNumeric(Seat) && Math.floor(Seat)==Seat) ? true : errorInput('#formSeat') ;
-        var SeatForExam = $('#formSeatForExam').val(); var processSeatForExam = (SeatForExam!='' && $.isNumeric(SeatForExam) && Math.floor(SeatForExam)==SeatForExam) ? true : errorInput('#formSeatForExam') ;
-
-
-        if(Room!='' && processSeat && processSeatForExam){
-            $('#formRoom,#formSeat,#formSeatForExam,#btnCloseClassroom').prop('disabled',true);
-            loading_button('#btnSaveClassroom');
-            loading_page('#viewClassroom');
-
-            var data = {
-                action : 'add',
-                ID : '',
-                formData : {
-                    Room : Room,
-                    Seat : Seat,
-                    SeatForExam : SeatForExam,
-                    Status : 0,
-                    UpdateBy : sessionNIP,
-                    UpdateAt : dateTimeNow()
-                }
-            };
-
-            var token = jwt_encode(data,'UAP)(*');
-            var url = base_url_js+"api/__crudClassroom";
-
-            $.post(url,{token:token},function (data_result) {
-
-                for(var i=1;i<=parseInt(dataSesi);i++){
-                    var selected = $('#formClassroom'+i).val();
-                    loadSelectOptionClassroom('#formClassroom'+i,selected);
-                }
-
-                setTimeout(function () {
-
-                    if(data_result.inserID!=0) {
-                        toastr.success('Data tersimpan','Success!');
-                        $('#GlobalModal').modal('hide');
-
-                    } else {
-                        $('#formRoom,#formSeat,#formSeatForExam,#btnCloseClassroom').prop('disabled',false);
-                        $('#btnSaveClassroom').prop('disabled',false).html('Save');
-                        toastr.warning('Room is exist','Warning');
-                    }
-                },1000);
-
-            });
-        } else {
-            toastr.error('Form Required','Error!');
-        }
-    });
-
-    $(document).on('change','.form-sesiawal,.form-timepercredit,.form-credit',function () {
-        var ID = $(this).attr('data-id');
-        setSesiAkhir(ID);
-        checkSchedule(ID);
-
-    });
-
-    $(document).on('keyup','.form-sesiawal,.form-credit',function () {
-        var ID = $(this).attr('data-id');
-        setSesiAkhir(ID);
-        checkSchedule(ID);
-
-    });
-
-    // Onchange Cek kelas Bentrok
-    $(document).on('change','.form-classroom,.form-day',function () {
-        var ID = $(this).attr('data-id');
-        checkSchedule(ID);
-    });
-
-
     
     function setSesiAkhir(ID) {
         var TimePerCredit = $('#formTimePerCredit'+ID).val();
@@ -576,15 +528,70 @@
         }
     }
 
-    function setGroupClass(value) {
+    function setGroupClass() {
+
+        var ProgramsCampusID = $('#formProgramsCampusID').val();
+        var SemesterID = $('#formSemesterID').val();
+
         var CombinedClasses = $('input[name=formCombinedClasses]:checked').val();
         var formBaseProdi = $('#formBaseProdi1').val();
 
+        if(formBaseProdi!=null && formBaseProdi!=''){
+            if($('#formParalel').is(':checked') && $('#ClassgroupParalel').val()==null){
+
+
+                var url = base_url_js+'api/__getClassGroupParalel';
+                var ProdiCode = (CombinedClasses==0) ? formBaseProdi.split('.')[1] : 'ZO';
+
+                var data = {
+                    ProgramsCampusID : ProgramsCampusID,
+                    SemesterID : SemesterID,
+                    ProdiCode : ProdiCode,
+                    IsSemesterAntara : SemesterAntara
+                };
+                var token = jwt_encode(data,'UAP)(*');
+                $('#ClassgroupParalel').empty();
+                var alphabet = genCharArray();
+                $.post(url,{token:token},function (jsonResult) {
+
+                    $('#ClassgroupParalel').append('<option value="" disabled selected>-- New Group --</option>');
+                    if(jsonResult.length>0){
+                        for(var s=0;s<jsonResult.length;s++){
+                            var d = jsonResult[s];
+                            var gr =  d.ProdiCode +'-'+d.Numeric;
+                            var n = alphabet[d.alp];
+                            $('#ClassgroupParalel').append('<option value="'+gr+'-'+n+'">'+gr+'</option>');
+                        }
+                    }
+                });
+
+                setGroupClassFinal('','A');
+
+            } else if($('#formParalel').is(':checked') && $('#ClassgroupParalel').val()!=null){
+                // var alphabet = genCharArray();
+                var group = $('#ClassgroupParalel').val();
+
+                setGroupClassFinal(group,'');
+            } else {
+                setGroupClassFinal('','');
+            }
+        }
+
+    }
+
+    function setGroupClassFinal(group,alp) {
+
+        var value = $('input[type=radio][name=formCombinedClasses]:checked').val();
+
+        var CombinedClasses = $('input[name=formCombinedClasses]:checked').val();
+        var formBaseProdi = $('#formBaseProdi1').val();
+
+        var ProgramsCampusID = $('#formProgramsCampusID').val();
+        var SemesterID = $('#formSemesterID').val();
+        var ProdiCode = (CombinedClasses==0) ? formBaseProdi.split('.')[1] : 'ZO';
 
         if(value==1){
-            var ProgramsCampusID = $('#formProgramsCampusID').val();
-            var SemesterID = $('#formSemesterID').val();
-            var ProdiCode = (CombinedClasses==0) ? formBaseProdi.split('.')[1] : 'ZO';
+
 
             var data = {
                 ProgramsCampusID : ProgramsCampusID,
@@ -595,14 +602,18 @@
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'api/__getClassGroup';
             $.post(url,{token:token},function (result) {
-                console.log(result);
-                $('#viewClassGroup').html(result.Group);
-                $('#formClassGroup').val(result.Group);
+                // console.log(result);
+
+                var g = (alp!='') ? result.Group+'-'+alp : result.Group;
+                var gg = (group=='') ? g : group;
+
+                $('#viewClassGroup').html(gg);
+                $('#formClassGroup').val(gg);
             });
-        } else {
+        }
+        else {
             if(formBaseProdi!=null){
-                var ProgramsCampusID = $('#formProgramsCampusID').val();
-                var SemesterID = $('#formSemesterID').val();
+
                 var ProdiCode = (CombinedClasses==0) ? formBaseProdi.split('.')[1] : 'ZO';
 
                 var data = {
@@ -614,13 +625,15 @@
                 var token = jwt_encode(data,'UAP)(*');
                 var url = base_url_js+'api/__getClassGroup';
                 $.post(url,{token:token},function (result) {
-                    $('#viewClassGroup').html(result.Group);
-                    $('#formClassGroup').val(result.Group);
+
+                    var g = (alp!='') ? result.Group+'-'+alp : result.Group;
+                    var gg = (group=='') ? g : group;
+
+                    $('#viewClassGroup').html(gg);
+                    $('#formClassGroup').val(gg);
                 });
             }
         }
-
-
     }
 
     function loadAcademicYearOnPublish(smt) {
@@ -639,7 +652,6 @@
 
     function loadformCombinedClasses(value) {
 
-        // console.log(value);
 
         if(value==1){
             $('#btnControlProdi').removeClass('hide');
@@ -659,18 +671,8 @@
             }
         }
 
-        setGroupClass(value);
+        setGroupClass();
 
-
-
-        // if(value==1){
-        //     $('#formBaseProdi').prop('multiple',true);
-        // } else {
-        //     $('#formBaseProdi').prop('multiple',false);
-        // }
-        // $('#formBaseProdi').select2({
-        //     allowClear: true
-        // });
     }
 
     function loadformTeamTeaching(value,element_dosen) {
@@ -694,6 +696,8 @@
         $('#formMataKuliah1').select2("val","");
 
         $('#viewClassGroup').text('-');
+        $('#ClassgroupParalel').empty();
+        $('#formParalel').prop('checked',false);
         $('#formClassGroup,#formCredit1,#formSesiAwal1,#formSesiAkhir1,#textTotalSKSMK').val('');
         $('#formTeamTeaching').prop('disabled',true);
 
@@ -701,7 +705,6 @@
         $('#subsesi1').addClass('hide');
         $('#bodyAddSesi').html('');
     }
-
 
     function requiredForm(element) {
         $(element).css('border','1px solid red');
@@ -816,7 +819,6 @@
         var ClassGroup = $('#formClassGroup').val();
 
         var Coordinator = $('#formCoordinator').val();
-        // if(Coordinator==''){ process.push(0); requiredForm('#s2id_formCoordinator a'); }
 
         var TeamTeaching = $('input[name=formteamTeaching]:checked').val();
         var UpdateBy = sessionNIP;
@@ -878,6 +880,8 @@
             loading_button('#btnSavejadwal');
             $('#removeNewSesi,#addNewSesi').prop('disabled',true);
 
+            var dataClassGroup = ClassGroup.split('-');
+            var typeParalel = ($('#formParalel').is(':checked')) ? '1' : '0';
             var SubSesi = (dataSesi>1) ? '1' : '0';
             var data = {
                 action : 'add',
@@ -898,7 +902,10 @@
                         },
                         schedule_class_group : {
                             ScheduleID : 0,
-                            ProdiCode : ClassGroup.split('-')[0],
+                            ProdiCode : dataClassGroup[0],
+                            Type : typeParalel,
+                            Numeric : dataClassGroup[1],
+                            Alphabet : (typeParalel=='1') ? dataClassGroup[2] : null,
                             Group : ClassGroup
                         },
                         schedule_details : dataScheduleDetailsArray,
@@ -927,7 +934,6 @@
 
     });
 </script>
-
 
 <!-- CRUD Time Per Credit-->
 <script>
@@ -978,74 +984,4 @@
 
 
     });
-
-    $(document).on('click','#btnAddTimePerCredit',function () {
-        var Time = $('#formTime').val();
-
-        if(Time!=''){
-            $('#formTime').prop('disabled',true);
-            loading_buttonSm('#btnAddTimePerCredit');
-            var url = base_url_js+'api/__crudTimePerCredit';
-            var data = {
-              action : 'add',
-              formData : {
-                  Time : Time,
-                  UpdateBy : sessionNIP,
-                  UpdateAt : dateTimeNow()
-              }
-            };
-            var token = jwt_encode(data,'UAP)(*');
-            $.post(url,{token:token},function (json_result) {
-                $('#formTime,#btnAddTimePerCredit').prop('disabled',false);
-                $('#btnAddTimePerCredit').html('<i class="fa fa-plus-circle" aria-hidden="true"></i> Add');
-
-                setTimeout(function () {
-                    if(json_result.inserID==0){
-                        toastr.warning('Data Exist','Warning!');
-                    } else {
-
-                        for(var d=1;d<=parseInt(dataSesi);d++){
-                            var selected = $('#formTimePerCredit'+d).val();
-                            loadSelectOptionTimePerCredit('#formTimePerCredit'+d,selected);
-                        }
-
-
-                        $('#formTime').val('');
-                        $('#rowTime').append('<tr id="tr'+json_result.inserID+'">' +
-                            '<td class="td-center">'+Time+' Minute</td>' +
-                            '<td class="td-center">' +
-                            '<button class="btn btn-default btn-default-danger" data-id="'+json_result.inserID+'">Delete</button>' +
-                            '</td>' +
-                            '</tr>');
-                        toastr.success('Data Saved','Success!');
-                    }
-                },1000);
-            });
-
-        } else {
-            $('#formTime').css('border','1px solid red');
-            setTimeout(function () {
-                $('#formTime').css('border','1px solid #ccc');
-            },5000);
-        }
-    });
-    $(document).on('click','.btn-delete-timepercredit',function () {
-        var ID = $(this).attr('data-id');
-        var token = jwt_encode({action:'delete',ID:ID},'UAP)(*');
-        var url = base_url_js+'api/__crudTimePerCredit';
-
-        $.post(url,{token:token},function (json_result) {
-            if(json_result.inserID==0){
-                toastr.warning('Data tidak dapat di hapus','Warning!');
-            } else {
-                for(var d=1;d<=parseInt(dataSesi);d++){
-                    var selected = $('#formTimePerCredit'+d).val();
-                    loadSelectOptionTimePerCredit('#formTimePerCredit'+d,selected);
-                }
-                $('#tr'+ID).remove();
-                toastr.success('Data deleted','Success!');
-            }
-        });
-
-    })
 </script>

@@ -1001,9 +1001,10 @@ class C_api extends CI_Controller {
     }
 
     public function getClassGroup(){
-        $token = $this->input->post('token');
-        $key = "UAP)(*";
-        $data_arr = (array) $this->jwt->decode($token,$key);
+//        $token = $this->input->post('token');
+//        $key = "UAP)(*";
+//        $data_arr = (array) $this->jwt->decode($token,$key);
+        $data_arr = $this->getInputToken();
 
         $data = $this->m_api->__checkClassGroup(
             $data_arr['ProgramsCampusID'],
@@ -1017,6 +1018,18 @@ class C_api extends CI_Controller {
         );
 
         return print_r(json_encode($result));
+    }
+
+    public function getClassGroupParalel(){
+        $data_arr = $this->getInputToken();
+        $data = $this->m_api->__checkClassGroupParalel(
+            $data_arr['ProgramsCampusID'],
+            $data_arr['SemesterID'],
+            $data_arr['ProdiCode'],
+            $data_arr['IsSemesterAntara']
+        );
+
+        return print_r(json_encode($data));;
     }
 
     public function crudClassroom(){

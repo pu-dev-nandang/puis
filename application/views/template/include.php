@@ -365,6 +365,15 @@
         console.log(data);
     }
 
+    function genCharArray() {
+        var charA = 'A', charZ = 'Z';
+        var a = [], i = charA.charCodeAt(0), j = charZ.charCodeAt(0);
+        for (; i <= j; ++i) {
+            a.push(String.fromCharCode(i));
+        }
+        return a;
+    }
+
     function loadSelectOptionSemester(element,selected) {
 
         var token = jwt_encode({action:'read'},'UAP)(*');

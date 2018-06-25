@@ -55,22 +55,6 @@
                     <div id="viewBaseProdi"></div>
                 </td>
             </tr>
-<!--            <tr>-->
-<!--                <td style="width: 190px;">Mata Kuliah</td>-->
-<!--                <td style="width: 1px;">:</td>-->
-<!--                <td>-->
-<!--                    <div id="viewMataKuliah"></div>-->
-<!--                    <input type="hide" id="formMKID" class="hide" readonly />-->
-<!--                    <input type="hide" id="formMKCode" class="hide" readonly />-->
-<!--                    <input type="hide" id="formReplaceSD" class="hide" readonly />-->
-<!---->
-<!--                    <p style="margin-bottom: 0px;font-size: 10px;">-->
-<!--                        Semester : <span id="textSemester">-</span> | Total Credit : <span id="textTotalSKS">-</span>-->
-<!--                        <input type="hide" class="hide" id="textTotalSKSMK" />-->
-<!--                    </p>-->
-<!---->
-<!--                </td>-->
-<!--            </tr>-->
 
             <tr>
                 <td>Group Kelas</td>
@@ -404,6 +388,7 @@
                 .add(parseInt(totalTime), 'minute').format('HH:mm');
 
             $('#formSesiAkhir'+ID).val(sesiAkhir);
+            $('#formSesiAkhir_newSub'+ID).val(sesiAkhir);
         }
     }
 
@@ -503,7 +488,6 @@
 
         $.post(url,{token:token},function (JSONresult) {
 
-            // console.log(JSONresult);
 
             $('#semesterName').html('<b style="color:green;">'+JSONresult.semesterName+'</b>');
             $('#viewProgramsCampus').html('<b style="color:green;">'+JSONresult.viewProgramsCampus+'</b>');
@@ -516,17 +500,6 @@
             }
 
             $('#viewCombinedClasses').html('<b style="color:green;">'+viewCombinedClasses+'</b>');
-
-            // var viewBaseProdi = (JSONresult.CombinedClasses==1) ? '-' : JSONresult.ProgramStudy;
-            // $('#viewBaseProdi').html('<b style="color:green;">'+viewBaseProdi+'</b>');
-
-            // $('#viewMataKuliah').html('<b style="color:green;">'+JSONresult.viewMataKuliah+'</b><br/><i>'+JSONresult.viewMataKuliahEng+'</i>');
-            //
-            // $('#formMKID').val(JSONresult.MKID);
-            // $('#formMKCode').val(JSONresult.MKCode);
-            //
-            // $('#textSemester').text(JSONresult.Semester);
-            // $('#textTotalSKS').text(JSONresult.TotalSKS);
 
 
             $('#viewBaseProdi').html('<ul id="listCourse" style="list-style-type: none;padding-left:0px;"></ul>');
@@ -608,16 +581,21 @@
                 '                <td>:</td>' +
                 '                <td>' +
                 '                    <div class="row">' +
-                '' +
                 '                        <div class="col-xs-4">' +
                 '                            <select class="form-control form-jadwal form-timepercredit" data-id="'+dataSesiDb+'" id="formTimePerCredit'+dataSesiDb+'"></select>' +
                 '                            <a href="javascript:void(0)" id="addTimePerCredit" class="'+btn_conf+'" style="font-size:10px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Tambah <i>Time Per Credit</i></a>' +
                 '                        </div>' +
                 '                        <div class="col-xs-4">' +
-                '                            <input type="text" readonly class="form-control form-jadwal formSesiAwal form-sesiawal" data-id="'+dataSesiDb+'" id="formSesiAwal'+dataSesiDb+'" />' +
+                '                           <div id="div_formSesiAwal'+dataSesiDb+'" data-no="'+dataSesiDb+'" class="input-group">' +
+                '                                <input data-format="hh:mm" type="text" id="formSesiAwal'+dataSesiDb+'" class="form-control form-attd" value="'+SubSesiDetails[i].StartSessions.substr(0,5)+'"/>' +
+                '                                <span class="add-on input-group-addon">' +
+                '                                    <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>' +
+                '                                </span>' +
+                '                            </div>' +
+                // '                            <input type="text" readonly class="form-control form-jadwal formSesiAwal form-sesiawal" data-id="'+dataSesiDb+'" id="formSesiAwal'+dataSesiDb+'" />' +
                 '                        </div>' +
                 '                        <div class="col-xs-4">' +
-                '                            <input type="text" class="form-control form-jadwal" id="formSesiAkhir'+dataSesiDb+'" style="color: #333;" readonly />' +
+                '                            <input type="text" class="form-control form-jadwal" id="formSesiAkhir'+dataSesiDb+'" value="'+SubSesiDetails[i].EndSessions.substr(0,5)+'" style="color: #333;" readonly />' +
                 '                        </div>' +
                 '                    </div>' +
                 '                    <div id="alertBentrok'+dataSesiDb+'"></div>' +
@@ -627,15 +605,29 @@
             loadSelectOptionClassroom('#formClassroom'+dataSesiDb,SubSesiDetails[i].ClassroomID);
             fillDays('#formDay'+dataSesiDb,'Eng',SubSesiDetails[i].DayID);
             $('#formCredit'+dataSesiDb).val(SubSesiDetails[i].Credit);
+            // $('#formSesiAkhir'+dataSesiDb).val();
 
-            loadSelectOptionTimePerCredit('#formTimePerCredit'+dataSesiDb,SubSesiDetails[i].TimePerCredit);
+            var TimePerCredit = SubSesiDetails[i].TimePerCredit;
 
-            var exSt = SubSesiDetails[i].StartSessions.split(':');
-            var exEnd = SubSesiDetails[i].EndSessions.split(':');
-            $("#formSesiAwal"+dataSesiDb).datetimepicker(timeOption);
-            $('#formSesiAwal'+dataSesiDb).val(exSt[0]+':'+exSt[1]);
-            $('#formSesiAkhir'+dataSesiDb).val(exEnd[0]+':'+exEnd[1]);
+            loadSelectOptionTimePerCredit('#formTimePerCredit'+dataSesiDb,TimePerCredit);
 
+
+            $('#div_formSesiAwal'+dataSesiDb).datetimepicker({
+                pickDate: false,
+                pickSeconds : false
+            }).on('changeDate', function(e) {
+                var no = $(this).attr('data-no');
+                var d = new Date(e.localDate);
+                var Credit = $('#formCredit'+no).val();
+                var totalTime = parseInt(TimePerCredit) * parseInt(Credit);
+
+                var sesiAkhir = moment()
+                    .hours(d.getHours())
+                    .minutes(d.getMinutes())
+                    .add(parseInt(totalTime), 'minute').format('HH:mm');
+
+                $('#formSesiAkhir'+no).val(sesiAkhir);
+            });
 
             dataSesiDb += 1;
 
@@ -651,18 +643,12 @@
             $('#headerSubSesi'+dataSesiArr[0]).removeClass('hide');
         }
 
-        // var Classroom = $('#formClassroom'+dataSesi).val(); if(Classroom==''){ newSesi = requiredForm('#s2id_formClassroom'+dataSesi+' a'); }
-        // var Credit = $('#formCredit'+dataSesi).val(); if(Credit==''){newSesi = requiredForm('#formCredit'+dataSesi);}
-        // var TimePerCredit = $('#formTimePerCredit'+dataSesi).val(); if(TimePerCredit==''){newSesi = requiredForm('#formTimePerCredit'+dataSesi);}
-        // var StartSessions = $('#formSesiAwal'+dataSesi).val(); if(StartSessions==''){newSesi = requiredForm('#formSesiAwal'+dataSesi);}
-        // var EndSessions = $('#formSesiAkhir'+dataSesi).val(); if(EndSessions==''){newSesi = requiredForm('#formSesiAkhir'+dataSesi);}
 
         if(newSesi){
             dataSesi = dataSesi + 1;
 
             dataSesiNewArr.push(dataSesi);
 
-            // console.log(dataSesi);
 
             $('#subsesi1').removeClass('hide');
             $('#bodyAddSesi').append('<tr class="trNewSesi'+dataSesi+'">' +
@@ -700,10 +686,16 @@
                 '                            </select>' +
                 '                        </div>' +
                 '                        <div class="col-xs-4">' +
-                '                            <input type="text" readonly class="form-control form-jadwal formSesiAwal form-sesiawal" id="formSesiAwal'+dataSesi+'" data-id="'+dataSesi+'" />' +
+                '                           <div id="div_formSesiAwal_newSub'+dataSesi+'" data-no="'+dataSesi+'" class="input-group">' +
+                '                                <input data-format="hh:mm" type="text" id="formSesiAwal'+dataSesi+'" class="form-control form-attd" value="00:00"/>' +
+                '                                <span class="add-on input-group-addon">' +
+                '                                    <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>' +
+                '                                </span>' +
+                '                            </div>' +
+                // '                            <input type="text" readonly class="form-control form-jadwal formSesiAwal form-sesiawal" id="formSesiAwal'+dataSesi+'" data-id="'+dataSesi+'" />' +
                 '                        </div>' +
                 '                        <div class="col-xs-4">' +
-                '                            <input type="text" class="form-control form-jadwal" id="formSesiAkhir'+dataSesi+'" style="color: #333;" readonly />' +
+                '                            <input type="text" class="form-control form-jadwal" id="formSesiAkhir_newSub'+dataSesi+'" style="color: #333;" readonly />' +
                 '                        </div>' +
                 '                    </div>' +
                 '<div id="alertBentrok'+dataSesi+'"></div>' +
@@ -713,7 +705,26 @@
             loadSelectOptionClassroom('#formClassroom'+dataSesi,'');
             fillDays('#formDay'+dataSesi,'Eng','');
             loadSelectOptionTimePerCredit('#formTimePerCredit'+dataSesi,'');
-            $("#formSesiAwal"+dataSesi).datetimepicker(timeOption);
+
+
+
+            $('#div_formSesiAwal_newSub'+dataSesi).datetimepicker({
+                pickDate: false,
+                pickSeconds : false
+            }).on('changeDate', function(e) {
+                var no = $(this).attr('data-no');
+                var d = new Date(e.localDate);
+                var Credit = $('#formCredit'+no).val();
+                var TimePerCredit = $('#formTimePerCredit'+no).val();
+                var totalTime = parseInt(TimePerCredit) * parseInt(Credit);
+
+                var sesiAkhir = moment()
+                    .hours(d.getHours())
+                    .minutes(d.getMinutes())
+                    .add(parseInt(totalTime), 'minute').format('HH:mm');
+
+                $('#formSesiAkhir_newSub'+no).val(sesiAkhir);
+            });
 
 
         } else {
@@ -734,11 +745,6 @@
                 return value != Sesi;
             });
 
-            // if(dataSesi<=0){
-            //     dataSesi = dataSesiDb;
-            // } else {
-            //     dataSesi = dataSesi - 1;
-            // }
             if(dataSesiArr.length==1 && dataSesiNewArr.length==0){
                 $('#headerSubSesi'+dataSesiArr[0]).addClass('hide');
             }
