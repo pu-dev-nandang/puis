@@ -17,40 +17,40 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetFont('Arial','B',10);
 
-        $pdf->Cell(45,11,'',0,0,'C');
-        $pdf->Cell(230,11,'SEATING MAP FINAL EXAM (UAS) - 2017/2018 GANJIL',1,1,'C');
+        $pdf->Cell(45,9,'',0,0,'C');
+        $pdf->Cell(230,9,'SEATING MAP FINAL EXAM (UAS) - 2017/2018 GANJIL',1,1,'C');
 
         $pdf->SetFont('Arial','I',7);
-        $pdf->Cell(0,7,'Page : '.$pdf->PageNo().' of {nb}',0,0,'R');
+        $pdf->Cell(0,5,'Page : '.$pdf->PageNo().' of {nb}',0,1,'R');
 
         $pdf->SetFont('Arial','',10);
 
-        $pdf->Cell(190,3,'',0,1);
+//        $pdf->Cell(190,3,'',0,1);
 
         $space_header = 5;
         $pdf->Cell(45,$space_header,'',0,0);
         $pdf->Cell(20,$space_header,'Course',0,0);
         $pdf->Cell(3,$space_header,':',0,0,'C');
-        $pdf->Cell(92,$space_header,'Studio 4',0,0);
+        $pdf->Cell(122,$space_header,'Studio 4',0,0);
         $pdf->Cell(20,$space_header,'Date',0,0);
         $pdf->Cell(3,$space_header,':',0,0,'C');
-        $pdf->Cell(92,$space_header,'Tuesday, 8 Jun 2018',0,1);
+        $pdf->Cell(62,$space_header,'Tuesday, 8 Jun 2018',0,1);
 
         $pdf->Cell(45,$space_header,'',0,0);
         $pdf->Cell(20,$space_header,'Pengawas 1',0,0);
         $pdf->Cell(3,$space_header,':',0,0,'C');
-        $pdf->Cell(92,$space_header,'Nandang M',0,0);
+        $pdf->Cell(122,$space_header,'Nandang M',0,0);
         $pdf->Cell(20,$space_header,'Time',0,0);
         $pdf->Cell(3,$space_header,':',0,0,'C');
-        $pdf->Cell(92,$space_header,'08:00 - 09:00',0,1);
+        $pdf->Cell(62,$space_header,'08:00 - 09:00',0,1);
 
         $pdf->Cell(45,$space_header,'',0,0);
         $pdf->Cell(20,$space_header,'Pengawas 2',0,0);
         $pdf->Cell(3,$space_header,':',0,0,'C');
-        $pdf->Cell(92,$space_header,'-',0,0);
+        $pdf->Cell(122,$space_header,'-',0,0);
         $pdf->Cell(20,$space_header,'Room',0,0);
         $pdf->Cell(3,$space_header,':',0,0,'C');
-        $pdf->Cell(92,$space_header,'503',0,1);
+        $pdf->Cell(62,$space_header,'503',0,1);
 
         $pdf->Cell(275,7,'',0,1);
         $pdf->Cell(275,0.3,'',1,1);

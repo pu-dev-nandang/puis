@@ -257,9 +257,15 @@
         var divNum = $(this).attr('data-id');
         var Prodi = $(this).val();
         if(Prodi!=''){
+
             var ProdiID = Prodi.split('.')[0];
             getCourseOfferings(ProdiID,divNum);
             if(dataProdi==1){
+
+                $('#viewClassGroup').text('-');
+                $('#ClassgroupParalel').empty();
+                $('#formParalel').prop('checked',false);
+
                 setGroupClass();
             }
         }

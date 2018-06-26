@@ -539,7 +539,6 @@
         if(formBaseProdi!=null && formBaseProdi!=''){
             if($('#formParalel').is(':checked') && $('#ClassgroupParalel').val()==null){
 
-
                 var url = base_url_js+'api/__getClassGroupParalel';
                 var ProdiCode = (CombinedClasses==0) ? formBaseProdi.split('.')[1] : 'ZO';
 
@@ -591,8 +590,6 @@
         var ProdiCode = (CombinedClasses==0) ? formBaseProdi.split('.')[1] : 'ZO';
 
         if(value==1){
-
-
             var data = {
                 ProgramsCampusID : ProgramsCampusID,
                 SemesterID : SemesterID,
