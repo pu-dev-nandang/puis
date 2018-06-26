@@ -44,12 +44,14 @@
             <tr style="background: #333;color: #fff;">
                 <th style="width: 3%;"><input type="checkbox" class="uniform" value="nothing" id ="dataResultCheckAll"></th>
                 <th style="width: 12%;">Program Study</th>
-                <th style="width: 10%;">Semester</th>
+                <!-- <th style="width: 10%;">Semester</th> -->
                 <th style="width: 20%;">Nama</th>
-                <th style="width: 5%;">NPM</th>
-                <th style="width: 5%;">Year</th>
+                <!-- <th style="width: 5%;">NPM</th> -->
+                <!-- <th style="width: 5%;">Year</th> -->
                 <th style="width: 15%;">Payment Type</th>
                 <th style="width: 15%;">Email PU</th>
+                <th style="width: 15%;">IPS</th>
+                <th style="width: 15%;">IPK</th>
                 <th style="width: 10%;">Discount</th>
                 <th style="width: 10%;">Invoice</th>
                 <th style="width: 10%;">Status</th>
@@ -198,19 +200,21 @@
                    if(Data_mhs[i]['StatusPayment'] == 0)
                     {
                       $('#dataRow').append(tr +
-                          '<td>'+inputCHK+'</td>' +
-                          '<td>'+Data_mhs[i]['ProdiEng']+'</td>' +
-                          '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
-                          '<td>'+Data_mhs[i]['Nama']+'</td>' +
-                          '<td>'+Data_mhs[i]['NPM']+'</td>' +
-                          '<td>'+Data_mhs[i]['Year']+'</td>' +
-                          '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +
-                          '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
-                          '<td>'+Data_mhs[i]['Discount']+'%</td>' +
-                          '<td>'+yy+'</td>' +
-                          '<td>'+status+'</td>' +
-                          '<td>'+'<button class = "DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'">View</button>'+'</td>' +
-                          '</tr>');
+                                             '<td>'+inputCHK+'</td>' +
+                                             '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
+                                             // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
+                                             '<td>'+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'</td>' +
+                                             // '<td>'+Data_mhs[i]['NPM']+'</td>' +
+                                             // '<td>'+Data_mhs[i]['Year']+'</td>' +
+                                             '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +
+                                             '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
+                                             '<td>'+Data_mhs[i]['IPS'].toFixed(2)+'</td>' +
+                                             '<td>'+Data_mhs[i]['IPK'].toFixed(2)+'</td>' +
+                                             '<td>'+Data_mhs[i]['Discount']+'%</td>' +
+                                             '<td>'+yy+'</td>' +
+                                             '<td>'+status+'</td>' +
+                                             '<td>'+'<button class = "DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'">View</button>'+'</td>' +
+                                             '</tr>');
                     } 
                    
                }
@@ -403,7 +407,7 @@
             $.post(url,{token:token},function (resultJson) {
                // var resultJson = jQuery.parseJSON(resultJson);
                loadData(1);
-
+               $('#GlobalModalLarge').modal('hide');
             }).fail(function() {
               toastr.info('No Action...'); 
               // toastr.error('The Database connection error, please try again', 'Failed!!');

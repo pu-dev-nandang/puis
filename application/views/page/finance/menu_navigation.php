@@ -16,6 +16,12 @@
                         Tagihan Mahasiswa
                         </a>
                     </li>
+                    <li class="<?php if($this->uri->segment(2)=='master' && $this->uri->segment(3) == "discount" ){echo "current";} ?>">
+                        <a href="#">
+                        <i class="icon-angle-right"></i>
+                        Discount
+                        </a>
+                    </li>
                 </ul>
             </li>
             <li class="<?php if($this->uri->segment(2)=='admission'){echo "current open";} ?>">
@@ -89,19 +95,25 @@
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "set-tagihan-mhs"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/set-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
-                        Set Tagihan Mahasiswa
+                        Set Tagihan
+                        </a>
+                    </li>
+                    <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "set-cicilan-tagihan-mhs"){echo "current";} ?>">
+                        <a href="#'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Set Cicilan
                         </a>
                     </li>
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "cek-tagihan-mhs"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/cek-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
-                        Cek Tagihan Mahasiswa
+                        Approve Tagihan
                         </a>
                     </li>
                      <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "cancel-tagihan-mhs"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/cancel-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
-                        Cancel Tagihan Mahasiswa
+                        Cancel Tagihan
                         </a>
                     </li>
                 </ul>

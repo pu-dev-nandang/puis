@@ -39,7 +39,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 spl_autoload_register(function ($class_name) {
-    include APPPATH.'third_party/fpdf/'. $class_name . '.php';
+    include APPPATH.'third_party/fpdf3/'. $class_name . '.php';
 });
 
 class MyPDF extends PDF {
