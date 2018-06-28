@@ -236,6 +236,39 @@ class C_login extends CI_Controller {
                                     $client->close();
                                     
                                   }
+
+                                  // find data apakah memiliki beberapa cicilan
+                                  $ID_payment = $getData[0]['ID_payment'];
+                                  $getData3 = $this->m_finance->findDatapayment_studentsBaseID_payment($ID_payment);
+                                  if (count($getData3) > 0) {
+                                    // create va selanjutnya
+                                    $GetPayment = $this->m_master->caribasedprimary('db_finance.payment','ID',$getData[0]['ID_payment']);
+                                    $NPM = $GetPayment[0]['NPM'];
+                                    $data = $this->m_master->PaymentgetMahasiswaByNPM($NPM);
+                                    $Nama = $data['Nama'];
+                                    $EmailPU = $data['EmailPU'];
+                                    $payment = $getData3[0]['Invoice'];
+
+                                    $deli = strpos($payment, '.');
+                                    $payment = substr($payment, 0,$deli);
+
+                                    $DeadLinePayment = $getData3[0]['Deadline'];
+                                    $VA_number = $this->m_finance->getVANumberMHS($NPM);
+                                    $create_va = $this->m_finance->create_va_Payment($payment,$DeadLinePayment, $Nama, $EmailPU,$VA_number,'Cicilan',$tableRoutes = 'db_finance.payment_students');
+
+                                    if ($create_va['status']) {
+                                        // After create va update payment students
+                                        $ab = $this->m_finance->updatePaymentStudentsFromCicilan($create_va['msg']['trx_id'],$getData3[0]['ID']);
+                                        // Send Email
+                                         $msg = 'Please continue to pay the next installment with VA Number : '.$VA_number. ' <br> as much as Rp '.number_format($getData3[0]['Invoice'],2,',','.');
+                                        $text = 'Dear '.$Nama.',<br><br>
+                                                '.$msg.'    
+                                                ';        
+                                        $to = $EmailPU;
+                                        $subject = "Podomoro University Notification";
+                                        $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                                    }
+                                  }
                                   echo '{"status":"000"}';
                                   exit;
                               break;

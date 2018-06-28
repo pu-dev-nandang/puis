@@ -1425,7 +1425,7 @@ class C_api extends CI_Controller {
                 $result = [];
 
                 for($i=0;$i<count($prodi);$i++){
-                    $data = $this->db->query('SELECT tf.PTID,tf.Cost,pt.Description FROM db_finance.tuition_fee tf 
+                    $data = $this->db->query('SELECT tf.ID,tf.PTID,tf.Cost,pt.Description,pt.Abbreviation FROM db_finance.tuition_fee tf 
                                                     LEFT JOIN db_finance.payment_type pt ON (tf.PTID = pt.ID)
                                                     LEFT JOIN db_academic.program_study ps ON (tf.ProdiID = ps.ID)
                                                     WHERE tf.ClassOf = "'.$ClassOf.'" AND tf.ProdiID = "'.$prodi[$i]['ID'].'" 

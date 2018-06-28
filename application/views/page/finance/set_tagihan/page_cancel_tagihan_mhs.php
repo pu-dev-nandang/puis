@@ -23,7 +23,7 @@
     </div>
     <div class="col-md-3">
         <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM" value="<?php echo $NPM ?>">
+            <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM">
         </div>
     </div>
     <div class="col-md-3">
@@ -62,7 +62,7 @@
         </table>
     </div>
     <div  class="col-xs-12" align="right" id="pagination_link"></div>
-    <div  class="col-xs-12" align="right"><button class="btn btn-inverse btn-notification btn-submi-unapprove hide" id="btn-submit-unapprove">Unapprove</button>&nbsp<button class="btn btn-inverse btn-notification btn-submit hide" id="btn-submit">Approve</button></div>
+    <div  class="col-xs-12" align="right"><button class="btn btn-inverse btn-notification btn-cancel hide" id="btn-cancel">Cancel</button></div>
 </div>
 
 
@@ -195,30 +195,36 @@
                    {
                     tr = '<tr style="background-color: #8ED6EA; color: black;" NPM = "'+Data_mhs[i]['NPM']+'">';
                     inputCHK = ''; 
-                   } 
+                   }
+
+                   if(Data_mhs[i]['StatusPayment'] == 0)
+                    {
+                      if (Data_mhs[i]['DetailPayment'].length == 1) {
+                        $('#dataRow').append(tr +
+                                               '<td>'+inputCHK+'</td>' +
+                                               '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
+                                               // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
+                                               '<td>'+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'</td>' +
+                                               // '<td>'+Data_mhs[i]['NPM']+'</td>' +
+                                               // '<td>'+Data_mhs[i]['Year']+'</td>' +
+                                               '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +
+                                               '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
+                                               '<td>'+Data_mhs[i]['IPS'].toFixed(2)+'</td>' +
+                                               '<td>'+Data_mhs[i]['IPK'].toFixed(2)+'</td>' +
+                                               '<td>'+Data_mhs[i]['Discount']+'%</td>' +
+                                               '<td>'+yy+'</td>' +
+                                               '<td>'+status+'</td>' +
+                                               '<td>'+'<button class = "DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'">View</button>'+'</td>' +
+                                               '</tr>');
+                      }
+                      
+                    } 
                    
-                   $('#dataRow').append(tr +
-                       '<td>'+inputCHK+'</td>' +
-                       '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
-                       // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
-                       '<td>'+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'</td>' +
-                       // '<td>'+Data_mhs[i]['NPM']+'</td>' +
-                       // '<td>'+Data_mhs[i]['Year']+'</td>' +
-                       '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +
-                       '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
-                       '<td>'+Data_mhs[i]['IPS'].toFixed(2)+'</td>' +
-                       '<td>'+Data_mhs[i]['IPK'].toFixed(2)+'</td>' +
-                       '<td>'+Data_mhs[i]['Discount']+'%</td>' +
-                       '<td>'+yy+'</td>' +
-                       '<td>'+status+'</td>' +
-                       '<td>'+'<button class = "DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'">View</button>'+'</td>' +
-                       '</tr>');
                }
 
                if(Data_mhs.length > 0)
                {
-                $('#btn-submit').removeClass('hide');
-                $("#btn-submit-unapprove").removeClass('hide');
+                $("#btn-cancel").removeClass('hide');
                 $('#datatable2').removeClass('hide');
                 $("#pagination_link").html(resultJson.pagination_link);
                }
@@ -331,7 +337,7 @@
          return allVals;
     }
 
-    $(document).on('click','#btn-submit', function () {
+    $(document).on('click','#btn-cancel', function () {
         var arrValueCHK = getChecboxNPM();
         console.log(arrValueCHK);
         if (arrValueCHK.length > 0) {
@@ -386,101 +392,6 @@
             }
             
 
-           $('#GlobalModal .modal-header').html('<h4 class="modal-title">'+'List Checklist Data'+'</h4>');
-           $('#GlobalModal .modal-body').html(html);
-           $('#GlobalModal .modal-footer').html(footer);
-           $('#GlobalModal').modal({
-               'show' : true,
-               'backdrop' : 'static'
-           });
-         
-           $( "#ModalbtnSaveForm" ).click(function() {
-            loading_button('#ModalbtnSaveForm');
-            var url = base_url_js+'finance/approved_created_tagihan_mhs';
-            var data = {
-                arrValueCHK : arrValueCHK,
-            };
-            var token = jwt_encode(data,'UAP)(*');
-            $.post(url,{token:token},function (resultJson) {
-               // var resultJson = jQuery.parseJSON(resultJson);
-               loadData(1);
-
-            }).fail(function() {
-              toastr.info('No Action...'); 
-              // toastr.error('The Database connection error, please try again', 'Failed!!');
-            }).always(function() {
-                $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
-            });
-             
-           }); // exit click function
-
-        }
-        else
-        {
-            toastr.error("Silahkan checked dahulu", 'Failed!!');
-        }
-    });
-
-    $(document).on('click','#btn-submit-unapprove', function () {
-      // $(".uniform[value=21150045]").addClass('hide');
-      // $("#datatable2 table > tbody > tr [input[value=21150045]]").addClass('hide');
-      // $(".uniform[value=21150045]").parent().addClass('hide');
-      // $("tr[NPM=21150045]").addClass('hide'); Ok
-
-        var arrValueCHK = getChecboxNPM();
-        console.log(arrValueCHK);
-        if (arrValueCHK.length > 0) {
-            // check status jika 1
-            var bool = true;
-            var html = '';
-            var table = '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
-                          '<thead>'+
-                              '<tr>'+
-                                  '<th style="width: 5px;">No</th>'+
-                                  '<th style="width: 55px;">Nama</th>'+
-                                  '<th style="width: 55px;">NPM</th>'+
-                                  '<th style="width: 55px;">Prodi</th>'+
-                                  '<th style="width: 55px;">Payment Type</th>'+
-                                  '<th style="width: 55px;">Discount</th>'+
-                                  '<th style="width: 55px;">Invoice</th>';
-            table += '</tr>' ;  
-            table += '</thead>' ; 
-            table += '<tbody>' ;
-            var isi = '';
-            for (var i = 0; i < arrValueCHK.length ; i++) {
-              // console.log(arrValueCHK[i]['Status']);
-              if (arrValueCHK[i]['Status'] == 0) {
-                bool = false;
-                break;
-              }
-              var yy = (arrValueCHK[i]['Invoice'] != '') ? formatRupiah(arrValueCHK[i]['Invoice']) : '-';
-                isi += '<tr>'+
-                      '<td>'+ (i+1) + '</td>'+
-                      '<td>'+ (arrValueCHK[i]['Nama']) + '</td>'+
-                      '<td>'+ (arrValueCHK[i]['NPM']) + '</td>'+
-                      '<td>'+ (arrValueCHK[i]['Prodi']) + '</td>'+
-                      '<td>'+ (arrValueCHK[i]['PTName']) + '</td>'+
-                      '<td>'+ (arrValueCHK[i]['Discount']) + ' %</td>'+
-                      '<td>'+ yy + '</td>'+
-                    '<tr>';  
-                
-            }
-
-            table += isi+'</tbody>' ; 
-            table += '</table>' ;
-
-            if (bool) {
-              html += table;
-
-              var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
-                  '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>';
-            } else {
-              var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
-                  '';
-                  html = "Inputan data anda memiliki Status Approve, mohon periksa kembali";
-            }
-            
-
            $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'List Checklist Data'+'</h4>');
            $('#GlobalModalLarge .modal-body').html(html);
            $('#GlobalModalLarge .modal-footer').html(footer);
@@ -491,24 +402,15 @@
          
            $( "#ModalbtnSaveForm" ).click(function() {
             loading_button('#ModalbtnSaveForm');
-            var url = base_url_js+'finance/unapproved_created_tagihan_mhs';
+            var url = base_url_js+'finance/cancel_created_tagihan_mhs';
             var data = {
                 arrValueCHK : arrValueCHK,
             };
             var token = jwt_encode(data,'UAP)(*');
             $.post(url,{token:token},function (resultJson) {
-               var resultJson = jQuery.parseJSON(resultJson);
-               console.log(resultJson);
-               if (resultJson != '')
-               {
-                toastr.info(resultJson); 
-               }
-               else
-               {
-                toastr.success('Data berhasil disimpan', 'Success!');
-               }
+               // var resultJson = jQuery.parseJSON(resultJson);
                loadData(1);
-
+               $('#GlobalModalLarge').modal('hide');
             }).fail(function() {
               toastr.info('No Action...'); 
               // toastr.error('The Database connection error, please try again', 'Failed!!');
@@ -517,7 +419,6 @@
             });
              
            }); // exit click function
-          
 
         }
         else
@@ -525,7 +426,6 @@
             toastr.error("Silahkan checked dahulu", 'Failed!!');
         }
     });
-
 
     function getReloadTableSocket()
     {

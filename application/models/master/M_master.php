@@ -1697,6 +1697,38 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         
     }
 
+    public function checkTglNow($tglInput)
+    {
+        $sql = 'select * from (
+                select CURDATE() as skrg
+                ) aa where "'.$tglInput.'" < skrg ';
+        $query=$this->db->query($sql, array())->result_array();
+        // print_r($tglInput);   
+        if (count($query) > 0) {
+            return false;
+        }     
+        else
+        {
+            return true;
+        }
+    }
+
+    public function chkTgl($a1,$a2)
+    {
+        $sql = 'select * from (
+                select CURDATE() as skrg
+                ) aa where "'.$a1.'" < "'.$a2.'"';
+        $query=$this->db->query($sql, array())->result_array();
+        // print_r($tglInput);   
+        if (count($query) > 0) {
+            return true;
+        }     
+        else
+        {
+            return false;
+        }
+    }
+
     public function inserData_test($aaa)
     {
         $dataSave = array(

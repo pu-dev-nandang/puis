@@ -267,7 +267,7 @@ class M_finance extends CI_Model {
            // $url = $aa[0]['url'];
            $getVANumber = $VA_number;
            $datetime_expired = $DeadLinePayment;
-           $payment = str_replace('.', '', $payment);
+           // $payment = str_replace('.', '', $payment);
 
            if ($getVANumber != null) {
                $data_asli = array(
@@ -401,7 +401,7 @@ class M_finance extends CI_Model {
                'trx_amount' => $data['trx_amount'],
                'datetime_expired' => $data['datetime_expired'],
                'description' => $data['description'],
-               'Status' => 0,
+               'Status' => 2,
                'Created' => date('Y-m-d H:i:s'),
                'routes_table' => $routes_table,
                        );
@@ -409,7 +409,7 @@ class M_finance extends CI_Model {
        $this->db->update('db_va.va_log', $dataSave);
    }
 
-   public function update_va_Payment($payment = null,$DeadLinePayment = null, $Name = null, $Email = null,$BilingID = null)
+   public function update_va_Payment($payment = null,$DeadLinePayment = null, $Name = null, $Email = null,$BilingID = null,$routes_table = 'db_finance.payment_pre')
    {
        $arr = array();
        $arr['status'] = false;
@@ -457,7 +457,7 @@ class M_finance extends CI_Model {
                }
                else {
                    $data_response = BniEnc::decrypt($response_json['data'], $client_id, $secret_key);
-                   $this->update_va_log($data_asli,'db_finance.payment_pre');
+                   $this->update_va_log($data_asli,$routes_table);
                    $arr['status'] = true;
                    $arr['msg'] = $data_asli;
                }
@@ -513,6 +513,49 @@ class M_finance extends CI_Model {
        }
        curl_close($ch);
        return $rs;
+   }
+
+   public function checkBiling($biling)
+   {
+       include_once APPPATH.'third_party/bni/BniEnc.php';
+       $arr_temp = array();
+       // include_once APPPATH.'third_party/bni/BniEnc.php';
+       $client_id = '00202';
+       $secret_key = '8ef738df0433c674e6663f3f7f5e6b68';
+       $url = 'https://apibeta.bni-ecollection.com/';
+       
+           $data_asli = array(
+               'client_id' => $client_id,
+               'trx_id' => $biling, // fill with Billing ID
+               'type' => 'inquirybilling',
+           );
+           $hashed_string = BniEnc::encrypt(
+               $data_asli,
+               $client_id,
+               $secret_key
+           );
+
+           $data = array(
+               'client_id' => $client_id,
+               'data' => $hashed_string,
+           );
+
+           $response = $this->get_content($url, json_encode($data));
+           $response_json = json_decode($response, true);
+           if ($response_json['status'] !== '000') {
+               // $arr_temp[$i]['msg'] = $response_json['status'];
+               $arr_temp['msg'] = $response_json;
+               $arr_temp['trx_id'] = $biling;
+
+           }
+           else {
+               $data_response = BniEnc::decrypt($response_json['data'], $client_id, $secret_key);
+               // $arr_temp['msg'] = $response_json['status'];
+               $arr_temp['msg'] = $data_response;
+               $arr_temp['trx_id'] = $biling;
+           }
+
+       return $arr_temp;
    }
 
    public function getTuitionFee($ID_register_formulir)
@@ -716,30 +759,34 @@ class M_finance extends CI_Model {
            $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,$path);
    }
 
-   public function get_tagihan_mhs($ta,$prodi,$PTID,$limit, $start)
+   public function get_tagihan_mhs($ta,$prodi,$PTID,$NPM,$limit, $start)
    {
-    error_reporting(0);
+    // error_reporting(0);
     $arr = array();
     $this->load->model('master/m_master');
     $ta1 = explode('.', $ta);
     $ta = $ta1[1];
     $db = 'ta_'.$ta.'.students';
+    $db2 = 'ta_'.$ta;
     $field = 'StatusStudentID';
     $value = 3;
+    $NPM = ($NPM == "" || $NPM == null) ? '' : ' and a.NPM = "'.$NPM.'"';
     $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
     if ($prodi == '') {
      $sql = 'select a.*,b.EmailPU,c.Cost from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
              on a.ProdiID = c.ProdiID
-             where a.StatusStudentID = ?  and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? 
+             where a.StatusStudentID = ?  and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.'
+             order by a.NPM asc
              LIMIT '.$start. ', '.$limit;
-
+      // print_r($sql);       
      $Data_mhs=$this->db->query($sql, array($value,$PTID,$SemesterID[0]['ID'],$ta,$PTID))->result_array();
     }
     else
     {
       $sql = 'select a.*,b.EmailPU,c.Cost from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
               on a.ProdiID = c.ProdiID
-              where a.StatusStudentID = ? and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? 
+              where a.StatusStudentID = ? and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.'
+              order by a.NPM asc 
               LIMIT '.$start. ', '.$limit;
       $Data_mhs=$this->db->query($sql, array($value,$prodi,$PTID,$SemesterID[0]['ID'],$ta,$PTID))->result_array();
     }
@@ -752,10 +799,76 @@ class M_finance extends CI_Model {
       $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$Data_mhs[$i]['ProdiID']);
       $array = array('ProdiEng' => $ProdiEng[0]['NameEng']);
       $Data_mhs[$i] = $Data_mhs[$i] + $array;
+
+      // get IPS Mahasiswa
+        $IPS = $this->getIPSMahasiswa($db2,$Data_mhs[$i]['NPM']);
+        $Data_mhs[$i] = $Data_mhs[$i] + array('IPS' => $IPS);
+
+      // get IPS Mahasiswa
+        $IPK = $this->getIPKMahasiswa($db2,$Data_mhs[$i]['NPM']);
+        $Data_mhs[$i] = $Data_mhs[$i] + array('IPK' => $IPK);  
+
     }
     $arr['Data_mhs'] = $Data_mhs;
     $arr['Discount'] = $Discount;
     return $arr;
+   }
+
+  public function getIPKMahasiswa($db,$NPM)
+  {
+    // error_reporting(0);
+    $IPK = 0;
+    // hitung IPK
+      // get query IPK
+        $sql = 'select * from '.$db.'.study_planning where NPM = ?';
+        $query = $this->db->query($sql, array($NPM))->result_array();
+
+      // proses perhitungan IPK
+        $GradeValueCredit = 0;
+        $Credit = 0;
+        for ($j=0; $j < count($query); $j++) { 
+         $GradeValue = $query[$j]['GradeValue'];
+         $CreditSub = $query[$j]['Credit'];
+         $GradeValueCredit = $GradeValueCredit + ($GradeValue * $CreditSub);
+         $Credit = $Credit + $CreditSub;
+        }
+
+      $IPK = $GradeValueCredit / $Credit;
+      return $IPK;  
+  }
+
+   public function getIPSMahasiswa($db,$NPM)
+   {
+    // error_reporting(0);
+    $IPS = 0;
+    // hitung IPS
+      // get semester desc
+        $sql = 'select ID from db_academic.semester where Status = 0 order by ID desc Limit 1';
+        $query = $this->db->query($sql, array())->result_array();
+        $SemesterID = $query[0]['ID'];
+
+      // get query IPS
+        $sql = 'select * from '.$db.'.study_planning where NPM = ? and SemesterID = ? ';
+
+        // print_r($sql);
+        $query = $this->db->query($sql, array($NPM,$SemesterID))->result_array();
+        if (count($query) == 0) {
+          $IPS = 0;
+          return $IPS;
+        }
+
+      // proses perhitungan IPS
+        $GradeValueCredit = 0;
+        $Credit = 0;
+        for ($j=0; $j < count($query); $j++) { 
+         $GradeValue = $query[$j]['GradeValue'];
+         $CreditSub = $query[$j]['Credit'];
+         $GradeValueCredit = $GradeValueCredit + ($GradeValue * $CreditSub);
+         $Credit = $Credit + $CreditSub;
+        }
+
+      $IPS = $GradeValueCredit / $Credit;
+      return $IPS;  
    }
 
    public function getDeadlineTagihanDB($field,$SemesterID)
@@ -773,7 +886,8 @@ class M_finance extends CI_Model {
     return $Const_VA;
    }
 
-   public function insertaDataPayment($PTID,$SemesterID,$NPM,$Invoice,$Discount)
+                  
+   public function insertaDataPayment($PTID,$SemesterID,$NPM,$Invoice,$Discount,$Status = "0",$UpdatedBy = null)
    {
     $dataSave = array(
         'PTID' => $PTID,
@@ -781,19 +895,22 @@ class M_finance extends CI_Model {
         'NPM' => $NPM,
         'Invoice' => $Invoice,
         'Discount' => $Discount,
+        'Status' => $Status,
+        'UpdatedBy' => $UpdatedBy
     );
       $this->db->insert('db_finance.payment', $dataSave);
       $insertId = $this->db->insert_id();
       return  $insertId;
    }
 
-   public function insertaDataPaymentStudents($ID_payment,$Invoice,$BilingID,$Deadline)
+   public function insertaDataPaymentStudents($ID_payment,$Invoice,$BilingID,$Deadline,$Status = 0)
    {
     $dataSave = array(
         'ID_payment' => $ID_payment,
         'Invoice' => $Invoice,
         'BilingID' => $BilingID,
         'Deadline' => $Deadline,
+        'Status' => $Status
     );
       $this->db->insert('db_finance.payment_students', $dataSave);
    }
@@ -840,6 +957,12 @@ class M_finance extends CI_Model {
       $dt = $this->m_master->caribasedprimary($db,'NPM',$query[$i]['NPM']);
       if($prodi == '' || $prodi == Null){
         $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$dt[0]['ProdiID']);
+
+        // get IPS Mahasiswa
+          $IPS = $this->getIPSMahasiswa('ta_'.$Year,$query[$i]['NPM']);
+
+        // get IPS Mahasiswa
+          $IPK = $this->getIPKMahasiswa('ta_'.$Year,$query[$i]['NPM']);
         $arr[] = array(
             'PaymentID' => $query[$i]['ID'],
             'PTID'  => $query[$i]['PTID'],
@@ -855,6 +978,8 @@ class M_finance extends CI_Model {
             'ProdiID' => $dt[0]['ProdiID'],
             'ProdiEng' => $ProdiEng[0]['NameEng'],
             'Year' => $Year,
+            'IPS' => $IPS,
+            'IPK' => $IPK,
             'DetailPayment' => $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']),
         );
       }
@@ -942,18 +1067,151 @@ class M_finance extends CI_Model {
         $this->db->where('BilingID',$BilingID);
         $this->db->update('db_finance.payment_students', $dataSave);
 
-      $sql = 'select count(*) as total from db_finance.payment where Status = 0 and ID = ?';
-      $query=$this->db->query($sql, array($ID_payment))->result_array();
-      if ($query[0]['total'] == 0) {
-          $dataSave = array(
-                     'Status' =>"1",
-                     'UpdateAt' => date('Y-m-d H:i:s'),
-                     'UpdatedBy' => "0"
-                             );
-             $this->db->where('ID',$ID_payment);
-             $this->db->update('db_finance.payment', $dataSave);
+      $getData3 = $this->findDatapayment_studentsBaseID_payment($ID_payment);
+      if (count($getData3) == 0) {
+        $sql = 'select count(*) as total from db_finance.payment where Status = 0 and ID = ?';
+        $query=$this->db->query($sql, array($ID_payment))->result_array();
+        if ($query[0]['total'] == 0) {
+            $dataSave = array(
+                       'Status' =>"1",
+                       'UpdateAt' => date('Y-m-d H:i:s'),
+                       'UpdatedBy' => "0"
+                               );
+               $this->db->where('ID',$ID_payment);
+               $this->db->update('db_finance.payment', $dataSave);
+        }
       }
         
+   }
+
+   public function delete_id_table($ID,$table)
+   {
+       $sql = "delete from db_finance.".$table." where ID = ".$ID;
+       $query=$this->db->query($sql, array());
+   }
+
+   public function inserData_master_tagihan_mhs($TypePembayaran,$Prodi,$Cost,$ClassOf)
+   {
+    $dataSave = array(
+        'PTID' => $TypePembayaran,
+        'ProdiID' => $Prodi,
+        'ClassOf' => $ClassOf,
+        'Cost' => $Cost,
+    );
+      $this->db->insert('db_finance.tuition_fee', $dataSave);
+   }
+
+   public function editData_master_tagihan_mhs($TypePembayaran,$Prodi,$Cost,$ClassOf,$ID)
+   {
+      $dataSave = array(
+          'PTID' => $TypePembayaran,
+          'ProdiID' => $Prodi,
+          'ClassOf' => $ClassOf,
+          'Cost' => $Cost,
+      );
+      $this->db->where('ID',$ID);
+      $this->db->update('db_finance.tuition_fee', $dataSave);
+   }
+
+   public function updateTagihanMhsList($input)
+   {
+    for ($i=0; $i < count($input); $i++) { 
+      $ID = $input[$i]->id;
+      $Cost = $input[$i]->Cost;
+      $dataSave = array(
+          'Cost' => $Cost,
+      );
+      $this->db->where('ID',$ID);
+      $this->db->update('db_finance.tuition_fee', $dataSave);
+    }
+   }
+
+   public function deleteTagihanMHSByProdiYear($input)
+   {
+    $ProdiID = $input['ProdiID'];
+    $ClassOf = $input['ClassOf'];
+    $sql = "delete from db_finance.tuition_fee where ProdiID = ".$ProdiID.' and ClassOf = "'.$ClassOf.'"';
+    $query=$this->db->query($sql, array());
+   }
+
+   public function cancel_created_tagihan_mhs($input)
+   {
+    $this->load->model('master/m_master');
+    $arr = array();
+    $arr['msg'] = '';
+    $now = date('Y-m-d H:i:s');
+    for ($i=0; $i < count($input); $i++) { 
+      $PTID = $input[$i]->PTID;
+      $SemesterID = $input[$i]->semester;
+      $NPM = $input[$i]->NPM;
+      // Closed VA dahulu
+          // check Status VA
+              // cari Biling ID
+                $sql = 'select * from db_finance.payment as a join db_finance.payment_students as b
+                        on a.ID = b.ID_payment where a.NPM = ? and a.SemesterID = ? and a.PTID = ? and b.Status  = 0 order by b.ID asc limit 1';
+                $query=$this->db->query($sql, array($NPM,$SemesterID,$PTID))->result_array();
+                if (count($query) > 0 ) {
+                  $BilingID = $query[0]['BilingID'];
+                  $checkVa = $this->checkBiling($BilingID);
+                  // print_r($checkVa);
+                  // die();
+                  // va status  = 1 => active
+                  // va status = 2 => Inactive
+                  if ($checkVa['msg']['va_status'] != 2) {
+                      // cancel VA 
+                     $getData= $this->m_master->caribasedprimary('db_va.va_log','trx_id',$BilingID);
+                     $trx_amount = $getData[0]['trx_amount'];
+                     $datetime_expired = $now;
+                     $customer_name = $getData[0]['customer_name'];
+                     $customer_email = $getData[0]['customer_email'];
+                     $update = $this->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students');
+                     if ($update['status'] == 1) {
+                       // triger VA closed berhasil, update va_log status = 2 // auto dari update_va_Payment
+                       // delete data pada table payment dan payment_students
+                          // action delete belum benar
+                       $this->delete_id_table($query[0]['ID'],'payment');
+                       $this->delete_id_table($query[0]['ID'],'payment_students');
+                     }
+                     else
+                     {
+                       $arr['msg'] .= 'Va tidak bisa di cancel, error koneksi ke BNI <br>';
+                     }
+                  }
+                  else
+                  {
+                       $this->delete_id_table($query[0]['ID'],'payment');
+                       $this->delete_id_table($query[0]['ID'],'payment_students');
+                  }
+                }
+        }
+        return $arr;
+   }
+
+   public function findDatapayment_studentsBaseID_payment($ID_payment,$Status = 0)
+   {
+    $sql = 'select * from db_finance.payment_students where ID_payment = ? and Status = ? order by ID asc';
+    $query=$this->db->query($sql, array($ID_payment,$Status))->result_array();
+    return $query;
+   }
+
+   public function updateCicilanMHS($BilingID,$trx_amount,$datetime_expired)
+   {
+    $dataSave = array(
+            'Invoice' => $trx_amount,
+            'Deadline' => $datetime_expired,
+            'UpdateAt' => date('Y-m-d H:i:s'),
+                    );
+    $this->db->where('BilingID',$BilingID);
+    $this->db->update('db_finance.payment_students', $dataSave);
+   }
+
+   public function updatePaymentStudentsFromCicilan($BilingID,$ID)
+   {
+    $dataSave = array(
+            'BilingID' => $BilingID,
+                    );
+    $this->db->where('ID',$ID);
+    $this->db->update('db_finance.payment_students', $dataSave);
    }
 
 }

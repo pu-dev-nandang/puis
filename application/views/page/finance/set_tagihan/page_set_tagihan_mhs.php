@@ -1,25 +1,30 @@
 
 <div class="row" style="margin-top: 30px;">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="thumbnail" style="min-height: 30px;padding: 10px;">
             <select class="form-control" id="selectCurriculum">
-                <option selected disabled>--- Curriculum ---</option>
+                <option selected value = ''>--- All Curriculum ---</option>
                 <option disabled>------</option>
             </select>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="thumbnail" style="min-height: 30px;padding: 10px;">
             <select class="form-control" id="selectProdi">
-                <option selected value = ''>--- All ---</option>
+                <option selected value = ''>--- All Prodi---</option>
                 <option disabled>------</option>
             </select>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
+        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+            <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM" value="">
+        </div>
+    </div>
+    <div class="col-md-3">
         <div class="thumbnail" style="min-height: 30px;padding: 10px;">
             <select class="form-control" id="selectPTID">
-                <option selected disabled>--- Payment Type ---</option>
+                <option selected value = ''>--- All Payment Type ---</option>
                 <option disabled>------</option>
             </select>
         </div>
@@ -29,18 +34,23 @@
 <div class="row">
     <div class="col-md-12">
         <hr/>
+        <!-- <div class="col-md-3 col-md-offset-8"> -->
+          <!-- <input type="text" name="NPM" placeholder="Input NPM" id = "NPM" class="form-control"> -->
+        <!-- </div>   -->
         <table class="table table-bordered datatable2 hide" id = "datatable2">
             <thead>
             <tr style="background: #333;color: #fff;">
                 <th style="width: 3%;"><input type="checkbox" class="uniform" value="nothing" id ="dataResultCheckAll"></th>
                 <th style="width: 12%;">Program Study</th>
-                <th style="width: 10%;">Semester</th>
+                <!-- <th style="width: 10%;">Semester</th> -->
                 <th style="width: 20%;">Nama</th>
-                <th style="width: 5%;">NPM</th>
-                <th style="width: 5%;">Year</th>
+                <!-- <th style="width: 5%;">NPM</th> -->
+                <!-- <th style="width: 5%;">Year</th> -->
                 <th style="width: 5%;">Foto</th>
                 <th style="width: 15%;">Email PU</th>
                 <th style="width: 5%;">No HP</th>
+                <th style="width: 5%;">IPS</th>
+                <th style="width: 5%;">IPK</th>
                 <th style="width: 5%;">Discount</th>
                 <th style="width: 20%;">Invoice</th>
             </tr>
@@ -83,6 +93,14 @@
       // loadData_register_document(page);
     });
 
+    $(document).on('keypress','#NIM', function ()
+    {
+
+        if (event.keyCode == 10 || event.keyCode == 13) {
+          loadData(1);
+        }
+    }); // exit enter
+
     function loadData(page) {
         $("#btn-submit").addClass('hide');
         $("#datatable2").addClass('hide');
@@ -93,6 +111,7 @@
         var ta = $('#selectCurriculum').val();
         var prodi = $('#selectProdi').val();
         var PTID = $('#selectPTID').val();
+        var NPM = $('#NIM').val();
         if(ta!='' && ta!=null && PTID !='' && PTID != null){
             $('#NotificationModal .modal-header').addClass('hide');
             $('#NotificationModal .modal-body').html('<center>' +
@@ -110,7 +129,8 @@
             var data = {
                 ta : ta,
                 prodi : prodi,
-                PTID  : PTID
+                PTID  : PTID,
+                NPM : NPM
             };
             var token = jwt_encode(data,'UAP)(*');
             $.post(url,{token:token},function (resultJson) {
@@ -132,18 +152,20 @@
                     selecTOption += '</select>';
 
                     var yy = (Data_mhs[i]['Cost'] != '') ? formatRupiah(Data_mhs[i]['Cost']) : '-';
-                    var cost = '<input class="form-control costInput getDom" id="cost_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" value = "'+yy+'" payment-type = "'+PTID+'" readonly>';
+                    var cost = '<input class="form-control costInput getDom" id="cost_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" value = "'+yy+'" payment-type = "'+PTID+'" readonly style="background-color: #fff;color: #333;">';
 
                    $('#dataRow').append('<tr>' +
                        '<td>'+'<input type="checkbox" class="uniform" value ="'+Data_mhs[i]['NPM']+'" Prodi = "'+Data_mhs[i]['ProdiEng']+'" Nama ="'+Data_mhs[i]['Name']+'" semester = "'+Data_mhs[i]['SemesterID']+'" ta = "'+res[1]+'"></td>' +
-                       '<td>'+Data_mhs[i]['ProdiEng']+'</td>' +
-                       '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
-                       '<td>'+Data_mhs[i]['Name']+'</td>' +
-                       '<td>'+Data_mhs[i]['NPM']+'</td>' +
-                       '<td>'+Data_mhs[i]['ClassOf']+'</td>' +
+                       '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
+                       // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
+                       '<td>'+Data_mhs[i]['Name']+'<br>'+Data_mhs[i]['NPM']+'</td>' +
+                       // '<td>'+Data_mhs[i]['NPM']+'</td>' +
+                       // '<td>'+Data_mhs[i]['ClassOf']+'</td>' +
                        '<td>'+img+'</td>' +
                        '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
                        '<td>'+Data_mhs[i]['HP']+'</td>' +
+                       '<td>'+Data_mhs[i]['IPS'].toFixed(2)+'</td>'+
+                        '<td>'+Data_mhs[i]['IPK'].toFixed(2)+'</td>'+
                        '<td>'+selecTOption+'</td>' +
                        '<td>'+cost+'</td>' +
                        '</tr>');
@@ -264,12 +286,13 @@
                {
                 toastr.success('Data berhasil disimpan', 'Success!');
                }
-
+               loadData(1);
             }).fail(function() {
               toastr.info('No Action...'); 
               // toastr.error('The Database connection error, please try again', 'Failed!!');
             }).always(function() {
                 $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
+                $('#NotificationModal').modal('hide');
             });
              
            }); // exit click function
