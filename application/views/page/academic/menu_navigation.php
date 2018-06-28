@@ -90,8 +90,8 @@
                     Schedule Exam
                 </a>
             </li>
-            <li class="">
-                <a href="#">
+            <li class="<?php if($this->uri->segment(2)=='score'){echo "current";} ?>">
+                <a href="<?php echo base_url('academic/score') ?>">
                     <i class="fa fa-area-chart"></i>
                     Score
                 </a>

@@ -1906,4 +1906,43 @@ class M_api extends CI_Model {
 
     }
 
+    public function getDataCourse2Score($SemesterID,$ProdiID,$CombinedClasses,$IsSemesterAntara){
+
+        $dataSch = $this->db->query('SELECT sc.Classgroup,sc.TotalAssigment, sc.TeamTeaching,
+                                        sdc.*,cd.TotalSKS AS Credit, mk.MKCode, mk.Name AS MKName,
+                                        mk.NameEng AS MKNameEng, sc.Coordinator, em.Name AS CoordinatorName 
+                                        FROM db_academic.schedule_details_course sdc 
+                                        LEFT JOIN db_academic.schedule sc ON (sc.ID = sdc.ScheduleID)
+                                        LEFT JOIN db_employees.employees em ON (em.NIP = sc.Coordinator)
+                                        LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID) 
+                                        LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                        WHERE sc.SemesterID = "'.$SemesterID.'" 
+                                        AND sdc.ProdiID = "'.$ProdiID.'"
+                                        AND sc.CombinedClasses = "'.$CombinedClasses.'"
+                                        AND sc.IsSemesterAntara = "'.$IsSemesterAntara.'" 
+                                        ORDER BY sdc.ID ASC')->result_array();
+
+        if(count($dataSch)>0){
+            for($i=0;$i<count($dataSch);$i++){
+                $detailSch = $this->db->query('SELECT cl.Room, d.NameEng AS DayEng, sd.StartSessions, sd.EndSessions FROM db_academic.schedule_details sd 
+                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+                                                    LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
+                                                    WHERE sd.ScheduleID = "'.$dataSch[$i]['ScheduleID'].'"
+                                                     ORDER BY sd.DayID, sd.StartSessions ASC')->result_array();
+
+                $team = $this->db->query('SELECT em.NIP, em.Name FROM db_academic.schedule_team_teaching stt 
+                                                    LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
+                                                    WHERE stt.ScheduleID = "'.$dataSch[$i]['ScheduleID'].'" ')
+                                            ->result_array();
+
+                $dataSch[$i]['DetailTeamTeaching'] = $team;
+                $dataSch[$i]['DetailSchedule'] = $detailSch;
+            }
+        }
+
+
+        return $dataSch;
+
+    }
+
 }
