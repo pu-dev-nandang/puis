@@ -345,7 +345,7 @@
             'September': 8,
             'October': 9,
             'November': 10,
-            'December': 11,
+            'December': 11
         }
 
         return arr_mounth[mounth];
@@ -363,6 +363,15 @@
 
     function log(data) {
         console.log(data);
+    }
+
+    function genCharArray() {
+        var charA = 'A', charZ = 'Z';
+        var a = [], i = charA.charCodeAt(0), j = charZ.charCodeAt(0);
+        for (; i <= j; ++i) {
+            a.push(String.fromCharCode(i));
+        }
+        return a;
     }
 
     function loadSelectOptionSemester(element,selected) {

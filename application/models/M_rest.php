@@ -261,6 +261,7 @@ class M_rest extends CI_Model {
                 $arr_p = array(
                     'SemesterID' => $dataSemester[$i]['ID'],
                     'Semester' => $dataSemester[$i]['Name'],
+                    'Status' => $dataSemester[$i]['Status'],
                     'DetailsCoordinator' => $Coordinator,
                     'DetailsTeamTeaching' => $TeamTeaching
                 );
@@ -287,6 +288,7 @@ class M_rest extends CI_Model {
                 $arr_p = array(
                     'SemesterID' => $dataSemester[$i]['ID'],
                     'Semester' => $dataSemester[$i]['Name'],
+                    'Status' => $dataSemester[$i]['Status'],
                     'DetailsCoordinator' => $this->getDetailTimeTable($Coordinator,'Coordinator'),
                     'DetailsTeamTeaching' => $this->getDetailTimeTable($TeamTheaching,'')
                 );

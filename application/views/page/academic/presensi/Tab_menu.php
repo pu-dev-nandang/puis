@@ -86,7 +86,6 @@
         // console.log(filterGroup);
         if(filterGroup!='' && filterGroup!=null){
             var data = {
-                // NIP : 2114002,
                 page : 'InputPresensi',
                 ScheduleID : filterGroup
             };
@@ -327,7 +326,7 @@
 
                 $('#formEnd').val(sesiAkhir);
 
-            });;
+            });
 
             $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default btn-schedule-exchange" data-dismiss="modal">Close</button> | ' +
                 '<button class="btn btn-danger btn-schedule-exchange" id="btnDeleteScheduleEx" '+btnActDel+' data-no="'+No+'" data-id="'+ID_Attd+'">Delete Permission</button> ' +
@@ -355,10 +354,6 @@
         var formStart = $('#formStart').val();
         var formEnd = $('#formEnd').val();
 
-        // console.log(filterSemester);
-        // console.log(formDate);
-        // console.log(formStart);
-        // console.log(formEnd);
 
         if(filterSemester!=null && filterSemester!='' && formDate!=null && formDate!=''
             && formStart!=null && formStart!='' && formStart!='00:00'

@@ -8,14 +8,14 @@
             <li class="<?php if($this->uri->segment(2)=='kurikulum'){echo "current";} ?>">
                 <a href="<?php echo base_url('academic/kurikulum'); ?>">
                     <i class="fa fa-university"></i>
-                    Kurikulum
+                    Curriculum
                 </a>
             </li>
 
             <li class="<?php if($this->uri->segment(2)=='matakuliah'){echo "current";} ?>">
                 <a href="<?php echo base_url('academic/matakuliah'); ?>">
                     <i class="fa fa-th-large"></i>
-                    Matakuliah
+                    Courses
                 </a>
             </li>
 
@@ -23,7 +23,7 @@
             <li class="<?php if($this->uri->segment(2)=='tahun-akademik'){echo "current";} ?>">
                 <a href="<?php echo base_url('academic/tahun-akademik'); ?>">
                     <i class="fa fa-calendar-check-o"></i>
-                    Tahun Akademik
+                    Academic Year
                 </a>
             </li>
 
@@ -35,12 +35,13 @@
                 </a>
             </li>
 
-            <li class="">
-                <a href="#">
-                    <i class="fa fa-percent"></i>
-                    Beasiswa
-                </a>
-            </li>
+<!--            <li class="">-->
+<!--                <a href="#">-->
+<!--                    <i class="fa fa-percent"></i>-->
+<!--                    Beasiswa-->
+<!--                </a>-->
+<!--            </li>-->
+
 <!--            <li class="--><?php //if($this->uri->segment(2)=='ketersediaan-dosen'){echo "current";} ?><!--">-->
 <!--                <a href="--><?php //echo base_url('academic/ketersediaan-dosen'); ?><!--">-->
 <!--                    <i class="fa fa-pencil-square-o"></i>-->
@@ -56,13 +57,13 @@
 
         </ul>
         <div class="sidebar-title">
-            <span>Transaksi Akademisi</span>
+            <span>Academic Transactions</span>
         </div>
         <ul id="nav">
             <li class="<?php if($this->uri->segment(2)=='jadwal'){echo "current";} ?>">
                 <a href="<?php echo base_url('academic/jadwal'); ?>">
                     <i class="fa fa-calendar"></i>
-                    Jadwal
+                    Schedule
                 </a>
             </li>
 <!--            <li class="">-->
@@ -74,31 +75,31 @@
             <li class="<?php if($this->uri->segment(2)=='study-planning'){echo "current";} ?>">
                 <a href="<?php echo base_url('academic/study-planning'); ?>">
                     <i class="fa fa-tasks"></i>
-                    Rencana Studi
+                    Study Plan
                 </a>
             </li>
             <li class="<?php if($this->uri->segment(2)=='presensi'){echo "current";} ?>">
                 <a href="<?php echo base_url('academic/presensi'); ?>">
                     <i class="fa fa-users"></i>
-                    Presensi
+                    Attendance
                 </a>
             </li>
             <li class="<?php if($this->uri->segment(2)=='jadwal-ujian'){echo "current";} ?>">
                 <a href="<?php echo base_url('academic/jadwal-ujian'); ?>">
                     <i class="fa fa-sitemap"></i>
-                    Jadwal Ujian
+                    Schedule Exam
                 </a>
             </li>
             <li class="">
                 <a href="#">
                     <i class="fa fa-area-chart"></i>
-                    Nilai
+                    Score
                 </a>
             </li>
             <li class="">
                 <a href="#">
                     <i class="fa fa-flag"></i>
-                    Tugas Akhir
+                    Final Project
                 </a>
             </li>
         </ul>

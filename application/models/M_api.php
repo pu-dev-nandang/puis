@@ -877,12 +877,37 @@ class M_api extends CI_Model {
                                                     s.IsSemesterAntara = "'.$IsSemesterAntara.'" AND
                                                     scg.ProdiCode = "'.$ProdiCode.'"  ');
 
-//        $data = $this->db->query('SELECT * FROM db_academic.schedule_class_group
-//                                            WHERE ProgramsCampusID = "'.$ProgramsCampusID.'" AND
-//                                            SemesterID = "'.$SemesterID.'" AND
-//                                            ProdiCode = "'.$ProdiCode.'"
-//                                             ');
         return $data->result_array();
+    }
+
+    public function __checkClassGroupParalel($ProgramsCampusID,$SemesterID,$ProdiCode,$IsSemesterAntara){
+
+        $data = $this->db->query('SELECT * FROM db_academic.schedule_class_group scg 
+                                            LEFT JOIN db_academic.schedule s ON (s.ID = scg.ScheduleID)
+                                            WHERE scg.ProdiCode LIKE "'.$ProdiCode.'" 
+                                            AND s.SemesterID = "'.$SemesterID.'"
+                                            AND s.ProgramsCampusID = "'.$ProgramsCampusID.'"
+                                            AND s.IsSemesterAntara = "'.$IsSemesterAntara.'"
+                                            AND scg.Type = "1"
+                                            AND scg.Alphabet = 0
+                                             ')->result_array();
+
+        if(count($data)>0){
+            for($s=0;$s<count($data);$s++){
+                $data_s = $this->db->query('SELECT COUNT(*) AS alp FROM db_academic.schedule_class_group scg 
+                                            LEFT JOIN db_academic.schedule s ON (s.ID = scg.ScheduleID)
+                                            WHERE scg.ProdiCode LIKE "'.$ProdiCode.'" 
+                                            AND s.SemesterID = "'.$SemesterID.'"
+                                            AND s.ProgramsCampusID = "'.$ProgramsCampusID.'"
+                                            AND s.IsSemesterAntara = "'.$IsSemesterAntara.'"
+                                            AND scg.Type = "1"
+                                            AND scg.Numeric = "'.$data[$s]['Numeric'].'"
+                                             ')->result_array();
+                $data[$s]['alp'] = $data_s[0]['alp'];
+            }
+        }
+
+        return $data;
     }
 
     public function __getAllClassRoom(){

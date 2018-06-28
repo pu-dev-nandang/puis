@@ -127,15 +127,13 @@
             }
         };
 
-        // console.log(data);
-
         var url = base_url_js+'api/__crudSchedule';
         var token = jwt_encode(data,'UAP)(*');
 
         $.post(url,{token:token},function (data_result) {
             var div = $('#dataScedule');
 
-            // console.log(data_result);
+
 
             if(data_result.length>0){
                 div.html('');
