@@ -659,9 +659,6 @@ class C_api extends CI_Controller {
             if($data_arr['action']=='add'){
                 $formData = (array) $data_arr['formData'];
 
-//                print_r($formData);
-//                exit;
-
                 // Scedule
                 $insertSchedule = (array) $formData['schedule'];
                 $this->db->insert('db_academic.schedule',$insertSchedule);
@@ -684,8 +681,8 @@ class C_api extends CI_Controller {
                     // Insert Attd
                     $dataInsetAttd = array(
                         'SemesterID' => $insertSchedule['SemesterID'],
-                        'SDID' => $insert_id_SD,
-                        'ScheduleID' => $insert_id
+                        'ScheduleID' => $insert_id,
+                        'SDID' => $insert_id_SD
                     );
 
                     $this->db->insert('db_academic.attendance',$dataInsetAttd);
@@ -711,9 +708,6 @@ class C_api extends CI_Controller {
                         $this->db->insert('db_academic.schedule_team_teaching',$arr);
                     }
                 }
-
-
-
 
 
 
@@ -763,16 +757,23 @@ class C_api extends CI_Controller {
 
             }
             else if($data_arr['action']=='deleteSubSesi') {
+
                 $ID = $data_arr['sdID'];
+
+                $dataSD = $this->db->get_where('db_academic.schedule_details',
+                    array('ID' => $ID),1)->result_array();
+
+                $this->db->delete('db_academic.attendance', array('ScheduleID' => $dataSD[0]['ScheduleID'],'SDID' => $ID));
+
                 $this->db->where('ID', $ID);
                 $this->db->delete('db_academic.schedule_details');
 
                 return print_r(1);
             }
             else if($data_arr['action']=='edit'){
+
                 $formData = (array) $data_arr['formData'];
                 $schedule_details = (array) $formData['schedule_details'];
-
 
                 // Update Schedule
                 $ScheduleID = $data_arr['ID'];
@@ -793,7 +794,19 @@ class C_api extends CI_Controller {
                 // Insert Schedule Detail
                 $dataScheduleDetailsArrayNew = (array) $schedule_details['dataScheduleDetailsArrayNew'];
                 for($d2=0;$d2<count($dataScheduleDetailsArrayNew);$d2++){
+
                     $this->db->insert('db_academic.schedule_details',(array) $dataScheduleDetailsArrayNew[$d2]);
+
+                    $insert_id_SD = $this->db->insert_id();
+
+                    // Insert Attd
+//                    $dataInsetAttd = array(
+//                        'SemesterID' => $dataScheduleDetailsArrayNew[$d2]['SemesterID'],
+//                        'ScheduleID' => $insert_id,
+//                        'SDID' => $insert_id_SD
+//                    );
+//
+//                    $this->db->insert('db_academic.attendance',$dataInsetAttd);
                     $this->db->reset_query();
                 }
 

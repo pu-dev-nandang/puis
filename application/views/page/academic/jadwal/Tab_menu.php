@@ -449,3 +449,323 @@
 
     })
 </script>
+
+<!-- Edit Jadwal -->
+<script>
+    $(document).on('click','#btnRemoveYes',function () {
+        loading_buttonSm('#btnRemoveYes');
+        $('#btnRemoveNo').prop('disabled',true);
+        var data = {
+            action : 'delete',
+            ScheduleID : ScheduleID
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api/__crudSchedule';
+        $.post(url,{token:token},function (result) {
+            toastr.success('Data Removed','Sucess!');
+            setTimeout(function () {
+                window.location.href = base_url_js+'academic/jadwal';
+            },1500);
+        });
+    });
+
+    $(document).on('change','.form-sesiawal,.form-timepercredit,.form-credit',function () {
+        var ID = $(this).attr('data-id');
+        setSesiAkhir(ID);
+        checkSchedule(ID);
+
+    });
+
+    $(document).on('keyup','.form-sesiawal,.form-credit',function () {
+        var ID = $(this).attr('data-id');
+        setSesiAkhir(ID);
+        checkSchedule(ID);
+
+    });
+
+    // Onchange Cek kelas Bentrok
+    $(document).on('change','.form-classroom,.form-day',function () {
+        var ID = $(this).attr('data-id');
+        checkSchedule(ID);
+    });
+
+    $(document).on('change','input[type=radio][fm=dtt-form]',function () {
+        loadformTeamTeaching($(this).val(),'#formTeamTeaching');
+    });
+
+
+    // ========
+
+    $(document).on('click','.btn-delete-sesi',function () {
+        var Sesi = $(this).attr('data-sesi');
+        var sdID = $(this).attr('data-sd');
+
+        if(sdID==''){
+
+            $('.trNewSesi'+Sesi).remove();
+
+            dataSesiNewArr = $.grep(dataSesiNewArr, function(value) {
+                return value != Sesi;
+            });
+
+            if(dataSesiArr.length==1 && dataSesiNewArr.length==0){
+                $('#headerSubSesi'+dataSesiArr[0]).addClass('hide');
+            }
+        } else {
+            $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Remove <span style="color:red;">Sub Sesi '+Sesi+'</span> ?? </b> ' +
+                '<button type="button" id="btnRemoveSubSesiYes" data-sd="'+sdID+'" data-sesi="'+Sesi+'" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+                '<button type="button" id="btnRemoveSubSesiNo" class="btn btn-default" data-dismiss="modal">No</button>' +
+                '</div>');
+            $('#NotificationModal').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+        }
+
+
+    });
+
+    $(document).on('click','#btnRemoveSubSesiYes',function () {
+        var Sesi = $(this).attr('data-sesi');
+        var sdID = $(this).attr('data-sd');
+
+        loading_buttonSm('#btnRemoveSubSesiYes');
+        $('#btnRemoveSubSesiNo').prop('disabled',true);
+        var url = base_url_js+'api/__crudSchedule';
+        var token = jwt_encode({action:'deleteSubSesi',sdID:sdID},'UAP)(*');
+        $.post(url,{token:token},function (result) {
+
+            dataSesiArr = $.grep(dataSesiArr, function(value) {
+                return value != Sesi;
+            });
+            $('.trNewSesi'+Sesi).remove();
+
+
+            dataSesiDb = dataSesiDb - 1;
+
+            if(dataSesiArr.length==1){
+                $('#headerSubSesi'+dataSesiArr[0]).addClass('hide');
+            }
+
+            $('#NotificationModal').modal('hide');
+
+        });
+    });
+
+    $(document).on('change','#replaceSchedule',function () {
+
+        if ($(this).is(':checked')){
+            var sdID = $(this).val();
+            $('#formReplaceSD').val(sdID);
+            $('#btnSavejadwal,#addNewSesi').prop('disabled',false);
+        } else {
+            $('#formReplaceSD').val('');
+            $('#btnSavejadwal,#addNewSesi').prop('disabled',true);
+        }
+
+    });
+</script>
+
+<!-- Edit Jadwal ---- CRUD Room -->
+<script>
+    $(document).on('click','#addClassRoom',function () {
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Classroom</h4>');
+        $('#GlobalModal .modal-body').html('<div class="row">' +
+            '                            <div class="col-xs-4">' +
+            '                                <label>Room</label>' +
+            '                                <input type="text" class="form-control" id="formRoom">' +
+            '                            </div>' +
+            '                            <div class="col-xs-4">' +
+            '                                <label>Seat</label>' +
+            '                                <input type="number" class="form-control" id="formSeat">' +
+            '                            </div>' +
+            '                            <div class="col-xs-4">' +
+            '                                <label>Seat For Exam</label>' +
+            '                                <input type="number" class="form-control" id="formSeatForExam">' +
+            '                            </div>' +
+            '                        </div>');
+        $('#GlobalModal .modal-footer').html('<button type="button" id="btnCloseClassroom" class="btn btn-default" data-dismiss="modal">Close</button>' +
+            '<button type="button" class="btn btn-success" id="btnSaveClassroom">Save</button>');
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+    });
+    $(document).on('click','#btnSaveClassroom',function () {
+
+
+        var process = true;
+
+        var Room = $('#formRoom').val(); process = (Room=='') ? errorInput('#formRoom') : true ;
+        var Seat = $('#formSeat').val(); var processSeat = (Seat!='' && $.isNumeric(Seat) && Math.floor(Seat)==Seat) ? true : errorInput('#formSeat') ;
+        var SeatForExam = $('#formSeatForExam').val(); var processSeatForExam = (SeatForExam!='' && $.isNumeric(SeatForExam) && Math.floor(SeatForExam)==SeatForExam) ? true : errorInput('#formSeatForExam') ;
+
+
+        if(Room!='' && processSeat && processSeatForExam){
+            $('#formRoom,#formSeat,#formSeatForExam,#btnCloseClassroom').prop('disabled',true);
+            loading_button('#btnSaveClassroom');
+            loading_page('#viewClassroom');
+
+            var data = {
+                action : 'add',
+                ID : '',
+                formData : {
+                    Room : Room,
+                    Seat : Seat,
+                    SeatForExam : SeatForExam,
+                    Status : 0,
+                    UpdateBy : sessionNIP,
+                    UpdateAt : dateTimeNow()
+                }
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+"api/__crudClassroom";
+
+            $.post(url,{token:token},function (data_result) {
+
+                for(var i=1;i<=parseInt(dataSesi);i++){
+                    var selected = $('#formClassroom'+i).val();
+                    loadSelectOptionClassroom('#formClassroom'+i,selected);
+                }
+
+                setTimeout(function () {
+
+                    if(data_result.inserID!=0) {
+                        toastr.success('Data tersimpan','Success!');
+                        $('#GlobalModal').modal('hide');
+
+                    } else {
+                        $('#formRoom,#formSeat,#formSeatForExam,#btnCloseClassroom').prop('disabled',false);
+                        $('#btnSaveClassroom').prop('disabled',false).html('Save');
+                        toastr.warning('Room is exist','Warning');
+                    }
+                },1000);
+
+            });
+        } else {
+            toastr.error('Form Required','Error!');
+        }
+    });
+</script>
+
+
+<!-- Edit Jadwal ----  CRUD Time Per Credit-->
+<script>
+    $(document).on('click','#addTimePerCredit',function () {
+
+        var url = base_url_js + 'api/__crudTimePerCredit';
+        var token = jwt_encode({action: 'read'}, 'UAP)(*');
+        $.post(url, {token: token}, function (data_json) {
+            if (data_json.length > 0) {
+                $('#NotificationModal .modal-body').html('' +
+                    '<div class="form-group">' +
+                    '<div class="row">' +
+                    '<div class="col-md-8">' +
+                    '<div class="input-group">' +
+                    '      <input type="number" class="form-control" id="formTime">' +
+                    '      <span class="input-group-btn">' +
+                    '        <button class="btn btn-success" id="btnAddTimePerCredit" type="button"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add</button>' +
+                    '      </span>' +
+                    '    </div>' +
+                    '</div>' +
+                    '<div class="col-md-4">' +
+                    '<button class="btn btn-default" style="float: right;" data-dismiss="modal">Close</button>' +
+                    '</div></div> </div> ' +
+                    '<table class="table table-bordered">' +
+                    '    <thead>' +
+                    '    <tr>' +
+                    '        <th class="th-center">Time</th>' +
+                    '        <th class="th-center" style="width: 110px;">Action</th>' +
+                    '    </tr>' +
+                    '    </thead>' +
+                    '    <tbody id="rowTime"></tbody>' +
+                    '</table>');
+                for (var i = 0; i < data_json.length; i++) {
+                    $('#rowTime').append('<tr id="tr' + data_json[i].ID + '">' +
+                        '<td class="td-center">' + data_json[i].Time + ' Minute</td>' +
+                        '<td class="td-center">' +
+                        '<button class="btn btn-default btn-default-danger btn-delete-timepercredit" data-id="' + data_json[i].ID + '">Delete</button>' +
+                        '</td>' +
+                        '</tr>');
+                }
+                ;
+
+
+                $('#NotificationModal').modal({
+                    'show': true
+                });
+            }
+        })
+    });
+    $(document).on('click','#btnAddTimePerCredit',function () {
+        var Time = $('#formTime').val();
+
+        if(Time!=''){
+            $('#formTime').prop('disabled',true);
+            loading_buttonSm('#btnAddTimePerCredit');
+            var url = base_url_js+'api/__crudTimePerCredit';
+            var data = {
+                action : 'add',
+                formData : {
+                    Time : Time,
+                    UpdateBy : sessionNIP,
+                    UpdateAt : dateTimeNow()
+                }
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            $.post(url,{token:token},function (json_result) {
+                $('#formTime,#btnAddTimePerCredit').prop('disabled',false);
+                $('#btnAddTimePerCredit').html('<i class="fa fa-plus-circle" aria-hidden="true"></i> Add');
+
+                setTimeout(function () {
+                    if(json_result.inserID==0){
+                        toastr.warning('Data Exist','Warning!');
+                    } else {
+
+                        for(var d=1;d<=parseInt(dataSesi);d++){
+                            var selected = $('#formTimePerCredit'+d).val();
+                            loadSelectOptionTimePerCredit('#formTimePerCredit'+d,selected);
+                        }
+
+
+                        $('#formTime').val('');
+                        $('#rowTime').append('<tr id="tr'+json_result.inserID+'">' +
+                            '<td class="td-center">'+Time+' Minute</td>' +
+                            '<td class="td-center">' +
+                            '<button class="btn btn-default btn-default-danger" data-id="'+json_result.inserID+'">Delete</button>' +
+                            '</td>' +
+                            '</tr>');
+                        toastr.success('Data Saved','Success!');
+                    }
+                },1000);
+            });
+
+        } else {
+            $('#formTime').css('border','1px solid red');
+            setTimeout(function () {
+                $('#formTime').css('border','1px solid #ccc');
+            },5000);
+        }
+    });
+    $(document).on('click','.btn-delete-timepercredit',function () {
+        var ID = $(this).attr('data-id');
+        var token = jwt_encode({action:'delete',ID:ID},'UAP)(*');
+        var url = base_url_js+'api/__crudTimePerCredit';
+
+        $.post(url,{token:token},function (json_result) {
+            if(json_result.inserID==0){
+                toastr.warning('Data tidak dapat di hapus','Warning!');
+            } else {
+                for(var d=1;d<=parseInt(dataSesi);d++){
+                    var selected = $('#formTimePerCredit'+d).val();
+                    loadSelectOptionTimePerCredit('#formTimePerCredit'+d,selected);
+                }
+                $('#tr'+ID).remove();
+                toastr.success('Data deleted','Success!');
+            }
+        });
+
+    });
+</script>
