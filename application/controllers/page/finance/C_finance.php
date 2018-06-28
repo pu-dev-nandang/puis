@@ -334,4 +334,105 @@ class C_finance extends Finnance_Controler {
         echo json_encode($proses);
     }
 
+    public function set_cicilan_tagihan_mhs()
+    {
+        $max_cicilan= $this->m_master->showData_array('db_admission.cfg_cicilan');
+        $this->data['max_cicilan'] = $max_cicilan[0]['max_cicilan'];
+        $content = $this->load->view('page/'.$this->data['department'].'/set_tagihan/page_set_cicilan_tagihan_mhs',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function set_cicilan_tagihan_mhs_submit()
+    {
+        $Input = $this->getInputToken();
+        $fieldEND = '';
+        $bool = true;
+        $DeadLinePayment = '';
+        $ID = $Input[0]->ID;
+        for ($i=0; $i < count($Input); $i++) { 
+                        // get Deadline
+                        $fieldEND = 'bayarBPPEnd';
+                        switch ($Input[$i]->PTID) {
+                            case '1':
+                                $fieldEND = '';
+                                break;
+                            case '2':
+                                $fieldEND = 'bayarBPPEnd';
+                                break;
+                            case '3':
+                                $fieldEND = 'bayarEnd';
+                                break;    
+                            default:
+                                $fieldEND = '';
+                                break;
+                        }
+            if ($DeadLinePayment == '') {
+                $getDeadlineTagihanDB = $this->m_finance->getDeadlineTagihanDB($fieldEND,$Input[$i]->SemesterID);
+                $DeadLinePayment = $getDeadlineTagihanDB.' 23:59:00';  
+            }            
+               
+            // check Deadline Input telah melewati tanggal Deadline
+            $aaa = $this->m_master->chkTgl($Input[$i]->Deadline,$DeadLinePayment);
+            if (!$aaa) {
+                $bool = false;
+                break;
+            }
+        }
+
+        if ($bool) {
+               // cari Biling ID status = 0
+               $a = $this->m_finance->findDatapayment_studentsBaseID_payment($ID);
+               if(count($a) != 1)
+               {
+                echo json_encode('Data ini telah diset cicilan, sehingga proses dihentikan.');
+                break;
+               }
+               else
+               {
+                    $now = date('Y-m-d H:i:s');
+                    for ($i=0; $i < count($Input); $i++) { 
+                      // update cicilan untuk array 0 atau array pertama
+                      if ($i == 0) {
+                        // update va existing
+                        $BilingID = $a[0]['BilingID'];
+                        $checkVa = $this->m_finance->checkBiling($BilingID);
+                        if ($checkVa['msg']['va_status'] != 2) {
+                            $getData= $this->m_master->caribasedprimary('db_va.va_log','trx_id',$BilingID);
+                            $trx_amount = $Input[$i]->Payment;
+                            $datetime_expired = $Input[$i]->Deadline;
+                            $customer_name = $getData[0]['customer_name'];
+                            $customer_email = $getData[0]['customer_email'];
+                            $update = $this->m_finance->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students');
+                            if ($update['status'] == 1) {
+                              // update data pada table db_finance.payment_students
+                                $this->m_finance->updateCicilanMHS($BilingID,$trx_amount,$datetime_expired);
+                            }
+                            else
+                            {
+                              $arr['msg'] .= 'Va tidak bisa di update, error koneksi ke BNI <br>';
+                            }
+                        }
+                      }
+                      else
+                      {
+                        $this->m_finance->insertaDataPaymentStudents($ID,$Input[$i]->Payment,"0",$Input[$i]->Deadline);
+                      } 
+
+                    }
+                    echo json_encode(''); 
+               }
+        }
+        else
+        {
+            echo json_encode('Tanggal yang anda input melewati tanggal akademik : '.$DeadLinePayment);
+        }  
+
+    }
+
+    public function edit_cicilan_tagihan_mhs()
+    {
+        $content = $this->load->view('page/'.$this->data['department'].'/set_tagihan/page_edit_cicilan_tagihan_mhs',$this->data,true);
+        $this->temp($content);
+    }
+
 }

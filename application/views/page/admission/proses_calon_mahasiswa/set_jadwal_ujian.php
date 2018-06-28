@@ -60,6 +60,7 @@
         $('#datetimepicker1').datetimepicker({
         	// startDate: today,
         	// startDate: '+2d',
+        	startDate: new Date(),
         });
 	});
 

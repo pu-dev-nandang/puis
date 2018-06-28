@@ -99,21 +99,27 @@
                         </a>
                     </li>
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "set-cicilan-tagihan-mhs"){echo "current";} ?>">
-                        <a href="#'); ?>">
+                        <a href="<?php echo base_url('finance/tagihan-mhs/set-cicilan-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
                         Set Cicilan
+                        </a>
+                    </li>
+                    <!--<li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "edit-cicilan-tagihan-mhs"){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/tagihan-mhs/edit-cicilan-tagihan-mhs'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Edit Cicilan
+                        </a>
+                    </li>-->
+                    <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "cancel-tagihan-mhs"){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/tagihan-mhs/cancel-tagihan-mhs'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Cancel Tagihan
                         </a>
                     </li>
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "cek-tagihan-mhs"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/cek-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
                         Approve Tagihan
-                        </a>
-                    </li>
-                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "cancel-tagihan-mhs"){echo "current";} ?>">
-                        <a href="<?php echo base_url('finance/tagihan-mhs/cancel-tagihan-mhs'); ?>">
-                        <i class="icon-angle-right"></i>
-                        Cancel Tagihan
                         </a>
                     </li>
                 </ul>

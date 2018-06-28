@@ -199,22 +199,25 @@
 
                    if(Data_mhs[i]['StatusPayment'] == 0)
                     {
-                      $('#dataRow').append(tr +
-                                             '<td>'+inputCHK+'</td>' +
-                                             '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
-                                             // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
-                                             '<td>'+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'</td>' +
-                                             // '<td>'+Data_mhs[i]['NPM']+'</td>' +
-                                             // '<td>'+Data_mhs[i]['Year']+'</td>' +
-                                             '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +
-                                             '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
-                                             '<td>'+Data_mhs[i]['IPS'].toFixed(2)+'</td>' +
-                                             '<td>'+Data_mhs[i]['IPK'].toFixed(2)+'</td>' +
-                                             '<td>'+Data_mhs[i]['Discount']+'%</td>' +
-                                             '<td>'+yy+'</td>' +
-                                             '<td>'+status+'</td>' +
-                                             '<td>'+'<button class = "DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'">View</button>'+'</td>' +
-                                             '</tr>');
+                      if (Data_mhs[i]['DetailPayment'].length == 1) {
+                        $('#dataRow').append(tr +
+                                               '<td>'+inputCHK+'</td>' +
+                                               '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
+                                               // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
+                                               '<td>'+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'</td>' +
+                                               // '<td>'+Data_mhs[i]['NPM']+'</td>' +
+                                               // '<td>'+Data_mhs[i]['Year']+'</td>' +
+                                               '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +
+                                               '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
+                                               '<td>'+Data_mhs[i]['IPS'].toFixed(2)+'</td>' +
+                                               '<td>'+Data_mhs[i]['IPK'].toFixed(2)+'</td>' +
+                                               '<td>'+Data_mhs[i]['Discount']+'%</td>' +
+                                               '<td>'+yy+'</td>' +
+                                               '<td>'+status+'</td>' +
+                                               '<td>'+'<button class = "DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'">View</button>'+'</td>' +
+                                               '</tr>');
+                      }
+                      
                     } 
                    
                }

@@ -267,7 +267,7 @@ class M_finance extends CI_Model {
            // $url = $aa[0]['url'];
            $getVANumber = $VA_number;
            $datetime_expired = $DeadLinePayment;
-           $payment = str_replace('.', '', $payment);
+           // $payment = str_replace('.', '', $payment);
 
            if ($getVANumber != null) {
                $data_asli = array(
@@ -1067,16 +1067,19 @@ class M_finance extends CI_Model {
         $this->db->where('BilingID',$BilingID);
         $this->db->update('db_finance.payment_students', $dataSave);
 
-      $sql = 'select count(*) as total from db_finance.payment where Status = 0 and ID = ?';
-      $query=$this->db->query($sql, array($ID_payment))->result_array();
-      if ($query[0]['total'] == 0) {
-          $dataSave = array(
-                     'Status' =>"1",
-                     'UpdateAt' => date('Y-m-d H:i:s'),
-                     'UpdatedBy' => "0"
-                             );
-             $this->db->where('ID',$ID_payment);
-             $this->db->update('db_finance.payment', $dataSave);
+      $getData3 = $this->findDatapayment_studentsBaseID_payment($ID_payment);
+      if (count($getData3) == 0) {
+        $sql = 'select count(*) as total from db_finance.payment where Status = 0 and ID = ?';
+        $query=$this->db->query($sql, array($ID_payment))->result_array();
+        if ($query[0]['total'] == 0) {
+            $dataSave = array(
+                       'Status' =>"1",
+                       'UpdateAt' => date('Y-m-d H:i:s'),
+                       'UpdatedBy' => "0"
+                               );
+               $this->db->where('ID',$ID_payment);
+               $this->db->update('db_finance.payment', $dataSave);
+        }
       }
         
    }
@@ -1145,7 +1148,7 @@ class M_finance extends CI_Model {
           // check Status VA
               // cari Biling ID
                 $sql = 'select * from db_finance.payment as a join db_finance.payment_students as b
-                        on a.ID = b.ID_payment where a.NPM = ? and a.SemesterID = ? and a.PTID = ?';
+                        on a.ID = b.ID_payment where a.NPM = ? and a.SemesterID = ? and a.PTID = ? and b.Status  = 0 order by b.ID asc limit 1';
                 $query=$this->db->query($sql, array($NPM,$SemesterID,$PTID))->result_array();
                 if (count($query) > 0 ) {
                   $BilingID = $query[0]['BilingID'];
@@ -1180,15 +1183,35 @@ class M_finance extends CI_Model {
                        $this->delete_id_table($query[0]['ID'],'payment_students');
                   }
                 }
-
-                 
-                 
         }
-
         return $arr;
-    
-
    }
 
+   public function findDatapayment_studentsBaseID_payment($ID_payment,$Status = 0)
+   {
+    $sql = 'select * from db_finance.payment_students where ID_payment = ? and Status = ? order by ID asc';
+    $query=$this->db->query($sql, array($ID_payment,$Status))->result_array();
+    return $query;
+   }
+
+   public function updateCicilanMHS($BilingID,$trx_amount,$datetime_expired)
+   {
+    $dataSave = array(
+            'Invoice' => $trx_amount,
+            'Deadline' => $datetime_expired,
+            'UpdateAt' => date('Y-m-d H:i:s'),
+                    );
+    $this->db->where('BilingID',$BilingID);
+    $this->db->update('db_finance.payment_students', $dataSave);
+   }
+
+   public function updatePaymentStudentsFromCicilan($BilingID,$ID)
+   {
+    $dataSave = array(
+            'BilingID' => $BilingID,
+                    );
+    $this->db->where('ID',$ID);
+    $this->db->update('db_finance.payment_students', $dataSave);
+   }
 
 }
