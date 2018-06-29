@@ -319,6 +319,8 @@ $route['finance/cancel_created_tagihan_mhs'] =  'page/finance/c_finance/cancel_c
 $route['finance/tagihan-mhs/set-cicilan-tagihan-mhs'] =  'page/finance/c_finance/set_cicilan_tagihan_mhs';
 $route['finance/tagihan-mhs/set-cicilan-tagihan-mhs/submit'] =  'page/finance/c_finance/set_cicilan_tagihan_mhs_submit';
 $route['finance/tagihan-mhs/edit-cicilan-tagihan-mhs'] =  'page/finance/c_finance/edit_cicilan_tagihan_mhs';
+$route['finance/tagihan-mhs/set-edit-cicilan-tagihan-mhs/submit'] =  'page/finance/c_finance/edit_cicilan_tagihan_mhs_submit';
+$route['finance/tagihan-mhs/set-delete-cicilan-tagihan-mhs/submit'] =  'page/finance/c_finance/delete_cicilan_tagihan_mhs_submit';
 
 
 

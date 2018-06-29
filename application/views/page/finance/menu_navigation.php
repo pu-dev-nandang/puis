@@ -104,12 +104,12 @@
                         Set Cicilan
                         </a>
                     </li>
-                    <!--<li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "edit-cicilan-tagihan-mhs"){echo "current";} ?>">
+                    <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "edit-cicilan-tagihan-mhs"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/edit-cicilan-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
-                        Edit Cicilan
+                        Edit / Delete Cicilan
                         </a>
-                    </li>-->
+                    </li>
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "cancel-tagihan-mhs"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/cancel-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
@@ -126,14 +126,14 @@
             </li>
             <li class="">
                 <a href="#">
-                    <i class="fa fa-calendar"></i>
-                    Tanggal Cair
+                    <i class="fa fa-refresh"></i>
+                    Check VA
                 </a>
             </li>
             <li class="">
                 <a href="#">
-                    <i class="fa fa-refresh"></i>
-                    Deposit Mahasiswa
+                    <i class="fa fa-calendar"></i>
+                    Tanggal Cair
                 </a>
             </li>
             <li class="">

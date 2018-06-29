@@ -197,9 +197,9 @@
                     inputCHK = ''; 
                    }
 
-                   if(Data_mhs[i]['StatusPayment'] == 0)
+                   if(Data_mhs[i]['StatusPayment'] == 0) // menandakan belum approve
                     {
-                      if (Data_mhs[i]['DetailPayment'].length == 1) {
+                      if (Data_mhs[i]['DetailPayment'].length == 1) { // menandakan bahwa yang di cancel yang bukan memiliki cicilan lebih dari satu
                         $('#dataRow').append(tr +
                                                '<td>'+inputCHK+'</td>' +
                                                '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
