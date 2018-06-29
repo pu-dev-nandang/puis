@@ -924,6 +924,8 @@ class M_finance extends CI_Model {
     // join dengan table auth terlebih dahulu
     $PTID = ($PTID == '' || $PTID == Null) ? '' : ' and a.PTID = '.$PTID;
     $NIM = ($NIM == '' || $NIM == Null) ? 'where a.NPM like "%"' : ' where  a.NPM = '.$NIM;
+    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+    $SemesterID = $SemesterID[0]['ID'];
     if ($ta == '') {
       $ta1 = $ta;
     }
@@ -937,8 +939,8 @@ class M_finance extends CI_Model {
       $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description 
               from db_finance.Payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' order by a.Status asc LIMIT '.$start. ', '.$limit;
-      $query=$this->db->query($sql, array())->result_array();
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and c.ID = ? order by a.Status asc LIMIT '.$start. ', '.$limit;
+      $query=$this->db->query($sql, array($SemesterID))->result_array();
       
     }
     else
@@ -946,8 +948,8 @@ class M_finance extends CI_Model {
       $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description 
               from db_finance.Payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? order by a.Status asc LIMIT '.$start. ', '.$limit;
-      $query=$this->db->query($sql, array($ta1))->result_array();
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? and c.ID = ? order by a.Status asc LIMIT '.$start. ', '.$limit;
+      $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
     }
 
     // get all data to join db ta
@@ -1212,6 +1214,100 @@ class M_finance extends CI_Model {
                     );
     $this->db->where('ID',$ID);
     $this->db->update('db_finance.payment_students', $dataSave);
+   }
+
+   public function edit_cicilan_tagihan_mhs_submit($Input)
+   {
+    $this->load->model('master/m_master');
+    $arr = array();
+    $arr['msg']  = '';
+    for ($i=0; $i < count($Input); $i++) { 
+      // check yang memiliki bilingId
+      // jika memiliki bilingID maka update VA, jika tidak maka update database aja
+      if ($Input[$i]->BilingID != 0) {
+        // update VA
+        $BilingID = $Input[$i]->BilingID;
+        $getData= $this->m_master->caribasedprimary('db_va.va_log','trx_id',$BilingID);
+        $trx_amount = $Input[$i]->Invoice;
+        $datetime_expired = $Input[$i]->Deadline;
+        $customer_name = $getData[0]['customer_name'];
+        $customer_email = $getData[0]['customer_email'];
+        $update = $this->m_finance->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students');
+        if ($update['status'] == 1) {
+          // update data pada table db_finance.payment_students
+            $this->m_finance->updateCicilanMHS($BilingID,$trx_amount,$datetime_expired);
+        }
+        else
+        {
+          $arr['msg'] .= 'Va tidak bisa di update, error koneksi ke BNI with Name : '.$customer_name.'<br>';
+        }
+      }
+      else
+      {
+        $BilingID = $Input[$i]->BilingID;
+        $ID = $Input[$i]->ID;
+        $trx_amount = $Input[$i]->Invoice;
+        $datetime_expired = $Input[$i]->Deadline;
+        $this->m_finance->UpdateCicilanbyID($ID,$BilingID,$trx_amount,$datetime_expired);
+      }
+    }
+
+    return $arr;
+
+   }
+
+   public function UpdateCicilanbyID($ID,$BilingID,$trx_amount,$datetime_expired)
+   {
+    $dataSave = array(
+            'Invoice' => $trx_amount,
+            'Deadline' => $datetime_expired,
+            'UpdateAt' => date('Y-m-d H:i:s'),
+            'BilingID' => $BilingID,
+                    );
+    $this->db->where('ID',$ID);
+    $this->db->update('db_finance.payment_students', $dataSave);
+   }
+
+   public function delete_cicilan_tagihan_mhs_submit($Input)
+   {
+    $this->load->model('master/m_master');
+    $arr = array();
+    $arr['msg']  = '';
+    $ID_payment = '';
+    for ($i=0; $i < count($Input); $i++) { 
+      // check yang memiliki bilingId
+      // jika memiliki bilingID maka update VA, jika tidak maka update database aja
+      if ($Input[$i]->BilingID != 0) {
+        $BilingID = $Input[$i]->BilingID;
+        $getData0= $this->m_master->caribasedprimary('db_finance.payment_students','BilingID',$BilingID);
+        $ID_payment = $getData0[0]['ID_payment'];
+        $getData= $this->m_master->caribasedprimary('db_va.va_log','trx_id',$BilingID);
+        $trx_amount = $Input[$i]->Invoice;
+        $datetime_expired = date('Y-m-d H:i:s');
+        $customer_name = $getData[0]['customer_name'];
+        $customer_email = $getData[0]['customer_email'];
+        $update = $this->m_finance->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students');
+        if ($update['status'] == 1) {
+          // delete data pada table db_finance.payment_students
+            $ID = $Input[$i]->ID;
+            $this->m_finance->delete_id_table($ID,'payment_students');
+        }
+        else
+        {
+          $arr['msg'] .= 'Va tidak bisa di update, error koneksi ke BNI with Name : '.$customer_name.'<br>';
+        }
+      }
+      else
+      {
+        $BilingID = $Input[$i]->BilingID;
+        $ID = $Input[$i]->ID;
+        $trx_amount = $Input[$i]->Invoice;
+        $datetime_expired = $Input[$i]->Deadline;
+        $this->m_finance->delete_id_table($ID,'payment_students');
+      }
+    }
+    $this->m_finance->delete_id_table($ID_payment,'payment');
+    return $arr;
    }
 
 }

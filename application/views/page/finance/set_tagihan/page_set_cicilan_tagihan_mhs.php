@@ -168,9 +168,9 @@
                          inputCHK = ''; 
                         }
 
-                        if(Data_mhs[i]['StatusPayment'] == 0)
+                        if(Data_mhs[i]['StatusPayment'] == 0) // menandakan belum approve
                          {
-                           if (Data_mhs[i]['DetailPayment'].length == 1) {
+                           if (Data_mhs[i]['DetailPayment'].length == 1) { // menandakan untuk setting cicilan maka harus memiliki satu detail payment
                                $('#dataRow').append(tr +
                                                       // '<td>'+inputCHK+'</td>' +
                                                       '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
@@ -370,33 +370,75 @@
             break;
           }  
         }
+          /*var startDate = moment("28.04.2016", "DD.MM.YYYY");
+          var endDate = moment("26.04.2016", "DD.MM.YYYY");
+
+          var result = 'Diff: ' + endDate.diff(startDate, 'days');
+          console.log(result);*/
 
         if (bool) {
           console.log(arrTemp);
-          var url = base_url_js + "finance/tagihan-mhs/set-cicilan-tagihan-mhs/submit";
-          var data = arrTemp
-          var token = jwt_encode(data,"UAP)(*");
-          $.post(url,{token:token},function (data_json) {
-              // jsonData = data_json;
-              var obj = JSON.parse(data_json); 
-              if(obj != ''){
-                  $('#btn-Save').prop('disabled',false).html('Submit');  
-                  toastr.error(obj, 'Failed!!');
-              }
-              else
-              {
-                  window.location.reload(true); 
-              }
+          // hitung tanggal tidak boleh melewati cicilan sebelumnya
+            var bool2 = true;
+            for (var i = 0; i < arrTemp.length; i++) {
+              var date1 = arrTemp[i].Deadline;
+              date1 = date1.substring(0, 10);
+               for (var j = 0; j < arrTemp.length; j++) {
+                if (i < j) {
+                   var date2 = arrTemp[j].Deadline;
+                   date2 = date2.substring(0, 10);
 
-          }).done(function() {
-            // $('#btn-Save').prop('disabled',false).html('Submit');
-          }).fail(function() {
-            $('#btn-Save').prop('disabled',false).html('Submit');  
-            toastr.error('The Database connection error, please try again', 'Failed!!');
-          }).always(function() {
-           $('#btn-Save').prop('disabled',false).html('Submit');
-          });
-          
+                   var startDate = moment(date1, "YYYY-MM-DD");
+                   var endDate = moment(date2, "YYYY-MM-DD");
+                   var result = endDate.diff(startDate, 'days');
+                   result = parseInt(result);
+                   console.log(result);
+                   if (result <= 0) {
+                    bool2 = false;
+                    console.log('i ' + date1 + '< j : ' + date2);
+                    break;
+                   } 
+                }
+                
+               }
+
+               if (!bool2) {
+                  break;
+                  console.log('i < j');
+               }
+
+            }
+          // hitung tanggal tidak boleh melewati cicilan sebelumnya
+
+          if (bool2) {
+            var url = base_url_js + "finance/tagihan-mhs/set-cicilan-tagihan-mhs/submit";
+            var data = arrTemp
+            var token = jwt_encode(data,"UAP)(*");
+            $.post(url,{token:token},function (data_json) {
+                // jsonData = data_json;
+                var obj = JSON.parse(data_json); 
+                if(obj != ''){
+                    $('#btn-Save').prop('disabled',false).html('Submit');  
+                    toastr.error(obj, 'Failed!!');
+                }
+                else
+                {
+                    window.location.reload(true); 
+                }
+
+            }).done(function() {
+              // $('#btn-Save').prop('disabled',false).html('Submit');
+            }).fail(function() {
+              $('#btn-Save').prop('disabled',false).html('Submit');  
+              toastr.error('The Database connection error, please try again', 'Failed!!');
+            }).always(function() {
+             $('#btn-Save').prop('disabled',false).html('Submit');
+            });
+          } else {
+            toastr.error('Tanggal Deadline cicilan tidak boleh mendahului tanggal cicilan sebelumnya', 'Failed!!');
+            $('#btn-Save').prop('disabled',false).html('Submit');
+          }
+
         } else {
           toastr.error(msg, 'Failed!!');
           $('#btn-Save').prop('disabled',false).html('Submit');

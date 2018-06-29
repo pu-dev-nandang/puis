@@ -435,4 +435,23 @@ class C_finance extends Finnance_Controler {
         $this->temp($content);
     }
 
+    public function edit_cicilan_tagihan_mhs_submit()
+    {
+        $Input = $this->getInputToken();
+        $msg = '';
+        $proses = $this->m_finance->edit_cicilan_tagihan_mhs_submit($Input);
+        $msg = $proses['msg'];
+        echo json_encode($msg);
+
+    }
+
+    public function delete_cicilan_tagihan_mhs_submit()
+    {
+        $Input = $this->getInputToken();
+        $msg = '';
+        $proses = $this->m_finance->delete_cicilan_tagihan_mhs_submit($Input);
+        $msg = $proses['msg'];
+        echo json_encode($msg);
+    }
+
 }
