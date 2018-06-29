@@ -92,7 +92,9 @@ $route['human-resources/employees'] = 'page/hr/c_employees/employees';
 $route['database/lecturers'] = 'page/database/c_database/lecturers';
 $route['database/lecturer-details/(:any)'] = 'page/database/c_database/lecturersDetails/$1';
 $route['database/loadpagelecturersDetails'] = 'page/database/c_database/loadpagelecturersDetails';
+
 $route['database/students'] = 'page/database/c_database/students';
+$route['database/loadPageStudents'] = 'page/database/c_database/loadPageStudents';
 $route['database/showStudent'] = 'page/database/c_database/showStudent';
 $route['database/employees'] = 'page/database/c_database/employees';
 
@@ -351,6 +353,7 @@ $route['api/__geteducationLevel'] = 'api/c_api/geteducationLevel';
 $route['api/__getMKByID'] = 'api/c_api/getMKByID';
 $route['api/__getSemester'] = 'api/c_api/getSemester';
 $route['api/__getLecturer'] = 'api/c_api/getLecturer';
+$route['api/__getStudents'] = 'api/c_api/getStudents';
 $route['api/__getAllMK'] = 'api/c_api/getAllMK';
 
 $route['api/__setLecturersAvailability'] = 'api/c_api/setLecturersAvailability';

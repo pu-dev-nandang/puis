@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class M_api extends CI_Model {
 
-    private function getClassOf(){
+    public function getClassOf(){
         $data = $this->db->query('SELECT ast.Year FROM db_academic.auth_students ast 
                                                   GROUP BY ast.Year');
 
@@ -1943,6 +1943,47 @@ class M_api extends CI_Model {
 
         return $dataSch;
 
+    }
+
+    public function getDataStudents_Schedule($SemesterID,$ScheduleID){
+
+        $dataClassOf = $this->getClassOf();
+
+        $res = [];
+        for($c=0;$c<count($dataClassOf);$c++){
+            $db_ = 'ta_'.$dataClassOf[$c]['Year'];
+            $dataSc = $this->db->query('SELECT sp.*,s.Name FROM '.$db_.'.study_planning sp 
+                                                LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
+                                                WHERE sp.SemesterID = "'.$SemesterID.'" 
+                                                AND sp.ScheduleID = "'.$ScheduleID.'" 
+                                                AND sp.StatusSystem = "1" ')->result_array();
+
+            if(count($dataSc)>0){
+                for($d=0;$d<count($dataSc);$d++){
+                    $dataSc[$d]['DB_Student'] = $db_;
+                }
+                array_push($res,$dataSc);
+            }
+
+        }
+
+        return $res;
+
+    }
+
+    public function getAllStudents(){
+        $dataClassOf = $this->getClassOf();
+        $res = [];
+        for($c=0;$c<count($dataClassOf);$c++){
+            $db_ = 'ta_'.$dataClassOf[$c]['Year'];
+            $dataSc = $this->db->query('SELECT * FROM '.$db_.'.students ORDER BY ProdiID, NPM ASC ')->result_array();
+
+            array_push($res,$dataSc);
+        }
+
+        print_r($res);
+
+        return $res;
     }
 
 }

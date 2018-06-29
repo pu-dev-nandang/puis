@@ -1,139 +1,46 @@
-<div style="margin-top: 30px;">
-    <table id="tableMK2" class="table table-striped table-hover table-bordered table-tabletools table-responsive">
-        <thead>
-        <tr>
-            <th class="th-center" style="width: 15px;">No</th>
-            <th class="th-center" style="width: 40px">Photo</th>
-            <th class="th-center">NPM</th>
-            <th class="th-center">Name</th>
-            <th class="th-center">Class Of</th>
-            <th class="th-center">Prodi</th>
-            <th class="th-center" style="width: 50px;">Status</th>
-        </tr>
-        </thead>
-        <tbody id="dataStudent"></tbody>
-    </table>
+
+
+
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <div class="thumbnail">
+            <div class="row">
+                <div class="col-md-6">
+                    <select class="form-control" id="filterCurriculum"></select>
+                </div>
+                <div class="col-md-6">
+                    <select class="form-control" id="filterBaseProdi"></select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <hr/>
+        <div id="pageStudents"></div>
+    </div>
 </div>
 
 <script>
     $(document).ready(function () {
-        loadDataStudentds();
+
+        $('#filterCurriculum,#filterBaseProdi').empty();
+        $('#filterCurriculum').append('<option value="" disabled selected>-- Curriculum--</option>' +
+            '                <option disabled>------------------------------------------</option>');
+        loadSelectOptionCurriculum('#filterCurriculum','');
+
+        $('#filterBaseProdi').append('<option value="">--- All Program Study ---</option>' +
+            '<option disabled>------------------------------------------</option>');
+        loadSelectOptionBaseProdi('#filterBaseProdi','');
+
+
     });
 
-    function loadDataStudentds() {
-        var url = base_url_js+'api/__getAllStudents';
-        $.getJSON(url,function (data_json) {
-            console.log(data_json);
-            var tr = $('#dataStudent');
-            var no=1;
-
-            for(var i=0;i<data_json.length;i++){
-                var data_stdn = data_json[i];
-
-                for(var s=0;s<data_stdn.DataStudents.length;s++){
-                    var std = data_stdn.DataStudents[s];
-                    var foto_student = base_url_img_student+'ta_'+std.ClassOf+'/'+std.Photo;
-                    var label = '';
-                    if(std.StatusStudentID==7 || std.StatusStudentID==6 || std.StatusStudentID==4){
-                        label = 'label-danger';
-                    } else if(std.StatusStudentID==2){
-                        label = 'label-warning';
-                    } else if(std.StatusStudentID==3){
-                        label = 'label-success';
-                    } else if(std.StatusStudentID==1){
-                        label = 'label-primary';
-                    }
-
-
-                    tr.append('<tr>' +
-                        '<td class="td-center"><div>'+(no++)+'</div></td>' +
-                        '<td class="td-center"><div><img src="'+foto_student+'"  class="img-rounded" width="30" height="30" style="max-width: 30px;object-fit: scale-down;"></div></td>' +
-                        '<td class="td-center"><div><a href="javascript:void(0);" class="btnPortalStudent">'+std.NPM+'</a></div></td>' +
-                        '<td><div><a href="javascript:void(0);" data-npm="'+std.NPM+'" data-ta="'+std.ClassOf+'" class="btnDetailStudent"><b>'+std.Name+'</b></a></div></td>' +
-                        '<td class="td-center">'+std.ClassOf+'</td>' +
-                        '<td class="td-center">'+std.ProdiNameEng+'</td>' +
-                        '<td class="td-center"><span class="label '+label+'">'+std.StatusStudentDesc+'</span></td>' +
-                        '</tr>');
-
-                    $("img").bind("error",function(){
-                        // Replacing image source
-                        if(std.Gender=='P'){
-                            $(this).attr("src",base_url_js+"images/icon/female.png");
-                        } else {
-                            $(this).attr("src",base_url_js+"images/icon/male.png");
-                        }
-
-                    });
-                }
-            }
-
-            var table = $('#tableMK2').DataTable({
-                'iDisplayLength' : 10,
-                "sDom": "<'row'<'dataTables_header clearfix'<'col-md-3'l><'col-md-9'Tf>r>>t<'row'<'dataTables_header clearfix'<'col-md-1'><'col-md-11'>r>>t<'row'<'dataTables_footer clearfix'<'col-md-6'i><'col-md-6'p>>>", // T is new
-                "oTableTools": {
-                    "aButtons": [
-                        {
-                            "sExtends" : "xls",
-                            "sButtonText" : '<i class="fa fa-download" aria-hidden="true"></i> Excel',
-                        },
-                        {
-                            "sExtends" : "pdf",
-                            "sButtonText" : '<i class="fa fa-download" aria-hidden="true"></i> PDF',
-                            "sPdfOrientation" : "landscape",
-                            "sPdfMessage" : "Daftar Seluruh Mata Kuliah"
-                        }
-
-                    ],
-                    "sSwfPath": "../assets/template/plugins/datatables/tabletools/swf/copy_csv_xls_pdf.swf"
-                },
-                initComplete: function () {
-                    // $('.dataTables_header').append('<div class="col-md-12"><div class="row"></div></div>');
-                    $('.dataTables_header .col-md-11').css('padding-right','5px');
-                    var nodiv = 1;
-                    this.api().columns().every( function () {
-                        var column = this;
-                        var desc = '';
-                        if(nodiv==7){
-                            desc = '--- Status ---';
-                        } else if(nodiv==5){
-                            desc = '--- Class Of ---';
-                        } else if(nodiv==6){
-                            desc = '--- Base Prodi ---';
-                        }
-                        var select = $('<select class="form-control filter-prodi" style="width: 150px;"><option selected disabled>'+desc+'</option><option value="">All</option></select>')
-                            .prependTo( $('.dataTables_header .col-md-11') )
-                            .on( 'change', function () {
-                                var val = $.fn.dataTable.util.escapeRegex(
-                                    $(this).val()
-                                );
-
-                                column
-                                    .search( val ? '^'+val+'$' : '', true, false )
-                                    .draw();
-                            } );
-                        column.data().unique().sort().each( function ( d, j ) {
-                            var f = d.split('div');
-                            if(f.length<=1){
-                                if(nodiv==7){
-                                    // console.log($(d).text());
-                                    var d2 = $(d).text();
-                                    select.append( '<option value="'+d2+'">'+d2+'</option>' );
-                                } else {
-                                    select.append( '<option value="'+d+'">'+d+'</option>' );
-                                }
-
-                            } else {
-                                select.remove();
-                                // select.addClass('hide');
-                            }
-                        } );
-                        nodiv++;
-                    } );
-                }
-
-            });
-        });
-    }
+    $(document).on('change','#filterCurriculum,#filterBaseProdi',function () {
+        loadPage();
+    });
 
     $(document).on('click','.btnDetailStudent',function () {
         var ta = $(this).attr('data-ta');
@@ -165,4 +72,30 @@
 
 
     });
+
+    function loadPage() {
+
+        var filterCurriculum = $('#filterCurriculum').val();
+        var filterBaseProdi = $('#filterBaseProdi').val();
+
+        if(filterCurriculum!='' && filterCurriculum!=null
+        && filterBaseProdi!='' && filterBaseProdi!=null){
+
+            var data = {
+                Year : filterCurriculum.split('.')[1],
+                ProdiID : filterBaseProdi.split('.')[0]
+            };
+
+            var url = base_url_js+'database/loadPageStudents';
+            $.post(url,{data:data},function (page) {
+                setTimeout(function () {
+                    $('#pageStudents').html(page);
+                },500);
+            });
+
+        }
+
+
+    }
+
 </script>
