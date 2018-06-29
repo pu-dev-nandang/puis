@@ -1709,6 +1709,13 @@ class C_api extends CI_Controller {
                 $this->db->update('db_academic.grade_course');
                 return print_r(1);
             }
+
+            else if($data_arr['action']=='dataCourse'){
+
+                $data = $this->m_api->getDataCourse2Score($data_arr['SemesterID']
+                    ,$data_arr['ProdiID'],$data_arr['CombinedClasses'],$data_arr['IsSemesterAntara']);
+                return print_r(json_encode($data));
+            }
         }
     }
 

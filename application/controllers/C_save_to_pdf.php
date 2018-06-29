@@ -491,16 +491,6 @@ class C_save_to_pdf extends CI_Controller {
 
         // ---
 
-        $pdf->Cell(25,5,'Code',0,0);
-        $pdf->Cell(3,5,':',0,0,'C');
-        $pdf->Cell(81,5,'HOT0014',0,0);
-
-        $pdf->Cell(25,5,'Study Program',0,0);
-        $pdf->Cell(3,5,':',0,0,'C');
-        $pdf->Cell(50,5,'HBP',0,1);
-
-        // ---
-
         $pdf->Cell(25,5,'Group',0,0);
         $pdf->Cell(3,5,':',0,0,'C');
         $pdf->Cell(81,5,'HBP8A',0,0);
@@ -519,8 +509,6 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(3,5,':',0,0,'C');
         $pdf->Cell(50,5,'504',0,1);
     }
-
-
 
     private function header_attd_table($pdf){
         $pdf->Cell(185,7,'',0,1,'');
@@ -594,4 +582,83 @@ class C_save_to_pdf extends CI_Controller {
     }
 
 
+    // ========= Score ==========
+
+    private function header_report_exam($pdf,$exam){
+        $pdf->SetFont('Arial','I',7);
+        $pdf->Cell(0,7,'Page : '.$pdf->PageNo().' of {nb}',0,0,'R');
+        $pdf->AliasNbPages();
+
+        $pdf->SetFont('Arial','B',10);
+        $pdf->Cell(185,7,'',0,1);
+        $pdf->Cell(185,5,'Food and Beverage - Service Theory',0,1,'C');
+        $pdf->Cell(185,5,'HOT0014',0,1,'C');
+//        $pdf->Cell(185,5,'EVEN SEMESTER ACADEMIC YEAR 2017/2018',0,1,'C');
+
+        $pdf->Cell(185,7,'',0,1,'');
+        $pdf->SetFont('Arial','',9);
+        $pdf->Cell(25,5,'Code',0,0);
+        $pdf->Cell(3,5,':',0,0,'C');
+        $pdf->Cell(81,5,'HOT0014',0,0);
+
+        $pdf->Cell(25,5,'Study Program',0,0);
+        $pdf->Cell(3,5,':',0,0,'C');
+        $pdf->Cell(50,5,'HBP',0,1);
+
+        // ---
+
+        $pdf->Cell(25,5,'Course',0,0);
+        $pdf->Cell(3,5,':',0,0,'C');
+        $pdf->Cell(81,5,'Food and Beverage - Service Theory',0,0);
+
+        $pdf->Cell(25,5,'Day, date',0,0);
+        $pdf->Cell(3,5,':',0,0,'C');
+        $pdf->Cell(50,5,'Monday, 25 Desember 2018',10,1);
+
+        // ---
+
+        $pdf->Cell(25,5,'Code',0,0);
+        $pdf->Cell(3,5,':',0,0,'C');
+        $pdf->Cell(81,5,'HOT0014',0,0);
+
+        $pdf->Cell(25,5,'Study Program',0,0);
+        $pdf->Cell(3,5,':',0,0,'C');
+        $pdf->Cell(50,5,'HBP',0,1);
+
+        // ---
+
+        $pdf->Cell(25,5,'Group',0,0);
+        $pdf->Cell(3,5,':',0,0,'C');
+        $pdf->Cell(81,5,'HBP8A',0,0);
+
+        $pdf->Cell(25,5,'Time',0,0);
+        $pdf->Cell(3,5,':',0,0,'C');
+        $pdf->Cell(50,5,'08:00 - 09:40',0,1);
+
+        // ---
+
+        $pdf->Cell(25,5,'Lecturer/s',0,0);
+        $pdf->Cell(3,5,':',0,0,'C');
+        $pdf->Cell(81,5,'Michael Yadisaputra',0,0);
+
+        $pdf->Cell(25,5,'Room',0,0);
+        $pdf->Cell(3,5,':',0,0,'C');
+        $pdf->Cell(50,5,'504',0,1);
+    }
+
+    // UTS
+    public function report_uts(){
+
+        $pdf = new FPDF('p','mm','A4');
+        // membuat halaman baru
+        $pdf->AddPage();
+        $this->header_exam($pdf);
+
+        $this->header_report_exam($pdf,'UTS');
+
+
+//        $pdf->Output('Study_Card.pdf','D');
+        $pdf->Output();
+
+    }
 }

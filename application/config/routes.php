@@ -68,17 +68,16 @@ $route['academic/jadwal'] = 'page/academic/c_jadwal';
 
 $route['academic/study-planning'] = 'page/academic/c_study_planning';
 
-
 $route['academic/reference'] = 'page/academic/C_reference';
-
-$route['academic/__setPageJadwal'] = 'page/academic/c_jadwal/setPageJadwal';
-
-$route['academic/jadwal-ujian'] = 'page/academic/c_jadwal_ujian';
 
 
 // Jadwal Ujian
 $route['academic/__setPageJadwalUjian'] = 'page/academic/c_jadwal_ujian/setPageJadwal';
+$route['academic/__setPageJadwal'] = 'page/academic/c_jadwal/setPageJadwal';
+$route['academic/jadwal-ujian'] = 'page/academic/c_jadwal_ujian';
 
+// ---- Score ----
+$route['academic/score'] =  'page/academic/c_score';
 
 // --- Modal Academic ----
 $route['academic/modal-tahun-akademik-detail-prodi'] = 'page/academic/c_akademik/modal_tahun_akademik_detail_prodi';
@@ -338,6 +337,9 @@ $route['save2pdf/draft-questions'] =  'c_save_to_pdf/draft_questions';
 $route['save2pdf/answer-sheet'] =  'c_save_to_pdf/answer_sheet';
 $route['save2pdf/news-event'] =  'c_save_to_pdf/news_event';
 $route['save2pdf/attendance-list'] =  'c_save_to_pdf/attendance_list';
+
+$route['save2pdf/report-uts'] =  'c_save_to_pdf/report_uts';
+
 
 // ====== API ======
 $route['api/__getKurikulumByYear'] = 'api/c_api/getKurikulumByYear';
