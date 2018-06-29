@@ -100,14 +100,13 @@ class C_api extends CI_Controller {
             $sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ') ORDER BY em.PositionMain, NIP ASC';
 
-        } else {
+        }
+        else {
             $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
                         ps.NameEng AS ProdiNameEng
                         FROM db_employees.employees em 
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                         WHERE (em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7")';
-//            $sql.= '  ORDER BY '.$columns[$requestData['order'][0]['column']].' '.$requestData['order'][0]['dir'].'
-//                        LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
             $sql.= 'ORDER BY em.PositionMain, NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
         }
@@ -137,6 +136,74 @@ class C_api extends CI_Controller {
             $nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
             $nestedData[] = $Division.' - '.$Position;
             $nestedData[] = $row["ProdiNameEng"];
+
+            $data[] = $nestedData;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($totalData)),
+            "recordsFiltered" => intval( count($totalData) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+
+    }
+
+    public function getStudents(){
+        $requestData= $_REQUEST;
+
+        $dataYear = $this->input->get('dataYear');
+        $dataProdiID = $this->input->get('dataProdiID');
+
+        $db_ = 'ta_'.$dataYear;
+
+
+        $totalData = $this->db->get_where($db_.'.students',
+                array('ProdiID' => $dataProdiID))->result_array();
+
+        $sql = 'SELECT s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, s.StatusStudentID, ss.Description AS StatusStudent 
+                          FROM '.$db_.'.students s 
+                          LEFT JOIN db_academic.program_study ps ON (ps.ID = s.ProdiID)
+                          LEFT JOIN db_academic.status_student ss ON (ss.ID = s.StatusStudentID)';
+
+        if( !empty($requestData['search']['value']) ) {
+            $sql.= ' WHERE s.NPM LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR s.Name LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR s.ClassOf LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' ORDER BY s.NPM, s.ProdiID ASC';
+        }
+        else {
+            $sql.= 'ORDER BY s.NPM, s.ProdiID ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+        }
+
+        $query = $this->db->query($sql)->result_array();
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $Gender = ($row["Gender"]=='P') ? 'Female' : 'Male';
+
+            $label = '';
+            if($row['StatusStudentID']==7 || $row['StatusStudentID'] ==6 || $row['StatusStudentID'] ==4){
+                $label = 'label-danger';
+            } else if($row['StatusStudentID'] ==2){
+                $label = 'label-warning';
+            } else if($row['StatusStudentID'] ==3){
+                $label = 'label-success';
+            } else if($row['StatusStudentID'] ==1){
+                $label = 'label-primary';
+            }
+
+            $nestedData[] = '<div style="text-align: center;">'.$row["NPM"].'</div>';
+            $nestedData[] = '<div style="text-align: center;"><img src="'.base_url('uploads/students/').$db_.'/'.$row["Photo"].'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
+            $nestedData[] = '<a href="javascript:void(0);" data-npm="'.$row["NPM"].'" data-ta="'.$row["ClassOf"].'" class="btnDetailStudent"><b>'.$row["Name"].'</b></a>';
+            $nestedData[] = '<div style="text-align: center;">'.$Gender.'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$row["ClassOf"].'</div>';
+//            $nestedData[] = $row["ProdiNameEng"];
+            $nestedData[] = '<div style="text-align: center;"><span class="label '.$label.' ">'.$row["StatusStudent"].'</span></div>';
 
             $data[] = $nestedData;
         }
@@ -741,8 +808,16 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='delete'){
                 $ID = $data_arr['ScheduleID'];
 
-//                $tables = array('db_academic.schedule_class_group', 'db_academic.schedule_details',
-//                    'db_academic.schedule_details_course', 'db_academic.schedule_team_teaching');
+                // Get Attendance
+                $dataAttd = $this->db->get_where('db_academic.attendance',
+                            array('ScheduleID' => $ID))->result_array();
+
+                // Delete Attendance Students
+                $this->db->delete('db_academic.attendance_students',array('ID_Attd' => $dataAttd[0]['ID']));
+
+                // Delete Attendance
+                $this->db->delete('db_academic.attendance',array('ScheduleID' => $ID));
+
 
                 $tables = array('db_academic.schedule_details',
                     'db_academic.schedule_details_course', 'db_academic.schedule_team_teaching');
@@ -753,20 +828,35 @@ class C_api extends CI_Controller {
                 $this->db->where('ID', $ID);
                 $this->db->delete('db_academic.schedule');
 
-                return print_r(1);
 
+                return print_r(1);
             }
             else if($data_arr['action']=='deleteSubSesi') {
-
                 $ID = $data_arr['sdID'];
 
                 $dataSD = $this->db->get_where('db_academic.schedule_details',
                     array('ID' => $ID),1)->result_array();
 
-                $this->db->delete('db_academic.attendance', array('ScheduleID' => $dataSD[0]['ScheduleID'],'SDID' => $ID));
+                $whereAttd = array(
+                    'ScheduleID' => $dataSD[0]['ScheduleID'],
+                    'SDID' => $ID
+                );
+
+                $dataAttd = $this->db->get_where('db_academic.attendance',$whereAttd,1)->result_array();
+
+                $this->db->delete('db_academic.attendance_students',array('ID_Attd'=>$dataAttd[0]['ID']));
+                $this->db->delete('db_academic.attendance', $whereAttd);
 
                 $this->db->where('ID', $ID);
                 $this->db->delete('db_academic.schedule_details');
+
+                // Update Subsesi jika tinggal 1
+                $dataSubSesi = $this->db->get_where('db_academic.schedule_details',
+                    array('ScheduleID'=>$dataSD[0]['ScheduleID']))->result_array();
+                $SubSesi = (count($dataSubSesi)>1) ? '1' : '0';
+                $this->db->set('SubSesi', $SubSesi);
+                $this->db->where('ID', $dataSD[0]['ScheduleID']);
+                $this->db->update('db_academic.schedule');
 
                 return print_r(1);
             }
@@ -795,18 +885,38 @@ class C_api extends CI_Controller {
                 $dataScheduleDetailsArrayNew = (array) $schedule_details['dataScheduleDetailsArrayNew'];
                 for($d2=0;$d2<count($dataScheduleDetailsArrayNew);$d2++){
 
-                    $this->db->insert('db_academic.schedule_details',(array) $dataScheduleDetailsArrayNew[$d2]);
+                    $dataNewSesi = (array) $dataScheduleDetailsArrayNew[$d2];
+
+                    $this->db->insert('db_academic.schedule_details', $dataNewSesi);
+
+
+                    // Get Schedule
+                    $dataSch = $this->db->get_where('db_academic.schedule',
+                        array('ID' => $dataNewSesi['ScheduleID']),1)->result_array();
 
                     $insert_id_SD = $this->db->insert_id();
+                    $this->db->reset_query();
 
                     // Insert Attd
-//                    $dataInsetAttd = array(
-//                        'SemesterID' => $dataScheduleDetailsArrayNew[$d2]['SemesterID'],
-//                        'ScheduleID' => $insert_id,
-//                        'SDID' => $insert_id_SD
-//                    );
-//
-//                    $this->db->insert('db_academic.attendance',$dataInsetAttd);
+                    $dataInsetAttd = array(
+                        'SemesterID' => $dataSch[0]['SemesterID'],
+                        'ScheduleID' => $dataNewSesi['ScheduleID'],
+                        'SDID' => $insert_id_SD
+                    );
+                    $this->db->insert('db_academic.attendance',$dataInsetAttd);
+                    $insert_id_attd = $this->db->insert_id();
+
+
+                    // Cek Mahasiswa Yang Ngambil
+                    $dataMhs = $this->m_api->getDataStudents_Schedule($dataSch[0]['SemesterID'],$dataNewSesi['ScheduleID']);
+
+                    for($m=0;$m<count($dataMhs);$m++){
+                        $data_attd_s = array(
+                            'ID_Attd' => $insert_id_attd,
+                            'NPM' => $dataMhs[$m]['NPM']
+                        );
+                    }
+
                     $this->db->reset_query();
                 }
 
@@ -824,6 +934,15 @@ class C_api extends CI_Controller {
 
                     }
                 }
+
+
+                // Update Subsesi jika tinggal 1
+                $dataSubSesi = $this->db->get_where('db_academic.schedule_details',
+                    array('ScheduleID'=>$ScheduleID))->result_array();
+                $SubSesi = (count($dataSubSesi)>1) ? '1' : '0';
+                $this->db->set('SubSesi', $SubSesi);
+                $this->db->where('ID', $ScheduleID);
+                $this->db->update('db_academic.schedule');
 
                 return print_r(1);
 
@@ -1446,7 +1565,6 @@ class C_api extends CI_Controller {
         }
     }
 
-
     public function getEmployeesBy($division = null,$position = null)
     {
         try{
@@ -1915,5 +2033,7 @@ class C_api extends CI_Controller {
             }
         }
     }
+
+
 
 }

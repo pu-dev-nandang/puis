@@ -72,6 +72,11 @@ class C_database extends Globalclass {
         $this->temp($content);
     }
 
+    public function loadPageStudents(){
+        $data['dataForm'] = $this->input->post('data');
+        $this->load->view('page/database/students/students_details',$data);
+    }
+
     public function students2()
     {
         $content = $this->load->view('page/database/students','',true);

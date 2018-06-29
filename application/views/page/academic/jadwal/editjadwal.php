@@ -159,8 +159,6 @@
 
 
             if(formTeamTeaching!=null){
-                // console.log(formTeamTeaching);
-                // console.log(formTeamTeaching.length);
 
                 for(var t=0;t<formTeamTeaching.length;t++){
                     var dt = {
@@ -247,9 +245,6 @@
 
         if($.inArray(0,process)==-1){
 
-            // if(totalCredit<=textTotalSKSMK){
-
-
                 var data = {
                     action : 'edit',
                     ID : ScheduleID,
@@ -274,8 +269,8 @@
                         }
                 };
 
-                console.log(data);
-                return false;
+                // console.log(data);
+                // return false;
 
                 $('#tableForm .form-sesiawal').prop('readonly',false);
                 $('#formCoordinator,input[name=formteamTeaching],.form-jadwal,.btn-act-editForm,.btn-delete-sesi').prop('disabled',true);
