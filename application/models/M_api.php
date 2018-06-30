@@ -947,6 +947,19 @@ class M_api extends CI_Model {
 
     public function __checkSchedule($dataFilter){
 
+//        echo 'SELECT s.ID AS ScheduleID,s.ClassGroup , sd.ID AS sdID, sd.DayID,sd.StartSessions, sd.EndSessions, cl.Room
+//                                              FROM db_academic.schedule s
+//                                              RIGHT JOIN db_academic.schedule_details sd ON (s.ID=sd.ScheduleID)
+//                                              LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+//                                              WHERE s.SemesterID="'.$dataFilter['SemesterID'].'"
+//                                              AND s.IsSemesterAntara="'.$dataFilter['IsSemesterAntara'].'"
+//                                              AND sd.ClassroomID="'.$dataFilter['ClassroomID'].'"
+//                                              AND sd.DayID="'.$dataFilter['DayID'].'"
+//                                              AND (("'.$dataFilter['StartSessions'].'" >= sd.StartSessions  AND "'.$dataFilter['StartSessions'].'" <= sd.EndSessions) OR
+//                                              ("'.$dataFilter['EndSessions'].'" >= sd.StartSessions AND "'.$dataFilter['EndSessions'].'" <= sd.EndSessions) OR
+//                                              ("'.$dataFilter['StartSessions'].'" <= sd.StartSessions AND "'.$dataFilter['EndSessions'].'" >= sd.EndSessions)
+//                                              ) ORDER BY sd.StartSessions ASC ';
+
         $jadwal = $this->db->query('SELECT s.ID AS ScheduleID,s.ClassGroup , sd.ID AS sdID, sd.DayID,sd.StartSessions, sd.EndSessions, cl.Room                                               
                                               FROM db_academic.schedule s
                                               RIGHT JOIN db_academic.schedule_details sd ON (s.ID=sd.ScheduleID)   
@@ -1961,8 +1974,9 @@ class M_api extends CI_Model {
             if(count($dataSc)>0){
                 for($d=0;$d<count($dataSc);$d++){
                     $dataSc[$d]['DB_Student'] = $db_;
+                    array_push($res,$dataSc[$d]);
                 }
-                array_push($res,$dataSc);
+
             }
 
         }

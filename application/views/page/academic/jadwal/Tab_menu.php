@@ -452,9 +452,9 @@
 
 <!-- Edit Jadwal -->
 <script>
-    $(document).on('click','#btnRemoveYes',function () {
-        loading_buttonSm('#btnRemoveYes');
-        $('#btnRemoveNo').prop('disabled',true);
+    $(document).on('click','#btnRemoveYesEditSc',function () {
+        loading_buttonSm('#btnRemoveYesEditSc');
+        $('#btnRemoveNoEditSc').prop('disabled',true);
         var data = {
             action : 'delete',
             ScheduleID : ScheduleID
@@ -469,34 +469,34 @@
         });
     });
 
-    $(document).on('change','.form-sesiawal,.form-timepercredit,.form-credit',function () {
+    $(document).on('change','.form-timepercredit-edit-sc,.form-credit-edit-sc',function () {
         var ID = $(this).attr('data-id');
-        setSesiAkhir(ID);
-        checkSchedule(ID);
+        setSesiAkhir_EditJadwal(ID);
+        checkSchedule_EditJadwal(ID);
 
     });
 
-    $(document).on('keyup','.form-sesiawal,.form-credit',function () {
+    $(document).on('keyup','.form-credit-edit-sc',function () {
         var ID = $(this).attr('data-id');
-        setSesiAkhir(ID);
-        checkSchedule(ID);
+        setSesiAkhir_EditJadwal(ID);
+        checkSchedule_EditJadwal(ID);
 
     });
 
     // Onchange Cek kelas Bentrok
-    $(document).on('change','.form-classroom,.form-day',function () {
+    $(document).on('change','.form-classroom-edit-sc,.form-day-edit-sc',function () {
         var ID = $(this).attr('data-id');
-        checkSchedule(ID);
+        checkSchedule_EditJadwal(ID);
     });
 
-    $(document).on('change','input[type=radio][fm=dtt-form]',function () {
+    $(document).on('change','input[type=radio][fm=dtt-form-edit-sc]',function () {
         loadformTeamTeaching($(this).val(),'#formTeamTeaching');
     });
 
 
     // ========
 
-    $(document).on('click','.btn-delete-sesi',function () {
+    $(document).on('click','.btn-delete-sesi-edit-sc',function () {
         var Sesi = $(this).attr('data-sesi');
         var sdID = $(this).attr('data-sd');
 
@@ -513,8 +513,8 @@
             }
         } else {
             $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Remove <span style="color:red;">Sub Sesi '+Sesi+'</span> ?? </b> ' +
-                '<button type="button" id="btnRemoveSubSesiYes" data-sd="'+sdID+'" data-sesi="'+Sesi+'" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
-                '<button type="button" id="btnRemoveSubSesiNo" class="btn btn-default" data-dismiss="modal">No</button>' +
+                '<button type="button" id="btnRemoveSubSesiYesEditSc" data-sd="'+sdID+'" data-sesi="'+Sesi+'" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+                '<button type="button" id="btnRemoveSubSesiNoEditSc" class="btn btn-default" data-dismiss="modal">No</button>' +
                 '</div>');
             $('#NotificationModal').modal({
                 'show' : true,
@@ -525,12 +525,12 @@
 
     });
 
-    $(document).on('click','#btnRemoveSubSesiYes',function () {
+    $(document).on('click','#btnRemoveSubSesiYesEditSc',function () {
         var Sesi = $(this).attr('data-sesi');
         var sdID = $(this).attr('data-sd');
 
-        loading_buttonSm('#btnRemoveSubSesiYes');
-        $('#btnRemoveSubSesiNo').prop('disabled',true);
+        loading_buttonSm('#btnRemoveSubSesiYesEditSc');
+        $('#btnRemoveSubSesiNoEditSc').prop('disabled',true);
         var url = base_url_js+'api/__crudSchedule';
         var token = jwt_encode({action:'deleteSubSesi',sdID:sdID},'UAP)(*');
         $.post(url,{token:token},function (result) {

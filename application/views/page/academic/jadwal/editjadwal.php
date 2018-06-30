@@ -9,11 +9,11 @@
         padding-bottom: 15px !important;
     }
 
-    .form-sesiawal[readonly] {
-        background-color: #ffffff;
-        color: #333333;
-        cursor: text;
-    }
+    /*.form-sesiawal[readonly] {*/
+        /*background-color: #ffffff;*/
+        /*color: #333333;*/
+        /*cursor: text;*/
+    /*}*/
 </style>
 
 <div class="row" style="margin-bottom: 30px;">
@@ -67,7 +67,7 @@
                 <td>Dosen Koordinator</td>
                 <td>:</td>
                 <td>
-                    <select class="select2-select-00 full-width-fix form-jadwal"
+                    <select class="select2-select-00 full-width-fix form-jadwal-edit-sc"
                             size="5" id="formCoordinator">
                         <option value=""></option>
                     </select>
@@ -80,14 +80,14 @@
                     <div class="row">
                         <div class="col-md-4">
                             <label class="radio-inline">
-                                <input type="radio" class="form-jadwal" fm="dtt-form" name="formteamTeaching" value="0" checked> Tidak
+                                <input type="radio" class="form-jadwal-edit-sc" fm="dtt-form-edit-sc" name="formteamTeaching" value="0" checked> Tidak
                             </label>
                             <label class="radio-inline">
-                                <input type="radio" class="form-jadwal"  fm="dtt-form" name="formteamTeaching" value="1"> Ya
+                                <input type="radio" class="form-jadwal-edit-sc"  fm="dtt-form-edit-sc" name="formteamTeaching" value="1"> Ya
                             </label>
                         </div>
                         <div class="col-md-8">
-                            <select class="select2-select-00 full-width-fix form-jadwal"
+                            <select class="select2-select-00 full-width-fix form-jadwal-edit-sc"
                                     size="5" multiple id="formTeamTeaching" disabled></select>
                         </div>
                     </div>
@@ -146,7 +146,7 @@
 
         // schedule ---
 
-        var Coordinator = $('#formCoordinator').val(); if(Coordinator==''){ process.push(0); requiredForm('#s2id_formCoordinator a'); }
+        var Coordinator = $('#formCoordinator').val();
 
         var TeamTeaching = $('input[name=formteamTeaching]:checked').val();
         var UpdateBy = sessionNIP;
@@ -219,7 +219,7 @@
                 var Credit = $('#formCredit'+dataSesiNewArr[i]).val(); if(Credit=='' || Credit==0){process.push(0); requiredForm('#formCredit'+dataSesiNewArr[i]);}
                 var TimePerCredit = $('#formTimePerCredit'+dataSesiNewArr[i]).val();
                 var StartSessions = $('#formSesiAwal'+dataSesiNewArr[i]).val(); if(StartSessions==''){process.push(0); requiredForm('#formSesiAwal'+dataSesiNewArr[i]);}
-                var EndSessions = $('#formSesiAkhir'+dataSesiNewArr[i]).val();if(EndSessions==''){process.push(0); requiredForm('#formSesiAkhir'+dataSesiNewArr[i]);}
+                var EndSessions = $('#formSesiAkhir_newSub'+dataSesiNewArr[i]).val();if(EndSessions==''){process.push(0); requiredForm('#formSesiAkhir'+dataSesiNewArr[i]);}
 
                 totalCredit = parseInt(totalCredit) + parseInt(Credit);
                 var arrSesi = {
@@ -269,11 +269,11 @@
                         }
                 };
 
-                // console.log(data);
-                // return false;
 
-                $('#tableForm .form-sesiawal').prop('readonly',false);
-                $('#formCoordinator,input[name=formteamTeaching],.form-jadwal,.btn-act-editForm,.btn-delete-sesi').prop('disabled',true);
+
+                // $('#tableForm .form-sesiawal').prop('readonly',false);
+                $('#formCoordinator,input[name=formteamTeaching],.form-jadwal-edit-sc,' +
+                    '.btn-act-editForm,.btn-delete-sesi-edit-sc').prop('disabled',true);
                 if(TeamTeaching==1 && formTeamTeaching!=null){
                     $('#formTeamTeaching').prop('disabled',true);
                 }
@@ -290,8 +290,8 @@
                     toastr.success('Data Saved','Success');
 
                     setTimeout(function () {
-                        $('#tableForm .form-sesiawal').prop('readonly',true);
-                        $('#formCoordinator,input[name=formteamTeaching],.form-jadwal,.btn-act-editForm,.btn-delete-sesi').prop('disabled',false);
+                        // $('#tableForm .form-sesiawal').prop('readonly',true);
+                        $('#formCoordinator,input[name=formteamTeaching],.form-jadwal-edit-sc,.btn-act-editForm,.btn-delete-sesi-edit-sc').prop('disabled',false);
                         $('#btnSavejadwal').html('Save');
                         if(TeamTeaching==1 && formTeamTeaching!=null){
                             $('#formTeamTeaching').prop('disabled',false);
@@ -313,8 +313,8 @@
     $('#btnRemove').click(function () {
         // var ScheduleID = $(this).attr('data-id');
         $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Remove Schedule ?? </b> ' +
-            '<button type="button" id="btnRemoveYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
-            '<button type="button" id="btnRemoveNo" class="btn btn-default" data-dismiss="modal">No</button>' +
+            '<button type="button" id="btnRemoveYesEditSc" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+            '<button type="button" id="btnRemoveNoEditSc" class="btn btn-default" data-dismiss="modal">No</button>' +
             '</div>');
         $('#NotificationModal').modal({
             'show' : true,
@@ -323,7 +323,7 @@
     });
 
     
-    function setSesiAkhir(ID) {
+    function setSesiAkhir_EditJadwal(ID) {
         var TimePerCredit = $('#formTimePerCredit'+ID).val();
         var SesiAwal = $('#formSesiAwal'+ID).val();
         var Credit = $('#formCredit'+ID).val();
@@ -358,7 +358,8 @@
         return false;
     }
 
-    function checkSchedule(ID) {
+    function checkSchedule_EditJadwal(ID) {
+
         var SemesterID = $('#formSemesterID').val();
         var ProgramsCampusID = $('#formProgramsCampusID').val();
 
@@ -366,7 +367,10 @@
         var ClassroomID = $('#formClassroom'+ID).val();
         var DayID = $('#formDay'+ID).val();
         var StartSessions = $('#formSesiAwal'+ID).val();
-        var EndSessions = $('#formSesiAkhir'+ID).val();
+        var formSesiAkhir = $('#formSesiAkhir'+ID).val();
+        var formSesiAkhir_newSub = $('#formSesiAkhir_newSub'+ID).val();
+
+        var EndSessions = (typeof formSesiAkhir_newSub  !== "undefined") ? formSesiAkhir_newSub : formSesiAkhir ;
 
         if(ClassroomID!='' && DayID!='' && StartSessions!='' && EndSessions!='') {
             var data = {
@@ -380,6 +384,8 @@
                     EndSessions : EndSessions
                 }
             };
+
+            // console.log(data);
 
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'api/__checkSchedule';
@@ -504,7 +510,7 @@
             tb.append('<tr class="trNewSesi'+dataSesiDb+' '+hd+'"  id="headerSubSesi'+dataSesiDb+'">' +
                 '                <td colspan="3" class="td-center " id="subsesi'+dataSesiDb+'">' +
                 '                    <span class="btn btn-info span-sesi">--- Sub Sesi ---</span>' +
-                '                    <button style="float:right;" '+btnRv+' class="btn btn-default btn-default-danger btn-delete-sesi" data-sesi="'+dataSesiDb+'" data-sd="'+SubSesiDetails[i].sdID+'">Remove This Sub Sesi</button>' +
+                '                    <button style="float:right;" '+btnRv+' class="btn btn-default btn-default-danger btn-delete-sesi-edit-sc" data-sesi="'+dataSesiDb+'" data-sd="'+SubSesiDetails[i].sdID+'">Remove This Sub Sesi</button>' +
                 '                </td>' +
                 '            </tr>' +
                 '            <tr class="trNewSesi'+dataSesiDb+'">' +
@@ -513,16 +519,16 @@
                 '                <td>' +
                 '                    <div class="row">' +
                 '                        <div class="col-xs-5">' +
-                '                            <select class="form-control form-jadwal form-classroom" data-id="'+dataSesiDb+'" id="formClassroom'+dataSesiDb+'">' +
+                '                            <select class="form-control form-jadwal-edit-sc form-classroom-edit-sc" data-id="'+dataSesiDb+'" id="formClassroom'+dataSesiDb+'">' +
                 '                                <option value=""></option>' +
                 '                            </select>' +
                 '                            <a href="javascript:void(0)" id="addClassRoom"  class="'+btn_conf+'" style="font-size:10px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Tambah Ruangan</a>' +
                 '                        </div>' +
                 '                        <div class="col-xs-4">' +
-                '                            <select class="form-control form-jadwal form-day" data-id="'+dataSesiDb+'" id="formDay'+dataSesiDb+'"></select>' +
+                '                            <select class="form-control form-jadwal-edit-sc form-day-edit-sc" data-id="'+dataSesiDb+'" id="formDay'+dataSesiDb+'"></select>' +
                 '                        </div>' +
                 '                        <div class="col-xs-3">' +
-                '                            <input class="form-control form-jadwal form-credit" placeholder="Credit" dataSesiDb="'+dataSesiDb+'" data-id="'+dataSesiDb+'" id="formCredit'+dataSesiDb+'" type="number"/>' +
+                '                            <input class="form-control form-jadwal-edit-sc form-credit-edit-sc" placeholder="Credit" dataSesiDb="'+dataSesiDb+'" data-id="'+dataSesiDb+'" id="formCredit'+dataSesiDb+'" type="number"/>' +
                 '                        </div>' +
                 '                    </div>' +
                 '                </td>' +
@@ -533,7 +539,7 @@
                 '                <td>' +
                 '                    <div class="row">' +
                 '                        <div class="col-xs-4">' +
-                '                            <select class="form-control form-jadwal form-timepercredit" data-id="'+dataSesiDb+'" id="formTimePerCredit'+dataSesiDb+'"></select>' +
+                '                            <select class="form-control form-jadwal-edit-sc form-timepercredit-edit-sc" data-id="'+dataSesiDb+'" id="formTimePerCredit'+dataSesiDb+'"></select>' +
                 '                            <a href="javascript:void(0)" id="addTimePerCredit" class="'+btn_conf+'" style="font-size:10px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Tambah <i>Time Per Credit</i></a>' +
                 '                        </div>' +
                 '                        <div class="col-xs-4">' +
@@ -543,10 +549,9 @@
                 '                                    <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>' +
                 '                                </span>' +
                 '                            </div>' +
-                // '                            <input type="text" readonly class="form-control form-jadwal formSesiAwal form-sesiawal" data-id="'+dataSesiDb+'" id="formSesiAwal'+dataSesiDb+'" />' +
                 '                        </div>' +
                 '                        <div class="col-xs-4">' +
-                '                            <input type="text" class="form-control form-jadwal" id="formSesiAkhir'+dataSesiDb+'" value="'+SubSesiDetails[i].EndSessions.substr(0,5)+'" style="color: #333;" readonly />' +
+                '                            <input type="text" class="form-control form-jadwal-edit-sc" id="formSesiAkhir'+dataSesiDb+'" value="'+SubSesiDetails[i].EndSessions.substr(0,5)+'" style="color: #333;" readonly />' +
                 '                        </div>' +
                 '                    </div>' +
                 '                    <div id="alertBentrok'+dataSesiDb+'"></div>' +
@@ -578,6 +583,8 @@
                     .add(parseInt(totalTime), 'minute').format('HH:mm');
 
                 $('#formSesiAkhir'+no).val(sesiAkhir);
+
+                setSesiAkhir_EditJadwal(no);
             });
 
             dataSesiDb += 1;
@@ -605,7 +612,7 @@
             $('#bodyAddSesi').append('<tr class="trNewSesi'+dataSesi+'">' +
                 '                <td colspan="3" class="td-center">' +
                 '                    <span class="btn btn-warning span-sesi">--- Sub Sesi ---</span>' +
-                '                    <button style="float:right;" class="btn btn-default btn-default-danger btn-delete-sesi" data-sesi="'+dataSesi+'" data-sd="">Remove This Sub Sesi</button>' +
+                '                    <button style="float:right;" class="btn btn-default btn-default-danger btn-delete-sesi-edit-sc" data-sesi="'+dataSesi+'" data-sd="">Remove This Sub Sesi</button>' +
                 '                </td>' +
                 '            </tr>' +
                 '            <tr class="trNewSesi'+dataSesi+'">' +
@@ -614,15 +621,15 @@
                 '                <td>' +
                 '                    <div class="row">' +
                 '                        <div class="col-xs-5">' +
-                '                            <select class="form-control form-jadwal form-classroom" data-id="'+dataSesi+'" id="formClassroom'+dataSesi+'">' +
+                '                            <select class="form-control form-jadwal-edit-sc form-classroom-edit-sc" data-id="'+dataSesi+'" id="formClassroom'+dataSesi+'">' +
                 '                                <option value=""></option>' +
                 '                            </select>' +
                 '                        </div>' +
                 '                        <div class="col-xs-4">' +
-                '                            <select class="form-control form-jadwal form-day" data-id="'+dataSesi+'" id="formDay'+dataSesi+'"></select>' +
+                '                            <select class="form-control form-jadwal-edit-sc form-day-edit-sc" data-id="'+dataSesi+'" id="formDay'+dataSesi+'"></select>' +
                 '                        </div>' +
                 '                        <div class="col-xs-3">' +
-                '                            <input class="form-control form-jadwal form-credit" data-id="'+dataSesi+'" placeholder="Credit" id="formCredit'+dataSesi+'" type="number"/>' +
+                '                            <input class="form-control form-jadwal-edit-sc form-credit-edit-sc" data-id="'+dataSesi+'" placeholder="Credit" id="formCredit'+dataSesi+'" type="number"/>' +
                 '                        </div>' +
                 '                    </div>' +
                 '                </td>' +
@@ -633,7 +640,7 @@
                 '                <td>' +
                 '                    <div class="row">' +
                 '                        <div class="col-xs-4">' +
-                '                            <select class="form-control form-jadwal form-timepercredit" data-id="'+dataSesi+'" id="formTimePerCredit'+dataSesi+'">' +
+                '                            <select class="form-control form-jadwal-edit-sc form-timepercredit-edit-sc" data-id="'+dataSesi+'" id="formTimePerCredit'+dataSesi+'">' +
                 '                            </select>' +
                 '                        </div>' +
                 '                        <div class="col-xs-4">' +
@@ -643,10 +650,9 @@
                 '                                    <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>' +
                 '                                </span>' +
                 '                            </div>' +
-                // '                            <input type="text" readonly class="form-control form-jadwal formSesiAwal form-sesiawal" id="formSesiAwal'+dataSesi+'" data-id="'+dataSesi+'" />' +
                 '                        </div>' +
                 '                        <div class="col-xs-4">' +
-                '                            <input type="text" class="form-control form-jadwal" id="formSesiAkhir_newSub'+dataSesi+'" style="color: #333;" readonly />' +
+                '                            <input type="text" class="form-control form-jadwal-edit-sc" id="formSesiAkhir_newSub'+dataSesi+'" style="color: #333;" readonly />' +
                 '                        </div>' +
                 '                    </div>' +
                 '<div id="alertBentrok'+dataSesi+'"></div>' +
@@ -675,6 +681,7 @@
                     .add(parseInt(totalTime), 'minute').format('HH:mm');
 
                 $('#formSesiAkhir_newSub'+no).val(sesiAkhir);
+                checkSchedule_EditJadwal(no);
             });
 
 
