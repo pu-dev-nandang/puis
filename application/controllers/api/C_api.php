@@ -162,19 +162,21 @@ class C_api extends CI_Controller {
         $totalData = $this->db->get_where($db_.'.students',
                 array('ProdiID' => $dataProdiID))->result_array();
 
-        $sql = 'SELECT s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, s.StatusStudentID, ss.Description AS StatusStudent 
+        $sql = 'SELECT s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, s.StatusStudentID, 
+                          ss.Description AS StatusStudent, ast.Password, ast.Password_Old, ast.Status AS StatusAuth
                           FROM '.$db_.'.students s 
                           LEFT JOIN db_academic.program_study ps ON (ps.ID = s.ProdiID)
-                          LEFT JOIN db_academic.status_student ss ON (ss.ID = s.StatusStudentID)';
+                          LEFT JOIN db_academic.status_student ss ON (ss.ID = s.StatusStudentID)
+                          LEFT JOIN db_academic.auth_students ast ON (ast.NPM = s.NPM)';
 
         if( !empty($requestData['search']['value']) ) {
-            $sql.= ' WHERE s.NPM LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' WHERE s.ProdiID = "'.$dataProdiID.'" AND ( s.NPM LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR s.Name LIKE "'.$requestData['search']['value'].'%" ';
-            $sql.= ' OR s.ClassOf LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR s.ClassOf LIKE "'.$requestData['search']['value'].'%" )';
             $sql.= ' ORDER BY s.NPM, s.ProdiID ASC';
         }
         else {
-            $sql.= 'ORDER BY s.NPM, s.ProdiID ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+            $sql.= 'WHERE s.ProdiID = "'.$dataProdiID.'" ORDER BY s.NPM, s.ProdiID ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
         }
 
         $query = $this->db->query($sql)->result_array();
@@ -188,22 +190,22 @@ class C_api extends CI_Controller {
 
             $label = '';
             if($row['StatusStudentID']==7 || $row['StatusStudentID'] ==6 || $row['StatusStudentID'] ==4){
-                $label = 'label-danger';
+                $label = 'style="color: red;"';
             } else if($row['StatusStudentID'] ==2){
-                $label = 'label-warning';
+                $label = 'style="color: #ff9800;"';
             } else if($row['StatusStudentID'] ==3){
-                $label = 'label-success';
+                $label = 'style="color: green;"';
             } else if($row['StatusStudentID'] ==1){
-                $label = 'label-primary';
+                $label = 'style="color: #03a9f4;"';
             }
 
-            $nestedData[] = '<div style="text-align: center;">'.$row["NPM"].'</div>';
+//            $nestedData[] = '<div style="text-align: center;">'.$row["NPM"].'</div>';
             $nestedData[] = '<div style="text-align: center;"><img src="'.base_url('uploads/students/').$db_.'/'.$row["Photo"].'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
-            $nestedData[] = '<a href="javascript:void(0);" data-npm="'.$row["NPM"].'" data-ta="'.$row["ClassOf"].'" class="btnDetailStudent"><b>'.$row["Name"].'</b></a>';
+            $nestedData[] = '<a href="javascript:void(0);" data-npm="'.$row["NPM"].'" data-ta="'.$row["ClassOf"].'" class="btnDetailStudent"><b>'.$row["Name"].'</b></a><br/>'.$row["NPM"];
             $nestedData[] = '<div style="text-align: center;">'.$Gender.'</div>';
-            $nestedData[] = '<div style="text-align: center;">'.$row["ClassOf"].'</div>';
+            $nestedData[] = '<div style="text-align: center;"><button class="btn btn-sm btn-primary btnLoginPortalStudents" data-npm="'.$row["NPM"].'"><i class="fa fa-sign-in right-margin"></i> Login Portal</button></div>';
 //            $nestedData[] = $row["ProdiNameEng"];
-            $nestedData[] = '<div style="text-align: center;"><span class="label '.$label.' ">'.$row["StatusStudent"].'</span></div>';
+            $nestedData[] = '<div style="text-align: center;"><i class="fa fa-circle" '.$label.'></i></div>';
 
             $data[] = $nestedData;
         }

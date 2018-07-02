@@ -343,9 +343,9 @@ class C_login extends CI_Controller {
         $this->session->set_userdata($setSession);
     }
 
-    private function genratePassword($NIP,$Password){
+    private function genratePassword($Username,$Password){
 
-        $plan_password = $NIP.''.$Password;
+        $plan_password = $Username.''.$Password;
         $pas = md5($plan_password);
         $pass = sha1('jksdhf832746aiH{}{()&(*&(*'.$pas.'HdfevgyDDw{}{}{;;*766&*&*');
 
@@ -454,6 +454,120 @@ class C_login extends CI_Controller {
         $ci->email->subject('TES EMAIL CUY');
         $ci->email->message(''.$mesg);
         $ci->email->send();
+    }
+
+
+    // ========= LOGIN SSO =========
+    public function getAuthSSOLogin(){
+        $token = $this->input->post('token');
+        $key = "L0G1N-S50-3R0";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+
+        // Cek Apakah students atau bukan
+        $pass = $this->genratePassword($data_arr['Username'],$data_arr['Password']);
+
+        $dataStudents = $this->db->query('SELECT * FROM db_academic.auth_students
+                                                  WHERE NPM = "'.$data_arr['Username'].'" LIMIT 1')->result_array();
+
+        $result = [];
+        if(count($dataStudents)>0){
+            if($dataStudents[0]['Status']=='-1'){
+
+                // Cek apakah password lama sama
+                if(md5($data_arr['Password'])==$dataStudents[0]['Password_Old']){
+                    $dataMhs = $this->get_dataStd($dataStudents[0]['Year'],$dataStudents[0]['NPM']);
+                    $std = array(
+                        'Name' => $dataMhs['Name'],
+                        'Username' => $dataMhs['NPM'],
+                        'User' => 'Students',
+                        'LastPassword' => md5($data_arr['Password']),
+                        'Path_Photo' => base_url().'uploads/students/ta_'.$dataStudents[0]['Year'].'/'.$dataMhs['Photo']
+                    );
+                    $result = array(
+                        'Students' => $std,
+                        'Status' => '-1',
+                        'Login' => false,
+                        'Message' => 'Please Change Your Password'
+                    );
+                } else {
+                    $result = array(
+                        'Status' => '-5',
+                        'Login' => false,
+                        'Message' => 'Old Password Not Match'
+                    );
+                }
+
+
+            } else if($dataStudents[0]['Status']=='1'){
+
+                // Cek Apakah Password Sama Dengan Inputan
+                if($pass==$dataStudents[0]['Password']){
+                    $result = array(
+                        'Status' => '1',
+                        'Login' => true,
+                        'Message' => 'Login Success'
+                    );
+                } else {
+                    $result = array(
+                        'Status' => '-5',
+                        'Login' => false,
+                        'Message' => 'Password Is Wrong'
+                    );
+                }
+
+            } else{
+                $result = array(
+                    'Status' => '0',
+                    'Login' => false,
+                    'Message' => 'Your Login Is Blocked'
+                );
+            }
+        } else {
+            $result = array(
+                'Status' => '0',
+                'Login' => false,
+                'Message' => 'Your Login Is Blocked'
+            );
+        }
+
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+        return print_r(json_encode($result));
+
+    }
+
+    private function get_dataStd($Year,$NPM){
+        $db_ = 'ta_'.$Year;
+        $data = $this->db->get_where($db_.'.students', array('NPM'=>$NPM),1);
+
+        return $data->result_array()[0];
+    }
+
+
+    public function updatePassword(){
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+        
+        $token = $this->input->post('token');
+        $key = "L0G1N-S50-3R0";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+
+        // Cek Apakah students atau bukan
+        $pass = $this->genratePassword($data_arr['Username'],$data_arr['NewPassword']);
+
+        if($data_arr['User']=='Students'){
+            $data = array(
+                'Password' => $pass,
+                'Status' => '1'
+            );
+
+            $this->db->where('NPM', $data_arr['Username']);
+            $this->db->update('db_academic.auth_students', $data);
+
+            return print_r(1);
+        }
+//        print_r($data_arr);
+
     }
 
 }
