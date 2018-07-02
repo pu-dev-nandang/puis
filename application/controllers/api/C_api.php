@@ -888,14 +888,11 @@ class C_api extends CI_Controller {
                     $dataNewSesi = (array) $dataScheduleDetailsArrayNew[$d2];
 
                     $this->db->insert('db_academic.schedule_details', $dataNewSesi);
-
+                    $insert_id_SD = $this->db->insert_id();
 
                     // Get Schedule
                     $dataSch = $this->db->get_where('db_academic.schedule',
                         array('ID' => $dataNewSesi['ScheduleID']),1)->result_array();
-
-                    $insert_id_SD = $this->db->insert_id();
-                    $this->db->reset_query();
 
                     // Insert Attd
                     $dataInsetAttd = array(
@@ -915,6 +912,7 @@ class C_api extends CI_Controller {
                             'ID_Attd' => $insert_id_attd,
                             'NPM' => $dataMhs[$m]['NPM']
                         );
+                        $this->db->insert('db_academic.attendance_students',$data_attd_s);
                     }
 
                     $this->db->reset_query();
@@ -962,7 +960,6 @@ class C_api extends CI_Controller {
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
 
-//        print_r($data_arr);
         if(count($data_arr)>0 && $data_arr['action']=='check'){
             $dataFilter =(array) $data_arr['formData'];
             $data = $this->m_api->__checkSchedule($dataFilter);

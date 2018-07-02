@@ -364,12 +364,10 @@
             var Credit = $('#formCredit'+no).val();
             var totalTime = parseInt(TimePerCredit) * parseInt(Credit);
 
-            var sesiAkhir = moment()
-                .hours(d.getHours())
-                .minutes(d.getMinutes())
-                .add(parseInt(totalTime), 'minute').format('HH:mm');
+            var sesiAkhir = moment().hours(d.getHours()).minutes(d.getMinutes()).add(parseInt(totalTime), 'minute').format('HH:mm');
 
             $('#formSesiAkhir'+no).val(sesiAkhir);
+            checkSchedule(no);
         });
 
     });
@@ -455,12 +453,10 @@
 
                 var totalTime = parseInt(TimePerCredit) * parseInt(Credit);
 
-                var sesiAkhir = moment()
-                    .hours(d.getHours())
-                    .minutes(d.getMinutes())
-                    .add(parseInt(totalTime), 'minute').format('HH:mm');
+                var sesiAkhir = moment().hours(d.getHours()).minutes(d.getMinutes()).add(parseInt(totalTime), 'minute').format('HH:mm');
 
                 $('#formSesiAkhir'+no).val(sesiAkhir);
+                checkSchedule(no);
             });
 
         } else {
