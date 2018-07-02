@@ -1674,8 +1674,37 @@ class C_api extends CI_Controller {
 
                 return print_r(json_encode($data));
             }
-            else if($data_arr['action']=='save2pdfLayout'){
 
+            // ===== Save 2 PDF Exam ======
+            else if($data_arr['action']=='save2pdf_Layout'){
+                $IDExam = $data_arr['IDExam'];
+            }
+            else if($data_arr['action']=='save2pdf_DraftQuestions'){
+                $IDExam = $data_arr['IDExam'];
+                $dataPdf = $this->db->query('SELECT ex.Type, sm.Name AS SemesterName, d.NameEng AS DayEng, 
+                                                      coor.Name AS Coordintor,
+                                                      cl.Room, ex.ExamDate, ex.ExamStart, ex.ExamEnd, 
+                                                      em1.Name AS Pengawas1, em2.Name AS Pengawas2 
+                                                      FROM db_academic.exam ex
+                                                      LEFT JOIN db_academic.schedule s ON (s.ID = ex.ScheduleID)                                                       
+                                                      LEFT JOIN db_employees.employees coor ON (coor.NIP = s.Coordinator)                                                       
+                                                      LEFT JOIN db_academic.semester sm ON (sm.ID = ex.SemesterID)
+                                                      LEFT JOIN db_academic.days d ON (d.ID = ex.DayID)
+                                                      LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
+                                                      LEFT JOIN db_employees.employees em1 ON (em1.NIP = ex.Pengawas1)
+                                                      LEFT JOIN db_employees.employees em2 ON (em1.NIP = ex.Pengawas2)
+                                                      WHERE ex.ID = "'.$IDExam.'" ')->result_array();
+                print_r($dataPdf);
+
+            }
+            else if($data_arr['action']=='save2pdf_AnswerSheet'){
+                $IDExam = $data_arr['IDExam'];
+            }
+            else if($data_arr['action']=='save2pdf_NewsEvent'){
+                $IDExam = $data_arr['IDExam'];
+            }
+            else if($data_arr['action']=='save2pdf_AttendanceList'){
+                $IDExam = $data_arr['IDExam'];
             }
         }
     }

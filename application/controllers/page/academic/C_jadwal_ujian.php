@@ -28,7 +28,6 @@ class C_jadwal_ujian extends Academic_Controler {
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
 
-
         $page = $data_arr['page'];
         $ScheduleID = $data_arr['ScheduleID'];
 

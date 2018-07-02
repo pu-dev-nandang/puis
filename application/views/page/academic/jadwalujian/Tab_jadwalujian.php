@@ -292,6 +292,8 @@
 
 </script>
 
+
+<!-- Load Jadwal -->
 <script>
     $(document).on('change','.form-filter',function () {
         loadDataScheduleExam();
@@ -333,15 +335,15 @@
                             '    <span class="caret"></span>' +
                             '  </button>' +
                             '  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">' +
-                            '    <li><a href="#">Edit</a></li>' +
-                            '    <li><a href="#">Edit Peserta</a></li>' +
-                            '    <li><a href="javascript:void(0);" data-idexam="'+dataEx.ID+'" class="btnGetLayout">Layout</a></li>' +
-                            '    <li><a href="#">Naskah Soal</a></li>' +
-                            '    <li><a href="#">Lembar Jawaban</a></li>' +
-                            '    <li><a href="#">Berita Acara</a></li>' +
-                            '    <li><a href="#">Daftar Hadir</a></li>' +
+                            '    <li><a href="javascript:void(0);" data-idexam="'+dataEx.ID+'" class="">Edit</a></li>' +
+                            '    <li><a href="javascript:void(0);" data-idexam="'+dataEx.ID+'" class="">Edit Peserta</a></li>' +
+                            '    <li><a href="javascript:void(0);" data-idexam="'+dataEx.ID+'" data-act="save2pdf_Layout" class="btn2PDFExam">Layout</a></li>' +
+                            '    <li><a href="javascript:void(0);" data-idexam="'+dataEx.ID+'" data-act="save2pdf_DraftQuestions" class="btn2PDFExam">Naskah Soal</a></li>' +
+                            '    <li><a href="javascript:void(0);" data-idexam="'+dataEx.ID+'" data-act="save2pdf_AnswerSheet" class="btn2PDFExam">Lembar Jawaban</a></li>' +
+                            '    <li><a href="javascript:void(0);" data-idexam="'+dataEx.ID+'" data-act="save2pdf_NewsEvent" class="btn2PDFExam">Berita Acara</a></li>' +
+                            '    <li><a href="javascript:void(0);" data-idexam="'+dataEx.ID+'" data-act="save2pdf_AttendanceList" class="btn2PDFExam">Daftar Hadir</a></li>' +
                             '    <li role="separator" class="divider"></li>' +
-                            '    <li><a href="#">Delete</a></li>' +
+                            '    <li><a href="javascript:void(0);" data-idexam="'+dataEx.ID+'" class="">Delete</a></li>' +
                             '  </ul>' +
                             '</div>';
 
@@ -374,6 +376,51 @@
         $.post(url,{token:token},function (jsonResult) {
 
         });
-
     });
+
+    $(document).on('click','.btn2PDFExam',function () {
+        var action = $(this).attr('data-act');
+        var IDExam = $(this).attr('data-idexam');
+        save2pdf_exam(action,IDExam);
+    });
+
+    function save2pdf_exam(action,IDExam) {
+        
+        var data = {
+          action : action,
+          IDExam : IDExam
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api/__crudJadwalUjian';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+
+            return false;
+
+            var token_pdf = jwt_encode(jsonResult,'UAP)(*');;
+
+            var pdf_u =  'exam-layout';
+            if(action=='save2pdf_DraftQuestions'){
+                pdf_u = 'draft-questions';
+            }
+            else if(action=='save2pdf_AnswerSheet'){
+                pdf_u = 'answer-sheet';
+            }
+            else if(action=='save2pdf_NewsEvent'){
+                pdf_u = 'news-event';
+            }
+            else if(action=='save2pdf_AttendanceList'){
+                pdf_u = 'attendance-list';
+            }
+
+            var url_pdf = base_url_js+'ave2pdf/'+pdf_u+'?token='+token_pdf;
+            window.open(
+                url_pdf,
+                '_blank' // <- This is what makes it open in a new window.
+            );
+
+        });
+
+    }
 </script>
