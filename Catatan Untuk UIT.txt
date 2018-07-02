@@ -1,0 +1,13 @@
+
+===============================
+Untuk reset uji coba
+
+Truncet
+- db_academic.schedule
+- db_academic.schedule_*
+- db_academic.std_krs
+- db_academic.std_krs_*
+- db_academic.exam
+- db_academic.exam_detalis
+
+- ta_*.study_planning where system 1
