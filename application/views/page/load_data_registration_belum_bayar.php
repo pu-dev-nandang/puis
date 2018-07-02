@@ -2,7 +2,7 @@
 <div class="col-md-12">
     <table class="table table-striped table-bordered table-hover table-checkable datatable">
     	<thead>
-    		<tr>
+    		<tr style="background: #333;color: #fff;">
     		<th style="width: 15px;">No</th>
     		<th>Nama</th>
     		<th>Email</th>

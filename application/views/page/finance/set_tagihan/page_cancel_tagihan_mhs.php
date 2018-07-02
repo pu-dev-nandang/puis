@@ -3,6 +3,8 @@
   .btn-submit{
     background-color: #1ace37;
   }
+
+  .btn-unapprove { background-color: hsl(41, 85%, 35%) !important; background-repeat: repeat-x; filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#efb73d", endColorstr="#a5750d"); background-image: -khtml-gradient(linear, left top, left bottom, from(#efb73d), to(#a5750d)); background-image: -moz-linear-gradient(top, #efb73d, #a5750d); background-image: -ms-linear-gradient(top, #efb73d, #a5750d); background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #efb73d), color-stop(100%, #a5750d)); background-image: -webkit-linear-gradient(top, #efb73d, #a5750d); background-image: -o-linear-gradient(top, #efb73d, #a5750d); background-image: linear-gradient(#efb73d, #a5750d); border-color: #a5750d #a5750d hsl(41, 85%, 29%); color: #fff !important; text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.39); -webkit-font-smoothing: antialiased; }
 </style>
 <div class="row" style="margin-top: 30px;">
     <div class="col-md-3">
@@ -62,7 +64,7 @@
         </table>
     </div>
     <div  class="col-xs-12" align="right" id="pagination_link"></div>
-    <div  class="col-xs-12" align="right"><button class="btn btn-inverse btn-notification btn-cancel hide" id="btn-cancel">Cancel</button></div>
+    <div  class="col-xs-12" align="right"><button class="btn btn-unapprove btn-cancel hide" id="btn-cancel"> <i class="fa fa-times" aria-hidden="true"></i> Cancel</button></div>
 </div>
 
 

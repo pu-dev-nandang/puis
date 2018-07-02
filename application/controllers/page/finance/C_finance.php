@@ -454,4 +454,26 @@ class C_finance extends Finnance_Controler {
         echo json_encode($msg);
     }
 
+    public function penerimaan_tagihan_mhs()
+    {
+        $content = $this->load->view('page/'.$this->data['department'].'/penerimaan_pembayaran/penerimaan_pembayaran_mhs',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function get_pembayaran_mhs($page = null)
+    {
+        $input = $this->getInputToken();
+        $this->load->library('pagination');
+        $config = $this->config_pagination_default_ajax(1000,50,3);
+        $this->pagination->initialize($config);
+        $page = $this->uri->segment(3);
+        $start = ($page - 1) * $config["per_page"];
+        $data = $this->m_finance->get_pembayaran_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NIM'],$config["per_page"], $start);
+        $output = array(
+        'pagination_link'  => $this->pagination->create_links(),
+        'loadtable'   => $data,
+        );
+        echo json_encode($output);
+    }
+
 }

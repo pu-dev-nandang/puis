@@ -43,6 +43,7 @@
 		</div>
 	</div> <!-- /.col-md-6 -->
 </div>
+<hr>
 <div class="row" style="margin-top: 30px;">
     <div class="col-md-12">
         <div class="widget box">

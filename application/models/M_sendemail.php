@@ -139,7 +139,7 @@ class M_sendemail extends CI_Model {
                             <div style="text-align: center;">
                                 <img src="http://siak.podomorouniversity.ac.id/logo_tr.png" style="max-width: 250px;">
                                 <hr style="border-top: 1px solid #cccccc;"/>
-                                <div style="font-family:Proxima Nova Semi-bold,Helvetica,sans-serif;font-weight:bold;font-size:24px;line-height:24px;color:#607D8B">Alert</div>
+                                <div style="font-family:Proxima Nova Semi-bold,Helvetica,sans-serif;font-weight:bold;font-size:24px;line-height:24px;color:#607D8B">Podomoro University Message</div>
                             </div>
                             <br/>
                             <div style="font-family:Proxima Nova Reg,Helvetica,sans-serif">

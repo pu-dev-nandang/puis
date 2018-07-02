@@ -6,6 +6,26 @@
         <ul id="nav">
             <li class="<?php if($this->uri->segment(2)=='master'){echo "current open";} ?>">
                 <a href="javascript:void(0);">
+                    <i class="fa fa-wrench" aria-hidden="true"></i>
+                    Configuration
+                </a>
+                <ul class="sub-menu">
+                    <li class="<?php if($this->uri->segment(2)=='configuration' && $this->uri->segment(3) == "#" ){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/configuration/#'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Bank
+                        </a>
+                    </li>
+                    <li class="<?php if($this->uri->segment(2)=='configuration' && $this->uri->segment(3) == "#" ){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/configuration/#'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Prefix VA
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="<?php if($this->uri->segment(2)=='master'){echo "current open";} ?>">
+                <a href="javascript:void(0);">
                     <i class="fa fa-globe"></i>
                     Master
                 </a>
@@ -120,6 +140,12 @@
                         <a href="<?php echo base_url('finance/tagihan-mhs/cek-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
                         Approve Tagihan
+                        </a>
+                    </li>
+                    <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "penerimaan-tagihan-mhs"){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/tagihan-mhs/penerimaan-tagihan-mhs'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Penerimaan Pembayaran
                         </a>
                     </li>
                 </ul>

@@ -26,7 +26,7 @@
 	    	div = '<div id = "tblData" class="table-responsive">';
 	    	table = '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
 	    	'<thead>'+
-	    	    '<tr>'+
+	    	    '<tr style="background: #333;color: #fff;">'+
 	    	        '<th style="width: 5px;">No </th>'+
 	    	        '<th style="width: 55px;">Nama</th>'+
 	    	        '<th style="width: 55px;">Prodi</th>'+

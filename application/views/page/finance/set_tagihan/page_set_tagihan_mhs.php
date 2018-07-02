@@ -3,7 +3,7 @@
     <div class="col-md-3">
         <div class="thumbnail" style="min-height: 30px;padding: 10px;">
             <select class="form-control" id="selectCurriculum">
-                <option selected value = ''>--- All Curriculum ---</option>
+                <option selected value = ''>--- Curriculum ---</option>
                 <option disabled>------</option>
             </select>
         </div>
@@ -11,7 +11,7 @@
     <div class="col-md-3">
         <div class="thumbnail" style="min-height: 30px;padding: 10px;">
             <select class="form-control" id="selectProdi">
-                <option selected value = ''>--- All Prodi---</option>
+                <option selected value = ''>--- Prodi---</option>
                 <option disabled>------</option>
             </select>
         </div>
@@ -24,7 +24,7 @@
     <div class="col-md-3">
         <div class="thumbnail" style="min-height: 30px;padding: 10px;">
             <select class="form-control" id="selectPTID">
-                <option selected value = ''>--- All Payment Type ---</option>
+                <option selected value = ''>--- Payment Type ---</option>
                 <option disabled>------</option>
             </select>
         </div>
@@ -59,7 +59,8 @@
         </table>
     </div>
     <div  class="col-xs-12" align="right" id="pagination_link"></div>
-    <div  class="col-xs-12" align="right"><button class="btn btn-inverse btn-notification btn-submit hide" id="btn-submit">Submit</button></div>
+    <div  class="col-xs-12" align="right"><button class="btn btn-success  btn-submit hide" id="btn-submit"> <i class="icon-pencil icon-white"></i> <span><strong>Submit</strong></span></button></div>
+    <br>
 </div>
 
 
@@ -260,10 +261,10 @@
             var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
                 '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>';
 
-           $('#GlobalModal .modal-header').html('<h4 class="modal-title">'+'List Checklist Data'+'</h4>');
-           $('#GlobalModal .modal-body').html(html);
-           $('#GlobalModal .modal-footer').html(footer);
-           $('#GlobalModal').modal({
+           $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'List Checklist Data'+'</h4>');
+           $('#GlobalModalLarge .modal-body').html(html);
+           $('#GlobalModalLarge .modal-footer').html(footer);
+           $('#GlobalModalLarge').modal({
                'show' : true,
                'backdrop' : 'static'
            });
@@ -287,6 +288,7 @@
                 toastr.success('Data berhasil disimpan', 'Success!');
                }
                loadData(1);
+               $('#GlobalModalLarge').modal('hide');
             }).fail(function() {
               toastr.info('No Action...'); 
               // toastr.error('The Database connection error, please try again', 'Failed!!');
