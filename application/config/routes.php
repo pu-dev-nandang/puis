@@ -11,6 +11,8 @@ $route['profile'] = 'c_dashboard/profile';
 
 
 // === AUTH ===
+$route['uath/getAuthSSOLogin'] = 'c_login/getAuthSSOLogin';
+$route['uath/updatePassword'] = 'c_login/updatePassword';
 $route['uath/authUserPassword'] = 'c_login/authUserPassword';
 $route['auth/authGoogle'] = 'c_login/authGoogle';
 // $route['auth/gen_pass'] = 'c_login/gen_pass';

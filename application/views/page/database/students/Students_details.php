@@ -6,7 +6,12 @@
         text-align: center;
     }
 </style>
-
+<div class="" style="margin-bottom: 15px;padding: 10px;text-align: right;">
+    <i class="fa fa-circle" style="color: #03a9f4;"> Lulus</i> |
+    <i class="fa fa-circle" style="color: green;"> Aktif</i>  |
+    <i class="fa fa-circle" style="color: #ff9800;"> Cuti</i>  |
+    <i class="fa fa-circle" style="color: red;"> Non-Aktif / Mengundurkan Diri / DO</i>
+</div>
 <div class="widget box">
     <div class="widget-header">
         <h4 class=""><i class="icon-reorder"></i> Students</h4>
@@ -15,7 +20,6 @@
                         <span class="btn btn-xs" id="btn_addmk">
                             <i class="icon-plus"></i> Add Students
                         </span>
-
             </div>
         </div>
     </div>
@@ -25,11 +29,11 @@
             <table id="tableStudents" class="table table-striped table-bordered table-hover table-responsive">
                 <thead>
                 <tr class="tr-center" style="background: #20525a;color: #ffffff;">
-                    <th style="width: 10%;">NIM</th>
+<!--                    <th style="width: 10%;">NIM</th>-->
                     <th style="width: 5%;">Photo</th>
                     <th>Name</th>
                     <th style="width: 5%;">Gender</th>
-                    <th style="width: 10%;">Class Of</th>
+                    <th style="width: 10%;">Login Portal</th>
 <!--                    <th class="th-center">Program Study</th>-->
                     <th style="width: 5%;">Status</th>
                 </tr>
