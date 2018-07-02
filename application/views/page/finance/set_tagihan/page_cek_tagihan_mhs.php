@@ -1,8 +1,24 @@
 
 <style type="text/css">
-  .btn-submit{
-    background-color: #1ace37;
+  .btn-custom {
+    background-color: hsl(86, 79%, 44%) !important;
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#daf6b5", endColorstr="#7cc817");
+    background-image: -khtml-gradient(linear, left top, left bottom, from(#daf6b5), to(#7cc817));
+    background-image: -moz-linear-gradient(top, #daf6b5, #7cc817);
+    background-image: -ms-linear-gradient(top, #daf6b5, #7cc817);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #daf6b5), color-stop(100%, #7cc817));
+    background-image: -webkit-linear-gradient(top, #daf6b5, #7cc817);
+    background-image: -o-linear-gradient(top, #daf6b5, #7cc817);
+    background-image: linear-gradient(#daf6b5, #7cc817);
+    border-color: #7cc817 #7cc817 hsl(86, 79%, 34%);
+    color: #333 !important;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.66);
+    -webkit-font-smoothing: antialiased;
   }
+
+  .btn-unapprove { background-color: hsl(41, 85%, 35%) !important; background-repeat: repeat-x; filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#efb73d", endColorstr="#a5750d"); background-image: -khtml-gradient(linear, left top, left bottom, from(#efb73d), to(#a5750d)); background-image: -moz-linear-gradient(top, #efb73d, #a5750d); background-image: -ms-linear-gradient(top, #efb73d, #a5750d); background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #efb73d), color-stop(100%, #a5750d)); background-image: -webkit-linear-gradient(top, #efb73d, #a5750d); background-image: -o-linear-gradient(top, #efb73d, #a5750d); background-image: linear-gradient(#efb73d, #a5750d); border-color: #a5750d #a5750d hsl(41, 85%, 29%); color: #fff !important; text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.39); -webkit-font-smoothing: antialiased; }
+
 </style>
 <div class="row" style="margin-top: 30px;">
     <div class="col-md-3">
@@ -62,7 +78,9 @@
         </table>
     </div>
     <div  class="col-xs-12" align="right" id="pagination_link"></div>
-    <div  class="col-xs-12" align="right"><button class="btn btn-inverse btn-notification btn-submi-unapprove hide" id="btn-submit-unapprove">Unapprove</button>&nbsp<button class="btn btn-inverse btn-notification btn-submit hide" id="btn-submit">Approve</button></div>
+    <div  class="col-xs-12" align="right"><button class="btn btn-inverse btn-notification btn-unapprove hide" id="btn-submit-unapprove"><i class="fa fa-times" aria-hidden="true"></i>
+ Unapprove</button>&nbsp<button class="btn btn-inverse btn-notification btn-custom btn-submit hide" id="btn-submit"> <i class="fa fa-check" aria-hidden="true"></i>
+ Approve</button></div>
 </div>
 
 
@@ -386,10 +404,10 @@
             }
             
 
-           $('#GlobalModal .modal-header').html('<h4 class="modal-title">'+'List Checklist Data'+'</h4>');
-           $('#GlobalModal .modal-body').html(html);
-           $('#GlobalModal .modal-footer').html(footer);
-           $('#GlobalModal').modal({
+           $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'List Checklist Data'+'</h4>');
+           $('#GlobalModalLarge .modal-body').html(html);
+           $('#GlobalModalLarge .modal-footer').html(footer);
+           $('#GlobalModalLarge').modal({
                'show' : true,
                'backdrop' : 'static'
            });
@@ -404,7 +422,7 @@
             $.post(url,{token:token},function (resultJson) {
                // var resultJson = jQuery.parseJSON(resultJson);
                loadData(1);
-
+               $('#GlobalModalLarge').modal('hide');
             }).fail(function() {
               toastr.info('No Action...'); 
               // toastr.error('The Database connection error, please try again', 'Failed!!');
@@ -508,7 +526,7 @@
                 toastr.success('Data berhasil disimpan', 'Success!');
                }
                loadData(1);
-
+               $('#GlobalModalLarge').modal('hide');
             }).fail(function() {
               toastr.info('No Action...'); 
               // toastr.error('The Database connection error, please try again', 'Failed!!');

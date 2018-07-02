@@ -22,7 +22,7 @@
 		<table class="table table-striped table-bordered table-hover table-checkable tableData">
 			<!-- <caption><strong>List Dokumen</strong></caption> -->
 			<thead>
-				<tr>
+				<tr style="background: #333;color: #fff;">
 					<th>Tahun</th>
 					<th>Formulir Code</th>
 					<th style="width: 100px;">Activated by Candidate</th>

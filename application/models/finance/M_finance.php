@@ -1171,8 +1171,9 @@ class M_finance extends CI_Model {
                        // triger VA closed berhasil, update va_log status = 2 // auto dari update_va_Payment
                        // delete data pada table payment dan payment_students
                           // action delete belum benar
-                       $this->delete_id_table($query[0]['ID'],'payment');
-                       $this->delete_id_table($query[0]['ID'],'payment_students');
+                       $this->delete_id_table($query[0]['ID_payment'],'payment_students');
+                       $this->delete_id_table($query[0]['ID_payment'],'payment');
+                       
                      }
                      else
                      {
@@ -1181,8 +1182,9 @@ class M_finance extends CI_Model {
                   }
                   else
                   {
-                       $this->delete_id_table($query[0]['ID'],'payment');
-                       $this->delete_id_table($query[0]['ID'],'payment_students');
+                       $this->delete_id_table($query[0]['ID_payment'],'payment_students');  
+                       $this->delete_id_table($query[0]['ID_payment'],'payment');
+                      
                   }
                 }
         }
@@ -1307,6 +1309,135 @@ class M_finance extends CI_Model {
       }
     }
     $this->m_finance->delete_id_table($ID_payment,'payment');
+    return $arr;
+   }
+
+   public function get_pembayaran_mhs($ta,$prodi,$PTID,$NIM,$limit, $start)
+   {
+    // error_reporting(0);
+    $arr = array();
+    $this->load->model('master/m_master');
+
+    // join dengan table auth terlebih dahulu
+    $PTID = ($PTID == '' || $PTID == Null) ? '' : ' and a.PTID = '.$PTID;
+    $NIM = ($NIM == '' || $NIM == Null) ? 'where a.NPM like "%"' : ' where  a.NPM = '.$NIM;
+    /*$SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+    $SemesterID = $SemesterID[0]['ID'];*/
+    if ($ta == '') {
+      $ta1 = $ta;
+    }
+    else
+    {
+      $ta = explode('.', $ta);
+      $ta1 = $ta[1];
+    }
+
+    if ($ta1 == '') {
+      $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description,e.ID as ID_payment_students,e.BilingID,e.Invoice as InvoiceStudents
+              from db_finance.Payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+              join db_academic.semester as c on a.SemesterID = c.ID
+              join db_finance.payment_type as d on a.PTID = d.ID join db_finance.payment_students as e on a.ID = e.ID_payment '.$NIM.$PTID.' 
+              and e.Status = 1 order by e.ID asc LIMIT '.$start. ', '.$limit;
+      $query=$this->db->query($sql, array())->result_array();
+      
+    }
+    else
+    {
+      $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description,e.ID as ID_payment_students,e.BilingID,e.Invoice as InvoiceStudents
+              from db_finance.Payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+              join db_academic.semester as c on a.SemesterID = c.ID
+              join db_finance.payment_type as d on a.PTID = d.ID join db_finance.payment_students as e on a.ID = e.ID_payment '.$NIM.$PTID.' and b.Year = ? and e.Status = 1 
+              order by e.ID asc LIMIT '.$start. ', '.$limit;
+      $query=$this->db->query($sql, array($ta1))->result_array();
+    }
+
+    // get all data to join db ta
+    $Cicilan = 'Cicilan ke ';
+    // print_r($sql);
+    for ($i=0; $i < count($query); $i++) { 
+      $Year = $query[$i]['Year'];
+      $db = 'ta_'.$Year.'.students';
+      $dt = $this->m_master->caribasedprimary($db,'NPM',$query[$i]['NPM']);
+      if($prodi == '' || $prodi == Null){
+        $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$dt[0]['ProdiID']);
+
+        // get IPS Mahasiswa
+          $IPS = $this->getIPSMahasiswa('ta_'.$Year,$query[$i]['NPM']);
+
+        // get IPS Mahasiswa
+          $IPK = $this->getIPKMahasiswa('ta_'.$Year,$query[$i]['NPM']);
+
+        // cek cicilan atau tidak
+          $DetailPayment = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']);
+          if (count($DetailPayment) > 0) {
+            $Cicilan = 'Tidak Cicilan';
+          }
+          else
+          {
+            $a = 1;
+            for ($j=0; $j < count($DetailPayment); $j++) { 
+              if ($DetailPayment[$j]['ID'] == $query[$i]['ID_payment_students']) {
+                  $Cicilan .= $a;
+                  break;
+              }  
+              $a++;
+            }
+          }
+          
+
+        $arr[] = array(
+            'PaymentID' => $query[$i]['ID'],
+            'PTID'  => $query[$i]['PTID'],
+            'PTIDDesc' => $query[$i]['Description'],
+            'SemesterID' => $query[$i]['SemesterID'],
+            'SemesterName' => $query[$i]['NameSemester'],
+            'NPM' => $query[$i]['NPM'],
+            'Nama' => $dt[0]['Name'],
+            'EmailPU' => $query[$i]['EmailPU'],
+            'InvoicePayment' => $query[$i]['Invoice'],
+            'Discount' => $query[$i]['Discount'],
+            'StatusPayment' => $query[$i]['Status'],
+            'ProdiID' => $dt[0]['ProdiID'],
+            'ProdiEng' => $ProdiEng[0]['NameEng'],
+            'Year' => $Year,
+            'IPS' => $IPS,
+            'IPK' => $IPK,
+            'Cicilan' => $Cicilan,
+            'BilingID' => $query[$i]['BilingID'],
+            'InvoiceStudents' => $query[$i]['InvoiceStudents'],
+            'ID_payment_students' => $query[$i]['ID_payment_students'],
+        );
+      }
+      else
+      {
+        $prodi = explode('.', $prodi);
+        $prodi = $prodi[0];
+        if ($prodi == $dt[0]['ProdiID']) {
+          $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$dt[0]['ProdiID']);
+          $arr[] = array(
+              'PaymentID' => $query[$i]['ID'],
+              'PTID'  => $query[$i]['PTID'],
+              'PTIDDesc' => $query[$i]['Description'],
+              'SemesterID' => $query[$i]['SemesterID'],
+              'SemesterName' => $query[$i]['NameSemester'],
+              'NPM' => $query[$i]['NPM'],
+              'Nama' => $dt[0]['Name'],
+              'EmailPU' => $query[$i]['EmailPU'],
+              'InvoicePayment' => $query[$i]['Invoice'],
+              'Discount' => $query[$i]['Discount'],
+              'StatusPayment' => $query[$i]['Status'],
+              'ProdiID' => $dt[0]['ProdiID'],
+              'ProdiEng' => $ProdiEng[0]['NameEng'],
+              'Year' => $Year,
+              'Cicilan' => $Cicilan,
+              'BilingID' => $query[$i]['BilingID'],
+              'InvoiceStudents' => $query[$i]['InvoiceStudents'],
+              'ID_payment_students' => $query[$i]['ID_payment_students'],
+          );
+        }
+      }
+      
+    }
     return $arr;
    }
 

@@ -259,7 +259,7 @@
             input += '</div>';
 
            $("#pageSetCicilan").html(input);
-           $("#pageSetCicilan").after('<br><div class = "col-xs-12" align = "right" id="btn-div"><button class="btn btn-inverse btn-notification btn-Save" id="btn-Save">Submit</button></div>');
+           $("#pageSetCicilan").after('<br><div class = "col-xs-12" align = "right" id="btn-div"><button class="btn btn-success btn-notification btn-Save" id="btn-Save"><i class="icon-pencil icon-white"></i> Submit</button></div>');
 
            $('.costInput').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
            $('.costInput').maskMoney('mask', '9894');

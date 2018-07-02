@@ -150,6 +150,77 @@ class C_api extends CI_Controller {
 
     }
 
+    public function getEmployees()
+    {
+        $requestData= $_REQUEST;
+        // print_r($requestData);
+
+        $totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE PositionMain not like "%14%"')->result_array();
+
+        if( !empty($requestData['search']['value']) ) {
+            $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
+                        ps.NameEng AS ProdiNameEng,em.EmailPU
+                        FROM db_employees.employees em 
+                        LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                        WHERE (em.PositionMain not like "%14%")  AND ( ';
+
+            $sql.= ' em.NIP LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR em.Name LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ') ORDER BY NIP,em.PositionMain  ASC';
+
+        }
+        else {
+            $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
+                        ps.NameEng AS ProdiNameEng,em.EmailPU
+                        FROM db_employees.employees em 
+                        LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                        WHERE (em.PositionMain not like "%14%")';
+            $sql.= 'ORDER BY NIP,em.PositionMain ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+        }
+
+        $query = $this->db->query($sql)->result_array();
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $jb = explode('.',$row["PositionMain"]);
+            $Division = '';
+            $Position = '';
+
+            if(count($jb)>1){
+                $dataDivision = $this->db->select('Division')->get_where('db_employees.division',array('ID'=>$jb[0]),1)->result_array()[0];
+                $dataPosition = $this->db->select('Position')->get_where('db_employees.position',array('ID'=>$jb[1]),1)->result_array()[0];
+                $Division = $dataDivision['Division'];
+                $Position = $dataPosition['Position'];
+            }
+
+            $nestedData[] = $row["NIP"];
+            // $nestedData[] = $row["NIDN"];
+            $nestedData[] = '<div style="text-align: center;"><img src="http://siak.podomorouniversity.ac.id/includes/foto/'.$row["Photo"].'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
+            $nestedData[] = '<a href="'.base_url('database/lecturer-details/'.$row["NIP"]).'" style="font-weight: bold;">'.$row["Name"].'</a>';
+            $nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
+            $nestedData[] = $Division.' - '.$Position;
+            $nestedData[] = $row["EmailPU"];
+            $nestedData[] = $row["ProdiNameEng"];
+
+            $data[] = $nestedData;
+        }
+
+        // print_r($data);
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($totalData)),
+            "recordsFiltered" => intval( count($totalData) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+    }
+
     public function getStudents(){
         $requestData= $_REQUEST;
 

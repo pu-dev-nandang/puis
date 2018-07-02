@@ -63,7 +63,7 @@
                 </div>
                 <br>
                 <div class="col-xs-12" align = "right">
-                   <button class="btn btn-inverse btn-notification btn-submit" id="btn-submit">Submit</button>
+                   <button class="btn btn-success btn-notification btn-submit " id="btn-submit"><i class="icon-pencil icon-white"></i> Submit</button>
                 </div>
             </div>
         </div>
@@ -120,6 +120,7 @@
             setTimeout(function () {
                 $("#pageData").html(obj.loadtable);
                 $("#pagination_link").html(obj.pagination_link);
+                // $("#btn-submit").removeClass('hide');
             },500);
         }).done(function() {
           

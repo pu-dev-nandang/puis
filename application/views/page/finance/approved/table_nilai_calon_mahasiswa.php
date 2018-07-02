@@ -22,7 +22,7 @@
 		<table class="table table-striped table-bordered table-hover table-checkable tableData">
 			<!-- <caption><strong>List Dokumen</strong></caption> -->
 			<thead>
-				<tr>
+				<tr style="background: #333;color: #fff;">
 					<?php if (isset($chkActive)): ?>
 						<th class="checkbox-column" style="width: 60px;">
 							<input type="checkbox" class="uniform" value="nothing" id ="dataResultCheckAll">
