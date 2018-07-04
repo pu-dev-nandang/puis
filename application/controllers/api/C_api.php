@@ -1448,13 +1448,6 @@ class C_api extends CI_Controller {
                     ->result_array();
 
 
-
-//                $data = $this->db->query('SELECT NIP,NIDN,Name,TitleAhead,TitleBehind,PositionMain,Phone,HP,Email,EmailPU,Password,Address,Photo,Photo_new
-//                                            FROM db_employees.employees
-//                                            WHERE NIP = "'.$NIP.'" LIMIT 1 ')->result_array();
-//
-//                print_r($data);
-
                 if(count($data)>0){
                     $sp = explode('.',$data[0]['PositionMain']);
                     $DiviosionID = $sp[0];

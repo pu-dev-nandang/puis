@@ -239,6 +239,7 @@
     window.sessionNIP = "<?php echo $this->session->userdata('NIP'); ?>";
     window.timePerCredits = "<?php echo $this->session->userdata('timePerCredits'); ?>";
 
+    window.base_url_sign_out = "http://localhost:8080/login3/";
     window.base_url_portal_students = "http://localhost:8080/students/";
     window.base_url_portal_lecturers = "http://localhost:8080/lecturer/";
 
@@ -277,6 +278,16 @@
 
         });
 
+    });
+
+    $(document).on('click','.btnActionLogOut',function () {
+        var url = base_url_js+"auth/logMeOut";
+        loading_page('#NotificationModal .modal-body');
+        $.post(url,function (result) {
+            setTimeout(function () {
+                window.location.href = base_url_sign_out;
+            },2000);
+        });
     });
 
     function load_navigation() {

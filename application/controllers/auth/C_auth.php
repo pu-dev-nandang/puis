@@ -50,20 +50,11 @@ class C_auth extends Globalclass {
 //        $this->load->view('md5');
 
         if($table=='karyawan'){
-            $data = $this->db_server->query('SELECT k.*FROM siak4.karyawan k ')->result_array();
-//            ,u.password  JOIN siak4.user u ON (k.NIP = u.Nama)
-//            print_r(count($data));
-//            print_r($data);
 
+            $data = $this->db_server->query('SELECT k.*, u.Password AS Password_Old, u.Lock FROM siak4.karyawan k 
+                                              LEFT JOIN siak4.user u ON (u.Nama = k.NIP AND k.ID = u.EntityID)')->result_array();
 
             for($i=0;$i<count($data);$i++){
-
-//                $PositionMain ='';
-//                $arrIT = [2017090,2016065,2018018];
-//                if(array_search($data[$i]['NIP'],$arrIT)!=''){
-//                    $PositionMain = '12.13';
-//                }
-
                 switch ($data[$i]['NIP']){
                     case '2017090':
                         $PositionMain = '12.13';
@@ -77,9 +68,9 @@ class C_auth extends Globalclass {
                         $PositionMain = '12.13';
                         $EmailPU = 'alhadi.rahman@podomorouniversity.ac.id';
                         break;
-                    case '2017101' :
+                    case '2018034' :
                         $PositionMain = '12.11';
-                        $EmailPU = 'faried.irmansyah@podomorouniversity.ac.id';
+                        $EmailPU = 'martin.hasen@podomorouniversity.ac.id';
                         break;
 
                     default :
@@ -87,14 +78,31 @@ class C_auth extends Globalclass {
                         $EmailPU = '';
                 }
 
+                $Status = ($data[$i]['Lock']==0) ? '-1' : '0';
+                $NIP = trim($data[$i]['NIP']);
+
+                $f = explode('.',$data[$i]['Foto']);
+                $foto = (count($f)==2) ? $NIP.'.'.$f[1] : '' ;
+
+                // Get Email Podomoro
+                if($EmailPU==''){
+                    $s = $data[$i]['Email'];
+                    $ex = explode(',',$s);
+                    for ($d=0;$d<count($ex);$d++){
+                        $eeeem = explode('@podomorouniversity',$ex[$d]);
+                        if(count($eeeem)>0){
+                            $EmailPU = trim($ex[$d]);
+                            break;
+                        }
+                    }
+                }
+
                 $arr = array(
                     "ReligionID" => $data[$i]['AgamaID'],
-
-
                     "PositionMain" => $PositionMain,
                     "CityID" => $data[$i]['KotaID'],
                     "ProvinceID" => $data[$i]['PropinsiID'],
-                    "NIP" => $data[$i]['NIP'],
+                    "NIP" => $NIP,
                     "KTP" => $data[$i]['KTP'],
                     "Name" => $data[$i]['Nama'],
                     "TitleAhead" => $data[$i]['Title'],
@@ -106,29 +114,40 @@ class C_auth extends Globalclass {
                     "HP" => $data[$i]['HP'],
                     "Email" => $data[$i]['Email'],
                     "EmailPU" => $EmailPU,
-                    "Password" => $this->genratePassword($data[$i]['NIP'],123456),
+                    "Password" => $this->genratePassword($NIP,123456),
+                    "Password_Old" => $data[$i]['Password_Old'],
                     "Address" => $data[$i]['Alamat'],
-                    "Photo" => $data[$i]['Foto']
-
+                    "Photo" => $foto,
+                    "Status" => $Status
                 );
 
                 $this->db->insert('db_employees.employees',$arr);
             }
         }
         else if($table=='dosen'){
-            $data = $this->db_server->query('SELECT k.* FROM siak4.dosen k')->result_array();
-//            RIGHT JOIN siak4.user u ON (k.NIP = u.Nama)
-//            echo count($data);
-            $no=1;
-            $no_sama = 1;
-            for($i=0;$i<count($data);$i++){
-                $data_cek = $this->db->query('SELECT * FROM db_employees.employees WHERE NIP = "'.$data[$i]['NIP'].'" ')->result_array();
-                if(count($data_cek)>0){
-                    print_r($data_cek);
-                    $no_sama += 1;
-                } else {
+            $data = $this->db_server->query('SELECT k.*, u.Password AS Password_Old, u.Lock 
+                                                        FROM siak4.dosen k 
+                                                        RIGHT JOIN siak4.user u 
+                                                        ON (k.NIP = u.Nama AND k.ID = u.EntityID)')
+                                    ->result_array();
 
-                    $Status = ($data[$i]['StatusPegawai']=='Tetap')? 3 : 4;
+//            $no=1;
+//            $no_sama = 1;
+            for($i=0;$i<count($data);$i++){
+//                $data_cek = $this->db->query('SELECT * FROM db_employees.employees WHERE NIP = "'.$data[$i]['NIP'].'" ')->result_array();
+                $data_cek = $this->db_server->query('SELECT * FROM siak4.karyawan WHERE NIP = "'.trim($data[$i]['NIP']).'" ')->result_array();
+                if(count($data_cek)>0){
+
+                    $this->db->set('PositionOther1', '14.7');
+                    $this->db->where('NIP', trim($data[$i]['NIP']));
+                    $this->db->update('db_employees.employees');
+
+//                    print_r($data_cek);
+//                    $no_sama += 1;
+                }
+                else {
+
+                    $StatusEmployeeID = ($data[$i]['StatusPegawai']=='Tetap')? 3 : 4;
 
                     $ProdiID = $data[$i]['ProdiID'];
 
@@ -166,15 +185,31 @@ class C_auth extends Globalclass {
                         $ProdiID = 11;
                     }
 
+
+                    $NIP = trim($data[$i]['NIP']);
+
+                    $Status = ($data[$i]['Lock']==0) ? '-1' : '0';
+
+                    $f = explode('.',$data[$i]['Foto']);
+                    $foto = (count($f)==2) ? $NIP.'.'.$f[1] : '' ;
+
+                    $PositionMain = '14.7';
+                    if($NIP=='2114002' || $NIP=='3114016'){
+                        $PositionMain = '14.5';
+                    } else if($NIP=='1116066' || $NIP=='1217099' || $NIP=='2218002' ||
+                        $NIP=='2415078' || $NIP=='2516028' || $NIP=='2617100' || $NIP=='3017098' || $NIP=='3114014'){
+                        $PositionMain = '14.6';
+                    }
+
                     $arr = array(
                         "ReligionID" => $data[$i]['AgamaID'],
 
-                        "PositionMain" => '14.7',
+                        "PositionMain" => $PositionMain,
                         "ProdiID" => $ProdiID,
-                        "StatusEmployeeID" => $Status,
+                        "StatusEmployeeID" => $StatusEmployeeID,
                         "CityID" => $data[$i]['KotaID'],
                         "ProvinceID" => $data[$i]['PropinsiID'],
-                        "NIP" => $data[$i]['NIP'],
+                        "NIP" => $NIP,
                         "KTP" => $data[$i]['KTP'],
                         "Name" => $data[$i]['Nama'],
                         "TitleAhead" => $data[$i]['Title'],
@@ -186,13 +221,15 @@ class C_auth extends Globalclass {
                         "HP" => $data[$i]['HP'],
                         "Email" => $data[$i]['Email'],
                         "Password" => $this->genratePassword($data[$i]['NIP'],123456),
+                        "Password_Old" => $data[$i]['Password_Old'],
                         "Address" => $data[$i]['Alamat'],
                         "NIDN" => $data[$i]['NIDN'],
-                        "Photo" => $data[$i]['Foto']
+                        "Photo" => $foto,
+                        "Status" => $Status
 
                     );
 
-                    $no += 1;
+//                    $no += 1;
 
 //                    print_r($arr);
 
@@ -200,9 +237,30 @@ class C_auth extends Globalclass {
                 }
             }
 
-            print_r($no);
-            echo "<br/>";
-            print_r($no_sama);
+        }
+
+        else if($table=='cekdosen'){
+            $data = $this->db_server->query('SELECT k.*, u.Password AS Password_Old, u.Lock 
+                                                        FROM siak4.dosen k 
+                                                        RIGHT JOIN siak4.user u 
+                                                        ON (k.NIP = u.Nama AND k.ID = u.EntityID)')
+                ->result_array();
+            $dataLec = [];
+            for($i=0;$i<count($data);$i++){
+                $data_cek = $this->db_server->query('SELECT * FROM siak4.karyawan WHERE NIP = "'.$data[$i]['NIP'].'" ')->result_array();
+                if(count($data_cek)>0){
+                    $arr = array(
+                        'NIP' => $data_cek[0]['NIP'],
+                        'Name' => $data_cek[0]['Nama']
+                    );
+                    array_push($dataLec,$arr);
+//                    print_r($data_cek);
+//                    $no_sama += 1;
+                }
+
+            }
+
+            print_r($dataLec);
         }
 
         else if($table=='prodi'){
@@ -675,8 +733,6 @@ class C_auth extends Globalclass {
 
 
             for($i=0;$i<count($data);$i++){
-
-//                $EmailPU = $data[$i]['Email'];
 
                 $ProdiID = $data[$i]['ProdiID'];
 
