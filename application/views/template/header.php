@@ -97,7 +97,7 @@
                     <!--<img alt="" src="assets/img/avatar1_small.jpg" />-->
                     <!--                    <i class="fa fa-male"></i>-->
                     <!--                    <img src="--><?php //echo base_url('images/avatar.png'); ?><!--" class="img-circle" style="max-width: 35px;border: 3px solid #0f1f4b;"/>-->
-                    <img data-src="http://siak.podomorouniversity.ac.id/includes/foto/<?php echo $this->session->userdata('Photo'); ?>"
+                    <img data-src="<?php echo url_pas.'uploads/employees/'.$this->session->userdata('Photo'); ?>"
                          class="img-circle img-fitter" width="35" height="35" style="max-width: 35px;border: 3px solid #0f1f4b;"/>
                     <span class="username"><?php echo $name; ?></span>
                     <i class="fa fa-caret-down small"></i>
@@ -180,21 +180,13 @@
 
     $(document).on('click','#useLogOut',function () {
         $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Log Me Out ?? </b> ' +
-            '<button type="button" id="btnActionLogOut" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+            '<button type="button" class="btn btn-primary btnActionLogOut" style="margin-right: 5px;">Yes</button>' +
             '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
             '</div>');
         $('#NotificationModal').modal('show');
     });
 
-    $(document).on('click','#btnActionLogOut',function () {
-        var url = base_url_js+"auth/logMeOut";
-        loading_page('#NotificationModal .modal-body');
-        $.post(url,function (result) {
-            setTimeout(function () {
-                window.location.href = base_url_js;
-            },2000);
-        });
-    });
+
 
     $('.departement').click(function () {
         var url = base_url_js+'change-departement';

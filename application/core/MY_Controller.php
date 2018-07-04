@@ -46,15 +46,22 @@ abstract class Globalclass extends MyAbstract{
 
     public function template($content)
     {
-
+        $depertment = $this->__getDepartement();
         $data['include'] = $this->load->view('template/include','',true);
+        if($depertment!=null && $depertment!=''){
 
-        $data['header'] = $this->menu_header();
-        $data['navigation'] = $this->menu_navigation();
-        $data['crumbs'] = $this->crumbs();
 
-        $data['content'] = $content;
-        $this->load->view('template/template',$data);
+            $data['header'] = $this->menu_header();
+            $data['navigation'] = $this->menu_navigation();
+            $data['crumbs'] = $this->crumbs();
+
+            $data['content'] = $content;
+            $this->load->view('template/template',$data);
+        } else {
+            $this->load->view('template/userfalse',$data);
+        }
+
+
 
     }
 
@@ -82,8 +89,8 @@ abstract class Globalclass extends MyAbstract{
     }
 
     protected function menu_navigation(){
-
-        $data['departement'] = $this->__getDepartement();
+        $nav = $this->__getDepartement();
+        $data['departement'] = $nav;
         $page = $this->load->view('page/'.$data['departement'].'/menu_navigation','',true);
         return $page;
     }
@@ -98,7 +105,12 @@ abstract class Globalclass extends MyAbstract{
 
     //==== Get Set ===
     public function __getDepartement(){
-        return $this->session->userdata('departementNavigation');
+        $nav = $this->session->userdata('departementNavigation');
+
+
+        return $nav;
+
+
     }
 
     public function __setDepartement($dpt)

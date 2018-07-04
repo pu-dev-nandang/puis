@@ -50,20 +50,10 @@ class C_auth extends Globalclass {
 //        $this->load->view('md5');
 
         if($table=='karyawan'){
-            $data = $this->db_server->query('SELECT k.*FROM siak4.karyawan k ')->result_array();
-//            ,u.password  JOIN siak4.user u ON (k.NIP = u.Nama)
-//            print_r(count($data));
-//            print_r($data);
-
+            $data = $this->db_server->query('SELECT k.*, u.Password AS Password_Old, u.Lock FROM siak4.karyawan k 
+                                              LEFT JOIN siak4.user u ON (u.Nama = k.NIP AND k.ID = u.EntityID)')->result_array();
 
             for($i=0;$i<count($data);$i++){
-
-//                $PositionMain ='';
-//                $arrIT = [2017090,2016065,2018018];
-//                if(array_search($data[$i]['NIP'],$arrIT)!=''){
-//                    $PositionMain = '12.13';
-//                }
-
                 switch ($data[$i]['NIP']){
                     case '2017090':
                         $PositionMain = '12.13';
@@ -77,9 +67,9 @@ class C_auth extends Globalclass {
                         $PositionMain = '12.13';
                         $EmailPU = 'alhadi.rahman@podomorouniversity.ac.id';
                         break;
-                    case '2017101' :
+                    case '2018034' :
                         $PositionMain = '12.11';
-                        $EmailPU = 'faried.irmansyah@podomorouniversity.ac.id';
+                        $EmailPU = 'martin.hasen@podomorouniversity.ac.id';
                         break;
 
                     default :
@@ -87,10 +77,13 @@ class C_auth extends Globalclass {
                         $EmailPU = '';
                 }
 
+                $Status = ($data[$i]['Lock']==0) ? '-1' : '0';
+
+                $f = explode('.',$data[$i]['Foto']);
+                $foto = (count($f)==2) ? $data[$i]['NIP'].'.'.$f[1] : '' ;
+
                 $arr = array(
                     "ReligionID" => $data[$i]['AgamaID'],
-
-
                     "PositionMain" => $PositionMain,
                     "CityID" => $data[$i]['KotaID'],
                     "ProvinceID" => $data[$i]['PropinsiID'],
@@ -107,17 +100,18 @@ class C_auth extends Globalclass {
                     "Email" => $data[$i]['Email'],
                     "EmailPU" => $EmailPU,
                     "Password" => $this->genratePassword($data[$i]['NIP'],123456),
+                    "Password_Old" => $data[$i]['Password_Old'],
                     "Address" => $data[$i]['Alamat'],
-                    "Photo" => $data[$i]['Foto']
-
+                    "Photo" => $foto,
+                    "Status" => $Status
                 );
 
                 $this->db->insert('db_employees.employees',$arr);
             }
         }
         else if($table=='dosen'){
-            $data = $this->db_server->query('SELECT k.* FROM siak4.dosen k')->result_array();
-//            RIGHT JOIN siak4.user u ON (k.NIP = u.Nama)
+            $data = $this->db_server->query('SELECT k.*, u.Password AS Password_Old, u.Lock FROM siak4.dosen k RIGHT JOIN siak4.user u ON (k.NIP = u.Nama AND k.ID = u.EntityID)')->result_array();
+//
 //            echo count($data);
             $no=1;
             $no_sama = 1;
@@ -128,7 +122,7 @@ class C_auth extends Globalclass {
                     $no_sama += 1;
                 } else {
 
-                    $Status = ($data[$i]['StatusPegawai']=='Tetap')? 3 : 4;
+                    $StatusEmployeeID = ($data[$i]['StatusPegawai']=='Tetap')? 3 : 4;
 
                     $ProdiID = $data[$i]['ProdiID'];
 
@@ -166,12 +160,17 @@ class C_auth extends Globalclass {
                         $ProdiID = 11;
                     }
 
+                    $Status = ($data[$i]['Lock']==0) ? '-1' : '0';
+
+                    $f = explode('.',$data[$i]['Foto']);
+                    $foto = (count($f)==2) ? $data[$i]['NIP'].'.'.$f[1] : '' ;
+
                     $arr = array(
                         "ReligionID" => $data[$i]['AgamaID'],
 
                         "PositionMain" => '14.7',
                         "ProdiID" => $ProdiID,
-                        "StatusEmployeeID" => $Status,
+                        "StatusEmployeeID" => $StatusEmployeeID,
                         "CityID" => $data[$i]['KotaID'],
                         "ProvinceID" => $data[$i]['PropinsiID'],
                         "NIP" => $data[$i]['NIP'],
@@ -186,9 +185,11 @@ class C_auth extends Globalclass {
                         "HP" => $data[$i]['HP'],
                         "Email" => $data[$i]['Email'],
                         "Password" => $this->genratePassword($data[$i]['NIP'],123456),
+                        "Password_Old" => $data[$i]['Password_Old'],
                         "Address" => $data[$i]['Alamat'],
                         "NIDN" => $data[$i]['NIDN'],
-                        "Photo" => $data[$i]['Foto']
+                        "Photo" => $foto,
+                        "Status" => $Status
 
                     );
 

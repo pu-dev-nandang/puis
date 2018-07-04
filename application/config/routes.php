@@ -12,6 +12,10 @@ $route['profile'] = 'c_dashboard/profile';
 
 // === AUTH ===
 $route['uath/getAuthSSOLogin'] = 'c_login/getAuthSSOLogin';
+
+$route['uath/__checkPassword'] = 'c_login/checkPassword';
+$route['uath/__checkUsername'] = 'c_login/checkUsername';
+
 $route['uath/updatePassword'] = 'c_login/updatePassword';
 $route['uath/authUserPassword'] = 'c_login/authUserPassword';
 $route['auth/authGoogle'] = 'c_login/authGoogle';
@@ -19,9 +23,7 @@ $route['auth/authGoogle'] = 'c_login/authGoogle';
 $route['auth/logMeOut'] = 'c_login/logMeOut';
 $route['sendmail'] = 'c_login/sendmail';
 $route['callback'] = 'c_login/callback';
-$route['authEmp/(:any)/(:any)'] = 'c_login/genratePassword2/$1/$2';
 
-$route['gen/(:any)/(:any)'] = 'c_login/gen/$1/$2';
 
 
 $route['db/(:any)'] = 'auth/c_auth/db/$1';
