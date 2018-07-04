@@ -2000,4 +2000,12 @@ class M_api extends CI_Model {
         return $res;
     }
 
+    public function getAgama()
+    {
+        $sql = "select * from db_employees.religion";
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
+    }
+
+
 }

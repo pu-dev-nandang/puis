@@ -476,4 +476,28 @@ class C_finance extends Finnance_Controler {
         echo json_encode($output);
     }
 
+    public function testExcel()
+    {
+        $input = $this->getInputToken();
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load('./uploads/TemplatePembayaran.xlsx'); // Empty Sheet
+        $excel2->setActiveSheetIndex(0);
+        $excel2->getActiveSheet()->setCellValue('C6', '4')
+            ->setCellValue('C7', '5')
+            ->setCellValue('C8', '6')       
+            ->setCellValue('C9', '7');
+
+        $excel2->setActiveSheetIndex(0);
+        $excel2->getActiveSheet()->setCellValue('A7', '4')
+            ->setCellValue('C7', '5');
+        $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
+        // We'll be outputting an excel file  
+        // header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
+        // It will be called file.xlss
+        // header('Content-Disposition: attachment; filename="file.xls"'); // jalan ketika tidak menggunakan ajax
+        $objWriter->save('./uploads/report_finance/Nimit New.xlsx');
+        // $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
+    }
+
 }
