@@ -101,6 +101,13 @@ $route['database/students'] = 'page/database/c_database/students';
 $route['database/loadPageStudents'] = 'page/database/c_database/loadPageStudents';
 $route['database/showStudent'] = 'page/database/c_database/showStudent';
 $route['database/employees'] = 'page/database/c_database/employees';
+$route['database/employees/form_input_add'] = 'page/database/c_database/form_input_employees';
+$route['database/employees/form_input_add/(:any)'] = 'page/database/c_database/form_input_employees/$1';
+$route['database/employees/form_input_submit'] = 'page/database/c_database/form_input_submit_employees';
+$route['database/employees/changestatus'] = 'page/database/c_database/changestatus';
+
+
+
 
 $route['database/mentor-academic'] = 'page/database/c_database/mentor_academic';
 
@@ -329,6 +336,7 @@ $route['finance/tagihan-mhs/set-edit-cicilan-tagihan-mhs/submit'] =  'page/finan
 $route['finance/tagihan-mhs/set-delete-cicilan-tagihan-mhs/submit'] =  'page/finance/c_finance/delete_cicilan_tagihan_mhs_submit';
 $route['finance/tagihan-mhs/penerimaan-tagihan-mhs'] =  'page/finance/c_finance/penerimaan_tagihan_mhs';
 $route['finance/get_pembayaran_mhs/(:num)'] =  'page/finance/c_finance/get_pembayaran_mhs/$1';
+$route['finance/export_excel'] =  'page/finance/c_finance/testExcel';
 
 
 
@@ -365,6 +373,7 @@ $route['api/__getStudents'] = 'api/c_api/getStudents';
 $route['api/__getAllMK'] = 'api/c_api/getAllMK';
 
 $route['api/__getEmployees'] = 'api/c_api/getEmployees';
+$route['api/employees/searchnip/(:any)'] = 'api/c_api/searchnip_employees/$1';
 
 
 $route['api/__setLecturersAvailability'] = 'api/c_api/setLecturersAvailability';
@@ -461,6 +470,12 @@ $route['api/__getBaseDiscountSelectOption'] = 'api/c_api/getBaseDiscountSelectOp
 
 $route['api/__getSMAWilayahApproval'] = 'api/c_api/getSMAWilayahApproval';
 $route['api/__getNotification_divisi'] = 'api/c_api/getNotification_divisi';
+$route['api/__getAgama'] = 'api/c_api/getAgama';
+$route['api/__getDivision'] = 'api/c_api/getDivision';
+$route['api/__getPosition'] = 'api/c_api/getPosition';
+$route['api/__getStatusEmployee'] = 'api/c_api/getStatusEmployee';
+
+
 // for inject //
 $route['testadi'] = 'dashboard/c_dashboard/testadi';
 $route['testadi2'] = 'c_login/testadi2';

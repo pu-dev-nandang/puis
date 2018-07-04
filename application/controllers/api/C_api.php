@@ -159,20 +159,20 @@ class C_api extends CI_Controller {
 
         if( !empty($requestData['search']['value']) ) {
             $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
-                        ps.NameEng AS ProdiNameEng,em.EmailPU
+                        ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status
                         FROM db_employees.employees em 
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                         WHERE (em.PositionMain not like "%14%")  AND ( ';
 
             $sql.= ' em.NIP LIKE "'.$requestData['search']['value'].'%" ';
-            $sql.= ' OR em.Name LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR em.Name LIKE "%'.$requestData['search']['value'].'%" ';
             $sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ') ORDER BY NIP,em.PositionMain  ASC';
 
         }
         else {
             $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
-                        ps.NameEng AS ProdiNameEng,em.EmailPU
+                        ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status
                         FROM db_employees.employees em 
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                         WHERE (em.PositionMain not like "%14%")';
@@ -205,8 +205,13 @@ class C_api extends CI_Controller {
             $nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
             $nestedData[] = $Division.' - '.$Position;
             $nestedData[] = $row["EmailPU"];
-            $nestedData[] = $row["ProdiNameEng"];
-
+            $nestedData[] = ($row["Status"] == '1') ? 'Aktif' : 'Tidak Aktif';
+            $nestedData[] = '<span data-smt="'.$row["NIP"].'" class="btn btn-xs btn-edit">
+                                    <i class="fa fa-pencil-square-o"></i> Edit
+                                   </span>
+                                   <span data-smt="'.$row["NIP"].'" class="btn btn-xs btn-Active" data-active = "'.$row["Status"].'">
+                                    <i class="fa fa-pencil-square-o"></i> ChangeStatus
+                                   </span>';
             $data[] = $nestedData;
         }
 
@@ -2126,6 +2131,34 @@ class C_api extends CI_Controller {
         }
     }
 
+    public function getAgama()
+    {
+        $generate = $this->m_api->getAgama();
+        echo json_encode($generate);
+    }
 
+    public function getDivision()
+    {
+        $generate = $this->m_master->showData_array('db_employees.division');
+        echo json_encode($generate);
+    }
+
+    public function getPosition()
+    {
+        $generate = $this->m_master->showData_array('db_employees.position');
+        echo json_encode($generate);
+    }
+
+    public function getStatusEmployee()
+    {
+        $generate = $this->m_master->showData_array('db_employees.employees_status');
+        echo json_encode($generate);
+    }
+
+    public function searchnip_employees($NIP)
+    {
+        $generate = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
+        echo json_encode($generate);
+    }
 
 }

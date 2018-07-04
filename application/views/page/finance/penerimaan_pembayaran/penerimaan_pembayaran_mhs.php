@@ -104,6 +104,37 @@
          }
     }); // exit enter
 
+    $(document).on("click", "#export_excel", function(event){
+      /*loading_button('#export_excel');
+      $('#NotificationModal .modal-header').addClass('hide');
+      $('#NotificationModal .modal-body').html('<center>' +
+          '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+          '                    <br/>' +
+          '                    Loading Data . . .' +
+          '                </center>');
+      $('#NotificationModal .modal-footer').addClass('hide');
+      $('#NotificationModal').modal({
+          'backdrop' : 'static',
+          'show' : true
+      });*/
+      var url = base_url_js+'finance/export_excel';
+      data = dataa;
+      var token = jwt_encode(data,"UAP)(*");
+          $.post(url,{token:token},function (data_json) {
+              // jsonData = data_json;
+              // var obj = JSON.parse(data_json); 
+              // console.log(obj);
+          }).done(function() {
+            // loadTableEvent(loadDataEvent);
+          }).fail(function() {
+            toastr.error('The Database connection error, please try again', 'Failed!!');
+          }).always(function() {
+           $('#export_excel').prop('disabled',false).html('<i class="fa fa-download" aria-hidden="true"></i> Excel');
+
+          });
+
+    });
+
     $(document).on("click", ".pagination li a", function(event){
       event.preventDefault();
       var page = $(this).attr("data-ci-pagination-page");
@@ -136,12 +167,12 @@
                         '<hr/>'+
                         '<div align="right">'+
                             '<div class="btn-group">'+
-                                '<button type="button" class="btn btn-convert">'+
+                                '<button type="button" class="btn btn-convert" id = "export_excel">'+
                                   '<i class="fa fa-download" aria-hidden="true"></i> Excel'+
                                 '</button>'+
-                                '<button type="button" class="btn btn-convert">'+
-                                  '<i class="fa fa-download" aria-hidden="true"></i> PDF'+
-                                '</button>'+
+                                //'<button type="button" class="btn btn-convert">'+
+                                 // '<i class="fa fa-download" aria-hidden="true"></i> PDF'+
+                                //'</button>'+
                            ' </div>'+
                         '</div>'+
                         '<br>'+
@@ -166,6 +197,7 @@
             var resultJson = jQuery.parseJSON(resultJson);
             console.log(resultJson);
             var Data_mhs = resultJson.loadtable;
+            dataa = Data_mhs;
             setTimeout(function () {
                 $("#conTainJS").html(htmlDy);
 

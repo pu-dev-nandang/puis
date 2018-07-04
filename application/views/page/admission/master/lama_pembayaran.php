@@ -89,7 +89,7 @@
                toastr.success('Data berhasil disimpan', 'Success!');
                loadTable();
                $('#NotificationModal').modal('hide');
-            },2000);
+            },500);
         });
   });
 
