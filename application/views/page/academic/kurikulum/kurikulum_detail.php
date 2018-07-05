@@ -96,8 +96,8 @@
                 // '                                <th style="width: 5%;">Ed Level</th>' +
                 '                                <th style="width: 5%;">Total Credit</th>' +
                 '                                <th style="width: 5%;">Pre</th>' +
-                '                                <th style="width: 9%;">Syllabus</th>' +
-                '                                <th style="width: 9%;">SAP</th>' +
+                // '                                <th style="width: 9%;">Syllabus</th>' +
+                // '                                <th style="width: 9%;">SAP</th>' +
                 '                            </tr>' +
                 // '                            <tr>' +
                 // '                                <th style="width:80px;">T</th>' +
@@ -141,8 +141,8 @@
                     '<td class="td-center"><div>'+detailSemester[s].TotalSKS+'</div></td>' +
                     '<td class="td-center"><div>'+StatusPrecondition+'</div></td>' +
                     // '<td class="td-center"><div>'+silabus+'</div></td>' +
-                    '<td class="td-center"><div>'+syllabus+'</div></td>' +
-                    '<td class="td-center"><div>'+sap+'</div></td>' +
+                    // '<td class="td-center"><div>'+syllabus+'</div></td>' +
+                    // '<td class="td-center"><div>'+sap+'</div></td>' +
                     // '<td class="td-center"><div>'+detailSemester[s].SKSPraktikLapangan+'</div></td>' +
                     '</tr>');
             }

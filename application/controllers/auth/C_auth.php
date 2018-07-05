@@ -125,11 +125,20 @@ class C_auth extends Globalclass {
             }
         }
         else if($table=='dosen'){
-            $data = $this->db_server->query('SELECT k.*, u.Password AS Password_Old, u.Lock 
-                                                        FROM siak4.dosen k 
-                                                        RIGHT JOIN siak4.user u 
-                                                        ON (k.NIP = u.Nama AND k.ID = u.EntityID)')
+            $data = $this->db_server->query('SELECT k.*, u.Password AS Password_Old, u.Lock
+                                                        FROM siak4.dosen k
+                                                        LEFT JOIN siak4.user u
+                                                        ON (k.NIP = u.Nama AND k.ID = u.EntityID) WHERE u.TabelUserID = 2')
                                     ->result_array();
+
+//            $data = $this->db_server->query('SELECT k.*
+//                                                        FROM siak4.dosen k
+//                                                        RIGHT JOIN siak4.user u ON (k.NIP = u.Nama) ')
+//                ->result_array();
+//
+//            print_r($data);
+//
+//            exit;
 
 //            $no=1;
 //            $no_sama = 1;
@@ -138,9 +147,9 @@ class C_auth extends Globalclass {
                 $data_cek = $this->db_server->query('SELECT * FROM siak4.karyawan WHERE NIP = "'.trim($data[$i]['NIP']).'" ')->result_array();
                 if(count($data_cek)>0){
 
-                    $this->db->set('PositionOther1', '14.7');
-                    $this->db->where('NIP', trim($data[$i]['NIP']));
-                    $this->db->update('db_employees.employees');
+//                    $this->db->set('PositionOther1', '14.7');
+//                    $this->db->where('NIP', trim($data[$i]['NIP']));
+//                    $this->db->update('db_employees.employees');
 
 //                    print_r($data_cek);
 //                    $no_sama += 1;
@@ -231,7 +240,7 @@ class C_auth extends Globalclass {
 
 //                    $no += 1;
 
-//                    print_r($arr);
+//                    print_r(array('NIP'=>$data[$i]['NIP']));
 
                     $this->db->insert('db_employees.employees',$arr);
                 }
