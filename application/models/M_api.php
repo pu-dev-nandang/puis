@@ -1227,7 +1227,7 @@ class M_api extends CI_Model {
 
         $dataSemester = $this->_getSemesterActive();
 
-        $data = $this->db->query('SELECT s.Name,s.NPM,s.ClassOf,ast.EmailPU FROM '.$db_ta.'.Students s 
+        $data = $this->db->query('SELECT s.Name,s.NPM,s.ClassOf,ast.EmailPU FROM '.$db_ta.'.students s 
                                                     LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = s.NPM)
                                                     LEFT JOIN db_academic.auth_students ast ON (ast.NPM = s.NPM)
                                                     WHERE s.ProdiID = "'.$dataWhere['ProdiID'].'" 
