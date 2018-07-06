@@ -55,12 +55,12 @@
  */
 	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
 	define("url_registration","http://localhost/registeronline/", true);
-	define("serverRoot","http://localhost", true);
-	define("url_pas","http://localhost:8080/siak3/", true);
+	define("serverRoot","http://pcam.podomorouniversity.ac.id", true);
+	define("url_pas","http://pcam.podomorouniversity.ac.id/", true);
 	define("url_pcam","http://pcam.podomorouniversity.ac.id/dashboard", true);
-	define("url_students","http://localhost:8080/students/home", true);
-	define("url_lecturers","http://localhost:8080/lecturer/home", true);
-	define("url_sign_out","http://localhost:8080/login3", true);
+	define("url_students","http://studentpu.podomorouniversity.ac.id/home", true);
+	define("url_lecturers","http://lecturerpu.podomorouniversity.ac.id/home", true);
+	define("url_sign_out","http://portal.podomorouniversity.ac.id", true);
 
 /*
  *---------------------------------------------------------------
