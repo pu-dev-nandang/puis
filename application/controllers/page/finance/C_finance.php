@@ -476,12 +476,37 @@ class C_finance extends Finnance_Controler {
         echo json_encode($output);
     }
 
+    public function check_va()
+    {
+        $content = $this->load->view('page/'.$this->data['department'].'/checkva/page_check_va',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function check_va_cari()
+    {   
+        $arr = array('msg' => '' , 'rs' => '');
+        $Input = $this->getInputToken();
+        $VA = $Input['VA'];
+        // cari va desc dengan status = 0 pada table va_log
+            $va_log = $this->m_finance->cari_va($VA);
+            if ($va_log['msg'] == '') {
+                $data = $va_log['data'];
+                $arr['rs'] = $data;
+            }
+            else
+            {
+                $arr['msg'] = $va_log['msg'];
+            }
+
+        echo json_encode($arr);    
+    }
+
     public function testExcel()
     {
         $input = $this->getInputToken();
         include APPPATH.'third_party/PHPExcel/PHPExcel.php';
         $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
-        $excel2 = $excel2->load('./uploads/TemplatePembayaran.xlsx'); // Empty Sheet
+        $excel2 = $excel2->load('./uploads/finance/TemplatePembayaran.xlsx'); // Empty Sheet
         $excel2->setActiveSheetIndex(0);
         $excel2->getActiveSheet()->setCellValue('C6', '4')
             ->setCellValue('C7', '5')
@@ -496,7 +521,7 @@ class C_finance extends Finnance_Controler {
         // header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
         // It will be called file.xlss
         // header('Content-Disposition: attachment; filename="file.xls"'); // jalan ketika tidak menggunakan ajax
-        $objWriter->save('./uploads/report_finance/Nimit New.xlsx');
+        $objWriter->save('./document/Nimit New.xlsx');
         // $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
     }
 

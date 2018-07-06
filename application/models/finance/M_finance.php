@@ -1471,4 +1471,37 @@ class M_finance extends CI_Model {
     }
    }
 
+   public function cari_va($VA)
+   {
+    $rs = array('msg' => '');
+    $sql = 'select * from db_va.va_log where virtual_account = ? order by ID desc limit 1';
+    $query=$this->db->query($sql, array($VA))->result_array();
+    if (count($query) > 0) {
+      $sql1 = 'select * from db_va.va_log where virtual_account = ? and Status != 1 order by ID desc limit 1';
+      $query1=$this->db->query($sql1, array($VA))->result_array();
+      if (count($query1) > 0) {
+        // check datetime expired sudah melewati waktu atau belum
+        $datetime_expired = $query1[0]['datetime_expired'];
+        $sql2 = 'select * from (
+                  select now() as ac
+                )aa
+                where ? > ac';
+                $query2=$this->db->query($sql2, array($datetime_expired))->result_array();
+            if (count($query2) > 0) {
+                  $rs['data'] = $query1;
+            }
+            else{
+              $rs['msg'] = 'VA dengan number '.$VA.' Inactive';
+            } 
+      }
+    }
+    else
+    {
+      $rs['msg'] = 'VA dengan number '.$VA.' belum pernah digunakan';
+    }
+
+    return $rs;
+
+   }
+
 }
