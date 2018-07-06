@@ -1,4 +1,10 @@
 /.idea
+
+
+/index.php
+#index.php
+index.php
+
 /application/logs
 /application/config/database.php
 /uploads/employees/*.jpeg
