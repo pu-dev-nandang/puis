@@ -959,7 +959,7 @@ class C_master extends Admission_Controler {
 
         try{
             $config=array('orientation'=>'P','size'=>'A4');
-            $this->load->library('mypdf',$config);
+            $this->load->library('MyPDF',$config);
             $this->mypdf->SetMargins(10,10,10,10);
             $this->mypdf->SetAutoPageBreak(true, 0);
             $this->mypdf->AddPage();
@@ -1070,7 +1070,7 @@ class C_master extends Admission_Controler {
 
         try{
             $config=array('orientation'=>'P','size'=>'A4');
-            $this->load->library('mypdf',$config);
+            $this->load->library('MyPDF',$config);
             $this->mypdf->SetMargins(10,10,10,10);
             $this->mypdf->SetAutoPageBreak(true, 0);
             $this->mypdf->AddPage();
