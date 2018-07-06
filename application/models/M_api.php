@@ -450,7 +450,7 @@ class M_api extends CI_Model {
                                                       WHERE cd.ID = "'.$Course[$i].'" 
                                                       AND cd.ID IN (
                                                             SELECT sdc.CDID FROM db_academic.schedule_details_course sdc 
-                                                            LEFT JOIN db_academic.Schedule s ON (sdc.ScheduleID = s.ID) 
+                                                            LEFT JOIN db_academic.schedule s ON (sdc.ScheduleID = s.ID) 
                                                             ) 
                                                       LIMIT 1')->result_array();
 
