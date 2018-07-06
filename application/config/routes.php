@@ -9,14 +9,9 @@ $route['translate_uri_dashes'] = FALSE;
 $route['navigation/(:num)'] = 'c_departement/navigation/$1';
 $route['profile'] = 'c_dashboard/profile';
 
+// FROM PORTAL
+$route['uath/__portal4SignIn'] = 'c_login/portal4SignIn';
 
-// === AUTH ===
-$route['uath/getAuthSSOLogin'] = 'c_login/getAuthSSOLogin';
-
-$route['uath/__checkPassword'] = 'c_login/checkPassword';
-$route['uath/__checkUsername'] = 'c_login/checkUsername';
-
-$route['uath/updatePassword'] = 'c_login/updatePassword';
 $route['uath/authUserPassword'] = 'c_login/authUserPassword';
 $route['auth/authGoogle'] = 'c_login/authGoogle';
 // $route['auth/gen_pass'] = 'c_login/gen_pass';
