@@ -27,7 +27,7 @@
                 <!-- <th style="width: 3%;"></th> -->
                 <th style="width: 12%;">Program Study</th>
                 <!-- <th style="width: 10%;">Semester</th> -->
-                <th style="width: 20%;">Nama</th>
+                <th style="width: 20%;">Nama,NPM &  VA</th>
                 <!-- <th style="width: 5%;">NPM</th> -->
                 <!-- <th style="width: 5%;">Year</th> -->
                 <th style="width: 15%;">Payment Type</th>
@@ -179,7 +179,7 @@
                                                       // '<td>'+inputCHK+'</td>' +
                                                       '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
                                                       // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
-                                                      '<td>'+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'</td>' +
+                                                      '<td>'+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
                                                       // '<td>'+Data_mhs[i]['NPM']+'</td>' +
                                                       // '<td>'+Data_mhs[i]['Year']+'</td>' +
                                                       '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +

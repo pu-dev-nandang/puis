@@ -43,7 +43,7 @@
                 <th style="width: 3%;"><input type="checkbox" class="uniform" value="nothing" id ="dataResultCheckAll"></th>
                 <th style="width: 12%;">Program Study</th>
                 <!-- <th style="width: 10%;">Semester</th> -->
-                <th style="width: 20%;">Nama</th>
+                <th style="width: 20%;">Nama,NPM & VA</th>
                 <!-- <th style="width: 5%;">NPM</th> -->
                 <!-- <th style="width: 5%;">Year</th> -->
                 <th style="width: 5%;">Foto</th>
@@ -159,7 +159,7 @@
                        '<td>'+'<input type="checkbox" class="uniform" value ="'+Data_mhs[i]['NPM']+'" Prodi = "'+Data_mhs[i]['ProdiEng']+'" Nama ="'+Data_mhs[i]['Name']+'" semester = "'+Data_mhs[i]['SemesterID']+'" ta = "'+res[1]+'"></td>' +
                        '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
                        // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
-                       '<td>'+Data_mhs[i]['Name']+'<br>'+Data_mhs[i]['NPM']+'</td>' +
+                       '<td>'+Data_mhs[i]['Name']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
                        // '<td>'+Data_mhs[i]['NPM']+'</td>' +
                        // '<td>'+Data_mhs[i]['ClassOf']+'</td>' +
                        '<td>'+img+'</td>' +

@@ -1,3 +1,4 @@
+<legend>Pembayaran Formulir Verify By Virtual Account (VA)</legend>
 <div class="row" style="margin-top: 30px;">
 	<div class="col-md-12">
 		<div class="widget box">
