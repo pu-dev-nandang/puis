@@ -19,7 +19,7 @@ class C_login extends CI_Controller {
         $this->load->library('JWT');
         $this->load->library('google');
         $this->load->model('m_auth');
-
+        date_default_timezone_set("Asia/Jakarta");
 
     }
 
@@ -46,16 +46,25 @@ class C_login extends CI_Controller {
         $key = "s3Cr3T-G4N";
         $data_arr = (array) $this->jwt->decode($token,$key);
 
-        $dataEmp = $this->db->select('ID,NIP')->get_where('db_employees.employees',
-            array('NIP'=>$data_arr['Username'],'Password'=>$data_arr['Token']),1)->result_array();
+        $dateNow = date("Y-m-d");
 
-        if(count($dataEmp)>0){
-            $this->setSession($dataEmp[0]['ID'],$dataEmp[0]['NIP']);
-            redirect(base_url('dashboard'));
-        } else {
+        if($dateNow==$data_arr['dueDate']){
+            $dataEmp = $this->db->select('ID,NIP')->get_where('db_employees.employees',
+                array('NIP'=>$data_arr['Username'],'Password'=>$data_arr['Token']),1)->result_array();
+
+
+            if(count($dataEmp)>0){
+                $this->setSession($dataEmp[0]['ID'],$dataEmp[0]['NIP']);
+                redirect(base_url('dashboard'));
+            } else {
 //            echo 'gagal login son';
+                redirect(url_sign_out);
+            }
+        } else {
             redirect(url_sign_out);
         }
+
+
     }
 
     public function authGoogle(){
