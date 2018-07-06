@@ -791,6 +791,9 @@ class M_finance extends CI_Model {
       $Data_mhs=$this->db->query($sql, array($value,$prodi,$PTID,$SemesterID[0]['ID'],$ta,$PTID))->result_array();
     }
 
+    // get Number VA Mahasiswa
+    $Const_VA = $this->m_master->showData_array('db_va.master_va');
+
     // $SemesterID = $SemesterID[0]['ID'];
     $Discount = $this->m_master->showData_array('db_finance.discount');
     for ($i=0; $i < count($Data_mhs); $i++) { 
@@ -806,7 +809,12 @@ class M_finance extends CI_Model {
 
       // get IPS Mahasiswa
         $IPK = $this->getIPKMahasiswa($db2,$Data_mhs[$i]['NPM']);
-        $Data_mhs[$i] = $Data_mhs[$i] + array('IPK' => $IPK);  
+        $Data_mhs[$i] = $Data_mhs[$i] + array('IPK' => $IPK);
+
+      // ge VA Mahasiwa
+        $VA = $Const_VA[0]['Const_VA'].$Data_mhs[$i]['NPM'];
+        $Data_mhs[$i] = $Data_mhs[$i] + array('VA' => $VA);
+
 
     }
     $arr['Data_mhs'] = $Data_mhs;
@@ -952,6 +960,9 @@ class M_finance extends CI_Model {
       $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
     }
 
+    // get Number VA Mahasiswa
+        $Const_VA = $this->m_master->showData_array('db_va.master_va');
+
     // get all data to join db ta
     for ($i=0; $i < count($query); $i++) { 
       $Year = $query[$i]['Year'];
@@ -961,10 +972,13 @@ class M_finance extends CI_Model {
         $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$dt[0]['ProdiID']);
 
         // get IPS Mahasiswa
-          $IPS = $this->getIPSMahasiswa('ta_'.$Year,$query[$i]['NPM']);
+           $IPS = $this->getIPSMahasiswa('ta_'.$Year,$query[$i]['NPM']);
 
         // get IPS Mahasiswa
-          $IPK = $this->getIPKMahasiswa('ta_'.$Year,$query[$i]['NPM']);
+           $IPK = $this->getIPKMahasiswa('ta_'.$Year,$query[$i]['NPM']);
+
+        // ge VA Mahasiwa
+           $VA = $Const_VA[0]['Const_VA'].$query[$i]['NPM'];
         $arr[] = array(
             'PaymentID' => $query[$i]['ID'],
             'PTID'  => $query[$i]['PTID'],
@@ -983,6 +997,7 @@ class M_finance extends CI_Model {
             'IPS' => $IPS,
             'IPK' => $IPK,
             'DetailPayment' => $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']),
+            'VA' => $VA
         );
       }
       else
