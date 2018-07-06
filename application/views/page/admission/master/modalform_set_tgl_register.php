@@ -15,7 +15,14 @@
                     <label class="control-label">Start Date:</label>
                 </div>    
                 <div class="col-sm-6">
-                    <input type="text" id="startDate"  class="form-control" readonly="" value = ''>
+                    <!--<input type="text" id="startDate"  class="form-control" readonly="" value = ''>-->
+                    <div id="datetimepicker1" class="input-group input-append date">
+                        <input data-format="yyyy-MM-dd hh:mm:ss" class="form-control" id="startDate" type="text"></input>
+                        <span class="input-group-addon add-on">
+                          <i data-time-icon="icon-time" data-date-icon="icon-calendar">
+                          </i>
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -25,7 +32,14 @@
                     <label class="control-label">End Date :</label>
                 </div>    
                 <div class="col-sm-6">
-                    <input type="text" id="endDate"  class="form-control" readonly="">
+                    <!--<input type="text" id="endDate"  class="form-control" readonly="">-->
+                    <div id="datetimepicker2" class="input-group input-append date">
+                        <input data-format="yyyy-MM-dd hh:mm:ss" class="form-control" id="endDate" type="text"></input>
+                        <span class="input-group-addon add-on">
+                          <i data-time-icon="icon-time" data-date-icon="icon-calendar">
+                          </i>
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -38,15 +52,28 @@
     </form>
 <script type="text/javascript">
     $(document).ready(function () {
-        $('#startDate').datetimepicker({
+        $('#startDate').prop('readonly',true);
+        $('#datetimepicker1').datetimepicker({
             // startDate: today,
-            startDate: '+1d',
+            // startDate: '+2d',
+            startDate: new Date(),
         });
 
-        $('#endDate').datetimepicker({
+        $('#endDate').prop('readonly',true);
+        $('#datetimepicker2').datetimepicker({
+            // startDate: today,
+            // startDate: '+2d',
+            startDate: new Date(),
+        });
+        /*$('#startDate').datetimepicker({
             // startDate: today,
             startDate: '+1d',
-        });
+        });*/
+
+        /*$('#endDate').datetimepicker({
+            // startDate: today,
+            startDate: '+1d',
+        });*/
 
         <?php if ($action == 'edit'): ?>
           $("#startDate").val('<?php echo $getData[0]['Start_register'] ?>');
