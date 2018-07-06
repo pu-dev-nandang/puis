@@ -60,8 +60,7 @@
             <input type="text" id="krs_end" name="regular" class="form-control form-tahun-akademik form-next">
         </td>
         <td>
-<!--            <a href="javascript:void(0);" data-head="KRS" data-load="prodi" class="btn btn-sm btn-warning btn-block more_details">Special Case</a>-->
-            -
+            <a href="javascript:void(0);" data-head="KRS" data-load="prodi" class="btn btn-sm btn-warning btn-block more_details">Special Case</a>
         </td>
     </tr>
     <tr>
@@ -496,6 +495,23 @@
 
     });
 
+
+    $(document).on('click','.btn-delete-aysco',function () {
+        var ID = $(this).attr('data-id');
+        var token = jwt_encode({action:'deleteSC',ID:ID},'UAP)(*');
+        var url = base_url_js+'api/__crudDataDetailTahunAkademik';
+
+        var el = '.btn-delete-aysco[data-id='+ID+']';
+        loading_buttonSm(el);
+        $.post(url,{token:token},function (jsonResult) {
+            setTimeout(function () {
+                $('#trSC'+ID).remove();
+            },1000);
+        });
+
+    });
+
+
     function checkAllCourse() {
         var allVals = [];
         $('#divMK :checked').each(function() {
@@ -545,19 +561,4 @@
         });
 
     }
-
-    $(document).on('click','.btn-delete-aysco',function () {
-        var ID = $(this).attr('data-id');
-        var token = jwt_encode({action:'deleteSC',ID:ID},'UAP)(*');
-        var url = base_url_js+'api/__crudDataDetailTahunAkademik';
-
-        var el = '.btn-delete-aysco[data-id='+ID+']';
-        loading_buttonSm(el);
-        $.post(url,{token:token},function (jsonResult) {
-            setTimeout(function () {
-                $('#trSC'+ID).remove();
-            },1000);
-        });
-
-    });
 </script>

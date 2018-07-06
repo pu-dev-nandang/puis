@@ -204,7 +204,8 @@ class M_api extends CI_Model {
     }
 
     public function __getDosenSelectOption(){
-        $data = $this->db->query('SELECT ID,NIP,NIDN,Name FROM db_employees.employees WHERE PositionMain = "14.5" OR PositionMain = "14.6" OR PositionMain = "14.7"');
+        $data = $this->db->query('SELECT ID,NIP,NIDN,Name FROM db_employees.employees WHERE 
+                                                                    PositionMain = "14.5" OR PositionMain = "14.6" OR PositionMain = "14.7"');
         return $data->result_array();
     }
 
@@ -1233,6 +1234,7 @@ class M_api extends CI_Model {
                                                     AND s.ProgramID = "'.$dataWhere['ProgramID'].'" 
                                                     ORDER BY s.NPM ASC')
                         ->result_array();
+
         $result = [];
         if(count($data)>0){
             $smtActID = $dataSemester['ID'];
@@ -1246,8 +1248,6 @@ class M_api extends CI_Model {
                                                     LEFT JOIN db_employees.employees em ON (em.NIP = ma.NIP)
                                                     WHERE ma.NPM = "'.$data[$i]['NPM'].'" ')->result_array();
 
-
-
                 $data[$i]['DetailSemester'] = $this->getMaxCredit($db_ta,$data[$i]['NPM'],$dataWhere['ClassOf'],$dataSemester,$smtActID);
                 $data[$i]['DetailPayment'] = $this->getPayment($dataSemester['ID'],$data[$i]['NPM']);
                 $data[$i]['DetailMentor'] = $data_mentor;
@@ -1260,6 +1260,10 @@ class M_api extends CI_Model {
                 array_push($result,$dataRes);
             }
         }
+
+//        print_r($result);
+//
+//        exit;
 
         return $result;
 
@@ -1276,66 +1280,88 @@ class M_api extends CI_Model {
 
         $dataIDLast = $this->db->query('SELECT * FROM db_academic.semester s 
                                         WHERE s.ID < "'.$smtActID['ID'].'" ORDER BY ID DESC LIMIT 1')
-                                    ->result_array()[0];
+                                    ->result_array();
 
-        $dataResult = $this->db->query('SELECT s.GradeValue,s.SemesterID,cd.TotalSKS AS Credit FROM '.$db_ta.'.study_planning s
+
+        if(count($dataIDLast)>0){
+            $dataResult = $this->db->query('SELECT s.GradeValue,s.SemesterID,cd.TotalSKS AS Credit FROM '.$db_ta.'.study_planning s
                                                 LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = s.CDID) 
                                                 WHERE s.NPM = "'.$NPM.'" ORDER BY s.SemesterID ASC ')->result_array();
 
-        $TotalSKS=0;
-        $totalGradeValue=0;
+//            print_r($dataResult);
+            $TotalSKS=0;
+            $totalGradeValue=0;
 
-        $TotalSKSSemester=0;
-        $totalGradeValueSemester=0;
+            $TotalSKSSemester=0;
+            $totalGradeValueSemester=0;
 
-        for ($s=0;$s<count($dataResult);$s++){
+            for ($s=0;$s<count($dataResult);$s++){
 
-            // Menghitung IPK
-            $TotalSKS = $TotalSKS + (int) $dataResult[$s]['Credit'];
-            $gradeV = (int) $dataResult[$s]['Credit'] * (float) $dataResult[$s]['GradeValue'];
+                // Menghitung IPK
+                $TotalSKS = $TotalSKS + (int) $dataResult[$s]['Credit'];
+                $gradeV = (int) $dataResult[$s]['Credit'] * (float) $dataResult[$s]['GradeValue'];
 
-            $totalGradeValue =$totalGradeValue + $gradeV;
+                $totalGradeValue =$totalGradeValue + $gradeV;
 
-            if($dataResult[$s]['SemesterID']==$dataIDLast['ID']){
-                $TotalSKSSemester = $TotalSKSSemester + (int) $dataResult[$s]['Credit'];
-                $gradeVSemester = (int) $dataResult[$s]['Credit'] * (float) $dataResult[$s]['GradeValue'];
-                $totalGradeValueSemester = $totalGradeValueSemester + $gradeVSemester;
+                if($dataResult[$s]['SemesterID']==$dataIDLast[0]['ID']){
+                    $TotalSKSSemester = $TotalSKSSemester + (int) $dataResult[$s]['Credit'];
+                    $gradeVSemester = (int) $dataResult[$s]['Credit'] * (float) $dataResult[$s]['GradeValue'];
+                    $totalGradeValueSemester = $totalGradeValueSemester + $gradeVSemester;
+                }
+
             }
 
-        }
 
-        $IPK = $totalGradeValue/$TotalSKS;
 
-        $LastIPS = ($totalGradeValueSemester==0 || $TotalSKSSemester==0) ? 0 : $totalGradeValueSemester/$TotalSKSSemester;
+            $IPK = ($totalGradeValue>0) ? $totalGradeValue/$TotalSKS : 0;
 
-        $dataMakCredit = $this->db->query('SELECT * FROM db_academic.range_credits WHERE 
+            $LastIPS = ($totalGradeValueSemester==0 || $TotalSKSSemester==0) ? 0 : $totalGradeValueSemester/$TotalSKSSemester;
+
+            $dataMakCredit = $this->db->query('SELECT * FROM db_academic.range_credits WHERE 
                                                       IPSStart <= '.$LastIPS.' 
                                                       AND IPSEnd >= '.$LastIPS.' LIMIT 1')->result_array();
 
 
-        // Semester Saat Ini
-        $dataTotalSmt = $this->db->query('SELECT s.Status FROM db_academic.semester s 
+            // Semester Saat Ini
+            $dataTotalSmt = $this->db->query('SELECT s.Status FROM db_academic.semester s 
                                                     WHERE s.ID >= (SELECT ID FROM db_academic.semester s2 
                                                     WHERE s2.Year="'.$ClassOf.'" 
                                                     LIMIT 1)')->result_array();
 
-        $smt = 0;
-        for($s=0;$s<count($dataTotalSmt);$s++){
-            if($dataTotalSmt[$s]['Status']=='1'){
-                $smt += 1;
-                break;
-            } else {
-                $smt += 1;
+            $smt = 0;
+            for($s=0;$s<count($dataTotalSmt);$s++){
+                if($dataTotalSmt[$s]['Status']=='1'){
+                    $smt += 1;
+                    break;
+                } else {
+                    $smt += 1;
+                }
             }
+
+            $result = array(
+//            'LastIPS' => $dataResult[0],
+                'IPK' => $IPK,
+                'LastIPS' => $LastIPS,
+                'MaxCredit' => $dataMakCredit[0],
+                'Semester' => $smt
+            );
+
+        }
+        else {
+            $result = array(
+//            'LastIPS' => $dataResult[0],
+                'IPK' => 0,
+                'LastIPS' => 0,
+                'MaxCredit' => 22,
+                'Semester' => 1
+            );
         }
 
-        $result = array(
-//            'LastIPS' => $dataResult[0],
-            'IPK' => $IPK,
-            'LastIPS' => $LastIPS,
-            'MaxCredit' => $dataMakCredit[0],
-            'Semester' => $smt
-        );
+
+
+
+
+
         return $result;
     }
 
