@@ -71,6 +71,8 @@
       loading_button('#ModalbtnSaveForm');
        var TypePembayaran = $("#selectTypePembayaran").val();
        var Prodi = $("#selectProdi").val();
+       Prodi = Prodi.split('.');
+       Prodi = Prodi[0];
        var Cost = $("#Cost").val();
        var ClassOf = $("#selectClassOf").val();
         for(i = 0; i <Cost.length; i++) {
@@ -90,11 +92,20 @@
        if (validationInput = validation(data)) {
            var token = jwt_encode(data,"UAP)(*");
            $.post(url,{token:token},function (data_json) {
+            var data_json = jQuery.parseJSON(data_json);
                setTimeout(function () {
                   toastr.options.fadeOut = 10000;
-                  toastr.success('Data berhasil disimpan', 'Success!');
-                  $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
-                  loadData();
+                  if(data_json == '')
+                  {
+                    toastr.success('Data berhasil disimpan', 'Success!');
+                  }
+                  else
+                  {
+                    toastr.error(data_json, 'Failed!!');
+                  }
+                    $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
+                    loadData();
+                    $("#GlobalModalLarge").modal('hide');
                },500);
            });
        }
@@ -102,7 +113,6 @@
        {
           $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
        }
-
     });
 
 
