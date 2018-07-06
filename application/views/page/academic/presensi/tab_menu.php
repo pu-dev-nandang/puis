@@ -86,7 +86,7 @@
         // console.log(filterGroup);
         if(filterGroup!='' && filterGroup!=null){
             var data = {
-                page : 'InputPresensi',
+                page : 'inputPresensi',
                 ScheduleID : filterGroup
             };
             var token = jwt_encode(data,'UAP)(*');
