@@ -1736,4 +1736,18 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         );
         $this->db->insert('test.aaa', $dataSave);
     }
+
+    public function checkExistingTBL($field,$value,$table)
+    {
+        $a = $this->caribasedprimary($table,$field,$value);
+        if (count($a) > 0) {
+            // existing
+            return false;
+        }
+        else
+        {
+            // nothing
+            return true;
+        }
+    }
 }

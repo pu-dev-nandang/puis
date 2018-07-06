@@ -937,7 +937,7 @@ class M_finance extends CI_Model {
 
     if ($ta1 == '') {
       $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description 
-              from db_finance.Payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
               join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and c.ID = ? order by a.Status asc LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array($SemesterID))->result_array();
@@ -946,7 +946,7 @@ class M_finance extends CI_Model {
     else
     {
       $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description 
-              from db_finance.Payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
               join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? and c.ID = ? order by a.Status asc LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
@@ -1334,7 +1334,7 @@ class M_finance extends CI_Model {
 
     if ($ta1 == '') {
       $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description,e.ID as ID_payment_students,e.BilingID,e.Invoice as InvoiceStudents
-              from db_finance.Payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
               join db_finance.payment_type as d on a.PTID = d.ID join db_finance.payment_students as e on a.ID = e.ID_payment '.$NIM.$PTID.' 
               and e.Status = 1 order by e.ID asc LIMIT '.$start. ', '.$limit;
@@ -1344,7 +1344,7 @@ class M_finance extends CI_Model {
     else
     {
       $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description,e.ID as ID_payment_students,e.BilingID,e.Invoice as InvoiceStudents
-              from db_finance.Payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
               join db_finance.payment_type as d on a.PTID = d.ID join db_finance.payment_students as e on a.ID = e.ID_payment '.$NIM.$PTID.' and b.Year = ? and e.Status = 1 
               order by e.ID asc LIMIT '.$start. ', '.$limit;
@@ -1439,6 +1439,21 @@ class M_finance extends CI_Model {
       
     }
     return $arr;
+   }
+
+   public function checkMasterTagihanExisting($TypePembayaran,$Prodi,$ClassOf)
+   {
+    $sql= 'select * from db_finance.tuition_fee where PTID = ? and ProdiID = ? and ClassOf = ?';
+    $query=$this->db->query($sql, array($TypePembayaran,$Prodi,$ClassOf))->result_array();
+    if (count($query) > 0) {
+      // existing
+      return false;
+    }
+    else
+    {
+      // nothing
+      return true;
+    }
    }
 
 }

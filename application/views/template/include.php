@@ -239,9 +239,9 @@
     window.sessionNIP = "<?php echo $this->session->userdata('NIP'); ?>";
     window.timePerCredits = "<?php echo $this->session->userdata('timePerCredits'); ?>";
 
-    window.base_url_sign_out = "http://localhost:8080/login3/";
-    window.base_url_portal_students = "http://localhost:8080/students/";
-    window.base_url_portal_lecturers = "http://localhost:8080/lecturer/";
+    window.base_url_sign_out = "<?php echo url_sign_out ?>";
+    window.base_url_portal_students = "<?php echo url_students ?>";
+    window.base_url_portal_lecturers = "<?php echo url_lecturers ?>";
 
     window.allowDepartementNavigation = [];
 
