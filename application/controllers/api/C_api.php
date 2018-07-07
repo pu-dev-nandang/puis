@@ -129,9 +129,10 @@ class C_api extends CI_Controller {
                 $Position = $dataPosition['Position'];
             }
 
+            $imgEmp = url_img_employees.''.$row["Photo"];
             $nestedData[] = $row["NIP"];
             $nestedData[] = $row["NIDN"];
-            $nestedData[] = '<div style="text-align: center;"><img src="http://siak.podomorouniversity.ac.id/includes/foto/'.$row["Photo"].'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
+            $nestedData[] = '<div style="text-align: center;"><img src="'.$imgEmp.'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
             $nestedData[] = '<a href="'.base_url('database/lecturer-details/'.$row["NIP"]).'" style="font-weight: bold;">'.$row["Name"].'</a>';
             $nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
             $nestedData[] = $Division.' - '.$Position;
