@@ -770,6 +770,29 @@ class C_api extends CI_Controller {
 
                 return print_r(1);
             }
+            else if($data_arr['action']=='insertSCKRS'){
+                $dataForm = (array) $data_arr['dataForm'];
+                $this->db->insert('db_academic.academic_years_special_case', $dataForm);
+                return print_r(1);
+            }
+            else if ($data_arr['action']=='readSCKRS'){
+                $SemesterID = $data_arr['SemesterID'];
+
+                $data = $this->db->query('SELECT aysc.ID,ps.ID AS ProdiID,ps.Code, aysc.Start, aysc.End 
+                                              FROM db_academic.academic_years_special_case aysc
+                                              LEFT JOIN db_academic.program_study ps ON (ps.ID = aysc.UserID)
+                                              WHERE aysc.SemesterID = "'.$SemesterID.'" 
+                                              AND aysc.Status = "2" ')->result_array();
+
+
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='deleteSCKRS'){
+                $ID = $data_arr['ID'];
+                $this->db->delete('db_academic.academic_years_special_case',
+                    array('ID'=>$ID));
+                return print_r(1);
+            }
         }
 
     }
