@@ -6,7 +6,7 @@
             <?php $activeMenu = $this->uri->segment(2); ?>
             <ul class="nav nav-tabs">
                 <li class="<?php if($activeMenu=='lecturers') { echo 'active';} ?>"><a href="<?php echo base_url('database/lecturers'); ?>"><i class="fa fa-th-list right-margin" aria-hidden="true"></i> Lecturers</a></li>
-                <li class="<?php if($activeMenu=='mentor-academic') { echo 'active';} ?>"><a href="<?php echo base_url('database/mentor-academic'); ?>"><i class="fa fa-users right-margin" aria-hidden="true"></i> Penasehat Akademik</a></li>
+                <li class="<?php if($activeMenu=='mentor-academic') { echo 'active';} ?>"><a href="<?php echo base_url('database/mentor-academic'); ?>"><i class="fa fa-users right-margin" aria-hidden="true"></i> Mentor Academic</a></li>
                 <li class="<?php if($activeMenu=='mentor-final-academic') { echo 'active';} ?>"><a href="<?php echo base_url('database/mentor-final-academic'); ?>" data-toggle="tab"><i class="fa fa-flag right-margin" aria-hidden="true"></i> Final Project</a></li>
             </ul>
             <div style="padding-top: 30px;border-top: 1px solid #cccccc">
