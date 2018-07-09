@@ -51,6 +51,8 @@
                 <th style="width: 5%;">No HP</th>
                 <th style="width: 5%;">IPS</th>
                 <th style="width: 5%;">IPK</th>
+                <th style="width: 5%;">Credit</th>
+                <th style="width: 5%;">Price</th>
                 <th style="width: 5%;">Discount</th>
                 <th style="width: 20%;">Invoice</th>
             </tr>
@@ -143,7 +145,17 @@
                 var res = ta.split(".");
                for(var i=0;i<Data_mhs.length;i++){
                     var img = '<img src="'+base_url_js+'uploads/students/ta_'+res[1]+'/'+Data_mhs[i]['Photo']+'" class="img-rounded" width="30" height="30" style="max-width: 30px;object-fit: scale-down;">';
+
                     var selecTOption = '<select class="selecTOption getDom" id="'+'discount_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" payment-type = "'+PTID+'" invoice = "'+Data_mhs[i]['Cost']+'">';
+
+                   var yy = (Data_mhs[i]['Cost'] != '') ? formatRupiah(Data_mhs[i]['Cost']) : '-';
+                   
+                   if(PTID == 3)
+                   {
+                     var t = parseInt(Data_mhs[i]['Cost']) * parseInt(Data_mhs[i]['Credit']);
+                     yy = (Data_mhs[i]['Cost'] != '') ? formatRupiah(t) : '-';
+                     selecTOption = '<select class="selecTOption getDom" id="'+'discount_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" payment-type = "'+PTID+'" invoice = "'+t+'">';
+                   } 
 
                         for (var k = 0;k < xx['Discount'].length; k++)
                         {
@@ -152,8 +164,9 @@
                         }
                     selecTOption += '</select>';
 
-                    var yy = (Data_mhs[i]['Cost'] != '') ? formatRupiah(Data_mhs[i]['Cost']) : '-';
+                    
                     var cost = '<input class="form-control costInput getDom" id="cost_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" value = "'+yy+'" payment-type = "'+PTID+'" readonly style="background-color: #fff;color: #333;">';
+                    var priceLabel = (Data_mhs[i]['Cost'] != '') ? formatRupiah(Data_mhs[i]['Cost']) : '-';
 
                    $('#dataRow').append('<tr>' +
                        '<td>'+'<input type="checkbox" class="uniform" value ="'+Data_mhs[i]['NPM']+'" Prodi = "'+Data_mhs[i]['ProdiEng']+'" Nama ="'+Data_mhs[i]['Name']+'" semester = "'+Data_mhs[i]['SemesterID']+'" ta = "'+res[1]+'"></td>' +
@@ -166,7 +179,9 @@
                        '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
                        '<td>'+Data_mhs[i]['HP']+'</td>' +
                        '<td>'+Data_mhs[i]['IPS'].toFixed(2)+'</td>'+
-                        '<td>'+Data_mhs[i]['IPK'].toFixed(2)+'</td>'+
+                       '<td>'+Data_mhs[i]['IPK'].toFixed(2)+'</td>'+
+                       '<td>'+Data_mhs[i]['Credit']+'</td>'+
+                       '<td>'+priceLabel+'</td>'+
                        '<td>'+selecTOption+'</td>' +
                        '<td>'+cost+'</td>' +
                        '</tr>');
