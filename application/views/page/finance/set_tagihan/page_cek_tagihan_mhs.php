@@ -52,6 +52,10 @@
         </div>
     </div>
 </div>
+<br>
+<div class="thumbnail" style="padding: 10px;">
+    <b>Status : </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Approve & Paid Off | <i class="fa fa-circle" style="color: #eade8e;"></i> Approve & Not Yet Paid Off  
+</div>
 
 <div class="row">
     <div class="col-md-12">

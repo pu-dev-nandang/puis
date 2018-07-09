@@ -811,10 +811,13 @@ class M_finance extends CI_Model {
         $IPK = $this->getIPKMahasiswa($db2,$Data_mhs[$i]['NPM']);
         $Data_mhs[$i] = $Data_mhs[$i] + array('IPK' => $IPK);
 
-      // ge VA Mahasiwa
+      // get VA Mahasiwa
         $VA = $Const_VA[0]['Const_VA'].$Data_mhs[$i]['NPM'];
         $Data_mhs[$i] = $Data_mhs[$i] + array('VA' => $VA);
 
+      // get sks yang diambil
+         $Credit = $this->getSKSMahasiswa($db2,$Data_mhs[$i]['NPM']);
+         $Data_mhs[$i] = $Data_mhs[$i] + array('Credit' => $Credit);
 
     }
     $arr['Data_mhs'] = $Data_mhs;
@@ -822,9 +825,29 @@ class M_finance extends CI_Model {
     return $arr;
    }
 
+   public function getSKSMahasiswa($db,$NPM)
+   {
+     // get semester desc
+        $sql = 'select ID from db_academic.semester where Status = 0 order by ID desc Limit 1';
+        $query = $this->db->query($sql, array())->result_array();
+        $SemesterID = $query[0]['ID'];
+
+      $sql = 'select * from '.$db.'.study_planning where NPM = ? and SemesterID = ?';
+      $query = $this->db->query($sql, array($NPM,$SemesterID))->result_array();
+
+      $Credit = 0;
+      for ($j=0; $j < count($query); $j++) { 
+       $CreditSub = $query[$j]['Credit'];
+       $Credit = $Credit + $CreditSub;
+      }
+
+      return $Credit;
+
+   }
+
   public function getIPKMahasiswa($db,$NPM)
   {
-    // error_reporting(0);
+    error_reporting(0);
     $IPK = 0;
     // hitung IPK
       // get query IPK
@@ -847,7 +870,7 @@ class M_finance extends CI_Model {
 
    public function getIPSMahasiswa($db,$NPM)
    {
-    // error_reporting(0);
+    error_reporting(0);
     $IPS = 0;
     // hitung IPS
       // get semester desc
@@ -968,17 +991,21 @@ class M_finance extends CI_Model {
       $Year = $query[$i]['Year'];
       $db = 'ta_'.$Year.'.students';
       $dt = $this->m_master->caribasedprimary($db,'NPM',$query[$i]['NPM']);
+      // get IPS Mahasiswa
+         $IPS = $this->getIPSMahasiswa('ta_'.$Year,$query[$i]['NPM']);
+
+      // get IPS Mahasiswa
+         $IPK = $this->getIPKMahasiswa('ta_'.$Year,$query[$i]['NPM']);
+
+      // ge VA Mahasiwa
+         $VA = $Const_VA[0]['Const_VA'].$query[$i]['NPM'];
+
+      // get sks yang diambil
+         $Credit = $this->getSKSMahasiswa('ta_'.$Year,$query[$i]['NPM']);
+
       if($prodi == '' || $prodi == Null){
         $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$dt[0]['ProdiID']);
 
-        // get IPS Mahasiswa
-           $IPS = $this->getIPSMahasiswa('ta_'.$Year,$query[$i]['NPM']);
-
-        // get IPS Mahasiswa
-           $IPK = $this->getIPKMahasiswa('ta_'.$Year,$query[$i]['NPM']);
-
-        // ge VA Mahasiwa
-           $VA = $Const_VA[0]['Const_VA'].$query[$i]['NPM'];
         $arr[] = array(
             'PaymentID' => $query[$i]['ID'],
             'PTID'  => $query[$i]['PTID'],
@@ -997,7 +1024,8 @@ class M_finance extends CI_Model {
             'IPS' => $IPS,
             'IPK' => $IPK,
             'DetailPayment' => $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']),
-            'VA' => $VA
+            'VA' => $VA,
+            'Credit' => $Credit,
         );
       }
       else
@@ -1022,6 +1050,8 @@ class M_finance extends CI_Model {
               'ProdiEng' => $ProdiEng[0]['NameEng'],
               'Year' => $Year,
               'DetailPayment' => $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']),
+              'VA' => $VA,
+              'Credit' => $Credit,
           );
         }
       }
@@ -1329,7 +1359,7 @@ class M_finance extends CI_Model {
 
    public function get_pembayaran_mhs($ta,$prodi,$PTID,$NIM,$limit, $start)
    {
-    // error_reporting(0);
+    error_reporting(0);
     $arr = array();
     $this->load->model('master/m_master');
 
@@ -1366,9 +1396,6 @@ class M_finance extends CI_Model {
       $query=$this->db->query($sql, array($ta1))->result_array();
     }
 
-    // get all data to join db ta
-    $Cicilan = 'Cicilan ke ';
-    // print_r($sql);
     for ($i=0; $i < count($query); $i++) { 
       $Year = $query[$i]['Year'];
       $db = 'ta_'.$Year.'.students';
@@ -1384,7 +1411,7 @@ class M_finance extends CI_Model {
 
         // cek cicilan atau tidak
           $DetailPayment = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']);
-          if (count($DetailPayment) > 0) {
+          if (count($DetailPayment) == 1) {
             $Cicilan = 'Tidak Cicilan';
           }
           else
@@ -1392,6 +1419,9 @@ class M_finance extends CI_Model {
             $a = 1;
             for ($j=0; $j < count($DetailPayment); $j++) { 
               if ($DetailPayment[$j]['ID'] == $query[$i]['ID_payment_students']) {
+                // get all data to join db ta
+                $Cicilan = 'Cicilan ke ';
+                // print_r($sql);
                   $Cicilan .= $a;
                   break;
               }  
