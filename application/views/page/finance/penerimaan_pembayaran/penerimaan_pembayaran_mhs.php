@@ -41,6 +41,38 @@
     </div>
 </div>
 
+<div class="col-md-12">
+      <hr/>
+      <div class="col-md-12">
+        <div class="DTTT btn-group">
+          <a class="btn DTTT_button_xls" id="ToolTables_DataTables_Table_0_0">
+            <span><i class="fa fa-download" aria-hidden="true"></i> 
+              Excel
+            </span>
+          </a>
+          <!--<a class="btn DTTT_button_pdf" id="ToolTables_DataTables_Table_0_1">
+            <span><i class="fa fa-download" aria-hidden="true"></i> PDF
+            </span>
+          </a>-->
+        </div>
+        <div id="DataTables_Table_0_filter" class="dataTables_filter">
+          <label>
+            <div class="input-group">
+              <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                  <select class="form-control" id="selectSemester">
+                      <option selected value = ''>--- All Semester ---</option>
+                      <option disabled>------</option>
+                  </select>
+              </div>
+            </div>
+          </label>
+        </div>
+      </div>  
+</div>                        
+<br>
+<br>
+<br>
+<br>
 <div class="row" id='conTainJS'>
     <!--<div class="col-md-12">
         <hr/>
@@ -164,18 +196,6 @@
         };
         var token = jwt_encode(data,'UAP)(*');
         var htmlDy = '<div class="col-md-12">'+
-                        '<hr/>'+
-                        '<div align="right">'+
-                            '<div class="btn-group">'+
-                                '<button type="button" class="btn btn-convert" id = "export_excel">'+
-                                  '<i class="fa fa-download" aria-hidden="true"></i> Excel'+
-                                '</button>'+
-                                //'<button type="button" class="btn btn-convert">'+
-                                 // '<i class="fa fa-download" aria-hidden="true"></i> PDF'+
-                                //'</button>'+
-                           ' </div>'+
-                        '</div>'+
-                        '<br>'+
                         '<table class="table table-bordered datatable2 " id = "datatable2">'+
                             '<thead>'+
                             '<tr style="background: #333;color: #fff;">'+

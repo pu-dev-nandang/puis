@@ -18,15 +18,15 @@
     </div>
     <div class="col-md-3">
         <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM" value="">
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
             <select class="form-control" id="selectPTID">
                 <option selected value = ''>--- Payment Type ---</option>
                 <option disabled>------</option>
             </select>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+            <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM" value="">
         </div>
     </div>
 </div>

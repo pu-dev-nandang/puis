@@ -1621,7 +1621,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         error_reporting(0);
         $arr = array();
         $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description 
-                from db_finance.Payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
                 join db_academic.semester as c on a.SemesterID = c.ID
                 join db_finance.payment_type as d on a.PTID = d.ID where a.NPM = ? limit 1';
         $query=$this->db->query($sql, array($NPM))->result_array();

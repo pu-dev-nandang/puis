@@ -331,7 +331,7 @@ $route['finance/tagihan-mhs/set-edit-cicilan-tagihan-mhs/submit'] =  'page/finan
 $route['finance/tagihan-mhs/set-delete-cicilan-tagihan-mhs/submit'] =  'page/finance/c_finance/delete_cicilan_tagihan_mhs_submit';
 $route['finance/tagihan-mhs/penerimaan-tagihan-mhs'] =  'page/finance/c_finance/penerimaan_tagihan_mhs';
 $route['finance/get_pembayaran_mhs/(:num)'] =  'page/finance/c_finance/get_pembayaran_mhs/$1';
-$route['finance/export_excel'] =  'page/finance/c_finance/testExcel';
+$route['finance/export_excel'] =  'page/finance/c_finance/export_excel';
 $route['finance/check-va'] =  'page/finance/c_finance/check_va';
 $route['finance/check-va-cari'] =  'page/finance/c_finance/check_va_cari';
 
