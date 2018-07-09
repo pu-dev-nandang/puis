@@ -150,32 +150,13 @@
                     </li>
                 </ul>
             </li>
-            <li class="">
-                <a href="#">
+            <li class="<?php if($this->uri->segment(2)=='check-va'){echo "current";} ?>">
+                <a href="<?php echo base_url('finance/check-va'); ?>">
                     <i class="fa fa-refresh"></i>
                     Check VA
                 </a>
             </li>
-            <li class="">
-                <a href="#">
-                    <i class="fa fa-calendar"></i>
-                    Tanggal Cair
-                </a>
-            </li>
-            <li class="">
-                <a href="#">
-                    <i class="fa fa-user-secret"></i>
-                    Mr. X
-                </a>
-            </li>
-
-
-
-
         </ul>
-
-
-
         <div class="sidebar-widget align-center">
             <div class="btn-group" data-toggle="buttons" id="theme-switcher">
                 <label class="btn active">

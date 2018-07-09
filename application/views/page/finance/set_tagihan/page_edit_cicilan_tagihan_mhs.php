@@ -73,7 +73,7 @@
 
     $(document).on('click','#idbtn-cari', function () {
         var NPM = $("#NIM").val();
-        result = Validation_required(NPM,NPM);
+        result = Validation_required(NPM,'NPM');
         if (result['status'] == 0) {
           toastr.error(result['messages'], 'Failed!!');
         }
