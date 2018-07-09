@@ -57,6 +57,9 @@
 	define("url_registration","http://localhost/registeronline/", true);
 	define("serverRoot","http://pcam.podomorouniversity.ac.id", true);
 	define("url_pas","http://pcam.podomorouniversity.ac.id/", true);
+	define("url_img_employees",url_pas."uploads/employees/", true);
+	define("url_img_students",url_pas."uploads/students/", true);
+
 	define("url_pcam","http://pcam.podomorouniversity.ac.id/dashboard", true);
 	define("url_students","http://studentpu.podomorouniversity.ac.id/home", true);
 	define("url_lecturers","http://lecturerpu.podomorouniversity.ac.id/home", true);

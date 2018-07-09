@@ -139,7 +139,8 @@
                 dataForm : {
                     ProdiID :  formProdi.split('.')[0],
                     Year : formCurriculum.split('.')[1],
-                    NIP : formlecturer
+                    NIP : formlecturer,
+                    Status : '1'
                 },
                 dataNPM : dataNPM
             };

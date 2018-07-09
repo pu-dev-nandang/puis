@@ -54,7 +54,7 @@ class C_rest extends CI_Controller {
             if($user['user']=='lecturer'){
                 $data = $this->m_api->__checkDateKRSLecturer($dataToken['date']);
             } else {
-                $data = $this->m_api->__checkDateKRS($dataToken['date'],$dataToken['NPM']);
+                $data = $this->m_api->__checkDateKRS($dataToken['SemesterIDActive'],$dataToken['date'],$dataToken['ProdiID'],$dataToken['NPM'],$dataToken['DB_std']);
             }
 
             return print_r(json_encode($data));

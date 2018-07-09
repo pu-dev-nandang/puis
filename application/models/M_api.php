@@ -1115,12 +1115,25 @@ class M_api extends CI_Model {
         return $query;
     }
 
-    public function __checkDateKRS($date,$NPM){
-        $data = $this->db->query('SELECT ay.krsStart,ay.krsEnd,ay.SemesterID FROM db_academic.semester s 
-                                            JOIN db_academic.academic_years ay ON (ay.SemesterID = s.ID)
+    public function __checkDateKRS($SemesterIDActive,$date,$ProdiID,$NPM,$DB_std){
+
+        // Cek apakah ada special casenya
+        $dataSC = $this->db->query('SELECT * FROM db_academic.academic_years_special_case WHERE SemesterID = "'.$SemesterIDActive.'"
+                                              AND AcademicDescID = 1 AND UserID = "'.$ProdiID.'" AND Status = "2"
+                                               AND Start <= "'.$date.'" AND End >= "'.$date.'" ')->result_array();
+
+        if(count($dataSC)>0){
+            $data[0] = array(
+                'SemesterID' => $SemesterIDActive,
+                'krsStart' => $dataSC[0]['Start'],
+                'krsEnd' => $dataSC[0]['End'],
+            );
+        } else {
+            $data = $this->db->query('SELECT ay.krsStart,ay.krsEnd,ay.SemesterID FROM  db_academic.academic_years ay
                                             WHERE ay.krsStart <= "'.$date.'" 
                                             AND ay.krsEnd >= "'.$date.'" 
-                                            AND s.Status = 1 ')->result_array();
+                                            AND ay.SemesterID = "'.$SemesterIDActive.'" ')->result_array();
+        }
 
         $dataCekbayarBPP = $this->db->query('SELECT p.* FROM db_academic.semester s
                                                     LEFT JOIN db_finance.payment p ON (s.ID = p.SemesterID) 
