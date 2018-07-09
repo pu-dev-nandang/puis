@@ -129,9 +129,10 @@ class C_api extends CI_Controller {
                 $Position = $dataPosition['Position'];
             }
 
+            $imgEmp = url_img_employees.''.$row["Photo"];
             $nestedData[] = $row["NIP"];
             $nestedData[] = $row["NIDN"];
-            $nestedData[] = '<div style="text-align: center;"><img src="http://siak.podomorouniversity.ac.id/includes/foto/'.$row["Photo"].'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
+            $nestedData[] = '<div style="text-align: center;"><img src="'.$imgEmp.'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
             $nestedData[] = '<a href="'.base_url('database/lecturer-details/'.$row["NIP"]).'" style="font-weight: bold;">'.$row["Name"].'</a>';
             $nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
             $nestedData[] = $Division.' - '.$Position;
@@ -768,6 +769,29 @@ class C_api extends CI_Controller {
                 $this->db->where('ID', $id);
                 $this->db->delete('db_academic.academic_years_special_case');
 
+                return print_r(1);
+            }
+            else if($data_arr['action']=='insertSCKRS'){
+                $dataForm = (array) $data_arr['dataForm'];
+                $this->db->insert('db_academic.academic_years_special_case', $dataForm);
+                return print_r(1);
+            }
+            else if ($data_arr['action']=='readSCKRS'){
+                $SemesterID = $data_arr['SemesterID'];
+
+                $data = $this->db->query('SELECT aysc.ID,ps.ID AS ProdiID,ps.Code, aysc.Start, aysc.End 
+                                              FROM db_academic.academic_years_special_case aysc
+                                              LEFT JOIN db_academic.program_study ps ON (ps.ID = aysc.UserID)
+                                              WHERE aysc.SemesterID = "'.$SemesterID.'" 
+                                              AND aysc.Status = "2" ')->result_array();
+
+
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='deleteSCKRS'){
+                $ID = $data_arr['ID'];
+                $this->db->delete('db_academic.academic_years_special_case',
+                    array('ID'=>$ID));
                 return print_r(1);
             }
         }

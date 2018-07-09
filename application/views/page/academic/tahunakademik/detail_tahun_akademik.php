@@ -11,6 +11,10 @@
         background-color: #fff;
         color: #333;
     }
+
+    #tableSPKRS tr th, #tableSPKRS tr td {
+        text-align: center;
+    }
 </style>
 
 <a href="<?php echo base_url('academic/tahun-akademik'); ?>" id="btnBack" class="btn btn-info"><i class="fa fa-arrow-circle-left right-margin" aria-hidden="true"></i> Back</a>
@@ -20,7 +24,6 @@
 <div class="alert alert-info" role="alert">
     <b><span id="nameTahunAkademik"></span></b>
 </div>
-
 
 <!--<input id="formSemesterID" value="--><?php //echo $ID; ?><!--" readonly />-->
 <table class="table table-bordered table-striped" id="tableDetailTA">
@@ -60,7 +63,7 @@
             <input type="text" id="krs_end" name="regular" class="form-control form-tahun-akademik form-next">
         </td>
         <td>
-            <a href="javascript:void(0);" data-head="KRS" data-load="prodi" class="btn btn-sm btn-warning btn-block more_details">Special Case</a>
+            <a href="javascript:void(0);" id="idBtnSPKRS" data-head="KRS" data-load="prodi" class="btn btn-sm btn-warning btn-block">Special Case</a>
         </td>
     </tr>
     <tr>
@@ -194,14 +197,6 @@
     });
 
     $('#btnSaveDetail').click(function () {
-        // var k = $('#krs_start').datepicker("getDate");
-        // log(k);
-        //
-        // if(k==null){
-        //     alert(123)
-        // }
-        //
-        // return false;
 
         var data = {
             action : 'edit',
@@ -231,9 +226,6 @@
             }
         };
 
-        // console.log(data);
-        // return false;
-
         loading_button('#btnSaveDetail');
         $('.form-tahun-akademik,#btnBack').prop('disabled',true);
 
@@ -245,12 +237,6 @@
                 $('.form-tahun-akademik,#btnBack').prop('disabled',false);
             },2000);
         });
-
-        // console.log(data);
-
-        // var krsStart = ;
-        // log(krsStart);
-        // log();
 
     });
 
@@ -331,59 +317,64 @@
 </script>
 
 <script>
-    $(document).on('click','.more_details',function () {
-        var head = $(this).attr('data-head');
-        var Type = $(this).attr('data-type');
+    $('#idBtnSPKRS').click(function () {
 
-        if(Type!=''){
-            var AcademicDescID = Type.split('.')[0].trim();
-            var Status = Type.split('.')[1].trim();
-        }
+        loadDataSPKRS();
 
-        var body = '<div class="well"><select class="select2-select-00 full-width-fix" size="5" id="formTeaching"><option></option></select>' +
-            '<input id="formAcademicDescID" value="'+AcademicDescID+'" class="hide" hidden /> ' +
-            '<input id="formStatus" value="'+Status+'" class="hide" hidden /> ' +
-            '<hr/>' +
-            '<div id="divMK"></div> ' +
-            '<hr/>' +
-            '<div class="row">' +
-            '   <div class="col-xs-6">' +
-            '       <input type="text" id="formSc_start" nextelement="formSc_end" name="regular" class="form-control form-tahun-akademik" readonly>' +
-            '   </div>' +
-            '   <div class="col-xs-6">' +
-            '       <input type="text" id="formSc_end" name="regular" class="form-control form-tahun-akademik" readonly>' +
-            '   </div>' +
+        var dataBody = '<div class="well">' +
+            '    <div class="row">' +
+            '        <div class="col-xs-12">' +
+            '            <div class="form-group">' +
+            '                <label>Prodi</label>' +
+            '                <select class="form-control" id="formProdi_SPKRS"></select>' +
+            '            </div>' +
+            '        </div>' +
+            '        <div class="col-xs-6">' +
+            '            <label>Start</label>' +
+            '            <input id="formStart_SPKRS" class="form-control form-tahun-akademik" readonly>' +
+            '        </div>' +
+            '        <div class="col-xs-6">' +
+            '            <label>End</label>' +
+            '            <input id="formEnd_SPKRS" class="form-control form-tahun-akademik" readonly>' +
+            '           <button id="btnSave_SPKRS" class="btn btn-primary" style="float: right;margin-top:15px;">Save</button>' +
+            '        </div>' +
+            '    </div>' +
             '</div>' +
             '<div class="row">' +
-            '   <div class="col-md-12" style="text-align: right;">' +
-            '       <button class="btn btn-success" id="btnSaveSc" style="margin-top: 15px;">Save</button>' +
-            '   </div>' +
-            '   <div class="col-md-12">' +
-            '       <div id="divMsg"></div>' +
-            '   </div>' +
-            '</div>' +
-            '</div>' +
-            '<hr/>' +
-            '<div id="divtableSC"></div>';
-
+            '    <div class="col-xs-12">' +
+            '        <table class="table table-bordered" id="tableSPKRS">' +
+            '            <thead>' +
+            '            <tr style="background: #437e88;color: #ffffff;">' +
+            '                <th style="width: 15%;">Prodi</th>' +
+            '                <th>Start</th>' +
+            '                <th>End</th>' +
+            '                <th style="width: 15%;">Act</th>' +
+            '            </tr>' +
+            '            </thead>' +
+            '           <tbody id="dataTrSPKRS"></tbody>' +
+            '        </table>' +
+            '    </div>' +
+            '</div>';
 
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
             '<span aria-hidden="true">&times;</span></button>' +
-            '<h4 class="modal-title">Special Case - '+head+'</h4>');
-        $('#GlobalModal .modal-body').html(body);
+            '<h4 class="modal-title">Special Case - KRS</h4>');
+        $('#GlobalModal .modal-body').html(dataBody);
         $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
 
-        loadSelectOptionLecturersSingle('#formTeaching','');
-        $('#formTeaching').select2({allowClear: true});
-        $('#formSc_start').datepicker({
+        $('#formProdi_SPKRS').empty();
+        $('#formProdi_SPKRS').append('<option value="" disabled selected>--- Select Program Study ---</option>' +
+            '<option disabled>------------------------------------------</option>');
+        loadSelectOptionBaseProdi('#formProdi_SPKRS','');
+
+        $('#formStart_SPKRS').datepicker({
             showOtherMonths:true,
             autoSize: true,
             dateFormat: 'dd MM yy',
             // minDate: new Date(moment().year(),moment().month(),moment().date()),
             onSelect : function () {
                 var data_date = $(this).val().split(' ');
-                var nextelement = $(this).attr('nextelement')
-                nextDatePick(data_date,nextelement);
+                nextDatePick(data_date,'formEnd_SPKRS');
             }
         });
 
@@ -391,173 +382,33 @@
             'show' : true,
             'backdrop' : 'static'
         });
-
-        loadDataSc(ID,AcademicDescID);
-
-
     });
 
-    $(document).on('change','#formTeaching',function () {
-        var formTeaching = $('#formTeaching').val();
-        if(formTeaching!=''){
-            //var ID = "<?php //echo $CDID; ?>//";
-            var token = jwt_encode({action:'schedule',SemesterID:ID,NIP:formTeaching},'UAP)(*');
-            var url = base_url_js+'api/__crudDataDetailTahunAkademik';
-            $('#divMK').html('');
-            $.post(url,{token:token},function (jsonResult) {
-                if(jsonResult.length>0){
-                    for(var i=0;i<jsonResult.length;i++){
-                        var dt = jsonResult[i];
-                        $('#divMK').append('<div class="checkbox">' +
-                            '  <label>' +
-                            '    <input type="checkbox" value="'+dt.ScheduleID+'|'+dt.NameEng+'">'+dt.ClassGroup+' | '+dt.NameEng+
-                            '  </label>' +
-                            '</div>');
-                    }
-                } else {
-                    $('#divMK').html('<b>--- No Course ---</b>');
-                }
+    function loadDataSPKRS() {
 
-            });
-        }
-    });
-
-    $(document).on('click','#btnSaveSc',function () {
-        var c = checkAllCourse();
-        var NIP = $('#formTeaching').val();
-
-        var dataStart = $('#formSc_start').datepicker("getDate");
-        var dataEnd = $('#formSc_end').datepicker("getDate");
-
-        if(dataStart!=null && dataEnd!=null && NIP!='' && c.length>0){
-
-            loading_buttonSm('#btnSaveSc');
-            $('#divMsg').html('');
-
-            var Start = moment(dataStart).format('YYYY-MM-DD');
-            var End = moment(dataEnd).format('YYYY-MM-DD');
-            var formAcademicDescID = $('#formAcademicDescID').val();
-            var formStatus = $('#formStatus').val();
-
-            var dataSc = [];
-            for(var s=0;s<c.length;s++){
-                var ex = c[s].split('|');
-                var d = {
-                    Course : ex[1],
-                    Details : {
-                        SemesterID : ID,
-                        AcademicDescID : formAcademicDescID,
-                        UserID : NIP,
-                        DataID : ex[0].trim(),
-                        Start : Start,
-                        End : End,
-                        Status : ''+formStatus
-                    }
-                };
-                dataSc.push(d);
-            }
-
-            var token = jwt_encode({action:'insertSC',dataForm:dataSc},'UAP)(*');
-            var url = base_url_js+'api/__crudDataDetailTahunAkademik';
-
-            $.post(url,{token:token},function (jsonResult) {
-
-                setTimeout(function () {
-                    if(jsonResult.length>0){
-                        $('#divMsg').html('<div class="thumbanial" style="margin-top: 15px;padding: 10px;background: #ffffff;border: 1px solid #FF9800;"><div id="msg"></div></div>');
-                        for(var d=0;d<jsonResult.length;d++){
-                            var data = jsonResult[d];
-                            var color = (data.Status=='1') ? 'style="color: green;"' : 'style="color: red;"';
-                            var icn = (data.Status=='1') ? '<i '+color+' class="fa fa-check-circle"></i>' : '<i '+color+' class="fa fa-times-circle"></i>';
-
-                            $('#msg').append('<div style="border-bottom: 1px solid #ddd;padding-bottom: 5px;margin-bottom: 5px;">' +
-                                '<span>'+icn+' '+data.Course+'</span><br/>' +
-                                '<i '+color+'>'+data.Msg+'</i>' +
-                                '</div>');
-
-                            if(data.Status=='1'){
-                                var dc = data.Details;
-                                $('#dtSC').append('<tr id="trSC'+dc.ID+'">' +
-                                    '<td><b>'+dc.Lecturers+'</b><br/>'+dc.ClassGroup+' | '+dc.NameEng+'</td>' +
-                                    '<td style="text-align: center;">'+moment(dc.Start).format('DD MMM YYYY')+' - '+moment(dc.End).format('DD MMM YYYY')+'</td>' +
-                                    '<td style="text-align: center;"><button class="btn btn-danger btn-delete-aysco" data-id="'+dc.ID+'"><i class="fa fa-trash" aria-hidden="true"></i></button></td>' +
-                                    '</tr>');
-                            }
-                        }
-                    }
-                    $('#btnSaveSc').html('Save').prop('disabled',false);
-                },1000);
-            });
-
-        } else {
-            toastr.error('Form Required','Error');
-        }
-
-    });
-
-
-    $(document).on('click','.btn-delete-aysco',function () {
-        var ID = $(this).attr('data-id');
-        var token = jwt_encode({action:'deleteSC',ID:ID},'UAP)(*');
         var url = base_url_js+'api/__crudDataDetailTahunAkademik';
+        var data = {
+            action : 'readSCKRS',
+            SemesterID : ID
+        };
 
-        var el = '.btn-delete-aysco[data-id='+ID+']';
-        loading_buttonSm(el);
+        var token = jwt_encode(data,'UAP)(*');
+        $('#dataTrSPKRS').empty();
         $.post(url,{token:token},function (jsonResult) {
-            setTimeout(function () {
-                $('#trSC'+ID).remove();
-            },1000);
-        });
-
-    });
-
-
-    function checkAllCourse() {
-        var allVals = [];
-        $('#divMK :checked').each(function() {
-            allVals.push($(this).val());
-        });
-
-        return allVals;
-    }
-
-    function loadDataSc(ID,AcademicDescID) {
-        var token = jwt_encode({action:'dataSC',SemesterID:ID,AcademicDescID:AcademicDescID},'UAP)(*');
-        var url = base_url_js+'api/__crudDataDetailTahunAkademik';
-        $.post(url,{token:token},function (jsonResult) {
-
-            $('#divtableSC').html('<table id="tableSC" class="table table-bordered">' +
-                '<thead>' +
-                '   <tr style="background: #437e88;color: #ffffff;">' +
-                '       <th>User</th>' +
-                '       <th style="width: 45%;">Detail</th>' +
-                '       <th style="width: 5%;">Action</th>' +
-                '   </tr>' +
-                '</thead>' +
-                '<tbody id="dtSC"></tbody>' +
-                '</table>');
 
             if(jsonResult.length>0){
-
-                // $('#dtSC').empty();
-                for(var t=0;t<jsonResult.length;t++){
-                    var dc = jsonResult[t];
-                    $('#dtSC').append('<tr id="trSC'+dc.ID+'">' +
-                        '<td><b>'+dc.Lecturers+'</b><br/>'+dc.ClassGroup+' | '+dc.NameEng+'</td>' +
-                        '<td style="text-align: center;">'+moment(dc.Start).format('DD MMM YYYY')+' - '+moment(dc.End).format('DD MMM YYYY')+'</td>' +
-                        '<td style="text-align: center;"><button class="btn btn-danger btn-delete-aysco" data-id="'+dc.ID+'"><i class="fa fa-trash" aria-hidden="true"></i></button></td>' +
+                for(var i=0;i<jsonResult.length;i++){
+                    var d = jsonResult[i];
+                    $('#dataTrSPKRS').append('<tr id="rwTr'+d.ID+'">' +
+                        '<td>'+d.Code+'</td>' +
+                        '<td>'+moment(d.Start).format('DD MMM YYYY')+'</td>' +
+                        '<td>'+moment(d.End).format('DD MMM YYYY')+'</td>' +
+                        '<td><button data-id="'+d.ID+'" class="btn btn-danger btn-delete-aysc-krs"><i class="fa fa-trash" aria-hidden="true"></i></button></td>' +
                         '</tr>');
+                    $('#formProdi_SPKRS option[value="'+d.ProdiID+'.'+d.Code+'"]')
+                        .prop('disabled',true).css('background','#00800040');
                 }
-
-                $('#tableSC').DataTable({
-                    "sDom": "<'row'<'dataTables_header clearfix'<'col-md-3'><'col-md-9'f>r>>t<'row'<'dataTables_footer clearfix'<'col-md-12'p>>>", // T is new
-                    'bLengthChange' : false,
-                    'bInfo' : false,
-                    'pageLength' : 7
-                });
             }
-
-
         });
 
     }
