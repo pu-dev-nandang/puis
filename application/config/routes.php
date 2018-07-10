@@ -341,6 +341,7 @@ $route['finance/check-va-cari'] =  'page/finance/c_finance/check_va_cari';
 
 
 
+
 // ---global---
 $route['loadDataRegistrationBelumBayar'] =  'api/C_global/loadDataRegistrationBelumBayar';
 $route['loadDataRegistrationTelahBayar'] =  'api/C_global/load_data_registration_telah_bayar';
@@ -355,6 +356,8 @@ $route['save2pdf/news-event'] =  'c_save_to_pdf/news_event';
 $route['save2pdf/attendance-list'] =  'c_save_to_pdf/attendance_list';
 
 $route['save2pdf/report-uts'] =  'c_save_to_pdf/report_uts';
+
+$route['save2pdf/getpdfkwitansi/(:any)'] =  'c_save_to_pdf/getpdfkwitansi/$1';
 
 
 // ====== API ======
