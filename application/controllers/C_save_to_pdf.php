@@ -661,4 +661,96 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Output();
 
     }
+
+    public function getpdfkwitansi($token)
+    {
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+        // print_r($data_arr);
+
+        $pdf = new FPDF('l','mm','A5');
+        // membuat halaman baru
+        $pdf->AddPage();
+
+        $pdf->SetMargins(10,10,10,10);
+        $pdf->SetAutoPageBreak(true, 0);
+        
+        // Logo
+        $pdf->Image('./images/logo_tr.png',5,5,50);
+        
+        $pdf->SetFont('Arial','',20);
+        $pdf->Cell(200, 0, 'Kwitansi Pembayaran Mahasiswa', 0, 1, 'C', 0);
+        
+        $pdf->SetFont('Arial','',15);
+        $pdf->Cell(200, 15, 'Tahun Akademik', 0, 1, 'C', 0);
+
+        $pdf->SetFont('Arial','',15);
+        $pdf->Cell(200, 0, $data_arr['semester'], 0, 1, 'C', 0);
+
+        $pdf->Line(10, 30, 200, 30);
+
+        $pdf->Cell(200, 7, '', 0, 1, 'C', 0);
+        
+        $pdf->SetFont('Arial','',10);
+        $pdf->Cell(100, 5, '', 0, 0, 'C');
+        $this->load->model('master/m_master');
+        $date = date('Y-m-d');
+        $date = $this->m_master->getIndoBulan($date);
+        $pdf->Cell(90, 5, 'Tanggal Cetak : '.$date, 0, 1, 'R');
+
+        $pdf->Cell(35, 7, 'Nama', 0, 0, 'L');
+        $pdf->Cell(5, 7, ':', 0, 0, 'L');
+        $pdf->Cell(100, 7, $data_arr['nama'], 0, 1, 'L');
+
+        $pdf->Cell(35, 7, 'NPM', 0, 0, 'L');
+        $pdf->Cell(5, 7, ':', 0, 0, 'L');
+        $pdf->Cell(100, 7, $data_arr['npm'], 0, 1, 'L');
+
+        $pdf->Cell(35, 7, 'Tipe Pembayaran', 0, 0, 'L');
+        $pdf->Cell(5, 7, ':', 0, 0, 'L');
+        $pdf->Cell(100, 7, $data_arr['ptid'], 0, 1, 'L');
+
+        $pdf->Cell(35, 7, 'Program Studi', 0, 0, 'L');
+        $pdf->Cell(5, 7, ':', 0, 0, 'L');
+        $pdf->Cell(100, 7, $data_arr['prodi'], 0, 1, 'L');
+
+        $pdf->Cell(35, 7, 'Virtual Account', 0, 0, 'L');
+        $pdf->Cell(5, 7, ':', 0, 0, 'L');
+        $pdf->Cell(100, 7, $data_arr['va'], 0, 1, 'L');
+
+        $pdf->Cell(35, 7, 'BilingID', 0, 0, 'L');
+        $pdf->Cell(5, 7, ':', 0, 0, 'L');
+        $pdf->Cell(100, 7, $data_arr['bilingid'], 0, 1, 'L');
+
+        $pdf->Cell(35, 7, 'Invoice', 0, 0, 'L');
+        $pdf->Cell(5, 7, ':', 0, 0, 'L');
+        $pdf->Cell(100, 7, $data_arr['invoice'], 0, 1, 'L');
+
+        $pdf->Cell(35, 7, 'Waktu Pembayaran', 0, 0, 'L');
+        $pdf->Cell(5, 7, ':', 0, 0, 'L');
+        $pdf->Cell(100, 7, $data_arr['Time'], 0, 1, 'L');
+
+        $pdf->Cell(200, 7, '', 0, 1, 'C', 0);
+        $pdf->Cell(190, 7, 'Note : ', 0, 1, 'L');
+        $pdf->Cell(190, 7, 'Kwitansi ini merupakan bukti pembayaran yang diterbitkan oleh Podomoro University.', 0, 1, 'L');
+        $pdf->Cell(190, 7, 'Jika terdapat kekeliruan harap hubungi bagian Admisi dibawah ini.', 0, 1, 'L');
+
+        $pdf->Line(10, 135, 200, 135);
+        $setY = 135;
+        $pdf->SetFont('Arial','',6);
+        $pdf->SetXY(40,$setY);
+        $pdf->SetTextColor(0,0,0);
+        $pdf->Cell(190, 5, 'Admission Office :  Central Park Mall, Lantai 3, Unit 112, Podomoro City, JL Letjen S. Parman Kav.28, Jakarta Barat 11470', 0, 1, 'L', 0);
+
+        $setY = 138;
+        $pdf->SetFont('Arial','',6);
+        $pdf->SetXY(43,$setY);
+        $pdf->SetTextColor(0,0,0);
+        // $this->mypdf->SetFillColor(0,0,0);
+        $pdf->Cell(190, 5, 'Telp : (021) 292 00 456    Email : admission@podomorouniversity.ac.id   Website : www.podomorouniversity.ac.id', 0, 1, 'L', 0);
+
+        $pdf->AliasNbPages();    
+
+        $pdf->Output();
+    }
 }

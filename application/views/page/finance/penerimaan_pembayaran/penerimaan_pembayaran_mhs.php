@@ -179,9 +179,22 @@
       var invoice = $(this).attr('invoice');
       var nama = $(this).attr('nama');
       var prodi = $(this).attr('prodi');
+      var Time = $(this).attr('Time');
 
-      
-      
+      var data = {
+         npm : npm,
+         semester : semester,
+         ptid : ptid,
+         va : va,
+         bilingid : bilingid,
+         invoice : invoice,
+         nama : nama,
+         prodi : prodi,
+         Time : Time,
+       };
+       var token = jwt_encode(data,"UAP)(*");
+      window.open(base_url_js+'save2pdf/getpdfkwitansi/'+token,'_blank');
+
     });
 
     $(document).on("click", ".pagination li a", function(event){
@@ -253,7 +266,7 @@
                 if (Data_mhs.length > 0) {
                         for (var i = 0; i < Data_mhs.length; i++) {
                             var yy = (Data_mhs[i]['InvoiceStudents'] != '') ? formatRupiah(Data_mhs[i]['InvoiceStudents']) : '-';
-                            var btnPrint = '<span data-smt="'+Data_mhs[i]['ID_payment_students']+'" class="btn btn-xs btn-print" NPM = "'+Data_mhs[i]['NPM']+'" Semester = "'+Data_mhs[i]['SemesterName']+'" PTID = "'+Data_mhs[i]['PTIDDesc']+'" VA = "'+Data_mhs[i]['VA']+'" BilingID = "'+Data_mhs[i]['BilingID']+'" Invoice = "'+yy+'" Nama = "'+Data_mhs[i]['Nama']+'"  Prodi = "'+Data_mhs[i]['ProdiEng']+'"><i class="fa fa-print"></i> Print</span>';
+                            var btnPrint = '<span data-smt="'+Data_mhs[i]['ID_payment_students']+'" class="btn btn-xs btn-print" NPM = "'+Data_mhs[i]['NPM']+'" Semester = "'+Data_mhs[i]['SemesterName']+'" PTID = "'+Data_mhs[i]['PTIDDesc']+'" VA = "'+Data_mhs[i]['VA']+'" BilingID = "'+Data_mhs[i]['BilingID']+'" Invoice = "'+yy+'" Nama = "'+Data_mhs[i]['Nama']+'"  Prodi = "'+Data_mhs[i]['ProdiEng']+'" Time = "'+Data_mhs[i]['Time']+'"><i class="fa fa-print"></i> Print</span>';
                             $('#dataRow').append('<tr>' +
                                 '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
                                 '<td>'+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
