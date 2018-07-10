@@ -170,6 +170,20 @@
 
     });
 
+    $(document).on("click", ".btn-print", function(event){
+      var npm = $(this).attr('npm');
+      var semester = $(this).attr('semester');
+      var ptid = $(this).attr('ptid');
+      var va = $(this).attr('va');
+      var bilingid = $(this).attr('bilingid');
+      var invoice = $(this).attr('invoice');
+      var nama = $(this).attr('nama');
+      var prodi = $(this).attr('prodi');
+
+      
+      
+    });
+
     $(document).on("click", ".pagination li a", function(event){
       event.preventDefault();
       var page = $(this).attr("data-ci-pagination-page");
@@ -214,12 +228,13 @@
                             '<thead>'+
                             '<tr style="background: #333;color: #fff;">'+
                             '    <th style="width: 12%;">Program Study</th>'+
-                            '    <th style="width: 20%;">Nama</th>'+
+                            '    <th style="width: 20%;">Nama,NPM & VA</th>'+
                             '    <th style="width: 5%;">Payment Type</th>'+
                             '    <th style="width: 5%;">BilingID</th>'+
                             '    <th style="width: 10%;">Invoice</th>'+
+                            '    <th style="width: 10%;">Time</th>'+
                             '    <th style="width: 20%;">Ket</th>'+
-                            '    <th style="width: 5%;">Cetak Faktur</th>'+
+                            '    <th style="width: 5%;">Cetak Kwitansi</th>'+
                             '</tr>'+
                             '</thead>'+
                             '<tbody id="dataRow"></tbody>'+
@@ -238,13 +253,14 @@
                 if (Data_mhs.length > 0) {
                         for (var i = 0; i < Data_mhs.length; i++) {
                             var yy = (Data_mhs[i]['InvoiceStudents'] != '') ? formatRupiah(Data_mhs[i]['InvoiceStudents']) : '-';
-                            var btnPrint = '<span data-smt="'+Data_mhs[i]['ID_payment_students']+'" class="btn btn-xs btn-print"><i class="fa fa-print"></i> Print</span>';
+                            var btnPrint = '<span data-smt="'+Data_mhs[i]['ID_payment_students']+'" class="btn btn-xs btn-print" NPM = "'+Data_mhs[i]['NPM']+'" Semester = "'+Data_mhs[i]['SemesterName']+'" PTID = "'+Data_mhs[i]['PTIDDesc']+'" VA = "'+Data_mhs[i]['VA']+'" BilingID = "'+Data_mhs[i]['BilingID']+'" Invoice = "'+yy+'" Nama = "'+Data_mhs[i]['Nama']+'"  Prodi = "'+Data_mhs[i]['ProdiEng']+'"><i class="fa fa-print"></i> Print</span>';
                             $('#dataRow').append('<tr>' +
                                 '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
-                                '<td>'+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'</td>' +
+                                '<td>'+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
                                 '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +
                                 '<td>'+Data_mhs[i]['BilingID']+'</td>' +
                                 '<td>'+yy+'</td>' +
+                                '<td>'+Data_mhs[i]['Time']+'</td>' +
                                 '<td>'+Data_mhs[i]['Cicilan']+'</td>' +
                                 '<td>'+btnPrint+'</td>' +
                                 '</tr>');
