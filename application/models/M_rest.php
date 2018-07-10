@@ -126,12 +126,51 @@ class M_rest extends CI_Model {
                         $LecturerCoor = $data[$sc]['TitleAhead'].' '.$data[$sc]['Name'].' '.$data[$sc]['TitleBehind'];
                         $data[$sc]['Lecturer'] = trim($LecturerCoor);
 
-                        $dataSchedule = $this->db->query('SELECT sd.StartSessions,sd.EndSessions,cl.Room,d.Name AS Day, d.NameEng AS DayEng FROM db_academic.schedule_details sd
+                        $dataSchedule = $this->db->query('SELECT sd.ID AS SDID, sd.StartSessions,sd.EndSessions,cl.Room,d.Name AS Day, d.NameEng AS DayEng 
+                                                                      FROM db_academic.schedule_details sd
                                                                       LEFT JOIN db_academic.classroom cl ON (cl.ID=sd.ClassroomID)
                                                                       LEFT JOIN db_academic.days d ON (d.ID=sd.DayID)
                                                                       WHERE sd.ScheduleID = "'.$data[$sc]['ScheduleID'].'"
                                                                        ORDER BY d.ID ASC')->result_array();
+                        // Get Attendance
+                        if(count($dataSchedule)>0){
+                            $meeting = 0;
+                            $Totalpresen = 0;
+                            for($sds=0;$sds<count($dataSchedule);$sds++){
+                                $dataAttd = $this->db->query('SELECT attd_s.* FROM db_academic.attendance_students attd_s 
+                                                          LEFT JOIN db_academic.attendance attd ON (attd.ID = attd_s.ID_Attd)
+                                                          WHERE attd.SemesterID = "'.$dataSemester[$i]['ID'].'" 
+                                                          AND attd.ScheduleID = "'.$data[$sc]['ScheduleID'].'"
+                                                          AND attd.ScheduleID = "'.$data[$sc]['ScheduleID'].'"
+                                                          AND attd.SDID = "'.$dataSchedule[$sds]['SDID'].'"
+                                                           AND attd_s.NPM = "'.$NPM.'" ')->result_array();
+
+                                if(count($dataAttd)>0){
+                                    $presen = 0;
+                                    $ArrPresensi = [];
+                                    for($m=1;$m<=14;$m++){
+                                        $meeting += 1;
+                                        if($dataAttd[0]['M'.$m]=='1'){
+                                            $presen += 1;
+                                            $Totalpresen += 1;
+                                        }
+                                        array_push($ArrPresensi,$dataAttd[0]['M'.$m]);
+                                    }
+
+
+                                    $dataSchedule[$sds]['Presensi'] = $presen;
+                                    $dataSchedule[$sds]['AttendanceStudentDetails'] = $ArrPresensi;
+                                }
+                            }
+
+                        }
+
                         $data[$sc]['Schedule'] = $dataSchedule;
+
+                        // Menghitung preseni
+                        $PresensiArg = ($Totalpresen==0) ? 0 : ($Totalpresen/$meeting) * 100;
+                        $data[$sc]['AttendanceStudent'] = $PresensiArg;
+
                         $data[$sc]['TeamTeachingDetails'] = [];
 
                         if($data[$sc]['TeamTeaching']==1){
@@ -143,29 +182,7 @@ class M_rest extends CI_Model {
                             $data[$sc]['TeamTeachingDetails'] = $dataTT ;
                         }
 
-                        // Get Attendance
-                        $dataAttd = $this->db->query('SELECT * FROM db_academic.attendance_students attd_s 
-                                                          LEFT JOIN db_academic.attendance attd ON (attd.ID = attd_s.ID_Attd)
-                                                          WHERE attd.SemesterID = "'.$dataSemester[$i]['ID'].'" 
-                                                          AND attd.ScheduleID = "'.$data[$sc]['ScheduleID'].'"
-                                                           AND attd_s.NPM = "'.$NPM.'" ')->result_array();
 
-                        if(count($dataAttd)>0){
-                            $meeting = 0;
-                            $presen = 0;
-                            for($a=0;$a<count($dataAttd);$a++){
-                                for($m=1;$m<=14;$m++){
-                                    $meeting += 1;
-                                    if($dataAttd[$a]['M'.$m]=='1'){
-                                        $presen += 1;
-                                    }
-                                }
-                            }
-
-                            // Menghitung preseni
-                            $PresensiArg = ($presen==0) ? 0 : ($presen/$meeting) * 100;
-                            $data[$sc]['AttendanceStudent'] = $PresensiArg;
-                        }
 
                     }
 
