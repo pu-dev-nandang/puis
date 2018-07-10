@@ -1357,7 +1357,7 @@ class M_finance extends CI_Model {
     return $arr;
    }
 
-   public function get_pembayaran_mhs($ta,$prodi,$PTID,$NIM,$limit, $start)
+   public function get_pembayaran_mhs($ta,$prodi,$PTID,$NIM,$Semester,$limit, $start)
    {
     error_reporting(0);
     $arr = array();
@@ -1366,6 +1366,7 @@ class M_finance extends CI_Model {
     // join dengan table auth terlebih dahulu
     $PTID = ($PTID == '' || $PTID == Null) ? '' : ' and a.PTID = '.$PTID;
     $NIM = ($NIM == '' || $NIM == Null) ? 'where a.NPM like "%"' : ' where  a.NPM = '.$NIM;
+    $Semester = ($Semester == '' || $Semester == Null) ? '' : ' and a.SemesterID = '.$Semester;
     /*$SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
     $SemesterID = $SemesterID[0]['ID'];*/
     if ($ta == '') {
@@ -1381,7 +1382,7 @@ class M_finance extends CI_Model {
       $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description,e.ID as ID_payment_students,e.BilingID,e.Invoice as InvoiceStudents
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID join db_finance.payment_students as e on a.ID = e.ID_payment '.$NIM.$PTID.' 
+              join db_finance.payment_type as d on a.PTID = d.ID join db_finance.payment_students as e on a.ID = e.ID_payment '.$NIM.$PTID.$Semester.' 
               and e.Status = 1 order by e.ID asc LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array())->result_array();
       
@@ -1391,7 +1392,7 @@ class M_finance extends CI_Model {
       $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description,e.ID as ID_payment_students,e.BilingID,e.Invoice as InvoiceStudents
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID join db_finance.payment_students as e on a.ID = e.ID_payment '.$NIM.$PTID.' and b.Year = ? and e.Status = 1 
+              join db_finance.payment_type as d on a.PTID = d.ID join db_finance.payment_students as e on a.ID = e.ID_payment '.$NIM.$PTID.$Semester.' and b.Year = ? and e.Status = 1 
               order by e.ID asc LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array($ta1))->result_array();
     }
@@ -1533,5 +1534,12 @@ class M_finance extends CI_Model {
     return $rs;
 
    }
+
+   public function findPaymentBaseUnique($PTID,$SemesterID,$NPM)
+   {
+    $sql = 'select * from db_finance.payment where PTID = ? and SemesterID = ? and NPM = ?';
+    $query=$this->db->query($sql, array($PTID,$SemesterID,$NPM))->result_array();
+    return $query;
+   } 
 
 }

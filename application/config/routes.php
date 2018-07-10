@@ -224,6 +224,7 @@ $route['admission/master-registration/DataFormulirOffline/downloadPDFToken'] = '
 $route['admission/config/upload-pdf-per-pengumuman'] = 'page/admission/c_master/upload_pengumuman';
 
 $route['fileGet/(:any)'] = 'page/admission/c_master/fileGet/$1';
+$route['download/(:any)'] = 'page/admission/c_master/download/$1';
 
 
 

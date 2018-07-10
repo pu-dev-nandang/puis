@@ -45,11 +45,7 @@
       <hr/>
       <div class="col-md-12">
         <div class="DTTT btn-group">
-          <a class="btn DTTT_button_xls" id="ToolTables_DataTables_Table_0_0">
-            <span><i class="fa fa-download" aria-hidden="true"></i> 
-              Excel
-            </span>
-          </a>
+          <button type="button" class="btn btn-convert" id="export_excel"><i class="fa fa-download" aria-hidden="true"></i> Excel</button>
           <!--<a class="btn DTTT_button_pdf" id="ToolTables_DataTables_Table_0_1">
             <span><i class="fa fa-download" aria-hidden="true"></i> PDF
             </span>
@@ -60,8 +56,6 @@
             <div class="input-group">
               <div class="thumbnail" style="min-height: 30px;padding: 10px;">
                   <select class="form-control" id="selectSemester">
-                      <option selected value = ''>--- All Semester ---</option>
-                      <option disabled>------</option>
                   </select>
               </div>
             </div>
@@ -112,6 +106,7 @@
         loadSelectOptionCurriculum('#selectCurriculum','');
         loadSelectOptionBaseProdi('#selectProdi','');
         loadSelectOptionPaymentTypeMHS('#selectPTID','');
+        loadSelectOptionSemester('#selectSemester',0);
         loadData(1);
         getReloadTableSocket();
     });
@@ -125,6 +120,10 @@
     });
 
     $('#selectPTID').change(function () {
+        loadData(1);
+    });
+
+    $('#selectSemester').change(function () {
         loadData(1);
     });
 
@@ -150,12 +149,16 @@
           'show' : true
       });*/
       var url = base_url_js+'finance/export_excel';
-      data = dataa;
+      data = {
+        Data : dataa,
+        Semester : $('#selectSemester').val(),
+      }
       var token = jwt_encode(data,"UAP)(*");
           $.post(url,{token:token},function (data_json) {
-              // jsonData = data_json;
-              // var obj = JSON.parse(data_json); 
-              // console.log(obj);
+              var response = jQuery.parseJSON(data_json);
+              //console.log(response);
+              //window.location.href = base_url_js+'fileGet/'+response;
+              window.open(base_url_js+'download/'+response,'_blank');
           }).done(function() {
             // loadTableEvent(loadDataEvent);
           }).fail(function() {
@@ -186,6 +189,16 @@
         var prodi = $('#selectProdi').val();
         var PTID = $('#selectPTID').val();
         var NIM = $('#NIM').val().trim();
+        try{
+          var Semester = $('#selectSemester').val();
+          console.log(Semester);
+          Semester = Semester.split('.');
+          Semester = Semester[0];
+        }
+        catch(e)
+        {
+
+        }
 
         var url = base_url_js+'finance/get_pembayaran_mhs/'+page;
         var data = {
@@ -193,6 +206,7 @@
             prodi : prodi,
             PTID  : PTID,
             NIM : NIM,
+            Semester : Semester,
         };
         var token = jwt_encode(data,'UAP)(*');
         var htmlDy = '<div class="col-md-12">'+
