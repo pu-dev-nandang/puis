@@ -240,8 +240,8 @@
     window.timePerCredits = "<?php echo $this->session->userdata('timePerCredits'); ?>";
 
     window.base_url_sign_out = "<?php echo url_sign_out ?>";
-    window.base_url_portal_students = "<?php echo url_students ?>";
-    window.base_url_portal_lecturers = "<?php echo url_lecturers ?>";
+    window.base_url_portal_students = "<?php echo url_sign_in_students ?>";
+    window.base_url_portal_lecturers = "<?php echo url_sign_in_lecturers ?>";
 
     window.allowDepartementNavigation = [];
 

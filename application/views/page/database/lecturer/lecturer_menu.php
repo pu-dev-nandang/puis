@@ -57,9 +57,6 @@
                 <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="Position" data-toggle="tab">Position</a></li>
             </ul>
             <div class="tab-content">
-
-                <button onclick="ref()">Refresh Attd</button>
-                <!--=== Overview ===-->
                 <hr/>
                 <div id="divPage"></div>
             </div>
@@ -135,7 +132,7 @@
 
         $.post(url,{token:token},function (jsonResult) {
 
-            $('#viewPhoto').html('<img class="img-rounded" src="'+base_url_img_employee+''+jsonResult.Photo_new+'" />');
+            $('#viewPhoto').html('<img class="img-rounded" src="'+base_url_img_employee+''+jsonResult.Photo+'" />');
 
 
             $('#viewName').html(jsonResult.NIP+' - '+jsonResult.TitleAhead.trim()+' '+jsonResult.Name+' '+jsonResult.TitleBehind.trim()+' ' +
@@ -440,19 +437,6 @@
             toastr.success('Grade Approved','Saved');
         });
     });
-</script>
-
-<script>
-    function ref() {
-        var data = {
-            NIP : NIP,
-            page : 'InputAttendance',
-            ScheduleID : 1
-        };
-        var token = jwt_encode(data,'UAP)(*');
-
-        loadPage(token);
-    }
 </script>
 
 <!-- Attendance Lecturer -->
