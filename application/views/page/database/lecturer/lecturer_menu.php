@@ -45,16 +45,16 @@
             <ul class="nav nav-tabs">
                 <li class="active"><a href="javascript:void(0)" class="menuDetails" data-page="lecturer_details" data-toggle="tab">Biodata</a></li>
                 <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="lecturer_academic" data-toggle="tab">Academic</a></li>
-                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="Schedule_lecturer" data-toggle="tab">Schedule</a></li>
-                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="Students" data-toggle="tab">Students</a></li>
-                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="Research" data-toggle="tab">Research</a></li>
-                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="Loyality" data-toggle="tab">Loyality</a></li>
-                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="Appreciation" data-toggle="tab">Appreciation</a></li>
-                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="Scientific Work" data-toggle="tab">Scientific Work</a></li>
-                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="Activities" data-toggle="tab">Activities</a></li>
-                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="Journal" data-toggle="tab">Journal</a></li>
-                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="Books" data-toggle="tab">Books</a></li>
-                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="Position" data-toggle="tab">Position</a></li>
+                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="schedule_lecturer" data-toggle="tab">Schedule</a></li>
+                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="students" data-toggle="tab">Students</a></li>
+                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="research" data-toggle="tab">Research</a></li>
+                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="loyality" data-toggle="tab">Loyality</a></li>
+                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="appreciation" data-toggle="tab">Appreciation</a></li>
+                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="scientific Work" data-toggle="tab">Scientific Work</a></li>
+                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="activities" data-toggle="tab">Activities</a></li>
+                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="journal" data-toggle="tab">Journal</a></li>
+                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="books" data-toggle="tab">Books</a></li>
+                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="position" data-toggle="tab">Position</a></li>
             </ul>
             <div class="tab-content">
                 <hr/>
