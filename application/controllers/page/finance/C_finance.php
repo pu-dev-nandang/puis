@@ -753,7 +753,7 @@ class C_finance extends Finnance_Controler {
         );
 
         // start dari A7
-        $a = 7;
+        $a = 8;
         for ($i=0; $i < count($dataGenerate); $i++) {
            $no = $i + 1;  
            $excel3->setCellValue('A'.$a, $no); 

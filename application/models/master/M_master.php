@@ -1750,4 +1750,50 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             return true;
         }
     }
+
+    public function getIndoBulan($date)
+    {
+        $bulan_arr = explode("-",$date);
+        $date = $bulan_arr[1];
+        switch ($date) {
+            case 1: 
+                $nama_bulan = "Januari";
+                break;
+            case 2:
+                $nama_bulan = "Februari";
+                break;
+            case 3:
+                $nama_bulan = "Maret";
+                break;
+            case 4:
+                $nama_bulan = "April";
+                break;
+            case 5:
+                $nama_bulan = "Mei";
+                break;
+            case 6:
+                $nama_bulan = "Juni";
+                break;
+            case 7:
+                $nama_bulan = "Juli";
+                break;
+            case 8:
+                $nama_bulan = "Agustus";
+                break;
+            case 9:
+                return "September";
+                break;
+            case 10:
+                $nama_bulan = "Oktober";
+                break;
+            case 11:
+                $nama_bulan = "November";
+                break;
+            case 12:
+                $nama_bulan = "Desember";
+                break;
+        }
+
+       return $date = $bulan_arr[2]." ".$nama_bulan." ".$bulan_arr[0];  
+    }
 }

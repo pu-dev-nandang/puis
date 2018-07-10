@@ -1379,7 +1379,7 @@ class M_finance extends CI_Model {
     }
 
     if ($ta1 == '') {
-      $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description,e.ID as ID_payment_students,e.BilingID,e.Invoice as InvoiceStudents
+      $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description,e.ID as ID_payment_students,e.BilingID,e.Invoice as InvoiceStudents,e.UpdateAt as TimeBayar
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
               join db_finance.payment_type as d on a.PTID = d.ID join db_finance.payment_students as e on a.ID = e.ID_payment '.$NIM.$PTID.$Semester.' 
@@ -1389,13 +1389,16 @@ class M_finance extends CI_Model {
     }
     else
     {
-      $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description,e.ID as ID_payment_students,e.BilingID,e.Invoice as InvoiceStudents
+      $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description,e.ID as ID_payment_students,e.BilingID,e.Invoice as InvoiceStudents,e.UpdateAt as TimeBayar
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
               join db_finance.payment_type as d on a.PTID = d.ID join db_finance.payment_students as e on a.ID = e.ID_payment '.$NIM.$PTID.$Semester.' and b.Year = ? and e.Status = 1 
               order by e.ID asc LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array($ta1))->result_array();
     }
+
+    // get Number VA Mahasiswa
+        $Const_VA = $this->m_master->showData_array('db_va.master_va');
 
     for ($i=0; $i < count($query); $i++) { 
       $Year = $query[$i]['Year'];
@@ -1409,6 +1412,9 @@ class M_finance extends CI_Model {
 
         // get IPS Mahasiswa
           $IPK = $this->getIPKMahasiswa('ta_'.$Year,$query[$i]['NPM']);
+
+          // ge VA Mahasiwa
+             $VA = $Const_VA[0]['Const_VA'].$query[$i]['NPM'];
 
         // cek cicilan atau tidak
           $DetailPayment = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']);
@@ -1450,8 +1456,10 @@ class M_finance extends CI_Model {
             'IPK' => $IPK,
             'Cicilan' => $Cicilan,
             'BilingID' => $query[$i]['BilingID'],
+            'Time' => $query[$i]['TimeBayar'],
             'InvoiceStudents' => $query[$i]['InvoiceStudents'],
             'ID_payment_students' => $query[$i]['ID_payment_students'],
+            'VA' => $VA,
         );
       }
       else
@@ -1477,8 +1485,10 @@ class M_finance extends CI_Model {
               'Year' => $Year,
               'Cicilan' => $Cicilan,
               'BilingID' => $query[$i]['BilingID'],
+              'Time' => $query[$i]['TimeBayar'],
               'InvoiceStudents' => $query[$i]['InvoiceStudents'],
               'ID_payment_students' => $query[$i]['ID_payment_students'],
+              'VA' => $VA,
           );
         }
       }
