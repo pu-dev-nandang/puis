@@ -935,6 +935,21 @@ class C_master extends Admission_Controler {
         }
     }
 
+    public function download($file)
+    {
+        if (file_exists('./document/'.$file)) {
+             $this->load->helper('download');
+             $data   = file_get_contents('./document/'.$file);
+             $name   = $file;
+             force_download($name, $data); // script download file
+            // $this->showFile($file);
+        }
+        else
+        {
+            show_404($log_error = TRUE);
+        }
+    }
+
     private function showFile($file)
     {
         header("Content-type: application/pdf");
