@@ -88,7 +88,7 @@
 
         $.post(url,{token:token},function (resultJson) {
 
-            $('#dataImg').html('<img src="http://siak.podomorouniversity.ac.id/includes/foto/'+resultJson.Photo+'" class="img-thumbnail">');
+            $('#dataImg').html('<img src="'+base_url_img_employee+''+resultJson.Photo+'" class="img-thumbnail">');
 
             $('#dataName').html(resultJson.TitleAhead+' '+resultJson.Name+' '+resultJson.TitleBehind);
 

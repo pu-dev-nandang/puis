@@ -9,7 +9,7 @@ class M_rest extends CI_Model {
         return $data->result_array()[0];
     }
 
-    public function __getKSM2($db,$ProdiID,$NPM){
+    public function __getKSM2___delete($db,$ProdiID,$NPM){
 
         $data = $this->db->query('SELECT sp.ScheduleID,sc.ClassGroup, sc.TeamTeaching,em.NIP,em.Name, em.EmailPU FROM '.$db.'.study_planning sp
                                                 LEFT JOIN db_academic.semester s ON (s.ID = sp.SemesterID)
@@ -141,6 +141,30 @@ class M_rest extends CI_Model {
                                 $dataTT[$t]['Lecturer'] = trim($Lecturer);
                             }
                             $data[$sc]['TeamTeachingDetails'] = $dataTT ;
+                        }
+
+                        // Get Attendance
+                        $dataAttd = $this->db->query('SELECT * FROM db_academic.attendance_students attd_s 
+                                                          LEFT JOIN db_academic.attendance attd ON (attd.ID = attd_s.ID_Attd)
+                                                          WHERE attd.SemesterID = "'.$dataSemester[$i]['ID'].'" 
+                                                          AND attd.ScheduleID = "'.$data[$sc]['ScheduleID'].'"
+                                                           AND attd_s.NPM = "'.$NPM.'" ')->result_array();
+
+                        if(count($dataAttd)>0){
+                            $meeting = 0;
+                            $presen = 0;
+                            for($a=0;$a<count($dataAttd);$a++){
+                                for($m=1;$m<=14;$m++){
+                                    $meeting += 1;
+                                    if($dataAttd[$a]['M'.$m]=='1'){
+                                        $presen += 1;
+                                    }
+                                }
+                            }
+
+                            // Menghitung preseni
+                            $PresensiArg = ($presen==0) ? 0 : ($presen/$meeting) * 100;
+                            $data[$sc]['AttendanceStudent'] = $PresensiArg;
                         }
 
                     }
