@@ -1,11 +1,11 @@
 
 
 <div style="text-align: center;">
-    <h3>Create <span style="color: green;font-weight: bold;">Kurikulum <?php echo $kurikulum['Year']; ?></span></h3>
+    <h3>Create <span style="color: green;font-weight: bold;">Curriculum <?php echo $kurikulum['Year']; ?></span></h3>
     <hr/>
     <button class="btn btn-success" id="btnYes">Yes</button>
     |
-    <button class="btn btn-danger" id="btnCancle" type="button" data-dismiss="modal">Cencle</button>
+    <button class="btn btn-danger" id="btnCancle" type="button" data-dismiss="modal">Close</button>
 
 </div>
 
@@ -20,12 +20,12 @@
             var data_ = parseInt(data);
             if(data_==0){
                 setTimeout(function () {
-                    toastr.error('Data Sudah Ada', 'Failed!!');
+                    toastr.error('Curriculum already exist', 'Failed!!');
                     $('#GlobalModal').modal('hide');
                 },2000);
             } else {
                 setTimeout(function () {
-                    toastr.success('Data tersimpan', 'Success!');
+                    toastr.success('Saved', 'Success!');
                     $('#GlobalModal').modal('hide');
                 },2000);
             }

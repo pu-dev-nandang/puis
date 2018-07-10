@@ -206,7 +206,7 @@
 
         <div class="form-group" style="border-top: 1px solid #d3d3d3;padding-top: 10px;text-align: right;">
             <div class="col-sm-12" id="BtnFooter">
-                <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancle</button>
+                <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>
                 <button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>
                 <button type="button" id="ModalbtnEditForm" class="btn btn-default btn-default-success hide">Edit Data</button>
             </div>

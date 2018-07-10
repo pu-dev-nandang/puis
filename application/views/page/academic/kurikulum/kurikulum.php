@@ -17,7 +17,7 @@
                 <div class="col-xs-6" style="text-align: right;">
                     <div class="btn-group">
                         <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            Add Kurikulum
+                            Add Curriculum
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" id="yearAddKurikulum">
@@ -40,7 +40,7 @@
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                             <li><a href="javascript:void(0)" data-action="ConfProgram" data-header="Program Kampus" class="btn-conf">Program Kuliah</a></li>
-                            <li><a href="javascript:void(0)" data-action="ConfJenisKurikulum" data-header="Jenis Kurikulum" class="btn-conf">Jenis Kurikulum</a></li>
+                            <li><a href="javascript:void(0)" data-action="ConfJenisKurikulum" data-header="Jenis Kurikulum" class="btn-conf">Curriculum Type</a></li>
                             <li><a href="javascript:void(0)" data-action="ConfJenisKelompok" data-header="Kelompok Mata Kuliah" class="btn-conf">Kelompok</a></li>
 <!--                            <li><a href="javascript:void(0)" data-action="ClassGroup" data-header="Group Kelas" class="btn-conf">Group Kelas</a></li>-->
                         </ul>
@@ -140,7 +140,7 @@
         for(var i=0;i<2;i++){
             $('#yearAddKurikulum').append('<li>' +
                 '<a href="javascript:void(0)" data-year="'+moment().add(i,'years').year()+'" data-action="add-kurikulum" class="btn-control">' +
-                'Kurikulum '+moment().add(i,'years').year()+'' +
+                'Curriculum '+moment().add(i,'years').year()+'' +
                 '</a></li>');
         }
     }
@@ -158,7 +158,7 @@
         var token = jwt_encode(data,"UAP)(*");
         $.post(url,{token:token},function (html) {
             $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-                '<h4 class="modal-title">Add Kurikulum</h4>');
+                '<h4 class="modal-title">Add Curriculum</h4>');
             $('#GlobalModal .modal-body').html(html);
             $('#GlobalModal .modal-footer').html(' ');
             $('#GlobalModal').modal({
@@ -179,7 +179,7 @@
         };
         var token = jwt_encode(data,"UAP)(*");
         $.post(url,{ token:token }, function (html) {
-            $('#GlobalModal .modal-header').html('<h4 class="modal-title">Add MK Semester '+semester+' - Kurikulum '+curriculumYear+'</h4>');
+            $('#GlobalModal .modal-header').html('<h4 class="modal-title">Add MK Semester '+semester+' - Curriculum '+curriculumYear+'</h4>');
             $('#GlobalModal .modal-body').html(html);
             $('#GlobalModal .modal-footer').html(' ');
             $('#GlobalModal').modal({
