@@ -54,36 +54,46 @@
  * NOTE: If you change these, also change the error_reporting() code below
  */
 	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
-	define("url_registration","http://localhost/registeronline/", true);
-	define("serverRoot","http://pcam.podomorouniversity.ac.id", true);
-	define("url_pas","http://pcam.podomorouniversity.ac.id/", true);
-	define("url_img_employees",url_pas."uploads/employees/", true);
-	define("url_img_students",url_pas."uploads/students/", true);
+	if($_SERVER['SERVER_NAME']!='localhost') {
+        define("url_registration","http://localhost/registeronline/", true);
+        define("serverRoot","http://pcam.podomorouniversity.ac.id", true);
+        define("url_pas","http://pcam.podomorouniversity.ac.id/", true);
+        define("url_img_employees",url_pas."uploads/employees/", true);
+        define("url_img_students",url_pas."uploads/students/", true);
 
-	define("url_pcam","http://pcam.podomorouniversity.ac.id/dashboard", true);
-	define("url_students","http://studentpu.podomorouniversity.ac.id/home", true);
-	define("url_lecturers","http://lecturerpu.podomorouniversity.ac.id/home", true);
-	define("url_sign_out","http://portal.podomorouniversity.ac.id", true);
+        define("url_pcam","http://pcam.podomorouniversity.ac.id/dashboard", true);
+        define("url_students","http://studentpu.podomorouniversity.ac.id/home", true);
+        define("url_lecturers","http://lecturerpu.podomorouniversity.ac.id/home", true);
+        define("url_sign_out","http://portal.podomorouniversity.ac.id", true);
 //
-    define("url_sign_in_lecturers","http://lecturerpu.podomorouniversity.ac.id/", true);
-    define("url_sign_in_students","http://studentpu.podomorouniversity.ac.id/", true);
+        define("url_sign_in_lecturers","http://lecturerpu.podomorouniversity.ac.id/", true);
+        define("url_sign_in_students","http://studentpu.podomorouniversity.ac.id/", true);
+    } else {
+
+        define("port",":8080", true);
+
+        // Local Nandang
+        define("url_registration","http://localhost/registeronline/", true);
+        define("serverRoot","http://localhost".port."/siak3", true);
+        define("url_pas","http://localhost".port."/siak3/", true);
+        define("url_img_employees",url_pas."uploads/employees/", true);
+        define("url_img_students",url_pas."uploads/employees/", true);
+
+        define("url_pcam",url_pas."dashboard", true);
+
+        define("url_sign_out","http://localhost".port."/login3/", true);
+
+        // Auth From PCAM
+        define("url_sign_in_lecturers","http://localhost".port."/lecturer/", true);
+        define("url_sign_in_students","http://localhost".port."/students/", true);
+
+        define("url_lecturers",url_sign_in_lecturers."home", true);
+        define("url_students",url_sign_in_students."home", true);
+    }
 
 
-	// Local Nandang
-//    define("url_registration","http://localhost/registeronline/", true);
-//    define("serverRoot","http://localhost:8080/siak3", true);
-//    define("url_pas","http://localhost:8080/siak3/", true);
-//    define("url_img_employees",url_pas."uploads/employees/", true);
-//    define("url_img_students",url_pas."uploads/employees/", true);
-//
-//    define("url_pcam",url_pas."dashboard", true);
-//    define("url_students","http://localhost:8080/students/home", true);
-//    define("url_lecturers","http://localhost:8080/lecturer/home", true);
-//    define("url_sign_out","http://localhost:8080/login3/", true);
-//
-//    // Auth From PCAM
-//    define("url_sign_in_lecturers","http://localhost:8080/lecturer/", true);
-//    define("url_sign_in_students","http://localhost:8080/students/", true);
+
+
 
 /*
  *---------------------------------------------------------------
