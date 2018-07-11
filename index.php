@@ -70,7 +70,8 @@
         define("url_sign_in_students","http://studentpu.podomorouniversity.ac.id/", true);
     } else {
 
-        define("port",":8080", true);
+	    $port_user = ($_SERVER['SERVER_PORT']!='80') ? ':'.$_SERVER['SERVER_PORT'] : '';
+        define("port",$port_user, true);
 
         // Local Nandang
         define("url_registration","http://localhost/registeronline/", true);
