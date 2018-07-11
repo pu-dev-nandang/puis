@@ -11,6 +11,33 @@ class C_save_to_pdf extends CI_Controller {
         date_default_timezone_set("Asia/Jakarta");
     }
 
+    private function getInputToken($token)
+    {
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+        return $data_arr;
+    }
+
+
+    public function listStudentsFromCourse(){
+
+        $token = $this->input->get('token');
+        $data_arr = $this->getInputToken($token);
+
+//        print_r($data_arr);
+//
+//        exit;
+
+        $pdf = new FPDF('p','mm','A4');
+        // membuat halaman baru
+        $pdf->AddPage();
+
+        $this->header_exam_layout($pdf);
+
+
+        $pdf->Output();
+    }
+
     private function header_exam_layout($pdf){
 
         $pdf->Image(base_url('images/icon/logo-l.png'),10,10,30);

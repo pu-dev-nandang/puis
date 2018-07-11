@@ -179,7 +179,7 @@
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group hide">
             <label class="col-sm-4 control-label">Silabus</label>
             <div class="col-sm-8" style="border-top: 1px solid #d3d3d3;">
                 <label class="radio-inline">
@@ -191,7 +191,7 @@
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group hide">
             <label class="col-sm-4 control-label">SAP</label>
             <div class="col-sm-8" style="border-top: 1px solid #d3d3d3;">
                 <label class="radio-inline">

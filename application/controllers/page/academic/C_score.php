@@ -22,4 +22,9 @@ class C_score extends Academic_Controler {
         $this->temp($content);
     }
 
+    public function inputScore(){
+        $data_arr = $this->getInputToken();
+        $this->load->view('page/academic/score/inputScore',$data_arr);
+    }
+
 }

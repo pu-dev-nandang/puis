@@ -889,6 +889,7 @@
                             Coordinator : Coordinator,
                             TeamTeaching : TeamTeaching,
                             SubSesi : SubSesi,
+                            TotalAssigment : 5,
                             IsSemesterAntara : ''+SemesterAntara,
                             UpdateBy : UpdateBy,
                             UpdateAt : UpdateAt
