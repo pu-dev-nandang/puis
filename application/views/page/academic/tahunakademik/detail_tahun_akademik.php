@@ -17,10 +17,6 @@
     }
 </style>
 
-<a href="<?php echo base_url('academic/tahun-akademik'); ?>" id="btnBack" class="btn btn-info"><i class="fa fa-arrow-circle-left right-margin" aria-hidden="true"></i> Back</a>
-<button class="btn btn-success" id="btnSaveDetail">Save</button>
-<hr/>
-
 <div class="alert alert-info" role="alert">
     <b><span id="nameTahunAkademik"></span></b>
 </div>
@@ -173,6 +169,13 @@
     </tr>
     </tbody>
 </table>
+
+<hr/>
+<div style="text-align: right;">
+    <a href="<?php echo base_url('academic/tahun-akademik'); ?>" id="btnBack" class="btn btn-info"><i class="fa fa-arrow-circle-left right-margin" aria-hidden="true"></i> Back</a>
+    <button class="btn btn-success" id="btnSaveDetail">Save</button>
+</div>
+
 
 
 <script>

@@ -34,15 +34,18 @@
 
 
             </td>
-            <td class="td-center"><div class="btn-group">
-                    <button type="button" class="btn btn-default btn-default-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Action <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a href="javascript:void(0)" data-id="<?php echo $item_smt['ID']; ?>" data-action="edit" class="btn-th-action" id="modalBtnEdit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a></li>
-                        <li class="<?php echo $publish; ?>"><a href="javascript:void(0)" data-id="<?php echo $item_smt['ID']; ?>" data-action="publish" class="btn-th-action" id="modalBtnPublish"><i class="fa fa-bullhorn" aria-hidden="true"></i> Publish</a></li>
-                    </ul>
-                </div>
+            <td class="td-center">
+                <a href="javascript:void(0)" data-id="<?php echo $item_smt['ID']; ?>" data-action="publish"
+                   class="btn btn-sm btn-default btn-default-primary <?php echo $publish; ?> btn-th-action" id="modalBtnPublish"><i class="fa fa-bullhorn" aria-hidden="true"></i> Publish</a>
+<!--                <div class="btn-group">-->
+<!--                    <button type="button" class="btn btn-default btn-default-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+<!--                        Action <span class="caret"></span>-->
+<!--                    </button>-->
+<!--                    <ul class="dropdown-menu">-->
+<!--                        <li><a href="javascript:void(0)" data-id="--><?php //echo $item_smt['ID']; ?><!--" data-action="edit" class="btn-th-action" id="modalBtnEdit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a></li>-->
+<!--                        <li class="--><?php //echo $publish; ?><!--"><a href="javascript:void(0)" data-id="--><?php //echo $item_smt['ID']; ?><!--" data-action="publish" class="btn-th-action" id="modalBtnPublish"><i class="fa fa-bullhorn" aria-hidden="true"></i> Publish</a></li>-->
+<!--                    </ul>-->
+<!--                </div>-->
             </td>
         </tr>
         <?php $no++; } ?>

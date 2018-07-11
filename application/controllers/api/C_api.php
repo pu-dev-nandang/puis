@@ -887,18 +887,12 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='read'){
                 $dataWhere = (array) $data_arr['dataWhere'];
 
-//                $days = (count((array) $dataWhere['Days'])>0) ? $dataWhere['Days'] : [1,2,3,4,5,6,7] ;
                 $days = $this->db->order_by('ID','ASC')->get('db_academic.days')->result_array();
 
-//                $daysName = (array) $dataWhere['DaysName'];
-
-//                return print_r(json_encode($data_arr));
                 for($i=0;$i<count($days);$i++){
                     $data[$i]['Day'] = $days[$i];
                     $data[$i]['Details'] = $this->m_api->getSchedule($days[$i]['ID'],$dataWhere);
                 }
-//
-//
                 return print_r(json_encode($data));
             }
             else if($data_arr['action']=='readOneSchedule'){
@@ -1918,8 +1912,12 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action']=='update'){
 
-                $formUpdate = (array) $data_arr['formUpdate'];
+                // Update Schedule
+                $this->db->set('TotalAssigment', $data_arr['TotalAssigment']);
+                $this->db->where('ID', $data_arr['ScheduleID']);
+                $this->db->update('db_academic.schedule');
 
+                $formUpdate = (array) $data_arr['formUpdate'];
                 for($s=0;$s<count($formUpdate);$s++){
                     $dataF = (array) $formUpdate[$s];
 
@@ -1948,7 +1946,6 @@ class C_api extends CI_Controller {
                 $this->db->update('db_academic.grade_course');
                 return print_r(1);
             }
-
             else if($data_arr['action']=='dataCourse'){
 
                 $data = $this->m_api->getDataCourse2Score($data_arr['SemesterID']

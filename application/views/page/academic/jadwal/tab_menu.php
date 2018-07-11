@@ -48,7 +48,6 @@
     </div>
 </div>
 
-
 <script>
     $(document).ready(function () {
         loadPage('jadwal','');
@@ -85,14 +84,7 @@
         
         // Reset Penawaran MK
     });
-    
-    function resetPenawaranMK() {
-        $('#formSemester').val('');
-        $('#box1View,#box1Storage,#box2View,#box2Storage').empty();
-        $('#OfferingDiv').addClass('hide');
-        $('#btnAnother').html('');
-        $('#dataOfferings').empty();
-    }
+
 
     $(document).on('click','.btn-action',function () {
         var page = $(this).attr('data-page');
@@ -112,6 +104,51 @@
 
         loadPage(page,ScheduleID);
     });
+
+    $(document).on('click','.btnDetailStudents',function () {
+
+        var token = $(this).attr('data-std');
+        var dataArr = jwt_decode(token,'UAP)(*');
+        var dataHtml = '<h4>Students not yet</h4>';
+        if(dataArr.Students.length>0){
+            dataHtml = '<table class="table table-bordered">' +
+                '    <thead>' +
+                '    <tr style="background: #005975; color: #ffffff;">' +
+                '        <th style="width: 20%;text-align: center;">NPM</th>' +
+                '        <th style="text-align: center;">Name</th>' +
+                '    </tr>' +
+                '    </thead>' +
+                '    <tbody id="dataMHS"></tbody>' +
+                '</table>' +
+                '<div style="text-align: right;"><a href="'+base_url_js+'save2pdf/listStudentsFromCourse?token='+token+'" target="_blank" class="btn btn-sm btn-info">Download Students</a></div>';
+        }
+
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">'+dataArr.Group+' - '+dataArr.Coordinator+'</h4>');
+        $('#GlobalModal .modal-body').html(dataHtml);
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+        for(var m=0;m<dataArr.Students.length;m++){
+            var d = dataArr.Students[m];
+            $('#dataMHS').append('<tr>' +
+                '<td style="text-align: center;">'+d.NPM+'</td>' +
+                '<td><b>'+d.Name+'</b></td>' +
+                '</tr>');
+        }
+
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+    });
+
+    function resetPenawaranMK() {
+        $('#formSemester').val('');
+        $('#box1View,#box1Storage,#box2View,#box2Storage').empty();
+        $('#OfferingDiv').addClass('hide');
+        $('#btnAnother').html('');
+        $('#dataOfferings').empty();
+    }
 
     function checkSemesterAntara() {
         var url = base_url_js+'api/__crudTahunAkademik';
@@ -161,16 +198,15 @@
         filterSchedule();
     });
 
-    $('input[type=checkbox][class=filterDay]').change(function () {
+    $(document).on('change','input[type=checkbox][class=filterDay]',function () {
         var v = $(this).val();
-
-        // console.log($('input[type=checkbox][class=filterDay]:checked').val());
 
         if(v==0){
             $('input[type=checkbox][class=filterDay]').prop('checked',false);
             $(this).prop('checked',true);
             checkedDay = [];
-        } else {
+        }
+        else {
 
             if($('input[type=checkbox][value='+v+']').is(':checked')){
                 checkedDay.push($(this).val());
@@ -188,7 +224,8 @@
         if(checkedDay.length==0){
             $('input[type=checkbox][value=0]').prop('checked',true);
             $('.widget-schedule').removeClass('hide');
-        } else {
+        }
+        else {
             $('.widget-schedule').addClass('hide');
             if(checkedDay.length>0){
                 for(var i=0;i<checkedDay.length;i++){
@@ -196,8 +233,6 @@
                 }
             }
         }
-
-
 
     });
 </script>

@@ -77,6 +77,7 @@ $route['academic/jadwal-ujian'] = 'page/academic/c_jadwal_ujian';
 
 // ---- Score ----
 $route['academic/score'] =  'page/academic/c_score';
+$route['academic/inputScore'] =  'page/academic/c_score/inputScore';
 
 // --- Modal Academic ----
 $route['academic/modal-tahun-akademik-detail-prodi'] = 'page/academic/c_akademik/modal_tahun_akademik_detail_prodi';
@@ -349,6 +350,8 @@ $route['loadDataRegistrationFormulirOffline'] =  'api/C_global/load_data_registr
 
 
 // ---- Save to PDF ---
+$route['save2pdf/listStudentsFromCourse'] =  'c_save_to_pdf/listStudentsFromCourse';
+
 $route['save2pdf/exam-layout'] =  'c_save_to_pdf/exam_layout';
 $route['save2pdf/draft-questions'] =  'c_save_to_pdf/draft_questions';
 $route['save2pdf/answer-sheet'] =  'c_save_to_pdf/answer_sheet';

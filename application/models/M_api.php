@@ -654,11 +654,11 @@ class M_api extends CI_Model {
             $CO_IsSemesterAntara = ($dataWhere['IsSemesterAntara']!='') ? ' AND co.IsSemesterAntara = "'.$dataWhere['IsSemesterAntara'].'" ' : '';
             $CO_Semester = ($dataWhere['Semester']!='') ? ' AND co.Semester = "'.$dataWhere['Semester'].'" ' : '';
 
+            $ClassOf = $this->getClassOf();
 
             // Get Course
             for($c=0;$c<count($result);$c++){
                 $ProdiIDsdc = ($dataWhere['ProdiID']!='') ? ' AND sdc.ProdiID = "'.$dataWhere['ProdiID'].'" ' : '';
-
 
 
                 $dataOffering = $this->db->query('SELECT * FROM db_academic.course_offerings co 
@@ -691,27 +691,26 @@ class M_api extends CI_Model {
                     }
                 }
 
-//                $dataCourse = $this->db->query('SELECT sdc.CDID, mk.ID, mk.MKCode, mk.NameEng AS MKNameEng, mk.Name AS MKName,
-//                                                          ps.NameEng AS ProdiEng, ps.name AS Prodi, ps.Code AS ProdiCode,
-//                                                          co.Semester
-//                                                          FROM db_academic.schedule_details_course sdc
-//                                                          LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
-//                                                          LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
-//                                                          LEFT JOIN db_academic.course_offerings co ON (ps.ID = co.ProdiID)
-//                                                          WHERE sdc.ScheduleID="'.$result[$c]['ID'].'" AND co.ProgramsCampusID = "'.$dataWhere['ProgramsCampusID'].'"
-//                                                          '.$CO_Semester.'  '.$CO_SemesterID.' '.$CO_IsSemesterAntara.'
-//                                                           '.$ProdiIDsdc);
-
-//                for($s=0;$s<count($dataOffering);$s++){
-//                    $mk = json_decode($dataOffering[$s]['Arr_CDID']);
-//
-//                }
-
                 $result[$c]['SemesterDetails'] = $dataOffering;
                 $result[$c]['DetailCourse'] = $dataCourse;
 
-            }
+                $Students = [];
+                for($st=0;$st<count($ClassOf);$st++){
+                    $db_ = 'ta_'.$ClassOf[$st]['Year'];
 
+                    $dataStdCourse = $this->db->query('SELECT s.Name, s.NPM FROM '.$db_.'.study_planning sp 
+                                                            LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
+                                                            WHERE sp.SemesterID = "'.$dataWhere['SemesterID'].'" 
+                                                            AND sp.ScheduleID = "'.$result[$c]['ID'].'" ')->result_array();
+
+                    if(count($dataStdCourse)>0){
+                        array_push($Students,$dataStdCourse);
+                    }
+                }
+
+                $result[$c]['StudentsDetails'] = (count($Students)>0) ? $Students[0] : $Students ;
+
+            }
 
             for($i=0;$i<count($result);$i++){
                 if($result[$i]['TeamTeaching']==1){
@@ -719,6 +718,9 @@ class M_api extends CI_Model {
                 }
 
             }
+
+            // Daftar Jadwal
+
         }
 
         return $result;
@@ -1763,9 +1765,10 @@ class M_api extends CI_Model {
 
         $dataClassOf = $this->getClassOf();
 
-        $dataCourse = $this->db->query('SELECT sdc.*,mk.NameEng AS MKNameEng, mk.MKCode FROM db_academic.schedule_details_course sdc 
+        $dataCourse = $this->db->query('SELECT sdc.*,mk.NameEng AS MKNameEng, mk.MKCode, s.TotalAssigment FROM db_academic.schedule_details_course sdc 
                                                   LEFT JOIN db_academic.curriculum_details cd ON (sdc.CDID = cd.ID)
                                                   LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
+                                                  LEFT JOIN db_academic.schedule s ON (s.ID = sdc.ScheduleID)
                                                   WHERE sdc.ScheduleID = "'.$ScheduleID.'" ')->result_array();
 
         $res = [];
@@ -1989,6 +1992,13 @@ class M_api extends CI_Model {
 
                 $dataSch[$i]['DetailTeamTeaching'] = $team;
                 $dataSch[$i]['DetailSchedule'] = $detailSch;
+
+                // Silabus SAP
+                $dataSilabusSAP = $this->db->get_where('db_academic.grade_course',
+                            array('SemesterID' => $SemesterID,
+                                'ScheduleID' => $dataSch[$i]['ScheduleID']),1)->result_array();
+
+                $dataSch[$i]['dataSilabusSAP'] = $dataSilabusSAP;
             }
         }
 
