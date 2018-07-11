@@ -71,18 +71,20 @@
     } else {
 
 	    $port_user = ($_SERVER['SERVER_PORT']!='80') ? ':'.$_SERVER['SERVER_PORT'] : '';
+	    $folder_user = ($_SERVER['SERVER_PORT']!='80') ? 'siak3' : 'puis';
+	    $portal_user = ($_SERVER['SERVER_PORT']!='80') ? 'login3' : 'portal';
         define("port",$port_user, true);
 
         // Local Nandang
         define("url_registration","http://localhost/registeronline/", true);
-        define("serverRoot","http://localhost".port."/siak3", true);
-        define("url_pas","http://localhost".port."/siak3/", true);
+        define("serverRoot","http://localhost".port."/".$folder_user, true);
+        define("url_pas","http://localhost".port."/".$folder_user."/", true);
         define("url_img_employees",url_pas."uploads/employees/", true);
         define("url_img_students",url_pas."uploads/employees/", true);
 
         define("url_pcam",url_pas."dashboard", true);
 
-        define("url_sign_out","http://localhost".port."/login3/", true);
+        define("url_sign_out","http://localhost".port."/".$portal_user."/", true);
 
         // Auth From PCAM
         define("url_sign_in_lecturers","http://localhost".port."/lecturer/", true);
