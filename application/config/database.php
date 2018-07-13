@@ -24,7 +24,7 @@ if($_SERVER['SERVER_NAME']!='localhost') {
 
 } else {
 
-    $db['default']['hostname'] = 'localhost';
+    $db['default']['hostname'] = 'localhost:3306';
     $db['default']['username'] = 'root';
     $db['default']['password'] = '';
     $db['default']['database'] = 'db_academic';

@@ -225,6 +225,7 @@ $route['admission/config/upload-pdf-per-pengumuman'] = 'page/admission/c_master/
 
 $route['fileGet/(:any)'] = 'page/admission/c_master/fileGet/$1';
 $route['download/(:any)'] = 'page/admission/c_master/download/$1';
+$route['download_template/(:any)'] = 'page/admission/c_master/download_template/$1';
 
 
 
@@ -295,6 +296,10 @@ $route['admission/distribusi-formulir/formulir-online'] = 'page/admission/c_admi
 $route['admission/distribusi-formulir/formulir-online/pagination/(:num)'] = 'page/admission/c_admission/pagination_formulir_online/$1';
 $route['admission/distribusi-formulir/formulir-offline/save'] = 'page/admission/c_admission/formulir_offline_sale_save';
 $route['admission/distribusi-formulir/formulir-offline/selectPIC'] = 'page/admission/c_admission/formulir_offline_salect_PIC';
+
+$route['admission/mastercalonmahasiswa/generate-nim'] = 'page/admission/c_admission/generatenim';
+$route['admission/mastercalonmahasiswa/submit_import_excel_File_generate_nim'] = 'page/admission/c_admission/submit_import_excel_File_generate_nim';
+
 
 
 // ---Finance----
