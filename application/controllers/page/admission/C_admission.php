@@ -762,6 +762,12 @@ class C_admission extends Admission_Controler {
         }
         
         $aa = 1;
+        $bb = 1;
+        $Q_getLastNPM = $this->m_master->getLastNPM($ta,$ProdiID);
+        // print_r($Q_getLastNPM);
+        if (count($Q_getLastNPM)== 1) {
+          $bb = $Q_getLastNPM[0]['NPM'];
+        }
         for ($i=2; $i < $CountRow; $i++) {
           $temp = array();
           $ProgramID = $objWorksheet->getCellByColumnAndRow(1, $i)->getCalculatedValue();
@@ -773,23 +779,26 @@ class C_admission extends Admission_Controler {
           $HighSchoolID = $objWorksheet->getCellByColumnAndRow(7, $i)->getCalculatedValue();
           $HighSchool = $objWorksheet->getCellByColumnAndRow(8, $i)->getCalculatedValue();
           $MajorsHighSchool = $objWorksheet->getCellByColumnAndRow(9, $i)->getCalculatedValue();
-          // search NPM dengan 2 Pertama kode Prodi CodeID
-          // 2 kedua tahun angkatan ambil 2 digit terakhir
-          $Q_Prodi = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
-          $CodeID = $Q_Prodi[0]['CodeID'];
-          $strLenTA = strlen($ta) - 2; // last 2 digit
-          $P_ang = substr($ta, $strLenTA,2); // last 2 digit
-          $Q_getLastNPM = $this->m_master->getLastNPM($ta,$ProdiID);
           if (count($Q_getLastNPM) == 0) {
-            $inc = $CodeID.$P_ang."000".$aa;
+            // search NPM dengan 2 Pertama kode Prodi CodeID
+            // 2 kedua tahun angkatan ambil 2 digit terakhir
+            $Q_Prodi = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+            $CodeID = $Q_Prodi[0]['CodeID'];
+            $strLenTA = strlen($ta) - 2; // last 2 digit
+            $P_ang = substr($ta, $strLenTA,2); // last 2 digit
+            $MaxInc = 4;
+            $strlen_aa = strlen($aa);
+            $V_aa = $aa;
+            for ($j=0; $j < ($MaxInc-$strlen_aa); $j++) { 
+              $V_aa = '0'.$V_aa;
+            }
+            $inc = $CodeID.$P_ang.$V_aa;
           }
           else
           {
-            $inc = $Q_getLastNPM[0]['NPM'];
-            // print_r($inc);
-            $inc = (int)$inc;
-            $inc = $inc + 1;
-            // print_r('Adding = '.$inc);
+            // $bb =(int)$bb
+            $bb = $bb + 1;
+            $inc = $bb;
           }
 
           $NPM = $inc;
