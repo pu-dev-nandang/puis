@@ -10,7 +10,8 @@ class C_admission extends Admission_Controler {
         $this->load->model('master/m_master');
         $this->load->model('admission/m_admission');
         $this->load->model('m_sendemail');
-        $this->data['department'] = parent::__getDepartement();
+        $this->data['department'] = parent::__getDepartement(); 
+        $this->load->model('m_api');
     }
 
     public function dashboard()
@@ -741,26 +742,138 @@ class C_admission extends Admission_Controler {
       if(isset($_FILES["fileData"]["name"]))
       {
         $path = $_FILES["fileData"]["tmp_name"];
+        $arr_insert = array();
         include APPPATH.'third_party/PHPExcel/PHPExcel.php';
         $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
         $excel2 = $excel2->load($path); // Empty Sheet
-        $objWorksheet = $excel2->setActiveSheetIndex(1);
-        echo '<table border=1>' . "\n";
-        foreach ($objWorksheet->getRowIterator() as $row) {
-          echo '<tr>' . "\n";
-          $cellIterator = $row->getCellIterator();
-          $cellIterator->setIterateOnlyExistingCells(false); // This loops all cells,
-                                                             // even if it is not set.
-                                                             // By default, only cells
-                                                             // that are set will be
-                                                             // iterated.
-          foreach ($cellIterator as $cell) {
-            echo '<td>' . $cell->getValue() . '</td>' . "\n";
-          }
-          echo '</tr>' . "\n";
-        }
-        echo '</table>' . "\n";
+        $objWorksheet = $excel2->setActiveSheetIndex(0);
+        $CountRow = $objWorksheet->getHighestRow();
+        $ProdiID = $this->input->post('Prodi');
+        $ta = $this->input->post('ta');
+        $ta = 'ta_'.$ta;
+        //echo $objWorksheet->getCellByColumnAndRow(1, 8)->getCalculatedValue();
+        // start by coloumn 1
+        //check existing db
+        $checkDB = $this->m_master->checkDB($ta);
+        if ($checkDB) {
+          // create db
+          $this->m_api->createDBYearAcademicNew($ta);
 
+        }
+        
+        $aa = 1;
+        for ($i=2; $i < $CountRow; $i++) {
+          $temp = array();
+          $ProgramID = $objWorksheet->getCellByColumnAndRow(1, $i)->getCalculatedValue();
+          $LevelStudyID = $objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue();
+          $ReligionID = $objWorksheet->getCellByColumnAndRow(3, $i)->getCalculatedValue();
+          $NationalityID = $objWorksheet->getCellByColumnAndRow(4, $i)->getCalculatedValue();
+          $ProvinceID = $objWorksheet->getCellByColumnAndRow(5, $i)->getCalculatedValue();
+          $CityID = $objWorksheet->getCellByColumnAndRow(6, $i)->getCalculatedValue();
+          $HighSchoolID = $objWorksheet->getCellByColumnAndRow(7, $i)->getCalculatedValue();
+          $HighSchool = $objWorksheet->getCellByColumnAndRow(8, $i)->getCalculatedValue();
+          $MajorsHighSchool = $objWorksheet->getCellByColumnAndRow(9, $i)->getCalculatedValue();
+          // search NPM dengan 2 Pertama kode Prodi CodeID
+          // 2 kedua tahun angkatan ambil 2 digit terakhir
+          $Q_Prodi = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+          $CodeID = $Q_Prodi[0]['CodeID'];
+          $strLenTA = strlen($ta) - 2; // last 2 digit
+          $P_ang = substr($ta, $strLenTA,2); // last 2 digit
+          $Q_getLastNPM = $this->m_master->getLastNPM($ta,$ProdiID);
+          if (count($Q_getLastNPM) == 0) {
+            $inc = $CodeID.$P_ang."000".$aa;
+          }
+          else
+          {
+            $inc = $Q_getLastNPM[0]['NPM'];
+            // print_r($inc);
+            $inc = (int)$inc;
+            $inc = $inc + 1;
+            // print_r('Adding = '.$inc);
+          }
+
+          $NPM = $inc;
+          $Name = $objWorksheet->getCellByColumnAndRow(11, $i)->getCalculatedValue();
+          $Address = $objWorksheet->getCellByColumnAndRow(12, $i)->getCalculatedValue();
+          $Photo = "";
+          $Gender = $objWorksheet->getCellByColumnAndRow(14, $i)->getCalculatedValue();
+          $PlaceOfBirth = $objWorksheet->getCellByColumnAndRow(15, $i)->getCalculatedValue();
+          $DateOfBirth = $objWorksheet->getCellByColumnAndRow(16, $i)->getCalculatedValue();
+          $Phone = $objWorksheet->getCellByColumnAndRow(17, $i)->getCalculatedValue();
+          $HP = $objWorksheet->getCellByColumnAndRow(18, $i)->getCalculatedValue();
+          $ClassOf = $objWorksheet->getCellByColumnAndRow(19, $i)->getCalculatedValue();
+          $Email = $objWorksheet->getCellByColumnAndRow(20, $i)->getCalculatedValue();
+          $Jacket = $objWorksheet->getCellByColumnAndRow(21, $i)->getCalculatedValue();
+          $AnakKe = $objWorksheet->getCellByColumnAndRow(22, $i)->getCalculatedValue();
+          $JumlahSaudara = $objWorksheet->getCellByColumnAndRow(23, $i)->getCalculatedValue();
+          $NationExamValue = $objWorksheet->getCellByColumnAndRow(24, $i)->getCalculatedValue();
+          $GraduationYear = $objWorksheet->getCellByColumnAndRow(25, $i)->getCalculatedValue();
+          $IjazahNumber = $objWorksheet->getCellByColumnAndRow(26, $i)->getCalculatedValue();
+          $Father = $objWorksheet->getCellByColumnAndRow(27, $i)->getCalculatedValue();
+          $Mother = $objWorksheet->getCellByColumnAndRow(28, $i)->getCalculatedValue();
+          $StatusFather = $objWorksheet->getCellByColumnAndRow(29, $i)->getCalculatedValue();
+          $StatusMother = $objWorksheet->getCellByColumnAndRow(30, $i)->getCalculatedValue();
+          $PhoneFather = $objWorksheet->getCellByColumnAndRow(31, $i)->getCalculatedValue();
+          $PhoneMother = $objWorksheet->getCellByColumnAndRow(32, $i)->getCalculatedValue();
+          $OccupationFather = $objWorksheet->getCellByColumnAndRow(33, $i)->getCalculatedValue();
+          $OccupationMother = $objWorksheet->getCellByColumnAndRow(34, $i)->getCalculatedValue();
+          $EducationFather = $objWorksheet->getCellByColumnAndRow(35, $i)->getCalculatedValue();
+          $EducationMother = $objWorksheet->getCellByColumnAndRow(36, $i)->getCalculatedValue();
+          $AddressFather = $objWorksheet->getCellByColumnAndRow(37, $i)->getCalculatedValue();
+          $AddressMother = $objWorksheet->getCellByColumnAndRow(38, $i)->getCalculatedValue();
+          $EmailFather = $objWorksheet->getCellByColumnAndRow(39, $i)->getCalculatedValue();
+          $EmailMother = $objWorksheet->getCellByColumnAndRow(40, $i)->getCalculatedValue();
+          $StatusStudentID = 3;
+          $temp = array(
+            'ProdiID' => $ProdiID,
+            'ProgramID' => $ProgramID,
+            'LevelStudyID' => $LevelStudyID,
+            'ReligionID' => $ReligionID,
+            'NationalityID' => $NationalityID,
+            'ProvinceID' => $ProvinceID,
+            'CityID' => $CityID,
+            'HighSchoolID' => $HighSchoolID,
+            'HighSchool' => $HighSchool,
+            'MajorsHighSchool' => $MajorsHighSchool,
+            'NPM' => $NPM,
+            'Name' => $Name,
+            'Address' => $Address,
+            'Address' => $Address,
+            'Gender' => $Gender,
+            'PlaceOfBirth' => $PlaceOfBirth,
+            'DateOfBirth' => $DateOfBirth,
+            'Phone' => $Phone,
+            'HP' => $HP,
+            'ClassOf' => $ClassOf,
+            'Email' => $Email,
+            'Jacket' => $Jacket,
+            'AnakKe' => $AnakKe,
+            'JumlahSaudara' => $JumlahSaudara,
+            'NationExamValue' => $NationExamValue,
+            'GraduationYear' => $GraduationYear,
+            'IjazahNumber' => $IjazahNumber,
+            'Father' => $Father,
+            'Mother' => $Mother,
+            'StatusFather' => $StatusFather,
+            'StatusMother' => $StatusMother,
+            'PhoneFather' => $PhoneFather,
+            'PhoneMother' => $PhoneMother,
+            'OccupationFather' => $OccupationFather,
+            'OccupationMother' => $OccupationMother,
+            'EducationFather' => $EducationFather,
+            'EducationMother' => $EducationMother,
+            'AddressFather' => $AddressFather,
+            'AddressMother' => $AddressMother,
+            'EmailFather' => $EmailFather,
+            'EmailMother' => $EmailMother,
+            'StatusStudentID' => $StatusStudentID,
+          );
+          $arr_insert[] = $temp;
+          $aa++;
+        }
+
+        $this->db->insert_batch($ta.'.students', $arr_insert);
+        echo json_encode(array('status'=> 1,'msg' => ''));
       }
       else
       {

@@ -19,12 +19,16 @@
 							    </select>
 							</div>
 							<div class="col-xs-2" style="">
-								<label class="control-label">Upload File:</label>
+							    Tahun Angkatan
+							    <select class="select2-select-00 col-md-4 full-width-fix" id="selectTa">
+							        <option></option>
+							    </select>
 							</div>
-							<a href="<?php echo base_url('download_template/admisi-t_import_mhs.csv'); ?>">File Template</a>
-							<div class="col-xs-2">
+							<div class="col-xs-2" style="">
+								<label class="control-label">Upload File:</label>
 								<input type="file" data-style="fileinput" id="ExFile">
 							</div>
+							<a href="<?php echo base_url('download_template/admisi-t_import_mhs.xlsm'); ?>">File Template</a>
 							<div class="col-xs-1">
 								<button class="btn btn-inverse btn-notification" id="btn-proses">Proses</button>
 							</div>
@@ -40,7 +44,22 @@
 <script type="text/javascript">
 	$(document).ready(function () {
 	    loadProgramStudy();
+	    loadTahunLulus();
 	});
+
+	function loadTahunLulus()
+	{
+		var thisYear = (new Date()).getFullYear();
+		var startTahun = parseInt(thisYear) - parseInt(5);
+		var selisih = parseInt(thisYear) - parseInt(startTahun);
+		for (var i = 0; i <= selisih; i++) {
+		    var selected = (i==selisih) ? 'selected' : '';
+		    $('#selectTa').append('<option value="'+ ( parseInt(startTahun) + parseInt(i) ) +'" '+selected+'>'+( parseInt(startTahun) + parseInt(i) )+'</option>');
+		}
+		$('#selectTa').select2({
+		  // allowClear: true
+		});
+	}
 
 	function loadProgramStudy()
 	{
@@ -94,6 +113,10 @@
 		var form_data = new FormData();
 		var fileData = document.getElementById("ExFile").files[0];
 		var url = base_url_js + "admission/mastercalonmahasiswa/submit_import_excel_File_generate_nim";
+		var ta = $("#selectTa").val();
+		var Prodi = $("#selectProgramStudy").val();
+		form_data.append('ta',ta);
+		form_data.append('Prodi',Prodi);
 		form_data.append('fileData',fileData);
 	  	$.ajax({
 	  	  type:"POST",
