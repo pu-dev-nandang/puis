@@ -1552,6 +1552,25 @@ class C_api extends CI_Controller {
                 $data = $this->m_api->getDetailStudyPlanning($data_arr['NPM'],$data_arr['ta']);
                 return print_r(json_encode($data));
             }
+            else if($data_arr['action'] == 'detailKRSStudents'){
+
+                $NPM = $this->session->userdata('student_NPM');
+                $ProgramCampusID = $this->session->userdata('student_ProgramCampusID');
+                $Semester = $this->session->userdata('student_Semester');
+                $IsSemesterAntara = '0';
+                $ClassOf = $this->session->userdata('student_ClassOf');
+
+                $data = $this->m_academic->__getKRS($data_arr['SemesterID'],$ProgramCampusID,$data_arr['ProdiID'],
+                    $Semester,$IsSemesterAntara,$NPM,$ClassOf);
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='add'){
+                $formData = (array) $data_arr['formData'];
+                $this->db->insert('db_academic.std_krs', $formData);
+                $insert_id = $this->db->insert_id();
+
+                return print_r($insert_id);
+            }
         }
 
     }
@@ -2152,6 +2171,92 @@ class C_api extends CI_Controller {
         }
     }
 
+    public function crudKRSOnline(){
+        $data_arr = $this->getInputToken();
+
+        if(count($data_arr)>0){
+            if($data_arr['action']=='checkCountSeat'){
+                $whereCheck = (array) $data_arr['whereCheck'];
+                $query = $this->db->get_where('db_academic.std_krs', $whereCheck)->result_array();
+                return print_r(json_encode($query));
+            }
+            else if($data_arr['action']=='add'){
+                $formData = (array) $data_arr['formData'];
+                $this->db->insert('db_academic.std_krs', $formData);
+                $insert_id = $this->db->insert_id();
+
+                // Masukan ke dalam attd_students
+                $SemesterID = $formData['SemesterID'];
+                $ScheduleID = $formData['ScheduleID'];
+                $dataAttd = $this->db->get_where('db_academic.attendance',
+                    array( 'SemesterID' => $SemesterID,
+                        'ScheduleID' => $ScheduleID)
+                )->result_array();
+
+                if(count($dataAttd)>0){
+                    $NPM = $formData['NPM'];
+
+                    for($a=0;$a<count($dataAttd);$a++){
+                        $dataInsAttd = array(
+                            'ID_Attd' => $dataAttd[$a]['ID'],
+                            'NPM' => $NPM
+                        );
+                        $this->db->insert('db_academic.attendance_students', $dataInsAttd);
+                    }
+                }
+
+                // Tambahkan ke KSMnya
+                $this->m_api->insertToMainKRS($insert_id,$formData['TypeSP'],$data_arr['Student_DB']);
+
+
+                return print_r($insert_id);
+            }
+            else if($data_arr['action']=='deleteKRS'){
+
+             $SemesterID = $data_arr['SemesterID'];
+             $ScheduleID = $data_arr['ScheduleID'];
+             $NPM = $data_arr['NPM'];
+             $Student_DB = $data_arr['Student_DB'];
+
+             // Cek di attendance untuk di delete
+                $dataAttd = $this->db->get_where('db_academic.attendance',
+                        array('SemesterID' => $SemesterID,
+                            'ScheduleID' => $ScheduleID))->result_array();
+
+                if(count($dataAttd)>0){
+                    for($a=0;$a<count($dataAttd);$a++){
+                        $this->db->where(array('ID_Attd'=>$dataAttd[0]['ID'],'NPM' => $NPM));
+                        $this->db->delete('db_academic.attendance_students');
+                    }
+                }
+
+                // tabel std_krs
+                $dataStdKRS = $this->db->get_where('db_academic.std_krs',array(
+                    'SemesterID' => $SemesterID,
+                    'ScheduleID' => $ScheduleID,
+                    'NPM' => $NPM
+                ))->result_array();
+                if(count($dataStdKRS)>0){
+                    for($k=0;$k<count($dataStdKRS);$k++){
+                        $this->db->where('KRSID' , $dataStdKRS[$k]['ID']);
+                        $this->db->delete('db_academic.std_krs_comment');
+
+                        $this->db->where('ID',$dataStdKRS[$k]['ID']);
+                        $this->db->delete('db_academic.std_krs');
+                    }
+                }
+
+                // Cek apakah sudah jadi KSM ataubelum
+                $this->db->where(array('SemesterID'=>$SemesterID,'NPM' => $NPM, 'ScheduleID' => $ScheduleID));
+                $this->db->delete($Student_DB.'.study_planning');
+
+                return print_r(1);
+
+
+            }
+        }
+    }
+
     public function getAgama()
     {
         $generate = $this->m_api->getAgama();
@@ -2181,5 +2286,7 @@ class C_api extends CI_Controller {
         $generate = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
         echo json_encode($generate);
     }
+
+
 
 }

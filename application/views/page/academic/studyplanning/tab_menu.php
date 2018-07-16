@@ -22,6 +22,9 @@
     table.table-krs th, table.table-krs td {
         text-align: center;
     }
+    .t-center {
+        text-align: center;
+    }
 </style>
 
 <div class="row" style="margin-top: 30px;">
@@ -65,6 +68,23 @@
     $(document).ready(function () {
         window.SemesterAntara = 0;
 
+        window.NPM = '';
+        window.ta = '';
+
+        // Data Schedule yang sudah di kirim oleh setudent
+        window.ScheduleExist = [];
+        window.totalCreditExist = 0;
+
+        window.dataMaxCredit = 0;
+        window.totalMyCourse = 0;
+        window.totalCredit = 0;
+        window.KRSDraf = [];
+
+
+        // Daftar KRS yang sudah menjadi KSM
+        window.ArrDrafKRS = [];
+
+
         $('input[type=checkbox][data-toggle=toggle]').bootstrapToggle();
         loadSelectOptionProgramCampus('#filterProgramCampus','');
 
@@ -99,8 +119,26 @@
 
     $(document).on('click','.detailStudyPlan',function () {
 
-        var NPM = $(this).attr('data-npm');
-        var ta = $(this).attr('data-ta');
+        // Data Schedule yang sudah di kirim oleh setudent
+        ScheduleExist = [];
+        totalCreditExist = 0;
+
+        dataMaxCredit = 0;
+        totalMyCourse = 0;
+        totalCredit = 0;
+        KRSDraf = [];
+        ArrDrafKRS = [];
+
+
+        // var NPM =
+        ta = $(this).attr('data-ta');
+        NPM = $(this).attr('data-npm');
+        showDataKRSStudent();
+
+
+    });
+
+    function showDataKRSStudent() {
         var data = {
             action : 'detailStudent',
             NPM : NPM,
@@ -115,7 +153,7 @@
             var emailMhs = (dataStd.EmailPU!=null && dataStd.EmailPU!='') ? '' : 'hide';
             var emailDsn = (dataStd.MentorEmailPU!=null && dataStd.MentorEmailPU!='') ? '' : 'hide';
 
-            $('#divPage').html('<div class="col-md-8 col-md-offset-2" style="margin-bottom: 15px;">' +
+            $('#divPage').html('<div class="col-md-8 col-md-offset-2" style="margin-bottom: 15px;" xmlns="http://www.w3.org/1999/html">' +
                 '            <div class="row">' +
                 '<div class="col-md-12" style="margin-bottom: 15px;"><button class="btn btn-warning" id="btnBack"><i class="fa fa-arrow-left right-margin" aria-hidden="true"></i> Back</button></div>' +
                 '                <div class="col-xs-2">' +
@@ -173,10 +211,12 @@
                 '                <th style="width: 5%;">Status</th>' +
                 '            </tr>' +
                 '            </thead><tbody id="dataSchedule"></tbody>' +
-                '        </table><hr/>');
+                '        </table><hr/>' +
+                '<div id="dataPageLoad" class="well"></div>');
 
             var tr = $('#dataSchedule');
-            var totalCredit = 0;
+            dataMaxCredit = dataStd.DetailSemester.MaxCredit.Credit;
+            totalMyCourse = dataStd.Schedule.length;
             for(var i=0;i<dataStd.Schedule.length;i++){
                 var dataSc = dataStd.Schedule[i];
                 var status = '<i class="fa fa-circle" style="color:#d8d8d8;"></i>';
@@ -189,14 +229,20 @@
                 }
 
                 tr.append('<tr>' +
-                        '<td>'+dataSc.MKCode+'</td>' +
-                        '<td style="text-align: left;"><b>'+dataSc.NameEng+'</b><br/><i>'+dataSc.Name+'</i></td>' +
-                        '<td>'+dataSc.TypeSP+'</td>' +
-                        '<td>'+dataSc.Credit+'</td>' +
-                        '<td>'+dataSc.ClassGroup+'</td>' +
-                        '<td><ul id="sc'+i+'" class="list-scd"></ul></td>' +
-                        '<td>'+status+'</td>' +
+                    '<td>'+dataSc.MKCode+'</td>' +
+                    '<td style="text-align: left;"><b>'+dataSc.NameEng+'</b><br/><i>'+dataSc.Name+'</i></td>' +
+                    '<td>'+dataSc.TypeSP+'</td>' +
+                    '<td>'+dataSc.Credit+'</td>' +
+                    '<td>'+dataSc.ClassGroup+'</td>' +
+                    '<td><ul id="sc'+i+'" class="list-scd"></ul></td>' +
+                    '<td>'+status+'</td>' +
                     '</tr>');
+
+                ScheduleExist.push(dataSc.ScheduleID);
+
+                ArrDrafKRS.push(dataSc.CDID);
+                totalCredit = parseInt(totalCredit) + parseInt(dataSc.Credit);
+
 
                 var sc = $('#sc'+i);
                 for(var s=0;s<dataSc.DetailSchedule.length;s++){
@@ -209,17 +255,167 @@
                     sc.append('<li>R.'+dataSCD.Room+' | <span style="text-align: right;">'+dataSCD.DayNameEng+', '+start+' - '+end+'<span></li>');
                 }
 
-                totalCredit = totalCredit + parseInt(dataSc.Credit);
+                totalCreditExist = totalCreditExist + parseInt(dataSc.Credit);
                 if(i==(dataStd.Schedule.length - 1)){
                     tr.append('<tr style="background: lightyellow;font-weight: bold;">' +
                         '<td colspan="3">Total Credit</td>' +
-                        '<td>'+totalCredit+'</td>' +
+                        '<td>'+totalCreditExist+'</td>' +
                         '</tr>');
                 }
             }
-        });
 
-    });
+            if(typeof dataStd.DetailOfferings.Arr_CDID !== "undefined"){
+
+                $('#dataPageLoad').html('' +
+                    '<div class="tableRequired">' +
+                    // '<div class="alert alert-warning hide" role="alert" id="alertKRS"><b>KRS Waiting Approval (Penasehat Akademik)</b></div>' +
+                    '                    <h3><span class="label label-primary">Required Course</span></h3>' +
+                    '                </div>' +
+                    '                <div class="tableRequired">' +
+                    '                    <div class="table-responsive" style="margin-top:30px;">' +
+                    '                       <table class="table table-bordered">' +
+                    '                           <thead>' +
+                    '                               <tr style="background: #20485a;color: #ffffff;">' +
+                    // '                                   <th class="t-center" style="width: 10px;">No</th>' +
+                    '                                   <th class="t-center" style="width: 90px;">Code</th>' +
+                    '                                   <th class="t-center">Course</th>' +
+                    '                                   <th class="t-center" style="width: 10px;">Status</th>' +
+                    '                                   <th class="t-center" style="width: 10px;">Credit</th>' +
+                    '                                   <th class="t-center" style="width: 75px;">Group</th>' +
+                    '                                   <th class="t-center" style="width: 355px;">Schedule</th>' +
+                    '                                   <th class="t-center" style="width: 5px;">Action</th>' +
+                    '                               </tr>' +
+                    '                           </thead>' +
+                    '                           <tbody id="dataCourse">' +
+                    '                           </tbody>' +
+                    '                       </table>'+
+                    '                    </div>' +
+                    '                </div>' +
+
+                    '<div class="tableOptional">' +
+                    '                    <h3><span class="label label-warning">Optional Course</span></h3>' +
+                    '                </div>' +
+                    '                <div class="tableOptional">' +
+                    '                    <div class="table-responsive" style="margin-top:30px;">' +
+                    '                       <table class="table table-bordered"">' +
+                    '                           <thead>' +
+                    '                               <tr style="background: #90855e;color: #ffffff;">' +
+                    // '                                   <th class="t-center" style="width: 10px;">No</th>' +
+                    '                                   <th class="t-center" style="width: 90px;">Code</th>' +
+                    '                                   <th class="t-center">Course</th>' +
+                    '                                   <th class="t-center" style="width: 10px;">Status</th>' +
+                    '                                   <th class="t-center" style="width: 10px;">Credit</th>' +
+                    '                                   <th class="t-center" style="width: 75px;">Group</th>' +
+                    '                                   <th class="t-center" style="width: 355px;">Schedule</th>' +
+                    '                                   <th class="t-center" style="width: 5px;">Action</th>' +
+                    '                               </tr>' +
+                    '                           </thead>' +
+                    '                           <tbody id="dataCourseOptional">' +
+                    '                           </tbody>' +
+                    '                       </table>'+
+                    '                    </div>' +
+                    '                </div>' +
+                    '<br/>' +
+                    '<div style="text-align: right;">' +
+                    '<span id="totalCredit"></span> of <span id="dataMaxCredit"></span> Credit' +
+                    '</div>');
+
+                var no = 1;
+                var totalReq = 0;
+                var totalOpt = 0;
+
+                for(var i=0;i<dataStd.DetailOfferings.Schedule.length;i++){
+
+                    var sc = dataStd.DetailOfferings.Schedule[i];
+
+                    var tr = '';
+
+
+                    if(sc.MKType==1 && dataStd.DetailOfferings.Semester==sc.Semester){
+                        totalReq += 1;
+                        tr = $('#dataCourse');
+                    } else {
+                        totalOpt += 1;
+                        tr = $('#dataCourseOptional');
+                    }
+
+                    var bg = (sc.SPID!=null) ? '<span class="btn btn-default btn-default-warning btn-sm"><b>Ul</b></span>' : '<span class="btn btn-default btn-default-primary btn-sm"><b>Br</b></span>';
+
+                    console.log(ScheduleExist);
+                    var typesp = (sc.SPID!=null) ? 'Ul' : 'Br';
+                    var btnAct='<button class="btn btn-sm btn-danger btn-delete-krs" id="btnDeleteKRS'+sc.ID+'" data-semesterid="'+dataStd.DetailOfferings.SemesterID+'" data-credit="'+sc.Credit+'" data-cdid="'+sc.CDID+'" data-group="'+sc.ClassGroup+'" data-id="'+sc.ID+'" data-typesp="'+typesp+'"><i class="fa fa-trash"></i></button>';
+                    if(ScheduleExist.indexOf(sc.ID) == -1){
+                        btnAct='<button class="btn btn-success btn-sm btn-add-krs" id="btnAddKRS'+sc.ID+'" data-semesterid="'+dataStd.DetailOfferings.SemesterID+'" data-credit="'+sc.Credit+'" data-cdid="'+sc.CDID+'" data-group="'+sc.ClassGroup+'" data-id="'+sc.ID+'" data-typesp="'+typesp+'"><i class="fa fa-download"></i></button>';
+                    }
+
+                    tr.append('<tr>' +
+                        '<td style="text-align: center;">'+sc.MKCode+'</td>' +
+                        '<td><strong>'+sc.MKNameEng+'</strong><br/><i>'+sc.MKName+'</i><br/><p style="color: blue;">Semester '+sc.Semester+'</p>' +
+                        '<div id="alertSC'+sc.ID+'"></div> ' +
+                        '</td>' +
+                        '<td style="text-align: center;">'+bg+'</td>' +
+                        '<td style="text-align: center;">'+sc.Credit+'</td>' +
+                        '<td style="text-align: center;">'+sc.ClassGroup+'</td>' +
+                        '<td><div id="scd'+no+'"></div></td>' +
+                        '<td style="text-align: center;">' +
+                        '<div id="btnActKRSOnline'+sc.ID+'">'+btnAct+'</div> ' +
+                        '<textarea id="scheduleArr'+sc.ID+'" class="hide" hidden readonly></textarea>' +
+                        '</td>' +
+                        '</tr>');
+
+                    var sc_detail = sc.ScheduleDetails;
+                    var scd = $('#scd'+no);
+                    scd.html('');
+                    var Draf = [];
+
+                    for(var d=0;d<sc_detail.length;d++){
+
+                        var data = sc_detail[d];
+
+                        var DrafArr = {
+                            Course : sc.MKNameEng,
+                            ID : data.ID,
+                            ScheduleID : data.ScheduleID,
+                            ClassroomID : data.ClassroomID,
+                            DayID : data.DayID,
+                            StartSessions : data.StartSessions,
+                            EndSessions : data.EndSessions
+                        };
+
+                        if(totalMyCourse>0 && $.inArray(sc.CDID,ArrDrafKRS)!=-1){KRSDraf.push(DrafArr);}
+                        Draf.push(DrafArr);
+
+                        var alert = (sc.SubSesi==1)? 'alert-warning' : 'alert-info';
+
+                        var extStart = data.StartSessions.split(':');
+                        var start = extStart[0]+':'+extStart[1];
+
+                        var extEnd = data.EndSessions.split(':');
+                        var end = extEnd[0]+':'+extEnd[1];
+
+                        scd.append('<div class="alert '+alert+' alert-schedule" role="alert" style="width: 330px;"><b>R.'+data.Room+' </b> ' +
+                            '<span class="seat"><span class="CountSeat'+sc.ID+'">'+data.CountSeat+'</span> of '+data.Seat+' Seat</span>' +
+                            '<span style="float: right;">'+data.DayNameEng+', '+start+' - '+end+'</span></div>');
+                        $('#btnAddKRS'+sc.ID).attr('data-seat',data.Seat);
+
+                    }
+
+                    $('#scheduleArr'+sc.ID).val(JSON.stringify(Draf));
+
+
+                    no += 1;
+                }
+
+                $('#totalMyCourse').text(totalMyCourse);
+                $('#totalCredit').text(totalCredit);
+                $('#dataMaxCredit').text(dataMaxCredit);
+
+                // console.log(Draf);
+
+            }
+
+        });
+    }
 
 
     
@@ -333,8 +529,6 @@
 
         }
 
-
-
     }
 
     $(document).on('click','.sendEmail',function () {
@@ -343,4 +537,192 @@
         PopupCenter(url,'xtf','900','500')
 
     });
+
+    $(document).on('click','.btn-delete-krs',function () {
+        var SemesterID = $(this).attr('data-semesterid');
+        var Group = $(this).attr('data-group');
+        var ID = $(this).attr('data-id');
+        var Credit = $(this).attr('data-credit');
+        var CDID = $(this).attr('data-cdid');
+        var typesp = $(this).attr('data-typesp');
+
+        $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Delete '+Group+' ??<hr/></b> ' +
+            '<button type="button" class="btn btn-primary" data-id="'+ID+'" data-credit="'+Credit+'" data-cdid="'+CDID+'" data-typesp="'+typesp+'" data-semesterid="'+SemesterID+'" id="btnYesDeleteKRS" style="margin-right: 5px;">Yes</button>' +
+            '<button type="button" class="btn btn-default" id="btnNoDeleteKRS" data-dismiss="modal">No</button>' +
+            '</div>');
+        $('#NotificationModal').modal('show');
+    });
+
+    $(document).on('click','#btnYesDeleteKRS',function () {
+        var SemesterID = $('#btnYesDeleteKRS').attr('data-semesterid');
+        var ScheduleID = $('#btnYesDeleteKRS').attr('data-id');
+
+        var Credit = $(this).attr('data-credit');
+        var CDID = $(this).attr('data-cdid');
+        var typesp = $(this).attr('data-typesp');
+        loading_buttonSm('#btnDeleteKRS'+ScheduleID);
+        loading_buttonSm('#btnYesDeleteKRS');
+        $('#btnNoDeleteKRS').prop('disabled',true);
+
+        var data = {
+            action : 'deleteKRS',
+            SemesterID : SemesterID,
+            ScheduleID : ScheduleID,
+            NPM : NPM,
+            Student_DB : 'ta_'+ta
+        };
+
+        // console.log(data);
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api/__crudKRSOnline';
+
+        $.post(url,{token:token},function (jsonResult) {
+            showDataKRSStudent();
+            setTimeout(function () {
+                $('#btnActKRSOnline'+ScheduleID).html('<button class="btn btn-success btn-sm btn-add-krs"' +
+                    ' id="btnAddKRS'+ScheduleID+'" data-semesterid="'+SemesterID+'" data-credit="'+Credit+'" ' +
+                    'data-cdid="'+CDID+'" data-id="'+ScheduleID+'" data-typesp="'+typesp+'"><i class="fa fa-download"></i></button>');
+
+                $('#NotificationModal').modal('hide');
+            },1000);
+
+        });
+
+
+    });
+
+    $(document).on('click','.btn-add-krs',function () {
+
+        var SemesterID = $(this).attr('data-semesterid');
+        var ScheduleID = $(this).attr('data-id');
+        var MaxSeat = $(this).attr('data-seat');
+        var CDID = $(this).attr('data-cdid');
+        var TypeSP = $(this).attr('data-typesp');
+        var Credit = $(this).attr('data-credit');
+        var Group = $(this).attr('data-group');
+
+        checkCountSeat(SemesterID,ScheduleID,CDID,TypeSP,Credit,MaxSeat,Group);
+
+    });
+
+    function checkCountSeat(SemesterID,ScheduleID,CDID,TypeSP,Credit,MaxSeat,Group) {
+        var data = {
+            action : 'checkCountSeat',
+            whereCheck : {
+                SemesterID : SemesterID,
+                ScheduleID : ScheduleID,
+                CDID : CDID
+            }
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api/__crudKRSOnline';
+
+
+        var dataSchedule = $('#scheduleArr'+ScheduleID).val();
+        var DrafArr = JSON.parse(dataSchedule);
+
+        var NextCredit = parseInt(totalCredit) + parseInt(Credit);
+        // return false;
+
+        var process = [];
+        // Dari Lokal Dulu
+        for(var d=0;d<DrafArr.length;d++){
+
+            for(var k=0;k<KRSDraf.length;k++){
+
+                if(DrafArr[d].DayID==KRSDraf[k].DayID){
+                    if( (DrafArr[d].StartSessions >= KRSDraf[k].StartSessions && DrafArr[d].StartSessions <= KRSDraf[k].EndSessions) ||
+                        (DrafArr[d].EndSessions >= KRSDraf[k].StartSessions && DrafArr[d].EndSessions <= KRSDraf[k].EndSessions) ||
+                        (DrafArr[d].StartSessions <= KRSDraf[k].StartSessions && DrafArr[d].EndSessions >= KRSDraf[k].EndSessions)
+                    ){
+                        process.push(0);
+                        $('#alertSC'+DrafArr[d].ScheduleID).html('<div class="alert alert-danger" style="margin-bottom:0px;" role="alert">' +
+                            '<b><i class="fa fa-level-down" aria-hidden="true"></i> Conflict with : </b> '+KRSDraf[k].Course+'</div>')
+                        toastr.error(KRSDraf[k].Course,'Error Conflict with');
+                        return false;
+                    }
+                }
+
+            }
+
+        }
+
+        if($.inArray(0,process)==-1){
+
+            if(dataMaxCredit>=NextCredit){
+
+                $.post(url,{token:token},function (resultJson) {
+
+                    var s = resultJson.length + 1 ;
+
+                    if(parseInt(MaxSeat)<s){
+                        $('.CountSeat'+ScheduleID).html(resultJson.length);
+                        toastr.error('Class Full','Error');
+                    } else {
+                        $('.CountSeat'+ScheduleID).html(s);
+                        saveToDraf(SemesterID,ScheduleID,CDID,TypeSP,Credit,Group);
+                        for(var d=0;d<DrafArr.length;d++){
+                            KRSDraf.push(DrafArr[d]);
+                        }
+                        $('#alertSC'+ScheduleID).html('');
+
+                    }
+
+                });
+
+            }
+            else {
+                toastr.error('Not Enough Credit','Error');
+            }
+        }
+
+        // return false;
+
+
+    }
+
+    function saveToDraf(SemesterID,ScheduleID,CDID,TypeSP,Credit,Group) {
+
+        // $('#btnAddKRS'+ScheduleID).css('padding','3px 5px 3px 5px');
+        loading_buttonSm('#btnAddKRS'+ScheduleID);
+
+        var data = {
+            action : 'add',
+            Student_DB : 'ta_'+ta,
+            formData : {
+                SemesterID : SemesterID,
+                NPM : NPM,
+                ScheduleID : ScheduleID,
+                CDID : CDID,
+                TypeSP : TypeSP,
+                Status : '3',
+                Input_At : dateTimeNow()
+            }
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api/__crudKRSOnline';
+        $.post(url,{token:token},function (resultJSON) {
+
+            showDataKRSStudent();
+            setTimeout(function () {
+
+                $('#btnActKRSOnline'+ScheduleID).html('<button class="btn btn-sm btn-danger btn-delete-krs" ' +
+                    ' id="btnDeleteKRS'+ScheduleID+'" data-semesterid="'+SemesterID+'" data-credit="'+Credit+'" data-cdid="'+CDID+'"' +
+                    ' data-group="'+Group+'" data-id="'+ScheduleID+'" data-typesp="'+TypeSP+'"><i class="fa fa-trash"></i></button>');
+                toastr.success('Saved','Success');
+
+                totalMyCourse = totalMyCourse + 1;
+                totalCredit = totalCredit + parseInt(Credit);
+
+
+                $('#totalCredit').text(totalCredit);
+
+            },500);
+
+        });
+
+    }
 </script>
