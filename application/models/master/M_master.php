@@ -1796,4 +1796,26 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
        return $date = $bulan_arr[2]." ".$nama_bulan." ".$bulan_arr[0];  
     }
+
+    public function checkDB($Database)
+    {
+        $sql = "show databases like '%".$Database."%'";
+        $query=$this->db->query($sql, array())->result_array();
+        if (count($query) > 0) {
+            // existing
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    public function getLastNPM($ta,$ProdiID)
+    {
+        $sql = "select * from ".$ta.".students where ProdiID = ? order by ID desc limit 1";
+        // print_r($ProdiID);
+        $query=$this->db->query($sql, array($ProdiID))->result_array();
+        return $query;
+    }
 }
