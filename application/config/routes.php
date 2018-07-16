@@ -479,6 +479,8 @@ $route['api/__getDivision'] = 'api/c_api/getDivision';
 $route['api/__getPosition'] = 'api/c_api/getPosition';
 $route['api/__getStatusEmployee'] = 'api/c_api/getStatusEmployee';
 
+$route['api/__crudKRSOnline'] = 'api/c_api/crudKRSOnline';
+
 
 // for inject //
 $route['testadi'] = 'dashboard/c_dashboard/testadi';
