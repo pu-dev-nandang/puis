@@ -372,13 +372,20 @@ if ($this->uri->segment(1) == 'dashboard') {
                     </li>
                 </ul>
             </li>
-            <li class="">
-                <a href="#">
+            <li class="<?php if($this->uri->segment(2)=='mastercalonmahasiswa'){echo "current open";} ?>">
+                <a href="javascript:void(0);">
                     <i class="fa fa-user-circle"></i>
                     Master Calon Mahasiswa
                 </a>
+                <ul class="sub-menu">
+                    <li class="<?php if($this->uri->segment(2)=='mastercalonmahasiswa' && $this->uri->segment(3) == "generate-nim" ){echo "current";} ?>">
+                        <a href="<?php echo base_url('admission/mastercalonmahasiswa/generate-nim'); ?>">
+                            <i class="icon-angle-right"></i>
+                            Generate NIM
+                        </a>
+                    </li>
+                </ul>
             </li>
-
             <li class="">
                 <a href="#">
                     <i class="fa fa-exchange" aria-hidden="true"></i>

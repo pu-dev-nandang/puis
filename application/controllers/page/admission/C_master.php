@@ -950,6 +950,22 @@ class C_master extends Admission_Controler {
         }
     }
 
+    public function download_template($file)
+    {
+        $file = str_replace('-', '/', $file);
+        if (file_exists('./uploads/'.$file)) {
+             $this->load->helper('download');
+             $data   = file_get_contents('./uploads/'.$file);
+             $name   = $file;
+             force_download($name, $data); // script download file
+            // $this->showFile($file);
+        }
+        else
+        {
+            show_404($log_error = TRUE);
+        }
+    }
+
     private function showFile($file)
     {
         header("Content-type: application/pdf");

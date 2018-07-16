@@ -729,4 +729,43 @@ class C_admission extends Admission_Controler {
 
     }
 
+    public function generatenim()
+    {
+      $content = $this->load->view('page/'.$this->data['department'].'/master_calon_mahasiswa/generatenim',$this->data,true);
+      $this->temp($content);
+    }
+
+    public function submit_import_excel_File_generate_nim()
+    {
+      // print_r($_FILES);
+      if(isset($_FILES["fileData"]["name"]))
+      {
+        $path = $_FILES["fileData"]["tmp_name"];
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load($path); // Empty Sheet
+        $objWorksheet = $excel2->setActiveSheetIndex(1);
+        echo '<table border=1>' . "\n";
+        foreach ($objWorksheet->getRowIterator() as $row) {
+          echo '<tr>' . "\n";
+          $cellIterator = $row->getCellIterator();
+          $cellIterator->setIterateOnlyExistingCells(false); // This loops all cells,
+                                                             // even if it is not set.
+                                                             // By default, only cells
+                                                             // that are set will be
+                                                             // iterated.
+          foreach ($cellIterator as $cell) {
+            echo '<td>' . $cell->getValue() . '</td>' . "\n";
+          }
+          echo '</tr>' . "\n";
+        }
+        echo '</table>' . "\n";
+
+      }
+      else
+      {
+        exit('No direct script access allowed');
+      }
+    }
+
 }
