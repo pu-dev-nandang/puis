@@ -224,9 +224,9 @@ $route['admission/master-registration/sales_koordinator/pagination/(:num)'] = 'p
 $route['admission/master-registration/DataFormulirOffline/downloadPDFToken'] = 'page/admission/c_master/downloadPDFToken';
 $route['admission/config/upload-pdf-per-pengumuman'] = 'page/admission/c_master/upload_pengumuman';
 
-$route['fileGet/(:any)'] = 'page/admission/c_master/fileGet/$1';
-$route['download/(:any)'] = 'page/admission/c_master/download/$1';
-$route['download_template/(:any)'] = 'page/admission/c_master/download_template/$1';
+$route['fileGet/(:any)'] = 'api/c_global/fileGet/$1';
+$route['download/(:any)'] = 'api/c_global/download/$1';
+$route['download_template/(:any)'] = 'api/c_global/download_template/$1';
 
 
 
