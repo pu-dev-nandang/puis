@@ -1137,13 +1137,14 @@ class M_finance extends CI_Model {
        $query=$this->db->query($sql, array());
    }
 
-   public function inserData_master_tagihan_mhs($TypePembayaran,$Prodi,$Cost,$ClassOf)
+   public function inserData_master_tagihan_mhs($TypePembayaran,$Prodi,$Cost,$ClassOf,$Pay_Cond)
    {
     $dataSave = array(
         'PTID' => $TypePembayaran,
         'ProdiID' => $Prodi,
         'ClassOf' => $ClassOf,
         'Cost' => $Cost,
+        'Pay_Cond' => $Pay_Cond
     );
       $this->db->insert('db_finance.tuition_fee', $dataSave);
    }
@@ -1177,8 +1178,10 @@ class M_finance extends CI_Model {
    {
     $ProdiID = $input['ProdiID'];
     $ClassOf = $input['ClassOf'];
-    $sql = "delete from db_finance.tuition_fee where ProdiID = ".$ProdiID.' and ClassOf = "'.$ClassOf.'"';
-    $query=$this->db->query($sql, array());
+    $bintang = $input['bintang'];
+    $bintang = strlen($bintang);
+    $sql = "delete from db_finance.tuition_fee where ProdiID = ".$ProdiID.' and ClassOf = "'.$ClassOf.'" and Pay_Cond = ?';
+    $query=$this->db->query($sql, array($bintang));
    }
 
    public function cancel_created_tagihan_mhs($input)
@@ -1497,10 +1500,10 @@ class M_finance extends CI_Model {
     return $arr;
    }
 
-   public function checkMasterTagihanExisting($TypePembayaran,$Prodi,$ClassOf)
+   public function checkMasterTagihanExisting($TypePembayaran,$Prodi,$ClassOf,$Pay_Cond)
    {
-    $sql= 'select * from db_finance.tuition_fee where PTID = ? and ProdiID = ? and ClassOf = ?';
-    $query=$this->db->query($sql, array($TypePembayaran,$Prodi,$ClassOf))->result_array();
+    $sql= 'select * from db_finance.tuition_fee where PTID = ? and ProdiID = ? and ClassOf = ? and Pay_Cond = ?';
+    $query=$this->db->query($sql, array($TypePembayaran,$Prodi,$ClassOf,$Pay_Cond))->result_array();
     if (count($query) > 0) {
       // existing
       return false;

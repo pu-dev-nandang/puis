@@ -48,8 +48,8 @@ class C_tuition_fee extends Finnance_Controler {
     {
         $input = $this->getInputToken();
         // check data master tagihan exist
-        if ($this->m_finance->checkMasterTagihanExisting($input['TypePembayaran'],$input['Prodi'],$input['ClassOf'])) {
-             $this->m_finance->inserData_master_tagihan_mhs($input['TypePembayaran'],$input['Prodi'],$input['Cost'],$input['ClassOf']);
+        if ($this->m_finance->checkMasterTagihanExisting($input['TypePembayaran'],$input['Prodi'],$input['ClassOf'],$input['Pay_Cond'])) {
+             $this->m_finance->inserData_master_tagihan_mhs($input['TypePembayaran'],$input['Prodi'],$input['Cost'],$input['ClassOf'],$input['Pay_Cond']);
              echo json_encode('');
         }
         else
