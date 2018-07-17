@@ -40,4 +40,64 @@ class C_global extends CI_Controller {
         echo $content;
     }
 
+    public function download($file)
+    {
+        if (file_exists('./document/'.$file)) {
+             $this->load->helper('download');
+             $data   = file_get_contents('./document/'.$file);
+             $name   = $file;
+             force_download($name, $data); // script download file
+            // $this->showFile($file);
+        }
+        else
+        {
+            show_404($log_error = TRUE);
+        }
+    }
+
+    public function fileGet($file)
+    {
+        //check session ID_register_formulir ada atau tidak
+        // check session token untuk download
+
+        // Check File exist atau tidak
+        if (file_exists('./document/'.$file)) {
+            // $this->load->helper('download');
+            // $data   = file_get_contents('./document/'.$namaFolder.'/'.$file);
+            // $name   = $file;
+            // force_download($name, $data); // script download file
+            $this->showFile($file);
+        }
+        else
+        {
+            show_404($log_error = TRUE);
+        }
+    }
+
+    public function download_template($file)
+    {
+        $file = str_replace('-', '/', $file);
+        if (file_exists('./uploads/'.$file)) {
+             $this->load->helper('download');
+             $data   = file_get_contents('./uploads/'.$file);
+             $name   = $file;
+             force_download($name, $data); // script download file
+            // $this->showFile($file);
+        }
+        else
+        {
+            show_404($log_error = TRUE);
+        }
+    }
+
+    private function showFile($file)
+    {
+        header("Content-type: application/pdf");
+        header("Content-disposition: inline;     
+        filename=".basename('document/'.$file));
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        $filePath = readfile('document/'.$file);
+    }
+
 }
