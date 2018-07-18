@@ -772,21 +772,26 @@ class M_finance extends CI_Model {
     $value = 3;
     $NPM = ($NPM == "" || $NPM == null) ? '' : ' and a.NPM = "'.$NPM.'"';
     $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+
+    $queryAdd = '';
+    if ($PTID == 3) {
+      $queryAdd = ' and a.NPM in (select NPM from db_finance.payment where PTID = 2 and SemesterID = '.$SemesterID[0]['ID'].' and Status = "1")';
+    }
     if ($prodi == '') {
-     $sql = 'select a.*,b.EmailPU,c.Cost from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
+     $sql = 'select a.*,b.EmailPU,b.Pay_Cond,c.Cost from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
              on a.ProdiID = c.ProdiID
-             where a.StatusStudentID = ?  and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.'
-             order by a.NPM asc
+             where a.StatusStudentID = ?  and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
+             and b.Pay_Cond = c.Pay_Cond order by a.NPM asc
              LIMIT '.$start. ', '.$limit;
       // print_r($sql);       
      $Data_mhs=$this->db->query($sql, array($value,$PTID,$SemesterID[0]['ID'],$ta,$PTID))->result_array();
     }
     else
     {
-      $sql = 'select a.*,b.EmailPU,c.Cost from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
+      $sql = 'select a.*,b.EmailPU,b.Pay_Cond,c.Cost from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
               on a.ProdiID = c.ProdiID
-              where a.StatusStudentID = ? and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.'
-              order by a.NPM asc 
+              where a.StatusStudentID = ? and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
+               and b.Pay_Cond = c.Pay_Cond order by a.NPM asc 
               LIMIT '.$start. ', '.$limit;
       $Data_mhs=$this->db->query($sql, array($value,$prodi,$PTID,$SemesterID[0]['ID'],$ta,$PTID))->result_array();
     }
@@ -967,7 +972,7 @@ class M_finance extends CI_Model {
     }
 
     if ($ta1 == '') {
-      $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description 
+      $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
               join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and c.ID = ? order by a.Status asc LIMIT '.$start. ', '.$limit;
@@ -976,7 +981,7 @@ class M_finance extends CI_Model {
     }
     else
     {
-      $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description 
+      $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
               join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? and c.ID = ? order by a.Status asc LIMIT '.$start. ', '.$limit;
@@ -1026,6 +1031,7 @@ class M_finance extends CI_Model {
             'DetailPayment' => $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']),
             'VA' => $VA,
             'Credit' => $Credit,
+            'Pay_Cond' => $query[$i]['Pay_Cond'],
         );
       }
       else
@@ -1052,6 +1058,7 @@ class M_finance extends CI_Model {
               'DetailPayment' => $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']),
               'VA' => $VA,
               'Credit' => $Credit,
+              'Pay_Cond' => $query[$i]['Pay_Cond'],
           );
         }
       }
@@ -1219,7 +1226,9 @@ class M_finance extends CI_Model {
                        // triger VA closed berhasil, update va_log status = 2 // auto dari update_va_Payment
                        // delete data pada table payment dan payment_students
                           // action delete belum benar
-                       $this->delete_id_table($query[0]['ID_payment'],'payment_students');
+                       // $this->delete_id_table($query[0]['ID_payment'],'payment_students');
+                       $sqlDelete = "delete from db_finance.payment_students where ID_payment = ".$query[0]['ID_payment'];
+                       $queryDelete=$this->db->query($sqlDelete, array());
                        $this->delete_id_table($query[0]['ID_payment'],'payment');
                        
                      }
@@ -1526,17 +1535,66 @@ class M_finance extends CI_Model {
       if (count($query1) > 0) {
         // check datetime expired sudah melewati waktu atau belum
         $datetime_expired = $query1[0]['datetime_expired'];
+        // print_r($datetime_expired);
         $sql2 = 'select * from (
                   select now() as ac
                 )aa
                 where ? > ac';
                 $query2=$this->db->query($sql2, array($datetime_expired))->result_array();
             if (count($query2) > 0) {
-                  $rs['data'] = $query1;
+                  // get bilingID
+                  $this->load->model('master/m_master');
+                  switch ($query1[0]['routes_table']) {
+                    case 'db_finance.payment_students':
+                      $getData = $this->m_master->caribasedprimary('db_finance.payment_students','BilingID',$query1[0]['trx_id']);
+                      if ($getData > 0) {
+                        // get Informasi Mahasiswa
+                           $GetPayment = $this->m_master->caribasedprimary('db_finance.payment','ID',$getData[0]['ID_payment']);
+                           $NPM = $GetPayment[0]['NPM'];
+                           $data = $this->m_master->PaymentgetMahasiswaByNPM($NPM);
+                           $PTIDDesc = $data['PTIDDesc'];
+                           $SemesterName = $data['SemesterName'];
+                           $Nama = $data['Nama'];
+                           $EmailPU = $data['EmailPU'];
+                           $ProdiEng = $data['ProdiEng'];
+                           $Invoice = $getData[0]['Invoice'];
+                           $BilingID = $query1[0]['trx_id'];
+                           $Status = 'Active';
+                           $rs['data'] = array(
+                                'ProdiEng' => $ProdiEng,
+                                'PTIDDesc' => $PTIDDesc,
+                                'Nama' => $Nama,
+                                'NPM' => $NPM,
+                                'VA' => $VA,
+                                'EmailPU' => $EmailPU,
+                                'BilingID' => $BilingID,
+                                'Invoice' => $Invoice,
+                                'Status' => $Status,
+                                'Expired' => $datetime_expired,
+                                'SemesterName' => $SemesterName
+
+                           );
+                      }
+                      else
+                      {
+                        $rs['msg'] = 'VA dengan number '.$VA.' available';
+                      }
+                      
+                      break;
+                    
+                    default:
+                      # code...
+                      break;
+                  }
+                  
             }
             else{
-              $rs['msg'] = 'VA dengan number '.$VA.' Inactive';
+              $rs['msg'] = 'VA dengan number '.$VA.' available';
             } 
+      }
+      else
+      {
+        $rs['msg'] = 'VA dengan number '.$VA.' available';
       }
     }
     else

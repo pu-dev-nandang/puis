@@ -36,6 +36,12 @@
                         Tagihan Mahasiswa
                         </a>
                     </li>
+                    <li class="<?php if($this->uri->segment(2)=='master' && $this->uri->segment(3) == "pricelist-mhs" ){echo "current";} ?>">
+                        <a href="#'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Import PriceList Mahasiswa
+                        </a>
+                    </li>
                     <li class="<?php if($this->uri->segment(2)=='master' && $this->uri->segment(3) == "discount" ){echo "current";} ?>">
                         <a href="#">
                         <i class="icon-angle-right"></i>
@@ -148,14 +154,20 @@
                         Penerimaan Pembayaran
                         </a>
                     </li>
+                    <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "calender-tagihan-mhs"){echo "current";} ?>">
+                        <a href="#">
+                        <i class="icon-angle-right"></i>
+                        Calender Tagihan
+                        </a>
+                    </li>
                 </ul>
             </li>
-            <!--<li class="<?php if($this->uri->segment(2)=='check-va'){echo "current";} ?>">
+            <li class="<?php if($this->uri->segment(2)=='check-va'){echo "current";} ?>">
                 <a href="<?php echo base_url('finance/check-va'); ?>">
                     <i class="fa fa-refresh"></i>
                     Check VA
                 </a>
-            </li>-->
+            </li>
         </ul>
         <div class="sidebar-widget align-center">
             <div class="btn-group" data-toggle="buttons" id="theme-switcher">

@@ -96,5 +96,11 @@
           $('#selectClassOf').append('<option value="'+ ( parseInt(startTahun) + parseInt(i) ) +'" '+selected+'>'+( parseInt(startTahun) + parseInt(i) )+'</option>');
       }
 
+      var selectedCuriculum = '<?php echo $selectCurriculum ?>';
+       $("#selectClassOf option").filter(function() {
+         //may want to use $.trim in here
+         return $(this).val() == selectedCuriculum; 
+       }).prop("selected", true);
+
     }
 </script>

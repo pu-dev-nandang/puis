@@ -50,9 +50,13 @@
 
     function modal_generate(action,title,ID='') {
         var url = base_url_js+"finance/master/modal-tagihan-mhs";
+        var selectCurriculum = $("#selectCurriculum").val();
+        var aa = selectCurriculum.split(".");
+        selectCurriculum = aa[1];
         var data = {
             Action : action,
             CDID : ID,
+            selectCurriculum : selectCurriculum
         };
         var token = jwt_encode(data,"UAP)(*");
         $.post(url,{ token:token }, function (html) {

@@ -71,10 +71,11 @@
                 <!-- <th style="width: 5%;">Year</th> -->
                 <th style="width: 15%;">Payment Type</th>
                 <th style="width: 15%;">Email PU</th>
-                <th style="width: 15%;">IPS</th>
-                <th style="width: 15%;">IPK</th>
-                <th style="width: 10%;">Discount</th>
+                <th style="width: 5%;">IPS</th>
+                <th style="width: 5%;">IPK</th>
+                <th style="width: 5%;">Discount</th>
                 <th style="width: 10%;">Invoice</th>
+                <th style="width: 20%;">Cicilan</th>
                 <th style="width: 10%;">Status</th>
                 <th style="width: 10%;">Detail Payment</th>
             </tr>
@@ -174,21 +175,63 @@
                     var yy = (Data_mhs[i]['InvoicePayment'] != '') ? formatRupiah(Data_mhs[i]['InvoicePayment']) : '-';
                     // proses status
                     var status = '';
+
+                    var b = 0;
+                    var cicilan = 0;
+                    var bayar = 0;
+                    var htmlCicilan = '';
+
                     if(Data_mhs[i]['StatusPayment'] == 0)
                     {
                       status = 'Belum Approve <br> Belum Lunas';
+                      for (var j = 0; j < Data_mhs[i]['DetailPayment'].length; j++) {
+                        var a = Data_mhs[i]['DetailPayment'][j]['Status'];
+                        if(a== 1)
+                        {
+                          b = parseInt(b) + parseInt(Data_mhs[i]['DetailPayment'][j]['Invoice']);
+                          bayar = bayar + 1;
+                        }
+                        cicilan = cicilan + 1;
+                      }
+
+                      if(cicilan == 1)
+                      {
+                        htmlCicilan = "Tidak Cicilan";
+                      }
+                      else
+                      {
+                        for (var k = 1; k <= cicilan; k++) {
+                          var bayarStatus = (k > bayar) ? '<i class="fa fa-minus-circle" style="color: red;"></i>' : '<i class="fa fa-check-circle" style="color: green;"></i>';
+                          htmlCicilan += '<p> '+k+ ': '+bayarStatus+'</p>';
+                        }
+                      }
                     }
                     else
                     {
                       status = 'Approve';
                       // check lunas atau tidak
                         // count jumlah pembayaran dengan status 1
-                        var b = 0;
                         for (var j = 0; j < Data_mhs[i]['DetailPayment'].length; j++) {
                           var a = Data_mhs[i]['DetailPayment'][j]['Status'];
                           if(a== 1)
                           {
                             b = parseInt(b) + parseInt(Data_mhs[i]['DetailPayment'][j]['Invoice']);
+                            bayar = bayar + 1;
+                          }
+                          cicilan = cicilan + 1;
+                        }
+                        console.log(cicilan);
+
+
+                        if(cicilan == 1)
+                        {
+                          htmlCicilan = "Tidak Cicilan";
+                        }
+                        else
+                        {
+                          for (var k = 1; k <= cicilan; k++) {
+                            var bayarStatus = (k > bayar) ? '<i class="fa fa-minus-circle" style="color: red;"></i>' : '<i class="fa fa-check-circle" style="color: green;"></i>';
+                            htmlCicilan += '<p>Cicilan ke '+k+ ': '+bayarStatus+'</p>';
                           }
                         }
 
@@ -219,12 +262,13 @@
                     tr = '<tr style="background-color: #8ED6EA; color: black;" NPM = "'+Data_mhs[i]['NPM']+'">';
                     inputCHK = ''; 
                    } 
-                   
+                   // show bintang
+                   var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>'; 
                    $('#dataRow').append(tr +
                        '<td>'+inputCHK+'</td>' +
                        '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
                        // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
-                       '<td>'+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
+                       '<td>'+bintang+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
                        // '<td>'+Data_mhs[i]['NPM']+'</td>' +
                        // '<td>'+Data_mhs[i]['Year']+'</td>' +
                        '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +
@@ -233,6 +277,7 @@
                        '<td>'+Data_mhs[i]['IPK'].toFixed(2)+'</td>' +
                        '<td>'+Data_mhs[i]['Discount']+'%</td>' +
                        '<td>'+yy+'</td>' +
+                       '<td>'+htmlCicilan+'</td>'+
                        '<td>'+status+'</td>' +
                        '<td>'+'<button class = "DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'">View</button>'+'</td>' +
                        '</tr>');

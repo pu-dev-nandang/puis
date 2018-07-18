@@ -69,6 +69,15 @@
         
     });
 
+    $(document).on('keypress','#NIM', function ()
+    {
+
+        if (event.keyCode == 10 || event.keyCode == 13) {
+          valuee = $(this).val();
+          loadData(1,valuee);
+        }
+    }); // exit enter
+
     $(document).on('click','#idbtn-cari', function () {
         var NPM = $("#NIM").val();
         result = Validation_required(NPM,'NPM');
@@ -170,12 +179,14 @@
 
                         if(Data_mhs[i]['StatusPayment'] == 0) // menandakan belum approve
                          {
+                           // show bintang
+                           var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
                            if (Data_mhs[i]['DetailPayment'].length == 1) { // menandakan untuk setting cicilan maka harus memiliki satu detail payment
                                $('#dataRow').append(tr +
                                                       // '<td>'+inputCHK+'</td>' +
                                                       '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
                                                       // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
-                                                      '<td>'+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
+                                                      '<td>'+bintang+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
                                                       // '<td>'+Data_mhs[i]['NPM']+'</td>' +
                                                       // '<td>'+Data_mhs[i]['Year']+'</td>' +
                                                       '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +

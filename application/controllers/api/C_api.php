@@ -2304,6 +2304,29 @@ class C_api extends CI_Controller {
         echo json_encode($generate);
     }
 
+    public function cek_deadlineBPPSKS()
+    {
+        $this->load->model('finance/m_finance');
+        $arr = array('result' => '','msg' => '');
+        $input = $this->getInputToken();
+        $fieldCek = $input['fieldCek'];
+        $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+        $SemesterID = $SemesterID[0]['ID'];
+        $getDeadlineTagihanDB = $this->m_finance->getDeadlineTagihanDB($fieldCek,$SemesterID);
+        $dateFieldCek = $getDeadlineTagihanDB.' 23:59:00';  
+        $aaa = $this->m_master->chkTgl(date('Y-m-d H:i:s'),$dateFieldCek);
+        if($aaa)
+        {
+            $arr['result'] = 'Tgl Deadline ; '.$dateFieldCek;
+        }
+        else
+        {
+            $arr['msg'] = 'Tanggal Akademik : '.$dateFieldCek.' melewati tanggal sekarang, Mohon cek inputan tanggal akademik';
+        }
+
+        echo json_encode($arr);
+    }
+
 
 
 }

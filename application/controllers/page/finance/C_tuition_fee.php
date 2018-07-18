@@ -38,9 +38,7 @@ class C_tuition_fee extends Finnance_Controler {
         $input = $this->getInputToken();
         $this->data['action'] = $input['Action'];
         $this->data['id'] = $input['CDID'];
-        if ($input['Action'] == 'edit') {
-            $this->data['getData'] = $this->m_master->caribasedprimary('db_finance.tuition_fee','ID',$input['CDID']);
-        }
+        $this->data['selectCurriculum'] = $input['selectCurriculum'];
         echo $this->load->view('page/'.$this->data['department'].'/master/modalform_tuition_fee',$this->data,true);
     }
 

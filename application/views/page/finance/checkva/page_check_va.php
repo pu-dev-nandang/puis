@@ -11,7 +11,12 @@
     <button type="button" class="btn btn-default" id = 'idbtn-cari'><span class="glyphicon glyphicon-search"></span> Cari</button>
   </div>
 </div>
-
+<div class="row">
+    <div class="col-md-12">
+    	<hr/>
+    	<div id = 'pageLoaddata'></div>
+    </div>	
+</div>
 <script type="text/javascript">
 	$(document).on('click','#idbtn-cari', function () {
 	    var VA = $("#VA").val();
@@ -24,6 +29,15 @@
 	      loadData(VA);
 	    }
 	});
+
+	$(document).on('keypress','#VA', function ()
+	{
+
+	    if (event.keyCode == 10 || event.keyCode == 13) {
+	      valuee = $(this).val();
+	      loadData(valuee);
+	    }
+	}); // exit enter
 
 	function loadData(VA)
 	{
@@ -46,6 +60,48 @@
             $.post(url,{token:token},function (resultJson) {
             	var resultJson = jQuery.parseJSON(resultJson);
             	console.log(resultJson);
+            	$("#pageLoaddata").empty()
+            	var html = '';
+            	var tblhead = '<table class="table table-bordered" id="datatable2">'+
+					            '<thead>'+
+					            '<tr style="background: #333;color: #fff;">'+
+					                '<th style="width: 12%;">Program Study</th>'+
+					                '<th style="width: 20%;">Nama,NPM &amp;  VA</th>'+
+					                '<th style="width: 15%;">Payment Type</th>'+
+					                '<th style="width: 15%;">Email PU</th>'+
+					                '<th style="width: 10%;">Biling</th>'+
+					                '<th style="width: 10%;">Invoice</th>'+
+					                '<th style="width: 10%;">Status</th>'+
+					                '<th style="width: 10%;">Expired</th>'+
+					            '</tr>'+
+					            '</thead>';
+
+				html = tblhead;
+				var tbody = '';
+				tbody += '<tbody>';
+            	if(resultJson.msg == '')
+            	{
+					var data = resultJson['rs'];
+					tbody += '<tr>'+
+									'<td>'+data['ProdiEng']+'<br>'+data['SemesterName']+'</td>'+
+									'<td>'+data['Nama']+'<br>'+data['NPM']+'<br>'+data['VA']+'</td>'+
+									'<td>'+data['PTIDDesc']+'</td>'+
+									'<td>'+data['EmailPU']+'</td>'+
+									'<td>'+data['BilingID']+'</td>'+
+									'<td>'+formatRupiah(data['Invoice'])+'</td>'+
+									'<td>'+data['Status']+'</td>'+
+									'<td>'+data['Expired']+'</td>';
+            	}
+            	else
+            	{
+            		tbody += '<tr>'+
+            					'<td colspan = "8" align = "center">'+resultJson.msg+'</td>';
+
+            		;
+            	}	
+            	 tbody += '</tbody>';			
+            	 $("#pageLoaddata").html(html+tbody);	   	        
+
 		    }).fail(function() {
               toastr.info('No Result Data'); 
               // toastr.error('The Database connection error, please try again', 'Failed!!');
