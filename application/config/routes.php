@@ -454,6 +454,8 @@ $route['api/__getSMAWilayah'] = 'api/c_api/getSMAWilayah';
 // get data untuk finance
 $route['api/__getDataRegisterBelumBayar'] = 'api/c_api/getDataRegisterBelumBayar';
 $route['api/__getDataRegisterTelahBayar'] = 'api/c_api/getDataRegisterTelahBayar';
+$route['api/__cek_deadlineBPPSKS'] = 'api/c_api/cek_deadlineBPPSKS';
+
 
 $route['api/__crudTuitionFee'] = 'api/c_api/crudTuitionFee';
 $route['api/__getEmployees/(:any)/(:any)'] = 'api/c_api/getEmployeesBy/$1/$2';

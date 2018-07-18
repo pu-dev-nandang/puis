@@ -148,6 +148,7 @@
                 var Data_mhs = resultJson.loadtable;
                 data = Data_mhs;
                 dataaModal = Data_mhs;
+                var t_array = [];
                for(var i=0;i<Data_mhs.length;i++){
                     var ccc = 0;
                     var yy = (Data_mhs[i]['InvoicePayment'] != '') ? formatRupiah(Data_mhs[i]['InvoicePayment']) : '-';
@@ -202,11 +203,14 @@
                    if(Data_mhs[i]['StatusPayment'] == 0) // menandakan belum approve
                     {
                       if (Data_mhs[i]['DetailPayment'].length == 1) { // menandakan bahwa yang di cancel yang bukan memiliki cicilan lebih dari satu
+                        // show bintang
+                        var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
+                        t_array.push(Data_mhs[i]['Nama']);
                         $('#dataRow').append(tr +
                                                '<td>'+inputCHK+'</td>' +
                                                '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
                                                // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
-                                               '<td>'+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
+                                               '<td>'+bintang+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
                                                // '<td>'+Data_mhs[i]['NPM']+'</td>' +
                                                // '<td>'+Data_mhs[i]['Year']+'</td>' +
                                                '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +
@@ -224,7 +228,7 @@
                    
                }
 
-               if(Data_mhs.length > 0)
+               if(t_array.length > 0)
                {
                 $("#btn-cancel").removeClass('hide');
                 $('#datatable2').removeClass('hide');

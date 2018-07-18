@@ -30,7 +30,6 @@
                 <th style="width: 10%;">BPP</th>
                 <th style="width: 10%;">Credit</th>
                 <th style="width: 10%;">Another</th>
-                <th style="width: 10%;">Semester 1 Pay</th>
                 <th style="width: 10%;">Action</th>
             </tr>
             </thead>
@@ -51,9 +50,13 @@
 
     function modal_generate(action,title,ID='') {
         var url = base_url_js+"finance/master/modal-tagihan-mhs";
+        var selectCurriculum = $("#selectCurriculum").val();
+        var aa = selectCurriculum.split(".");
+        selectCurriculum = aa[1];
         var data = {
             Action : action,
             CDID : ID,
+            selectCurriculum : selectCurriculum
         };
         var token = jwt_encode(data,"UAP)(*");
         $.post(url,{ token:token }, function (html) {
@@ -75,6 +78,7 @@
        Prodi = Prodi[0];
        var Cost = $("#Cost").val();
        var ClassOf = $("#selectClassOf").val();
+       var Pay_Cond = $("#selectPay_Cond").val();
         for(i = 0; i <Cost.length; i++) {
          
          Cost = Cost.replace(".", "");
@@ -86,7 +90,8 @@
            TypePembayaran : TypePembayaran,
            Prodi : Prodi,
            Cost : Cost,
-           ClassOf : ClassOf
+           ClassOf : ClassOf,
+           Pay_Cond : Pay_Cond
        };
 
        if (validationInput = validation(data)) {
@@ -226,6 +231,7 @@
     $(document).on('click','.btn-delete', function () {
        var dtprodi = $(this).attr('data-prodi');
        var selectCurriculum = $("#selectCurriculum").val();
+       var bintang = $(this).attr('bintang');
        selectCurriculum = selectCurriculum.split(".");
        var ClassOf = selectCurriculum[1]; 
        // update data to db
@@ -250,7 +256,8 @@
            var url =base_url_js+'finance/master/deleted-tagihan-mhs-submit';
            var data = {
                 ClassOf : ClassOf,
-                ProdiID : dtprodi
+                ProdiID : dtprodi,
+                bintang : bintang
            };
            var token = jwt_encode(data,'UAP)(*');
            $.post(url,{token:token},function (data_json) {
@@ -283,21 +290,33 @@
                    var btn_edit = '<span data-smt="" class="btn btn-xs btn-edit" inptext = "disabled" row = "C_'+i+'">'+
                                         '<i class="fa fa-pencil-square-o"></i> Edit'+
                                        '</span>';
-                   var btn_delete = '<span data-prodi="'+dataProdi.ProdiID+'" class="btn btn-xs btn-delete">'+
-                                         '<i class="fa fa-trash"></i> Delete'+
-                                        '</span>';                   
-                   var html = '<tr>' +
-                       '<td>'+dataProdi.ProdiName+'</td>';
-
-                   for (var j = 0; j < 5; j++) {
-                       var vv = '<td>-</td>'
-                       if ( (j in dataProdi.Detail) ) {
-                         vv = '<td id = "RID_'+dataProdi.Detail[j].ID+'" Cost = "'+dataProdi.Detail[j].Cost+'" class = "C_'+i+'">'+formatRupiah(parseInt(dataProdi.Detail[j].Cost))+'</td>';
+                   var tt = '';
+                   var bintang = '*';
+                   for (var j = 0; j < 4; j++) {
+                       var vv = '<td>-</td>';
+                       for (var k = 0; k < dataProdi.Detail.length; k++) {
+                         var ss = j + 1;
+                         if(ss == dataProdi.Detail[k].PTID)
+                         {
+                          vv = '<td id = "RID_'+dataProdi.Detail[k].ID+'" Cost = "'+dataProdi.Detail[k].Cost+'" class = "C_'+i+'">'+formatRupiah(parseInt(dataProdi.Detail[k].Cost))+'</td>';
+                          bintang = (dataProdi.Detail[k].Pay_Cond == 1) ? '*' : '**';
+                          break;
+                         }
                        }
-
-                       html += vv;
+                       /*if ( (j in dataProdi.Detail) ) {
+                         vv = '<td id = "RID_'+dataProdi.Detail[j].ID+'" Cost = "'+dataProdi.Detail[j].Cost+'" class = "C_'+i+'">'+formatRupiah(parseInt(dataProdi.Detail[j].Cost))+'</td>';
+                         bintang = (dataProdi.Detail[j].Pay_Cond == 1) ? '*' : '**';
+                       }*/
+                       tt += vv;
                    }
 
+                   var btn_delete = '<span data-prodi="'+dataProdi.ProdiID+'" bintang = "'+bintang+'"  class="btn btn-xs btn-delete">'+
+                                         '<i class="fa fa-trash"></i> Delete'+
+                                        '</span>';         
+
+                   var html = '<tr>' +
+                       '<td>'+dataProdi.ProdiName+bintang+'</td>';
+                   html += tt;
                    html +=  '<td>'+btn_edit+btn_delete+'</td></tr>';
 
                    $('#dataRow').append(html);

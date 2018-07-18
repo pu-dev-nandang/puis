@@ -116,90 +116,115 @@
         var PTID = $('#selectPTID').val();
         var NPM = $('#NIM').val();
         if(ta!='' && ta!=null && PTID !='' && PTID != null){
-            $('#NotificationModal .modal-header').addClass('hide');
-            $('#NotificationModal .modal-body').html('<center>' +
-                '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
-                '                    <br/>' +
-                '                    Loading Data . . .' +
-                '                </center>');
-            $('#NotificationModal .modal-footer').addClass('hide');
-            $('#NotificationModal').modal({
-                'backdrop' : 'static',
-                'show' : true
-            });
-            $('#dataRow').html('');
-            var url = base_url_js+'finance/get_tagihan_mhs/'+page;
-            var data = {
-                ta : ta,
-                prodi : prodi,
-                PTID  : PTID,
-                NPM : NPM
+            // cek tanggal deadline sudah melewati atau belum
+            var fieldCek = (PTID == 2) ? 'bayarBPPEnd' : 'bayarEnd';
+            var url1 = base_url_js+'api/__cek_deadlineBPPSKS';
+            var data1 = {
+                fieldCek : fieldCek,
             };
-            var token = jwt_encode(data,'UAP)(*');
-            $.post(url,{token:token},function (resultJson) {
-               var resultJson = jQuery.parseJSON(resultJson);
-               console.log(resultJson);
-                var Data_mhs = resultJson.loadtable;
-                var xx = resultJson.loadtable;
-                var Data_mhs = Data_mhs['Data_mhs'];
-                var res = ta.split(".");
-               for(var i=0;i<Data_mhs.length;i++){
-                    var img = '<img src="'+base_url_js+'uploads/students/ta_'+res[1]+'/'+Data_mhs[i]['Photo']+'" class="img-rounded" width="30" height="30" style="max-width: 30px;object-fit: scale-down;">';
 
-                    var selecTOption = '<select class="selecTOption getDom" id="'+'discount_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" payment-type = "'+PTID+'" invoice = "'+Data_mhs[i]['Cost']+'">';
+            var token1 = jwt_encode(data1,'UAP)(*');
+            $.post(url1,{token:token1},function (resultJson) {
+              if(resultJson.msg == '')
+              {
+                $('#NotificationModal .modal-header').addClass('hide');
+                $('#NotificationModal .modal-body').html('<center>' +
+                    '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+                    '                    <br/>' +
+                    '                    Loading Data . . .' +
+                    '                </center>');
+                $('#NotificationModal .modal-footer').addClass('hide');
+                $('#NotificationModal').modal({
+                    'backdrop' : 'static',
+                    'show' : true
+                });
+                $('#dataRow').html('');
+                var url = base_url_js+'finance/get_tagihan_mhs/'+page;
+                var data = {
+                    ta : ta,
+                    prodi : prodi,
+                    PTID  : PTID,
+                    NPM : NPM
+                };
+                var token = jwt_encode(data,'UAP)(*');
+                $.post(url,{token:token},function (resultJson) {
+                   var resultJson = jQuery.parseJSON(resultJson);
+                   console.log(resultJson);
+                    var Data_mhs = resultJson.loadtable;
+                    var xx = resultJson.loadtable;
+                    var Data_mhs = Data_mhs['Data_mhs'];
+                    var res = ta.split(".");
+                   for(var i=0;i<Data_mhs.length;i++){
+                        var img = '<img src="'+base_url_js+'uploads/students/ta_'+res[1]+'/'+Data_mhs[i]['Photo']+'" class="img-rounded" width="30" height="30" style="max-width: 30px;object-fit: scale-down;">';
 
-                   var yy = (Data_mhs[i]['Cost'] != '') ? formatRupiah(Data_mhs[i]['Cost']) : '-';
-                   
-                   if(PTID == 3)
+                        var selecTOption = '<select class="selecTOption getDom" id="'+'discount_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" payment-type = "'+PTID+'" invoice = "'+Data_mhs[i]['Cost']+'">';
+
+                       var yy = (Data_mhs[i]['Cost'] != '') ? formatRupiah(Data_mhs[i]['Cost']) : '-';
+                       
+                       if(PTID == 3)
+                       {
+                         var t = parseInt(Data_mhs[i]['Cost']) * parseInt(Data_mhs[i]['Credit']);
+                         yy = (Data_mhs[i]['Cost'] != '') ? formatRupiah(t) : '-';
+                         selecTOption = '<select class="selecTOption getDom" id="'+'discount_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" payment-type = "'+PTID+'" invoice = "'+t+'">';
+                       } 
+
+                            for (var k = 0;k < xx['Discount'].length; k++)
+                            {
+                                var selected = (k==0) ? 'selected' : '';
+                                selecTOption += '<option value="'+xx['Discount'][k]['Discount']+'" '+selected+'>'+xx['Discount'][k]['Discount']+'%'+'</option>';
+                            }
+                        selecTOption += '</select>';
+
+                        
+                        var cost = '<input class="form-control costInput getDom" id="cost_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" value = "'+yy+'" payment-type = "'+PTID+'" readonly style="background-color: #fff;color: #333;">';
+                        var priceLabel = (Data_mhs[i]['Cost'] != '') ? formatRupiah(Data_mhs[i]['Cost']) : '-';
+
+                        // show bintang
+                        var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
+
+                       $('#dataRow').append('<tr>' +
+                           '<td>'+'<input type="checkbox" class="uniform" value ="'+Data_mhs[i]['NPM']+'" Prodi = "'+Data_mhs[i]['ProdiEng']+'" Nama ="'+Data_mhs[i]['Name']+'" semester = "'+Data_mhs[i]['SemesterID']+'" ta = "'+res[1]+'"></td>' +
+                           '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
+                           // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
+                           '<td>'+bintang+Data_mhs[i]['Name']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
+                           // '<td>'+Data_mhs[i]['NPM']+'</td>' +
+                           // '<td>'+Data_mhs[i]['ClassOf']+'</td>' +
+                           '<td>'+img+'</td>' +
+                           '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
+                           '<td>'+Data_mhs[i]['HP']+'</td>' +
+                           '<td>'+Data_mhs[i]['IPS'].toFixed(2)+'</td>'+
+                           '<td>'+Data_mhs[i]['IPK'].toFixed(2)+'</td>'+
+                           '<td>'+Data_mhs[i]['Credit']+'</td>'+
+                           '<td>'+priceLabel+'</td>'+
+                           '<td>'+selecTOption+'</td>' +
+                           '<td>'+cost+'</td>' +
+                           '</tr>');
+                   }
+
+                   if(Data_mhs.length > 0)
                    {
-                     var t = parseInt(Data_mhs[i]['Cost']) * parseInt(Data_mhs[i]['Credit']);
-                     yy = (Data_mhs[i]['Cost'] != '') ? formatRupiah(t) : '-';
-                     selecTOption = '<select class="selecTOption getDom" id="'+'discount_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" payment-type = "'+PTID+'" invoice = "'+t+'">';
-                   } 
+                    $('#btn-submit').removeClass('hide');
+                    $('#datatable2').removeClass('hide');
+                    $("#pagination_link").html(resultJson.pagination_link);
+                   }
+                   
+                }).fail(function() {
+                  
+                  toastr.info('No Result Data'); 
+                  // toastr.error('The Database connection error, please try again', 'Failed!!');
+                }).always(function() {
+                    $('#NotificationModal').modal('hide');
+                });
+              }
+              else
+              {
+                toastr.error(resultJson.msg, 'Failed!!');
+              }
 
-                        for (var k = 0;k < xx['Discount'].length; k++)
-                        {
-                            var selected = (k==0) ? 'selected' : '';
-                            selecTOption += '<option value="'+xx['Discount'][k]['Discount']+'" '+selected+'>'+xx['Discount'][k]['Discount']+'%'+'</option>';
-                        }
-                    selecTOption += '</select>';
-
-                    
-                    var cost = '<input class="form-control costInput getDom" id="cost_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" value = "'+yy+'" payment-type = "'+PTID+'" readonly style="background-color: #fff;color: #333;">';
-                    var priceLabel = (Data_mhs[i]['Cost'] != '') ? formatRupiah(Data_mhs[i]['Cost']) : '-';
-
-                   $('#dataRow').append('<tr>' +
-                       '<td>'+'<input type="checkbox" class="uniform" value ="'+Data_mhs[i]['NPM']+'" Prodi = "'+Data_mhs[i]['ProdiEng']+'" Nama ="'+Data_mhs[i]['Name']+'" semester = "'+Data_mhs[i]['SemesterID']+'" ta = "'+res[1]+'"></td>' +
-                       '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
-                       // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
-                       '<td>'+Data_mhs[i]['Name']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
-                       // '<td>'+Data_mhs[i]['NPM']+'</td>' +
-                       // '<td>'+Data_mhs[i]['ClassOf']+'</td>' +
-                       '<td>'+img+'</td>' +
-                       '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
-                       '<td>'+Data_mhs[i]['HP']+'</td>' +
-                       '<td>'+Data_mhs[i]['IPS'].toFixed(2)+'</td>'+
-                       '<td>'+Data_mhs[i]['IPK'].toFixed(2)+'</td>'+
-                       '<td>'+Data_mhs[i]['Credit']+'</td>'+
-                       '<td>'+priceLabel+'</td>'+
-                       '<td>'+selecTOption+'</td>' +
-                       '<td>'+cost+'</td>' +
-                       '</tr>');
-               }
-
-               if(Data_mhs.length > 0)
-               {
-                $('#btn-submit').removeClass('hide');
-                $('#datatable2').removeClass('hide');
-                $("#pagination_link").html(resultJson.pagination_link);
-               }
-               
             }).fail(function() {
-              
               toastr.info('No Result Data'); 
-              // toastr.error('The Database connection error, please try again', 'Failed!!');
             }).always(function() {
-                $('#NotificationModal').modal('hide');
+                            
             });
         }
     }
