@@ -175,6 +175,7 @@
                         </div>
                         <div class="col-xs-3">
                             <input class="form-control form-credit" data-id="1" placeholder="Credit" id="formCredit1" type="number"/>
+                            <p style="margin:0px;color: #009688;">Maks Credit : <span id="viewMaksCredit">0</span></p>
                         </div>
                     </div>
                 </td>
