@@ -72,14 +72,14 @@
             <li class="dropdown <?php if($this->uri->segment(1)=='database'){echo 'current';} ?>">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                     <i class="fa fa-database"></i>
-                    <span>Database</span>
+                    <span>Data</span>
                     <!--                    <i class="icon-caret-down small"></i>-->
                 </a>
                 <ul class="dropdown-menu">
                     <li class="<?php if($this->uri->segment(2)=='lecturers'){echo 'active';} ?>"><a href="<?php echo base_url('database/lecturers'); ?>">Lecturers</a></li>
-                    <li class="<?php if($this->uri->segment(2)=='students'){echo 'active';} ?>"><a href="<?php echo base_url('database/students'); ?>">Mahasiswa</a></li>
+                    <li class="<?php if($this->uri->segment(2)=='students'){echo 'active';} ?>"><a href="<?php echo base_url('database/students'); ?>">Students</a></li>
                     <li class="divider"></li>
-                    <li class="<?php if($this->uri->segment(2)=='employees'){echo 'active';} ?>"><a href="<?php echo base_url('database/employees'); ?>">Karyawan</a></li>
+                    <li class="<?php if($this->uri->segment(2)=='employees'){echo 'active';} ?>"><a href="<?php echo base_url('database/employees'); ?>">Employees</a></li>
                 </ul>
             </li>
 
@@ -87,7 +87,7 @@
             <li class="dropdown <?php if($this->session->userdata('menuDepartement')){echo 'hide';} ?>">
                 <a href="#" class="project-switcher-btn dropdown-toggle">
                     <i class="fa fa-folder-open"></i>
-                    <span>Departement</span>
+                    <span>Services</span>
                 </a>
             </li>
 
@@ -103,7 +103,7 @@
                     <i class="fa fa-caret-down small"></i>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a href="<?php echo base_url('profile/Nandang-Mulyadi'); ?>">
+                    <li><a href="<?php echo base_url('profile/'.str_replace(' ','-',$this->session->userdata('Name'))); ?>">
                             <i class="fa fa-user"></i>
                             My Profile</a></li>
                     <!--                    <li><a href="pages_calendar.html"><i class="fa fa-calendar"></i> My Calendar</a></li>-->
@@ -169,7 +169,7 @@
     $(document).on('click','#btn_announcement',function () {
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<h4 class="modal-title">Announcement</h4>');
-        $('#GlobalModal .modal-body').html('Announcement');
+        $('#GlobalModal .modal-body').html('Announcement (Under Construction)');
         $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
             '<button type="button" class="btn btn-primary"><i class="fa fa-paper-plane-o right-margin" aria-hidden="true"></i> Publish</button>');
         $('#GlobalModal').modal({
@@ -179,7 +179,7 @@
     });
 
     $(document).on('click','#useLogOut',function () {
-        $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Log Me Out ?? </b> ' +
+        $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Log Me Out </b><hr/> ' +
             '<button type="button" class="btn btn-primary btnActionLogOut" style="margin-right: 5px;">Yes</button>' +
             '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
             '</div>');
