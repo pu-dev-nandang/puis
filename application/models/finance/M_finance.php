@@ -409,7 +409,7 @@ class M_finance extends CI_Model {
        $this->db->update('db_va.va_log', $dataSave);
    }
 
-   public function update_va_Payment($payment = null,$DeadLinePayment = null, $Name = null, $Email = null,$BilingID = null,$routes_table = 'db_finance.payment_pre')
+   public function update_va_Payment($payment = null,$DeadLinePayment = null, $Name = null, $Email = null,$BilingID = null,$routes_table = 'db_finance.payment_pre',$desc = 'Pembayaran Uang Kuliah')
    {
        $arr = array();
        $arr['status'] = false;
@@ -431,7 +431,7 @@ class M_finance extends CI_Model {
                    'customer_email' => $Email,
                    'customer_phone' => '+622129200456',
                    'datetime_expired' => $datetime_expired, // billing will be expired in 2 hours
-                   'description' => 'Pembayaran Uang Kuliah',
+                   'description' => $desc,
                    'type' => 'updateBilling',
 
                );
@@ -1055,6 +1055,8 @@ class M_finance extends CI_Model {
               'ProdiID' => $dt[0]['ProdiID'],
               'ProdiEng' => $ProdiEng[0]['NameEng'],
               'Year' => $Year,
+              'IPS' => $IPS,
+              'IPK' => $IPK,
               'DetailPayment' => $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']),
               'VA' => $VA,
               'Credit' => $Credit,
@@ -1218,10 +1220,11 @@ class M_finance extends CI_Model {
                       // cancel VA 
                      $getData= $this->m_master->caribasedprimary('db_va.va_log','trx_id',$BilingID);
                      $trx_amount = $getData[0]['trx_amount'];
+                     $desc = 'Closed '.$getData[0]['description'];
                      $datetime_expired = $now;
                      $customer_name = $getData[0]['customer_name'];
                      $customer_email = $getData[0]['customer_email'];
-                     $update = $this->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students');
+                     $update = $this->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students',$desc);
                      if ($update['status'] == 1) {
                        // triger VA closed berhasil, update va_log status = 2 // auto dari update_va_Payment
                        // delete data pada table payment dan payment_students
@@ -1239,7 +1242,9 @@ class M_finance extends CI_Model {
                   }
                   else
                   {
-                       $this->delete_id_table($query[0]['ID_payment'],'payment_students');  
+                       //$this->delete_id_table($query[0]['ID_payment'],'payment_students');
+                       $sqlDelete = "delete from db_finance.payment_students where ID_payment = ".$query[0]['ID_payment'];
+                       $queryDelete=$this->db->query($sqlDelete, array());  
                        $this->delete_id_table($query[0]['ID_payment'],'payment');
                       
                   }
@@ -1290,8 +1295,9 @@ class M_finance extends CI_Model {
         $trx_amount = $Input[$i]->Invoice;
         $datetime_expired = $Input[$i]->Deadline;
         $customer_name = $getData[0]['customer_name'];
+        $desc = 'Edited '.$getData[0]['description'];
         $customer_email = $getData[0]['customer_email'];
-        $update = $this->m_finance->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students');
+        $update = $this->m_finance->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students',$desc);
         if ($update['status'] == 1) {
           // update data pada table db_finance.payment_students
             $this->m_finance->updateCicilanMHS($BilingID,$trx_amount,$datetime_expired);
@@ -1341,11 +1347,12 @@ class M_finance extends CI_Model {
         $getData0= $this->m_master->caribasedprimary('db_finance.payment_students','BilingID',$BilingID);
         $ID_payment = $getData0[0]['ID_payment'];
         $getData= $this->m_master->caribasedprimary('db_va.va_log','trx_id',$BilingID);
+        $desc = 'Closed '.$getData[0]['description'];
         $trx_amount = $Input[$i]->Invoice;
         $datetime_expired = date('Y-m-d H:i:s');
         $customer_name = $getData[0]['customer_name'];
         $customer_email = $getData[0]['customer_email'];
-        $update = $this->m_finance->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students');
+        $update = $this->m_finance->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students',$desc);
         if ($update['status'] == 1) {
           // delete data pada table db_finance.payment_students
             $ID = $Input[$i]->ID;
@@ -1599,7 +1606,7 @@ class M_finance extends CI_Model {
     }
     else
     {
-      $rs['msg'] = 'VA dengan number '.$VA.' belum pernah digunakan';
+      $rs['msg'] = 'VA dengan number '.$VA.' tidak ditemukan pada transaksi database';
     }
 
     return $rs;
@@ -1611,6 +1618,109 @@ class M_finance extends CI_Model {
     $sql = 'select * from db_finance.payment where PTID = ? and SemesterID = ? and NPM = ?';
     $query=$this->db->query($sql, array($PTID,$SemesterID,$NPM))->result_array();
     return $query;
-   } 
+   }
+
+   public function get_list_telat_bayar_mhs($ta,$prodi,$PTID,$NIM,$limit, $start)
+   {
+      // error_reporting(0);
+      $arr = array();
+      $this->load->model('master/m_master');
+
+      // join dengan table auth terlebih dahulu
+      $PTID = ($PTID == '' || $PTID == Null) ? '' : ' and a.PTID = '.$PTID;
+      $NIM = ($NIM == '' || $NIM == Null) ? 'where a.NPM like "%"' : ' where  a.NPM = '.$NIM;
+      $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+      $SemesterID = $SemesterID[0]['ID'];
+      if ($ta == '') {
+        $ta1 = $ta;
+      }
+      else
+      {
+        $ta = explode('.', $ta);
+        $ta1 = $ta[1];
+      }
+
+      if ($ta1 == '') {
+        $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                join db_academic.semester as c on a.SemesterID = c.ID
+                join db_finance.payment_type as d on a.PTID = d.ID join db_finance.payment_students as e
+                on a.ID = e.ID_payment '.$NIM.$PTID.' and c.ID = ?  and e.Status = 0 and DATE_FORMAT(e.Deadline,"%Y-%m-%d") <= curdate() group by a.ID LIMIT '.$start. ', '.$limit;
+        $query=$this->db->query($sql, array($SemesterID))->result_array();
+      }
+      else
+      {
+        $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                join db_academic.semester as c on a.SemesterID = c.ID
+                join db_finance.payment_type as d on a.PTID = d.ID 
+                join db_finance.payment_students as e
+                on a.ID = e.ID_payment
+                '.$NIM.$PTID.' and b.Year = ? and c.ID = ? and e.Status = 0 and DATE_FORMAT(e.Deadline,"%Y-%m-%d") <= curdate() group by a.ID LIMIT '.$start. ', '.$limit;
+        $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
+      }
+
+      // get Number VA Mahasiswa
+          $Const_VA = $this->m_master->showData_array('db_va.master_va');
+
+      // get all data to join db ta
+      for ($i=0; $i < count($query); $i++) { 
+        $Year = $query[$i]['Year'];
+        $db = 'ta_'.$Year.'.students';
+        $dt = $this->m_master->caribasedprimary($db,'NPM',$query[$i]['NPM']);
+
+        // get VA Mahasiwa
+           $VA = $Const_VA[0]['Const_VA'].$query[$i]['NPM'];
+
+        if($prodi == '' || $prodi == Null){
+          $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$dt[0]['ProdiID']);
+          $sql1 = '';
+          $arr[] = array(
+              'PaymentID' => $query[$i]['ID'],
+              'PTID'  => $query[$i]['PTID'],
+              'PTIDDesc' => $query[$i]['Description'],
+              'SemesterID' => $query[$i]['SemesterID'],
+              'SemesterName' => $query[$i]['NameSemester'],
+              'NPM' => $query[$i]['NPM'],
+              'Nama' => $dt[0]['Name'],
+              'EmailPU' => $query[$i]['EmailPU'],
+              'InvoicePayment' => $query[$i]['Invoice'],
+              'ProdiID' => $dt[0]['ProdiID'],
+              'ProdiEng' => $ProdiEng[0]['NameEng'],
+              'Year' => $Year,
+              'DetailPayment' => $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']),
+              'VA' => $VA,
+              'Pay_Cond' => $query[$i]['Pay_Cond'],
+          );
+        }
+        else
+        {
+          $prodi = explode('.', $prodi);
+          $prodi = $prodi[0];
+          if ($prodi == $dt[0]['ProdiID']) {
+            $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$dt[0]['ProdiID']);
+            $arr[] = array(
+                'PaymentID' => $query[$i]['ID'],
+              'PTID'  => $query[$i]['PTID'],
+              'PTIDDesc' => $query[$i]['Description'],
+              'SemesterID' => $query[$i]['SemesterID'],
+              'SemesterName' => $query[$i]['NameSemester'],
+              'NPM' => $query[$i]['NPM'],
+              'Nama' => $dt[0]['Name'],
+              'EmailPU' => $query[$i]['EmailPU'],
+              'InvoicePayment' => $query[$i]['Invoice'],
+              'ProdiID' => $dt[0]['ProdiID'],
+              'ProdiEng' => $ProdiEng[0]['NameEng'],
+              'Year' => $Year,
+              'DetailPayment' => $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']),
+              'VA' => $VA,
+              'Pay_Cond' => $query[$i]['Pay_Cond'],
+            );
+          }
+        }
+        
+      }
+      return $arr;
+   }
 
 }

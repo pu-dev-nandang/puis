@@ -338,9 +338,15 @@ $route['finance/tagihan-mhs/set-edit-cicilan-tagihan-mhs/submit'] =  'page/finan
 $route['finance/tagihan-mhs/set-delete-cicilan-tagihan-mhs/submit'] =  'page/finance/c_finance/delete_cicilan_tagihan_mhs_submit';
 $route['finance/tagihan-mhs/penerimaan-tagihan-mhs'] =  'page/finance/c_finance/penerimaan_tagihan_mhs';
 $route['finance/get_pembayaran_mhs/(:num)'] =  'page/finance/c_finance/get_pembayaran_mhs/$1';
-$route['finance/export_excel'] =  'page/finance/c_finance/export_excel';
+//$route['finance/export_excel'] =  'page/finance/c_finance/export_excel';
+$route['finance/export_excel/(:any)'] =  'page/finance/c_finance/export_excel/$1';
 $route['finance/check-va'] =  'page/finance/c_finance/check_va';
 $route['finance/check-va-cari'] =  'page/finance/c_finance/check_va_cari';
+$route['finance/tagihan-mhs/import_price_list_mhs'] =  'page/finance/c_finance/import_price_list_mhs';
+$route['finance/tagihan-mhs/submit_import_price_list_mhs'] =  'page/finance/c_finance/submit_import_price_list_mhs';
+$route['finance/tagihan-mhs/list-telat-bayar'] =  'page/finance/c_finance/list_telat_bayar';
+$route['finance/get_list_telat_bayar/(:num)'] =  'page/finance/c_finance/get_list_telat_bayar/$1';
+$route['finance/edit_telat_bayar/(:any)'] =  'page/finance/c_finance/edit_telat_bayar/$1';
 
 
 
@@ -455,6 +461,7 @@ $route['api/__getSMAWilayah'] = 'api/c_api/getSMAWilayah';
 $route['api/__getDataRegisterBelumBayar'] = 'api/c_api/getDataRegisterBelumBayar';
 $route['api/__getDataRegisterTelahBayar'] = 'api/c_api/getDataRegisterTelahBayar';
 $route['api/__cek_deadlineBPPSKS'] = 'api/c_api/cek_deadlineBPPSKS';
+$route['api/__cek_deadline_paymentNPM'] = 'api/c_api/cek_deadline_paymentNPM';
 
 
 $route['api/__crudTuitionFee'] = 'api/c_api/crudTuitionFee';

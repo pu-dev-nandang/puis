@@ -4,7 +4,7 @@
         <!--=== Navigation ===-->
 
         <ul id="nav">
-            <li class="<?php if($this->uri->segment(2)=='master'){echo "current open";} ?>">
+            <!--<li class="<?php if($this->uri->segment(2)=='master'){echo "current open";} ?>">
                 <a href="javascript:void(0);">
                     <i class="fa fa-wrench" aria-hidden="true"></i>
                     Configuration
@@ -23,6 +23,12 @@
                         </a>
                     </li>
                 </ul>
+            </li>-->
+            <li class="<?php if($this->uri->segment(1)=='dashboard'){echo "current";} ?>">
+                <a href="<?php echo base_url('dashboard'); ?>">
+                    <i class="fa fa-tachometer"></i>
+                    Dashboard
+                </a>
             </li>
             <li class="<?php if($this->uri->segment(2)=='master'){echo "current open";} ?>">
                 <a href="javascript:void(0);">
@@ -34,12 +40,6 @@
                         <a href="<?php echo base_url('finance/master/tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
                         Tagihan Mahasiswa
-                        </a>
-                    </li>
-                    <li class="<?php if($this->uri->segment(2)=='master' && $this->uri->segment(3) == "pricelist-mhs" ){echo "current";} ?>">
-                        <a href="#'); ?>">
-                        <i class="icon-angle-right"></i>
-                        Import PriceList Mahasiswa
                         </a>
                     </li>
                     <li class="<?php if($this->uri->segment(2)=='master' && $this->uri->segment(3) == "discount" ){echo "current";} ?>">
@@ -118,6 +118,12 @@
                     Tagihan Mahasiswa
                 </a>
                 <ul class="sub-menu">
+                    <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "import_price_list_mhs" ){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/tagihan-mhs/import_price_list_mhs'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Import PriceList Mahasiswa
+                        </a>
+                    </li>
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "set-tagihan-mhs"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/set-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
@@ -148,16 +154,16 @@
                         List Tagihan
                         </a>
                     </li>
+                    <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "list-telat-bayar"){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/tagihan-mhs/list-telat-bayar'); ?>">
+                        <i class="icon-angle-right"></i>
+                        List Telat Bayar
+                        </a>
+                    </li>
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "penerimaan-tagihan-mhs"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/penerimaan-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
                         Penerimaan Pembayaran
-                        </a>
-                    </li>
-                    <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "calender-tagihan-mhs"){echo "current";} ?>">
-                        <a href="#">
-                        <i class="icon-angle-right"></i>
-                        Calender Tagihan
                         </a>
                     </li>
                 </ul>
@@ -166,6 +172,12 @@
                 <a href="<?php echo base_url('finance/check-va'); ?>">
                     <i class="fa fa-refresh"></i>
                     Check VA
+                </a>
+            </li>
+            <li class="<?php if($this->uri->segment(2)=='download-log-va'){echo "current";} ?>">
+                <a href="#">
+                    <i class="fa fa-cloud-download"></i>
+                    Download Log VA
                 </a>
             </li>
         </ul>

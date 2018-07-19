@@ -182,7 +182,7 @@ class C_finance extends Finnance_Controler {
 
     public function page_set_tagihan_mhs()
     {
-        $content = $this->load->view('page/'.$this->data['department'].'/set_tagihan/page_set_tagihan_mhs',$this->data,true);
+        $content = $this->load->view('page/'.$this->data['department'].'/tagihan_mahasiswa/page_set_tagihan_mhs',$this->data,true);
         $this->temp($content);
     }
 
@@ -217,19 +217,24 @@ class C_finance extends Finnance_Controler {
             $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
             for ($i=0; $i < count($Input); $i++) { 
                 // get Deadline
-                $fieldEND = 'bayarBPPEnd';
+                $fieldEND = '';
+                $desc = '';
                 switch ($Input[$i]->PTID) {
                     case '1':
                         $fieldEND = '';
+                        $desc = '';
                         break;
                     case '2':
                         $fieldEND = 'bayarBPPEnd';
+                        $desc = 'Pembayaran BPP';
                         break;
                     case '3':
                         $fieldEND = 'bayarEnd';
+                        $desc = 'Pembayaran SKS';
                         break;    
                     default:
                         $fieldEND = '';
+                        $desc = '';
                         break;
                 }
 
@@ -255,7 +260,7 @@ class C_finance extends Finnance_Controler {
                             $Name = $getDataMhsBYNPM[0]['Name'];
                             $Email = $getDataMhsBYNPM[0]['EmailPU'];
                             $VA_number = $this->m_finance->getVANumberMHS($Input[$i]->NPM);
-                            $create_va = $this->m_finance->create_va_Payment($payment,$DeadLinePayment, $Name, $Email,$VA_number,$description = $fieldEND,$tableRoutes = 'db_finance.payment_students');
+                            $create_va = $this->m_finance->create_va_Payment($payment,$DeadLinePayment, $Name, $Email,$VA_number,$description = $desc,$tableRoutes = 'db_finance.payment_students');
                             if ($create_va['status']) {
                                 // After create va insert data to db_finance.payment  and db_finance.payment_students
                                 $countSuccessVA++;
@@ -284,7 +289,7 @@ class C_finance extends Finnance_Controler {
     public function page_cek_tagihan_mhs($page = '')
     {
         $this->data['NPM'] = $page;
-        $content = $this->load->view('page/'.$this->data['department'].'/set_tagihan/page_cek_tagihan_mhs',$this->data,true);
+        $content = $this->load->view('page/'.$this->data['department'].'/tagihan_mahasiswa/page_cek_tagihan_mhs',$this->data,true);
         $this->temp($content);
     }
 
@@ -322,7 +327,7 @@ class C_finance extends Finnance_Controler {
 
     public function cancel_tagihan_mhs()
     {
-        $content = $this->load->view('page/'.$this->data['department'].'/set_tagihan/page_cancel_tagihan_mhs',$this->data,true);
+        $content = $this->load->view('page/'.$this->data['department'].'/tagihan_mahasiswa/page_cancel_tagihan_mhs',$this->data,true);
         $this->temp($content);
     }
 
@@ -338,7 +343,7 @@ class C_finance extends Finnance_Controler {
     {
         $max_cicilan= $this->m_master->showData_array('db_admission.cfg_cicilan');
         $this->data['max_cicilan'] = $max_cicilan[0]['max_cicilan'];
-        $content = $this->load->view('page/'.$this->data['department'].'/set_tagihan/page_set_cicilan_tagihan_mhs',$this->data,true);
+        $content = $this->load->view('page/'.$this->data['department'].'/tagihan_mahasiswa/page_set_cicilan_tagihan_mhs',$this->data,true);
         $this->temp($content);
     }
 
@@ -351,19 +356,24 @@ class C_finance extends Finnance_Controler {
         $ID = $Input[0]->ID;
         for ($i=0; $i < count($Input); $i++) { 
                         // get Deadline
-                        $fieldEND = 'bayarBPPEnd';
+                        $fieldEND = '';
+                        $desc = '';
                         switch ($Input[$i]->PTID) {
                             case '1':
                                 $fieldEND = '';
+                                $desc = '';
                                 break;
                             case '2':
                                 $fieldEND = 'bayarBPPEnd';
+                                $desc = 'Pembayaran BPP';
                                 break;
                             case '3':
                                 $fieldEND = 'bayarEnd';
+                                $desc = 'Pembayaran SKS';
                                 break;    
                             default:
                                 $fieldEND = '';
+                                $desc = '';
                                 break;
                         }
             if ($DeadLinePayment == '') {
@@ -402,7 +412,7 @@ class C_finance extends Finnance_Controler {
                             $datetime_expired = $Input[$i]->Deadline;
                             $customer_name = $getData[0]['customer_name'];
                             $customer_email = $getData[0]['customer_email'];
-                            $update = $this->m_finance->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students');
+                            $update = $this->m_finance->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students',$desc);
                             if ($update['status'] == 1) {
                               // update data pada table db_finance.payment_students
                                 $this->m_finance->updateCicilanMHS($BilingID,$trx_amount,$datetime_expired);
@@ -431,7 +441,7 @@ class C_finance extends Finnance_Controler {
 
     public function edit_cicilan_tagihan_mhs()
     {
-        $content = $this->load->view('page/'.$this->data['department'].'/set_tagihan/page_edit_cicilan_tagihan_mhs',$this->data,true);
+        $content = $this->load->view('page/'.$this->data['department'].'/tagihan_mahasiswa/page_edit_cicilan_tagihan_mhs',$this->data,true);
         $this->temp($content);
     }
 
@@ -721,7 +731,81 @@ class C_finance extends Finnance_Controler {
         return $rs;
     }
 
-    public function export_excel()
+    public function export_excel($token)
+    {
+        $key = "UAP)(*";
+        $input = (array) $this->jwt->decode($token,$key);
+        // print_r($input);
+        $Semester = $input['Semester'];
+        $Semester = explode('.', $Semester);
+        $Semester = $Semester[1];
+        $data = $input['Data'];
+        $dataGenerate = $this->GroupingNPM($data);
+
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load('./uploads/finance/TemplatePembayaran.xlsx'); // Empty Sheet
+        $excel2->setActiveSheetIndex(0);
+
+        $excel3 = $excel2->getActiveSheet();
+        $excel3->setCellValue('A2', 'Rekap Penerimaan & AGING '.$Semester);
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+        $style_row = array(
+          'alignment' => array(
+            'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+          ),
+          'borders' => array(
+            'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+            'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+            'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+            'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+          )
+        );
+
+        // start dari A7
+        $a = 8;
+        for ($i=0; $i < count($dataGenerate); $i++) {
+           $no = $i + 1;  
+           $excel3->setCellValue('A'.$a, $no); 
+           $excel3->setCellValue('B'.$a, $dataGenerate[$i]['Nama']);
+           $excel3->setCellValue('C'.$a, $dataGenerate[$i]['NPM']);
+           $excel3->setCellValue('D'.$a, $dataGenerate[$i]['ProdiEng']);
+           $excel3->setCellValue('E'.$a, $dataGenerate[$i]['SPP']);
+           $excel3->setCellValue('F'.$a, $dataGenerate[$i]['Another']);
+           $excel3->setCellValue('G'.$a, $dataGenerate[$i]['BPP']);
+           $excel3->setCellValue('H'.$a, $dataGenerate[$i]['BPPKet']);
+           $excel3->setCellValue('I'.$a, $dataGenerate[$i]['Credit']);
+           $excel3->setCellValue('J'.$a, $dataGenerate[$i]['CreditKet']);
+
+           // Apply style row yang telah kita buat tadi ke masing-masing baris (isi tabel)
+           $excel3->getStyle('A'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('B'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('C'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('D'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('E'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('F'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('G'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('H'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('I'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('J'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('K'.$a)->applyFromArray($style_row);
+
+           $a = $a + 1; 
+        }
+
+        $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
+        // We'll be outputting an excel file  
+        header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
+        // It will be called file.xlss
+        header('Content-Disposition: attachment; filename="file.xlsx"'); // jalan ketika tidak menggunakan ajax
+        //$filename = 'PenerimaanPembayaran.xlsx';
+        //$objWriter->save('./document/'.$filename);
+        $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
+
+    }
+
+    /*public function export_excel()
     {
         $input = $this->getInputToken();
         // print_r($input);
@@ -792,76 +876,78 @@ class C_finance extends Finnance_Controler {
         $objWriter->save('./document/'.$filename);
         // $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
         echo json_encode($filename);
+    }*/
+
+    public function import_price_list_mhs()
+    {
+        $content = $this->load->view('page/'.$this->data['department'].'/tagihan_mahasiswa/page_import_price_list_mhs',$this->data,true);
+        $this->temp($content);
     }
 
-    public function export_excel2()
+    public function submit_import_price_list_mhs()
+    {
+        // print_r($_FILES);
+        if(isset($_FILES["fileData"]["name"]))
+        {
+          $path = $_FILES["fileData"]["tmp_name"];
+          $arr_insert = array();
+          include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+          $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+          $excel2 = $excel2->load($path); // Empty Sheet
+          $objWorksheet = $excel2->setActiveSheetIndex(0);
+          $CountRow = $objWorksheet->getHighestRow();
+          $Pay_Cond = $this->input->post('Pay_Cond');
+         
+          for ($i=2; $i < $CountRow; $i++) {
+            $temp = array();
+            $NPM = $objWorksheet->getCellByColumnAndRow(0, $i)->getCalculatedValue();
+            $temp = array(
+              'NPM' => $NPM,
+              'Pay_Cond' => $Pay_Cond,
+            );
+            $arr_insert[] = $temp;
+          }
+          $this->db->update_batch('db_academic.auth_students', $arr_insert, 'NPM');
+          echo json_encode(array('status'=> 1,'msg' => ''));
+        }
+        else
+        {
+          exit('No direct script access allowed');
+        }
+    }
+
+    public function list_telat_bayar()
+    {
+        $content = $this->load->view('page/'.$this->data['department'].'/tagihan_mahasiswa/page_list_telat_bayar',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function get_list_telat_bayar($page = null)
     {
         $input = $this->getInputToken();
-        // print_r($input);
-        $Semester = $input['Semester'];
-        $Semester = explode('.', $Semester);
-        $Semester = $Semester[1];
-        $data = $input['Data'];
-        $dataGenerate = $this->GroupingNPM($data); 
-        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
-        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
-        $excel2 = $excel2->load('./uploads/finance/TemplatePembayaran.xlsx'); // Empty Sheet
-        $excel2->setActiveSheetIndex(0);
-        /*$excel2->getActiveSheet()->setCellValue('A2', 'Rekap Penerimaan & AGING '.$Semester)
-            ->setCellValue('C7', '5')
-            ->setCellValue('C8', '6')       
-            ->setCellValue('C9', '7');*/
-
-        // $excel2->getActiveSheet()->insertNewRowBefore(0 + 1, 1); // insert new row
-        
-        $excel3 = $excel2->getActiveSheet();
-        $excel3->setCellValue('A2', 'Rekap Penerimaan & AGING '.$Semester);
-
-        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
-        $style_row = array(
-          'alignment' => array(
-            'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
-          ),
-          'borders' => array(
-            'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
-            'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
-            'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
-            'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
-          )
+        $this->load->library('pagination');
+        $config = $this->config_pagination_default_ajax(1000,10,3);
+        $this->pagination->initialize($config);
+        $page = $this->uri->segment(3);
+        $start = ($page - 1) * $config["per_page"];
+        $data = $this->m_finance->get_list_telat_bayar_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NIM'],$config["per_page"], $start);
+        $output = array(
+        'pagination_link'  => $this->pagination->create_links(),
+        'loadtable'   => $data,
         );
+        echo json_encode($output);
+    }
 
-        // start dari A7
-        $a = 7;
-        for ($i=0; $i < count($data); $i++) {
-           $no = $i + 1;  
-           $excel3->setCellValue('A'.$a, $no); 
-           $excel3->setCellValue('B'.$a, $data[$i]->Nama);
-           $excel3->setCellValue('C'.$a, $data[$i]->NPM);
-           $excel3->setCellValue('D'.$a, $data[$i]->ProdiEng);
-
-           // Apply style row yang telah kita buat tadi ke masing-masing baris (isi tabel)
-           $excel3->getStyle('A'.$a)->applyFromArray($style_row);
-           $excel3->getStyle('B'.$a)->applyFromArray($style_row);
-           $excel3->getStyle('C'.$a)->applyFromArray($style_row);
-           $excel3->getStyle('D'.$a)->applyFromArray($style_row);
-           $excel3->getStyle('E'.$a)->applyFromArray($style_row);
-           $excel3->getStyle('F'.$a)->applyFromArray($style_row);
-           $excel3->getStyle('G'.$a)->applyFromArray($style_row);
-           $excel3->getStyle('H'.$a)->applyFromArray($style_row);
-           $excel3->getStyle('I'.$a)->applyFromArray($style_row);
-           $excel3->getStyle('J'.$a)->applyFromArray($style_row);
-           $excel3->getStyle('K'.$a)->applyFromArray($style_row);
-
-           $a = $a + 1; 
-        }
-
-        $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
-        // We'll be outputting an excel file  
-        // header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
-        // It will be called file.xlss
-        // header('Content-Disposition: attachment; filename="file.xls"'); // jalan ketika tidak menggunakan ajax
-        $objWriter->save('./document/PenerimaanPembayaran.xlsx');
-        // $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
+    public function edit_telat_bayar($token)
+    {
+        $key = "UAP)(*";
+        $input = (array) $this->jwt->decode($token,$key);
+        $this->data['NPM'] = $input['NPM'];
+        $this->data['PaymentID'] = $input['PaymentID'];
+        $this->data['semester'] = $input['semester'];
+        $this->data['PTID'] = $input['PTID'];
+        $content = $this->load->view('page/'.$this->data['department'].'/tagihan_mahasiswa/page_edit_telat_bayar',$this->data,true);
+        $this->temp($content);
 
     }
 

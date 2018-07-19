@@ -2327,6 +2327,24 @@ class C_api extends CI_Controller {
         echo json_encode($arr);
     }
 
+    public function cek_deadline_paymentNPM()
+    {
+        $arr = array();
+        try {
+          $input = $this->getInputToken();
+          $NPM = $input['NPM'];
+          $arr = $this->m_api->cek_deadline_paymentNPM($NPM);
+          echo json_encode($arr);
+        }
+
+        //catch exception
+        catch(Exception $e) {
+          echo json_encode($arr);
+        }
+        
+
+    }
+
 
 
 }
