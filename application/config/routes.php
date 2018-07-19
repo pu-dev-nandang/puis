@@ -350,6 +350,8 @@ $route['loadDataRegistrationFormulirOffline'] =  'api/C_global/load_data_registr
 
 
 // ---- Save to PDF ---
+$route['save2pdf/schedule-pdf'] =  'c_save_to_pdf/schedulePDF';
+
 $route['save2pdf/listStudentsFromCourse'] =  'c_save_to_pdf/listStudentsFromCourse';
 
 $route['save2pdf/exam-layout'] =  'c_save_to_pdf/exam_layout';
@@ -361,6 +363,9 @@ $route['save2pdf/attendance-list'] =  'c_save_to_pdf/attendance_list';
 $route['save2pdf/report-uts'] =  'c_save_to_pdf/report_uts';
 
 $route['save2pdf/getpdfkwitansi/(:any)'] =  'c_save_to_pdf/getpdfkwitansi/$1';
+
+// ---- Save to EXCEL
+$route['save2excel/test'] =  'c_save_to_excel/test2';
 
 
 // ====== API ======

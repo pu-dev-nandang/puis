@@ -642,7 +642,8 @@ class M_api extends CI_Model {
                                           LEFT JOIN db_academic.schedule s ON (s.ID=sd.ScheduleID)
                                           LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                           LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)                                   
-                                          WHERE sd.DayID = "'.$DayID.'" '.$ProgramsCampusID.' '.$SemesterID.' '.$CombinedClasses.' '.$IsSemesterAntara.' ORDER BY sd.StartSessions ASC ');
+                                          WHERE sd.DayID = "'.$DayID.'" '.$ProgramsCampusID.' '.$SemesterID.' '.$CombinedClasses.' '.$IsSemesterAntara.' 
+                                          ORDER BY sd.StartSessions, sd.EndSessions ASC ');
 
         $result = $data->result_array();
 
@@ -683,7 +684,8 @@ class M_api extends CI_Model {
                                                           WHERE sdc.ScheduleID="'.$result[$c]['ID'].'" AND sdc.CDID = "'.$Arr_CDID[$s].'" LIMIT 1')->result_array();
 
                             if(count($__course)>0){
-                                $__course[0]['Semester'] = $dataWhere['Semester'];
+//                                $__course[0]['Semester'] = $dataWhere['Semester'];
+                                $__course[0]['Semester'] = $dataOffering[$f]['Semester'];
                                 array_push($dataCourse,$__course[0]);
                             }
                         }
