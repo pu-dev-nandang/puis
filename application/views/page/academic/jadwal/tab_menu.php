@@ -185,12 +185,14 @@
         var Semester = $('#filterSemester').val();
         var SemesterID = (Semester!='' && Semester!= null) ? Semester.split('.')[0] : '';
 
+        console.log(SemesterID);
+
         $('#selectSemesterSc').html('<select class="form-control" id="filterSemesterSchedule"></select>');
         // $('#filterSemesterSchedule').empty();
-        $('#filterSemesterSchedule').append('<option value="" disabled selected>-- Semester --</option>' +
+        $('#filterSemesterSchedule').append('<option value="">-- All Semester --</option>' +
             '                <option disabled>------------</option>');
         loadSelectOPtionAllSemester('#filterSemesterSchedule','',SemesterID,SemesterAntara);
-        // filterSchedule();
+        filterSchedule();
 
     });
 
