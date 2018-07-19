@@ -2222,5 +2222,25 @@ class M_api extends CI_Model {
         }
     }
 
+    public function cek_deadline_paymentNPM($NPM)
+    {
+        error_reporting(0);
+        $arr = array();
+        $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+        // cari data payment yang status = 0 desc limit 1
+        $sql = 'select * from db_finance.payment where Status = "0" and NPM = ? and SemesterID = ? order by ID desc limit 1';
+        $query=$this->db->query($sql, array($NPM,$SemesterID[0]['ID']))->result_array();
+        if (count($query) == 1 ) {
+            $ID_payment = $query[0]['ID'];
+            $this->load->model('master/m_master');
+            $get = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$ID_payment);
+            for ($i=0; $i < count($get); $i++) { 
+                $arr[] = array('Deadline' => $get[$i]['Deadline'],'Price' => $get[$i]['Invoice'],'Status' => $get[$i]['Status']);
+            }
+        }
+        return $arr;
+
+    }
+
 
 }

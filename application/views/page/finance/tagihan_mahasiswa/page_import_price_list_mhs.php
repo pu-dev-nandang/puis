@@ -2,7 +2,7 @@
 	<div class="col-md-12">
 		<div class="widget box">
 			<div class="widget-header">
-				<h4><i class="icon-reorder"></i>Generate NIM Mahasiswa</h4>
+				<h4><i class="icon-reorder"></i>Import Price List Mahasiswa</h4>
 				<div class="toolbar no-padding">
 					<!--<div class="btn-group">
 						<span class="btn btn-xs widget-collapse"><i class="icon-angle-down"></i></span>
@@ -13,26 +13,20 @@
 				<div class="form-horizontal">
 					<div class="form-group">
 							<div class="col-xs-2" style="">
-							    Prody
-							    <select class="select2-select-00 col-md-4 full-width-fix" id="selectProgramStudy">
-							        <option></option>
-							    </select>
-							</div>
-							<div class="col-xs-2" style="">
-							    Tahun Angkatan
-							    <select class="select2-select-00 col-md-4 full-width-fix" id="selectTa">
-							        <option></option>
+							    Kategory
+							    <select class="select2-select-00 col-md-4 full-width-fix" id="selectKategory">
+							        <option value="1">*</option>
+							        <option value="2">**</option>
 							    </select>
 							</div>
 							<div class="col-xs-2" style="">
 								<label class="control-label">Upload File:</label>
 								<input type="file" data-style="fileinput" id="ExFile">
 							</div>
-							<a href="<?php echo base_url('download_template/admisi-t_import_mhs.xlsm'); ?>">File Template</a>
+							<a href="<?php echo base_url('download_template/finance-Template_import_price_list_mhs.xlsx'); ?>">File Template</a>
 							<div class="col-xs-1">
 								<button class="btn btn-inverse btn-notification" id="btn-proses">Proses</button>
 							</div>
-							
 						</div>
 					<!-- </div> -->
 				</div>
@@ -43,61 +37,40 @@
 
 <script type="text/javascript">
 	$(document).ready(function () {
-	    loadProgramStudy();
-	    loadTahunLulus();
-	});
-
-	function loadTahunLulus()
-	{
-		var thisYear = (new Date()).getFullYear();
-		var startTahun = parseInt(thisYear) - parseInt(5);
-		var selisih = parseInt(thisYear) - parseInt(startTahun);
-		for (var i = 0; i <= selisih; i++) {
-		    var selected = (i==selisih) ? 'selected' : '';
-		    $('#selectTa').append('<option value="'+ ( parseInt(startTahun) + parseInt(i) ) +'" '+selected+'>'+( parseInt(startTahun) + parseInt(i) )+'</option>');
-		}
-		$('#selectTa').select2({
-		  // allowClear: true
-		});
-	}
-
-	function loadProgramStudy()
-	{
-	    var url = base_url_js+"api/__getBaseProdiSelectOption";
-	    $('#selectProgramStudy').empty();
-	    $.post(url,function (data_json) {
-	          for(var i=0;i<data_json.length;i++){
-	              // var selected = (i==0) ? 'selected' : '';
-	              //var selected = (data_json[i].RegionName=='Kota Jakarta Pusat') ? 'selected' : '';
-	              $('#selectProgramStudy').append('<option value="'+data_json[i].ID+'" '+''+'>'+data_json[i].Name+'</option>');
-	          }
-	          $('#selectProgramStudy').select2({
-	             //allowClear: true
-	          });
-	    }).done(function () {
+	    /*var url = base_url_js+'api/__cek_deadline_paymentNPM';
+	    var data = {
+	        NPM : '11160002',
+	    };
+	    var token = jwt_encode(data,'UAP)(*');
+	    $.post(url,{token:token},function (resultJson) {
+	       console.log(resultJson);
+	    }).fail(function() {
 	      
-	    });
-	}
+	    }).always(function() {
+	        
+	    });*/
+	});
 
 	$(document).on('click','#btn-proses', function () {
 		loading_button('#btn-proses');
 	  if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
 	  		toastr.error('The File APIs are not fully supported in this browser.', 'Failed!!');
+	  		$('#btn-proses').prop('disabled',false).html('Proses');  
 	        return;
 	      }   
 
 	      input = document.getElementById('ExFile');
 	      if (!input) {
 	        toastr.error('Um, couldnot find the fileinput element.', 'Failed!!');
-	        $('#btn-proses').prop('disabled',false).html('Proses'); 
+	        $('#btn-proses').prop('disabled',false).html('Proses');  
 	      }
 	      else if (!input.files) {
 	        toastr.error('This browser doesnot seem to support the `files', 'Failed!!');
-	        $('#btn-proses').prop('disabled',false).html('Proses'); 
+	        $('#btn-proses').prop('disabled',false).html('Proses');  
 	      }
 	      else if (!input.files[0]) {
 	        toastr.error('Please select a file before clicking Proses', 'Failed!!');
-	        $('#btn-proses').prop('disabled',false).html('Proses'); 
+	        $('#btn-proses').prop('disabled',false).html('Proses');  
 	      }
 	      else {
 	        /*file = input.files[0];
@@ -115,12 +88,10 @@
 	{
 		var form_data = new FormData();
 		var fileData = document.getElementById("ExFile").files[0];
-		var url = base_url_js + "admission/mastercalonmahasiswa/submit_import_excel_File_generate_nim";
-		var ta = $("#selectTa").val();
-		var Prodi = $("#selectProgramStudy").val();
-		form_data.append('ta',ta);
-		form_data.append('Prodi',Prodi);
+		var url = base_url_js + "finance/tagihan-mhs/submit_import_price_list_mhs";
+		var selectKategory = $("#selectKategory").val();
 		form_data.append('fileData',fileData);
+		form_data.append('Pay_Cond',selectKategory);
 	  	$.ajax({
 	  	  type:"POST",
 	  	  url:url,

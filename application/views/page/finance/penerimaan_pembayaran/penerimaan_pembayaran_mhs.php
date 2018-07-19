@@ -154,7 +154,9 @@
         Semester : $('#selectSemester').val(),
       }
       var token = jwt_encode(data,"UAP)(*");
-          $.post(url,{token:token},function (data_json) {
+      window.open(url+'/'+token,'_blank');
+
+          /*$.post(url,{token:token},function (data_json) {
               var response = jQuery.parseJSON(data_json);
               //console.log(response);
               //window.location.href = base_url_js+'fileGet/'+response;
@@ -166,7 +168,7 @@
           }).always(function() {
            $('#export_excel').prop('disabled',false).html('<i class="fa fa-download" aria-hidden="true"></i> Excel');
 
-          });
+          });*/
 
     });
 
