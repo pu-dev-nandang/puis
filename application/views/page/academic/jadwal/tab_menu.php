@@ -313,6 +313,7 @@
             // console.log(data);
             // console.log(data.split('|')[2]);
             $('#textTotalSKSMK').val(data.split('|')[2]);
+            $('#viewMaksCredit').html(data.split('|')[2]);
 
             // var cr = $('#formCredit1').val();
             if(dataSesi==1){
