@@ -14,14 +14,14 @@ class C_api extends CI_Controller {
         $this->load->library('JWT');
         $this->load->library('google');
 
-        if($this->session->userdata('loggedIn')==false){
-            $data = array(
-                'Message' => 'Error',
-                'Description' => 'Your Session Login Is Destroy'
-            );
-            print_r(json_encode($data));
-            exit;
-        }
+//        if($this->session->userdata('loggedIn')==false){
+//            $data = array(
+//                'Message' => 'Error',
+//                'Description' => 'Your Session Login Is Destroy'
+//            );
+//            print_r(json_encode($data));
+//            exit;
+//        }
     }
 
     private function getInputToken()
@@ -2035,11 +2035,12 @@ class C_api extends CI_Controller {
                 }
 
                 $res = array(
-                    'NIP' => $data[0]['NIP'.$No],
+//                    'NIP' => $data[0]['NIP'.$No],
                     'BAP' => $data[0]['BAP'.$No],
-                    'Date' => $data[0]['Date'.$No],
-                    'In' => $data[0]['In'.$No],
-                    'Out' => $data[0]['Out'.$No],
+//                    'Date' => $data[0]['Date'.$No],
+//                    'In' => $data[0]['In'.$No],
+//                    'Out' => $data[0]['Out'.$No],
+                    'Details' => $data,
                     'DetailLecturers' => $coor
                 );
                 return print_r(json_encode($res));
@@ -2049,21 +2050,22 @@ class C_api extends CI_Controller {
                 $ID = $data_arr['ID'];
                 $No = $data_arr['No'];
 
-                $formUpdate = (array) $data_arr['formUpdate'];
-
-//                print_r($formUpdate);
+                $this->db->insert('db_academic.attendance_lecturers',(array) $data_arr['insertAttdLecturer']);
 
                 $dataUpdate = array(
-                    'NIP'.$No => $formUpdate['NIP'],
-                    'BAP'.$No => $formUpdate['BAP'],
-                    'Date'.$No => $formUpdate['Date'],
-                    'In'.$No => $formUpdate['In'],
-                    'Out'.$No => $formUpdate['Out']
+                    'Meet'.$No => '1',
+                    'BAP'.$No => $data_arr['BAP']
                 );
 
                 $this->db->where('ID', $ID);
                 $this->db->update('db_academic.attendance', $dataUpdate);
 
+                return print_r(1);
+            }
+
+            else if($data_arr['action']=='DeleteAttdLecturers'){
+                $this->db->where('ID', $data_arr['ID']);
+                $this->db->delete('db_academic.attendance_lecturers');
                 return print_r(1);
             }
 

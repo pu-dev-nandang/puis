@@ -2011,15 +2011,19 @@ class M_api extends CI_Model {
 
         if(count($data)>0){
             for($s=1;$s<=14;$s++){
-                $data[0]['Name'.$s] = '';
+
+                $Lecturers = $this->db->query('SELECT al.*, em.Name FROM db_academic.attendance_lecturers al 
+                                                         LEFT JOIN db_employees.employees em ON (al.NIP = em.NIP)
+                                                         WHERE al.ID_Attd = "'.$data[0]['ID'].'" 
+                                                         AND al.Meet = "'.$s.'" 
+                                                         ORDER BY al.Date, al.In, al.Out ASC ')->result_array();
+
+                $data[0]['AttdLecturers'.$s] = $Lecturers;
+
                 $p = '-';
                 $a = '-';
 
-                if($data[0]['NIP'.$s] != '' && $data[0]['NIP'.$s] != null){
-                    $dataLec = $this->db->select('Name')->get_where('db_employees.employees',
-                        array('NIP' => $data[0]['NIP'.$s]),1)->result_array();
-
-                    $data[0]['Name'.$s] = $dataLec[0]['Name'];
+                if($data[0]['Meet'.$s] == 1 && $data[0]['Meet'.$s] == '1'){
 
                     $p = 0;
                     $a = 0;
@@ -2033,19 +2037,19 @@ class M_api extends CI_Model {
                 }
 
                 $dataWhereS_Ex = $this->db->get_where('db_academic.schedule_exchange',
-                                        array(
-                                            'ID_Attd' => $AttendanceID,
-                                            'Meeting'=>$s),1)->result_array();
+                    array(
+                        'ID_Attd' => $AttendanceID,
+                        'Meeting'=>$s),1)->result_array();
                 $ScheduleEx_Status = (count($dataWhereS_Ex)>0) ? $dataWhereS_Ex[0]['Status'] : '-';
 
                 $data[0]['ScheduleExchange_Status'.$s] = $ScheduleEx_Status;
                 $data[0]['S_P'.$s] = $p;
                 $data[0]['S_A'.$s] = $a;
+
             }
         }
 
         return $data;
-
 
     }
 

@@ -46,7 +46,6 @@
 </div>
 
 
-
 <div id="divpagePresensi"></div>
 
 <!--<script src="--><?php //echo base_url('assets/custom/js/presensi.js'); ?><!--"></script>-->
@@ -55,8 +54,8 @@
     $(document).ready(function () {
 
         $('#filterSemester').empty();
-        $('#filterSemester').append('<option value="" disabled selected>-- Year Academic--</option>' +
-            '                <option disabled>------------------------------------------</option>');
+        // $('#filterSemester').append('<option value="" disabled selected>-- Year Academic--</option>' +
+        //     '                <option disabled>------------------------------------------</option>');
         loSelectOptionSemester('#filterSemester','');
 
         $('#filterBaseProdi').empty();
@@ -671,6 +670,7 @@
 <!-- Input Attd lecturers -->
 <script>
     $(document).on('click','.inputLecturerAttd',function () {
+
         var ID = $(this).attr('data-id');
         var No = $(this).attr('data-no');
 
@@ -793,12 +793,14 @@
                 action : 'UpdtAttdLecturers',
                 ID : ID,
                 No : No,
-                formUpdate : {
+                BAP : formBAP,
+                insertAttdLecturer : {
+                    ID_Attd : ID,
                     NIP : NIP,
+                    Meet : No,
                     Date : moment(formDate).format('YYYY-MM-DD'),
                     In : formIn,
                     Out : formOut,
-                    BAP : formBAP
                 }
             };
             var token = jwt_encode(data,'UAP)(*');
@@ -813,6 +815,25 @@
             toastr.warning('Form Required','Warning');
         }
 
+
+    });
+
+    $(document).on('click','.btn-delete-attd',function () {
+
+        if(confirm("Remove data ?")){
+            var ID = $(this).attr('data-id');
+
+            var url = base_url_js+'api/__crudAttendance';
+            var data = {
+                action : 'DeleteAttdLecturers',
+                ID : ID
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            $.post(url,{token:token},function () {
+                toastr.success('Data Removed','Remove Success');
+                getDataAttendance();
+            });
+        }
 
     });
 
