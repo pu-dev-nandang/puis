@@ -220,7 +220,7 @@
                           }
                           cicilan = cicilan + 1;
                         }
-                        console.log(cicilan);
+                        // console.log(cicilan);
 
 
                         if(cicilan == 1)
@@ -279,7 +279,7 @@
                        '<td>'+yy+'</td>' +
                        '<td>'+htmlCicilan+'</td>'+
                        '<td>'+status+'</td>' +
-                       '<td>'+'<button class = "DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'">View</button>'+'</td>' +
+                       '<td>'+'<button class = "DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'">View</button>'+'</td>' +
                        '</tr>');
                }
 
@@ -298,6 +298,7 @@
             }).always(function() {
                 $('#NotificationModal').modal('hide');
             });
+            $('#NIM').focus();
     }
 
     $(document).on('click','#dataResultCheckAll', function () {
@@ -306,6 +307,7 @@
 
     $(document).on('click','.DetailPayment', function () {
         var NPM = $(this).attr('NPM');
+        var PaymentID = $(this).attr('PaymentID');
         var html = '';
         var table = '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
                       '<thead>'+
@@ -323,7 +325,7 @@
         var isi = '';
         // console.log(dataaModal);
         for (var i = 0; i < dataaModal.length; i++) {
-          if(dataaModal[i]['NPM'] == NPM)
+          if(dataaModal[i]['PaymentID'] == PaymentID)
           {
             var DetailPaymentArr = dataaModal[i]['DetailPayment'];
             var Nama = dataaModal[i]['Nama'];

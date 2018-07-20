@@ -816,8 +816,8 @@ class C_save_to_pdf extends CI_Controller {
         // Logo
         $pdf->Image('./images/logo_tr.png',5,5,50);
         
-        $pdf->SetFont('Arial','',20);
-        $pdf->Cell(200, 0, 'Kwitansi Pembayaran Mahasiswa', 0, 1, 'C', 0);
+        $pdf->SetFont('Arial','',17);
+        $pdf->Cell(200, 0, 'Tanda Terima Pembayaran Mahasiswa', 0, 1, 'C', 0);
         
         $pdf->SetFont('Arial','',15);
         $pdf->Cell(200, 15, 'Tahun Akademik', 0, 1, 'C', 0);
@@ -870,7 +870,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->Cell(200, 7, '', 0, 1, 'C', 0);
         $pdf->Cell(190, 7, 'Note : ', 0, 1, 'L');
-        $pdf->Cell(190, 7, 'Kwitansi ini merupakan bukti pembayaran yang diterbitkan oleh Podomoro University.', 0, 1, 'L');
+        $pdf->Cell(190, 7, 'Tanda terima ini merupakan bukti pembayaran yang diterbitkan oleh Podomoro University.', 0, 1, 'L');
         $pdf->Cell(190, 7, 'Jika terdapat kekeliruan harap hubungi bagian Admisi dibawah ini.', 0, 1, 'L');
 
         $pdf->Line(10, 135, 200, 135);

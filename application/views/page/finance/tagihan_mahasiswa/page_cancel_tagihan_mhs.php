@@ -134,7 +134,7 @@
                 'show' : true
             });
             $('#dataRow').html('');
-            var url = base_url_js+'finance/get_created_tagihan_mhs/'+page;
+            var url = base_url_js+'finance/get_created_tagihan_mhs_not_approved/'+page;
             var data = {
                 ta : ta,
                 prodi : prodi,

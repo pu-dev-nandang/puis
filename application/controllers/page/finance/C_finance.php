@@ -191,7 +191,10 @@ class C_finance extends Finnance_Controler {
         $input = $this->getInputToken();
 
         $this->load->library('pagination');
-        $config = $this->config_pagination_default_ajax(1000,20,3);
+        // count all
+        $count = $this->m_finance->count_get_tagihan_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NPM']);
+
+        $config = $this->config_pagination_default_ajax($count,20,3);
         $this->pagination->initialize($config);
         $page = $this->uri->segment(3);
         $start = ($page - 1) * $config["per_page"];
@@ -297,11 +300,31 @@ class C_finance extends Finnance_Controler {
     {
         $input = $this->getInputToken();
         $this->load->library('pagination');
-        $config = $this->config_pagination_default_ajax(1000,10,3);
+        // count
+        $count = $this->m_finance->count_get_created_tagihan_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NIM']);
+        $config = $this->config_pagination_default_ajax($count,50,3);
         $this->pagination->initialize($config);
         $page = $this->uri->segment(3);
         $start = ($page - 1) * $config["per_page"];
         $data = $this->m_finance->get_created_tagihan_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NIM'],$config["per_page"], $start);
+        $output = array(
+        'pagination_link'  => $this->pagination->create_links(),
+        'loadtable'   => $data,
+        );
+        echo json_encode($output);
+    }
+
+    public function get_created_tagihan_mhs_not_approved($page = null)
+    {
+        $input = $this->getInputToken();
+        $this->load->library('pagination');
+        // count
+        $count = $this->m_finance->count_get_created_tagihan_mhs_not_approved($input['ta'],$input['prodi'],$input['PTID'],$input['NIM']);
+        $config = $this->config_pagination_default_ajax($count,50,3);
+        $this->pagination->initialize($config);
+        $page = $this->uri->segment(3);
+        $start = ($page - 1) * $config["per_page"];
+        $data = $this->m_finance->get_created_tagihan_mhs_not_approved($input['ta'],$input['prodi'],$input['PTID'],$input['NIM'],$config["per_page"], $start);
         $output = array(
         'pagination_link'  => $this->pagination->create_links(),
         'loadtable'   => $data,
@@ -511,226 +534,6 @@ class C_finance extends Finnance_Controler {
         echo json_encode($arr);    
     }
 
-    private function GroupingNPM($data)
-    {
-        $temp = array();
-        $rs = array();
-        for ($i=0; $i < count($data); $i++) { 
-            $find = 0;
-            for ($k=0; $k < count($temp); $k++) { 
-                 if ($data[$i]->NPM == $temp[$k]['NPM']) {
-                     $find = 1;
-                     // print_r('$data[$i]->NPM = '.$data[$i]->NPM.' $temp[$k]["NPM"] = '. $temp[$k]['NPM'].' ');
-                     break;
-                 }
-            }
-
-            if ($find == 0) {
-                $temp2 = array('NPM' => $data[$i]->NPM,'PTID' => $data[$i]->PTID, 'InvoicePayment' => $data[$i]->InvoicePayment, 'InvoiceStudents' => $data[$i]->InvoiceStudents,'SemesterID' => $data[$i]->SemesterID,'PaymentID' => $data[$i]->PaymentID,'Nama' => $data[$i]->Nama,'ProdiEng' => $data[$i]->ProdiEng);
-                for ($j=($i+1); $j <count($data) ; $j=$j+1) {
-                        if ($data[$i]->NPM == $data[$j]->NPM) {
-                            if ($data[$i]->PTID == $data[$j]->PTID) {
-                                $InvoiceStudents = $data[$j]->InvoiceStudents + $temp2['InvoiceStudents'];
-                                $temp2['InvoiceStudents'] = $InvoiceStudents;
-                            }
-                        }
-                    
-                }
-                $temp[] = $temp2;
-            }
-            
-        }
-
-        // print_r($temp);
-
-        for ($i=0; $i < count($temp); $i++) { 
-            $find = 0;
-            for ($k=0; $k < count($rs); $k++) { 
-                 if ($temp[$i]['NPM'] == $rs[$k]['NPM']) {
-                     $find = 1;
-                     break;
-                 }
-            }
-            if ($find == 0) {
-                   $temp2 = array('NPM' => $temp[$i]['NPM'],'Nama' => $temp[$i]['Nama'],'ProdiEng' => $temp[$i]['ProdiEng'],'SPP' => '', 'SPPKet' => '', 'BPP' => '','BPPKet' => '', 'Credit' => '','CreditKet' => '','Another' => '','AnotherKet' => '');
-                   if ($temp[$i]['PTID'] == 1) {
-                        $temp2['SPP'] = $temp[$i]['InvoiceStudents'];
-                        if ($temp[$i]['InvoiceStudents'] >= $temp[$i]['InvoicePayment']) {
-                            $temp2['SPPKet'] = 'Lunas';
-                        }
-                        else
-                        {
-                            $temp2['SPPKet'] = 'Belum Lunas';
-                        }
-                   }
-                   elseif ($temp[$i]['PTID'] == 2) {
-                        $temp2['BPP'] = $temp[$i]['InvoiceStudents'];
-                        if ($temp[$i]['InvoiceStudents'] >= $temp[$i]['InvoicePayment']) {
-                            $temp2['BPPKet'] = 'Lunas';
-                        }
-                        else
-                        {
-                            $temp2['BPPKet'] = 'Belum Lunas';
-                        }
-                   }
-                   elseif ($temp[$i]['PTID'] == 3) {
-                        $temp2['Credit'] = $temp[$i]['InvoiceStudents'];
-                        if ($temp[$i]['InvoiceStudents'] >= $temp[$i]['InvoicePayment']) {
-                            $temp2['CreditKet'] = 'Lunas';
-                        }
-                        else
-                        {
-                            $temp2['CreditKet'] = 'Belum Lunas';
-                        }
-                   }
-                   elseif ($temp[$i]['PTID'] == 4) {
-                        $temp2['Another'] = $temp[$i]['InvoiceStudents'];
-                        if ($temp[$i]['InvoiceStudents'] >= $temp[$i]['InvoicePayment']) {
-                            $temp2['AnotherKet'] = 'Lunas';
-                        }
-                        else
-                        {
-                            $temp2['AnotherKet'] = 'Belum Lunas';
-                        }
-                   }
-
-                    $SemesterID = $temp[$i]['SemesterID'];
-                    $NPM = $temp[$i]['NPM'];
-
-                    for ($j=($i+1); $j < count($temp); $j = $j +1) {
-                        if ($temp[$i]['NPM']== $temp[$j]['NPM']) { 
-                          if ($temp[$j]['PTID'] == 1) {
-                               // $temp2['SPP'] = $temp[$j]['InvoiceStudents'];
-                               $PTID = $temp[$j]['PTID'];
-
-                               $Payment =$this->m_finance->findPaymentBaseUnique($PTID,$SemesterID,$NPM);
-                               $PaymentID = $Payment[0]['ID'];
-
-                               $payment_students = $this->m_master->caribasedprimary('db_admission.payment_students','ID_payment',$PaymentID);
-                               $InvoiceStudents = 0;
-                               $InvoicePayment = $Payment[0]['Invoice'];
-                               for ($z=0; $z < count($payment_students); $z++) { 
-                                    $InvoiceStudents = $InvoiceStudents + $payment_students[$z]['Invoice'];
-                               } 
-
-                               $temp2['SPP'] = $InvoiceStudents;
-                               if ($InvoiceStudents >= $InvoicePayment) {
-                                   $temp2['SPPKet'] = 'Lunas';
-                               }
-                               else
-                               {
-                                   $temp2['SPPKet'] = 'Belum Lunas'; 
-                               }
-                               /*if ($temp[$j]['InvoiceStudents'] >= $temp[$j]['InvoicePayment']) {
-                                   $temp2['SPPKet'] = 'Lunas';
-                               }
-                               else
-                               {
-                                   $temp2['SPPKet'] = 'Belum Lunas';
-                               }*/
-                          }
-                          elseif ($temp[$j]['PTID'] == 2) {
-                                $PTID = $temp[$j]['PTID'];
-
-                                $Payment =$this->m_finance->findPaymentBaseUnique($PTID,$SemesterID,$NPM);
-                                $PaymentID = $Payment[0]['ID'];
-
-                                $payment_students = $this->m_master->caribasedprimary('db_admission.payment_students','ID_payment',$PaymentID);
-                                $InvoiceStudents = 0;
-                                $InvoicePayment = $Payment[0]['Invoice'];
-                                for ($z=0; $z < count($payment_students); $z++) { 
-                                     $InvoiceStudents = $InvoiceStudents + $payment_students[$z]['Invoice'];
-                                } 
-
-                                $temp2['BPP'] = $InvoiceStudents;
-                                if ($InvoiceStudents >= $InvoicePayment) {
-                                    $temp2['BPPKet'] = 'Lunas';
-                                }
-                                else
-                                {
-                                    $temp2['BPPKet'] = 'Belum Lunas'; 
-                                }
-                               /*$temp2['BPP'] = $temp[$j]['InvoiceStudents'];
-                               if ($temp[$j]['InvoiceStudents'] >= $temp[$j]['InvoicePayment']) {
-                                   $temp2['BPPKet'] = 'Lunas';
-                               }
-                               else
-                               {
-                                   $temp2['BPPKet'] = 'Belum Lunas';
-                               }*/
-                          }
-                          elseif ($temp[$j]['PTID'] == 3) {
-                                $PTID = $temp[$j]['PTID'];
-
-                                $Payment =$this->m_finance->findPaymentBaseUnique($PTID,$SemesterID,$NPM);
-                                $PaymentID = $Payment[0]['ID'];
-
-                                $payment_students = $this->m_master->caribasedprimary('db_admission.payment_students','ID_payment',$PaymentID);
-                                $InvoiceStudents = 0;
-                                $InvoicePayment = $Payment[0]['Invoice'];
-                                for ($z=0; $z < count($payment_students); $z++) { 
-                                     $InvoiceStudents = $InvoiceStudents + $payment_students[$z]['Invoice'];
-                                } 
-
-                                $temp2['Credit'] = $InvoiceStudents;
-                                if ($InvoiceStudents >= $InvoicePayment) {
-                                    $temp2['CreditKet'] = 'Lunas';
-                                }
-                                else
-                                {
-                                    $temp2['CreditKet'] = 'Belum Lunas'; 
-                                }
-                               /*$temp2['Credit'] = $temp[$j]['InvoiceStudents'];
-                               if ($temp[$j]['InvoiceStudents'] >= $temp[$j]['InvoicePayment']) {
-                                   $temp2['CreditKet'] = 'Lunas';
-                               }
-                               else
-                               {
-                                   $temp2['CreditKet'] = 'Belum Lunas';
-                               }*/
-                          }
-                          elseif ($temp[$i]['PTID'] == 4) {
-                               $PTID = $temp[$j]['PTID'];
-
-                               $Payment =$this->m_finance->findPaymentBaseUnique($PTID,$SemesterID,$NPM);
-                               $PaymentID = $Payment[0]['ID'];
-
-                               $payment_students = $this->m_master->caribasedprimary('db_admission.payment_students','ID_payment',$PaymentID);
-                               $InvoiceStudents = 0;
-                               $InvoicePayment = $Payment[0]['Invoice'];
-                               for ($z=0; $z < count($payment_students); $z++) { 
-                                    $InvoiceStudents = $InvoiceStudents + $payment_students[$z]['Invoice'];
-                               } 
-
-                               $temp2['Another'] = $InvoiceStudents;
-                               if ($InvoiceStudents >= $InvoicePayment) {
-                                   $temp2['AnotherKet'] = 'Lunas';
-                               }
-                               else
-                               {
-                                   $temp2['AnotherKet'] = 'Belum Lunas'; 
-                               }
-
-                               /*$temp2['Another'] = $temp[$j]['InvoiceStudents'];
-                               if ($temp[$j]['InvoiceStudents'] >= $temp[$j]['InvoicePayment']) {
-                                   $temp2['AnotherKet'] = 'Lunas';
-                               }
-                               else
-                               {
-                                   $temp2['AnotherKet'] = 'Belum Lunas';
-                               }*/
-                          }
-                        }  
-                    }  
-                    $rs[] = $temp2; 
-            }
-        }
-
-       // print_r($rs);
-        
-        return $rs;
-    }
-
     public function export_excel($token)
     {
         $key = "UAP)(*";
@@ -880,7 +683,7 @@ class C_finance extends Finnance_Controler {
 
     public function import_price_list_mhs()
     {
-        $content = $this->load->view('page/'.$this->data['department'].'/tagihan_mahasiswa/page_import_price_list_mhs',$this->data,true);
+        $content = $this->load->view('page/'.$this->data['department'].'/master/page_import_price_list_mhs',$this->data,true);
         $this->temp($content);
     }
 
@@ -896,6 +699,7 @@ class C_finance extends Finnance_Controler {
           $excel2 = $excel2->load($path); // Empty Sheet
           $objWorksheet = $excel2->setActiveSheetIndex(0);
           $CountRow = $objWorksheet->getHighestRow();
+          $CountRow = $CountRow + 1;
           $Pay_Cond = $this->input->post('Pay_Cond');
          
           for ($i=2; $i < $CountRow; $i++) {
@@ -926,7 +730,9 @@ class C_finance extends Finnance_Controler {
     {
         $input = $this->getInputToken();
         $this->load->library('pagination');
-        $config = $this->config_pagination_default_ajax(1000,10,3);
+        // count
+        $count = $this->m_finance->count_get_list_telat_bayar_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NIM']);
+        $config = $this->config_pagination_default_ajax($count,100,3);
         $this->pagination->initialize($config);
         $page = $this->uri->segment(3);
         $start = ($page - 1) * $config["per_page"];
@@ -951,28 +757,161 @@ class C_finance extends Finnance_Controler {
 
     }
 
-    public function testExcel()
+    public function import_pembayaran_manual()
+    {
+        $content = $this->load->view('page/'.$this->data['department'].'/tagihan_mahasiswa/page_import_pembayaran_manual',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function submit_import_pembayaran_manual()
+    {
+        // print_r($_FILES);
+        if(isset($_FILES["fileData"]["name"]))
+        {
+          $path = $_FILES["fileData"]["tmp_name"];
+          include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+          $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+          $excel2 = $excel2->load($path); // Empty Sheet
+          $objWorksheet = $excel2->setActiveSheetIndex(0);
+          $CountRow = $objWorksheet->getHighestRow();
+          $CountRow = $CountRow + 1;
+          $selectPTID = $this->input->post('selectPTID');
+          $selectSemester = $this->input->post('selectSemester');
+         
+          for ($i=2; $i < $CountRow; $i++) {
+            $temp = array();
+            $NPM = $objWorksheet->getCellByColumnAndRow(0, $i)->getCalculatedValue();
+            // get payment
+               $auth = $this->m_master->caribasedprimary('db_academic.auth_students','NPM',$NPM);
+               $Pay_Cond = $auth[0]['Pay_Cond'];
+               $Year = $auth[0]['Year'];
+               $db = 'ta_'.$Year.'.students';
+               $ta = $this->m_master->caribasedprimary($db,'NPM',$NPM);
+               $ProdiID = $ta[0]['ProdiID'];
+               $payment = $this->m_finance->getPriceBaseBintang($selectPTID,$ProdiID,$Year,$Pay_Cond);
+
+            $aa = $this->m_finance->insertaDataPayment($selectPTID,$selectSemester,$NPM,$payment,0,"1",$this->session->userdata('NIP'));
+            if ($aa != 0) {
+                $bb = $this->m_finance->insertaDataPaymentStudents($aa,$payment,0,'0000-00-00 00:00:00',1);
+            }
+            
+          }
+          
+          echo json_encode(array('status'=> 1,'msg' => ''));
+        }
+        else
+        {
+          exit('No direct script access allowed');
+        }
+    }
+
+    public function import_beasiswa_mahasiswa()
+    {
+        $content = $this->load->view('page/'.$this->data['department'].'/master/page_import_beasiswa_mahasiswa',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function  submit_import_beasiswa_mahasiswa()
+    {
+        // print_r($_FILES);
+        if(isset($_FILES["fileData"]["name"]))
+        {
+          $path = $_FILES["fileData"]["tmp_name"];
+          $arr_insert = array();
+          include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+          $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+          $excel2 = $excel2->load($path); // Empty Sheet
+          $objWorksheet = $excel2->setActiveSheetIndex(0);
+          $CountRow = $objWorksheet->getHighestRow();
+          $CountRow = $CountRow + 1;
+          $selectPTID = $this->input->post('selectPTID');
+          
+          for ($i=2; $i < $CountRow; $i++) {
+            $temp = array();
+            $NPM = $objWorksheet->getCellByColumnAndRow(0, $i)->getCalculatedValue();
+            $Discount = $objWorksheet->getCellByColumnAndRow(3, $i)->getCalculatedValue();
+
+            // replace
+            $Discount = $this->m_master->replaceKomaToTitik($Discount);
+            if ($selectPTID == 2) {
+               $temp = array(
+                             'NPM' => $NPM,
+                             'Bea_BPP' => $Discount,
+                           );
+            }
+            elseif ($selectPTID == 3) {
+                $temp = array(
+                              'NPM' => $NPM,
+                              'Bea_Credit' => $Discount,
+                            );
+            }
+            $arr_insert[] = $temp;
+          }
+
+          $this->db->update_batch('db_academic.auth_students', $arr_insert, 'NPM');
+          echo json_encode(array('status'=> 1,'msg' => ''));
+        }
+        else
+        {
+          exit('No direct script access allowed');
+        }
+    }
+
+    public function mahasiswa()
+    {
+        $content = $this->load->view('page/'.$this->data['department'].'/master/page_master_mahasiswa',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function mahasiswa_list($page = null)
     {
         $input = $this->getInputToken();
-        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
-        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
-        $excel2 = $excel2->load('./uploads/finance/TemplatePembayaran.xlsx'); // Empty Sheet
-        $excel2->setActiveSheetIndex(0);
-        $excel2->getActiveSheet()->setCellValue('C6', '4')
-            ->setCellValue('C7', '5')
-            ->setCellValue('C8', '6')       
-            ->setCellValue('C9', '7');
 
-        $excel2->setActiveSheetIndex(0);
-        $excel2->getActiveSheet()->setCellValue('A7', '4')
-            ->setCellValue('C7', '5');
-        $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
-        // We'll be outputting an excel file  
-        // header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
-        // It will be called file.xlss
-        // header('Content-Disposition: attachment; filename="file.xls"'); // jalan ketika tidak menggunakan ajax
-        $objWriter->save('./document/Nimit New.xlsx');
-        // $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
+        $this->load->library('pagination');
+        // cari count
+        $count = $this->m_finance->count_mahasiswa_list($input['ta'],$input['prodi'],$input['NPM']);
+        $config = $this->config_pagination_default_ajax($count,20,4);   
+        $this->pagination->initialize($config);
+        $page = $this->uri->segment(4);
+        $start = ($page - 1) * $config["per_page"];
+
+        $data = $this->m_finance->mahasiswa_list($input['ta'],$input['prodi'],$input['NPM'],$config["per_page"], $start);
+        $output = array(
+        'pagination_link'  => $this->pagination->create_links(),
+        'loadtable'   => $data,
+        );
+        echo json_encode($output);
     }
+
+    public function edited_bea_bpp()
+    {
+        $input = $this->getInputToken();
+        $dataSave = array(
+                'Bea_BPP' => $input['Discount'],
+                        );
+        $this->db->where('NPM',$input['Npm']);
+        $this->db->update('db_academic.auth_students', $dataSave);
+    }
+
+    public function edited_bea_credit()
+    {
+        $input = $this->getInputToken();
+        $dataSave = array(
+                'Bea_Credit' => $input['Discount'],
+                        );
+        $this->db->where('NPM',$input['Npm']);
+        $this->db->update('db_academic.auth_students', $dataSave);
+    }
+
+    public function edited_pay_cond()
+    {
+        $input = $this->getInputToken();
+        $dataSave = array(
+                'Pay_Cond' => $input['bintang'],
+                        );
+        $this->db->where('NPM',$input['Npm']);
+        $this->db->update('db_academic.auth_students', $dataSave);
+    }
+    
 
 }

@@ -224,6 +224,84 @@ class C_save_to_excel extends CI_Controller
          $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
     }
 
+    public function export_excel_payment_received()
+    {
+        $token = $this->input->post('token');
+        //print_r($token);
+        //die();
+        $key = "UAP)(*";
+        $input = (array) $this->jwt->decode($token,$key);
+        // print_r($input);
+        $Semester = $input['Semester'];
+        $Semester = explode('.', $Semester);
+        $Semester = $Semester[1];
+        $data = $input['Data'];
+        $this->load->model('finance/m_finance');
+        $dataGenerate = $this->m_finance->GroupingNPM($data);
+
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load('./uploads/finance/TemplatePembayaran.xlsx'); // Empty Sheet
+        $excel2->setActiveSheetIndex(0);
+
+        $excel3 = $excel2->getActiveSheet();
+        $excel3->setCellValue('A2', 'Rekap Penerimaan & AGING '.$Semester);
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+        $style_row = array(
+          'alignment' => array(
+            'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+          ),
+          'borders' => array(
+            'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+            'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+            'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+            'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+          )
+        );
+
+        // start dari A7
+        $a = 8;
+        for ($i=0; $i < count($dataGenerate); $i++) {
+           $no = $i + 1;  
+           $excel3->setCellValue('A'.$a, $no); 
+           $excel3->setCellValue('B'.$a, $dataGenerate[$i]['Nama']);
+           $excel3->setCellValue('C'.$a, $dataGenerate[$i]['NPM']);
+           $excel3->setCellValue('D'.$a, $dataGenerate[$i]['ProdiEng']);
+           $excel3->setCellValue('E'.$a, $dataGenerate[$i]['SPP']);
+           $excel3->setCellValue('F'.$a, $dataGenerate[$i]['Another']);
+           $excel3->setCellValue('G'.$a, $dataGenerate[$i]['BPP']);
+           $excel3->setCellValue('H'.$a, $dataGenerate[$i]['BPPKet']);
+           $excel3->setCellValue('I'.$a, $dataGenerate[$i]['Credit']);
+           $excel3->setCellValue('J'.$a, $dataGenerate[$i]['CreditKet']);
+
+           // Apply style row yang telah kita buat tadi ke masing-masing baris (isi tabel)
+           $excel3->getStyle('A'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('B'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('C'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('D'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('E'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('F'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('G'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('H'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('I'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('J'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('K'.$a)->applyFromArray($style_row);
+
+           $a = $a + 1; 
+        }
+
+        $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
+        // We'll be outputting an excel file  
+        header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
+        // It will be called file.xlss
+        header('Content-Disposition: attachment; filename="file.xlsx"'); // jalan ketika tidak menggunakan ajax
+        //$filename = 'PenerimaanPembayaran.xlsx';
+        //$objWriter->save('./document/'.$filename);
+        $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
+
+    }
+
 
 
 }

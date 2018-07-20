@@ -108,7 +108,7 @@
                 'show' : true
             });
             $('#dataRow').html('');
-            var url = base_url_js+'finance/get_created_tagihan_mhs/'+page;
+            var url = base_url_js+'finance/get_created_tagihan_mhs_not_approved/'+page;
             var data = {
                 ta : '',
                 prodi : '',
@@ -121,7 +121,7 @@
                console.log(resultJson);
                 var Data_mhs = resultJson.loadtable;
                 dataaModal = Data_mhs;
-                if (Data_mhs.length == 1) {
+                if (Data_mhs.length > 0) {
                     for(var i=0;i<Data_mhs.length;i++){
                          var ccc = 0;
                          var yy = (Data_mhs[i]['InvoicePayment'] != '') ? formatRupiah(Data_mhs[i]['InvoicePayment']) : '-';
@@ -203,7 +203,7 @@
                         
                     }
 
-                    if(Data_mhs.length == 1)
+                    if(Data_mhs.length > 0)
                     {
                       if (Data_mhs[0]['DetailPayment'].length == 1) {
                             $('#datatable2').removeClass('hide');

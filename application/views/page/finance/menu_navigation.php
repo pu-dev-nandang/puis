@@ -36,6 +36,12 @@
                     Master
                 </a>
                 <ul class="sub-menu">
+                    <li class="<?php if($this->uri->segment(2)=='master' && $this->uri->segment(3) == "mahasiswa" ){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/master/mahasiswa'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Mahasiswa
+                        </a>
+                    </li>
                     <li class="<?php if($this->uri->segment(2)=='master' && $this->uri->segment(3) == "tagihan-mhs" ){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/master/tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
@@ -46,6 +52,18 @@
                         <a href="#">
                         <i class="icon-angle-right"></i>
                         Discount
+                        </a>
+                    </li>
+                    <li class="<?php if($this->uri->segment(2)=='master' && $this->uri->segment(3) == "import_price_list_mhs" ){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/master/import_price_list_mhs'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Import PriceList Mahasiswa
+                        </a>
+                    </li>
+                    <li class="<?php if($this->uri->segment(2)=='master' && $this->uri->segment(3) == "import_beasiswa_mahasiswa" ){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/master/import_beasiswa_mahasiswa'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Import Beasiswa Mahasiswa
                         </a>
                     </li>
                 </ul>
@@ -118,10 +136,10 @@
                     Tagihan Mahasiswa
                 </a>
                 <ul class="sub-menu">
-                    <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "import_price_list_mhs" ){echo "current";} ?>">
-                        <a href="<?php echo base_url('finance/tagihan-mhs/import_price_list_mhs'); ?>">
+                    <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "import_pembayaran_manual" ){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/tagihan-mhs/import_pembayaran_manual'); ?>">
                         <i class="icon-angle-right"></i>
-                        Import PriceList Mahasiswa
+                        Import Pembayaran Manual
                         </a>
                     </li>
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "set-tagihan-mhs"){echo "current";} ?>">
