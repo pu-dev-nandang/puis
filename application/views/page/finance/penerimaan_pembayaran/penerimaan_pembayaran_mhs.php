@@ -135,6 +135,22 @@
          }
     }); // exit enter
 
+    function submit(action, method, values) {
+        var form = $('<form/>', {
+            action: action,
+            method: method
+        });
+        $.each(values, function() {
+            form.append($('<input/>', {
+                type: 'hidden',
+                name: this.name,
+                value: this.value
+            }));    
+        });
+        form.attr('target', '_blank');
+        form.appendTo('body').submit();
+    }
+
     $(document).on("click", "#export_excel", function(event){
       /*loading_button('#export_excel');
       $('#NotificationModal .modal-header').addClass('hide');
@@ -154,7 +170,11 @@
         Semester : $('#selectSemester').val(),
       }
       var token = jwt_encode(data,"UAP)(*");
-      window.open(url+'/'+token,'_blank');
+      submit(url, 'POST', [
+          { name: 'token', value: token },
+      ]);
+      //window.open(url+'/'+token,'_blank');
+     
 
           /*$.post(url,{token:token},function (data_json) {
               var response = jQuery.parseJSON(data_json);
@@ -264,23 +284,24 @@
             dataa = Data_mhs;
             setTimeout(function () {
                 $("#conTainJS").html(htmlDy);
-
+                $("#pagination_link").html(resultJson.pagination_link);
                 if (Data_mhs.length > 0) {
                         for (var i = 0; i < Data_mhs.length; i++) {
+                            var timee = (Data_mhs[i]['Time'] == null) ? '-' : Data_mhs[i]['Time'];
                             var yy = (Data_mhs[i]['InvoiceStudents'] != '') ? formatRupiah(Data_mhs[i]['InvoiceStudents']) : '-';
-                            var btnPrint = '<span data-smt="'+Data_mhs[i]['ID_payment_students']+'" class="btn btn-xs btn-print" NPM = "'+Data_mhs[i]['NPM']+'" Semester = "'+Data_mhs[i]['SemesterName']+'" PTID = "'+Data_mhs[i]['PTIDDesc']+'" VA = "'+Data_mhs[i]['VA']+'" BilingID = "'+Data_mhs[i]['BilingID']+'" Invoice = "'+yy+'" Nama = "'+Data_mhs[i]['Nama']+'"  Prodi = "'+Data_mhs[i]['ProdiEng']+'" Time = "'+Data_mhs[i]['Time']+'"><i class="fa fa-print"></i> Print</span>';
+                            var btnPrint = '<span data-smt="'+Data_mhs[i]['ID_payment_students']+'" class="btn btn-xs btn-print" NPM = "'+Data_mhs[i]['NPM']+'" Semester = "'+Data_mhs[i]['SemesterName']+'" PTID = "'+Data_mhs[i]['PTIDDesc']+'" VA = "'+Data_mhs[i]['VA']+'" BilingID = "'+Data_mhs[i]['BilingID']+'" Invoice = "'+yy+'" Nama = "'+Data_mhs[i]['Nama']+'"  Prodi = "'+Data_mhs[i]['ProdiEng']+'" Time = "'+timee+'"><i class="fa fa-print"></i> Print</span>';
                             $('#dataRow').append('<tr>' +
                                 '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
                                 '<td>'+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
                                 '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +
                                 '<td>'+Data_mhs[i]['BilingID']+'</td>' +
                                 '<td>'+yy+'</td>' +
-                                '<td>'+Data_mhs[i]['Time']+'</td>' +
+                                '<td>'+timee+'</td>' +
                                 '<td>'+Data_mhs[i]['Cicilan']+'</td>' +
                                 '<td>'+btnPrint+'</td>' +
                                 '</tr>');
                         }
-                        
+
                 } else {
                     $('#dataRow').append('<tr><td colspan="8" align = "center">No Result Data</td></tr>');
                 }

@@ -309,6 +309,14 @@ $route['finance/master/modal-tagihan-mhs'] =  'page/finance/c_tuition_fee/modal_
 $route['finance/master/modal-tagihan-mhs-submit'] =  'page/finance/c_tuition_fee/modal_tagihan_mhs_submit';
 $route['finance/master/edited-tagihan-mhs-submit'] =  'page/finance/c_tuition_fee/edited_tagihan_mhs_submit';
 $route['finance/master/deleted-tagihan-mhs-submit'] =  'page/finance/c_tuition_fee/deleted_tagihan_mhs_submit';
+$route['finance/master/mahasiswa'] =  'page/finance/c_finance/mahasiswa';
+$route['finance/master/import_price_list_mhs'] =  'page/finance/c_finance/import_price_list_mhs';
+$route['finance/master/import_beasiswa_mahasiswa'] =  'page/finance/c_finance/import_beasiswa_mahasiswa';
+$route['finance/master/mahasiswa_list/(:num)'] =  'page/finance/c_finance/mahasiswa_list/$1';
+$route['finance/master/edited-bea-bpp'] =  'page/finance/c_finance/edited_bea_bpp';
+$route['finance/master/edited-bea-credit'] =  'page/finance/c_finance/edited_bea_credit';
+$route['finance/master/edited-pay-cond'] =  'page/finance/c_finance/edited_pay_cond';
+
 
 
 $route['finance/admission/penerimaan-pembayaran/formulir-registration/online'] =  'page/finance/c_finance/formulir_registration_online_page';
@@ -327,6 +335,7 @@ $route['finance/submit_tagihan_mhs'] =  'page/finance/c_finance/submit_tagihan_m
 $route['finance/tagihan-mhs/cek-tagihan-mhs/(:num)'] =  'page/finance/c_finance/page_cek_tagihan_mhs/$1';
 $route['finance/tagihan-mhs/cek-tagihan-mhs'] =  'page/finance/c_finance/page_cek_tagihan_mhs';
 $route['finance/get_created_tagihan_mhs/(:num)'] =  'page/finance/c_finance/get_created_tagihan_mhs/$1';
+$route['finance/get_created_tagihan_mhs_not_approved/(:num)'] =  'page/finance/c_finance/get_created_tagihan_mhs_not_approved/$1';
 $route['finance/approved_created_tagihan_mhs'] =  'page/finance/c_finance/approved_created_tagihan_mhs';
 $route['finance/unapproved_created_tagihan_mhs'] =  'page/finance/c_finance/unapproved_created_tagihan_mhs';
 $route['finance/tagihan-mhs/cancel-tagihan-mhs'] =  'page/finance/c_finance/cancel_tagihan_mhs';
@@ -339,18 +348,18 @@ $route['finance/tagihan-mhs/set-delete-cicilan-tagihan-mhs/submit'] =  'page/fin
 $route['finance/tagihan-mhs/penerimaan-tagihan-mhs'] =  'page/finance/c_finance/penerimaan_tagihan_mhs';
 $route['finance/get_pembayaran_mhs/(:num)'] =  'page/finance/c_finance/get_pembayaran_mhs/$1';
 //$route['finance/export_excel'] =  'page/finance/c_finance/export_excel';
-$route['finance/export_excel/(:any)'] =  'page/finance/c_finance/export_excel/$1';
+$route['finance/export_excel'] =  'C_save_to_excel/export_excel_payment_received';
 $route['finance/check-va'] =  'page/finance/c_finance/check_va';
 $route['finance/check-va-cari'] =  'page/finance/c_finance/check_va_cari';
-$route['finance/tagihan-mhs/import_price_list_mhs'] =  'page/finance/c_finance/import_price_list_mhs';
+
 $route['finance/tagihan-mhs/submit_import_price_list_mhs'] =  'page/finance/c_finance/submit_import_price_list_mhs';
 $route['finance/tagihan-mhs/list-telat-bayar'] =  'page/finance/c_finance/list_telat_bayar';
 $route['finance/get_list_telat_bayar/(:num)'] =  'page/finance/c_finance/get_list_telat_bayar/$1';
 $route['finance/edit_telat_bayar/(:any)'] =  'page/finance/c_finance/edit_telat_bayar/$1';
+$route['finance/tagihan-mhs/import_pembayaran_manual'] =  'page/finance/c_finance/import_pembayaran_manual';
+$route['finance/tagihan-mhs/submit_import_pembayaran_manual'] =  'page/finance/c_finance/submit_import_pembayaran_manual';
 
-
-
-
+$route['finance/tagihan-mhs/submit_import_beasiswa_mahasiswa'] =  'page/finance/c_finance/submit_import_beasiswa_mahasiswa';
 
 
 

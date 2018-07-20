@@ -157,25 +157,36 @@
                    for(var i=0;i<Data_mhs.length;i++){
                         var img = '<img src="'+base_url_js+'uploads/students/ta_'+res[1]+'/'+Data_mhs[i]['Photo']+'" class="img-rounded" width="30" height="30" style="max-width: 30px;object-fit: scale-down;">';
 
+                        var Bea_BPP = Data_mhs[i]['Bea_BPP'];
+                        var Bea_Credit = Data_mhs[i]['Bea_Credit']; 
+
                         var selecTOption = '<select class="selecTOption getDom" id="'+'discount_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" payment-type = "'+PTID+'" invoice = "'+Data_mhs[i]['Cost']+'">';
 
-                       var yy = (Data_mhs[i]['Cost'] != '') ? formatRupiah(Data_mhs[i]['Cost']) : '-';
+                       var value_cost = Data_mhs[i]['Cost'] - ((Bea_BPP/100)*Data_mhs[i]['Cost']);
+                       var yy = (value_cost != '') ? formatRupiah(value_cost) : '-';
                        
                        if(PTID == 3)
                        {
                          var t = parseInt(Data_mhs[i]['Cost']) * parseInt(Data_mhs[i]['Credit']);
-                         yy = (Data_mhs[i]['Cost'] != '') ? formatRupiah(t) : '-';
+                         var value_cost = t - ((Bea_Credit/100)*t);
+                         yy = (value_cost != '') ? formatRupiah(value_cost) : '-';
                          selecTOption = '<select class="selecTOption getDom" id="'+'discount_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" payment-type = "'+PTID+'" invoice = "'+t+'">';
                        } 
-
                             for (var k = 0;k < xx['Discount'].length; k++)
                             {
-                                var selected = (k==0) ? 'selected' : '';
+                                var O_discount = xx['Discount'];
+                                if(PTID == 2)
+                                {
+                                  var selected = (O_discount[k]['Discount'] == Bea_BPP) ? 'selected' : '';
+                                }
+                                else if(PTID == 3)
+                                {
+                                  var selected = (O_discount[k]['Discount'] == Bea_Credit) ? 'selected' : '';
+                                }
                                 selecTOption += '<option value="'+xx['Discount'][k]['Discount']+'" '+selected+'>'+xx['Discount'][k]['Discount']+'%'+'</option>';
                             }
                         selecTOption += '</select>';
 
-                        
                         var cost = '<input class="form-control costInput getDom" id="cost_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" value = "'+yy+'" payment-type = "'+PTID+'" readonly style="background-color: #fff;color: #333;">';
                         var priceLabel = (Data_mhs[i]['Cost'] != '') ? formatRupiah(Data_mhs[i]['Cost']) : '-';
 

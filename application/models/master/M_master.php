@@ -1427,6 +1427,12 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $priceMask;
     }
 
+    public function replaceKomaToTitik($Discount)
+    {
+        $Discount = str_replace(',','.', $Discount);
+        return $Discount;
+    }
+
     public function update_va_log($data)
     {
         $dataSave = array(

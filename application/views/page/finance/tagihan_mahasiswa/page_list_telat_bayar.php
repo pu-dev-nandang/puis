@@ -225,6 +225,7 @@
             }).always(function() {
                 $('#NotificationModal').modal('hide');
             });
+            $('#NIM').focus();
     }
 
     $(document).on('click','.edit', function () {

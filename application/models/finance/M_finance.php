@@ -759,6 +759,41 @@ class M_finance extends CI_Model {
            $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,$path);
    }
 
+   public function count_get_tagihan_mhs($ta,$prodi,$PTID,$NPM)
+   {
+    $this->load->model('master/m_master');
+    $ta1 = explode('.', $ta);
+    $ta = $ta1[1];
+    $db = 'ta_'.$ta.'.students';
+    $db2 = 'ta_'.$ta;
+    $field = 'StatusStudentID';
+    $value = 3;
+    $NPM = ($NPM == "" || $NPM == null) ? '' : ' and a.NPM = "'.$NPM.'"';
+    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+
+    $queryAdd = '';
+    if ($PTID == 3) {
+      $queryAdd = ' and a.NPM in (select NPM from db_finance.payment where PTID = 2 and SemesterID = '.$SemesterID[0]['ID'].' and Status = "1")';
+    }
+    if ($prodi == '') {
+     $sql = 'select count(*) as total from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
+             on a.ProdiID = c.ProdiID
+             where a.StatusStudentID = ?  and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
+             and b.Pay_Cond = c.Pay_Cond order by a.NPM asc';
+     $Data_mhs=$this->db->query($sql, array($value,$PTID,$SemesterID[0]['ID'],$ta,$PTID))->result_array();
+    }
+    else
+    {
+      $sql = 'select count(*) as total from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
+              on a.ProdiID = c.ProdiID
+              where a.StatusStudentID = ? and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
+               and b.Pay_Cond = c.Pay_Cond order by a.NPM asc';
+      $Data_mhs=$this->db->query($sql, array($value,$prodi,$PTID,$SemesterID[0]['ID'],$ta,$PTID))->result_array();
+    }
+
+    return $Data_mhs[0]['total'];
+   }
+
    public function get_tagihan_mhs($ta,$prodi,$PTID,$NPM,$limit, $start)
    {
     // error_reporting(0);
@@ -778,17 +813,16 @@ class M_finance extends CI_Model {
       $queryAdd = ' and a.NPM in (select NPM from db_finance.payment where PTID = 2 and SemesterID = '.$SemesterID[0]['ID'].' and Status = "1")';
     }
     if ($prodi == '') {
-     $sql = 'select a.*,b.EmailPU,b.Pay_Cond,c.Cost from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
+     $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit,c.Cost from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
              on a.ProdiID = c.ProdiID
              where a.StatusStudentID = ?  and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
              and b.Pay_Cond = c.Pay_Cond order by a.NPM asc
              LIMIT '.$start. ', '.$limit;
-      // print_r($sql);       
      $Data_mhs=$this->db->query($sql, array($value,$PTID,$SemesterID[0]['ID'],$ta,$PTID))->result_array();
     }
     else
     {
-      $sql = 'select a.*,b.EmailPU,b.Pay_Cond,c.Cost from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
+      $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit,c.Cost from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
               on a.ProdiID = c.ProdiID
               where a.StatusStudentID = ? and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
                and b.Pay_Cond = c.Pay_Cond order by a.NPM asc 
@@ -951,6 +985,202 @@ class M_finance extends CI_Model {
       $this->db->insert('db_finance.payment_students', $dataSave);
    }
 
+   public function count_get_created_tagihan_mhs_not_approved($ta,$prodi,$PTID,$NIM)
+   {
+    $arr = array();
+    $this->load->model('master/m_master');
+
+    // join dengan table auth terlebih dahulu
+    $PTID = ($PTID == '' || $PTID == Null) ? '' : ' and a.PTID = '.$PTID;
+    $NIM = ($NIM == '' || $NIM == Null) ? 'where a.NPM like "%"' : ' where  a.NPM = '.$NIM;
+    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+    $SemesterID = $SemesterID[0]['ID'];
+    if ($ta == '') {
+      $ta1 = $ta;
+    }
+    else
+    {
+      $ta = explode('.', $ta);
+      $ta1 = $ta[1];
+    }
+
+    if ($ta1 == '') {
+      $sql = 'select count(*) as total 
+              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+              join db_academic.semester as c on a.SemesterID = c.ID
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and c.ID = ? and a.Status = "0"';
+      $query=$this->db->query($sql, array($SemesterID))->result_array();
+
+    }
+    else
+    {
+      $sql = 'select count(*) as total 
+              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+              join db_academic.semester as c on a.SemesterID = c.ID
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? and c.ID = ? and a.Status = "0"';
+      $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
+    }
+    return $query[0]['total'];
+
+   }
+
+   public function get_created_tagihan_mhs_not_approved($ta,$prodi,$PTID,$NIM,$limit, $start)
+   {
+    // error_reporting(0);
+    $arr = array();
+    $this->load->model('master/m_master');
+
+    // join dengan table auth terlebih dahulu
+    $PTID = ($PTID == '' || $PTID == Null) ? '' : ' and a.PTID = '.$PTID;
+    $NIM = ($NIM == '' || $NIM == Null) ? 'where a.NPM like "%"' : ' where  a.NPM = '.$NIM;
+    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+    $SemesterID = $SemesterID[0]['ID'];
+    if ($ta == '') {
+      $ta1 = $ta;
+    }
+    else
+    {
+      $ta = explode('.', $ta);
+      $ta1 = $ta[1];
+    }
+
+    if ($ta1 == '') {
+      $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
+              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+              join db_academic.semester as c on a.SemesterID = c.ID
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and c.ID = ? and a.Status = "0" order by a.Status asc LIMIT '.$start. ', '.$limit;
+      $query=$this->db->query($sql, array($SemesterID))->result_array();
+
+    }
+    else
+    {
+      $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
+              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+              join db_academic.semester as c on a.SemesterID = c.ID
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? and c.ID = ? and a.Status = "0" order by a.Status asc LIMIT '.$start. ', '.$limit;
+      $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
+    }
+
+    // get Number VA Mahasiswa
+        $Const_VA = $this->m_master->showData_array('db_va.master_va');
+
+    // get all data to join db ta
+    for ($i=0; $i < count($query); $i++) { 
+      $Year = $query[$i]['Year'];
+      $db = 'ta_'.$Year.'.students';
+      $dt = $this->m_master->caribasedprimary($db,'NPM',$query[$i]['NPM']);
+      // get IPS Mahasiswa
+         $IPS = $this->getIPSMahasiswa('ta_'.$Year,$query[$i]['NPM']);
+
+      // get IPS Mahasiswa
+         $IPK = $this->getIPKMahasiswa('ta_'.$Year,$query[$i]['NPM']);
+
+      // ge VA Mahasiwa
+         $VA = $Const_VA[0]['Const_VA'].$query[$i]['NPM'];
+
+      // get sks yang diambil
+         $Credit = $this->getSKSMahasiswa('ta_'.$Year,$query[$i]['NPM']);
+
+      if($prodi == '' || $prodi == Null){
+        $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$dt[0]['ProdiID']);
+
+        $arr[] = array(
+            'PaymentID' => $query[$i]['ID'],
+            'PTID'  => $query[$i]['PTID'],
+            'PTIDDesc' => $query[$i]['Description'],
+            'SemesterID' => $query[$i]['SemesterID'],
+            'SemesterName' => $query[$i]['NameSemester'],
+            'NPM' => $query[$i]['NPM'],
+            'Nama' => $dt[0]['Name'],
+            'EmailPU' => $query[$i]['EmailPU'],
+            'InvoicePayment' => $query[$i]['Invoice'],
+            'Discount' => $query[$i]['Discount'],
+            'StatusPayment' => $query[$i]['Status'],
+            'ProdiID' => $dt[0]['ProdiID'],
+            'ProdiEng' => $ProdiEng[0]['NameEng'],
+            'Year' => $Year,
+            'IPS' => $IPS,
+            'IPK' => $IPK,
+            'DetailPayment' => $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']),
+            'VA' => $VA,
+            'Credit' => $Credit,
+            'Pay_Cond' => $query[$i]['Pay_Cond'],
+        );
+      }
+      else
+      {
+        $prodi = explode('.', $prodi);
+        $prodi = $prodi[0];
+        if ($prodi == $dt[0]['ProdiID']) {
+          $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$dt[0]['ProdiID']);
+          $arr[] = array(
+              'PaymentID' => $query[$i]['ID'],
+              'PTID'  => $query[$i]['PTID'],
+              'PTIDDesc' => $query[$i]['Description'],
+              'SemesterID' => $query[$i]['SemesterID'],
+              'SemesterName' => $query[$i]['NameSemester'],
+              'NPM' => $query[$i]['NPM'],
+              'Nama' => $dt[0]['Name'],
+              'EmailPU' => $query[$i]['EmailPU'],
+              'InvoicePayment' => $query[$i]['Invoice'],
+              'Discount' => $query[$i]['Discount'],
+              'StatusPayment' => $query[$i]['Status'],
+              'ProdiID' => $dt[0]['ProdiID'],
+              'ProdiEng' => $ProdiEng[0]['NameEng'],
+              'Year' => $Year,
+              'IPS' => $IPS,
+              'IPK' => $IPK,
+              'DetailPayment' => $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']),
+              'VA' => $VA,
+              'Credit' => $Credit,
+              'Pay_Cond' => $query[$i]['Pay_Cond'],
+          );
+        }
+      }
+      
+    }
+    return $arr;
+   }
+
+   public function count_get_created_tagihan_mhs($ta,$prodi,$PTID,$NIM)
+   {
+    $arr = array();
+    $this->load->model('master/m_master');
+
+    // join dengan table auth terlebih dahulu
+    $PTID = ($PTID == '' || $PTID == Null) ? '' : ' and a.PTID = '.$PTID;
+    $NIM = ($NIM == '' || $NIM == Null) ? 'where a.NPM like "%"' : ' where  a.NPM = '.$NIM;
+    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+    $SemesterID = $SemesterID[0]['ID'];
+    if ($ta == '') {
+      $ta1 = $ta;
+    }
+    else
+    {
+      $ta = explode('.', $ta);
+      $ta1 = $ta[1];
+    }
+
+    if ($ta1 == '') {
+      $sql = 'select count(*) as total 
+              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+              join db_academic.semester as c on a.SemesterID = c.ID
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and c.ID = ?';
+      $query=$this->db->query($sql, array($SemesterID))->result_array();
+
+    }
+    else
+    {
+      $sql = 'select count(*) as total 
+              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+              join db_academic.semester as c on a.SemesterID = c.ID
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? and c.ID = ? ';
+      $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
+    }
+    return $query[0]['total'];
+
+   }
+
    public function get_created_tagihan_mhs($ta,$prodi,$PTID,$NIM,$limit, $start)
    {
     // error_reporting(0);
@@ -977,7 +1207,7 @@ class M_finance extends CI_Model {
               join db_academic.semester as c on a.SemesterID = c.ID
               join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and c.ID = ? order by a.Status asc LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array($SemesterID))->result_array();
-      
+
     }
     else
     {
@@ -1620,6 +1850,50 @@ class M_finance extends CI_Model {
     return $query;
    }
 
+   public function count_get_list_telat_bayar_mhs($ta,$prodi,$PTID,$NIM)
+   {
+    // error_reporting(0);
+    $arr = array();
+    $this->load->model('master/m_master');
+
+    // join dengan table auth terlebih dahulu
+    $PTID = ($PTID == '' || $PTID == Null) ? '' : ' and a.PTID = '.$PTID;
+    $NIM = ($NIM == '' || $NIM == Null) ? 'where a.NPM like "%"' : ' where  a.NPM = '.$NIM;
+    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+    $SemesterID = $SemesterID[0]['ID'];
+    if ($ta == '') {
+      $ta1 = $ta;
+    }
+    else
+    {
+      $ta = explode('.', $ta);
+      $ta1 = $ta[1];
+    }
+
+    if ($ta1 == '') {
+      $sql = 'select count(*) as total 
+              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+              join db_academic.semester as c on a.SemesterID = c.ID
+              join db_finance.payment_type as d on a.PTID = d.ID join db_finance.payment_students as e
+              on a.ID = e.ID_payment '.$NIM.$PTID.' and c.ID = ?  and e.Status = 0 and DATE_FORMAT(e.Deadline,"%Y-%m-%d") <= curdate() group by a.ID';
+      $query=$this->db->query($sql, array($SemesterID))->result_array();
+    }
+    else
+    {
+      $sql = 'select count(*) as total
+              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+              join db_academic.semester as c on a.SemesterID = c.ID
+              join db_finance.payment_type as d on a.PTID = d.ID 
+              join db_finance.payment_students as e
+              on a.ID = e.ID_payment
+              '.$NIM.$PTID.' and b.Year = ? and c.ID = ? and e.Status = 0 and DATE_FORMAT(e.Deadline,"%Y-%m-%d") <= curdate() group by a.ID';
+      $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
+    }
+
+    return $query[0]['total'];
+
+   }
+
    public function get_list_telat_bayar_mhs($ta,$prodi,$PTID,$NIM,$limit, $start)
    {
       // error_reporting(0);
@@ -1721,6 +1995,315 @@ class M_finance extends CI_Model {
         
       }
       return $arr;
+   }
+
+   public function GroupingNPM($data)
+   {
+       $temp = array();
+       $rs = array();
+       for ($i=0; $i < count($data); $i++) { 
+           $find = 0;
+           for ($k=0; $k < count($temp); $k++) { 
+                if ($data[$i]->NPM == $temp[$k]['NPM']) {
+                    $find = 1;
+                    // print_r('$data[$i]->NPM = '.$data[$i]->NPM.' $temp[$k]["NPM"] = '. $temp[$k]['NPM'].' ');
+                    break;
+                }
+           }
+
+           if ($find == 0) {
+               $temp2 = array('NPM' => $data[$i]->NPM,'PTID' => $data[$i]->PTID, 'InvoicePayment' => $data[$i]->InvoicePayment, 'InvoiceStudents' => $data[$i]->InvoiceStudents,'SemesterID' => $data[$i]->SemesterID,'PaymentID' => $data[$i]->PaymentID,'Nama' => $data[$i]->Nama,'ProdiEng' => $data[$i]->ProdiEng);
+               for ($j=($i+1); $j <count($data) ; $j=$j+1) {
+                       if ($data[$i]->NPM == $data[$j]->NPM) {
+                           if ($data[$i]->PTID == $data[$j]->PTID) {
+                               $InvoiceStudents = $data[$j]->InvoiceStudents + $temp2['InvoiceStudents'];
+                               $temp2['InvoiceStudents'] = $InvoiceStudents;
+                           }
+                       }
+                   
+               }
+               $temp[] = $temp2;
+           }
+           
+       }
+
+       // print_r($temp);
+
+       for ($i=0; $i < count($temp); $i++) { 
+           $find = 0;
+           for ($k=0; $k < count($rs); $k++) { 
+                if ($temp[$i]['NPM'] == $rs[$k]['NPM']) {
+                    $find = 1;
+                    break;
+                }
+           }
+           if ($find == 0) {
+                  $temp2 = array('NPM' => $temp[$i]['NPM'],'Nama' => $temp[$i]['Nama'],'ProdiEng' => $temp[$i]['ProdiEng'],'SPP' => '', 'SPPKet' => '', 'BPP' => '','BPPKet' => '', 'Credit' => '','CreditKet' => '','Another' => '','AnotherKet' => '');
+                  if ($temp[$i]['PTID'] == 1) {
+                       $temp2['SPP'] = $temp[$i]['InvoiceStudents'];
+                       if ($temp[$i]['InvoiceStudents'] >= $temp[$i]['InvoicePayment']) {
+                           $temp2['SPPKet'] = 'Lunas';
+                       }
+                       else
+                       {
+                           $temp2['SPPKet'] = 'Belum Lunas';
+                       }
+                  }
+                  elseif ($temp[$i]['PTID'] == 2) {
+                       $temp2['BPP'] = $temp[$i]['InvoiceStudents'];
+                       if ($temp[$i]['InvoiceStudents'] >= $temp[$i]['InvoicePayment']) {
+                           $temp2['BPPKet'] = 'Lunas';
+                       }
+                       else
+                       {
+                           $temp2['BPPKet'] = 'Belum Lunas';
+                       }
+                  }
+                  elseif ($temp[$i]['PTID'] == 3) {
+                       $temp2['Credit'] = $temp[$i]['InvoiceStudents'];
+                       if ($temp[$i]['InvoiceStudents'] >= $temp[$i]['InvoicePayment']) {
+                           $temp2['CreditKet'] = 'Lunas';
+                       }
+                       else
+                       {
+                           $temp2['CreditKet'] = 'Belum Lunas';
+                       }
+                  }
+                  elseif ($temp[$i]['PTID'] == 4) {
+                       $temp2['Another'] = $temp[$i]['InvoiceStudents'];
+                       if ($temp[$i]['InvoiceStudents'] >= $temp[$i]['InvoicePayment']) {
+                           $temp2['AnotherKet'] = 'Lunas';
+                       }
+                       else
+                       {
+                           $temp2['AnotherKet'] = 'Belum Lunas';
+                       }
+                  }
+
+                   $SemesterID = $temp[$i]['SemesterID'];
+                   $NPM = $temp[$i]['NPM'];
+
+                   for ($j=($i+1); $j < count($temp); $j = $j +1) {
+                       if ($temp[$i]['NPM']== $temp[$j]['NPM']) { 
+                         if ($temp[$j]['PTID'] == 1) {
+                              // $temp2['SPP'] = $temp[$j]['InvoiceStudents'];
+                              $PTID = $temp[$j]['PTID'];
+
+                              $Payment =$this->m_finance->findPaymentBaseUnique($PTID,$SemesterID,$NPM);
+                              $PaymentID = $Payment[0]['ID'];
+
+                              $payment_students = $this->m_master->caribasedprimary('db_admission.payment_students','ID_payment',$PaymentID);
+                              $InvoiceStudents = 0;
+                              $InvoicePayment = $Payment[0]['Invoice'];
+                              for ($z=0; $z < count($payment_students); $z++) { 
+                                   $InvoiceStudents = $InvoiceStudents + $payment_students[$z]['Invoice'];
+                              } 
+
+                              $temp2['SPP'] = $InvoiceStudents;
+                              if ($InvoiceStudents >= $InvoicePayment) {
+                                  $temp2['SPPKet'] = 'Lunas';
+                              }
+                              else
+                              {
+                                  $temp2['SPPKet'] = 'Belum Lunas'; 
+                              }
+                              /*if ($temp[$j]['InvoiceStudents'] >= $temp[$j]['InvoicePayment']) {
+                                  $temp2['SPPKet'] = 'Lunas';
+                              }
+                              else
+                              {
+                                  $temp2['SPPKet'] = 'Belum Lunas';
+                              }*/
+                         }
+                         elseif ($temp[$j]['PTID'] == 2) {
+                               $PTID = $temp[$j]['PTID'];
+
+                               $Payment =$this->m_finance->findPaymentBaseUnique($PTID,$SemesterID,$NPM);
+                               $PaymentID = $Payment[0]['ID'];
+
+                               $payment_students = $this->m_master->caribasedprimary('db_admission.payment_students','ID_payment',$PaymentID);
+                               $InvoiceStudents = 0;
+                               $InvoicePayment = $Payment[0]['Invoice'];
+                               for ($z=0; $z < count($payment_students); $z++) { 
+                                    $InvoiceStudents = $InvoiceStudents + $payment_students[$z]['Invoice'];
+                               } 
+
+                               $temp2['BPP'] = $InvoiceStudents;
+                               if ($InvoiceStudents >= $InvoicePayment) {
+                                   $temp2['BPPKet'] = 'Lunas';
+                               }
+                               else
+                               {
+                                   $temp2['BPPKet'] = 'Belum Lunas'; 
+                               }
+                              /*$temp2['BPP'] = $temp[$j]['InvoiceStudents'];
+                              if ($temp[$j]['InvoiceStudents'] >= $temp[$j]['InvoicePayment']) {
+                                  $temp2['BPPKet'] = 'Lunas';
+                              }
+                              else
+                              {
+                                  $temp2['BPPKet'] = 'Belum Lunas';
+                              }*/
+                         }
+                         elseif ($temp[$j]['PTID'] == 3) {
+                               $PTID = $temp[$j]['PTID'];
+
+                               $Payment =$this->m_finance->findPaymentBaseUnique($PTID,$SemesterID,$NPM);
+                               $PaymentID = $Payment[0]['ID'];
+
+                               $payment_students = $this->m_master->caribasedprimary('db_admission.payment_students','ID_payment',$PaymentID);
+                               $InvoiceStudents = 0;
+                               $InvoicePayment = $Payment[0]['Invoice'];
+                               for ($z=0; $z < count($payment_students); $z++) { 
+                                    $InvoiceStudents = $InvoiceStudents + $payment_students[$z]['Invoice'];
+                               } 
+
+                               $temp2['Credit'] = $InvoiceStudents;
+                               if ($InvoiceStudents >= $InvoicePayment) {
+                                   $temp2['CreditKet'] = 'Lunas';
+                               }
+                               else
+                               {
+                                   $temp2['CreditKet'] = 'Belum Lunas'; 
+                               }
+                              /*$temp2['Credit'] = $temp[$j]['InvoiceStudents'];
+                              if ($temp[$j]['InvoiceStudents'] >= $temp[$j]['InvoicePayment']) {
+                                  $temp2['CreditKet'] = 'Lunas';
+                              }
+                              else
+                              {
+                                  $temp2['CreditKet'] = 'Belum Lunas';
+                              }*/
+                         }
+                         elseif ($temp[$i]['PTID'] == 4) {
+                              $PTID = $temp[$j]['PTID'];
+
+                              $Payment =$this->m_finance->findPaymentBaseUnique($PTID,$SemesterID,$NPM);
+                              $PaymentID = $Payment[0]['ID'];
+
+                              $payment_students = $this->m_master->caribasedprimary('db_admission.payment_students','ID_payment',$PaymentID);
+                              $InvoiceStudents = 0;
+                              $InvoicePayment = $Payment[0]['Invoice'];
+                              for ($z=0; $z < count($payment_students); $z++) { 
+                                   $InvoiceStudents = $InvoiceStudents + $payment_students[$z]['Invoice'];
+                              } 
+
+                              $temp2['Another'] = $InvoiceStudents;
+                              if ($InvoiceStudents >= $InvoicePayment) {
+                                  $temp2['AnotherKet'] = 'Lunas';
+                              }
+                              else
+                              {
+                                  $temp2['AnotherKet'] = 'Belum Lunas'; 
+                              }
+
+                              /*$temp2['Another'] = $temp[$j]['InvoiceStudents'];
+                              if ($temp[$j]['InvoiceStudents'] >= $temp[$j]['InvoicePayment']) {
+                                  $temp2['AnotherKet'] = 'Lunas';
+                              }
+                              else
+                              {
+                                  $temp2['AnotherKet'] = 'Belum Lunas';
+                              }*/
+                         }
+                       }  
+                   }  
+                   $rs[] = $temp2; 
+           }
+       }
+
+      // print_r($rs);
+       
+       return $rs;
+   }
+
+   public function getPriceBaseBintang($selectPTID,$ProdiID,$Year,$Pay_Cond)
+   {
+    $sql = 'select * from db_finance.tuition_fee where PTID = ? and ProdiID = ? and ClassOf = ? and Pay_Cond = ?';
+    $query=$this->db->query($sql, array($selectPTID,$ProdiID,$Year,$Pay_Cond))->result_array();
+    return $query[0]['Cost'];
+   }
+
+   public function count_mahasiswa_list($ta,$prodi,$NPM)
+   {
+    // error_reporting(0);
+    $this->load->model('master/m_master');
+    $ta1 = explode('.', $ta);
+    $ta = $ta1[1];
+    $db = 'ta_'.$ta.'.students';
+    $db2 = 'ta_'.$ta;
+    $field = 'StatusStudentID';
+    $value = 3;
+    $NPM = ($NPM == "" || $NPM == null) ? '' : ' and a.NPM = "'.$NPM.'"';
+
+    $queryAdd = '';
+    if ($prodi == '') {
+     $sql = 'select count(*) as total from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM
+             where a.StatusStudentID = ?  '.$NPM.$queryAdd.'
+             order by a.NPM asc';
+      // print_r($sql);       
+     $Data_mhs=$this->db->query($sql, array($value))->result_array();
+    }
+    else
+    {
+      $sql = 'select count(*) as total from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM 
+              where a.StatusStudentID = ? and a.ProdiID = ? '.$NPM.$queryAdd.'
+              order by a.NPM asc';
+      $Data_mhs=$this->db->query($sql, array($value,$prodi))->result_array();
+    }
+
+    return $Data_mhs[0]['total'];
+   }
+
+   public function mahasiswa_list($ta,$prodi,$NPM,$limit, $start)
+   {
+    // error_reporting(0);
+    $arr = array();
+    $this->load->model('master/m_master');
+    $ta1 = explode('.', $ta);
+    $ta = $ta1[1];
+    $db = 'ta_'.$ta.'.students';
+    $db2 = 'ta_'.$ta;
+    $field = 'StatusStudentID';
+    $value = 3;
+    $NPM = ($NPM == "" || $NPM == null) ? '' : ' and a.NPM = "'.$NPM.'"';
+
+    $queryAdd = '';
+    if ($prodi == '') {
+     $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM
+             where a.StatusStudentID = ?  '.$NPM.$queryAdd.'
+             order by a.NPM asc
+             LIMIT '.$start. ', '.$limit;
+      // print_r($sql);       
+     $Data_mhs=$this->db->query($sql, array($value))->result_array();
+    }
+    else
+    {
+      $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM 
+              where a.StatusStudentID = ? and a.ProdiID = ? '.$NPM.$queryAdd.'
+              order by a.NPM asc 
+              LIMIT '.$start. ', '.$limit;
+      $Data_mhs=$this->db->query($sql, array($value,$prodi))->result_array();
+    }
+
+    // get Number VA Mahasiswa
+    $Const_VA = $this->m_master->showData_array('db_va.master_va');
+
+    // $SemesterID = $SemesterID[0]['ID'];
+    $Discount = $this->m_master->showData_array('db_finance.discount');
+    for ($i=0; $i < count($Data_mhs); $i++) { 
+      $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$Data_mhs[$i]['ProdiID']);
+      $array = array('ProdiEng' => $ProdiEng[0]['NameEng']);
+      $Data_mhs[$i] = $Data_mhs[$i] + $array;
+
+      // get VA Mahasiwa
+        $VA = $Const_VA[0]['Const_VA'].$Data_mhs[$i]['NPM'];
+        $Data_mhs[$i] = $Data_mhs[$i] + array('VA' => $VA);
+
+    }
+    $arr['Data_mhs'] = $Data_mhs;
+    $arr['Discount'] = $Discount;
+    return $arr;
    }
 
 }
