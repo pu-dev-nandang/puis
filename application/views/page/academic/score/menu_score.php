@@ -151,8 +151,8 @@
                                 '    <i class="fa fa-pencil-square-o" aria-hidden="true"></i> <span class="caret"></span>' +
                                 '  </button>' +
                                 '  <ul class="dropdown-menu">' +
-                                '    <li><a href="javascript:void(0);" id="btnInputScore" data-nip="'+dataC.Coordinator+'" data-id="'+dataC.ID+'">Input Score</a></li>' +
-                                '    <li><a href="javascript:void(0);" class="btnGrade" data-page="InputGrade1" data-group="'+dataC.ClassGroup+'" data-id="'+dataC.ID+'">Grade Approval</a></li>' +
+                                '    <li><a href="javascript:void(0);" class="btnInputScore" data-nip="'+dataC.Coordinator+'" data-id="'+dataC.ScheduleID+'">Input Score</a></li>' +
+                                '    <li><a href="javascript:void(0);" class="btnGrade" data-page="InputGrade1" data-group="'+dataC.Classgroup+'" data-id="'+dataC.ScheduleID+'">Grade Approval</a></li>' +
                                 '    <li role="separator" class="divider"></li>' +
                                 '    <li><a href="javascript:void(0);" class="inputScheduleExchange" data-no="'+i+'" data-id="">Cetak Report UTS</a></li>' +
                                 '    <li><a href="javascript:void(0);" class="inputScheduleExchange" data-no="'+i+'" data-id="">Cetak Report UAS</a></li>' +
@@ -194,7 +194,7 @@
 </script>
 
 <script>
-    $(document).on('click','#btnInputScore',function () {
+    $(document).on('click','.btnInputScore',function () {
         var NIP = $(this).attr('data-nip');
         var ScheduleID = $(this).attr('data-id');
         var data = {
