@@ -227,6 +227,7 @@ $route['admission/config/upload-pdf-per-pengumuman'] = 'page/admission/c_master/
 $route['fileGet/(:any)'] = 'api/c_global/fileGet/$1';
 $route['download/(:any)'] = 'api/c_global/download/$1';
 $route['download_template/(:any)'] = 'api/c_global/download_template/$1';
+$route['download_anypath'] = 'api/c_global/download_anypath';
 
 
 
@@ -360,6 +361,8 @@ $route['finance/tagihan-mhs/import_pembayaran_manual'] =  'page/finance/c_financ
 $route['finance/tagihan-mhs/submit_import_pembayaran_manual'] =  'page/finance/c_finance/submit_import_pembayaran_manual';
 
 $route['finance/tagihan-mhs/submit_import_beasiswa_mahasiswa'] =  'page/finance/c_finance/submit_import_beasiswa_mahasiswa';
+$route['finance/download-log-va'] =  'page/finance/c_finance/download_log_va';
+$route['finance/listfile_va'] =  'page/finance/c_finance/listfile_va';
 
 
 

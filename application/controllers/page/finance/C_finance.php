@@ -912,6 +912,18 @@ class C_finance extends Finnance_Controler {
         $this->db->where('NPM',$input['Npm']);
         $this->db->update('db_academic.auth_students', $dataSave);
     }
+
+    public function download_log_va()
+    {
+       $content = $this->load->view('page/'.$this->data['department'].'/download_log_va/page_download_log_va',$this->data,true);
+       $this->temp($content);
+    }
+
+    public function listfile_va()
+    {
+        $generate = $this->m_master->loadData_limit500('db_va.va_log_sftp','ID','desc');
+        echo json_encode($generate);
+    }
     
 
 }

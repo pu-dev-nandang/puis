@@ -1824,4 +1824,12 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $query=$this->db->query($sql, array($ProdiID))->result_array();
         return $query;
     }
+
+    public function loadData_limit500($table,$fieldOrderby,$orderby)
+    {
+        $sql = "select * from ".$table." order by ".$fieldOrderby." ".$orderby." limit 500";
+        //print_r($sql);
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
+    }
 }
