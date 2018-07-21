@@ -90,6 +90,24 @@ class C_global extends CI_Controller {
         }
     }
 
+    public function download_anypath()
+    {
+        $input = $this->getInputToken();
+        $path = $input['path'];
+        $filename = $input['Filename'];
+        if (file_exists($path)) {
+             $this->load->helper('download');
+             $data   = file_get_contents($path);
+             $name   = $filename;
+             force_download($name, $data); // script download file
+            // $this->showFile($file);
+        }
+        else
+        {
+            show_404($log_error = TRUE);
+        }
+    }
+
     private function showFile($file)
     {
         header("Content-type: application/pdf");

@@ -193,7 +193,7 @@
                 </a>
             </li>
             <li class="<?php if($this->uri->segment(2)=='download-log-va'){echo "current";} ?>">
-                <a href="#">
+                <a href="<?php echo base_url('finance/download-log-va'); ?>">
                     <i class="fa fa-cloud-download"></i>
                     Download Log VA
                 </a>
