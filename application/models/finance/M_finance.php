@@ -258,12 +258,12 @@ class M_finance extends CI_Model {
            include_once APPPATH.'third_party/bni/BniEnc.php';
            // FROM BNI
            $this->load->model('master/m_master');
-           $aa = $this->m_master->showData_array('db_va.cfg_bank');
-            $client_id = '00202';
+           //$aa = $this->m_master->showData_array('db_va.cfg_bank');
+            $client_id = VA_client_id;
            // $client_id = $aa[0]['client_id'];
-            $secret_key = '8ef738df0433c674e6663f3f7f5e6b68';
+            $secret_key = VA_secret_key;
            // $secret_key = $aa[0]['secret_key'];
-            $url = 'https://apibeta.bni-ecollection.com/';
+            $url = VA_url;
            // $url = $aa[0]['url'];
            $getVANumber = $VA_number;
            $datetime_expired = $DeadLinePayment;
@@ -417,9 +417,9 @@ class M_finance extends CI_Model {
        if ($payment != null) {
            include_once APPPATH.'third_party/bni/BniEnc.php';
            // FROM BNI
-           $client_id = '00202';
-           $secret_key = '8ef738df0433c674e6663f3f7f5e6b68';
-           $url = 'https://apibeta.bni-ecollection.com/';
+           $client_id = VA_client_id;
+           $secret_key = VA_secret_key;
+           $url = VA_url;
            $datetime_expired = $DeadLinePayment;
 
            if ($BilingID != null) {
@@ -520,9 +520,9 @@ class M_finance extends CI_Model {
        include_once APPPATH.'third_party/bni/BniEnc.php';
        $arr_temp = array();
        // include_once APPPATH.'third_party/bni/BniEnc.php';
-       $client_id = '00202';
-       $secret_key = '8ef738df0433c674e6663f3f7f5e6b68';
-       $url = 'https://apibeta.bni-ecollection.com/';
+       $client_id = VA_client_id;
+       $secret_key = VA_secret_key;
+       $url = VA_url;
        
            $data_asli = array(
                'client_id' => $client_id,
@@ -1423,6 +1423,23 @@ class M_finance extends CI_Model {
     $query=$this->db->query($sql, array($bintang));
    }
 
+   public function inserData_discount($Discount)
+   {
+      $dataSave = array(
+          'Discount' => $Discount,
+      );
+      $this->db->insert('db_finance.discount', $dataSave);
+   }
+
+   public function editData_discount($Discount,$ID)
+   {
+    $dataSave = array(
+        'Discount' => $Discount,
+    );
+    $this->db->where('ID',$ID);
+    $this->db->update('db_finance.discount', $dataSave);
+   }
+
    public function cancel_created_tagihan_mhs($input)
    {
     $this->load->model('master/m_master');
@@ -1522,20 +1539,44 @@ class M_finance extends CI_Model {
         // update VA
         $BilingID = $Input[$i]->BilingID;
         $getData= $this->m_master->caribasedprimary('db_va.va_log','trx_id',$BilingID);
+        // get datetime
+        $expDatetime = $getData[0]['datetime_expired'];
+        $now = date('Y-m-d H:i:s');
+        $chkdate = $this->m_master->chkTgl($now,$expDatetime);
         $trx_amount = $Input[$i]->Invoice;
         $datetime_expired = $Input[$i]->Deadline;
         $customer_name = $getData[0]['customer_name'];
-        $desc = 'Edited '.$getData[0]['description'];
+        $desc = 'Add,Expired Biling '.$getData[0]['description'];
         $customer_email = $getData[0]['customer_email'];
-        $update = $this->m_finance->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students',$desc);
-        if ($update['status'] == 1) {
-          // update data pada table db_finance.payment_students
-            $this->m_finance->updateCicilanMHS($BilingID,$trx_amount,$datetime_expired);
+        $VA_number = $getData[0]['virtual_account'];
+        if (!$chkdate) {
+         $create_va_Payment = $this->create_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$VA_number,$desc,'db_finance.payment_students');
+         if ($create_va_Payment['status']) {
+           // update biling and Deadline di payment Student
+           $dataSave = array(
+                   'BilingID' =>$create_va_Payment['msg']['trx_id'],
+                   'Invoice' => $trx_amount,
+                   'Deadline' => $datetime_expired,
+                   'UpdateAt' => date('Y-m-d H:i:s'),
+                           );
+           $this->db->where('BilingID',$BilingID);
+           $this->db->update('db_finance.payment_students', $dataSave);
+         }
+          
         }
         else
         {
-          $arr['msg'] .= 'Va tidak bisa di update, error koneksi ke BNI with Name : '.$customer_name.'<br>';
+          $update = $this->m_finance->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students',$desc);
+          if ($update['status'] == 1) {
+            // update data pada table db_finance.payment_students
+              $this->m_finance->updateCicilanMHS($BilingID,$trx_amount,$datetime_expired);
+          }
+          else
+          {
+            $arr['msg'] .= 'Va tidak bisa di update, error koneksi ke BNI with Name : '.$customer_name.'<br>';
+          }
         }
+        
       }
       else
       {

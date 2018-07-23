@@ -1066,9 +1066,9 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         include_once APPPATH.'third_party/bni/BniEnc.php';
         $arr_temp = array();
         // include_once APPPATH.'third_party/bni/BniEnc.php';
-        $client_id = '00202';
-        $secret_key = '8ef738df0433c674e6663f3f7f5e6b68';
-        $url = 'https://apibeta.bni-ecollection.com/';
+        $client_id = VA_client_id;
+        $secret_key = VA_secret_key;
+        $url = VA_url;
         for ($i=0; $i < count($input['chkValue']); $i++) {
             $data_asli = array(
                 'client_id' => $client_id,
@@ -1196,9 +1196,9 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     {
         include_once APPPATH.'third_party/bni/BniEnc.php';
         $arr_temp = array();
-        $client_id = '00202';
-        $secret_key = '8ef738df0433c674e6663f3f7f5e6b68';
-        $url = 'https://apibeta.bni-ecollection.com/';
+        $client_id = VA_client_id;
+        $secret_key = VA_secret_key;
+        $url = VA_url;
         for ($i=0; $i < count($input['chkValue']); $i++) {
             $data_asli = array(
                 'client_id' => $client_id,
@@ -1248,9 +1248,9 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $expiredNow = date('c', time() + 0);
         $arr_temp = array();
         // include_once APPPATH.'third_party/bni/BniEnc.php';
-        $client_id = '00202';
-        $secret_key = '8ef738df0433c674e6663f3f7f5e6b68';
-        $url = 'https://apibeta.bni-ecollection.com/';
+        $client_id = VA_client_id;
+        $secret_key = VA_secret_key;
+        $url = VA_url;
         // print_r($bilingStatus);
         for ($i=0; $i < count($input['chkValue']); $i++) {
             sleep(1);
@@ -1725,7 +1725,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 select CURDATE() as skrg
                 ) aa where "'.$a1.'" < "'.$a2.'"';
         $query=$this->db->query($sql, array())->result_array();
-        // print_r($tglInput);   
+        // print_r($sql);   
         if (count($query) > 0) {
             return true;
         }     

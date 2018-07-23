@@ -302,7 +302,7 @@ class C_finance extends Finnance_Controler {
         $this->load->library('pagination');
         // count
         $count = $this->m_finance->count_get_created_tagihan_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NIM']);
-        $config = $this->config_pagination_default_ajax($count,50,3);
+        $config = $this->config_pagination_default_ajax($count,20,3);
         $this->pagination->initialize($config);
         $page = $this->uri->segment(3);
         $start = ($page - 1) * $config["per_page"];
@@ -946,6 +946,25 @@ class C_finance extends Finnance_Controler {
             $this->data['getData'] = $this->m_master->caribasedprimary('db_finance.discount','ID',$input['CDID']);
         }
         echo $this->load->view('page/'.$this->data['department'].'/master/modalform_discount',$this->data,true);
+    }
+
+    public function sbmt_discount()
+    {
+        $input = $this->getInputToken();
+        switch ($input['Action']) {
+            case 'add':
+                $this->m_finance->inserData_discount($input['Discount']);
+                break;
+            case 'edit':
+                $this->m_finance->editData_discount($input['Discount'],$input['CDID']);
+                break;
+            case 'delete':
+                $this->m_finance->delete_id_table($input['CDID'],'discount');
+                break;
+            default:
+                # code...
+                break;
+        }
     }
     
 
