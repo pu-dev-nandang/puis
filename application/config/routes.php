@@ -320,6 +320,7 @@ $route['finance/master/edited-pay-cond'] =  'page/finance/c_finance/edited_pay_c
 $route['finance/master/discount'] =  'page/finance/c_finance/page_master_discount';
 $route['finance/master/load_discount'] =  'page/finance/c_finance/load_discount';
 $route['finance/master/modalform_discount'] =  'page/finance/c_finance/modalform_discount';
+$route['finance/master/sbmt_discount'] =  'page/finance/c_finance/sbmt_discount';
 
 
 

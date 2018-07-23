@@ -1,3 +1,4 @@
+<script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
 <style type="text/css">
   .setfont
   {
@@ -33,7 +34,7 @@
 
 <script type="text/javascript">
   $(document).ready(function() {
-    loadTableJPA(loadDataDiscount);
+    loadTableDiscount(loadDataDiscount);
   }); // exit document Function
 
   $(document).on('click','.btn-add', function () {
@@ -88,7 +89,7 @@
             setTimeout(function () {
                toastr.options.fadeOut = 10000;
                toastr.success('Data berhasil disimpan', 'Success!');
-               loadTableJPA(loadDataDiscount);
+               loadTableDiscount(loadDataDiscount);
                $('#NotificationModal').modal('hide');
             },2000);
         });
@@ -120,7 +121,7 @@
             setTimeout(function () {
                toastr.options.fadeOut = 10000;
                toastr.success('Data berhasil disimpan', 'Success!');
-               loadTableJPA(loadDataDiscount);
+               loadTableDiscount(loadDataDiscount);
                $('#NotificationModal').modal('hide');
             },2000);
         });
@@ -131,16 +132,14 @@
     loading_button('#ModalbtnSaveForm');
      var aksi = $("#ModalbtnSaveForm").attr('action');
      var id = $("#ModalbtnSaveForm").attr('kodeuniq');
-     var selectRangking1 = $("#selectRangking1").val();
-     var selectRangking2 = $("#selectRangking2").val();
-     var selectPotongan = $("#selectPotongan").val();
+     var Discount = $("#Discount").val();
+     Discount = findAndReplace(Discount, '.', '');
+     Discount = findAndReplace(Discount, ',', '.');
      var url = base_url_js+'finance/master/sbmt_discount';
      var data = {
          Action : aksi,
          CDID : id,
-         selectRangking1:selectRangking1,
-         selectRangking2 : selectRangking2,
-         selectPotongan:selectPotongan,
+         Discount:Discount,
      };
 
      if (validationInput = validation(data)) {
@@ -150,7 +149,7 @@
                 toastr.options.fadeOut = 10000;
                 toastr.success('Data berhasil disimpan', 'Success!');
                 $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
-                loadTableJPA(loadDataDiscount);
+                loadTableDiscount(loadDataDiscount);
              },500);
          });
      }
@@ -203,7 +202,7 @@
       })
   }
 
-  function loadTableJPA(callback)
+  function loadTableDiscount(callback)
   {
       // Some code
       // console.log('test');

@@ -14,6 +14,16 @@ class MY_Controller extends CI_Controller {
             if($departement==''){
 //                $this->session->set_userdata('departementNavigation', 'academic');
             }
+
+            // define config Virtual Account
+            if (!defined('VA_client_id')) {
+                $this->load->model('master/m_master');
+                $getCFGVA = $this->m_master->showData_array('db_va.cfg_bank');
+                define('VA_client_id',$getCFGVA[0]['client_id'] ,true);
+                define('VA_secret_key',$getCFGVA[0]['secret_key'] ,true);
+                define('VA_url',$getCFGVA[0]['url'] ,true);
+            }
+
         } else {
             redirect(base_url());
         }
