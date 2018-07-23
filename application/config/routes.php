@@ -317,6 +317,9 @@ $route['finance/master/mahasiswa_list/(:num)'] =  'page/finance/c_finance/mahasi
 $route['finance/master/edited-bea-bpp'] =  'page/finance/c_finance/edited_bea_bpp';
 $route['finance/master/edited-bea-credit'] =  'page/finance/c_finance/edited_bea_credit';
 $route['finance/master/edited-pay-cond'] =  'page/finance/c_finance/edited_pay_cond';
+$route['finance/master/discount'] =  'page/finance/c_finance/page_master_discount';
+$route['finance/master/load_discount'] =  'page/finance/c_finance/load_discount';
+$route['finance/master/modalform_discount'] =  'page/finance/c_finance/modalform_discount';
 
 
 

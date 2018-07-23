@@ -49,7 +49,7 @@
                         </a>
                     </li>
                     <li class="<?php if($this->uri->segment(2)=='master' && $this->uri->segment(3) == "discount" ){echo "current";} ?>">
-                        <a href="#">
+                        <a href="<?php echo base_url('finance/master/discount'); ?>">
                         <i class="icon-angle-right"></i>
                         Discount
                         </a>
