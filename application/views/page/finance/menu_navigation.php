@@ -163,19 +163,19 @@
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "cancel-tagihan-mhs"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/cancel-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
-                        Cancel Tagihan
+                        Batal Tagihan
                         </a>
                     </li>
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "cek-tagihan-mhs"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/cek-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
-                        List Tagihan
+                        Daftar Tagihan
                         </a>
                     </li>
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "list-telat-bayar"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/list-telat-bayar'); ?>">
                         <i class="icon-angle-right"></i>
-                        List Telat Bayar
+                        Daftar Outstanding Pembayaran
                         </a>
                     </li>
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "penerimaan-tagihan-mhs"){echo "current";} ?>">
