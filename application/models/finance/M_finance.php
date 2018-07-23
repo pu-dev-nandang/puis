@@ -867,7 +867,7 @@ class M_finance extends CI_Model {
    public function getSKSMahasiswa($db,$NPM)
    {
      // get semester desc
-        $sql = 'select ID from db_academic.semester where Status = 0 order by ID desc Limit 1';
+        $sql = 'select ID from db_academic.semester where Status = 1 order by ID desc Limit 1';
         $query = $this->db->query($sql, array())->result_array();
         $SemesterID = $query[0]['ID'];
 

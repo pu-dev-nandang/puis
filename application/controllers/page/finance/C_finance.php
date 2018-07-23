@@ -924,6 +924,29 @@ class C_finance extends Finnance_Controler {
         $generate = $this->m_master->loadData_limit500('db_va.va_log_sftp','ID','desc');
         echo json_encode($generate);
     }
+
+    public function page_master_discount()
+    {
+        $content = $this->load->view('page/'.$this->data['department'].'/master/page_master_discount',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function load_discount()
+    {
+        $generate = $this->m_master->showData_array('db_finance.discount');
+        echo json_encode($generate);
+    }
+
+    public function modalform_discount()
+    {
+        $input = $this->getInputToken();
+        $this->data['action'] = $input['Action'];
+        $this->data['id'] = $input['CDID'];
+        if ($input['Action'] == 'edit') {
+            $this->data['getData'] = $this->m_master->caribasedprimary('db_finance.discount','ID',$input['CDID']);
+        }
+        echo $this->load->view('page/'.$this->data['department'].'/master/modalform_discount',$this->data,true);
+    }
     
 
 }
