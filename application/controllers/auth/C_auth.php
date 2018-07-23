@@ -576,7 +576,7 @@ class C_auth extends Globalclass {
             ini_set('memory_limit', '-1');
             ini_set('max_execution_time', $max_execution_time); //60 seconds = 1 minutes
 
-            $db_ = 2017;
+            $db_ = 2015;
             $db_lokal = 'ta_'.$db_;
             $dataMhs = $this->db_server->query('SELECT m.ID, m.NPM, r.MKID FROM siak4.rencanastudi r 
                                                 LEFT JOIN siak4.mahasiswa m ON (m.ID = r.MhswID) 

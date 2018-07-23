@@ -2018,6 +2018,7 @@ class C_api extends CI_Controller {
                 $data = $this->db->get_where('db_academic.attendance',
                             array('ID'=>$ID))->result_array();
 
+
                 $coor = $this->db->query('SELECT em.NIP,em.Name FROM db_academic.schedule s 
                                             LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                             WHERE s.ID = "'.$data[0]['ScheduleID'].'"
@@ -2050,7 +2051,18 @@ class C_api extends CI_Controller {
                 $ID = $data_arr['ID'];
                 $No = $data_arr['No'];
 
-                $this->db->insert('db_academic.attendance_lecturers',(array) $data_arr['insertAttdLecturer']);
+                // Cek apakah sudah ada diabsen atau belum
+                $insertAttdLecturer = (array) $data_arr['insertAttdLecturer'];
+                $dataAttdLec = $this->db->get_where('db_academic.attendance_lecturers',
+                    array(
+                        'ID_Attd' => $insertAttdLecturer['ID_Attd'],
+                        'NIP' => $insertAttdLecturer['NIP'],
+                        'Meet' => $insertAttdLecturer['Meet']
+                        ),1)->result_array();
+
+                if(count($dataAttdLec)<=0){
+                    $this->db->insert('db_academic.attendance_lecturers',(array) $data_arr['insertAttdLecturer']);
+                }
 
                 $dataUpdate = array(
                     'Meet'.$No => '1',
