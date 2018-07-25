@@ -8,15 +8,15 @@
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class=""><i class="icon-reorder"></i> Tahun Akademik</h4>
+                <h4 class=""><i class="icon-reorder"></i> Academic Year</h4>
                 <div class="toolbar no-padding">
                     <div class="btn-group">
                         <span class="btn btn-xs btn-th-action" data-action="add" id="btn_addTahunAkademik">
-                            <i class="icon-plus"></i> Add Tahun Akademik
+                            <i class="icon-plus"></i> Academic Year
                         </span>
-                        <span class="btn btn-xs btn-th-action" data-action="add_db" id="btn_addDB">
-                            <i class="fa fa-database"></i> Create Database
-                        </span>
+<!--                        <span class="btn btn-xs btn-th-action" data-action="add_db" id="btn_addDB">-->
+<!--                            <i class="fa fa-database"></i> Create Database-->
+<!--                        </span>-->
                     </div>
                 </div>
             </div>

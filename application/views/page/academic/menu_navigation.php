@@ -5,23 +5,23 @@
 
         <ul id="nav">
 
-            <li class="<?php if($this->uri->segment(2)=='kurikulum'){echo "current";} ?>">
-                <a href="<?php echo base_url('academic/kurikulum'); ?>">
+            <li class="<?php if($this->uri->segment(2)=='curriculum'){echo "current";} ?>">
+                <a href="<?php echo base_url('academic/curriculum'); ?>">
                     <i class="fa fa-university"></i>
                     Curriculum
                 </a>
             </li>
 
-            <li class="<?php if($this->uri->segment(2)=='matakuliah'){echo "current";} ?>">
-                <a href="<?php echo base_url('academic/matakuliah'); ?>">
+            <li class="<?php if($this->uri->segment(2)=='courses'){echo "current";} ?>">
+                <a href="<?php echo base_url('academic/courses'); ?>">
                     <i class="fa fa-th-large"></i>
                     Courses
                 </a>
             </li>
 
 
-            <li class="<?php if($this->uri->segment(2)=='tahun-akademik'){echo "current";} ?>">
-                <a href="<?php echo base_url('academic/tahun-akademik'); ?>">
+            <li class="<?php if($this->uri->segment(2)=='academic-year'){echo "current";} ?>">
+                <a href="<?php echo base_url('academic/academic-year'); ?>">
                     <i class="fa fa-calendar-check-o"></i>
                     Academic Year
                 </a>
@@ -60,10 +60,10 @@
             <span>Academic Transactions</span>
         </div>
         <ul id="nav">
-            <li class="<?php if($this->uri->segment(2)=='jadwal'){echo "current";} ?>">
-                <a href="<?php echo base_url('academic/jadwal'); ?>">
+            <li class="<?php if($this->uri->segment(2)=='timetables'){echo "current";} ?>">
+                <a href="<?php echo base_url('academic/timetables'); ?>">
                     <i class="fa fa-calendar"></i>
-                    Schedule
+                    Timetables
                 </a>
             </li>
 <!--            <li class="">-->
@@ -78,16 +78,16 @@
                     Study Plan
                 </a>
             </li>
-            <li class="<?php if($this->uri->segment(2)=='presensi'){echo "current";} ?>">
-                <a href="<?php echo base_url('academic/presensi'); ?>">
+            <li class="<?php if($this->uri->segment(2)=='attendance'){echo "current";} ?>">
+                <a href="<?php echo base_url('academic/attendance'); ?>">
                     <i class="fa fa-users"></i>
                     Attendance
                 </a>
             </li>
-            <li class="<?php if($this->uri->segment(2)=='jadwal-ujian'){echo "current";} ?>">
-                <a href="<?php echo base_url('academic/jadwal-ujian'); ?>">
+            <li class="<?php if($this->uri->segment(2)=='exam-schedule'){echo "current";} ?>">
+                <a href="<?php echo base_url('academic/exam-schedule'); ?>">
                     <i class="fa fa-sitemap"></i>
-                    Schedule Exam
+                    Exam Schedule
                 </a>
             </li>
             <li class="<?php if($this->uri->segment(2)=='score'){echo "current";} ?>">
@@ -99,7 +99,7 @@
             <li class="">
                 <a href="#">
                     <i class="fa fa-flag"></i>
-                    Final Project
+                    Final Project (Coming Soon)
                 </a>
             </li>
         </ul>

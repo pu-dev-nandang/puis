@@ -88,7 +88,7 @@
         $('input[type=checkbox][data-toggle=toggle]').bootstrapToggle();
         loadSelectOptionProgramCampus('#filterProgramCampus','');
 
-        $('#filterSemester').append('<option value="" disabled selected>-- Year Academic--</option>' +
+        $('#filterSemester').append('<option value="" disabled selected>-- Academic Year --</option>' +
             '                <option disabled>-----------------</option>');
         loSelectOptionSemester('#filterSemester','');
 

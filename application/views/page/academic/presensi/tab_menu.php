@@ -59,7 +59,7 @@
         loSelectOptionSemester('#filterSemester','');
 
         $('#filterBaseProdi').empty();
-        $('#filterBaseProdi').append('<option value="" disabled selected>-- Select Program Study --</option>' +
+        $('#filterBaseProdi').append('<option value="" disabled selected>-- Select Programme Study --</option>' +
             '<option disabled>------------------------------------------</option>');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
 
@@ -669,102 +669,124 @@
 
 <!-- Input Attd lecturers -->
 <script>
+
+
     $(document).on('click','.inputLecturerAttd',function () {
 
         var ID = $(this).attr('data-id');
         var No = $(this).attr('data-no');
+        var filterAttendance = $('#filterAttendance').val();
 
-        var url = base_url_js+'api/__crudAttendance';
-        var data = {
-            action : 'getAttdLecturers',
-            ID : ID,
-            No : No
-        };
-        var token = jwt_encode(data,'UAP)(*');
+        if(filterAttendance!='' && filterAttendance!=null){
 
-        $.post(url,{token:token},function (jsonResult) {
+            var Credit = filterAttendance.split('.')[3];
+            var TimePerCredit = filterAttendance.split('.')[4];
 
-            $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-                '<h4 class="modal-title">Attendance '+No+'</h4>');
+            var url = base_url_js+'api/__crudAttendance';
+            var data = {
+                action : 'getAttdLecturers',
+                ID : ID,
+                No : No
+            };
+            var token = jwt_encode(data,'UAP)(*');
 
-            var attd_nip = jsonResult.NIP;
-            var attd_bap = (jsonResult.BAP!='' && jsonResult.BAP!=null) ? jsonResult.BAP : '';
-            // var attd_date = (jsonResult.Date!='' && jsonResult.Date!=null) ? jsonResult.Date : '';
-            var attd_in = (jsonResult.In!='' && jsonResult.In!=null) ? jsonResult.In.substr(0,5) : '00:00';
-            var attd_out = (jsonResult.Out!='' && jsonResult.Out!=null) ? jsonResult.Out.substr(0,5) : '00:00';
+            $.post(url,{token:token},function (jsonResult) {
+
+                $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                    '<h4 class="modal-title">Attendance '+No+'</h4>');
+
+                var attd_nip = jsonResult.NIP;
+                var attd_bap = (jsonResult.BAP!='' && jsonResult.BAP!=null) ? jsonResult.BAP : '';
+                // var attd_date = (jsonResult.Date!='' && jsonResult.Date!=null) ? jsonResult.Date : '';
+                var attd_in = (jsonResult.In!='' && jsonResult.In!=null) ? jsonResult.In.substr(0,5) : '00:00';
+                var attd_out = (jsonResult.Out!='' && jsonResult.Out!=null) ? jsonResult.Out.substr(0,5) : '00:00';
 
 
-            var body_attd = '<div class="row">' +
-                '                        <div class="col-xs-4">' +
-                '                            <div class="form-group">' +
-                '                                <label>Date</label>' +
-                '                               <input type="text" id="formDate" class="form-control form-attd" readonly>' +
-                '                            </div>' +
-                '                            <div class="form-group">' +
-                '                                <label>In</label>' +
-                '                                <div id="inputIn" class="input-group">' +
-                '                                    <input data-format="hh:mm" type="text" id="formIn" class="form-control form-attd" value="'+attd_in+'"/>' +
-                '                                    <span class="add-on input-group-addon">' +
-                '                                        <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>' +
-                '                                    </span>' +
-                '                                </div>' +
-                '                            </div>' +
-                '                            <div class="form-group">' +
-                '                                <label>Out</label>' +
-                '                                <div id="inputOut" class="input-group">' +
-                '                                    <input data-format="hh:mm" type="text" id="formOut" class="form-control form-attd" value="'+attd_out+'"/>' +
-                '                                    <span class="add-on input-group-addon">' +
-                '                                      <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>' +
-                '                                    </span>' +
-                '                                </div>' +
-                '                            </div>' +
-                '                        </div>' +
-                '                        <div class="col-xs-8">' +
-                '                           <div class="form-group">' +
-                '                               <label>Lecturer</label>' +
-                '                               <select class="form-control" id="formLecturer"></select>' +
-                '                           </div>' +
-                '                            <div class="form-group">' +
-                '                                <label>BAP</label>' +
-                '                                <textarea class="form-control" id="formBAP" rows="5">'+attd_bap+'</textarea>' +
-                '                            </div>' +
-                '                        </div>' +
-                '                    </div>';
+                var body_attd = '<div class="row">' +
+                    '                        <div class="col-xs-4">' +
+                    '                            <div class="form-group">' +
+                    '                                <label>Date</label>' +
+                    '                               <input type="text" id="formDate" class="form-control form-attd" readonly>' +
+                    '                               <input type="text" id="formCredit" class="hide" value="'+Credit+'" hidden readonly>' +
+                    '                               <input type="text" id="formTimePerCredit" class="hide" value="'+TimePerCredit+'" hidden readonly>' +
+                    '                            </div>' +
+                    '                            <div class="form-group">' +
+                    '                                <label>In</label>' +
+                    '                                <div id="inputIn" class="input-group">' +
+                    '                                    <input data-format="hh:mm" type="text" id="formIn" class="form-control form-attd" value="'+attd_in+'"/>' +
+                    '                                    <span class="add-on input-group-addon">' +
+                    '                                        <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>' +
+                    '                                    </span>' +
+                    '                                </div>' +
+                    '<p style="margin-top: 3px;font-size: 10px;color: #607D8B;font-weight: bold;">Credit : '+Credit+' | '+TimePerCredit+' minute/credit</p>' +
+                    '                            </div>' +
+                    '                            <div class="form-group">' +
+                    '                                <label>Out</label>' +
+                    '                               <input class="form-control" id="formOut"> ' +
+                    // '                                <div id="inputOut" class="input-group">' +
+                    // '                                    <input data-format="hh:mm" type="text" id="" class="form-control form-attd" value="'+attd_out+'"/>' +
+                    // '                                    <span class="add-on input-group-addon">' +
+                    // '                                      <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>' +
+                    // '                                    </span>' +
+                    // '                                </div>' +
+                    '                            </div>' +
+                    '                        </div>' +
+                    '                        <div class="col-xs-8">' +
+                    '                           <div class="form-group">' +
+                    '                               <label>Lecturer</label>' +
+                    '                               <select class="form-control" id="formLecturer"></select>' +
+                    '                           </div>' +
+                    '                            <div class="form-group">' +
+                    '                                <label>BAP</label>' +
+                    '                                <textarea class="form-control" id="formBAP" rows="5">'+attd_bap+'</textarea>' +
+                    '                            </div>' +
+                    '                        </div>' +
+                    '                    </div>';
 
-            $('#GlobalModal .modal-body').html(body_attd);
+                $('#GlobalModal .modal-body').html(body_attd);
 
-            for(var t=0;t<jsonResult.DetailLecturers.length;t++){
-                var lec = jsonResult.DetailLecturers[t];
-                var sc = (attd_nip==lec.NIP) ? 'selected' : '';
-                $('#formLecturer').append('<option value="'+lec.NIP+'" '+sc+'>'+lec.NIP+' - '+lec.Name+'</option>');
-            }
+                for(var t=0;t<jsonResult.DetailLecturers.length;t++){
+                    var lec = jsonResult.DetailLecturers[t];
+                    var sc = (attd_nip==lec.NIP) ? 'selected' : '';
+                    $('#formLecturer').append('<option value="'+lec.NIP+'" '+sc+'>'+lec.NIP+' - '+lec.Name+'</option>');
+                }
 
-            $('#inputIn,#inputOut').datetimepicker({
-                pickDate: false,
-                pickSeconds : false
+                $('#inputIn').datetimepicker({
+                    pickDate: false,
+                    pickSeconds : false
+                }).on('changeDate',function (e) {
+                    var TimePerCredit = $('#formTimePerCredit').val();
+                    var Credit = $('#formCredit').val();
+                    var totalTime = parseInt(TimePerCredit) * parseInt(Credit);
+
+                    var inputIn = $('#formIn').val().split(':');
+                    var StartSessions = moment().hours(inputIn[0]).minutes(inputIn[1]);
+                    var EndSessions = StartSessions.add(parseInt(totalTime),'minute').format('HH:mm');
+                    $('#formOut').val(EndSessions);
+                });
+
+                $("#formDate").datepicker({
+                    showOtherMonths:true,
+                    autoSize: true,
+                    dateFormat: 'dd MM yy'
+                });
+
+                if(jsonResult.Date !=='0000-00-00' && jsonResult.Date != null){
+                    var d = new Date(jsonResult.Date);
+
+                    $('#formDate').datepicker('setDate',d);
+                }
+
+                $('a.ui-state-default').attr('href','javascript:void(0)');
+
+                $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> ' +
+                    '<button class="btn btn-success" id="btnSaveAttdLecturer" data-no="'+No+'" data-id="'+ID+'">Save</button>');
+                $('#GlobalModal').modal({
+                    'show' : true,
+                    'backdrop' : 'static'
+                });
             });
-
-            $("#formDate").datepicker({
-                showOtherMonths:true,
-                autoSize: true,
-                dateFormat: 'dd MM yy'
-            });
-
-            if(jsonResult.Date !=='0000-00-00' && jsonResult.Date != null){
-                var d = new Date(jsonResult.Date);
-
-                $('#formDate').datepicker('setDate',d);
-            }
-
-            $('a.ui-state-default').attr('href','javascript:void(0)');
-
-            $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> ' +
-                '<button class="btn btn-success" id="btnSaveAttdLecturer" data-no="'+No+'" data-id="'+ID+'">Save</button>');
-            $('#GlobalModal').modal({
-                'show' : true,
-                'backdrop' : 'static'
-            });
-        });
+        }
 
     });
 

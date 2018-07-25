@@ -2,11 +2,11 @@
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class=""><i class="icon-reorder"></i> Matakuliah</h4>
+                <h4 class=""><i class="icon-reorder"></i> Courses</h4>
                 <div class="toolbar no-padding">
                     <div class="btn-group">
                         <span class="btn btn-xs" id="btn_addmk">
-                            <i class="icon-plus"></i> Add Mata Kuliah
+                            <i class="icon-plus"></i> Courses
                         </span>
                     </div>
                 </div>

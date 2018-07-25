@@ -8,9 +8,9 @@
     </div>
     <div class="col-md-8" style="text-align: right;">
         <button data-page="jadwalujian" type="button" class="btn btn-success btn-action
-                        control-jadwal"><i class="fa fa-calendar right-margin" aria-hidden="true"></i> Schedule Exam</button>
+                        control-jadwal"><i class="fa fa-calendar right-margin" aria-hidden="true"></i> Exam Schedule</button>
         <button data-page="inputjadwalujian" type="button" class="btn btn-default btn-default-success btn-action control-jadwal">
-            <i class="fa fa-pencil right-margin" aria-hidden="true"></i> Set Schedule Exam
+            <i class="fa fa-pencil right-margin" aria-hidden="true"></i> Set Exam Schedule
         </button>
     </div>
 

@@ -110,7 +110,6 @@
 
                 var dataAttd = jsonResult[0];
 
-
                 var tr = $('#dataRwSchedule');
 
                 for(var a=1;a<=14;a++){
@@ -203,14 +202,11 @@
         $.post(url,{token:token},function (jsonResult) {
 
             opt.empty();
-            // opt.append('<option selected disabled>-- Select Schedule --</option>');
-            // opt.append('<option disabled>----------------------</option>');
             if(jsonResult.length>0){
-
                 for(var i=0;i<jsonResult.length;i++){
                     var dataR = jsonResult[i];
                     var time = dataR.StartSessions.substr(0,5)+' - '+dataR.EndSessions.substr(0,5);
-                    opt.append('<option value="'+dataR.AttendanceID+'.'+dataR.ScheduleID+'.'+dataR.ID+'">'+dataR.DayNameEng+', '+time+' | Ruang '+dataR.Room+'</option>');
+                    opt.append('<option value="'+dataR.AttendanceID+'.'+dataR.ScheduleID+'.'+dataR.ID+'.'+dataR.Credit+'.'+dataR.TimePerCredit+'">'+dataR.DayNameEng+', '+time+' | Ruang '+dataR.Room+'</option>');
                 }
             }
         });

@@ -39,9 +39,9 @@
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                            <li><a href="javascript:void(0)" data-action="ConfProgram" data-header="Program Kampus" class="btn-conf">Program Kuliah</a></li>
-                            <li><a href="javascript:void(0)" data-action="ConfJenisKurikulum" data-header="Jenis Kurikulum" class="btn-conf">Curriculum Type</a></li>
-                            <li><a href="javascript:void(0)" data-action="ConfJenisKelompok" data-header="Kelompok Mata Kuliah" class="btn-conf">Kelompok</a></li>
+                            <li><a href="javascript:void(0)" data-action="ConfProgram" data-header="Campus Programme" class="btn-conf">Campus Programme</a></li>
+                            <li><a href="javascript:void(0)" data-action="ConfJenisKurikulum" data-header="Curriculum Type" class="btn-conf">Curriculum Type</a></li>
+                            <li><a href="javascript:void(0)" data-action="ConfJenisKelompok" data-header="Course Group" class="btn-conf">Course Group</a></li>
 <!--                            <li><a href="javascript:void(0)" data-action="ClassGroup" data-header="Group Kelas" class="btn-conf">Group Kelas</a></li>-->
                         </ul>
                     </div>
