@@ -1893,7 +1893,7 @@ class M_finance extends CI_Model {
 
    public function count_get_list_telat_bayar_mhs($ta,$prodi,$PTID,$NIM)
    {
-    // error_reporting(0);
+    error_reporting(0);
     $arr = array();
     $this->load->model('master/m_master');
 
