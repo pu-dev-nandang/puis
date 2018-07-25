@@ -14,7 +14,7 @@
         </div>
         <div class="col-xs-5" style="">
             <select id="filterBaseProdi" class="form-control form-filter form-filter-jadwal">
-                <option value="">--- All Program Study ---</option>
+                <option value="">--- All Programme Study ---</option>
                 <option disabled>------------------------------------------</option>
             </select>
         </div>
@@ -55,7 +55,7 @@
     $(document).ready(function () {
         // loadSelectOptionProgramCampus('#filterProgramCampus','');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
-        $('#filterSemester').append('<option value="" disabled selected>-- Year Academic--</option>' +
+        $('#filterSemester').append('<option value="" disabled selected>-- Academic Year --</option>' +
             '                <option disabled>------------------------------------------</option>');
 
         loSelectOptionSemester('#filterSemester','');

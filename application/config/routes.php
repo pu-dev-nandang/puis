@@ -33,7 +33,7 @@ $route['change-departement'] = 'dashboard/c_dashboard/change_departement';
 
 
 // === Academic ===
-$route['academic/kurikulum'] = 'page/academic/c_kurikulum/kurikulum';
+$route['academic/curriculum'] = 'page/academic/c_kurikulum/kurikulum';
 $route['academic/kurikulum-detail'] = 'page/academic/c_kurikulum/kurikulum_detail';
 $route['academic/kurikulum/add-kurikulum'] = 'page/academic/c_kurikulum/add_kurikulum';
 $route['academic/kurikulum/loadPageDetailMataKuliah'] = 'page/academic/c_kurikulum/loadPageDetailMataKuliah';
@@ -43,11 +43,11 @@ $route['academic/kurikulum/data-conf'] = 'page/academic/c_kurikulum/getDataConf'
 
 
 $route['academic/kurikulum-detail-mk'] = 'page/academic/c_kurikulum/kurikulum_detail_mk';
-$route['academic/matakuliah'] = 'page/academic/c_matakuliah/mata_kuliah';
+$route['academic/courses'] = 'page/academic/c_matakuliah/mata_kuliah';
 $route['academic/dataTableMK'] = 'page/academic/c_matakuliah/dataTableMK';
 
 $route['academic/tesdb'] = 'page/academic/c_tahun_akademik/tesdb';
-$route['academic/tahun-akademik'] = 'page/academic/c_tahun_akademik/tahun_akademik';
+$route['academic/academic-year'] = 'page/academic/c_tahun_akademik/tahun_akademik';
 $route['academic/tahun-akademik-table'] = 'page/academic/c_tahun_akademik/tahun_akademik_table';
 $route['academic/detail-tahun-akademik'] = 'page/academic/c_tahun_akademik/page_detail_tahun_akademik';
 $route['academic/modal-tahun-akademik'] = 'page/academic/c_tahun_akademik/modal_tahun_akademik';
@@ -63,7 +63,7 @@ $route['academic/semester-antara/details/(:num)'] = 'page/academic/c_semester_an
 $route['academic/ketersediaan-dosen'] = 'page/academic/c_akademik/ketersediaan_dosen';
 $route['academic/ModalKetersediaanDosen'] = 'page/academic/c_akademik/Modal_KetersediaanDosen';
 
-$route['academic/jadwal'] = 'page/academic/c_jadwal';
+$route['academic/timetables'] = 'page/academic/c_jadwal';
 
 $route['academic/study-planning'] = 'page/academic/c_study_planning';
 
@@ -73,7 +73,7 @@ $route['academic/reference'] = 'page/academic/C_reference';
 // Jadwal Ujian
 $route['academic/__setPageJadwalUjian'] = 'page/academic/c_jadwal_ujian/setPageJadwal';
 $route['academic/__setPageJadwal'] = 'page/academic/c_jadwal/setPageJadwal';
-$route['academic/jadwal-ujian'] = 'page/academic/c_jadwal_ujian';
+$route['academic/exam-schedule'] = 'page/academic/c_jadwal_ujian';
 
 // ---- Score ----
 $route['academic/score'] =  'page/academic/c_score';
@@ -109,7 +109,7 @@ $route['database/mentor-academic'] = 'page/database/c_database/mentor_academic';
 
 
 // --- Presensi ---
-$route['academic/presensi'] = 'page/academic/c_presensi';
+$route['academic/attendance'] = 'page/academic/c_presensi';
 $route['academic/loadPagePresensi'] = 'page/academic/c_presensi/loadPagePresensi';
 
 

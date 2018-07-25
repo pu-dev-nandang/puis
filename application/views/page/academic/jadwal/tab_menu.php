@@ -24,17 +24,17 @@
         <div class="btn-group" role="group" aria-label="...">
 
             <button data-page="jadwal" type="button" class="btn btn-primary btn-action
-                        control-jadwal"><i class="fa fa-calendar right-margin" aria-hidden="true"></i> Schedule</button>
+                        control-jadwal"><i class="fa fa-calendar right-margin" aria-hidden="true"></i> Timetables</button>
 
             <button data-page="ruangan" type="button" class="btn btn-default btn-default-primary btn-action
-                        control-jadwal"><i class="fa fa-window-restore right-margin" aria-hidden="true"></i> Room Schedule</button>
+                        control-jadwal"><i class="fa fa-window-restore right-margin" aria-hidden="true"></i> Room Timetables (Comming Soon)</button>
         </div>
         |
         <button data-page="penawaran_mk" type="button" class="btn btn-default btn-default-primary btn-action control-jadwal">
             <i class="fa fa-exchange right-margin" aria-hidden="true"></i> Course Offerings
         </button>
         <button data-page="inputjadwal" type="button" class="btn btn-default btn-default-primary btn-action control-jadwal">
-            <i class="fa fa-pencil right-margin" aria-hidden="true"></i> Set Schedule
+            <i class="fa fa-pencil right-margin" aria-hidden="true"></i> Set Timetables
         </button>
     </div>
 

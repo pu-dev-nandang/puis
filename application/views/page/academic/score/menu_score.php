@@ -56,12 +56,12 @@
     $(document).ready(function () {
 
         $('#filterSemester,#filterBaseProdi').empty();
-        $('#filterSemester').append('<option value="" disabled selected>-- Year Academic--</option>' +
+        $('#filterSemester').append('<option value="" disabled selected>-- Academic Year --</option>' +
             '                <option disabled>------------------------------------------</option>');
         loSelectOptionSemester('#filterSemester','');
 
 
-        $('#filterBaseProdi').append('<option value="" disabled selected>-- Select Program Study --</option>' +
+        $('#filterBaseProdi').append('<option value="" disabled selected>-- Select Programme Study --</option>' +
             '<option disabled>------------------------------------------</option>');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
     });

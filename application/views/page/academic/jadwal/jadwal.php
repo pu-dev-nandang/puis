@@ -84,7 +84,7 @@
         loadSelectOptionProgramCampus('#filterProgramCampus','');
 
         $('#filterBaseProdi').empty();
-        $('#filterBaseProdi').append('<option value="">-- All Program Study --</option>' +
+        $('#filterBaseProdi').append('<option value="">-- All Programme Study --</option>' +
             '<option disabled>------------------------------------------</option>');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
 

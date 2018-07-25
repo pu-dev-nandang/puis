@@ -59,7 +59,7 @@
         loSelectOptionSemester('#filterSemester','');
 
         $('#filterBaseProdi').empty();
-        $('#filterBaseProdi').append('<option value="" disabled selected>-- Select Program Study --</option>' +
+        $('#filterBaseProdi').append('<option value="" disabled selected>-- Select Programme Study --</option>' +
             '<option disabled>------------------------------------------</option>');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
 
