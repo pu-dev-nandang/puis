@@ -67,7 +67,7 @@ $route['academic/timetables'] = 'page/academic/c_jadwal';
 
 $route['academic/study-planning'] = 'page/academic/c_study_planning';
 
-$route['academic/reference'] = 'page/academic/C_reference';
+$route['academic/references'] = 'page/academic/C_reference';
 
 
 // Jadwal Ujian

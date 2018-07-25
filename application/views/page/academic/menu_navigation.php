@@ -48,10 +48,10 @@
 <!--                    Ketersediaan Dosen-->
 <!--                </a>-->
 <!--            </li>-->
-            <li class="<?php if($this->uri->segment(2)=='reference'){echo "current";} ?>">
-                <a href="<?php echo base_url('academic/reference'); ?>">
+            <li class="<?php if($this->uri->segment(2)=='references'){echo "current";} ?>">
+                <a href="<?php echo base_url('academic/references'); ?>">
                     <i class="fa fa-external-link-square"></i>
-                    Reference
+                    References
                 </a>
             </li>
 

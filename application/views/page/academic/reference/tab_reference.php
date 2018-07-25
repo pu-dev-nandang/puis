@@ -26,7 +26,7 @@
                         <div class="btn-group btn-grade" data-action="add">
                             <span class="btn btn-xs">
                                 <strong>
-                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> Add Grade
+                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> Grade
                                 </strong>
                             </span>
                         </div>
@@ -46,7 +46,7 @@
                         <div class="btn-group btn-range-credit" data-action="add">
                             <span class="btn btn-xs">
                                 <strong>
-                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> Add Range
+                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> Range
                                 </strong>
                             </span>
                         </div>
