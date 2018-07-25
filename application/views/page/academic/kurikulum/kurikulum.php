@@ -11,7 +11,7 @@
                 </div>
                 <div class="col-xs-3">
                     <select class="form-control" id="selectProdi">
-                        <option value="">--- All Prodi ---</option>
+                        <option value="">--- All Programme Study ---</option>
                     </select>
                 </div>
                 <div class="col-xs-6" style="text-align: right;">
