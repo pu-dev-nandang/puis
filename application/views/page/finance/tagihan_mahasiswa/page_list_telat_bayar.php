@@ -220,7 +220,8 @@
                
             }).fail(function() {
               
-              toastr.info('No Result Data'); 
+              toastr.info('No Result Data');
+              $('#NotificationModal').modal('hide'); 
               // toastr.error('The Database connection error, please try again', 'Failed!!');
             }).always(function() {
                 $('#NotificationModal').modal('hide');
