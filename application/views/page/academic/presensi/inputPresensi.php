@@ -20,7 +20,7 @@
                     <div class="col-xs-4">
                         <select class="form-control" id="filterAttendanceType">
 <!--                            <option selected disabled>--- Type ---</option>-->
-                            <option value="0">Schedule</option>
+                            <option value="0">Timetable</option>
                             <option value="1">UTS</option>
                             <option value="2">UAS</option>
                         </select>

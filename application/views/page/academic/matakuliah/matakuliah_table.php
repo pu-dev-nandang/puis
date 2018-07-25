@@ -62,7 +62,7 @@
             initComplete: function () {
                 this.api().columns().every( function () {
                     var column = this;
-                    var select = $('<select class="form-control filter-prodi"><option selected disabled>--- Select Study Programme ---</option><option value="">All</option></select>')
+                    var select = $('<select class="form-control filter-prodi"><option selected disabled>--- Select Programme Study ---</option><option value="">All</option></select>')
                         .appendTo( $('.dataTables_header .col-md-9') )
                         .on( 'change', function () {
                             var val = $.fn.dataTable.util.escapeRegex(
