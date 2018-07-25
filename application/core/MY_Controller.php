@@ -256,8 +256,36 @@ abstract class Admission_Controler extends Globalclass{
         if (count($getDataMenu) > 0) {
             $this->session->set_userdata('auth_admission_sess',1);
             $this->session->set_userdata('menu_admission_sess',$getDataMenu);
-
+            $this->session->set_userdata('menu_admission_grouping',$this->groupBYMenu_sess());
         }
+    }
+
+    public function groupBYMenu_sess()
+    {
+        $DataDB = $this->session->userdata('menu_admission_sess');
+        $this->load->model('master/m_master');
+        $arr = array();
+        for ($i=0; $i < count($DataDB); $i++) {
+            $submenu1 = $this->m_master->getSubmenu1BaseMenu($DataDB[$i]['ID_menu']);
+            $arr2 = array();
+            for ($k=0; $k < count($submenu1); $k++) { 
+                $submenu2 = $this->m_master->getSubmenu2BaseSubmenu1($submenu1[$k]['SubMenu1']);
+                $arr2[] = array(
+                    'SubMenu1' => $submenu1[$k]['SubMenu1'],
+                    'Submenu' => $submenu2,
+                );
+            }
+
+            $arr[] =array(
+                'Menu' => $DataDB[$i]['Menu'],
+                'Icon' => $DataDB[$i]['Icon'],
+                'Submenu' => $arr2
+
+            );
+            
+        }
+
+        return $arr;
     }
 
     public function auth_ajax()
@@ -265,6 +293,29 @@ abstract class Admission_Controler extends Globalclass{
         if (!$this->input->is_ajax_request()) {
             exit('No direct script access allowed');
         }
+    }
+
+    public function checkAuth_user()
+    {
+        $base_url = base_url();
+        $currentURL = current_url();
+        $getURL = str_replace($base_url,"",$currentURL);
+        $this->load->model('master/m_master');
+        $chk = $this->m_master->chkAuthDB_Base_URL($getURL);
+
+        if (!$this->input->is_ajax_request()) {
+            if (count($chk) == 0) {
+                show_404($log_error = TRUE); 
+            }
+            else
+            {
+                if ($chk[0]['read'] == 0) {
+                   show_404($log_error = TRUE); 
+                }
+            }
+            
+        }
+        
     }
 
 }

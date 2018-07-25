@@ -116,11 +116,47 @@ $route['academic/loadPagePresensi'] = 'page/academic/c_presensi/loadPagePresensi
 // --- Admission ----
 // --- Master ----
 
-$route['admission/config/set-tgl-register-online'] = 'page/admission/c_master/page_set_tgl_register';
+// test routes from db
+require_once( BASEPATH .'database/DB.php' );
+$db =& DB();
+$query = $db->get('db_admission.cfg_sub_menu');
+$result = $query->result();
+foreach( $result as $row )
+{
+	$Slug = $row->Slug;
+	$Slug = explode('/', $Slug);
+	if (in_array('(:any)', $Slug)) {
+	   $a = count($Slug) - 1;
+	   $URI = '';
+	   for ($i=0; $i < $a; $i++) { 
+	   	$URI .= $Slug[$i].'/';
+	   }
+	   $route[ $URI.'(:any)' ] = $row->Controller;
+	}
+	elseif(in_array('(:num)', $Slug)) {
+		$a = count($Slug) - 1;
+		$URI = '';
+		for ($i=0; $i < $a; $i++) { 
+			$URI .= $Slug[$i].'/';
+		}
+		$route[ $URI.'(:num)' ] = $row->Controller;
+	}
+	else
+	{
+		$route[ $row->Slug ] = $row->Controller;
+	}
+
+}
+// test routes from db
+
+$route['admission/config/set-tgl-register-online'] = 'page/admission/c_master/page_set_tgl_register'; // db menu
+
 $route['admission/master/data_cfg_deadline'] = 'page/admission/c_master/data_cfg_deadline';
 $route['admission/master/modalform_set_tgl_register'] = 'page/admission/c_master/modalform_set_tgl_register';
 $route['admission/master/modalform_set_tgl_register/save'] = 'page/admission/c_master/submit_cfg_deadline';
-$route['admission/config/set-max-cicilan'] = 'page/admission/c_master/page_set_max_cicilan';
+
+$route['admission/config/set-max-cicilan'] = 'page/admission/c_master/page_set_max_cicilan'; // db menu
+
 $route['admission/master/modalform_set_max_cicilan'] = 'page/admission/c_master/modalform_set_max_cicilan';
 $route['admission/master/modalform_set_max_cicilan/save'] = 'page/admission/c_master/submit_cfg_cicilan';
 $route['admission/master/data_cfg_cicilan'] = 'page/admission/c_master/data_cfg_cicilan';
@@ -130,82 +166,89 @@ $route['admission/master/modalform_sekolah'] = 'page/admission/c_master/modalfor
 $route['admission/master/modalform_sekolah/save'] = 'page/admission/c_master/submit_sekolah';
 
 
-$route['admission/config/sdaerah/master-sma'] = 'page/admission/c_master/sma';
-$route['admission/config/sdaerah/master-sma/(:any)'] = 'page/admission/c_master/sma/$1';
+$route['admission/config/sdaerah/master-sma'] = 'page/admission/c_master/sma'; // db menu
+$route['admission/config/sdaerah/master-sma/(:any)'] = 'page/admission/c_master/sma/$1'; // db menu
 $route['admission/config/sdaerah/integration'] = 'page/admission/c_master/sma_integration';
 
 $route['admission/master-sma/table'] = 'page/admission/c_master/sma_table';
 
-$route['admission/config/set-email'] = 'page/admission/c_master/config_set_email';
+$route['admission/config/set-email'] = 'page/admission/c_master/config_set_email'; // db menu
 $route['admission/master-config/testing_email'] = 'page/admission/c_master/testing_email';
 $route['admission/master-config/save_email'] = 'page/admission/c_master/save_email';
-$route['admission/config/total-account'] = 'page/admission/c_master/total_account';
+$route['admission/config/total-account'] = 'page/admission/c_master/total_account'; // db menu
 $route['admission/master-config/loadTableTotalAccount'] = 'page/admission/c_master/load_table_total_account';
 $route['admission/master-config/modalform/(:any)'] = 'page/admission/c_master/modalform/$1';
 $route['admission/master-config/submit_count_account'] = 'page/admission/c_master/submit_count_account';
 
-$route['admission/config/email-to'] = 'page/admission/c_master/email_to';
+$route['admission/config/email-to'] = 'page/admission/c_master/email_to'; // db menu
 
 $route['admission/master-config/loadTableEmailTo'] = 'page/admission/c_master/load_table_email_to';
 $route['admission/master-config/submit_email_to'] = 'page/admission/c_master/submit_email_to';
 $route['admission/master-config/lama-pembayaran'] = 'page/admission/c_master/lama_pembayaran';
 $route['admission/master-config/loadTableMaster/(:any)'] = 'page/admission/c_master/load_table_master/$1';
 $route['admission/master-config/submit_lama_pembayaran'] = 'page/admission/c_master/submit_lama_pembayaran';
-$route['admission/config/harga-formulir/online'] = 'page/admission/c_master/harga_formulir_online';
-$route['admission/master-config/submit_harga_formulir_online'] = 'page/admission/c_master/submit_harga_formulir_online';
+$route['admission/config/harga-formulir/online'] = 'page/admission/c_master/harga_formulir_online'; // db menu
+$route['admission/master-config/submit_harga_formulir_online'] = 'page/admission/c_master/submit_harga_formulir_online'; // db menu
 $route['admission/config/harga-formulir/offline'] = 'page/admission/c_master/harga_formulir_offline';
 $route['admission/master-config/submit_harga_formulir_offline'] = 'page/admission/c_master/submit_harga_formulir_offline';
-$route['admission/config/sdaerah/wilayah'] = 'page/admission/c_master/global_wilayah';
+$route['admission/config/sdaerah/wilayah'] = 'page/admission/c_master/global_wilayah'; // dbmenu
 $route['admission/master-config/loadTableMasterNoAction/(:any)'] = 'page/admission/c_master/loadTableMasterNoAction/$1';
-$route['admission/master/jenis-tempat-tinggal'] = 'page/admission/c_master/jenis_tempat_tinggal';
+$route['admission/master/jenis-tempat-tinggal'] = 'page/admission/c_master/jenis_tempat_tinggal'; // db menu
 $route['admission/master-config/submit_jenis_tempat_tinggal'] = 'page/admission/c_master/submit_jenis_tempat_tinggal';
-$route['admission/master/pendapatan'] = 'page/admission/c_master/pendapatan';
+$route['admission/master/pendapatan'] = 'page/admission/c_master/pendapatan'; // db menu
 $route['admission/master-config/submit_Pendapatan'] = 'page/admission/c_master/submit_pendapatan';
-$route['admission/config/set-print-label'] = 'page/admission/c_master/set_print_label';
+$route['admission/config/set-print-label'] = 'page/admission/c_master/set_print_label'; // db menu
 $route['admission/master-config/testing_print_label_token'] = 'page/admission/c_master/testing_print_label_token';
 $route['admission/master-config/save_set_print_label'] = 'page/admission/c_master/save_set_print_label';
 
 
 
-$route['admission/master/agama'] = 'page/admission/c_master/agama';
+$route['admission/master/agama'] = 'page/admission/c_master/agama'; // db menu
+
 $route['admission/master-global/loadTableMasterAgama'] = 'page/admission/c_master/load_table_master_agama';
-$route['admission/master/tipe-sekolah'] = 'page/admission/c_master/tipe_sekolah';
+$route['admission/master/tipe-sekolah'] = 'page/admission/c_master/tipe_sekolah'; // db menu
 $route['admission/master-global/loadTableMasterTipeSekolah'] = 'page/admission/c_master/load_table_tipe_sekolah';
-$route['admission/master/document-checklist'] = 'page/admission/c_master/document_checklist';
+$route['admission/master/document-checklist'] = 'page/admission/c_master/document_checklist'; // db menu
 $route['admission/master-registration/submit_document_checklist'] = 'page/admission/c_master/submit_document_checklist';
-$route['admission/config/number-formulir/online'] = 'page/admission/c_master/formulir_online';
+
+$route['admission/config/number-formulir/online'] = 'page/admission/c_master/formulir_online'; // db menu
+
 $route['admission/master-registration/loadDataFormulirOnline'] = 'page/admission/c_master/loadDataFormulirOnline';
 $route['admission/master-registration/getJsonFormulirOnline'] = 'page/admission/c_master/get_json_formulir_online';
 $route['admission/master-registration/GenerateFormulirOnline'] = 'page/admission/c_master/generate_formulir_online';
+
 $route['admission/config/number-formulir/offline'] = 'page/admission/c_master/formulir_offline';
+
 $route['admission/master-registration/loadDataFormulirOffline'] = 'page/admission/c_master/loadDataFormulirOffline';
 $route['admission/master-registration/getJsonFormulirOffline'] = 'page/admission/c_master/get_json_formulir_offline';
 $route['admission/master-registration/GenerateFormulirOffline'] = 'page/admission/c_master/generate_formulir_offline';
-$route['admission/master/jacket-size'] = 'page/admission/c_master/jacket_size';
+$route['admission/master/jacket-size'] = 'page/admission/c_master/jacket_size'; // db menu
 $route['admission/master-register/submit_jacket_size'] = 'page/admission/c_master/submit_jacket_size';
-$route['admission/master/jurusan-sekolah'] = 'page/admission/c_master/jurusan_sekolah';
+$route['admission/master/jurusan-sekolah'] = 'page/admission/c_master/jurusan_sekolah'; // db menu
 $route['admission/master-config/submit_jurusan_sekolah'] = 'page/admission/c_master/submit_jurusan_sekolah';
-$route['admission/master/ujian-masuk-per-prody'] = 'page/admission/c_master/ujian_masuk_per_prody';
+$route['admission/master/ujian-masuk-per-prody'] = 'page/admission/c_master/ujian_masuk_per_prody'; // db menu
 $route['admission/master-registration/ujian-masuk-per-prody/modalform'] = 'page/admission/c_master/modalform_ujian_masuk_per_prody';
 $route['admission/master-registration/ujian-masuk-per-prody/loadTable'] = 'page/admission/c_master/table_ujian_masuk_per_prody';
 $route['admission/master-registration/ujian-masuk-per-prody/submit'] = 'page/admission/c_master/submit_ujian_masuk_per_prody';
-$route['admission/config/virtual-account/page-create-va'] = 'page/admission/c_master/page_create_va';
+
+$route['admission/config/virtual-account/page-create-va'] = 'page/admission/c_master/page_create_va'; // db menu
+
 $route['admission/master-registration/generate_va'] = 'page/admission/c_master/generate_va';
 $route['admission/master-registration/loadDataVA-available'] = 'page/admission/c_master/loadDataVA_available';
-$route['admission/master/event'] = 'page/admission/c_master/event';
+$route['admission/master/event'] = 'page/admission/c_master/event'; // db menu
 $route['admission/master-registration/modalform_event'] = 'page/admission/c_master/modalform_event';
 $route['admission/master-registration/event/table_event'] = 'page/admission/c_master/table_event';
 $route['admission/master-registration/modalform_event/save'] = 'page/admission/c_master/modalform_event_save';
-$route['admission/master/sumber-iklan'] = 'page/admission/c_master/sumber_iklan';
+$route['admission/master/sumber-iklan'] = 'page/admission/c_master/sumber_iklan'; // db menu
 $route['admission/master-register/submit_source_from_event'] = 'page/admission/c_master/submit_source_from_event';
-$route['admission/config/virtual-account/page-recycle-va'] = 'page/admission/c_master/page_recycle_va';
+$route['admission/config/virtual-account/page-recycle-va'] = 'page/admission/c_master/page_recycle_va'; // db menu
 $route['admission/master-registration/loadDataVA-deleted/(:num)'] = 'page/admission/c_master/loadDataVA_deleted/$1';
 $route['admission/master-registration/virtual-account/page-recycle-va/submit_recycle_va'] = 'page/admission/c_master/submit_recycle_va';
-$route['admission/master/program-beasiswa/jalur-prestasi-akademik'] = 'page/admission/c_master/jalur_prestasi_akademik';
+$route['admission/master/program-beasiswa/jalur-prestasi-akademik'] = 'page/admission/c_master/jalur_prestasi_akademik'; // db menu
 $route['admission/master-registration/jpa/table_jpa'] = 'page/admission/c_master/table_jpa';
 $route['admission/master-registration/modalform_jpa'] = 'page/admission/c_master/modalform_jpa';
 $route['admission/master-registration/submit_jpa'] = 'page/admission/c_master/submit_jpa';
-$route['admission/master/program-beasiswa/jalur-prestasi-akademik-umum'] = 'page/admission/c_master/jalur_prestasi_akademik_umum';
+$route['admission/master/program-beasiswa/jalur-prestasi-akademik-umum'] = 'page/admission/c_master/jalur_prestasi_akademik_umum'; // db menu
 $route['admission/master-registration/modalform_jpau'] = 'page/admission/c_master/modalform_jpau';
 $route['admission/master-registration/jpau/table_jpau'] = 'page/admission/c_master/table_jpau';
 $route['admission/master-registration/submit_jpau'] = 'page/admission/c_master/submit_jpau';
@@ -217,7 +260,7 @@ $route['admission/master-registration/submit_jpok'] = 'page/admission/c_master/s
 
 
 
-$route['admission/master/sales-koordinator-wilayah'] = 'page/admission/c_master/sales_koordinator_wilayah_page';
+$route['admission/master/sales-koordinator-wilayah'] = 'page/admission/c_master/sales_koordinator_wilayah_page'; // db menu
 $route['admission/master-registration/modalform_sales_koordinator'] = 'page/admission/c_master/sales_koordinator_wilayah_modal_form';
 $route['admission/master-registration/modalform_sales_koordinator/save'] = 'page/admission/c_master/modalform_sales_koordinator_save';
 $route['admission/master-registration/sales_koordinator/pagination/(:num)'] = 'page/admission/c_master/sales_koordinator_pagination/$1';
@@ -232,7 +275,7 @@ $route['download_anypath'] = 'api/c_global/download_anypath';
 
 
 $route['admission/master-registration/biaya-kuliah'] = 'page/admission/c_master/biaya_kuliah';
-$route['admission/config/menu-previleges'] = 'page/admission/c_master/menu_previleges';
+$route['admission/config/menu-previleges'] = 'page/admission/c_master/menu_previleges'; // db menu
 $route['admission/master-config/modalform_previleges'] = 'page/admission/c_master/modal_form_previleges';
 $route['admission/master-config/menu-previleges/get_menu'] = 'page/admission/c_master/get_menu';
 $route['admission/master-config/menu-previleges/get_menu/save'] = 'page/admission/c_master/get_menu_save_menu';
@@ -253,7 +296,7 @@ $route['readNotificationDivision'] = 'dashboard/c_dashboard/readNotificationDivi
 
 
 // proses
-$route['admission/proses-calon-mahasiswa/dokumen/dokumen-upload'] = 'page/admission/c_admission/verifikasi_dokumen_calon_mahasiswa';
+$route['admission/proses-calon-mahasiswa/dokumen/dokumen-upload'] = 'page/admission/c_admission/verifikasi_dokumen_calon_mahasiswa'; // db menu
 $route['admission/proses-calon-mahasiswa/verifikasi-dokument/register_document_table/pagination/(:num)'] = 'page/admission/c_admission/pagination_calon_mahasiswa/$1';
 $route['admission/proses-calon-mahasiswa/verifikasi-dokument/proses_document'] = 'page/admission/c_admission/proses_document';
 $route['admission/proses-calon-mahasiswa/jadwal-ujian/set-jadwal-ujian'] = 'page/admission/c_admission/set_jadwal_ujian';
@@ -266,35 +309,35 @@ $route['admission/proses-calon-mahasiswa/jadwal-ujian/daftar-jadwal-ujian/pagina
 $route['admission/proses-calon-mahasiswa/jadwal-ujian/set-nilai-ujian'] = 'page/admission/c_admission/set_nilai_ujian';
 $route['admission/proses-calon-mahasiswa/jadwal-ujian/set-nilai-ujian/pagination/(:num)'] = 'page/admission/c_admission/set_nilai_ujian_load_data_paging/$1';
 $route['admission/proses-calon-mahasiswa/jadwal-ujian/set-nilai-ujian/save'] = 'page/admission/c_admission/set_nilai_ujian_save';
-$route['admission/proses-calon-mahasiswa/jadwal-ujian/set-ujian'] = 'page/admission/c_admission/set_ujian';
+$route['admission/proses-calon-mahasiswa/jadwal-ujian/set-ujian'] = 'page/admission/c_admission/set_ujian'; // db menu
 $route['admission/proses-calon-mahasiswa/loadData_calon_mahasiswa/(:num)'] = 'page/admission/c_admission/loadData_calon_mahasiswa/$1';
 $route['admission/proses-calon-mahasiswa/submit_ikut_ujian'] = 'page/admission/c_admission/submit_ikut_ujian';
-$route['admission/proses-calon-mahasiswa/dokumen/input-nilai-rapor'] = 'page/admission/c_admission/input_nilai_rapor';
+$route['admission/proses-calon-mahasiswa/dokumen/input-nilai-rapor'] = 'page/admission/c_admission/input_nilai_rapor'; // db menu
 
 $route['admission/proses-calon-mahasiswa/set-nilai-rapor/pagination/(:num)'] = 'page/admission/c_admission/set_nilai_rapor_load_data_paging/$1';
 $route['admission/proses-calon-mahasiswa/set-nilai-rapor/save'] = 'page/admission/c_admission/set_nilai_rapor_save';
-$route['admission/proses-calon-mahasiswa/dokumen/cancel-nilai-rapor'] = 'page/admission/c_admission/cancel_nilai_lapor';
+$route['admission/proses-calon-mahasiswa/dokumen/cancel-nilai-rapor'] = 'page/admission/c_admission/cancel_nilai_lapor'; // db menu
 $route['admission/proses-calon-mahasiswa/loaddata_nilai_calon_mahasiswa/(:num)'] = 'page/admission/c_admission/loaddata_nilai_calon_mahasiswa/$1';
 $route['admission/proses-calon-mahasiswa/submit_cancel_nilai_rapor'] = 'page/admission/c_admission/submit_cancel_nilai_rapor';
-$route['admission/proses-calon-mahasiswa/set_tuition_fee'] = 'page/admission/c_admission/set_tuition_fee';
+$route['admission/proses-calon-mahasiswa/set_tuition_fee'] = 'page/admission/c_admission/set_tuition_fee'; // db menu
 $route['admission/proses-calon-mahasiswa/set_tuition_fee/input/(:num)'] = 'page/admission/c_admission/set_tuition_fee_input/$1';
 $route['admission/proses-calon-mahasiswa/set_tuition_fee/save'] = 'page/admission/c_admission/set_tuition_fee_save';
 $route['admission/proses-calon-mahasiswa/set_tuition_fee/delete/(:num)'] = 'page/admission/c_admission/set_tuition_fee_delete/$1';
 $route['admission/proses-calon-mahasiswa/set_tuition_fee/delete_data'] = 'page/admission/c_admission/set_tuition_fee_delete_data';
 $route['admission/proses-calon-mahasiswa/set_tuition_fee/approved/(:num)'] = 'page/admission/c_admission/set_tuition_fee_approved/$1';
-$route['admission/proses-calon-mahasiswa/cicilan'] = 'page/admission/c_admission/cicilan';
+$route['admission/proses-calon-mahasiswa/cicilan'] = 'page/admission/c_admission/cicilan'; // db menu
 $route['admission/proses-calon-mahasiswa/cicilan_data/(:num)'] = 'page/admission/c_admission/cicilan_data/$1';
 $route['admission/proses-calon-mahasiswa/submit_edit_deadline_cicilan'] = 'page/admission/c_admission/submit_edit_deadline_cicilan';
-$route['admission/proses-calon-mahasiswa/checkdata-calon-mahasiswa'] = 'page/admission/c_admission/page_data_calon_mahasiswa';
+$route['admission/proses-calon-mahasiswa/checkdata-calon-mahasiswa'] = 'page/admission/c_admission/page_data_calon_mahasiswa'; // db menu
 $route['admission/proses-calon-mahasiswa/data-calon-mhs/(:num)'] = 'page/admission/c_admission/data_calon_mahasiswa/$1';
 $route['admission/detailPayment'] = 'page/admission/c_admission/detailPayment';
 
 
-$route['admission/distribusi-formulir/formulir-offline'] = 'page/admission/c_admission/distribusi_formulir_offline';
+$route['admission/distribusi-formulir/formulir-offline'] = 'page/admission/c_admission/distribusi_formulir_offline'; // db menu
 $route['admission/distribusi-formulir/formulir-offline/pagination/(:num)'] = 'page/admission/c_admission/pagination_formulir_offline/$1';
 $route['admission/distribusi-formulir/formulir-offline/submit_sellout'] = 'page/admission/c_admission/submit_sellout_formulir_offline/$1';
 
-$route['admission/distribusi-formulir/formulir-online'] = 'page/admission/c_admission/distribusi_formulir_online';
+$route['admission/distribusi-formulir/formulir-online'] = 'page/admission/c_admission/distribusi_formulir_online'; // db menu
 $route['admission/distribusi-formulir/formulir-online/pagination/(:num)'] = 'page/admission/c_admission/pagination_formulir_online/$1';
 $route['admission/distribusi-formulir/formulir-offline/save'] = 'page/admission/c_admission/formulir_offline_sale_save';
 $route['admission/distribusi-formulir/formulir-offline/selectPIC'] = 'page/admission/c_admission/formulir_offline_salect_PIC';

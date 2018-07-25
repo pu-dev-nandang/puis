@@ -54,7 +54,7 @@
 				if (response[i]['Print'] == 1 ) {
 					print = 'Sudah di Print';
 				}
-				var btn_print = '<span data-smt="'+response[i]['FormulirCode']+'" class="btn btn-xs btn-print" data-token = "'+response[i]['Link']+'"><i class="fa fa-print"></i> Print</span>';
+				var btn_print = '<span data-smt="'+response[i]['FormulirCode']+'" class="btn btn-xs btn-print btn-read" data-token = "'+response[i]['Link']+'"><i class="fa fa-print"></i> Print</span>';
 				$(".datatable tbody").append(
 					'<tr>'+
 						'<td>'+no+'</td>'+

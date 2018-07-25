@@ -48,8 +48,8 @@
                         <p style="color: red;">* Boleh Kosong</p>  
                     </div>
                     <hr>
-                      <button type="button" class="btn btn-default" id="sbmt">Submit</button>
-                      <button type="button" class="btn btn-info" id = 'test'>Test</button>
+                      <button type="button" class="btn btn-default btn-add" id="sbmt">Submit</button>
+                      <button type="button" class="btn btn-info btn-read" id = 'test'>Test</button>
                   <!--</form>-->
                 </div>
                 <!-- /.box-body -->

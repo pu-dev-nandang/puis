@@ -30,7 +30,7 @@
 	                </div>
 	                <div class="panel-body">
 	                    <div class="tab-content">
-	                        <div class="tab-pane fade in active" id="tab1primary">
+	                        <div class="tab-pane fade in active btn-add" id="tab1primary">
 	                        	<!-- <div class="panel panel-default"> -->
             				    	<div class="panel panel-primary">
             			    	        <div class="panel-heading clearfix">
@@ -179,7 +179,7 @@
             				    	</div>
             					<!-- </div> -->
 	                    	</div>
-	                        <div class="tab-pane fade" id="tab2primary">
+	                        <div class="tab-pane fade btn-read" id="tab2primary">
 	                        	<div class = "row">	
 	                        		<div class="col-xs-2" style="">
 	                        			Tahun
@@ -619,7 +619,7 @@
 		}).done(function() {
 	      
 	    }).fail(function() {
-	      toastr.error('The Database connection error, please try again', 'Failed!!');
+	      //toastr.error('The Database connection error, please try again', 'Failed!!');
 	    }).always(function() {
 	      // $('#btn-dwnformulir').prop('disabled',false).html('Formulir');
 	    });
