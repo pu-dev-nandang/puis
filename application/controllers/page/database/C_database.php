@@ -103,8 +103,11 @@ class C_database extends Globalclass {
                 $Address = $data_arr['Address'];
                 $Photo = $uploadFile['file_name'];
                 $PositionOther1 = $data_arr['PositionOtherdivisi1'].'.'.$data_arr['PositionOtherMain1'];
+                $PositionOther1 = ($PositionOther1 == '.')? '' : $PositionOther1;
                 $PositionOther2 = $data_arr['PositionOtherdivisi2'].'.'.$data_arr['PositionOtherMain2'];
+                $PositionOther2 = ($PositionOther2 == '.')? '' : $PositionOther2;
                 $PositionOther3 = $data_arr['PositionOtherdivisi3'].'.'.$data_arr['PositionOtherMain3'];
+                $PositionOther3 = ($PositionOther3 == '.')? '' : $PositionOther3;
                 $StatusEmployeeID = $data_arr['StatusEmployeeID'];
                 $Status = "1";
                 $this->m_database->insert_data_employees($ReligionID,$JobGradeID,$PositionMain,$ProdiID,$CityID,$ProvinceID,$NIP,$NIDN,$KTP,$Name,$TitleAhead,$TitleBehind,$Gender,$PlaceOfBirth,$DateOfBirth,$Phone,$HP,$Email,$EmailPU,$Password,$Address,$Photo,$PositionOther1,$PositionOther2,$PositionOther3,$StatusEmployeeID,$Status);
@@ -140,8 +143,12 @@ class C_database extends Globalclass {
             $Address = $data_arr['Address'];
             // $Photo = $uploadFile['file_name'];
             $PositionOther1 = $data_arr['PositionOtherdivisi1'].'.'.$data_arr['PositionOtherMain1'];
+            $PositionOther1 = ($PositionOther1 == '.')? '' : $PositionOther1;
             $PositionOther2 = $data_arr['PositionOtherdivisi2'].'.'.$data_arr['PositionOtherMain2'];
+            $PositionOther2 = ($PositionOther2 == '.')? '' : $PositionOther2;
             $PositionOther3 = $data_arr['PositionOtherdivisi3'].'.'.$data_arr['PositionOtherMain3'];
+            $PositionOther3 = ($PositionOther3 == '.')? '' : $PositionOther3;
+
             $StatusEmployeeID = $data_arr['StatusEmployeeID'];
             $Status = "1";
             $NIPedit =  $data_arr['NIPedit'];

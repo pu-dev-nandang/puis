@@ -469,7 +469,7 @@ class M_master extends CI_Model {
         $this->db->insert('db_admission.cfg_menu', $dataSave);
     }
 
-    public function saveSubMenu($menu,$sub_menu1,$sub_menu2,$chkPrevileges)
+    public function saveSubMenu($menu,$sub_menu1,$sub_menu2,$chkPrevileges,$Slug,$Controller)
     {
         $sub_menu2 = ($sub_menu2 == '') ? 'empty' : $sub_menu2;
         // print_r($chkPrevileges);
@@ -477,6 +477,8 @@ class M_master extends CI_Model {
         $dataSave['ID_Menu'] = $menu;
         $dataSave['SubMenu1'] = ucwords($sub_menu1);
         $dataSave['SubMenu2'] = ucwords($sub_menu2);
+        $dataSave['Slug'] = $Slug;
+        $dataSave['Controller'] = $Controller;
 
         for ($i=0; $i < count($chkPrevileges) ; $i++) {
             switch ($chkPrevileges[$i]) {
@@ -526,12 +528,31 @@ class M_master extends CI_Model {
         $delete = '';
         $ID = '';
         $query = '';
+        $Slug = '';
+        $Controller = '';
+
         if(array_key_exists("Menu",$input))
         {
             $ID_Menu = $input['ID_Menu'];
             $Menu = $input['Menu'];
             $sql = "update db_admission.cfg_menu set Menu = ? where ID = ? ";
             $query=$this->db->query($sql, array($Menu,$ID_Menu));
+        }
+
+        if(array_key_exists("Slug",$input))
+        {
+            $ID_Menu = $input['ID_Menu'];
+            $Slug = $input['Slug'];
+            $sql = "update db_admission.cfg_sub_menu set Slug = ? where ID = ? ";
+            $query=$this->db->query($sql, array($Slug,$ID_Menu));
+        }
+
+        if(array_key_exists("Controller",$input))
+        {
+            $ID_Menu = $input['ID_Menu'];
+            $Controller = $input['Controller'];
+            $sql = "update db_admission.cfg_sub_menu set Controller = ? where ID = ? ";
+            $query=$this->db->query($sql, array($Controller,$ID_Menu));
         }
 
         if(array_key_exists("SubMenu1",$input))
@@ -758,14 +779,31 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
     public function getMenuUser($NIP)
     {
-        $sql = 'SELECT b.Menu from db_employees.employees as a
+        $sql = 'SELECT b.ID as ID_menu,b.Icon,c.ID,b.Menu,c.SubMenu1,c.SubMenu2,d.`read`,d.`update`,d.`write`,d.`delete`,c.Slug,c.Controller 
+                from db_employees.employees as a
                 join db_admission.previleges as d
                 on a.NIP = d.NIP
                 join db_admission.cfg_sub_menu as c
                 on d.ID_cfg_sub_menu = c.ID
                 join db_admission.cfg_menu as b
-                on b.ID = c.ID_Menu where a.NIP = ? GROUP by b.Menu';
+                on b.ID = c.ID_Menu where a.NIP = ? GROUP by b.id';
         $query=$this->db->query($sql, array($NIP))->result_array();
+        return $query;
+    }
+
+    public function getSubmenu2BaseSubmenu1($submenu1)
+    {
+        $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
+        from db_admission.cfg_sub_menu as a  join db_admission.previleges as b on a.ID = b.ID_cfg_sub_menu where a.SubMenu1 = ? and b.NIP = ?';
+        $query=$this->db->query($sql, array($submenu1,$this->session->userdata('NIP')))->result_array();
+        return $query;
+    }
+
+    public function getSubmenu1BaseMenu($ID_Menu)
+    {
+        $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
+        from db_admission.cfg_sub_menu as a join db_admission.previleges as b on a.ID = b.ID_cfg_sub_menu  where a.ID_Menu = ? and b.NIP = ? group by SubMenu1';
+        $query=$this->db->query($sql, array($ID_Menu,$this->session->userdata('NIP')))->result_array();
         return $query;
     }
 
@@ -1831,5 +1869,166 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         //print_r($sql);
         $query=$this->db->query($sql, array())->result_array();
         return $query;
+    }
+
+    public function chkAuthDB_Base_URL($URL)
+    {
+        $a = explode('/', $URL);
+        $b = count($a) - 1;
+        $URISlug = 'and a.Slug = "'.$URL.'"';
+        if ($a[$b] == 1) {
+            $URISlug = '';
+            for ($i=0; $i < count($b); $i++) { 
+                $URISlug .= $a[$i].'/';
+            }
+            $URISlug = 'and a.Slug like "%'.$URISlug.'%"';
+        }
+        $sql = "select b.read,b.write,b.update,b.delete from db_admission.cfg_sub_menu as a join db_admission.previleges as b on a.ID = b.ID_cfg_sub_menu 
+        where b.NIP = ? ".$URISlug;
+        //print_r($sql);
+        $query=$this->db->query($sql, array($this->session->userdata('NIP')))->result_array();
+        return $query;
+    }
+
+    public function checkAuth_user()
+    {
+        $base_url = base_url();
+        $currentURL = current_url();
+        $URL = str_replace($base_url,"",$currentURL);
+        
+        // get Access URL
+        $getDataSess  = $this->session->userdata('menu_admission_grouping');
+        $access = array(
+            'read' => 1,
+            'write' => 1,
+            'update' => 1,
+            'delete' => 1,
+        );
+
+        $p = $this->chkAuthDB_Base_URL($URL);
+        if (count($p) > 0 ) {
+            $access = array(
+                'read' => $p[0]['read'],
+                'write' => $p[0]['write'],
+                'update' => $p[0]['update'],
+                'delete' => $p[0]['delete'],
+            );
+        }
+
+        $html = '';
+        if ($access['read'] == 0) {
+            $html .= '<script type="text/javascript">
+                 var waitForEl = function(selector, callback) {
+                   if (jQuery(selector).length) {
+                     callback();
+                   } else {
+                     setTimeout(function() {
+                       waitForEl(selector, callback);
+                     }, 100);
+                   }
+                 };
+
+                 waitForEl(".btn-read", function() {
+                   $(".btn-read").remove();
+                 });
+
+                 $(document).ready(function () {
+                     $(".btn-read").remove();
+                     $(document).ajaxComplete(function () {
+                         $(".btn-read").remove();
+                     });
+                 });
+                 </script>
+            ';
+            echo $html;
+        }
+
+        if ($access['write'] == 0) {
+            $html .= '<script type="text/javascript">
+                 var waitForEl = function(selector, callback) {
+                   if (jQuery(selector).length) {
+                     callback();
+                   } else {
+                     setTimeout(function() {
+                       waitForEl(selector, callback);
+                     }, 100);
+                   }
+                 };
+
+                 waitForEl(".btn-add", function() {
+                   $(".btn-add").remove();
+                 });
+
+                 $(document).ready(function () {
+                     $(".btn-add").remove();
+                     $(document).ajaxComplete(function () {
+                        $(".btn-add").remove();
+                     });
+                 });
+                 </script>
+            ';
+            echo $html;
+        }
+        if ($access['update'] == 0) {
+            $html .= '<script type="text/javascript">
+                 var waitForEl = function(selector, callback) {
+                   if (jQuery(selector).length) {
+                     callback();
+                   } else {
+                     setTimeout(function() {
+                       waitForEl(selector, callback);
+                     }, 100);
+                   }
+                 };
+
+                 waitForEl(".btn-edit", function() {
+                   $(".btn-edit").remove();
+                 });
+
+                 $(document).ready(function () {
+                     $(".btn-edit").remove();
+                     $(document).ajaxComplete(function () {
+                              $(".btn-edit").remove();
+                     });
+                 });
+                 </script>
+            ';
+            echo $html;
+        }
+        if ($access['delete'] == 0) {
+            $html .= '<script type="text/javascript">
+                 var waitForEl = function(selector, callback) {
+                   if (jQuery(selector).length) {
+                     callback();
+                   } else {
+                     setTimeout(function() {
+                       waitForEl(selector, callback);
+                     }, 100);
+                   }
+                 };
+
+                 waitForEl(".btn-delete", function() {
+                   $(".btn-delete").remove();
+                 });
+
+                 waitForEl(".btn-Active", function() {
+                   $(".btn-Active").remove();
+                 });
+
+                 $(document).ready(function () {
+                    $(".btn-delete").remove();
+                    $(".btn-Active").remove();
+                    $(document).ajaxComplete(function () {
+                        $(".btn-delete").remove();
+                        $(".btn-Active").remove();
+                    });
+                     
+                 });
+                 
+                 </script>
+            ';
+            echo $html;
+        }
+        return $html;
     }
 }

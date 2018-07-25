@@ -6,7 +6,7 @@
                 <h4 class="header"><i class="icon-reorder"></i>Master Event</h4>
                 <div class="toolbar no-padding">
                     <div class="btn-group">
-                      <span data-smt="" class="btn btn-xs btn-add-event">
+                      <span data-smt="" class="btn btn-xs btn-add-event btn-add">
                         <i class="icon-plus"></i> Add Event
                        </span>
                     </div>

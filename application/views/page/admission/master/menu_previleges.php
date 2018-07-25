@@ -128,12 +128,16 @@
         var selectMenu = $('#selectMenu').val();
         var sub_menu1 = $("#sub_menu1").val();
         var sub_menu2 = $("#sub_menu2").val();
+        var Slug = $("#Slug").val();
+        var Controller = $("#Controller").val();
         var chkPrevileges = getAllCheckbox('chkPrevileges');
         var data = {
                     selectMenu : selectMenu,
                     sub_menu1 : sub_menu1,
                     sub_menu2 : sub_menu2,
                     chkPrevileges : chkPrevileges,
+                    Slug : Slug,
+                    Controller : Controller
                     };
         var token = jwt_encode(data,"UAP)(*");
         if (validation2(data)) {
@@ -208,14 +212,16 @@
         var table = '<table class="table table-striped table-bordered table-hover table-checkable datatable">'+
         '<thead>'+
             '<tr>'+
-                '<th style="width: 106px;">Menu</th>'+
-                '<th style="width: 15px;">Sub Menu 1</th>'+
-                '<th style="width: 15px;">Sub Menu 2</th>'+
-                '<th style="width: 15px;">Read</th>'+
-                '<th style="width: 15px;">Write</th>'+
-                '<th style="width: 15px;">Update</th>'+
-                '<th style="width: 15px;">Delete</th>'+
-                '<th style="width: 15px;">Action</th>'+
+                '<th style="width: 10%;">Menu</th>'+
+                '<th style="width: 13%;">Sub Menu 1</th>'+
+                '<th style="width: 13%;">Sub Menu 2</th>'+
+                '<th style="width: 21%;">URI</th>'+
+                '<th style="width: 21%;">Controler</th>'+
+                '<th style="width: 4%;">Read</th>'+
+                '<th style="width: 4%;">Write</th>'+
+                '<th style="width: 4%;">Update</th>'+
+                '<th style="width: 4%;">Delete</th>'+
+                '<th style="width: 4%;">Action</th>'+
             '</tr>'+
         '</thead>'+
         '<tbody>'+
@@ -247,6 +253,8 @@
                         '<td><input type = "text" class = "form-control Menu" value ="'+response[i]['Menu']+'" id-key = "'+response[i]['ID_Menu']+'"><div class = "hide">'+response[i]['Menu']+'</div></td>'+
                         '<td><input type = "text" class = "form-control SubMenu1" value ="'+response[i]['SubMenu1']+'" id-key = "'+response[i]['ID']+'"><div class = "hide">'+response[i]['SubMenu1']+'</div></td>'+
                         '<td><input type = "text" class = "form-control SubMenu2" value ="'+response[i]['SubMenu2']+'" id-key = "'+response[i]['ID']+'"><div class = "hide">'+response[i]['SubMenu2']+'<div></td>'+
+                        '<td><input type = "text" class = "form-control Slug" value ="'+response[i]['Slug']+'" id-key = "'+response[i]['ID']+'"><div class = "hide">'+response[i]['Slug']+'<div></td>'+
+                        '<td><input type = "text" class = "form-control Controller" value ="'+response[i]['Controller']+'" id-key = "'+response[i]['ID']+'"><div class = "hide">'+response[i]['Controller']+'<div></td>'+
                         '<td><select class = "read" id-key = "'+response[i]['ID']+'"><option value = "'+response[i]['read']+'">'+read+'</option><option value = "1">True</option><option value = "0">False</option></select>'+'</td>'+
                         '<td><select class = "write" id-key = "'+response[i]['ID']+'"><option value = "'+response[i]['write']+'">'+write+'</option><option value = "1">True</option><option value = "0">False</option></select>'+'</td>'+
                         '<td><select class = "update" id-key = "'+response[i]['ID']+'"><option value = "'+response[i]['update']+'">'+update+'</option><option value = "1">True</option><option value = "0">False</option></select>'+'</td>'+
@@ -259,6 +267,58 @@
             LoaddataTableStandard('.datatable');
         })
     }
+
+    $(document).on('keypress','.Controller', function (e) {
+        var keycode = (e.keyCode ? e.keyCode : e.which);
+        if (keycode == '13') {
+            var ID_Menu = $(this).attr('id-key');
+            var Controller = $(this).val();
+            var url = base_url_js+'admission/master-config/menu-previleges/get_submenu/update';
+            var data = {
+                        ID_Menu : ID_Menu,
+                        Controller : Controller,
+                        };
+            var token = jwt_encode(data,"UAP)(*");          
+            $.post(url,{token:token},function (data_json) {
+                // jsonData = data_json;
+                // var obj = JSON.parse(data_json); 
+                // console.log(obj);
+            }).done(function() {
+              //loadMenuPrevileges(loadDatamenuPrevileges);
+              //loadSubMenu();
+            }).fail(function() {
+              toastr.error('The Database connection error, please try again', 'Failed!!');
+            }).always(function() {
+
+            });
+        }
+    });
+
+    $(document).on('keypress','.Slug', function (e) {
+        var keycode = (e.keyCode ? e.keyCode : e.which);
+        if (keycode == '13') {
+            var ID_Menu = $(this).attr('id-key');
+            var Slug = $(this).val();
+            var url = base_url_js+'admission/master-config/menu-previleges/get_submenu/update';
+            var data = {
+                        ID_Menu : ID_Menu,
+                        Slug : Slug,
+                        };
+            var token = jwt_encode(data,"UAP)(*");          
+            $.post(url,{token:token},function (data_json) {
+                // jsonData = data_json;
+                // var obj = JSON.parse(data_json); 
+                // console.log(obj);
+            }).done(function() {
+              //loadMenuPrevileges(loadDatamenuPrevileges);
+              //loadSubMenu();
+            }).fail(function() {
+              toastr.error('The Database connection error, please try again', 'Failed!!');
+            }).always(function() {
+
+            });
+        }
+    });
 
     $(document).on('keypress','.Menu', function (e) {
         var keycode = (e.keyCode ? e.keyCode : e.which);
@@ -302,8 +362,8 @@
                 // var obj = JSON.parse(data_json); 
                 // console.log(obj);
             }).done(function() {
-              loadMenuPrevileges(loadDatamenuPrevileges);
-              loadSubMenu();
+              //loadMenuPrevileges(loadDatamenuPrevileges);
+              //loadSubMenu();
             }).fail(function() {
               toastr.error('The Database connection error, please try again', 'Failed!!');
             }).always(function() {
@@ -328,8 +388,8 @@
                 // var obj = JSON.parse(data_json); 
                 // console.log(obj);
             }).done(function() {
-              loadMenuPrevileges(loadDatamenuPrevileges);
-              loadSubMenu();
+              //loadMenuPrevileges(loadDatamenuPrevileges);
+              //loadSubMenu();
             }).fail(function() {
               toastr.error('The Database connection error, please try again', 'Failed!!');
             }).always(function() {
@@ -352,8 +412,8 @@
             // var obj = JSON.parse(data_json); 
             // console.log(obj);
         }).done(function() {
-          loadMenuPrevileges(loadDatamenuPrevileges);
-          loadSubMenu();
+          //loadMenuPrevileges(loadDatamenuPrevileges);
+          //loadSubMenu();
         }).fail(function() {
           toastr.error('The Database connection error, please try again', 'Failed!!');
         }).always(function() {
@@ -375,8 +435,8 @@
             // var obj = JSON.parse(data_json); 
             // console.log(obj);
         }).done(function() {
-          loadMenuPrevileges(loadDatamenuPrevileges);
-          loadSubMenu();
+          //loadMenuPrevileges(loadDatamenuPrevileges);
+          //loadSubMenu();
         }).fail(function() {
           toastr.error('The Database connection error, please try again', 'Failed!!');
         }).always(function() {
@@ -398,8 +458,8 @@
             // var obj = JSON.parse(data_json); 
             // console.log(obj);
         }).done(function() {
-          loadMenuPrevileges(loadDatamenuPrevileges);
-          loadSubMenu();
+          //loadMenuPrevileges(loadDatamenuPrevileges);
+          //loadSubMenu();
         }).fail(function() {
           toastr.error('The Database connection error, please try again', 'Failed!!');
         }).always(function() {
@@ -421,8 +481,8 @@
             // var obj = JSON.parse(data_json); 
             // console.log(obj);
         }).done(function() {
-          loadMenuPrevileges(loadDatamenuPrevileges);
-          loadSubMenu();
+          //loadMenuPrevileges(loadDatamenuPrevileges);
+          //loadSubMenu();
         }).fail(function() {
           toastr.error('The Database connection error, please try again', 'Failed!!');
         }).always(function() {
@@ -442,8 +502,8 @@
             // var obj = JSON.parse(data_json); 
             // console.log(obj);
         }).done(function() {
-          loadMenuPrevileges(loadDatamenuPrevileges);
-          loadSubMenu();
+          //loadMenuPrevileges(loadDatamenuPrevileges);
+          //loadSubMenu();
         }).fail(function() {
           toastr.error('The Database connection error, please try again', 'Failed!!');
         }).always(function() {
@@ -760,7 +820,7 @@
                 // var obj = JSON.parse(data_json); 
                 // console.log(obj);
             }).done(function() {
-              loadMenuPrevilegesUser(loadDatamenuPrevilegesUser);
+              //loadMenuPrevilegesUser(loadDatamenuPrevilegesUser);
             }).fail(function() {
               toastr.error('The Database connection error, please try again', 'Failed!!');
             }).always(function() {
@@ -791,7 +851,7 @@
                 // var obj = JSON.parse(data_json); 
                 // console.log(obj);
             }).done(function() {
-              loadMenuPrevilegesUser(loadDatamenuPrevilegesUser);
+              //loadMenuPrevilegesUser(loadDatamenuPrevilegesUser);
             }).fail(function() {
               toastr.error('The Database connection error, please try again', 'Failed!!');
             }).always(function() {
@@ -822,7 +882,7 @@
                 // var obj = JSON.parse(data_json); 
                 // console.log(obj);
             }).done(function() {
-              loadMenuPrevilegesUser(loadDatamenuPrevilegesUser);
+              //loadMenuPrevilegesUser(loadDatamenuPrevilegesUser);
             }).fail(function() {
               toastr.error('The Database connection error, please try again', 'Failed!!');
             }).always(function() {
@@ -853,7 +913,7 @@
                 // var obj = JSON.parse(data_json); 
                 // console.log(obj);
             }).done(function() {
-              loadMenuPrevilegesUser(loadDatamenuPrevilegesUser);
+              //loadMenuPrevilegesUser(loadDatamenuPrevilegesUser);
             }).fail(function() {
               toastr.error('The Database connection error, please try again', 'Failed!!');
             }).always(function() {

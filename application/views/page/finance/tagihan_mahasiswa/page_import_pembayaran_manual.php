@@ -46,7 +46,7 @@
 
 <script type="text/javascript">
 	$(document).ready(function () {
-	    loadSelectOptionPaymentTypeMHS('#selectPTID','');
+	    loadSelectOptionPaymentTypeAll('#selectPTID','');
 	    loadSelectOptionSemester('#selectSemester','');
 	});
 

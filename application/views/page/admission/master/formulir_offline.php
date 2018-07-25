@@ -51,7 +51,7 @@
                                 </select>
                             </div>
                             <div class="col-xs-3">
-                                <button class="btn btn-inverse btn-notification" id="generate">Generate Formulir Code</button>
+                                <button class="btn btn-inverse btn-notification btn-add" id="generate">Generate Formulir Code</button>
                             </div>
                         </div>
                     </div>

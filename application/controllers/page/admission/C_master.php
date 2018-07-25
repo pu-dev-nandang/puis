@@ -11,6 +11,7 @@ class C_master extends Admission_Controler {
         $this->load->model('m_sendemail');
         $this->load->model('master/m_master');
         $this->data['department'] = parent::__getDepartement();
+        //$this->checkAuth_user();
     }
 
     public function page_set_tgl_register()
@@ -671,8 +672,10 @@ class C_master extends Admission_Controler {
         $menu = $input['selectMenu'];
         $sub_menu1 = $input['sub_menu1'];
         $sub_menu2 = $input['sub_menu2'];
+        $Slug = $input['Slug'];
+        $Controller = $input['Controller'];
         $chkPrevileges = $input['chkPrevileges'];
-        $this->m_master->saveSubMenu($menu,$sub_menu1,$sub_menu2,$chkPrevileges);
+        $this->m_master->saveSubMenu($menu,$sub_menu1,$sub_menu2,$chkPrevileges,$Slug,$Controller);
     }
 
     public function get_submenu_show()
