@@ -391,6 +391,10 @@
             var url = base_url_js+'api/__checkSchedule';
             $.post(url,{token:token},function (json_result) {
 
+                // console.log(json_result);
+
+
+
                 var MKID_ = $('#formMKID').val();
                 var MKCode_ = $('#formMKCode').val();
 
@@ -413,19 +417,34 @@
                         '                    </div>');
 
                     var ol = $('#ulbentrok'+ID);
+                    var ArrScheduleID = [];
                     for(var i=0;i<json_result.length;i++){
                         var data = json_result[i];
-                        ol.append('<li>' +
-                            'Group <strong style="color:#333;">'+data.ClassGroup+'</strong> : <span style="color: blue;">'+data.Room+' | '+daysEng[(parseInt(data.DayID)-1)]+' '+data.StartSessions+' - '+data.EndSessions+'</span>' +
-                            '<ul style="color: #607d8b;" id="dtMK'+i+'"></ul>' +
-                            '</li>');
 
-                        var ul = $('#dtMK'+i);
-                        for(var m=0;m<data.DetailsCourse.length;m++){
-                            var mk_ = data.DetailsCourse[m];
-                            ul.append('<li>'+mk_.MKCode+' | '+mk_.NameEng+'</li>');
-                        }
+                        ArrScheduleID.push(data.ScheduleID);
+                            ol.append('<li>' +
+                                'Group <strong style="color:#333;">'+data.ClassGroup+'</strong> : <span style="color: blue;">'+data.Room+' | '+daysEng[(parseInt(data.DayID)-1)]+' '+data.StartSessions+' - '+data.EndSessions+'</span>' +
+                                '<ul style="color: #607d8b;" id="dtMK'+i+'"></ul>' +
+                                '</li>');
+
+                            var ul = $('#dtMK'+i);
+                            for(var m=0;m<data.DetailsCourse.length;m++){
+                                var mk_ = data.DetailsCourse[m];
+                                ul.append('<li>'+mk_.MKCode+' | '+mk_.NameEng+'</li>');
+                            }
+
+
+
                     }
+
+                    // console.log();
+                    if(json_result.length==1 && $.inArray(ScheduleID,ArrScheduleID)!=-1){
+                        $('#btnSavejadwal,#addNewSesi').prop('disabled',false);
+                        $('.trNewSesi'+ID).css('background','#ffffff');
+                        $(element).html('');
+                    }
+
+
                 }
             });
         }
