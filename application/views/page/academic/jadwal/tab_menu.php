@@ -502,7 +502,7 @@
         $.post(url,{token:token},function (result) {
             toastr.success('Data Removed','Sucess!');
             setTimeout(function () {
-                window.location.href = base_url_js+'academic/jadwal';
+                window.location.href = base_url_js+'academic/timetables';
             },1500);
         });
     });
