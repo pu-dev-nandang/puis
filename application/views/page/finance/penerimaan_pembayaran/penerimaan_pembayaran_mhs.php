@@ -105,7 +105,7 @@
     $(document).ready(function () {
         loadSelectOptionCurriculum('#selectCurriculum','');
         loadSelectOptionBaseProdi('#selectProdi','');
-        loadSelectOptionPaymentTypeMHS('#selectPTID','');
+        loadSelectOptionPaymentTypeAll('#selectPTID','');
         loadSelectOptionSemester('#selectSemester',0);
         loadData(1);
         getReloadTableSocket();

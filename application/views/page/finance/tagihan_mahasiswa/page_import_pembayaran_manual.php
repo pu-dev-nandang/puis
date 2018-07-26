@@ -37,6 +37,12 @@
 								<button class="btn btn-inverse btn-notification" id="btn-proses">Proses</button>
 							</div>
 						</div>
+						<div class="form-group">
+							<div class="form-check col-xs-2">
+							    <input type="checkbox" class="form-check-input" id="maba">
+							    <label class="form-check-label" for="exampleCheck1">Mahasiswa Baru</label>
+							</div>
+						</div>
 					<!-- </div> -->
 				</div>
 			</div>
@@ -129,9 +135,18 @@
 			var fileData = document.getElementById("ExFile").files[0];
 			var url = base_url_js + "finance/tagihan-mhs/submit_import_pembayaran_manual";
 			var selectKategory = $("#selectKategory").val();
+			if ($('#maba').is(':checked')) {
+				var maba = 1;
+			}
+			else
+			{
+				var maba = 0;
+			}
+
 			form_data.append('fileData',fileData);
 			form_data.append('selectPTID',PTID);
 			form_data.append('selectSemester',selectSemester);
+			form_data.append('maba',maba);
 		  	$.ajax({
 		  	  type:"POST",
 		  	  url:url,
