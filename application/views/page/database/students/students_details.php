@@ -44,7 +44,7 @@
 <script>
 
     $(document).ready(function () {
-        load_students();
+        setTimeout(function (args) { load_students(); },500);
     });
 
     function load_students() {
