@@ -88,28 +88,35 @@
         $('input[type=checkbox][data-toggle=toggle]').bootstrapToggle();
         loadSelectOptionProgramCampus('#filterProgramCampus','');
 
-        $('#filterSemester').append('<option value="" disabled selected>-- Academic Year --</option>' +
-            '                <option disabled>-----------------</option>');
+        // $('#filterSemester').append('<option value="" disabled selected>-- Academic Year --</option>' +
+        //     '                <option disabled>-----------------</option>');
         loSelectOptionSemester('#filterSemester','');
 
         loadSelectOptionBaseProdi('#filterBaseProdi','');
         // loadSelectOPtionAllSemester('#filterSemesterSchedule','');
 
         getStudents();
+
+        setTimeout(function () {
+            loadSemester();
+            setTimeout(function () { getStudents(); },500);
+            },500);
     });
 
     $(document).on('change','#filterSemester',function () {
-        var Semester = $('#filterSemester').val();
-        var SemesterID = (Semester!='' && Semester!= null) ? Semester.split('.')[0] : '';
-        $('#filterSemesterSchedule').empty();
-        $('#filterSemesterSchedule').append('<option value="" disabled selected>-- Semester --</option>' +
-            '                <option disabled>------</option>');
-        loadSelectOPtionAllSemester('#filterSemesterSchedule','',SemesterID,SemesterAntara);
-        // filterSchedule();
-
+        loadSemester();
     });
 
-    $(document).on('change','#filterBaseProdi,#filterSemesterSchedule',function () {
+    function loadSemester() {
+        var Semester = $('#filterSemester').val();
+        if(Semester!='' && Semester!=null){
+            var SemesterID = (Semester!='' && Semester!= null) ? Semester.split('.')[0] : '';
+            $('#filterSemesterSchedule').empty();
+            loadSelectOPtionAllSemester('#filterSemesterSchedule','',SemesterID,SemesterAntara);
+        }
+    }
+
+    $(document).on('change','#filterSemester,#filterBaseProdi,#filterSemesterSchedule',function () {
         getStudents();
     });
 
@@ -146,6 +153,10 @@
         };
         var url = base_url_js+'api/__crudStudyPlanning';
         var token = jwt_encode(data,'UAP)(*');
+
+        ScheduleExist = [];
+        KRSDraf = [];
+
         $.post(url,{token:token},function (jsonResult) {
 
             var dataStd = jsonResult;
@@ -341,7 +352,6 @@
 
                     var bg = (sc.SPID!=null) ? '<span class="btn btn-default btn-default-warning btn-sm"><b>Ul</b></span>' : '<span class="btn btn-default btn-default-primary btn-sm"><b>Br</b></span>';
 
-                    console.log(ScheduleExist);
                     var typesp = (sc.SPID!=null) ? 'Ul' : 'Br';
                     var btnAct='<button class="btn btn-sm btn-danger btn-delete-krs" id="btnDeleteKRS'+sc.ID+'" data-semesterid="'+dataStd.DetailOfferings.SemesterID+'" data-credit="'+sc.Credit+'" data-cdid="'+sc.CDID+'" data-group="'+sc.ClassGroup+'" data-id="'+sc.ID+'" data-typesp="'+typesp+'"><i class="fa fa-trash"></i></button>';
                     if(ScheduleExist.indexOf(sc.ID) == -1){
@@ -464,7 +474,6 @@
 
             var url = base_url_js + 'api/__crudStudyPlanning';
             $.post(url, {token: token}, function (jsonResult) {
-            // console.log(jsonResult);
 
             var tr = $('#dataStudents');
             var no = 1;
@@ -579,6 +588,7 @@
 
         $.post(url,{token:token},function (jsonResult) {
             showDataKRSStudent();
+
             setTimeout(function () {
                 $('#btnActKRSOnline'+ScheduleID).html('<button class="btn btn-success btn-sm btn-add-krs"' +
                     ' id="btnAddKRS'+ScheduleID+'" data-semesterid="'+SemesterID+'" data-credit="'+Credit+'" ' +
@@ -627,6 +637,7 @@
         // return false;
 
         var process = [];
+
         // Dari Lokal Dulu
         for(var d=0;d<DrafArr.length;d++){
 
