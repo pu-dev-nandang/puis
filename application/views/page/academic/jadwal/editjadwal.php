@@ -297,7 +297,7 @@
                             $('#formTeamTeaching').prop('disabled',false);
                         }
 
-                        window.location.href= base_url_js+'academic/jadwal';
+                        window.location.href= base_url_js+'academic/timetables';
                     },3000);
 
                 });
@@ -409,8 +409,8 @@
                         '                            <div class="alert alert-danger" role="alert">' +
                         '                                <b><i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-right: 5px;"></i> Jadwal bentrok</b>, Silahklan rubah : Ruang / Hari / Jam' +
                         '                                <hr style="margin-bottom: 3px;margin-top: 10px;"/>' +
-                        '                                <ol id="ulbentrok'+ID+'">' +
-                        '                                </ol>' +
+                        '                                <ul id="ulbentrok'+ID+'">' +
+                        '                                </ul>' +
                         '                            </div>' +
                         '                        </div>' +
                         '' +
@@ -422,7 +422,7 @@
                         var data = json_result[i];
 
                         ArrScheduleID.push(data.ScheduleID);
-                            ol.append('<li>' +
+                            ol.append('<li id="listSc'+data.ScheduleID+'">' +
                                 'Group <strong style="color:#333;">'+data.ClassGroup+'</strong> : <span style="color: blue;">'+data.Room+' | '+daysEng[(parseInt(data.DayID)-1)]+' '+data.StartSessions+' - '+data.EndSessions+'</span>' +
                                 '<ul style="color: #607d8b;" id="dtMK'+i+'"></ul>' +
                                 '</li>');
@@ -442,6 +442,8 @@
                         $('#btnSavejadwal,#addNewSesi').prop('disabled',false);
                         $('.trNewSesi'+ID).css('background','#ffffff');
                         $(element).html('');
+                    } else if($.inArray(ScheduleID,ArrScheduleID)!=-1){
+                        $('#listSc'+ScheduleID).addClass('hide');
                     }
 
 
