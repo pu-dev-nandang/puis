@@ -71,8 +71,11 @@ abstract class Globalclass extends MyAbstract{
             $this->load->view('template/userfalse',$data);
         }
 
+    }
 
-
+    public function page404(){
+        $data['include'] = $this->load->view('template/include','',true);
+        $this->load->view('template/404page',$data);
     }
 
     public function blank_temp($content){

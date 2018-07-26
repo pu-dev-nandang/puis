@@ -473,11 +473,6 @@
         };
         var token = jwt_encode(data,'UAP)(*');
         $.post(url,{token:token},function (jsonResult) {
-
-            // console.log(jsonResult);
-            // $(element).append('<option value="" disabled selected>--- Select Semester ---</option>' +
-            //     '                <option disabled>------------------------------------------</option>');
-
             for(var i=0;i<jsonResult.length;i++){
                 var color = (jsonResult[i].Semester>8) ? 'red' : '#333';
                 if(jsonResult[i].Semester<=14){
@@ -485,10 +480,28 @@
                 }
 
             }
-        })
+        });
 
-        // $('#formSemester').append('<option value="" disabled selected>--- Select Semester ---</option>' +
-        //     '                <option disabled>------------------------------------------</option>');
+    }
+
+    function loadSelectOptionStatusStudent(element,selected) {
+
+        var url = base_url_js+'api/__crudStatusStudents';
+        var data = {
+            action : 'read'
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+
+        $.post(url,{token:token},function (jsonResult) {
+            if(jsonResult.length>0){
+                for(var s=0;s<jsonResult.length;s++){
+                    var d = jsonResult[s];
+                    $(element).append('<option value="'+d.ID+'">'+d.Description+'</option>');
+                }
+            }
+
+        });
 
     }
 

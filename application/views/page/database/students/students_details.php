@@ -6,12 +6,7 @@
         text-align: center;
     }
 </style>
-<div class="" style="margin-bottom: 15px;padding: 10px;text-align: right;">
-    <i class="fa fa-circle" style="color: #03a9f4;"> Lulus</i> |
-    <i class="fa fa-circle" style="color: green;"> Aktif</i>  |
-    <i class="fa fa-circle" style="color: #ff9800;"> Cuti</i>  |
-    <i class="fa fa-circle" style="color: red;"> Non-Aktif / Mengundurkan Diri / DO</i>
-</div>
+
 <div class="widget box">
     <div class="widget-header">
         <h4 class=""><i class="icon-reorder"></i> Students</h4>
@@ -33,6 +28,7 @@
                     <th style="width: 5%;">Photo</th>
                     <th>Name</th>
                     <th style="width: 5%;">Gender</th>
+                    <th style="width: 5%;">Action</th>
                     <th style="width: 10%;">Login Portal</th>
 <!--                    <th class="th-center">Program Study</th>-->
                     <th style="width: 5%;">Status</th>
@@ -55,6 +51,7 @@
 
         var dataYear = '<?php echo $dataForm["Year"] ?>';
         var dataProdiID = '<?php echo $dataForm["ProdiID"] ?>';
+        var dataStatus = '<?php echo $dataForm["StatusStudents"] ?>';
 
         var dataTable = $('#tableStudents').DataTable( {
             "processing": true,
@@ -62,7 +59,7 @@
             "iDisplayLength" : 10,
             "ordering" : false,
             "ajax":{
-                url : base_url_js+"api/__getStudents?dataYear="+dataYear+"&&dataProdiID="+dataProdiID, // json datasource
+                url : base_url_js+"api/__getStudents?dataYear="+dataYear+"&&dataProdiID="+dataProdiID+'&&s='+dataStatus, // json datasource
                 ordering : false,
                 type: "post",  // method  , by default get
                 error: function(){  // error handling
