@@ -250,7 +250,8 @@ class C_api extends CI_Controller {
                 )->result_array();
 
         $sql = 'SELECT s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, s.StatusStudentID, 
-                          ss.Description AS StatusStudent, ast.Password, ast.Password_Old, ast.Status AS StatusAuth
+                          ss.Description AS StatusStudent, ast.Password, ast.Password_Old, ast.Status AS StatusAuth, 
+                          ast.EmailPU
                           FROM '.$db_.'.students s 
                           LEFT JOIN db_academic.program_study ps ON (ps.ID = s.ProdiID)
                           LEFT JOIN db_academic.status_student ss ON (ss.ID = s.StatusStudentID)
@@ -298,8 +299,8 @@ class C_api extends CI_Controller {
                                   <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                                     <li><a href="javascript:void(0);">Edit Student</a></li>
                                     <li role="separator" class="divider"></li>
-                                    <li><a href="javascript:void(0);" class="btn-reset-password" data-npm="'.$row["NPM"].'">Reset Password</a></li>
-                                    <li><a href="javascript:void(0);" class="btn-change-status" data-npm="'.$row["NPM"].'">Change Status</a></li>
+                                    <li><a href="javascript:void(0);" class="btn-reset-password" data-npm="'.$row["NPM"].'" data-name="'.$row["Name"].'" data-statusid="'.$row['StatusStudentID'].'">Reset Password</a></li>
+                                    <li><a href="javascript:void(0);" class="btn-change-status" data-emailpu="'.$row["EmailPU"].'" data-year="'.$dataYear.'" data-npm="'.$row["NPM"].'" data-name="'.$row["Name"].'" data-statusid="'.$row['StatusStudentID'].'">Change Status</a></li>
                                     
                                   </ul>
                                 </div>';
@@ -694,6 +695,55 @@ class C_api extends CI_Controller {
             if($data_arr['action']=='read'){
                 $data = $this->db->order_by('ID', 'ASC')->get('db_academic.status_student')->result_array();
                 return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='resetPassword'){
+
+                $dataUpdate = array(
+                    'Password_Old' => md5($data_arr['NewPassword']),
+                    'Status' => '-1'
+                );
+                $this->db->where('NPM', $data_arr['NPM']);
+                $this->db->update('db_academic.auth_students', $dataUpdate);
+                return print_r(1);
+            }
+            else if($data_arr['action']=='changeStatus'){
+
+                // Cek apakah data NPM ada di auth_students
+                $dataAuth = $this->db->get_where('db_academic.auth_students',array(
+                                                    'NPM' => $data_arr['NPM']
+                                                ),1)->result_array();
+
+
+                $statusLogin = ($data_arr['StatusID']=='3') ? '1' : '0';
+                if(count($dataAuth)>0){
+                    $arrUpdate = array(
+                        'StatusStudentID' => $data_arr['StatusID'],
+                        'Status' => $statusLogin
+                    );
+                    $this->db->where('NPM', $data_arr['NPM']);
+                    $this->db->update('db_academic.auth_students', $arrUpdate);
+                } else {
+                    $dataInsert = array(
+                        'NPM' => $data_arr['NPM'],
+                        'Year' => $data_arr['dataYear'],
+                        'EmailPU' => $data_arr['EmailPU'],
+                        'StatusStudentID' => $data_arr['StatusID'],
+                        'Status' => $statusLogin
+                    );
+                    $this->db->insert('db_academic.auth_students',$dataInsert);
+                }
+
+                // Update di table students
+                $da_ = "ta_".$data_arr['dataYear'];
+                $arrUpdateStd = array(
+                    'StatusStudentID' => $data_arr['StatusID']
+                );
+                $this->db->where('NPM', $data_arr['NPM']);
+                $this->db->update($da_.'.students', $arrUpdateStd);
+
+                return print_r(1);
+
+
             }
 
         }

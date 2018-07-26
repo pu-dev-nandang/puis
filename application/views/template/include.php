@@ -497,7 +497,8 @@
             if(jsonResult.length>0){
                 for(var s=0;s<jsonResult.length;s++){
                     var d = jsonResult[s];
-                    $(element).append('<option value="'+d.ID+'">'+d.Description+'</option>');
+                    var sc = (selected==d.ID) ? 'selected' : '';
+                    $(element).append('<option value="'+d.ID+'" '+sc+'>'+d.Description+'</option>');
                 }
             }
 
