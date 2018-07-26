@@ -743,6 +743,7 @@ class C_admission extends Admission_Controler {
       {
         $path = $_FILES["fileData"]["tmp_name"];
         $arr_insert = array();
+        $arr_insert_auth = array();
         include APPPATH.'third_party/PHPExcel/PHPExcel.php';
         $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
         $excel2 = $excel2->load($path); // Empty Sheet
@@ -768,8 +769,9 @@ class C_admission extends Admission_Controler {
         if (count($Q_getLastNPM)== 1) {
           $bb = $Q_getLastNPM[0]['NPM'];
         }
-        for ($i=2; $i < $CountRow; $i++) {
+        for ($i=2; $i < ($CountRow + 1); $i++) {
           $temp = array();
+          $temp2 = array();
           $ProgramID = $objWorksheet->getCellByColumnAndRow(1, $i)->getCalculatedValue();
           $LevelStudyID = $objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue();
           $ReligionID = $objWorksheet->getCellByColumnAndRow(3, $i)->getCalculatedValue();
@@ -878,10 +880,27 @@ class C_admission extends Admission_Controler {
             'StatusStudentID' => $StatusStudentID,
           );
           $arr_insert[] = $temp;
+
+          $plan_password = $NPM.''.'123456';
+          $pas = md5($plan_password);
+          $pass = sha1('jksdhf832746aiH{}{()&(*&(*'.$pas.'HdfevgyDDw{}{}{;;*766&*&*');
+
+          $temp2 = array(
+              'NPM' => $NPM,
+              'Password' => $pass,
+              'Year' => date('Y'),
+              'EmailPU' => $NPM.'@podomorouniversity.ac.id',
+              'StatusStudentID' => 3,
+              'Status' => '1',
+          );
+
+          $arr_insert_auth[] = $temp2;
+
           $aa++;
         }
 
         $this->db->insert_batch($ta.'.students', $arr_insert);
+        $this->db->insert_batch('db_academic.auth_students', $arr_insert_auth);
         echo json_encode(array('status'=> 1,'msg' => ''));
       }
       else

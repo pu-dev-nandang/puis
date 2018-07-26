@@ -97,7 +97,7 @@
         loadData(1);
         loadSelectOptionCurriculum('#selectCurriculum','');
         loadSelectOptionBaseProdi('#selectProdi','');
-        loadSelectOptionPaymentTypeMHS('#selectPTID','');
+        loadSelectOptionPaymentTypeAll('#selectPTID','');
         getReloadTableSocket();
         // $("#btn-submit").addClass('hide');
     });
@@ -262,6 +262,19 @@
                     tr = '<tr style="background-color: #8ED6EA; color: black;" NPM = "'+Data_mhs[i]['NPM']+'">';
                     inputCHK = ''; 
                    } 
+
+                   // show to fixed
+                   var IPS = 0;
+                   var IPK = 0;
+                   try {
+                       IPS = Data_mhs[i]['IPS'].toFixed(2);
+                       IPK = Data_mhs[i]['IPK'].toFixed(2);
+                   }
+                   catch(err) {
+                       IPS = 0;
+                       IPK = 0;
+                   }
+
                    // show bintang
                    var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>'; 
                    $('#dataRow').append(tr +
@@ -273,8 +286,8 @@
                        // '<td>'+Data_mhs[i]['Year']+'</td>' +
                        '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +
                        '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
-                       '<td>'+Data_mhs[i]['IPS'].toFixed(2)+'</td>' +
-                       '<td>'+Data_mhs[i]['IPK'].toFixed(2)+'</td>' +
+                       '<td>'+IPS+'</td>' +
+                       '<td>'+IPK+'</td>' +
                        '<td>'+Data_mhs[i]['Discount']+'%</td>' +
                        '<td>'+yy+'</td>' +
                        '<td>'+htmlCicilan+'</td>'+
