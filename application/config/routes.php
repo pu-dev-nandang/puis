@@ -2,12 +2,13 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 $route['default_controller'] = 'c_login';
-$route['404_override'] = '';
+$route['404_override'] = 'dashboard/c_dashboard/page404';
 $route['translate_uri_dashes'] = FALSE;
 
 
 $route['navigation/(:num)'] = 'c_departement/navigation/$1';
 $route['profile'] = 'c_dashboard/profile';
+$route['page404'] = 'dashboard/c_dashboard/page404';
 
 // FROM PORTAL
 $route['uath/__portal4SignIn'] = 'c_login/portal4SignIn';
@@ -430,6 +431,7 @@ $route['api/__cekMKCode'] = 'api/c_api/cekMKCode';
 $route['api/__crudMataKuliah'] = 'api/c_api/crudMataKuliah';
 
 $route['api/__crudTahunAkademik'] = 'api/c_api/crudTahunAkademik';
+$route['api/__crudStatusStudents'] = 'api/c_api/crudStatusStudents';
 
 $route['api/__crudDataDetailTahunAkademik'] = 'api/c_api/crudDataDetailTahunAkademik';
 

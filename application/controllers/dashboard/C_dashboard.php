@@ -66,5 +66,12 @@ class C_dashboard extends Globalclass {
         $client->close();
     }
 
+    public function page404(){
+        parent::page404();
+//        $data['']=123;
+//        $content = $this->load->view('template/404page','',true);
+//        $this->temp($content);
+    }
+
 
 }

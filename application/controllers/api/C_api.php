@@ -232,12 +232,22 @@ class C_api extends CI_Controller {
 
         $dataYear = $this->input->get('dataYear');
         $dataProdiID = $this->input->get('dataProdiID');
+        $dataStatus = $this->input->get('s');
 
         $db_ = 'ta_'.$dataYear;
 
+        $dataWhere = 's.ProdiID = "'.$dataProdiID.'"';
+        $arryWhere = array('ProdiID' => $dataProdiID);
+        if($dataStatus!='' && $dataStatus!=null){
+            $arryWhere = array(
+                'ProdiID' => $dataProdiID,
+                'StatusStudentID' => $dataStatus
+            );
+            $dataWhere = 's.ProdiID = "'.$dataProdiID.'" AND s.StatusStudentID = "'.$dataStatus.'" ';
+        }
 
-        $totalData = $this->db->get_where($db_.'.students',
-                array('ProdiID' => $dataProdiID))->result_array();
+        $totalData = $this->db->get_where($db_.'.students',$arryWhere
+                )->result_array();
 
         $sql = 'SELECT s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, s.StatusStudentID, 
                           ss.Description AS StatusStudent, ast.Password, ast.Password_Old, ast.Status AS StatusAuth
@@ -247,13 +257,13 @@ class C_api extends CI_Controller {
                           LEFT JOIN db_academic.auth_students ast ON (ast.NPM = s.NPM)';
 
         if( !empty($requestData['search']['value']) ) {
-            $sql.= ' WHERE s.ProdiID = "'.$dataProdiID.'" AND ( s.NPM LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' WHERE '.$dataWhere.' AND ( s.NPM LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR s.Name LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR s.ClassOf LIKE "'.$requestData['search']['value'].'%" )';
             $sql.= ' ORDER BY s.NPM, s.ProdiID ASC';
         }
         else {
-            $sql.= 'WHERE s.ProdiID = "'.$dataProdiID.'" ORDER BY s.NPM, s.ProdiID ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+            $sql.= 'WHERE '.$dataWhere.' ORDER BY s.NPM, s.ProdiID ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
         }
 
         $query = $this->db->query($sql)->result_array();
@@ -280,6 +290,19 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div style="text-align: center;"><img src="'.base_url('uploads/students/').$db_.'/'.$row["Photo"].'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
             $nestedData[] = '<a href="javascript:void(0);" data-npm="'.$row["NPM"].'" data-ta="'.$row["ClassOf"].'" class="btnDetailStudent"><b>'.$row["Name"].'</b></a><br/>'.$row["NPM"];
             $nestedData[] = '<div style="text-align: center;">'.$Gender.'</div>';
+            $nestedData[] = '<div class="dropdown">
+                                  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <i class="fa fa-pencil-square-o"></i>
+                                    <span class="caret"></span>
+                                  </button>
+                                  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                    <li><a href="javascript:void(0);">Edit Student</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="javascript:void(0);" class="btn-reset-password" data-npm="'.$row["NPM"].'">Reset Password</a></li>
+                                    <li><a href="javascript:void(0);" class="btn-change-status" data-npm="'.$row["NPM"].'">Change Status</a></li>
+                                    
+                                  </ul>
+                                </div>';
             $nestedData[] = '<div style="text-align: center;"><button class="btn btn-sm btn-primary btnLoginPortalStudents" data-npm="'.$row["NPM"].'"><i class="fa fa-sign-in right-margin"></i> Login Portal</button></div>';
 //            $nestedData[] = $row["ProdiNameEng"];
             $nestedData[] = '<div style="text-align: center;"><i class="fa fa-circle" '.$label.'></i></div>';
@@ -484,20 +507,6 @@ class C_api extends CI_Controller {
             $this->db->delete('db_academic.curriculum_details');
             return print_r(1);
         }
-
-//        if($data_arr['DataPraSyart']!=''){
-//            for($i=0;$i<count($data_arr['DataPraSyart']);$i++){
-//
-//                $ex = explode(".",$data_arr['DataPraSyart'][$i]);
-//
-//                $data_Pra = array(
-//                    'CurriculumDetailID' => $insert_id,
-//                    'MKID' => trim($ex[0]),
-//                    'MKCode' => trim($ex[1])
-//                );
-//                $this->db->insert('db_academic.precondition',$data_Pra);
-//            }
-//        }
     }
 
     public function getdetailKurikulum(){
@@ -580,9 +589,11 @@ class C_api extends CI_Controller {
     }
 
     public function crudTahunAkademik(){
-        $token = $this->input->post('token');
-        $key = "UAP)(*";
-        $data_arr = (array) $this->jwt->decode($token,$key);
+//        $token = $this->input->post('token');
+//        $key = "UAP)(*";
+//        $data_arr = (array) $this->jwt->decode($token,$key);
+
+        $data_arr = $this->getInputToken();
 
         if(count($data_arr)>0){
 
@@ -673,6 +684,19 @@ class C_api extends CI_Controller {
             }
         }
 
+    }
+
+    public function crudStatusStudents(){
+        $data_arr = $this->getInputToken();
+
+        if(count($data_arr)>0){
+
+            if($data_arr['action']=='read'){
+                $data = $this->db->order_by('ID', 'ASC')->get('db_academic.status_student')->result_array();
+                return print_r(json_encode($data));
+            }
+
+        }
     }
 
     public function crudDataDetailTahunAkademik(){
