@@ -92,7 +92,7 @@ class C_admission extends Admission_Controler {
       if ($Status == "Reject") {
           $text = 'Dear Candidate,<br><br>
                       You have document not approved yet, Please send your valid document.<br>
-                      '.$this->GlobalVariableAdi['url_registration']."formulir-registration/".$keyURL['url'].'
+                      '.url_registration."formulir-registration/".$keyURL['url'].'
                   ';
           $to = $keyURL['email'];
           $subject = "Podomoro University Document Upload";
@@ -105,7 +105,7 @@ class C_admission extends Admission_Controler {
         if ($check) {
             $text = 'Dear Candidate,<br><br>
                         You have finished your all required document.<br>
-                        '.$this->GlobalVariableAdi['url_registration']."formulir-registration/".$keyURL['url'].'
+                        '.url_registration."formulir-registration/".$keyURL['url'].'
                     ';
             $to = $keyURL['email'];
             $subject = "Podomoro University Document Upload";
@@ -381,7 +381,7 @@ class C_admission extends Admission_Controler {
 
     public function input_nilai_rapor()
     {
-      $this->data['url_registration'] = $this->GlobalVariableAdi['url_registration'];
+      $this->data['url_registration'] = url_registration;
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/set_nilai_rapor',$this->data,true);
       $this->temp($content);
     }
@@ -413,7 +413,6 @@ class C_admission extends Admission_Controler {
     public function set_nilai_rapor_save()
     {
       $input = $this->getInputToken();
-      // print_r($input);
       $this->m_admission->saveDataNilaRapor($input);
       $this->m_admission->saveDataRangkingRapor($input);
       echo json_encode( array('msg' => 'Data berhasil disimpan') );
@@ -436,7 +435,7 @@ class C_admission extends Admission_Controler {
        $this->pagination->initialize($config);
        $page = $this->uri->segment(4);
        $start = ($page - 1) * $config["per_page"];
-       $this->data['url_registration'] = $this->GlobalVariableAdi['url_registration'];
+       $this->data['url_registration'] = url_registration;
        $this->data['datadb'] = $this->m_admission->loadData_calon_mahasiswa_created($config["per_page"], $start,$Nama,$selectProgramStudy,$Sekolah);
        $this->data['mataujian'] = $this->m_admission->select_mataUjian($selectProgramStudy);
        $this->data['grade'] = $this->m_admission->showData('db_academic.grade');
@@ -465,7 +464,7 @@ class C_admission extends Admission_Controler {
       $this->temp($content);
     }
 
-    public function set_tuition_fee_input($page = null)
+    /*public function set_tuition_fee_input($page = null)
     {
       $this->load->library('pagination');
       $config = $this->config_pagination_default_ajax(1000,5,5);
@@ -476,8 +475,40 @@ class C_admission extends Admission_Controler {
       $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
       $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee($config["per_page"], $start));
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_tuition_fee_input',$this->data,true);
+
+      $pagination = '';
+      if (count($this->m_admission->getDataCalonMhsTuitionFee($config["per_page"], $start)) > 0) {
+        $pagination = $this->pagination->create_links();
+      }
+
       $output = array(
-      'pagination_link'  => $this->pagination->create_links(),
+      'pagination_link'  => $pagination,
+      'loadtable'   => $content,
+      );
+      echo json_encode($output);
+
+    }*/
+
+    public function set_tuition_fee_input($page = null)
+    {
+      $this->load->library('pagination');
+      $config = $this->config_pagination_default_ajax(1000,5,5);
+      $this->pagination->initialize($config);
+      $page = $this->uri->segment(5);
+      $start = ($page - 1) * $config["per_page"];
+
+      $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
+      $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee($config["per_page"], $start));
+      $this->m_admission->getDataCalonMhsAll($config["per_page"], $start,$input)
+      $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_tuition_fee_input',$this->data,true);
+
+      $pagination = '';
+      if (count($this->m_admission->getDataCalonMhsTuitionFee($config["per_page"], $start)) > 0) {
+        $pagination = $this->pagination->create_links();
+      }
+
+      $output = array(
+      'pagination_link'  => $pagination,
       'loadtable'   => $content,
       );
       echo json_encode($output);

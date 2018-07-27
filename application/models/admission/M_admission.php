@@ -131,11 +131,13 @@ class M_admission extends CI_Model {
         for ($i=0; $i < count($data_arr); $i++) { 
           $arr = explode(";", $data_arr[$i]);
           $ID = $arr[0];
-          $NamaFile = ($arr[1] == 'nothing' ? $NamaFile="" : $NamaFile=$arr[1]);
+          //$NamaFile = ($arr[1] == 'nothing' ? $NamaFile="" : $NamaFile=$arr[1]);
           $VerificationBY = $this->session->userdata('NIP');
           $VerificationAT = date("Y-m-d H:i:s");
-          $sql = "update db_admission.register_document set Status = ?,Attachment = ?, VerificationBY = ?, VerificationAT = ? where ID = ?";
-          $query=$this->db->query($sql, array($Status,$NamaFile,$VerificationBY,$VerificationAT,$ID));
+          // $sql = "update db_admission.register_document set Status = ?,Attachment = ?, VerificationBY = ?, VerificationAT = ? where ID = ?";
+          $sql = "update db_admission.register_document set Status = ?, VerificationBY = ?, VerificationAT = ? where ID = ?";
+          // $query=$this->db->query($sql, array($Status,$NamaFile,$VerificationBY,$VerificationAT,$ID));
+          $query=$this->db->query($sql, array($Status,$VerificationBY,$VerificationAT,$ID));
         } 
         
     }
@@ -790,7 +792,7 @@ class M_admission extends CI_Model {
 
     public function daftar_set_nilai_rapor_load_data_paging($limit, $start,$ID_ProgramStudy)
     {
-      $sql = 'select a.Name as NameCandidate,a.Email, d.ID as ID_register_formulir, e.bobot as Bobot, e.NamaUjian
+      $sql = 'select a.Name as NameCandidate,a.Email, d.ID as ID_register_formulir, e.bobot as Bobot, e.NamaUjian,f.SchoolName,f.CityName
               from db_admission.register as a
               join db_admission.register_verification as b
               on a.ID = b.RegisterID
@@ -800,6 +802,8 @@ class M_admission extends CI_Model {
               on c.ID = d.ID_register_verified
               join db_admission.ujian_perprody_m as e
               on e.ID_ProgramStudy = d.ID_program_study
+              join db_admission.school as f
+              on a.SchoolID = f.ID
               where d.ID_program_study = ? and e.Active = 1 and d.ID not in(select ID_register_formulir from db_admission.register_nilai)
               and  d.ID not in (select ID_register_formulir from db_admission.register_butuh_ujian)
               GROUP by d.ID
@@ -813,7 +817,7 @@ class M_admission extends CI_Model {
       for ($i=0; $i < count($arr['processs1']); $i++) { 
         $ID_ujian_perprody = $arr['processs1'][$i]->id_mataujian;
         $ID_register_formulir = $arr['processs1'][$i]->id_formulir;
-
+        
         $bool = true;
         for ($j=0; $j < count($arr['rangking']); $j++) { 
             $id_doc = $arr['rangking'][$j]->id_doc;
@@ -825,7 +829,7 @@ class M_admission extends CI_Model {
             }
             
         } 
-
+        
         if ($bool) {
             $dataSave = array(
                     'ID_ujian_perprody' => $ID_ujian_perprody,
@@ -967,7 +971,7 @@ class M_admission extends CI_Model {
       }
      }
 
-     public function getDataCalonMhsTuitionFee($limit, $start)
+     /*public function getDataCalonMhsTuitionFee($limit, $start)
      {
       $arr_temp = array();
       $sql= 'select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,
@@ -975,7 +979,7 @@ class M_admission extends CI_Model {
               h.ctr_name as CountryAddress,i.ProvinceName as ProvinceAddress,j.RegionName as RegionAddress,k.DistrictName as DistrictsAddress,
               a.District as DistrictAddress,a.Address,a.ZipCode,a.PhoneNumber,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
               n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
-              if((select count(*) as total from db_admission.register_nilai where Status = "Approved" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
+              if((select count(*) as total from db_admission.register_nilai where Status = "Verified" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
               as status1
               from db_admission.register_formulir as a
               JOIN db_admission.register_verified as b 
@@ -1006,18 +1010,143 @@ class M_admission extends CI_Model {
               ON n.ID = d.SchoolID
               join db_academic.program_study as o
               on o.ID = a.ID_program_study
-              where ( a.ID in (select ID_register_formulir from db_admission.register_nilai where Status = "Approved") 
+              where ( a.ID in (select ID_register_formulir from db_admission.register_nilai where Status = "Verified") 
               or a.ID in (select ID_register_formulir from db_admission.register_kelulusan_ujian where Kelulusan = "Lulus") ) and a.ID not in (select ID_register_formulir from db_finance.payment_register) LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array())->result_array();
+      //print_r($query);
+      //die();
+
       $this->load->model('master/m_master');
       $jpa = $this->m_master->showData_array('db_admission.register_dsn_jpa');
       for ($i=0; $i < count($query); $i++) { 
+
+        // get SKS
+        $ID_program_study = $query[$i]['ID_program_study'];
+        $ccc = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ID_program_study);
+        $Credit = $ccc[0]['DefaultCredit'];
+
         $DiskonSPP = 0;
         // get Price
             $getPaymentType_Cost = $this->getPaymentType_Cost($query[$i]['ID_program_study']);
             $arr_temp2 = array();
-            for ($k=0; $k < count($getPaymentType_Cost); $k++) { 
-              $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Cost']);
+            for ($k=0; $k < count($getPaymentType_Cost); $k++) {
+              if ($getPaymentType_Cost[$k]['Abbreviation'] == 'Credit') {
+                 $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => (int)$getPaymentType_Cost[$k]['Cost'] * (int) $Credit.'.00');
+               }
+               else
+               {
+                $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Cost']);
+               } 
+              
+            }
+        if ($query[$i]['status1'] == 'Rapor') {
+          // check rangking
+            $getRangking = $this->getRangking($query[$i]['ID_register_formulir']);
+            $getRangking = $getRangking[0]['Rangking'];
+          // get Discount
+            for ($j=0; $j < count($jpa); $j++) { 
+              if ($getRangking >= $jpa[$j]['StartRange'] && $getRangking <= $jpa[$j]['EndRange'] ) {
+                $DiskonSPP = $jpa[$j]['DiskonSPP'];
+                break;
+              }
+            }
+            
+            $arr_temp[$i] = array(
+              'ID_register_formulir' => $query[$i]['ID_register_formulir'],
+              'Name' => $query[$i]['Name'],
+              'NamePrody' => $query[$i]['NamePrody'],
+              'SchoolName' => $query[$i]['SchoolName'],
+              'Status1' => $query[$i]['status1'],
+              'DiskonSPP' => $DiskonSPP,
+              'RangkingRapor' => $getRangking,
+            );
+        }
+        else
+        {
+            $arr_temp[$i] = array(
+              'ID_register_formulir' => $query[$i]['ID_register_formulir'],
+              'Name' => $query[$i]['Name'],
+              'NamePrody' => $query[$i]['NamePrody'],
+              'SchoolName' => $query[$i]['SchoolName'],
+              'Status1' => $query[$i]['status1'],
+              'DiskonSPP' => $DiskonSPP,
+              'RangkingRapor' => 0,
+            );
+        }
+
+        $arr_temp[$i] = $arr_temp[$i] + $arr_temp2;
+      }
+      return $arr_temp;
+
+     }*/
+
+     public function getDataCalonMhsTuitionFee($limit, $start)
+     {
+      $arr_temp = array();
+      $sql= 'select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,
+              f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,g.JenisTempatTinggal,
+              h.ctr_name as CountryAddress,i.ProvinceName as ProvinceAddress,j.RegionName as RegionAddress,k.DistrictName as DistrictsAddress,
+              a.District as DistrictAddress,a.Address,a.ZipCode,a.PhoneNumber,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
+              n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
+              if((select count(*) as total from db_admission.register_nilai where Status = "Verified" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
+              as status1
+              from db_admission.register_formulir as a
+              JOIN db_admission.register_verified as b 
+              ON a.ID_register_verified = b.ID
+              JOIN db_admission.register_verification as c
+              ON b.RegVerificationID = c.ID
+              JOIN db_admission.register as d
+              ON c.RegisterID = d.ID
+              JOIN db_admission.country as e
+              ON a.NationalityID = e.ctr_code
+              JOIN db_employees.religion as f
+              ON a.ReligionID = f.IDReligion
+              JOIN db_admission.register_jtinggal_m as g
+              ON a.ID_register_jtinggal_m = g.ID
+              JOIN db_admission.country as h
+              ON a.ID_country_address = h.ctr_code
+              JOIN db_admission.province as i
+              ON a.ID_province = i.ProvinceID
+              JOIN db_admission.region as j
+              ON a.ID_region = j.RegionID
+              JOIN db_admission.district as k
+              ON a.ID_districts = k.DistrictID
+              JOIN db_admission.school_type as l
+              ON l.sct_code = a.ID_school_type
+              JOIN db_admission.register_major_school as m
+              ON m.ID = a.ID_register_major_school
+              JOIN db_admission.school as n
+              ON n.ID = d.SchoolID
+              join db_academic.program_study as o
+              on o.ID = a.ID_program_study
+              where ( a.ID in (select ID_register_formulir from db_admission.register_nilai where Status = "Verified") 
+              or a.ID in (select ID_register_formulir from db_admission.register_kelulusan_ujian where Kelulusan = "Lulus") ) and a.ID not in (select ID_register_formulir from db_finance.payment_register) LIMIT '.$start. ', '.$limit;
+      $query=$this->db->query($sql, array())->result_array();
+      //print_r($query);
+      //die();
+
+      $this->load->model('master/m_master');
+      $jpa = $this->m_master->showData_array('db_admission.register_dsn_jpa');
+      for ($i=0; $i < count($query); $i++) { 
+
+        // get SKS
+        $ID_program_study = $query[$i]['ID_program_study'];
+        $ccc = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ID_program_study);
+        $Credit = $ccc[0]['DefaultCredit'];
+
+        $DiskonSPP = 0;
+        // get Price
+            $getPaymentType_Cost = $this->getPaymentType_Cost($query[$i]['ID_program_study']);
+            $arr_temp2 = array();
+            for ($k=0; $k < count($getPaymentType_Cost); $k++) {
+              if ($getPaymentType_Cost[$k]['Abbreviation'] == 'Credit') {
+                 $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => (int)$getPaymentType_Cost[$k]['Cost'] * (int) $Credit.'.00');
+               }
+               else
+               {
+                $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Cost']);
+               } 
+              
             }
         if ($query[$i]['status1'] == 'Rapor') {
           // check rangking

@@ -80,12 +80,12 @@
                         Approved
                         </a>
                         <ul class="sub-menu">
-                            <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "approved" && $this->uri->segment(4) == "nilai-rapor" && $this->uri->segment(5) == ""){echo "current";} ?>">
+                            <!--<li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "approved" && $this->uri->segment(4) == "nilai-rapor" && $this->uri->segment(5) == ""){echo "current";} ?>">
                                 <a href="<?php echo base_url('finance/admission/approved/nilai-rapor'); ?>">
                                     <i class="icon-angle-right"></i>
                                     Nilai Rapor
                                 </a>
-                            </li>
+                            </li>-->
                             <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "approved" && $this->uri->segment(4) == "tuition-fee" ){echo "current";} ?>">
                                 <a href="<?php echo base_url('finance/admission/approved/tuition-fee'); ?>">
                                 <i class="icon-angle-right"></i>

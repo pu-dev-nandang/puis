@@ -52,7 +52,11 @@
 							 	<?php if (isset($chkActive)): ?>
 							 	<td><?php echo $no++ ?> <input type="checkbox" class="uniform" value ="<?php echo $datadb[$i]['ID_register_formulir'] ?>"></td>
 							 	<?php endif ?>
-							 	<td><?php echo $datadb[$i]['Name'] ?></td>
+							 	<td>
+							 		<?php echo $datadb[$i]['Name'] ?><br>
+							 		<?php echo $datadb[$i]['SchoolName'] ?><br>
+							 		<?php echo $datadb[$i]['SchoolRegion'] ?>
+							 	</td>
 							 	<td><?php echo $datadb[$i]['NamePrody'] ?></td>
 							 	<!-- <td><?php echo $datadb[$i]['IdentityCard'] ?></td> -->
 							 	<td><?php echo $datadb[$i]['Email'] ?></td>
@@ -79,8 +83,18 @@
 							 	<?php endfor; ?>
 							 	<td><?php echo $Grade ?></td>
 							 	<?php $getData = $this->m_admission->getRangking($datadb[$i]['ID_register_formulir']) ?>
-							 	<td><?php echo $getData[0]['Rangking'] ?></td>	
-							 	<td><a href="<?php echo $url_registration ?>document/<?php echo $datadb[$i]['Email'] ?>/<?php echo $getData[0]['Attachment'] ?>" target="_blank">File</a></td>	
+							 	<td><?php echo $getData[0]['Rangking'] ?></td>
+							 	<?php $Attachment = $getData[0]['Attachment'] ?>
+							 	<?php $a = explode(',', $Attachment) ?>
+							 	<?php if (count($a) > 1): ?>
+							 		<td>
+							 		<?php for ($x = 0; $x < count($a); $x++): ?>
+							 			<a href="<?php echo $url_registration ?>document/<?php echo $datadb[$i]['Email'] ?>/<?php echo $a[$x] ?>" target="_blank">File_<?php echo ($x+1) ?></a><br>	
+							 		<?php endfor; ?>
+							 		</td>
+							 	<?php else: ?>
+							 		<td><a href="<?php echo $url_registration ?>document/<?php echo $datadb[$i]['Email'] ?>/<?php echo $getData[0]['Attachment'] ?>" target="_blank">File</a></td>			
+							 	<?php endif ?>	
 							 </tr>
 				<?php endfor; ?>
 			</tbody>

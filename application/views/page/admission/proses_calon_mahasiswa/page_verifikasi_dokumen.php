@@ -254,7 +254,8 @@ $(document).on('click','#confirmYesProcess', function () {
         setTimeout(function () {
            toastr.options.fadeOut = 10000;
            toastr.success('Data berhasil disimpan', 'Success!');
-           loadData_register_document(1);
+           //loadData_register_document(1);
+           location.reload(); 
            $('#NotificationModal').modal('hide');
         },500);
     });
