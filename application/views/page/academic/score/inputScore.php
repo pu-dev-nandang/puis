@@ -7,6 +7,12 @@
         
     }
 
+    #tableScore thead tr td {
+        background: #607D8B;
+        color: #fff;
+        font-weight: bold;
+    }
+
     #tableScore tr td {
         text-align: center;
     }
@@ -22,6 +28,11 @@
 
         window.dataIDStudyPlanning=[];
 
+        window.Grade_Assig1 = 0;
+        window.Grade_Assig2 = 0;
+        window.Grade_Assig3 = 0;
+        window.Grade_Assig4 = 0;
+        window.Grade_Assig5 = 0;
         window.Grade_Assigment=0;
         window.Grade_UTS=0;
         window.Grade_UAS=0;
@@ -39,6 +50,12 @@
 
 
             if(jsonResultGrade.Status=='1'){
+                Grade_Assig1 = jsonResultGrade.Details.Assg1;
+                Grade_Assig2 = jsonResultGrade.Details.Assg2;
+                Grade_Assig3 = jsonResultGrade.Details.Assg3;
+                Grade_Assig4 = jsonResultGrade.Details.Assg4;
+                Grade_Assig5 = jsonResultGrade.Details.Assg5;
+
                 Grade_Assigment = jsonResultGrade.Details.Assigment;
                 Grade_UTS = jsonResultGrade.Details.UTS;
                 Grade_UAS = jsonResultGrade.Details.UAS;
@@ -62,7 +79,7 @@
             var dataMK = jsonDataResult.Course[0];
 
             $('#divScore').html('<h3><b>'+dataMK.MKCode+' - '+dataMK.MKNameEng+'</b></h3><input id="formScheduleID" value="'+ScheduleID+'" class="hide" hidden readonly />' +
-                '<div class="form-group"><label>Total Assigment</label><select class="form-control" style="max-width: 140px;" id="formTotalAsg"></select></div>'+
+                '<div class="form-group hide"><label>Total Assigment</label><select class="form-control" style="max-width: 140px;" id="formTotalAsg"></select></div>'+
                 '    <div >'+
                 '        <div class="table-responsive">'+
                 '            <table id="tableScore" class="table table-striped table-bordered table-hover">'+
@@ -75,11 +92,11 @@
                 '                    <th rowspan="2" style="width: 10%;">Grade</th>'+
                 '                </tr>' +
                 '<tr>' +
-                '                    <th style="width: 10%;">1</th>'+
-                '                    <th style="width: 10%;">2</th>'+
-                '                    <th style="width: 10%;">3</th>'+
-                '                    <th style="width: 10%;">4</th>'+
-                '                    <th style="width: 10%;">5</th>'+
+                '                    <td style="width: 10%;">Assg 1 : ('+Grade_Assig1+' %)</td>'+
+                '                    <td style="width: 10%;">Assg 2 : ('+Grade_Assig2+' %)</td>'+
+                '                    <td style="width: 10%;">Assg 3 : ('+Grade_Assig3+' %)</td>'+
+                '                    <td style="width: 10%;">Assg 4 : ('+Grade_Assig4+' %)</td>'+
+                '                    <td style="width: 10%;">Assg 5 : ('+Grade_Assig5+' %)</td>'+
                 '</tr>' +
                 '</thead>'+
                 '                <tbody id="dtRow"></tbody>'+

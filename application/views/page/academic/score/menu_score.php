@@ -6,6 +6,10 @@
     #tableDataScore thead tr {
         background-color: #436888;color: #ffffff;
     }
+
+    .tbGradeC tr td{
+        text-align: center;
+    }
 </style>
 
 <div class="col-md-12">
@@ -56,14 +60,19 @@
     $(document).ready(function () {
 
         $('#filterSemester,#filterBaseProdi').empty();
-        $('#filterSemester').append('<option value="" disabled selected>-- Academic Year --</option>' +
-            '                <option disabled>------------------------------------------</option>');
+        // $('#filterSemester').append('<option value="" disabled selected>-- Academic Year --</option>' +
+        //     '                <option disabled>------------------------------------------</option>');
         loSelectOptionSemester('#filterSemester','');
 
 
-        $('#filterBaseProdi').append('<option value="" disabled selected>-- Select Programme Study --</option>' +
-            '<option disabled>------------------------------------------</option>');
+        // $('#filterBaseProdi').append('<option value="" disabled selected>-- Select Programme Study --</option>' +
+        //     '<option disabled>------------------------------------------</option>');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
+
+        setTimeout(function () {
+            loadCourse();
+        },1000);
+
     });
 
     $(document).on('change','.filter-score',function () {
@@ -108,7 +117,7 @@
                             '                    <th rowspan="2">Course</th>' +
                             '                    <th rowspan="2" style="width: 5%;">Credit</th>' +
                             '                    <th rowspan="2" style="width: 20%;">Lecturer</th>' +
-                            '                    <th rowspan="2" style="width: 5%;">Silabus SAP</th>' +
+                            '                    <th rowspan="2" style="width: 5%;">Syllabus & RPS</th>' +
                             '                    <th rowspan="2" style="width: 5%;">Act</th>' +
                             '                    <th colspan="2">Schedule</th>' +
                             '                </tr>' +
@@ -225,48 +234,64 @@
 
         $.post(url,{token:token},function (jsonResult) {
 
-            var bodyGrade = '<div style="text-align:center;"><h3>Belum Input Grade</h3></div>';
+            var bodyGrade ='';
             if(jsonResult.length>0){
                 var dataG = jsonResult[0];
 
-                var silabus = (dataG.Silabus!=null && dataG.Silabus!='') ? '<a target="_blank" href="'+base_url_portal_lecturers+'uploads/silabus/'+dataG.Silabus+'">Download Silabus</a>' : 'Belum Upload';
-                var sap = (dataG.SAP!=null && dataG.SAP!='') ? '<a target="_blank" href="'+base_url_portal_lecturers+'uploads/sap/'+dataG.SAP+'">Download SAP</a>' : 'Belum Upload';
+                var silabus = (dataG.Silabus!=null && dataG.Silabus!='') ? '<a class="btn btn-block btn-default" target="_blank" href="'+base_url_portal_lecturers+'uploads/silabus/'+dataG.Silabus+'">Download Syllabus</a>' : 'Not yet upload';
+                var sap = (dataG.SAP!=null && dataG.SAP!='') ? '<a class="btn btn-block btn-default" target="_blank" href="'+base_url_portal_lecturers+'uploads/sap/'+dataG.SAP+'">Download RPS</a>' : 'Not yet upload';
                 var status = 'Not Yet Send Grade';
                 var btnAct = 'disabled';
                 var btnCheck = '';
+                var appc = (dataG.Status=='0') ? 'checked' : '';
                 if(dataG.Status=='1') {
                     btnAct = '';
                     btnCheck = '';
                     status = 'Waiting Approval';
-                } else if(dataG.Status=='2') {
+                }
+                else if(dataG.Status=='2') {
                     btnCheck = '';
                     status = '<i class="fa fa-check-circle" style="color: green;"></i> Approved';
                 }
 
-                bodyGrade = '<h4>Silabus & SAP</h4>' +
-                    '                    <table class="table">' +
+                bodyGrade = '<h4>Syllabus & RPS</h4>' +
+                    '                    <table class="table table-bordered tbGradeC">' +
                     '                        <tr>' +
                     '                            <td style="width: 50%;">'+silabus+'</td>' +
                     '                            <td style="width: 50%;">'+sap+'</td>' +
                     '                        </tr>' +
                     '                    </table>' +
                     '                    <h4>Grade</h4>' +
-                    '                    <table class="table">' +
-                    '                        <tr>' +
-                    '                            <td style="width: 20%;">Assigment</td>' +
-                    '                            <td style="width: 20%;">UTS</td>' +
-                    '                            <td style="width: 20%;">UAS</td>' +
+                    '                    <table class="table table-bordered tbGradeC">' +
+                    '                        <tr style="background: #9e9e9e3d;font-weight: bold;">' +
+                    '                            <td colspan="5" style="width: 60%;">Assigment</td>' +
+                    '                            <td style="width: 10%;">UTS</td>' +
+                    '                            <td style="width: 10%;">UAS</td>' +
                     '                            <td style="width: 20%;">Status</td>' +
                     '                        </tr>' +
                     '                        <tr>' +
-                    '                            <td>'+dataG.Assigment+' %</td>' +
-                    '                            <td>'+dataG.UTS+' %</td>' +
-                    '                            <td>'+dataG.UAS+' %</td>' +
-                    '                            <td id="viewStatus'+dataG.ID+'">'+status+'</td>' +
+                    '                            <td colspan="5">'+dataG.Assigment+' %</td>' +
+                    '                            <td rowspan="3">'+dataG.UTS+' %</td>' +
+                    '                            <td rowspan="3">'+dataG.UAS+' %</td>' +
+                    '                            <td rowspan="3" id="viewStatus'+dataG.ID+'">'+status+'</td>' +
+                    '                        </tr>' +
+                    '                        <tr style="background: #0080001f;font-weight: bold;">' +
+                    '                            <td>1</td>' +
+                    '                            <td>2</td>' +
+                    '                            <td>3</td>' +
+                    '                            <td>4</td>' +
+                    '                            <td>5</td>' +
                     '                        </tr>' +
                     '                        <tr>' +
-                    '                            <td colspan="4" style="text-align: right;">' +
-                    '                                <button data-id="'+dataG.ID+'" id="btnGradeApprove" class="btn btn-default btn-default-success" '+btnAct+'>Approved</button>' +
+                    '                            <td>'+dataG.Assg1+'</td>' +
+                    '                            <td>'+dataG.Assg2+'</td>' +
+                    '                            <td>'+dataG.Assg3+'</td>' +
+                    '                            <td>'+dataG.Assg4+'</td>' +
+                    '                            <td>'+dataG.Assg5+'</td>' +
+                    '                        </tr>' +
+                    '                        <tr>' +
+                    '                            <td colspan="9" style="text-align: right;">' +
+                    '                                <button data-id="'+dataG.ID+'" id="btnGradeApprove" class="btn btn-default btn-default-success" '+appc+' '+btnAct+'>Approved</button>' +
                     '                            </td>' +
                     '                        </tr>' +
                     '                    </table>' +
@@ -278,17 +303,15 @@
                     '                    </div>';
 
 
-            } else {
 
+
+            } else {
+                bodyGrade = '<div style="text-align:center;"><h3>Belum Input Grade</h3></div>';
             }
 
             $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
                 '<h4 class="modal-title">'+ClassGroup+'</h4>');
             $('#GlobalModal .modal-body').html(bodyGrade);
-
-            if(dataG.Status=='0'){
-                $('#checkGradeAgain').prop('checked',true);
-            }
 
 
             $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
@@ -445,14 +468,18 @@
         var TotalAsg = $('#formTotalAsg').val();
 
         var TotalAsgValue = 0;
+        var arryAssg = [Grade_Assig1,Grade_Assig2,Grade_Assig3,Grade_Assig4,Grade_Assig5];
+        var arS = 0;
         for(var a=1;a<=TotalAsg;a++){
-            var n = ($('#formAsg'+a+''+ID).val()!='') ? $('#formAsg'+a+''+ID).val() : 0;
+            var n = ($('#formAsg'+a+''+ID).val()!='') ? $('#formAsg'+a+''+ID).val() * (arryAssg[arS]/100) : 0;
             TotalAsgValue = TotalAsgValue + parseFloat(n);
+            arS++;
         }
 
         // Misal => tugas 30%, UTS 35%, UAS 35%
 
-        var AvgAsg = (parseFloat(TotalAsgValue) / parseInt(TotalAsg)) * (Grade_Assigment/100);
+        // var AvgAsg = (parseFloat(TotalAsgValue) / parseInt(TotalAsg)) * (Grade_Assigment/100);
+        var AvgAsg = (parseFloat(TotalAsgValue)) * (Grade_Assigment/100);
         var AvgUTS = parseFloat($('#formUTS'+ID).val()) * (Grade_UTS/100);
         var AvgUAS = parseFloat($('#formUAS'+ID).val()) * (Grade_UAS/100);
 

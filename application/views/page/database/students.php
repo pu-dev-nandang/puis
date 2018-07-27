@@ -210,6 +210,10 @@
         var formEmailPU = $('#formEmailPU').val();
 
         if(formEmailPU!='' && formEmailPU!=null){
+
+            loading_buttonSm('#btnSaveChangeStatus');
+            $('#btnCloseChangeStatus').prop('disabled',true);
+
             var data = {
                 action : 'changeStatus',
                 StatusID : formChangeStatus,
@@ -219,8 +223,12 @@
             };
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'api/__crudStatusStudents';
-            $.post(url,{token:token},function () {
-
+            $.post(url,{token:token},function (result) {
+                load_students();
+                toastr.success('Status Changed','Success');
+                setTimeout(function () {
+                    $('#NotificationModal').modal('hide');
+                },500);
             });
         } else {
             toastr.warning('Email PU','is Required');
