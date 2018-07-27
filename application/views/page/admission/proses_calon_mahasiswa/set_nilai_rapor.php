@@ -91,7 +91,7 @@
 		$.post(url,{token:token},function (data_json) {
 		    // jsonData = data_json;
 		    var obj = JSON.parse(data_json); 
-		    // console.log(obj);
+		    //console.log(obj);
 		    setTimeout(function () {
 	       	    $("#loadTableData").html(obj.loadtable);
 	            $("#pagination_link").html(obj.pagination_link);
@@ -272,8 +272,19 @@
 
 	$(document).on('click','.show_a_href', function () {
 		var file__  = $(this).attr('filee');
-		var emaiil = $(this).attr('Email');
-		window.open('<?php echo $url_registration ?>'+'document/'+emaiil+'/'+file__,'_blank');
+		var aaa = file__.split(",");
+		if (aaa.length > 0) {
+			var emaiil = $(this).attr('Email');
+			for (var i = 0; i < aaa.length; i++) {
+				window.open('<?php echo $url_registration ?>'+'document/'+emaiil+'/'+aaa[i],'_blank');
+			}
+			
+		}
+		else
+		{
+			window.open('<?php echo $url_registration ?>'+'document/'+emaiil+'/'+file__,'_blank');
+		}
+		
 	});
 
 </script>

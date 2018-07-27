@@ -43,7 +43,13 @@
 					<?php $jml_bobot = 0 ?>
 						<tr class = 'ID_ujian_perprody<?php echo $datadb[$i]['ID_register_formulir'] ?>'>
 							<td><?php echo $no++ ?></td>
-							<td><?php echo $datadb[$i]['NameCandidate'] ?></td>
+							<td>
+								<?php echo $datadb[$i]['NameCandidate'] ?>
+								<br>
+								<?php echo $datadb[$i]['SchoolName'] ?>
+								<br>
+								<?php echo $datadb[$i]['CityName'] ?>	
+								</td>
 							<?php for ($j = 0; $j < count($mataujian); $j++): ?>
 								<td>
 									<select class="ID_ujian_perprody select2-select-00 col-md-4 full-width-fix" id-mataujian ='<?php echo $mataujian[$j]['ID'] ?>' bobot = '<?php echo $mataujian[$j]['Bobot'] ?>' id-formulir = '<?php echo $datadb[$i]['ID_register_formulir'] ?>'>
