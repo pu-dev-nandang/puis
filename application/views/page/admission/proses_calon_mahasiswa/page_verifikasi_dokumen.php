@@ -76,7 +76,19 @@
 				<?php 
 					$attachment = "";
 					 if ($datadb['data'][$i]['document'][$j]['Attachment'] != "") {
-					 	$attachment = '<a href="'.$this->GlobalVariableAdi['url_registration'].'document/'.$datadb['data'][$i]['Email'].'/'.$datadb['data'][$i]['document'][$j]['Attachment'].'" target="_blank">'.$datadb['data'][$i]['document'][$j]['Attachment'].'</a>';
+					 	$file = $datadb['data'][$i]['document'][$j]['Attachment'];
+					 	$file = explode(',', $file);
+					 	if (count($file) > 1) {
+					 		$attachment = '';
+					 		for ($z=0; $z < count($file); $z++) { 
+					 			$attachment .= '<a href="'.url_registration.'document/'.$datadb['data'][$i]['Email'].'/'.$file[$z].'" target="_blank">'.$file[$z].'</a><br>';
+					 		}
+					 	}
+					 	else
+					 	{
+					 		$attachment = '<a href="'.url_registration.'document/'.$datadb['data'][$i]['Email'].'/'.$datadb['data'][$i]['document'][$j]['Attachment'].'" target="_blank">'.$datadb['data'][$i]['document'][$j]['Attachment'].'</a>';
+					 	}
+
 					 	$namaFile = $datadb['data'][$i]['document'][$j]['Attachment'];
 					 }
 					 else
