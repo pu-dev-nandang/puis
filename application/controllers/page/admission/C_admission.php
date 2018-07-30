@@ -492,18 +492,19 @@ class C_admission extends Admission_Controler {
     public function set_tuition_fee_input($page = null)
     {
       $this->load->library('pagination');
-      $config = $this->config_pagination_default_ajax(1000,5,5);
+      $page_Count = 5;
+      $config = $this->config_pagination_default_ajax(1000,$page_Count,5);
       $this->pagination->initialize($config);
       $page = $this->uri->segment(5);
       $start = ($page - 1) * $config["per_page"];
 
       $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
       $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee($config["per_page"], $start));
-      $this->m_admission->getDataCalonMhsAll($config["per_page"], $start,$input)
+      // $this->m_admission->getDataCalonMhsAll($config["per_page"], $start,$input);
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_tuition_fee_input',$this->data,true);
 
       $pagination = '';
-      if (count($this->m_admission->getDataCalonMhsTuitionFee($config["per_page"], $start)) > 0) {
+      if (count($this->m_admission->getDataCalonMhsTuitionFee($config["per_page"], $start)) > $page_Count) {
         $pagination = $this->pagination->create_links();
       }
 

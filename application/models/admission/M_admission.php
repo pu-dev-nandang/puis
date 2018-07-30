@@ -1089,7 +1089,7 @@ class M_admission extends CI_Model {
               a.District as DistrictAddress,a.Address,a.ZipCode,a.PhoneNumber,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
               n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
               if((select count(*) as total from db_admission.register_nilai where Status = "Verified" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
-              as status1
+              as status1,b.FormulirCode
               from db_admission.register_formulir as a
               JOIN db_admission.register_verified as b 
               ON a.ID_register_verified = b.ID
@@ -1122,11 +1122,12 @@ class M_admission extends CI_Model {
               where ( a.ID in (select ID_register_formulir from db_admission.register_nilai where Status = "Verified") 
               or a.ID in (select ID_register_formulir from db_admission.register_kelulusan_ujian where Kelulusan = "Lulus") ) and a.ID not in (select ID_register_formulir from db_finance.payment_register) LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array())->result_array();
-      //print_r($query);
-      //die();
 
       $this->load->model('master/m_master');
       $jpa = $this->m_master->showData_array('db_admission.register_dsn_jpa');
+      $getDiscount = $this->m_master->showData_array('db_finance.discount');
+      $getBeasiswa = $this->m_master->showData_array('db_admission.register_dsn_type_m');
+      $getMaxCicilan = $this->m_master->showData_array('db_admission.cfg_cicilan');
       for ($i=0; $i < count($query); $i++) { 
 
         // get SKS
@@ -1148,10 +1149,15 @@ class M_admission extends CI_Model {
                } 
               
             }
+          $Attachment = '';
+          // get All Files Uploaded
+             $Document = $this->getDataDokumentRegister($query[$i]['ID_register_formulir']);  
         if ($query[$i]['status1'] == 'Rapor') {
           // check rangking
             $getRangking = $this->getRangking($query[$i]['ID_register_formulir']);
+            $Attachment = $getRangking[0]['Attachment'];
             $getRangking = $getRangking[0]['Rangking'];
+
           // get Discount
             for ($j=0; $j < count($jpa); $j++) { 
               if ($getRangking >= $jpa[$j]['StartRange'] && $getRangking <= $jpa[$j]['EndRange'] ) {
@@ -1166,8 +1172,15 @@ class M_admission extends CI_Model {
               'NamePrody' => $query[$i]['NamePrody'],
               'SchoolName' => $query[$i]['SchoolName'],
               'Status1' => $query[$i]['status1'],
-              'DiskonSPP' => $DiskonSPP,
+              'DiskonSPP' => $DiskonSPP.'.0',
               'RangkingRapor' => $getRangking,
+              'getDiscount' =>$getDiscount,
+              'FormulirCode' => $query[$i]['FormulirCode'],
+              'Document' => $Document,
+              'Attachment' => $Attachment,
+              'getBeasiswa' => $getBeasiswa,
+              'Email' => $query[$i]['Email'],
+              'getMaxCicilan' => $getMaxCicilan
             );
         }
         else
@@ -1178,8 +1191,15 @@ class M_admission extends CI_Model {
               'NamePrody' => $query[$i]['NamePrody'],
               'SchoolName' => $query[$i]['SchoolName'],
               'Status1' => $query[$i]['status1'],
-              'DiskonSPP' => $DiskonSPP,
+              'DiskonSPP' => $DiskonSPP.'.0',
               'RangkingRapor' => 0,
+              'getDiscount' =>$getDiscount,
+              'FormulirCode' => $query[$i]['FormulirCode'],
+              'Document' => $Document,
+              'Attachment' => $Attachment,
+              'getBeasiswa' => $getBeasiswa,
+              'Email' => $query[$i]['Email'],
+              'getMaxCicilan' => $getMaxCicilan,
             );
         }
 
