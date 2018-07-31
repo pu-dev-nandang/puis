@@ -20,22 +20,8 @@
     </div>
     <div class="widget-content no-padding">
 
-        <div class="table-responsive">
-            <table id="tableStudents" class="table table-striped table-bordered table-hover table-responsive">
-                <thead>
-                <tr class="tr-center" style="background: #20525a;color: #ffffff;">
-<!--                    <th style="width: 10%;">NIM</th>-->
-                    <th style="width: 5%;">Photo</th>
-                    <th>Name</th>
-                    <th style="width: 5%;">Gender</th>
-                    <th style="width: 5%;">Action</th>
-                    <th style="width: 10%;">Login Portal</th>
-<!--                    <th class="th-center">Program Study</th>-->
-                    <th style="width: 5%;">Status</th>
-                </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+        <div class="table-responsive" id="dataTBStudents">
+
         </div>
 
     </div>
@@ -44,10 +30,26 @@
 <script>
 
     $(document).ready(function () {
-        setTimeout(function (args) { load_students(); },500);
+        setTimeout(function () { load_students(); },500);
     });
 
     function load_students() {
+
+        $('#dataTBStudents').html('<table id="tableStudents" class="table table-striped table-bordered table-hover table-responsive">' +
+            '                <thead>' +
+            '                <tr class="tr-center" style="background: #20525a;color: #ffffff;">' +
+            '<!--                    <th style="width: 10%;">NIM</th>-->' +
+            '                    <th style="width: 5%;">Photo</th>' +
+            '                    <th>Name</th>' +
+            '                    <th style="width: 5%;">Gender</th>' +
+            '                    <th style="width: 5%;">Action</th>' +
+            '                    <th style="width: 10%;">Login Portal</th>' +
+            '<!--                    <th class="th-center">Program Study</th>-->' +
+            '                    <th style="width: 5%;">Status</th>' +
+            '                </tr>' +
+            '                </thead>' +
+            '                <tbody></tbody>' +
+            '            </table>');
 
         var dataYear = '<?php echo $dataForm["Year"] ?>';
         var dataProdiID = '<?php echo $dataForm["ProdiID"] ?>';

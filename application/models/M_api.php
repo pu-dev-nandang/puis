@@ -440,7 +440,7 @@ class M_api extends CI_Model {
                                                       FROM db_academic.curriculum_details cd
                                                       LEFT JOIN db_academic.mata_kuliah mk ON (cd.MKID = mk.ID)
                                                       WHERE cd.ID = "'.$Course[$i].'" 
-                                                      LIMIT 1')->result_array()[0];
+                                                      LIMIT 1')->result_array();
 
                 $dataCekInSchedule = $this->db->query('SELECT s1.ID AS ScheduleID
                                                       FROM db_academic.curriculum_details cd
@@ -454,9 +454,12 @@ class M_api extends CI_Model {
                                                             ) 
                                                       LIMIT 1')->result_array();
 
-                $dataCourse['ScheduleID'] = (count($dataCekInSchedule)>0) ? $dataCekInSchedule[0]['ScheduleID'] : null;
+                if(count($dataCourse)>0){
+                    $dataCourse[0]['ScheduleID'] = (count($dataCekInSchedule)>0) ? $dataCekInSchedule[0]['ScheduleID'] : null;
+                }
 
-                array_push($CourseArr,$dataCourse);
+                $dataPush = (count($dataCourse)>0) ? $dataCourse[0] : $dataCourse;
+                array_push($CourseArr,$dataPush);
 
             }
 
