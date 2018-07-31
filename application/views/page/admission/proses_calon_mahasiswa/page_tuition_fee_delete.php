@@ -6,7 +6,7 @@
 	window.getDataCalonMhs = <?php echo $getDataCalonMhs ?>;
 	$(document).ready(function () {
 		// console.log(payment_type);
-		// console.log(getDataCalonMhs);
+		console.log(getDataCalonMhs);
 		loadtable_header(loadDataTable);
 	});
 
@@ -27,13 +27,13 @@
 	    	table = '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
 	    	'<thead>'+
 	    	    '<tr>'+
-	    	        '<th style="width: 5px;">No  <input type="checkbox" class="uniform" value="nothing" id ="dataResultCheckAll"></th>'+
-	    	        '<th style="width: 55px;">Nama</th>'+
-	    	        '<th style="width: 55px;">Prodi</th>'+
-	    	        '<th style="width: 55px;">Sekolah</th>'
+	    	        '<th style="width: 5px;">No  <!--<input type="checkbox" class="uniform" value="nothing" id ="dataResultCheckAll">--></th>'+
+	    	        '<th style="width: 55px;">Nama,Prodi & Sekolah</th>'+
+	    	        '<th style="width: 55px;">Formulir Code</th>'+
+	    	        '<th style="width: 10%;">Beasiswa & File</th>'
 	    	for (var i = 0; i < payment_type.length; i++) {
 	    	    table += '<th style="width: 75px;">'+payment_type[i].Abbreviation+'</th>' ;
-	    	    table += '<th style="width: 70px;">Pot</th>';	
+	    	    //table += '<th style="width: 70px;">Pot</th>';	
 	    	}
 	    		
 	    	table += '</tr>' ;	
@@ -67,16 +67,24 @@
 							DiskonSPP = getDataCalonMhs[i]['Discount-'+key];
 						}
 					}
-				isi_payment += '<td>'+value_cost+'</td>';
-				isi_payment += '<td>'+DiskonSPP+'%</td>';
+				isi_payment += '<td>Invoice : '+value_cost+'<br> Discount : '+DiskonSPP+'%</td>';
+				//isi_payment += '<td>'+DiskonSPP+'%</td>';
+			}
+
+			if (getDataCalonMhs[i]['getFile'] != '-') {
+				showFile = '<a href="javascript:void(0)" class="show_a_href" id = "show'+getDataCalonMhs[i]['ID_register_formulir']+'" filee = "'+getDataCalonMhs[i]['getFile']+'" Email = "'+getDataCalonMhs[i]['Email']+'">Show</a>';
+			}
+			else
+			{
+				showFile = '-';
 			}
 
 			$(".tableData tbody").append(
 					'<tr>'+
-						'<td align= "center">'+no+'&nbsp<input type="checkbox" class="uniform" value ="'+getDataCalonMhs[i]['ID_register_formulir']+'"</td>'+
-						'<td>'+getDataCalonMhs[i]['Name']+'</td>'+
-						'<td>'+getDataCalonMhs[i]['NamePrody']+'</td>'+
-						'<td>'+getDataCalonMhs[i]['SchoolName']+'</td>'+
+						'<td align= "center">'+no+'&nbsp<input type="checkbox" class="uniform" nama ="'+getDataCalonMhs[i]['Name']+'" value ="'+getDataCalonMhs[i]['ID_register_formulir']+'"</td>'+
+						'<td>'+getDataCalonMhs[i]['Name']+'<br>'+getDataCalonMhs[i]['NamePrody']+'<br>'+getDataCalonMhs[i]['SchoolName']+'</td>'+
+						'<td>'+getDataCalonMhs[i]['FormulirCode']+'</td>'+
+						'<td>'+getDataCalonMhs[i]['getBeasiswa']+'<br>'+showFile+'</td>'+
 						isi_payment+
 					'</tr>' 	
 			);

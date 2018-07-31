@@ -1120,7 +1120,7 @@ class M_admission extends CI_Model {
               join db_academic.program_study as o
               on o.ID = a.ID_program_study
               where ( a.ID in (select ID_register_formulir from db_admission.register_nilai where Status = "Verified") 
-              or a.ID in (select ID_register_formulir from db_admission.register_kelulusan_ujian where Kelulusan = "Lulus") ) and a.ID not in (select ID_register_formulir from db_finance.payment_register) LIMIT '.$start. ', '.$limit;
+              or a.ID in (select ID_register_formulir from db_admission.register_kelulusan_ujian where Kelulusan = "Lulus") ) and a.ID not in (select ID_register_formulir from db_finance.register_admisi) LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array())->result_array();
 
       $this->load->model('master/m_master');
@@ -1221,7 +1221,7 @@ class M_admission extends CI_Model {
 
      public function getPaymentType_Cost_created($ID_register_formulir)
      {
-      $sql = 'select a.*,b.Description,b.Abbreviation from db_finance.payment_register as a join db_finance.payment_type as b on a.PTID = b.ID where a.ID_register_formulir = ?';
+      $sql = 'select a.*,b.Description,b.Abbreviation,c.Pay_tuition_fee,C.Discount from db_finance.payment_admisi as c join db_finance.payment_type as b on c.PTID = b.ID join db_finance.register_admisi as a on c.ID_register_formulir = a.ID_register_formulir where a.ID_register_formulir = ?';
       $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
       return $query;
      }
@@ -1249,14 +1249,47 @@ class M_admission extends CI_Model {
       }
      }
 
-     public function getDataCalonMhsTuitionFee_delete($limit, $start)
+     public function count_getDataCalonMhsTuitionFee()
      {
-      $arr_temp = array();
-      $sql= 'select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,
-              f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
-              n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
-              if((select count(*) as total from db_admission.register_nilai where Status = "Approved" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
-              as status1,p.CreateAT,p.CreateBY
+      $sql= 'select count(*) as total
+              from db_admission.register_formulir as a
+              JOIN db_admission.register_verified as b 
+              ON a.ID_register_verified = b.ID
+              JOIN db_admission.register_verification as c
+              ON b.RegVerificationID = c.ID
+              JOIN db_admission.register as d
+              ON c.RegisterID = d.ID
+              JOIN db_admission.country as e
+              ON a.NationalityID = e.ctr_code
+              JOIN db_employees.religion as f
+              ON a.ReligionID = f.IDReligion
+              JOIN db_admission.register_jtinggal_m as g
+              ON a.ID_register_jtinggal_m = g.ID
+              JOIN db_admission.country as h
+              ON a.ID_country_address = h.ctr_code
+              JOIN db_admission.province as i
+              ON a.ID_province = i.ProvinceID
+              JOIN db_admission.region as j
+              ON a.ID_region = j.RegionID
+              JOIN db_admission.district as k
+              ON a.ID_districts = k.DistrictID
+              JOIN db_admission.school_type as l
+              ON l.sct_code = a.ID_school_type
+              JOIN db_admission.register_major_school as m
+              ON m.ID = a.ID_register_major_school
+              JOIN db_admission.school as n
+              ON n.ID = d.SchoolID
+              join db_academic.program_study as o
+              on o.ID = a.ID_program_study
+              where ( a.ID in (select ID_register_formulir from db_admission.register_nilai where Status = "Verified") 
+              or a.ID in (select ID_register_formulir from db_admission.register_kelulusan_ujian where Kelulusan = "Lulus") ) and a.ID not in (select ID_register_formulir from db_finance.register_admisi)';
+      $query=$this->db->query($sql, array())->result_array();
+      return $query[0]['total'];
+     }
+
+     public function count_getDataCalonMhsTuitionFee_delete()
+     {
+      $sql= 'select count(*) as total
               from db_admission.register_formulir as a
               JOIN db_admission.register_verified as b 
               ON a.ID_register_verified = b.ID
@@ -1276,7 +1309,41 @@ class M_admission extends CI_Model {
               ON n.ID = d.SchoolID
               join db_academic.program_study as o
               on o.ID = a.ID_program_study
-              join db_finance.payment_register as p
+              join db_finance.register_admisi as p
+              on a.ID = p.ID_register_formulir
+              where p.Status = "Created" group by a.ID';
+      $query=$this->db->query($sql, array())->result_array();
+      return $query[0]['total'];
+     }
+
+     public function getDataCalonMhsTuitionFee_delete($limit, $start)
+     {
+      $arr_temp = array();
+      $sql= 'select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,
+              f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
+              n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
+              if((select count(*) as total from db_admission.register_nilai where Status = "Verified" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
+              as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa
+              from db_admission.register_formulir as a
+              JOIN db_admission.register_verified as b 
+              ON a.ID_register_verified = b.ID
+              JOIN db_admission.register_verification as c
+              ON b.RegVerificationID = c.ID
+              JOIN db_admission.register as d
+              ON c.RegisterID = d.ID
+              JOIN db_admission.country as e
+              ON a.NationalityID = e.ctr_code
+              JOIN db_employees.religion as f
+              ON a.ReligionID = f.IDReligion
+              JOIN db_admission.school_type as l
+              ON l.sct_code = a.ID_school_type
+              JOIN db_admission.register_major_school as m
+              ON m.ID = a.ID_register_major_school
+              JOIN db_admission.school as n
+              ON n.ID = d.SchoolID
+              join db_academic.program_study as o
+              on o.ID = a.ID_program_study
+              join db_finance.register_admisi as p
               on a.ID = p.ID_register_formulir
               where p.Status = "Created" group by a.ID LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array())->result_array();
@@ -1290,10 +1357,31 @@ class M_admission extends CI_Model {
             for ($k=0; $k < count($getPaymentType_Cost); $k++) { 
               // $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Cost']);
               $arr_temp2 = $arr_temp2 + array(
-                $getPaymentType_Cost[$k]['Abbreviation'] => number_format($getPaymentType_Cost[$k]['Pay_tuition_fee'],2,',','.'),
+                $getPaymentType_Cost[$k]['Abbreviation'] => 'Rp. '.number_format($getPaymentType_Cost[$k]['Pay_tuition_fee'],2,',','.'),
                 'Discount-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Discount']
               );
             }
+
+        // get file dan type beasiswa
+           $getBeasiswa = $this->m_master->caribasedprimary('db_admission.register_dsn_type_m','ID',$query[$i]['TypeBeasiswa']);
+           if (count($getBeasiswa) > 0) {
+             $getBeasiswa = $getBeasiswa[0]['DiscountType']; 
+           }
+           else
+           {
+            $getBeasiswa = '-'; 
+           }
+
+        // get File
+          $getFile = $this->m_master->caribasedprimary('db_admission.register_document','ID',$query[$i]['FileBeasiswa']);
+          if (count($getFile) > 0) {
+            $getFile = $getFile[0]['Attachment']; 
+          }
+          else
+          {
+           $getFile = '-'; 
+          }
+            
         if ($query[$i]['status1'] == 'Rapor') {
           // check rangking
             $getRangking = $this->getRangking($query[$i]['ID_register_formulir']);
@@ -1307,6 +1395,10 @@ class M_admission extends CI_Model {
               'Status1' => $query[$i]['status1'],
               // 'DiskonSPP' => $DiskonSPP,
               'RangkingRapor' => $getRangking,
+              'FormulirCode' => $query[$i]['FormulirCode'],
+              'getBeasiswa' => $getBeasiswa,
+              'getFile' => $getFile,
+              'Email' => $query[$i]['Email']
             );
         }
         else
@@ -1319,6 +1411,10 @@ class M_admission extends CI_Model {
               'Status1' => $query[$i]['status1'],
               // 'DiskonSPP' => $DiskonSPP,
               'RangkingRapor' => 0,
+              'FormulirCode' => $query[$i]['FormulirCode'],
+              'getBeasiswa' => $getBeasiswa,
+              'getFile' => $getFile,
+              'Email' => $query[$i]['Email'],
             );
         }
 
@@ -1331,7 +1427,13 @@ class M_admission extends CI_Model {
      public function set_tuition_fee_delete_data($input)
      {
       for ($i=0; $i < count($input); $i++) { 
-        $sql = "delete from db_finance.payment_register where ID_register_formulir = ".$input[$i];
+        $sql = "delete from db_finance.register_admisi where ID_register_formulir = ".$input[$i];
+        $query=$this->db->query($sql, array()); 
+
+        $sql = "delete from db_finance.payment_admisi where ID_register_formulir = ".$input[$i];
+        $query=$this->db->query($sql, array()); 
+
+        $sql = "delete from db_finance.payment_pre where ID_register_formulir = ".$input[$i];
         $query=$this->db->query($sql, array()); 
       }
      }
@@ -1363,7 +1465,7 @@ class M_admission extends CI_Model {
              ON n.ID = d.SchoolID
              join db_academic.program_study as o
              on o.ID = a.ID_program_study
-             join db_finance.payment_register as p
+             join db_finance.register_admisi as p
              on a.ID = p.ID_register_formulir
              where p.Status = "Approved" group by a.ID LIMIT '.$start. ', '.$limit;
      $query=$this->db->query($sql, array())->result_array();
@@ -1607,6 +1709,54 @@ class M_admission extends CI_Model {
           $arr_result = $query;
         }
         return $arr_result;
+    }
+
+    public function set_input_tuition_fee_submit($input)
+    {
+      //save data to payment_register
+      $this->load->model('master/m_master');
+      $data2 = $input['data2'][0];
+      $arr = [];
+      $temp = array();
+      $temp2 = array();
+      $temp['ID_register_formulir'] = $data2->id_formulir;
+      $temp['TypeBeasiswa'] = $data2->getBeasiswa;
+      $temp['FileBeasiswa'] = $data2->getDokumen;
+      $temp['Desc'] = $data2->ket;
+      $temp['CreateAT'] = date('Y-m-d');
+      $temp['CreateBY'] = $this->session->userdata('NIP');
+      $this->db->insert('db_finance.register_admisi', $temp);
+
+      foreach ($data2 as $key => $value) {
+            $a = explode('-', $key);
+            if (count($a) > 1) {
+              $get = $this->m_master->caribasedprimary('db_finance.payment_type','Abbreviation',$a[1]);
+              $temp2['Discount'] = $value;
+              $temp2['Pay_tuition_fee'] = $this->m_master->ClearPricetoDB($data2->$a[1]);
+              $temp2['PTID'] = $get[0]['ID'];
+              $temp2['ID_register_formulir'] = $data2->id_formulir;
+              
+              $arr[] = $temp2;
+            }
+            
+      }
+      $this->db->insert_batch('db_finance.payment_admisi', $arr);
+      
+
+      // save data cicilan pada table payment_pre
+        $ID_register_formulir = $data2->id_formulir;
+        $data1 = $input['data1'];
+        $arr2 = array();
+        for ($i=0; $i < count($data1); $i++) { 
+          $temp3 = array();
+          $temp3['ID_register_formulir'] = $ID_register_formulir;
+          $temp3['Invoice'] = $data1[$i]->Payment;
+          $temp3['Deadline'] = $data1[$i]->Deadline;
+          $arr2[] = $temp3;
+        }
+
+        $this->db->insert_batch('db_finance.payment_pre', $arr2);
+
     }
 
 }

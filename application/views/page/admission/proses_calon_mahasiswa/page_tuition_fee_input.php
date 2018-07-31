@@ -118,11 +118,10 @@
 				}
 				else
 				{
-					var selected = (k==0) ? 'selected' : '';
-				}
-
-				if (k == 0) {
-					selecTOption += '<option value="'+'0'+'" '+selected+'>'+'Tidak Beasiswa'+''+'</option>';
+					//var selected = (k==0) ? 'selected' : '';
+					if (k == 0) {
+						selecTOption += '<option value="'+'0'+'" '+selected+'>'+'Tidak Beasiswa'+''+'</option>';
+					}
 				}
 
 				selecTOption += '<option value="'+getBeasiswa[k]['ID']+'" '+selected+'>'+getBeasiswa[k]['DiscountType']+''+'</option>';
@@ -148,6 +147,7 @@
 
 			selecTOption2 += '</select>';
 
+			showFile = '';
 			if (getDataCalonMhs[i]['RangkingRapor'] != 0) {
 				showFile = '<a href="javascript:void(0)" class="show_a_href" id = "show'+getDataCalonMhs[i]['ID_register_formulir']+'" filee = "'+getDataCalonMhs[i]['Attachment']+'" Email = "'+getDataCalonMhs[i]['Email']+'">Show</a>';
 			}

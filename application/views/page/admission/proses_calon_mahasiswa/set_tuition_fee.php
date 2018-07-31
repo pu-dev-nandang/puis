@@ -93,7 +93,7 @@
         switch(pageHtml)
         {
          case "tuition_fee" :
-            process_tuition_fee();
+            //process_tuition_fee();
          break;      
          case  "tuition_fee_delete" :
                process_tuition_fee_delete();
@@ -132,6 +132,7 @@
                        toastr.options.fadeOut = 10000;
                        toastr.success('Data berhasil disimpan', 'Success!');
                        loadPage('tuition_fee_delete/1');
+                       $(".widget_delete").remove();
                        $('#NotificationModal').modal('hide');
                     },500);
                 }).done(function() {
@@ -258,53 +259,155 @@
          return allVals;
     }
 
+
     // event cheklist
-    $(document).on('change','.tableData input[type=checkbox]:checked', function () {
-        if(this.checked) {
+    $(document).on('change','.tableData input[type=checkbox]', function () {
+        var Uniformvaluee = $(this).val();
+        switch(pageHtml)
+        {
+         case "tuition_fee" :
             var Uniformvaluee = $(this).val();
-            var Nama = $(this).attr('nama');
-            if (Uniformvaluee != 'nothing') {
-                // get data to make dom
-                    var arrcheklist = [];
-                $('.getDom').each(function(){
-                    var arrTemp = [];
-                    var id_formulir = $(this).attr('id-formulir');
-                    var payment_type = $(this).attr('payment-type');
-                    var payment_type_ID = $(this).attr('payment-type_ID');
-                    var valuee = $(this).val();
-                    var getBeasiswa = $('#getBeasiswa'+Uniformvaluee).val();
-                    var getDokumen = $('#getDokumen'+Uniformvaluee).val();
-                    var ket = $('#ket'+Uniformvaluee).val();
-                    var pt = payment_type.split('-');
-                    if (pt.length == 1) {
-                        if (id_formulir == Uniformvaluee) {
-                            arrTemp = {
-                                    id_formulir : id_formulir,
-                                    payment_type : payment_type,
-                                    payment_type_ID : payment_type_ID,
-                                    valuee : valuee,
-                                    getBeasiswa : getBeasiswa,
-                                    getDokumen : getDokumen,
-                                    ket : ket,
-                                    Nama : Nama,
-                            };
-                            arrcheklist.push(arrTemp);
+            if(this.checked) {
+                $('.getDom[id-formulir="'+Uniformvaluee+'"]').prop('disabled', true);
+                var Nama = $(this).attr('nama');
+                if (Uniformvaluee != 'nothing') {
+                    // get data to make dom
+                        var arrcheklist = [];
+                    $('.getDom').each(function(){
+                        var arrTemp = [];
+                        var id_formulir = $(this).attr('id-formulir');
+                        var payment_type = $(this).attr('payment-type');
+                        var payment_type_ID = $(this).attr('payment-type_ID');
+                        var valuee = $(this).val();
+                        var getBeasiswa = $('#getBeasiswa'+Uniformvaluee).val();
+                        var getDokumen = $('#getDokumen'+Uniformvaluee).val();
+                        var ket = $('#ket'+Uniformvaluee).val();
+                        var pt = payment_type.split('-');
+                        if (pt.length == 1) {
+                            var Discount = $("#"+payment_type+Uniformvaluee).val();
+                            if (id_formulir == Uniformvaluee) {
+                                arrTemp = {
+                                        id_formulir : id_formulir,
+                                        payment_type : payment_type,
+                                        payment_type_ID : payment_type_ID,
+                                        valuee : valuee,
+                                        getBeasiswa : getBeasiswa,
+                                        getDokumen : getDokumen,
+                                        ket : ket,
+                                        Nama : Nama,
+                                        Discount : Discount
+                                };
+                                arrcheklist.push(arrTemp);
+                            }
                         }
-                    }
-                    
-                })
-                //console.log(arrcheklist); 
-                var arrResult =  generateArr(arrcheklist);
-                domHTMLCicilan(arrResult);  
+                        
+                    })
+                    console.log(arrcheklist); 
+                    var arrResult =  generateArr(arrcheklist);
+                    domHTMLCicilan(arrResult);  
+                }
+                
             }
-            
+            else
+            {
+                $(".widget_"+Uniformvaluee).remove();
+                $('.getDom').prop('disabled', false);
+            }
+         break;      
+         case  "tuition_fee_delete" :
+            var Nama = $(this).attr('nama');
+            if(this.checked) {
+               var url = base_url_js + "get_detail_cicilan_fee_admisi";
+               var data = {
+                   ID_register_formulir : Uniformvaluee,
+               }
+               var token = jwt_encode(data,"UAP)(*");
+               $.post(url,{token:token},function (data_json) {
+                   // jsonData = data_json;
+                   var obj = JSON.parse(data_json);
+                   console.log(obj);
+                   var bbb = '';
+                   for (var i = 0; i < obj.length; i++) {
+                       bbb += '<tr>'+
+                                 '<td>'+ (parseInt(i)+1) + '</td>'+
+                                 '<td>'+ formatRupiah(obj[i]['Invoice']) + '</td>'+
+                                 '<td>'+ obj[i]['Deadline']+'</td>'+
+                               '</tr>';  
+                   }
+                   var aaa = '<!--<div class = "row">-->'+
+                                '<div id = "tblData" class="table-responsive">'+
+                                    '<table class="table table-striped table-bordered table-hover table-checkable">'+
+                                    '<thead>'+
+                                      '<tr>'+
+                                        '<th style="width: 5px;">Cicilan ke </th>'+
+                                        '<th style="width: 5px;">Invoice </th>'+
+                                        '<th style="width: 5px;">Deadline </th>'+
+                                       '<tr>'+ 
+                                    '</thead>'+
+                                    '<tbody>'+
+                                    bbb+
+                                    '</tbody>'+'</table></div>'+
+                             '<!--</div>-->';
+
+                   var html = '<div class="widget box widget_'+Uniformvaluee+' widget_delete">'+
+                       '<div class="widget-header">'+
+                           '<h4 class="header"><i class="icon-reorder"></i> Detail Cicilan '+Nama+'</h4>'+
+                       '</div>'+
+                       '<div class="widget-content">'+
+                           aaa
+                       '</div>'+
+                   '</div>';
+                   $(".formAddFormKD").append(html);
+               }).done(function() {
+                 
+               }).fail(function() {
+                
+                 toastr.error('The Database connection error, please try again', 'Failed!!');
+               }).always(function() {
+                
+               });
+            }
+            else
+            {
+                $(".widget_"+Uniformvaluee).remove();
+            }   
+         break;
         }
+        
                
     });
 
+    function generateArr(data)
+    {
+        var arrText = [];
+        for (var i = 0; i < data.length; i++) {
+            var arrTemp = {};
+            arrTemp['id_formulir'] = data[i]['id_formulir'];
+            arrTemp['Discount-'+data[i]['payment_type']] = data[i]['Discount'];
+            arrTemp[data[i]['payment_type']] = data[i]['valuee'];
+            arrTemp['getDokumen'] = data[i]['getDokumen'];
+            arrTemp['getBeasiswa'] = data[i]['getBeasiswa'];
+            arrTemp['ket'] = data[i]['ket'];
+            arrTemp['Nama'] = data[i]['Nama'];
+            for (var j = i + 1; j < data.length; j++) {
+                if (data[i]['id_formulir'] == data[j]['id_formulir']) {
+                    arrTemp[data[j]['payment_type']] = data[j]['valuee'];
+                    arrTemp['Discount-'+data[j]['payment_type']] = data[j]['Discount'];
+                    i++;
+                }
+            }
+
+            arrText.push(arrTemp);
+
+        }
+
+        //console.log(arrText);
+        return arrText;
+    }
+
     function domHTMLCicilan(data)
     {
-        //console.log(data);
+        console.log(data);
         //console.log(payment_type);
         //console.log(max_cicilan);
         max_cicilanString = max_cicilan[0]['max_cicilan'];
@@ -329,7 +432,7 @@
             '<div class = "row" id="pageSetCicilan'+data[0]['id_formulir']+'">'+
             '</div>'
 
-        var html = '<div class="widget box">'+
+        var html = '<div class="widget box widget_'+data[0]['id_formulir']+'">'+
             '<div class="widget-header">'+
                 '<h4 class="header"><i class="icon-reorder"></i> Set Cicilan '+data[0]['Nama']+'</h4>'+
             '</div>'+
@@ -343,7 +446,7 @@
     $(document).on('change','.jml_cicilan', function () {
         var data = $(this).attr('data');
         data = jwt_decode(data,'UAP)(*');
-        console.log(data);
+        //console.log(data);
          $("#btn-div"+data[0]['id_formulir']).remove();
         // get all invoice
         var get_Invoice = 0;
@@ -535,8 +638,11 @@
               // hitung tanggal tidak boleh melewati cicilan sebelumnya
 
               if (bool2) {
-                var url = base_url_js + "#";
-                var data = arrTemp
+                var url = base_url_js + "admission/proses-calon-mahasiswa/set_input_tuition_fee_submit";
+                var data = {
+                    data1 : arrTemp,
+                    data2 : dataa
+                }
                 var token = jwt_encode(data,"UAP)(*");
                 $.post(url,{token:token},function (data_json) {
                     // jsonData = data_json;
@@ -547,7 +653,10 @@
                     }
                     else
                     {
-                        //window.location.reload(true); 
+                        $(".widget_"+dataa[0]['id_formulir']).remove();
+                        $('.uniform[value="'+dataa[0]['id_formulir']+'"]').remove();
+                        toastr.success('Data berhasil disimpan', 'Success!');
+                        $('tr[id="id_formulir'+dataa[0]['id_formulir']+'"]').remove();
                     }
 
                 }).done(function() {
@@ -558,6 +667,8 @@
                 }).always(function() {
                  $('#btn-Save'+dataa[0]['id_formulir']).prop('disabled',false).html('Submit');
                 });
+
+                //$('#btn-Save'+dataa[0]['id_formulir']).prop('disabled',false).html('Submit');  
               } else {
                 toastr.error('Tanggal Deadline cicilan tidak boleh mendahului tanggal cicilan sebelumnya', 'Failed!!');
                 $('#btn-Save'+dataa[0]['id_formulir']).prop('disabled',false).html('Submit');
@@ -570,32 +681,6 @@
 
         });
     });
-
-    function generateArr(data)
-    {
-        var arrText = [];
-        for (var i = 0; i < data.length; i++) {
-            var arrTemp = {};
-            arrTemp['id_formulir'] = data[i]['id_formulir'];
-            arrTemp[data[i]['payment_type']] = data[i]['valuee'];
-            arrTemp['getDokumen'] = data[i]['getDokumen'];
-            arrTemp['getBeasiswa'] = data[i]['getBeasiswa'];
-            arrTemp['ket'] = data[i]['ket'];
-            arrTemp['Nama'] = data[i]['Nama'];
-            for (var j = i + 1; j < data.length; j++) {
-                if (data[i]['id_formulir'] == data[j]['id_formulir']) {
-                    arrTemp[data[j]['payment_type']] = data[j]['valuee'];
-                    i++;
-                }
-            }
-
-            arrText.push(arrTemp);
-
-        }
-
-        //console.log(arrText);
-        return arrText;
-    }
 
     $(document).on('click','#dataResultCheckAll', function () {
         $('input.uniform').not(this).prop('checked', this.checked);
