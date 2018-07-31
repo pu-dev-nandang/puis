@@ -118,4 +118,13 @@ class C_global extends CI_Controller {
         $filePath = readfile('document/'.$file);
     }
 
+    public function get_detail_cicilan_fee_admisi()
+    {
+        $input = $this->getInputToken();
+        $ID_register_formulir = $input['ID_register_formulir'];
+        $output = $this->m_master->caribasedprimary('db_finance.payment_pre','ID_register_formulir',$ID_register_formulir);
+        echo json_encode($output);
+
+    }
+
 }

@@ -492,23 +492,20 @@ class C_admission extends Admission_Controler {
     public function set_tuition_fee_input($page = null)
     {
       $this->load->library('pagination');
-      $config = $this->config_pagination_default_ajax(1000,5,5);
+      $page_Count = 5;
+      $countData = $this->m_admission->count_getDataCalonMhsTuitionFee();
+      $config = $this->config_pagination_default_ajax($countData,$page_Count,5);
       $this->pagination->initialize($config);
       $page = $this->uri->segment(5);
       $start = ($page - 1) * $config["per_page"];
 
       $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
       $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee($config["per_page"], $start));
-      $this->m_admission->getDataCalonMhsAll($config["per_page"], $start,$input)
+      // $this->m_admission->getDataCalonMhsAll($config["per_page"], $start,$input);
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_tuition_fee_input',$this->data,true);
 
-      $pagination = '';
-      if (count($this->m_admission->getDataCalonMhsTuitionFee($config["per_page"], $start)) > 0) {
-        $pagination = $this->pagination->create_links();
-      }
-
       $output = array(
-      'pagination_link'  => $pagination,
+      'pagination_link'  => $this->pagination->create_links(),
       'loadtable'   => $content,
       );
       echo json_encode($output);
@@ -534,7 +531,9 @@ class C_admission extends Admission_Controler {
     public function set_tuition_fee_delete($page = null)
     {
       $this->load->library('pagination');
-      $config = $this->config_pagination_default_ajax(1000,5,5);
+      $page_Count = 5;
+      $countData = $this->m_admission->count_getDataCalonMhsTuitionFee_delete();
+      $config = $this->config_pagination_default_ajax($countData,$page_Count,5);
       $this->pagination->initialize($config);
       $page = $this->uri->segment(5);
       $start = ($page - 1) * $config["per_page"];
@@ -542,6 +541,7 @@ class C_admission extends Admission_Controler {
       $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
       $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee_delete($config["per_page"], $start));
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_tuition_fee_delete',$this->data,true);
+
       $output = array(
       'pagination_link'  => $this->pagination->create_links(),
       'loadtable'   => $content,
@@ -759,6 +759,22 @@ class C_admission extends Admission_Controler {
       );
       echo json_encode($output);
 
+    }
+
+    public function set_input_tuition_fee_submit()
+    {
+      $input = $this->getInputToken();
+      // save data to payment_register and payment_pre
+      //print_r($input);
+      $msg = '';
+      try {
+        $output =$this->m_admission->set_input_tuition_fee_submit($input);
+        $msg = '';
+      }
+      catch(Exception $e) {
+        $msg = $e->getMessage();
+      }
+      echo json_encode($msg);
     }
 
     public function generatenim()

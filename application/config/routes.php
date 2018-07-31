@@ -333,6 +333,11 @@ $route['admission/proses-calon-mahasiswa/checkdata-calon-mahasiswa'] = 'page/adm
 $route['admission/proses-calon-mahasiswa/data-calon-mhs/(:num)'] = 'page/admission/c_admission/data_calon_mahasiswa/$1';
 $route['admission/detailPayment'] = 'page/admission/c_admission/detailPayment';
 
+// --- update admisi setelah request 20180731
+$route['admission/proses-calon-mahasiswa/set_input_tuition_fee_submit'] = 'page/admission/c_admission/set_input_tuition_fee_submit';
+
+
+
 
 $route['admission/distribusi-formulir/formulir-offline'] = 'page/admission/c_admission/distribusi_formulir_offline'; // db menu
 $route['admission/distribusi-formulir/formulir-offline/pagination/(:num)'] = 'page/admission/c_admission/pagination_formulir_offline/$1';
@@ -345,6 +350,7 @@ $route['admission/distribusi-formulir/formulir-offline/selectPIC'] = 'page/admis
 
 $route['admission/mastercalonmahasiswa/generate-nim'] = 'page/admission/c_admission/generatenim';
 $route['admission/mastercalonmahasiswa/submit_import_excel_File_generate_nim'] = 'page/admission/c_admission/submit_import_excel_File_generate_nim';
+
 
 
 
@@ -418,6 +424,7 @@ $route['finance/listfile_va'] =  'page/finance/c_finance/listfile_va';
 $route['loadDataRegistrationBelumBayar'] =  'api/C_global/loadDataRegistrationBelumBayar';
 $route['loadDataRegistrationTelahBayar'] =  'api/C_global/load_data_registration_telah_bayar';
 $route['loadDataRegistrationFormulirOffline'] =  'api/C_global/load_data_registration_formulir_offline';
+$route['get_detail_cicilan_fee_admisi'] =  'api/C_global/get_detail_cicilan_fee_admisi';
 
 
 // ---- Save to PDF ---
