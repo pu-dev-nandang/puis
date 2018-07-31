@@ -161,7 +161,7 @@
                                 '  </button>' +
                                 '  <ul class="dropdown-menu">' +
                                 '    <li><a href="javascript:void(0);" class="btnInputScore" data-nip="'+dataC.Coordinator+'" data-id="'+dataC.ScheduleID+'">Input Score</a></li>' +
-                                '    <li><a href="javascript:void(0);" class="btnGrade" data-page="InputGrade1" data-group="'+dataC.Classgroup+'" data-id="'+dataC.ScheduleID+'">Grade Approval</a></li>' +
+                                '    <li><a href="javascript:void(0);" class="btnGrade" data-page="InputGrade1" data-group="'+dataC.Classgroup+'" data-id="'+dataC.ScheduleID+'">Approval - Score Weighted</a></li>' +
                                 '    <li role="separator" class="divider"></li>' +
                                 '    <li><a href="javascript:void(0);" class="inputScheduleExchange" data-no="'+i+'" data-id="">Cetak Report UTS</a></li>' +
                                 '    <li><a href="javascript:void(0);" class="inputScheduleExchange" data-no="'+i+'" data-id="">Cetak Report UAS</a></li>' +
@@ -176,6 +176,8 @@
                                 silabusSAP = '<i class="fa fa-check-circle" style="color: green;"></i>';
                             } else if(dataC.dataSilabusSAP.length>0 && dataC.dataSilabusSAP[0].Status=='0'){
                                 silabusSAP = '<i class="fa fa-repeat"></i>';
+                            } else if(dataC.dataSilabusSAP.length>0 && dataC.dataSilabusSAP[0].Status=='-2'){
+                                silabusSAP = '<i class="fa fa-times-circle" style="color: darkred;"></i>';
                             }
 
                             tr.append('<tr>' +
@@ -252,7 +254,12 @@
                 else if(dataG.Status=='2') {
                     btnCheck = '';
                     status = '<i class="fa fa-check-circle" style="color: green;"></i> Approved';
+                } else if(dataG.Status=='-2'){
+                    btnCheck = '';
+                    status = '<i class="fa fa-times-circle" style="color: darkred;"></i> Not Approved';
                 }
+
+                var reason = (dataG.ReasonNotApprove!=null && dataG.ReasonNotApprove!='') ? dataG.ReasonNotApprove : '';
 
                 bodyGrade = '<h4>Syllabus & RPS</h4>' +
                     '                    <table class="table table-bordered tbGradeC">' +
@@ -260,8 +267,8 @@
                     '                            <td style="width: 50%;">'+silabus+'</td>' +
                     '                            <td style="width: 50%;">'+sap+'</td>' +
                     '                        </tr>' +
-                    '                    </table>' +
-                    '                    <h4>Grade</h4>' +
+                    '                    </table><hr/>' +
+                    '                    <h4>Score Weighted</h4>' +
                     '                    <table class="table table-bordered tbGradeC">' +
                     '                        <tr style="background: #9e9e9e3d;font-weight: bold;">' +
                     '                            <td colspan="5" style="width: 60%;">Assigment</td>' +
@@ -283,27 +290,31 @@
                     '                            <td>5</td>' +
                     '                        </tr>' +
                     '                        <tr>' +
-                    '                            <td>'+dataG.Assg1+'</td>' +
-                    '                            <td>'+dataG.Assg2+'</td>' +
-                    '                            <td>'+dataG.Assg3+'</td>' +
-                    '                            <td>'+dataG.Assg4+'</td>' +
-                    '                            <td>'+dataG.Assg5+'</td>' +
+                    '                            <td>'+dataG.Assg1+' %</td>' +
+                    '                            <td>'+dataG.Assg2+' %</td>' +
+                    '                            <td>'+dataG.Assg3+' %</td>' +
+                    '                            <td>'+dataG.Assg4+' %</td>' +
+                    '                            <td>'+dataG.Assg5+' %</td>' +
                     '                        </tr>' +
                     '                        <tr>' +
+                    '                            <td colspan="9">' +
+                    '                               <textarea class="form-control" id="formReasonNotApprove" rows="3" placeholder="Please, input reason if you do not approve">'+reason+'</textarea>' +
+                    '                           </td>' +
+                    '                        </tr>' +
+                    '                        <tr>' +
+                    // '                            <td>Action</td>' +
                     '                            <td colspan="9" style="text-align: right;">' +
+                    '                                <button data-id="'+dataG.ID+'" id="btnGradeNotApprove" class="btn btn-default btn-default-danger">Not Approved</button> | ' +
                     '                                <button data-id="'+dataG.ID+'" id="btnGradeApprove" class="btn btn-default btn-default-success" '+appc+' '+btnAct+'>Approved</button>' +
                     '                            </td>' +
                     '                        </tr>' +
                     '                    </table>' +
-                    '                    <hr/>' +
-                    '                    <div class="checkbox">' +
+                    // '                    <hr/>' +
+                    '                    <div class="checkbox hide">' +
                     '                        <label>' +
                     '                            <input id="checkGradeAgain" type="checkbox" value="'+dataG.ID+'" '+btnCheck+'> Berikan Akses Untuk Input Ulang Silabus & SAP' +
                     '                        </label>' +
                     '                    </div>';
-
-
-
 
             } else {
                 bodyGrade = '<div style="text-align:center;"><h3>Belum Input Grade</h3></div>';
@@ -333,13 +344,38 @@
         var token = jwt_encode({action:'gradeUpdate',ID:ID,Status:'2'},'UAP)(*');
         $.post(url,{token:token},function (result) {
             loadCourse();
+            toastr.success('Grade Approved','Saved');
             setTimeout(function () {
-                $('#btnGradeApprove').html('Approved');
-                $('#viewStatus'+ID).html('<i class="fa fa-check-circle" style="color: green;"></i> Approved');
-                toastr.success('Grade Approved','Saved');
+                // $('#btnGradeApprove').html('Approved');
+                // $('#viewStatus'+ID).html('<i class="fa fa-check-circle" style="color: green;"></i> Approved');
+
+                $('#GlobalModal').modal('hide');
             },500);
 
         })
+    });
+
+    $(document).on('click','#btnGradeNotApprove',function () {
+        var formReasonNotApprove = $('#formReasonNotApprove').val();
+
+        if(formReasonNotApprove!='' && formReasonNotApprove!=null){
+
+            loading_button('#btnGradeNotApprove');
+            var ID = $(this).attr('data-id');
+
+            var url = base_url_js+'api/__crudScore';
+            var token = jwt_encode({action:'updateNotApprove',ID:ID,ReasonNotApprove:formReasonNotApprove,Status:'-2'},'UAP)(*');
+
+            $.post(url,{token:token},function (resultBack) {
+                loadCourse();
+                toastr.success('Reason sent','Success');
+                setTimeout(function () { $('#GlobalModal').modal('hide'); },500);
+            });
+
+        } else {
+            toastr.error('Reason is required','Error');
+        }
+
     });
 
     $(document).on('change','#checkGradeAgain',function () {
