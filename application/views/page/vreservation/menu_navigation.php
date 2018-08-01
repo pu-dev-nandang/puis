@@ -190,3 +190,10 @@ if ($this->uri->segment(1) == 'dashboard') {
 $this->m_master->checkAuth_user();
 
  ?>
+
+ <script type="text/javascript">
+     function loadDataSchedule(arrClass)
+     {  
+        
+     }
+ </script>

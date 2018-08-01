@@ -29,7 +29,6 @@
 	 *
 	 * Demo JavaScript used on dashboard and calendar-page.
 	 */
-
 	"use strict";
 
 	$(document).ready(function(){
@@ -58,9 +57,10 @@
 		}
 
 		$('#calendar_view').fullCalendar({
+			defaultView: 'agendaWeek',
 			disableDragging: false,
 			weekends: false,
-			header: h,
+			//header: h,
 			editable: true,
 			events: [{
 					title: 'All Day Event',
@@ -106,6 +106,16 @@
 				}
 			]
 		});
+
+		/*$('#calendar_view').fullCalendar({
+			defaultView: 'agendaDay',
+			      groupByResource: true,
+			      resources: [
+			        { id: 'a', title: 'Room A' },
+			        { id: 'b', title: 'Room B' }
+			      ],
+			      events: [{"resourceId":"a","title":"All Day Event","start":"2018-08-01"},{"resourceId":"a","title":"Conference","start":"2018-07-31","end":"2018-08-02"},{"resourceId":"b","title":"Meeting","start":"2018-08-01T10:30:00+00:00","end":"2018-08-01T12:30:00+00:00"},{"resourceId":"a","title":"Lunch","start":"2018-08-01T12:00:00+00:00"}]
+		});*/
 
 	});
 
@@ -154,6 +164,7 @@
 	        }
 	    }).done(function() {
 	        LoaddataTableStandard('.datatable');
+	        loadDataSchedule();
 	    })
 	}
 </script>
