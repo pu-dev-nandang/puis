@@ -33,7 +33,7 @@
 	"use strict";
 
 	$(document).ready(function(){
-		getAllRoom();
+		loadRoomStatus(loadDataRoomStatus);
 
 		//===== Calendar =====//
 		var date = new Date();
@@ -59,6 +59,7 @@
 
 		$('#calendar_view').fullCalendar({
 			disableDragging: false,
+			weekends: false,
 			header: h,
 			editable: true,
 			events: [{
@@ -106,89 +107,53 @@
 			]
 		});
 
-		function getAllRoom()
-		{
-			var url = base_url_js+'vreservation/getRoom/'+page;
-			var data = {
-			    ta : ta,
-			    prodi : prodi,
-			    PTID  : PTID,
-			    NIM : NIM,
-			};
-			var token = jwt_encode(data,'UAP)(*');
-			$.post(url,{token:token},function (resultJson) {
-			   var resultJson = jQuery.parseJSON(resultJson);
-			   console.log(resultJson);
-			    var Data_mhs = resultJson.loadtable;
-			    data = Data_mhs;
-			    dataaModal = Data_mhs;
-			    for(var i=0;i<Data_mhs.length;i++){
-			      var ccc = 0;
-			      var yy = (Data_mhs[i]['InvoicePayment'] != '') ? formatRupiah(Data_mhs[i]['InvoicePayment']) : '-';
-			      // proses status
-			      var status = '';
-
-			      var b = 0;
-			      var cicilan = 0;
-			      var bayar = 0;
-			      var htmlCicilan = '';
-			      // count jumlah pembayaran dengan status 1
-			      for (var j = 0; j < Data_mhs[i]['DetailPayment'].length; j++) {
-			        var a = Data_mhs[i]['DetailPayment'][j]['Status'];
-			        if(a== 1)
-			        {
-			          b = parseInt(b) + parseInt(Data_mhs[i]['DetailPayment'][j]['Invoice']);
-			          bayar = bayar + 1;
-			        }
-			        cicilan = cicilan + 1;
-			      }
-
-
-			      if(cicilan == 1)
-			      {
-			        htmlCicilan = "Tidak Cicilan, Deadline : "+Data_mhs[i]['DetailPayment'][0]['Deadline'];
-			      }
-			      else
-			      {
-			        for (var k = 1; k <= cicilan; k++) {
-			          var dd = parseInt(k) - 1 ;
-			          var bayarStatus = (k > bayar) ? '<i class="fa fa-minus-circle" style="color: red;"></i>' : '<i class="fa fa-check-circle" style="color: green;"></i>';
-			          htmlCicilan += '<p>Cicilan ke '+k+ ': '+bayarStatus+ ' ,Deadline : '+Data_mhs[i]['DetailPayment'][dd]['Deadline']+'</p>';
-			        }
-			      }
-
-			      var tr = '<tr>';
-			      // show bintang
-			      var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>'; 
-			      $('#dataRow').append(tr +
-			          '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
-			          // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
-			          '<td>'+bintang+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
-			          // '<td>'+Data_mhs[i]['NPM']+'</td>' +
-			          // '<td>'+Data_mhs[i]['Year']+'</td>' +
-			          '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +
-			          '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
-			          '<td>'+yy+'</td>' +
-			          '<td>'+htmlCicilan+'</td>'+
-			          '<td>'+'<button class = "DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'">View</button>&nbsp <button class = "edit" NPM = "'+Data_mhs[i]['NPM']+'" semester = "'+Data_mhs[i]['SemesterID']+'" PTID = "'+Data_mhs[i]['PTID']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'">Edit</button>'+'</td>' +
-			          '</tr>');
-			     
-			    }
-
-			   if(Data_mhs.length > 0)
-			   {
-			    $('#datatable2').removeClass('hide');
-			    $("#pagination_link").html(resultJson.pagination_link);
-			   }
-			   
-			}).fail(function() {
-			  
-			  toastr.info('No Result Data'); 
-			  // toastr.error('The Database connection error, please try again', 'Failed!!');
-			}).always(function() {
-			    $('#NotificationModal').modal('hide');
-			});
-		}
-
 	});
+
+	function loadRoomStatus(callback)
+	{
+	    // Some code
+	    // console.log('test');
+	    $("#loadtableMenu").empty();
+	    var table = '<table class="table table-striped table-bordered table-hover table-checkable datatable">'+
+	    '<thead>'+
+	        '<tr>'+
+	            '<th style="width: 10%;">Room</th>'+
+	            '<th style="width: 13%;">Status</th>'+
+	            '<th style="width: 13%;">Booked By</th>'+
+	            '<th style="width: 21%;">Ends</th>'+
+	        '</tr>'+
+	    '</thead>'+
+	    '<tbody>'+
+	    '</tbody>'+
+	    '</table>';
+	    //$("#loadtableNow").empty();
+	    $("#classroom_view").html(table);
+
+	    /*if (typeof callback === 'function') { 
+	        callback(); 
+	    }*/
+	    callback();
+	}
+
+	function loadDataRoomStatus()
+	{
+	    var url = base_url_js+'vreservation/getroom'
+	// loading_page('#loadtableNow');
+	    $.post(url,function (data_json) {
+	        var response = jQuery.parseJSON(data_json);
+	        // $("#loadingProcess").remove();
+	        for (var i = 0; i < response.length; i++) {
+	            $(".datatable tbody").append(
+	                '<tr>'+
+	                    '<td>'+response[i]['room']+'</td>'+
+	                    '<td>'+response[i]['status']+'</td>'+
+	                    '<td>'+response[i]['BookedBy']+'</td>'+
+	                    '<td>'+response[i]['Ends']+'</td>'+
+	                '</tr>' 
+	                );
+	        }
+	    }).done(function() {
+	        LoaddataTableStandard('.datatable');
+	    })
+	}
 </script>
