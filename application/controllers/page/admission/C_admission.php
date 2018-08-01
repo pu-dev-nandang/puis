@@ -872,6 +872,7 @@ class C_admission extends Admission_Controler {
           $Gender = $objWorksheet->getCellByColumnAndRow(14, $i)->getCalculatedValue();
           $PlaceOfBirth = $objWorksheet->getCellByColumnAndRow(15, $i)->getCalculatedValue();
           $DateOfBirth = $objWorksheet->getCellByColumnAndRow(16, $i)->getCalculatedValue();
+          $DateOfBirth = date('Y-m-d',PHPExcel_Shared_Date::ExcelToPHP($DateOfBirth));
           $Phone = $objWorksheet->getCellByColumnAndRow(17, $i)->getCalculatedValue();
           $HP = $objWorksheet->getCellByColumnAndRow(18, $i)->getCalculatedValue();
           $ClassOf = $objWorksheet->getCellByColumnAndRow(19, $i)->getCalculatedValue();

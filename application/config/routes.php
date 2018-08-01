@@ -573,3 +573,36 @@ $route['api/__crudKRSOnline'] = 'api/c_api/crudKRSOnline';
 $route['testadi'] = 'dashboard/c_dashboard/testadi';
 $route['testadi2'] = 'c_login/testadi2';
 // for inject //
+
+
+
+// Venue Reservation // 
+$route['venue_reservation'] = 'page/vreservation/c_global';
+$query = $db->get('db_reservation.cfg_sub_menu');
+$result = $query->result();
+foreach( $result as $row )
+{
+	$Slug = $row->Slug;
+	$Slug = explode('/', $Slug);
+	if (in_array('(:any)', $Slug)) {
+	   $a = count($Slug) - 1;
+	   $URI = '';
+	   for ($i=0; $i < $a; $i++) { 
+	   	$URI .= $Slug[$i].'/';
+	   }
+	   $route[ $URI.'(:any)' ] = $row->Controller;
+	}
+	elseif(in_array('(:num)', $Slug)) {
+		$a = count($Slug) - 1;
+		$URI = '';
+		for ($i=0; $i < $a; $i++) { 
+			$URI .= $Slug[$i].'/';
+		}
+		$route[ $URI.'(:num)' ] = $row->Controller;
+	}
+	else
+	{
+		$route[ $row->Slug ] = $row->Controller;
+	}
+
+}

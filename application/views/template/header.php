@@ -50,6 +50,12 @@
                     <span>Announcement</span>
                 </a>
             </li>
+            <li class="<?php if($this->uri->segment(1)=='vreservation'){echo 'current';} ?>">
+                <a href="<?php echo base_url('vreservation/dashboard/view'); ?>" id="btn_reservation">
+                    <i class="fa fa-th-large" aria-hidden="true"></i>
+                    <span>Venue Reservation</span>
+                </a>
+            </li>
             <li class="dropdown hidden-xs hidden-sm" id = 'NotificationPersonal'>
 
             </li>
