@@ -1580,6 +1580,7 @@ class M_admission extends CI_Model {
                                       'BilingID' => $getCicilan[$j]['BilingID'],
                                       'Status' => $getCicilan[$j]['Status'],
                                       'Deadline' => $getCicilan[$j]['Deadline'],
+                                      'ID' => $getCicilan[$j]['ID'],
                                       )
         );
          if (count($getCicilan) == ($j+1)) {
@@ -1594,6 +1595,7 @@ class M_admission extends CI_Model {
                                               'BilingID' => '',
                                               'Status' => '',
                                               'Deadline' => '',
+                                              'ID' => '',
                                               )
                 );
                 $arr_temp2 = $arr_temp2 + $arr_temp3; 

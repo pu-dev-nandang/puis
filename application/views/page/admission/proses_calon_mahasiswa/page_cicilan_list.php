@@ -60,7 +60,7 @@
 				if (getDataCalonMhs[i]['Cicilan_'+b]['Status'] == '') {
 					c = '-';
 				}
-				var d = (getDataCalonMhs[i]['Cicilan_'+b]['BilingID'] != "" && getDataCalonMhs[i]['Cicilan_'+b]['Status'] == 0) ? '<br>Deadline : <input class = "deadline" id = "deadline_'+no+'" value = "'+getDataCalonMhs[i]['Cicilan_'+b]['Deadline']+'" cicilan = "'+b+'">' :'<br> Deadline : '+getDataCalonMhs[i]['Cicilan_'+b]['Deadline'];
+				var d = (getDataCalonMhs[i]['Cicilan_'+b]['BilingID'] != "" && getDataCalonMhs[i]['Cicilan_'+b]['Status'] == 0) ? '<br>Deadline : <div id = "deadline_'+no+'" class="input-group input-append date datetimepicker"><input value = "'+getDataCalonMhs[i]['Cicilan_'+b]['Deadline']+'" cicilan = "'+b+'" data-format="yyyy-MM-dd hh:mm:ss" class="form-control deadline_'+no+'" type="text" readonly="true" idcicilan = "'+getDataCalonMhs[i]['Cicilan_'+b]['ID']+'"><span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span></div>' :'<br> Deadline : '+getDataCalonMhs[i]['Cicilan_'+b]['Deadline'];
 				a += '<td> Invoice : Rp '+getDataCalonMhs[i]['Cicilan_'+b]['Invoice']+'<br>BilingID : '+getDataCalonMhs[i]['Cicilan_'+b]['BilingID']+'<br>Status : '+c+d+'</td>';
 
 				if(getDataCalonMhs[i]['Cicilan_'+b]['Status'] == 1 || getDataCalonMhs[i]['Cicilan_'+b]['Status'] == '')
@@ -85,10 +85,32 @@
 			no++;
 		}
 
-		$('.deadline').datetimepicker({
+		/*$('.deadline').datetimepicker({
 			// startDate: today,
 			startDate: '+1d',
+		});*/
+
+		$('.datetimepicker').datetimepicker({
+		 // startDate: today,
+		 // startDate: '+2d',
+		 //startDate: date.addDays(1),
 		});
+
+		Date.prototype.addDays = function(days) {
+		    var date = new Date(this.valueOf());
+		    date.setDate(date.getDate() + days);
+		    return date;
+		}
+		var date = new Date();
+		/*for (var i = 1 ; i <= getDataCalonMhs.length; i++) {
+		   $('#deadline_'+i).datetimepicker({
+		    // startDate: today,
+		    // startDate: '+2d',
+		    startDate: date.addDays(i),
+		   });
+
+		   //$('#datetime_deadline'+data[0]['id_formulir']+'_'+i).prop('readonly',true);
+		} */
 		pageHtml = 'cicilan';
 	}
 </script>

@@ -75,17 +75,23 @@
         a = a[1];
         var idInput = a; 
         loading_button('#btn-Save_'+a);
-        a = $("#deadline_"+a).val();
-        var ID_register_formulir = $(this).attr('ID_register_formulir');
-        var Action = (a == undefined) ? 'create_va' : 'update_va';
-        var deadline_payment = (a == undefined) ? '' : a;
-        var url = base_url_js+'admission/proses-calon-mahasiswa/submit_edit_deadline_cicilan';
 
-        var data = {
+        var arr = [];
+        var ID_register_formulir = $(this).attr('ID_register_formulir');
+        $(".deadline_"+a).each(function(){
+            var temp = {
                 ID_register_formulir : ID_register_formulir,
-                Action : Action,
-                deadline_payment : deadline_payment
-        };
+                //cicilan : $(this).attr('cicilan'),
+                Deadline : $(this).val(),
+                ID : $(this).attr('idcicilan'),
+            }
+
+            arr.push(temp);
+        })
+
+        console.log(arr);
+        var url = base_url_js+'admission/proses-calon-mahasiswa/submit_edit_deadline_cicilan';
+        var data = arr;
         var token = jwt_encode(data,"UAP)(*");
         $.post(url,{token:token},function (data_json) {
             setTimeout(function () {
@@ -109,7 +115,7 @@
           
         }).always(function() {
             $('#btn-Save_'+idInput).prop('disabled',false).html('Edit Deadline');
-        });
+        }); 
         
     });
     

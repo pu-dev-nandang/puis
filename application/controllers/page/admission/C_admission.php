@@ -601,7 +601,21 @@ class C_admission extends Admission_Controler {
     {
       $input = $this->getInputToken();
       $arr = array('msg' => '','status'=>0);
-      switch ($input['Action']) {
+      $arr2 = array();
+      for ($i=0; $i < count($input); $i++) { 
+        foreach ($input[$i] as $key => $value) {
+          $arr2[] = array($key => $value);
+        }
+      }
+      
+      print_r($arr2);
+      /*$dataSave = array(
+              'ID_ujian_perprody' => $ID_ujian_perprody,
+              'DateTimeTest' => $DateTimeTest,
+              'Lokasi' => $Lokasi,
+      );
+      $this->db->insert('db_admission.register_jadwal_ujian', $dataSave);*/
+      /*switch ($input['Action']) {
           case 'create_va':
               // get VA Number
                 $getDataPersonal = $this->m_admission->getDataPersonal($input['ID_register_formulir']);
@@ -702,7 +716,8 @@ class C_admission extends Admission_Controler {
                       
                     }
               break;
-      }
+      }*/
+
       echo json_encode($arr);
 
     }
