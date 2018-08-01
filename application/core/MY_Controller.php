@@ -333,3 +333,117 @@ abstract class Finnance_Controler extends Globalclass{
         parent::__construct();
     }
 }
+
+
+abstract class Vreservation_Controler extends Globalclass{
+
+    public function __construct()
+    {
+        parent::__construct();
+        if (!$this->session->userdata('auth_vreservation_sess')) {
+            $this->getAuthVreservation();
+        }
+    }
+
+    public $pathView = 'page/vreservation/';
+
+    public function temp($content)
+    {
+        $this->template($content);
+    }
+
+
+    // overide function
+    public function template($content)
+    {
+
+        $data['include'] = $this->load->view('template/include','',true);
+
+        $data['header'] = $this->menu_header();
+        $data['navigation'] = $this->menu_navigation();
+        $data['crumbs'] = $this->crumbs();
+
+        $data['content'] = $content;
+        $this->load->view('template/template',$data);
+
+    }
+
+    // overide function
+    public function  menu_navigation(){
+        $data['departement'] = $this->__getDepartement();
+        $page = $this->load->view('page/vreservation/menu_navigation','',true);
+        return $page;
+    }
+
+    private function getAuthVreservation()
+    {
+        $data = array();
+        $this->load->model('master/m_master');
+        $getDataMenu = $this->m_master->getMenuUser($this->session->userdata('NIP'),'db_reservation');
+        $data_sess = array();
+        if (count($getDataMenu) > 0) {
+            $this->session->set_userdata('auth_vreservation_sess',1);
+            $this->session->set_userdata('menu_vreservation_sess',$getDataMenu);
+            $this->session->set_userdata('menu_vreservation_grouping',$this->groupBYMenu_sess());
+        }
+    }
+
+    public function groupBYMenu_sess()
+    {
+        $DataDB = $this->session->userdata('menu_vreservation_sess');
+        $this->load->model('master/m_master');
+        $arr = array();
+        for ($i=0; $i < count($DataDB); $i++) {
+            $submenu1 = $this->m_master->getSubmenu1BaseMenu($DataDB[$i]['ID_menu'],'db_reservation');
+            $arr2 = array();
+            for ($k=0; $k < count($submenu1); $k++) { 
+                $submenu2 = $this->m_master->getSubmenu2BaseSubmenu1($submenu1[$k]['SubMenu1'],'db_reservation');
+                $arr2[] = array(
+                    'SubMenu1' => $submenu1[$k]['SubMenu1'],
+                    'Submenu' => $submenu2,
+                );
+            }
+
+            $arr[] =array(
+                'Menu' => $DataDB[$i]['Menu'],
+                'Icon' => $DataDB[$i]['Icon'],
+                'Submenu' => $arr2
+
+            );
+            
+        }
+
+        return $arr;
+    }
+
+    public function auth_ajax()
+    {
+        if (!$this->input->is_ajax_request()) {
+            exit('No direct script access allowed');
+        }
+    }
+
+    public function checkAuth_user()
+    {
+        $base_url = base_url();
+        $currentURL = current_url();
+        $getURL = str_replace($base_url,"",$currentURL);
+        $this->load->model('master/m_master');
+        $chk = $this->m_master->chkAuthDB_Base_URL($getURL);
+
+        if (!$this->input->is_ajax_request()) {
+            if (count($chk) == 0) {
+                show_404($log_error = TRUE); 
+            }
+            else
+            {
+                if ($chk[0]['read'] == 0) {
+                   show_404($log_error = TRUE); 
+                }
+            }
+            
+        }
+        
+    }
+
+}

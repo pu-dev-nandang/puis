@@ -777,32 +777,32 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $query=$this->db->query($sql, array());
     }
 
-    public function getMenuUser($NIP)
+    public function getMenuUser($NIP,$db = 'db_admission')
     {
         $sql = 'SELECT b.ID as ID_menu,b.Icon,c.ID,b.Menu,c.SubMenu1,c.SubMenu2,d.`read`,d.`update`,d.`write`,d.`delete`,c.Slug,c.Controller 
                 from db_employees.employees as a
-                join db_admission.previleges as d
+                join '.$db.'.previleges as d
                 on a.NIP = d.NIP
-                join db_admission.cfg_sub_menu as c
+                join '.$db.'.cfg_sub_menu as c
                 on d.ID_cfg_sub_menu = c.ID
-                join db_admission.cfg_menu as b
+                join '.$db.'.cfg_menu as b
                 on b.ID = c.ID_Menu where a.NIP = ? GROUP by b.id';
         $query=$this->db->query($sql, array($NIP))->result_array();
         return $query;
     }
 
-    public function getSubmenu2BaseSubmenu1($submenu1)
+    public function getSubmenu2BaseSubmenu1($submenu1,$db='db_admission')
     {
         $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
-        from db_admission.cfg_sub_menu as a  join db_admission.previleges as b on a.ID = b.ID_cfg_sub_menu where a.SubMenu1 = ? and b.NIP = ?';
+        from '.$db.'.cfg_sub_menu as a  join '.$db.'.previleges as b on a.ID = b.ID_cfg_sub_menu where a.SubMenu1 = ? and b.NIP = ?';
         $query=$this->db->query($sql, array($submenu1,$this->session->userdata('NIP')))->result_array();
         return $query;
     }
 
-    public function getSubmenu1BaseMenu($ID_Menu)
+    public function getSubmenu1BaseMenu($ID_Menu,$db='db_admission')
     {
         $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
-        from db_admission.cfg_sub_menu as a join db_admission.previleges as b on a.ID = b.ID_cfg_sub_menu  where a.ID_Menu = ? and b.NIP = ? group by SubMenu1';
+        from '.$db.'.cfg_sub_menu as a join '.$db.'.previleges as b on a.ID = b.ID_cfg_sub_menu  where a.ID_Menu = ? and b.NIP = ? group by SubMenu1';
         $query=$this->db->query($sql, array($ID_Menu,$this->session->userdata('NIP')))->result_array();
         return $query;
     }

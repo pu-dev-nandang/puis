@@ -30,7 +30,7 @@
 	    }
 	});
 
-	$(document).on('keypress','#VA', function ()
+	$(document).on('keypress','#VA', function (event)
 	{
 
 	    if (event.keyCode == 10 || event.keyCode == 13) {
