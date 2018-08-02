@@ -183,6 +183,18 @@
             });
         }
     });
+
+    $(document).on('keyup','#formReason',function () {
+        var r = $('#formReason').val().length;
+        $('#viewLengthReason').text(r);
+        $('#viewLengthReason').css('color','green');
+        if(r>=40){
+            $('#viewLengthReason').css('color','red');
+        } else if(r>=30){
+            $('#viewLengthReason').css('color','#d88a16');
+        }
+
+    });
     
     $(document).on('click','.inputScheduleExchange',function () {
 
@@ -230,7 +242,22 @@
                 '            <tr>' +
                 '                <td>Date</td>' +
                 '                <td>' +
+                '                    <input class="form-control form-ScEx" id="formDateOriginal" style="width: 170px;">' +
+                '                       <span>Original date</span>' +
+                '                </td>' +
+                '            </tr>' +
+                '           <tr>' +
+                '               <td>Reason</td>' +
+                '               <td>' +
+                '                   <textarea rows="2" class="form-control" id="formReason" placeholder="Maximum length 40 character..." maxlength="40"></textarea>' +
+                '                   Length : <span id="viewLengthReason">0</span> of 40' +
+                '                </td>' +
+                '           </tr>' +
+                '            <tr>' +
+                '                <td>Date</td>' +
+                '                <td>' +
                 '                    <input class="form-control form-ScEx" id="formDate" style="width: 170px;">' +
+                '                       <span>Exchange date</span>' +
                 '                </td>' +
                 '            </tr>' +
                 '            <tr>' +
@@ -292,7 +319,7 @@
 
             loadSelectOptionClassroom('#formClassroom',data_ClassroomID);
 
-            $("#formDate").datepicker({
+            $("#formDate,#formDateOriginal").datepicker({
                 showOtherMonths:true,
                 autoSize: true,
                 dateFormat: 'dd MM yy'
@@ -301,8 +328,17 @@
             if(jsonResult.S_Exchange.length>0 && jsonResult.S_Exchange[0].Date !=='0000-00-00'
                 && jsonResult.S_Exchange[0].Date != null && jsonResult.S_Exchange[0].Date != '' ){
 
+                var dOri = new Date(jsonResult.S_Exchange[0].DateOriginal);
+                $('#formDateOriginal').datepicker('setDate',dOri);
+
                 var d = new Date(jsonResult.S_Exchange[0].Date);
                 $('#formDate').datepicker('setDate',d);
+
+            }
+
+            if(jsonResult.S_Exchange.length>0 && jsonResult.S_Exchange[0].Reason!='' && jsonResult.S_Exchange[0].Reason!=null){
+                $('#formReason').val(jsonResult.S_Exchange[0].Reason);
+                $('#viewLengthReason').html(jsonResult.S_Exchange[0].Reason.length);
             }
 
             $('#formCkStatus').prop('checked',false);
@@ -349,12 +385,17 @@
 
         var formLecturers = $('#formLecturers').val();
         var formDate = $('#formDate').datepicker("getDate");
+        var formDateOriginal = $('#formDateOriginal').datepicker("getDate");
+        var formReason = $('#formReason').val();
         var formClassroom = $('#formClassroom').val();
         var formStart = $('#formStart').val();
         var formEnd = $('#formEnd').val();
 
 
-        if(filterSemester!=null && filterSemester!='' && formDate!=null && formDate!=''
+        if(filterSemester!=null && filterSemester!=''
+            && formDateOriginal!=null && formDateOriginal!=''
+            && formDate!=null && formDate!=''
+            && formReason!=null && formReason!=''
             && formStart!=null && formStart!='' && formStart!='00:00'
             && formEnd!=null && formEnd!=''){
 
@@ -418,7 +459,9 @@
                         NIP : formLecturers,
                         Meeting : Meeting,
                         ClassroomID : formClassroom,
+                        DateOriginal : moment(formDateOriginal).format('YYYY-MM-DD'),
                         Date : moment(formDate).format('YYYY-MM-DD'),
+                        Reason : formReason,
                         DayID : DayID,
                         StartSessions : formStart,
                         EndSessions : formEnd,
@@ -432,7 +475,7 @@
                     };
                     var token2 = jwt_encode(dataToken,'UAP)(*');
                     $.post(url,{token:token2},function (jsonResult) {
-                        // console.log(jsonResult);
+
                         $('#GlobalModal').modal('hide');
                         getDataAttendance();
                         toastr.success('Data saved','Success');

@@ -908,9 +908,9 @@ class C_api extends CI_Controller {
                 $insert_id = $this->db->insert_id();
 
                 //schedule_class_group
-                $dataGroup = (array) $formData['schedule_class_group'];
-                $dataGroup['ScheduleID'] = $insert_id;
-                $this->db->insert('db_academic.schedule_class_group',$dataGroup);
+//                $dataGroup = (array) $formData['schedule_class_group'];
+//                $dataGroup['ScheduleID'] = $insert_id;
+//                $this->db->insert('db_academic.schedule_class_group',$dataGroup);
 
 
                 // schedule_details
@@ -1120,6 +1120,17 @@ class C_api extends CI_Controller {
                 $data = $this->m_api->getScheduleDetails($data_arr['ScheduleID']);
 
                 return print_r(json_encode($data));
+            }
+
+            // Cek Group
+            else if($data_arr['action']=='checkGroup'){
+//                $dataG = $this->db->get_where('',
+//                        array('ClassGroup' => ))->result_array();
+
+                $dataG = $this->db->query('SELECT * FROM db_academic.schedule 
+                                                WHERE ClassGroup LIKE "'.$data_arr['Group'].'"  ')
+                                            ->result_array();
+                return print_r(json_encode($dataG));
             }
 
         }

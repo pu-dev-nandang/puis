@@ -485,7 +485,41 @@
             }
         });
 
-    })
+    });
+
+    // Cek Jadwal
+    $(document).on('keyup','#formClassGroupCadangan',function () {
+        cekGroupCuy();
+    });
+
+    $(document).on('blur','#formClassGroupCadangan',function () {
+        cekGroupCuy();
+    });
+
+    function cekGroupCuy() {
+        var g = $('#formClassGroupCadangan').val();
+        if(g!='' && g!=null){
+            var data = {
+                action : 'checkGroup',
+                Group : g
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__crudSchedule';
+            // $('#alertClassGroup').html('');
+            $.post(url,{token:token},function (result) {
+
+                $('#btnSavejadwal').prop('disabled',true);
+
+                if(result.length>0){
+                    $('#btnSavejadwal').prop('disabled',true);
+                    $('#alertClassGroup').html('<span style="color: red;"><i class="fa fa-times-circle"></i> | Group Exist</span>');
+                } else {
+                    $('#btnSavejadwal').prop('disabled',false);
+                    $('#alertClassGroup').html('<span style="color: green;"><i class="fa fa-check-circle"></i> | Group Can Use</span>');
+                }
+            });
+        }
+    }
 </script>
 
 <!-- Edit Jadwal -->
