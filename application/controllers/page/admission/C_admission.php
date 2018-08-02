@@ -951,10 +951,11 @@ class C_admission extends Admission_Controler {
           $temp2 = array(
               'NPM' => $NPM,
               'Password' => $pass,
+              'Password_Old' => md5($NPM),
               'Year' => date('Y'),
               'EmailPU' => $NPM.'@podomorouniversity.ac.id',
               'StatusStudentID' => 3,
-              'Status' => '1',
+              'Status' => '-1',
           );
 
           $arr_insert_auth[] = $temp2;

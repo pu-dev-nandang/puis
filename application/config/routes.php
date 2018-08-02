@@ -606,3 +606,6 @@ foreach( $result as $row )
 	}
 
 }
+
+$route['venue_reservation'] = 'page/vreservation/c_global';
+$route['vreservation/getroom'] = 'page/vreservation/c_global/getroom';
