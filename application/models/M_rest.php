@@ -132,6 +132,11 @@ class M_rest extends CI_Model {
                                                                       LEFT JOIN db_academic.days d ON (d.ID=sd.DayID)
                                                                       WHERE sd.ScheduleID = "'.$data[$sc]['ScheduleID'].'"
                                                                        ORDER BY d.ID ASC')->result_array();
+
+                        $dataGrade = $this->db->query('SELECT * FROM db_academic.grade_course gc 
+                                                            WHERE gc.ScheduleID = "'.$data[$sc]['ScheduleID'].'"
+                                                             ')->result_array();
+
                         // Get Attendance
                         if(count($dataSchedule)>0){
                             $meeting = 0;
@@ -165,6 +170,7 @@ class M_rest extends CI_Model {
 
                         }
 
+                        $data[$sc]['GradeCourse'] = $dataGrade;
                         $data[$sc]['Schedule'] = $dataSchedule;
 
                         // Menghitung preseni

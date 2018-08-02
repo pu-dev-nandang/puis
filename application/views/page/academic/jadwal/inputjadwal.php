@@ -95,7 +95,7 @@
                 </td>
             </tr>
 
-            <tr>
+            <tr class="hide">
                 <td>Group Paralel</td>
                 <td>:</td>
                 <td>
@@ -118,8 +118,10 @@
                 <td>Group Kelas</td>
                 <td>:</td>
                 <td>
-                    <span class="btn-default-primary" id="viewClassGroup" style="padding-left: 5px;padding-right: 5px;"> - </span>
+                    <span class="btn-default-primary hide" id="viewClassGroup" style="padding-left: 5px;padding-right: 5px;"> - </span>
                     <input type="hide" class="hide" id="formClassGroup" />
+                    <input type="text" class="form-control" style="max-width: 150px;" onkeyup="this.value = this.value.toUpperCase();" id="formClassGroupCadangan" />
+                    <div id="alertClassGroup"></div>
                 </td>
             </tr>
 
@@ -698,6 +700,10 @@
         dataSesi=1;
         $('#subsesi1').addClass('hide');
         $('#bodyAddSesi').html('');
+
+        // Group
+        $('#formClassGroupCadangan').val('');
+        $('#alertClassGroup').html('');
     }
 
     function requiredForm(element) {
@@ -810,7 +816,10 @@
             }
         }
 
-        var ClassGroup = $('#formClassGroup').val();
+        // var ClassGroup = $('#formClassGroup').val();
+        var ClassGroup = $('#formClassGroupCadangan').val();
+
+        console.log(ClassGroup);
 
         var Coordinator = $('#formCoordinator').val();
 
@@ -874,8 +883,8 @@
             loading_button('#btnSavejadwal');
             $('#removeNewSesi,#addNewSesi').prop('disabled',true);
 
-            var dataClassGroup = ClassGroup.split('-');
-            var typeParalel = ($('#formParalel').is(':checked')) ? '1' : '0';
+            // var dataClassGroup = ClassGroup.split('-');
+            // var typeParalel = ($('#formParalel').is(':checked')) ? '1' : '0';
             var SubSesi = (dataSesi>1) ? '1' : '0';
             var data = {
                 action : 'add',
@@ -895,14 +904,14 @@
                             UpdateBy : UpdateBy,
                             UpdateAt : UpdateAt
                         },
-                        schedule_class_group : {
-                            ScheduleID : 0,
-                            ProdiCode : dataClassGroup[0],
-                            Type : typeParalel,
-                            Numeric : dataClassGroup[1],
-                            Alphabet : (typeParalel=='1') ? dataClassGroup[2] : null,
-                            Group : ClassGroup
-                        },
+                        // schedule_class_group : {
+                        //     ScheduleID : 0,
+                        //     ProdiCode : dataClassGroup[0],
+                        //     Type : typeParalel,
+                        //     Numeric : dataClassGroup[1],
+                        //     Alphabet : (typeParalel=='1') ? dataClassGroup[2] : null,
+                        //     Group : ClassGroup
+                        // },
                         schedule_details : dataScheduleDetailsArray,
                         schedule_details_course : schedule_details_course,
                         schedule_team_teaching : teamTeachingArray

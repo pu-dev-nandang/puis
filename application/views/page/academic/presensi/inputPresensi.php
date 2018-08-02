@@ -139,7 +139,7 @@
                     var BAP = (dataAttd['BAP'+a]!='' && dataAttd['BAP'+a]!=null) ? dataAttd['BAP'+a] : '-' ;
 
                     if(dataAttd['AttdLecturers'+a].length>0){
-                           var rw_span = (dataAttd['AttdLecturers'+a].length);
+                        var rw_span = (dataAttd['AttdLecturers'+a].length);
                            tr.append('<tr style="'+bg_td+'">' +
                                '            <td rowspan="'+rw_span+'">'+a+'</td>' +
                                '            <td rowspan="'+rw_span+'">'+btn_Sc_Ex_Status+'</td>' +
@@ -174,8 +174,8 @@
                             '            <td>'+dataAttd['S_A'+a]+'</td>' +
                             '            <td>'+btnAct+'</td>' +
                             '            <td>'+BAP+'</td>' +
-                            '            <td rowspan="'+rw_span+'" style="text-align: left;background: #ffc1072e;"></td>' +
-                            '            <td rowspan="'+rw_span+'" style="text-align: left;background: #8bc34a73;"></td>' +
+                            '            <td rowspan="" style="text-align: left;background: #ffc1072e;"></td>' +
+                            '            <td rowspan="" style="text-align: left;background: #8bc34a73;"></td>' +
                             '        </tr>');
                     }
 
