@@ -661,7 +661,7 @@ class M_api extends CI_Model {
                                           LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                           LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)                                   
                                           WHERE sd.DayID = "'.$DayID.'" '.$ProgramsCampusID.' '.$SemesterID.' '.$CombinedClasses.' '.$IsSemesterAntara.' 
-                                          ORDER BY sd.StartSessions, sd.EndSessions ASC ');
+                                          ORDER BY sd.StartSessions, sd.EndSessions ASC');
 
         $result = $data->result_array();
 
@@ -715,18 +715,18 @@ class M_api extends CI_Model {
                 $result[$c]['DetailCourse'] = $dataCourse;
 
                 $Students = [];
-                for($st=0;$st<count($ClassOf);$st++){
-                    $db_ = 'ta_'.$ClassOf[$st]['Year'];
-
-                    $dataStdCourse = $this->db->query('SELECT s.Name, s.NPM FROM '.$db_.'.study_planning sp 
-                                                            LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
-                                                            WHERE sp.SemesterID = "'.$dataWhere['SemesterID'].'" 
-                                                            AND sp.ScheduleID = "'.$result[$c]['ID'].'" ')->result_array();
-
-                    if(count($dataStdCourse)>0){
-                        array_push($Students,$dataStdCourse);
-                    }
-                }
+//                for($st=0;$st<count($ClassOf);$st++){
+//                    $db_ = 'ta_'.$ClassOf[$st]['Year'];
+//
+//                    $dataStdCourse = $this->db->query('SELECT s.Name, s.NPM FROM '.$db_.'.study_planning sp
+//                                                            LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
+//                                                            WHERE sp.SemesterID = "'.$dataWhere['SemesterID'].'"
+//                                                            AND sp.ScheduleID = "'.$result[$c]['ID'].'" ')->result_array();
+//
+//                    if(count($dataStdCourse)>0){
+//                        array_push($Students,$dataStdCourse);
+//                    }
+//                }
 
                 $result[$c]['StudentsDetails'] = (count($Students)>0) ? $Students[0] : $Students ;
 
