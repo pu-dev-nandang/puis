@@ -677,7 +677,7 @@ class M_api extends CI_Model {
 
             // Get Course
             for($c=0;$c<count($result);$c++){
-                $ProdiIDsdc = ($dataWhere['ProdiID']!='') ? ' AND sdc.ProdiID = "'.$dataWhere['ProdiID'].'" ' : '';
+//                $ProdiIDsdc = ($dataWhere['ProdiID']!='') ? ' AND sdc.ProdiID = "'.$dataWhere['ProdiID'].'" ' : '';
 
 
                 $dataOffering = $this->db->query('SELECT * FROM db_academic.course_offerings co 
@@ -715,18 +715,18 @@ class M_api extends CI_Model {
                 $result[$c]['DetailCourse'] = $dataCourse;
 
                 $Students = [];
-//                for($st=0;$st<count($ClassOf);$st++){
-//                    $db_ = 'ta_'.$ClassOf[$st]['Year'];
-//
-//                    $dataStdCourse = $this->db->query('SELECT s.Name, s.NPM FROM '.$db_.'.study_planning sp
-//                                                            LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
-//                                                            WHERE sp.SemesterID = "'.$dataWhere['SemesterID'].'"
-//                                                            AND sp.ScheduleID = "'.$result[$c]['ID'].'" ')->result_array();
-//
-//                    if(count($dataStdCourse)>0){
-//                        array_push($Students,$dataStdCourse);
-//                    }
-//                }
+                for($st=0;$st<count($ClassOf);$st++){
+                    $db_ = 'ta_'.$ClassOf[$st]['Year'];
+
+                    $dataStdCourse = $this->db->query('SELECT s.Name, s.NPM FROM '.$db_.'.study_planning sp 
+                                                            LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
+                                                            WHERE sp.SemesterID = "'.$dataWhere['SemesterID'].'" 
+                                                            AND sp.ScheduleID = "'.$result[$c]['ID'].'" ')->result_array();
+
+                    if(count($dataStdCourse)>0){
+                        array_push($Students,$dataStdCourse);
+                    }
+                }
 
                 $result[$c]['StudentsDetails'] = (count($Students)>0) ? $Students[0] : $Students ;
 
