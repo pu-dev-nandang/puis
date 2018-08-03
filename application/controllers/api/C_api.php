@@ -965,12 +965,18 @@ class C_api extends CI_Controller {
 
                 $days = $this->db->get_where('db_academic.days',array('ID'=>$data_arr['DayID']),1)->result_array();
 
+
                 $data[0]['Day'] = $days[0];
                 $data[0]['Details'] = $this->m_api->getSchedule($data_arr['DayID'],$dataWhere);
+
+
+
 //                for($i=0;$i<count($days);$i++){
 //                    $data[$i]['Day'] = $days[$i];
 //                    $data[$i]['Details'] = $this->m_api->getSchedule($days[$i]['ID'],$dataWhere);
 //                }
+
+
                 return print_r(json_encode($data));
             }
             else if($data_arr['action']=='readOneSchedule'){
