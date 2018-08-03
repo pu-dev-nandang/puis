@@ -48,4 +48,121 @@ class C_global extends Vreservation_Controler {
 
     }
 
+    public function getschedule()
+    {
+        // get room
+        $getRoom = $this->m_master->showData_array('db_academic.classroom');
+        $endTime = '18';
+        $getHoursNow = date('H');
+        $getHoursNow = (int)$getHoursNow;
+        $data['getRoom'] = $getRoom;
+        $arrHours = array();
+
+        // array list booked and requested
+        $data_pass = array(
+            array(
+                'user'  => 'User 1',
+                'start' => '10.30',
+                'end'   => '12.00',
+                'time'  => 90,
+                'colspan' => 3,
+                'agenda' => 'meeting',
+                'room' => 503,
+                'approved' => 1
+            ),
+            array(
+                'user'  => 'User 1',
+                'start' => '08.00',
+                'end'   => '10.00',
+                'time'  => 120,
+                'colspan' => 4,
+                'agenda' => 'meeting',
+                'room' => 504,
+                'approved' => 1
+            ),
+
+            array(
+                'user'  => 'User 1',
+                'start' => '13.00',
+                'end'   => '15.30',
+                'time'  => 150,
+                'colspan' => 5,
+                'agenda' => 'meeting',
+                'room' => 503,
+                'approved' => 1
+            ),
+            
+            array(
+                'user'  => 'User 1',
+                'start' => '13.00',
+                'end'   => '15.00',
+                'time'  => 120,
+                'colspan' => 4,
+                'agenda' => 'meeting',
+                'room' => 506,
+                'approved' => 1
+            ),
+
+            array(
+                'user'  => 'User 1',
+                'start' => '10.30',
+                'end'   => '12.00',
+                'time'  => 90,
+                'colspan' => 3,
+                'agenda' => 'meeting',
+                'room' => 505,
+                'approved' => 0
+            ),
+            array(
+                'user'  => 'User 1',
+                'start' => '15.00',
+                'end'   => '17.00',
+                'time'  => 120,
+                'colspan' => 4,
+                'agenda' => 'meeting',
+                'room' => 503,
+                'approved' => 0
+            ),
+
+            array(
+                'user'  => 'User 1',
+                'start' => '13.00',
+                'end'   => '15.00',
+                'time'  => 120,
+                'colspan' => 4,
+                'agenda' => 'meeting',
+                'room' => 507,
+                'approved' => 0
+            ),
+            
+            array(
+                'user'  => 'User 1',
+                'start' => '13.00',
+                'end'   => '14.30',
+                'time'  => 90,
+                'colspan' => 3,
+                'agenda' => 'meeting',
+                'room' => 508,
+                'approved' => 0
+            ),
+        );
+
+        for ($i=7; $i <= $endTime; $i++) { 
+            // check len
+            $a = $i;
+            for ($j=0; $j < 2 - strlen($i); $j++) { 
+                $a = '0'.$a;
+            }
+            $a = $a.':00';
+            $arrHours[] = date("h:i a", strtotime($a));
+            $d = $a.':30';
+            //$arrHours[] = date("h:i a", strtotime($d));
+            $arrHours[] = date("h:i a", strtotime($d));
+        }
+        $data['arrHours'] = $arrHours;
+        $data['data_pass'] = $data_pass;
+        $content = $this->load->view($this->pathView.'schedule',$data,true);
+        echo json_encode($content);
+    }
+
 }
