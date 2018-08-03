@@ -69,7 +69,7 @@
         
     });
 
-    $(document).on('keypress','#NIM', function ()
+    $(document).on('keypress','#NIM', function (event)
     {
 
         if (event.keyCode == 10 || event.keyCode == 13) {

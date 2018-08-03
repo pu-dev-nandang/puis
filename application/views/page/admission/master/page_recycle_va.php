@@ -48,7 +48,7 @@
                 </div>
                 <br>
                 <div class="col-xs-12" align = "right">
-                   <button class="btn btn-inverse btn-notification btn-recycle" id="btn-recycle">Recycle</button>
+                   <button class="btn btn-inverse btn-notification btn-recycle btn-add" id="btn-recycle">Recycle</button>
                 </div>
             </div>
         </div>

@@ -302,7 +302,7 @@ class C_finance extends Finnance_Controler {
         $this->load->library('pagination');
         // count
         $count = $this->m_finance->count_get_created_tagihan_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NIM']);
-        $config = $this->config_pagination_default_ajax($count,50,3);
+        $config = $this->config_pagination_default_ajax($count,20,3);
         $this->pagination->initialize($config);
         $page = $this->uri->segment(3);
         $start = ($page - 1) * $config["per_page"];
@@ -777,6 +777,7 @@ class C_finance extends Finnance_Controler {
           $CountRow = $CountRow + 1;
           $selectPTID = $this->input->post('selectPTID');
           $selectSemester = $this->input->post('selectSemester');
+          $maba = $this->input->post('maba');
          
           for ($i=2; $i < $CountRow; $i++) {
             $temp = array();
@@ -788,7 +789,23 @@ class C_finance extends Finnance_Controler {
                $db = 'ta_'.$Year.'.students';
                $ta = $this->m_master->caribasedprimary($db,'NPM',$NPM);
                $ProdiID = $ta[0]['ProdiID'];
+
                $payment = $this->m_finance->getPriceBaseBintang($selectPTID,$ProdiID,$Year,$Pay_Cond);
+               // check PTID, jika SKS / Credit dikali per sks yang diambil // 3 credit
+                  // check checklist mahasiswa baru atau tidak
+                if ($selectPTID == 3) {
+                    if ($maba == 1) {
+                        $ProStuDefaultCredit = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+                        $DefaultCredit = $ProStuDefaultCredit[0]['DefaultCredit'];
+                        $payment = (int)$payment * (int)$DefaultCredit;
+                    }
+                    else
+                    {
+                        // '.$db.'.study_planning
+                        $Credit = $this->m_finance->getSKSMahasiswa('ta_'.$Year,$NPM);
+                        $payment = (int)$payment * (int)$Credit;
+                    }
+                }
 
             $aa = $this->m_finance->insertaDataPayment($selectPTID,$selectSemester,$NPM,$payment,0,"1",$this->session->userdata('NIP'));
             if ($aa != 0) {
@@ -923,6 +940,48 @@ class C_finance extends Finnance_Controler {
     {
         $generate = $this->m_master->loadData_limit500('db_va.va_log_sftp','ID','desc');
         echo json_encode($generate);
+    }
+
+    public function page_master_discount()
+    {
+        $content = $this->load->view('page/'.$this->data['department'].'/master/page_master_discount',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function load_discount()
+    {
+        $generate = $this->m_master->showData_array('db_finance.discount');
+        echo json_encode($generate);
+    }
+
+    public function modalform_discount()
+    {
+        $input = $this->getInputToken();
+        $this->data['action'] = $input['Action'];
+        $this->data['id'] = $input['CDID'];
+        if ($input['Action'] == 'edit') {
+            $this->data['getData'] = $this->m_master->caribasedprimary('db_finance.discount','ID',$input['CDID']);
+        }
+        echo $this->load->view('page/'.$this->data['department'].'/master/modalform_discount',$this->data,true);
+    }
+
+    public function sbmt_discount()
+    {
+        $input = $this->getInputToken();
+        switch ($input['Action']) {
+            case 'add':
+                $this->m_finance->inserData_discount($input['Discount']);
+                break;
+            case 'edit':
+                $this->m_finance->editData_discount($input['Discount'],$input['CDID']);
+                break;
+            case 'delete':
+                $this->m_finance->delete_id_table($input['CDID'],'discount');
+                break;
+            default:
+                # code...
+                break;
+        }
     }
     
 

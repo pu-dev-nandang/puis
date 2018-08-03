@@ -21,6 +21,15 @@ class C_login extends CI_Controller {
         $this->load->model('m_auth');
         date_default_timezone_set("Asia/Jakarta");
 
+        // define config Virtual Account
+        if (!defined('VA_client_id')) {
+            $this->load->model('master/m_master');
+            $getCFGVA = $this->m_master->showData_array('db_va.cfg_bank');
+            define('VA_client_id',$getCFGVA[0]['client_id'] ,true);
+            define('VA_secret_key',$getCFGVA[0]['secret_key'] ,true);
+            define('VA_url',$getCFGVA[0]['url'] ,true);
+        }
+
     }
 
     public function temp($content){
@@ -182,8 +191,8 @@ class C_login extends CI_Controller {
     {
         include_once APPPATH.'third_party/bni/BniEnc.php';
         // FROM BNI
-        $client_id = '00202';
-        $secret_key = '8ef738df0433c674e6663f3f7f5e6b68';
+        $client_id = VA_client_id;
+        $secret_key = VA_secret_key;
 
         // URL utk simulasi pembayaran: http://dev.bni-ecollection.com/
 
@@ -288,18 +297,21 @@ class C_login extends CI_Controller {
                                     // Buat Update dan View Node JS untuk notifikasi
                                     $this->m_finance->update_payment_MHS($data_asli['trx_id'],$getData[0]['ID_payment']); 
 
-                                    // Send Email
-                                    $text = 'Dear '.$Nama.',<br><br>
-                                                Your payment has been received,<br><br>
-                                                Payment Type : '.$PTIDDesc.'<br>
-                                                Prodi : '.$ProdiEng.'<br>
-                                                SemesterName : '.$SemesterName.'<br><br>
-                                                as much as Rp '.number_format($getData[0]['Invoice'],2,',','.').'
-                                                <br>
-                                            ';        
-                                    $to = $EmailPU;
-                                    $subject = "Podomoro University Payment thank you";
-                                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                                    if (ENVIRONMENT == 'production') {
+                                      // Send Email
+                                      $text = 'Dear '.$Nama.',<br><br>
+                                                  Your payment has been received,<br><br>
+                                                  Payment Type : '.$PTIDDesc.'<br>
+                                                  Prodi : '.$ProdiEng.'<br>
+                                                  SemesterName : '.$SemesterName.'<br><br>
+                                                  as much as Rp '.number_format($getData[0]['Invoice'],2,',','.').'
+                                                  <br>
+                                              ';        
+                                      $to = $EmailPU;
+                                      $subject = "Podomoro University Payment thank you";
+                                      $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                                    }  
+
                                     $this->m_master->update_va_log($data_asli);
                                     $this->m_master->saveNotification($data);
 
@@ -335,14 +347,16 @@ class C_login extends CI_Controller {
                                     if ($create_va['status']) {
                                         // After create va update payment students
                                         $ab = $this->m_finance->updatePaymentStudentsFromCicilan($create_va['msg']['trx_id'],$getData3[0]['ID']);
-                                        // Send Email
-                                         $msg = 'Please continue to pay the next installment with VA Number : '.$VA_number. ' <br> as much as Rp '.number_format($getData3[0]['Invoice'],2,',','.');
-                                        $text = 'Dear '.$Nama.',<br><br>
-                                                '.$msg.'    
-                                                ';        
-                                        $to = $EmailPU;
-                                        $subject = "Podomoro University Notification";
-                                        $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                                        if (ENVIRONMENT == 'production') {
+                                          // Send Email
+                                           $msg = 'Please continue to pay the next installment with VA Number : '.$VA_number. ' <br> as much as Rp '.number_format($getData3[0]['Invoice'],2,',','.');
+                                          $text = 'Dear '.$Nama.',<br><br>
+                                                  '.$msg.'    
+                                                  ';        
+                                          $to = $EmailPU;
+                                          $subject = "Podomoro University Notification";
+                                          $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                                        }  
                                     }
                                   }
                                   echo '{"status":"000"}';

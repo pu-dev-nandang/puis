@@ -14,7 +14,7 @@ if ($this->uri->segment(1) == 'dashboard') {
         <!--=== Navigation ===-->
         <ul id="nav">
             <?php 
-                $getData  = $this->session->userdata('menu_admission_grouping');
+                $getData  = $this->session->userdata('menu_vreservation_grouping');
                 for ($i=0; $i < count($getData); $i++) {
                     $temp = array();
                     $chkSubMenu1 = 0;
@@ -190,3 +190,10 @@ if ($this->uri->segment(1) == 'dashboard') {
 $this->m_master->checkAuth_user();
 
  ?>
+
+ <script type="text/javascript">
+     function loadDataSchedule(arrClass)
+     {  
+        
+     }
+ </script>

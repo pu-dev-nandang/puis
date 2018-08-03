@@ -8,7 +8,7 @@
                 <h4 class="header"><i class="icon-reorder"></i>Set Max Cicilan</h4>
                 <div class="toolbar no-padding">
                     <div class="btn-group">
-                      <span data-smt="" class="btn btn-xs btn-add-event">
+                      <span data-smt="" class="btn btn-xs btn-add">
                         <i class="icon-plus"></i> Add
                        </span>
                     </div>
@@ -29,7 +29,7 @@
         loadTable(loadData);
     });
 
-   $(document).on('click','.btn-add-event', function () {
+   $(document).on('click','.btn-add', function () {
       modal_generate('add','Add');
    });
 

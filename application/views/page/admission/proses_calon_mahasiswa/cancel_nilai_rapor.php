@@ -116,15 +116,16 @@
         $.post(url,{token:token},function (data_json) {
             // jsonData = data_json;
             var obj = JSON.parse(data_json); 
-            // console.log(obj);
-            setTimeout(function () {
+            $("#pageData").html(obj.loadtable);
+            $("#pagination_link").html(obj.pagination_link);
+            /*setTimeout(function () {
                 $("#pageData").html(obj.loadtable);
                 $("#pagination_link").html(obj.pagination_link);
-            },500);
+            },500);*/
         }).done(function() {
           
         }).fail(function() {
-          toastr.error('The Database connection error, please try again', 'Failed!!');
+          //toastr.error('The Database connection error, please try again', 'Failed!!');
         }).always(function() {
           // $('#btn-dwnformulir').prop('disabled',false).html('Formulir');
         });

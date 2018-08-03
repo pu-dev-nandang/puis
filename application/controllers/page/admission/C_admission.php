@@ -92,7 +92,7 @@ class C_admission extends Admission_Controler {
       if ($Status == "Reject") {
           $text = 'Dear Candidate,<br><br>
                       You have document not approved yet, Please send your valid document.<br>
-                      '.$this->GlobalVariableAdi['url_registration']."formulir-registration/".$keyURL['url'].'
+                      '.url_registration."formulir-registration/".$keyURL['url'].'
                   ';
           $to = $keyURL['email'];
           $subject = "Podomoro University Document Upload";
@@ -105,7 +105,7 @@ class C_admission extends Admission_Controler {
         if ($check) {
             $text = 'Dear Candidate,<br><br>
                         You have finished your all required document.<br>
-                        '.$this->GlobalVariableAdi['url_registration']."formulir-registration/".$keyURL['url'].'
+                        '.url_registration."formulir-registration/".$keyURL['url'].'
                     ';
             $to = $keyURL['email'];
             $subject = "Podomoro University Document Upload";
@@ -381,7 +381,7 @@ class C_admission extends Admission_Controler {
 
     public function input_nilai_rapor()
     {
-      $this->data['url_registration'] = $this->GlobalVariableAdi['url_registration'];
+      $this->data['url_registration'] = url_registration;
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/set_nilai_rapor',$this->data,true);
       $this->temp($content);
     }
@@ -413,7 +413,6 @@ class C_admission extends Admission_Controler {
     public function set_nilai_rapor_save()
     {
       $input = $this->getInputToken();
-      // print_r($input);
       $this->m_admission->saveDataNilaRapor($input);
       $this->m_admission->saveDataRangkingRapor($input);
       echo json_encode( array('msg' => 'Data berhasil disimpan') );
@@ -436,7 +435,7 @@ class C_admission extends Admission_Controler {
        $this->pagination->initialize($config);
        $page = $this->uri->segment(4);
        $start = ($page - 1) * $config["per_page"];
-       $this->data['url_registration'] = $this->GlobalVariableAdi['url_registration'];
+       $this->data['url_registration'] = url_registration;
        $this->data['datadb'] = $this->m_admission->loadData_calon_mahasiswa_created($config["per_page"], $start,$Nama,$selectProgramStudy,$Sekolah);
        $this->data['mataujian'] = $this->m_admission->select_mataUjian($selectProgramStudy);
        $this->data['grade'] = $this->m_admission->showData('db_academic.grade');
@@ -465,7 +464,7 @@ class C_admission extends Admission_Controler {
       $this->temp($content);
     }
 
-    public function set_tuition_fee_input($page = null)
+    /*public function set_tuition_fee_input($page = null)
     {
       $this->load->library('pagination');
       $config = $this->config_pagination_default_ajax(1000,5,5);
@@ -476,6 +475,35 @@ class C_admission extends Admission_Controler {
       $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
       $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee($config["per_page"], $start));
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_tuition_fee_input',$this->data,true);
+
+      $pagination = '';
+      if (count($this->m_admission->getDataCalonMhsTuitionFee($config["per_page"], $start)) > 0) {
+        $pagination = $this->pagination->create_links();
+      }
+
+      $output = array(
+      'pagination_link'  => $pagination,
+      'loadtable'   => $content,
+      );
+      echo json_encode($output);
+
+    }*/
+
+    public function set_tuition_fee_input($page = null)
+    {
+      $this->load->library('pagination');
+      $page_Count = 5;
+      $countData = $this->m_admission->count_getDataCalonMhsTuitionFee();
+      $config = $this->config_pagination_default_ajax($countData,$page_Count,5);
+      $this->pagination->initialize($config);
+      $page = $this->uri->segment(5);
+      $start = ($page - 1) * $config["per_page"];
+
+      $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
+      $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee($config["per_page"], $start));
+      // $this->m_admission->getDataCalonMhsAll($config["per_page"], $start,$input);
+      $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_tuition_fee_input',$this->data,true);
+
       $output = array(
       'pagination_link'  => $this->pagination->create_links(),
       'loadtable'   => $content,
@@ -503,7 +531,9 @@ class C_admission extends Admission_Controler {
     public function set_tuition_fee_delete($page = null)
     {
       $this->load->library('pagination');
-      $config = $this->config_pagination_default_ajax(1000,5,5);
+      $page_Count = 5;
+      $countData = $this->m_admission->count_getDataCalonMhsTuitionFee_delete();
+      $config = $this->config_pagination_default_ajax($countData,$page_Count,5);
       $this->pagination->initialize($config);
       $page = $this->uri->segment(5);
       $start = ($page - 1) * $config["per_page"];
@@ -511,6 +541,7 @@ class C_admission extends Admission_Controler {
       $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
       $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee_delete($config["per_page"], $start));
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_tuition_fee_delete',$this->data,true);
+
       $output = array(
       'pagination_link'  => $this->pagination->create_links(),
       'loadtable'   => $content,
@@ -570,7 +601,21 @@ class C_admission extends Admission_Controler {
     {
       $input = $this->getInputToken();
       $arr = array('msg' => '','status'=>0);
-      switch ($input['Action']) {
+      $arr2 = array();
+      for ($i=0; $i < count($input); $i++) { 
+        foreach ($input[$i] as $key => $value) {
+          $arr2[] = array($key => $value);
+        }
+      }
+      
+      print_r($arr2);
+      /*$dataSave = array(
+              'ID_ujian_perprody' => $ID_ujian_perprody,
+              'DateTimeTest' => $DateTimeTest,
+              'Lokasi' => $Lokasi,
+      );
+      $this->db->insert('db_admission.register_jadwal_ujian', $dataSave);*/
+      /*switch ($input['Action']) {
           case 'create_va':
               // get VA Number
                 $getDataPersonal = $this->m_admission->getDataPersonal($input['ID_register_formulir']);
@@ -671,7 +716,8 @@ class C_admission extends Admission_Controler {
                       
                     }
               break;
-      }
+      }*/
+
       echo json_encode($arr);
 
     }
@@ -730,6 +776,22 @@ class C_admission extends Admission_Controler {
 
     }
 
+    public function set_input_tuition_fee_submit()
+    {
+      $input = $this->getInputToken();
+      // save data to payment_register and payment_pre
+      //print_r($input);
+      $msg = '';
+      try {
+        $output =$this->m_admission->set_input_tuition_fee_submit($input);
+        $msg = '';
+      }
+      catch(Exception $e) {
+        $msg = $e->getMessage();
+      }
+      echo json_encode($msg);
+    }
+
     public function generatenim()
     {
       $content = $this->load->view('page/'.$this->data['department'].'/master_calon_mahasiswa/generatenim',$this->data,true);
@@ -743,6 +805,7 @@ class C_admission extends Admission_Controler {
       {
         $path = $_FILES["fileData"]["tmp_name"];
         $arr_insert = array();
+        $arr_insert_auth = array();
         include APPPATH.'third_party/PHPExcel/PHPExcel.php';
         $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
         $excel2 = $excel2->load($path); // Empty Sheet
@@ -768,8 +831,9 @@ class C_admission extends Admission_Controler {
         if (count($Q_getLastNPM)== 1) {
           $bb = $Q_getLastNPM[0]['NPM'];
         }
-        for ($i=2; $i < $CountRow; $i++) {
+        for ($i=2; $i < ($CountRow + 1); $i++) {
           $temp = array();
+          $temp2 = array();
           $ProgramID = $objWorksheet->getCellByColumnAndRow(1, $i)->getCalculatedValue();
           $LevelStudyID = $objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue();
           $ReligionID = $objWorksheet->getCellByColumnAndRow(3, $i)->getCalculatedValue();
@@ -808,6 +872,7 @@ class C_admission extends Admission_Controler {
           $Gender = $objWorksheet->getCellByColumnAndRow(14, $i)->getCalculatedValue();
           $PlaceOfBirth = $objWorksheet->getCellByColumnAndRow(15, $i)->getCalculatedValue();
           $DateOfBirth = $objWorksheet->getCellByColumnAndRow(16, $i)->getCalculatedValue();
+          $DateOfBirth = date('Y-m-d',PHPExcel_Shared_Date::ExcelToPHP($DateOfBirth));
           $Phone = $objWorksheet->getCellByColumnAndRow(17, $i)->getCalculatedValue();
           $HP = $objWorksheet->getCellByColumnAndRow(18, $i)->getCalculatedValue();
           $ClassOf = $objWorksheet->getCellByColumnAndRow(19, $i)->getCalculatedValue();
@@ -878,10 +943,28 @@ class C_admission extends Admission_Controler {
             'StatusStudentID' => $StatusStudentID,
           );
           $arr_insert[] = $temp;
+
+          $plan_password = $NPM.''.'123456';
+          $pas = md5($plan_password);
+          $pass = sha1('jksdhf832746aiH{}{()&(*&(*'.$pas.'HdfevgyDDw{}{}{;;*766&*&*');
+
+          $temp2 = array(
+              'NPM' => $NPM,
+              'Password' => $pass,
+              'Password_Old' => md5($NPM),
+              'Year' => date('Y'),
+              'EmailPU' => $NPM.'@podomorouniversity.ac.id',
+              'StatusStudentID' => 3,
+              'Status' => '-1',
+          );
+
+          $arr_insert_auth[] = $temp2;
+
           $aa++;
         }
 
         $this->db->insert_batch($ta.'.students', $arr_insert);
+        $this->db->insert_batch('db_academic.auth_students', $arr_insert_auth);
         echo json_encode(array('status'=> 1,'msg' => ''));
       }
       else

@@ -49,7 +49,7 @@
                         </a>
                     </li>
                     <li class="<?php if($this->uri->segment(2)=='master' && $this->uri->segment(3) == "discount" ){echo "current";} ?>">
-                        <a href="#">
+                        <a href="<?php echo base_url('finance/master/discount'); ?>">
                         <i class="icon-angle-right"></i>
                         Discount
                         </a>
@@ -80,12 +80,12 @@
                         Approved
                         </a>
                         <ul class="sub-menu">
-                            <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "approved" && $this->uri->segment(4) == "nilai-rapor" && $this->uri->segment(5) == ""){echo "current";} ?>">
+                            <!--<li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "approved" && $this->uri->segment(4) == "nilai-rapor" && $this->uri->segment(5) == ""){echo "current";} ?>">
                                 <a href="<?php echo base_url('finance/admission/approved/nilai-rapor'); ?>">
                                     <i class="icon-angle-right"></i>
                                     Nilai Rapor
                                 </a>
-                            </li>
+                            </li>-->
                             <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "approved" && $this->uri->segment(4) == "tuition-fee" ){echo "current";} ?>">
                                 <a href="<?php echo base_url('finance/admission/approved/tuition-fee'); ?>">
                                 <i class="icon-angle-right"></i>
@@ -163,19 +163,19 @@
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "cancel-tagihan-mhs"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/cancel-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
-                        Cancel Tagihan
+                        Batal Tagihan
                         </a>
                     </li>
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "cek-tagihan-mhs"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/cek-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
-                        List Tagihan
+                        Daftar Tagihan
                         </a>
                     </li>
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "list-telat-bayar"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/list-telat-bayar'); ?>">
                         <i class="icon-angle-right"></i>
-                        List Telat Bayar
+                        Daftar Outstanding Pembayaran
                         </a>
                     </li>
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "penerimaan-tagihan-mhs"){echo "current";} ?>">

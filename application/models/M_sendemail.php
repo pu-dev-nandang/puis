@@ -75,7 +75,7 @@ class M_sendemail extends CI_Model {
             <td style="background-color:#fff;padding:0 30px;color:#333;vertical-align:top;border:1px solid #cccccc;">
                 <br>
                 <div style="text-align: center;">
-                    <img src="http://siak.podomorouniversity.ac.id/logo_tr.png" style="max-width: 250px;">
+                    <img src="https://lh3.googleusercontent.com/mkqZdtpCm7IfWWrPdfxJBETqOTiEU09s3cr4tzfFwAGRl3WqH_pyo3yDGPKmpSHfMw1mSFU0JTRk-3yX9M7xAG5KiVHzuMS1DPHzFg=w500-h144-rw-no" style="max-width: 250px;">
                     <hr style="border-top: 1px solid #cccccc;"/>
                     <div style="font-family:Proxima Nova Semi-bold,Helvetica,sans-serif;font-weight:bold;font-size:24px;line-height:24px;color:#607D8B">Registration</div>
                 </div>
@@ -137,7 +137,7 @@ class M_sendemail extends CI_Model {
                             <td style="background-color:#fff;padding:0 30px;color:#333;vertical-align:top;border:1px solid #cccccc;">
                             <br>
                             <div style="text-align: center;">
-                                <img src="http://siak.podomorouniversity.ac.id/logo_tr.png" style="max-width: 250px;">
+                                <img src="https://lh3.googleusercontent.com/mkqZdtpCm7IfWWrPdfxJBETqOTiEU09s3cr4tzfFwAGRl3WqH_pyo3yDGPKmpSHfMw1mSFU0JTRk-3yX9M7xAG5KiVHzuMS1DPHzFg=w500-h144-rw-no" style="max-width: 250px;">
                                 <hr style="border-top: 1px solid #cccccc;"/>
                                 <div style="font-family:Proxima Nova Semi-bold,Helvetica,sans-serif;font-weight:bold;font-size:24px;line-height:24px;color:#607D8B">Podomoro University Message</div>
                             </div>

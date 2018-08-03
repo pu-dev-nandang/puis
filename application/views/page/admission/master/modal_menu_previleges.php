@@ -45,7 +45,7 @@
         <div class="form-group"> 
             <div class="row">
                 <div class="col-sm-4">
-                    <label class="control-label">Isi Nama Sub Menu 1:</label>
+                    <label class="control-label">Sub Menu 1:</label>
                 </div>    
                 <div class="col-sm-6">
                     <input type="text" id="sub_menu1"  class="form-control" placeholder="">
@@ -55,10 +55,30 @@
         <div class="form-group"> 
             <div class="row">
                 <div class="col-sm-4">
-                    <label class="control-label">Isi Nama Sub Menu 2:</label>
+                    <label class="control-label">Sub Menu 2:</label>
                 </div>    
                 <div class="col-sm-6">
                     <input type="text" id="sub_menu2"  class="form-control" placeholder="">
+                </div>
+            </div>
+        </div>
+        <div class="form-group"> 
+            <div class="row">
+                <div class="col-sm-4">
+                    <label class="control-label">Slug / URI:</label>
+                </div>    
+                <div class="col-sm-6">
+                    <input type="text" id="Slug"  class="form-control" placeholder="">
+                </div>
+            </div>
+        </div>
+        <div class="form-group"> 
+            <div class="row">
+                <div class="col-sm-4">
+                    <label class="control-label">Controler/Function</label>
+                </div>    
+                <div class="col-sm-6">
+                    <input type="text" id="Controller"  class="form-control" placeholder="">
                 </div>
             </div>
         </div>

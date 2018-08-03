@@ -5,7 +5,7 @@
 				<h4><i class="icon-reorder"></i>Master Sales Koordinator</h4>
 				<div class="toolbar no-padding">
 				    <div class="btn-group">
-				      <span data-smt="" class="btn btn-xs btn-add-event">
+				      <span data-smt="" class="btn btn-xs btn-add-event btn-add">
 				        <i class="icon-plus"></i> Add Sales Koordinator
 				       </span>
 				    </div>
