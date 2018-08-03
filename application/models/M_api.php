@@ -747,6 +747,205 @@ class M_api extends CI_Model {
 
     }
 
+    public function getSchedulePerDay($DayID,$dataWhere){
+
+        $ProgramsCampusID = ($dataWhere['ProgramsCampusID']!='') ? ' AND s.ProgramsCampusID = "'.$dataWhere['ProgramsCampusID'].'" ' : '';
+        $SemesterID = ($dataWhere['SemesterID']!='') ? ' AND s.SemesterID = "'.$dataWhere['SemesterID'].'" ' : '';
+        $CombinedClasses = ($dataWhere['CombinedClasses']!='') ? ' AND s.CombinedClasses = "'.$dataWhere['CombinedClasses'].'" ' : '';
+        $IsSemesterAntara = ($dataWhere['IsSemesterAntara']!='') ? ' AND s.IsSemesterAntara = "'.$dataWhere['IsSemesterAntara'].'" ' : '';
+
+        $ProdiID = ($dataWhere['ProdiID']!='') ? ' AND sdc.ProdiID = "'.$dataWhere['ProdiID'].'" ' : '';
+
+        $dataDay = $this->db->query('SELECT sdc.CDID FROM db_academic.schedule_details sd
+                                          LEFT JOIN db_academic.schedule s ON (s.ID = sd.ScheduleID)
+                                          LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = sd.ScheduleID)
+                                          WHERE sd.DayID = '.$DayID.'  '.$ProgramsCampusID.'
+                                           '.$SemesterID.' '.$CombinedClasses.' 
+                                           '.$IsSemesterAntara.' 
+                                           '.$ProdiID.' 
+                                           GROUP BY s.ID ')->result_array();
+
+        $res = $dataDay;
+
+        return $res;
+
+    }
+
+    public function getSchedulePerDayLimit($DayID,$dataWhere,$start,$length){
+
+
+        $ProgramsCampusID = ($dataWhere['ProgramsCampusID']!='') ? ' AND s.ProgramsCampusID = "'.$dataWhere['ProgramsCampusID'].'" ' : '';
+        $SemesterID = ($dataWhere['SemesterID']!='') ? ' AND s.SemesterID = "'.$dataWhere['SemesterID'].'" ' : '';
+        $CombinedClasses = ($dataWhere['CombinedClasses']!='') ? ' AND s.CombinedClasses = "'.$dataWhere['CombinedClasses'].'" ' : '';
+        $IsSemesterAntara = ($dataWhere['IsSemesterAntara']!='') ? ' AND s.IsSemesterAntara = "'.$dataWhere['IsSemesterAntara'].'" ' : '';
+
+        $ProdiID = ($dataWhere['ProdiID']!='') ? ' AND sdc.ProdiID = "'.$dataWhere['ProdiID'].'" ' : '';
+
+        $q ='SELECT s.*, sd.ClassroomID,sd.Credit,sd.DayID,sd.TimePerCredit,sd.StartSessions,sd.EndSessions,
+                                          em.Name AS Lecturer,
+                                          cl.Room 
+                                          FROM db_academic.schedule_details sd
+                                          LEFT JOIN db_academic.schedule s ON (s.ID = sd.ScheduleID)
+                                          LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = sd.ScheduleID)
+                                          LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                          LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+                                          WHERE sd.DayID = '.$DayID.'  '.$ProgramsCampusID.'
+                                           '.$SemesterID.' '.$CombinedClasses.' 
+                                           '.$IsSemesterAntara.' 
+                                           '.$ProdiID.' 
+                                           GROUP BY s.ID 
+                                           ORDER BY sd.StartSessions, sd.EndSessions ASC
+                                           LIMIT '.$start.' , '.$length.'
+                                           ';
+
+
+
+        return $q;
+    }
+
+    public function getSchedulePerDaySearch($DayID,$dataWhere,$search){
+        $ProgramsCampusID = ($dataWhere['ProgramsCampusID']!='') ? ' AND s.ProgramsCampusID = "'.$dataWhere['ProgramsCampusID'].'" ' : '';
+        $SemesterID = ($dataWhere['SemesterID']!='') ? ' AND s.SemesterID = "'.$dataWhere['SemesterID'].'" ' : '';
+        $CombinedClasses = ($dataWhere['CombinedClasses']!='') ? ' AND s.CombinedClasses = "'.$dataWhere['CombinedClasses'].'" ' : '';
+        $IsSemesterAntara = ($dataWhere['IsSemesterAntara']!='') ? ' AND s.IsSemesterAntara = "'.$dataWhere['IsSemesterAntara'].'" ' : '';
+
+        $ProdiID = ($dataWhere['ProdiID']!='') ? ' AND sdc.ProdiID = "'.$dataWhere['ProdiID'].'" ' : '';
+
+        $q ='SELECT s.*, sd.ClassroomID,sd.Credit,sd.DayID,sd.TimePerCredit,sd.StartSessions,sd.EndSessions,
+                                          em.Name AS Lecturer,
+                                          cl.Room 
+                                          FROM db_academic.schedule_details sd
+                                          LEFT JOIN db_academic.schedule s ON (s.ID = sd.ScheduleID)
+                                          LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = sd.ScheduleID)
+                                          LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                          LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+                                          WHERE ( sd.DayID = '.$DayID.'  '.$ProgramsCampusID.'
+                                           '.$SemesterID.' '.$CombinedClasses.' 
+                                           '.$IsSemesterAntara.' 
+                                           '.$ProdiID.' ) AND (
+                                           s.ClassGroup LIKE "%'.$search.'%" OR
+                                           em.Name LIKE "%'.$search.'%" OR
+                                           cl.Room LIKE "%'.$search.'%"
+                                            ) 
+                                           GROUP BY s.ID 
+                                           ORDER BY sd.StartSessions, sd.EndSessions ASC                                           
+                                           ';
+
+
+
+        return $q;
+    }
+
+    public function getTeamTeachingPerDay($ScheduleID){
+        $data = $this->db->query('SELECT em.Name AS Lecturer FROM db_academic.schedule_team_teaching stt
+                                            LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
+                                            WHERE stt.ScheduleID = "'.$ScheduleID.'" ')->result_array();
+
+        $res = '';
+        if(count($data)>0){
+
+            for($i=0;$i<count($data);$i++){
+
+                $lec = '<div style="margin-bottom: 7px;"><span class="label label-info-inline"><b>'.$data[$i]['Lecturer'].'</b></span></div>';
+
+                $res = $res.''.$lec;
+            }
+        }
+
+        return $res;
+    }
+
+    public function getCoursesPerDay($ScheduleID){
+        $dataCourse = $this->db->query('SELECT mk.MKCode, mk.Name AS MKName, mk.NameEng AS MKNameEng ,
+                                            ps.Code AS CodeProdi, ps.NameEng AS ProdiEng 
+                                            FROM db_academic.schedule_details_course sdc 
+                                            LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
+                                            LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                            WHERE sdc.ScheduleID = "'.$ScheduleID.'" ')->result_array();
+
+
+        $resCourse = '';
+        if(count($dataCourse)>0){
+            for($r=0;$r<count($dataCourse);$r++){
+                $d = $dataCourse[$r];
+
+                $cc = '<div style="margin-bottom: 10px;"><b>'.$d['MKNameEng'].'</b><br/><i>'.$d['MKName'].'</i><br/>
+                            <span class="label label-default">'.$d['MKCode'].'</span> | 
+                            <span class="label label-danger-inline"><b>'.$d['ProdiEng'].'</b></span></div>';
+                $resCourse = $resCourse.''.$cc;
+            }
+        }
+
+        return $resCourse;
+    }
+
+    public function getTotalStdPerDay($SemesterID,$ScheduleID){
+        $ClassOf = $this->getClassOf();
+
+        $totalStd = 0;
+        for($st=0;$st<count($ClassOf);$st++){
+            $db_ = 'ta_'.$ClassOf[$st]['Year'];
+
+            $dataStdCourse = $this->db->query('SELECT s.NPM FROM '.$db_.'.study_planning sp 
+                                                            LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
+                                                            WHERE sp.SemesterID = "'.$SemesterID.'" 
+                                                            AND sp.ScheduleID = "'.$ScheduleID.'" ')->result_array();
+            $totalStd = $totalStd + count($dataStdCourse);
+        }
+
+        return $totalStd;
+    }
+
+
+    public function getDetailSc($dataWhere,$result){
+        if(count($result)>0){
+            $CO_SemesterID = ($dataWhere['SemesterID']!='') ? ' AND co.SemesterID = "'.$dataWhere['SemesterID'].'" ' : '';
+            $CO_ProdiID = ($dataWhere['ProdiID']!='') ? ' AND co.ProdiID = "'.$dataWhere['ProdiID'].'" ' : '';
+            $CO_IsSemesterAntara = ($dataWhere['IsSemesterAntara']!='') ? ' AND co.IsSemesterAntara = "'.$dataWhere['IsSemesterAntara'].'" ' : '';
+            $CO_Semester = ($dataWhere['Semester']!='') ? ' AND co.Semester = "'.$dataWhere['Semester'].'" ' : '';
+
+//            $ClassOf = $this->getClassOf();
+            for($c=0;$c<count($result);$c++){
+                $dataOffering = $this->db->query('SELECT * FROM db_academic.course_offerings co 
+                                                          WHERE co.ProgramsCampusID = "'.$dataWhere['ProgramsCampusID'].'" '.$CO_Semester.' 
+                                                           '.$CO_SemesterID.' '.$CO_ProdiID.' '.$CO_IsSemesterAntara.' ')->result_array();
+
+                $dataCourse = [];
+
+                if(count($dataOffering)>0){
+                    for($f=0;$f<count($dataOffering);$f++){
+                        $Arr_CDID = json_decode($dataOffering[$f]['Arr_CDID']);
+
+                        for($s=0;$s<count($Arr_CDID);$s++){
+
+                            $__course = $this->db->query('SELECT sdc.CDID, mk.ID, mk.MKCode, mk.NameEng AS MKNameEng, mk.Name AS MKName,
+                                                          ps.NameEng AS ProdiEng, ps.name AS Prodi, ps.Code AS ProdiCode, cd.Semester AS BaseSemester
+                                                          FROM db_academic.schedule_details_course sdc
+                                                          LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                          LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
+                                                          LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                                          WHERE sdc.ScheduleID="'.$result[$c]['ID'].'" AND sdc.CDID = "'.$Arr_CDID[$s].'" LIMIT 1')->result_array();
+
+                            if(count($__course)>0){
+//                                $__course[0]['Semester'] = $dataWhere['Semester'];
+                                $__course[0]['Semester'] = $dataOffering[$f]['Semester'];
+                                array_push($dataCourse,$__course[0]);
+                            }
+                        }
+
+                    }
+                }
+
+                $result[$c]['SemesterDetails'] = $dataOffering;
+                $result[$c]['DetailCourse'] = $dataCourse;
+
+            }
+        }
+
+        return $result;
+    }
+
+
     public function getOneSchedule($ScheduleID){
 //        $data = $this->db->query('SELECT s.ID,sm.Name AS semesterName,sm.ID AS SemesterID, pc.Name AS viewProgramsCampus,
 //                                          s.CombinedClasses,

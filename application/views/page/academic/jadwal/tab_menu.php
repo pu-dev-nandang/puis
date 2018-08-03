@@ -14,20 +14,22 @@
 
 <div class="row" style="margin-top: 30px;">
 
-    <div class="col-md-4">
-        <div class="">
-            <label>Semester Antara</label>
-            <input type="checkbox" id="formSemesterAntara" data-toggle="toggle" data-style="ios"/>
-        </div>
-    </div>
-    <div class="col-md-8" style="text-align: right;">
+<!--    <div class="col-md-4">-->
+<!--        <div class="">-->
+<!--            <label>Semester Antara</label>-->
+<!--            <input type="checkbox" id="formSemesterAntara" data-toggle="toggle" data-style="ios"/>-->
+<!--        </div>-->
+<!--    </div>-->
+    <div class="col-md-12" style="text-align: right;">
         <div class="btn-group" role="group" aria-label="...">
 
             <button data-page="jadwal" type="button" class="btn btn-primary btn-action
                         control-jadwal"><i class="fa fa-calendar right-margin" aria-hidden="true"></i> Timetables</button>
 
-            <button data-page="ruangan" type="button" class="btn btn-default btn-default-primary btn-action
-                        control-jadwal"><i class="fa fa-window-restore right-margin" aria-hidden="true"></i> Room Timetables (Comming Soon)</button>
+            <button data-page="jadwalPerSemester" type="button" class="btn btn-default btn-default-primary btn-action
+                        control-jadwal"><i class="fa fa-window-restore right-margin" aria-hidden="true"></i> Semester Timetables</button>
+<!--            <button data-page="ruangan" type="button" class="btn btn-default btn-default-primary btn-action-->
+<!--                        control-jadwal"><i class="fa fa-window-restore right-margin" aria-hidden="true"></i> Room Timetables (Comming Soon)</button>-->
         </div>
         |
         <button data-page="penawaran_mk" type="button" class="btn btn-default btn-default-primary btn-action control-jadwal">

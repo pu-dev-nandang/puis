@@ -1146,6 +1146,68 @@ class C_api extends CI_Controller {
         }
     }
 
+    public function getSchedulePerday(){
+        $requestData= $_REQUEST;
+
+        $token = $this->input->get('token');
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+
+        $dataWhere = (array) $data_arr['dataWhere'];
+
+        $totalData = $this->m_api->getSchedulePerDay($data_arr['DayID'],$dataWhere);
+
+        if( !empty($requestData['search']['value']) ) {
+            $sql = $this->m_api->getSchedulePerDaySearch($data_arr['DayID'],$dataWhere,$requestData['search']['value']);
+        } else {
+            $sql = $this->m_api->getSchedulePerDayLimit($data_arr['DayID'],$dataWhere,$requestData['start'],$requestData['length']);
+        }
+
+        $query = $this->db->query($sql)->result_array();
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            // Group Kelas
+            $groupClass = '<b><a href="javascript:void(0)" class="btn-action" data-page="editjadwal" data-id="'.$row['ID'].'">'.$row["ClassGroup"].'</a></b>';
+            $sbSesi = ($row['SubSesi']=='1' || $row['SubSesi']==1) ? '<br/><span class="label label-warning">Sub-Sesi</span>' : '';
+
+            $TeamTeaching = '';
+            if($row["TeamTeaching"]==1){
+                $TeamTeaching = $this->m_api->getTeamTeachingPerDay($row['ID']);
+            }
+
+            $coor = '<div style="color: #427b44;margin-bottom: 10px;"><b>'.$row["Lecturer"].'</b></div>';
+
+            // Mendapatkan matakuliah
+            $courses = $this->m_api->getCoursesPerDay($row['ID']);
+
+            // Mendapatkan Jumlah Students
+            $Students = $this->m_api->getTotalStdPerDay($row['SemesterID'],$row['ID']);
+
+            $nestedData[] = '<div style="text-align:center;">'.$groupClass.''.$sbSesi.'</div>';
+            $nestedData[] = $courses;
+            $nestedData[] = '<div style="text-align:center;">'.$row["Credit"].'</div>';
+            $nestedData[] = $coor.''.$TeamTeaching;
+            $nestedData[] = '<div style="text-align:center;">'.$Students.'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.substr($row["StartSessions"],0,5).' - '.substr($row["EndSessions"],0,5).'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$row["Room"].'</div>';
+
+            $data[] = $nestedData;
+        }
+
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($totalData)),
+            "recordsFiltered" => intval( count($totalData) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+    }
+
     public function checkSchedule(){
         $token = $this->input->post('token');
         $key = "UAP)(*";
