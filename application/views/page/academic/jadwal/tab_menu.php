@@ -174,7 +174,7 @@
         $.post(url,{token:token},function (page) {
             setTimeout(function () {
                 $('#dataPage').html(page);
-            },500);
+            },100);
         });
     }
 </script>
@@ -196,7 +196,7 @@
 
     });
 
-    $(document).on('change','#filterProgramCampus,#filterBaseProdi,#filterCombine,#filterSemesterSchedule',function () {
+    $(document).on('change','#filterProgramCampus,#filterBaseProdi,#filterCombine,#filterSemesterSchedule,#filterDay',function () {
         filterSchedule();
     });
 
@@ -406,7 +406,7 @@
                         $('#btnSaveClassroom').prop('disabled',false).html('Save');
                         toastr.warning('Room is exist','Warning');
                     }
-                },1000);
+                },500);
 
             });
         } else {

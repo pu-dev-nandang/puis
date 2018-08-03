@@ -2,7 +2,7 @@
 
 <div class="thumbnail" style="margin-bottom: 10px;">
     <div class="row">
-        <div class="col-xs-2" style="">
+        <div class="col-xs-2 hide" style="">
             <select class="form-control form-filter-jadwal" id="filterProgramCampus"></select>
         </div>
         <div class="col-xs-2" style="">
@@ -38,12 +38,23 @@
                 </ul>
             </div>
         </div>
+        <div class="col-xs-2" style="">
+            <select class="form-control form-filter-jadwal" id="filterDay">
+                <option value="1">Monday</option>
+                <option value="2">Tuesday</option>
+                <option value="3">Wednesday</option>
+                <option value="4">Thrusday</option>
+                <option value="5">Friday</option>
+                <option value="6">Saturday</option>
+                <option value="7">Sunday</option>
+            </select>
+        </div>
     </div>
 
 
 </div>
 
-<div class="thumbnail" style="padding: 5px;">
+<div class="thumbnail hide" style="padding: 5px;">
     <label class="checkbox-inline">
         <input type="checkbox" id="filterDayCheckAll" class="filterDay" value="0" checked> All Days
     </label>
@@ -141,6 +152,7 @@
 
             var data = {
                 action : 'read',
+                DayID : $('#filterDay').val(),
                 dataWhere  : {
                     ProgramsCampusID : ProgramsCampusID,
                     SemesterID : SemesterID,
@@ -344,7 +356,7 @@
                     $('#btnSchedule2Excel').attr('href',base_url_js+'save2pdf/schedule-excel?token='+token2export);
                     $('#btnDropdownExport').prop('disabled',false);
 
-                },500);
+                },100);
 
             });
         }

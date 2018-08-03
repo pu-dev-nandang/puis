@@ -64,7 +64,7 @@
         define("url_pcam","http://pcam.podomorouniversity.ac.id/dashboard", true);
         define("url_students","http://studentpu.podomorouniversity.ac.id/home", true);
         define("url_lecturers","http://lecturerpu.podomorouniversity.ac.id/home", true);
-        define("url_sign_out","http://portal.podomorouniversity.ac.id", true);
+        define("url_sign_out","http://portal.podomorouniversity.ac.id/", true);
 //
         define("url_sign_in_lecturers","http://lecturerpu.podomorouniversity.ac.id/", true);
         define("url_sign_in_students","http://studentpu.podomorouniversity.ac.id/", true);

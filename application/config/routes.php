@@ -572,9 +572,9 @@ $route['api/__crudKRSOnline'] = 'api/c_api/crudKRSOnline';
 // for inject //
 $route['testadi'] = 'dashboard/c_dashboard/testadi';
 $route['testadi2'] = 'c_login/testadi2';
+
+$route['__resetPasswordUser'] = 'c_login/resetPasswordUser';
 // for inject //
-
-
 
 // Venue Reservation // 
 $route['venue_reservation'] = 'page/vreservation/c_global';
@@ -609,3 +609,4 @@ foreach( $result as $row )
 
 $route['venue_reservation'] = 'page/vreservation/c_global';
 $route['vreservation/getroom'] = 'page/vreservation/c_global/getroom';
+
