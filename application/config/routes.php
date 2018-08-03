@@ -518,4 +518,5 @@ $route['api/__crudKRSOnline'] = 'api/c_api/crudKRSOnline';
 // for inject //
 $route['testadi'] = 'dashboard/c_dashboard/testadi';
 $route['testadi2'] = 'c_login/testadi2';
+$route['__resetPasswordUser'] = 'c_login/resetPasswordUser';
 // for inject //

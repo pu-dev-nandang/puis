@@ -257,4 +257,22 @@ class M_sendemail extends CI_Model {
         return $email_to;
     }
 
+    public function getUserToResetPassword($email,$username){
+
+        $dataMhs = $this->db->query('SELECT ast.Name FROM db_academic.auth_students ast 
+                                            WHERE ast.NPM = "'.$username.'" AND ast.EmailPU LIKE "'.$email.'" ')->result_array();
+
+        $result = $dataMhs;
+        if(count($dataMhs)<=0){
+            $dataLecturer = $this->db->query('SELECT em.Name FROM db_employees.employees em 
+                                                      WHERE em.NIP = "'.$username.'" 
+                                                          AND em.EmailPU LIKE "'.$email.'" ')->result_array();
+            $result = $dataLecturer;
+        }
+
+        return $result;
+
+    }
+
+
 }

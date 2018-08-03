@@ -130,6 +130,54 @@ class C_login extends CI_Controller {
         }
     }
 
+    public function resetPasswordUser(){
+        $this->load->model('m_sendemail');
+
+        $token = $this->input->get('token');
+        $flag = $this->input->get('f');
+        $daten = $this->input->get('d');
+
+        if($flag=='st'){
+            $dataUser = $this->db->query('SELECT s.NPM AS Username, s.EmailPU FROM db_academic.auth_students s 
+                      WHERE s.Password = "'.$token.'"  LIMIT 1')->result_array();
+        } else {
+            $dataUser = $this->db->query('SELECT em.NIP AS Username, em.EmailPU FROM db_employees.employees em 
+                      WHERE em.Password = "'.$token.'" LIMIT 1')->result_array();
+        }
+
+        $res=0;
+        if(count($dataUser)>0){
+
+            $dataT = array(
+                'Username' => $dataUser[0]['Username'],
+                'TokenUser' => $token,
+                'Flag' => $flag
+            );
+            $token2 = $this->jwt->encode($dataT,'chPass');
+
+            $to = $dataUser[0]['EmailPU'];
+            $subject = 'Reset Password - Podomoro University '.$daten;
+            $text = 'Dear <strong style="color: blue;">'.$to.'</strong>,
+                <p style="color: #673AB7;">To reset your password on <strong>Portal Podomoro University</strong>, please Click the link below, 
+                and your account will be activated instantly</p>
+                <table width="178" cellspacing="0" cellpadding="12" border="0">
+                    <tbody>
+                    <tr>
+                        <td bgcolor="#ff9000" align="center">
+                            <a href="'.url_sign_out.'resetPasswordpage?token='.$token2.'&f='.$flag.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color:#ff9000" target="_blank" >Reset password &#187;</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>';
+            $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+
+            $res=1;
+        }
+
+        return print_r($res);
+
+    }
+
     public function callback()
     {
         include_once APPPATH.'third_party/bni/BniEnc.php';
