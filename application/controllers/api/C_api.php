@@ -1155,15 +1155,20 @@ class C_api extends CI_Controller {
 
         $dataWhere = (array) $data_arr['dataWhere'];
 
-        $totalData = $this->m_api->getSchedulePerDay($data_arr['DayID'],$dataWhere);
+
 
         if( !empty($requestData['search']['value']) ) {
             $sql = $this->m_api->getSchedulePerDaySearch($data_arr['DayID'],$dataWhere,$requestData['search']['value']);
+            $query = $this->db->query($sql)->result_array();
+            $totalData = $query;
         } else {
+            $totalData = $this->m_api->getTotalPerDay($data_arr['DayID'],$dataWhere);
             $sql = $this->m_api->getSchedulePerDayLimit($data_arr['DayID'],$dataWhere,$requestData['start'],$requestData['length']);
+
+            $query = $this->db->query($sql)->result_array();
         }
 
-        $query = $this->db->query($sql)->result_array();
+
 
         $data = array();
         for($i=0;$i<count($query);$i++){

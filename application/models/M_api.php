@@ -747,7 +747,7 @@ class M_api extends CI_Model {
 
     }
 
-    public function getSchedulePerDay($DayID,$dataWhere){
+    public function getTotalPerDay($DayID,$dataWhere){
 
         $ProgramsCampusID = ($dataWhere['ProgramsCampusID']!='') ? ' AND s.ProgramsCampusID = "'.$dataWhere['ProgramsCampusID'].'" ' : '';
         $SemesterID = ($dataWhere['SemesterID']!='') ? ' AND s.SemesterID = "'.$dataWhere['SemesterID'].'" ' : '';
@@ -835,6 +835,7 @@ class M_api extends CI_Model {
 
         return $q;
     }
+
 
     public function getTeamTeachingPerDay($ScheduleID){
         $data = $this->db->query('SELECT em.Name AS Lecturer FROM db_academic.schedule_team_teaching stt
