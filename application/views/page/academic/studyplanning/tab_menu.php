@@ -522,8 +522,9 @@
 
                 if(Student.DetailMentor.length>0){
                     var dataMentor = Student.DetailMentor[0];
-                    var spDsn = dataMentor.Mentor.split(' ');
-                    var dsn = (spDsn.length>2) ? spDsn[0]+' '+spDsn[1] : dataMentor.Mentor;
+                    // var spDsn = dataMentor.Mentor.split(' ');
+                    // var dsn = (spDsn.length>2) ? spDsn[0]+' '+spDsn[1] : dataMentor.Mentor;
+                    var dsn = (dataMentor.Mentor!='' && dataMentor.Mentor!=null) ? dataMentor.Mentor : '-';
                     var divMentor = dsn+'<br/><i>'+dataMentor.NIP+'</i>';
                     $('#mentorData'+no).html(divMentor);
                 }

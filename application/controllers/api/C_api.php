@@ -908,9 +908,9 @@ class C_api extends CI_Controller {
                 $insert_id = $this->db->insert_id();
 
                 //schedule_class_group
-                $dataGroup = (array) $formData['schedule_class_group'];
-                $dataGroup['ScheduleID'] = $insert_id;
-                $this->db->insert('db_academic.schedule_class_group',$dataGroup);
+//                $dataGroup = (array) $formData['schedule_class_group'];
+//                $dataGroup['ScheduleID'] = $insert_id;
+//                $this->db->insert('db_academic.schedule_class_group',$dataGroup);
 
 
                 // schedule_details
@@ -961,12 +961,22 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='read'){
                 $dataWhere = (array) $data_arr['dataWhere'];
 
-                $days = $this->db->order_by('ID','ASC')->get('db_academic.days')->result_array();
+//                $days = $this->db->order_by('ID','ASC')->get('db_academic.days')->result_array();
 
-                for($i=0;$i<count($days);$i++){
-                    $data[$i]['Day'] = $days[$i];
-                    $data[$i]['Details'] = $this->m_api->getSchedule($days[$i]['ID'],$dataWhere);
-                }
+                $days = $this->db->get_where('db_academic.days',array('ID'=>$data_arr['DayID']),1)->result_array();
+
+
+                $data[0]['Day'] = $days[0];
+                $data[0]['Details'] = $this->m_api->getSchedule($data_arr['DayID'],$dataWhere);
+
+
+
+//                for($i=0;$i<count($days);$i++){
+//                    $data[$i]['Day'] = $days[$i];
+//                    $data[$i]['Details'] = $this->m_api->getSchedule($days[$i]['ID'],$dataWhere);
+//                }
+
+
                 return print_r(json_encode($data));
             }
             else if($data_arr['action']=='readOneSchedule'){
@@ -1120,6 +1130,17 @@ class C_api extends CI_Controller {
                 $data = $this->m_api->getScheduleDetails($data_arr['ScheduleID']);
 
                 return print_r(json_encode($data));
+            }
+
+            // Cek Group
+            else if($data_arr['action']=='checkGroup'){
+//                $dataG = $this->db->get_where('',
+//                        array('ClassGroup' => ))->result_array();
+
+                $dataG = $this->db->query('SELECT * FROM db_academic.schedule 
+                                                WHERE ClassGroup LIKE "'.$data_arr['Group'].'"  ')
+                                            ->result_array();
+                return print_r(json_encode($dataG));
             }
 
         }
@@ -2051,9 +2072,10 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($data));
             }
             else if($data_arr['action']=='gradeUpdate'){
-                $this->db->set('Status', $data_arr['Status']);
+//                $this->db->set('Status', $data_arr['Status']);
+                $data_update = array('ReasonNotApprove' => '' , 'Status' => $data_arr['Status']);
                 $this->db->where('ID', $data_arr['ID']);
-                $this->db->update('db_academic.grade_course');
+                $this->db->update('db_academic.grade_course',$data_update);
                 return print_r(1);
             }
             else if($data_arr['action']=='dataCourse'){
@@ -2061,6 +2083,19 @@ class C_api extends CI_Controller {
                 $data = $this->m_api->getDataCourse2Score($data_arr['SemesterID']
                     ,$data_arr['ProdiID'],$data_arr['CombinedClasses'],$data_arr['IsSemesterAntara']);
                 return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='updateNotApprove'){
+
+                $data_update = array(
+                    'ReasonNotApprove' => $data_arr['ReasonNotApprove'],
+                    'Status' => $data_arr['Status']
+                );
+
+                $this->db->where('ID', $data_arr['ID']);
+                $this->db->update('db_academic.grade_course', $data_update);
+
+                return print_r(1);
+
             }
         }
     }

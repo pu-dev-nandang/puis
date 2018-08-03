@@ -205,7 +205,22 @@ class M_api extends CI_Model {
 
     public function __getDosenSelectOption(){
         $data = $this->db->query('SELECT ID,NIP,NIDN,Name FROM db_employees.employees WHERE 
-                                                                    PositionMain = "14.5" OR PositionMain = "14.6" OR PositionMain = "14.7"');
+                                                                    PositionMain = "14.5" 
+                                                                    OR PositionMain = "14.6" 
+                                                                    OR PositionMain = "14.7"
+                                                                    
+                                                                    OR PositionOther1 = "14.5"
+                                                                    OR PositionOther1 = "14.6"
+                                                                    OR PositionOther1 = "14.7"
+                                                                    
+                                                                    OR PositionOther2 = "14.5"
+                                                                    OR PositionOther2 = "14.6"
+                                                                    OR PositionOther2 = "14.7"
+                                                                    
+                                                                    OR PositionOther3 = "14.5"
+                                                                    OR PositionOther3 = "14.6"
+                                                                    OR PositionOther3 = "14.7"
+                                                                    ');
         return $data->result_array();
     }
 
@@ -646,7 +661,7 @@ class M_api extends CI_Model {
                                           LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                           LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)                                   
                                           WHERE sd.DayID = "'.$DayID.'" '.$ProgramsCampusID.' '.$SemesterID.' '.$CombinedClasses.' '.$IsSemesterAntara.' 
-                                          ORDER BY sd.StartSessions, sd.EndSessions ASC ');
+                                          ORDER BY sd.StartSessions, sd.EndSessions ASC');
 
         $result = $data->result_array();
 
@@ -662,7 +677,7 @@ class M_api extends CI_Model {
 
             // Get Course
             for($c=0;$c<count($result);$c++){
-                $ProdiIDsdc = ($dataWhere['ProdiID']!='') ? ' AND sdc.ProdiID = "'.$dataWhere['ProdiID'].'" ' : '';
+//                $ProdiIDsdc = ($dataWhere['ProdiID']!='') ? ' AND sdc.ProdiID = "'.$dataWhere['ProdiID'].'" ' : '';
 
 
                 $dataOffering = $this->db->query('SELECT * FROM db_academic.course_offerings co 
