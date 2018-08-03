@@ -1,27 +1,30 @@
-<!--=== Calendar ===-->
-<div class="col-md-6">
-	<div class="widget">
-		<div class="widget-header">
-				<h4><i class="icon-calendar"></i> Schedule</h4>
+<div class = 'row'>
+	<!--=== Calendar ===-->
+	<div class="col-md-12">
+		<div class="widget">
+			<div class="widget-header">
+					<h4><i class="icon-calendar"></i> Schedule Today</h4>
+				</div>
+			<div class="widget-content">
+				<div id="schedule"></div>
 			</div>
-		<div class="widget-content">
-			<div id="calendar_view"></div>
-		</div>
-	</div> <!-- /.widget box -->
-</div> <!-- /.col-md-6 -->
-<!-- /Calendar -->
-
-<div class="col-md-6">
-	<div class="widget">
-		<div class="widget-header">
-				<h4><i class="fa fa-caret-square-o-right"></i> Room</h4>
+		</div> <!-- /.widget box -->
+	</div> <!-- /.col-md-6 -->
+	<!-- /Calendar -->
+</div>	
+<!--<div class = 'row'>
+	<div class="col-md-6">
+		<div class="widget">
+			<div class="widget-header">
+					<h4><i class="fa fa-caret-square-o-right"></i> Room</h4>
+				</div>
+			<div class="widget-content">
+				<div id="classroom_view"></div>
 			</div>
-		<div class="widget-content">
-			<div id="classroom_view"></div>
-		</div>
-	</div> <!-- /.widget box -->
-</div> <!-- /.col-md-6 -->
-<!-- /Calendar -->
+		</div> <!-- /.widget box -->
+	</div> <!-- /.col-md-6 -->
+	<!-- /Calendar -->
+</div>
 
 <script type="text/javascript">
 	/*
@@ -164,7 +167,8 @@
 	        }
 	    }).done(function() {
 	        LoaddataTableStandard('.datatable');
-	        loadDataSchedule();
+	        var divHtml = $("#schedule");
+	        loadDataSchedule(divHtml);
 	    })
 	}
 </script>

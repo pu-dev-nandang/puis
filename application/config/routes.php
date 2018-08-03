@@ -609,3 +609,7 @@ foreach( $result as $row )
 
 $route['venue_reservation'] = 'page/vreservation/c_global';
 $route['vreservation/getroom'] = 'page/vreservation/c_global/getroom';
+$route['vreservation/getschedule'] = 'page/vreservation/c_global/getschedule';
+
+
+$route['testApprove'] = 'page/finance/c_finance/testApprove';
