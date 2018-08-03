@@ -205,7 +205,22 @@ class M_api extends CI_Model {
 
     public function __getDosenSelectOption(){
         $data = $this->db->query('SELECT ID,NIP,NIDN,Name FROM db_employees.employees WHERE 
-                                                                    PositionMain = "14.5" OR PositionMain = "14.6" OR PositionMain = "14.7"');
+                                                                    PositionMain = "14.5" 
+                                                                    OR PositionMain = "14.6" 
+                                                                    OR PositionMain = "14.7"
+                                                                    
+                                                                    OR PositionOther1 = "14.5"
+                                                                    OR PositionOther1 = "14.6"
+                                                                    OR PositionOther1 = "14.7"
+                                                                    
+                                                                    OR PositionOther2 = "14.5"
+                                                                    OR PositionOther2 = "14.6"
+                                                                    OR PositionOther2 = "14.7"
+                                                                    
+                                                                    OR PositionOther3 = "14.5"
+                                                                    OR PositionOther3 = "14.6"
+                                                                    OR PositionOther3 = "14.7"
+                                                                    ');
         return $data->result_array();
     }
 
