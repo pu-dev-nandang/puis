@@ -493,7 +493,8 @@ $route['api/__getAcademicYearOnPublish'] = 'api/c_api/getAcademicYearOnPublish';
 $route['api/__getTimePerCredits'] = 'api/c_api/getTimePerCredits';
 
 $route['api/__crudSchedule'] = 'api/c_api/crudSchedule';
-$route['api/__getSchedule'] = 'api/c_api/getSchedulePerday';
+$route['api/__getSchedulePerDay'] = 'api/c_api/getSchedulePerDay';
+$route['api/__getSchedulePerSemester'] = 'api/c_api/getSchedulePerSemester';
 
 $route['api/__crudProgramCampus'] = 'api/c_api/crudProgramCampus';
 $route['api/__crudSemester'] = 'api/c_api/crudSemester';

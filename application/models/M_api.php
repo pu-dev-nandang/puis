@@ -747,7 +747,10 @@ class M_api extends CI_Model {
 
     }
 
-    public function getSchedulePerDay($DayID,$dataWhere){
+
+    // ====== Get Jadwal Per Day =======
+
+    public function getTotalPerDay($DayID,$dataWhere){
 
         $ProgramsCampusID = ($dataWhere['ProgramsCampusID']!='') ? ' AND s.ProgramsCampusID = "'.$dataWhere['ProgramsCampusID'].'" ' : '';
         $SemesterID = ($dataWhere['SemesterID']!='') ? ' AND s.SemesterID = "'.$dataWhere['SemesterID'].'" ' : '';
@@ -896,7 +899,106 @@ class M_api extends CI_Model {
         return $totalStd;
     }
 
+    // =======================================
 
+    // ====== Get Jadwal Per Semester =======
+    public function getTotalPerSemester($dataWhere){
+
+        $CO_SemesterID = ($dataWhere['SemesterID']!='') ? ' AND co.SemesterID = "'.$dataWhere['SemesterID'].'" ' : '';
+        $CO_ProdiID = ($dataWhere['ProdiID']!='') ? ' AND co.ProdiID = "'.$dataWhere['ProdiID'].'" ' : '';
+        $CO_IsSemesterAntara = ($dataWhere['IsSemesterAntara']!='') ? ' AND co.IsSemesterAntara = "'.$dataWhere['IsSemesterAntara'].'" ' : '';
+        $CO_Semester = ($dataWhere['Semester']!='') ? ' AND co.Semester = "'.$dataWhere['Semester'].'" ' : '';
+
+
+        $dataOffering = $this->db->query('SELECT * FROM db_academic.course_offerings co 
+                                                          WHERE co.ProgramsCampusID = "'.$dataWhere['ProgramsCampusID'].'"
+                                                           '.$CO_SemesterID.'
+                                                           '.$CO_ProdiID.' 
+                                                           '.$CO_Semester.'                                                             
+                                                           '.$CO_IsSemesterAntara.' ')->result_array();
+
+        $res = [];
+        if(count($dataOffering)>0){
+            for($r=0;$r<count($dataOffering);$r++){
+                $Arr_CDID = json_decode($dataOffering[$r]['Arr_CDID']);
+                for($s=0;$s<count($Arr_CDID);$s++){
+                    array_push($res,$Arr_CDID[$s]);
+                }
+            }
+        }
+
+        return $res;
+
+    }
+
+    public function getTotalPerSemesterLimit($dataWhere,$start,$length){
+
+        $dataCDID = $this->getTotalPerSemester($dataWhere);
+
+        $arrLim = array_slice($dataCDID, $start, $length);
+
+        $res =[];
+        if(count($arrLim)>0){
+            for($c=0;$c<count($arrLim);$c++){
+                $dataC = $this->db->query('SELECT s.*, sd.ClassroomID,sd.Credit,sd.DayID,sd.TimePerCredit,sd.StartSessions,sd.EndSessions,
+                                                  em.Name AS Lecturer,
+                                                  cl.Room 
+                                                FROM db_academic.schedule_details_course sdc
+                                                LEFT JOIN db_academic.schedule s ON (s.ID = sdc.ScheduleID)
+                                                LEFT JOIN db_academic.schedule_details sd ON (s.ID = sd.ScheduleID)
+                                                LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                                LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+                                                WHERE s.SemesterID = "'.$dataWhere['SemesterID'].'" 
+                                                AND sdc.CDID = "'.$arrLim[$c].'"
+                                                ')->result_array();
+
+                if(count($dataC)>0){
+                    for($dc=0;$dc<count($dataC);$dc++){
+                        array_push($res,$dataC[$dc]);
+                    }
+                }
+            }
+        }
+
+        return $res;
+    }
+
+    public function getTotalPerSemesterSearch($dataWhere,$search){
+        $arrLim = $this->getTotalPerSemester($dataWhere);
+
+        $res =[];
+        if(count($arrLim)>0){
+            for($c=0;$c<count($arrLim);$c++){
+                $dataC = $this->db->query('SELECT s.*, sd.ClassroomID,sd.Credit,sd.DayID,sd.TimePerCredit,sd.StartSessions,sd.EndSessions,
+                                                  em.Name AS Lecturer,
+                                                  cl.Room 
+                                                FROM db_academic.schedule_details_course sdc
+                                                LEFT JOIN db_academic.schedule s ON (s.ID = sdc.ScheduleID)
+                                                LEFT JOIN db_academic.schedule_details sd ON (s.ID = sd.ScheduleID)
+                                                LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                                LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+                                                WHERE ( s.SemesterID = "'.$dataWhere['SemesterID'].'" 
+                                                AND sdc.CDID = "'.$arrLim[$c].'" ) AND (
+                                                    s.ClassGroup LIKE "%'.$search.'%" OR
+                                                   em.Name LIKE "%'.$search.'%" OR
+                                                   cl.Room LIKE "%'.$search.'%"
+                                                )
+                                                ')->result_array();
+
+                if(count($dataC)>0){
+                    for($dc=0;$dc<count($dataC);$dc++){
+                        array_push($res,$dataC[$dc]);
+                    }
+                }
+            }
+        }
+
+        return $res;
+
+    }
+
+
+    // =======================================
     public function getDetailSc($dataWhere,$result){
         if(count($result)>0){
             $CO_SemesterID = ($dataWhere['SemesterID']!='') ? ' AND co.SemesterID = "'.$dataWhere['SemesterID'].'" ' : '';

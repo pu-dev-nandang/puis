@@ -53,6 +53,7 @@
 <script>
     $(document).ready(function () {
         loadPage('jadwal','');
+        // loadPage('jadwalPerSemester','');
         $('input[type=checkbox][data-toggle=toggle]').bootstrapToggle();
 
         checkSemesterAntara();
@@ -87,7 +88,6 @@
         // Reset Penawaran MK
     });
 
-
     $(document).on('click','.btn-action',function () {
         var page = $(this).attr('data-page');
         var ScheduleID = (page=='editjadwal') ? $(this).attr('data-id') : '';
@@ -101,8 +101,6 @@
             $('button[data-page='+page+']').removeClass('btn-default btn-default-primary');
             $('button[data-page='+page+']').addClass('btn-primary');
         }
-
-
 
         loadPage(page,ScheduleID);
     });
@@ -183,62 +181,48 @@
 
 <script>
     // Untuk Page Jadwal
-    $(document).on('change','#filterSemester',function () {
-        var Semester = $('#filterSemester').val();
+    // $(document).on('change','#filterSemester',function () {
+    //     var Semester = $('#filterSemester').val();
+    //     var SemesterID = (Semester!='' && Semester!= null) ? Semester.split('.')[0] : '';
+    //
+    //     console.log(SemesterID);
+    //
+    //     $('#selectSemesterSc').html('<select class="form-control" id="filterSemesterSchedule"></select>');
+    //     // $('#filterSemesterSchedule').empty();
+    //     $('#filterSemesterSchedule').append('<option value="">-- All Semester --</option>' +
+    //         '                <option disabled>------------</option>');
+    //     loadSelectOPtionAllSemester('#filterSemesterSchedule','',SemesterID,SemesterAntara);
+    //     filterSchedule();
+    //
+    // });
+
+    $(document).on('change','#filterProgramCampus,#filterSemester,#filterBaseProdi,#filterCombine,#filterDay',function () {
+        filterSchedule();
+    });
+
+
+</script>
+
+<!-- Semester Timetable -->
+<script>
+    $(document).on('change','#filterST_Semester',function () {
+        loadST_semester();
+    });
+
+    $(document).on('change','',function () {
+        filterST_Schedule();
+    });
+
+    function loadST_semester() {
+        var Semester = $('#filterST_Semester').val();
         var SemesterID = (Semester!='' && Semester!= null) ? Semester.split('.')[0] : '';
 
-        console.log(SemesterID);
-
-        $('#selectSemesterSc').html('<select class="form-control" id="filterSemesterSchedule"></select>');
+        $('#selectST_SemesterSc').html('<select class="form-control" id="filterST_SemesterSchedule"></select>');
         // $('#filterSemesterSchedule').empty();
-        $('#filterSemesterSchedule').append('<option value="">-- All Semester --</option>' +
-            '                <option disabled>------------</option>');
-        loadSelectOPtionAllSemester('#filterSemesterSchedule','',SemesterID,SemesterAntara);
-        filterSchedule();
-
-    });
-
-    $(document).on('change','#filterProgramCampus,#filterBaseProdi,#filterCombine,#filterSemesterSchedule,#filterDay',function () {
-        filterSchedule();
-    });
-
-    $(document).on('change','input[type=checkbox][class=filterDay]',function () {
-        var v = $(this).val();
-
-        if(v==0){
-            $('input[type=checkbox][class=filterDay]').prop('checked',false);
-            $(this).prop('checked',true);
-            checkedDay = [];
-        }
-        else {
-
-            if($('input[type=checkbox][value='+v+']').is(':checked')){
-                checkedDay.push($(this).val());
-            } else {
-                checkedDay = $.grep(checkedDay, function(value) {
-                    return value != v;
-                });
-            }
-
-
-            $('input[type=checkbox][value=0]').prop('checked',false);
-            // $(this).prop('checked',true);
-        }
-
-        if(checkedDay.length==0){
-            $('input[type=checkbox][value=0]').prop('checked',true);
-            $('.widget-schedule').removeClass('hide');
-        }
-        else {
-            $('.widget-schedule').addClass('hide');
-            if(checkedDay.length>0){
-                for(var i=0;i<checkedDay.length;i++){
-                    $('#dayWidget'+checkedDay[i]).removeClass('hide');
-                }
-            }
-        }
-
-    });
+        // $('#filterST_SemesterSchedule').append('<option value="">-- All Semester --</option>' +
+        //     '                <option disabled>------------</option>');
+        loadSelectOPtionAllSemester('#filterST_SemesterSchedule','',SemesterID,SemesterAntara);
+    }
 </script>
 
 <!--Penawaran MK-->

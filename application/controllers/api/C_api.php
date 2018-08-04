@@ -961,21 +961,11 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='read'){
                 $dataWhere = (array) $data_arr['dataWhere'];
 
-//                $days = $this->db->order_by('ID','ASC')->get('db_academic.days')->result_array();
-
                 $days = $this->db->get_where('db_academic.days',array('ID'=>$data_arr['DayID']),1)->result_array();
 
 
                 $data[0]['Day'] = $days[0];
                 $data[0]['Details'] = $this->m_api->getSchedule($data_arr['DayID'],$dataWhere);
-
-
-
-//                for($i=0;$i<count($days);$i++){
-//                    $data[$i]['Day'] = $days[$i];
-//                    $data[$i]['Details'] = $this->m_api->getSchedule($days[$i]['ID'],$dataWhere);
-//                }
-
 
                 return print_r(json_encode($data));
             }
@@ -997,7 +987,6 @@ class C_api extends CI_Controller {
 
                 // Delete Attendance
                 $this->db->delete('db_academic.attendance',array('ScheduleID' => $ID));
-
 
                 $tables = array('db_academic.schedule_details',
                     'db_academic.schedule_details_course', 'db_academic.schedule_team_teaching');
@@ -1146,7 +1135,7 @@ class C_api extends CI_Controller {
         }
     }
 
-    public function getSchedulePerday(){
+    public function getSchedulePerDay(){
         $requestData= $_REQUEST;
 
         $token = $this->input->get('token');
@@ -1155,15 +1144,20 @@ class C_api extends CI_Controller {
 
         $dataWhere = (array) $data_arr['dataWhere'];
 
-        $totalData = $this->m_api->getSchedulePerDay($data_arr['DayID'],$dataWhere);
+
 
         if( !empty($requestData['search']['value']) ) {
             $sql = $this->m_api->getSchedulePerDaySearch($data_arr['DayID'],$dataWhere,$requestData['search']['value']);
+            $query = $this->db->query($sql)->result_array();
+            $totalData = $query;
         } else {
+            $totalData = $this->m_api->getTotalPerDay($data_arr['DayID'],$dataWhere);
             $sql = $this->m_api->getSchedulePerDayLimit($data_arr['DayID'],$dataWhere,$requestData['start'],$requestData['length']);
+
+            $query = $this->db->query($sql)->result_array();
         }
 
-        $query = $this->db->query($sql)->result_array();
+
 
         $data = array();
         for($i=0;$i<count($query);$i++){
@@ -1206,6 +1200,75 @@ class C_api extends CI_Controller {
             "data"            => $data
         );
         echo json_encode($json_data);
+    }
+
+    public function getSchedulePerSemester(){
+        $requestData= $_REQUEST;
+
+        $token = $this->input->get('token');
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+
+        $dataWhere = (array) $data_arr['dataWhere'];
+
+        if( !empty($requestData['search']['value']) ) {
+            $query = $this->m_api->getTotalPerSemesterSearch($dataWhere,$requestData['search']['value']);
+//            $query = $this->db->query($sql)->result_array();
+            $totalData = $query;
+        } else {
+            $totalData = $this->m_api->getTotalPerSemester($dataWhere);
+            $query = $this->m_api->getTotalPerSemesterLimit($dataWhere,$requestData['start'],$requestData['length']);
+
+        }
+
+
+        $data = array();
+        $no = 1;
+        for($i=0;$i<count($query);$i++){
+
+            $nestedData=array();
+            $row = $query[$i];
+
+            // Group Kelas
+            $groupClass = '<b><a href="javascript:void(0)" class="btn-action" data-page="editjadwal" data-id="'.$row['ID'].'">'.$row["ClassGroup"].'</a></b>';
+            $sbSesi = ($row['SubSesi']=='1' || $row['SubSesi']==1) ? '<br/><span class="label label-warning">Sub-Sesi</span>' : '';
+
+            $TeamTeaching = '';
+            if($row["TeamTeaching"]==1){
+                $TeamTeaching = $this->m_api->getTeamTeachingPerDay($row['ID']);
+            }
+
+            $coor = '<div style="color: #427b44;margin-bottom: 10px;"><b>'.$row["Lecturer"].'</b></div>';
+
+            // Mendapatkan matakuliah
+            $courses = $this->m_api->getCoursesPerDay($row['ID']);
+
+            // Mendapatkan Jumlah Students
+            $Students = $this->m_api->getTotalStdPerDay($row['SemesterID'],$row['ID']);
+
+
+//            $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$groupClass.''.$sbSesi.'</div>';
+            $nestedData[] = $courses;
+            $nestedData[] = '<div style="text-align:center;">'.$row["Credit"].'</div>';
+            $nestedData[] = $coor.''.$TeamTeaching;
+            $nestedData[] = '<div style="text-align:center;">'.$Students.'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.substr($row["StartSessions"],0,5).' - '.substr($row["EndSessions"],0,5).'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$row["Room"].'</div>';
+
+            $no++;
+            $data[] = $nestedData;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($totalData)),
+            "recordsFiltered" => intval( count($totalData) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+
     }
 
     public function checkSchedule(){
