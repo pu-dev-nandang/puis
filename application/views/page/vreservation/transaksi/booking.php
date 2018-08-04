@@ -9,9 +9,12 @@
 				<div class = "row">	
 					<div class="col-xs-3">
 						<div id="datetimepicker1" class="input-group input-append date datetimepicker">
-								<input data-format="yyyy-MM-dd hh:mm:ss" class="form-control" id="datetime_deadline1" type="	text" readonly="">
+								<input data-format="yyyy-MM-dd" class="form-control" id="datetime_deadline1" type="	text" readonly="" >
 								<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>
 						</div>
+					</div>
+					<div class="col-xs-3">
+					<button class="btn btn-success" id = "search"><span class="glyphicon glyphicon-search"></span> Search</button>
 					</div>
 				</div>
 				<br>
@@ -37,9 +40,8 @@
           var date = new Date();
 
 		$('#datetimepicker1').datetimepicker({
-		 // startDate: today,
-		 // startDate: '+2d',
-		 startDate: date.addDays(1),
+			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+		 startDate: date.addDays(0),
 		});
 
 		$('#datetime_deadline1').prop('readonly',true);

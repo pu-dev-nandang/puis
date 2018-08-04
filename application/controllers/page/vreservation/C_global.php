@@ -115,11 +115,11 @@ class C_global extends Vreservation_Controler {
             ),
             array(
                 'user'  => 'User 1',
-                'start' => '15.00',
+                'start' => '16.30',
                 'end'   => '17.00',
                 'time'  => 120,
-                'colspan' => 4,
-                'agenda' => 'meeting',
+                'colspan' => 1,
+                'agenda' => 'requested',
                 'room' => 503,
                 'approved' => 0
             ),
@@ -130,7 +130,7 @@ class C_global extends Vreservation_Controler {
                 'end'   => '15.00',
                 'time'  => 120,
                 'colspan' => 4,
-                'agenda' => 'meeting',
+                'agenda' => 'requested',
                 'room' => 507,
                 'approved' => 0
             ),
@@ -141,11 +141,16 @@ class C_global extends Vreservation_Controler {
                 'end'   => '14.30',
                 'time'  => 90,
                 'colspan' => 3,
-                'agenda' => 'meeting',
+                'agenda' => 'requested',
                 'room' => 508,
                 'approved' => 0
             ),
         );
+
+        // SORTING ASC
+        usort($data_pass, function($a, $b) {
+            return $a['room'] - $b['room'];
+        });
 
         for ($i=7; $i <= $endTime; $i++) { 
             // check len
@@ -153,11 +158,13 @@ class C_global extends Vreservation_Controler {
             for ($j=0; $j < 2 - strlen($i); $j++) { 
                 $a = '0'.$a;
             }
+            $d = $a.':30';
             $a = $a.':00';
             $arrHours[] = date("h:i a", strtotime($a));
-            $d = $a.':30';
             //$arrHours[] = date("h:i a", strtotime($d));
-            $arrHours[] = date("h:i a", strtotime($d));
+            if ($i != $endTime) {
+                $arrHours[] = date("h:i a", strtotime($d));
+            }
         }
         $data['arrHours'] = $arrHours;
         $data['data_pass'] = $data_pass;

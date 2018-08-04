@@ -118,36 +118,36 @@ $route['academic/loadPagePresensi'] = 'page/academic/c_presensi/loadPagePresensi
 // --- Master ----
 
 // test routes from db
-// require_once( BASEPATH .'database/DB.php' );
-// $db =& DB();
-// $query = $db->get('db_admission.cfg_sub_menu');
-// $result = $query->result();
-// foreach( $result as $row )
-// {
-// 	$Slug = $row->Slug;
-// 	$Slug = explode('/', $Slug);
-// 	if (in_array('(:any)', $Slug)) {
-// 	   $a = count($Slug) - 1;
-// 	   $URI = '';
-// 	   for ($i=0; $i < $a; $i++) { 
-// 	   	$URI .= $Slug[$i].'/';
-// 	   }
-// 	   $route[ $URI.'(:any)' ] = $row->Controller;
-// 	}
-// 	elseif(in_array('(:num)', $Slug)) {
-// 		$a = count($Slug) - 1;
-// 		$URI = '';
-// 		for ($i=0; $i < $a; $i++) { 
-// 			$URI .= $Slug[$i].'/';
-// 		}
-// 		$route[ $URI.'(:num)' ] = $row->Controller;
-// 	}
-// 	else
-// 	{
-// 		$route[ $row->Slug ] = $row->Controller;
-// 	}
+require_once( BASEPATH .'database/DB.php' );
+$db =& DB();
+$query = $db->get('db_admission.cfg_sub_menu');
+$result = $query->result();
+foreach( $result as $row )
+{
+	$Slug = $row->Slug;
+	$Slug = explode('/', $Slug);
+	if (in_array('(:any)', $Slug)) {
+	   $a = count($Slug) - 1;
+	   $URI = '';
+	   for ($i=0; $i < $a; $i++) { 
+	   	$URI .= $Slug[$i].'/';
+	   }
+	   $route[ $URI.'(:any)' ] = $row->Controller;
+	}
+	elseif(in_array('(:num)', $Slug)) {
+		$a = count($Slug) - 1;
+		$URI = '';
+		for ($i=0; $i < $a; $i++) { 
+			$URI .= $Slug[$i].'/';
+		}
+		$route[ $URI.'(:num)' ] = $row->Controller;
+	}
+	else
+	{
+		$route[ $row->Slug ] = $row->Controller;
+	}
 
-// }
+}
 // test routes from db
 
 $route['admission/config/set-tgl-register-online'] = 'page/admission/c_master/page_set_tgl_register'; // db menu
@@ -578,36 +578,36 @@ $route['testadi2'] = 'c_login/testadi2';
 $route['__resetPasswordUser'] = 'c_login/resetPasswordUser';
 // for inject //
 
-// Venue Reservation // 
-// $route['venue_reservation'] = 'page/vreservation/c_global';
-// $query = $db->get('db_reservation.cfg_sub_menu');
-// $result = $query->result();
-// foreach( $result as $row )
-// {
-// 	$Slug = $row->Slug;
-// 	$Slug = explode('/', $Slug);
-// 	if (in_array('(:any)', $Slug)) {
-// 	   $a = count($Slug) - 1;
-// 	   $URI = '';
-// 	   for ($i=0; $i < $a; $i++) { 
-// 	   	$URI .= $Slug[$i].'/';
-// 	   }
-// 	   $route[ $URI.'(:any)' ] = $row->Controller;
-// 	}
-// 	elseif(in_array('(:num)', $Slug)) {
-// 		$a = count($Slug) - 1;
-// 		$URI = '';
-// 		for ($i=0; $i < $a; $i++) { 
-// 			$URI .= $Slug[$i].'/';
-// 		}
-// 		$route[ $URI.'(:num)' ] = $row->Controller;
-// 	}
-// 	else
-// 	{
-// 		$route[ $row->Slug ] = $row->Controller;
-// 	}
+//Venue Reservation // 
+$route['venue_reservation'] = 'page/vreservation/c_global';
+$query = $db->get('db_reservation.cfg_sub_menu');
+$result = $query->result();
+foreach( $result as $row )
+{
+	$Slug = $row->Slug;
+	$Slug = explode('/', $Slug);
+	if (in_array('(:any)', $Slug)) {
+	   $a = count($Slug) - 1;
+	   $URI = '';
+	   for ($i=0; $i < $a; $i++) { 
+	   	$URI .= $Slug[$i].'/';
+	   }
+	   $route[ $URI.'(:any)' ] = $row->Controller;
+	}
+	elseif(in_array('(:num)', $Slug)) {
+		$a = count($Slug) - 1;
+		$URI = '';
+		for ($i=0; $i < $a; $i++) { 
+			$URI .= $Slug[$i].'/';
+		}
+		$route[ $URI.'(:num)' ] = $row->Controller;
+	}
+	else
+	{
+		$route[ $row->Slug ] = $row->Controller;
+	}
 
-// }
+}
 
 $route['venue_reservation'] = 'page/vreservation/c_global';
 $route['vreservation/getroom'] = 'page/vreservation/c_global/getroom';

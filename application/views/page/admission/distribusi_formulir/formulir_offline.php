@@ -421,7 +421,7 @@
 	    loadData(1);
 	      $('#tanggal').prop('readonly',true);
 	      $("#tanggal").datepicker({
-			    //dateFormat: 'yy-mm-dd',
+			    dateFormat: 'yy-mm-dd',
 
 		  });
 		$("#selectEvent").addClass("hide");
