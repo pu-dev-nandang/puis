@@ -188,10 +188,10 @@
                 "iDisplayLength" : 10,
                 "ordering" : false,
                 "language": {
-                    "searchPlaceholder": "Group, Lecturer, Classroom"
+                    "searchPlaceholder": "Group, (Co)Lecturer, Classroom"
                 },
                 "ajax":{
-                    url : base_url_js+"api/__getSchedule?token="+token, // json datasource
+                    url : base_url_js+"api/__getSchedulePerDay?token="+token, // json datasource
                     ordering : false,
                     type: "post",  // method  , by default get
                     error: function(){  // error handling

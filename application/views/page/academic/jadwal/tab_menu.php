@@ -53,6 +53,7 @@
 <script>
     $(document).ready(function () {
         loadPage('jadwal','');
+        // loadPage('jadwalPerSemester','');
         $('input[type=checkbox][data-toggle=toggle]').bootstrapToggle();
 
         checkSemesterAntara();
@@ -87,7 +88,6 @@
         // Reset Penawaran MK
     });
 
-
     $(document).on('click','.btn-action',function () {
         var page = $(this).attr('data-page');
         var ScheduleID = (page=='editjadwal') ? $(this).attr('data-id') : '';
@@ -101,8 +101,6 @@
             $('button[data-page='+page+']').removeClass('btn-default btn-default-primary');
             $('button[data-page='+page+']').addClass('btn-primary');
         }
-
-
 
         loadPage(page,ScheduleID);
     });
@@ -221,8 +219,8 @@
 
         $('#selectST_SemesterSc').html('<select class="form-control" id="filterST_SemesterSchedule"></select>');
         // $('#filterSemesterSchedule').empty();
-        $('#filterST_SemesterSchedule').append('<option value="">-- All Semester --</option>' +
-            '                <option disabled>------------</option>');
+        // $('#filterST_SemesterSchedule').append('<option value="">-- All Semester --</option>' +
+        //     '                <option disabled>------------</option>');
         loadSelectOPtionAllSemester('#filterST_SemesterSchedule','',SemesterID,SemesterAntara);
     }
 </script>
