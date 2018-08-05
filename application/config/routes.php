@@ -547,6 +547,7 @@ $route['api/__crudEmployees'] = 'api/c_api/crudEmployees';
 $route['api/__crudScore'] = 'api/c_api/crudScore';
 $route['api/__crudAttendance'] = 'api/c_api/crudAttendance';
 $route['api/__crudScheduleExchange'] = 'api/c_api/crudScheduleExchange';
+$route['api/__crudLimitCredit'] = 'api/c_api/crudLimitCredit';
 
 $route['rest/__checkDateKRS'] = 'api/c_rest/checkDateKRS';
 $route['rest/__getDetailKRS'] = 'api/c_rest/getDetailKRS';

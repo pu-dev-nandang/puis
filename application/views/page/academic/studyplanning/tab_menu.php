@@ -25,17 +25,22 @@
     .t-center {
         text-align: center;
     }
+
+    #tbStdLC tr th {
+        text-align: center;
+        background: #007475;
+        color: #FFFFFF;
+    }
 </style>
+
+
 
 <div class="row" style="margin-top: 30px;">
 
-    <div class="col-md-3">
-        <div class="">
-            <label>Semester Antara</label>
-            <input type="checkbox" id="formSemesterAntara" data-toggle="toggle" data-style="ios"/>
-        </div>
+    <div class="col-md-2">
+        <button class="btn btn-default btn-default-warning btn-block" id="btnLimitCredit" disabled>Set Limit Credit</button>
     </div>
-    <div class="col-md-9">
+    <div class="col-md-10">
         <div class="thumbnail">
             <div class="row">
                 <div class="col-xs-3">
@@ -84,24 +89,36 @@
         // Daftar KRS yang sudah menjadi KSM
         window.ArrDrafKRS = [];
 
-
         $('input[type=checkbox][data-toggle=toggle]').bootstrapToggle();
         loadSelectOptionProgramCampus('#filterProgramCampus','');
 
-        // $('#filterSemester').append('<option value="" disabled selected>-- Academic Year --</option>' +
-        //     '                <option disabled>-----------------</option>');
         loSelectOptionSemester('#filterSemester','');
 
         loadSelectOptionBaseProdi('#filterBaseProdi','');
-        // loadSelectOPtionAllSemester('#filterSemesterSchedule','');
 
-        getStudents();
+        window.myInv = setInterval(loadPageFirst,500);
+        window.myInv2 = setInterval(loadTableFirst,500);
 
-        setTimeout(function () {
-            loadSemester();
-            setTimeout(function () { getStudents(); },500);
-            },500);
     });
+
+    function loadPageFirst(){
+        var filterSemester = $('#filterSemester').val();
+        if(filterSemester!='' && filterSemester!=null){
+            loadSemester();
+            $('#btnLimitCredit').attr('data-semesterid',filterSemester.split('.')[0]);
+            $('#btnLimitCredit').prop('disabled',false);
+            clearInterval(myInv);
+        }
+    }
+
+    function loadTableFirst(){
+        var filterSemesterSchedule = $('#filterSemesterSchedule').val();
+        if(filterSemesterSchedule!='' && filterSemesterSchedule!=null){
+            getStudents();
+            clearInterval(myInv2);
+        }
+    }
+
 
     $(document).on('change','#filterSemester',function () {
         loadSemester();
@@ -427,7 +444,6 @@
         });
     }
 
-
     
     function getStudents() {
 
@@ -472,8 +488,10 @@
 
             var token = jwt_encode(data, 'UAP)(*');
 
-            var url = base_url_js + 'api/__crudStudyPlanning';
+            var url = base_url_js+'api/__crudStudyPlanning';
             $.post(url, {token: token}, function (jsonResult) {
+
+                // console.log(jsonResult);
 
             var tr = $('#dataStudents');
             var no = 1;
@@ -485,8 +503,6 @@
                     var stp = StudyPlanning[c];
                     CreditUnit = CreditUnit + parseInt(stp.TotalSKS);
                 }
-
-                // console.log(CreditUnit);
 
                 var Student = jsonResult[i].Student;
 
@@ -737,4 +753,200 @@
         });
 
     }
+</script>
+<script>
+<!-- Set Limit Credit -->
+
+    $(document).on('click','#btnLimitCredit',function () {
+
+        var SemesterID = $(this).attr('data-semesterid');
+
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Limit Credit</h4>');
+
+        var htmlLimit = '<div class="row">' +
+            '            <div class="col-xs-6">' +
+            '                <input value="'+SemesterID+'" id="formSemesterID" hidden readonly /> ' +
+            '                <select class="form-control" id="selectLC_Curriculum"></select>' +
+            '            </div>' +
+            '            <div class="col-xs-6">' +
+            '                <select class="form-control" id="selectLC_Prodi"></select>' +
+            '            </div>' +
+            '           </div>' +
+            '           <div class="row">' +
+            '            <div class="col-xs-8"><hr/>' +
+            '               <div class="form-group">' +
+            '               <label>Student</label>' +
+            '                  <div id="dataStudents">Selc. Student</div>' +
+            '               </div>' +
+            '            </div>' +
+            '            <div class="col-xs-4"><hr/>' +
+            '               <div class="form-group">' +
+            '                   <label>Limit Credit</label>' +
+            '                   <input type="number" id="formCredit" class="form-control"/>' +
+            '               </div>' +
+            '            </div>' +
+            '        </div>' +
+            '<div class="row">' +
+            '<div class="col-xs-12" style="text-align: right;">' +
+            '<button class="btn btn-success" id="btnSaveLC">Add</button>' +
+            '</div>' +
+            '</div>' +
+            '' +
+            '<div class="row">' +
+            '<div class="col-xs-12"><hr/>' +
+            '<table class="table table-bordered table-striped" id="tbStdLC">' +
+            '<thead>' +
+            '<tr>' +
+            '<th style="width:3%">No</th>' +
+            '<th>Student</th>' +
+            '<th style="width:15%">Credit</th>' +
+            '<th style="width:15%">Action</th>' +
+            '</tr>' +
+            '</thead><tbody id="dataRWStdLC"></tbody>' +
+            '</table>' +
+            '</div>' +
+            '</div> ';
+
+        $('#GlobalModal .modal-body').html(htmlLimit);
+
+        loadSelectOptionCurriculum('#selectLC_Curriculum','');
+        loadSelectOptionBaseProdi('#selectLC_Prodi','');
+
+        setTimeout(function () {
+            loadStd();
+        },1000);
+
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+    });
+
+    $(document).on('change','#selectLC_Curriculum,#selectLC_Prodi',function () {
+        loadStd();
+    });
+
+    function loadStd() {
+
+        var Curriculum = $('#selectLC_Curriculum').val();
+        var Prodi = $('#selectLC_Prodi').val();
+
+        if(Curriculum!='' && Curriculum!=null && Prodi!='' && Prodi!=null){
+            loading_data('#dataStudents');
+
+            var db_student = 'ta_'+Curriculum.split('.')[1];
+            var ProdiID = Prodi.split('.')[0];
+            var data = {
+              action : 'getStudents',
+                DB_Student : db_student,
+                ProdiID : ProdiID,
+                SemesterID : $('#formSemesterID').val()
+            };
+
+            var tr = $('#dataRWStdLC');
+            tr.empty();
+            $('#dataStudents').html('Student Not Yet');
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__crudLimitCredit';
+            $.post(url,{token:token},function (jsonResult) {
+
+                if(jsonResult.Students.length>0){
+                    $('#dataStudents').html('<select class="select2-select-00 full-width-fix" size="5" id="selectLC_Students">' +
+                        '                        <option value=""></option>' +
+                        '                    </select>');
+
+                    for(var i=0;i<jsonResult.Students.length;i++){
+                        var d = jsonResult.Students[i];
+                        var dis ='';
+                        if(d.LCID!='' && d.LCID!=null){
+                            dis = 'disabled'
+                        }
+                        $('#selectLC_Students').append('<option value="'+d.NPM+'" '+dis+'>'+d.NPM+' - '+d.Name+'</option>');
+                    }
+                    $('#selectLC_Students').select2({allowClear: true});
+                }
+
+                // Load Table
+                if(jsonResult.dataLC.length>0){
+                    var no = 1;
+                    for(var c=0;c<jsonResult.dataLC.length;c++){
+                        var dlc = jsonResult.dataLC[c];
+                        tr.append('<tr id="trLC'+dlc.LCID+'">' +
+                            '<td style="text-align: center;">'+no+'</td>' +
+                            '<td><b>'+dlc.Name+'</b><br/>'+dlc.NPM+'</td>' +
+                            '<td style="text-align: center;">'+dlc.Credit+'</td>' +
+                            '<td style="text-align: center;">' +
+                            '   <button class="btn btn-danger btn-del-lc" data-id="'+dlc.LCID+'">Del</button>' +
+                            '</td>' +
+                            '</tr>');
+                        no++;
+                    }
+                }
+                else {
+                    tr.append('<tr><td colspan="4" style="text-align: center;">-- Data Not Yet --</td></tr>');
+                }
+            });
+        }
+
+    }
+
+    $(document).on('click','.btn-del-lc',function () {
+
+        if(confirm('Delete data?')){
+            var LCID = $(this).attr('data-id');
+            var data = {
+              action : 'deleteLC',
+              LCID : LCID
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__crudLimitCredit';
+            $.post(url,{token:token},function () {
+                // loadStd();
+                toastr.success('Data deleted','Success');
+                loading_buttonSm('.btn-del-lc[data-id='+LCID+']');
+                setTimeout(function () {
+                    loadStd();
+                },500);
+            });
+        }
+
+    });
+    
+    $(document).on('click','#btnSaveLC',function () {
+        var Students = $('#selectLC_Students').val();
+        var Credit = $('#formCredit').val();
+
+        if(Students!='' && Students!=null
+            && Credit!='' && Credit!=null){
+
+            loading_buttonSm('#btnSaveLC');
+
+            var data = {
+              action : 'addLC',
+              dataInsert : {
+                  SemesterID : $('#formSemesterID').val(),
+                  NPM : Students,
+                  Credit : Credit,
+                  UpdateBy : sessionNIP,
+                  UpdateAt : dateTimeNow()
+              }
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__crudLimitCredit';
+            $.post(url,{token:token},function (result) {
+                loadStd();
+                toastr.success('Data deleted','Success');
+                $('#formCredit').val('');
+                setTimeout(function () {
+                    $('#btnSaveLC').prop('disabled',false).html('Add');
+                },500);
+            });
+
+        }
+
+    });
+
 </script>

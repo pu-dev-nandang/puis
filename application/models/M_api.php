@@ -1584,7 +1584,7 @@ class M_api extends CI_Model {
                                                     LEFT JOIN db_employees.employees em ON (em.NIP = ma.NIP)
                                                     WHERE ma.NPM = "'.$data[$i]['NPM'].'" ')->result_array();
 
-                $data[$i]['DetailSemester'] = $this->getMaxCredit($db_ta,$data[$i]['NPM'],$dataWhere['ClassOf'],$smtActID);
+                $data[$i]['DetailSemester'] = $this->getMaxCredit($db_ta,$data[$i]['NPM'],$dataWhere['ClassOf'],$smtActID,$dataWhere['ProdiID']);
                 $data[$i]['DetailPayment'] = $this->getPayment($dataSemester['ID'],$data[$i]['NPM']);
                 $data[$i]['DetailMentor'] = $data_mentor;
 
@@ -1611,7 +1611,7 @@ class M_api extends CI_Model {
         return $data->result_array();
     }
 
-    private function getMaxCredit($db_ta,$NPM,$ClassOf,$smtActID){
+    private function getMaxCredit($db_ta,$NPM,$ClassOf,$smtActID,$ProdiID){
 
 
         $dataIDLast = $this->db->query('SELECT * FROM db_academic.semester s 
@@ -1653,10 +1653,6 @@ class M_api extends CI_Model {
 
             $LastIPS = ($totalGradeValueSemester==0 || $TotalSKSSemester==0) ? 0 : $totalGradeValueSemester/$TotalSKSSemester;
 
-            $dataMakCredit = $this->db->query('SELECT * FROM db_academic.range_credits WHERE 
-                                                      IPSStart <= '.$LastIPS.' 
-                                                      AND IPSEnd >= '.$LastIPS.' LIMIT 1')->result_array();
-
 
             // Semester Saat Ini
             $dataTotalSmt = $this->db->query('SELECT s.Status FROM db_academic.semester s 
@@ -1674,15 +1670,38 @@ class M_api extends CI_Model {
                 }
             }
 
-            $MaxCredit = $dataMakCredit[0];
+            // Cek semester
+            if($smt==1 || $smt=='1'){
+                $dataCreditDef = $this->db->select('DefaultCredit')->get_where('db_academic.program_study',
+                    array('ID' => $ProdiID),1)->result_array();
+
+                $IPK = 0;
+                $LastIPS = 0;
+                $MaxCredit = array('Credit'=>$dataCreditDef[0]['DefaultCredit'],'Flag'=>'0');
+                $smt = 1;
+            } else {
+                //Cek Maksimal Credit apakah di custom atau tidak
+                $dataCustomCredit = $this->db->select('Credit')->get_where('db_academic.limit_credit',
+                    array('SemesterID'=>$smtActID,'NPM'=>$NPM),1)->result_array();
+
+                if(count($dataCustomCredit)>0){
+                    $MaxCredit = array('Credit'=>$dataCustomCredit[0]['Credit'],'Flag'=>'2');
+                } else {
+                    $dataMakCredit = $this->db->query('SELECT Credit FROM db_academic.range_credits WHERE 
+                                                      IPSStart <= '.$LastIPS.' 
+                                                      AND IPSEnd >= '.$LastIPS.' LIMIT 1')->result_array();
+                    $MaxCredit = array('Credit' => $dataMakCredit[0]['Credit'],'Flag'=>'1');
+                }
+            }
 
         }
         else {
             $IPK = 0;
             $LastIPS = 0;
-            $MaxCredit = 22;
+            $MaxCredit = array('Credit'=>0,'Flag'=>'-1');
             $smt = 1;
         }
+
 
 
         $result = array(
@@ -1805,7 +1824,7 @@ class M_api extends CI_Model {
 
         $dataSemester = $this->_getSemesterActive();
         $smtActID = $dataSemester['ID'];
-        $data[0]['DetailSemester'] = $this->getMaxCredit($db_ta,$NPM,$ta,$smtActID);
+        $data[0]['DetailSemester'] = $this->getMaxCredit($db_ta,$NPM,$ta,$smtActID,$data[0]['ProdiID']);
 
         // Get Mata Kuliah yang ditawarkan
         $dataOfferings = $this->db->query('SELECT co.* FROM db_academic.course_offerings co 
@@ -1845,9 +1864,6 @@ class M_api extends CI_Model {
         }
 
         $data[0]['DetailOfferings'] = $result;
-
-
-
 
         $dataPlanning = $this->db->query('SELECT cd.ID AS CDID, s.ID AS ScheduleID, mk.ID AS MKID, 
                                                     mk.Name, mk.NameEng, mk.MKCode, 
