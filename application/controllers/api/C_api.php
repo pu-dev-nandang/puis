@@ -2589,7 +2589,47 @@ class C_api extends CI_Controller {
         catch(Exception $e) {
           echo json_encode($arr);
         }
-        
+
+    }
+
+
+    public function crudLimitCredit(){
+
+        $data_arr = $this->getInputToken();
+
+        if(count($data_arr)>0){
+            if($data_arr['action']=='getStudents'){
+
+                $dataStd = $this->db->query('SELECT s.NPM,s.Name, lc.ID AS LCID FROM '.$data_arr['DB_Student'].'.students s 
+                                                      LEFT JOIN db_academic.limit_credit lc ON (s.NPM=lc.NPM)
+                                                      WHERE s.ProdiID = "'.$data_arr['ProdiID'].'" 
+                                                      ORDER BY s.NPM ASC')->result_array();
+
+                $dataLC = $this->db->query('SELECT s.NPM, s.Name, lc.Credit, lc.ID AS LCID FROM db_academic.limit_credit lc 
+                                                    LEFT JOIN '.$data_arr['DB_Student'].'.students s ON (s.NPM = lc.NPM)
+                                                    WHERE s.ProdiID = "'.$data_arr['ProdiID'].'" 
+                                                    AND lc.SemesterID = "'.$data_arr['SemesterID'].'"
+                                                    ORDER BY s.NPM ASC')->result_array();
+
+                $res = array(
+                    'Students' => $dataStd,
+                    'dataLC' => $dataLC
+                );
+
+                return print_r(json_encode($res));
+            }
+            else if($data_arr['action']=='deleteLC'){
+                $this->db->where('ID', $data_arr['LCID']);
+                $this->db->delete('db_academic.limit_credit');
+
+                return print_r(1);
+            }
+            else if($data_arr['action']=='addLC'){
+                $dataInsert = (array) $data_arr['dataInsert'];
+                $this->db->insert('db_academic.limit_credit', $dataInsert);
+                return print_r(1);
+            }
+        }
 
     }
 

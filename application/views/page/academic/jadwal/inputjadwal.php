@@ -819,7 +819,7 @@
         // var ClassGroup = $('#formClassGroup').val();
         var ClassGroup = $('#formClassGroupCadangan').val();
 
-        console.log(ClassGroup);
+        // console.log(ClassGroup);
 
         var Coordinator = $('#formCoordinator').val();
 

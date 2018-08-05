@@ -38,8 +38,8 @@
         loadSelectOptionProgramCampus('#filterST_ProgramCampus','');
 
         $('#filterST_BaseProdi').empty();
-        $('#filterST_BaseProdi').append('<option value="">-- All Programme Study --</option>' +
-            '<option disabled>------------------------------------------</option>');
+        // $('#filterST_BaseProdi').append('<option value="">-- All Programme Study --</option>' +
+        //     '<option disabled>------------------------------------------</option>');
         loadSelectOptionBaseProdi('#filterST_BaseProdi','');
 
 
@@ -48,8 +48,8 @@
         //     '                <option disabled>------------------------------------------</option>');
         loSelectOptionSemester('#filterST_Semester','');
         loadST_semester();
-        setTimeout(function () {
 
+        setTimeout(function () {
             filterST_Schedule();
         },1000);
 
@@ -70,13 +70,14 @@
         var div = $('#dataST_Scedule');
         div.html('');
         if(SemesterID!=null && SemesterID!=''){
-            var classDay = 'label-info';
+
             var tr_bg_color = '#555555';
-            var dayView = $('#filterST_SemesterSchedule option:selected').text();
+            var semesterView = $('#filterST_SemesterSchedule option:selected').text();
+            var prodiView = $('#filterST_BaseProdi option:selected').text();
             div.html('' +
                 '<div class="widget box widget-schedule">' +
                 '    <div class="widget-header">' +
-                '        <h4 class=""><span class="'+classDay+'" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;">'+dayView+'</span></h4>' +
+                '        <h4 class=""><span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;">'+semesterView+'</span> <span  class="label-danger" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;">'+prodiView+'</span></h4>' +
                 '    </div>' +
                 '    <div class="widget-content no-padding">' +
                 '<table class="table table-bordered table-striped" id="tableST_Schedule">' +
@@ -98,7 +99,6 @@
                 '</table>' +
                 '        <div id="">' +
                 '        </div>' +
-                '' +
                 '    </div>' +
                 '</div>');
 
@@ -124,6 +124,7 @@
                 "ordering" : false,
                 "bLengthChange" : false,
                 "bInfo" : false,
+                "bFilter" : false,
                 "language": {
                     "searchPlaceholder": "Group, (Co)Lecturer, Classroom"
                 },

@@ -348,6 +348,10 @@
         $(''+element).prop('disabled',true);
     }
 
+    function loading_data(element) {
+        $(''+element).html('<i class="fa fa-refresh fa-spin fa-fw"></i> please, waiting');
+    }
+
     function convertDateMMtomm(mounth) {
         var arr_mounth = {
             'January': 0,
