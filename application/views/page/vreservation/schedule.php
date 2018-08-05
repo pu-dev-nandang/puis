@@ -54,6 +54,8 @@
 	  height: 600px;
 	  overflow-y: auto;
 	}
+
+	.pointer {cursor: pointer;}
 </style>
 
 
@@ -84,14 +86,14 @@
 								<?php if ($data_pass[$k]['room'] == $getRoom[$i]['Room'] && $converDTS == $arrHours[$j]): ?>
 									<?php if ($data_pass[$k]['agenda'] == 'meeting'): ?>
 										<td style="width: 72px;height: 20px;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>">
-											<div class="panel-red" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>"><span>Booked <br>by User 3</span></div>
+											<div class="panel-red pointer" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>"><span>Booked <br>by <?php echo $data_pass[$k]['user'] ?></span></div>
 										</td>
 										<?php $bool = true ?>
 										<?php $j = $j + (int)$data_pass[$k]['colspan'] - 1 ?>
 										<?php break; ?>
 									<?php else: ?>
 										<td style="width: 72px;height: 20px;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>">
-											<div class="panel-orange" title="<?php echo $converDTS ?>-<?php echo $converDTE?>"><span>Requested <br>by User 2</span></div>
+											<div class="panel-orange pointer" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>"><span>Requested <br><?php echo $data_pass[$k]['user'] ?></span></div>
 										</td>
 										<?php $bool = true ?>
 										<?php $j = $j + (int)$data_pass[$k]['colspan'] - 1 ?>
@@ -101,7 +103,7 @@
 							<?php endfor ?>
 							<?php if (!$bool): ?>
 								<td style="width: 72px;height: 20px;">
-		    							<div class="panel-blue" id = "droppable" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $arrHours[$j]?>"><span>Available</span></div>
+		    							<div class="panel-blue pointer" id = "droppable" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $arrHours[$j]?>"><span>Available</span></div>
 								</td>			
 							<?php endif ?>	
 						<?php endfor ?>		

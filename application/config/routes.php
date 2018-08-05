@@ -570,6 +570,10 @@ $route['api/__getStatusEmployee'] = 'api/c_api/getStatusEmployee';
 
 $route['api/__crudKRSOnline'] = 'api/c_api/crudKRSOnline';
 
+//v_reservation
+$route['api/__m_equipment_additional'] = 'api/c_api/m_equipment_additional';
+$route['api/get_time_opt_reservation'] = 'api/c_api/get_time_opt_reservation';
+
 
 // for inject //
 $route['testadi'] = 'dashboard/c_dashboard/testadi';
@@ -611,8 +615,9 @@ foreach( $result as $row )
 
 $route['venue_reservation'] = 'page/vreservation/c_global';
 $route['vreservation/getroom'] = 'page/vreservation/c_global/getroom';
-
 $route['vreservation/getschedule'] = 'page/vreservation/c_global/getschedule';
+$route['vreservation/modal_form'] = 'page/vreservation/c_global/modal_form';
 
 
+// test
 $route['testApprove'] = 'page/finance/c_finance/testApprove';
