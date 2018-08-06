@@ -244,7 +244,7 @@
                 '            <tr style="background:#437e88;color:#ffffff;">' +
                 '                <th style="width: 7%;">Code</th>' +
                 '                <th>Course</th>' +
-                // '                <th style="width: 5%;">Type</th>' +
+                '                <th style="width: 5%;">Type</th>' +
                 '                <th style="width: 5%;">Credit</th>' +
                 '                <th style="width: 5%;">Group</th>' +
                 '                <th style="width: 20%;">Schedule</th>' +
@@ -272,7 +272,7 @@
                 tr.append('<tr>' +
                     '<td>'+dataSc.MKCode+'</td>' +
                     '<td style="text-align: left;"><b>'+dataSc.NameEng+'</b><br/><i>'+dataSc.Name+'</i></td>' +
-                    // '<td>'+dataSc.TypeSP+'</td>' +
+                    '<td>'+dataSc.TypeSP+'</td>' +
                     '<td>'+dataSc.Credit+'</td>' +
                     '<td>'+dataSc.ClassGroup+'</td>' +
                     '<td><ul id="sc'+i+'" class="list-scd"></ul></td>' +
