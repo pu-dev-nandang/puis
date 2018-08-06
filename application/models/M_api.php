@@ -1716,94 +1716,92 @@ class M_api extends CI_Model {
         return $result;
     }
 
-    private function getScheduleByCDID($student_DB,$NPM,$CDID){
-//        $student_DB = $this->session->userdata('student_DB');
-//        $NPM = $this->session->userdata('student_NPM');
+    private function getScheduleByCDID($student_DB,$NPM,$CDID,$smtActID){
 
         $data = $this->db->query('SELECT s.*, 
                                             cd.ID AS CDID, cd.MKType, cd.Semester ,cd.TotalSKS AS Credit, cd.StatusPrecondition, cd.DataPrecondition, 
-                                            mk.ID AS MKID, mk.MKCode, mk.Name AS MKName, mk.NameEng AS MKNameEng,
-                                            skc.ID AS ReasonID, skc.Reason
+                                            mk.ID AS MKID, mk.MKCode, mk.Name AS MKName, mk.NameEng AS MKNameEng
                                             FROM db_academic.schedule_details_course sdc
                                             LEFT JOIN db_academic.schedule s ON (s.ID = sdc.ScheduleID)
                                             LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                             LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
-                                            LEFT JOIN db_academic.std_krs sk ON (sk.ScheduleID = s.ID)
-                                            LEFT JOIN db_academic.std_krs_comment skc ON (skc.KRSID = sk.ID)
-                                            WHERE sdc.CDID = "'.$CDID.'" LIMIT 1 ')->result_array();
+                                            WHERE sdc.CDID = "'.$CDID.'" AND s.SemesterID = "'.$smtActID.'" ')->result_array();
 
         $result = [];
         if(count($data)>0){
-            if($data[0]['StatusPrecondition']==1){
-                $dataPre = json_decode($data[0]['DataPrecondition']);
 
-                $pre_arr = [];
-                $cek_arr = [];
-                for($i=0;$i<count($dataPre);$i++){
-                    $exp = explode('.',$dataPre[$i]);
-                    $pre = $this->db->query('SELECT ID,MKcode,Name,NameEng FROM db_academic.mata_kuliah 
+            for($s=0;$s<count($data);$s++){
+                $d = $data[$s];
+                if($d['StatusPrecondition']==1){
+                    $dataPre = json_decode($d['DataPrecondition']);
+
+                    $pre_arr = [];
+                    $cek_arr = [];
+                    for($i=0;$i<count($dataPre);$i++){
+                        $exp = explode('.',$dataPre[$i]);
+                        $pre = $this->db->query('SELECT ID,MKcode,Name,NameEng FROM db_academic.mata_kuliah 
                                             WHERE ID="'.$exp[0].'"')->result_array();
 
-                    // Cek apakah prasyarat sudah diambil atau belum
-                    $cekPre = $this->db
-                        ->get_where($student_DB.'.study_planning', array('NPM'=>$NPM,'MKID'=>$exp[0]),1)
-                        ->result_array();
+                        // Cek apakah prasyarat sudah diambil atau belum
+                        $cekPre = $this->db
+                            ->get_where($student_DB.'.study_planning', array('NPM'=>$NPM,'MKID'=>$exp[0]),1)
+                            ->result_array();
 
-                    if(count($cekPre)>0){
-                        array_push($cek_arr,1);
-                    } else {
-                        array_push($cek_arr,0);
+                        if(count($cekPre)>0){
+                            array_push($cek_arr,1);
+                        } else {
+                            array_push($cek_arr,0);
+                        }
+
+                        array_push($pre_arr,$pre[0]);
                     }
 
-                    array_push($pre_arr,$pre[0]);
+                    $d['DetailPrecondition'] = $pre_arr;
+                    if(in_array(0, $cek_arr)){
+                        $d['AllowPrecondition'] = 0;
+                    } else {
+                        $d['AllowPrecondition'] = 1;
+                    }
+
                 }
 
-                $data[0]['DetailPrecondition'] = $pre_arr;
-                if(in_array(0, $cek_arr)){
-                    $data[0]['AllowPrecondition'] = 0;
-                } else {
-                    $data[0]['AllowPrecondition'] = 1;
-                }
+                $dataMK = $this->db
+                    ->get_where($student_DB.'.study_planning', array('NPM'=>$NPM,'MKID'=>$d['MKID']),1)
+                    ->result_array();
 
-            }
+                $d['SPID'] = (count($dataMK)>0)? $dataMK[0]['ID'] : null ;
 
-            $result = $data[0];
-
-            $dataMK = $this->db
-                ->get_where($student_DB.'.study_planning', array('NPM'=>$NPM,'MKID'=>$result['MKID']),1)
-                ->result_array();
-
-
-
-            $result['SPID'] = (count($dataMK)>0)? $dataMK[0]['ID'] : null ;
-
-            //Status KRS
-            $dataStatus = $this->db->get_where('db_academic.std_krs',array('NPM'=>$NPM,'CDID'=>$CDID),1)->result_array();
-            $result['DetailKRS'] = (count($dataStatus)>0)? $dataStatus[0] : $dataStatus;
-            // Get Sesi
-            $dataSesi = $this->db->query('SELECT sd.ID, d.Name AS DayName,d.NameEng AS DayNameEng, cl.Room, cl.Seat, 
+                //Status KRS
+                $dataStatus = $this->db->get_where('db_academic.std_krs',array('NPM'=>$NPM,'CDID'=>$CDID),1)->result_array();
+                $d['DetailKRS'] = (count($dataStatus)>0)? $dataStatus[0] : $dataStatus;
+                // Get Sesi
+                $dataSesi = $this->db->query('SELECT sd.ID, d.Name AS DayName,d.NameEng AS DayNameEng, cl.Room, cl.Seat, 
                                                   sd.StartSessions, sd.EndSessions, sd.ClassroomID, sd.DayID, sd.ScheduleID  
                                                     FROM db_academic.schedule_details sd 
                                                     LEFT JOIN db_academic.days d ON (d.ID=sd.DayID)
                                                     LEFT JOIN db_academic.classroom cl ON (cl.ID=sd.ClassroomID)
-                                                    WHERE sd.ScheduleID = "'.$result['ID'].'" ')->result_array();
+                                                    WHERE sd.ScheduleID = "'.$d['ID'].'" ')->result_array();
 
-            for($s=0;$s<count($dataSesi);$s++){
-                $whereCheck = array(
-                    'SemesterID' => $result['SemesterID'],
-                    'ScheduleID' => $result['ID'],
-                    'CDID' => $CDID
-                );
-                $querySeat = $this->db->get_where('db_academic.std_krs', $whereCheck)->result_array();
-                $dataSesi[$s]['CountSeat'] = count($querySeat);
+                for($s2=0;$s2<count($dataSesi);$s2++){
+                    $whereCheck = array(
+                        'SemesterID' => $d['SemesterID'],
+                        'ScheduleID' => $d['ID'],
+                        'CDID' => $CDID
+                    );
+                    $querySeat = $this->db->get_where('db_academic.std_krs', $whereCheck)->result_array();
+                    $dataSesi[$s2]['CountSeat'] = count($querySeat);
+                }
+
+                $d['ScheduleDetails'] = $dataSesi;
+
+                if($d['TeamTeaching']=='1'){
+                    $dataTT = $this->db->query('SELECT * FROM db_academic.schedule_team_teaching stt WHERE stt.ScheduleID = "'.$d['ID'].'" ')->result_array();
+                    $d['TeamTeachingDetails'] = $dataTT;
+                }
+
+                array_push($result,$d);
             }
 
-            $result['ScheduleDetails'] = $dataSesi;
-
-            if($result['TeamTeaching']=='1'){
-                $dataTT = $this->db->query('SELECT * FROM db_academic.schedule_team_teaching stt WHERE stt.ScheduleID = "'.$result['ID'].'" ')->result_array();
-                $result['TeamTeachingDetails'] = $dataTT;
-            }
         }
 
         return $result;
@@ -1842,9 +1840,12 @@ class M_api extends CI_Model {
             $result = $dataOfferings[0];
             $result['Schedule'] = [];
             for($i=0;$i<count($dataCDID);$i++){
-                $dataSch = $this->getScheduleByCDID($db_ta,$data[0]['NPM'],$dataCDID[$i]);
+                $dataSch = $this->getScheduleByCDID($db_ta,$data[0]['NPM'],$dataCDID[$i],$smtActID);
                 if(count($dataSch)>0){
-                    array_push($result['Schedule'],$dataSch);
+                    for($s=0;$s<count($dataSch);$s++){
+                        array_push($result['Schedule'],$dataSch[$s]);
+                    }
+//                    array_push($result['Schedule'],$dataSch);
                 }
 
             }
