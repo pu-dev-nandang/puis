@@ -10,6 +10,7 @@ class C_api extends CI_Controller {
         header('Content-Type: application/json');
         $this->load->model('m_api');
         $this->load->model('master/m_master');
+        $this->load->model('master/m_reservation');
         $this->load->model('akademik/m_tahun_akademik');
         $this->load->library('JWT');
         $this->load->library('google');
@@ -2631,6 +2632,35 @@ class C_api extends CI_Controller {
             }
         }
 
+    }
+
+    public function m_equipment_additional()
+    {
+        $arr = $this->m_reservation->get_m_equipment_additional();
+        echo json_encode($arr);
+    }
+
+    public function get_time_opt_reservation()
+    {
+        $arrHours = array();
+        $endTime = '18';
+        $getHoursNow = date('H');
+        $getHoursNow = (int)$getHoursNow;
+        for ($i=$getHoursNow; $i <= $endTime; $i++) { 
+                // check len
+                $a = $i;
+                for ($j=0; $j < 2 - strlen($i); $j++) { 
+                    $a = '0'.$a;
+                }
+                $d = $a.':30';
+                $a = $a.':00';
+                $arrHours[] = date("h:i a", strtotime($a));
+                //$arrHours[] = date("h:i a", strtotime($d));
+                if ($i != $endTime) {
+                    $arrHours[] = date("h:i a", strtotime($d));
+                }
+         }
+        echo json_encode($arrHours);
     }
 
 

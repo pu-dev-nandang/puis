@@ -15,7 +15,7 @@ class C_transaksi extends Vreservation_Controler {
     }
 
 
-    public function booking()
+    public function booking_create()
     {
         $content = $this->load->view($this->pathView.'transaksi/booking','',true);
         $this->temp($content);

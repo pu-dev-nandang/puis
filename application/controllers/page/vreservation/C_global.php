@@ -71,7 +71,7 @@ class C_global extends Vreservation_Controler {
                 'approved' => 1
             ),
             array(
-                'user'  => 'User 1',
+                'user'  => 'User 6',
                 'start' => '08.00',
                 'end'   => '10.00',
                 'time'  => 120,
@@ -82,7 +82,7 @@ class C_global extends Vreservation_Controler {
             ),
 
             array(
-                'user'  => 'User 1',
+                'user'  => 'User 5',
                 'start' => '13.00',
                 'end'   => '15.30',
                 'time'  => 150,
@@ -114,7 +114,7 @@ class C_global extends Vreservation_Controler {
                 'approved' => 0
             ),
             array(
-                'user'  => 'User 1',
+                'user'  => 'User 4',
                 'start' => '16.30',
                 'end'   => '17.00',
                 'time'  => 120,
@@ -125,7 +125,7 @@ class C_global extends Vreservation_Controler {
             ),
 
             array(
-                'user'  => 'User 1',
+                'user'  => 'User 3',
                 'start' => '13.00',
                 'end'   => '15.00',
                 'time'  => 120,
@@ -136,7 +136,7 @@ class C_global extends Vreservation_Controler {
             ),
             
             array(
-                'user'  => 'User 1',
+                'user'  => 'User 2',
                 'start' => '13.00',
                 'end'   => '14.30',
                 'time'  => 90,
@@ -152,7 +152,7 @@ class C_global extends Vreservation_Controler {
             return $a['room'] - $b['room'];
         });
 
-        for ($i=7; $i <= $endTime; $i++) { 
+        for ($i=7; $i < $endTime; $i++) { 
             // check len
             $a = $i;
             for ($j=0; $j < 2 - strlen($i); $j++) { 
@@ -170,6 +170,26 @@ class C_global extends Vreservation_Controler {
         $data['data_pass'] = $data_pass;
         $content = $this->load->view($this->pathView.'schedule',$data,true);
         echo json_encode($content);
+    }
+
+    public function modal_form()
+    {
+        $input = $this->getInputToken();
+        $this->data['action'] = $input['Action'];
+        $this->data['room'] = $input['room'];
+        $this->data['time'] = $input['time'];
+        $this->data['user'] = $input['user'];
+        $this->data['tgl'] = $input['tgl'];
+        switch ($input['Action']) {
+            case 'add':
+                echo $this->load->view($this->pathView.'modal_form',$this->data,true);
+                break;
+            
+            default:
+                # code...
+                break;
+        }
+        
     }
 
 }
