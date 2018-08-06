@@ -574,6 +574,7 @@ $route['api/__crudKRSOnline'] = 'api/c_api/crudKRSOnline';
 //v_reservation
 $route['api/__m_equipment_additional'] = 'api/c_api/m_equipment_additional';
 $route['api/get_time_opt_reservation'] = 'api/c_api/get_time_opt_reservation';
+$route['api/__m_additional_personel'] = 'api/c_api/m_additional_personel';
 
 
 // for inject //

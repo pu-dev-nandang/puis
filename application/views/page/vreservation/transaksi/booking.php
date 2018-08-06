@@ -80,9 +80,22 @@
         $(this).prop('checked',true);
     });
 
+    $(document).on('click','.chk_person_support', function () {
+        $('input.chk_person_support').prop('checked', false);
+        $(this).prop('checked',true);
+    });
+
+    $(document).on('click','.chk_e_multiple', function () {
+        $('input.chk_e_multiple').prop('checked', false);
+        $(this).prop('checked',true);
+    });
+
+
+    // event ya multiple belum
+
     $(document).on('change','#e_additionalYA', function () {
         if(this.checked) {
-            equipment_additional = [];
+            //equipment_additional = [];
             $('#divE_additional').remove();
             // get data m_equipment_additional
             var url = base_url_js+"api/__m_equipment_additional";
@@ -114,6 +127,61 @@
                 $('#a'+i).append('</tr>');
               }
               $('#tablechk_e_additional').append('</table>');
+            }).done(function () {
+              //loadAlamatSekolah();
+            });
+        }
+
+    });
+
+    $(document).on('change','#person_supportTDK', function () {
+        if(this.checked) {
+            $('#divperson_support').remove();
+        }
+
+    });
+
+    $(document).on('change','#e_additionalTDK', function () {
+        if(this.checked) {
+            $('#divE_additional').remove();
+        }
+
+    });
+
+    $(document).on('change','#person_supportYA', function () {
+        if(this.checked) {
+            //equipment_additional = [];
+            $('#divperson_support').remove();
+            // get data m_equipment_additional
+            var url = base_url_js+"api/__m_additional_personel";
+            $.post(url,function (data_json) {
+              var response = data_json;
+              var splitBagi = 3;
+              var split = parseInt(response.length / splitBagi);
+              var sisa = response.length % splitBagi;
+              
+              if (sisa > 0) {
+                    split++;
+              }
+              var getRow = 0;
+              var divE_additional = '<div class="col-md-6" id="divperson_support"><strong>Choices Person Support</strong></div>';
+              $('#person_support').after(divE_additional);
+              $('#divperson_support').append('<table class="table" id ="tablechk_divperson_support">');
+              for (var i = 0; i < split; i++) {
+                if ((sisa > 0) && ((i + 1) == split) ) {
+                                    splitBagi = sisa;    
+                }
+                $('#tablechk_divperson_support').append('<tr id = "psa'+i+'">');
+                for (var k = 0; k < splitBagi; k++) {
+                    $('#psa'+i).append('<td>'+
+                                        '<input type="checkbox" class = "chk_person_support_td" name="chk_person_support_td" value = "'+response[getRow].ID+'">&nbsp'+ response[getRow].Division+
+                                     '</td>'
+                                    );
+                    getRow++;
+                }
+                $('#psa'+i).append('</tr>');
+              }
+              $('#tablechk_divperson_support').append('</table>');
             }).done(function () {
               //loadAlamatSekolah();
             });
