@@ -171,9 +171,20 @@
         var url = base_url_js+'api/__crudStudyPlanning';
         var token = jwt_encode(data,'UAP)(*');
 
+        // dataMaxCredit = 0;
+        // ScheduleExist = [];
+        // KRSDraf = [];
+        // ArrDrafKRS = [];
+        // totalCreditExist = 0;
+
         ScheduleExist = [];
-        KRSDraf = [];
         totalCreditExist = 0;
+
+        dataMaxCredit = 0;
+        totalMyCourse = 0;
+        totalCredit = 0;
+        KRSDraf = [];
+        ArrDrafKRS = [];
 
         $.post(url,{token:token},function (jsonResult) {
 
@@ -233,10 +244,10 @@
                 '            <tr style="background:#437e88;color:#ffffff;">' +
                 '                <th style="width: 7%;">Code</th>' +
                 '                <th>Course</th>' +
-                '                <th style="width: 5%;">Type</th>' +
+                // '                <th style="width: 5%;">Type</th>' +
                 '                <th style="width: 5%;">Credit</th>' +
                 '                <th style="width: 5%;">Group</th>' +
-                '                <th>Schedule</th>' +
+                '                <th style="width: 20%;">Schedule</th>' +
                 '                <th style="width: 5%;">Status</th>' +
                 '            </tr>' +
                 '            </thead><tbody id="dataSchedule"></tbody>' +
@@ -261,7 +272,7 @@
                 tr.append('<tr>' +
                     '<td>'+dataSc.MKCode+'</td>' +
                     '<td style="text-align: left;"><b>'+dataSc.NameEng+'</b><br/><i>'+dataSc.Name+'</i></td>' +
-                    '<td>'+dataSc.TypeSP+'</td>' +
+                    // '<td>'+dataSc.TypeSP+'</td>' +
                     '<td>'+dataSc.Credit+'</td>' +
                     '<td>'+dataSc.ClassGroup+'</td>' +
                     '<td><ul id="sc'+i+'" class="list-scd"></ul></td>' +
@@ -309,7 +320,7 @@
                     // '                                   <th class="t-center" style="width: 10px;">No</th>' +
                     '                                   <th class="t-center" style="width: 90px;">Code</th>' +
                     '                                   <th class="t-center">Course</th>' +
-                    '                                   <th class="t-center" style="width: 10px;">Status</th>' +
+                    // '                                   <th class="t-center" style="width: 10px;">Status</th>' +
                     '                                   <th class="t-center" style="width: 10px;">Credit</th>' +
                     '                                   <th class="t-center" style="width: 75px;">Group</th>' +
                     '                                   <th class="t-center" style="width: 355px;">Schedule</th>' +
@@ -333,7 +344,7 @@
                     // '                                   <th class="t-center" style="width: 10px;">No</th>' +
                     '                                   <th class="t-center" style="width: 90px;">Code</th>' +
                     '                                   <th class="t-center">Course</th>' +
-                    '                                   <th class="t-center" style="width: 10px;">Status</th>' +
+                    // '                                   <th class="t-center" style="width: 10px;">Status</th>' +
                     '                                   <th class="t-center" style="width: 10px;">Credit</th>' +
                     '                                   <th class="t-center" style="width: 75px;">Group</th>' +
                     '                                   <th class="t-center" style="width: 355px;">Schedule</th>' +
@@ -346,9 +357,10 @@
                     '                    </div>' +
                     '                </div>' +
                     '<br/>' +
-                    '<div style="text-align: right;">' +
-                    '<span id="totalCredit"></span> of <span id="dataMaxCredit"></span> Credit' +
-                    '</div>');
+                    // '<div style="text-align: right;">' +
+                    // '<span id="totalCredit"></span> of <span id="dataMaxCredit"></span> Credit' +
+                    // '</div>' +
+                    '');
 
                 var no = 1;
                 var totalReq = 0;
@@ -382,7 +394,7 @@
                         '<td><strong>'+sc.MKNameEng+'</strong><br/><i>'+sc.MKName+'</i><br/><p style="color: blue;">Semester '+sc.Semester+'</p>' +
                         '<div id="alertSC'+sc.ID+'"></div> ' +
                         '</td>' +
-                        '<td style="text-align: center;">'+bg+'</td>' +
+                        // '<td style="text-align: center;">'+bg+'</td>' +
                         '<td style="text-align: center;">'+sc.Credit+'</td>' +
                         '<td style="text-align: center;">'+sc.ClassGroup+'</td>' +
                         '<td><div id="scd'+no+'"></div></td>' +
@@ -681,6 +693,8 @@
 
         if($.inArray(0,process)==-1){
 
+            console.log(dataMaxCredit);
+            console.log(NextCredit);
             if(dataMaxCredit>=NextCredit){
 
                 $.post(url,{token:token},function (resultJson) {
@@ -745,10 +759,10 @@
                 toastr.success('Saved','Success');
 
                 totalMyCourse = totalMyCourse + 1;
-                totalCredit = totalCredit + parseInt(Credit);
-
-
-                $('#totalCredit').text(totalCredit);
+                // totalCredit = totalCredit + parseInt(Credit);
+                //
+                //
+                // $('#totalCredit').text(totalCredit);
 
             },500);
 
