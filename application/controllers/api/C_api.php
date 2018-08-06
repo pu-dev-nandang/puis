@@ -2633,6 +2633,67 @@ class C_api extends CI_Controller {
 
     }
 
+    public function crudCombinedClass(){
+
+        $data_arr = $this->getInputToken();
+
+        if(count($data_arr)>0){
+            if($data_arr['action']=='readGroupCalss'){
+                $data = $this->m_api->__getCC_GroupCalss($data_arr['ProdiID']);
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='addCombine'){
+                $dataInsert = (array) $data_arr['dataInsert'];
+                $this->db->insert('db_academic.schedule_details_course',$dataInsert);
+
+                // Update CombineCLass
+                $this->db->set('CombinedClasses', '1');
+                $this->db->where('ID', $dataInsert['ScheduleID']);
+                $this->db->update('db_academic.schedule');
+
+                return print_r(1);
+
+            }
+            else if($data_arr['action']=='getScheduleGC'){
+
+                $dataDel = $this->db->select('ID')
+                    ->get_where('db_academic.schedule_details_course',
+                        array('ScheduleID' => $data_arr['ScheduleID']))->result_array();
+
+                $dataCourse = $this->db->query('SELECT sdc.ScheduleID,sdc.ID AS SDCID, mk.NameEng AS MKNameEng, mk.MKCode FROM db_academic.schedule_details_course sdc
+                                                          LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                          WHERE sdc.ScheduleID = "'.$data_arr['ScheduleID'].'" 
+                                                          AND sdc.ProdiID = "'.$data_arr['ProdiID'].'" LIMIT 1')->result_array();
+
+                if(count($dataCourse)>0){
+                    $dataCourse[0]['TotalProdi'] = count($dataDel);
+                }
+                
+                return print_r(json_encode($dataCourse));
+            }
+            else if($data_arr['action']=='delSDCGL'){
+                $this->db->where('ID', $data_arr['SDCID']);
+                $this->db->delete('db_academic.schedule_details_course');
+
+                // cek apakah status combine update atau tidak
+                $dataC = $this->db->select('ID')
+                    ->get_where('db_academic.schedule_details_course',array('ScheduleID'=>$data_arr['ScheduleID']))
+                    ->result_array();
+
+                if(count($dataC)==1){
+
+                    $this->db->set('CombinedClasses', '0');
+                    $this->db->where('ID', $data_arr['ScheduleID']);
+                    $this->db->update('db_academic.schedule');
+                }
+
+                return print_r(1);
+
+            }
+        }
+
+
+    }
 
 
 }
