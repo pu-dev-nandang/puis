@@ -281,7 +281,8 @@
 
                 ScheduleExist.push(dataSc.ScheduleID);
 
-                ArrDrafKRS.push(dataSc.CDID);
+                // ArrDrafKRS.push(dataSc.CDID);
+                ArrDrafKRS.push(dataSc.ScheduleID);
                 totalCredit = parseInt(totalCredit) + parseInt(dataSc.Credit);
 
 
@@ -423,7 +424,7 @@
                             EndSessions : data.EndSessions
                         };
 
-                        if(totalMyCourse>0 && $.inArray(sc.CDID,ArrDrafKRS)!=-1){KRSDraf.push(DrafArr);}
+                        if(totalMyCourse>0 && $.inArray(sc.ID,ArrDrafKRS)!=-1){KRSDraf.push(DrafArr);}
                         Draf.push(DrafArr);
 
                         var alert = (sc.SubSesi==1)? 'alert-warning' : 'alert-info';
@@ -693,8 +694,6 @@
 
         if($.inArray(0,process)==-1){
 
-            console.log(dataMaxCredit);
-            console.log(NextCredit);
             if(dataMaxCredit>=NextCredit){
 
                 $.post(url,{token:token},function (resultJson) {
