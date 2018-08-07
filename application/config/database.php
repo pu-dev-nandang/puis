@@ -24,9 +24,9 @@ if($_SERVER['SERVER_NAME']!='localhost') {
 
 } else {
 
-    $db['default']['hostname'] = '10.1.30.18';
-    $db['default']['username'] = 'db_itpu';
-    $db['default']['password'] = 'Uap)(*&^%';
+    $db['default']['hostname'] = '192.168.0.19:3308';
+    $db['default']['username'] = 'dbadmin';
+    $db['default']['password'] = 'secret';
     $db['default']['database'] = 'db_academic';
     $db['default']['dbdriver'] = 'mysqli';// support with MYSQl,POSTGRE SQL, ORACLE,SQL SERVER
     $db['default']['dbprefix'] = '';

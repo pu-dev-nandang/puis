@@ -183,21 +183,6 @@
 </script>
 
 <script>
-    // Untuk Page Jadwal
-    // $(document).on('change','#filterSemester',function () {
-    //     var Semester = $('#filterSemester').val();
-    //     var SemesterID = (Semester!='' && Semester!= null) ? Semester.split('.')[0] : '';
-    //
-    //     console.log(SemesterID);
-    //
-    //     $('#selectSemesterSc').html('<select class="form-control" id="filterSemesterSchedule"></select>');
-    //     // $('#filterSemesterSchedule').empty();
-    //     $('#filterSemesterSchedule').append('<option value="">-- All Semester --</option>' +
-    //         '                <option disabled>------------</option>');
-    //     loadSelectOPtionAllSemester('#filterSemesterSchedule','',SemesterID,SemesterAntara);
-    //     filterSchedule();
-    //
-    // });
 
     $(document).on('change','#filterProgramCampus,#filterSemester,#filterBaseProdi,#filterCombine,#filterDay',function () {
         filterSchedule();
@@ -212,7 +197,7 @@
         loadST_semester();
     });
 
-    $(document).on('change','',function () {
+    $(document).on('change','#filterST_ProgramCampus,#filterST_Semester,#filterST_BaseProdi,#filterST_Combine,#selectST_SemesterSc',function () {
         filterST_Schedule();
     });
 

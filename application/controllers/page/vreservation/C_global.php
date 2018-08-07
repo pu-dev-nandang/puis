@@ -71,7 +71,7 @@ class C_global extends Vreservation_Controler {
                 'approved' => 1
             ),
             array(
-                'user'  => 'User 1',
+                'user'  => 'User 6',
                 'start' => '08.00',
                 'end'   => '10.00',
                 'time'  => 120,
@@ -82,7 +82,7 @@ class C_global extends Vreservation_Controler {
             ),
 
             array(
-                'user'  => 'User 1',
+                'user'  => 'User 5',
                 'start' => '13.00',
                 'end'   => '15.30',
                 'time'  => 150,
@@ -114,55 +114,82 @@ class C_global extends Vreservation_Controler {
                 'approved' => 0
             ),
             array(
-                'user'  => 'User 1',
-                'start' => '15.00',
+                'user'  => 'User 4',
+                'start' => '16.30',
                 'end'   => '17.00',
                 'time'  => 120,
-                'colspan' => 4,
-                'agenda' => 'meeting',
+                'colspan' => 1,
+                'agenda' => 'requested',
                 'room' => 503,
                 'approved' => 0
             ),
 
             array(
-                'user'  => 'User 1',
+                'user'  => 'User 3',
                 'start' => '13.00',
                 'end'   => '15.00',
                 'time'  => 120,
                 'colspan' => 4,
-                'agenda' => 'meeting',
+                'agenda' => 'requested',
                 'room' => 507,
                 'approved' => 0
             ),
             
             array(
-                'user'  => 'User 1',
+                'user'  => 'User 2',
                 'start' => '13.00',
                 'end'   => '14.30',
                 'time'  => 90,
                 'colspan' => 3,
-                'agenda' => 'meeting',
+                'agenda' => 'requested',
                 'room' => 508,
                 'approved' => 0
             ),
         );
 
-        for ($i=7; $i <= $endTime; $i++) { 
+        // SORTING ASC
+        usort($data_pass, function($a, $b) {
+            return $a['room'] - $b['room'];
+        });
+
+        for ($i=7; $i < $endTime; $i++) { 
             // check len
             $a = $i;
             for ($j=0; $j < 2 - strlen($i); $j++) { 
                 $a = '0'.$a;
             }
+            $d = $a.':30';
             $a = $a.':00';
             $arrHours[] = date("h:i a", strtotime($a));
-            $d = $a.':30';
             //$arrHours[] = date("h:i a", strtotime($d));
-            $arrHours[] = date("h:i a", strtotime($d));
+            if ($i != $endTime) {
+                $arrHours[] = date("h:i a", strtotime($d));
+            }
         }
         $data['arrHours'] = $arrHours;
         $data['data_pass'] = $data_pass;
         $content = $this->load->view($this->pathView.'schedule',$data,true);
         echo json_encode($content);
+    }
+
+    public function modal_form()
+    {
+        $input = $this->getInputToken();
+        $this->data['action'] = $input['Action'];
+        $this->data['room'] = $input['room'];
+        $this->data['time'] = $input['time'];
+        $this->data['user'] = $input['user'];
+        $this->data['tgl'] = $input['tgl'];
+        switch ($input['Action']) {
+            case 'add':
+                echo $this->load->view($this->pathView.'modal_form',$this->data,true);
+                break;
+            
+            default:
+                # code...
+                break;
+        }
+        
     }
 
 }

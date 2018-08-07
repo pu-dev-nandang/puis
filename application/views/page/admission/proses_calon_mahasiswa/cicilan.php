@@ -1,6 +1,6 @@
-<script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
-<script type="text/javascript" src="<?php echo base_url();?>assets/datepicker/bootstrap-datepicker.js"></script>
-<link href="<?php echo base_url();?>assets/datepicker/datepicker.css" rel="stylesheet" type="text/css"/>
+<!-- <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script> -->
+<!-- <script type="text/javascript" src="<?php echo base_url();?>assets/datepicker/bootstrap-datepicker.js"></script> -->
+<!-- <link href="<?php echo base_url();?>assets/datepicker/datepicker.css" rel="stylesheet" type="text/css"/> -->
 <div class="row" style="margin-top: 30px;">
     <div class="col-md-12 formAddFormKD">
         <div class="widget box">
