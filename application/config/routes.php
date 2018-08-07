@@ -577,6 +577,7 @@ $route['api/__crudCombinedClass'] = 'api/c_api/crudCombinedClass';
 //v_reservation
 $route['api/__m_equipment_additional'] = 'api/c_api/m_equipment_additional';
 $route['api/get_time_opt_reservation'] = 'api/c_api/get_time_opt_reservation';
+$route['api/__m_additional_personel'] = 'api/c_api/m_additional_personel';
 
 
 

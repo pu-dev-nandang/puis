@@ -10,7 +10,7 @@ class C_api extends CI_Controller {
         header('Content-Type: application/json');
         $this->load->model('m_api');
         $this->load->model('master/m_master');
-        $this->load->model('master/m_reservation');
+        $this->load->model('vreservation/m_reservation');
         $this->load->model('akademik/m_tahun_akademik');
         $this->load->library('JWT');
         $this->load->library('google');
@@ -2705,10 +2705,15 @@ class C_api extends CI_Controller {
 
     public function get_time_opt_reservation()
     {
+        $data_arr = $this->getInputToken();
+        $start = $data_arr['time'];
+        $aaa = explode(':', $start);
+        
         $arrHours = array();
         $endTime = '18';
-        $getHoursNow = date('H');
-        $getHoursNow = (int)$getHoursNow;
+        //$getHoursNow = date('H');
+        
+        $getHoursNow = (int)$aaa[0] + 1;
         for ($i=$getHoursNow; $i <= $endTime; $i++) { 
                 // check len
                 $a = $i;
@@ -2724,6 +2729,12 @@ class C_api extends CI_Controller {
                 }
          }
         echo json_encode($arrHours);
+    }
+
+    public function m_additional_personel()
+    {
+        $arr = $this->m_reservation->get_m_additional_personel();
+        echo json_encode($arr);
     }
 
 

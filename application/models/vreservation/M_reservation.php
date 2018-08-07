@@ -18,4 +18,12 @@ class M_reservation extends CI_Model {
         $query=$this->db->query($sql, array());
         return $query->result_array();
     }
+
+    public function get_m_additional_personel()
+    {
+        $sql = 'select a.*,b.* from db_reservation.m_additional_personel as a join db_employees.division as b
+        on a.ID_division = b.ID';
+        $query=$this->db->query($sql, array());
+        return $query->result_array();
+    }
 }
