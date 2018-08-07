@@ -163,7 +163,7 @@ abstract class Globalclass extends MyAbstract{
         $config["cur_tag_close"] = "</a></li>";
         $config["num_tag_open"] = "<li>";
         $config["num_tag_close"] = "</li>";
-        $config["num_links"] = 1;
+        $config["num_links"] = 4;
 
         return $config;
     }

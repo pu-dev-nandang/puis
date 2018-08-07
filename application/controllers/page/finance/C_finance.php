@@ -765,6 +765,71 @@ class C_finance extends Finnance_Controler {
         $this->temp($content);
     }
 
+    public function import_pembayaran_lain()
+    {
+        $content = $this->load->view('page/'.$this->data['department'].'/tagihan_mahasiswa/page_import_pembayaran_lain',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function submit_import_pembayaran_lain()
+    {
+        // print_r($_FILES);
+        if(isset($_FILES["fileData"]["name"]))
+        {
+          $path = $_FILES["fileData"]["tmp_name"];
+          include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+          $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+          $excel2 = $excel2->load($path); // Empty Sheet
+          $objWorksheet = $excel2->setActiveSheetIndex(0);
+          $CountRow = $objWorksheet->getHighestRow();
+          $CountRow = $CountRow + 1;
+          $selectPTID = $this->input->post('selectPTID');
+          $selectSemester = $this->input->post('selectSemester');
+          $maba = $this->input->post('maba');
+         
+          for ($i=2; $i < $CountRow; $i++) {
+            $temp = array();
+            $NPM = $objWorksheet->getCellByColumnAndRow(0, $i)->getCalculatedValue();
+            // get payment
+               $auth = $this->m_master->caribasedprimary('db_academic.auth_students','NPM',$NPM);
+               $Pay_Cond = $auth[0]['Pay_Cond'];
+               $Year = $auth[0]['Year'];
+               $db = 'ta_'.$Year.'.students';
+               $ta = $this->m_master->caribasedprimary($db,'NPM',$NPM);
+               $ProdiID = $ta[0]['ProdiID'];
+
+               $payment = $this->m_finance->getPriceBaseBintang($selectPTID,$ProdiID,$Year,$Pay_Cond);
+               // check PTID, jika SKS / Credit dikali per sks yang diambil // 3 credit
+                  // check checklist mahasiswa baru atau tidak
+                if ($selectPTID == 3) {
+                    if ($maba == 1) {
+                        $ProStuDefaultCredit = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+                        $DefaultCredit = $ProStuDefaultCredit[0]['DefaultCredit'];
+                        $payment = (int)$payment * (int)$DefaultCredit;
+                    }
+                    else
+                    {
+                        // '.$db.'.study_planning
+                        $Credit = $this->m_finance->getSKSMahasiswa('ta_'.$Year,$NPM);
+                        $payment = (int)$payment * (int)$Credit;
+                    }
+                }
+
+            $aa = $this->m_finance->insertaDataPayment($selectPTID,$selectSemester,$NPM,$payment,0,"1",$this->session->userdata('NIP'));
+            if ($aa != 0) {
+                $bb = $this->m_finance->insertaDataPaymentStudents($aa,$payment,0,'0000-00-00 00:00:00',1);
+            }
+            
+          }
+          
+          echo json_encode(array('status'=> 1,'msg' => ''));
+        }
+        else
+        {
+          exit('No direct script access allowed');
+        }
+    }
+
     public function submit_import_pembayaran_manual()
     {
         // print_r($_FILES);
