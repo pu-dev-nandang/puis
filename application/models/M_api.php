@@ -1687,9 +1687,12 @@ class M_api extends CI_Model {
                 if(count($dataCustomCredit)>0){
                     $MaxCredit = array('Credit'=>$dataCustomCredit[0]['Credit'],'Flag'=>'2');
                 } else {
+
+                    $pembulatanIPS = round($LastIPS,2);
+
                     $dataMakCredit = $this->db->query('SELECT Credit FROM db_academic.range_credits WHERE 
-                                                      IPSStart <= '.$LastIPS.' 
-                                                      AND IPSEnd >= '.$LastIPS.' LIMIT 1')->result_array();
+                                                      IPSStart <= '.$pembulatanIPS.' 
+                                                      AND IPSEnd >= '.$pembulatanIPS.' LIMIT 1')->result_array();
                     $MaxCredit = array('Credit' => $dataMakCredit[0]['Credit'],'Flag'=>'1');
                 }
             }
