@@ -447,6 +447,29 @@ class C_finance extends Finnance_Controler {
                               $arr['msg'] .= 'Va tidak bisa di update, error koneksi ke BNI <br>';
                             }
                         }
+                        else
+                        {
+                            $sqlDelete = 'delete from db_finance.payment_students where BilingID = "'.$BilingID.'"';
+                            $queryDelete=$this->db->query($sqlDelete, array());
+
+                            $getData= $this->m_master->caribasedprimary('db_va.va_log','trx_id',$BilingID);
+                            $VA_number = $getData[0]['virtual_account'];
+                            $trx_amount = $Input[$i]->Payment;
+                            $datetime_expired = $Input[$i]->Deadline;
+                            $customer_name = $getData[0]['customer_name'];
+                            $customer_email = $getData[0]['customer_email'];
+                            // $update = $this->m_finance->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students',$desc);
+                            $update = $this->m_finance->create_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$VA_number,'Re-'.$desc,'db_finance.payment_students');
+                            if ($update['status']) {
+                              // update data pada table db_finance.payment_students
+                                // $this->m_finance->updateCicilanMHS($BilingID,$trx_amount,$datetime_expired);
+                                $this->m_finance->insertaDataPaymentStudents($ID,$Input[$i]->Payment,$update['msg']['trx_id'],$Input[$i]->Deadline);
+                            }
+                            else
+                            {
+                              $arr['msg'] .= 'Va tidak bisa di update, error koneksi ke BNI <br>';
+                            }
+                        }
                       }
                       else
                       {
@@ -1048,6 +1071,22 @@ class C_finance extends Finnance_Controler {
             default:
                 # code...
                 break;
+        }
+    }
+
+    public function testApprove()
+    {
+        $sql = 'select * from db_finance.payment where Status = "1" and DATE_FORMAT(UpdateAt,"%Y%m%d") = 20180807';
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) { 
+            $ID_payment = $query[$i]['ID'];
+            $dataSave = array(
+                    'Status' => 1,
+                    'BilingID' => 0,
+                            );
+            $this->db->where('ID_payment',$ID_payment);
+            $this->db->where('Status',0);
+            $this->db->update('db_finance.payment_students', $dataSave);
         }
     }
     
