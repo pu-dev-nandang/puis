@@ -830,13 +830,13 @@
     $(document).on('change','#formCC_addProdi',function () {
         var formCC_addProdi = $('#formCC_addProdi').val();
         if(formCC_addProdi!='' && formCC_addProdi!=null){
-            loadGroupClass('#formCC_ClassGroup',formCC_addProdi.split('.')[0]);
+            loadGroupClass('formCC_ClassGroup',formCC_addProdi.split('.')[0]);
         }
     });
     $(document).on('change','#filterCC_ProdiDell',function () {
         var filterCC_ProdiDell = $('#filterCC_ProdiDell').val();
         if(filterCC_ProdiDell!='' && filterCC_ProdiDell!=null){
-            loadGroupClass('#formCC_ClassGroupDell',filterCC_ProdiDell.split('.')[0]);
+            loadGroupClass('formCC_ClassGroupDell',filterCC_ProdiDell.split('.')[0]);
             loadScheduleFromGC();
         }
     });

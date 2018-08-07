@@ -32,7 +32,8 @@
                     </div>
                     <div class="form-group">
                         <label>Select Group Class</label>
-                        <select class="form-control" id="formCC_ClassGroup"></select>
+                        <div id="div_formCC_ClassGroup">-</div>
+<!--                        <select class="form-control" id="formCC_ClassGroup"></select>-->
                     </div>
 
                     <div class="form-group" style="text-align: right;">
@@ -62,7 +63,7 @@
                 <div class="col-xs-4">
                     <div class="form-group">
                         <label>Select Group Class</label>
-                        <select class="form-control" id="formCC_ClassGroupDell"></select>
+                        <div id="div_formCC_ClassGroupDell">-</div>
                     </div>
                 </div>
             </div>
@@ -170,12 +171,12 @@
         var token = jwt_encode(data,'UAP)(*');
         $.post(url,{token:token},function (jsonResult) {
 
-            console.log(jsonResult);
+            // console.log(jsonResult);
 
             if(jsonResult.length>0){
                 $('#dvCC_Course').html('<select class="select2-select-00 full-width-fix" size="5" id="formCC_MataKuliah">' +
                     '                        <option value=""></option>' +
-                    '                    </select>');
+                    '                    </select><p>Mata kuliah yg tampil adalah yg belum diset jadwal</p>');
 
                 for(var i=0;i<jsonResult.length;i++){
                     var semester = jsonResult[i].Offerings.Semester;
@@ -183,13 +184,19 @@
                     var mk = jsonResult[i].Details;
                     for(var m=0;m<mk.length;m++){
                         var dataMK = mk[m];
-                        var asalSmt = (semester!=dataMK.Semester) ? '('+dataMK.Semester+')' : '';
-                        var schDisabled = (dataMK.ScheduleID!="") ? 'disabled' : '';
+                        // var schDisabled = (dataMK.ScheduleID!="") ? 'disabled' : '';
 
-                        $('#formCC_MataKuliah').append('<option value="'+dataMK.CDID+'|'+dataMK.ID+'" '+schDisabled+'>Smt '+semester+' '+asalSmt+' - '+dataMK.MKCode+' | '+dataMK.MKNameEng+'</option>');
+                        if(dataMK.ScheduleID!=""){
+
+                        } else {
+                            var asalSmt = (semester!=dataMK.Semester) ? '('+dataMK.Semester+')' : '';
+                            $('#formCC_MataKuliah').append('<option value="'+dataMK.CDID+'|'+dataMK.ID+'">Smt '+semester+' '+asalSmt+' - '+dataMK.MKCode+' | '+dataMK.MKNameEng+'</option>');
+                        }
+
+
                     }
 
-                    $('#formCC_MataKuliah').append('<option disabled>-------</option>');
+                    // $('#formCC_MataKuliah').append('<option disabled>-------</option>');
 
                 }
 
@@ -209,14 +216,24 @@
         var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'api/__crudCombinedClass';
         $.post(url,{token:token},function (jsonResult) {
+            var div_em = '#div_'+elm;
+            var opt_em = '#'+elm;
 
-            $(elm).empty();
+            console.log(div_em,opt_em);
+
+            $(div_em).html('');
             if(jsonResult.length>0){
-                $(elm).append('<option disabled selected>-- Select Group --</option>');
+
+                $(div_em).html('<select class="select2-select-00 full-width-fix" size="5" id="'+elm+'">' +
+                    '                        <option value=""></option>' +
+                    '                    </select>');
+
                 for(var c=0;c<jsonResult.length;c++){
                     var d = jsonResult[c];
-                    $(elm).append('<option value="'+d.ID+'">'+d.ClassGroup+'</option>');
+                    $(opt_em).append('<option value="'+d.ID+'">'+d.ClassGroup+'</option>');
                 }
+
+                $(opt_em).select2({allowClear: true});
             }
         });
     }
