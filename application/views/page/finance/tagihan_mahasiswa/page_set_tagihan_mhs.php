@@ -125,6 +125,7 @@
 
             var token1 = jwt_encode(data1,'UAP)(*');
             $.post(url1,{token:token1},function (resultJson) {
+              resultJson = ''; // loss untuk tidak mengikat tanggal academic
               if(resultJson.msg == '')
               {
                 $('#NotificationModal .modal-header').addClass('hide');
