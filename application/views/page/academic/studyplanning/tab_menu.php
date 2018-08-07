@@ -173,6 +173,7 @@
 
         ScheduleExist = [];
         KRSDraf = [];
+        totalCreditExist = 0;
 
         $.post(url,{token:token},function (jsonResult) {
 
@@ -245,6 +246,7 @@
             var tr = $('#dataSchedule');
             dataMaxCredit = dataStd.DetailSemester.MaxCredit.Credit;
             totalMyCourse = dataStd.Schedule.length;
+
             for(var i=0;i<dataStd.Schedule.length;i++){
                 var dataSc = dataStd.Schedule[i];
                 var status = '<i class="fa fa-circle" style="color:#d8d8d8;"></i>';
