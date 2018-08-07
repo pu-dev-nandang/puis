@@ -38,6 +38,9 @@
         <button data-page="inputjadwal" type="button" class="btn btn-default btn-default-primary btn-action control-jadwal">
             <i class="fa fa-pencil right-margin" aria-hidden="true"></i> Set Timetables
         </button>
+        <button data-page="combinedClass" type="button" class="btn btn-default btn-default-primary btn-action control-jadwal">
+            <i class="fa fa-retweet right-margin" aria-hidden="true"></i> Combined Class
+        </button>
     </div>
 
 </div>
@@ -810,5 +813,58 @@
             }
         });
 
+    });
+</script>
+
+<!-- Set Combined Class -->
+<script>
+    $(document).on('change','#filterCC_Prodi',function () {
+        var filterCC_Prodi = $('#filterCC_Prodi').val();
+
+        if(filterCC_Prodi!='' && filterCC_Prodi!=null){
+            getCC_CourseOfferings(filterCC_Prodi);
+        }
+
+    });
+
+    $(document).on('change','#formCC_addProdi',function () {
+        var formCC_addProdi = $('#formCC_addProdi').val();
+        if(formCC_addProdi!='' && formCC_addProdi!=null){
+            loadGroupClass('#formCC_ClassGroup',formCC_addProdi.split('.')[0]);
+        }
+    });
+    $(document).on('change','#filterCC_ProdiDell',function () {
+        var filterCC_ProdiDell = $('#filterCC_ProdiDell').val();
+        if(filterCC_ProdiDell!='' && filterCC_ProdiDell!=null){
+            loadGroupClass('#formCC_ClassGroupDell',filterCC_ProdiDell.split('.')[0]);
+            loadScheduleFromGC();
+        }
+    });
+    $(document).on('change','#formCC_ClassGroupDell',function () {
+        loadScheduleFromGC();
+    });
+    $(document).on('click','#btnDellCombined',function (result) {
+        
+        if(confirm('Delete data?')){
+            loading_buttonSm('#btnDellCombined');
+            var SDCID = $(this).attr('data-sdcid');
+            var ScheduleID = $(this).attr('data-id');
+            var data = {
+                action : 'delSDCGL',
+                SDCID : SDCID,
+                ScheduleID : ScheduleID
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__crudCombinedClass';
+            $.post(url,{token:token},function (result) {
+                toastr.success('Data deleted','Success');
+                setTimeout(function () {
+                    $('#filterCC_ProdiDell').val('');
+                    $('#formCC_ClassGroupDell,#trCombinedCl').empty();
+                },500);
+            });
+        }
+        
+        
     });
 </script>

@@ -2581,5 +2581,18 @@ class M_api extends CI_Model {
 
     }
 
+    public function __getCC_GroupCalss($ProdiID){
+        $dataSmtAct = $this->_getSemesterActive();
+
+        $data = $this->db->query('SELECT s.ID, s.ClassGroup FROM db_academic.schedule_details_course sdc 
+                                                LEFT JOIN db_academic.schedule s ON (s.ID = sdc.ScheduleID)
+                                                WHERE s.SemesterID = "'.$dataSmtAct['ID'].'" 
+                                                AND sdc.ProdiID = "'.$ProdiID.'"
+                                                GROUP BY s.ID ')->result_array();
+
+
+        return $data;
+    }
+
 
 }
