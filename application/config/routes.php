@@ -414,6 +414,12 @@ $route['finance/edit_telat_bayar/(:any)'] =  'page/finance/c_finance/edit_telat_
 $route['finance/tagihan-mhs/import_pembayaran_manual'] =  'page/finance/c_finance/import_pembayaran_manual';
 $route['finance/tagihan-mhs/submit_import_pembayaran_manual'] =  'page/finance/c_finance/submit_import_pembayaran_manual';
 
+$route['finance/tagihan-mhs/import_pembayaran_lain'] =  'page/finance/c_finance/import_pembayaran_lain';
+$route['finance/tagihan-mhs/submit_import_pembayaran_lain'] =  'page/finance/c_finance/submit_import_pembayaran_lain';
+
+
+
+
 $route['finance/tagihan-mhs/submit_import_beasiswa_mahasiswa'] =  'page/finance/c_finance/submit_import_beasiswa_mahasiswa';
 $route['finance/download-log-va'] =  'page/finance/c_finance/download_log_va';
 $route['finance/listfile_va'] =  'page/finance/c_finance/listfile_va';
