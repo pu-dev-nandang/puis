@@ -245,7 +245,8 @@ class C_finance extends Finnance_Controler {
                 {
                     $getDeadlineTagihanDB = $this->m_finance->getDeadlineTagihanDB($fieldEND,$SemesterID[0]['ID']);
                     // check Deadline Tagihan telah melewati tanggal sekarang atau belum
-                    $chkTgl = $this->m_master->checkTglNow($getDeadlineTagihanDB);
+                    //$chkTgl = $this->m_master->checkTglNow($getDeadlineTagihanDB);
+                    $chkTgl = true;
                     if ($chkTgl) {
                         $getDataMhsBYNPM = $this->m_master->getDataMhsBYNPM($Input[$i]->NPM,$Input[$i]->ta);
                         $payment = str_replace("Rp.","", $Input[$i]->Invoice);
@@ -405,7 +406,8 @@ class C_finance extends Finnance_Controler {
             }            
                
             // check Deadline Input telah melewati tanggal Deadline
-            $aaa = $this->m_master->chkTgl($Input[$i]->Deadline,$DeadLinePayment);
+            //$aaa = $this->m_master->chkTgl($Input[$i]->Deadline,$DeadLinePayment);
+            $aaa = true;
             if (!$aaa) {
                 $bool = false;
                 break;
