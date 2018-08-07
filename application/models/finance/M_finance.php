@@ -1631,7 +1631,10 @@ class M_finance extends CI_Model {
         }
         else
         {
-          $arr['msg'] .= 'Va tidak bisa di update, error koneksi ke BNI with Name : '.$customer_name.'<br>';
+          // $arr['msg'] .= 'Va tidak bisa di update, error koneksi ke BNI with Name : '.$customer_name.'<br>';
+          $ID = $Input[$i]->ID;
+          $this->m_finance->delete_id_table($ID,'payment_students');
+          $arr['msg'] .= '';
         }
       }
       else

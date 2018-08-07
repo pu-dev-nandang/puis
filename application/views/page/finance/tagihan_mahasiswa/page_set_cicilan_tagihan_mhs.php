@@ -388,7 +388,6 @@
           console.log(result);*/
 
         if (bool) {
-          console.log(arrTemp);
           // hitung tanggal tidak boleh melewati cicilan sebelumnya
             var bool2 = true;
             for (var i = 0; i < arrTemp.length; i++) {
