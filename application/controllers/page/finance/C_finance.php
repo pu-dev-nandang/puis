@@ -808,40 +808,25 @@ class C_finance extends Finnance_Controler {
           $CountRow = $CountRow + 1;
           $selectPTID = $this->input->post('selectPTID');
           $selectSemester = $this->input->post('selectSemester');
+          $selectSemester = explode('.', $selectSemester);
           $maba = $this->input->post('maba');
          
           for ($i=2; $i < $CountRow; $i++) {
             $temp = array();
             $NPM = $objWorksheet->getCellByColumnAndRow(0, $i)->getCalculatedValue();
-            // get payment
-               $auth = $this->m_master->caribasedprimary('db_academic.auth_students','NPM',$NPM);
-               $Pay_Cond = $auth[0]['Pay_Cond'];
-               $Year = $auth[0]['Year'];
-               $db = 'ta_'.$Year.'.students';
-               $ta = $this->m_master->caribasedprimary($db,'NPM',$NPM);
-               $ProdiID = $ta[0]['ProdiID'];
+            $PTID = $selectPTID;
+            $SemesterID = $selectSemester[0];
+            $sql = 'select ID from db_finance.payment where PTID = "'.$PTID.'"  and SemesterID = "'.$SemesterID.'" and NPM = "'.$NPM.'" and Status = "1" ';
+            $query=$this->db->query($sql, array())->result_array();
 
-               $payment = $this->m_finance->getPriceBaseBintang($selectPTID,$ProdiID,$Year,$Pay_Cond);
-               // check PTID, jika SKS / Credit dikali per sks yang diambil // 3 credit
-                  // check checklist mahasiswa baru atau tidak
-                if ($selectPTID == 3) {
-                    if ($maba == 1) {
-                        $ProStuDefaultCredit = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
-                        $DefaultCredit = $ProStuDefaultCredit[0]['DefaultCredit'];
-                        $payment = (int)$payment * (int)$DefaultCredit;
-                    }
-                    else
-                    {
-                        // '.$db.'.study_planning
-                        $Credit = $this->m_finance->getSKSMahasiswa('ta_'.$Year,$NPM);
-                        $payment = (int)$payment * (int)$Credit;
-                    }
-                }
-
-            $aa = $this->m_finance->insertaDataPayment($selectPTID,$selectSemester,$NPM,$payment,0,"1",$this->session->userdata('NIP'));
-            if ($aa != 0) {
-                $bb = $this->m_finance->insertaDataPaymentStudents($aa,$payment,0,'0000-00-00 00:00:00',1);
-            }
+            $ID_payment = $query[0]['ID'];
+            $dataSave = array(
+                    'Status' => 1,
+                    'BilingID' => 0,
+                            );
+            $this->db->where('ID_payment',$ID_payment);
+            $this->db->where('Status',0);
+            $this->db->update('db_finance.payment_students', $dataSave);
             
           }
           
@@ -867,6 +852,8 @@ class C_finance extends Finnance_Controler {
           $CountRow = $CountRow + 1;
           $selectPTID = $this->input->post('selectPTID');
           $selectSemester = $this->input->post('selectSemester');
+          $selectSemester = explode('.', $selectSemester);
+          $selectSemester = $selectSemester[0];
           $maba = $this->input->post('maba');
          
           for ($i=2; $i < $CountRow; $i++) {
