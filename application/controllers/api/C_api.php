@@ -1817,14 +1817,17 @@ class C_api extends CI_Controller {
                 return print_r($insert_id);
             }
             else if($data_arr['action']=='searchByGroup'){
-                $data = $this->db->query('SELECT sdc.ID AS SDCID, sdc.ScheduleID, ps.NameEng,s.ID AS ProdiEng,sdc.CDID , cd.Semester, cr.Year FROM db_academic.schedule_details_course sdc 
+                $data = $this->db->query('SELECT sdc.ID AS SDCID, sdc.ScheduleID, ps.NameEng,s.ID AS ProdiEng,sdc.CDID , 
+                                                    cd.Semester, cr.Year, mk.MKCode, s.ClassGroup 
+                                                    FROM db_academic.schedule_details_course sdc 
                                                     LEFT JOIN db_academic.schedule s ON (s.ID = sdc.ScheduleID)
                                                     LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
                                                     LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                                     LEFT JOIN db_academic.curriculum cr ON (cr.ID = cd.CurriculumID)
+                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
                                                     WHERE s.SemesterID = "'.$data_arr['SemesterID'].'" 
                                                     AND s.ClassGroup 
-                                                    LIKE "%'.$data_arr['ClassGroup'].'%" ORDER BY cr.Year DESC ')->result_array();
+                                                    LIKE "%'.$data_arr['ClassGroup'].'%" ORDER BY cr.Year DESC LIMIT 5')->result_array();
 
                 if(count($data)>0){
                     for($c=0;$c<count($data);$c++){
@@ -2706,14 +2709,27 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action']=='addCombine'){
                 $dataInsert = (array) $data_arr['dataInsert'];
-                $this->db->insert('db_academic.schedule_details_course',$dataInsert);
 
-                // Update CombineCLass
-                $this->db->set('CombinedClasses', '1');
-                $this->db->where('ID', $dataInsert['ScheduleID']);
-                $this->db->update('db_academic.schedule');
 
-                return print_r(1);
+                // Cek apakah sudah di masukan apa belum
+                $dataS = $this->db->query('SELECT * FROM db_academic.schedule_details_course sdc WHERE sdc.ProdiID = "'.$dataInsert['ProdiID'].'" 
+                                                                    AND sdc.CDID = "'.$dataInsert['CDID'].'" ')->result_array();
+
+                if(count($dataS)<=0){
+                    $this->db->insert('db_academic.schedule_details_course',$dataInsert);
+
+                    // Update CombineCLass
+                    $this->db->set('CombinedClasses', '1');
+                    $this->db->where('ID', $dataInsert['ScheduleID']);
+                    $this->db->update('db_academic.schedule');
+                    return print_r(1);
+                } else {
+                    return print_r(0);
+                }
+
+
+
+
 
             }
             else if($data_arr['action']=='getScheduleGC'){

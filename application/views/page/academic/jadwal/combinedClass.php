@@ -99,12 +99,15 @@
     });
 
     $('#searchClassGroup').keyup(function () {
-        var  SemesterID = $('#formCC_SemesterID').val();
-        var url = base_url_js+'api/__getClassGroupAutoComplete/'+SemesterID+'/';
-        $("#searchClassGroup").autocomplete({
-            source: url,
-            minLength: 2
-        });
+
+        loadSearchGroup();
+
+        // var  SemesterID = $('#formCC_SemesterID').val();
+        // var url = base_url_js+'api/__getClassGroupAutoComplete/'+SemesterID+'/';
+        // $("#searchClassGroup").autocomplete({
+        //     source: url,
+        //     minLength: 2
+        // });
     });
 
     $('#btnSaveAddCC').click(function () {
@@ -137,13 +140,22 @@
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'api/__crudCombinedClass';
             $.post(url,{token:token},function (result) {
-                toastr.success('Saved','Success');
+
+                if(result==0 || result=='0'){
+                    toastr.warning('Data Exist','Warning');
+                } else if(result==1 || result=='1'){
+                    toastr.success('Saved','Success');
+                    loadSearchGroup();
+                }
+
                 setTimeout(function () {
                     $('#btnSaveAddCC').prop('disabled',false).html('Save');
                     $('#filterCC_Prodi,#formCC_addProdi').val('');
                     $('#dvCC_Course').html('-');
                     $('#formCC_ClassGroup').empty();
                 },500);
+
+
             });
         }
 
@@ -174,7 +186,7 @@
 
                         $('#trCombinedCl').append('<tr id="trID'+d.SDCID+'" >' +
                             '<td>' +
-                            '<b>'+d.NameEng+'</b><br/><i>Semester '+d.Semester+'</i>' +
+                            '<b>'+d.NameEng+'</b><br/><i>Semester '+d.Semester+'</i> |  <span style="color: orangered;">'+d.ClassGroup+'</span> | <span style="color: blue;">'+d.MKCode+'</span>' +
                             '</td>' +
                             '<td>'+btnAct+'</td>' +
                             '</tr>');
