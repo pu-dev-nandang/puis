@@ -93,6 +93,19 @@
                 </div>
             </div>
         </div>
+        <div class="form-group"> 
+            <div class="row">
+                <div class="col-sm-3">
+                    <label class="control-label">Request Layout:</label>
+                </div>    
+                <div class="col-sm-6">
+                    <input type="file" data-style="fileinput" id="ExFile">
+                    <br>
+                    <b>If no Upload then using Default Layout</b><br>
+                    <a href="<?php echo base_url('fileGetAny/vreservation-aa.pdf'); ?>" target="_blank"></i>Click Default Layout</a>
+                </div>
+            </div>
+        </div>
         <div style="text-align: center;">       
     		<div class="col-sm-12" id="BtnFooter">
                 <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>

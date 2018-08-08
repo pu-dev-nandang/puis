@@ -12,6 +12,7 @@ class C_global extends Vreservation_Controler {
         $this->load->model('m_api');
         $this->load->library('JWT');
         $this->load->model('master/m_master');
+        $this->load->model('vreservation/m_reservation');
     }
 
 
@@ -48,109 +49,157 @@ class C_global extends Vreservation_Controler {
 
     }
 
-    public function getschedule()
+    // public function getschedule()
+    // {
+    //     // get room
+    //     $getRoom = $this->m_master->showData_array('db_academic.classroom');
+    //     $endTime = '18';
+    //     $getHoursNow = date('H');
+    //     $getHoursNow = (int)$getHoursNow;
+    //     $data['getRoom'] = $getRoom;
+    //     $arrHours = array();
+
+    //     // array list booked and requested
+    //     $data_pass = array(
+    //         array(
+    //             'user'  => 'User 1',
+    //             'start' => '10.30',
+    //             'end'   => '12.00',
+    //             'time'  => 90,
+    //             'colspan' => 3,
+    //             'agenda' => 'meeting',
+    //             'room' => 503,
+    //             'approved' => 1
+    //         ),
+    //         array(
+    //             'user'  => 'User 6',
+    //             'start' => '08.00',
+    //             'end'   => '10.00',
+    //             'time'  => 120,
+    //             'colspan' => 4,
+    //             'agenda' => 'meeting',
+    //             'room' => 504,
+    //             'approved' => 1
+    //         ),
+
+    //         array(
+    //             'user'  => 'User 5',
+    //             'start' => '13.00',
+    //             'end'   => '15.30',
+    //             'time'  => 150,
+    //             'colspan' => 5,
+    //             'agenda' => 'meeting',
+    //             'room' => 503,
+    //             'approved' => 1
+    //         ),
+            
+    //         array(
+    //             'user'  => 'User 1',
+    //             'start' => '13.00',
+    //             'end'   => '15.00',
+    //             'time'  => 120,
+    //             'colspan' => 4,
+    //             'agenda' => 'meeting',
+    //             'room' => 506,
+    //             'approved' => 1
+    //         ),
+
+    //         array(
+    //             'user'  => 'User 1',
+    //             'start' => '10.30',
+    //             'end'   => '12.00',
+    //             'time'  => 90,
+    //             'colspan' => 3,
+    //             'agenda' => 'meeting',
+    //             'room' => 505,
+    //             'approved' => 0
+    //         ),
+    //         array(
+    //             'user'  => 'User 4',
+    //             'start' => '16.30',
+    //             'end'   => '17.00',
+    //             'time'  => 120,
+    //             'colspan' => 1,
+    //             'agenda' => 'requested',
+    //             'room' => 503,
+    //             'approved' => 0
+    //         ),
+
+    //         array(
+    //             'user'  => 'User 3',
+    //             'start' => '13.00',
+    //             'end'   => '15.00',
+    //             'time'  => 120,
+    //             'colspan' => 4,
+    //             'agenda' => 'requested',
+    //             'room' => 507,
+    //             'approved' => 0
+    //         ),
+            
+    //         array(
+    //             'user'  => 'User 2',
+    //             'start' => '13.00',
+    //             'end'   => '14.30',
+    //             'time'  => 90,
+    //             'colspan' => 3,
+    //             'agenda' => 'requested',
+    //             'room' => 508,
+    //             'approved' => 0
+    //         ),
+    //     );
+
+    //     // SORTING ASC
+    //     usort($data_pass, function($a, $b) {
+    //         return $a['room'] - $b['room'];
+    //     });
+
+    //     for ($i=7; $i < $endTime; $i++) { 
+    //         // check len
+    //         $a = $i;
+    //         for ($j=0; $j < 2 - strlen($i); $j++) { 
+    //             $a = '0'.$a;
+    //         }
+    //         $d = $a.':30';
+    //         $a = $a.':00';
+    //         $arrHours[] = date("h:i a", strtotime($a));
+    //         //$arrHours[] = date("h:i a", strtotime($d));
+    //         if ($i != $endTime) {
+    //             $arrHours[] = date("h:i a", strtotime($d));
+    //         }
+    //     }
+    //     $data['arrHours'] = $arrHours;
+    //     $data['data_pass'] = $data_pass;
+    //     $content = $this->load->view($this->pathView.'schedule',$data,true);
+    //     echo json_encode($content);
+    // }
+
+    public function getschedule($date = null)
     {
         // get room
         $getRoom = $this->m_master->showData_array('db_academic.classroom');
+        // get data classroom
+        if ($date== null) {
+            $date = date('Y-m-d');
+        }
+            $datetime = DateTime::createFromFormat('Y-m-d', $date);
+            $NameDay = $datetime->format('l');
+            $data1 = $this->m_reservation->getDataClassroomAcademic($NameDay,$date);
+
+
+
         $endTime = '18';
         $getHoursNow = date('H');
         $getHoursNow = (int)$getHoursNow;
         $data['getRoom'] = $getRoom;
         $arrHours = array();
 
-        // array list booked and requested
-        $data_pass = array(
-            array(
-                'user'  => 'User 1',
-                'start' => '10.30',
-                'end'   => '12.00',
-                'time'  => 90,
-                'colspan' => 3,
-                'agenda' => 'meeting',
-                'room' => 503,
-                'approved' => 1
-            ),
-            array(
-                'user'  => 'User 6',
-                'start' => '08.00',
-                'end'   => '10.00',
-                'time'  => 120,
-                'colspan' => 4,
-                'agenda' => 'meeting',
-                'room' => 504,
-                'approved' => 1
-            ),
-
-            array(
-                'user'  => 'User 5',
-                'start' => '13.00',
-                'end'   => '15.30',
-                'time'  => 150,
-                'colspan' => 5,
-                'agenda' => 'meeting',
-                'room' => 503,
-                'approved' => 1
-            ),
-            
-            array(
-                'user'  => 'User 1',
-                'start' => '13.00',
-                'end'   => '15.00',
-                'time'  => 120,
-                'colspan' => 4,
-                'agenda' => 'meeting',
-                'room' => 506,
-                'approved' => 1
-            ),
-
-            array(
-                'user'  => 'User 1',
-                'start' => '10.30',
-                'end'   => '12.00',
-                'time'  => 90,
-                'colspan' => 3,
-                'agenda' => 'meeting',
-                'room' => 505,
-                'approved' => 0
-            ),
-            array(
-                'user'  => 'User 4',
-                'start' => '16.30',
-                'end'   => '17.00',
-                'time'  => 120,
-                'colspan' => 1,
-                'agenda' => 'requested',
-                'room' => 503,
-                'approved' => 0
-            ),
-
-            array(
-                'user'  => 'User 3',
-                'start' => '13.00',
-                'end'   => '15.00',
-                'time'  => 120,
-                'colspan' => 4,
-                'agenda' => 'requested',
-                'room' => 507,
-                'approved' => 0
-            ),
-            
-            array(
-                'user'  => 'User 2',
-                'start' => '13.00',
-                'end'   => '14.30',
-                'time'  => 90,
-                'colspan' => 3,
-                'agenda' => 'requested',
-                'room' => 508,
-                'approved' => 0
-            ),
-        );
-
+        $data_pass = $data1;
         // SORTING ASC
-        usort($data_pass, function($a, $b) {
-            return $a['room'] - $b['room'];
-        });
+            usort($data_pass, function($a, $b) {
+                return $a['room'] - $b['room'];
+            });
+        // print_r($data_pass);
+        // die();
 
         for ($i=7; $i < $endTime; $i++) { 
             // check len
