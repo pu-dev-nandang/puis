@@ -1759,6 +1759,24 @@ class C_api extends CI_Controller {
         echo json_encode($getData);
     }
 
+    public function getClassGroupAutoComplete($SemesterID){
+        $term = $this->input->get('term');
+        $data = $this->db->query('SELECT ID,ClassGroup FROM db_academic.schedule 
+                                      WHERE SemesterID = "'.$SemesterID.'" AND ClassGroup LIKE "%'.$term.'%" LIMIT 7 ')->result_array();
+
+        $dataRes = [];
+        for($i=0;$i<count($data);$i++){
+            $arrp = array(
+               'ID' => $data[$i]['ID'],
+               'label' => $data[$i]['ClassGroup'],
+               'value' => $data[$i]['ClassGroup']
+            );
+            array_push($dataRes,$arrp);
+        }
+
+        return print_r(json_encode($dataRes));
+    }
+
     public function crudStudyPlanning()
     {
         $data_arr = $this->getInputToken();
@@ -1791,6 +1809,42 @@ class C_api extends CI_Controller {
                 $insert_id = $this->db->insert_id();
 
                 return print_r($insert_id);
+            }
+            else if($data_arr['action']=='searchByGroup'){
+                $data = $this->db->query('SELECT ps.NameEng,s.ID AS ProdiEng,sdc.CDID , cd.Semester, cr.Year FROM db_academic.schedule_details_course sdc 
+                                                    LEFT JOIN db_academic.schedule s ON (s.ID = sdc.ScheduleID)
+                                                    LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
+                                                    LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                                    LEFT JOIN db_academic.curriculum cr ON (cr.ID = cd.CurriculumID)
+                                                    WHERE s.SemesterID = "'.$data_arr['SemesterID'].'" 
+                                                    AND s.ClassGroup 
+                                                    LIKE "%'.$data_arr['ClassGroup'].'%" ORDER BY cr.Year DESC ')->result_array();
+
+                if(count($data)>0){
+                    for($c=0;$c<count($data);$c++){
+                        // Semester Saat Ini
+                        $dataTotalSmt = $this->db->query('SELECT s.Status FROM db_academic.semester s 
+                                                    WHERE s.ID >= (SELECT ID FROM db_academic.semester s2 
+                                                    WHERE s2.Year="'.$data[$c]['Year'].'" 
+                                                    LIMIT 1)')->result_array();
+
+                        $smt = 0;
+                        for($s=0;$s<count($dataTotalSmt);$s++){
+                            if($dataTotalSmt[$s]['Status']=='1'){
+                                $smt += 1;
+                                break;
+                            } else {
+                                $smt += 1;
+                            }
+                        }
+
+                        $data[$c]['Semester'] = $smt;
+                    }
+                }
+
+
+
+                return print_r(json_encode($data));
             }
         }
 

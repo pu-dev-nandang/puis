@@ -115,6 +115,49 @@
     /* Add by Adhi 20180702 */
     .btn-convert { background-color: hsl(145, 62%, 68%) !important; background-repeat: repeat-x; filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#cdf3dd", endColorstr="#7adfa4"); background-image: -khtml-gradient(linear, left top, left bottom, from(#cdf3dd), to(#7adfa4)); background-image: -moz-linear-gradient(top, #cdf3dd, #7adfa4); background-image: -ms-linear-gradient(top, #cdf3dd, #7adfa4); background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #cdf3dd), color-stop(100%, #7adfa4)); background-image: -webkit-linear-gradient(top, #cdf3dd, #7adfa4); background-image: -o-linear-gradient(top, #cdf3dd, #7adfa4); background-image: linear-gradient(#cdf3dd, #7adfa4); border-color: #7adfa4 #7adfa4 hsl(145, 62%, 63%); color: #333 !important; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.33); -webkit-font-smoothing: antialiased; }
 
+
+    .ui-autocomplete {
+        display: block;
+        position: absolute;
+        z-index: 1000;
+        cursor: default;
+        padding: 0;
+        margin-top: 2px;
+        list-style: none;
+        background-color: #ffffff;
+        border: 1px solid #ccc;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+        -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+
+        width: auto !important;
+        min-width: 115px !important;
+    }
+    .ui-autocomplete > li {
+        padding: 3px 10px;
+    }
+    .ui-autocomplete > li.ui-menu-item a {
+        /*font-weight: bold;*/
+        color:#333;
+        text-decoration: none;
+    }
+
+    .ui-autocomplete > li.ui-menu-item:hover {
+        background: #083f88;
+        color: #FFFFFF;
+    }
+    .ui-autocomplete > li.ui-menu-item:hover a {
+        color: #FFFFFF;
+    }
+
+
+
+    .ui-helper-hidden-accessible {
+        display: block;
+    }
 </style>
 
 <!--=== JavaScript ===-->

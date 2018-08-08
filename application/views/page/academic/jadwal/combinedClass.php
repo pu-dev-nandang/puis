@@ -1,4 +1,3 @@
-
 <div class="col-md-12" style="text-align: center;">
     <h4 id="viewCC_Semester"></h4>
     <hr/>
@@ -54,17 +53,15 @@
         </div>
         <div class="widget-content">
             <div class="row">
-                <div class="col-xs-4">
-                    <div class="form-group">
-                        <label>Select Prodi</label>
-                        <select class="form-control selc-prodi" id="filterCC_ProdiDell"></select>
+                <div class="col-xs-5">
+
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="searchClassGroup" placeholder="Search by group class">
+                                        <span class="input-group-btn">
+                        <button class="btn btn-primary" id="btnSearchGroup" type="button"><span class="glyphicon glyphicon-search" style="margin-right: 5px;"></span> Show timetables</button>
+                      </span>
                     </div>
-                </div>
-                <div class="col-xs-4">
-                    <div class="form-group">
-                        <label>Select Group Class</label>
-                        <div id="div_formCC_ClassGroupDell">-</div>
-                    </div>
+                    <hr/>
                 </div>
             </div>
 
@@ -77,9 +74,7 @@
                             <th style="width: 7%;">Action</th>
                         </tr>
                         </thead>
-                        <tbody id="trCombinedCl">
-
-                        </tbody>
+                        <tbody id="trCombinedCl"></tbody>
                     </table>
                 </div>
             </div>
@@ -97,6 +92,48 @@
         $('.selc-prodi').append('<option value="" selected disabled>--- Select Prodi ---</option>');
         loadSelectOptionBaseProdi('.selc-prodi');
 
+    });
+
+    $('#btnSearchGroup').click(function () {
+        var searchClassGroup = $('#searchClassGroup').val();
+
+        if(searchClassGroup!='' && searchClassGroup!=null){
+            var data = {
+                action : 'searchByGroup',
+                SemesterID : $('#formCC_SemesterID').val(),
+                ClassGroup : searchClassGroup
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__crudStudyPlanning';
+            $.post(url,{token:token},function (jsonResult) {
+                if(jsonResult.length>0){
+
+                    var btnAct = (jsonResult.length>1) ? '<button class="btn btn-danger">Del</button>' : '-';
+
+                    $('#trCombinedCl').empty();
+
+                    for(var i=0;i<jsonResult.length;i++){
+                        var d = jsonResult[i];
+                        $('#trCombinedCl').append('<tr>' +
+                            '<td>' +
+                            '<b>'+d.NameEng+'</b><br/><i>Semester '+d.Semester+'</i>' +
+                            '</td>' +
+                            '<td>'+btnAct+'</td>' +
+                            '</tr>');
+                    }
+                }
+            });
+        }
+
+    });
+
+    $('#searchClassGroup').keyup(function () {
+        var  SemesterID = $('#formCC_SemesterID').val();
+        var url = base_url_js+'api/__getClassGroupAutoComplete/'+SemesterID+'/';
+        $("#searchClassGroup").autocomplete({
+            source: url,
+            minLength: 2
+        });
     });
 
     $('#btnSaveAddCC').click(function () {
