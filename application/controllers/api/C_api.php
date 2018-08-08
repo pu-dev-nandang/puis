@@ -2712,9 +2712,12 @@ class C_api extends CI_Controller {
 
 
                 // Cek apakah sudah di masukan apa belum
-                $dataS = $this->db->query('SELECT * FROM db_academic.schedule_details_course sdc WHERE sdc.ProdiID = "'.$dataInsert['ProdiID'].'" 
+                $dataS = $this->db->query('SELECT * FROM db_academic.schedule_details_course sdc WHERE 
+                                                                    sdc.ScheduleID = "'.$dataInsert['ScheduleID'].'"
+                                                                    AND sdc.ProdiID = "'.$dataInsert['ProdiID'].'" 
                                                                     AND sdc.CDID = "'.$dataInsert['CDID'].'" ')->result_array();
 
+                
                 if(count($dataS)<=0){
                     $this->db->insert('db_academic.schedule_details_course',$dataInsert);
 
