@@ -186,7 +186,7 @@
 
                         $('#trCombinedCl').append('<tr id="trID'+d.SDCID+'" >' +
                             '<td>' +
-                            '<b>'+d.NameEng+'</b><br/><i>Semester '+d.Semester+'</i> |  <span style="color: orangered;">'+d.ClassGroup+'</span> | <span style="color: blue;">'+d.MKCode+'</span>' +
+                            '<b>'+d.NameEng+'</b><br/><i>Semester '+d.Semester+'</i> | Group Class : <span style="color: orangered;">'+d.ClassGroup+'</span> | MKCode : <span style="color: blue;">'+d.MKCode+'</span>' +
                             '</td>' +
                             '<td>'+btnAct+'</td>' +
                             '</tr>');
