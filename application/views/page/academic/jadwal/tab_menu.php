@@ -145,6 +145,67 @@
         });
     });
 
+    $(document).on('click','.btn-sw-std',function () {
+
+        var SemesterID = $(this).attr('data-smtid');
+        var ScheduleID = $(this).attr('data-scheduleid');
+
+
+        var data = {
+         action : 'getDataStudents',
+           SemesterID : SemesterID,
+           ScheduleID : ScheduleID
+       };
+
+       var token = jwt_encode(data,'UAP)(*');
+       var url = base_url_js+'api/__crudSchedule';
+       $.post(url,{token:token},function (jsonResult) {
+           // console.log(jsonResult);
+
+           var dataHtml = '<h4>Students not yet</h4>';
+
+
+           if(jsonResult.length>0){
+
+               dataHtml = '<table class="table table-bordered">' +
+                   '    <thead>' +
+                   '    <tr style="background: #005975; color: #ffffff;">' +
+                   '        <th style="width: 20%;text-align: center;">NPM</th>' +
+                   '        <th style="text-align: center;">Name</th>' +
+                   '    </tr>' +
+                   '    </thead>' +
+                   '    <tbody id="dataMHS"></tbody>' +
+                   '</table>';
+
+
+           }
+
+           $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+               '<h4 class="modal-title">Group</h4>');
+           $('#GlobalModal .modal-body').html(dataHtml);
+           $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+           if(jsonResult.length>0){
+               for(var s=0;s<jsonResult.length;s++){
+                   var d = jsonResult[s];
+                   $('#dataMHS').append('<tr>' +
+                       '<td style="text-align: center;">'+d.NPM+'</td>' +
+                       '<td>'+d.Name+'</td>' +
+                       '</tr>');
+               }
+           }
+
+
+           $('#GlobalModal').modal({
+               'show' : true,
+               'backdrop' : 'static'
+           });
+
+       });
+
+
+    });
+
     function resetPenawaranMK() {
         $('#formSemester').val('');
         $('#box1View,#box1Storage,#box2View,#box2Storage').empty();

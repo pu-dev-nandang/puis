@@ -1133,6 +1133,14 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($dataG));
             }
 
+            else if($data_arr['action']=='getDataStudents'){
+                $SemesterID = $data_arr['SemesterID'];
+                $ScheduleID = $data_arr['ScheduleID'];
+                $data = $this->m_api->getStudentByScheduleID($SemesterID,$ScheduleID);
+
+                return print_r(json_encode($data));
+            }
+
         }
     }
 
@@ -1186,7 +1194,7 @@ class C_api extends CI_Controller {
             $nestedData[] = $courses;
             $nestedData[] = '<div style="text-align:center;">'.$row["Credit"].'</div>';
             $nestedData[] = $coor.''.$TeamTeaching;
-            $nestedData[] = '<div style="text-align:center;">'.$Students.'</div>';
+            $nestedData[] = '<div style="text-align:center;"><a href="javascript:void(0)" class="btn-sw-std" data-smtid="'.$row['SemesterID'].'" data-scheduleid="'.$row['ID'].'">'.$Students.'</a></div>';
             $nestedData[] = '<div style="text-align:center;">'.substr($row["StartSessions"],0,5).' - '.substr($row["EndSessions"],0,5).'</div>';
             $nestedData[] = '<div style="text-align:center;">'.$row["Room"].'</div>';
 
