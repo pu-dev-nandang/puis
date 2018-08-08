@@ -1459,15 +1459,20 @@ class M_api extends CI_Model {
                                             AND ay.SemesterID = "'.$SemesterIDActive.'" ')->result_array();
         }
 
-        $dataCekbayarBPP = $this->db->query('SELECT p.* FROM db_academic.semester s
+
+
+        if(count($data)>0){
+            $dataCekbayarBPP = $this->db->query('SELECT p.* FROM db_academic.semester s
                                                     LEFT JOIN db_finance.payment p ON (s.ID = p.SemesterID) 
                                                     WHERE p.PTID = "2" 
                                                     AND p.NPM = "'.$NPM.'" 
                                                     AND s.Status = 1 ')->result_array();
-
-        if(count($data)>0){
             $data[0]['PaymentDetails'] = $dataCekbayarBPP;
         }
+//        else {
+//            $data = $this->db->query('SELECT ay.krsStart,ay.krsEnd,ay.SemesterID FROM  db_academic.academic_years ay
+//                                            WHERE ay.SemesterID = "'.$SemesterIDActive.'" ')->result_array();
+//        }
         return $data;
     }
 
@@ -2599,5 +2604,32 @@ class M_api extends CI_Model {
         return $data;
     }
 
+
+    public function getStudentByScheduleID($SemesterID,$ScheduleID){
+
+        $dataCl = $this->getClassOf();
+
+        $arrDataStd = [];
+        if(count($dataCl)>0){
+            for($i=0;$i<count($dataCl);$i++){
+                $db_ = 'ta_'.$dataCl[$i]['Year'];
+
+                $data = $this->db->query('SELECT s.NPM,s.Name FROM '.$db_.'.study_planning sp 
+                                                    LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
+                                                    WHERE sp.SemesterID ="'.$SemesterID.'" 
+                                                    AND sp.ScheduleID = "'.$ScheduleID.'" ')->result_array();
+
+                if(count($data)>0){
+                    for($s=0;$s<count($data);$s++){
+                        array_push($arrDataStd,$data[$s]);
+                    }
+                }
+
+            }
+        }
+
+        return $arrDataStd;
+
+    }
 
 }

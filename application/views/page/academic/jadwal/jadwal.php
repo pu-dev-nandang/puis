@@ -48,33 +48,6 @@
 
 </div>
 
-<!--<div class="thumbnail hide" style="padding: 5px;">-->
-<!--    <label class="checkbox-inline">-->
-<!--        <input type="checkbox" id="filterDayCheckAll" class="filterDay" value="0" checked> All Days-->
-<!--    </label>-->
-<!--    <label class="checkbox-inline">-->
-<!--        <input type="checkbox" class="filterDay" value="1"> Monday-->
-<!--    </label>-->
-<!--    <label class="checkbox-inline">-->
-<!--        <input type="checkbox" class="filterDay" value="2"> Tuesday-->
-<!--    </label>-->
-<!--    <label class="checkbox-inline">-->
-<!--        <input type="checkbox" class="filterDay" value="3"> Wednesday-->
-<!--    </label>-->
-<!--    <label class="checkbox-inline">-->
-<!--        <input type="checkbox" class="filterDay" value="4"> Thrusday-->
-<!--    </label>-->
-<!--    <label class="checkbox-inline">-->
-<!--        <input type="checkbox" class="filterDay" value="5"> Friday-->
-<!--    </label>-->
-<!--    <label class="checkbox-inline" style="color: red;">-->
-<!--        <input type="checkbox" class="filterDay" value="6"> Saturday-->
-<!--    </label>-->
-<!--    <label class="checkbox-inline" style="color: red;">-->
-<!--        <input type="checkbox" class="filterDay" value="7"> Sunday-->
-<!--    </label>-->
-<!--</div>-->
-
 <div id="dataScedule" style="margin-top: 30px;">
 </div>
 
