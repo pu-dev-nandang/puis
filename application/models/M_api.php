@@ -2632,4 +2632,78 @@ class M_api extends CI_Model {
 
     }
 
+    public function __getSimpleSearch($key){
+
+        // Student
+        $dataClass = $this->getClassOf();
+        $selcStd = '';
+        $joinStd = '';
+        $whereStd = '';
+        for($c=0;$c<count($dataClass);$c++){
+            $db_ = 'ta_'.$dataClass[$c]['Year'];
+
+            $slc = 's'.$c.'.Name Name'.$c.',';
+            $selcStd = $selcStd.' '.$slc;
+
+            $std = ' LEFT JOIN '.$db_.'.students s'.$c.' ON (s'.$c.'.NPM = ast.NPM ) ';
+            $joinStd = $joinStd.' '.$std;
+
+            $w = 's'.$c.'.Name LIKE "%'.$key.'%" OR ';
+            $whereStd = $whereStd.' '.$w;
+        }
+
+        $dataS = $this->db->query('SELECT '.$selcStd.' ast.NPM FROM db_academic.auth_students ast '.$joinStd.'
+                                    WHERE  '.$whereStd.' ast.NPM LIKE "%'.$key.'%" 
+                                    LIMIT 5')->result_array();
+
+        $result = [];
+        if(count($dataS)>0){
+
+            for($dt=0;$dt<count($dataS);$dt++){
+                $d = $dataS[$dt];
+                $Name = '';
+                for($c=0;$c<count($dataClass);$c++){
+                    if($d['Name'.$c]!='' && $d['Name'.$c]!=null){
+                        $Name = $d['Name'.$c];
+                        break;
+                    }
+                }
+                $arr = array(
+                    'Name' => $Name,
+                    'Username' => $d['NPM'],
+                    'Flag' => 'std'
+                );
+
+                array_push($result,$arr);
+            }
+
+        }
+
+        $dataEm = $this->db->query('SELECT em.NIP, em.Name, em.Password, em.PositionMain, em.PositionOther1, em.PositionOther2, em.PositionOther3 FROM db_employees.employees em 
+                                              WHERE em.Name LIKE "%'.$key.'%" OR em.NIP LIKE "%'.$key.'%"
+                                               LIMIT 5')->result_array();
+
+        if(count($dataEm)>0){
+            for($e=0;$e<count($dataEm);$e++){
+                $d = $dataEm[$e];
+                $arr = array(
+                    'Name' => $d['Name'],
+                    'Username' => $d['NIP'],
+                    'Token' => $d['Password'],
+                    'Flag' => 'emp',
+                    'Position' => [$d['PositionMain'],$d['PositionOther1'],$d['PositionOther2'],$d['PositionOther3']]
+                );
+
+                array_push($result,$arr);
+            }
+        }
+
+
+
+
+        return $result;
+
+
+    }
+
 }

@@ -95,18 +95,6 @@
 
     });
 
-    $(document).on('click','.btnLoginPortalStudents',function () {
-
-        var NPM = $(this).attr('data-npm');
-
-        var token = jwt_encode({NPM:NPM},'s3Cr3T-G4N');
-
-        var url = base_url_portal_students+'auth/loginFromAkademik?token='+token;
-        PopupCenter(url,'xtf','1300','500');
-
-    });
-
-
     // Change Password Students
     $(document).on('click','.btn-reset-password',function () {
 
@@ -241,6 +229,8 @@
 
 
     });
+
+    // .btnLoginPortalStudents -> ada di header
 
     function loadPage() {
 
