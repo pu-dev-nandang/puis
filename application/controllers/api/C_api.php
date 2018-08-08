@@ -1827,7 +1827,7 @@ class C_api extends CI_Controller {
                                                     LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
                                                     WHERE s.SemesterID = "'.$data_arr['SemesterID'].'" 
                                                     AND s.ClassGroup 
-                                                    LIKE "%'.$data_arr['ClassGroup'].'%" ORDER BY cr.Year DESC LIMIT 5')->result_array();
+                                                    LIKE "%'.$data_arr['ClassGroup'].'%" ORDER BY cr.Year DESC LIMIT 10')->result_array();
 
                 if(count($data)>0){
                     for($c=0;$c<count($data);$c++){
