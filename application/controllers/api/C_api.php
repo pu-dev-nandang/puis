@@ -2717,7 +2717,7 @@ class C_api extends CI_Controller {
                                                                     AND sdc.ProdiID = "'.$dataInsert['ProdiID'].'" 
                                                                     AND sdc.CDID = "'.$dataInsert['CDID'].'" ')->result_array();
 
-                
+
                 if(count($dataS)<=0){
                     $this->db->insert('db_academic.schedule_details_course',$dataInsert);
 
@@ -2814,6 +2814,13 @@ class C_api extends CI_Controller {
     {
         $arr = $this->m_reservation->get_m_additional_personel();
         echo json_encode($arr);
+    }
+
+
+    public function getSimpleSearch(){
+        $key = $this->input->get('key');
+        $data = $this->m_api->__getSimpleSearch($key);
+        return print_r(json_encode($data));
     }
 
 

@@ -10,6 +10,10 @@
         overflow-y: auto;
     }
 
+    #tableSimpleSearch tr th,#tableSimpleSearch tr td {
+        text-align: center;
+    }
+
 </style>
 
 <!-- Header -->
@@ -84,8 +88,10 @@
                 <ul class="dropdown-menu">
                     <li class="<?php if($this->uri->segment(2)=='lecturers'){echo 'active';} ?>"><a href="<?php echo base_url('database/lecturers'); ?>">Lecturers</a></li>
                     <li class="<?php if($this->uri->segment(2)=='students'){echo 'active';} ?>"><a href="<?php echo base_url('database/students'); ?>">Students</a></li>
-                    <li class="divider"></li>
+<!--                    <li class="divider"></li>-->
                     <li class="<?php if($this->uri->segment(2)=='employees'){echo 'active';} ?>"><a href="<?php echo base_url('database/employees'); ?>">Employees</a></li>
+                    <li class="divider"></li>
+                    <li class=""><a href="javascript:void(0);" id="btnSimpleSearch"><i class="fa fa-search" aria-hidden="true"></i> Simple Search</a></li>
                 </ul>
             </li>
 
@@ -184,6 +190,87 @@
         });
     });
 
+    $('#btnSimpleSearch').click(function () {
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Simple Search</h4>');
+
+        var htmlss = '<div class="row">' +
+            '        <div class="col-md-12">' +
+            '            <div class="input-group">' +
+            '                <input type="text" id="formSimpleSearch" class="form-control" placeholder="Search by NIM, NIP, Name . . .">' +
+            '                        <span class="input-group-btn">' +
+            '                <button class="btn btn-default" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>' +
+            '              </span>' +
+            '            </div><!-- /input-group -->' +
+            '        </div>' +
+            '        <div class="col-md-12"><hr/>' +
+            '            <table class="table table-bordered" id="tableSimpleSearch">' +
+            '                <thead>' +
+            '                <tr style="background: #438882;color: #fff;">' +
+            '                    <th>User</th>' +
+            '                    <th style="width: 5%;">Action</th>' +
+            '                    <th style="width: 5%;">Portal</th>' +
+            '                </tr>' +
+            '                </thead>' +
+            '                <tbody id="trDataUser"></tbody>' +
+            '            </table>' +
+            '        </div>' +
+            '    </div>';
+
+        $('#GlobalModal .modal-body').html(htmlss);
+
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+        $('#GlobalModal').on('shown.bs.modal', function () {
+            $('#formSimpleSearch').focus();
+        })
+
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+    });
+
+    $(document).on('keyup','#formSimpleSearch',function () {
+        var formSimpleSearch = $('#formSimpleSearch').val();
+        if(formSimpleSearch!='' && formSimpleSearch!=null){
+            var url = base_url_js+'api/__getSimpleSearch?key='+formSimpleSearch;
+            $.getJSON(url,function (jsonResult) {
+                console.log(jsonResult);
+                $('#trDataUser').empty();
+                if(jsonResult.length>0){
+                    for(var i=0;i<jsonResult.length;i++){
+                        var d = jsonResult[i];
+
+                        var bg = '#fff';
+
+                        var btnLoginPortal = '-';
+                        if(d.Flag=='std'){
+                            btnLoginPortal = '<button class="btn btn-block btn-primary btnLoginPortalStudents" data-npm="'+d.Username+'"><i class="fa fa-sign-in right-margin"></i> Login Portal</button>';
+                        } else {
+                            bg = '#ffeb3b3b';
+
+                            if($.inArray('14.7',d.Position)!=-1 || $.inArray('14.6',d.Position)!=-1 || $.inArray('14.5',d.Position)!=-1){
+                                btnLoginPortal = '<button class="btn btn-block btn-success btnLoginPortal" data-nip="'+d.Username+'" data-password="'+d.Token+'"><i class="fa fa-sign-in right-margin"></i> Login Portal</button>';
+                            }
+                        }
+
+                        $('#trDataUser').append('<tr style="background: '+bg+';">' +
+                            '<td style="text-align: left;"><b>'+d.Name+'</b><br/><span>'+d.Username+'</span></td>' +
+                            '<td></td>' +
+                            '<td>'+btnLoginPortal+'</td>' +
+                            '</tr>');
+                    }
+                }
+                else {
+                    $('#trDataUser').append('<tr>' +
+                        '<td colspan="3">-- Data Not Yet --</td>' +
+                        '</tr>');
+                }
+            });
+        }
+    });
+
     $(document).on('click','#useLogOut',function () {
         $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Log Me Out </b><hr/> ' +
             '<button type="button" class="btn btn-primary btnActionLogOut" style="margin-right: 5px;">Yes</button>' +
@@ -192,7 +279,29 @@
         $('#NotificationModal').modal('show');
     });
 
+    $(document).on('click','.btnLoginPortalStudents',function () {
 
+        var NPM = $(this).attr('data-npm');
+
+        var token = jwt_encode({NPM:NPM},'s3Cr3T-G4N');
+
+        var url = base_url_portal_students+'auth/loginFromAkademik?token='+token;
+        PopupCenter(url,'xtf','1300','500');
+
+    });
+
+
+    $(document).on('click','#btnLoginPortal,.btnLoginPortal',function () {
+
+        var username = $(this).attr('data-nip');
+        var password = $(this).attr('data-password');
+
+        var token = jwt_encode({username:username,password:password},'s3Cr3T-G4N');
+
+        var url = base_url_portal_lecturers+'auth/loginFromAkademik?token='+token;
+        PopupCenter(url,'xtf','1300','500');
+
+    });
 
     $('.departement').click(function () {
         var url = base_url_js+'change-departement';
