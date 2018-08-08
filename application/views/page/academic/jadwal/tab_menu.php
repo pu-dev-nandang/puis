@@ -843,12 +843,12 @@
     $(document).on('change','#formCC_ClassGroupDell',function () {
         loadScheduleFromGC();
     });
-    $(document).on('click','#btnDellCombined',function (result) {
+    $(document).on('click','.btn-del-combined',function (result) {
         
         if(confirm('Delete data?')){
-            loading_buttonSm('#btnDellCombined');
             var SDCID = $(this).attr('data-sdcid');
             var ScheduleID = $(this).attr('data-id');
+            loading_buttonSm('.btn-del-combined[data-sdcid='+SDCID+']');
             var data = {
                 action : 'delSDCGL',
                 SDCID : SDCID,
@@ -859,8 +859,7 @@
             $.post(url,{token:token},function (result) {
                 toastr.success('Data deleted','Success');
                 setTimeout(function () {
-                    $('#filterCC_ProdiDell').val('');
-                    $('#formCC_ClassGroupDell,#trCombinedCl').empty();
+                    loadSearchGroup();
                 },500);
             });
         }

@@ -95,36 +95,7 @@
     });
 
     $('#btnSearchGroup').click(function () {
-        var searchClassGroup = $('#searchClassGroup').val();
-
-        if(searchClassGroup!='' && searchClassGroup!=null){
-            var data = {
-                action : 'searchByGroup',
-                SemesterID : $('#formCC_SemesterID').val(),
-                ClassGroup : searchClassGroup
-            };
-            var token = jwt_encode(data,'UAP)(*');
-            var url = base_url_js+'api/__crudStudyPlanning';
-            $.post(url,{token:token},function (jsonResult) {
-                if(jsonResult.length>0){
-
-                    var btnAct = (jsonResult.length>1) ? '<button class="btn btn-danger">Del</button>' : '-';
-
-                    $('#trCombinedCl').empty();
-
-                    for(var i=0;i<jsonResult.length;i++){
-                        var d = jsonResult[i];
-                        $('#trCombinedCl').append('<tr>' +
-                            '<td>' +
-                            '<b>'+d.NameEng+'</b><br/><i>Semester '+d.Semester+'</i>' +
-                            '</td>' +
-                            '<td>'+btnAct+'</td>' +
-                            '</tr>');
-                    }
-                }
-            });
-        }
-
+        loadSearchGroup();
     });
 
     $('#searchClassGroup').keyup(function () {
@@ -178,6 +149,40 @@
 
 
     });
+
+
+    function loadSearchGroup() {
+        var searchClassGroup = $('#searchClassGroup').val();
+
+        if(searchClassGroup!='' && searchClassGroup!=null){
+            var data = {
+                action : 'searchByGroup',
+                SemesterID : $('#formCC_SemesterID').val(),
+                ClassGroup : searchClassGroup
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__crudStudyPlanning';
+            $.post(url,{token:token},function (jsonResult) {
+                if(jsonResult.length>0){
+
+                    $('#trCombinedCl').empty();
+
+                    for(var i=0;i<jsonResult.length;i++){
+                        var d = jsonResult[i];
+
+                        var btnAct = (jsonResult.length>1) ? '<button class="btn btn-danger btn-del-combined" data-sdcid="'+d.SDCID+'" data-id="'+d.ScheduleID+'">Del</button>' : '-';
+
+                        $('#trCombinedCl').append('<tr id="trID'+d.SDCID+'" >' +
+                            '<td>' +
+                            '<b>'+d.NameEng+'</b><br/><i>Semester '+d.Semester+'</i>' +
+                            '</td>' +
+                            '<td>'+btnAct+'</td>' +
+                            '</tr>');
+                    }
+                }
+            });
+        }
+    }
 
 
     function loadCC_AcademicYearOnPublish(smt) {

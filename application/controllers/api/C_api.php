@@ -1708,8 +1708,6 @@ class C_api extends CI_Controller {
                     return print_r(json_encode($data));
                 }
 
-
-
             }
 
         }
@@ -1811,7 +1809,7 @@ class C_api extends CI_Controller {
                 return print_r($insert_id);
             }
             else if($data_arr['action']=='searchByGroup'){
-                $data = $this->db->query('SELECT ps.NameEng,s.ID AS ProdiEng,sdc.CDID , cd.Semester, cr.Year FROM db_academic.schedule_details_course sdc 
+                $data = $this->db->query('SELECT sdc.ID AS SDCID, sdc.ScheduleID, ps.NameEng,s.ID AS ProdiEng,sdc.CDID , cd.Semester, cr.Year FROM db_academic.schedule_details_course sdc 
                                                     LEFT JOIN db_academic.schedule s ON (s.ID = sdc.ScheduleID)
                                                     LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
                                                     LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
