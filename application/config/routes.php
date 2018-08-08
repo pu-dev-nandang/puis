@@ -515,6 +515,7 @@ $route['api/__checkSchedule'] = 'api/c_api/checkSchedule';
 $route['api/__crudCourseOfferings'] = 'api/c_api/crudCourseOfferings';
 $route['api/__crudLecturer'] = 'api/c_api/crudLecturer';
 $route['api/__crudStudyPlanning'] = 'api/c_api/crudStudyPlanning';
+$route['api/__getClassGroupAutoComplete/(:num)'] = 'api/c_api/getClassGroupAutoComplete/$1';
 
 
 $route['api/__filterStudents'] = 'api/c_api/filterStudents';
