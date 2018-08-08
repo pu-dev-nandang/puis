@@ -221,14 +221,10 @@
                     var mk = jsonResult[i].Details;
                     for(var m=0;m<mk.length;m++){
                         var dataMK = mk[m];
-                        // var schDisabled = (dataMK.ScheduleID!="") ? 'disabled' : '';
+                        var schDisabled = (dataMK.ScheduleID!="") ? 'disabled' : '';
 
-                        if(dataMK.ScheduleID!=""){
-
-                        } else {
-                            var asalSmt = (semester!=dataMK.Semester) ? '('+dataMK.Semester+')' : '';
-                            $('#formCC_MataKuliah').append('<option value="'+dataMK.CDID+'|'+dataMK.ID+'">Smt '+semester+' '+asalSmt+' - '+dataMK.MKCode+' | '+dataMK.MKNameEng+'</option>');
-                        }
+                        var asalSmt = (semester!=dataMK.Semester) ? '('+dataMK.Semester+')' : '';
+                        $('#formCC_MataKuliah').append('<option value="'+dataMK.CDID+'|'+dataMK.ID+'" '+schDisabled+'>Smt '+semester+' '+asalSmt+' - '+dataMK.MKCode+' | '+dataMK.MKNameEng+'</option>');
 
 
                     }
