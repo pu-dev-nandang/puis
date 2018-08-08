@@ -179,8 +179,10 @@ class M_rest extends CI_Model {
 
                         $data[$sc]['TeamTeachingDetails'] = [];
 
+
                         if($data[$sc]['TeamTeaching']==1){
-                            $dataTT = $this->db->query('SELECT e.NIP,e.Name,e.TitleAhead, e.TitleBehind FROM db_academic.schedule_team_teaching stt LEFT JOIN db_employees.employees e ON (e.NIP = stt.NIP)')->result_array();
+                            $dataTT = $this->db->query('SELECT e.NIP,e.Name,e.TitleAhead, e.TitleBehind FROM db_academic.schedule_team_teaching stt 
+                                                          LEFT JOIN db_employees.employees e ON (e.NIP = stt.NIP) WHERE stt.ScheduleID = "'.$data[$sc]['ScheduleID'].'" ')->result_array();
                             for($t=0;$t<count($dataTT);$t++){
                                 $Lecturer = $dataTT[$t]['TitleAhead'].' '.$dataTT[$t]['Name'].' '.$dataTT[$t]['TitleBehind'];
                                 $dataTT[$t]['Lecturer'] = trim($Lecturer);
