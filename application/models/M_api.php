@@ -1451,7 +1451,8 @@ class M_api extends CI_Model {
                 'krsStart' => $dataSC[0]['Start'],
                 'krsEnd' => $dataSC[0]['End'],
             );
-        } else {
+        }
+        else {
             $data = $this->db->query('SELECT ay.krsStart,ay.krsEnd,ay.SemesterID FROM  db_academic.academic_years ay
                                             WHERE ay.krsStart <= "'.$date.'" 
                                             AND ay.krsEnd >= "'.$date.'" 
