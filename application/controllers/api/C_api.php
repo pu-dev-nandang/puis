@@ -1848,6 +1848,12 @@ class C_api extends CI_Controller {
                         }
 
                         $data[$c]['Semester'] = $smt;
+
+                        $aarw = array(
+                            'SDCID' => $data[$c]['SDCID'],
+                            'ScheduleID' => $data[$c]['ScheduleID']
+                        );
+                        $data[$c]['D'] = $this->m_api->getStdCombinedClass($aarw);
                     }
                 }
 
@@ -2719,6 +2725,11 @@ class C_api extends CI_Controller {
 
 
                 if(count($dataS)<=0){
+
+                    // Hapus STD Dari KRS Online
+                    $this->m_api->kickStudent($data_arr['SemesterID'],$dataInsert['ScheduleID'],$dataInsert['CDID'],$dataInsert['ProdiID']);
+
+
                     $this->db->insert('db_academic.schedule_details_course',$dataInsert);
 
                     // Update CombineCLass
@@ -2753,22 +2764,10 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($dataCourse));
             }
             else if($data_arr['action']=='delSDCGL'){
-                $this->db->where('ID', $data_arr['SDCID']);
-                $this->db->delete('db_academic.schedule_details_course');
 
-                // cek apakah status combine update atau tidak
-                $dataC = $this->db->select('ID')
-                    ->get_where('db_academic.schedule_details_course',array('ScheduleID'=>$data_arr['ScheduleID']))
-                    ->result_array();
+                $data = $this->m_api->delCombinedClass($data_arr);
 
-                if(count($dataC)==1){
-
-                    $this->db->set('CombinedClasses', '0');
-                    $this->db->where('ID', $data_arr['ScheduleID']);
-                    $this->db->update('db_academic.schedule');
-                }
-
-                return print_r(1);
+                return print_r(json_encode($data));
 
             }
         }

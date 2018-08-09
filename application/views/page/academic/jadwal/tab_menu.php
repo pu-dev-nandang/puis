@@ -13,7 +13,6 @@
 
 
 <div class="row" style="margin-top: 30px;">
-
 <!--    <div class="col-md-4">-->
 <!--        <div class="">-->
 <!--            <label>Semester Antara</label>-->
@@ -917,11 +916,21 @@
             };
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'api/__crudCombinedClass';
-            $.post(url,{token:token},function (result) {
-                toastr.success('Data deleted','Success');
-                setTimeout(function () {
-                    loadSearchGroup();
-                },500);
+            $.post(url,{token:token},function (jsonResult) {
+
+                if(jsonResult.Status==1 || jsonResult.Status=='1'){
+                    toastr.success('Data deleted','Success');
+                    setTimeout(function () {
+                        loadSearchGroup();
+                    },500);
+                } else {
+                    toastr.error('Some students joined this group','Error');
+                    setTimeout(function (args) {
+                        $('.btn-del-combined[data-sdcid='+SDCID+']').html('Del').prop('disabled',false);
+                    },500);
+                }
+
+
             });
         }
         

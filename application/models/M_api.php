@@ -2702,7 +2702,221 @@ class M_api extends CI_Model {
 
 
         return $result;
+    }
 
+    public function delCombinedClass($data_arr){
+        // Cek apakah ada student atau tidak
+        $dataGetJad = $this->db->get_where('db_academic.schedule_details_course',
+            array('ID' => $data_arr['SDCID']),1)->result_array();
+
+        $getSmtAct = $this->_getSemesterActive();
+
+        $res_std = [];
+        $res_sp = [];
+        // cek apakah di std KRS ada ?
+        if(count($dataGetJad)>0){
+            for($i=0;$i<count($dataGetJad);$i++){
+
+                $d = $dataGetJad[$i];
+
+                $dataClass = $this->getClassOf();
+
+                for($c=0;$c<count($dataClass);$c++){
+
+                    $db_ = 'ta_'.$dataClass[$c]['Year'];
+                    $dataStd = $this->db->query('SELECT s.NPM FROM db_academic.std_krs sk 
+                                                          LEFT JOIN '.$db_.'.students s 
+                                                          ON (s.NPM = sk.NPM)
+                                                          WHERE sk.ScheduleID = "'.$d['ScheduleID'].'" 
+                                                          AND sk.SemesterID = "'.$getSmtAct['ID'].'"
+                                                          AND s.ProdiID = "'.$d['ProdiID'].'"
+                                                          ')->result_array();
+
+
+                    if(count($dataStd)>0){
+                        for($st=0;$st<count($dataStd);$st++){
+                            array_push($res_std,$dataStd[$st]['NPM']);
+                        }
+
+                    }
+
+                    $dataSp = $this->db->query('SELECT s.NPM FROM '.$db_.'.study_planning sp 
+                                                          LEFT JOIN '.$db_.'.students s 
+                                                          ON (s.NPM = sp.NPM)
+                                                          WHERE sp.ScheduleID = "'.$d['ScheduleID'].'" 
+                                                          AND sp.SemesterID = "'.$getSmtAct['ID'].'"
+                                                          AND s.ProdiID = "'.$d['ProdiID'].'"
+                                                          ')->result_array();
+
+                    if(count($dataSp)>0){
+                        for($sp=0;$sp<count($dataSp);$sp++){
+                            array_push($res_sp,$dataSp[$sp]['NPM']);
+                        }
+
+                    }
+
+
+                }
+
+            }
+        }
+
+        // Penggabungan Array
+        $result = $res_std;
+        if(count($res_std)>0 && count($res_sp)>0){
+            for($sp=0;$sp<count($res_sp);$sp++){
+                if(!in_array($res_sp[$sp],$result)){
+                    array_push($result,$res_sp[$sp]);
+                }
+            }
+
+        }
+        else if(count($res_std)<=0 && count($res_sp)>0) {
+            $result = $res_sp;
+        }
+
+        if(count($result)<=0){
+            $this->db->where('ID', $data_arr['SDCID']);
+            $this->db->delete('db_academic.schedule_details_course');
+
+            // cek apakah status combine update atau tidak
+            $dataC = $this->db->select('ID')
+                ->get_where('db_academic.schedule_details_course',array('ScheduleID'=>$data_arr['ScheduleID']))
+                ->result_array();
+
+            if(count($dataC)==1){
+
+                $this->db->set('CombinedClasses', '0');
+                $this->db->where('ID', $data_arr['ScheduleID']);
+                $this->db->update('db_academic.schedule');
+            }
+
+            $resT = array(
+                'Status' => 1,
+                'Details' => []
+            );
+        }
+        else {
+            $resT = array(
+                'Status' => 0,
+                'Details' => $result
+            );
+        }
+
+        return $resT;
+
+    }
+
+    public function getStdCombinedClass($data_arr){
+        // Cek apakah ada student atau tidak
+        $dataGetJad = $this->db->get_where('db_academic.schedule_details_course',
+            array('ID' => $data_arr['SDCID']),1)->result_array();
+
+        $getSmtAct = $this->_getSemesterActive();
+
+        $res_std = [];
+        $res_sp = [];
+        // cek apakah di std KRS ada ?
+        if(count($dataGetJad)>0){
+            for($i=0;$i<count($dataGetJad);$i++){
+
+                $d = $dataGetJad[$i];
+
+                $dataClass = $this->getClassOf();
+
+                for($c=0;$c<count($dataClass);$c++){
+
+                    $db_ = 'ta_'.$dataClass[$c]['Year'];
+                    $dataStd = $this->db->query('SELECT s.NPM FROM db_academic.std_krs sk 
+                                                          LEFT JOIN '.$db_.'.students s 
+                                                          ON (s.NPM = sk.NPM)
+                                                          WHERE sk.ScheduleID = "'.$d['ScheduleID'].'" 
+                                                          AND sk.SemesterID = "'.$getSmtAct['ID'].'"
+                                                          AND s.ProdiID = "'.$d['ProdiID'].'"
+                                                          ')->result_array();
+
+
+                    if(count($dataStd)>0){
+                        for($st=0;$st<count($dataStd);$st++){
+                            array_push($res_std,$dataStd[$st]['NPM']);
+                        }
+
+                    }
+
+                    $dataSp = $this->db->query('SELECT s.NPM FROM '.$db_.'.study_planning sp 
+                                                          LEFT JOIN '.$db_.'.students s 
+                                                          ON (s.NPM = sp.NPM)
+                                                          WHERE sp.ScheduleID = "'.$d['ScheduleID'].'" 
+                                                          AND sp.SemesterID = "'.$getSmtAct['ID'].'"
+                                                          AND s.ProdiID = "'.$d['ProdiID'].'"
+                                                          ')->result_array();
+
+                    if(count($dataSp)>0){
+                        for($sp=0;$sp<count($dataSp);$sp++){
+                            array_push($res_sp,$dataSp[$sp]['NPM']);
+                        }
+
+                    }
+
+
+                }
+
+            }
+        }
+
+        // Penggabungan Array
+        $result = $res_std;
+        if(count($res_std)>0 && count($res_sp)>0){
+            for($sp=0;$sp<count($res_sp);$sp++){
+                if(!in_array($res_sp[$sp],$result)){
+                    array_push($result,$res_sp[$sp]);
+                }
+            }
+
+        }
+        else if(count($res_std)<=0 && count($res_sp)>0) {
+            $result = $res_sp;
+        }
+
+        if(count($result)>0){
+            $resT = array(
+                'Status' => 0,
+                'Details' => $result
+            );
+        } else {
+            $resT = array(
+                'Status' => 1,
+                'Details' => []
+            );
+        }
+
+        return $resT;
+
+    }
+
+    public function kickStudent($SemesterID,$ScheduleID,$CDID,$ProdiID){
+
+        $delW = array(
+            'SemesterID' => $SemesterID,
+            'CDID' => $CDID
+        );
+
+
+        // Delete dari KSM
+        $dataCl = $this->getClassOf();
+        for($l=0;$l<count($dataCl);$l++){
+            $db_ = 'ta_'.$dataCl[$l]['Year'];
+
+            $this->db->where($delW);
+            $this->db->delete($db_.'.study_planning');
+
+        }
+
+        // Delete dari KRS
+        $this->db->where($delW);
+        $this->db->delete('db_academic.std_krs');
+
+        return 1;
 
     }
 
