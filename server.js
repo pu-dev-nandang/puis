@@ -17,6 +17,13 @@ io.on('connection', function (socket) {
         update_notifikasi: data.update_notifikasi 
       });
   })
+
+  socket.on( 'update_schedule_notifikasi', function( data ) {
+      io.sockets.emit( 'update_schedule_notifikasi', {
+        update_schedule_notifikasi: data.update_schedule_notifikasi,
+        date :  data.date,
+      });
+  })
   
   /*socket.on( 'new_message', function( data ) {
     io.sockets.emit( 'new_message', {
