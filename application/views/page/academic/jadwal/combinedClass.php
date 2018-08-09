@@ -58,7 +58,7 @@
                     <div class="input-group">
                         <input type="text" class="form-control" id="searchClassGroup" placeholder="Search by group class">
                                         <span class="input-group-btn">
-                        <button class="btn btn-primary" id="btnSearchGroup" type="button"><span class="glyphicon glyphicon-search" style="margin-right: 5px;"></span> Show timetables</button>
+                        <button class="btn btn-primary" id="btnSearchGroup" type="button"><span class="glyphicon glyphicon-search"></span></button>
                       </span>
                     </div>
                     <hr/>
@@ -72,6 +72,7 @@
                         <tr style="background: #607D8B;color: #fff;">
                             <th>Course</th>
                             <th style="width: 7%;">Action</th>
+                            <th style="width: 7%;">Student</th>
                         </tr>
                         </thead>
                         <tbody id="trCombinedCl"></tbody>
@@ -129,6 +130,7 @@
 
             var data = {
               action : 'addCombine',
+              SemesterID : SemesterID,
               dataInsert : {
                   ScheduleID : ScheduleID,
                   ProdiID : ProdiA.split('.')[0],
@@ -151,7 +153,7 @@
                 setTimeout(function () {
                     $('#btnSaveAddCC').prop('disabled',false).html('Save');
                     $('#filterCC_Prodi,#formCC_addProdi').val('');
-                    $('#dvCC_Course').html('-');
+                    $('#dvCC_Course,#div_formCC_ClassGroup').html('-');
                     $('#formCC_ClassGroup').empty();
                 },500);
 
@@ -184,17 +186,50 @@
 
                         var btnAct = (jsonResult.length>1) ? '<button class="btn btn-danger btn-del-combined" data-sdcid="'+d.SDCID+'" data-id="'+d.ScheduleID+'">Del</button>' : '-';
 
+                        var tstd = jwt_encode(d.D.Details,'std');
                         $('#trCombinedCl').append('<tr id="trID'+d.SDCID+'" >' +
                             '<td>' +
                             '<b>'+d.NameEng+'</b><br/><i>Semester '+d.Semester+'</i> | Group Class : <span style="color: orangered;">'+d.ClassGroup+'</span> | MKCode : <span style="color: blue;">'+d.MKCode+'</span>' +
                             '</td>' +
                             '<td>'+btnAct+'</td>' +
+                            '<td style="text-align: center;"><a href="javascript:void(0)" class="btn-detail-mhs" data-std="'+tstd+'">'+d.D.Details.length+'</a></td>' +
                             '</tr>');
                     }
                 }
             });
         }
     }
+
+    $(document).on('click','.btn-detail-mhs',function () {
+       var t_std = $(this).attr('data-std');
+       var dataStd = jwt_decode(t_std,'std');
+
+        var htmld = '<table class="table table-bordered table-striped">' +
+            '<thead><tr style="background: cornflowerblue;color:#fff;">' +
+            '<th style="text-align: center;">NPM</th>' +
+            '</tr></thead>' +
+            '<tbody id="trStd"><tr><td style="text-align: center;">Student Not Yet</td></tr></tbody>' +
+            '</table> ' +
+            '<hr/>' +
+            '<div style="text-align: right;"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div>'
+
+        $('#NotificationModal .modal-body').html(htmld);
+
+        if(dataStd.length>0){
+            $('#trStd').html('');
+            for(var i=0;i<dataStd.length;i++){
+                $('#trStd').append('<tr>' +
+                    '<td style="text-align: center;">'+dataStd[i]+'</td>' +
+                    '</tr>');
+            }
+        }
+
+        $('#NotificationModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+    });
 
 
     function loadCC_AcademicYearOnPublish(smt) {
@@ -243,7 +278,6 @@
                         var asalSmt = (semester!=dataMK.Semester) ? '('+dataMK.Semester+')' : '';
                         $('#formCC_MataKuliah').append('<option value="'+dataMK.CDID+'|'+dataMK.ID+'" '+schDisabled+'>Smt '+semester+' '+asalSmt+' - '+dataMK.MKCode+' | '+dataMK.MKNameEng+'</option>');
 
-
                     }
 
                     // $('#formCC_MataKuliah').append('<option disabled>-------</option>');
@@ -268,8 +302,6 @@
         $.post(url,{token:token},function (jsonResult) {
             var div_em = '#div_'+elm;
             var opt_em = '#'+elm;
-
-            console.log(div_em,opt_em);
 
             $(div_em).html('');
             if(jsonResult.length>0){
