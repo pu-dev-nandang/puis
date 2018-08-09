@@ -2031,4 +2031,43 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         }
         return $html;
     }
+
+    public function dateDifference($date1, $date2)
+    {       
+        $date1=strtotime($date1);
+        $date2=strtotime($date2); 
+        $diff = abs($date1 - $date2);
+        
+        $day = $diff/(60*60*24); // in day
+        $dayFix = floor($day);
+        $dayPen = $day - $dayFix;
+        $secFix = 0;
+        if($dayPen > 0)
+        {
+            $hour = $dayPen*(24); // in hour (1 day = 24 hour)
+            $hourFix = floor($hour);
+            $hourPen = $hour - $hourFix;
+            if($hourPen > 0)
+            {
+                $min = $hourPen*(60); // in hour (1 hour = 60 min)
+                $minFix = floor($min);
+                $minPen = $min - $minFix;
+                if($minPen > 0)
+                {
+                    $sec = $minPen*(60); // in sec (1 min = 60 sec)
+                    $secFix = floor($sec);
+                }
+            }
+        }
+        $str = "";
+        if($dayFix > 0)
+            $str.= $dayFix."_day;";
+        if($hourFix > 0)
+            $str.= $hourFix."_hour;";
+        if($minFix > 0)
+            $str.= $minFix."_min;";
+        if($secFix > 0)
+            $str.= $secFix."_sec ";
+        return $str;
+    }
 }

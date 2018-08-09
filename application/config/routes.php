@@ -272,6 +272,7 @@ $route['fileGet/(:any)'] = 'api/c_global/fileGet/$1';
 $route['download/(:any)'] = 'api/c_global/download/$1';
 $route['download_template/(:any)'] = 'api/c_global/download_template/$1';
 $route['download_anypath'] = 'api/c_global/download_anypath';
+$route['fileGetAny/(:any)'] = 'api/c_global/fileGetAny/$1';
 
 
 
@@ -630,7 +631,9 @@ foreach( $result as $row )
 $route['venue_reservation'] = 'page/vreservation/c_global';
 $route['vreservation/getroom'] = 'page/vreservation/c_global/getroom';
 $route['vreservation/getschedule'] = 'page/vreservation/c_global/getschedule';
+$route['vreservation/getschedule/(:any)'] = 'page/vreservation/c_global/getschedule/$1';
 $route['vreservation/modal_form'] = 'page/vreservation/c_global/modal_form';
+$route['vreservation/add_save_transaksi'] = 'page/vreservation/c_transaksi/add_save_transaksi';
 
 
 // test

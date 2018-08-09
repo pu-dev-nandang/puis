@@ -192,9 +192,13 @@ $this->m_master->checkAuth_user();
  ?>
 
  <script type="text/javascript">
-     function loadDataSchedule(divHtml)
+     function loadDataSchedule(divHtml,date = '')
      {  
+        divHtml.html('');
         var url = base_url_js+'vreservation/getschedule';
+        if (date != '') {
+            url = base_url_js+'vreservation/getschedule/'+date;
+        }
         $.post(url,function (data_json) {
             var response = jQuery.parseJSON(data_json);
             divHtml.html(response);

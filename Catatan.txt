@@ -8,3 +8,16 @@ JOIN siak4.detailkurikulum dt ON (r.MKID=dt.MKID)
 WHERE substring(m.NPM,3,2)=14;
 
 --------------------------
+
+
+---- adi ----
+SELECT TIMEDIFF(CONCAT(curdate(),' ','14:00:00'), CONCAT(curdate(),' ','16:30:00')) as a;
+
+select a.Room,b.NameEng,c.StartSessions,c.EndSessions,TIMEDIFF(CONCAT(curdate(),' ',EndSessions), CONCAT(curdate(),' ',StartSessions)) as time
+from db_academic.classroom as a join db_academic.schedule_details as c
+on a.ID = c.ClassroomID
+join db_academic.days as b
+on c.DayID = b.ID
+where CURDATE() >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
+and CURDATE() <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
+--- end -----

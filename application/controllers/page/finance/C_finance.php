@@ -1063,7 +1063,7 @@ class C_finance extends Finnance_Controler {
 
     public function testApprove()
     {
-        $sql = 'select * from db_finance.payment where Status = "1" and DATE_FORMAT(UpdateAt,"%Y%m%d") = 20180807';
+        $sql = 'select * from db_finance.payment where Status = "1" and DATE_FORMAT(UpdateAt,"%Y%m%d") = 20180808';
         $query=$this->db->query($sql, array())->result_array();
         for ($i=0; $i < count($query); $i++) { 
             $ID_payment = $query[$i]['ID'];

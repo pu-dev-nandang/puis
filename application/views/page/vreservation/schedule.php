@@ -84,7 +84,7 @@
 								<?php $converDTS = date("h:i a", strtotime($data_pass[$k]['start'])); ?>
 								<?php $converDTE = date("h:i a", strtotime($data_pass[$k]['end'])); ?>
 								<?php if ($data_pass[$k]['room'] == $getRoom[$i]['Room'] && $converDTS == $arrHours[$j]): ?>
-									<?php if ($data_pass[$k]['agenda'] == 'meeting'): ?>
+									<?php if ($data_pass[$k]['approved'] == 1): ?>
 										<td style="width: 72px;height: 20px;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>">
 											<div class="panel-red pointer" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>"><span>Booked <br>by <?php echo $data_pass[$k]['user'] ?></span></div>
 										</td>

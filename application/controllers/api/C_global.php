@@ -74,6 +74,36 @@ class C_global extends CI_Controller {
         }
     }
 
+    public function fileGetAny($file)
+    {
+        //check session ID_register_formulir ada atau tidak
+        // check session token untuk download
+        $file = str_replace('-', '/', $file);
+
+        // Check File exist atau tidak
+        if (file_exists('./uploads/'.$file)) {
+            // $this->load->helper('download');
+            // $data   = file_get_contents('./document/'.$namaFolder.'/'.$file);
+            // $name   = $file;
+            // force_download($name, $data); // script download file
+            $this->showFile2($file);
+        }
+        else
+        {
+            show_404($log_error = TRUE);
+        }
+    }
+
+    private function showFile2($file)
+    {
+        header("Content-type: application/pdf");
+        header("Content-disposition: inline;     
+        filename=".basename('uploads/'.$file));
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        $filePath = readfile('uploads/'.$file);
+    }
+
     public function download_template($file)
     {
         $file = str_replace('-', '/', $file);
