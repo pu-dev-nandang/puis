@@ -895,6 +895,15 @@ class M_api extends CI_Model {
         return $totalStd;
     }
 
+    public function getTotalStdNotYetApprovePerDay($SemesterID,$ScheduleID){
+        $data = $this->db->query('SELECT * FROM db_academic.std_krs sk 
+                                          WHERE sk.SemesterID = "'.$SemesterID.'"
+                                           AND sk.ScheduleID = "'.$ScheduleID.'" ')
+            ->result_array();
+
+        return count($data);
+    }
+
     // =======================================
 
     // ====== Get Jadwal Per Semester =======

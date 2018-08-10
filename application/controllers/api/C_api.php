@@ -1175,6 +1175,7 @@ class C_api extends CI_Controller {
 
             // Mendapatkan Jumlah Students
             $Students = $this->m_api->getTotalStdPerDay($row['SemesterID'],$row['ID']);
+            $StudentsNY = $this->m_api->getTotalStdNotYetApprovePerDay($row['SemesterID'],$row['ID']);
 
             $btnDelMK = ($Students>0) ? 1 : 0;
             // Group Kelas
@@ -1197,7 +1198,7 @@ class C_api extends CI_Controller {
             $nestedData[] = $courses;
             $nestedData[] = '<div style="text-align:center;">'.$row["Credit"].'</div>';
             $nestedData[] = $coor.''.$TeamTeaching;
-            $nestedData[] = '<div style="text-align:center;"><a href="javascript:void(0)" class="btn-sw-std" data-smtid="'.$row['SemesterID'].'" data-scheduleid="'.$row['ID'].'">'.$Students.'</a></div>';
+            $nestedData[] = '<div style="text-align:center;"><a href="javascript:void(0)" class="btn-sw-std" data-smtid="'.$row['SemesterID'].'" data-scheduleid="'.$row['ID'].'">'.$Students.'</a> of '.$StudentsNY.'</div>';
             $nestedData[] = '<div style="text-align:center;">'.substr($row["StartSessions"],0,5).' - '.substr($row["EndSessions"],0,5).'</div>';
             $nestedData[] = '<div style="text-align:center;">'.$row["Room"].'</div>';
 
