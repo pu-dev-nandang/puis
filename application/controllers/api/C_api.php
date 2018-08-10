@@ -1173,8 +1173,12 @@ class C_api extends CI_Controller {
             $nestedData=array();
             $row = $query[$i];
 
+            // Mendapatkan Jumlah Students
+            $Students = $this->m_api->getTotalStdPerDay($row['SemesterID'],$row['ID']);
+
+            $btnDelMK = ($Students>0) ? 1 : 0;
             // Group Kelas
-            $groupClass = '<b><a href="javascript:void(0)" class="btn-action" data-page="editjadwal" data-id="'.$row['ID'].'">'.$row["ClassGroup"].'</a></b>';
+            $groupClass = '<b><a href="javascript:void(0)" class="btn-action" data-page="editjadwal" data-btndel="'.$btnDelMK.'" data-id="'.$row['ID'].'">'.$row["ClassGroup"].'</a></b>';
             $sbSesi = ($row['SubSesi']=='1' || $row['SubSesi']==1) ? '<br/><span class="label label-warning">Sub-Sesi</span>' : '';
 
             $TeamTeaching = '';
@@ -1187,8 +1191,7 @@ class C_api extends CI_Controller {
             // Mendapatkan matakuliah
             $courses = $this->m_api->getCoursesPerDay($row['ID']);
 
-            // Mendapatkan Jumlah Students
-            $Students = $this->m_api->getTotalStdPerDay($row['SemesterID'],$row['ID']);
+
 
             $nestedData[] = '<div style="text-align:center;">'.$groupClass.''.$sbSesi.'</div>';
             $nestedData[] = $courses;
@@ -2824,6 +2827,11 @@ class C_api extends CI_Controller {
     public function getSimpleSearch(){
         $key = $this->input->get('key');
         $data = $this->m_api->__getSimpleSearch($key);
+        return print_r(json_encode($data));
+    }
+
+    public function getStudentByScheduleID($ScheduleID){
+        $data = $this->m_api->__getStudentByScheduleID($ScheduleID);
         return print_r(json_encode($data));
     }
 
