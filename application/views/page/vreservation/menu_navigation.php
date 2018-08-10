@@ -196,6 +196,28 @@ $this->m_master->checkAuth_user();
         })
      }
 
+     $(document).on('click','.btn-apppove', function () {
+        loading_button('.btn-apppove');   
+        var id_table = $(this).attr('id_table');
+         var url =base_url_js+'vreservation/approve_submit';
+         var data = {ID_tbl : id_table};
+         var token = jwt_encode(data,'UAP)(*');
+         $.post(url,{token:token},function (data_json) {
+             setTimeout(function () {
+                toastr.options.fadeOut = 10000;
+                toastr.success('Data berhasil disimpan', 'Success!');
+                // send notification other school from client
+                var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+                // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
+                  socket.emit('update_schedule_notifikasi', { 
+                    update_schedule_notifikasi: '1',
+                    date : '',
+                  });
+                $('#GlobalModalLarge').modal('hide');
+             },500);
+         });
+     })
+
      $(document).ready(function () {
          socket_messages();
          countApprove();
@@ -218,6 +240,8 @@ $this->m_master->checkAuth_user();
                  // $("#CaptionTBL").html('<strong>'+getDate+'</strong>');
                  var divHtml = $("#schedule");
                  loadDataSchedule(divHtml);
+                 countApprove();
+                 // loadDataListApprove();
              }
 
          }); // exit socket
@@ -238,4 +262,35 @@ $this->m_master->checkAuth_user();
         var page = $(this).attr('data-page');
         window.open(base_url_js+'vreservation/'+page,'_blank');
      });
+
+    $(document).on('click','.panel-orange', function () {
+        var dataJson = $(this).attr('data');
+        var room = $(this).attr('room');
+        var tgl = $("#datetime_deadline1").val();
+        var dtarr = dataJson.split('@@');
+        var time =  dtarr[1];
+        modal_generate('view','Form Booking Reservation',room,time,tgl,'',dtarr);
+    });
+
+    function modal_generate(action,title,room,time,tgl,user = '',dt = []) {
+        var url = base_url_js+"vreservation/modal_form";
+        var data = {
+            Action : action,
+            room : room,
+            time : time,
+            user : user,
+            tgl  : tgl,
+            dt : dt,
+        };
+        var token = jwt_encode(data,"UAP)(*");
+        $.post(url,{ token:token }, function (html) {
+            $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+title+'</h4>');
+            $('#GlobalModalLarge .modal-body').html(html);
+            $('#GlobalModalLarge .modal-footer').html(' ');
+            $('#GlobalModalLarge').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+        })
+    }
  </script>

@@ -587,6 +587,8 @@ $route['api/__getSimpleSearch'] = 'api/c_api/getSimpleSearch';
 $route['api/__m_equipment_additional'] = 'api/c_api/m_equipment_additional';
 $route['api/get_time_opt_reservation'] = 'api/c_api/get_time_opt_reservation';
 $route['api/__m_additional_personel'] = 'api/c_api/m_additional_personel';
+$route['api/__room_equipment'] = 'api/c_api/room_equipment';
+
 
 
 
@@ -637,6 +639,7 @@ $route['vreservation/add_save_transaksi'] = 'page/vreservation/c_transaksi/add_s
 $route['vreservation/getCountApprove'] = 'page/vreservation/c_global/getCountApprove';
 $route['vreservation/vr_request'] = 'page/vreservation/c_transaksi/vr_request';
 $route['vreservation/json_list_approve'] = 'page/vreservation/c_transaksi/json_list_approve';
+$route['vreservation/approve_submit'] = 'page/vreservation/c_transaksi/approve_submit';
 
 
 // test

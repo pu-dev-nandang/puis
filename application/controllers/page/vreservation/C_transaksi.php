@@ -31,9 +31,10 @@ class C_transaksi extends Vreservation_Controler {
             $filename = $uploadFile['file_name'];
         }
 
+        // print_r($filename);die();
+
         $Start = date("Y-m-d H:i:s", strtotime($input['date'].$input['Start']));
         $End = date("Y-m-d H:i:s", strtotime($input['date'].$input['End']));
-
         $time = $this->m_master->countTimeQuery($End, $Start);
         $time = $time[0]['time'];
         $time = explode(':', $time);
@@ -73,6 +74,7 @@ class C_transaksi extends Vreservation_Controler {
                             'ID_add_personel' => $ID_add_personel,
                             'Req_date' => date('Y-m-d'),
                             'CreatedBy' => $this->session->userdata('NIP'),
+                            'Req_layout' => $filename,
                         );
                         $this->db->insert('db_reservation.t_booking', $dataSave);
                         $insert_id = $this->db->insert_id();
@@ -99,7 +101,8 @@ class C_transaksi extends Vreservation_Controler {
                            'ID_add_personel' => $ID_add_personel,
                            'Req_date' => date('Y-m-d'),
                            'CreatedBy' => $this->session->userdata('NIP'),
-                           'Multiple' => $Multiple
+                           'Multiple' => $Multiple,
+                           'Req_layout' => $filename,
                        );
                        $this->db->insert('db_reservation.t_booking', $dataSave);
 
@@ -121,6 +124,7 @@ class C_transaksi extends Vreservation_Controler {
                             'Req_date' => date('Y-m-d'),
                             'CreatedBy' => $this->session->userdata('NIP'),
                             'Multiple' => $Multiple,
+                            'Req_layout' => $filename,
                         );
                         $this->db->insert('db_reservation.t_booking', $dataSave);
                     }
@@ -140,6 +144,7 @@ class C_transaksi extends Vreservation_Controler {
                     'ID_add_personel' => $ID_add_personel,
                     'Req_date' => date('Y-m-d'),
                     'CreatedBy' => $this->session->userdata('NIP'),
+                    'Req_layout' => $filename,
                 );
                 $this->db->insert('db_reservation.t_booking', $dataSave);
             }
@@ -189,6 +194,19 @@ class C_transaksi extends Vreservation_Controler {
     {
         $getData = $this->m_reservation->getDataT_booking();
         echo json_encode($getData);
+    }
+
+    public function approve_submit()
+    {
+        $input = $this->getInputToken();
+        $ID = $input['ID_tbl'];
+        $dataSave = array(
+                'Status' => 1,
+                'ApprovedBy' => $this->session->userdata('NIP'),
+                'ApprovedBy' => date('Y-m-d H:i:s'),
+                        );
+        $this->db->where('ID',$ID);
+        $this->db->update('db_reservation.t_booking', $dataSave);
     }
 
 
