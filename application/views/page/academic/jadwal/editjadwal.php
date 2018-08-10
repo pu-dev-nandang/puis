@@ -101,8 +101,14 @@
 
         <hr/>
 
-        <div style="text-align: right;">
-            <button class="btn btn-danger btn-act-editForm" style="float: left;" id="btnRemove">Remove</button>
+
+        <div class="col-xs-6" style="">
+            <button class="btn btn-danger btn-act-editForm" id="btnRemove" disabled>Remove</button>
+            <p><span id="viewStdSchedule"></span> Students (Jika jumlah tidak sesuai, berarti ada mahasiswa yang belum di approve)</p>
+        </div>
+
+        <div class="col-xs-6" style="text-align: right;">
+
             <button class="btn btn-default btn-default-success btn-act-editForm" id="addNewSesi">Add Sub Sesi</button>
             |
             <button class="btn btn-success btn-act-editForm" id="btnSavejadwal">Save</button>
@@ -464,6 +470,7 @@
 
         $.post(url,{token:token},function (JSONresult) {
 
+            console.log(JSONresult);
 
             $('#semesterName').html('<b style="color:green;">'+JSONresult.semesterName+'</b>');
             $('#viewProgramsCampus').html('<b style="color:green;">'+JSONresult.viewProgramsCampus+'</b>');
@@ -508,6 +515,15 @@
             loadSubSesi(JSONresult.SubSesiDetails);
 
             $('#btnRemove').attr('data-code',JSONresult.MKCode);
+            var s = 0;
+            if(JSONresult.DataStudent.length>0){
+                s = JSONresult.DataStudent.length;
+                $('#btnRemove').prop('disabled',true);
+
+            } else {
+                $('#btnRemove').prop('disabled',false);
+            }
+            $('#viewStdSchedule').html(s);
 
         });
     }

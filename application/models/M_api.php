@@ -1049,24 +1049,7 @@ class M_api extends CI_Model {
 
 
     public function getOneSchedule($ScheduleID){
-//        $data = $this->db->query('SELECT s.ID,sm.Name AS semesterName,sm.ID AS SemesterID, pc.Name AS viewProgramsCampus,
-//                                          s.CombinedClasses,
-//                                          ps.NameEng AS ProgramStudy,
-//                                          s.ClassGroup AS viewClassGroup,
-//                                          mk.ID AS MKID, mk.MKCode, mk.Name AS viewMataKuliah, mk.NameEng AS viewMataKuliahEng,
-//                                          cd.Semester, cd.TotalSKS,
-//                                          em.Name AS Coordinator,
-//                                          em.NIP,
-//                                          s.TeamTeaching,
-//                                          s.SubSesi
-//                                          FROM  db_academic.schedule s
-//                                          LEFT JOIN db_academic.semester sm ON (s.SemesterID = sm.ID)
-//                                          LEFT JOIN db_academic.programs_campus pc ON (s.ProgramsCampusID = pc.ID)
-//                                          LEFT JOIN db_academic.program_study ps ON (s.ProdiID = ps.ID)
-//                                          LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = s.MKID)
-//                                          LEFT JOIN db_academic.curriculum_details cd ON (sm.CurriculumID = cd.CurriculumID AND cd.MKID = s.MKID)
-//                                          LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
-//                                          WHERE s.ID = "'.$ScheduleID.'" LIMIT 1');
+
         $data = $this->db->query('SELECT s.ID,sm.Name AS semesterName,
                                           sm.ID AS SemesterID, pc.Name AS viewProgramsCampus,
                                           s.CombinedClasses,
@@ -1106,6 +1089,8 @@ class M_api extends CI_Model {
                                                       LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
                                                       WHERE sdc.ScheduleID = "'.$ScheduleID.'" ');
             $result[0]['Courses'] = $dataCourse->result_array();
+
+            $result[0]['DataStudent'] = $this->__getStudentByScheduleID($ScheduleID);
         }
 
         return $result[0];
@@ -2927,6 +2912,45 @@ class M_api extends CI_Model {
         $this->db->delete('db_academic.std_krs');
 
         return 1;
+
+    }
+
+    public function __getStudentByScheduleID($ScheduleID){
+
+        $getSmtAct = $this->_getSemesterActive();
+
+        $dataCL = $this->getClassOf();
+
+        $selWhere = array(
+            'SemesterID' => $getSmtAct['ID'],
+            'ScheduleID'=>$ScheduleID
+        );
+        $res = [];
+        for($c=0;$c<count($dataCL);$c++){
+            $d = $dataCL[$c];
+            $db_ = 'ta_'.$d['Year'];
+            $dataSP = $this->db->select('NPM')->get_where($db_.'.study_planning',$selWhere)->result_array();
+            if(count($dataSP)>0){
+                for($s=0;$s<count($dataSP);$s++){
+                    array_push($res,$dataSP[$s]['NPM']);
+                }
+            }
+        }
+
+        // Get From Std KRS
+        $dataSTD = $this->db->select('NPM')->get_where('db_academic.std_krs',$selWhere)->result_array();
+
+        // Menggabungkan
+        for($m=0;$m<count($dataSTD);$m++){
+            if(!in_array($dataSTD[$m]['NPM'],$res)){
+                array_push($res,$dataSTD[$m]['NPM']);
+            }
+        }
+
+
+        return $res;
+
+
 
     }
 
