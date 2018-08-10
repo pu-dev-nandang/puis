@@ -304,4 +304,71 @@ class M_reservation extends CI_Model {
 
         return $bool;
     }
+
+    public function getCountApprove()
+    {
+        $sql = 'select count(*) as total from db_reservation.t_booking where Status = 0 and Start >= NOW()';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query[0]['total'];
+
+    }
+
+    public function getDataT_booking($Start = null,$Status = 0)
+    {
+        $arr_result = array();
+        $this->load->model('master/m_master');
+        $Start = ($Start == null) ? ' and Start >= NOW()' : ' and Start like "%'.$Start.'%"';
+        $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP where a.Status = ?
+                 '.$Start;
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) { 
+            $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['Start']);
+            $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['End']);
+            $StartNameDay = $Startdatetime->format('l');
+            $EndNameDay = $Enddatetime->format('l');
+            $Time = $query[$i]['Time'].' Minutes';
+            $ID_equipment_add = '-';
+            $Name_equipment_add = '-';
+            if ($query[$i]['ID_equipment_add'] != '' || $query[$i]['ID_equipment_add'] != null) {
+                $ID_equipment_add = explode(',', $query[$i]['ID_equipment_add']);
+                $Name_equipment_add = '<ul>';
+                for ($j=0; $j < count($ID_equipment_add); $j++) { 
+                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add[$j]);
+                    $ID_m_equipment = $get[0]['ID_m_equipment'];
+                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
+                    $Name_equipment_add .= '<li>'.$get[0]['Equipment'].'</li>';
+                }
+                $Name_equipment_add .= '</ul>';
+            }
+
+            $ID_add_personel = '-';
+            $Name_add_personel = '-';
+            if ($query[$i]['ID_add_personel'] != '' || $query[$i]['ID_add_personel'] != null) {
+                $ID_add_personel = explode(',', $query[$i]['ID_add_personel']);
+                $Name_add_personel = '<ul>';
+                for ($j=0; $j < count($ID_add_personel); $j++) { 
+                    $get = $this->m_master->caribasedprimary('db_employees.division','ID',$ID_add_personel[$j]);
+                    $Name_add_personel .= '<li>'.$get[0]['Division'].'</li>';
+                }
+
+                $Name_add_personel .= '</ul>';
+            }
+
+            $Reqdatetime = DateTime::createFromFormat('Y-m-d', $query[$i]['Req_date']);
+            $ReqdateNameDay = $Reqdatetime->format('l');
+            $arr_result[] = array(
+                    'Start' => $StartNameDay.', '.$query[$i]['Start'],
+                    'End' => $EndNameDay.', '.$query[$i]['End'],
+                    'Time' => $Time,
+                    'Agenda' => $query[$i]['Agenda'],
+                    'Room' => $query[$i]['Room'],
+                    'Equipment_add' => $Name_equipment_add,
+                    'Persone_add' => $Name_add_personel,
+                    'Req_date' => $ReqdateNameDay.', '.$query[$i]['Req_date'],
+                    'Req_layout' => $query[$i]['Req_layout'],
+            );
+        }
+
+        return $arr_result;         
+    }
 }
