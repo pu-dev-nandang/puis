@@ -908,11 +908,13 @@
         if(confirm('Delete data?')){
             var SDCID = $(this).attr('data-sdcid');
             var ScheduleID = $(this).attr('data-id');
+            var Semester = $(this).attr('data-smt');
             loading_buttonSm('.btn-del-combined[data-sdcid='+SDCID+']');
             var data = {
                 action : 'delSDCGL',
                 SDCID : SDCID,
-                ScheduleID : ScheduleID
+                ScheduleID : ScheduleID,
+                Semester : Semester
             };
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'api/__crudCombinedClass';
