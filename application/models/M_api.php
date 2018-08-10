@@ -2720,6 +2720,7 @@ class M_api extends CI_Model {
                                                           LEFT JOIN '.$db_.'.students s 
                                                           ON (s.NPM = sk.NPM)
                                                           WHERE sk.ScheduleID = "'.$d['ScheduleID'].'" 
+                                                          AND sk.CDID = "'.$d['CDID'].'"
                                                           AND sk.SemesterID = "'.$getSmtAct['ID'].'"
                                                           AND s.ProdiID = "'.$d['ProdiID'].'"
                                                           ')->result_array();
@@ -2736,7 +2737,8 @@ class M_api extends CI_Model {
                                                           LEFT JOIN '.$db_.'.students s 
                                                           ON (s.NPM = sp.NPM)
                                                           WHERE sp.ScheduleID = "'.$d['ScheduleID'].'" 
-                                                          AND sp.SemesterID = "'.$getSmtAct['ID'].'"
+                                                          AND sp.SemesterID = "'.$d['CDID'].'"
+                                                          AND sp.CDID = "'.$getSmtAct['ID'].'"
                                                           AND s.ProdiID = "'.$d['ProdiID'].'"
                                                           ')->result_array();
 
@@ -2800,9 +2802,13 @@ class M_api extends CI_Model {
     }
 
     public function getStdCombinedClass($data_arr,$smt){
+
+
         // Cek apakah ada student atau tidak
         $dataGetJad = $this->db->get_where('db_academic.schedule_details_course',
             array('ID' => $data_arr['SDCID']),1)->result_array();
+
+
 
         $getSmtAct = $this->_getSemesterActive();
 
@@ -2823,6 +2829,7 @@ class M_api extends CI_Model {
                                                           LEFT JOIN '.$db_.'.students s 
                                                           ON (s.NPM = sk.NPM)
                                                           WHERE sk.ScheduleID = "'.$d['ScheduleID'].'" 
+                                                          AND sk.CDID = "'.$d['CDID'].'"
                                                           AND sk.SemesterID = "'.$getSmtAct['ID'].'"
                                                           AND s.ProdiID = "'.$d['ProdiID'].'"
                                                           ')->result_array();
@@ -2840,6 +2847,7 @@ class M_api extends CI_Model {
                                                           ON (s.NPM = sp.NPM)
                                                           WHERE sp.ScheduleID = "'.$d['ScheduleID'].'" 
                                                           AND sp.SemesterID = "'.$getSmtAct['ID'].'"
+                                                          AND sp.CDID = "'.$d['CDID'].'"
                                                           AND s.ProdiID = "'.$d['ProdiID'].'"
                                                           ')->result_array();
 
@@ -2905,17 +2913,34 @@ class M_api extends CI_Model {
 
         }
 
-        $ds = $this->db->select('ID')->get_where('db_academic.std_krs',$delW)->result_array();
+        $ds = $this->db->select('ID,ScheduleID')->get_where('db_academic.std_krs',$delW)->result_array();
         if(count($ds)>0){
             for($c=0;$c<count($ds);$c++){
                 $d = $ds[$c];
                 $this->db->where('KRSID',$d['ID']);
                 $this->db->delete('db_academic.std_krs_comment');
+
+
+
+                // Delete Presensi
+                $Attd = $this->db->select('ID')->get_where('db_academic.attendance',array(
+                    'SemesterID' => $SemesterID,
+                    'ScheduleID' => $d['ScheduleID']
+                ))->result_array();
+                if(count($Attd)>0){
+                    for($a=0;$a<count($Attd);$a++){
+                        $this->db->where('ID_Attd',$Attd[$a]['ID']);
+                        $this->db->delete('db_academic.attendance_students');
+                    }
+                }
+
             }
         }
+
+
+
+
         // Delete dari KRS
-
-
         $this->db->where($delW);
         $this->db->delete('db_academic.std_krs');
 
