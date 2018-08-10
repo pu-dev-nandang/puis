@@ -189,7 +189,7 @@ class C_global extends Vreservation_Controler {
 
         $endTime = '18';
         $getHoursNow = date('H');
-        $getHoursNow = (int)$getHoursNow;
+        $getHoursNow = ($date == date('Y-m-d')) ? (int)$getHoursNow : 7;
         $data['getRoom'] = $getRoom;
         $arrHours = array();
 
@@ -217,6 +217,7 @@ class C_global extends Vreservation_Controler {
         }
         $data['arrHours'] = $arrHours;
         $data['data_pass'] = $data_pass;
+        $data['date'] = $date;
         $content = $this->load->view($this->pathView.'schedule',$data,true);
         echo json_encode($content);
     }

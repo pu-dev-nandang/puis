@@ -2042,6 +2042,8 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $dayFix = floor($day);
         $dayPen = $day - $dayFix;
         $secFix = 0;
+        $minFix = 0;
+        $hourFix = 0;
         if($dayPen > 0)
         {
             $hour = $dayPen*(24); // in hour (1 day = 24 hour)
@@ -2068,6 +2070,15 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $str.= $minFix."_min;";
         if($secFix > 0)
             $str.= $secFix."_sec ";
-        return $str;
+
+        return $minFix;
+    }
+
+    public function countTimeQuery($Start, $End)
+    {
+        $sql = 'select TIMEDIFF("'.$Start.'","'.$End.'") as time';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
+        
     }
 }

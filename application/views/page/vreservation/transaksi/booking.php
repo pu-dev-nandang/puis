@@ -56,7 +56,7 @@
   
 
   $(document).on('click','#ModalbtnSaveForm', function () {
-    // loading_button('#ModalbtnSaveForm');
+    loading_button('#ModalbtnSaveForm');
     var Room = $("#Room").val();
     var Start = $("#Start").val();
     var End = $("#End").val();
@@ -128,6 +128,18 @@
               if(data.status == 1) {
                 // toastr.options.fadeOut = 100000;
                 toastr.success(data.msg, 'Success!');
+                var divHtml = $("#schedule");
+                loadDataSchedule(divHtml);
+                $('#GlobalModalLarge').modal('hide');
+
+                // send notification other school from client
+                var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+                // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
+                  socket.emit('update_schedule_notifikasi', { 
+                    update_schedule_notifikasi: '1',
+                    date : $('#datetime_deadline1').val(),
+                  });
+
               }
               else
               {
@@ -135,6 +147,7 @@
                 toastr.error(data.msg, 'Failed!!');
               }
               $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
+
             },
             error: function (data) {
               toastr.error("Connection Error, Please try again", 'Error!!');
@@ -187,15 +200,15 @@
         case  "Room" :
         case  "Start" :
         case  "End" :
-        case  "file" :
-              if (!arr[key]) {
-                toatString += 'Invalid File' + "<br>";
-              }
-              break;
         case  "Agenda" :
               result = Validation_required(arr[key],key);
               if (result['status'] == 0) {
                 toatString += result['messages'] + "<br>";
+              }
+              break;
+        case  "file" :
+              if (!arr[key]) {
+                toatString += 'Invalid File' + "<br>";
               }
               break;
         case  "chk_e_additional" :
@@ -316,6 +329,7 @@
     $(document).on('change','#e_multipleTDK', function () {
         if(this.checked) {
             $('#divE_multiple').remove();
+            $('.divPageSelect').remove();
         }
 
     });

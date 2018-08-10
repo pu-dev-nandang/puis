@@ -2792,6 +2792,11 @@ class C_api extends CI_Controller {
         //$getHoursNow = date('H');
         
         $getHoursNow = (int)$aaa[0] + 1;
+
+        $Start2 = date("H", strtotime($start));
+        $endTime = (int)$endTime - (int)$Start2;
+        $endTime = $endTime + $getHoursNow - 1;
+       
         for ($i=$getHoursNow; $i <= $endTime; $i++) { 
                 // check len
                 $a = $i;

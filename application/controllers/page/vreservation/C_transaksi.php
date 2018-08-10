@@ -30,13 +30,18 @@ class C_transaksi extends Vreservation_Controler {
         if (is_array($uploadFile)) {
             $filename = $uploadFile['file_name'];
         }
-        $time = $this->m_master->dateDifference($input['Start'], $input['End']);
-        $time = explode('_', $time);
-        $time = $time[0];
+
+        $Start = date("Y-m-d H:i:s", strtotime($input['date'].$input['Start']));
+        $End = date("Y-m-d H:i:s", strtotime($input['date'].$input['End']));
+
+        $time = $this->m_master->countTimeQuery($End, $Start);
+        $time = $time[0]['time'];
+        $time = explode(':', $time);
+        $time = ($time[0] * 60) + $time[1];
         $Colspan = $time / 30;
         $Colspan = (int)$Colspan;
-        $cc = $time % 30;
-        if ($cc > 0) {
+        $a = $time % 30;
+        if ($a > 0) {
             $Colspan++;
         }
 
@@ -49,17 +54,40 @@ class C_transaksi extends Vreservation_Controler {
         if (is_array($input['chk_person_support'])) {
             $ID_add_personel = implode(',', $input['chk_person_support']);
         }
-       
-        $Start = date("Y-m-d h:i:s", strtotime($input['date'].$input['Start']));
-        $End = date("Y-m-d h:i:s", strtotime($input['date'].$input['End']));
 
         // check data bentrok dengan jam lain
-        $chk = $this->m_reservation->checkBentrok($Start,$End,$input['chk_e_multiple']);
+        $chk = $this->m_reservation->checkBentrok($Start,$End,$input['chk_e_multiple'],$input['Room']);
         if ($chk) {
             $Multiple = '';
             if (is_array($input['chk_e_multiple'])) {
                 for ($i=0; $i < count($input['chk_e_multiple']); $i++) { 
                    if ($i == 0) {
+                        $dataSave = array(
+                            'Start' => $Start,
+                            'End' => $End,
+                            'Time' => $time,
+                            'Colspan' => $Colspan,
+                            'Agenda' => $input['Agenda'],
+                            'Room' => $input['Room'],
+                            'ID_equipment_add' => $ID_equipment_add,
+                            'ID_add_personel' => $ID_add_personel,
+                            'Req_date' => date('Y-m-d'),
+                            'CreatedBy' => $this->session->userdata('NIP'),
+                        );
+                        $this->db->insert('db_reservation.t_booking', $dataSave);
+                        $insert_id = $this->db->insert_id();
+                        $Multiple = $insert_id;
+
+                        $dataSave = array(
+                            'Multiple' => $insert_id,
+                        );
+                        $this->db->where('ID', $insert_id);
+                        $this->db->update('db_reservation.t_booking', $dataSave);
+
+                       $get = $input['chk_e_multiple'][$i];
+                       $Start = date("Y-m-d H:i:s", strtotime($get.$input['Start']));
+                       $End = date("Y-m-d H:i:s", strtotime($get.$input['End']));
+                        
                        $dataSave = array(
                            'Start' => $Start,
                            'End' => $End,
@@ -71,22 +99,16 @@ class C_transaksi extends Vreservation_Controler {
                            'ID_add_personel' => $ID_add_personel,
                            'Req_date' => date('Y-m-d'),
                            'CreatedBy' => $this->session->userdata('NIP'),
+                           'Multiple' => $Multiple
                        );
                        $this->db->insert('db_reservation.t_booking', $dataSave);
-                       $insert_id = $this->db->insert_id();
 
-                       $Multiple = $insert_id;
-                       $dataSave = array(
-                           'Multiple' => $insert_id,
-                       );
-                       $this->db->where('ID', $insert_id);
-                       $this->db->update('db_reservation.t_booking', $dataSave);
                     }
                     else
                     {
                         $get = $input['chk_e_multiple'][$i];
-                        $Start = date("Y-m-d h:i:s", strtotime($get.$input['Start']));
-                        $End = date("Y-m-d h:i:s", strtotime($get.$input['End']));
+                        $Start = date("Y-m-d H:i:s", strtotime($get.$input['Start']));
+                        $End = date("Y-m-d H:i:s", strtotime($get.$input['End']));
                         $dataSave = array(
                             'Start' => $Start,
                             'End' => $End,
@@ -121,10 +143,14 @@ class C_transaksi extends Vreservation_Controler {
                 );
                 $this->db->insert('db_reservation.t_booking', $dataSave);
             }
+            echo json_encode(array('msg' => 'The Proses Finish','status' => 1));
+        }
+        else
+        {
+            echo json_encode(array('msg' => 'Your schedule is Conflict Please check.','status' => 0));
         }
 
-
-        echo json_encode(array('msg' => 'The Proses Finish','status' => 1));
+        
     }
 
     // mt_rand()

@@ -61,6 +61,7 @@
 
 <div class="table-responsive table-area" style="overflow-x:auto;">
 	<table class="table table-bordered table2">
+		<caption id= "CaptionTBL"><strong><?php echo $date ?></strong></caption>
 	<!-- <table class="table2"> -->
 	    <thead>
 	    	<tr>
@@ -86,14 +87,14 @@
 								<?php if ($data_pass[$k]['room'] == $getRoom[$i]['Room'] && $converDTS == $arrHours[$j]): ?>
 									<?php if ($data_pass[$k]['approved'] == 1): ?>
 										<td style="width: 72px;height: 20px;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>">
-											<div class="panel-red pointer" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>"><span>Booked <br>by <?php echo $data_pass[$k]['user'] ?></span></div>
+											<div class="panel-red pointer" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>"><span>Booked <br>by <?php echo $data_pass[$k]['user'] ?></span></div>
 										</td>
 										<?php $bool = true ?>
 										<?php $j = $j + (int)$data_pass[$k]['colspan'] - 1 ?>
 										<?php break; ?>
 									<?php else: ?>
 										<td style="width: 72px;height: 20px;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>">
-											<div class="panel-orange pointer" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>"><span>Requested <br><?php echo $data_pass[$k]['user'] ?></span></div>
+											<div class="panel-orange pointer" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>"><span>Requested <br><?php echo $data_pass[$k]['user'] ?></span></div>
 										</td>
 										<?php $bool = true ?>
 										<?php $j = $j + (int)$data_pass[$k]['colspan'] - 1 ?>
