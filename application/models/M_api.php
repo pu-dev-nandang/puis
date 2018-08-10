@@ -2912,7 +2912,17 @@ class M_api extends CI_Model {
 
         }
 
+        $ds = $this->db->select('ID')->get_where('db_academic.std_krs',$delW)->result_array();
+        if(count($ds)>0){
+            for($c=0;$c<count($ds);$c++){
+                $d = $ds[$c];
+                $this->db->where('KRSID',$d['ID']);
+                $this->db->delete('db_academic.std_krs_comment');
+            }
+        }
         // Delete dari KRS
+
+
         $this->db->where($delW);
         $this->db->delete('db_academic.std_krs');
 
