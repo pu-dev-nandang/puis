@@ -2704,6 +2704,8 @@ class M_api extends CI_Model {
 
                 for($c=0;$c<count($dataClass);$c++){
 
+                    $semester = $this->_getSeemsterByClassOf($dataClass[$c]['Year']);
+
                     $db_ = 'ta_'.$dataClass[$c]['Year'];
                     $dataStd = $this->db->query('SELECT s.NPM FROM db_academic.std_krs sk 
                                                           LEFT JOIN '.$db_.'.students s 
@@ -2714,7 +2716,7 @@ class M_api extends CI_Model {
                                                           ')->result_array();
 
 
-                    if(count($dataStd)>0){
+                    if(count($dataStd)>0 && $semester==$data_arr['Semester']){
                         for($st=0;$st<count($dataStd);$st++){
                             array_push($res_std,$dataStd[$st]['NPM']);
                         }
@@ -2729,7 +2731,7 @@ class M_api extends CI_Model {
                                                           AND s.ProdiID = "'.$d['ProdiID'].'"
                                                           ')->result_array();
 
-                    if(count($dataSp)>0){
+                    if(count($dataSp)>0 && $semester==$data_arr['Semester']){
                         for($sp=0;$sp<count($dataSp);$sp++){
                             array_push($res_sp,$dataSp[$sp]['NPM']);
                         }
@@ -2846,12 +2848,6 @@ class M_api extends CI_Model {
         }
 
 
-
-        //
-//        print_r($res_std);
-//        print_r($res_sp);
-//
-//        exit;
         // Penggabungan Array
         $result = $res_std;
         if(count($res_std)>0 && count($res_sp)>0){

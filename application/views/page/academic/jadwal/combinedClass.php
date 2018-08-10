@@ -184,7 +184,7 @@
                     for(var i=0;i<jsonResult.length;i++){
                         var d = jsonResult[i];
 
-                        var btnAct = (jsonResult.length>1) ? '<button class="btn btn-danger btn-del-combined" data-sdcid="'+d.SDCID+'" data-id="'+d.ScheduleID+'">Del</button>' : '-';
+                        var btnAct = (jsonResult.length>1) ? '<button class="btn btn-danger btn-del-combined" data-sdcid="'+d.SDCID+'" data-smt="'+d.Semester+'" data-id="'+d.ScheduleID+'">Del</button>' : '-';
 
                         var tstd = jwt_encode(d.D.Details,'std');
                         $('#trCombinedCl').append('<tr id="trID'+d.SDCID+'" >' +
