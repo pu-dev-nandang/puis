@@ -179,6 +179,18 @@ class C_transaksi extends Vreservation_Controler {
          }
     }
 
+    public function vr_request()
+    {
+        $content = $this->load->view($this->pathView.'transaksi/page_approve','',true);
+        $this->temp($content);
+    }
+
+    public function json_list_approve()
+    {
+        $getData = $this->m_reservation->getDataT_booking();
+        echo json_encode($getData);
+    }
+
 
 
 }

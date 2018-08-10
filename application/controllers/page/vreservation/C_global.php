@@ -242,4 +242,10 @@ class C_global extends Vreservation_Controler {
         
     }
 
+    public function getCountApprove()
+    {
+        $getData= $this->m_reservation->getCountApprove();
+        echo json_encode($getData);
+    }
+
 }

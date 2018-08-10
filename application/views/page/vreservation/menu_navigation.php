@@ -1,14 +1,3 @@
-<?php
-if ($this->uri->segment(1) == 'dashboard') {
-    redirect(base_url().'admission/dashboard');
-}
-
-?>
-<script type="text/javascript">
-    <?php if ($this->uri->segment(1) == 'dashboard'): ?>
-    window.location.href = base_url_js+'admission/dashboard';
-    <?php endif ?>
-</script>
 <div id="sidebar" class="sidebar-fixed">
     <div id="sidebar-content">
         <!--=== Navigation ===-->
@@ -209,6 +198,7 @@ $this->m_master->checkAuth_user();
 
      $(document).ready(function () {
          socket_messages();
+         countApprove();
      });
 
      function socket_messages()
@@ -232,4 +222,20 @@ $this->m_master->checkAuth_user();
 
          }); // exit socket
      }
+
+     function countApprove()
+     {
+        var url = base_url_js+'vreservation/getCountApprove';
+        $.post(url,function (data_json) {
+            var response = jQuery.parseJSON(data_json);
+            $("#countRequest").html('<b>Total Request : <a href="javascript:void(0)" class="btn-action btn-edit btn-get-link" data-page="vr_request">'+response+'</a></b>');
+        }).done(function() {
+
+        })
+     }
+
+     $(document).on('click','.btn-get-link', function () {
+        var page = $(this).attr('data-page');
+        window.open(base_url_js+'vreservation/'+page,'_blank');
+     });
  </script>

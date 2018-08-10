@@ -634,6 +634,9 @@ $route['vreservation/getschedule'] = 'page/vreservation/c_global/getschedule';
 $route['vreservation/getschedule/(:any)'] = 'page/vreservation/c_global/getschedule/$1';
 $route['vreservation/modal_form'] = 'page/vreservation/c_global/modal_form';
 $route['vreservation/add_save_transaksi'] = 'page/vreservation/c_transaksi/add_save_transaksi';
+$route['vreservation/getCountApprove'] = 'page/vreservation/c_global/getCountApprove';
+$route['vreservation/vr_request'] = 'page/vreservation/c_transaksi/vr_request';
+$route['vreservation/json_list_approve'] = 'page/vreservation/c_transaksi/json_list_approve';
 
 
 // test
