@@ -1856,7 +1856,7 @@ class C_api extends CI_Controller {
                             'SDCID' => $data[$c]['SDCID'],
                             'ScheduleID' => $data[$c]['ScheduleID']
                         );
-                        $data[$c]['D'] = $this->m_api->getStdCombinedClass($aarw);
+                        $data[$c]['D'] = $this->m_api->getStdCombinedClass($aarw,$smt);
                     }
                 }
 
@@ -2743,10 +2743,6 @@ class C_api extends CI_Controller {
                 } else {
                     return print_r(0);
                 }
-
-
-
-
 
             }
             else if($data_arr['action']=='getScheduleGC'){
