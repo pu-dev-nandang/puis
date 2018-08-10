@@ -1822,7 +1822,7 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action']=='searchByGroup'){
                 $data = $this->db->query('SELECT sdc.ID AS SDCID, sdc.ScheduleID, ps.NameEng,s.ID AS ProdiEng,sdc.CDID , 
-                                                    cd.Semester, cr.Year, mk.MKCode, s.ClassGroup 
+                                                    cd.Semester, cr.Year, mk.MKCode, s.ClassGroup, mk.ID AS MKID 
                                                     FROM db_academic.schedule_details_course sdc 
                                                     LEFT JOIN db_academic.schedule s ON (s.ID = sdc.ScheduleID)
                                                     LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
@@ -2399,6 +2399,13 @@ class C_api extends CI_Controller {
                                               AND CombinedClasses = "0" 
                                               AND sdc.ProdiID = "'.$data_arr['ProdiID'].'" 
                                               ORDER BY s.ClassGroup ASC')->result_array();
+
+                    echo 'SELECT s.* FROM db_academic.schedule s 
+                                              LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                              WHERE s.SemesterID = "'.$data_arr['SemesterID'].'" 
+                                              AND CombinedClasses = "0" 
+                                              AND sdc.ProdiID = "'.$data_arr['ProdiID'].'" 
+                                              ORDER BY s.ClassGroup ASC';
 
                     $result = $data;
 
