@@ -1173,8 +1173,13 @@ class C_api extends CI_Controller {
             $nestedData=array();
             $row = $query[$i];
 
+            // Mendapatkan Jumlah Students
+            $Students = $this->m_api->getTotalStdPerDay($row['SemesterID'],$row['ID']);
+            $StudentsNY = $this->m_api->getTotalStdNotYetApprovePerDay($row['SemesterID'],$row['ID']);
+
+            $btnDelMK = ($Students>0) ? 1 : 0;
             // Group Kelas
-            $groupClass = '<b><a href="javascript:void(0)" class="btn-action" data-page="editjadwal" data-id="'.$row['ID'].'">'.$row["ClassGroup"].'</a></b>';
+            $groupClass = '<b><a href="javascript:void(0)" class="btn-action" data-page="editjadwal" data-btndel="'.$btnDelMK.'" data-id="'.$row['ID'].'">'.$row["ClassGroup"].'</a></b>';
             $sbSesi = ($row['SubSesi']=='1' || $row['SubSesi']==1) ? '<br/><span class="label label-warning">Sub-Sesi</span>' : '';
 
             $TeamTeaching = '';
@@ -1187,14 +1192,13 @@ class C_api extends CI_Controller {
             // Mendapatkan matakuliah
             $courses = $this->m_api->getCoursesPerDay($row['ID']);
 
-            // Mendapatkan Jumlah Students
-            $Students = $this->m_api->getTotalStdPerDay($row['SemesterID'],$row['ID']);
+
 
             $nestedData[] = '<div style="text-align:center;">'.$groupClass.''.$sbSesi.'</div>';
             $nestedData[] = $courses;
             $nestedData[] = '<div style="text-align:center;">'.$row["Credit"].'</div>';
             $nestedData[] = $coor.''.$TeamTeaching;
-            $nestedData[] = '<div style="text-align:center;"><a href="javascript:void(0)" class="btn-sw-std" data-smtid="'.$row['SemesterID'].'" data-scheduleid="'.$row['ID'].'">'.$Students.'</a></div>';
+            $nestedData[] = '<div style="text-align:center;"><a href="javascript:void(0)" class="btn-sw-std" data-smtid="'.$row['SemesterID'].'" data-scheduleid="'.$row['ID'].'">'.$Students.'</a> of '.$StudentsNY.'</div>';
             $nestedData[] = '<div style="text-align:center;">'.substr($row["StartSessions"],0,5).' - '.substr($row["EndSessions"],0,5).'</div>';
             $nestedData[] = '<div style="text-align:center;">'.$row["Room"].'</div>';
 
@@ -1818,7 +1822,7 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action']=='searchByGroup'){
                 $data = $this->db->query('SELECT sdc.ID AS SDCID, sdc.ScheduleID, ps.NameEng,s.ID AS ProdiEng,sdc.CDID , 
-                                                    cd.Semester, cr.Year, mk.MKCode, s.ClassGroup 
+                                                    cd.Semester, cr.Year, mk.MKCode, s.ClassGroup, mk.ID AS MKID 
                                                     FROM db_academic.schedule_details_course sdc 
                                                     LEFT JOIN db_academic.schedule s ON (s.ID = sdc.ScheduleID)
                                                     LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
@@ -1853,7 +1857,7 @@ class C_api extends CI_Controller {
                             'SDCID' => $data[$c]['SDCID'],
                             'ScheduleID' => $data[$c]['ScheduleID']
                         );
-                        $data[$c]['D'] = $this->m_api->getStdCombinedClass($aarw);
+                        $data[$c]['D'] = $this->m_api->getStdCombinedClass($aarw,$smt);
                     }
                 }
 
@@ -2396,6 +2400,13 @@ class C_api extends CI_Controller {
                                               AND sdc.ProdiID = "'.$data_arr['ProdiID'].'" 
                                               ORDER BY s.ClassGroup ASC')->result_array();
 
+                    echo 'SELECT s.* FROM db_academic.schedule s 
+                                              LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                              WHERE s.SemesterID = "'.$data_arr['SemesterID'].'" 
+                                              AND CombinedClasses = "0" 
+                                              AND sdc.ProdiID = "'.$data_arr['ProdiID'].'" 
+                                              ORDER BY s.ClassGroup ASC';
+
                     $result = $data;
 
                 } else {
@@ -2741,10 +2752,6 @@ class C_api extends CI_Controller {
                     return print_r(0);
                 }
 
-
-
-
-
             }
             else if($data_arr['action']=='getScheduleGC'){
 
@@ -2829,12 +2836,18 @@ class C_api extends CI_Controller {
         return print_r(json_encode($data));
     }
 
+
     public function room_equipment()
     {
         $data_arr = $this->getInputToken();
         $room = $data_arr['room'];
         $arr = $this->m_reservation->get_m_room_equipment($room);
         echo json_encode($arr);
+    }
+    public function getStudentByScheduleID($ScheduleID){
+        $data = $this->m_api->__getStudentByScheduleID($ScheduleID);
+        return print_r(json_encode($data));
+
     }
 
 
