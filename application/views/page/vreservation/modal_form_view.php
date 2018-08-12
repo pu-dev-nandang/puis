@@ -49,7 +49,7 @@
                     <label class="control-label">Start</label>
                 </div>    
                 <div class="col-sm-6">
-                   <input type="text" name="Start" id= "Start" placeholder="Input Start" class="form-control" value="<?php echo $time ?>" readonly>
+                   <input type="text" name="Start" id= "Start" placeholder="Input Start" class="form-control" value="<?php echo $Start ?>" readonly>
                 </div>
             </div>
         </div>
@@ -62,9 +62,7 @@
                     <label class="control-label">End</label>
                 </div>    
                 <div class="col-sm-6">
-                   <select class="select2-select-00 col-md-4 full-width-fix" id="End">
-                        <!-- <option></option> -->
-                    </select>
+                   <input type="text" name="Start" id= "Room" placeholder="Input Room" class="form-control" value="<?php echo $End ?>" readonly>
                 </div>
             </div>
         </div>
@@ -74,7 +72,17 @@
                     <label class="control-label">Agenda :</label>
                 </div>    
                 <div class="col-sm-6">
-                   <input type="text" name="Agenda" id= "Agenda" placeholder="Input Agenda" class="form-control">
+                   <input type="text" name="Agenda" id= "Agenda" placeholder="Input Agenda" class="form-control" value="<?php echo $Agenda ?>" readonly>
+                </div>
+            </div>
+        </div>
+        <div class="form-group"> 
+            <div class="row">
+                <div class="col-sm-3">
+                    <label class="control-label">User :</label>
+                </div>    
+                <div class="col-sm-6">
+                   <input type="text" name="Agenda" id= "Agenda" placeholder="Input Agenda" class="form-control" value="<?php echo $User ?>" readonly>
                 </div>
             </div>
         </div>
@@ -84,9 +92,7 @@
                     <label class="control-label">Equipment Additional :</label>
                 </div>    
                 <div class="col-sm-6">
-                    <div class="col-md-3" id ="e_additional">
-                                                                  
-                    </div>
+                    <label class="control-label"><?php echo $Name_equipment_add ?></label>
                 </div>
             </div>
         </div>
@@ -96,21 +102,7 @@
                     <label class="control-label">Person Support :</label>
                 </div>    
                 <div class="col-sm-6">
-                    <div class="col-md-3" id ="person_support">
-                                                                  
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="form-group"> 
-            <div class="row">
-                <div class="col-sm-3">
-                    <label class="control-label">Multiple Days :</label>
-                </div>    
-                <div class="col-sm-6">
-                    <div class="col-md-3" id ="multiplePage">
-                                                                  
-                    </div>
+                    <label class="control-label"><?php echo $Name_add_personel ?></label> 
                 </div>
             </div>
         </div>
@@ -120,17 +112,14 @@
                     <label class="control-label">Request Layout:</label>
                 </div>    
                 <div class="col-sm-6">
-                    <input type="file" data-style="fileinput" id="ExFile">
-                    <br>
-                    <b>If no Upload then using Default Layout</b><br>
-                    <a href="<?php echo base_url('fileGetAny/vreservation-aa.pdf'); ?>" target="_blank"></i>Click Default Layout</a>
+                    <?php echo $Req_layout ?>
                 </div>
             </div>
         </div>
         <div style="text-align: center;">       
     		<div class="col-sm-12" id="BtnFooter">
                 <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>
-                <button type="button" id="ModalbtnSaveForm" class="btn btn-success" action = "<?php echo $action ?>">Save</button>
+                <button type="button" class="btn btn-success btn-edit btn-apppove" id_table = "<?php echo $ID ?>">Approve</button>
     		</div>
         </div>    
     </form>
@@ -271,7 +260,6 @@
             time : time
         }
         var token = jwt_encode(data,"UAP)(*");
-        $('#End').empty();
         $.post(url,{ token:token },function (data_json) {
           for (var i = 0; i < data_json.length; i++) {
               var selected = (i==0) ? 'selected' : '';

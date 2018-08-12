@@ -229,16 +229,126 @@ class C_global extends Vreservation_Controler {
         $this->data['room'] = $input['room'];
         $this->data['time'] = $input['time'];
         $this->data['user'] = $input['user'];
-        $this->data['tgl'] = $input['tgl'];
-        switch ($input['Action']) {
-            case 'add':
-                echo $this->load->view($this->pathView.'modal_form',$this->data,true);
-                break;
-            
-            default:
-                # code...
-                break;
+        if (array_key_exists("tgl",$input)) {
+            $End = date("Y-m-d H:i:s", strtotime($input['tgl'].$input['time']));
         }
+        else
+        {
+            $input['tgl'] = date('Y-m-d');
+            $End = date("Y-m-d H:i:s", strtotime($input['time']));
+        }
+        $this->data['tgl'] = $input['tgl'];
+        // print_r($input['time']);
+        // cek time telah melewati waktu sekarang
+        $Start = date("Y-m-d H:i:s");
+        $time = $this->m_master->countTimeQuery($End, $Start);
+        $time = $time[0]['time'];
+        $time = explode(':', $time);
+        
+        if (strpos($time[0], '-00') !== false) {
+            $time = ($time[0] * 60) + $time[1];
+            $time = '-'.$time;
+            $time = (int)$time;
+        }
+        else
+        {
+            $time0 = (int)$time[0];
+            $time1 = ($time0 * 60);
+            if (strpos($time1, '-') !== false) {
+                $time = $time1 - $time[1];
+            }
+            else
+            {
+                $time = $time1 + $time[1];
+            }
+            $time = (int)$time;
+        }
+        
+        //print_r($time);
+        if ($time > -30) {
+            switch ($input['Action']) {
+                case 'add':
+                    echo $this->load->view($this->pathView.'modal_form',$this->data,true);
+                    break;
+                case 'view':
+                    $data = $input['dt'];
+                    $Start = $data[1];
+                    $End = $data[2];
+                    $this->data['End'] = date("h:i a", strtotime($End));
+                    $this->data['Start'] = date("h:i a", strtotime($Start));
+                    $this->data['Agenda'] = $data[5];
+                    $this->data['User'] = $data[0];
+                    $ID = $data[9];
+                    $get = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$ID);
+                    // get data Equipment Additional
+                    $Name_equipment_add = '-';
+                    if ($get[0]['ID_equipment_add'] != '' || $get[0]['ID_equipment_add'] != null) {
+                        $ID_equipment_add = explode(',', $get[0]['ID_equipment_add']);
+                        $Name_equipment_add = '';
+                        for ($j=0; $j < count($ID_equipment_add); $j++) { 
+                            $get2 = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add[$j]);
+                            // print_r($ID_equipment_add);die();
+                            $ID_m_equipment = $get2[0]['ID_m_equipment'];
+                            $get3 = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
+                            if ($j != count($ID_equipment_add) - 1) {
+                                $Name_equipment_add .= $get3[0]['Equipment'].',';
+                            }
+                            else
+                            {
+                                $Name_equipment_add .= $get3[0]['Equipment'];
+                            }
+                            
+                        }
+                    }
+                    $this->data['Name_equipment_add'] = $Name_equipment_add;
+
+                    // get personel
+                    $ID_add_personel = '-';
+                    $Name_add_personel = '-';
+                    if ($get[0]['ID_add_personel'] != '' || $get[0]['ID_add_personel'] != null) {
+                        $ID_add_personel = explode(',', $get[0]['ID_add_personel']);
+                        $Name_add_personel = '';
+                        for ($j=0; $j < count($ID_add_personel); $j++) { 
+                            $get2 = $this->m_master->caribasedprimary('db_employees.division','ID',$ID_add_personel[$j]);
+                            if ($j != count($ID_equipment_add) - 1) {
+                                $Name_add_personel .= $get2[0]['Division'].',';
+                            }
+                            else
+                            {
+                                $Name_add_personel .= $get2[0]['Division'];
+                            }
+                        }
+
+                    }
+                    $this->data['Name_add_personel'] = $Name_add_personel;
+
+                    
+                    if ($get[0]['Req_layout'] != '' || $get[0]['Req_layout'] != null) {
+                         $Req_layout = '<a href="'.base_url("fileGetAny/vreservation-".$get[0]['Req_layout']."").'" target="_blank"></i>Layout</a>';
+                    }
+                    else
+                    {
+                        $Req_layout = '<a href="'.base_url("fileGetAny/vreservation-aa.pdf").'" target="_blank"></i>Default Layout</a>';
+                    }
+                    $this->data['Req_layout'] = $Req_layout;
+                    $this->data['ID'] = $get[0]['ID'];
+                    echo $this->load->view($this->pathView.'modal_form_view',$this->data,true);
+                    break;
+                default:
+                    # code...
+                    break;
+            }
+        }
+        else
+        {
+            $html = '<div>Time is not Available</div><br><div style="text-align: center;">       
+            <div class="col-sm-12" id="BtnFooter">
+                <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>
+            </div>
+        </div>';
+        echo $html;
+        }
+        
         
     }
 

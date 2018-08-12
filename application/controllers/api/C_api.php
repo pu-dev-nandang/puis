@@ -2798,11 +2798,13 @@ class C_api extends CI_Controller {
         $endTime = '18';
         //$getHoursNow = date('H');
         
-        $getHoursNow = (int)$aaa[0] + 1;
+        // $getHoursNow = (int)$aaa[0] + 1;
 
         $Start2 = date("H", strtotime($start));
-        $endTime = (int)$endTime - (int)$Start2;
-        $endTime = $endTime + $getHoursNow - 1;
+        //$endTime = (int)$endTime - (int)$Start2;
+        //$endTime = $endTime + $getHoursNow - 1;
+        //print_r($endTime);die();
+        $getHoursNow = (int)$Start2 + 1;
        
         for ($i=$getHoursNow; $i <= $endTime; $i++) { 
                 // check len
@@ -2834,9 +2836,18 @@ class C_api extends CI_Controller {
         return print_r(json_encode($data));
     }
 
+
+    public function room_equipment()
+    {
+        $data_arr = $this->getInputToken();
+        $room = $data_arr['room'];
+        $arr = $this->m_reservation->get_m_room_equipment($room);
+        echo json_encode($arr);
+    }
     public function getStudentByScheduleID($ScheduleID){
         $data = $this->m_api->__getStudentByScheduleID($ScheduleID);
         return print_r(json_encode($data));
+
     }
 
 

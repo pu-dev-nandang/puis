@@ -287,27 +287,6 @@
 		modal_generate('add','Form Booking Reservation',room,time,tgl);
   });
 
-    function modal_generate(action,title,room,time,tgl,user = '') {
-        var url = base_url_js+"vreservation/modal_form";
-        var data = {
-            Action : action,
-            room : room,
-            time : time,
-            user : user,
-            tgl  : tgl
-        };
-        var token = jwt_encode(data,"UAP)(*");
-        $.post(url,{ token:token }, function (html) {
-            $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+title+'</h4>');
-            $('#GlobalModalLarge .modal-body').html(html);
-            $('#GlobalModalLarge .modal-footer').html(' ');
-            $('#GlobalModalLarge').modal({
-                'show' : true,
-                'backdrop' : 'static'
-            });
-        })
-    }
-
     $(document).on('click','.chk_e_additional', function () {
         $('input.chk_e_additional').prop('checked', false);
         $(this).prop('checked',true);
@@ -325,13 +304,11 @@
 
 
     // event ya multiple belum
-
     $(document).on('change','#e_multipleTDK', function () {
         if(this.checked) {
             $('#divE_multiple').remove();
             $('.divPageSelect').remove();
         }
-
     });
 
     $(document).on('change','#countDays', function () {
@@ -415,7 +392,7 @@
                 $('#tablechk_e_additional').append('<tr id = "a'+i+'">');
                 for (var k = 0; k < splitBagi; k++) {
                     $('#a'+i).append('<td>'+
-                                        '<input type="checkbox" class = "chke_additional" name="chke_additional" value = "'+response[getRow].ID+'">&nbsp'+ response[getRow].Equipment+
+                                        '<input type="checkbox" class = "chke_additional" name="chke_additional" value = "'+response[getRow].ID_add+'">&nbsp'+ response[getRow].Equipment+
                                      '</td>'
                                     );
                     getRow++;

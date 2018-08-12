@@ -13,7 +13,7 @@ class M_reservation extends CI_Model {
 
     public function get_m_equipment_additional($available = '> 0')
     {
-        $sql = 'select a.*,b.* from db_reservation.m_equipment_additional as a join db_reservation.m_equipment as b
+        $sql = 'select a.ID as ID_add,a.*,b.* from db_reservation.m_equipment_additional as a join db_reservation.m_equipment as b
         on a.ID_m_equipment = b.ID where a.Qty '.$available;
         $query=$this->db->query($sql, array());
         return $query->result_array();
@@ -94,7 +94,8 @@ class M_reservation extends CI_Model {
                 'agenda' => 'Study',
                 'room' => $query[$i]['Room'],
                 'approved' => 1,
-                'NIP' => '',
+                'NIP' => '0',
+                'ID' => '0',
                 //'NameEng' => $query[$i]['NameEng'],
             );
             $arr_result[] = $dt;
@@ -111,6 +112,7 @@ class M_reservation extends CI_Model {
                 'room' => $query2[$i]['Room'],
                 'approved' => $query2[$i]['Status'],
                 'NIP' => $query2[$i]['CreatedBy'],
+                'ID' => $query2[$i]['ID'],
                 //'NameEng' => $query[$i]['NameEng'],
             );
             $arr_result[] = $dt;
@@ -143,7 +145,8 @@ class M_reservation extends CI_Model {
                 'agenda' => 'Study',
                 'room' => $query3[$i]['Room'],
                 'approved' => 1,
-                'NIP' => '',
+                'NIP' => '0',
+                'ID' => '0',
                 //'NameEng' => $query[$i]['NameEng'],
             );
             $arr_result[] = $dt;
@@ -307,7 +310,7 @@ class M_reservation extends CI_Model {
 
     public function getCountApprove()
     {
-        $sql = 'select count(*) as total from db_reservation.t_booking where Status = 0 and Start >= NOW()';
+        $sql = 'select count(*) as total from db_reservation.t_booking where Status = 0 and Start >= timestamp(DATE_SUB(NOW(), INTERVAL 30 MINUTE))';
         $query=$this->db->query($sql, array())->result_array();
         return $query[0]['total'];
 
@@ -317,10 +320,11 @@ class M_reservation extends CI_Model {
     {
         $arr_result = array();
         $this->load->model('master/m_master');
-        $Start = ($Start == null) ? ' and Start >= NOW()' : ' and Start like "%'.$Start.'%"';
+        $Start = ($Start == null) ? ' and Start >= timestamp(DATE_SUB(NOW(), INTERVAL 30 MINUTE))' : ' and Start like "%'.$Start.'%"';
         $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP where a.Status = ?
                  '.$Start;
-        $query=$this->db->query($sql, array())->result_array();
+        $query=$this->db->query($sql, array($Status))->result_array();
+        // print_r($query);die();
         for ($i=0; $i < count($query); $i++) { 
             $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['Start']);
             $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['End']);
@@ -334,6 +338,7 @@ class M_reservation extends CI_Model {
                 $Name_equipment_add = '<ul>';
                 for ($j=0; $j < count($ID_equipment_add); $j++) { 
                     $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add[$j]);
+                    // print_r($ID_equipment_add);die();
                     $ID_m_equipment = $get[0]['ID_m_equipment'];
                     $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
                     $Name_equipment_add .= '<li>'.$get[0]['Equipment'].'</li>';
@@ -366,9 +371,17 @@ class M_reservation extends CI_Model {
                     'Persone_add' => $Name_add_personel,
                     'Req_date' => $ReqdateNameDay.', '.$query[$i]['Req_date'],
                     'Req_layout' => $query[$i]['Req_layout'],
+                    'ID' => $query[$i]['ID'],
             );
         }
 
         return $arr_result;         
+    }
+
+    public function get_m_room_equipment($room)
+    {
+        $sql = 'select a.Room,a.qty,b.Equipment from db_reservation.m_room_equipment as a join db_reservation.m_equipment as b on a.ID_m_equipment = b.ID and a.Room = ?';
+        $query=$this->db->query($sql, array($room))->result_array();
+        return $query;
     }
 }

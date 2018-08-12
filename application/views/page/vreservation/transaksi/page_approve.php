@@ -52,10 +52,68 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-        loadNumberFormulir();
+        loadDataListApprove();
+        socket_messages2();
     });
 
-    function loadNumberFormulir()
+    $(document).on('click','.btn-edit', function () {
+      //loading_button('.btn-edit');
+      ID_tbl = $(this).attr('idtbooking');
+      $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Are you sure ? </b> ' +
+          '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+          '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+          '</div>');
+      $('#NotificationModal').modal('show');
+
+      $("#confirmYes").click(function(){
+          $('#NotificationModal .modal-header').addClass('hide');
+          $('#NotificationModal .modal-body').html('<center>' +
+              '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+              '                    <br/>' +
+              '                    Loading Data . . .' +
+              '                </center>');
+          $('#NotificationModal .modal-footer').addClass('hide');
+          $('#NotificationModal').modal({
+              'backdrop' : 'static',
+              'show' : true
+          });
+          var url =base_url_js+'vreservation/approve_submit';
+          var data = {ID_tbl : ID_tbl};
+          var token = jwt_encode(data,'UAP)(*');
+          $.post(url,{token:token},function (data_json) {
+              setTimeout(function () {
+                 toastr.options.fadeOut = 10000;
+                 toastr.success('Data berhasil disimpan', 'Success!');
+                 loadDataListApprove();
+                 // send notification other school from client
+                 var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+                 // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
+                   socket.emit('update_schedule_notifikasi', { 
+                     update_schedule_notifikasi: '1',
+                     date : '',
+                   });
+                 $('#NotificationModal').modal('hide');
+              },500);
+          });
+      })
+    });  
+
+    function socket_messages2()
+    {
+        var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+        // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
+        socket.on( 'update_schedule_notifikasi', function( data ) {
+
+            //$( "#new_count_message" ).html( data.new_count_message );
+            //$('#notif_audio')[0].play();
+            if (data.update_schedule_notifikasi == 1) {
+                loadDataListApprove();
+            }
+
+        }); // exit socket
+    }
+
+    function loadDataListApprove()
     {
         $("#pageData").empty();
         loading_page('#pageData');
@@ -64,7 +122,7 @@
                             '<table class="table table-striped table-bordered table-hover table-checkable datatable">'+
                                 '<thead>'+
                                     '<tr>'+
-                                    '<th style="width: 15px;">No</th>'+
+                                    // '<th style="width: 15px;">No</th>'+
                                    ' <th>Start</th>'+
                                    ' <th>End</th>'+
                                    ' <th>Time</th>'+
@@ -74,6 +132,7 @@
                                    ' <th>Personel Support</th>'+
                                    ' <th>Req Date</th>'+
                                    ' <th>Req Layout</th>'+
+                                   ' <th>Action</th>'+
                                     '</tr>'+
                                ' </thead>'+
                                 '<tbody>'+
@@ -87,27 +146,24 @@
                 var response = jQuery.parseJSON(data_json);
                $("#pageData").html(html_table);
                for (var i = 0; i < response.length; i++) {
-                var status = '<td style="'+
-                                'color:  green;'+
-                                '">IN'+
-                              '</td>';
-                if (response[i]['Status'] == 1 ) {
-                    status = '<td style="'+
-                                'color:  red;'+
-                                '">Sold Out'+
-                              '</td>';
-                }
+                var btn = '<span class="btn btn-xs btn-edit" idtbooking ="'+response[i]['ID']+'" >'+
+                                    '<i class="fa fa-pencil-square-o"></i> Approve'+
+                                   '</span>';
+                var Req_layout = (response[i]['Req_layout'] == '') ? 'Default' : '<a href="javascript:void(0)" class="btn-action btn-edit btn-get-link" data-page="fileGetAny/vreservation/'+response[i]['Req_layout']+'">Request Layout</a>';                  
                 $(".datatable tbody").append(
                     '<tr>'+
-                        '<td>'+no+'</td>'+
-                        '<td>'+response[i]['Years']+'</td>'+
-                        '<td>'+response[i]['FormulirCode']+'</td>'+
-                        status+
-                        '<td>'+response[i]['CreateAT']+'</td>'+
-                        '<td>'+response[i]['Name']+'</td>'+
+                        '<td>'+response[i]['Start']+'</td>'+
+                        '<td>'+response[i]['End']+'</td>'+
+                        '<td>'+response[i]['Time']+'</td>'+
+                        '<td>'+response[i]['Agenda']+'</td>'+
+                        '<td>'+response[i]['Room']+'</td>'+
+                        '<td>'+response[i]['Equipment_add']+'</td>'+
+                        '<td>'+response[i]['Persone_add']+'</td>'+
+                        '<td>'+response[i]['Req_date']+'</td>'+
+                        '<td>'+Req_layout+'</td>'+
+                        '<td>'+btn+'</td>'+
                     '</tr>' 
                     );
-                no++;
             }
             LoaddataTable('.datatable');
             },500);
