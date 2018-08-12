@@ -172,6 +172,12 @@ class M_master extends CI_Model {
         $query=$this->db->query($sql, array());
     }
 
+    public function delete_id_table_all_db($ID,$table)
+    {
+        $sql = "delete from ".$table." where ID = ".$ID;
+        $query=$this->db->query($sql, array());
+    }
+
     public function getActive_id_active_table($ID,$Active,$table)
     {
         if ($Active == 0) {

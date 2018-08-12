@@ -155,9 +155,10 @@ class M_reservation extends CI_Model {
         return $arr_result;
     }
 
-    public function checkBentrok($Start,$End,$chk_e_multiple,$Room)
+    public function checkBentrok($Start,$End,$chk_e_multiple,$Room,$NotIDMyself = '')
     {
         $bool = true;
+        $NotIDMyself = ($NotIDMyself == '') ? '' : ' and a.ID != '.$NotIDMyself;
         for ($xx=0; $xx < 3; $xx++) {  // check twice
             // get 
             $TimeStart = date("H:i:s", strtotime($Start));
@@ -199,7 +200,7 @@ class M_reservation extends CI_Model {
                     {
                         $sql2 = 'select count(*) as total from db_reservation.t_booking as a
                                  join db_employees.employees as b on a.CreatedBy = b.NIP
-                                 where a.Status in(0,1) and ((a.`Start` >= "'.$Start.'" and a.`Start` < "'.$End.'" ) or (a.`End` > "'.$Start.'" and a.`End` <= "'.$End.'" )) and a.Room = '.$Room;
+                                 where a.Status in(0,1) and ((a.`Start` >= "'.$Start.'" and a.`Start` < "'.$End.'" ) or (a.`End` > "'.$Start.'" and a.`End` <= "'.$End.'" )) and a.Room = "'.$Room.'"'.' '.$NotIDMyself;
                         $query2=$this->db->query($sql2, array())->result_array();
                          if ($query2[0]['total'] > 0) {
                             $bool = false;
@@ -232,11 +233,18 @@ class M_reservation extends CI_Model {
                 }
                 else
                 {
+                    // $sql3 = 'select count(*) as total
+                    //         from db_academic.classroom as a join db_academic.schedule_exchange as c
+                    //         on a.ID = c.ClassroomID
+                    //         join db_academic.days as b
+                    //         on c.DayID = b.ID where c.Status = "1" and c.Date ="'.$date2.'"';
+                    // $query3=$this->db->query($sql3, array())->result_array();
                     $sql3 = 'select count(*) as total
                             from db_academic.classroom as a join db_academic.schedule_exchange as c
                             on a.ID = c.ClassroomID
                             join db_academic.days as b
-                            on c.DayID = b.ID where c.Status = "1" and c.Date ="'.$date2.'"';
+                            on c.DayID = b.ID where c.Status = "1" and c.Date ="'.$date2.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'"';
+                    //print_r($sql3);die();
                     $query3=$this->db->query($sql3, array())->result_array();
                     if ($query3[0]['total'] > 0) {
                         $bool = false;
@@ -245,7 +253,7 @@ class M_reservation extends CI_Model {
                     {
                         $sql2 = 'select count(*) as total from db_reservation.t_booking as a
                                  join db_employees.employees as b on a.CreatedBy = b.NIP
-                                 where a.Status = 1 and ((a.`Start` >= "'.$Start.'" and a.`Start` < "'.$End.'" ) or (a.`End` > "'.$Start.'" and a.`End` <= "'.$End.'" )) and a.Room = '.$Room;
+                                 where a.Status = 1 and ((a.`Start` >= "'.$Start.'" and a.`Start` < "'.$End.'" ) or (a.`End` > "'.$Start.'" and a.`End` <= "'.$End.'" )) and a.Room = "'.$Room.'"'.' '.$NotIDMyself;
                         $query2=$this->db->query($sql2, array())->result_array();
                          if ($query2[0]['total'] > 0) {
                             $bool = false;
@@ -278,11 +286,18 @@ class M_reservation extends CI_Model {
                     }
                     else
                     {
+                        // $sql3 = 'select count(*) as total
+                        //         from db_academic.classroom as a join db_academic.schedule_exchange as c
+                        //         on a.ID = c.ClassroomID
+                        //         join db_academic.days as b
+                        //         on c.DayID = b.ID where c.Status = "1" and c.Date ="'.$getDate.'"';
+                        // $query3=$this->db->query($sql3, array())->result_array();
                         $sql3 = 'select count(*) as total
                                 from db_academic.classroom as a join db_academic.schedule_exchange as c
                                 on a.ID = c.ClassroomID
                                 join db_academic.days as b
-                                on c.DayID = b.ID where c.Status = "1" and c.Date ="'.$getDate.'"';
+                                on c.DayID = b.ID where c.Status = "1" and c.Date ="'.$getDate.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'"';
+                        //print_r($sql3);die();
                         $query3=$this->db->query($sql3, array())->result_array();
                         if ($query3[0]['total'] > 0) {
                             $bool = false;
@@ -291,7 +306,7 @@ class M_reservation extends CI_Model {
                         {
                             $sql2 = 'select count(*) as total from db_reservation.t_booking as a
                                      join db_employees.employees as b on a.CreatedBy = b.NIP
-                                     where a.Status in(0,1) and ((a.`Start` >= "'.$Start.'" and a.`Start` < "'.$End.'" ) or (a.`End` > "'.$Start.'" and a.`End` <= "'.$End.'" )) and a.Room = "'.$Room.'"';
+                                     where a.Status in(0,1) and ((a.`Start` >= "'.$Start.'" and a.`Start` < "'.$End.'" ) or (a.`End` > "'.$Start.'" and a.`End` <= "'.$End.'" )) and a.Room = "'.$Room.'" '.$NotIDMyself;
                             $query2=$this->db->query($sql2, array())->result_array();
                              if ($query2[0]['total'] > 0) {
                                 $bool = false;
@@ -383,5 +398,68 @@ class M_reservation extends CI_Model {
         $sql = 'select a.Room,a.qty,b.Equipment from db_reservation.m_room_equipment as a join db_reservation.m_equipment as b on a.ID_m_equipment = b.ID and a.Room = ?';
         $query=$this->db->query($sql, array($room))->result_array();
         return $query;
+    }
+
+    public function checkBentrokScheduleAPI()
+    {
+        $bool = true;
+        $arr_result = array('ID' => '','bool' => $bool);
+        // get data schedule details and compare with t_booking table
+        $sql = 'select * from db_reservation.t_booking where Start >= timestamp(DATE_SUB(NOW(), INTERVAL 30 MINUTE))';
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) {
+             $Start = $query[$i]['Start'];
+             $End = $query[$i]['End'];
+             $Room = $query[$i]['Room'];
+             // get 
+             $TimeStart = date("H:i:s", strtotime($Start));
+             $TimeEnd = date("H:i:s", strtotime($End)); 
+             // check academic timeline
+                $datetime = DateTime::createFromFormat('Y-m-d H:i:s', $Start);
+                $NameDay = $datetime->format('l');
+                $date2 = date("Y-m-d", strtotime($Start));
+
+                $sql2 = 'select count(*) as total from db_academic.classroom as a join db_academic.schedule_details as c
+                        on a.ID = c.ClassroomID
+                        join db_academic.days as b
+                        on c.DayID = b.ID
+                        where CURDATE() >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
+                        and CURDATE() <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
+                        and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                on a.ID = b.ID_Attd where b.Status = "1" and b.DateOriginal = "'.$date2.'")';
+                $query2=$this->db->query($sql2, array())->result_array();
+                if ($query2[0]['total'] > 0) {
+                    // print_r('bentrok :'.$NameDay.', '.$TimeStart.'-'.$TimeEnd.' : '.$date2).'<br>';
+                    $bool = false;
+                    // break;
+                    $arr_result = array('ID' => $query[$i]['ID'],'bool' => $bool);
+                    break;
+                }
+                else
+                {
+                    $sql3 = 'select count(*) as total
+                            from db_academic.classroom as a join db_academic.schedule_exchange as c
+                            on a.ID = c.ClassroomID
+                            join db_academic.days as b
+                            on c.DayID = b.ID where c.Status = "1" and c.Date ="'.$date2.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'"';
+                    //print_r($sql3);die();
+                    $query3=$this->db->query($sql3, array())->result_array();
+                    if ($query3[0]['total'] > 0) {
+                        // print_r('bentrok :'.$NameDay.', '.$TimeStart.'-'.$TimeEnd.' : '.$date2);
+                        $bool = false;
+                        // break;
+                        $arr_result = array('ID' => $query[$i]['ID'],'bool' => $bool);
+                        break;
+                    }
+                    else
+                    {
+                        // print_r('Ok<br>');
+                    }
+                }
+        }
+
+        // die();
+        return $arr_result;
+
     }
 }

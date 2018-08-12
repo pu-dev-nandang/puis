@@ -203,18 +203,28 @@ $this->m_master->checkAuth_user();
          var data = {ID_tbl : id_table};
          var token = jwt_encode(data,'UAP)(*');
          $.post(url,{token:token},function (data_json) {
-             setTimeout(function () {
-                toastr.options.fadeOut = 10000;
-                toastr.success('Data berhasil disimpan', 'Success!');
-                // send notification other school from client
-                var socket = io.connect( 'http://'+window.location.hostname+':3000' );
-                // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
-                  socket.emit('update_schedule_notifikasi', { 
-                    update_schedule_notifikasi: '1',
-                    date : '',
-                  });
-                $('#GlobalModalLarge').modal('hide');
-             },500);
+            var response = jQuery.parseJSON(data_json);
+            if (response == '') {
+                setTimeout(function () {
+                   toastr.options.fadeOut = 10000;
+                   toastr.success('Data berhasil disimpan', 'Success!');
+                   // send notification other school from client
+                   var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+                   // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
+                     socket.emit('update_schedule_notifikasi', { 
+                       update_schedule_notifikasi: '1',
+                       date : '',
+                     });
+                   var divHtml = $("#schedule");
+                   loadDataSchedule(divHtml);  
+                   $('#GlobalModalLarge').modal('hide');
+                },500);
+            }
+            else
+            {
+                toastr.error(response, 'Failed!!');
+            }
+             
          });
      })
 
@@ -252,7 +262,7 @@ $this->m_master->checkAuth_user();
         var url = base_url_js+'vreservation/getCountApprove';
         $.post(url,function (data_json) {
             var response = jQuery.parseJSON(data_json);
-            $("#countRequest").html('<b>Total Request : <a href="javascript:void(0)" class="btn-action btn-edit btn-get-link" data-page="vr_request">'+response+'</a></b>');
+            $("#countRequest").html('<b>Total Request : <a href="javascript:void(0)" class="btn-action btn-edit btn-get-link" data-page="transaksi/approve">'+response+'</a></b>');
         }).done(function() {
 
         })

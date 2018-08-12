@@ -230,7 +230,8 @@ class C_global extends Vreservation_Controler {
         $this->data['time'] = $input['time'];
         $this->data['user'] = $input['user'];
         if (array_key_exists("tgl",$input)) {
-            $End = date("Y-m-d H:i:s", strtotime($input['tgl'].$input['time']));
+            // $End = date("Y-m-d H:i:s", strtotime($input['tgl'].$input['time']));
+            $End = date("Y-m-d H:i:s", strtotime($input['time']));
         }
         else
         {
@@ -238,6 +239,7 @@ class C_global extends Vreservation_Controler {
             $End = date("Y-m-d H:i:s", strtotime($input['time']));
         }
         $this->data['tgl'] = $input['tgl'];
+        // print_r($End);
         // print_r($input['time']);
         // cek time telah melewati waktu sekarang
         $Start = date("Y-m-d H:i:s");
@@ -263,8 +265,7 @@ class C_global extends Vreservation_Controler {
             }
             $time = (int)$time;
         }
-        
-        //print_r($time);
+
         if ($time > -30) {
             switch ($input['Action']) {
                 case 'add':

@@ -1,5 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+include_once APPPATH.'vendor/autoload.php';
+use ElephantIO\Client;
+use ElephantIO\Engine\SocketIO\Version1X;
 
 class C_api extends CI_Controller {
 
@@ -2847,6 +2850,71 @@ class C_api extends CI_Controller {
     public function getStudentByScheduleID($ScheduleID){
         $data = $this->m_api->__getStudentByScheduleID($ScheduleID);
         return print_r(json_encode($data));
+
+    }
+
+    public function checkBentrokScheduleAPI()
+    {
+        $chk = $this->m_reservation->checkBentrokScheduleAPI();
+        if (!$chk['bool']) {
+            // insert table to t_booking_delete
+                $this->load->model('m_sendemail');
+                // get data user
+                $get = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$chk['ID']);
+                $getUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$get[0]['CreatedBy']);
+
+                $dataSave = array(
+                    'Start' => $get[0]['Start'],
+                    'End' => $get[0]['End'],
+                    'Time' => $get[0]['Time'],
+                    'Colspan' => $get[0]['Colspan'],
+                    'Agenda' => $get[0]['Agenda'],
+                    'Room' => $get[0]['Room'],
+                    'ID_equipment_add' => $get[0]['ID_equipment_add'],
+                    'ID_add_personel' => $get[0]['ID_add_personel'],
+                    'Req_date' => $get[0]['Req_date'],
+                    'CreatedBy' => $get[0]['CreatedBy'],
+                    'ID_t_booking' => $get[0]['ID'],
+                    'Note_deleted' => 'Conflict',
+                    'DeletedBy' => 0,
+                    'Req_layout' => $get[0]['Req_layout'],
+                );
+                $this->db->insert('db_reservation.t_booking_delete', $dataSave); 
+
+                $this->m_master->delete_id_table_all_db($get[0]['ID'],'db_reservation.t_booking');
+
+
+            // send email and update notification
+                // broadcase update js
+            if($_SERVER['SERVER_NAME'] =='localhost') {
+                $client = new Client(new Version1X('//10.1.10.230:3000'));
+            }
+            else{
+                $client = new Client(new Version1X('//10.1.30.17:3000'));
+            }    
+                $client->initialize();
+                // send message to connected clients
+                $client->emit('update_schedule_notifikasi', ['update_schedule_notifikasi' => '1','date' => '']);
+                $client->close();
+
+                // send email
+                
+                $Email = $getUser[0]['EmailPU'];
+                $text = 'Dear '.$getUser[0]['Name'].',<br><br>
+                            Your Venue Reservation was conflict,<br>
+                            Your schedule automated delete by System,<br>
+                            Please Create new schedule. <br>
+                            
+                        ';        
+                $to = $Email;
+                $subject = "Podomoro University Venue Reservation";
+                $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                echo json_encode(0);
+        }
+        else
+        {
+            echo json_encode(1);
+        }
 
     }
 

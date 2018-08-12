@@ -588,7 +588,7 @@ $route['api/__m_equipment_additional'] = 'api/c_api/m_equipment_additional';
 $route['api/get_time_opt_reservation'] = 'api/c_api/get_time_opt_reservation';
 $route['api/__m_additional_personel'] = 'api/c_api/m_additional_personel';
 $route['api/__room_equipment'] = 'api/c_api/room_equipment';
-
+$route['api/__checkBentrokScheduleAPI'] = 'api/c_api/checkBentrokScheduleAPI';
 
 
 
