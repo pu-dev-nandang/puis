@@ -1134,13 +1134,25 @@ class C_api extends CI_Controller {
             }
 
             else if($data_arr['action']=='getDataStudents'){
+
                 $SemesterID = $data_arr['SemesterID'];
                 $ScheduleID = $data_arr['ScheduleID'];
-                $data = $this->m_api->getStudentByScheduleID($SemesterID,$ScheduleID);
+
+                if($data_arr['Flag']=='sp'){
+                    $data = $this->m_api->getStudentByScheduleID($SemesterID,$ScheduleID,$data_arr['CDID']);
+                } else if($data_arr['Flag']=='std'){
+                    $data = $this->m_api->getTotalStdNotYetApprovePerDay($SemesterID,$ScheduleID,$data_arr['CDID']);
+                }
+
+
+
 
                 return print_r(json_encode($data));
             }
 
+            else if($data_arr['action']==''){
+
+            }
         }
     }
 
@@ -1174,8 +1186,10 @@ class C_api extends CI_Controller {
             $row = $query[$i];
 
             // Mendapatkan Jumlah Students
-            $Students = $this->m_api->getTotalStdPerDay($row['SemesterID'],$row['ID']);
-            $StudentsNY = $this->m_api->getTotalStdNotYetApprovePerDay($row['SemesterID'],$row['ID']);
+            $Students = $this->m_api->getTotalStdPerDay($row['SemesterID'],$row['ID'],$row['CDID']);
+            $total_std_KRS = $this->m_api->getTotalStdNotYetApprovePerDay($row['SemesterID'],$row['ID'],$row['CDID']);
+
+            $StudentsNY = count($total_std_KRS);
 
             $btnDelMK = ($Students>0) ? 1 : 0;
             // Group Kelas
@@ -1198,7 +1212,7 @@ class C_api extends CI_Controller {
             $nestedData[] = $courses;
             $nestedData[] = '<div style="text-align:center;">'.$row["Credit"].'</div>';
             $nestedData[] = $coor.''.$TeamTeaching;
-            $nestedData[] = '<div style="text-align:center;"><a href="javascript:void(0)" class="btn-sw-std" data-smtid="'.$row['SemesterID'].'" data-scheduleid="'.$row['ID'].'">'.$Students.'</a> of '.$StudentsNY.'</div>';
+            $nestedData[] = '<div style="text-align:center;"><a href="javascript:void(0)" class="btn-sw-std" data-smtid="'.$row['SemesterID'].'" data-scheduleid="'.$row['ID'].'" data-flag="sp" data-cdid="'.$row['CDID'].'">'.$Students.'</a> of <a href="javascript:void(0)" class="btn-sw-std" data-smtid="'.$row['SemesterID'].'" data-scheduleid="'.$row['ID'].'" data-flag="std" data-cdid="'.$row['CDID'].'">'.$StudentsNY.'</a></div>';
             $nestedData[] = '<div style="text-align:center;">'.substr($row["StartSessions"],0,5).' - '.substr($row["EndSessions"],0,5).'</div>';
             $nestedData[] = '<div style="text-align:center;">'.$row["Room"].'</div>';
 
@@ -1242,6 +1256,11 @@ class C_api extends CI_Controller {
             $nestedData=array();
             $row = $query[$i];
 
+            $Students = $this->m_api->getTotalStdPerDay($row['SemesterID'],$row['ID'],$row['CDID']);
+            $total_std_KRS = $this->m_api->getTotalStdNotYetApprovePerDay($row['SemesterID'],$row['ID'],$row['CDID']);
+
+            $StudentsNY = count($total_std_KRS);
+
             // Group Kelas
             $groupClass = '<b><a href="javascript:void(0)" class="btn-action" data-page="editjadwal" data-id="'.$row['ID'].'">'.$row["ClassGroup"].'</a></b>';
             $sbSesi = ($row['SubSesi']=='1' || $row['SubSesi']==1) ? '<br/><span class="label label-warning">Sub-Sesi</span>' : '';
@@ -1257,7 +1276,7 @@ class C_api extends CI_Controller {
             $courses = $this->m_api->getCoursesPerDay($row['ID']);
 
             // Mendapatkan Jumlah Students
-            $Students = $this->m_api->getTotalStdPerDay($row['SemesterID'],$row['ID']);
+//            $Students = $this->m_api->getTotalStdPerDay($row['SemesterID'],$row['ID']);
 
 
 //            $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
@@ -1265,8 +1284,8 @@ class C_api extends CI_Controller {
             $nestedData[] = $courses;
             $nestedData[] = '<div style="text-align:center;">'.$row["Credit"].'</div>';
             $nestedData[] = $coor.''.$TeamTeaching;
-            $nestedData[] = '<div style="text-align:center;">'.$Students.'</div>';
-            $nestedData[] = '<div style="text-align:center;">'.substr($row["StartSessions"],0,5).' - '.substr($row["EndSessions"],0,5).'</div>';
+            $nestedData[] = '<div style="text-align:center;"><a href="javascript:void(0)" class="btn-sw-std" data-smtid="'.$row['SemesterID'].'" data-scheduleid="'.$row['ID'].'" data-flag="sp" data-cdid="'.$row['CDID'].'">'.$Students.'</a> of <a href="javascript:void(0)" class="btn-sw-std" data-smtid="'.$row['SemesterID'].'" data-scheduleid="'.$row['ID'].'" data-flag="std" data-cdid="'.$row['CDID'].'">'.$StudentsNY.'</a></div>';
+            $nestedData[] = '<div style="text-align:center;"><b>'.$row['DayEng'].'</b><br/>'.substr($row["StartSessions"],0,5).' - '.substr($row["EndSessions"],0,5).'</div>';
             $nestedData[] = '<div style="text-align:center;">'.$row["Room"].'</div>';
 
             $no++;
@@ -1785,6 +1804,13 @@ class C_api extends CI_Controller {
         }
 
         return print_r(json_encode($dataRes));
+    }
+
+    public function getScheduleIDByClassGroup($Group){
+        $data = $this->db->query('SELECT ID FROM db_academic.schedule WHERE ClassGroup LIKE "'.$Group.'" LIMIT 1 ')->result_array();
+        $res = (count($data)>0) ? $data[0]['ID'] : 0;
+
+        return print_r($res);
     }
 
     public function crudStudyPlanning()
@@ -2400,12 +2426,6 @@ class C_api extends CI_Controller {
                                               AND sdc.ProdiID = "'.$data_arr['ProdiID'].'" 
                                               ORDER BY s.ClassGroup ASC')->result_array();
 
-                    echo 'SELECT s.* FROM db_academic.schedule s 
-                                              LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
-                                              WHERE s.SemesterID = "'.$data_arr['SemesterID'].'" 
-                                              AND CombinedClasses = "0" 
-                                              AND sdc.ProdiID = "'.$data_arr['ProdiID'].'" 
-                                              ORDER BY s.ClassGroup ASC';
 
                     $result = $data;
 
