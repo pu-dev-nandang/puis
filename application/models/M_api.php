@@ -857,7 +857,7 @@ class M_api extends CI_Model {
         return $res;
     }
 
-    public function getCoursesPerDay($ScheduleID,$Semester){
+    public function getCoursesPerDay($ScheduleID){
         $dataCourse = $this->db->query('SELECT mk.MKCode, mk.Name AS MKName, mk.NameEng AS MKNameEng ,
                                             ps.Code AS CodeProdi, ps.NameEng AS ProdiEng, cr.Year
                                             FROM db_academic.schedule_details_course sdc 

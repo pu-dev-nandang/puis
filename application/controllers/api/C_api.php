@@ -1207,7 +1207,7 @@ class C_api extends CI_Controller {
             $coor = '<div style="color: #427b44;margin-bottom: 10px;"><b>'.$row["Lecturer"].'</b></div>';
 
             // Mendapatkan matakuliah
-            $courses = $this->m_api->getCoursesPerDay($row['ID'],$row['Semester']);
+            $courses = $this->m_api->getCoursesPerDay($row['ID']);
 
 
 
