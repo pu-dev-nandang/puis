@@ -782,10 +782,11 @@ class M_api extends CI_Model {
 
         $q ='SELECT s.*, sd.ClassroomID,sd.Credit,sd.DayID,sd.TimePerCredit,sd.StartSessions,sd.EndSessions,
                                           em.Name AS Lecturer,
-                                          cl.Room, sdc.CDID 
+                                          cl.Room, sdc.CDID, cd.Semester 
                                           FROM db_academic.schedule_details sd
                                           LEFT JOIN db_academic.schedule s ON (s.ID = sd.ScheduleID)
                                           LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = sd.ScheduleID)
+                                          LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                           LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                           LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
                                           WHERE sd.DayID = '.$DayID.'  '.$ProgramsCampusID.'
@@ -812,10 +813,11 @@ class M_api extends CI_Model {
 
         $q ='SELECT s.*, sd.ClassroomID,sd.Credit,sd.DayID,sd.TimePerCredit,sd.StartSessions,sd.EndSessions,
                                           em.Name AS Lecturer,
-                                          cl.Room, sdc.CDID, d.NameEng AS DayEng 
+                                          cl.Room, sdc.CDID, cd.Semester 
                                           FROM db_academic.schedule_details sd
                                           LEFT JOIN db_academic.schedule s ON (s.ID = sd.ScheduleID)
                                           LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = sd.ScheduleID)
+                                          LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                           LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                           LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
                                           LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
@@ -855,13 +857,15 @@ class M_api extends CI_Model {
         return $res;
     }
 
-    public function getCoursesPerDay($ScheduleID){
+    public function getCoursesPerDay($ScheduleID,$Semester){
         $dataCourse = $this->db->query('SELECT mk.MKCode, mk.Name AS MKName, mk.NameEng AS MKNameEng ,
-                                            ps.Code AS CodeProdi, ps.NameEng AS ProdiEng 
+                                            ps.Code AS CodeProdi, ps.NameEng AS ProdiEng, cr.Year
                                             FROM db_academic.schedule_details_course sdc 
+                                            LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                            LEFT JOIN db_academic.curriculum cr ON (cr.ID = cd.CurriculumID)
                                             LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
                                             LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
-                                            WHERE sdc.ScheduleID = "'.$ScheduleID.'" ')->result_array();
+                                            WHERE sdc.ScheduleID = "'.$ScheduleID.'" ORDER BY cd.ID DESC ')->result_array();
 
 
         $resCourse = '';
@@ -869,9 +873,13 @@ class M_api extends CI_Model {
             for($r=0;$r<count($dataCourse);$r++){
                 $d = $dataCourse[$r];
 
-                $cc = '<div style="margin-bottom: 10px;"><b>'.$d['MKNameEng'].'</b><br/><i>'.$d['MKName'].'</i><br/>
+                $smt = $this->_getSeemsterByClassOf($dataCourse[$r]['Year']);
+
+                $cc = '<div style="margin-bottom: 10px;"><b>'.$d['MKNameEng'].'</b><br/>
+                            <i>'.$d['MKName'].'</i><br/>
                             <span class="label label-default">'.$d['MKCode'].'</span> | 
-                            <span class="label label-danger-inline"><b>'.$d['ProdiEng'].'</b></span></div>';
+                            <span class="label label-danger-inline"><b>'.$d['CodeProdi'].'</b></span> | 
+                            <i style="color:blue;">Semester : '.$smt.'</i></div>';
                 $resCourse = $resCourse.''.$cc;
             }
         }
