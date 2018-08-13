@@ -81,19 +81,27 @@
           var data = {ID_tbl : ID_tbl};
           var token = jwt_encode(data,'UAP)(*');
           $.post(url,{token:token},function (data_json) {
-              setTimeout(function () {
-                 toastr.options.fadeOut = 10000;
-                 toastr.success('Data berhasil disimpan', 'Success!');
-                 loadDataListApprove();
-                 // send notification other school from client
-                 var socket = io.connect( 'http://'+window.location.hostname+':3000' );
-                 // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
-                   socket.emit('update_schedule_notifikasi', { 
-                     update_schedule_notifikasi: '1',
-                     date : '',
-                   });
-                 $('#NotificationModal').modal('hide');
-              },500);
+            var response = jQuery.parseJSON(data_json);
+            if (response == '') {
+                setTimeout(function () {
+                   toastr.options.fadeOut = 10000;
+                   toastr.success('Data berhasil disimpan', 'Success!');
+                   loadDataListApprove();
+                   // send notification other school from client
+                   var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+                   // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
+                     socket.emit('update_schedule_notifikasi', { 
+                       update_schedule_notifikasi: '1',
+                       date : '',
+                     });
+                   $('#NotificationModal').modal('hide');
+                },500);
+            }
+            else
+              {
+                toastr.error(response, 'Failed!!');
+                $('#NotificationModal').modal('hide');
+              }
           });
       })
     });  

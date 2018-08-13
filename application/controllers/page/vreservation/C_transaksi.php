@@ -198,15 +198,29 @@ class C_transaksi extends Vreservation_Controler {
 
     public function approve_submit()
     {
+        $msg = '';
         $input = $this->getInputToken();
         $ID = $input['ID_tbl'];
-        $dataSave = array(
-                'Status' => 1,
-                'ApprovedBy' => $this->session->userdata('NIP'),
-                'ApprovedBy' => date('Y-m-d H:i:s'),
-                        );
-        $this->db->where('ID',$ID);
-        $this->db->update('db_reservation.t_booking', $dataSave);
+        // check approve bentrok
+        $get = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$ID);
+        $Start = $get[0]['Start'];$End = $get[0]['End'];$chk_e_multiple = '';$Room = $get[0]['Room'];
+        $chk = $this->m_reservation->checkBentrok($Start,$End,$chk_e_multiple,$Room,$ID);
+        if ($chk) {
+            $dataSave = array(
+                    'Status' => 1,
+                    'ApprovedBy' => $this->session->userdata('NIP'),
+                    'ApprovedBy' => date('Y-m-d H:i:s'),
+                            );
+            $this->db->where('ID',$ID);
+            $this->db->update('db_reservation.t_booking', $dataSave);
+        }
+        else
+        {
+            $msg = 'This schedule conflict, Please check';
+        }
+
+        echo json_encode($msg);
+        
     }
 
 
