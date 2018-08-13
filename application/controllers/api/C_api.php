@@ -1809,8 +1809,8 @@ class C_api extends CI_Controller {
         return print_r(json_encode($dataRes));
     }
 
-    public function getScheduleIDByClassGroup($Group){
-        $data = $this->db->query('SELECT ID FROM db_academic.schedule WHERE ClassGroup LIKE "'.$Group.'" LIMIT 1 ')->result_array();
+    public function getScheduleIDByClassGroup($SemesterID,$Group){
+        $data = $this->db->query('SELECT ID FROM db_academic.schedule WHERE SemesterID = "'.$SemesterID.'" AND ClassGroup LIKE "'.$Group.'" LIMIT 1 ')->result_array();
         $res = (count($data)>0) ? $data[0]['ID'] : 0;
 
         return print_r($res);

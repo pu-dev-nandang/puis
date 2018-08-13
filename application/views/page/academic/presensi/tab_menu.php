@@ -79,13 +79,21 @@
         checkPage();
     });
 
+    // Change Smester ID
+    $(document).on('change','#filterSemester',function () {
+        checkPage();
+    });
+
     function checkPage() {
         var filterGroup = $('#filterClassGroup').val();
+        var filterSemester = $('#filterSemester').val();
         // console.log(filterGroup);
-        if(filterGroup!='' && filterGroup!=null){
+        if(filterGroup!='' && filterGroup!=null && filterSemester!=null && filterSemester!==''){
+
+            var SemesterID = filterSemester.split('.')[0];
             loading_page('#divpagePresensi');
 
-            var url = base_url_js+'api/__getScheduleIDByClassGroup/'+filterGroup;
+            var url = base_url_js+'api/__getScheduleIDByClassGroup/'+SemesterID+'/'+filterGroup;
             $.getJSON(url,function (result) {
                 if(result!=0 && result!= '0') {
                     var data = {
