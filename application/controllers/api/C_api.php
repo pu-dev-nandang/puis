@@ -2898,6 +2898,7 @@ class C_api extends CI_Controller {
                     'Note_deleted' => 'Conflict',
                     'DeletedBy' => 0,
                     'Req_layout' => $get[0]['Req_layout'],
+                    'Status' => $get[0]['Status'],
                 );
                 $this->db->insert('db_reservation.t_booking_delete', $dataSave); 
 
@@ -2917,13 +2918,22 @@ class C_api extends CI_Controller {
                 $client->emit('update_schedule_notifikasi', ['update_schedule_notifikasi' => '1','date' => '']);
                 $client->close();
 
+                $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['Start']);
+                $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['End']);
+                $StartNameDay = $Startdatetime->format('l');
+                $EndNameDay = $Enddatetime->format('l');
+
                 // send email
-                
                 $Email = $getUser[0]['EmailPU'];
                 $text = 'Dear '.$getUser[0]['Name'].',<br><br>
-                            Your Venue Reservation was conflict,<br>
-                            Your schedule automated delete by System,<br>
-                            Please Create new schedule. <br>
+                            Your Venue Reservation was conflict,<br><br>
+                            <strong>Your schedule automated delete by System</strong>,<br><br>
+                            Details Schedule : <br><ul>
+                            <li>Start  : '.$StartNameDay.', '.$get[0]['Start'].'</li>
+                            <li>End  : '.$EndNameDay.', '.$get[0]['End'].'</li>
+                            <li>Room  : '.$get[0]['Room'].'</li>
+                            </ul>
+                            Please Create new schedule, if you need it  <br>
                             
                         ';        
                 $to = $Email;

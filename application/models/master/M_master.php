@@ -23,6 +23,7 @@ class M_master extends CI_Model {
         return $query->result();
     }
 
+
     public function showData_array($tabel)
     {
         $sql = "select * from ".$tabel;
@@ -809,6 +810,25 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     {
         $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
         from '.$db.'.cfg_sub_menu as a join '.$db.'.previleges as b on a.ID = b.ID_cfg_sub_menu  where a.ID_Menu = ? and b.NIP = ? group by SubMenu1';
+        $query=$this->db->query($sql, array($ID_Menu,$this->session->userdata('NIP')))->result_array();
+        return $query;
+    }
+
+    public function getSubmenu2BaseSubmenu1_grouping($submenu1,$db='db_admission')
+    {
+        $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
+        from '.$db.'.cfg_sub_menu as a  join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
+        join '.$db.'.previleges_guser as c on b.cfg_group_user = c.G_user
+         where a.SubMenu1 = ? and c.NIP = ?';
+        $query=$this->db->query($sql, array($submenu1,$this->session->userdata('NIP')))->result_array();
+        return $query;
+    }
+
+    public function getSubmenu1BaseMenu_grouping($ID_Menu,$db='db_admission')
+    {
+        $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
+        from '.$db.'.cfg_sub_menu as a join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
+        join '.$db.'.previleges_guser as c on b.cfg_group_user = c.G_user  where a.ID_Menu = ? and c.NIP = ? group by a.SubMenu1';
         $query=$this->db->query($sql, array($ID_Menu,$this->session->userdata('NIP')))->result_array();
         return $query;
     }
