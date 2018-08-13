@@ -148,12 +148,16 @@
 
         var SemesterID = $(this).attr('data-smtid');
         var ScheduleID = $(this).attr('data-scheduleid');
+        var CDID = $(this).attr('data-cdid');
+        var Flag = $(this).attr('data-flag');
 
 
         var data = {
-         action : 'getDataStudents',
-           SemesterID : SemesterID,
-           ScheduleID : ScheduleID
+            action : 'getDataStudents',
+            Flag : Flag,
+            SemesterID : SemesterID,
+            ScheduleID : ScheduleID,
+            CDID : CDID
        };
 
        var token = jwt_encode(data,'UAP)(*');
@@ -169,6 +173,7 @@
                dataHtml = '<table class="table table-bordered">' +
                    '    <thead>' +
                    '    <tr style="background: #005975; color: #ffffff;">' +
+                   '        <th style="width: 2%;text-align: center;">No</th>' +
                    '        <th style="width: 20%;text-align: center;">NPM</th>' +
                    '        <th style="text-align: center;">Name</th>' +
                    '    </tr>' +
@@ -185,9 +190,12 @@
            $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
 
            if(jsonResult.length>0){
+               var no=1;
                for(var s=0;s<jsonResult.length;s++){
                    var d = jsonResult[s];
-                   $('#dataMHS').append('<tr>' +
+                   var bg = (Flag=='std' && d.Status=='1') ? 'style="background: #e6ffc8;"' : '';
+                   $('#dataMHS').append('<tr '+bg+'>' +
+                       '<td style="text-align: center;">'+(no++)+'</td>' +
                        '<td style="text-align: center;">'+d.NPM+'</td>' +
                        '<td>'+d.Name+'</td>' +
                        '</tr>');
@@ -202,6 +210,10 @@
 
        });
 
+
+    });
+
+    $(document).on('click','.btn-sw-std-krs',function () {
 
     });
 

@@ -9,44 +9,37 @@
 <!--<h1>Menu</h1>-->
 <!--<hr/>-->
 
-<div class="col-md-12">
-    <div class="row">
-        <div class="col-md-4">
-            <div class="">
-                <label>Semester Antara</label>
-                <input type="checkbox" id="formSemesterAntara" data-toggle="toggle" data-style="ios"/>
+
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <div class="thumbnail">
+            <div class="row">
+                <div class="col-xs-6">
+                    <select id="filterSemester" class="form-control filter-presensi"></select>
+                </div>
+                <div class="col-xs-6">
+
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="filterClassGroup" placeholder="Search by group class">
+                        <span class="input-group-btn">
+                        <button class="btn btn-primary" id="btnFilterSearchGroup" type="button"><span class="glyphicon glyphicon-search"></span></button>
+                      </span>
+                    </div>
+
+                </div>
             </div>
         </div>
 
+        <hr/>
     </div>
-
-
-    <div class="thumbnail" style="margin-top: 30px;">
-        <div class="row">
-            <div class="col-md-3">
-                <select id="filterSemester" class="form-control filter-presensi"></select>
-            </div>
-            <div class="col-md-3">
-                <select class="form-control filter-presensi" id="filterCombine">
-                    <option value="0">Combine Class No</option>
-                    <option value="1">Combine Class Yes</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <select id="filterBaseProdi" class="form-control filter-presensi"></select>
-            </div>
-            <div class="col-md-3">
-                <select id="filterGroup" class="form-control"></select>
-            </div>
-        </div>
-    </div>
-
-
-    <hr/>
 </div>
 
 
-<div id="divpagePresensi"></div>
+<div class="row">
+    <div id="divpagePresensi">
+        <div style="text-align:center;"><h3 style="color: #ccc;font-weight: bold;">-- Data Not Yet --</h3></div>
+    </div>
+</div>
 
 <!--<script src="--><?php //echo base_url('assets/custom/js/presensi.js'); ?><!--"></script>-->
 <script>
@@ -58,96 +51,72 @@
         //     '                <option disabled>------------------------------------------</option>');
         loSelectOptionSemester('#filterSemester','');
 
-        $('#filterBaseProdi').empty();
-        $('#filterBaseProdi').append('<option value="" disabled selected>-- Select Programme Study --</option>' +
-            '<option disabled>------------------------------------------</option>');
-        loadSelectOptionBaseProdi('#filterBaseProdi','');
-
-        // var data = {
-        //     // NIP : 2114002,
-        //     page : 'InputPresensi',
-        //     ScheduleID : 2
-        // };
-        // var token = jwt_encode(data,'UAP)(*');
-        // loadPagePresensi(token);
-
     });
 
-    $(document).on('change','.filter-presensi',function () {
-        loadFilterPresensi();
+    // Filter
+    $(document).on('keyup','#filterClassGroup',function () {
+        var  filterSemester = $('#filterSemester').val();
+        if(filterSemester!='' && filterSemester!=null){
+            var SemesterID = filterSemester.split('.')[0];
+            var url = base_url_js+'api/__getClassGroupAutoComplete/'+SemesterID+'/';
+            $("#filterClassGroup").autocomplete({
+                source: url,
+                minLength: 2
+            });
+
+        }
     });
 
-    $('#formSemesterAntara,#filterSemester,#filterCombine,#filterBaseProdi').change(function () {
-        $('#divpagePresensi').html('');
+    $(document).on('keypress','#filterClassGroup',function (e) {
+        if (e.which == 13) {
+            checkPage();
+            return false;    //<---- Add this line
+        }
     });
-    $('#filterGroup').change(function () {
-        var filterGroup = $('#filterGroup').val();
+
+    // Search
+    $(document).on('click','#btnFilterSearchGroup',function () {
+        checkPage();
+    });
+
+    function checkPage() {
+        var filterGroup = $('#filterClassGroup').val();
         // console.log(filterGroup);
         if(filterGroup!='' && filterGroup!=null){
-            var data = {
-                page : 'inputPresensi',
-                ScheduleID : filterGroup
-            };
-            var token = jwt_encode(data,'UAP)(*');
-            loadPagePresensi(token);
+            loading_page('#divpagePresensi');
+
+            var url = base_url_js+'api/__getScheduleIDByClassGroup/'+filterGroup;
+            $.getJSON(url,function (result) {
+                if(result!=0 && result!= '0') {
+                    var data = {
+                        page : 'inputPresensi',
+                        ScheduleID : result
+                    };
+                    var token = jwt_encode(data,'UAP)(*');
+                    loadPagePresensi(token);
+                } else {
+                    setTimeout(function () {
+                        $('#divpagePresensi').html('<div style="text-align:center;"><h3 style="color: #ccc;font-weight: bold;">-- Data Not Yet --</h3></div>');
+                    },500);
+                }
+
+            });
+
         } else {
             $('#divpagePresensi').html('');
         }
-
-    });
+    }
 
     function loadPagePresensi(token) {
         var url = base_url_js+'academic/loadPagePresensi';
 
-        loading_page('#divpagePresensi');
+
         $.post(url,{token:token},function (html) {
             setTimeout(function () {
                 $('#divpagePresensi').html(html);
             },500)
         });
     }
-    
-    function loadFilterPresensi() {
-        var filterSemester = $('#filterSemester').val();
-        var filterCombine = $('#filterCombine').val();
-        var filterBaseProdi = $('#filterBaseProdi').val();
-
-        if(filterSemester!=null && filterSemester!=''){
-            var exp_fSemester = filterSemester.split('.');
-            var SemesterID = exp_fSemester[0];
-            var ProdiID = '';
-            var ds = (filterCombine=='1') ? true : false;
-            if(filterCombine=='0' && filterBaseProdi!=null && filterBaseProdi!=''){
-                var exp_BaseProdi = filterBaseProdi.split('.');
-                ProdiID = exp_BaseProdi[0];
-            }
-            $('#filterBaseProdi').prop('disabled',ds);
-
-            var url = base_url_js+'api/__crudAttendance';
-            var data = {
-                action : 'filterPresensi',
-                SemesterID : SemesterID,
-                CombinedClasses : filterCombine,
-                ProdiID : ProdiID
-            };
-            var token = jwt_encode(data,'UAP)(*');
-
-            $.post(url,{token:token},function (jsonResult) {
-
-                var sl = $('#filterGroup');
-
-                sl.empty();
-                sl.append('<option selected disabled>--- Select Class Group ---</option>');
-                if(jsonResult.length>0){
-                    for(var i=0;i<jsonResult.length;i++){
-                        var dataF = jsonResult[i]
-                        sl.append('<option value="'+dataF.ID+'">'+dataF.ClassGroup+'</option>');
-                    }
-                }
-            });
-        }
-    }
-
 
 </script>
 

@@ -89,7 +89,7 @@
                 '        <th style="width:5%;" class="th-center">Credit</th>' +
                 '        <th style="width:20%;" class="th-center">Lecturers</th>' +
                 '        <th style="width:5%;" class="th-center">Students</th>' +
-                '        <th style="width:17%;" class="th-center">Time</th>' +
+                '        <th style="width:17%;" class="th-center">Date, Time</th>' +
                 '        <th style="width:7%;" class="th-center">Room</th>' +
 
                 // '        <th class="th-center">Action</th>' +
