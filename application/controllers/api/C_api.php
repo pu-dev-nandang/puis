@@ -1207,7 +1207,7 @@ class C_api extends CI_Controller {
             $coor = '<div style="color: #427b44;margin-bottom: 10px;"><b>'.$row["Lecturer"].'</b></div>';
 
             // Mendapatkan matakuliah
-            $courses = $this->m_api->getCoursesPerDay($row['ID']);
+            $courses = $this->m_api->getCoursesPerDay($row['ID'],$row['Semester']);
 
 
 
@@ -1865,20 +1865,9 @@ class C_api extends CI_Controller {
                 if(count($data)>0){
                     for($c=0;$c<count($data);$c++){
                         // Semester Saat Ini
-                        $dataTotalSmt = $this->db->query('SELECT s.Status FROM db_academic.semester s 
-                                                    WHERE s.ID >= (SELECT ID FROM db_academic.semester s2 
-                                                    WHERE s2.Year="'.$data[$c]['Year'].'" 
-                                                    LIMIT 1)')->result_array();
 
-                        $smt = 0;
-                        for($s=0;$s<count($dataTotalSmt);$s++){
-                            if($dataTotalSmt[$s]['Status']=='1'){
-                                $smt += 1;
-                                break;
-                            } else {
-                                $smt += 1;
-                            }
-                        }
+
+                        $smt = $this->m_api->_getSeemsterByClassOf($data[$c]['Year']);
 
                         $data[$c]['Semester'] = $smt;
 
@@ -2937,6 +2926,9 @@ class C_api extends CI_Controller {
         }
 
     }
+
+
+
 
 
 
