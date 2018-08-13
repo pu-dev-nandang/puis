@@ -918,8 +918,7 @@ class M_api extends CI_Model {
                                 array(
                                     'NPM' => $data[$i]['NPM'],
                                     'SemesterID' => $SemesterID,
-                                    'ScheduleID' => $ScheduleID,
-                                    'CDID' => $CDID
+                                    'ScheduleID' => $ScheduleID
                                 ))->result_array();
                 $status = (count($dSP)>0) ? '1' : '0';
 
@@ -2623,7 +2622,7 @@ class M_api extends CI_Model {
                                                     LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
                                                     WHERE sp.SemesterID ="'.$SemesterID.'" 
                                                     AND sp.ScheduleID = "'.$ScheduleID.'"
-                                                    AND sp.CDID = "'.$CDID.'"
+                                                    
                                                      ')->result_array();
 
                 if(count($data)>0){
