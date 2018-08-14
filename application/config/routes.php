@@ -273,6 +273,7 @@ $route['download/(:any)'] = 'api/c_global/download/$1';
 $route['download_template/(:any)'] = 'api/c_global/download_template/$1';
 $route['download_anypath'] = 'api/c_global/download_anypath';
 $route['fileGetAny/(:any)'] = 'api/c_global/fileGetAny/$1';
+$route['autocompleteAllUser'] = 'api/c_global/autocompleteAllUser';
 
 
 
@@ -590,7 +591,7 @@ $route['api/get_time_opt_reservation'] = 'api/c_api/get_time_opt_reservation';
 $route['api/__m_additional_personel'] = 'api/c_api/m_additional_personel';
 $route['api/__room_equipment'] = 'api/c_api/room_equipment';
 $route['api/__checkBentrokScheduleAPI'] = 'api/c_api/checkBentrokScheduleAPI';
-
+$route['api/__crudClassroomVreservation'] = 'api/c_api/crudClassroomVreservation';
 
 
 // for inject //
@@ -664,9 +665,14 @@ $route['vreservation/config/modalform_group_user'] = 'page/vreservation/c_config
 $route['vreservation/config/groupuser/save'] = 'page/vreservation/c_config/save_group_user';
 $route['vreservation/config/groupuser/update'] = 'page/vreservation/c_config/update_group_user';
 $route['vreservation/config/groupuser/delete'] = 'page/vreservation/c_config/delete_group_user';
+$route['vreservation/config/getAuthDataTables'] = 'page/vreservation/c_config/getAuthDataTables';
+$route['vreservation/add_auth_user'] = 'page/vreservation/c_config/add_auth_user';
+$route['vreservation/delete_authUser'] = 'page/vreservation/c_config/delete_authUser';
+$route['vreservation/edit_auth_user'] = 'page/vreservation/c_config/edit_auth_user';
+$route['vreservation/master/modalform/(:any)'] = 'page/vreservation/c_master/modalform/$1';
+$route['vreservation/master/loadTableMaster/(:any)'] = 'page/vreservation/c_master/load_table_master/$1';
+$route['vreservation/master/submit_m_equipment'] = 'page/vreservation/c_master/submit_m_equipment';
 
-
-
-
+$route['admission/master-config/submit_jenis_tempat_tinggal'] = 'page/admission/c_master/submit_jenis_tempat_tinggal';
 // test
 $route['testApprove'] = 'page/finance/c_finance/testApprove';

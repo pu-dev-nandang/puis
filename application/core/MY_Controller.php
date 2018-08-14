@@ -340,9 +340,12 @@ abstract class Vreservation_Controler extends Globalclass{
     public function __construct()
     {
         parent::__construct();
+        $this->load->model('master/m_master');
+        $this->load->model('vreservation/m_reservation');
         if (!$this->session->userdata('auth_vreservation_sess')) {
             $this->getAuthVreservation();
         }
+        // $this->checkAuth_user();
     }
 
     public $pathView = 'page/vreservation/';
@@ -379,7 +382,7 @@ abstract class Vreservation_Controler extends Globalclass{
     {
         $data = array();
         $this->load->model('master/m_master');
-        $getDataMenu = $this->m_master->getMenuUser($this->session->userdata('NIP'),'db_reservation');
+        $getDataMenu = $this->m_master->getMenuGroupUser($this->session->userdata('NIP'),'db_reservation');
         $data_sess = array();
         if (count($getDataMenu) > 0) {
             $this->session->set_userdata('auth_vreservation_sess',1);
@@ -412,7 +415,7 @@ abstract class Vreservation_Controler extends Globalclass{
             );
             
         }
-
+        //print_r($arr);die();
         return $arr;
     }
 
@@ -429,7 +432,7 @@ abstract class Vreservation_Controler extends Globalclass{
         $currentURL = current_url();
         $getURL = str_replace($base_url,"",$currentURL);
         $this->load->model('master/m_master');
-        $chk = $this->m_master->chkAuthDB_Base_URL($getURL);
+        $chk = $this->m_reservation->chkAuthDB_Base_URL_vreservation($getURL);
 
         if (!$this->input->is_ajax_request()) {
             if (count($chk) == 0) {

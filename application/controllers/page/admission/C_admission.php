@@ -842,6 +842,8 @@ class C_admission extends Admission_Controler {
           $CityID = $objWorksheet->getCellByColumnAndRow(6, $i)->getCalculatedValue();
           $HighSchoolID = $objWorksheet->getCellByColumnAndRow(7, $i)->getCalculatedValue();
           $HighSchool = $objWorksheet->getCellByColumnAndRow(8, $i)->getCalculatedValue();
+          $HighSchool = strtoupper($HighSchool);
+
           $MajorsHighSchool = $objWorksheet->getCellByColumnAndRow(9, $i)->getCalculatedValue();
           if (count($Q_getLastNPM) == 0) {
             // search NPM dengan 2 Pertama kode Prodi CodeID
@@ -867,7 +869,13 @@ class C_admission extends Admission_Controler {
 
           $NPM = $inc;
           $Name = $objWorksheet->getCellByColumnAndRow(11, $i)->getCalculatedValue();
+          $Name = strtolower($Name);
+          $Name = ucwords($Name);
+          
           $Address = $objWorksheet->getCellByColumnAndRow(12, $i)->getCalculatedValue();
+          $Address = strtolower($Address);
+          $Address = ucwords($Address);
+
           $Photo = "";
           $Gender = $objWorksheet->getCellByColumnAndRow(14, $i)->getCalculatedValue();
           $PlaceOfBirth = $objWorksheet->getCellByColumnAndRow(15, $i)->getCalculatedValue();
@@ -877,14 +885,24 @@ class C_admission extends Admission_Controler {
           $HP = $objWorksheet->getCellByColumnAndRow(18, $i)->getCalculatedValue();
           $ClassOf = $objWorksheet->getCellByColumnAndRow(19, $i)->getCalculatedValue();
           $Email = $objWorksheet->getCellByColumnAndRow(20, $i)->getCalculatedValue();
+          $Email = strtolower($Email);
+          
           $Jacket = $objWorksheet->getCellByColumnAndRow(21, $i)->getCalculatedValue();
           $AnakKe = $objWorksheet->getCellByColumnAndRow(22, $i)->getCalculatedValue();
           $JumlahSaudara = $objWorksheet->getCellByColumnAndRow(23, $i)->getCalculatedValue();
           $NationExamValue = $objWorksheet->getCellByColumnAndRow(24, $i)->getCalculatedValue();
           $GraduationYear = $objWorksheet->getCellByColumnAndRow(25, $i)->getCalculatedValue();
           $IjazahNumber = $objWorksheet->getCellByColumnAndRow(26, $i)->getCalculatedValue();
+
           $Father = $objWorksheet->getCellByColumnAndRow(27, $i)->getCalculatedValue();
+          $Father = strtolower($Father);
+          $Father = ucwords($Father);
+
           $Mother = $objWorksheet->getCellByColumnAndRow(28, $i)->getCalculatedValue();
+          $Mother = strtolower($Mother);
+          $Mother = ucwords($Mother);
+          
+
           $StatusFather = $objWorksheet->getCellByColumnAndRow(29, $i)->getCalculatedValue();
           $StatusMother = $objWorksheet->getCellByColumnAndRow(30, $i)->getCalculatedValue();
           $PhoneFather = $objWorksheet->getCellByColumnAndRow(31, $i)->getCalculatedValue();
@@ -893,8 +911,15 @@ class C_admission extends Admission_Controler {
           $OccupationMother = $objWorksheet->getCellByColumnAndRow(34, $i)->getCalculatedValue();
           $EducationFather = $objWorksheet->getCellByColumnAndRow(35, $i)->getCalculatedValue();
           $EducationMother = $objWorksheet->getCellByColumnAndRow(36, $i)->getCalculatedValue();
+
           $AddressFather = $objWorksheet->getCellByColumnAndRow(37, $i)->getCalculatedValue();
+          $AddressFather = strtolower($AddressFather);
+          $AddressFather = ucwords($AddressFather);
+
           $AddressMother = $objWorksheet->getCellByColumnAndRow(38, $i)->getCalculatedValue();
+          $AddressMother = strtolower($AddressMother);
+          $AddressMother = ucwords($AddressMother);
+
           $EmailFather = $objWorksheet->getCellByColumnAndRow(39, $i)->getCalculatedValue();
           $EmailMother = $objWorksheet->getCellByColumnAndRow(40, $i)->getCalculatedValue();
           $StatusStudentID = 3;
@@ -948,10 +973,14 @@ class C_admission extends Admission_Controler {
           $pas = md5($plan_password);
           $pass = sha1('jksdhf832746aiH{}{()&(*&(*'.$pas.'HdfevgyDDw{}{}{;;*766&*&*');
 
+          $pasword_old = $DateOfBirth;
+          $d = explode('-', $pasword_old);
+          $pasword_old = $d[2].$d[1].substr($d[0], 2,2);
+
           $temp2 = array(
               'NPM' => $NPM,
               'Password' => $pass,
-              'Password_Old' => md5($NPM),
+              'Password_Old' => md5($pasword_old),
               'Year' => date('Y'),
               'EmailPU' => $NPM.'@podomorouniversity.ac.id',
               'StatusStudentID' => 3,

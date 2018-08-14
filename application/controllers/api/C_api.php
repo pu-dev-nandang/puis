@@ -1568,6 +1568,102 @@ class C_api extends CI_Controller {
 
     }
 
+    public function uploadFfile($name)
+    {
+         // upload file
+         $filename = md5($name);
+         $config['upload_path']   = './uploads/vreservation/';
+         $config['overwrite'] = TRUE; 
+         $config['allowed_types'] = '*'; 
+         $config['file_name'] = $filename;
+         //$config['max_size']      = 100; 
+         //$config['max_width']     = 300; 
+         //$config['max_height']    = 300;  
+         $this->load->library('upload', $config);
+            
+         if ( ! $this->upload->do_upload('fileData')) {
+            return $error = $this->upload->display_errors(); 
+            //$this->load->view('upload_form', $error); 
+         }
+            
+         else { 
+           return $data =  $this->upload->data(); 
+            //$this->load->view('upload_success', $data); 
+         }
+    }
+
+    public function crudClassroomVreservation(){
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+
+        if(count($data_arr)>0) {
+            if($data_arr['action'] == 'read') {
+                $data = $this->m_api->__getAllClassRoom();
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action'] == 'add'){
+                $formData = (array) $data_arr['formData'];
+
+                // Cek Apakah ruangan sudah di input
+                $this->db->where('Room', $formData['Room']);
+                $room = $this->db->get('db_academic.classroom')->result_array();
+
+
+                if(count($room)>0){
+                    $result = array(
+                        'inserID' => 0
+                    );
+                } else {
+
+                    $uploadFile = $this->uploadFfile(mt_rand());
+                    $filename = '';
+                    if (is_array($uploadFile)) {
+                        $filename = $uploadFile['file_name'];
+                    }
+                    $file = array('Layout' => $filename);
+                    $formData = $formData + $file;
+                    $this->db->insert('db_academic.classroom',$formData);
+                    $insert_id = $this->db->insert_id();
+                    $result = array(
+                        'inserID' => $insert_id
+                    );
+                }
+
+                return print_r(json_encode($result));
+            }
+            else if($data_arr['action'] == 'edit'){
+                $formData = (array) $data_arr['formData'];
+
+                $uploadFile = $this->uploadFfile(mt_rand());
+                $filename = '';
+                if (is_array($uploadFile)) {
+                    $filename = $uploadFile['file_name'];
+                }
+                $file = array('Layout' => $filename);
+                $formData = $formData + $file;
+                
+                $ID = $data_arr['ID'];
+                $this->db->where('ID', $ID);
+                $this->db->update('db_academic.classroom',$formData);
+                $result = array(
+                    'inserID' => $ID
+                );
+
+                return print_r(json_encode($result));
+
+            }
+            else if($data_arr['action'] == 'delete'){
+                $ID = $data_arr['ID'];
+                $this->db->where('ID', $ID);
+                $this->db->delete('db_academic.classroom');
+                return print_r($ID);
+            }
+
+        }
+
+    }
+
     public function crudGrade(){
         $token = $this->input->post('token');
         $key = "UAP)(*";
