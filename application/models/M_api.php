@@ -911,7 +911,7 @@ class M_api extends CI_Model {
                                           LEFT JOIN db_academic.auth_students ast ON (ast.NPM=sk.NPM)
                                           WHERE sk.SemesterID = "'.$SemesterID.'"
                                            AND sk.ScheduleID = "'.$ScheduleID.'"
-                                             
+                                             ORDER BY sk.NPM ASC
                                             ')
             ->result_array();
 
@@ -2630,7 +2630,7 @@ class M_api extends CI_Model {
                                                     LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
                                                     WHERE sp.SemesterID ="'.$SemesterID.'" 
                                                     AND sp.ScheduleID = "'.$ScheduleID.'"
-                                                    
+                                                    ORDER BY s.NPM ASC
                                                      ')->result_array();
 
                 if(count($data)>0){
