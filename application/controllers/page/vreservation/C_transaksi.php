@@ -196,6 +196,18 @@ class C_transaksi extends Vreservation_Controler {
         echo json_encode($getData);
     }
 
+    public function json_list_booking_by_user()
+    {
+        $getData = $this->m_reservation->getDataT_bookingByUser(null,'',2);
+        echo json_encode($getData);
+    }
+
+    public function json_list_booking()
+    {
+        $getData = $this->m_reservation->getDataT_booking(null,'',2);
+        echo json_encode($getData);
+    }
+
     public function approve_submit()
     {
         $msg = '';
@@ -223,6 +235,66 @@ class C_transaksi extends Vreservation_Controler {
         
     }
 
+    public function cancel_submit()
+    {
+        $msg = '';
+            $input = $this->getInputToken();
+
+            $get = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$input['ID_tbl']);
+            $getUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$get[0]['CreatedBy']);
+
+            $dataSave = array(
+                'Start' => $get[0]['Start'],
+                'End' => $get[0]['End'],
+                'Time' => $get[0]['Time'],
+                'Colspan' => $get[0]['Colspan'],
+                'Agenda' => $get[0]['Agenda'],
+                'Room' => $get[0]['Room'],
+                'ID_equipment_add' => $get[0]['ID_equipment_add'],
+                'ID_add_personel' => $get[0]['ID_add_personel'],
+                'Req_date' => $get[0]['Req_date'],
+                'CreatedBy' => $get[0]['CreatedBy'],
+                'ID_t_booking' => $get[0]['ID'],
+                'Note_deleted' => 'Cancel By User',
+                'DeletedBy' => $this->session->userdata('NIP'),
+                'Req_layout' => $get[0]['Req_layout'],
+                'Status' => $get[0]['Status'],
+            );
+            $this->db->insert('db_reservation.t_booking_delete', $dataSave); 
+
+            $this->m_master->delete_id_table_all_db($get[0]['ID'],'db_reservation.t_booking');
+// send email
+            
+            $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['Start']);
+            $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['End']);
+            $StartNameDay = $Startdatetime->format('l');
+            $EndNameDay = $Enddatetime->format('l');
+
+            $Email = $getUser[0]['EmailPU'];
+            $text = 'Dear '.$getUser[0]['Name'].',<br><br>
+                        Your Venue Reservation was Cancel by '.$this->session->userdata('Name').',<br><br>
+                        Details Schedule : <br><ul>
+                        <li>Start  : '.$StartNameDay.', '.$get[0]['Start'].'</li>
+                        <li>End  : '.$EndNameDay.', '.$get[0]['End'].'</li>
+                        <li>Room  : '.$get[0]['Room'].'</li>
+                        </ul>
+                    ';        
+            $to = $Email;
+            $subject = "Podomoro University Venue Reservation";
+            $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+        echo json_encode($msg);    
+    }
+
+    public function booking_cancel()
+    {
+        $content = $this->load->view($this->pathView.'transaksi/page_booking_cancel','',true);
+        $this->temp($content);
+    }
+    public function cancel_reservation()
+    {
+        $content = $this->load->view($this->pathView.'transaksi/page_cancel_reservation','',true);
+        $this->temp($content);
+    }
 
 
 }

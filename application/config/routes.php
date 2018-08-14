@@ -641,6 +641,31 @@ $route['vreservation/getCountApprove'] = 'page/vreservation/c_global/getCountApp
 $route['vreservation/vr_request'] = 'page/vreservation/c_transaksi/vr_request';
 $route['vreservation/json_list_approve'] = 'page/vreservation/c_transaksi/json_list_approve';
 $route['vreservation/approve_submit'] = 'page/vreservation/c_transaksi/approve_submit';
+$route['vreservation/json_list_booking_by_user'] = 'page/vreservation/c_transaksi/json_list_booking_by_user';
+$route['vreservation/cancel_submit'] = 'page/vreservation/c_transaksi/cancel_submit';
+$route['vreservation/json_list_booking'] = 'page/vreservation/c_transaksi/json_list_booking';
+
+$route['vreservation/config/modalform_previleges'] = 'page/vreservation/c_config/modal_form_previleges';
+$route['vreservation/config/menu-previleges/get_menu'] = 'page/vreservation/c_config/get_menu';
+$route['vreservation/config/menu-previleges/get_menu/save'] = 'page/vreservation/c_config/get_menu_save_menu';
+$route['vreservation/config/menu-previleges/get_submenu/save'] = 'page/vreservation/c_config/get_submenu_save_menu';
+$route['vreservation/config/menu-previleges/get_submenu/show'] = 'page/vreservation/c_config/get_submenu_show';
+$route['vreservation/config/menu-previleges/get_submenu/update'] = 'page/vreservation/c_config/get_submenu_update';
+$route['vreservation/config/menu-previleges/get_submenu/delete'] = 'page/vreservation/c_config/get_submenu_delete';
+$route['vreservation/getGroupPrevileges'] = 'page/vreservation/c_config/getGroupPrevileges';
+$route['vreservation/getMenu'] = 'page/vreservation/c_config/getMenu';
+$route['vreservation/getMenu'] = 'page/vreservation/c_config/getMenu';
+$route['vreservation/config/menu-previleges/get_submenu_by_menu'] = 'page/vreservation/c_config/get_submenu_by_menu';
+$route['vreservation/config/menu-previleges/get_previleges_group/show'] = 'page/vreservation/c_config/get_previleges_group_show';
+$route['vreservation/config/menu-previleges/groupuser/save'] = 'page/vreservation/c_config/save_groupuser_previleges';
+$route['vreservation/config/menu-previleges/groupuser/update'] = 'page/vreservation/c_config/previleges_groupuser_update';
+$route['vreservation/config/menu-previleges/groupuser/delete'] = 'page/vreservation/c_config/previleges_groupuser_delete';
+$route['vreservation/config/modalform_group_user'] = 'page/vreservation/c_config/modalform_group_user';
+$route['vreservation/config/groupuser/save'] = 'page/vreservation/c_config/save_group_user';
+$route['vreservation/config/groupuser/update'] = 'page/vreservation/c_config/update_group_user';
+$route['vreservation/config/groupuser/delete'] = 'page/vreservation/c_config/delete_group_user';
+
+
 
 
 // test
