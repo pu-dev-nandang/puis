@@ -1082,6 +1082,71 @@ class C_auth extends Globalclass {
 
 
         }
+
+        else if($table=='updateAttd'){
+            $dataSchedule = $this->db->query('SELECT ID,SemesterID,ScheduleID FROM db_academic.attendance')->result_array();
+            $db_ = 'ta_2018';
+
+            for($i=0;$i<count($dataSchedule);$i++){
+                $ScheduleID = $dataSchedule[$i]['ScheduleID'];
+                $SemesterID = $dataSchedule[$i]['SemesterID'];
+                $data = $this->db->query('SELECT NPM FROM '.$db_.'.study_planning sp WHERE sp.ScheduleID = "'.$ScheduleID.'" AND sp.SemesterID = "'.$SemesterID.'" ')->result_array();
+
+                // Insert ke attd std
+                for($s=0;$s<count($data);$s++){
+                    $dataIn = array(
+                        'ID_Attd' => $dataSchedule[$i]['ID'],
+                        'NPM' => $data[$s]['NPM']
+                    );
+                    $this->db->insert('db_academic.attendance_students',$dataIn);
+                }
+
+
+            }
+
+        }
+
+        else if($table=='updatePasswd2018'){
+
+            $db_ = 'ta_2018';
+
+            $dataStd = $this->db->select('*')->get($db_.'.students')->result_array();
+
+            for($i=0;$i<count($dataStd);$i++){
+
+                $Name = ucwords(strtolower($dataStd[$i]['Name']));
+                $Address = ucwords(strtolower($dataStd[$i]['Address']));
+
+                $up = array(
+                    'Name' => $Name,
+                    'HighSchool' => strtoupper($dataStd[$i]['HighSchool']),
+                    'Address' => $Address,
+                    'Email' => strtolower($dataStd[$i]['Email']),
+                    'Father' => ucwords(strtolower($dataStd[$i]['Father'])),
+                    'Mother' => ucwords(strtolower($dataStd[$i]['Mother'])),
+                    'AddressFather' => ucwords(strtolower($dataStd[$i]['AddressFather'])),
+                    'AddressMother' => ucwords(strtolower($dataStd[$i]['AddressMother']))
+                );
+
+                $this->db->set($up);
+                $this->db->where('ID', $dataStd[$i]['ID']);
+                $this->db->update($db_.'.students');
+
+                $ex = explode('-',$dataStd[$i]['DateOfBirth']);
+
+                $pass = trim($ex[2]).''.trim($ex[1]).''.trim(substr($ex[0],2,2));
+
+                print_r($pass);
+
+                $this->db->set('Password_Old',md5($pass));
+                $this->db->where('NPM', $dataStd[$i]['NPM']);
+                $this->db->update('db_academic.auth_students');
+
+
+            }
+
+//            $data = $this->db->query('SELECT * FROM db_academic.auth_students')->result_array();
+        }
     }
 
     private function genratePassword($NIP,$Password){
