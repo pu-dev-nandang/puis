@@ -135,7 +135,17 @@ class C_rest extends CI_Controller {
                 return print_r(1);
             }
 
-        } else {
+            else if($dataToken['action']=='getDetailsStudents'){
+                $SemesterID = $dataToken['SemesterID'];
+                $ScheduleID = $dataToken['ScheduleID'];
+
+                $dataStd = $this->m_rest->__getStudentsDetails($SemesterID,$ScheduleID);
+
+                return print_r(json_encode($dataStd));
+            }
+
+        }
+        else {
             $msg = array(
                 'msg' => 'Error'
             );

@@ -354,6 +354,7 @@ class M_rest extends CI_Model {
     private function getDetailTimeTable($dataSch,$param){
 
         if(count($dataSch)){
+            $this->load->model('m_api');
             for ($s = 0; $s < count($dataSch); $s++) {
                 $sesi = $this->db->query('SELECT sd.ScheduleID, cl.Room, d.NameEng, sd.StartSessions, sd.EndSessions
                                                    FROM db_academic.schedule_details sd
@@ -369,6 +370,8 @@ class M_rest extends CI_Model {
                                                     WHERE sdc.ScheduleID = "' . $dataSch[$s]['ID'] . '" GROUP BY  sdc.ScheduleID ')->result_array();
 //                                                    WHERE sdc.ScheduleID = "' . $dataSch[$s]['ID'] . '" AND  sdc.ProdiID = "'.$ProdiID.'"  ')->result_array();
                 $dataSch[$s]['detailCourse'] = $course;
+//                $dataSch[$s]['Students'] = $this->m_api->getStudentByScheduleID($dataSch[$s]['SemesterID'],$dataSch[$s]['ID'],'');
+                $dataSch[$s]['TotalStudents'] = $this->m_api->getTotalStdPerDay($dataSch[$s]['SemesterID'],$dataSch[$s]['ID'],'');
 
 //                if($param=='Coordinator'){
                     $team = $this->db->query('SELECT em.NIP,em.Name FROM db_academic.schedule_team_teaching stt 
@@ -388,6 +391,38 @@ class M_rest extends CI_Model {
         }
 
         return $dataSch;
+    }
+
+    public function __getStudentsDetails($SemesterID,$ScheduleID){
+
+        $this->load->model('m_api');
+        $dataCl = $this->m_api->getClassOf();
+
+        $arrDataStd = [];
+        if(count($dataCl)>0){
+            for($i=0;$i<count($dataCl);$i++){
+                $db_ = 'ta_'.$dataCl[$i]['Year'];
+
+                $data = $this->db->query('SELECT s.NPM, s.Name, sp.Evaluasi1, sp.Evaluasi2, 
+                                                    sp.Evaluasi3, sp.Evaluasi4, sp.Evaluasi5, sp.UTS, sp.UAS,
+                                                    sp.Score, sp.Grade, sp.Approval 
+                                                    FROM '.$db_.'.study_planning sp 
+                                                    LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
+                                                    WHERE sp.SemesterID ="'.$SemesterID.'" 
+                                                    AND sp.ScheduleID = "'.$ScheduleID.'"
+                                                    ORDER BY s.NPM ASC
+                                                     ')->result_array();
+
+                if(count($data)>0){
+                    for($s=0;$s<count($data);$s++){
+                        array_push($arrDataStd,$data[$s]);
+                    }
+                }
+
+            }
+        }
+
+        return $arrDataStd;
     }
 
 
