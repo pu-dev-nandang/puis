@@ -310,7 +310,13 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $sql = "delete from db_reservation.cfg_rule_g_user where ID = ".$input['ID'];
         $query=$this->db->query($sql, array());
     }
-    
+
+    public function getCountAllDataAuth()
+    {
+        $sql = 'select count(*) as total from db_reservation.previleges_guser';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query[0]['total'];
+    }
 
     public function get_m_equipment_additional($available = '> 0')
     {
@@ -846,5 +852,225 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         // die();
         return $arr_result;
 
+    }
+
+    public function getDataWithoutSuperAdmin()
+    {
+        $sql = 'select * from db_reservation.cfg_group_user where ID != 1';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
+    }
+
+    public function chkAuthDB_Base_URL_vreservation($URL)
+    {
+        $a = explode('/', $URL);
+        $b = count($a) - 1;
+        $URISlug = 'and a.Slug = "'.$URL.'"';
+        if ($a[$b] == 1) {
+            $URISlug = '';
+            for ($i=0; $i < count($b); $i++) { 
+                $URISlug .= $a[$i].'/';
+            }
+            $URISlug = 'and a.Slug like "%'.$URISlug.'%"';
+        }
+        $sql = "select b.read,b.write,b.update,b.delete from db_reservation.cfg_sub_menu as a join db_reservation.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
+        join db_reservation.previleges_guser as c on c.G_user = b.cfg_group_user
+        where c.NIP = ? ".$URISlug;
+        $query=$this->db->query($sql, array($this->session->userdata('NIP')))->result_array();
+        // print_r($query);die();
+        return $query;
+    }
+
+    public function checkAuth_user_vreservation()
+    {
+        $base_url = base_url();
+        $currentURL = current_url();
+        $URL = str_replace($base_url,"",$currentURL);
+        
+        // get Access URL
+        $getDataSess  = $this->session->userdata('menu_vreservation_grouping');
+        $access = array(
+            'read' => 0,
+            'write' => 0,
+            'update' => 0,
+            'delete' => 0,
+        );
+
+        $p = $this->chkAuthDB_Base_URL_vreservation($URL);
+        if (count($p) > 0 ) {
+            $access = array(
+                'read' => $p[0]['read'],
+                'write' => $p[0]['write'],
+                'update' => $p[0]['update'],
+                'delete' => $p[0]['delete'],
+            );
+        }
+
+        // print_r($access);die();
+
+        $html = '';
+        if ($access['read'] == 0) {
+            $html .= '<script type="text/javascript">
+                 var waitForEl = function(selector, callback) {
+                   if (jQuery(selector).length) {
+                     callback();
+                   } else {
+                     setTimeout(function() {
+                       waitForEl(selector, callback);
+                     }, 100);
+                   }
+                 };
+
+                 waitForEl(".btn-read", function() {
+                   $(".btn-read").remove();
+                 });
+
+                 $(document).ready(function () {
+                     $(".btn-read").remove();
+                     //window.location.href = base_url_js+"vreservation/dashboard/view";
+                     $(document).ajaxComplete(function () {
+                         $(".btn-read").remove();
+                     });
+                 });
+                 </script>
+            ';
+            echo $html;
+        }
+
+        if ($access['write'] == 0) {
+            $html .= '<script type="text/javascript">
+                 var waitForEl = function(selector, callback) {
+                   if (jQuery(selector).length) {
+                     callback();
+                   } else {
+                     setTimeout(function() {
+                       waitForEl(selector, callback);
+                     }, 100);
+                   }
+                 };
+
+                 waitForEl(".btn-add", function() {
+                   $(".btn-add").remove();
+                 });
+
+                 $(document).ready(function () {
+                     $(".btn-add").remove();
+                     $(document).ajaxComplete(function () {
+                        $(".btn-add").remove();
+                     });
+                 });
+                 </script>
+            ';
+            echo $html;
+        }
+        if ($access['update'] == 0) {
+            $html .= '<script type="text/javascript">
+                 var waitForEl = function(selector, callback) {
+                   if (jQuery(selector).length) {
+                     callback();
+                   } else {
+                     setTimeout(function() {
+                       waitForEl(selector, callback);
+                     }, 100);
+                   }
+                 };
+
+                 waitForEl(".btn-edit", function() {
+                   $(".btn-edit").remove();
+                 });
+
+                 $(document).ready(function () {
+                     $(".btn-edit").remove();
+                     $(document).ajaxComplete(function () {
+                              $(".btn-edit").remove();
+                     });
+                 });
+                 </script>
+            ';
+            echo $html;
+        }
+        if ($access['delete'] == 0) {
+            $html .= '<script type="text/javascript">
+                 var waitForEl = function(selector, callback) {
+                   if (jQuery(selector).length) {
+                     callback();
+                   } else {
+                     setTimeout(function() {
+                       waitForEl(selector, callback);
+                     }, 100);
+                   }
+                 };
+
+                 waitForEl(".btn-delete", function() {
+                   $(".btn-delete").remove();
+                 });
+
+                 waitForEl(".btn-Active", function() {
+                   $(".btn-Active").remove();
+                 });
+
+                 $(document).ready(function () {
+                    $(".btn-delete").remove();
+                    $(".btn-Active").remove();
+                    $(document).ajaxComplete(function () {
+                        $(".btn-delete").remove();
+                        $(".btn-Active").remove();
+                    });
+                     
+                 });
+                 
+                 </script>
+            ';
+            echo $html;
+        }
+
+
+        // special menu & group
+        $bool = true;
+        foreach ($access as $key => $value) {
+            if ($value == 0) {
+                $bool = false;
+                break;
+            }
+        }
+
+        if (!$bool) {
+            $html .= '<script type="text/javascript">
+                 var waitForEl = function(selector, callback) {
+                   if (jQuery(selector).length) {
+                     callback();
+                   } else {
+                     setTimeout(function() {
+                       waitForEl(selector, callback);
+                     }, 100);
+                   }
+                 };
+
+                 waitForEl(".btn-delete-menu-auth", function() {
+                    $(".btn-delete-menu-auth").remove();
+                 });
+
+                 waitForEl(".btn-edit-menu-auth", function() {
+                   $(".btn-edit-menu-auth").remove();
+                 });
+
+                 waitForEl(".btn-edit-menu-auth", function() {
+                   $(".btn-edit-menu-auth").remove();
+                 })
+
+                 waitForEl(".btn-add-menu-auth", function() {
+                   $(".btn-add-menu-auth").remove();
+                 });
+
+                 waitForEl(".btn-delete-menu-auth", function() {
+                   $(".btn-delete-menu-auth").remove();
+                 });
+                 
+                 </script>
+            ';
+            echo $html;
+        }
+
+        return $html;
     }
 }

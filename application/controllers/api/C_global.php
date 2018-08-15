@@ -157,4 +157,19 @@ class C_global extends CI_Controller {
 
     }
 
+    public function autocompleteAllUser()
+    {
+        $input = $this->getInputToken();
+        $data['response'] = 'true'; //mengatur response
+        $data['message'] = array(); //membuat array
+        $getData = $this->m_master->getAllUserAutoComplete($input['Nama']);
+        for ($i=0; $i < count($getData); $i++) {
+            $data['message'][] = array(
+                'label' => $getData[$i]['Name'],
+                'value' => $getData[$i]['NIP']
+            );
+        }
+        echo json_encode($data);
+    }
+
 }

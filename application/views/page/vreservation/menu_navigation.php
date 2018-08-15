@@ -176,7 +176,7 @@
 <!-- /Sidebar -->
 
 <?php 
-$this->m_master->checkAuth_user();
+$this->m_reservation->checkAuth_user_vreservation();
 
  ?>
 
@@ -262,7 +262,7 @@ $this->m_master->checkAuth_user();
         var url = base_url_js+'vreservation/getCountApprove';
         $.post(url,function (data_json) {
             var response = jQuery.parseJSON(data_json);
-            $("#countRequest").html('<b>Total Request : <a href="javascript:void(0)" class="btn-action btn-edit btn-get-link" data-page="transaksi/approve">'+response+'</a></b>');
+            $("#countRequest").html('<b>Total Request : <a href="javascript:void(0)" class="btn-action btn-get-link" data-page="transaksi/approve">'+response+'</a></b>');
         }).done(function() {
 
         })

@@ -249,6 +249,18 @@ class M_master extends CI_Model {
         $query=$this->db->query($sql, array());
     }
 
+    public function getActive_id_activeAll_table_allDB($ID,$Active,$table)
+    {
+        if ($Active == 0) {
+            $sql = "update ".$table." set Active = 1 where ID = ".$ID;
+        }
+        else
+        {
+            $sql = "update ".$table." set Active = 0 where ID = ".$ID;
+        }
+        $query=$this->db->query($sql, array());
+    }
+
     public function inserData_jenis_tempat_tinggal($jenis_tempat_tinggal)
     {
         $dataSave = array(
@@ -792,6 +804,22 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 on a.NIP = d.NIP
                 join '.$db.'.cfg_sub_menu as c
                 on d.ID_cfg_sub_menu = c.ID
+                join '.$db.'.cfg_menu as b
+                on b.ID = c.ID_Menu where a.NIP = ? GROUP by b.id';
+        $query=$this->db->query($sql, array($NIP))->result_array();
+        return $query;
+    }
+
+    public function getMenuGroupUser($NIP,$db = 'db_admission')
+    {
+        $sql = 'SELECT b.ID as ID_menu,b.Icon,c.ID,b.Menu,c.SubMenu1,c.SubMenu2,x.`read`,x.`update`,x.`write`,x.`delete`,c.Slug,c.Controller 
+                from db_employees.employees as a
+                join '.$db.'.previleges_guser as d
+                on a.NIP = d.NIP
+                join '.$db.'.cfg_rule_g_user as x
+                on d.G_user = x.cfg_group_user
+                join '.$db.'.cfg_sub_menu as c
+                on x.ID_cfg_sub_menu = c.ID
                 join '.$db.'.cfg_menu as b
                 on b.ID = c.ID_Menu where a.NIP = ? GROUP by b.id';
         $query=$this->db->query($sql, array($NIP))->result_array();
@@ -2106,5 +2134,14 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $query=$this->db->query($sql, array())->result_array();
         return $query;
         
+    }
+
+    public function getAllUserAutoComplete($Nama)
+    {
+        $sql = 'select CONCAT(a.Name," | ",a.NIP) as Name, a.NIP from db_employees.employees as a
+          where (a.Name like "%'.$Nama.'%" or a.NIP like "%'.$Nama.'%" )
+          GROUP BY a.NIP';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
     }
 }

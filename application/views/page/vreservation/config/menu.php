@@ -6,7 +6,7 @@
                 <h4 class="header"><i class="icon-reorder"></i>Daftar Menu</h4>
                 <div class="toolbar no-padding">
                     <div class="btn-group">
-                      <span data-smt="" class="btn btn-xs btn-add-menu btn-add">
+                      <span data-smt="" class="btn btn-xs btn-add-menu btn-add btn-add-menu-auth">
                         <i class="icon-plus"></i> Add Menu
                        </span>
                     </div>
@@ -266,7 +266,7 @@
                 $(".datatable2 tbody").append(
                     '<tr>'+
                         '<td><input type = "text" class = "form-control GroupPrevileges" value ="'+response[i]['GroupAuth']+'" id-key = "'+response[i]['ID']+'"><div class = "hide">'+response[i]['GroupAuth']+'</div></td>'+
-                        '<td class = "btn-delete"><span class = "btn btn-xs btn-delete btn-delete-groupp" id-key = "'+response[i]['ID']+'"><i class="fa fa-trash"></i></span>'+'</td>'+
+                        '<td class = "btn-delete"><span class = "btn btn-xs btn-delete btn-delete-groupp btn-danger" id-key = "'+response[i]['ID']+'"><i class="fa fa-trash"></i></span>'+'</td>'+
                     '</tr>' 
                     );
             }
@@ -287,13 +287,13 @@
                 '<th style="width: 10%;">Menu</th>'+
                 '<th style="width: 13%;">Sub Menu 1</th>'+
                 '<th style="width: 13%;">Sub Menu 2</th>'+
-                '<th style="width: 21%;">URI</th>'+
-                '<th style="width: 21%;" class = "btn-edit">Controler</th>'+
-                '<th style="width: 4%;" class = "btn-edit">Read</th>'+
-                '<th style="width: 4%;" class = "btn-edit">Write</th>'+
-                '<th style="width: 4%;" class = "btn-edit">Update</th>'+
-                '<th style="width: 4%;" class = "btn-edit">Delete</th>'+
-                '<th style="width: 4%;" class = "btn-delete">Action</th>'+
+                '<th style="width: 21%;" class = "btn-edit-menu-auth">URI</th>'+
+                '<th style="width: 21%;" class = "btn-edit-menu-auth">Controler</th>'+
+                '<th style="width: 4%;" class = "btn-edit-menu-auth">Read</th>'+
+                '<th style="width: 4%;" class = "btn-edit-menu-auth">Write</th>'+
+                '<th style="width: 4%;" class = "btn-edit-menu-auth">Update</th>'+
+                '<th style="width: 4%;" class = "btn-edit-menu-auth">Delete</th>'+
+                '<th style="width: 4%;" class = "btn-delete-menu-auth">Action</th>'+
             '</tr>'+
         '</thead>'+
         '<tbody>'+
@@ -325,13 +325,13 @@
                         '<td><input type = "text" class = "form-control Menu" value ="'+response[i]['Menu']+'" id-key = "'+response[i]['ID_Menu']+'"><div class = "hide">'+response[i]['Menu']+'</div></td>'+
                         '<td><input type = "text" class = "form-control SubMenu1" value ="'+response[i]['SubMenu1']+'" id-key = "'+response[i]['ID']+'"><div class = "hide">'+response[i]['SubMenu1']+'</div></td>'+
                         '<td><input type = "text" class = "form-control SubMenu2" value ="'+response[i]['SubMenu2']+'" id-key = "'+response[i]['ID']+'"><div class = "hide">'+response[i]['SubMenu2']+'<div></td>'+
-                        '<td><input type = "text" class = "form-control Slug" value ="'+response[i]['Slug']+'" id-key = "'+response[i]['ID']+'"><div class = "hide">'+response[i]['Slug']+'<div></td>'+
-                        '<td class = "btn-edit"><input type = "text" class = "form-control Controller" value ="'+response[i]['Controller']+'" id-key = "'+response[i]['ID']+'"><div class = "hide">'+response[i]['Controller']+'<div></td>'+
-                        '<td class = "btn-edit"><select class = "read" id-key = "'+response[i]['ID']+'"><option value = "'+response[i]['read']+'">'+read+'</option><option value = "1">True</option><option value = "0">False</option></select>'+'</td>'+
-                        '<td class = "btn-edit"><select class = "write" id-key = "'+response[i]['ID']+'"><option value = "'+response[i]['write']+'">'+write+'</option><option value = "1">True</option><option value = "0">False</option></select>'+'</td>'+
-                        '<td class = "btn-edit"><select class = "update" id-key = "'+response[i]['ID']+'"><option value = "'+response[i]['update']+'">'+update+'</option><option value = "1">True</option><option value = "0">False</option></select>'+'</td>'+
-                        '<td class = "btn-edit"><select class = "delete" id-key = "'+response[i]['ID']+'"><option value = "'+response[i]['delete']+'">'+deletee+'</option><option value = "1">True</option><option value = "0">False</option></select>'+'</td>'+
-                        '<td class = "btn-delete"><span class = "btn btn-xs btn-delete btn-delete-menusub" id-key = "'+response[i]['ID']+'"><i class="fa fa-trash"></i></span>'+'</td>'+
+                        '<td class = "btn-edit-menu-auth"><input type = "text" class = "form-control Slug" value ="'+response[i]['Slug']+'" id-key = "'+response[i]['ID']+'"><div class = "hide">'+response[i]['Slug']+'<div></td>'+
+                        '<td class = "btn-edit-menu-auth"><input type = "text" class = "form-control Controller" value ="'+response[i]['Controller']+'" id-key = "'+response[i]['ID']+'"><div class = "hide">'+response[i]['Controller']+'<div></td>'+
+                        '<td class = "btn-edit-menu-auth"><select class = "read" id-key = "'+response[i]['ID']+'"><option value = "'+response[i]['read']+'">'+read+'</option><option value = "1">True</option><option value = "0">False</option></select>'+'</td>'+
+                        '<td class = "btn-edit-menu-auth"><select class = "write" id-key = "'+response[i]['ID']+'"><option value = "'+response[i]['write']+'">'+write+'</option><option value = "1">True</option><option value = "0">False</option></select>'+'</td>'+
+                        '<td class = "btn-edit-menu-auth"><select class = "update" id-key = "'+response[i]['ID']+'"><option value = "'+response[i]['update']+'">'+update+'</option><option value = "1">True</option><option value = "0">False</option></select>'+'</td>'+
+                        '<td class = "btn-edit-menu-auth"><select class = "delete" id-key = "'+response[i]['ID']+'"><option value = "'+response[i]['delete']+'">'+deletee+'</option><option value = "1">True</option><option value = "0">False</option></select>'+'</td>'+
+                        '<td class = "btn-delete-menu-auth"><span class = "btn btn-xs btn-delete btn-delete-menusub btn-danger" id-key = "'+response[i]['ID']+'"><i class="fa fa-trash"></i></span>'+'</td>'+
                     '</tr>' 
                     );
             }
@@ -804,7 +804,7 @@
                 '<th style="width: 15px;" class = "btn-edit">Write</th>'+
                 '<th style="width: 15px;" class = "btn-edit">Update</th>'+
                 '<th style="width: 15px;" class = "btn-edit">Delete</th>'+
-                '<th style="width: 15px;" class = "btn-delete">Action</th>'+
+                '<th style="width: 15px;" class = "btn-delete-menu-auth">Action</th>'+
             '</tr>'+
         '</thead>'+
         '<tbody>'+
@@ -851,7 +851,7 @@
                         '<td class = "btn-edit"><select class = "writeUser" id-key = "'+response[i]['ID_previleges']+'" auth-menu = "'+response[i]['writeMenu']+'"><option value = "'+response[i]['write']+'">'+write+'</option><option value = "1">True</option><option value = "0">False</option></select>'+'</td>'+
                         '<td class = "btn-edit"><select class = "updateUser" id-key = "'+response[i]['ID_previleges']+'" auth-menu = "'+response[i]['updateMenu']+'"><option value = "'+response[i]['update']+'">'+update+'</option><option value = "1">True</option><option value = "0">False</option></select>'+'</td>'+
                         '<td class = "btn-edit"><select class = "deleteUser" id-key = "'+response[i]['ID_previleges']+'" auth-menu = "'+response[i]['deleteMenu']+'"><option value = "'+response[i]['delete']+'">'+deletee+'</option><option value = "1">True</option><option value = "0">False</option></select>'+'</td>'+
-                        '<td class = "btn-delete"><span class = "btn btn-xs btn-delete-previleges" id-key = "'+response[i]['ID_previleges']+'"><i class="fa fa-trash"></i></span>'+'</td>'+
+                        '<td class = ""><span class = "btn btn-xs btn-delete-previleges btn-danger" id-key = "'+response[i]['ID_previleges']+'"><i class="fa fa-trash"></i></span>'+'</td>'+
                     '</tr>' 
                     );
             }

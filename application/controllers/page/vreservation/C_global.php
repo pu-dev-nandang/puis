@@ -11,8 +11,8 @@ class C_global extends Vreservation_Controler {
         $this->load->model('m_sendemail');
         $this->load->model('m_api');
         $this->load->library('JWT');
-        $this->load->model('master/m_master');
-        $this->load->model('vreservation/m_reservation');
+        // $this->load->model('master/m_master');
+        // $this->load->model('vreservation/m_reservation');
     }
 
 
