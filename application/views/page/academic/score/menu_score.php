@@ -160,7 +160,7 @@
                                 '    <i class="fa fa-pencil-square-o" aria-hidden="true"></i> <span class="caret"></span>' +
                                 '  </button>' +
                                 '  <ul class="dropdown-menu">' +
-                                '    <li><a href="javascript:void(0);" class="btnInputScore" data-nip="'+dataC.Coordinator+'" data-id="'+dataC.ScheduleID+'">Input Score</a></li>' +
+                                '    <li><a href="javascript:void(0);" class="btnInputScore" data-nip="'+dataC.Coordinator+'" data-smt="'+SemesterID+'" data-id="'+dataC.ScheduleID+'">Input Score</a></li>' +
                                 '    <li><a href="javascript:void(0);" class="btnGrade" data-page="InputGrade1" data-group="'+dataC.Classgroup+'" data-id="'+dataC.ScheduleID+'">Approval - Score Weighted</a></li>' +
                                 '    <li role="separator" class="divider"></li>' +
                                 '    <li><a href="javascript:void(0);" class="inputScheduleExchange" data-no="'+i+'" data-id="">Cetak Report UTS</a></li>' +
@@ -208,9 +208,11 @@
     $(document).on('click','.btnInputScore',function () {
         var NIP = $(this).attr('data-nip');
         var ScheduleID = $(this).attr('data-id');
+        var SemesterID = $(this).attr('data-smt');
         var data = {
             NIP : NIP,
-            ScheduleID : ScheduleID
+            ScheduleID : ScheduleID,
+            SemesterID : SemesterID
         };
         var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'academic/inputScore';

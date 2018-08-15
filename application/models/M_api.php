@@ -2241,7 +2241,7 @@ class M_api extends CI_Model {
 
     }
 
-    public function __getScore($ScheduleID) {
+    public function __getScore($SemesterID,$ScheduleID) {
 
         $dataClassOf = $this->getClassOf();
 
@@ -2256,21 +2256,23 @@ class M_api extends CI_Model {
             $db_ = 'ta_'.$dataClassOf[$c]['Year'];
             $dataSc = $this->db->query('SELECT sp.*,s.Name FROM '.$db_.'.study_planning sp 
                                                 LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
-                                                WHERE sp.ScheduleID = "'.$ScheduleID.'" AND sp.StatusSystem = "1" ')
+                                                WHERE sp.SemesterID = "'.$SemesterID.'" AND sp.ScheduleID = "'.$ScheduleID.'" 
+                                                AND sp.StatusSystem = "1" ORDER BY sp.NPM ASC')
                 ->result_array();
 
             if(count($dataSc)>0){
                 for($d=0;$d<count($dataSc);$d++){
                     $dataSc[$d]['DB_Student'] = $db_;
+                    array_push($res,$dataSc[$d]);
                 }
-                array_push($res,$dataSc);
+
             }
 
         }
 
         $result = array(
             'Course' => $dataCourse,
-            'Students' => $res[0]
+            'Students' => $res
         );
 
         return $result;

@@ -2228,7 +2228,8 @@ class C_api extends CI_Controller {
         if(count($data_arr)>0){
             if($data_arr['action']=='read'){
                 $ScheduleID = $data_arr['ScheduleID'];
-                $data = $this->m_api->__getScore($ScheduleID);
+                $SemesterID = $data_arr['SemesterID'];
+                $data = $this->m_api->__getScore($SemesterID,$ScheduleID);
                 return print_r(json_encode($data));
             }
             else if($data_arr['action']=='grade'){

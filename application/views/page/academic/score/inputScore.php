@@ -71,8 +71,9 @@
     function getDataScore() {
 
         var ScheduleID = '<?php echo $ScheduleID; ?>';
+        var SemesterID = '<?php echo $SemesterID; ?>';
         var url = base_url_js+'api/__crudScore';
-        var token = jwt_encode({action:'read',ScheduleID:ScheduleID},'UAP)(*');
+        var token = jwt_encode({action:'read',ScheduleID:ScheduleID,SemesterID:SemesterID},'UAP)(*');
 
         $.post(url,{token:token},function (jsonDataResult) {
 
