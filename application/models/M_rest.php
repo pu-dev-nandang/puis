@@ -422,7 +422,27 @@ class M_rest extends CI_Model {
             }
         }
 
-        return $arrDataStd;
+
+        // Get Total Assigment Aktif
+        $dataAssg = $this->db->select('ID AS ScheduleID, ClassGroup, TotalAssigment')->get_where('db_academic.schedule',array(
+                                            'SemesterID' => $SemesterID,
+                                            'ID' => $ScheduleID
+                                        ),1)->result_array();
+
+        $dataGrade = $this->db->get_where('db_academic.grade_course',array(
+                                                'SemesterID' => $SemesterID,
+                                                'ScheduleID' => $ScheduleID
+                                            ),1)->result_array();;
+
+
+        if(count($dataAssg)>0){
+            $dataAssg[0]['DetailStudent'] = $arrDataStd;
+            $dataAssg[0]['Weightages'] = $dataGrade;
+        }
+
+
+
+        return $dataAssg;
     }
 
 
