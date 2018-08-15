@@ -2589,15 +2589,30 @@ class M_api extends CI_Model {
         $arr = array();
         $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
         // cari data payment yang status = 0 desc limit 1
-        $sql = 'select * from db_finance.payment where Status = "0" and NPM = ? and SemesterID = ? order by ID desc limit 1';
+        $sql = 'select * from db_finance.payment where NPM = ? and SemesterID = ? order by ID desc limit 1';
         $query=$this->db->query($sql, array($NPM,$SemesterID[0]['ID']))->result_array();
+        // print_r($query);die();
         if (count($query) == 1 ) {
+            $dd = array();
             $ID_payment = $query[0]['ID'];
             $this->load->model('master/m_master');
+            $PTID = $this->m_master->caribasedprimary('db_finance.payment_type','ID',$query[0]['PTID']);
+
             $get = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$ID_payment);
+            $cicilan = (count($get) > 1) ? 1 : 0;
+            $dd = array(
+                'Invoice' => $query[0]['Invoice'],
+                'Discount' => $query[0]['Discount'],
+                'PTID' => $PTID[0]['Description'],
+                'Installment' => $cicilan,
+            );
+
+            $arr['Invoice'] = $dd;
+            $cc = array();
             for ($i=0; $i < count($get); $i++) { 
-                $arr[] = array('Deadline' => $get[$i]['Deadline'],'Price' => $get[$i]['Invoice'],'Status' => $get[$i]['Status']);
+                $cc[] = array('Deadline' => $get[$i]['Deadline'],'Price' => $get[$i]['Invoice'],'Status' => $get[$i]['Status'],'UpdateAt' => $get[$i]['UpdateAt']);
             }
+            $arr['DetailPayment'] = $cc;
         }
         return $arr;
 
