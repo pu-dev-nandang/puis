@@ -123,7 +123,7 @@
                     <input type="file" data-style="fileinput" id="ExFile">
                     <br>
                     <b>If no Upload then using Default Layout</b><br>
-                    <a href="<?php echo base_url('fileGetAny/vreservation-aa.pdf'); ?>" target="_blank"></i>Click Default Layout</a>
+                    <a href="<?php echo base_url('fileGetAny/vreservation-'.$Layout); ?>" target="_blank"></i>Click Default Layout</a>
                 </div>
             </div>
         </div>

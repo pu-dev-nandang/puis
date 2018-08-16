@@ -269,6 +269,9 @@ class C_global extends Vreservation_Controler {
             $time = (int)$time;
         }
 
+        $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','Room',$input['room']);
+        $file = $getRoom[0]['Layout'];
+        $this->data['Layout'] = $file;
         if ($time > -30) {
             switch ($input['Action']) {
                 case 'add':
@@ -338,8 +341,9 @@ class C_global extends Vreservation_Controler {
                     }
                     else
                     {
-                        $Req_layout = '<a href="'.base_url("fileGetAny/vreservation-aa.pdf").'" target="_blank"></i>Default Layout</a>';
+                        $Req_layout = '<a href="'.base_url("fileGetAny/vreservation-".$file).'" target="_blank"></i>Default Layout</a>';
                     }
+                    
                     $this->data['Req_layout'] = $Req_layout;
                     $this->data['ID'] = $get[0]['ID'];
                     echo $this->load->view($this->pathView.'modal_form_view',$this->data,true);
@@ -358,7 +362,6 @@ class C_global extends Vreservation_Controler {
         </div>';
         echo $html;
         }
-        
         
     }
 
