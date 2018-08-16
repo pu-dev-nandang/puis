@@ -29,6 +29,15 @@
 
 <script type="text/javascript">
 	$(document).ready(function(){
+    // var url = base_url_js+'api/__cek_deadline_paymentNPM';
+    // var data = {
+    //     NPM : '12140015'
+    // };
+    // var token = jwt_encode(data,"UAP)(*");
+    // $.post(url,{ token:token },function (data_json) {
+    //     console.log(data_json);
+    // });         
+
 		var divHtml = $("#schedule");
 		loadDataSchedule(divHtml);
 
@@ -67,7 +76,12 @@
       $('.chke_additional').each(function() {
          if ($(this).is(':checked')) {
             var valuee = $(this).val();
-            chk_e_additional.push(valuee);
+            var Qty = $(".chke_additional"+valuee).val();
+            var eeArr = {
+              ID_equipment_add : valuee,
+              Qty : Qty
+            };
+            chk_e_additional.push(eeArr);
          }
       });
     }
@@ -87,14 +101,14 @@
 
      // console.log(chk_person_support);
 
-    var chk_e_multiple = '';
-    if ($('#multipleYA').is(':checked')) {
-      var chk_e_multiple = [];
-      $('.datetime_deadlineMulti').each(function() {
-         var valuee = $(this).val();
-         chk_e_multiple.push(valuee);
-      });
-    }
+    // var chk_e_multiple = '';
+    // if ($('#multipleYA').is(':checked')) {
+    //   var chk_e_multiple = [];
+    //   $('.datetime_deadlineMulti').each(function() {
+    //      var valuee = $(this).val();
+    //      chk_e_multiple.push(valuee);
+    //   });
+    // }
 
    var data = {
        Room : Room,
@@ -103,10 +117,13 @@
        Agenda : Agenda,
        chk_e_additional : chk_e_additional,
        chk_person_support : chk_person_support,
-       chk_e_multiple : chk_e_multiple,
+       //chk_e_multiple : chk_e_multiple,
        file : file_validation(),
        date : $('#datetime_deadline1').val(),
+       Participant : $("#Participant").val(),
    };
+
+   console.log(data);
 
    if (validationInput = validationModal(data)) {
           var form_data = new FormData();
@@ -374,7 +391,8 @@
             var url = base_url_js+"api/__m_equipment_additional";
             $.post(url,function (data_json) {
               var response = data_json;
-              var splitBagi = 3;
+              console.log(response);
+              var splitBagi = 2;
               var split = parseInt(response.length / splitBagi);
               var sisa = response.length % splitBagi;
               
@@ -382,7 +400,7 @@
                     split++;
               }
               var getRow = 0;
-              var divE_additional = '<div class="col-md-6" id="divE_additional"><strong>Choices Equipment Additional</strong></div>';
+              var divE_additional = '<div class="col-md-6" id="divE_additional" style="width: 500px;"><strong>Choices Equipment Additional</strong></div>';
               $('#e_additional').after(divE_additional);
               $('#divE_additional').append('<table class="table" id ="tablechk_e_additional">');
               for (var i = 0; i < split; i++) {
@@ -392,8 +410,10 @@
                 $('#tablechk_e_additional').append('<tr id = "a'+i+'">');
                 for (var k = 0; k < splitBagi; k++) {
                     $('#a'+i).append('<td>'+
-                                        '<input type="checkbox" class = "chke_additional" name="chke_additional" value = "'+response[getRow].ID_add+'">&nbsp'+ response[getRow].Equipment+
-                                     '</td>'
+                                        '<input type="checkbox" class = "chke_additional" name="chke_additional" value = "'+response[getRow].ID_add+'">&nbsp'+ response[getRow].Equipment+' By '+response[getRow].Division+
+                                     '</td>'+
+                                     '<td>'+
+                                        ' <input type="number" class="form-control chke_additional'+response[getRow].ID_add+' hide"  value="1" id = "chke_additional'+response[getRow].ID_add+'">'+'</td>'
                                     );
                     getRow++;
                 }
@@ -410,6 +430,17 @@
     $(document).on('change','#person_supportTDK', function () {
         if(this.checked) {
             $('#divperson_support').remove();
+        }
+    });
+
+    $(document).on('change','.chke_additional', function () {
+      var aa = $(this).val();
+        if(this.checked) {
+            $('#chke_additional'+aa).removeClass('hide');
+        }
+        else
+        {
+          $('#chke_additional'+aa).addClass('hide');
         }
 
     });

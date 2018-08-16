@@ -5,7 +5,7 @@
 			<div class="widget-header">
 					<h4><i class="icon-calendar"></i> Schedule Today</h4>
 					<div class="thumbnail" style="padding: 10px;" id = "countRequest">
-					    <b>Total Request : <a href="javascript:void(0)" class="btn-action" data-page="v_request" data-id="1">11</a></b>
+					    <!-- <b>Total Request : <a href="javascript:void(0)" class="btn-action" data-page="v_request" data-id="1">11</a></b> -->
 					</div>
 				</div>
 			<div class="widget-content">

@@ -131,7 +131,7 @@
         loading_page('#pageData');
         var html_table ='<div class="col-md-12">'+
                          '<div class="table-responsive">'+
-                            '<table class="table table-striped table-bordered table-hover table-checkable datatable">'+
+                            '<table class="table table-bordered table-hover table-checkable datatable">'+
                                 '<thead>'+
                                     '<tr>'+
                                     // '<th style="width: 15px;">No</th>'+

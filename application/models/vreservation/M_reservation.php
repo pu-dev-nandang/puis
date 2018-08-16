@@ -320,8 +320,8 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
     public function get_m_equipment_additional($available = '> 0')
     {
-        $sql = 'select a.ID as ID_add,a.*,b.* from db_reservation.m_equipment_additional as a join db_reservation.m_equipment as b
-        on a.ID_m_equipment = b.ID where a.Qty '.$available;
+        $sql = 'select a.ID as ID_add,a.*,b.*,c.Division from db_reservation.m_equipment_additional as a join db_reservation.m_equipment as b
+        on a.ID_m_equipment = b.ID join db_employees.division as c on a.Owner = c.ID where a.Qty '.$available;
         $query=$this->db->query($sql, array());
         return $query->result_array();
     }
@@ -672,8 +672,13 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add[$j]);
                     // print_r($ID_equipment_add);die();
                     $ID_m_equipment = $get[0]['ID_m_equipment'];
+                    $Owner = $get[0]['Owner'];
+                    $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$Owner);
+                    $Owner = $getX[0]['Division'];
+
+                    $Qty = $get[0]['Qty'];
                     $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
-                    $Name_equipment_add .= '<li>'.$get[0]['Equipment'].'</li>';
+                    $Name_equipment_add .= '<li>'.$get[0]['Equipment'].' by '.$Owner.'['.$Qty.']</li>';
                 }
                 $Name_equipment_add .= '</ul>';
             }
@@ -701,7 +706,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     'Room' => $query[$i]['Room'],
                     'Equipment_add' => $Name_equipment_add,
                     'Persone_add' => $Name_add_personel,
-                    'Req_date' => $ReqdateNameDay.', '.$query[$i]['Req_date'],
+                    'Req_date' => $query[$i]['Name'].'<br>'.$ReqdateNameDay.', '.$query[$i]['Req_date'],
                     'Req_layout' => $query[$i]['Req_layout'],
                     'ID' => $query[$i]['ID'],
                     'Status' => $query[$i]['Status'],
@@ -744,9 +749,19 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 for ($j=0; $j < count($ID_equipment_add); $j++) { 
                     $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add[$j]);
                     // print_r($ID_equipment_add);die();
+                    // $ID_m_equipment = $get[0]['ID_m_equipment'];
+                    // $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
+                    // $Name_equipment_add .= '<li>'.$get[0]['Equipment'].'</li>';
+
+                    // print_r($ID_equipment_add);die();
                     $ID_m_equipment = $get[0]['ID_m_equipment'];
+                    $Owner = $get[0]['Owner'];
+                    $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$Owner);
+                    $Owner = $getX[0]['Division'];
+
+                    $Qty = $get[0]['Qty'];
                     $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
-                    $Name_equipment_add .= '<li>'.$get[0]['Equipment'].'</li>';
+                    $Name_equipment_add .= '<li>'.$get[0]['Equipment'].' by '.$Owner.'['.$Qty.']</li>';
                 }
                 $Name_equipment_add .= '</ul>';
             }
@@ -774,7 +789,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     'Room' => $query[$i]['Room'],
                     'Equipment_add' => $Name_equipment_add,
                     'Persone_add' => $Name_add_personel,
-                    'Req_date' => $ReqdateNameDay.', '.$query[$i]['Req_date'],
+                    'Req_date' => $query[$i]['Name'].'<br>'.$ReqdateNameDay.', '.$query[$i]['Req_date'],
                     'Req_layout' => $query[$i]['Req_layout'],
                     'ID' => $query[$i]['ID'],
                     'Status' => $query[$i]['Status'],
@@ -786,8 +801,15 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
     public function get_m_room_equipment($room)
     {
-        $sql = 'select a.Room,a.qty,b.Equipment from db_reservation.m_room_equipment as a join db_reservation.m_equipment as b on a.ID_m_equipment = b.ID and a.Room = ?';
+        $sql = 'select a.Room,a.qty,b.Equipment,a.Note from db_reservation.m_room_equipment as a join db_reservation.m_equipment as b on a.ID_m_equipment = b.ID and a.Room = ?';
         $query=$this->db->query($sql, array($room))->result_array();
+        return $query;
+    }
+
+    public function get_m_room_equipment_all()
+    {
+        $sql = 'select a.ID,a.Room,a.qty,b.Equipment,c.Name as NameCreated,a.CreatedAt, d.Name as NameUpdated,a.UpdatedAt,a.Note from db_reservation.m_room_equipment as a join db_reservation.m_equipment as b on a.ID_m_equipment = b.ID join db_employees.employees as c on a.CreatedBy = c.NIP left join db_employees.employees as d on a.UpdatedBy = d.NIP';
+        $query=$this->db->query($sql, array())->result_array();
         return $query;
     }
 
@@ -1072,5 +1094,26 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         }
 
         return $html;
+    }
+
+    public function get__m_additional_personel()
+    {
+        $sql = 'select b.Division,a.ID as ID_m_additional_personel, b.ID as ID_division from db_reservation.m_additional_personel as a
+        join db_employees.division as b on a.ID_division = b.ID
+        ';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
+    }
+
+    public function get_JSonEquipment_additional()
+    {
+        $sql = 'select c.ID,a.Equipment,b.ID as ID_division,b.Division,c.Qty,c.ID_m_equipment,c.CreatedBy,c.CreatedAt,c.UpdatedBy,c.UpdatedAt,d.Name as NameCreated,
+                e.Name as NameUpdated
+                from db_reservation.m_equipment as a join db_reservation.m_equipment_additional as c on a.ID = c.ID_m_equipment
+                join db_employees.division as b on c.`Owner` = b.ID join db_employees.employees as d on d.NIP = c.CreatedBy left join db_employees.employees as e 
+                on e.NIP = c.UpdatedBy
+        ';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
     }
 }

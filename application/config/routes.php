@@ -672,7 +672,16 @@ $route['vreservation/edit_auth_user'] = 'page/vreservation/c_config/edit_auth_us
 $route['vreservation/master/modalform/(:any)'] = 'page/vreservation/c_master/modalform/$1';
 $route['vreservation/master/loadTableMaster/(:any)'] = 'page/vreservation/c_master/load_table_master/$1';
 $route['vreservation/master/submit_m_equipment'] = 'page/vreservation/c_master/submit_m_equipment';
+$route['vreservation/master/additional_personel_json_data'] = 'page/vreservation/c_master/additional_personel_json_data';
+$route['vreservation/master/additional_personel/modalform'] = 'page/vreservation/c_master/additional_personel_modal_form';
+$route['vreservation/master/additional_personel/submit'] = 'page/vreservation/c_master/additional_personel_submit';
+$route['vreservation/master/loaddataJSonEquipmentRoom'] = 'page/vreservation/c_master/loaddataJSonEquipmentRoom';
+$route['vreservation/master/modal_form_equipmentroom'] = 'page/vreservation/c_master/modal_form_equipmentroom';
+$route['vreservation/master/getDataEquipmentMaster'] = 'page/vreservation/c_master/getDataEquipmentMaster';
+$route['vreservation/master/EquipmentRoom/submit'] = 'page/vreservation/c_master/EquipmentRoom_submit';
+$route['vreservation/master/loaddataJSonEquipment_additional'] = 'page/vreservation/c_master/loaddataJSonEquipment_additional';
+$route['vreservation/master/modal_form_equipmentadditional'] = 'page/vreservation/c_master/modal_form_equipmentadditional';
+$route['vreservation/master/EquipmentAdditional/submit'] = 'page/vreservation/c_master/EquipmentAdditional_submit';
 
-$route['admission/master-config/submit_jenis_tempat_tinggal'] = 'page/admission/c_master/submit_jenis_tempat_tinggal';
 // test
 $route['testApprove'] = 'page/finance/c_finance/testApprove';
