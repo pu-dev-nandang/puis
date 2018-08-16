@@ -1085,7 +1085,7 @@ class C_auth extends Globalclass {
 
         else if($table=='updateAttd'){
             $dataSchedule = $this->db->query('SELECT ID,SemesterID,ScheduleID FROM db_academic.attendance')->result_array();
-            $db_ = 'ta_2018';
+            $db_ = 'ta_2014';
 
             for($i=0;$i<count($dataSchedule);$i++){
                 $ScheduleID = $dataSchedule[$i]['ScheduleID'];
@@ -1147,6 +1147,47 @@ class C_auth extends Globalclass {
 
 //            $data = $this->db->query('SELECT * FROM db_academic.auth_students')->result_array();
         }
+
+        else if($table=='rekap'){
+            $db_ = 'ta_2014';
+            $dataStd = $this->db->query('SELECT * FROM '.$db_.'.students ORDER BY NPM ASC')->result_array();
+
+            $res = [];
+            for($c=0;$c<count($dataStd);$c++){
+                $NPM = $dataStd[$c]['NPM'];
+                $dataS = $this->db->query('SELECT * FROM '.$db_.'.study_planning 
+                                                            WHERE SemesterID = 13 AND NPM = "'.$NPM.'" ')
+                    ->result_array();
+                $Credit = 0;
+                for($s=0;$s<count($dataS);$s++){
+                    $Credit = $Credit + $dataS[$s]['Credit'];
+                }
+
+                $re = array(
+                    'NPM' => $NPM,
+                    'Name' => ucwords(strtolower($dataStd[$c]['Name'])),
+                    'Credit' => $Credit
+                );
+                array_push($res,$re);
+            }
+
+            echo "<table><tr><th>NPM</th><th>Name</th><th>Credit</th></tr>";
+
+            for($r=0;$r<count($res);$r++){
+                echo "<tr><td>".$res[$r]['NPM']."</td><td>".$res[$r]['Name']."</td><td>".$res[$r]['Credit']."</td></tr>";
+            }
+
+            echo "</table>";
+
+//            return print_r($res);
+        }
+    }
+
+    public function getClassOf(){
+        $data = $this->db->query('SELECT ast.Year FROM db_academic.auth_students ast 
+                                                  GROUP BY ast.Year');
+
+        return $data->result_array();
     }
 
     private function genratePassword($NIP,$Password){
@@ -1223,8 +1264,6 @@ class C_auth extends Globalclass {
         return $data->result_array()[0];
 
     }
-
-
 
     public function migrationStudent(){
 
@@ -1422,13 +1461,6 @@ class C_auth extends Globalclass {
             }
         }
 
-        // study_result
-//        $data = $this->db_server->query('SELECT hs.TahunID AS SemesterID, m.NPM, hs.SKSIPS AS SKS, hs.IPS, hs.IPK , hs.SKSIPK AS TotalSKS, j.MKID
-//                                        FROM siak4.hasilstudi hs
-//                                        LEFT JOIN siak4.mahasiswa m ON(hs.MhswID = m.ID)
-//                                        LEFT JOIN siak4.rencanastudi r ON (r.MhswID = hs.MhswID)
-//                                        LEFT JOIN siak4.jadwal j ON (r.JadwalID=j.ID)
-//                                        WHERE m.TahunMasuk='.$angkatan)->result_array();
 
     }
 
