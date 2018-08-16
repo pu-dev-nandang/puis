@@ -564,6 +564,11 @@ $route['rest/__getDetailKRS'] = 'api/c_rest/getDetailKRS';
 
 $route['rest/__geTimetable'] = 'api/c_rest/geTimetable';
 $route['rest/__getKSM'] = 'api/c_rest/getKSM';
+$route['rest/__cek_deadline_paymentNPM'] = 'api/c_rest/cek_deadline_paymentNPM';
+
+
+
+
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
 $route['api/__getRegionByProv'] = 'api/c_api/getRegionByProv';
 $route['api/__getDistrictByRegion'] = 'api/c_api/getDistrictByRegion';

@@ -2588,35 +2588,46 @@ class M_api extends CI_Model {
     public function cek_deadline_paymentNPM($NPM)
     {
         error_reporting(0);
+        $this->load->model('master/m_master');
         $arr = array();
         $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
         // cari data payment yang status = 0 desc limit 1
-        $sql = 'select * from db_finance.payment where NPM = ? and SemesterID = ? order by ID desc limit 1';
+        $sql = 'select * from db_finance.payment where NPM = ? and SemesterID = ? order by ID ASC';
         $query=$this->db->query($sql, array($NPM,$SemesterID[0]['ID']))->result_array();
         // print_r($query);die();
-        if (count($query) == 1 ) {
-            $dd = array();
-            $ID_payment = $query[0]['ID'];
-            $this->load->model('master/m_master');
-            $PTID = $this->m_master->caribasedprimary('db_finance.payment_type','ID',$query[0]['PTID']);
+        if (count($query) > 0 ) {
+            $resFinal =[];
+            for($g=0;$g<count($query);$g++){
+                $dd = array();
+                $dataG = $query[$g];
+                $ID_payment = $dataG['ID'];
 
-            $get = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$ID_payment);
-            $cicilan = (count($get) > 1) ? 1 : 0;
-            $dd = array(
-                'Invoice' => $query[0]['Invoice'],
-                'Discount' => $query[0]['Discount'],
-                'PTID' => $PTID[0]['Description'],
-                'Installment' => $cicilan,
-            );
+                $PTID = $this->m_master->caribasedprimary('db_finance.payment_type','ID',$dataG['PTID']);
 
-            $arr['Invoice'] = $dd;
-            $cc = array();
-            for ($i=0; $i < count($get); $i++) { 
-                $cc[] = array('Deadline' => $get[$i]['Deadline'],'Price' => $get[$i]['Invoice'],'Status' => $get[$i]['Status'],'UpdateAt' => $get[$i]['UpdateAt']);
+                $get = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$ID_payment);
+
+                $getConstVa = $this->m_master->caribasedprimary('db_va.master_va','ID',1);
+                $cicilan = (count($get) > 1) ? 1 : 0;
+                $dd = array(
+                    'Invoice' => $dataG['Invoice'],
+                    'Discount' => $dataG['Discount'],
+                    'PaymentType' => $PTID[0]['Description'],
+                    'Installment' => $cicilan,
+                    'Const_VA' => $getConstVa[0]['Const_VA'].''.$NPM,
+                );
+
+                $arr['Invoice'] = $dd;
+                $cc = array();
+                for ($i=0; $i < count($get); $i++) {
+                    $cc[] = array('Deadline' => $get[$i]['Deadline'],'Price' => $get[$i]['Invoice'],'Status' => $get[$i]['Status'],'UpdateAt' => $get[$i]['UpdateAt']);
+                }
+                $arr['DetailPayment'] = $cc;
+
+                array_push($resFinal,$arr);
             }
-            $arr['DetailPayment'] = $cc;
+
         }
-        return $arr;
+        return $resFinal;
 
     }
 

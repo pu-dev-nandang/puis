@@ -11,6 +11,7 @@ class C_rest extends CI_Controller {
         $this->load->model('m_api');
         $this->load->model('m_rest');
         $this->load->model('akademik/m_tahun_akademik');
+        $this->load->model('master/m_master');
         $this->load->library('JWT');
         $this->load->library('google');
     }
@@ -154,5 +155,23 @@ class C_rest extends CI_Controller {
 
 
     }
+
+    public function cek_deadline_paymentNPM()
+    {
+        $dataToken = $this->getInputToken();
+        $cekUser = $this->cekAuthAPI($dataToken['auth']);
+        if($cekUser) {
+            $NPM = $dataToken['NPM'];
+            $arr = $this->m_api->cek_deadline_paymentNPM($NPM);
+            return print_r(json_encode($arr));
+        }
+        else {
+            $msg = array(
+                'msg' => 'Error'
+            );
+            return print_r(json_encode($msg));
+        }
+    }
+
 
 }
