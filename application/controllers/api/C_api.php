@@ -2909,25 +2909,65 @@ class C_api extends CI_Controller {
         // $getHoursNow = (int)$aaa[0] + 1;
 
         $Start2 = date("H", strtotime($start));
+        // --- adding modification ---
+
+        $xx= date("H:i", strtotime($start));
+        $time = strtotime($xx);
+        $time = date("H:i", strtotime('+30 minutes', $time));
+        $bool = true;
+        $arr = array();
+        $inc = 0;
+        while ($bool) {
+            if (count($arr) == 0) {
+                $arr[] = $time;
+            }
+            else
+            {
+                $xx= date("H:i", strtotime($arr[$inc]));
+                $time = strtotime($xx);
+                $time = date("H:i", strtotime('+30 minutes', $time));
+                $arr[] = $time;
+                $inc++;
+            }
+
+            $zz = count($arr) - 1;
+            $yy = date("H", strtotime($arr[$zz]));
+
+            // print_r('=> '.$yy.' =>');
+            // print_r($endTime);
+            if ($yy == $endTime) {
+                $bool = false;
+                break;
+            }
+        }
+
+        // print_r($arr);die();
+
         //$endTime = (int)$endTime - (int)$Start2;
         //$endTime = $endTime + $getHoursNow - 1;
         //print_r($endTime);die();
-        $getHoursNow = (int)$Start2 + 1;
+
+        // $getHoursNow = (int)$Start2 + 1;
        
-        for ($i=$getHoursNow; $i <= $endTime; $i++) { 
-                // check len
-                $a = $i;
-                for ($j=0; $j < 2 - strlen($i); $j++) { 
-                    $a = '0'.$a;
-                }
-                $d = $a.':30';
-                $a = $a.':00';
-                $arrHours[] = date("h:i a", strtotime($a));
-                //$arrHours[] = date("h:i a", strtotime($d));
-                if ($i != $endTime) {
-                    $arrHours[] = date("h:i a", strtotime($d));
-                }
-         }
+        // for ($i=$getHoursNow; $i <= $endTime; $i++) { 
+        //         // check len
+        //         $a = $i;
+        //         for ($j=0; $j < 2 - strlen($i); $j++) { 
+        //             $a = '0'.$a;
+        //         }
+        //         $d = $a.':30';
+        //         $a = $a.':00';
+        //         $arrHours[] = date("h:i a", strtotime($a));
+        //         //$arrHours[] = date("h:i a", strtotime($d));
+        //         if ($i != $endTime) {
+        //             $arrHours[] = date("h:i a", strtotime($d));
+        //         }
+        //  }
+
+        for ($i=0; $i < count($arr); $i++) { 
+            $arrHours[] = date("h:i a", strtotime($arr[$i]));
+        }
+
         echo json_encode($arrHours);
     }
 

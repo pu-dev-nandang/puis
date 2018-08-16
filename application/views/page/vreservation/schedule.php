@@ -72,7 +72,7 @@
 		    		Room
 		    	</th>
 		    	<?php for($i = 0; $i < count($arrHours); $i= $i + 2): ?>
-		    		<th colspan="2" style="text-align: center;"><?php echo $arrHours[$i] ?></th>
+		    		<th colspan="2" style="text-align: left;"><?php echo $arrHours[$i] ?></th>
 		    	<?php endfor ?>
 		    </tr>	   
 	    </thead>

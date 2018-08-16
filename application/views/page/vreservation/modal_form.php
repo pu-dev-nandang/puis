@@ -102,7 +102,7 @@
                 </div>
             </div>
         </div>
-        <div class="form-group"> 
+       <!--  <div class="form-group"> 
             <div class="row">
                 <div class="col-sm-3">
                     <label class="control-label">Multiple Days :</label>
@@ -113,7 +113,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
         <div class="form-group"> 
             <div class="row">
                 <div class="col-sm-3">
@@ -124,6 +124,16 @@
                     <br>
                     <b>If no Upload then using Default Layout</b><br>
                     <a href="<?php echo base_url('fileGetAny/vreservation-aa.pdf'); ?>" target="_blank"></i>Click Default Layout</a>
+                </div>
+            </div>
+        </div>
+        <div class="form-group"> 
+            <div class="row">
+                <div class="col-sm-3">
+                    <label class="control-label">Participant :</label>
+                </div>    
+                <div class="col-sm-3">
+                   <input type="number" class="form-control"  id="Participant" value="1">
                 </div>
             </div>
         </div>
@@ -154,6 +164,7 @@
                                     '<tr>'+
                                    ' <th>Nama</th>'+
                                    ' <th>Qty</th>'+
+                                   ' <th>Note</th>'+
                                     '</tr>'+
                                ' </thead>'+
                                 '<tbody>'+
@@ -175,6 +186,7 @@
                     '<tr>'+
                         '<td>'+data_json[i]['Equipment']+'</td>'+
                         '<td>'+data_json[i]['qty']+'</td>'+
+                        '<td>'+data_json[i]['Note']+'</td>'+
                     '</tr>' 
                     );
             }

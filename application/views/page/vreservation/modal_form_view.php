@@ -92,14 +92,14 @@
                     <label class="control-label">Equipment Additional :</label>
                 </div>    
                 <div class="col-sm-6">
-                    <label class="control-label"><?php echo $Name_equipment_add ?></label>
+                    <label class="control-label" style="text-align: left;"><?php echo $Name_equipment_add ?></label>
                 </div>
             </div>
         </div>
         <div class="form-group"> 
             <div class="row">
                 <div class="col-sm-3">
-                    <label class="control-label">Person Support :</label>
+                    <label class="control-label"  style="text-align: left;">Person Support :</label>
                 </div>    
                 <div class="col-sm-6">
                     <label class="control-label"><?php echo $Name_add_personel ?></label> 
@@ -143,6 +143,7 @@
                                     '<tr>'+
                                    ' <th>Nama</th>'+
                                    ' <th>Qty</th>'+
+                                   ' <th>Note</th>'+
                                     '</tr>'+
                                ' </thead>'+
                                 '<tbody>'+
@@ -164,6 +165,7 @@
                     '<tr>'+
                         '<td>'+data_json[i]['Equipment']+'</td>'+
                         '<td>'+data_json[i]['qty']+'</td>'+
+                        '<td>'+data_json[i]['Note']+'</td>'+
                     '</tr>' 
                     );
             }

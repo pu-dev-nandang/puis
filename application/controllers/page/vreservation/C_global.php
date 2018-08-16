@@ -292,11 +292,14 @@ class C_global extends Vreservation_Controler {
                             $ID_m_equipment = $get2[0]['ID_m_equipment'];
                             $get3 = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
                             if ($j != count($ID_equipment_add) - 1) {
-                                $Name_equipment_add .= $get3[0]['Equipment'].',';
+                                $Owner = $get2[0]['Owner'];
+                                $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$Owner);
+                                $Owner = $getX[0]['Division'];
+                                $Name_equipment_add .= $get3[0]['Equipment'].' by '.$Owner.'['.$get2[0]['Qty'].'] , ';
                             }
                             else
                             {
-                                $Name_equipment_add .= $get3[0]['Equipment'];
+                                $Name_equipment_add .= $get3[0]['Equipment'].' by '.$Owner.'['.$get2[0]['Qty'].']';
                             }
                             
                         }
@@ -311,7 +314,7 @@ class C_global extends Vreservation_Controler {
                         $Name_add_personel = '';
                         for ($j=0; $j < count($ID_add_personel); $j++) { 
                             $get2 = $this->m_master->caribasedprimary('db_employees.division','ID',$ID_add_personel[$j]);
-                            if ($j != count($ID_equipment_add) - 1) {
+                            if ($j != count($ID_add_personel) - 1) {
                                 $Name_add_personel .= $get2[0]['Division'].',';
                             }
                             else

@@ -46,9 +46,19 @@ class C_transaksi extends Vreservation_Controler {
             $Colspan++;
         }
 
+        // $ID_equipment_add = '';
+        // if (is_array($input['chk_e_additional'])) {
+        //     $ID_equipment_add = implode(',', $input['chk_e_additional']);
+        // }
+
         $ID_equipment_add = '';
         if (is_array($input['chk_e_additional'])) {
-            $ID_equipment_add = implode(',', $input['chk_e_additional']);
+            $xx = $input['chk_e_additional'];
+            $yy = array();
+            for ($i=0; $i < count($xx); $i++) { 
+                $yy[] = $xx[$i]->ID_equipment_add;
+            }
+            $ID_equipment_add = implode(',', $yy);
         }
         
         $ID_add_personel = '';
@@ -57,10 +67,13 @@ class C_transaksi extends Vreservation_Controler {
         }
 
         // check data bentrok dengan jam lain
-        $chk = $this->m_reservation->checkBentrok($Start,$End,$input['chk_e_multiple'],$input['Room']);
+        // $chk = $this->m_reservation->checkBentrok($Start,$End,$input['chk_e_multiple'],$input['Room']);
+        $chk = $this->m_reservation->checkBentrok($Start,$End,'',$input['Room']);
         if ($chk) {
             $Multiple = '';
-            if (is_array($input['chk_e_multiple'])) {
+            // if (is_array($input['chk_e_multiple'])) {
+            $boolArray = false;
+            if ($boolArray) {
                 for ($i=0; $i < count($input['chk_e_multiple']); $i++) { 
                    if ($i == 0) {
                         $dataSave = array(
@@ -145,8 +158,21 @@ class C_transaksi extends Vreservation_Controler {
                     'Req_date' => date('Y-m-d'),
                     'CreatedBy' => $this->session->userdata('NIP'),
                     'Req_layout' => $filename,
+                    'ParticipantQty' => $input['Participant']
                 );
                 $this->db->insert('db_reservation.t_booking', $dataSave);
+                $ID_t_booking = $this->db->insert_id();
+
+                if (is_array($input['chk_e_additional'])) {
+                    // save data t_booking_eq_additional
+                    $xx = $input['chk_e_additional'];
+                    $yy = array();
+                    for ($i=0; $i < count($xx); $i++) { 
+                        $yy[] = array('ID_t_booking' =>$ID_t_booking,'ID_equipment_additional' => $xx[$i]->ID_equipment_add,'Qty' =>  $xx[$i]->Qty);
+                    }
+                    // $this->db->insert('db_reservation.t_booking_eq_additional', $yy);
+                    $this->db->insert_batch('db_reservation.t_booking_eq_additional', $yy);
+                }
             }
             echo json_encode(array('msg' => 'The Proses Finish','status' => 1));
         }
@@ -154,8 +180,6 @@ class C_transaksi extends Vreservation_Controler {
         {
             echo json_encode(array('msg' => 'Your schedule is Conflict Please check.','status' => 0));
         }
-
-        
     }
 
     // mt_rand()
@@ -225,6 +249,44 @@ class C_transaksi extends Vreservation_Controler {
                             );
             $this->db->where('ID',$ID);
             $this->db->update('db_reservation.t_booking', $dataSave);
+
+            // // add Qty
+            // $getE_additional = $this->m_master->caribasedprimary('db_reservation.t_booking_eq_additional','ID_t_booking',$ID);
+            // if (count($getE_additional) > 0) {
+            //     $bool = true; // check qty ready
+            //     for ($i=0; $i < count($getE_additional); $i++) { 
+            //         // add Qty
+            //         $ID_equipment_additional = $getE_additional[$i]['ID_equipment_additional'];
+            //         $Qty_T = $getE_additional[$i]['Qty'];
+            //         $getM_equip_add = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_additional);
+            //         if ($getM_equip_add < $Qty_T || $getM_equip_add ==  0) {
+            //             $bool = false;
+            //             break;
+            //         }
+            //     }
+
+            //     if ($bool) {
+            //         for ($i=0; $i < count($getE_additional); $i++) { 
+            //             // add Qty
+            //             $ID_equipment_additional = $getE_additional[$i]['ID_equipment_additional'];
+            //             $Qty_T = $getE_additional[$i]['Qty'];
+            //             $getM_equip_add = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_additional);
+            //             $QTY_Upd = $getM_equip_add[0]['Qty'] - $Qty_T;
+            //             $dataSave = array(
+            //                 'Qty' => $QTY_Upd,
+            //             );
+            //             $this->db->where('ID', $ID_equipment_additional);
+            //             $this->db->update('db_reservation.m_equipment_additional', $dataSave);
+            //         }
+            //     }
+            //     else
+            //     {
+            //         $msg = 'This Equipment Additional isnot enough to quantity, Please check';
+            //     }
+                
+
+            // }
+
         }
         else
         {
@@ -242,6 +304,62 @@ class C_transaksi extends Vreservation_Controler {
 
             $get = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$input['ID_tbl']);
             $getUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$get[0]['CreatedBy']);
+            $getE_additional = $this->m_master->caribasedprimary('db_reservation.t_booking_eq_additional','ID_t_booking',$get[0]['ID']);
+
+            for ($i=0; $i < count($getE_additional); $i++) { 
+                $dataSave = array(
+                    'ID_t_booking_eq_add' => $getE_additional[$i]['ID'],
+                    'ID_t_booking' => $get[0]['ID'],
+                    'ID_equipment_additional' => $getE_additional[$i]['ID_equipment_additional'],
+                    'Qty' => $getE_additional[$i]['Qty'],
+                );
+                $this->db->insert('db_reservation.t_booking_eq_additional_delete', $dataSave); 
+            }
+            
+            $sql = "delete from db_reservation.t_booking_eq_additional where ID_t_booking = ".$get[0]['ID'];
+            $query=$this->db->query($sql, array());
+
+            // if (count($getE_additional) > 0) {
+            //     // cek status approve atau tidak
+            //     if ($get[0]['Status'] == 1) {
+            //         for ($i=0; $i < count($getE_additional); $i++) { 
+            //             // add Qty
+            //             $ID_equipment_additional = $getE_additional[$i]['ID_equipment_additional'];
+            //             $Qty_T = $getE_additional[$i]['Qty'];
+            //             $getM_equip_add = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_additional);
+            //             $QTY_Upd = $Qty_T + $getM_equip_add[0]['Qty'];
+            //             $dataSave = array(
+            //                 'Qty' => $QTY_Upd,
+            //             );
+            //             $this->db->where('ID', $ID_equipment_additional);
+            //             $this->db->update('db_reservation.m_equipment_additional', $dataSave);
+
+            //             $dataSave = array(
+            //                 'ID_t_booking_eq_add' => $getE_additional[$i]['ID'],
+            //                 'ID_t_booking' => $get[0]['ID'],
+            //                 'ID_equipment_additional' => $getE_additional[$i]['ID_equipment_additional'],
+            //                 'Qty' => $getE_additional[$i]['Qty'],
+            //             );
+            //             $this->db->insert('db_reservation.t_booking_eq_additional_delete', $dataSave); 
+            //         }
+            //     }
+            //     else
+            //     {
+            //         for ($i=0; $i < count($getE_additional); $i++) { 
+            //             $dataSave = array(
+            //                 'ID_t_booking_eq_add' => $getE_additional[$i]['ID'],
+            //                 'ID_t_booking' => $get[0]['ID'],
+            //                 'ID_equipment_additional' => $getE_additional[$i]['ID_equipment_additional'],
+            //                 'Qty' => $getE_additional[$i]['Qty'],
+            //             );
+            //             $this->db->insert('db_reservation.t_booking_eq_additional_delete', $dataSave); 
+            //         }
+            //     }
+
+            //     $sql = "delete from db_reservation.t_booking_eq_additional where ID_t_booking = ".$get[0]['ID'];
+            //     $query=$this->db->query($sql, array());
+
+            // }
 
             $dataSave = array(
                 'Start' => $get[0]['Start'],
