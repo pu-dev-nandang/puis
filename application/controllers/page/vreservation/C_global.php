@@ -229,9 +229,12 @@ class C_global extends Vreservation_Controler {
         $this->data['room'] = $input['room'];
         $this->data['time'] = $input['time'];
         $this->data['user'] = $input['user'];
-        if (array_key_exists("tgl",$input)) {
-            // $End = date("Y-m-d H:i:s", strtotime($input['tgl'].$input['time']));
-            $End = date("Y-m-d H:i:s", strtotime($input['time']));
+
+        // print_r(strlen($input['time']));die();
+
+        if (strlen($input['time']) == 8) {
+            $End = date("Y-m-d H:i:s", strtotime($input['tgl'].$input['time']));
+            // $End = date("Y-m-d H:i:s", strtotime($input['time']));\
         }
         else
         {
@@ -299,6 +302,9 @@ class C_global extends Vreservation_Controler {
                             }
                             else
                             {
+                                $Owner = $get2[0]['Owner'];
+                                $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$Owner);
+                                $Owner = $getX[0]['Division'];
                                 $Name_equipment_add .= $get3[0]['Equipment'].' by '.$Owner.'['.$get2[0]['Qty'].']';
                             }
                             
@@ -345,7 +351,7 @@ class C_global extends Vreservation_Controler {
         }
         else
         {
-            $html = '<div>Time is not Available</div><br><div style="text-align: center;">       
+            $html = '<div>Time date selected is less than present time</div><br><div style="text-align: center;">       
             <div class="col-sm-12" id="BtnFooter">
                 <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>
             </div>
