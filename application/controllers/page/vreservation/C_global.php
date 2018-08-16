@@ -351,7 +351,7 @@ class C_global extends Vreservation_Controler {
         }
         else
         {
-            $html = '<div>Time is not Available</div><br><div style="text-align: center;">       
+            $html = '<div>Time date selected is less than present time</div><br><div style="text-align: center;">       
             <div class="col-sm-12" id="BtnFooter">
                 <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>
             </div>
