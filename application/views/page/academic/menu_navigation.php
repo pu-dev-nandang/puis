@@ -4,14 +4,26 @@
         <!--=== Navigation ===-->
 
         <ul id="nav">
-
+            <li class="<?php if($this->uri->segment(2)=='master'){echo "current open";} ?>">
+                <a href="javascript:void(0);">
+                    <i class="fa fa-globe"></i>
+                    Master
+                </a>
+                <ul class="sub-menu">
+                    <li class="<?php if($this->uri->segment(2)=='master' && $this->uri->segment(3) == "student" ){echo "current";} ?>">
+                        <a href="<?php echo base_url('academic/master/student'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Student
+                        </a>
+                    </li>
+                </ul>
+            </li>
             <li class="<?php if($this->uri->segment(2)=='curriculum'){echo "current";} ?>">
                 <a href="<?php echo base_url('academic/curriculum'); ?>">
                     <i class="fa fa-university"></i>
                     Curriculum
                 </a>
             </li>
-
             <li class="<?php if($this->uri->segment(2)=='courses'){echo "current";} ?>">
                 <a href="<?php echo base_url('academic/courses'); ?>">
                     <i class="fa fa-th-large"></i>

@@ -301,7 +301,7 @@ class C_api extends CI_Controller {
                                     <span class="caret"></span>
                                   </button>
                                   <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                    <li><a href="javascript:void(0);">Edit Student</a></li>
+                                    <li><a href="javascript:void(0);" class="btn-edit-student" data-npm="'.$row["NPM"].'" ta = "'.$db_.'">Edit Student</a></li>
                                     <li role="separator" class="divider"></li>
                                     <li><a href="javascript:void(0);" class="btn-reset-password" data-npm="'.$row["NPM"].'" data-name="'.$row["Name"].'" data-statusid="'.$row['StatusStudentID'].'">Reset Password</a></li>
                                     <li><a href="javascript:void(0);" class="btn-change-status" data-emailpu="'.$row["EmailPU"].'" data-year="'.$dataYear.'" data-npm="'.$row["NPM"].'" data-name="'.$row["Name"].'" data-statusid="'.$row['StatusStudentID'].'">Change Status</a></li>

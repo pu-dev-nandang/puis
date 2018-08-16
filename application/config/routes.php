@@ -114,6 +114,14 @@ $route['academic/attendance'] = 'page/academic/c_presensi';
 $route['academic/loadPagePresensi'] = 'page/academic/c_presensi/loadPagePresensi';
 
 
+// -- master student -- 
+$route['academic/master/student'] = 'page/academic/c_m_student';
+$route['academic/master/showStudent'] = 'page/academic/c_m_student/showStudent';
+$route['academic/master/loadPageStudents'] = 'page/academic/c_m_student/loadPageStudents';
+$route['academic/master/FormStudents'] = 'page/academic/c_m_student/FormStudents';
+$route['academic/master/form_input_student/(:any)'] = 'page/academic/c_m_student/form_input_student';
+
+
 // --- Admission ----
 // --- Master ----
 

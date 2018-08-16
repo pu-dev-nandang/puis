@@ -1205,7 +1205,7 @@ class M_api extends CI_Model {
 
         $db = 'ta_'.$ta;
         $data = $this->db->query('SELECT s.*, au.EmailPU, p.Name AS ProdiName, p.NameEng AS ProdiNameEng,
-                                      ss.Description AS StatusStudentDesc
+                                      ss.Description AS StatusStudentDesc,"'.$db.'" as ta_student
                                       FROM '.$db.'.students s
                                       JOIN db_academic.program_study p ON (s.ProdiID = p.ID)
                                       JOIN db_academic.status_student ss ON (s.StatusStudentID = ss.ID)
