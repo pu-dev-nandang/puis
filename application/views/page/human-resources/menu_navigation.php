@@ -12,22 +12,22 @@
                     Master Employees
                 </a>
             </li>
-            <li class="<?php if($this->uri->segment(2)=='human-resources'){echo"current";}?>">
-                <a href="<?php echo base_url('human-resources/lecturers');?>">
-                    <i class="fa fa-download"></i>
-                    Master Dosen
-                </a>
-            </li>
+<!--            <li class="--><?php //if($this->uri->segment(2)=='human-resources'){echo"current";}?><!--">-->
+<!--                <a href="--><?php //echo base_url('human-resources/lecturers');?><!--">-->
+<!--                    <i class="fa fa-download"></i>-->
+<!--                    Master Dosen-->
+<!--                </a>-->
+<!--            </li>-->
+<!--            <li class="">-->
+<!--                <a href="#">-->
+<!--                    <i class="fa fa-download"></i>-->
+<!--                    Presensi Dosen-->
+<!--                </a>-->
+<!--            </li>-->
             <li class="">
                 <a href="#">
-                    <i class="fa fa-download"></i>
-                    Presensi Dosen
-                </a>
-            </li>
-            <li class="">
-                <a href="#">
-                    <i class="fa fa-money"></i>
-                    Honor Dosen PartTime
+                    <i class="fa fa-tasks"></i>
+                    Report Dosen Partime
                 </a>
             </li>
 

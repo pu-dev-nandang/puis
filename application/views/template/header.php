@@ -108,7 +108,7 @@
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding-top: 8px;padding-bottom: 5px;">
                     <?php $imgProfile = (file_exists('./uploads/employees/'.$this->session->userdata('Photo')))
                         ? url_pas.'uploads/employees/'.$this->session->userdata('Photo') :
-                        url_pas.'images/icon/male.png'; ?>
+                        url_pas.'images/icon/no_image.png'; ?>
                     <img data-src="<?php echo $imgProfile; ?>"
                          class="img-circle img-fitter" width="35" height="35" style="max-width: 35px;border: 3px solid #0f1f4b;"/>
                     <span class="username"><?php echo $name; ?></span>
