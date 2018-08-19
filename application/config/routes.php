@@ -88,6 +88,9 @@ $route['academic/modal-tahun-akademik-detail-lecturer'] = 'page/academic/c_akade
 $route['human-resources/lecturers'] = 'page/database/c_database/lecturers';
 //$route['human-resources/employees'] = 'page/database/c_database/employees';
 $route['human-resources/employees'] = 'page/hr/c_employees/employees';
+$route['human-resources/employees/input-employees'] = 'page/hr/c_employees/input_employees';
+$route['human-resources/employees/edit-employees/(:num)'] = 'page/hr/c_employees/edit_employees/$1';
+$route['human-resources/upload_photo'] = 'page/hr/c_employees/upload_photo';
 
 // ====== Database =====
 $route['database/lecturers'] = 'page/database/c_database/lecturers';
@@ -478,6 +481,7 @@ $route['api/__getAllMK'] = 'api/c_api/getAllMK';
 $route['api/__getEmployees'] = 'api/c_api/getEmployees';
 $route['api/employees/searchnip/(:any)'] = 'api/c_api/searchnip_employees/$1';
 
+$route['api/__getEmployeesHR'] = 'api/c_api/getEmployeesHR';
 
 $route['api/__setLecturersAvailability'] = 'api/c_api/setLecturersAvailability';
 $route['api/__setLecturersAvailabilityDetail/(:any)'] = 'api/c_api/setLecturersAvailabilityDetail/$1';
@@ -580,6 +584,7 @@ $route['api/__getNotification'] = 'api/c_api/getNotification';
 $route['api/__getBasePaymentTypeSelectOption'] = 'api/c_api/getBasePaymentTypeSelectOption';
 $route['api/__getBaseDiscountSelectOption'] = 'api/c_api/getBaseDiscountSelectOption';
 
+
 $route['api/__getSMAWilayahApproval'] = 'api/c_api/getSMAWilayahApproval';
 $route['api/__getNotification_divisi'] = 'api/c_api/getNotification_divisi';
 $route['api/__getAgama'] = 'api/c_api/getAgama';
@@ -588,7 +593,6 @@ $route['api/__getPosition'] = 'api/c_api/getPosition';
 $route['api/__getStatusEmployee'] = 'api/c_api/getStatusEmployee';
 
 $route['api/__crudKRSOnline'] = 'api/c_api/crudKRSOnline';
-
 
 $route['api/__crudCombinedClass'] = 'api/c_api/crudCombinedClass';
 $route['api/__getSimpleSearch'] = 'api/c_api/getSimpleSearch';

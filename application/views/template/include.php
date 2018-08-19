@@ -947,6 +947,141 @@
         });
     }
 
+    function loadSelectOptionDivision(element,selected) {
+
+        if(selected=='' || typeof selected === "undefined"){
+            $(element).append('<option value="" selected>-- Select Division --</option>');
+            $(element).append('<option disabled>----------------</option>');
+        }
+
+        var url = base_url_js+'api/__getDivision';
+        $.getJSON(url,function (jsonResult) {
+            for(var i=0;i<jsonResult.length;i++){
+                var d = jsonResult[i];
+                var sc = ( selected!='' && typeof selected !== "undefined" && selected==d.ID) ? 'selected' : '';
+                $(element).append('<option value="'+d.ID+'" '+sc+'>'+d.Division+'</option>');
+            }
+        });
+    }
+
+    function loadSelectOptionPosition(element,selected) {
+
+        if(selected=='' || typeof selected === "undefined"){
+            $(element).append('<option value="" selected>-- Select Position --</option>');
+            $(element).append('<option disabled>----------------</option>');
+        }
+
+        var url = base_url_js+'api/__getPosition';
+        $.getJSON(url,function (jsonResult) {
+            for(var i=0;i<jsonResult.length;i++){
+                var d = jsonResult[i];
+                var sc = ( selected!='' && typeof selected !== "undefined" && selected==d.ID) ? 'selected' : '';
+                $(element).append('<option value="'+d.ID+'" '+sc+'>'+d.Position+'</option>');
+            }
+        });
+    }
+
+    function loadSelectOptionReligi(element,selected) {
+        var url = base_url_js+'api/__getAgama';
+
+        $.getJSON(url,function (jsonResult) {
+            for(var i=0;i<jsonResult.length;i++){
+                var d = jsonResult[i];
+                var sc = (selected!='' && typeof selected !== "undefined" && d.IDReligion == selected) ? 'selected' : '';
+                $(element).append('<option value="'+d.IDReligion+'" '+sc+'>'+d.Religion+'</option>');
+            }
+        });
+    }
+
+    function loadSelectOptionEmployeesStatus(element,selected) {
+        var url = base_url_js+'api/__getStatusEmployee';
+        $.getJSON(url,function (jsonResult) {
+            for(var i=0;i<jsonResult.length;i++){
+                var d = jsonResult[i];
+                var sc = (selected!='' && typeof selected !== "undefined" && selected==d.IDStatus) ? 'selected' : '';
+                var color = (d.IDStatus<0) ? 'style="color:red;"' : '';
+                $(element).append('<option value="'+d.IDStatus+'" '+color+' '+sc+'>'+d.Description+'</option>');
+            }
+        });
+    }
+
+    function loadYearOfBirth(element,selected){
+        $(element).empty();
+        var thisYear = (new Date()).getFullYear();
+        var startTahun = parseInt(thisYear) - parseInt(120);
+        var selisih = parseInt(thisYear) - parseInt(startTahun);
+        for (var i = 0; i <= selisih; i++) {
+            var valTh = ( parseInt(startTahun) + parseInt(i));
+            var sc = (selected!='' && typeof selected !== "undefined" && valTh == selected ) ? 'selected' : '';
+            $(element).append('<option value="'+valTh+'" '+sc+'>'+valTh+'</option>');
+        }
+    }
+
+    function loadMonthBirth(element,selected){
+        $(element).empty();
+        var month = {
+            01 : 'Jan',
+            02 : 'Feb',
+            03 : 'Mar',
+            04 : 'April',
+            05 : 'Mei',
+            06 : 'Jun',
+            07 : 'Jul',
+            08 : 'Aug',
+            09 : 'Sep',
+            10 : 'Okt',
+            11 : 'Nov',
+            12 : 'Des'
+    };
+
+        for(var key in month) {
+            var getKey = key.toString();
+            var value = (getKey.length == 1) ? '0' + getKey : key;
+
+            var sc = (selected!='' && selected!=null && typeof selected !== "undefined" && value==selected)? 'selected' : '';
+            $(element).append('<option value="'+ value +'" '+sc+'>'+month[key]+'</option>');
+        }
+
+    }
+
+    function loadCountDays(Year,Month,element,selected){
+
+        $(element).empty();
+        var countDays = moment(Year+"-"+Month, "YYYY-MM").daysInMonth()
+        // get dd
+        for (var i = 1; i <= countDays ; i++) {
+
+            var getKey = i.toString();
+            var value =  (getKey.length == 1) ? '0' + getKey : value = i;
+
+            var sc = (selected!='' && typeof selected !== "undefined" && value == selected) ? 'selected' : '';
+
+            $(element).append('<option value="'+ value +'" '+sc+'>'+value+'</option>');
+        }
+    }
+
+    function viewImageBeforeUpload(input,el_View,el_SizeView,
+                                   el_ExtView,el_size,el_Ext) {
+
+        if (input.files && input.files[0]) {
+            var sz = parseFloat(input.files[0].size) / 1000;
+            var ext = input.files[0].type.split('/')[1];
+
+            $(el_SizeView).html(sz.toFixed(2));
+            $(el_ExtView).html(ext);
+
+            $(el_size).val(sz.toFixed(2));
+            $(el_Ext).val(ext);
+
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+                $(el_View).attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
     function findAndReplace(string, target, replacement) {
      
      var i = 0, length = string.length;

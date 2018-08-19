@@ -578,10 +578,7 @@ class M_api extends CI_Model {
                 }
                 array_push($result,$data[0]);
             }
-
-
         }
-
         return $result;
     }
 
@@ -626,19 +623,10 @@ class M_api extends CI_Model {
                 'Curriculum' => $dataCurriculum[$s],
                 'Semester' => $smt
             );
-
-
             array_push($result,$d);
-
         }
-
-
-
-
-
         return $result;
     }
-
 
     public function getSchedule($DayID,$dataWhere){
 
