@@ -106,10 +106,10 @@
             <!-- User Login Dropdown -->
             <li class="dropdown user">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding-top: 8px;padding-bottom: 5px;">
-                    <!--<img alt="" src="assets/img/avatar1_small.jpg" />-->
-                    <!--                    <i class="fa fa-male"></i>-->
-                    <!--                    <img src="--><?php //echo base_url('images/avatar.png'); ?><!--" class="img-circle" style="max-width: 35px;border: 3px solid #0f1f4b;"/>-->
-                    <img data-src="<?php echo url_pas.'uploads/employees/'.$this->session->userdata('Photo'); ?>"
+                    <?php $imgProfile = (file_exists('./uploads/employees/'.$this->session->userdata('Photo')))
+                        ? url_pas.'uploads/employees/'.$this->session->userdata('Photo') :
+                        url_pas.'images/icon/male.png'; ?>
+                    <img data-src="<?php echo $imgProfile; ?>"
                          class="img-circle img-fitter" width="35" height="35" style="max-width: 35px;border: 3px solid #0f1f4b;"/>
                     <span class="username"><?php echo $name; ?></span>
                     <i class="fa fa-caret-down small"></i>

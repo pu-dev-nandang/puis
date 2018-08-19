@@ -8,6 +8,9 @@ class C_save_to_pdf extends CI_Controller {
         parent::__construct();
         $this->load->library('JWT');
         $this->load->library('pdf');
+
+        $this->load->model('report/m_save_to_pdf');
+
         date_default_timezone_set("Asia/Jakarta");
     }
 
@@ -23,109 +26,115 @@ class C_save_to_pdf extends CI_Controller {
         $token = $this->input->get('token');
         $data_arr = $this->getInputToken($token);
 
+
         $pdf = new FPDF('l','mm','A4');
 
-//
-//        print_r($data_arr);
-//        exit;
 
-        if(count($data_arr)>0){
-
-            for($s=0;$s<count($data_arr);$s++){
-
-                $dataSch = (array) $data_arr[$s];
-                $SemesterDetails = (array) $dataSch['SemesterDetails'];
+        $data_sch = $this->m_save_to_pdf->getScheduleByDay($data_arr['SemesterID'],$data_arr['DayID']);
 
 
-                $pdf->AddPage();
-                $this->header_schedule($pdf,$SemesterDetails,$dataSch['DayNameEng']);
+        if(count($data_sch)>0){
 
-                $pdf->SetFillColor(226, 226, 226);
-                $pdf->SetFont('Arial','B',8);
-                $pdf->Cell(10,7,'No.',1,0,'C',true);
-                $pdf->Cell(20,7,'Group',1,0,'C',true);
-                $pdf->Cell(100,7,'Course',1,0,'C',true);
-                $pdf->Cell(20,7,'Combined',1,0,'C',true);
-                $pdf->Cell(25,7,'Time',1,0,'C',true);
-                $pdf->Cell(15,7,'Room',1,0,'C',true);
-                $pdf->Cell(85,7,'Lecturers',1,1,'C',true);
+            $DayNameEng = $data_sch['DetailsSemester']['DayNameEng'];
+            $SemesterDetails = $data_sch['DetailsSemester']['SemesterName'];
+
+            $pdf->AddPage();
+            $this->header_schedule($pdf,$SemesterDetails,$DayNameEng);
+
+            $dataCourse = $data_sch['DetailsCourse'];
 
 
-                $pdf->SetFont('Arial','',8);
+            $deft_w = 10;
+            if(count($dataCourse)>0){
+
+                $no = 1;
+                for($m=0;$m<count($dataCourse);$m++){
+
+                    $d_course = $dataCourse[$m];
 
 
-                if(count($dataSch['CourseDetails'])>0){
-                    $no = 1;
-                    for($m=0;$m<count($dataSch['CourseDetails']);$m++){
-                        $d_course = (array) $dataSch['CourseDetails'][$m];
+                    $w = (count($d_course['detailTeamTeaching'])>0) ? (count($d_course['detailTeamTeaching'])+1) * $deft_w : $deft_w;
 
-                        $w = (count($d_course['TeamTeaching'])>0) ? (count($d_course['TeamTeaching'])+1) * 7 : 7;
+                    $pdf->Cell(10,$w,$no,1,0,'C');
+                    $pdf->Cell(20,$w,$d_course['ClassGroup'],1,0,'C');
 
-                        $combined = ($d_course['CombinedClasses']=='1')? 'Yes' : 'No';
-                        $pdf->Cell(10,$w,$no,1,0,'C');
-                        $pdf->Cell(20,$w,$d_course['ClassGroup'],1,0,'C');
-                        $pdf->Cell(100,$w,$d_course['Course'],1,0,'L');
-                        $pdf->Cell(20,$w,$combined,1,0,'C');
-                        $pdf->Cell(25,$w,$d_course['Time'],1,0,'C');
-                        $pdf->Cell(15,$w,$d_course['ClassRoom'],1,0,'C');
-                        $pdf->SetFont('Arial','B',8);
-                        $pdf->Cell(85,7,'(c) '.$d_course['Coordinator'],1,1,'L');
-                        $pdf->SetFont('Arial','',8);
-                        if(count($d_course['TeamTeaching'])>0){
-                            for($t=0;$t<count($d_course['TeamTeaching']);$t++){
-                                $teamT = $d_course['TeamTeaching'][$t];
-                                $pdf->Cell(190,7,'',0,0,'L');
-                                $pdf->Cell(85,7,$teamT,1,1,'L');
-                            }
+                    $course = (strlen(trim($d_course['Course']))>=55) ? substr(trim($d_course['Course']),0,55).'_' : trim($d_course['Course']);
+                    $pdf->Cell(90,$w,' '.$course,1,0,'L');
+
+                    $pdf->Cell(20,$w,substr($d_course['StartSessions'],0,5).' - '.substr($d_course['EndSessions'],0,5),1,0,'C');
+                    $pdf->Cell(25,$w,$d_course['ClassRoom'],1,0,'C');
+                    $pdf->SetFont('Arial','B',8);
+                    $coor = (strlen(trim($d_course['Coordinator']))>20) ? substr(trim($d_course['Coordinator']),0,19).'_' : trim($d_course['Coordinator']) ;
+                    $pdf->Cell(42,$deft_w,' (Co) '.$coor,1,0,'L');
+
+                    $pdf->Cell(20,$deft_w,'',1,0,'L');
+                    $pdf->Cell(15,$deft_w,'',1,0,'L');
+                    $pdf->Cell(20,$deft_w,'',1,0,'L');
+                    $pdf->Cell(15,$deft_w,'',1,1,'L');
+
+                    $pdf->SetFont('Arial','',8);
+                    if(count($d_course['detailTeamTeaching'])>0){
+                        for($t=0;$t<count($d_course['detailTeamTeaching']);$t++){
+                            $teamT = $d_course['detailTeamTeaching'][$t];
+                            $teamT2 = (strlen(trim($teamT))>26) ? substr(trim($teamT),0,25).'_' : trim($teamT) ;
+                            $pdf->Cell(165,$deft_w,'',0,0,'L');
+                            $pdf->Cell(42,$deft_w,' '.$teamT2,1,0,'L');
+                            $pdf->Cell(20,$deft_w,'',1,0,'L');
+                            $pdf->Cell(15,$deft_w,'',1,0,'L');
+                            $pdf->Cell(20,$deft_w,'',1,0,'L');
+                            $pdf->Cell(15,$deft_w,'',1,1,'L');
                         }
-
-                        $no += 1;
                     }
-                } else {
-                    $pdf->Cell(275,7,'Schedule Not yet',1,1,'C');
-                }
 
+//                    $y = $pdf->GetY();
+                    if($pdf->GetY()>173){
+                        $pdf->AddPage();
+                        $this->header_schedule($pdf,$SemesterDetails,$DayNameEng);
+                    }
+//                    $pdf->Cell(0,$deft_w,''.$y,1,1,'L');
+
+                    $no += 1;
+                }
+            }
+            else {
+                $pdf->Cell(275,7,'Schedule Not yet',1,1,'C');
             }
 
         }
-
-        $pdf->Output('I','filename.pdf');
-
+        $pdf->Output('I',$DayNameEng.'_schedule.pdf');
     }
 
     private function header_schedule($pdf,$SemesterDetails,$DayNameEng){
-        $pdf->Image(base_url('images/icon/logo-l.png'),10,10,30);
+        $pdf->Image(base_url('images/icon/logo-hr.png'),10,10,50);
 
         $pdf->SetFont('Arial','B',10);
 
-        $pdf->Cell(45,9,'',0,0,'C');
-        $pdf->Cell(230,9,'SCHEDULE - '.$SemesterDetails['AcademicYear'],1,1,'C');
+        $pdf->Cell(60,9,'',0,0,'C');
+        $pdf->Cell(0,9,'Semester - '.$SemesterDetails,1,1,'C');
 
-        $pdf->Cell(45,3,'',0,0,'C');
-        $pdf->Cell(230,3,'',0,1,'');
-        
+
+        $pdf->Ln(5);
+        $pdf->Cell(0,5,''.$DayNameEng,0,1,'C');
+
+        $pdf->SetFont('Arial','i',7);
+        $pdf->Cell(275,5,'FM-UAP/AKD-08-05',0,1,'R');
+//        $pdf->Cell(275,5,''.$DayNameEng,0,1,'R');
+//        $pdf->Ln(5);
+
+        $pdf->SetFillColor(226, 226, 226);
+        $pdf->SetFont('Arial','B',8);
+        $pdf->Cell(10,7,'No',1,0,'C',true);
+        $pdf->Cell(20,7,'Group',1,0,'C',true);
+        $pdf->Cell(90,7,'Course',1,0,'C',true);
+        $pdf->Cell(20,7,'Time',1,0,'C',true);
+        $pdf->Cell(25,7,'Room',1,0,'C',true);
+        $pdf->Cell(42,7,'Lecturers',1,0,'C',true);
+        $pdf->Cell(20,7,'Time',1,0,'C',true);
+        $pdf->Cell(15,7,'Taken',1,0,'C',true);
+        $pdf->Cell(20,7,'Time',1,0,'C',true);
+        $pdf->Cell(15,7,'Returned',1,1,'C',true);
 
         $pdf->SetFont('Arial','',8);
-        $pdf->Cell(45,5,'',0,0,'C');
-        $pdf->Cell(20,5,'Program',0,0,'L');
-        $pdf->Cell(95,5,': '.$SemesterDetails['Program'],0,0,'L');
-        $pdf->Cell(20,5,'Prodi',0,0,'L');
-        $pdf->Cell(95,5,': '.$SemesterDetails['Prodi'],0,1,'L');
-
-        $pdf->Cell(45,5,'',0,0,'C');
-        $pdf->Cell(20,5,'Combine',0,0,'L');
-        $pdf->Cell(95,5,': '.$SemesterDetails['Combine'],0,0,'L');
-        $pdf->Cell(20,5,'Semester',0,0,'L');
-        $pdf->Cell(95,5,': '.$SemesterDetails['Semester'],0,1,'L');
-
-        $pdf->Ln(7);
-        $pdf->Cell(275,0.3,'',1,1,'');
-
-        $pdf->Ln(5);
-        $pdf->SetFont('Arial','B',10);
-        $pdf->Cell(275,5,''.$DayNameEng,0,1,'C');
-        $pdf->Ln(5);
-
     }
     //===========
 
@@ -135,9 +144,6 @@ class C_save_to_pdf extends CI_Controller {
         $token = $this->input->get('token');
         $data_arr = $this->getInputToken($token);
 
-//        print_r($data_arr);
-//
-//        exit;
 
         $pdf = new FPDF('p','mm','A4');
         // membuat halaman baru

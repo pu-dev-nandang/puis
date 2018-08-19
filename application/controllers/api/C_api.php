@@ -231,6 +231,106 @@ class C_api extends CI_Controller {
         echo json_encode($json_data);
     }
 
+    public function getEmployeesHR()
+    {
+        $requestData= $_REQUEST;
+        // print_r($requestData);
+
+        $totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE StatusEmployeeID != -2 ')->result_array();
+
+        if( !empty($requestData['search']['value']) ) {
+            $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
+                        ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.Address, ems.Description, em.StatusEmployeeID
+                        FROM db_employees.employees em 
+                        LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                        LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID) 
+                        WHERE em.StatusEmployeeID != -2 AND ( ';
+
+            $sql.= ' em.NIP LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR em.Name LIKE "%'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ') ORDER BY NIP  ASC';
+
+        }
+        else {
+            $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
+                        ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.Address, ems.Description, em.StatusEmployeeID
+                        FROM db_employees.employees em 
+                        LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                        LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID) 
+                        WHERE em.StatusEmployeeID != -2 ';
+            $sql.= 'ORDER BY em.StatusEmployeeID, NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+        }
+
+        $query = $this->db->query($sql)->result_array();
+
+        $data = array();
+
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $jb = explode('.',$row["PositionMain"]);
+            $Division = '';
+            $Position = '';
+
+            if(count($jb)>1){
+                $dataDivision = $this->db->select('Division')->get_where('db_employees.division',array('ID'=>$jb[0]),1)->result_array()[0];
+                $dataPosition = $this->db->select('Position')->get_where('db_employees.position',array('ID'=>$jb[1]),1)->result_array()[0];
+                $Division = $dataDivision['Division'];
+                $Position = $dataPosition['Position'];
+            }
+
+            $photo = (file_exists('./uploads/employees/'.$row["Photo"])) ? base_url('uploads/employees/'.$row["Photo"]) : base_url('images/icon/userfalse.png');
+
+            $nestedData[] = '<div style="text-align: center;"><img src="'.$photo.'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
+
+            $emailPU = ($row["EmailPU"]!='' && $row["EmailPU"]!=null) ? '<br/><span style="color: darkred;">'.$row["EmailPU"].'</span>' : '';
+            $nidn = ($row["NIDN"]!='' && $row["NIDN"]!=null) ? '<br/>NIDN : '.$row["NIDN"] : '';
+            $nestedData[] = '<a href="'.base_url('human-resources/employees/edit-employees/'.$row["NIP"]).'" style="font-weight: bold;">'.$row["Name"].'</a>
+                                '.$emailPU.'
+                                <br/>NIK : '.$row["NIP"].'
+                                '.$nidn;
+//            $nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
+            $nestedData[] = $Division.'<br/>'.$Position;
+            $nestedData[] = $row["Address"];
+
+
+
+
+
+
+//            $nestedData[] = $row['Description'];
+            $status = '-';
+            if($row['StatusEmployeeID']==1){
+                $status = '<i class="fa fa-circle" style="color: #4CAF50;"></i>';
+            } else if($row['StatusEmployeeID']==2){
+                $status = '<i class="fa fa-circle" style="color: #FF9800;"></i>';
+            } else if($row['StatusEmployeeID']==3){
+                $status = '<i class="fa fa-circle" style="color: #03A9F4;"></i>';
+            } else if($row['StatusEmployeeID']==4){
+                $status = '<i class="fa fa-circle" style="color: #9e9e9e;"></i>';
+            } else if($row['StatusEmployeeID']==-1){
+                $status = '<i class="fa fa-warning" style="color: #F44336;"></i>';
+            }
+            $nestedData[] = '<div style="text-align: center;">'.$status.'</div>';
+
+            $data[] = $nestedData;
+
+        }
+
+        // print_r($data);
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($totalData)),
+            "recordsFiltered" => intval( count($totalData) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+    }
+
     public function getStudents(){
         $requestData= $_REQUEST;
 
@@ -2250,6 +2350,58 @@ class C_api extends CI_Controller {
                 $data = $this->db->select('NIP,Name')->get('db_employees.employees')->result_array();
                 return print_r(json_encode($data));
             }
+
+            else if($data_arr['action']=='addEmployees'){
+                $formInsert = (array) $data_arr['formInsert'];
+
+                // Cek apakah NIP sudah digunakan atau belum
+                $NIP = $formInsert['NIP'];
+                $dataN = $this->db->select('NIP')->get_where('db_employees.employees',
+                    array('NIP' => $NIP))->result_array();
+
+                if(count($dataN)>0) {
+                    return print_r(0);
+                } else {
+                    $formInsert['Password_Old'] = md5($formInsert['Password_Old']);
+                    $this->db->insert('db_employees.employees',$formInsert);
+
+                    return print_r(1);
+                }
+            }
+
+            else if($data_arr['action']=='UpdateEmployees'){
+
+                // Cek apakah delete photo atau tidak
+                if($data_arr['DeletePhoto']==1 || $data_arr['DeletePhoto']=='1'){
+                    $pathPhoto = './uploads/employees/'.$data_arr['LastPhoto'];
+                    if(file_exists($pathPhoto)){
+                        unlink($pathPhoto);
+                    }
+
+                }
+
+                $formUpdate = (array) $data_arr['formUpdate'];
+                $formUpdate['Password_Old'] = md5($formUpdate['Password_Old']);
+
+                $this->db->where('NIP', $data_arr['NIP']);
+                $this->db->update('db_employees.employees',$formUpdate);
+
+                return print_r(1);
+
+            }
+
+            else if($data_arr['action']=='deleteEmployees'){
+                $this->db->set('StatusEmployeeID',-2);
+                $this->db->where('NIP', $data_arr['NIP']);
+                $this->db->update('db_employees.employees');
+
+                return print_r(1);
+            }
+            else if($data_arr['action']=='deletePermanantEmployees'){
+                $this->db->where('NIP', $data_arr['NIP']);
+                $this->db->delete('db_employees.employees');
+                return print_r(1);
+            }
         }
 
     }
@@ -2732,7 +2884,9 @@ class C_api extends CI_Controller {
 
     public function getStatusEmployee()
     {
-        $generate = $this->m_master->showData_array('db_employees.employees_status');
+//        $generate = $this->m_master->showData_array('db_employees.employees_status');
+        $generate = $this->db->query('SELECT * FROM db_employees.employees_status 
+              WHERE IDStatus != -2')->result_array();
         echo json_encode($generate);
     }
 

@@ -8,8 +8,8 @@
 
             <li class="<?php if($this->uri->segment(2)=='employees'){echo"current";}?>">
                 <a href="<?php echo base_url('human-resources/employees');?>">
-                    <i class="fa fa-user-circle"></i>
-                    Master Karyawan
+                    <i class="fa fa-users"></i>
+                    Master Employees
                 </a>
             </li>
             <li class="<?php if($this->uri->segment(2)=='human-resources'){echo"current";}?>">

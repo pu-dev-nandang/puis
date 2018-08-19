@@ -105,10 +105,19 @@
             var classDay = 'label-info';
             var tr_bg_color = '#438882';
             var dayView = $('#filterDay option:selected').text();
+            var DayID = $('#filterDay').val();
+            var tokenPrintPDF = jwt_encode({SemesterID:SemesterID,DayID:DayID},'UAP)(*');
             div.html('' +
                 '<div class="widget box widget-schedule">' +
                 '    <div class="widget-header">' +
                 '        <h4 class=""><span class="'+classDay+'" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;">'+dayView+'</span></h4>' +
+                '       <div class="toolbar no-padding">' +
+                '           <div class="btn-group">' +
+                '               <a href="'+base_url_js+'save2pdf/schedule-pdf?token='+tokenPrintPDF+'" target="_blank"><span class="btn btn-xs" id="btn_addmk">' +
+                '                   <i class="icon-download"></i> Download PDF' +
+                '               </span></a>' +
+                '           </div>' +
+                '       </div>' +
                 '    </div>' +
                 '    <div class="widget-content no-padding">' +
                 '<table class="table table-bordered table-striped" id="tableSchedule">' +
