@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class C_global extends Vreservation_Controler {
 
-    private $data = array();
+    // private $data = array();
 
     function __construct()
     {

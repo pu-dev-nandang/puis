@@ -42,7 +42,9 @@
 	</div> <!-- /.col-md-6 -->
 	<!-- /Calendar -->
 </div>
-
+<!-- <pre>
+	<?php print_r($this->session->userdata('V_BookingDay')) ?>
+</pre> -->
 <script type="text/javascript">
 	/*
 	 * pages_calendar.js
@@ -143,6 +145,7 @@
 	{
 		var divHtml = $("#schedule");
 		loadDataSchedule(divHtml);
+		countApprove();
 		
 		// setTimeout(function () {
 		// 	loadRoomStatus(loadDataRoomStatus);
@@ -160,6 +163,7 @@
 	        if (data.update_schedule_notifikasi == 1) {
 	            // action
 	            getLoadFirst();
+	            //countApprove();
 	        }
 
 	    }); // exit socket

@@ -281,7 +281,7 @@
         // Some code
         // console.log('test');
         $("#loadtableMenu").empty();
-        var table = '<table class="table table-striped table-bordered table-hover table-checkable datatable">'+
+        var table = '<table class="table table-striped table-bordered table-hover table-checkable datatable4">'+
         '<thead>'+
             '<tr>'+
                 '<th style="width: 10%;">Menu</th>'+
@@ -320,7 +320,7 @@
                 var write = (response[i]['write'] == 1) ? 'True' : 'False';
                 var update = (response[i]['update'] == 1) ? 'True' : 'False';
                 var deletee = (response[i]['delete'] == 1) ? 'True' : 'False';
-                $(".datatable tbody").append(
+                $(".datatable4 tbody").append(
                     '<tr>'+
                         '<td><input type = "text" class = "form-control Menu" value ="'+response[i]['Menu']+'" id-key = "'+response[i]['ID_Menu']+'"><div class = "hide">'+response[i]['Menu']+'</div></td>'+
                         '<td><input type = "text" class = "form-control SubMenu1" value ="'+response[i]['SubMenu1']+'" id-key = "'+response[i]['ID']+'"><div class = "hide">'+response[i]['SubMenu1']+'</div></td>'+
@@ -336,7 +336,7 @@
                     );
             }
         }).done(function() {
-            LoaddataTableStandard('.datatable');
+            LoaddataTableStandard('.datatable4');
         })
     }
 

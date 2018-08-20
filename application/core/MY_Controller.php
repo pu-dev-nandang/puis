@@ -337,6 +337,8 @@ abstract class Finnance_Controler extends Globalclass{
 
 abstract class Vreservation_Controler extends Globalclass{
 
+    public $data = array();
+
     public function __construct()
     {
         parent::__construct();
@@ -346,6 +348,12 @@ abstract class Vreservation_Controler extends Globalclass{
             $this->getAuthVreservation();
         }
         // $this->checkAuth_user();
+        // read policy
+        $dayPolicy = $this->session->userdata('V_BookingDay');
+        $dateDay = date('Y-m-d');
+        $dateDay = date('Y-m-d', strtotime($dateDay . ' +'.$dayPolicy.' day'));
+        $this->data['dateDay'] = $dateDay;
+        $this->data['dayPolicy'] = $dayPolicy;
     }
 
     public $pathView = 'page/vreservation/';
@@ -388,6 +396,8 @@ abstract class Vreservation_Controler extends Globalclass{
             $this->session->set_userdata('auth_vreservation_sess',1);
             $this->session->set_userdata('menu_vreservation_sess',$getDataMenu);
             $this->session->set_userdata('menu_vreservation_grouping',$this->groupBYMenu_sess());
+            // save session group user
+            $this->m_reservation->save_sess_policy_grouping();
         }
     }
 

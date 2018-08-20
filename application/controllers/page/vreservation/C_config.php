@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class C_config extends Vreservation_Controler {
 
-    private $data = array();
+    // private $data = array();
 
     function __construct()
     {
@@ -301,6 +301,31 @@ class C_config extends Vreservation_Controler {
         );
         $this->db->where('NIP', $input['NIP']);
         $this->db->update('db_reservation.previleges_guser', $dataSave);
+    }
+
+    public function policy()
+    {
+        $content = $this->load->view($this->pathView.'config/policy','',true);
+        $this->temp($content);
+    }
+
+    public function policy_json_data()
+    {
+        $sql = 'select a.*,b.GroupAuth from db_reservation.cfg_policy as a join db_reservation.cfg_group_user as b on a.ID_group_user = b.ID join db_reservation.previleges_guser as c 
+                on b.ID = c.G_user';
+        $query=$this->db->query($sql, array())->result_array();
+        echo json_encode($query);
+    }
+
+    public function policy_modalform()
+    {
+        $input = $this->getInputToken();
+        $this->data['action'] = $input['Action'];
+        $this->data['id'] = $input['CDID'];
+        if ($input['Action'] == 'edit') {
+            $this->data['getDataEdit'] =  $this->m_master->caribasedprimary('db_reservation.cfg_policy','ID',$input['CDID']);
+        }
+        echo $this->load->view($this->pathView.'config/modalform_policy',$this->data,true);
     }
 
 }

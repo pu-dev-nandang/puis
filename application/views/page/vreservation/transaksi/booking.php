@@ -15,13 +15,13 @@
         </div>
       </div>
 			<div class="widget-header">
-					<h4 id = 'schdate'><i class="icon-calendar"></i> Schedule</h4>
+					<h4 id = 'schdate'><i class="icon-calendar"></i> Schedule Date : <?php echo $dateDay ?></h4>
 				</div>
 			<div class="widget-content">
 				<div class = "row">	
 					<div class="col-xs-3">
 						<div id="datetimepicker1" class="input-group input-append date datetimepicker">
-								<input data-format="yyyy-MM-dd" class="form-control" id="datetime_deadline1" type="	text" readonly="" >
+								<input data-format="yyyy-MM-dd" class="form-control" id="datetime_deadline1" type="	text" readonly="" value="<?php echo $dateDay ?>">
 								<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>
 						</div>
 					</div>
@@ -51,8 +51,8 @@
     // });         
 
 		var divHtml = $("#schedule");
-		loadDataSchedule(divHtml);
-
+		loadDataSchedule(divHtml,'<?php echo $dateDay ?>');
+    socket_messages_tbooking();
 		Date.prototype.addDays = function(days) {
 	          var date = new Date(this.valueOf());
 	          date.setDate(date.getDate() + days);
@@ -62,11 +62,35 @@
 
 		$('#datetimepicker1').datetimepicker({
 			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
-		 startDate: date.addDays(0),
+     // startDate: date.addDays(0), // adding by policy booking minus 1
+		 startDate: date.addDays(<?php echo $dayPolicy ?>), // adding by policy booking minus 1
 		});
 
 		$('#datetime_deadline1').prop('readonly',true);
 	});
+
+  function socket_messages_tbooking()
+  {
+      var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+      // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
+      socket.on( 'update_schedule_notifikasi', function( data ) {
+
+          //$( "#new_count_message" ).html( data.new_count_message );
+          //$('#notif_audio')[0].play();
+          if (data.update_schedule_notifikasi == 1) {
+              // action
+              var getDate = data.date;
+              if (getDate == '') {
+                 getDate = "<?php echo date('Y-m-d') ?>";
+              }
+              // $("#CaptionTBL").html('<strong>'+getDate+'</strong>');
+              var divHtml = $("#schedule");
+              loadDataSchedule(divHtml,'<?php echo $dateDay ?>');
+              // loadDataListApprove();
+          }
+
+      }); // exit socket
+  }
 
   $(document).on('click','#search', function () {
     var get = $('#datetime_deadline1').val();
@@ -159,7 +183,7 @@
                 // toastr.options.fadeOut = 100000;
                 toastr.success(data.msg, 'Success!');
                 var divHtml = $("#schedule");
-                loadDataSchedule(divHtml);
+                loadDataSchedule(divHtml,'<?php echo $dateDay ?>');
                 $('#GlobalModalLarge').modal('hide');
 
                 // send notification other school from client
