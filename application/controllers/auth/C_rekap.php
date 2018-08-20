@@ -16,9 +16,53 @@ class C_rekap extends Globalclass {
     {
         parent::__construct();
         $this->db = $this->load->database('default', TRUE);
+        $this->server22 = $this->load->database('server22', TRUE);
     }
 
     public function rekap_($db){
+
+        $std = $this->db->query('SELECT s.NPM AS member_id, s.Name AS member_name, 
+                                    s.DateOfBirth AS birth_date, s.Address AS member_address,
+                                    ast.EmailPU AS member_mail_address, s.Email AS member_email,Gender AS gender
+                                    FROM ta_2018.students s 
+                                    LEFT JOIN db_academic.auth_students ast
+                                    ON (s.NPM = ast.NPM)')->result_array();
+
+        for($i=0;$i<count($std);$i++){
+            $d = $std[$i];
+
+            $d['member_type_id'] = 2;
+            $d['gender'] = ($d['gender']=='P') ? 0 : 1;
+            $d['inst_name'] = 'Podomoro University';
+            $d['member_since_date'] = '2018-01-12';
+            $d['register_date'] = '2018-01-12';
+            $d['expire_date'] = '2018-01-12';
+            $d['input_date'] = '2018-08-20';
+            $d['last_update'] = '2018-08-20';
+
+            $dataMem = $this->server22->select('member_id')->get_where('library.member', array('member_id'=>$d['member_id']))->result_array();
+
+
+            if(count($dataMem)<=0){
+                $this->server22->insert('library.member',$d);
+            }
+
+//            $std[$i] = $d;
+
+        }
+
+        print_r($std);
+
+
+        exit;
+
+
+
+
+        return print_r(json_encode($data));
+    }
+
+    public function rekap_2($db){
         $db_ = 'ta_'.$db;
         $dataStd = $this->db->query('SELECT * FROM '.$db_.'.students ORDER BY NPM ASC')->result_array();
 

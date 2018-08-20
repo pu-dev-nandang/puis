@@ -64,7 +64,7 @@ class M_api extends CI_Model {
     }
 
     public function __getLecturer(){
-        $data = $this->db->query('SELECT * FROM db_employees.employees WHERE PositionMain = "14.7"');
+        $data = $this->db->query('SELECT * FROM db_employees.employees WHERE StatusEmployeeID != -2 AND PositionMain = "14.7"');
         return $data->result_array();
     }
 
@@ -204,8 +204,8 @@ class M_api extends CI_Model {
     }
 
     public function __getDosenSelectOption(){
-        $data = $this->db->query('SELECT ID,NIP,NIDN,Name FROM db_employees.employees WHERE 
-                                                                    PositionMain = "14.5" 
+        $data = $this->db->query('SELECT ID,NIP,NIDN,Name FROM db_employees.employees WHERE StatusEmployeeID != -2 AND
+                                                                    (PositionMain = "14.5" 
                                                                     OR PositionMain = "14.6" 
                                                                     OR PositionMain = "14.7"
                                                                     
@@ -219,7 +219,8 @@ class M_api extends CI_Model {
                                                                     
                                                                     OR PositionOther3 = "14.5"
                                                                     OR PositionOther3 = "14.6"
-                                                                    OR PositionOther3 = "14.7"
+                                                                    OR PositionOther3 = "14.7")
+                                                                    
                                                                     ');
         return $data->result_array();
     }

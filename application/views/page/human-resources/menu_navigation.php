@@ -24,8 +24,8 @@
 <!--                    Presensi Dosen-->
 <!--                </a>-->
 <!--            </li>-->
-            <li class="">
-                <a href="#">
+            <li class="<?php if($this->uri->segment(2)=='report-dosen-partime'){echo"current";}?>">
+                <a href="<?php echo base_url('human-resources/report-dosen-partime'); ?>">
                     <i class="fa fa-tasks"></i>
                     Report Dosen Partime
                 </a>

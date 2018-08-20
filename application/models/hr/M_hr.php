@@ -71,4 +71,11 @@ class M_hr extends CI_Model {
 
     }
 
+    public function getLecPartime(){
+        $data = $this->db->query('SELECT * FROM db_employees.employees em
+                                          WHERE em.StatusEmployeeID != -2 AND em.StatusEmployeeID = 4 ')->result_array();
+
+        return $data;
+    }
+
 }

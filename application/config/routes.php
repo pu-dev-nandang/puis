@@ -94,6 +94,8 @@ $route['human-resources/employees/input-employees'] = 'page/hr/c_employees/input
 $route['human-resources/employees/edit-employees/(:num)'] = 'page/hr/c_employees/edit_employees/$1';
 $route['human-resources/upload_photo'] = 'page/hr/c_employees/upload_photo';
 
+$route['human-resources/report-dosen-partime'] = 'page/hr/c_employees/report_partime';
+
 // ====== Database =====
 $route['database/lecturers'] = 'page/database/c_database/lecturers';
 $route['database/lecturer-details/(:any)'] = 'page/database/c_database/lecturersDetails/$1';
@@ -539,7 +541,7 @@ $route['api/__crudLecturer'] = 'api/c_api/crudLecturer';
 $route['api/__crudStudyPlanning'] = 'api/c_api/crudStudyPlanning';
 $route['api/__getClassGroupAutoComplete/(:num)'] = 'api/c_api/getClassGroupAutoComplete/$1';
 $route['api/__getScheduleIDByClassGroup/(:num)/(:any)'] = 'api/c_api/getScheduleIDByClassGroup/$1/$2';
-
+$route['api/__crudPartime'] = 'api/c_api/crudPartime';
 
 $route['api/__filterStudents'] = 'api/c_api/filterStudents';
 $route['api/__getFormulirOfflineAvailable'] = 'api/c_api/getFormulirOfflineAvailable';
@@ -603,6 +605,7 @@ $route['api/__crudKRSOnline'] = 'api/c_api/crudKRSOnline';
 
 $route['api/__crudCombinedClass'] = 'api/c_api/crudCombinedClass';
 $route['api/__getSimpleSearch'] = 'api/c_api/getSimpleSearch';
+
 
 //v_reservation
 $route['api/__m_equipment_additional'] = 'api/c_api/m_equipment_additional';
