@@ -25,6 +25,8 @@ $route['callback'] = 'c_login/callback';
 $route['db/(:any)'] = 'auth/c_auth/db/$1';
 $route['foto'] = 'auth/c_auth/foto';
 $route['migration-students'] = 'auth/c_auth/migrationStudent';
+$route['rekap/(:num)'] = 'auth/c_rekap/rekap_/$1';
+
 
 
 // === Dashboard ===
