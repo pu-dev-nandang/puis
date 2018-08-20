@@ -5,6 +5,17 @@
     }
 </style>
 
+<div class="row">
+    <div class="col-md-4 col-md-offset-4">
+        <div class="thumbnail">
+            <select class="form-control" id="filterStatusEmployees">
+                <option value="">--- All Status Employees ---</option>
+            </select>
+        </div>
+        <hr/>
+    </div>
+</div>
+
 <div class="thumbnail" style="padding: 10px; text-align: right;margin-bottom: 10px;">
     <span style="color: #4CAF50;margin-right: 5px;margin-left: 5px;"><i class="fa fa-circle" style="margin-right: 5px;"></i> Permanent Employees </span> |
     <span style="color: #FF9800;margin-right: 5px;margin-left: 5px;"><i class="fa fa-circle" style="margin-right: 5px;"></i> Contract Employees </span> |
@@ -31,10 +42,16 @@
 <script>
 
     $(document).ready(function () {
-        loadDataEmployees();
+        loadSelectOptionStatusEmployee('#filterStatusEmployees','');
+        loadDataEmployees('');
     });
 
-    function loadDataEmployees() {
+    $('#filterStatusEmployees').change(function () {
+        var s = $(this).val();
+        loadDataEmployees(s);
+    });
+
+    function loadDataEmployees(status) {
         var dataTable = $('#tableEmployees').DataTable( {
             "processing": true,
             "destroy": true,
@@ -42,7 +59,7 @@
             "iDisplayLength" : 10,
             "ordering" : false,
             "ajax":{
-                url : base_url_js+"api/__getEmployeesHR", // json datasource
+                url : base_url_js+"api/__getEmployeesHR?s="+status, // json datasource
                 ordering : false,
                 type: "post",  // method  , by default get
                 error: function(){  // error handling

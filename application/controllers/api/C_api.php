@@ -13,6 +13,7 @@ class C_api extends CI_Controller {
         header('Content-Type: application/json');
         $this->load->model('m_api');
         $this->load->model('master/m_master');
+        $this->load->model('hr/m_hr');
         $this->load->model('vreservation/m_reservation');
         $this->load->model('akademik/m_tahun_akademik');
         $this->load->library('JWT');
@@ -233,10 +234,15 @@ class C_api extends CI_Controller {
 
     public function getEmployeesHR()
     {
+
+        $status = $this->input->get('s');
+
         $requestData= $_REQUEST;
         // print_r($requestData);
 
-        $totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE StatusEmployeeID != -2 ')->result_array();
+        $whereStatus = ($status!='') ? ' AND StatusEmployeeID = "'.$status.'" ' : '';
+
+        $totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE StatusEmployeeID != -2 '.$whereStatus)->result_array();
 
         if( !empty($requestData['search']['value']) ) {
             $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
@@ -244,7 +250,7 @@ class C_api extends CI_Controller {
                         FROM db_employees.employees em 
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                         LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID) 
-                        WHERE em.StatusEmployeeID != -2 AND ( ';
+                        WHERE em.StatusEmployeeID != -2 '.$whereStatus.' AND ( ';
 
             $sql.= ' em.NIP LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR em.Name LIKE "%'.$requestData['search']['value'].'%" ';
@@ -258,7 +264,7 @@ class C_api extends CI_Controller {
                         FROM db_employees.employees em 
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                         LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID) 
-                        WHERE em.StatusEmployeeID != -2 ';
+                        WHERE em.StatusEmployeeID != -2 '.$whereStatus;
             $sql.= 'ORDER BY em.StatusEmployeeID, NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
         }
@@ -282,7 +288,9 @@ class C_api extends CI_Controller {
                 $Position = $dataPosition['Position'];
             }
 
-            $photo = (file_exists('./uploads/employees/'.$row["Photo"])) ? base_url('uploads/employees/'.$row["Photo"]) : base_url('images/icon/userfalse.png');
+            $photo = (file_exists('./uploads/employees/'.$row["Photo"]) && $row["Photo"]!='' && $row["Photo"]!=null)
+                ? base_url('uploads/employees/'.$row["Photo"])
+                : base_url('images/icon/userfalse.png');
 
             $nestedData[] = '<div style="text-align: center;"><img src="'.$photo.'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
 
@@ -2347,7 +2355,7 @@ class C_api extends CI_Controller {
 
         if(count($data_arr)>0){
             if($data_arr['action']=='read'){
-                $data = $this->db->select('NIP,Name')->get('db_employees.employees')->result_array();
+                $data = $this->db->select('NIP,Name')->get_where('db_employees.employees',array('StatusEmployeeID !=' => -2))->result_array();
                 return print_r(json_encode($data));
             }
 
@@ -3226,6 +3234,15 @@ class C_api extends CI_Controller {
             echo json_encode(1);
         }
 
+    }
+
+    function crudPartime(){
+        $data_arr = $this->getInputToken();
+
+        if($data_arr['action']=='readPartime'){
+            $data = $this->m_hr->getLecPartime();
+            return print_r(json_encode($data));
+        }
     }
 
 

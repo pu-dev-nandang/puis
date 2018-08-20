@@ -51,7 +51,7 @@ class C_employees extends HR_Controler {
         $this->tab_menu($page);
     }
 
-    function upload_photo(){
+    public function upload_photo(){
 
         $fileName = $this->input->get('fileName');
 
@@ -75,6 +75,25 @@ class C_employees extends HR_Controler {
             }
 
 
+
+    }
+
+
+    // =============================================
+
+    public function tab_menu_report($page)
+    {
+        $department = parent::__getDepartement();
+        $data['page'] = $page;
+        $content = $this->load->view('page/'.$department.'/report/tab_report',$data,true);
+        $this->temp($content);
+    }
+
+    public function report_partime(){
+
+        $department = parent::__getDepartement();
+        $page = $this->load->view('page/'.$department.'/report/report_partime','',true);
+        $this->tab_menu_report($page);
 
     }
 

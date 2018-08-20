@@ -739,6 +739,23 @@
         })
     }
 
+
+    // ===== Function HR =====
+
+    function loadSelectOptionStatusEmployee(element,selected) {
+        var url = base_url_js+'api/__getStatusEmployee';
+        $.getJSON(url,function (jsonResult) {
+            console.log(jsonResult);
+            for(var i=0;i<jsonResult.length;i++){
+                var d = jsonResult[i];
+                var bg = (d.IDStatus < 0) ? 'style="color:red;"' : '' ;
+                $(element).append('<option value="'+d.IDStatus+'" '+bg+'>'+d.Description+'</option>');
+            }
+        });
+    }
+
+    // ======================
+
     function fillDays(element,lang,selected) {
         var days = (lang=='Eng') ? daysEng : daysInd ;
 
@@ -751,6 +768,7 @@
             val += 1;
         }
     }
+
     function formatRupiah(bilangan) {
         var	number_string = bilangan.toString(),
             sisa 	= number_string.length % 3,

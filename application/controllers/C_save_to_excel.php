@@ -12,12 +12,6 @@ class C_save_to_excel extends CI_Controller
         date_default_timezone_set("Asia/Jakarta");
 
 
-        // We'll be outputting an excel file
-//        header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
-//        // It will be called file.xlss
-//        header('Content-Disposition: attachment; filename="file.xls"'); // jalan ketika tidak menggunakan ajax
-
-
     }
 
     public function test2()
@@ -95,35 +89,7 @@ class C_save_to_excel extends CI_Controller
             $excel->getActiveSheet()->getStyle('H3')->applyFromArray($style_col);
 
             $numrow = 4; // Set baris pertama untuk isi tabel adalah baris ke 4
-//            $data = $this->dkm->showDataKaryawan_produksi();
-//            foreach($data as $key){ // Lakukan looping pada variabel siswa
-//                $excel->setActiveSheetIndex(0)->setCellValue('A'.$numrow, $key->nik);
-//                $excel->setActiveSheetIndex(0)->setCellValue('B'.$numrow, $key->nama);
-//                $excel->setActiveSheetIndex(0)->setCellValue('C'.$numrow, $key->nama_divisi);
-//                $excel->setActiveSheetIndex(0)->setCellValue('D'.$numrow, $key->nm_status_karyawan);
-//                $excel->setActiveSheetIndex(0)->setCellValue('E'.$numrow, $key->nama_jabatan);
-//                $excel->setActiveSheetIndex(0)->setCellValue('F'.$numrow, $key->tgl_msk);
-//                $excel->setActiveSheetIndex(0)->setCellValue('G'.$numrow, $key->tgl_lahir);
-//                $excel->setActiveSheetIndex(0)->setCellValue('H'.$numrow, $key->skill);
-//
-//                // Apply style row yang telah kita buat tadi ke masing-masing baris (isi tabel)
-//                $excel->getActiveSheet()->getStyle('A'.$numrow)->applyFromArray($style_row);
-//                $excel->getActiveSheet()->getStyle('B'.$numrow)->applyFromArray($style_row);
-//                $excel->getActiveSheet()->getStyle('C'.$numrow)->applyFromArray($style_row);
-//                $excel->getActiveSheet()->getStyle('D'.$numrow)->applyFromArray($style_row);
-//                $excel->getActiveSheet()->getStyle('E'.$numrow)->applyFromArray($style_row);
-//                $excel->getActiveSheet()->getStyle('F'.$numrow)->applyFromArray($style_row);
-//                $excel->getActiveSheet()->getStyle('G'.$numrow)->applyFromArray($style_row);
-//                $excel->getActiveSheet()->getStyle('H'.$numrow)->applyFromArray($style_row);
-//                $numrow++; // Tambah 1 setiap kali looping
-//            } // exit loop foreach
 
-            // Set width kolom
-            /*$excel->getActiveSheet()->getColumnDimension('A')->setWidth(5); // Set width kolom A
-            $excel->getActiveSheet()->getColumnDimension('B')->setWidth(15); // Set width kolom B
-            $excel->getActiveSheet()->getColumnDimension('C')->setWidth(25); // Set width kolom C
-            $excel->getActiveSheet()->getColumnDimension('D')->setWidth(20); // Set width kolom D
-            $excel->getActiveSheet()->getColumnDimension('E')->setWidth(30); // Set width kolom E */
 
             // Set height semua kolom menjadi auto (mengikuti height isi dari kolommnya, jadi otomatis)
             $excel->getActiveSheet()->getDefaultRowDimension()->setRowHeight(-1);
