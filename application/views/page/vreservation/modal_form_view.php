@@ -138,7 +138,7 @@
         var room = "<?php echo $room ?>";
         var html_table =''+
                          '<div class="table-responsive">'+
-                            '<table class="table table-striped table-bordered table-hover table-checkable datatable">'+
+                            '<table class="table table-striped table-bordered table-hover table-checkable datatable3">'+
                                 '<thead>'+
                                     '<tr>'+
                                    ' <th>Nama</th>'+
@@ -161,7 +161,7 @@
                 // var response = jQuery.parseJSON(data_json);
                $("#page_equipment_room").html(html_table);
                for (var i = 0; i < data_json.length; i++) {
-                $(".datatable tbody").append(
+                $(".datatable3 tbody").append(
                     '<tr>'+
                         '<td>'+data_json[i]['Equipment']+'</td>'+
                         '<td>'+data_json[i]['qty']+'</td>'+
@@ -169,7 +169,7 @@
                     '</tr>' 
                     );
             }
-            LoaddataTable('.datatable');
+            LoaddataTable('.datatable3');
             },500);
         });                
     }
