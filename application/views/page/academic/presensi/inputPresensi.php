@@ -140,11 +140,21 @@
 
                     if(dataAttd['AttdLecturers'+a].length>0){
                         var rw_span = (dataAttd['AttdLecturers'+a].length);
+
+                            var dateIn = dataAttd['AttdLecturers'+a][0].Date;
+                            var viewDateIn = (dateIn!=null && dateIn!='' && typeof dateIn !== undefined) ? moment(dataAttd['AttdLecturers'+a][0].Date).format('dddd, DD MMM YYYY') : '';
+
+                            var timeIn = dataAttd['AttdLecturers'+a][0].In;
+                            var viewTimeIn = (timeIn!=null && timeIn!='' && typeof timeIn !== undefined) ? dataAttd['AttdLecturers'+a][0].In.substr(0,5) : '';
+
+                            var timeOut = dataAttd['AttdLecturers'+a][0].Out;
+                            var viewTimeOut = (timeOut!=null && timeOut!='' && typeof timeOut !== undefined) ? dataAttd['AttdLecturers'+a][0].Out.substr(0,5) : '';
+
                            tr.append('<tr style="'+bg_td+'">' +
                                '            <td rowspan="'+rw_span+'">'+a+'</td>' +
                                '            <td rowspan="'+rw_span+'">'+btn_Sc_Ex_Status+'</td>' +
                                '            <td style="text-align: left;"><b>'+dataAttd['AttdLecturers'+a][0].Name+'</b>' +
-                               '                <span style="float: right;">'+moment(dataAttd['AttdLecturers'+a][0].Date).format('dddd, DD MMM YYYY')+' | '+dataAttd['AttdLecturers'+a][0].In.substr(0,5)+' - '+dataAttd['AttdLecturers'+a][0].Out.substr(0,5)+' | ' +
+                               '                <span style="float: right;">'+viewDateIn+' | '+viewTimeIn+' - '+viewTimeOut+' | ' +
                                '                <button class="btn btn-sm btn-default btn-default-danger btn-delete-attd" data-id="'+dataAttd['AttdLecturers'+a][0].ID+'"><i  class="fa fa-minus-circle"></i></button></span>'+
                                '            </td>' +
                                '            <td rowspan="'+rw_span+'">'+dataAttd['S_P'+a]+'</td>' +
