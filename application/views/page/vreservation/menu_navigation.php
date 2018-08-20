@@ -192,8 +192,18 @@ $this->m_reservation->checkAuth_user_vreservation();
             var response = jQuery.parseJSON(data_json);
             divHtml.html(response);
         }).done(function() {
-
+            loadRoomStatus(loadDataRoomStatus);
         })
+     }
+
+     function loadRoomStatus(loadDataRoomStatus)
+     {
+        
+     }
+    
+     function loadDataRoomStatus()
+     {
+        
      }
 
      $(document).on('click','.btn-apppove', function () {

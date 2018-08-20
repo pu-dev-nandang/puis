@@ -53,17 +53,18 @@
 	.table-responsive {
 	  
 	  height: auto !important;  
-	  max-height: 600px;
+	  max-height: 450px;
 	  overflow-y: auto;
 	}
 
 	.pointer {cursor: pointer;}
 </style>
 
-
 <div class="table-responsive table-area" style="overflow-x:auto;">
 	<table class="table table-bordered table2">
-		<caption id= "CaptionTBL"><strong><?php echo $date ?></strong></caption>
+		<!-- <caption id= "CaptionTBL">
+			<strong><?php echo $date ?></strong>
+		</caption> -->
 	<!-- <table class="table2"> -->
 	    <thead>
 	    	<tr>
@@ -89,15 +90,16 @@
 								<?php $converDTE = date("h:i a", strtotime($data_pass[$k]['end'])); ?>
 								<?php if ($data_pass[$k]['room'] == $getRoom[$i]['Room'] && $converDTS == $arrHours[$j]): ?>
 									<?php if ($data_pass[$k]['approved'] == 1): ?>
-										<td style="width: 72px;height: 20px;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>">
-											<div class="panel-red pointer" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>"><span>Booked <br>by <?php echo $data_pass[$k]['user'] ?></span></div>
+										<td class="panel-red pointer" style="width: 72px;height: 20px;background-color: #e98180;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>">
+											<span><?php echo $data_pass[$k]['user'] ?></span>
+											<!-- <div class="panel-red pointer" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>"><span><?php echo $data_pass[$k]['user'] ?></span></div> -->
 										</td>
 										<?php $bool = true ?>
 										<?php $j = $j + (int)$data_pass[$k]['colspan'] - 1 ?>
 										<?php break; ?>
 									<?php else: ?>
-										<td style="width: 72px;height: 20px;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>">
-											<div class="panel-orange pointer" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>"><span>Requested <br><?php echo $data_pass[$k]['user'] ?></span></div>
+										<td class="panel-orange pointer" style="width: 72px;height: 20px;background-color: #ffb848;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>"><span><?php echo $data_pass[$k]['user'] ?></span>
+											<!-- <div class="panel-orange pointer" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>"><span><?php echo $data_pass[$k]['user'] ?></span></div> -->
 										</td>
 										<?php $bool = true ?>
 										<?php $j = $j + (int)$data_pass[$k]['colspan'] - 1 ?>
@@ -106,8 +108,8 @@
 								<?php endif ?>
 							<?php endfor ?>
 							<?php if (!$bool): ?>
-								<td style="width: 72px;height: 20px;">
-		    							<div class="panel-blue pointer" id = "droppable" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $arrHours[$j]?>"><span>Available</span></div>
+								<td style="width: 72px;height: 20px;background-color: #6ba5c1;" class="panel-blue pointer" id = "droppable" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $arrHours[$j]?>">
+		    							<!-- <div class="panel-blue pointer" id = "droppable" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $arrHours[$j]?>"><span></span></div> -->
 								</td>			
 							<?php endif ?>	
 						<?php endfor ?>		
@@ -117,6 +119,10 @@
 	</table>
 </div>
 <script type="text/javascript">
+	getRoom = <?php echo json_encode($getRoom)  ?>;
+	arrHours = <?php echo json_encode($arrHours)  ?>;
+	data_pass = <?php echo json_encode($data_pass)  ?>;
+
 	$( function() {
     	//$( document ).tooltip();
     	$(".panel-red").hover();

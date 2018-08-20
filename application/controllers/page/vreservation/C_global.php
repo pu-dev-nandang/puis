@@ -24,30 +24,78 @@ class C_global extends Vreservation_Controler {
 
     public function getroom()
     {
-        $arr = array();
-        $getData = $this->m_master->showData_array('db_academic.classroom');
-        $a = 0;
-        for ($i=0; $i < count($getData); $i++) { 
-            $room = $getData[$i]['Room'];
-            $status = '<span class="label label-success">Available</span>';
-            $BookedBy = '-';
-            $Ends = '-';
-            if ($i == $a) {
-                $status = '<span class="label label-danger">Booked</span>';
-                $BookedBy = 'Alhadi Rahman';
-                $Ends = date('Y-m-d H:i:s', time() + 2 * 3600);
-                $a = $a + 2;
-            }    
-            $arr[] = array(
-                'room' => $room,
-                'status' => $status,
-                'BookedBy' => $BookedBy,
-                'Ends' => $Ends
-            );
-        }
-        echo json_encode($arr);
+        // $date = date('Y-m-d');
+        // $datetime = DateTime::createFromFormat('Y-m-d', $date);
+        // $NameDay = $datetime->format('l');
+        // $data1 = $this->m_reservation->getDataClassroomAcademic($NameDay,$date);
+
+        // $arr_json = array();
+        // $arrHours = array();
+        // $getRoom = $this->m_master->showData_array('db_academic.classroom');
+        // $endTime = '20';
+        // for ($i=7; $i < $endTime; $i++) { 
+        //     // check len
+        //     $a = $i;
+        //     for ($j=0; $j < 2 - strlen($i); $j++) { 
+        //         $a = '0'.$a;
+        //     }
+        //     $d = $a.':30';
+        //     $a = $a.':00';
+        //     $arrHours[] = date("h:i a", strtotime($a));
+        //     //$arrHours[] = date("h:i a", strtotime($d));
+        //     if ($i != $endTime) {
+        //         $arrHours[] = date("h:i a", strtotime($d));
+        //     }
+        // }
+
+        // $data_pass = $data1;
+        // // SORTING ASC
+        //     usort($data_pass, function($a, $b) {
+        //         return $a['room'] - $b['room'];
+        //     });
+
+        // for ($i=0; $i <count($getRoom) ; $i++) { 
+        //     $loopArr = array();
+        //     for ($j=0; $j <count($arrHours) ; $j++) { 
+        //         $bool = false;
+        //         for ($k=0; $k < count($data_pass); $k++) { 
+        //             # code...
+        //         }
+        //     }
+        // }
+
+
+        $arrHours = '';
+        echo json_encode($arrHours);
 
     }
+
+    // public function getroom()
+    // {
+    //     $arr = array();
+    //     $getData = $this->m_master->showData_array('db_academic.classroom');
+    //     $a = 0;
+    //     for ($i=0; $i < count($getData); $i++) { 
+    //         $room = $getData[$i]['Room'];
+    //         $status = '<span class="label label-success">Available</span>';
+    //         $BookedBy = '-';
+    //         $Ends = '-';
+    //         if ($i == $a) {
+    //             $status = '<span class="label label-danger">Booked</span>';
+    //             $BookedBy = 'Alhadi Rahman';
+    //             $Ends = date('Y-m-d H:i:s', time() + 2 * 3600);
+    //             $a = $a + 2;
+    //         }    
+    //         $arr[] = array(
+    //             'room' => $room,
+    //             'status' => $status,
+    //             'BookedBy' => $BookedBy,
+    //             'Ends' => $Ends
+    //         );
+    //     }
+    //     echo json_encode($arr);
+
+    // }
 
     // public function getschedule()
     // {
@@ -187,7 +235,7 @@ class C_global extends Vreservation_Controler {
 
 
 
-        $endTime = '18';
+        $endTime = '20';
         $getHoursNow = date('H');
         $getHoursNow = ($date == date('Y-m-d')) ? (int)$getHoursNow : 7;
         $data['getRoom'] = $getRoom;

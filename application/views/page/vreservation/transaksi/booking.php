@@ -2,8 +2,20 @@
 	<!--=== Calendar ===-->
 	<div class="col-md-12">
 		<div class="widget">
+      <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-3"></div>
+        <div class="col-md-3"></div>
+        <div class="col-md-3">
+          <b>Status : </b><br>
+          <i class="fa fa-circle" style="color:#6ba5c1;"></i> Available || 
+          <i class="fa fa-circle" style="color:#e98180;"></i> Booked ||
+          <i class="fa fa-circle" style="color:#ffb848;"></i> Requested 
+
+        </div>
+      </div>
 			<div class="widget-header">
-					<h4><i class="icon-calendar"></i> Schedule</h4>
+					<h4 id = 'schdate'><i class="icon-calendar"></i> Schedule</h4>
 				</div>
 			<div class="widget-content">
 				<div class = "row">	
@@ -60,6 +72,7 @@
     var get = $('#datetime_deadline1').val();
     var divHtml = $("#schedule");
     loadDataSchedule(divHtml,get);
+    $("#schdate").html('<i class="icon-calendar"></i> Schedule Date : '+ get);
   });
 
   

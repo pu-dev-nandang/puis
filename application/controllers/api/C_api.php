@@ -3058,7 +3058,7 @@ class C_api extends CI_Controller {
         $aaa = explode(':', $start);
         
         $arrHours = array();
-        $endTime = '18';
+        $endTime = '20';
         //$getHoursNow = date('H');
         
         // $getHoursNow = (int)$aaa[0] + 1;
