@@ -50,26 +50,41 @@
 	    border: 1px dotted #333;
 	}
 
-	.table-responsive {
+	/*.table-responsive {
 	  
 	  height: auto !important;  
 	  max-height: 450px;
 	  overflow-y: auto;
-	}
+	}*/
 
 	.pointer {cursor: pointer;}
+
+
+	#tblFreeze tbody {
+	    display:block;
+	    height:520px;
+	    overflow:auto;
+	}
+	#tblFreeze thead,#tblFreeze tbody tr {
+	    display:table;
+	    width:100%;
+	    table-layout:fixed;/* even columns width , fix width of table too*/
+	}
+	#tblFreeze thead {
+	    width: calc( 100% - 1em ) scrollbar is average 1em/16px width, remove it from thead width 
+	}
+	#tblFreeze table {
+	    width:400px;
+	}
+
 </style>
 
 <div class="table-responsive table-area" style="overflow-x:auto;">
-	<table class="table table-bordered table2">
-		<!-- <caption id= "CaptionTBL">
-			<strong><?php echo $date ?></strong>
-		</caption> -->
-	<!-- <table class="table2"> -->
+	<table class="table table-bordered table2" id = "tblFreeze">
 	    <thead>
 	    	<tr>
 	    		<!-- <pre><?php //print_r($data_pass) ?></pre> -->
-		    	<th class="fixed-side">
+		    	<th width="6%">
 		    		Room
 		    	</th>
 		    	<?php for($i = 0; $i < count($arrHours); $i= $i + 2): ?>
@@ -80,7 +95,7 @@
 	    <tbody>
 	    	<?php for($i = 0; $i < count($getRoom); $i++): ?>
 	    		<tr>
-	    			<td width="4%"><?php echo $getRoom[$i]['Room'] ?></td>
+	    			<td width="6%"><?php echo $getRoom[$i]['Room'] ?></td>
 					<?php $countTD =  count($arrHours) ?>
 						<?php for($j = 0; $j < $countTD; $j++): ?>
 							<?php $bool = false ?>
@@ -90,7 +105,7 @@
 								<?php $converDTE = date("h:i a", strtotime($data_pass[$k]['end'])); ?>
 								<?php if ($data_pass[$k]['room'] == $getRoom[$i]['Room'] && $converDTS == $arrHours[$j]): ?>
 									<?php if ($data_pass[$k]['approved'] == 1): ?>
-										<td class="panel-red pointer" style="width: 72px;height: 20px;background-color: #e98180;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>">
+										<td class="panel-red pointer" style="background-color: #e98180;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>">
 											<span><?php echo $data_pass[$k]['user'] ?></span>
 											<!-- <div class="panel-red pointer" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>"><span><?php echo $data_pass[$k]['user'] ?></span></div> -->
 										</td>
@@ -98,7 +113,7 @@
 										<?php $j = $j + (int)$data_pass[$k]['colspan'] - 1 ?>
 										<?php break; ?>
 									<?php else: ?>
-										<td class="panel-orange pointer" style="width: 72px;height: 20px;background-color: #ffb848;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>"><span><?php echo $data_pass[$k]['user'] ?></span>
+										<td class="panel-orange pointer" style="background-color: #ffb848;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>"><span><?php echo $data_pass[$k]['user'] ?></span>
 											<!-- <div class="panel-orange pointer" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>"><span><?php echo $data_pass[$k]['user'] ?></span></div> -->
 										</td>
 										<?php $bool = true ?>
@@ -108,7 +123,7 @@
 								<?php endif ?>
 							<?php endfor ?>
 							<?php if (!$bool): ?>
-								<td style="width: 72px;height: 20px;background-color: #6ba5c1;" class="panel-blue pointer" id = "droppable" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $arrHours[$j]?>">
+								<td style="background-color: #6ba5c1;" class="panel-blue pointer" id = "droppable" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $arrHours[$j]?>">
 		    							<!-- <div class="panel-blue pointer" id = "droppable" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $arrHours[$j]?>"><span></span></div> -->
 								</td>			
 							<?php endif ?>	

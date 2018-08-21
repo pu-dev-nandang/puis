@@ -53,7 +53,6 @@
 	 */
 	"use strict";
 	$(document).ready(function(){
-		
 		getLoadFirst();
 		socket_messages_DASHBOARD();
 		//===== Calendar =====//
