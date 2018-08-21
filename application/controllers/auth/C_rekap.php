@@ -16,11 +16,12 @@ class C_rekap extends Globalclass {
     {
         parent::__construct();
         $this->db = $this->load->database('default', TRUE);
-        $this->server22 = $this->load->database('server22', TRUE);
+
     }
 
     public function inportDBLibrary($db){
 
+        $this->server22 = $this->load->database('server22', TRUE);
         $std = $this->db->query('SELECT s.NPM AS member_id, s.Name AS member_name, 
                                     s.DateOfBirth AS birth_date, s.Address AS member_address,
                                     ast.EmailPU AS member_mail_address, s.Email AS member_email,Gender AS gender
