@@ -668,6 +668,26 @@
 
     }
 
+
+    function loadSelectOptionClassGroupAttendance(SemesterID,element,selected) {
+
+        // var url = base_url_js+'academic/kurikulum/getClassGroup';
+        var url = base_url_js+'api/__crudSchedule';
+        var token = jwt_encode({action:'getClassGroup',SemesterID:SemesterID},'UAP)(*');
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            for(var i=0;i<jsonResult.length;i++){
+
+                var d = jsonResult[i];
+
+                $(element).append('<option value="'+d.ClassGroup+'">'+d.ClassGroup+' - '+d.Name+'</option>');
+            }
+
+        });
+
+    }
+
     function loadSelectOptionClassroom(element,selected){
         var url = base_url_js+'api/__crudClassroom';
         var token = jwt_encode({action:'read'},'UAP)(*');

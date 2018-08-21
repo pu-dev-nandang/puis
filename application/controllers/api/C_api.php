@@ -1261,8 +1261,13 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($data));
             }
 
-            else if($data_arr['action']==''){
+            else if($data_arr['action']=='getClassGroup'){
+                $data = $this->db->query('SELECT s.ClassGroup, em.Name FROM db_academic.schedule s 
+                                                  LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                                  WHERE s.SemesterID = "'.$data_arr['SemesterID'].'"
+                                                   ORDER BY s.ClassGroup ASC ')->result_array();
 
+                return print_r(json_encode($data));
             }
         }
     }
@@ -1276,13 +1281,12 @@ class C_api extends CI_Controller {
 
         $dataWhere = (array) $data_arr['dataWhere'];
 
-
-
         if( !empty($requestData['search']['value']) ) {
             $sql = $this->m_api->getSchedulePerDaySearch($data_arr['DayID'],$dataWhere,$requestData['search']['value']);
             $query = $this->db->query($sql)->result_array();
             $totalData = $query;
-        } else {
+        }
+        else {
             $totalData = $this->m_api->getTotalPerDay($data_arr['DayID'],$dataWhere);
             $sql = $this->m_api->getSchedulePerDayLimit($data_arr['DayID'],$dataWhere,$requestData['start'],$requestData['length']);
 
@@ -1316,8 +1320,6 @@ class C_api extends CI_Controller {
 
             // Mendapatkan matakuliah
             $courses = $this->m_api->getCoursesPerDay($row['ID']);
-
-
 
             $nestedData[] = '<div style="text-align:center;">'.$groupClass.''.$sbSesi.'</div>';
             $nestedData[] = $courses;
