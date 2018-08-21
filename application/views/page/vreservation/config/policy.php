@@ -10,11 +10,11 @@
     <div class="col-md-8">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i>Additional Personel</h4>
+                <h4 class="header"><i class="icon-reorder"></i>Policy</h4>
                 <div class="toolbar no-padding">
                     <div class="btn-group">
                       <span data-smt="" class="btn btn-xs btn-add">
-                        <i class="icon-plus"></i> Add Additional Personel
+                        <i class="icon-plus"></i> Add Policy
                        </span>
                     </div>
                 </div>
@@ -36,12 +36,12 @@
   }); // exit document Function
 
   $(document).on('click','.btn-add', function () {
-     modal_generate('add','Add Additional Personel');
+     modal_generate('add','Add Policy');
   });
 
   $(document).on('click','.btn-edit', function () {
     var ID = $(this).attr('data-smt');
-     modal_generate('edit','Edit Additional Personel',ID);
+     modal_generate('edit','Edit Policy',ID);
   });
 
   $(document).on('click','.btn-delete', function () {
@@ -65,7 +65,7 @@
             'backdrop' : 'static',
             'show' : true
         });
-        var url = base_url_js+'vreservation/master/additional_personel/submit';
+        var url = base_url_js+'vreservation/config/policy/submit';
         var aksi = "delete";
         var ID = $(this).attr('data-smt');
         var data = {
@@ -89,12 +89,15 @@
      var aksi = $("#ModalbtnSaveForm").attr('aksi');
      var id = $("#ModalbtnSaveForm").attr('kodeuniq');
      var selectDivision = $("#selectDivision").val();
+     var selectGroupuUser = $("#selectGroupuUser").val();
+     var BookingDay = $("#BookingDay").val();
 
-     var url = base_url_js+'vreservation/master/additional_personel/submit';
+     var url = base_url_js+'vreservation/config/policy/submit';
      var data = {
          Action : aksi,
          CDID : id,
-         selectDivision:selectDivision,
+         selectGroupuUser:selectGroupuUser,
+         BookingDay:BookingDay,
      };
 
      if (validationInput = validation(data)) {
@@ -107,6 +110,13 @@
                 loadTableJS(loadDataTable);
                 $('#GlobalModal').modal('hide');
              },500);
+         }).fail(function() {
+          toastr.error('The Database connection error, please try again', 'Failed!!');
+           $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
+         })
+         .always(function() {
+           // alert( "finished" );
+           $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
          });
      }
      else
@@ -144,7 +154,7 @@
   }
 
   function modal_generate(action,title,ID='') {
-      var url = base_url_js+"vreservation/master/additional_personel/modalform";
+      var url = base_url_js+"vreservation/config/policy/modalform";
       var data = {
           Action : action,
           CDID : ID,
@@ -169,7 +179,8 @@
       var table = '<div class = "col-md-12"><div class="table-responsive"> <table class="table table-striped table-bordered table-hover table-checkable datatable" id ="IDTblGroupUser">'+
       '<thead>'+
           '<tr>'+
-              '<th style="width: 106px;">Divsion Name</th>'+
+              '<th style="width: 106px;">Group User</th>'+
+              '<th style="width: 106px;">Booking Day</th>'+
               '<th style="width: 15px;">Action</th>'+
           '</tr>'+
       '</thead>'+
@@ -187,17 +198,18 @@
 
   function loadDataTable()
   {
-      var url = base_url_js+'vreservation/master/additional_personel_json_data'
+      var url = base_url_js+'vreservation/config/policy_json_data'
   // loading_page('#loadtableNow');
       $.post(url,function (data_json) {
           var response = jQuery.parseJSON(data_json);
           // $("#loadingProcess").remove();
           for (var i = 0; i < response.length; i++) {
-             var btn_edit = '<span data-smt="'+response[i]['ID_m_additional_personel']+'" class="btn btn-xs btn-edit"><i class="fa fa-pencil-square-o"></i> Edit</span>';
-             var btn_delete = '<span data-smt="'+response[i]['ID_m_additional_personel']+'"  class="btn btn-xs btn-delete"><i class="fa fa-trash"> Delete</i></span>';
+             var btn_edit = '<span data-smt="'+response[i]['ID']+'" class="btn btn-xs btn-edit"><i class="fa fa-pencil-square-o"></i> Edit</span>';
+             var btn_delete = '<span data-smt="'+response[i]['ID']+'"  class="btn btn-xs btn-delete"><i class="fa fa-trash"> Delete</i></span>';
               $(".datatable tbody").append(
                   '<tr>'+
-                      '<td>'+response[i]['Division']+'</td>'+
+                      '<td>'+response[i]['GroupAuth']+'</td>'+
+                      '<td>'+response[i]['BookingDay']+'</td>'+
                       '<td>'+btn_edit+btn_delete+'</td>'+
                   '</tr>' 
                   );

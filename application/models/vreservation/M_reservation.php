@@ -1117,4 +1117,23 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $query=$this->db->query($sql, array())->result_array();
         return $query;
     }
+
+    public function save_sess_policy_grouping()
+    {
+        $NIP = $this->session->userdata('NIP');
+        $sql = 'select a.* from db_reservation.cfg_policy as a join db_reservation.cfg_group_user as b on a.ID_group_user = b.ID join db_reservation.previleges_guser as c 
+                on b.ID = c.G_user where c.NIP = ? limit 1';
+        $query=$this->db->query($sql, array($NIP))->result_array();
+        $arr = array(
+            'V_BookingDay' => 1,
+        );
+
+        if (count($query) > 0) {
+            $arr = array(
+                'V_BookingDay' => $query[0]['BookingDay'],
+            );
+        }
+
+        $this->session->set_userdata($arr);
+    }
 }
