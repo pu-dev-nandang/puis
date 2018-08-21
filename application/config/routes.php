@@ -701,6 +701,7 @@ $route['vreservation/master/modal_form_equipmentadditional'] = 'page/vreservatio
 $route['vreservation/master/EquipmentAdditional/submit'] = 'page/vreservation/c_master/EquipmentAdditional_submit';
 $route['vreservation/config/policy_json_data'] = 'page/vreservation/c_config/policy_json_data';
 $route['vreservation/config/policy/modalform'] = 'page/vreservation/c_config/policy_modalform';
+$route['vreservation/config/policy/submit'] = 'page/vreservation/c_config/policy_submit';
 
 
 // test

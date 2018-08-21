@@ -110,6 +110,13 @@
                 loadTableJS(loadDataTable);
                 $('#GlobalModal').modal('hide');
              },500);
+         }).fail(function() {
+          toastr.error('The Database connection error, please try again', 'Failed!!');
+           $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
+         })
+         .always(function() {
+           // alert( "finished" );
+           $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
          });
      }
      else

@@ -311,8 +311,7 @@ class C_config extends Vreservation_Controler {
 
     public function policy_json_data()
     {
-        $sql = 'select a.*,b.GroupAuth from db_reservation.cfg_policy as a join db_reservation.cfg_group_user as b on a.ID_group_user = b.ID join db_reservation.previleges_guser as c 
-                on b.ID = c.G_user';
+        $sql = 'select a.*,b.GroupAuth from db_reservation.cfg_policy as a join db_reservation.cfg_group_user as b on a.ID_group_user = b.ID';
         $query=$this->db->query($sql, array())->result_array();
         echo json_encode($query);
     }
@@ -326,6 +325,39 @@ class C_config extends Vreservation_Controler {
             $this->data['getDataEdit'] =  $this->m_master->caribasedprimary('db_reservation.cfg_policy','ID',$input['CDID']);
         }
         echo $this->load->view($this->pathView.'config/modalform_policy',$this->data,true);
+    }
+
+    public function policy_submit()
+    {
+        $input = $this->getInputToken();
+        switch ($input['Action']) {
+            case 'add':
+                //$this->m_master->inserData_jenis_tempat_tinggal($input['Equipment']);
+            $dataSave = array(
+                'ID_group_user' => $input['selectGroupuUser'],
+                'BookingDay' => $input['BookingDay'],
+            );
+            $this->db->insert('db_reservation.cfg_policy', $dataSave);
+                break;
+            case 'edit':
+                //$this->m_master->editData_jenis_tempat_tinggal($input['Equipment'],$input['CDID']);
+                $dataSave = array(
+                    'ID_group_user' => $input['selectGroupuUser'],
+                    'BookingDay' => $input['BookingDay'],
+                );
+                $this->db->where('ID', $input['CDID']);
+                $this->db->update('db_reservation.cfg_policy', $dataSave);
+                break;
+            case 'delete':
+                $this->m_master->delete_id_table_all_db($input['CDID'],'db_reservation.cfg_policy');
+                break;
+            case 'getactive':
+                // $this->m_master->getActive_id_activeAll_table_allDB($input['CDID'],$input['Active'],'db_reservation.m_equipment');
+                break;
+            default:
+                # code...
+                break;
+        }
     }
 
 }
