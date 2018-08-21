@@ -14,18 +14,15 @@
     <div class="col-md-6 col-md-offset-3">
         <div class="thumbnail">
             <div class="row">
-                <div class="col-xs-6">
+                <div class="col-xs-4">
                     <select id="filterSemester" class="form-control filter-presensi"></select>
                 </div>
                 <div class="col-xs-6">
+                    <div id="viewGroup"></div>
+                </div>
 
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="filterClassGroup" placeholder="Search by group class">
-                        <span class="input-group-btn">
-                        <button class="btn btn-primary" id="btnFilterSearchGroup" type="button"><span class="glyphicon glyphicon-search"></span></button>
-                      </span>
-                    </div>
-
+                <div class="col-xs-2">
+                    <button class="btn btn-primary btn-block" id="btnFilterSearchGroup">Search</button>
                 </div>
             </div>
         </div>
@@ -47,31 +44,20 @@
     $(document).ready(function () {
 
         $('#filterSemester').empty();
-        // $('#filterSemester').append('<option value="" disabled selected>-- Year Academic--</option>' +
-        //     '                <option disabled>------------------------------------------</option>');
         loSelectOptionSemester('#filterSemester','');
 
-    });
+        window.varG = true;
 
-    // Filter
-    $(document).on('keyup','#filterClassGroup',function () {
-        var  filterSemester = $('#filterSemester').val();
-        if(filterSemester!='' && filterSemester!=null){
-            var SemesterID = filterSemester.split('.')[0];
-            var url = base_url_js+'api/__getClassGroupAutoComplete/'+SemesterID+'/';
-            $("#filterClassGroup").autocomplete({
-                source: url,
-                minLength: 2
-            });
+        setInterval(function () {
+            if(varG){
+                loadGroupDiv();
+            }
+        },1000);
 
-        }
-    });
 
-    $(document).on('keypress','#filterClassGroup',function (e) {
-        if (e.which == 13) {
-            checkPage();
-            return false;    //<---- Add this line
-        }
+
+
+
     });
 
     // Search
@@ -81,8 +67,25 @@
 
     // Change Smester ID
     $(document).on('change','#filterSemester',function () {
-        checkPage();
+        // checkPage();
+        loadGroupDiv();
+        $('#divpagePresensi').html('<div style="text-align:center;"><h3 style="color: #ccc;font-weight: bold;">-- Select Class Group --</h3></div>');
     });
+
+    function loadGroupDiv() {
+        $('#viewGroup').html('');
+        $('#viewGroup').html('<select class="select2-select-00 full-width-fix"' +
+            '                                size="5" id="filterClassGroup"><option></option></select>');
+        var filterSemester = $('#filterSemester').val();
+        if(filterSemester!='' && filterSemester!=null){
+            var SemesterID = filterSemester.split('.')[0];
+            loadSelectOptionClassGroupAttendance(SemesterID,'#filterClassGroup','');
+            $('#filterClassGroup').select2({allowClear: true});
+
+            varG = false;
+        }
+
+    }
 
     function checkPage() {
         var filterGroup = $('#filterClassGroup').val();
