@@ -2700,6 +2700,14 @@ class C_api extends CI_Controller {
                 $ScheduleID = $data_arr['ScheduleID'];
                 $SDID = $data_arr['SDID'];
                 $Meeting = $data_arr['Meeting'];
+                $data = $this->m_api->__getStudensAttd2Edit($SemesterID,$ScheduleID,$SDID,$Meeting);
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='getAttdStudentsToEdit'){
+                $SemesterID = $data_arr['SemesterID'];
+                $ScheduleID = $data_arr['ScheduleID'];
+                $SDID = $data_arr['SDID'];
+                $Meeting = $data_arr['Meeting'];
                 $data = $this->m_api->__getStudensAttd($SemesterID,$ScheduleID,$SDID,$Meeting);
                 return print_r(json_encode($data));
             }

@@ -131,6 +131,7 @@
                         '  <ul class="dropdown-menu">' +
                         '    <li><a href="javascript:void(0);" class="inputLecturerAttd" data-no="'+a+'" data-id="'+dataAttd['ID']+'">Input Attendance Lecturer</a></li>' +
                         '    <li><a href="javascript:void(0);" class="inputStudentAttd" data-no="'+a+'" data-id="'+dataAttd['ID']+'">Input Attendance Students</a></li>' +
+                        '    <li><a href="javascript:void(0);" class="editStudentAttd" data-no="'+a+'" data-id="'+dataAttd['ID']+'">Edit Students</a></li>' +
                         '    <li role="separator" class="divider"></li>' +
                         '    <li><a href="javascript:void(0);" class="inputScheduleExchange" data-no="'+a+'" data-id="'+dataAttd['ID']+'">Set Schedule Exchange</a></li>' +
                         '  </ul>' +
