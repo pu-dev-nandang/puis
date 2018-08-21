@@ -2348,6 +2348,40 @@ class M_api extends CI_Model {
 
     }
 
+    public function __getStudensAttd2Edit($SemesterID,$ScheduleID,$SDID,$Meeting){
+        $dataAttd = $this->db->query('SELECT attd_s.*,ast.Year AS ta FROM db_academic.attendance_students attd_s
+                                          LEFT JOIN db_academic.attendance attd ON (attd.ID = attd_s.ID_Attd)
+                                          LEFT JOIN db_academic.auth_students ast ON (ast.NPM = attd_s.NPM)
+                                          WHERE attd.SemesterID = "'.$SemesterID.'"
+                                          AND attd.ScheduleID = "'.$ScheduleID.'"
+                                          AND attd.SDID = "'.$SDID.'" ')->result_array();
+
+        $result = [];
+        if(count($dataAttd)>0){
+            for($s=0;$s<count($dataAttd);$s++){
+                $db_ = 'ta_'.$dataAttd[$s]['ta'];
+                $dataStd = $this->db->select('ID,Name,NPM,ClassOf')
+                    ->get_where($db_.'.students',array('NPM' => $dataAttd[$s]['NPM']))
+                    ->result_array();
+
+                $attdStd = ($dataAttd[$s]['M'.$Meeting]!='' && $dataAttd[$s]['M'.$Meeting]!=null) ? $dataAttd[$s]['M'.$Meeting] : '0';
+                $arr = array(
+                    'DetailStudent' => $dataStd[0],
+                    'ID_Attd_S' => $dataAttd[$s]['ID'],
+                    'DBStudent' => $db_,
+                    'Status' => $attdStd,
+                    'Description' => $dataAttd[$s]['D'.$Meeting]
+                );
+
+                array_push($result,$arr);
+
+            }
+
+        }
+
+        return $result;
+    }
+
     public function __getAttendanceSchedule($AttendanceID){
         $data = $this->db->get_where('db_academic.attendance',
             array('ID'=>$AttendanceID),1)

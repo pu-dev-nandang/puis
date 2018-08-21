@@ -883,3 +883,77 @@
     });
 
 </script>
+
+
+<!-- Edit Students -->
+<script>
+    $(document).on('click','.editStudentAttd',function () {
+        var ID = $(this).attr('data-id');
+        var No = $(this).attr('data-no');
+
+        var SemesterID = 13;
+
+        var DataAttendance = $('#filterAttendance').val();
+        var ScheduleID = DataAttendance.split('.')[1];
+        var SDID = DataAttendance.split('.')[2];
+
+        var url = base_url_js+'api/__crudAttendance';
+        var data = {
+            action : 'getAttdStudentsToEdit',
+            SemesterID : SemesterID,
+            ScheduleID : ScheduleID,
+            SDID : SDID,
+            Meeting : No
+        };
+        var token = jwt_encode(data,'UAP)(*');
+
+        $.post(url,{token:token},function (jsonResult) {
+            console.log(jsonResult);
+            var body_attd = '<h3>Students Not Yet</h3>';
+            if(jsonResult.length>0){
+                body_attd = '<table class="table table-bordered table-striped" id="tableStdAttd">' +
+                    '        <thead>' +
+                    '        <tr style="background:#436f88;color: #ffffff;">' +
+                    '            <th style="width: 1%;">No</th>' +
+                    '            <th style="width: 10%;">NPM</th>' +
+                    '            <th>Name</th>' +
+                    '            <th style="width: 5%;">Action</th>' +
+                    '        </tr>' +
+                    '        </thead>' +
+                    '        <tbody id="trBody">' +
+                    '        </tbody>' +
+                    '    </table>';
+            }
+
+            $('#GlobalModalLarge .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                '<h4 class="modal-title">Attendance Students | Pertemuan '+No+'</h4>');
+
+            $('#GlobalModalLarge .modal-body').html(body_attd);
+
+            if(jsonResult.length>0){
+
+                window.totalMhs = jsonResult.length;
+                var no_tr=1;
+                for(var i=0;i<totalMhs;i++){
+                    var dataRowStd = jsonResult[i];
+
+                    $('#trBody').append('<tr>' +
+                        '<td>'+(no_tr++)+'</td>' +
+                        '<td>'+dataRowStd.DetailStudent.NPM+'<input value="'+dataRowStd.ID_Attd_S+'" id="formID_Attd_S'+i+'" class="hide" hidden readonly/></td>' +
+                        '<td style="text-align: left;font-weight: bold;">'+dataRowStd.DetailStudent.Name+'</td>' +
+                        '<td><button class="btn btn-danger">Del</button></td>' +
+                        '</tr>');
+                }
+            }
+
+            $('#GlobalModalLarge .modal-footer').html('Total : '+totalMhs+' | P : <span id="totalP"></span> | A : <span id="totalA"></span> | <button type="button" class="btn btn-default btn-attd-students" data-dismiss="modal">Close</button> ' +
+                '<button class="btn btn-success" id="btnSaveAttdStudents" data-no="'+No+'" data-id="'+ID+'">Save</button>');
+            $('#GlobalModalLarge').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+
+
+        });
+    });
+</script>
