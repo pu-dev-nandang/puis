@@ -232,11 +232,13 @@
     });
 
     $(document).on('keyup','#formSimpleSearch',function () {
+
         var formSimpleSearch = $('#formSimpleSearch').val();
+
         if(formSimpleSearch!='' && formSimpleSearch!=null){
             var url = base_url_js+'api/__getSimpleSearch?key='+formSimpleSearch;
             $.getJSON(url,function (jsonResult) {
-                console.log(jsonResult);
+                // console.log(jsonResult);
                 $('#trDataUser').empty();
                 if(jsonResult.length>0){
                     for(var i=0;i<jsonResult.length;i++){
@@ -268,6 +270,12 @@
                         '</tr>');
                 }
             });
+        }
+        else {
+            $('#trDataUser').empty();
+            $('#trDataUser').append('<tr>' +
+                '<td colspan="3">-- Data Not Yet --</td>' +
+                '</tr>');
         }
     });
 

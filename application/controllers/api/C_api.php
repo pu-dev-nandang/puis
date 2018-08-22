@@ -3157,6 +3157,12 @@ class C_api extends CI_Controller {
         return print_r(json_encode($data));
     }
 
+    public function getSimpleSearchStudents(){
+        $key = $this->input->get('key');
+        $data = $this->m_api->__getSimpleSearchStudents($key);
+        return print_r(json_encode($data));
+    }
+
 
     public function room_equipment()
     {

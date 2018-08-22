@@ -15,7 +15,7 @@ class C_auth extends Globalclass {
     public function __construct()
     {
         parent::__construct();
-        $this->db_server = $this->load->database('server', TRUE);
+//        $this->db_server = $this->load->database('server', TRUE);
         $this->db = $this->load->database('default', TRUE);
     }
 
@@ -1085,7 +1085,7 @@ class C_auth extends Globalclass {
 
         else if($table=='updateAttd'){
             $dataSchedule = $this->db->query('SELECT ID,SemesterID,ScheduleID FROM db_academic.attendance')->result_array();
-            $db_ = 'ta_2014';
+            $db_ = 'ta_2018';
 
             for($i=0;$i<count($dataSchedule);$i++){
                 $ScheduleID = $dataSchedule[$i]['ScheduleID'];

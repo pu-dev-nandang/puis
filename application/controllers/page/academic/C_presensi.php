@@ -15,12 +15,37 @@ class C_presensi extends Academic_Controler {
         parent::template($content);
     }
 
+    public function menu_presensi($page){
+
+        $data['department'] = parent::__getDepartement();
+        $data['page'] = $page;
+        $content = $this->load->view('page/'.$data['department'].'/presensi/menu_presensi',$data,true);
+        $this->temp($content);
+
+    }
+
+    //==== Page =====
     public function index()
     {
         $data['department'] = parent::__getDepartement();
-        $content = $this->load->view('page/'.$data['department'].'/presensi/tab_menu',$data,true);
-        $this->temp($content);
+        $content = $this->load->view('page/'.$data['department'].'/presensi/attendance',$data,true);
+        $this->menu_presensi($content);
     }
+
+    public function monitoring_lecturer(){
+        $data['department'] = parent::__getDepartement();
+        $content = $this->load->view('page/'.$data['department'].'/presensi/monitoring_lecturer',$data,true);
+        $this->menu_presensi($content);
+    }
+
+    public function monitoring_student(){
+        $data['department'] = parent::__getDepartement();
+        $content = $this->load->view('page/'.$data['department'].'/presensi/monitoring_student',$data,true);
+        $this->menu_presensi($content);
+    }
+
+
+    //========================
 
 
     public function loadPagePresensi(){

@@ -44,8 +44,6 @@
     $(document).ready(function () {
 
         $('#filterCurriculum,#filterBaseProdi').empty();
-        // $('#filterCurriculum').append('<option value="" disabled selected>-- Curriculum--</option>' +
-        //     '                <option disabled>------------------------------------------</option>');
         loadSelectOptionCurriculum('#filterCurriculum','');
 
         // $('#filterBaseProdi').append('<option value="">--- All Program Study ---</option>' +

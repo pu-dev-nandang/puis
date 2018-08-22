@@ -11,8 +11,8 @@
 
 
 <div class="row">
-    <div class="col-md-6 col-md-offset-3">
-        <div class="thumbnail">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="well">
             <div class="row">
                 <div class="col-xs-4">
                     <select id="filterSemester" class="form-control filter-presensi"></select>
@@ -22,7 +22,7 @@
                 </div>
 
                 <div class="col-xs-2">
-                    <button class="btn btn-primary btn-block" id="btnFilterSearchGroup">Search</button>
+                    <button class="btn btn-primary btn-block" id="btnFilterSearchGroup"><i class="fa fa-search" aria-hidden="true"></i></button>
                 </div>
             </div>
         </div>
@@ -38,7 +38,6 @@
     </div>
 </div>
 
-<!--<script src="--><?php //echo base_url('assets/custom/js/presensi.js'); ?><!--"></script>-->
 <script>
 
     $(document).ready(function () {
@@ -908,14 +907,34 @@
         var token = jwt_encode(data,'UAP)(*');
 
         $.post(url,{token:token},function (jsonResult) {
-            console.log(jsonResult);
+
             var body_attd = '<h3>Students Not Yet</h3>';
             if(jsonResult.length>0){
-                body_attd = '<table class="table table-bordered table-striped" id="tableStdAttd">' +
+                body_attd = '<div class="well">' +
+                    '<div class="input-group">' +
+                    '   <input type="text" id="formSimpleSearchAttd" class="form-control" placeholder="Search by NIM, Name . . .">' +
+                    '   <span class="input-group-btn">' +
+                    '<button class="btn btn-default" type="button">' +
+                    '<i class="fa fa-search" aria-hidden="true"></i>' +
+                    '</button>' +
+                    '</span></div>' +
+                    '<hr/>' +
+                    '<table class="table table-bordered">' +
+                    '<thead>' +
+                    '<tr style="background: #4f8742ab;color:#fff;">' +
+                    '<th style="width: 20%;">NIM</th>' +
+                    '<th>Name</th>' +
+                    '<th style="width: 7%;">Action</th>' +
+                    '</tr>' +
+                    '</thead>' +
+                    '<tbody id="rowStdAttd"></tbody>' +
+                    '</table>' +
+                    '</div>' +
+                    '<table class="table table-bordered table-striped" id="tableStdAttd">' +
                     '        <thead>' +
                     '        <tr style="background:#436f88;color: #ffffff;">' +
                     '            <th style="width: 1%;">No</th>' +
-                    '            <th style="width: 10%;">NPM</th>' +
+                    '            <th style="width: 10%;">NIM</th>' +
                     '            <th>Name</th>' +
                     '            <th style="width: 5%;">Action</th>' +
                     '        </tr>' +
@@ -926,9 +945,12 @@
             }
 
             $('#GlobalModalLarge .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-                '<h4 class="modal-title">Attendance Students | Pertemuan '+No+'</h4>');
+                '<h4 class="modal-title">Edit Students</h4>');
 
             $('#GlobalModalLarge .modal-body').html(body_attd);
+
+            $('#filterCurriculumAttd').empty();
+            loadSelectOptionCurriculum('#filterCurriculumAttd','');
 
             if(jsonResult.length>0){
 
@@ -946,8 +968,7 @@
                 }
             }
 
-            $('#GlobalModalLarge .modal-footer').html('Total : '+totalMhs+' | P : <span id="totalP"></span> | A : <span id="totalA"></span> | <button type="button" class="btn btn-default btn-attd-students" data-dismiss="modal">Close</button> ' +
-                '<button class="btn btn-success" id="btnSaveAttdStudents" data-no="'+No+'" data-id="'+ID+'">Save</button>');
+            $('#GlobalModalLarge .modal-footer').html('<button type="button" class="btn btn-default btn-attd-students" data-dismiss="modal">Close</button>');
             $('#GlobalModalLarge').modal({
                 'show' : true,
                 'backdrop' : 'static'
@@ -956,4 +977,34 @@
 
         });
     });
+
+    $(document).on('keyup','#formSimpleSearchAttd',function () {
+        var formSimpleSearch = $('#formSimpleSearchAttd').val();
+        if(formSimpleSearch!='' && formSimpleSearch!=null){
+            var url = base_url_js+'api/__getSimpleSearchStudents?key='+formSimpleSearch;
+            $.getJSON(url,function (jsonResult) {
+
+                $('#rowStdAttd').empty();
+                if(jsonResult.length>0){
+                    for(var i=0;i<jsonResult.length;i++){
+                        var d = jsonResult[i];
+
+
+                        $('#rowStdAttd').append('<tr>' +
+                            '<td style="text-align: left;">'+d.Username+'</td>' +
+                            '<td>'+d.Name+'</td>' +
+                            '<td><button class="btn btn-success btn-block">Add Student</button></td>' +
+                            '</tr>');
+                    }
+                }
+                else {
+                    $('#rowStdAttd').empty();
+                    $('#rowStdAttd').append('<tr>' +
+                        '<td colspan="3">-- Data Not Yet --</td>' +
+                        '</tr>');
+                }
+            });
+        }
+    });
+
 </script>
