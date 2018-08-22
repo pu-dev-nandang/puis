@@ -91,7 +91,7 @@
                 </a>
             </li>
             <li class="<?php if($this->uri->segment(2)=='attendance'){echo "current";} ?>">
-                <a href="<?php echo base_url('academic/attendance'); ?>">
+                <a href="<?php echo base_url('academic/attendance/input-attendace'); ?>">
                     <i class="fa fa-users"></i>
                     Attendance
                 </a>

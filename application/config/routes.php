@@ -117,8 +117,11 @@ $route['database/mentor-academic'] = 'page/database/c_database/mentor_academic';
 
 
 // --- Presensi ---
-$route['academic/attendance'] = 'page/academic/c_presensi';
+$route['academic/attendance/input-attendace'] = 'page/academic/c_presensi';
 $route['academic/loadPagePresensi'] = 'page/academic/c_presensi/loadPagePresensi';
+
+$route['academic/attendance/monitoring-attendace-lecturer'] = 'page/academic/c_presensi/monitoring_lecturer';
+$route['academic/attendance/monitoring-attendace-student'] = 'page/academic/c_presensi/monitoring_student';
 
 
 // -- master student -- 
@@ -605,6 +608,7 @@ $route['api/__crudKRSOnline'] = 'api/c_api/crudKRSOnline';
 
 $route['api/__crudCombinedClass'] = 'api/c_api/crudCombinedClass';
 $route['api/__getSimpleSearch'] = 'api/c_api/getSimpleSearch';
+$route['api/__getSimpleSearchStudents'] = 'api/c_api/getSimpleSearchStudents';
 
 
 //v_reservation
