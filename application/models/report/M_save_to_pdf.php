@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class M_save_to_pdf extends CI_Model {
 
 
-    public function getScheduleByDay($SemesterID,$DayID){
+    public function getScheduleByDay($SemesterID,$DayID,$dateNow){
 
         // Get Name Semester ID
         $dataSm = $this->db->select('Name AS SemesterName')->get_where('db_academic.semester',array('ID'=>$SemesterID),1)->result_array();
@@ -21,9 +21,40 @@ class M_save_to_pdf extends CI_Model {
                                             WHERE s.SemesterID = "'.$SemesterID.'" AND sd.DayID = "'.$DayID.'"
                                             ORDER BY sd.StartSessions, sd.EndSessions, s.ClassGroup ASC ')->result_array();
 
+
+
+        $dayNumb = date('N', strtotime($dateNow));
+
+        if($dayNumb == $DayID){
+            $dataEx = $this->db->query('SELECT s.ID, s.TeamTeaching, s.ClassGroup, sd.StartSessions, sd.EndSessions, em.Name AS Coordinator,
+                                            cl.Room AS ClassRoom  FROM db_academic.schedule_exchange ex 
+                                            LEFT JOIN db_academic.attendance attd ON (attd.ID = ex.ID_Attd)
+                                            LEFT JOIN db_academic.schedule s ON (attd.ScheduleID = s.ID)
+                                            LEFT JOIN db_academic.schedule_details sd ON (sd.ScheduleID = s.ID)
+                                            LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                            LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+                                              WHERE ex.Date = "'.$dateNow.'" ')
+                ->result_array();
+
+            if(count($dataEx)>0){
+                for($e=0;$e<count($dataEx);$e++){
+                    $dataEx[$e]['Label'] = 'Ex';
+                    array_push($dataSc,$dataEx[$e]);
+                }
+            }
+        }
+
+
+
+
+
+
         if(count($dataSc)>0){
             for($i=0;$i<count($dataSc);$i++){
                 $d = $dataSc[$i];
+
+                $d['Label'] = (isset($d['Label']) && $d['Label']=='Ex') ? 'Ex' : 'Pr';
+
                 $detailTeamTeaching = [];
                 if($d['TeamTeaching']=='1' || $d['TeamTeaching']==1){
                     $dataEm = $this->db->query('SELECT em.Name FROM db_academic.schedule_team_teaching stt 
@@ -63,6 +94,5 @@ class M_save_to_pdf extends CI_Model {
         return $arrResult;
 
     }
-
 
 }

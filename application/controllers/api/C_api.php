@@ -2659,13 +2659,11 @@ class C_api extends CI_Controller {
 
                 return print_r(1);
             }
-
             else if($data_arr['action']=='DeleteAttdLecturers'){
                 $this->db->where('ID', $data_arr['ID']);
                 $this->db->delete('db_academic.attendance_lecturers');
                 return print_r(1);
             }
-
             else if($data_arr['action']=='filterPresensi'){
 
                 if($data_arr['CombinedClasses']=='0'){
@@ -2727,6 +2725,15 @@ class C_api extends CI_Controller {
                 }
 
                 return print_r(1);
+            }
+            else if($data_arr['action']=='monitoringLecturer'){
+//                print_r($data_arr);
+                $SemesterID = $data_arr['SemesterID'];
+                $ProdiID = $data_arr['ProdiID'];
+
+                $data = $this->m_api->__getMonitoringAttdLecturer($SemesterID,$ProdiID);
+
+                return print_r(json_encode($data));
             }
         }
     }

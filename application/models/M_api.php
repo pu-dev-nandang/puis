@@ -3140,4 +3140,52 @@ class M_api extends CI_Model {
         return $smt;
     }
 
+    public function __getMonitoringAttdLecturer($SemesterID,$ProdiID){
+        $data = $this->db->query('SELECT sdc.ScheduleID, s.ClassGroup,  mk.NameEng AS MKNameEng, mk.MKCode, em.Name AS Lecturer, em.NIP
+                                             FROM db_academic.schedule_details_course sdc
+                                             LEFT JOIN db_academic.schedule s ON (s.ID = sdc.ScheduleID)
+                                             LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                             LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                             WHERE sdc.ProdiID = "'.$ProdiID.'" 
+                                             AND s.SemesterID = "'.$SemesterID.'" GROUP BY s.ID ORDER BY s.ClassGroup ASC ')->result_array();
+
+
+        // Get Schedule && Attendace
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+                $d = $data[$i];
+
+                $dataSc = $this->db->query('SELECT sd.ID, d.NameEng AS DayEng, cl.Room, sd.StartSessions, sd.EndSessions 
+                                                      FROM db_academic.schedule_details sd 
+                                                      LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
+                                                      LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+                                                      WHERE sd.ScheduleID = "'.$d['ScheduleID'].'"
+                                                      ')->result_array();
+
+                if(count($dataSc)>0){
+                    for($s=0;$s<count($dataSc);$s++){
+                        $dCourse = $dataSc[$s];
+
+                        $dataAttd = $this->db->select('Meet1,Meet2,Meet3,Meet4,Meet5,Meet6,Meet7,Meet8,Meet9,Meet10,
+                        Meet11,Meet12,Meet13,Meet14')
+                            ->get_where('db_academic.attendance',
+                            array('SemesterID'=>$SemesterID,'ScheduleID'=>$d['ScheduleID'],'SDID' => $dCourse['ID']),1)->result_array();
+
+                        $dCourse['Attendance'] = $dataAttd;
+                        $dataSc[$s] = $dCourse;
+
+                    }
+                }
+
+
+                $d['Schedule'] = $dataSc;
+
+
+                $data[$i] = $d;
+            }
+        }
+
+        return $data;
+    }
+
 }

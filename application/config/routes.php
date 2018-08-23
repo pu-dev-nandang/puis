@@ -455,6 +455,7 @@ $route['get_detail_cicilan_fee_admisi'] =  'api/C_global/get_detail_cicilan_fee_
 
 // ---- Save to PDF ---
 $route['save2pdf/schedule-pdf'] =  'c_save_to_pdf/schedulePDF';
+$route['save2pdf/monitoringAttdLecturer'] =  'c_save_to_pdf/monitoringAttdLecturer';
 
 $route['save2pdf/listStudentsFromCourse'] =  'c_save_to_pdf/listStudentsFromCourse';
 
