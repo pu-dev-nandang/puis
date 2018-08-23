@@ -1008,3 +1008,57 @@
     });
 
 </script>
+
+<!-- Delete Attendance -->
+<script>
+    $(document).on('click','.deleteAttendance',function () {
+
+
+        var ID = $(this).attr('data-id');
+        var No = $(this).attr('data-no');
+
+        $('#NotificationModal .modal-body').html('<div style="text-align: center;"><h3>Delete Attendance in <b>Session '+No+'</b> ??</h3><hr/> ' +
+            '<button type="button" class="btn btn-danger" id="btnDeleteAttendance"  data-no="'+No+'" data-id="'+ID+'" style="margin-right: 5px;">Yes</button>' +
+            '<button type="button" class="btn btn-default" id="btnCloseDelAttd" data-dismiss="modal">No</button>' +
+            '</div>');
+        // $('#NotificationModal').modal('show');
+        //
+        // $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+        //     '<h4 class="modal-title">Attendance '+No+'</h4>');
+        //
+        // var body_attd = '<div style="text-align: center;"><hr/>' +
+        //     '<button type="button" id="" class="btn btn-default" data-dismiss="modal">Close</button> | ' +
+        //     '<button class="btn btn-danger" id="" data-no="'+No+'" data-id="'+ID+'">Yes</button></div>';
+        // $('#GlobalModal .modal-body').html(body_attd);
+        //
+        // $('#GlobalModal .modal-footer').html('');
+        $('#NotificationModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+    });
+
+    $(document).on('click','#btnDeleteAttendance',function () {
+        var No = $(this).attr('data-no');
+        var ID = $(this).attr('data-id');
+
+        loading_buttonSm('#btnDeleteAttendance');
+        $('#btnCloseDelAttd').prop('disabled',true);
+
+
+        var url = base_url_js+'api/__crudAttendance';
+        var data = {
+            action : 'DeleteAttendance',
+            ID_Attd : ID,
+            Meet : No
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        $.post(url,{token:token},function () {
+            toastr.success('Data Removed','Remove Success');
+            getDataAttendance();
+            setTimeout(function (args) {
+                $('#NotificationModal').modal('hide');
+            },500);
+        });
+    });
+</script>

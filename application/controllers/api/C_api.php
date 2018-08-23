@@ -2727,13 +2727,32 @@ class C_api extends CI_Controller {
                 return print_r(1);
             }
             else if($data_arr['action']=='monitoringLecturer'){
-//                print_r($data_arr);
                 $SemesterID = $data_arr['SemesterID'];
                 $ProdiID = $data_arr['ProdiID'];
 
                 $data = $this->m_api->__getMonitoringAttdLecturer($SemesterID,$ProdiID);
 
                 return print_r(json_encode($data));
+            }
+
+            else if ($data_arr['action']=='DeleteAttendance'){
+
+                // Delete Attendance Lecturer
+                $this->db->where(array('ID_Attd' => $data_arr['ID_Attd'], 'Meet' => $data_arr['Meet']));
+                $this->db->delete('db_academic.attendance_lecturers');
+
+                // Set Null di Student
+                $this->db->set('M'.$data_arr['Meet'], null);
+                $this->db->where('ID_Attd', $data_arr['ID_Attd']);
+                $this->db->update('db_academic.attendance_students');
+
+                // Set Null di Attendance
+                $this->db->set('Meet'.$data_arr['Meet'], null);
+                $this->db->where('ID', $data_arr['ID_Attd']);
+                $this->db->update('db_academic.attendance');
+
+                return print_r(1);
+
             }
         }
     }
