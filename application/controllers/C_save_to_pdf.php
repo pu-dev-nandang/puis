@@ -23,15 +23,16 @@ class C_save_to_pdf extends CI_Controller {
 
     // ==== PDF Schedule ====
     public function schedulePDF(){
+
         $token = $this->input->get('token');
         $data_arr = $this->getInputToken($token);
 
 
+
+
         $pdf = new FPDF('l','mm','A4');
 
-
-        $data_sch = $this->m_save_to_pdf->getScheduleByDay($data_arr['SemesterID'],$data_arr['DayID']);
-
+        $data_sch = $this->m_save_to_pdf->getScheduleByDay($data_arr['SemesterID'],$data_arr['DayID'],date("Y-m-d"));
 
         if(count($data_sch)>0){
 
@@ -55,7 +56,10 @@ class C_save_to_pdf extends CI_Controller {
 
                     $w = (count($d_course['detailTeamTeaching'])>0) ? (count($d_course['detailTeamTeaching'])+1) * $deft_w : $deft_w;
 
-                    $pdf->Cell(10,$w,$no,1,0,'C');
+                    $pdf->SetFillColor(255, 206, 206);
+                    $lb = ($d_course['Label']=='Ex') ? true : false;
+
+                    $pdf->Cell(10,$w,$no,1,0,'C',$lb);
                     $pdf->Cell(20,$w,$d_course['ClassGroup'],1,0,'C');
 
                     $course = (strlen(trim($d_course['Course']))>=55) ? substr(trim($d_course['Course']),0,55).'_' : trim($d_course['Course']);
@@ -86,12 +90,10 @@ class C_save_to_pdf extends CI_Controller {
                         }
                     }
 
-//                    $y = $pdf->GetY();
                     if($pdf->GetY()>173){
                         $pdf->AddPage();
                         $this->header_schedule($pdf,$SemesterDetails,$DayNameEng);
                     }
-//                    $pdf->Cell(0,$deft_w,''.$y,1,1,'L');
 
                     $no += 1;
                 }
@@ -101,6 +103,13 @@ class C_save_to_pdf extends CI_Controller {
             }
 
         }
+
+
+
+
+
+
+
         $pdf->Output('I',$DayNameEng.'_schedule.pdf');
     }
 
@@ -139,6 +148,7 @@ class C_save_to_pdf extends CI_Controller {
     //===========
 
     // ==== PDF Monitoring Attendance Lecturer ====
+
     public function monitoringAttdLecturer(){
         $token = $this->input->post('token');
 
@@ -236,6 +246,7 @@ class C_save_to_pdf extends CI_Controller {
 
     }
 
+    // ============================================
 
     public function listStudentsFromCourse(){
 
