@@ -24,6 +24,28 @@
                     </li>
                 </ul>
             </li>-->
+            <?php 
+            $authIT =  $this->session->userdata('PositionMain');
+            $authIT =  $authIT['IDDivision'];
+            ?>
+
+
+            <?php if ($authIT == 12 ): ?>
+                <li class="<?php if($this->uri->segment(2)=='config'){echo "current open";} ?>">
+                    <a href="javascript:void(0);">
+                        <i class="fa fa-wrench"></i>
+                        Config
+                    </a>
+                    <ul class="sub-menu">
+                        <li class="<?php if($this->uri->segment(2)=='config' && $this->uri->segment(3) == "policysys" ){echo "current";} ?>">
+                            <a href="<?php echo base_url('finance/config/policysys'); ?>">
+                            <i class="icon-angle-right"></i>
+                            Policy System
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            <?php endif ?>    
             <li class="<?php if($this->uri->segment(1)=='dashboard'){echo "current";} ?>">
                 <a href="<?php echo base_url('dashboard'); ?>">
                     <i class="fa fa-tachometer"></i>
@@ -166,7 +188,7 @@
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "edit-cicilan-tagihan-mhs"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/edit-cicilan-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
-                        Edit / Delete Cicilan
+                        Edit / Delete Pembayaran
                         </a>
                     </li>
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "cancel-tagihan-mhs"){echo "current";} ?>">

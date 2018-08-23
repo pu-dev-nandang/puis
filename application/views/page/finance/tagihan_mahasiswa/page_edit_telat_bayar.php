@@ -124,7 +124,26 @@
                          var status = '';
                          if(Data_mhs[i]['StatusPayment'] == 0)
                          {
-                           status = 'Belum Approve <br> Belum Lunas';
+                           status = 'Belum Approve ';
+                           for (var j = 0; j < Data_mhs[i]['DetailPayment'].length; j++) {
+                             var a = Data_mhs[i]['DetailPayment'][j]['Status'];
+                             if(a== 1)
+                             {
+                               b = parseInt(b) + parseInt(Data_mhs[i]['DetailPayment'][j]['Invoice']);
+                               //bayar = bayar + 1;
+                             }
+                             //cicilan = cicilan + 1;
+                           }
+                           if(b < Data_mhs[i]['InvoicePayment'])
+                           {
+                             status += '<br> Belum Lunas';
+                             // ccc = 1;
+                           }
+                           else
+                           {
+                             status += '<br> Lunas';
+                             // ccc = 2
+                           }
                          }
                          else
                          {

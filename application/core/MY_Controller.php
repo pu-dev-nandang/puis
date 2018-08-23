@@ -331,7 +331,20 @@ abstract class Finnance_Controler extends Globalclass{
     public function __construct()
     {
         parent::__construct();
+        // save session using VA or NOT
+        $this->get_PolicySYS();
     }
+
+    public function get_PolicySYS()
+    {
+        if (!$this->session->userdata('finance_auth_Policy_SYS')) {
+            $this->load->model('master/m_master');
+            $get = $this->m_master->showData_array('db_finance.cfg_policy_sys');
+            $this->session->set_userdata('finance_auth_Policy_SYS',$get[0]['VA_active']);
+        }
+    }
+
+
 }
 
 

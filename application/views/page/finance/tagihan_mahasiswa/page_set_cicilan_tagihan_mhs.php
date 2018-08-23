@@ -205,30 +205,33 @@
 
                     if(Data_mhs.length > 0)
                     {
-                      if (Data_mhs[0]['DetailPayment'].length == 1) {
-                            $('#datatable2').removeClass('hide');
-                            var sss = '<select class = "full-width-fix" id = "jml_cicilan">'+
-                                               ' <option value = "" disabled selected>--Pilih Jumlah Cicilan--</option>';
-                            for (var l = 2; l <= max_cicilan; l++) {
-                                sss += ' <option value = "'+l+'">'+l+'</option>'
-                            }
+                      if(Data_mhs[0]['StatusPayment'] == 0) {// menandakan belum approve
+                        if (Data_mhs[0]['DetailPayment'].length == 1) {
+                              $('#datatable2').removeClass('hide');
+                              var sss = '<select class = "full-width-fix" id = "jml_cicilan">'+
+                                                 ' <option value = "" disabled selected>--Pilih Jumlah Cicilan--</option>';
+                              for (var l = 2; l <= max_cicilan; l++) {
+                                  sss += ' <option value = "'+l+'">'+l+'</option>'
+                              }
 
-                            sss += '</select>';                   
+                              sss += '</select>';                   
 
-                            var aaa = '<div class = "row">'+
-                                    '<div class="form-group">'+
-                                        '<label class="col-xs-1 control-label">Set Cicilan</label>'+  
-                                        '<div class = "col-xs-2">'+
-                                           sss+
-                                        '</div>'+  
-                                    '</div>'+    
-                                '</div><br>'+
-                                '<div class = "row" id="pageSetCicilan">'+
-                                '</div>'
-                            $(".widget-content").html(aaa);
-                            $("#inputCicilan").removeClass('hide');
+                              var aaa = '<div class = "row">'+
+                                      '<div class="form-group">'+
+                                          '<label class="col-xs-1 control-label">Set Cicilan</label>'+  
+                                          '<div class = "col-xs-2">'+
+                                             sss+
+                                          '</div>'+  
+                                      '</div>'+    
+                                  '</div><br>'+
+                                  '<div class = "row" id="pageSetCicilan">'+
+                                  '</div>'
+                              $(".widget-content").html(aaa);
+                              $("#inputCicilan").removeClass('hide');
 
-                      }  
+                        } 
+                      }
+                        
                     }
                 } else {
                   toastr.error('Error', 'Failed!!');

@@ -63,21 +63,21 @@
         <table class="table table-bordered datatable2 hide" id = "datatable2">
             <thead>
             <tr style="background: #333;color: #fff;">
-                <th style="width: 3%;"><input type="checkbox" class="uniform" value="nothing" id ="dataResultCheckAll"></th>
-                <th style="width: 12%;">Program Study</th>
+                <th style="width: 2%;"><input type="checkbox" class="uniform" value="nothing" id ="dataResultCheckAll"></th>
+                <th style="width: 8%;">Program Study</th>
                 <!-- <th style="width: 10%;">Semester</th> -->
                 <th style="width: 20%;">Nama,NPM &  VA</th>
                 <!-- <th style="width: 5%;">NPM</th> -->
                 <!-- <th style="width: 5%;">Year</th> -->
-                <th style="width: 15%;">Payment Type</th>
-                <th style="width: 15%;">Email PU</th>
+                <th style="width: 8%;">Payment Type</th>
+                <!-- <th style="width: 15%;">Email PU</th> -->
                 <th style="width: 5%;">IPS</th>
                 <th style="width: 5%;">IPK</th>
                 <th style="width: 5%;">Discount</th>
-                <th style="width: 10%;">Invoice</th>
-                <th style="width: 20%;">Cicilan</th>
-                <th style="width: 10%;">Status</th>
-                <th style="width: 10%;">Detail Payment</th>
+                <th style="width: 10%;">Total Invoice</th>
+                <th style="width: 10%;">Cicilan</th>
+                <th style="width: 15%;">Status</th>
+                <th style="width: 20%;">Detail Payment</th>
             </tr>
             </thead>
             <tbody id="dataRow"></tbody>
@@ -183,7 +183,7 @@
 
                     if(Data_mhs[i]['StatusPayment'] == 0)
                     {
-                      status = 'Belum Approve <br> Belum Lunas';
+                      status = 'Belum Approve';
                       for (var j = 0; j < Data_mhs[i]['DetailPayment'].length; j++) {
                         var a = Data_mhs[i]['DetailPayment'][j]['Status'];
                         if(a== 1)
@@ -192,6 +192,17 @@
                           bayar = bayar + 1;
                         }
                         cicilan = cicilan + 1;
+                      }
+
+                      if(b < Data_mhs[i]['InvoicePayment'])
+                      {
+                        status += '<br> Belum Lunas';
+                        // ccc = 1;
+                      }
+                      else
+                      {
+                        status += '<br> Lunas';
+                        // ccc = 2
                       }
 
                       if(cicilan == 1)
@@ -260,7 +271,10 @@
                    else
                    {
                     tr = '<tr style="background-color: #8ED6EA; color: black;" NPM = "'+Data_mhs[i]['NPM']+'">';
-                    inputCHK = ''; 
+                    inputCHK = '';
+                    <?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
+                       inputCHK = '<input type="checkbox" class="uniform" value ="'+Data_mhs[i]['NPM']+'" Prodi = "'+Data_mhs[i]['ProdiEng']+'" Nama ="'+Data_mhs[i]['Nama']+'" semester = "'+Data_mhs[i]['SemesterID']+'" ta = "'+Data_mhs[i]['Year']+'" invoice = "'+Data_mhs[i]['InvoicePayment']+'" discount = "'+Data_mhs[i]['Discount']+'" PTID = "'+Data_mhs[i]['PTID']+'" PTName = "'+Data_mhs[i]['PTIDDesc']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'" Status = "'+ccc+'">'; 
+                     <?php endif ?> 
                    } 
 
                    // show to fixed
@@ -277,6 +291,14 @@
 
                    // show bintang
                    var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>'; 
+
+                   var btn_edit = '';
+                   var btn_view = '<button class = "DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'">View</button>';
+                   <?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
+                     btn_edit = '<br><br> <button class = "btn btn-default edit" NPM = "'+Data_mhs[i]['NPM']+'" semester = "'+Data_mhs[i]['SemesterID']+'" PTID = "'+Data_mhs[i]['PTID']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'">Edit Tagihan</button>';
+                     var btn_view = '<button class = " btn btn-primary DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'">Pembayaran Manual </button>';
+                   <?php endif ?>
+
                    $('#dataRow').append(tr +
                        '<td>'+inputCHK+'</td>' +
                        '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
@@ -285,14 +307,14 @@
                        // '<td>'+Data_mhs[i]['NPM']+'</td>' +
                        // '<td>'+Data_mhs[i]['Year']+'</td>' +
                        '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +
-                       '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
+                       // '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
                        '<td>'+IPS+'</td>' +
                        '<td>'+IPK+'</td>' +
                        '<td>'+Data_mhs[i]['Discount']+'%</td>' +
                        '<td>'+yy+'</td>' +
                        '<td>'+htmlCicilan+'</td>'+
                        '<td>'+status+'</td>' +
-                       '<td>'+'<button class = "DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'">View</button>'+'</td>' +
+                       '<td>'+btn_view+btn_edit+'</td>' +
                        '</tr>');
                }
 
@@ -318,6 +340,23 @@
         $('input.uniform').not(this).prop('checked', this.checked);
     });
 
+    $(document).on('click','.edit', function () {
+        var PaymentID = $(this).attr('PaymentID');
+        var NPM = $(this).attr('NPM');
+        var semester = $(this).attr('semester');
+        var PTID = $(this).attr('PaymentID');
+        var data = {
+            PaymentID : PaymentID,
+            NPM : NPM,
+            semester  : semester,
+            PTID : PTID,
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        window.open(base_url_js+'finance/edit_telat_bayar/'+token,'_blank');
+
+
+    });
+
     $(document).on('click','.DetailPayment', function () {
         var NPM = $(this).attr('NPM');
         var PaymentID = $(this).attr('PaymentID');
@@ -332,11 +371,13 @@
                               '<th style="width: 55px;">Status</th>'+
                               '<th style="width: 55px;">Deadline</th>'+
                               '<th style="width: 55px;">UpdateAt</th>';
+        <?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
+          table += '<th style="width: 55px;">Action</th>' ;                        
+        <?php endif ?>                      
         table += '</tr>' ;  
         table += '</thead>' ; 
         table += '<tbody>' ;
         var isi = '';
-        // console.log(dataaModal);
         for (var i = 0; i < dataaModal.length; i++) {
           if(dataaModal[i]['PaymentID'] == PaymentID)
           {
@@ -345,6 +386,7 @@
             for (var j = 0; j < DetailPaymentArr.length; j++) {
               var yy = (DetailPaymentArr[j]['Invoice'] != '') ? formatRupiah(DetailPaymentArr[j]['Invoice']) : '-';
               var status = (DetailPaymentArr[j]['Status'] == 0) ? 'Belum Bayar' : 'Sudah Bayar';
+              var btn_bayar = (DetailPaymentArr[j]['Status'] == 0) ? '<button class = "bayar" IDStudent = "'+DetailPaymentArr[j]['ID']+'" bayar = "1">Bayar</button>' : '<button class = "bayar" IDStudent = "'+DetailPaymentArr[j]['ID']+'" bayar = "0">Tidak Bayar</button>';
               isi += '<tr>'+
                     '<td>'+ (j+1) + '</td>'+
                     '<td>'+ Nama + '</td>'+
@@ -353,6 +395,9 @@
                     '<td>'+ status + '</td>'+
                     '<td>'+ DetailPaymentArr[j]['Deadline'] + '</td>'+
                     '<td>'+ DetailPaymentArr[j]['UpdateAt'] + '</td>'+
+                    <?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
+                    '<td>'+ btn_bayar + '</td>'+
+                    <?php endif ?>  
                   '<tr>'; 
             }
             break;
@@ -413,6 +458,31 @@
          });
          return allVals;
     }
+
+    $(document).on('click','.bayar', function () {
+    });
+
+    $(document).on('click','.bayar', function () {
+        var IDStudent = $(this).attr('IDStudent');
+        var bayar = $(this).attr('bayar');
+        loading_button(".bayar[IDStudent='"+IDStudent+"']");
+        var url = base_url_js+'finance/bayar_manual_mahasiswa';
+        var data = {
+            IDStudent : IDStudent,
+            bayar : bayar,
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        $.post(url,{token:token},function (resultJson) {
+           // var resultJson = jQuery.parseJSON(resultJson);
+           loadData(1);
+           $(".bayar[IDStudent='"+IDStudent+"']").remove();
+        }).fail(function() {
+          toastr.info('No Action...'); 
+          // toastr.error('The Database connection error, please try again', 'Failed!!');
+        }).always(function() {
+
+        }); 
+    });
 
     $(document).on('click','#btn-submit', function () {
         var arrValueCHK = getChecboxNPM();

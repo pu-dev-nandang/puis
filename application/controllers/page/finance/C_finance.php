@@ -245,8 +245,14 @@ class C_finance extends Finnance_Controler {
                 {
                     $getDeadlineTagihanDB = $this->m_finance->getDeadlineTagihanDB($fieldEND,$SemesterID[0]['ID']);
                     // check Deadline Tagihan telah melewati tanggal sekarang atau belum
-                    //$chkTgl = $this->m_master->checkTglNow($getDeadlineTagihanDB);
-                    $chkTgl = true;
+                    if ($this->session->userdata('finance_auth_Policy_SYS') == 1) {
+                        $chkTgl = $this->m_master->checkTglNow($getDeadlineTagihanDB);
+                    }
+                    else
+                    {
+                        $chkTgl = true;
+                    }
+                    
                     if ($chkTgl) {
                         $getDataMhsBYNPM = $this->m_master->getDataMhsBYNPM($Input[$i]->NPM,$Input[$i]->ta);
                         $payment = str_replace("Rp.","", $Input[$i]->Invoice);
@@ -264,17 +270,28 @@ class C_finance extends Finnance_Controler {
                             $Name = $getDataMhsBYNPM[0]['Name'];
                             $Email = $getDataMhsBYNPM[0]['EmailPU'];
                             $VA_number = $this->m_finance->getVANumberMHS($Input[$i]->NPM);
-                            $create_va = $this->m_finance->create_va_Payment($payment,$DeadLinePayment, $Name, $Email,$VA_number,$description = $desc,$tableRoutes = 'db_finance.payment_students');
-                            if ($create_va['status']) {
-                                // After create va insert data to db_finance.payment  and db_finance.payment_students
-                                $countSuccessVA++;
-                                $aa = $this->m_finance->insertaDataPayment($Input[$i]->PTID,$Input[$i]->semester,$Input[$i]->NPM,$payment,$Input[$i]->Discount);
-                                $ab = $this->m_finance->insertaDataPaymentStudents($aa,$payment,$create_va['msg']['trx_id'],$create_va['msg']['datetime_expired']);
+
+                            // cek VA policy
+                            if ($this->session->userdata('finance_auth_Policy_SYS') == 1) {
+                                $create_va = $this->m_finance->create_va_Payment($payment,$DeadLinePayment, $Name, $Email,$VA_number,$description = $desc,$tableRoutes = 'db_finance.payment_students');
+                                if ($create_va['status']) {
+                                    // After create va insert data to db_finance.payment  and db_finance.payment_students
+                                    $countSuccessVA++;
+                                    $aa = $this->m_finance->insertaDataPayment($Input[$i]->PTID,$Input[$i]->semester,$Input[$i]->NPM,$payment,$Input[$i]->Discount);
+                                    $ab = $this->m_finance->insertaDataPaymentStudents($aa,$payment,$create_va['msg']['trx_id'],$create_va['msg']['datetime_expired']);
+                                }
+                                else
+                                {
+                                    $msg .= 'Tidak bisa Create VA dengan Nama : '.$Name.' dan NPM : '.$Input[$i]->NPM.'<br>';
+                                }
                             }
                             else
                             {
-                                $msg .= 'Tidak bisa Create VA dengan Nama : '.$Name.' dan NPM : '.$Input[$i]->NPM.'<br>';
+                                $countSuccessVA++;
+                                $aa = $this->m_finance->insertaDataPayment($Input[$i]->PTID,$Input[$i]->semester,$Input[$i]->NPM,$payment,$Input[$i]->Discount);
+                                $ab = $this->m_finance->insertaDataPaymentStudents($aa,$payment,0,$DeadLinePayment);
                             }
+                            
                         }
                     }
                     else
@@ -406,8 +423,14 @@ class C_finance extends Finnance_Controler {
             }            
                
             // check Deadline Input telah melewati tanggal Deadline
-            //$aaa = $this->m_master->chkTgl($Input[$i]->Deadline,$DeadLinePayment);
-            $aaa = true;
+            if ($this->session->userdata('finance_auth_Policy_SYS') == 1) {
+                $aaa = $this->m_master->chkTgl($Input[$i]->Deadline,$DeadLinePayment);
+            }
+            else
+            {
+                $aaa = true;
+            }
+            
             if (!$aaa) {
                 $bool = false;
                 break;
@@ -428,48 +451,61 @@ class C_finance extends Finnance_Controler {
                     for ($i=0; $i < count($Input); $i++) { 
                       // update cicilan untuk array 0 atau array pertama
                       if ($i == 0) {
-                        // update va existing
-                        $BilingID = $a[0]['BilingID'];
-                        $checkVa = $this->m_finance->checkBiling($BilingID);
-                        if ($checkVa['msg']['va_status'] != 2) {
-                            $getData= $this->m_master->caribasedprimary('db_va.va_log','trx_id',$BilingID);
-                            $trx_amount = $Input[$i]->Payment;
-                            $datetime_expired = $Input[$i]->Deadline;
-                            $customer_name = $getData[0]['customer_name'];
-                            $customer_email = $getData[0]['customer_email'];
-                            $update = $this->m_finance->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students',$desc);
-                            if ($update['status'] == 1) {
-                              // update data pada table db_finance.payment_students
-                                $this->m_finance->updateCicilanMHS($BilingID,$trx_amount,$datetime_expired);
+                        if ($this->session->userdata('finance_auth_Policy_SYS') == 1) {
+                            // update va existing
+                            $BilingID = $a[0]['BilingID'];
+                            $checkVa = $this->m_finance->checkBiling($BilingID);
+                            if ($checkVa['msg']['va_status'] != 2) {
+                                $getData= $this->m_master->caribasedprimary('db_va.va_log','trx_id',$BilingID);
+                                $trx_amount = $Input[$i]->Payment;
+                                $datetime_expired = $Input[$i]->Deadline;
+                                $customer_name = $getData[0]['customer_name'];
+                                $customer_email = $getData[0]['customer_email'];
+                                $update = $this->m_finance->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students',$desc);
+                                if ($update['status'] == 1) {
+                                  // update data pada table db_finance.payment_students
+                                    $this->m_finance->updateCicilanMHS($BilingID,$trx_amount,$datetime_expired);
+                                }
+                                else
+                                {
+                                  $arr['msg'] .= 'Va tidak bisa di update, error koneksi ke BNI <br>';
+                                }
                             }
                             else
                             {
-                              $arr['msg'] .= 'Va tidak bisa di update, error koneksi ke BNI <br>';
+                                $sqlDelete = 'delete from db_finance.payment_students where BilingID = "'.$BilingID.'"';
+                                $queryDelete=$this->db->query($sqlDelete, array());
+
+                                $getData= $this->m_master->caribasedprimary('db_va.va_log','trx_id',$BilingID);
+                                $VA_number = $getData[0]['virtual_account'];
+                                $trx_amount = $Input[$i]->Payment;
+                                $datetime_expired = $Input[$i]->Deadline;
+                                $customer_name = $getData[0]['customer_name'];
+                                $customer_email = $getData[0]['customer_email'];
+                                // $update = $this->m_finance->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students',$desc);
+                                $update = $this->m_finance->create_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$VA_number,'Re-'.$desc,'db_finance.payment_students');
+                                if ($update['status']) {
+                                  // update data pada table db_finance.payment_students
+                                    // $this->m_finance->updateCicilanMHS($BilingID,$trx_amount,$datetime_expired);
+                                    $this->m_finance->insertaDataPaymentStudents($ID,$Input[$i]->Payment,$update['msg']['trx_id'],$Input[$i]->Deadline);
+                                }
+                                else
+                                {
+                                  $arr['msg'] .= 'Va tidak bisa di update, error koneksi ke BNI <br>';
+                                }
                             }
-                        }
+                        } // exit if va status
                         else
                         {
-                            $sqlDelete = 'delete from db_finance.payment_students where BilingID = "'.$BilingID.'"';
-                            $queryDelete=$this->db->query($sqlDelete, array());
+                            // update data pada table db_finance.payment_students
+                              $trx_amount = $Input[$i]->Payment;
+                              $datetime_expired = $Input[$i]->Deadline;
+                              $ID_psStudent = $a[0]['ID'];
+                              $this->m_finance->UpdateCicilanbyID($ID_psStudent,0,$trx_amount,$datetime_expired);
+                              //$this->m_finance->updateCicilanMHS(0,$trx_amount,$datetime_expired);
 
-                            $getData= $this->m_master->caribasedprimary('db_va.va_log','trx_id',$BilingID);
-                            $VA_number = $getData[0]['virtual_account'];
-                            $trx_amount = $Input[$i]->Payment;
-                            $datetime_expired = $Input[$i]->Deadline;
-                            $customer_name = $getData[0]['customer_name'];
-                            $customer_email = $getData[0]['customer_email'];
-                            // $update = $this->m_finance->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students',$desc);
-                            $update = $this->m_finance->create_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$VA_number,'Re-'.$desc,'db_finance.payment_students');
-                            if ($update['status']) {
-                              // update data pada table db_finance.payment_students
-                                // $this->m_finance->updateCicilanMHS($BilingID,$trx_amount,$datetime_expired);
-                                $this->m_finance->insertaDataPaymentStudents($ID,$Input[$i]->Payment,$update['msg']['trx_id'],$Input[$i]->Deadline);
-                            }
-                            else
-                            {
-                              $arr['msg'] .= 'Va tidak bisa di update, error koneksi ke BNI <br>';
-                            }
                         }
+                        
                       }
                       else
                       {
@@ -1075,6 +1111,35 @@ class C_finance extends Finnance_Controler {
             $this->db->where('Status',0);
             $this->db->update('db_finance.payment_students', $dataSave);
         }
+    }
+
+    public function bayar_manual_mahasiswa()
+    {
+        $input = $this->getInputToken();
+        $IDStudent = $input['IDStudent'];
+        $bayar = $input['bayar'];
+        if ($bayar == 1) {
+            $dataSave = array(
+                    'Status' => 1,
+                    'BilingID' => 0,
+                    'UpdateAt' => date('Y-m-d H:i:s'),
+                            );
+            $this->db->where('ID',$IDStudent);
+            $this->db->where('Status',0);
+            $this->db->update('db_finance.payment_students', $dataSave);
+        }
+        else
+        {
+            $dataSave = array(
+                    'Status' => 0,
+                    'BilingID' => 0,
+                    'UpdateAt' => date('Y-m-d H:i:s'),
+                            );
+            $this->db->where('ID',$IDStudent);
+            $this->db->where('Status',1);
+            $this->db->update('db_finance.payment_students', $dataSave);
+        }
+        
     }
     
 
