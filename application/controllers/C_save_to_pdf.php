@@ -138,6 +138,104 @@ class C_save_to_pdf extends CI_Controller {
     }
     //===========
 
+    // ==== PDF Monitoring Attendance Lecturer ====
+    public function monitoringAttdLecturer(){
+        $token = $this->input->post('token');
+
+        $data_arr = $this->getInputToken($token);
+
+        $pdf = new FPDF('l','mm','A4');
+
+        $pdf->AddPage();
+
+        $pdf->Image(base_url('images/icon/logo-hr.png'),10,10,50);
+
+        $pdf->SetFont('Times','B',10);
+
+        $pdf->Ln(1);
+
+        $h = 4;
+
+        $pdf->Cell(296,$h,'Universitas Agung Podomoro',0,1,'C');
+
+        $pdf->SetFont('Times','',8);
+        $pdf->Cell(296,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28 Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
+        $pdf->Cell(296,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
+
+        $pdf->Line(10,27,296,27);
+
+        $pdf->Ln(7);
+
+        $pdf->SetFont('Times','B',8);
+        $pdf->Cell(296,$h,'ATTENDANCE REPORT SEMESTER '.strtoupper($data_arr['Semester']),0,1,'C');
+        $pdf->Cell(296,$h,'PROGRAMME STUDY : '.strtoupper($data_arr['Prodi']),0,1,'C');
+
+        $pdf->Ln(5);
+
+        $h = 5.5;
+
+        $pdf->SetFillColor(226, 226, 226);
+        $pdf->SetFont('Times','B',8);
+        $pdf->Cell(8,$h + $h,'No',1,0,'C',true);
+        $pdf->Cell(22,$h + $h,'Code',1,0,'C',true);
+        $pdf->Cell(85,$h + $h,'Course',1,0,'C',true);
+        $pdf->Cell(15,$h + $h,'Group',1,0,'C',true);
+        $pdf->Cell(50,$h + $h,'Lecturer',1,0,'C',true);
+
+        $pdf->Cell(20,$h + $h,'Day',1,0,'C',true);
+        $pdf->Cell(20,$h + $h,'Time',1,0,'C',true);
+        $pdf->Cell(24,$h + $h,'Room',1,0,'C',true);
+        $pdf->Cell(43,$h,'Session',1,1,'C',true);
+
+        $pdf->Cell(244,$h,'',0,0,'C');
+        $pdf->Cell(14,$h,'Target',1,0,'C',true);
+        $pdf->Cell(14,$h,'Real',1,0,'C',true);
+        $pdf->Cell(15,$h,'%',1,1,'C',true);
+
+        $pdf->SetFont('Times','',8);
+        $save2PDF = (array) $data_arr['save2PDF'];
+        if(count($save2PDF)>0){
+            $no = 1;
+            for($s=0;$s<count($save2PDF);$s++){
+                $d = (array) $save2PDF[$s];
+
+                $newH = $h * count($d['Schedule']);
+
+                $pdf->Cell(8,$newH,($no++),1,0,'C');
+                $pdf->Cell(22,$newH,$d['MKCode'],1,0,'C');
+                $pdf->Cell(85,$newH,' '.$d['MKNameEng'],1,0);
+                $pdf->Cell(15,$newH,$d['ClassGroup'],1,0,'C');
+                $pdf->Cell(50,$newH,' '.$d['Lecturer'],1,0);
+
+                for($c=0;$c<count($d['Schedule']);$c++){
+                    $dt = (array) $d['Schedule'][$c];
+
+                    if($c!=0){
+                        $pdf->Cell(180,$h,'',0,0,'C');
+                    }
+
+                    $pdf->Cell(20,$h,$dt['Day'],1,0,'C');
+                    $pdf->Cell(20,$h,$dt['Time'],1,0,'C');
+                    $pdf->Cell(24,$h,$dt['Room'],1,0,'C');
+
+                    $pdf->Cell(14,$h,$dt['Target'],1,0,'C');
+                    $pdf->Cell(14,$h,$dt['Real'],1,0,'C');
+                    $pdf->Cell(15,$h,$dt['Percent'],1,1,'C');
+
+                }
+
+
+
+            }
+        }
+
+
+
+        $pdf->Output('I','Monitoring_Attendance_Lecturer.pdf');
+
+
+    }
+
 
     public function listStudentsFromCourse(){
 
