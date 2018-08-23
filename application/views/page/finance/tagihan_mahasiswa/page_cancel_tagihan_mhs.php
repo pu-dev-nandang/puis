@@ -37,6 +37,10 @@
         </div>
     </div>
 </div>
+<br>
+<!-- <div class="thumbnail" style="padding: 10px;">
+    <b>Status : </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Approve & Paid Off | <i class="fa fa-circle" style="color: #eade8e;"></i> Approve & Not Yet Paid Off  
+</div> -->
 
 <div class="row">
     <div class="col-md-12">
@@ -156,7 +160,26 @@
                     var status = '';
                     if(Data_mhs[i]['StatusPayment'] == 0)
                     {
-                      status = 'Belum Approve <br> Belum Lunas';
+                      status = 'Belum Approve ';
+                      for (var j = 0; j < Data_mhs[i]['DetailPayment'].length; j++) {
+                        var a = Data_mhs[i]['DetailPayment'][j]['Status'];
+                        if(a== 1)
+                        {
+                          b = parseInt(b) + parseInt(Data_mhs[i]['DetailPayment'][j]['Invoice']);
+                          //bayar = bayar + 1;
+                        }
+                        //cicilan = cicilan + 1;
+                      }
+                      if(b < Data_mhs[i]['InvoicePayment'])
+                      {
+                        status += '<br> Belum Lunas';
+                        // ccc = 1;
+                      }
+                      else
+                      {
+                        status += '<br> Lunas';
+                        // ccc = 2
+                      }
                     }
                     else
                     {
@@ -202,7 +225,8 @@
 
                    if(Data_mhs[i]['StatusPayment'] == 0) // menandakan belum approve
                     {
-                      if (Data_mhs[i]['DetailPayment'].length == 1) { // menandakan bahwa yang di cancel yang bukan memiliki cicilan lebih dari satu
+                      // if (Data_mhs[i]['DetailPayment'].length == 1) { // menandakan bahwa yang di cancel yang bukan memiliki cicilan lebih dari satu
+                      if (Data_mhs[i]['DetailPayment'].length > 0) { // menandakan bahwa yang di cancel yang bukan memiliki cicilan lebih dari satu
                         // show bintang
                         var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
                         t_array.push(Data_mhs[i]['Nama']);

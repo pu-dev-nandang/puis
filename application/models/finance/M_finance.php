@@ -1004,11 +1004,16 @@ class M_finance extends CI_Model {
       $ta1 = $ta[1];
     }
 
+    $policyStatus = 'and a.Status = "0"';
+    if ($this->session->userdata('finance_auth_Policy_SYS') ==  0) {
+      $policyStatus = '';
+    }
+
     if ($ta1 == '') {
       $sql = 'select count(*) as total 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and c.ID = ? and a.Status = "0"';
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and c.ID = ? '.$policyStatus;
       $query=$this->db->query($sql, array($SemesterID))->result_array();
 
     }
@@ -1017,7 +1022,7 @@ class M_finance extends CI_Model {
       $sql = 'select count(*) as total 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? and c.ID = ? and a.Status = "0"';
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? and c.ID = ? '.$policyStatus;
       $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
     }
     return $query[0]['total'];
@@ -1044,11 +1049,16 @@ class M_finance extends CI_Model {
       $ta1 = $ta[1];
     }
 
+    $policyStatus = 'and a.Status = "0"';
+    if ($this->session->userdata('finance_auth_Policy_SYS') ==  0) {
+      $policyStatus = '';
+    }
+
     if ($ta1 == '') {
       $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and c.ID = ? and a.Status = "0" order by a.Status asc LIMIT '.$start. ', '.$limit;
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and c.ID = ? '.$policyStatus.' order by a.Status asc LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array($SemesterID))->result_array();
 
     }
@@ -1057,7 +1067,7 @@ class M_finance extends CI_Model {
       $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? and c.ID = ? and a.Status = "0" order by a.Status asc LIMIT '.$start. ', '.$limit;
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? and c.ID = ? '.$policyStatus.' order by a.Status asc LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
     }
 
@@ -1453,48 +1463,64 @@ class M_finance extends CI_Model {
       // Closed VA dahulu
           // check Status VA
               // cari Biling ID
+                if ($this->session->userdata('finance_auth_Policy_SYS') == 0) {
+                  $bstatus = '';
+                }
+                else
+                {
+                  $bstatus = 'and b.Status  = 0';
+                }
                 $sql = 'select * from db_finance.payment as a join db_finance.payment_students as b
-                        on a.ID = b.ID_payment where a.NPM = ? and a.SemesterID = ? and a.PTID = ? and b.Status  = 0 order by b.ID asc limit 1';
+                        on a.ID = b.ID_payment where a.NPM = ? and a.SemesterID = ? and a.PTID = ? '.$bstatus.' order by b.ID asc limit 1';
                 $query=$this->db->query($sql, array($NPM,$SemesterID,$PTID))->result_array();
                 if (count($query) > 0 ) {
                   $BilingID = $query[0]['BilingID'];
-                  $checkVa = $this->checkBiling($BilingID);
-                  // print_r($checkVa);
-                  // die();
-                  // va status  = 1 => active
-                  // va status = 2 => Inactive
-                  if ($checkVa['msg']['va_status'] != 2) {
-                      // cancel VA 
-                     $getData= $this->m_master->caribasedprimary('db_va.va_log','trx_id',$BilingID);
-                     $trx_amount = $getData[0]['trx_amount'];
-                     $desc = 'Closed '.$getData[0]['description'];
-                     $datetime_expired = $now;
-                     $customer_name = $getData[0]['customer_name'];
-                     $customer_email = $getData[0]['customer_email'];
-                     $update = $this->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students',$desc);
-                     if ($update['status'] == 1) {
-                       // triger VA closed berhasil, update va_log status = 2 // auto dari update_va_Payment
-                       // delete data pada table payment dan payment_students
-                          // action delete belum benar
-                       // $this->delete_id_table($query[0]['ID_payment'],'payment_students');
-                       $sqlDelete = "delete from db_finance.payment_students where ID_payment = ".$query[0]['ID_payment'];
-                       $queryDelete=$this->db->query($sqlDelete, array());
-                       $this->delete_id_table($query[0]['ID_payment'],'payment');
-                       
-                     }
-                     else
-                     {
-                       $arr['msg'] .= 'Va tidak bisa di cancel, error koneksi ke BNI <br>';
-                     }
+                  if ($BilingID != 0) {
+                    $checkVa = $this->checkBiling($BilingID);
+                    // print_r($checkVa);
+                    // die();
+                    // va status  = 1 => active
+                    // va status = 2 => Inactive
+                    if ($checkVa['msg']['va_status'] != 2) {
+                        // cancel VA 
+                       $getData= $this->m_master->caribasedprimary('db_va.va_log','trx_id',$BilingID);
+                       $trx_amount = $getData[0]['trx_amount'];
+                       $desc = 'Closed '.$getData[0]['description'];
+                       $datetime_expired = $now;
+                       $customer_name = $getData[0]['customer_name'];
+                       $customer_email = $getData[0]['customer_email'];
+                       $update = $this->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students',$desc);
+                       if ($update['status'] == 1) {
+                         // triger VA closed berhasil, update va_log status = 2 // auto dari update_va_Payment
+                         // delete data pada table payment dan payment_students
+                            // action delete belum benar
+                         // $this->delete_id_table($query[0]['ID_payment'],'payment_students');
+                         $sqlDelete = "delete from db_finance.payment_students where ID_payment = ".$query[0]['ID_payment'];
+                         $queryDelete=$this->db->query($sqlDelete, array());
+                         $this->delete_id_table($query[0]['ID_payment'],'payment');
+                         
+                       }
+                       else
+                       {
+                         $arr['msg'] .= 'Va tidak bisa di cancel, error koneksi ke BNI <br>';
+                       }
+                    }
+                    else
+                    {
+                         //$this->delete_id_table($query[0]['ID_payment'],'payment_students');
+                         $sqlDelete = "delete from db_finance.payment_students where ID_payment = ".$query[0]['ID_payment'];
+                         $queryDelete=$this->db->query($sqlDelete, array());  
+                         $this->delete_id_table($query[0]['ID_payment'],'payment');
+                        
+                    }
                   }
                   else
                   {
-                       //$this->delete_id_table($query[0]['ID_payment'],'payment_students');
-                       $sqlDelete = "delete from db_finance.payment_students where ID_payment = ".$query[0]['ID_payment'];
-                       $queryDelete=$this->db->query($sqlDelete, array());  
-                       $this->delete_id_table($query[0]['ID_payment'],'payment');
-                      
+                    $sqlDelete = "delete from db_finance.payment_students where ID_payment = ".$query[0]['ID_payment'];
+                    $queryDelete=$this->db->query($sqlDelete, array());
+                    $this->delete_id_table($query[0]['ID_payment'],'payment');
                   }
+                  
                 }
         }
         return $arr;
@@ -1643,6 +1669,9 @@ class M_finance extends CI_Model {
         $ID = $Input[$i]->ID;
         $trx_amount = $Input[$i]->Invoice;
         $datetime_expired = $Input[$i]->Deadline;
+
+        $getData0= $this->m_master->caribasedprimary('db_finance.payment_students','ID',$ID);
+        $ID_payment = $getData0[0]['ID_payment'];
         $this->m_finance->delete_id_table($ID,'payment_students');
       }
     }

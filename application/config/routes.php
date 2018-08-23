@@ -433,6 +433,9 @@ $route['finance/get_list_telat_bayar/(:num)'] =  'page/finance/c_finance/get_lis
 $route['finance/edit_telat_bayar/(:any)'] =  'page/finance/c_finance/edit_telat_bayar/$1';
 $route['finance/tagihan-mhs/import_pembayaran_manual'] =  'page/finance/c_finance/import_pembayaran_manual';
 $route['finance/tagihan-mhs/submit_import_pembayaran_manual'] =  'page/finance/c_finance/submit_import_pembayaran_manual';
+$route['finance/bayar_manual_mahasiswa'] =  'page/finance/c_finance/bayar_manual_mahasiswa';
+
+
 
 $route['finance/tagihan-mhs/import_pembayaran_lain'] =  'page/finance/c_finance/import_pembayaran_lain';
 $route['finance/tagihan-mhs/submit_import_pembayaran_lain'] =  'page/finance/c_finance/submit_import_pembayaran_lain';
@@ -444,6 +447,12 @@ $route['finance/tagihan-mhs/submit_import_beasiswa_mahasiswa'] =  'page/finance/
 $route['finance/download-log-va'] =  'page/finance/c_finance/download_log_va';
 $route['finance/listfile_va'] =  'page/finance/c_finance/listfile_va';
 
+
+// -- config --
+$route['finance/config/policysys'] =  'page/finance/c_config/policysys';
+$route['finance/config/policy_sys_json_data'] =  'page/finance/c_config/policy_sys_json_data';
+$route['finance/config/policysys/modalform'] =  'page/finance/c_config/policy_sys_modalform';
+$route['finance/config/policysys/submit'] =  'page/finance/c_config/policy_sys_submit';
 
 
 // ---global---

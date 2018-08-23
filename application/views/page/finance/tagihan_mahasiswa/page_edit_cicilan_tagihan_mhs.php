@@ -185,7 +185,7 @@
                          {
                               // show bintang
                               var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
-                              if (Data_mhs[i]['DetailPayment'].length > 1) { // menandakan memiliki cicilan lebih dari 1
+                              // if (Data_mhs[i]['DetailPayment'].length > 1) { // menandakan memiliki cicilan lebih dari 1
                                $('#dataRow').append(tr +
                                                       // '<td>'+inputCHK+'</td>' +
                                                       '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
@@ -202,7 +202,7 @@
                                                       '<td>'+status+'</td>' +
                                                       '<td>'+'<button class = "DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'">View</button>'+'</td>' +
                                                       '</tr>');
-                            }   
+                              // }   
                             
                          } 
                         
@@ -211,7 +211,7 @@
                     if(Data_mhs.length == 1)
                     {
                       if (Data_mhs[0]['StatusPayment'] == 0) {
-                        if (Data_mhs[0]['DetailPayment'].length > 1) {
+                        // if (Data_mhs[0]['DetailPayment'].length > 1) {
                               $('#datatable2').removeClass('hide');
                               var DetailPayment = Data_mhs[0]['DetailPayment'];
                               // buat table cicilan beserta input
@@ -275,7 +275,7 @@
                               $('.datetimepickerClass').prop('readonly',true);
                               $('.costInput').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
                               $('.costInput').maskMoney('mask', '9894');
-                        }
+                        // }
                       }        
 
                     }

@@ -12,11 +12,11 @@
             <div class="widget-header">
                 <h4 class="header"><i class="icon-reorder"></i>Policy</h4>
                 <div class="toolbar no-padding">
-                    <div class="btn-group">
+                    <!-- <div class="btn-group">
                       <span data-smt="" class="btn btn-xs btn-add">
                         <i class="icon-plus"></i> Add Policy
                        </span>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <div class="widget-content">
@@ -35,69 +35,24 @@
     loadTableJS(loadDataTable);
   }); // exit document Function
 
-  $(document).on('click','.btn-add', function () {
-     modal_generate('add','Add Policy');
-  });
-
   $(document).on('click','.btn-edit', function () {
     var ID = $(this).attr('data-smt');
      modal_generate('edit','Edit Policy',ID);
   });
 
-  $(document).on('click','.btn-delete', function () {
-    var ID = $(this).attr('data-smt');
-     $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Apakah anda yakin untuk melakukan request ini ?? </b> ' +
-         '<button type="button" id="confirmYesDelete" class="btn btn-primary" style="margin-right: 5px;" data-smt = "'+ID+'">Yes</button>' +
-         '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
-         '</div>');
-     $('#NotificationModal').modal('show');
-  });
-
-  $(document).on('click','#confirmYesDelete',function () {
-        $('#NotificationModal .modal-header').addClass('hide');
-        $('#NotificationModal .modal-body').html('<center>' +
-            '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
-            '                    <br/>' +
-            '                    Loading Data . . .' +
-            '                </center>');
-        $('#NotificationModal .modal-footer').addClass('hide');
-        $('#NotificationModal').modal({
-            'backdrop' : 'static',
-            'show' : true
-        });
-        var url = base_url_js+'vreservation/config/policy/submit';
-        var aksi = "delete";
-        var ID = $(this).attr('data-smt');
-        var data = {
-            Action : aksi,
-            CDID : ID,
-        };
-        var token = jwt_encode(data,"UAP)(*");
-        $.post(url,{token:token},function (data_json) {
-            setTimeout(function () {
-               toastr.options.fadeOut = 10000;
-               toastr.success('Data berhasil disimpan', 'Success!');
-               loadTableJS(loadDataTable);
-               $('#NotificationModal').modal('hide');
-            },500);
-        });
-  });
-
-
+ 
   $(document).on('click','#ModalbtnSaveForm', function () {
     loading_button('#ModalbtnSaveForm');
      var aksi = $("#ModalbtnSaveForm").attr('aksi');
      var id = $("#ModalbtnSaveForm").attr('kodeuniq');
      var selectDivision = $("#selectDivision").val();
-     var selectGroupuUser = $("#selectGroupuUser").val();
-     var BookingDay = $("#BookingDay").val();
+     var VA_status = $("#VA_status").val();
 
-     var url = base_url_js+'vreservation/config/policy/submit';
+     var url = base_url_js+'finance/config/policysys/submit';
      var data = {
          Action : aksi,
          CDID : id,
-         selectGroupuUser:selectGroupuUser,
-         BookingDay:BookingDay,
+         VA_status:VA_status,
      };
 
      if (validationInput = validation(data)) {
@@ -154,7 +109,7 @@
   }
 
   function modal_generate(action,title,ID='') {
-      var url = base_url_js+"vreservation/config/policy/modalform";
+      var url = base_url_js+"finance/config/policysys/modalform";
       var data = {
           Action : action,
           CDID : ID,
@@ -176,11 +131,10 @@
       // Some code
       // console.log('test');
       $("#pageData").empty();
-      var table = '<div class = "col-md-12"><div class="table-responsive"> <table class="table table-striped table-bordered table-hover table-checkable datatable" id ="IDTblGroupUser">'+
+      var table = '<div class = "col-md-12"><div class="table-responsive"> <table class="table table-striped table-bordered table-hover table-checkable datatable">'+
       '<thead>'+
           '<tr>'+
-              '<th style="width: 106px;">Group User</th>'+
-              '<th style="width: 106px;">Booking Day</th>'+
+              '<th style="width: 106px;">VA Status</th>'+
               '<th style="width: 15px;">Action</th>'+
           '</tr>'+
       '</thead>'+
@@ -198,19 +152,17 @@
 
   function loadDataTable()
   {
-      var url = base_url_js+'vreservation/config/policy_json_data'
+      var url = base_url_js+'finance/config/policy_sys_json_data'
   // loading_page('#loadtableNow');
       $.post(url,function (data_json) {
           var response = jQuery.parseJSON(data_json);
           // $("#loadingProcess").remove();
           for (var i = 0; i < response.length; i++) {
              var btn_edit = '<span data-smt="'+response[i]['ID']+'" class="btn btn-xs btn-edit"><i class="fa fa-pencil-square-o"></i> Edit</span>';
-             var btn_delete = '<span data-smt="'+response[i]['ID']+'"  class="btn btn-xs btn-delete"><i class="fa fa-trash"> Delete</i></span>';
               $(".datatable tbody").append(
                   '<tr>'+
-                      '<td>'+response[i]['GroupAuth']+'</td>'+
-                      '<td>'+response[i]['BookingDay']+'</td>'+
-                      '<td>'+btn_edit+btn_delete+'</td>'+
+                      '<td>'+response[i]['VA_active']+'</td>'+
+                      '<td>'+btn_edit+'</td>'+
                   '</tr>' 
                   );
           }
