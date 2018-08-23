@@ -23,26 +23,29 @@ class M_save_to_pdf extends CI_Model {
 
 
 
-        $dayNumb = date('N', strtotime($dateNow));
+        // ====== Get Exchange =======
+        $dayofweek = date('w', strtotime($dateNow));
+        $dateSearch    = date('Y-m-d', strtotime(($DayID - $dayofweek).' day', strtotime($dateNow)));
 
-        if($dayNumb == $DayID){
-            $dataEx = $this->db->query('SELECT s.ID, s.TeamTeaching, s.ClassGroup, sd.StartSessions, sd.EndSessions, em.Name AS Coordinator,
+
+
+        $dataEx = $this->db->query('SELECT s.ID, s.TeamTeaching, s.ClassGroup, sd.StartSessions, sd.EndSessions, em.Name AS Coordinator,
                                             cl.Room AS ClassRoom  FROM db_academic.schedule_exchange ex 
                                             LEFT JOIN db_academic.attendance attd ON (attd.ID = ex.ID_Attd)
                                             LEFT JOIN db_academic.schedule s ON (attd.ScheduleID = s.ID)
                                             LEFT JOIN db_academic.schedule_details sd ON (sd.ScheduleID = s.ID)
                                             LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                             LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
-                                              WHERE ex.Date = "'.$dateNow.'" ')
-                ->result_array();
+                                              WHERE ex.Date = "'.$dateSearch.'" AND ex.Status = "1" ')
+            ->result_array();
 
-            if(count($dataEx)>0){
-                for($e=0;$e<count($dataEx);$e++){
-                    $dataEx[$e]['Label'] = 'Ex';
-                    array_push($dataSc,$dataEx[$e]);
-                }
+        if(count($dataEx)>0){
+            for($e=0;$e<count($dataEx);$e++){
+                $dataEx[$e]['Label'] = 'Ex';
+                array_push($dataSc,$dataEx[$e]);
             }
         }
+
 
 
 
