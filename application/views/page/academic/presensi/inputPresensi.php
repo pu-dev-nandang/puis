@@ -134,6 +134,8 @@
                         '    <li><a href="javascript:void(0);" class="editStudentAttd" data-no="'+a+'" data-id="'+dataAttd['ID']+'">Edit Students</a></li>' +
                         '    <li role="separator" class="divider"></li>' +
                         '    <li><a href="javascript:void(0);" class="inputScheduleExchange" data-no="'+a+'" data-id="'+dataAttd['ID']+'">Set Schedule Exchange</a></li>' +
+                        '    <li role="separator" class="divider"></li>' +
+                        '    <li><a style="color: red;" href="javascript:void(0);" class="deleteAttendance" data-no="'+a+'" data-id="'+dataAttd['ID']+'">Delete Attendance</a></li>' +
                         '  </ul>' +
                         '</div>';
 
