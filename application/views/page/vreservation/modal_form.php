@@ -102,28 +102,38 @@
                 </div>
             </div>
         </div>
-       <!--  <div class="form-group"> 
+        <div class="form-group"> 
             <div class="row">
                 <div class="col-sm-3">
-                    <label class="control-label">Multiple Days :</label>
+                    <label class="control-label">Seat Qty:</label>
                 </div>    
                 <div class="col-sm-6">
-                    <div class="col-md-3" id ="multiplePage">
-                                                                  
-                    </div>
+                   <input type="text" id = "Seat" class="form-control" readonly="true" value="<?php echo $RoomDB[0]['Seat'] ?>">
                 </div>
             </div>
-        </div> -->
+        </div>
         <div class="form-group"> 
             <div class="row">
                 <div class="col-sm-3">
                     <label class="control-label">Request Layout:</label>
                 </div>    
-                <div class="col-sm-6">
-                    <input type="file" data-style="fileinput" id="ExFile">
-                    <br>
-                    <b>If no Upload then using Default Layout</b><br>
-                    <a href="<?php echo base_url('fileGetAny/vreservation-'.$Layout); ?>" target="_blank"></i>Click Default Layout</a>
+                <div class="col-sm-9">
+                        <div class="col-md-3" id="layoutPage">
+                            <table class="table" id="table_layout">
+                                <tbody>
+                                    <tr id="tr_layout0">
+                                        <td><input type="checkbox" class="chk_layout" name="chk_layout" value="Tidak" id="layoutTDK">&nbsp; No</td>
+                                        <td><input type="checkbox" class="chk_layout" name="chk_layout" value="Ya" id="layoutYA">&nbsp; Yes</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    <div class="hide" id = "shwUploadFile">
+                        <input type="file" data-style="fileinput" id="ExFile">
+                        <br>
+                        <b>If no Upload then using Default Layout</b><br>
+                        <a href="<?php echo base_url('fileGetAny/vreservation-'.$Layout); ?>" target="_blank"></i>Click Default Layout</a>
+                    </div>    
                 </div>
             </div>
         </div>
@@ -133,7 +143,7 @@
                     <label class="control-label">Participant :</label>
                 </div>    
                 <div class="col-sm-3">
-                   <input type="number" class="form-control"  id="Participant" value="1">
+                   <input type="number" class="form-control"  id="Participant" value="2" min = "2" max="<?php echo $RoomDB[0]['Seat'] ?>">
                 </div>
             </div>
         </div>
@@ -272,7 +282,6 @@
         }
         $('#table_person_support').append('</table>');
       }
-
 
 
       function LoadEnd()

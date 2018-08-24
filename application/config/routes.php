@@ -718,6 +718,10 @@ $route['vreservation/master/EquipmentRoom/submit'] = 'page/vreservation/c_master
 $route['vreservation/master/loaddataJSonEquipment_additional'] = 'page/vreservation/c_master/loaddataJSonEquipment_additional';
 $route['vreservation/master/modal_form_equipmentadditional'] = 'page/vreservation/c_master/modal_form_equipmentadditional';
 $route['vreservation/master/EquipmentAdditional/submit'] = 'page/vreservation/c_master/EquipmentAdditional_submit';
+$route['vreservation/master/getRoomItem'] = 'page/vreservation/c_master/getRoomItem';
+$route['vreservation/master/submit_select_venue_room'] = 'page/vreservation/c_master/submit_select_venue_room';
+
+
 $route['vreservation/config/policy_json_data'] = 'page/vreservation/c_config/policy_json_data';
 $route['vreservation/config/policy/modalform'] = 'page/vreservation/c_config/policy_modalform';
 $route['vreservation/config/policy/submit'] = 'page/vreservation/c_config/policy_submit';

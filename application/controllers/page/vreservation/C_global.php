@@ -224,7 +224,8 @@ class C_global extends Vreservation_Controler {
     public function getschedule($date = null)
     {
         // get room
-        $getRoom = $this->m_master->showData_array('db_academic.classroom');
+        // $getRoom = $this->m_master->showData_array('db_academic.classroom');
+        $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','L_Venue',1);
         // get data classroom
         if ($date== null) {
             $date = date('Y-m-d');
@@ -318,6 +319,7 @@ class C_global extends Vreservation_Controler {
         }
 
         $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','Room',$input['room']);
+        $this->data['RoomDB'] = $getRoom;
         $file = $getRoom[0]['Layout'];
         $this->data['Layout'] = $file;
         if ($time > -30) {
@@ -335,6 +337,7 @@ class C_global extends Vreservation_Controler {
                     $this->data['User'] = $data[0];
                     $ID = $data[9];
                     $get = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$ID);
+                    $this->data['ParticipantQty'] = $get[0]['ParticipantQty'];
                     // get data Equipment Additional
                     $Name_equipment_add = '-';
                     if ($get[0]['ID_equipment_add'] != '' || $get[0]['ID_equipment_add'] != null) {

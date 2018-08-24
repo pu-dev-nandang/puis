@@ -63,13 +63,17 @@
     $(document).on('click','.btn-delete', function () {
       //loading_button('.btn-edit');
       ID_tbl = $(this).attr('idtbooking');
-      $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Are you sure ? </b> ' +
+      $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Reason ! </b> <br>' +
+          '<input type = "text" class = "form-group" id ="NoteDel" style="margin: 0px 0px 15px; height: 30px; width: 329px;" maxlength="30"><br>'+
           '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
           '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
           '</div>');
       $('#NotificationModal').modal('show');
 
       $("#confirmYes").click(function(){
+          var url =base_url_js+'vreservation/cancel_submit';
+          var Reason = $("#NoteDel").val();
+          // console.log(Reason);
           $('#NotificationModal .modal-header').addClass('hide');
           $('#NotificationModal .modal-body').html('<center>' +
               '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
@@ -81,8 +85,8 @@
               'backdrop' : 'static',
               'show' : true
           });
-          var url =base_url_js+'vreservation/cancel_submit';
-          var data = {ID_tbl : ID_tbl};
+
+          var data = {ID_tbl : ID_tbl,Reason : Reason};
           var token = jwt_encode(data,'UAP)(*');
           $.post(url,{token:token},function (data_json) {
             var response = jQuery.parseJSON(data_json);

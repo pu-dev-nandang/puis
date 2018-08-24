@@ -10,6 +10,7 @@
           <b>Status : </b><br>
           <i class="fa fa-circle" style="color:#6ba5c1;"></i> Available || 
           <i class="fa fa-circle" style="color:#e98180;"></i> Booked ||
+          <i class="fa fa-circle" style="color:#20c51b;"></i> Booked ||
           <i class="fa fa-circle" style="color:#ffb848;"></i> Requested 
 
         </div>
@@ -346,6 +347,11 @@
         $(this).prop('checked',true);
     });
 
+    $(document).on('click','.chk_layout', function () {
+        $('input.chk_layout').prop('checked', false);
+        $(this).prop('checked',true);
+    });
+
     $(document).on('click','.chk_person_support', function () {
         $('input.chk_person_support').prop('checked', false);
         $(this).prop('checked',true);
@@ -354,6 +360,20 @@
     $(document).on('click','.chk_e_multiple', function () {
         $('input.chk_e_multiple').prop('checked', false);
         $(this).prop('checked',true);
+    });
+
+    // event ya multiple belum
+    $(document).on('change','#layoutTDK', function () {
+        if(this.checked) {
+            $("#shwUploadFile").addClass('hide');
+        }
+    });
+
+    // event ya multiple belum
+    $(document).on('change','#layoutYA', function () {
+        if(this.checked) {
+            $("#shwUploadFile").removeClass('hide');
+        }
     });
 
 
@@ -447,10 +467,10 @@
                 $('#tablechk_e_additional').append('<tr id = "a'+i+'">');
                 for (var k = 0; k < splitBagi; k++) {
                     $('#a'+i).append('<td>'+
-                                        '<input type="checkbox" class = "chke_additional" name="chke_additional" value = "'+response[getRow].ID_add+'">&nbsp'+ response[getRow].Equipment+' By '+response[getRow].Division+
+                                        '<input type="checkbox" min = "1" class = "chke_additional" name="chke_additional" value = "'+response[getRow].ID_add+'">&nbsp'+ response[getRow].Equipment+' By '+response[getRow].Division+
                                      '</td>'+
                                      '<td>'+
-                                        ' <input type="number" class="form-control chke_additional'+response[getRow].ID_add+' hide"  value="1" id = "chke_additional'+response[getRow].ID_add+'">'+'</td>'
+                                        ' <input type="number" min = "1" class="form-control chke_additional'+response[getRow].ID_add+' hide"  value="1" id = "chke_additional'+response[getRow].ID_add+'">'+'</td>'
                                     );
                     getRow++;
                 }

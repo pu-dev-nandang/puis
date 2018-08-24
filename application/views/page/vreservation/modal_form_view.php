@@ -109,6 +109,26 @@
         <div class="form-group"> 
             <div class="row">
                 <div class="col-sm-3">
+                    <label class="control-label"  style="text-align: left;">Participant Qty :</label>
+                </div>    
+                <div class="col-sm-6">
+                    <label class="control-label"><?php echo $ParticipantQty ?></label> 
+                </div>
+            </div>
+        </div>
+        <div class="form-group"> 
+            <div class="row">
+                <div class="col-sm-3">
+                    <label class="control-label"  style="text-align: left;">Seat Qty :</label>
+                </div>    
+                <div class="col-sm-6">
+                    <label class="control-label"><?php echo $RoomDB[0]['Seat'] ?></label> 
+                </div>
+            </div>
+        </div>
+        <div class="form-group"> 
+            <div class="row">
+                <div class="col-sm-3">
                     <label class="control-label">Request Layout:</label>
                 </div>    
                 <div class="col-sm-6">

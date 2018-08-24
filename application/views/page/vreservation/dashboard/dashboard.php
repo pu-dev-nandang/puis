@@ -10,13 +10,14 @@
 					<b>Status : </b><br>
 					<i class="fa fa-circle" style="color:#6ba5c1;"></i> Available || 
 					<i class="fa fa-circle" style="color:#e98180;"></i> Booked ||
+					<i class="fa fa-circle" style="color:#20c51b;"></i> Booked ||
 					<i class="fa fa-circle" style="color:#ffb848;"></i> Requested 
 
 				</div>
 			</div>
 			
 			<div class="widget-header">
-					<h4><i class="icon-calendar"></i> Schedule Today</h4>
+					<h4><i class="icon-calendar"></i>Today Schedule</h4>
 					<div class="thumbnail" style="padding: 10px;" id = "countRequest">
 					    <!-- <b>Total Request : <a href="javascript:void(0)" class="btn-action" data-page="v_request" data-id="1">11</a></b> -->
 					</div>

@@ -173,6 +173,50 @@ class C_transaksi extends Vreservation_Controler {
                     // $this->db->insert('db_reservation.t_booking_eq_additional', $yy);
                     $this->db->insert_batch('db_reservation.t_booking_eq_additional', $yy);
                 }
+
+                if (is_array($input['chk_person_support'])) {
+                    $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $Start);
+                    $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $End);
+                    $StartNameDay = $Startdatetime->format('l');
+                    $EndNameDay = $Enddatetime->format('l');
+                    if($_SERVER['SERVER_NAME']!='localhost') {
+                        for ($i=0; $i < count($input['chk_person_support']); $i++) { 
+                           $nested = $input['chk_person_support'];
+                           $getDataDB = $this->m_master->caribasedprimary('db_employees.division','ID',$nested[$i]);
+                           $Email = $getDataDB[0]['Email'];
+                           $text = 'Dear '.$getDataDB[0]['Division'].',<br><br>
+                                       Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
+                                       Details Schedule : <br><ul>
+                                       <li>Start  : '.$StartNameDay.', '.$Start.'</li>
+                                       <li>End  : '.$EndNameDay.', '.$End.'</li>
+                                       <li>Room  : '.$input['Room'].'</li>
+                                       <li>Agenda  : '.$input['Agenda'].'</li>
+                                       <li>Note : <strong>Need Person Support</strong></li>
+                                       </ul>
+                                   ';        
+                           $to = $Email;
+                           $subject = "Podomoro University Venue Reservation Person Support";
+                           $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                        }
+                    }
+                    else{
+                        $Email = 'alhadi.rahman@podomorouniversity.ac.id';
+                        $text = 'Dear IT,<br><br>
+                                    Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
+                                    Details Schedule : <br><ul>
+                                    <li>Start  : '.$StartNameDay.', '.$Start.'</li>
+                                    <li>End  : '.$EndNameDay.', '.$End.'</li>
+                                    <li>Room  : '.$input['Room'].'</li>
+                                    <li>Agenda  : '.$input['Agenda'].'</li>
+                                    <li>Note : <strong>Need Person Support</strong></li>
+                                    </ul>
+                                ';        
+                        $to = $Email;
+                        $subject = "Podomoro University Venue Reservation Person Support";
+                        $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                    }    
+                    
+                }
             }
             echo json_encode(array('msg' => 'The Proses Finish','status' => 1));
         }
@@ -287,6 +331,26 @@ class C_transaksi extends Vreservation_Controler {
 
             // }
 
+            // send email approve to user
+            $getUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$get[0]['CreatedBy']);
+            $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['Start']);
+            $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['End']);
+            $StartNameDay = $Startdatetime->format('l');
+            $EndNameDay = $Enddatetime->format('l');
+
+            $Email = $getUser[0]['EmailPU'];
+            $text = 'Dear '.$getUser[0]['Name'].',<br><br>
+                        Your Venue Reservation approved by '.$this->session->userdata('Name').',<br><br>
+                        Details Schedule : <br><ul>
+                        <li>Start  : '.$StartNameDay.', '.$get[0]['Start'].'</li>
+                        <li>End  : '.$EndNameDay.', '.$get[0]['End'].'</li>
+                        <li>Room  : '.$get[0]['Room'].'</li>
+                        </ul>
+                    ';        
+            $to = $Email;
+            $subject = "Podomoro University Venue Reservation Approved";
+            $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+
         }
         else
         {
@@ -305,6 +369,7 @@ class C_transaksi extends Vreservation_Controler {
             $get = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$input['ID_tbl']);
             $getUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$get[0]['CreatedBy']);
             $getE_additional = $this->m_master->caribasedprimary('db_reservation.t_booking_eq_additional','ID_t_booking',$get[0]['ID']);
+            $Reason = $input['Reason'];
 
             for ($i=0; $i < count($getE_additional); $i++) { 
                 $dataSave = array(
@@ -373,7 +438,7 @@ class C_transaksi extends Vreservation_Controler {
                 'Req_date' => $get[0]['Req_date'],
                 'CreatedBy' => $get[0]['CreatedBy'],
                 'ID_t_booking' => $get[0]['ID'],
-                'Note_deleted' => 'Cancel By User',
+                'Note_deleted' => 'Cancel By User##'.$Reason,
                 'DeletedBy' => $this->session->userdata('NIP'),
                 'Req_layout' => $get[0]['Req_layout'],
                 'Status' => $get[0]['Status'],
@@ -395,11 +460,52 @@ class C_transaksi extends Vreservation_Controler {
                         <li>Start  : '.$StartNameDay.', '.$get[0]['Start'].'</li>
                         <li>End  : '.$EndNameDay.', '.$get[0]['End'].'</li>
                         <li>Room  : '.$get[0]['Room'].'</li>
+                        <li>Reason : '.$Reason.'</li>
                         </ul>
                     ';        
             $to = $Email;
-            $subject = "Podomoro University Venue Reservation";
+            $subject = "Podomoro University Venue Reservation Cancel Reservation";
             $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+
+            // send email to administratif
+            $getEmail = $this->m_master->showData_array('db_reservation.email_to');
+            if($_SERVER['SERVER_NAME']!='localhost') {
+                for ($i=0; $i < count($getEmail); $i++) {
+                    if ($i != 0) {
+                         $Email = $getEmail[$i]['Email'];
+                         $text = 'Dear '.$getEmail[$i]['Ownership'].',<br><br>
+                                     Venue Reservation was Cancel by '.$this->session->userdata('Name').',<br><br>
+                                     Details Schedule : <br><ul>
+                                     <li>Start  : '.$StartNameDay.', '.$get[0]['Start'].'</li>
+                                     <li>End  : '.$EndNameDay.', '.$get[0]['End'].'</li>
+                                     <li>Room  : '.$get[0]['Room'].'</li>
+                                     <li>Reason : '.$Reason.'</li>
+                                     </ul>
+                                 ';        
+                         $to = $Email;
+                         $subject = "Podomoro University Venue Reservation Cancel Reservation";
+                         $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                    } 
+                }
+
+            }
+            else
+            {
+                $Email = $getEmail[0]['Email'];
+                $text = 'Dear '.$getEmail[0]['Ownership'].',<br><br>
+                            Venue Reservation was Cancel by '.$this->session->userdata('Name').',<br><br>
+                            Details Schedule : <br><ul>
+                            <li>Start  : '.$StartNameDay.', '.$get[0]['Start'].'</li>
+                            <li>End  : '.$EndNameDay.', '.$get[0]['End'].'</li>
+                            <li>Room  : '.$get[0]['Room'].'</li>
+                            <li>Reason : '.$Reason.'</li>
+                            </ul>
+                        ';        
+                $to = $Email;
+                $subject = "Podomoro University Venue Reservation Cancel Reservation";
+                $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+            }
+
         echo json_encode($msg);    
     }
 

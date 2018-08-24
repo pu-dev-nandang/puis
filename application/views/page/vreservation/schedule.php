@@ -27,6 +27,18 @@
 	    height: 45px;
 	    border: 1px dotted #333;
 	}
+
+	.panel-green {
+		font-size: 10px;
+		color: #fff;
+		font-weight: bold;
+		text-align: center;
+		padding: 1px;
+		background: #20c51b;
+	    /*max-width: 100px;*/
+	    height: 45px;
+	    border: 1px dotted #333;
+	}
 	.panel-blue {
 		font-size: 10px;
 		color: #fff;
@@ -68,10 +80,11 @@
 	#tblFreeze thead,#tblFreeze tbody tr {
 	    display:table;
 	    width:100%;
-	    table-layout:fixed;/* even columns width , fix width of table too*/
+	    table-layout:fixed; /* even columns width , fix width of table too*/
 	}
 	#tblFreeze thead {
-	    width: calc( 100% - 1em ) scrollbar is average 1em/16px width, remove it from thead width 
+	    /*width: calc( 100% - 1em ) scrollbar is average 1em/16px width, remove it from thead width */
+	     width: calc( 100% - 0em )
 	}
 	#tblFreeze table {
 	    width:400px;
@@ -105,7 +118,15 @@
 								<?php $converDTE = date("h:i a", strtotime($data_pass[$k]['end'])); ?>
 								<?php if ($data_pass[$k]['room'] == $getRoom[$i]['Room'] && $converDTS == $arrHours[$j]): ?>
 									<?php if ($data_pass[$k]['approved'] == 1): ?>
-										<td class="panel-red pointer" style="background-color: #e98180;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>">
+										<?php 
+											$bc = '#e98180';
+											$bc2 = 'panel-red';
+											if ($data_pass[$k]['NIP'] != 0) {
+												$bc = '#20c51b';
+												$bc2 = 'panel-green';
+											}
+										?>
+										<td class="<?php echo $bc2 ?> pointer" style="background-color: <?php echo $bc ?>;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>">
 											<span><?php echo $data_pass[$k]['user'] ?></span>
 											<!-- <div class="panel-red pointer" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>"><span><?php echo $data_pass[$k]['user'] ?></span></div> -->
 										</td>
