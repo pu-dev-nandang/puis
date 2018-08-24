@@ -157,7 +157,7 @@
                 var btn = '<span class="btn btn-xs btn-edit" idtbooking ="'+response[i]['ID']+'" >'+
                                     '<i class="fa fa-pencil-square-o"></i> Approve'+
                                    '</span>';
-                var Req_layout = (response[i]['Req_layout'] == '') ? 'Default' : '<a href="javascript:void(0)" class="btn-action btn-edit btn-get-link" data-page="fileGetAny/vreservation/'+response[i]['Req_layout']+'">Request Layout</a>';                  
+                var Req_layout = (response[i]['Req_layout'] == '') ? 'Default' : '<a href="javascript:void(0)" class="btn-action btn-get-link" data-page="fileGetAny/vreservation-'+response[i]['Req_layout']+'">Request Layout</a>';                  
                 $(".datatable tbody").append(
                     '<tr>'+
                         '<td>'+response[i]['Start']+'</td>'+
@@ -177,4 +177,9 @@
             },500);
         });
     }
+
+    $(document).on('click','.btn-get-link', function () {
+       var page = $(this).attr('data-page');
+       window.open(base_url_js+''+page,'_blank');
+    });
 </script>
