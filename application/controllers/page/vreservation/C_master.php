@@ -288,4 +288,50 @@ class C_master extends Vreservation_Controler {
         }
     }
 
+    public function select_venue_room()
+    {
+        $content = $this->load->view($this->pathView.'master/select_venue_room',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function getRoomItem()
+    {
+        $data = array();
+        $get = $this->m_master->showData_array('db_academic.classroom');
+        for ($i=0; $i < count($get); $i++) { 
+            $nestedData=array();
+            $row = $get[$i];
+             $nestedData[] = $row['ID'];
+             $nestedData[] = $row['Room'];
+             $nestedData[] = $row['L_Venue'];
+             $data[] = $nestedData;
+        }
+        $json_data = array(
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+    }
+
+    public function submit_select_venue_room()
+    {
+        $input = $this->getInputToken();
+        $arr_insert = [];
+        for ($i=0; $i < count($input['checkboxArr']); $i++) {
+          $temp = array();
+          $ID = $input['checkboxArr'][$i];
+          $temp = array(
+            'ID' => $ID,
+            'L_Venue' => 1
+          );
+          $arr_insert[] = $temp;
+        }
+        $this->db->update_batch('db_academic.classroom', $arr_insert, 'ID');
+
+        $getID = implode(',',$input['checkboxArr'] );
+        $sql = 'update db_academic.classroom set L_Venue = 0 where ID not in ('.$getID.')';
+        $query2=$this->db->query($sql, array());
+
+
+    }
+
 }

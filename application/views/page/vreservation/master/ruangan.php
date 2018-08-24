@@ -35,7 +35,14 @@
         var SeatForExam = (action=='edit') ? parseInt(classroom[3]) : '';
 
         if(action=='add' || action=='edit'){
-            var readonly = (action=='edit')? 'readonly' : '';
+            <?php $positionMain = $this->session->userdata('PositionMain'); 
+                $positionMain = $positionMain['IDDivision'];
+            ?>
+            <?php if ($positionMain == 12): ?>
+                var readonly = '';
+            <?php else: ?>
+                var readonly = (action=='edit')? 'readonly' : '';
+            <?php endif ?>
             $('#GlobalModal .modal-header').html('<h4 class="modal-title">Classroom</h4>');
             $('#GlobalModal .modal-body').html('<div class="row">' +
                 '                            <div class="col-xs-4">' +

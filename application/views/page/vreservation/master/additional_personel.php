@@ -165,7 +165,7 @@
   {
       // Some code
       // console.log('test');
-      $("#pageData").empt
+      $("#pageData").empty();
       var table = '<div class = "col-md-12"><div class="table-responsive"> <table class="table table-striped table-bordered table-hover table-checkable datatable" id ="IDTblGroupUser">'+
       '<thead>'+
           '<tr>'+
