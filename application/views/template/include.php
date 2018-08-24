@@ -681,7 +681,7 @@
 
                 var d = jsonResult[i];
 
-                $(element).append('<option value="'+d.ClassGroup+'">'+d.ClassGroup+' - '+d.Name+'</option>');
+                $(element).append('<option value="'+d.ScheduleID+'.'+d.ClassGroup+'">'+d.ClassGroup+' - '+d.Name+'</option>');
             }
 
         });

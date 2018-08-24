@@ -3188,4 +3188,76 @@ class M_api extends CI_Model {
         return $data;
     }
 
+    public function getExchangeBySmtID($SemesterID){
+
+        $data = $this->db->query('SELECT attd.ScheduleID, em.Name AS Lecturer, s.ClassGroup, ex.DateOriginal AS A_Date, ex.Meeting AS A_Sesi, sd.StartSessions AS A_StartSessions, 
+                                            sd.EndSessions AS A_EndSessions, cl1.Room AS A_Room,
+                                            ex.Date AS T_Date, ex.StartSessions AS T_StartSessions, ex.EndSessions AS T_EndSessions, 
+                                            cl2.Room AS T_Room,ex.Reason, ex.Status
+                                            FROM db_academic.schedule_exchange ex
+                                            LEFT JOIN db_academic.classroom cl2 ON (cl2.ID = ex.ClassroomID)
+                                            LEFT JOIN db_academic.attendance attd ON (attd.ID = ex.ID_Attd)
+                                            LEFT JOIN db_academic.schedule s ON (s.ID = attd.ScheduleID)
+                                            LEFT JOIN db_employees.employees em ON (em.NIP = ex.NIP)
+                                            LEFT JOIN db_academic.schedule_details sd ON (sd.ID = attd.SDID)
+                                            LEFT JOIN db_academic.classroom cl1 ON (cl1.ID = sd.ClassroomID)
+                                            WHERE attd.SemesterID = "'.$SemesterID.'" 
+                                            ORDER BY ex.DateOriginal ,ex.DayID ASC')->result_array();
+
+        // Get Course
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+                $dataC = $this->db->query('SELECT mk.NameEng AS Course FROM db_academic.schedule_details_course sdc 
+                                                    LEFT JOIN db_academic.mata_kuliah mk 
+                                                    ON (mk.ID = sdc.MKID)
+                                                    WHERE sdc.ScheduleID = "'.$data[$i]['ScheduleID'].'" LIMIT 1')->result_array();
+
+                $data[$i]['Course'] = $dataC[0]['Course'];
+            }
+        }
+
+        return $data;
+    }
+
+    public function getStudentsAttendance($SemesterID,$ScheduleID){
+
+//        $dataAttd = $this->db->select('ID')->get_where('db_academic.attendance',array(
+//            'SemesterID' => $SemesterID,
+//            'ScheduleID' => $ScheduleID
+//        ));
+
+        $dataCourse = $this->db->query('SELECT mk.NameEng, mk.MKCode, sdc.MKID FROM db_academic.schedule_details_course sdc 
+                                                 LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                 WHERE sdc.ScheduleID = "'.$ScheduleID.'" LIMIT 1')->result_array();
+
+        $dataStd = $this->getStudentByScheduleID($SemesterID,$ScheduleID,'');
+
+        if(count($dataStd)>0){
+            for($i=0;$i<count($dataStd);$i++){
+                $d = $dataStd[$i];
+                $dt = $this->db->query('SELECT attds.M1,attds.M2,attds.M3,attds.M4,attds.M5,attds.M6,attds.M7,attds.M8,attds.M9,
+                                                attds.M10, attds.M11 ,attds.M12,attds.M13,attds.M14, d.NameEng AS DayEng
+                                                FROM db_academic.attendance_students attds 
+                                                LEFT JOIN db_academic.attendance attd ON (attd.ID = attds.ID_Attd)
+                                                LEFT JOIN db_academic.schedule_details sd ON (sd.ID = attd.SDID)
+                                                LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
+                                                WHERE attds.NPM = "'.$d['NPM'].'" AND attd.SemesterID = "'.$SemesterID.'" 
+                                                AND attd.ScheduleID = "'.$ScheduleID.'" ORDER BY sd.DayID ASC ')->result_array();
+
+                $d['Attendance'] = $dt;
+
+                $dataStd[$i] = $d;
+            }
+
+        }
+
+        $res = array(
+            'Course' => $dataCourse,
+            'Student' => $dataStd
+        );
+
+        return $res;
+
+    }
+
 }

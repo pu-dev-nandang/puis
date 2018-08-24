@@ -1262,7 +1262,7 @@ class C_api extends CI_Controller {
             }
 
             else if($data_arr['action']=='getClassGroup'){
-                $data = $this->db->query('SELECT s.ClassGroup, em.Name FROM db_academic.schedule s 
+                $data = $this->db->query('SELECT s.ID AS ScheduleID,s.ClassGroup, em.Name FROM db_academic.schedule s 
                                                   LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                                   WHERE s.SemesterID = "'.$data_arr['SemesterID'].'"
                                                    ORDER BY s.ClassGroup ASC ')->result_array();
@@ -2754,6 +2754,15 @@ class C_api extends CI_Controller {
                 return print_r(1);
 
             }
+            else if($data_arr['action']=='getStdAttendance'){
+
+                $SemesterID = $data_arr['SemesterID'];
+                $ScheduleID = $data_arr['ScheduleID'];
+
+                $data = $this->m_api->getStudentsAttendance($SemesterID,$ScheduleID);
+
+                return print_r(json_encode($data));
+            }
         }
     }
 
@@ -2818,6 +2827,11 @@ class C_api extends CI_Controller {
 
                 return print_r(1);
 
+            }
+            else if($data_arr['action']=='readBySemesterID'){
+                $SemesterID = $data_arr['SemesterID'];
+                $data = $this->m_api->getExchangeBySmtID($SemesterID);
+                return print_r(json_encode($data));
             }
         }
     }
