@@ -122,6 +122,7 @@ $route['academic/loadPagePresensi'] = 'page/academic/c_presensi/loadPagePresensi
 
 $route['academic/attendance/monitoring-attendace-lecturer'] = 'page/academic/c_presensi/monitoring_lecturer';
 $route['academic/attendance/monitoring-attendace-student'] = 'page/academic/c_presensi/monitoring_student';
+$route['academic/attendance/monitoring-schedule-exchange'] = 'page/academic/c_presensi/monitoring_exchange';
 
 
 // -- master student -- 
@@ -456,6 +457,7 @@ $route['get_detail_cicilan_fee_admisi'] =  'api/C_global/get_detail_cicilan_fee_
 // ---- Save to PDF ---
 $route['save2pdf/schedule-pdf'] =  'c_save_to_pdf/schedulePDF';
 $route['save2pdf/monitoringAttdLecturer'] =  'c_save_to_pdf/monitoringAttdLecturer';
+$route['save2pdf/scheduleExchange'] =  'c_save_to_pdf/scheduleExchange';
 
 $route['save2pdf/listStudentsFromCourse'] =  'c_save_to_pdf/listStudentsFromCourse';
 

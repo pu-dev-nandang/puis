@@ -17,13 +17,10 @@
                 <div class="col-xs-4">
                     <select id="filterSemester" class="form-control filter-presensi"></select>
                 </div>
-                <div class="col-xs-6">
+                <div class="col-xs-8">
                     <div id="viewGroup"></div>
                 </div>
 
-                <div class="col-xs-2">
-                    <button class="btn btn-primary btn-block" id="btnFilterSearchGroup"><i class="fa fa-search" aria-hidden="true"></i></button>
-                </div>
             </div>
         </div>
 
@@ -53,14 +50,9 @@
             }
         },1000);
 
-
-
-
-
     });
 
-    // Search
-    $(document).on('click','#btnFilterSearchGroup',function () {
+    $(document).on('change','#filterClassGroup',function () {
         checkPage();
     });
 
@@ -1021,17 +1013,6 @@
             '<button type="button" class="btn btn-danger" id="btnDeleteAttendance"  data-no="'+No+'" data-id="'+ID+'" style="margin-right: 5px;">Yes</button>' +
             '<button type="button" class="btn btn-default" id="btnCloseDelAttd" data-dismiss="modal">No</button>' +
             '</div>');
-        // $('#NotificationModal').modal('show');
-        //
-        // $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-        //     '<h4 class="modal-title">Attendance '+No+'</h4>');
-        //
-        // var body_attd = '<div style="text-align: center;"><hr/>' +
-        //     '<button type="button" id="" class="btn btn-default" data-dismiss="modal">Close</button> | ' +
-        //     '<button class="btn btn-danger" id="" data-no="'+No+'" data-id="'+ID+'">Yes</button></div>';
-        // $('#GlobalModal .modal-body').html(body_attd);
-        //
-        // $('#GlobalModal .modal-footer').html('');
         $('#NotificationModal').modal({
             'show' : true,
             'backdrop' : 'static'

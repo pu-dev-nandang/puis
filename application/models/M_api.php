@@ -3188,4 +3188,35 @@ class M_api extends CI_Model {
         return $data;
     }
 
+    public function getExchangeBySmtID($SemesterID){
+
+        $data = $this->db->query('SELECT attd.ScheduleID, em.Name AS Lecturer, s.ClassGroup, ex.DateOriginal AS A_Date, ex.Meeting AS A_Sesi, sd.StartSessions AS A_StartSessions, 
+                                            sd.EndSessions AS A_EndSessions, cl1.Room AS A_Room,
+                                            ex.Date AS T_Date, ex.StartSessions AS T_StartSessions, ex.EndSessions AS T_EndSessions, 
+                                            cl2.Room AS T_Room,ex.Reason, ex.Status
+                                            FROM db_academic.schedule_exchange ex
+                                            LEFT JOIN db_academic.classroom cl2 ON (cl2.ID = ex.ClassroomID)
+                                            LEFT JOIN db_academic.attendance attd ON (attd.ID = ex.ID_Attd)
+                                            LEFT JOIN db_academic.schedule s ON (s.ID = attd.ScheduleID)
+                                            LEFT JOIN db_employees.employees em ON (em.NIP = ex.NIP)
+                                            LEFT JOIN db_academic.schedule_details sd ON (sd.ID = attd.SDID)
+                                            LEFT JOIN db_academic.classroom cl1 ON (cl1.ID = sd.ClassroomID)
+                                            WHERE attd.SemesterID = "'.$SemesterID.'" 
+                                            ORDER BY ex.DateOriginal ,ex.DayID ASC')->result_array();
+
+        // Get Course
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+                $dataC = $this->db->query('SELECT mk.NameEng AS Course FROM db_academic.schedule_details_course sdc 
+                                                    LEFT JOIN db_academic.mata_kuliah mk 
+                                                    ON (mk.ID = sdc.MKID)
+                                                    WHERE sdc.ScheduleID = "'.$data[$i]['ScheduleID'].'" LIMIT 1')->result_array();
+
+                $data[$i]['Course'] = $dataC[0]['Course'];
+            }
+        }
+
+        return $data;
+    }
+
 }

@@ -28,7 +28,6 @@ class MY_Controller extends CI_Controller {
             redirect(base_url());
         }
 
-//        $this->load->model('master/m_master');
         $this->load->library('JWT');
         $this->load->library('google');
     }

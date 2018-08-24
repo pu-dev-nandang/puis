@@ -44,6 +44,12 @@ class C_presensi extends Academic_Controler {
         $this->menu_presensi($content);
     }
 
+    public function monitoring_exchange(){
+        $data['department'] = parent::__getDepartement();
+        $content = $this->load->view('page/'.$data['department'].'/presensi/monitoring_schedule_exchange',$data,true);
+        $this->menu_presensi($content);
+    }
+
 
     //========================
 

@@ -2819,6 +2819,11 @@ class C_api extends CI_Controller {
                 return print_r(1);
 
             }
+            else if($data_arr['action']=='readBySemesterID'){
+                $SemesterID = $data_arr['SemesterID'];
+                $data = $this->m_api->getExchangeBySmtID($SemesterID);
+                return print_r(json_encode($data));
+            }
         }
     }
 
