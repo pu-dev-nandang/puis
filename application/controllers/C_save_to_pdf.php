@@ -103,7 +103,7 @@ class C_save_to_pdf extends CI_Controller {
             }
 
         }
-        
+
         $pdf->Output('I',$DayNameEng.'_schedule.pdf');
     }
 

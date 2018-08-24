@@ -87,7 +87,9 @@
             var SemesterID = filterSemester.split('.')[0];
             loading_page('#divpagePresensi');
 
-            var url = base_url_js+'api/__getScheduleIDByClassGroup/'+SemesterID+'/'+filterGroup;
+            var group = filterGroup.split('.')[1];
+
+            var url = base_url_js+'api/__getScheduleIDByClassGroup/'+SemesterID+'/'+group;
             $.getJSON(url,function (result) {
                 if(result!=0 && result!= '0') {
                     var data = {

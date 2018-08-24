@@ -3219,4 +3219,45 @@ class M_api extends CI_Model {
         return $data;
     }
 
+    public function getStudentsAttendance($SemesterID,$ScheduleID){
+
+//        $dataAttd = $this->db->select('ID')->get_where('db_academic.attendance',array(
+//            'SemesterID' => $SemesterID,
+//            'ScheduleID' => $ScheduleID
+//        ));
+
+        $dataCourse = $this->db->query('SELECT mk.NameEng, mk.MKCode, sdc.MKID FROM db_academic.schedule_details_course sdc 
+                                                 LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                 WHERE sdc.ScheduleID = "'.$ScheduleID.'" LIMIT 1')->result_array();
+
+        $dataStd = $this->getStudentByScheduleID($SemesterID,$ScheduleID,'');
+
+        if(count($dataStd)>0){
+            for($i=0;$i<count($dataStd);$i++){
+                $d = $dataStd[$i];
+                $dt = $this->db->query('SELECT attds.M1,attds.M2,attds.M3,attds.M4,attds.M5,attds.M6,attds.M7,attds.M8,attds.M9,
+                                                attds.M10, attds.M11 ,attds.M12,attds.M13,attds.M14, d.NameEng AS DayEng
+                                                FROM db_academic.attendance_students attds 
+                                                LEFT JOIN db_academic.attendance attd ON (attd.ID = attds.ID_Attd)
+                                                LEFT JOIN db_academic.schedule_details sd ON (sd.ID = attd.SDID)
+                                                LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
+                                                WHERE attds.NPM = "'.$d['NPM'].'" AND attd.SemesterID = "'.$SemesterID.'" 
+                                                AND attd.ScheduleID = "'.$ScheduleID.'" ORDER BY sd.DayID ASC ')->result_array();
+
+                $d['Attendance'] = $dt;
+
+                $dataStd[$i] = $d;
+            }
+
+        }
+
+        $res = array(
+            'Course' => $dataCourse,
+            'Student' => $dataStd
+        );
+
+        return $res;
+
+    }
+
 }
