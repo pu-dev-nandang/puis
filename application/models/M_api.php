@@ -2092,9 +2092,9 @@ class M_api extends CI_Model {
 
     public function getJadwalUjian(){
         $SemesterActive = $this->_getSemesterActive();
-        $data = $this->db->query('SELECT s.*,em.Name AS CoordinatorName FROM db_academic.schedule s 
+        $data = $this->db->query('SELECT s.ID,s.ClassGroup,em.Name AS CoordinatorName FROM db_academic.schedule s 
                                           LEFT JOIN db_employees.employees em ON (s.Coordinator = em.NIP)
-                                          WHERE s.SemesterID = "'.$SemesterActive['ID'].'" ');
+                                          WHERE s.SemesterID = "'.$SemesterActive['ID'].'" ORDER BY s.ClassGroup ASC ');
         return $data->result_array();
     }
 
@@ -2192,11 +2192,10 @@ class M_api extends CI_Model {
         return $res;
     }
 
-    public function getScheduleExam($SemesterID,$Type,$ProdiID){
+    public function getScheduleExam($SemesterID,$Type){
         $data = $this->db->query('SELECT e.*,s.ClassGroup,d.NameEng AS DayEng, cl.Room,
                                       em1.Name AS Pengawas1Name, em2.Name AS Pengawas2Name 
                                       FROM db_academic.exam e 
-                                      LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = e.ScheduleID)
                                       LEFT JOIN db_academic.schedule s ON (s.ID = e.ScheduleID)
                                       LEFT JOIN db_academic.classroom cl ON (cl.ID=e.ExamClassroomID)
                                       LEFT JOIN db_academic.days d ON (d.ID=e.DayID)
@@ -2204,7 +2203,8 @@ class M_api extends CI_Model {
                                       LEFT JOIN db_employees.employees em2 ON (em2.NIP = e.Pengawas2)
                                       WHERE e.SemesterID = "'.$SemesterID.'" 
                                       AND e.Type = "'.$Type.'" 
-                                      AND sdc.ProdiID = "'.$ProdiID.'" ')->result_array();
+                                      ORDER BY e.ExamDate ASC
+                                      ')->result_array();
 
         if(count($data)>0){
             for($i=0;$i<count($data);$i++){
@@ -2802,14 +2802,17 @@ class M_api extends CI_Model {
             for($dt=0;$dt<count($dataS);$dt++){
                 $d = $dataS[$dt];
                 $Name = '';
+                $DB_Student = '';
                 for($c=0;$c<count($dataClass);$c++){
                     if($d['Name'.$c]!='' && $d['Name'.$c]!=null){
                         $Name = $d['Name'.$c];
+                        $DB_Student = 'ta_'.$dataClass[$c]['Year'];
                         break;
                     }
                 }
                 $arr = array(
                     'Name' => $Name,
+                    'DB_Student' => $DB_Student,
                     'Username' => $d['NPM'],
                     'Flag' => 'std'
                 );
@@ -3191,7 +3194,9 @@ class M_api extends CI_Model {
         return $data;
     }
 
-    public function getExchangeBySmtID($SemesterID){
+    public function getExchangeBySmtID($SemesterID,$Status){
+
+        $st = ($Status!='') ? ' AND ex.Status = "'.$Status.'" ' : '';
 
         $data = $this->db->query('SELECT attd.ScheduleID, em.Name AS Lecturer, s.ClassGroup, ex.DateOriginal AS A_Date, ex.Meeting AS A_Sesi, sd.StartSessions AS A_StartSessions, 
                                             sd.EndSessions AS A_EndSessions, cl1.Room AS A_Room,
@@ -3204,7 +3209,7 @@ class M_api extends CI_Model {
                                             LEFT JOIN db_employees.employees em ON (em.NIP = ex.NIP)
                                             LEFT JOIN db_academic.schedule_details sd ON (sd.ID = attd.SDID)
                                             LEFT JOIN db_academic.classroom cl1 ON (cl1.ID = sd.ClassroomID)
-                                            WHERE attd.SemesterID = "'.$SemesterID.'" 
+                                            WHERE attd.SemesterID = "'.$SemesterID.'" '.$st.'
                                             ORDER BY ex.DateOriginal ,ex.DayID ASC')->result_array();
 
         // Get Course

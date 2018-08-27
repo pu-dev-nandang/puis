@@ -6,32 +6,34 @@
 </style>
 
 <hr/>
-<div class="thumbnail" style="margin-bottom: 10px;">
-    <div class="row">
-        <div class="col-xs-4" style="">
-            <select id="filterSemester" class="form-control form-filter form-filter-jadwal">
-            </select>
+
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="thumbnail" style="margin-bottom: 10px;">
+            <div class="row">
+                <div class="col-xs-5" style="">
+                    <select id="filterSemester" class="form-control form-filter">
+                    </select>
+                </div>
+<!--                <div class="col-xs-5" style="">-->
+<!--                    <select id="filterBaseProdi" class="form-control form-filter"></select>-->
+<!--                </div>-->
+                <div class="col-xs-2" style="">
+                    <select id="filterExam" class="form-control form-filter">
+                        <option value="uts">UTS</option>
+                        <option value="uas">UAS</option>
+                    </select>
+                </div>
+            </div>
         </div>
-        <div class="col-xs-5" style="">
-            <select id="filterBaseProdi" class="form-control form-filter form-filter-jadwal">
-                <option value="">--- All Programme Study ---</option>
-                <option disabled>------------------------------------------</option>
-            </select>
-        </div>
-        <div class="col-xs-3" style="">
-            <select id="filterExam" class="form-control form-filter form-filter-jadwal">
-                <option disabled selected>--- Exam Type ---</option>
-                <option value="uts">UTS</option>
-                <option value="uas">UAS</option>
-            </select>
-        </div>
+        <hr/>
+
     </div>
 </div>
 
 <div class="row">
     <div class="col-md-12" style="min-height: 150px;">
         <div class="">
-            <hr/>
             <table class="table table-bordered" id="tableExam">
                 <thead>
                 <tr style="background: #437e88;color: #ffffff;">
@@ -55,10 +57,22 @@
     $(document).ready(function () {
         // loadSelectOptionProgramCampus('#filterProgramCampus','');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
-        $('#filterSemester').append('<option value="" disabled selected>-- Academic Year --</option>' +
-            '                <option disabled>------------------------------------------</option>');
 
         loSelectOptionSemester('#filterSemester','');
+
+        window.firsLoadExam = setInterval(function () {
+
+            var filterSemester = $('#filterSemester').val();
+            var filterBaseProdi = $('#filterBaseProdi').val();
+            var filterExam = $('#filterExam').val();
+
+            if(filterSemester!='' && filterSemester!=null &&
+                filterExam!='' && filterExam!=null){
+                loadDataScheduleExam();
+                clearInterval(firsLoadExam);
+            }
+
+        },1000);
 
 
     });

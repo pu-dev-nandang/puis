@@ -1,14 +1,8 @@
 <div class="row" style="margin-top: 30px;">
 
-    <div class="col-md-4">
-        <div class="">
-            <label>Semester Antara</label>
-            <input type="checkbox" id="formSemesterAntara" data-toggle="toggle" data-style="ios"/>
-        </div>
-    </div>
-    <div class="col-md-8" style="text-align: right;">
+    <div class="col-md-8 col-md-offset-4" style="text-align: right;">
         <button data-page="jadwalujian" type="button" class="btn btn-success btn-action
-                        control-jadwal"><i class="fa fa-calendar right-margin" aria-hidden="true"></i> Exam Schedule</button>
+                        control-jadwal"><i class="fa fa-calendar right-margin" aria-hidden="true"></i> Exam Schedule</button> |
         <button data-page="inputjadwalujian" type="button" class="btn btn-default btn-default-success btn-action control-jadwal">
             <i class="fa fa-pencil right-margin" aria-hidden="true"></i> Set Exam Schedule
         </button>
@@ -305,22 +299,27 @@
         var filterBaseProdi = $('#filterBaseProdi').val();
         var filterExam = $('#filterExam').val();
 
-        if(filterSemester!='' && filterSemester!=null && filterBaseProdi!='' && filterBaseProdi!=null && filterExam!='' && filterExam!=null){
+        // if(filterSemester!='' && filterSemester!=null && filterBaseProdi!='' && filterBaseProdi!=null &&
+        //     filterExam!='' && filterExam!=null){
+
+        if(filterSemester!='' && filterSemester!=null &&
+
+            filterExam!='' && filterExam!=null){
             var filterSemesterSplit = filterSemester.split('.');
-            var filterBaseProdiSplit = filterBaseProdi.split('.');
+            // var filterBaseProdiSplit = filterBaseProdi.split('.');
 
             var data = {
                 action : 'readSchedule',
                 SemesterID : filterSemesterSplit[0],
-                Type : filterExam,
-                ProdiID : filterBaseProdiSplit[0]
+                Type : filterExam
+
             };
 
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'api/__crudJadwalUjian';
             $('#trExam').empty();
             $.post(url,{token:token},function (resultJson) {
-                console.log(resultJson);
+                // console.log(resultJson);
                 if(resultJson.length>0){
 
                     for(var i=0;i<resultJson.length;i++){
@@ -360,6 +359,11 @@
                             '</tr>');
                     }
 
+                }
+                else {
+                    $('#trExam').append('<tr>' +
+                        '<td colspan="8" style="text-align: center;">--- Data Not Yet ---</td>' +
+                        '</tr>');
                 }
             });
         }

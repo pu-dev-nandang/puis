@@ -12,14 +12,21 @@
 </style>
 
 <div class="row">
-    <div class="col-md-4 col-md-offset-4">
+    <div class="col-md-6 col-md-offset-3">
         <div class="well">
             <div class="row">
-                <div class="col-xs-7">
+                <div class="col-xs-4">
                     <select class="form-control" id="filterSemester"></select>
                 </div>
-                <div class="col-xs-5">
-                    <button class="btn btn-default btn-default-success" disabled id="btnDownload2PDFExchange">Download to PDF</button>
+                <div class="col-xs-4">
+                    <select class="form-control" id="filterStatus">
+                        <option value="">-- All Status --</option>
+                        <option value="1">Approved</option>
+                        <option value="0">Not Yet Approved</option>
+                    </select>
+                </div>
+                <div class="col-xs-4">
+                    <button class="btn btn-default btn-block btn-default-success" disabled id="btnDownload2PDFExchange">Download to PDF</button>
                 </div>
             </div>
         </div>
@@ -79,7 +86,7 @@
 
     });
 
-    $(document).on('change','#filterSemester',function () {
+    $(document).on('change','#filterSemester,#filterStatus',function () {
         loadScheduleExchage();
     });
 
@@ -90,6 +97,8 @@
     function loadScheduleExchage() {
 
         var filterSemester = $('#filterSemester').val();
+        var filterStatus = $('#filterStatus').val();
+
 
         if(filterSemester!=null && filterSemester!=''){
 
@@ -98,7 +107,7 @@
             var SemesterID = filterSemester.split('.')[0];
 
             var url = base_url_js+'api/__crudScheduleExchange';
-            var token = jwt_encode({action:'readBySemesterID',SemesterID:SemesterID},'UAP)(*');
+            var token = jwt_encode({action:'readBySemesterID',SemesterID:SemesterID,Status:filterStatus},'UAP)(*');
 
 
             $.post(url,{token:token},function (jsonResult) {
@@ -149,7 +158,6 @@
                             Reason : d.Reason,
                             Status : d.Status
                         };
-
                         dataFormHide2PDF.push(arr2pdf);
                     }
 
