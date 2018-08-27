@@ -56,7 +56,7 @@
         </div>
 
         <form id="FormHide2PDF" action="<?php echo base_url('save2pdf/scheduleExchange'); ?>" method="post" target="_blank">
-            <textarea id="dataFormHide2PDF" class=""  name="token" ></textarea>
+            <textarea id="dataFormHide2PDF" class="hide" hidden name="token" ></textarea>
         </form>
 
     </div>
@@ -66,18 +66,15 @@
 <script>
     $(document).ready(function () {
 
-        console.log(moment('2018-08-21').format('dddd, D MMM YYYY'))
+        // console.log(moment('2018-08-21').format('dddd, D MMM YYYY'));
 
-        window.firstLoad = true;
         window.dataFormHide2PDF = [];
 
         $('#filterSemester').empty();
         loSelectOptionSemester('#filterSemester','');
 
-        setInterval(function () {
-            if(firstLoad){
-                loadScheduleExchage();
-            }
+        window.loadFirstTime = setInterval(function () {
+            loadScheduleExchage();
         },1000);
 
     });
@@ -96,7 +93,8 @@
 
         if(filterSemester!=null && filterSemester!=''){
 
-            firstLoad = false;
+            clearInterval(loadFirstTime);
+
             var SemesterID = filterSemester.split('.')[0];
 
             var url = base_url_js+'api/__crudScheduleExchange';

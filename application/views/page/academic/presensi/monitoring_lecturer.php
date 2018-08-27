@@ -21,7 +21,7 @@
                     <select class="form-control" id="filterProgrammeStudy"></select>
                 </div>
                 <div class="col-xs-3">
-                    <button id="btnSave2PDF_monitoringAttdLec" disabled class="btn btn-default btn-default-success btn-block">Download To PDF</button>
+                    <button id="btnSave2PDF_monitoringAttdLec" disabled class="btn btn-default btn-default-success btn-block">Download to PDF</button>
                 </div>
             </div>
         </div>
@@ -44,7 +44,6 @@
 
     $(document).ready(function () {
 
-        window.loadFirstTime = true;
         window.save2PDF = [];
 
         $('#filterSemester').empty();
@@ -52,15 +51,14 @@
 
         loadSelectOptionBaseProdi('#filterProgrammeStudy','');
 
-        setInterval(function () {
-            if(loadFirstTime){
-                var filterSemester = $('#filterSemester').val();
-                var filterProgrammeStudy = $('#filterProgrammeStudy').val();
-                if(filterSemester!='' && filterSemester!=null &&
-                    filterProgrammeStudy!='' && filterProgrammeStudy!=null){
-                    loadingDataMonitoringAttd();
-                    loadFirstTime = false;
-                }
+        window.loadFirstTime = setInterval(function () {
+            var filterSemester = $('#filterSemester').val();
+            var filterProgrammeStudy = $('#filterProgrammeStudy').val();
+            if(filterSemester!='' && filterSemester!=null &&
+                filterProgrammeStudy!='' && filterProgrammeStudy!=null){
+                loadingDataMonitoringAttd();
+
+                clearInterval(loadFirstTime);
             }
         },1000);
 
