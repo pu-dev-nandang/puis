@@ -45,9 +45,11 @@
     $(document).ready(function () {
         window.totalMhs = 0;
         getSelectOptionAttendance();
-        setTimeout(function () {
+
+        window.loadFirstTime = setInterval(function () {
             getDataAttendance();
-        },500);
+        },1000);
+
     });
 
     $('#filterAttendanceType').change(function () {
@@ -75,6 +77,8 @@
         if(type==0 && DataAttendance!='' && DataAttendance!=null){
 
             var AttendanceID = DataAttendance.split('.')[0];
+
+            clearInterval(loadFirstTime);
 
 
             var url = base_url_js+'api/__crudAttendance';

@@ -42,12 +42,10 @@
         $('#filterSemester').empty();
         loSelectOptionSemester('#filterSemester','');
 
-        window.varG = true;
 
-        setInterval(function () {
-            if(varG){
-                loadGroupDiv();
-            }
+
+        window.loadFirstTime = setInterval(function () {
+            loadGroupDiv();
         },1000);
 
     });
@@ -73,7 +71,7 @@
             loadSelectOptionClassGroupAttendance(SemesterID,'#filterClassGroup','');
             $('#filterClassGroup').select2({allowClear: true});
 
-            varG = false;
+            clearInterval(loadFirstTime);
         }
 
     }

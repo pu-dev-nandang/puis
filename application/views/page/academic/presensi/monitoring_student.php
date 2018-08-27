@@ -17,10 +17,17 @@
                 <div class="col-xs-4">
                     <select id="filterSemester" class="form-control filter-presensi"></select>
                 </div>
-                <div class="col-xs-8">
+                <div class="col-xs-6">
                     <div id="viewGroup"></div>
                 </div>
+                <div class="col-xs-2">
+                    <button class="btn btn-default btn-default-success" id="btnSavePDFAttdStd">Download to PDF</button>
 
+                    <form id="FormHide2PDF" action="<?php echo base_url('save2pdf/monitoringStudent'); ?>" method="post" target="_blank">
+                        <textarea id="textToPDF" class="hide" name="token" hidden></textarea>
+                    </form>
+
+                </div>
             </div>
         </div>
 
@@ -72,12 +79,9 @@
         $('#filterSemester').empty();
         loSelectOptionSemester('#filterSemester','');
 
-        window.varG = true;
 
-        setInterval(function () {
-            if(varG){
+       window.loadFirstTime = setInterval(function () {
                 loadGroupDiv();
-            }
         },1000);
 
     });
@@ -93,6 +97,10 @@
         loadPageAttdStudent();
     });
 
+    $('#btnSavePDFAttdStd').click(function () {
+        $('#FormHide2PDF').submit();
+    });
+
     function loadGroupDiv() {
         $('#viewGroup').html('');
         $('#viewGroup').html('<select class="select2-select-00 full-width-fix"' +
@@ -103,7 +111,7 @@
             loadSelectOptionClassGroupAttendance(SemesterID,'#filterClassGroup','');
             $('#filterClassGroup').select2({allowClear: true});
 
-            varG = false;
+            clearInterval(loadFirstTime);
         }
 
     }
@@ -132,66 +140,81 @@
 
                 tr.empty();
 
+                // Data Course
+                var course = jsonResult.Course[0];
+                $('#viewCourse').html(course.NameEng);
 
+                var student = jsonResult.Student;
+                if(student.length>0){
+                    var no = 1;
+                    for(var i=0;i<student.length;i++){
+                        var d = student[i];
 
-                    // Data Course
-                    var course = jsonResult.Course[0];
-                    $('#viewCourse').html(course.NameEng);
+                        var rwSpan = 1 + d.Attendance.length;
 
-                    var student = jsonResult.Student;
-                    if(student.length>0){
-                        var no = 1;
-                        for(var i=0;i<student.length;i++){
-                            var d = student[i];
+                        tr.append('<tr>' +
+                            '<td rowspan="'+rwSpan+'">'+(no++)+'</td>' +
+                            '<td style="text-align: left;" rowspan="'+rwSpan+'">'+d.NPM+'</td>' +
+                            '<td style="text-align: left;" rowspan="'+rwSpan+'"><b>'+d.Name+'</b></td>' +
+                            '</tr>');
 
-                            var rwSpan = 1 + d.Attendance.length;
+                        var attCount = 0;
+                        var target = 14 * d.Attendance.length;
+                        for(var a=0;a<d.Attendance.length;a++){
+                            var da = d.Attendance[a];
 
-                            tr.append('<tr>' +
-                                '<td rowspan="'+rwSpan+'">'+(no++)+'</td>' +
-                                '<td style="text-align: left;" rowspan="'+rwSpan+'">'+d.NPM+'</td>' +
-                                '<td style="text-align: left;" rowspan="'+rwSpan+'"><b>'+d.Name+'</b></td>' +
-                                '</tr>');
+                            var trEnd = '</tr>';
 
-                            for(var a=0;a<d.Attendance.length;a++){
-                                var da = d.Attendance[a];
-
-
-                                var trEnd = '</tr>';
-
-                                if(a==0){
-                                    var target = 14 * d.Attendance.length;
-                                    trEnd = '<td rowspan="'+rwSpan+'">'+target+'</td>' +
-                                        '<td rowspan="'+rwSpan+'">7</td>' +
-                                        '<td rowspan="'+rwSpan+'">7</td>' +
-                                        '</tr>';
-                                }
-
-                                tr.append('<tr>' +
-                                    '<td style="text-align: left;">'+da.DayEng+'</td>' +
-                                    '<td>'+checkSesi(da.M1)+'</td>' +
-                                    '<td>'+checkSesi(da.M2)+'</td>' +
-                                    '<td>'+checkSesi(da.M3)+'</td>' +
-                                    '<td>'+checkSesi(da.M4)+'</td>' +
-                                    '<td>'+checkSesi(da.M5)+'</td>' +
-                                    '<td>'+checkSesi(da.M6)+'</td>' +
-                                    '<td>'+checkSesi(da.M7)+'</td>' +
-                                    '<td>'+checkSesi(da.M8)+'</td>' +
-                                    '<td>'+checkSesi(da.M9)+'</td>' +
-                                    '<td>'+checkSesi(da.M10)+'</td>' +
-                                    '<td>'+checkSesi(da.M11)+'</td>' +
-                                    '<td>'+checkSesi(da.M12)+'</td>' +
-                                    '<td>'+checkSesi(da.M13)+'</td>' +
-                                    '<td>'+checkSesi(da.M14)+'</td>' +
-                                    ''+trEnd);
+                            if(a==0){
+                                trEnd = '<td rowspan="'+rwSpan+'">'+target+'</td>' +
+                                    '<td rowspan="'+rwSpan+'" id="real'+i+'">7</td>' +
+                                    '<td rowspan="'+rwSpan+'" id="percent'+i+'">7</td>' +
+                                    '</tr>';
                             }
 
+                            // Count Sesi
+                            for(var t=1;t<=14;t++){
+                                if(da['M'+t]==1 || da['M'+t]=='1'){
+                                    attCount += 1;
+                                }
+                            }
 
+                            tr.append('<tr>' +
+                                '<td style="text-align: left;">'+da.DayEng+'</td>' +
+                                '<td>'+checkSesi(da.M1)+'</td>' +
+                                '<td>'+checkSesi(da.M2)+'</td>' +
+                                '<td>'+checkSesi(da.M3)+'</td>' +
+                                '<td>'+checkSesi(da.M4)+'</td>' +
+                                '<td>'+checkSesi(da.M5)+'</td>' +
+                                '<td>'+checkSesi(da.M6)+'</td>' +
+                                '<td>'+checkSesi(da.M7)+'</td>' +
+                                '<td>'+checkSesi(da.M8)+'</td>' +
+                                '<td>'+checkSesi(da.M9)+'</td>' +
+                                '<td>'+checkSesi(da.M10)+'</td>' +
+                                '<td>'+checkSesi(da.M11)+'</td>' +
+                                '<td>'+checkSesi(da.M12)+'</td>' +
+                                '<td>'+checkSesi(da.M13)+'</td>' +
+                                '<td>'+checkSesi(da.M14)+'</td>' +
+                                ''+trEnd);
                         }
-                    } else {
-                        tr.append('<tr><td colspan="19">--- Student Not Yet ---</td></tr>');
+
+                        $('#real'+i).html(attCount);
+                        var percent = (attCount!=0) ? ((attCount/target) * 100).toFixed(0) : 0;
+                        $('#percent'+i).html(percent+' %');
+                        student[i].Target = target;
+                        student[i].Total_Attd = attCount;
+                        student[i].Percent = percent+' %';
+
+
                     }
+                } else {
+                    tr.append('<tr><td colspan="19">--- Student Not Yet ---</td></tr>');
+                }
 
+                console.log(jsonResult);
+                var token = jwt_encode(jsonResult,'UAP)(*');
 
+                $('#textToPDF').val(token);
 
             });
 
@@ -202,7 +225,7 @@
 
     function checkSesi(Meet) {
         var res = '-';
-        if(Meet!=null && Meet!=''){
+        if(Meet==1 || Meet=='1'){
             res = '<i class="fa fa-check-circle" style="color: green;"></i>';
         } else if (Meet=='2' || Meet==2) {
             res = '<i class="fa fa-times-circle" style="color: red;"></i>';
