@@ -928,7 +928,7 @@
                     '            <th style="width: 1%;">No</th>' +
                     '            <th style="width: 10%;">NIM</th>' +
                     '            <th>Name</th>' +
-                    '            <th style="width: 5%;">Action</th>' +
+                    '            <th style="width: 9%;">Action</th>' +
                     '        </tr>' +
                     '        </thead>' +
                     '        <tbody id="trBody">' +
@@ -951,11 +951,14 @@
                 for(var i=0;i<totalMhs;i++){
                     var dataRowStd = jsonResult[i];
 
-                    $('#trBody').append('<tr>' +
+
+                    $('#trBody').append('<tr id="trN'+dataRowStd.ID_Attd_S+'">' +
                         '<td>'+(no_tr++)+'</td>' +
                         '<td>'+dataRowStd.DetailStudent.NPM+'<input value="'+dataRowStd.ID_Attd_S+'" id="formID_Attd_S'+i+'" class="hide" hidden readonly/></td>' +
                         '<td style="text-align: left;font-weight: bold;">'+dataRowStd.DetailStudent.Name+'</td>' +
-                        '<td><button class="btn btn-danger">Del</button></td>' +
+                        '<td><button class="btn btn-danger btn-del-attd-s" data-npm="'+dataRowStd.DetailStudent.NPM+'" data-db="'+dataRowStd.DBStudent+'" ' +
+                        'data-id-attd-s="'+dataRowStd.ID_Attd_S+'" data-id-attd="'+dataRowStd.ID_Attd+'" ' +
+                        'data-sc="'+dataRowStd.SemesterID+'.'+dataRowStd.ScheduleID+'"><i class="fa fa-trash"></i></button></td>' +
                         '</tr>');
                 }
             }
@@ -985,7 +988,7 @@
                         $('#rowStdAttd').append('<tr>' +
                             '<td style="text-align: left;">'+d.Username+'</td>' +
                             '<td>'+d.Name+'</td>' +
-                            '<td><button class="btn btn-success btn-block">Add Student</button></td>' +
+                            '<td><button class="btn btn-success btn-block"><i class="fa fa-download"></i></button></td>' +
                             '</tr>');
                     }
                 }
@@ -997,6 +1000,50 @@
                 }
             });
         }
+    });
+
+    $(document).on('click','.btn-del-attd-s',function () {
+
+        var NPM = $(this).attr('data-npm');
+        var ID_Attd = $(this).attr('data-id-attd');
+        var ID_Attd_S = $(this).attr('data-id-attd-s');
+        var db_student = $(this).attr('data-db');
+        var Schedule = $(this).attr('data-sc');
+
+        loading_buttonSm('.btn-del-attd-s[data-id-attd-s='+ID_Attd_S+']');
+
+        var url = base_url_js+'api/__crudAttendance';
+        var data = {
+            action : 'delAttendanceStudents',
+            NPM : NPM,
+            SemesterID : Schedule.split('.')[0].trim(),
+            ScheduleID : Schedule.split('.')[1].trim(),
+            ID_Attd : ID_Attd,
+            ID_Attd_S : ID_Attd_S,
+            db_student : db_student
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        $.post(url,{token:token},function (jsonResult) {
+
+            if(jsonResult.Status==1 || jsonResult.Status=='1'){
+                toastr.success('Delete Success','Success');
+                getDataAttendance();
+                setTimeout(function () {
+                    $('#trN'+ID_Attd_S).animateCss('zoomOut',function () {
+                        $('#trN'+ID_Attd_S).remove();
+                    });
+                },500);
+            } else {
+                toastr.error(jsonResult.Msg,'Error');
+                setTimeout(function () {
+                    $('.btn-del-attd-s[data-id-attd-s='+ID_Attd_S+']').prop('disabled',false).html('<i class="fa fa-trash"></i>');
+                },500);
+            }
+
+        });
+
+
     });
 
 </script>
