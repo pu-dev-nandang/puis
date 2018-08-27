@@ -80,4 +80,5 @@
 		}
 		pageHtml = 'tuition_fee_approved';
 	}
+
 </script>

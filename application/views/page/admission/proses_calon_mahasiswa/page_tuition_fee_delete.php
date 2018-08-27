@@ -81,7 +81,7 @@
 
 			$(".tableData tbody").append(
 					'<tr>'+
-						'<td align= "center">'+no+'&nbsp<input type="checkbox" class="uniform" nama ="'+getDataCalonMhs[i]['Name']+'" value ="'+getDataCalonMhs[i]['ID_register_formulir']+'"</td>'+
+						'<td align= "center">'+no+'&nbsp<input type="checkbox" class="uniform" nama ="'+getDataCalonMhs[i]['Name']+'" value ="'+getDataCalonMhs[i]['ID_register_formulir']+'" </td>'+
 						'<td>'+getDataCalonMhs[i]['Name']+'<br>'+getDataCalonMhs[i]['NamePrody']+'<br>'+getDataCalonMhs[i]['SchoolName']+'</td>'+
 						'<td>'+getDataCalonMhs[i]['FormulirCode']+'</td>'+
 						'<td>'+getDataCalonMhs[i]['getBeasiswa']+'<br>'+showFile+'</td>'+
