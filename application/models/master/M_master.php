@@ -655,13 +655,82 @@ class M_master extends CI_Model {
     public function get_submenu_by_menu($input)
     {
         $ID_Menu = $input['Menu'];
-        $NIP = $input['NIP'];
+        $GroupUser = $input['GroupUser'];
         $sql = "select a.Menu,b.* from db_admission.cfg_menu as a
       join db_admission.cfg_sub_menu as b
       on a.ID = b.ID_Menu where b.ID_Menu = ?
-      and b.ID not in (select ID_cfg_sub_menu from db_admission.previleges where NIP = ?)";
-        $query=$this->db->query($sql, array($ID_Menu,$NIP))->result_array();
+      and b.ID not in (select ID_cfg_sub_menu from db_admission.cfg_rule_g_user where cfg_group_user = ?)";
+        $query=$this->db->query($sql, array($ID_Menu,$GroupUser))->result_array();
         return $query;
+    }
+
+    public function groupuser_save($input)
+    {
+        $ID_GroupUSer = $input['ID_GroupUSer'];
+        $checkbox = $input['checkbox'];
+        $data = array();
+        $increment = 0;
+        for ($i=0; $i < count($checkbox); $i++) {
+            $value = strtolower($checkbox[$i]->value);
+            $ID_cfg_sub_menu = $checkbox[$i]->ID;
+
+            // check data pertama
+            if (count($data) == 0) {
+                $data[$increment] = array(
+                    'cfg_group_user' => $ID_GroupUSer,
+                    'ID_cfg_sub_menu' => $ID_cfg_sub_menu,
+                    $value => 1,
+                );
+                continue;
+            }
+
+            if (count($data) > 0) {
+                // check data ada pada array
+                $check = false;
+                for ($j=0; $j < count($data); $j++) {
+                    if ($data[$j]['ID_cfg_sub_menu'] == $ID_cfg_sub_menu) {
+                        $data[$j][$value] = 1;
+                        $check = true;
+                        break;
+                    }
+                }
+
+                if ($check) {
+                    continue;
+                }
+
+                // check data tidak ada pada array
+                for ($j=0; $j < count($data); $j++) {
+                    if ($data[$j]['ID_cfg_sub_menu'] != $ID_cfg_sub_menu) {
+                        $check = true;
+                        break;
+                    }
+                }
+
+                if ($check) {
+                    $increment++;
+                    $data[$increment] = array(
+                        'cfg_group_user' => $ID_GroupUSer,
+                        'ID_cfg_sub_menu' => $ID_cfg_sub_menu,
+                        $value => 1,
+                    );
+                    continue;
+                }
+
+            }
+
+        }
+
+        // print_r($data);
+        // save data
+        for ($i=0; $i < count($data); $i++) {
+            $dataSave = array();
+            foreach ($data[$i] as $key => $value) {
+                $dataSave[$key] = $value;
+                // $dataSave = array($key=>$value);
+            }
+            $this->db->insert('db_admission.cfg_rule_g_user', $dataSave);
+        }
     }
 
     public function save_user_previleges($input)
@@ -747,7 +816,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $query;
     }
 
-    public function previleges_user_update($input)
+    public function previleges_groupuser_update($input)
     {
         // $dataArr = array();
         $read = '';
@@ -761,7 +830,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         {
             $ID = $input['ID'];
             $read = $input['read'];
-            $sql = "update db_admission.previleges set `read` = ? where ID = ? ";
+            $sql = "update db_admission.cfg_rule_g_user set `read` = ? where ID = ? ";
             $query=$this->db->query($sql, array($read,$ID));
         }
 
@@ -769,7 +838,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         {
             $ID = $input['ID'];
             $write = $input['write'];
-            $sql = "update db_admission.previleges set `write` = ? where ID = ? ";
+            $sql = "update db_admission.cfg_rule_g_user set `write` = ? where ID = ? ";
             $query=$this->db->query($sql, array($write,$ID));
         }
 
@@ -777,7 +846,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         {
             $ID = $input['ID'];
             $update = $input['update'];
-            $sql = "update db_admission.previleges set `update` = ? where ID = ? ";
+            $sql = "update db_admission.cfg_rule_g_user set `update` = ? where ID = ? ";
             $query=$this->db->query($sql, array($update,$ID));
         }
 
@@ -785,7 +854,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         {
             $ID = $input['ID'];
             $delete = $input['delete'];
-            $sql = "update db_admission.previleges set `delete` = ? where ID = ? ";
+            $sql = "update db_admission.cfg_rule_g_user set `delete` = ? where ID = ? ";
             $query=$this->db->query($sql, array($delete,$ID));
         }
     }
@@ -1937,10 +2006,11 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             }
             $URISlug = 'and a.Slug like "%'.$URISlug.'%"';
         }
-        $sql = "select b.read,b.write,b.update,b.delete from db_admission.cfg_sub_menu as a join db_admission.previleges as b on a.ID = b.ID_cfg_sub_menu 
-        where b.NIP = ? ".$URISlug;
-        //print_r($sql);
+        $sql = "select b.read,b.write,b.update,b.delete from db_admission.cfg_sub_menu as a join db_admission.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
+        join db_admission.previleges_guser as c on c.G_user = b.cfg_group_user
+        where c.NIP = ? ".$URISlug;
         $query=$this->db->query($sql, array($this->session->userdata('NIP')))->result_array();
+        // print_r($query);die();
         return $query;
     }
 
@@ -1953,10 +2023,10 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         // get Access URL
         $getDataSess  = $this->session->userdata('menu_admission_grouping');
         $access = array(
-            'read' => 1,
-            'write' => 1,
-            'update' => 1,
-            'delete' => 1,
+            'read' => 0,
+            'write' => 0,
+            'update' => 0,
+            'delete' => 0,
         );
 
         $p = $this->chkAuthDB_Base_URL($URL);
@@ -1988,6 +2058,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
                  $(document).ready(function () {
                      $(".btn-read").remove();
+                     //window.location.href = base_url_js+"vreservation/dashboard/view";
                      $(document).ajaxComplete(function () {
                          $(".btn-read").remove();
                      });
@@ -2083,6 +2154,53 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             ';
             echo $html;
         }
+
+
+        // special menu & group
+        $bool = true;
+        foreach ($access as $key => $value) {
+            if ($value == 0) {
+                $bool = false;
+                break;
+            }
+        }
+
+        if (!$bool) {
+            $html .= '<script type="text/javascript">
+                 var waitForEl = function(selector, callback) {
+                   if (jQuery(selector).length) {
+                     callback();
+                   } else {
+                     setTimeout(function() {
+                       waitForEl(selector, callback);
+                     }, 100);
+                   }
+                 };
+
+                 waitForEl(".btn-delete-menu-auth", function() {
+                    $(".btn-delete-menu-auth").remove();
+                 });
+
+                 waitForEl(".btn-edit-menu-auth", function() {
+                   $(".btn-edit-menu-auth").remove();
+                 });
+
+                 waitForEl(".btn-edit-menu-auth", function() {
+                   $(".btn-edit-menu-auth").remove();
+                 })
+
+                 waitForEl(".btn-add-menu-auth", function() {
+                   $(".btn-add-menu-auth").remove();
+                 });
+
+                 waitForEl(".btn-delete-menu-auth", function() {
+                   $(".btn-delete-menu-auth").remove();
+                 });
+                 
+                 </script>
+            ';
+            echo $html;
+        }
         return $html;
     }
 
@@ -2141,6 +2259,41 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $sql = 'select CONCAT(a.Name," | ",a.NIP) as Name, a.NIP from db_employees.employees as a
           where (a.Name like "%'.$Nama.'%" or a.NIP like "%'.$Nama.'%" )
           GROUP BY a.NIP';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
+    }
+
+    public function getDataWithoutSuperAdmin()
+    {
+        $sql = 'select * from db_admission.cfg_group_user where ID != 1';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
+    }
+
+    public function get_previleges_group_show($GroupID)
+    {
+        $sql = 'SELECT d.GroupAuth, b.Menu,c.SubMenu1,c.SubMenu2,c.ID_Menu,a.ID_cfg_sub_menu,a.ID as ID_previleges,a.`read`,a.`write`,a.`update`,
+a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,c.`delete` as deleteMenu from db_admission.cfg_rule_g_user as a
+            join db_admission.cfg_group_user as d
+            on a.cfg_group_user = d.ID
+            join db_admission.cfg_sub_menu as c
+            on a.ID_cfg_sub_menu = c.ID
+            join db_admission.cfg_menu as b
+            on b.ID = c.ID_Menu where d.ID = ? ';
+        $query=$this->db->query($sql, array($GroupID))->result_array();
+        return $query;
+    }
+
+    public function getCountAllDataAuth($table)
+    {
+        $sql = 'select count(*) as total from '.$table;
+        $query=$this->db->query($sql, array())->result_array();
+        return $query[0]['total'];
+    }
+
+    public function getDataWithoutSuperAdminGlobal($table)
+    {
+        $sql = 'select * from '.$table.' where ID != 1';
         $query=$this->db->query($sql, array())->result_array();
         return $query;
     }
