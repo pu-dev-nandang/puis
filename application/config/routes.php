@@ -312,6 +312,22 @@ $route['admission/master-config/menu-previleges/get_previleges_user/show'] = 'pa
 $route['admission/master-config/menu-previleges/previleges_user/update'] = 'page/admission/c_master/previleges_user_update';
 $route['admission/master-config/menu-previleges/previleges_user/delete'] = 'page/admission/c_master/previleges_user_delete';
 
+// menu & group
+$route['admission/master-config/menu-previleges/getGroupPrevileges'] = 'page/admission/c_master/getGroupPrevileges';
+$route['admission/master-config/menu-previleges/groupuser/save'] = 'page/admission/c_master/groupuser_save';
+$route['admission/master-config/menu-previleges/get_previleges_group/show'] = 'page/admission/c_master/get_previleges_group_show';
+$route['admission/master-config/menu-previleges/modalform_group_user'] = 'page/admission/c_master/modalform_group_user';
+$route['admission/master-config/menu-previleges/save_group_user'] = 'page/admission/c_master/save_group_user';
+$route['admission/master-config/menu-previleges/update_group_user'] = 'page/admission/c_master/update_group_user';
+$route['admission/master-config/menu-previleges/config/groupuser/delete'] = 'page/admission/c_master/delete_group_user';
+$route['admission/edit_auth_user'] = 'page/admission/c_master/edit_auth_user';
+$route['admission/add_auth_user'] = 'page/admission/c_master/add_auth_user';
+$route['admission/delete_authUser'] = 'page/admission/c_master/delete_authUser';
+$route['admission/config/getAuthDataTables'] = 'page/admission/c_master/getAuthDataTables';
+
+
+
+
 
 $route['admission/dashboard'] = 'page/admission/c_admission/dashboard';
 $route['readNotificationDivision'] = 'dashboard/c_dashboard/readNotificationDivision';
@@ -371,6 +387,7 @@ $route['admission/distribusi-formulir/formulir-offline/selectPIC'] = 'page/admis
 
 $route['admission/mastercalonmahasiswa/generate-nim'] = 'page/admission/c_admission/generatenim';
 $route['admission/mastercalonmahasiswa/submit_import_excel_File_generate_nim'] = 'page/admission/c_admission/submit_import_excel_File_generate_nim';
+
 
 
 
@@ -693,7 +710,7 @@ $route['vreservation/config/menu-previleges/get_submenu/show'] = 'page/vreservat
 $route['vreservation/config/menu-previleges/get_submenu/update'] = 'page/vreservation/c_config/get_submenu_update';
 $route['vreservation/config/menu-previleges/get_submenu/delete'] = 'page/vreservation/c_config/get_submenu_delete';
 $route['vreservation/getGroupPrevileges'] = 'page/vreservation/c_config/getGroupPrevileges';
-$route['vreservation/getMenu'] = 'page/vreservation/c_config/getMenu';
+// $route['vreservation/getMenu'] = 'page/vreservation/c_config/getMenu';
 $route['vreservation/getMenu'] = 'page/vreservation/c_config/getMenu';
 $route['vreservation/config/menu-previleges/get_submenu_by_menu'] = 'page/vreservation/c_config/get_submenu_by_menu';
 $route['vreservation/config/menu-previleges/get_previleges_group/show'] = 'page/vreservation/c_config/get_previleges_group_show';

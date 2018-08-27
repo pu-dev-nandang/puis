@@ -253,7 +253,7 @@ abstract class Admission_Controler extends Globalclass{
     {
         $data = array();
         $this->load->model('master/m_master');
-        $getDataMenu = $this->m_master->getMenuUser($this->session->userdata('NIP'));
+        $getDataMenu = $this->m_master->getMenuGroupUser($this->session->userdata('NIP'),'db_admission');
         $data_sess = array();
         if (count($getDataMenu) > 0) {
             $this->session->set_userdata('auth_admission_sess',1);
@@ -268,10 +268,10 @@ abstract class Admission_Controler extends Globalclass{
         $this->load->model('master/m_master');
         $arr = array();
         for ($i=0; $i < count($DataDB); $i++) {
-            $submenu1 = $this->m_master->getSubmenu1BaseMenu($DataDB[$i]['ID_menu']);
+            $submenu1 = $this->m_master->getSubmenu1BaseMenu_grouping($DataDB[$i]['ID_menu'],'db_admission');
             $arr2 = array();
             for ($k=0; $k < count($submenu1); $k++) { 
-                $submenu2 = $this->m_master->getSubmenu2BaseSubmenu1($submenu1[$k]['SubMenu1']);
+                $submenu2 = $this->m_master->getSubmenu2BaseSubmenu1_grouping($submenu1[$k]['SubMenu1'],'db_admission');
                 $arr2[] = array(
                     'SubMenu1' => $submenu1[$k]['SubMenu1'],
                     'Submenu' => $submenu2,
@@ -286,8 +286,33 @@ abstract class Admission_Controler extends Globalclass{
             );
             
         }
-
+        //print_r($arr);die();
         return $arr;
+
+        // $DataDB = $this->session->userdata('menu_admission_sess');
+        // $this->load->model('master/m_master');
+        // $arr = array();
+        // for ($i=0; $i < count($DataDB); $i++) {
+        //     $submenu1 = $this->m_master->getSubmenu1BaseMenu($DataDB[$i]['ID_menu']);
+        //     $arr2 = array();
+        //     for ($k=0; $k < count($submenu1); $k++) { 
+        //         $submenu2 = $this->m_master->getSubmenu2BaseSubmenu1($submenu1[$k]['SubMenu1']);
+        //         $arr2[] = array(
+        //             'SubMenu1' => $submenu1[$k]['SubMenu1'],
+        //             'Submenu' => $submenu2,
+        //         );
+        //     }
+
+        //     $arr[] =array(
+        //         'Menu' => $DataDB[$i]['Menu'],
+        //         'Icon' => $DataDB[$i]['Icon'],
+        //         'Submenu' => $arr2
+
+        //     );
+            
+        // }
+
+        // return $arr;
     }
 
     public function auth_ajax()

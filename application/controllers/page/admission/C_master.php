@@ -736,7 +736,7 @@ class C_master extends Admission_Controler {
     public function previleges_user_update()
     {
         $input = $this->getInputToken();
-        $this->m_master->previleges_user_update($input);
+        $this->m_master->previleges_groupuser_update($input);
     }
 
     public function previleges_user_delete()
@@ -1432,6 +1432,212 @@ class C_master extends Admission_Controler {
                 # code...
                 break;
         }
+    }
+
+    // modification menu
+    public function getGroupPrevileges()
+    {
+        // get NIP
+        $NIP = $this->session->userdata('NIP');
+        $get = $this->m_master->caribasedprimary('db_admission.previleges_guser','NIP',$NIP);
+        if ($get[0]['G_user'] == 1) {
+            $generate = $this->m_master->showData_array('db_admission.cfg_group_user');
+        }
+        else
+        {
+            $generate = $this->m_master->getDataWithoutSuperAdmin();
+        }
+        
+        echo json_encode($generate);
+    }
+
+    public function groupuser_save()
+    {
+        $input = $this->getInputToken();
+        $this->m_master->groupuser_save($input);
+    }
+
+    public function get_previleges_group_show()
+    {
+        $input = $this->getInputToken();
+        $GroupID = $input['Nama_search'];
+        $generate = $this->m_master->get_previleges_group_show($GroupID);
+        echo json_encode($generate);
+    }
+
+    public function modalform_group_user()
+    {
+        $input = $this->getInputToken();
+        $this->data['action'] = $input['Action'];
+        echo $this->load->view('page/'.$this->data['department'].'/master/modal_group_user',$this->data,true);
+    }
+
+    public function save_group_user()
+    {
+        $input = $this->getInputToken();
+        $dataSave = array(
+            'GroupAuth' => $input['groupName'],
+        );
+        $this->db->insert('db_admission.cfg_group_user', $dataSave);
+    }
+
+    public function update_group_user()
+    {
+        $input = $this->getInputToken();
+        $ID = $input['ID'];
+        $GroupAuth = $input['GroupAuth'];
+        $sql = "update db_admission.cfg_group_user set GroupAuth = ? where ID = ? ";
+        $query=$this->db->query($sql, array($GroupAuth,$ID));
+    }
+
+    public function delete_group_user()
+    {
+        $input = $this->getInputToken();
+        $sql = "delete from db_admission.cfg_group_user where ID = ".$input['ID'];
+        $query=$this->db->query($sql, array());
+    }
+
+    public function menu_group()
+    {
+        $content = $this->load->view('page/'.$this->data['department'].'/master/previleges',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function edit_auth_user()
+    {
+        $input = $this->getInputToken();
+        $dataSave = array(
+            'G_user' => $input['valuee'],
+        );
+        $this->db->where('NIP', $input['NIP']);
+        $this->db->update('db_admission.previleges_guser', $dataSave);
+    }
+
+    public function add_auth_user()
+    {
+        error_reporting(0);
+        $input = $this->getInputToken();
+        $dataSave = array(
+            'NIP' => $input['NIP'],
+            'G_user' => $input['GroupUser'],
+        );
+        $this->db->insert('db_admission.previleges_guser', $dataSave);
+
+    }
+
+    public function delete_authUser()
+    {
+        $input = $this->getInputToken();
+        $sql = "delete from db_admission.previleges_guser where NIP = '".$input['NIP']."'";
+        $query=$this->db->query($sql, array());
+    }
+
+    public function getAuthDataTables()
+    {
+        $requestData= $_REQUEST;
+        // print_r($requestData);
+        $totalData = $this->m_master->getCountAllDataAuth('db_admission.previleges_guser');
+
+        // get NIP
+        $NIP = $this->session->userdata('NIP');
+        $get = $this->m_master->caribasedprimary('db_admission.previleges_guser','NIP',$NIP);
+        if ($get[0]['G_user'] == 1) {
+            if( !empty($requestData['search']['value']) ) {
+                $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_admission.previleges_guser as a join db_employees.employees as b
+                        on a.NIP = b.NIP ';
+
+                $sql.= ' where a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%"';
+                $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+            }
+            else {
+                 $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_admission.previleges_guser as a join db_employees.employees as b
+                         on a.NIP = b.NIP ';
+                 $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+            }
+        }
+        else
+        {
+            if( !empty($requestData['search']['value']) ) {
+                $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_admission.previleges_guser as a join db_employees.employees as b
+                        on a.NIP = b.NIP ';
+
+                $sql.= ' where a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%" and a.G_user != 1';
+                $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+            }
+            else {
+                 $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_admission.previleges_guser as a join db_employees.employees as b
+                         on a.NIP = b.NIP and a.G_user != 1';
+                 $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+            }
+        }
+
+        // if( !empty($requestData['search']['value']) ) {
+        //     $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_reservation.previleges_guser as a join db_employees.employees as b
+        //             on a.NIP = b.NIP ';
+
+        //     $sql.= ' where a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%"';
+        //     $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+        // }
+        // else {
+        //      $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_reservation.previleges_guser as a join db_employees.employees as b
+        //              on a.NIP = b.NIP ';
+        //      $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+        // }
+
+        $query = $this->db->query($sql)->result_array();
+
+        if ($get[0]['G_user'] == 1) {
+            $getGroupUser = $this->m_master->showData_array('db_admission.cfg_group_user');
+        }
+        else
+        {
+            $getGroupUser = $this->m_master->getDataWithoutSuperAdminGlobal('db_admission.cfg_group_user');
+        }
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $nestedData[] = $row['NIP'];
+            $nestedData[] = $row['Name'];
+
+            $combo = '<select class="full-width-fix select grouPAuth btn-edit" NIP = "'.$row['NIP'].'">';
+            for ($j=0; $j < count($getGroupUser); $j++) { 
+                if ($getGroupUser[$j]['ID'] == $row['G_user']) {
+                     $combo .= '<option value = "'.$getGroupUser[$j]['ID'].'" selected>'.$getGroupUser[$j]['GroupAuth'].'</option>';
+                }
+                else
+                {
+                    $combo .= '<option value = "'.$getGroupUser[$j]['ID'].'">'.$getGroupUser[$j]['GroupAuth'].'</option>';
+                }
+            }
+
+            $combo .= '</select>';
+
+            $nestedData[] = $combo;
+
+            $btn = '<button class="btn btn-danger btn-sm btn-delete btn-delete-group" NIP = "'.$row['NIP'].'"><i class="fa fa-trash" aria-hidden="true"></i></button>';  
+
+            $nestedData[] = $btn;
+            $data[] = $nestedData;
+        }
+
+        // print_r($data);
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalData ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
     }
 
 }
