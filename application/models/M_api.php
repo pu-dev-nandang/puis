@@ -2314,7 +2314,7 @@ class M_api extends CI_Model {
     public function __getStudensAttd($SemesterID,$ScheduleID,$SDID,$Meeting){
 
 
-        $dataAttd = $this->db->query('SELECT attd_s.*,ast.Year AS ta FROM db_academic.attendance_students attd_s
+        $dataAttd = $this->db->query('SELECT attd_s.*,ast.Year AS ta, attd.SemesterID, attd.ScheduleID FROM db_academic.attendance_students attd_s
                                           LEFT JOIN db_academic.attendance attd ON (attd.ID = attd_s.ID_Attd)
                                           LEFT JOIN db_academic.auth_students ast ON (ast.NPM = attd_s.NPM)
                                           WHERE attd.SemesterID = "'.$SemesterID.'"
@@ -2332,6 +2332,9 @@ class M_api extends CI_Model {
                 $attdStd = ($dataAttd[$s]['M'.$Meeting]!='' && $dataAttd[$s]['M'.$Meeting]!=null) ? $dataAttd[$s]['M'.$Meeting] : '0';
                 $arr = array(
                     'DetailStudent' => $dataStd[0],
+                    'SemesterID' => $dataAttd[$s]['SemesterID'],
+                    'ScheduleID' => $dataAttd[$s]['ScheduleID'],
+                    'ID_Attd' => $dataAttd[$s]['ID_Attd'],
                     'ID_Attd_S' => $dataAttd[$s]['ID'],
                     'DBStudent' => $db_,
                     'Status' => $attdStd,

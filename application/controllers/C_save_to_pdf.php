@@ -402,22 +402,26 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(13,$h + $h,'Target',1,0,'C',true);
         $pdf->Cell(13,$h + $h,'Real',1,0,'C',true);
         $pdf->Cell(18.5,$h + $h,'%',1,0,'C',true);
+        $pdf->Cell(30,$h+$h,'Day',1,0,'C',true);
 
-        $pdf->Cell(30,$h + $h,'Day',1,0,'C',true);
-        $pdf->Cell(9,$h + $h,'1',1,0,'C',true);
-        $pdf->Cell(9,$h + $h,'2',1,0,'C',true);
-        $pdf->Cell(9,$h + $h,'3',1,0,'C',true);
-        $pdf->Cell(9,$h + $h,'4',1,0,'C',true);
-        $pdf->Cell(9,$h + $h,'5',1,0,'C',true);
-        $pdf->Cell(9,$h + $h,'6',1,0,'C',true);
-        $pdf->Cell(9,$h + $h,'7',1,0,'C',true);
-        $pdf->Cell(9,$h + $h,'8',1,0,'C',true);
-        $pdf->Cell(9,$h + $h,'9',1,0,'C',true);
-        $pdf->Cell(9,$h + $h,'10',1,0,'C',true);
-        $pdf->Cell(9,$h + $h,'11',1,0,'C',true);
-        $pdf->Cell(9,$h + $h,'12',1,0,'C',true);
-        $pdf->Cell(9,$h + $h,'13',1,0,'C',true);
-        $pdf->Cell(9,$h + $h,'14',1,1,'C',true);
+        $pdf->Cell(126,$h,'Session',1,1,'C',true);
+
+        $pdf->Cell(160.5,$h,'',0,0,'C');
+
+        $pdf->Cell(9,$h,'1',1,0,'C',true);
+        $pdf->Cell(9,$h,'2',1,0,'C',true);
+        $pdf->Cell(9,$h,'3',1,0,'C',true);
+        $pdf->Cell(9,$h,'4',1,0,'C',true);
+        $pdf->Cell(9,$h,'5',1,0,'C',true);
+        $pdf->Cell(9,$h,'6',1,0,'C',true);
+        $pdf->Cell(9,$h,'7',1,0,'C',true);
+        $pdf->Cell(9,$h,'8',1,0,'C',true);
+        $pdf->Cell(9,$h,'9',1,0,'C',true);
+        $pdf->Cell(9,$h,'10',1,0,'C',true);
+        $pdf->Cell(9,$h,'11',1,0,'C',true);
+        $pdf->Cell(9,$h,'12',1,0,'C',true);
+        $pdf->Cell(9,$h,'13',1,0,'C',true);
+        $pdf->Cell(9,$h,'14',1,1,'C',true);
 
 
 
@@ -438,8 +442,10 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Cell(60,$hrowD,' '.$d['Name'],1,0,'L');
 
             $pdf->Cell(13,$hrowD,$d['Target'],1,0,'C');
+            $pdf->SetFont('Times','B',8);
             $pdf->Cell(13,$hrowD,$d['Total_Attd'],1,0,'C');
             $pdf->Cell(18.5,$hrowD,$d['Percent'],1,0,'C');
+            $pdf->SetFont('Times','',8);
 
 //            $pdf->SetTextColor(0,255,0);
 

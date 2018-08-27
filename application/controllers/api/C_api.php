@@ -2763,6 +2763,48 @@ class C_api extends CI_Controller {
 
                 return print_r(json_encode($data));
             }
+            else if($data_arr['action']=='delAttendanceStudents'){
+                $NPM = $data_arr['NPM'];
+                $SemesterID = $data_arr['SemesterID'];
+                $ScheduleID = $data_arr['ScheduleID'];
+                $ID_Attd = $data_arr['ID_Attd'];
+                $ID_Attd_S = $data_arr['ID_Attd_S'];
+                $db_student = $data_arr['db_student'];
+
+                // Cek apakah double di attendance
+                $dataAtdStd = $this->db
+                    ->get_where('db_academic.attendance_students',$arrCheck = array(
+                        'NPM' => $NPM,'ID_Attd' => $ID_Attd))->result_array();
+                if(count($dataAtdStd)>1){
+                    $this->db->where('ID', $ID_Attd_S);
+                    $this->db->delete('db_academic.attendance_students');
+                    $res = array(
+                        'Status' => 1,
+                        'Msg' => 'Delete Success'
+                    );
+                } else{
+                    // Cek apakah di KSM tidak ada, jika ada maka tidak dapat di hapus
+                    $dataKSM = $this->db->get_where($db_student.'.study_planning',array(
+                        'NPM' => $NPM, 'SemesterID' => $SemesterID, 'ScheduleID' => $ScheduleID
+                    ))->result_array();
+                    if(count($dataKSM)>0){
+                        $res = array(
+                            'Status' => 0,
+                            'Msg' => 'Schedule in KSM is Exist'
+                        );
+                    } else {
+                        $this->db->where('ID', $ID_Attd_S);
+                        $this->db->delete('db_academic.attendance_students');
+                        $res = array(
+                            'Status' => 1,
+                            'Msg' => 'Delete Success'
+                        );
+                    }
+                }
+
+                return print_r(json_encode($res));
+
+            }
         }
     }
 
