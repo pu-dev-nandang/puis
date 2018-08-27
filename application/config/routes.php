@@ -422,6 +422,9 @@ $route['finance/admission/approved/tuition-fee'] =  'page/finance/c_finance/tuit
 $route['finance/approved/tuition-fee/approve/(:num)'] =  'page/finance/c_finance/tuition_fee_approve/$1';
 $route['finance/approved/tuition-fee/approve_save'] =  'page/finance/c_finance/approve_save';
 $route['finance/approved/tuition-fee/approved/(:num)'] =  'page/finance/c_finance/tuition_fee_approved/$1';
+$route['finance/admission/set_tuition_fee/delete_data'] =  'page/finance/c_finance/set_tuition_fee_delete_data';
+
+
 $route['finance/tagihan-mhs/set-tagihan-mhs'] =  'page/finance/c_finance/page_set_tagihan_mhs';
 $route['finance/get_tagihan_mhs/(:num)'] =  'page/finance/c_finance/get_tagihan_mhs/$1';
 $route['finance/submit_tagihan_mhs'] =  'page/finance/c_finance/submit_tagihan_mhs';

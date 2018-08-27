@@ -76,6 +76,7 @@
             default:
                 'code block'
         }
+        $(".widget_delete").remove();
         
     }
 
@@ -415,7 +416,7 @@
         //var token = jwt_encode(data,'UAP)(*');
         var sss = '<select class = "full-width-fix jml_cicilan" data = "'+myJSON+'">'+
                            ' <option value = "" disabled selected>--Pilih Jumlah Cicilan--</option>';
-        for (var l = 2; l <= max_cicilanString; l++) {
+        for (var l = 1; l <= max_cicilanString; l++) {
             sss += ' <option value = "'+l+'">'+l+'</option>'
         }
 
