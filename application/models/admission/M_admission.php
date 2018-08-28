@@ -1445,7 +1445,7 @@ class M_admission extends CI_Model {
              f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
              n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
              if((select count(*) as total from db_admission.register_nilai where Status = "Approved" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
-             as status1,p.CreateAT,p.CreateBY
+             as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa
              from db_admission.register_formulir as a
              JOIN db_admission.register_verified as b 
              ON a.ID_register_verified = b.ID
@@ -1483,19 +1483,44 @@ class M_admission extends CI_Model {
                'Discount-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Discount']
              );
            }
+
+           // get file dan type beasiswa
+            $getBeasiswa = $this->m_master->caribasedprimary('db_admission.register_dsn_type_m','ID',$query[$i]['TypeBeasiswa']);
+            if (count($getBeasiswa) > 0) {
+              $getBeasiswa = $getBeasiswa[0]['DiscountType']; 
+            }
+            else
+            {
+             $getBeasiswa = '-'; 
+            }
+
+            // get File
+            $getFile = $this->m_master->caribasedprimary('db_admission.register_document','ID',$query[$i]['FileBeasiswa']);
+            if (count($getFile) > 0) {
+              $getFile = $getFile[0]['Attachment']; 
+            }
+            else
+            {
+             $getFile = '-'; 
+            }
+
        if ($query[$i]['status1'] == 'Rapor') {
          // check rangking
            $getRangking = $this->getRangking($query[$i]['ID_register_formulir']);
            $getRangking = $getRangking[0]['Rangking'];
            
            $arr_temp[$i] = array(
-             'ID_register_formulir' => $query[$i]['ID_register_formulir'],
-             'Name' => $query[$i]['Name'],
-             'NamePrody' => $query[$i]['NamePrody'],
-             'SchoolName' => $query[$i]['SchoolName'],
-             'Status1' => $query[$i]['status1'],
-             // 'DiskonSPP' => $DiskonSPP,
-             'RangkingRapor' => $getRangking,
+            'ID_register_formulir' => $query[$i]['ID_register_formulir'],
+            'Name' => $query[$i]['Name'],
+            'NamePrody' => $query[$i]['NamePrody'],
+            'SchoolName' => $query[$i]['SchoolName'],
+            'Status1' => $query[$i]['status1'],
+            // 'DiskonSPP' => $DiskonSPP,
+            'RangkingRapor' => $getRangking,
+            'FormulirCode' => $query[$i]['FormulirCode'],
+            'getBeasiswa' => $getBeasiswa,
+            'getFile' => $getFile,
+            'Email' => $query[$i]['Email']
            );
        }
        else
@@ -1508,6 +1533,10 @@ class M_admission extends CI_Model {
              'Status1' => $query[$i]['status1'],
              // 'DiskonSPP' => $DiskonSPP,
              'RangkingRapor' => 0,
+             'FormulirCode' => $query[$i]['FormulirCode'],
+             'getBeasiswa' => $getBeasiswa,
+             'getFile' => $getFile,
+             'Email' => $query[$i]['Email'],
            );
        }
 

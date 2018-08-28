@@ -114,6 +114,12 @@
                                 Tagihan & Cicilan
                                 </a>
                             </li>
+                            <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "approved" && $this->uri->segment(4) == "edit" ){echo "current";} ?>">
+                                <a href="<?php echo base_url('finance/admission/approved/edit'); ?>">
+                                <i class="icon-angle-right"></i>
+                                Edit Tagihan & Cicilan
+                                </a>
+                            </li>
                         </ul>
                     </li>
                     <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "penerimaan-pembayaran"){echo "open-default";} ?>">

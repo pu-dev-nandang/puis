@@ -38,7 +38,7 @@
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i> Set Calon Mahasiswa mengikuti Ujian</h4>
+                <h4 class="header"><i class="icon-reorder"></i> Set Ujian</h4>
             </div>
             <div class="widget-content">
                 <div class = "row">

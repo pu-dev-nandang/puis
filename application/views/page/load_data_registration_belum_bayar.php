@@ -12,6 +12,9 @@
     		<th>Deadline Pembayaran</th>
     		<th>Sekolah</th>
     		<th>Register At</th>
+    		<?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
+    			<th>Bayar</th>
+    		<?php endif ?>
     		<!-- <th>Upload At</th> -->
     		</tr>
     	</thead>
@@ -47,6 +50,7 @@
 								'">Bukti Pembayaran belum diupload'+
 							  '</td>';
 				}*/
+				var btn_edit = '<button class = "btn btn-primary btn_bayar" VA_number = "'+data_json[i]['VA_number']+'" > Bayar </button>';
 				$(".datatable tbody").append(
 					'<tr>'+
 						'<td>'+no+'</td>'+
@@ -60,6 +64,9 @@
 						'<td>'+data_json[i]['SchoolName']+'</td>'+
 						'<td>'+data_json[i]['RegisterAT']+'</td>'+
 						// '<td>'+data_json[i]['uploadAT']+'</td>'+
+						<?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
+							'<td>'+btn_edit+'</td>'+
+						<?php endif ?>
 					'</tr>'	
 					);
 				no++;
