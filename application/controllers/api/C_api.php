@@ -2311,8 +2311,7 @@ class C_api extends CI_Controller {
 
                 $data = $this->m_api->getScheduleExam(
                     $data_arr['SemesterID'],
-                    $data_arr['Type'],
-                    $data_arr['ProdiID']
+                    $data_arr['Type']
                 );
 
                 return print_r(json_encode($data));
@@ -2805,6 +2804,63 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($res));
 
             }
+            else if($data_arr['action']=='addAttendanceStudents'){
+
+                $NPM = $data_arr['NPM'];
+                $DB_Student = $data_arr['DB_Student'];
+                $SemesterID = $data_arr['SemesterID'];
+                $ScheduleID = $data_arr['ScheduleID'];
+
+                // Cek apakah di KSM ada
+                $dataKSM = $this->db->get_where($DB_Student.'.study_planning',array(
+                    'NPM' => $NPM,
+                    'SemesterID' => $SemesterID,
+                    'ScheduleID' => $ScheduleID
+                ))->result_array();
+
+                if(count($dataKSM)>0){
+                    // Cek apakah sudah ada di attendance
+                    $dataAttdS = $this->db->query('SELECT * FROM db_academic.attendance attd
+                                                      LEFT JOIN db_academic.attendance_students attds ON (attds.ID_Attd = attd.ID)
+                                                      WHERE attd.SemesterID = "'.$SemesterID.'" 
+                                                      AND attd.ScheduleID = "'.$ScheduleID.'"
+                                                       AND attds.NPM = "'.$NPM.'" ')->result_array();
+
+                    if(count($dataAttdS)>0){
+                        $res = array(
+                            'Status' => 0,
+                            'Msg' => 'Student Attendance is Exist'
+                        );
+                    } else {
+                        $dataAttd = $this->db->query('SELECT * FROM db_academic.attendance attd
+                                                      WHERE attd.SemesterID = "'.$SemesterID.'" 
+                                                      AND attd.ScheduleID = "'.$ScheduleID.'"
+                                                       ')->result_array();
+                        if(count($dataAttd)>0){
+                            for($r=0;$r<count($dataAttd);$r++){
+                                $arrIns = array(
+                                    'ID_Attd' => $dataAttd[$r]['ID'],
+                                    'NPM' => $NPM
+                                );
+                                $this->db->insert('db_academic.attendance_students',$arrIns);
+                            }
+                        }
+                        $res = array(
+                            'Status' => 1,
+                            'Msg' => 'Adding Success'
+                        );
+                    }
+
+                } else {
+                    $res = array(
+                        'Status' => 0,
+                        'Msg' => 'Schedule Not Exist, please check KSM'
+                    );
+                }
+
+                return print_r(json_encode($res));
+
+            }
         }
     }
 
@@ -2872,7 +2928,8 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action']=='readBySemesterID'){
                 $SemesterID = $data_arr['SemesterID'];
-                $data = $this->m_api->getExchangeBySmtID($SemesterID);
+                $Status = $data_arr['Status'];
+                $data = $this->m_api->getExchangeBySmtID($SemesterID,$Status);
                 return print_r(json_encode($data));
             }
         }

@@ -1,7 +1,7 @@
 
 <style>
     #tbInput td {
-        text-align: center;
+        /*text-align: center;*/
     }
     .form-datetime[readonly] {
         background-color: #ffffff;
@@ -9,7 +9,7 @@
         cursor: text;
     }
     #tableEditExamStd thead tr th, #tableEditExamStd tbody tr td {
-        text-align: center;
+        /*text-align: center;*/
     }
 </style>
 
@@ -36,7 +36,9 @@
                 <div class="row">
                     <div class="col-md-6">
                         <input id="formSemesterID" type="hidden" class="hide" hidden readonly>
-                        <select class="form-control" id="formCourse"></select>
+<!--                        <select class="form-control" id="formCourse"></select>-->
+                        <div id="viewGroup"></div>
+<!--                        <select class="select2-select-00 full-width-fix" size="5" id="formCourse"><option></option></select>-->
                     </div>
                     <div class="col-md-6">
                         <input type="text" id="formDate" readonly class="form-control form-datetime">
@@ -211,12 +213,18 @@
         var url = base_url_js+'api/__crudJadwalUjian';
         var token = jwt_encode({action:'read'},'UAP)(*');
         $.post(url,{token:token},function (jsonResult) {
+
+            $('#viewGroup').html('<select class="select2-select-00 full-width-fix"' +
+                '                                size="5" id="formCourse"></select>');
+
             $('#formCourse').empty();
-            $('#formCourse').append('<option value="" disabled selected>-- Select Group --</option>');
+            $('#formCourse').append('<option value=""></option>');
             for(var i=0;i<jsonResult.length;i++){
                 var data = jsonResult[i];
-                $('#formCourse').append('<option value="'+data.ID+'">'+data.ClassGroup+' ( '+data.CoordinatorName+' )</option>');
+                $('#formCourse').append('<option value="'+data.ID+'">'+data.ClassGroup+' - '+data.CoordinatorName+'</option>');
             }
+
+            $('#formCourse').select2({allowClear: true});
         });
     }
     

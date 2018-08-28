@@ -903,6 +903,7 @@
             var body_attd = '<h3>Students Not Yet</h3>';
             if(jsonResult.length>0){
                 body_attd = '<div class="well">' +
+                    '<input id="schedule" value="'+SemesterID+'.'+ScheduleID+'" class="hide" hidden readonly /> ' +
                     '<div class="input-group">' +
                     '   <input type="text" id="formSimpleSearchAttd" class="form-control" placeholder="Search by NIM, Name . . .">' +
                     '   <span class="input-group-btn">' +
@@ -916,7 +917,7 @@
                     '<tr style="background: #4f8742ab;color:#fff;">' +
                     '<th style="width: 20%;">NIM</th>' +
                     '<th>Name</th>' +
-                    '<th style="width: 7%;">Action</th>' +
+                    '<th style="width: 9%;">Action</th>' +
                     '</tr>' +
                     '</thead>' +
                     '<tbody id="rowStdAttd"></tbody>' +
@@ -984,11 +985,15 @@
                     for(var i=0;i<jsonResult.length;i++){
                         var d = jsonResult[i];
 
+                        // console.log(d);
 
-                        $('#rowStdAttd').append('<tr>' +
+                        $('#rowStdAttd').append('<tr id="addB'+d.Username+'">' +
                             '<td style="text-align: left;">'+d.Username+'</td>' +
                             '<td>'+d.Name+'</td>' +
-                            '<td><button class="btn btn-success btn-block"><i class="fa fa-download"></i></button></td>' +
+                            '<td><button class="btn btn-success btn-block btn-add-attd-s" ' +
+                            'data-name="'+d.Name+'" ' +
+                            'data-npm="'+d.Username+'" ' +
+                            'data-db="'+d.DB_Student+'"><i class="fa fa-download"></i></button></td>' +
                             '</tr>');
                     }
                 }
@@ -1044,6 +1049,46 @@
         });
 
 
+    });
+
+    $(document).on('click','.btn-add-attd-s',function () {
+        var Schedule = $('#schedule').val();
+        var Name = $(this).attr('data-name');
+        var NPM = $(this).attr('data-npm');
+        var DB_Student = $(this).attr('data-db');
+
+        loading_buttonSm('.btn-add-attd-s[data-npm='+NPM+']');
+
+        var url = base_url_js+'api/__crudAttendance';
+        var data = {
+            action : 'addAttendanceStudents',
+            NPM : NPM,
+            DB_Student : DB_Student,
+            SemesterID : Schedule.split('.')[0].trim(),
+            ScheduleID : Schedule.split('.')[1].trim()
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        $.post(url,{token:token},function (jsonResult) {
+
+            if(jsonResult.Status==1 || jsonResult.Status=='1'){
+                toastr.success(jsonResult.Msg,'Success');
+                $('#trBody').append('<tr>' +
+                    '<td>-</td>' +
+                    '<td>'+NPM+'</td>' +
+                    '<td style="text-align: left;">'+Name+'</td>' +
+                    '<td>-</td>' +
+                    '</tr>');
+            } else {
+                toastr.error(jsonResult.Msg,'Error');
+            }
+
+            setTimeout(function () {
+                $('.btn-add-attd-s[data-npm='+NPM+']').prop('disabled',false)
+                    .html('<i class="fa fa-download"></i>');
+            },500);
+
+        });
     });
 
 </script>

@@ -22,6 +22,8 @@ class C_jadwal_ujian extends Academic_Controler {
         $this->temp($content);
     }
 
+
+
     public function setPageJadwal()
     {
         $token = $this->input->post('token');
