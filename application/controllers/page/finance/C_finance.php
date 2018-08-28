@@ -1412,6 +1412,262 @@ class C_finance extends Finnance_Controler {
       $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
 
     }
-    
+
+    public function penerimaan_pembayaran_biaya()
+    {
+        $content = $this->load->view('page/'.$this->data['department'].'/penerimaan_pembayaran/penerimaan_pembayaran_admission',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function getPayment_admission()
+    {
+        $requestData= $_REQUEST;
+        // print_r($requestData);
+        $totalData = $this->m_finance->getCountAllPayment_admission();
+
+        $sql = 'select * from (
+                select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,
+                f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
+                n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
+                if((select count(*) as total from db_admission.register_nilai where Status = "Approved" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
+                as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,
+                if( (select count(*) as total from db_finance.payment_pre where ID_register_formulir = a.ID limit 1) > 1,"Cicilan","Tidak Cicilan") as cicilan,
+                if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment
+                from db_admission.register_formulir as a
+                JOIN db_admission.register_verified as b 
+                ON a.ID_register_verified = b.ID
+                JOIN db_admission.register_verification as c
+                ON b.RegVerificationID = c.ID
+                JOIN db_admission.register as d
+                ON c.RegisterID = d.ID
+                JOIN db_admission.country as e
+                ON a.NationalityID = e.ctr_code
+                JOIN db_employees.religion as f
+                ON a.ReligionID = f.IDReligion
+                JOIN db_admission.school_type as l
+                ON l.sct_code = a.ID_school_type
+                JOIN db_admission.register_major_school as m
+                ON m.ID = a.ID_register_major_school
+                JOIN db_admission.school as n
+                ON n.ID = d.SchoolID
+                join db_academic.program_study as o
+                on o.ID = a.ID_program_study
+                join db_finance.register_admisi as p
+                on a.ID = p.ID_register_formulir
+                where p.Status = "Approved" group by a.ID
+
+                ) SubQuery
+            ';
+
+        $sql.= ' where Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
+                or FormulirCode LIKE "'.$requestData['search']['value'].'%" or SchoolName LIKE "%'.$requestData['search']['value'].'%"
+                or StatusPayment LIKE "'.$requestData['search']['value'].'%" or cicilan LIKE "'.$requestData['search']['value'].'%"
+                ';
+        $sql.= ' ORDER BY StatusPayment ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            // $nestedData[] = '<input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'">';
+            $nestedData[] = $row['NamePrody'];
+            $nestedData[] = $row['Name'].'<br>'.$row['Email'];
+            $nestedData[] = $row['FormulirCode'];
+            // get tagihan
+            $getTagihan = $this->m_admission->getPaymentType_Cost_created($row['ID_register_formulir']);
+            $tagihan = '';
+            for ($j=0; $j < count($getTagihan); $j++) { 
+                $tagihan .= $getTagihan[$j]['Abbreviation'].' : '.'Rp '.number_format($getTagihan[$j]['Pay_tuition_fee'],2,',','.').'<br>';
+            }
+
+            $nestedData[] = $tagihan;
+            $nestedData[] = $row['cicilan'];
+            $nestedData[] = '<button class="btn btn-inverse btn-notification btn-show" id-register-formulir = "'.$row['ID_register_formulir'].'" email = "'.$row['Email'].'" Nama = "'.$row['Name'].'">Show</button>';
+            $nestedData[] = $row['StatusPayment'];
+            $nestedData[] = '<button class = "btn btn-primary btn-payment" id-register-formulir = "'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">Detail</button>';
+
+
+            // $combo = '<select class="full-width-fix select grouPAuth btn-edit" NIP = "'.$row['NIP'].'">';
+            // for ($j=0; $j < count($getGroupUser); $j++) { 
+            //     if ($getGroupUser[$j]['ID'] == $row['G_user']) {
+            //          $combo .= '<option value = "'.$getGroupUser[$j]['ID'].'" selected>'.$getGroupUser[$j]['GroupAuth'].'</option>';
+            //     }
+            //     else
+            //     {
+            //         $combo .= '<option value = "'.$getGroupUser[$j]['ID'].'">'.$getGroupUser[$j]['GroupAuth'].'</option>';
+            //     }
+            // }
+
+            // $combo .= '</select>';
+
+            // $nestedData[] = $combo;
+
+            // $btn = '<button class="btn btn-danger btn-sm btn-delete btn-delete-group" NIP = "'.$row['NIP'].'"><i class="fa fa-trash" aria-hidden="true"></i></button>';  
+
+            // $nestedData[] = $btn;
+            // $data[] = $nestedData;
+            $data[] = $nestedData;
+        }
+
+        // print_r($data);
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalData ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+    }
+
+
+    public function getPayment_admission_edit_cicilan()
+    {
+        $requestData= $_REQUEST;
+        // print_r($requestData);
+        $totalData = $this->m_finance->getCountAllPayment_admission();
+
+        $sql = 'select * from (
+                select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,
+                f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
+                n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
+                if((select count(*) as total from db_admission.register_nilai where Status = "Approved" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
+                as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,
+                if( (select count(*) as total from db_finance.payment_pre where ID_register_formulir = a.ID limit 1) > 1,"Cicilan","Tidak Cicilan") as cicilan,
+                if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment
+                from db_admission.register_formulir as a
+                JOIN db_admission.register_verified as b 
+                ON a.ID_register_verified = b.ID
+                JOIN db_admission.register_verification as c
+                ON b.RegVerificationID = c.ID
+                JOIN db_admission.register as d
+                ON c.RegisterID = d.ID
+                JOIN db_admission.country as e
+                ON a.NationalityID = e.ctr_code
+                JOIN db_employees.religion as f
+                ON a.ReligionID = f.IDReligion
+                JOIN db_admission.school_type as l
+                ON l.sct_code = a.ID_school_type
+                JOIN db_admission.register_major_school as m
+                ON m.ID = a.ID_register_major_school
+                JOIN db_admission.school as n
+                ON n.ID = d.SchoolID
+                join db_academic.program_study as o
+                on o.ID = a.ID_program_study
+                join db_finance.register_admisi as p
+                on a.ID = p.ID_register_formulir
+                where p.Status = "Approved" group by a.ID
+
+                ) SubQuery
+            ';
+
+        $sql.= ' where Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
+                or FormulirCode LIKE "'.$requestData['search']['value'].'%" or SchoolName LIKE "%'.$requestData['search']['value'].'%"
+                or StatusPayment LIKE "'.$requestData['search']['value'].'%" or cicilan LIKE "'.$requestData['search']['value'].'%"
+                ';
+        $sql.= ' ORDER BY StatusPayment ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $nestedData[] = '<input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">';
+            $nestedData[] = $row['NamePrody'];
+            $nestedData[] = $row['Name'].'<br>'.$row['Email'];
+            $nestedData[] = $row['FormulirCode'];
+            // get tagihan
+            $getTagihan = $this->m_admission->getPaymentType_Cost_created($row['ID_register_formulir']);
+            $tagihan = '';
+            for ($j=0; $j < count($getTagihan); $j++) { 
+                $tagihan .= $getTagihan[$j]['Abbreviation'].' : '.'Rp '.number_format($getTagihan[$j]['Pay_tuition_fee'],2,',','.').'<br>';
+            }
+
+            $nestedData[] = $tagihan;
+            $nestedData[] = $row['cicilan'];
+            $nestedData[] = '<button class="btn btn-inverse btn-notification btn-show" id-register-formulir = "'.$row['ID_register_formulir'].'" email = "'.$row['Email'].'" Nama = "'.$row['Name'].'">Show</button>';
+            $nestedData[] = $row['StatusPayment'];
+            // $nestedData[] = '<button class = "btn btn-primary btn-payment" id-register-formulir = "'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">Detail</button>';
+
+
+            // $combo = '<select class="full-width-fix select grouPAuth btn-edit" NIP = "'.$row['NIP'].'">';
+            // for ($j=0; $j < count($getGroupUser); $j++) { 
+            //     if ($getGroupUser[$j]['ID'] == $row['G_user']) {
+            //          $combo .= '<option value = "'.$getGroupUser[$j]['ID'].'" selected>'.$getGroupUser[$j]['GroupAuth'].'</option>';
+            //     }
+            //     else
+            //     {
+            //         $combo .= '<option value = "'.$getGroupUser[$j]['ID'].'">'.$getGroupUser[$j]['GroupAuth'].'</option>';
+            //     }
+            // }
+
+            // $combo .= '</select>';
+
+            // $nestedData[] = $combo;
+
+            // $btn = '<button class="btn btn-danger btn-sm btn-delete btn-delete-group" NIP = "'.$row['NIP'].'"><i class="fa fa-trash" aria-hidden="true"></i></button>';  
+
+            // $nestedData[] = $btn;
+            // $data[] = $nestedData;
+            $data[] = $nestedData;
+        }
+
+        // print_r($data);
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalData ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+    }
+
+    public function getPayment_detail_admission()
+    {
+        $input = $this->getInputToken();
+        $data = $this->m_finance->checkPayment_admisi($input['ID_register_formulir']);
+        echo json_encode($data);
+    }
+
+    public function bayar_manual_mahasiswa_admission()
+    {
+        $input = $this->getInputToken();
+        $IDStudent = $input['IDStudent'];
+        $bayar = $input['bayar'];
+        if ($bayar == 1) {
+            $dataSave = array(
+                    'Status' => 1,
+                    'BilingID' => 0,
+                    'UpdateAt' => date('Y-m-d H:i:s'),
+                            );
+            $this->db->where('ID',$IDStudent);
+            $this->db->where('Status',0);
+            $this->db->update('db_finance.payment_pre', $dataSave);
+        }
+        else
+        {
+            $dataSave = array(
+                    'Status' => 0,
+                    'BilingID' => 0,
+                    'UpdateAt' => date('Y-m-d H:i:s'),
+                            );
+            $this->db->where('ID',$IDStudent);
+            $this->db->where('Status',1);
+            $this->db->update('db_finance.payment_pre', $dataSave);
+        }
+        
+    }
+
+    public function approved_edit()
+    {
+        $content = $this->load->view('page/'.$this->data['department'].'/approved/edit_tagihan_cicilan',$this->data,true);
+        $this->temp($content);
+    }
 
 }

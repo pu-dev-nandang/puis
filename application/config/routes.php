@@ -424,6 +424,12 @@ $route['finance/approved/tuition-fee/approve_save'] =  'page/finance/c_finance/a
 $route['finance/approved/tuition-fee/approved/(:num)'] =  'page/finance/c_finance/tuition_fee_approved/$1';
 $route['finance/admission/set_tuition_fee/delete_data'] =  'page/finance/c_finance/set_tuition_fee_delete_data';
 $route['finance/bayar_manual_mahasiswa_formulironline'] =  'page/finance/c_finance/bayar_manual_mahasiswa_formulironline';
+$route['finance/admission/penerimaan-pembayaran/biaya'] =  'page/finance/c_finance/penerimaan_pembayaran_biaya';
+$route['finance/getPayment_admission'] =  'page/finance/c_finance/getPayment_admission';
+$route['finance/getPayment_admission_edit_cicilan'] =  'page/finance/c_finance/getPayment_admission_edit_cicilan';
+
+$route['finance/getPayment_detail_admission'] =  'page/finance/c_finance/getPayment_detail_admission';
+$route['finance/admission/approved/edit'] =  'page/finance/c_finance/approved_edit';
 
 
 $route['finance/tagihan-mhs/set-tagihan-mhs'] =  'page/finance/c_finance/page_set_tagihan_mhs';
@@ -456,6 +462,7 @@ $route['finance/edit_telat_bayar/(:any)'] =  'page/finance/c_finance/edit_telat_
 $route['finance/tagihan-mhs/import_pembayaran_manual'] =  'page/finance/c_finance/import_pembayaran_manual';
 $route['finance/tagihan-mhs/submit_import_pembayaran_manual'] =  'page/finance/c_finance/submit_import_pembayaran_manual';
 $route['finance/bayar_manual_mahasiswa'] =  'page/finance/c_finance/bayar_manual_mahasiswa';
+$route['finance/bayar_manual_mahasiswa_admission'] =  'page/finance/c_finance/bayar_manual_mahasiswa_admission';
 
 
 
