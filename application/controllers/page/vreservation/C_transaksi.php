@@ -369,7 +369,11 @@ class C_transaksi extends Vreservation_Controler {
             $get = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$input['ID_tbl']);
             $getUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$get[0]['CreatedBy']);
             $getE_additional = $this->m_master->caribasedprimary('db_reservation.t_booking_eq_additional','ID_t_booking',$get[0]['ID']);
-            $Reason = $input['Reason'];
+
+            $Reason = '';
+            if(array_key_exists("Reason",$input))
+                $Reason = $input['Reason'];
+            }
 
             for ($i=0; $i < count($getE_additional); $i++) { 
                 $dataSave = array(
