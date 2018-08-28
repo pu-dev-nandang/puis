@@ -1380,6 +1380,38 @@ class C_finance extends Finnance_Controler {
       $subject = "Podomoro University Notification Bills";
       $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
     }
+
+    public function bayar_manual_mahasiswa_formulironline()
+    {
+        $input = $this->getInputToken();
+        $VA_number = $input['VA_number'];
+        $dataSave = array(
+              'BilingID' => 0,
+                      );
+      $this->db->where('VA_number',$VA_number);
+      $this->db->update('db_admission.register', $dataSave);
+
+      // insert to another table
+      $getData = $this->m_master->caribasedprimary('db_admission.register','VA_number',$VA_number);
+      $Email = $getData[0]['Email'];
+      $RegisterID = $getData[0]['ID'];
+      $this->m_master->saveDataToVerification_offline($RegisterID);
+      $getData = $this->m_master->caribasedprimary('db_admission.register_verification','RegisterID',$RegisterID);
+      $RegVerificationID = $getData[0]['ID'];
+      $FormulirCode = $this->m_finance->getFormulirCode('online');
+      // save data to register_verified
+      $this->m_master->saveDataRegisterVerified($RegVerificationID,$FormulirCode);
+
+      $text = 'Dear Candidate,<br><br>
+                  Your payment has been received,<br>
+                  Please click link below to login your portal <br>
+                  '.url_registration."login/".'
+              ';        
+      $to = $Email;
+      $subject = "Podomoro University Link Formulir Registration";
+      $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+
+    }
     
 
 }

@@ -459,8 +459,6 @@
          return allVals;
     }
 
-    $(document).on('click','.bayar', function () {
-    });
 
     $(document).on('click','.bayar', function () {
         var IDStudent = $(this).attr('IDStudent');

@@ -423,6 +423,7 @@ $route['finance/approved/tuition-fee/approve/(:num)'] =  'page/finance/c_finance
 $route['finance/approved/tuition-fee/approve_save'] =  'page/finance/c_finance/approve_save';
 $route['finance/approved/tuition-fee/approved/(:num)'] =  'page/finance/c_finance/tuition_fee_approved/$1';
 $route['finance/admission/set_tuition_fee/delete_data'] =  'page/finance/c_finance/set_tuition_fee_delete_data';
+$route['finance/bayar_manual_mahasiswa_formulironline'] =  'page/finance/c_finance/bayar_manual_mahasiswa_formulironline';
 
 
 $route['finance/tagihan-mhs/set-tagihan-mhs'] =  'page/finance/c_finance/page_set_tagihan_mhs';
@@ -752,3 +753,4 @@ $route['vreservation/config/policy/submit'] = 'page/vreservation/c_config/policy
 
 // test
 $route['testApprove'] = 'page/finance/c_finance/testApprove';
+$route['testInject'] = 'api/c_global/testInject';

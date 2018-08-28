@@ -134,6 +134,32 @@
 		});
 	}
 
+	$(document).on('click','.btn_bayar', function () {
+		if (confirm('Are you sure you want to save this thing into the database?')) {
+		    // Save it!
+		    var VA_number = $(this).attr('va_number');
+		    loading_button(".btn_bayar[va_number='"+VA_number+"']");
+		    var url = base_url_js+'finance/bayar_manual_mahasiswa_formulironline';
+		    var data = {
+		        VA_number : VA_number,
+		    };
+		    var token = jwt_encode(data,'UAP)(*');
+		    $.post(url,{token:token},function (resultJson) {
+		       // var resultJson = jQuery.parseJSON(resultJson);
+		       loaddataBelumBayar();
+		       loadDataTelahBayar();
+		       // $(".bayar[IDStudent='"+IDStudent+"']").remove();
+		    }).fail(function() {
+		      toastr.info('No Action...'); 
+		      // toastr.error('The Database connection error, please try again', 'Failed!!');
+		    }).always(function() {
+
+		    }); 
+		} else {
+		    // Do nothing!
+		}
+	});
+
 	$(document).on('click','#btn-proses', function () {
 		$("#dataBelumBayar").empty();
 		loading_page('#dataBelumBayar');

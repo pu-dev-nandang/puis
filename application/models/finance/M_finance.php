@@ -1380,8 +1380,8 @@ class M_finance extends CI_Model {
       $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and c.ID = ? order by a.Status asc LIMIT '.$start. ', '.$limit;
-      $query=$this->db->query($sql, array($SemesterID))->result_array();
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' order by c.ID desc,a.Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
+      $query=$this->db->query($sql, array())->result_array();
 
     }
     else
@@ -1389,8 +1389,8 @@ class M_finance extends CI_Model {
       $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? and c.ID = ? order by a.Status asc LIMIT '.$start. ', '.$limit;
-      $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? order by a.Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
+      $query=$this->db->query($sql, array($ta1))->result_array();
     }
 
     // get Number VA Mahasiswa
