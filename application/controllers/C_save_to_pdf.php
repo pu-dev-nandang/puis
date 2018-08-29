@@ -690,10 +690,163 @@ class C_save_to_pdf extends CI_Controller {
 
 
 
-        $pdf->Output('I','Schedule_Exchange.pdf');
+        $pdf->Output('I','Monitoring_Attendance_Students.pdf');
     }
 
     // ++++++++++++++++++++++++++++++++
+
+
+    // ==== Monitoring Attendance By Range Date
+
+    public function monitoringAttendanceByRangeDate(){
+
+
+        $token = $this->input->post('token');
+        $data_arr = $this->getInputToken($token);
+
+//        print_r($data_arr);
+//        exit;
+
+        $pdf = new FPDF('l','mm','A4');
+
+        $pdf->AddPage();
+        $this->headerDefault($pdf);
+
+        // 287
+
+        $h = 3;
+
+        $pdf->SetFont('Times','B',8);
+        $pdf->Cell(287,$h,'Semester '.$data_arr['Semester'],0,1,'C');
+        $pdf->Cell(287,$h,$data_arr['Employees'],0,1,'C');
+
+        $pdf->Ln(5);
+
+        $pdf->SetFont('Times','B',7);
+        $pdf->SetFillColor(153, 204, 255);
+        $h_header = 4;
+        // 287
+        $pdf->Cell(7,$h_header,'No','TRL',0,'C',true);
+        $pdf->Cell(15,$h_header,'NIP','TRL',0,'C',true);
+        $pdf->Cell(41,$h_header,'Name','TRL',0,'C',true);
+        $pdf->Cell(15,$h_header,'Group','TRL',0,'C',true);
+        $pdf->Cell(53,$h_header,'Course','TRL',0,'C',true);
+        $pdf->Cell(8,$h_header,'Credit','TRL',0,'C',true);
+
+        $totalTgl = count($data_arr['PDFarrDate']);
+        $wTgl = 4;
+
+        $pdf->Cell(($wTgl * $totalTgl),$h_header,$data_arr['RangeDate'],1,0,'C',true);
+        $pdf->Cell(10,$h_header,'Total','TRL',0,'C',true);
+        $pdf->Cell(10,$h_header,'Total','TRL',1,'C',true);
+
+
+        $pdf->Cell(7,$h_header,'','BRL',0,'C',true);
+        $pdf->Cell(15,$h_header,'','BRL',0,'C',true);
+        $pdf->Cell(41,$h_header,'','BRL',0,'C',true);
+        $pdf->Cell(15,$h_header,'','BRL',0,'C',true);
+        $pdf->Cell(53,$h_header,'','BRL',0,'C',true);
+        $pdf->Cell(8,$h_header,'','BRL',0,'C',true);
+
+        $dateHeaderObj = (array) $data_arr['PDFarrDate'];
+
+        for($i=0;$i<$totalTgl;$i++){
+            $dateHeader = $dateHeaderObj[$i];
+            if(date('N', strtotime($dateHeader))==6 || date('N', strtotime($dateHeader))==7){
+                $pdf->SetFillColor(255, 153, 153);
+            } else {
+                $pdf->SetFillColor(153, 204, 255);
+            }
+            $pdf->Cell($wTgl,$h_header,''.substr($dateHeader,8,2),1,0,'C',true);
+
+        }
+
+        $pdf->Cell(10,$h_header,'Sesi','BRL',0,'C',true);
+        $pdf->Cell(10,$h_header,'Credit','BRL',1,'C',true);
+
+
+        $pdf->SetFont('Times','',7);
+
+        $h_body = 5;
+        if(count($data_arr['Details'])>0){
+            $no = 1;
+            for($t=0;$t<count($data_arr['Details']);$t++){
+                $DetailsObj = (array) $data_arr['Details'];
+                $d = (array) $DetailsObj[$t];
+
+                $pdf->Cell(7,$h_body * count($d['Course']),$no,1,0,'C');
+                $pdf->Cell(15,$h_body * count($d['Course']),$d['NIP'],1,0,'C');
+
+                $LecName = (strlen($d['Name'])>34) ? substr($d['Name'],0,34).'_' : $d['Name'];
+                $pdf->Cell(41,$h_body * count($d['Course']),$LecName,1,0,'L');
+
+                // Cek Group
+                for($r=0;$r<count($d['Course']);$r++){
+
+                    if($r!=0){
+                        $pdf->Cell(63,$h_body,'',0,0,'C');
+                    }
+
+                    $cObj = (array) $d['Course'];
+                    $c = (array) $cObj[$r];
+
+                    $CNameCourse = (strlen($c['NameEng'])>46) ? substr($c['NameEng'],0,46).'_' : $c['NameEng'];
+                    $pdf->Cell(15,$h_body,$c['ClassGroup'],1,0,'C');
+                    $pdf->Cell(53,$h_body,$CNameCourse,1,0,'L');
+                    $pdf->Cell(8,$h_body,$c['Credit'],1,0,'C');
+
+                    $AttdObj = (array) $c['Attendance'];
+
+                    $totalSesi = 0;
+                    for($i=0;$i<$totalTgl;$i++){
+                        $sts = 0;
+                        if(count($AttdObj)>0){
+
+                            for($a=0;$a<count($AttdObj);$a++){
+                                $d_Attd = $AttdObj[$a];
+                                if($dateHeaderObj[$i]==$d_Attd){
+                                    $sts = $sts + 1;
+                                }
+                            }
+                        }
+
+                        $totalSesi = $totalSesi + $sts;
+                        $ssSts = ($sts!=0) ? $sts : '';
+                        if($sts!=0){
+                            $pdf->SetFillColor(153, 255, 153);
+                        } else if(date('N', strtotime($dateHeaderObj[$i]))==6 || date('N', strtotime($dateHeaderObj[$i]))==7){
+                            $pdf->SetFillColor(224, 224, 224);
+                        } else {
+                            $pdf->SetFillColor(255, 255, 255);
+                        }
+//                        $cl = ($sts!=0) ? true : false;
+                        $pdf->Cell($wTgl,$h_body,$ssSts,1,0,'C',true);
+                    }
+
+                    $pdf->SetFont('Times','B',7);
+                    $pdf->SetFillColor(255, 255, 204);
+                    $pdf->Cell(10,$h_body,$totalSesi,1,0,'C',true);
+                    $totalCredit = ($totalSesi!=0) ? $totalSesi * (int) $c['Credit'] : 0;
+                    $pdf->Cell(10,$h_body,$totalCredit,1,1,'C',true);
+                    $pdf->SetFont('Times','',7);
+
+                }
+
+
+
+                $no++;
+
+            }
+        }
+
+
+
+
+        $pdf->SetFont('Times','',7);
+
+        $pdf->Output('I','Monitoring_Attendance_Range_Date.pdf');
+    }
+
 
     private function headerDefault($pdf){
         $pdf->Image(base_url('images/icon/logo-hr.png'),10,10,50);

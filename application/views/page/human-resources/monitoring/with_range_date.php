@@ -33,7 +33,14 @@
 
 <div class="row">
     <div class="col-md-12">
+        <div style="text-align: right;">
+            <button class="btn btn-default btn-default-success" id="btnSave2PDFWithRangeDate" disabled>Download to PDF</button>
+            <form id="FormHide2PDF" action="<?php echo base_url('save2pdf/monitoringAttendanceByRangeDate'); ?>" method="post" target="_blank">
+                <textarea id="dataFormHide2PDF" class="hide" hidden name="token" ></textarea>
+            </form>
+        </div>
         <hr/>
+
         <div id="divContrctMonitoring"></div>
     </div>
 </div>
@@ -63,6 +70,10 @@
             }
 
         },1000);
+    });
+
+    $(document).on('click','#btnSave2PDFWithRangeDate',function () {
+        $('#FormHide2PDF').submit();
     });
 
     $(document).on('change','#filterSemester,#filterStatusEmployees',function () {
@@ -153,6 +164,8 @@
         var filterRangeEnd = $('#filterRangeEnd').val();
         var RangeDate = $('#RangeDate').val();
 
+        var token2PDF = [];
+
         if(filterSemester!='' && filterSemester!=null
             && filterStatusEmployees!='' && filterStatusEmployees!=null
             && filterRangeStart !='' && filterRangeStart!=null
@@ -174,6 +187,9 @@
             var url = base_url_js+'api/__crudEmployees';
 
             $.post(url,{token:token},function (jsonResult) {
+
+                var PDFarrDate = [] ;
+
 
                 if(jsonResult.length>0){
                     var arrDate = momentRange(filterRangeStart,filterRangeEnd);
@@ -198,6 +214,7 @@
                     $.each(arrDate.details, function(i, e) {
                         var bg = (moment(e).days() == 0 || moment(e).days() == 6) ? 'background:#bb1818;' : '';
                         $("#trHead").append('<th style="font-size:10px;width: 1%;'+bg+'">' + moment(e).format("DD") + '</th>');
+                        PDFarrDate.push(moment(e).format("YYYY-MM-DD"));
                     });
 
                     var no =1;
@@ -263,9 +280,18 @@
                 }
 
 
+                token2PDF = {
+                    Semester : $('#filterSemester option:selected').text(),
+                    Employees : $('#filterStatusEmployees option:selected').text(),
+                    RangeDate : RangeDate,
+                    PDFarrDate : PDFarrDate,
+                    Details : jsonResult
+                };
 
 
-
+                var token = jwt_encode(token2PDF,'UAP)(*');
+                $('#btnSave2PDFWithRangeDate').prop('disabled',false);
+                $('#dataFormHide2PDF').val(token);
 
             });
 

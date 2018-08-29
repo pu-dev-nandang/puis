@@ -29,7 +29,7 @@ class M_save_to_pdf extends CI_Model {
 
 
 
-        $dataEx = $this->db->query('SELECT s.ID, s.TeamTeaching, s.ClassGroup, sd.StartSessions, sd.EndSessions, em.Name AS Coordinator,
+        $dataEx = $this->db->query('SELECT s.ID, s.TeamTeaching, s.ClassGroup, ex.StartSessions, ex.EndSessions, em.Name AS Coordinator,
                                             cl.Room AS ClassRoom  FROM db_academic.schedule_exchange ex 
                                             LEFT JOIN db_academic.attendance attd ON (attd.ID = ex.ID_Attd)
                                             LEFT JOIN db_academic.schedule s ON (attd.ScheduleID = s.ID)
