@@ -24,10 +24,10 @@
 <!--                    Presensi Dosen-->
 <!--                </a>-->
 <!--            </li>-->
-            <li class="<?php if($this->uri->segment(2)=='report-dosen-partime'){echo"current";}?>">
-                <a href="<?php echo base_url('human-resources/report-dosen-partime'); ?>">
-                    <i class="fa fa-tasks"></i>
-                    Report Dosen Partime
+            <li class="<?php if($this->uri->segment(2)=='monitoring-attendance'){echo"current";}?>">
+                <a href="<?php echo base_url('human-resources/monitoring-attendance/with-range-date'); ?>">
+                    <i class="fa fa-line-chart"></i>
+                    Monitoring Attendance
                 </a>
             </li>
 
