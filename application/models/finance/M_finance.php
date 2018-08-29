@@ -249,6 +249,13 @@ class M_finance extends CI_Model {
     return $query;
    }
 
+   public function checkPayment_admisi($ID_register_formulir)
+   {
+    $sql = 'select * from db_finance.payment_pre where ID_register_formulir = ? order by ID asc';
+    $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
+    return $query;
+   }
+
    public function create_va_Payment($payment = null,$DeadLinePayment = null, $Name = null, $Email = null,$VA_number = null,$description = 'Pembayaran Uang Kuliah',$tableRoutes = 'db_finance.payment_pre')
    {
        $arr = array();
@@ -2542,6 +2549,13 @@ class M_finance extends CI_Model {
     $arr['Data_mhs'] = $Data_mhs;
     $arr['Discount'] = $Discount;
     return $arr;
+   }
+
+   public function getCountAllPayment_admission()
+   {
+    $sql = 'select count(*) as total from db_finance.register_admisi where Status = "Approved" ';
+    $query=$this->db->query($sql, array())->result_array();
+    return $query[0]['total'];
    }
 
 }

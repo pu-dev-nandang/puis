@@ -149,7 +149,7 @@
                                 </ul>  
                             </li>
                             <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "penerimaan-pembayaran" && $this->uri->segment(4) == "biaya" ){echo "current";} ?>">
-                                <a href="#">
+                                <a href="<?php echo base_url('finance/admission/penerimaan-pembayaran/biaya'); ?>">
                                 <i class="icon-angle-right"></i>
                                 BPP,SPP,SKS & ETC
                                 </a>
