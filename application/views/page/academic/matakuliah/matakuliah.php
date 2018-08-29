@@ -123,7 +123,7 @@
             $('#GlobalModal .modal-footer').html('<button type="button" id="btnClose" class="btn btn-default" data-dismiss="modal">Close</button>' +
                 '<button type="button" class="btn btn-success hide" data-act="edit" data-id="'+idMK+'" id="btnAddMK">Save</button>' +
                 '<button type="button" class="btn btn-info" id="btnEditMK">Edit Data</button>' +
-                '<button type="button" class="btn btn-danger" data-act="delete" data-id="'+idMK+'" id="btnDeleteMK" style="float: left;">Delete</button>' +
+                // '<button type="button" class="btn btn-danger" data-act="delete" data-id="'+idMK+'" id="btnDeleteMK" style="float: left;">Delete</button>' +
                 '');
             $('#GlobalModal').modal({
                 'show' : true,

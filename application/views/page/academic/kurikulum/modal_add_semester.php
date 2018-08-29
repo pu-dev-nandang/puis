@@ -266,8 +266,8 @@
             $.post(url,{token:token},function (data_json) {
                 var data = data_json[0];
 
-                console.log(data);
-                $('#BtnFooter').append('<button type="button" class="btn btn-danger" data-id="'+data.ID+'" id="ModalbtnDeleteForm" style="float:left;">Delete</button>');
+                // console.log(data);
+                // $('#BtnFooter').append('<button type="button" class="btn btn-danger" disabled data-id="'+data.ID+'" id="ModalbtnDeleteForm" style="float:left;">Delete</button>');
 
 
                 $('#ModalJenisKurikulum').val(data.CurriculumTypeID);

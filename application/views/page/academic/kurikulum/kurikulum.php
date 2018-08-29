@@ -6,12 +6,12 @@
             <div class="row">
                 <div class="col-xs-3" style="">
                     <select class="form-control" id="selectKurikulum">
-                        <option value="" disabled selected>--- Select Curriculum ---</option>
+<!--                        <option value="" disabled selected>--- Select Curriculum ---</option>-->
                     </select>
                 </div>
                 <div class="col-xs-3">
                     <select class="form-control" id="selectProdi">
-                        <option value="">--- All Programme Study ---</option>
+<!--                        <option value="">--- All Programme Study ---</option>-->
                     </select>
                 </div>
                 <div class="col-xs-6" style="text-align: right;">
@@ -69,10 +69,18 @@
         loadSelectOptionBaseProdi('#selectProdi','');
         loaddataAddKurikulum();
         $('.btn-addsmt').prop('disabled',true);
+
+        var loadDataFirst = setInterval(function () {
+            var selectKurikulum = $('#selectKurikulum').val();
+            var selectProdi = $('#selectProdi').val();
+            if(selectKurikulum!='' && selectKurikulum!=null && selectProdi!='' && selectProdi!=null){
+                pageKurikulum();
+                clearInterval(loadDataFirst);
+            }
+        },1000);
     });
 
     $(document).on('change','#selectKurikulum, #selectProdi',function () {
-        $('.btn-addsmt').prop('disabled',true);
         pageKurikulum();
     });
 
@@ -115,24 +123,31 @@
 
     function pageKurikulum() {
 
-        var kurikulum = $('#selectKurikulum').find(':selected').val().split('.');
-        var year = kurikulum[1].trim();
-        var prodi = $('#selectProdi').find(':selected').val().split('.');
-        var prodiID = prodi[0];
-        loading_page('#pageKurikulum');
-        var url = base_url_js+'academic/kurikulum-detail';
-        var data = {
-            SemesterSearch : '',
-            year : year,
-            ProdiID : prodiID
-        };
 
-        var token = jwt_encode(data,"UAP)(*");
-        $.post(url,{token:token},function (page) {
-            setTimeout(function () {
-                $('#pageKurikulum').html(page);
-            },500);
-        });
+        var selectKurikulum = $('#selectKurikulum').val();
+        var selectProdi = $('#selectProdi').val();
+        if(selectKurikulum!='' && selectKurikulum!=null && selectProdi!='' && selectProdi!=null){
+            $('.btn-addsmt').prop('disabled',true);
+
+            var kurikulum = $('#selectKurikulum').find(':selected').val().split('.');
+            var year = kurikulum[1].trim();
+            var prodi = $('#selectProdi').find(':selected').val().split('.');
+            var prodiID = prodi[0];
+            loading_page('#pageKurikulum');
+            var url = base_url_js+'academic/kurikulum-detail';
+            var data = {
+                SemesterSearch : '',
+                year : year,
+                ProdiID : prodiID
+            };
+
+            var token = jwt_encode(data,"UAP)(*");
+            $.post(url,{token:token},function (page) {
+                setTimeout(function () {
+                    $('#pageKurikulum').html(page);
+                },500);
+            });
+        }
 
     }
 
