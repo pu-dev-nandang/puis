@@ -314,7 +314,8 @@
                 $(".widget_"+Uniformvaluee).remove();
                 $('.getDom').prop('disabled', false);
             }
-         break;      
+         break;
+         case  "tuition_fee_approved" :      
          case  "tuition_fee_delete" :
             var Nama = $(this).attr('nama');
             if(this.checked) {
@@ -352,7 +353,7 @@
 
                    var html = '<div class="widget box widget_'+Uniformvaluee+' widget_delete">'+
                        '<div class="widget-header">'+
-                           '<h4 class="header"><i class="icon-reorder"></i> Detail Cicilan '+Nama+'</h4>'+
+                           '<h4 class="header"><i class="icon-reorder"></i> Detail Payment '+Nama+'</h4>'+
                        '</div>'+
                        '<div class="widget-content">'+
                            aaa
@@ -424,7 +425,7 @@
 
         var aaa = '<div class = "row">'+
                 '<div class="form-group">'+
-                    '<label class="col-xs-1 control-label">Set Cicilan</label>'+  
+                    '<label class="col-xs-1 control-label">Set Payment</label>'+  
                     '<div class = "col-xs-2">'+
                        sss+
                     '</div>'+  
@@ -435,7 +436,7 @@
 
         var html = '<div class="widget box widget_'+data[0]['id_formulir']+'">'+
             '<div class="widget-header">'+
-                '<h4 class="header"><i class="icon-reorder"></i> Set Cicilan '+data[0]['Nama']+'</h4>'+
+                '<h4 class="header"><i class="icon-reorder"></i> Set Payment '+data[0]['Nama']+'</h4>'+
             '</div>'+
             '<div class="widget-content">'+
                 aaa

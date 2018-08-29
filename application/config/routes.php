@@ -372,8 +372,9 @@ $route['admission/detailPayment'] = 'page/admission/c_admission/detailPayment';
 
 // --- update admisi setelah request 20180731
 $route['admission/proses-calon-mahasiswa/set_input_tuition_fee_submit'] = 'page/admission/c_admission/set_input_tuition_fee_submit';
-
-
+$route['admission/proses-calon-mahasiswa/getDataPersonal_Candidate'] = 'page/admission/c_admission/getDataPersonal_Candidate';
+$route['admission/proses-calon-mahasiswa/getDataPersonal_Candidate_to_be_mhs'] = 'page/admission/c_admission/getDataPersonal_Candidate_to_be_mhs';
+$route['admission/proses-calon-mahasiswa/generate_to_be_mhs'] = 'page/admission/c_admission/generate_to_be_mhs';
 
 
 $route['admission/distribusi-formulir/formulir-offline'] = 'page/admission/c_admission/distribusi_formulir_offline'; // db menu
@@ -430,6 +431,7 @@ $route['finance/getPayment_admission_edit_cicilan'] =  'page/finance/c_finance/g
 
 $route['finance/getPayment_detail_admission'] =  'page/finance/c_finance/getPayment_detail_admission';
 $route['finance/admission/approved/edit'] =  'page/finance/c_finance/approved_edit';
+$route['finance/admission/approved/edit_submit'] =  'page/finance/c_finance/approved_edit_submit';
 
 
 $route['finance/tagihan-mhs/set-tagihan-mhs'] =  'page/finance/c_finance/page_set_tagihan_mhs';

@@ -1716,6 +1716,17 @@ class M_finance extends CI_Model {
     $this->db->update('db_finance.payment_students', $dataSave);
    }
 
+   public function updateCicilanMHS_admission($BilingID,$trx_amount,$datetime_expired)
+   {
+    $dataSave = array(
+            'Invoice' => $trx_amount,
+            'Deadline' => $datetime_expired,
+            'UpdateAt' => date('Y-m-d H:i:s'),
+                    );
+    $this->db->where('BilingID',$BilingID);
+    $this->db->update('db_finance.payment_pre', $dataSave);
+   }
+
    public function updatePaymentStudentsFromCicilan($BilingID,$ID)
    {
     $dataSave = array(
@@ -1800,6 +1811,18 @@ class M_finance extends CI_Model {
                     );
     $this->db->where('ID',$ID);
     $this->db->update('db_finance.payment_students', $dataSave);
+   }
+
+   public function UpdateCicilan_admission_byID($ID,$BilingID,$trx_amount,$datetime_expired)
+   {
+    $dataSave = array(
+            'Invoice' => $trx_amount,
+            'Deadline' => $datetime_expired,
+            'UpdateAt' => date('Y-m-d H:i:s'),
+            'BilingID' => $BilingID,
+                    );
+    $this->db->where('ID',$ID);
+    $this->db->update('db_finance.payment_pre', $dataSave);
    }
 
    public function delete_cicilan_tagihan_mhs_submit($Input)
@@ -2556,6 +2579,71 @@ class M_finance extends CI_Model {
     $sql = 'select count(*) as total from db_finance.register_admisi where Status = "Approved" ';
     $query=$this->db->query($sql, array())->result_array();
     return $query[0]['total'];
+   }
+
+   public function edit_cicilan_tagihan_admission_submit($Input)
+   {
+    $this->load->model('master/m_master');
+    $arr = array();
+    $arr['msg']  = '';
+    for ($i=0; $i < count($Input); $i++) { 
+      // check yang memiliki bilingId
+      // jika memiliki bilingID maka update VA, jika tidak maka update database aja
+      if ($Input[$i]->BilingID != 0) {
+        // update VA
+        $BilingID = $Input[$i]->BilingID;
+        $getData= $this->m_master->caribasedprimary('db_va.va_log','trx_id',$BilingID);
+        // get datetime
+        $expDatetime = $getData[0]['datetime_expired'];
+        $now = date('Y-m-d H:i:s');
+        $chkdate = $this->m_master->chkTgl($now,$expDatetime);
+        $trx_amount = $Input[$i]->Invoice;
+        $datetime_expired = $Input[$i]->Deadline;
+        $customer_name = $getData[0]['customer_name'];
+        $desc = 'Add,Expired Biling '.$getData[0]['description'];
+        $customer_email = $getData[0]['customer_email'];
+        $VA_number = $getData[0]['virtual_account'];
+        if (!$chkdate) {
+         $create_va_Payment = $this->create_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$VA_number,$desc,'db_finance.payment_pre');
+         if ($create_va_Payment['status']) {
+           // update biling and Deadline di payment Student
+           $dataSave = array(
+                   'BilingID' =>$create_va_Payment['msg']['trx_id'],
+                   'Invoice' => $trx_amount,
+                   'Deadline' => $datetime_expired,
+                   'UpdateAt' => date('Y-m-d H:i:s'),
+                           );
+           $this->db->where('BilingID',$BilingID);
+           $this->db->update('db_finance.payment_students', $dataSave);
+         }
+          
+        }
+        else
+        {
+          $update = $this->m_finance->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_pre',$desc);
+          if ($update['status'] == 1) {
+            // update data pada table db_finance.payment_students
+              $this->m_finance->updateCicilanMHS_admission($BilingID,$trx_amount,$datetime_expired);
+          }
+          else
+          {
+            $arr['msg'] .= 'Va tidak bisa di update, error koneksi ke BNI with Name : '.$customer_name.'<br>';
+          }
+        }
+        
+      }
+      else
+      {
+        $BilingID = $Input[$i]->BilingID;
+        $ID = $Input[$i]->ID;
+        $trx_amount = $Input[$i]->Invoice;
+        $datetime_expired = $Input[$i]->Deadline;
+        $this->m_finance->UpdateCicilan_admission_byID($ID,$BilingID,$trx_amount,$datetime_expired);
+      }
+    }
+
+    return $arr;
+
    }
 
 }

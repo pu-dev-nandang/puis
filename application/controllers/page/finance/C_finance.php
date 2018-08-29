@@ -1670,4 +1670,13 @@ class C_finance extends Finnance_Controler {
         $this->temp($content);
     }
 
+    public function approved_edit_submit()
+    {
+        $Input = $this->getInputToken();
+        $msg = '';
+        $proses = $this->m_finance->edit_cicilan_tagihan_admission_submit($Input);
+        $msg = $proses['msg'];
+        echo json_encode($msg);
+    }
+
 }

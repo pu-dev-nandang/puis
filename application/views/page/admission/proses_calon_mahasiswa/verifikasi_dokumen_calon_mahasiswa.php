@@ -74,7 +74,7 @@
 		$.post(url,{token:token},function (data_json) {
 		    // jsonData = data_json;
 		    var obj = JSON.parse(data_json); 
-		    // console.log(obj);
+		    console.log(obj);
 		    setTimeout(function () {
 	       	    $("#register_document_table").html(obj.register_document_table);
 	            $("#pagination_link").html(obj.pagination_link);
