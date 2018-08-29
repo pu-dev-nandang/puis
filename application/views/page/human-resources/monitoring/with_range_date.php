@@ -47,10 +47,17 @@
         loadSelectOptionStatusEmployee('#filterStatusEmployees',4);
 
         window.loadFirst = setInterval(function () {
+            var filterSemester = $('#filterSemester').val();
+            var filterStatusEmployees = $('#filterStatusEmployees').val();
+
             var filterRangeStart = $('#filterRangeStart').val();
             var filterRangeEnd = $('#filterRangeEnd').val();
 
-            if(filterRangeStart!='' && filterRangeStart!=null && filterRangeEnd!='' && filterRangeEnd!=null){
+            if(filterSemester!='' && filterSemester!=null
+                && filterStatusEmployees!='' && filterStatusEmployees!=null
+                && filterRangeStart !='' && filterRangeStart!=null
+                && filterRangeEnd !='' && filterRangeEnd!=null
+            ){
                 loadTb();
                 clearInterval(loadFirst);
             }
@@ -137,6 +144,8 @@
 
     function loadTb() {
 
+        loading_page('#divContrctMonitoring');
+
         var filterSemester = $('#filterSemester').val();
         var filterStatusEmployees = $('#filterStatusEmployees').val();
 
@@ -213,20 +222,37 @@
 
                             var totalSesi = 0;
                             $.each(arrDate.details, function(i, e) {
-                                var bg = ($.inArray(moment(e).format("YYYY-MM-DD"),d_c.Attendance)!=-1) ? 'style="background:#8bc34a78;font-weight: bold;"' : '';
-                                var sts = ($.inArray(moment(e).format("YYYY-MM-DD"),d_c.Attendance)!=-1) ? 1 : '';
-                                $("#trS_"+no+"_"+d_c.ScheduleID).append('<td '+bg+'>' + sts + '</td>');
+
+                                var bg =  ''
 
                                 if($.inArray(moment(e).format("YYYY-MM-DD"),d_c.Attendance)!=-1){
-                                    totalSesi = totalSesi + 1;
+                                    bg = 'style="background:#4CAF50;font-weight: bold;color:#fff;"';
+                                } else if(moment(e).days() == 0 || moment(e).days() == 6){
+                                    bg = 'style="background:#f5f5f5;"';
                                 }
+
+                                var sts = 0;
+                                if(d_c.Attendance.length>0){
+                                    for(var sr=0;sr<d_c.Attendance.length;sr++){
+                                        if(d_c.Attendance[sr]==moment(e).format("YYYY-MM-DD")){
+                                            sts = sts + 1;
+                                        }
+                                    }
+                                }
+
+                                totalSesi = totalSesi + sts;
+                                var ssSts = (sts!=0) ? sts : '';
+
+
+                                $("#trS_"+no+"_"+d_c.ScheduleID).append('<td '+bg+'>' + ssSts + '</td>');
+
 
                             });
 
                             var totalCredit = (totalSesi!=0) ? totalSesi * parseInt(d_c.Credit) : 0;
 
-                            $("#trS_"+no+"_"+d_c.ScheduleID).append('<td>' + totalSesi + '</td>');
-                            $("#trS_"+no+"_"+d_c.ScheduleID).append('<td>' + totalCredit + '</td>');
+                            $("#trS_"+no+"_"+d_c.ScheduleID).append('<td><b>' + totalSesi + '</b></td>');
+                            $("#trS_"+no+"_"+d_c.ScheduleID).append('<td style="background: #ffeb3b38;"><b>' + totalCredit + '</b></td>');
                         }
 
                         no++;
