@@ -496,6 +496,7 @@ $route['save2pdf/schedule-pdf'] =  'c_save_to_pdf/schedulePDF';
 $route['save2pdf/monitoringAttdLecturer'] =  'c_save_to_pdf/monitoringAttdLecturer';
 $route['save2pdf/scheduleExchange'] =  'c_save_to_pdf/scheduleExchange';
 $route['save2pdf/monitoringStudent'] =  'c_save_to_pdf/monitoringStudent';
+$route['save2pdf/monitoringAttendanceByRangeDate'] =  'c_save_to_pdf/monitoringAttendanceByRangeDate';
 
 $route['save2pdf/listStudentsFromCourse'] =  'c_save_to_pdf/listStudentsFromCourse';
 
