@@ -158,6 +158,13 @@
     .ui-helper-hidden-accessible {
         display: block;
     }
+
+    .daterangepicker .ranges {
+        width: 250px;
+    }
+    .daterangepicker .ranges .input-mini {
+        width : 110px !important;
+    }
 </style>
 
 <!--=== JavaScript ===-->
@@ -200,6 +207,7 @@
 <script type="text/javascript" src="<?php echo base_url('assets/template/'); ?>plugins/easy-pie-chart/jquery.easy-pie-chart.min.js"></script> -->
 
 <script type="text/javascript" src="<?php echo base_url('assets/template/'); ?>plugins/daterangepicker/moment.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/moment-range/'); ?>moment-range.js"></script>
 <!--<script type="text/javascript" src="--><?php //echo base_url('assets/template/'); ?><!--plugins/daterangepicker/moment_id.js"></script>-->
 <script type="text/javascript" src="<?php echo base_url('assets/template/'); ?>plugins/daterangepicker/daterangepicker.js"></script>
 <script type="text/javascript" src="<?php echo base_url('assets/template/'); ?>plugins/blockui/jquery.blockUI.min.js"></script>
@@ -765,11 +773,11 @@
     function loadSelectOptionStatusEmployee(element,selected) {
         var url = base_url_js+'api/__getStatusEmployee';
         $.getJSON(url,function (jsonResult) {
-            console.log(jsonResult);
             for(var i=0;i<jsonResult.length;i++){
                 var d = jsonResult[i];
+                var sc = (selected!=null && selected!='' && typeof  selected !== 'undefined' && selected==d.IDStatus) ? 'selected' : '';
                 var bg = (d.IDStatus < 0) ? 'style="color:red;"' : '' ;
-                $(element).append('<option value="'+d.IDStatus+'" '+bg+'>'+d.Description+'</option>');
+                $(element).append('<option value="'+d.IDStatus+'" '+sc+' '+bg+'>'+d.Description+'</option>');
             }
         });
     }
