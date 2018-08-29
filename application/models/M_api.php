@@ -3319,7 +3319,7 @@ class M_api extends CI_Model {
 //                                                           ')->result_array();
 
                         $dataAttd = $this->db->query('SELECT attd.ID FROM db_academic.attendance attd
-                                                                  WHERE attd.ScheduleID = "'.$dc['ScheduleID'].'" ')
+                                                                  WHERE attd.SemesterID = "'.$SemesterID.'" AND attd.ScheduleID = "'.$dc['ScheduleID'].'" ')
                                                                     ->result_array();
 
                         $attd_s = [];
@@ -3351,7 +3351,6 @@ class M_api extends CI_Model {
 
                         $dataSC[$r]['NameEng'] = $c[0]['MKNameEng'];
                         $dataSC[$r]['Credit'] = $c[0]['Credit'];
-                        $dataSC[$r]['Attendance___'] = $dataAtLec;
                         $dataSC[$r]['Attendance'] = $attd_s;
                     }
 
