@@ -754,10 +754,9 @@ class C_save_to_pdf extends CI_Controller {
             $dateHeader = $dateHeaderObj[$i];
             if(date('N', strtotime($dateHeader))==6 || date('N', strtotime($dateHeader))==7){
                 $pdf->SetFillColor(255, 153, 153);
-            } else {
-                $pdf->SetFillColor(153, 204, 255);
             }
             $pdf->Cell($wTgl,$h_header,''.substr($dateHeader,8,2),1,0,'C',true);
+            $pdf->SetFillColor(153, 204, 255);
 
         }
 
