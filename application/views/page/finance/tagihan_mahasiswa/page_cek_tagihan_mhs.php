@@ -344,7 +344,7 @@
         var PaymentID = $(this).attr('PaymentID');
         var NPM = $(this).attr('NPM');
         var semester = $(this).attr('semester');
-        var PTID = $(this).attr('PaymentID');
+        var PTID = $(this).attr('ptid');
         var data = {
             PaymentID : PaymentID,
             NPM : NPM,
