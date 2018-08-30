@@ -922,7 +922,7 @@ class M_admission extends CI_Model {
             ON n.ID = d.SchoolID
             join db_academic.program_study as o
             on o.ID = a.ID_program_study
-            where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID in (select ID_register_formulir from db_admission.register_nilai where Status != "Approved") LIMIT '.$start. ', '.$limit;
+            where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID in (select ID_register_formulir from db_admission.register_nilai where Status != "Verified") LIMIT '.$start. ', '.$limit;
            $query=$this->db->query($sql, array())->result_array();
            return $query;
     }

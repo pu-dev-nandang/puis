@@ -208,6 +208,8 @@ abstract class Admission_Controler extends Globalclass{
         }
     }
 
+    public $path_upload_regOnline = path_register_online.'document/';
+
     private function authAdmission()
     {
         $NIP = $this->session->userdata('NIP');

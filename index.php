@@ -68,6 +68,8 @@
 //
         define("url_sign_in_lecturers","http://lecturerpu.podomorouniversity.ac.id/", true);
         define("url_sign_in_students","http://studentpu.podomorouniversity.ac.id/", true);
+        
+        define("path_register_online","/var/www/html/registeronline/", true);
     } else {
 
 	    $port_user = ($_SERVER['SERVER_PORT']!='80') ? ':'.$_SERVER['SERVER_PORT'] : '';
@@ -92,6 +94,8 @@
 
         define("url_lecturers",url_sign_in_lecturers."home", true);
         define("url_students",url_sign_in_students."home", true);
+
+        define("path_register_online","c:/xampp/htdocs/registeronline/", true);
     }
 
 

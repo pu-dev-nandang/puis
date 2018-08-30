@@ -1459,9 +1459,9 @@ class C_finance extends Finnance_Controler {
                 ) SubQuery
             ';
 
-        $sql.= ' where Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
+        $sql.= ' where (Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
                 or FormulirCode LIKE "'.$requestData['search']['value'].'%" or SchoolName LIKE "%'.$requestData['search']['value'].'%"
-                or StatusPayment LIKE "'.$requestData['search']['value'].'%" or cicilan LIKE "'.$requestData['search']['value'].'%"
+                or StatusPayment LIKE "'.$requestData['search']['value'].'%" or cicilan LIKE "'.$requestData['search']['value'].'%")
                 ';
         $sql.= ' ORDER BY StatusPayment ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
@@ -1476,6 +1476,7 @@ class C_finance extends Finnance_Controler {
             $nestedData[] = $row['NamePrody'];
             $nestedData[] = $row['Name'].'<br>'.$row['Email'];
             $nestedData[] = $row['FormulirCode'];
+
             // get tagihan
             $getTagihan = $this->m_admission->getPaymentType_Cost_created($row['ID_register_formulir']);
             $tagihan = '';
@@ -1564,9 +1565,10 @@ class C_finance extends Finnance_Controler {
                 ) SubQuery
             ';
 
-        $sql.= ' where Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
+        $sql.= ' where (Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
                 or FormulirCode LIKE "'.$requestData['search']['value'].'%" or SchoolName LIKE "%'.$requestData['search']['value'].'%"
-                or StatusPayment LIKE "'.$requestData['search']['value'].'%" or cicilan LIKE "'.$requestData['search']['value'].'%"
+                or StatusPayment LIKE "'.$requestData['search']['value'].'%" or cicilan LIKE "'.$requestData['search']['value'].'%")
+                and FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)
                 ';
         $sql.= ' ORDER BY StatusPayment ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 

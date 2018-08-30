@@ -158,6 +158,11 @@
     .ui-helper-hidden-accessible {
         display: block;
     }
+
+   .table-responsive {
+             min-height: .01%;
+             overflow-x: auto;
+    }
 </style>
 
 <!--=== JavaScript ===-->
