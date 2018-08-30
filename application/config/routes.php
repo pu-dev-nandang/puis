@@ -70,13 +70,16 @@ $route['academic/timetables'] = 'page/academic/c_jadwal';
 
 $route['academic/study-planning'] = 'page/academic/c_study_planning';
 
-$route['academic/references'] = 'page/academic/C_reference';
+$route['academic/references'] = 'page/academic/c_reference';
 
 
 // Jadwal Ujian
 $route['academic/__setPageJadwalUjian'] = 'page/academic/c_jadwal_ujian/setPageJadwal';
 $route['academic/__setPageJadwal'] = 'page/academic/c_jadwal/setPageJadwal';
 $route['academic/exam-schedule'] = 'page/academic/c_jadwal_ujian';
+
+$route['academic/exam-schedule/list-exam'] = 'page/academic/c_jadwal_ujian/list_exam';
+$route['academic/exam-schedule/set-exam-schedule'] = 'page/academic/c_jadwal_ujian/set_exam_schedule';
 
 // ---- Score ----
 $route['academic/score'] =  'page/academic/c_score';
