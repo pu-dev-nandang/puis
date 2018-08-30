@@ -103,9 +103,10 @@
             var data = {
                 ta : '',
                 prodi : '',
-                PTID  : '',
+                PTID  : '<?php echo $PTID ?>',
                 NIM : NIM,
             };
+            // console.log(data)
             var token = jwt_encode(data,'UAP)(*');
             $.post(url,{token:token},function (resultJson) {
                var resultJson = jQuery.parseJSON(resultJson);

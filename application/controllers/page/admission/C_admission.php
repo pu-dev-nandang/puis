@@ -43,7 +43,7 @@ class C_admission extends Admission_Controler {
         $status = $input['selectStatus'];
 
         $this->load->library('pagination');
-        $config = $this->config_pagination_default_ajax($this->m_admission->count_calon_mahasiswa(),2,6);
+        $config = $this->config_pagination_default_ajax(1000,2,6);
   
         $this->pagination->initialize($config);
         $page = $this->uri->segment(6);
@@ -724,7 +724,8 @@ class C_admission extends Admission_Controler {
 
     public function page_data_calon_mahasiswa()
     {
-      $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_data_calon_mahasiswa',$this->data,true);
+      // $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_data_calon_mahasiswa',$this->data,true);
+      $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_data_calon_mahasiswa_server_side',$this->data,true);
       $this->temp($content);
     }
 
@@ -1000,6 +1001,340 @@ class C_admission extends Admission_Controler {
       {
         exit('No direct script access allowed');
       }
+    }
+
+
+    public function getDataPersonal_Candidate()
+    {
+        $requestData= $_REQUEST;
+        // print_r($requestData);
+        // die();
+        $No = $requestData['start'] + 1;
+        $totalData = $this->m_admission->getCountAllDataPersonal_Candidate($requestData);
+
+        $sql = 'select ccc.* from (
+                select a.ID as RegisterID,a.Name,a.SchoolID,b.SchoolName,a.Email,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, e.ID as ID_register_formulir,e.UploadFoto,
+                xq.DiscountType,
+                if(f.Rangking > 0 ,f.Rangking,"-") as Rangking,
+                if(
+                    (select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = e.ID limit 1) = 0 ,
+                        if((select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID limit 1) 
+                             > 0 ,"Lunas","-"
+                          )
+                        ,
+                        "Belum Lunas"
+                  ) as chklunas,
+                (select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID ) as Cicilan
+                ,xx.Name as NameSales
+                from db_admission.register as a
+                join db_admission.school as b
+                on a.SchoolID = b.ID
+                LEFT JOIN db_admission.register_verification as z
+                on a.ID = z.RegisterID
+                LEFT JOIN db_admission.register_verified as c
+                on z.ID = c.RegVerificationID
+                LEFT JOIN db_admission.register_formulir as e
+                on c.ID = e.ID_register_verified
+                LEFT join db_academic.program_study as d
+                on e.ID_program_study = d.ID
+                LEFT join db_admission.register_rangking as f
+                on e.ID = f.ID_register_formulir
+                left join db_admission.sale_formulir_offline as xz
+                  on c.FormulirCode = xz.FormulirCodeOffline
+                LEFT JOIN db_employees.employees as xx
+                on xz.PIC = xx.NIP
+                LEFT JOIN db_finance.register_admisi as xy
+                on e.ID = xy.ID_register_formulir
+                LEFT JOIN db_admission.register_dsn_type_m as xq
+                on xq.ID = xy.TypeBeasiswa
+              ) ccc
+            ';
+
+        $sql.= ' where Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
+                or FormulirCode LIKE "'.$requestData['search']['value'].'%" or SchoolName LIKE "%'.$requestData['search']['value'].'%"
+                or chklunas LIKE "'.$requestData['search']['value'].'%" or DiscountType LIKE "'.$requestData['search']['value'].'%"
+                or NameSales LIKE "'.$requestData['search']['value'].'%"';
+        $sql.= ' ORDER BY chklunas ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            // $nestedData[] = '<input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'">';
+            // $nestedData[] = $row['NamePrody'];
+            $nestedData[] = $No;
+            $nestedData[] = $row['Name'].'<br>'.$row['Email'].'<br>'.$row['SchoolName'];
+            $nestedData[] = $row['NamePrody'].'<br>'.$row['FormulirCode'].'<br>'.$row['VA_number'];
+            $nestedData[] = $row['NameSales'];
+            $nestedData[] = $row['Rangking'];
+            $nestedData[] = $row['DiscountType'];
+            $nestedData[] = '<button class="btn btn-inverse btn-notification btn-show" id-register-formulir = "'.$row['ID_register_formulir'].'" email = "'.$row['Email'].'" Nama = "'.$row['Name'].'">Show</button>';
+            // get tagihan
+            $getTagihan = $this->m_admission->getPaymentType_Cost_created($row['ID_register_formulir']);
+            $tagihan = '';
+            for ($j=0; $j < count($getTagihan); $j++) { 
+                $tagihan .= $getTagihan[$j]['Abbreviation'].' : '.'Rp '.number_format($getTagihan[$j]['Pay_tuition_fee'],2,',','.').'<br>';
+            }
+
+            $nestedData[] = $tagihan;
+            $cicilan = '';
+            if ($row['Cicilan'] == 0) {
+              $cicilan = '-';
+            }
+            elseif ($row['Cicilan'] == 1) {
+               $cicilan = '1x Pembayaran'.'<br><button class = "btn btn-primary btn-payment" id-register-formulir = "'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">Detail</button>';
+             }
+             elseif ($row['Cicilan'] > 1) {
+               $cicilan = $row['Cicilan'].'x Pembayaran'.'<br><button class = "btn btn-primary btn-payment" id-register-formulir = "'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">Detail</button>';
+             }
+            $nestedData[] = $cicilan;
+            $nestedData[] = $row['chklunas'];
+            $data[] = $nestedData;
+            $No++;
+        }
+
+        // print_r($data);
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalData ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+    }
+
+    public function getDataPersonal_Candidate_to_be_mhs()
+    {
+      $requestData= $_REQUEST;
+      // print_r($requestData);
+      // die();
+      $No = $requestData['start'] + 1;
+      $totalData = $this->m_admission->getCountAllDataPersonal_Candidate($requestData);
+
+      $sql = 'select ccc.* from (
+              select a.ID as RegisterID,a.Name,a.SchoolID,b.SchoolName,a.Email,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, e.ID as ID_register_formulir,e.UploadFoto,
+              xq.DiscountType,
+              if(f.Rangking > 0 ,f.Rangking,"-") as Rangking,
+              if(
+                  (select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = e.ID limit 1) = 0 ,
+                      if((select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID limit 1) 
+                           > 0 ,"Lunas","-"
+                        )
+                      ,
+                      "Belum Lunas"
+                ) as chklunas,
+              (select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID ) as Cicilan
+              ,xx.Name as NameSales
+              from db_admission.register as a
+              join db_admission.school as b
+              on a.SchoolID = b.ID
+              LEFT JOIN db_admission.register_verification as z
+              on a.ID = z.RegisterID
+              LEFT JOIN db_admission.register_verified as c
+              on z.ID = c.RegVerificationID
+              LEFT JOIN db_admission.register_formulir as e
+              on c.ID = e.ID_register_verified
+              LEFT join db_academic.program_study as d
+              on e.ID_program_study = d.ID
+              LEFT join db_admission.register_rangking as f
+              on e.ID = f.ID_register_formulir
+              left join db_admission.sale_formulir_offline as xz
+                on c.FormulirCode = xz.FormulirCodeOffline
+              LEFT JOIN db_employees.employees as xx
+              on xz.PIC = xx.NIP
+              LEFT JOIN db_finance.register_admisi as xy
+              on e.ID = xy.ID_register_formulir
+              LEFT JOIN db_admission.register_dsn_type_m as xq
+              on xq.ID = xy.TypeBeasiswa
+            ) ccc
+          ';
+
+      $sql.= ' where (Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
+              or FormulirCode LIKE "'.$requestData['search']['value'].'%" or SchoolName LIKE "%'.$requestData['search']['value'].'%"
+              or chklunas LIKE "'.$requestData['search']['value'].'%" or DiscountType LIKE "'.$requestData['search']['value'].'%"
+              or NameSales LIKE "'.$requestData['search']['value'].'%") and chklunas in ("Lunas","Belum Lunas")';
+      $sql.= ' ORDER BY chklunas Desc LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+      $query = $this->db->query($sql)->result_array();
+
+      $data = array();
+      for($i=0;$i<count($query);$i++){
+          $nestedData=array();
+          $row = $query[$i];
+
+          // $nestedData[] = '<input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'">';
+          // $nestedData[] = $row['NamePrody'];
+          $nestedData[] = $No.' &nbsp <input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'">';
+          $nestedData[] = $row['Name'].'<br>'.$row['Email'].'<br>'.$row['SchoolName'];
+          $nestedData[] = $row['NamePrody'].'<br>'.$row['FormulirCode'].'<br>'.$row['VA_number'];
+          $nestedData[] = $row['NameSales'];
+          $nestedData[] = $row['Rangking'];
+          $nestedData[] = $row['DiscountType'];
+          $nestedData[] = '<button class="btn btn-inverse btn-notification btn-show" id-register-formulir = "'.$row['ID_register_formulir'].'" email = "'.$row['Email'].'" Nama = "'.$row['Name'].'">Show</button>';
+          // get tagihan
+          $getTagihan = $this->m_admission->getPaymentType_Cost_created($row['ID_register_formulir']);
+          $tagihan = '';
+          for ($j=0; $j < count($getTagihan); $j++) { 
+              $tagihan .= $getTagihan[$j]['Abbreviation'].' : '.'Rp '.number_format($getTagihan[$j]['Pay_tuition_fee'],2,',','.').'<br>';
+          }
+
+          $nestedData[] = $tagihan;
+          $cicilan = '';
+          if ($row['Cicilan'] == 0) {
+            $cicilan = '-';
+          }
+          elseif ($row['Cicilan'] == 1) {
+            $cicilan = '1x Pembayaran'.'<br><button class = "btn btn-primary btn-payment" id-register-formulir = "'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">Detail</button>';
+          }
+          elseif ($row['Cicilan'] > 1) {
+            $cicilan = $row['Cicilan'].'x Pembayaran'.'<br><button class = "btn btn-primary btn-payment" id-register-formulir = "'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">Detail</button>';
+          }
+          $nestedData[] = $cicilan;
+          $nestedData[] = $row['chklunas'];
+          $data[] = $nestedData;
+          $No++;
+      }
+
+      // print_r($data);
+
+      $json_data = array(
+          "draw"            => intval( $requestData['draw'] ),
+          "recordsTotal"    => intval($totalData),
+          "recordsFiltered" => intval($totalData ),
+          "data"            => $data
+      );
+      echo json_encode($json_data);
+    }
+
+
+    public function generate_to_be_mhs()
+    {
+      $input = $this->getInputToken();
+       // $this->db->query('CREATE TABLE ta_2018.docstd (
+       //                        `ID`  int(11) NOT NULL ,
+       //                        `NPM`  varchar(255) NULL ,
+       //                        `ID_doc_checklist`  int(11) NULL ,
+       //                        `Path`  varchar(255) NULL ,
+       //                        PRIMARY KEY (`ID`)
+       //                      ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1');
+
+      // //check existing db
+      //     $checkDB = $this->m_master->checkDB($ta);
+      //     if ($checkDB) {
+      //       // create db
+      //       $this->m_api->createDBYearAcademicNew($ta);
+      //       $this->db->query('CREATE TABLE '.$db_new.'.docstd (
+      //                         `ID`  int(11) NOT NULL ,
+      //                         `NPM`  varchar(255) NULL ,
+      //                         `ID_doc_checklist`  int(11) NULL ,
+      //                         `Path`  varchar(255) NULL ,
+      //                         PRIMARY KEY (`ID`)
+      //                       ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1');
+              
+      //     }
+      //     $aa = 1;
+      //     $bb = 1;
+      //     $Q_getLastNPM = $this->m_master->getLastNPM($ta,$ProdiID);
+      //     // print_r($Q_getLastNPM);
+      //     if (count($Q_getLastNPM)== 1) {
+      //       $bb = $Q_getLastNPM[0]['NPM'];
+      //     }
+      // if (count($Q_getLastNPM) == 0) {
+      //             // search NPM dengan 2 Pertama kode Prodi CodeID
+      //             // 2 kedua tahun angkatan ambil 2 digit terakhir
+      //             $Q_Prodi = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+      //             $CodeID = $Q_Prodi[0]['CodeID'];
+      //             $strLenTA = strlen($ta) - 2; // last 2 digit
+      //             $P_ang = substr($ta, $strLenTA,2); // last 2 digit
+      //             $MaxInc = 4;
+      //             $strlen_aa = strlen($aa);
+      //             $V_aa = $aa;
+      //             for ($j=0; $j < ($MaxInc-$strlen_aa); $j++) { 
+      //               $V_aa = '0'.$V_aa;
+      //             }
+      //             $inc = $CodeID.$P_ang.$V_aa;
+      //           }
+      //           else
+      //           {
+      //             // $bb =(int)$bb
+      //             $bb = $bb + 1;
+      //             $inc = $bb;
+      //           }
+      // $NPM = $inc;
+      // $temp = array(
+      //             'ProdiID' => $ProdiID,
+      //             'ProgramID' => $ProgramID,
+      //             'LevelStudyID' => $LevelStudyID,
+      //             'ReligionID' => $ReligionID,
+      //             'NationalityID' => $NationalityID,
+      //             'ProvinceID' => $ProvinceID,
+      //             'CityID' => $CityID,
+      //             'HighSchoolID' => $HighSchoolID,
+      //             'HighSchool' => $HighSchool,
+      //             'MajorsHighSchool' => $MajorsHighSchool,
+      //             'NPM' => $NPM,
+      //             'Name' => $Name,
+      //             'Address' => $Address,
+      //             'Address' => $Address,
+      //             'Gender' => $Gender,
+      //             'PlaceOfBirth' => $PlaceOfBirth,
+      //             'DateOfBirth' => $DateOfBirth,
+      //             'Phone' => $Phone,
+      //             'HP' => $HP,
+      //             'ClassOf' => $ClassOf,
+      //             'Email' => $Email,
+      //             'Jacket' => $Jacket,
+      //             'AnakKe' => $AnakKe,
+      //             'JumlahSaudara' => $JumlahSaudara,
+      //             'NationExamValue' => $NationExamValue,
+      //             'GraduationYear' => $GraduationYear,
+      //             'IjazahNumber' => $IjazahNumber,
+      //             'Father' => $Father,
+      //             'Mother' => $Mother,
+      //             'StatusFather' => $StatusFather,
+      //             'StatusMother' => $StatusMother,
+      //             'PhoneFather' => $PhoneFather,
+      //             'PhoneMother' => $PhoneMother,
+      //             'OccupationFather' => $OccupationFather,
+      //             'OccupationMother' => $OccupationMother,
+      //             'EducationFather' => $EducationFather,
+      //             'EducationMother' => $EducationMother,
+      //             'AddressFather' => $AddressFather,
+      //             'AddressMother' => $AddressMother,
+      //             'EmailFather' => $EmailFather,
+      //             'EmailMother' => $EmailMother,
+      //             'StatusStudentID' => $StatusStudentID,
+      //           );
+      //           $arr_insert[] = $temp;
+
+      //           $plan_password = $NPM.''.'123456';
+      //           $pas = md5($plan_password);
+      //           $pass = sha1('jksdhf832746aiH{}{()&(*&(*'.$pas.'HdfevgyDDw{}{}{;;*766&*&*');
+
+      //           $pasword_old = $DateOfBirth;
+      //           $d = explode('-', $pasword_old);
+      //           $pasword_old = $d[2].$d[1].substr($d[0], 2,2);
+
+      //           $temp2 = array(
+      //               'NPM' => $NPM,
+      //               'Password' => $pass,
+      //               'Password_Old' => md5($pasword_old),
+      //               'Year' => date('Y'),
+      //               'EmailPU' => $NPM.'@podomorouniversity.ac.id',
+      //               'StatusStudentID' => 3,
+      //               'Status' => '-1',
+      //           );
+
+      //           $arr_insert_auth[] = $temp2;
+
+      //           $aa++;
+      // $this->db->insert_batch($ta.'.students', $arr_insert);
+      //         $this->db->insert_batch('db_academic.auth_students', $arr_insert_auth);
+
     }
 
 }

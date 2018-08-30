@@ -67,6 +67,8 @@
             default:
                 'code block'
         }
+
+        $(".widget_delete").remove();
         
     }
 
@@ -259,7 +261,7 @@
 
                    var html = '<div class="widget box widget_'+Uniformvaluee+' widget_delete">'+
                        '<div class="widget-header">'+
-                           '<h4 class="header"><i class="icon-reorder"></i> Detail Cicilan '+Nama+'</h4>'+
+                           '<h4 class="header"><i class="icon-reorder"></i> Detail Payment '+Nama+'</h4>'+
                        '</div>'+
                        '<div class="widget-content">'+
                            aaa
@@ -317,7 +319,7 @@
 
                     var html = '<div class="widget box widget_'+Uniformvaluee+' widget_delete">'+
                         '<div class="widget-header">'+
-                            '<h4 class="header"><i class="icon-reorder"></i> Detail Cicilan '+Nama+'</h4>'+
+                            '<h4 class="header"><i class="icon-reorder"></i> Detail Payment '+Nama+'</h4>'+
                         '</div>'+
                         '<div class="widget-content">'+
                             aaa
