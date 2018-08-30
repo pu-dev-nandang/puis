@@ -2738,6 +2738,23 @@ class C_api extends CI_Controller {
 
                 return print_r(1);
             }
+
+            else if($data_arr['action']=='blastAttendance'){
+                $SemesterID = $data_arr['SemesterID'];
+                $Meet = $data_arr['Meet'];
+                $Status = $data_arr['Status'];
+
+                $set = ' M'.$Meet.' = '.$Status.' ';
+
+                $this->db->query('UPDATE db_academic.attendance_students
+                                    SET '.$set.'
+                                    WHERE ID_Attd IN (SELECT ID FROM db_academic.attendance 
+                                    WHERE SemesterID = "'.$SemesterID.'")');
+
+                return print_r(1);
+
+            }
+
             else if($data_arr['action']=='monitoringLecturer'){
                 $SemesterID = $data_arr['SemesterID'];
                 $ProdiID = $data_arr['ProdiID'];

@@ -11,7 +11,7 @@
 
 
 <div class="row">
-    <div class="col-md-8 col-md-offset-2">
+    <div class="col-md-6 col-md-offset-2">
         <div class="well">
             <div class="row">
                 <div class="col-xs-4">
@@ -24,6 +24,12 @@
             </div>
         </div>
 
+        <hr/>
+    </div>
+    <div class="col-md-2">
+        <div class="well">
+            <button class="btn btn-default btn-default-danger btn-block" id="btnBlaskAttendance">Blast Attendance</button>
+        </div>
         <hr/>
     </div>
 </div>
@@ -48,6 +54,87 @@
             loadGroupDiv();
         },1000);
 
+    });
+    
+    $('#btnBlaskAttendance').click(function () {
+
+        var filterSemester = $('#filterSemester').val();
+
+        if(filterSemester!='' && filterSemester!=null){
+
+            $('#NotificationModal .modal-body').html('<div>' +
+                '<div style="text-align: center;">' +
+                '<h4>Blast to All Students</h4>' +
+                '<hr/>' +
+                '</div> ' +
+                '<div class="form-group">' +
+                '<label>Select Session</label>' +
+                '<select class="form-control" id="formBlastSession"></select>' +
+                '</div>' +
+                '<div class="form-group">' +
+                '<label>Select Status</label>' +
+                '<br/>' +
+                '<label class="radio-inline" style="color: green;">' +
+                '  <input type="radio" name="formBlastStatus" value="1" checked> Present' +
+                '</label>' +
+                '<label class="radio-inline" style="color: red;">' +
+                '  <input type="radio" name="formBlastStatus" value="2"> Absent' +
+                '</label>' +
+                '</div>' +
+                '<hr/>' +
+                '<div style="text-align: right;">' +
+                '<button type="button" class="btn btn-default" style="margin-right: 5px;" data-dismiss="modal">Close</button> ' +
+                '<button type="button" class="btn btn-primary" id="btnBlastSubmit">Submit</button> ' +
+                '</div>' +
+                '</div>');
+
+            var arrNotDC = [1,2,14];
+            for(var i=1;i<=14;i++){
+                var ds = ($.inArray(i,arrNotDC)!=-1) ? '' : 'disabled';
+                $('#formBlastSession').append('<option value="'+i+'" '+ds+'>'+i+'</option>');
+            }
+
+            $('#NotificationModal').modal('show');
+
+        }
+
+    });
+
+    $(document).on('click','#btnBlastSubmit',function () {
+        var filterSemester = $('#filterSemester').val();
+        var formBlastSession = $('#formBlastSession').val();
+        var formBlastStatus = $('input[type=radio][name=formBlastStatus]:checked').val();
+
+        console.log(filterSemester);
+        console.log(formBlastSession);
+        console.log(formBlastStatus);
+
+        if(filterSemester!='' && filterSemester!=null &&
+            formBlastSession!='' && formBlastSession!=null &&
+            formBlastStatus!='' && formBlastStatus!=null){
+
+            loading_buttonSm('#btnBlastSubmit');
+
+            var data = {
+                action : 'blastAttendance',
+                SemesterID : filterSemester.split('.')[0],
+                Meet : formBlastSession,
+                Status : formBlastStatus
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+
+            var url = base_url_js+'api/__crudAttendance';
+
+            $.post(url,{token:token},function (result) {
+                toastr.success('Blast Attendance','Success');
+                setTimeout(function () {
+                    $('#NotificationModal').modal('hide');
+                },100);
+            });
+
+
+        }
     });
 
     $(document).on('change','#filterClassGroup',function () {
