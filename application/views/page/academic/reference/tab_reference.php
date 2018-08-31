@@ -192,7 +192,7 @@
                     '                            <th class="th-center" style="width: ">Class</th>' +
                     '                            <th class="th-center">Seat</th>' +
                     '                            <th class="th-center">Seat For Exam</th>' +
-                    '                            <th class="th-center" style="width: 110px;">Action</th>' +
+                    '                            <th class="th-center hide" style="width: 110px;">Action</th>' +
                     '                        </tr>' +
                     '                        </thead>' +
                     '                        <tbody id="dataClassroom"></tbody>' +
@@ -209,9 +209,9 @@
                         '<td class="td-center">'+data.Room+'</td>' +
                         '<td class="td-center">'+data.Seat+'</td>' +
                         '<td class="td-center">'+data.SeatForExam+'</td>' +
-                        '<td class="td-center">' +
-                        '<button class="btn btn-default btn-default-success btn-classroom" data-action="edit" data-form="'+data.ID+'|'+data.Room+'|'+data.Seat+'|'+data.SeatForExam+'"><i class="fa fa-pencil" aria-hidden="true"></i></button> ' +
-                        ' <button class="btn btn-default btn-default-danger btn-classroom" data-action="delete" data-form="'+data.ID+'|'+data.Room+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>' +
+                        '<td class="td-center hide">' +
+                        // '<button class="btn btn-default btn-default-success btn-classroom" data-action="edit" data-form="'+data.ID+'|'+data.Room+'|'+data.Seat+'|'+data.SeatForExam+'"><i class="fa fa-pencil" aria-hidden="true"></i></button> ' +
+                        // ' <button class="btn btn-default btn-default-danger btn-classroom" data-action="delete" data-form="'+data.ID+'|'+data.Room+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>' +
                         '</td>' +
                         '</tr>');
                 }
@@ -223,7 +223,7 @@
                     'pageLength' : 7
                 });
 
-                $('.dataTables_header .col-md-3').html('<button class="btn btn-default btn-default-primary btn-classroom" data-action="add"><i class="fa fa-plus-circle fa-right" aria-hidden="true"></i> Add Classroom</button>');
+                // $('.dataTables_header .col-md-3').html('<button class="btn btn-default btn-default-primary btn-classroom" data-action="add"><i class="fa fa-plus-circle fa-right" aria-hidden="true"></i> Add Classroom</button>');
             }
 
 
@@ -408,7 +408,7 @@
                         '</td>' +
                         '<td class="td-center">' +
                         '<button class="btn btn-default btn-default-success btn-grade" data-action="edit" data-form="'+data.ID+'|'+data.Grade+'|'+data.Score+'|'+data.StartRange+'|'+data.EndRange+'|'+data.Description+'|'+data.DescriptionEng+'|'+data.Status+'"><i class="fa fa-pencil" aria-hidden="true"></i></button> ' +
-                        '<button class="btn btn-default btn-default-danger btn-grade" data-action="delete" data-form="'+data.ID+'|'+data.Grade+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>' +
+                        // '<button class="btn btn-default btn-default-danger btn-grade" data-action="delete" data-form="'+data.ID+'|'+data.Grade+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>' +
                         '</td>' +
                         '</tr>');
                 }
@@ -560,7 +560,7 @@
                         '<td class="td-center">'+data.Credit+'</td>' +
                         '<td class="td-center">' +
                         '<button class="btn btn-default btn-default-success btn-range-credit" data-action="edit" data-id="'+data.ID+'" data-form="'+data.IPSStart+'|'+data.IPSEnd+'|'+data.Credit+'"><i class="fa fa-pencil" aria-hidden="true"></i></button> ' +
-                        '<button class="btn btn-default btn-default-danger btn-range-credit" data-action="delete" data-id="'+data.ID+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button> ' +
+                        // '<button class="btn btn-default btn-default-danger btn-range-credit" data-action="delete" data-id="'+data.ID+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button> ' +
                         '</td>' +
                         '</tr>');
 

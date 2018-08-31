@@ -9,7 +9,7 @@
         cursor: text;
     }
     #tableEditExamStd thead tr th, #tableEditExamStd tbody tr td {
-        /*text-align: center;*/
+        text-align: center;
     }
 </style>
 
@@ -36,9 +36,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <input id="formSemesterID" type="hidden" class="hide" hidden readonly>
-<!--                        <select class="form-control" id="formCourse"></select>-->
                         <div id="viewGroup"></div>
-<!--                        <select class="select2-select-00 full-width-fix" size="5" id="formCourse"><option></option></select>-->
                     </div>
                     <div class="col-md-6">
                         <input type="text" id="formDate" readonly class="form-control form-datetime">

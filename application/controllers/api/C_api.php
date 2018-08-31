@@ -2411,6 +2411,19 @@ class C_api extends CI_Controller {
                 $this->db->delete('db_employees.employees');
                 return print_r(1);
             }
+
+            else if($data_arr['action']=='showLecturerMonitoring'){
+
+                $SemesterID = $data_arr['SemesterID'];
+                $StatusEmployeeID = $data_arr['StatusEmployeeID'];
+                $Start = $data_arr['Start'];
+                $End = $data_arr['End'];
+
+                $data = $this->m_api->showLecturerMonitoring($SemesterID,$StatusEmployeeID,$Start,$End);
+
+                return print_r(json_encode($data));
+
+            }
         }
 
     }
@@ -2725,6 +2738,23 @@ class C_api extends CI_Controller {
 
                 return print_r(1);
             }
+
+            else if($data_arr['action']=='blastAttendance'){
+                $SemesterID = $data_arr['SemesterID'];
+                $Meet = $data_arr['Meet'];
+                $Status = $data_arr['Status'];
+
+                $set = ' M'.$Meet.' = '.$Status.' ';
+
+                $this->db->query('UPDATE db_academic.attendance_students
+                                    SET '.$set.'
+                                    WHERE ID_Attd IN (SELECT ID FROM db_academic.attendance 
+                                    WHERE SemesterID = "'.$SemesterID.'")');
+
+                return print_r(1);
+
+            }
+
             else if($data_arr['action']=='monitoringLecturer'){
                 $SemesterID = $data_arr['SemesterID'];
                 $ProdiID = $data_arr['ProdiID'];
@@ -2929,7 +2959,9 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='readBySemesterID'){
                 $SemesterID = $data_arr['SemesterID'];
                 $Status = $data_arr['Status'];
-                $data = $this->m_api->getExchangeBySmtID($SemesterID,$Status);
+                $Start = $data_arr['Start'];
+                $End = $data_arr['End'];
+                $data = $this->m_api->getExchangeBySmtID($SemesterID,$Status,$Start,$End);
                 return print_r(json_encode($data));
             }
         }
@@ -3043,7 +3075,7 @@ class C_api extends CI_Controller {
     {
 //        $generate = $this->m_master->showData_array('db_employees.employees_status');
         $generate = $this->db->query('SELECT * FROM db_employees.employees_status 
-              WHERE IDStatus != -2')->result_array();
+              WHERE IDStatus != -2 ORDER BY IDStatus DESC')->result_array();
         echo json_encode($generate);
     }
 

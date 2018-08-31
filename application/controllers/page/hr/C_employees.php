@@ -85,14 +85,14 @@ class C_employees extends HR_Controler {
     {
         $department = parent::__getDepartement();
         $data['page'] = $page;
-        $content = $this->load->view('page/'.$department.'/report/tab_report',$data,true);
+        $content = $this->load->view('page/'.$department.'/monitoring/tab_monitoring',$data,true);
         $this->temp($content);
     }
 
-    public function report_partime(){
+    public function with_range_date(){
 
         $department = parent::__getDepartement();
-        $page = $this->load->view('page/'.$department.'/report/report_partime','',true);
+        $page = $this->load->view('page/'.$department.'/monitoring/with_range_date','',true);
         $this->tab_menu_report($page);
 
     }

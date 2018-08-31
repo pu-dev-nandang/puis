@@ -70,13 +70,16 @@ $route['academic/timetables'] = 'page/academic/c_jadwal';
 
 $route['academic/study-planning'] = 'page/academic/c_study_planning';
 
-$route['academic/references'] = 'page/academic/C_reference';
+$route['academic/references'] = 'page/academic/c_reference';
 
 
 // Jadwal Ujian
 $route['academic/__setPageJadwalUjian'] = 'page/academic/c_jadwal_ujian/setPageJadwal';
 $route['academic/__setPageJadwal'] = 'page/academic/c_jadwal/setPageJadwal';
 $route['academic/exam-schedule'] = 'page/academic/c_jadwal_ujian';
+
+$route['academic/exam-schedule/list-exam'] = 'page/academic/c_jadwal_ujian/list_exam';
+$route['academic/exam-schedule/set-exam-schedule'] = 'page/academic/c_jadwal_ujian/set_exam_schedule';
 
 // ---- Score ----
 $route['academic/score'] =  'page/academic/c_score';
@@ -94,7 +97,7 @@ $route['human-resources/employees/input-employees'] = 'page/hr/c_employees/input
 $route['human-resources/employees/edit-employees/(:num)'] = 'page/hr/c_employees/edit_employees/$1';
 $route['human-resources/upload_photo'] = 'page/hr/c_employees/upload_photo';
 
-$route['human-resources/report-dosen-partime'] = 'page/hr/c_employees/report_partime';
+$route['human-resources/monitoring-attendance/with-range-date'] = 'page/hr/c_employees/with_range_date';
 
 // ====== Database =====
 $route['database/lecturers'] = 'page/database/c_database/lecturers';
@@ -499,6 +502,7 @@ $route['save2pdf/schedule-pdf'] =  'c_save_to_pdf/schedulePDF';
 $route['save2pdf/monitoringAttdLecturer'] =  'c_save_to_pdf/monitoringAttdLecturer';
 $route['save2pdf/scheduleExchange'] =  'c_save_to_pdf/scheduleExchange';
 $route['save2pdf/monitoringStudent'] =  'c_save_to_pdf/monitoringStudent';
+$route['save2pdf/monitoringAttendanceByRangeDate'] =  'c_save_to_pdf/monitoringAttendanceByRangeDate';
 
 $route['save2pdf/listStudentsFromCourse'] =  'c_save_to_pdf/listStudentsFromCourse';
 

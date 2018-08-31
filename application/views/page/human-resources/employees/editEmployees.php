@@ -304,16 +304,17 @@
         <div class="row">
             <div class="col-md-12"><hr/></div>
             <div class="col-md-6">
+                <div class="hide">
+                    <?php
+                    $idBtnDelPermananet = ($btnDelPermanent['Status']==0) ? 'id="btnDelPeranentCuy"' : '';
+                    $btnDis = ($btnDelPermanent['Status']==0) ? '' : 'disabled';
 
-                <?php
-                $idBtnDelPermananet = ($btnDelPermanent['Status']==0) ? 'id="btnDelPeranentCuy"' : '';
-                $btnDis = ($btnDelPermanent['Status']==0) ? '' : 'disabled';
+                    ?>
+                    <div>
 
-                ?>
-                <div>
-
-                    <button class="btn btn-warning" <?php echo $btnDis; ?> <?php echo $idBtnDelPermananet; ?>>Permanent Delete</button>
-                    <p style="margin-top: 5px;color: blue;">*) <?php echo $btnDelPermanent['Msg']; ?></p>
+                        <button class="btn btn-warning" <?php echo $btnDis; ?> <?php echo $idBtnDelPermananet; ?>>Permanent Delete</button>
+                        <p style="margin-top: 5px;color: blue;">*) <?php echo $btnDelPermanent['Msg']; ?></p>
+                    </div>
                 </div>
             </div>
             <div class="col-md-6" style="text-align: right;">

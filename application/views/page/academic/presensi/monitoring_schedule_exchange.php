@@ -12,21 +12,30 @@
 </style>
 
 <div class="row">
-    <div class="col-md-6 col-md-offset-3">
+    <div class="col-md-4 col-md-offset-2">
         <div class="well">
             <div class="row">
-                <div class="col-xs-4">
+                <div class="col-xs-7">
                     <select class="form-control" id="filterSemester"></select>
                 </div>
-                <div class="col-xs-4">
+                <div class="col-xs-5">
                     <select class="form-control" id="filterStatus">
                         <option value="">-- All Status --</option>
                         <option value="1">Approved</option>
                         <option value="0">Not Yet Approved</option>
                     </select>
                 </div>
-                <div class="col-xs-4">
-                    <button class="btn btn-default btn-block btn-default-success" disabled id="btnDownload2PDFExchange">Download to PDF</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="well">
+            <div class="row">
+                <div class="col-xs-12">
+                    <input id="filterRangeStart" class="hide" hidden readonly>
+                    <input id="filterRangeEnd" class="hide" hidden readonly>
+                    <button class="btn btn-danger" id="btnDeleteFilterRange"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                    <button class="btn btn-default" id="formSetRange"><i class="fa fa-calendar" aria-hidden="true"></i> | ( <i id="viewRange"><span></span></i>  )</button>
                 </div>
             </div>
         </div>
@@ -35,6 +44,11 @@
 
 <div class="row">
     <div class="col-md-12">
+
+        <div style="text-align: right;">
+            <button class="btn btn-default btn-default-primary" disabled id="btnDownload2PDFExchange">Download to PDF</button>
+        </div>
+
         <hr/>
         <div class="table-responsive">
             <table class="table table-bordered table-striped" id="tableExchange">
@@ -94,6 +108,66 @@
         $('#FormHide2PDF').submit();
     });
 
+    $(document).on('click','#btnDeleteFilterRange',function () {
+        $('#viewRange span').html('-');
+        $('#filterRangeStart').val('');
+        $('#filterRangeEnd').val('');
+        loadScheduleExchage();
+    });
+
+
+    $('#formSetRange').daterangepicker({
+            startDate: moment().subtract('days', 29),
+            endDate: moment(),
+            minDate: '01/01/2014',
+            maxDate: moment().format('MM/DD/YYYY'),
+            // maxDate: '12/12/2018',
+            dateLimit: { days: 60 },
+            showDropdowns: true,
+            showWeekNumbers: true,
+            timePicker: false,
+            timePickerIncrement: 1,
+            timePicker12Hour: true,
+            // ranges: {
+            //     // 'Today': [moment(), moment()],
+            //     // 'Yesterday': [moment().subtract('days', 1), moment().subtract('days', 1)],
+            //     'Last 7 Days': [moment().subtract('days', 6), moment()],
+            //     'Last 30 Days': [moment().subtract('days', 29), moment()],
+            //     'This Month': [moment().startOf('month'), moment().endOf('month')],
+            //     'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
+            // },
+            opens: 'left',
+            buttonClasses: ['btn btn-default'],
+            applyClass: 'btn-sm btn-primary',
+            cancelClass: 'btn-sm',
+            format: 'DD/MM/YYYY',
+            separator: ' to ',
+            locale: {
+                applyLabel: 'Submit',
+                fromLabel: 'From',
+                toLabel: 'To',
+                customRangeLabel: 'Custom Range',
+                daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr','Sa'],
+                monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                firstDay: 1
+            }
+        },
+
+        function (start, end) {
+
+            var range_updated = start.format('DD MMMM YYYY') + ' - ' + end.format('DD MMMM YYYY');
+
+            $('#filterRangeStart').val(start.format('YYYY-MM-DD'));
+            $('#filterRangeEnd').val(end.format('YYYY-MM-DD'));
+
+            loadScheduleExchage();
+            $('#viewRange span').html(range_updated);
+
+
+        });
+
+    $('#viewRange span').html(' - ');
+
     function loadScheduleExchage() {
 
         var filterSemester = $('#filterSemester').val();
@@ -102,12 +176,16 @@
 
         if(filterSemester!=null && filterSemester!=''){
 
+            // Cek Range Date
+            var Start = $('#filterRangeStart').val();
+            var End = $('#filterRangeEnd').val();
+
             clearInterval(loadFirstTime);
 
             var SemesterID = filterSemester.split('.')[0];
 
             var url = base_url_js+'api/__crudScheduleExchange';
-            var token = jwt_encode({action:'readBySemesterID',SemesterID:SemesterID,Status:filterStatus},'UAP)(*');
+            var token = jwt_encode({action:'readBySemesterID',SemesterID:SemesterID,Status:filterStatus,Start:Start,End:End},'UAP)(*');
 
 
             $.post(url,{token:token},function (jsonResult) {
@@ -176,4 +254,7 @@
 
 
     }
+
+
+
 </script>

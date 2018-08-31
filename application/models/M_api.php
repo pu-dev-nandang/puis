@@ -3194,9 +3194,11 @@ class M_api extends CI_Model {
         return $data;
     }
 
-    public function getExchangeBySmtID($SemesterID,$Status){
+    public function getExchangeBySmtID($SemesterID,$Status,$Start,$End){
 
         $st = ($Status!='') ? ' AND ex.Status = "'.$Status.'" ' : '';
+
+        $range = ($Start!='' && $End!='') ? ' AND ex.Date >= "'.$Start.'" AND ex.Date <= "'.$End.'" ' : '';
 
         $data = $this->db->query('SELECT attd.ScheduleID, em.Name AS Lecturer, s.ClassGroup, ex.DateOriginal AS A_Date, ex.Meeting AS A_Sesi, sd.StartSessions AS A_StartSessions, 
                                             sd.EndSessions AS A_EndSessions, cl1.Room AS A_Room,
@@ -3209,8 +3211,8 @@ class M_api extends CI_Model {
                                             LEFT JOIN db_employees.employees em ON (em.NIP = ex.NIP)
                                             LEFT JOIN db_academic.schedule_details sd ON (sd.ID = attd.SDID)
                                             LEFT JOIN db_academic.classroom cl1 ON (cl1.ID = sd.ClassroomID)
-                                            WHERE attd.SemesterID = "'.$SemesterID.'" '.$st.'
-                                            ORDER BY ex.DateOriginal ,ex.DayID ASC')->result_array();
+                                            WHERE attd.SemesterID = "'.$SemesterID.'" '.$st.' '.$range.'
+                                            ORDER BY ex.Date, ex.DateOriginal ,ex.DayID ASC')->result_array();
 
         // Get Course
         if(count($data)>0){
@@ -3270,6 +3272,97 @@ class M_api extends CI_Model {
         );
 
         return $res;
+
+    }
+
+    public function showLecturerMonitoring($SemesterID,$StatusEmployeeID,$Start,$End){
+
+        $dataLecturer = $this->db->query('SELECT NIP, Name FROM db_employees.employees em 
+                                                  WHERE em.StatusEmployeeID = "'.$StatusEmployeeID.'"
+                                                  ORDER BY em.NIP ASC ')->result_array();
+
+        $res = [];
+
+        if(count($dataLecturer)>0){
+            for($i=0;$i<count($dataLecturer);$i++){
+                $d = $dataLecturer[$i];
+                $dataSC = $this->db->query('SELECT s.ID AS ScheduleID, s.ClassGroup FROM db_academic.schedule s 
+                                                          WHERE 
+                                                          s.SemesterID = "'.$SemesterID.'" AND 
+                                                          s.Coordinator = "'.$d['NIP'].'" 
+                                                          ORDER BY s.ClassGroup ASC
+                                                          ')->result_array();
+
+                $dataSCTeam = $this->db->query('SELECT stt.ScheduleID, s.ClassGroup FROM db_academic.schedule_team_teaching stt 
+                                                        LEFT JOIN db_academic.schedule s ON (s.ID = stt.ScheduleID)
+                                                        WHERE stt.NIP = "'.$d['NIP'].'"
+                                                         ORDER BY s.ClassGroup ASC ')->result_array();
+
+
+                if(count($dataSCTeam)>0) {
+                    for($s=0;$s<count($dataSCTeam);$s++){
+                        array_push($dataSC,$dataSCTeam[$s]);
+                    }
+                }
+
+                // Mengambil dosen yang mempunyai jadwal saja
+                if(count($dataSC)>0){
+                    for($r=0;$r<count($dataSC);$r++){
+                        $dc = $dataSC[$r];
+
+//                        $attd = $this->db->query('SELECT attd_l.Date FROM db_academic.attendance_lecturers attd_l
+//                                                           LEFT JOIN db_academic.attendance attd On (attd_l.ID_Attd = attd.ID)
+//                                                           WHERE
+//                                                           attd_l.NIP = "'.$d['NIP'].'" AND
+//                                                           attd.ScheduleID = "'.$dc['ScheduleID'].'"
+//                                                           AND attd_l.Date >= "'.$Start.'" AND attd_l.Date <= "'.$End.'"
+//                                                           ')->result_array();
+
+                        $dataAttd = $this->db->query('SELECT attd.ID FROM db_academic.attendance attd
+                                                                  WHERE attd.SemesterID = "'.$SemesterID.'" AND attd.ScheduleID = "'.$dc['ScheduleID'].'" ')
+                                                                    ->result_array();
+
+                        $attd_s = [];
+                        if(count($dataAttd)>0){
+                            // Get Attendance
+                            for($a=0;$a<count($dataAttd);$a++){
+                                $dataAtLec = $this->db->query('SELECT attd_l.Date FROM db_academic.attendance_lecturers attd_l 
+                                                                    WHERE 
+                                                                    attd_l.ID_Attd = "'.$dataAttd[$a]['ID'].'"
+                                                                    AND attd_l.Date >= "'.$Start.'" 
+                                                                    AND attd_l.Date <= "'.$End.'"
+                                                                      ')->result_array();
+                                if(count($dataAtLec)>0){
+                                    for($t=0;$t<count($dataAtLec);$t++){
+                                        array_push($attd_s,$dataAtLec[$t]['Date']);
+                                    }
+                                }
+                            }
+                        }
+
+
+
+
+
+                        $c = $this->db->query('SELECT mk.NameEng AS MKNameEng, cd.TotalSKS AS Credit FROM db_academic.schedule_details_course sdc 
+                                                        LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                        LEFT JOIN db_academic.curriculum_details cd ON (sdc.CDID = cd.ID)
+                                                        WHERE sdc.ScheduleID = "'.$dc['ScheduleID'].'" LIMIT 1')->result_array();
+
+                        $dataSC[$r]['NameEng'] = $c[0]['MKNameEng'];
+                        $dataSC[$r]['Credit'] = $c[0]['Credit'];
+                        $dataSC[$r]['Attendance'] = $attd_s;
+                    }
+
+                    $dataLecturer[$i]['Course'] = $dataSC;
+                    array_push($res,$dataLecturer[$i]);
+                }
+            }
+
+        }
+
+        return $res;
+
 
     }
 

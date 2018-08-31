@@ -48,7 +48,7 @@
                     <span>Dashboard</span>
                 </a>
             </li>
-            <li>
+            <li class="hide">
                 <a href="javascript:void(0);" id="btn_announcement">
                     <i class="fa fa-bullhorn" aria-hidden="true"></i>
                     <span>Announcement</span>
@@ -176,6 +176,19 @@
         loadAllowDivision();
         showHTMLMessagesDivision();
         socket_messages();
+
+        if($.cookie("theme")==null || $.cookie("theme") =='' || $.cookie("theme")=='dark'){
+            $('#theme-switcher label').addClass('btn-inverse active');
+            $('#theme-switcher label:first-child').removeClass('active');
+        }
+
+
+
+        // $('#theme-switcher').children()[0].removeClass('active').addClass('btn-inverse');
+        // $('#theme-switcher').children()[1].addClass('btn-inverse active');
+        // $('.sidebar-widget #theme-switcher .btn').removeClass('active');
+        // btn-inverse active
+
     });
 
     $(document).on('click','#btn_announcement',function () {
