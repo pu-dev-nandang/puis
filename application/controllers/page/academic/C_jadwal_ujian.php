@@ -15,14 +15,35 @@ class C_jadwal_ujian extends Academic_Controler {
         parent::template($content);
     }
 
+    public function menu_jadwalUjian($page){
+        $data['department'] = parent::__getDepartement();
+        $data['page'] = $page;
+        $content = $this->load->view('page/'.$data['department'].'/jadwalujian/menu_jadwal_ujian',$data,true);
+        $this->temp($content);
+    }
+
+
+    public function list_exam(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/jadwalujian/list_exam',$data,true);
+        $this->menu_jadwalUjian($page);
+    }
+
+    public function set_exam_schedule(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/jadwalujian/set_exam_schedule',$data,true);
+        $this->menu_jadwalUjian($page);
+    }
+
+
+
+    // Jadwal Ujian Lama
     public function index()
     {
         $data['department'] = parent::__getDepartement();
         $content = $this->load->view('page/'.$data['department'].'/jadwalujian/tab_jadwalujian',$data,true);
         $this->temp($content);
     }
-
-
 
     public function setPageJadwal()
     {

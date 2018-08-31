@@ -78,77 +78,83 @@
     $(document).on('change','#formCourse',function () {
         var url = base_url_js+'api/__crudJadwalUjian';
         var ScheduleID = $('#formCourse').val();
-        var ExamType = $('input[type=radio][name=formExam]:checked').val();
-        var token = jwt_encode({
-            action:'checkCourse',
-            ScheduleID:ScheduleID,
-            Type : ExamType
-        },'UAP)(*');
 
-        $.post(url,{token:token},function (jsonResult) {
+        if(ScheduleID!='' && ScheduleID!=null){
+            var ExamType = $('input[type=radio][name=formExam]:checked').val();
+            var token = jwt_encode({
+                action:'checkCourse',
+                ScheduleID:ScheduleID,
+                Type : ExamType
+            },'UAP)(*');
 
-            dataStudentForExam = [];
-            dataAllStudentForExam = [];
+            $.post(url,{token:token},function (jsonResult) {
 
-            $('#divDetails').html('<h3 style="color: #FF9800;"><b>Course</b></h3>' +
-                '        <div id="dataCourse"></div>' +
-                '        <h3 style="color: #FF9800;"><b>Coordinator</b></h3>' +
-                '        <div id="dataCoordinator"></div>' +
-                '        <div id="dataTeamTeaching"></div>');
+                dataStudentForExam = [];
+                dataAllStudentForExam = [];
 
-            var course = jsonResult.Course;
-            for(var i=0;i<course.length;i++){
-                var dataCourse = course[i];
-                $('#dataCourse').append('<b>'+dataCourse.MKCode+' - '+dataCourse.Course+' | '+dataCourse.Credit+' SKS</b>' +
-                    '<br/><i>'+dataCourse.ProdiEng+'</i><br/>');
-            }
+                $('#divDetails').html('<h3 style="color: #FF9800;"><b>Course</b></h3>' +
+                    '        <div id="dataCourse"></div>' +
+                    '        <h3 style="color: #FF9800;"><b>Coordinator</b></h3>' +
+                    '        <div id="dataCoordinator"></div>' +
+                    '        <div id="dataTeamTeaching"></div>');
 
-            var coordinator = jsonResult.Coordinator[0];
-            $('#dataCoordinator').html('<b>'+coordinator.NIP+' - '+coordinator.Name+'</b>');
-
-            var teamTeaching = jsonResult.TeamTeaching;
-            if(teamTeaching.length>0){
-                $('#dataTeamTeaching').html('<h3 style="color: #FF9800;"><b>Team</b></h3>' +
-                    '            <div id="dataTeam"></div>');
-
-                for(var t=0;t<teamTeaching.length;t++){
-                    var dataT = teamTeaching[t];
-                    $('#dataTeam').append('<b>'+dataT.NIP+' - '+dataT.Lecturer+'</b><br/>');
+                var course = jsonResult.Course;
+                for(var i=0;i<course.length;i++){
+                    var dataCourse = course[i];
+                    $('#dataCourse').append('<b>'+dataCourse.MKCode+' - '+dataCourse.Course+' | '+dataCourse.Credit+' SKS</b>' +
+                        '<br/><i>'+dataCourse.ProdiEng+'</i><br/>');
                 }
-            }
 
-            var dataStudents = jsonResult.StudentsDetails;
-            $('#btnEditExamStudents').attr('data-classgroup',$('#formCourse option[value='+ScheduleID+']').text());
-            $('#btnEditExamStudents').attr('data-ex',(jsonResult.Exam.length>0) ? 1 : 0);
-            if(jsonResult.Exam.length>0){
-                $('#trAlertJadwal').removeClass('hide');
-                $('#jmlJadwal').html(jsonResult.Exam.length);
-                if(jsonResult.StudentsDetails.length>0){
+                var coordinator = jsonResult.Coordinator[0];
+                $('#dataCoordinator').html('<b>'+coordinator.NIP+' - '+coordinator.Name+'</b>');
 
-                    for(var s=0;s<dataStudents.length;s++){
-                        if(dataStudents[s].IDEd!='' && dataStudents[s].IDEd!=null){
-                            dataStudentForExamDisabled.push(dataStudents[s]);
+                var teamTeaching = jsonResult.TeamTeaching;
+                if(teamTeaching.length>0){
+                    $('#dataTeamTeaching').html('<h3 style="color: #FF9800;"><b>Team</b></h3>' +
+                        '            <div id="dataTeam"></div>');
+
+                    for(var t=0;t<teamTeaching.length;t++){
+                        var dataT = teamTeaching[t];
+                        $('#dataTeam').append('<b>'+dataT.NIP+' - '+dataT.Lecturer+'</b><br/>');
+                    }
+                }
+
+                var dataStudents = jsonResult.StudentsDetails;
+                $('#btnEditExamStudents').attr('data-classgroup',$('#formCourse option[value='+ScheduleID+']').text());
+                $('#btnEditExamStudents').attr('data-ex',(jsonResult.Exam.length>0) ? 1 : 0);
+                if(jsonResult.Exam.length>0){
+                    $('#trAlertJadwal').removeClass('hide');
+                    $('#jmlJadwal').html(jsonResult.Exam.length);
+                    if(jsonResult.StudentsDetails.length>0){
+
+                        for(var s=0;s<dataStudents.length;s++){
+                            if(dataStudents[s].IDEd!='' && dataStudents[s].IDEd!=null){
+                                dataStudentForExamDisabled.push(dataStudents[s]);
+                            } else {
+                                dataStudentForExam.push(dataStudents[s]);
+                            }
+                            dataAllStudentForExam.push(dataStudents[s]);
                         }
-                        dataAllStudentForExam.push(dataStudents[s]);
-                    }
 
-                }
-            }
-            else {
-                $('#trAlertJadwal').addClass('hide');
-                if(jsonResult.StudentsDetails.length>0){
-                    for(var s=0;s<dataStudents.length;s++){
-
-                        dataStudentForExam.push(dataStudents[s]);
-                        dataAllStudentForExam.push(dataStudents[s]);
                     }
                 }
-            }
+                else {
+                    $('#trAlertJadwal').addClass('hide');
+                    if(jsonResult.StudentsDetails.length>0){
+                        for(var s=0;s<dataStudents.length;s++){
 
-            $('#dataTotalStudent').html(dataStudentForExam.length);
-            $('#OfDataTotalStudent').html(dataAllStudentForExam.length);
+                            dataStudentForExam.push(dataStudents[s]);
+                            dataAllStudentForExam.push(dataStudents[s]);
+                        }
+                    }
+                }
 
-        });
+                $('#dataTotalStudent').html(dataStudentForExam.length);
+                $('#OfDataTotalStudent').html(dataAllStudentForExam.length);
+
+            });
+        }
+
     });
 
     $(document).on('click','#btnEditExamStudents',function () {
@@ -159,16 +165,19 @@
         if(Classgroup!='' && Classgroup!=null){
             $('#GlobalModal .modal-header').html('<h4 class="modal-title">Edit Students | '+Classgroup+'</h4>');
 
-            var dataHTML = '<table id="tableEditExamStd" class="table table-bordered table-striped">' +
+            var dataHTML = '<div class="row">' +
+                '<div class="col-md-2 col-md-offset-3">' +
+                '<label>Student : </label>' +
+                '</div> ' +
+                '<div class="col-md-4">' +
+                '<select class="form-control" id="selectSumStd"></select>' +
+                '<hr/>' +
+                '</div> ' +
+                '</div>' +
+                '<div class="table-responsive">' +
+                '<table id="tableEditExamStd" class="table table-bordered table-striped">' +
                 '            <thead>' +
                 '            <tr style="background: #438848;color: #FFFFFF;">' +
-                // '                <th style="width: 7%;">' +
-                // '                    <div class="checkbox" style="margin: 0px;">' +
-                // '                       <label>' +
-                // '                           <input id="checkAllStd" type="checkbox"> All' +
-                // '                       </label>' +
-                // '                    </div>' +
-                // '                </th>' +
                 '                <th style="width: 7%;"></th>' +
                 '                <th style="width: 7%;">No</th>' +
                 '                <th style="width: 20%;">NPM</th>' +
@@ -176,7 +185,8 @@
                 '            </tr>' +
                 '            </thead>' +
                 '            <tbody id="rwStdExam"></tbody>' +
-                '        </table>';
+                '        </table>' +
+                '</div>';
 
             $('#GlobalModal .modal-body').html(dataHTML);
             $('#GlobalModal .modal-footer').html('Selected : <b id="modalStdCk"></b> of <b id="modalAllStd"></b> Students | ' +
@@ -218,11 +228,14 @@
                         '<td style="text-align:left;">'+dataAllStudentForExam[sm].Name+'</td>' +
                         '</tr>');
 
-                    // if(dataEx==1){
-                    //
-                    // }
+
+                    $('#selectSumStd').append('<option value="'+noS+'">'+noS+'</option>');
 
                 }
+                if(dataStudentForExam.length>0){
+                    $('#selectSumStd').val(dataStudentForExam.length);
+                }
+
 
                 $('#checkAllStd').prop('checked',false);
                 if(dataAllStudentForExam.length == dataStudentForExam.length){
@@ -241,6 +254,19 @@
             });
         }
 
+    });
+
+    $(document).on('change','#selectSumStd',function (){
+
+        var val = $('#selectSumStd').val();
+        var st = (dataStudentForExamDisabled.length>0) ? dataStudentForExamDisabled.length : 0;
+        var end = (dataStudentForExamDisabled.length>0) ? parseInt(dataStudentForExamDisabled.length) + parseInt(val) : val;
+
+        $('.checkStdExam').prop('checked',false);
+        for(var i=st;i<end;i++){
+            $('#ckS'+i).prop('checked',true);
+        }
+        checkStdExam();
     });
 
     $(document).on('change','#checkAllStd',function () {
