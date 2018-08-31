@@ -107,6 +107,25 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Output('I',$DayNameEng.'_schedule.pdf');
     }
 
+    public function test(){
+        $p = new FPDF();
+        $p->AddPage();
+        $p->SetFont('Arial','B',16);
+        $p->SetAutoPageBreak(false);
+        $height_of_cell = 60; // mm
+        $page_height = 286.93; // mm (portrait letter)
+        $bottom_margin = 0; // mm
+        for($i=0;$i<=100;$i++) :
+            $block=floor($i/6);
+            $space_left=$page_height-($p->GetY()+$bottom_margin); // space left on page
+            if ($i/6==floor($i/6) && $height_of_cell > $space_left) {
+                $p->AddPage(); // page break
+            }
+            $p->Cell(100,10,'This is a text line - Group '.$block,'B',2);
+        endfor;
+        $p->Output();
+    }
+
     private function header_schedule($pdf,$SemesterDetails,$DayNameEng){
         $pdf->Image(base_url('images/icon/logo-hr.png'),10,10,50);
 
@@ -712,59 +731,20 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->AddPage();
         $this->headerDefault($pdf);
 
-        // 287
+        $totalTgl = count($data_arr['PDFarrDate']);
+        $dateHeaderObj = (array) $data_arr['PDFarrDate'];
+        $wTgl = 4;
 
+        // 287
         $h = 3;
 
         $pdf->SetFont('Times','B',8);
         $pdf->Cell(287,$h,'Semester '.$data_arr['Semester'],0,1,'C');
         $pdf->Cell(287,$h,$data_arr['Employees'],0,1,'C');
-
-        $pdf->Ln(5);
-
-        $pdf->SetFont('Times','B',7);
-        $pdf->SetFillColor(153, 204, 255);
-        $h_header = 4;
-        // 287
-        $pdf->Cell(7,$h_header,'No','TRL',0,'C',true);
-        $pdf->Cell(15,$h_header,'NIP','TRL',0,'C',true);
-        $pdf->Cell(41,$h_header,'Name','TRL',0,'C',true);
-        $pdf->Cell(15,$h_header,'Group','TRL',0,'C',true);
-        $pdf->Cell(53,$h_header,'Course','TRL',0,'C',true);
-        $pdf->Cell(8,$h_header,'Credit','TRL',0,'C',true);
-
-        $totalTgl = count($data_arr['PDFarrDate']);
-        $wTgl = 4;
-
-        $pdf->Cell(($wTgl * $totalTgl),$h_header,$data_arr['RangeDate'],1,0,'C',true);
-        $pdf->Cell(10,$h_header,'Total','TRL',0,'C',true);
-        $pdf->Cell(10,$h_header,'Total','TRL',1,'C',true);
+        $this->header_monitoringAttendanceByRangeDate($pdf,$data_arr);
 
 
-        $pdf->Cell(7,$h_header,'','BRL',0,'C',true);
-        $pdf->Cell(15,$h_header,'','BRL',0,'C',true);
-        $pdf->Cell(41,$h_header,'','BRL',0,'C',true);
-        $pdf->Cell(15,$h_header,'','BRL',0,'C',true);
-        $pdf->Cell(53,$h_header,'','BRL',0,'C',true);
-        $pdf->Cell(8,$h_header,'','BRL',0,'C',true);
 
-        $dateHeaderObj = (array) $data_arr['PDFarrDate'];
-
-        for($i=0;$i<$totalTgl;$i++){
-            $dateHeader = $dateHeaderObj[$i];
-            if(date('N', strtotime($dateHeader))==6 || date('N', strtotime($dateHeader))==7){
-                $pdf->SetFillColor(255, 153, 153);
-            }
-            $pdf->Cell($wTgl,$h_header,''.substr($dateHeader,8,2),1,0,'C',true);
-            $pdf->SetFillColor(153, 204, 255);
-
-        }
-
-        $pdf->Cell(10,$h_header,'Sesi','BRL',0,'C',true);
-        $pdf->Cell(10,$h_header,'Credit','BRL',1,'C',true);
-
-
-        $pdf->SetFont('Times','',7);
 
         $h_body = 5;
         if(count($data_arr['Details'])>0){
@@ -808,7 +788,6 @@ class C_save_to_pdf extends CI_Controller {
                                 }
                             }
                         }
-
                         $totalSesi = $totalSesi + $sts;
                         $ssSts = ($sts!=0) ? $sts : '';
                         if($sts!=0){
@@ -819,7 +798,10 @@ class C_save_to_pdf extends CI_Controller {
                             $pdf->SetFillColor(255, 255, 255);
                         }
 //                        $cl = ($sts!=0) ? true : false;
+//                        $pdf->Cell($wTgl,$h_body,$ssSts,1,0,'C',true);
                         $pdf->Cell($wTgl,$h_body,$ssSts,1,0,'C',true);
+
+
                     }
 
                     $pdf->SetFont('Times','B',7);
@@ -829,9 +811,14 @@ class C_save_to_pdf extends CI_Controller {
                     $pdf->Cell(10,$h_body,$totalCredit,1,1,'C',true);
                     $pdf->SetFont('Times','',7);
 
+
+
                 }
 
-
+                if($pdf->GetY()>173){
+                    $pdf->AddPage();
+                    $this->header_monitoringAttendanceByRangeDate($pdf,$data_arr);
+                }
 
                 $no++;
 
@@ -846,6 +833,55 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Output('I','Monitoring_Attendance_Range_Date.pdf');
     }
 
+    private function header_monitoringAttendanceByRangeDate($pdf,$data_arr){
+        $totalTgl = count($data_arr['PDFarrDate']);
+        $dateHeaderObj = (array) $data_arr['PDFarrDate'];
+        $wTgl = 4;
+
+        $pdf->Ln(5);
+
+        $pdf->SetFont('Times','B',7);
+        $pdf->SetFillColor(153, 204, 255);
+        $h_header = 4;
+        // 287
+        $pdf->Cell(7,$h_header,'No','TRL',0,'C',true);
+        $pdf->Cell(15,$h_header,'NIP','TRL',0,'C',true);
+        $pdf->Cell(41,$h_header,'Name','TRL',0,'C',true);
+        $pdf->Cell(15,$h_header,'Group','TRL',0,'C',true);
+        $pdf->Cell(53,$h_header,'Course','TRL',0,'C',true);
+        $pdf->Cell(8,$h_header,'Credit','TRL',0,'C',true);
+
+
+        $pdf->Cell(($wTgl * $totalTgl),$h_header,$data_arr['RangeDate'],1,0,'C',true);
+        $pdf->Cell(10,$h_header,'Total','TRL',0,'C',true);
+        $pdf->Cell(10,$h_header,'Total','TRL',1,'C',true);
+
+
+        $pdf->Cell(7,$h_header,'','BRL',0,'C',true);
+        $pdf->Cell(15,$h_header,'','BRL',0,'C',true);
+        $pdf->Cell(41,$h_header,'','BRL',0,'C',true);
+        $pdf->Cell(15,$h_header,'','BRL',0,'C',true);
+        $pdf->Cell(53,$h_header,'','BRL',0,'C',true);
+        $pdf->Cell(8,$h_header,'','BRL',0,'C',true);
+
+
+        for($i=0;$i<$totalTgl;$i++){
+            $dateHeader = $dateHeaderObj[$i];
+            if(date('N', strtotime($dateHeader))==6 || date('N', strtotime($dateHeader))==7){
+                $pdf->SetFillColor(255, 153, 153);
+            }
+            $pdf->Cell($wTgl,$h_header,''.substr($dateHeader,8,2),1,0,'C',true);
+            $pdf->SetFillColor(153, 204, 255);
+
+        }
+
+        $pdf->Cell(10,$h_header,'Sesi','BRL',0,'C',true);
+        $pdf->Cell(10,$h_header,'Credit','BRL',1,'C',true);
+
+        $pdf->SetFont('Times','',7);
+    }
+
+    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     private function headerDefault($pdf){
         $pdf->Image(base_url('images/icon/logo-hr.png'),10,10,50);
