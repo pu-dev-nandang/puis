@@ -74,7 +74,8 @@
                            '</tr>'+
                            '</thead>'+
                            '<tbody id="dataRow"></tbody>'+
-                       '</table>';
+                       '</table>'
+                       ;
                //$("#loadtableNow").empty();
                $("#dataPageLoad").html(table);
 
@@ -123,7 +124,8 @@
                 break;
             case 'to-be-mhs':
                 $("#dataPageLoad").empty();
-                var table = '<table class="table table-bordered datatable2" id = "datatable2">'+
+                var table = '<div class = "row"><div class = "col-md-12"><div class = "table-responsive">'+
+                            '<table class="table table-bordered datatable2" id = "datatable2">'+
                             '<thead>'+
                             '<tr style="background: #333;color: #fff;">'+
                                 // '<th></th>'+
@@ -140,7 +142,21 @@
                             '</tr>'+
                             '</thead>'+
                             '<tbody id="dataRow"></tbody>'+
-                        '</table></div><button class = "btn btn-success btn-edit" id = "generateToBEMhs">Generate</button>';
+                        '</table></div></div></div><br>'+
+                        '<div class = "row">'+
+                            '<div class = "col-md-12">'+
+                              '<div class="thumbnail" style="min-height: 120px;padding: 10px;">'+
+                                '<h4 class="header"><i class="icon-reorder"></i> Generate to be Student</h4>'+
+                                '<div class = "col-md-3"> Pilih Semester'+
+                                      '<select class="form-control" id="selectSemester">'+
+                                      '</select>'+
+                                '</div>'+
+                                '<div class = "col-md-3"> <br>'+
+                                      '<button class = "btn btn-success btn-edit" id = "generateToBEMhs">Generate</button>'+
+                                '</div>'+  
+                              '</div>'+
+                            '</div>'+  
+                        '</div>';
                 //$("#loadtableNow").empty();
                 $("#dataPageLoad").html(table);
 
@@ -224,6 +240,7 @@
                              var url = base_url_js+'admission/proses-calon-mahasiswa/generate_to_be_mhs';
                              var data = {
                                          checkboxArr : checkboxArr,
+                                         Semester : $('#selectSemester').val(),
                                         };
                              var token = jwt_encode(data,"UAP)(*");
                               $.post(url,{token:token},function (data_json) {
@@ -246,6 +263,7 @@
 
                 }) // exit click function    
 
+                loadSelectOptionSemester('#selectSemester',0);
                 break;    
             default:
                 'code block'

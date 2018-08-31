@@ -33,7 +33,9 @@
         var Room = (action=='edit' || action=='delete') ? classroom[1] : '';
         var Seat = (action=='edit') ? parseInt(classroom[2]) : '';
         var SeatForExam = (action=='edit') ? parseInt(classroom[3]) : '';
-
+        var DeretForExam = (action=='edit') ? parseInt(classroom[4]) : '';
+        var LectureDesk = (action=='edit') ? classroom[5] : '';
+        
         if(action=='add' || action=='edit'){
             <?php $positionMain = $this->session->userdata('PositionMain'); 
                 $positionMain = $positionMain['IDDivision'];
@@ -57,6 +59,17 @@
                 '                                <label>Seat For Exam</label>' +
                 '                                <input type="number" class="form-control" value="'+SeatForExam+'" id="formSeatForExam">' +
                 '                            </div>' +
+                '                            <div class="col-xs-4">' +
+                '                                <label>Deret For Exam</label>' +
+                '                                <input type="number" class="form-control" value="'+DeretForExam+'" id="formDeretForExam" min = "2" max = "10">' +
+                '                            </div>' +
+                '                            <div class="col-xs-4">' +
+                '                                <label>Lecture Desk</label>' +
+                '                                   <select id = "formLectureDesk" class="full-width-fix">'+
+                '                                          <option value = "left">Left</option>'+
+                '                                          <option value = "right">Right</option>'+
+                '                                   </select>'+
+                '                            </div>' +
                                              '<div class="col-xs-3">'+
                                                 ' <label class="control-label">Layout:</label>'+
                                              '</div>'+    
@@ -71,6 +84,17 @@
                 'show' : true,
                 'backdrop' : 'static'
             });
+
+            // console.log(action);
+
+            if(action == 'edit')
+            {
+                console.log(LectureDesk);
+                $("#formLectureDesk option").filter(function() {
+                   //may want to use $.trim in here
+                   return $(this).val() == LectureDesk; 
+                 }).prop("selected", true);
+            }
         }
         else {
             $('#NotificationModal .modal-body').html('<div style="text-align: center;">Hapus <b style="color: red;">'+Room+'</b>  ?? | ' +
@@ -91,7 +115,8 @@
         var Room = $('#formRoom').val(); process = (Room=='') ? errorInput('#formRoom') : true ;
         var Seat = $('#formSeat').val(); var processSeat = (Seat!='' && $.isNumeric(Seat) && Math.floor(Seat)==Seat) ? true : errorInput('#formSeat') ;
         var SeatForExam = $('#formSeatForExam').val(); var processSeatForExam = (SeatForExam!='' && $.isNumeric(SeatForExam) && Math.floor(SeatForExam)==SeatForExam) ? true : errorInput('#formSeatForExam') ;
-
+        var DeretForExam = $('#formDeretForExam').val(); var processDeretForExam = (DeretForExam!='' && $.isNumeric(DeretForExam) && Math.floor(DeretForExam)==DeretForExam) ? true : errorInput('#formDeretForExam') ;
+        var LectureDesk = $('#formLectureDesk').val(); process = (LectureDesk=='') ? errorInput('#formLectureDesk') : true ;
 
         if(Room!='' && processSeat && processSeatForExam){
             $('#formRoom,#formSeat,#formSeatForExam,#btnCloseClassroom').prop('disabled',true);
@@ -105,9 +130,11 @@
                     Room : Room,
                     Seat : Seat,
                     SeatForExam : SeatForExam,
+                    DeretForExam : DeretForExam,
                     Status : 0,
                     UpdateBy : sessionNIP,
-                    UpdateAt : dateTimeNow()
+                    UpdateAt : dateTimeNow(),
+                    LectureDesk : LectureDesk
                 }
             };
 
@@ -205,6 +232,8 @@
                     '                            <th class="th-center" style="width: ">Class</th>' +
                     '                            <th class="th-center">Seat</th>' +
                     '                            <th class="th-center">Seat For Exam</th>' +
+                    '                            <th class="th-center">Deret For Exam</th>' +
+                    '                            <th class="th-center">Lecture Desk</th>' +
                     '                            <th class="th-center">Layout</th>' +
                     '                            <th class="th-center" style="width: 110px;">Action</th>' +
                     '                        </tr>' +
@@ -223,9 +252,11 @@
                         '<td class="td-center">'+data.Room+'</td>' +
                         '<td class="td-center">'+data.Seat+'</td>' +
                         '<td class="td-center">'+data.SeatForExam+'</td>' +
+                        '<td class="td-center">'+data.DeretForExam+'</td>' +
+                        '<td class="td-center">'+data.LectureDesk+'</td>' +
                         '<td class="td-center">'+'<a href="'+base_url_js+'fileGetAny/vreservation-'+data.Layout+'" target="_blank"></i>Click Default Layout</a>'+'</td>' +
                         '<td class="td-center">' +
-                        '<button class="btn btn-default btn-default-success btn-classroom btn-edit" data-action="edit" data-form="'+data.ID+'|'+data.Room+'|'+data.Seat+'|'+data.SeatForExam+'"><i class="fa fa-pencil" aria-hidden="true"></i></button> ' +
+                        '<button class="btn btn-default btn-default-success btn-classroom btn-edit" data-action="edit" data-form="'+data.ID+'|'+data.Room+'|'+data.Seat+'|'+data.SeatForExam+'|'+data.DeretForExam+'|'+data.LectureDesk+'"><i class="fa fa-pencil" aria-hidden="true"></i></button> ' +
                         ' <button class="btn btn-default btn-default-danger btn-classroom btn-delete" data-action="delete" data-form="'+data.ID+'|'+data.Room+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>' +
                         '</td>' +
                         '</tr>');

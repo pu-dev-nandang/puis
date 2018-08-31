@@ -159,6 +159,11 @@
         display: block;
     }
 
+
+   .table-responsive {
+             min-height: .01%;
+             overflow-x: auto;
+  }
     .daterangepicker .ranges {
         width: 250px;
     }
