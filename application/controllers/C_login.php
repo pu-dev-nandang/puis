@@ -50,8 +50,34 @@ class C_login extends CI_Controller {
     }
 
     // LOGIN FROM PORAL
-    public function portal4SignIn(){
+    public function portal4SignIn_get(){
         $token = $this->input->get('token');
+        $key = "s3Cr3T-G4N";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+
+        $dateNow = date("Y-m-d");
+
+        if($dateNow==$data_arr['dueDate']){
+            $dataEmp = $this->db->select('ID,NIP')->get_where('db_employees.employees',
+                array('NIP'=>$data_arr['Username'],'Password'=>$data_arr['Token']),1)->result_array();
+
+
+            if(count($dataEmp)>0){
+                $this->setSession($dataEmp[0]['ID'],$dataEmp[0]['NIP']);
+                redirect(base_url('dashboard'));
+            } else {
+//            echo 'gagal login son';
+                redirect(url_sign_out);
+            }
+        } else {
+            redirect(url_sign_out);
+        }
+
+
+    }
+
+    public function portal4SignIn(){
+        $token = $this->input->post('token');
         $key = "s3Cr3T-G4N";
         $data_arr = (array) $this->jwt->decode($token,$key);
 
