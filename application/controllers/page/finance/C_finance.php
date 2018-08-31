@@ -1637,6 +1637,13 @@ class C_finance extends Finnance_Controler {
         echo json_encode($data);
     }
 
+    public function getPayment_detail_admission2()
+    {
+        $input = $this->getInputToken();
+        $data = $this->m_finance->checkPayment_admisi2($input['ID_register_formulir']);
+        echo json_encode($data);
+    }
+
     public function bayar_manual_mahasiswa_admission()
     {
         $input = $this->getInputToken();

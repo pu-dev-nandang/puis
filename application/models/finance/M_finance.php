@@ -256,6 +256,28 @@ class M_finance extends CI_Model {
     return $query;
    }
 
+   public function checkPayment_admisi2($ID_register_formulir)
+   {
+    $arr_result = array();
+    $sql = 'select * from db_finance.payment_pre where ID_register_formulir = ? order by ID asc';
+    $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
+    $this->load->model('admission/m_admission');
+    $getFormulirCode = $this->m_admission->getDataPersonal($ID_register_formulir);
+    $FormulirCode = $getFormulirCode[0]['FormulirCode'];
+    // find formulir code pada db_admission.to_be_mhs
+    $this->load->model('master/m_master');
+    $get = $this->m_master->caribasedprimary('db_admission.to_be_mhs','FormulirCode',$FormulirCode);
+    if (count($get) > 0) {
+      $arr_result = array('data' => $query,'action' => 0);
+    }
+    else
+    {
+      $arr_result = array('data' => $query,'action' => 1);
+    }
+
+    return $arr_result;
+   }
+
    public function create_va_Payment($payment = null,$DeadLinePayment = null, $Name = null, $Email = null,$VA_number = null,$description = 'Pembayaran Uang Kuliah',$tableRoutes = 'db_finance.payment_pre')
    {
        $arr = array();

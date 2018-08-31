@@ -430,6 +430,7 @@ $route['finance/getPayment_admission'] =  'page/finance/c_finance/getPayment_adm
 $route['finance/getPayment_admission_edit_cicilan'] =  'page/finance/c_finance/getPayment_admission_edit_cicilan';
 
 $route['finance/getPayment_detail_admission'] =  'page/finance/c_finance/getPayment_detail_admission';
+$route['finance/getPayment_detail_admission2'] =  'page/finance/c_finance/getPayment_detail_admission2';
 $route['finance/admission/approved/edit'] =  'page/finance/c_finance/approved_edit';
 $route['finance/admission/approved/edit_submit'] =  'page/finance/c_finance/approved_edit_submit';
 

@@ -47,7 +47,7 @@ class M_admission extends CI_Model {
 
       $tahun = 'year(RegisterAT) = '.$tahun;
       $sql = "select * from (
-              select a.ID,z.name as name_programstudy, 
+              select a.ID,z.name as name_programstudy,b.FormulirCode, 
               (select count(*) as total from db_admission.register_document 
               where ".$status." and ID_register_formulir = a.ID
               GROUP BY ID_register_formulir limit 1) as document_undone,
@@ -88,6 +88,7 @@ class M_admission extends CI_Model {
               on a.ID_program_study = z.id
               ) as a
               where document_undone > 0 and Name like ".$nama." and ".$tahun."
+              and FormulirCode not in(select FormulirCode from db_admission.to_be_mhs)
               order by document_progress desc
               LIMIT ".$start. ", ".$limit; // query undone
 

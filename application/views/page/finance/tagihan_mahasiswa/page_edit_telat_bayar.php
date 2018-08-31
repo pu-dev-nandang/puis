@@ -189,7 +189,17 @@
                         }
 
                         if(Data_mhs[i]['StatusPayment'] == 0) // menandakan belum approve
-                         {
+                         {    
+                              var IPSTo = '';
+                              var IPKTo = '';
+                              try {
+                                  IPSTo = Data_mhs[i]['IPS'].toFixed(2);
+                                  IPKTo = Data_mhs[i]['IPK'].toFixed(2);
+                              }
+                              catch(err) {
+                                  IPSTo = '';
+                                  IPKTo = '';
+                              } 
                               // show bintang
                               var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
                               if (Data_mhs[i]['DetailPayment'].length > 0) { // menandakan memiliki cicilan lebih dari 1
@@ -202,8 +212,8 @@
                                                       // '<td>'+Data_mhs[i]['Year']+'</td>' +
                                                       '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +
                                                       '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
-                                                      '<td>'+Data_mhs[i]['IPS'].toFixed(2)+'</td>' +
-                                                      '<td>'+Data_mhs[i]['IPK'].toFixed(2)+'</td>' +
+                                                      '<td>'+IPSTo+'</td>' +
+                                                      '<td>'+IPKTo+'</td>' +
                                                       '<td>'+Data_mhs[i]['Discount']+'%</td>' +
                                                       '<td>'+yy+'</td>' +
                                                       '<td>'+status+'</td>' +

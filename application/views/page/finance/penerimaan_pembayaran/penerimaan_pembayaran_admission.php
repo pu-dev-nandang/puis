@@ -182,19 +182,25 @@
       table += '</thead>' ; 
       table += '<tbody>' ;
 
-      var url = base_url_js+'finance/getPayment_detail_admission';
+      var url = base_url_js+'finance/getPayment_detail_admission2';
       var data = {
           ID_register_formulir : ID_register_formulir,
       };
       var token = jwt_encode(data,'UAP)(*');
       $.post(url,{token:token},function (resultJson) {
-         var DetailPaymentArr = jQuery.parseJSON(resultJson);
-         
+         var resultJson = jQuery.parseJSON(resultJson);
+         var DetailPaymentArr = resultJson['data'];
+         var action = resultJson['action'];
          var isi = '';
          for (var j = 0; j < DetailPaymentArr.length; j++) {
            var yy = (DetailPaymentArr[j]['Invoice'] != '') ? formatRupiah(DetailPaymentArr[j]['Invoice']) : '-';
            var status = (DetailPaymentArr[j]['Status'] == 0) ? 'Belum Bayar' : 'Sudah Bayar';
-           var btn_bayar = (DetailPaymentArr[j]['Status'] == 0) ? '<button class = "bayar" IDStudent = "'+DetailPaymentArr[j]['ID']+'" bayar = "1">Bayar</button>' : '<button class = "bayar" IDStudent = "'+DetailPaymentArr[j]['ID']+'" bayar = "0">Tidak Bayar</button>';
+           var btn_bayar = '';
+           if(action == 1)
+           {
+            btn_bayar = (DetailPaymentArr[j]['Status'] == 0) ? '<button class = "bayar" IDStudent = "'+DetailPaymentArr[j]['ID']+'" bayar = "1">Bayar</button>' : '<button class = "bayar" IDStudent = "'+DetailPaymentArr[j]['ID']+'" bayar = "0">Tidak Bayar</button>';
+           }
+           
            isi += '<tr>'+
                  '<td>'+ (j+1) + '</td>'+
                  // '<td>'+ Nama + '</td>'+
