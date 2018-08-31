@@ -48,34 +48,32 @@
             $('#GlobalModal .modal-header').html('<h4 class="modal-title">Classroom</h4>');
             $('#GlobalModal .modal-body').html('<div class="row">' +
                 '                            <div class="col-xs-4">' +
-                '                                <label>Room</label>' +
+                '                                <div class="form-group"><label>Room</label>' +
                 '                                <input type="text" class="form-control" value="'+Room+'" '+readonly+' style="color:#333;" id="formRoom">' +
-                '                            </div>' +
+                '                            </div></div>' +
                 '                            <div class="col-xs-4">' +
-                '                                <label>Seat</label>' +
+                '                                <div class="form-group"><label>Seat</label>' +
                 '                                <input type="number" class="form-control" value="'+Seat+'" id="formSeat">' +
-                '                            </div>' +
+                '                            </div></div>' +
                 '                            <div class="col-xs-4">' +
-                '                                <label>Seat For Exam</label>' +
+                '                                <div class="form-group"><label>Seat For Exam</label>' +
                 '                                <input type="number" class="form-control" value="'+SeatForExam+'" id="formSeatForExam">' +
-                '                            </div>' +
+                '                            </div></div>' +
                 '                            <div class="col-xs-4">' +
-                '                                <label>Deret For Exam</label>' +
+                '                                <div class="form-group"><label>Deret For Exam</label>' +
                 '                                <input type="number" class="form-control" value="'+DeretForExam+'" id="formDeretForExam" min = "2" max = "10">' +
-                '                            </div>' +
+                '                            </div></div>' +
                 '                            <div class="col-xs-4">' +
-                '                                <label>Lecture Desk</label>' +
-                '                                   <select id = "formLectureDesk" class="full-width-fix">'+
+                '                                <div class="form-group"><label>Lecture Desk</label>' +
+                '                                   <select id = "formLectureDesk" class="form-control">'+
                 '                                          <option value = "left">Left</option>'+
                 '                                          <option value = "right">Right</option>'+
                 '                                   </select>'+
-                '                            </div>' +
-                                             '<div class="col-xs-3">'+
-                                                ' <label class="control-label">Layout:</label>'+
-                                             '</div>'+    
-                                             '<div class="col-sm-6">'+
+                '                            </div></div>' +
+                                             '<div class="col-xs-4">'+
+                                                '<div class="form-group"><label class="control-label">Layout:</label>'+
                                                  '<input type="file" data-style="fileinput" id="ExFile">'+
-                                                 '<br>'+
+                                                 '</div>'+
                                              '</div>'+
                 '                        </div>');
             $('#GlobalModal .modal-footer').html('<button type="button" id="btnCloseClassroom" class="btn btn-default" data-dismiss="modal">Close</button>' +
