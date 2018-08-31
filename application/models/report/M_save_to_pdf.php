@@ -35,7 +35,7 @@ class M_save_to_pdf extends CI_Model {
                                             LEFT JOIN db_academic.schedule s ON (attd.ScheduleID = s.ID)
                                             LEFT JOIN db_academic.schedule_details sd ON (sd.ScheduleID = s.ID)
                                             LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
-                                            LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+                                            LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ClassroomID)
                                               WHERE ex.Date = "'.$dateSearch.'" AND ex.Status = "1" ')
             ->result_array();
 

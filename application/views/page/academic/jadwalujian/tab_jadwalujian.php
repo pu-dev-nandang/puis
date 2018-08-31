@@ -82,7 +82,7 @@
         if(ScheduleID!='' && ScheduleID!=null){
             var ExamType = $('input[type=radio][name=formExam]:checked').val();
             var token = jwt_encode({
-                action:'checkCourse',
+                action:'checkCourse4Exam',
                 ScheduleID:ScheduleID,
                 Type : ExamType
             },'UAP)(*');

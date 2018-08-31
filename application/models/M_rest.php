@@ -53,8 +53,8 @@ class M_rest extends CI_Model {
 
     }
 
-    public function __getKSM($db,$ProdiID,$NPM){
-        $dataSemester = $this->db->query('SELECT s.* FROM db_academic.semester s ORDER BY s.ID ASC')->result_array();
+    public function __getKSM($db,$ProdiID,$NPM,$ClassOf){
+        $dataSemester = $this->db->query('SELECT s.* FROM db_academic.semester s WHERE s.Year >= '.$ClassOf.' ORDER BY s.ID ASC')->result_array();
 
 //        print_r($dataSemester);
 
@@ -96,16 +96,22 @@ class M_rest extends CI_Model {
                         }
                     }
 
-                    $dataArr = array(
-                        'SemesterID' => $dataSemester[$i]['ID'],
-                        'Semester' => $smt,
-                        'SemesterName' => $dataSemester[$i]['Name'],
-                        'StatusSystem' => '0',
-                        'Schedule' => $dataSchedule
-                    );
-                    array_push($result,$dataArr);
-                    $smt += 1;
                 }
+                else {
+                    $dataSchedule = [];
+                }
+
+                $dataArr = array(
+                    'SemesterID' => $dataSemester[$i]['ID'],
+                    'Semester' => $smt,
+                    'SemesterName' => $dataSemester[$i]['Name'],
+                    'StatusSystem' => '0',
+                    'Schedule' => $dataSchedule
+                );
+                array_push($result,$dataArr);
+                $smt += 1;
+
+
             }
             else {
 
