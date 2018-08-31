@@ -106,26 +106,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->Output('I',$DayNameEng.'_schedule.pdf');
     }
-
-    public function test(){
-        $p = new FPDF();
-        $p->AddPage();
-        $p->SetFont('Arial','B',16);
-        $p->SetAutoPageBreak(false);
-        $height_of_cell = 60; // mm
-        $page_height = 286.93; // mm (portrait letter)
-        $bottom_margin = 0; // mm
-        for($i=0;$i<=100;$i++) :
-            $block=floor($i/6);
-            $space_left=$page_height-($p->GetY()+$bottom_margin); // space left on page
-            if ($i/6==floor($i/6) && $height_of_cell > $space_left) {
-                $p->AddPage(); // page break
-            }
-            $p->Cell(100,10,'This is a text line - Group '.$block,'B',2);
-        endfor;
-        $p->Output();
-    }
-
+    
     private function header_schedule($pdf,$SemesterDetails,$DayNameEng){
         $pdf->Image(base_url('images/icon/logo-hr.png'),10,10,50);
 

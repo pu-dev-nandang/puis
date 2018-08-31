@@ -2150,11 +2150,14 @@ class M_api extends CI_Model {
                                                             WHERE sp.ScheduleID = "'.$ScheduleID.'" 
                                                             AND sp.StatusSystem = "1" ')->result_array();
 
-            if(count($dataSt)>=0){
+            if(count($dataSt)>0){
+
+
                 $arr = array(
                     'DB_Students' => $db_,
                     'Details' => $dataSt
                 );
+                array_push($dataStudents,$arr);
 
                 $TotalStudents = $TotalStudents + count($dataSt);
 
@@ -2174,7 +2177,7 @@ class M_api extends CI_Model {
                     array_push($dataStudentsDetails,$dataSt[$s]);
                 }
 
-                array_push($dataStudents,$arr);
+
             }
 
         }

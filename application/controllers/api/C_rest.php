@@ -91,7 +91,7 @@ class C_rest extends CI_Controller {
 
         if($cekUser){
 
-            $data = $this->m_rest->__getKSM($dataToken['DB_'],$dataToken['ProdiID'],$dataToken['NPM']);
+            $data = $this->m_rest->__getKSM($dataToken['DB_'],$dataToken['ProdiID'],$dataToken['NPM'],$dataToken['ClassOf']);
             return print_r(json_encode($data));
 
         } else {
