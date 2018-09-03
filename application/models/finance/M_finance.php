@@ -829,6 +829,7 @@ class M_finance extends CI_Model {
 
    public function process_tuition_fee_calon_mhs($arrDataPersonal,$arrDataInvoice)
    {
+    // print_r($arrDataInvoice);die();
        $errorMSG = '';
        # Create VA untuk set payment & # save data
        $payment = $arrDataInvoice[0]['Invoice'];
