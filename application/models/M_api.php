@@ -2094,8 +2094,20 @@ class M_api extends CI_Model {
         $SemesterActive = $this->_getSemesterActive();
         $data = $this->db->query('SELECT s.ID,s.ClassGroup,em.Name AS CoordinatorName FROM db_academic.schedule s 
                                           LEFT JOIN db_employees.employees em ON (s.Coordinator = em.NIP)
-                                          WHERE s.SemesterID = "'.$SemesterActive['ID'].'" ORDER BY s.ClassGroup ASC ');
-        return $data->result_array();
+                                          WHERE s.SemesterID = "'.$SemesterActive['ID'].'" ORDER BY s.ClassGroup ASC ')->result_array();
+
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+                $course = $this->db->query('SELECT mk.NameEng AS CourseEng FROM db_academic.schedule_details_course sdc 
+                                                      LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                      WHERE sdc.ScheduleID = "'.$data[$i]['ID'].'" LIMIT 1')->result_array();
+                if(count($course)>0){
+                    $data[$i]['CourseEng'] = $course[0]['CourseEng'];
+                }
+            }
+        }
+
+        return $data;
     }
 
     public function getDateExam(){
@@ -2116,8 +2128,9 @@ class M_api extends CI_Model {
 
         // Cek Schedule Exam
         $dataExam = $this->db->query('SELECT * FROM db_academic.exam ex 
+                                              LEFT JOIN db_academic.exam_group exg ON (ex.ID = exg.ExamID)
                                               WHERE ex.SemesterID = "'.$SemesterActive['ID'].'" 
-                                              AND ex.ScheduleID = "'.$ScheduleID.'" 
+                                              AND exg.ScheduleID = "'.$ScheduleID.'" 
                                               AND ex.Type = "'.$Type.'" ')->result_array();
 
         $dataSch = $this->db->query('SELECT em.NIP, em.Name FROM db_academic.schedule s 
@@ -2165,9 +2178,9 @@ class M_api extends CI_Model {
 
                     // Cek Apakah ada Di Exam
                     $dataStdExamCheck = $this->db->query('SELECT exd.* FROM db_academic.exam ex
-                                                                    LEFT JOIN db_academic.exam_details exd 
-                                                                    ON (ex.ID = exd.ExamID)
-                                                                    WHERE ex.ScheduleID = "'.$ScheduleID.'"
+                                                                    LEFT JOIN db_academic.exam_details exd ON (ex.ID = exd.ExamID)
+                                                                    LEFT JOIN db_academic.exam_group exg ON (ex.ID = exg.ExamID)
+                                                                    WHERE exg.ScheduleID = "'.$ScheduleID.'"
                                                                     AND exd.MhswID = "'.$dataSt[$s]['MhswID'].'" 
                                                                     LIMIT 1')
                                             ->result_array();
