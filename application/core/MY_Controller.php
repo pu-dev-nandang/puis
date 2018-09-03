@@ -280,10 +280,13 @@ abstract class Admission_Controler extends Globalclass{
                 );
             }
 
-            // SORTING ASC
-                usort($arr2, function($a, $b) {
-                    return $a['SubMenu1'] - $b['SubMenu1'];
-                });
+            if ($i == 0) {
+                // SORTING ASC
+                    usort($arr2, function($a, $b) {
+                        return $a['SubMenu1'] - $b['SubMenu1'];
+                    });
+            }
+            
 
             $arr[] =array(
                 'Menu' => $DataDB[$i]['Menu'],
