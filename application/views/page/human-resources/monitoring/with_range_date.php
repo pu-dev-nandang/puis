@@ -108,7 +108,7 @@
             startDate: moment().subtract('days', 29),
             endDate: moment(),
             minDate: '01/01/2014',
-            maxDate: moment().format('MM/DD/YYYY'),
+            maxDate: moment().add(10, 'days').format('DD/MM/YYYY'),
             // maxDate: '12/12/2018',
             dateLimit: { days: 31 },
             showDropdowns: true,
