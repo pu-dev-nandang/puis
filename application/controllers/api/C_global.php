@@ -24,12 +24,19 @@ class C_global extends CI_Controller {
 
     public function loadDataRegistrationBelumBayar()
     {
+        $Tahun = $this->input->post('tahun');
+        // print_r('test =--'.$Tahun);die();
+        // $Tahun = $Tahun['tahun'];
+        $this->data['tahun']= $Tahun;
         $content = $this->load->view('page/load_data_registration_belum_bayar',$this->data,true);
         echo $content;
     }
 
     public function load_data_registration_telah_bayar()
     {
+        $Tahun = $this->input->post('tahun');
+        // $Tahun = $Tahun['tahun'];
+        $this->data['tahun']= $Tahun;
         $content = $this->load->view('page/load_data_registration_telah_bayar',$this->data,true);
         echo $content;
     }

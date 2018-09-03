@@ -1,4 +1,15 @@
 <legend>Pembayaran Formulir Verify By Virtual Account (VA)</legend>
+
+<div class="row">
+	<div class="col-md-3">
+	    <div class="thumbnail" style="min-height: 80px;padding: 10px;">
+	    	Tahun
+	        <select class="select2-select-00 col-xs-2 full-width-fix" id="selectTahun">
+                  <option></option>
+            </select>
+	    </div>
+	</div>
+</div>	
 <div class="row" style="margin-top: 30px;">
 	<div class="col-md-12">
 		<div class="widget box">
@@ -72,10 +83,35 @@
 	//window.url_images = 'http://localhost/register/upload/';
 	window.url_images = '<?php echo $this->GlobalVariableAdi['url_registration'] ?>'+'upload/';
 	$(document).ready(function () {
+		loadTahun();
 	    loaddataBelumBayar();
 	    loadDataTelahBayar();
 	    // loadSelectbaris();
 	});
+
+	$(document).on('change','#selectTahun', function () {
+	    loaddataBelumBayar();
+	    loadDataTelahBayar();
+	});
+
+	function loadTahun()
+	  {
+	      var startTahun = 2014;
+	      var thisYear = (new Date()).getFullYear();
+	      var selisih = parseInt(thisYear) - parseInt(startTahun);
+	      $("#selectTahun").empty();
+	      for (var i = 0; i <= selisih; i++) {
+	          var selected = (i==0) ? 'selected' : '';
+	          $('#selectTahun').append('<option value="'+ ( parseInt(startTahun) + parseInt(i) ) +'" '+selected+'>'+( parseInt(startTahun) + parseInt(i) )+'</option>');
+	      }
+	      $('#selectTahun').select2({
+	        // allowClear: true
+	      });
+
+	      $('#selectStatus').select2({
+	        // allowClear: true
+	      });
+	  }
 
 	function loadSelectbaris()
 	{
@@ -115,7 +151,9 @@
 		$("#dataRegTelahBayar").empty();
 		loading_page('#dataRegTelahBayar');
 		var url = base_url_js+'loadDataRegistrationTelahBayar';
-		$.post(url,function (data_json) {
+		var data = {tahun : $("#selectTahun").val()};
+		// console.log(data);
+		$.post(url,data,function (data_json) {
 		    setTimeout(function () {
 		        $("#dataRegTelahBayar").html(data_json);
 		    },500);
@@ -127,7 +165,8 @@
 		$("#dataBelumBayar").empty();
 		loading_page('#dataBelumBayar');
 		var url = base_url_js+'loadDataRegistrationBelumBayar';
-		$.post(url,function (data_json) {
+		var data = {tahun : $("#selectTahun").val()};
+		$.post(url,data,function (data_json) {
 		    setTimeout(function () {
 		        $("#dataBelumBayar").html(data_json);
 		    },500);

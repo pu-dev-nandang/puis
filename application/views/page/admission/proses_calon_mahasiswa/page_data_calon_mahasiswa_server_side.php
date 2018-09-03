@@ -4,7 +4,7 @@
     <div class="col-md-12 formAddFormKD">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i> Data Calon Mahasiswa</h4>
+                <h4 class="header"><i class="icon-reorder"></i> Data Registrasi Mahasiswa</h4>
             </div>
             <div class="widget-content">
                 <!--  -->
@@ -20,10 +20,25 @@
                          <div class="thumbnail" style="padding: 10px;">
                              <b>Status : </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Paid Off 
                          </div>
-                         <br> 
-                        <div id="dataPageLoad" style="margin-top:0px;">
-                            
-                        </div>
+                         <br>
+                         <div class="row">
+                            <div class="col-xs-2" style="">
+                              Tahun
+                              <select class="select2-select-00 col-xs-2 full-width-fix" id="selectTahun">
+                                  <option></option>
+                              </select>
+                            </div>
+                          </div>  
+                         <br>
+                         <div class = "row">
+                          <div class = "col-md-12">
+                            <div class = "table-responsive">
+                                <div id="dataPageLoad" style="margin-top:0px;">
+                                    
+                                </div>
+                            </div>
+                          </div>
+                        </div>    
                         <!-- <div  class="col-xs-12" align="right" id="pagination_link"></div> -->
                     </div>
                 </div>
@@ -35,11 +50,32 @@
 <script type="text/javascript">
     window.pageHtml = '';
     window.temp = '';
+
+    function loadTahun()
+      {
+          var startTahun = 2018;
+          var thisYear = (new Date()).getFullYear();
+          var selisih = parseInt(thisYear) - parseInt(startTahun);
+          $("#selectTahun").empty();
+          for (var i = 0; i <= selisih; i++) {
+              var selected = (i==0) ? 'selected' : '';
+              $('#selectTahun').append('<option value="'+ ( parseInt(startTahun) + parseInt(i) ) +'" '+selected+'>'+( parseInt(startTahun) + parseInt(i) )+'</option>');
+          }
+          $('#selectTahun').select2({
+            // allowClear: true
+          });
+
+          $('#selectStatus').select2({
+            // allowClear: true
+          });
+      }
+
     $(document).ready(function () {
         if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
             $('#panel_web').addClass('wrap');
             $('#panel_web').css({"padding": "0px", "padding-right": "20px"});
         }
+        loadTahun();
         loadPage('data-calon-mhs/1');
     });
 
@@ -49,6 +85,14 @@
         $('li[role=presentation]').removeClass('active');
         $(this).parent().addClass('active');
         loadPage(page);
+    });
+
+    $(document).on('change','#selectTahun', function () {
+        // loaddataBelumBayar();
+        // loadDataTelahBayar();
+        loadPage(pageHtml+'/1');
+        // console.log($(this).val());
+        // loadPage('data-calon-mhs/1');
     });
 
     function loadPage(page) {
@@ -104,6 +148,7 @@
                    "ajax":{
                        url : base_url_js+"admission/proses-calon-mahasiswa/getDataPersonal_Candidate", // json datasource
                        ordering : false,
+                       data : {tahun : $("#selectTahun").val()},
                        type: "post",  // method  , by default get
                        error: function(){  // error handling
                            $(".employee-grid-error").html("");
@@ -120,11 +165,11 @@
                    },
                } );
 
-
+               pageHtml = 'data-calon-mhs';
                 break;
             case 'to-be-mhs':
                 $("#dataPageLoad").empty();
-                var table = '<div class = "row"><div class = "col-md-12"><div class = "table-responsive">'+
+                var table = ''+
                             '<table class="table table-bordered datatable2" id = "datatable2">'+
                             '<thead>'+
                             '<tr style="background: #333;color: #fff;">'+
@@ -142,7 +187,7 @@
                             '</tr>'+
                             '</thead>'+
                             '<tbody id="dataRow"></tbody>'+
-                        '</table></div></div></div><br>'+
+                        '</table><br>'+
                         '<div class = "row">'+
                             '<div class = "col-md-12">'+
                               '<div class="thumbnail" style="min-height: 120px;padding: 10px;">'+
@@ -169,6 +214,7 @@
                     "ajax":{
                         url : base_url_js+"admission/proses-calon-mahasiswa/getDataPersonal_Candidate_to_be_mhs", // json datasource
                         ordering : false,
+                        data : {tahun : $("#selectTahun").val()},
                         type: "post",  // method  , by default get
                         error: function(){  // error handling
                             $(".employee-grid-error").html("");
@@ -264,6 +310,8 @@
                 }) // exit click function    
 
                 loadSelectOptionSemester('#selectSemester',0);
+                pageHtml = 'to-be-mhs';
+
                 break;    
             default:
                 'code block'

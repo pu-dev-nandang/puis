@@ -1987,13 +1987,19 @@ class C_api extends CI_Controller {
 
     public function getDataRegisterBelumBayar()
     {
-        $getData = $this->m_api->getDataRegisterBelumBayar();
+        $Tahun = $this->input->post('Tahun');
+        // $Tahun = $Tahun['Tahun'];
+        // $getData = $this->m_api->getDataRegisterBelumBayar();
+        $getData = $this->m_api->getDataRegisterBelumBayar2($Tahun);
         echo json_encode($getData);
     }
 
     public function getDataRegisterTelahBayar()
     {
-        $getData = $this->m_api->getDataRegisterTelahBayar();
+        $Tahun = $this->input->post('Tahun');
+        // $Tahun = $Tahun['Tahun'];
+        // $getData = $this->m_api->getDataRegisterTelahBayar();
+        $getData = $this->m_api->getDataRegisterTelahBayar2($Tahun);
         echo json_encode($getData);
     }
 

@@ -172,6 +172,8 @@ foreach( $result as $row )
 }
 // test routes from db
 
+$route['admission/config/submit_upload_announcement'] = 'page/admission/c_master/submit_upload_announcement';
+
 $route['admission/config/set-tgl-register-online'] = 'page/admission/c_master/page_set_tgl_register'; // db menu
 
 $route['admission/master/data_cfg_deadline'] = 'page/admission/c_master/data_cfg_deadline';

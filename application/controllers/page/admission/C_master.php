@@ -1640,4 +1640,30 @@ class C_master extends Admission_Controler {
         echo json_encode($json_data);
     }
 
+    public function submit_upload_announcement()
+    {
+        // upload file
+        $filename = 'Announcenment.pdf';
+        $config['upload_path']   = path_register_online.'/upload/';
+        $config['overwrite'] = TRUE; 
+        $config['allowed_types'] = '*'; 
+        $config['file_name'] = $filename;
+        //$config['max_size']      = 100; 
+        //$config['max_width']     = 300; 
+        //$config['max_height']    = 300;  
+        $this->load->library('upload', $config);
+           
+        if ( ! $this->upload->do_upload('fileData')) {
+           // return $error = $this->upload->display_errors(); 
+           echo json_encode(array('msg' => 'The file did not upload successfully','status' => 0));
+           //$this->load->view('upload_form', $error); 
+        }
+           
+        else { 
+          // return $data =  $this->upload->data(); 
+          echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+           //$this->load->view('upload_success', $data); 
+        }
+    }
+
 }

@@ -6,6 +6,15 @@
 <div class="row">
     <div class="col-md-12">
         <hr/>
+        <div class="row">
+            <div class="col-xs-2" style="">
+              Tahun
+              <select class="select2-select-00 col-xs-2 full-width-fix" id="selectTahun">
+                  <option></option>
+              </select>
+            </div>
+        </div>  
+         <br>
         <div id = "pageTable">
           
         </div>
@@ -15,8 +24,33 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
+      loadTahun();
       loadTableHeader(loadData);
     });
+
+    $(document).on('change','#selectTahun', function () {
+        loadTableHeader(loadData);
+    });
+
+    function loadTahun()
+    {
+        var startTahun = 2018;
+        var thisYear = (new Date()).getFullYear();
+        var selisih = parseInt(thisYear) - parseInt(startTahun);
+        $("#selectTahun").empty();
+        for (var i = 0; i <= selisih; i++) {
+            var selected = (i==0) ? 'selected' : '';
+            $('#selectTahun').append('<option value="'+ ( parseInt(startTahun) + parseInt(i) ) +'" '+selected+'>'+( parseInt(startTahun) + parseInt(i) )+'</option>');
+        }
+        $('#selectTahun').select2({
+          // allowClear: true
+        });
+
+        $('#selectStatus').select2({
+          // allowClear: true
+        });
+    }
+
 
     function loadTableHeader(callback)
     {
@@ -76,6 +110,7 @@
               url : base_url_js+"finance/getPayment_admission", // json datasource
               ordering : false,
               type: "post",  // method  , by default get
+              data : {tahun : $("#selectTahun").val()},
               error: function(){  // error handling
                   $(".employee-grid-error").html("");
                   $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
