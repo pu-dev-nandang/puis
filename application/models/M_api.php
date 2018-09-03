@@ -1423,6 +1423,26 @@ class M_api extends CI_Model {
         return $query;
     }
 
+    public function getDataRegisterBelumBayar2($Tahun)
+    {
+        $sql = "select a.* from (
+                select a.ID,a.Name,a.Email,b.SchoolName,a.PriceFormulir,a.VA_number,a.BilingID,a.Datetime_expired,a.RegisterAT,c.FileUpload,c.CreateAT as uploadAT,c.ID as ver_id
+                        from db_admission.register as a LEFT JOIN db_admission.school as b
+                        on a.SchoolID = b.ID
+                        LEFT JOIN db_admission.register_verification as c
+                        on a.ID = c.RegisterID where a.SetTa = '".$Tahun."'
+                ) as a
+                where a.ver_id not in (select RegVerificationID from db_admission.register_verified)
+                UNION
+                select a.ID,a.Name,a.Email,b.SchoolName,a.PriceFormulir,a.VA_number,a.BilingID,a.Datetime_expired,a.RegisterAT,null,null,null
+                from db_admission.register as a LEFT JOIN db_admission.school as b
+                on a.SchoolID = b.ID
+                where a.ID not in(select RegisterID from db_admission.register_verification)
+                ORDER BY uploadAT desc";        
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
+    }
+
     public function getDataRegisterTelahBayar()
     {
         $sql = "select a.ID,a.Name,a.Email,b.SchoolName,a.PriceFormulir,a.VA_number,a.BilingID,a.Datetime_expired,a.RegisterAT,c.FileUpload,c.CreateAT as uploadAT,c.ID as ver_id,d.FormulirCode,d.VerificationAT,e.name as VerificationBY,
@@ -1435,6 +1455,22 @@ class M_api extends CI_Model {
                 on c.ID = d.RegVerificationID
                 LEFT JOIN db_employees.employees as e
                 on e.NIP = d.VerificationBY where a.StatusReg = 0";        
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
+    }
+
+    public function getDataRegisterTelahBayar2($Tahun)
+    {
+        $sql = "select a.ID,a.Name,a.Email,b.SchoolName,a.PriceFormulir,a.VA_number,a.BilingID,a.Datetime_expired,a.RegisterAT,c.FileUpload,c.CreateAT as uploadAT,c.ID as ver_id,d.FormulirCode,d.VerificationAT,e.name as VerificationBY,
+                d.ID as verified_id
+                from db_admission.register as a LEFT JOIN db_admission.school as b
+                on a.SchoolID = b.ID
+                JOIN db_admission.register_verification as c
+                on a.ID = c.RegisterID
+                join db_admission.register_verified as d
+                on c.ID = d.RegVerificationID
+                LEFT JOIN db_employees.employees as e
+                on e.NIP = d.VerificationBY where a.StatusReg = 0 and a.SetTa = '".$Tahun."'";        
         $query=$this->db->query($sql, array())->result_array();
         return $query;
     }

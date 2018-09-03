@@ -33,7 +33,9 @@
 		var url = base_url_js+'api/__getDataRegisterBelumBayar';
 		//var url_images = 'http://localhost/register/upload/';
 		loading_page('#loadingProcess');
-		$.post(url,function (data_json) {
+		var Tahun  = "<?php echo $tahun ?>";
+		var data = {Tahun : Tahun};
+		$.post(url,data,function (data_json) {
 			//var response = jQuery.parseJSON(data_json);
 			var no = 1;
 			//console.log(data_json)

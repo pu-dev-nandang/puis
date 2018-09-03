@@ -408,7 +408,7 @@ class M_master extends CI_Model {
         $key = "UAP)(*";
         // $url = $this->jwt->encode($yy.$code.$increment.";".$tahun,$key);
         $url = substr(md5(uniqid(mt_rand(), true)), 0, 8);
-        $baseURL = $this->GlobalVariableAdi['url_registration']."formulir-registration-offline/".$url;
+        $baseURL = url_registration."formulir-registration-offline/".$url;
         $dataSave = array(
             'Years' => $tahun,
             'FormulirCode' => $yy.$code.$increment,

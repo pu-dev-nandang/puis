@@ -280,6 +280,11 @@ abstract class Admission_Controler extends Globalclass{
                 );
             }
 
+            // SORTING ASC
+                usort($arr2, function($a, $b) {
+                    return $a['SubMenu1'] - $b['SubMenu1'];
+                });
+
             $arr[] =array(
                 'Menu' => $DataDB[$i]['Menu'],
                 'Icon' => $DataDB[$i]['Icon'],
@@ -288,7 +293,8 @@ abstract class Admission_Controler extends Globalclass{
             );
             
         }
-        //print_r($arr);die();
+
+        // print_r($arr);die();
         return $arr;
 
         // $DataDB = $this->session->userdata('menu_admission_sess');

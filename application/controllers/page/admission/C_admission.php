@@ -1007,6 +1007,7 @@ class C_admission extends Admission_Controler {
     public function getDataPersonal_Candidate()
     {
         $requestData= $_REQUEST;
+        $reqTahun = $this->input->post('tahun');
         // print_r($requestData);
         // die();
         $No = $requestData['start'] + 1;
@@ -1047,6 +1048,7 @@ class C_admission extends Admission_Controler {
                 on e.ID = xy.ID_register_formulir
                 LEFT JOIN db_admission.register_dsn_type_m as xq
                 on xq.ID = xy.TypeBeasiswa
+                where a.SetTa = "'.$reqTahun.'" 
               ) ccc
             ';
 
@@ -1110,6 +1112,7 @@ class C_admission extends Admission_Controler {
     public function getDataPersonal_Candidate_to_be_mhs()
     {
       $requestData= $_REQUEST;
+      $reqTahun = $this->input->post('tahun');
       // print_r($requestData);
       // die();
       $No = $requestData['start'] + 1;
@@ -1149,7 +1152,7 @@ class C_admission extends Admission_Controler {
               LEFT JOIN db_finance.register_admisi as xy
               on e.ID = xy.ID_register_formulir
               LEFT JOIN db_admission.register_dsn_type_m as xq
-              on xq.ID = xy.TypeBeasiswa
+              on xq.ID = xy.TypeBeasiswa where a.SetTa = "'.$reqTahun.'"
             ) ccc
           ';
 
@@ -1508,6 +1511,17 @@ class C_admission extends Admission_Controler {
                           $this->db->insert('db_finance.payment_students', $dataSave);
                         }
                      }
+
+                     $text = 'Dear '.$Name.',<br><br>
+                                 Congarulations, You were admitted to Podomoro University,<br>
+                                 Your Nim is '.$NPM.'.<br><br>
+                                 For Details, Please open your portal '.url_sign_out.' with :<br>
+                                 Username : '.$NPM.'<br>
+                                 Password : '.$pasword_old.'<br><br>
+                             ';
+                     $to = $Email;
+                     $subject = "Podomoro University Registration";
+                     $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
 
                   }  
             $aa++;

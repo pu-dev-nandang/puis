@@ -1423,6 +1423,7 @@ class C_finance extends Finnance_Controler {
     {
         $requestData= $_REQUEST;
         // print_r($requestData);
+        $reqTahun = $this->input->post('tahun');
         $totalData = $this->m_finance->getCountAllPayment_admission();
 
         $sql = 'select * from (
@@ -1454,7 +1455,7 @@ class C_finance extends Finnance_Controler {
                 on o.ID = a.ID_program_study
                 join db_finance.register_admisi as p
                 on a.ID = p.ID_register_formulir
-                where p.Status = "Approved" group by a.ID
+                where p.Status = "Approved"  and d.SetTa = "'.$reqTahun.'" group by a.ID
 
                 ) SubQuery
             ';
