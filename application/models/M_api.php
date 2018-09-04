@@ -2800,7 +2800,7 @@ class M_api extends CI_Model {
         }
 
         $dataEm = $this->db->query('SELECT em.NIP, em.Name, em.Password, em.PositionMain, em.PositionOther1, em.PositionOther2, em.PositionOther3 FROM db_employees.employees em 
-                                              WHERE em.Name LIKE "%'.$key.'%" OR em.NIP LIKE "%'.$key.'%"
+                                              WHERE em.StatusEmployeeID != -1 AND em.StatusEmployeeID != -2 AND ( em.Name LIKE "%'.$key.'%" OR em.NIP LIKE "%'.$key.'%" )
                                                LIMIT 5')->result_array();
 
         if(count($dataEm)>0){
