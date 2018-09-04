@@ -718,6 +718,25 @@
         });
     }
 
+    function loadSelect2OptionClassroom(element,selected) {
+
+        var url = base_url_js+'api/__crudClassroom';
+        var token = jwt_encode({action:'read'},'UAP)(*');
+
+        var option = $(''+element);
+        $.post(url,{token:token},function (data_json) {
+            if(data_json.length>0){
+                $(element).empty();
+                for(var i=0;i<data_json.length;i++){
+                    option.append('<option value="'+data_json[i].ID+'">'+data_json[i].Room+' | Seat : '+data_json[i].Seat+' | Exam : '+data_json[i].SeatForExam+'</option>')
+                        .val(selected).trigger('change');
+                }
+            }
+
+        });
+
+    }
+
     function loadSelectOptionTimePerCredit(element,selected) {
         var url = base_url_js+'api/__crudTimePerCredit';
         var token = jwt_encode({action:'read'},'UAP)(*');
@@ -766,7 +785,8 @@
             if(data_json.length>0){
                 for(var i=0;i<data_json.length;i++){
                     var data = data_json[i];
-                    option.append('<option value="'+data.NIP+'">'+data.NIP+' - '+data.Name+'</option>');
+                    option.append('<option value="'+data.NIP+'">'+data.NIP+' - '+data.Name+'</option>')
+                        .val(selected).trigger('change');
                 }
             }
         })
