@@ -291,6 +291,9 @@ $route['admission/master-registration/modalform_sales_koordinator/save'] = 'page
 $route['admission/master-registration/sales_koordinator/pagination/(:num)'] = 'page/admission/c_master/sales_koordinator_pagination/$1';
 $route['admission/master-registration/DataFormulirOffline/downloadPDFToken'] = 'page/admission/c_master/downloadPDFToken';
 $route['admission/config/upload-pdf-per-pengumuman'] = 'page/admission/c_master/upload_pengumuman';
+$route['admission/submit_set_tahun_ajaran'] = 'page/admission/c_master/submit_set_tahun_ajaran';
+$route['admission/master-registration/reset_va'] = 'page/admission/c_master/reset_va';
+
 
 $route['fileGet/(:any)'] = 'api/c_global/fileGet/$1';
 $route['download/(:any)'] = 'api/c_global/download/$1';
@@ -298,6 +301,7 @@ $route['download_template/(:any)'] = 'api/c_global/download_template/$1';
 $route['download_anypath'] = 'api/c_global/download_anypath';
 $route['fileGetAny/(:any)'] = 'api/c_global/fileGetAny/$1';
 $route['autocompleteAllUser'] = 'api/c_global/autocompleteAllUser';
+
 
 
 
@@ -533,6 +537,7 @@ $route['api/__getMKByID'] = 'api/c_api/getMKByID';
 $route['api/__getSemester'] = 'api/c_api/getSemester';
 $route['api/__getLecturer'] = 'api/c_api/getLecturer';
 $route['api/__getStudents'] = 'api/c_api/getStudents';
+
 $route['api/__getAllMK'] = 'api/c_api/getAllMK';
 
 $route['api/__getEmployees'] = 'api/c_api/getEmployees';

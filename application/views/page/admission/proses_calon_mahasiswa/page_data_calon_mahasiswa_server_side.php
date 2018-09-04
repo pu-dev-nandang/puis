@@ -5,6 +5,13 @@
         <div class="widget box">
             <div class="widget-header">
                 <h4 class="header"><i class="icon-reorder"></i> Data Registrasi Mahasiswa</h4>
+                <!-- <div class="toolbar no-padding">
+                    <div class="btn-group">
+                      <span data-smt="" class="btn btn-xs btn-add">
+                        <i class="icon-plus"></i> Add
+                       </span>
+                    </div>
+                </div> -->
             </div>
             <div class="widget-content">
                 <!--  -->
@@ -115,6 +122,7 @@
                                '<th>Tagihan</th>'+
                                '<th>Detail Payment</th>'+
                                '<th>Status Payment</th>'+
+                               '<th>Login</th>'+
                            '</tr>'+
                            '</thead>'+
                            '<tbody id="dataRow"></tbody>'+
@@ -512,6 +520,35 @@
                 'backdrop' : 'static'
             });
         })
+    });
+
+    function submit(action, method, values) {
+        var form = $('<form/>', {
+            action: action,
+            method: method
+        });
+        $.each(values, function() {
+            form.append($('<input/>', {
+                type: 'hidden',
+                name: this.name,
+                value: this.value
+            }));    
+        });
+        form.attr('target', '_blank');
+        form.appendTo('body').submit();
+    }
+
+    $(document).on("click", ".btnLoginPortalRegister", function(event){
+      var url = '<?php echo url_registration; ?>'+'auth/loginByPcam';
+      var Email = $(this).attr('data-xx');
+      data = {
+        Email : Email,
+      }
+      var token = jwt_encode(data,"UAP)(*");
+      submit(url, 'POST', [
+          { name: 'token', value: token },
+      ]);
+
     });
     
 </script>

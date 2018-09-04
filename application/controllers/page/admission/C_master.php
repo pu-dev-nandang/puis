@@ -742,11 +742,16 @@ class C_master extends Admission_Controler {
     public function previleges_user_delete()
     {
         $input = $this->getInputToken();
-        $this->m_master->previleges_user_delete($input);
+        $this->m_master->previleges_group_user_delete($input);
     }
 
     public function page_create_va()
     {
+        $t = $this->m_master->caribasedprimary('db_admission.count_account','Active',1);
+        $this->data['TotalAcccount'] = 1000;
+        if (count($t) > 0) {
+             $this->data['TotalAcccount'] = $t[0]['CountAccount'];
+        }
         $content = $this->load->view('page/'.$this->data['department'].'/master/page_create_va',$this->data,true);
         $this->temp($content);
     }
@@ -1663,6 +1668,75 @@ class C_master extends Admission_Controler {
           // return $data =  $this->upload->data(); 
           echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
            //$this->load->view('upload_success', $data); 
+        }
+    }
+
+    public function set_tahun_ajaran()
+    {
+        // get tahun ajaran
+        $t = $this->m_master->showData_array('db_admission.set_ta');
+        $this->data['tahun'] = date('Y');
+        if (count($t) > 0) {
+           $this->data['tahun'] = $t[0]['Ta'];
+        }
+        
+        $content = $this->load->view('page/'.$this->data['department'].'/master/set_tahun_ajaran',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function submit_set_tahun_ajaran()
+    {
+        $input = $this->getInputToken();
+        $Ta = $input['Ta'];
+        $sql = "update db_admission.set_ta set Ta = '".$Ta."'";
+        $query=$this->db->query($sql, array());
+    }
+
+    public function reset_va()
+    {
+        $this->auth_ajax();
+        $this->load->model('finance/m_finance');
+        $sql = "select VA from db_admission.va_generate where VA_Status != 1";
+        $query=$this->db->query($sql, array())->result_array();
+        if (count($query) > 0) {
+            for ($i=0; $i < count($query); $i++) { 
+                $VA = $query[$i]['VA'];
+                try{
+                    $va_log = $this->m_finance->cari_va($VA);
+                    if ($va_log['msg'] == '') { // VA aktif
+                        $data = $va_log['data'];
+                        // print_r($data);die();
+                        $DeadLinePayment = date('Y-m-d H:i:s');
+                       $update = $this->m_finance->update_va_Payment($data['Invoice'],$DeadLinePayment, $data['Nama'], $data['EmailPU'],$data['BilingID'],$routes_table = '',$desc = 'Close by Reset VA');
+                       // if ($update['status'] == 1) {
+                       //   $dataSave = array(
+                       //           'VA_Status' => 1,
+                       //                   );
+                       //   $this->db->where('VA',$VA);
+                       //   $this->db->update('db_admission.va_generate', $dataSave);
+                       // }
+                       // else
+                       // {
+                       //   echo 'Error';
+                       // } 
+                    }
+                    else
+                    {
+                        // VA tidak aktif
+                    }
+                    $dataSave = array(
+                            'VA_Status' => 1,
+                                    );
+                    $this->db->where('VA',$VA);
+                    $this->db->update('db_admission.va_generate', $dataSave);
+                }
+                catch(Exception $e)
+                {
+                    continue;
+                }
+            }
+            
+            
         }
     }
 

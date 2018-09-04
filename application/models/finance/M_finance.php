@@ -848,6 +848,8 @@ class M_finance extends CI_Model {
 
                 $dataSave = array(
                         'Status' => 'Approved',
+                        'ApprovedBY' => $this->session->userdata('NIP'),
+                        'ApprovedAT' => date('Y-m-d'),
                                 );
                 $this->db->where('ID_register_formulir',$arrDataPersonal[0]['ID_register_formulir']);
                 $this->db->update('db_finance.register_admisi', $dataSave);
@@ -2109,7 +2111,72 @@ class M_finance extends CI_Model {
                       }
                       
                       break;
-                    
+                    case 'db_admission.register':
+                      $getData = $this->m_master->caribasedprimary('db_admission.register','BilingID',$query1[0]['trx_id']);
+                      if ($getData > 0) {
+                        // get Informasi
+                           //  $arr_temp = array();
+                           //  foreach ($getData as $key => $value) {
+                           //    $arr_temp[] = $value;
+                           //  }
+                           // $rs['data'] = $arr_temp;
+                            $rs['data'] = array(
+                                 'ProdiEng' => 'Register Online',
+                                 'PTIDDesc' => 'Pembayaran Formulir Online',
+                                 'Nama' => $getData[0]['Name'],
+                                 'NPM' => 'RegisterOnline',
+                                 'VA' => $VA,
+                                 'EmailPU' => $getData[0]['Email'],
+                                 'BilingID' => $getData[0]['BilingID'],
+                                 'Invoice' => $getData[0]['PriceFormulir'],
+                                 'Status' => 'Active',
+                                 'Expired' => $getData[0]['Datetime_expired'],
+                                 'SemesterName' => ''
+
+                            );
+                      }
+                      else
+                      {
+                        $rs['msg'] = 'VA dengan number '.$VA.' available';
+                      }
+                      
+                      break;
+                    case 'db_finance.payment_pre':
+                      $getData = $this->m_master->caribasedprimary('db_finance.payment_pre','BilingID',$query1[0]['trx_id']);
+                      if ($getData > 0) {
+                        // get Informasi Mahasiswa
+                           $this->load->model('admission/m_admission');
+                           $GetInformasi = $this->m_admission->getDataPersonal($getData[0]['ID_register_formulir']);
+                           $NPM = $GetInformasi[0]['FormulirCode'];
+                           $PTIDDesc = 'Pembayaran Uang Masuk Kuliah';
+                           $SemesterName = '';
+                           $Nama = $GetInformasi[0]['Name'];
+                           $EmailPU = $GetInformasi[0]['Email'];
+                           $ProdiEng = $GetInformasi[0]['NameProdyEng'];
+                           $Invoice = $getData[0]['Invoice'];
+                           $BilingID = $query1[0]['trx_id'];
+                           $Status = 'Active';
+                           $rs['data'] = array(
+                                'ProdiEng' => $ProdiEng,
+                                'PTIDDesc' => $PTIDDesc,
+                                'Nama' => $Nama,
+                                'NPM' => $NPM,
+                                'VA' => $VA,
+                                'EmailPU' => $EmailPU,
+                                'BilingID' => $BilingID,
+                                'Invoice' => $Invoice,
+                                'Status' => $Status,
+                                'Expired' => $datetime_expired,
+                                'SemesterName' => $SemesterName
+
+                           );
+                      }
+                      else
+                      {
+                        $rs['msg'] = 'VA dengan number '.$VA.' available';
+                      }
+                      
+                      break;  
                     default:
                       # code...
                       break;

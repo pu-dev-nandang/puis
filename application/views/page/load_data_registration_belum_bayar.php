@@ -34,6 +34,7 @@
 		//var url_images = 'http://localhost/register/upload/';
 		loading_page('#loadingProcess');
 		var Tahun  = "<?php echo $tahun ?>";
+		// console.log(Tahun);
 		var data = {Tahun : Tahun};
 		$.post(url,data,function (data_json) {
 			//var response = jQuery.parseJSON(data_json);

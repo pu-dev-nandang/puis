@@ -861,9 +861,16 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
     public function previleges_user_delete($input)
     {
-        $sql = "delete from db_admission.previleges where ID = ".$input['ID'];
+        $sql = "delete from db_admission.cfg_rule_g_user where ID = ".$input['ID'];
         $query=$this->db->query($sql, array());
     }
+
+    public function previleges_group_user_delete($input)
+    {
+        $sql = "delete from db_admission.cfg_rule_g_user where ID = ".$input['ID'];
+        $query=$this->db->query($sql, array());
+    }
+
 
     public function getMenuUser($NIP,$db = 'db_admission')
     {

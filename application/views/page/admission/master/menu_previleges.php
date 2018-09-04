@@ -965,7 +965,8 @@
         var auth_menu = $(this).attr('auth-menu');
         if (auth_menu == 0) {
             toastr.error('Menu ini tidak memiliki akses read', 'Failed!!');
-            loadMenuPrevilegesUser(loadDatamenuPrevilegesUser);
+            // loadMenuPrevilegesUser(loadDatamenuPrevilegesUser);
+            loadMenuPrevilegesGroupUser(loadDatamenuPrevilegesGroupUser)
         }
         else
         {
@@ -996,7 +997,8 @@
         var auth_menu = $(this).attr('auth-menu');
         if (auth_menu == 0) {
             toastr.error('Menu ini tidak memiliki akses write', 'Failed!!');
-            loadMenuPrevilegesUser(loadDatamenuPrevilegesUser);
+            // loadMenuPrevilegesUser(loadDatamenuPrevilegesUser);
+            loadMenuPrevilegesGroupUser(loadDatamenuPrevilegesGroupUser)
         }
         else
         {
@@ -1027,7 +1029,8 @@
         var auth_menu = $(this).attr('auth-menu');
         if (auth_menu == 0) {
             toastr.error('Menu ini tidak memiliki akses update', 'Failed!!');
-            loadMenuPrevilegesUser(loadDatamenuPrevilegesUser);
+            // loadMenuPrevilegesUser(loadDatamenuPrevilegesUser);
+            loadMenuPrevilegesGroupUser(loadDatamenuPrevilegesGroupUser)
         }
         else
         {
@@ -1058,7 +1061,8 @@
         var auth_menu = $(this).attr('auth-menu');
         if (auth_menu == 0) {
             toastr.error('Menu ini tidak memiliki akses delete', 'Failed!!');
-            loadMenuPrevilegesUser(loadDatamenuPrevilegesUser);
+            // loadMenuPrevilegesUser(loadDatamenuPrevilegesUser);
+            loadMenuPrevilegesGroupUser(loadDatamenuPrevilegesGroupUser)
         }
         else
         {
@@ -1095,7 +1099,8 @@
             // var obj = JSON.parse(data_json); 
             // console.log(obj);
         }).done(function() {
-          loadMenuPrevilegesUser(loadDatamenuPrevilegesUser);
+          // loadMenuPrevilegesUser(loadDatamenuPrevilegesUser);
+          loadMenuPrevilegesGroupUser(loadDatamenuPrevilegesGroupUser)
         }).fail(function() {
           toastr.error('The Database connection error, please try again', 'Failed!!');
         }).always(function() {
