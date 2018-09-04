@@ -2354,6 +2354,69 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='save2pdf_AttendanceList'){
                 $IDExam = $data_arr['IDExam'];
             }
+
+            else if($data_arr['action']=='checkBentrokExam'){
+
+                $data = $this->db->query('SELECT * FROM db_academic.exam ex
+                                                    WHERE
+                                                    ex.SemesterID = "'.$data_arr['SemesterID'].'" 
+                                                    AND ex.Type LIKE "'.$data_arr['Type'].'" 
+                                                    AND ex.ExamDate = "'.$data_arr['Date'].'" 
+                                                    AND ex.ExamClassroomID = "'.$data_arr['RoomID'].'" 
+                                                    AND ( ("'.$data_arr['Start'].'" >= ex.ExamStart AND "'.$data_arr['Start'].'" <= ex.ExamEnd) OR 
+                                                        ("'.$data_arr['End'].'" >= ex.ExamStart AND "'.$data_arr['End'].'" <= ex.ExamEnd) OR
+                                                        ("'.$data_arr['Start'].'" <= ex.ExamStart AND "'.$data_arr['End'].'" >= ex.ExamEnd)
+                                                    )
+                                                     ')->result_array();
+                $res = 0;
+                if(count($data)>0){
+                    $res = 1;
+                }
+
+                return print_r($res);
+            }
+
+            else if($data_arr['action']=='setExamSchedule'){
+
+                $insert_exam = (array) $data_arr['insert_exam'];
+
+                $this->db->insert('db_academic.exam',$insert_exam);
+                $insert_exam_id = $this->db->insert_id();
+
+                $ex_g = (array) $data_arr['insert_group'];
+
+                for($g=0;$g<count($ex_g);$g++){
+
+                    $ar = array(
+                        'ExamID' => $insert_exam_id,
+                        'ScheduleID' => $ex_g[$g]
+                    );
+
+                    $this->db->insert('db_academic.exam_group',$ar);
+                }
+
+
+                $ex_g_d = (array) $data_arr['insert_details'];
+
+                for($s=0;$s<count($ex_g_d);$s++){
+                    $ds = (array) $ex_g_d[$s];
+                    $dg = $this->db->select('ID')->get_where('db_academic.exam_group',
+                        array(
+                            'ExamID' => $insert_exam_id,
+                            'ScheduleID' => $ds['ScheduleID']
+                        )
+                    ,1)->result_array();
+
+                    $ds['ExamID'] = $insert_exam_id;
+                    $ds['ExamGroupID'] = $dg[0]['ID'];
+
+                    $this->db->insert('db_academic.exam_details',$ds);
+
+                }
+
+                return print_r(1);
+
+            }
         }
     }
 
