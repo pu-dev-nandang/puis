@@ -200,4 +200,15 @@ class C_global extends CI_Controller {
 
     }
 
+    // public function page_mahasiswa()
+    // {
+    //     $content = $this->load->view('page/academic'.'/master/students/students','',true);
+    //     $this->temp($content);
+    // }
+
+    // public function page_dok_admisi_mahasiswa()
+    // {
+
+    // }
+
 }

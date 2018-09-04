@@ -96,7 +96,7 @@
 
 	function loadTahun()
 	  {
-	      var startTahun = 2014;
+	      var startTahun = 2018;
 	      var thisYear = (new Date()).getFullYear();
 	      var selisih = parseInt(thisYear) - parseInt(startTahun);
 	      $("#selectTahun").empty();

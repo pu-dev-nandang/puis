@@ -52,6 +52,7 @@
                             </div>
                             <div class="col-xs-4">
                                 <button class="btn btn-inverse btn-notification btn-add" id="generate">Generate VA</button>
+                                <button class="btn btn-default" id="resetva">Reset VA</button>
                             </div>
                         </div>
                     </div>
@@ -104,6 +105,18 @@
         processGenerate(selectJMLVA);
     });
 
+    $(document).on('click','#resetva', function () {
+        loading_button('#resetva');
+        var url = base_url_js+'admission/master-registration/reset_va';
+        $.post(url,function (data_json) {
+            setTimeout(function () {
+                loadTbl_VA(loadVA_available);
+                $('#resetva').prop('disabled',false).html('Reset VA');
+            },1000);
+        });
+        
+    });
+
     function processGenerate(selectJMLVA)
     {
         loading_button('#generate');
@@ -122,7 +135,8 @@
 
     function loadJMLVa()
     {
-        for (var i = 10; i <= 1000; i= i + 10) {
+        var TotalAcccount = "<?php echo $TotalAcccount ?>"
+        for (var i = 10; i <= TotalAcccount; i= i + 10) {
             var selected = (i==10) ? 'selected' : '';
             $('#selectJMLVA').append('<option value="'+ i +'" '+selected+'>'+i+'</option>');
         }

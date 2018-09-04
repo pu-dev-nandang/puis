@@ -1437,8 +1437,9 @@ class M_api extends CI_Model {
                 select a.ID,a.Name,a.Email,b.SchoolName,a.PriceFormulir,a.VA_number,a.BilingID,a.Datetime_expired,a.RegisterAT,null,null,null
                 from db_admission.register as a LEFT JOIN db_admission.school as b
                 on a.SchoolID = b.ID
-                where a.ID not in(select RegisterID from db_admission.register_verification)
-                ORDER BY uploadAT desc";        
+                where a.ID not in(select RegisterID from db_admission.register_verification) and a.SetTa = '".$Tahun."'
+                ORDER BY uploadAT desc"; 
+                // print_r($sql);die();       
         $query=$this->db->query($sql, array())->result_array();
         return $query;
     }

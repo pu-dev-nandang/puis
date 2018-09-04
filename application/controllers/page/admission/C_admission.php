@@ -1094,6 +1094,7 @@ class C_admission extends Admission_Controler {
              }
             $nestedData[] = $cicilan;
             $nestedData[] = $row['chklunas'];
+            $nestedData[] = '<div style="text-align: center;"><button class="btn btn-sm btn-primary btnLoginPortalRegister " data-xx="'.$row['Email'].'"><i class="fa fa-sign-in right-margin"></i> Login Portal</button></div>';
             $data[] = $nestedData;
             $No++;
         }
