@@ -3326,14 +3326,6 @@ class M_api extends CI_Model {
                     for($r=0;$r<count($dataSC);$r++){
                         $dc = $dataSC[$r];
 
-//                        $attd = $this->db->query('SELECT attd_l.Date FROM db_academic.attendance_lecturers attd_l
-//                                                           LEFT JOIN db_academic.attendance attd On (attd_l.ID_Attd = attd.ID)
-//                                                           WHERE
-//                                                           attd_l.NIP = "'.$d['NIP'].'" AND
-//                                                           attd.ScheduleID = "'.$dc['ScheduleID'].'"
-//                                                           AND attd_l.Date >= "'.$Start.'" AND attd_l.Date <= "'.$End.'"
-//                                                           ')->result_array();
-
                         $dataAttd = $this->db->query('SELECT attd.ID FROM db_academic.attendance attd
                                                                   WHERE attd.SemesterID = "'.$SemesterID.'" AND attd.ScheduleID = "'.$dc['ScheduleID'].'" ')
                                                                     ->result_array();
@@ -3347,6 +3339,7 @@ class M_api extends CI_Model {
                                                                     attd_l.ID_Attd = "'.$dataAttd[$a]['ID'].'"
                                                                     AND attd_l.Date >= "'.$Start.'" 
                                                                     AND attd_l.Date <= "'.$End.'"
+                                                                    AND attd_l.NIP = "'.$d['NIP'].'"
                                                                       ')->result_array();
                                 if(count($dataAtLec)>0){
                                     for($t=0;$t<count($dataAtLec);$t++){
@@ -3355,9 +3348,6 @@ class M_api extends CI_Model {
                                 }
                             }
                         }
-
-
-
 
 
                         $c = $this->db->query('SELECT mk.NameEng AS MKNameEng, cd.TotalSKS AS Credit FROM db_academic.schedule_details_course sdc 
