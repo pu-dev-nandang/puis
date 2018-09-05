@@ -173,9 +173,15 @@
                                '        </tr>');
 
                            for(var lecA=1;lecA<dataAttd['AttdLecturers'+a].length;lecA++){
+
+                               var dateAttd = (dataAttd['AttdLecturers'+a][lecA].Date!=null && dataAttd['AttdLecturers'+a][lecA].Date!='') ? moment(dataAttd['AttdLecturers'+a][lecA].Date).format('dddd, DD MMM YYYY') : '';
+                               var inAttd = (dataAttd['AttdLecturers'+a][lecA].In!=null && dataAttd['AttdLecturers'+a][lecA].In!='') ? dataAttd['AttdLecturers'+a][lecA].In.substr(0,5) : '';
+                               var OutAttd = (dataAttd['AttdLecturers'+a][lecA].Out!=null && dataAttd['AttdLecturers'+a][lecA].Out!='') ? dataAttd['AttdLecturers'+a][lecA].Out.substr(0,5) : '';
+
+
                                tr.append('<tr  style="'+bg_td+'">' +
                                    '<td style="text-align: left;"><b>'+dataAttd['AttdLecturers'+a][lecA].Name+'</b>' +
-                                   '<span style="float: right;">'+moment(dataAttd['AttdLecturers'+a][lecA].Date).format('dddd, DD MMM YYYY')+' | '+dataAttd['AttdLecturers'+a][lecA].In.substr(0,5)+' - '+dataAttd['AttdLecturers'+a][lecA].Out.substr(0,5)+' | ' +
+                                   '<span style="float: right;">'+dateAttd+' | '+inAttd+' - '+OutAttd+' | ' +
                                    '<button class="btn btn-sm btn-default btn-default-danger btn-delete-attd" data-id="'+dataAttd['AttdLecturers'+a][0].ID+'"><i  class="fa fa-minus-circle"></i></button></span>'+
                                    '</td>' +
                                    '</tr>');

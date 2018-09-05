@@ -311,7 +311,6 @@
 
     });
 
-
     $(document).on('click','#btnLoginPortal,.btnLoginPortal',function () {
 
         var username = $(this).attr('data-nip');

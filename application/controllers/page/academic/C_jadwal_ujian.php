@@ -6,7 +6,7 @@ class C_jadwal_ujian extends Academic_Controler {
     function __construct()
     {
         parent::__construct();
-//        $this->load->model('akademik/m_tahun_akademik');
+        $this->load->model('akademik/m_jadwal_ujian');
     }
 
 
@@ -32,6 +32,13 @@ class C_jadwal_ujian extends Academic_Controler {
     public function set_exam_schedule(){
         $data['department'] = parent::__getDepartement();
         $page = $this->load->view('page/'.$data['department'].'/jadwalujian/set_exam_schedule',$data,true);
+        $this->menu_jadwalUjian($page);
+    }
+
+    public function edit_exam_schedule($ExamID){
+        $data['department'] = parent::__getDepartement();
+        $data['arrExam'] = $this->m_jadwal_ujian->__getExam($ExamID);
+        $page = $this->load->view('page/'.$data['department'].'/jadwalujian/edit_exam_schedule',$data,true);
         $this->menu_jadwalUjian($page);
     }
 

@@ -71,7 +71,7 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div id="inputStart" class="input-group">
-                                <input data-format="hh:mm" type="text" id="formStart" class="form-control form-exam" value=""/>
+                                <input data-format="hh:mm" type="text" id="formStart" class="form-control form-exam" value="00:00"/>
                                 <span class="add-on input-group-addon">
                                 <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
                             </span>
@@ -79,7 +79,7 @@
                         </div>
                         <div class="col-md-4">
                             <div id="inputEnd" class="input-group">
-                                <input data-format="hh:mm" type="text" id="formEnd" class="form-control form-exam" value=""/>
+                                <input data-format="hh:mm" type="text" id="formEnd" class="form-control form-exam" value="00:00"/>
                                 <span class="add-on input-group-addon">
                                 <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
                             </span>
@@ -129,13 +129,7 @@
         </div>
         <hr/>
 
-        <div class="alert alert-danger" role="alert">
-            <b>Conflict with </b>
-            <ul>
-                <li>ARC 5 - Oke</li>
-                <li>ARC 5 - Oke</li>
-            </ul>
-        </div>
+        <div id="divAlertBentrok"></div>
     </div>
 
 </div>
@@ -349,7 +343,10 @@
         
     });
     
-    function checkBentrol(SemesterID,Type,Date,RoomID,Start,End,token) {
+    function checkBentrol(SemesterID,Type,Date,RoomID,Start,End,token2save) {
+
+        loading_button('#btnSaveSetSchedule');
+        $('.form-exam').prop('disabled',true);
         
         var data = {
             action : 'checkBentrokExam',
@@ -364,8 +361,40 @@
         var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'api/__crudJadwalUjian';
         
-        $.post(url,{token:token},function (result) {
-            console.log(result);
+        $.post(url,{token:token},function (jsonResult) {
+
+
+            setTimeout(function () {
+                $('#btnSaveSetSchedule').html('Save');
+                $('.form-exam,#btnSaveSetSchedule').prop('disabled',false);
+
+            },500);
+
+            if(jsonResult.length>0){
+                $('#divAlertBentrok').html('<div class="alert alert-danger" role="alert">' +
+                    '                <b>Conflict with </b>' +
+                    '                <hr/><div id="dataBentrok"></div>' +
+                    '            </div>');
+
+                for(var i=0;i<jsonResult.length;i++){
+                    var d = jsonResult[i];
+                    $('#dataBentrok').append('<ul id="ulC'+i+'">' +
+                        '                </ul>' +
+                        '                <div style="color: blue;margin-top: 10px;margin-left: 20px;">' +
+                        '                    '+moment(d.ExamDate).format('dddd, DD MMM YYYY')+' | '+d.Room+' | '+d.ExamStart.substr(0,5)+' - '+d.ExamEnd.substr(0,5)+'' +
+                        '                </div>' +
+                        '                <hr/>');
+
+                    for(var c=0;c<d.Course.length;c++){
+                        var dc = d.Course[c];
+                        $('#ulC'+i).append('<li>'+dc.NameEng+'</li>');
+                    }
+                }
+
+            } else {
+                $('#divAlertBentrok').html('');
+                saveSchedule(token2save);
+            }
         });
         
         
@@ -435,7 +464,6 @@
 
             $.post(url,{token:token},function (jsonResult) {
 
-                // console.log(jsonResult);
                 var arr_NPM_draf = [];
                 var std = jsonResult.StudentsDetails;
 

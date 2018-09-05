@@ -1416,6 +1416,121 @@ class C_api extends CI_Controller {
 
     }
 
+    public function getScheduleExam(){
+        $requestData= $_REQUEST;
+
+        $token = $this->input->get('token');
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+
+//        print_r($data_arr);
+//        exit;
+        $totalData = 0;
+
+
+        if( !empty($requestData['search']['value']) ) {
+//            $sql = $this->m_api->getSchedulePerDaySearch($data_arr['DayID'],$dataWhere,$requestData['search']['value']);
+//            $query = $this->db->query($sql)->result_array();
+//            $totalData = $query;
+        }
+        else {
+
+//            $sql = 'SELECT s.ClassGroup, mk.NameEng AS CourseEng, em.Name AS Coordinator, p1.Name AS P_Name1, p2.Name AS P_Name2
+//                                FROM db_academic.exam ex
+//                                LEFT JOIN db_academic.exam_group exg ON (ex.ID = exg.ExamID)
+//                                LEFT JOIN db_academic.schedule s ON (s.ID = exg.ScheduleID)
+//                                LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+//                                LEFT JOIN db_employees.employees p1 ON (p1.NIP = ex.Pengawas1)
+//                                LEFT JOIN db_employees.employees p2 ON (p2.NIP = ex.Pengawas2)
+//                                LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+//                                lEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+//                                WHERE ex.SemesterID = "'.$data_arr['SemesterID'].'" AND Type LIKE "'.$data_arr['Type'].'"
+//                                GROUP BY exg.ScheduleID';
+
+            $sql = 'SELECT ex.ID, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room , p1.Name AS P_Name1, p2.Name AS P_Name2
+                                FROM db_academic.exam ex
+                                LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
+                                LEFT JOIN db_employees.employees p1 ON (p1.NIP = ex.Pengawas1)
+                                LEFT JOIN db_employees.employees p2 ON (p2.NIP = ex.Pengawas2)
+                                WHERE ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'" ';
+
+            $data = $this->db->query($sql)->result_array();
+
+            if(count($data)>0){
+                for($i=0;$i<count($data);$i++){
+                    $dataC = $this->db->query('SELECT s.ClassGroup, mk.NameEng AS CourseEng, em.Name AS Coordinator FROM db_academic.exam_group exg 
+                                                        LEFT JOIN db_academic.schedule s ON (s.ID = exg.ScheduleID)
+                                                        LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                                        LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                        lEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                        WHERE exg.ExamID = "'.$data[$i]['ID'].'" GROUP BY exg.ScheduleID ORDER BY s.ClassGroup ASC')->result_array();
+                    $data[$i]['Course'] = $dataC;
+                }
+            }
+
+            $query = $data;
+
+        }
+//
+//        print_r($query);
+//        exit;
+
+
+
+        $no =1;
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $p = ($row['P_Name2']!='' && $row['P_Name2']!=null) ? ' - '.$row['P_Name1'].'<br/> - '.$row['P_Name2'] : ' - '.$row['P_Name1'] ;
+
+            $course = '';
+            for($c=0;$c<count($row['Course']);$c++){
+                $d = $row['Course'][$c];
+                $course = $course.' <div style="margin-top: 1px;"><b>'.$d['ClassGroup'].' | '.$d['CourseEng'].'</b><br/><p style="color: #2196F3;font-size: 11px;">(Co) '.$d['Coordinator'].'</p></div> ';
+            }
+
+            $act = '<div  style="text-align:center;"><div class="btn-group">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li><a href="'.base_url('academic/exam-schedule/edit-exam-schedule/'.$row['ID']).'">Edit</a></li>
+                    <li><a href="#">Layout</a></li>
+                    <li><a href="#">Naskah Soal</a></li>
+                    <li><a href="#">Lembar Jawaban</a></li>
+                    <li><a href="#">Berita Acara</a></li>
+                    <li><a href="#">Daftar Hadir</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#">Delete</a></li>
+                  </ul>
+                </div>
+                </div>';
+
+            $nestedData[] = '<div style="text-align:center;">'.($no++).'</div>';
+            $nestedData[] = $course;
+            $nestedData[] = $p;
+            $nestedData[] = $act;
+            $nestedData[] = '<div  style="text-align:center;">'.date("D, d M Y", strtotime($row['ExamDate'])).'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.substr($row['ExamStart'],0,5).' - '.substr($row['ExamEnd'],0,5).'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$row['Room'].'</div>';
+
+            $data[] = $nestedData;
+        }
+
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($query)),
+            "recordsFiltered" => intval( count($query) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+
+
+    }
+
     public function checkSchedule(){
         $token = $this->input->post('token');
         $key = "UAP)(*";
@@ -2356,9 +2471,68 @@ class C_api extends CI_Controller {
                 $IDExam = $data_arr['IDExam'];
             }
 
+            else if($data_arr['action']=='editGroupExam'){
+
+                // Update Exam
+                $whereExam = array('ID' => $data_arr['ExamID'],'SemesterID' => $data_arr['SemesterID']);
+
+                $updateExam = (array) $data_arr['updateExam'];
+
+                $this->db->where($whereExam);
+                $this->db->update('db_academic.exam',$updateExam);
+
+                // Update Group Jika ada
+                if(count($data_arr['insert_group'])>0){
+                    for($g=0;$g<count($data_arr['insert_group']);$g++){
+                        $arrInsert = array(
+                            'ExamID' => $data_arr['ExamID'],
+                            'ScheduleID' => $data_arr['insert_group'][$g]
+                        );
+
+                        $dataCk = $this->db->get_where('db_academic.exam_group',$arrInsert)->result_array();
+
+                        if(count($dataCk)<=0){
+                            $this->db->insert('db_academic.exam_group',$arrInsert);
+                        }
+                    }
+                }
+
+                // Update Details kalo ada
+                if(count($data_arr['insert_details'])>0){
+                    for($d=0;$d<count($data_arr['insert_details']);$d++){
+                        $n = (array) $data_arr['insert_details'][$d];
+
+                        // Get Exam ID
+                        $dg = $this->db->select('ID')->get_where('db_academic.exam_group',
+                            array('ExamID' => $data_arr['ExamID'], 'ScheduleID' => $n['ScheduleID']),1)->result_array();
+
+                        $arrInsD = array(
+                            'ExamID' =>  $data_arr['ExamID'],
+                            'ExamGroupID' => $dg[0]['ID'],
+                            'ScheduleID' => $n['ScheduleID'],
+                            'MhswID' => $n['MhswID'],
+                            'NPM' => $n['NPM'],
+                            'DB_Students' => $n['DB_Students']
+                        );
+
+                        // Cek apakah mahasiswa sudah ada atau belum
+                        $cekMhs = $this->db->get_where('db_academic.exam_details',$arrInsD,1)->result_array();
+                        if(count($cekMhs)<=0){
+                            $this->db->insert('db_academic.exam_details',$arrInsD);
+                        }
+                    }
+                }
+
+                return print_r(1);
+
+
+
+            }
+
             else if($data_arr['action']=='checkBentrokExam'){
 
-                $data = $this->db->query('SELECT * FROM db_academic.exam ex
+                $data = $this->db->query('SELECT ex.*,cl.Room FROM db_academic.exam ex
+                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
                                                     WHERE
                                                     ex.SemesterID = "'.$data_arr['SemesterID'].'" 
                                                     AND ex.Type LIKE "'.$data_arr['Type'].'" 
@@ -2369,12 +2543,40 @@ class C_api extends CI_Controller {
                                                         ("'.$data_arr['Start'].'" <= ex.ExamStart AND "'.$data_arr['End'].'" >= ex.ExamEnd)
                                                     )
                                                      ')->result_array();
-                $res = 0;
+
                 if(count($data)>0){
-                    $res = 1;
+                    for($c=0;$c<count($data);$c++){
+                        $dataC = $this->db->query('SELECT exg.*,mk.NameEng FROM db_academic.exam_group exg
+                                                            LEFT JOIN db_academic.schedule s ON (s.ID = exg.ScheduleID)
+                                                            LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                            LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                            WHERE exg.ExamID = "'.$data[$c]['ID'].'" GROUP BY exg.ScheduleID ')->result_array();
+                        $data[$c]['Course'] = $dataC;
+                    }
                 }
 
+
+                return print_r(json_encode($data));
+            }
+
+            else if($data_arr['action']=='deleteGroupExam'){
+                $ExamID = $data_arr['ExamID'];
+                $ScheduleID = $data_arr['ScheduleID'];
+
+                $res = 1;
+                $dEx = $this->db->get_where('exam_group',array('ExamID' => $ExamID))->result_array();
+                if(count($dEx)<=1){
+                    $res = -1;
+                    $this->db->where('ID',$ExamID);
+                    $this->db->delete('exam');
+                }
+
+
+                $this->db->where(array('ExamID'=>$ExamID,'ScheduleID'=>$ScheduleID));
+                $this->db->delete(array('exam_group','exam_details'));
+
                 return print_r($res);
+
             }
 
             else if($data_arr['action']=='setExamSchedule'){
@@ -2729,6 +2931,10 @@ class C_api extends CI_Controller {
 
                 if(count($dataAttdLec)<=0){
                     $this->db->insert('db_academic.attendance_lecturers',(array) $data_arr['insertAttdLecturer']);
+                } else {
+                    // Update Attendance Lecturer
+                    $this->db->where('ID', $dataAttdLec[0]['ID']);
+                    $this->db->update('db_academic.attendance_lecturers', (array) $data_arr['insertAttdLecturer']);
                 }
 
                 $dataUpdate = array(
