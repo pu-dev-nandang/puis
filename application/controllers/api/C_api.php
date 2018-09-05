@@ -1463,7 +1463,7 @@ class C_api extends CI_Controller {
                                                         LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                                         LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                                         lEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
-                                                        WHERE exg.ExamID = "'.$data[$i]['ID'].'" GROUP BY exg.ScheduleID')->result_array();
+                                                        WHERE exg.ExamID = "'.$data[$i]['ID'].'" GROUP BY exg.ScheduleID ORDER BY s.ClassGroup ASC')->result_array();
                     $data[$i]['Course'] = $dataC;
                 }
             }
@@ -2464,7 +2464,61 @@ class C_api extends CI_Controller {
                 $IDExam = $data_arr['IDExam'];
             }
 
-            else if($data_arr['action']=='showDataExam'){
+            else if($data_arr['action']=='editGroupExam'){
+
+                // Update Exam
+                $whereExam = array('ID' => $data_arr['ExamID'],'SemesterID' => $data_arr['SemesterID']);
+
+                $updateExam = (array) $data_arr['updateExam'];
+
+                $this->db->where($whereExam);
+                $this->db->update('db_academic.exam',$updateExam);
+
+                // Update Group Jika ada
+                if(count($data_arr['insert_group'])>0){
+                    for($g=0;$g<count($data_arr['insert_group']);$g++){
+                        $arrInsert = array(
+                            'ExamID' => $data_arr['ExamID'],
+                            'ScheduleID' => $data_arr['insert_group'][$g]
+                        );
+
+                        $dataCk = $this->db->get_where('db_academic.exam_group',$arrInsert)->result_array();
+
+                        if(count($dataCk)<=0){
+                            $this->db->insert('db_academic.exam_group',$arrInsert);
+                        }
+                    }
+                }
+
+                // Update Details kalo ada
+                if(count($data_arr['insert_details'])>0){
+                    for($d=0;$d<count($data_arr['insert_details']);$d++){
+                        $n = (array) $data_arr['insert_details'][$d];
+
+                        // Get Exam ID
+                        $dg = $this->db->select('ID')->get_where('db_academic.exam_group',
+                            array('ExamID' => $data_arr['ExamID'], 'ScheduleID' => $n['ScheduleID']),1)->result_array();
+
+                        $arrInsD = array(
+                            'ExamID' =>  $data_arr['ExamID'],
+                            'ExamGroupID' => $dg[0]['ID'],
+                            'ScheduleID' => $n['ScheduleID'],
+                            'MhswID' => $n['MhswID'],
+                            'NPM' => $n['NPM'],
+                            'DB_Students' => $n['DB_Students']
+                        );
+
+                        // Cek apakah mahasiswa sudah ada atau belum
+                        $cekMhs = $this->db->get_where('db_academic.exam_details',$arrInsD,1)->result_array();
+                        if(count($cekMhs)<=0){
+                            $this->db->insert('db_academic.exam_details',$arrInsD);
+                        }
+                    }
+                }
+
+                return print_r(1);
+
+
 
             }
 
@@ -2502,17 +2556,17 @@ class C_api extends CI_Controller {
                 $ExamID = $data_arr['ExamID'];
                 $ScheduleID = $data_arr['ScheduleID'];
 
-                $this->db->where(array('ExamID'=>$ExamID,'ScheduleID'=>$ScheduleID));
-                $this->db->delete(array('exam_group','exam_details'));
-
                 $res = 1;
-                //Cek apakah exam_group masih ada ? jika tidak ada maka delete exam
                 $dEx = $this->db->get_where('exam_group',array('ExamID' => $ExamID))->result_array();
-                if(count($dEx)<=0){
+                if(count($dEx)<=1){
+                    $res = -1;
                     $this->db->where('ID',$ExamID);
                     $this->db->delete('exam');
-                    $res = -1;
                 }
+
+
+                $this->db->where(array('ExamID'=>$ExamID,'ScheduleID'=>$ScheduleID));
+                $this->db->delete(array('exam_group','exam_details'));
 
                 return print_r($res);
 
@@ -2870,6 +2924,10 @@ class C_api extends CI_Controller {
 
                 if(count($dataAttdLec)<=0){
                     $this->db->insert('db_academic.attendance_lecturers',(array) $data_arr['insertAttdLecturer']);
+                } else {
+                    // Update Attendance Lecturer
+                    $this->db->where('ID', $dataAttdLec[0]['ID']);
+                    $this->db->update('db_academic.attendance_lecturers', (array) $data_arr['insertAttdLecturer']);
                 }
 
                 $dataUpdate = array(
