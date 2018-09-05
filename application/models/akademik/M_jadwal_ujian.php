@@ -13,12 +13,21 @@ class M_jadwal_ujian extends CI_Model {
                                                     LEFT JOIN db_academic.schedule s ON (s.ID = exg.ScheduleID)
                                                     LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                                     LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
-                                                    WHERE exg.ExamID = "'.$data[$i]['ID'].'" GROUP BY exg.ScheduleID')->result_array();
+                                                    WHERE exg.ExamID = "'.$data[$i]['ID'].'" GROUP BY exg.ScheduleID ORDER BY s.ClassGroup ASC')->result_array();
 
                 if(count($dataC)>0){
                     for($f=0;$f<count($dataC);$f++){
-                        $dataF = $this->db->select('NPM,DB_Students')->get_where('db_academic.exam_details',array('ExamID' => $data[$i]['ID'],'ExamGroupID' => $dataC[$f]['ID'] ,
+                        $dataF = $this->db->select('ID,NPM,DB_Students')->get_where('db_academic.exam_details',
+                            array('ExamID' => $data[$i]['ID'],'ExamGroupID' => $dataC[$f]['ID'] ,
                             'ScheduleID' => $dataC[$f]['ScheduleID']))->result_array();
+
+                        if(count($dataF)>0){
+                            for($r=0;$r<count($dataF);$r++){
+                                $dn = $this->db->select('Name')->get_where($dataF[$r]['DB_Students'].'.students',array('NPM'=>$dataF[$r]['NPM']),1)->result_array();
+                                $dataF[$r]['Name'] = $dn[0]['Name'];
+                            }
+                        }
+
                         $dataC[$f]['DetailStudent'] = $dataF;
                     }
                 }

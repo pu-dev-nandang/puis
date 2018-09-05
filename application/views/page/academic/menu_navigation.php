@@ -97,7 +97,7 @@
                 </a>
             </li>
             <li class="<?php if($this->uri->segment(2)=='exam-schedule'){echo "current";} ?>">
-                <a href="<?php echo base_url('academic/exam-schedule'); ?>">
+                <a href="<?php echo base_url('academic/exam-schedule/list-exam'); ?>">
                     <i class="fa fa-sitemap"></i>
                     Exam Schedule
                 </a>
