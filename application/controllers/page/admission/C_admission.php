@@ -1423,7 +1423,18 @@ class C_admission extends Admission_Controler {
             $getDoc = $this->m_master->caribasedprimary('db_admission.register_document','ID_register_formulir',$arrInputID[$i]);
             for ($z=0; $z < count($getDoc); $z++) {
               if ($getDoc[$z]['Attachment'] != '' || !empty($getDoc[$z]['Attachment'])) {
-                 copy($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'], './uploads/document/'.$NPM.'/'.$getDoc[$z]['Attachment']);
+                $explode = explode(',', $getDoc[$z]['Attachment']);
+                if (count($explode) > 0) {
+                  for ($ee=0; $ee < count($explode); $ee++) { 
+                    copy($this->path_upload_regOnline.$Email.'/'.$explode[$ee], './uploads/document/'.$NPM.'/'.$explode[$ee]);
+                  }
+                }
+                else
+                {
+                  copy($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'], './uploads/document/'.$NPM.'/'.$getDoc[$z]['Attachment']);
+                }
+
+                 // copy($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'], './uploads/document/'.$NPM.'/'.$getDoc[$z]['Attachment']);
               } 
 
               $dataSave = array(  

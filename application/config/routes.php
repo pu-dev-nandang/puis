@@ -172,6 +172,8 @@ foreach( $result as $row )
 }
 // test routes from db
 
+$route['admission/database/loadPageStudents'] = 'page/database/c_database/loadPageStudents_admission';
+
 $route['admission/config/submit_upload_announcement'] = 'page/admission/c_master/submit_upload_announcement';
 
 $route['admission/config/set-tgl-register-online'] = 'page/admission/c_master/page_set_tgl_register'; // db menu
@@ -537,6 +539,8 @@ $route['api/__getMKByID'] = 'api/c_api/getMKByID';
 $route['api/__getSemester'] = 'api/c_api/getSemester';
 $route['api/__getLecturer'] = 'api/c_api/getLecturer';
 $route['api/__getStudents'] = 'api/c_api/getStudents';
+$route['api/__getStudentsAdmission'] = 'api/c_api/getStudentsAdmission';
+
 
 $route['api/__getAllMK'] = 'api/c_api/getAllMK';
 
@@ -608,6 +612,7 @@ $route['api/__getSumberIklan'] = 'api/c_api/getSumberIklan';
 $route['api/__getPriceFormulirOffline'] = 'api/c_api/getPriceFormulirOffline';
 $route['api/__getEvent'] = 'api/c_api/getEvent';
 $route['api/__getDocument'] = 'api/c_api/getDocument';
+$route['api/__getDocumentAdmisiMHS'] = 'api/c_api/getDocumentAdmisiMHS';
 
 
 // get data SMA dan SMK per Wilayah

@@ -29,6 +29,7 @@
 					<th>Status Jual</th>
 					<th>Sales</th>
 					<th>Harga Jual</th>
+					<th>Tanggal Jual</th>
 					<th>Nama Pembeli</th>
 					<th>Hp Pembeli</th>
 					<th>Telp Rumah Pembeli</th>
@@ -60,6 +61,7 @@
 							 	<?php echo $status_jual ?>
 							 	<td><?php echo $datadb[$i]['Sales'] ?></td>
 							 	<td><?php echo number_format($datadb[$i]['Price_Form'],0,',','.') ?></td>
+							 	<td><?php echo $datadb[$i]['DateSale'] ?></td>
 							 	<td><?php echo $datadb[$i]['NamaPembeli'] ?></td>
 							 	<td><?php echo $datadb[$i]['PhoneNumberPembeli'] ?></td>
 							 	<td><?php echo $datadb[$i]['HomeNumberPembeli'] ?></td>

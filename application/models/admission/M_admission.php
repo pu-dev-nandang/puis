@@ -331,7 +331,7 @@ class M_admission extends CI_Model {
 
         $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,a.StatusReg,b.Years,b.Status as StatusUsed, b.StatusJual,
                 b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,
-                b.ID as ID_sale_formulir_offline,b.Price_Form
+                b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale
                 from (
                 select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
                 from db_admission.register as a 
@@ -344,7 +344,7 @@ class M_admission extends CI_Model {
                 where a.StatusReg = 1
                 ) as a right JOIN
                 (
-                select a.FormulirCode,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,
+                select a.FormulirCode,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,
                 b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form from db_admission.formulir_number_offline_m as a
                 left join db_admission.sale_formulir_offline as b
                 on a.FormulirCode = b.FormulirCodeOffline
@@ -674,6 +674,7 @@ class M_admission extends CI_Model {
               'SchoolIDChanel' => $input_arr['autoCompleteSchoolChanel'],
               'Price_Form' => $input_arr['priceFormulir'],
               'CreateAT' => date('Y-m-d'),
+              'DateSale' => $input_arr['tanggal'],
               'CreatedBY' => $this->session->userdata('NIP'),
               // 'Price_Form' => $Kelulusan,
       );
@@ -952,6 +953,18 @@ class M_admission extends CI_Model {
                  where a.Status = 'Done' and a.ID_register_formulir = ?
              ";
          $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
+         return $query;
+     }
+
+     public function getDocumentAdmisiMHS($NPM)
+     {
+         $sql = "select a.ID,a.NPM,a.ID_reg_doc_checklist,a.Status,a.Attachment,b.DocumentChecklist,
+                 b.Required from db_admission.doc_mhs as a
+                 join db_admission.reg_doc_checklist as b
+                 on b.ID = a.ID_reg_doc_checklist
+                 where a.Status = 'Done' and a.NPM = ?
+             ";
+         $query=$this->db->query($sql, array($NPM))->result_array();
          return $query;
      }
 
@@ -1764,6 +1777,7 @@ class M_admission extends CI_Model {
       $temp['TypeBeasiswa'] = $data2->getBeasiswa;
       $temp['FileBeasiswa'] = $data2->getDokumen;
       $temp['Desc'] = $data2->ket;
+      // print_r($temp);die();
       $temp['CreateAT'] = date('Y-m-d');
       $temp['CreateBY'] = $this->session->userdata('NIP');
       $this->db->insert('db_finance.register_admisi', $temp);

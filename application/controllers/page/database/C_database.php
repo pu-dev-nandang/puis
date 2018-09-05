@@ -231,5 +231,17 @@ class C_database extends Globalclass {
         $this->temp($content);
     }
 
+    public function data_mahasiswa()
+    {
+        $content = $this->load->view('page/database/admisi/students','',true);
+        $this->temp($content);
+    }
+
+    public function loadPageStudents_admission()
+    {
+        $data['dataForm'] = $this->input->post('data');
+        $this->load->view('page/database/admisi/students_details',$data);
+    }
+
 
 }

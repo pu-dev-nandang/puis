@@ -463,6 +463,7 @@
     	 var url = base_url_js+'admission/distribusi-formulir/formulir-offline/save';
     	 var PIC = $("#selectPIC").val();
     	 var priceFormulir = $("#priceFormulir").val();
+       var tanggal = $("#tanggal").val();
        // var output_ok = $('#output_ok').val();
         priceFormulir = priceFormulir.replace(".", "");
     	 var data = {
@@ -481,7 +482,8 @@
     	     autoCompleteSchoolChanel : autoCompleteSchoolChanel,
     	     CDID : CDID,
     	     priceFormulir : priceFormulir,
-    	     PIC : PIC
+    	     PIC : PIC,
+           tanggal : tanggal
     	 };
 
     	 if (validationInput = validation2(data)) {
