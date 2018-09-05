@@ -1051,6 +1051,258 @@ class C_save_to_pdf extends CI_Controller {
 
     }
 
+    // Naskah Soal dan Lembar Jawaban
+    public function draft_questions_answer_sheet(){
+
+        $pdf = new FPDF('l','mm','A4');
+        // membuat halaman baru
+        $pdf->AddPage();
+
+        $pdf->Image(base_url('images/icon/favicon.png'),13,10,13);
+        $pdf->Image(base_url('images/icon/favicon.png'),158,10,13);
+
+        $h=5;
+
+        $pdf->SetFont('Times','B',11);
+//        $pdf->Cell(15,$h,'',0,0,'C');
+        $pdf->Cell(140,$h,'Universitas Agung Podomoro',0,0,'C');
+        $pdf->Cell(5,$h,'',0,0);
+//        $pdf->Cell(15,$h,'',0,0,'C');
+        $pdf->Cell(140,$h,'Universitas Agung Podomoro',0,1,'C');
+
+        $h=3.5;
+
+        $pdf->SetFont('Times','',8);
+//        $pdf->Cell(15,$h,'',0,0,'C');
+        $pdf->Cell(140,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,0,'C');
+        $pdf->Cell(5,$h,'',0,0);
+//        $pdf->Cell(15,$h,'',0,0,'C');
+        $pdf->Cell(140,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
+
+//        $pdf->Cell(15,$h,'',0,0,'C');
+        $pdf->Cell(140,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,0,'C');
+        $pdf->Cell(5,$h,'',0,0);
+//        $pdf->Cell(15,$h,'',0,0,'C');
+        $pdf->Cell(140,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
+
+//        $pdf->Cell(15,$h,'',0,0,'C');
+        $pdf->Cell(140,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,0,'C');
+        $pdf->Cell(5,$h,'',0,0);
+//        $pdf->Cell(15,$h,'',0,0,'C');
+        $pdf->Cell(140,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
+
+        $pdf->Line(10,27,145,27);
+        $pdf->Line(157,27,290,27);
+
+        $pdf->Ln(4);
+
+        $pdf->SetFont('Times','B',8);
+
+        $pdf->Cell(140,$h,'DRAFT QUESTIONS',0,0,'C');
+        $pdf->Cell(5,$h,'',0,0);
+        $pdf->Cell(140,$h,'ANSWER SHEET',0,1,'C');
+
+        $pdf->Cell(140,$h,'ATTENDANCE FINAL EXAMINATION',0,0,'C');
+        $pdf->Cell(5,$h,'',0,0);
+        $pdf->Cell(140,$h,'ATTENDANCE FINAL EXAMINATION',0,1,'C');
+
+        $pdf->Cell(140,$h,'EVEN SEMESTER',0,0,'C');
+        $pdf->Cell(5,$h,'',0,0);
+        $pdf->Cell(140,$h,'EVEN SEMESTER',0,1,'C');
+
+        $pdf->Cell(140,$h,'ACADEMIC YEAR 2017/2018',0,0,'C');
+        $pdf->Cell(5,$h,'',0,0);
+        $pdf->Cell(140,$h,'ACADEMIC YEAR 2017/2018',0,1,'C');
+
+        $pdf->Ln(5);
+
+        //++++++++++++++++++++++++++++++++++++++++++++
+
+        $pdf->SetFont('Times','',9);
+        $h=5;
+
+        $pdf->Rect(10, 47, 135, 40);
+        $pdf->Rect(156, 47, 135, 40);
+
+        //======================================
+
+
+        $pdf->Cell(3,$h,'',0,0,'L');
+        $pdf->Cell(25,$h,'Exam',0,0,'L');
+        $pdf->Cell(2,$h,':',0,0,'C');
+        $pdf->Cell(110,$h,'Oke gan',0,0,'L');
+
+        $pdf->Cell(5,$h,'',0,0);
+
+        $pdf->Cell(3,$h,'',0,0,'L');
+        $pdf->Cell(25,$h,'Exam',0,0,'L');
+        $pdf->Cell(2,$h,':',0,0,'C');
+        $pdf->Cell(110,$h,'Oke gan',0,1,'L');
+
+        //======================================
+
+
+        $pdf->Cell(3,$h,'',0,0,'L');
+        $pdf->Cell(25,$h,'Day, Date ',0,0,'L');
+        $pdf->Cell(2,$h,':',0,0,'C');
+        $pdf->Cell(110,$h,'Oke gan',0,0,'L');
+
+        $pdf->Cell(5,$h,'',0,0);
+
+        $pdf->Cell(3,$h,'',0,0,'L');
+        $pdf->Cell(25,$h,'Day, Date ',0,0,'L');
+        $pdf->Cell(2,$h,':',0,0,'C');
+        $pdf->Cell(110,$h,'Oke gan',0,1,'L');
+
+        //======================================
+
+        $pdf->Cell(3,$h,'',0,0,'L');
+        $pdf->Cell(25,$h,'Time, Room',0,0,'L');
+        $pdf->Cell(2,$h,':',0,0,'C');
+        $pdf->Cell(110,$h,'Oke gan',0,0,'L');
+
+        $pdf->Cell(5,$h,'',0,0);
+
+        $pdf->Cell(3,$h,'',0,0,'L');
+        $pdf->Cell(25,$h,'Time, Room',0,0,'L');
+        $pdf->Cell(2,$h,':',0,0,'C');
+        $pdf->Cell(110,$h,'Oke gan',0,1,'L');
+
+
+        //======================================
+
+        $pdf->Cell(3,$h,'',0,0,'L');
+        $pdf->Cell(25,$h,'Total Script',0,0,'L');
+        $pdf->Cell(2,$h,':',0,0,'C');
+        $pdf->Cell(110,$h,'Oke gan',0,0,'L');
+
+        $pdf->Cell(5,$h,'',0,0);
+
+        $pdf->Cell(3,$h,'',0,0,'L');
+        $pdf->Cell(25,$h,'Answer Sheet',0,0,'L');
+        $pdf->Cell(2,$h,':',0,0,'C');
+        $pdf->Cell(110,$h,'Oke gan',0,1,'L');
+
+
+        //=============================================
+
+        $pdf->Ln(6);
+//        $pdf->Rect(10, 75, 135, 23);
+//        $pdf->Rect(156, 75, 135, 23);
+
+        //======================================
+
+        $pdf->Cell(3,$h,'',0,0,'L');
+        $pdf->Cell(25,$h,'Pengawas 1',0,0,'L');
+        $pdf->Cell(2,$h,':',0,0,'C');
+        $pdf->Cell(110,$h,'Oke gan',0,0,'L');
+
+        $pdf->Cell(5,$h,'',0,0);
+
+        $pdf->Cell(3,$h,'',0,0,'L');
+        $pdf->Cell(25,$h,'Pengawas 1',0,0,'L');
+        $pdf->Cell(2,$h,':',0,0,'C');
+        $pdf->Cell(110,$h,'Oke gan',0,1,'L');
+
+        //======================================
+
+        $pdf->Cell(3,$h,'',0,0,'L');
+        $pdf->Cell(25,$h,'Pengawas 2',0,0,'L');
+        $pdf->Cell(2,$h,':',0,0,'C');
+        $pdf->Cell(110,$h,'Oke gan',0,0,'L');
+
+        $pdf->Cell(5,$h,'',0,0);
+
+        $pdf->Cell(3,$h,'',0,0,'L');
+        $pdf->Cell(25,$h,'Pengawas 2',0,0,'L');
+        $pdf->Cell(2,$h,':',0,0,'C');
+        $pdf->Cell(110,$h,'Oke gan',0,1,'L');
+
+
+
+        //======================================
+
+        $pdf->Ln(7);
+
+        $pdf->SetFont('Times','B',9);
+        $h = 6;
+        $pdf->setFillColor(255,255,102);
+
+        $pdf->Cell(20,$h,'Group',1,0,'C',true);
+        $pdf->Cell(108,$h,'Course',1,0,'C',true);
+        $pdf->Cell(7,$h,'Std',1,0,'C',true);
+
+
+        $pdf->Cell(11,$h,'',0,0);
+
+        $pdf->Cell(20,$h,'Group',1,0,'C',true);
+        $pdf->Cell(108,$h,'Course',1,0,'C',true);
+        $pdf->Cell(7,$h,'Std',1,1,'C',true);
+
+
+        // --------------
+
+        $pdf->SetFont('Times','',8);
+        $h = 4;
+
+        for($i=1;$i<=3;$i++){
+
+            $pdf->Cell(20,$h,'HBPB21','LRT',0,'C');
+            $pdf->Cell(108,$h,'Oke gan','LRT',0,'L');
+            $pdf->Cell(7,$h,'100','LRT',0,'C');
+
+
+            $pdf->Cell(11,$h,'',0,0);
+
+            $pdf->Cell(20,$h,'HBPB21','LRT',0,'C');
+            $pdf->Cell(108,$h,'Oke gan','LRT',0,'L');
+            $pdf->Cell(7,$h,$i,'LRT',1,'C');
+
+
+            // *******
+
+
+            $pdf->Cell(20,$h,'','LRB',0,'C');
+            $pdf->Cell(108,$h,'(Co) Bambang','LRB',0,'L');
+            $pdf->Cell(7,$h,'','LRB',0,'C');
+
+            $pdf->Cell(11,$h,'',0,0);
+
+            $pdf->Cell(20,$h,'','LRB',0,'C');
+            $pdf->Cell(108,$h,'(Co) Bambang','LRB',0,'L');
+            $pdf->Cell(7,$h,'','LRB',1,'C');
+        }
+
+
+
+        $pdf->Ln(7);
+
+        $pdf->SetFont('Times','I',7);
+        $pdf->Cell(135,$h,'Download On : '.date("d M Y H:i:s").' | '.chr(169).' IT Podomoro University',0,0,'R');
+
+        $pdf->Cell(11,$h,'',0,0);
+
+        $pdf->Cell(135,$h,'Download On : '.date("d M Y H:i:s").' | '.chr(169).' IT Podomoro University',0,1,'R');
+
+//        $pdf->Cell(185,5,'Download On : '.date("d M Y H:i:s").' | '.chr(169).' IT Podomoro University',0,1,'R');
+
+
+
+//        $this->headerDefault($pdf);
+
+//        $pdf->SetFont('Arial','B',10);
+//        $pdf->Cell(140,7,'',1,0);
+//        $pdf->Cell(5,7,'',0,0);
+//        $pdf->Cell(140,7,'',1,1);
+
+//        $pdf->SetDash(5,5); //5mm on, 5mm off
+//        $pdf->Line(152.5,10,152.5,200);
+
+        $pdf->Output();
+    }
+
+
+
     // Naskah Soal
     public function draft_questions(){
 

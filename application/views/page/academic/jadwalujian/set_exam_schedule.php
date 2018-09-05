@@ -279,7 +279,7 @@
             }
 
 
-            // Other MK
+            // Other Course
             if(notr>0){
                 for(var h=1;h<=notr;h++){
                     var formCourse_ot = $('#formCourse'+h).val();
@@ -336,8 +336,6 @@
             var token = jwt_encode(data,'UAP)(*');
 
             checkBentrol(formSemesterID,Type,formInputDate,formClassroom,formStart,formEnd,token);
-
-
 
         }
         

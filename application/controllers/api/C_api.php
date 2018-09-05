@@ -1423,57 +1423,50 @@ class C_api extends CI_Controller {
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
 
-//        print_r($data_arr);
-//        exit;
-        $totalData = 0;
 
 
         if( !empty($requestData['search']['value']) ) {
-//            $sql = $this->m_api->getSchedulePerDaySearch($data_arr['DayID'],$dataWhere,$requestData['search']['value']);
-//            $query = $this->db->query($sql)->result_array();
-//            $totalData = $query;
+
+            $search = $requestData['search']['value'];
+            $sql = 'SELECT ex.ID, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room , p1.Name AS P_Name1, p2.Name AS P_Name2
+                                FROM db_academic.exam ex
+                                LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
+                                LEFT JOIN db_academic.days d On (d.ID = ex.DayID)
+                                LEFT JOIN db_employees.employees p1 ON (p1.NIP = ex.Pengawas1)
+                                LEFT JOIN db_employees.employees p2 ON (p2.NIP = ex.Pengawas2)
+                                WHERE ( ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'" ) AND
+                                 (d.NameEng LIKE "%'.$search.'%" OR cl.Room LIKE "%'.$search.'%" 
+                                 OR p1.Name LIKE "%'.$search.'%" OR p2.Name LIKE "%'.$search.'%"
+                                 OR p1.NIP LIKE "%'.$search.'%" OR p2.NIP LIKE "%'.$search.'%" 
+                                 ) ';
         }
         else {
 
-//            $sql = 'SELECT s.ClassGroup, mk.NameEng AS CourseEng, em.Name AS Coordinator, p1.Name AS P_Name1, p2.Name AS P_Name2
-//                                FROM db_academic.exam ex
-//                                LEFT JOIN db_academic.exam_group exg ON (ex.ID = exg.ExamID)
-//                                LEFT JOIN db_academic.schedule s ON (s.ID = exg.ScheduleID)
-//                                LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
-//                                LEFT JOIN db_employees.employees p1 ON (p1.NIP = ex.Pengawas1)
-//                                LEFT JOIN db_employees.employees p2 ON (p2.NIP = ex.Pengawas2)
-//                                LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
-//                                lEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
-//                                WHERE ex.SemesterID = "'.$data_arr['SemesterID'].'" AND Type LIKE "'.$data_arr['Type'].'"
-//                                GROUP BY exg.ScheduleID';
-
-            $sql = 'SELECT ex.ID, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room , p1.Name AS P_Name1, p2.Name AS P_Name2
+            $sql = 'SELECT ex.ID, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room, p1.Name AS P_Name1, p2.Name AS P_Name2,
+                                p1.NIP AS P_NIP1, p2.NIP AS P_NIP2
                                 FROM db_academic.exam ex
                                 LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
                                 LEFT JOIN db_employees.employees p1 ON (p1.NIP = ex.Pengawas1)
                                 LEFT JOIN db_employees.employees p2 ON (p2.NIP = ex.Pengawas2)
                                 WHERE ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'" ';
+        }
 
-            $data = $this->db->query($sql)->result_array();
+        $dataTable = $this->db->query($sql)->result_array();
 
-            if(count($data)>0){
-                for($i=0;$i<count($data);$i++){
-                    $dataC = $this->db->query('SELECT s.ClassGroup, mk.NameEng AS CourseEng, em.Name AS Coordinator FROM db_academic.exam_group exg 
+        if(count($dataTable)>0){
+            for($i=0;$i<count($dataTable);$i++){
+                $dataC = $this->db->query('SELECT s.ClassGroup, mk.NameEng AS CourseEng, em.Name AS Coordinator FROM db_academic.exam_group exg 
                                                         LEFT JOIN db_academic.schedule s ON (s.ID = exg.ScheduleID)
                                                         LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                                         LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                                         lEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
-                                                        WHERE exg.ExamID = "'.$data[$i]['ID'].'" GROUP BY exg.ScheduleID ORDER BY s.ClassGroup ASC')->result_array();
-                    $data[$i]['Course'] = $dataC;
-                }
+                                                        WHERE exg.ExamID = "'.$dataTable[$i]['ID'].'" 
+                                                        GROUP BY exg.ScheduleID ORDER BY s.ClassGroup ASC')->result_array();
+                $dataTable[$i]['Course'] = $dataC;
             }
-
-            $query = $data;
-
         }
-//
-//        print_r($query);
-//        exit;
+
+        $query = $dataTable;
 
 
 
@@ -1483,7 +1476,9 @@ class C_api extends CI_Controller {
             $nestedData=array();
             $row = $query[$i];
 
-            $p = ($row['P_Name2']!='' && $row['P_Name2']!=null) ? ' - '.$row['P_Name1'].'<br/> - '.$row['P_Name2'] : ' - '.$row['P_Name1'] ;
+            $p = ($row['P_Name2']!='' && $row['P_Name2']!=null)
+                ? ' - '.$row['P_NIP1'].' | '.$row['P_Name1'].'<br/> - '.$row['P_NIP2'].' | '.$row['P_Name2']
+                : ' - '.$row['P_NIP1'].' | '.$row['P_Name1'] ;
 
             $course = '';
             for($c=0;$c<count($row['Course']);$c++){
@@ -1497,13 +1492,13 @@ class C_api extends CI_Controller {
                   </button>
                   <ul class="dropdown-menu">
                     <li><a href="'.base_url('academic/exam-schedule/edit-exam-schedule/'.$row['ID']).'">Edit</a></li>
-                    <li><a href="#">Layout</a></li>
-                    <li><a href="#">Naskah Soal</a></li>
-                    <li><a href="#">Lembar Jawaban</a></li>
-                    <li><a href="#">Berita Acara</a></li>
-                    <li><a href="#">Daftar Hadir</a></li>
                     <li role="separator" class="divider"></li>
-                    <li><a href="#">Delete</a></li>
+                    <li><a target="_blank" href="'.base_url('save2pdf/exam-layout').'">Layout</a></li>
+                    <li><a target="_blank" href="'.base_url('save2pdf/draft_questions_answer_sheet').'">Soal & Jawaban</a></li>
+                    <li><a target="_blank" href="'.base_url('save2pdf/news-event').'">Berita Acara</a></li>
+                    <li><a target="_blank" href="'.base_url('save2pdf/attendance-list').'">Daftar Hadir</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a class="btnDeleteExam" data-id="'.$row['ID'].'" href="javascript:void(0);" style="color: red;">Delete</a></li>
                   </ul>
                 </div>
                 </div>';
@@ -2462,6 +2457,27 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action']=='save2pdf_AttendanceList'){
                 $IDExam = $data_arr['IDExam'];
+            }
+
+            else if($data_arr['action']=='deleteExamInExamList'){
+                $ExamID = $data_arr['ExamID'];
+
+                // Delete Exam
+                $this->db->where('ID', $ExamID);
+                $this->db->delete('db_academic.exam');
+
+                $this->db->where('ExamID', $ExamID);
+                $this->db->delete(array('db_academic.exam_group','db_academic.exam_details'));
+
+                return print_r(1);
+            }
+
+            else if($data_arr['action']=='deleteStuden4EditExam'){
+
+                $this->db->where('ID', $data_arr['Exam_detail_ID']);
+                $this->db->delete('db_academic.exam_details');
+
+                return print_r(1);
             }
 
             else if($data_arr['action']=='editGroupExam'){

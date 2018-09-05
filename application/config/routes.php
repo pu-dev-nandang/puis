@@ -508,6 +508,7 @@ $route['save2pdf/monitoringAttendanceByRangeDate'] =  'c_save_to_pdf/monitoringA
 $route['save2pdf/listStudentsFromCourse'] =  'c_save_to_pdf/listStudentsFromCourse';
 
 $route['save2pdf/exam-layout'] =  'c_save_to_pdf/exam_layout';
+$route['save2pdf/draft_questions_answer_sheet'] =  'c_save_to_pdf/draft_questions_answer_sheet';
 $route['save2pdf/draft-questions'] =  'c_save_to_pdf/draft_questions';
 $route['save2pdf/answer-sheet'] =  'c_save_to_pdf/answer_sheet';
 $route['save2pdf/news-event'] =  'c_save_to_pdf/news_event';
