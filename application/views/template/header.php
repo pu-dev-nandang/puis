@@ -54,12 +54,6 @@
                     <span>Announcement</span>
                 </a>
             </li>
-            <li class="<?php if($this->uri->segment(1)=='vreservation'){echo 'current';} ?>">
-                <a href="<?php echo base_url('vreservation/dashboard/view'); ?>" id="btn_reservation">
-                    <i class="fa fa-th-large" aria-hidden="true"></i>
-                    <span>Venue Reservation</span>
-                </a>
-            </li>
             <li class="dropdown hidden-xs hidden-sm" id = 'NotificationPersonal'>
 
             </li>
@@ -120,6 +114,12 @@
                             My Profile</a></li>
                     <!--                    <li><a href="pages_calendar.html"><i class="fa fa-calendar"></i> My Calendar</a></li>-->
                     <!--                    <li><a href="#"><i class="fa fa-tasks"></i> My Tasks</a></li>-->
+                    <li>
+                        <a href="<?php echo base_url('vreservation/dashboard/view'); ?>" id="btn_reservation">
+                            <i class="fa fa-th-large" aria-hidden="true"></i>
+                            <span>Venue Reservation</span>
+                        </a>
+                    </li>
                     <li class="divider"></li>
                     <li><a href="javascript:void(0)" id="useLogOut"><i class="fa fa-power-off"></i> Log Out</a></li>
                 </ul>
