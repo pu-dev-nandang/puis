@@ -211,18 +211,36 @@
 
         // ==== Other Course ====
 
-        var CourseOtherNext = [];
+        var formCourseArray = (formCourse!='' && formCourse!=null) ? [formCourse] : [];
+        var CourseOtherNext = (formCourse!='' && formCourse!=null) ? [1] : [0];
         if(notr>0){
             for(var r=1;r<=notr;r++){
                 var formCourseOther = $('#formCourse'+r).val();
                 errorForm('formCourse'+r,formCourseOther,1);
                 if(formCourseOther!='' && formCourseOther!=null){
                     CourseOtherNext.push(1);
+                    formCourseArray.push(formCourseOther);
                 } else {
                     CourseOtherNext.push(0);
                 }
             }
         }
+
+        formCourseArray.sort()
+        var reportRecipientsDuplicate = [];
+        for (var i = 0; i < formCourseArray.length - 1; i++) {
+            if (formCourseArray[i + 1] == formCourseArray[i]) {
+                reportRecipientsDuplicate.push(formCourseArray[i]);
+            }
+        }
+
+        $('#divAlertBentrok').html('');
+        if(reportRecipientsDuplicate.length>0){
+            toastr.error('Redundant Group','Error');
+            $('#divAlertBentrok').html('<div class="alert alert-danger" role="alert"><b>Redundant Group</b>, please check Group' +
+                ' and delete one of them</div>');
+        }
+
 
         // ======================
 
@@ -241,7 +259,9 @@
         if($.inArray(0,CourseOtherNext)==-1 && formInputDate!='' && formInputDate!=null
             && formCourse!='' && formCourse!=null && formStart!='' && formStart!=null
             && formEnd!='' && formEnd!=null && formClassroom!='' && formClassroom!=null
-            && formPengawas1!='' && formPengawas1!=null){
+            && formPengawas1!='' && formPengawas1!=null
+            && reportRecipientsDuplicate.length<=0
+        ){
 
             var formSemesterID = $('#formSemesterID').val();
             var formDayID = $('#formDayID').val();
