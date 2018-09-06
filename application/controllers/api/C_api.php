@@ -3814,6 +3814,26 @@ class C_api extends CI_Controller {
                 $to = $Email;
                 $subject = "Podomoro University Venue Reservation";
                 $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+
+
+                // send email to Adum
+                $text = 'Dear Team,<br><br>
+                            Venue Reservation was conflict,<br><br>
+                            <strong>The schedule automated delete by System</strong>,<br><br>
+                            Details Schedule : <br><ul>
+                            <li>Start       : '.$StartNameDay.', '.$get[0]['Start'].'</li>
+                            <li>End         : '.$EndNameDay.', '.$get[0]['End'].'</li>
+                            <li>Room        : '.$get[0]['Room'].'</li>
+                            <li>Request BY  : '.$getUser[0]['Name'].'</li>
+                            </ul>
+                            Please Create new schedule, if you need it  <br>
+                            
+                        ';
+                $eAdum = $this->m_master->caribasedprimary('db_reservation.email_to','Ownership','Adum');                
+                $to = $eAdum[0]['Email'];
+                $subject = "Podomoro University Venue Reservation";
+                $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                
                 echo json_encode(0);
         }
         else

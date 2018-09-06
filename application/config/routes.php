@@ -134,8 +134,8 @@ $route['academic/master/student'] = 'page/academic/c_m_student';
 $route['academic/master/showStudent'] = 'page/academic/c_m_student/showStudent';
 $route['academic/master/loadPageStudents'] = 'page/academic/c_m_student/loadPageStudents';
 $route['academic/master/FormStudents'] = 'page/academic/c_m_student/FormStudents';
-$route['academic/master/form_input_student/(:any)'] = 'page/academic/c_m_student/form_input_student';
-
+// $route['academic/master/form_input_student'] = 'page/academic/c_m_student/form_input_student';
+$route['academic/master/edit-student'] = 'page/academic/c_m_student/edit_student';
 
 // --- Admission ----
 // --- Master ----
@@ -467,6 +467,9 @@ $route['finance/tagihan-mhs/penerimaan-tagihan-mhs'] =  'page/finance/c_finance/
 $route['finance/get_pembayaran_mhs/(:num)'] =  'page/finance/c_finance/get_pembayaran_mhs/$1';
 //$route['finance/export_excel'] =  'page/finance/c_finance/export_excel';
 $route['finance/export_excel'] =  'C_save_to_excel/export_excel_payment_received';
+$route['finance/export_excel_report'] =  'C_save_to_excel/export_excel_report_finance';
+
+
 $route['finance/check-va'] =  'page/finance/c_finance/check_va';
 $route['finance/check-va-cari'] =  'page/finance/c_finance/check_va_cari';
 
@@ -483,6 +486,8 @@ $route['finance/bayar_manual_mahasiswa_admission'] =  'page/finance/c_finance/ba
 
 $route['finance/tagihan-mhs/import_pembayaran_lain'] =  'page/finance/c_finance/import_pembayaran_lain';
 $route['finance/tagihan-mhs/submit_import_pembayaran_lain'] =  'page/finance/c_finance/submit_import_pembayaran_lain';
+$route['finance/tagihan-mhs/report'] =  'page/finance/c_finance/report';
+$route['finance/get_reporting/(:num)'] =  'page/finance/c_finance/get_reporting/$1';
 
 
 
