@@ -1455,20 +1455,44 @@ class C_api extends CI_Controller {
 
         if(count($dataTable)>0){
             for($i=0;$i<count($dataTable);$i++){
-                $dataC = $this->db->query('SELECT s.ClassGroup, mk.NameEng AS CourseEng, em.Name AS Coordinator FROM db_academic.exam_group exg 
+                $dataC = $this->db->query('SELECT exg.ID, exg.ScheduleID, s.ClassGroup, mk.NameEng AS CourseEng, mk.MKCode, em.Name AS Coordinator  
+                                                        FROM db_academic.exam_group exg
                                                         LEFT JOIN db_academic.schedule s ON (s.ID = exg.ScheduleID)
                                                         LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                                         LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                                         lEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
                                                         WHERE exg.ExamID = "'.$dataTable[$i]['ID'].'" 
                                                         GROUP BY exg.ScheduleID ORDER BY s.ClassGroup ASC')->result_array();
+
+                if(count($dataC)>0){
+                    for($s=0;$s<count($dataC);$s++){
+                        $dataSt = $this->db->query('SELECT NPM,DB_Students FROM db_academic.exam_details exd 
+                                                              WHERE exd.ExamID = "'.$dataTable[$i]['ID'].'"
+                                                               AND exd.ExamGroupID = "'.$dataC[$s]['ID'].'"
+                                                               AND exd.ScheduleID = "'.$dataC[$s]['ScheduleID'].'"
+                                                                ')->result_array();
+
+                        // Details Students
+                        if(count($dataSt)>0){
+                            for ($ss=0;$ss<count($dataSt);$ss++){
+                                $ddst = $this->db->select('Name')->get_where($dataSt[$ss]['DB_Students'].'.students',
+                                    array('NPM' => $dataSt[$ss]['NPM']),1)->result_array();
+                                $dataSt[$ss]['Name'] = $ddst[0]['Name'];
+                            }
+                        }
+                        $dataC[$s]['DetailsStudent'] = $dataSt;
+                    }
+                }
+
                 $dataTable[$i]['Course'] = $dataC;
             }
         }
 
+
         $query = $dataTable;
 
-
+//        print_r($query);
+//        exit;
 
         $no =1;
         $data = array();
@@ -1481,10 +1505,42 @@ class C_api extends CI_Controller {
                 : ' - '.$row['P_NIP1'].' | '.$row['P_Name1'] ;
 
             $course = '';
+            $totalStudent = 0;
             for($c=0;$c<count($row['Course']);$c++){
                 $d = $row['Course'][$c];
+                $totalStudent = $totalStudent + count($d['DetailsStudent']);
                 $course = $course.' <div style="margin-top: 1px;"><b>'.$d['ClassGroup'].' | '.$d['CourseEng'].'</b><br/><p style="color: #2196F3;font-size: 11px;">(Co) '.$d['Coordinator'].'</p></div> ';
             }
+
+
+            $exam_date = date("D, d M Y", strtotime($row['ExamDate']));
+            $exam_time = substr($row['ExamStart'],0,5).' - '.substr($row['ExamEnd'],0,5);
+            $exam_room = $row['Room'];
+            $data_token_soal_jawaban = array(
+                'Semester' => strtoupper($data_arr['Semester']),
+                'Exam' => strtoupper($data_arr['Type']),
+                'Date' => $exam_date,
+                'Time' => $exam_time,
+                'Room' => $exam_room,
+                'Pengawas_1' => $row['P_NIP1'].' - '.$row['P_Name1'],
+                'Pengawas_2' => ($row['P_Name2']!='' && $row['P_Name2']!=null) ? $row['P_NIP2'].' - '.$row['P_Name2'] : '-',
+                'Course' => $row['Course']
+
+            );
+
+            $tkn_soal_jawaban = $this->jwt->encode($data_token_soal_jawaban,'UAP)(*');
+
+            $data_token_attendance_std = array(
+                'Exam' => array(
+                    'Semester' => strtoupper($data_arr['Semester']),
+                    'Exam' => strtoupper($data_arr['Type']),
+                    'Date' => $exam_date,
+                    'Time' => $exam_time,
+                    'Room' => $exam_room,
+                ),
+                'Course' => $row['Course']
+            );
+            $tkn_attendance_std = $this->jwt->encode($data_token_attendance_std,'UAP)(*');
 
             $act = '<div  style="text-align:center;"><div class="btn-group">
                   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -1494,9 +1550,10 @@ class C_api extends CI_Controller {
                     <li><a href="'.base_url('academic/exam-schedule/edit-exam-schedule/'.$row['ID']).'">Edit</a></li>
                     <li role="separator" class="divider"></li>
                     <li><a target="_blank" href="'.base_url('save2pdf/exam-layout').'">Layout</a></li>
-                    <li><a target="_blank" href="'.base_url('save2pdf/draft_questions_answer_sheet').'">Soal & Jawaban</a></li>
+                    <li><a target="_blank" href="'.base_url('save2pdf/exam-layout').'">Layout Random</a></li>
+                    <li><a class="btnSave2PDF_Exam" href="javascript:void(0);" data-url="save2pdf/draft_questions_answer_sheet" data-token="'.$tkn_soal_jawaban.'">Draft Questions  & Answer Sheet</a></li>
+                    <li><a class="btnSave2PDF_Exam" href="javascript:void(0);" data-url="save2pdf/attendance-list" data-token="'.$tkn_attendance_std.'">Exam Attendance</a></li>
                     <li><a target="_blank" href="'.base_url('save2pdf/news-event').'">Berita Acara</a></li>
-                    <li><a target="_blank" href="'.base_url('save2pdf/attendance-list').'">Daftar Hadir</a></li>
                     <li role="separator" class="divider"></li>
                     <li><a class="btnDeleteExam" data-id="'.$row['ID'].'" href="javascript:void(0);" style="color: red;">Delete</a></li>
                   </ul>
@@ -1506,10 +1563,11 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div style="text-align:center;">'.($no++).'</div>';
             $nestedData[] = $course;
             $nestedData[] = $p;
+            $nestedData[] = '<div style="text-align:center;">'.$totalStudent.'</div>';
             $nestedData[] = $act;
-            $nestedData[] = '<div  style="text-align:center;">'.date("D, d M Y", strtotime($row['ExamDate'])).'</div>';
-            $nestedData[] = '<div  style="text-align:center;">'.substr($row['ExamStart'],0,5).' - '.substr($row['ExamEnd'],0,5).'</div>';
-            $nestedData[] = '<div  style="text-align:center;">'.$row['Room'].'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$exam_date.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$exam_time.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$exam_room.'</div>';
 
             $data[] = $nestedData;
         }

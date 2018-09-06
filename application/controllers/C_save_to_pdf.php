@@ -1053,66 +1053,67 @@ class C_save_to_pdf extends CI_Controller {
 
     // Naskah Soal dan Lembar Jawaban
     public function draft_questions_answer_sheet(){
+        $token = $this->input->post('token');
+        $data_arr = $this->getInputToken($token);
 
         $pdf = new FPDF('l','mm','A4');
         // membuat halaman baru
         $pdf->AddPage();
 
-        $pdf->Image(base_url('images/icon/favicon.png'),13,10,13);
+        $pdf->SetMargins(5,5,0);
+
+        $totalGroup = count($data_arr['Course']);
+        $h_border = ($totalGroup * 8) + 100;
+        $pdf->Rect(3, 7, 140, $h_border);
+        $pdf->Rect(155, 7, 140, $h_border);
+
+        $pdf->Image(base_url('images/icon/favicon.png'),5,10,13);
         $pdf->Image(base_url('images/icon/favicon.png'),158,10,13);
 
         $h=5;
 
         $pdf->SetFont('Times','B',11);
-//        $pdf->Cell(15,$h,'',0,0,'C');
-        $pdf->Cell(140,$h,'Universitas Agung Podomoro',0,0,'C');
-        $pdf->Cell(5,$h,'',0,0);
-//        $pdf->Cell(15,$h,'',0,0,'C');
-        $pdf->Cell(140,$h,'Universitas Agung Podomoro',0,1,'C');
+        $pdf->Cell(133,$h,'Universitas Agung Podomoro',0,0,'C');
+        $pdf->Cell(20,$h,'',0,0);
+        $pdf->Cell(132,$h,'Universitas Agung Podomoro',0,1,'C');
 
         $h=3.5;
 
         $pdf->SetFont('Times','',8);
-//        $pdf->Cell(15,$h,'',0,0,'C');
-        $pdf->Cell(140,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,0,'C');
-        $pdf->Cell(5,$h,'',0,0);
-//        $pdf->Cell(15,$h,'',0,0,'C');
-        $pdf->Cell(140,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
+        $pdf->Cell(135,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
 
-//        $pdf->Cell(15,$h,'',0,0,'C');
-        $pdf->Cell(140,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,0,'C');
-        $pdf->Cell(5,$h,'',0,0);
-//        $pdf->Cell(15,$h,'',0,0,'C');
-        $pdf->Cell(140,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
+        $pdf->Cell(135,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
 
-//        $pdf->Cell(15,$h,'',0,0,'C');
-        $pdf->Cell(140,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,0,'C');
-        $pdf->Cell(5,$h,'',0,0);
-//        $pdf->Cell(15,$h,'',0,0,'C');
-        $pdf->Cell(140,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
+        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
 
-        $pdf->Line(10,27,145,27);
-        $pdf->Line(157,27,290,27);
+        $pdf->Line(3,27,143,27);
+        $pdf->Line(155,27,295,27);
 
         $pdf->Ln(4);
 
         $pdf->SetFont('Times','B',8);
 
-        $pdf->Cell(140,$h,'DRAFT QUESTIONS',0,0,'C');
-        $pdf->Cell(5,$h,'',0,0);
-        $pdf->Cell(140,$h,'ANSWER SHEET',0,1,'C');
+        $pdf->Cell(135,$h,'DRAFT QUESTIONS',0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'ANSWER SHEET',0,1,'C');
 
-        $pdf->Cell(140,$h,'ATTENDANCE FINAL EXAMINATION',0,0,'C');
-        $pdf->Cell(5,$h,'',0,0);
-        $pdf->Cell(140,$h,'ATTENDANCE FINAL EXAMINATION',0,1,'C');
+        $pdf->Cell(135,$h,'ATTENDANCE FINAL EXAMINATION',0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'ATTENDANCE FINAL EXAMINATION',0,1,'C');
 
-        $pdf->Cell(140,$h,'EVEN SEMESTER',0,0,'C');
-        $pdf->Cell(5,$h,'',0,0);
-        $pdf->Cell(140,$h,'EVEN SEMESTER',0,1,'C');
+        $pdf->Cell(135,$h,'EVEN SEMESTER',0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'EVEN SEMESTER',0,1,'C');
 
-        $pdf->Cell(140,$h,'ACADEMIC YEAR 2017/2018',0,0,'C');
-        $pdf->Cell(5,$h,'',0,0);
-        $pdf->Cell(140,$h,'ACADEMIC YEAR 2017/2018',0,1,'C');
+        $pdf->Cell(135,$h,'ACADEMIC YEAR '.$data_arr['Semester'],0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'ACADEMIC YEAR '.$data_arr['Semester'],0,1,'C');
 
         $pdf->Ln(5);
 
@@ -1121,67 +1122,54 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('Times','',9);
         $h=5;
 
-        $pdf->Rect(10, 47, 135, 40);
-        $pdf->Rect(156, 47, 135, 40);
-
-        //======================================
-
-
-        $pdf->Cell(3,$h,'',0,0,'L');
         $pdf->Cell(25,$h,'Exam',0,0,'L');
         $pdf->Cell(2,$h,':',0,0,'C');
-        $pdf->Cell(110,$h,'Oke gan',0,0,'L');
+        $pdf->Cell(105,$h,$data_arr['Exam'],0,0,'L');
 
-        $pdf->Cell(5,$h,'',0,0);
+        $pdf->Cell(20,$h,'',0,0);
 
-        $pdf->Cell(3,$h,'',0,0,'L');
-        $pdf->Cell(25,$h,'Exam',0,0,'L');
+
+        $pdf->Cell(40,$h,'Exam',0,0,'L');
         $pdf->Cell(2,$h,':',0,0,'C');
-        $pdf->Cell(110,$h,'Oke gan',0,1,'L');
+        $pdf->Cell(90,$h,$data_arr['Exam'],0,1,'L');
 
         //======================================
 
 
-        $pdf->Cell(3,$h,'',0,0,'L');
         $pdf->Cell(25,$h,'Day, Date ',0,0,'L');
         $pdf->Cell(2,$h,':',0,0,'C');
-        $pdf->Cell(110,$h,'Oke gan',0,0,'L');
+        $pdf->Cell(105,$h,$data_arr['Date'],0,0,'L');
 
-        $pdf->Cell(5,$h,'',0,0);
+        $pdf->Cell(20,$h,'',0,0);
 
-        $pdf->Cell(3,$h,'',0,0,'L');
-        $pdf->Cell(25,$h,'Day, Date ',0,0,'L');
+        $pdf->Cell(40,$h,'Day, Date ',0,0,'L');
         $pdf->Cell(2,$h,':',0,0,'C');
-        $pdf->Cell(110,$h,'Oke gan',0,1,'L');
+        $pdf->Cell(90,$h,$data_arr['Date'],0,1,'L');
 
         //======================================
 
-        $pdf->Cell(3,$h,'',0,0,'L');
         $pdf->Cell(25,$h,'Time, Room',0,0,'L');
         $pdf->Cell(2,$h,':',0,0,'C');
-        $pdf->Cell(110,$h,'Oke gan',0,0,'L');
+        $pdf->Cell(105,$h,$data_arr['Time'].', '.$data_arr['Room'],0,0,'L');
 
-        $pdf->Cell(5,$h,'',0,0);
+        $pdf->Cell(20,$h,'',0,0);
 
-        $pdf->Cell(3,$h,'',0,0,'L');
-        $pdf->Cell(25,$h,'Time, Room',0,0,'L');
+        $pdf->Cell(40,$h,'Time, Room',0,0,'L');
         $pdf->Cell(2,$h,':',0,0,'C');
-        $pdf->Cell(110,$h,'Oke gan',0,1,'L');
+        $pdf->Cell(90,$h,$data_arr['Time'].', '.$data_arr['Room'],0,1,'L');
 
 
         //======================================
 
-        $pdf->Cell(3,$h,'',0,0,'L');
         $pdf->Cell(25,$h,'Total Script',0,0,'L');
         $pdf->Cell(2,$h,':',0,0,'C');
-        $pdf->Cell(110,$h,'Oke gan',0,0,'L');
+        $pdf->Cell(105,$h,'_ _ _ _ _ _ _ _ _ _ _ _',0,0,'L');
 
-        $pdf->Cell(5,$h,'',0,0);
+        $pdf->Cell(20,$h,'',0,0);
 
-        $pdf->Cell(3,$h,'',0,0,'L');
-        $pdf->Cell(25,$h,'Answer Sheet',0,0,'L');
+        $pdf->Cell(40,$h,'Number of Answer Sheet',0,0,'L');
         $pdf->Cell(2,$h,':',0,0,'C');
-        $pdf->Cell(110,$h,'Oke gan',0,1,'L');
+        $pdf->Cell(90,$h,'_ _ _ _ _ _ _ _ _ _ _ _',0,1,'L');
 
 
         //=============================================
@@ -1192,31 +1180,27 @@ class C_save_to_pdf extends CI_Controller {
 
         //======================================
 
-        $pdf->Cell(3,$h,'',0,0,'L');
         $pdf->Cell(25,$h,'Pengawas 1',0,0,'L');
         $pdf->Cell(2,$h,':',0,0,'C');
-        $pdf->Cell(110,$h,'Oke gan',0,0,'L');
+        $pdf->Cell(105,$h,$data_arr['Pengawas_1'],0,0,'L');
 
-        $pdf->Cell(5,$h,'',0,0);
+        $pdf->Cell(20,$h,'',0,0);
 
-        $pdf->Cell(3,$h,'',0,0,'L');
-        $pdf->Cell(25,$h,'Pengawas 1',0,0,'L');
+        $pdf->Cell(40,$h,'Pengawas 1',0,0,'L');
         $pdf->Cell(2,$h,':',0,0,'C');
-        $pdf->Cell(110,$h,'Oke gan',0,1,'L');
+        $pdf->Cell(90,$h,$data_arr['Pengawas_1'],0,1,'L');
 
         //======================================
 
-        $pdf->Cell(3,$h,'',0,0,'L');
         $pdf->Cell(25,$h,'Pengawas 2',0,0,'L');
         $pdf->Cell(2,$h,':',0,0,'C');
-        $pdf->Cell(110,$h,'Oke gan',0,0,'L');
+        $pdf->Cell(105,$h,$data_arr['Pengawas_2'],0,0,'L');
 
-        $pdf->Cell(5,$h,'',0,0);
+        $pdf->Cell(20,$h,'',0,0);
 
-        $pdf->Cell(3,$h,'',0,0,'L');
-        $pdf->Cell(25,$h,'Pengawas 2',0,0,'L');
+        $pdf->Cell(40,$h,'Pengawas 2',0,0,'L');
         $pdf->Cell(2,$h,':',0,0,'C');
-        $pdf->Cell(110,$h,'Oke gan',0,1,'L');
+        $pdf->Cell(90,$h,$data_arr['Pengawas_2'],0,1,'L');
 
 
 
@@ -1233,7 +1217,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(7,$h,'Std',1,0,'C',true);
 
 
-        $pdf->Cell(11,$h,'',0,0);
+        $pdf->Cell(17,$h,'',0,0);
 
         $pdf->Cell(20,$h,'Group',1,0,'C',true);
         $pdf->Cell(108,$h,'Course',1,0,'C',true);
@@ -1245,254 +1229,181 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('Times','',8);
         $h = 4;
 
-        for($i=1;$i<=3;$i++){
+        for($i=0;$i<$totalGroup;$i++){
 
-            $pdf->Cell(20,$h,'HBPB21','LRT',0,'C');
-            $pdf->Cell(108,$h,'Oke gan','LRT',0,'L');
-            $pdf->Cell(7,$h,'100','LRT',0,'C');
+            $c = (array) $data_arr['Course'][$i];
+
+            $courseName = (strlen($c['CourseEng'])>=65) ? substr($c['CourseEng'],0,65).'_' : $c['CourseEng'];
+
+            $pdf->Cell(20,$h,$c['ClassGroup'],'LRT',0,'C');
+            $pdf->SetFont('Times','B',8);
+//            $pdf->Cell(108,$h,$c['MKCode'].' - ','LRT',0,'L');
+            $pdf->Cell(108,$h,$c['MKCode'].' - '.$courseName,'LRT',0,'L');
+            $pdf->SetFont('Times','',8);
+            $pdf->Cell(7,$h,count($c['DetailsStudent']),'LRT',0,'C');
 
 
-            $pdf->Cell(11,$h,'',0,0);
+            $pdf->Cell(17,$h,'',0,0);
 
-            $pdf->Cell(20,$h,'HBPB21','LRT',0,'C');
-            $pdf->Cell(108,$h,'Oke gan','LRT',0,'L');
-            $pdf->Cell(7,$h,$i,'LRT',1,'C');
+            $pdf->Cell(20,$h,$c['ClassGroup'],'LRT',0,'C');
+            $pdf->SetFont('Times','B',8);
+            $pdf->Cell(108,$h,$c['MKCode'].' - '.$courseName,'LRT',0,'L');
+            $pdf->SetFont('Times','',8);
+            $pdf->Cell(7,$h,count($c['DetailsStudent']),'LRT',1,'C');
 
 
             // *******
 
 
             $pdf->Cell(20,$h,'','LRB',0,'C');
-            $pdf->Cell(108,$h,'(Co) Bambang','LRB',0,'L');
+            $pdf->Cell(108,$h,'(Co) '.$c['Coordinator'],'LRB',0,'L');
             $pdf->Cell(7,$h,'','LRB',0,'C');
 
-            $pdf->Cell(11,$h,'',0,0);
+            $pdf->Cell(17,$h,'',0,0);
 
             $pdf->Cell(20,$h,'','LRB',0,'C');
-            $pdf->Cell(108,$h,'(Co) Bambang','LRB',0,'L');
+            $pdf->Cell(108,$h,'(Co) '.$c['Coordinator'],'LRB',0,'L');
             $pdf->Cell(7,$h,'','LRB',1,'C');
         }
 
 
 
-        $pdf->Ln(7);
+        $pdf->Ln(5);
 
         $pdf->SetFont('Times','I',7);
-        $pdf->Cell(135,$h,'Download On : '.date("d M Y H:i:s").' | '.chr(169).' IT Podomoro University',0,0,'R');
+        $pdf->Cell(135,$h,'Download On : '.date("d M Y H:i:s").' | '.chr(169).' Podomoro University',0,0,'R');
 
-        $pdf->Cell(11,$h,'',0,0);
+        $pdf->Cell(17,$h,'',0,0);
 
-        $pdf->Cell(135,$h,'Download On : '.date("d M Y H:i:s").' | '.chr(169).' IT Podomoro University',0,1,'R');
-
-//        $pdf->Cell(185,5,'Download On : '.date("d M Y H:i:s").' | '.chr(169).' IT Podomoro University',0,1,'R');
+        $pdf->Cell(135,$h,'Download On : '.date("d M Y H:i:s").' | '.chr(169).' Podomoro University',0,1,'R');
 
 
-
-//        $this->headerDefault($pdf);
-
-//        $pdf->SetFont('Arial','B',10);
-//        $pdf->Cell(140,7,'',1,0);
-//        $pdf->Cell(5,7,'',0,0);
-//        $pdf->Cell(140,7,'',1,1);
-
-//        $pdf->SetDash(5,5); //5mm on, 5mm off
-//        $pdf->Line(152.5,10,152.5,200);
-
-        $pdf->Output();
+        $pdf->Output('draft_questions_answer_sheet.pdf','I');
     }
 
+    // Daftar Hadir
+    public function attendance_list(){
+
+        $token = $this->input->post('token');
+        $data_arr = $this->getInputToken($token);
+
+//        print_r($data_arr);
+//        exit;
 
 
-    // Naskah Soal
-    public function draft_questions(){
 
         $pdf = new FPDF('p','mm','A4');
         // membuat halaman baru
-        $pdf->AddPage();
-
-        $this->header_exam($pdf);
-
-        $pdf->SetFont('Arial','B',10);
-        $pdf->Cell(185,7,'',0,1);
-        $pdf->Cell(185,5,'DRAFT QUESTIONS',0,1,'C');
-        $pdf->Cell(185,5,'ATTENDANCE FINAL EXAMINATION',0,1,'C');
-        $pdf->Cell(185,5,'EVEN SEMESTER',0,1,'C');
-        $pdf->Cell(185,5,'ACADEMIC YEAR 2017/2018',0,1,'C');
-
-        $pdf->Cell(185,7,'',0,1);
-
-        $pdf->Rect(10, 76, 185, 93);
-        $pdf->Rect(10, 184, 185, 23);
-
-        $pdf->SetFont('Arial','I',8);
-        $pdf->Cell(185,5,'Exam Scheduled / Supplementary *)',0,1,'R');
-
-        $height_fill = 10;
-        $pdf->Cell(185,5,'',0,1);
-        $pdf->SetFont('Arial','',10);
-        $pdf->Cell(5,$height_fill,'',0,0);
-        $pdf->Cell(40,$height_fill,'Information Exam',0,0,'L');
-        $pdf->Cell(5,$height_fill,':',0,0);
-        $pdf->Cell(135,$height_fill,'UAS',0,1);
-
-        $pdf->Cell(5,$height_fill,'',0,0);
-        $pdf->Cell(40,$height_fill,'Study Program',0,0,'L');
-        $pdf->Cell(5,$height_fill,':',0,0);
-        $pdf->Cell(135,$height_fill,'HBP',0,1);
-
-        $pdf->Cell(5,$height_fill,'',0,0);
-        $pdf->Cell(40,$height_fill,'Code | Course',0,0,'L');
-        $pdf->Cell(5,$height_fill,':',0,0);
-        $pdf->Cell(135,$height_fill,'HOT0014 | Food and Beverage - Service Theory',0,1);
-
-        $pdf->Cell(5,$height_fill,'',0,0);
-        $pdf->Cell(40,$height_fill,'Class Group',0,0,'L');
-        $pdf->Cell(5,$height_fill,':',0,0);
-        $pdf->Cell(135,$height_fill,'A',0,1);
-
-        $pdf->Cell(5,$height_fill,'',0,0);
-        $pdf->Cell(40,$height_fill,'Lecturer/s',0,0,'L');
-        $pdf->Cell(5,$height_fill,':',0,0);
-        $pdf->Cell(135,$height_fill,'MICHAEL YADISAPUTRA, MICHAEL YADISAPUTRA',0,1);
-
-        $pdf->Cell(5,$height_fill,'',0,0);
-        $pdf->Cell(40,$height_fill,'Day, Date',0,0,'L');
-        $pdf->Cell(5,$height_fill,':',0,0);
-        $pdf->Cell(135,$height_fill,'Monday, 25 June 2018',0,1);
-
-        $pdf->Cell(5,$height_fill,'',0,0);
-        $pdf->Cell(40,$height_fill,'Time, Room',0,0,'L');
-        $pdf->Cell(5,$height_fill,':',0,0);
-        $pdf->Cell(135,$height_fill,'08:00 - 09:00, 503',0,1);
-
-        $pdf->Cell(5,$height_fill,'',0,0);
-        $pdf->Cell(40,$height_fill,'Total Script',0,0,'L');
-        $pdf->Cell(5,$height_fill,':',0,0);
-        $pdf->Cell(135,$height_fill,'______________________',0,1);
-
-        $pdf->Cell(185,7,'',0,1);
-        $pdf->SetFont('Arial','I',8);
-        $pdf->Cell(185,7,'Note : Cross out unnecessary *)',0,1,'L');
 
 
-        $pdf->Cell(185,10,'',0,1);
-        $pdf->SetFont('Arial','',10);
+        $dataExam = (array) $data_arr['Exam'];
+        $totalCourse = count($data_arr['Course']);
 
-        $pdf->Cell(5,$height_fill,'',0,0);
-        $pdf->Cell(40,$height_fill,'Pengawas 1',0,0,'L');
-        $pdf->Cell(5,$height_fill,':',0,0);
-        $pdf->Cell(135,$height_fill,'Nandang Mulyadi',0,1);
+        $width_attd = 9;
 
-        $pdf->Cell(5,$height_fill,'',0,0);
-        $pdf->Cell(40,$height_fill,'Pengawas 2',0,0,'L');
-        $pdf->Cell(5,$height_fill,':',0,0);
-        $pdf->Cell(135,$height_fill,'-',0,1);
+        for($c=0;$c<$totalCourse;$c++){
+            $pdf->AddPage();
+            $this->header_exam($pdf);
+            $dataCourse = (array) $data_arr['Course'][$c];
+            $this->header_attendance($pdf,$dataExam,$dataCourse);
 
-        $pdf->Cell(185,10,'',0,1);
-        $pdf->SetFont('Arial','I',7);
-        $pdf->Cell(185,5,'Download On : '.date("d M Y H:i:s").' | '.chr(169).' IT Podomoro University',0,1,'R');
+            $this->header_attd_table($pdf);
+            // Data Student
+            $totalStd = count($dataCourse['DetailsStudent']);
+            $no = 1;
+            for($t=0;$t<$totalStd;$t++){
+                $st_detail = (array) $dataCourse['DetailsStudent'][$t];
 
-//        $pdf->Output('Study_Card.pdf','D');
-        $pdf->Output();
+                $pdf->Cell(10,$width_attd,$no++,1,0,'C');
+                $pdf->Cell(25,$width_attd,$st_detail['NPM'],1,0,'C');
+                $pdf->Cell(95,$width_attd,' '.ucwords(strtolower($st_detail['Name'])),1,0,'L');
+                $pdf->Cell(35,$width_attd,'',1,0,'C');
+                $pdf->Cell(20,$width_attd,'',1,1,'C');
+
+                if($pdf->GetY()>=265){
+                    $pdf->AddPage();
+                    $this->header_attd_table($pdf);
+                }
+            }
+
+
+            $pdf->SetFont('Arial','I',9);
+            $pdf->Cell(185,5,'',0,1,'');
+            $pdf->Cell(130,3,'',0,0,'R');
+            $pdf->Cell(55,3,'Sign by Lecturer : ',0,1,'C');
+
+            $pdf->Cell(185,17,'',0,1,'');
+
+            $pdf->Cell(130,3,'',0,0,'R');
+            $pdf->Cell(55,3,'( ...................... )',0,1,'C');
+
+
+            $pdf->Cell(185,7,'',0,1,'');
+            $pdf->SetFont('Times','I',7);
+            $pdf->Cell(185,3,'Download On : '.date("d M Y H:i:s").' | '.chr(169).' Podomoro University',0,1,'R');
+
+
+        }
+
+        $pdf->Output('attendance_exam_list.pdf','I');
 
     }
 
-    // Lembar Jawaban
-    public function answer_sheet(){
-
-        $pdf = new FPDF('p','mm','A4');
+    // Berita Acara dan Bukti Serah Terima berkas
+    public function news_event(){
+        $pdf = new FPDF('l','mm','A4');
         // membuat halaman baru
         $pdf->AddPage();
 
-        $this->header_exam($pdf);
+        $pdf->SetMargins(5,5,0);
 
-        $pdf->SetFont('Arial','B',10);
-        $pdf->Cell(185,7,'',0,1);
-        $pdf->Cell(185,5,'ANSWER SHEET',0,1,'C');
-        $pdf->Cell(185,5,'ATTENDANCE FINAL EXAMINATION',0,1,'C');
-        $pdf->Cell(185,5,'EVEN SEMESTER',0,1,'C');
-        $pdf->Cell(185,5,'ACADEMIC YEAR 2017/2018',0,1,'C');
+        $totalGroup = 3;
+        $h_border = ($totalGroup * 8) + 100;
+        $pdf->Rect(3, 7, 140, $h_border);
+        $pdf->Rect(155, 7, 140, $h_border);
 
-        $pdf->Cell(185,7,'',0,1);
+        $pdf->Image(base_url('images/icon/favicon.png'),5,10,13);
+        $pdf->Image(base_url('images/icon/favicon.png'),158,10,13);
 
-        $pdf->Rect(10, 76, 185, 93);
-        $pdf->Rect(10, 184, 185, 23);
+        $h=5;
 
-        $pdf->SetFont('Arial','I',8);
-        $pdf->Cell(185,5,'Exam Scheduled / Supplementary *)',0,1,'R');
+        $pdf->SetFont('Times','B',11);
+        $pdf->Cell(133,$h,'Universitas Agung Podomoro',0,0,'C');
+        $pdf->Cell(20,$h,'',0,0);
+        $pdf->Cell(132,$h,'Universitas Agung Podomoro',0,1,'C');
 
-        $height_fill = 10;
-        $pdf->Cell(185,5,'',0,1);
-        $pdf->SetFont('Arial','',10);
-        $pdf->Cell(5,$height_fill,'',0,0);
-        $pdf->Cell(45,$height_fill,'Information Exam',0,0,'L');
-        $pdf->Cell(5,$height_fill,':',0,0);
-        $pdf->Cell(130,$height_fill,'UAS',0,1);
+        $h=3.5;
 
-        $pdf->Cell(5,$height_fill,'',0,0);
-        $pdf->Cell(45,$height_fill,'Study Program',0,0,'L');
-        $pdf->Cell(5,$height_fill,':',0,0);
-        $pdf->Cell(130,$height_fill,'HBP',0,1);
+        $pdf->SetFont('Times','',8);
+        $pdf->Cell(135,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
 
-        $pdf->Cell(5,$height_fill,'',0,0);
-        $pdf->Cell(45,$height_fill,'Code | Course',0,0,'L');
-        $pdf->Cell(5,$height_fill,':',0,0);
-        $pdf->Cell(130,$height_fill,'HOT0014 | Food and Beverage - Service Theory',0,1);
+        $pdf->Cell(135,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
 
-        $pdf->Cell(5,$height_fill,'',0,0);
-        $pdf->Cell(45,$height_fill,'Class Group',0,0,'L');
-        $pdf->Cell(5,$height_fill,':',0,0);
-        $pdf->Cell(130,$height_fill,'A',0,1);
+        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
 
-        $pdf->Cell(5,$height_fill,'',0,0);
-        $pdf->Cell(45,$height_fill,'Lecturer/s',0,0,'L');
-        $pdf->Cell(5,$height_fill,':',0,0);
-        $pdf->Cell(130,$height_fill,'MICHAEL YADISAPUTRA, MICHAEL YADISAPUTRA',0,1);
+        $pdf->Line(3,27,143,27);
+        $pdf->Line(155,27,295,27);
 
-        $pdf->Cell(5,$height_fill,'',0,0);
-        $pdf->Cell(45,$height_fill,'Day, Date',0,0,'L');
-        $pdf->Cell(5,$height_fill,':',0,0);
-        $pdf->Cell(130,$height_fill,'Monday, 25 June 2018',0,1);
+        $pdf->Ln(4);
 
-        $pdf->Cell(5,$height_fill,'',0,0);
-        $pdf->Cell(45,$height_fill,'Time, Room',0,0,'L');
-        $pdf->Cell(5,$height_fill,':',0,0);
-        $pdf->Cell(130,$height_fill,'08:00 - 09:00, 503',0,1);
+        $pdf->SetFont('Times','B',8);
 
-        $pdf->Cell(5,$height_fill,'',0,0);
-        $pdf->Cell(45,$height_fill,'Number of Answer Sheet',0,0,'L');
-        $pdf->Cell(5,$height_fill,':',0,0);
-        $pdf->Cell(130,$height_fill,'______________________',0,1);
+        $pdf->Cell(135,$h,'DRAFT QUESTIONS',0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'BERITA ACARA PENYERAHAN BERKAS UJIAN',0,1,'C');
 
-        $pdf->Cell(185,7,'',0,1);
-        $pdf->SetFont('Arial','I',8);
-        $pdf->Cell(185,7,'Note : Cross out unnecessary *)',0,1,'L');
-
-
-        $pdf->Cell(185,10,'',0,1);
-        $pdf->SetFont('Arial','',10);
-
-        $pdf->Cell(5,$height_fill,'',0,0);
-        $pdf->Cell(45,$height_fill,'Pengawas 1',0,0,'L');
-        $pdf->Cell(5,$height_fill,':',0,0);
-        $pdf->Cell(130,$height_fill,'Nandang Mulyadi',0,1);
-
-        $pdf->Cell(5,$height_fill,'',0,0);
-        $pdf->Cell(45,$height_fill,'Pengawas 2',0,0,'L');
-        $pdf->Cell(5,$height_fill,':',0,0);
-        $pdf->Cell(130,$height_fill,'-',0,1);
-
-        $pdf->Cell(185,10,'',0,1);
-        $pdf->SetFont('Arial','I',7);
-        $pdf->Cell(185,5,'Download On : '.date("d M Y H:i:s").' | '.chr(169).' IT Podomoro University',0,1,'R');
-
-//        $pdf->Output('Study_Card.pdf','D');
-        $pdf->Output();
-
+        $pdf->Output('news_event.pdf','I');
     }
+
 
     // Berita Acara
-    public function news_event(){
+    public function news_event1(){
 
         $pdf = new FPDF('l','mm','A5');
         // membuat halaman baru
@@ -1602,35 +1513,36 @@ class C_save_to_pdf extends CI_Controller {
 
     }
 
-    private function header_attendance($pdf){
-        $pdf->SetFont('Arial','I',7);
-        $pdf->Cell(0,7,'Page : '.$pdf->PageNo().' of {nb}',0,0,'R');
-        $pdf->AliasNbPages();
+    private function header_attendance($pdf,$dataExam,$dataCourse){
 
         $pdf->SetFont('Arial','B',10);
         $pdf->Cell(185,7,'',0,1);
         $pdf->Cell(185,5,'ATTENDANCE FINAL EXAMINATION',0,1,'C');
-        $pdf->Cell(185,5,'EVEN SEMESTER ACADEMIC YEAR 2017/2018',0,1,'C');
+        $pdf->Cell(185,5,'EVEN SEMESTER ACADEMIC YEAR '.$dataExam['Semester'],0,1,'C');
 
         $pdf->Cell(185,7,'',0,1,'');
         $pdf->SetFont('Arial','',9);
-        $pdf->Cell(25,5,'Code',0,0);
-        $pdf->Cell(3,5,':',0,0,'C');
-        $pdf->Cell(81,5,'HOT0014',0,0);
-
-        $pdf->Cell(25,5,'Study Program',0,0);
-        $pdf->Cell(3,5,':',0,0,'C');
-        $pdf->Cell(50,5,'HBP',0,1);
+//        $pdf->Cell(25,5,'Code',0,0);
+//        $pdf->Cell(3,5,':',0,0,'C');
+//        $pdf->Cell(81,5,$dataCourse['MKCode'],0,0);
+//
+//        $pdf->Cell(25,5,'Study Program',0,0);
+//        $pdf->Cell(3,5,':',0,0,'C');
+//        $pdf->Cell(50,5,'HBP',0,1);
 
         // ---
 
-        $pdf->Cell(25,5,'Course',0,0);
+        $cName = (strlen($dataCourse['CourseEng'])>=40)
+            ? substr($dataCourse['CourseEng'],0,40).'_'
+            : $dataCourse['CourseEng'];
+
+        $pdf->Cell(25,5,'Code | Course',0,0);
         $pdf->Cell(3,5,':',0,0,'C');
-        $pdf->Cell(81,5,'Food and Beverage - Service Theory',0,0);
+        $pdf->Cell(81,5,$dataCourse['MKCode'].' - '.$cName,0,0);
 
         $pdf->Cell(25,5,'Day, date',0,0);
         $pdf->Cell(3,5,':',0,0,'C');
-        $pdf->Cell(50,5,'Monday, 25 Desember 2018',10,1);
+        $pdf->Cell(50,5,$dataExam['Date'],10,1);
 
         // ---
 
@@ -1640,21 +1552,26 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->Cell(25,5,'Time',0,0);
         $pdf->Cell(3,5,':',0,0,'C');
-        $pdf->Cell(50,5,'08:00 - 09:40',0,1);
+        $pdf->Cell(50,5,$dataExam['Time'],0,1);
 
         // ---
 
         $pdf->Cell(25,5,'Lecturer/s',0,0);
         $pdf->Cell(3,5,':',0,0,'C');
-        $pdf->Cell(81,5,'Michael Yadisaputra',0,0);
+        $pdf->Cell(81,5,$dataCourse['Coordinator'],0,0);
 
         $pdf->Cell(25,5,'Room',0,0);
         $pdf->Cell(3,5,':',0,0,'C');
-        $pdf->Cell(50,5,'504',0,1);
+        $pdf->Cell(50,5,$dataExam['Room'],0,1);
     }
 
     private function header_attd_table($pdf){
-        $pdf->Cell(185,7,'',0,1,'');
+        $pdf->Cell(185,3,'',0,1,'');
+
+        $pdf->SetFont('Arial','I',7);
+        $pdf->Cell(185,7,'Page : '.$pdf->PageNo().' of {nb}',0,1,'R');
+        $pdf->AliasNbPages();
+
         $width_attd = 9;
         $pdf->SetFillColor(226, 226, 226);
         $pdf->SetFont('Arial','B',10);
@@ -1666,63 +1583,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('Arial','',10);
     }
 
-    // Daftar Hadir
-    public function attendance_list(){
 
-        $pdf = new FPDF('p','mm','A4');
-        // membuat halaman baru
-        $pdf->AddPage();
-        $this->header_exam($pdf);
-
-        $this->header_attendance($pdf);
-
-        $this->header_attd_table($pdf);
-
-
-        $width_attd = 9;
-
-        $no = 1;
-        for($s=0;$s<26;$s++){
-            $pdf->Cell(10,$width_attd,$no++,1,0,'C');
-            $pdf->Cell(25,$width_attd,'21140008',1,0,'C');
-            $pdf->Cell(95,$width_attd,'Name',1,0,'L');
-            $pdf->Cell(35,$width_attd,'Sign',1,0,'C');
-            $pdf->Cell(20,$width_attd,''.$pdf->GetY(),1,1,'C');
-
-            if($pdf->GetY()>=265){
-                $pdf->AddPage();
-                $this->header_exam($pdf);
-                $this->header_attendance($pdf);
-                $this->header_attd_table($pdf);
-            }
-
-        }
-
-
-
-        $pdf->Cell(185,7,'',0,1,'');
-        $pdf->SetFont('Arial','I',7);
-        $pdf->Cell(185,3,'Download On : '.date("d M Y H:i:s").' | '.chr(169).' IT Podomoro University',0,1,'R');
-
-
-
-        $pdf->SetFont('Arial','I',9);
-        $pdf->Cell(185,17,'',0,1,'');
-        $pdf->Cell(130,3,'',0,0,'R');
-        $pdf->Cell(55,3,'Sign by Lecturer : ',0,1,'C');
-
-        $pdf->Cell(185,17,'',0,1,'');
-
-        $pdf->Cell(130,3,'',0,0,'R');
-        $pdf->Cell(55,3,'( ...................... )',0,1,'C');
-
-
-
-
-//        $pdf->Output('Study_Card.pdf','D');
-        $pdf->Output();
-
-    }
 
 
     // ========= Score ==========
