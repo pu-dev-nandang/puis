@@ -363,7 +363,8 @@ class C_finance extends Finnance_Controler {
          $this->mypdf->Output($path,'F');
 
          $text = 'Dear '.$Personal[0]['Name'].',<br><br>
-                     Plase find attached your Tuition Fee.';
+                     Plase find attached your Tuition Fee.<br>
+                     For Detail your payment, please see in '.url_registration."login/";
          $to = $Personal[0]['Email'];
          $subject = "Podomoro University Tuition Fee";
          $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,$path);
@@ -1384,15 +1385,15 @@ class C_finance extends Finnance_Controler {
     public function bayar_manual_mahasiswa_formulironline()
     {
         $input = $this->getInputToken();
-        $VA_number = $input['VA_number'];
+        $RegID = $input['RegID'];
         $dataSave = array(
               'BilingID' => 0,
                       );
-      $this->db->where('VA_number',$VA_number);
+      $this->db->where('ID',$RegID);
       $this->db->update('db_admission.register', $dataSave);
 
       // insert to another table
-      $getData = $this->m_master->caribasedprimary('db_admission.register','VA_number',$VA_number);
+      $getData = $this->m_master->caribasedprimary('db_admission.register','ID',$RegID);
       $Email = $getData[0]['Email'];
       $RegisterID = $getData[0]['ID'];
       $this->m_master->saveDataToVerification_offline($RegisterID);

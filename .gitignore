@@ -23,8 +23,8 @@ index.php
 /uploads/students/ta_2016/*.jpg
 /uploads/students/ta_2016/*.png
 
-/uploads/document/*.pdf
-
+**/uploads/document/
+document/*
 /uploads/syllabus_sap/*.pdf
 /uploads/vreservation/*.pdf
-/document/*.pdf
+

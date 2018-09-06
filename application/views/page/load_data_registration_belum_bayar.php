@@ -53,7 +53,7 @@
 								'">Bukti Pembayaran belum diupload'+
 							  '</td>';
 				}*/
-				var btn_edit = '<button class = "btn btn-primary btn_bayar" VA_number = "'+data_json[i]['VA_number']+'" > Bayar </button>';
+				var btn_edit = '<button class = "btn btn-primary btn_bayar" RegID = "'+data_json[i]['ID']+'" > Bayar </button>';
 				$(".datatable tbody").append(
 					'<tr>'+
 						'<td>'+no+'</td>'+

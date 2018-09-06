@@ -266,7 +266,11 @@
                     var checkboxArr = [];
                      table.$('input[type="checkbox"]').each(function(){
                        if(this.checked){
-                          checkboxArr.push(this.value);
+                          if(this.value != '')
+                          {
+                            checkboxArr.push(this.value);
+                          }
+                          
                        }
                         
                      });
@@ -422,7 +426,8 @@
                           '<td>'+ (i+1)+'</td>'+
                           '<td>'+json[i]['DocumentChecklist'] +'</td>'+
                           '<td>'+json[i]['Required'] +'</td>'+
-                          '<td>'+'<a href = "<?php echo url_registration ?>document/'+Email+'/'+json[i]['Attachment']+'" target="_blank">File</a></td>'+
+                          // '<td>'+'<a href = "<?php echo url_registration ?>document/'+Email+'/'+json[i]['Attachment']+'" target="_blank">File</a></td>'+
+                          '<td>'+'<a href="javascript:void(0)" class="show_a_href" id = "show'+Email+'" filee = "'+json[i]['Attachment']+'" Email = "'+Email+'">File</a></td>'+
                           '<td>'+json[i]['Status'] +'</td>'
                           ; 
             }
@@ -439,6 +444,28 @@
                 'backdrop' : 'static'
             });
         })
+    });
+
+    $(document).on('click','.show_a_href', function () {
+        var file__  = $(this).attr('filee');
+        var emaiil  = $(this).attr('Email');
+        var aaa = file__.split(",");
+        // console.log(aaa);
+        if (aaa.length > 0) {
+            // var emaiil = $(this).attr('Email');
+            for (var i = 0; i < aaa.length; i++) {
+                // window.open('<?php echo url_registration ?>'+'uploads/document/'+NPM+'/'+aaa[i],'_blank');
+                // window.open('<?php echo url_registration ?>'+'document/'+emaiil+'/'+aaa[i],'_blank', 'modal=yes');
+                window.open('<?php echo url_registration ?>'+'document/'+emaiil+'/'+aaa[i],'_blank');
+            }
+            
+        }
+        else
+        {
+            // window.open('<?php echo url_pas ?>'+'uploads/document/'+NPM+'/'+file__,'_blank');
+            window.open('<?php echo url_registration ?>'+'document/'+emaiil+'/'+file__,'_blank');
+        }
+        
     });
 
     $(document).on('click','.Detail', function () {

@@ -433,6 +433,106 @@ class C_api extends CI_Controller {
 
     }
 
+    public function getStudentsAdmission(){
+        $requestData= $_REQUEST;
+
+        $dataYear = $this->input->get('dataYear');
+        $dataProdiID = $this->input->get('dataProdiID');
+        $dataStatus = $this->input->get('s');
+
+        $db_ = 'ta_'.$dataYear;
+
+        $dataWhere = 's.ProdiID = "'.$dataProdiID.'"';
+        $arryWhere = array('ProdiID' => $dataProdiID);
+        if($dataStatus!='' && $dataStatus!=null){
+            $arryWhere = array(
+                'ProdiID' => $dataProdiID,
+                'StatusStudentID' => $dataStatus
+            );
+            $dataWhere = 's.ProdiID = "'.$dataProdiID.'" AND s.StatusStudentID = "'.$dataStatus.'" ';
+        }
+
+        $totalData = $this->db->get_where($db_.'.students',$arryWhere
+                )->result_array();
+
+        $sql = 'SELECT asx.FormulirCode, s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, s.StatusStudentID, 
+                          ss.Description AS StatusStudent, ast.Password, ast.Password_Old, ast.Status AS StatusAuth, 
+                          ast.EmailPU
+                          FROM '.$db_.'.students s 
+                          LEFT JOIN db_academic.program_study ps ON (ps.ID = s.ProdiID)
+                          LEFT JOIN db_academic.status_student ss ON (ss.ID = s.StatusStudentID)
+                          LEFT JOIN db_academic.auth_students ast ON (ast.NPM = s.NPM)
+                          LEFT JOIN db_admission.to_be_mhs asx ON (ast.NPM = asx.NPM)
+                          ';
+
+        if( !empty($requestData['search']['value']) ) {
+            $sql.= ' WHERE '.$dataWhere.' AND ( s.NPM LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR s.Name LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR s.ClassOf LIKE "'.$requestData['search']['value'].'%" )';
+            $sql.= ' OR asx.FormulirCode LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' ORDER BY s.NPM, s.ProdiID ASC';
+        }
+        else {
+            $sql.= 'WHERE '.$dataWhere.' ORDER BY s.NPM, s.ProdiID ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+        }
+
+        // print_r($sql);die();
+
+        $query = $this->db->query($sql)->result_array();
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $Gender = ($row["Gender"]=='P') ? 'Female' : 'Male';
+
+            $label = '';
+            if($row['StatusStudentID']==7 || $row['StatusStudentID'] ==6 || $row['StatusStudentID'] ==4){
+                $label = 'style="color: red;"';
+            } else if($row['StatusStudentID'] ==2){
+                $label = 'style="color: #ff9800;"';
+            } else if($row['StatusStudentID'] ==3){
+                $label = 'style="color: green;"';
+            } else if($row['StatusStudentID'] ==1){
+                $label = 'style="color: #03a9f4;"';
+            }
+
+//            $nestedData[] = '<div style="text-align: center;">'.$row["NPM"].'</div>';
+            // $nestedData[] = '<div style="text-align: center;"><img src="'.base_url('uploads/students/').$db_.'/'.$row["Photo"].'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
+            $nestedData[] = $row["FormulirCode"];
+            $nestedData[] = '<a href="javascript:void(0);" data-npm="'.$row["NPM"].'" data-ta="'.$row["ClassOf"].'" class="btnDetailStudent"><b>'.$row["Name"].'</b></a><br/>'.$row["NPM"];
+            $nestedData[] = '<div style="text-align: center;"><button class="btn btn-inverse btn-notification btn-show" NPM="'.$row["NPM"].'" Name = "'.$row["Name"].'">Show</button></div>';
+            $nestedData[] = '<div style="text-align: center;">'.$Gender.'</div>';
+            // $nestedData[] = '<div class="dropdown">
+            //                       <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            //                         <i class="fa fa-pencil-square-o"></i>
+            //                         <span class="caret"></span>
+            //                       </button>
+            //                       <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+            //                         <li><a href="javascript:void(0);" class="btn-edit-student " data-npm="'.$row["NPM"].'" ta = "'.$db_.'">Edit Student</a></li>
+            //                         <li role="separator" class="divider"></li>
+            //                         <li><a href="javascript:void(0);" class="btn-reset-password " data-npm="'.$row["NPM"].'" data-name="'.$row["Name"].'" data-statusid="'.$row['StatusStudentID'].'">Reset Password</a></li>
+            //                         <li><a href="javascript:void(0);" class="btn-change-status " data-emailpu="'.$row["EmailPU"].'" data-year="'.$dataYear.'" data-npm="'.$row["NPM"].'" data-name="'.$row["Name"].'" data-statusid="'.$row['StatusStudentID'].'">Change Status</a></li>
+                                    
+            //                       </ul>
+            //                     </div>';
+//            $nestedData[] = $row["ProdiNameEng"];
+            $nestedData[] = '<div style="text-align: center;"><i class="fa fa-circle" '.$label.'></i></div>';
+
+            $data[] = $nestedData;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($totalData)),
+            "recordsFiltered" => intval( count($totalData) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+
+    }
+
     public function getAllMK(){
         $data = $this->m_api->__getAllMK();
         return print_r(json_encode($data));
@@ -2382,6 +2482,14 @@ class C_api extends CI_Controller {
         $input = $this->getInputToken();
         $this->load->model('admission/m_admission');
         $getData = $this->m_admission->getDataDokumentRegister($input['ID_register_formulir']);
+        echo json_encode($getData);
+    }
+
+    public function getDocumentAdmisiMHS()
+    {
+        $input = $this->getInputToken();
+        $this->load->model('admission/m_admission');
+        $getData = $this->m_admission->getDocumentAdmisiMHS($input['NPM']);
         echo json_encode($getData);
     }
 
