@@ -1103,9 +1103,11 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(17,$h,'',0,0);
         $pdf->Cell(135,$h,'ANSWER SHEET',0,1,'C');
 
-        $pdf->Cell(135,$h,'ATTENDANCE FINAL EXAMINATION',0,0,'C');
+        $xam_t = ($data_arr['Exam']=='uts' || $data_arr['Exam']=='UTS') ? 'MID EXAM' : 'FINAL EXAM';
+
+        $pdf->Cell(135,$h,'ATTENDANCE '.$xam_t,0,0,'C');
         $pdf->Cell(17,$h,'',0,0);
-        $pdf->Cell(135,$h,'ATTENDANCE FINAL EXAMINATION',0,1,'C');
+        $pdf->Cell(135,$h,'ATTENDANCE '.$xam_t,0,1,'C');
 
         $pdf->Cell(135,$h,'EVEN SEMESTER',0,0,'C');
         $pdf->Cell(17,$h,'',0,0);
@@ -1517,7 +1519,10 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetFont('Arial','B',10);
         $pdf->Cell(185,7,'',0,1);
-        $pdf->Cell(185,5,'ATTENDANCE FINAL EXAMINATION',0,1,'C');
+
+        $xam_t = ($dataExam['Exam']=='uts' || $dataExam['Exam']=='UTS') ? 'MID EXAM' : 'FINAL EXAM';
+
+        $pdf->Cell(185,5,'ATTENDANCE '.$xam_t,0,1,'C');
         $pdf->Cell(185,5,'EVEN SEMESTER ACADEMIC YEAR '.$dataExam['Semester'],0,1,'C');
 
         $pdf->Cell(185,7,'',0,1,'');
