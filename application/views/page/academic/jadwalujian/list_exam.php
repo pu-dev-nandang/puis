@@ -40,6 +40,10 @@
     </div>
 </div>
 
+<form id="form2savePDF_Exam" action="" target="_blank" hidden method="post">
+    <textarea id="formAreaPDF_Exam" class="hide" hidden readonly name="token"></textarea>
+</form>
+
 
 <script>
     $(document).ready(function () {
@@ -96,6 +100,17 @@
         });
 
     });
+
+    $(document).on('click','.btnSave2PDF_Exam',function () {
+        var token = $(this).attr('data-token');
+        var url = $(this).attr('data-url');
+
+        $('#form2savePDF_Exam').attr('action',base_url_js+''+url);
+        $('#formAreaPDF_Exam').val(token);
+
+        $('#form2savePDF_Exam').submit();
+
+    });
     
     function loadDataExam() {
         var filterSemester = $('#filterSemester').val();
@@ -112,6 +127,7 @@
                     '                        <th style="width: 1%;">No</th>' +
                     '                        <th>Course</th>' +
                     '                        <th style="width: 20%;">Pengawas</th>' +
+                    '                        <th style="width: 5%;">Student</th>' +
                     '                        <th style="width: 5%;">Action</th>' +
                     '                        <th style="width: 20%;">Date</th>' +
                     '                        <th style="width: 10%;">Time</th>' +
@@ -129,6 +145,7 @@
                 var data = {
                     action : 'showDataExam',
                     SemesterID : filterSemester.split('.')[0],
+                    Semester : $('#filterSemester option:selected').text(),
                     ProdiID : ProdiID,
                     Type : filterExam
                 };
