@@ -12,6 +12,14 @@
 			<div class="widget-content">
 				<div class="form-horizontal">
 					<div class="form-group">
+						<div class="col-xs-12">
+							<div class="thumbnail" style="padding: 10px;">
+							    <b>Note : </b>
+							    <p><b>Data yang diimport ke system adalah data pembayaran yang telah lunas</b> </p> 
+							</div>
+						</div>
+					</div>	
+					<div class="form-group">
 							<div class="col-xs-2">
 						        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
 						            <select class="form-control" id="selectPTID">
@@ -28,19 +36,26 @@
 						            </select>
 						        </div>
 							</div>
-							<div class="col-xs-2" style="">
+							<div class="col-xs-1" style="">
 								<label class="control-label">Upload File:</label>
 								<input type="file" data-style="fileinput" id="ExFile">
 							</div>
-							<a href="<?php echo base_url('download_template/finance-Template_import_pembayaran_manual.xlsx'); ?>">File Template</a>
 							<div class="col-xs-1">
+								<label class="control-label"><a href="<?php echo base_url('download_template/finance-Template_import_pembayaran_manual.xlsx'); ?>">Template</a></label>
+							</div>	
+							<!-- <div class="col-xs-2">
 								<button class="btn btn-inverse btn-notification" id="btn-proses">Proses</button>
-							</div>
+							</div> -->
 						</div>
 						<div class="form-group">
 							<div class="form-check col-xs-2">
 							    <input type="checkbox" class="form-check-input" id="maba">
 							    <label class="form-check-label" for="exampleCheck1">Mahasiswa Baru</label>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="form-check col-xs-2">
+								<button class="btn btn-inverse btn-notification" id="btn-proses">Proses</button>
 							</div>
 						</div>
 					<!-- </div> -->
