@@ -261,14 +261,40 @@
 
     }
 
+    function submit(action, method, values) {
+        var form = $('<form/>', {
+            action: action,
+            method: method
+        });
+        $.each(values, function() {
+            form.append($('<input/>', {
+                type: 'hidden',
+                name: this.name,
+                value: this.value
+            }));    
+        });
+        form.attr('target', '_blank');
+        form.appendTo('body').submit();
+    }
+
     // edit Students
     $(document).on('click','.btn-edit-student',function () {
-        
+        var url = base_url_js+'academic/master/edit-student';
+        var NPM = $(this).attr('data-npm');
+        var Ta = $(this).attr('ta');
+        data = {
+          NPM : NPM,
+          Ta : Ta
+        }
+        var token = jwt_encode(data,"UAP)(*");
+        submit(url, 'POST', [
+            { name: 'token', value: token },
+        ]);
     });
 
-    // Add Students
-    $(document).on('click','#btn_addstd',function () {
-        window.location.href = base_url_js+'academic/master/form_input_student';
-    });
+    // // Add Students
+    // $(document).on('click','#btn_addstd',function () {
+    //     window.location.href = base_url_js+'academic/master/form_input_student';
+    // });
 
 </script>

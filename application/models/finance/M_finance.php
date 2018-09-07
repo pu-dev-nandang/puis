@@ -2736,4 +2736,148 @@ class M_finance extends CI_Model {
 
    }
 
+   public function get_report_pembayaran_mhs($ta,$prodi,$NIM,$Semester,$limit, $start)
+   {
+    error_reporting(0);
+    $arr = array();
+    $this->load->model('master/m_master');
+    // print_r($start.' - '.$limit);die();
+
+    $arrDB = array();
+    $sqlDB = 'show databases like "%ta_2%"';
+    $queryDB=$this->db->query($sqlDB, array())->result_array();
+    foreach ($queryDB as $key) {
+      foreach ($key as $keyB ) {
+        $arrDB[] = $keyB;
+      }
+      
+    }
+
+    rsort($arrDB);
+    // print_r($arrDB);die();
+
+    $CountLimit = $start + $limit;
+    $CountLimit = ($CountLimit > count($queryDB)) ? count($queryDB) : $CountLimit;
+
+    // join dengan table auth terlebih dahulu
+    // $PTID = ($PTID == '' || $PTID == Null) ? '' : ' and a.PTID = '.$PTID;
+    $PTID = '';
+    $NIM = ($NIM == '' || $NIM == Null) ? 'where a.NPM like "%"' : ' where  a.NPM = '.$NIM;
+    $Semester = ($Semester == '' || $Semester == Null) ? '' : ' and SemesterID = '.$Semester;
+
+    // get Number VA Mahasiswa
+        $Const_VA = $this->m_master->showData_array('db_va.master_va');
+        // $No = $start + 1;
+        $No = 1;
+    for ($x=$start; $x < $CountLimit; $x++) { 
+      $dbget = $arrDB[$x];
+      
+      if ($ta == '') {
+        $ex = explode('_', $dbget);
+        $ta1 = $ex[1];
+      }
+      else
+      {
+        $ta = explode('.', $ta);
+        $ta1 = $ta[1];
+        $x = $CountLimit;
+      }
+
+      // print_r($ta1);
+
+      // get Data Mahasiswa
+      $sql = 'select a.NPM,a.Name,b.NameEng from ta_'.$ta1.'.students as a join db_academic.program_study as b on a.ProdiID = b.ID where StatusStudentID in (3,2,7)';
+      $query=$this->db->query($sql, array())->result_array();
+      // print_r($query);
+      for ($u=0; $u < count($query); $u++) { 
+        $arrMHS = array(
+            'No' => $No,
+            'NPM' => $query[$u]['NPM'],
+            'Name' => $query[$u]['Name'],
+            'ProdiENG' => $query[$u]['NameEng'],
+            'Year' => $ta1,
+        );
+
+        // cek BPP 
+        $sqlBPP = 'select * from db_finance.payment where PTID = 2 and NPM = ? '.$Semester; //  limit 1
+        $queryBPP=$this->db->query($sqlBPP, array($query[$u]['NPM']))->result_array();
+        $arrBPP = array(
+          'BPP' => '0',
+          'PayBPP' => '0',
+          'SisaBPP' => '0',
+          'DetailPaymentBPP' => '',
+        );
+          if (count($queryBPP) > 0) {
+              for ($t=0; $t < count($queryBPP); $t++) { 
+                // cek payment students
+                $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$queryBPP[$t]['ID']);
+                $PayBPP = 0;
+                $SisaBPP = 0;
+                for ($r=0; $r < count($Q_invStudent); $r++) { 
+                  if ($Q_invStudent[$r]['Status'] == 1) { // lunas
+                    $PayBPP = $PayBPP + $Q_invStudent[$r]['Invoice'];
+                  }
+                  else
+                  {
+                    $SisaBPP = $SisaBPP + $Q_invStudent[$r]['Invoice'];
+                  }
+                }
+
+                $arrBPP = array(
+                  'BPP' => (int)$queryBPP[$t]['Invoice'],
+                  'PayBPP' => (int)$PayBPP,
+                  'SisaBPP' => (int)$SisaBPP,
+                  'DetailPaymentBPP' => $Q_invStudent,
+                );
+
+              }
+          }
+
+        // cek SPP 
+        $sqlSPP = 'select * from db_finance.payment where PTID = 3 and NPM = ? '.$Semester; // limit 1
+        $querySPP=$this->db->query($sqlSPP, array($query[$u]['NPM']))->result_array();
+        $arrSPP = array(
+          'SPP' => '0',
+          'PaySPP' => '0',
+          'SisaSPP' => '0',
+          'DetailPaymentSPP' => '',
+        );
+          if (count($querySPP) > 0) {
+              for ($t=0; $t < count($querySPP); $t++) { 
+                // cek payment students
+                $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$querySPP[$t]['ID']);
+                $PaySPP = 0;
+                $SisaSPP = 0;
+                for ($r=0; $r < count($Q_invStudent); $r++) { 
+                  if ($Q_invStudent[$r]['Status'] == 1) { // lunas
+                    $PaySPP = $PaySPP + $Q_invStudent[$r]['Invoice'];
+                  }
+                  else
+                  {
+                    $SisaSPP = $SisaSPP + $Q_invStudent[$r]['Invoice'];
+                  }
+                }
+
+                $arrSPP = array(
+                  'SPP' => (int)$querySPP[$t]['Invoice'],
+                  'PaySPP' => (int)$PaySPP,
+                  'SisaSPP' => (int)$SisaSPP,
+                  'DetailPaymentSPP' => $Q_invStudent,
+                );
+
+              }
+          }  
+        if ($arrBPP['SisaBPP'] > 0 || $arrSPP['SisaSPP'] > 0) {
+            $arr[] = $arrMHS + $arrBPP + $arrSPP ; 
+        }  
+        
+        $No++;
+      } // loop per mhs
+
+    }
+
+    // print_r($arr);die();
+    return $arr;
+   }
+
 }

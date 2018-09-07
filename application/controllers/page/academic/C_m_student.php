@@ -51,5 +51,13 @@ class C_m_student extends Academic_Controler {
         $this->temp($content);
     }
 
+    public function edit_student()
+    {
+        $input = $this->getInputToken();
+        $arr = $this->m_master->caribasedprimary($input['Ta'].'.students','NPM',$input['NPM']);
+
+        print_r($arr);
+    }
+
 
 }

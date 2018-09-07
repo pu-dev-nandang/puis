@@ -1955,8 +1955,10 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 $nama_bulan = "Agustus";
                 break;
             case 9:
-                return "September";
+                $nama_bulan = "September";
                 break;
+                // return "September";
+                // break;
             case 10:
                 $nama_bulan = "Oktober";
                 break;

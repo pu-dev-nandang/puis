@@ -10,13 +10,13 @@
 <div class="widget box">
     <div class="widget-header">
         <h4 class=""><i class="icon-reorder"></i> Students</h4>
-        <div class="toolbar no-padding">
+        <!-- <div class="toolbar no-padding">
             <div class="btn-group">
                         <span class="btn btn-xs" id="btn_addstd">
                             <i class="icon-plus"></i> Add Students
                         </span>
             </div>
-        </div>
+        </div> -->
     </div>
     <div class="widget-content no-padding">
 

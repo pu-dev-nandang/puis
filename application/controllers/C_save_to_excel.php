@@ -190,6 +190,14 @@ class C_save_to_excel extends CI_Controller
          $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
     }
 
+    public function export_excel_report_finance()
+    {
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $input = (array) $this->jwt->decode($token,$key);
+        print_r($input);
+    }
+
     public function export_excel_payment_received()
     {
         $token = $this->input->post('token');
