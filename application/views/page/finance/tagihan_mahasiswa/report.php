@@ -437,7 +437,7 @@
                                 '<td>'+keterangan+'</td>' +
                                 '</tr>');
                             var valueToPush = new Array();
-                            valueToPush = [no,Data_mhs[i]['Name'],Data_mhs[i]['NPM'],Data_mhs[i]['ProdiENG'],formatRupiah(Data_mhs[i]['BPP']),formatRupiah(Data_mhs[i]['Cr']),formatRupiah(Total_tagihan),formatRupiah(Total_pembayaran),formatRupiah(Piutang),ketEXcel];
+                            valueToPush = [no,Data_mhs[i]['Name'],Data_mhs[i]['NPM'],Data_mhs[i]['ProdiENG'],Data_mhs[i]['BPP'],Data_mhs[i]['Cr'],Total_tagihan,Total_pembayaran,Piutang,ketEXcel,Data_mhs[i]['Year']];
                             // console.log(valueToPush);
                             // dataa[] = [no,Data_mhs[i]['Name'],Data_mhs[i]['NPM']];
                             dataa.push(valueToPush);
@@ -455,14 +455,14 @@
                           );
 
                         summary = {
-                          sumTagihan : formatRupiah(sumTagihan),
-                          sumPembayaran : formatRupiah(sumPembayaran),
-                          sumPiutang : formatRupiah(sumPiutang),
+                          sumTagihan : sumTagihan,
+                          sumPembayaran : sumPembayaran,
+                          sumPiutang : sumPiutang,
                           taShow : 'Total '+taShow
                         };
 
                 } else {
-                    $('#dataRow').append('<tr><td colspan="8" align = "center">No Result Data</td></tr>');
+                    $('#dataRow').append('<tr><td colspan="9" align = "center">No Result Data</td></tr>');
                 }
             },500);    
         }).fail(function() {
