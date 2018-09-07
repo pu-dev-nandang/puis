@@ -886,6 +886,659 @@ class C_save_to_pdf extends CI_Controller {
 
     }
 
+    // ========== Exam PDF =========
+
+    public function filterDocument(){
+        $token = $this->input->post('token');
+        $data_arr = $this->getInputToken($token);
+//        print_r($data_arr);
+
+
+        if($data_arr['DocumentType']==1){
+
+            // Get data exam
+            $dataExam = $this->m_save_to_pdf->getExamSchedule($data_arr['SemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
+
+
+            $pdf = new FPDF('l','mm','A4');
+
+            if(count($dataExam)>0){
+                for($ex=0;$ex<count($dataExam);$ex++){
+                    if(count($dataExam[$ex]['Course'])>0){
+                        for($i=0;$i<count($dataExam[$ex]['Course']);$i++){
+                            // membuat halaman baru
+                            $pdf->AddPage();
+                            $dataDetailExam = $dataExam[$ex];
+                            $dataCourse = $dataExam[$ex]['Course'][$i];
+
+                            $this->news_event($pdf,$data_arr,$dataDetailExam,$dataCourse);
+
+                            $pdf->SetFont('Times','',7);
+                            $pdf->Ln(9);
+                            $pdf->Cell(135,1,'Page : '.$pdf->PageNo().' of {nb}',0,0,'R');
+                            $pdf->Cell(17,1,'',0,0);
+                            $pdf->Cell(135,1,'Page : '.$pdf->PageNo().' of {nb}',0,1,'R');
+                            $pdf->AliasNbPages();
+
+                        }
+                    }
+                }
+            }
+
+            $pdf->Output('document_penyerahan_berkas.pdf','I');
+        }
+        else if($data_arr['DocumentType']==2){
+
+            // Get data exam
+            $dataExam = $this->m_save_to_pdf->getExamSchedule($data_arr['SemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
+
+
+            $pdf = new FPDF('P','mm','A4');
+
+            if(count($dataExam)>0){
+                for($ex=0;$ex<count($dataExam);$ex++){
+                    if(count($dataExam[$ex]['Course'])>0){
+                        for($i=0;$i<count($dataExam[$ex]['Course']);$i++){
+                            // membuat halaman baru
+                            $pdf->AddPage();
+                            $dataDetailExam = $dataExam[$ex];
+                            $dataCourse = $dataExam[$ex]['Course'][$i];
+
+                            $this->news_implementation($pdf,$data_arr,$dataDetailExam,$dataCourse);
+
+                            $pdf->SetFont('Times','',7);
+                            $pdf->Ln(9);
+                            $pdf->Cell(195,1,'Page : '.$pdf->PageNo().' of {nb}',0,1,'R');
+                            $pdf->AliasNbPages();
+
+                        }
+                    }
+                }
+            }
+
+            $pdf->Output('document_pelaksaan_ujian.pdf','I');
+        }
+        else if($data_arr['DocumentType']==3){
+
+            // Get data exam
+            $dataExam = $this->m_save_to_pdf->getExamScheduleWithStudent($data_arr['SemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
+
+            $pdf = new FPDF('P','mm','A4');
+
+            if(count($dataExam)>0){
+
+                for($ex=0;$ex<count($dataExam);$ex++){
+                    if(count($dataExam[$ex]['Course'])>0){
+                        for($i=0;$i<count($dataExam[$ex]['Course']);$i++){
+                            // membuat halaman baru
+                            $pdf->AddPage();
+                            $dataDetailExam = $dataExam[$ex];
+                            $dataCourse = $dataExam[$ex]['Course'][$i];
+
+                            $this->exam_attendance_students($pdf,$data_arr,$dataDetailExam,$dataCourse);
+
+                            $pdf->SetFont('Times','',7);
+                            $pdf->Ln(9);
+                            $pdf->Cell(195,1,'Page : '.$pdf->PageNo().' of {nb}',0,1,'R');
+                            $pdf->AliasNbPages();
+
+                        }
+                    }
+                }
+
+            }
+
+            $pdf->Output('document_attendance_exam_student.pdf','I');
+        }
+        else if($data_arr['DocumentType']==4){
+            // Get data exam
+            $dataExam = $this->m_save_to_pdf->getExamSchedule($data_arr['SemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
+
+//            print_r($dataExam);
+//            exit;
+
+            $pdf = new FPDF('L','mm','A4');
+            if(count($dataExam)>0){
+                $pdf->SetMargins(10,3,10);
+                $pdf->AddPage();
+
+                $this->header_attendance_pengawas($pdf);
+
+                $h = 7;
+
+                $pdf->Cell(23,$h,'Group',1,0,'C');
+                $pdf->Cell(99,$h,'Course',1,0,'C');
+                $pdf->Cell(60,$h,'Pengawas',1,0,'C');
+
+                $pdf->Cell(25,$h,'Time',1,0,'C');
+                $pdf->Cell(20,$h,'Room',1,0,'C');
+                $pdf->Cell(30,$h,'Taken',1,0,'C');
+                $pdf->Cell(30,$h,'Returned',1,1,'C');
+
+                for($ex=0;$ex<count($dataExam);$ex++){
+
+                    $dataDetailExam = $dataExam[$ex];
+
+                    $this->attendance_pengawas($pdf,$data_arr,$dataDetailExam);
+                }
+            }
+
+            $pdf->Output('document_pengawas.pdf','I');
+
+        }
+
+
+    }
+
+    private function news_event($pdf,$data_arr,$dataDetailExam,$dataCourse){
+
+//        $pdf->SetMargins(5,5,0);
+
+        $pdf->Rect(3, 7, 140, 185);
+        $pdf->Rect(155, 7, 140, 185);
+
+        $pdf->Image(base_url('images/icon/favicon.png'),5,10,13);
+        $pdf->Image(base_url('images/icon/favicon.png'),158,10,13);
+
+        $h=7;
+
+        $pdf->SetFont('Times','B',12);
+        $pdf->Cell(133,$h,'Universitas Agung Podomoro',0,0,'C');
+        $pdf->Cell(20,$h,'',0,0);
+        $pdf->Cell(132,$h,'Universitas Agung Podomoro',0,1,'C');
+
+        $h=5;
+
+        $pdf->SetFont('Times','',10);
+        $pdf->Cell(135,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
+
+        $pdf->Cell(135,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
+
+        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
+
+        $pdf->Line(3,33,143,33);
+        $pdf->Line(155,33,295,33);
+
+        $pdf->Ln(4);
+
+        $pdf->SetFont('Times','B',10);
+
+        $pdf->Cell(135,$h,'EXAM PAPER HANDOVER',0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'EXAM PAPER HANDOVER',0,1,'C');
+
+        $pdf->Cell(135,$h,'ACADEMIC YEAR '.strtoupper($data_arr['Semester']),0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'ACADEMIC YEAR '.strtoupper($data_arr['Semester']),0,1,'C');
+
+        $pdf->SetFont('Times','',10);
+
+        $pdf->Ln(4);
+        $examType = ($data_arr['Type']=='UTS' || $data_arr['Type']=='uts')
+            ? 'Mid Exam' : 'Fina Exam';
+
+        $pdf->Cell(135,$h,'It has handover exam paper of '.$examType,0,0,'L');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'It has handover exam paper of '.$examType,0,1,'L');
+
+        $pdf->Ln(4);
+
+        $w_t = 30;
+        $w_pars = 5;
+        $w_fill = 100;
+        $w_space = 17;
+
+        $pdf->Cell($w_t,$h,'Class Group',0,0,'L');
+        $pdf->Cell($w_pars,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,$dataCourse['ClassGroup'],0,0,'L');
+        $pdf->Cell($w_space,$h,'',0,0);
+        $pdf->Cell($w_t,$h,'Class Group',0,0,'L');
+        $pdf->Cell($w_pars,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,$dataCourse['ClassGroup'],0,1,'L');
+
+
+        $pdf->Cell($w_t,$h,'Code',0,0,'L');
+        $pdf->Cell($w_pars,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,$dataCourse['MKCode'],0,0,'L');
+        $pdf->Cell($w_space,$h,'',0,0);
+        $pdf->Cell($w_t,$h,'Code',0,0,'L');
+        $pdf->Cell($w_pars,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,$dataCourse['MKCode'],0,1,'L');
+
+
+        $pdf->Cell($w_t,$h,'Course',0,0,'L');
+        $pdf->Cell($w_pars,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,$dataCourse['Course'],0,0,'L');
+        $pdf->Cell($w_space,$h,'',0,0);
+        $pdf->Cell($w_t,$h,'Course',0,0,'L');
+        $pdf->Cell($w_pars,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,$dataCourse['Course'],0,1,'L');
+
+
+        $pdf->Cell($w_t,$h,'Lecturer',0,0,'L');
+        $pdf->Cell($w_pars,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,$dataCourse['Lecturere'],0,0,'L');
+        $pdf->Cell($w_space,$h,'',0,0);
+        $pdf->Cell($w_t,$h,'Lecturer',0,0,'L');
+        $pdf->Cell($w_pars,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,$dataCourse['Lecturere'],0,1,'L');
+
+
+        $pdf->Cell($w_t,$h,'Day, Date',0,0,'L');
+        $pdf->Cell($w_pars,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,date("l, d F Y", strtotime($dataDetailExam['ExamDate'])),0,0,'L');
+        $pdf->Cell($w_space,$h,'',0,0);
+        $pdf->Cell($w_t,$h,'Day, Date',0,0,'L');
+        $pdf->Cell($w_pars,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,date("l, d F Y", strtotime($dataDetailExam['ExamDate'])),0,1,'L');
+
+
+        $pdf->Cell($w_t,$h,'Time',0,0,'L');
+        $pdf->Cell($w_pars,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,substr($dataDetailExam['ExamStart'],0,5).' - '.substr($dataDetailExam['ExamEnd'],0,5),0,0,'L');
+        $pdf->Cell($w_space,$h,'',0,0);
+        $pdf->Cell($w_t,$h,'Time',0,0,'L');
+        $pdf->Cell($w_pars,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,substr($dataDetailExam['ExamStart'],0,5).' - '.substr($dataDetailExam['ExamEnd'],0,5),0,1,'L');
+
+        $pdf->Cell($w_t,$h,'Room',0,0,'L');
+        $pdf->Cell($w_pars,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,$dataDetailExam['Room'],0,0,'L');
+        $pdf->Cell($w_space,$h,'',0,0);
+        $pdf->Cell($w_t,$h,'Room',0,0,'L');
+        $pdf->Cell($w_pars,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,$dataDetailExam['Room'],0,1,'L');
+
+        $pdf->Cell($w_t,$h,'Total Script',0,0,'L');
+        $pdf->Cell($w_pars,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,'_ _ _ _ _ _ _ _ _ _ _ _ _ _',0,0,'L');
+        $pdf->Cell($w_space,$h,'',0,0);
+        $pdf->Cell($w_t,$h,'Total Script',0,0,'L');
+        $pdf->Cell($w_pars,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,'_ _ _ _ _ _ _ _ _ _ _ _ _ _',0,1,'L');
+
+
+        $pdf->Ln(10);
+
+        $pdf->Line(25,107,130,107);
+        $pdf->Line(180,107,280,107);
+
+        $pdf->SetFont('Times','B',11);
+        $pdf->Cell(135,$h,'Taking',0,0,'L');
+        $pdf->Cell($w_space,$h,'',0,0);
+        $pdf->Cell(135,$h,'Taking',0,1,'L');
+
+        $pdf->SetFont('Times','B',10);
+        $pdf->Cell(67.5,$h,'Submitted by',0,0,'C');
+        $pdf->Cell(67.5,$h,'Received by',0,0,'C');
+        $pdf->Cell($w_space,$h,'',0,0);
+        $pdf->Cell(67.5,$h,'Submitted by',0,0,'C');
+        $pdf->Cell(67.5,$h,'Received by',0,1,'C');
+
+        $pdf->Ln(15);
+        $pdf->SetFont('Times','',10);
+        $pdf->Cell(67.5,$h,'( _ _ _ _ _ _ _ _ _ _ )',0,0,'C');
+        $pdf->Cell(67.5,$h,'( _ _ _ _ _ _ _ _ _ _ )',0,0,'C');
+        $pdf->Cell($w_space,$h,'',0,0);
+        $pdf->Cell(67.5,$h,'( _ _ _ _ _ _ _ _ _ _ )',0,0,'C');
+        $pdf->Cell(67.5,$h,'( _ _ _ _ _ _ _ _ _ _ )',0,1,'C');
+
+        $pdf->Ln(10);
+
+        $pdf->Line(25,147,130,147);
+        $pdf->Line(180,147,280,147);
+
+        $pdf->SetFont('Times','B',11);
+        $pdf->Cell(135,$h,'Return',0,0,'L');
+        $pdf->Cell($w_space,$h,'',0,0);
+        $pdf->Cell(135,$h,'Return',0,1,'L');
+
+        $pdf->SetFont('Times','B',10);
+        $pdf->Cell(67.5,$h,'Submitted by',0,0,'C');
+        $pdf->Cell(67.5,$h,'Received by',0,0,'C');
+        $pdf->Cell($w_space,$h,'',0,0);
+        $pdf->Cell(67.5,$h,'Submitted by',0,0,'C');
+        $pdf->Cell(67.5,$h,'Received by',0,1,'C');
+
+        $pdf->Ln(15);
+        $pdf->SetFont('Times','',10);
+        $pdf->Cell(67.5,$h,'( _ _ _ _ _ _ _ _ _ _ )',0,0,'C');
+        $pdf->Cell(67.5,$h,'( _ _ _ _ _ _ _ _ _ _ )',0,0,'C');
+        $pdf->Cell($w_space,$h,'',0,0);
+        $pdf->Cell(67.5,$h,'( _ _ _ _ _ _ _ _ _ _ )',0,0,'C');
+        $pdf->Cell(67.5,$h,'( _ _ _ _ _ _ _ _ _ _ )',0,1,'C');
+
+    }
+
+    private function news_implementation($pdf,$data_arr,$dataDetailExam,$dataCourse){
+
+//        $pdf->Rect(10, 7, 195, 280);
+
+        $pdf->Image(base_url('images/icon/favicon.png'),15,13,15);
+
+        $pdf->SetFont('Times','I',7);
+        $pdf->Cell(195,1,'FM-UAP/AKD-13-05',0,1,'R');
+
+        $h = 5;
+
+        $pdf->SetFont('Times','B',14);
+        $pdf->Cell(195,$h,'Universitas Agung Podomoro',0,1,'C');
+
+        $pdf->Ln(1);
+
+        $pdf->SetFont('Times','',10);
+        $pdf->Cell(195,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
+        $pdf->Cell(195,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
+        $pdf->Cell(195,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
+
+        $pdf->Line(10,35,205,35);
+
+        $pdf->Ln(10);
+
+        $pdf->SetFont('Times','B',12);
+        $pdf->Cell(195,$h,'EXAMINATION FORM',0,1,'C');
+        $pdf->Cell(195,$h,'ACADEMIC YEAR '.strtoupper($data_arr['Semester']),0,1,'C');
+
+        $examType = ($data_arr['Type']=='UTS' || $data_arr['Type']=='uts')
+            ? 'Mid Exam' : 'Fina Exam';
+
+        $pdf->Ln(5);
+        $pdf->SetFont('Times','',10);
+        $pdf->Cell(195,$h,'Today, it has conducated for '.$examType,0,1,'L');
+
+        $w_sp1 = 10;
+        $w_label = 30;
+        $w_sp2 = 5;
+        $w_fill = 150;
+
+        $pdf->Ln(5);
+
+        $h = 7;
+
+        $pdf->Cell($w_sp1,$h,'',0,0,'L');
+        $pdf->Cell($w_label,$h,'Class Group',0,0,'L');
+        $pdf->Cell($w_sp2,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,$dataCourse['ClassGroup'],0,1,'L');
+
+        $pdf->Cell($w_sp1,$h,'',0,0,'L');
+        $pdf->Cell($w_label,$h,'Code',0,0,'L');
+        $pdf->Cell($w_sp2,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,$dataCourse['MKCode'],0,1,'L');
+
+        $pdf->Cell($w_sp1,$h,'',0,0,'L');
+        $pdf->Cell($w_label,$h,'Course',0,0,'L');
+        $pdf->Cell($w_sp2,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,$dataCourse['Course'],0,1,'L');
+
+        $pdf->Cell($w_sp1,$h,'',0,0,'L');
+        $pdf->Cell($w_label,$h,'Lecturer',0,0,'L');
+        $pdf->Cell($w_sp2,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,$dataCourse['Lecturere'],0,1,'L');
+
+        $pdf->Cell($w_sp1,$h,'',0,0,'L');
+        $pdf->Cell($w_label,$h,'Day, Date',0,0,'L');
+        $pdf->Cell($w_sp2,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,date("l, d F Y", strtotime($dataDetailExam['ExamDate'])),0,1,'L');
+
+        $pdf->Cell($w_sp1,$h,'',0,0,'L');
+        $pdf->Cell($w_label,$h,'Time',0,0,'L');
+        $pdf->Cell($w_sp2,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,substr($dataDetailExam['ExamStart'],0,5).' - '.substr($dataDetailExam['ExamEnd'],0,5),0,1,'L');
+
+        $pdf->Cell($w_sp1,$h,'',0,0,'L');
+        $pdf->Cell($w_label,$h,'Room',0,0,'L');
+        $pdf->Cell($w_sp2,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,$dataDetailExam['Room'],0,1,'L');
+
+
+        $pdf->Cell($w_sp1,$h,'',0,0,'L');
+        $pdf->Cell($w_label,$h,'Present',0,0,'L');
+        $pdf->Cell($w_sp2,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,'_ _ _ _ _ _ student',0,1,'L');
+
+        $pdf->Cell($w_sp1,$h,'',0,0,'L');
+        $pdf->Cell($w_label,$h,'Absent',0,0,'L');
+        $pdf->Cell($w_sp2,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,'_ _ _ _ _ _ student',0,1,'L');
+
+        $pdf->Ln(5);
+        $pdf->SetFont('Times','B',10);
+        $pdf->SetFillColor(226, 226, 226);
+        $pdf->Cell($w_sp1,$h,'',0,0,'C');
+        $pdf->Cell(10,$h,'No',1,0,'C',true);
+        $pdf->Cell(30,$h,'NIM',1,0,'C',true);
+        $pdf->Cell(50,$h,'Name',1,0,'C',true);
+        $pdf->Cell(95,$h,'Description',1,1,'C',true);
+
+//        $pdf->SetFont('Times','',10);
+        for($s=1;$s<=5;$s++){
+            $pdf->Cell($w_sp1,$h,'',0,0,'C');
+            $pdf->Cell(10,$h,$s,1,0,'C');
+            $pdf->Cell(30,$h,'',1,0,'C');
+            $pdf->Cell(50,$h,'',1,0,'C');
+            $pdf->Cell(95,$h,'',1,1,'C');
+        }
+
+        $pdf->Ln(5);
+
+        $pdf->Cell(195,$h,'Remark during exam session :',0,1,'L');
+        for($s=1;$s<=5;$s++){
+            $pdf->Cell(195,$h,'','B',1,'L');
+        }
+
+        $pdf->Ln(5);
+
+        $pdf->Cell(195,$h,'Jakarta, '.date("d F Y", strtotime($dataDetailExam['ExamDate'])),0,1,'R');
+
+        $pdf->Cell(97.5,$h,'Invigilator 1',0,0,'C');
+        $pdf->Cell(97.5,$h,'Invigilator 2',0,1,'C');
+
+        $pdf->Ln(15);
+
+        $pdf->Cell(97.5,$h,'(_ _ _ _ _ _ _ _ _ _ _ _ _ _)',0,0,'C');
+        $pdf->Cell(97.5,$h,'(_ _ _ _ _ _ _ _ _ _ _ _ _ _)',0,1,'C');
+
+    }
+
+    private function exam_attendance_students($pdf,$data_arr,$dataDetailExam,$dataCourse){
+        $pdf->Image(base_url('images/icon/favicon.png'),15,13,15);
+
+        $pdf->SetFont('Times','I',7);
+        $pdf->Cell(195,1,'FM-UAP/AKD-13-03A',0,1,'R');
+
+        $h = 5;
+
+        $pdf->SetFont('Times','B',14);
+        $pdf->Cell(195,$h,'Universitas Agung Podomoro',0,1,'C');
+
+        $pdf->Ln(1);
+
+        $pdf->SetFont('Times','',10);
+        $pdf->Cell(195,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
+        $pdf->Cell(195,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
+        $pdf->Cell(195,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
+
+        $pdf->Line(10,35,205,35);
+
+        $pdf->Ln(7);
+
+        $pdf->SetFont('Times','B',10);
+        $pdf->Cell(195,$h,'ATTENDANCE FINAL EXAM',0,1,'C');
+        $pdf->Cell(195,$h,'EVEN SEMESTER ACADEMIC YEAR '.strtoupper($data_arr['Semester']),0,1,'C');
+
+        $pdf->Ln(5);
+        $pdf->SetFont('Times','',10);
+
+
+        $w_label_r = 22;
+        $w_sp_r = 3;
+        $w_fill_r = 105;
+
+        $w_label_l = 18;
+        $w_sp_l = 3;
+        $w_fill_l = 45;
+
+        $pdf->Cell($w_label_r,$h,'Class Group',0,0,'L');
+        $pdf->Cell($w_sp_r,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_r,$h,$dataCourse['ClassGroup'],0,0,'L');
+
+        $pdf->Cell($w_label_l,$h,'Day, Date',0,0,'L');
+        $pdf->Cell($w_sp_l,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_l,$h,date("l, d M Y", strtotime($dataDetailExam['ExamDate'])),0,1,'L');
+
+        $dCourse = (strlen($dataCourse['Course'])>=50) ? substr($dataCourse['Course'],0,50).'_' : $dataCourse['Course'];
+
+        $pdf->Cell($w_label_r,$h,'Course',0,0,'L');
+        $pdf->Cell($w_sp_r,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_r,$h,$dataCourse['MKCode'].' - '.$dCourse,0,0,'L');
+
+        $pdf->Cell($w_label_l,$h,'Time',0,0,'L');
+        $pdf->Cell($w_sp_l,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_l,$h,substr($dataDetailExam['ExamStart'],0,5).' - '.substr($dataDetailExam['ExamEnd'],0,5),0,1,'L');
+
+        $pdf->Cell($w_label_r,$h,'Lecturer',0,0,'L');
+        $pdf->Cell($w_sp_r,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_r,$h,$dataCourse['Lecturere'],0,0,'L');
+
+        $pdf->Cell($w_label_l,$h,'Room',0,0,'L');
+        $pdf->Cell($w_sp_l,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_l,$h,$dataDetailExam['Room'],0,1,'L');
+
+        $pdf->Ln(5);
+        $pdf->SetFillColor(226, 226, 226);
+        $pdf->SetFont('Times','B',10);
+        $h = 7;
+        $pdf->Cell(10,$h,'No',1,0,'C',true);
+        $pdf->Cell(25,$h,'NIM',1,0,'C',true);
+        $pdf->Cell(110,$h,'Name',1,0,'C',true);
+        $pdf->Cell(30,$h,'Sign',1,0,'C',true);
+        $pdf->Cell(20,$h,'Score',1,1,'C',true);
+
+        $pdf->SetFont('Times','',10);
+//        $h = 5;
+
+        if(count($dataCourse['DetailStudents'])){
+            $no =1;
+            for($t=0;$t<count($dataCourse['DetailStudents']);$t++){
+                $d = $dataCourse['DetailStudents'][$t];
+                $pdf->Cell(10,$h,$no,1,0,'C');
+                $pdf->Cell(25,$h,$d['NPM'],1,0,'C');
+                $pdf->Cell(110,$h,ucwords(strtolower($d['Name'])),1,0,'L');
+                $pdf->Cell(30,$h,'',1,0,'C');
+                $pdf->Cell(20,$h,'',1,1,'C');
+
+                $no++;
+            }
+        }
+
+        // Kosong
+        for($k=1;$k<=2;$k++){
+            $pdf->Cell(10,$h,'',1,0,'C');
+            $pdf->Cell(25,$h,'',1,0,'C');
+            $pdf->Cell(110,$h,'',1,0,'L');
+            $pdf->Cell(30,$h,'',1,0,'C');
+            $pdf->Cell(20,$h,'',1,1,'C');
+        }
+
+        $pdf->Ln(5);
+        $pdf->Cell(150,$h,'',0,0,'C');
+        $pdf->Cell(45,$h,'Sign by Lecturer',0,1,'C');
+
+        $pdf->Ln(8);
+
+        $pdf->Cell(150,$h,'',0,0,'C');
+        $pdf->Cell(45,$h,'( _ _ _ _ _ _ _ _ _ )',0,1,'C');
+
+
+    }
+
+    private function header_attendance_pengawas($pdf){
+        $pdf->Image(base_url('images/icon/favicon.png'),15,3,20);
+
+        $h = 5;
+
+        $pdf->SetFont('Times','B',14);
+        $pdf->Cell(287,$h,'Universitas Agung Podomoro',0,1,'C');
+
+        $pdf->Ln(1);
+
+        $pdf->SetFont('Times','',10);
+        $pdf->Cell(287,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
+        $pdf->Cell(287,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
+        $pdf->Cell(287,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
+
+        $pdf->Line(10,25,297,25);
+
+
+        $pdf->Ln(7);
+    }
+
+    private function attendance_pengawas($pdf,$data_arr,$dataDetailExam){
+
+
+        $totalCourse = count($dataDetailExam['Course']);
+        $h = 7;
+        $h_pengawas = ($h * $totalCourse)/2;
+
+        $h_d = $h*$totalCourse;
+
+        for($i=0;$i<count($dataDetailExam['Course']);$i++){
+            $d = $dataDetailExam['Course'][$i];
+            $pdf->Cell(23,$h,$d['ClassGroup'],1,0,'C');
+            $pdf->Cell(99,$h,$d['Course'],1,0,'L');
+
+            if($i==0){
+
+//                $pdf->Cell(122,$h_d,'',1,0,'C');
+
+                // Pengawas
+                $pdf->Cell(60,$h_d,'Pengawas',1,0,'C');
+                $pdf->Cell(25,$h_d,'Pengawas',1,0,'C');
+                $pdf->Cell(20,$h_d,'Pengawas',1,0,'C');
+                $pdf->Cell(30,$h_d,'Pengawas',1,0,'C');
+                $pdf->Cell(30,$h_d,'Pengawas',1,1,'C');
+
+            }
+
+            $n = ($i == (count($dataDetailExam['Course']) - 1)) ? 1 : 0;
+
+
+
+
+        }
+
+
+
+
+
+//        for ($i=0;$i<count($totalCourse['Course']);$i++){
+//
+//            if($i!=0){
+//                $pdf->Cell(8,$h,'',0,0,'C');
+//            }
+//
+//            $pdf->Cell(25,$h,'Time '.$i,1,0,'C');
+//            $pdf->Cell(20,$h,'Room',1,0,'C');
+//            $pdf->Cell(30,$h,'Taken',1,0,'C');
+//            $pdf->Cell(30,$h,'Returned',1,1,'C');
+//        }
+
+
+
+
+
+    }
+
+
+
+    //===========================
+
     public function listStudentsFromCourse(){
 
         $token = $this->input->get('token');
@@ -1352,7 +2005,7 @@ class C_save_to_pdf extends CI_Controller {
     }
 
     // Berita Acara dan Bukti Serah Terima berkas
-    public function news_event(){
+    public function news_event2(){
         $pdf = new FPDF('l','mm','A4');
         // membuat halaman baru
         $pdf->AddPage();

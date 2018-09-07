@@ -1553,7 +1553,7 @@ class M_api extends CI_Model {
         return $data->result_array();
     }
 
-    private function _getSemesterActive(){
+    public function _getSemesterActive(){
         $data = $this->db->get_where('db_academic.semester', array('Status'=>'1'),1);
 
         return $data->result_array()[0];
@@ -2110,15 +2110,18 @@ class M_api extends CI_Model {
         return $data;
     }
 
-    public function getDateExam(){
+    public function getDateExam($SemesterID){
 
-        $SemesterActive = $this->_getSemesterActive();
+//        $SemesterActive = $this->_getSemesterActive();
 
         $data = $this->db->query('SELECT * FROM db_academic.academic_years 
-                                          WHERE SemesterID = "'.$SemesterActive['ID'].'" 
-                                          LIMIT 1');
+                                          WHERE SemesterID = "'.$SemesterID.'" 
+                                          LIMIT 1')->result_array();
 
-        return $data->result_array()[0];
+
+
+
+        return (count($data))? $data[0] : [];
 
     }
 

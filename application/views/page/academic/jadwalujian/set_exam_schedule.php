@@ -45,7 +45,7 @@
                 <td>
                     <div class="row">
                         <div class="col-xs-8">
-                            <input id="formSemesterID" type="hidden" class="hide" hidden readonly>
+                            <input id="formSemesterID" class="hide" readonly hidden>
                             <div id="viewGroup"></div>
                         </div>
                         <div class="col-xs-2" style="padding-top: 5px;">
@@ -142,10 +142,19 @@
 
         window.notr = 0;
 
-        getDataCourse('#viewGroup','');
-        dateInputJadwal();
+        getIDSemesterActive('#formSemesterID');
 
-        loadSelectOptionClassroom('#formClassroom','');
+        getDataCourse('#viewGroup','');
+
+        var loadTglF = setInterval(function () {
+            var formSemesterID = $('#formSemesterID').val();
+            if(formSemesterID!='' && formSemesterID!=null){
+                dateInputJadwal();
+                clearInterval(loadTglF);
+            }
+        },1000);
+
+        loadSelect2OptionClassroom('#formClassroom','');
         $('#inputStart,#inputEnd').datetimepicker({
             pickDate: false,
             pickSeconds : false
@@ -662,15 +671,14 @@
 
     function dateInputJadwal() {
         var dataForm = $('input[name=formExam]:checked').val();
+        var formSemesterID = $('#formSemesterID').val();;
         var url = base_url_js+'api/__crudJadwalUjian';
-        var token = jwt_encode({action:'checkDateExam'},'UAP)(*');
+        var token = jwt_encode({action:'checkDateExam',SemesterID : formSemesterID},'UAP)(*');
 
         $( "#formDate" ).val('');
         $( "#formDate" ).datepicker( "destroy" );
 
         $.post(url,{token:token},function (jsonResult) {
-
-            $('#formSemesterID').val(jsonResult.SemesterID);
 
             var dateStart = jsonResult.utsStart;
             var dateEnd = jsonResult.utsEnd;

@@ -505,6 +505,8 @@ $route['save2pdf/scheduleExchange'] =  'c_save_to_pdf/scheduleExchange';
 $route['save2pdf/monitoringStudent'] =  'c_save_to_pdf/monitoringStudent';
 $route['save2pdf/monitoringAttendanceByRangeDate'] =  'c_save_to_pdf/monitoringAttendanceByRangeDate';
 
+$route['save2pdf/filterDocument'] =  'c_save_to_pdf/filterDocument';
+
 $route['save2pdf/listStudentsFromCourse'] =  'c_save_to_pdf/listStudentsFromCourse';
 
 $route['save2pdf/exam-layout'] =  'c_save_to_pdf/exam_layout';
@@ -530,6 +532,7 @@ $route['api/__getBaseProdiSelectOptionAll'] = 'api/c_api/getProdiSelectOptionAll
 $route['api/__geteducationLevel'] = 'api/c_api/geteducationLevel';
 
 $route['api/__getMKByID'] = 'api/c_api/getMKByID';
+$route['api/__getSemesterActive'] = 'api/c_api/getSemesterActive';
 $route['api/__getSemester'] = 'api/c_api/getSemester';
 $route['api/__getLecturer'] = 'api/c_api/getLecturer';
 $route['api/__getStudents'] = 'api/c_api/getStudents';

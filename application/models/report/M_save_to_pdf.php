@@ -98,4 +98,86 @@ class M_save_to_pdf extends CI_Model {
 
     }
 
+    public function getExamSchedule($SemesterID,$Type,$ExamDate){
+
+        $data = $this->db->query('SELECT ex.*,cl.Room, em1.Name AS Name_P1, em2.Name AS Name_P2 FROM db_academic.exam ex 
+                                          LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
+                                          LEFT JOIN db_employees.employees em1 ON (em1.NIP = ex.Pengawas1)
+                                          LEFT JOIN db_employees.employees em2 ON (em2.NIP = ex.Pengawas2)
+                                          WHERE ex.SemesterID = "'.$SemesterID.'"
+                                           AND ex.Type = "'.$Type.'"
+                                            AND ex.ExamDate = "'.$ExamDate.'"
+                                             ORDER BY ex.ExamDate, ex.ExamStart, ex.ExamEnd ')->result_array();
+
+        if(count($data)>0){
+            for($c=0;$c<count($data);$c++){
+                $dataC = $this->db->query('SELECT exg.*, s.ClassGroup, mk.NameEng AS Course, mk.MKCode, 
+                                                    em.Name AS Lecturere
+                                                    FROM db_academic.exam_group exg
+                                                    LEFT JOIN db_academic.schedule s ON (s.ID = exg.ScheduleID)
+                                                    LEFT JOIN db_academic.schedule_details_course sdc ON (s.ID = sdc.ScheduleID)
+                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                    LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                                    WHERE exg.ExamID = "'.$data[$c]['ID'].'"
+                                                     GROUP BY exg.ScheduleID ORDER BY s.ClassGroup ASC ')->result_array();
+
+                $data[$c]['Course'] = $dataC;
+            }
+        }
+
+        return $data;
+
+    }
+
+    public function getExamScheduleWithStudent($SemesterID,$Type,$ExamDate){
+
+        $data = $this->db->query('SELECT ex.*,cl.Room FROM db_academic.exam ex 
+                                          LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
+                                          WHERE ex.SemesterID = "'.$SemesterID.'"
+                                           AND ex.Type = "'.$Type.'"
+                                            AND ex.ExamDate = "'.$ExamDate.'"
+                                             ORDER BY ex.ExamDate, ex.ExamStart, ex.ExamEnd ')->result_array();
+
+        if(count($data)>0){
+            for($c=0;$c<count($data);$c++){
+                $dataC = $this->db->query('SELECT exg.*, s.ClassGroup, mk.NameEng AS Course, mk.MKCode, 
+                                                    em.Name AS Lecturere
+                                                    FROM db_academic.exam_group exg
+                                                    LEFT JOIN db_academic.schedule s ON (s.ID = exg.ScheduleID)
+                                                    LEFT JOIN db_academic.schedule_details_course sdc ON (s.ID = sdc.ScheduleID)
+                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                    LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                                    WHERE exg.ExamID = "'.$data[$c]['ID'].'"
+                                                     GROUP BY exg.ScheduleID ORDER BY s.ClassGroup ASC ')->result_array();
+
+                if(count($dataC)>0){
+                    for($r=0;$r<count($dataC);$r++){
+                        $dataStd = $this->db->query('SELECT NPM,DB_Students FROM db_academic.exam_details exd 
+                                                        WHERE exd.ExamID = "'.$data[$c]['ID'].'" 
+                                                        AND exd.ScheduleID = "'.$dataC[$r]['ScheduleID'].'"
+                                                         ORDER BY exd.NPM ASC ')->result_array();
+
+                        if(count($dataStd)>0){
+                            for($st=0;$st<count($dataStd);$st++){
+                                $dataStdName = $this->db->select('Name')->get_where($dataStd[$st]['DB_Students'].'.students',
+                                    array('NPM' => $dataStd[$st]['NPM']),1)->result_array();
+                                $dataStd[$st]['Name'] = $dataStdName[0]['Name'];
+                            }
+                        }
+
+                        $dataC[$r]['DetailStudents'] = $dataStd;
+
+                    }
+                }
+
+
+
+                $data[$c]['Course'] = $dataC;
+            }
+        }
+
+        return $data;
+
+    }
+
 }
