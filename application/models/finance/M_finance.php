@@ -2736,7 +2736,7 @@ class M_finance extends CI_Model {
 
    }
 
-   public function get_report_pembayaran_mhs($ta,$prodi,$NIM,$Semester,$limit, $start)
+   public function get_report_pembayaran_mhs($ta,$prodi,$NIM,$Semester,$Status,$limit, $start)
    {
     error_reporting(0);
     $arr = array();
@@ -2762,7 +2762,8 @@ class M_finance extends CI_Model {
     // join dengan table auth terlebih dahulu
     // $PTID = ($PTID == '' || $PTID == Null) ? '' : ' and a.PTID = '.$PTID;
     $PTID = '';
-    $NIM = ($NIM == '' || $NIM == Null) ? 'where a.NPM like "%"' : ' where  a.NPM = '.$NIM;
+    $NIM = ($NIM == '' || $NIM == Null) ? '' : ' and a.NPM = '.$NIM;
+    $prodi = ($prodi == '' || $prodi == Null) ? '' : ' and a.ProdiID = '.$prodi;
     $Semester = ($Semester == '' || $Semester == Null) ? '' : ' and SemesterID = '.$Semester;
 
     // get Number VA Mahasiswa
@@ -2786,7 +2787,7 @@ class M_finance extends CI_Model {
       // print_r($ta1);
 
       // get Data Mahasiswa
-      $sql = 'select a.NPM,a.Name,b.NameEng from ta_'.$ta1.'.students as a join db_academic.program_study as b on a.ProdiID = b.ID where StatusStudentID in (3,2,7)';
+      $sql = 'select a.NPM,a.Name,b.NameEng from ta_'.$ta1.'.students as a join db_academic.program_study as b on a.ProdiID = b.ID where StatusStudentID in (3,2,7) '.$NIM.$prodi;
       $query=$this->db->query($sql, array())->result_array();
       // print_r($query);
       for ($u=0; $u < count($query); $u++) { 
@@ -2833,43 +2834,65 @@ class M_finance extends CI_Model {
               }
           }
 
-        // cek SPP 
-        $sqlSPP = 'select * from db_finance.payment where PTID = 3 and NPM = ? '.$Semester; // limit 1
-        $querySPP=$this->db->query($sqlSPP, array($query[$u]['NPM']))->result_array();
-        $arrSPP = array(
-          'SPP' => '0',
-          'PaySPP' => '0',
-          'SisaSPP' => '0',
-          'DetailPaymentSPP' => '',
+        // cek Credit 
+        $sqlCr = 'select * from db_finance.payment where PTID = 3 and NPM = ? '.$Semester; // limit 1
+        $queryCr=$this->db->query($sqlCr, array($query[$u]['NPM']))->result_array();
+        $arrCr = array(
+          'Cr' => '0',
+          'PayCr' => '0',
+          'SisaCr' => '0',
+          'DetailPaymentCr' => '',
         );
-          if (count($querySPP) > 0) {
-              for ($t=0; $t < count($querySPP); $t++) { 
+          if (count($queryCr) > 0) {
+              for ($t=0; $t < count($queryCr); $t++) { 
                 // cek payment students
-                $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$querySPP[$t]['ID']);
-                $PaySPP = 0;
-                $SisaSPP = 0;
+                $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$queryCr[$t]['ID']);
+                $PayCr = 0;
+                $SisaCr = 0;
                 for ($r=0; $r < count($Q_invStudent); $r++) { 
                   if ($Q_invStudent[$r]['Status'] == 1) { // lunas
-                    $PaySPP = $PaySPP + $Q_invStudent[$r]['Invoice'];
+                    $PayCr = $PayCr + $Q_invStudent[$r]['Invoice'];
                   }
                   else
                   {
-                    $SisaSPP = $SisaSPP + $Q_invStudent[$r]['Invoice'];
+                    $SisaCr = $SisaCr + $Q_invStudent[$r]['Invoice'];
                   }
                 }
 
-                $arrSPP = array(
-                  'SPP' => (int)$querySPP[$t]['Invoice'],
-                  'PaySPP' => (int)$PaySPP,
-                  'SisaSPP' => (int)$SisaSPP,
-                  'DetailPaymentSPP' => $Q_invStudent,
+                $arrCr = array(
+                  'Cr' => (int)$queryCr[$t]['Invoice'],
+                  'PayCr' => (int)$PayCr,
+                  'SisaCr' => (int)$SisaCr,
+                  'DetailPaymentCr' => $Q_invStudent,
                 );
 
               }
-          }  
-        if ($arrBPP['SisaBPP'] > 0 || $arrSPP['SisaSPP'] > 0) {
-            $arr[] = $arrMHS + $arrBPP + $arrSPP ; 
-        }  
+          }
+
+          // if($Status == 0) // tidak lunas
+          switch ($Status) {
+            case '': // All
+              $arr[] = $arrMHS + $arrBPP + $arrCr ; 
+              break;
+            case 0:  // Tidak Lunas
+              if ($arrBPP['DetailPaymentBPP'] == '' || $arrCr['DetailPaymentCr'] == '' ||  $arrBPP['SisaBPP'] > 0 || $arrCr['SisaCr'] > 0) {
+                $arr[] = $arrMHS + $arrBPP + $arrCr ; 
+              }
+              break;
+            case 1:  // Lunas
+              if ($arrBPP['DetailPaymentBPP'] != '' && $arrCr['DetailPaymentCr'] != '' &&  $arrBPP['SisaBPP'] == 0 && $arrCr['SisaCr'] == 0) {
+                $arr[] = $arrMHS + $arrBPP + $arrCr ; 
+              }
+              // $arr[] = $arrMHS + $arrBPP + $arrCr ; 
+              break;  
+            default:
+              # code...
+              break;
+          }
+
+        // if ($arrBPP['SisaBPP'] > 0 || $arrCr['SisaCr'] > 0) {
+        //     $arr[] = $arrMHS + $arrBPP + $arrCr ; 
+        // }  
         
         $No++;
       } // loop per mhs

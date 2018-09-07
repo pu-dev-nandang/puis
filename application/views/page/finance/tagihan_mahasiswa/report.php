@@ -8,8 +8,12 @@
           border:solid #000 !important;
           border-width:0 1px 1px 0 !important;
         }
+     @media print {
+      .noprint { display:none };
+          
+    }    
 </style>
-<div class="row" style="margin-top: 30px;">
+<div class="row noprint" style="margin-top: 30px;">
     <div class="col-md-3">
         <div class="thumbnail" style="min-height: 30px;padding: 10px;">
             <select class="form-control" id="selectCurriculum">
@@ -26,14 +30,15 @@
             </select>
         </div>
     </div>
-    <!-- <div class="col-md-3">
+    <div class="col-md-3">
         <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <select class="form-control" id="selectPTID">
-                <option selected value = ''>--- All Payment Type ---</option>
-                <option disabled>------</option>
+            <select class="form-control" id="selectStatus">
+                <option value = ''>--All Status--</option>
+                <option selected value = '0'>Tidak Lunas</option>
+                <option value="1">Lunas</option>
             </select>
         </div>
-    </div> -->
+    </div>
     <div class="col-md-3">
         <div class="thumbnail" style="min-height: 30px;padding: 10px;">
             <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM">
@@ -41,7 +46,7 @@
     </div>
 </div>
 
-<div class="col-md-12">
+<div class="col-md-12 noprint">
       <hr/>
       <div class="col-md-12">
         <div class="DTTT btn-group">
@@ -102,6 +107,8 @@
 
 <script type="text/javascript">
     window.dataa = '';
+    window.summary = '';
+    window.PostPassing = '';
     $(document).ready(function () {
         loadSelectOptionCurriculum('#selectCurriculum','');
         loadSelectOptionBaseProdi('#selectProdi','');
@@ -137,7 +144,11 @@
         loadData(1);
     });
 
-    $('#selectPTID').change(function () {
+    // $('#selectPTID').change(function () {
+    //     loadData(1);
+    // });
+
+    $('#selectStatus').change(function () {
         loadData(1);
     });
 
@@ -185,7 +196,8 @@
       var url = base_url_js+'finance/export_excel_report';
       data = {
         Data : dataa,
-        Semester : $('#selectSemester').val(),
+        summary : summary,
+        PostPassing : PostPassing,
       }
       var token = jwt_encode(data,"UAP)(*");
       submit(url, 'POST', [
@@ -250,10 +262,10 @@
     function loadData(page) {
         loading_page('#conTainJS');
         dataa = '';
-
+        PostPassing = '';
         // get proses data dari database
         var ta = $('#selectCurriculum').val();
-        var prodi = $('#selectProdi').val();
+        // var prodi = $('#selectProdi').val();
         // var PTID = $('#selectPTID').val();
         var NIM = $('#NIM').val().trim();
         try{
@@ -261,6 +273,10 @@
           // console.log(Semester);
           Semester = Semester.split('.');
           Semester = Semester[0];
+
+          var prodi = $('#selectProdi').val();
+          prodi = prodi.split('.');
+          prodi = prodi[0];
         }
         catch(e)
         {
@@ -274,10 +290,12 @@
             // PTID  : PTID,
             NIM : NIM,
             Semester : Semester,
+            Status : $('#selectStatus').val(),
         };
         var token = jwt_encode(data,'UAP)(*');
         var htmlDy = '<div class="col-md-12">'+
                         '<table class="table table-bordered datatable2 " id = "datatable2">'+
+                            '<caption id ="CaptionTa"></caption>'+
                             '<thead>'+
                             '<tr style="background: #333;color: #fff;">'+
                             '    <th style="width: 1%;" rowspan = "2">No</th>'+
@@ -297,82 +315,152 @@
                             '<tbody id="dataRow"></tbody>'+
                         '</table>'+
                     '</div>'+
-                    '<div  class="col-xs-12" align="right" id="pagination_link"></div>';
+                    '<div  class="col-xs-12 noprint" align="right" id="pagination_link"></div>';
    
         $.post(url,{token:token},function (resultJson) {
             var resultJson = jQuery.parseJSON(resultJson);
             // console.log(resultJson);
             var Data_mhs = resultJson.loadtable;
-            dataa = Data_mhs;
+            var taShow = ta;
+            // dataa = Data_mhs;
             setTimeout(function () {
                 $("#conTainJS").html(htmlDy);
                 $("#pagination_link").html(resultJson.pagination_link);
                 if (Data_mhs.length > 0) {
+                        dataa = [];
+                        summary = {};
+                        var sumTagihan = 0;
+                        var sumPembayaran = 0;
+                        var sumPiutang = 0;
+                        taShow = 'Mahasiswa TA '+Data_mhs[0]['Year'];
+                        PostPassing = data;
                         for (var i = 0; i < Data_mhs.length; i++) {
                             var  no = parseInt(i) + 1;
                             // var timee = (Data_mhs[i]['Time'] == null) ? '-' : Data_mhs[i]['Time'];
                             // var yy = (Data_mhs[i]['InvoiceStudents'] != '') ? formatRupiah(Data_mhs[i]['InvoiceStudents']) : '-';
                             // var btnPrint = '<span data-smt="'+Data_mhs[i]['ID_payment_students']+'" class="btn btn-xs btn-print" NPM = "'+Data_mhs[i]['NPM']+'" Semester = "'+Data_mhs[i]['SemesterName']+'" PTID = "'+Data_mhs[i]['PTIDDesc']+'" VA = "'+Data_mhs[i]['VA']+'" BilingID = "'+Data_mhs[i]['BilingID']+'" Invoice = "'+yy+'" Nama = "'+Data_mhs[i]['Nama']+'"  Prodi = "'+Data_mhs[i]['ProdiEng']+'" Time = "'+timee+'"><i class="fa fa-print"></i> Print</span>';
-                            var Total_tagihan = parseInt(Data_mhs[i]['BPP'])  + parseInt(Data_mhs[i]['SPP']) ;
-                            var Total_pembayaran = parseInt(Data_mhs[i]['PayBPP'])  + parseInt(Data_mhs[i]['PaySPP']) ;
-                            var Piutang = parseInt(Data_mhs[i]['SisaSPP'])  + parseInt(Data_mhs[i]['SisaBPP']) ;
+                            var Total_tagihan = parseInt(Data_mhs[i]['BPP'])  + parseInt(Data_mhs[i]['Cr']) ;
+                            sumTagihan = sumTagihan + Total_tagihan;
+                            var Total_pembayaran = parseInt(Data_mhs[i]['PayBPP'])  + parseInt(Data_mhs[i]['PayCr']) ;
+                            sumPembayaran = sumPembayaran + Total_pembayaran;
+                            var Piutang = parseInt(Data_mhs[i]['SisaCr'])  + parseInt(Data_mhs[i]['SisaBPP']) ;
+                            sumPiutang = sumPiutang + Piutang;
                             var keterangan = '';
+                            var ketEXcel = "";
                             var keteranganBPP = '';
-                            var keteranganSPP = '';
+                            var keteranganBPPEX = "";
+                            var keteranganCr = '';
+                            var keteranganCrEX = "";
 
                             if (Piutang > 0) {
                               if(Data_mhs[i]['DetailPaymentBPP'] != '')
                               {
                                 var DetailPaymentBPP = Data_mhs[i]['DetailPaymentBPP'];
                                 keteranganBPP = '<ul>BPP';
+                                keteranganBPPEX = "BPP\n";
                                 for (var l = 0; l < DetailPaymentBPP.length; l++) {
                                   var lno = parseInt(l) + 1;
                                   var StatusPay = (DetailPaymentBPP[l]['Status'] == 1)? 'Sudah Bayar' : 'Belum Bayar';
                                   if (DetailPaymentBPP[l]['Status'] == 0) {
                                     keteranganBPP += '<li>Pembayaran : '+lno+'</li>';
+                                    keteranganBPPEX += "Pembayaran : "+lno+" \n";
                                     keteranganBPP += '<li>Deadline : '+DetailPaymentBPP[l]['Deadline']+'</li>';
+                                    keteranganBPPEX += "Deadline : "+DetailPaymentBPP[l]['Deadline']+"\n";
                                     keteranganBPP += '<li>Status : '+StatusPay+'</li>';
+                                    keteranganBPPEX += "Status : "+StatusPay+"\n";
                                   }
                                   
                                 }
                                   keteranganBPP += '</ul>';
+                                  keteranganBPPEX += "\n";
+                              }
+                              else{
+                                keteranganBPP = '<p>Tagihan BPP belum diset</p>';
+                                keteranganBPPEX = "Tagihan BPP belum diset\n";
                               }
 
-                              if(Data_mhs[i]['DetailPaymentSPP'] != '')
+                              if(Data_mhs[i]['DetailPaymentCr'] != '')
                               {
-                                var DetailPaymentSPP = Data_mhs[i]['DetailPaymentSPP'];
-                                keteranganSPP = '<ul>SPP';
-                                for (var l = 0; l < DetailPaymentSPP.length; l++) {
+                                var DetailPaymentCr = Data_mhs[i]['DetailPaymentCr'];
+                                keteranganCr = '<ul>Credit';
+                                keteranganCrEX = "Credit\n";
+                                for (var l = 0; l < DetailPaymentCr.length; l++) {
                                   var lno = parseInt(l) + 1;
-                                  var StatusPay = (DetailPaymentSPP[l]['Status'] == 1)? 'Sudah Bayar' : 'Belum Bayar';
-                                  if(DetailPaymentSPP[l]['Status'] == 0)
+                                  var StatusPay = (DetailPaymentCr[l]['Status'] == 1)? 'Sudah Bayar' : 'Belum Bayar';
+                                  if(DetailPaymentCr[l]['Status'] == 0)
                                   {
-                                    keteranganSPP += '<li>Pembayaran : '+lno+'</li>';
-                                    keteranganSPP += '<li>Deadline : '+DetailPaymentSPP[l]['Deadline']+'</li>';
-                                    keteranganSPP += '<li>Status : '+StatusPay+'</li>';
+                                    keteranganCr += '<li>Pembayaran : '+lno+'</li>';
+                                    keteranganCrEX += "Pembayaran : "+lno+"\n";
+                                    keteranganCr += '<li>Deadline : '+DetailPaymentCr[l]['Deadline']+'</li>';
+                                    keteranganCrEX += "Deadline : "+DetailPaymentCr[l]['Deadline']+"\n";
+                                    keteranganCr += '<li>Status : '+StatusPay+'</li>';
+                                    keteranganCrEX += "Status : "+StatusPay+"\n";
                                   }
                                   
                                 }
-                                  keteranganSPP += '</ul>';
+                                  keteranganCr += '</ul>';
+                                  keteranganCrEX += "\n";
 
                               }
+                              else
+                              {
+                                keteranganCr += '<p>Tagihan Credit belum diset</p>';
+                                keteranganCrEX += "Tagihan Credit belum diset\n";
+                              }
+                            }
+                            else if(Piutang == 0 && (Data_mhs[i]['DetailPaymentCr'] == '' || Data_mhs[i]['DetailPaymentBPP'] == '') ) // belum diset
+                            {
+                              if (Data_mhs[i]['DetailPaymentBPP'] == '') {
+                                keteranganBPP = '<p>Tagihan BPP belum diset</p>';
+                                keteranganBPPEX = "Tagihan BPP belum diset\n";
+                              }
+
+                              if (Data_mhs[i]['DetailPaymentCr'] == '') {
+                                keteranganCr = '<p>Tagihan Credit belum diset</p>';
+                                keteranganCrEX = "Tagihan Credit belum diset\n";
+                              }
+                              
                             }
 
-                            keterangan = keteranganBPP + keteranganSPP;
+                            keterangan = keteranganBPP + keteranganCr;
+                            ketEXcel = keteranganBPPEX + keteranganCrEX;
 
                             $('#dataRow').append('<tr>' +
                                 '<td>'+no+'</td>' +
                                 '<td>'+Data_mhs[i]['Name']+'<br>'+Data_mhs[i]['NPM']+'<br>'+'</td>' +
                                 '<td>'+Data_mhs[i]['ProdiENG']+'</td>' +
                                 '<td>'+formatRupiah(Data_mhs[i]['BPP'])+'</td>' +
-                                '<td>'+formatRupiah(Data_mhs[i]['SPP'])+'</td>' +
+                                '<td>'+formatRupiah(Data_mhs[i]['Cr'])+'</td>' +
                                 '<td>'+formatRupiah(Total_tagihan)+'</td>' +
                                 '<td>'+formatRupiah(Total_pembayaran)+'</td>' +
                                 '<td>'+formatRupiah(Piutang)+'</td>' +
                                 '<td>'+keterangan+'</td>' +
                                 '</tr>');
+                            var valueToPush = new Array();
+                            valueToPush = [no,Data_mhs[i]['Name'],Data_mhs[i]['NPM'],Data_mhs[i]['ProdiENG'],formatRupiah(Data_mhs[i]['BPP']),formatRupiah(Data_mhs[i]['Cr']),formatRupiah(Total_tagihan),formatRupiah(Total_pembayaran),formatRupiah(Piutang),ketEXcel];
+                            // console.log(valueToPush);
+                            // dataa[] = [no,Data_mhs[i]['Name'],Data_mhs[i]['NPM']];
+                            dataa.push(valueToPush);
                         }
+                        // console.log(dataa);
                         $('#NIM').focus();
+                        $('#CaptionTa').html('<h2>'+taShow+'</h2>');
+                        $("#dataRow").append('<tr style="background: #333;color: #fff;">'+
+                            '<td colspan = "5" style="text-align:center">Total '+taShow+'</td>'+
+                            '<td>'+formatRupiah(sumTagihan)+'</td>' +
+                            '<td>'+formatRupiah(sumPembayaran)+'</td>' +
+                            '<td>'+formatRupiah(sumPiutang)+'</td>' +
+                            '<td></td>'+
+                            '</tr>'  
+                          );
+
+                        summary = {
+                          sumTagihan : formatRupiah(sumTagihan),
+                          sumPembayaran : formatRupiah(sumPembayaran),
+                          sumPiutang : formatRupiah(sumPiutang),
+                          taShow : 'Total '+taShow
+                        };
+
                 } else {
                     $('#dataRow').append('<tr><td colspan="8" align = "center">No Result Data</td></tr>');
                 }

@@ -195,7 +195,100 @@ class C_save_to_excel extends CI_Controller
         $token = $this->input->post('token');
         $key = "UAP)(*";
         $input = (array) $this->jwt->decode($token,$key);
-        print_r($input);
+        $GetDateNow = date('Y-m-d');
+        $this->load->model('master/m_master');
+        $GetDateNow = $this->m_master->getIndoBulan($GetDateNow);
+        // print_r($input['Data']);die();
+
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load('./uploads/finance/Template_report.xlsx'); // Empty Sheet
+        $excel2->setActiveSheetIndex(0);
+
+        $excel3 = $excel2->getActiveSheet();
+        $excel3->setCellValue('A3', $GetDateNow);
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+        $style_row = array(
+          'alignment' => array(
+            'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+          ),
+          'borders' => array(
+            'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+            'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+            'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+            'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+          )
+        );
+
+        // start dari A7
+        $dataGenerate = $input['Data'];
+        $summary = $input['summary'];
+        $PostPassing = $input['PostPassing'];
+        $a = 7;
+        for ($i=0; $i < count($dataGenerate); $i++) {
+           $no = $i + 1;  
+           $excel3->setCellValue('A'.$a, $dataGenerate[$i][0]); 
+           $excel3->setCellValue('B'.$a, $dataGenerate[$i][1]);
+           $excel3->setCellValue('C'.$a, $dataGenerate[$i][2]);
+           $excel3->setCellValue('D'.$a, $dataGenerate[$i][3]);
+           $excel3->setCellValue('E'.$a, $dataGenerate[$i][4]);
+           $excel3->setCellValue('F'.$a, $dataGenerate[$i][5]);
+           $excel3->setCellValue('G'.$a, $dataGenerate[$i][6]);
+           $excel3->setCellValue('H'.$a, $dataGenerate[$i][7]);
+           $excel3->setCellValue('I'.$a, $dataGenerate[$i][8]);
+           
+           // $ket = "adi\nresa";
+
+           $excel3->setCellValue('J'.$a, $dataGenerate[$i][9]);
+
+           // Apply style row yang telah kita buat tadi ke masing-masing baris (isi tabel)
+           $excel3->getStyle('A'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('B'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('C'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('D'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('E'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('F'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('G'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('H'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('I'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('J'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('J'.$a)->getAlignment()->setWrapText(true);
+           // $excel3->getStyle('K'.$a)->applyFromArray($style_row);
+
+           $a = $a + 1; 
+        }
+
+         $excel3->mergeCells('A'.$a.':F'.$a); // Set Merge Cell pada kolom A1 sampai E1
+         $setTA = $summary->taShow;
+         $excel3->setCellValue('A'.$a, $setTA); 
+         $excel3->getStyle('A'.$a)->applyFromArray($style_row);
+         $excel3->getStyle('B'.$a)->applyFromArray($style_row);
+         $excel3->getStyle('C'.$a)->applyFromArray($style_row);
+         $excel3->getStyle('D'.$a)->applyFromArray($style_row);
+         $excel3->getStyle('E'.$a)->applyFromArray($style_row);
+         $excel3->getStyle('F'.$a)->applyFromArray($style_row);
+         // $excel3->getStyle('A'.$a)->applyFromArray($style_row);
+         $excel3->setCellValue('G'.$a, $summary->sumTagihan); 
+         $excel3->setCellValue('H'.$a, $summary->sumPembayaran); 
+         $excel3->setCellValue('I'.$a, $summary->sumPiutang); 
+         $excel3->setCellValue('J'.$a, '');
+
+         $excel3->getStyle('G'.$a)->applyFromArray($style_row);
+         $excel3->getStyle('H'.$a)->applyFromArray($style_row);
+         $excel3->getStyle('I'.$a)->applyFromArray($style_row);
+         $excel3->getStyle('J'.$a)->applyFromArray($style_row); 
+
+        $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
+        // We'll be outputting an excel file  
+        header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
+        // It will be called file.xlss
+        header('Content-Disposition: attachment; filename="file.xlsx"'); // jalan ketika tidak menggunakan ajax
+        //$filename = 'PenerimaanPembayaran.xlsx';
+        //$objWriter->save('./document/'.$filename);
+        $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
+
+        // print_r($input['summary']);
     }
 
     public function export_excel_payment_received()
