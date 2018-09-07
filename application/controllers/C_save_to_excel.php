@@ -207,7 +207,7 @@ class C_save_to_excel extends CI_Controller
         $excel2->setActiveSheetIndex(0);
 
         $excel3 = $excel2->getActiveSheet();
-        $excel3->setCellValue('A3', $GetDateNow.' Jam '.date('H').':'.date('m'));
+        $excel3->setCellValue('A3', $GetDateNow.' Jam '.date('H:i'));
 
         // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
         $style_row = array(
