@@ -1523,7 +1523,10 @@ class C_api extends CI_Controller {
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
 
-
+        $whereP = ($data_arr['ExamDate']!=null && $data_arr['ExamDate']!='')
+            ? 'ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'" AND ex.ExamDate LIKE "'.$data_arr['ExamDate'].'" '
+            : 'ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'"' ;
+        // ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'"
 
         if( !empty($requestData['search']['value']) ) {
 
@@ -1534,11 +1537,11 @@ class C_api extends CI_Controller {
                                 LEFT JOIN db_academic.days d On (d.ID = ex.DayID)
                                 LEFT JOIN db_employees.employees p1 ON (p1.NIP = ex.Pengawas1)
                                 LEFT JOIN db_employees.employees p2 ON (p2.NIP = ex.Pengawas2)
-                                WHERE ( ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'" ) AND
+                                WHERE ( '.$whereP.' ) AND
                                  (d.NameEng LIKE "%'.$search.'%" OR cl.Room LIKE "%'.$search.'%" 
                                  OR p1.Name LIKE "%'.$search.'%" OR p2.Name LIKE "%'.$search.'%"
                                  OR p1.NIP LIKE "%'.$search.'%" OR p2.NIP LIKE "%'.$search.'%" 
-                                 ) ';
+                                 ) ORDER BY ex.ExamDate, ex.ExamStart, ex.ExamEnd ASC ';
         }
         else {
 
@@ -1548,7 +1551,7 @@ class C_api extends CI_Controller {
                                 LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
                                 LEFT JOIN db_employees.employees p1 ON (p1.NIP = ex.Pengawas1)
                                 LEFT JOIN db_employees.employees p2 ON (p2.NIP = ex.Pengawas2)
-                                WHERE ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'" ';
+                                WHERE '.$whereP.' ORDER BY ex.ExamDate, ex.ExamStart, ex.ExamEnd ASC ';
         }
 
         $dataTable = $this->db->query($sql)->result_array();
@@ -1642,6 +1645,9 @@ class C_api extends CI_Controller {
             );
             $tkn_attendance_std = $this->jwt->encode($data_token_attendance_std,'UAP)(*');
 
+
+//            <li><a class="btnSave2PDF_Exam" href="javascript:void(0);" data-url="save2pdf/attendance-list" data-token="'.$tkn_attendance_std.'">Exam Attendance</a></li>
+//                    <li><a target="_blank" href="'.base_url('save2pdf/news-event').'">Berita Acara</a></li>
             $act = '<div  style="text-align:center;"><div class="btn-group">
                   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
@@ -1652,8 +1658,6 @@ class C_api extends CI_Controller {
                     <li><a target="_blank" href="'.base_url('save2pdf/exam-layout').'">Layout</a></li>
                     <li><a target="_blank" href="'.base_url('save2pdf/exam-layout').'">Layout Random</a></li>
                     <li><a class="btnSave2PDF_Exam" href="javascript:void(0);" data-url="save2pdf/draft_questions_answer_sheet" data-token="'.$tkn_soal_jawaban.'">Draft Questions  & Answer Sheet</a></li>
-                    <li><a class="btnSave2PDF_Exam" href="javascript:void(0);" data-url="save2pdf/attendance-list" data-token="'.$tkn_attendance_std.'">Exam Attendance</a></li>
-                    <li><a target="_blank" href="'.base_url('save2pdf/news-event').'">Berita Acara</a></li>
                     <li role="separator" class="divider"></li>
                     <li><a class="btnDeleteExam" data-id="'.$row['ID'].'" href="javascript:void(0);" style="color: red;">Delete</a></li>
                   </ul>
@@ -2517,6 +2521,11 @@ class C_api extends CI_Controller {
         echo json_encode($data);
     }
 
+    public function getSemesterActive(){
+        $data = $this->m_api->_getSemesterActive();
+        return print_r(json_encode($data));
+    }
+
     public function getSumberIklan()
     {
         $getData = $this->m_master->showDataActive_array('db_admission.source_from_event',1);
@@ -2560,7 +2569,7 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($data));
             }
             else if($data_arr['action']=='checkDateExam'){
-                $data = $this->m_api->getDateExam();
+                $data = $this->m_api->getDateExam($data_arr['SemesterID']);
                 return print_r(json_encode($data));
             }
             else if($data_arr['action']=='checkCourse4Exam'){

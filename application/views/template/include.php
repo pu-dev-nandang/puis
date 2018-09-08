@@ -753,6 +753,30 @@
         });
     }
 
+    function momentRange(start,end) {
+        // var fromDate = moment();
+        // var toDate = moment().add(15, 'days');
+
+        var fromDate = moment(start);
+        var toDate = moment(end);
+
+        var range = moment().range(fromDate, toDate);
+        var diff = range.diff('days');
+
+        var array = range.toArray('days');
+        // $.each(array, function(i, e) {
+        //     $("#rangec").append("<li>" + moment(e).format("DD MM YYYY") + "</li>");
+        // });
+
+        var res = {
+            diff : diff,
+            details : array
+        };
+
+        return res;
+
+    }
+
     function loSelectOptionSemester(element,selected) {
         var url = base_url_js+'api/__crudSemester';
         var token = jwt_encode({action:'read',order:'DESC'},'UAP)(*');
@@ -789,6 +813,14 @@
                 }
             }
         })
+    }
+
+    function getIDSemesterActive(element) {
+        var url = base_url_js+'api/__getSemesterActive';
+        $.getJSON(url,function (jsonResult) {
+            // console.log(jsonResult);
+            $(element).val(jsonResult.ID);
+        });
     }
 
 

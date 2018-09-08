@@ -80,29 +80,6 @@
         loadTb();
     });
 
-    function momentRange(start,end) {
-        // var fromDate = moment();
-        // var toDate = moment().add(15, 'days');
-
-        var fromDate = moment(start);
-        var toDate = moment(end);
-
-        var range = moment().range(fromDate, toDate);
-        var diff = range.diff('days');
-
-        var array = range.toArray('days');
-        // $.each(array, function(i, e) {
-        //     $("#rangec").append("<li>" + moment(e).format("DD MM YYYY") + "</li>");
-        // });
-
-        var res = {
-            diff : diff,
-            details : array
-        };
-
-        return res;
-
-    }
 
     $('#formSetRange').daterangepicker({
             startDate: moment().subtract('days', 29),
