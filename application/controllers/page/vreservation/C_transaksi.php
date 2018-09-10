@@ -174,11 +174,47 @@ class C_transaksi extends Vreservation_Controler {
                     $this->db->insert_batch('db_reservation.t_booking_eq_additional', $yy);
                 }
 
+
+                // define for email
+                $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $Start);
+                $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $End);
+                $StartNameDay = $Startdatetime->format('l');
+                $EndNameDay = $Enddatetime->format('l');
+                if($_SERVER['SERVER_NAME']!='localhost') {
+                    // email to ga
+                    $Email = 'ga@podomorouniversity.ac.id';
+                    $text = 'Dear GA Team,<br><br>
+                                Please Approve Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
+                                Details Schedule : <br><ul>
+                                <li>Start  : '.$StartNameDay.', '.$Start.'</li>
+                                <li>End  : '.$EndNameDay.', '.$End.'</li>
+                                <li>Room  : '.$input['Room'].'</li>
+                                <li>Agenda  : '.$input['Agenda'].'</li>
+                                </ul>
+                            ';        
+                    $to = $Email;
+                    $subject = "Podomoro University Venue Reservation Notification";
+                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+
+                }
+                else
+                {
+                    $Email = 'alhadi.rahman@podomorouniversity.ac.id';
+                    $text = 'Dear GA Team,<br><br>
+                                Please Approve Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
+                                Details Schedule : <br><ul>
+                                <li>Start  : '.$StartNameDay.', '.$Start.'</li>
+                                <li>End  : '.$EndNameDay.', '.$End.'</li>
+                                <li>Room  : '.$input['Room'].'</li>
+                                <li>Agenda  : '.$input['Agenda'].'</li>
+                                </ul>
+                            ';        
+                    $to = $Email;
+                    $subject = "Podomoro University Venue Reservation Notification";
+                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                }
+
                 if (is_array($input['chk_person_support'])) {
-                    $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $Start);
-                    $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $End);
-                    $StartNameDay = $Startdatetime->format('l');
-                    $EndNameDay = $Enddatetime->format('l');
                     if($_SERVER['SERVER_NAME']!='localhost') {
                         for ($i=0; $i < count($input['chk_person_support']); $i++) { 
                            $nested = $input['chk_person_support'];
@@ -197,6 +233,7 @@ class C_transaksi extends Vreservation_Controler {
                            $to = $Email;
                            $subject = "Podomoro University Venue Reservation Person Support";
                            $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+
                         }
                     }
                     else{
