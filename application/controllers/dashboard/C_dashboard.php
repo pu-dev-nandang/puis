@@ -15,8 +15,17 @@ class C_dashboard extends Globalclass {
     public function index()
     {
         $data['department'] = parent::__getDepartement();
-        $content = $this->load->view('dashboard/dashboard',$data,true);
-        $this->temp($content);
+        // print_r(APPPATH.'views/page/'.$data['department'].'/dashboard.php');die();
+        if (file_exists(APPPATH.'views/page/'.$data['department'].'/dashboard.php')) {
+            $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
+            $this->temp($content);
+        }
+        else
+        {
+            $content = $this->load->view('dashboard/dashboard',$data,true);
+            $this->temp($content);
+        }
+        
     }
 
     public function change_departement(){
@@ -76,9 +85,16 @@ class C_dashboard extends Globalclass {
     public function finance_dashboard()
     {
         // echo __FUNCTION__;
-        $data['passing'] = '';
-        $content = $this->load->view('dashboard/finance_dashboard',$data,true);
-        $this->temp($content);
+        $data['department'] = parent::__getDepartement();
+        // print_r(APPPATH.'views/page/'.$data['department'].'/dashboard.php');die();
+        if (file_exists(APPPATH.'views/page/'.$data['department'].'/dashboard.php')) {
+            $content = $this->load->view('dashboard/finance_dashboard',$data,true);
+            $this->temp($content);
+        }
+        else
+        {
+            $this->index();
+        }
 
     }
 
