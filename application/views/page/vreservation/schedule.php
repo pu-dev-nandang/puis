@@ -126,7 +126,7 @@
 												$bc2 = 'panel-green';
 											}
 										?>
-										<td class="<?php echo $bc2 ?> pointer" style="background-color: <?php echo $bc ?>;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>">
+										<td class="<?php echo $bc2 ?> pointer" style="background-color: <?php echo $bc ?>;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>&#013;<?php echo 'Request : '.$data_pass[$k]['user'] ?>&#013;Agenda : <?php echo $data_pass[$k]['agenda'] ?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>">
 											<span><?php echo $data_pass[$k]['user'] ?></span>
 											<!-- <div class="panel-red pointer" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>"><span><?php echo $data_pass[$k]['user'] ?></span></div> -->
 										</td>
@@ -134,7 +134,7 @@
 										<?php $j = $j + (int)$data_pass[$k]['colspan'] - 1 ?>
 										<?php break; ?>
 									<?php else: ?>
-										<td class="panel-orange pointer" style="background-color: #ffb848;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>"><span><?php echo $data_pass[$k]['user'] ?></span>
+										<td class="panel-orange pointer" style="background-color: #ffb848;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $converDTS ?>-<?php echo $converDTE?>&#013;<?php echo 'Request : '.$data_pass[$k]['user'] ?>&#013;Agenda : <?php echo $data_pass[$k]['agenda'] ?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>"><span><?php echo $data_pass[$k]['user'] ?></span>
 											<!-- <div class="panel-orange pointer" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>"><span><?php echo $data_pass[$k]['user'] ?></span></div> -->
 										</td>
 										<?php $bool = true ?>
