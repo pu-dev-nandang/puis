@@ -1,10 +1,3 @@
-<?php
-if ($this->uri->segment(1) == 'dashboard') {
-    redirect(base_url().'finance/dashboard');
-}
-
-?>
-
 <div id="sidebar" class="sidebar-fixed">
     <div id="sidebar-content">
 
