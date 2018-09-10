@@ -180,4 +180,57 @@ class M_save_to_pdf extends CI_Model {
 
     }
 
+    public function getExamByID($ExamID){
+
+        $data = $this->db->query('SELECT ex.*,cl.Room, cl.DeretForExam,cl.LectureDesk,  
+                                             s.Name AS Semester,
+                                             em1.Name AS Name_P1, em2.Name AS Name_P2
+                                            FROM db_academic.exam ex
+                                            LEFT JOIN db_academic.classroom cl ON (cl.ID=ex.ExamClassroomID)
+                                            LEFT JOIN db_employees.employees em1 ON (em1.NIP = ex.Pengawas1)
+                                            LEFT JOIN db_employees.employees em2 ON (em2.NIP = ex.Pengawas2)
+                                            LEFT JOIN db_academic.semester s ON (s.ID = ex.SemesterID)
+                                            WHERE ex.ID = "'.$ExamID.'" ')->result_array();
+
+
+        if(count($data)>0){
+
+            for($i=0;$i<count($data);$i++){
+
+                // Data Course
+                $dataC = $this->db->query('SELECT exg.*,s.ClassGroup, mk.NameEng AS CourseEng, mk.MKCode FROM db_academic.exam_group exg 
+                                                      LEFT JOIN db_academic.schedule s ON (s.ID = exg.ScheduleID)
+                                                      LEFT JOIN db_academic.schedule_details_course sdc ON (s.ID = sdc.ScheduleID)
+                                                      LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                      WHERE exg.ExamID = "'.$data[$i]['ID'].'" GROUP BY s.ID')->result_array();
+
+                if(count($dataC)>0){
+
+                    // Cek Status Random atau tidak
+                    $dataRand = $this->db->get_where('db_academic.config',array('ConfigID' => 1),1)->result_array();
+                    $rand = ($dataRand[0]['Status']=='1' || $dataRand[0]['Status']==1) ? 'RAND()' : 'exd.NPM ASC' ;
+
+                    for($c=0;$c<count($dataC);$c++){
+
+                        // Get Students
+                        $dataStd = $this->db->query('SELECT exd.NPM,exd.Name,exd.ScheduleID 
+                                                                  FROM db_academic.exam_details exd 
+                                                                  WHERE exd.ExamID = "'.$data[$i]['ID'].'"
+                                                                   AND exd.ScheduleID = "'.$dataC[$c]['ScheduleID'].'"
+                                                                    ORDER BY '.$rand.' ')
+                                                                    ->result_array();
+
+                        $dataC[$c]['DetailStudent'] = $dataStd;
+                    }
+                }
+
+                $data[$i]['Course'] = $dataC;
+
+            }
+        }
+
+        return $data;
+
+    }
+
 }

@@ -298,6 +298,7 @@
                                 ScheduleID : formCourse,
                                 MhswID : d.MhswID,
                                 NPM : d.NPM,
+                                Name : ucwords(d.Name),
                                 DB_Students : d.DB_Students
                             };
                             insert_details.push(arr_s);
@@ -332,6 +333,7 @@
                                         ScheduleID : formCourse_ot,
                                         MhswID : od.MhswID,
                                         NPM : od.NPM,
+                                        Name : ucwords(od.Name),
                                         DB_Students : od.DB_Students
                                     };
                                     insert_details.push(arr_s_ot);

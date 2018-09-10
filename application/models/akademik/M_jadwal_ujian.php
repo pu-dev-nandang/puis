@@ -17,16 +17,16 @@ class M_jadwal_ujian extends CI_Model {
 
                 if(count($dataC)>0){
                     for($f=0;$f<count($dataC);$f++){
-                        $dataF = $this->db->select('ID,NPM,DB_Students')->get_where('db_academic.exam_details',
+                        $dataF = $this->db->select('ID,NPM,Name,DB_Students')->get_where('db_academic.exam_details',
                             array('ExamID' => $data[$i]['ID'],'ExamGroupID' => $dataC[$f]['ID'] ,
                             'ScheduleID' => $dataC[$f]['ScheduleID']))->result_array();
 
-                        if(count($dataF)>0){
-                            for($r=0;$r<count($dataF);$r++){
-                                $dn = $this->db->select('Name')->get_where($dataF[$r]['DB_Students'].'.students',array('NPM'=>$dataF[$r]['NPM']),1)->result_array();
-                                $dataF[$r]['Name'] = $dn[0]['Name'];
-                            }
-                        }
+//                        if(count($dataF)>0){
+//                            for($r=0;$r<count($dataF);$r++){
+//                                $dn = $this->db->select('Name')->get_where($dataF[$r]['DB_Students'].'.students',array('NPM'=>$dataF[$r]['NPM']),1)->result_array();
+//                                $dataF[$r]['Name'] = $dn[0]['Name'];
+//                            }
+//                        }
 
                         $dataC[$f]['DetailStudent'] = $dataF;
                     }

@@ -4,10 +4,55 @@
     #tableShowExam>thead>tr>th, #tableExam>tbody>tr>td {
         text-align: center;
     }
+
+    .material-switch > input[type="checkbox"] {
+        display: none;
+    }
+
+    .material-switch > label {
+        cursor: pointer;
+        height: 0px;
+        position: relative;
+        width: 40px;
+    }
+
+    .material-switch > label::before {
+        background: rgb(0, 0, 0);
+        box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+        content: '';
+        height: 16px;
+        margin-top: -8px;
+        position:absolute;
+        opacity: 0.3;
+        transition: all 0.4s ease-in-out;
+        width: 40px;
+    }
+    .material-switch > label::after {
+        background: rgb(255, 255, 255);
+        border-radius: 16px;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+        content: '';
+        height: 24px;
+        left: -4px;
+        margin-top: -8px;
+        position: absolute;
+        top: -4px;
+        transition: all 0.3s ease-in-out;
+        width: 24px;
+    }
+    .material-switch > input[type="checkbox"]:checked + label::before {
+        background: inherit;
+        opacity: 0.5;
+    }
+    .material-switch > input[type="checkbox"]:checked + label::after {
+        background: inherit;
+        left: 20px;
+    }
 </style>
 
 <div class="row">
-    <div class="col-md-6 col-md-offset-1">
+    <div class="col-md-6">
         <div class="well" style="margin-bottom: 10px;">
             <div class="row">
                 <div class="col-xs-4" style="">
@@ -48,6 +93,19 @@
             </div>
         </div>
     </div>
+    <div class="col-md-2">
+        <div class="thumbnail" style="padding: 23px 15px 23px 15px;">
+            <div class="row">
+                <div class="col-xs-12">
+                    <label>Random Layout</label>
+                    <div class="material-switch pull-right">
+                        <input id="layoutExam" type="checkbox"/>
+                        <label for="layoutExam" class="label-primary"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -76,10 +134,31 @@
                 clearInterval(loadFirst);
             }
 
-            console.log(1);
-
         },1000);
 
+        loadConfigLayout();
+
+    });
+    
+    function loadConfigLayout() {
+
+        var token = jwt_encode({action:'readConfig',ConfigID:1},'UAP)(*');
+        var url = base_url_js+'api/__crudConfig';
+        $.post(url,{token:token},function (jsonResult) {
+            var c = (jsonResult[0].Status==1 || jsonResult[0].Status=='1') ? 'checked' : '';
+            $('#layoutExam').prop('checked',c);
+        });
+    }
+
+    $('#layoutExam').change(function () {
+
+        var status = ($('#layoutExam').is(':checked')) ? '1' : '0';
+
+        var token = jwt_encode({action:'updateConfig',ConfigID:1,Status:status},'UAP)(*');
+        var url = base_url_js+'api/__crudConfig';
+        $.post(url,{token:token},function (result) {
+            toastr.success('Data Saved','Success');
+        });
     });
 
     $('.form-filter-list-exam').change(function () {
