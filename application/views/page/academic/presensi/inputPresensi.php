@@ -182,13 +182,14 @@
                                tr.append('<tr  style="'+bg_td+'">' +
                                    '<td style="text-align: left;"><b>'+dataAttd['AttdLecturers'+a][lecA].Name+'</b>' +
                                    '<span style="float: right;">'+dateAttd+' | '+inAttd+' - '+OutAttd+' | ' +
-                                   '<button class="btn btn-sm btn-default btn-default-danger btn-delete-attd" data-id="'+dataAttd['AttdLecturers'+a][0].ID+'"><i  class="fa fa-minus-circle"></i></button></span>'+
+                                   '<button class="btn btn-sm btn-default btn-default-danger btn-delete-attd" data-id="'+dataAttd['AttdLecturers'+a][lecA].ID+'"><i  class="fa fa-minus-circle"></i></button></span>'+
                                    '</td>' +
                                    '</tr>');
                            }
 
 
-                    } else {
+                    }
+                    else {
                         tr.append('<tr  style="'+bg_td+'">' +
                             '            <td>'+a+'</td>' +
                             '            <td>'+btn_Sc_Ex_Status+'</td>' +
@@ -201,8 +202,6 @@
                             '            <td rowspan="" style="text-align: left;background: #8bc34a73;"></td>' +
                             '        </tr>');
                     }
-
-
 
                 }
 
