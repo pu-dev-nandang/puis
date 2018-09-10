@@ -406,6 +406,14 @@ $route['admission/mastercalonmahasiswa/submit_import_excel_File_generate_nim'] =
 
 
 // ---Finance----
+
+$route['finance/dashboard_getoutstanding_today'] =  'dashboard/c_dashboard/dashboard_getoutstanding_today';
+$route['finance/dashboard'] =  'dashboard/c_dashboard/finance_dashboard';
+$route['finance/summary_payment'] =  'dashboard/c_dashboard/summary_payment';
+$route['finance/summary_payment_admission'] =  'dashboard/c_dashboard/summary_payment_admission';
+$route['finance/summary_payment_formulir'] =  'dashboard/c_dashboard/summary_payment_formulir';
+
+
 $route['finance/master/tagihan-mhs'] =  'page/finance/c_tuition_fee/tuition_fee';
 $route['finance/master/modal-tagihan-mhs'] =  'page/finance/c_tuition_fee/modal_tagihan_mhs';
 $route['finance/master/modal-tagihan-mhs-submit'] =  'page/finance/c_tuition_fee/modal_tagihan_mhs_submit';

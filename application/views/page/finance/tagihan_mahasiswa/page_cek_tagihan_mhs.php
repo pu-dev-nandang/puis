@@ -293,9 +293,9 @@
                    var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>'; 
 
                    var btn_edit = '';
-                   var btn_view = '<button class = "DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'">View</button>';
+                   var btn_view = '<button class = "btn btn-default DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'"><i class="fa fa-search" aria-hidden="true"></i> View</button>';
                    <?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
-                     btn_edit = '<br><br> <button class = "btn btn-default edit" NPM = "'+Data_mhs[i]['NPM']+'" semester = "'+Data_mhs[i]['SemesterID']+'" PTID = "'+Data_mhs[i]['PTID']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'">Edit Tagihan</button>';
+                     btn_edit = '<br><br> <button class = "btn btn-default edit" NPM = "'+Data_mhs[i]['NPM']+'" semester = "'+Data_mhs[i]['SemesterID']+'" PTID = "'+Data_mhs[i]['PTID']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
                      var btn_view = '<button class = " btn btn-primary DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'">Pembayaran Manual </button>';
                    <?php endif ?>
 

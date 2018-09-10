@@ -207,7 +207,7 @@
                       '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
                       '<td>'+yy+'</td>' +
                       '<td>'+htmlCicilan+'</td>'+
-                      '<td>'+'<button class = "DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'">View</button>&nbsp <button class = "edit" NPM = "'+Data_mhs[i]['NPM']+'" semester = "'+Data_mhs[i]['SemesterID']+'" PTID = "'+Data_mhs[i]['PTID']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'">Edit</button>'+'</td>' +
+                      '<td>'+'<button class = "DetailPayment btn btn-default" NPM = "'+Data_mhs[i]['NPM']+'"><i class="fa fa-search" aria-hidden="true"></i> View</button>&nbsp <button class = "edit" NPM = "'+Data_mhs[i]['NPM']+'" semester = "'+Data_mhs[i]['SemesterID']+'" PTID = "'+Data_mhs[i]['PTID']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'">Edit</button>'+'</td>' +
                       '</tr>');
                  
                 }

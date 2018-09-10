@@ -221,6 +221,9 @@
                                                       '</tr>');
                             }   
                             
+                         }
+                         else{
+                          toastr.info('Mohon Unapprove dahulu sebelum di edit'); 
                          } 
                         
                     }

@@ -244,7 +244,7 @@
                                                '<td>'+Data_mhs[i]['Discount']+'%</td>' +
                                                '<td>'+yy+'</td>' +
                                                '<td>'+status+'</td>' +
-                                               '<td>'+'<button class = "DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'">View</button>'+'</td>' +
+                                               '<td>'+'<button class = "btn btn-default DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'"><i class="fa fa-search" aria-hidden="true"></i> View</button>'+'</td>' +
                                                '</tr>');
                       }
                       
