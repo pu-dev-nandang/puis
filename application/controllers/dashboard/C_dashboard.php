@@ -17,7 +17,7 @@ class C_dashboard extends Globalclass {
         $data['department'] = parent::__getDepartement();
         // print_r(APPPATH.'views/page/'.$data['department'].'/dashboard.php');die();
         if (file_exists(APPPATH.'views/page/'.$data['department'].'/dashboard.php')) {
-            $content = $this->load->view('dashboard/finance_dashboard',$data,true);
+            $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
             $this->temp($content);
         }
         else
