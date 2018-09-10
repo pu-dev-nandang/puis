@@ -82,12 +82,12 @@
                         Import PriceList Mahasiswa
                         </a>
                     </li>
-                    <li class="<?php if($this->uri->segment(2)=='master' && $this->uri->segment(3) == "import_beasiswa_mahasiswa" ){echo "current";} ?>">
+                    <!-- <li class="<?php if($this->uri->segment(2)=='master' && $this->uri->segment(3) == "import_beasiswa_mahasiswa" ){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/master/import_beasiswa_mahasiswa'); ?>">
                         <i class="icon-angle-right"></i>
                         Import Beasiswa Mahasiswa
                         </a>
-                    </li>
+                    </li> -->
                 </ul>
             </li>
             <li class="<?php if($this->uri->segment(2)=='admission'){echo "current open";} ?>">
