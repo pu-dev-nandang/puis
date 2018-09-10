@@ -991,29 +991,46 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Output('document_attendance_exam_student.pdf','I');
         }
         else if($data_arr['DocumentType']==4){
+
+//            print_r($data_arr);
+//            exit;
+
             // Get data exam
             $dataExam = $this->m_save_to_pdf->getExamSchedule($data_arr['SemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
-
-//            print_r($dataExam);
-//            exit;
 
             $pdf = new FPDF('L','mm','A4');
             if(count($dataExam)>0){
                 $pdf->SetMargins(10,3,10);
                 $pdf->AddPage();
 
-                $this->header_attendance_pengawas($pdf);
+                $this->header_attendance_pengawas($pdf,$data_arr);
 
                 $h = 7;
+                $pdf->SetFillColor(226, 226, 226);
+                $pdf->Cell(25,$h,'Time','TLR',0,'C',true);
+                $pdf->Cell(20,$h,'Room','TLR',0,'C',true);
 
-                $pdf->Cell(23,$h,'Group',1,0,'C');
-                $pdf->Cell(99,$h,'Course',1,0,'C');
-                $pdf->Cell(60,$h,'Pengawas',1,0,'C');
+                $pdf->Cell(70,$h,'Invigilator 1',1,0,'C',true);
+                $pdf->Cell(70,$h,'Invigilator 2',1,0,'C',true);
 
-                $pdf->Cell(25,$h,'Time',1,0,'C');
-                $pdf->Cell(20,$h,'Room',1,0,'C');
-                $pdf->Cell(30,$h,'Taken',1,0,'C');
-                $pdf->Cell(30,$h,'Returned',1,1,'C');
+                $pdf->Cell(22,$h,'Group','TLR',0,'C',true);
+                $pdf->Cell(75,$h,'Course','TLR',1,'C',true);
+
+
+
+                $pdf->Cell(25,$h,'','BLR',0,'C',true);
+                $pdf->Cell(20,$h,'','BLR',0,'C',true);
+
+                $pdf->Cell(40,$h,'Name',1,0,'C',true);
+                $pdf->Cell(15,$h,'Taken',1,0,'C',true);
+                $pdf->Cell(15,$h,'Returned',1,0,'C',true);
+                $pdf->Cell(40,$h,'Name',1,0,'C',true);
+                $pdf->Cell(15,$h,'Taken',1,0,'C',true);
+                $pdf->Cell(15,$h,'Returned',1,0,'C',true);
+
+                $pdf->Cell(22,$h,'','BLR',0,'C',true);
+                $pdf->Cell(75,$h,'','BLR',1,'C',true);
+
 
                 for($ex=0;$ex<count($dataExam);$ex++){
 
@@ -1458,55 +1475,73 @@ class C_save_to_pdf extends CI_Controller {
 
     }
 
-    private function header_attendance_pengawas($pdf){
-        $pdf->Image(base_url('images/icon/favicon.png'),15,3,20);
+    private function header_attendance_pengawas($pdf,$data_arr){
+        $pdf->Image(base_url('images/icon/favicon.png'),15,5,15);
 
         $h = 5;
 
         $pdf->SetFont('Times','B',14);
-        $pdf->Cell(287,$h,'Universitas Agung Podomoro',0,1,'C');
+        $pdf->Cell(282,$h,'Universitas Agung Podomoro',0,1,'C');
 
         $pdf->Ln(1);
 
         $pdf->SetFont('Times','',10);
-        $pdf->Cell(287,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
-        $pdf->Cell(287,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
-        $pdf->Cell(287,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
+        $pdf->Cell(282,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
+        $pdf->Cell(282,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
+        $pdf->Cell(282,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
 
-        $pdf->Line(10,25,297,25);
+        $pdf->Line(10,25,292,25);
 
+        $pdf->Ln(5);
 
-        $pdf->Ln(7);
+        $pdf->SetFont('Times','B',12);
+        $pdf->Cell(282,$h,date('l, d F Y',strtotime($data_arr['ExamDate'])),0,1,'C');
+        $pdf->SetFont('Times','',10);
+
+        $pdf->Ln(4);
+
     }
 
     private function attendance_pengawas($pdf,$data_arr,$dataDetailExam){
 
-
         $totalCourse = count($dataDetailExam['Course']);
         $h = 7;
-        $h_pengawas = ($h * $totalCourse)/2;
+        $h2 = $h * $totalCourse;
+        for($i=0;$i<$totalCourse;$i++){
 
-        $h_d = $h*$totalCourse;
 
-        for($i=0;$i<count($dataDetailExam['Course']);$i++){
-            $d = $dataDetailExam['Course'][$i];
-            $pdf->Cell(23,$h,$d['ClassGroup'],1,0,'C');
-            $pdf->Cell(99,$h,$d['Course'],1,0,'L');
+            $time = substr($dataDetailExam['ExamStart'],0,5).' - '.substr($dataDetailExam['ExamEnd'],0,5);
+
+            $group = $dataDetailExam['Course'][$i]['ClassGroup'];
+            $datacourse = $dataDetailExam['Course'][$i]['Course'];
+            $course = (strlen($datacourse)>=45) ? substr($datacourse,0,45).'_' : $datacourse;
+
+            $data_p1 = $dataDetailExam['Name_P1'];
+            $data_p2 = $dataDetailExam['Name_P2'];
+
+            $Name_P1 = (strlen($data_p1)>=20) ? substr($data_p1,0,20).'_' : $data_p1;
+            $Name_P2 = (strlen($data_p2)>=20) ? substr($data_p2,0,20).'_' : $data_p2;
+
 
             if($i==0){
 
-//                $pdf->Cell(122,$h_d,'',1,0,'C');
 
-                // Pengawas
-                $pdf->Cell(60,$h_d,'Pengawas',1,0,'C');
-                $pdf->Cell(25,$h_d,'Pengawas',1,0,'C');
-                $pdf->Cell(20,$h_d,'Pengawas',1,0,'C');
-                $pdf->Cell(30,$h_d,'Pengawas',1,0,'C');
-                $pdf->Cell(30,$h_d,'Pengawas',1,1,'C');
+                $pdf->Cell(25,$h2,$time,1,0,'C');
+                $pdf->Cell(20,$h2,$dataDetailExam['Room'],1,0,'C');
+                $pdf->Cell(40,$h2,$Name_P1,1,0,'L');
+                $pdf->Cell(15,$h2,'',1,0,'C');
+                $pdf->Cell(15,$h2,'',1,0,'C');
+                $pdf->Cell(40,$h2,$Name_P2,1,0,'L');
+                $pdf->Cell(15,$h2,'',1,0,'C');
+                $pdf->Cell(15,$h2,'',1,0,'C');
 
+            } else {
+                $pdf->Cell(185,$h2,'',0,0,'C');
             }
 
-            $n = ($i == (count($dataDetailExam['Course']) - 1)) ? 1 : 0;
+
+            $pdf->Cell(22,$h,$group,1,0,'C');
+            $pdf->Cell(75,$h,$course,1,1,'L');
 
 
 
@@ -1517,17 +1552,40 @@ class C_save_to_pdf extends CI_Controller {
 
 
 
-//        for ($i=0;$i<count($totalCourse['Course']);$i++){
+
+
+
+//        $totalCourse = count($dataDetailExam['Course']);
+//        $h = 7;
+//        $h_pengawas = ($h * $totalCourse)/2;
 //
-//            if($i!=0){
-//                $pdf->Cell(8,$h,'',0,0,'C');
+//        $h_d = $h*$totalCourse;
+//
+//        for($i=0;$i<count($dataDetailExam['Course']);$i++){
+//            $d = $dataDetailExam['Course'][$i];
+//            $pdf->Cell(23,$h,$d['ClassGroup'],1,0,'C');
+//            $pdf->Cell(99,$h,$d['Course'],1,0,'L');
+//
+//            if($i==0){
+//
+////                $pdf->Cell(122,$h_d,'',1,0,'C');
+//
+//                // Pengawas
+//                $pdf->Cell(60,$h_d,'Pengawas',1,0,'C');
+//                $pdf->Cell(25,$h_d,'Pengawas',1,0,'C');
+//                $pdf->Cell(20,$h_d,'Pengawas',1,0,'C');
+//                $pdf->Cell(30,$h_d,'Pengawas',1,0,'C');
+//                $pdf->Cell(30,$h_d,'Pengawas',1,1,'C');
+//
 //            }
 //
-//            $pdf->Cell(25,$h,'Time '.$i,1,0,'C');
-//            $pdf->Cell(20,$h,'Room',1,0,'C');
-//            $pdf->Cell(30,$h,'Taken',1,0,'C');
-//            $pdf->Cell(30,$h,'Returned',1,1,'C');
+//            $n = ($i == (count($dataDetailExam['Course']) - 1)) ? 1 : 0;
+//
+//
+//
+//
 //        }
+
 
 
 
