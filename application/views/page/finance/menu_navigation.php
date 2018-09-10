@@ -1,3 +1,10 @@
+<?php
+if ($this->uri->segment(1) == 'dashboard') {
+    redirect(base_url().'finance/dashboard');
+}
+
+?>
+
 <div id="sidebar" class="sidebar-fixed">
     <div id="sidebar-content">
 
@@ -209,12 +216,12 @@
                         Daftar Tagihan
                         </a>
                     </li>
-                    <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "list-telat-bayar"){echo "current";} ?>">
+                    <!-- <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "list-telat-bayar"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/list-telat-bayar'); ?>">
                         <i class="icon-angle-right"></i>
                         Daftar Outstanding Pembayaran
                         </a>
-                    </li>
+                    </li> -->
                    <!--  <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "penerimaan-tagihan-mhs"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/penerimaan-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
