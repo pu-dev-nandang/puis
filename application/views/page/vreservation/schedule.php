@@ -84,7 +84,7 @@
 	}
 	#tblFreeze thead {
 	    /*width: calc( 100% - 1em ) scrollbar is average 1em/16px width, remove it from thead width */
-	     width: calc( 100% - 0em )
+	     width: calc( 100% - 1.2em )
 	}
 	#tblFreeze table {
 	    width:400px;
