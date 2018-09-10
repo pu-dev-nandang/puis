@@ -1543,53 +1543,7 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Cell(22,$h,$group,1,0,'C');
             $pdf->Cell(75,$h,$course,1,1,'L');
 
-
-
-
         }
-
-
-
-
-
-
-
-
-//        $totalCourse = count($dataDetailExam['Course']);
-//        $h = 7;
-//        $h_pengawas = ($h * $totalCourse)/2;
-//
-//        $h_d = $h*$totalCourse;
-//
-//        for($i=0;$i<count($dataDetailExam['Course']);$i++){
-//            $d = $dataDetailExam['Course'][$i];
-//            $pdf->Cell(23,$h,$d['ClassGroup'],1,0,'C');
-//            $pdf->Cell(99,$h,$d['Course'],1,0,'L');
-//
-//            if($i==0){
-//
-////                $pdf->Cell(122,$h_d,'',1,0,'C');
-//
-//                // Pengawas
-//                $pdf->Cell(60,$h_d,'Pengawas',1,0,'C');
-//                $pdf->Cell(25,$h_d,'Pengawas',1,0,'C');
-//                $pdf->Cell(20,$h_d,'Pengawas',1,0,'C');
-//                $pdf->Cell(30,$h_d,'Pengawas',1,0,'C');
-//                $pdf->Cell(30,$h_d,'Pengawas',1,1,'C');
-//
-//            }
-//
-//            $n = ($i == (count($dataDetailExam['Course']) - 1)) ? 1 : 0;
-//
-//
-//
-//
-//        }
-
-
-
-
-
 
     }
 
@@ -1597,73 +1551,59 @@ class C_save_to_pdf extends CI_Controller {
 
     //===========================
 
-    public function listStudentsFromCourse(){
+    private function header_exam_layout($pdf,$dataExam,$dataCourse){
 
-        $token = $this->input->get('token');
-        $data_arr = $this->getInputToken($token);
-
-
-        $pdf = new FPDF('p','mm','A4');
-        // membuat halaman baru
-        $pdf->AddPage();
-
-        $this->header_exam_layout($pdf);
-
-
-        $pdf->Output();
-    }
-
-    private function header_exam_layout($pdf){
 
         $pdf->Image(base_url('images/icon/logo-l.png'),10,10,30);
 
         $pdf->SetFont('Arial','B',10);
 
+        $exam = ($dataExam['Type']=='uts' || $dataExam['Type']=='UTS') ? 'MID EXAM '.strtoupper($dataExam['Semester'])
+            : 'FINAL EXAM '.strtoupper($dataExam['Semester']) ;
+
         $pdf->Cell(45,9,'',0,0,'C');
-        $pdf->Cell(230,9,'SEATING MAP FINAL EXAM (UAS) - 2017/2018 GANJIL',1,1,'C');
+        $pdf->Cell(230,9,'SEATING MAP '.$exam,1,1,'C');
 
         $pdf->SetFont('Arial','I',7);
         $pdf->Cell(0,5,'Page : '.$pdf->PageNo().' of {nb}',0,1,'R');
 
         $pdf->SetFont('Arial','',10);
 
-//        $pdf->Cell(190,3,'',0,1);
+        $dataCourseName = $dataCourse['CourseEng'];
+        $course = (strlen($dataCourseName)>=55) ? substr($dataCourseName,0,55).'_' : $dataCourseName;
 
         $space_header = 5;
         $pdf->Cell(45,$space_header,'',0,0);
         $pdf->Cell(20,$space_header,'Course',0,0);
         $pdf->Cell(3,$space_header,':',0,0,'C');
-        $pdf->Cell(122,$space_header,'Studio 4',0,0);
+        $pdf->Cell(122,$space_header, $dataCourse['MKCode'].' - '.$course,0,0);
         $pdf->Cell(20,$space_header,'Date',0,0);
         $pdf->Cell(3,$space_header,':',0,0,'C');
-        $pdf->Cell(62,$space_header,'Tuesday, 8 Jun 2018',0,1);
+        $pdf->Cell(62,$space_header,date('l, d F, Y',strtotime($dataExam['ExamDate'])),0,1);
 
         $pdf->Cell(45,$space_header,'',0,0);
         $pdf->Cell(20,$space_header,'Pengawas 1',0,0);
         $pdf->Cell(3,$space_header,':',0,0,'C');
-        $pdf->Cell(122,$space_header,'Nandang M',0,0);
+        $pdf->Cell(122,$space_header,$dataExam['Name_P1'],0,0);
         $pdf->Cell(20,$space_header,'Time',0,0);
         $pdf->Cell(3,$space_header,':',0,0,'C');
-        $pdf->Cell(62,$space_header,'08:00 - 09:00',0,1);
+        $pdf->Cell(62,$space_header,substr($dataExam['ExamStart'],0,5).' - '.substr($dataExam['ExamEnd'],0,5),0,1);
 
         $pdf->Cell(45,$space_header,'',0,0);
         $pdf->Cell(20,$space_header,'Pengawas 2',0,0);
         $pdf->Cell(3,$space_header,':',0,0,'C');
-        $pdf->Cell(122,$space_header,'-',0,0);
+        $pdf->Cell(122,$space_header,$dataExam['Name_P2'],0,0);
         $pdf->Cell(20,$space_header,'Room',0,0);
         $pdf->Cell(3,$space_header,':',0,0,'C');
-        $pdf->Cell(62,$space_header,'503',0,1);
+        $pdf->Cell(62,$space_header,$dataExam['Room'],0,1);
 
         $pdf->Cell(275,7,'',0,1);
         $pdf->Cell(275,0.3,'',1,1);
 
         // Lecturer
-        $mejaGuru = 'kiri2';
-        if($mejaGuru=='kiri'){
+        if($dataExam['LectureDesk']=='left'){
             $pdf->Image(base_url('images/icon/lecturer.png'),25,50,15);
-            $pdf->Image(base_url('images/icon/door.png'),250,50,15);
         } else {
-            $pdf->Image(base_url('images/icon/door.png'),25,50,15);
             $pdf->Image(base_url('images/icon/lecturer.png'),250,50,15);
         }
 
@@ -1677,14 +1617,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->AliasNbPages();
 
-    }
 
-    public function exam_layout(){
-        $pdf = new FPDF('l','mm','A4');
-        // membuat halaman baru
-        $pdf->AddPage();
-
-        $this->header_exam_layout($pdf);
 
         $base_x = 10;
         $base_y = 75;
@@ -1692,7 +1625,7 @@ class C_save_to_pdf extends CI_Controller {
         $koor_y = $base_y;
         $no=1;
 
-        $jml_deret = 7; // Dinamis
+        $jml_deret = $dataExam['DeretForExam']; // Dinamis
         $total_w = 275;
         $space = 2;
         $width = ($total_w - (($jml_deret - 1) * $space)) / $jml_deret;
@@ -1701,15 +1634,21 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('Arial','',10);
         $pdf->setFillColor(255,255,102);
 
-        for($m=1;$m<=170;$m++){
+        // Total Students
+        $array_stf = $dataCourse['DetailStudent'];
+        $totalStudent = count($array_stf);
+
+        for($m=0;$m<$totalStudent;$m++){
+            $d_Std = $array_stf[$m];
 
             // NIM
             $pdf->SetXY($koor_x,$koor_y);
-            $pdf->Cell($width,$height_panel,'NPM '.$m,1,0,'C',true);
+            $pdf->Cell($width,$height_panel,$d_Std['NPM'],1,0,'C',true);
 
             // Name
             $pdf->SetXY($koor_x,($koor_y+7));
-            $nm = $m."_Nandang M";
+            $exName = explode(' ',$d_Std['Name']);
+            $nm = (count($exName)>=3) ? trim($exName[0]).' '.trim($exName[1]) : $d_Std['Name'];
             $exp_name = explode(" ",$nm);
             $name_fil = (count($exp_name)>3) ? $exp_name[0].' '.$exp_name[1] : $nm;
             $name = (strlen($name_fil)<=15) ? $name_fil : $exp_name[0];
@@ -1722,12 +1661,13 @@ class C_save_to_pdf extends CI_Controller {
 
                 if($pdf->GetY()>170){
                     // membuat halaman baru
-                    $pdf->AddPage();
-                    $this->header_exam_layout($pdf);
+//                    $this->header_exam_layout($pdf,$dataExam,$dataCourse);
                     $pdf->SetFont('Arial','',10);
                     $pdf->setFillColor(255,255,102);
-                    $koor_x = $base_x;
-                    $koor_y = $base_y;
+                    $koor_x = 10;
+                    $koor_y = 10;
+                    $pdf->AddPage();
+
                 }
             } else {
                 $koor_x = $koor_x+$width;
@@ -1736,8 +1676,36 @@ class C_save_to_pdf extends CI_Controller {
             $no++;
         }
 
-//        $pdf->Output('Study_Card.pdf','D');
-        $pdf->Output();
+    }
+
+    public function exam_layout($ExamID){
+
+        $data = $this->m_save_to_pdf->getExamByID($ExamID);
+
+        if(count($data)>0){
+
+            $pdf = new FPDF('l','mm','A4');
+
+
+            $dataExam = $data[0];
+
+            for($i=0;$i<count($dataExam['Course']);$i++){
+                $dataCourse = $dataExam['Course'][$i];
+
+
+                // membuat halaman baru
+                $pdf->AddPage();
+                $this->header_exam_layout($pdf,$dataExam,$dataCourse);
+            }
+
+            //        $pdf->Output('Study_Card.pdf','D');
+            $pdf->Output('layout.pdf','I');
+
+        } else {
+
+        }
+
+
     }
 
     private function header_exam($pdf){

@@ -1655,8 +1655,7 @@ class C_api extends CI_Controller {
                   <ul class="dropdown-menu">
                     <li><a href="'.base_url('academic/exam-schedule/edit-exam-schedule/'.$row['ID']).'">Edit</a></li>
                     <li role="separator" class="divider"></li>
-                    <li><a target="_blank" href="'.base_url('save2pdf/exam-layout').'">Layout</a></li>
-                    <li><a target="_blank" href="'.base_url('save2pdf/exam-layout').'">Layout Random</a></li>
+                    <li><a target="_blank" href="'.base_url('save2pdf/exam-layout/'.$row['ID']).'">Layout</a></li>
                     <li><a class="btnSave2PDF_Exam" href="javascript:void(0);" data-url="save2pdf/draft_questions_answer_sheet" data-token="'.$tkn_soal_jawaban.'">Draft Questions  & Answer Sheet</a></li>
                     <li role="separator" class="divider"></li>
                     <li><a class="btnDeleteExam" data-id="'.$row['ID'].'" href="javascript:void(0);" style="color: red;">Delete</a></li>
@@ -2580,6 +2579,9 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='add'){
                 $formData = (array) $data_arr['formData'];
                 $dataStudents = (array) $data_arr['dataStudents'];
+
+                print_r($data_arr);
+                exit;
 
                 $this->db->insert('db_academic.exam',$formData);
                 $insert_id = $this->db->insert_id();
@@ -3917,6 +3919,30 @@ class C_api extends CI_Controller {
             $data = $this->m_hr->getLecPartime();
             return print_r(json_encode($data));
         }
+    }
+
+    public function crudConfig(){
+
+        $data_arr = $this->getInputToken();
+
+        if(count($data_arr)>0){
+
+            if($data_arr['action']=='readConfig'){
+                $data = $this->db->get_where('db_academic.config',array('ConfigID' => $data_arr['ConfigID']))->result_array();
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='updateConfig'){
+
+                $this->db->set('Status', $data_arr['Status']);
+                $this->db->where('ConfigID', $data_arr['ConfigID']);
+                $this->db->update('db_academic.config');
+
+                return print_r(1);
+            }
+
+        }
+
+
     }
 
 
