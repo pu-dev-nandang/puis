@@ -131,8 +131,10 @@ class M_save_to_pdf extends CI_Model {
 
     public function getExamScheduleWithStudent($SemesterID,$Type,$ExamDate){
 
-        $data = $this->db->query('SELECT ex.*,cl.Room FROM db_academic.exam ex 
+        $data = $this->db->query('SELECT ex.*,cl.Room, em1.Name AS Name_P1, em2.Name AS Name_P2 FROM db_academic.exam ex 
                                           LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
+                                          LEFT JOIN db_employees.employees em1 ON (em1.NIP = ex.Pengawas1)
+                                          LEFT JOIN db_employees.employees em2 ON (em2.NIP = ex.Pengawas2)
                                           WHERE ex.SemesterID = "'.$SemesterID.'"
                                            AND ex.Type = "'.$Type.'"
                                             AND ex.ExamDate = "'.$ExamDate.'"

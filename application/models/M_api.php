@@ -3408,8 +3408,20 @@ class M_api extends CI_Model {
         }
 
         return $res;
+    }
 
+    public function getInvigilatorSch($SemesterID,$Type,$NIP){
+        $data = $this->db->query('SELECT ex.*,cl.Room FROM db_academic.exam ex 
+                                          LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
+                                          WHERE 
+                                          ex.SemesterID = "'.$SemesterID.'" AND
+                                          ex.Type = "'.$Type.'" AND 
+                                          ( ex.Pengawas1 = "'.$NIP.'"
+                                           OR ex.Pengawas2 = "'.$NIP.'" ) 
+                                           ORDER BY ex.ExamDate, ex.ExamStart ASC')
+                    ->result_array();
 
+        return $data;
     }
 
 }

@@ -87,10 +87,21 @@ class C_login extends CI_Controller {
             $dataEmp = $this->db->select('ID,NIP')->get_where('db_employees.employees',
                 array('NIP'=>$data_arr['Username'],'Password'=>$data_arr['Token']),1)->result_array();
 
-
             if(count($dataEmp)>0){
+
+                // Set Last Login
+                $dateTimeNow = date("Y-m-d H:i:s");
+                $this->db->set('LastLogin', $dateTimeNow);
+                $this->db->where('ID', $dataEmp[0]['ID']);
+                $this->db->update('db_employees.employees');
+
                 $this->setSession($dataEmp[0]['ID'],$dataEmp[0]['NIP']);
-                redirect(base_url('dashboard'));
+                if($data_arr['TypeUser']=='i'){
+                    redirect(base_url('invigilator'));
+                } else {
+                    redirect(base_url('dashboard'));
+                }
+
             } else {
 //            echo 'gagal login son';
                 redirect(url_sign_out);
@@ -469,6 +480,7 @@ class C_login extends CI_Controller {
             'menuDepartement' => (count($ruleUser)>1) ? false : true ,
             'departementNavigation' => $dataSession[0]['MenuNavigation'],
             'IDdepartementNavigation' => $dataSession[0]['IDDivision'],
+            'LoginAt' => date("Y-m-d H:i:s"),
             'loggedIn' => true
         );
 

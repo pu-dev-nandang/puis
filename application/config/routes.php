@@ -701,6 +701,8 @@ $route['api/__room_equipment'] = 'api/c_api/room_equipment';
 $route['api/__checkBentrokScheduleAPI'] = 'api/c_api/checkBentrokScheduleAPI';
 $route['api/__crudClassroomVreservation'] = 'api/c_api/crudClassroomVreservation';
 
+$route['api/__crudInvigilator'] = 'api/c_api/crudInvigilator';
+
 
 // for inject //
 $route['testadi'] = 'dashboard/c_dashboard/testadi';
@@ -802,3 +804,7 @@ $route['vreservation/config/policy/submit'] = 'page/vreservation/c_config/policy
 // test
 $route['testApprove'] = 'page/finance/c_finance/testApprove';
 $route['testInject'] = 'api/c_global/testInject';
+
+
+// Pengawas Ujian
+$route['invigilator'] = 'c_pengawas_ujian';
