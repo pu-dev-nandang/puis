@@ -3810,10 +3810,19 @@ class C_api extends CI_Controller {
 
     }
 
+    public function crudInvigilator(){
+        $data_arr = $this->getInputToken();
 
+        if(count($data_arr)>0){
 
+            if($data_arr['action']=='readScheduleInvigilator'){
 
+                $data = $this->m_api->getInvigilatorSch($data_arr['SemesterID'],
+                    $data_arr['TypeExam'],$data_arr['NIP']);
+                return print_r(json_encode($data));
+            }
 
-
+        }
+    }
 
 }

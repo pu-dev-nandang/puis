@@ -106,7 +106,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->Output('I',$DayNameEng.'_schedule.pdf');
     }
-    
+
     private function header_schedule($pdf,$SemesterDetails,$DayNameEng){
         $pdf->Image(base_url('images/icon/logo-hr.png'),10,10,50);
 
@@ -891,8 +891,6 @@ class C_save_to_pdf extends CI_Controller {
     public function filterDocument(){
         $token = $this->input->post('token');
         $data_arr = $this->getInputToken($token);
-//        print_r($data_arr);
-
 
         if($data_arr['DocumentType']==1){
 
@@ -992,9 +990,6 @@ class C_save_to_pdf extends CI_Controller {
         }
         else if($data_arr['DocumentType']==4){
 
-//            print_r($data_arr);
-//            exit;
-
             // Get data exam
             $dataExam = $this->m_save_to_pdf->getExamSchedule($data_arr['SemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
 
@@ -1041,6 +1036,39 @@ class C_save_to_pdf extends CI_Controller {
             }
 
             $pdf->Output('document_pengawas.pdf','I');
+
+        }
+        else if($data_arr['DocumentType']==5){
+
+            // Get data exam
+            $dataExam = $this->m_save_to_pdf->getExamScheduleWithStudent($data_arr['SemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
+
+//            print_r($dataExam);
+//            exit;
+
+            if(count($dataExam)>0){
+
+                $pdf = new FPDF('L','mm','A4');
+
+                if(count($dataExam)==1){
+                    $this->exam_template_map($pdf,$data_arr,$dataExam[0],'');
+                } else {
+                    for($i=0;$i<count($dataExam);$i++){
+
+                        $data2 = (isset($dataExam[$i + 1])) ? $dataExam[$i + 1] : '';
+
+                        $this->exam_template_map($pdf,$data_arr,$dataExam[$i],$data2);
+
+                        $i += 1;
+
+                    }
+                }
+
+                $pdf->Output('document_map.pdf','I');
+
+            } else {
+                echo "Attribut / Data is empty";
+            }
 
         }
 
@@ -1259,70 +1287,70 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Ln(10);
 
         $pdf->SetFont('Times','B',12);
-        $pdf->Cell(195,$h,'EXAMINATION FORM',0,1,'C');
-        $pdf->Cell(195,$h,'ACADEMIC YEAR '.strtoupper($data_arr['Semester']),0,1,'C');
+        $pdf->Cell(195,$h,'BERITA ACARA PELAKSANAAN UJIAN',0,1,'C');
+//        $pdf->Cell(195,$h,'ACADEMIC YEAR '.strtoupper($data_arr['Semester']),0,1,'C');
 
         $examType = ($data_arr['Type']=='UTS' || $data_arr['Type']=='uts')
-            ? 'Mid Exam' : 'Fina Exam';
+            ? 'Ujian Tengah Semester GASAL' : 'Ujian Akhir Semester GENAP';
 
         $pdf->Ln(5);
         $pdf->SetFont('Times','',10);
-        $pdf->Cell(195,$h,'Today, it has conducated for '.$examType,0,1,'L');
+        $pdf->Cell(195,$h,'Pada hari ini telah dilaksanakan  '.$examType.', Tahun Akademik '.$data_arr['Semester'],0,1,'L');
 
         $w_sp1 = 10;
-        $w_label = 30;
+        $w_label = 40;
         $w_sp2 = 5;
-        $w_fill = 150;
+        $w_fill = 140;
 
         $pdf->Ln(5);
 
         $h = 7;
 
         $pdf->Cell($w_sp1,$h,'',0,0,'L');
-        $pdf->Cell($w_label,$h,'Class Group',0,0,'L');
+        $pdf->Cell($w_label,$h,'Kelas (Group)',0,0,'L');
         $pdf->Cell($w_sp2,$h,':',0,0,'C');
         $pdf->Cell($w_fill,$h,$dataCourse['ClassGroup'],0,1,'L');
 
         $pdf->Cell($w_sp1,$h,'',0,0,'L');
-        $pdf->Cell($w_label,$h,'Code',0,0,'L');
+        $pdf->Cell($w_label,$h,'Kode Mata Kuliah',0,0,'L');
         $pdf->Cell($w_sp2,$h,':',0,0,'C');
         $pdf->Cell($w_fill,$h,$dataCourse['MKCode'],0,1,'L');
 
         $pdf->Cell($w_sp1,$h,'',0,0,'L');
-        $pdf->Cell($w_label,$h,'Course',0,0,'L');
+        $pdf->Cell($w_label,$h,'Mata Kuliah',0,0,'L');
         $pdf->Cell($w_sp2,$h,':',0,0,'C');
         $pdf->Cell($w_fill,$h,$dataCourse['Course'],0,1,'L');
 
         $pdf->Cell($w_sp1,$h,'',0,0,'L');
-        $pdf->Cell($w_label,$h,'Lecturer',0,0,'L');
+        $pdf->Cell($w_label,$h,'Dosen',0,0,'L');
         $pdf->Cell($w_sp2,$h,':',0,0,'C');
         $pdf->Cell($w_fill,$h,$dataCourse['Lecturere'],0,1,'L');
 
         $pdf->Cell($w_sp1,$h,'',0,0,'L');
-        $pdf->Cell($w_label,$h,'Day, Date',0,0,'L');
+        $pdf->Cell($w_label,$h,'Hari, Tanggal',0,0,'L');
         $pdf->Cell($w_sp2,$h,':',0,0,'C');
         $pdf->Cell($w_fill,$h,date("l, d F Y", strtotime($dataDetailExam['ExamDate'])),0,1,'L');
 
         $pdf->Cell($w_sp1,$h,'',0,0,'L');
-        $pdf->Cell($w_label,$h,'Time',0,0,'L');
+        $pdf->Cell($w_label,$h,'Waktu',0,0,'L');
         $pdf->Cell($w_sp2,$h,':',0,0,'C');
         $pdf->Cell($w_fill,$h,substr($dataDetailExam['ExamStart'],0,5).' - '.substr($dataDetailExam['ExamEnd'],0,5),0,1,'L');
 
         $pdf->Cell($w_sp1,$h,'',0,0,'L');
-        $pdf->Cell($w_label,$h,'Room',0,0,'L');
+        $pdf->Cell($w_label,$h,'Ruangan',0,0,'L');
         $pdf->Cell($w_sp2,$h,':',0,0,'C');
         $pdf->Cell($w_fill,$h,$dataDetailExam['Room'],0,1,'L');
 
 
         $pdf->Cell($w_sp1,$h,'',0,0,'L');
-        $pdf->Cell($w_label,$h,'Present',0,0,'L');
+        $pdf->Cell($w_label,$h,'Jumlah Peserta hadir',0,0,'L');
         $pdf->Cell($w_sp2,$h,':',0,0,'C');
-        $pdf->Cell($w_fill,$h,'_ _ _ _ _ _ student',0,1,'L');
+        $pdf->Cell($w_fill,$h,'_ _ _ _ _ _ orang',0,1,'L');
 
         $pdf->Cell($w_sp1,$h,'',0,0,'L');
-        $pdf->Cell($w_label,$h,'Absent',0,0,'L');
+        $pdf->Cell($w_label,$h,'Jumlah Peserta tidak hadir',0,0,'L');
         $pdf->Cell($w_sp2,$h,':',0,0,'C');
-        $pdf->Cell($w_fill,$h,'_ _ _ _ _ _ student',0,1,'L');
+        $pdf->Cell($w_fill,$h,'_ _ _ _ _ _ orang',0,1,'L');
 
         $pdf->Ln(5);
         $pdf->SetFont('Times','B',10);
@@ -1330,8 +1358,8 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_sp1,$h,'',0,0,'C');
         $pdf->Cell(10,$h,'No',1,0,'C',true);
         $pdf->Cell(30,$h,'NIM',1,0,'C',true);
-        $pdf->Cell(50,$h,'Name',1,0,'C',true);
-        $pdf->Cell(95,$h,'Description',1,1,'C',true);
+        $pdf->Cell(50,$h,'Nama',1,0,'C',true);
+        $pdf->Cell(95,$h,'Keterangan',1,1,'C',true);
 
 //        $pdf->SetFont('Times','',10);
         for($s=1;$s<=5;$s++){
@@ -1344,17 +1372,18 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->Ln(5);
 
-        $pdf->Cell(195,$h,'Remark during exam session :',0,1,'L');
+        $pdf->Cell(195,$h,'Catatan khusus selama ujian berlangsung :',0,1,'L');
         for($s=1;$s<=5;$s++){
             $pdf->Cell(195,$h,'','B',1,'L');
         }
 
         $pdf->Ln(5);
+        $pdf->SetFont('Times','',10);
 
         $pdf->Cell(195,$h,'Jakarta, '.date("d F Y", strtotime($dataDetailExam['ExamDate'])),0,1,'R');
 
-        $pdf->Cell(97.5,$h,'Invigilator 1',0,0,'C');
-        $pdf->Cell(97.5,$h,'Invigilator 2',0,1,'C');
+        $pdf->Cell(97.5,$h,'Pengawas Ujian 1',0,0,'C');
+        $pdf->Cell(97.5,$h,'Pengawas Ujian 2',0,1,'C');
 
         $pdf->Ln(15);
 
@@ -1547,6 +1576,284 @@ class C_save_to_pdf extends CI_Controller {
 
     }
 
+    private function exam_template_map($pdf,$data_arr,$dataDetailExam,$dataDetailExam_2){
+
+        $pdf->SetMargins(5,5,0);
+        $pdf->AddPage();
+
+        $totalGroup = count($dataDetailExam['Course']);
+        $totalGroup_2 = ($dataDetailExam_2!='')? count($dataDetailExam_2['Course']) : 1 ;
+        $h_fx = ($totalGroup>=$totalGroup_2) ? $totalGroup : $totalGroup_2;
+        $h_border = ($h_fx * 8) + 100;
+        $pdf->Rect(3, 3, 140, $h_border);
+        $pdf->Rect(155, 3, 140, $h_border);
+
+        $pdf->Image(base_url('images/icon/favicon.png'),5,6,12);
+        $pdf->Image(base_url('images/icon/favicon.png'),158,6,12);
+
+        $h=6;
+
+        $pdf->SetFont('Times','B',13);
+        $pdf->Cell(133,$h,'Universitas Agung Podomoro',0,0,'C');
+        $pdf->Cell(20,$h,'',0,0);
+        $pdf->Cell(132,$h,'Universitas Agung Podomoro',0,1,'C');
+
+        $h=3.9;
+
+        $pdf->SetFont('Times','',9);
+        $pdf->Cell(135,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
+
+        $pdf->Cell(135,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
+
+        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
+
+        $pdf->Line(3,25,143,25);
+        $pdf->Line(155,25,295,25);
+
+        $h=3.9;
+
+        $pdf->Ln(5);
+        $pdf->SetFont('Times','B',10);
+
+        $xam_t = ($data_arr['Type']=='uts' || $data_arr['Type']=='UTS') ? 'MID EXAM' : 'FINAL EXAM';
+
+        $pdf->Cell(135,$h,$xam_t,0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,$xam_t,0,1,'C');
+
+        $pdf->Cell(135,$h,'EVEN SEMESTER',0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'EVEN SEMESTER',0,1,'C');
+
+        $pdf->Cell(135,$h,'ACADEMIC YEAR '.strtoupper($data_arr['Semester']),0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,'ACADEMIC YEAR '.strtoupper($data_arr['Semester']),0,1,'C');
+
+        //++++++++++++++++++++++++++++++++++++++++++++
+        $pdf->Ln(5);
+        $pdf->SetFont('Times','',10);
+        $h=5;
+
+        $w_label_left_1 = 25;
+        $w_sp_left_1 = 7;
+        $w_fill_left_1 = 45;
+
+        $w_label_left_2 = 25;
+        $w_sp_left_2 = 7;
+        $w_fill_left_2 = 35;
+
+        $w_space = 8;
+
+        $w_label_right_1 = 25;
+        $w_sp_right_1 = 7;
+        $w_fill_right_1 = 45;
+
+        $w_label_right_2 = 25;
+        $w_sp_right_2 = 7;
+        $w_fill_right_2 = 35;
+
+        //======================================================
+
+        $pdf->Cell($w_label_left_1,$h,'Exam',0,0,'L');
+        $pdf->Cell($w_sp_left_1,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_left_1,$h,$xam_t." (".strtoupper($data_arr['Type']).")",0,0,'L');
+
+        $pdf->Cell($w_label_left_2,$h,'',0,0,'L');
+        $pdf->Cell($w_sp_left_2,$h,'',0,0,'C');
+        $pdf->Cell($w_fill_left_2,$h,'',0,0,'L');
+
+        $pdf->Cell($w_space,$h,'',0,0);
+
+
+        $pdf->Cell($w_label_right_1,$h,'Exam',0,0,'L');
+        $pdf->Cell($w_sp_right_1,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_right_1,$h,$xam_t." (".strtoupper($data_arr['Type']).")",0,0,'L');
+
+        $pdf->Cell($w_label_right_2,$h,'',0,0,'L');
+        $pdf->Cell($w_sp_right_2,$h,'',0,0,'C');
+        $pdf->Cell($w_fill_right_2,$h,'',0,1,'L');
+
+        //======================================================
+
+        $pdf->Cell($w_label_left_1,$h,'Day, Date',0,0,'L');
+        $pdf->Cell($w_sp_left_1,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_left_1,$h,date('l, d M Y',strtotime($data_arr['ExamDate'])),0,0,'L');
+
+        $pdf->Cell($w_label_left_2,$h,'Exam Type',0,0,'L');
+        $pdf->Cell($w_sp_left_2,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_left_2,$h,'Open / Close',0,0,'L');
+
+        $pdf->Cell($w_space,$h,'',0,0);
+
+
+        $pdf->Cell($w_label_right_1,$h,'Day, Date',0,0,'L');
+        $pdf->Cell($w_sp_right_1,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_right_1,$h,date('l, d M Y',strtotime($data_arr['ExamDate'])),0,0,'L');
+
+        $pdf->Cell($w_label_right_2,$h,'Exam Type',0,0,'L');
+        $pdf->Cell($w_sp_right_2,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_right_2,$h,'Open / Close',0,1,'L');
+
+        //======================================================
+
+        $time_1 = substr($dataDetailExam['ExamStart'],0,5).' - '.substr($dataDetailExam['ExamEnd'],0,5);
+        $time_2 = ($dataDetailExam_2!='') ? substr($dataDetailExam_2['ExamStart'],0,5).' - '.substr($dataDetailExam_2['ExamEnd'],0,5) : '-';
+
+        $pdf->Cell($w_label_left_1,$h,'Time',0,0,'L');
+        $pdf->Cell($w_sp_left_1,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_left_1,$h,$time_1,0,0,'L');
+
+        $pdf->Cell($w_label_left_2,$h,'Calculator',0,0,'L');
+        $pdf->Cell($w_sp_left_2,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_left_2,$h,'Yes / No',0,0,'L');
+
+        $pdf->Cell($w_space,$h,'',0,0);
+
+
+        $pdf->Cell($w_label_right_1,$h,'Time',0,0,'L');
+        $pdf->Cell($w_sp_right_1,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_right_1,$h,$time_2,0,0,'L');
+
+        $pdf->Cell($w_label_right_2,$h,'Calculator',0,0,'L');
+        $pdf->Cell($w_sp_right_2,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_right_2,$h,'Yes / No',0,1,'L');
+
+        //======================================================
+
+        $room_1 = $dataDetailExam['Room'];
+        $room_2 = ($dataDetailExam_2!='') ? $dataDetailExam_2['Room'] : '-';
+
+        $pdf->Cell($w_label_left_1,$h,'Room',0,0,'L');
+        $pdf->Cell($w_sp_left_1,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_left_1,$h,$room_1,0,0,'L');
+
+        $pdf->Cell($w_label_left_2,$h,'Dictionary',0,0,'L');
+        $pdf->Cell($w_sp_left_2,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_left_2,$h,'Yes / No',0,0,'L');
+
+        $pdf->Cell($w_space,$h,'',0,0);
+
+
+        $pdf->Cell($w_label_right_1,$h,'Room',0,0,'L');
+        $pdf->Cell($w_sp_right_1,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_right_1,$h,$room_2,0,0,'L');
+
+        $pdf->Cell($w_label_right_2,$h,'Dictionary',0,0,'L');
+        $pdf->Cell($w_sp_right_2,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_right_2,$h,'Yes / No',0,1,'L');
+
+        //======================================================
+        $pdf->Ln(5);
+
+        $invigilator_1_1 = $dataDetailExam['Name_P1'];
+        $invigilator_1_2 = ($dataDetailExam_2!='') ? $dataDetailExam_2['Name_P1'] : '-' ;
+
+        $pdf->Cell($w_label_left_1,$h,'Invigilator 1',0,0,'L');
+        $pdf->Cell($w_sp_left_1,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_left_1+$w_label_left_2+$w_sp_left_2+$w_fill_left_2,$h,$invigilator_1_1,0,0,'L');
+
+        $pdf->Cell($w_space,$h,'',0,0);
+
+        $pdf->Cell($w_label_right_1,$h,'Invigilator 1',0,0,'L');
+        $pdf->Cell($w_sp_right_1,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_right_1+$w_label_right_2+$w_sp_right_2+$w_fill_right_2,$h,$invigilator_1_2,0,1,'L');
+
+        //======================================================
+
+        $invigilator_2_1 = $dataDetailExam['Name_P2'];
+        $invigilator_2_2 = ($dataDetailExam_2!='') ? $dataDetailExam_2['Name_P2'] : '-' ;
+
+        $pdf->Cell($w_label_left_1,$h,'Invigilator 2',0,0,'L');
+        $pdf->Cell($w_sp_left_1,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_left_1+$w_label_left_2+$w_sp_left_2+$w_fill_left_2,$h,$invigilator_2_1,0,0,'L');
+
+        $pdf->Cell($w_space,$h,'',0,0);
+
+        $pdf->Cell($w_label_right_1,$h,'Invigilator 2',0,0,'L');
+        $pdf->Cell($w_sp_right_1,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_right_1+$w_label_right_2+$w_sp_right_2+$w_fill_right_2,$h,$invigilator_2_2,0,1,'L');
+
+        //======================================================
+
+        //======================================
+
+        $pdf->Ln(7);
+
+        $pdf->SetFont('Times','B',9);
+        $h = 6;
+        $pdf->setFillColor(255,255,102);
+
+        $pdf->Cell(20,$h,'Group',1,0,'C',true);
+        $pdf->Cell(20,$h,'Code',1,0,'C',true);
+        $pdf->Cell(88,$h,'Course',1,0,'C',true);
+        $pdf->Cell(7,$h,'Std',1,0,'C',true);
+
+
+        $pdf->Cell(17,$h,'',0,0);
+
+        $pdf->Cell(20,$h,'Group',1,0,'C',true);
+        $pdf->Cell(20,$h,'Code',1,0,'C',true);
+        $pdf->Cell(88,$h,'Course',1,0,'C',true);
+        $pdf->Cell(7,$h,'Std',1,1,'C',true);
+
+
+        // --------------
+
+        $pdf->SetFont('Times','',8);
+        $h = 4;
+        for($c=0;$c<$h_fx;$c++){
+            $course1 = (isset($dataDetailExam['Course'][$c])) ? $dataDetailExam['Course'][$c] : '' ;
+            $course2 = (isset($dataDetailExam_2['Course'][$c])) ? $dataDetailExam_2['Course'][$c] : '' ;
+
+            $border_1 = ($course1!='') ? : 0;
+            $border_2 = ($course2!='') ? : 0;
+
+            $group_1 = ($course1!='') ? $course1['ClassGroup'] :'';
+            $group_2 = ($course2!='') ? $course2['ClassGroup'] :'';
+
+            $code_1 = ($course1!='') ? $course1['MKCode'] :'';
+            $code_2 = ($course2!='') ? $course2['MKCode'] :'';
+
+            $c_name_1 = ($course1!='') ? $course1['Course'] :'';
+            $c_name_2 = ($course2!='') ? $course2['Course'] :'';
+
+            $std_1 = ($course1!='') ? count($course1['DetailStudents']) :'';
+            $std_2 = ($course2!='') ? count($course2['DetailStudents']) :'';
+
+            $pdf->Cell(20,$h,$group_1,$border_1,0,'C');
+            $pdf->Cell(20,$h,$code_1,$border_1,0,'C');
+            $pdf->Cell(88,$h,$c_name_1,$border_1,0,'L');
+            $pdf->Cell(7,$h,$std_1,$border_1,0,'C');
+
+
+            $pdf->Cell(17,$h,'',0,0);
+
+            $pdf->Cell(20,$h,$group_2,$border_2,0,'C');
+            $pdf->Cell(20,$h,$code_2,$border_2,0,'C');
+            $pdf->Cell(88,$h,$c_name_2,$border_2,0,'L');
+            $pdf->Cell(7,$h,$std_2,$border_2,1,'C');
+
+        }
+
+
+        $pdf->Ln(5);
+
+        $pdf->SetFont('Times','I',7);
+        $pdf->Cell(135,$h,'Download On : '.date("d M Y H:i:s").' | '.chr(169).' Podomoro University',0,0,'R');
+
+        $pdf->Cell(17,$h,'',0,0);
+
+        $pdf->Cell(135,$h,'Download On : '.date("d M Y H:i:s").' | '.chr(169).' Podomoro University',0,1,'R');
+
+
+    }
+
 
 
     //===========================
@@ -1602,16 +1909,16 @@ class C_save_to_pdf extends CI_Controller {
 
         // Lecturer
         if($dataExam['LectureDesk']=='left'){
-            $pdf->Image(base_url('images/icon/lecturer.png'),25,50,15);
+            $pdf->Image(base_url('images/icon/lecturerdesk.png'),25,50,30);
         } else {
-            $pdf->Image(base_url('images/icon/lecturer.png'),250,50,15);
+            $pdf->Image(base_url('images/icon/lecturerdesk.png'),250,50,30);
         }
 
 
         $pdf->SetFillColor(226, 226, 226);
         $pdf->Cell(275,7,'',0,1);
-        $pdf->Cell(45,5,'',0,0);
-        $pdf->Cell(180,7,'Board',1,1,'C',true);
+        $pdf->Cell(55,5,'',0,0);
+        $pdf->Cell(170,7,'Board',1,1,'C',true);
 
         $pdf->Cell(275,15,'',0,1);
 
@@ -2362,13 +2669,13 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetMargins(10,10,10,10);
         $pdf->SetAutoPageBreak(true, 0);
-        
+
         // Logo
         $pdf->Image('./images/logo_tr.png',5,5,50);
-        
+
         $pdf->SetFont('Arial','',17);
         $pdf->Cell(200, 0, 'Tanda Terima Pembayaran Mahasiswa', 0, 1, 'C', 0);
-        
+
         $pdf->SetFont('Arial','',15);
         $pdf->Cell(200, 15, 'Tahun Akademik', 0, 1, 'C', 0);
 
@@ -2378,7 +2685,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Line(10, 30, 200, 30);
 
         $pdf->Cell(200, 7, '', 0, 1, 'C', 0);
-        
+
         $pdf->SetFont('Arial','',10);
         $pdf->Cell(100, 5, '', 0, 0, 'C');
         $this->load->model('master/m_master');
@@ -2437,7 +2744,7 @@ class C_save_to_pdf extends CI_Controller {
         // $this->mypdf->SetFillColor(0,0,0);
         $pdf->Cell(190, 5, 'Telp : (021) 292 00 456    Email : admission@podomorouniversity.ac.id   Website : www.podomorouniversity.ac.id', 0, 1, 'L', 0);
 
-        $pdf->AliasNbPages();    
+        $pdf->AliasNbPages();
 
         $pdf->Output();
     }
