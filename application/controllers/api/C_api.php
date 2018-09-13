@@ -3843,6 +3843,7 @@ class C_api extends CI_Controller {
                     'DeletedBy' => 0,
                     'Req_layout' => $get[0]['Req_layout'],
                     'Status' => $get[0]['Status'],
+                    'MarcommSupport' => $get[0]['MarcommSupport'],
                 );
                 $this->db->insert('db_reservation.t_booking_delete', $dataSave); 
 

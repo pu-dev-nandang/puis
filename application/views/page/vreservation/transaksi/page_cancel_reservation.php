@@ -146,6 +146,7 @@
                                    ' <th>Room</th>'+
                                    ' <th>Equipment Add</th>'+
                                    ' <th>Personel Support</th>'+
+                                   ' <th>Markom Support</th>'+
                                    ' <th>Req Date</th>'+
                                    ' <th>Req Layout</th>'+
                                    ' <th>Action</th>'+
@@ -179,6 +180,7 @@
                         '<td>'+response[i]['Room']+'</td>'+
                         '<td>'+response[i]['Equipment_add']+'</td>'+
                         '<td>'+response[i]['Persone_add']+'</td>'+
+                        '<td>'+response[i]['MarkomSupport']+'</td>'+
                         '<td>'+response[i]['Req_date']+'</td>'+
                         '<td>'+Req_layout+'</td>'+
                         '<td>'+btn+'</td>'+

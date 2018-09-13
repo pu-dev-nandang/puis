@@ -22,6 +22,63 @@ class C_transaksi extends Vreservation_Controler {
         $this->temp($content);
     }
 
+    public function uploadDokumenMultiple($filename)
+    {
+        $path = './uploads/vreservation';
+        // Count total files
+        $countfiles = count($_FILES['fileDataMarkomm']['name']);
+      
+      $output = array();
+      // Looping all files
+      for($i=0;$i<$countfiles;$i++){
+            $config = array();
+            if(!empty($_FILES['fileDataMarkomm']['name'][$i])){
+     
+              // Define new $_FILES array - $_FILES['file']
+              $_FILES['file']['name'] = $_FILES['fileDataMarkomm']['name'][$i];
+              $_FILES['file']['type'] = $_FILES['fileDataMarkomm']['type'][$i];
+              $_FILES['file']['tmp_name'] = $_FILES['fileDataMarkomm']['tmp_name'][$i];
+              $_FILES['file']['error'] = $_FILES['fileDataMarkomm']['error'][$i];
+              $_FILES['file']['size'] = $_FILES['fileDataMarkomm']['size'][$i];
+
+              // Set preference
+              $config['upload_path'] = $path.'/';
+              $config['allowed_types'] = '*';
+              $config['overwrite'] = TRUE; 
+              $no = $i + 1;
+              $config['file_name'] = $filename.'_'.$no;
+
+              $filenameUpload = $_FILES['file']['name'];
+              $ext = pathinfo($filenameUpload, PATHINFO_EXTENSION);
+
+              // $filenameNew = $filename.'_'.$no.'.pdf';
+              $filenameNew = $filename.'_'.$no.'_'.mt_rand().'.'.$ext;
+              // print_r($_FILES['file']['type']);
+
+     
+              //Load upload library
+              $this->load->library('upload',$config); 
+              $this->upload->initialize($config);
+     
+              // File upload
+              if($this->upload->do_upload('file')){
+                // Get data about the file
+                $uploadData = $this->upload->data();
+                $filePath = $uploadData['file_path'];
+                $filename_uploaded = $uploadData['file_name'];
+                // rename file
+                $old = $filePath.'/'.$filename_uploaded;
+                $new = $filePath.'/'.$filenameNew;
+
+                rename($old, $new);
+
+                $output[] = $filenameNew;
+              }
+            }
+        }
+        return $output;
+    }
+
     public function add_save_transaksi()
     {
         $input = $this->getInputToken();
@@ -31,7 +88,16 @@ class C_transaksi extends Vreservation_Controler {
             $filename = $uploadFile['file_name'];
         }
 
-        // print_r($filename);die();
+        if (array_key_exists('fileDataMarkomm',$_FILES)) {
+            // upload file markomm
+            $uploadFile2 = $this->uploadDokumenMultiple('GraphicDesign');
+            $filenamemarkomm = ''; 
+            if (is_array($uploadFile2)) {
+                $filenamemarkomm = implode(';', $uploadFile2);
+            }
+        }
+
+        // print_r($filenamemarkomm);die();
 
         $Start = date("Y-m-d H:i:s", strtotime($input['date'].$input['Start']));
         $End = date("Y-m-d H:i:s", strtotime($input['date'].$input['End']));
@@ -64,6 +130,49 @@ class C_transaksi extends Vreservation_Controler {
         $ID_add_personel = '';
         if (is_array($input['chk_person_support'])) {
             $ID_add_personel = implode(',', $input['chk_person_support']);
+        }
+
+        $chk_markom_support = '';
+        if (is_array($input['chk_markom_support'])) {
+            if ($filenamemarkomm == '') {
+                $chk_markom_support = implode(',', $input['chk_markom_support']);
+            }
+            else
+            {
+                $s = $input['chk_markom_support'];
+                for ($x=0; $x < count($s); $x++) { 
+                    if ($x == 0 ) {
+                        if ($s[$x] == 'Graphic Design') {
+                            $chk_markom_support = $s[$x].'['.$filenamemarkomm.']'; 
+                        }
+                        else
+                        {
+                            $chk_markom_support = $s[$x]; 
+                        }
+                        
+                    }
+                    elseif($x == (count($s) - 1))
+                    {
+                        if ($s[$x] == 'Graphic Design') {
+                            $chk_markom_support = $chk_markom_support.','.$s[$x].'['.$filenamemarkomm.']'; 
+                        }
+                        else
+                        {
+                            $chk_markom_support = $chk_markom_support.','.$s[$x]; 
+                        }
+                    }
+                    else
+                    {
+                        if ($s[$x] == 'Graphic Design') {
+                            $chk_markom_support = $chk_markom_support.','.$s[$x].'['.$filenamemarkomm.']'; 
+                        }
+                        else
+                        {
+                            $chk_markom_support = $chk_markom_support.','.$s[$x].''; 
+                        }
+                    }
+                }
+            }
         }
 
         // check data bentrok dengan jam lain
@@ -158,7 +267,8 @@ class C_transaksi extends Vreservation_Controler {
                     'Req_date' => date('Y-m-d'),
                     'CreatedBy' => $this->session->userdata('NIP'),
                     'Req_layout' => $filename,
-                    'ParticipantQty' => $input['Participant']
+                    'ParticipantQty' => $input['Participant'],
+                    'MarcommSupport' => $chk_markom_support,
                 );
                 $this->db->insert('db_reservation.t_booking', $dataSave);
                 $ID_t_booking = $this->db->insert_id();
@@ -180,6 +290,12 @@ class C_transaksi extends Vreservation_Controler {
                 $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $End);
                 $StartNameDay = $Startdatetime->format('l');
                 $EndNameDay = $Enddatetime->format('l');
+
+                $MarkomEmail ='';
+                if (is_array($input['chk_markom_support'])) {
+                    $ss = implode(',', $input['chk_markom_support']);
+                    $MarkomEmail = '<li>Documentation  : '.$ss.'</li>';
+                }
                 if($_SERVER['SERVER_NAME']!='localhost') {
                     // email to ga
                     $Email = 'ga@podomorouniversity.ac.id';
@@ -190,6 +306,7 @@ class C_transaksi extends Vreservation_Controler {
                                 <li>End  : '.$EndNameDay.', '.$End.'</li>
                                 <li>Room  : '.$input['Room'].'</li>
                                 <li>Agenda  : '.$input['Agenda'].'</li>
+                                '.$MarkomEmail.'
                                 </ul>
                             ';        
                     $to = $Email;
@@ -207,6 +324,7 @@ class C_transaksi extends Vreservation_Controler {
                                 <li>End  : '.$EndNameDay.', '.$End.'</li>
                                 <li>Room  : '.$input['Room'].'</li>
                                 <li>Agenda  : '.$input['Agenda'].'</li>
+                                '.$MarkomEmail.'
                                 </ul>
                             ';        
                     $to = $Email;
@@ -253,6 +371,54 @@ class C_transaksi extends Vreservation_Controler {
                         $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
                     }    
                     
+                }
+
+                // email notification to markom
+                $exFile =explode(';', $filenamemarkomm);
+                $MarkomSupport = '<ul>';
+                for ($m=0; $m < count($exFile); $m++) { 
+                    $MarkomSupport .= '<li>'.'<a href="'.base_url("fileGetAny/vreservation-".$exFile[$m]).'" target="_blank"></i>'.$exFile[$m].'</a></li>';
+                }
+
+                $MarkomSupport .= '</ul></li>';
+                if ($filenamemarkomm != '') {
+                    if($_SERVER['SERVER_NAME']!='localhost') {
+                          $getDataDB = $this->m_master->caribasedprimary('db_reservation.email_to','Ownership','Markom');
+                          $Email = $getDataDB[0]['Email'];
+                          $text = 'Dear Team,<br><br>
+                                      Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
+                                      Details Schedule : <br><ul>
+                                      <li>Start                       : '.$StartNameDay.', '.$Start.'</li>
+                                      <li>End                         : '.$EndNameDay.', '.$End.'</li>
+                                      <li>Room                        : '.$input['Room'].'</li>
+                                      <li>Agenda                      : '.$input['Agenda'].'</li>
+                                      <li>Documentation               : <strong>Please Click link below to download these files</strong>
+                                      '.$MarkomSupport.'
+                                      </ul>
+
+                                  ';        
+                          $to = $Email;
+                          $subject = "Podomoro University Venue Reservation Marcomm Support";
+                          $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                    }
+                    else{
+                        $Email = 'alhadi.rahman@podomorouniversity.ac.id';
+                        $text = 'Dear Team,<br><br>
+                                    Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
+                                    Details Schedule : <br><ul>
+                                    <li>Start                       : '.$StartNameDay.', '.$Start.'</li>
+                                    <li>End                         : '.$EndNameDay.', '.$End.'</li>
+                                    <li>Room                        : '.$input['Room'].'</li>
+                                    <li>Agenda                      : '.$input['Agenda'].'</li>
+                                    <li>Documentation      : <strong>Please Click link below to download these files</strong>
+                                    '.$MarkomSupport.'
+                                    </ul>
+
+                                ';        
+                        $to = $Email;
+                        $subject = "Podomoro University Venue Reservation Marcomm Support";
+                        $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                    } 
                 }
             }
             echo json_encode(array('msg' => 'The Proses Finish','status' => 1));
@@ -484,6 +650,7 @@ class C_transaksi extends Vreservation_Controler {
                 'DeletedBy' => $this->session->userdata('NIP'),
                 'Req_layout' => $get[0]['Req_layout'],
                 'Status' => $get[0]['Status'],
+                'MarcommSupport' => $get[0]['MarcommSupport'],
             );
             $this->db->insert('db_reservation.t_booking_delete', $dataSave); 
 

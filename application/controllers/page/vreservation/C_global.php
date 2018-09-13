@@ -395,6 +395,38 @@ class C_global extends Vreservation_Controler {
                         $Req_layout = '<a href="'.base_url("fileGetAny/vreservation-".$file).'" target="_blank"></i>Default Layout</a>';
                     }
                     
+                    $MarkomSupport = '<label>No</Label>';
+                    if ($get[0]['MarcommSupport'] != '') {
+                        $MarkomSupport = '<ul>';
+                        $dd = explode(',', $get[0]['MarcommSupport']);
+                        for ($zx=0; $zx < count($dd); $zx++) {
+                            $a = 'How are you?';
+
+                            if (strpos($dd[$zx], 'Graphic Design') !== false) {
+                                 $pos = strpos($dd[$zx],'[');
+                                 $li = substr($dd[$zx], 0,$pos);
+                                 $posE = strpos($dd[$zx],']');
+                                 $ISIe = substr($dd[$zx], ($pos+1), $posE);
+                                 $length = strlen($ISIe);
+                                 $ISIe = substr($ISIe, 0, ($length - 1));
+                                 // print_r($ISIe);die();
+                                 $MarkomSupport .= '<li>'.$li;
+                                 $FileMarkom = explode(';', $ISIe);
+                                 $MarkomSupport .= '<ul>';
+                                 for ($vc=0; $vc < count($FileMarkom); $vc++) { 
+                                    $MarkomSupport .= '<li>'.'<a href="'.base_url("fileGetAny/vreservation-".$FileMarkom[$vc]).'" target="_blank"></i>'.$FileMarkom[$vc].'</a>';
+                                 }
+                                 $MarkomSupport .= '</ul></li>';
+                            } 
+                            else{
+                              $MarkomSupport .= '<li>'.$dd[$zx].'</li>';  
+                            }
+                            
+                        }
+                        $MarkomSupport .= '</ul>';
+
+                    }
+                    $this->data['MarkomSupport'] = $MarkomSupport;
                     $this->data['Req_layout'] = $Req_layout;
                     $this->data['ID'] = $get[0]['ID'];
                     echo $this->load->view($this->pathView.'modal_form_view',$this->data,true);

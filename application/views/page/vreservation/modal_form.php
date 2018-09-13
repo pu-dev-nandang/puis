@@ -105,6 +105,18 @@
         <div class="form-group"> 
             <div class="row">
                 <div class="col-sm-3">
+                    <label class="control-label">Marcomm Support :</label>
+                </div>    
+                <div class="col-sm-6">
+                    <div class="col-md-3" id ="markom_support">
+                                                                  
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group"> 
+            <div class="row">
+                <div class="col-sm-3">
                     <label class="control-label">Seat Qty:</label>
                 </div>    
                 <div class="col-sm-6">
@@ -128,7 +140,7 @@
                                 </tbody>
                             </table>
                         </div>
-                    <div class="hide" id = "shwUploadFile">
+                    <div class="hide col-md-6" id = "shwUploadFile" style="width: 500px;">
                         <input type="file" data-style="fileinput" id="ExFile">
                         <br>
                         <b>If no Upload then using Default Layout</b><br>
@@ -162,6 +174,7 @@
         load_person_support();
         load_multiple();
         loadEquipmentRoom();
+        load_markom_support();
     });
 
     function loadEquipmentRoom()
@@ -281,6 +294,32 @@
             $('#tr_person_support'+i).append('</tr>');
         }
         $('#table_person_support').append('</table>');
+      }
+
+      function load_markom_support()
+      {
+        $('#markom_support').append('<table class="table" id ="table_markom_support">');
+        for (var i = 0; i < 1; i++) {
+            $('#table_markom_support').append('<tr id = "tr_markom_support'+i+'">');
+            for (var k = 0; k < 2; k++) {
+                if (k == 0) {
+                    $('#tr_markom_support'+i).append('<td>'+
+                                        '<input type="checkbox" class = "chk_markom_support" name="chk_markom_support" value = "Tidak" id = "markom_supportTDK">&nbsp No' +
+                                     '</td>'
+                                    );
+                }
+                else
+                {
+                    $('#tr_markom_support'+i).append('<td>'+
+                                        '<input type="checkbox" class = "chk_markom_support" name="chk_markom_support" value = "Ya" id = "markom_supportYA">&nbsp Yes' +
+                                     '</td>'
+                                    );
+                }
+                
+            }
+            $('#tr_markom_support'+i).append('</tr>');
+        }
+        $('#table_markom_support').append('</table>');
       }
 
 
