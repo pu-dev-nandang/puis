@@ -24,6 +24,7 @@ index.php
 /uploads/students/ta_2016/*.png
 
 **/uploads/document/
+**/uploads/vreservation/
 document/*
 /uploads/syllabus_sap/*.pdf
 /uploads/vreservation/*.pdf

@@ -137,6 +137,17 @@
       });
     }
 
+    var chk_markom_support = '';
+    if ($('#markom_supportYA').is(':checked')) {
+      var chk_markom_support = [];
+      $('.chk_markom_support_td').each(function() {
+         if ($(this).is(':checked')) {
+            var valuee = $(this).val();
+            chk_markom_support.push(valuee);
+         }
+      });
+    }
+
      // console.log(chk_person_support);
 
     // var chk_e_multiple = '';
@@ -159,6 +170,7 @@
        file : file_validation(),
        date : $('#datetime_deadline1').val(),
        Participant : $("#Participant").val(),
+       chk_markom_support : chk_markom_support,
    };
 
    console.log(data);
@@ -170,6 +182,16 @@
           var token = jwt_encode(data,"UAP)(*");
           form_data.append('token',token);
           form_data.append('fileData',fileData);
+
+          if ( $( "#ExFileMarkomm" ).length ) {
+              var filesMarkomm = $('#'+'ExFileMarkomm')[0].files;
+              for(var count = 0; count<filesMarkomm.length; count++)
+              {
+               form_data.append("fileDataMarkomm[]", filesMarkomm[count]);
+              }
+           
+          }
+          
           $.ajax({
             type:"POST",
             url:url,
@@ -296,6 +318,100 @@
                 }
               }
               break;
+        case  "chk_markom_support" :
+              if ($('#markom_supportYA').is(':checked')) {
+                // check lenght lebih dari satu
+                var aa = arr[key];
+                if (aa.length == 0) {
+                  toatString += 'Please check Marcomm Support' + "<br>";
+                }
+                else
+                {
+                  // check upload markomm support
+                  // Graphic Design
+                  var bool = 0;
+                  for (var x = 0; x < aa.length; x++) {
+                    if (aa[x] == 'Graphic Design') {bool = 1; break;}
+                  }
+                  if (bool == 1) {
+                    // try{
+                    //   var name = document.getElementById("ExFileMarkomm").files[0].name;
+                    //   var ext = name.split('.').pop().toLowerCase();
+                    //   if(jQuery.inArray(ext, ['jpeg','jpeg','JPG','jpg','PNG','png','pdf','PDF']) == -1) 
+                    //   {
+                    //     toatString += 'Invalid File Marcomm' + "<br>";
+                    //   }
+                    //   var oFReader = new FileReader();
+                    //   oFReader.readAsDataURL(document.getElementById("ExFileMarkomm").files[0]);
+                    //   var f = document.getElementById("ExFileMarkomm").files[0];
+                    //   var fsize = f.size||f.fileSize;
+                    //   if(fsize > 2000000) // 2mb
+                    //   {
+                    //    toatString += 'Image File Size Marcomm is very big ' + "<br>";
+                    //   }
+
+                    // }
+                    // catch(err)
+                    // {
+                    //   toatString += 'Invalid File Marcomm' + "<br>";
+                    // }
+                    var ID_element = 'ExFileMarkomm';
+                    var files = $('#'+ID_element)[0].files;
+                    var error = '';
+                    var msgStr = '';
+                    var max_upload_per_file = 4;
+                    // console.log(files.length);
+                    if (files.length == 0) {
+                      toatString += 'File Graphic Design is Required<br>';
+                    }
+                    else
+                    {
+                      if (files.length > max_upload_per_file) {
+                        toatString += '1 Document should not be more than 4 Files<br>';
+
+                      }
+                      else
+                      {
+                        for(var count = 0; count<files.length; count++)
+                        {
+                         var name = files[count].name;
+                         // console.log(name);
+                         var extension = name.split('.').pop().toLowerCase();
+                         if(jQuery.inArray(extension, ['jpeg','jpeg','JPG','jpg','PNG','png','pdf','PDF']) == -1)
+                         {
+                          var no = parseInt(count) + 1;
+                          toatString += 'Marcomm Number '+ no + ' Invalid Type File<br>';
+                          //toastr.error("Invalid Image File", 'Failed!!');
+                          // return false;
+                         }
+
+                         var oFReader = new FileReader();
+                         oFReader.readAsDataURL(files[count]);
+                         var f = files[count];
+                         var fsize = f.size||f.fileSize;
+                         // console.log(fsize);
+
+                         if(fsize > 2000000) // 2mb
+                         {
+                          toatString += 'Marcomm Number '+ no + ' Image File Size is very big<br>';
+                          //toastr.error("Image File Size is very big", 'Failed!!');
+                          //return false;
+                         }
+                         
+                        }
+                      }
+                    }// exit file lenght == 0
+                  } // exit else bool = 1
+                }
+              }
+              else
+              {
+                if($("#markom_supportTDK"). prop("checked") == false){
+                  toatString += 'Please Choices Marcomm Support' + "<br>";
+                }
+              }
+
+              break;      
         case  "chk_e_multiple" :
               if ($('#multipleYA').is(':checked')) {
                 if ($("#countDays").val() == '') {
@@ -354,6 +470,11 @@
 
     $(document).on('click','.chk_person_support', function () {
         $('input.chk_person_support').prop('checked', false);
+        $(this).prop('checked',true);
+    });
+
+    $(document).on('click','.chk_markom_support', function () {
+        $('input.chk_markom_support').prop('checked', false);
         $(this).prop('checked',true);
     });
 
@@ -490,6 +611,12 @@
         }
     });
 
+    $(document).on('change','#markom_supportTDK', function () {
+        if(this.checked) {
+            $('#divmarkom_support').remove();
+        }
+    });
+
     $(document).on('change','.chke_additional', function () {
       var aa = $(this).val();
         if(this.checked) {
@@ -525,7 +652,7 @@
                     split++;
               }
               var getRow = 0;
-              var divE_additional = '<div class="col-md-6" id="divperson_support"><strong>Choices Person Support</strong></div>';
+              var divE_additional = '<div class="col-md-6" id="divperson_support" style="width: 500px;"><strong>Choices Person Support</strong></div>';
               $('#person_support').after(divE_additional);
               $('#divperson_support').append('<table class="table" id ="tablechk_divperson_support">');
               for (var i = 0; i < split; i++) {
@@ -550,4 +677,52 @@
 
     });
 
+    $(document).on('change','#markom_supportYA', function () {
+        if(this.checked) {
+            //equipment_additional = [];
+            $('#divmarkom_support').remove();
+            var response = ['Video','Photo','Full Duration','Graphic Design'];
+            var splitBagi = 3;
+            var split = parseInt(response.length / splitBagi);
+            var sisa = response.length % splitBagi;
+            
+            if (sisa > 0) {
+                  split++;
+            }
+            var getRow = 0;
+            var divE_additional = '<div class="col-md-6" id="divmarkom_support" style="width: 500px;"><strong>Choices Support by Marcomm</strong></div>';
+            $('#markom_support').after(divE_additional);
+            $('#divmarkom_support').append('<table class="table" id ="tablechk_divmarkom_support">');
+            for (var i = 0; i < split; i++) {
+              if ((sisa > 0) && ((i + 1) == split) ) {
+                                  splitBagi = sisa;    
+              }
+              $('#tablechk_divmarkom_support').append('<tr id = "msa'+i+'">');
+              for (var k = 0; k < splitBagi; k++) {
+                  $('#msa'+i).append('<td>'+
+                                      '<input type="checkbox" class = "chk_markom_support_td" name="chk_markom_support_td" value = "'+response[getRow]+'">&nbsp'+ response[getRow]+
+                                   '</td>'
+                                  );
+                  getRow++;
+              }
+              $('#msa'+i).append('</tr>');
+            }
+            $('#tablechk_divmarkom_support').append('</table>');
+        }
+
+    });
+
+    $(document).on('change','.chk_markom_support_td[value="Graphic Design"]', function () {
+        if(this.checked) {
+           // console.log('Graphic Design');
+           var divE_Upload = '<div class="col-md-6" id="divmarkom_supportUpload" style="width: 500px;"><strong>Upload File</strong>';
+           divE_Upload += '<input type="file" data-style="fileinput" id="ExFileMarkomm" multiple></div>';
+           $('#tablechk_divmarkom_support').after(divE_Upload);
+
+        }
+        else
+        {
+          $('#divmarkom_supportUpload').remove();
+        }
+    });
 </script>

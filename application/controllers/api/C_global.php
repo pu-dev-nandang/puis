@@ -87,18 +87,51 @@ class C_global extends CI_Controller {
         // check session token untuk download
         $file = str_replace('-', '/', $file);
 
-        // Check File exist atau tidak
-        if (file_exists('./uploads/'.$file)) {
-            // $this->load->helper('download');
-            // $data   = file_get_contents('./document/'.$namaFolder.'/'.$file);
-            // $name   = $file;
-            // force_download($name, $data); // script download file
-            $this->showFile2($file);
+        $path = $file;
+        $ext = pathinfo($path, PATHINFO_EXTENSION);
+        if ($ext == 'pdf') {
+            if (file_exists('./uploads/'.$file)) {
+                    // // $file = "path_to_file";
+                    // $fp = fopen($path, "r") ;
+                    // header("Cache-Control: maxage=1");
+                    // header("Pragma: public");
+                    // header("Content-type: application/pdf");
+                    // header("Content-Disposition: inline; filename=".$filename."");
+                    // header("Content-Description: PHP Generated Data");
+                    // header("Content-Transfer-Encoding: binary");
+                    // header('Content-Length:' . filesize($path));
+                    // ob_clean();
+                    // flush();
+                    // while (!feof($fp)) {
+                    //    $buff = fread($fp, 1024);
+                    //    print $buff;
+                    // }
+                    // exit;
+                $this->showFile2($file);
+            }
+            else
+            {
+                show_404($log_error = TRUE);
+            }
         }
         else
         {
-            show_404($log_error = TRUE);
+            $imageData = base64_encode(file_get_contents(FCPATH.'uploads/'.$path));
+            echo '<img src="data:image/jpeg;base64,'.$imageData.'">';
         }
+
+        // // Check File exist atau tidak
+        // if (file_exists('./uploads/'.$file)) {
+        //     // $this->load->helper('download');
+        //     // $data   = file_get_contents('./document/'.$namaFolder.'/'.$file);
+        //     // $name   = $file;
+        //     // force_download($name, $data); // script download file
+        //     $this->showFile2($file);
+        // }
+        // else
+        // {
+        //     show_404($log_error = TRUE);
+        // }
     }
 
     private function showFile2($file)

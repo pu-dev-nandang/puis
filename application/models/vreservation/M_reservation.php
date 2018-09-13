@@ -699,6 +699,39 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
             $Reqdatetime = DateTime::createFromFormat('Y-m-d', $query[$i]['Req_date']);
             $ReqdateNameDay = $Reqdatetime->format('l');
+
+            $MarkomSupport = '<label>No</Label>';
+            if ($query[$i]['MarcommSupport'] != '') {
+                $MarkomSupport = '<ul>';
+                $dd = explode(',', $query[$i]['MarcommSupport']);
+                for ($zx=0; $zx < count($dd); $zx++) {
+                    $a = 'How are you?';
+
+                    if (strpos($dd[$zx], 'Graphic Design') !== false) {
+                         $pos = strpos($dd[$zx],'[');
+                         $li = substr($dd[$zx], 0,$pos);
+                         $posE = strpos($dd[$zx],']');
+                         $ISIe = substr($dd[$zx], ($pos+1), $posE);
+                         $length = strlen($ISIe);
+                         $ISIe = substr($ISIe, 0, ($length - 1));
+                         // print_r($ISIe);die();
+                         $MarkomSupport .= '<li>'.$li;
+                         $FileMarkom = explode(';', $ISIe);
+                         $MarkomSupport .= '<ul>';
+                         for ($vc=0; $vc < count($FileMarkom); $vc++) { 
+                            $MarkomSupport .= '<li>'.'<a href="'.base_url("fileGetAny/vreservation-".$FileMarkom[$vc]).'" target="_blank"></i>'.$FileMarkom[$vc].'</a>';
+                         }
+                         $MarkomSupport .= '</ul></li>';
+                    } 
+                    else{
+                      $MarkomSupport .= '<li>'.$dd[$zx].'</li>';  
+                    }
+                    
+                }
+                $MarkomSupport .= '</ul>';
+
+            }
+
             $arr_result[] = array(
                     'Start' => $StartNameDay.', '.$query[$i]['Start'],
                     'End' => $EndNameDay.', '.$query[$i]['End'],
@@ -711,6 +744,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     'Req_layout' => $query[$i]['Req_layout'],
                     'ID' => $query[$i]['ID'],
                     'Status' => $query[$i]['Status'],
+                    'MarkomSupport' => $MarkomSupport
             );
         }
 
@@ -782,6 +816,39 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
             $Reqdatetime = DateTime::createFromFormat('Y-m-d', $query[$i]['Req_date']);
             $ReqdateNameDay = $Reqdatetime->format('l');
+
+            $MarkomSupport = '<label>No</Label>';
+            if ($query[$i]['MarcommSupport'] != '') {
+                $MarkomSupport = '<ul>';
+                $dd = explode(',', $query[$i]['MarcommSupport']);
+                for ($zx=0; $zx < count($dd); $zx++) {
+                    $a = 'How are you?';
+
+                    if (strpos($dd[$zx], 'Graphic Design') !== false) {
+                         $pos = strpos($dd[$zx],'[');
+                         $li = substr($dd[$zx], 0,$pos);
+                         $posE = strpos($dd[$zx],']');
+                         $ISIe = substr($dd[$zx], ($pos+1), $posE);
+                         $length = strlen($ISIe);
+                         $ISIe = substr($ISIe, 0, ($length - 1));
+                         // print_r($ISIe);die();
+                         $MarkomSupport .= '<li>'.$li;
+                         $FileMarkom = explode(';', $ISIe);
+                         $MarkomSupport .= '<ul>';
+                         for ($vc=0; $vc < count($FileMarkom); $vc++) { 
+                            $MarkomSupport .= '<li>'.'<a href="'.base_url("fileGetAny/vreservation-".$FileMarkom[$vc]).'" target="_blank"></i>'.$FileMarkom[$vc].'</a>';
+                         }
+                         $MarkomSupport .= '</ul></li>';
+                    } 
+                    else{
+                      $MarkomSupport .= '<li>'.$dd[$zx].'</li>';  
+                    }
+                    
+                }
+                $MarkomSupport .= '</ul>';
+
+            }
+
             $arr_result[] = array(
                     'Start' => $StartNameDay.', '.$query[$i]['Start'],
                     'End' => $EndNameDay.', '.$query[$i]['End'],
@@ -794,6 +861,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     'Req_layout' => $query[$i]['Req_layout'],
                     'ID' => $query[$i]['ID'],
                     'Status' => $query[$i]['Status'],
+                    'MarkomSupport' => $MarkomSupport
             );
         }
 

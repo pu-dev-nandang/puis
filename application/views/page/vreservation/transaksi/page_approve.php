@@ -138,6 +138,7 @@
                                    ' <th>Room</th>'+
                                    ' <th>Equipment Add</th>'+
                                    ' <th>Personel Support</th>'+
+                                   ' <th>Markom Support</th>'+
                                    ' <th>Req Date</th>'+
                                    ' <th>Req Layout</th>'+
                                    ' <th>Action</th>'+
@@ -152,6 +153,7 @@
         $.post(url,function (data_json) {
             setTimeout(function () {
                 var response = jQuery.parseJSON(data_json);
+                console.log(response);
                $("#pageData").html(html_table);
                for (var i = 0; i < response.length; i++) {
                 var btn = '<span class="btn btn-xs btn-edit" idtbooking ="'+response[i]['ID']+'" >'+
@@ -167,6 +169,7 @@
                         '<td>'+response[i]['Room']+'</td>'+
                         '<td>'+response[i]['Equipment_add']+'</td>'+
                         '<td>'+response[i]['Persone_add']+'</td>'+
+                        '<td>'+response[i]['MarkomSupport']+'</td>'+
                         '<td>'+response[i]['Req_date']+'</td>'+
                         '<td>'+Req_layout+'</td>'+
                         '<td>'+btn+'</td>'+
