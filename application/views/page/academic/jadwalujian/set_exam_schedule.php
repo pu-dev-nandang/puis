@@ -366,13 +366,13 @@
 
             var token = jwt_encode(data,'UAP)(*');
 
-            checkBentrol(formSemesterID,Type,formInputDate,formClassroom,formStart,formEnd,token);
+            checkBentrok(formSemesterID,Type,formInputDate,formClassroom,formStart,formEnd,token);
 
         }
         
     });
     
-    function checkBentrol(SemesterID,Type,Date,RoomID,Start,End,token2save) {
+    function checkBentrok(SemesterID,Type,Date,RoomID,Start,End,token2save) {
 
         loading_button('#btnSaveSetSchedule');
         $('.form-exam').prop('disabled',true);

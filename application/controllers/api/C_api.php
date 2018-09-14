@@ -1698,16 +1698,34 @@ class C_api extends CI_Controller {
         $status = ($data_arr['Status']!='') ? 'AND ex.Status = "'.$data_arr['Status'].'"' : '';
         $whereP = ' ex.SemesterID = "'.$data_arr['SemesterID'].'" 
                         AND ex.Type = "'.strtolower($data_arr['Type']).'"
-                        "'.$status.'" AND ex.InsertBy = "'.$data_arr['NIP'].'" ';
+                        "'.$status.'" AND ex.InsertByProdiID = "'.$data_arr['ProdiID'].'" ';
 
         if( !empty($requestData['search']['value']) ) {
 
-        } else {
+            $search = $requestData['search']['value'];
 
-            $sql = 'SELECT ex.*, cl.Room, em1.Name AS P_Name1, em2.Name AS P_Name2 FROM db_academic.exam ex
+            $sql = 'SELECT ex.*, cl.Room, em1.Name AS P_Name1, em2.Name AS P_Name2, em3.Name AS Name_InsertBy 
+                              FROM db_academic.exam ex
                               LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
                               LEFT JOIN db_employees.employees em1 ON (em1.NIP = ex.Pengawas1)
                               LEFT JOIN db_employees.employees em2 ON (em2.NIP = ex.Pengawas2)
+                              LEFT JOIN db_employees.employees em3 ON (em3.NIP = ex.InsertBy)
+                              WHERE ( '.$whereP.' ) AND 
+                              (
+                              em1.Name LIKE "%'.$search.'%" OR
+                              em2.Name LIKE "%'.$search.'%" OR
+                              em3.Name LIKE "%'.$search.'%" OR 
+                              cl.Room LIKE "%'.$search.'%"  
+                              ) ';
+
+        } else {
+
+            $sql = 'SELECT ex.*, cl.Room, em1.Name AS P_Name1, em2.Name AS P_Name2, em3.Name AS Name_InsertBy 
+                              FROM db_academic.exam ex
+                              LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
+                              LEFT JOIN db_employees.employees em1 ON (em1.NIP = ex.Pengawas1)
+                              LEFT JOIN db_employees.employees em2 ON (em2.NIP = ex.Pengawas2)
+                              LEFT JOIN db_employees.employees em3 ON (em3.NIP = ex.InsertBy)
                               WHERE '.$whereP.' ';
 
         }
@@ -1736,10 +1754,10 @@ class C_api extends CI_Controller {
             $totalStudent = 0;
             if(count($dataC)>0){
                 for($s=0;$s<count($dataC);$s++){
-                    $br = ($s!=0) ? '<br/>' : '';
+                    $br = ($s!=0) ? '' : '';
                     $viewCourse = $viewCourse.''.$br.''.$dataC[$s]['MKCode'].' - '.$dataC[$s]['CourseEng'].
                             '<br/><p style="font-size:12px;color: #009688;">Group : <b>'.$dataC[$s]['ClassGroup'].
-                        '</b> | <i class="fa fa-user"></i> '.$dataC[$s]['Lecturer'].'</p>';
+                        '</b> | <i class="fa fa-user margin-right"></i> '.$dataC[$s]['Lecturer'].'</p>';
 
                     // Get Students
                     $dataStd = $this->db->query('SELECT * FROM db_academic.exam_details exd 
@@ -1765,6 +1783,9 @@ class C_api extends CI_Controller {
             $p2 = ($row['P_Name2']!='' && $row['P_Name2']!=null) ? $row['P_Name2'] : '';
             $invigilator = ($p2!='') ? '- '.$p1.'<br/>- '.$p2 : '- '.$p1;
 
+            $tokenID = $this->jwt->encode(array(
+                'ExamID' => $row['ID']
+            ),'UAP)(*');
             $act = '-';
             if($row['Status']=='0' || $row['Status']==0){
                 $act = '<div class="btn-group">
@@ -1772,8 +1793,8 @@ class C_api extends CI_Controller {
                     <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
                   </button>
                   <ul class="dropdown-menu">
-                    <li><a href="'.base_url('academic/exam-schedule/edit-exam-schedule/'.$row['ID']).'">Edit</a></li>
-                    <li><a class="btnDeleteExam" data-id="'.$row['ID'].'" href="javascript:void(0);" style="color: red;">Delete</a></li>
+                    <li><a href="'.url_sign_in_lecturers.'exam/edit-schedule-exam/'.$tokenID.'">Edit</a></li>
+                    <li><a class="btnDeleteExamFromLecturer" data-id="'.$row['ID'].'" href="javascript:void(0);" style="color: red;">Delete</a></li>
                   </ul>
                 </div>';
             }
@@ -1784,10 +1805,11 @@ class C_api extends CI_Controller {
             $nestedData[] = $invigilator;
             $nestedData[] = '<div  style="text-align:center;">'.$totalStudent.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$act.'</div>';
-            $nestedData[] = '<div style="text-align:center;">'.date('l, d M Y',strtotime($row['ExamDate'])).'</div>';
-            $nestedData[] = '<div  style="text-align:center;">'.$time.'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.date('l, d M Y',strtotime($row['ExamDate'])).'<br/>'.$time.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['Room'].'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$status.'</div>';
+            $nestedData[] = '<p style="font-size: 12px;"><i class="fa fa-user margin-right"></i><b>'.$row['Name_InsertBy'].
+                '</b><br/>'.date('l, d M Y h:s:i',strtotime($row['InsertAt'])).'</p>';
 
             $data[] = $nestedData;
 
