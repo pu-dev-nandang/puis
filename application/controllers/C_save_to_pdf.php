@@ -806,10 +806,46 @@ class C_save_to_pdf extends CI_Controller {
             }
         }
 
+        $pdf->Ln(9);
+        $h = 4.5;
+        $w_ttd = 50;
+        $pdf->SetFillColor(224, 224, 224);
+        $pdf->SetFont('Times','',7);
+//        $pdf->Cell(287,$h,'Semester '.$data_arr['Semester'],1,1,'C');
+        $pdf->Cell($w_ttd,$h,'Reported by',1,0,'C',true);
+        $pdf->Cell($w_ttd,$h,'Acknowledge by',1,0,'C',true);
+        $pdf->Cell($w_ttd,$h,'Acknowledge by',1,1,'C',true);
 
+        $pdf->Cell($w_ttd,$h,'Date : ',1,0,'L');
+        $pdf->Cell($w_ttd,$h,'Date : ',1,0,'L');
+        $pdf->Cell($w_ttd,$h,'Date : ',1,1,'L');
+        $h = 19;
+        $pdf->Cell($w_ttd,$h,'',1,0,'L');
+        $pdf->Cell($w_ttd,$h,'',1,0,'L');
+        $pdf->Cell($w_ttd,$h,'',1,1,'L');
 
+        $h = 4.5;
+        $pdf->SetFont('Times','B',7);
+        $pdf->Cell($w_ttd,$h,$this->session->userdata('Name'),1,0,'C');
+        // Get Kabag Akademik id 6.11
+        $dataKabagAkademik = $this->m_save_to_pdf->getEmployeesByPositionMain('6.11');
+        $kabag = (count($dataKabagAkademik)>0) ? $dataKabagAkademik[0]['Name'] : '' ;
+        $pdf->Cell($w_ttd,$h,$kabag,1,0,'C');
+
+        $dataRektorat1 = $this->m_save_to_pdf->getEmployeesByPositionMain('2.2');
+        $Rektorat1 = (count($dataRektorat1)>0) ? $dataRektorat1[0]['Name'] : '' ;
+        $pdf->Cell($w_ttd,$h,$Rektorat1,1,1,'C');
 
         $pdf->SetFont('Times','',7);
+        $pdf->Cell($w_ttd,$h,'Staff SAS',1,0,'C');
+        $pdf->Cell($w_ttd,$h,'Kabag. Administrasi Perkuliahan',1,0,'C');
+        $pdf->Cell($w_ttd,$h,'Wakil Rektor Bidang Akademik',1,1,'C');
+
+
+
+        $pdf->Ln(5);
+        $pdf->SetFont('Times','I',7);
+        $pdf->Cell(287,$h,'Download On : '.date("l, d F Y H:i:s").' | '.chr(169).' Podomoro University',0,0,'C');
 
         $pdf->Output('I','Monitoring_Attendance_Range_Date.pdf');
     }

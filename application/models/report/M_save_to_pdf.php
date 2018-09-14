@@ -235,4 +235,12 @@ class M_save_to_pdf extends CI_Model {
 
     }
 
+    public function getEmployeesByPositionMain($PositionMain){
+        $data = $this->db->query('SELECT NIP,Name FROM db_employees.employees 
+                                            WHERE PositionMain = "'.$PositionMain.'" 
+                                            AND (StatusEmployeeID = 2 OR StatusEmployeeID = 1) LIMIT 1')
+                                        ->result_array();
+        return $data;
+    }
+
 }
