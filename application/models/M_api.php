@@ -3342,17 +3342,19 @@ class M_api extends CI_Model {
         if(count($dataLecturer)>0){
             for($i=0;$i<count($dataLecturer);$i++){
                 $d = $dataLecturer[$i];
-                $dataSC = $this->db->query('SELECT s.ID AS ScheduleID, s.ClassGroup FROM db_academic.schedule s 
+                $dataSC = $this->db->query('SELECT sd.ID AS SDID, s.ID AS ScheduleID, s.ClassGroup FROM db_academic.schedule_details sd 
+                                                          LEFT JOIN db_academic.schedule s ON (s.ID = sd.ScheduleID)
                                                           WHERE 
                                                           s.SemesterID = "'.$SemesterID.'" AND 
                                                           s.Coordinator = "'.$d['NIP'].'" 
-                                                          ORDER BY s.ClassGroup ASC
+                                                          ORDER BY s.ClassGroup, sd.ID ASC
                                                           ')->result_array();
 
-                $dataSCTeam = $this->db->query('SELECT stt.ScheduleID, s.ClassGroup FROM db_academic.schedule_team_teaching stt 
-                                                        LEFT JOIN db_academic.schedule s ON (s.ID = stt.ScheduleID)
-                                                        WHERE stt.NIP = "'.$d['NIP'].'"
-                                                         ORDER BY s.ClassGroup ASC ')->result_array();
+                $dataSCTeam = $this->db->query('SELECT sd.ID AS SDID,stt.ScheduleID, s.ClassGroup FROM db_academic.schedule_details sd
+                                                        LEFT JOIN db_academic.schedule s ON (s.ID = sd.ScheduleID)
+                                                        LEFT JOIN db_academic.schedule_team_teaching stt ON (s.ID = stt.ScheduleID)
+                                                        WHERE s.SemesterID = "'.$SemesterID.'" AND stt.NIP = "'.$d['NIP'].'"
+                                                         ORDER BY s.ClassGroup, sd.ID ASC ')->result_array();
 
 
                 if(count($dataSCTeam)>0) {
@@ -3367,7 +3369,9 @@ class M_api extends CI_Model {
                         $dc = $dataSC[$r];
 
                         $dataAttd = $this->db->query('SELECT attd.ID FROM db_academic.attendance attd
-                                                                  WHERE attd.SemesterID = "'.$SemesterID.'" AND attd.ScheduleID = "'.$dc['ScheduleID'].'" ')
+                                                                  WHERE attd.SemesterID = "'.$SemesterID.'"
+                                                                   AND attd.ScheduleID = "'.$dc['ScheduleID'].'" 
+                                                                    AND attd.SDID = "'.$dc['SDID'].'"')
                                                                     ->result_array();
 
                         $attd_s = [];
@@ -3390,7 +3394,8 @@ class M_api extends CI_Model {
                         }
 
 
-                        $c = $this->db->query('SELECT mk.NameEng AS MKNameEng, cd.TotalSKS AS Credit FROM db_academic.schedule_details_course sdc 
+                        $c = $this->db->query('SELECT mk.NameEng AS MKNameEng, sd.Credit FROM db_academic.schedule_details_course sdc 
+                                                        LEFT JOIN db_academic.schedule_details sd ON (sd.ID = "'.$dc['SDID'].'")
                                                         LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
                                                         LEFT JOIN db_academic.curriculum_details cd ON (sdc.CDID = cd.ID)
                                                         WHERE sdc.ScheduleID = "'.$dc['ScheduleID'].'" LIMIT 1')->result_array();

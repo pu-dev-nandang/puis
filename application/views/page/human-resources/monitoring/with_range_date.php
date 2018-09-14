@@ -208,7 +208,7 @@
 
                         for(var c=0;c<d.Course.length;c++){
                             var d_c = d.Course[c];
-                            $('#dataLec').append('<tr id="trS_'+no+'_'+d_c.ScheduleID+'">' +
+                            $('#dataLec').append('<tr id="trS_'+no+'_'+d_c.ScheduleID+'_'+d_c.SDID+'">' +
                                 '<td>'+d_c.ClassGroup+'</td>' +
                                 '<td style="text-align: left;">'+d_c.NameEng+'</td>' +
                                 '<td>'+d_c.Credit+'</td>' +
@@ -238,15 +238,15 @@
                                 var ssSts = (sts!=0) ? sts : '';
 
 
-                                $("#trS_"+no+"_"+d_c.ScheduleID).append('<td '+bg+'>' + ssSts + '</td>');
+                                $("#trS_"+no+"_"+d_c.ScheduleID+"_"+d_c.SDID).append('<td '+bg+'>' + ssSts + '</td>');
 
 
                             });
 
                             var totalCredit = (totalSesi!=0) ? totalSesi * parseInt(d_c.Credit) : 0;
 
-                            $("#trS_"+no+"_"+d_c.ScheduleID).append('<td><b>' + totalSesi + '</b></td>');
-                            $("#trS_"+no+"_"+d_c.ScheduleID).append('<td style="background: #ffeb3b38;"><b>' + totalCredit + '</b></td>');
+                            $("#trS_"+no+"_"+d_c.ScheduleID+"_"+d_c.SDID).append('<td><b>' + totalSesi + '</b></td>');
+                            $("#trS_"+no+"_"+d_c.ScheduleID+"_"+d_c.SDID).append('<td style="background: #ffeb3b38;"><b>' + totalCredit + '</b></td>');
                         }
 
                         no++;
