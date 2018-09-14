@@ -603,6 +603,7 @@ $route['api/__crudSchedule'] = 'api/c_api/crudSchedule';
 $route['api/__getSchedulePerDay'] = 'api/c_api/getSchedulePerDay';
 $route['api/__getSchedulePerSemester'] = 'api/c_api/getSchedulePerSemester';
 $route['api/__getScheduleExam'] = 'api/c_api/getScheduleExam';
+$route['api/__getScheduleExamLecturer'] = 'api/c_api/getScheduleExamLecturer';
 
 $route['api/__crudProgramCampus'] = 'api/c_api/crudProgramCampus';
 $route['api/__crudSemester'] = 'api/c_api/crudSemester';
