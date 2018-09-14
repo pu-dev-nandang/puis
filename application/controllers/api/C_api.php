@@ -1787,13 +1787,14 @@ class C_api extends CI_Controller {
                 'ExamID' => $row['ID']
             ),'UAP)(*');
             $act = '-';
+
+            // <li><a href="'.url_sign_in_lecturers.'exam/edit-schedule-exam/'.$tokenID.'">Edit</a></li>
             if($row['Status']=='0' || $row['Status']==0){
                 $act = '<div class="btn-group">
                   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
                   </button>
                   <ul class="dropdown-menu">
-                    <li><a href="'.url_sign_in_lecturers.'exam/edit-schedule-exam/'.$tokenID.'">Edit</a></li>
                     <li><a class="btnDeleteExamFromLecturer" data-id="'.$row['ID'].'" href="javascript:void(0);" style="color: red;">Delete</a></li>
                   </ul>
                 </div>';
