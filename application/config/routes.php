@@ -808,3 +808,38 @@ $route['testInject'] = 'api/c_global/testInject';
 
 // Pengawas Ujian
 $route['invigilator'] = 'c_pengawas_ujian';
+
+
+
+// budgeting & PR
+$route['budgeting'] = 'page/budgeting/c_budgeting';
+
+$query = $db->get('db_budgeting.cfg_sub_menu');
+$result = $query->result();
+foreach( $result as $row )
+{
+	$Slug = $row->Slug;
+	$Slug = explode('/', $Slug);
+	if (in_array('(:any)', $Slug)) {
+	   $a = count($Slug) - 1;
+	   $URI = '';
+	   for ($i=0; $i < $a; $i++) { 
+	   	$URI .= $Slug[$i].'/';
+	   }
+	   $route[ $URI.'(:any)' ] = $row->Controller;
+	}
+	elseif(in_array('(:num)', $Slug)) {
+		$a = count($Slug) - 1;
+		$URI = '';
+		for ($i=0; $i < $a; $i++) { 
+			$URI .= $Slug[$i].'/';
+		}
+		$route[ $URI.'(:num)' ] = $row->Controller;
+	}
+	else
+	{
+		$route[ $row->Slug ] = $row->Controller;
+	}
+
+}
+

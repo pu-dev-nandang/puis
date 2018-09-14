@@ -508,3 +508,92 @@ abstract class Vreservation_Controler extends Globalclass{
     }
 
 }
+
+
+abstract class Budgeting_Controler extends Globalclass{
+
+    public $data = array();
+
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('budgeting/m_budgeting');
+    }
+
+    public function temp($content)
+    {
+        $this->template($content);
+    }
+
+
+    // overide function
+    public function template($content)
+    {
+
+        $data['include'] = $this->load->view('template/include','',true);
+
+        $data['header'] = $this->menu_header();
+        $data['navigation'] = $this->menu_navigation();
+        $data['crumbs'] = $this->crumbs();
+
+        $data['content'] = $content;
+        $this->load->view('template/template',$data);
+
+    }
+
+    // overide function
+    public function  menu_navigation(){
+        $data['departement'] = $this->__getDepartement();
+        $page = $this->load->view('page/'.$data['departement'].'/budgeting/menu_navigation','',true);
+        return $page;
+    }
+
+    public function auth_ajax()
+    {
+        if (!$this->input->is_ajax_request()) {
+            exit('No direct script access allowed');
+        }
+    }
+
+    public function getAuthSession($MenuDepartement)
+    {
+        $data = array();
+        $getDataMenu = $this->m_budgeting->getMenuGroupUser($this->session->userdata('NIP'),$MenuDepartement);
+        $data_sess = array();
+        if (count($getDataMenu) > 0) {
+            $this->session->set_userdata('auth_budgeting_sess',1);
+            $this->session->set_userdata('menu_budgeting_sess',$getDataMenu);
+            $this->session->set_userdata('menu_budgeting_grouping',$this->groupBYMenu_sess());
+        }
+    }
+
+    public function groupBYMenu_sess()
+    {
+        $DataDB = $this->session->userdata('menu_budgeting_sess');
+        $this->load->model('master/m_master');
+        $arr = array();
+        for ($i=0; $i < count($DataDB); $i++) {
+            $submenu1 = $this->m_master->getSubmenu1BaseMenu_grouping($DataDB[$i]['ID_menu'],'db_budgeting');
+            $arr2 = array();
+            for ($k=0; $k < count($submenu1); $k++) { 
+                $submenu2 = $this->m_master->getSubmenu2BaseSubmenu1_grouping($submenu1[$k]['SubMenu1'],'db_budgeting',$DataDB[$i]['ID_menu']);
+                $arr2[] = array(
+                    'SubMenu1' => $submenu1[$k]['SubMenu1'],
+                    'Submenu' => $submenu2,
+                );
+            }
+
+            $arr[] =array(
+                'Menu' => $DataDB[$i]['Menu'],
+                'Icon' => $DataDB[$i]['Icon'],
+                'Submenu' => $arr2
+
+            );
+            
+        }
+        // print_r($arr);die();
+        return $arr;
+    }
+
+}
