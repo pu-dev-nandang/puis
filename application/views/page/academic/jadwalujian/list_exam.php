@@ -240,7 +240,6 @@
 
             loading_page('#divTable');
 
-
             setTimeout(function () {
                 $('#divTable').html('<div class="">' +
                     '                <table class="table table-bordered" id="tableShowExam">' +

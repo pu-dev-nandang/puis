@@ -1524,8 +1524,8 @@ class C_api extends CI_Controller {
         $data_arr = (array) $this->jwt->decode($token,$key);
 
         $whereP = ($data_arr['ExamDate']!=null && $data_arr['ExamDate']!='')
-            ? 'ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'" AND ex.ExamDate LIKE "'.$data_arr['ExamDate'].'" '
-            : 'ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'"' ;
+            ? 'ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'" AND ex.Status = "1" AND ex.ExamDate LIKE "'.$data_arr['ExamDate'].'" '
+            : 'ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'" AND ex.Status = "1"' ;
         // ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'"
 
         if( !empty($requestData['search']['value']) ) {
@@ -1687,6 +1687,144 @@ class C_api extends CI_Controller {
 
     }
 
+    public function getScheduleExamWaitingApproval(){
+        $requestData= $_REQUEST;
+
+        $token = $this->input->get('token');
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+
+        $whereP = (isset($data_arr['ProdiID']) && $data_arr['ProdiID']!='' && $data_arr['ProdiID']!=null)
+            ? ' ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'" 
+            AND ex.Status = "0" AND ex.InsertByProdiID = "'.$data_arr['ProdiID'].'" '
+            : ' ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'" AND ex.Status = "0" ';
+
+        if( !empty($requestData['search']['value']) ) {
+
+            $search = $requestData['search']['value'];
+            $sql = 'SELECT ex.ID, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room , p1.Name AS P_Name1, p2.Name AS P_Name2,
+                                em.Name AS NameInsertBy
+                                FROM db_academic.exam ex
+                                LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
+                                LEFT JOIN db_academic.days d On (d.ID = ex.DayID)
+                                LEFT JOIN db_employees.employees p1 ON (p1.NIP = ex.Pengawas1)
+                                LEFT JOIN db_employees.employees p2 ON (p2.NIP = ex.Pengawas2)
+                                LEFT JOIN db_employees.employees em ON (em.NIP = ex.InsertBy)
+                                WHERE ( '.$whereP.' ) AND
+                                 (d.NameEng LIKE "%'.$search.'%" OR cl.Room LIKE "%'.$search.'%" 
+                                 OR p1.Name LIKE "%'.$search.'%" OR p2.Name LIKE "%'.$search.'%"
+                                 OR p1.NIP LIKE "%'.$search.'%" OR p2.NIP LIKE "%'.$search.'%" 
+                                 ) ORDER BY ex.ExamDate, ex.ExamStart, ex.ExamEnd ASC ';
+        }
+        else {
+
+            $sql = 'SELECT ex.ID, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room, p1.Name AS P_Name1, p2.Name AS P_Name2,
+                                p1.NIP AS P_NIP1, p2.NIP AS P_NIP2, em.Name AS NameInsertBy
+                                FROM db_academic.exam ex
+                                LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
+                                LEFT JOIN db_employees.employees p1 ON (p1.NIP = ex.Pengawas1)
+                                LEFT JOIN db_employees.employees p2 ON (p2.NIP = ex.Pengawas2)
+                                LEFT JOIN db_employees.employees em ON (em.NIP = ex.InsertBy)
+                                WHERE '.$whereP.' ORDER BY ex.ExamDate, ex.ExamStart, ex.ExamEnd ASC ';
+        }
+
+        $dataTable = $this->db->query($sql)->result_array();
+
+        if(count($dataTable)>0){
+            for($i=0;$i<count($dataTable);$i++){
+                $dataC = $this->db->query('SELECT exg.ID, exg.ScheduleID, s.ClassGroup, mk.NameEng AS CourseEng, mk.MKCode, em.Name AS Coordinator  
+                                                        FROM db_academic.exam_group exg
+                                                        LEFT JOIN db_academic.schedule s ON (s.ID = exg.ScheduleID)
+                                                        LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                                        LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                        lEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                        WHERE exg.ExamID = "'.$dataTable[$i]['ID'].'" 
+                                                        GROUP BY exg.ScheduleID ORDER BY s.ClassGroup ASC')->result_array();
+
+                if(count($dataC)>0){
+                    for($s=0;$s<count($dataC);$s++){
+                        $dataSt = $this->db->query('SELECT NPM,DB_Students FROM db_academic.exam_details exd 
+                                                              WHERE exd.ExamID = "'.$dataTable[$i]['ID'].'"
+                                                               AND exd.ExamGroupID = "'.$dataC[$s]['ID'].'"
+                                                               AND exd.ScheduleID = "'.$dataC[$s]['ScheduleID'].'"
+                                                                ')->result_array();
+
+                        // Details Students
+                        if(count($dataSt)>0){
+                            for ($ss=0;$ss<count($dataSt);$ss++){
+                                $ddst = $this->db->select('Name')->get_where($dataSt[$ss]['DB_Students'].'.students',
+                                    array('NPM' => $dataSt[$ss]['NPM']),1)->result_array();
+                                $dataSt[$ss]['Name'] = $ddst[0]['Name'];
+                            }
+                        }
+                        $dataC[$s]['DetailsStudent'] = $dataSt;
+                    }
+                }
+
+                $dataTable[$i]['Course'] = $dataC;
+            }
+        }
+
+
+        $query = $dataTable;
+
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $course = '';
+            $totalStudent = 0;
+            for($c=0;$c<count($row['Course']);$c++){
+                $d = $row['Course'][$c];
+                $totalStudent = $totalStudent + count($d['DetailsStudent']);
+                $course = $course.' <div style="margin-top: 1px;"><b>'.$d['ClassGroup'].' | '.$d['CourseEng'].'</b><br/><p style="color: #2196F3;font-size: 11px;">(Co) '.$d['Coordinator'].'</p></div> ';
+            }
+
+
+            $exam_date = date("D, d M Y", strtotime($row['ExamDate']));
+            $exam_time = substr($row['ExamStart'],0,5).' - '.substr($row['ExamEnd'],0,5);
+            $exam_room = $row['Room'];
+
+
+//            <li><a class="btnSave2PDF_Exam" href="javascript:void(0);" data-url="save2pdf/attendance-list" data-token="'.$tkn_attendance_std.'">Exam Attendance</a></li>
+//                    <li><a target="_blank" href="'.base_url('save2pdf/news-event').'">Berita Acara</a></li>
+            $act = '<div  style="text-align:center;"><div class="btn-group">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li><a href="'.base_url('academic/exam-schedule/edit-exam-schedule/'.$row['ID']).'">Approved</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a class="btnDeleteExam" data-id="'.$row['ID'].'" href="javascript:void(0);" style="color: red;">Delete</a></li>
+                  </ul>
+                </div>
+                </div>';
+
+
+            $nestedData[] = $course;
+            $nestedData[] = '<div style="text-align:center;">'.$totalStudent.'</div>';
+            $nestedData[] = $act;
+            $nestedData[] = '<div  style="text-align:center;">'.$exam_date.'<br/>'.$exam_time.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$exam_room.'</div>';
+            $nestedData[] = $row['NameInsertBy'];
+
+            $data[] = $nestedData;
+        }
+
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($query)),
+            "recordsFiltered" => intval( count($query) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+
+
+    }
+
     public function getScheduleExamLecturer()
     {
         $requestData= $_REQUEST;
@@ -1695,10 +1833,11 @@ class C_api extends CI_Controller {
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
 
-        $status = ($data_arr['Status']!='') ? 'AND ex.Status = "'.$data_arr['Status'].'"' : '';
+        $status = ($data_arr['Status']!='') ? ' AND ex.Status = "'.$data_arr['Status'].'" ' : '';
         $whereP = ' ex.SemesterID = "'.$data_arr['SemesterID'].'" 
                         AND ex.Type = "'.strtolower($data_arr['Type']).'"
-                        "'.$status.'" AND ex.InsertByProdiID = "'.$data_arr['ProdiID'].'" ';
+                        AND ex.InsertByProdiID = "'.$data_arr['ProdiID'].'" 
+                         '.$status;
 
         if( !empty($requestData['search']['value']) ) {
 
@@ -1788,13 +1927,14 @@ class C_api extends CI_Controller {
             ),'UAP)(*');
             $act = '-';
 
-            // <li><a href="'.url_sign_in_lecturers.'exam/edit-schedule-exam/'.$tokenID.'">Edit</a></li>
+            //
             if($row['Status']=='0' || $row['Status']==0){
                 $act = '<div class="btn-group">
                   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
                   </button>
                   <ul class="dropdown-menu">
+                    <li><a href="'.url_sign_in_lecturers.'exam/edit-schedule-exam/'.$tokenID.'">Edit</a></li>
                     <li><a class="btnDeleteExamFromLecturer" data-id="'.$row['ID'].'" href="javascript:void(0);" style="color: red;">Delete</a></li>
                   </ul>
                 </div>';

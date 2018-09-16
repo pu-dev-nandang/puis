@@ -79,6 +79,7 @@ $route['academic/__setPageJadwal'] = 'page/academic/c_jadwal/setPageJadwal';
 $route['academic/exam-schedule'] = 'page/academic/c_jadwal_ujian';
 
 $route['academic/exam-schedule/list-exam'] = 'page/academic/c_jadwal_ujian/list_exam';
+$route['academic/exam-schedule/list-waiting-approve'] = 'page/academic/c_jadwal_ujian/list_waiting_approve';
 $route['academic/exam-schedule/set-exam-schedule'] = 'page/academic/c_jadwal_ujian/set_exam_schedule';
 $route['academic/exam-schedule/edit-exam-schedule/(:num)'] = 'page/academic/c_jadwal_ujian/edit_exam_schedule/$1';
 
@@ -603,6 +604,7 @@ $route['api/__crudSchedule'] = 'api/c_api/crudSchedule';
 $route['api/__getSchedulePerDay'] = 'api/c_api/getSchedulePerDay';
 $route['api/__getSchedulePerSemester'] = 'api/c_api/getSchedulePerSemester';
 $route['api/__getScheduleExam'] = 'api/c_api/getScheduleExam';
+$route['api/__getScheduleExamWaitingApproval'] = 'api/c_api/getScheduleExamWaitingApproval';
 $route['api/__getScheduleExamLecturer'] = 'api/c_api/getScheduleExamLecturer';
 
 $route['api/__crudProgramCampus'] = 'api/c_api/crudProgramCampus';

@@ -3,9 +3,12 @@
 <?php
 
 $btn_list = "btn-default btn-default-success";
+$btn_list_waiting = "btn-default btn-default-warning";
 $btn_set_exam = "btn-default btn-default-success";
 if($this->uri->segment(3)=='list-exam') {
     $btn_list = "btn-success";
+} else if($this->uri->segment(3)=='list-waiting-approve') {
+    $btn_list_waiting = "btn-warning";
 } else if($this->uri->segment(3)=='set-exam-schedule') {
     $btn_set_exam = "btn-success";
 }
@@ -16,7 +19,10 @@ if($this->uri->segment(3)=='list-exam') {
 
     <div class="col-md-8 col-md-offset-4" style="text-align: right;">
         <a href="<?php echo base_url('academic/exam-schedule/list-exam'); ?>" class="btn <?php echo $btn_list; ?>">
-            <i class="fa fa-calendar right-margin" aria-hidden="true"></i> List Schedule</a> |
+            <i class="fa fa-calendar right-margin" aria-hidden="true"></i> List Exam Schedule</a>
+        <a href="<?php echo base_url('academic/exam-schedule/list-waiting-approve'); ?>" class="btn <?php echo $btn_list_waiting; ?>">
+            <i class="fa fa-question-circle right-margin" aria-hidden="true"></i> List Waiting Approve</a>
+        |
         <a href="<?php echo base_url('academic/exam-schedule/set-exam-schedule'); ?>" class="btn <?php echo $btn_set_exam; ?>">
             <i class="fa fa-pencil right-margin" aria-hidden="true"></i> Set Exam Schedule
         </a>
