@@ -156,6 +156,33 @@ class C_rest extends CI_Controller {
 
     }
 
+    public function getExamSchedule(){
+
+        $dataToken = $this->getInputToken();
+        $cekUser = $this->cekAuthAPI($dataToken['auth']);
+
+        if($cekUser){
+
+            if($dataToken['action']=='readExamSchedule'){
+                $NIP = $dataToken['NIP'];
+//                $SemesterID = $dataToken['SemesterID'];
+                $schedule = $this->m_rest->__getExamSchedule($NIP,strtolower($dataToken['Type']));
+
+                return print_r(json_encode($schedule));
+            }
+
+
+        }
+        else {
+            $msg = array(
+                'msg' => 'Error'
+            );
+            return print_r(json_encode($msg));
+        }
+
+
+    }
+
     public function cek_deadline_paymentNPM()
     {
         $dataToken = $this->getInputToken();

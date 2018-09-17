@@ -333,7 +333,8 @@ class M_rest extends CI_Model {
                                               WHERE s.SemesterID = "'.$dataSemester[$i]['ID'].'" 
                                               AND s.Coordinator = "'.$NIP.'" AND s.IsSemesterAntara = "0" ')->result_array();
 
-                $TeamTheaching = $this->db->query('SELECT s.*,em.Name AS CoordinatorName, stt.Status AS StatusTeamTeaching FROM db_academic.schedule_team_teaching stt 
+                $TeamTheaching = $this->db->query('SELECT s.*,em.Name AS CoordinatorName, stt.Status AS StatusTeamTeaching 
+                                                        FROM db_academic.schedule_team_teaching stt 
                                                         LEFT JOIN db_academic.schedule s ON (s.ID=stt.ScheduleID)
                                                         LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                                         WHERE s.SemesterID ="'.$SemesterID.'" 
@@ -449,6 +450,92 @@ class M_rest extends CI_Model {
 
 
         return $dataAssg;
+    }
+
+
+    public function __getExamSchedule($NIP,$Type)
+    {
+
+        $SemesterActive = $this->_getSemesterActive();
+        $SemesterID = $SemesterActive['ID'];
+
+        $dataSemester = $this->db->query('SELECT s.* FROM db_academic.semester s ORDER BY s.ID ASC')->result_array();
+
+        $result = [];
+        for($i=0;$i<count($dataSemester);$i++){
+            if($dataSemester[$i]['ID']<13){
+
+                $arr_p = array(
+                    'SemesterID' => $dataSemester[$i]['ID'],
+                    'Semester' => $dataSemester[$i]['Name'],
+                    'Status' => $dataSemester[$i]['Status'],
+                    'ExamSchedule' => []
+                );
+
+                array_push($result,$arr_p);
+
+            }
+            // Sistem Baru
+            else {
+
+                $Coordinator = $this->db->query('SELECT s.ID, mk.NameEng AS CourseEng, mk.MKCode
+                                              FROM db_academic.schedule s
+                                              LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                              LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                              LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                              WHERE s.SemesterID = "'.$dataSemester[$i]['ID'].'" 
+                                              AND s.Coordinator = "'.$NIP.'" AND s.IsSemesterAntara = "0"
+                                               GROUP BY s.ID')->result_array();
+
+                $TeamTheaching = $this->db->query('SELECT s.ID, mk.NameEng AS CourseEng, mk.MKCode 
+                                                        FROM db_academic.schedule_team_teaching stt 
+                                                        LEFT JOIN db_academic.schedule s ON (s.ID=stt.ScheduleID)
+                                                        LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                                      LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                      LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                        WHERE s.SemesterID ="'.$SemesterID.'" 
+                                                        AND stt.NIP = "'.$NIP.'"
+                                                        AND s.IsSemesterAntara = "0" ')->result_array();
+
+                $dataCourse = $Coordinator;
+                if(count($TeamTheaching)>0){
+                    for($t=0;$t<count($TeamTheaching);$t++){
+                        array_push($dataCourse,$TeamTheaching[$t]);
+                    }
+                }
+
+                // Load Exam
+                if(count($dataCourse)>0){
+                    for($r=0;$r<count($dataCourse);$r++){
+                        $d = $dataCourse[$r];
+                        $dataExam = $this->db->query('SELECT ex.Type, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room
+                                                                , em1.Name AS P_Name1, em2.Name AS P_Name2
+                                                                FROM db_academic.exam_group exg
+                                                                LEFT JOIN db_academic.exam ex ON (ex.ID = exg.ExamID)
+                                                                LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
+                                                                LEFT JOIN db_employees.employees em1 ON (em1.NIP = ex.Pengawas1)
+                                                                LEFT JOIN db_employees.employees em2 ON (em2.NIP = ex.Pengawas2)
+                                                                WHERE exg.ScheduleID = "'.$d['ID'].'" AND ex.Type = "'.$Type.'"
+                                                                 ORDER BY ExamDate, ExamStart, ExamEnd ASC')->result_array();
+                        $dataCourse[$r]['ExamSchedule'] = $dataExam;
+                    }
+                }
+
+
+                $arr_p = array(
+                    'SemesterID' => $dataSemester[$i]['ID'],
+                    'Semester' => $dataSemester[$i]['Name'],
+                    'Status' => $dataSemester[$i]['Status'],
+                    'ExamSchedule' => $dataCourse
+                );
+
+                array_push($result,$arr_p);
+
+            }
+        }
+
+        return $result;
+
     }
 
 
