@@ -209,7 +209,7 @@ class C_dashboard extends Globalclass {
 
                         }    
 
-                        if ($arrBPP['DetailPaymentBPP'] != '' || $arrCr['DetailPaymentCr'] != '' ||  $arrBPP['SisaBPP'] > 0 || $arrCr['SisaCr'] > 0) { // belum lunas
+                        if ( ($arrBPP['DetailPaymentBPP'] != '' || $arrCr['DetailPaymentCr'] != '') &&  ($arrBPP['SisaBPP'] > 0 || $arrCr['SisaCr'] > 0) ) { // belum lunas
                           $a_Unpaid_Off = $a_Unpaid_Off + 1;
 
                         } 
