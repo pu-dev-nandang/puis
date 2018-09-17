@@ -199,6 +199,23 @@
                         if (yy == '-') {
                           inputCHK = '';
                         }
+
+                        var IPK = 0;
+                        var IPS = 0;
+                        try {
+                            IPK = Data_mhs[i]['IPK'].toFixed(2);
+                        }
+                        catch(err) {
+                            var IPK = 0;
+                        }
+
+                        try {
+                            IPS = Data_mhs[i]['IPS'].toFixed(2);
+                        }
+                        catch(err) {
+                            var IPS = 0;
+                        }
+                        
                        $('#dataRow').append('<tr>' +
                            '<td>'+inputCHK+'</td>' +
                            '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
@@ -209,8 +226,8 @@
                            '<td>'+img+'</td>' +
                            '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
                            '<td>'+Data_mhs[i]['HP']+'</td>' +
-                           '<td>'+Data_mhs[i]['IPS'].toFixed(2)+'</td>'+
-                           '<td>'+Data_mhs[i]['IPK'].toFixed(2)+'</td>'+
+                           '<td>'+IPS+'</td>'+
+                           '<td>'+IPK+'</td>'+
                            '<td>'+Data_mhs[i]['Credit']+'</td>'+
                            '<td>'+priceLabel+'</td>'+
                            '<td>'+selecTOption+'</td>' +
