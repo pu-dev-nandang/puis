@@ -321,7 +321,7 @@
 
 
                 <button class="btn btn-success" id="btnUpdate">Save</button> |
-                <button class="btn btn-danger" id="btnDelete">Delete</button>
+                <button class="btn btn-danger hide" disabled hidden id="btnDelete">Delete</button>
             </div>
         </div>
 

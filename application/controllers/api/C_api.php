@@ -1829,7 +1829,7 @@ class C_api extends CI_Controller {
     {
         $requestData= $_REQUEST;
 
-        $token = $this->input->get('token');
+        $token = $this->input->post('token');
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
 
@@ -1839,40 +1839,24 @@ class C_api extends CI_Controller {
                         AND ex.InsertByProdiID = "'.$data_arr['ProdiID'].'" 
                          '.$status;
 
+        $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
-
             $search = $requestData['search']['value'];
-
-            $sql = 'SELECT ex.*, cl.Room, em1.Name AS P_Name1, em2.Name AS P_Name2, em3.Name AS Name_InsertBy 
-                              FROM db_academic.exam ex
-                              LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
-                              LEFT JOIN db_employees.employees em1 ON (em1.NIP = ex.Pengawas1)
-                              LEFT JOIN db_employees.employees em2 ON (em2.NIP = ex.Pengawas2)
-                              LEFT JOIN db_employees.employees em3 ON (em3.NIP = ex.InsertBy)
-                              WHERE ( '.$whereP.' ) AND 
-                              (
-                              em1.Name LIKE "%'.$search.'%" OR
-                              em2.Name LIKE "%'.$search.'%" OR
-                              em3.Name LIKE "%'.$search.'%" OR 
-                              cl.Room LIKE "%'.$search.'%"  
-                              ) ';
-
-        } else {
-
-            $sql = 'SELECT ex.*, cl.Room, em1.Name AS P_Name1, em2.Name AS P_Name2, em3.Name AS Name_InsertBy 
-                              FROM db_academic.exam ex
-                              LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
-                              LEFT JOIN db_employees.employees em1 ON (em1.NIP = ex.Pengawas1)
-                              LEFT JOIN db_employees.employees em2 ON (em2.NIP = ex.Pengawas2)
-                              LEFT JOIN db_employees.employees em3 ON (em3.NIP = ex.InsertBy)
-                              WHERE '.$whereP.' ';
-
+            $dataSearch = ' AND ( em1.Name LIKE "%'.$search.'%" OR em2.Name LIKE "%'.$search.'%" OR
+                              em3.Name LIKE "%'.$search.'%" OR cl.Room LIKE "%'.$search.'%" ) ';
         }
 
-        $dataTable = $this->db->query($sql)->result_array();
+        $queryDefault = 'SELECT ex.*, cl.Room, em1.Name AS P_Name1, em2.Name AS P_Name2, em3.Name AS Name_InsertBy 
+                              FROM db_academic.exam ex
+                              LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
+                              LEFT JOIN db_employees.employees em1 ON (em1.NIP = ex.Pengawas1)
+                              LEFT JOIN db_employees.employees em2 ON (em2.NIP = ex.Pengawas2)
+                              LEFT JOIN db_employees.employees em3 ON (em3.NIP = ex.InsertBy)
+                              WHERE ( '.$whereP.' ) '.$dataSearch.' ';
 
-        $query = $dataTable;
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
+        $query = $this->db->query($sql)->result_array();
 
         $data = array();
         for($i=0;$i<count($query);$i++){
@@ -1958,8 +1942,8 @@ class C_api extends CI_Controller {
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
-            "recordsTotal"    => intval(count($query)),
-            "recordsFiltered" => intval( count($query) ),
+            "recordsTotal"    => intval(count($queryDefault)),
+            "recordsFiltered" => intval( count($queryDefault) ),
             "data"            => $data
         );
         echo json_encode($json_data);
@@ -2956,16 +2940,19 @@ class C_api extends CI_Controller {
                 // Update Group Jika ada
                 if(count($data_arr['insert_group'])>0){
                     for($g=0;$g<count($data_arr['insert_group']);$g++){
-                        $arrInsert = array(
-                            'ExamID' => $data_arr['ExamID'],
-                            'ScheduleID' => $data_arr['insert_group'][$g]
-                        );
+                        if($data_arr['insert_group'][$g]!=null && $data_arr['insert_group'][$g]!=''){
+                            $arrInsert = array(
+                                'ExamID' => $data_arr['ExamID'],
+                                'ScheduleID' => $data_arr['insert_group'][$g]
+                            );
 
-                        $dataCk = $this->db->get_where('db_academic.exam_group',$arrInsert)->result_array();
+                            $dataCk = $this->db->get_where('db_academic.exam_group',$arrInsert)->result_array();
 
-                        if(count($dataCk)<=0){
-                            $this->db->insert('db_academic.exam_group',$arrInsert);
+                            if(count($dataCk)<=0){
+                                $this->db->insert('db_academic.exam_group',$arrInsert);
+                            }
                         }
+
                     }
                 }
 
