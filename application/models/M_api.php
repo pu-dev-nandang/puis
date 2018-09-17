@@ -2191,6 +2191,14 @@ class M_api extends CI_Model {
                                                   LEFT JOIN db_employees.employees em ON (stt.NIP = em.NIP) 
                                                   WHERE stt.ScheduleID = "'.$ScheduleID.'"');
 
+        $dataTimetable = $this->db->query('SELECT sd.StartSessions AS Start, sd.EndSessions AS End, d.NameEng AS DayEng, cl.Room 
+                                                        FROM db_academic.schedule_details sd
+                                                        LEFT JOIN db_academic.schedule s ON (s.ID = sd.ScheduleID)
+                                                        LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
+                                                        LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+                                                         WHERE sd.ScheduleID = "'.$ScheduleID.'" 
+                                                         ORDER BY d.ID, sd.StartSessions, sd.EndSessions ASC');
+
         $year = $this->_getClassStd();
         $dataStudents = [];
         $dataStudentsDetails = [];
@@ -2239,6 +2247,7 @@ class M_api extends CI_Model {
             'Exam' => $dataExam,
             'Coordinator' => $dataSch->result_array(),
             'Course' => $dataCourse->result_array(),
+            'Timetable' => $dataTimetable->result_array(),
             'TeamTeaching' => $dataTeamTeaching->result_array(),
             'Students' => $dataStudents,
             'TotalStudents' => $TotalStudents,
