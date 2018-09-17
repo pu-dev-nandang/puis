@@ -95,7 +95,7 @@ class C_budgeting extends Budgeting_Controler {
                 $dateEnd= cal_days_in_month(CAL_GREGORIAN, $input['MonthEnd'], $input['Year']);
                 $Year = $input['Year'];
                 $StartPeriod = $Year.'-'.$input['MonthStart'].'-'.$dateStart;
-                $EndPeriod = $Year.'-'.$input['MonthEnd'].'-'.$dateEnd;
+                $EndPeriod = ($Year + 1).'-'.$input['MonthEnd'].'-'.$dateEnd;
                 $sql = 'select * from db_budgeting.cfg_dateperiod where Year = ? and Active = 1';
                 $query=$this->db->query($sql, array($Year))->result_array();
                 if (count($query) > 0) {
@@ -108,7 +108,7 @@ class C_budgeting extends Budgeting_Controler {
                         'StartPeriod' => $StartPeriod,
                         'EndPeriod' => $EndPeriod
                     );
-                    $this->db->insert('db_admission.count_account', $dataSave);
+                    $this->db->insert('db_budgeting.cfg_dateperiod', $dataSave);
                 }
 
                 break;
@@ -117,7 +117,7 @@ class C_budgeting extends Budgeting_Controler {
                 $dateEnd= cal_days_in_month(CAL_GREGORIAN, $input['MonthEnd'], $input['Year']);
                 $Year = $input['Year'];
                 $StartPeriod = $Year.'-'.$input['MonthStart'].'-'.$dateStart;
-                $EndPeriod = $Year.'-'.$input['MonthEnd'].'-'.$dateEnd;
+                $EndPeriod = ($Year + 1).'-'.$input['MonthEnd'].'-'.$dateEnd;
                 $sql = 'select * from db_budgeting.cfg_dateperiod where Year = ? and Active = 1';
                 $query=$this->db->query($sql, array($Year))->result_array();
 
