@@ -392,9 +392,6 @@
 
                 };
 
-                console.log(data);
-                return false;
-
                 var token = jwt_encode(data,'UAP)(*');
 
                 checkBentrok(formSemesterID,Type,formInputDate,RoomID,formStart,formEnd,token);
