@@ -843,3 +843,4 @@ foreach( $result as $row )
 
 }
 
+$route['budgeting/page/LoadTimePeriod'] = 'page/budgeting/c_budgeting/pageLoadTimePeriod';

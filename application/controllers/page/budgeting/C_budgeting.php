@@ -6,6 +6,8 @@ class C_budgeting extends Budgeting_Controler {
     public function __construct()
     {
         parent::__construct();
+        $this->load->model('master/m_master');
+        $this->data['department'] = parent::__getDepartement(); 
     }
 
     public function index()
@@ -40,16 +42,28 @@ class C_budgeting extends Budgeting_Controler {
         // get previleges for menu and content
         $MenuDepartement= 'NA.'.$this->session->userdata('IDdepartementNavigation');
         $this->getAuthSession($MenuDepartement);
-        $departementName = $this->__getDepartement();
         // $content = '<pre>'.print_r($this->session->userdata('menu_budgeting_grouping')).'</pre>';
-        $content = $this->load->view('page/'.$departementName.'/budgeting/dashboard',$this->data,true);
+        $content = $this->load->view('page/'.$this->data['department'].'/budgeting/dashboard',$this->data,true);
         $this->temp($content);
     }
 
-    public function configfinance()
+    public function configfinance($Request = null)
     {
-        $content = $this->load->view('page/'.'finance'.'/budgeting/configfinance',$this->data,true);
-        $this->temp($content);
+        if ($Request == null) {
+            $content = $this->load->view('page/'.$this->data['department'].'/budgeting/configfinance',$this->data,true);
+            $this->temp($content);
+        }
+        
+    }
+
+    public function pageLoadTimePeriod()
+    {
+        $this->auth_ajax();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $this->data['loadData'] = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Active',1);
+        $this->data['loadData'] = json_encode($this->data['loadData']);
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/pageLoadTimePeriod',$this->data,true);
+        echo json_encode($arr_result);
     }
 
 

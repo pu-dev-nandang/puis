@@ -25,9 +25,8 @@
 
 	}
 </style>
-<!-- <pre><?php print_r($this->session->userdata('menu_budgeting_grouping')) ?></pre> -->
 <div class="row">
-		<h2 align="center">Period Sep 2018 - Sep 2019</h2>
+		<h2 align="center">Period Sep 2018 - Aug 2019</h2>
 </div>
 <div class="row">
 	<div class="col-xs-12">
