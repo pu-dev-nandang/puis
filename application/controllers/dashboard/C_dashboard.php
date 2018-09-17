@@ -129,7 +129,7 @@ class C_dashboard extends Globalclass {
                 $a_Unpaid_Off = 0;
                 $a_unsetPaid = 0;
                     // get Data Mahasiswa
-                    $sql = 'select a.NPM,a.Name,b.NameEng from '.$arrDB[$i].'.students as a join db_academic.program_study as b on a.ProdiID = b.ID where StatusStudentID in (3,2,7) ';
+                    $sql = 'select a.NPM,a.Name,b.NameEng from '.$arrDB[$i].'.students as a join db_academic.program_study as b on a.ProdiID = b.ID where a.StatusStudentID in (3,2,7) ';
                     $query=$this->db->query($sql, array())->result_array();
                     for ($u=0; $u < count($query); $u++) { 
 
@@ -203,20 +203,21 @@ class C_dashboard extends Globalclass {
                             }
                         }
 
-
-                        if ($arrBPP['DetailPaymentBPP'] != '' && $arrCr['DetailPaymentCr'] != '' &&  $arrBPP['SisaBPP'] == 0 && $arrCr['SisaCr'] == 0) { // lunas
-                          $a_Paid_Off = $a_Paid_Off + 1;
-
-                        }    
-
-                        if ( ($arrBPP['DetailPaymentBPP'] != '' || $arrCr['DetailPaymentCr'] != '') &&  ($arrBPP['SisaBPP'] > 0 || $arrCr['SisaCr'] > 0) ) { // belum lunas
-                          $a_Unpaid_Off = $a_Unpaid_Off + 1;
-
-                        } 
-
-                        if ($arrBPP['DetailPaymentBPP'] == '' || $arrCr['DetailPaymentCr'] == '') { // belum lunas
+                        if ($arrBPP['DetailPaymentBPP'] == '' || $arrCr['DetailPaymentCr'] == '') { // unset paid
                           $a_unsetPaid = $a_unsetPaid + 1;
 
+                        }
+                        else
+                        {
+                            if ($arrBPP['DetailPaymentBPP'] != '' && $arrCr['DetailPaymentCr'] != '' &&  $arrBPP['SisaBPP'] == 0 && $arrCr['SisaCr'] == 0) { // lunas
+                              $a_Paid_Off = $a_Paid_Off + 1;
+
+                            }
+                            elseif ( $arrBPP['DetailPaymentBPP'] != '' || $arrCr['DetailPaymentCr'] != '' ||  $arrBPP['SisaBPP'] > 0 || $arrCr['SisaCr'] > 0 ) { // belum lunas
+                              $a_Unpaid_Off = $a_Unpaid_Off + 1;
+
+                            }     
+                            
                         }  
 
                     } // loop per mhs    
