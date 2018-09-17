@@ -41,11 +41,12 @@
     function LoadCodePrefix()
     {
         loading_page("#pageContentConfig");
-        setTimeout(function()
-            { 
-                $("#pageContentConfig").html('<div class = "row" align = "center"><h2>Comming Soon</h2></div>');
-            }, 
-        1000);
+        // setTimeout(function()
+        //     { 
+        //         $("#pageContentConfig").html('<div class = "row" align = "center"><h2>Comming Soon</h2></div>');
+        //     }, 
+        // 1000);
+        $("#pageContentConfig").html('<div class = "row" align = "center"><h2>Comming Soon</h2></div>');
     }
 
     function LoadTimePeriod()

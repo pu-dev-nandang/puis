@@ -11,6 +11,11 @@
 	<div class="panel panel-primary">
         <div class="panel-heading clearfix">
             <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Time Period Budgeting</h4>
+            <div class="toolbar no-padding pull-right">
+                <span data-smt="" class="btn btn-add">
+                    <i class="icon-plus"></i> Add Period
+               </span>
+            </div>
         </div>
         <div class="panel-body">
             <div class="table-responsive" id = "loadTable">
@@ -35,22 +40,25 @@ function loadTable()
 							'<th>Start Period</th>'+
 							'<th>End Period</th>'+
 							'<th>Action</th>'+
-						'<tr><thead>'	
+						'</tr></thead>'	
 						;
 	TableGenerate += '<tbody>';
 	var dataForTable = <?php echo $loadData ?>;
 	for (var i = 0; i < dataForTable.length; i++) {
+		var btn_edit = '<button type="button" class="btn btn-warning btn-edit" Year = "'+dataForTable[i].Year+'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
+		var btn_del = ' <button type="button" class="btn btn-danger"  Year = "'+dataForTable[i].Year+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
 		TableGenerate += '<tr>'+
 							'<td width = "3%">'+ (parseInt(i) + 1)+'</td>'+
 							'<td>'+ dataForTable[i].Year+'</td>'+
 							'<td>'+ getMonth(dataForTable[i].StartPeriod)+'</td>'+
 							'<td>'+ getMonth(dataForTable[i].EndPeriod)+'</td>'+
-							'<td>'+ ''+'</td>'+
+							'<td>'+ btn_edit + ' '+' &nbsp' + btn_del+'</td>'+
 						 '</tr>'	
 	}
 
 	TableGenerate += '</tbody></table>';
 	$("#loadTable").html(TableGenerate);
+	LoaddataTableStandard("#tableData");
 					
 }
 
@@ -74,7 +82,7 @@ function getMonth(datee)
 	var aa = datee.split('-');
 	var ab = aa[1];
 	ab = parseInt(ab) - 1;
-	return month[ab];
+	return month[ab]+' '+aa[0];
 }
 
 </script>
