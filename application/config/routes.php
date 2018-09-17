@@ -844,3 +844,7 @@ foreach( $result as $row )
 }
 
 $route['budgeting/page/LoadTimePeriod'] = 'page/budgeting/c_budgeting/pageLoadTimePeriod';
+$route['budgeting/time_period/modalform'] = 'page/budgeting/c_budgeting/modal_pageLoadTimePeriod';
+$route['budgeting/time_period/modalform/save'] = 'page/budgeting/c_budgeting/modal_pageLoadTimePeriod_save';
+$route['budgeting/table_cari/(:any)/(:any)/(:any)'] = 'page/budgeting/c_budgeting/LoadTable_db_budgeting_cari/$1/$2/$3/$4';
+$route['budgeting/table_all/(:any)/(:any)'] = 'page/budgeting/c_budgeting/LoadTable_db_budgeting_all/$1/$2';
