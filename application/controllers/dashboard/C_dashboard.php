@@ -157,7 +157,7 @@ class C_dashboard extends Globalclass {
                                   $SisaBPP = $SisaBPP + $Q_invStudent[$r]['Invoice'];
                                 }
                               }
-
+                              
                               $arrBPP = array(
                                 'BPP' => (int)$queryBPP[$t]['Invoice'],
                                 'PayBPP' => (int)$PayBPP,
