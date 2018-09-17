@@ -1181,6 +1181,40 @@ class C_auth extends Globalclass {
 
 //            return print_r($res);
         }
+
+        else if($table=='getAllStudent'){
+            $db_ = 'ta_2018';
+            $dataStd = $this->db->get($db_.'.students')->result_array();
+            for($i=0;$i<count($dataStd);$i++){
+                $d = $dataStd[$i];
+                // Cek apakah sudah ada di AUTH
+                $dataAuth = $this->db->get_where('db_academic.auth_students',array('NPM' => $d['NPM']),1)->result_array();
+                if(count($dataAuth)>0){
+                    // Update
+                    $dataUpdate = array(
+                        'Name' => ucwords(strtolower($d['Name'])),
+                        'ProdiID' => $d['ProdiID']
+                    );
+                    $this->db->set($dataUpdate);
+                    $this->db->where('ID', $dataAuth[0]['ID']);
+                    $this->db->update('db_academic.auth_students');
+
+                }
+                else {
+                    $dataInsert = array(
+                        'NPM' => $d['NPM'],
+                        'Name' => $d['Name'],
+                        'ProdiID' => $d['ProdiID'],
+                        'Password_Old' => md5('Podomoro2015'),
+                        'Year' => $d['ClassOf'],
+                        'StatusStudentID' => $d['StatusStudentID'],
+                        'Status' => '-1',
+                    );
+                    $this->db->insert('db_academic.auth_students',$dataInsert);
+                }
+            }
+
+        }
     }
 
     public function getClassOf(){

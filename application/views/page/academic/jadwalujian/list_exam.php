@@ -210,6 +210,7 @@
             $.post(url,{token:token},function (jsonResult) {
 
                 $('#form2PDFDate').empty();
+                $('#form2PDFDate').append('<option value="">-- All Date --</option>');
                 if(jsonResult.utsStart!=null && jsonResult.utsStart!=''){
                     var filterExam = $('#filterExam').val();
                     var start = (filterExam=='UTS' || filterExam=='uts') ? jsonResult.utsStart : jsonResult.uasStart;

@@ -1546,6 +1546,7 @@ class C_api extends CI_Controller {
                                 LEFT JOIN db_employees.employees p1 ON (p1.NIP = ex.Pengawas1)
                                 LEFT JOIN db_employees.employees p2 ON (p2.NIP = ex.Pengawas2)
                                 LEFT JOIN db_employees.employees em ON (em.NIP = ex.InsertBy)
+                                LEFT JOIN db_academic.days d ON (d.ID = ex.DayID)
                                 WHERE ( '.$whereP.' ) '.$dataSearch.' '.$orderBy;
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
