@@ -5,7 +5,9 @@ class M_jadwal_ujian extends CI_Model {
 
     public function __getExam($ExamID){
 
-        $data = $this->db->query('SELECT * FROM db_academic.exam ex WHERE ex.ID = "'.$ExamID.'" ')->result_array();
+        $data = $this->db->query('SELECT ex.*, cl.Room, cl.Seat, cl.SeatForExam FROM db_academic.exam ex 
+                                            LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
+                                            WHERE ex.ID = "'.$ExamID.'" ')->result_array();
 
         if(count($data)>0){
             for($i=0;$i<count($data);$i++){

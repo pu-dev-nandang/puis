@@ -250,9 +250,9 @@
                     '                        <th style="width: 20%;">Pengawas</th>' +
                     '                        <th style="width: 5%;">Student</th>' +
                     '                        <th style="width: 5%;">Action</th>' +
-                    '                        <th style="width: 20%;">Date</th>' +
-                    '                        <th style="width: 10%;">Time</th>' +
+                    '                        <th style="width: 15%;">Day, Date ,Time</th>' +
                     '                        <th style="width: 7%;">Room</th>' +
+                    '                        <th style="width: 15%;">Insert by</th>' +
                     '                    </tr>' +
                     '                    </thead>' +
                     '                    <tbody id="trExam"></tbody>' +
@@ -283,7 +283,8 @@
                         "searchPlaceholder": "Day, Room, Name / NIP Pengawas"
                     },
                     "ajax":{
-                        url : base_url_js+"api/__getScheduleExam?token="+token, // json datasource
+                        url : base_url_js+"api/__getScheduleExam", // json datasource
+                        data : {token:token},
                         ordering : false,
                         type: "post",  // method  , by default get
                         error: function(){  // error handling

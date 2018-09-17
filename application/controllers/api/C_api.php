@@ -1519,42 +1519,41 @@ class C_api extends CI_Controller {
     public function getScheduleExam(){
         $requestData= $_REQUEST;
 
-        $token = $this->input->get('token');
+        $token = $this->input->post('token');
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
 
         $whereP = ($data_arr['ExamDate']!=null && $data_arr['ExamDate']!='')
             ? 'ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'" AND ex.Status = "1" AND ex.ExamDate LIKE "'.$data_arr['ExamDate'].'" '
             : 'ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'" AND ex.Status = "1"' ;
-        // ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'"
 
+        $orderBy = ' ORDER BY ex.ExamDate, ex.ExamStart, ex.ExamEnd ASC ';
+        $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
 
             $search = $requestData['search']['value'];
-            $sql = 'SELECT ex.ID, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room , p1.Name AS P_Name1, p2.Name AS P_Name2
-                                FROM db_academic.exam ex
-                                LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
-                                LEFT JOIN db_academic.days d On (d.ID = ex.DayID)
-                                LEFT JOIN db_employees.employees p1 ON (p1.NIP = ex.Pengawas1)
-                                LEFT JOIN db_employees.employees p2 ON (p2.NIP = ex.Pengawas2)
-                                WHERE ( '.$whereP.' ) AND
+            $dataSearch = ' AND
                                  (d.NameEng LIKE "%'.$search.'%" OR cl.Room LIKE "%'.$search.'%" 
                                  OR p1.Name LIKE "%'.$search.'%" OR p2.Name LIKE "%'.$search.'%"
                                  OR p1.NIP LIKE "%'.$search.'%" OR p2.NIP LIKE "%'.$search.'%" 
-                                 ) ORDER BY ex.ExamDate, ex.ExamStart, ex.ExamEnd ASC ';
+                                 ) ';
         }
-        else {
 
-            $sql = 'SELECT ex.ID, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room, p1.Name AS P_Name1, p2.Name AS P_Name2,
-                                p1.NIP AS P_NIP1, p2.NIP AS P_NIP2
+        $queryDefault = 'SELECT ex.ID, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room, p1.Name AS P_Name1, p2.Name AS P_Name2,
+                                p1.NIP AS P_NIP1, p2.NIP AS P_NIP2, em.Name AS InsertByName, ex.InsertAt
                                 FROM db_academic.exam ex
                                 LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
                                 LEFT JOIN db_employees.employees p1 ON (p1.NIP = ex.Pengawas1)
                                 LEFT JOIN db_employees.employees p2 ON (p2.NIP = ex.Pengawas2)
-                                WHERE '.$whereP.' ORDER BY ex.ExamDate, ex.ExamStart, ex.ExamEnd ASC ';
-        }
+                                LEFT JOIN db_employees.employees em ON (em.NIP = ex.InsertBy)
+                                WHERE ( '.$whereP.' ) '.$dataSearch.' '.$orderBy;
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+
 
         $dataTable = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
 
         if(count($dataTable)>0){
             for($i=0;$i<count($dataTable);$i++){
@@ -1597,7 +1596,7 @@ class C_api extends CI_Controller {
 //        print_r($query);
 //        exit;
 
-        $no =1;
+        $no = $requestData['start'] + 1;
         $data = array();
         for($i=0;$i<count($query);$i++){
             $nestedData=array();
@@ -1616,7 +1615,7 @@ class C_api extends CI_Controller {
             }
 
 
-            $exam_date = date("D, d M Y", strtotime($row['ExamDate']));
+            $exam_date = date("l, d M Y", strtotime($row['ExamDate']));
             $exam_time = substr($row['ExamStart'],0,5).' - '.substr($row['ExamEnd'],0,5);
             $exam_room = $row['Room'];
             $data_token_soal_jawaban = array(
@@ -1663,14 +1662,17 @@ class C_api extends CI_Controller {
                 </div>
                 </div>';
 
+            $dateInsert = ($row['InsertAt']!='' && $row['InsertAt']!=null) ? date('l, d M Y h:i',strtotime($row['InsertAt'])) : '-' ;
+
             $nestedData[] = '<div style="text-align:center;">'.($no++).'</div>';
             $nestedData[] = $course;
             $nestedData[] = $p;
             $nestedData[] = '<div style="text-align:center;">'.$totalStudent.'</div>';
             $nestedData[] = $act;
-            $nestedData[] = '<div  style="text-align:center;">'.$exam_date.'</div>';
-            $nestedData[] = '<div  style="text-align:center;">'.$exam_time.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$exam_date.'<br/>'.$exam_time.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$exam_room.'</div>';
+            $nestedData[] = '<b><i class="fa fa-user margin-right"></i> '.$row['InsertByName'].'</b>
+                                <br/><span style="font-size: 11px;color: #9e9e9e;">'.$dateInsert.'</span>';
 
             $data[] = $nestedData;
         }
@@ -1678,8 +1680,8 @@ class C_api extends CI_Controller {
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
-            "recordsTotal"    => intval(count($query)),
-            "recordsFiltered" => intval( count($query) ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
             "data"            => $data
         );
         echo json_encode($json_data);
@@ -1829,7 +1831,7 @@ class C_api extends CI_Controller {
     {
         $requestData= $_REQUEST;
 
-        $token = $this->input->get('token');
+        $token = $this->input->post('token');
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
 
@@ -1839,40 +1841,24 @@ class C_api extends CI_Controller {
                         AND ex.InsertByProdiID = "'.$data_arr['ProdiID'].'" 
                          '.$status;
 
+        $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
-
             $search = $requestData['search']['value'];
-
-            $sql = 'SELECT ex.*, cl.Room, em1.Name AS P_Name1, em2.Name AS P_Name2, em3.Name AS Name_InsertBy 
-                              FROM db_academic.exam ex
-                              LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
-                              LEFT JOIN db_employees.employees em1 ON (em1.NIP = ex.Pengawas1)
-                              LEFT JOIN db_employees.employees em2 ON (em2.NIP = ex.Pengawas2)
-                              LEFT JOIN db_employees.employees em3 ON (em3.NIP = ex.InsertBy)
-                              WHERE ( '.$whereP.' ) AND 
-                              (
-                              em1.Name LIKE "%'.$search.'%" OR
-                              em2.Name LIKE "%'.$search.'%" OR
-                              em3.Name LIKE "%'.$search.'%" OR 
-                              cl.Room LIKE "%'.$search.'%"  
-                              ) ';
-
-        } else {
-
-            $sql = 'SELECT ex.*, cl.Room, em1.Name AS P_Name1, em2.Name AS P_Name2, em3.Name AS Name_InsertBy 
-                              FROM db_academic.exam ex
-                              LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
-                              LEFT JOIN db_employees.employees em1 ON (em1.NIP = ex.Pengawas1)
-                              LEFT JOIN db_employees.employees em2 ON (em2.NIP = ex.Pengawas2)
-                              LEFT JOIN db_employees.employees em3 ON (em3.NIP = ex.InsertBy)
-                              WHERE '.$whereP.' ';
-
+            $dataSearch = ' AND ( em1.Name LIKE "%'.$search.'%" OR em2.Name LIKE "%'.$search.'%" OR
+                              em3.Name LIKE "%'.$search.'%" OR cl.Room LIKE "%'.$search.'%" ) ';
         }
 
-        $dataTable = $this->db->query($sql)->result_array();
+        $queryDefault = 'SELECT ex.*, cl.Room, em1.Name AS P_Name1, em2.Name AS P_Name2, em3.Name AS Name_InsertBy 
+                              FROM db_academic.exam ex
+                              LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
+                              LEFT JOIN db_employees.employees em1 ON (em1.NIP = ex.Pengawas1)
+                              LEFT JOIN db_employees.employees em2 ON (em2.NIP = ex.Pengawas2)
+                              LEFT JOIN db_employees.employees em3 ON (em3.NIP = ex.InsertBy)
+                              WHERE ( '.$whereP.' ) '.$dataSearch.' ';
 
-        $query = $dataTable;
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
+        $query = $this->db->query($sql)->result_array();
 
         $data = array();
         for($i=0;$i<count($query);$i++){
@@ -1958,8 +1944,8 @@ class C_api extends CI_Controller {
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
-            "recordsTotal"    => intval(count($query)),
-            "recordsFiltered" => intval( count($query) ),
+            "recordsTotal"    => intval(count($queryDefault)),
+            "recordsFiltered" => intval( count($queryDefault) ),
             "data"            => $data
         );
         echo json_encode($json_data);
@@ -2956,16 +2942,19 @@ class C_api extends CI_Controller {
                 // Update Group Jika ada
                 if(count($data_arr['insert_group'])>0){
                     for($g=0;$g<count($data_arr['insert_group']);$g++){
-                        $arrInsert = array(
-                            'ExamID' => $data_arr['ExamID'],
-                            'ScheduleID' => $data_arr['insert_group'][$g]
-                        );
+                        if($data_arr['insert_group'][$g]!=null && $data_arr['insert_group'][$g]!=''){
+                            $arrInsert = array(
+                                'ExamID' => $data_arr['ExamID'],
+                                'ScheduleID' => $data_arr['insert_group'][$g]
+                            );
 
-                        $dataCk = $this->db->get_where('db_academic.exam_group',$arrInsert)->result_array();
+                            $dataCk = $this->db->get_where('db_academic.exam_group',$arrInsert)->result_array();
 
-                        if(count($dataCk)<=0){
-                            $this->db->insert('db_academic.exam_group',$arrInsert);
+                            if(count($dataCk)<=0){
+                                $this->db->insert('db_academic.exam_group',$arrInsert);
+                            }
                         }
+
                     }
                 }
 
