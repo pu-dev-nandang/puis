@@ -826,7 +826,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $h = 4.5;
         $pdf->SetFont('Times','B',7);
-        $pdf->Cell($w_ttd,$h,$this->session->userdata('Name'),1,0,'C');
+        $pdf->Cell($w_ttd,$h,'',1,0,'C');
         // Get Kabag Akademik id 6.11
         $dataKabagAkademik = $this->m_save_to_pdf->getEmployeesByPositionMain('6.11');
         $kabag = (count($dataKabagAkademik)>0) ? $dataKabagAkademik[0]['Name'] : '' ;

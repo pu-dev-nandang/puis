@@ -2207,7 +2207,7 @@ class M_api extends CI_Model {
             $db_ = 'ta_'.$year[$y]['Year'];
 
             $dataSt = $this->db->query('SELECT sp.MhswID, s.NPM, s.Name FROM '.$db_.'.study_planning sp 
-                                                            LEFT JOIN '.$db_.'.students s ON (s.ID = sp.MhswID)
+                                                            LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
                                                             WHERE sp.ScheduleID = "'.$ScheduleID.'" 
                                                             AND sp.StatusSystem = "1" ')->result_array();
 
@@ -2229,7 +2229,7 @@ class M_api extends CI_Model {
                                                                     LEFT JOIN db_academic.exam_details exd ON (ex.ID = exd.ExamID)
                                                                     LEFT JOIN db_academic.exam_group exg ON (ex.ID = exg.ExamID)
                                                                     WHERE exg.ScheduleID = "'.$ScheduleID.'"
-                                                                    AND exd.MhswID = "'.$dataSt[$s]['MhswID'].'" 
+                                                                    AND exd.NPM = "'.$dataSt[$s]['NPM'].'" 
                                                                     LIMIT 1')
                                             ->result_array();
 

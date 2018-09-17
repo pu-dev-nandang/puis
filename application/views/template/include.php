@@ -911,7 +911,7 @@
         $.post(url,{token:token},function (data_json) {
             if(data_json.length>0){
                 for(var i=0;i<data_json.length;i++){
-                    option.append('<option value="'+data_json[i].ID+'">'+data_json[i].Room+' | Seat : '+data_json[i].Seat+' | Exam : '+data_json[i].SeatForExam+'</option>')
+                    option.append('<option value="'+data_json[i].ID+'.'+data_json[i].Seat+'.'+data_json[i].SeatForExam+'">'+data_json[i].Room+' | Seat : '+data_json[i].Seat+' | Exam : '+data_json[i].SeatForExam+'</option>')
                         .val(selected).trigger('change');
                 }
             }

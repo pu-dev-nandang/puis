@@ -69,12 +69,19 @@
 
                     </td>
                 </tr>
+                <tr>
+                    <th>Promgramme Study</th>
+                    <td>:</td>
+                    <td>
+                        <select class="form-control" id="formBaseProdi" style="max-width: 350px;"></select>
+                    </td>
+                </tr>
                 <tr style="background: lightyellow;">
                     <th>Current Group</th>
                     <td>:</td>
                     <td>
                         <ul id="ulCurrentGroup">
-                            <?php for($t=0;$t<count($d['Course']);$t++){ $dc = $d['Course'][$t]; ?>
+                            <?php $totalStudent=0; for($t=0;$t<count($d['Course']);$t++){ $dc = $d['Course'][$t]; ?>
                                 <li id="liGr<?php echo $dc['ScheduleID']; ?>"><b><?php echo $dc['ClassGroup'].' - '.$dc['CourseEng']; ?>
                                     <textarea id="textStd<?php echo $t; ?>" class="hide" hidden readonly><?php echo json_encode($dc['DetailStudent']); ?></textarea>
                                     </b> |
@@ -82,7 +89,7 @@
                                             data-examid="<?php echo $d['ID']; ?>"
                                             data-id="<?php echo $dc['ScheduleID']; ?>"><span id="viewTextStd<?php echo $t; ?>"><?php echo count($dc['DetailStudent']); ?></span> Student</button> |
                                     <button class="btn btn-sm btn-default btn-default-danger btnDeleteGroup" data-examid="<?php echo $d['ID']; ?>" data-id="<?php echo $dc['ScheduleID']; ?>"><i class="fa fa-trash"></i></button></li>
-                            <?php } ?>
+                            <?php $totalStudent = $totalStudent + count($dc['DetailStudent']); } ?>
                         </ul>
                     </td>
                 </tr>
@@ -172,6 +179,7 @@
             </table>
 
             <div style="text-align: right;">
+                <input id="viewTotalStudent" class="hide" hidden readonly value="<?php echo $totalStudent; ?>">
                 <a href="<?php echo base_url('academic/exam-schedule/list-exam'); ?>" class="btn btn-warning"><i class="fa fa-arrow-left margin-right"></i> Back to List</a>
                 <button id="btnSaveEditSchedule" class="btn btn-primary">Save</button>
             </div>
@@ -187,13 +195,17 @@
 
             window.notr = 0;
 
+            $('#formBaseProdi').append('<option value="">-- Select Programme Study --</option>' +
+                '<option disabled>------------------------------------------</option>');
+            loadSelectOptionBaseProdi('#formBaseProdi',<?php echo $d['InsertByProdiID']; ?>);
+
             var formDate = "<?php echo $d['ExamDate']; ?>";
             $('#viewDate').html(moment(formDate).format('dddd, DD MMM YYYY'));
             // console.log(new Date(formDate));
             // $('#formDate').datepicker('setDate',new Date(formDate));
 
             dateInputJadwal_();
-            loadSelect2OptionClassroom('#formClassroom','<?php echo $d['ExamClassroomID']; ?>');
+            loadSelect2OptionClassroom('#formClassroom','<?php echo $d['ExamClassroomID'].'.'.$d['Seat'].'.'.$d['SeatForExam']; ?>');
 
             $('#inputStart,#inputEnd').datetimepicker({
                 pickDate: false,
@@ -243,6 +255,8 @@
                         $('#NotificationModal').modal('hide');
                         if(result==-1 || result=='-1'){
                             window.location.href = base_url_js+'academic/exam-schedule/list-exam';
+                        } else {
+                            window.location.href = '';
                         }
                     },500);
                 });
@@ -522,34 +536,44 @@
                     }
                 }
 
-                var data = {
-                    action : 'editGroupExam',
-                    ExamID : formExamID,
-                    SemesterID : formSemesterID,
-                    updateExam : {
-                        Type : Type,
-                        ExamDate : formInputDate,
-                        DayID : formDayID,
-                        ExamClassroomID : formClassroom,
-                        ExamStart : formStart,
-                        ExamEnd : formEnd,
-                        Pengawas1 : formPengawas1,
-                        Pengawas2 : formPengawas2
-                    },
-                    insert_details : insert_details,
-                    insert_group : insert_group
-                };
 
-                var token = jwt_encode(data,'UAP)(*');
+                var RoomID = formClassroom.split('.')[0];
+                var SeatForExam = formClassroom.split('.')[2];
+                var viewTotalStudent = $('#viewTotalStudent').val();
+                var totalStudent = parseInt(insert_details.length) + parseInt(viewTotalStudent);
 
-                checkBentrol(formExamID,formSemesterID,Type,formInputDate,formClassroom,formStart,formEnd,token);
+                if(totalStudent <= SeatForExam){
+                    var data = {
+                        action : 'editGroupExam',
+                        ExamID : formExamID,
+                        SemesterID : formSemesterID,
+                        updateExam : {
+                            Type : Type,
+                            ExamDate : formInputDate,
+                            DayID : formDayID,
+                            ExamClassroomID : RoomID,
+                            ExamStart : formStart,
+                            ExamEnd : formEnd,
+                            Pengawas1 : formPengawas1,
+                            Pengawas2 : formPengawas2
+                        },
+                        insert_details : insert_details,
+                        insert_group : insert_group
+                    };
 
+                    var token = jwt_encode(data,'UAP)(*');
+
+                    checkBentrok(formExamID,formSemesterID,Type,formInputDate,RoomID,formStart,formEnd,token);
+                }
+                else {
+                    toastr.error('Classroom not Enought','Error');
+                }
 
             }
 
         });
 
-        function checkBentrol(ExamID,SemesterID,Type,Date,RoomID,Start,End,token2save) {
+        function checkBentrok(ExamID,SemesterID,Type,Date,RoomID,Start,End,token2save) {
 
             loading_button('#btnSaveEditSchedule');
             $('.form-exam').prop('disabled',true);
@@ -792,6 +816,10 @@
 
                     $('#textStd'+no_array).val(na);
                     $('#viewTextStd'+no_array).html(newArrStd.length);
+
+                    var viewTotalStudent = $('#viewTotalStudent').val();
+                    var newVal = parseInt(viewTotalStudent) - 1;
+                    $('#viewTotalStudent').val(newVal);
 
                     if(newArrStd.length<=0){
                         $('#NotificationModal').modal('hide');

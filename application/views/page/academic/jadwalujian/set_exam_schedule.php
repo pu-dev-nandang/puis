@@ -40,6 +40,13 @@
                 </td>
             </tr>
             <tr>
+                <th>Pgromme Study</th>
+                <td>:</td>
+                <td>
+                    <select class="form-control" id="formBaseProdi" style="max-width: 350px;"></select>
+                </td>
+            </tr>
+            <tr>
                 <th>Group</th>
                 <td>:</td>
                 <td>
@@ -142,6 +149,10 @@
 
         window.notr = 0;
 
+        $('#formBaseProdi').append('<option value="">-- Select Programme Study --</option>' +
+            '<option disabled>------------------------------------------</option>');
+        loadSelectOptionBaseProdi('#formBaseProdi','');
+
         getIDSemesterActive('#formSemesterID');
 
         getDataCourse('#viewGroup','');
@@ -215,6 +226,9 @@
         var formInputDate = $('#formInputDate').val();
         errorForm('formDate',formInputDate,0);
 
+        var formBaseProdi = $('#formBaseProdi').val();
+        errorForm('formBaseProdi',formBaseProdi,0);
+
         var formCourse = $('#formCourse').val();
         errorForm('formCourse',formCourse,1);
 
@@ -266,6 +280,7 @@
         errorForm('formPengawas1',formPengawas1,1);
 
         if($.inArray(0,CourseOtherNext)==-1 && formInputDate!='' && formInputDate!=null
+            && formBaseProdi!='' && formBaseProdi!=null
             && formCourse!='' && formCourse!=null && formStart!='' && formStart!=null
             && formEnd!='' && formEnd!=null && formClassroom!='' && formClassroom!=null
             && formPengawas1!='' && formPengawas1!=null
@@ -294,11 +309,12 @@
                     if(d.IDEd == '' || d.IDEd == null){
 
                         if($.inArray(d.NPM,Arr_formStudent)!=-1){
+                            var Name = (d.Name!='' && d.Name!=null) ? ucwords(d.Name) : '';
                             var arr_s = {
                                 ScheduleID : formCourse,
                                 MhswID : d.MhswID,
                                 NPM : d.NPM,
-                                Name : ucwords(d.Name),
+                                Name : Name,
                                 DB_Students : d.DB_Students
                             };
                             insert_details.push(arr_s);
@@ -328,12 +344,12 @@
                                     if($.inArray(formCourse_ot,insert_group)==-1){
                                         insert_group.push(formCourse_ot);
                                     }
-
+                                    var Name = (od.Name!='' && od.Name!=null) ? ucwords(od.Name) : '';
                                     var arr_s_ot = {
                                         ScheduleID : formCourse_ot,
                                         MhswID : od.MhswID,
                                         NPM : od.NPM,
-                                        Name : ucwords(od.Name),
+                                        Name : Name,
                                         DB_Students : od.DB_Students
                                     };
                                     insert_details.push(arr_s_ot);
@@ -344,29 +360,50 @@
 
                 }
             }
-            
-            var data = {
-                action : 'setExamSchedule',
-                insert_exam : {
-                    SemesterID : formSemesterID,
-                    Type : Type,
-                    ExamDate : formInputDate,
-                    DayID : formDayID,
-                    ExamClassroomID : formClassroom,
-                    ExamStart : formStart,
-                    ExamEnd : formEnd,
-                    Pengawas1 : formPengawas1,
-                    Pengawas2 : formPengawas2
 
-                },
-                insert_details : insert_details,
-                insert_group : insert_group
+            var RoomID =  formClassroom.split('.')[0];
+            var SeatForExam =  formClassroom.split('.')[2];
+            var TotalStudent = insert_details.length;
 
-            };
+            if(parseInt(TotalStudent) <= parseInt(SeatForExam)){
+                var ProdiID = formBaseProdi.split('.')[0];
+                var data = {
+                    action : 'setExamSchedule',
+                    insert_exam : {
+                        SemesterID : formSemesterID,
+                        Type : Type,
+                        ExamDate : formInputDate,
+                        DayID : formDayID,
+                        ExamClassroomID : RoomID,
+                        ExamStart : formStart,
+                        ExamEnd : formEnd,
+                        Pengawas1 : formPengawas1,
+                        Pengawas2 : formPengawas2,
 
-            var token = jwt_encode(data,'UAP)(*');
+                        Status : '1',
+                        InsertByProdiID : ProdiID,
+                        InsertBy : sessionNIP,
+                        InsertAt : dateTimeNow()
 
-            checkBentrok(formSemesterID,Type,formInputDate,formClassroom,formStart,formEnd,token);
+
+                    },
+                    insert_details : insert_details,
+                    insert_group : insert_group
+
+                };
+
+                console.log(data);
+                return false;
+
+                var token = jwt_encode(data,'UAP)(*');
+
+                checkBentrok(formSemesterID,Type,formInputDate,RoomID,formStart,formEnd,token);
+            }
+            else {
+                toastr.error('Class Room not enought','Error');
+            }
+
+
 
         }
         
