@@ -26,4 +26,14 @@ class M_budgeting extends CI_Model {
         $query=$this->db->query($sql, array($NIP,$MenuDepartement))->result_array();
         return $query;
     }
+
+    public function getData_cfg_postrealisasi($Active = null)
+    {
+        $arr_result = array();
+        $Active = ($Active == null) ? '' : ' where a.Active = "'.$Active.'"';
+        $sql = 'select a.CodePostRealisasi,a.CodePost,b.PostName,a.RealisasiPostName,a.Departement from db_budgeting.cfg_postrealisasi as a join db_budgeting.cfg_post as b on a.CodePost = b.CodePost
+                '.$Active;
+        $query=$this->db->query($sql, array())->result_array();
+                
+    }
 }

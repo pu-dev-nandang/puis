@@ -1,28 +1,28 @@
 <div class="tabbable tabbable-custom tabbable-full-width">
     <ul class="nav nav-tabs">
-        <li class="active">
+        <li class="<?php if($request==null || $request=='CodePrefix'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "PrefixCode">Code Prefix</a>
         </li>
-        <li class="">
+        <li class="<?php if($request=='TimePeriod'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "TimePeriod">Time Period</a>
         </li>
-        <li class="">
-            <a href="javascript:void(0)" class="pageAnchor" page = "Item">Master Post</a>
+        <li class="<?php if($request=='MasterPost'){echo "active";} ?>">
+            <a href="javascript:void(0)" class="pageAnchor" page = "MasterPost">Master Post</a>
         </li>
-        <li class="">
-            <a href="javascript:void(0)" class="pageAnchor" page = "Item">Set Post Departement</a>
+        <li class="<?php if($request=='SetPostDepartement'){echo "active";} ?>">
+            <a href="javascript:void(0)" class="pageAnchor" page = "SetPostDepartement">Set Post Departement</a>
         </li>
-        <li class="">
+        <li class="<?php if($request=='MasterUserRole'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "MasterUserRole">Master User Role</a>
         </li>
-        <li class="">
+        <li class="<?php if($request=='UserRole'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "UserRole">Set User Role Departement</a>
         </li>
-        <li class="">
+        <li class="<?php if($request=='Catalog'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "Catalog">Catalog</a>
         </li>
-        <li class="">
-            <a href="javascript:void(0)" class="pageAnchor" page = "Catalog">Supplier</a>
+        <li class="<?php if($request=='Supplier'){echo "active";} ?>">
+            <a href="javascript:void(0)" class="pageAnchor" page = "Supplier">Supplier</a>
         </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
@@ -35,24 +35,42 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        LoadCodePrefix();
+        <?php if ($request == null): ?>
+            LoadCodePrefix();
+        <?php else: ?>
+            Load<?php echo $request ?>();    
+        <?php endif ?>
+        
     }); // exit document Function
 
     function LoadCodePrefix()
     {
         loading_page("#pageContentConfig");
-        // setTimeout(function()
-        //     { 
-        //         $("#pageContentConfig").html('<div class = "row" align = "center"><h2>Comming Soon</h2></div>');
-        //     }, 
-        // 1000);
-        $("#pageContentConfig").html('<div class = "row" align = "center"><h2>Comming Soon</h2></div>');
+        var url = base_url_js+'budgeting/page/loadCodePrefix';
+        $.post(url,function (resultJson) {
+            var response = jQuery.parseJSON(resultJson);
+            var html = response.html;
+            var jsonPass = response.jsonPass;
+            $("#pageContentConfig").html(html);
+        }); // exit spost
     }
 
     function LoadTimePeriod()
     {
         loading_page("#pageContentConfig");
         var url = base_url_js+'budgeting/page/LoadTimePeriod';
+        $.post(url,function (resultJson) {
+            var response = jQuery.parseJSON(resultJson);
+            var html = response.html;
+            var jsonPass = response.jsonPass;
+            $("#pageContentConfig").html(html);
+        }); // exit spost
+    }
+
+    function LoadMasterPost()
+    {
+        loading_page("#pageContentConfig");
+        var url = base_url_js+'budgeting/page/loadMasterPost';
         $.post(url,function (resultJson) {
             var response = jQuery.parseJSON(resultJson);
             var html = response.html;
@@ -73,8 +91,8 @@
             case "TimePeriod":
                 LoadTimePeriod();
                 break;
-            case "Apple":
-                text = "How you like them apples?";
+            case "MasterPost":
+                LoadMasterPost();
                 break;
             default:
                 text = "I have never heard of that fruit...";

@@ -13,7 +13,7 @@
             <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Time Period Budgeting</h4>
             <div class="toolbar no-padding pull-right">
                 <span data-smt="" class="btn btn-add">
-                    <i class="icon-plus"></i> Add Period
+                    <i class="icon-plus"></i> Add
                </span>
             </div>
         </div>
@@ -29,20 +29,10 @@ $(document).ready(function() {
     loadTable();
 
     $(".btn-add").click(function(){
-	    modal_generate('add','Add Time Period');
+	    modal_generate('add','Add');
     });
     
 }); // exit document Function
-
-// button add
-// $(document).on('click','.btn-add', function () {
-// 	modal_generate('add','Add Time Period');
-// });
-
-// $(document).on('click','.btn-edit', function () {
-//   var ID = $(this).attr('year');
-//    modal_generate('edit','Edit Time Period',ID);
-// });
 
 function modal_generate(action,title,ID='') {
     var url = base_url_js+"budgeting/time_period/modalform";
@@ -147,7 +137,7 @@ function loadTable()
 
         $(".btn-edit").click(function(){
     	    var ID = $(this).attr('year');
-    	     modal_generate('edit','Edit Time Period',ID);
+    	     modal_generate('edit','Edit',ID);
         });
 
         $(".btn-delete").click(function(){	
@@ -215,89 +205,5 @@ function getMonth(datee)
 	ab = parseInt(ab) - 1;
 	return month[ab]+' '+aa[0];
 }
-
-// $(document).on('click','#ModalbtnSaveForm', function () {
-// 	if (confirm("Are you sure?") == true) {
-// 	    loading_button('#ModalbtnSaveForm');
-// 	    var url = base_url_js+'budgeting/time_period/modalform/save';
-
-// 	    var Year = $("#Year").val();
-// 	    var MonthStart = $("#MonthStart").val();
-// 	    var MonthEnd = $("#MonthEnd").val();
-// 	    var action = $(this).attr('action');
-// 	    var id = $("#ModalbtnSaveForm").attr('kodeuniq');
-// 	    var data = {
-// 	    			Year : Year,
-// 	                MonthStart : MonthStart,
-// 	                MonthEnd : MonthEnd,
-// 	                Action : action,
-// 	                CDID : id
-// 	                };
-// 	    var token = jwt_encode(data,"UAP)(*");
-// 	    $.post(url,{token:token},function (data_json) {
-//         	var response = jQuery.parseJSON(data_json);
-//         	if (response == '') {
-//         		toastr.success('Data berhasil disimpan', 'Success!');
-//         	}
-//         	else
-//         	{
-//         		toastr.error(response, 'Failed!!');
-//         	}
-//         	loadTable();
-//         	$('#GlobalModal').modal('hide');
-//         }).done(function() {
-//           // loadTable();
-//         }).fail(function() {
-//           toastr.error('The Database connection error, please try again', 'Failed!!');
-//         }).always(function() {
-//          $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
-
-//         });
-
-// 	  } 
-// 	  else {
-// 	    return false;
-// 	  }
-       
-// });
-
-
-// $(document).on('click','.btn-delete', function () {
-//     var ID = $(this).attr('year');
-//      $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Are you sure ? </b> ' +
-//          '<button type="button" id="confirmYesDelete" class="btn btn-primary" style="margin-right: 5px;" data-smt = "'+ID+'">Yes</button>' +
-//          '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
-//          '</div>');
-//      $('#NotificationModal').modal('show');
-//   });
-// $(document).on('click','#confirmYesDelete',function () {
-//     $('#NotificationModal .modal-header').addClass('hide');
-//     $('#NotificationModal .modal-body').html('<center>' +
-//         '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
-//         '                    <br/>' +
-//         '                    Loading Data . . .' +
-//         '                </center>');
-//     $('#NotificationModal .modal-footer').addClass('hide');
-//     $('#NotificationModal').modal({
-//         'backdrop' : 'static',
-//         'show' : true
-//     });
-//     var url = base_url_js+'budgeting/time_period/modalform/save';
-//     var aksi = "delete";
-//     var ID = $(this).attr('data-smt');
-//     var data = {
-//         Action : aksi,
-//         CDID : ID,
-//     };
-//     var token = jwt_encode(data,"UAP)(*");
-//     $.post(url,{token:token},function (data_json) {
-//         setTimeout(function () {
-//            toastr.options.fadeOut = 10000;
-//            toastr.success('Data berhasil disimpan', 'Success!');
-//            loadTable();
-//            $('#NotificationModal').modal('hide');
-//         },500);
-//     });
-// });
 
 </script>

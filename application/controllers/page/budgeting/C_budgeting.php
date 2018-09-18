@@ -53,19 +53,34 @@ class C_budgeting extends Budgeting_Controler {
 
     public function configfinance($Request = null)
     {
-        if ($Request == null) {
+        $arr_menuConfig = array('CodePrefix',
+                                'TimePeriod',
+                                'MasterPost',
+                                'SetPostDepartement',
+                                'MasterUserRole',
+                                'UserRole',
+                                'Catalog',
+                                'Supplier',
+                                null
+                            );
+        if (in_array($Request, $arr_menuConfig))
+          {
+            $this->data['request'] = $Request;
             $content = $this->load->view('page/'.$this->data['department'].'/budgeting/configfinance',$this->data,true);
             $this->temp($content);
-        }
-        
+          }
+        else
+          {
+            show_404($log_error = TRUE);
+          }
     }
 
     public function pageLoadTimePeriod()
     {
         $this->auth_ajax();
         $arr_result = array('html' => '','jsonPass' => '');
-        $this->data['loadData'] = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Active',1);
-        $this->data['loadData'] = json_encode($this->data['loadData']);
+        // $this->data['loadData'] = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Active',1);
+        // $this->data['loadData'] = json_encode($this->data['loadData']);
         $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/pageLoadTimePeriod',$this->data,true);
         echo json_encode($arr_result);
     }
@@ -202,6 +217,123 @@ class C_budgeting extends Budgeting_Controler {
         }
 
         echo json_encode($query);
+    }
+
+    public function loadCodePrefix()
+    {
+        $this->auth_ajax();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $this->data['loadData'] = $this->m_master->showData_array('db_budgeting.cfg_codeprefix');
+        $this->data['loadData'] = json_encode($this->data['loadData']);
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/pageloadCodePrefix',$this->data,true);
+        echo json_encode($arr_result);
+    }
+
+    public function pageloadMasterPost()
+    {
+        $this->auth_ajax();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/pageloadMasterPost',$this->data,true);
+        echo json_encode($arr_result);
+    }
+
+    public function save_codeprefix()
+    {
+        $this->auth_ajax();
+        $input =  $this->getInputToken();
+        if(array_key_exists("CodePost",$input))
+        {
+            $dataSave = array(
+                'CodePost' => $input['CodePost'],
+            );
+            $this->db->update('db_budgeting.cfg_codeprefix', $dataSave);
+        }
+
+        if(array_key_exists("LengthCodePost",$input))
+        {
+            $dataSave = array(
+                'LengthCodePost' => $input['LengthCodePost'],
+            );
+            $this->db->update('db_budgeting.cfg_codeprefix', $dataSave);
+        }
+
+        if(array_key_exists("CodePostRealisasi",$input))
+        {
+            $dataSave = array(
+                'CodePostRealisasi' => $input['CodePostRealisasi'],
+            );
+            $this->db->update('db_budgeting.cfg_codeprefix', $dataSave);
+        }
+
+        if(array_key_exists("LengthCodePostRealisasi",$input))
+        {
+            $dataSave = array(
+                'LengthCodePostRealisasi' => $input['LengthCodePostRealisasi'],
+            );
+            $this->db->update('db_budgeting.cfg_codeprefix', $dataSave);
+        }
+
+        if(array_key_exists("CodePostBudget",$input))
+        {
+            $dataSave = array(
+                'CodePostBudget' => $input['CodePostBudget'],
+            );
+            $this->db->update('db_budgeting.cfg_codeprefix', $dataSave);
+        }
+
+        if(array_key_exists("YearCodePostBudget",$input))
+        {
+            $dataSave = array(
+                'YearCodePostBudget' => $input['YearCodePostBudget'],
+            );
+            $this->db->update('db_budgeting.cfg_codeprefix', $dataSave);
+        }
+
+        if(array_key_exists("LengthCodePostBudget",$input))
+        {
+            $dataSave = array(
+                'LengthCodePostBudget' => $input['LengthCodePostBudget'],
+            );
+            $this->db->update('db_budgeting.cfg_codeprefix', $dataSave);
+        }
+
+        if(array_key_exists("CodeCatalog",$input))
+        {
+            $dataSave = array(
+                'CodeCatalog' => $input['CodeCatalog'],
+            );
+            $this->db->update('db_budgeting.cfg_codeprefix', $dataSave);
+        }
+
+        if(array_key_exists("LengthCodeCatalog",$input))
+        {
+            $dataSave = array(
+                'LengthCodeCatalog' => $input['LengthCodeCatalog'],
+            );
+            $this->db->update('db_budgeting.cfg_codeprefix', $dataSave);
+        }
+
+        if(array_key_exists("CodeSupplier",$input))
+        {
+            $dataSave = array(
+                'CodeSupplier' => $input['CodeSupplier'],
+            );
+            $this->db->update('db_budgeting.cfg_codeprefix', $dataSave);
+        }
+
+        if(array_key_exists("LengthCodeSupplier",$input))
+        {
+            $dataSave = array(
+                'LengthCodeSupplier' => $input['LengthCodeSupplier'],
+            );
+            $this->db->update('db_budgeting.cfg_codeprefix', $dataSave);
+        }
+    }
+
+    public function get_cfg_postrealisasi()
+    {
+        $this->auth_ajax();
+        $getData = $this->m_budgeting->getData_cfg_postrealisasi(1);
     }
 
 
