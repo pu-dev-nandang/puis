@@ -103,6 +103,25 @@ class C_rest extends CI_Controller {
 
     }
 
+    public function getExamScheduleForStudent(){
+        $dataToken = $this->getInputToken();
+        $cekUser = $this->cekAuthAPI($dataToken['auth']);
+//
+//        print_r($dataToken);
+//        exit;
+
+        if($cekUser){
+            $data = $this->m_rest->__getExamScheduleForStudent($dataToken['DB_'],
+                $dataToken['ProdiID'],$dataToken['NPM'],$dataToken['ClassOf'],$dataToken['ExamType'],$dataToken['Date']);
+            return print_r(json_encode($data));
+        } else {
+            $msg = array(
+                'msg' => 'Error'
+            );
+            return print_r(json_encode($msg));
+        }
+    }
+
     public function geTimetable(){
 
         $dataToken = $this->getInputToken();
@@ -144,6 +163,33 @@ class C_rest extends CI_Controller {
 
                 return print_r(json_encode($dataStd));
             }
+
+        }
+        else {
+            $msg = array(
+                'msg' => 'Error'
+            );
+            return print_r(json_encode($msg));
+        }
+
+
+    }
+
+    public function getExamSchedule(){
+
+        $dataToken = $this->getInputToken();
+        $cekUser = $this->cekAuthAPI($dataToken['auth']);
+
+        if($cekUser){
+
+            if($dataToken['action']=='readExamSchedule'){
+                $NIP = $dataToken['NIP'];
+//                $SemesterID = $dataToken['SemesterID'];
+                $schedule = $this->m_rest->__getExamSchedule($NIP,strtolower($dataToken['Type']));
+
+                return print_r(json_encode($schedule));
+            }
+
 
         }
         else {
