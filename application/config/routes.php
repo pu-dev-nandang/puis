@@ -669,6 +669,7 @@ $route['rest/__getDetailKRS'] = 'api/c_rest/getDetailKRS';
 $route['rest/__geTimetable'] = 'api/c_rest/geTimetable';
 $route['rest/__getExamSchedule'] = 'api/c_rest/getExamSchedule';
 $route['rest/__getKSM'] = 'api/c_rest/getKSM';
+$route['rest/__getExamScheduleForStudent'] = 'api/c_rest/getExamScheduleForStudent';
 $route['rest/__cek_deadline_paymentNPM'] = 'api/c_rest/cek_deadline_paymentNPM';
 
 
