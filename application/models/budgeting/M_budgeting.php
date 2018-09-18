@@ -8,6 +8,7 @@ class M_budgeting extends CI_Model {
     function __construct()
     {
         parent::__construct();
+        $this->load->model('master/m_master');
     }
 
 
@@ -34,6 +35,29 @@ class M_budgeting extends CI_Model {
         $sql = 'select a.CodePostRealisasi,a.CodePost,b.PostName,a.RealisasiPostName,a.Departement from db_budgeting.cfg_postrealisasi as a join db_budgeting.cfg_post as b on a.CodePost = b.CodePost
                 '.$Active;
         $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) { 
+            $Departement = $query[$i]['Departement'];
+            $exp = explode('.', $Departement);
+            if ($exp[0] == 'NA') { // Non Academic
+                $tget = $this->m_master->caribasedprimary('db_employees.division','ID',$exp[1]);
+                $Departement = $tget[0]['Division'];
+            }
+            elseif ($exp[0] == 'A') {
+                $tget = $this->m_master->caribasedprimary('db_academic.program_study','ID',$exp[1]);
+                $Departement = $tget[0]['NameEng'];
+            }
+
+            $temp = array(
+                        'CodePostRealisasi' => $query[$i]['CodePostRealisasi'],
+                        'CodePost' => $query[$i]['CodePost'],
+                        'PostName' => $query[$i]['PostName'],
+                        'RealisasiPostName' => $query[$i]['RealisasiPostName'],
+                        'Departement' => $Departement,
+                    );
+            $arr_result[] = $temp;
+        }
+
+        return $arr_result;
                 
     }
 }

@@ -1,4 +1,4 @@
-<div class="tabbable tabbable-custom tabbable-full-width">
+<div class="tabbable tabbable-custom tabbable-full-width btn-read">
     <ul class="nav nav-tabs">
         <li class="<?php if($request==null || $request=='CodePrefix'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "PrefixCode">Code Prefix</a>

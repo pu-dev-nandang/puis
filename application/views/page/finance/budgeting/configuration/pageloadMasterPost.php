@@ -6,6 +6,14 @@
 	    color: #FFFFFF;
 
 	}
+
+    #tableData2 thead th,#tableData2 tfoot td {
+
+        text-align: center;
+        background: #20485A;
+        color: #FFFFFF;
+
+    }
 </style>
 <div class="col-xs-12" >
 	<div class="panel panel-primary">
@@ -46,14 +54,82 @@ $(document).ready(function() {
     loadTable1();
     loadTable2();
 
-    $(".btn-add").click(function(){
+    $(".btn-add-master-post").click(function(){
 	    modal_generate('add','Add');
+    });
+
+    $(".btn-add-realization-Post").click(function(){
+        modal_generate2('add','Add');
     });
     
 }); // exit document Function
 
+function modal_generate2(action,title,ID='') {
+    var url = base_url_js+"budgeting/postrealisasi/modalform";
+    var data = {
+        Action : action,
+        CDID : ID,
+    };
+    var token = jwt_encode(data,"UAP)(*");
+    $.post(url,{ token:token }, function (html) {
+        $('#GlobalModalLargeLarge .modal-header').html('<h4 class="modal-title">'+title+'</h4>');
+        $('#GlobalModalLargeLarge .modal-body').html(html);
+        $('#GlobalModalLargeLarge .modal-footer').html(' ');
+        $('#GlobalModalLargeLarge').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+        $('#ModalbtnSaveForm').click(function(){
+            if (confirm("Are you sure?") == true) {
+                loading_button('#ModalbtnSaveForm');
+                var url = base_url_js+'budgeting/postrealisasi/modalform/save';
+
+                var Year = $("#Year").val();
+                var MonthStart = $("#MonthStart").val();
+                var MonthEnd = $("#MonthEnd").val();
+                var action = $(this).attr('action');
+                var id = $("#ModalbtnSaveForm").attr('kodeuniq');
+                var data = {
+                            Year : Year,
+                            MonthStart : MonthStart,
+                            MonthEnd : MonthEnd,
+                            Action : action,
+                            CDID : id
+                            };
+                var token = jwt_encode(data,"UAP)(*");
+                $.post(url,{token:token},function (data_json) {
+                    var response = jQuery.parseJSON(data_json);
+                    if (response == '') {
+                        toastr.success('Data berhasil disimpan', 'Success!');
+                    }
+                    else
+                    {
+                        toastr.error(response, 'Failed!!');
+                    }
+                    loadTable();
+                    $('#GlobalModalLargeLarge').modal('hide');
+                }).done(function() {
+                  // loadTable();
+                }).fail(function() {
+                  toastr.error('The Database connection error, please try again', 'Failed!!');
+                }).always(function() {
+                 $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
+
+                });
+
+              } 
+              else {
+                return false;
+              }
+               
+        });
+    })
+
+}
+
 function modal_generate(action,title,ID='') {
-    var url = base_url_js+"budgeting/MasterPost/modalform";
+    var url = base_url_js+"budgeting/masterpost/modalform";
     var data = {
         Action : action,
         CDID : ID,
@@ -71,7 +147,7 @@ function modal_generate(action,title,ID='') {
         $('#ModalbtnSaveForm').click(function(){
         	if (confirm("Are you sure?") == true) {
         	    loading_button('#ModalbtnSaveForm');
-        	    var url = base_url_js+'budgeting/time_period/modalform/save';
+        	    var url = base_url_js+'budgeting/masterpost/modalform/save';
 
         	    var Year = $("#Year").val();
         	    var MonthStart = $("#MonthStart").val();
@@ -149,7 +225,7 @@ function loadTable1()
 
 	    TableGenerate += '</tbody></table>';
 	    $("#loadTable1").html(TableGenerate);
-	    LoaddataTableStandard("#tableData1");
+	    LoaddataTable("#tableData1");
 
         $(".btn-edit-post").click(function(){
     	    var ID = $(this).attr('year');
@@ -207,7 +283,7 @@ function loadTable2()
                         '<tr>'+
                             '<th width = "3%">No</th>'+
                             '<th>Post Code Realization</th>'+
-                            '<th>Post Code</th>'+
+                            '<th>Post Code & Name</th>'+
                             '<th>Realization Name</th>'+
                             '<th>Departement</th>'+
                             '<th>Action</th>'+
@@ -227,7 +303,7 @@ function loadTable2()
             TableGenerate += '<tr>'+
                                 '<td width = "3%">'+ (parseInt(i) + 1)+'</td>'+
                                 '<td>'+ dataForTable[i].CodePostRealisasi+'</td>'+
-                                '<td>'+ dataForTable[i].CodePost+'</td>'+ // plus name
+                                '<td>'+ dataForTable[i].CodePost+'<br>'+dataForTable[i].PostName+'</td>'+ // plus name
                                 '<td>'+ dataForTable[i].RealisasiPostName+'</td>'+
                                 '<td>'+ dataForTable[i].Departement+'</td>'+
                                 '<td>'+ btn_edit + ' '+' &nbsp' + btn_del+'</td>'+
@@ -236,11 +312,11 @@ function loadTable2()
 
         TableGenerate += '</tbody></table>';
         $("#loadTable2").html(TableGenerate);
-        LoaddataTableStandard("#tableData2");
+        LoaddataTable("#tableData2");
 
         $(".btn-edit-postrealization").click(function(){
             var ID = $(this).attr('year');
-             modal_generate('edit','Edit',ID);
+             modal_generate2('edit','Edit',ID);
         });
 
         $(".btn-delete-postrealization").click(function(){  
@@ -263,7 +339,7 @@ function loadTable2()
                      'backdrop' : 'static',
                      'show' : true
                  });
-                 var url = base_url_js+'budgeting/masterpost/modalform/save';
+                 var url = base_url_js+'budgeting/postrealisasi/modalform/save';
                  var aksi = "delete";
                  var ID = $(this).attr('data-smt');
                  var data = {

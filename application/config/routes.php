@@ -851,6 +851,9 @@ $route['budgeting/table_cari/(:any)/(:any)/(:any)'] = 'page/budgeting/c_budgetin
 $route['budgeting/table_all/(:any)/(:any)'] = 'page/budgeting/c_budgeting/LoadTable_db_budgeting_all/$1/$2';
 
 $route['budgeting/page/loadMasterPost'] = 'page/budgeting/c_budgeting/pageloadMasterPost';
+$route['budgeting/masterpost/modalform'] = 'page/budgeting/c_budgeting/modal_pageloadMasterPost';
+
+
 $route['budgeting/get_cfg_postrealisasi'] = 'page/budgeting/c_budgeting/get_cfg_postrealisasi';
 
 

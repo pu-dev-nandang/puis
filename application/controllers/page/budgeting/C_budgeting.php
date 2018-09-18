@@ -79,8 +79,6 @@ class C_budgeting extends Budgeting_Controler {
     {
         $this->auth_ajax();
         $arr_result = array('html' => '','jsonPass' => '');
-        // $this->data['loadData'] = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Active',1);
-        // $this->data['loadData'] = json_encode($this->data['loadData']);
         $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/pageLoadTimePeriod',$this->data,true);
         echo json_encode($arr_result);
     }
@@ -334,6 +332,22 @@ class C_budgeting extends Budgeting_Controler {
     {
         $this->auth_ajax();
         $getData = $this->m_budgeting->getData_cfg_postrealisasi(1);
+        echo json_encode($getData);
+    }
+
+    public function modal_pageloadMasterPost()
+    {
+        $this->auth_ajax();
+        $input = $this->getInputToken();
+        $this->data['action'] = $input['Action'];
+        $this->data['id'] = $input['CDID'];
+        if ($input['Action'] == 'edit') {
+            $sql = 'select * from db_budgeting.cfg_post where CodePost = ? and Active = 1';
+            $query=$this->db->query($sql, array($this->data['id']))->result_array();
+            $this->data['getData'] = $query;
+        }
+        echo $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/modalform_masterpost',$this->data,true);
+
     }
 
 
