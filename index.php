@@ -55,7 +55,7 @@
  */
 	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
 	if($_SERVER['SERVER_NAME']!='localhost' && $_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
-        define("url_registration","http://localhost/registeronline/", true);
+        define("url_registration","http://admission.podomorouniversity.ac.id/", true);
         define("serverRoot","http://pcam.podomorouniversity.ac.id", true);
         define("url_pas","http://pcam.podomorouniversity.ac.id/", true);
         define("url_img_employees",url_pas."uploads/employees/", true);
