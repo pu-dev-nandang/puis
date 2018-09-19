@@ -1526,25 +1526,39 @@ class M_finance extends CI_Model {
       // check Mahasiswa telah melakukan transaksi atau belum
        $NPM = $Input[$i]->NPM;
        $SemesterID = $Input[$i]->semester;
+       $PTID = $Input[$i]->PTID;
        $sql = 'select count(*) as total from db_academic.std_krs where SemesterID = ? and NPM = ?';
        $query=$this->db->query($sql, array($SemesterID,$NPM))->result_array();
        $count = $query[0]['total'];
-       if ($count == 0) {
-         $dataSave = array(
-                 'Status' =>"0",
-                 'UpdateAt' => null,
-                 'UpdatedBy' => null
-                         );
-         $this->db->where('ID',$Input[$i]->PaymentID);
-         $this->db->update('db_finance.payment', $dataSave);
+       if ($PTID == 2) {
+         if ($count == 0) {
+           $dataSave = array(
+                   'Status' =>"0",
+                   'UpdateAt' => null,
+                   'UpdatedBy' => null
+                           );
+           $this->db->where('ID',$Input[$i]->PaymentID);
+           $this->db->update('db_finance.payment', $dataSave);
+         }
+         else
+         {
+          if ($msg == '') {
+            $msg = '<ul>';
+          }
+          $msg .= '<li>Proses UnApprove ditolak, Mohon cek Transaksi KRS pada Mahasiswa dengan NPM : '.$Input[$i]->NPM.'</li>';
+         }
        }
        else
        {
-        if ($msg == '') {
-          $msg = '<ul>';
-        }
-        $msg .= '<li>Proses UnApprove ditolak, Mohon cek Transaksi KRS pada Mahasiswa dengan NPM : '.$Input[$i]->NPM.'</li>';
+        $dataSave = array(
+                'Status' =>"0",
+                'UpdateAt' => null,
+                'UpdatedBy' => null
+                        );
+        $this->db->where('ID',$Input[$i]->PaymentID);
+        $this->db->update('db_finance.payment', $dataSave);
        }
+       
     }
 
     return $msg;
