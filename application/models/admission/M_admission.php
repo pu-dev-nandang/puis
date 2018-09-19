@@ -498,7 +498,7 @@ class M_admission extends CI_Model {
 
     public function daftar_jadwal_ujian_load_data_now()
     {
-      $sql = 'select C.Name as prody,a.ID_ujian_perprody,DATE(a.DateTimeTest) as tanggal
+      $sql = 'select c.Name as prody,a.ID_ujian_perprody,DATE(a.DateTimeTest) as tanggal
         ,CONCAT((EXTRACT(HOUR FROM a.DateTimeTest)),":",(EXTRACT(MINUTE FROM a.DateTimeTest))) as jam,
         a.Lokasi,
         h.Name as NameCandidate,h.Email,i.SchoolName,f.FormulirCode,e.ID as ID_register_formulir
@@ -520,7 +520,7 @@ class M_admission extends CI_Model {
         join db_admission.school as i
         on i.ID = h.SchoolID
         where DATE(a.DateTimeTest) = CURDATE()
-        GROUP BY C.Name,DATE(a.DateTimeTest),e.ID';
+        GROUP BY c.Name,DATE(a.DateTimeTest),e.ID';
       $query=$this->db->query($sql, array())->result_array();
       return $query;
     }
@@ -571,7 +571,7 @@ class M_admission extends CI_Model {
 
     public function daftar_set_nilai_ujian_load_data_paging($limit, $start,$ID_ProgramStudy)
     {
-      $sql = 'select C.Name as prody,a.ID_ujian_perprody,DATE(a.DateTimeTest) as tanggal
+      $sql = 'select c.Name as prody,a.ID_ujian_perprody,DATE(a.DateTimeTest) as tanggal
               ,CONCAT((EXTRACT(HOUR FROM a.DateTimeTest)),":",(EXTRACT(MINUTE FROM a.DateTimeTest))) as jam,
               a.Lokasi,b.NamaUjian,b.Bobot,
               h.Name as NameCandidate,e.ID as ID_register_formulir,b.ID_ProgramStudy
