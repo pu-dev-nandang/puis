@@ -1009,10 +1009,11 @@ class C_save_to_pdf extends CI_Controller {
                             $dataDetailExam = $dataExam[$ex];
                             $dataCourse = $dataExam[$ex]['Course'][$i];
 
+                            $this->header_exam_attendance_students($pdf,$data_arr,$dataDetailExam,$dataCourse);
                             $this->exam_attendance_students($pdf,$data_arr,$dataDetailExam,$dataCourse);
 
                             $pdf->SetFont('Times','',7);
-                            $pdf->Ln(9);
+                            $pdf->Ln(5);
                             $pdf->Cell(195,1,'Page : '.$pdf->PageNo().' of {nb}',0,1,'R');
                             $pdf->AliasNbPages();
 
@@ -1029,45 +1030,21 @@ class C_save_to_pdf extends CI_Controller {
             // Get data exam
             $dataExam = $this->m_save_to_pdf->getExamSchedule($data_arr['SemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
 
-            $pdf = new FPDF('L','mm','A4');
+            $pdf = new FPDF('P','mm','A4');
             if(count($dataExam)>0){
-                $pdf->SetMargins(10,3,10);
+                $pdf->SetMargins(3,3,10);
                 $pdf->AddPage();
 
-                $this->header_attendance_pengawas($pdf,$data_arr);
-
-                $h = 7;
-                $pdf->SetFillColor(226, 226, 226);
-                $pdf->Cell(25,$h,'Time','TLR',0,'C',true);
-                $pdf->Cell(20,$h,'Room','TLR',0,'C',true);
-
-                $pdf->Cell(70,$h,'Invigilator 1',1,0,'C',true);
-                $pdf->Cell(70,$h,'Invigilator 2',1,0,'C',true);
-
-                $pdf->Cell(22,$h,'Group','TLR',0,'C',true);
-                $pdf->Cell(75,$h,'Course','TLR',1,'C',true);
-
-
-
-                $pdf->Cell(25,$h,'','BLR',0,'C',true);
-                $pdf->Cell(20,$h,'','BLR',0,'C',true);
-
-                $pdf->Cell(40,$h,'Name',1,0,'C',true);
-                $pdf->Cell(15,$h,'Taken',1,0,'C',true);
-                $pdf->Cell(15,$h,'Returned',1,0,'C',true);
-                $pdf->Cell(40,$h,'Name',1,0,'C',true);
-                $pdf->Cell(15,$h,'Taken',1,0,'C',true);
-                $pdf->Cell(15,$h,'Returned',1,0,'C',true);
-
-                $pdf->Cell(22,$h,'','BLR',0,'C',true);
-                $pdf->Cell(75,$h,'','BLR',1,'C',true);
+//                $this->header_attendance_pengawas($pdf,$data_arr);
+                $this->header_attendance_pengawas_p($pdf,$data_arr);
 
 
                 for($ex=0;$ex<count($dataExam);$ex++){
 
                     $dataDetailExam = $dataExam[$ex];
 
-                    $this->attendance_pengawas($pdf,$data_arr,$dataDetailExam);
+//                    $this->attendance_pengawas($pdf,$data_arr,$dataDetailExam);
+                    $this->attendance_pengawas_p($pdf,$data_arr,$dataDetailExam);
                 }
             }
 
@@ -1078,9 +1055,6 @@ class C_save_to_pdf extends CI_Controller {
 
             // Get data exam
             $dataExam = $this->m_save_to_pdf->getExamScheduleWithStudent($data_arr['SemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
-
-//            print_r($dataExam);
-//            exit;
 
             if(count($dataExam)>0){
 
@@ -1150,23 +1124,25 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetFont('Times','B',10);
 
-        $pdf->Cell(135,$h,'EXAM PAPER HANDOVER',0,0,'C');
-        $pdf->Cell(17,$h,'',0,0);
-        $pdf->Cell(135,$h,'EXAM PAPER HANDOVER',0,1,'C');
+        $xam_t = ($data_arr['Type']=='uts' || $data_arr['Type']=='UTS') ? 'MID EXAM' : 'FINAL EXAM';
+        $xam_h = ($data_arr['Type']=='uts' || $data_arr['Type']=='UTS') ? 'ODD' : 'EVEN';
 
-        $pdf->Cell(135,$h,'ACADEMIC YEAR '.strtoupper($data_arr['Semester']),0,0,'C');
+        $pdf->Cell(135,$h,$xam_t.' PAPER HANDOVER',0,0,'C');
         $pdf->Cell(17,$h,'',0,0);
-        $pdf->Cell(135,$h,'ACADEMIC YEAR '.strtoupper($data_arr['Semester']),0,1,'C');
+        $pdf->Cell(135,$h,$xam_t.' PAPER HANDOVER',0,1,'C');
+
+        $Semester = explode(' ',$data_arr['Semester']);
+        $pdf->Cell(135,$h,$xam_h.' ACADEMIC YEAR '.strtoupper(trim($Semester[0])),0,0,'C');
+        $pdf->Cell(17,$h,'',0,0);
+        $pdf->Cell(135,$h,$xam_h.' ACADEMIC YEAR '.strtoupper(trim($Semester[0])),0,1,'C');
 
         $pdf->SetFont('Times','',10);
 
         $pdf->Ln(4);
-        $examType = ($data_arr['Type']=='UTS' || $data_arr['Type']=='uts')
-            ? 'Mid Exam' : 'Fina Exam';
 
-        $pdf->Cell(135,$h,'It has handover exam paper of '.$examType,0,0,'L');
+        $pdf->Cell(135,$h,'It has been handover the '.strtolower($xam_t).' paper',0,0,'L');
         $pdf->Cell(17,$h,'',0,0);
-        $pdf->Cell(135,$h,'It has handover exam paper of '.$examType,0,1,'L');
+        $pdf->Cell(135,$h,'It has been handover the '.strtolower($xam_t).' paper',0,1,'L');
 
         $pdf->Ln(4);
 
@@ -1174,6 +1150,15 @@ class C_save_to_pdf extends CI_Controller {
         $w_pars = 5;
         $w_fill = 100;
         $w_space = 17;
+
+
+        $pdf->Cell($w_t,$h,'Course',0,0,'L');
+        $pdf->Cell($w_pars,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,$dataCourse['Course'],0,0,'L');
+        $pdf->Cell($w_space,$h,'',0,0);
+        $pdf->Cell($w_t,$h,'Course',0,0,'L');
+        $pdf->Cell($w_pars,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,$dataCourse['Course'],0,1,'L');
 
         $pdf->Cell($w_t,$h,'Class Group',0,0,'L');
         $pdf->Cell($w_pars,$h,':',0,0,'C');
@@ -1192,14 +1177,6 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_pars,$h,':',0,0,'C');
         $pdf->Cell($w_fill,$h,$dataCourse['MKCode'],0,1,'L');
 
-
-        $pdf->Cell($w_t,$h,'Course',0,0,'L');
-        $pdf->Cell($w_pars,$h,':',0,0,'C');
-        $pdf->Cell($w_fill,$h,$dataCourse['Course'],0,0,'L');
-        $pdf->Cell($w_space,$h,'',0,0);
-        $pdf->Cell($w_t,$h,'Course',0,0,'L');
-        $pdf->Cell($w_pars,$h,':',0,0,'C');
-        $pdf->Cell($w_fill,$h,$dataCourse['Course'],0,1,'L');
 
 
         $pdf->Cell($w_t,$h,'Lecturer',0,0,'L');
@@ -1256,10 +1233,10 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(135,$h,'Taking',0,1,'L');
 
         $pdf->SetFont('Times','B',10);
-        $pdf->Cell(67.5,$h,'Submitted by',0,0,'C');
+        $pdf->Cell(67.5,$h,'Delivered by',0,0,'C');
         $pdf->Cell(67.5,$h,'Received by',0,0,'C');
         $pdf->Cell($w_space,$h,'',0,0);
-        $pdf->Cell(67.5,$h,'Submitted by',0,0,'C');
+        $pdf->Cell(67.5,$h,'Delivered by',0,0,'C');
         $pdf->Cell(67.5,$h,'Received by',0,1,'C');
 
         $pdf->Ln(15);
@@ -1281,10 +1258,10 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(135,$h,'Return',0,1,'L');
 
         $pdf->SetFont('Times','B',10);
-        $pdf->Cell(67.5,$h,'Submitted by',0,0,'C');
+        $pdf->Cell(67.5,$h,'Delivered by',0,0,'C');
         $pdf->Cell(67.5,$h,'Received by',0,0,'C');
         $pdf->Cell($w_space,$h,'',0,0);
-        $pdf->Cell(67.5,$h,'Submitted by',0,0,'C');
+        $pdf->Cell(67.5,$h,'Delivered by',0,0,'C');
         $pdf->Cell(67.5,$h,'Received by',0,1,'C');
 
         $pdf->Ln(15);
@@ -1327,7 +1304,7 @@ class C_save_to_pdf extends CI_Controller {
 //        $pdf->Cell(195,$h,'ACADEMIC YEAR '.strtoupper($data_arr['Semester']),0,1,'C');
 
         $examType = ($data_arr['Type']=='UTS' || $data_arr['Type']=='uts')
-            ? 'Ujian Tengah Semester GASAL' : 'Ujian Akhir Semester GENAP';
+            ? 'Ujian Tengah Semester GANJIL' : 'Ujian Akhir Semester GENAP';
 
         $pdf->Ln(5);
         $pdf->SetFont('Times','',10);
@@ -1341,6 +1318,16 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Ln(5);
 
         $h = 7;
+
+        $pdf->Cell($w_sp1,$h,'',0,0,'L');
+        $pdf->Cell($w_label,$h,'Hari / Tanggal',0,0,'L');
+        $pdf->Cell($w_sp2,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,date("l / d F Y", strtotime($dataDetailExam['ExamDate'])),0,1,'L');
+
+        $pdf->Cell($w_sp1,$h,'',0,0,'L');
+        $pdf->Cell($w_label,$h,'Waktu Ujian',0,0,'L');
+        $pdf->Cell($w_sp2,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,substr($dataDetailExam['ExamStart'],0,5).' - '.substr($dataDetailExam['ExamEnd'],0,5),0,1,'L');
 
         $pdf->Cell($w_sp1,$h,'',0,0,'L');
         $pdf->Cell($w_label,$h,'Kelas (Group)',0,0,'L');
@@ -1361,16 +1348,6 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_label,$h,'Dosen',0,0,'L');
         $pdf->Cell($w_sp2,$h,':',0,0,'C');
         $pdf->Cell($w_fill,$h,$dataCourse['Lecturere'],0,1,'L');
-
-        $pdf->Cell($w_sp1,$h,'',0,0,'L');
-        $pdf->Cell($w_label,$h,'Hari, Tanggal',0,0,'L');
-        $pdf->Cell($w_sp2,$h,':',0,0,'C');
-        $pdf->Cell($w_fill,$h,date("l, d F Y", strtotime($dataDetailExam['ExamDate'])),0,1,'L');
-
-        $pdf->Cell($w_sp1,$h,'',0,0,'L');
-        $pdf->Cell($w_label,$h,'Waktu',0,0,'L');
-        $pdf->Cell($w_sp2,$h,':',0,0,'C');
-        $pdf->Cell($w_fill,$h,substr($dataDetailExam['ExamStart'],0,5).' - '.substr($dataDetailExam['ExamEnd'],0,5),0,1,'L');
 
         $pdf->Cell($w_sp1,$h,'',0,0,'L');
         $pdf->Cell($w_label,$h,'Ruangan',0,0,'L');
@@ -1428,7 +1405,7 @@ class C_save_to_pdf extends CI_Controller {
 
     }
 
-    private function exam_attendance_students($pdf,$data_arr,$dataDetailExam,$dataCourse){
+    private function header_exam_attendance_students($pdf,$data_arr,$dataDetailExam,$dataCourse){
         $pdf->Image(base_url('images/icon/favicon.png'),15,13,15);
 
         $pdf->SetFont('Times','I',7);
@@ -1450,14 +1427,22 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->Ln(7);
 
+
+        $xam_t = ($data_arr['Type']=='uts' || $data_arr['Type']=='UTS') ? 'MID EXAM' : 'FINAL EXAM';
+        $xam_h = ($data_arr['Type']=='uts' || $data_arr['Type']=='UTS') ? 'ODD' : 'EVEN';
+        $Semester = explode(' ',$data_arr['Semester']);
+
         $pdf->SetFont('Times','B',10);
-        $pdf->Cell(195,$h,'ATTENDANCE FINAL EXAM',0,1,'C');
-        $pdf->Cell(195,$h,'EVEN SEMESTER ACADEMIC YEAR '.strtoupper($data_arr['Semester']),0,1,'C');
+        $pdf->Cell(195,$h,'ATTENDANCE '.$xam_t,0,1,'C');
+        $pdf->Cell(195,$h,$xam_h.' SEMESTER ACADEMIC YEAR '.strtoupper(trim($Semester[0])),0,1,'C');
 
         $pdf->Ln(5);
         $pdf->SetFont('Times','',10);
+    }
 
+    private function exam_attendance_students($pdf,$data_arr,$dataDetailExam,$dataCourse){
 
+        $h = 5;
         $w_label_r = 22;
         $w_sp_r = 3;
         $w_fill_r = 105;
@@ -1466,19 +1451,30 @@ class C_save_to_pdf extends CI_Controller {
         $w_sp_l = 3;
         $w_fill_l = 45;
 
-        $pdf->Cell($w_label_r,$h,'Class Group',0,0,'L');
+
+        $pdf->Cell($w_label_r,$h,'Code',0,0,'L');
         $pdf->Cell($w_sp_r,$h,':',0,0,'C');
-        $pdf->Cell($w_fill_r,$h,$dataCourse['ClassGroup'],0,0,'L');
+        $pdf->Cell($w_fill_r,$h,$dataCourse['MKCode'],0,0,'L');
+
+        $pdf->Cell($w_label_l,$h,'',0,0,'L');
+        $pdf->Cell($w_sp_l,$h,'',0,0,'C');
+        $pdf->Cell($w_fill_l,$h,'',0,1,'L');
+
+        $dCourse = (strlen($dataCourse['Course'])>=50) ? substr($dataCourse['Course'],0,50).'_' : $dataCourse['Course'];
+        $pdf->Cell($w_label_r,$h,'Course',0,0,'L');
+        $pdf->Cell($w_sp_r,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_r,$h,$dCourse,0,0,'L');
 
         $pdf->Cell($w_label_l,$h,'Day, Date',0,0,'L');
         $pdf->Cell($w_sp_l,$h,':',0,0,'C');
         $pdf->Cell($w_fill_l,$h,date("l, d M Y", strtotime($dataDetailExam['ExamDate'])),0,1,'L');
 
-        $dCourse = (strlen($dataCourse['Course'])>=50) ? substr($dataCourse['Course'],0,50).'_' : $dataCourse['Course'];
 
-        $pdf->Cell($w_label_r,$h,'Course',0,0,'L');
+
+
+        $pdf->Cell($w_label_r,$h,'Class Group',0,0,'L');
         $pdf->Cell($w_sp_r,$h,':',0,0,'C');
-        $pdf->Cell($w_fill_r,$h,$dataCourse['MKCode'].' - '.$dCourse,0,0,'L');
+        $pdf->Cell($w_fill_r,$h,$dataCourse['ClassGroup'],0,0,'L');
 
         $pdf->Cell($w_label_l,$h,'Time',0,0,'L');
         $pdf->Cell($w_sp_l,$h,':',0,0,'C');
@@ -1515,30 +1511,38 @@ class C_save_to_pdf extends CI_Controller {
                 $pdf->Cell(30,$h,'',1,0,'C');
                 $pdf->Cell(20,$h,'',1,1,'C');
 
+                if($pdf->GetY()>=242){
+                    $pdf->AddPage();
+                    $this->header_exam_attendance_students($pdf,$data_arr,$dataDetailExam,$dataCourse);
+                }
+
                 $no++;
             }
         }
 
         // Kosong
-        for($k=1;$k<=2;$k++){
-            $pdf->Cell(10,$h,'',1,0,'C');
-            $pdf->Cell(25,$h,'',1,0,'C');
-            $pdf->Cell(110,$h,'',1,0,'L');
-            $pdf->Cell(30,$h,'',1,0,'C');
-            $pdf->Cell(20,$h,'',1,1,'C');
-        }
+//        for($k=1;$k<=2;$k++){
+//            $pdf->Cell(10,$h,'',1,0,'C');
+//            $pdf->Cell(25,$h,'',1,0,'C');
+//            $pdf->Cell(110,$h,'',1,0,'L');
+//            $pdf->Cell(30,$h,'',1,0,'C');
+//            $pdf->Cell(20,$h,'',1,1,'C');
+//        }
 
         $pdf->Ln(5);
         $pdf->Cell(150,$h,'',0,0,'C');
         $pdf->Cell(45,$h,'Sign by Lecturer',0,1,'C');
 
-        $pdf->Ln(8);
+        $pdf->Ln(15);
 
         $pdf->Cell(150,$h,'',0,0,'C');
         $pdf->Cell(45,$h,'( _ _ _ _ _ _ _ _ _ )',0,1,'C');
 
 
     }
+
+
+    // =============== PENGAWAS
 
     private function header_attendance_pengawas($pdf,$data_arr){
         $pdf->Image(base_url('images/icon/favicon.png'),15,5,15);
@@ -1565,7 +1569,89 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->Ln(4);
 
+        $h = 7;
+        $pdf->SetFillColor(226, 226, 226);
+        $pdf->Cell(25,$h,'Time','TLR',0,'C',true);
+        $pdf->Cell(20,$h,'Room','TLR',0,'C',true);
+
+        $pdf->Cell(70,$h,'Invigilator 1',1,0,'C',true);
+        $pdf->Cell(70,$h,'Invigilator 2',1,0,'C',true);
+
+        $pdf->Cell(22,$h,'Group','TLR',0,'C',true);
+        $pdf->Cell(75,$h,'Course','TLR',1,'C',true);
+
+
+
+        $pdf->Cell(25,$h,'','BLR',0,'C',true);
+        $pdf->Cell(20,$h,'','BLR',0,'C',true);
+
+        $pdf->Cell(40,$h,'Name',1,0,'C',true);
+        $pdf->Cell(15,$h,'Taken',1,0,'C',true);
+        $pdf->Cell(15,$h,'Returned',1,0,'C',true);
+        $pdf->Cell(40,$h,'Name',1,0,'C',true);
+        $pdf->Cell(15,$h,'Taken',1,0,'C',true);
+        $pdf->Cell(15,$h,'Returned',1,0,'C',true);
+
+        $pdf->Cell(22,$h,'','BLR',0,'C',true);
+        $pdf->Cell(75,$h,'','BLR',1,'C',true);
+
     }
+
+    private function header_attendance_pengawas_p($pdf,$data_arr){
+        $pdf->Image(base_url('images/icon/favicon.png'),15,5,15);
+
+        $h = 5;
+
+        $pdf->SetFont('Times','B',12);
+        $pdf->Cell(205,$h,'Universitas Agung Podomoro',0,1,'C');
+
+        $pdf->Ln(1);
+
+        $pdf->SetFont('Times','',10);
+        $pdf->Cell(205,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
+        $pdf->Cell(205,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
+        $pdf->Cell(205,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
+
+        $pdf->Line(3,25,207,25);
+
+        $pdf->Ln(5);
+
+        $pdf->SetFont('Times','B',10);
+        $pdf->Cell(198,$h,date('l, d F Y',strtotime($data_arr['ExamDate'])),0,1,'C');
+        $pdf->SetFont('Times','B',7);
+
+        $pdf->Ln(4);
+
+        $h = 7;
+        $pdf->SetFillColor(226, 226, 226);
+        $pdf->Cell(15,$h,'Time','TLR',0,'C',true);
+        $pdf->Cell(15,$h,'Room','TLR',0,'C',true);
+
+        $pdf->Cell(49,$h,'Invigilator 1',1,0,'C',true);
+        $pdf->Cell(49,$h,'Invigilator 2',1,0,'C',true);
+
+        $pdf->Cell(15,$h,'Group','TLR',0,'C',true);
+        $pdf->Cell(62,$h,'Course','TLR',1,'C',true);
+
+
+
+        $pdf->Cell(15,$h,'','BLR',0,'C',true);
+        $pdf->Cell(15,$h,'','BLR',0,'C',true);
+
+        $pdf->Cell(25,$h,'Name',1,0,'C',true);
+        $pdf->Cell(12,$h,'Taken',1,0,'C',true);
+        $pdf->Cell(12,$h,'Returned',1,0,'C',true);
+
+        $pdf->Cell(25,$h,'Name',1,0,'C',true);
+        $pdf->Cell(12,$h,'Taken',1,0,'C',true);
+        $pdf->Cell(12,$h,'Returned',1,0,'C',true);
+
+        $pdf->Cell(15,$h,'','BLR',0,'C',true);
+        $pdf->Cell(62,$h,'','BLR',1,'C',true);
+
+    }
+
+    // ==============
 
     private function attendance_pengawas($pdf,$data_arr,$dataDetailExam){
 
@@ -1607,6 +1693,52 @@ class C_save_to_pdf extends CI_Controller {
 
             $pdf->Cell(22,$h,$group,1,0,'C');
             $pdf->Cell(75,$h,$course,1,1,'L');
+
+        }
+
+    }
+    private function attendance_pengawas_p($pdf,$data_arr,$dataDetailExam){
+
+        $pdf->SetFont('Times','',7);
+
+        $totalCourse = count($dataDetailExam['Course']);
+        $h = 10;
+        $h2 = $h * $totalCourse;
+        for($i=0;$i<$totalCourse;$i++){
+
+
+            $time = substr($dataDetailExam['ExamStart'],0,5).' - '.substr($dataDetailExam['ExamEnd'],0,5);
+
+            $group = $dataDetailExam['Course'][$i]['ClassGroup'];
+            $datacourse = $dataDetailExam['Course'][$i]['Course'];
+            $course = (strlen($datacourse)>=45) ? substr($datacourse,0,45).'_' : $datacourse;
+
+            $data_p1 = $dataDetailExam['Name_P1'];
+            $data_p2 = $dataDetailExam['Name_P2'];
+
+            $Name_P1 = (strlen($data_p1)>=20) ? substr($data_p1,0,20).'_' : $data_p1;
+            $Name_P2 = (strlen($data_p2)>=20) ? substr($data_p2,0,20).'_' : $data_p2;
+
+
+            if($i==0){
+
+                $ex_time = explode(' ',$time);
+                $pdf->Cell(15,$h2,$time,1,0,'C');
+                $pdf->Cell(15,$h2,$dataDetailExam['Room'],1,0,'C');
+                $pdf->Cell(25,$h2,$Name_P1,1,0,'L');
+                $pdf->Cell(12,$h2,'',1,0,'C');
+                $pdf->Cell(12,$h2,'',1,0,'C');
+                $pdf->Cell(25,$h2,$Name_P2,1,0,'L');
+                $pdf->Cell(12,$h2,'',1,0,'C');
+                $pdf->Cell(12,$h2,'',1,0,'C');
+
+            } else {
+                $pdf->Cell(185,$h2,'',0,0,'C');
+            }
+
+
+            $pdf->Cell(15,$h,$group,1,0,'C');
+            $pdf->Cell(62,$h,$course,1,1,'L');
 
         }
 
@@ -1658,6 +1790,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('Times','B',10);
 
         $xam_t = ($data_arr['Type']=='uts' || $data_arr['Type']=='UTS') ? 'MID EXAM' : 'FINAL EXAM';
+        $xam_h = ($data_arr['Type']=='uts' || $data_arr['Type']=='UTS') ? 'ODD' : 'EVEN';
 
         $pdf->Cell(135,$h,$xam_t,0,0,'C');
         $pdf->Cell(17,$h,'',0,0);
@@ -1667,9 +1800,10 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(17,$h,'',0,0);
         $pdf->Cell(135,$h,'EVEN SEMESTER',0,1,'C');
 
-        $pdf->Cell(135,$h,'ACADEMIC YEAR '.strtoupper($data_arr['Semester']),0,0,'C');
+        $Semester = explode(' ',$data_arr['Semester']);
+        $pdf->Cell(135,$h,$xam_h.' ACADEMIC YEAR '.strtoupper(trim($Semester[0])),0,0,'C');
         $pdf->Cell(17,$h,'',0,0);
-        $pdf->Cell(135,$h,'ACADEMIC YEAR '.strtoupper($data_arr['Semester']),0,1,'C');
+        $pdf->Cell(135,$h,$xam_h.' ACADEMIC YEAR '.strtoupper(trim($Semester[0])),0,1,'C');
 
         //++++++++++++++++++++++++++++++++++++++++++++
         $pdf->Ln(5);
@@ -1817,9 +1951,20 @@ class C_save_to_pdf extends CI_Controller {
 
         //======================================================
 
+        $pdf->Ln(3);
+        $pdf->Cell($w_label_left_1,$h,'Total Exam',0,0,'L');
+        $pdf->Cell($w_sp_left_1,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_left_1+$w_label_left_2+$w_sp_left_2+$w_fill_left_2,$h,' _ _ _ _ _ _ ',0,0,'L');
+
+        $pdf->Cell($w_space,$h,'',0,0);
+
+        $pdf->Cell($w_label_right_1,$h,'Total Exam',0,0,'L');
+        $pdf->Cell($w_sp_right_1,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_right_1+$w_label_right_2+$w_sp_right_2+$w_fill_right_2,$h,' _ _ _ _ _ _ ',0,1,'L');
+
         //======================================
 
-        $pdf->Ln(7);
+        $pdf->Ln(4);
 
         $pdf->SetFont('Times','B',9);
         $h = 6;
