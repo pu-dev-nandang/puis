@@ -13,7 +13,7 @@ if($_SERVER['SERVER_NAME']!='localhost' && $_SERVER['SERVER_NAME'] == 'pcam.podo
     $db['default']['dbdriver'] = 'mysqli';// support with MYSQl,POSTGRE SQL, ORACLE,SQL SERVER
     $db['default']['dbprefix'] = '';
     $db['default']['pconnect'] = TRUE;
-    $db['default']['db_debug'] = FALSE;
+    $db['default']['db_debug'] = TRUE;
     $db['default']['cache_on'] = FALSE;
     $db['default']['cachedir'] = '';
     $db['default']['char_set'] = 'utf8';
