@@ -175,17 +175,20 @@ class M_rest extends CI_Model {
         return $result;
     }
 
-    public function __getExamScheduleForStudent($db,$ProdiID,$NPM,$ClassOf,$ExamType,$Date){
+    public function __getExamScheduleForStudent($db,$ProdiID,$SemesterID,$NPM,$SemeaterYear,$ClassOf,$ExamType,$Date){
         $dataSemester = $this->db->query('SELECT s.*, ay.utsStart, ay.utsEnd, ay.uasStart, ay.uasEnd FROM db_academic.semester s 
                                                         LEFT JOIN db_academic.academic_years ay ON (ay.SemesterID = s.ID)
-                                                        WHERE s.Year >= '.$ClassOf.' 
+                                                        WHERE s.ID = '.$SemesterID.' 
                                                         ORDER BY s.ID ASC')->result_array();
 
         $result = [];
-        $smt = 1;
         for($i=0;$i<count($dataSemester);$i++){
 
             $ExamSchedule = [];
+            $ErrorOn = 'old_system';
+            $PaymentType = '';
+            $PaymentStatus = -5;
+            $Message = 'Old System';
 
             if($dataSemester[$i]['ID']>=13) {
                 // Cek apakah BPP dan SKS sudah terbayar
@@ -195,7 +198,7 @@ class M_rest extends CI_Model {
                     $PaymentType = '';
                     $PaymentStatus = -5;
                     $ErrorOn = 'schedule';
-                    $Message = 'Exam Schedule Unavailable';
+                    $Message = 'Exam Schedule Available On : ';
                     // Cek apakah tanggal merupakan tanggal Exam
                     $ExamSchStart = ($ExamType=='uts' || $ExamType=='UTS') ? $dataSemester[$i]['utsStart'] : $dataSemester[$i]['uasStart'] ;
                     if($Date>=$ExamSchStart){
@@ -205,7 +208,7 @@ class M_rest extends CI_Model {
                         // Get data jadwal
                         $ExamSchedule = $this->db->query('SELECT sc.ID AS ScheduleID, mk.MKCode, mk.Name AS Course, mk.NameEng AS CourseEng, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room,  
                                                                     sc.ClassGroup
-                                                                    FROM ta_2016.study_planning sp
+                                                                    FROM '.$db.'.study_planning sp
                                                                     LEFT JOIN db_academic.exam_details exd ON (exd.ScheduleID = sp.ScheduleID AND exd.NPM = sp.NPM)
                                                                     LEFT JOIN db_academic.exam ex ON (ex.ID = exd.ExamID AND ex.Type LIKE "'.$ExamType.'")
                                                                     LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
@@ -214,8 +217,6 @@ class M_rest extends CI_Model {
                                                                     WHERE sp.SemesterID = "'.$dataSemester[$i]['ID'].'" 
                                                                     AND sp.NPM = "'.$NPM.'"
                                                                      ORDER BY mk.MKCode ASC ')->result_array();
-
-
 
 
                         if(count($ExamSchedule)>0){
@@ -268,46 +269,63 @@ class M_rest extends CI_Model {
 
                     }
 
-                } else if ($dataPayment['BPP']['Status']!=1) {
+                }
+                else if ($dataPayment['BPP']['Status']!=1) {
                     $ErrorOn = 'payment';
                     $PaymentType = 'BPP';
                     $PaymentStatus = $dataPayment['BPP']['Status'];
                     $Message = $dataPayment['BPP']['Message'];
-                } else {
+                }
+                else {
                     $ErrorOn = 'payment';
                     $PaymentType = 'Credit';
                     $PaymentStatus = $dataPayment['Credit']['Status'];
                     $Message = $dataPayment['Credit']['Message'];
                 }
 
-                // =======
-                $dataArr = array(
-                    'SemesterID' => $dataSemester[$i]['ID'],
-                    'Semester' => $smt,
-                    'SemesterName' => $dataSemester[$i]['Name'],
-                    'UTS' => array('Start' => $dataSemester[$i]['utsStart'], 'End' => $dataSemester[$i]['utsEnd']),
-                    'UAS' => array('Start' => $dataSemester[$i]['uasStart'], 'End' => $dataSemester[$i]['uasEnd']),
-                    'ExamSchedule' => $ExamSchedule,
-                    'ErrorOn' => $ErrorOn,
-                    'DataPayment' => array(
-                        'PaymentType' => $PaymentType,
-                        'PaymentStatus' => $PaymentStatus
-                    ),
-                    'Message' => $Message
 
-
-                );
-                array_push($result,$dataArr);
-                // =======
             }
 
-            $smt += 1;
+            // =======
+            $dataArr = array(
+                'SemesterID' => $dataSemester[$i]['ID'],
+                'Semester' => $this->checkSemesterByClassOf($ClassOf,$SemesterID),
+                'SemesterName' => $dataSemester[$i]['Name'],
+                'UTS' => array('Start' => $dataSemester[$i]['utsStart'], 'End' => $dataSemester[$i]['utsEnd']),
+                'UAS' => array('Start' => $dataSemester[$i]['uasStart'], 'End' => $dataSemester[$i]['uasEnd']),
+                'ExamSchedule' => $ExamSchedule,
+                'ErrorOn' => $ErrorOn,
+                'DataPayment' => array(
+                    'PaymentType' => $PaymentType,
+                    'PaymentStatus' => $PaymentStatus
+                ),
+                'Message' => $Message
+
+
+            );
+            array_push($result,$dataArr);
+            // =======
+
 
 
         }
 
 //        print_r($result);
         return $result;
+
+    }
+
+    public function checkSemesterByClassOf($ClassOf,$SemesterID){
+        $dataSemester = $this->db->query('SELECT s.* FROM db_academic.semester s
+                                                        WHERE s.Year >= "'.$ClassOf.'" AND s.id <= "'.$SemesterID.'"
+                                                        ORDER BY s.ID ASC')->result_array();
+
+//        print_r($dataSemester);
+//        exit;
+
+        $smt_now = count($dataSemester);
+
+        return $smt_now;
 
     }
 
