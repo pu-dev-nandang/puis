@@ -541,7 +541,7 @@ class M_admission extends CI_Model {
         }
       }
 
-      $sql = 'select C.Name as prody,a.ID_ujian_perprody,DATE(a.DateTimeTest) as tanggal
+      $sql = 'select c.Name as prody,a.ID_ujian_perprody,DATE(a.DateTimeTest) as tanggal
         ,CONCAT((EXTRACT(HOUR FROM a.DateTimeTest)),":",(EXTRACT(MINUTE FROM a.DateTimeTest))) as jam,
         a.Lokasi,
         h.Name as NameCandidate,h.Email,i.SchoolName,f.FormulirCode,e.ID as ID_register_formulir
@@ -563,7 +563,7 @@ class M_admission extends CI_Model {
         join db_admission.school as i
         on i.ID = h.SchoolID
         '.$where.' 
-        GROUP BY C.Name,DATE(a.DateTimeTest),e.ID '.' LIMIT '.$start. ', '.$limit;
+        GROUP BY c.Name,DATE(a.DateTimeTest),e.ID '.' LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array())->result_array();
       return $query;
 
