@@ -373,14 +373,14 @@ class M_admission extends CI_Model {
 
     public function getJadwalUjian()
     {
-      $sql = "select C.Name,a.ID_ujian_perprody,DATE(a.DateTimeTest) as tanggal
+      $sql = "select c.Name,a.ID_ujian_perprody,DATE(a.DateTimeTest) as tanggal
               ,CONCAT((EXTRACT(HOUR FROM a.DateTimeTest)),':',(EXTRACT(MINUTE FROM a.DateTimeTest))) as jam,
               a.Lokasi from db_admission.register_jadwal_ujian as a 
               join db_admission.ujian_perprody_m as b
               on a.ID_ujian_perprody = b.ID
               join db_academic.program_study as c
               on c.ID = b.ID_ProgramStudy
-              GROUP BY C.Name,DATE(a.DateTimeTest)
+              GROUP BY c.Name,DATE(a.DateTimeTest)
               ";          
       $query=$this->db->query($sql, array())->result_array();
       return $query;
