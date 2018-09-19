@@ -60,4 +60,69 @@ class M_budgeting extends CI_Model {
         return $arr_result;
                 
     }
+
+    public function getTheCode($tbl,$fieldCode,$PrefixCode,$length,$Year = null)
+    {   
+        $Code = '';
+        $strLenPrefix = strlen($PrefixCode) + 1; // + 1 untuk -
+        if ($Year == null) {
+            $sql = 'select * from '.$tbl.' where '.$fieldCode.' like "'.$PrefixCode.'%" order by '.$fieldCode.' desc limit 1';
+            $query=$this->db->query($sql, array())->result_array();
+            if (count($query) == 1) {
+                $V = $query[0][$fieldCode];
+                $V = explode('-', $V);
+                $inc = $V[1];
+                $inc = (int)$inc;
+                $inc = $inc + 1;
+                $lenINC = strlen($inc);
+                $strINC = $inc;
+                for ($i=0; $i < $length-$lenINC-$strLenPrefix; $i++) { 
+                    $strINC = '0'.$strINC;
+                }
+
+                $Code = $PrefixCode.'-'.$strINC;
+            }
+            elseif(count($query) == 0)
+            {
+               $inc = 1;
+               $lenINC = strlen($inc);
+               $strINC = $inc;
+               for ($i=0; $i < $length-$lenINC-$strLenPrefix; $i++) { 
+                   $strINC = '0'.$strINC;
+               }
+               $Code = $PrefixCode.'-'.$strINC; 
+            }
+        }
+        else
+        {
+            $sql = 'select * from '.$tbl.' where '.$fieldCode.' like "'.$PrefixCode.$Year.'%" order by '.$fieldCode.' desc limit 1';
+            $query=$this->db->query($sql, array())->result_array();
+            if (count($query) == 1) {
+                $V = $query[0][$fieldCode];
+                $V = explode('-', $V);
+                $inc = $V[1];
+                $inc = (int)$inc;
+                $inc = $inc + 1;
+                $lenINC = strlen($inc);
+                $strINC = $inc;
+                for ($i=0; $i < $length-$lenINC-$strLenPrefix; $i++) { 
+                    $strINC = '0'.$strINC;
+                }
+
+                $Code = $PrefixCode.$Year.'-'.$strINC;
+            }
+            elseif(count($query) == 0)
+            {
+               $inc = 1;
+               $lenINC = strlen($inc);
+               $strINC = $inc;
+               for ($i=0; $i < $length-$lenINC-$strLenPrefix; $i++) { 
+                   $strINC = '0'.$strINC;
+               }
+               $Code = $PrefixCode.$Year.'-'.$strINC; 
+            }
+        }
+
+        return $Code;
+    }
 }

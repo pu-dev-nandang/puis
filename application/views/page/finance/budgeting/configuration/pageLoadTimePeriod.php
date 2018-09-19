@@ -170,8 +170,16 @@ function loadTable()
                  var token = jwt_encode(data,"UAP)(*");
                  $.post(url,{token:token},function (data_json) {
                      setTimeout(function () {
-                        toastr.options.fadeOut = 10000;
-                        toastr.success('Data berhasil disimpan', 'Success!');
+                        // toastr.options.fadeOut = 10000;
+                        // toastr.success('Data berhasil disimpan', 'Success!');
+                        var response = jQuery.parseJSON(data_json);
+                        if (response == '') {
+                            toastr.success('Data berhasil disimpan', 'Success!');
+                        }
+                        else
+                        {
+                            toastr.error(response, 'Failed!!');
+                        }
                         loadTable();
                         $('#NotificationModal').modal('hide');
                      },500);

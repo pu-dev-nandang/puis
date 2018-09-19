@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class C_budgeting extends Budgeting_Controler {
     public $Msg = array(
             'Duplicate' => 'The data duplicate, Please check',
-            'NotAction' => 'The data has been used to transaction, Cannot be action',
+            'NotAction' => 'The data has been used for transaction, Cannot be action',
     );
 
     public function __construct()
@@ -340,6 +340,7 @@ class C_budgeting extends Budgeting_Controler {
         $this->auth_ajax();
         $input = $this->getInputToken();
         $this->data['action'] = $input['Action'];
+        // print_r($this->data);
         $this->data['id'] = $input['CDID'];
         if ($input['Action'] == 'edit') {
             $sql = 'select * from db_budgeting.cfg_post where CodePost = ? and Active = 1';
@@ -347,6 +348,216 @@ class C_budgeting extends Budgeting_Controler {
             $this->data['getData'] = $query;
         }
         echo $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/modalform_masterpost',$this->data,true);
+
+    }
+
+    public function modal_pageloadMasterPost_save()
+    {
+        $this->auth_ajax();
+        $input = $this->getInputToken();
+        $Msg = '';
+        switch ($input['Action']) {
+            case 'add':
+                $NeedPrefix = $input['NeedPrefix'];
+                $CodePost = $input['CodePost'];
+                if ($NeedPrefix == 1) { // get the code
+                    $CfgCode = $this->m_master->showData_array('db_budgeting.cfg_codeprefix');
+                    $CodePostPrefix = $CfgCode[0]['CodePost'];
+                    $LengthCode = $CfgCode[0]['LengthCodePost'];
+                    $tbl = 'db_budgeting.cfg_post';
+                    $fieldCode = 'CodePost';
+                    $CodePost = $this->m_budgeting->getTheCode($tbl,$fieldCode,$CodePostPrefix,$LengthCode);
+                }
+
+
+                $sql = 'select * from db_budgeting.cfg_post where CodePost = ? and Active = 1';
+                $query=$this->db->query($sql, array($CodePost))->result_array();
+                if (count($query) > 0) {
+                   $Msg = $this->Msg['Duplicate'];
+                }
+                else
+                {
+                   $dataSave = array(
+                       'CodePost' => $CodePost,
+                       'PostName' => trim(ucwords($input['PostName'])),
+                       'CreatedBy' => $this->session->userdata('NIP'),
+                       'CreatedAt' => date('Y-m-d'),
+                   );
+                   $this->db->insert('db_budgeting.cfg_post', $dataSave);
+                }
+                break;
+            case 'edit':
+                $CodePost = $input['CodePost'];
+                $query = array();
+                if ($CodePost != $input['CDID']) {
+                    $sql = 'select * from db_budgeting.cfg_post where CodePost = ? and Active = 1';
+                    $query=$this->db->query($sql, array($CodePost))->result_array();
+                }
+
+                if (count($query) > 0) {
+                   $Msg = $this->Msg['Duplicate'];
+                }
+                else
+                {
+                    $sql = 'select * from db_budgeting.cfg_post where CodePost = ? and Active = 1';
+                    $query=$this->db->query($sql, array($input['CDID']))->result_array();
+                    $Status = $query[0]['Status'];
+                    if ($Status == 1) {
+                        try {
+                           $dataSave = array(
+                               'CodePost' => $CodePost,
+                               'PostName' => trim(ucwords($input['PostName'])),
+                           );
+                           $this->db->where('CodePost', $input['CDID']);
+                           $this->db->where('Active', 1);
+                           $this->db->update('db_budgeting.cfg_post', $dataSave);
+                        } catch (Exception $e) {
+                             $Msg = $this->Msg['Duplicate'];
+                        }   
+                    }
+                    else
+                    {
+                        $Msg = $this->Msg['NotAction'];
+                    }
+                }
+                break;
+            case 'delete':
+                $CodePost = $input['CDID'];
+                $sql = 'select * from db_budgeting.cfg_post where CodePost = ? and Active = 1';
+                $query=$this->db->query($sql, array($CodePost))->result_array();
+                $Status = $query[0]['Status']; // check can be delete
+                   if ($Status == 1) {
+                       $dataSave = array(
+                           'Active' => 0
+                       );
+                       $this->db->where('CodePost', $CodePost);
+                       $this->db->where('Active', 1);
+                       $this->db->update('db_budgeting.cfg_post', $dataSave);
+                   }
+                   else
+                   {
+                       $Msg = $this->Msg['NotAction'];
+                   }
+                break;
+            default:
+                # code...
+                break;
+        }
+
+        echo json_encode($Msg);
+    }
+
+    public function modal_postrealisasi()
+    {
+        $this->auth_ajax();
+        $input = $this->getInputToken();
+        $this->data['action'] = $input['Action'];
+        // print_r($this->data);
+        $this->data['id'] = $input['CDID'];
+        if ($input['Action'] == 'edit') {
+            $sql = 'select * from db_budgeting.cfg_postrealisasi where CodePostRealisasi = ? and Active = 1';
+            $query=$this->db->query($sql, array($this->data['id']))->result_array();
+            $this->data['getData'] = $query;
+        }
+        echo $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/modal_postrealisasi',$this->data,true);
+    }
+
+    public function save_postrealisasi()
+    {
+        $this->auth_ajax();
+        $input = $this->getInputToken();
+        $Msg = '';
+        switch ($input['Action']) {
+            case 'add':
+                $NeedPrefix = $input['NeedPrefix'];
+                $CodePostRealisasi = $input['CodePostRealisasi'];
+                if ($NeedPrefix == 1) { // get the code
+                    $CfgCode = $this->m_master->showData_array('db_budgeting.cfg_codeprefix');
+                    $CodePostPrefix = $CfgCode[0]['CodePostRealisasi'];
+                    $LengthCode = $CfgCode[0]['LengthCodePostRealisasi'];
+                    $tbl = 'db_budgeting.cfg_postrealisasi';
+                    $fieldCode = 'CodePostRealisasi';
+                    $CodePostRealisasi = $this->m_budgeting->getTheCode($tbl,$fieldCode,$CodePostPrefix,$LengthCode);
+                }
+
+
+                $sql = 'select * from db_budgeting.cfg_postrealisasi where CodePostRealisasi = ? and Active = 1';
+                $query=$this->db->query($sql, array($CodePostRealisasi))->result_array();
+                if (count($query) > 0) {
+                   $Msg = $this->Msg['Duplicate'];
+                }
+                else
+                {
+                   $dataSave = array(
+                       'CodePostRealisasi' => $CodePostRealisasi,
+                       'CodePost' => $input['PostItem'],
+                       'RealisasiPostName' => trim(ucwords($input['RealisasiPostName'])),
+                       'Departement' => $input['Departement'],
+                       'CreatedBy' => $this->session->userdata('NIP'),
+                       'CreatedAt' => date('Y-m-d'),
+                   );
+                   $this->db->insert('db_budgeting.cfg_postrealisasi', $dataSave);
+                }
+                break;
+            case 'edit':
+                $CodePost = $input['CodePost'];
+                $query = array();
+                if ($CodePost != $input['CDID']) {
+                    $sql = 'select * from db_budgeting.cfg_post where CodePost = ? and Active = 1';
+                    $query=$this->db->query($sql, array($CodePost))->result_array();
+                }
+
+                if (count($query) > 0) {
+                   $Msg = $this->Msg['Duplicate'];
+                }
+                else
+                {
+                    $sql = 'select * from db_budgeting.cfg_post where CodePost = ? and Active = 1';
+                    $query=$this->db->query($sql, array($input['CDID']))->result_array();
+                    $Status = $query[0]['Status'];
+                    if ($Status == 1) {
+                        try {
+                           $dataSave = array(
+                               'CodePost' => $CodePost,
+                               'PostName' => trim(ucwords($input['PostName'])),
+                           );
+                           $this->db->where('CodePost', $input['CDID']);
+                           $this->db->where('Active', 1);
+                           $this->db->update('db_budgeting.cfg_post', $dataSave);
+                        } catch (Exception $e) {
+                             $Msg = $this->Msg['Duplicate'];
+                        }   
+                    }
+                    else
+                    {
+                        $Msg = $this->Msg['NotAction'];
+                    }
+                }
+                break;
+            case 'delete':
+                $CodePost = $input['CDID'];
+                $sql = 'select * from db_budgeting.cfg_post where CodePost = ? and Active = 1';
+                $query=$this->db->query($sql, array($CodePost))->result_array();
+                $Status = $query[0]['Status']; // check can be delete
+                   if ($Status == 1) {
+                       $dataSave = array(
+                           'Active' => 0
+                       );
+                       $this->db->where('CodePost', $CodePost);
+                       $this->db->where('Active', 1);
+                       $this->db->update('db_budgeting.cfg_post', $dataSave);
+                   }
+                   else
+                   {
+                       $Msg = $this->Msg['NotAction'];
+                   }
+                break;
+            default:
+                # code...
+                break;
+        }
+
+        echo json_encode($Msg);
 
     }
 

@@ -693,6 +693,8 @@ $route['api/__getSimpleSearch'] = 'api/c_api/getSimpleSearch';
 $route['api/__getSimpleSearchStudents'] = 'api/c_api/getSimpleSearchStudents';
 
 
+$route['api/__getAllDepartementPU'] = 'api/c_api/getAllDepartementPU';
+
 //v_reservation
 $route['api/__m_equipment_additional'] = 'api/c_api/m_equipment_additional';
 $route['api/get_time_opt_reservation'] = 'api/c_api/get_time_opt_reservation';
@@ -852,6 +854,9 @@ $route['budgeting/table_all/(:any)/(:any)'] = 'page/budgeting/c_budgeting/LoadTa
 
 $route['budgeting/page/loadMasterPost'] = 'page/budgeting/c_budgeting/pageloadMasterPost';
 $route['budgeting/masterpost/modalform'] = 'page/budgeting/c_budgeting/modal_pageloadMasterPost';
+$route['budgeting/masterpost/modalform/save'] = 'page/budgeting/c_budgeting/modal_pageloadMasterPost_save';
+$route['budgeting/postrealisasi/modalform'] = 'page/budgeting/c_budgeting/modal_postrealisasi';
+
 
 
 $route['budgeting/get_cfg_postrealisasi'] = 'page/budgeting/c_budgeting/get_cfg_postrealisasi';
@@ -859,4 +864,6 @@ $route['budgeting/get_cfg_postrealisasi'] = 'page/budgeting/c_budgeting/get_cfg_
 
 $route['budgeting/page/loadCodePrefix'] = 'page/budgeting/c_budgeting/loadCodePrefix';
 $route['budgeting/save_codeprefix'] = 'page/budgeting/c_budgeting/save_codeprefix';
+
+$route['budgeting/postrealisasi/modalform/save'] = 'page/budgeting/c_budgeting/save_postrealisasi';
 

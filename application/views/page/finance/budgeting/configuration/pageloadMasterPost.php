@@ -72,52 +72,62 @@ function modal_generate2(action,title,ID='') {
     };
     var token = jwt_encode(data,"UAP)(*");
     $.post(url,{ token:token }, function (html) {
-        $('#GlobalModalLargeLarge .modal-header').html('<h4 class="modal-title">'+title+'</h4>');
-        $('#GlobalModalLargeLarge .modal-body').html(html);
-        $('#GlobalModalLargeLarge .modal-footer').html(' ');
-        $('#GlobalModalLargeLarge').modal({
+        $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+title+'</h4>');
+        $('#GlobalModalLarge .modal-body').html(html);
+        $('#GlobalModalLarge .modal-footer').html(' ');
+        $('#GlobalModalLarge').modal({
             'show' : true,
             'backdrop' : 'static'
         });
 
-        $('#ModalbtnSaveForm').click(function(){
+        $('#ModalbtnSaveForm2').click(function(){
             if (confirm("Are you sure?") == true) {
-                loading_button('#ModalbtnSaveForm');
+                loading_button('#ModalbtnSaveForm2');
                 var url = base_url_js+'budgeting/postrealisasi/modalform/save';
 
-                var Year = $("#Year").val();
-                var MonthStart = $("#MonthStart").val();
-                var MonthEnd = $("#MonthEnd").val();
+                var NeedPrefix = $('.NeedPrefix:checked').val();
+                var CodePostRealisasi = $("#CodePostRealisasi").val();
+                var PostItem = $("#PostItem").val();
+                var RealisasiPostName = $("#RealisasiPostName").val();
+                var Departement = $("#Departement").val();
+                
                 var action = $(this).attr('action');
-                var id = $("#ModalbtnSaveForm").attr('kodeuniq');
+                var id = $("#ModalbtnSaveForm2").attr('kodeuniq');
                 var data = {
-                            Year : Year,
-                            MonthStart : MonthStart,
-                            MonthEnd : MonthEnd,
+                            NeedPrefix : NeedPrefix,
+                            CodePostRealisasi : CodePostRealisasi,
+                            PostItem : PostItem,
+                            RealisasiPostName : RealisasiPostName,
+                            Departement : Departement,
                             Action : action,
                             CDID : id
                             };
                 var token = jwt_encode(data,"UAP)(*");
-                $.post(url,{token:token},function (data_json) {
-                    var response = jQuery.parseJSON(data_json);
-                    if (response == '') {
-                        toastr.success('Data berhasil disimpan', 'Success!');
-                    }
-                    else
-                    {
-                        toastr.error(response, 'Failed!!');
-                    }
-                    loadTable();
-                    $('#GlobalModalLargeLarge').modal('hide');
-                }).done(function() {
-                  // loadTable();
-                }).fail(function() {
-                  toastr.error('The Database connection error, please try again', 'Failed!!');
-                }).always(function() {
-                 $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
+                if (validationInput = validation2(data)) {
+                    $.post(url,{token:token},function (data_json) {
+                        var response = jQuery.parseJSON(data_json);
+                        if (response == '') {
+                            toastr.success('Data berhasil disimpan', 'Success!');
+                        }
+                        else
+                        {
+                            toastr.error(response, 'Failed!!');
+                        }
+                        loadTable2();
+                        $('#GlobalModalLarge').modal('hide');
+                    }).done(function() {
+                      // loadTable();
+                    }).fail(function() {
+                      toastr.error('The Database connection error, please try again', 'Failed!!');
+                    }).always(function() {
+                     $('#ModalbtnSaveForm2').prop('disabled',false).html('Save');
 
-                });
-
+                    });
+                } // if validation
+                else
+                {
+                    $('#ModalbtnSaveForm2').prop('disabled',false).html('Save');
+                }// exit validation
               } 
               else {
                 return false;
@@ -149,38 +159,45 @@ function modal_generate(action,title,ID='') {
         	    loading_button('#ModalbtnSaveForm');
         	    var url = base_url_js+'budgeting/masterpost/modalform/save';
 
-        	    var Year = $("#Year").val();
-        	    var MonthStart = $("#MonthStart").val();
-        	    var MonthEnd = $("#MonthEnd").val();
+        	    var NeedPrefix = $('.NeedPrefix:checked').val();
+                var CodePost = $('#CodePost').val();
+                var PostName = $("#PostName").val();
+
         	    var action = $(this).attr('action');
         	    var id = $("#ModalbtnSaveForm").attr('kodeuniq');
         	    var data = {
-        	    			Year : Year,
-        	                MonthStart : MonthStart,
-        	                MonthEnd : MonthEnd,
+        	    			NeedPrefix : NeedPrefix,
+        	                CodePost : CodePost,
+        	                PostName : PostName,
         	                Action : action,
         	                CDID : id
         	                };
         	    var token = jwt_encode(data,"UAP)(*");
-        	    $.post(url,{token:token},function (data_json) {
-                	var response = jQuery.parseJSON(data_json);
-                	if (response == '') {
-                		toastr.success('Data berhasil disimpan', 'Success!');
-                	}
-                	else
-                	{
-                		toastr.error(response, 'Failed!!');
-                	}
-                	loadTable();
-                	$('#GlobalModal').modal('hide');
-                }).done(function() {
-                  // loadTable();
-                }).fail(function() {
-                  toastr.error('The Database connection error, please try again', 'Failed!!');
-                }).always(function() {
-                 $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
+                if (validationInput = validation(data)) {
+                    $.post(url,{token:token},function (data_json) {
+                        var response = jQuery.parseJSON(data_json);
+                        if (response == '') {
+                            toastr.success('Data berhasil disimpan', 'Success!');
+                        }
+                        else
+                        {
+                            toastr.error(response, 'Failed!!');
+                        }
+                        loadTable1();
+                        $('#GlobalModal').modal('hide');
+                    }).done(function() {
+                      // loadTable();
+                    }).fail(function() {
+                      toastr.error('The Database connection error, please try again', 'Failed!!');
+                    }).always(function() {
+                     $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
 
-                });
+                    }); // exit spost
+                }
+                else
+                {
+                    $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
+                }// exit validation
 
         	  } 
         	  else {
@@ -190,6 +207,82 @@ function modal_generate(action,title,ID='') {
         });
     })
 
+}
+
+function validation2(arr)
+{
+  var toatString = "";
+  var result = "";
+  for(var key in arr) {
+     switch(key)
+     {
+      case  "Action" :
+      case  "CDID" :
+            break;
+      case  "NeedPrefix" :
+      case  "RealisasiPostName" :
+            result = Validation_required(arr[key],key);
+              if (result['status'] == 0) {
+                toatString += result['messages'] + "<br>";
+            }
+            break;
+      case  "CodePostRealisasi" :
+            // console.log(arr['NeedPrefix']);
+            if(arr['NeedPrefix'] == 0)
+            {
+                result = Validation_required(arr[key],key);
+                  if (result['status'] == 0) {
+                    toatString += result['messages'] + "<br>";
+                }
+            }
+            break;      
+     }
+
+  }
+  if (toatString != "") {
+    toastr.error(toatString, 'Failed!!');
+    return false;
+  }
+
+  return true;
+}
+
+function validation(arr)
+{
+  var toatString = "";
+  var result = "";
+  for(var key in arr) {
+     switch(key)
+     {
+      case  "Action" :
+      case  "CDID" :
+            break;
+      case  "NeedPrefix" :
+      case  "PostName" :
+            result = Validation_required(arr[key],key);
+              if (result['status'] == 0) {
+                toatString += result['messages'] + "<br>";
+            }
+            break;
+      case  "CodePost" :
+            console.log(arr['NeedPrefix']);
+            if(arr['NeedPrefix'] == 0)
+            {
+                result = Validation_required(arr[key],key);
+                  if (result['status'] == 0) {
+                    toatString += result['messages'] + "<br>";
+                }
+            }
+            break;      
+     }
+
+  }
+  if (toatString != "") {
+    toastr.error(toatString, 'Failed!!');
+    return false;
+  }
+
+  return true;
 }
 
 function loadTable1()
@@ -228,7 +321,7 @@ function loadTable1()
 	    LoaddataTable("#tableData1");
 
         $(".btn-edit-post").click(function(){
-    	    var ID = $(this).attr('year');
+    	    var ID = $(this).attr('code');
     	     modal_generate('edit','Edit',ID);
         });
 
@@ -262,8 +355,16 @@ function loadTable1()
                  var token = jwt_encode(data,"UAP)(*");
                  $.post(url,{token:token},function (data_json) {
                      setTimeout(function () {
-                        toastr.options.fadeOut = 10000;
-                        toastr.success('Data berhasil disimpan', 'Success!');
+                        // toastr.options.fadeOut = 10000;
+                        // toastr.success('Data berhasil disimpan', 'Success!');
+                        var response = jQuery.parseJSON(data_json);
+                        if (response == '') {
+                            toastr.success('Data berhasil disimpan', 'Success!');
+                        }
+                        else
+                        {
+                            toastr.error(response, 'Failed!!');
+                        }
                         loadTable1();
                         $('#NotificationModal').modal('hide');
                      },500);
@@ -304,7 +405,7 @@ function loadTable2()
                                 '<td width = "3%">'+ (parseInt(i) + 1)+'</td>'+
                                 '<td>'+ dataForTable[i].CodePostRealisasi+'</td>'+
                                 '<td>'+ dataForTable[i].CodePost+'<br>'+dataForTable[i].PostName+'</td>'+ // plus name
-                                '<td>'+ dataForTable[i].RealisasiPostName+'</td>'+
+                                '<td>'+ dataForTable[i].PostName+'-'+dataForTable[i].RealisasiPostName+'</td>'+
                                 '<td>'+ dataForTable[i].Departement+'</td>'+
                                 '<td>'+ btn_edit + ' '+' &nbsp' + btn_del+'</td>'+
                              '</tr>'    
@@ -349,9 +450,15 @@ function loadTable2()
                  var token = jwt_encode(data,"UAP)(*");
                  $.post(url,{token:token},function (data_json) {
                      setTimeout(function () {
-                        toastr.options.fadeOut = 10000;
-                        toastr.success('Data berhasil disimpan', 'Success!');
-                        loadTable1();
+                        var response = jQuery.parseJSON(data_json);
+                        if (response == '') {
+                            toastr.success('Data berhasil disimpan', 'Success!');
+                        }
+                        else
+                        {
+                            toastr.error(response, 'Failed!!');
+                        }
+                        loadTable2();
                         $('#NotificationModal').modal('hide');
                      },500);
                  });
