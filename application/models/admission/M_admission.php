@@ -1235,7 +1235,8 @@ class M_admission extends CI_Model {
 
      public function getPaymentType_Cost_created($ID_register_formulir)
      {
-      $sql = 'select a.*,b.Description,b.Abbreviation,c.Pay_tuition_fee,C.Discount from db_finance.payment_admisi as c join db_finance.payment_type as b on c.PTID = b.ID join db_finance.register_admisi as a on c.ID_register_formulir = a.ID_register_formulir where a.ID_register_formulir = ?';
+      $sql = 'select a.*,b.Description,b.Abbreviation,c.Pay_tuition_fee,
+      c.Discount from db_finance.payment_admisi as c join db_finance.payment_type as b on c.PTID = b.ID join db_finance.register_admisi as a on c.ID_register_formulir = a.ID_register_formulir where a.ID_register_formulir = ?';
       $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
       return $query;
      }
