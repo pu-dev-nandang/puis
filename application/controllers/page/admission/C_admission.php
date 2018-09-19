@@ -1524,18 +1524,18 @@ class C_admission extends Admission_Controler {
                         }
                      }
 
-                     $text = 'Dear '.$Name.',<br><br>
-                                 Congarulations, You were admitted to Podomoro University,<br>
-                                 Your Nim is '.$NPM.'.<br><br>
-                                 For Details, Please open your portal '.url_sign_out.' with :<br>
-                                 Username : '.$NPM.'<br>
-                                 Password : '.$pasword_old.'<br><br>
-                             ';
-                     $to = $Email;
-                     $subject = "Podomoro University Registration";
-                     $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                  }
 
-                  }  
+                  $text = 'Dear '.$Name.',<br><br>
+                              Congarulations, You were admitted to Podomoro University,<br>
+                              Your Nim is '.$NPM.'.<br><br>
+                              For Details, Please open your portal '.url_sign_out.' with :<br>
+                              Username : '.$NPM.'<br>
+                              Password : '.$pasword_old.'<br><br>
+                          ';
+                  $to = $Email;
+                  $subject = "Podomoro University Registration";
+                  $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);  
             $aa++;
           }
           // print_r($arr);
