@@ -571,6 +571,7 @@ class C_finance extends Finnance_Controler {
     {
         $Input = $this->getInputToken();
         $Input = $Input['arrValueCHK'];
+        // print_r($Input);die();
         $proses = $this->m_finance->updatePaymentunApprove($Input);
         echo json_encode($proses);
     }
