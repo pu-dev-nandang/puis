@@ -241,7 +241,6 @@ class M_rest extends CI_Model {
                                 }
 
 
-
                                 if(count($arrDataAttd)>0){
                                     $meeting = 0;
                                     $Totalpresen = 0;
@@ -256,11 +255,18 @@ class M_rest extends CI_Model {
 
                                     }
 
-
-
-
                                     $PresensiArg = ($Totalpresen==0) ? 0 : ($Totalpresen/$meeting) * 100;
                                     $ExamSchedule[$g]['AttendanceStudent'] = $PresensiArg;
+
+                                    // UAS
+                                    if($ExamType=='uas' || $ExamType=='UAS'){
+                                        if($PresensiArg<75){
+                                            $ExamSchedule[$g]['ExamDate'] = null;
+                                            $ExamSchedule[$g]['ExamEnd'] = null;
+                                            $ExamSchedule[$g]['ExamStart'] = null;
+                                            $ExamSchedule[$g]['Room'] = null;
+                                        }
+                                    }
                                 }
                             }
 
