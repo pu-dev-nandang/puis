@@ -279,130 +279,261 @@
         var formPengawas1 = $('#formPengawas1').val();
         errorForm('formPengawas1',formPengawas1,1);
 
-        if($.inArray(0,CourseOtherNext)==-1 && formInputDate!='' && formInputDate!=null
-            && formBaseProdi!='' && formBaseProdi!=null
-            && formCourse!='' && formCourse!=null && formStart!='' && formStart!=null
-            && formEnd!='' && formEnd!=null && formClassroom!='' && formClassroom!=null
-            && formPengawas1!='' && formPengawas1!=null
-            && reportRecipientsDuplicate.length<=0
-        ){
+        if(formBaseProdi!='' && formBaseProdi!=null){
+            if($.inArray(0,CourseOtherNext)==-1 && formInputDate!='' && formInputDate!=null
 
-            var formSemesterID = $('#formSemesterID').val();
-            var formDayID = $('#formDayID').val();
-            var Type = $('input[name=formExam]:checked').val();
+                && formCourse!='' && formCourse!=null && formStart!='' && formStart!=null
+                && formEnd!='' && formEnd!=null && formClassroom!='' && formClassroom!=null
+                && formPengawas1!='' && formPengawas1!=null
+                && reportRecipientsDuplicate.length<=0
+            ){
 
-            var formPengawas2 = $('#formPengawas2').val();
+                var formSemesterID = $('#formSemesterID').val();
+                var formDayID = $('#formDayID').val();
+                var Type = $('input[name=formExam]:checked').val();
 
-            var insert_details = [];
-            var insert_group = [formCourse];
+                var formPengawas2 = $('#formPengawas2').val();
 
-            // Requered
-            var formStudent = $('#formStudent').val();
-            var Arr_formStudent = JSON.parse(formStudent);
+                var insert_details = [];
+                var insert_group = [formCourse];
 
-            var AllStudent = $('#AllStudent').val();
-            var Arr_AllStudent = JSON.parse(AllStudent);
+                // Requered
+                var formStudent = $('#formStudent').val();
+                var Arr_formStudent = JSON.parse(formStudent);
 
-            if(Arr_formStudent.length>0){
-                for(var q=0;q<Arr_AllStudent.length;q++){
-                    var d = Arr_AllStudent[q];
-                    if(d.IDEd == '' || d.IDEd == null){
+                var AllStudent = $('#AllStudent').val();
+                var Arr_AllStudent = JSON.parse(AllStudent);
 
-                        if($.inArray(d.NPM,Arr_formStudent)!=-1){
-                            var Name = (d.Name!='' && d.Name!=null) ? ucwords(d.Name) : '';
-                            var arr_s = {
-                                ScheduleID : formCourse,
-                                MhswID : d.MhswID,
-                                NPM : d.NPM,
-                                Name : Name,
-                                DB_Students : d.DB_Students
-                            };
-                            insert_details.push(arr_s);
+                if(Arr_formStudent.length>0){
+                    for(var q=0;q<Arr_AllStudent.length;q++){
+                        var d = Arr_AllStudent[q];
+                        if(d.IDEd == '' || d.IDEd == null){
+
+                            if($.inArray(d.NPM,Arr_formStudent)!=-1){
+                                var Name = (d.Name!='' && d.Name!=null) ? ucwords(d.Name) : '';
+                                var arr_s = {
+                                    ScheduleID : formCourse,
+                                    MhswID : d.MhswID,
+                                    NPM : d.NPM,
+                                    Name : Name,
+                                    DB_Students : d.DB_Students
+                                };
+                                insert_details.push(arr_s);
+                            }
                         }
+
                     }
-
                 }
-            }
 
 
-            // Other Course
-            if(notr>0){
-                for(var h=1;h<=notr;h++){
-                    var formCourse_ot = $('#formCourse'+h).val();
-                    var formStudent_ot = $('#formStudent'+h).val();
-                    var Arr_formStudent_ot = JSON.parse(formStudent_ot);
+                // Other Course
+                if(notr>0){
+                    for(var h=1;h<=notr;h++){
+                        var formCourse_ot = $('#formCourse'+h).val();
+                        var formStudent_ot = $('#formStudent'+h).val();
+                        var Arr_formStudent_ot = JSON.parse(formStudent_ot);
 
-                    var AllStudent_ot = $('#AllStudent'+h).val();
-                    var Arr_AllStudent_ot = JSON.parse(AllStudent_ot);
+                        var AllStudent_ot = $('#AllStudent'+h).val();
+                        var Arr_AllStudent_ot = JSON.parse(AllStudent_ot);
 
-                    if(Arr_formStudent_ot.length>0){
-                        for(var o=0;o<Arr_AllStudent_ot.length;o++){
-                            var od = Arr_AllStudent_ot[o];
-                            if(od.IDEd == '' || od.IDEd == null){
-                                if($.inArray(od.NPM,Arr_formStudent_ot)!=-1){
+                        if(Arr_formStudent_ot.length>0){
+                            for(var o=0;o<Arr_AllStudent_ot.length;o++){
+                                var od = Arr_AllStudent_ot[o];
+                                if(od.IDEd == '' || od.IDEd == null){
+                                    if($.inArray(od.NPM,Arr_formStudent_ot)!=-1){
 
-                                    if($.inArray(formCourse_ot,insert_group)==-1){
-                                        insert_group.push(formCourse_ot);
+                                        if($.inArray(formCourse_ot,insert_group)==-1){
+                                            insert_group.push(formCourse_ot);
+                                        }
+                                        var Name = (od.Name!='' && od.Name!=null) ? ucwords(od.Name) : '';
+                                        var arr_s_ot = {
+                                            ScheduleID : formCourse_ot,
+                                            MhswID : od.MhswID,
+                                            NPM : od.NPM,
+                                            Name : Name,
+                                            DB_Students : od.DB_Students
+                                        };
+                                        insert_details.push(arr_s_ot);
                                     }
-                                    var Name = (od.Name!='' && od.Name!=null) ? ucwords(od.Name) : '';
-                                    var arr_s_ot = {
-                                        ScheduleID : formCourse_ot,
-                                        MhswID : od.MhswID,
-                                        NPM : od.NPM,
-                                        Name : Name,
-                                        DB_Students : od.DB_Students
-                                    };
-                                    insert_details.push(arr_s_ot);
                                 }
                             }
                         }
+
                     }
+                }
+
+                var RoomID =  formClassroom.split('.')[0];
+                var SeatForExam =  formClassroom.split('.')[2];
+                var TotalStudent = insert_details.length;
+
+                if(parseInt(TotalStudent) <= parseInt(SeatForExam)){
+                    var ProdiID = formBaseProdi.split('.')[0];
+                    var data = {
+                        action : 'setExamSchedule',
+                        insert_exam : {
+                            SemesterID : formSemesterID,
+                            Type : Type,
+                            ExamDate : formInputDate,
+                            DayID : formDayID,
+                            ExamClassroomID : RoomID,
+                            ExamStart : formStart,
+                            ExamEnd : formEnd,
+                            Pengawas1 : formPengawas1,
+                            Pengawas2 : formPengawas2,
+
+                            Status : '1',
+                            InsertByProdiID : ProdiID,
+                            InsertBy : sessionNIP,
+                            InsertAt : dateTimeNow()
+
+
+                        },
+                        insert_details : insert_details,
+                        insert_group : insert_group
+
+                    };
+
+                    var token = jwt_encode(data,'UAP)(*');
+
+                    checkBentrok(formSemesterID,Type,formInputDate,RoomID,formStart,formEnd,token);
+                }
+                else {
+                    toastr.error('Class Room not enought','Error');
+                }
+
+
+
+            }
+        } else {
+            if(confirm('is this a combined class schedule?')){
+                if($.inArray(0,CourseOtherNext)==-1 && formInputDate!='' && formInputDate!=null
+
+                    && formCourse!='' && formCourse!=null && formStart!='' && formStart!=null
+                    && formEnd!='' && formEnd!=null && formClassroom!='' && formClassroom!=null
+                    && formPengawas1!='' && formPengawas1!=null
+                    && reportRecipientsDuplicate.length<=0
+                ){
+
+                    var formSemesterID = $('#formSemesterID').val();
+                    var formDayID = $('#formDayID').val();
+                    var Type = $('input[name=formExam]:checked').val();
+
+                    var formPengawas2 = $('#formPengawas2').val();
+
+                    var insert_details = [];
+                    var insert_group = [formCourse];
+
+                    // Requered
+                    var formStudent = $('#formStudent').val();
+                    var Arr_formStudent = JSON.parse(formStudent);
+
+                    var AllStudent = $('#AllStudent').val();
+                    var Arr_AllStudent = JSON.parse(AllStudent);
+
+                    if(Arr_formStudent.length>0){
+                        for(var q=0;q<Arr_AllStudent.length;q++){
+                            var d = Arr_AllStudent[q];
+                            if(d.IDEd == '' || d.IDEd == null){
+
+                                if($.inArray(d.NPM,Arr_formStudent)!=-1){
+                                    var Name = (d.Name!='' && d.Name!=null) ? ucwords(d.Name) : '';
+                                    var arr_s = {
+                                        ScheduleID : formCourse,
+                                        MhswID : d.MhswID,
+                                        NPM : d.NPM,
+                                        Name : Name,
+                                        DB_Students : d.DB_Students
+                                    };
+                                    insert_details.push(arr_s);
+                                }
+                            }
+
+                        }
+                    }
+
+
+                    // Other Course
+                    if(notr>0){
+                        for(var h=1;h<=notr;h++){
+                            var formCourse_ot = $('#formCourse'+h).val();
+                            var formStudent_ot = $('#formStudent'+h).val();
+                            var Arr_formStudent_ot = JSON.parse(formStudent_ot);
+
+                            var AllStudent_ot = $('#AllStudent'+h).val();
+                            var Arr_AllStudent_ot = JSON.parse(AllStudent_ot);
+
+                            if(Arr_formStudent_ot.length>0){
+                                for(var o=0;o<Arr_AllStudent_ot.length;o++){
+                                    var od = Arr_AllStudent_ot[o];
+                                    if(od.IDEd == '' || od.IDEd == null){
+                                        if($.inArray(od.NPM,Arr_formStudent_ot)!=-1){
+
+                                            if($.inArray(formCourse_ot,insert_group)==-1){
+                                                insert_group.push(formCourse_ot);
+                                            }
+                                            var Name = (od.Name!='' && od.Name!=null) ? ucwords(od.Name) : '';
+                                            var arr_s_ot = {
+                                                ScheduleID : formCourse_ot,
+                                                MhswID : od.MhswID,
+                                                NPM : od.NPM,
+                                                Name : Name,
+                                                DB_Students : od.DB_Students
+                                            };
+                                            insert_details.push(arr_s_ot);
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+
+                    var RoomID =  formClassroom.split('.')[0];
+                    var SeatForExam =  formClassroom.split('.')[2];
+                    var TotalStudent = insert_details.length;
+
+                    if(parseInt(TotalStudent) <= parseInt(SeatForExam)){
+                        var ProdiID = formBaseProdi.split('.')[0];
+                        var data = {
+                            action : 'setExamSchedule',
+                            insert_exam : {
+                                SemesterID : formSemesterID,
+                                Type : Type,
+                                ExamDate : formInputDate,
+                                DayID : formDayID,
+                                ExamClassroomID : RoomID,
+                                ExamStart : formStart,
+                                ExamEnd : formEnd,
+                                Pengawas1 : formPengawas1,
+                                Pengawas2 : formPengawas2,
+
+                                Status : '1',
+                                InsertByProdiID : ProdiID,
+                                InsertBy : sessionNIP,
+                                InsertAt : dateTimeNow()
+
+
+                            },
+                            insert_details : insert_details,
+                            insert_group : insert_group
+
+                        };
+
+                        var token = jwt_encode(data,'UAP)(*');
+
+                        checkBentrok(formSemesterID,Type,formInputDate,RoomID,formStart,formEnd,token);
+                    }
+                    else {
+                        toastr.error('Class Room not enought','Error');
+                    }
+
+
 
                 }
             }
-
-            var RoomID =  formClassroom.split('.')[0];
-            var SeatForExam =  formClassroom.split('.')[2];
-            var TotalStudent = insert_details.length;
-
-            if(parseInt(TotalStudent) <= parseInt(SeatForExam)){
-                var ProdiID = formBaseProdi.split('.')[0];
-                var data = {
-                    action : 'setExamSchedule',
-                    insert_exam : {
-                        SemesterID : formSemesterID,
-                        Type : Type,
-                        ExamDate : formInputDate,
-                        DayID : formDayID,
-                        ExamClassroomID : RoomID,
-                        ExamStart : formStart,
-                        ExamEnd : formEnd,
-                        Pengawas1 : formPengawas1,
-                        Pengawas2 : formPengawas2,
-
-                        Status : '1',
-                        InsertByProdiID : ProdiID,
-                        InsertBy : sessionNIP,
-                        InsertAt : dateTimeNow()
-
-
-                    },
-                    insert_details : insert_details,
-                    insert_group : insert_group
-
-                };
-
-                var token = jwt_encode(data,'UAP)(*');
-
-                checkBentrok(formSemesterID,Type,formInputDate,RoomID,formStart,formEnd,token);
-            }
-            else {
-                toastr.error('Class Room not enought','Error');
-            }
-
-
-
         }
+
+
         
     });
     
