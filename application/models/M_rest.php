@@ -184,6 +184,9 @@ class M_rest extends CI_Model {
         $result = [];
         for($i=0;$i<count($dataSemester);$i++){
 
+
+            $Semester = $this->checkSemesterByClassOf($ClassOf,$SemesterID);
+
             $ExamSchedule = [];
             $ErrorOn = 'old_system';
             $PaymentType = '';
@@ -191,10 +194,9 @@ class M_rest extends CI_Model {
             $Message = 'Old System';
 
             if($dataSemester[$i]['ID']>=13) {
-                // Cek apakah BPP dan SKS sudah terbayar
-                $dataPayment = $this->checkPayment($NPM,$dataSemester[$i]['ID']);
-                if($dataPayment['BPP']['Status']==1 && $dataPayment['Credit']['Status']==1){
 
+
+                if($Semester==1|| $Semester=='1'){
                     $PaymentType = '';
                     $PaymentStatus = -5;
                     $ErrorOn = 'schedule';
@@ -274,28 +276,112 @@ class M_rest extends CI_Model {
                         }
 
                     }
+                } else {
+                    // Cek apakah BPP dan SKS sudah terbayar
+                    $dataPayment = $this->checkPayment($NPM,$dataSemester[$i]['ID']);
+                    if($dataPayment['BPP']['Status']==1 && $dataPayment['Credit']['Status']==1){
 
-                }
-                else if ($dataPayment['BPP']['Status']!=1) {
-                    $ErrorOn = 'payment';
-                    $PaymentType = 'BPP';
-                    $PaymentStatus = $dataPayment['BPP']['Status'];
-                    $Message = $dataPayment['BPP']['Message'];
-                }
-                else {
-                    $ErrorOn = 'payment';
-                    $PaymentType = 'Credit';
-                    $PaymentStatus = $dataPayment['Credit']['Status'];
-                    $Message = $dataPayment['Credit']['Message'];
-                }
+                        $PaymentType = '';
+                        $PaymentStatus = -5;
+                        $ErrorOn = 'schedule';
+                        $Message = 'Exam Schedule Available On : ';
+                        // Cek apakah tanggal merupakan tanggal Exam
+                        $ExamSchStart = ($ExamType=='uts' || $ExamType=='UTS') ? $dataSemester[$i]['utsStart'] : $dataSemester[$i]['uasStart'] ;
+                        if($Date>=$ExamSchStart){
+                            $ErrorOn = "";
+                            $Message = 'Exam schedule Available';
 
+                            // Get data jadwal
+                            $ExamSchedule = $this->db->query('SELECT sc.ID AS ScheduleID, mk.MKCode, mk.Name AS Course, mk.NameEng AS CourseEng, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room,  
+                                                                    sc.ClassGroup
+                                                                    FROM '.$db.'.study_planning sp
+                                                                    LEFT JOIN db_academic.exam_details exd ON (exd.ScheduleID = sp.ScheduleID AND exd.NPM = sp.NPM)
+                                                                    LEFT JOIN db_academic.exam ex ON (ex.ID = exd.ExamID AND ex.Type LIKE "'.$ExamType.'")
+                                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
+                                                                    LEFT JOIN db_academic.schedule sc ON (sc.ID = sp.ScheduleID)
+                                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sp.MKID)
+                                                                    WHERE sp.SemesterID = "'.$dataSemester[$i]['ID'].'" 
+                                                                    AND sp.NPM = "'.$NPM.'"
+                                                                     ORDER BY mk.MKCode ASC ')->result_array();
+
+
+                            if(count($ExamSchedule)>0){
+
+                                for($g=0;$g<count($ExamSchedule);$g++){
+
+                                    $examD = $ExamSchedule[$g];
+
+                                    // Get Schedule Detail
+                                    $dataSD = $this->db->select('ID')->get_where('db_academic.schedule_details',array('ScheduleID' => $examD['ScheduleID']))->result_array();
+
+                                    $arrDataAttd = [];
+                                    for($t=0;$t<count($dataSD);$t++){
+                                        // Get Attendance
+                                        $dataAttd = $this->db->query('SELECT attd_s.* FROM db_academic.attendance_students attd_s 
+                                                          LEFT JOIN db_academic.attendance attd ON (attd.ID = attd_s.ID_Attd)
+                                                          WHERE attd.SemesterID = "'.$dataSemester[$i]['ID'].'" 
+                                                          AND attd.ScheduleID = "'.$examD['ScheduleID'].'"
+                                                          AND attd.SDID = "'.$dataSD[$t]['ID'].'"
+                                                           AND attd_s.NPM = "'.$NPM.'" ')->result_array();
+                                        array_push($arrDataAttd,$dataAttd);
+                                    }
+
+
+                                    if(count($arrDataAttd)>0){
+                                        $meeting = 0;
+                                        $Totalpresen = 0;
+                                        for($a=0;$a<count($arrDataAttd);$a++){
+                                            $dataAttd = $arrDataAttd[$a];
+                                            for($m=1;$m<=14;$m++){
+                                                $meeting += 1;
+                                                if($dataAttd[0]['M'.$m]=='1'){
+                                                    $Totalpresen += 1;
+                                                }
+                                            }
+
+                                        }
+
+                                        $PresensiArg = ($Totalpresen==0) ? 0 : ($Totalpresen/$meeting) * 100;
+                                        $ExamSchedule[$g]['AttendanceStudent'] = $PresensiArg;
+
+                                        // UAS
+                                        if($ExamType=='uas' || $ExamType=='UAS'){
+                                            if($PresensiArg<75){
+                                                $ExamSchedule[$g]['ExamDate'] = null;
+                                                $ExamSchedule[$g]['ExamEnd'] = null;
+                                                $ExamSchedule[$g]['ExamStart'] = null;
+                                                $ExamSchedule[$g]['Room'] = null;
+                                            }
+                                        }
+                                    }
+                                }
+
+
+                            }
+
+                        }
+
+                    }
+                    else if ($dataPayment['BPP']['Status']!=1) {
+                        $ErrorOn = 'payment';
+                        $PaymentType = 'BPP';
+                        $PaymentStatus = $dataPayment['BPP']['Status'];
+                        $Message = $dataPayment['BPP']['Message'];
+                    }
+                    else {
+                        $ErrorOn = 'payment';
+                        $PaymentType = 'Credit';
+                        $PaymentStatus = $dataPayment['Credit']['Status'];
+                        $Message = $dataPayment['Credit']['Message'];
+                    }
+                }
 
             }
 
             // =======
             $dataArr = array(
                 'SemesterID' => $dataSemester[$i]['ID'],
-                'Semester' => $this->checkSemesterByClassOf($ClassOf,$SemesterID),
+                'Semester' => $Semester,
                 'SemesterName' => $dataSemester[$i]['Name'],
                 'UTS' => array('Start' => $dataSemester[$i]['utsStart'], 'End' => $dataSemester[$i]['utsEnd']),
                 'UAS' => array('Start' => $dataSemester[$i]['uasStart'], 'End' => $dataSemester[$i]['uasEnd']),
