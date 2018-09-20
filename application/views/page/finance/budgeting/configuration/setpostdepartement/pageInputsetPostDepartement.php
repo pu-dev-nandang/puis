@@ -122,6 +122,7 @@
 									'<thead>'+
 									'<tr>'+
 										'<th width = "3%">No</th>'+
+			                            '<th>Departement</th>'+
 			                            '<th>Code</th>'+
 										'<th>Post Realization</th>'+
 										'<th>Year</th>'+
@@ -137,8 +138,22 @@
 		var token = jwt_encode(data,'UAP)(*');
 		$.post(url,{token:token},function (resultJson) {
 			var response = jQuery.parseJSON(resultJson);
+			for (var i = 0; i < response.length; i++) {
+				TableGenerate += '<tr>'+
+									'<td width = "3%">'+ (parseInt(i) + 1)+'</td>'+
+									'<td>'+ response[i].Departement+'</td>'+
+									'<td>'+ response[i].CodePostBudget+'</td>'+
+									'<td>'+ response[i].CodeSubPost+'<br>'+response[i].PostName+'-'+response[i].RealisasiPostName+'</td>'+
+									'<td>'+ response[i].Year+'</td>'+
+									'<td>'+ response[i].Budget+'</td>'+
+								'</tr>';	
+
+			}
+
+			TableGenerate += '</tbody></table></div></div>';
 			
 			$("#loadPageTable").html(setLastYear+'<br>'+TableGenerate);
+			LoaddataTableStandard("#tableData1");
 		}).fail(function() {
 		  toastr.info('No Result Data'); 
 		}).always(function() {

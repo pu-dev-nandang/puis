@@ -145,6 +145,21 @@ class M_budgeting extends CI_Model {
                 where a.Year = ? and b.Departement = ?
                 ';
         $query=$this->db->query($sql, array($Year,$DepartementCode))->result_array();
-                
+        for ($i=0; $i < count($query); $i++) { 
+            $temp = array(
+                    'CodePostBudget' => $query[$i]['CodePostBudget'],
+                    'CodeSubPost' => $query[$i]['CodeSubPost'],
+                    'Year' => $query[$i]['Year'],
+                    'Budget' => $query[$i]['Budget'],
+                    'RealisasiPostName' => $query[$i]['RealisasiPostName'],
+                    'PostName' => $query[$i]['PostName'],
+                    'CodePost' => $query[$i]['CodePost'],
+                    'Departement' => $Departement
+            );
+
+            $arr_result[] = $temp;
+        }
+
+        return $arr_result;       
     }
 }
