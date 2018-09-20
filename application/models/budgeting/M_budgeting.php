@@ -40,7 +40,7 @@ class M_budgeting extends CI_Model {
             $exp = explode('.', $Departement);
             if ($exp[0] == 'NA') { // Non Academic
                 $tget = $this->m_master->caribasedprimary('db_employees.division','ID',$exp[1]);
-                $Departement = $tget[0]['Division'];
+                $Departement = $tget[0]['Description'].' ('.$tget[0]['Division'].')';
             }
             elseif ($exp[0] == 'A') {
                 $tget = $this->m_master->caribasedprimary('db_academic.program_study','ID',$exp[1]);

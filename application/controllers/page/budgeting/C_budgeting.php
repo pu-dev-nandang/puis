@@ -452,7 +452,6 @@ class C_budgeting extends Budgeting_Controler {
         $this->auth_ajax();
         $input = $this->getInputToken();
         $this->data['action'] = $input['Action'];
-        // print_r($this->data);
         $this->data['id'] = $input['CDID'];
         if ($input['Action'] == 'edit') {
             $sql = 'select * from db_budgeting.cfg_postrealisasi where CodePostRealisasi = ? and Active = 1';
@@ -500,11 +499,11 @@ class C_budgeting extends Budgeting_Controler {
                 }
                 break;
             case 'edit':
-                $CodePost = $input['CodePost'];
+                $CodePostRealisasi = $input['CodePostRealisasi'];
                 $query = array();
-                if ($CodePost != $input['CDID']) {
-                    $sql = 'select * from db_budgeting.cfg_post where CodePost = ? and Active = 1';
-                    $query=$this->db->query($sql, array($CodePost))->result_array();
+                if ($CodePostRealisasi != $input['CDID']) {
+                    $sql = 'select * from db_budgeting.cfg_postrealisasi where CodePostRealisasi = ? and Active = 1';
+                    $query=$this->db->query($sql, array($CodePostRealisasi))->result_array();
                 }
 
                 if (count($query) > 0) {
@@ -512,18 +511,20 @@ class C_budgeting extends Budgeting_Controler {
                 }
                 else
                 {
-                    $sql = 'select * from db_budgeting.cfg_post where CodePost = ? and Active = 1';
+                    $sql = 'select * from db_budgeting.cfg_postrealisasi where CodePostRealisasi = ? and Active = 1';
                     $query=$this->db->query($sql, array($input['CDID']))->result_array();
                     $Status = $query[0]['Status'];
                     if ($Status == 1) {
                         try {
                            $dataSave = array(
-                               'CodePost' => $CodePost,
-                               'PostName' => trim(ucwords($input['PostName'])),
+                               'CodePostRealisasi' => $CodePostRealisasi,
+                               'RealisasiPostName' => trim(ucwords($input['RealisasiPostName'])),
+                               'CodePost' => $input['PostItem'],
+                               'Departement' => $input['Departement'],
                            );
-                           $this->db->where('CodePost', $input['CDID']);
+                           $this->db->where('CodePostRealisasi', $input['CDID']);
                            $this->db->where('Active', 1);
-                           $this->db->update('db_budgeting.cfg_post', $dataSave);
+                           $this->db->update('db_budgeting.cfg_postrealisasi', $dataSave);
                         } catch (Exception $e) {
                              $Msg = $this->Msg['Duplicate'];
                         }   
@@ -535,17 +536,17 @@ class C_budgeting extends Budgeting_Controler {
                 }
                 break;
             case 'delete':
-                $CodePost = $input['CDID'];
-                $sql = 'select * from db_budgeting.cfg_post where CodePost = ? and Active = 1';
-                $query=$this->db->query($sql, array($CodePost))->result_array();
+                $CodePostRealisasi = $input['CDID'];
+                $sql = 'select * from db_budgeting.cfg_postrealisasi where CodePostRealisasi = ? and Active = 1';
+                $query=$this->db->query($sql, array($CodePostRealisasi))->result_array();
                 $Status = $query[0]['Status']; // check can be delete
                    if ($Status == 1) {
                        $dataSave = array(
                            'Active' => 0
                        );
-                       $this->db->where('CodePost', $CodePost);
+                       $this->db->where('CodePostRealisasi', $CodePostRealisasi);
                        $this->db->where('Active', 1);
-                       $this->db->update('db_budgeting.cfg_post', $dataSave);
+                       $this->db->update('db_budgeting.cfg_postrealisasi', $dataSave);
                    }
                    else
                    {
@@ -559,6 +560,22 @@ class C_budgeting extends Budgeting_Controler {
 
         echo json_encode($Msg);
 
+    }
+
+    public function LoadSetPostDepartement()
+    {
+        $this->auth_ajax();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/pageSetPostDepartement',$this->data,true);
+        echo json_encode($arr_result);
+    }
+
+    public function LoadInputsetPostDepartement()
+    {
+        $this->auth_ajax();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/setpostdepartement/pageInputsetPostDepartement',$this->data,true);
+        echo json_encode($arr_result);
     }
 
 

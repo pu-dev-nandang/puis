@@ -1,4 +1,4 @@
-<div class="tabbable tabbable-custom tabbable-full-width btn-read">
+<div class="tabbable tabbable-custom tabbable-full-width btn-read menuConfig">
     <ul class="nav nav-tabs">
         <li class="<?php if($request==null || $request=='CodePrefix'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "PrefixCode">Code Prefix</a>
@@ -79,9 +79,21 @@
         }); // exit spost
     }
 
+    function LoadSetPostDepartement()
+    {
+        loading_page("#pageContentConfig");
+        var url = base_url_js+'budgeting/page/LoadSetPostDepartement';
+        $.post(url,function (resultJson) {
+            var response = jQuery.parseJSON(resultJson);
+            var html = response.html;
+            var jsonPass = response.jsonPass;
+            $("#pageContentConfig").html(html);
+        }); // exit spost
+    }
+
     $(document).on('click','.pageAnchor', function () {
         var Page = $(this).attr('page');
-        $("li").removeClass('active');
+        $(".menuConfig li").removeClass('active');
         $(this).parent().addClass('active');
         $("#pageContentConfig").empty();
         switch(Page) {
@@ -94,6 +106,9 @@
             case "MasterPost":
                 LoadMasterPost();
                 break;
+            case "SetPostDepartement":
+                LoadSetPostDepartement();
+                break;    
             default:
                 text = "I have never heard of that fruit...";
         }

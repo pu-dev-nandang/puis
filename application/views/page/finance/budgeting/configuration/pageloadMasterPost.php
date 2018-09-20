@@ -18,7 +18,7 @@
 <div class="col-xs-12" >
 	<div class="panel panel-primary">
         <div class="panel-heading clearfix">
-            <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Master Post</h4>
+            <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Item Post</h4>
             <div class="toolbar no-padding pull-right">
                 <span data-smt="" class="btn btn-add btn-add-master-post">
                     <i class="icon-plus"></i> Add
@@ -35,7 +35,7 @@
 <div class="col-xs-12" >
     <div class="panel panel-primary">
         <div class="panel-heading clearfix">
-            <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Realization Post / Sub Post</h4>
+            <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Realization Post</h4>
             <div class="toolbar no-padding pull-right">
                 <span data-smt="" class="btn btn-add btn-add-realization-Post">
                     <i class="icon-plus"></i> Add
@@ -416,7 +416,7 @@ function loadTable2()
         LoaddataTable("#tableData2");
 
         $(".btn-edit-postrealization").click(function(){
-            var ID = $(this).attr('year');
+            var ID = $(this).attr('code');
              modal_generate2('edit','Edit',ID);
         });
 

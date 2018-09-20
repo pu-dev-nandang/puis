@@ -75,13 +75,14 @@
         </div>
         </div>    
     </form>
+    
 <script type="text/javascript">
     $(document).ready(function () {
         getDataPostItem();
         getAllDepartementPU();
         <?php if ($action == 'edit'): ?>
-          $("#CodePost").val('<?php echo $getData[0]['CodePost'] ?>')
-          $("#PostName").val('<?php echo $getData[0]['PostName'] ?>')
+          $("#CodePostRealisasi").val('<?php echo $getData[0]['CodePostRealisasi'] ?>');
+          $("#RealisasiPostName").val('<?php echo $getData[0]['RealisasiPostName'] ?>');
         <?php endif ?>
 
         $(".NeedPrefix").change(function(){
@@ -116,6 +117,13 @@
             $('#PostItem').append('<option value="'+ response[i]['CodePost']  +'" '+selected+'>'+response[i]['PostName']+'</option>');
         }
 
+        <?php if ($action == 'edit'): ?>
+          $("#PostItem option").filter(function() {
+            //may want to use $.trim in here
+            return $(this).val() == "<?php echo $getData[0]['CodePost'] ?>"; 
+          }).prop("selected", true);
+        <?php endif ?>
+
         $('#PostItem').select2({
            //allowClear: true
         });
@@ -135,6 +143,13 @@
             $('#Departement').append('<option value="'+ data_json[i]['Code']  +'" '+selected+'>'+data_json[i]['Name2']+'</option>');
         }
 
+        <?php if ($action == 'edit'): ?>
+            $("#Departement option").filter(function() {
+             //may want to use $.trim in here
+             return $(this).val() == "<?php echo $getData[0]['Departement'] ?>"; 
+           }).prop("selected", true);
+        <?php endif ?>
+       
         $('#Departement').select2({
            //allowClear: true
         });
