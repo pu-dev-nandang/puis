@@ -96,7 +96,7 @@
 
 		$("#loadPageTable").empty();
 
-		var Export = '<div class="col-lg-3 col-md-3 col-xs-6">'+
+		var Export = '<div class="col-lg-3 col-md-3 col-xs-4">'+
 							'<h4 class="header"><i class="icon-reorder"></i> Export</h4>'+
 							'<div class="col-xs-12">'+
 								'<button class = "btn btn-default"><i class="fa fa-download" aria-hidden="true"></i> Excel</button>&nbsp'+
@@ -105,13 +105,19 @@
 					 '</div>';	      
 
 		var setLastYear = '<div class="col-md-12">'+
-								'<div class="thumbnail" style="min-height: 120px;padding: 10px;">'+
-									'<div class="col-lg-3 col-md-3 col-xs-6">'+
+								'<div class="thumbnail" style="min-height: 130px;padding: 10px;">'+
+									'<div class="col-lg-3 col-md-3 col-xs-4">'+
 		                                '<h4 class="header"><i class="icon-reorder"></i> Get Budget Last Year</h4>'+
 		                                '<div class = "col-xs-12"> <br>'+
 		                                      '<button class = "btn btn-success btn-edit" id = "generateBudgetLastYear">Take</button>'+
 		                                '</div>'+
-		                            '</div>'+    
+		                            '</div>'+
+		                            '<div class="col-lg-3 col-md-3 col-xs-4">'+
+		                                '<h4 class="header"><i class="icon-reorder"></i> Add</h4>'+
+		                                '<div class = "col-xs-12"> <br>'+
+		                                      '<button class = "btn btn-default btn-add" id = "addRow"><i class="fa fa-plus" aria-hidden="true"></i> Add</button>'+
+		                                '</div>'+
+		                            '</div>'+      
 	                                Export+  
                                 '</div>'+
                            '</div>';
@@ -153,7 +159,32 @@
 			TableGenerate += '</tbody></table></div></div>';
 			
 			$("#loadPageTable").html(setLastYear+'<br>'+TableGenerate);
-			LoaddataTableStandard("#tableData1");
+			// LoaddataTableStandard("#tableData1");
+			var t = $('#tableData1').DataTable();
+			    var counter = 1;
+			 	
+			    $('#addRow').on( 'click', function () {
+			    	console.log(response);
+			    	var No = counter;
+			    	t
+			    	    .clear()
+			    	    .draw();
+			        t.row.add( [
+			            1,
+			            $("#Departement").find(":selected").text(),
+			            'Automatic after submit',
+			            counter +'.4',
+			            counter +'.5',
+			            $("#Year").find(":selected").text(),
+			            counter +'.7',
+			        ] ).draw( false );
+			 
+			        counter++;
+			    } );
+			 
+			    // Automatically add a first row of data
+			    // $('#addRow').click();
+
 		}).fail(function() {
 		  toastr.info('No Result Data'); 
 		}).always(function() {
