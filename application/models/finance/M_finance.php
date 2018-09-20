@@ -1246,16 +1246,13 @@ class M_finance extends CI_Model {
       $ta1 = $ta[1];
     }
 
-    $policyStatus = 'and a.Status = "0"';
-    if ($this->session->userdata('finance_auth_Policy_SYS') ==  0) {
-      $policyStatus = '';
-    }
+    $Status = 'and a.Status = "0"';
 
     if ($ta1 == '') {
       $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and c.ID = ? '.$policyStatus.' order by a.Status asc LIMIT '.$start. ', '.$limit;
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and c.ID = ? '.$Status.' order by a.Status asc LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array($SemesterID))->result_array();
 
     }
@@ -1264,7 +1261,7 @@ class M_finance extends CI_Model {
       $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? and c.ID = ? '.$policyStatus.' order by a.Status asc LIMIT '.$start. ', '.$limit;
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? and c.ID = ? '.$Status.' order by a.Status asc LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
     }
 
