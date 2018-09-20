@@ -207,8 +207,6 @@
                 toastr.success(data.msg, 'Success!');
                 var divHtml = $("#schedule");
                 loadDataSchedule(divHtml,'<?php echo $dateDay ?>');
-                $('#GlobalModalLarge').modal('hide');
-
                 // send notification other school from client
                 var socket = io.connect( 'http://'+window.location.hostname+':3000' );
                 // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
@@ -224,6 +222,7 @@
                 toastr.error(data.msg, 'Failed!!');
               }
               $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
+              $('#GlobalModalLarge').modal('hide');
 
             },
             error: function (data) {
