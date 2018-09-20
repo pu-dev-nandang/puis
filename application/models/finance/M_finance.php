@@ -975,7 +975,7 @@ class M_finance extends CI_Model {
     if ($prodi == '') {
      $sql = 'select count(*) as total from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
              on a.ProdiID = c.ProdiID
-             where a.StatusStudentID in (3,2,7)  and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
+             where a.StatusStudentID in (3,2,8)  and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
              and b.Pay_Cond = c.Pay_Cond order by a.NPM asc';
      $Data_mhs=$this->db->query($sql, array($PTID,$SemesterID[0]['ID'],$ta,$PTID))->result_array();
     }
@@ -983,7 +983,7 @@ class M_finance extends CI_Model {
     {
       $sql = 'select count(*) as total from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
               on a.ProdiID = c.ProdiID
-              where a.StatusStudentID in (3,2,7)  and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
+              where a.StatusStudentID in (3,2,8)  and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
                and b.Pay_Cond = c.Pay_Cond order by a.NPM asc';
       $Data_mhs=$this->db->query($sql, array($prodi,$PTID,$SemesterID[0]['ID'],$ta,$PTID))->result_array();
     }
@@ -1012,7 +1012,7 @@ class M_finance extends CI_Model {
     if ($prodi == '') {
      $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit,c.Cost from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
              on a.ProdiID = c.ProdiID
-             where a.StatusStudentID in (3,2,7)  and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
+             where a.StatusStudentID in (3,2,8)  and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
              and b.Pay_Cond = c.Pay_Cond order by a.NPM asc
              LIMIT '.$start. ', '.$limit;
      $Data_mhs=$this->db->query($sql, array($PTID,$SemesterID[0]['ID'],$ta,$PTID))->result_array();
@@ -1021,7 +1021,7 @@ class M_finance extends CI_Model {
     {
       $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit,c.Cost from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
               on a.ProdiID = c.ProdiID
-              where a.StatusStudentID in (3,2,7)  and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
+              where a.StatusStudentID in (3,2,8)  and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
                and b.Pay_Cond = c.Pay_Cond order by a.NPM asc 
               LIMIT '.$start. ', '.$limit;
       $Data_mhs=$this->db->query($sql, array($prodi,$PTID,$SemesterID[0]['ID'],$ta,$PTID))->result_array();
@@ -2611,7 +2611,7 @@ class M_finance extends CI_Model {
     $queryAdd = '';
     if ($prodi == '') {
      $sql = 'select count(*) as total from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM
-             where a.StatusStudentID in (3,2,7)   '.$NPM.$queryAdd.'
+             where a.StatusStudentID in (3,2,8)   '.$NPM.$queryAdd.'
              order by a.NPM asc';
       // print_r($sql);       
      $Data_mhs=$this->db->query($sql, array())->result_array();
@@ -2619,7 +2619,7 @@ class M_finance extends CI_Model {
     else
     {
       $sql = 'select count(*) as total from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM 
-              where a.StatusStudentID in (3,2,7)  and a.ProdiID = ? '.$NPM.$queryAdd.'
+              where a.StatusStudentID in (3,2,8)  and a.ProdiID = ? '.$NPM.$queryAdd.'
               order by a.NPM asc';
       $Data_mhs=$this->db->query($sql, array($prodi))->result_array();
     }
@@ -2643,7 +2643,7 @@ class M_finance extends CI_Model {
     $queryAdd = '';
     if ($prodi == '') {
      $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM
-             where a.StatusStudentID in (3,2,7)   '.$NPM.$queryAdd.'
+             where a.StatusStudentID in (3,2,8)   '.$NPM.$queryAdd.'
              order by a.NPM asc
              LIMIT '.$start. ', '.$limit;
       // print_r($sql);       
@@ -2652,7 +2652,7 @@ class M_finance extends CI_Model {
     else
     {
       $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM 
-              where a.StatusStudentID in (3,2,7)  and a.ProdiID = ? '.$NPM.$queryAdd.'
+              where a.StatusStudentID in (3,2,8)  and a.ProdiID = ? '.$NPM.$queryAdd.'
               order by a.NPM asc 
               LIMIT '.$start. ', '.$limit;
       $Data_mhs=$this->db->query($sql, array($prodi))->result_array();
@@ -2801,7 +2801,7 @@ class M_finance extends CI_Model {
       // print_r($ta1);
 
       // get Data Mahasiswa
-      $sql = 'select a.NPM,a.Name,b.NameEng from ta_'.$ta1.'.students as a join db_academic.program_study as b on a.ProdiID = b.ID where StatusStudentID in (3,2,7) '.$NIM.$prodi;
+      $sql = 'select a.NPM,a.Name,b.NameEng from ta_'.$ta1.'.students as a join db_academic.program_study as b on a.ProdiID = b.ID where StatusStudentID in (3,2,8) '.$NIM.$prodi;
       $query=$this->db->query($sql, array())->result_array();
       // print_r($query);
       for ($u=0; $u < count($query); $u++) { 

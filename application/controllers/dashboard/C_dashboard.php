@@ -129,7 +129,7 @@ class C_dashboard extends Globalclass {
                 $a_Unpaid_Off = 0;
                 $a_unsetPaid = 0;
                     // get Data Mahasiswa
-                    $sql = 'select a.NPM,a.Name,b.NameEng from '.$arrDB[$i].'.students as a join db_academic.program_study as b on a.ProdiID = b.ID where a.StatusStudentID in (3,2,7) ';
+                    $sql = 'select a.NPM,a.Name,b.NameEng from '.$arrDB[$i].'.students as a join db_academic.program_study as b on a.ProdiID = b.ID where a.StatusStudentID in (3,2,8) ';
                     $query=$this->db->query($sql, array())->result_array();
                     for ($u=0; $u < count($query); $u++) { 
 
