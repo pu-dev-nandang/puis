@@ -373,15 +373,15 @@ class C_transaksi extends Vreservation_Controler {
                     
                 }
 
-                // email notification to markom
-                $exFile =explode(';', $filenamemarkomm);
-                $MarkomSupport = '<ul>';
-                for ($m=0; $m < count($exFile); $m++) { 
-                    $MarkomSupport .= '<li>'.'<a href="'.base_url("fileGetAny/vreservation-".$exFile[$m]).'" target="_blank"></i>'.$exFile[$m].'</a></li>';
-                }
+                if (array_key_exists('fileDataMarkomm',$_FILES)) {
+                    // email notification to markom
+                    $exFile =explode(';', $filenamemarkomm);
+                    $MarkomSupport = '<ul>';
+                    for ($m=0; $m < count($exFile); $m++) { 
+                        $MarkomSupport .= '<li>'.'<a href="'.base_url("fileGetAny/vreservation-".$exFile[$m]).'" target="_blank"></i>'.$exFile[$m].'</a></li>';
+                    }
+                    $MarkomSupport .= '</ul></li>';
 
-                $MarkomSupport .= '</ul></li>';
-                if ($filenamemarkomm != '') {
                     if($_SERVER['SERVER_NAME']!='localhost') {
                           $getDataDB = $this->m_master->caribasedprimary('db_reservation.email_to','Ownership','Markom');
                           $Email = $getDataDB[0]['Email'];
