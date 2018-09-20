@@ -861,6 +861,7 @@ $route['budgeting/page/loadCodePrefix'] = 'page/budgeting/c_budgeting/loadCodePr
 $route['budgeting/save_codeprefix'] = 'page/budgeting/c_budgeting/save_codeprefix';
 $route['budgeting/page/LoadSetPostDepartement'] = 'page/budgeting/c_budgeting/LoadSetPostDepartement';
 $route['budgeting/page/LoadInputsetPostDepartement'] = 'page/budgeting/c_budgeting/LoadInputsetPostDepartement';
+$route['budgeting/getPostDepartement'] = 'page/budgeting/c_budgeting/getPostDepartement';
 
 
 

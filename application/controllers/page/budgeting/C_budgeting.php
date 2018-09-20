@@ -578,5 +578,13 @@ class C_budgeting extends Budgeting_Controler {
         echo json_encode($arr_result);
     }
 
+    public function getPostDepartement()
+    {
+         $this->auth_ajax();
+         $input = $this->getInputToken();
+         $getData = $this->m_budgeting->getPostDepartement($input['Year'],$input['Departement']);
+         echo json_encode($getData);
+    }
+
 
 }

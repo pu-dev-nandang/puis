@@ -42,7 +42,7 @@ class M_budgeting extends CI_Model {
                 $tget = $this->m_master->caribasedprimary('db_employees.division','ID',$exp[1]);
                 $Departement = $tget[0]['Description'].' ('.$tget[0]['Division'].')';
             }
-            elseif ($exp[0] == 'A') {
+            elseif ($exp[0] == 'AC') {
                 $tget = $this->m_master->caribasedprimary('db_academic.program_study','ID',$exp[1]);
                 $Departement = $tget[0]['NameEng'];
             }
@@ -124,5 +124,27 @@ class M_budgeting extends CI_Model {
         }
 
         return $Code;
+    }
+
+    public function getPostDepartement($Year,$Departement)
+    {
+        $arr_result = array();
+        $DepartementCode = $Departement;
+        $exp = explode('.', $Departement);
+        if ($exp[0] == 'NA') { // Non Academic
+            $tget = $this->m_master->caribasedprimary('db_employees.division','ID',$exp[1]);
+            $Departement = $tget[0]['Description'].' ('.$tget[0]['Division'].')';
+        }
+        elseif ($exp[0] == 'AC') {
+            $tget = $this->m_master->caribasedprimary('db_academic.program_study','ID',$exp[1]);
+            $Departement = $tget[0]['NameEng'];
+        }
+        $sql = 'select a.CodePostBudget,a.CodeSubPost,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
+                from db_budgeting.cfg_set_post as a join db_budgeting.cfg_postrealisasi as b on a.CodeSubPost = b.CodePostRealisasi
+                join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
+                where a.Year = ? and b.Departement = ?
+                ';
+        $query=$this->db->query($sql, array($Year,$DepartementCode))->result_array();
+                
     }
 }

@@ -99,7 +99,7 @@
 		var Export = '<div class="col-lg-3 col-md-3 col-xs-6">'+
 							'<h4 class="header"><i class="icon-reorder"></i> Export</h4>'+
 							'<div class="col-xs-12">'+
-								'<button class = "btn btn-default"><i class="fa fa-download" aria-hidden="true"></i> Excel</button>'+
+								'<button class = "btn btn-default"><i class="fa fa-download" aria-hidden="true"></i> Excel</button>&nbsp'+
 								'<button class = "btn btn-default"><i class="fa fa-download" aria-hidden="true"></i> PDF</button>'+
 							'</div>'+
 					 '</div>';	      
@@ -130,7 +130,20 @@
 									'</tr></thead>'	
 							;
 		TableGenerate += '<tbody>';
-
-		$("#loadPageTable").html(setLastYear+'<br>'+TableGenerate);
+		var data = {
+		    Year : Year,
+			Departement : Departement,
+		};
+		var token = jwt_encode(data,'UAP)(*');
+		$.post(url,{token:token},function (resultJson) {
+			var response = jQuery.parseJSON(resultJson);
+			
+			$("#loadPageTable").html(setLastYear+'<br>'+TableGenerate);
+		}).fail(function() {
+		  toastr.info('No Result Data'); 
+		}).always(function() {
+		                
+		});	
+		
 	}
 </script>
