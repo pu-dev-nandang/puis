@@ -641,7 +641,7 @@ class C_budgeting extends Budgeting_Controler {
 
                    $tbl = 'db_budgeting.cfg_postrealisasi';
                    $fieldCode = 'CodePostRealisasi';
-                   $ValueCode = $CodePostBudget;
+                   $ValueCode = $input['CodeSubPost'];
                    $this->m_budgeting->makeCanBeDelete($tbl,$fieldCode,$ValueCode);
                 }
                 break;
@@ -687,17 +687,25 @@ class C_budgeting extends Budgeting_Controler {
                 }
                 break;
             case 'delete':
-                $CodePostRealisasi = $input['CDID'];
-                $sql = 'select * from db_budgeting.cfg_postrealisasi where CodePostRealisasi = ? and Active = 1';
-                $query=$this->db->query($sql, array($CodePostRealisasi))->result_array();
+                $CodePostBudget = $input['CodePostBudget'];
+                $sql = 'select * from db_budgeting.cfg_set_post where CodePostBudget = ? and Active = 1';
+                $query=$this->db->query($sql, array($CodePostBudget))->result_array();
                 $Status = $query[0]['Status']; // check can be delete
                    if ($Status == 1) {
                        $dataSave = array(
                            'Active' => 0
                        );
-                       $this->db->where('CodePostRealisasi', $CodePostRealisasi);
+                       $this->db->where('CodePostBudget', $CodePostBudget);
                        $this->db->where('Active', 1);
-                       $this->db->update('db_budgeting.cfg_postrealisasi', $dataSave);
+                       $this->db->update('db_budgeting.cfg_set_post', $dataSave);
+
+                       $dataSave = array(
+                           'CodePostBudget' => $CodePostBudget,
+                           'Time' => date('Y-m-d H:i:s'),
+                           'ActionBy' => $this->session->userdata('NIP'),
+                           'Detail' => json_encode(array('action' => 'Delete')),
+                       );
+                       $this->db->insert('db_budgeting.log_cfg_set_post', $dataSave);
                    }
                    else
                    {
@@ -710,6 +718,16 @@ class C_budgeting extends Budgeting_Controler {
         }
 
         echo json_encode($Msg);
+    }
+
+    public function getBudgetLastYearByCode()
+    {
+        $this->auth_ajax();
+        $input = $this->getInputToken();
+        $LastYear = $input['Year'] - 1;
+        $sql = 'select Budget from db_budgeting.cfg_set_post where CodeSubPost = ? and Year = ? and Active = 1 limit 1';
+        $query=$this->db->query($sql, array($input['CodePostRealisasi'],$LastYear))->result_array();
+        echo json_encode($query);
     }
 
 

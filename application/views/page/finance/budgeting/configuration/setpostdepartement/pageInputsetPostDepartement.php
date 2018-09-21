@@ -34,7 +34,7 @@
 			<div class="col-xs-6">
 				<div class="form-group">
 					<label>Departement</label>
-					<select class="select2-select-00 full-width-fix" id="Departement">
+					<select class="select2-select-00 full-width-fix" id="DepartementPost">
 					     <!-- <option></option> -->
 					 </select>
 				</div>	
@@ -84,18 +84,18 @@
 	function getAllDepartementPU()
 	{
 	  var url = base_url_js+"api/__getAllDepartementPU";
-	  $('#Departement').empty();
+	  $('#DepartementPost').empty();
 	  $.post(url,function (data_json) {
 	    for (var i = 0; i < data_json.length; i++) {
 	        var selected = (i==0) ? 'selected' : '';
-	        $('#Departement').append('<option value="'+ data_json[i]['Code']  +'" '+selected+'>'+data_json[i]['Name2']+'</option>');
+	        $('#DepartementPost').append('<option value="'+ data_json[i]['Code']  +'" '+selected+'>'+data_json[i]['Name2']+'</option>');
 	    }
 	   
-	    $('#Departement').select2({
+	    $('#DepartementPost').select2({
 	       //allowClear: true
 	    });
 
-	    $("#Departement").change(function(){
+	    $("#DepartementPost").change(function(){
 	    	loadPageTable();
 	    })
 
@@ -108,7 +108,7 @@
 	{
 		var Year = $("#Year").val();
 		// console.log(Year);
-		var Departement = $("#Departement").val();
+		var Departement = $("#DepartementPost").val();
 		var url = base_url_js+"budgeting/getDomPostDepartement";
 
 		$("#loadPageTable").empty();
@@ -185,7 +185,7 @@
 
 				TableGenerate += '<tr '+BG+'>'+
 									'<td width = "3%">'+ (parseInt(i) + 1)+'</td>'+
-									'<td>'+ $("#Departement").find(":selected").text()+'</td>'+
+									'<td>'+ $("#DepartementPost").find(":selected").text()+'</td>'+
 									'<td>'+ CodePostBudget+'</td>'+
 									'<td>'+ dataDB[i].CodePostRealisasi+'<br>'+dataDB[i].PostName+'-'+dataDB[i].RealisasiPostName+'</td>'+
 									'<td>'+ $("#Year").find(":selected").text()+'</td>'+
@@ -215,7 +215,7 @@
 			    // 	    .draw();
 			    //     t.row.add( [
 			    //         1,
-			    //         $("#Departement").find(":selected").text(),
+			    //         $("#DepartementPost").find(":selected").text(),
 			    //         'Automatic after submit',
 			    //         counter +'.4',
 			    //         $("#Year").find(":selected").text(),
@@ -242,9 +242,114 @@
 
 	function EventButtonAction()
 	{
+		$('#tableData3 tbody').on('click', '.getBudgetLastYear', function () {
+			var CodePostRealisasi = $(this).attr('CodePostRealisasi');
+			var trno = $(this).attr('trno');
+			if (confirm("Are you sure?") == true) {
+				loadingStart();
+				var url =base_url_js+'budgeting/getBudgetLastYearByCode';
+				var data = {
+				          CodePostRealisasi : CodePostRealisasi,
+				          Year : $("#Year").val(),
+				      };
+				var token = jwt_encode(data,'UAP)(*');
+				$.post(url,{token:token},function (data_json) {
+					var response = jQuery.parseJSON(data_json);
+					if(response.length > 0)
+					{
+						var input = '<input type = "text" class = "form-control BudgetInput'+CodePostRealisasi+'">';
+						var Cost = response[0]['Budget'];
+				         var n = Cost.indexOf(".");
+				         var Cost = Cost.substring(0, n);
+
+						var input = '<input type = "text" class = "form-control BudgetInput'+CodePostRealisasi+'">';
+						$('.Budget'+CodePostRealisasi).html(input);
+						$('.BudgetInput'+CodePostRealisasi).val(Cost);
+						$('.BudgetInput'+CodePostRealisasi).maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+						$('.BudgetInput'+CodePostRealisasi).maskMoney('mask', '9894');
+
+						var ActionSave = '<button class="btn btn-primary btn-save'+CodePostRealisasi+'"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>';
+						$(".No"+trno).html(ActionSave);
+						$('.BudgetInput'+CodePostRealisasi).focus(); 
+
+						$(".btn-save"+CodePostRealisasi).click(function(){
+							var getBudget = $('.BudgetInput'+CodePostRealisasi).val();
+							for(i = 0; i <getBudget.length; i++) {
+							 
+							 getBudget = getBudget.replace(".", "");
+							 
+							}
+
+							var Year = $("#Year").val();
+							if (confirm("Are you sure?") == true) {
+								loadingStart();
+								var url =base_url_js+'budgeting/save-setpostdepartement';
+								var data = {
+								          CodeSubPost : CodePostRealisasi,
+								          Year : Year,
+								          Budget : getBudget,
+								          Action : 'add'
+								      };
+								var token = jwt_encode(data,'UAP)(*');
+								$.post(url,{token:token},function (data_json) {
+									var response = jQuery.parseJSON(data_json);
+									if (response == '') {
+									    toastr.success('Data berhasil disimpan', 'Success!');
+									}
+									else
+									{
+									    toastr.error(response, 'Failed!!');
+									}
+							        loadPageTable();
+									loadingEnd(500)
+								});
+							}
+							else
+							{
+								loadPageTable();
+							}
+						})
+					} // if response length
+					else
+					{
+						toastr.info('The data last year unavailable');
+					}
+					loadingEnd(500)
+				});
+			}
+			else
+			{
+				loadPageTable();
+			}	
+		});
 
 		$('#tableData3 tbody').on('click', '.btn-delete-postbudget', function () {
 			var CodePostBudget = $(this).attr('CodePostBudget');
+			if (confirm("Are you sure?") == true) {
+				loadingStart();
+				var url =base_url_js+'budgeting/save-setpostdepartement';
+				var data = {
+				          CodePostBudget : CodePostBudget,
+				          Action : 'delete'
+				      };
+				var token = jwt_encode(data,'UAP)(*');
+				$.post(url,{token:token},function (data_json) {
+					var response = jQuery.parseJSON(data_json);
+					if (response == '') {
+					    toastr.success('Data berhasil disimpan', 'Success!');
+					}
+					else
+					{
+					    toastr.error(response, 'Failed!!');
+					}
+			        loadPageTable();
+					loadingEnd(500)
+				});
+			}
+			else
+			{
+				loadPageTable();
+			}
 			
 		});	
 

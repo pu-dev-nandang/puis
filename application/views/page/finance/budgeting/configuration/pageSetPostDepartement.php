@@ -10,10 +10,10 @@
                         <a href="javascript:void(0)" class="pageAnchor" page = "InputPostDepartement">Input</a>
                     </li>
                     <li class="">
-                        <a href="javascript:void(0)" class="pageAnchor" page = "ExportPostDepartement">Export</a>
+                        <a href="javascript:void(0)" class="pagePostDepartement" page = "LogPostDepartement">Log</a>
                     </li>
                     <li class="">
-                        <a href="javascript:void(0)" class="pagePostDepartement" page = "LogPostDepartement">Log</a>
+                        <a href="javascript:void(0)" class="pageAnchor" page = "ExportPostDepartement">Export</a>
                     </li>
                 </ul>
                 <div style="padding-top: 30px;border-top: 1px solid #cccccc">

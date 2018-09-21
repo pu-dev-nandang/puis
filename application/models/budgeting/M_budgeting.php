@@ -168,7 +168,7 @@ class M_budgeting extends CI_Model {
         $arr_result = array();
         $get_Data = $this->m_master->caribasedprimary('db_budgeting.cfg_postrealisasi','Departement',$Departement);
         $sql = 'select a.CodePostBudget,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
-                from db_budgeting.cfg_postrealisasi as b left join (select * from db_budgeting.cfg_set_post where Year = ?) as a on a.CodeSubPost = b.CodePostRealisasi
+                from db_budgeting.cfg_postrealisasi as b left join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
                 join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
                 where b.Departement = ?
                 ';
@@ -181,7 +181,7 @@ class M_budgeting extends CI_Model {
     public function makeCanBeDelete($tbl,$fieldCode,$ValueCode)
     {
         $dataSave = array(
-            'Status' => 1,
+            'Status' => 0,
         );
         $this->db->where($fieldCode, $ValueCode);
         $this->db->update($tbl, $dataSave);
