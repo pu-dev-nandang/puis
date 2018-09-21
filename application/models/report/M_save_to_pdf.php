@@ -121,6 +121,24 @@ class M_save_to_pdf extends CI_Model {
                                                     WHERE exg.ExamID = "'.$data[$c]['ID'].'"
                                                      GROUP BY exg.ScheduleID ORDER BY s.ClassGroup ASC ')->result_array();
 
+
+
+                for($r=0;$r<count($dataC);$r++){
+                    // Detail Prodi
+                    $dataProdi = $this->db->query('SELECT ps.Code FROM db_academic.schedule_details_course sdc 
+                                                            LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
+                                                            WHERE sdc.ScheduleID = "'.$dataC[$r]['ScheduleID'].'"
+                                                            GROUP BY ps.ID ORDER BY ps.ID')->result_array();
+
+                    $prodi = '';
+                    for($p=0;$p<count($dataProdi);$p++){
+                        $del = ($p==0) ? '' : ', ';
+                        $prodi = $prodi.''.$del.''.''.$dataProdi[$p]['Code'];
+                    }
+                    $dataC[$r]['Prodi'] = $prodi;
+                }
+
+
                 $data[$c]['Course'] = $dataC;
             }
         }
@@ -170,6 +188,21 @@ class M_save_to_pdf extends CI_Model {
                         $dataC[$r]['DetailStudents'] = $dataStd;
 
                     }
+                }
+
+                for($r=0;$r<count($dataC);$r++){
+                    // Detail Prodi
+                    $dataProdi = $this->db->query('SELECT ps.Code FROM db_academic.schedule_details_course sdc 
+                                                            LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
+                                                            WHERE sdc.ScheduleID = "'.$dataC[$r]['ScheduleID'].'"
+                                                            GROUP BY ps.ID ORDER BY ps.ID')->result_array();
+
+                    $prodi = '';
+                    for($p=0;$p<count($dataProdi);$p++){
+                        $del = ($p==0) ? '' : ', ';
+                        $prodi = $prodi.''.$del.''.''.$dataProdi[$p]['Code'];
+                    }
+                    $dataC[$r]['Prodi'] = $prodi;
                 }
 
 
