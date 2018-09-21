@@ -4,6 +4,15 @@
     #tableShowExam>thead>tr>th, #tableExam>tbody>tr>td {
         text-align: center;
     }
+
+    #tableStudent thead tr th {
+        text-align: center;
+        background: #005975;
+        color: #ffffff;
+    }
+    #tableStudent tbody tr td {
+        text-align: center;
+    }
 </style>
 
 <div class="row">
@@ -97,6 +106,79 @@
         loadConfigLayout();
 
     });
+
+    // ==== Button Show Student ====
+
+    $(document).on('click','.btnShowDetailStdExam',function () {
+
+        var ExamID = $(this).attr('data-examid');
+
+        var token = jwt_encode({action:'readDetailStudent', ExamID : ExamID},'UAP)(*');
+        var url = base_url_js+'api/__crudJadwalUjian';
+
+        $.post(url,{token:token},function (jsonResult) {
+            var dataHtml = '<div style="text-align:center;"><h3>--- Data not yet ---</h3></div>';
+            console.log(jsonResult);
+            if(jsonResult.length>0){
+
+                dataHtml = '<table class="table table-bordered" id="tableStudent">' +
+                    '    <thead>' +
+                    '    <tr>' +
+                    '        <th rowspan="2" style="width: 2%;">N0</th>' +
+                    '        <th rowspan="2">Name</th>' +
+                    '        <th colspan="2" style="width: 30%">Payment</th>' +
+                    '    </tr>' +
+                    '    <tr>' +
+                    '       <th style="width: 15%">BPP</th>' +
+                    '       <th style="width: 15%">Credit</th>' +
+                    '   </tr>' +
+                    '    </thead>' +
+                    '    <tbody id="dataMHSExam"></tbody>' +
+                    '</table>' +
+                    '';
+                $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                    '<h4 class="modal-title">Details Student</h4>');
+                $('#GlobalModal .modal-body').html(dataHtml);
+                $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+                var no_std = 1;
+                for(var i=0;i<jsonResult.length;i++){
+                    var d = jsonResult[i];
+
+                    var BPP = '<span style="color: #ff9800;" ><i class="fa fa-exclamation-triangle margin-right"></i> Unset</span>';
+                    var Credit = '<span style="color: #ff9800;" ><i class="fa fa-exclamation-triangle margin-right"></i> Unset</span>';
+
+                    if(d.DetailPayment.BPP.Status==1 || d.DetailPayment.BPP.Status=='1'){
+                        BPP = '<span style="color: green;"><i class="fa fa-check-circle margin-right"></i> Paid</span>';
+                    } else if(d.DetailPayment.BPP.Status==0 || d.DetailPayment.BPP.Status=='0'){
+                        BPP = '<span style="color:red;"><i class="fa fa-times-circle margin-right"></i> Unpaid</span>';
+                    }
+
+                    if(d.DetailPayment.Credit.Status==1 || d.DetailPayment.Credit.Status=='1'){
+                        Credit = '<span style="color: green;"><i class="fa fa-check-circle margin-right"></i> Paid</span>';
+                    } else if(d.DetailPayment.Credit.Status==0 || d.DetailPayment.Credit.Status=='0'){
+                        Credit = '<span style="color:red;"><i class="fa fa-times-circle margin-right"></i> Unpaid</span>';
+                    }
+
+                    $('#dataMHSExam').append('<tr>' +
+                        '<td>'+(no_std++)+'</td>' +
+                        '<td style="text-align: left;"><b>'+d.Name+'</b><br/>'+d.NPM+'</td>' +
+                        '<td>'+BPP+'</td>' +
+                        '<td>'+Credit+'</td>' +
+                        '</tr>');
+                }
+
+                $('#GlobalModal').modal({
+                    'show' : true,
+                    'backdrop' : 'static'
+                });
+
+            }
+
+        });
+    });
+
+    // ==========================
     
     function loadConfigLayout() {
 

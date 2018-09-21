@@ -1668,7 +1668,7 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div style="text-align:center;">'.($no++).'</div>';
             $nestedData[] = $course;
             $nestedData[] = $p;
-            $nestedData[] = '<div style="text-align:center;">'.$totalStudent.'</div>';
+            $nestedData[] = '<div style="text-align:center;"><a href="javascript:void(0);" class="btnShowDetailStdExam" data-examid="'.$row['ID'].'">'.$totalStudent.'</a></div>';
             $nestedData[] = $act;
             $nestedData[] = '<div  style="text-align:center;">'.$exam_date.'<br/>'.$exam_time.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$exam_room.'</div>';
@@ -2874,6 +2874,11 @@ class C_api extends CI_Controller {
                     $data_arr['Type']
                 );
 
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='readDetailStudent'){
+                $ExamID = $data_arr['ExamID'];
+                $data = $this->m_api->getExamStudent($ExamID);
                 return print_r(json_encode($data));
             }
 

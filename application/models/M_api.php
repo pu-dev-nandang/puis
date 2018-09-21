@@ -3444,4 +3444,19 @@ class M_api extends CI_Model {
         return $data;
     }
 
+    public function getExamStudent($ExamID){
+        $dataExamDetail = $this->db->query('SELECT exd.*,ex.SemesterID, aut.Name FROM db_academic.exam_details exd 
+                                                      LEFT JOIN db_academic.exam ex ON (ex.ID = exd.ExamID)
+                                                      LEFT JOIN db_academic.auth_students aut ON (aut.NPM = exd.NPM)
+                                                      WHERE exd.ExamID = "'.$ExamID.'" ')->result_array();
+        if(count($dataExamDetail)>0){
+            for($i=0;$i<count($dataExamDetail);$i++){
+                $dataPayment = $this->m_rest->checkPayment($dataExamDetail[$i]['NPM'],$dataExamDetail[$i]['SemesterID']);
+                $dataExamDetail[$i]['DetailPayment'] = $dataPayment;
+            }
+        }
+
+        return $dataExamDetail;
+    }
+
 }
