@@ -126,11 +126,11 @@
                     '    <tr>' +
                     '        <th rowspan="2" style="width: 2%;">N0</th>' +
                     '        <th rowspan="2">Name</th>' +
-                    '        <th colspan="2" style="width: 30%">Payment</th>' +
+                    '        <th colspan="2" style="width: 40%">Payment</th>' +
                     '    </tr>' +
                     '    <tr>' +
-                    '       <th style="width: 15%">BPP</th>' +
-                    '       <th style="width: 15%">Credit</th>' +
+                    '       <th style="width: 20%">BPP</th>' +
+                    '       <th style="width: 20%">Credit</th>' +
                     '   </tr>' +
                     '    </thead>' +
                     '    <tbody id="dataMHSExam"></tbody>' +
