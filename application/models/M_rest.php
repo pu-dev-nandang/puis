@@ -467,6 +467,19 @@ class M_rest extends CI_Model {
         return $result;
     }
 
+    public function getAttendanceStudent($NPM,$ScheduleID){
+        $dataSD = $this->db->query('SELECT sd.ID FROM db_academic.schedule_details sd 
+                                              LEFT JOIN db_academic.schedule s ON (s.ID = sd.ScheduleID)
+                                              WHERE s.ID = "'.$ScheduleID.'" ')->result_array();
+
+        if(count($dataSD)>0){
+            for($s=0;$s<count($dataSD);$s++){
+
+            }
+        }
+
+    }
+
     public function newSystem($data,$ProdiID){
 
 
@@ -502,7 +515,6 @@ class M_rest extends CI_Model {
 
         return $data;
     }
-
 
     public function __geTimetable($NIP)
     {
