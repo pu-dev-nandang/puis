@@ -3,6 +3,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class M_api extends CI_Model {
 
+    function __construct()
+    {
+        parent::__construct();
+        $this->load->model('m_rest');
+    }
+
     public function getClassOf(){
         $data = $this->db->query('SELECT ast.Year FROM db_academic.auth_students ast 
                                                   GROUP BY ast.Year');

@@ -276,7 +276,8 @@ class M_rest extends CI_Model {
                         }
 
                     }
-                } else {
+                }
+                else {
                     // Cek apakah BPP dan SKS sudah terbayar
                     $dataPayment = $this->checkPayment($NPM,$dataSemester[$i]['ID']);
                     if($dataPayment['BPP']['Status']==1 && $dataPayment['Credit']['Status']==1){
@@ -421,7 +422,7 @@ class M_rest extends CI_Model {
 
     }
 
-    private function checkPayment($NPM,$SemesterID){
+    public function checkPayment($NPM,$SemesterID){
         // BPP
         $dataBpp = $this->db->select('Status')->get_where('db_finance.payment',
             array('NPM'=>$NPM,'PTID' => 2, 'SemesterID' => $SemesterID),1)->result_array();

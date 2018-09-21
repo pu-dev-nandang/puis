@@ -3,6 +3,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class M_save_to_pdf extends CI_Model {
 
+    function __construct()
+    {
+        parent::__construct();
+        $this->load->model('m_rest');
+    }
+
 
     public function getScheduleByDay($SemesterID,$DayID,$dateNow){
 
@@ -171,45 +177,84 @@ class M_save_to_pdf extends CI_Model {
                                                      GROUP BY exg.ScheduleID ORDER BY s.ClassGroup ASC ')->result_array();
 
                 if(count($dataC)>0){
+
+                    // Get Prodi
+                    for($r=0;$r<count($dataC);$r++){
+                        // Detail Prodi
+                        $dataProdi = $this->db->query('SELECT ps.Code FROM db_academic.schedule_details_course sdc 
+                                                            LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
+                                                            WHERE sdc.ScheduleID = "'.$dataC[$r]['ScheduleID'].'"
+                                                            GROUP BY ps.ID ORDER BY ps.ID')->result_array();
+
+                        $prodi = '';
+                        for($p=0;$p<count($dataProdi);$p++){
+                            $del = ($p==0) ? '' : ', ';
+                            $prodi = $prodi.''.$del.''.''.$dataProdi[$p]['Code'];
+                        }
+                        $dataC[$r]['Prodi'] = $prodi;
+                    }
+
+
+
+                    // Get Students
                     for($r=0;$r<count($dataC);$r++){
                         $dataStd = $this->db->query('SELECT NPM,DB_Students FROM db_academic.exam_details exd 
                                                         WHERE exd.ExamID = "'.$data[$c]['ID'].'" 
                                                         AND exd.ScheduleID = "'.$dataC[$r]['ScheduleID'].'"
                                                          ORDER BY exd.NPM ASC ')->result_array();
 
+                        $arr_student = [];
                         if(count($dataStd)>0){
                             for($st=0;$st<count($dataStd);$st++){
-                                $dataStdName = $this->db->select('Name')->get_where($dataStd[$st]['DB_Students'].'.students',
+                                $arr = [];
+                                $dataStdName = $this->db->select('Name,ClassOf')->get_where($dataStd[$st]['DB_Students'].'.students',
                                     array('NPM' => $dataStd[$st]['NPM']),1)->result_array();
-                                $dataStd[$st]['Name'] = $dataStdName[0]['Name'];
+
+                                // Cek Semester
+                                $dataSemester = $this->m_rest->checkSemesterByClassOf($dataStdName[0]['ClassOf'],$SemesterID);
+
+                                if($dataSemester==1 || $dataSemester=='1'){
+                                    $arr = array(
+                                        'NPM' => $dataStd[$st]['NPM'],
+                                        'Name' => $dataStdName[0]['Name'],
+                                        'DB_Students' => $dataStd[$st]['DB_Students'],
+                                    );
+                                } else {
+                                  // Cek Pembayaran
+                                    $dataPayment = $this->m_rest->checkPayment($dataStd[$st]['NPM'],$SemesterID);
+                                    if($dataPayment['BPP']['Status']==1 && $dataPayment['Credit']['Status']==1){
+                                        $arr = array(
+                                            'NPM' => $dataStd[$st]['NPM'],
+                                            'Name' => $dataStdName[0]['Name'],
+                                            'DB_Students' => $dataStd[$st]['DB_Students'],
+                                        );
+                                    }
+                                }
+
+                                if(isset($arr['NPM'])){
+                                    array_push($arr_student,$arr);
+                                }
+
                             }
                         }
 
-                        $dataC[$r]['DetailStudents'] = $dataStd;
+                        $dataC[$r]['DetailStudents'] = $arr_student;
 
                     }
+
+
                 }
 
-                for($r=0;$r<count($dataC);$r++){
-                    // Detail Prodi
-                    $dataProdi = $this->db->query('SELECT ps.Code FROM db_academic.schedule_details_course sdc 
-                                                            LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
-                                                            WHERE sdc.ScheduleID = "'.$dataC[$r]['ScheduleID'].'"
-                                                            GROUP BY ps.ID ORDER BY ps.ID')->result_array();
 
-                    $prodi = '';
-                    for($p=0;$p<count($dataProdi);$p++){
-                        $del = ($p==0) ? '' : ', ';
-                        $prodi = $prodi.''.$del.''.''.$dataProdi[$p]['Code'];
-                    }
-                    $dataC[$r]['Prodi'] = $prodi;
-                }
 
 
 
                 $data[$c]['Course'] = $dataC;
             }
         }
+
+//        print_r($data);
+//        exit;
 
         return $data;
 
