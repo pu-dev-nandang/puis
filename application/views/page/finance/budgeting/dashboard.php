@@ -167,7 +167,7 @@
 		$("#pagetableDepartement").html(tbl);
 
 		$("#AllTotal").html(
-			'<div class = "col-md-2 col-md-offset-10" style = "background-color : #20485A; min-height : 50px;color: #FFFFFF;" align = "center"><h4>Total : '+formatRupiah(totalAll)+'</h4></div>'
+			'<div class = "col-md-3 col-md-offset-9" style = "background-color : #20485A; min-height : 50px;color: #FFFFFF;" align = "center"><h4>Total : '+formatRupiah(totalAll)+'</h4></div>'
 		);
 	}
 </script>

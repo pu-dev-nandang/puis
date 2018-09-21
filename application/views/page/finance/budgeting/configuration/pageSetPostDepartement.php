@@ -10,6 +10,9 @@
                         <a href="javascript:void(0)" class="pageAnchor" page = "InputPostDepartement">Input</a>
                     </li>
                     <li class="">
+                        <a href="javascript:void(0)" class="pageAnchor" page = "ExportPostDepartement">Export</a>
+                    </li>
+                    <li class="">
                         <a href="javascript:void(0)" class="pagePostDepartement" page = "LogPostDepartement">Log</a>
                     </li>
                 </ul>

@@ -5,6 +5,7 @@ class C_budgeting extends Budgeting_Controler {
     public $Msg = array(
             'Duplicate' => 'The data duplicate, Please check',
             'NotAction' => 'The data has been used for transaction, Cannot be action',
+            'Error' => 'Error connection',
     );
 
     public function __construct()
@@ -496,6 +497,11 @@ class C_budgeting extends Budgeting_Controler {
                        'CreatedAt' => date('Y-m-d'),
                    );
                    $this->db->insert('db_budgeting.cfg_postrealisasi', $dataSave);
+
+                   $tbl = 'db_budgeting.cfg_post';
+                   $fieldCode = 'CodePost';
+                   $ValueCode = $input['PostItem'];
+                   $this->m_budgeting->makeCanBeDelete($tbl,$fieldCode,$ValueCode);
                 }
                 break;
             case 'edit':
@@ -584,6 +590,126 @@ class C_budgeting extends Budgeting_Controler {
          $input = $this->getInputToken();
          $getData = $this->m_budgeting->getPostDepartement($input['Year'],$input['Departement']);
          echo json_encode($getData);
+    }
+
+    public function getDomPostDepartement()
+    {
+        $this->auth_ajax();
+        $input = $this->getInputToken();
+        $getDataForDom = $this->m_budgeting->getPostDepartementForDom($input['Year'],$input['Departement']);
+        echo json_encode($getDataForDom);
+    }
+
+    public function save_setpostdepartement()
+    {
+        $this->auth_ajax();
+        $input = $this->getInputToken();
+        $Msg = '';
+        switch ($input['Action']) {
+            case 'add':
+                $tbl = 'db_budgeting.cfg_set_post';
+                $fieldCode = 'CodePostBudget';
+                $CfgCode = $this->m_master->showData_array('db_budgeting.cfg_codeprefix');
+                $CodePostPrefix = $CfgCode[0]['CodePostBudget'];
+                $LengthCode = $CfgCode[0]['LengthCodePostBudget'];
+                $CodePostBudget = $this->m_budgeting->getTheCode($tbl,$fieldCode,$CodePostPrefix,$LengthCode,$input['Year']);
+
+                $sql = 'select * from db_budgeting.cfg_set_post where CodeSubPost = ? and Active = 1 and Year = ?';
+                $query=$this->db->query($sql, array($input['CodeSubPost'],$input['Year']))->result_array();
+                if (count($query) > 0) {
+                   $Msg = $this->Msg['Duplicate'];
+                }
+                else
+                {
+                   $dataSave = array(
+                       'CodePostBudget' => $CodePostBudget,
+                       'CodeSubPost' => $input['CodeSubPost'],
+                       'Year' => $input['Year'],
+                       'Budget' => $input['Budget'],
+                       'CreatedBy' => $this->session->userdata('NIP'),
+                       'CreatedAt' => date('Y-m-d'),
+                   );
+                   $this->db->insert('db_budgeting.cfg_set_post', $dataSave);
+
+                   $dataSave = array(
+                       'CodePostBudget' => $CodePostBudget,
+                       'Time' => date('Y-m-d H:i:s'),
+                       'ActionBy' => $this->session->userdata('NIP'),
+                       'Detail' => json_encode(array('action' => 'Created')),
+                   );
+                   $this->db->insert('db_budgeting.log_cfg_set_post', $dataSave);
+
+                   $tbl = 'db_budgeting.cfg_postrealisasi';
+                   $fieldCode = 'CodePostRealisasi';
+                   $ValueCode = $CodePostBudget;
+                   $this->m_budgeting->makeCanBeDelete($tbl,$fieldCode,$ValueCode);
+                }
+                break;
+            case 'edit':
+                $CodePostBudget = $input['CodePostBudget'];
+                $sql = 'select * from db_budgeting.cfg_set_post where CodePostBudget = ? and Active = 1';
+                $query=$this->db->query($sql, array($CodePostBudget))->result_array();
+                $Status = $query[0]['Status'];
+                if ($Status == 1) {
+                    try {
+                       $get = $this->m_master->caribasedprimary('db_budgeting.cfg_set_post','CodePostBudget',$CodePostBudget); 
+                       $time = date('Y-m-d H:i:s');
+                       $dataSave = array(
+                           'Budget' => $input['Budget'],
+                           'LastUpdateBy' => $this->session->userdata('NIP'),
+                           'LastUpdateAt' => $time,
+                       );
+                       $this->db->where('CodePostBudget', $CodePostBudget);
+                       $this->db->update('db_budgeting.cfg_set_post', $dataSave);
+
+                       $arr_detail = array(
+                            'Before' => array(
+                                   'Budget' => $get[0]['Budget'],
+                            ),
+                            'After' => array(
+                                'Budget' => $input['Budget'],
+                            ),    
+                       );
+                       $dataSave = array(
+                           'CodePostBudget' => $CodePostBudget,
+                           'Time' => $time,
+                           'ActionBy' => $this->session->userdata('NIP'),
+                           'Detail' => json_encode(array('action' => 'Edited','Detail' => $arr_detail)),
+                       );
+                       $this->db->insert('db_budgeting.log_cfg_set_post', $dataSave);
+                    } catch (Exception $e) {
+                         $Msg = $this->Msg['Error'];
+                    }   
+                }
+                else
+                {
+                    $Msg = $this->Msg['NotAction'];
+                }
+                break;
+            case 'delete':
+                $CodePostRealisasi = $input['CDID'];
+                $sql = 'select * from db_budgeting.cfg_postrealisasi where CodePostRealisasi = ? and Active = 1';
+                $query=$this->db->query($sql, array($CodePostRealisasi))->result_array();
+                $Status = $query[0]['Status']; // check can be delete
+                   if ($Status == 1) {
+                       $dataSave = array(
+                           'Active' => 0
+                       );
+                       $this->db->where('CodePostRealisasi', $CodePostRealisasi);
+                       $this->db->where('Active', 1);
+                       $this->db->update('db_budgeting.cfg_postrealisasi', $dataSave);
+                   }
+                   else
+                   {
+                       $Msg = $this->Msg['NotAction'];
+                   }
+                break;
+            default:
+                # code...
+                break;
+        }
+
+        echo json_encode($Msg);
     }
 
 

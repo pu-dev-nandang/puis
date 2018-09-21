@@ -95,6 +95,7 @@ class M_budgeting extends CI_Model {
         }
         else
         {
+            $Year = substr($Year, 2,2);
             $sql = 'select * from '.$tbl.' where '.$fieldCode.' like "'.$PrefixCode.$Year.'%" order by '.$fieldCode.' desc limit 1';
             $query=$this->db->query($sql, array())->result_array();
             if (count($query) == 1) {
@@ -105,10 +106,9 @@ class M_budgeting extends CI_Model {
                 $inc = $inc + 1;
                 $lenINC = strlen($inc);
                 $strINC = $inc;
-                for ($i=0; $i < $length-$lenINC-$strLenPrefix; $i++) { 
+                for ($i=0; $i < $length-$lenINC-$strLenPrefix-(strlen($Year)); $i++) { 
                     $strINC = '0'.$strINC;
                 }
-
                 $Code = $PrefixCode.$Year.'-'.$strINC;
             }
             elseif(count($query) == 0)
@@ -116,7 +116,7 @@ class M_budgeting extends CI_Model {
                $inc = 1;
                $lenINC = strlen($inc);
                $strINC = $inc;
-               for ($i=0; $i < $length-$lenINC-$strLenPrefix; $i++) { 
+               for ($i=0; $i < $length-$lenINC-$strLenPrefix-(strlen($Year)); $i++) { 
                    $strINC = '0'.$strINC;
                }
                $Code = $PrefixCode.$Year.'-'.$strINC; 
@@ -161,5 +161,29 @@ class M_budgeting extends CI_Model {
         }
 
         return $arr_result;       
+    }
+
+    public function getPostDepartementForDom($Year,$Departement)
+    {
+        $arr_result = array();
+        $get_Data = $this->m_master->caribasedprimary('db_budgeting.cfg_postrealisasi','Departement',$Departement);
+        $sql = 'select a.CodePostBudget,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
+                from db_budgeting.cfg_postrealisasi as b left join (select * from db_budgeting.cfg_set_post where Year = ?) as a on a.CodeSubPost = b.CodePostRealisasi
+                join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
+                where b.Departement = ?
+                ';
+        $query=$this->db->query($sql, array($Year,$Departement))->result_array();
+        $arr_result = array('data' => $query,'OpPostRealisasi' => $get_Data);
+        return $arr_result;
+
+    }
+
+    public function makeCanBeDelete($tbl,$fieldCode,$ValueCode)
+    {
+        $dataSave = array(
+            'Status' => 1,
+        );
+        $this->db->where($fieldCode, $ValueCode);
+        $this->db->update($tbl, $dataSave);
     }
 }

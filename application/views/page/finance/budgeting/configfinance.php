@@ -1,3 +1,4 @@
+<script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
 <div class="tabbable tabbable-custom tabbable-full-width btn-read menuConfig">
     <ul class="nav nav-tabs">
         <li class="<?php if($request==null || $request=='CodePrefix'){echo "active";} ?>">
