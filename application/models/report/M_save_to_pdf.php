@@ -213,21 +213,50 @@ class M_save_to_pdf extends CI_Model {
                                 // Cek Semester
                                 $dataSemester = $this->m_rest->checkSemesterByClassOf($dataStdName[0]['ClassOf'],$SemesterID);
 
+                                // Cek Attendace
+                                $dataAttendace = $this->m_rest->getAttendanceStudent($dataStd[$st]['NPM'],$dataC[$r]['ScheduleID']);
+
                                 if($dataSemester==1 || $dataSemester=='1'){
-                                    $arr = array(
-                                        'NPM' => $dataStd[$st]['NPM'],
-                                        'Name' => $dataStdName[0]['Name'],
-                                        'DB_Students' => $dataStd[$st]['DB_Students'],
-                                    );
-                                } else {
-                                  // Cek Pembayaran
-                                    $dataPayment = $this->m_rest->checkPayment($dataStd[$st]['NPM'],$SemesterID);
-                                    if($dataPayment['BPP']['Status']==1 && $dataPayment['Credit']['Status']==1){
+                                    if($Type=='uts' || $Type=='UTS'){
                                         $arr = array(
                                             'NPM' => $dataStd[$st]['NPM'],
                                             'Name' => $dataStdName[0]['Name'],
                                             'DB_Students' => $dataStd[$st]['DB_Students'],
                                         );
+                                    } else {
+                                        if(isset($dataAttendace['Percentage'])
+                                            && $dataAttendace['Percentage']!=null
+                                            && $dataAttendace['Percentage']!='' && round($dataAttendace['Percentage'])>=75){
+                                            $arr = array(
+                                                'NPM' => $dataStd[$st]['NPM'],
+                                                'Name' => $dataStdName[0]['Name'],
+                                                'DB_Students' => $dataStd[$st]['DB_Students'],
+                                            );
+                                        }
+                                    }
+
+                                } else {
+                                  // Cek Pembayaran
+                                    $dataPayment = $this->m_rest->checkPayment($dataStd[$st]['NPM'],$SemesterID);
+                                    if($dataPayment['BPP']['Status']==1 && $dataPayment['Credit']['Status']==1){
+                                        if($Type=='uts' || $Type=='UTS'){
+                                            $arr = array(
+                                                'NPM' => $dataStd[$st]['NPM'],
+                                                'Name' => $dataStdName[0]['Name'],
+                                                'DB_Students' => $dataStd[$st]['DB_Students'],
+                                            );
+                                        } else {
+                                            if(isset($dataAttendace['Percentage'])
+                                                && $dataAttendace['Percentage']!=null
+                                                && $dataAttendace['Percentage']!='' && round($dataAttendace['Percentage'])>=75){
+                                                $arr = array(
+                                                    'NPM' => $dataStd[$st]['NPM'],
+                                                    'Name' => $dataStdName[0]['Name'],
+                                                    'DB_Students' => $dataStd[$st]['DB_Students'],
+                                                );
+                                            }
+                                        }
+
                                     }
                                 }
 

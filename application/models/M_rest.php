@@ -467,6 +467,58 @@ class M_rest extends CI_Model {
         return $result;
     }
 
+    public function getAttendanceStudent($NPM,$ScheduleID){
+        $dataSD = $this->db->query('SELECT sd.ID AS SDID, s.SemesterID FROM db_academic.schedule_details sd 
+                                              LEFT JOIN db_academic.schedule s ON (s.ID = sd.ScheduleID)
+                                              WHERE s.ID = "'.$ScheduleID.'" ')->result_array();
+
+
+        $arrDataAttd = [];
+        if(count($dataSD)>0){
+            for($s=0;$s<count($dataSD);$s++){
+
+                // Get Attendance
+                $dataAttd = $this->db->query('SELECT attd_s.* FROM db_academic.attendance_students attd_s 
+                                                          LEFT JOIN db_academic.attendance attd ON (attd.ID = attd_s.ID_Attd)
+                                                          WHERE attd.SemesterID = "'.$dataSD[$s]['SemesterID'].'" 
+                                                          AND attd.ScheduleID = "'.$ScheduleID.'"
+                                                          AND attd.SDID = "'.$dataSD[$s]['SDID'].'"
+                                                           AND attd_s.NPM = "'.$NPM.'" ')->result_array();
+
+                array_push($arrDataAttd,$dataAttd);
+            }
+        }
+
+        $meeting = 0;
+        $Totalpresen = 0;
+        $Percentage = 0;
+
+        if(count($arrDataAttd)>0){
+
+            for($a=0;$a<count($arrDataAttd);$a++){
+                $dataAttd = $arrDataAttd[$a];
+                for($m=1;$m<=14;$m++){
+                    $meeting += 1;
+                    if($dataAttd[0]['M'.$m]=='1'){
+                        $Totalpresen += 1;
+                    }
+                }
+
+            }
+
+            $Percentage = ($Totalpresen==0) ? 0 : ($Totalpresen/$meeting) * 100;
+        }
+
+        $result = array(
+            'Session' => $meeting,
+            'TotalPresent' => $Totalpresen,
+            'Percentage' => $Percentage
+        );
+
+        return $result;
+
+    }
+
     public function newSystem($data,$ProdiID){
 
 
@@ -502,7 +554,6 @@ class M_rest extends CI_Model {
 
         return $data;
     }
-
 
     public function __geTimetable($NIP)
     {

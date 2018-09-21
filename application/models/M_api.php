@@ -3452,7 +3452,10 @@ class M_api extends CI_Model {
         if(count($dataExamDetail)>0){
             for($i=0;$i<count($dataExamDetail);$i++){
                 $dataPayment = $this->m_rest->checkPayment($dataExamDetail[$i]['NPM'],$dataExamDetail[$i]['SemesterID']);
+                $dataAttendance = $this->m_rest->getAttendanceStudent($dataExamDetail[$i]['NPM'],$dataExamDetail[$i]['ScheduleID']);
+
                 $dataExamDetail[$i]['DetailPayment'] = $dataPayment;
+                $dataExamDetail[$i]['DetailAttendance'] = $dataAttendance;
             }
         }
 

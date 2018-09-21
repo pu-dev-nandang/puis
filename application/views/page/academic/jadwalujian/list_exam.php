@@ -126,11 +126,12 @@
                     '    <tr>' +
                     '        <th rowspan="2" style="width: 2%;">N0</th>' +
                     '        <th rowspan="2">Name</th>' +
-                    '        <th colspan="2" style="width: 40%">Payment</th>' +
+                    '        <th rowspan="2" style="width: 13%;">Attd</th>' +
+                    '        <th colspan="2" style="width: 35">Payment</th>' +
                     '    </tr>' +
                     '    <tr>' +
-                    '       <th style="width: 20%">BPP</th>' +
-                    '       <th style="width: 20%">Credit</th>' +
+                    '       <th style="width: 17%">BPP</th>' +
+                    '       <th style="width: 17%">Credit</th>' +
                     '   </tr>' +
                     '    </thead>' +
                     '    <tbody id="dataMHSExam"></tbody>' +
@@ -160,9 +161,12 @@
                         Credit = '<span style="color:red;"><i class="fa fa-times-circle margin-right"></i> Unpaid</span>';
                     }
 
+                    var AttdPercentage = (typeof  d.DetailAttendance.Percentage !== undefined
+                        && d.DetailAttendance.Percentage!=null && d.DetailAttendance.Percentage!='') ? d.DetailAttendance.Percentage : 0;
                     $('#dataMHSExam').append('<tr>' +
                         '<td>'+(no_std++)+'</td>' +
                         '<td style="text-align: left;"><b>'+d.Name+'</b><br/>'+d.NPM+'</td>' +
+                        '<td>'+AttdPercentage.toFixed()+' %</td>' +
                         '<td>'+BPP+'</td>' +
                         '<td>'+Credit+'</td>' +
                         '</tr>');
