@@ -1152,13 +1152,15 @@ class C_save_to_pdf extends CI_Controller {
         $w_space = 17;
 
 
+        $course = (strlen($dataCourse['Course'])>=43) ? substr($dataCourse['Course'],0,43).'_': $dataCourse['Course'] ;
+
         $pdf->Cell($w_t,$h,'Course',0,0,'L');
         $pdf->Cell($w_pars,$h,':',0,0,'C');
-        $pdf->Cell($w_fill,$h,$dataCourse['Course'],0,0,'L');
+        $pdf->Cell($w_fill,$h,$dataCourse['MKCode'].' - '.$course,0,0,'L');
         $pdf->Cell($w_space,$h,'',0,0);
         $pdf->Cell($w_t,$h,'Course',0,0,'L');
         $pdf->Cell($w_pars,$h,':',0,0,'C');
-        $pdf->Cell($w_fill,$h,$dataCourse['Course'],0,1,'L');
+        $pdf->Cell($w_fill,$h,$dataCourse['MKCode'].' - '.$course,0,1,'L');
 
         $pdf->Cell($w_t,$h,'Class Group',0,0,'L');
         $pdf->Cell($w_pars,$h,':',0,0,'C');
@@ -1169,13 +1171,13 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_fill,$h,$dataCourse['ClassGroup'],0,1,'L');
 
 
-        $pdf->Cell($w_t,$h,'Code',0,0,'L');
+        $pdf->Cell($w_t,$h,'Study Program',0,0,'L');
         $pdf->Cell($w_pars,$h,':',0,0,'C');
-        $pdf->Cell($w_fill,$h,$dataCourse['MKCode'],0,0,'L');
+        $pdf->Cell($w_fill,$h,$dataCourse['Prodi'],0,0,'L');
         $pdf->Cell($w_space,$h,'',0,0);
-        $pdf->Cell($w_t,$h,'Code',0,0,'L');
+        $pdf->Cell($w_t,$h,'Study Program',0,0,'L');
         $pdf->Cell($w_pars,$h,':',0,0,'C');
-        $pdf->Cell($w_fill,$h,$dataCourse['MKCode'],0,1,'L');
+        $pdf->Cell($w_fill,$h,$dataCourse['Prodi'],0,1,'L');
 
 
 
@@ -1330,6 +1332,11 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_fill,$h,substr($dataDetailExam['ExamStart'],0,5).' - '.substr($dataDetailExam['ExamEnd'],0,5),0,1,'L');
 
         $pdf->Cell($w_sp1,$h,'',0,0,'L');
+        $pdf->Cell($w_label,$h,'Program Studi',0,0,'L');
+        $pdf->Cell($w_sp2,$h,':',0,0,'C');
+        $pdf->Cell($w_fill,$h,$dataCourse['Prodi'],0,1,'L');
+
+        $pdf->Cell($w_sp1,$h,'',0,0,'L');
         $pdf->Cell($w_label,$h,'Kelas (Group)',0,0,'L');
         $pdf->Cell($w_sp2,$h,':',0,0,'C');
         $pdf->Cell($w_fill,$h,$dataCourse['ClassGroup'],0,1,'L');
@@ -1386,7 +1393,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Ln(5);
 
         $pdf->Cell(195,$h,'Catatan khusus selama ujian berlangsung :',0,1,'L');
-        for($s=1;$s<=5;$s++){
+        for($s=1;$s<=4;$s++){
             $pdf->Cell(195,$h,'','B',1,'L');
         }
 
@@ -1445,20 +1452,20 @@ class C_save_to_pdf extends CI_Controller {
         $h = 5;
         $w_label_r = 22;
         $w_sp_r = 3;
-        $w_fill_r = 105;
+        $w_fill_r = 95;
 
-        $w_label_l = 18;
+        $w_label_l = 23;
         $w_sp_l = 3;
-        $w_fill_l = 45;
+        $w_fill_l = 50;
 
 
         $pdf->Cell($w_label_r,$h,'Code',0,0,'L');
         $pdf->Cell($w_sp_r,$h,':',0,0,'C');
         $pdf->Cell($w_fill_r,$h,$dataCourse['MKCode'],0,0,'L');
 
-        $pdf->Cell($w_label_l,$h,'',0,0,'L');
-        $pdf->Cell($w_sp_l,$h,'',0,0,'C');
-        $pdf->Cell($w_fill_l,$h,'',0,1,'L');
+        $pdf->Cell($w_label_l,$h,'Study Program',0,0,'L');
+        $pdf->Cell($w_sp_l,$h,':',0,0,'C');
+        $pdf->Cell($w_fill_l,$h,$dataCourse['Prodi'],0,1,'L');
 
         $dCourse = (strlen($dataCourse['Course'])>=50) ? substr($dataCourse['Course'],0,50).'_' : $dataCourse['Course'];
         $pdf->Cell($w_label_r,$h,'Course',0,0,'L');
@@ -1733,7 +1740,7 @@ class C_save_to_pdf extends CI_Controller {
                 $pdf->Cell(12,$h2,'',1,0,'C');
 
             } else {
-                $pdf->Cell(185,$h2,'',0,0,'C');
+                $pdf->Cell(128,$h2,'',0,0,'C');
             }
 
 
