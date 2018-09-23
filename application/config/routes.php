@@ -607,6 +607,8 @@ $route['api/__getScheduleExam'] = 'api/c_api/getScheduleExam';
 $route['api/__getScheduleExamWaitingApproval'] = 'api/c_api/getScheduleExamWaitingApproval';
 $route['api/__getScheduleExamLecturer'] = 'api/c_api/getScheduleExamLecturer';
 
+$route['api/__getListCourseInScore'] = 'api/c_api/getListCourseInScore';
+
 $route['api/__crudProgramCampus'] = 'api/c_api/crudProgramCampus';
 $route['api/__crudSemester'] = 'api/c_api/crudSemester';
 

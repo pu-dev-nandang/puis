@@ -2235,7 +2235,8 @@ class M_api extends CI_Model {
                                                                     LEFT JOIN db_academic.exam_details exd ON (ex.ID = exd.ExamID)
                                                                     LEFT JOIN db_academic.exam_group exg ON (ex.ID = exg.ExamID)
                                                                     WHERE exg.ScheduleID = "'.$ScheduleID.'"
-                                                                    AND exd.NPM = "'.$dataSt[$s]['NPM'].'" 
+                                                                    AND exd.NPM = "'.$dataSt[$s]['NPM'].'"
+                                                                    AND ex.Type = "'.$Type.'" 
                                                                     LIMIT 1')
                                             ->result_array();
 
