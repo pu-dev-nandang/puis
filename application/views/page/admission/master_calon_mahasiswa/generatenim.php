@@ -50,12 +50,13 @@
 	function loadTahunLulus()
 	{
 		var thisYear = (new Date()).getFullYear();
-		var startTahun = parseInt(thisYear) - parseInt(5);
-		var selisih = parseInt(thisYear) - parseInt(startTahun);
+		var startTahun = parseInt(thisYear);
+		var selisih = (2018 < parseInt(thisYear)) ? parseInt(1) + (parseInt(thisYear) - parseInt(2018)) : 1;
 		for (var i = 0; i <= selisih; i++) {
-		    var selected = (i==selisih) ? 'selected' : '';
+		    var selected = (i==1) ? 'selected' : '';
 		    $('#selectTa').append('<option value="'+ ( parseInt(startTahun) + parseInt(i) ) +'" '+selected+'>'+( parseInt(startTahun) + parseInt(i) )+'</option>');
 		}
+
 		$('#selectTa').select2({
 		  // allowClear: true
 		});
