@@ -3451,13 +3451,31 @@ class M_api extends CI_Model {
     }
 
     public function getExamStudent($ExamID){
-        $dataExamDetail = $this->db->query('SELECT exd.*,ex.SemesterID, aut.Name FROM db_academic.exam_details exd 
+        $dataExamDetail = $this->db->query('SELECT exd.*,ex.SemesterID, aut.Name, aut.Year FROM db_academic.exam_details exd 
                                                       LEFT JOIN db_academic.exam ex ON (ex.ID = exd.ExamID)
                                                       LEFT JOIN db_academic.auth_students aut ON (aut.NPM = exd.NPM)
                                                       WHERE exd.ExamID = "'.$ExamID.'" ')->result_array();
         if(count($dataExamDetail)>0){
             for($i=0;$i<count($dataExamDetail);$i++){
-                $dataPayment = $this->m_rest->checkPayment($dataExamDetail[$i]['NPM'],$dataExamDetail[$i]['SemesterID']);
+
+                // Cek Semester
+                $dataSemester = $this->m_rest->checkSemesterByClassOf($dataExamDetail[$i]['Year'],$dataExamDetail[$i]['SemesterID']);
+
+                if($dataSemester==1 || $dataSemester=='1'){
+                    $dataPayment = array(
+                        'BPP' => array(
+                            'Message' => 'BPP payment Paid',
+                            'Status' => 1
+                        ),
+                        'Credit' => array(
+                            'Message' => 'Credit payment unset, please contact academic service',
+                            'Status' => 1
+                        )
+                    );
+                } else {
+                    $dataPayment = $this->m_rest->checkPayment($dataExamDetail[$i]['NPM'],$dataExamDetail[$i]['SemesterID']);
+                }
+
                 $dataAttendance = $this->m_rest->getAttendanceStudent($dataExamDetail[$i]['NPM'],$dataExamDetail[$i]['ScheduleID']);
 
                 $dataExamDetail[$i]['DetailPayment'] = $dataPayment;

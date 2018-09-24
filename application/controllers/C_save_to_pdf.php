@@ -153,7 +153,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->AddPage();
 
-        $this->headerDefault($pdf);
+        $this->headerDefaultLanscape($pdf);
 
         $h = 5;
 
@@ -239,7 +239,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->AddPage();
 
-        $this->headerDefault($pdf);
+        $this->headerDefaultLanscape($pdf);
 
         $h = 5;
 
@@ -361,7 +361,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf = new FPDF('l','mm','A4');
 
         $pdf->AddPage();
-        $this->headerDefault($pdf);
+        $this->headerDefaultLanscape($pdf);
 
 
         $h = 4;
@@ -710,7 +710,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf = new FPDF('l','mm','A4');
 
         $pdf->AddPage();
-        $this->headerDefault($pdf);
+        $this->headerDefaultLanscape($pdf);
 
         $totalTgl = count($data_arr['PDFarrDate']);
         $dateHeaderObj = (array) $data_arr['PDFarrDate'];
@@ -900,7 +900,7 @@ class C_save_to_pdf extends CI_Controller {
 
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    private function headerDefault($pdf){
+    private function headerDefaultLanscape($pdf){
         $pdf->Image(base_url('images/icon/logo-hr.png'),10,10,50);
 
         $pdf->SetFont('Times','B',11);
@@ -920,6 +920,29 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->Ln(7);
 
+    }
+
+    private function headerDefaultPotret($pdf,$NoForm){
+        $pdf->Image(base_url('images/icon/favicon.png'),15,13,15);
+
+        $pdf->SetFont('Times','I',7);
+        $pdf->Cell(195,1,$NoForm,0,1,'R');
+
+        $h = 5;
+
+        $pdf->SetFont('Times','B',14);
+        $pdf->Cell(195,$h,'Universitas Agung Podomoro',0,1,'C');
+
+        $pdf->Ln(1);
+
+        $pdf->SetFont('Times','',10);
+        $pdf->Cell(195,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
+        $pdf->Cell(195,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
+        $pdf->Cell(195,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
+
+        $pdf->Line(10,35,205,35);
+
+        $pdf->Ln(7);
     }
 
     // ========== Exam PDF =========
@@ -1413,32 +1436,14 @@ class C_save_to_pdf extends CI_Controller {
     }
 
     private function header_exam_attendance_students($pdf,$data_arr,$dataDetailExam,$dataCourse){
-        $pdf->Image(base_url('images/icon/favicon.png'),15,13,15);
 
-        $pdf->SetFont('Times','I',7);
-        $pdf->Cell(195,1,'FM-UAP/AKD-13-03A',0,1,'R');
-
-        $h = 5;
-
-        $pdf->SetFont('Times','B',14);
-        $pdf->Cell(195,$h,'Universitas Agung Podomoro',0,1,'C');
-
-        $pdf->Ln(1);
-
-        $pdf->SetFont('Times','',10);
-        $pdf->Cell(195,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
-        $pdf->Cell(195,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
-        $pdf->Cell(195,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
-
-        $pdf->Line(10,35,205,35);
-
-        $pdf->Ln(7);
-
+        $this->headerDefaultPotret($pdf,'FM-UAP/AKD-13-03A');
 
         $xam_t = ($data_arr['Type']=='uts' || $data_arr['Type']=='UTS') ? 'MID EXAM' : 'FINAL EXAM';
         $xam_h = ($data_arr['Type']=='uts' || $data_arr['Type']=='UTS') ? 'ODD' : 'EVEN';
         $Semester = explode(' ',$data_arr['Semester']);
 
+        $h = 5;
         $pdf->SetFont('Times','B',10);
         $pdf->Cell(195,$h,'ATTENDANCE '.$xam_t,0,1,'C');
         $pdf->Cell(195,$h,$xam_h.' SEMESTER ACADEMIC YEAR '.strtoupper(trim($Semester[0])),0,1,'C');
@@ -2935,5 +2940,56 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->AliasNbPages();
 
         $pdf->Output();
+    }
+
+
+    // ===== Rekap Exam Schedule =====
+    public function recapExamSchedule(){
+
+        $pdf = new FPDF('P','mm','A4');
+        $pdf->AddPage();
+        $this->headerDefaultPotret($pdf,'FM-UAP/AKD-13-02');
+
+        $h = 6;
+        $pdf->SetFont('Times','B',10);
+        $pdf->Cell(195,$h,'Schedule Mid Exam Odd Semester Academic Year 2018/2019',0,1,'C');
+
+        $pdf->Ln(5);
+        // 195
+        $pdf->SetFillColor(226, 226, 226);
+        $pdf->SetFont('Times','B',8);
+        $pdf->Cell(7,$h,'No',1,0,'C',true);
+        $pdf->Cell(30,$h,'Date, Time',1,0,'C',true);
+        $pdf->Cell(50,$h,'Course',1,0,'C',true);
+        $pdf->Cell(30,$h,'Lecturer',1,0,'C',true);
+        $pdf->Cell(15,$h,'Group',1,0,'C',true);
+        $pdf->Cell(10,$h,'Std',1,0,'C',true);
+        $pdf->Cell(18,$h,'Room',1,0,'C',true);
+        $pdf->Cell(35,$h,'Invigilator',1,1,'C',true);
+
+
+        $pdf->SetFont('Times','',8);
+        $h = 4;
+
+        $pdf->Cell(7,$h,'1000','LRT',0,'C');
+        $pdf->Cell(30,$h,'Monday, 08 Oct 2018','LRT',0,'C');
+        $pdf->Cell(50,$h,'Course','LRT',0,'L');
+        $pdf->Cell(30,$h,'Lecturer','LRT',0,'L');
+        $pdf->Cell(15,$h,'Group','LRT',0,'C');
+        $pdf->Cell(10,$h,'Std','LRT',0,'C');
+        $pdf->Cell(18,$h,'Room','LRT',0,'C');
+        $pdf->Cell(35,$h,'Invigilator','LRT',1,'L');
+
+        $pdf->Cell(7,$h,'','LRB',0,'C');
+        $pdf->Cell(30,$h,'08:00 - 09:10 | 100 mnt','LRB',0,'C');
+        $pdf->Cell(50,$h,'Course','LRB',0,'L');
+        $pdf->Cell(30,$h,'Lecturer','LRB',0,'L');
+        $pdf->Cell(15,$h,'Group','LRB',0,'C');
+        $pdf->Cell(10,$h,'Std','LRB',0,'C');
+        $pdf->Cell(18,$h,'Room','LRB',0,'C');
+        $pdf->Cell(35,$h,'Invigilator','LRB',1,'L');
+
+
+        $pdf->Output('document_recap_exam_schedule.pdf','I');
     }
 }

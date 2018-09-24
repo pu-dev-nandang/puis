@@ -29,10 +29,12 @@
                         <option value="uas">UAS</option>
                     </select>
                 </div>
-                <div class="col-xs-5">
+                <div class="col-xs-4">
                     <select class="form-control" id="form2PDFDate"></select>
                 </div>
-
+                <div class="col-xs-1 hide">
+                    <button class="btn btn-default"><i class="fa fa-download"></i></button>
+                </div>
             </div>
         </div>
         <hr/>
@@ -74,7 +76,6 @@
         </div>
     </div>
 </div>
-
 
 <div class="row">
     <div class="col-md-12" style="min-height: 150px;">
@@ -236,6 +237,12 @@
             $('#formAreaPDF_Exam').val(token);
 
             $('#form2savePDF_Exam').submit();
+        } else if(form2PDFDate=='' || form2PDFDate==null){
+            toastr.warning('Please, select exam date','Warning');
+            $('#form2PDFDate').css('border','1px solid red');
+            setTimeout(function () {
+                $('#form2PDFDate').css('border','1px solid #ccc');
+            },3000);
         }
 
     });
