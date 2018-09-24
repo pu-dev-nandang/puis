@@ -59,23 +59,23 @@
     window.temp = '';
 
     function loadTahun()
-      {
-          var startTahun = 2018;
-          var thisYear = (new Date()).getFullYear();
-          var selisih = parseInt(thisYear) - parseInt(startTahun);
-          $("#selectTahun").empty();
-          for (var i = 0; i <= selisih; i++) {
-              var selected = (i==0) ? 'selected' : '';
-              $('#selectTahun').append('<option value="'+ ( parseInt(startTahun) + parseInt(i) ) +'" '+selected+'>'+( parseInt(startTahun) + parseInt(i) )+'</option>');
-          }
-          $('#selectTahun').select2({
-            // allowClear: true
-          });
+    {
+        var thisYear = (new Date()).getFullYear();
+        var startTahun = parseInt(thisYear);
+        var selisih = (2018 < parseInt(thisYear)) ? parseInt(1) + (parseInt(thisYear) - parseInt(2018)) : 1;
+        for (var i = 0; i <= selisih; i++) {
+          var selected = (i==1) ? 'selected' : '';
+          $('#selectTahun').append('<option value="'+ ( parseInt(startTahun) + parseInt(i) ) +'" '+selected+'>'+( parseInt(startTahun) + parseInt(i) )+'</option>');
+        }
 
-          $('#selectStatus').select2({
-            // allowClear: true
-          });
-      }
+        $('#selectTahun').select2({
+         // allowClear: true
+        });
+
+        $('#selectStatus').select2({
+          // allowClear: true
+        });
+    }
 
     $(document).ready(function () {
         if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
