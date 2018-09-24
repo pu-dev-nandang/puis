@@ -7,13 +7,13 @@
             <div class="tabbable tabbable-custom tabbable-full-width btn-read setPostDepartementmenu">
                 <ul class="nav nav-tabs">
                     <li class="active">
-                        <a href="javascript:void(0)" class="pageAnchor" page = "InputPostDepartement">Input</a>
+                        <a href="javascript:void(0)" class="pageAnchorPostDepartement" page = "InputPostDepartement">Input</a>
                     </li>
                     <li class="">
-                        <a href="javascript:void(0)" class="pagePostDepartement" page = "LogPostDepartement">Log</a>
+                        <a href="javascript:void(0)" class="pageAnchorPostDepartement" page = "LogPostDepartement">Log</a>
                     </li>
                     <li class="">
-                        <a href="javascript:void(0)" class="pageAnchor" page = "ExportPostDepartement">Export</a>
+                        <a href="javascript:void(0)" class="pageAnchorPostDepartement" page = "ExportPostDepartement">Export</a>
                     </li>
                 </ul>
                 <div style="padding-top: 30px;border-top: 1px solid #cccccc">
@@ -32,6 +32,26 @@ $(document).ready(function() {
     
 }); // exit document Function
 
+$(document).on('click','.pageAnchorPostDepartement', function () {
+    var Page = $(this).attr('page');
+    $(".menuConfig li").removeClass('active');
+    $(this).parent().addClass('active');
+    $("#pageSetPostMenu").empty();
+    switch(Page) {
+        case "InputPostDepartement":
+            LoadInputsetPostDepartement();
+            break;
+        case "LogPostDepartement":
+            LogPostDepartement();
+            break;
+        case "ExportPostDepartement":
+            ExportPostDepartement();
+            break;
+        default:
+            text = "I have never heard of that fruit...";
+    }
+});
+
 function LoadInputsetPostDepartement()
 {
     loading_page("#pageSetPostMenu");
@@ -42,5 +62,22 @@ function LoadInputsetPostDepartement()
         var jsonPass = response.jsonPass;
         $("#pageSetPostMenu").html(html);
     }); // exit spost
+}
+
+function LogPostDepartement()
+{
+    loading_page("#pageSetPostMenu");
+    var url = base_url_js+'budgeting/page/LogPostDepartement';
+    $.post(url,function (resultJson) {
+        var response = jQuery.parseJSON(resultJson);
+        var html = response.html;
+        var jsonPass = response.jsonPass;
+        $("#pageSetPostMenu").html(html);
+    }); // exit spost
+}
+
+function ExportPostDepartement()
+{
+    
 }
 </script>
