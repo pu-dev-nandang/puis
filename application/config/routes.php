@@ -528,6 +528,7 @@ $route['save2pdf/monitoringStudent'] =  'c_save_to_pdf/monitoringStudent';
 $route['save2pdf/monitoringAttendanceByRangeDate'] =  'c_save_to_pdf/monitoringAttendanceByRangeDate';
 
 $route['save2pdf/filterDocument'] =  'c_save_to_pdf/filterDocument';
+$route['save2pdf/recapExamSchedule'] =  'c_save_to_pdf/recapExamSchedule';
 
 $route['save2pdf/listStudentsFromCourse'] =  'c_save_to_pdf/listStudentsFromCourse';
 
