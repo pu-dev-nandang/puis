@@ -62,7 +62,7 @@
 
                 getDataScore();
             } else {
-                $('#divScore').html('<div style="text-align: center;"><h3>Grade Belum Diinput atau Belum Di Approve</h3><button class="btn btn-warning btn-bg menuDetails" data-page="Schedule_lecturer">Back</button></div>');
+                $('#divScore').html('<div style="text-align: center;"><h3>Grade Not Yet or Grade Not Yet Approved</h3><button class="btn btn-warning btn-bg menuDetails" id="btnBackFromInputScore">Back</button></div>');
             }
 
         });
@@ -85,6 +85,7 @@
                 '        <div class="table-responsive">'+
                 '            <table id="tableScore" class="table table-striped table-bordered table-hover">'+
                 '                <thead><tr>'+
+                '                    <th rowspan="2">No</th>'+
                 '                    <th rowspan="2">Students</th>'+
                 '                    <th colspan="5">Assigment ( '+Grade_Assigment+' % )</th>'+
                 '                    <th rowspan="2" style="width: 10%;">UTS<br/>( '+Grade_UTS+' % )</th>'+
@@ -122,6 +123,7 @@
             var jsonResult = jsonDataResult.Students;
             var tr = $('#dtRow');
             tr.empty();
+            var no = 1;
             for(var i=0;i<jsonResult.length;i++){
                 var dtsc = jsonResult[i];
 
@@ -159,6 +161,7 @@
                 var viewGrade = (dtsc.Grade!=null) ? '<b '+color+'>'+dtsc.Grade+'</b>' : '-';
 
                 tr.append('<tr>' +
+                    '<th>'+(no++)+'</th>' +
                     '<th style="font-weight: normal;text-align: left;"><b>'+nameStd+'</b> ' +
                     '<br/> <i>'+dtsc.NPM+'</i><input type="hide" class="hide" hidden readonly id="db_student'+dtsc.ID+'" value="'+dtsc.DB_Student+'" /> ' +
                     '</th>' +

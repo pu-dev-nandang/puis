@@ -1,9 +1,9 @@
 <style>
-    #tableDataScore thead tr th,#tableDataScore tbody tr td {
+    #tableScore thead tr th,#tableDataScore tbody tr td {
         text-align: center;
     }
 
-    #tableDataScore thead tr {
+    #tableScore thead tr {
         background-color: #436888;color: #ffffff;
     }
 
@@ -14,64 +14,59 @@
 
 <div class="col-md-12">
     <div class="row">
-        <div class="col-md-4">
-            <div class="">
-                <label>Semester Antara</label>
-                <input type="checkbox" id="formSemesterAntara" data-toggle="toggle" data-style="ios"/>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="row">
-        <div class="col-md-1"></div>
-        <div class="col-md-10">
-            <div class="thumbnail" style="margin-top: 30px;">
+        <div class="col-md-10 col-md-offset-1">
+            <div class="well">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-xs-3">
                         <select id="filterSemester" class="form-control filter-score"></select>
                     </div>
-                    <div class="col-md-4">
-                        <select class="form-control filter-score" id="filterCombine">
-                            <option value="0">Combine Class No</option>
-                            <option value="1">Combine Class Yes</option>
+                    <div class="col-xs-5">
+                        <select id="filterBaseProdi" class="form-control filter-score">
+                            <option value="">-- All Programme Study --</option>
                         </select>
                     </div>
-                    <div class="col-md-4">
-                        <select id="filterBaseProdi" class="form-control filter-score"></select>
+                    <div class="col-xs-4">
+                        <!-- 0 = Plan, 1 = waiting appr, 2 = Approval, -2 = Returned -->
+                        <select class="form-control filter-score" id="filterStatusGrade">
+                            <option value="">-- All Status Syllabus & RPS --</option>
+                            <option value="null">Not Yet Send</option>
+                            <option value="0">Returned</option>
+                            <option value="1">Waiting Approval</option>
+                            <option disabled>------------------------</option>
+                            <option value="2" style="background: #bdf3bd;">Approved</option>
+                            <option disabled>------------------------</option>
+                            <option value="-2" style="background: #ffa5a5;">Not Approved</option>
+                        </select>
                     </div>
-
                 </div>
             </div>
+            <hr/>
         </div>
     </div>
-
-    <hr/>
 
     <div class="row">
         <div class="col-md-12" id="divPageScore">
         </div>
     </div>
-
 </div>
 
 
 <script>
     $(document).ready(function () {
 
-        $('#filterSemester,#filterBaseProdi').empty();
-        // $('#filterSemester').append('<option value="" disabled selected>-- Academic Year --</option>' +
-        //     '                <option disabled>------------------------------------------</option>');
         loSelectOptionSemester('#filterSemester','');
 
-
-        // $('#filterBaseProdi').append('<option value="" disabled selected>-- Select Programme Study --</option>' +
-        //     '<option disabled>------------------------------------------</option>');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
 
-        setTimeout(function () {
-            loadCourse();
+
+        var loadFirstPage = setInterval(function () {
+            var filterSemester = $('#filterSemester').val();
+            if(filterSemester!='' && filterSemester!=null){
+                loadCourse();
+                clearInterval(loadFirstPage);
+            }
         },1000);
+
 
     });
 
@@ -79,8 +74,66 @@
         loadCourse();
     });
 
+    function loadCourse(){
+        var filterSemester = $('#filterSemester').val();
+        if(filterSemester!='' && filterSemester!=null){
 
-    function loadCourse() {
+            var filterBaseProdi = $('#filterBaseProdi').val();
+            var ProdiID = (filterBaseProdi!='' && filterBaseProdi!=null) ? filterBaseProdi.split('.')[0] : '' ;
+
+            var filterStatusGrade = $('#filterStatusGrade').val();
+
+            $('#divPageScore').html('<div class="">' +
+                '                <table class="table table-bordered" id="tableScore">' +
+                '                    <thead>' +
+                '                    <tr>' +
+                '                        <th style="width: 1%;">No</th>' +
+                '                        <th>Course</th>' +
+                '                        <th  style="width: 9%;">Group</th>' +
+                '                        <th style="width: 5%;">Credit</th>' +
+                '                        <th style="width: 25%;">Lecturer</th>' +
+                '                        <th style="width: 5%;">Student</th>' +
+                '                        <th style="width: 7%;">Action</th>' +
+                '                        <th style="width: 5%;">Syllabus <br/>& RPS</th>' +
+                '                    </tr>' +
+                '                    </thead>' +
+                '                    <tbody id="trExam"></tbody>' +
+                '                </table>' +
+                '            </div>');
+
+            var data = {
+                SemesterID : filterSemester.split('.')[0],
+                ProdiID : ProdiID,
+                StatusGrade : filterStatusGrade,
+                IsSemesterAntara : '0'
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+
+            var dataTable = $('#tableScore').DataTable( {
+                "processing": true,
+                "serverSide": true,
+                "iDisplayLength" : 10,
+                "ordering" : false,
+                "language": {
+                    "searchPlaceholder": "Group, Course, Coordinator"
+                },
+                "ajax":{
+                    url : base_url_js+"api/__getListCourseInScore", // json datasource
+                    data : {token:token},
+                    ordering : false,
+                    type: "post",  // method  , by default get
+                    error: function(){  // error handling
+                        $(".employee-grid-error").html("");
+                        $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                        $("#employee-grid_processing").css("display","none");
+                    }
+                }
+            } );
+        }
+    }
+
+    function loadCourse2() {
         var filterSemester = $('#filterSemester').val();
         var filterCombine = $('#filterCombine').val();
         var filterBaseProdi = $('#filterBaseProdi').val();

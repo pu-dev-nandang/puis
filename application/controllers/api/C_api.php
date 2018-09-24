@@ -1594,9 +1594,6 @@ class C_api extends CI_Controller {
 
         $query = $dataTable;
 
-//        print_r($query);
-//        exit;
-
         $no = $requestData['start'] + 1;
         $data = array();
         for($i=0;$i<count($query);$i++){
@@ -4233,6 +4230,107 @@ class C_api extends CI_Controller {
             }
 
         }
+    }
+
+    public function getListCourseInScore(){
+        $requestData= $_REQUEST;
+
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+
+        if($data_arr['StatusGrade']=='null'){
+            $whereStatusGrade = ' AND gc.Status IS NULL ';
+        } else {
+            $whereStatusGrade = ($data_arr['StatusGrade']!='' && $data_arr['StatusGrade']!=null)
+                ? ' AND gc.Status = "'.$data_arr['StatusGrade'].'" ' : '';
+        }
+
+
+        $whereP = ($data_arr['ProdiID'] !='' && $data_arr['ProdiID']!=null)
+            ? ' sc.SemesterID = "'.$data_arr['SemesterID'].'" '.$whereStatusGrade.' AND sc.IsSemesterAntara = "'.$data_arr['IsSemesterAntara'].'" AND sdc.ProdiID = "'.$data_arr['ProdiID'].'" '
+            : ' sc.SemesterID = "'.$data_arr['SemesterID'].'" '.$whereStatusGrade.' AND sc.IsSemesterAntara = "'.$data_arr['IsSemesterAntara'].'" ';
+        $orderBy = ' GROUP BY sc.ID ORDER BY sc.Classgroup, sdc.ID ASC ';
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataSearch = ' AND ( sc.Classgroup LIKE "%'.$search.'%" 
+            OR mk.Name LIKE "%'.$search.'%"
+             OR mk.NameEng LIKE "%'.$search.'%"
+              OR em.Name LIKE "%'.$search.'%" ) ';
+        }
+
+        $queryDefault = 'SELECT sc.Classgroup,sc.TotalAssigment,
+                                        sdc.*,cd.TotalSKS AS Credit, mk.MKCode, mk.Name AS MKName,
+                                        mk.NameEng AS MKNameEng, sc.Coordinator, 
+                                        em.Name AS CoordinatorName,
+                                        gc.ID AS GradeID, gc.Status AS StatusGrade 
+                                        FROM db_academic.schedule_details_course sdc 
+                                        LEFT JOIN db_academic.schedule sc ON (sc.ID = sdc.ScheduleID)
+                                        LEFT JOIN db_employees.employees em ON (em.NIP = sc.Coordinator)
+                                        LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID) 
+                                        LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                        LEFT JOIN db_academic.grade_course gc 
+                                          ON (gc.SemesterID = sc.SemesterID AND gc.ScheduleID = sc.ID)
+                                        WHERE ('.$whereP.' ) '.$dataSearch.' '.$orderBy.' ';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $StatusGrade = '-';
+            if($row['StatusGrade']=='2'){
+                $StatusGrade = '<i class="fa fa-check-circle" style="color: green;"></i>';
+            } else if ($row['StatusGrade']=='0'){
+                $StatusGrade = '<i class="fa fa-repeat"></i>';
+            } else if($row['StatusGrade']=='1'){
+                $StatusGrade = '<i class="fa fa-question-circle" style="color: blue;"></i>';
+            } else if($row['StatusGrade']=='-2'){
+                $StatusGrade = '<i class="fa fa-times-circle" style="color: darkred;"></i>';
+            }
+
+            $btnAct = '<div class="btn-group"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> <span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                <li><a href="javascript:void(0);" class="btnInputScore" data-nip="'.$row['Coordinator'].'" data-smt="'.$data_arr['SemesterID'].'" data-id="'.$row['ScheduleID'].'">Input Score</a></li>
+                <li><a href="javascript:void(0);" class="btnGrade" data-page="InputGrade1" data-group="'.$row['Classgroup'].'" data-id="'.$row['ScheduleID'].'">Approval - Score Weighted</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="javascript:void(0);" class="inputScheduleExchange" data-no="'.$no.'" data-id="">Cetak Report UTS</a></li>
+                <li><a href="javascript:void(0);" class="inputScheduleExchange" data-no="'.$no.'" data-id="">Cetak Report UAS</a></li>
+                </ul>
+                </div>';
+
+            // Student
+            $dataStudent = $this->m_api->getDataStudents_Schedule($data_arr['SemesterID'],$row['ScheduleID']);
+
+            $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div style="text-align:left;"><b>'.$row['MKNameEng'].'</b><br/>'.$row['MKName'].'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$row['Classgroup'].'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$row['Credit'].'</div>';
+            $nestedData[] = '<div style="text-align:left;">'.$row['CoordinatorName'].'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.count($dataStudent).'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$btnAct.'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$StatusGrade.'</div>';
+
+            $data[] = $nestedData;
+            $no++;
+        }
+
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+
     }
 
 }
