@@ -60,8 +60,8 @@ class C_budgeting extends Budgeting_Controler {
                                 'SetPostDepartement',
                                 'MasterUserRole',
                                 'UserRole',
-                                'Catalog',
-                                'Supplier',
+                                // 'Catalog',
+                                // 'Supplier',
                                 null
                             );
         if (in_array($Request, $arr_menuConfig))
@@ -736,6 +736,92 @@ class C_budgeting extends Budgeting_Controler {
         $arr_result = array('html' => '','jsonPass' => '');
         $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/setpostdepartement/pageLogPostDepartement',$this->data,true);
         echo json_encode($arr_result);
+    }
+
+    public function DataLogPostDepartement()
+    {
+        $requestData= $_REQUEST;
+        $sqltotalData = 'select count(*) as total from db_budgeting.log_cfg_set_post';
+        $querytotalData = $this->db->query($sqltotalData)->result_array();
+        $totalData = $querytotalData[0]['total'];
+
+        $sql = 'select a.*,b.PostName,b.CodePost,c.CodePostRealisasi,c.RealisasiPostName,c.Departement,d.Year,e.Name as NameAction,e.NIP from db_budgeting.log_cfg_set_post as a
+                join db_budgeting.cfg_set_post as d on a.CodePostBudget = d.CodePostBudget
+                join db_budgeting.cfg_postrealisasi as c on d.CodeSubPost =  c.CodePostRealisasi
+                join db_budgeting.cfg_post as b on c.CodePost = b.CodePost
+                join db_employees.employees as e on a.ActionBy = e.NIP   
+               ';
+
+        $sql.= ' where e.NIP LIKE "'.$requestData['search']['value'].'%" or e.Name LIKE "'.$requestData['search']['value'].'%" or a.CodePostBudget LIKE "'.$requestData['search']['value'].'%" or b.PostName LIKE "'.$requestData['search']['value'].'%" or c.RealisasiPostName LIKE "'.$requestData['search']['value'].'%"
+                ';
+        $sql.= ' ORDER BY a.Time Desc LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+        $query = $this->db->query($sql)->result_array();
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $Departement = $row['Departement'];
+            $exp = explode('.', $Departement);
+            if ($exp[0] == 'NA') { // Non Academic
+                $tget = $this->m_master->caribasedprimary('db_employees.division','ID',$exp[1]);
+                $Departement = $tget[0]['Description'].' ('.$tget[0]['Division'].')';
+            }
+            elseif ($exp[0] == 'AC') {
+                $tget = $this->m_master->caribasedprimary('db_academic.program_study','ID',$exp[1]);
+                $Departement = $tget[0]['NameEng'];
+            }
+
+            $DayDateTime = '';
+            $datetime = DateTime::createFromFormat('Y-m-d H:i:s', $row['Time']);
+            $DayDateTime = $datetime->format('D').','.$row['Time'];
+
+            // get Detail 
+            $JsonArr = json_decode($row['Detail']);
+            $JsonAction = $JsonArr->action;
+            $str = $JsonAction.'<br>';
+            if (array_key_exists("Detail",$JsonArr)) {
+                $JsonDetail = $JsonArr->Detail;
+                $Count1 = count($JsonDetail);
+                $No1 = 1;
+                foreach ($JsonDetail as $key => $value) {
+                    $str .= $key.' : ';
+                    $Count2 = count($value);
+                    $No2 = 1;
+                    foreach ($value as $ac => $valuee) {
+                        if ($No2 != $Count1) {
+                            $str .= $ac.' = '.'Rp. '.number_format($valuee,0,",",".").',-'.' ; '; 
+                        }
+                        else
+                        {
+                            $str .= $ac.' = '.'Rp. '.number_format($valuee,0,",",".").',-'.'<br>';
+                        }
+                        $No2++;
+                    }
+
+                    $No1++;
+                }
+            }
+            
+
+            $nestedData[] = $row['CodePostBudget'];
+            $nestedData[] = $row['CodePostRealisasi'].'<br>'.$row['PostName'].'-'.$row['RealisasiPostName'].'<br>'.$Departement;
+            $nestedData[] = $row['NIP'].'<br>'.$row['NameAction'];
+            $nestedData[] = $DayDateTime;
+            $nestedData[] = $str;
+            $data[] = $nestedData;
+        }
+
+        // print_r($data);
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalData ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
     }
 
 

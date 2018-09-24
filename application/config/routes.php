@@ -866,6 +866,7 @@ $route['budgeting/getDomPostDepartement'] = 'page/budgeting/c_budgeting/getDomPo
 $route['budgeting/save-setpostdepartement'] = 'page/budgeting/c_budgeting/save_setpostdepartement';
 $route['budgeting/getBudgetLastYearByCode'] = 'page/budgeting/c_budgeting/getBudgetLastYearByCode';
 $route['budgeting/page/LogPostDepartement'] = 'page/budgeting/c_budgeting/LogPostDepartement';
+$route['budgeting/DataLogPostDepartement'] = 'page/budgeting/c_budgeting/DataLogPostDepartement';
 
 
 

@@ -26,7 +26,7 @@
 			<div class="col-xs-6">
 				<div class="form-group">
 					<label>Year</label>
-					<select class="select2-select-00 full-width-fix" id="Year">
+					<select class="select2-select-00 full-width-fix" id="YearPostDepartement">
 					     <!-- <option></option> -->
 					 </select>
 				</div>	
@@ -58,7 +58,7 @@
 	function LoadFirstLoad()
 	{
 		// load Year
-		$("#Year").empty();
+		$("#YearPostDepartement").empty();
 		var url = base_url_js+'budgeting/table_all/cfg_dateperiod/1';
 		var thisYear = (new Date()).getFullYear();
 		$.post(url,function (resultJson) {
@@ -66,16 +66,16 @@
 			for(var i=0;i<response.length;i++){
 			    //var selected = (i==0) ? 'selected' : '';
 			    var selected = (response[i].Year==thisYear) ? 'selected' : '';
-			    $('#Year').append('<option value="'+response[i].Year+'" '+selected+'>'+response[i].Year+'</option>');
+			    $('#YearPostDepartement').append('<option value="'+response[i].Year+'" '+selected+'>'+response[i].Year+'</option>');
 			}
-			$('#Year').select2({
+			$('#YearPostDepartement').select2({
 			   //allowClear: true
 			});
 
 			getAllDepartementPU();
 
 			// get change function
-			$("#Year").change(function(){
+			$("#YearPostDepartement").change(function(){
 				loadPageTable();
 			})
 		}); 
@@ -106,7 +106,7 @@
 
 	function loadPageTable()
 	{
-		var Year = $("#Year").val();
+		var Year = $("#YearPostDepartement").val();
 		// console.log(Year);
 		var Departement = $("#DepartementPost").val();
 		var url = base_url_js+"budgeting/getDomPostDepartement";
@@ -173,7 +173,7 @@
 				var Action = '';
 				if(CodePostBudget == 'Unset')
 				{
-					Action = '<button class = "btn btn-success btn-default getBudgetLastYear" CodePostRealisasi = "'+dataDB[i].CodePostRealisasi+'" trno = "'+(parseInt(i) + 1)+'">Take Budget Last Year</button>&nbsp'+
+					Action = '<button class = "btn btn-success btn-default getBudgetLastYear" CodePostRealisasi = "'+dataDB[i].CodePostRealisasi+'" trno = "'+(parseInt(i) + 1)+'">Load Budget Last Year</button>&nbsp'+
 							 '<button class = "btn btn-default btn-add" CodePostRealisasi = "'+dataDB[i].CodePostRealisasi+'" trno = "'+(parseInt(i) + 1)+'"><i class="fa fa-plus" aria-hidden="true"></i> Add</button>';	
 				}
 				else
@@ -188,7 +188,7 @@
 									'<td>'+ $("#DepartementPost").find(":selected").text()+'</td>'+
 									'<td>'+ CodePostBudget+'</td>'+
 									'<td>'+ dataDB[i].CodePostRealisasi+'<br>'+dataDB[i].PostName+'-'+dataDB[i].RealisasiPostName+'</td>'+
-									'<td>'+ $("#Year").find(":selected").text()+'</td>'+
+									'<td>'+ $("#YearPostDepartement").find(":selected").text()+'</td>'+
 									Budget+
 									'<td class = "No'+(parseInt(i) + 1)+'">'+ Action+'</td>'+
 								'</tr>';
@@ -250,7 +250,7 @@
 				var url =base_url_js+'budgeting/getBudgetLastYearByCode';
 				var data = {
 				          CodePostRealisasi : CodePostRealisasi,
-				          Year : $("#Year").val(),
+				          Year : $("#YearPostDepartement").val(),
 				      };
 				var token = jwt_encode(data,'UAP)(*');
 				$.post(url,{token:token},function (data_json) {
@@ -280,7 +280,7 @@
 							 
 							}
 
-							var Year = $("#Year").val();
+							var Year = $("#YearPostDepartement").val();
 							if (confirm("Are you sure?") == true) {
 								loadingStart();
 								var url =base_url_js+'budgeting/save-setpostdepartement';
@@ -370,7 +370,7 @@
 				 
 				}
 
-				var Year = $("#Year").val();
+				var Year = $("#YearPostDepartement").val();
 				if (confirm("Are you sure?") == true) {
 					loadingStart();
 					var url =base_url_js+'budgeting/save-setpostdepartement';
@@ -428,7 +428,7 @@
 				 
 				}
 
-				var Year = $("#Year").val();
+				var Year = $("#YearPostDepartement").val();
 				if (confirm("Are you sure?") == true) {
 					loadingStart();
 					var url =base_url_js+'budgeting/save-setpostdepartement';
