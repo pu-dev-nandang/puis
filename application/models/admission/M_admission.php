@@ -1225,7 +1225,11 @@ class M_admission extends CI_Model {
 
      public function getPaymentType_Cost($ID_program_study)
      {
-      $year = date('Y');
+      $this->load->model('master/m_master');
+      // getTA
+      $Q_ta = $this->m_master->showData_array('db_admission.set_ta');
+      // $year = date('Y');
+      $year = $Q_ta[0]['Ta'];
       $sql = 'select a.PTID,a.ProdiID,a.ClassOf,a.Cost,b.Description,b.Abbreviation from db_finance.tuition_fee as a join db_finance.payment_type as b
               on a.PTID = b.ID where a.ProdiID = "'.$ID_program_study.'" and a.ClassOf = '.$year.'
               order by b.ID asc';
