@@ -953,6 +953,9 @@ class C_api extends CI_Controller {
                 $this->db->where('NPM', $data_arr['NPM']);
                 $this->db->update($da_.'.students', $arrUpdateStd);
 
+                $this->db->where('NPM', $data_arr['NPM']);
+                $this->db->update('db_academic.auth_students', $arrUpdateStd);
+
                 return print_r(1);
 
 
