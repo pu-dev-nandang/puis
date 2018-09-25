@@ -200,8 +200,8 @@ class M_budgeting extends CI_Model {
                 ) aa
                 ) as d on b.Departement = d.ID
                 where (b.RealisasiPostName like "%'.$PostDepartement.'%" or d.NameDepartement like "%'.$PostDepartement.'%" 
-                or c.PostName like "%'.$PostDepartement.'%" )
-                order by b.CodePostRealisasi desc
+                or c.PostName like "%'.$PostDepartement.'%" or b.CodePostRealisasi like "%'.$PostDepartement.'%")
+                order by b.CodePostRealisasi asc 
                 ';
         $query=$this->db->query($sql, array())->result_array();
         return $query;

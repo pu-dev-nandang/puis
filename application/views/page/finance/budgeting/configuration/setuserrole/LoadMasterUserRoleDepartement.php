@@ -1,5 +1,5 @@
 <style type="text/css">
-	#tableData5 thead th,#tableData5 tfoot td {
+	#tableData6 thead th,#tableData6 tfoot td {
 
 	    text-align: center;
 	    background: #20485A;
@@ -7,21 +7,15 @@
 
 	}
 
-	#tableData5>thead>tr>th, #tableData5>tbody>tr>th, #tableData5>tfoot>tr>th, #tableData5>thead>tr>td, #tableData5>tbody>tr>td, #tableData5>tfoot>tr>td {
+	#tableData6>thead>tr>th, #tableData6>tbody>tr>th, #tableData6>tfoot>tr>th, #tableData6>thead>tr>td, #tableData6>tbody>tr>td, #tableData6>tfoot>tr>td {
 	    border: 1px solid #b7b7b7
 	}
+
 </style>
 <div class="row" style="margin-right: 0px;margin-left: 0px">
 	<div class="col-md-6 col-md-offset-3">
-		<div class="thumbnail" style="height: 100px">
-			<div class="col-xs-6">
-				<div class="form-group">
-					<label>Year</label>
-					<select class="select2-select-00 full-width-fix" id="YearUserRoleDepartement">
-					 </select>
-				</div>	
-			</div>
-			<div class="col-xs-6">
+		<div class="thumbnail" style="height: 90px">
+			<div class="col-md-6 col-md-offset-3">
 				<div class="form-group">
 					<label>Search</label>
 					<div class="input-group">
@@ -35,38 +29,33 @@
 </div>	
 
 <div class="row" style="margin-right: 0px;margin-left: 0px;margin-top: 10px">
-	<div class="col-md-6" id = "loadPageTable1">
+	<div class="col-md-12" id = "loadPageTable">
 
-	</div>
-	<div class="col-md-6" id = "loadPageTable2">
-		
 	</div>
 </div>
 
 <script type="text/javascript">
+	window.jsonUserRole = [];
+	window.DepartementUserRole = '';
+	window.RealisasiPostNameUserRole = '';
 	$(document).ready(function() {
 		LoadFirstLoad();
 	}); // exit document Function
 
 	function LoadFirstLoad()
 	{
-		$("#YearUserRoleDepartement").empty();
-		var url = base_url_js+'budgeting/table_all/cfg_dateperiod/1';
-		var thisYear = (new Date()).getFullYear();
-		$.post(url,function (resultJson) {
-			var response = jQuery.parseJSON(resultJson);
-			for(var i=0;i<response.length;i++){
-			    //var selected = (i==0) ? 'selected' : '';
-			    var selected = (response[i].Year==thisYear) ? 'selected' : '';
-			    $('#YearUserRoleDepartement').append('<option value="'+response[i].Year+'" '+selected+'>'+response[i].Year+'</option>');
-			}
-			$('#YearUserRoleDepartement').select2({
-			   //allowClear: true
-			});
-			AutoCompletePostDepartement();
-		});
-		 
-		
+		AutoCompletePostDepartement();
+		getUserRole();
+	}
+
+	function getUserRole()
+	{
+		var url = base_url_js+'budgeting/table_all/cfg_m_userrole';
+		$.post(url,function (data_json) {
+		    var obj = JSON.parse(data_json);
+		    obj = obj.sortBy('ID', 'NameUserRole');
+		    jsonUserRole = obj;
+		})
 	}
 
 	function AutoCompletePostDepartement()
@@ -77,7 +66,13 @@
 		  select: function (event, ui) {
 		    event.preventDefault();
 		    var selectedObj = ui.item;
-		    $("#PostDepartementAutoComplete").val(selectedObj.value); 
+		    var label = selectedObj.label;
+		    label = label.split(' | ');
+		    DepartementUserRole = label[2];
+		    RealisasiPostNameUserRole = label[1];
+		    // console.log(DepartementUserRole + ' = ' + RealisasiPostNameUserRole);
+		    $("#PostDepartementAutoComplete").val(selectedObj.value);
+		    loadPageTable(); 
 		  },
 		  /*select: function (event,  ui)
 		  {
@@ -91,7 +86,8 @@
 		    var data = {
 		                PostDepartement : PostDepartement,
 		                };
-		    var token = jwt_encode(data,"UAP)(*");          
+		    var token = jwt_encode(data,"UAP)(*");
+		    $("#loadPageTable").empty();          
 		    $.post(url,{token:token},function (data_json) {
 		        var obj = JSON.parse(data_json);
 		        // console.log(obj);
@@ -102,21 +98,54 @@
 
 	}
 
-	function loadPageTable1()
+	function loadPageTable()
 	{
-		var TableGenerate = '<div class="table-responsive">'+
-								'<table class="table table-bordered" id ="tableData5">'+
-								'<thead>'+
-								'<tr>'+
-									'<th width = "3%">No</th>'+
-		                            '<th>Departement</th>'+
-		                            '<th>Code</th>'+
-									'<th>Post Realization</th>'+
-									'<th>Year</th>'+
-									'<th>Budget</th>'+
-									'<th>Action</th>'+
-								'</tr></thead>'	
+		var CodePostRealisasi = $("#PostDepartementAutoComplete").val();
+		var DivHeader = '<div class = "row">'+	
+							'<div class = "col-xs-3">'+
+								'<div class = "col-xs-12"><b>Departement : ' + DepartementUserRole+ '</b></div>'+
+								'<div class = "col-xs-12"><b>PostRealizationName : ' + RealisasiPostNameUserRole+ '</b></div>'+
+							'</div>'+
+						'</div>';	
+
+
+		var TableGenerate = '<div class = "row" style="margin-right: 0px;margin-left: 0px;margin-top: 10px">'+
+								'<div class = "col-xs-12">'+
+									'<div class="table-responsive">'+
+									'<table class="table table-bordered tableData" id ="tableData6">'+
+									'<thead>';
 							;
-		TableGenerate += '<tbody>';
+			TableGenerate += '<tr><th></th>';				
+
+		for (var i = 0; i < jsonUserRole.length; i++) {
+			TableGenerate += '<th>'+jsonUserRole[i]['NameUserRole']+'</th>';
+		}
+
+		TableGenerate += '</tr></thead><tbody>';
+		var arrAction = ['Entry','Approved','Cancel'];
+		for (var i = 0; i < arrAction.length; i++) {
+			var TD = '';
+			for (var j = 0; j < jsonUserRole.length; j++) {
+				var Input = '<div class="checkbox checbox-switch switch-primary">'+
+		                        '<label>'
+		                            '<input type="checkbox" id="layoutExam">'
+		                            '<span></span>'
+		                            '<b> | Random Layout</b>'
+		                        '</label>'
+                    		'</div>';
+				TD += '<td ID_m_UserRole = "'+jsonUserRole[j]['ID']+'" ActionUser = "'+arrAction[i]+'">'+Input+'</td>';
+			}
+			TableGenerate += '<tr>'+
+								'<td>'+arrAction[i]+'</td>'+
+								TD+
+							 '</tr>';	
+		}
+		TableGenerate += '</tbody></table></div></div></div>';
+
+		var Submit = '<div class = "row" style="margin-right: 0px;margin-left: 0px;margin-top: 10px">'+
+						'<div class="col-md-3 col-md-offset-9" align="center"><button type="button" id="SaveMasterUserRole" class="btn btn-success" >Save</button></div>'+
+					 '</div>';	
+
+		$("#loadPageTable").html(DivHeader+TableGenerate+Submit);
 	}
 </script>
