@@ -186,4 +186,24 @@ class M_budgeting extends CI_Model {
         $this->db->where($fieldCode, $ValueCode);
         $this->db->update($tbl, $dataSave);
     }
+
+    public function getPostDepartementAutoComplete($PostDepartement)
+    {
+        $sql = 'select b.CodePostRealisasi,b.RealisasiPostName,c.PostName,c.CodePost,d.NameDepartement
+                from db_budgeting.cfg_postrealisasi as b 
+                join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
+                join (
+                select * from (
+                select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study
+                UNION
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division
+                ) aa
+                ) as d on b.Departement = d.ID
+                where (b.RealisasiPostName like "%'.$PostDepartement.'%" or d.NameDepartement like "%'.$PostDepartement.'%" 
+                or c.PostName like "%'.$PostDepartement.'%" )
+                order by b.CodePostRealisasi desc
+                ';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
+    }
 }

@@ -824,5 +824,38 @@ class C_budgeting extends Budgeting_Controler {
         echo json_encode($json_data);
     }
 
+    public function LoadSetUserRole()
+    {
+        $this->auth_ajax();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/pageLoadSetUserRole',$this->data,true);
+        echo json_encode($arr_result);
+    }
+
+    public function LoadMasterUserRoleDepartement()
+    {
+        $this->auth_ajax();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/setuserrole/LoadMasterUserRoleDepartement',$this->data,true);
+        echo json_encode($arr_result);
+    }
+
+    public function AutoCompletePostDepartement()
+    {
+        $this->auth_ajax();
+        $input = $this->getInputToken();
+        $data['response'] = 'true'; //mengatur response
+        $data['message'] = array(); //membuat array
+        $getData = $this->m_budgeting->getPostDepartementAutoComplete($input['PostDepartement']);
+        for ($i=0; $i < count($getData); $i++) {
+        // for ($i=0; $i < 2; $i++) {
+            $data['message'][] = array(
+                'label' => $getData[$i]['CodePostRealisasi'].' | '.$getData[$i]['PostName'].'-'.$getData[$i]['RealisasiPostName'].' | '.$getData[$i]['NameDepartement'],
+                'value' => $getData[$i]['CodePostRealisasi']
+            );
+        }
+        echo json_encode($data);
+    }
+
 
 }

@@ -14,7 +14,7 @@
             <a href="javascript:void(0)" class="pageAnchor" page = "SetPostDepartement">Set Post Departement</a>
         </li>
         <li class="<?php if($request=='UserRole'){echo "active";} ?>">
-            <a href="javascript:void(0)" class="pageAnchor" page = "UserRole">Set User Role Departement</a>
+            <a href="javascript:void(0)" class="pageAnchor" page = "SetUserRole">Set User Role Departement</a>
         </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
@@ -83,6 +83,18 @@
         }); // exit spost
     }
 
+    function LoadSetUserRole()
+    {
+        loading_page("#pageContentConfig");
+        var url = base_url_js+'budgeting/page/LoadSetUserRole';
+        $.post(url,function (resultJson) {
+            var response = jQuery.parseJSON(resultJson);
+            var html = response.html;
+            var jsonPass = response.jsonPass;
+            $("#pageContentConfig").html(html);
+        }); // exit spost
+    }
+
     $(document).on('click','.pageAnchor', function () {
         var Page = $(this).attr('page');
         $(".menuConfig li").removeClass('active');
@@ -100,7 +112,10 @@
                 break;
             case "SetPostDepartement":
                 LoadSetPostDepartement();
-                break;    
+                break;
+            case "SetUserRole":
+                LoadSetUserRole();
+                break;
             default:
                 text = "I have never heard of that fruit...";
         }
