@@ -337,6 +337,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     public function getDataClassroomAcademic($NameDay,$date)
     {
         $arr_result = array();
+        $this->load->model('m_api');
         $date2 = $date;
         $date2 = ($date2 == null) ? date('Y-m-d') : $date2;
         // $sql = "select a.Room,b.NameEng,c.StartSessions,c.EndSessions,TIMEDIFF(CONCAT(curdate(),' ',EndSessions), CONCAT(curdate(),' ',StartSessions)) as time
@@ -348,11 +349,16 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         //         and CURDATE() <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
         //         and b.NameEng = ?
         //         order by a.Room";
-        $sql = "select a.Room,b.NameEng,c.StartSessions,c.EndSessions,TIMEDIFF(CONCAT(curdate(),' ',EndSessions), CONCAT(curdate(),' ',StartSessions)) as time
+        $sql = "select a.Room,b.NameEng,c.StartSessions,c.EndSessions,TIMEDIFF(CONCAT(curdate(),' ',EndSessions), CONCAT(curdate(),' ',StartSessions)) as time,
+                e.Name as NamaDosen,g.NameEng as NamaMataKuliah,d.ID as ScheduleID
                 from db_academic.classroom as a join db_academic.schedule_details as c
                 on a.ID = c.ClassroomID
                 join db_academic.days as b
                 on c.DayID = b.ID
+                left join db_academic.schedule as d on d.ID = c.ScheduleID
+                left join db_employees.employees as e on d.Coordinator = e.NIP
+                left join (select * from db_academic.schedule_details_course group by ScheduleID) as f on f.ScheduleID = d.ID
+                left join db_academic.mata_kuliah as g on g.ID = f.MKID
                 where '".$date2."' >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
                 and '".$date2."' <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
                 and b.NameEng = ?
@@ -361,6 +367,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 order by a.Room";  
         // print_r($sql);die();              
         $query=$this->db->query($sql, array($NameDay))->result_array();
+        // print_r($query);die(); 
 
         $date = ($date == null) ? '' : '  and DATE_FORMAT(a.`Start`,"%Y-%m-%d") = "'.$date.'"';
         $sql2 = 'select a.*,b.Name from db_reservation.t_booking as a
@@ -368,11 +375,18 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
          where a.Status in(0,1)  '.$date;
         $query2=$this->db->query($sql2, array())->result_array();
 
-        $sql3 = 'select a.Room,b.NameEng,c.StartSessions,c.EndSessions,TIMEDIFF(CONCAT(curdate()," ",EndSessions), CONCAT(curdate()," ",StartSessions)) as time 
+        $sql3 = 'select a.Room,b.NameEng,c.StartSessions,c.EndSessions,TIMEDIFF(CONCAT(curdate()," ",EndSessions), CONCAT(curdate()," ",StartSessions)) as time,
+                f.Name as NamaDosen,h.NameEng as NamaMataKuliah,e.ID as ScheduleID 
                 from db_academic.classroom as a join db_academic.schedule_exchange as c
                 on a.ID = c.ClassroomID
                 join db_academic.days as b
-                on c.DayID = b.ID where c.Status = "1" and c.Date ="'.$date2.'"';
+                on c.DayID = b.ID 
+                left join db_academic.attendance as d on d.ID = c.ID_Attd
+                left join db_academic.schedule as e on e.ID = d.ScheduleID
+                left join db_employees.employees as f on e.Coordinator = f.NIP
+                left join (select * from db_academic.schedule_details_course group by ScheduleID) as g on g.ScheduleID = e.ID
+                left join db_academic.mata_kuliah as h on h.ID = g.MKID
+                where c.Status = "1" and c.Date ="'.$date2.'"';
         $query3=$this->db->query($sql3, array())->result_array();
 
         for ($i=0; $i < count($query); $i++) { 
@@ -393,6 +407,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $end = explode(':', $end);
             $end = $end[0].':'.$end[1];
 
+            // get jumlah Mahasiswa
+            $arrMhs = $this->m_api->__getStudentByScheduleID($query[$i]['ScheduleID']);
+            $jumlahMHS = count($arrMhs);
+
             $dt = array(
                 'user'  => 'Academic TimeTables',
                 'start' => $start,
@@ -404,7 +422,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 'approved' => 1,
                 'NIP' => '0',
                 'ID' => '0',
-                //'NameEng' => $query[$i]['NameEng'],
+                'NamaMataKuliah' => $query[$i]['NamaMataKuliah'],
+                'NamaDosen' => $query[$i]['NamaDosen'],
+                'jumlahMHS' => $jumlahMHS
             );
             $arr_result[] = $dt;
         }
@@ -444,6 +464,11 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $end = explode(':', $end);
             $end = $end[0].':'.$end[1];
 
+            // get jumlah Mahasiswa
+            // $this->load->model('m_api');
+            $arrMhs = $this->m_api->__getStudentByScheduleID($query3[$i]['ScheduleID']);
+            $jumlahMHS = count($arrMhs);
+
             $dt = array(
                 'user'  => 'Academic TimeTables EX',
                 'start' => $start,
@@ -455,6 +480,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 'approved' => 1,
                 'NIP' => '0',
                 'ID' => '0',
+                'NamaMataKuliah' => $query3[$i]['NamaMataKuliah'],
+                'NamaDosen' => $query3[$i]['NamaDosen'],
+                'jumlahMHS' => $jumlahMHS
                 //'NameEng' => $query[$i]['NameEng'],
             );
             $arr_result[] = $dt;

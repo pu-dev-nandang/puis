@@ -124,10 +124,24 @@
 											if ($data_pass[$k]['NIP'] != 0) {
 												$bc = '#20c51b';
 												$bc2 = 'panel-green';
+												$NamaMataKuliah = '';
+												$NamaDosen = '';
+												$jumlahMHS = '';
+												$Details = $data_pass[$k]['user'];
+											}
+											else
+											{
+												$NamaMataKuliah = $data_pass[$k]['NamaMataKuliah'];
+												$NamaDosen = $data_pass[$k]['NamaDosen'];
+												$jumlahMHS = $data_pass[$k]['jumlahMHS'];
+												$Details = $NamaMataKuliah.' / '.$NamaDosen.' / '.$jumlahMHS;
+												if ($data_pass[$k]['user'] == 'Academic TimeTables EX') {
+													$Details = $data_pass[$k]['user'].'<br>'.$NamaMataKuliah.' / '.$NamaDosen.' / '.$jumlahMHS;
+												}
 											}
 										?>
 										<td class="<?php echo $bc2 ?> pointer" style="background-color: <?php echo $bc ?>;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>&#013;<?php echo 'Request : '.$data_pass[$k]['user'] ?>&#013;Agenda : <?php echo $data_pass[$k]['agenda'] ?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>">
-											<span><?php echo $data_pass[$k]['user'] ?></span>
+											<?php echo $Details ?>
 											<!-- <div class="panel-red pointer" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>"><span><?php echo $data_pass[$k]['user'] ?></span></div> -->
 										</td>
 										<?php $bool = true ?>
