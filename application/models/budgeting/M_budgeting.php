@@ -206,4 +206,16 @@ class M_budgeting extends CI_Model {
         $query=$this->db->query($sql, array())->result_array();
         return $query;
     }
+
+    public function get_cfg_set_roleuser($Departement)
+    {
+        $sql = 'select a.*,b.Name as NamaUser,b.NIP,c.Departement,c.ID as ID_set_roleuser
+                from db_budgeting.cfg_m_userrole as a left join (select * from db_budgeting.cfg_set_roleuser where Departement = ? and Active = 1) as c
+                on a.ID = c.ID_m_userrole
+                left join db_employees.employees as b on b.NIP = c.NIP 
+                order by a.NameUserRole asc
+                ';
+        $query=$this->db->query($sql, array($Departement))->result_array();
+        return $query;
+    }
 }

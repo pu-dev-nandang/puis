@@ -61,6 +61,8 @@ $(document).ready(function() {
     $(".btn-add-realization-Post").click(function(){
         modal_generate2('add','Add');
     });
+
+    $('script[src="<?php echo base_url('assets/custom/xprototype.js');?>"]').remove()
     
 }); // exit document Function
 

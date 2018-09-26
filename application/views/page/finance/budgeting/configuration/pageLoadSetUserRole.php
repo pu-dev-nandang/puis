@@ -1,3 +1,5 @@
+<!-- include xprototype -->
+<!-- <script type="text/javascript" src="<?php echo base_url('assets/custom/xprototype.js');?>"></script> -->
 <div class="col-xs-12" >
 	<div class="panel panel-primary">
         <div class="panel-heading clearfix">
@@ -10,7 +12,7 @@
                         <a href="javascript:void(0)" class="pageAnchorUserRoleDepartement" page = "MasterUserRoleDepartement">Master</a>
                     </li>
                     <li class="">
-                        <a href="javascript:void(0)" class="pageAnchorUserRoleDepartement" page = "SetUserRoleDepartement">Set User Role</a>
+                        <a href="javascript:void(0)" class="pageAnchorUserRoleDepartement" page = "SetUserActionDepartement">Set User Action</a>
                     </li>
                 </ul>
                 <div style="padding-top: 30px;border-top: 1px solid #cccccc">
@@ -26,25 +28,31 @@
 <script type="text/javascript">
 $(document).ready(function() {
     LoadMasterUserRoleDepartement();
-    
+    // AddScriptJS("<?php echo base_url('assets/custom/xprototype.js');?>");
+    // replacejscssfile("newscript.js", "<?php echo base_url('assets/custom/xprototype.js');?>", "js");
+
+    $(".pageAnchorUserRoleDepartement").click(function(){
+        var Page = $(this).attr('page');
+        $(".setUserRoleDepartement li").removeClass('active');
+        $(this).parent().addClass('active');
+        $("#pageSetPostMenu").empty();
+        switch(Page) {
+            case "MasterUserRoleDepartement":
+                LoadMasterUserRoleDepartement();
+                break;
+            case "SetUserActionDepartement":
+                LoadSetUserActionDepartement();
+                break;
+            default:
+                text = "I have never heard of that fruit...";
+        }
+    });
+
 }); // exit document Function
 
-$(document).on('click','.pageAnchorUserRoleDepartement', function () {
-    var Page = $(this).attr('page');
-    $(".menuConfig li").removeClass('active');
-    $(this).parent().addClass('active');
-    $("#pageSetPostMenu").empty();
-    switch(Page) {
-        case "InputPostDepartement":
-            LoadMasterUserRoleDepartement();
-            break;
-        case "LogPostDepartement":
-            // LogPostDepartement();
-            break;
-        default:
-            text = "I have never heard of that fruit...";
-    }
-});
+// $(document).on('click','.pageAnchorUserRoleDepartement', function () {
+    
+// });
 
 function LoadMasterUserRoleDepartement()
 {
@@ -58,20 +66,16 @@ function LoadMasterUserRoleDepartement()
     }); // exit spost
 }
 
-function LogPostDepartement()
+function LoadSetUserActionDepartement()
 {
-    loading_page("#pageSetPostMenu");
-    var url = base_url_js+'budgeting/page/LogPostDepartement';
+    loading_page("#pageUserRoleDepartement");
+    var url = base_url_js+'budgeting/page/LoadSetUserActionDepartement';
     $.post(url,function (resultJson) {
         var response = jQuery.parseJSON(resultJson);
         var html = response.html;
         var jsonPass = response.jsonPass;
-        $("#pageSetPostMenu").html(html);
+        $("#pageUserRoleDepartement").html(html);
     }); // exit spost
 }
 
-function ExportPostDepartement()
-{
-    
-}
 </script>

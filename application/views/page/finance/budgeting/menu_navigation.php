@@ -160,7 +160,7 @@
                     <?php else: ?>
                         <?php $uriSubMenu1 = $uriSubMenu1[0]  ?>
                         <li segment1 = "<?php echo $uriSubMenu1 ?>" class="<?php if($this->uri->segment(1)==$uriSubMenu1){echo "current ";} ?>">
-                            <a href="<?php echo $uriSubMenu1 ?>">
+                            <a href="<?php echo base_url($uriSubMenu1); ?>">
                                 <i class="<?php echo ($getData[$i]['Menu'] == '' || $getData[$i]['Menu'] == null) ? 'fa fa-globe' :  $getData[$i]['Icon'] ?>" aria-hidden="true"></i>
                                     <?php echo $getData[$i]['Menu'] ?>
                             </a>

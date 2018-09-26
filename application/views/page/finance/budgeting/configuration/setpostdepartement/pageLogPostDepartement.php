@@ -70,7 +70,7 @@
 		        url : base_url_js+"budgeting/DataLogPostDepartement", // json datasource
 		        ordering : false,
 		        type: "post",  // method  , by default get
-		        data : {tahun : $("#selectTahun").val()},
+		        // data : {length : $("select[name='tableData4_length']").val()},
 		        error: function(){  // error handling
 		            $(".employee-grid-error").html("");
 		            $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');

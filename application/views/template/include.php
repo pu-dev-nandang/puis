@@ -354,7 +354,6 @@
 </style>
 
 <!--=== JavaScript ===-->
-
 <script type="text/javascript" src="<?php echo base_url('assets/template/js/libs/jquery-1.10.2.min.js'); ?>"></script>
 <script type="text/javascript" src="<?php echo base_url('assets/template/plugins/jquery-ui/jquery-ui-1.10.2.custom.min.js'); ?>"></script>
 
@@ -470,9 +469,6 @@
 
 <!-- Socket js -->
 <script type="text/javascript" src="<?php echo base_url('node_modules/socket.io/node_modules/socket.io-client/socket.io.js');?>"></script>
-
-<!-- include xprototype -->
-<script type="text/javascript" src="<?php echo base_url('assets/custom/xprototype.js');?>"></script>
 <!-- Custom -->
 <script type="text/javascript">
     window.base_url_js = "<?php echo base_url(); ?>";

@@ -29,28 +29,35 @@
 <script type="text/javascript">
 $(document).ready(function() {
     LoadInputsetPostDepartement();
-    
+    // removejscssfile("<?php echo base_url('assets/custom/xprototype.js');?>", "js");
+    // $('script[src="<?php echo base_url('assets/custom/xprototype.js');?>"]').remove()
+    // replacejscssfile("<?php echo base_url('assets/custom/xprototype.js');?>", "newscript.js", "js")
+
+    $(".pageAnchorPostDepartement").click(function(){
+        var Page = $(this).attr('page');
+        $(".setPostDepartementmenu li").removeClass('active');
+        $(this).parent().addClass('active');
+        $("#pageSetPostMenu").empty();
+        switch(Page) {
+            case "InputPostDepartement":
+                LoadInputsetPostDepartement();
+                break;
+            case "LogPostDepartement":
+                LogPostDepartement();
+                break;
+            case "ExportPostDepartement":
+                ExportPostDepartement();
+                break;
+            default:
+                text = "I have never heard of that fruit...";
+        }
+    })
+
 }); // exit document Function
 
-$(document).on('click','.pageAnchorPostDepartement', function () {
-    var Page = $(this).attr('page');
-    $(".menuConfig li").removeClass('active');
-    $(this).parent().addClass('active');
-    $("#pageSetPostMenu").empty();
-    switch(Page) {
-        case "InputPostDepartement":
-            LoadInputsetPostDepartement();
-            break;
-        case "LogPostDepartement":
-            LogPostDepartement();
-            break;
-        case "ExportPostDepartement":
-            ExportPostDepartement();
-            break;
-        default:
-            text = "I have never heard of that fruit...";
-    }
-});
+// $(document).on('click','.pageAnchorPostDepartement', function () {
+    
+// });
 
 function LoadInputsetPostDepartement()
 {

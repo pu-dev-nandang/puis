@@ -850,6 +850,7 @@ $route['budgeting/page/LoadTimePeriod'] = 'page/budgeting/c_budgeting/pageLoadTi
 $route['budgeting/time_period/modalform'] = 'page/budgeting/c_budgeting/modal_pageLoadTimePeriod';
 $route['budgeting/time_period/modalform/save'] = 'page/budgeting/c_budgeting/modal_pageLoadTimePeriod_save';
 $route['budgeting/table_cari/(:any)/(:any)/(:any)'] = 'page/budgeting/c_budgeting/LoadTable_db_budgeting_cari/$1/$2/$3/$4';
+$route['budgeting/table_cari/(:any)/(:any)/(:any)/(:any)'] = 'page/budgeting/c_budgeting/LoadTable_db_budgeting_cari/$1/$2/$3/$4';
 $route['budgeting/table_all/(:any)/(:any)'] = 'page/budgeting/c_budgeting/LoadTable_db_budgeting_all/$1/$2';
 $route['budgeting/table_all/(:any)'] = 'page/budgeting/c_budgeting/LoadTable_db_budgeting_all/$1/$2';
 $route['budgeting/page/loadMasterPost'] = 'page/budgeting/c_budgeting/pageloadMasterPost';
@@ -871,6 +872,10 @@ $route['budgeting/DataLogPostDepartement'] = 'page/budgeting/c_budgeting/DataLog
 $route['budgeting/page/LoadSetUserRole'] = 'page/budgeting/c_budgeting/LoadSetUserRole';
 $route['budgeting/page/LoadMasterUserRoleDepartement'] = 'page/budgeting/c_budgeting/LoadMasterUserRoleDepartement';
 $route['budgeting/AutoCompletePostDepartement'] = 'page/budgeting/c_budgeting/AutoCompletePostDepartement';
+$route['budgeting/save_cfg_set_userrole'] = 'page/budgeting/c_budgeting/save_cfg_set_userrole';
+$route['budgeting/page/LoadSetUserActionDepartement'] = 'page/budgeting/c_budgeting/LoadSetUserActionDepartement';
+$route['budgeting/get_cfg_set_roleuser/(:any)'] = 'page/budgeting/c_budgeting/get_cfg_set_roleuser/$1';
+$route['budgeting/save_cfg_set_roleuser'] = 'page/budgeting/c_budgeting/save_cfg_set_roleuser';
 
 
 

@@ -754,7 +754,7 @@ class C_budgeting extends Budgeting_Controler {
 
         $sql.= ' where e.NIP LIKE "'.$requestData['search']['value'].'%" or e.Name LIKE "'.$requestData['search']['value'].'%" or a.CodePostBudget LIKE "'.$requestData['search']['value'].'%" or b.PostName LIKE "'.$requestData['search']['value'].'%" or c.RealisasiPostName LIKE "'.$requestData['search']['value'].'%"
                 ';
-        $sql.= ' ORDER BY a.Time Desc LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+        $sql.= ' ORDER BY a.Time Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
         $query = $this->db->query($sql)->result_array();
 
         $data = array();
@@ -855,6 +855,98 @@ class C_budgeting extends Budgeting_Controler {
             );
         }
         echo json_encode($data);
+    }
+
+    public function save_cfg_set_userrole()
+    {
+        $this->auth_ajax();
+        $Input = $this->getInputToken();
+        // check data insert or update
+        $sql = 'select * from db_budgeting.cfg_set_userrole where CodePostRealisasi = ? and ID_m_userrole = ?';
+        $query=$this->db->query($sql, array($Input['CodePostRealisasi'],$Input['id_m_userrole']))->result_array();
+        if (count($query) > 0) {
+            // update
+            $dataSave = array(
+                $Input['field'] => $Input['Input'],
+            );
+            $this->db->where('CodePostRealisasi', $Input['CodePostRealisasi']);
+            $this->db->where('ID_m_userrole', $Input['id_m_userrole']);
+            $this->db->update('db_budgeting.cfg_set_userrole', $dataSave);
+        }
+        else
+        {
+            // insert
+            $dataSave = array(
+                $Input['field'] => $Input['Input'],
+                'CodePostRealisasi' => $Input['CodePostRealisasi'],
+                'ID_m_userrole' => $Input['id_m_userrole']
+            );
+            $this->db->insert('db_budgeting.cfg_set_userrole', $dataSave);
+        }
+
+    }
+
+    public function LoadSetUserActionDepartement()
+    {
+        $this->auth_ajax();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/setuserrole/LoadSetUserActionDepartement',$this->data,true);
+        echo json_encode($arr_result);
+    }
+
+    public function get_cfg_set_roleuser($Departement)
+    {
+        $this->auth_ajax();
+        $getData = $this->m_budgeting->get_cfg_set_roleuser($Departement);
+        echo json_encode($getData);
+    }
+
+    public function save_cfg_set_roleuser()
+    {
+        $this->auth_ajax();
+        $msg = '';
+        $Input = $this->getInputToken();
+        $Action = $Input['Action'];
+        switch ($Action) {
+            case "":
+                if ($Input['ID_set_roleuser'] == "") {
+                    // insert data
+                    $dataSave = array(
+                        'ID_m_userrole' => $Input['ID_m_userrole'],
+                        'NIP' => $Input['NIP'],
+                        'Departement' => $Input['Departement']
+                    );
+                    $this->db->insert('db_budgeting.cfg_set_roleuser', $dataSave);
+                }
+                else
+                {
+                    // find $Input['ID_set_roleuser'] == ""
+                    $get = $this->m_master->caribasedprimary('db_budgeting.cfg_set_roleuser','ID',$Input['ID_set_roleuser']);
+                    if (count($get) > 0) {
+                        // update
+                        $dataSave = array(
+                            'NIP' => $Input['NIP'],
+                        );
+                        $this->db->where('ID', $Input['ID_set_roleuser']);
+                        $this->db->update('db_budgeting.cfg_set_roleuser', $dataSave);
+                    }
+                    else
+                    {
+                        $msg = "The Data is not exist, Please check";
+                    }
+                }
+                break;
+            case "delete":
+                $ID = $Input['ID_set_roleuser'];
+                $this->m_master->delete_id_table_all_db($ID,'db_budgeting.cfg_set_roleuser');
+                break;
+            default:
+                # code...
+                break;
+        }
+        
+
+        echo json_encode($msg);
     }
 
 
