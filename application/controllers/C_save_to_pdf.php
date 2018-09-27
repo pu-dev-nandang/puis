@@ -3202,9 +3202,11 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->Ln(7);
 
+        $y = $pdf->GetY();
         $pdf->SetFont('dinpromedium','',9);
         $pdf->Cell($w_Div,$h,'',0,0,'L');
         $pdf->Cell($w_Div,$h,'Tempat dan Tanggal Diterbitkan',0,1,'L');
+
 
         $pdf->SetFont('dinlightitalic','',8);
         $pdf->Cell($w_Div,$h,'',0,0,'L');
@@ -3240,6 +3242,9 @@ class C_save_to_pdf extends CI_Controller {
         $titleBRektor = ($Rektorat['TitleBehind']!='')? ' '.$Rektorat['TitleBehind'] : '';
         $Rektor = $titleARektor.''.$Rektorat['Name'].''.$titleBRektor;
 
+        // Foto
+
+
         $pdf->SetFont('dinpromedium','',9);
         $pdf->Cell($w_Div,$h,$Rektor,0,0,'L');
         $pdf->Cell($w_Div,$h,$Dekan,0,1,'L');
@@ -3248,6 +3253,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_Div,$h,'NIK : '.$Rektorat['NIP'],0,0,'L');
         $pdf->Cell($w_Div,$h,'NIK : '.$Student['NIP'],0,1,'L');
 
+        $pdf->Rect(70, $y, 33, 45);
 
 
 
