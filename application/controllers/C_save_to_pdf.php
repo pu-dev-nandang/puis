@@ -3232,15 +3232,21 @@ class C_save_to_pdf extends CI_Controller {
 
         $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].' ' : '';
         $titleB = ($Student['TitleBehind']!='') ? ' '.$Student['TitleBehind'] : '' ;
+
         $Dekan = $titleA.''.$Student['Dekan'].' '.$titleB;
 
+        $Rektorat = $dataStudent['Rektorat'][0];
+        $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].' ' : '';
+        $titleBRektor = ($Rektorat['TitleBehind']!='')? ' '.$Rektorat['TitleBehind'] : '';
+        $Rektor = $titleARektor.''.$Rektorat['Name'].''.$titleBRektor;
+
         $pdf->SetFont('dinpromedium','',9);
-        $pdf->Cell($w_Div,$h,'Nandang Mulyadi',0,0,'L');
+        $pdf->Cell($w_Div,$h,$Rektor,0,0,'L');
         $pdf->Cell($w_Div,$h,$Dekan,0,1,'L');
 
         $pdf->SetFont('dinpromedium','',8);
-        $pdf->Cell($w_Div,$h,'NIK : 2017090',0,0,'L');
-        $pdf->Cell($w_Div,$h,'NIK : 2017090',0,1,'L');
+        $pdf->Cell($w_Div,$h,'NIK : '.$Rektorat['NIP'],0,0,'L');
+        $pdf->Cell($w_Div,$h,'NIK : '.$Student['NIP'],0,1,'L');
 
 
 

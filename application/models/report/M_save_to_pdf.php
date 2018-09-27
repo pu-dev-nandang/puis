@@ -385,6 +385,9 @@ class M_save_to_pdf extends CI_Model {
 
         $grade = $this->getGraduation($ipk);
 
+        // Get Rektor
+        $dataRektor = $this->db->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees',array('PositionMain' => '2.1'),1)->result_array();
+
         $result = array(
             'Student' => $dataStd,
             'Result' => array(
@@ -394,6 +397,7 @@ class M_save_to_pdf extends CI_Model {
                 'IPK' => round($ipk,2),
                 'Grading' => $grade
             ),
+            'Rektorat' => $dataRektor,
             'DetailCourse' => $data
         );
 
