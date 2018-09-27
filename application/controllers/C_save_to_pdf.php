@@ -2992,4 +2992,347 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->Output('document_recap_exam_schedule.pdf','I');
     }
+
+
+    // ====== Transcript =======
+
+    public function transcript(){
+
+        $token = $this->input->post('token');
+        $data_arr = $this->getInputToken($token);
+
+        $dataStudent = $this->m_save_to_pdf->getTranscript($data_arr['DBStudent'],$data_arr['NPM']);
+
+
+//        print_r($dataStudent);
+//        exit;
+
+        $pdf = new FPDF('P','mm','legal');
+
+        // membuat halaman baru
+        $pdf->SetMargins(15,42.5,10);
+        $pdf->AddPage();
+
+        $pdf->SetFont('dinpromedium','',7);
+        $pdf->SetXY(15,5);
+        $pdf->Cell(125,7,'',0,0,'L');
+        $pdf->Cell(21,7,'Nomor Transkrip / ',0,0,'L');
+        $pdf->SetFont('dinlightitalic','',7);
+        $pdf->Cell(21,7,'Transcript Number',0,0,'L');
+        $pdf->SetFont('dinpromedium','',7);
+        $pdf->Cell(25,7,': xxxxx.xxxx.xxxx.x',0,1,'L');
+
+
+        $pdf->SetFont('dinpromedium','',16);
+        $pdf->SetXY(15,20);
+        $pdf->Cell(0,7,'DAFTAR HASIL STUDI',0,1,'C');
+        $pdf->SetFont('dinlightitalic','',16);
+        $pdf->Cell(51,7,'',0,0,'C');
+        $pdf->Cell(93,7,'RECORD OF ACADEMIC ACHIEVMENT','T',1,'C');
+        $pdf->SetXY(15,42.5);
+
+        $label_l = 44;
+        $sparator_l = 3;
+        $fill_l = 62;
+
+        $label_r = 50;
+        $sparator_r = 3;
+        $fill_r = 32;
+        $h=4;
+        $border = 0;
+
+        $Student = $dataStudent['Student'][0];
+
+        $pdf->SetFont('dinpromedium','',9);
+        $pdf->Cell($label_l,$h,'Nama',$border,0,'L');
+        $pdf->Cell($sparator_l,$h,':',$border,0,'C');
+        $pdf->Cell($fill_l,$h,ucwords(strtolower($Student['Name'])),$border,0,'L');
+        $pdf->Cell($label_r,$h,'Program Pendidikan',$border,0,'L');
+        $pdf->Cell($sparator_r,$h,':',$border,0,'C');
+        $pdf->Cell($fill_r,$h,$Student['GradeDesc'],$border,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',8);
+        $pdf->Cell($label_l,$h,'Name',$border,0,'L');
+        $pdf->Cell($sparator_l,$h,'',$border,0,'C');
+        $pdf->Cell($fill_l,$h,'',$border,0,'L');
+        $pdf->Cell($label_r,$h,'Educational Program',$border,0,'L');
+        $pdf->Cell($sparator_r,$h,':',$border,0,'C');
+        $pdf->Cell($fill_r,$h,$Student['GradeDescEng'],$border,1,'L');
+
+        $pdf->Ln(2);
+
+        $pdf->SetFont('dinpromedium','',9);
+        $pdf->Cell($label_l,$h,'Tempat dan Tanggal Lahir',$border,0,'L');
+        $pdf->Cell($sparator_l,$h,':',$border,0,'C');
+        $pdf->Cell($fill_l,$h,$Student['PlaceOfBirth'].', '.$Student['DateOfBirth'],$border,0,'L');
+        $pdf->Cell($label_r,$h,'Program Studi',$border,0,'L');
+        $pdf->Cell($sparator_r,$h,':',$border,0,'C');
+        $pdf->Cell($fill_r,$h,$Student['Prodi'],$border,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',8);
+        $pdf->Cell($label_l,$h,'Place and Date of Birth',$border,0,'L');
+        $pdf->Cell($sparator_l,$h,':',$border,0,'C');
+        $pdf->Cell($fill_l,$h,$Student['PlaceOfBirth'].', '.$Student['DateOfBirth'],$border,0,'L');
+        $pdf->Cell($label_r,$h,'Study Program',$border,0,'L');
+        $pdf->Cell($sparator_r,$h,':',$border,0,'C');
+        $pdf->Cell($fill_r,$h,$Student['ProdiEng'],$border,1,'L');
+
+        $pdf->Ln(2);
+
+        $pdf->SetFont('dinpromedium','',9);
+        $pdf->Cell($label_l,$h,'Nomor Induk Mahasiswa',$border,0,'L');
+        $pdf->Cell($sparator_l,$h,':',$border,0,'C');
+        $pdf->Cell($fill_l,$h,$Student['NPM'],$border,0,'L');
+        $pdf->Cell($label_r,$h,'Nomor Keputusan Pendirian',$border,0,'L');
+        $pdf->Cell($sparator_r,$h,':',$border,0,'C');
+        $pdf->Cell($fill_r,$h,'000 000000 0000',$border,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',8);
+        $pdf->Cell($label_l,$h,'Student Identification Number',$border,0,'L');
+        $pdf->Cell($sparator_l,$h,'',$border,0,'C');
+        $pdf->Cell($fill_l,$h,'',$border,0,'L');
+        $pdf->SetFont('dinpromedium','',9);
+        $pdf->Cell($label_r,$h,'Perguruan Tinggi',$border,0,'L');
+        $pdf->Cell($sparator_r,$h,'',$border,0,'C');
+        $pdf->Cell($fill_r,$h,'',$border,1,'L');
+
+
+        $pdf->Cell($label_l+$sparator_l+$fill_l,$h,'',0,0,'L');
+        $pdf->SetFont('dinlightitalic','',8);
+        $pdf->Cell($label_r,$h,'University Establishment Permit Number',$border,0,'L');
+        $pdf->Cell($sparator_r,$h,':',$border,0,'C');
+        $pdf->Cell($fill_r,$h,'000 000000 0000',$border,1,'L');
+
+
+        // Table
+        $pdf->Ln(7);
+
+        $w_no = 13;
+        $w_course = 110;
+        $w_credit = 15;
+        $w_grade = 15;
+        $w_score = 15;
+        $w_point = 23;
+
+
+        $border_fill = 'LR';
+
+        $this->header_transcript_table($pdf);
+
+        $DetailStudent = $dataStudent['DetailCourse'];
+        $no=1;
+        for($i=0;$i<count($DetailStudent);$i++){
+
+            $ds = $DetailStudent[$i];
+
+            $this->spasi_transcript_table($pdf,'T');
+
+            $h = 3.5;
+            $pdf->SetFont('dinprolight','',9);
+            $pdf->Cell($w_no,$h,($no++),$border_fill,0,'C');
+            $pdf->Cell($w_course,$h,$ds['MKName'],$border_fill,0,'L');
+            $pdf->Cell($w_credit,$h,$ds['Credit'],$border_fill,0,'C');
+            $pdf->Cell($w_grade,$h,$ds['Grade'],$border_fill,0,'C');
+            $pdf->Cell($w_score,$h,$ds['GradeValue'],$border_fill,0,'C');
+            $pdf->Cell($w_point,$h,round(($ds['Credit'] * $ds['GradeValue']),2),$border_fill,1,'C');
+
+            $pdf->SetFont('dinlightitalic','',8);
+            $pdf->Cell($w_no,$h,'',$border_fill,0,'C');
+            $pdf->Cell($w_course,$h,$ds['MKNameEng'],$border_fill,0,'L');
+            $pdf->Cell($w_credit,$h,'',$border_fill,0,'C');
+            $pdf->Cell($w_grade,$h,'',$border_fill,0,'C');
+            $pdf->Cell($w_score,$h,'',$border_fill,0,'C');
+            $pdf->Cell($w_point,$h,'',$border_fill,1,'C');
+
+            $this->spasi_transcript_table($pdf,'B');
+
+            if($pdf->GetY()>=310){
+                $pdf->SetMargins(15,10,10);
+                $pdf->AddPage();
+                $this->header_transcript_table($pdf);
+            }
+        }
+
+        $Result = $dataStudent['Result'];
+
+        $this->spasi_transcript_table($pdf,'TR');
+        $pdf->SetFont('dinprolight','',9);
+        $pdf->Cell($w_course+$w_no,$h,'Jumlah',$border_fill,0,'R');
+        $pdf->Cell($w_credit,$h,$Result['TotalSKS'],$border_fill,0,'C');
+        $pdf->Cell($w_grade,$h,'-',$border_fill,0,'C');
+        $pdf->Cell($w_score,$h,'-',$border_fill,0,'C');
+        $pdf->Cell($w_point,$h,$Result['TotalGradeValue'],$border_fill,1,'C');
+
+        $pdf->SetFont('dinlightitalic','',8);
+        $pdf->Cell($w_course+$w_no,$h,'Total',$border_fill,0,'R');
+        $pdf->Cell($w_credit,$h,'',$border_fill,0,'C');
+        $pdf->Cell($w_grade,$h,'',$border_fill,0,'C');
+        $pdf->Cell($w_score,$h,'',$border_fill,0,'C');
+        $pdf->Cell($w_point,$h,'',$border_fill,1,'C');
+        $this->spasi_transcript_table($pdf,'BR');
+
+        $pdf->Ln(7);
+        $totalW = $w_course+$w_no+$w_credit+$w_grade+$w_score+$w_point;
+        $w_Div = $totalW/2;
+        $w_R_label = 40;
+        $w_R_sparator = 3;
+        $w_R_fill = 52.5;
+
+        $pdf->Cell($w_Div,$h,'','LRT',0,'L');
+        $pdf->Cell($w_Div,$h,'','LRT',1,'L');
+
+        $pdf->SetFont('dinpromedium','',9);
+        $pdf->Cell($w_R_label,$h,' Indeks Prestasi Kumulatif','L',0,'L');
+        $pdf->Cell($w_R_sparator,$h,':',0,0,'L');
+        $pdf->Cell($w_R_fill,$h,$Result['IPK'],'R',0,'L');
+        $pdf->Cell($w_R_label,$h,' Predikat Kelulusan','L',0,'L');
+        $pdf->Cell($w_R_sparator,$h,':',0,0,'C');
+        $pdf->Cell($w_R_fill,$h,$Result['Grading'][0]['Description'],'R',1,'L');
+
+        $pdf->SetFont('dinlightitalic','',8);
+        $pdf->Cell($w_Div,$h,' Grade Point Average','L',0,'L');
+        $pdf->Cell($w_R_label,$h,' Graduation Honor','L',0,'L');
+        $pdf->Cell($w_R_sparator,$h,':',0,0,'C');
+        $pdf->Cell($w_R_fill,$h,$Result['Grading'][0]['DescriptionEng'],'R',1,'L');
+
+        $pdf->Cell($w_Div,$h,'','LRB',0,'L');
+        $pdf->Cell($w_Div,$h,'','LRB',1,'L');
+
+        $pdf->Ln(7);
+
+        $pdf->SetFont('dinpromedium','',9);
+        $pdf->Cell($w_Div,$h,'',0,0,'L');
+        $pdf->Cell($w_Div,$h,'Tempat dan Tanggal Diterbitkan',0,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',8);
+        $pdf->Cell($w_Div,$h,'',0,0,'L');
+        $pdf->Cell($w_Div,$h,'Place Date Issued',0,1,'L');
+
+        $pdf->SetFont('dinpromedium','',9);
+        $pdf->Cell($w_Div,$h,'',0,0,'L');
+        $pdf->Cell($w_Div,$h,'Jakarta, 09 Januari 2019',0,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',8);
+        $pdf->Cell($w_Div,$h,'',0,0,'L');
+        $pdf->Cell($w_Div,$h,'Jakarta,  09 January 2019',0,1,'L');
+
+        $pdf->Ln(5);
+
+        $pdf->SetFont('dinpromedium','',9);
+        $pdf->Cell($w_Div,$h,'Rektor',0,0,'L');
+        $pdf->Cell($w_Div,$h,'Dekan',0,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',8);
+        $pdf->Cell($w_Div,$h,'Rector',0,0,'L');
+        $pdf->Cell($w_Div,$h,'Dean',0,1,'L');
+
+        $pdf->Ln(14);
+
+        $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].' ' : '';
+        $titleB = ($Student['TitleBehind']!='') ? ' '.$Student['TitleBehind'] : '' ;
+        $Dekan = $titleA.''.$Student['Dekan'].' '.$titleB;
+
+        $pdf->SetFont('dinpromedium','',9);
+        $pdf->Cell($w_Div,$h,'Nandang Mulyadi',0,0,'L');
+        $pdf->Cell($w_Div,$h,$Dekan,0,1,'L');
+
+        $pdf->SetFont('dinpromedium','',8);
+        $pdf->Cell($w_Div,$h,'NIK : 2017090',0,0,'L');
+        $pdf->Cell($w_Div,$h,'NIK : 2017090',0,1,'L');
+
+
+
+
+        $pdf->Output('Transcript.pdf','I');
+    }
+
+    private function header_transcript_table($pdf){
+
+        $w_no = 13;
+        $w_course = 110;
+        $w_credit = 15;
+        $w_grade = 15;
+        $w_score = 15;
+        $w_point = 23;
+
+
+        $border_fill = 'LR';
+
+        $this->spasi_transcript_table($pdf,'T');
+
+        $h = 3;
+        $pdf->SetFont('dinpromedium','',9);
+        $pdf->Cell($w_no,$h,'No.',$border_fill,0,'C');
+        $pdf->Cell($w_course,$h,'Mata Kuliah',$border_fill,0,'C');
+        $pdf->Cell($w_credit,$h,'SKS',$border_fill,0,'C');
+        $pdf->Cell($w_grade,$h,'Nilai',$border_fill,0,'C');
+        $pdf->Cell($w_score,$h,'Angka',$border_fill,0,'C');
+        $pdf->Cell($w_point,$h,'SKS x Angka',$border_fill,1,'C');
+
+        $pdf->SetFont('dinlightitalic','',8);
+        $pdf->Cell($w_no,$h,'No.',$border_fill,0,'C');
+        $pdf->Cell($w_course,$h,'Course',$border_fill,0,'C');
+        $pdf->Cell($w_credit,$h,'Credit',$border_fill,0,'C');
+        $pdf->Cell($w_grade,$h,'Grade',$border_fill,0,'C');
+        $pdf->Cell($w_score,$h,'Score',$border_fill,0,'C');
+        $pdf->Cell($w_point,$h,'Point',$border_fill,1,'C');
+
+        $this->spasi_transcript_table($pdf,'B');
+    }
+
+    private function spasi_transcript_table($pdf,$desc){
+
+        $w_no = 13;
+        $w_course = 110;
+        $w_credit = 15;
+        $w_grade = 15;
+        $w_score = 15;
+        $w_point = 23;
+
+        $border_fill_t = 'LRT';
+        $border_fill_b = 'LRB';
+
+        if(strtolower($desc)=='t'){
+            $h = 1.3;
+
+            $pdf->Cell($w_no,$h,'',$border_fill_t,0,'C');
+            $pdf->Cell($w_course,$h,'',$border_fill_t,0,'C');
+            $pdf->Cell($w_credit,$h,'',$border_fill_t,0,'C');
+            $pdf->Cell($w_grade,$h,'',$border_fill_t,0,'C');
+            $pdf->Cell($w_score,$h,'',$border_fill_t,0,'C');
+            $pdf->Cell($w_point,$h,'',$border_fill_t,1,'C');
+        } else if(strtolower($desc)=='b') {
+            $h = 1.3;
+
+            $pdf->Cell($w_no,$h,'',$border_fill_b,0,'C');
+            $pdf->Cell($w_course,$h,'',$border_fill_b,0,'C');
+            $pdf->Cell($w_credit,$h,'',$border_fill_b,0,'C');
+            $pdf->Cell($w_grade,$h,'',$border_fill_b,0,'C');
+            $pdf->Cell($w_score,$h,'',$border_fill_b,0,'C');
+            $pdf->Cell($w_point,$h,'',$border_fill_b,1,'C');
+        } else if(strtolower($desc)=='tr'){
+            $h = 1.3;
+
+            $pdf->Cell($w_course+$w_no,$h,'',$border_fill_t,0,'C');
+            $pdf->Cell($w_credit,$h,'',$border_fill_t,0,'C');
+            $pdf->Cell($w_grade,$h,'',$border_fill_t,0,'C');
+            $pdf->Cell($w_score,$h,'',$border_fill_t,0,'C');
+            $pdf->Cell($w_point,$h,'',$border_fill_t,1,'C');
+        } else if(strtolower($desc)=='br') {
+            $h = 1.3;
+
+            $pdf->Cell($w_course+$w_no,$h,'',$border_fill_b,0,'C');
+            $pdf->Cell($w_credit,$h,'',$border_fill_b,0,'C');
+            $pdf->Cell($w_grade,$h,'',$border_fill_b,0,'C');
+            $pdf->Cell($w_score,$h,'',$border_fill_b,0,'C');
+            $pdf->Cell($w_point,$h,'',$border_fill_b,1,'C');
+        }
+    }
+
+    // ====== Penutup Transcript =======
+
+
+    // ====== Ijazah =======
+//    public function
+
 }

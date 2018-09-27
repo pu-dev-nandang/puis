@@ -350,4 +350,62 @@ class M_save_to_pdf extends CI_Model {
         return $data;
     }
 
+    public function getTranscript($DBStudent,$NPM){
+
+        $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth,  
+                                            ps.Name AS Prodi, ps.NameEng AS ProdiEng, edl.Description AS GradeDesc, 
+                                            edl.DescriptionEng AS GradeDescEng, em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind 
+                                            FROM '.$DBStudent.'.students s
+                                            LEFT JOIN db_academic.program_study ps ON (s.ProdiID = ps.ID) 
+                                            LEFT JOIN db_academic.education_level edl ON (edl.ID = ps.EducationLevelID)
+                                            LEFT JOIN db_academic.faculty f ON (f.ID = ps.FacultyID)
+                                            LEFT JOIN db_employees.employees em ON (em.NIP = f.NIP)
+                                            WHERE s.NPM = "'.$NPM.'" ')->result_array();
+
+
+        $data = $this->db->query('SELECT sp.Credit, sp.Grade, sp.GradeValue, mk.Name AS MKName, mk.NameEng AS MKNameEng 
+                                          FROM '.$DBStudent.'.study_planning sp 
+                                          LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sp.CDID)
+                                          LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
+                                          WHERE sp.NPM = "'.$NPM.'" ')->result_array();
+
+        $totalSKS = 0;
+        $totalGradeValue = 0;
+
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+                $d = $data[$i];
+
+                $totalSKS = $totalSKS + $d['Credit'];
+                $totalGradeValue = $totalGradeValue + ($d['Credit'] * $d['GradeValue']);
+            }
+        }
+
+        $ipk = (count($data)>0) ? $totalGradeValue/$totalSKS : 0 ;
+
+        $grade = $this->getGraduation($ipk);
+
+        $result = array(
+            'Student' => $dataStd,
+            'Result' => array(
+                'TotalSKS' => $totalSKS,
+                'TotalGradeValue' => $totalGradeValue,
+                'IPK_Ori' => $ipk,
+                'IPK' => round($ipk,2),
+                'Grading' => $grade
+            ),
+            'DetailCourse' => $data
+        );
+
+        return $result;
+    }
+
+    public function getGraduation($IPK){
+        $dataGrade = $this->db->query('SELECT * FROM db_academic.graduation g 
+                                                  WHERE g.IPKStart <= "'.$IPK.'" AND g.IPKEnd >= "'.$IPK.'"
+                                                   LIMIT 1')->result_array();
+
+        return $dataGrade;
+    }
+
 }

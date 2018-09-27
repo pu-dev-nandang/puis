@@ -54,5 +54,9 @@
 		</div>
 	</div>
 
+    <form id="formGlobalToken" action="" target="_blank" hidden method="post">
+        <textarea id="dataToken" class="hide" hidden readonly name="token"></textarea>
+    </form>
+
 </body>
 </html>

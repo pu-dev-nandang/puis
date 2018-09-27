@@ -72,6 +72,11 @@ class C_api extends CI_Controller {
         return print_r(json_encode($data));
     }
 
+    public function getKurikulumSelectOptionASC(){
+        $data = $this->m_api->__getKurikulumSelectOptionASC();
+        return print_r(json_encode($data));
+    }
+
     public function getMKByID(){
         $ID = $this->input->post('idMK');
         $data = $this->m_api->__getMKByID($ID);
@@ -1108,9 +1113,8 @@ class C_api extends CI_Controller {
     }
 
     public function crudSchedule(){
-        $token = $this->input->post('token');
-        $key = "UAP)(*";
-        $data_arr = (array) $this->jwt->decode($token,$key);
+
+        $data_arr = $this->getInputToken();
 
 //        print_r($data_arr);
         if(count($data_arr)>0){
@@ -1860,6 +1864,7 @@ class C_api extends CI_Controller {
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
         $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
 
         $data = array();
         for($i=0;$i<count($query);$i++){
@@ -1945,8 +1950,8 @@ class C_api extends CI_Controller {
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
-            "recordsTotal"    => intval(count($queryDefault)),
-            "recordsFiltered" => intval( count($queryDefault) ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
             "data"            => $data
         );
         echo json_encode($json_data);
@@ -4335,5 +4340,87 @@ class C_api extends CI_Controller {
         echo json_encode($json_data);
 
     }
+
+
+    // ====== Transcript Nilai =========
+    public function getTranscript(){
+        $requestData= $_REQUEST;
+        $data_arr = $this->getInputToken();
+
+        $dataWhere = ($data_arr['ProdiID']!='' && $data_arr['ProdiID']!=null)
+            ? 'aut_s.Year = "'.$data_arr['Year'].'" AND aut_s.StatusStudentID = "3" AND aut_s.ProdiID = "'.$data_arr['ProdiID'].'" '
+            : 'aut_s.Year = "'.$data_arr['Year'].'" AND aut_s.StatusStudentID = "3" ' ;
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataSearch = 'AND ( aut_s.Name LIKE "%'.$search.'%" OR aut_s.NPM LIKE "%'.$search.'%" 
+                           OR ps.Name LIKE "%'.$search.'%"  OR ps.NameEng LIKE "%'.$search.'%" )';
+        }
+
+        $queryDefault = 'SELECT aut_s.*, ps.Name AS ProdiName, ps.NameEng AS ProdiNameEng FROM db_academic.auth_students aut_s 
+                                      LEFT JOIN db_academic.program_study ps ON (ps.ID = aut_s.ProdiID)
+                                      WHERE ( '.$dataWhere.' ) '.$dataSearch.' ORDER BY aut_s.NPM ASC ';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $db_ = 'ta_'.$row['Year'];
+
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div  style="text-align:left;"><b>'.$row['NPM'].'</b></div>';
+            $nestedData[] = '<div  style="text-align:left;">
+                                    <b><i class="fa fa-user margin-right"></i> '.ucwords(strtolower($row['Name'])).'</b><br/>
+                                        <a>'.$row['EmailPU'].'</a></div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$row['ProdiNameEng'].'</div>';
+            $nestedData[] = '<div  style="text-align:center;">-</div>';
+            $nestedData[] = '<div  style="text-align:center;">
+                                                <button class="btn btn-sm btn-default btn-default-primary btnDowloadTranscript" data-db="'.$db_.'" data-npm="'.$row['NPM'].'">
+                                                    <i class="fa fa-download margin-right"></i> Transcript</button></div>';
+            $nestedData[] = '<div  style="text-align:center;"><button class="btn btn-sm btn-default btn-default-success"><i class="fa fa-download margin-right"></i> Ijazah</button></div>';
+
+            $no++;
+
+            $data[] = $nestedData;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+
+        echo json_encode($json_data);
+
+
+
+    }
+
+    public function crudTranscript(){
+
+        $data_arr = $this->getInputToken();
+
+        if(count($data_arr>0)){
+            if($data_arr['action']=='readStudent'){
+                $Year = $data_arr['Year'];
+                $ProdiID = $data_arr['ProdiID'];
+                $data = $this->db->get_where('db_academic.auth_students',array('ProdiID'=> $ProdiID,'Year'=>$Year))->result_array();
+                print_r($data);
+
+            }
+        }
+
+    }
+
+    // ==========
 
 }

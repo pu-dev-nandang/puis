@@ -19,4 +19,10 @@ date : moment().format('YYYY-MM-DD')
  [{"krsStart":"2018-03-10","krsEnd":"2018-03-30","SemesterID":"13"}]
 ```
 
+**Mendapatkan Student di dalam jadwal**
+```
+Model : m_api
+Method : __getStudentByScheduleID($ScheduleID)
+```
+
  
