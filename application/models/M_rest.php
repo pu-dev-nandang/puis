@@ -413,13 +413,10 @@ class M_rest extends CI_Model {
                                                         WHERE s.Year >= "'.$ClassOf.'" AND s.id <= "'.$SemesterID.'"
                                                         ORDER BY s.ID ASC')->result_array();
 
-//        print_r($dataSemester);
-//        exit;
 
         $smt_now = count($dataSemester);
 
         return $smt_now;
-
     }
 
     public function checkPayment($NPM,$SemesterID){

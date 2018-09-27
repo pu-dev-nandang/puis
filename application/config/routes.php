@@ -87,6 +87,10 @@ $route['academic/exam-schedule/edit-exam-schedule/(:num)'] = 'page/academic/c_ja
 $route['academic/score'] =  'page/academic/c_score';
 $route['academic/inputScore'] =  'page/academic/c_score/inputScore';
 
+// ---- Transcript ----
+$route['academic/transcript'] =  'page/academic/c_transcript';
+
+
 // --- Modal Academic ----
 $route['academic/modal-tahun-akademik-detail-prodi'] = 'page/academic/c_akademik/modal_tahun_akademik_detail_prodi';
 $route['academic/modal-tahun-akademik-detail-lecturer'] = 'page/academic/c_akademik/modal_tahun_akademik_detail_lecturer';
@@ -538,6 +542,7 @@ $route['save2pdf/draft-questions'] =  'c_save_to_pdf/draft_questions';
 $route['save2pdf/answer-sheet'] =  'c_save_to_pdf/answer_sheet';
 $route['save2pdf/news-event'] =  'c_save_to_pdf/news_event';
 $route['save2pdf/attendance-list'] =  'c_save_to_pdf/attendance_list';
+$route['save2pdf/transcript'] =  'c_save_to_pdf/transcript';
 
 $route['save2pdf/report-uts'] =  'c_save_to_pdf/report_uts';
 
@@ -579,6 +584,7 @@ $route['api/__changeTahunAkademik'] = 'api/c_api/changeTahunAkademik';
 
 $route['api/__insertKurikulum'] = 'api/c_api/insertKurikulum';
 $route['api/__getKurikulumSelectOption'] = 'api/c_api/getKurikulumSelectOption';
+$route['api/__getKurikulumSelectOptionASC'] = 'api/c_api/getKurikulumSelectOptionASC';
 
 
 $route['api/__getDosenSelectOption'] = 'api/c_api/getDosenSelectOption';
@@ -708,6 +714,9 @@ $route['api/__m_additional_personel'] = 'api/c_api/m_additional_personel';
 $route['api/__room_equipment'] = 'api/c_api/room_equipment';
 $route['api/__checkBentrokScheduleAPI'] = 'api/c_api/checkBentrokScheduleAPI';
 $route['api/__crudClassroomVreservation'] = 'api/c_api/crudClassroomVreservation';
+
+$route['api/__crudTranscript'] = 'api/c_api/crudTranscript';
+$route['api/__getTranscript'] = 'api/c_api/getTranscript';
 
 $route['api/__crudInvigilator'] = 'api/c_api/crudInvigilator';
 

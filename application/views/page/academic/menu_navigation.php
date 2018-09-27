@@ -4,7 +4,7 @@
         <!--=== Navigation ===-->
 
         <ul id="nav">
-            <li class="<?php if($this->uri->segment(2)=='master'){echo "current open";} ?>">
+            <li class="<?php if($this->uri->segment(2)=='master'){echo "current open";} ?> hide">
                 <a href="javascript:void(0);">
                     <i class="fa fa-globe"></i>
                     Master
@@ -112,6 +112,12 @@
                 <a href="#">
                     <i class="fa fa-flag"></i>
                     Final Project (Coming Soon)
+                </a>
+            </li>
+            <li class="<?php if($this->uri->segment(2)=='transcript'){echo "current";} ?>">
+                <a href="<?php echo base_url('academic/transcript') ?>">
+                    <i class="fa fa-line-chart"></i>
+                    Transcript
                 </a>
             </li>
         </ul>

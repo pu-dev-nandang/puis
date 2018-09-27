@@ -203,6 +203,12 @@ class M_api extends CI_Model {
         return $data->result_array();
     }
 
+    public function __getKurikulumSelectOptionASC(){
+        $data = $this->db->query('SELECT * FROM db_academic.curriculum ORDER BY Year ASC');
+
+        return $data->result_array();
+    }
+
     public function __geteducationLevel(){
         $data = $this->db->query('SELECT * FROM db_academic.education_level ORDER BY EducationLevelID DESC');
 
