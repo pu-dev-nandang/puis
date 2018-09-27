@@ -28,22 +28,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <div class="">
-            <table id="tableStudent" class="table table-bordered">
-                <thead>
-                <tr>
-                    <th style="width: 3%;">No</th>
-                    <th style="width: 5%;">NIM</th>
-                    <th>Student</th>
-                    <th style="width: 13%;">Prodi</th>
-                    <th style="width: 5%;">IPK</th>
-                    <th style="width: 10%;">Transcript</th>
-                    <th style="width: 7%;">Ijazah</th>
-                </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
+        <div id="viewDataTr"></div>
     </div>
 </div>
 
@@ -86,34 +71,55 @@
         var filterCurriculum = $('#filterCurriculum').val();
         var filterBaseProdi = $('#filterBaseProdi').val();
 
-        if(filterCurriculum!='' && filterCurriculum!=null){
+        loading_page('#viewDataTr');
 
-            var ProdiID = (filterBaseProdi!='' && filterBaseProdi!=null) ? filterBaseProdi.split('.')[0] : '' ;
+        setTimeout(function () {
+            if(filterCurriculum!='' && filterCurriculum!=null){
 
-            var token = jwt_encode({Year:filterCurriculum.split('.')[1], ProdiID:ProdiID},'UAP)(*');
+                $('#viewDataTr').html('' +
+                    '            <table id="tableStudent" class="table table-bordered">' +
+                    '                <thead>' +
+                    '                <tr>' +
+                    '                    <th style="width: 3%;">No</th>' +
+                    '                    <th style="width: 5%;">NIM</th>' +
+                    '                    <th>Student</th>' +
+                    '                    <th style="width: 13%;">Prodi</th>' +
+                    '                    <th style="width: 5%;">IPK</th>' +
+                    '                    <th style="width: 10%;">Transcript</th>' +
+                    '                    <th style="width: 7%;">Ijazah</th>' +
+                    '                </tr>' +
+                    '                </thead>' +
+                    '                <tbody></tbody>' +
+                    '            </table>');
 
-            var dataTable = $('#tableStudent').DataTable( {
-                "processing": true,
-                "serverSide": true,
-                "iDisplayLength" : 10,
-                "ordering" : false,
-                "language": {
-                    "searchPlaceholder": "Course, MKCode, Coordinator"
-                },
-                "ajax":{
-                    url : base_url_js+'api/__getTranscript', // json datasource
-                    ordering : false,
-                    data : {token:token},
-                    type: "post",  // method  , by default get
-                    error: function(){  // error handling
-                        $(".employee-grid-error").html("");
-                        $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
-                        $("#employee-grid_processing").css("display","none");
+
+                var ProdiID = (filterBaseProdi!='' && filterBaseProdi!=null) ? filterBaseProdi.split('.')[0] : '' ;
+
+                var token = jwt_encode({Year:filterCurriculum.split('.')[1], ProdiID:ProdiID},'UAP)(*');
+
+                var dataTable = $('#tableStudent').DataTable( {
+                    "processing": true,
+                    "serverSide": true,
+                    "iDisplayLength" : 10,
+                    "ordering" : false,
+                    "language": {
+                        "searchPlaceholder": "Course, MKCode, Coordinator"
+                    },
+                    "ajax":{
+                        url : base_url_js+'api/__getTranscript', // json datasource
+                        ordering : false,
+                        data : {token:token},
+                        type: "post",  // method  , by default get
+                        error: function(){  // error handling
+                            $(".employee-grid-error").html("");
+                            $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                            $("#employee-grid_processing").css("display","none");
+                        }
                     }
-                }
-            } );
+                } );
 
-        }
+            }
+        },500);
 
     }
 
