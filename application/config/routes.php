@@ -876,6 +876,11 @@ $route['budgeting/save_cfg_set_userrole'] = 'page/budgeting/c_budgeting/save_cfg
 $route['budgeting/page/LoadSetUserActionDepartement'] = 'page/budgeting/c_budgeting/LoadSetUserActionDepartement';
 $route['budgeting/get_cfg_set_roleuser/(:any)'] = 'page/budgeting/c_budgeting/get_cfg_set_roleuser/$1';
 $route['budgeting/save_cfg_set_roleuser'] = 'page/budgeting/c_budgeting/save_cfg_set_roleuser';
+$route['budgeting/page/catalog/InputCatalog'] = 'page/budgeting/finance/c_master/InputCatalog';
+$route['budgeting/page/catalog/FormInput'] = 'page/budgeting/finance/c_master/InputCatalog_FormInput';
+$route['budgeting/page/catalog/saveFormInput'] = 'page/budgeting/finance/c_master/InputCatalog_saveFormInput';
+$route['budgeting/page/catalog/DataIntable'] = 'page/budgeting/finance/c_master/Catalog_DataIntable';
+$route['budgeting/page/catalog/DataIntable/server_side'] = 'page/budgeting/finance/c_master/Catalog_DataIntable_server_side';
 
 
 

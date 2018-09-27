@@ -1380,4 +1380,8 @@
      return string;
      
     }
+
+    function isObject(value) {
+        return value && typeof value === 'object' && value.constructor === Object;
+    }
 </script>
