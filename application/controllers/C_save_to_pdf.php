@@ -2998,6 +2998,8 @@ class C_save_to_pdf extends CI_Controller {
 
     public function transcript(){
 
+        setlocale(LC_ALL, 'id_ID.UTF8', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', 'IND.UTF-8', 'IND.8859-1', 'IND', 'Indonesian.UTF8', 'Indonesian.UTF-8', 'Indonesian.8859-1', 'Indonesian', 'Indonesia', 'id', 'ID', 'en_US.UTF8', 'en_US.UTF-8', 'en_US.8859-1', 'en_US', 'American', 'ENG', 'English');
+
         $token = $this->input->post('token');
         $data_arr = $this->getInputToken($token);
 
@@ -3064,7 +3066,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinpromedium','',9);
         $pdf->Cell($label_l,$h,'Tempat dan Tanggal Lahir',$border,0,'L');
         $pdf->Cell($sparator_l,$h,':',$border,0,'C');
-        $pdf->Cell($fill_l,$h,$Student['PlaceOfBirth'].', '.$Student['DateOfBirth'],$border,0,'L');
+        $pdf->Cell($fill_l,$h,$Student['PlaceOfBirth'].', '.strftime("%d %B %Y",strtotime($Student['DateOfBirth'])),$border,0,'L');
         $pdf->Cell($label_r,$h,'Program Studi',$border,0,'L');
         $pdf->Cell($sparator_r,$h,':',$border,0,'C');
         $pdf->Cell($fill_r,$h,$Student['Prodi'],$border,1,'L');
@@ -3072,7 +3074,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinlightitalic','',8);
         $pdf->Cell($label_l,$h,'Place and Date of Birth',$border,0,'L');
         $pdf->Cell($sparator_l,$h,':',$border,0,'C');
-        $pdf->Cell($fill_l,$h,$Student['PlaceOfBirth'].', '.$Student['DateOfBirth'],$border,0,'L');
+        $pdf->Cell($fill_l,$h,$Student['PlaceOfBirth'].', '.date('d F Y',strtotime($Student['DateOfBirth'])),$border,0,'L');
         $pdf->Cell($label_r,$h,'Study Program',$border,0,'L');
         $pdf->Cell($sparator_r,$h,':',$border,0,'C');
         $pdf->Cell($fill_r,$h,$Student['ProdiEng'],$border,1,'L');
