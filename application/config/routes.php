@@ -712,6 +712,8 @@ $route['api/__getSimpleSearch'] = 'api/c_api/getSimpleSearch';
 $route['api/__getSimpleSearchStudents'] = 'api/c_api/getSimpleSearchStudents';
 
 
+$route['api/__getAllDepartementPU'] = 'api/c_api/getAllDepartementPU';
+
 //v_reservation
 $route['api/__m_equipment_additional'] = 'api/c_api/m_equipment_additional';
 $route['api/get_time_opt_reservation'] = 'api/c_api/get_time_opt_reservation';
@@ -833,3 +835,85 @@ $route['testInject'] = 'api/c_global/testInject';
 
 // Pengawas Ujian
 $route['invigilator'] = 'c_pengawas_ujian';
+
+
+
+// budgeting & PR
+$route['budgeting'] = 'page/budgeting/c_budgeting';
+
+$query = $db->get('db_budgeting.cfg_sub_menu');
+$result = $query->result();
+foreach( $result as $row )
+{
+	$Slug = $row->Slug;
+	$Slug = explode('/', $Slug);
+	if (in_array('(:any)', $Slug)) {
+	   $a = count($Slug) - 1;
+	   $URI = '';
+	   for ($i=0; $i < $a; $i++) { 
+	   	$URI .= $Slug[$i].'/';
+	   }
+	   $route[ $URI.'(:any)' ] = $row->Controller;
+	}
+	elseif(in_array('(:num)', $Slug)) {
+		$a = count($Slug) - 1;
+		$URI = '';
+		for ($i=0; $i < $a; $i++) { 
+			$URI .= $Slug[$i].'/';
+		}
+		$route[ $URI.'(:num)' ] = $row->Controller;
+	}
+	else
+	{
+		$route[ $row->Slug ] = $row->Controller;
+	}
+
+}
+
+$route['budgeting_configfinance/(:any)'] = 'page/budgeting/c_budgeting/configfinance/$1';
+$route['budgeting/page/LoadTimePeriod'] = 'page/budgeting/c_budgeting/pageLoadTimePeriod';
+$route['budgeting/time_period/modalform'] = 'page/budgeting/c_budgeting/modal_pageLoadTimePeriod';
+$route['budgeting/time_period/modalform/save'] = 'page/budgeting/c_budgeting/modal_pageLoadTimePeriod_save';
+$route['budgeting/table_cari/(:any)/(:any)/(:any)'] = 'page/budgeting/c_budgeting/LoadTable_db_budgeting_cari/$1/$2/$3/$4';
+$route['budgeting/table_cari/(:any)/(:any)/(:any)/(:any)'] = 'page/budgeting/c_budgeting/LoadTable_db_budgeting_cari/$1/$2/$3/$4';
+$route['budgeting/table_all/(:any)/(:any)'] = 'page/budgeting/c_budgeting/LoadTable_db_budgeting_all/$1/$2';
+$route['budgeting/table_all/(:any)'] = 'page/budgeting/c_budgeting/LoadTable_db_budgeting_all/$1/$2';
+$route['budgeting/page/loadMasterPost'] = 'page/budgeting/c_budgeting/pageloadMasterPost';
+$route['budgeting/masterpost/modalform'] = 'page/budgeting/c_budgeting/modal_pageloadMasterPost';
+$route['budgeting/masterpost/modalform/save'] = 'page/budgeting/c_budgeting/modal_pageloadMasterPost_save';
+$route['budgeting/postrealisasi/modalform'] = 'page/budgeting/c_budgeting/modal_postrealisasi';
+$route['budgeting/postrealisasi/modalform/save'] = 'page/budgeting/c_budgeting/save_postrealisasi';
+$route['budgeting/get_cfg_postrealisasi'] = 'page/budgeting/c_budgeting/get_cfg_postrealisasi';
+$route['budgeting/page/loadCodePrefix'] = 'page/budgeting/c_budgeting/loadCodePrefix';
+$route['budgeting/save_codeprefix'] = 'page/budgeting/c_budgeting/save_codeprefix';
+$route['budgeting/page/LoadSetPostDepartement'] = 'page/budgeting/c_budgeting/LoadSetPostDepartement';
+$route['budgeting/page/LoadInputsetPostDepartement'] = 'page/budgeting/c_budgeting/LoadInputsetPostDepartement';
+$route['budgeting/getPostDepartement'] = 'page/budgeting/c_budgeting/getPostDepartement';
+$route['budgeting/getDomPostDepartement'] = 'page/budgeting/c_budgeting/getDomPostDepartement';
+$route['budgeting/save-setpostdepartement'] = 'page/budgeting/c_budgeting/save_setpostdepartement';
+$route['budgeting/getBudgetLastYearByCode'] = 'page/budgeting/c_budgeting/getBudgetLastYearByCode';
+$route['budgeting/page/LogPostDepartement'] = 'page/budgeting/c_budgeting/LogPostDepartement';
+$route['budgeting/DataLogPostDepartement'] = 'page/budgeting/c_budgeting/DataLogPostDepartement';
+$route['budgeting/page/LoadSetUserRole'] = 'page/budgeting/c_budgeting/LoadSetUserRole';
+$route['budgeting/page/LoadMasterUserRoleDepartement'] = 'page/budgeting/c_budgeting/LoadMasterUserRoleDepartement';
+$route['budgeting/AutoCompletePostDepartement'] = 'page/budgeting/c_budgeting/AutoCompletePostDepartement';
+$route['budgeting/save_cfg_set_userrole'] = 'page/budgeting/c_budgeting/save_cfg_set_userrole';
+$route['budgeting/page/LoadSetUserActionDepartement'] = 'page/budgeting/c_budgeting/LoadSetUserActionDepartement';
+$route['budgeting/get_cfg_set_roleuser/(:any)'] = 'page/budgeting/c_budgeting/get_cfg_set_roleuser/$1';
+$route['budgeting/save_cfg_set_roleuser'] = 'page/budgeting/c_budgeting/save_cfg_set_roleuser';
+$route['budgeting/page/catalog/InputCatalog'] = 'page/budgeting/finance/c_master/InputCatalog';
+$route['budgeting/page/catalog/FormInput'] = 'page/budgeting/finance/c_master/InputCatalog_FormInput';
+$route['budgeting/page/catalog/saveFormInput'] = 'page/budgeting/finance/c_master/InputCatalog_saveFormInput';
+$route['budgeting/page/catalog/DataIntable'] = 'page/budgeting/finance/c_master/Catalog_DataIntable';
+$route['budgeting/page/catalog/DataIntable/server_side'] = 'page/budgeting/finance/c_master/Catalog_DataIntable_server_side';
+$route['budgeting/page/catalog/ApprovalCatalog'] = 'page/budgeting/finance/c_master/ApprovalCatalog';
+$route['budgeting/page/supplier/InputSupplier'] = 'page/budgeting/finance/c_master/InputSupplier';
+$route['budgeting/page/supplier/FormInput'] = 'page/budgeting/finance/c_master/InputSupplier_FormInput';
+$route['budgeting/page/supplier/saveFormInput'] = 'page/budgeting/finance/c_master/InputSupplier_saveFormInput';
+$route['budgeting/page/supplier/saveCategoryFormInput'] = 'page/budgeting/finance/c_master/saveCategoryFormInput';
+$route['budgeting/page/supplier/DataIntable'] = 'page/budgeting/finance/c_master/Supplier_DataIntable';
+$route['budgeting/page/supplier/DataIntable/server_side'] = 'page/budgeting/finance/c_master/Supplier_DataIntable_server_side';
+
+
+
+

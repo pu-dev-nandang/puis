@@ -120,6 +120,12 @@
                             <span>Venue Reservation</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="<?php echo base_url('budgeting'); ?>">
+                            <i class="fa fa-money" aria-hidden="true"></i>
+                            <span>Budgeting</span>
+                        </a>
+                    </li>
                     <li class="divider"></li>
                     <li><a href="javascript:void(0)" id="useLogOut"><i class="fa fa-power-off"></i> Log Out</a></li>
                 </ul>

@@ -178,7 +178,6 @@
 </style>
 
 <!--=== JavaScript ===-->
-
 <script type="text/javascript" src="<?php echo base_url('assets/template/js/libs/jquery-1.10.2.min.js'); ?>"></script>
 <script type="text/javascript" src="<?php echo base_url('assets/template/plugins/jquery-ui/jquery-ui-1.10.2.custom.min.js'); ?>"></script>
 
@@ -1215,5 +1214,9 @@
      
      return string;
      
+    }
+
+    function isObject(value) {
+        return value && typeof value === 'object' && value.constructor === Object;
     }
 </script>

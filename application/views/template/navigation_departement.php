@@ -62,6 +62,7 @@
                     <span class="title">Cooperation</span>
                 </a>
             </li>
+
             <li class="departement1 <?php if($departement=='cooperation'){echo 'current';} ?>"
                 division="7"
                 data-dpt="cooperation">
@@ -70,15 +71,14 @@
                     <span class="title">Student Live</span>
                 </a>
             </li>
-            <li class="departement1 <?php if($departement=='settings'){echo 'current';} ?>"
+            <li class="departement1 <?php if($departement=='it'){echo 'current';} ?>"
                 division="12"
                 data-dpt="settings">
                 <a href="javascript:void(0);">
-                    <span class="image"><img src="<?php echo base_url('assets/icon/settings.png'); ?>"></span>
-                    <span class="title">Settings</span>
+                    <span class="image"><img src="<?php echo base_url('assets/icon/it.png'); ?>"></span>
+                    <span class="title">IT</span>
                 </a>
             </li>
-
         </ul>
     </div> <!-- /#frame -->
 </div> <!-- /#project-switcher -->

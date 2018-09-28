@@ -918,13 +918,24 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $query;
     }
 
-    public function getSubmenu2BaseSubmenu1_grouping($submenu1,$db='db_admission')
+    public function getSubmenu2BaseSubmenu1_grouping($submenu1,$db='db_admission',$IDmenu = null)
     {
-        $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
-        from '.$db.'.cfg_sub_menu as a  join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
-        join '.$db.'.previleges_guser as c on b.cfg_group_user = c.G_user
-         where a.SubMenu1 = ? and c.NIP = ?';
-        $query=$this->db->query($sql, array($submenu1,$this->session->userdata('NIP')))->result_array();
+        if ($IDmenu != null) {
+            $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
+            from '.$db.'.cfg_sub_menu as a  join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
+            join '.$db.'.previleges_guser as c on b.cfg_group_user = c.G_user
+             where a.SubMenu1 = ? and c.NIP = ? and a.ID_Menu = ?';
+            $query=$this->db->query($sql, array($submenu1,$this->session->userdata('NIP'),$IDmenu))->result_array();
+        }
+        else
+        {
+            $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
+            from '.$db.'.cfg_sub_menu as a  join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
+            join '.$db.'.previleges_guser as c on b.cfg_group_user = c.G_user
+             where a.SubMenu1 = ? and c.NIP = ?';
+            $query=$this->db->query($sql, array($submenu1,$this->session->userdata('NIP')))->result_array();
+        }
+        
         return $query;
     }
 
