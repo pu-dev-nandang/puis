@@ -40,7 +40,7 @@ function loadTable()
 							'<th>Post</th>'+
                             '<th>Post Realization</th>'+
                             '<th>Post Budgeting</th>'+
-                            '<th>Catalog</th>'+
+                            // '<th>Catalog</th>'+
 							'<th>Supplier</th>'+
 						'</tr></thead>'	
 						;
@@ -135,7 +135,7 @@ function loadTable()
                             '<td>'+ CodePostInput+'</td>'+
                             '<td>'+ CodePostRealisasi+'</td>'+
                             '<td>'+ CodePostBudget+'</td>'+
-                            '<td>'+ CodeCatalog+'</td>'+
+                            // '<td>'+ CodeCatalog+'</td>'+
                             '<td>'+ CodeSupplier+'</td>'+
                          '</tr>'    
     }

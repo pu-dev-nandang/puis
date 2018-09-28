@@ -41,10 +41,10 @@
                     <div class="tabbable tabbable-custom tabbable-full-width btn-read MenuCatalog">
                         <ul class="nav nav-tabs">
                             <li class="active">
-                                <a href="javascript:void(0)" class="pageAnchorCatalog" page = "PageInputCatalog">Input</a>
+                                <a href="javascript:void(0)" class="pageAnchorCatalog" page = "InputCatalog">Input</a>
                             </li>
                             <li class="">
-                                <a href="javascript:void(0)" class="pageAnchorCatalog" page = "PageApprovalCatalog">Apprrove<b style="color: red;" id= "CountApproval"></b></a>
+                                <a href="javascript:void(0)" class="pageAnchorCatalog" page = "ApprovalCatalog">Approve<b style="color: red;" id= "CountApproval"></b></a>
                             </li>
                         </ul>
                         <div style="padding-top: 30px;border-top: 1px solid #cccccc">
@@ -62,6 +62,13 @@
 <script type="text/javascript">
     $(document).ready(function() {
         LoadPage('InputCatalog');
+
+        $(".pageAnchorCatalog").click(function(){
+            var Page = $(this).attr('page');
+            $(".MenuCatalog li").removeClass('active');
+            $(this).parent().addClass('active');
+            LoadPage(Page)
+        });
     }); // exit document Function
 
     function LoadPage(page)

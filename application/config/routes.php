@@ -881,6 +881,13 @@ $route['budgeting/page/catalog/FormInput'] = 'page/budgeting/finance/c_master/In
 $route['budgeting/page/catalog/saveFormInput'] = 'page/budgeting/finance/c_master/InputCatalog_saveFormInput';
 $route['budgeting/page/catalog/DataIntable'] = 'page/budgeting/finance/c_master/Catalog_DataIntable';
 $route['budgeting/page/catalog/DataIntable/server_side'] = 'page/budgeting/finance/c_master/Catalog_DataIntable_server_side';
+$route['budgeting/page/catalog/ApprovalCatalog'] = 'page/budgeting/finance/c_master/ApprovalCatalog';
+$route['budgeting/page/supplier/InputSupplier'] = 'page/budgeting/finance/c_master/InputSupplier';
+$route['budgeting/page/supplier/FormInput'] = 'page/budgeting/finance/c_master/InputSupplier_FormInput';
+$route['budgeting/page/supplier/saveFormInput'] = 'page/budgeting/finance/c_master/InputSupplier_saveFormInput';
+$route['budgeting/page/supplier/saveCategoryFormInput'] = 'page/budgeting/finance/c_master/saveCategoryFormInput';
+$route['budgeting/page/supplier/DataIntable'] = 'page/budgeting/finance/c_master/Supplier_DataIntable';
+$route['budgeting/page/supplier/DataIntable/server_side'] = 'page/budgeting/finance/c_master/Supplier_DataIntable_server_side';
 
 
 

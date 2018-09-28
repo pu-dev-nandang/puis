@@ -14,8 +14,8 @@
 				    <label class="control-label">Item Name</label>
 				</div>    
 				<div class="col-xs-3">
-				   <input type="text" name="ItemName" id= "ItemName" placeholder="Input ItemName" class="form-control" maxlength="20">
-				   <span id="charsItemName">20</span> characters remaining
+				   <input type="text" name="ItemName" id= "ItemName" placeholder="Input ItemName" class="form-control" maxlength="35">
+				   <span id="charsItemName">35</span> characters remaining
 				</div>
 			</div>
 		</div>
@@ -25,8 +25,8 @@
 				    <label class="control-label">Description</label>
 				</div>    
 				<div class="col-xs-3">
-				   <input type="text" name="Desc" id= "Desc" placeholder="Input Desc" class="form-control" maxlength="35">
-				   <span id="charsDesc">35</span> characters remaining
+				   <input type="text" name="Desc" id= "Desc" placeholder="Input Desc" class="form-control" maxlength="50">
+				   <span id="charsDesc">50</span> characters remaining
 				</div>
 				<div class="col-xs-2">
 				    <label class="control-label">Est Value</label>
@@ -45,6 +45,11 @@
 				   <input type="file" data-style="fileinput" id="ExFile" multiple>
 				   <span><b>JPG,PNG & Max 3 File</b></span>
 				</div>
+				<?php if ($action == 'edit'): ?>
+					<div class="col-xs-3" ID = "ShowPhoto">
+					   
+					</div>
+				<?php endif ?>
 			</div>
 		</div>
 		<div class="form-group">
@@ -80,14 +85,14 @@
 	function LoadFirst()
 	{
 		$("#ItemName").keyup(function(){
-			var maxLength = 20;
+			var maxLength = 35;
 			var length = $(this).val().length;
 			var length = maxLength-length;
 			$('#charsItemName').text(length);
 		})
 
 		$("#Desc").keyup(function(){
-			var maxLength = 35;
+			var maxLength = 50;
 			var length = $(this).val().length;
 			var length = maxLength-length;
 			$('#charsDesc').text(length);
@@ -99,7 +104,61 @@
 		$('#EstValue').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 
 		<?php if ($action == 'edit'): ?>
+			$("#Desc").val("<?php echo $get[0]['Desc'] ?>");
+			$("#ItemName").val("<?php echo $get[0]['Item'] ?>");
+
+			var ShowPhoto = "<?php echo $get[0]['Photo'] ?>";
+			var temp = '';
+			if(ShowPhoto != '')
+			{
+				ShowPhoto = ShowPhoto.split(",");
+				temp = '<ul>';
+					for (var i = 0; i < ShowPhoto.length; i++) {
+						temp += '<li>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-catalog-'+ShowPhoto[i]+'" target = "_blank">'+ShowPhoto[i]+'</a></li>';
+					}
+				temp += '</ul>'
+			}
 			
+
+			$("#ShowPhoto").html(temp);
+
+			var Cost = "<?php echo $get[0]['EstimaValue'] ?>";
+			var n = Cost.indexOf(".");
+			var Cost = Cost.substring(0, n);
+			$("#EstValue").val(Cost);
+			$('#EstValue').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+			$('#EstValue').maskMoney('mask', '9894');
+
+			<?php $getDetail = $get[0]['DetailCatalog'] ?>
+			<?php if ($getDetail != "" || $getDetail != null): ?>
+				var getDetail = [];
+			    getDetail =  <?php echo $getDetail ?>;
+				if (getDetail != '') {
+					var Input = '';
+					for(var key in getDetail) {
+						Input += '<div class = "row" style="margin-right: 0px;margin-left: 0px;margin-top: 10px">'+
+										'<div class="col-md-6 col-md-offset-2">'+
+											'<div class="col-xs-4">'+
+												'<input type="text" class="form-control addDetailinput" placeholder = "Input Name" value = "'+key+'">'+
+											'</div>'+
+											'<div class="col-xs-6">'+
+												'<input type="text" class="form-control addDetailinput" placeholder = "Input Value" value = "'+getDetail[key]+'">'+
+											'</div>'+
+											'<div class="col-xs-2">'+
+												'<button type="button" class="btn btn-danger btn-delete"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>'+
+											'</div>'+	
+										'</div>'+
+									'</div>';
+					}
+
+					$("#pageAddDetail").append(Input);	
+
+					$(".btn-delete").click(function(){
+						$(this)
+						  .parentsUntil( 'div[class="row"]' ).remove();
+					})	
+				}
+			<?php endif ?>
 		<?php endif ?>
 
 	}
@@ -145,6 +204,18 @@
 	       //allowClear: true
 	    });
 
+	    <?php if ($action == 'edit'): ?>
+	    	$("#Departement option").filter(function() {
+	    	   //may want to use $.trim in here
+	    	   return $(this).val() == '<?php echo $get[0]['Departement'] ?>'; 
+	    	 }).prop("selected", true);
+
+	    	$('#Departement').select2({
+	    	   //allowClear: true
+	    	});
+	    <?php endif ?>
+
+
 	  })
 	}
 
@@ -165,7 +236,7 @@
 	       var name = files[count].name;
 	       console.log(name);
 	       var extension = name.split('.').pop().toLowerCase();
-	       if(jQuery.inArray(extension, ['png','jpg']) == -1)
+	       if(jQuery.inArray(extension, ['png','jpg','jpeg']) == -1)
 	       {
 	        var no = parseInt(count) + 1;
 	        msgStr += 'File Number '+ no + ' Invalid Type File<br>';
@@ -291,6 +362,9 @@
 		                Item : $("#ItemName").val(),
 		                Desc : $("#Desc").val(),
 		                EstimaValue : findAndReplace($("#EstValue").val(),".",""),
+		                <?php if ($action == 'edit'): ?>
+		                	ID : "<?php echo $get[0]['ID'] ?>",
+		                <?php endif ?>
 		              };
 
 		if (validationInput = validation(DataArr)) {
@@ -318,6 +392,7 @@
 			      $('.pageAnchor[page="FormInput"]').trigger('click');
 			      	if (CountColapses2 == 0) {
 			      		$('.pageAnchor[page="DataIntable"]').trigger('click');
+			      		// LoadPageCatalog('DataIntable');
   			      	}
 			      	else
 			      	{
