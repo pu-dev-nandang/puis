@@ -4480,8 +4480,8 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div  style="text-align:center;">'.$row['NPM'].'</div>';
             $nestedData[] = '<div  style="text-align:left;"><b><i class="fa fa-user margin-right"></i> '.$row['Name'].'</b></div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['Code'].'</div>';
-            $nestedData[] = '<div  style="text-align:center;"><span id="viewTitleInd'.$row['ID'].'">'.$row['TitleInd'].'</span><input class="form-control hide fmFP'.$row['ID'].'" value="'.$row['TitleInd'].'" id="formTitleInd'.$row['ID'].'"></div>';
-            $nestedData[] = '<div  style="text-align:center;"><span id="viewTitleEng'.$row['ID'].'">'.$row['TitleEng'].'</span><input class="form-control hide fmFP'.$row['ID'].'" value="'.$row['TitleEng'].'" id="formTitleEng'.$row['ID'].'"></div>';
+            $nestedData[] = '<div  style="text-align:left;"><span id="viewTitleInd'.$row['ID'].'">'.$row['TitleInd'].'</span><input class="form-control hide fmFP'.$row['ID'].'" value="'.$row['TitleInd'].'" id="formTitleInd'.$row['ID'].'"></div>';
+            $nestedData[] = '<div  style="text-align:left;"><span id="viewTitleEng'.$row['ID'].'">'.$row['TitleEng'].'</span><input class="form-control hide fmFP'.$row['ID'].'" value="'.$row['TitleEng'].'" id="formTitleEng'.$row['ID'].'"></div>';
             $nestedData[] = '<div  style="text-align:center;">
                                     <button class="btn btn-success btn-sm hide btnSaveEditFP" data-id="'.$row['ID'].'" data-npm="'.$row['NPM'].'" id="btnSaveFP'.$row['ID'].'">Save</button>
                                     <button class="btn btn-default btn-sm btnEditFP" data-id="'.$row['ID'].'" data-npm=""'.$row['NPM'].' id="btnEditFP'.$row['ID'].'">Edit</button>
@@ -4511,13 +4511,18 @@ class C_api extends CI_Controller {
         if(count($data_arr>0)) {
             if ($data_arr['action'] == 'updateFP') {
 
-                print_r($data_arr);
-                exit;
-
+                // Cek apakah NIM sudah ada
+                $dataNIM = $this->db->get_where('db_academic.final_project',array('NPM' => $data_arr['NPM']),1)->result_array();
                 $dataForm = (array) $data_arr['dataForm'];
+                if(count($dataNIM)>0){
+                    // Update
+                    $this->db->where('NPM', $data_arr['NPM']);
+                    $this->db->update('final_project',$dataForm);
+                } else {
+                    $dataForm['NPM'] = $data_arr['NPM'];
+                    $this->db->insert('final_project',$dataForm);
+                }
 
-                $this->db->where('NPM', $data_arr['NPM']);
-                $this->db->update('final_project',$dataForm);
 
                 return print_r(1);
 
