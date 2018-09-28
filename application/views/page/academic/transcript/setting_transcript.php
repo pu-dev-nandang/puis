@@ -1,0 +1,319 @@
+
+<style>
+    .table-setting tr td {
+       font-weight: bold;
+    }
+    #tableHonor tr th{
+        text-align: center;
+        background: #607D8B;
+        color: #FFFFFF;
+    }
+    #tableHonor tr td, #tableEducation tr td {
+        text-align: center;
+    }
+
+    #tableEducation tr th{
+        text-align: center;
+        background: #607D8B;
+        color: #FFFFFF;
+    }
+</style>
+
+<!--<pre>-->
+<!--    --><?php //print_r($Transcript); ?>
+<!--</pre>-->
+<!--<pre>-->
+<!--    --><?php //print_r($Graduation); ?>
+<!--</pre>-->
+<!--<pre>-->
+<!--    --><?php //print_r($Education); ?>
+<!--</pre>-->
+
+<div class="row">
+    <div class="col-md-12" style="margin-top: 20px;">
+        <a href="<?php echo base_url('academic/transcript'); ?>" class="btn btn-warning"><i class="fa fa-arrow-left margin-right"></i> Back to List</a>
+        <hr/>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="thumbnail" style="padding: 0px">
+            <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;">Setting Transcript</span>
+
+            <div style="margin: 15px">
+                <table class="table table-setting">
+                    <tr>
+                        <td style="width: 50%">Nomor Keputusan Pendirian Perguruan Tinggai</td>
+                        <td style="width: 1%">:</td>
+                        <td>
+                            <input id="formSTID" value="<?php echo $Transcript['ID'] ?>" class="hide" hidden readonly>
+                            <input id="formSTNumberUniv" value="<?php echo $Transcript['NumberUniv'] ?>" class="form-control formST" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Tempat Diterbitkan</td>
+                        <td>:</td>
+                        <td>
+                            <input id="formSTPlaceIssued" value="<?php echo $Transcript['PlaceIssued']; ?>" class="form-control formST">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Tanggal Diterbitkan</td>
+                        <td>:</td>
+                        <td>
+                            <input id="formSTDateIssuedValue" value="<?php echo $Transcript['DateIssued']; ?>" class="form-control hide" readonly>
+                            <input id="formSTDateIssued" data-desc="Issue" class="form-control formST">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Tanggal Yudisium</td>
+                        <td>:</td>
+                        <td>
+                            <input id="formSTDateOfYudisiumValue" value="<?php echo $Transcript['DateOfYudisium']; ?>" class="form-control hide" readonly>
+                            <input id="formSTDateOfYudisium" data-desc="Yudisium" class="form-control formST">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="text-align: right;">
+                            <button class="btn btn-success" id="btnSaveST">Save</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+        <div class="thumbnail" style="padding: 0px">
+            <span class="label-success" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;">Setting Graduation Honor</span>
+
+            <div style="margin: 5px;margin-top: 15px;">
+                <table class="table table-bordered" id="tableHonor">
+                    <tr>
+                        <th colspan="2" style="width: 20%">IPK</th>
+                        <th rowspan="2" style="width: 25%">Predicate Indo</th>
+                        <th rowspan="2" style="width: 20%">Predicate Eng</th>
+                        <th rowspan="2" style="width: 2%">Act</th>
+                    </tr>
+                    <tr>
+                        <th style="width: 13%">Start</th>
+                        <th style="width: 13%">End</th>
+                    </tr>
+
+                    <?php
+                        foreach ($Graduation AS $itemG){ ?>
+
+                            <tr>
+                                <td><span class="spanGrade<?php echo $itemG['ID'] ?>" id="viewGStart<?php echo $itemG['ID']; ?>"><?php echo $itemG['IPKStart'] ?></span><input value="<?php echo $itemG['IPKStart'] ?>" class="form-control formFillG<?php echo $itemG['ID']; ?> hide" id="formIPKStart<?php echo $itemG['ID']; ?>"></td>
+                                <td><span class="spanGrade<?php echo $itemG['ID'] ?>" id="viewGEnd<?php echo $itemG['ID']; ?>"><?php echo $itemG['IPKEnd'] ?></span><input value="<?php echo $itemG['IPKEnd'] ?>" class="form-control formFillG<?php echo $itemG['ID']; ?> hide" id="formIPKEnd<?php echo $itemG['ID']; ?>"></td>
+                                <td><span class="spanGrade<?php echo $itemG['ID'] ?>" id="viewGDescription<?php echo $itemG['ID'];?>"><?php echo $itemG['Description'] ?></span><input value="<?php echo $itemG['Description'] ?>" class="form-control formFillG<?php echo $itemG['ID']; ?> hide" id="formDescription<?php echo $itemG['ID']; ?>"></td>
+                                <td><span class="spanGrade<?php echo $itemG['ID'] ?>" id="viewGDescriptionEng<?php echo $itemG['ID']; ?>"><?php echo $itemG['DescriptionEng'] ?></span><input value="<?php echo $itemG['DescriptionEng'] ?>" class="form-control formFillG<?php echo $itemG['ID']; ?> hide" id="formDescriptionEng<?php echo $itemG['ID']; ?>"></td>
+                                <td>
+                                    <button class="btn btn-success btn-sm btnSaveG hide" id="btnSaveG<?php echo $itemG['ID']; ?>" data-id="<?php echo $itemG['ID']; ?>">Save</button>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-default dropdown-toggle" id="btnDropDown<?php echo $itemG['ID']; ?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="javascript:void(0);" class="btnEditG" data-id="<?php echo $itemG['ID']; ?>">Edit</a></li>
+                                            <li role="separator" class="divider"></li>
+                                            <li class="disabled"><a href="javascript:void(0);" class="btnDelG disabled" disabled="disabled" data-id="<?php echo $itemG['ID']; ?>">Delete</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php }
+                    ?>
+
+<!--                    <button class="btn btn-sm btn-default btn-default-danger"><i class="fa fa-trash"></i></button>-->
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+        <div class="thumbnail" style="padding: 0px">
+            <span class="label-success" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;">Setting Education Program</span>
+
+            <div style="margin: 15px">
+                <table class="table table-bordered" id="tableEducation">
+                    <tr>
+                        <th style="width: 10%">Program Indo</th>
+                        <th style="width: 10%">Program Eng</th>
+                        <th style="width: 2%">Action</th>
+                    </tr>
+
+                    <?php foreach ($Education AS $itemE){ ?>
+                        <tr>
+                            <td><?php echo $itemE['Description']; ?></td>
+                            <td>
+                                <span id="viewDescriptionEng<?php echo $itemE['ID']; ?>"><?php echo $itemE['DescriptionEng']; ?></span>
+                                <input class="form-control hide" id="formEDescriptionEng<?php echo $itemE['ID']; ?>" value="<?php echo $itemE['DescriptionEng']; ?>"></td>
+                            <td>
+                                <button class="btn btn-success btn-sm btnSaveEd hide" id="btnSaveEd<?php echo $itemE['ID']; ?>" data-id="<?php echo $itemE['ID']; ?>">Save</button>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle" id="btnDropDownEd<?php echo $itemE['ID']; ?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="javascript:void(0);" class="btnEditEd" data-id="<?php echo $itemE['ID']; ?>">Edit</a></li>
+                                        <li role="separator" class="divider"></li>
+                                        <li class="disabled"><a href="javascript:void(0);" class="btnDelEd disabled" disabled="disabled" data-id="<?php echo $itemE['ID']; ?>">Delete</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php } ?>
+
+                    <!--                    <button class="btn btn-sm btn-default btn-default-danger"><i class="fa fa-trash"></i></button>-->
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $( "#formSTDateIssued,#formSTDateOfYudisium" )
+            .datepicker({
+                showOtherMonths:true,
+                autoSize: true,
+                dateFormat: 'dd MM yy',
+                onSelect : function () {
+                    var data_date = $(this).val().split(' ');
+                    var CustomMoment = moment(data_date[2]+'-'+(parseInt(convertDateMMtomm(data_date[1])) + 1)+'-'+data_date[0]).format('YYYY-MM-DD');
+                    var Desc = $(this).attr('data-desc');
+                    var elm = (Desc=='Issue') ? '#formSTDateIssuedValue' : '#formSTDateOfYudisiumValue';
+                    $(elm).val(CustomMoment);
+                }
+            });
+        $('#formSTDateIssued').datepicker('setDate',new Date("<?php echo $Transcript['DateIssued']; ?>"));
+        $('#formSTDateOfYudisium').datepicker('setDate',new Date("<?php echo $Transcript['DateOfYudisium']; ?>"));
+    });
+
+    // Save Setting Transcript
+    $('#btnSaveST').click(function () {
+        var ID = $('#formSTID').val();
+        var formSTNumberUniv = $('#formSTNumberUniv').val();
+        var formSTPlaceIssued = $('#formSTPlaceIssued').val();
+        var formSTDateIssuedValue = $('#formSTDateIssuedValue').val();
+        var formSTDateOfYudisiumValue = $('#formSTDateOfYudisiumValue').val();
+
+        loading_buttonSm('#btnSaveST');
+        $('.formST').prop('disabled',true);
+
+        var data = {
+            action : 'updateSettingTranscript',
+            ID : ID,
+            dataForm : {
+                NumberUniv : formSTNumberUniv,
+                PlaceIssued : formSTPlaceIssued,
+                DateIssued : formSTDateIssuedValue,
+                DateOfYudisium : formSTDateOfYudisiumValue
+            }
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api/__crudTranscript';
+        $.post(url,{token:token},function () {
+            toastr.success('Data Saved','Success');
+            setTimeout(function () {
+                $('#btnSaveST').html('Save');
+                $('.formST,#btnSaveST').prop('disabled',false);
+            },500);
+        });
+
+    });
+
+    // Graduation Honor
+    $(document).on('click','.btnEditG',function () {
+        var ID = $(this).attr('data-id');
+        $('#btnDropDown'+ID+', .spanGrade'+ID).addClass('hide');
+        $('#btnSaveG'+ID+', .formFillG'+ID).removeClass('hide');
+    });
+    $(document).on('click','.btnSaveG',function () {
+
+        var ID = $(this).attr('data-id');
+        loading_buttonSm('#btnSaveG'+ID);
+
+        $('#btnSaveG'+ID+', .formFillG'+ID).prop('disabled',true);
+
+        var formIPKStart = $('#formIPKStart'+ID).val();
+        var formIPKEnd = $('#formIPKEnd'+ID).val();
+        var formDescription = $('#formDescription'+ID).val();
+        var formDescriptionEng = $('#formDescriptionEng'+ID).val();
+        var data = {
+            action:'updateGrade',
+            ID:ID,
+            dataForm : {
+                IPKStart : formIPKStart,
+                IPKEnd : formIPKEnd,
+                Description : formDescription,
+                DescriptionEng : formDescriptionEng
+            }
+
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api/__crudTranscript';
+
+        $.post(url,{token:token},function (result) {
+            toastr.success('Data Saved','Success');
+            setTimeout(function () {
+                $('#btnSaveG'+ID+', .formFillG'+ID).prop('disabled',false);
+                $('#btnDropDown'+ID+', .spanGrade'+ID).removeClass('hide');
+                $('#btnSaveG'+ID+', .formFillG'+ID).addClass('hide');
+
+                $('#viewGStart'+ID).text(formIPKStart);
+                $('#viewGEnd'+ID).text(formIPKEnd);
+                $('#viewGDescription'+ID).text(formDescription);
+                $('#viewGDescriptionEng'+ID).text(formDescriptionEng);
+
+                $('#btnSaveG'+ID).prop('disabled',false);
+                $('#btnSaveG'+ID).html('Save');
+            },500);
+        });
+
+    });
+
+    // Education Level
+    $(document).on('click','.btnEditEd',function () {
+        var ID = $(this).attr('data-id');
+        $('#btnDropDownEd'+ID+', #viewDescriptionEng'+ID).addClass('hide');
+        $('#btnSaveEd'+ID+', #formEDescriptionEng'+ID).removeClass('hide');
+    });
+    $(document).on('click','.btnSaveEd',function () {
+        var ID = $(this).attr('data-id');
+        loading_buttonSm('#btnSaveEd'+ID);
+        $('#formEDescriptionEng'+ID).prop('disabled',true);
+        var formEDescriptionEng = $('#formEDescriptionEng'+ID).val();
+
+        var data = {
+            action : 'updateEducation',
+            ID : ID,
+            DescriptionEng : formEDescriptionEng
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api/__crudTranscript';
+
+        $.post(url,{token:token},function (result) {
+            toastr.success('Data Saved','Success');
+            setTimeout(function () {
+                $('#formEDescriptionEng'+ID+', #btnSaveEd'+ID).prop('disabled',false);
+                $('#btnSaveEd'+ID).html('Save');
+
+                $('#viewDescriptionEng'+ID).text(formEDescriptionEng);
+
+                $('#btnDropDownEd'+ID+', #viewDescriptionEng'+ID).removeClass('hide');
+                $('#btnSaveEd'+ID+', #formEDescriptionEng'+ID).addClass('hide');
+
+            },500);
+        });
+
+    });
+</script>

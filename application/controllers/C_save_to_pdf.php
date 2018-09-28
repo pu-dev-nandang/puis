@@ -3005,10 +3005,6 @@ class C_save_to_pdf extends CI_Controller {
 
         $dataStudent = $this->m_save_to_pdf->getTranscript($data_arr['DBStudent'],$data_arr['NPM']);
 
-
-//        print_r($dataStudent);
-//        exit;
-
         $pdf = new FPDF('P','mm','legal');
 
         // membuat halaman baru
@@ -3029,8 +3025,8 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetXY(15,20);
         $pdf->Cell(0,7,'DAFTAR HASIL STUDI',0,1,'C');
         $pdf->SetFont('dinlightitalic','',16);
-        $pdf->Cell(51,7,'',0,0,'C');
-        $pdf->Cell(93,7,'RECORD OF ACADEMIC ACHIEVEMENT','T',1,'C');
+        $pdf->Cell(49,7,'',0,0,'C');
+        $pdf->Cell(94,7,'RECORD OF ACADEMIC ACHIEVEMENT','T',1,'C');
         $pdf->SetXY(15,42.5);
 
         $label_l = 44;
@@ -3044,6 +3040,7 @@ class C_save_to_pdf extends CI_Controller {
         $border = 0;
 
         $Student = $dataStudent['Student'][0];
+        $Transcript = $dataStudent['Transcript'][0];
 
         $pdf->SetFont('dinpromedium','',9);
         $pdf->Cell($label_l,$h,'Nama',$border,0,'L');
@@ -3087,7 +3084,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($fill_l,$h,$Student['NPM'],$border,0,'L');
         $pdf->Cell($label_r,$h,'Nomor Keputusan Pendirian',$border,0,'L');
         $pdf->Cell($sparator_r,$h,':',$border,0,'C');
-        $pdf->Cell($fill_r,$h,'271/E/O/2018',$border,1,'L');
+        $pdf->Cell($fill_r,$h,$Transcript['NumberUniv'],$border,1,'L');
 
         $pdf->SetFont('dinlightitalic','',8);
         $pdf->Cell($label_l,$h,'Student Identification Number',$border,0,'L');
@@ -3234,11 +3231,11 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetFont('dinpromedium','',9);
         $pdf->Cell($w_Div,$h,'',0,0,'L');
-        $pdf->Cell($w_Div,$h,'Jakarta, 09 Januari 2019',0,1,'L');
+        $pdf->Cell($w_Div,$h,$Transcript['PlaceIssued'].', '.strftime("%d %B %Y",strtotime($Transcript['DateIssued'])),0,1,'L');
 
         $pdf->SetFont('dinlightitalic','',8);
         $pdf->Cell($w_Div,$h,'',0,0,'L');
-        $pdf->Cell($w_Div,$h,'Jakarta,  09 January 2019',0,1,'L');
+        $pdf->Cell($w_Div,$h,$Transcript['PlaceIssued'].',  '.date('F d, Y',strtotime($Transcript['DateIssued'])),0,1,'L');
 
         $pdf->Ln(5);
 
@@ -3276,8 +3273,8 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Rect(70, $y, 33, 45);
 
 
-
-        $pdf->Output('Transcript.pdf','I');
+        $nameF = str_replace(' ','_',strtoupper($Student['Name']));
+        $pdf->Output('TRNSCPT_'.$Student['NPM'].'_'.$nameF.'.pdf','I');
     }
 
     private function header_transcript_table($pdf){
@@ -3367,6 +3364,26 @@ class C_save_to_pdf extends CI_Controller {
 
 
     // ====== Ijazah =======
-//    public function
+    public function ijazah(){
+
+        $dataIjazah = $this->m_save_to_pdf->getIjazah('ta_2014','11140005');
+
+        $pdf = new FPDF('L','mm','A4');
+
+        // membuat halaman baru
+        $pdf->SetMargins(20.5,10.5,0);
+        $pdf->AddPage();
+
+        $h = 3;
+
+        $Ijazah = $dataIjazah['Ijazah'][0];
+        $pdf->SetFont('dinpromedium','',8);
+//        $pdf->SetXY(15,20.5);
+        $pdf->Cell(0,$h,'Nomor Keputusan Pendirian Perguruan Tinggi : '.$Ijazah['NumberUniv'],1,1,'L');
+
+        $pdf->Cell(276.5,$h,'inggi : '.$Ijazah['NumberUniv'],1,1,'L');
+
+        $pdf->Output('Ijazah.pdf','I');
+    }
 
 }

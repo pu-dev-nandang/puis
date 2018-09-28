@@ -108,10 +108,10 @@
                     Score
                 </a>
             </li>
-            <li class="">
-                <a href="#">
+            <li class="<?php if($this->uri->segment(2)=='final-project'){echo "current";} ?>">
+                <a href="<?php echo base_url('academic/final-project'); ?>">
                     <i class="fa fa-flag"></i>
-                    Final Project (Coming Soon)
+                    Final Project
                 </a>
             </li>
             <li class="<?php if($this->uri->segment(2)=='transcript'){echo "current";} ?>">

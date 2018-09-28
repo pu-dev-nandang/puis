@@ -4417,10 +4417,112 @@ class C_api extends CI_Controller {
                 print_r($data);
 
             }
+            else if($data_arr['action']=='updateGrade'){
+
+                $dataIns = (array) $data_arr['dataForm'];
+                $this->db->where('ID', $data_arr['ID']);
+                $this->db->update('db_academic.graduation',$dataIns);
+                return print_r(1);
+            }
+            else if($data_arr['action']=='updateSettingTranscript'){
+                $dataIns = (array) $data_arr['dataForm'];
+                $this->db->where('ID', $data_arr['ID']);
+                $this->db->update('db_academic.setting_transcript',$dataIns);
+                return print_r(1);
+            }
+            else if($data_arr['action']=='updateEducation'){
+
+                $this->db->set('DescriptionEng', $data_arr['DescriptionEng']);
+                $this->db->where('ID', $data_arr['ID']);
+                $this->db->update('db_academic.education_level');
+                return print_r(1);
+            }
         }
 
     }
-
     // ==========
+
+    // ====== Final Project =======
+    public function getFinalProject(){
+        $requestData= $_REQUEST;
+        $data_arr = $this->getInputToken();
+
+        $dataWhere = ($data_arr['ProdiID']!='' && $data_arr['ProdiID']!=null)
+            ? 'aut_s.Year = "'.$data_arr['Year'].'" AND aut_s.StatusStudentID = "3" AND aut_s.ProdiID = "'.$data_arr['ProdiID'].'" '
+            : 'aut_s.Year = "'.$data_arr['Year'].'" AND aut_s.StatusStudentID = "3" ' ;
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataSearch = 'AND ( aut_s.Name LIKE "%'.$search.'%" OR aut_s.NPM LIKE "%'.$search.'%" 
+                           OR ps.Name LIKE "%'.$search.'%"  OR ps.NameEng LIKE "%'.$search.'%" )';
+        }
+
+        $queryDefault = 'SELECT aut_s.*, ps.Name AS ProdiName, ps.NameEng AS ProdiNameEng, ps.Code,  
+                                      fp.TitleInd, fp.TitleEng
+                                      FROM db_academic.auth_students aut_s
+                                      LEFT JOIN db_academic.program_study ps ON (ps.ID = aut_s.ProdiID)
+                                      LEFT JOIN db_academic.final_project fp ON (fp.NPM = aut_s.NPM)
+                                      WHERE ( '.$dataWhere.' ) '.$dataSearch.' ORDER BY aut_s.NPM ASC ';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$row['NPM'].'</div>';
+            $nestedData[] = '<div  style="text-align:left;"><b><i class="fa fa-user margin-right"></i> '.$row['Name'].'</b></div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$row['Code'].'</div>';
+            $nestedData[] = '<div  style="text-align:center;"><span id="viewTitleInd'.$row['ID'].'">'.$row['TitleInd'].'</span><input class="form-control hide fmFP'.$row['ID'].'" value="'.$row['TitleInd'].'" id="formTitleInd'.$row['ID'].'"></div>';
+            $nestedData[] = '<div  style="text-align:center;"><span id="viewTitleEng'.$row['ID'].'">'.$row['TitleEng'].'</span><input class="form-control hide fmFP'.$row['ID'].'" value="'.$row['TitleEng'].'" id="formTitleEng'.$row['ID'].'"></div>';
+            $nestedData[] = '<div  style="text-align:center;">
+                                    <button class="btn btn-success btn-sm hide btnSaveEditFP" data-id="'.$row['ID'].'" data-npm="'.$row['NPM'].'" id="btnSaveFP'.$row['ID'].'">Save</button>
+                                    <button class="btn btn-default btn-sm btnEditFP" data-id="'.$row['ID'].'" data-npm=""'.$row['NPM'].' id="btnEditFP'.$row['ID'].'">Edit</button>
+                                </div>';
+
+            $no++;
+
+            $data[] = $nestedData;
+
+
+        }
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+
+        echo json_encode($json_data);
+
+    }
+
+    public function crudFinalProject(){
+
+        $data_arr = $this->getInputToken();
+
+        if(count($data_arr>0)) {
+            if ($data_arr['action'] == 'updateFP') {
+
+                print_r($data_arr);
+                exit;
+
+                $dataForm = (array) $data_arr['dataForm'];
+
+                $this->db->where('NPM', $data_arr['NPM']);
+                $this->db->update('final_project',$dataForm);
+
+                return print_r(1);
+
+            }
+        }
+    }
 
 }

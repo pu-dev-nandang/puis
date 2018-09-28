@@ -388,6 +388,8 @@ class M_save_to_pdf extends CI_Model {
         // Get Rektor
         $dataRektor = $this->db->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees',array('PositionMain' => '2.1'),1)->result_array();
 
+        $dataTranscript = $this->db->get('db_academic.setting_transcript')->result_array();
+
         $result = array(
             'Student' => $dataStd,
             'Result' => array(
@@ -397,6 +399,7 @@ class M_save_to_pdf extends CI_Model {
                 'IPK' => round($ipk,2),
                 'Grading' => $grade
             ),
+            'Transcript' => $dataTranscript,
             'Rektorat' => $dataRektor,
             'DetailCourse' => $data
         );
@@ -410,6 +413,27 @@ class M_save_to_pdf extends CI_Model {
                                                    LIMIT 1')->result_array();
 
         return $dataGrade;
+    }
+
+    public function getIjazah($DBStudent,$NPM){
+        $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth,  
+                                            ps.Name AS Prodi, ps.NameEng AS ProdiEng, edl.Description AS GradeDesc, 
+                                            edl.DescriptionEng AS GradeDescEng, em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind 
+                                            FROM '.$DBStudent.'.students s
+                                            LEFT JOIN db_academic.program_study ps ON (s.ProdiID = ps.ID) 
+                                            LEFT JOIN db_academic.education_level edl ON (edl.ID = ps.EducationLevelID)
+                                            LEFT JOIN db_academic.faculty f ON (f.ID = ps.FacultyID)
+                                            LEFT JOIN db_employees.employees em ON (em.NIP = f.NIP)
+                                            WHERE s.NPM = "'.$NPM.'" ')->result_array();
+
+        $dataTranscript = $this->db->get('db_academic.setting_transcript')->result_array();
+
+        $result = array(
+            'Student' => $dataStd,
+            'Ijazah' => $dataTranscript
+        );
+
+        return $result;
     }
 
 }
