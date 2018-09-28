@@ -89,6 +89,10 @@ $route['academic/inputScore'] =  'page/academic/c_score/inputScore';
 
 // ---- Transcript ----
 $route['academic/transcript'] =  'page/academic/c_transcript';
+$route['academic/setting-transcript'] =  'page/academic/c_transcript/setting_transcript';
+
+// ---- Final Project ----
+$route['academic/final-project'] =  'page/academic/c_final_project';
 
 
 // --- Modal Academic ----
@@ -543,6 +547,7 @@ $route['save2pdf/answer-sheet'] =  'c_save_to_pdf/answer_sheet';
 $route['save2pdf/news-event'] =  'c_save_to_pdf/news_event';
 $route['save2pdf/attendance-list'] =  'c_save_to_pdf/attendance_list';
 $route['save2pdf/transcript'] =  'c_save_to_pdf/transcript';
+$route['save2pdf/ijazah'] =  'c_save_to_pdf/ijazah';
 
 $route['save2pdf/report-uts'] =  'c_save_to_pdf/report_uts';
 
@@ -717,6 +722,9 @@ $route['api/__crudClassroomVreservation'] = 'api/c_api/crudClassroomVreservation
 
 $route['api/__crudTranscript'] = 'api/c_api/crudTranscript';
 $route['api/__getTranscript'] = 'api/c_api/getTranscript';
+
+$route['api/__crudFinalProject'] = 'api/c_api/crudFinalProject';
+$route['api/__getFinalProject'] = 'api/c_api/getFinalProject';
 
 $route['api/__crudInvigilator'] = 'api/c_api/crudInvigilator';
 

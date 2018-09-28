@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class C_transcript extends Academic_Controler {
+class C_final_project extends Academic_Controler {
 
     function __construct()
     {
@@ -18,14 +18,14 @@ class C_transcript extends Academic_Controler {
     public function menu_transcript($page){
         $data['department'] = parent::__getDepartement();
         $data['page'] = $page;
-        $content = $this->load->view('page/'.$data['department'].'/transcript/menu_transcript',$data,true);
+        $content = $this->load->view('page/'.$data['department'].'/finalproject/menu_finalproject',$data,true);
         parent::template($content);
     }
 
     public function index()
     {
         $data['department'] = parent::__getDepartement();
-        $page = $this->load->view('page/'.$data['department'].'/transcript/transcript_list_student',$data,true);
+        $page = $this->load->view('page/'.$data['department'].'/finalproject/finalproject_list_student',$data,true);
         $this->menu_transcript($page);
     }
 

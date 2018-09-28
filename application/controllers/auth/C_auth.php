@@ -15,7 +15,7 @@ class C_auth extends Globalclass {
     public function __construct()
     {
         parent::__construct();
-//        $this->db_server = $this->load->database('server', TRUE);
+        $this->db_server = $this->load->database('server', TRUE);
         $this->db = $this->load->database('default', TRUE);
     }
 
@@ -667,7 +667,7 @@ class C_auth extends Globalclass {
             $db_lokal = 'ta_'.$db_;
             $dataMhs = $this->db_server->query('SELECT m.ID, m.NPM, r.MKID FROM siak4.rencanastudi r 
                                                 LEFT JOIN siak4.mahasiswa m ON (m.ID = r.MhswID) 
-                                                WHERE m.TahunMasuk = "'.$db_.'" GROUP BY m.NPM ORDER BY m.NPM, r.TahunID ASC')->result_array();
+                                                WHERE (m.TahunMasuk = "'.$db_.'") AND (r.) GROUP BY m.NPM ORDER BY m.NPM, r.TahunID ASC')->result_array();
 
             $res=[];
 
@@ -1212,6 +1212,19 @@ class C_auth extends Globalclass {
                     );
                     $this->db->insert('db_academic.auth_students',$dataInsert);
                 }
+            }
+
+        }
+
+        else if($table=='updateStatus'){
+            $y = 2016;
+            $db_ = 'ta_'.$y;
+            $dataStd = $this->db->select('NPM, StatusStudentID')->get($db_.'.students')->result_array();
+
+            for($i=0;$i<count($dataStd);$i++){
+                $this->db->set('StatusStudentID', $dataStd[$i]['StatusStudentID']);
+                $this->db->where('NPM', $dataStd[$i]['NPM']);
+                $this->db->update('db_academic.auth_students');
             }
 
         }

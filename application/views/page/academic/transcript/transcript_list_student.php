@@ -9,6 +9,12 @@
     }
 </style>
 
+<div class="row" style="margin-top: 10px;">
+    <div class="col-md-12" style="text-align: right;">
+        <a href="<?php echo base_url('academic/setting-transcript'); ?>" class="btn btn-info"><i class="fa fa-cog margin-right"></i> Setting</a>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-md-6 col-md-offset-3">
         <div class="well">
@@ -103,7 +109,7 @@
                     "iDisplayLength" : 10,
                     "ordering" : false,
                     "language": {
-                        "searchPlaceholder": "Course, MKCode, Coordinator"
+                        "searchPlaceholder": "NIM, Name, Programme Study"
                     },
                     "ajax":{
                         url : base_url_js+'api/__getTranscript', // json datasource
