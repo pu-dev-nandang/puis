@@ -70,8 +70,7 @@
                     <span class="image"><img src="<?php echo base_url('assets/icon/student_live.png'); ?>"></span>
                     <span class="title">Student Live</span>
                 </a>
-            </li>
-            <li class="departement1 <?php if($departement=='it'){echo 'current';} ?>"
+            </li>            <li class="departement1 <?php if($departement=='it'){echo 'current';} ?>"
                 division="12"
                 data-dpt="settings">
                 <a href="javascript:void(0);">
