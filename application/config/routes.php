@@ -681,6 +681,8 @@ $route['api/__crudLimitCredit'] = 'api/c_api/crudLimitCredit';
 $route['api/database/__getListStudent'] = 'api/c_api/getListStudent';
 $route['api/database/upload_photo_student'] = 'page/academic/c_akademik/upload_photo_student';
 
+$route['api/database/__getListEmployees'] = 'api/c_api/getListEmployees';
+
 
 $route['rest/__checkDateKRS'] = 'api/c_rest/checkDateKRS';
 $route['rest/__getDetailKRS'] = 'api/c_rest/getDetailKRS';
@@ -690,8 +692,6 @@ $route['rest/__getExamSchedule'] = 'api/c_rest/getExamSchedule';
 $route['rest/__getKSM'] = 'api/c_rest/getKSM';
 $route['rest/__getExamScheduleForStudent'] = 'api/c_rest/getExamScheduleForStudent';
 $route['rest/__cek_deadline_paymentNPM'] = 'api/c_rest/cek_deadline_paymentNPM';
-
-
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';

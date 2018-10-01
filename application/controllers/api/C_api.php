@@ -4656,4 +4656,105 @@ class C_api extends CI_Controller {
 
     }
 
+    public function getListEmployees(){
+        $requestData= $_REQUEST;
+        $data_arr = $this->getInputToken();
+
+        $dataWhere = ($data_arr['StatusEmployeeID']!='' && $data_arr['StatusEmployeeID']!=null) ?
+            'AND StatusEmployeeID = "'.$data_arr['StatusEmployeeID'].'" '
+            : '' ;
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataSearch = ' AND ( em.Name LIKE "%'.$search.'%" OR em.NIP LIKE "%'.$search.'%" )';
+        }
+
+        $queryDefault = 'SELECT em.*, ems.Description AS StatusEmployees FROM db_employees.employees em 
+                                      LEFT JOIN db_employees.employees_status ems ON (em.StatusEmployeeID = ems.IDStatus)
+                                      WHERE ( em.StatusEmployeeID != -2  '.$dataWhere.' ) '.$dataSearch.' ORDER BY em.NIP ASC ';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+        $no = $requestData['start'] + 1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++) {
+            $nestedData = array();
+            $row = $query[$i];
+
+            $division = '-';
+            $position = '-';
+            if($row['PositionMain']!='' && $row['PositionMain']!=null){
+                $PositionMain = explode('.',$row['PositionMain']);
+
+                $dataDivisi = $this->db->select('Division,Description')->get_where('db_employees.division',
+                    array('ID' => $PositionMain[0]),1)->result_array();
+                $division = $dataDivisi[0]['Division'];
+
+                $dataPosition = $this->db->select('Position,Description')->get_where('db_employees.position'
+                    ,array('ID' => $PositionMain[1]),1)->result_array();
+
+                $position = $dataPosition[0]['Position'];
+            }
+
+
+
+            $gender = ($row['Gender']=='L') ? 'Female' : 'Male' ;
+
+            $url_image = './uploads/employees/'.$row['Photo'];
+            $srcImg = (file_exists($url_image)) ? base_url('uploads/employees/'.$row['Photo'])
+                : base_url('images/icon/userfalse.png') ;
+
+
+            $dataToken = array(
+                'Type' => 'emp',
+                'Name' => $row['Name'],
+                'NIP' => $row['NIP'],
+                'Email' => $row['EmailPU']
+            );
+
+            $token = $this->jwt->encode($dataToken,'UAP)(*');
+
+            $disBtnEmail = ($row['EmailPU']=='' || $row['EmailPU']=='') ? 'disabled' : '';
+
+            $btnAct = '<div class="btn-group">
+                          <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu">
+                            <li class="'.$disBtnEmail.'"><a href="javascript:void(0);" '.$disBtnEmail.' class="btn-reset-password '.$disBtnEmail.'" data-token="'.$token.'">Reset Password</a></li>
+                            </li>
+                          </ul>
+                        </div>';
+
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$row['NIP'].'</div>';
+            $nestedData[] = '<div  style="text-align:center;"><img src="'.$srcImg.'" style="max-width: 35px;" class="img-rounded"></div>';
+            $nestedData[] = '<div  style="text-align:left;"><b>'.$row['Name'].'</b><br/><span style="color: #2196f3;">'.$row['EmailPU'].'</span></div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$gender.'</div>';
+            $nestedData[] = '<div  style="text-align:left;">'.ucwords(strtolower($division)).'<br/>- '.ucwords(strtolower($position)).'</div>';
+            $nestedData[] = '<div  style="text-align:left;">'.$row['Address'].'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$btnAct.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$row['StatusEmployees'].'</div>';
+
+            $no++;
+
+            $data[] = $nestedData;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+
+        echo json_encode($json_data);
+
+    }
+
 }
