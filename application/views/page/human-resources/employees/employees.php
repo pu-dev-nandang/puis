@@ -24,7 +24,7 @@
     <span style="color: #F44336;margin-right: 5px;margin-left: 5px;"><i class="fa fa-warning" style="margin-right: 5px;"></i> Non Active </span>
 </div>
 <hr/>
-<div class="table-responsive">
+<div class="">
     <table class="table table-bordered table-striped" id="tableEmployees">
         <thead>
         <tr style="background: #20485A;color: #FFFFFF;">
