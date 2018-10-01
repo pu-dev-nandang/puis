@@ -74,7 +74,7 @@
     function LoadPage(page)
     {
       loading_page("#pageSupplier");
-      var url = base_url_js+'budgeting/page/supplier/'+page;
+      var url = base_url_js+'purchasing/page/supplier/'+page;
       $.post(url,function (resultJson) {
           var response = jQuery.parseJSON(resultJson);
           var html = response.html;

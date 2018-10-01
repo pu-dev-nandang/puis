@@ -354,7 +354,7 @@
 	function saveFileAndData(Detail)
 	{
 		var form_data = new FormData();
-		var url = base_url_js + "budgeting/page/catalog/saveFormInput";
+		var url = base_url_js + "purchasing/page/catalog/saveFormInput";
 		var DataArr = {
 		                Detail : Detail,
 		                Action : "<?php echo $action ?>",

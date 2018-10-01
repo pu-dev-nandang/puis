@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class C_master extends Budgeting_Controler {
+class C_master extends Purchasing_Controler {
     public $Msg = array(
             'Duplicate' => 'The data duplicate, Please check',
             'NotAction' => 'The data has been used for transaction, Cannot be action',
@@ -11,19 +11,19 @@ class C_master extends Budgeting_Controler {
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('master/m_master');
         $this->data['department'] = parent::__getDepartement(); 
+        $this->load->model('budgeting/m_budgeting');
     }
 
     public function catalog()
     {
-        $content = $this->load->view('page/'.$this->data['department'].'/budgeting/master/catalog',$this->data,true);
+        $content = $this->load->view('page/'.$this->data['department'].'/master/catalog',$this->data,true);
         $this->temp($content);
     }
 
     public function supplier()
     {
-        $content = $this->load->view('page/'.$this->data['department'].'/budgeting/master/supplier',$this->data,true);
+        $content = $this->load->view('page/'.$this->data['department'].'/master/supplier',$this->data,true);
         $this->temp($content);
     }
 
@@ -31,7 +31,7 @@ class C_master extends Budgeting_Controler {
     {
         $this->auth_ajax();
         $arr_result = array('html' => '','jsonPass' => '');
-        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/master/catalog/InputCatalog',$this->data,true);
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/catalog/InputCatalog',$this->data,true);
         echo json_encode($arr_result);
     }
 
@@ -41,10 +41,10 @@ class C_master extends Budgeting_Controler {
         $Input = $this->getInputToken();
         $this->data['action'] = $Input['action'];
         if ($Input['action'] == 'edit') {
-            $this->data['get'] = $this->m_master->caribasedprimary('db_budgeting.m_catalog','ID',$Input['ID']);
+            $this->data['get'] = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$Input['ID']);
         }
         $arr_result = array('html' => '','jsonPass' => '');
-        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/master/catalog/FormInputCatalog',$this->data,true);
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/catalog/FormInputCatalog',$this->data,true);
         echo json_encode($arr_result);
     }
 
@@ -60,6 +60,7 @@ class C_master extends Budgeting_Controler {
         $Detail = json_encode($Detail);
 
         $filename = $Input['Item'].'_Uploaded';
+        $filename = str_replace(" ", '_', $filename);
         switch ($Input['Action']) {
             case 'add':
                 if (array_key_exists('fileData',$_FILES)) {
@@ -80,7 +81,7 @@ class C_master extends Budgeting_Controler {
                            'ApprovalBy' => $this->session->userdata('NIP'),
                            'ApprovalAt' => date('Y-m-d H:i:s'),
                        );
-                       $this->db->insert('db_budgeting.m_catalog', $dataSave);
+                       $this->db->insert('db_purchasing.m_catalog', $dataSave);
                        echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
                    }
                    else
@@ -102,7 +103,7 @@ class C_master extends Budgeting_Controler {
                         'ApprovalBy' => $this->session->userdata('NIP'),
                         'ApprovalAt' => date('Y-m-d H:i:s'),
                     );
-                    $this->db->insert('db_budgeting.m_catalog', $dataSave);
+                    $this->db->insert('db_purchasing.m_catalog', $dataSave);
                     echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
                 }
 
@@ -124,7 +125,7 @@ class C_master extends Budgeting_Controler {
                            'LastUpdateAt' => date('Y-m-d H:i:s'),
                        );
                        $this->db->where('ID', $Input['ID']);
-                       $this->db->update('db_budgeting.m_catalog', $dataSave);
+                       $this->db->update('db_purchasing.m_catalog', $dataSave);
                        echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
                    }
                    else
@@ -143,7 +144,7 @@ class C_master extends Budgeting_Controler {
                         'LastUpdateAt' => date('Y-m-d H:i:s'),
                     );
                     $this->db->where('ID', $Input['ID']);
-                    $this->db->update('db_budgeting.m_catalog', $dataSave);
+                    $this->db->update('db_purchasing.m_catalog', $dataSave);
                     echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
                 }
                 break;
@@ -154,7 +155,7 @@ class C_master extends Budgeting_Controler {
                     'LastUpdateAt' => date('Y-m-d H:i:s'),
                 );
                 $this->db->where('ID', $Input['ID']);
-                $this->db->update('db_budgeting.m_catalog', $dataSave);
+                $this->db->update('db_purchasing.m_catalog', $dataSave);
                 echo json_encode(array(''));
                 break;
             case 'approve':
@@ -164,7 +165,7 @@ class C_master extends Budgeting_Controler {
                     'ApprovalAt' => date('Y-m-d H:i:s'),
                 );
                 $this->db->where('ID', $Input['ID']);
-                $this->db->update('db_budgeting.m_catalog', $dataSave);
+                $this->db->update('db_purchasing.m_catalog', $dataSave);
                 echo json_encode(array(''));
                 break;        
             default:
@@ -235,7 +236,7 @@ class C_master extends Budgeting_Controler {
         $this->auth_ajax();
         $arr_result = array('html' => '','jsonPass' => '');
         $this->data['action'] = $action;
-        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/master/catalog/Catalog_DataIntable',$this->data,true);
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/catalog/Catalog_DataIntable',$this->data,true);
         echo json_encode($arr_result);
     }
 
@@ -252,19 +253,19 @@ class C_master extends Budgeting_Controler {
         }
 
         $requestData= $_REQUEST;
-        $sql = 'select count(*) as total from db_budgeting.m_catalog as a where a.Active = 1 '.$condition;
+        $sql = 'select count(*) as total from db_purchasing.m_catalog as a where a.Active = 1 '.$condition;
         $query = $this->db->query($sql)->result_array();
         $totalData = $query[0]['total'];
         $No = $requestData['start'] + 1;
 
         $sql = 'select a.*,b.Name as NameCreated,c.NameDepartement
-                from db_budgeting.m_catalog as a 
+                from db_purchasing.m_catalog as a 
                 join db_employees.employees as b on a.CreatedBy = b.NIP
                 join (
                 select * from (
                 select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study
                 UNION
-                select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
                 ) aa
                 ) as c on a.Departement = c.ID
                ';
@@ -352,7 +353,7 @@ class C_master extends Budgeting_Controler {
     {
         $this->auth_ajax();
         $arr_result = array('html' => '','jsonPass' => '');
-        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/master/supplier/InputSupplier',$this->data,true);
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/supplier/InputSupplier',$this->data,true);
         echo json_encode($arr_result);
     }
 
@@ -362,10 +363,10 @@ class C_master extends Budgeting_Controler {
         $Input = $this->getInputToken();
         $this->data['action'] = $Input['action'];
         if ($Input['action'] == 'edit') {
-            $this->data['get'] = $this->m_master->caribasedprimary('db_budgeting.m_supplier','ID',$Input['ID']);
+            $this->data['get'] = $this->m_master->caribasedprimary('db_purchasing.m_supplier','ID',$Input['ID']);
         }
         $arr_result = array('html' => '','jsonPass' => '');
-        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/master/supplier/FormInputSupplier',$this->data,true);
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/supplier/FormInputSupplier',$this->data,true);
         echo json_encode($arr_result);
     }
 
@@ -396,12 +397,12 @@ class C_master extends Budgeting_Controler {
                     $CfgCode = $this->m_master->showData_array('db_budgeting.cfg_codeprefix');
                     $CodePostPrefix = $CfgCode[0]['CodeSupplier'];
                     $LengthCode = $CfgCode[0]['LengthCodeSupplier'];
-                    $tbl = 'db_budgeting.m_supplier';
+                    $tbl = 'db_purchasing.m_supplier';
                     $fieldCode = 'CodeSupplier';
                     $CodeSupplier = $this->m_budgeting->getTheCode($tbl,$fieldCode,$CodePostPrefix,$LengthCode);
                 }
 
-                $sql = 'select * from db_budgeting.m_supplier where CodeSupplier = ? and Active = 1';
+                $sql = 'select * from db_purchasing.m_supplier where CodeSupplier = ? and Active = 1';
                 $query=$this->db->query($sql, array($CodeSupplier))->result_array();
                 if (count($query) > 0) {
                    $Msg = $this->Msg['Duplicate'];
@@ -425,7 +426,7 @@ class C_master extends Budgeting_Controler {
                        'CreatedBy' => $this->session->userdata('NIP'),
                        'CreatedAt' => date('Y-m-d'),
                    );
-                   $this->db->insert('db_budgeting.m_supplier', $dataSave);
+                   $this->db->insert('db_purchasing.m_supplier', $dataSave);
                 }
                 break;
             case 'edit':
@@ -446,7 +447,7 @@ class C_master extends Budgeting_Controler {
                    'LastUpdateAt' => date('Y-m-d H:i:s'),
                 );
                 $this->db->where('ID', $ID);
-                $this->db->update('db_budgeting.m_supplier', $dataSave);
+                $this->db->update('db_purchasing.m_supplier', $dataSave);
                 break;
             case 'delete':
                 $dataSave = array(
@@ -455,7 +456,7 @@ class C_master extends Budgeting_Controler {
                     'LastUpdateAt' => date('Y-m-d H:i:s'),
                 );
                 $this->db->where('ID', $Input['ID']);
-                $this->db->update('db_budgeting.m_supplier', $dataSave);
+                $this->db->update('db_purchasing.m_supplier', $dataSave);
                 break;
             case 'approve':
                 $dataSave = array(
@@ -464,7 +465,7 @@ class C_master extends Budgeting_Controler {
                     'ApprovalAt' => date('Y-m-d H:i:s'),
                 );
                 $this->db->where('ID', $Input['ID']);
-                $this->db->update('db_budgeting.m_supplier', $dataSave);
+                $this->db->update('db_purchasing.m_supplier', $dataSave);
                 break;           
             default:
                 # code...
@@ -482,7 +483,7 @@ class C_master extends Budgeting_Controler {
         $dataSave = array(
             'CategoryName' => trim(ucwords($CategoryName)),
         );
-        $this->db->insert('db_budgeting.m_categorysupplier', $dataSave);
+        $this->db->insert('db_purchasing.m_categorysupplier', $dataSave);
     }
 
     public function Supplier_DataIntable($action = "All_approval")
@@ -490,7 +491,7 @@ class C_master extends Budgeting_Controler {
         $this->auth_ajax();
         $arr_result = array('html' => '','jsonPass' => '');
         $this->data['action'] = $action;
-        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/master/supplier/Supplier_DataIntable',$this->data,true);
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/supplier/Supplier_DataIntable',$this->data,true);
         echo json_encode($arr_result);
     }
 
@@ -507,15 +508,15 @@ class C_master extends Budgeting_Controler {
         }
 
         $requestData= $_REQUEST;
-        $sql = 'select count(*) as total from db_budgeting.m_supplier as a where a.Active = 1 '.$condition;
+        $sql = 'select count(*) as total from db_purchasing.m_supplier as a where a.Active = 1 '.$condition;
         $query = $this->db->query($sql)->result_array();
         $totalData = $query[0]['total'];
         $No = $requestData['start'] + 1;
 
         $sql = 'select a.*,b.Name as NameCreated,c.CategoryName
-                from db_budgeting.m_supplier as a 
+                from db_purchasing.m_supplier as a 
                 join db_employees.employees as b on a.CreatedBy = b.NIP
-                join db_budgeting.m_categorysupplier as c on a.CategorySupplier = c.ID
+                join db_purchasing.m_categorysupplier as c on a.CategorySupplier = c.ID
                ';
 
         $sql.= ' where ( a.CodeSupplier LIKE "'.$requestData['search']['value'].'%" or a.NamaSupplier LIKE "%'.$requestData['search']['value'].'%" or a.PICName LIKE "'.$requestData['search']['value'].'%" or a.DetailInfo LIKE "%'.$requestData['search']['value'].'%" or c.CategoryName LIKE "'.$requestData['search']['value'].'%" or a.CategorySupplier LIKE "%'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%" or a.DetailItem LIKE "%'.$requestData['search']['value'].'%"

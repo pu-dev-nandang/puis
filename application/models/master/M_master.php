@@ -652,6 +652,17 @@ class M_master extends CI_Model {
         return $query;
     }
 
+    public function getUserSessAuth($NIP,$IDDivision)
+    {
+        $sql = 'select CONCAT(a.Name," | ",a.NIP) as Name, a.NIP from db_employees.employees as a 
+          join db_employees.rule_users as b
+          on a.NIP = b.NIP
+          where b.IDDivision = ? and a.NIP = ?
+          GROUP BY a.NIP';
+        $query=$this->db->query($sql, array($IDDivision,$NIP))->result_array();
+        return $query;
+    }
+
     public function get_submenu_by_menu($input)
     {
         $ID_Menu = $input['Menu'];

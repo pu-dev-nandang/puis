@@ -74,7 +74,7 @@
     function LoadPage(page)
     {
       loading_page("#pageCatalog");
-      var url = base_url_js+'budgeting/page/catalog/'+page;
+      var url = base_url_js+'purchasing/page/catalog/'+page;
       $.post(url,function (resultJson) {
           var response = jQuery.parseJSON(resultJson);
           var html = response.html;

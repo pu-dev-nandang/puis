@@ -901,20 +901,81 @@ $route['budgeting/save_cfg_set_userrole'] = 'page/budgeting/c_budgeting/save_cfg
 $route['budgeting/page/LoadSetUserActionDepartement'] = 'page/budgeting/c_budgeting/LoadSetUserActionDepartement';
 $route['budgeting/get_cfg_set_roleuser/(:any)'] = 'page/budgeting/c_budgeting/get_cfg_set_roleuser/$1';
 $route['budgeting/save_cfg_set_roleuser'] = 'page/budgeting/c_budgeting/save_cfg_set_roleuser';
-$route['budgeting/page/catalog/InputCatalog'] = 'page/budgeting/finance/c_master/InputCatalog';
-$route['budgeting/page/catalog/FormInput'] = 'page/budgeting/finance/c_master/InputCatalog_FormInput';
-$route['budgeting/page/catalog/saveFormInput'] = 'page/budgeting/finance/c_master/InputCatalog_saveFormInput';
-$route['budgeting/page/catalog/DataIntable'] = 'page/budgeting/finance/c_master/Catalog_DataIntable';
-$route['budgeting/page/catalog/DataIntable/server_side'] = 'page/budgeting/finance/c_master/Catalog_DataIntable_server_side';
-$route['budgeting/page/catalog/ApprovalCatalog'] = 'page/budgeting/finance/c_master/ApprovalCatalog';
-$route['budgeting/page/supplier/InputSupplier'] = 'page/budgeting/finance/c_master/InputSupplier';
-$route['budgeting/page/supplier/FormInput'] = 'page/budgeting/finance/c_master/InputSupplier_FormInput';
-$route['budgeting/page/supplier/saveFormInput'] = 'page/budgeting/finance/c_master/InputSupplier_saveFormInput';
-$route['budgeting/page/supplier/saveCategoryFormInput'] = 'page/budgeting/finance/c_master/saveCategoryFormInput';
-$route['budgeting/page/supplier/DataIntable'] = 'page/budgeting/finance/c_master/Supplier_DataIntable';
-$route['budgeting/page/supplier/DataIntable/server_side'] = 'page/budgeting/finance/c_master/Supplier_DataIntable_server_side';
-$route['budgeting/page/supplier/ApprovalSupplier'] = 'page/budgeting/finance/c_master/ApprovalSupplier';
 
 
+// Purchasing
+$query = $db->get('db_purchasing.cfg_sub_menu');
+$result = $query->result();
+// print_r($result);die();
+foreach( $result as $row )
+{
+	$Slug = $row->Slug;
+	$Slug = explode('/', $Slug);
+	if (in_array('(:any)', $Slug)) {
+	   $a = count($Slug) - 1;
+	   $URI = '';
+	   for ($i=0; $i < $a; $i++) { 
+	   	$URI .= $Slug[$i].'/';
+	   }
+	   $route[ $URI.'(:any)' ] = $row->Controller;
+	}
+	elseif(in_array('(:num)', $Slug)) {
+		$a = count($Slug) - 1;
+		$URI = '';
+		for ($i=0; $i < $a; $i++) { 
+			$URI .= $Slug[$i].'/';
+		}
+		$route[ $URI.'(:num)' ] = $row->Controller;
+	}
+	else
+	{
+		$route[ $row->Slug ] = $row->Controller;
+	}
 
+}
 
+$route['purchasing/page/catalog/InputCatalog'] = 'page/purchasing/c_master/InputCatalog';
+$route['purchasing/page/catalog/FormInput'] = 'page/purchasing/c_master/InputCatalog_FormInput';
+$route['purchasing/page/catalog/saveFormInput'] = 'page/purchasing/c_master/InputCatalog_saveFormInput';
+$route['purchasing/page/catalog/DataIntable'] = 'page/purchasing/c_master/Catalog_DataIntable';
+$route['purchasing/page/catalog/DataIntable/server_side'] = 'page/purchasing/c_master/Catalog_DataIntable_server_side';
+$route['purchasing/page/catalog/ApprovalCatalog'] = 'page/purchasing/c_master/ApprovalCatalog';
+$route['purchasing/page/supplier/InputSupplier'] = 'page/purchasing/c_master/InputSupplier';
+$route['purchasing/page/supplier/FormInput'] = 'page/purchasing/c_master/InputSupplier_FormInput';
+$route['purchasing/page/supplier/saveFormInput'] = 'page/purchasing/c_master/InputSupplier_saveFormInput';
+$route['purchasing/page/supplier/saveCategoryFormInput'] = 'page/purchasing/c_master/saveCategoryFormInput';
+$route['purchasing/page/supplier/DataIntable'] = 'page/purchasing/c_master/Supplier_DataIntable';
+$route['purchasing/page/supplier/DataIntable/server_side'] = 'page/purchasing/c_master/Supplier_DataIntable_server_side';
+$route['purchasing/page/supplier/ApprovalSupplier'] = 'page/purchasing/c_master/ApprovalSupplier';
+$route['purchasing/table_all/(:any)'] = 'page/purchasing/c_purchasing/LoadTable_db_purchasing_all/$1/$2';
+$route['purchasing/table_all/(:any)/(:any)'] = 'page/purchasing/c_purchasing/LoadTable_db_purchasing_all/$1/$2';
+// IT
+$query = $db->get('db_it.cfg_sub_menu');
+$result = $query->result();
+// print_r($result);die();
+foreach( $result as $row )
+{
+	$Slug = $row->Slug;
+	$Slug = explode('/', $Slug);
+	if (in_array('(:any)', $Slug)) {
+	   $a = count($Slug) - 1;
+	   $URI = '';
+	   for ($i=0; $i < $a; $i++) { 
+	   	$URI .= $Slug[$i].'/';
+	   }
+	   $route[ $URI.'(:any)' ] = $row->Controller;
+	}
+	elseif(in_array('(:num)', $Slug)) {
+		$a = count($Slug) - 1;
+		$URI = '';
+		for ($i=0; $i < $a; $i++) { 
+			$URI .= $Slug[$i].'/';
+		}
+		$route[ $URI.'(:num)' ] = $row->Controller;
+	}
+	else
+	{
+		$route[ $row->Slug ] = $row->Controller;
+	}
+
+}

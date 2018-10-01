@@ -196,7 +196,7 @@ class M_budgeting extends CI_Model {
                 select * from (
                 select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study
                 UNION
-                select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
                 ) aa
                 ) as d on b.Departement = d.ID
                 where (b.RealisasiPostName like "%'.$PostDepartement.'%" or d.NameDepartement like "%'.$PostDepartement.'%" 

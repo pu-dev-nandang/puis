@@ -62,7 +62,7 @@
 		    "iDisplayLength" : 10,
 		    "ordering" : false,
 		    "ajax":{
-		        url : base_url_js+"budgeting/page/supplier/DataIntable/server_side", // json datasource
+		        url : base_url_js+"purchasing/page/supplier/DataIntable/server_side", // json datasource
 		        ordering : false,
 		        type: "post",  // method  , by default get
 		        data : {action : "<?php echo $action ?>"},
@@ -86,10 +86,10 @@
 			var ID = $(this).attr('code');
 	      	if (CountColapses == 0) {
 	      		// $('.pageAnchor[page="FormInput"]').trigger('click');
-	      		 $('#FormInput').show();
+	      		$('#FormInput').show();
 	      		var page = 'FormInput';
 	      		loading_page("#page"+page);
-	      		var url = base_url_js+'budgeting/page/supplier/'+page;
+	      		var url = base_url_js+'purchasing/page/supplier/'+page;
 	      		var data = {
 	      			action : 'edit',
 	      			ID : ID,
@@ -105,9 +105,10 @@
 		    }
 	      	else
 	      	{
+	      		// $('.pageAnchor[page="FormInput"]').trigger('click');
 	      		var page = 'FormInput';
 	      		loading_page("#page"+page);
-	      		var url = base_url_js+'budgeting/page/supplier/'+page;
+	      		var url = base_url_js+'purchasing/page/supplier/'+page;
 	      		var data = {
 	      			action : 'edit',
 	      			ID : ID,
@@ -119,6 +120,8 @@
 	      		    var jsonPass = response.jsonPass;
 	      		    $("#page"+page).html(html);
 	      		}); // exit spost
+
+	      		// CountColapses = 0;
 	      	}
 		});
 
@@ -140,7 +143,7 @@
           		                ID : $(this).attr('code'),
 	  	                   };
 			  	var token = jwt_encode(data,"UAP)(*");
-			  	var url = base_url_js + "budgeting/page/supplier/saveFormInput";
+			  	var url = base_url_js + "purchasing/page/supplier/saveFormInput";
 			  	$.post(url,{token:token},function (data_json) {
   	               var obj = JSON.parse(data_json); 
   	               if(obj == "")
@@ -186,7 +189,7 @@
           		                ID : $(this).attr('code'),
 	  	                   };
 			  	var token = jwt_encode(data,"UAP)(*");
-			  	var url = base_url_js + "budgeting/page/supplier/saveFormInput";
+			  	var url = base_url_js + "purchasing/page/supplier/saveFormInput";
 			  	$.post(url,{token:token},function (data_json) {
   	               var obj = JSON.parse(data_json); 
   	               if(obj == "")

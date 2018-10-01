@@ -4529,9 +4529,10 @@ class C_api extends CI_Controller {
     public function getAllDepartementPU()
     {
         $arr_result = array();
-        $NA = $this->m_master->showData_array('db_employees.division');
+        // $NA = $this->m_master->showData_array('db_employees.division');
+        $NA = $this->m_master->caribasedprimary('db_employees.division','StatusDiv',1);
         $AC = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
-        for ($i=0; $i < count($NA) - 1; $i++) { 
+        for ($i=0; $i < count($NA); $i++) { 
             $arr_result[] = array(
                 'Code'  => 'NA.'.$NA[$i]['ID'],
                 'Name1' => 'NA '.$NA[$i]['Description'],
@@ -4539,7 +4540,7 @@ class C_api extends CI_Controller {
             );
         }
 
-        for ($i=0; $i < count($AC) - 1; $i++) { 
+        for ($i=0; $i < count($AC); $i++) { 
             $arr_result[] = array(
                 'Code'  => 'AC.'.$NA[$i]['ID'],
                 'Name1' => 'AC '.$AC[$i]['Name'],

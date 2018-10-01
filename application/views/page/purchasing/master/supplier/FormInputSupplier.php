@@ -244,7 +244,7 @@
 		// save categoryName
 		$("#btnAddCategoryName").click(function(){
 			loading_button('#btnAddCategoryName');
-			var url = base_url_js+'budgeting/page/supplier/saveCategoryFormInput';
+			var url = base_url_js+'purchasing/page/supplier/saveCategoryFormInput';
 			var CategoryName = $("#CategoryName").val();
 			var data = {
 			            CategoryName : CategoryName,
@@ -306,7 +306,7 @@
 	function loadSelectCategory()
 	{
 		// add select category supplier
-		var url = base_url_js+"budgeting/table_all/m_categorysupplier";
+		var url = base_url_js+"purchasing/table_all/m_categorysupplier";
 		$('#CategorySupplier').empty()
 		$.post(url,function (data_json) {
 		    var obj = JSON.parse(data_json);
@@ -391,7 +391,7 @@
 		{	
 			if (confirm("Are you sure?") == true) {
 				loading_button('#btnSaveForm');
-				var url = base_url_js+'budgeting/page/supplier/saveFormInput';
+				var url = base_url_js+'purchasing/page/supplier/saveFormInput';
 
 				var NeedPrefix = $('.NeedPrefix:checked').val();
 				var checkAddDetailInfo = getAddDetailInfo();

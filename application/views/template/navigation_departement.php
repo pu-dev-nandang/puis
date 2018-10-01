@@ -13,7 +13,6 @@
 
     <div id="frame">
         <ul class="project-list">
-
             <li class="departement <?php if($departement=='admission'){echo 'current';} ?>"
                 division="10"
                 data-dpt="admission">
@@ -70,9 +69,18 @@
                     <span class="image"><img src="<?php echo base_url('assets/icon/student_live.png'); ?>"></span>
                     <span class="title">Student Live</span>
                 </a>
-            </li>            <li class="departement1 <?php if($departement=='it'){echo 'current';} ?>"
+            </li>    
+            <li class="departement <?php if($departement=='purchasing'){echo 'current';} ?>"
+                division="4"
+                data-dpt="purchasing">
+                <a href="javascript:void(0);">
+                    <span class="image"><img src="<?php echo base_url('assets/icon/purchase.png'); ?>"></span>
+                    <span class="title">Purchasing</span>
+                </a>
+            </li>   
+            <li class="departement <?php if($departement=='it'){echo 'current';} ?>"
                 division="12"
-                data-dpt="settings">
+                data-dpt="it">
                 <a href="javascript:void(0);">
                     <span class="image"><img src="<?php echo base_url('assets/icon/it.png'); ?>"></span>
                     <span class="title">IT</span>

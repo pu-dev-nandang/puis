@@ -49,7 +49,7 @@
 			if (page == 'FormInput') {
 				CountColapses = (CountColapses == 0) ? CountColapses = 1 : CountColapses = 0 ;
 				if(CountColapses == 1) {
-				 LoadPageSupplier(page);
+				 LoadPageCatalog(page);
 				}
 				else
 				{
@@ -60,7 +60,7 @@
 			{
 				CountColapses2 = (CountColapses2 == 0) ? CountColapses2 = 1 : CountColapses2 = 0 ;
 				if(CountColapses2 == 1) {
-				 LoadPageSupplier(page);
+				 LoadPageCatalog(page);
 				}
 				else
 				{
@@ -71,10 +71,10 @@
 
 	}
 
-	function LoadPageSupplier(page)
+	function LoadPageCatalog(page)
 	{
 		loading_page("#page"+page);
-		var url = base_url_js+'budgeting/page/supplier/'+page;
+		var url = base_url_js+'purchasing/page/catalog/'+page;
 		var data = {
 			action : 'add',
 		}

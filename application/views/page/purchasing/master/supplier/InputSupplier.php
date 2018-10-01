@@ -5,7 +5,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading" role="tab" id="headingOne">
                         <h4 class="panel-title">
-                            <a href="javascript:void(0)" class="pageAnchor" page = "FormInput" data-toggle="collapse" status = "0">Form Input
+                            <a href="javascript:void(0)" class="pageAnchor" page = "FormInput" data-toggle="collapse" status = "0" action = "add" CDID = "">Form Input
                             </a>
                         </h4>
                     </div>
@@ -18,7 +18,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading" role="tab" id="headingOne">
                         <h4 class="panel-title">
-                            <a href="javascript:void(0)" class="pageAnchor" page = "DataIntable" data-toggle="collapse" status = "0">Data
+                            <a href="javascript:void(0)" class="pageAnchor" page = "DataIntable" data-toggle="collapse" status = "0" action = "add" CDID = "">Data
                             </a>
                         </h4>
                     </div>
@@ -48,19 +48,24 @@
 			$(this).attr('data-target','#'+page);
 			if (page == 'FormInput') {
 				CountColapses = (CountColapses == 0) ? CountColapses = 1 : CountColapses = 0 ;
-				if(CountColapses == 1) {
-				 LoadPageCatalog(page);
-				}
-				else
+				var status = $(this).attr('status');
+				if(status == 0)
 				{
-				 $("#page"+page).empty();
+					if(CountColapses == 1) {
+					 LoadPageSupplier(page);
+					}
+					else
+					{
+					 $("#page"+page).empty();
+					}
 				}
+				
 			}
 			else
 			{
 				CountColapses2 = (CountColapses2 == 0) ? CountColapses2 = 1 : CountColapses2 = 0 ;
 				if(CountColapses2 == 1) {
-				 LoadPageCatalog(page);
+				 LoadPageSupplier(page);
 				}
 				else
 				{
@@ -69,12 +74,13 @@
 			}
 		})
 
+
 	}
 
-	function LoadPageCatalog(page)
+	function LoadPageSupplier(page)
 	{
 		loading_page("#page"+page);
-		var url = base_url_js+'budgeting/page/catalog/'+page;
+		var url = base_url_js+'purchasing/page/supplier/'+page;
 		var data = {
 			action : 'add',
 		}

@@ -59,7 +59,7 @@
 		    "iDisplayLength" : 10,
 		    "ordering" : false,
 		    "ajax":{
-		        url : base_url_js+"budgeting/page/catalog/DataIntable/server_side", // json datasource
+		        url : base_url_js+"purchasing/page/catalog/DataIntable/server_side", // json datasource
 		        ordering : false,
 		        type: "post",  // method  , by default get
 		        data : {action : "<?php echo $action ?>"},
@@ -82,10 +82,11 @@
 			$('.pageAnchor[page="DataIntable"]').trigger('click');
 			var ID = $(this).attr('code');
 	      	if (CountColapses == 0) {
-	      		$('.pageAnchor[page="FormInput"]').trigger('click');
+	      		// $('.pageAnchor[page="FormInput"]').trigger('click');
+	      		$('#FormInput').show();
 	      		var page = 'FormInput';
 	      		loading_page("#page"+page);
-	      		var url = base_url_js+'budgeting/page/catalog/'+page;
+	      		var url = base_url_js+'purchasing/page/catalog/'+page;
 	      		var data = {
 	      			action : 'edit',
 	      			ID : ID,
@@ -102,7 +103,7 @@
 	      	{
 	      		var page = 'FormInput';
 	      		loading_page("#page"+page);
-	      		var url = base_url_js+'budgeting/page/catalog/'+page;
+	      		var url = base_url_js+'purchasing/page/catalog/'+page;
 	      		var data = {
 	      			action : 'edit',
 	      			ID : ID,
@@ -129,7 +130,7 @@
           		                ID : $(this).attr('code'),
 	  	                   };
 			  	var token = jwt_encode(data,"UAP)(*");
-			  	var url = base_url_js + "budgeting/page/catalog/saveFormInput";
+			  	var url = base_url_js + "purchasing/page/catalog/saveFormInput";
 			  	$.post(url,{token:token},function (data_json) {
   	               var obj = JSON.parse(data_json); 
   	               if(obj == "")
@@ -169,7 +170,7 @@
           		                ID : $(this).attr('code'),
 	  	                   };
 			  	var token = jwt_encode(data,"UAP)(*");
-			  	var url = base_url_js + "budgeting/page/catalog/saveFormInput";
+			  	var url = base_url_js + "purchasing/page/catalog/saveFormInput";
 			  	$.post(url,{token:token},function (data_json) {
   	               var obj = JSON.parse(data_json); 
   	               if(obj == "")
