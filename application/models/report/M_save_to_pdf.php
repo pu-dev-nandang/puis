@@ -354,12 +354,14 @@ class M_save_to_pdf extends CI_Model {
 
         $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth,  
                                             ps.Name AS Prodi, ps.NameEng AS ProdiEng, edl.Description AS GradeDesc, 
-                                            edl.DescriptionEng AS GradeDescEng, em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind 
+                                            edl.DescriptionEng AS GradeDescEng, em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind, 
+                                            fp.TitleInd, fp.TitleEng
                                             FROM '.$DBStudent.'.students s
                                             LEFT JOIN db_academic.program_study ps ON (s.ProdiID = ps.ID) 
                                             LEFT JOIN db_academic.education_level edl ON (edl.ID = ps.EducationLevelID)
                                             LEFT JOIN db_academic.faculty f ON (f.ID = ps.FacultyID)
                                             LEFT JOIN db_employees.employees em ON (em.NIP = f.NIP)
+                                            LEFT JOIN db_academic.final_project fp ON (fp.NPM = s.NPM)
                                             WHERE s.NPM = "'.$NPM.'" ')->result_array();
 
 
