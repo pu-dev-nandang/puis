@@ -7,6 +7,7 @@ class C_database extends Globalclass {
     {
         parent::__construct();
 //        $this->session->set_userdata('departement_nav', 'academic');
+        $this->load->model('m_sendemail');
         $this->load->model('database/m_database');
         $this->load->library('JWT');
     }
@@ -241,6 +242,37 @@ class C_database extends Globalclass {
     {
         $data['dataForm'] = $this->input->post('data');
         $this->load->view('page/database/admisi/students_details',$data);
+    }
+
+
+    // Reset Pasword ====
+    public function sendMailResetPassword(){
+
+        $data_arr = $this->getInputToken();
+        $token = $this->input->post('token');
+
+        $to = $data_arr['Email'];
+//        $to = 'nndg.ace3@gmail.com';
+
+        $subject = 'Reset Your Password';
+        $text = 'Dear <strong style="color: blue;">'.$data_arr['Name'].'</strong>,
+
+                <p style="color: #673AB7;">To reset your password on <strong>Portal Podomoro University</strong>, please Click the link below, and your account will be activated instantly</p>
+
+                <table width="178" cellspacing="0" cellpadding="12" border="0">
+                    <tbody>
+                    <tr>
+                        <td bgcolor="#ff9000" align="center">
+                            <a href="'.url_sign_out.'resetpassword/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color:#ff9000" target="_blank" >Reset Password</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <br/>';
+
+        $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,null,'Reset Password');
+
+        return print_r(1);
     }
 
 

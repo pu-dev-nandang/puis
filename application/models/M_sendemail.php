@@ -61,8 +61,11 @@ class M_sendemail extends CI_Model {
         return $config;
     }
 
-    public function textEmail($text = null)
+    public function textEmail($text = null, $title = null)
     {
+
+        $titleHead = ($title!=null) ? $title : '';
+
         if ($text == null) {
             $text1 = '<div style="margin:0;padding:10px ;background-color:#ebebeb;font-size:14px;line-height:20px;font-family:Helvetica,sans-serif;width:100%;">
     <div class="adM">
@@ -139,7 +142,7 @@ class M_sendemail extends CI_Model {
                             <div style="text-align: center;">
                                 <img src="https://lh3.googleusercontent.com/mkqZdtpCm7IfWWrPdfxJBETqOTiEU09s3cr4tzfFwAGRl3WqH_pyo3yDGPKmpSHfMw1mSFU0JTRk-3yX9M7xAG5KiVHzuMS1DPHzFg=w500-h144-rw-no" style="max-width: 250px;">
                                 <hr style="border-top: 1px solid #cccccc;"/>
-                                <div style="font-family:Proxima Nova Semi-bold,Helvetica,sans-serif;font-weight:bold;font-size:24px;line-height:24px;color:#607D8B">Podomoro University Message</div>
+                                <div style="font-family:Proxima Nova Semi-bold,Helvetica,sans-serif;font-weight:bold;font-size:24px;line-height:24px;color:#607D8B">Notification '.$titleHead.'</div>
                             </div>
                             <br/>
                             <div style="font-family:Proxima Nova Reg,Helvetica,sans-serif">
@@ -161,7 +164,7 @@ class M_sendemail extends CI_Model {
 
     }
 
-    public function sendEmail($to = null,$subject = null,$smtp_host = null,$smtp_port = null,$smtp_user = null,$smtp_pass = null,$text = null, $attach = null)
+    public function sendEmail($to = null,$subject = null,$smtp_host = null,$smtp_port = null,$smtp_user = null,$smtp_pass = null,$text = null, $attach = null, $title = null)
     {
         $arr = array(
             'status' => 1,
@@ -174,7 +177,7 @@ class M_sendemail extends CI_Model {
         $this->VariableClass['text'] = $text;
 
         $config_email = $this->loadEmailConfig();
-        $textEmail = $this->textEmail($this->VariableClass['text']);
+        $textEmail = $this->textEmail($this->VariableClass['text'],$title);
         $max_execution_time = 630;
         ini_set('memory_limit', '-1');
         ini_set('max_execution_time', $max_execution_time); //60 seconds = 1 minutes

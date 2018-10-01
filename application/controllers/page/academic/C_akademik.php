@@ -49,5 +49,39 @@ class C_akademik extends Academic_Controler {
     }
     // ===== /MODAL =====
 
+    public function upload_photo_student(){
+
+        $folder = $this->input->get('f');
+        $fileName = $this->input->get('fileName');
+
+        $config['upload_path']          = './uploads/students/'.$folder.'/';
+        $config['allowed_types']        = 'gif|jpg|png|jpeg';
+        $config['max_size']             = 8000; // 8 mb
+        $config['file_name']            = $fileName;
+
+
+        $this->load->library('upload', $config);
+        if ( ! $this->upload->do_upload('userfile')){
+            $error = array('error' => $this->upload->display_errors());
+            return print_r(json_encode($error));
+        }
+        else {
+
+            // Update Db
+            $dataNPM = trim(explode('.',$fileName)[0]);
+
+            $this->db->set('Photo', $fileName);
+            $this->db->where('NPM', $dataNPM);
+            $this->db->update($folder.'.students');
+
+            $success = array('success' => $this->upload->data());
+            $success['success']['formGrade'] = 0;
+
+            return print_r(json_encode($success));
+        }
+
+
+
+    }
 
 }

@@ -1,19 +1,33 @@
 
-
+<style>
+    #tableStudent thead tr th {
+        background: #20525a;
+        color: #ffffff;
+        text-align: center;
+    }
+</style>
 
 <div class="row">
-    <div class="col-md-6 col-md-offset-3">
-        <div class="thumbnail">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="well">
             <div class="row">
-                <div class="col-md-4">
-                    <select class="form-control" id="filterCurriculum"></select>
+                <div class="col-xs-4">
+                    <select class="form-control filter-db-std" id="filterCurriculum">
+                        <option value="">-- All Curriculum --</option>
+                        <option disabled>------------------------</option>
+                    </select>
                 </div>
-                <div class="col-md-4">
-                    <select class="form-control" id="filterBaseProdi"></select>
+                <div class="col-xs-5">
+                    <select class="form-control filter-db-std" id="filterBaseProdi">
+                        <option value="">-- All Programme Study --</option>
+                        <option disabled>------------------------</option>
+                    </select>
                 </div>
-
-                <div class="col-md-4">
-                    <select class="form-control" id="filterStatus"></select>
+                <div class="col-xs-3">
+                    <select class="form-control filter-db-std" id="filterStatus">
+                        <option value="">-- All Status --</option>
+                        <option disabled>------------------------</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -21,133 +35,24 @@
 </div>
 
 <div class="row">
-    <div class="col-md-12" style="padding: 10px;text-align: right;">
-        <hr/>
-        <div class="">
-            <span style="color: #03a9f4;"><i class="fa fa-circle"></i> Lulus | </span>
-            <span style="color: green;"><i class="fa fa-circle"></i> Aktif | </span>
-            <span style="color: #ff9800;"><i class="fa fa-circle"></i> Cuti | </span>
-            <span style="color: red;"><i class="fa fa-circle"></i> Non-Aktif / Mengundurkan Diri / DO</span>
-        </div>
-
-        <hr/>
-    </div>
-</div>
-
-<div class="row">
     <div class="col-md-12">
-        <div id="pageStudents"></div>
+        <div id="divDataStudent">
+
+        </div>
     </div>
 </div>
+
 
 <script>
     $(document).ready(function () {
-
-        $('#filterCurriculum,#filterBaseProdi').empty();
         loadSelectOptionCurriculum('#filterCurriculum','');
-
-        // $('#filterBaseProdi').append('<option value="">--- All Program Study ---</option>' +
-        //     '<option disabled>------------------------------------------</option>');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
-
-        setTimeout(function () { loadPage(); },500);
-
-        $('#filterStatus').append('<option value="">--- All Status ---</option>' +
-            '<option disabled>------------------------------------------</option>');
         loadSelectOptionStatusStudent('#filterStatus','');
-
+        loadStudent();
     });
 
-    $(document).on('change','#filterCurriculum,#filterBaseProdi,#filterStatus',function () {
-        loadPage();
-    });
-
-    $(document).on('click','.btnDetailStudent',function () {
-        var ta = $(this).attr('data-ta');
-        var NPM = $(this).attr('data-npm');
-
-        // var url = base_url_js+'api/__crudeStudent';
-        var url = base_url_js+'database/showStudent';
-        var data = {
-            action : 'read',
-            formData : {
-                ta : ta,
-                NPM : NPM
-            }
-        };
-
-        var token = jwt_encode(data,'UAP)(*');
-        $.post(url,{token:token},function (html) {
-            // console.log(jsonResult);
-            //
-            $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-                '<h4 class="modal-title">Detail Mahasiswa</h4>');
-            $('#GlobalModal .modal-body').html(html);
-            $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
-            $('#GlobalModal').modal({
-                'show' : true,
-                'backdrop' : 'static'
-            });
-        });
-
-
-    });
-
-    // Change Password Students
-    $(document).on('click','.btn-reset-password',function () {
-
-        var Name = $(this).attr('data-name');
-        var NPM = $(this).attr('data-npm');
-        var StatusID = $(this).attr('data-statusid');
-
-        if(StatusID=='3'){
-            $('#NotificationModal .modal-body').html('<div style="text-align: center;">Reset Password - <b>'+Name+'</b><hr/> ' +
-                '<input class="form-control" type="text" id="formNewPassword" placeholder="Input new password . . ." />' +
-                '<p>Users must change their password at the next login</p>' +
-                '<div style="text-align: right;margin-top: 15px;">' +
-                '<button type="button" class="btn btn-default" id="btnCloseResetPassword" data-dismiss="modal">Close</button> ' +
-                '<button type="button" class="btn btn-success" data-npm="'+NPM+'"  id="btnSaveResetPassword">Save</button>' +
-                '</div></div>');
-        } else {
-            $('#NotificationModal .modal-body').html('<div style="text-align: center;">Reset Password - <b>'+Name+'</b><hr/> ' +
-                '<h3>Student not active</h3>' +
-                '<div style="text-align: right;margin-top: 15px;">' +
-                '<button type="button" class="btn btn-default" id="btnCloseResetPassword" data-dismiss="modal">Close</button> ' +
-                '</div></div>');
-        }
-
-
-
-        $('#NotificationModal').on('shown.bs.modal', function () {
-            $('#formNewPassword').focus();
-        })
-
-        $('#NotificationModal').modal({
-            'show' : true,
-            'backdrop' : 'static'
-        });
-    });
-    $(document).on('click','#btnSaveResetPassword',function () {
-       var  formNewPassword = $('#formNewPassword').val();
-       if(formNewPassword!='' && formNewPassword!=null){
-
-           loading_buttonSm('#btnSaveResetPassword');
-           $('#btnCloseResetPassword').prop('disabled',true);
-
-           var data = {
-             action : 'resetPassword',
-               NewPassword : formNewPassword,
-               NPM : $(this).attr('data-npm')
-           };
-           var token = jwt_encode(data,'UAP)(*');
-           var url = base_url_js+'api/__crudStatusStudents';
-           $.post(url,{token:token},function (result) {
-                toastr.success('Password Reset','Success');
-                setTimeout(function () {
-                    $('#NotificationModal').modal('hide');
-                },500);
-           });
-       }
+    $('.filter-db-std').change(function () {
+        loadStudent();
     });
 
     // Change Status
@@ -227,36 +132,137 @@
 
 
     });
-
-    // .btnLoginPortalStudents -> ada di header
-
-    function loadPage() {
-
-        loading_page('#pageStudents');
-
+    
+    function loadStudent() {
+        loading_page('#divDataStudent');
         var filterCurriculum = $('#filterCurriculum').val();
         var filterBaseProdi = $('#filterBaseProdi').val();
         var filterStatus = $('#filterStatus').val();
 
-        if(filterCurriculum!='' && filterCurriculum!=null
-        && filterBaseProdi!='' && filterBaseProdi!=null){
+        var Year = (filterCurriculum!='' && filterCurriculum!=null)
+            ? filterCurriculum.split('.')[1] : '';
+        var ProdiID = (filterBaseProdi!='' && filterBaseProdi!=null)
+            ? filterBaseProdi.split('.')[0] : '';
+        var StatusStudents = (filterStatus!='' && filterStatus!=null)
+            ? filterStatus : '';
+
+        setTimeout(function () {
+            $('#divDataStudent').html('<table class="table table-bordered" id="tableStudent">' +
+                '                <thead>' +
+                '                <tr>' +
+                '                    <th style="width: 1%;">No</th>' +
+                '                    <th style="width: 7%;">NIM</th>' +
+                '                    <th style="width: 5%;">Photo</th>' +
+                '                    <th style="">Name</th>' +
+                '                    <th style="width: 15%;">Progamme Study</th>' +
+                '                    <th style="width: 5%;">Upload Photo</th>' +
+                '                    <th style="width: 5%;">Action</th>' +
+                '                    <th style="width: 7%;">Login Portal</th>' +
+                '                    <th style="width: 5%;">Status</th>' +
+                '                </tr>' +
+                '                </thead>' +
+                '            </table>');
 
             var data = {
-                Year : filterCurriculum.split('.')[1],
-                ProdiID : filterBaseProdi.split('.')[0],
-                StatusStudents : filterStatus
+                Year : Year,
+                ProdiID : ProdiID,
+                StatusStudents : StatusStudents
             };
+            var token = jwt_encode(data,'UAP)(*');
 
-            var url = base_url_js+'database/loadPageStudents';
-            $.post(url,{data:data},function (page) {
-                setTimeout(function () {
-                    $('#pageStudents').html(page);
-                },500);
-            });
-
-        }
-
+            var dataTable = $('#tableStudent').DataTable( {
+                "processing": true,
+                "serverSide": true,
+                "iDisplayLength" : 10,
+                "ordering" : false,
+                "language": {
+                    "searchPlaceholder": "NIM, Name, Programme Study"
+                },
+                "ajax":{
+                    url : base_url_js+'api/database/__getListStudent', // json datasource
+                    ordering : false,
+                    data : {token:token},
+                    type: "post",  // method  , by default get
+                    error: function(){  // error handling
+                        $(".employee-grid-error").html("");
+                        $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                        $("#employee-grid_processing").css("display","none");
+                    }
+                }
+            } );
+        },1000);
 
     }
+
+    // ==== Upload Foto =========
+    $(document).on('change','.uploadPhotoEmp',function () {
+        // uploadPhoto();
+        var NPM = $(this).attr('data-npm');
+        viewImageBeforeUpload(this,'#imgThum'+NPM,'','','','#formTypeImage'+NPM);
+        var Type = $('#formTypeImage'+NPM).val();
+
+        var FileName = NPM+'.'+Type;
+        var db = $(this).attr('data-db');
+        uploadPhoto(db,NPM,FileName);
+
+    });
+    function uploadPhoto(db,NPM,fileName) {
+
+        if(fileName!='' && fileName!=null){
+
+            var formData = new FormData( $("#fmPhoto"+NPM)[0]);
+            var url = base_url_js+'api/database/upload_photo_student?f='+db+'&&fileName='+fileName;
+
+            $.ajax({
+                url : url,  // Controller URL
+                type : 'POST',
+                data : formData,
+                async : false,
+                cache : false,
+                contentType : false,
+                processData : false,
+                success : function(data) {
+
+                    var jsonData = JSON.parse(data);
+
+                    // if(typeof jsonData.success=='undefined'){
+                    //     toastr.error(jsonData.error,'Error');
+                    //     // alert(jsonData.error);
+                    // }
+                    // else {
+                    //     toastr.success('File Saved','Success!!');
+                    // }
+
+                }
+            });
+
+        } else {
+            toastr.error('NIK / NIK is empty','Error');
+        }
+
+    }
+    // ============================
+
+    // Reset Password
+    $(document).on('click','.btn-reset-password',function () {
+       var token = $(this).attr('data-token');
+       var DataToken = jwt_decode(token,'UAP)(*');
+       if(DataToken.Email!='' && DataToken.Email!=null){
+
+           $('#NotificationModal .modal-body').html('<div style="text-align: center;">Reset Password has been send to : <b style="color: blue;">'+DataToken.Email+'</b><hr/><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div>');
+           $('#NotificationModal').modal('show');
+
+           DataToken.DueDate = dateTimeNow();
+           var newToken = jwt_encode(DataToken,'UAP)(*');
+
+           var url = base_url_js+'database/sendMailResetPassword';
+           $.post(url,{token:newToken},function (result) {
+
+           });
+       } else {
+           toastr.error('Email Empty','Error');
+       }
+
+    });
 
 </script>

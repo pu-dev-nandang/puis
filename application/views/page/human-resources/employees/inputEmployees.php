@@ -328,17 +328,14 @@
         loadSelectOptionEmployeesStatus('#formStatusEmployee','');
         loadSelectOptionBaseProdi('#formProgrammeStudy','');
         
-        var lodD = true;
-        if(lodD){
-            setInterval(function () {
-                var Year = $('#formYearBirth').find(':selected').val();
-                var Month = $('#formMontBirth').find(':selected').val();
-                if(Year!='' && Year!=null && Month!='' && Month!=null){
-                    loadCountDays(Year,Month,'#formDateBirth','');
-                    lodD = false;
-                }
-            },1000)
-        }
+        var loadFirs = setInterval(function () {
+            var Year = $('#formYearBirth').find(':selected').val();
+            var Month = $('#formMontBirth').find(':selected').val();
+            if(Year!='' && Year!=null && Month!='' && Month!=null){
+                loadCountDays(Year,Month,'#formDateBirth','');
+                clearInterval(loadFirs);
+            }
+        },1000);
         
     });
 
