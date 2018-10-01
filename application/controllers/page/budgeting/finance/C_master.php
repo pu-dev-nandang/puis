@@ -420,7 +420,6 @@ class C_master extends Budgeting_Controler {
                        'DetailInfo' => $DetailInfo,
                        'DetailItem' => $DetailItem,
                        'Approval' => 1,
-                       'Approval' => 1,
                        'ApprovalBy' => $this->session->userdata('NIP'),
                        'ApprovalAt' => date('Y-m-d H:i:s'),
                        'CreatedBy' => $this->session->userdata('NIP'),
@@ -430,8 +429,43 @@ class C_master extends Budgeting_Controler {
                 }
                 break;
             case 'edit':
-
+                $ID = $Input['ID'];
+                $CodeSupplier = $Input['CodeSupplier'];
+                $dataSave = array(
+                   'CodeSupplier' => $CodeSupplier,
+                   'NamaSupplier' => trim(ucwords($NamaSupplier)),
+                   'PICName' => trim(ucwords($PICName)),
+                   'Alamat' => trim($Alamat),
+                   'Website' => trim($Website),
+                   'NoTelp' => trim($NoTelp),
+                   'NoHp' => trim($NoHp),
+                   'CategorySupplier' => $CategorySupplier,
+                   'DetailInfo' => $DetailInfo,
+                   'DetailItem' => $DetailItem,
+                   'LastUpdateBy' => $this->session->userdata('NIP'),
+                   'LastUpdateAt' => date('Y-m-d H:i:s'),
+                );
+                $this->db->where('ID', $ID);
+                $this->db->update('db_budgeting.m_supplier', $dataSave);
                 break;
+            case 'delete':
+                $dataSave = array(
+                    'Active' => 0,
+                    'LastUpdateBy' => $this->session->userdata('NIP'),
+                    'LastUpdateAt' => date('Y-m-d H:i:s'),
+                );
+                $this->db->where('ID', $Input['ID']);
+                $this->db->update('db_budgeting.m_supplier', $dataSave);
+                break;
+            case 'approve':
+                $dataSave = array(
+                    'Approval' => 1,
+                    'ApprovalBy' => $this->session->userdata('NIP'),
+                    'ApprovalAt' => date('Y-m-d H:i:s'),
+                );
+                $this->db->where('ID', $Input['ID']);
+                $this->db->update('db_budgeting.m_supplier', $dataSave);
+                break;           
             default:
                 # code...
                 break;
@@ -495,10 +529,10 @@ class C_master extends Budgeting_Controler {
             $row = $query[$i];
             $nestedData[] = $No;
             $nestedData[] = $row['CodeSupplier'];
-            $nestedData[] = $row['NamaSupplier'];
-            $nestedData[] = $row['Website'];
-            $nestedData[] = $row['PICName'];
-            $nestedData[] = $row['Alamat'];
+            $nestedData[] = $row['NamaSupplier'].'<br>'.$row['Website'].'<br>'.'PIC : '.$row['PICName'].'<br>'.'Alamat : '.$row['Alamat'];
+            // $nestedData[] = $row['Website'];
+            // $nestedData[] = $row['PICName'];
+            // $nestedData[] = $row['Alamat'];
             $nestedData[] = $row['NoTelp'].' & '.$row['NoHp'];
             $nestedData[] = $row['CategoryName'];
             
@@ -531,11 +565,11 @@ class C_master extends Budgeting_Controler {
             $nestedData[] = $temp;
 
             if ($action == 'All_approval') {
-                $btn = '<button type="button" class="btn btn-warning btn-edit btn-edit-catalog" code="'.$row['ID'].'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>&nbsp <button type="button" class="btn btn-danger btn-delete btn-delete-catalog" code="'.$row['ID'].'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
+                $btn = '<button type="button" class="btn btn-warning btn-edit btn-edit-supplier" code="'.$row['ID'].'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>&nbsp <button type="button" class="btn btn-danger btn-delete btn-delete-supplier" code="'.$row['ID'].'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
             }
             elseif ($action == 'non_approval')
             {
-                $btn = '<button type="button" class="btn btn-default btn-edit btn-approve-catalog" code="'.$row['ID'].'"> <i class="fa fa-handshake-o" aria-hidden="true"></i> Approve</button>';
+                $btn = '<button type="button" class="btn btn-default btn-edit btn-approve-supplier" code="'.$row['ID'].'"> <i class="fa fa-handshake-o" aria-hidden="true"></i> Approve</button>';
             }
             else
             {
@@ -558,6 +592,12 @@ class C_master extends Budgeting_Controler {
             "data"            => $data
         );
         echo json_encode($json_data);
+    }
+
+    public function ApprovalSupplier()
+    {
+      $this->auth_ajax();
+      $this->Supplier_DataIntable('non_approval');
     }
 
 }

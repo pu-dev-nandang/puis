@@ -913,6 +913,7 @@ $route['budgeting/page/supplier/saveFormInput'] = 'page/budgeting/finance/c_mast
 $route['budgeting/page/supplier/saveCategoryFormInput'] = 'page/budgeting/finance/c_master/saveCategoryFormInput';
 $route['budgeting/page/supplier/DataIntable'] = 'page/budgeting/finance/c_master/Supplier_DataIntable';
 $route['budgeting/page/supplier/DataIntable/server_side'] = 'page/budgeting/finance/c_master/Supplier_DataIntable_server_side';
+$route['budgeting/page/supplier/ApprovalSupplier'] = 'page/budgeting/finance/c_master/ApprovalSupplier';
 
 
 

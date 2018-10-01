@@ -162,6 +162,84 @@
 
 	function LoadFirst()
 	{
+		<?php if ($action == 'edit'): ?>
+			$("#rowCodePost").removeClass('hide');
+			$("#legendCode").addClass('hide');
+			$("#CodeSupplier").val('<?php echo $get[0]['CodeSupplier'] ?>');
+			$("#NamaSupplier").val('<?php echo $get[0]['NamaSupplier'] ?>');
+			$("#Alamat").val('<?php echo $get[0]['Alamat'] ?>');
+			$("#PICName").val('<?php echo $get[0]['PICName'] ?>');
+			$("#Website").val('<?php echo $get[0]['Website'] ?>');
+			$("#NoTelp").val('<?php echo $get[0]['NoTelp'] ?>');
+			$("#NoHp").val('<?php echo $get[0]['NoHp'] ?>');
+			$("#PICName").val('<?php echo $get[0]['PICName'] ?>');
+			// $("#PICName").val('<?php echo $get[0]['PICName'] ?>');
+
+			<?php $DetailInfo = $get[0]['DetailInfo'] ?>
+
+			<?php if ($DetailInfo != "" || $DetailInfo != null): ?>
+				var DetailInfo = [];
+			    DetailInfo =  <?php echo $DetailInfo ?>;
+				if (DetailInfo != '') {
+					var Input = '';
+					for(var key in DetailInfo) {
+						Input += '<div class = "row" style="margin-right: 0px;margin-left: 0px;margin-top: 10px">'+
+										'<div class="col-md-6 col-md-offset-2">'+
+											'<div class="col-xs-4">'+
+												'<input type="text" class="form-control addDetailInfo" placeholder = "Input Name" value = "'+key+'">'+
+											'</div>'+
+											'<div class="col-xs-6">'+
+												'<input type="text" class="form-control addDetailInfo" placeholder = "Input Value" value = "'+DetailInfo[key]+'">'+
+											'</div>'+
+											'<div class="col-xs-2">'+
+												'<button type="button" class="btn btn-danger btn-delete-addDetailInfo"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>'+
+											'</div>'+	
+										'</div>'+
+									'</div>';
+					}
+
+					$("#pageAddDetailInfo").append(Input);	
+
+					$(".btn-delete-addDetailInfo").click(function(){
+						$(this)
+						  .parentsUntil( 'div[class="row"]' ).remove();
+					})	
+				}
+			<?php endif ?>
+
+			<?php $DetailItem = $get[0]['DetailItem'] ?>
+
+			<?php if ($DetailItem != "" || $DetailItem != null): ?>
+				var DetailItem = [];
+			    DetailItem =  <?php echo $DetailItem ?>;
+				if (DetailItem != '') {
+					var Input = '';
+					for(var key in DetailItem) {
+						Input += '<div class = "row" style="margin-right: 0px;margin-left: 0px;margin-top: 10px">'+
+										'<div class="col-md-6 col-md-offset-2">'+
+											'<div class="col-xs-4">'+
+												'<input type="text" class="form-control addDetailItem" placeholder = "Input Name" value = "'+key+'">'+
+											'</div>'+
+											'<div class="col-xs-6">'+
+												'<input type="text" class="form-control addDetailItem" placeholder = "Input Value" value = "'+DetailItem[key]+'">'+
+											'</div>'+
+											'<div class="col-xs-2">'+
+												'<button type="button" class="btn btn-danger btn-delete-addDetailItem"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>'+
+											'</div>'+	
+										'</div>'+
+									'</div>';
+					}
+
+					$("#pageAddDetailItem").append(Input);	
+
+					$(".btn-delete-addDetailItem").click(function(){
+						$(this)
+						  .parentsUntil( 'div[class="row"]' ).remove();
+					})	
+				}
+			<?php endif ?>
+		<?php endif ?>
+
 		loadSelectCategory();
 		// save categoryName
 		$("#btnAddCategoryName").click(function(){
@@ -240,6 +318,17 @@
 		      $('#CategorySupplier').select2({
 		         //allowClear: true
 		      });
+
+		      <?php if ($action == 'edit'): ?>
+		      	$("#CategorySupplier option").filter(function() {
+		      	   //may want to use $.trim in here
+		      	   return $(this).val() == '<?php echo $get[0]['CategorySupplier'] ?>'; 
+		      	 }).prop("selected", true);
+
+		      	$('#CategorySupplier').select2({
+		      	   //allowClear: true
+		      	});
+		      <?php endif ?>
 		}).done(function () {
 		  
 		});
@@ -329,7 +418,9 @@
 				            DetailInfo : checkAddDetailInfo,
 				            CategorySupplier : CategorySupplier,
 				            DetailItem : checkAddDetailItem,
-
+				            <?php if ($action == 'edit'): ?>
+				            	ID : "<?php echo $get[0]['ID'] ?>",
+				            <?php endif ?>
 				            };
 				var token = jwt_encode(data,"UAP)(*");
 				if (validationInput = validation(data)) {

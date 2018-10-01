@@ -19,16 +19,16 @@
 					<tr>
 						<th width = "3%">No</th>
 						<th>CodeSupplier</th>
-						<th>NamaSupplier</th>
-						<th>Website</th>
-						<th>PIC</th>
-						<th>Alamat</th>
+						<th>Supplier</th>
+						<!-- <th>Website</th>
+						<th>PIC</th> -->
+						<!-- <th>Alamat</th> -->
 						<th>NoTelp & NoHp</th>
 						<th>CategorySupplier</th>
 						<th>DetailInfo</th>
 						<th>DetailItem</th>
 						<th>CreatedBy</th>
-						<th>Action</th>
+						<th width="15%">Action</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -85,7 +85,8 @@
 			$('.pageAnchor[page="DataIntable"]').trigger('click');
 			var ID = $(this).attr('code');
 	      	if (CountColapses == 0) {
-	      		$('.pageAnchor[page="FormInput"]').trigger('click');
+	      		// $('.pageAnchor[page="FormInput"]').trigger('click');
+	      		 $('#FormInput').show();
 	      		var page = 'FormInput';
 	      		loading_page("#page"+page);
 	      		var url = base_url_js+'budgeting/page/supplier/'+page;
@@ -100,6 +101,7 @@
 	      		    var jsonPass = response.jsonPass;
 	      		    $("#page"+page).html(html);
 	      		}); // exit spost
+
 		    }
 	      	else
 	      	{
@@ -123,12 +125,18 @@
 		$('#datatablesServer tbody').on('click', '.btn-delete-supplier', function () {
 			if (confirm("Are you sure?") == true) {
 				var data = {
-		  	                    Detail : '',
+								NeedPrefix : '',
+					            CodeSupplier : '',
+					            NamaSupplier : '',
+					            PICName : '',
+					            Alamat : '',
+					            Website : '',
+					            NoTelp : '',
+					            NoHp : '',
+					            DetailInfo : '',
+					            CategorySupplier : '',
+					            DetailItem : '',
           		                Action : "delete",
-          		                Departement : '',
-          		                Item : '',
-          		                Desc : '',
-          		                EstimaValue : '',
           		                ID : $(this).attr('code'),
 	  	                   };
 			  	var token = jwt_encode(data,"UAP)(*");
@@ -138,7 +146,7 @@
   	               if(obj == "")
   	               {
   	               	var page = 'DataIntable';
-  	               	LoadPageCatalog(page);
+  	               	LoadPageSupplier(page);
   	               	toastr.success("Done", 'Success!');
   	               }
   	               else
@@ -163,12 +171,18 @@
 		$('#datatablesServer tbody').on('click', '.btn-approve-supplier', function () {
 			if (confirm("Are you sure?") == true) {
 				var data = {
-		  	                    Detail : '',
+                    			NeedPrefix : '',
+                                CodeSupplier : '',
+                                NamaSupplier : '',
+                                PICName : '',
+                                Alamat : '',
+                                Website : '',
+                                NoTelp : '',
+                                NoHp : '',
+                                DetailInfo : '',
+                                CategorySupplier : '',
+                                DetailItem : '',	
           		                Action : "approve",
-          		                Departement : '',
-          		                Item : '',
-          		                Desc : '',
-          		                EstimaValue : '',
           		                ID : $(this).attr('code'),
 	  	                   };
 			  	var token = jwt_encode(data,"UAP)(*");
@@ -177,7 +191,7 @@
   	               var obj = JSON.parse(data_json); 
   	               if(obj == "")
   	               {
-  	               	var page = 'ApprovalCatalog';
+  	               	var page = 'ApprovalSupplier';
   	               	LoadPage(page)
   	               	toastr.success("Done", 'Success!');
   	               }
