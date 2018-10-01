@@ -225,14 +225,6 @@
 
                     var jsonData = JSON.parse(data);
 
-                    // if(typeof jsonData.success=='undefined'){
-                    //     toastr.error(jsonData.error,'Error');
-                    //     // alert(jsonData.error);
-                    // }
-                    // else {
-                    //     toastr.success('File Saved','Success!!');
-                    // }
-
                 }
             });
 
@@ -245,23 +237,28 @@
 
     // Reset Password
     $(document).on('click','.btn-reset-password',function () {
-       var token = $(this).attr('data-token');
-       var DataToken = jwt_decode(token,'UAP)(*');
-       if(DataToken.Email!='' && DataToken.Email!=null){
 
-           $('#NotificationModal .modal-body').html('<div style="text-align: center;">Reset Password has been send to : <b style="color: blue;">'+DataToken.Email+'</b><hr/><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div>');
-           $('#NotificationModal').modal('show');
+        if(confirm('Reset password ?')){
+            var token = $(this).attr('data-token');
+            var DataToken = jwt_decode(token,'UAP)(*');
+            if(DataToken.Email!='' && DataToken.Email!=null){
 
-           DataToken.DueDate = dateTimeNow();
-           var newToken = jwt_encode(DataToken,'UAP)(*');
+                $('#NotificationModal .modal-body').html('<div style="text-align: center;">Reset Password has been send to : <b style="color: blue;">'+DataToken.Email+'</b><hr/><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div>');
+                $('#NotificationModal').modal('show');
 
-           var url = base_url_js+'database/sendMailResetPassword';
-           $.post(url,{token:newToken},function (result) {
+                DataToken.DueDate = dateTimeNow();
+                var newToken = jwt_encode(DataToken,'UAP)(*');
 
-           });
-       } else {
-           toastr.error('Email Empty','Error');
-       }
+                var url = base_url_js+'database/sendMailResetPassword';
+                $.post(url,{token:newToken},function (result) {
+
+                });
+            } else {
+                toastr.error('Email Empty','Error');
+            }
+        }
+
+
 
     });
 
