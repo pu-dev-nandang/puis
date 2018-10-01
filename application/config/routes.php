@@ -113,6 +113,8 @@ $route['database/lecturers'] = 'page/database/c_database/lecturers';
 $route['database/lecturer-details/(:any)'] = 'page/database/c_database/lecturersDetails/$1';
 $route['database/loadpagelecturersDetails'] = 'page/database/c_database/loadpagelecturersDetails';
 
+$route['database/sendMailResetPassword'] = 'page/database/c_database/sendMailResetPassword';
+
 $route['database/students'] = 'page/database/c_database/students';
 $route['database/loadPageStudents'] = 'page/database/c_database/loadPageStudents';
 $route['database/showStudent'] = 'page/database/c_database/showStudent';

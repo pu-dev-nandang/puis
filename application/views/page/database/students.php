@@ -194,6 +194,7 @@
 
     }
 
+    // ==== Upload Foto =========
     $(document).on('change','.uploadPhotoEmp',function () {
         // uploadPhoto();
         var NPM = $(this).attr('data-npm');
@@ -205,7 +206,6 @@
         uploadPhoto(db,NPM,FileName);
 
     });
-
     function uploadPhoto(db,NPM,fileName) {
 
         if(fileName!='' && fileName!=null){
@@ -241,4 +241,28 @@
         }
 
     }
+    // ============================
+
+    // Reset Password
+    $(document).on('click','.btn-reset-password',function () {
+       var token = $(this).attr('data-token');
+       var DataToken = jwt_decode(token,'UAP)(*');
+       if(DataToken.Email!='' && DataToken.Email!=null){
+
+           $('#NotificationModal .modal-body').html('<div style="text-align: center;">Reset Password has been send to : <b style="color: blue;">'+DataToken.Email+'</b><hr/><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div>');
+           $('#NotificationModal').modal('show');
+
+           DataToken.DueDate = dateTimeNow();
+           var newToken = jwt_encode(DataToken,'UAP)(*');
+
+           var url = base_url_js+'database/sendMailResetPassword';
+           $.post(url,{token:newToken},function (result) {
+
+           });
+       } else {
+           toastr.error('Email Empty','Error');
+       }
+
+    });
+
 </script>

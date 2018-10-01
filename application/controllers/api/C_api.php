@@ -4589,12 +4589,23 @@ class C_api extends CI_Controller {
             $db_ = 'ta_'.$row['Year'];
             $dataDetailStd = $this->db->select('Photo,Gender')->get_where($db_.'.students',array('NPM' => $row['NPM']),1)->result_array();
 
+            $dataToken = array(
+                'Type' => 'std',
+                'Name' => $row['Name'],
+                'NPM' => $row['NPM'],
+                'Email' => $row['EmailPU']
+            );
+
+            $token = $this->jwt->encode($dataToken,'UAP)(*');
+
+            $disBtnEmail = ($row['EmailPU']=='' || $row['EmailPU']=='') ? 'disabled' : '';
+
             $btnAct = '<div class="btn-group">
                           <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
                           </button>
                           <ul class="dropdown-menu">
-                            <li><a href="#">Reset Password (Under Construction)</a></li>
+                            <li class="'.$disBtnEmail.'"><a href="javascript:void(0);" '.$disBtnEmail.' class="btn-reset-password '.$disBtnEmail.'" data-token="'.$token.'">Reset Password</a></li>
                             <li><a href="#">Edit (Coming Soon)</a></li>
                             <li role="separator" class="divider"></li>
                             <li><a href="javascript:void(0);" class="btn-change-status " data-emailpu="'.$row['EmailPU'].'" 
@@ -4627,7 +4638,7 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div  style="text-align:center;">'.$row['ProdiNameEng'].'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$fm.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$btnAct.'</div>';
-            $nestedData[] = '<div  style="text-align:center;"><button class="btn btn-sm btn-default btn-default-primary">Login Portal</button></div>';
+            $nestedData[] = '<div  style="text-align:center;"><button class="btn btn-sm btn-default btn-default-primary btnLoginPortalStudents" data-npm="'.$row['NPM'].'">Login Portal</button></div>';
             $nestedData[] = '<div  style="text-align:center;">'.ucwords(strtolower($row['StatusStudent'])).'</div>';
             $no++;
 
