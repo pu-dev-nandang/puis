@@ -107,7 +107,8 @@ function loadTable()
 							'<th width = "3%">No</th>'+
 							'<th>Year</th>'+
 							'<th>Start Period</th>'+
-							'<th>End Period</th>'+
+                            '<th>End Period</th>'+
+							'<th>Status</th>'+
 							'<th>Action</th>'+
 						'</tr></thead>'	
 						;
@@ -121,13 +122,20 @@ function loadTable()
 	    // console.log(dataForTable);
 	    for (var i = 0; i < dataForTable.length; i++) {
 	    	var btn_edit = '<button type="button" class="btn btn-warning btn-edit" Year = "'+dataForTable[i].Year+'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
-	    	var btn_del = ' <button type="button" class="btn btn-danger btn-delete"  Year = "'+dataForTable[i].Year+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
+	    	var btn_del = '<button type="button" class="btn btn-danger btn-delete"  Year = "'+dataForTable[i].Year+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
+            var Activated = '&nbsp<button type="button" class="btn btn-default btn-activated"  Year = "'+dataForTable[i].Year+'"> <i class="fa fa-check-circle" style="color: green;"></i> Activated</button>';
+            var StActivated = '<i class="fa fa-check-circle" style="color: green;"></i>';
+            if(dataForTable[i].Activated == 0)
+            {
+                StActivated = '<i class="fa fa-minus-circle" style="color: red;"></i>';
+            }
 	    	TableGenerate += '<tr>'+
 	    						'<td width = "3%">'+ (parseInt(i) + 1)+'</td>'+
 	    						'<td>'+ dataForTable[i].Year+'</td>'+
 	    						'<td>'+ getMonth(dataForTable[i].StartPeriod)+'</td>'+
-	    						'<td>'+ getMonth(dataForTable[i].EndPeriod)+'</td>'+
-	    						'<td>'+ btn_edit + ' '+' &nbsp' + btn_del+'</td>'+
+                                '<td>'+ getMonth(dataForTable[i].EndPeriod)+'</td>'+
+	    						'<td>'+ StActivated+'</td>'+
+	    						'<td>'+ btn_edit + ' '+' &nbsp' + btn_del+Activated+'</td>'+
 	    					 '</tr>'	
 	    }
 
@@ -162,6 +170,54 @@ function loadTable()
                  });
                  var url = base_url_js+'budgeting/time_period/modalform/save';
                  var aksi = "delete";
+                 var ID = $(this).attr('data-smt');
+                 var data = {
+                     Action : aksi,
+                     CDID : ID,
+                 };
+                 var token = jwt_encode(data,"UAP)(*");
+                 $.post(url,{token:token},function (data_json) {
+                     setTimeout(function () {
+                        // toastr.options.fadeOut = 10000;
+                        // toastr.success('Data berhasil disimpan', 'Success!');
+                        var response = jQuery.parseJSON(data_json);
+                        if (response == '') {
+                            toastr.success('Data berhasil disimpan', 'Success!');
+                        }
+                        else
+                        {
+                            toastr.error(response, 'Failed!!');
+                        }
+                        loadTable();
+                        $('#NotificationModal').modal('hide');
+                     },500);
+                 });
+            });
+
+        });
+
+        $(".btn-activated").click(function(){  
+            var ID = $(this).attr('year');
+             $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Are you sure ? </b> ' +
+                 '<button type="button" id="confirmYesDelete" class="btn btn-primary" style="margin-right: 5px;" data-smt = "'+ID+'">Yes</button>' +
+                 '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+                 '</div>');
+             $('#NotificationModal').modal('show');
+
+            $("#confirmYesDelete").click(function(){
+                 $('#NotificationModal .modal-header').addClass('hide');
+                 $('#NotificationModal .modal-body').html('<center>' +
+                     '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+                     '                    <br/>' +
+                     '                    Loading Data . . .' +
+                     '                </center>');
+                 $('#NotificationModal .modal-footer').addClass('hide');
+                 $('#NotificationModal').modal({
+                     'backdrop' : 'static',
+                     'show' : true
+                 });
+                 var url = base_url_js+'budgeting/time_period/modalform/save';
+                 var aksi = "activated";
                  var ID = $(this).attr('data-smt');
                  var data = {
                      Action : aksi,

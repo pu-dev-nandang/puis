@@ -2328,4 +2328,48 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $query=$this->db->query($sql, array())->result_array();
         return $query;
     }
+
+    public function getShowIntervalBulan($Start,$End)
+    {
+        $arr = array();
+        $date1 = $Start;
+        $date2 = $End;
+
+        $ts1 = strtotime($date1);
+        $ts2 = strtotime($date2);
+
+        $year1 = date('Y', $ts1);
+        $year2 = date('Y', $ts2);
+
+        $month1 = date('m', $ts1);
+        $month2 = date('m', $ts2);
+
+        $diff = (($year2 - $year1) * 12) + ($month2 - $month1);
+        $diff = $diff+1;
+
+        $aa = explode("-", $Start);
+        $y = $aa[0];
+        $m = $aa[1];
+        $arr_bulan = array(
+            'Jan','Feb','March','April','May','June','July','August','Sep','Oct','Nov','Des'
+        );
+        for ($i=0; $i < $diff; $i++) { 
+            $bb = $m;
+            if (strlen($bb) == 1) {
+                $bb = '0'.$bb;
+            }
+            $keyValueFirst = $y.$bb;
+            $c = (int)$m;
+            $c = $c - 1;
+            $month = $arr_bulan[$c];
+            $arr[] = array('keyValueFirst' => $keyValueFirst,'MonthName' => $month);
+            $m++;
+            if ($m > 12) {
+               $m = 1;
+               $y++;
+            }
+        }
+        
+        return $arr;
+    }
 }

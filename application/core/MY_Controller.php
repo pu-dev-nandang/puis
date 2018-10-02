@@ -530,6 +530,7 @@ abstract class Budgeting_Controler extends Globalclass{
     {
         $data = array();
         $getDataMenu = $this->m_budgeting->getMenuGroupUser($this->session->userdata('NIP'),$MenuDepartement);
+        $this->session->set_userdata('IDDepartementPUBudget',$MenuDepartement);
         $data_sess = array();
         if (count($getDataMenu) > 0) {
             $this->session->set_userdata('auth_budgeting_sess',1);

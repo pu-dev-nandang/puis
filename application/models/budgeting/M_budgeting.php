@@ -22,9 +22,12 @@ class M_budgeting extends CI_Model {
                 on d.G_user = x.cfg_group_user
                 join db_budgeting.cfg_sub_menu as c
                 on x.ID_cfg_sub_menu = c.ID
-                join db_budgeting.cfg_menu as b
-                on b.ID = c.ID_Menu where a.NIP = ? and b.IDDepartement = ? GROUP by b.id';
-        $query=$this->db->query($sql, array($NIP,$MenuDepartement))->result_array();
+                join (select * from db_budgeting.cfg_menu where IDDepartement = ?
+                UNION
+                select * from db_budgeting.cfg_menu where IDDepartement = "0"
+                ) as b
+                where a.NIP = ? GROUP by b.id';
+        $query=$this->db->query($sql, array($MenuDepartement,$NIP))->result_array();
         return $query;
     }
 
@@ -216,6 +219,25 @@ class M_budgeting extends CI_Model {
                 order by a.NameUserRole asc
                 ';
         $query=$this->db->query($sql, array($Departement))->result_array();
+        return $query;
+    }
+
+    public function get_creator_budget_approval($Year,$Departement)
+    {
+        $sql = 'select * from db_budgeting.creator_budget_approval where Year = ? and Departement = ? and Approval = 1';
+        $query=$this->db->query($sql, array($Year,$Departement))->result_array();
+        return $query;
+    }
+
+    public function get_creator_budget($Year,$Departement)
+    {
+        $sql = 'select * from db_budgeting.creator_budget as a join (
+           select a.CodePostBudget,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
+           from db_budgeting.cfg_postrealisasi as b left join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
+           join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
+           where b.Departement = ?     
+        ) as  b on a.CodePostBudget = b.CodePostBudget';
+        $query=$this->db->query($sql, array($Year,$Departement))->result_array();
         return $query;
     }
 }

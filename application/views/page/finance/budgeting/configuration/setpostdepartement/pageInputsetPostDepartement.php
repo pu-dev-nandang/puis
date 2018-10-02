@@ -65,7 +65,7 @@
 			var response = jQuery.parseJSON(resultJson);
 			for(var i=0;i<response.length;i++){
 			    //var selected = (i==0) ? 'selected' : '';
-			    var selected = (response[i].Year==thisYear) ? 'selected' : '';
+			    var selected = (response[i].Activated==1) ? 'selected' : '';
 			    $('#YearPostDepartement').append('<option value="'+response[i].Year+'" '+selected+'>'+response[i].Year+'</option>');
 			}
 			$('#YearPostDepartement').select2({

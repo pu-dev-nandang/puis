@@ -75,7 +75,7 @@
                 data-dpt="purchasing">
                 <a href="javascript:void(0);">
                     <span class="image"><img src="<?php echo base_url('assets/icon/purchase.png'); ?>"></span>
-                    <span class="title">Purchasing</span>
+                    <span class="title">Procurement</span>
                 </a>
             </li>   
             <li class="departement <?php if($departement=='it'){echo 'current';} ?>"

@@ -39,7 +39,13 @@ class C_budgeting extends Budgeting_Controler {
 
     public function BudgetingIT()
     {
-         echo __FUNCTION__;
+         // echo __FUNCTION__;
+        // get previleges for menu and content
+        $MenuDepartement= 'NA.'.$this->session->userdata('IDdepartementNavigation');
+        $this->getAuthSession($MenuDepartement);
+        // $content = '<pre>'.print_r($this->session->userdata('menu_budgeting_grouping')).'</pre>';
+        $content = $this->load->view('page/'.$this->data['department'].'/budgeting/dashboard',$this->data,true);
+        $this->temp($content);
     }
 
     public function BudgetingFinance()
@@ -105,7 +111,8 @@ class C_budgeting extends Budgeting_Controler {
         $Msg = '';
         switch ($input['Action']) {
             case 'add':
-                $dateStart = cal_days_in_month(CAL_GREGORIAN, $input['MonthStart'], $input['Year']); 
+                // $dateStart = cal_days_in_month(CAL_GREGORIAN, $input['MonthStart'], $input['Year']); 
+                $dateStart = '01'; 
                 $dateEnd= cal_days_in_month(CAL_GREGORIAN, $input['MonthEnd'], $input['Year']);
                 $Year = $input['Year'];
                 $StartPeriod = $Year.'-'.$input['MonthStart'].'-'.$dateStart;
@@ -120,14 +127,19 @@ class C_budgeting extends Budgeting_Controler {
                     $dataSave = array(
                         'Year' => $Year,
                         'StartPeriod' => $StartPeriod,
-                        'EndPeriod' => $EndPeriod
+                        'EndPeriod' => $EndPeriod,
+                        'Activated' => 1
                     );
                     $this->db->insert('db_budgeting.cfg_dateperiod', $dataSave);
+
+                    $sql = 'update db_budgeting.cfg_dateperiod set Activated = 0 where Year != ? ';
+                    $query=$this->db->query($sql, array($Year));
                 }
 
                 break;
             case 'edit':
-                $dateStart = cal_days_in_month(CAL_GREGORIAN, $input['MonthStart'], $input['Year']); 
+                // $dateStart = cal_days_in_month(CAL_GREGORIAN, $input['MonthStart'], $input['Year']); 
+                $dateStart = '01';
                 $dateEnd= cal_days_in_month(CAL_GREGORIAN, $input['MonthEnd'], $input['Year']);
                 $Year = $input['Year'];
                 $StartPeriod = $Year.'-'.$input['MonthStart'].'-'.$dateStart;
@@ -176,6 +188,30 @@ class C_budgeting extends Budgeting_Controler {
                        $Msg = $this->Msg['NotAction'];
                    }
                 break;
+            case 'activated':
+                $Year = $input['CDID'];
+                $sql = 'select * from db_budgeting.cfg_dateperiod where Year = ? and Active = 1';
+                $query=$this->db->query($sql, array($Year))->result_array();
+                $Status = $query[0]['Status']; // check can be delete
+                   if ($Status == 1) {
+                        // check activated
+                        $Activated = ($query[0]['Activated'] == 0) ? 1 : 0;
+
+                       $dataSave = array(
+                           'Activated' => $Activated,
+                       );
+                       $this->db->where('Year', $Year);
+                       $this->db->where('Active', 1);
+                       $this->db->update('db_budgeting.cfg_dateperiod', $dataSave);
+
+                        $sql = 'update db_budgeting.cfg_dateperiod set Activated = 0 where Year != ? ';
+                        $query=$this->db->query($sql, array($Year));
+                   }
+                   else
+                   {
+                       $Msg = $this->Msg['NotAction'];
+                   }
+                break;    
             default:
                 # code...
                 break;
@@ -948,6 +984,68 @@ class C_budgeting extends Budgeting_Controler {
 
         echo json_encode($msg);
     }
+
+    /*Note ***
+    *    Budgeting Entry for All
+    *Alhadi Rahman 02 Oktober 2018
+    */
+
+    public function entry_budgeting($Request = null)
+    {
+        // print_r($this->session->userdata('IDDepartementPUBudget'));
+        $arr = array('EntryBudget',
+                    'View',
+                    null
+                );
+                if (in_array($Request, $arr))
+                  {
+                    $this->data['request'] = $Request;
+                    $content = $this->load->view('global/budgeting/entry_budgeting',$this->data,true);
+                    $this->temp($content);
+                  }
+                else
+                  {
+                    show_404($log_error = TRUE);
+                  }
+       
+    }
+
+    public function EntryBudget()
+    {
+        $this->auth_ajax();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
+        // find data bulan arr
+        $arr_bulan = $this->m_master->getShowIntervalBulan($get[0]['StartPeriod'],$get[0]['EndPeriod']);
+        // print_r($arr_bulan);die();
+        $Year = $get[0]['Year'];
+        $Departement = $this->session->userdata('IDDepartementPUBudget');
+        $get = $this->m_budgeting->getPostDepartementForDom($Year,$Departement);
+        $this->data['Year'] = $Year;
+        $this->data['Departement'] = $Departement;
+        $this->data['arr_PostBudget'] = $get['data'];
+        $this->data['arr_bulan'] = $arr_bulan;
+        $arr_result['html'] = $this->load->view('global/budgeting/form_entry_budgeting',$this->data,true);
+        echo json_encode($arr_result);
+    } 
+
+    public function getCreatorBudget()
+    {
+        $this->auth_ajax();
+        $Input = $this->getInputToken();
+        $Year = $Input['Year'];
+        $Departement = $Input['Departement'];
+        $arr_result = array('creator_budget_approval' => array(),'creator_budget' => array());
+        $get = $this->m_budgeting->get_creator_budget_approval($Year,$Departement);
+        if (count($get) > 0) {
+            // get Creator Budget
+            $get2 = $this->m_budgeting->get_creator_budget($Year,$Departement);
+            $arr_result['creator_budget_approval'] = $get;
+            $arr_result['creator_budget'] = $get2;
+        }
+
+        echo json_encode($arr_result);
+    }   
 
 
 }
