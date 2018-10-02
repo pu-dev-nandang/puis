@@ -114,4 +114,76 @@
 
     });
 
+
+    // Update Email
+    $(document).on('click','.btn-update-email',function () {
+
+        var Name = $(this).attr('data-name');
+        var Email = $(this).attr('data-email');
+        var StatusEmployeeID = $(this).attr('data-empid');
+        var NIP = $(this).attr('data-nip');
+
+        $('#NotificationModal .modal-body').html('<div style="text-align: center;">Update Email - <b>'+Name+'</b><hr/> ' +
+            '<div class="form-group" style="text-align: left;">' +
+            '<label>Email</label>' +
+            '<input class="hide" value="'+StatusEmployeeID+'" id="formStatusEmployeeID'+NIP+'" /> ' +
+            '<input class="form-control" value="'+Email+'" id="formEmail'+NIP+'" /> ' +
+            '</div>' +
+            '<div style="text-align: right;margin-top: 15px;">' +
+            '<button type="button" class="btn btn-default" id="btnCloseUpdateEmail" data-dismiss="modal">Close</button> ' +
+            '<button type="button" class="btn btn-success" data-nip="'+NIP+'" data-name="'+Name+'" id="btnSaveChangeEmail">Save</button>' +
+            '</div></div>');
+
+
+        $('#NotificationModal').on('shown.bs.modal', function () {
+            $('#formEmail'+NIP).focus();
+        })
+
+        $('#NotificationModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+    });
+
+    $(document).on('click','#btnSaveChangeEmail',function () {
+        var NIP = $(this).attr('data-nip');
+        var Name = $(this).attr('data-name');
+        var formStatusEmployeeID = $('#formStatusEmployeeID'+NIP).val();
+        var formEmail = $('#formEmail'+NIP).val();
+
+        if(formEmail!='' && formEmail!=null && formStatusEmployeeID!='' && formStatusEmployeeID!=null){
+
+            loading_buttonSm('#btnSaveChangeEmail');
+            $('#btnCloseUpdateEmail,#formEmail'+NIP).prop('disabled',true);
+
+            var url = base_url_js+'api/__crudEmployees';
+
+            var token = jwt_encode({action:'updateEmailEmployees',NIP : NIP,StatusEmployeeID : formStatusEmployeeID, Email : formEmail},'UAP)(*');
+            $.post(url,{token:token},function (result) {
+
+
+                $('#viewEmail'+NIP).text(formEmail);
+                var data = {
+                    Type : 'emp',
+                    Name : Name,
+                    NIP : NIP,
+                    Email : formEmail
+                };
+                var tokenBtn = jwt_encode(data,'UAP)(*');
+                $('#btnUpdateEmail'+NIP).attr('data-email',formEmail);
+                $('#btnResetPass'+NIP).removeClass('disabled').prop('disabled',false);
+                $('#btnResetPass'+NIP).attr('data-token',tokenBtn);
+                $('#btnResetPass'+NIP).parent('li').removeClass('disabled');
+
+                setTimeout(function () {
+                    $('#NotificationModal').modal('hide');
+                },500);
+
+            });
+
+
+        }
+
+    });
+
 </script>

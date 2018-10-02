@@ -3156,6 +3156,17 @@ class C_api extends CI_Controller {
                 return print_r(1);
             }
 
+            else if($data_arr['action']=='updateEmailEmployees'){
+
+                $fillM = ($data_arr['StatusEmployeeID']==4 || $data_arr['StatusEmployeeID']=='4') ? 'Email' : 'EmailPU' ;
+                $this->db->set($fillM, $data_arr['Email']);
+                $this->db->where('NIP', $data_arr['NIP']);
+                $this->db->update('db_employees.employees');
+
+                return print_r(1);
+
+            }
+
             else if($data_arr['action']=='showLecturerMonitoring'){
 
                 $SemesterID = $data_arr['SemesterID'];
@@ -4702,38 +4713,43 @@ class C_api extends CI_Controller {
 
 
 
-            $gender = ($row['Gender']=='L') ? 'Female' : 'Male' ;
+            $gender = ($row['Gender']=='L') ? 'Male' : 'Female' ;
 
             $url_image = './uploads/employees/'.$row['Photo'];
             $srcImg = (file_exists($url_image)) ? base_url('uploads/employees/'.$row['Photo'])
                 : base_url('images/icon/userfalse.png') ;
 
 
+            $EmailSelect = ($row['StatusEmployeeID']==4 || $row['StatusEmployeeID']=='4') ? $row['Email'] : $row['EmailPU'] ;
+
+            $Email = (($row['StatusEmployeeID']==4 || $row['StatusEmployeeID']=='4') && count(explode(',', $EmailSelect))>1) ? '' : $EmailSelect;
+
+            $disBtnEmail = ($Email=='' || $Email==null) ? 'disabled' : '';
             $dataToken = array(
                 'Type' => 'emp',
                 'Name' => $row['Name'],
                 'NIP' => $row['NIP'],
-                'Email' => $row['EmailPU']
+                'Email' => $Email
             );
 
             $token = $this->jwt->encode($dataToken,'UAP)(*');
 
-            $disBtnEmail = ($row['EmailPU']=='' || $row['EmailPU']=='') ? 'disabled' : '';
+
 
             $btnAct = '<div class="btn-group">
                           <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
                           </button>
                           <ul class="dropdown-menu">
-                            <li class="'.$disBtnEmail.'"><a href="javascript:void(0);" '.$disBtnEmail.' class="btn-reset-password '.$disBtnEmail.'" data-token="'.$token.'">Reset Password</a></li>
-                            </li>
+                            <li class="'.$disBtnEmail.'"><a href="javascript:void(0);" '.$disBtnEmail.' id="btnResetPass'.$row['NIP'].'" class="btn-reset-password '.$disBtnEmail.'" data-token="'.$token.'">Reset Password</a></li>
+                            <li><a href="javascript:void(0);" class="btn-update-email" id="btnUpdateEmail'.$row['NIP'].'" data-name="'.$row['Name'].'" data-nip="'.$row['NIP'].'" data-empid="'.$row['StatusEmployeeID'].'" data-email="'.$Email.'">Update Email</a></li>
                           </ul>
                         </div>';
 
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['NIP'].'</div>';
             $nestedData[] = '<div  style="text-align:center;"><img src="'.$srcImg.'" style="max-width: 35px;" class="img-rounded"></div>';
-            $nestedData[] = '<div  style="text-align:left;"><b>'.$row['Name'].'</b><br/><span style="color: #2196f3;">'.$row['EmailPU'].'</span></div>';
+            $nestedData[] = '<div  style="text-align:left;"><b>'.$row['Name'].'</b><br/><span id="viewEmail'.$row['NIP'].'" style="color: #2196f3;">'.$Email.'</span></div>';
             $nestedData[] = '<div  style="text-align:center;">'.$gender.'</div>';
             $nestedData[] = '<div  style="text-align:left;">'.ucwords(strtolower($division)).'<br/>- '.ucwords(strtolower($position)).'</div>';
             $nestedData[] = '<div  style="text-align:left;">'.$row['Address'].'</div>';
