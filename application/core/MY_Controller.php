@@ -90,11 +90,15 @@ abstract class Globalclass extends MyAbstract{
 //        $data_departement ['departement'] = $this->m_master->get_departement();
 //        $data_nav['departement'] = $this->load->view('template/menu/departement',$data_departement,true);
 
+        $this->load->model('master/m_master');
+
         $nav_departement['departement'] = $this->__getDepartement();
         $data['page_departement'] = $this->load->view('template/navigation_departement',$nav_departement,true);
 
         $exp_name = explode(" ",$this->session->userdata('Name'));
         $data['name']= (count($exp_name)>0) ? $exp_name[0] : $this->session->userdata('Name');
+
+        $data['rule_service'] = $this->m_master->__getService($this->session->userdata('IDdepartementNavigation'));
 
         $page = $this->load->view('template/header',$data,true);
         return $page;

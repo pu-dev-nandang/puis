@@ -73,27 +73,52 @@
             <li class="dropdown hidden-xs hidden-sm" id = 'NotificationDivisi'>
 
             </li>
-            <li class="dropdown <?php if($this->uri->segment(1)=='database'){echo 'current';} ?>">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                    <i class="fa fa-database"></i>
-                    <span>Data</span>
-                    <!--                    <i class="icon-caret-down small"></i>-->
-                </a>
-                <ul class="dropdown-menu">
-                    <li class="<?php if($this->uri->segment(2)=='lecturers'){echo 'active';} ?>"><a href="<?php echo base_url('database/lecturers'); ?>">Lecturers</a></li>
-                    <li class="<?php if($this->uri->segment(2)=='students'){echo 'active';} ?>"><a href="<?php echo base_url('database/students'); ?>">Students</a></li>
-<!--                    <li class="divider"></li>-->
-                    <li class="<?php if($this->uri->segment(2)=='employees'){echo 'active';} ?>"><a href="<?php echo base_url('database/employees'); ?>">Employees</a></li>
-                    <li class="divider"></li>
-                    <li class=""><a href="javascript:void(0);" id="btnSimpleSearch"><i class="fa fa-search" aria-hidden="true"></i> Simple Search</a></li>
-                </ul>
-            </li>
+
+            <?php if(count($rule_service)>0){ ?>
+                <li class="dropdown <?php if($this->uri->segment(1)=='database'){echo 'current';} ?>">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa fa-cogs"></i>
+                        <span>Services</span>
+                        <!--                    <i class="icon-caret-down small"></i>-->
+                    </a>
+                    <ul class="dropdown-menu">
+
+                        <!-- Lecturer -->
+                        <?php if(in_array(1,$rule_service)){ ?>
+                            <li class="<?php if($this->uri->segment(2)=='lecturers'){echo 'active';} ?>">
+                                <a href="<?php echo base_url('database/lecturers'); ?>"><i class="fa fa-user-secret"></i> Lecturers</a></li>
+<!--                            <li class="divider"></li>-->
+
+                        <?php } ?>
+
+                        <?php if(in_array(2,$rule_service)){ ?>
+                            <li class="<?php if($this->uri->segment(2)=='students'){echo 'active';} ?>">
+                                <a href="<?php echo base_url('database/students'); ?>"><i class="fa fa-street-view"></i> Students</a></li>
+<!--                            <li class="divider"></li>-->
+
+                        <?php } ?>
+
+                        <?php if(in_array(3,$rule_service)){ ?>
+                            <li class="<?php if($this->uri->segment(2)=='employees'){echo 'active';} ?>">
+                                <a href="<?php echo base_url('database/employees'); ?>"><i class="fa fa-users"></i> Employees</a></li>
+<!--                            <li class="divider"></li>-->
+                        <?php } ?>
+
+                        <?php if(in_array(4,$rule_service)){ ?>
+                            <li class=""><a href="javascript:void(0);" id="btnSimpleSearch"><i class="fa fa-search"></i> Simple Search</a></li>
+<!--                            <li class="divider"></li>-->
+                        <?php } ?>
+
+                    </ul>
+                </li>
+            <?php } ?>
+
 
             <!-- Project Switcher Button -->
             <li class="dropdown <?php if($this->session->userdata('menuDepartement')){echo 'hide';} ?>">
                 <a href="#" class="project-switcher-btn dropdown-toggle">
                     <i class="fa fa-folder-open"></i>
-                    <span>Services</span>
+                    <span>Department</span>
                 </a>
             </li>
 
