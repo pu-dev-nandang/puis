@@ -52,14 +52,14 @@
 						divBulan += '<div class = "col-xs-1">'+
 										'<div class="form-group">'+	
 											'<label>'+arr_bulan[j].MonthName+'</label>'+
-											'<input type = "text" class = "form-control InputBulan'+arr_PostBudget[i]['CodePostBudget']+'" placeholder="Input Unit Cost..." value = "0" keyValue = "'+arr_bulan[j].keyValue+'">'+
+											'<input type = "text" class = "form-control InputBulan'+arr_PostBudget[i]['CodePostBudget']+'" placeholder="Input Unit Cost..." value = "0" keyValue = "'+arr_bulan[j].keyValue+'" code = "'+arr_PostBudget[i]['CodePostBudget']+'">'+
 										'</div>'+
 									'</div>';				
 					} else {							
 						divBulan += '<div class = "col-xs-1">'+
 										'<div class="form-group">'+	
 											// '<label>'+arr_bulan[j]+'</label>'+
-											'<input type = "text" class = "form-control InputBulan'+arr_PostBudget[i]['CodePostBudget']+'" placeholder="Input Unit Cost..." value = "0" keyValue = "'+arr_bulan[j].keyValue+'">'+
+											'<input type = "text" class = "form-control InputBulan'+arr_PostBudget[i]['CodePostBudget']+'" placeholder="Input Unit Cost..." value = "0" keyValue = "'+arr_bulan[j].keyValue+'" code = "'+arr_PostBudget[i]['CodePostBudget']+'">'+
 										'</div>'+
 									'</div>';	
 					}
@@ -67,7 +67,7 @@
 				divBulan += '</div></div>';
 			if(i == 0)
 			{
-				var Dom = '<div class="row">'+
+				var Dom = '<div class="row" code = "'+arr_PostBudget[i]['CodePostBudget']+'">'+
 							  	'<div class="col-xs-2">'+
 									'<div class="form-group">'+
 										'<label>Post Budget</label>'+
@@ -76,7 +76,7 @@
 										 '</select>'+
 									'</div>'+
 								'</div>'+
-								'<div class="col-xs-2">'+
+								'<div class="col-xs-1">'+
 									'<div class="form-group">'+
 										'<label>Unit Cost</label>'+
 										'<input type = "text" class = "form-control" id = "UnitCost'+arr_PostBudget[i]['CodePostBudget']+'" placeholder="Input Unit Cost..." value = "0">'+	
@@ -85,7 +85,7 @@
 								'<div class="col-xs-1">'+
 									'<div class="form-group">'+
 										'<label>Freq</label>'+
-										'<select class="select2-select-00 full-width-fix" id = "UnitCost'+arr_PostBudget[i]['CodePostBudget']+'">'+
+										'<select class="select2-select-00 full-width-fix" id = "Freq'+arr_PostBudget[i]['CodePostBudget']+'">'+
 											OPFreq+
 										'</select>'+
 									'</div>'+	
@@ -93,7 +93,7 @@
 								'<div class="col-xs-6" id = "tblInputBulan'+arr_PostBudget[i]['CodePostBudget']+'">'+
 									divBulan+
 								'</div>'+
-								'<div class="col-xs-1" id = "InputSubtotal'+arr_PostBudget[i]['CodePostBudget']+'">'+
+								'<div class="col-xs-2" id = "InputSubtotal'+arr_PostBudget[i]['CodePostBudget']+'" budget = "'+arr_PostBudget[i]['Budget']+'">'+
 									'<p>Limit : '+formatRupiah(arr_PostBudget[i]['Budget'])+'</p>'+
 									'<p id = "Subtotal'+arr_PostBudget[i]['CodePostBudget']+'"></p>'+
 								'</div>'+
@@ -105,7 +105,7 @@
 			}
 			else
 			{
-				var Dom = '<div class="row">'+
+				var Dom = '<div class="row" code = "'+arr_PostBudget[i]['CodePostBudget']+'">'+
 							  	'<div class="col-xs-2">'+
 									'<div class="form-group">'+
 										// '<label>Post Budget</label>'+
@@ -114,7 +114,7 @@
 										 '</select>'+
 									'</div>'+
 								'</div>'+
-								'<div class="col-xs-2">'+
+								'<div class="col-xs-1">'+
 									'<div class="form-group">'+
 										// '<label>Unit Cost</label>'+
 										'<input type = "text" class = "form-control" id = "UnitCost'+arr_PostBudget[i]['CodePostBudget']+'" placeholder="Input Unit Cost..." value = "0">'+
@@ -123,7 +123,7 @@
 								'<div class="col-xs-1">'+
 									'<div class="form-group">'+
 										// '<label>Freq</label>'+
-										'<select class="select2-select-00 full-width-fix" id = "UnitCost'+arr_PostBudget[i]['CodePostBudget']+'">'+
+										'<select class="select2-select-00 full-width-fix" id = "Freq'+arr_PostBudget[i]['CodePostBudget']+'">'+
 											OPFreq+
 										'</select>'+
 									'</div>'+	
@@ -131,8 +131,9 @@
 								'<div class="col-xs-6" id = "tblInputBulan'+arr_PostBudget[i]['CodePostBudget']+'">'+
 									divBulan+
 								'</div>'+
-								'<div class="col-xs-1" id = "InputSubtotal'+arr_PostBudget[i]['CodePostBudget']+'">'+
-									'<p>Limit : '+formatRupiah(arr_PostBudget[i]['Budget'])+'</p>'
+								'<div class="col-xs-2" id = "InputSubtotal'+arr_PostBudget[i]['CodePostBudget']+'" budget = "'+arr_PostBudget[i]['Budget']+'" total = "0">'+
+									'<p>Limit : '+formatRupiah(arr_PostBudget[i]['Budget'])+'</p>'+
+									'<p id = "Subtotal'+arr_PostBudget[i]['CodePostBudget']+'"></p>'+
 								'</div>'+
 								// '<div class="col-xs-1" id = "BatasMax'+arr_PostBudget[i]['CodePostBudget']+'">'
 
@@ -144,8 +145,132 @@
 				$("#pageInput").append(Dom);	
 				$('#UnitCost'+arr_PostBudget[i]['CodePostBudget']).maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 				$('.InputBulan'+arr_PostBudget[i]['CodePostBudget']).maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+
+				$(".InputBulan"+arr_PostBudget[i]['CodePostBudget']).keyup(function(){
+					var code = $(this).attr('code');
+					funcCheck(code);
+					// console.log(arr);
+				})
+
+				$("#UnitCost"+arr_PostBudget[i]['CodePostBudget']).keyup(function(){
+					var code = $(this).closest('div[class="row"]').attr('code');
+					funcCheck(code);
+				})
+
+				$("#Freq"+arr_PostBudget[i]['CodePostBudget']).change(function(){
+					var code = $(this).closest('div[class="row"]').attr('code');
+					// $(this).closest('div[class="row"]').css( "background-color", "red" );
+					// console.log(code);
+					funcCheck(code);
+				})
 		} // exkit looping
 
+		// pageContent
+		var Note = '<div class = "row">'+
+						'<div class = "col-md-12">'+
+							'<div class = "col-xs-4">'+
+								'<div class="form-group">'+
+									'<label>Note</label>'+
+									'<input type = "text" class = "form-control" id = "Note" placeholder="Input Note...">'+
+								'</div>'+
+							'</div>'+	
+							'<div class = "col-xs-2 col-md-offset-10" id = "GrandTotal">'+
+							
+							'</div>'+
+						'</div>'+
+					'</div>'+
+					'<div class = "row">'+
+						'<div class = "col-md-12">'+
+							'<div class = "col-xs-2 col-md-offset-10">'+
+								'<button class = "btn btn-success" id = "SaveBudget">Submit</button>'+
+							'</div>'+
+						'</div>'+
+					'</div>';			
+						;
+		$("#pageInput").after(Note);								
+	}
+
+	function funcCheck(code)
+	{
+		var UnitCost = $("#UnitCost"+code).val();
+		var Freq = $("#Freq"+code).val();
+		try{
+			UnitCost = findAndReplace(UnitCost,".","");
+		}
+		catch(err)
+		{
+			UnitCost = UnitCost;
+		}
 		
+		var Total = parseInt(UnitCost * Freq);
+		var Budget = $("#InputSubtotal"+code).attr('budget');
+		try{
+			var n = Budget.indexOf(".");
+			Budget = Budget.substring(0, n);
+		}
+		catch(err)
+		{
+			Budget = Budget;
+		}
+
+		var arr = [];
+		$(".InputBulan"+code).each(function(){
+			var valueee = $(this).val();
+			try{
+				valueee = findAndReplace(valueee,".","");
+			}
+			catch(err)
+			{
+				valueee = valueee;
+			}
+			arr.push(valueee);
+		})
+
+		var checkTot_Freq = 0;
+		for (var x = 0; x < arr.length; x++) {
+			checkTot_Freq = parseInt(checkTot_Freq) + parseInt(arr[x]);
+		}
+
+		if (checkTot_Freq > Freq) {
+			$(".InputBulan"+code).each(function(){
+				$(this).val(0);
+				$(this).maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+				$(this).maskMoney('mask', '9894');
+			})
+			$("#InputSubtotal"+code).attr('total',"0");
+
+			toastr.info("Your Input Exceeded than Freq, The Input Was Reset");
+		}
+		else
+		{
+			if (Total > Budget) {
+				$("#InputSubtotal"+code+" p").first().html('Limit : '+ formatRupiah(Budget));
+				$("#InputSubtotal"+code+" p").first().attr('style','color : red');
+
+			}
+			else
+			{
+				$("#InputSubtotal"+code+" p").first().html('Limit : '+ formatRupiah(Budget));
+				$("#InputSubtotal"+code+" p").first().attr('style','color : black');
+			}
+
+			$("#Subtotal"+code).html('Subtotal : '+ formatRupiah(Total));
+			$("#InputSubtotal"+code).attr('total',Total);
+			funcGrantotal();
+		}
+	}
+
+	function funcGrantotal()
+	{
+		var arr_PostBudget = [];
+		arr_PostBudget = <?php echo json_encode($arr_PostBudget) ?>;
+		var GrandTotal = 0;
+		for (var i = 0; i < arr_PostBudget.length; i++) {
+			var code = arr_PostBudget[i]['CodePostBudget'];
+			var subTotal = $("#InputSubtotal"+code).attr('total');
+			GrandTotal = parseInt(GrandTotal) + parseInt(subTotal);
+		}
+		// get all total
+		$("#GrandTotal").html('<p style = "color : green">'+'Grand Total : <br>'+formatRupiah(GrandTotal)+'</p>');
 	}
 </script>
