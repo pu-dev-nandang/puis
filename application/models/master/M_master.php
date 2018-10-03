@@ -665,6 +665,17 @@ class M_master extends CI_Model {
         return $query;
     }
 
+    public function getUserSessAuth($NIP,$IDDivision)
+    {
+        $sql = 'select CONCAT(a.Name," | ",a.NIP) as Name, a.NIP from db_employees.employees as a 
+          join db_employees.rule_users as b
+          on a.NIP = b.NIP
+          where b.IDDivision = ? and a.NIP = ?
+          GROUP BY a.NIP';
+        $query=$this->db->query($sql, array($IDDivision,$NIP))->result_array();
+        return $query;
+    }
+
     public function get_submenu_by_menu($input)
     {
         $ID_Menu = $input['Menu'];
@@ -931,13 +942,24 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $query;
     }
 
-    public function getSubmenu2BaseSubmenu1_grouping($submenu1,$db='db_admission')
+    public function getSubmenu2BaseSubmenu1_grouping($submenu1,$db='db_admission',$IDmenu = null)
     {
-        $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
-        from '.$db.'.cfg_sub_menu as a  join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
-        join '.$db.'.previleges_guser as c on b.cfg_group_user = c.G_user
-         where a.SubMenu1 = ? and c.NIP = ?';
-        $query=$this->db->query($sql, array($submenu1,$this->session->userdata('NIP')))->result_array();
+        if ($IDmenu != null) {
+            $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
+            from '.$db.'.cfg_sub_menu as a  join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
+            join '.$db.'.previleges_guser as c on b.cfg_group_user = c.G_user
+             where a.SubMenu1 = ? and c.NIP = ? and a.ID_Menu = ?';
+            $query=$this->db->query($sql, array($submenu1,$this->session->userdata('NIP'),$IDmenu))->result_array();
+        }
+        else
+        {
+            $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
+            from '.$db.'.cfg_sub_menu as a  join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
+            join '.$db.'.previleges_guser as c on b.cfg_group_user = c.G_user
+             where a.SubMenu1 = ? and c.NIP = ?';
+            $query=$this->db->query($sql, array($submenu1,$this->session->userdata('NIP')))->result_array();
+        }
+        
         return $query;
     }
 
@@ -2318,5 +2340,49 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $sql = 'select * from '.$table.' where ID != 1';
         $query=$this->db->query($sql, array())->result_array();
         return $query;
+    }
+
+    public function getShowIntervalBulan($Start,$End)
+    {
+        $arr = array();
+        $date1 = $Start;
+        $date2 = $End;
+
+        $ts1 = strtotime($date1);
+        $ts2 = strtotime($date2);
+
+        $year1 = date('Y', $ts1);
+        $year2 = date('Y', $ts2);
+
+        $month1 = date('m', $ts1);
+        $month2 = date('m', $ts2);
+
+        $diff = (($year2 - $year1) * 12) + ($month2 - $month1);
+        $diff = $diff+1;
+
+        $aa = explode("-", $Start);
+        $y = $aa[0];
+        $m = $aa[1];
+        $arr_bulan = array(
+            'Jan','Feb','March','April','May','June','July','August','Sep','Oct','Nov','Des'
+        );
+        for ($i=0; $i < $diff; $i++) { 
+            $bb = $m;
+            if (strlen($bb) == 1) {
+                $bb = '0'.$bb;
+            }
+            $keyValueFirst = $y.'-'.$bb;
+            $c = (int)$m;
+            $c = $c - 1;
+            $month = $arr_bulan[$c];
+            $arr[] = array('keyValueFirst' => $keyValueFirst,'MonthName' => $month);
+            $m++;
+            if ($m > 12) {
+               $m = 1;
+               $y++;
+            }
+        }
+        
+        return $arr;
     }
 }

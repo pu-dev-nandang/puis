@@ -108,6 +108,18 @@
                             <li class=""><a href="javascript:void(0);" id="btnSimpleSearch"><i class="fa fa-search"></i> Simple Search</a></li>
 <!--                            <li class="divider"></li>-->
                         <?php } ?>
+                        <?php if(in_array(5,$rule_service)){ ?>
+                            <li class="<?php if($this->uri->segment(1)=='vreservation'){echo 'active';} ?>">
+                                <a href="<?php echo base_url('vreservation/dashboard/view'); ?>"><i class="fa fa-th-large" aria-hidden="true"></i> Venue Reservation</a>
+                            </li>
+<!--                            <li class="divider"></li>-->
+                        <?php } ?>
+                        <?php if(in_array(6,$rule_service)){ ?>
+                            <li class="<?php if($this->uri->segment(1)=='budgeting'){echo 'active';} ?>">
+                                <a href="<?php echo base_url('budgeting'); ?>"><i class="fa fa-money" aria-hidden="true"></i> Budgeting</a>
+                            </li>
+<!--                            <li class="divider"></li>-->
+                        <?php } ?>
 
                     </ul>
                 </li>
@@ -139,12 +151,18 @@
                             My Profile</a></li>
                     <!--                    <li><a href="pages_calendar.html"><i class="fa fa-calendar"></i> My Calendar</a></li>-->
                     <!--                    <li><a href="#"><i class="fa fa-tasks"></i> My Tasks</a></li>-->
-                    <li>
+                    <!-- <li>
                         <a href="<?php echo base_url('vreservation/dashboard/view'); ?>" id="btn_reservation">
                             <i class="fa fa-th-large" aria-hidden="true"></i>
                             <span>Venue Reservation</span>
                         </a>
-                    </li>
+                    </li> -->
+                   <!--  <li>
+                        <a href="<?php echo base_url('budgeting'); ?>">
+                            <i class="fa fa-money" aria-hidden="true"></i>
+                            <span>Budgeting</span>
+                        </a>
+                    </li> -->
                     <li class="divider"></li>
                     <li><a href="javascript:void(0)" id="useLogOut"><i class="fa fa-power-off"></i> Log Out</a></li>
                 </ul>

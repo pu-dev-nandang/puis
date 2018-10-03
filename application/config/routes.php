@@ -717,6 +717,8 @@ $route['api/__getSimpleSearch'] = 'api/c_api/getSimpleSearch';
 $route['api/__getSimpleSearchStudents'] = 'api/c_api/getSimpleSearchStudents';
 
 
+$route['api/__getAllDepartementPU'] = 'api/c_api/getAllDepartementPU';
+
 //v_reservation
 $route['api/__m_equipment_additional'] = 'api/c_api/m_equipment_additional';
 $route['api/get_time_opt_reservation'] = 'api/c_api/get_time_opt_reservation';
@@ -732,7 +734,6 @@ $route['api/__crudFinalProject'] = 'api/c_api/crudFinalProject';
 $route['api/__getFinalProject'] = 'api/c_api/getFinalProject';
 
 $route['api/__crudInvigilator'] = 'api/c_api/crudInvigilator';
-
 
 // for inject //
 $route['testadi'] = 'dashboard/c_dashboard/testadi';
@@ -838,3 +839,152 @@ $route['testInject'] = 'api/c_global/testInject';
 
 // Pengawas Ujian
 $route['invigilator'] = 'c_pengawas_ujian';
+
+
+
+// budgeting & PR
+$route['budgeting'] = 'page/budgeting/c_budgeting';
+
+$query = $db->get('db_budgeting.cfg_sub_menu');
+$result = $query->result();
+foreach( $result as $row )
+{
+	$Slug = $row->Slug;
+	$Slug = explode('/', $Slug);
+	if (in_array('(:any)', $Slug)) {
+	   $a = count($Slug) - 1;
+	   $URI = '';
+	   for ($i=0; $i < $a; $i++) { 
+	   	$URI .= $Slug[$i].'/';
+	   }
+	   $route[ $URI.'(:any)' ] = $row->Controller;
+	}
+	elseif(in_array('(:num)', $Slug)) {
+		$a = count($Slug) - 1;
+		$URI = '';
+		for ($i=0; $i < $a; $i++) { 
+			$URI .= $Slug[$i].'/';
+		}
+		$route[ $URI.'(:num)' ] = $row->Controller;
+	}
+	else
+	{
+		$route[ $row->Slug ] = $row->Controller;
+	}
+
+}
+
+$route['budgeting_configfinance/(:any)'] = 'page/budgeting/c_budgeting/configfinance/$1';
+$route['budgeting/page/LoadTimePeriod'] = 'page/budgeting/c_budgeting/pageLoadTimePeriod';
+$route['budgeting/time_period/modalform'] = 'page/budgeting/c_budgeting/modal_pageLoadTimePeriod';
+$route['budgeting/time_period/modalform/save'] = 'page/budgeting/c_budgeting/modal_pageLoadTimePeriod_save';
+$route['budgeting/table_cari/(:any)/(:any)/(:any)'] = 'page/budgeting/c_budgeting/LoadTable_db_budgeting_cari/$1/$2/$3/$4';
+$route['budgeting/table_cari/(:any)/(:any)/(:any)/(:any)'] = 'page/budgeting/c_budgeting/LoadTable_db_budgeting_cari/$1/$2/$3/$4';
+$route['budgeting/table_all/(:any)/(:any)'] = 'page/budgeting/c_budgeting/LoadTable_db_budgeting_all/$1/$2';
+$route['budgeting/table_all/(:any)'] = 'page/budgeting/c_budgeting/LoadTable_db_budgeting_all/$1/$2';
+$route['budgeting/page/loadMasterPost'] = 'page/budgeting/c_budgeting/pageloadMasterPost';
+$route['budgeting/masterpost/modalform'] = 'page/budgeting/c_budgeting/modal_pageloadMasterPost';
+$route['budgeting/masterpost/modalform/save'] = 'page/budgeting/c_budgeting/modal_pageloadMasterPost_save';
+$route['budgeting/postrealisasi/modalform'] = 'page/budgeting/c_budgeting/modal_postrealisasi';
+$route['budgeting/postrealisasi/modalform/save'] = 'page/budgeting/c_budgeting/save_postrealisasi';
+$route['budgeting/get_cfg_postrealisasi'] = 'page/budgeting/c_budgeting/get_cfg_postrealisasi';
+$route['budgeting/page/loadCodePrefix'] = 'page/budgeting/c_budgeting/loadCodePrefix';
+$route['budgeting/save_codeprefix'] = 'page/budgeting/c_budgeting/save_codeprefix';
+$route['budgeting/page/LoadSetPostDepartement'] = 'page/budgeting/c_budgeting/LoadSetPostDepartement';
+$route['budgeting/page/LoadInputsetPostDepartement'] = 'page/budgeting/c_budgeting/LoadInputsetPostDepartement';
+$route['budgeting/getPostDepartement'] = 'page/budgeting/c_budgeting/getPostDepartement';
+$route['budgeting/getDomPostDepartement'] = 'page/budgeting/c_budgeting/getDomPostDepartement';
+$route['budgeting/save-setpostdepartement'] = 'page/budgeting/c_budgeting/save_setpostdepartement';
+$route['budgeting/getBudgetLastYearByCode'] = 'page/budgeting/c_budgeting/getBudgetLastYearByCode';
+$route['budgeting/page/LogPostDepartement'] = 'page/budgeting/c_budgeting/LogPostDepartement';
+$route['budgeting/DataLogPostDepartement'] = 'page/budgeting/c_budgeting/DataLogPostDepartement';
+$route['budgeting/page/LoadSetUserRole'] = 'page/budgeting/c_budgeting/LoadSetUserRole';
+$route['budgeting/page/LoadMasterUserRoleDepartement'] = 'page/budgeting/c_budgeting/LoadMasterUserRoleDepartement';
+$route['budgeting/AutoCompletePostDepartement'] = 'page/budgeting/c_budgeting/AutoCompletePostDepartement';
+$route['budgeting/save_cfg_set_userrole'] = 'page/budgeting/c_budgeting/save_cfg_set_userrole';
+$route['budgeting/page/LoadSetUserActionDepartement'] = 'page/budgeting/c_budgeting/LoadSetUserActionDepartement';
+$route['budgeting/get_cfg_set_roleuser/(:any)'] = 'page/budgeting/c_budgeting/get_cfg_set_roleuser/$1';
+$route['budgeting/save_cfg_set_roleuser'] = 'page/budgeting/c_budgeting/save_cfg_set_roleuser';
+$route['budgeting/EntryBudget/EntryBudget'] = 'page/budgeting/c_budgeting/EntryBudget';
+$route['budgeting/getCreatorBudget'] = 'page/budgeting/c_budgeting/getCreatorBudget';
+$route['budgeting/saveCreatorbudget'] = 'page/budgeting/c_budgeting/saveCreatorbudget';
+$route['budgeting/EntryBudget/Approval'] = 'page/budgeting/c_budgeting/EntryBudget_Approval';
+$route['budgeting/getLoadApprovalBudget'] = 'page/budgeting/c_budgeting/getLoadApprovalBudget';
+
+
+// Purchasing
+$query = $db->get('db_purchasing.cfg_sub_menu');
+$result = $query->result();
+// print_r($result);die();
+foreach( $result as $row )
+{
+	$Slug = $row->Slug;
+	$Slug = explode('/', $Slug);
+	if (in_array('(:any)', $Slug)) {
+	   $a = count($Slug) - 1;
+	   $URI = '';
+	   for ($i=0; $i < $a; $i++) { 
+	   	$URI .= $Slug[$i].'/';
+	   }
+	   $route[ $URI.'(:any)' ] = $row->Controller;
+	}
+	elseif(in_array('(:num)', $Slug)) {
+		$a = count($Slug) - 1;
+		$URI = '';
+		for ($i=0; $i < $a; $i++) { 
+			$URI .= $Slug[$i].'/';
+		}
+		$route[ $URI.'(:num)' ] = $row->Controller;
+	}
+	else
+	{
+		$route[ $row->Slug ] = $row->Controller;
+	}
+
+}
+
+$route['purchasing/page/catalog/InputCatalog'] = 'page/purchasing/c_master/InputCatalog';
+$route['purchasing/page/catalog/FormInput'] = 'page/purchasing/c_master/InputCatalog_FormInput';
+$route['purchasing/page/catalog/saveFormInput'] = 'page/purchasing/c_master/InputCatalog_saveFormInput';
+$route['purchasing/page/catalog/DataIntable'] = 'page/purchasing/c_master/Catalog_DataIntable';
+$route['purchasing/page/catalog/DataIntable/server_side'] = 'page/purchasing/c_master/Catalog_DataIntable_server_side';
+$route['purchasing/page/catalog/ApprovalCatalog'] = 'page/purchasing/c_master/ApprovalCatalog';
+$route['purchasing/page/supplier/InputSupplier'] = 'page/purchasing/c_master/InputSupplier';
+$route['purchasing/page/supplier/FormInput'] = 'page/purchasing/c_master/InputSupplier_FormInput';
+$route['purchasing/page/supplier/saveFormInput'] = 'page/purchasing/c_master/InputSupplier_saveFormInput';
+$route['purchasing/page/supplier/saveCategoryFormInput'] = 'page/purchasing/c_master/saveCategoryFormInput';
+$route['purchasing/page/supplier/DataIntable'] = 'page/purchasing/c_master/Supplier_DataIntable';
+$route['purchasing/page/supplier/DataIntable/server_side'] = 'page/purchasing/c_master/Supplier_DataIntable_server_side';
+$route['purchasing/page/supplier/ApprovalSupplier'] = 'page/purchasing/c_master/ApprovalSupplier';
+$route['purchasing/table_all/(:any)'] = 'page/purchasing/c_purchasing/LoadTable_db_purchasing_all/$1/$2';
+$route['purchasing/table_all/(:any)/(:any)'] = 'page/purchasing/c_purchasing/LoadTable_db_purchasing_all/$1/$2';
+// IT
+$query = $db->get('db_it.cfg_sub_menu');
+$result = $query->result();
+// print_r($result);die();
+foreach( $result as $row )
+{
+	$Slug = $row->Slug;
+	$Slug = explode('/', $Slug);
+	if (in_array('(:any)', $Slug)) {
+	   $a = count($Slug) - 1;
+	   $URI = '';
+	   for ($i=0; $i < $a; $i++) { 
+	   	$URI .= $Slug[$i].'/';
+	   }
+	   $route[ $URI.'(:any)' ] = $row->Controller;
+	}
+	elseif(in_array('(:num)', $Slug)) {
+		$a = count($Slug) - 1;
+		$URI = '';
+		for ($i=0; $i < $a; $i++) { 
+			$URI .= $Slug[$i].'/';
+		}
+		$route[ $URI.'(:num)' ] = $row->Controller;
+	}
+	else
+	{
+		$route[ $row->Slug ] = $row->Controller;
+	}
+
+}

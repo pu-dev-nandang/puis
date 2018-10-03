@@ -122,11 +122,7 @@ abstract class Globalclass extends MyAbstract{
     //==== Get Set ===
     public function __getDepartement(){
         $nav = $this->session->userdata('departementNavigation');
-
-
         return $nav;
-
-
     }
 
     public function __setDepartement($dpt)
@@ -301,33 +297,7 @@ abstract class Admission_Controler extends Globalclass{
             
         }
 
-        // print_r($arr);die();
         return $arr;
-
-        // $DataDB = $this->session->userdata('menu_admission_sess');
-        // $this->load->model('master/m_master');
-        // $arr = array();
-        // for ($i=0; $i < count($DataDB); $i++) {
-        //     $submenu1 = $this->m_master->getSubmenu1BaseMenu($DataDB[$i]['ID_menu']);
-        //     $arr2 = array();
-        //     for ($k=0; $k < count($submenu1); $k++) { 
-        //         $submenu2 = $this->m_master->getSubmenu2BaseSubmenu1($submenu1[$k]['SubMenu1']);
-        //         $arr2[] = array(
-        //             'SubMenu1' => $submenu1[$k]['SubMenu1'],
-        //             'Submenu' => $submenu2,
-        //         );
-        //     }
-
-        //     $arr[] =array(
-        //         'Menu' => $DataDB[$i]['Menu'],
-        //         'Icon' => $DataDB[$i]['Icon'],
-        //         'Submenu' => $arr2
-
-        //     );
-            
-        // }
-
-        // return $arr;
     }
 
     public function auth_ajax()
@@ -509,6 +479,324 @@ abstract class Vreservation_Controler extends Globalclass{
             
         }
         
+    }
+
+}
+
+
+abstract class Budgeting_Controler extends Globalclass{
+
+    public $data = array();
+
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('budgeting/m_budgeting');
+    }
+
+    public function temp($content)
+    {
+        $this->template($content);
+    }
+
+
+    // overide function
+    public function template($content)
+    {
+
+        $data['include'] = $this->load->view('template/include','',true);
+
+        $data['header'] = $this->menu_header();
+        $data['navigation'] = $this->menu_navigation();
+        $data['crumbs'] = $this->crumbs();
+
+        $data['content'] = $content;
+        $this->load->view('template/template',$data);
+
+    }
+
+    // overide function
+    public function  menu_navigation(){
+        $data['departement'] = $this->__getDepartement();
+        $page = $this->load->view('global/budgeting/menu_navigation','',true);
+        return $page;
+    }
+
+    public function auth_ajax()
+    {
+        if (!$this->input->is_ajax_request()) {
+            exit('No direct script access allowed');
+        }
+    }
+
+    public function getAuthSession($MenuDepartement)
+    {
+        $data = array();
+        $getDataMenu = $this->m_budgeting->getMenuGroupUser($this->session->userdata('NIP'),$MenuDepartement);
+        $this->session->set_userdata('IDDepartementPUBudget',$MenuDepartement);
+        $data_sess = array();
+        if (count($getDataMenu) > 0) {
+            $this->session->set_userdata('auth_budgeting_sess',1);
+            $this->session->set_userdata('menu_budgeting_sess',$getDataMenu);
+            $this->session->set_userdata('menu_budgeting_grouping',$this->groupBYMenu_sess());
+            $this->session->set_userdata('role_user_budgeting',$this->m_budgeting->role_user_budgeting());
+        }
+    }
+
+    public function groupBYMenu_sess()
+    {
+        $DataDB = $this->session->userdata('menu_budgeting_sess');
+        $this->load->model('master/m_master');
+        $arr = array();
+        for ($i=0; $i < count($DataDB); $i++) {
+            $submenu1 = $this->m_master->getSubmenu1BaseMenu_grouping($DataDB[$i]['ID_menu'],'db_budgeting');
+            $arr2 = array();
+            for ($k=0; $k < count($submenu1); $k++) { 
+                $submenu2 = $this->m_master->getSubmenu2BaseSubmenu1_grouping($submenu1[$k]['SubMenu1'],'db_budgeting',$DataDB[$i]['ID_menu']);
+                $arr2[] = array(
+                    'SubMenu1' => $submenu1[$k]['SubMenu1'],
+                    'Submenu' => $submenu2,
+                );
+            }
+
+            $arr[] =array(
+                'Menu' => $DataDB[$i]['Menu'],
+                'Icon' => $DataDB[$i]['Icon'],
+                'Submenu' => $arr2
+
+            );
+            
+        }
+        // print_r($arr);die();
+        return $arr;
+    }
+
+}
+
+abstract class Purchasing_Controler extends Globalclass{
+
+    public $data = array();
+
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('master/m_master');
+        // $this->load->model('budgeting/m_budgeting');
+        // check user auth
+        if (!$this->session->userdata('purchasing_sess')) {
+            $check = $this->authPurchasing();
+            if (!$check) {
+                // not authorize
+                redirect(base_url().'dashboard');
+            }
+            else
+            {
+                if (!$this->session->userdata('auth_purchasing_sess')) {
+                    $this->getAuthSession();
+                }
+            }
+        }
+    }
+
+    private function authPurchasing()
+    {
+        $NIP = $this->session->userdata('NIP');
+        $getData = $this->m_master->getUserSessAuth($NIP,4);
+        if (count($getData) > 0) {
+            $this->session->set_userdata('purchasing_sess',1);
+            return true;
+        }
+
+        return false;
+    }
+
+    public function temp($content)
+    {
+        $this->template($content);
+    }
+
+
+    // overide function
+    public function template($content)
+    {
+
+        $data['include'] = $this->load->view('template/include','',true);
+
+        $data['header'] = $this->menu_header();
+        $data['navigation'] = $this->menu_navigation();
+        $data['crumbs'] = $this->crumbs();
+
+        $data['content'] = $content;
+        $this->load->view('template/template',$data);
+
+    }
+
+    // overide function
+    public function  menu_navigation(){
+        $data['departement'] = $this->__getDepartement();
+        $page = $this->load->view('page/'.$data['departement'].'/menu_navigation','',true);
+        return $page;
+    }
+
+    public function auth_ajax()
+    {
+        if (!$this->input->is_ajax_request()) {
+            exit('No direct script access allowed');
+        }
+    }
+
+    public function getAuthSession()
+    {
+        $data = array();
+        $getDataMenu = $this->m_master->getMenuGroupUser($this->session->userdata('NIP'),'db_purchasing');
+        $data_sess = array();
+        if (count($getDataMenu) > 0) {
+            $this->session->set_userdata('auth_purchasing_sess',1);
+            $this->session->set_userdata('menu_purchasing_sess',$getDataMenu);
+            $this->session->set_userdata('menu_purchasing_grouping',$this->groupBYMenu_sess());
+        }
+    }
+
+    public function groupBYMenu_sess()
+    {
+        $DataDB = $this->session->userdata('menu_purchasing_sess');
+        $arr = array();
+        for ($i=0; $i < count($DataDB); $i++) {
+            $submenu1 = $this->m_master->getSubmenu1BaseMenu_grouping($DataDB[$i]['ID_menu'],'db_purchasing');
+            $arr2 = array();
+            for ($k=0; $k < count($submenu1); $k++) { 
+                $submenu2 = $this->m_master->getSubmenu2BaseSubmenu1_grouping($submenu1[$k]['SubMenu1'],'db_purchasing',$DataDB[$i]['ID_menu']);
+                $arr2[] = array(
+                    'SubMenu1' => $submenu1[$k]['SubMenu1'],
+                    'Submenu' => $submenu2,
+                );
+            }
+
+            $arr[] =array(
+                'Menu' => $DataDB[$i]['Menu'],
+                'Icon' => $DataDB[$i]['Icon'],
+                'Submenu' => $arr2
+
+            );
+            
+        }
+        return $arr;
+    }
+
+}
+
+
+abstract class It_Controler extends Globalclass{
+
+    public $data = array();
+
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('master/m_master');
+        // $this->load->model('budgeting/m_budgeting');
+        // check user auth
+        if (!$this->session->userdata('it_sess')) {
+            $check = $this->authIT();
+            if (!$check) {
+                // not authorize
+                redirect(base_url().'dashboard');
+            }
+            else
+            {
+                if (!$this->session->userdata('auth_it_sess')) {
+                    $this->getAuthSession();
+                }
+            }
+        }
+    }
+
+    private function authIT()
+    {
+        $NIP = $this->session->userdata('NIP');
+        $getData = $this->m_master->getUserSessAuth($NIP,4);
+        if (count($getData) > 0) {
+            $this->session->set_userdata('it_sess',1);
+            return true;
+        }
+
+        return false;
+    }
+
+    public function temp($content)
+    {
+        $this->template($content);
+    }
+
+
+    // overide function
+    public function template($content)
+    {
+
+        $data['include'] = $this->load->view('template/include','',true);
+
+        $data['header'] = $this->menu_header();
+        $data['navigation'] = $this->menu_navigation();
+        $data['crumbs'] = $this->crumbs();
+
+        $data['content'] = $content;
+        $this->load->view('template/template',$data);
+
+    }
+
+    // overide function
+    public function  menu_navigation(){
+        $data['departement'] = $this->__getDepartement();
+        $page = $this->load->view('page/'.$data['departement'].'/menu_navigation','',true);
+        return $page;
+    }
+
+    public function auth_ajax()
+    {
+        if (!$this->input->is_ajax_request()) {
+            exit('No direct script access allowed');
+        }
+    }
+
+    public function getAuthSession()
+    {
+        $data = array();
+        $getDataMenu = $this->m_master->getMenuGroupUser($this->session->userdata('NIP'),'db_it');
+        $data_sess = array();
+        if (count($getDataMenu) > 0) {
+            $this->session->set_userdata('auth_it_sess',1);
+            $this->session->set_userdata('menu_it_sess',$getDataMenu);
+            $this->session->set_userdata('menu_it_grouping',$this->groupBYMenu_sess());
+        }
+    }
+
+    public function groupBYMenu_sess()
+    {
+        $DataDB = $this->session->userdata('menu_it_sess');
+        $arr = array();
+        for ($i=0; $i < count($DataDB); $i++) {
+            $submenu1 = $this->m_master->getSubmenu1BaseMenu_grouping($DataDB[$i]['ID_menu'],'db_it');
+            $arr2 = array();
+            for ($k=0; $k < count($submenu1); $k++) { 
+                $submenu2 = $this->m_master->getSubmenu2BaseSubmenu1_grouping($submenu1[$k]['SubMenu1'],'db_it',$DataDB[$i]['ID_menu']);
+                $arr2[] = array(
+                    'SubMenu1' => $submenu1[$k]['SubMenu1'],
+                    'Submenu' => $submenu2,
+                );
+            }
+
+            $arr[] =array(
+                'Menu' => $DataDB[$i]['Menu'],
+                'Icon' => $DataDB[$i]['Icon'],
+                'Submenu' => $arr2
+
+            );
+            
+        }
+        return $arr;
     }
 
 }

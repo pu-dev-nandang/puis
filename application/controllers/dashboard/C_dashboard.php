@@ -412,5 +412,10 @@ class C_dashboard extends Globalclass {
 
     }
 
+    public function JsonLoadTable($table)
+    {
+        
+    }
+
 
 }
