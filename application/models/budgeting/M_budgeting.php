@@ -173,7 +173,7 @@ class M_budgeting extends CI_Model {
         $sql = 'select a.CodePostBudget,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
                 from db_budgeting.cfg_postrealisasi as b left join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
                 join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
-                where b.Departement = ?
+                where b.Departement = ? order by a.CodePostBudget asc
                 ';
         $query=$this->db->query($sql, array($Year,$Departement))->result_array();
         $arr_result = array('data' => $query,'OpPostRealisasi' => $get_Data);
@@ -222,9 +222,9 @@ class M_budgeting extends CI_Model {
         return $query;
     }
 
-    public function get_creator_budget_approval($Year,$Departement)
+    public function get_creator_budget_approval($Year,$Departement,$Approval = 'and Approval = 1')
     {
-        $sql = 'select * from db_budgeting.creator_budget_approval where Year = ? and Departement = ? and Approval = 1';
+        $sql = 'select * from db_budgeting.creator_budget_approval where Year = ? and Departement = ? '.$Approval;
         $query=$this->db->query($sql, array($Year,$Departement))->result_array();
         return $query;
     }
@@ -236,8 +236,23 @@ class M_budgeting extends CI_Model {
            from db_budgeting.cfg_postrealisasi as b left join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
            join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
            where b.Departement = ?     
-        ) as  b on a.CodePostBudget = b.CodePostBudget';
+        ) as  b on a.CodePostBudget = b.CodePostBudget order by a.CodePostBudget asc';
         $query=$this->db->query($sql, array($Year,$Departement))->result_array();
         return $query;
+    }
+
+    public function role_user_budgeting() // for role user budgeting per post
+    {
+        $arr = array('ID_m_userrole' => '','NameUserRole' => '');
+        $sql = 'select a.*,b.NameUserRole from db_budgeting.cfg_set_roleuser as a join db_budgeting.cfg_m_userrole as b on a.ID_m_userrole = b.ID
+                where a.NIP = ? and a.Departement = ?
+        ';
+        $query=$this->db->query($sql, array($this->session->userdata('NIP'),$this->session->userdata('IDDepartementPUBudget')))->result_array();
+        for ($i=0; $i < count($query); $i++) {
+            $arr[] = array('ID_m_userrole' => $query[$i]['ID_m_userrole'] ,'NameUserRole' => $query[$i]['NameUserRole']);
+        }
+
+        return $arr;
+        
     }
 }

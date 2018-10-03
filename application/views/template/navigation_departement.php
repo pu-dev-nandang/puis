@@ -45,7 +45,7 @@
                     <span class="title">Human Resources</span>
                 </a>
             </li>
-            <li class="departement1 <?php if($departement=='general-affair'){echo 'current';} ?>"
+            <li class="departement <?php if($departement=='general-affair'){echo 'current';} ?>"
                 division="8"
                 data-dpt="general-affair">
                 <a href="javascript:void(0);">

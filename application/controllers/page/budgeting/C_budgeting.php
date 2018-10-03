@@ -20,16 +20,21 @@ class C_budgeting extends Budgeting_Controler {
         $this->session->unset_userdata('auth_budgeting_sess');
         $this->session->unset_userdata('menu_budgeting_sess');
         $this->session->unset_userdata('menu_budgeting_grouping');
+        $this->session->unset_userdata('role_user_budgeting');
         $IDdepartementNavigation = $this->session->userdata('IDdepartementNavigation');
         switch ($IDdepartementNavigation) {
             case 12: // IT
                 // print_r($IDdepartementNavigation);
                 $this->BudgetingIT();
                 break;
-            case 9: // IT
+            case 9: // Finance
                 // print_r($IDdepartementNavigation);
                 $this->BudgetingFinance();
-                break;    
+                break;   
+            case 8: // Adum
+                // print_r($IDdepartementNavigation);
+                $this->BudgetingAdum();
+                break;     
             default:
                 # code...
                 break;
@@ -58,6 +63,14 @@ class C_budgeting extends Budgeting_Controler {
         $this->temp($content);
     }
 
+    public function BudgetingAdum()
+    {
+        $MenuDepartement= 'NA.'.$this->session->userdata('IDdepartementNavigation');
+        $this->getAuthSession($MenuDepartement);
+        $content = $this->load->view('page/'.$this->data['department'].'/budgeting/dashboard',$this->data,true);
+        $this->temp($content);
+    }
+
     public function configfinance($Request = null)
     {
         $arr_menuConfig = array('CodePrefix',
@@ -66,8 +79,6 @@ class C_budgeting extends Budgeting_Controler {
                                 'SetPostDepartement',
                                 'MasterUserRole',
                                 'UserRole',
-                                // 'Catalog',
-                                // 'Supplier',
                                 null
                             );
         if (in_array($Request, $arr_menuConfig))
@@ -994,7 +1005,8 @@ class C_budgeting extends Budgeting_Controler {
     {
         // print_r($this->session->userdata('IDDepartementPUBudget'));
         $arr = array('EntryBudget',
-                    'View',
+                    'Approval',
+                    'ListBudgetDepartement',
                     null
                 );
                 if (in_array($Request, $arr))
@@ -1015,12 +1027,44 @@ class C_budgeting extends Budgeting_Controler {
         $this->auth_ajax();
         $arr_result = array('html' => '','jsonPass' => '');
         $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
-        // find data bulan arr
         $arr_bulan = $this->m_master->getShowIntervalBulan($get[0]['StartPeriod'],$get[0]['EndPeriod']);
-        // print_r($arr_bulan);die();
         $Year = $get[0]['Year'];
         $Departement = $this->session->userdata('IDDepartementPUBudget');
         $get = $this->m_budgeting->getPostDepartementForDom($Year,$Departement);
+        $this->data['fin'] = 0;
+        if ($Departement == 'NA.9') {
+            $this->data['fin'] = 1;
+        }
+        $this->data['Year'] = $Year;
+        $this->data['Departement'] = $Departement;
+        $this->data['arr_PostBudget'] = $get['data'];
+        $this->data['arr_bulan'] = $arr_bulan;
+        $arr_result['html'] = $this->load->view('global/budgeting/form_entry_budgeting',$this->data,true);
+        echo json_encode($arr_result);
+    }
+
+    public function EntryBudget_Approval()
+    {
+        $this->auth_ajax();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $arr_result['html'] = $this->load->view('global/budgeting/form_approval_budgeting',$this->data,true);
+        echo json_encode($arr_result);
+    }
+
+    public function getLoadApprovalBudget()
+    {
+        $Input = $this->getInputToken();
+        $Departement = $Input['Departement'];
+        $arr_result = array('html' => '','jsonPass' => '');
+        $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
+        $arr_bulan = $this->m_master->getShowIntervalBulan($get[0]['StartPeriod'],$get[0]['EndPeriod']);
+        $Year = $get[0]['Year'];
+        $get = $this->m_budgeting->getPostDepartementForDom($Year,$Departement);
+        $this->data['fin'] = 0;
+        $DepartementSess = $this->session->userdata('IDDepartementPUBudget');
+        if ($DepartementSess == 'NA.9') {
+            $this->data['fin'] = 1;
+        }
         $this->data['Year'] = $Year;
         $this->data['Departement'] = $Departement;
         $this->data['arr_PostBudget'] = $get['data'];
@@ -1036,7 +1080,7 @@ class C_budgeting extends Budgeting_Controler {
         $Year = $Input['Year'];
         $Departement = $Input['Departement'];
         $arr_result = array('creator_budget_approval' => array(),'creator_budget' => array());
-        $get = $this->m_budgeting->get_creator_budget_approval($Year,$Departement);
+        $get = $this->m_budgeting->get_creator_budget_approval($Year,$Departement,'');
         if (count($get) > 0) {
             // get Creator Budget
             $get2 = $this->m_budgeting->get_creator_budget($Year,$Departement);
@@ -1045,6 +1089,113 @@ class C_budgeting extends Budgeting_Controler {
         }
 
         echo json_encode($arr_result);
+    }
+
+    public function saveCreatorbudget()
+    {
+        $this->auth_ajax();
+        $msg = '';
+        $Input = $this->getInputToken();
+        $creator_budget = $Input['creator_budget'];
+        // save to creator_budget
+        switch ($Input['action']) {
+            case 'add':
+                for ($i=0; $i < count($creator_budget); $i++) { 
+                    $CodePostBudget = $creator_budget[$i]->CodePostBudget;
+                    $UnitCost = $creator_budget[$i]->UnitCost;
+                    $Freq = $creator_budget[$i]->Freq;
+                    $DetailMonth = $creator_budget[$i]->DetailMonth;
+                    $DetailMonth = json_encode($DetailMonth);
+                    $SubTotal = $creator_budget[$i]->SubTotal;
+
+                    $dataSave = array(
+                        'CodePostBudget' => $CodePostBudget,
+                        'UnitCost' => $UnitCost,
+                        'Freq' => $Freq,
+                        'DetailMonth' => $DetailMonth,
+                        'SubTotal' => $SubTotal,
+                        'CreatedBy' => $this->session->userdata('NIP'),
+                        'CreatedAt' => date('Y-m-d H:i:s'),
+                    );
+                    $this->db->insert('db_budgeting.creator_budget', $dataSave);
+
+                }
+
+                $creator_budget_approval = $Input['creator_budget_approval'];
+                $dataSave = array(
+                    'Departement' => $creator_budget_approval->Departement,
+                    'Year' => $creator_budget_approval->Year,
+                    'Note' => $creator_budget_approval->Note,
+                );
+                $this->db->insert('db_budgeting.creator_budget_approval', $dataSave);
+                break;
+            case 'edit':
+                $ID = $Input['ID'];
+                for ($i=0; $i < count($creator_budget); $i++) { 
+                    $CodePostBudget = $creator_budget[$i]->CodePostBudget;
+                    $UnitCost = $creator_budget[$i]->UnitCost;
+                    $Freq = $creator_budget[$i]->Freq;
+                    $DetailMonth = $creator_budget[$i]->DetailMonth;
+                    $DetailMonth = json_encode($DetailMonth);
+                    $SubTotal = $creator_budget[$i]->SubTotal;
+
+                    $dataSave = array(
+                        'UnitCost' => $UnitCost,
+                        'Freq' => $Freq,
+                        'DetailMonth' => $DetailMonth,
+                        'SubTotal' => $SubTotal,
+                        'LastUpdateBy' => $this->session->userdata('NIP'),
+                        'LastUpdateAt' => date('Y-m-d H:i:s'),
+                    );
+                    $this->db->where('CodePostBudget', $CodePostBudget);
+                    $this->db->update('db_budgeting.creator_budget', $dataSave);
+
+                }
+
+                $creator_budget_approval = $Input['creator_budget_approval'];
+                $dataSave = array(
+                    'Note' => $creator_budget_approval->Note,
+                );
+                $this->db->where('ID', $ID);
+                $this->db->update('db_budgeting.creator_budget_approval', $dataSave);
+
+                break;
+            case 'approval':
+                $ID = $Input['ID'];
+                $dataSave = array(
+                    'Approval' =>1,
+                    'ApprovalBy' => $this->session->userdata('NIP'),
+                    'ApprovalAt' => date('Y-m-d'),
+                );
+                $this->db->where('ID', $ID);
+                $this->db->update('db_budgeting.creator_budget_approval', $dataSave);
+
+                // save to table budget_left
+                $creator_budget_approval = $Input['creator_budget_approval'];
+                $Year  = $creator_budget_approval->Year;
+                $Departement = $creator_budget_approval->Departement;
+                $get2 = $this->m_budgeting->get_creator_budget($Year,$Departement);
+                for ($i=0; $i < count($get2); $i++) { 
+                    $ID_creator_budget = $get2[$i]['ID'];
+                    $DetailMonth = $get2[$i]['DetailMonth'];
+                    $DetailMonth = json_decode($DetailMonth);
+                    // print_r($DetailMonth);
+                    for ($j=0; $j < count($DetailMonth); $j++) { 
+                        $dataSave = array(
+                            'ID_creator_budget' => $ID_creator_budget,
+                            'YearsMonth' => $DetailMonth[$j]->month.'-01',
+                            'Value' => $DetailMonth[$j]->value * $get2[$i]['UnitCost'],
+                        );
+
+                        $this->db->insert('db_budgeting.budget_left', $dataSave);
+                    }
+                }
+                break;    
+            default:
+                # code...
+                break;
+        }
+        echo json_encode($msg);
     }   
 
 

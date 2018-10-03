@@ -515,7 +515,7 @@ abstract class Budgeting_Controler extends Globalclass{
     // overide function
     public function  menu_navigation(){
         $data['departement'] = $this->__getDepartement();
-        $page = $this->load->view('page/'.$data['departement'].'/budgeting/menu_navigation','',true);
+        $page = $this->load->view('global/budgeting/menu_navigation','',true);
         return $page;
     }
 
@@ -536,6 +536,7 @@ abstract class Budgeting_Controler extends Globalclass{
             $this->session->set_userdata('auth_budgeting_sess',1);
             $this->session->set_userdata('menu_budgeting_sess',$getDataMenu);
             $this->session->set_userdata('menu_budgeting_grouping',$this->groupBYMenu_sess());
+            $this->session->set_userdata('role_user_budgeting',$this->m_budgeting->role_user_budgeting());
         }
     }
 

@@ -9,8 +9,16 @@
         <li class="<?php if($request==null || $request=='EntryBudget'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "EntryBudget">EntryBudget</a>
         </li>
-        <li class="<?php if($request=='View'){echo "active";} ?>">
-            <a href="javascript:void(0)" class="pageAnchor" page = "View">View</a>
+        <?php if ($this->session->userdata('IDDepartementPUBudget') == 'NA.9'): ?>
+        <li class="<?php if($request=='Approval'){echo "active";} ?>">
+            <a href="javascript:void(0)" class="pageAnchor" page = "Approval">Approval</a>
+        </li>
+        <li class="<?php if($request=='ListBudgetDepartement'){echo "active";} ?>">
+            <a href="javascript:void(0)" class="pageAnchor" page = "ListBudgetDepartement">List Budget Departement</a>
+        </li>
+        <?php endif ?>
+        <li class="<?php if($request=='BudgetLeft'){echo "active";} ?>">
+            <a href="javascript:void(0)" class="pageAnchor" page = "BudgetLeft">BudgetLeft</a>
         </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
@@ -42,6 +50,9 @@
     function LoadPage(page)
     {
         loading_page("#pageContent");
+        if (jQuery("#pageInputApproval").length) {
+          $("#pageInputApproval").remove();
+        }
         var url = base_url_js+'budgeting/EntryBudget/'+page;
         $.post(url,function (resultJson) {
             var response = jQuery.parseJSON(resultJson);

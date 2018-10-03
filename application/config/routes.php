@@ -902,6 +902,9 @@ $route['budgeting/get_cfg_set_roleuser/(:any)'] = 'page/budgeting/c_budgeting/ge
 $route['budgeting/save_cfg_set_roleuser'] = 'page/budgeting/c_budgeting/save_cfg_set_roleuser';
 $route['budgeting/EntryBudget/EntryBudget'] = 'page/budgeting/c_budgeting/EntryBudget';
 $route['budgeting/getCreatorBudget'] = 'page/budgeting/c_budgeting/getCreatorBudget';
+$route['budgeting/saveCreatorbudget'] = 'page/budgeting/c_budgeting/saveCreatorbudget';
+$route['budgeting/EntryBudget/Approval'] = 'page/budgeting/c_budgeting/EntryBudget_Approval';
+$route['budgeting/getLoadApprovalBudget'] = 'page/budgeting/c_budgeting/getLoadApprovalBudget';
 
 
 // Purchasing

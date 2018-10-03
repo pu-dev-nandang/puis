@@ -2358,7 +2358,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             if (strlen($bb) == 1) {
                 $bb = '0'.$bb;
             }
-            $keyValueFirst = $y.$bb;
+            $keyValueFirst = $y.'-'.$bb;
             $c = (int)$m;
             $c = $c - 1;
             $month = $arr_bulan[$c];
