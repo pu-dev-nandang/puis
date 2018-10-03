@@ -549,6 +549,7 @@ $route['save2pdf/news-event'] =  'c_save_to_pdf/news_event';
 $route['save2pdf/attendance-list'] =  'c_save_to_pdf/attendance_list';
 $route['save2pdf/transcript'] =  'c_save_to_pdf/transcript';
 $route['save2pdf/ijazah'] =  'c_save_to_pdf/ijazah';
+$route['save2pdf/diploma_supplement'] =  'c_save_to_pdf/diploma_supplement';
 
 $route['save2pdf/report-uts'] =  'c_save_to_pdf/report_uts';
 
