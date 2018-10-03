@@ -127,12 +127,14 @@
         var url = base_url_js+'api/__crudFinalProject';
 
         $.post(url,{token:token},function (result) {
+            toastr.success('Data saved','Success');
             setTimeout(function () {
+
+                $('#btnSaveFP'+ID).html('Save').prop('disabled',false);
 
                 $('#viewTitleInd'+ID).text(formTitleInd);
                 $('#viewTitleEng'+ID).text(formTitleEng);
 
-                toastr.success('Data Saved','Success');
                 $('#viewTitleInd'+ID+', #viewTitleEng'+ID+',#btnEditFP'+ID).removeClass('hide');
                 $('#formTitleInd'+ID+', #formTitleEng'+ID+', #btnSaveFP'+ID).addClass('hide');
 

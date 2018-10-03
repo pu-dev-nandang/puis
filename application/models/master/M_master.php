@@ -16,6 +16,19 @@ class M_master extends CI_Model {
         return $data->result_array();
     }
 
+    public function __getService($IDDivision){
+        $data = $this->db->get_where('db_employees.rule_service',array('IDDivision' => $IDDivision))->result_array();
+        $result =[];
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+                array_push($result,$data[$i]['IDService']);
+            }
+        }
+
+        return $result;
+
+    }
+
     public function showData($tabel)
     {
         $sql = "select * from ".$tabel;

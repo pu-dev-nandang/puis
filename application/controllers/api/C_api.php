@@ -3156,6 +3156,17 @@ class C_api extends CI_Controller {
                 return print_r(1);
             }
 
+            else if($data_arr['action']=='updateEmailEmployees'){
+
+                $fillM = ($data_arr['StatusEmployeeID']==4 || $data_arr['StatusEmployeeID']=='4') ? 'Email' : 'EmailPU' ;
+                $this->db->set($fillM, $data_arr['Email']);
+                $this->db->where('NIP', $data_arr['NIP']);
+                $this->db->update('db_employees.employees');
+
+                return print_r(1);
+
+            }
+
             else if($data_arr['action']=='showLecturerMonitoring'){
 
                 $SemesterID = $data_arr['SemesterID'];
@@ -4481,8 +4492,8 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div  style="text-align:center;">'.$row['NPM'].'</div>';
             $nestedData[] = '<div  style="text-align:left;"><b><i class="fa fa-user margin-right"></i> '.$row['Name'].'</b></div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['Code'].'</div>';
-            $nestedData[] = '<div  style="text-align:center;"><span id="viewTitleInd'.$row['ID'].'">'.$row['TitleInd'].'</span><input class="form-control hide fmFP'.$row['ID'].'" value="'.$row['TitleInd'].'" id="formTitleInd'.$row['ID'].'"></div>';
-            $nestedData[] = '<div  style="text-align:center;"><span id="viewTitleEng'.$row['ID'].'">'.$row['TitleEng'].'</span><input class="form-control hide fmFP'.$row['ID'].'" value="'.$row['TitleEng'].'" id="formTitleEng'.$row['ID'].'"></div>';
+            $nestedData[] = '<div  style="text-align:left;"><span id="viewTitleInd'.$row['ID'].'">'.$row['TitleInd'].'</span><input class="form-control hide fmFP'.$row['ID'].'" value="'.$row['TitleInd'].'" id="formTitleInd'.$row['ID'].'"></div>';
+            $nestedData[] = '<div  style="text-align:left;"><span id="viewTitleEng'.$row['ID'].'">'.$row['TitleEng'].'</span><input class="form-control hide fmFP'.$row['ID'].'" value="'.$row['TitleEng'].'" id="formTitleEng'.$row['ID'].'"></div>';
             $nestedData[] = '<div  style="text-align:center;">
                                     <button class="btn btn-success btn-sm hide btnSaveEditFP" data-id="'.$row['ID'].'" data-npm="'.$row['NPM'].'" id="btnSaveFP'.$row['ID'].'">Save</button>
                                     <button class="btn btn-default btn-sm btnEditFP" data-id="'.$row['ID'].'" data-npm=""'.$row['NPM'].' id="btnEditFP'.$row['ID'].'">Edit</button>
@@ -4512,13 +4523,18 @@ class C_api extends CI_Controller {
         if(count($data_arr>0)) {
             if ($data_arr['action'] == 'updateFP') {
 
-                print_r($data_arr);
-                exit;
-
+                // Cek apakah NIM sudah ada
+                $dataNIM = $this->db->get_where('db_academic.final_project',array('NPM' => $data_arr['NPM']),1)->result_array();
                 $dataForm = (array) $data_arr['dataForm'];
+                if(count($dataNIM)>0){
+                    // Update
+                    $this->db->where('NPM', $data_arr['NPM']);
+                    $this->db->update('final_project',$dataForm);
+                } else {
+                    $dataForm['NPM'] = $data_arr['NPM'];
+                    $this->db->insert('final_project',$dataForm);
+                }
 
-                $this->db->where('NPM', $data_arr['NPM']);
-                $this->db->update('final_project',$dataForm);
 
                 return print_r(1);
 
@@ -4549,6 +4565,238 @@ class C_api extends CI_Controller {
         }
 
         echo json_encode($arr_result);
+    }
+
+    public function getListStudent(){
+        $requestData= $_REQUEST;
+        $data_arr = $this->getInputToken();
+
+        $dataWhere = '';
+
+        if($data_arr['Year']!='' && $data_arr['ProdiID']=='' && $data_arr['StatusStudents']==''){
+            $dataWhere =  'WHERE (aut_s.Year = "'.$data_arr['Year'].'")';
+        } else if ($data_arr['Year']!='' && $data_arr['ProdiID']!='' && $data_arr['StatusStudents']==''){
+            $dataWhere =  'WHERE (aut_s.Year = "'.$data_arr['Year'].'" AND aut_s.ProdiID = "'.$data_arr['ProdiID'].'")';
+        } else if ($data_arr['Year']!='' && $data_arr['ProdiID']=='' && $data_arr['StatusStudents']!=''){
+            $dataWhere =  'WHERE (aut_s.Year = "'.$data_arr['Year'].'" AND aut_s.StatusStudentID = "'.$data_arr['StatusStudents'].'")';
+        } else if ($data_arr['Year']!='' && $data_arr['ProdiID']!='' && $data_arr['StatusStudents']!=''){
+            $dataWhere =  'WHERE (aut_s.Year = "'.$data_arr['Year'].'" AND aut_s.ProdiID = "'.$data_arr['ProdiID'].'" AND aut_s.StatusStudentID = "'.$data_arr['StatusStudents'].'")';
+        }
+
+        else if($data_arr['Year']=='' && $data_arr['ProdiID']!='' && $data_arr['StatusStudents']==''){
+            $dataWhere =  'WHERE (aut_s.ProdiID = "'.$data_arr['ProdiID'].'")';
+        } else if($data_arr['Year']=='' && $data_arr['ProdiID']!='' && $data_arr['StatusStudents']!=''){
+            $dataWhere =  'WHERE (aut_s.ProdiID = "'.$data_arr['ProdiID'].'" AND aut_s.StatusStudentID = "'.$data_arr['StatusStudents'].'")';
+        } else if($data_arr['Year']=='' && $data_arr['ProdiID']=='' && $data_arr['StatusStudents']!=''){
+            $dataWhere =  'WHERE (aut_s.StatusStudentID = "'.$data_arr['StatusStudents'].'")';
+        }
+
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+
+            if($dataWhere!=''){
+                $dataSearch = 'AND ( aut_s.Name LIKE "%'.$search.'%" OR aut_s.NPM LIKE "%'.$search.'%" 
+                           OR ps.Name LIKE "%'.$search.'%"  OR ps.NameEng LIKE "%'.$search.'%" )';
+            } else {
+                $dataSearch = 'WHERE ( aut_s.Name LIKE "%'.$search.'%" OR aut_s.NPM LIKE "%'.$search.'%" 
+                           OR ps.Name LIKE "%'.$search.'%"  OR ps.NameEng LIKE "%'.$search.'%" )';
+            }
+
+
+        }
+
+        $queryDefault = 'SELECT aut_s.*, ps.Name AS ProdiName, ps.NameEng AS ProdiNameEng, ss.Description AS StatusStudent  
+                                      FROM db_academic.auth_students aut_s
+                                      LEFT JOIN db_academic.program_study ps ON (ps.ID = aut_s.ProdiID)
+                                      LEFT JOIN db_academic.status_student ss ON (ss.ID = aut_s.StatusStudentID)
+                                      '.$dataWhere.' '.$dataSearch.' ORDER BY aut_s.NPM ASC ';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+        $no = $requestData['start'] + 1;
+        $data = array();
+        for($i=0;$i<count($query);$i++) {
+            $nestedData = array();
+            $row = $query[$i];
+
+            $db_ = 'ta_'.$row['Year'];
+            $dataDetailStd = $this->db->select('Photo,Gender')->get_where($db_.'.students',array('NPM' => $row['NPM']),1)->result_array();
+
+            $dataToken = array(
+                'Type' => 'std',
+                'Name' => $row['Name'],
+                'NPM' => $row['NPM'],
+                'Email' => $row['EmailPU']
+            );
+
+            $token = $this->jwt->encode($dataToken,'UAP)(*');
+
+            $disBtnEmail = ($row['EmailPU']=='' || $row['EmailPU']=='') ? 'disabled' : '';
+
+            $btnAct = '<div class="btn-group">
+                          <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu">
+                            <li class="'.$disBtnEmail.'"><a href="javascript:void(0);" '.$disBtnEmail.' class="btn-reset-password '.$disBtnEmail.'" data-token="'.$token.'">Reset Password</a></li>
+                            <li><a href="#">Edit (Coming Soon)</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="javascript:void(0);" class="btn-change-status " data-emailpu="'.$row['EmailPU'].'" 
+                            data-year="'.$row['Year'].'" data-npm="'.$row['NPM'].'" data-name="'.ucwords(strtolower($row['Name'])).'" 
+                            data-statusid="'.$row['StatusStudentID'].'">Change Status</a>
+                            </li>
+                          </ul>
+                        </div>';
+
+            $srcImage = base_url('images/icon/userfalse.png');
+            if($dataDetailStd[0]["Photo"]!='' && $dataDetailStd[0]["Photo"]!=null){
+                $urlImg = './uploads/students/'.$db_.'/'.$dataDetailStd[0]["Photo"];
+                $srcImage = (file_exists($urlImg)) ? base_url('uploads/students/'.$db_.'/'.$dataDetailStd[0]["Photo"]) : base_url('images/icon/userfalse.png') ;
+            }
+
+            $fm = '<input id="formTypeImage'.$row['NPM'].'" class="hide" /><form id="fmPhoto'.$row['NPM'].'" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
+                                <input id="formPhoto" class="hide" value="" hidden />
+                                <div class="form-group"><label class="btn btn-sm btn-default btn-default-warning btn-upload">
+                                        <i class="fa fa-upload"></i>
+                                        <input type="file" id="filePhoto" name="userfile" data-db="'.$db_.'" data-npm="'.$row['NPM'].'" class="uploadPhotoEmp"
+                                               style="display: none;" accept="image/*">
+                                    </label>
+                                </div>
+                            </form>';
+
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$row['NPM'].'</div>';
+            $nestedData[] = '<div  style="text-align:center;"><img id="imgThum'.$row['NPM'].'" src="'.$srcImage.'" style="max-width: 35px;" class="img-rounded"></div>';
+            $nestedData[] = '<div  style="text-align:left;"><b>'.ucwords(strtolower($row['Name'])).'</b><br/><span style="color: #2196f3;">'.$row['EmailPU'].'</span></div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$row['ProdiNameEng'].'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$fm.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$btnAct.'</div>';
+            $nestedData[] = '<div  style="text-align:center;"><button class="btn btn-sm btn-default btn-default-primary btnLoginPortalStudents" data-npm="'.$row['NPM'].'">Login Portal</button></div>';
+            $nestedData[] = '<div  style="text-align:center;">'.ucwords(strtolower($row['StatusStudent'])).'</div>';
+            $no++;
+
+            $data[] = $nestedData;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+
+        echo json_encode($json_data);
+
+    }
+
+    public function getListEmployees(){
+        $requestData= $_REQUEST;
+        $data_arr = $this->getInputToken();
+
+        $dataWhere = ($data_arr['StatusEmployeeID']!='' && $data_arr['StatusEmployeeID']!=null) ?
+            'AND StatusEmployeeID = "'.$data_arr['StatusEmployeeID'].'" '
+            : '' ;
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataSearch = ' AND ( em.Name LIKE "%'.$search.'%" OR em.NIP LIKE "%'.$search.'%" )';
+        }
+
+        $queryDefault = 'SELECT em.*, ems.Description AS StatusEmployees FROM db_employees.employees em 
+                                      LEFT JOIN db_employees.employees_status ems ON (em.StatusEmployeeID = ems.IDStatus)
+                                      WHERE ( em.StatusEmployeeID != -2  '.$dataWhere.' ) '.$dataSearch.' ORDER BY em.NIP ASC ';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+        $no = $requestData['start'] + 1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++) {
+            $nestedData = array();
+            $row = $query[$i];
+
+            $division = '-';
+            $position = '-';
+            if($row['PositionMain']!='' && $row['PositionMain']!=null){
+                $PositionMain = explode('.',$row['PositionMain']);
+
+                $dataDivisi = $this->db->select('Division,Description')->get_where('db_employees.division',
+                    array('ID' => $PositionMain[0]),1)->result_array();
+                $division = $dataDivisi[0]['Division'];
+
+                $dataPosition = $this->db->select('Position,Description')->get_where('db_employees.position'
+                    ,array('ID' => $PositionMain[1]),1)->result_array();
+
+                $position = $dataPosition[0]['Position'];
+            }
+
+
+
+            $gender = ($row['Gender']=='L') ? 'Male' : 'Female' ;
+
+            $url_image = './uploads/employees/'.$row['Photo'];
+            $srcImg = (file_exists($url_image)) ? base_url('uploads/employees/'.$row['Photo'])
+                : base_url('images/icon/userfalse.png') ;
+
+
+            $EmailSelect = ($row['StatusEmployeeID']==4 || $row['StatusEmployeeID']=='4') ? $row['Email'] : $row['EmailPU'] ;
+
+            $Email = (($row['StatusEmployeeID']==4 || $row['StatusEmployeeID']=='4') && count(explode(',', $EmailSelect))>1) ? '' : $EmailSelect;
+
+            $disBtnEmail = ($Email=='' || $Email==null) ? 'disabled' : '';
+            $dataToken = array(
+                'Type' => 'emp',
+                'Name' => $row['Name'],
+                'NIP' => $row['NIP'],
+                'Email' => $Email
+            );
+
+            $token = $this->jwt->encode($dataToken,'UAP)(*');
+
+
+
+            $btnAct = '<div class="btn-group">
+                          <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu">
+                            <li class="'.$disBtnEmail.'"><a href="javascript:void(0);" '.$disBtnEmail.' id="btnResetPass'.$row['NIP'].'" class="btn-reset-password '.$disBtnEmail.'" data-token="'.$token.'">Reset Password</a></li>
+                            <li><a href="javascript:void(0);" class="btn-update-email" id="btnUpdateEmail'.$row['NIP'].'" data-name="'.$row['Name'].'" data-nip="'.$row['NIP'].'" data-empid="'.$row['StatusEmployeeID'].'" data-email="'.$Email.'">Update Email</a></li>
+                          </ul>
+                        </div>';
+
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$row['NIP'].'</div>';
+            $nestedData[] = '<div  style="text-align:center;"><img src="'.$srcImg.'" style="max-width: 35px;" class="img-rounded"></div>';
+            $nestedData[] = '<div  style="text-align:left;"><b>'.$row['Name'].'</b><br/><span id="viewEmail'.$row['NIP'].'" style="color: #2196f3;">'.$Email.'</span></div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$gender.'</div>';
+            $nestedData[] = '<div  style="text-align:left;">'.ucwords(strtolower($division)).'<br/>- '.ucwords(strtolower($position)).'</div>';
+            $nestedData[] = '<div  style="text-align:left;">'.$row['Address'].'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$btnAct.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$row['StatusEmployees'].'</div>';
+
+            $no++;
+
+            $data[] = $nestedData;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+
+        echo json_encode($json_data);
+
     }
 
 }

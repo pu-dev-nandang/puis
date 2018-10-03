@@ -3205,14 +3205,16 @@ class C_save_to_pdf extends CI_Controller {
         $h = 1.5;
         $pdf->Cell($totalW,$h,'','LRT',1,'L');
         $h=3.5;
+        $SkripsiInd = ($Student['TitleInd']!='' && $Student['TitleInd']!=null) ? ucwords(strtolower($Student['TitleInd'])) : '-';
+        $SkripsiEng = ($Student['TitleEng']!='' && $Student['TitleEng']!=null) ? ucwords(strtolower($Student['TitleEng'])) : '-';
         $pdf->Cell($w_R_label,$h,'Judul Skripsi','L',0,'L');
         $pdf->Cell($w_R_sparator,$h,':',0,0,'C');
-        $pdf->Cell($w_R_fill+$w_Div,$h,'Skripsi Ok','R',1,'L');
+        $pdf->Cell($w_R_fill+$w_Div,$h,$SkripsiInd,'R',1,'L');
 
         $pdf->SetFont('dinlightitalic','',8);
         $pdf->Cell($w_R_label,$h,'Thesis Title','L',0,'L');
         $pdf->Cell($w_R_sparator,$h,':',0,0,'C');
-        $pdf->Cell($w_R_fill+$w_Div,$h,'Skripsi Ok','R',1,'L');
+        $pdf->Cell($w_R_fill+$w_Div,$h,$SkripsiEng,'R',1,'L');
         $h = 1.5;
         $pdf->Cell($totalW,$h,'','LRB',1,'L');
         $h=3.5;
