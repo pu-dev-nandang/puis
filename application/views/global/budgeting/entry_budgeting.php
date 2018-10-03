@@ -18,7 +18,7 @@
         </li>
         <?php endif ?>
         <li class="<?php if($request=='BudgetLeft'){echo "active";} ?>">
-            <a href="javascript:void(0)" class="pageAnchor" page = "BudgetLeft">BudgetLeft</a>
+            <a href="javascript:void(0)" class="pageAnchor" page = "BudgetLeft">Budget Remaining</a>
         </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
