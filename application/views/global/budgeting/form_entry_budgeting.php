@@ -616,12 +616,12 @@
 		   $("#ApprovalBtn").remove();
 		});
 
-		$("input").each(function(){
+		$("#pageInputApproval input").each(function(){
 			$(this).attr('readonly',true);
 			$(this).attr('disabled',true);
 		})
 
-		$("select").each(function(){
+		$("#pageInputApproval select").each(function(){
 			$(this).attr('readonly',true);
 			$(this).attr('disabled',true);
 		})
