@@ -19,16 +19,6 @@
     }
 </style>
 
-<!--<pre>-->
-<!--    --><?php //print_r($Transcript); ?>
-<!--</pre>-->
-<!--<pre>-->
-<!--    --><?php //print_r($Graduation); ?>
-<!--</pre>-->
-<!--<pre>-->
-<!--    --><?php //print_r($Education); ?>
-<!--</pre>-->
-
 <div class="row">
     <div class="col-md-12" style="margin-top: 20px;">
         <a href="<?php echo base_url('academic/transcript'); ?>" class="btn btn-warning"><i class="fa fa-arrow-left margin-right"></i> Back to List</a>
@@ -178,6 +168,54 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="col-md-6">
+        <div class="thumbnail" style="padding: 0px;min-height: 100px;">
+            <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;">Setting SKPI</span>
+
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3" style="margin-top: 20px;">
+                    <div class="well">
+                        <div class="">
+                            <select class="form-control" id="filterSKPI">
+                                <option value="1">Higher Education System in Indonesia</option>
+                                <option value="2">Level of Education and Conditional of Learning</option>
+                                <option value="3">Semester Credit Unit and Duration of Study</option>
+                                <option disabled>-----------------</option>
+                                <option value="4">Indonesian Qualification Framework (KKNI)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <hr/>
+                </div>
+            </div>
+
+
+            <div class="row" style="padding: 10px;">
+                <div class="col-md-6">
+                    <div class="text-center"><b>Indonesia</b></div>
+                    <br/>
+                    <textarea rows="5" class="form-control" id="formIndo"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <div class="text-center"><b>English</b></div>
+                    <br/>
+                    <textarea rows="5" class="form-control" id="formEng"></textarea>
+                </div>
+            </div>
+
+            <div class="row" style="padding: 10px;">
+                <div class="col-md-12 text-right">
+                    <hr/>
+                    <button class="btn btn-default btn-default-success" id="btnSaveSKPI">Save</button>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
 <script>
     $(document).ready(function () {
         $( "#formSTDateIssued,#formSTDateOfYudisium" )
@@ -195,7 +233,76 @@
             });
         $('#formSTDateIssued').datepicker('setDate',new Date("<?php echo $Transcript['DateIssued']; ?>"));
         $('#formSTDateOfYudisium').datepicker('setDate',new Date("<?php echo $Transcript['DateOfYudisium']; ?>"));
+
+        var loadFirsSKPI = setInterval(function () {
+
+            var filterSKPI = $('#filterSKPI').val();
+
+            if(filterSKPI!='' && filterSKPI!=null){
+                loadDataSKPI();
+                clearInterval(loadFirsSKPI);
+            }
+
+        },1000);
+
     });
+
+    // ====== SKPI ======
+    $('#filterSKPI').change(function () {
+        loadDataSKPI();
+    });
+
+    $('#btnSaveSKPI').click(function () {
+        var filterSKPI = $('#filterSKPI').val();
+
+        if(filterSKPI!='' && filterSKPI!=null) {
+
+            loading_buttonSm('#btnSaveSKPI');
+            $('#formIndo,#formEng').prop('disabled',true);
+
+            var formIndo = $('#formIndo').val();
+            var formEng = $('#formEng').val();
+
+            var data = {
+                action: 'updateSKPI', ID: filterSKPI,
+                dataUpdate : {
+                    Indonesia : formIndo,
+                    English : formEng,
+                    UpdateBy : sessionNIP,
+                    UpdateAt : dateTimeNow()
+                }
+            };
+            var url = base_url_js + 'api/__crudConfigSKPI';
+            var token = jwt_encode(data, 'UAP)(*');
+            $.post(url,{token:token},function (result) {
+                toastr.success('Date save','Success');
+                setTimeout(function () {
+                    $('#btnSaveSKPI').html('Save').prop('disabled',false);
+                    $('#formIndo,#formEng').prop('disabled',false);
+                },500);
+            });
+
+        }
+    });
+
+    function loadDataSKPI() {
+        var filterSKPI = $('#filterSKPI').val();
+
+        if(filterSKPI!='' && filterSKPI!=null){
+
+            var url = base_url_js+'api/__crudConfigSKPI';
+            var token = jwt_encode({action:'readData', ID:filterSKPI},'UAP)(*');
+
+            $.post(url,{token:token},function (jsonResult) {
+
+                $('#formIndo').val(jsonResult.Indonesia);
+                $('#formEng').val(jsonResult.English);
+
+            });
+
+        }
+    }
+    // ====== TUTUP SKPI ======
 
     // Save Setting Transcript
     $('#btnSaveST').click(function () {

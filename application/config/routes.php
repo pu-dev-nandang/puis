@@ -734,6 +734,8 @@ $route['api/__getFinalProject'] = 'api/c_api/getFinalProject';
 
 $route['api/__crudInvigilator'] = 'api/c_api/crudInvigilator';
 
+$route['api/__crudConfigSKPI'] = 'api/c_api/crudConfigSKPI';
+
 
 // for inject //
 $route['testadi'] = 'dashboard/c_dashboard/testadi';
@@ -839,3 +841,6 @@ $route['testInject'] = 'api/c_global/testInject';
 
 // Pengawas Ujian
 $route['invigilator'] = 'c_pengawas_ujian';
+
+// Announcement
+$route['announcement/list-announcement'] = 'page/announcement/c_announcement/list_announcement';

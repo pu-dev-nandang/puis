@@ -3420,6 +3420,7 @@ class C_save_to_pdf extends CI_Controller {
         $this->SKPI_page3($pdf);
         $this->SKPI_page4($pdf);
         $this->SKPI_page5($pdf);
+        $this->SKPI_page6($pdf);
 
 
         $pdf->Output('skpi.pdf','I');
@@ -3709,23 +3710,18 @@ essentially unchanged. It was popularised in the 1960s with the release of Letra
         $pdf->SetFont('dinprolight','',9);
         $pdf->Cell(90,$h,' Level 6',0,0,'L',true);
         $pdf->Cell(10,$h,'',0,0,'L');
-        $pdf->Cell(90,$h,' -',0,1,'L',true);
+        $pdf->Cell(90,$h,' -'.$pdf->GetY(),0,1,'L',true);
     }
 
     private function SKPI_page2($pdf){
 
         // membuat halaman baru
-        $pdf->SetMargins(10,3,10);
-
-        $pdf->AddPage();
-        $pdf->Ln(30);
+        $this->newPageSKPI($pdf);
 
         $R = 226;
         $G = 226;
         $B = 226;
-
-        $h_fill= 3.5;
-        $h_max = 242;
+        $h_max = 270;
 
         $pdf->SetFillColor($R, $G, $B);
 
@@ -3764,7 +3760,7 @@ essentially unchanged. It was popularised in the 1960s with the release of Letra
         $pdf->Cell(90,$h,' (KKNI Level 6)',0,1,'L',true);
         $this->minSpaceSKPI($pdf,$space_bt,true,$R, $G, $B);
 
-        // ++++++++++++++
+        // ==========KEMAMPUAN KERJA============
         $pdf->Ln(3);
         $h = 5.5;
         $pdf->SetFont('dinpromedium','',9);
@@ -3774,67 +3770,22 @@ essentially unchanged. It was popularised in the 1960s with the release of Letra
         $pdf->Cell(90,$h,' Working Capability',0,1,'L',true);
 
         $pdf->SetFont('dinprolight','',9);
-        // ===
-
-        $tx = 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ev';
-
-        $tx2 = 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting';
-
-        $y = $pdf->GetY()+5;
-        $y2 = $pdf->GetY()+5;
-
-        $nb=0;
-        $nb2=0;
-
-        for($i=1;$i<=7;$i++){
-
-            $t1 = ($i%2==0) ? $tx2 : $tx ;
-            $t2 = ($i%2==0) ? $tx : $tx2 ;
-
-            //Calculate the height of the row
-
-            $nb =max($nb,$pdf->NbLines(83,$t1));
-            $nb2 =max($nb2,$pdf->NbLines(83,$t2));
-
-            $h=$h_fill*$nb;
-            $h2=$h_fill*$nb2;
-
-            $hC = ($h > $h2) ? $h : $h2;
-
-            //Issue a page break first if needed
-            $pdf->CheckPageBreak($hC);
 
 
-            // Indo
-            $pdf->SetFont('dinprolight','',9);
-            $pdf->SetXY(10,$y);
-            $pdf->MultiCell(7, $h_fill, $i, 0, 'C',false);
-            $pdf->SetXY(17,$y);
-            $pdf->MultiCell(83, $h_fill, $y.' - '.$t1, 0, 'L',false);
-            $y = $pdf->GetY()+1;
+        $this->loadMultyCellWithNumber($pdf,8);
 
-            // Eng
-            $pdf->SetFont('dinlightitalic','',9);
-            $pdf->SetXY(110,$y2);
-            $pdf->MultiCell(7, $h_fill, $i, 0, 'C',false);
-            $pdf->SetXY(117,$y2);
-            $pdf->MultiCell(83, $h_fill, $y2.' -'.$t2, 0, 'L',false);
-            $y2 = $pdf->GetY()+1;
+        //===========================================
 
-            if($y2>$h_max){
-                $pdf->SetMargins(10,3,10);
-                $pdf->AddPage();
-                $pdf->Ln(30);
+        // ==========PENGUASAAN PENGETAHUAN============
 
-                $y = $pdf->GetY()+5;
-                $y2 = $pdf->GetY()+5;
-                $pdf->Cell(190,2,'','B',1,'L');
-            }
+        // Cek apakah membuat halaman baru atau tidak
+        $newH = $pdf->GetY()+15;
+        if($newH>$h_max){
+            $this->newPageSKPI($pdf);
+            $newH = $pdf->GetY()+5;
         }
 
-        // ++++++++++++++
-        $y = $pdf->GetY()+10;
-        $pdf->SetXY(10,$y);
+        $pdf->SetXY(10,$newH);
 
         $h = 5.5;
         $pdf->SetFont('dinpromedium','',9);
@@ -3844,62 +3795,18 @@ essentially unchanged. It was popularised in the 1960s with the release of Letra
         $pdf->SetFont('dinpromediumitalic','',9);
         $pdf->Cell(90,$h,' Knowledge Competencies',0,1,'L',true);
 
-        // ++++++++++++++
-        $pdf->SetFont('dinprolight','',9);
-        $y = $pdf->GetY()+5;
-        $y2 = $pdf->GetY()+5;
+        $this->loadMultyCellWithNumber($pdf,8);
 
-        $nb=0;
-        $nb2=0;
-
-        for($i=1;$i<=9;$i++){
-
-            $t1 = ($i%2==0) ? $tx2 : $tx ;
-            $t2 = ($i%2==0) ? $tx : $tx2 ;
-
-            //Calculate the height of the row
-
-            $nb =max($nb,$pdf->NbLines(83,$t1));
-            $nb2 =max($nb2,$pdf->NbLines(83,$t2));
-
-            $h=$h_fill*$nb;
-            $h2=$h_fill*$nb2;
-
-            $hC = ($h > $h2) ? $h : $h2;
-
-            //Issue a page break first if needed
-            $pdf->CheckPageBreak($hC);
+        //===========================================
 
 
-            // Indo
-            $pdf->SetFont('dinprolight','',9);
-            $pdf->SetXY(10,$y);
-            $pdf->MultiCell(7, $h_fill, $i, 0, 'C',false);
-            $pdf->SetXY(17,$y);
-            $pdf->MultiCell(83, $h_fill, $y.' - '.$t1, 0, 'L',false);
-            $y = $pdf->GetY()+1;
-
-            // Eng
-            $pdf->SetFont('dinlightitalic','',9);
-            $pdf->SetXY(110,$y2);
-            $pdf->MultiCell(7, $h_fill, $i, 0, 'C',false);
-            $pdf->SetXY(117,$y2);
-            $pdf->MultiCell(83, $h_fill, $y2.' -'.$t2, 0, 'L',false);
-            $y2 = $pdf->GetY()+1;
-
-            if($y2>$h_max){
-                $pdf->SetMargins(10,3,10);
-                $pdf->AddPage();
-                $pdf->Ln(30);
-
-                $y = $pdf->GetY()+5;
-                $y2 = $pdf->GetY()+5;
-                $pdf->Cell(190,2,'','B',1,'L');
-            }
+        // ==========SIKAP KHUSUS============
+        $y = $pdf->GetY()+15;
+        if($y>$h_max){
+            $this->newPageSKPI($pdf);
+            $y = $pdf->GetY()+5;
         }
 
-        // ++++++++++++++
-        $y = $pdf->GetY()+15;
         $pdf->SetXY(10,$y);
 
         $h = 5.5;
@@ -3910,61 +3817,7 @@ essentially unchanged. It was popularised in the 1960s with the release of Letra
         $pdf->SetFont('dinpromediumitalic','',9);
         $pdf->Cell(90,$h,' Special Attitude',0,1,'L',true);
 
-        // ++++++++++++++
-        $pdf->SetFont('dinprolight','',9);
-        $y = $pdf->GetY()+5;
-        $y2 = $pdf->GetY()+5;
-
-        $nb=0;
-        $nb2=0;
-
-        for($i=1;$i<=2;$i++){
-
-            $t1 = ($i%2==0) ? $tx2 : $tx ;
-            $t2 = ($i%2==0) ? $tx : $tx2 ;
-
-            //Calculate the height of the row
-
-            $nb =max($nb,$pdf->NbLines(83,$t1));
-            $nb2 =max($nb2,$pdf->NbLines(83,$t2));
-
-            $h=$h_fill*$nb;
-            $h2=$h_fill*$nb2;
-
-            $hC = ($h > $h2) ? $h : $h2;
-
-            //Issue a page break first if needed
-            $pdf->CheckPageBreak($hC);
-
-
-            // Indo
-            $pdf->SetFont('dinprolight','',9);
-            $pdf->SetXY(10,$y);
-            $pdf->MultiCell(7, $h_fill, $i, 0, 'C',false);
-            $pdf->SetXY(17,$y);
-            $pdf->MultiCell(83, $h_fill, $y.' - '.$t1, 0, 'L',false);
-            $y = $pdf->GetY()+1;
-
-            // Eng
-            $pdf->SetFont('dinlightitalic','',9);
-            $pdf->SetXY(110,$y2);
-            $pdf->MultiCell(7, $h_fill, $i, 0, 'C',false);
-            $pdf->SetXY(117,$y2);
-            $pdf->MultiCell(83, $h_fill, $y2.' -'.$t2, 0, 'L',false);
-            $y2 = $pdf->GetY()+1;
-
-            if($y2>$h_max){
-                $pdf->SetMargins(10,3,10);
-                $pdf->AddPage();
-                $pdf->Ln(30);
-
-                $y = $pdf->GetY()+5;
-                $y2 = $pdf->GetY()+5;
-                $pdf->Cell(190,2,'','B',1,'L');
-            }
-        }
-
-
+        $this->loadMultyCellWithNumber($pdf,4);
 
     }
 
@@ -4172,6 +4025,33 @@ essentially unchanged. It was popularised in the 1960s with the release of Letra
         $pdf->SetFont('dinlightitalic','',10);
         $pdf->Cell(190,$h,'04. Information on the Indonesia Higher Education System and the Indonesian National Qualification Framework',0,1,'L');
 
+        $pdf->Ln(3);
+        $h = 3.5;
+        $pdf->SetFont('dinpromedium','',9);
+        $pdf->Cell(90,$h,'SISTEM PENDIDIKAN TINGGI DI INDONESIA',0,0,'L');
+        $pdf->Cell(10,$h,'',0,0,'L');
+        $pdf->SetFont('dinpromediumitalic','',9);
+        $pdf->Cell(90,$h,'Higher Edocation System In Indonesia',0,1,'L');
+
+        $t = '
+                Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
+
+                The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
+                
+                It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using \'Content here, content here\', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for \'lorem ipsum\' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
+                ';
+
+        $y2 = $pdf->GetY()+4;
+        $pdf->SetFont('dinprolight','',9);
+        $pdf->SetXY(10,$y2);
+        $pdf->MultiCell(90, $h_fill, $t, 0, 'L',false);
+
+        $pdf->SetFont('dinlightitalic','',9);
+        $pdf->SetXY(110,$y2);
+        $pdf->MultiCell(90, $h_fill, $t, 0, 'L',false);
+
+
+
     }
 
     private function SKPI_page5($pdf){
@@ -4200,6 +4080,102 @@ essentially unchanged. It was popularised in the 1960s with the release of Letra
 
     }
 
+    private function SKPI_page6($pdf){
+        // membuat halaman baru
+        $this->newPageSKPI($pdf);
+
+        $R = 226;
+        $G = 226;
+        $B = 226;
+
+        $h_fill= 3.5;
+        $h_max = 242;
+        $pdf->SetFillColor($R, $G, $B);
+
+        $pdf->Cell(190,2,'','B',1,'L');
+        $pdf->Ln(3);
+
+        $h = 4.5;
+        $pdf->SetFont('dinpromedium','',11);
+        $pdf->Cell(190,$h,'06. PENGESAHAN SKPI',0,1,'L');
+        $pdf->SetFont('dinlightitalic','',10);
+        $pdf->Cell(190,$h,'06. SKPI Legalization',0,1,'L');
+
+
+        $h = 4;
+        $pdf->Ln(15);
+        $pdf->SetFont('dinprolight','',12);
+        $pdf->Cell(190,$h,'JAKARTA, 20 DESEMBER 2019',0,1,'L');
+        $pdf->SetFont('dinlightitalic','',10);
+        $pdf->Cell(190,$h,'Jakarta, December 20, 2019',0,1,'L');
+
+        $pdf->Ln(20);
+        $pdf->SetFont('dinpromedium','',12);
+        $pdf->Cell(190,$h,'NANDANG MULYADI SO, SE, S.KOM, MM, MBA, PH.D',0,1,'L');
+        $pdf->Ln(2);
+        $pdf->SetFont('dinprolight','',10);
+        $pdf->Cell(190,$h,'DEKAN SEKOLAH MANAJEMENT PODOMORO UNIVERSITY',0,1,'L');
+        $pdf->SetFont('dinlightitalic','',9);
+        $pdf->Cell(190,$h,'Dean School of Business Management',0,1,'L');
+
+        $pdf->Ln(4);
+        $pdf->SetFont('dinprolight','',10);
+        $pdf->Cell(190,$h,'NOMOR INDUK PEGAWAI : 2017090',0,1,'L');
+        $pdf->SetFont('dinlightitalic','',9);
+        $pdf->Cell(190,$h,'Employee ID Number',0,1,'L');
+
+        $pdf->Ln(7);
+        $pdf->Cell(190,2,'','B',1,'L');
+        $pdf->Ln(7);
+
+
+        $h = 3.5;
+        $pdf->SetFont('dinpromedium','',9);
+        $pdf->Cell(90,$h,'CATATAN RESMI',0,0,'L');
+        $pdf->Cell(10,$h,'',0,0,'L');
+        $pdf->SetFont('dinpromediumitalic','',9);
+        $pdf->Cell(90,$h,'Official Notes',0,1,'L');
+
+        $this->loadMultyCellWithNumber($pdf,4);
+
+        $pdf->Ln(15);
+        $pdf->SetFont('dinpromedium','',8);
+        $pdf->Cell(130,$h,'',0,0,'L');
+        $pdf->Cell(60,$h,'ALAMAT',0,1,'L');
+        $pdf->SetFont('dinpromediumitalic','',7);
+        $pdf->Cell(130,$h,'',0,0,'L');
+        $pdf->Cell(60,$h,'Contact Details',0,1,'L');
+
+
+        $pdf->Ln(3);
+        $pdf->SetFont('dinprolight','',8);
+        $pdf->Cell(130,$h,'',0,0,'L');
+        $pdf->Cell(60,$h,'UNIVERSITAS AGUNG PODOMORO',0,1,'L');
+        $pdf->SetFont('dinlightitalic','',7);
+        $pdf->Cell(130,$h,'',0,0,'L');
+        $pdf->Cell(60,$h,'Agung Podomoro University',0,1,'L');
+
+        $alamat = 'Located in: Central Park
+Address: Jl. Letjen S. Parman No.28, RT.12/RW.6, Tj. Duren Sel., Grogol petamburan, Kota Jakarta Barat, Daerah Khusus Ibukota Jakarta 11470
+Province: Jakarta
+Founded: 2014
+Phone: (021) 29200456';
+
+        $y = $pdf->GetY()+2;
+        $pdf->SetFont('dinprolight','',9);
+        $pdf->SetXY(140,$y);
+        $pdf->MultiCell(60, $h_fill, $alamat, 0, 'L',false);
+//        $h = 3.5;
+//        $pdf->SetFont('dinpromedium','',9);
+//        $pdf->Cell(120,$h,'CATATAN RESMI',1,0,'L');
+//        $pdf->Cell(10,$h,'',1,0,'L');
+//        $pdf->SetFont('dinpromediumitalic','',9);
+//
+//        $pdf->SetFont('dinpromedium','',9);
+//        $pdf->Cell(60,$h,'UNIVERSITAS AGUNG PODOMORO',1,1,'L');
+
+    }
+
     private function minSpaceSKPI($pdf,$h,$color,$R,$G,$B){
 
         $pdf->SetFillColor($R,$G,$B);
@@ -4214,6 +4190,192 @@ essentially unchanged. It was popularised in the 1960s with the release of Letra
         $pdf->Cell(90,$h,'',0,0,'L',$color);
         $pdf->Cell(10,$h,'',0,0,'L');
         $pdf->Cell(90,$h,'',0,1,'L');
+    }
+
+    private function loadMultyCellWithNumber($pdf,$lengthData){
+
+        $h_fill= 3.5;
+        $h_max = 270;
+
+        $tx = 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ev';
+
+        $tx2 = 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting';
+
+        $tx3 = 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.';
+
+//        $lengthData = 7;
+
+        $lineBreakLeft = 0;
+        $lineBreakRight = 0;
+
+        $lineBreakLeft2 = 0;
+        $lineBreakRight2 = 0;
+
+        $no_left = 1;
+        // Bagian Kiri
+        $y_left = $pdf->GetY()+5;
+        $y_right = $pdf->GetY()+5;
+        for($i=0;$i<$lengthData;$i++){
+            $nb=0;
+            $t = ($i%2==0) ? $tx : $tx3 ;
+            $t1 = substr($t,0,280);
+
+            $nb =max($nb,$pdf->NbLines(83,$t1));
+            $h=$h_fill*$nb;
+
+            if($y_left+$h > $h_max){
+                $lineBreakLeft = $i;
+                break;
+            }
+
+            // Indo
+            $pdf->SetFont('dinprolight','',9);
+            $pdf->SetXY(10,$y_left);
+            $pdf->MultiCell(7, $h_fill, ($no_left++), 0, 'C',false);
+            $pdf->SetXY(17,$y_left);
+            $pdf->MultiCell(83, $h_fill, $t1, 0, 'L',false);
+            $y_left = $y_left+$h+1;
+
+        }
+
+        $no_right = 1;
+        for($i=0;$i<$lengthData;$i++){
+            $nb=0;
+            $t = ($i%2==0) ? $tx : $tx2 ;
+            $t1 = substr($t,0,280);
+
+            $nb =max($nb,$pdf->NbLines(83,$t1));
+            $h=$h_fill*$nb;
+
+            if($y_right+$h > $h_max){
+                $lineBreakRight = $i;
+                break;
+            }
+
+            // Eng
+            $pdf->SetFont('dinlightitalic','',9);
+            $pdf->SetXY(110,$y_right);
+            $pdf->MultiCell(7, $h_fill, ($no_right++), 0, 'C',false);
+            $pdf->SetXY(117,$y_right);
+            $pdf->MultiCell(83, $h_fill, $nb.' - '.$t1, 0, 'L',false);
+            $y_right = $y_right+$h+1;
+        }
+
+
+        // Cek apakah masih ada kelanjutannya atau tidak untuk page 2
+        if(($lineBreakLeft !=0 || $lineBreakRight!=0) && ($lineBreakLeft < $lengthData || $lineBreakRight < $lengthData)){
+            $this->newPageSKPI($pdf);
+
+            $y_left = $pdf->GetY()+5;
+            $y_right = $pdf->GetY()+5;
+            $pdf->Cell(190,2,'','B',1,'L');
+
+            if($lineBreakLeft !=0 && $lineBreakLeft < $lengthData){
+                // Looping sekali lagi
+                // Bagian Kiri
+                for($i2=$lineBreakLeft;$i2<$lengthData;$i2++){
+                    $nb=0;
+                    $t = ($i2%2==0) ? $tx : $tx3 ;
+                    $t1 = substr($t,0,280);
+
+                    $nb =max($nb,$pdf->NbLines(83,$t1));
+                    $h=$h_fill*$nb;
+
+                    if($y_left+$h > $h_max){
+                        $lineBreakLeft2 = $i2;
+                        break;
+                    }
+
+                    // Indo
+                    $pdf->SetFont('dinprolight','',9);
+                    $pdf->SetXY(10,$y_left);
+                    $pdf->MultiCell(7, $h_fill, ($no_left++), 0, 'C',false);
+                    $pdf->SetXY(17,$y_left);
+                    $pdf->MultiCell(83, $h_fill, $t1, 0, 'L',false);
+                    $sp = ($i2==$lineBreakLeft) ? 4 : 1;
+                    $y_left = $y_left+$h+$sp;
+                }
+            }
+
+            if($lineBreakRight!=0 && $lineBreakRight < $lengthData){
+                // Bagian Kanan
+                for($i2=$lineBreakRight;$i2<$lengthData;$i2++){
+                    $nb=0;
+                    $t = ($i2%2==0) ? $tx : $tx3 ;
+                    $t1 = substr($t,0,280);
+
+                    $nb =max($nb,$pdf->NbLines(83,$t1));
+                    $h=$h_fill*$nb;
+
+                    if($y_right+$h > $h_max){
+                        $lineBreakRight2 = $i2;
+                        break;
+                    }
+                    // Eng
+                    $pdf->SetFont('dinlightitalic','',9);
+                    $pdf->SetXY(110,$y_right);
+                    $pdf->MultiCell(7, $h_fill, ($no_right++), 0, 'C',false);
+                    $pdf->SetXY(117,$y_right);
+                    $pdf->MultiCell(83, $h_fill, $t1, 0, 'L',false);
+                    $sp = ($i2==$lineBreakRight) ? 4 : 1;
+                    $y_right = $y_right+$h+$sp;
+                }
+            }
+
+
+        }
+
+
+        // Cek apakah masih ada kelanjutannya atau tidak untuk page 3
+        if(($lineBreakLeft2 !=0 || $lineBreakRight2!=0) && ($lineBreakLeft2 < $lengthData || $lineBreakRight2 < $lengthData)){
+            $this->newPageSKPI($pdf);
+
+            $y_left = $pdf->GetY()+5;
+            $y_right = $pdf->GetY()+5;
+            $pdf->Cell(190,2,'','B',1,'L');
+
+            if($lineBreakLeft2 !=0 && $lineBreakLeft2 < $lengthData){
+                // Looping sekali lagi
+                // Bagian Kiri
+                for($i3=$lineBreakLeft2;$i3<$lengthData;$i3++){
+
+                    $t = ($i3%2==0) ? $tx : $tx3 ;
+                    $t1 = substr($t,0,280);
+
+                    // Indo
+                    $pdf->SetFont('dinprolight','',9);
+                    $pdf->SetXY(10,$y_left);
+                    $pdf->MultiCell(7, $h_fill, ($no_left++), 0, 'C',false);
+                    $pdf->SetXY(17,$y_left);
+                    $pdf->MultiCell(83, $h_fill, $t1, 0, 'L',false);
+                    $y_left = $y_left+1;
+                }
+            }
+
+            if($lineBreakRight2!=0 && $lineBreakRight2 < $lengthData){
+                // Bagian Kanan
+                for($i3=$lineBreakRight2;$i3<$lengthData;$i3++){
+
+                    $t = ($i3%2==0) ? $tx2 : $tx3 ;
+                    $t1 = substr($t,0,280);
+                    // Eng
+                    $pdf->SetFont('dinlightitalic','',9);
+                    $pdf->SetXY(110,$y_right);
+                    $pdf->MultiCell(7, $h_fill, ($no_right++), 0, 'C',false);
+                    $pdf->SetXY(117,$y_right);
+                    $pdf->MultiCell(83, $h_fill, $t1, 0, 'L',false);
+                    $y_right = $y_right+1;
+                }
+            }
+
+        }
+
+    }
+
+    private function newPageSKPI($pdf){
+        $pdf->SetMargins(10,3,10);
+        $pdf->AddPage();
+        $pdf->Ln(30);
     }
 
 
