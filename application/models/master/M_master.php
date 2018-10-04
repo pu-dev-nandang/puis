@@ -2385,4 +2385,34 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         
         return $arr;
     }
+
+    public function getDepartementPu($field,$value)
+    {
+        $sql = 'select * from (
+                select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study
+                UNION
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                ) aa where '.$field.' = ?';
+        $query=$this->db->query($sql, array($value))->result_array();
+        return $query;        
+    }
+
+    public function BulanInggris($MonthNumber)
+    {
+        $arr_bulan = array(
+            'Jan','Feb','March','April','May','June','July','August','Sep','Oct','Nov','Des'
+        );
+        $MonthNumber = $MonthNumber - 1;
+        $MonthName = '';
+        try
+        {
+            $MonthName = $arr_bulan[$MonthNumber];
+        }
+        catch(Exception $ex)
+        {
+            $MonthName = '';
+        }
+
+        return $MonthName;
+    }
 }

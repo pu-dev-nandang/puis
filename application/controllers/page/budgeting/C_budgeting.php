@@ -1198,5 +1198,31 @@ class C_budgeting extends Budgeting_Controler {
         echo json_encode($msg);
     }   
 
+    public function ListBudgetDepartement()
+    {
+        $this->auth_ajax();
+        $this->authFin();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/budget/ListBudgetDepartement',$this->data,true);
+        echo json_encode($arr_result);
+    }
+
+    public function authFin()
+    {
+        $DepartementSess = $this->session->userdata('IDDepartementPUBudget');
+        if ($DepartementSess != 'NA.9') {
+            exit('No direct script access allowed');
+        }
+        
+    }
+
+    public function getListBudgetingDepartement()
+    {
+        $this->auth_ajax();
+        $Input = $this->getInputToken();
+        $Year = $Input['Year'];
+        $get = $this->m_budgeting->getListBudgetingDepartement($Year);
+        echo json_encode($get);
+    }
 
 }

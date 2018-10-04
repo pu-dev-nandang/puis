@@ -872,10 +872,10 @@
     }
 
     function formatRupiah(bilangan) {
-        var	number_string = bilangan.toString(),
-            sisa 	= number_string.length % 3,
-            rupiah 	= number_string.substr(0, sisa),
-            ribuan 	= number_string.substr(sisa).match(/\d{3}/g);
+        var number_string = bilangan.toString(),
+            sisa    = number_string.length % 3,
+            rupiah  = number_string.substr(0, sisa),
+            ribuan  = number_string.substr(sisa).match(/\d{3}/g);
 
         if (ribuan) {
             separator = sisa ? '.' : '';
@@ -883,6 +883,20 @@
         }
 
         return 'Rp. '+rupiah+',-';
+    }
+
+    function formatDigitNumber(bilangan) {
+        var number_string = bilangan.toString(),
+            sisa    = number_string.length % 3,
+            rupiah  = number_string.substr(0, sisa),
+            ribuan  = number_string.substr(sisa).match(/\d{3}/g);
+
+        if (ribuan) {
+            separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        return rupiah;
     }
 
     function UrlExists(url) {
@@ -1219,4 +1233,34 @@
     function isObject(value) {
         return value && typeof value === 'object' && value.constructor === Object;
     }
+
+    function FormSubmitAuto(action, method, values) {
+        var form = $('<form/>', {
+            action: action,
+            method: method
+        });
+        $.each(values, function() {
+            form.append($('<input/>', {
+                type: 'hidden',
+                name: this.name,
+                value: this.value
+            }));    
+        });
+        form.attr('target', '_blank');
+        form.appendTo('body').submit();
+    }
+
+    /* cara penggunaan FormSubmitAuto
+      var url = base_url_js+'finance/export_excel_report';
+      data = {
+        Data : dataa,
+        summary : summary,
+        PostPassing : PostPassing,
+      }
+      var token = jwt_encode(data,"UAP)(*");
+      FormSubmitAuto(url, 'POST', [
+          { name: 'token', value: token },
+      ]);*/
+
+
 </script>

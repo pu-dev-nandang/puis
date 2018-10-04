@@ -255,4 +255,28 @@ class M_budgeting extends CI_Model {
         return $arr;
         
     }
+
+    public function getListBudgetingDepartement($Year)
+    {
+        $sql = 'select aa.*,b.Approval from (
+                select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study
+                UNION
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                ) aa left join (select * from db_budgeting.creator_budget_approval where Year = ?) as b on aa.ID = b.Departement
+                ';
+        $query=$this->db->query($sql, array($Year))->result_array(); 
+        for ($i=0; $i < count($query); $i++) { 
+            // cari grand total
+            $GrandTotal = 0;
+            if ($query[$i]['Approval'] == '1' || $query[$i]['Approval'] == '0') {
+                $get = $this->get_creator_budget($Year,$query[$i]['ID']);
+                for ($j=0; $j < count($get); $j++) { 
+                   $GrandTotal = $GrandTotal + $get[$j]['SubTotal'];
+                }
+            }
+            
+            $query[$i] = $query[$i] + array('GrandTotal' => $GrandTotal);
+        }
+        return $query;       
+    }
 }
