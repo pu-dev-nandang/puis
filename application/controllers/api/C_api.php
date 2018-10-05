@@ -4551,16 +4551,16 @@ class C_api extends CI_Controller {
         for ($i=0; $i < count($NA); $i++) { 
             $arr_result[] = array(
                 'Code'  => 'NA.'.$NA[$i]['ID'],
-                'Name1' => 'NA '.$NA[$i]['Description'],
-                'Name2' => 'NA '.$NA[$i]['Division']
+                'Name1' => $NA[$i]['Description'],
+                'Name2' => $NA[$i]['Division']
             );
         }
 
         for ($i=0; $i < count($AC); $i++) { 
             $arr_result[] = array(
-                'Code'  => 'AC.'.$NA[$i]['ID'],
-                'Name1' => 'AC '.$AC[$i]['Name'],
-                'Name2' => 'AC '.$AC[$i]['NameEng']
+                'Code'  => 'AC.'.$AC[$i]['ID'],
+                'Name1' => $AC[$i]['Name'],
+                'Name2' => $AC[$i]['NameEng']
             );
         }
 

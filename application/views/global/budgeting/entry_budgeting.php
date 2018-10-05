@@ -7,23 +7,32 @@
             </a>
         </li>
         <li class="<?php if($request==null || $request=='EntryBudget'){echo "active";} ?>">
-            <a href="javascript:void(0)" class="pageAnchor" page = "EntryBudget">EntryBudget</a>
+            <a href="javascript:void(0)" class="pageAnchor" page = "EntryBudget">Entry Budget</a>
         </li>
         <?php if ($this->session->userdata('IDDepartementPUBudget') == 'NA.9'): ?>
         <li class="<?php if($request=='Approval'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "Approval">Approval</a>
         </li>
         <li class="<?php if($request=='ListBudgetDepartement'){echo "active";} ?>">
-            <a href="javascript:void(0)" class="pageAnchor" page = "ListBudgetDepartement">List Budget Departement</a>
+            <a href="javascript:void(0)" class="pageAnchor" page = "ListBudgetDepartement">Budget Departement Created</a>
         </li>
         <?php endif ?>
         <li class="<?php if($request=='BudgetLeft'){echo "active";} ?>">
-            <a href="javascript:void(0)" class="pageAnchor" page = "BudgetLeft">BudgetLeft</a>
+            <a href="javascript:void(0)" class="pageAnchor" page = "BudgetLeft">Budget Remaining</a>
         </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
-        <div class="row" id = "pageContent">
-           
+        <div class="col-xs-12" >
+            <div class="panel panel-primary">
+                <div class="panel-heading clearfix">
+                    <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Budget</h4>
+                </div>
+                <div class="panel-body">
+                    <div class="row" id = "pageContent">
+                       
+                    </div>    
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -59,6 +68,7 @@
             var html = response.html;
             var jsonPass = response.jsonPass;
             setTimeout(function () {
+                $("#pageContent").empty();
                 $("#pageContent").html(html);
             },1000);
             

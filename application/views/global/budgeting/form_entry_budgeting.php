@@ -44,16 +44,27 @@
 
 	function makeDomAwal(arr_PostBudget)
 	{
-		console.log(arr_PostBudget);
 		var arr_bulan = [];
 		arr_bulan = <?php echo json_encode($arr_bulan) ?>;
-		console.log(arr_bulan);
 		// var Dom = '';
 			var OPFreq = '';
 			for (var i = 0; i <= 12; i++) {
 				var selected = (i == 0) ? 'selected' : '';
 				OPFreq += '<option value = "'+i+'" '+selected+'>'+i+'</option>';
 			}
+
+			// make dom legend status limit & subtotal
+			var domLegend = '<div class = "row">'+
+								'<div class = "col-xs-3 col-md-offset-9">'+
+									'<b>Status : </b><br>'+
+									'<i class="fa fa-check-circle" style="color: green;"></i>'+
+									' Pass Limit || '+
+									'<i class="fa fa-minus-circle" style="color: red;"></i>'+
+									' Exceeded Limit'+
+								'</div>'+
+							'<div>'		
+								;
+			$("#pageInput").append(domLegend);
 
 			for (var i = 0; i < arr_PostBudget.length; i++) {
 				var divBulan = '<div class = "row">'+'<div class = "col-xs-12">';
@@ -77,7 +88,7 @@
 				divBulan += '</div></div>';
 					if(i == 0)
 					{
-						var Dom = '<div class="row" code = "'+arr_PostBudget[i]['CodePostBudget']+'">'+
+						var Dom = '<div class="row" code = "'+arr_PostBudget[i]['CodePostBudget']+'" style = "margin-top : 10px;">'+
 									  	'<div class="col-xs-2">'+
 											'<div class="form-group">'+
 												'<label>Post Budget</label>'+
@@ -100,16 +111,15 @@
 												'</select>'+
 											'</div>'+	
 										'</div>'+
-										'<div class="col-xs-6" id = "tblInputBulan'+arr_PostBudget[i]['CodePostBudget']+'">'+
+										'<div class="col-xs-7" id = "tblInputBulan'+arr_PostBudget[i]['CodePostBudget']+'">'+
 											divBulan+
 										'</div>'+
-										'<div class="col-xs-2" id = "InputSubtotal'+arr_PostBudget[i]['CodePostBudget']+'" budget = "'+arr_PostBudget[i]['Budget']+'">'+
-											'<br><p>Limit : '+formatRupiah(arr_PostBudget[i]['Budget'])+'</p>'+
-											'<p id = "Subtotal'+arr_PostBudget[i]['CodePostBudget']+'"></p>'+
+										'<div class="col-xs-1" id = "InputSubtotal'+arr_PostBudget[i]['CodePostBudget']+'" budget = "'+arr_PostBudget[i]['Budget']+'" total = "0" style = "font-size: 12px;">'+
+											'<div class="form-group">'+
+												'<label>Subtotal</label>'+
+												'<p id = "Subtotal'+arr_PostBudget[i]['CodePostBudget']+'">0</p>'+
+											'</div>'+	
 										'</div>'+
-										// '<div class="col-xs-1" id = "BatasMax'+arr_PostBudget[i]['CodePostBudget']+'">'
-
-										// '</div>'+
 								'</div>';
 
 					}
@@ -138,21 +148,37 @@
 												'</select>'+
 											'</div>'+	
 										'</div>'+
-										'<div class="col-xs-6" id = "tblInputBulan'+arr_PostBudget[i]['CodePostBudget']+'">'+
+										'<div class="col-xs-7" id = "tblInputBulan'+arr_PostBudget[i]['CodePostBudget']+'">'+
 											divBulan+
 										'</div>'+
-										'<div class="col-xs-2" id = "InputSubtotal'+arr_PostBudget[i]['CodePostBudget']+'" budget = "'+arr_PostBudget[i]['Budget']+'" total = "0">'+
-											'<p>Limit : '+formatRupiah(arr_PostBudget[i]['Budget'])+'</p>'+
-											'<p id = "Subtotal'+arr_PostBudget[i]['CodePostBudget']+'"></p>'+
+										'<div class="col-xs-1" id = "InputSubtotal'+arr_PostBudget[i]['CodePostBudget']+'" budget = "'+arr_PostBudget[i]['Budget']+'" total = "0" style = "font-size: 12px;">'+
+											'<div class="form-group">'+
+												'<p id = "Subtotal'+arr_PostBudget[i]['CodePostBudget']+'">0</p>'+
+											'</div>'+	
 										'</div>'+
-										// '<div class="col-xs-1" id = "BatasMax'+arr_PostBudget[i]['CodePostBudget']+'">'
-
-										// '</div>'+
 								'</div>';
 
 					} // exit if
 			
-				$("#pageInput").append(Dom);	
+				$("#pageInput").append(Dom);
+				if(i == arr_PostBudget.length - 1)
+				{
+					var DomsubTotalPermonth = '<div class = "row">'+
+												'<div class = "col-xs-7 col-md-offset-4">'						
+											;
+					for (var j = 0; j < arr_bulan.length; j++) {
+						DomsubTotalPermonth += '<div class = "col-xs-1">'+
+													'<div class="form-group subTotalPermonth" keyValue = "'+arr_bulan[j].keyValueFirst+'" style = "font-size: 12px;">'+	
+														
+													'</div>'+
+												'</div>';
+						
+					}
+
+					DomsubTotalPermonth += '</div></div>';								
+					$("#pageInput").append(DomsubTotalPermonth);
+				}
+
 				$('#UnitCost'+arr_PostBudget[i]['CodePostBudget']).maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 				$('.InputBulan'+arr_PostBudget[i]['CodePostBudget']).maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 
@@ -169,8 +195,6 @@
 
 				$("#Freq"+arr_PostBudget[i]['CodePostBudget']).change(function(){
 					var code = $(this).closest('div[class="row"]').attr('code');
-					// $(this).closest('div[class="row"]').css( "background-color", "red" );
-					// console.log(code);
 					funcCheck(code);
 				})
 			} // exkit looping
@@ -356,20 +380,45 @@
 		}
 		else
 		{
+			var domStatusLimit = '';
 			if (Total > Budget) {
-				$("#InputSubtotal"+code+" p").first().html('Limit : '+ formatRupiah(Budget));
-				$("#InputSubtotal"+code+" p").first().attr('style','color : red');
+				var Sisa = parseInt(Total) - parseInt(Budget) 
+				domStatusLimit = '<p><i class="fa fa-minus-circle" style="color: red;"></i> ('+formatDigitNumber(Sisa)+')</p>';
 
 			}
 			else
 			{
-				$("#InputSubtotal"+code+" p").first().html('Limit : '+ formatRupiah(Budget));
-				$("#InputSubtotal"+code+" p").first().attr('style','color : black');
+				domStatusLimit = '<p><i class="fa fa-check-circle" style="color: green;"></i></p>';
 			}
 
-			$("#Subtotal"+code).html('Subtotal : '+ formatRupiah(Total));
+			$("#Subtotal"+code).html('<p>'+ formatDigitNumber(Total)+'</p>'+domStatusLimit);
 			$("#InputSubtotal"+code).attr('total',Total);
+			funcSubtotalPerMonth();
 			funcGrantotal();
+		}
+	}
+
+	function funcSubtotalPerMonth()
+	{
+		var arr_bulan = [];
+		arr_bulan = <?php echo json_encode($arr_bulan) ?>;
+		for (var j = 0; j < arr_bulan.length; j++) {
+			var key = arr_bulan[j].keyValueFirst;
+			var SubTotalMonth = 0;
+			$('input[keyvalue ="'+key+'"]').each(function(){
+				val = $(this).val();
+				val = findAndReplace(val,".","");
+				var code = $(this).attr('code');
+				var UnitCost = $("#UnitCost"+code).val();
+				UnitCost = findAndReplace(UnitCost,".","");
+				var Count = parseInt(val) * parseInt(UnitCost);
+				SubTotalMonth = parseInt(SubTotalMonth) + parseInt(Count);
+			})
+			var fr = formatDigitNumber(SubTotalMonth);
+			// fr = findAndReplace(fr,"Rp.","" );
+			// fr = findAndReplace(fr," ","");
+			$('.subTotalPermonth[keyvalue ="'+key+'"]').html(fr);
+			
 		}
 	}
 
@@ -397,6 +446,19 @@
 		arr_PostBudget = <?php echo json_encode($arr_PostBudget) ?>;
 		var arr_bulan = [];
 		arr_bulan = <?php echo json_encode($arr_bulan) ?>;
+
+		// make dom legend status limit & subtotal
+		var domLegend = '<div class = "row">'+
+							'<div class = "col-xs-3 col-md-offset-9">'+
+								'<b>Status : </b><br>'+
+								'<i class="fa fa-check-circle" style="color: green;"></i>'+
+								' Pass Limit || '+
+								'<i class="fa fa-minus-circle" style="color: red;"></i>'+
+								' Exceeded Limit'+
+							'</div>'+
+						'<div>'		
+								;
+			$("#pageInput").append(domLegend);
 
 			for (var i = 0; i < arr_PostBudget.length; i++) {
 				var divBulan = '<div class = "row">'+'<div class = "col-xs-12">';
@@ -433,7 +495,7 @@
 
 					if(i == 0)
 					{
-						var Dom = '<div class="row" code = "'+arr_PostBudget[i]['CodePostBudget']+'">'+
+						var Dom = '<div class="row" code = "'+arr_PostBudget[i]['CodePostBudget']+'" style = "margin-top : 10px;">'+
 									  	'<div class="col-xs-2">'+
 											'<div class="form-group">'+
 												'<label>Post Budget</label>'+
@@ -456,12 +518,16 @@
 												'</select>'+
 											'</div>'+	
 										'</div>'+
-										'<div class="col-xs-6" id = "tblInputBulan'+arr_PostBudget[i]['CodePostBudget']+'">'+
+										'<div class="col-xs-7" id = "tblInputBulan'+arr_PostBudget[i]['CodePostBudget']+'">'+
 											divBulan+
 										'</div>'+
-										'<div class="col-xs-2" id = "InputSubtotal'+arr_PostBudget[i]['CodePostBudget']+'" budget = "'+arr_PostBudget[i]['Budget']+'" total = "'+creator_budget[i]['SubTotal']+'">'+
-											'<br><p>Limit : '+formatRupiah(arr_PostBudget[i]['Budget'])+'</p>'+
-											'<p id = "Subtotal'+arr_PostBudget[i]['CodePostBudget']+'">'+formatRupiah(creator_budget[i]['SubTotal'])+'</p>'+
+										'<div class="col-xs-1" id = "InputSubtotal'+arr_PostBudget[i]['CodePostBudget']+'" budget = "'+arr_PostBudget[i]['Budget']+'" total = "'+creator_budget[i]['SubTotal']+'" style = "font-size: 12px;">'+
+											// '<br><p>Limit : '+formatRupiah(arr_PostBudget[i]['Budget'])+'</p>'+
+											// '<p id = "Subtotal'+arr_PostBudget[i]['CodePostBudget']+'">'+formatRupiah(creator_budget[i]['SubTotal'])+'</p>'+
+											'<div class="form-group">'+
+												'<label>Subtotal</label>'+
+												'<p id = "Subtotal'+arr_PostBudget[i]['CodePostBudget']+'">'+formatDigitNumber(creator_budget[i]['SubTotal'])+'</p>'+
+											'</div>'+
 										'</div>'+
 										// '<div class="col-xs-1" id = "BatasMax'+arr_PostBudget[i]['CodePostBudget']+'">'
 
@@ -494,12 +560,15 @@
 												'</select>'+
 											'</div>'+	
 										'</div>'+
-										'<div class="col-xs-6" id = "tblInputBulan'+arr_PostBudget[i]['CodePostBudget']+'">'+
+										'<div class="col-xs-7" id = "tblInputBulan'+arr_PostBudget[i]['CodePostBudget']+'">'+
 											divBulan+
 										'</div>'+
-										'<div class="col-xs-2" id = "InputSubtotal'+arr_PostBudget[i]['CodePostBudget']+'" budget = "'+arr_PostBudget[i]['Budget']+'" total = "'+creator_budget[i]['SubTotal']+'">'+
-											'<p>Limit : '+formatRupiah(arr_PostBudget[i]['Budget'])+'</p>'+
-											'<p id = "Subtotal'+arr_PostBudget[i]['CodePostBudget']+'">'+formatRupiah(creator_budget[i]['SubTotal'])+'</p>'+
+										'<div class="col-xs-1" id = "InputSubtotal'+arr_PostBudget[i]['CodePostBudget']+'" budget = "'+arr_PostBudget[i]['Budget']+'" total = "'+creator_budget[i]['SubTotal']+'" style = "font-size: 12px;">'+
+											// '<p>Limit : '+formatRupiah(arr_PostBudget[i]['Budget'])+'</p>'+
+											// '<p id = "Subtotal'+arr_PostBudget[i]['CodePostBudget']+'">'+formatRupiah(creator_budget[i]['SubTotal'])+'</p>'+
+											'<div class="form-group">'+
+												'<p id = "Subtotal'+arr_PostBudget[i]['CodePostBudget']+'">'+formatDigitNumber(creator_budget[i]['SubTotal'])+'</p>'+
+											'</div>'+
 										'</div>'+
 										// '<div class="col-xs-1" id = "BatasMax'+arr_PostBudget[i]['CodePostBudget']+'">'
 
@@ -507,12 +576,25 @@
 								'</div>';
 
 					} // exit if
-			
+
 				$("#pageInput").append(Dom);
-				// $("#Freq"+arr_PostBudget[i]['CodePostBudget']).filter(function() {
-				//   //may want to use $.trim in here
-				//   return $(this).val() == creator_budget[i]['Freq']; 
-				// }).prop("selected", true);
+				if(i == arr_PostBudget.length - 1)
+				{
+					var DomsubTotalPermonth = '<div class = "row">'+
+												'<div class = "col-xs-7 col-md-offset-4">'						
+											;
+					for (var j = 0; j < arr_bulan.length; j++) {
+						DomsubTotalPermonth += '<div class = "col-xs-1">'+
+													'<div class="form-group subTotalPermonth" keyValue = "'+arr_bulan[j].keyValueFirst+'" style = "font-size: 12px;">'+	
+														
+													'</div>'+
+												'</div>';
+						
+					}
+
+					DomsubTotalPermonth += '</div></div>';								
+					$("#pageInput").append(DomsubTotalPermonth);
+				}
 
 				$('#UnitCost'+arr_PostBudget[i]['CodePostBudget']).maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 				$('#UnitCost'+arr_PostBudget[i]['CodePostBudget']).maskMoney('mask', '9894');
@@ -538,10 +620,16 @@
 					// console.log(code);
 					funcCheck(code);
 				})
+
 			} // exit looping
 
+		var StatusApproval = creator_budget_approval[0]['Approval'];	
 		// pageInput After
 		var ApprovalBtn = (fin == "1") ? '<div class = "col-xs-4">'+'<button type="button" class="btn btn-default" code="'+code+'" ID = "ApprovalBtn"> <i class="fa fa-handshake-o" aria-hidden="true"></i> Approve</button></div>' : '';
+		var ExportExcel = (StatusApproval == 1) ? '<div class = "col-xs-4">'+'<button type="button" class="btn btn-default" ID = "ExportExcel" Year = "'+creator_budget_approval[0]['Year']+'" Departement = "'+creator_budget_approval[0]['Departement']+'"> <i class="fa fa-file-excel-o"></i> Excel</button></div>' : '';
+		if (StatusApproval == 1) {
+			ApprovalBtn = ExportExcel;
+		}
 		var Note = '<div id = "pageNote"><div class = "row">'+
 						'<div class = "col-md-12">'+
 							'<div class = "col-xs-4">'+
@@ -562,7 +650,7 @@
 								'<div class = "col-xs-4">'+
 									'<button class = "btn btn-success" id = "SaveBudget">Submit</button>'+
 								'</div>'+	
-								ApprovalBtn+
+								ApprovalBtn
 							'</div>'+
 						'</div>'+
 					'</div></div>';			
@@ -578,7 +666,6 @@
 			$('#charsNote').text(length);
 		})
 
-		var StatusApproval = creator_budget_approval[0]['Approval'];
 		$("#SaveBudget").click(function(){
 			var ID = creator_budget_approval[0]['ID'];
 			saveData(ID);
@@ -591,9 +678,28 @@
 
 		if (StatusApproval == 1) {
 			dofuncApproved();
+			doFuncExportExcel();
 		}
 
 
+	}
+
+	function doFuncExportExcel()
+	{
+		$("#ExportExcel").click(function(){
+			var Year = $(this).attr('Year');
+			var Departement = $(this).attr('Departement');
+
+			var url = base_url_js+'budgeting/export_excel_budget_creator';
+			data = {
+			  Year : Year,
+			  Departement : Departement,
+			}
+			var token = jwt_encode(data,"UAP)(*");
+			FormSubmitAuto(url, 'POST', [
+			    { name: 'token', value: token },
+			]);
+		})
 	}
 
 	function dofuncApproved()
@@ -616,14 +722,36 @@
 		   $("#ApprovalBtn").remove();
 		});
 
-		$("input").each(function(){
-			$(this).attr('readonly',true);
-			$(this).attr('disabled',true);
-		})
+		if(jQuery("#pageInputApproval").length)
+		{
+			$("#pageInputApproval input").each(function(){
+				$(this).attr('readonly',true);
+				$(this).attr('disabled',true);
+			})
 
-		$("select").each(function(){
-			$(this).attr('readonly',true);
-			$(this).attr('disabled',true);
-		})
+			$("#pageInputApproval select").each(function(){
+				$(this).attr('readonly',true);
+				$(this).attr('disabled',true);
+			})
+		}
+		else
+		{
+			$("#pageInput input").each(function(){
+				$(this).attr('readonly',true);
+				$(this).attr('disabled',true);
+			})
+
+			$("#pageNote input").each(function(){
+				$(this).attr('readonly',true);
+				$(this).attr('disabled',true);
+			})
+
+			$("#pageInput select").each(function(){
+				$(this).attr('readonly',true);
+				$(this).attr('disabled',true);
+			})
+		}
+
+		
 	}
 </script>
