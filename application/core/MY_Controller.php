@@ -98,7 +98,8 @@ abstract class Globalclass extends MyAbstract{
         $exp_name = explode(" ",$this->session->userdata('Name'));
         $data['name']= (count($exp_name)>0) ? $exp_name[0] : $this->session->userdata('Name');
 
-        $data['rule_service'] = $this->m_master->__getService($this->session->userdata('IDdepartementNavigation'));
+        $MainPosition = $this->session->userdata('PositionMain');
+        $data['rule_service'] = $this->m_master->__getService($MainPosition['IDDivision']);
 
         $page = $this->load->view('template/header',$data,true);
         return $page;

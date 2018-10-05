@@ -62,12 +62,12 @@
                 </a>
             </li>
 
-            <li class="departement1 <?php if($departement=='cooperation'){echo 'current';} ?>"
-                division="7"
-                data-dpt="cooperation">
+            <li class="departement <?php if($departement=='cooperation'){echo 'current';} ?>"
+                division="16"
+                data-dpt="student-life">
                 <a href="javascript:void(0);">
                     <span class="image"><img src="<?php echo base_url('assets/icon/student_live.png'); ?>"></span>
-                    <span class="title">Student Live</span>
+                    <span class="title">Student Life</span>
                 </a>
             </li>    
             <li class="departement <?php if($departement=='purchasing'){echo 'current';} ?>"
