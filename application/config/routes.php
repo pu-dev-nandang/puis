@@ -1005,3 +1005,6 @@ foreach( $result as $row )
 	}
 
 }
+
+
+$route['ApiServerToServer'] = 'c_login/ApiServerToServer';

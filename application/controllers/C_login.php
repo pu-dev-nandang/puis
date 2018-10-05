@@ -487,4 +487,52 @@ class C_login extends CI_Controller {
         $this->session->set_userdata($setSession);
     }
 
+
+    public function ApiServerToServer()
+    {        
+        // $data = '{"client_id":"10.1.30.102","data":["eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhZGkiOiJhZGkifQ.JW9wQXbxUqxmbzNVRIWd0UJzErziJ19z6P_BJesBcmI"]}';
+        // $data_json = json_decode($data,true);
+        // print_r($data_json);
+        // die();
+        $data = file_get_contents('php://input');
+
+        $data_json = json_decode($data,true);
+
+        if (!$data_json) {
+            // handling orang iseng
+            echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+        else {
+            $getData = $data_json['data'];
+            $token = $getData;
+            $key = "UAP)(*";
+            $getData = (array) $this->jwt->decode($token,$key);
+            $echo = json_encode($getData);
+            // $data_json = json_encode($data_json,true);
+            // echo '{"status":"FCKGW","data" : '.$echo.'}';
+            if ($data_json['client_id'] == '10.1.30.102') {
+              if ($getData['adi'] == 'adi') { 
+                // runscript
+                $this->load->model('m_sendemail');
+                $text = 'Dear Test API server to server
+                        ';        
+                $to = 'it@podomorouniversity.ac.id';
+                $subject = "Podomoro University Test API server to server";
+                $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                echo '{"status":"FCKGW","data" : '.$echo.'}';
+              }
+              else
+              {
+                echo '{"status":"Key is wrong"}';
+              }
+              
+            }
+            else
+            {
+              echo '{"status":"Your are not register"}';
+            }
+            
+          }
+    }
+
 }
