@@ -55,6 +55,38 @@
         loadStudent();
     });
 
+    // === Show Details
+    $(document).on('click','.btnDetailStudent',function () {
+        var ta = $(this).attr('data-ta');
+        var NPM = $(this).attr('data-npm');
+
+        // var url = base_url_js+'api/__crudeStudent';
+        var url = base_url_js+'database/showStudent';
+        var data = {
+            action : 'read',
+            formData : {
+                ta : ta,
+                NPM : NPM
+            }
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        $.post(url,{token:token},function (html) {
+            // console.log(jsonResult);
+            //
+            $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                '<h4 class="modal-title">Detail Mahasiswa</h4>');
+            $('#GlobalModal .modal-body').html(html);
+            $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+            $('#GlobalModal').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+        });
+
+
+    });
+
     // Change Status
     $(document).on('click','.btn-change-status',function () {
         var Name = $(this).attr('data-name');

@@ -49,12 +49,15 @@
 
     function getData() {
         var url = base_url_js+'api/__crudeStudent';
-        var img = 'http://siak.podomorouniversity.ac.id/includes/foto';
+        // var img = 'http://siak.podomorouniversity.ac.id/includes/foto';
+        var img = base_url_js+'uploads/students/';
 
         var token = '<?php echo $token; ?>';
         $.post(url,{token:token},function (jsonResult) {
             // console.log(jsonResult);
             var data = jsonResult[0];
+
+            console.log(jsonResult);
 
             var label = '';
             if(data.StatusStudentID==7 || data.StatusStudentID==6 || data.StatusStudentID==4){
@@ -67,7 +70,7 @@
                 label = 'label-primary';
             }
 
-            $('#headData').html('<img src="'+img+'/'+data.Photo+'" class="img-rounded" alt="Nama Murid" style="max-width: 100px;">'+
+            $('#headData').html('<img src="'+img+'/'+data.ta_student+'/'+data.Photo+'" class="img-rounded" alt="Photo ('+data.Name+')" style="max-width: 100px;">'+
                                 '    <h4 style="margin-bottom: 5px;font-weight: bold;">'+data.Name+'</h4>' + data.NPM +' | <span class="label '+label+'">'+data.StatusStudentDesc+'</span><br/>'+
                 '<i class="fa fa-google-plus-square" aria-hidden="true" style="margin-right: 0px;color: #f44336;"></i> | <span style="color:#2196f3;">'+data.EmailPU+'</span>');
 

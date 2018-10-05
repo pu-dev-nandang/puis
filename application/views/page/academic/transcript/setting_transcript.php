@@ -174,15 +174,15 @@
             <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;">Setting SKPI</span>
 
             <div class="row">
-                <div class="col-md-6 col-md-offset-3" style="margin-top: 20px;">
+                <div class="col-md-8 col-md-offset-2" style="margin-top: 20px;">
                     <div class="well">
                         <div class="">
                             <select class="form-control" id="filterSKPI">
-                                <option value="1">Higher Education System in Indonesia</option>
-                                <option value="2">Level of Education and Conditional of Learning</option>
-                                <option value="3">Semester Credit Unit and Duration of Study</option>
+                                <option value="4">Higher Education System in Indonesia</option>
+                                <option value="5">Level of Education and Conditional of Learning</option>
+                                <option value="6">Semester Credit Unit and Duration of Study</option>
                                 <option disabled>-----------------</option>
-                                <option value="4">Indonesian Qualification Framework (KKNI)</option>
+                                <option value="7">Indonesian Qualification Framework (KKNI)</option>
                             </select>
                         </div>
                     </div>
@@ -266,8 +266,8 @@
             var data = {
                 action: 'updateSKPI', ID: filterSKPI,
                 dataUpdate : {
-                    Indonesia : formIndo,
-                    English : formEng,
+                    DescInd : formIndo,
+                    DescEng : formEng,
                     UpdateBy : sessionNIP,
                     UpdateAt : dateTimeNow()
                 }
@@ -295,8 +295,14 @@
 
             $.post(url,{token:token},function (jsonResult) {
 
-                $('#formIndo').val(jsonResult.Indonesia);
-                $('#formEng').val(jsonResult.English);
+                if(jsonResult.length>0){
+                    $('#formIndo').val(jsonResult[0].DescInd);
+                    $('#formEng').val(jsonResult[0].DescEng);
+                } else {
+                    $('#formIndo').val('');
+                    $('#formEng').val('');
+                }
+
 
             });
 

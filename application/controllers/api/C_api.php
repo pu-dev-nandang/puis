@@ -4573,18 +4573,38 @@ class C_api extends CI_Controller {
         if(count($data_arr>0)) {
             if($data_arr['action'] == 'readData') {
                 $ID = $data_arr['ID'];
-                $data = $this->db->get_where('db_academic.ds_academic',array('ID' => $ID),1)->result_array();
+                $data = $this->db->get_where('db_academic.ds_detail',
+                    array('DS_TypeID' => $ID),1)->result_array();
 
-                return print_r(json_encode($data[0]));
+                return print_r(json_encode($data));
             }
             else if($data_arr['action']=='updateSKPI'){
 
-                $dataUpdate = (array) $data_arr['dataUpdate'];
+                $ID = $data_arr['ID'];
+                $data = $this->db->get_where('db_academic.ds_detail',
+                    array('DS_TypeID' => $ID),1)->result_array();
 
-                $this->db->where('ID', $data_arr['ID']);
-                $this->db->update('db_academic.ds_academic',$dataUpdate);
+                $dataUpdate = (array) $data_arr['dataUpdate'];
+                // Jika Null Maka Insert
+                if(count($data)>0){
+
+                    $this->db->where('ID', $data[0]['ID']);
+                    $this->db->update('db_academic.ds_detail',$dataUpdate);
+                } else {
+
+                    $dataInsert = array(
+                        'DS_TypeID' => $ID,
+                        'DescInd' => $dataUpdate['DescInd'],
+                        'DescEng' => $dataUpdate['DescEng'],
+                        'CreateBy' => $dataUpdate['UpdateBy'],
+                        'CreateAt' => $dataUpdate['UpdateAt']
+                    );
+
+                    $this->db->insert('db_academic.ds_detail', $dataInsert);
+                }
 
                 return print_r(1);
+
             }
         }
     }
@@ -4693,7 +4713,7 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['NPM'].'</div>';
             $nestedData[] = '<div  style="text-align:center;"><img id="imgThum'.$row['NPM'].'" src="'.$srcImage.'" style="max-width: 35px;" class="img-rounded"></div>';
-            $nestedData[] = '<div  style="text-align:left;"><b>'.ucwords(strtolower($row['Name'])).'</b><br/><span style="color: #2196f3;">'.$row['EmailPU'].'</span></div>';
+            $nestedData[] = '<div  style="text-align:left;"><a href="javascript:void(0);" data-npm="'.$row['NPM'].'" data-ta="'.$row['Year'].'" class="btnDetailStudent"><b>'.ucwords(strtolower($row['Name'])).'</b></a><br/><span style="color: #c77905;">'.$row['EmailPU'].'</span></div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['ProdiNameEng'].'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$fm.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$btnAct.'</div>';
