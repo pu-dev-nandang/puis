@@ -25,7 +25,11 @@ index.php
 
 **/uploads/document/
 **/uploads/vreservation/
+***/uploads/budgeting/catalog/
 document/*
 /uploads/syllabus_sap/*.pdf
 /uploads/vreservation/*.pdf
 
+/uploads/budgeting/catalog/*.jpeg
+/uploads/budgeting/catalog/*.jpg
+/uploads/budgeting/catalog/*.png

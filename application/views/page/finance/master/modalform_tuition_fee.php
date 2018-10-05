@@ -90,7 +90,7 @@
     {
       var thisYear = (new Date()).getFullYear();
       var startTahun = 2014;
-      var selisih = parseInt(thisYear) - parseInt(startTahun);
+      var selisih = parseInt(thisYear+1) - parseInt(startTahun);
       for (var i = 0; i <= selisih; i++) {
           var selected = (i==0) ? 'selected' : '';
           $('#selectClassOf').append('<option value="'+ ( parseInt(startTahun) + parseInt(i) ) +'" '+selected+'>'+( parseInt(startTahun) + parseInt(i) )+'</option>');

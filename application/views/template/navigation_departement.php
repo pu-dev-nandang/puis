@@ -13,7 +13,6 @@
 
     <div id="frame">
         <ul class="project-list">
-
             <li class="departement <?php if($departement=='admission'){echo 'current';} ?>"
                 division="10"
                 data-dpt="admission">
@@ -46,7 +45,7 @@
                     <span class="title">Human Resources</span>
                 </a>
             </li>
-            <li class="departement1 <?php if($departement=='general-affair'){echo 'current';} ?>"
+            <li class="departement <?php if($departement=='general-affair'){echo 'current';} ?>"
                 division="8"
                 data-dpt="general-affair">
                 <a href="javascript:void(0);">
@@ -62,6 +61,7 @@
                     <span class="title">Cooperation</span>
                 </a>
             </li>
+
             <li class="departement1 <?php if($departement=='cooperation'){echo 'current';} ?>"
                 division="7"
                 data-dpt="cooperation">
@@ -69,16 +69,23 @@
                     <span class="image"><img src="<?php echo base_url('assets/icon/student_live.png'); ?>"></span>
                     <span class="title">Student Live</span>
                 </a>
-            </li>
-            <li class="departement1 <?php if($departement=='settings'){echo 'current';} ?>"
-                division="12"
-                data-dpt="settings">
+            </li>    
+            <li class="departement <?php if($departement=='purchasing'){echo 'current';} ?>"
+                division="4"
+                data-dpt="purchasing">
                 <a href="javascript:void(0);">
-                    <span class="image"><img src="<?php echo base_url('assets/icon/settings.png'); ?>"></span>
-                    <span class="title">Settings</span>
+                    <span class="image"><img src="<?php echo base_url('assets/icon/purchase.png'); ?>"></span>
+                    <span class="title">Procurement</span>
+                </a>
+            </li>   
+            <li class="departement <?php if($departement=='it'){echo 'current';} ?>"
+                division="12"
+                data-dpt="it">
+                <a href="javascript:void(0);">
+                    <span class="image"><img src="<?php echo base_url('assets/icon/it.png'); ?>"></span>
+                    <span class="title">IT</span>
                 </a>
             </li>
-
         </ul>
     </div> <!-- /#frame -->
 </div> <!-- /#project-switcher -->
