@@ -4567,6 +4567,28 @@ class C_api extends CI_Controller {
         echo json_encode($arr_result);
     }
 
+    public function crudConfigSKPI(){
+        $data_arr = $this->getInputToken();
+
+        if(count($data_arr>0)) {
+            if($data_arr['action'] == 'readData') {
+                $ID = $data_arr['ID'];
+                $data = $this->db->get_where('db_academic.ds_academic',array('ID' => $ID),1)->result_array();
+
+                return print_r(json_encode($data[0]));
+            }
+            else if($data_arr['action']=='updateSKPI'){
+
+                $dataUpdate = (array) $data_arr['dataUpdate'];
+
+                $this->db->where('ID', $data_arr['ID']);
+                $this->db->update('db_academic.ds_academic',$dataUpdate);
+
+                return print_r(1);
+            }
+        }
+    }
+
     public function getListStudent(){
         $requestData= $_REQUEST;
         $data_arr = $this->getInputToken();

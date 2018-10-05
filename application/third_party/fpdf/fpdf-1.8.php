@@ -114,7 +114,7 @@ function __construct($orientation='P', $unit='mm', $size='A4')
 		$this->fontpath = '';
 	// Core fonts
 	$this->CoreFonts = array('courier', 'helvetica', 'times', 'symbol', 'zapfdingbats', 'dinpromedium',
-		'din-medium', 'dinprolight', 'dinlig', 'dinlightitalic');
+		'din-medium', 'dinprolight', 'dinlig', 'dinlightitalic','dinpromediumitalic');
 	// Scale factor
 	if($unit=='pt')
 		$this->k = 1;
@@ -365,6 +365,10 @@ function AddPage($orientation='', $size='', $rotation=0)
 	}
 	$this->TextColor = $tc;
 	$this->ColorFlag = $cf;
+}
+
+	function test(){
+	echo 'adi';
 }
 
 function Header()

@@ -106,7 +106,12 @@
 
                         <?php if(in_array(4,$rule_service)){ ?>
                             <li class=""><a href="javascript:void(0);" id="btnSimpleSearch"><i class="fa fa-search"></i> Simple Search</a></li>
-<!--                            <li class="divider"></li>-->
+                            <!--                            <li class="divider"></li>-->
+                        <?php } ?>
+
+                        <?php if(in_array(7,$rule_service)){ ?>
+                            <li class=""><a href="<?php echo base_url('announcement/list-announcement'); ?>"><i class="fa fa-bullhorn"></i> Announcement</a></li>
+                            <!--                            <li class="divider"></li>-->
                         <?php } ?>
                         <?php if(in_array(5,$rule_service)){ ?>
                             <li class="<?php if($this->uri->segment(1)=='vreservation'){echo 'active';} ?>">

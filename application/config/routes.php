@@ -549,6 +549,7 @@ $route['save2pdf/news-event'] =  'c_save_to_pdf/news_event';
 $route['save2pdf/attendance-list'] =  'c_save_to_pdf/attendance_list';
 $route['save2pdf/transcript'] =  'c_save_to_pdf/transcript';
 $route['save2pdf/ijazah'] =  'c_save_to_pdf/ijazah';
+$route['save2pdf/diploma_supplement'] =  'c_save_to_pdf/diploma_supplement';
 
 $route['save2pdf/report-uts'] =  'c_save_to_pdf/report_uts';
 
@@ -735,6 +736,10 @@ $route['api/__getFinalProject'] = 'api/c_api/getFinalProject';
 
 $route['api/__crudInvigilator'] = 'api/c_api/crudInvigilator';
 
+
+$route['api/__crudConfigSKPI'] = 'api/c_api/crudConfigSKPI';
+
+
 // for inject //
 $route['testadi'] = 'dashboard/c_dashboard/testadi';
 $route['testadi2'] = 'c_login/testadi2';
@@ -839,6 +844,10 @@ $route['testInject'] = 'api/c_global/testInject';
 
 // Pengawas Ujian
 $route['invigilator'] = 'c_pengawas_ujian';
+
+
+// Announcement
+$route['announcement/list-announcement'] = 'page/announcement/c_announcement/list_announcement';
 
 
 
