@@ -458,7 +458,8 @@
 							'</div>'+
 						'<div>'		
 								;
-			$("#pageInput").append(domLegend);					
+			$("#pageInput").append(domLegend);
+
 			for (var i = 0; i < arr_PostBudget.length; i++) {
 				var divBulan = '<div class = "row">'+'<div class = "col-xs-12">';
 				var DetailMonth = creator_budget[i]['DetailMonth'];
@@ -622,9 +623,13 @@
 
 			} // exit looping
 
-
+		var StatusApproval = creator_budget_approval[0]['Approval'];	
 		// pageInput After
 		var ApprovalBtn = (fin == "1") ? '<div class = "col-xs-4">'+'<button type="button" class="btn btn-default" code="'+code+'" ID = "ApprovalBtn"> <i class="fa fa-handshake-o" aria-hidden="true"></i> Approve</button></div>' : '';
+		var ExportExcel = (StatusApproval == 1) ? '<div class = "col-xs-4">'+'<button type="button" class="btn btn-default" ID = "ExportExcel" Year = "'+creator_budget_approval[0]['Year']+'" Departement = "'+creator_budget_approval[0]['Departement']+'"> <i class="fa fa-file-excel-o"></i> Excel</button></div>' : '';
+		if (StatusApproval == 1) {
+			ApprovalBtn = ExportExcel;
+		}
 		var Note = '<div id = "pageNote"><div class = "row">'+
 						'<div class = "col-md-12">'+
 							'<div class = "col-xs-4">'+
@@ -645,7 +650,7 @@
 								'<div class = "col-xs-4">'+
 									'<button class = "btn btn-success" id = "SaveBudget">Submit</button>'+
 								'</div>'+	
-								ApprovalBtn+
+								ApprovalBtn
 							'</div>'+
 						'</div>'+
 					'</div></div>';			
@@ -661,7 +666,6 @@
 			$('#charsNote').text(length);
 		})
 
-		var StatusApproval = creator_budget_approval[0]['Approval'];
 		$("#SaveBudget").click(function(){
 			var ID = creator_budget_approval[0]['ID'];
 			saveData(ID);
@@ -674,9 +678,28 @@
 
 		if (StatusApproval == 1) {
 			dofuncApproved();
+			doFuncExportExcel();
 		}
 
 
+	}
+
+	function doFuncExportExcel()
+	{
+		$("#ExportExcel").click(function(){
+			var Year = $(this).attr('Year');
+			var Departement = $(this).attr('Departement');
+
+			var url = base_url_js+'budgeting/export_excel_budget_creator';
+			data = {
+			  Year : Year,
+			  Departement : Departement,
+			}
+			var token = jwt_encode(data,"UAP)(*");
+			FormSubmitAuto(url, 'POST', [
+			    { name: 'token', value: token },
+			]);
+		})
 	}
 
 	function dofuncApproved()

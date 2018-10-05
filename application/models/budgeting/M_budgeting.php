@@ -181,6 +181,21 @@ class M_budgeting extends CI_Model {
 
     }
 
+    public function getPostDepartementForDomApproval($Year,$Departement)
+    {
+        $arr_result = array();
+        $get_Data = $this->m_master->caribasedprimary('db_budgeting.cfg_postrealisasi','Departement',$Departement);
+        $sql = 'select a.CodePostBudget,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
+                from db_budgeting.cfg_postrealisasi as b join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
+                join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
+                where b.Departement = ? order by a.CodePostBudget asc
+                ';
+        $query=$this->db->query($sql, array($Year,$Departement))->result_array();
+        $arr_result = array('data' => $query,'OpPostRealisasi' => $get_Data);
+        return $arr_result;
+
+    }
+
     public function makeCanBeDelete($tbl,$fieldCode,$ValueCode)
     {
         $dataSave = array(
@@ -197,7 +212,7 @@ class M_budgeting extends CI_Model {
                 join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
                 join (
                 select * from (
-                select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study
+                select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
                 UNION
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
                 ) aa
@@ -259,7 +274,7 @@ class M_budgeting extends CI_Model {
     public function getListBudgetingDepartement($Year)
     {
         $sql = 'select aa.*,b.Approval from (
-                select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study
+                select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
                 UNION
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
                 ) aa left join (select * from db_budgeting.creator_budget_approval where Year = ?) as b on aa.ID = b.Departement
@@ -278,5 +293,55 @@ class M_budgeting extends CI_Model {
             $query[$i] = $query[$i] + array('GrandTotal' => $GrandTotal);
         }
         return $query;       
+    }
+
+    public function getListBudgetingRemaining($Year)
+    {
+        $sql = 'select aa.*,b.Approval from (
+                select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
+                UNION
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                ) aa left join (select * from db_budgeting.creator_budget_approval where Year = ?) as b on aa.ID = b.Departement
+                ';
+        $query=$this->db->query($sql, array($Year))->result_array(); 
+        for ($i=0; $i < count($query); $i++) { 
+            // cari grand total
+            $GrandTotal = 0;
+            if ($query[$i]['Approval'] == '1' || $query[$i]['Approval'] == '0') {
+                $get = $this->get_budget_remaining($Year,$query[$i]['ID']);
+                for ($j=0; $j < count($get); $j++) { 
+                   $GrandTotal = $GrandTotal + $get[$j]['Value'];
+                }
+            }
+            
+            $query[$i] = $query[$i] + array('GrandTotal' => $GrandTotal);
+        }
+        return $query;  
+    }
+
+    public function get_budget_remaining($Year,$Departement)
+    {
+        $sql = ' select dd.ID,cc.CodePostBudget,cc.Year,cc.RealisasiPostName,cc.PostName,dd.ID_creator_budget,dd.YearsMonth,dd.Value from
+            (
+                   select * from db_budgeting.creator_budget as a join (
+                   select a.CodePostBudget as CodePostBudget2,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
+                   from db_budgeting.cfg_postrealisasi as b left join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
+                   join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
+                   where b.Departement = ?     
+                ) as  b on a.CodePostBudget = b.CodePostBudget2 order by a.CodePostBudget asc
+            ) cc join db_budgeting.budget_left as dd on cc.ID = dd.ID_creator_budget
+            ';
+        $query=$this->db->query($sql, array($Year,$Departement))->result_array();
+        return $query;
+    }
+
+    public function Grouping_PostBudget($getData)
+    {
+        $arr_result = array();
+        for ($i=0; $i < count($getData); $i++) { 
+            $CodePostBudget1 = $getData[$i]['CodePostBudget'];
+            $YearsMonth = $getData[$i]['YearsMonth'];
+            $YearsMonth = explode("-", $YearsMonth);
+        }
     }
 }

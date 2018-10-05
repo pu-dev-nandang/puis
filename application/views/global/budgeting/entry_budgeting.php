@@ -14,7 +14,7 @@
             <a href="javascript:void(0)" class="pageAnchor" page = "Approval">Approval</a>
         </li>
         <li class="<?php if($request=='ListBudgetDepartement'){echo "active";} ?>">
-            <a href="javascript:void(0)" class="pageAnchor" page = "ListBudgetDepartement">List Budget Departement</a>
+            <a href="javascript:void(0)" class="pageAnchor" page = "ListBudgetDepartement">Budget Departement Created</a>
         </li>
         <?php endif ?>
         <li class="<?php if($request=='BudgetLeft'){echo "active";} ?>">

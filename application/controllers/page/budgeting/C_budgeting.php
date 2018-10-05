@@ -514,6 +514,7 @@ class C_budgeting extends Budgeting_Controler {
         $this->auth_ajax();
         $input = $this->getInputToken();
         $Msg = '';
+
         switch ($input['Action']) {
             case 'add':
                 $NeedPrefix = $input['NeedPrefix'];
@@ -652,8 +653,18 @@ class C_budgeting extends Budgeting_Controler {
         $this->auth_ajax();
         $input = $this->getInputToken();
         $Msg = '';
+
         switch ($input['Action']) {
             case 'add':
+            // check data telah diapprove atau belum // data pass : Year & Departement
+                $Q_get = $this->m_master->caribasedprimary('db_budgeting.cfg_postrealisasi','CodePostRealisasi',$input['CodeSubPost']);
+                $Departement = $Q_get[0]['Departement'];
+                $Q_get = $this->m_budgeting->get_creator_budget_approval($input['Year'],$Departement);
+                if (count($Q_get) > 0) {
+                    $Msg = $this->Msg['NotAction'];
+                    break;
+                }
+
                 $tbl = 'db_budgeting.cfg_set_post';
                 $fieldCode = 'CodePostBudget';
                 $CfgCode = $this->m_master->showData_array('db_budgeting.cfg_codeprefix');
@@ -1030,7 +1041,7 @@ class C_budgeting extends Budgeting_Controler {
         $arr_bulan = $this->m_master->getShowIntervalBulan($get[0]['StartPeriod'],$get[0]['EndPeriod']);
         $Year = $get[0]['Year'];
         $Departement = $this->session->userdata('IDDepartementPUBudget');
-        $get = $this->m_budgeting->getPostDepartementForDom($Year,$Departement);
+        $get = $this->m_budgeting->getPostDepartementForDomApproval($Year,$Departement);
         $this->data['fin'] = 0;
         if ($Departement == 'NA.9') {
             $this->data['fin'] = 1;
@@ -1059,7 +1070,7 @@ class C_budgeting extends Budgeting_Controler {
         $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
         $arr_bulan = $this->m_master->getShowIntervalBulan($get[0]['StartPeriod'],$get[0]['EndPeriod']);
         $Year = $get[0]['Year'];
-        $get = $this->m_budgeting->getPostDepartementForDom($Year,$Departement);
+        $get = $this->m_budgeting->getPostDepartementForDomApproval($Year,$Departement);
         $this->data['fin'] = 0;
         $DepartementSess = $this->session->userdata('IDDepartementPUBudget');
         if ($DepartementSess == 'NA.9') {
@@ -1189,7 +1200,13 @@ class C_budgeting extends Budgeting_Controler {
 
                         $this->db->insert('db_budgeting.budget_left', $dataSave);
                     }
+
+                    $tbl = 'db_budgeting.cfg_set_post';
+                    $fieldCode = 'CodePostBudget';
+                    $ValueCode = $get2[$i]['CodePostBudget'];
+                    $this->m_budgeting->makeCanBeDelete($tbl,$fieldCode,$ValueCode);
                 }
+
                 break;    
             default:
                 # code...
@@ -1223,6 +1240,56 @@ class C_budgeting extends Budgeting_Controler {
         $Year = $Input['Year'];
         $get = $this->m_budgeting->getListBudgetingDepartement($Year);
         echo json_encode($get);
+    }
+
+    public function BudgetLeft()
+    {
+        $this->auth_ajax();
+        $Departement = $this->session->userdata('IDDepartementPUBudget');
+        switch ($Departement) {
+            case 'NA.9':
+                $this->BudgetRemainingFinance();
+                break;
+            
+            default:
+                $this->BudgetRemainingPerDiv();
+                break;
+        }
+    }
+
+    public function BudgetRemainingFinance()
+    {
+        $arr_result = array('html' => '','jsonPass' => '');
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/budget/BudgetRemaining',$this->data,true);
+        echo json_encode($arr_result);
+    }
+
+    public function BudgetRemainingPerDiv()
+    {
+
+    }
+
+    public function getListBudgetingRemaining()
+    {
+        $this->auth_ajax();
+        $Input = $this->getInputToken();
+        $Year = $Input['Year'];
+        $get = $this->m_budgeting->getListBudgetingRemaining($Year);
+        echo json_encode($get);
+    }
+
+    public function detail_budgeting_remaining()
+    {
+        $this->auth_ajax();
+        $arr_result = array('data' =>'','arr_bulan' => '');
+        $Input = $this->getInputToken();
+        $Year = $Input['Year'];
+        $Departement = $Input['Departement'];
+        $getData = $this->m_budgeting->get_budget_remaining($Year,$Departement);
+        $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Year',$Year);
+        $arr_bulan = $this->m_master->getShowIntervalBulan($get[0]['StartPeriod'],$get[0]['EndPeriod']);
+        $arr_result = array('data' =>$getData,'arr_bulan' => $arr_bulan);
+        echo json_encode($arr_result);
     }
 
 }
