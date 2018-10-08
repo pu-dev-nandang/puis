@@ -510,6 +510,8 @@ class C_master extends Admission_Controler {
 
     public function formulir_offline()
     {
+        $totalData = $this->m_master->caribasedprimary('db_admission.count_account','Active',1);
+        $this->data['totalData'] = (int) $totalData[0]['CountAccount'];
         $content = $this->load->view('page/'.$this->data['department'].'/master/formulir_offline',$this->data,true);
         $this->temp($content);
     }

@@ -292,7 +292,7 @@ class M_admission extends CI_Model {
            return $query;
     }
 
-    public function selectDataDitribusiFormulirOffline($limit, $start,$tahun,$NomorFormulir,$NamaStaffAdmisi,$status,$statusJual)
+    public function selectDataDitribusiFormulirOffline($limit, $start,$tahun,$NomorFormulir,$NamaStaffAdmisi,$status,$statusJual,$NomorFormulirRef)
     {
       $arr_temp = array('data' => array());
       if($NomorFormulir != '%') {
@@ -302,6 +302,15 @@ class M_admission extends CI_Model {
       {
         $NomorFormulir = '"%"'; 
       }
+
+      if($NomorFormulirRef != '%') {
+          $NomorFormulirRef = ' and b.No_Ref like "%'.$NomorFormulirRef.'%"'; 
+      }
+      else
+      {
+        $NomorFormulirRef = ''; 
+      }
+
       if($NamaStaffAdmisi != '%') {
           $NamaStaffAdmisi = ' and b.Sales like "%'.$NamaStaffAdmisi.'%"'; 
       }
@@ -329,9 +338,9 @@ class M_admission extends CI_Model {
         $statusJual = ''; 
       }
 
-        $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,a.StatusReg,b.Years,b.Status as StatusUsed, b.StatusJual,
-                b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,
-                b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale
+        $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,b.No_Ref,a.StatusReg,b.Years,b.Status as StatusUsed, b.StatusJual,
+                b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,
+                b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi
                 from (
                 select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
                 from db_admission.register as a 
@@ -344,16 +353,22 @@ class M_admission extends CI_Model {
                 where a.StatusReg = 1
                 ) as a right JOIN
                 (
-                select a.FormulirCode,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,
-                b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form from db_admission.formulir_number_offline_m as a
+                select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,
+                b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,
+                if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,b.ID_ProgramStudy,y.Name as NameProdi
+                from db_admission.formulir_number_offline_m as a
                 left join db_admission.sale_formulir_offline as b
                 on a.FormulirCode = b.FormulirCodeOffline
                 left join db_employees.employees as c
                 on c.NIP = b.PIC
+                left join db_admission.school as z
+                on z.ID = b.SchoolID
+                left join db_academic.program_study as y
+                on b.ID_ProgramStudy = y.ID
                 )
                 as b
                 on a.FormulirCode = b.FormulirCode
-                where Years = "'.$tahun.'" and b.FormulirCode like '.$NomorFormulir.$NamaStaffAdmisi.$status.$statusJual.' LIMIT '.$start. ', '.$limit;
+                where Years = "'.$tahun.'" and b.FormulirCode like '.$NomorFormulir.$NamaStaffAdmisi.$status.$statusJual.$NomorFormulirRef.' LIMIT '.$start. ', '.$limit;
            $query=$this->db->query($sql, array())->result_array();
            return $query;
     }

@@ -132,7 +132,9 @@
     function loadQty()
     {
         $('#selectqty').empty();
-        for (var i = 5; i <= 1000; i =  i + 5) {
+        var totaldata = "<?php echo $totalData ?>";
+        totaldata = parseInt(totaldata);
+        for (var i = 5; i <= totaldata; i =  i + 5) {
             var selected = (i==0) ? 'selected' : '';
             $('#selectqty').append('<option value="'+ i +'" '+selected+'>'+i+'</option>');
         }

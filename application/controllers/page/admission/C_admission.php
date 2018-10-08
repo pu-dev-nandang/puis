@@ -157,6 +157,7 @@ class C_admission extends Admission_Controler {
        // print_r($input);
        $tahun = $input['selectTahun'];
        $NomorFormulir = $input['NomorFormulir'];
+       $NomorFormulirRef = $input['NomorFormulirRef'];
        $NamaStaffAdmisi = $input['NamaStaffAdmisi'];
        $status = $input['selectStatus'];
        $statusJual = $input['selectStatusJual'];
@@ -173,7 +174,7 @@ class C_admission extends Admission_Controler {
        $this->pagination->initialize($config);
        $page = $this->uri->segment(5);
        $start = ($page - 1) * $config["per_page"];
-       $this->data['datadb'] = $this->m_admission->selectDataDitribusiFormulirOffline($config["per_page"], $start,$tahun,$NomorFormulir,$NamaStaffAdmisi,$status,$statusJual);
+       $this->data['datadb'] = $this->m_admission->selectDataDitribusiFormulirOffline($config["per_page"], $start,$tahun,$NomorFormulir,$NamaStaffAdmisi,$status,$statusJual,$NomorFormulirRef);
       $content = $this->load->view('page/'.'admission'.'/distribusi_formulir/tabel_formulir_offline',$this->data,true);
 
        $output = array(
@@ -1543,6 +1544,181 @@ class C_admission extends Admission_Controler {
 
           // $this->db->insert_batch($ta.'.students', $arr);
           $this->db->insert_batch('db_academic.auth_students', $arr_insert_auth);
+
+    }
+
+    public function importFormulirManual()
+    {
+      include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+      $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+      $excel2 = $excel2->load('report_penjualan_data_18-10-02.xlsx'); // Empty Sheet
+      $objWorksheet = $excel2->setActiveSheetIndex(0);
+      $CountRow = $objWorksheet->getHighestRow();
+        
+       $arr_bulan = array(
+           'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Des'
+       ); 
+
+       $arr_temp = array();
+      for ($i=5; $i < ($CountRow + 1); $i++) {
+        $FormulirCode = $objWorksheet->getCellByColumnAndRow(0, $i)->getCalculatedValue();
+        // print_r($FormulirCode.'<br>');
+        $Tanggal = $objWorksheet->getCellByColumnAndRow(1, $i)->getCalculatedValue();
+        $Tanggal = explode(" ", $Tanggal);
+        for ($k=0; $k < count($arr_bulan); $k++) { 
+          $month = $Tanggal[1];
+          if ($arr_bulan[$k] == $month) {
+            $k++;
+            break;
+          }
+        }
+
+        if (strlen($k) == 1) {
+          $k = '0'.$k;
+        }
+
+        $date = $Tanggal[2].'-'.$k.'-'.$Tanggal[0];
+        $getNIP = $this->m_master->getAllUserAutoComplete($objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue());
+
+        try {
+          if (count($getNIP) > 0) {
+            $NIP = $getNIP[0]['NIP'];
+          }
+          else
+          {
+            $NIP = $objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue();
+          }
+          
+        }
+        //catch exception
+        catch(Exception $e) {
+          $NIP = $objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue();
+        }
+
+        $program_study = $this->m_master->caribasedprimary('db_academic.program_study','Name',$objWorksheet->getCellByColumnAndRow(5, $i)->getCalculatedValue());
+        $program_study2 = $this->m_master->caribasedprimary('db_academic.program_study','Name',$objWorksheet->getCellByColumnAndRow(6, $i)->getCalculatedValue());
+
+
+        $skool1 = $objWorksheet->getCellByColumnAndRow(10, $i)->getCalculatedValue();
+        $skool = trim(str_replace("SMA","", $skool1));
+        $skool = trim(str_replace("SMK","", $skool));
+        $sql = 'select * from db_admission.school where SchoolName like "%'.$skool.'%"';
+        $query=$this->db->query($sql, array())->result_array();
+
+        $aa = $skool1;
+        if (count($query) > 0) {
+          $SchoolID = $query[0]['ID'];
+        }
+        else
+        {
+          $city = $objWorksheet->getCellByColumnAndRow(11, $i)->getCalculatedValue();
+          $CityName = $objWorksheet->getCellByColumnAndRow(11, $i)->getCalculatedValue();
+          $CityID ='';
+
+          $sql2 = 'select * from db_admission.region where RegionName like "%'.$city.'%"';
+          $query2=$this->db->query($sql2, array())->result_array();
+          if (count($query2) > 0) {
+            $CityID =$query2[0]['RegionID']; 
+          }
+          else
+          {
+            $city2 = str_replace('Kabupaten', 'Kab.', $city);
+            $sql2 = 'select * from db_admission.region where RegionName like "%'.$city2.'%"';
+            $query2=$this->db->query($sql2, array())->result_array();
+            if (count($query2) > 0) {
+              $CityID =$query2[0]['RegionID']; 
+            }
+            else
+            {
+
+            }
+            
+          }
+
+          $ProvinceID = $this->m_master->caribasedprimary('db_admission.province_region','RegionID',$CityID);
+          $ProvinceID = $ProvinceID[0]['ProvinceID'];
+          $ProvinceName = $this->m_master->caribasedprimary('db_admission.province','ProvinceID',$ProvinceID);
+          $ProvinceName = $ProvinceName[0]['ProvinceName'];
+
+          $dataSave = array(
+              'ProvinceID' => $ProvinceID,
+              'ProvinceName' => $ProvinceName,
+              'CityID' => $CityID,
+              'CityName' => $CityName,
+              'DistrictID' => '',
+              'DistrictName' => '',
+              'SchoolType' => '',
+              'SchoolName' => $skool1,
+              'SchoolAddress' => '',
+              'Created' => 0,
+              'Approved' => 1,
+              'Approver' => 0,
+          );
+          // print_r($dataSave);
+          // print_r('<br>');
+          $this->db->insert('db_admission.school', $dataSave);
+          $SchoolID = $this->db->insert_id();
+        }
+
+        $Channel = 'Event';
+        $Iklan = trim($objWorksheet->getCellByColumnAndRow(12, $i)->getCalculatedValue());
+        $aa = $this->m_master->caribasedprimary('db_admission.source_from_event','src_name',$Iklan);
+        $sqlaa = 'select * from db_admission.source_from_event where src_name like "'.$Iklan.'%" ';
+        $queryaa=$this->db->query($sqlaa, array())->result_array();
+
+        $SchoolIDChanel = '';
+        if ($Iklan == 'SEKOLAH') {
+          $Channel = 'School';
+          $SchoolIDChanel = $SchoolID;
+        }
+        // // print_r($sqlaa.'<br>');
+        // if ($i == 10) {
+        //   die();
+        // }
+        if(count($queryaa) > 0)
+        {
+          $source_from_event_ID = $queryaa[0]['ID'];
+        }
+        else
+        {
+          $source_from_event_ID = 0;
+        }
+
+        $sql3 = 'select * from db_admission.formulir_number_offline_m where StatusJual = 0 order by ID asc';
+        $query3=$this->db->query($sql3, array())->result_array();
+        $No_Ref = $FormulirCode;
+        $FormulirCode = $query3[0]['FormulirCode'];
+
+        $temp = array(
+            'FormulirCodeOffline' => $FormulirCode,
+            'DateSale' => $date,
+            'PIC' => $NIP,
+            'FullName' => $objWorksheet->getCellByColumnAndRow(3, $i)->getCalculatedValue(),
+            'Gender' => ($objWorksheet->getCellByColumnAndRow(4, $i)->getCalculatedValue() == 'Female') ? 'P' : 'L',
+            'ID_ProgramStudy' => $program_study[0]['ID'] ,
+            'ID_ProgramStudy2' => (count($program_study2) > 0) ? $program_study2[0]['ID'] : 0,
+            'HomeNumber' => $objWorksheet->getCellByColumnAndRow(7, $i)->getCalculatedValue(),
+            'PhoneNumber' => $objWorksheet->getCellByColumnAndRow(8, $i)->getCalculatedValue(),
+            'Email' => $objWorksheet->getCellByColumnAndRow(9, $i)->getCalculatedValue(),
+            'SchoolID' => $SchoolID,
+            'Channel' => $Channel,
+            'price_event_ID' => '',
+            'source_from_event_ID' => $source_from_event_ID,
+            'SchoolIDChanel' => $SchoolID,
+            'Price_Form' => 300000,
+        );
+        $this->db->insert('db_admission.sale_formulir_offline', $temp);
+        $dataSave = array(
+                'No_Ref' => $No_Ref,
+                'StatusJual' => 1,
+                'Print' => 1
+                        );
+        $this->db->where('FormulirCode',$FormulirCode);
+        $this->db->update('db_admission.formulir_number_offline_m', $dataSave);
+
+      }
+      // $this->db->insert_batch('db_admission.sale_formulir_offline', $arr_temp);
+      // print_r($arr_temp);
 
     }
 

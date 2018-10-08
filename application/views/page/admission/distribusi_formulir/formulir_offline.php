@@ -1,6 +1,6 @@
 <link href="<?php echo base_url('assets/custom/jquery-ui.css'); ?>" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="<?php echo base_url();?>assets/datepicker/bootstrap-datepicker.js"></script>
-<link href="<?php echo base_url();?>assets/datepicker/datepicker.css" rel="stylesheet" type="text/css"/>
+<!-- <script type="text/javascript" src="<?php echo base_url();?>assets/datepicker/bootstrap-datepicker.js"></script>
+<link href="<?php echo base_url();?>assets/datepicker/datepicker.css" rel="stylesheet" type="text/css"/> -->
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
 <style type="text/css">
 	.form-horizontal .control-label {
@@ -12,221 +12,225 @@
 	    border-color: #bbce3b;
 	}
 </style>
-<div class="row" style="margin-top: 30px;">
-	<div class="col-md-12">
-		<div class="widget box">
-			<div class="widget-header">
-				<h4><i class="icon-reorder"></i>Penjualan Formulir Offline</h4>
-			</div>
-			<div class="widget-content">
-				<div class="panel with-nav-tabs panel-primary">
-	                <div class="panel-heading">
-	                        <ul class="nav nav-tabs">
-	                            <li class="active">
-	                            	<a href="#tab1primary" data-toggle="tab">Input Penjualan</a>
-	                            </li>
-	                            <li><a href="#tab2primary" data-toggle="tab">List Penjualan</a></li>
-	                        </ul>
-	                </div>
-	                <div class="panel-body">
-	                    <div class="tab-content">
-	                        <div class="tab-pane fade in active btn-add" id="tab1primary">
-	                        	<!-- <div class="panel panel-default"> -->
-            				    	<div class="panel panel-primary">
-            			    	        <div class="panel-heading clearfix">
-            			    	            <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Data Formulir</h4>
-            			    	        </div>
-            			    	        <div class="panel-body">
-            			    	            <div class = "row">	
-            			    	            	<div class="col-xs-3" style="">
-            			    	            		Formulir Code
-            			    	            		<select class="select2-select-00 col-md-4 full-width-fix" id="selectFormulirCode">
-            			    	            		    <option></option>
-            			    	            		</select>
-            			    	            	</div>
-            			    	            	<div class="col-xs-3" style="">
-            			    	            		Program Study
-            			    	            		<select class="select2-select-00 col-md-4 full-width-fix" id="selectProgramStudy">
-            			    	            		    <option></option>
-            			    	            		</select>
-            			    	            	</div>
-            			    	            	<div class="col-xs-2" style="">
-            			    	            		Tanggal
-            			    	            		<input type="text" name="tanggal" id= "tanggal" data-date-format="yyyy-mm-dd" placeholder="Date..." class="form-control">
-            			    	            	</div>
-            			    	            </div>
-            			    	            <br>
-            			    	            <div class="panel panel-primary">
-            		    	                    <div class="panel-heading clearfix">
-            		    	                        <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Biodata Pembeli</h4>
-            		    	                    </div>
-            		    	                    <div class="panel-body">
-            		    	                    	<div class="form-horizontal">
-            		    	                    		<div class="form-group">
-            		    	                    		    <label class="col-sm-1 control-label">Nama </label>
-            		    	                    		    <div class="col-md-3">
-            		    	                    		      <input type="text" name="Name" id= "Name" placeholder="Input Nama Pembeli..." class="form-control">
-            		    	                    		    </div>
-            		    	                    		    <label class="col-sm-1 control-label">Jenis Kelamin </label>
-            		    	                    		    	
-            	    	                    		    	<select class="select2-select-00 col-md-3 " id="selectGender">
-            	    	                    		    	    <option value = "L" selected>Laki - Laki</option>
-            	    	                    		    	    <option value = "P">Perempuan</option>
-            	    	                    		    	</select>
-            		    	                    		</div>
-            		    	                    		<div class="form-group">
-            		    	                    			<label class="col-sm-1 control-label">Hp </label>
-            		    	                    			<div class="col-md-3">
-            		    	                    				<input type="text" name="hp" id= "hp" placeholder="+62811111011" class="form-control">
-            		    	                    			</div>
-            		    	                    			<label class="col-sm-1 control-label">Telp Rumah </label>
-            		    	                    			<div class="col-md-3">
-            		    	                    				<input type="text" name="telp_rmh" id= "telp_rmh" placeholder="+62211111011" class="form-control">
-            		    	                    			</div>		
-            		    	                    		</div>
-            		    	                    		<div class="form-group">
-            		    	                    			<label class="col-sm-1 control-label">Email </label>
-            		    	                    			<div class="col-md-3">
-            		    	                    			  <input type="text" name="email" id= "email" placeholder="" class="form-control">
-            		    	                    			</div>
-            		    	                    		</div>
-            		    	                    		<div class="form-group">
-            		    	                    			<label class="col-sm-1 control-label">Sekolah </label>
-            		    	                    			<div class="col-md-3">
-            		    	                    			  <input type="text" name="autoCompleteSchool" id= "autoCompleteSchool" placeholder="Autocomplete" class="form-control">
-            		    	                    			</div>
-            		    	                    		</div>
-            		    	                    		<div class="form-group">
-            		    	                    			<label class="col-sm-1 control-label">Sumber Iklan </label>
-            		    	                    			<div class="col-md-3">
-            		    	                    			  <select class="select2-select-00 col-md-4 full-width-fix" id="selectSourceFrom">
-            		    	                        		   <option></option>
-            		    	                        		</select>
-            		    	                    			</div>
-            		    	                    		</div>		
-            		    	                    	</div>
-            		    	                    </div>
-            			    	            </div>
-            			    	            <div class="panel panel-primary">
-            		    	                    <div class="panel-heading clearfix">
-            		    	                        <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Channel</h4>
-            		    	                    </div>
-            		    	                    <div class="panel-body">
-            		    	                    	<div class="form-horizontal">
-            		    	                    		<div class="form-group">
-            		    	                    		    <label class="col-sm-1 control-label">Tipe Channel </label>
-            		    	                    		    <div class="col-md-3">
-            		    	                    		      <table>
-            		    	                    		      	<tr>
-            		    	                    		      		<td>
-            		    	                    		      			<label class="radio-inline">
-            										              			<input type="radio" name="tipeChannel" value = "Admission Office" class = "tipeChannel"> Admission Office
-            										            		</label>
-            										            	</td>
-            		    	                    		      	</tr>
-            		    	                    		      	<tr>
-            		    	                    		      		<td>
-            		    	                    		      			<label class="radio-inline">
-            										              			<input type="radio" name="tipeChannel" value = "Event" class = "tipeChannel"> Event
-            										            		</label>
-            		    	                    		      		</td>
-            		    	                    		      		<td style="width: 223px;">
-            	                		      						  <select class="select2-select-00 col-md-4 full-width-fix" id="selectEvent">
-            	                		      			    		   <option></option>
-            	                		      			    		</select>
-            		    	                    		      		</td>
-            		    	                    		      	</tr>
-            		    	                    		      	<tr>
-            		    	                    		      		<td>&nbsp</td>
-            		    	                    		      		<td>&nbsp</td>
-            		    	                    		      	</tr>
-            		    	                    		      	<tr>
-            		    	                    		      		<td>
-            		    	                    		      			<label class="radio-inline">
-            										              			<input type="radio" name="tipeChannel" value = "School" class = "tipeChannel"> School
-            										            		</label>
-            		    	                    		      		</td>
-            		    	                    		      		<td>
-            		    	                    		      			<input type="text" name="autoCompleteSchoolChanel" id= "autoCompleteSchoolChanel" placeholder="Autocomplete" class="form-control">
-            		    	                    		      		</td>
-            		    	                    		      	</tr>
-            		    	                    		      </table>
-            		    	                    		    </div>
-            		    	                    		</div>
-            		    	                    		<div class="form-group">
-            		    	                    			<label class="col-sm-1 control-label">Harga Formulir </label>
-            		    	                    			<div class="col-md-3">
-            		    	                    				<input type="text" name="priceFormulir" id= "priceFormulir" placeholder="" class="form-control">
-            		    	                    			</div>
-            		    	                    		</div>
-            		    	                    		<div class="form-group">
-            		    	                    			<label class="col-sm-1 control-label">PIC </label>
-            		    	                    			<div class="col-md-3">
-            		    	                    				<select class="select2-select-00 col-md-4 full-width-fix" id="selectPIC">
-            	                		      			    		   <option></option>
-            	                		      			    	</select>
-            		    	                    			</div>
-            		    	                    		</div>
-            		    	                    	</div>
-            		    	                    </div>
-            			    	            </div>
-            			    	            <div class ="form-group">
-            			    	            	<div align="right">
-            			    	            		<button class="btn btn-inverse btn-notification" id="btn-proses" action = "add" kode-unique = '1'>Save</button>
-            			    	            	</div>
-            			    	            </div>
-            			    	        </div>
-            				    	</div>
-            					<!-- </div> -->
-	                    	</div>
-	                        <div class="tab-pane fade btn-read" id="tab2primary">
-	                        	<div class = "row">	
-	                        		<div class="col-xs-2" style="">
-	                        			Tahun
-	                        			<select class="select2-select-00 col-md-4 full-width-fix" id="selectTahun">
-	                        			    <option></option>
-	                        			</select>
-	                        		</div>
-	                        		<div class="col-xs-2" style="">
-	                        			Nomor Formulir
-	                        			<input class="form-control" id="NomorFormulir" placeholder="All..." "="">
-	                        		</div>
-	                        		<div class="col-xs-2" style="">
-	                        			Nama Pendistribusi Formulir
-	                        			<input class="form-control" id="NamaStaffAdmisi" placeholder="All..." "="">
-	                        		</div>
-	                        		<div class="col-xs-2" style="">
-	                        			Status Activated by Candidate
-	                        			<select class="select2-select-00 col-md-4 full-width-fix" id="selectStatus">
-	                        			    <option value= "%" selected>All</option>
-	                        			    <option value= "0">No</option>
-	                        			    <option value= "1">Yes</option>
-	                        			</select>
-	                        		</div>
-                                          <div class="col-xs-2" style="">
-                                                Status Jual
-                                                <select class="select2-select-00 col-md-4 full-width-fix" id="selectStatusJual">
-                                                    <option value= "%" selected>All</option>
-                                                    <option value= "1">SoldOut</option>
-                                                    <option value= "0">In</option>
-                                                </select>
-                                          </div>
+<div class="row" style="margin-top: 30px;">      
+      <div class="col-md-12">
+            <div class="widget box">
+                  <div class="widget-header">
+                        <h4><i class="icon-reorder"></i>Penjualan Formulir Offline</h4>
+                  </div>
+                  <div class="widget-content">
+                        <div class="panel with-nav-tabs panel-primary">
+                            <div class="panel-heading">
+                                    <ul class="nav nav-tabs">
+                                        <li class="active">
+                                          <a href="#tab1primary" data-toggle="tab">Input Penjualan</a>
+                                        </li>
+                                        <li><a href="#tab2primary" data-toggle="tab">List Penjualan</a></li>
+                                    </ul>
+                            </div>
+                            <div class="panel-body">
+                                <div class="tab-content">
+                                    <div class="tab-pane fade in active btn-add" id="tab1primary">
+                                          <!-- <div class="panel panel-default"> -->
+                                                <div class="panel panel-primary">
+                                                  <div class="panel-heading clearfix">
+                                                      <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Data Formulir</h4>
+                                                  </div>
+                                                  <div class="panel-body">
+                                                      <div class = "row">     
+                                                            <div class="col-xs-3" style="">
+                                                                  Formulir Code
+                                                                  <select class="select2-select-00 col-md-4 full-width-fix" id="selectFormulirCode">
+                                                                      <option></option>
+                                                                  </select>
+                                                            </div>
+                                                            <div class="col-xs-3" style="">
+                                                                  Program Study
+                                                                  <select class="select2-select-00 col-md-4 full-width-fix" id="selectProgramStudy">
+                                                                      <option></option>
+                                                                  </select>
+                                                            </div>
+                                                            <div class="col-xs-2" style="">
+                                                                  Tanggal
+                                                                  <input type="text" name="tanggal" id= "tanggal" data-date-format="yyyy-mm-dd" placeholder="Date..." class="form-control">
+                                                            </div>
+                                                      </div>
+                                                      <br>
+                                                      <div class="panel panel-primary">
+                                                        <div class="panel-heading clearfix">
+                                                            <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Biodata Pembeli</h4>
+                                                        </div>
+                                                        <div class="panel-body">
+                                                            <div class="form-horizontal">
+                                                                  <div class="form-group">
+                                                                      <label class="col-sm-1 control-label">Nama </label>
+                                                                      <div class="col-md-3">
+                                                                        <input type="text" name="Name" id= "Name" placeholder="Input Nama Pembeli..." class="form-control">
+                                                                      </div>
+                                                                      <label class="col-sm-1 control-label">Jenis Kelamin </label>
+                                                                        
+                                                                  <select class="select2-select-00 col-md-3 " id="selectGender">
+                                                                      <option value = "L" selected>Laki - Laki</option>
+                                                                      <option value = "P">Perempuan</option>
+                                                                  </select>
+                                                                  </div>
+                                                                  <div class="form-group">
+                                                                        <label class="col-sm-1 control-label">Hp </label>
+                                                                        <div class="col-md-3">
+                                                                              <input type="text" name="hp" id= "hp" placeholder="+62811111011" class="form-control">
+                                                                        </div>
+                                                                        <label class="col-sm-1 control-label">Telp Rumah </label>
+                                                                        <div class="col-md-3">
+                                                                              <input type="text" name="telp_rmh" id= "telp_rmh" placeholder="+62211111011" class="form-control">
+                                                                        </div>            
+                                                                  </div>
+                                                                  <div class="form-group">
+                                                                        <label class="col-sm-1 control-label">Email </label>
+                                                                        <div class="col-md-3">
+                                                                          <input type="text" name="email" id= "email" placeholder="" class="form-control">
+                                                                        </div>
+                                                                  </div>
+                                                                  <div class="form-group">
+                                                                        <label class="col-sm-1 control-label">Sekolah </label>
+                                                                        <div class="col-md-3">
+                                                                          <input type="text" name="autoCompleteSchool" id= "autoCompleteSchool" placeholder="Autocomplete" class="form-control">
+                                                                        </div>
+                                                                  </div>
+                                                                  <div class="form-group">
+                                                                        <label class="col-sm-1 control-label">Sumber Iklan </label>
+                                                                        <div class="col-md-3">
+                                                                          <select class="select2-select-00 col-md-4 full-width-fix" id="selectSourceFrom">
+                                                                           <option></option>
+                                                                        </select>
+                                                                        </div>
+                                                                  </div>            
+                                                            </div>
+                                                        </div>
+                                                      </div>
+                                                      <div class="panel panel-primary">
+                                                        <div class="panel-heading clearfix">
+                                                            <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Channel</h4>
+                                                        </div>
+                                                        <div class="panel-body">
+                                                            <div class="form-horizontal">
+                                                                  <div class="form-group">
+                                                                      <label class="col-sm-1 control-label">Tipe Channel </label>
+                                                                      <div class="col-md-3">
+                                                                        <table>
+                                                                              <tr>
+                                                                                    <td>
+                                                                                          <label class="radio-inline">
+                                                                                                            <input type="radio" name="tipeChannel" value = "Admission Office" class = "tipeChannel"> Admission Office
+                                                                                                      </label>
+                                                                                    </td>
+                                                                              </tr>
+                                                                              <tr>
+                                                                                    <td>
+                                                                                          <label class="radio-inline">
+                                                                                                            <input type="radio" name="tipeChannel" value = "Event" class = "tipeChannel"> Event
+                                                                                                      </label>
+                                                                                    </td>
+                                                                                    <td style="width: 223px;">
+                                                                                            <select class="select2-select-00 col-md-4 full-width-fix" id="selectEvent">
+                                                                                       <option></option>
+                                                                                    </select>
+                                                                                    </td>
+                                                                              </tr>
+                                                                              <tr>
+                                                                                    <td>&nbsp</td>
+                                                                                    <td>&nbsp</td>
+                                                                              </tr>
+                                                                              <tr>
+                                                                                    <td>
+                                                                                          <label class="radio-inline">
+                                                                                                            <input type="radio" name="tipeChannel" value = "School" class = "tipeChannel"> School
+                                                                                                      </label>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                          <input type="text" name="autoCompleteSchoolChanel" id= "autoCompleteSchoolChanel" placeholder="Autocomplete" class="form-control">
+                                                                                    </td>
+                                                                              </tr>
+                                                                        </table>
+                                                                      </div>
+                                                                  </div>
+                                                                  <div class="form-group">
+                                                                        <label class="col-sm-1 control-label">Harga Formulir </label>
+                                                                        <div class="col-md-3">
+                                                                              <input type="text" name="priceFormulir" id= "priceFormulir" placeholder="" class="form-control">
+                                                                        </div>
+                                                                  </div>
+                                                                  <div class="form-group">
+                                                                        <label class="col-sm-1 control-label">PIC </label>
+                                                                        <div class="col-md-3">
+                                                                              <select class="select2-select-00 col-md-4 full-width-fix" id="selectPIC">
+                                                                                       <option></option>
+                                                                              </select>
+                                                                        </div>
+                                                                  </div>
+                                                            </div>
+                                                        </div>
+                                                      </div>
+                                                      <div class ="form-group">
+                                                            <div align="right">
+                                                                  <button class="btn btn-inverse btn-notification" id="btn-proses" action = "add" kode-unique = '1'>Save</button>
+                                                            </div>
+                                                      </div>
+                                                  </div>
+                                                </div>
+                                                <!-- </div> -->
                                     </div>
-                                    <div class="row">
-                                          <div  class="col-xs-12" align="right" id="pagination_link"></div> 
-                                    </div>      
-	                        		<!-- <div class = "table-responsive" id= "register_document_table"></div> -->
-	                        	</div>
-	                        	<br>	
-	                        	<div id= "formulir_offline_table"></div>
-	                        </div>
-	                    </div>
-	                </div>
-	            </div>
-			</div>
-		</div>
-	</div> <!-- /.col-md-6 -->
-</div>
+                                    <div class="tab-pane fade btn-read" id="tab2primary">
+                                          <div class = "row">     
+                                                <div class="col-xs-2" style="">
+                                                      Tahun
+                                                      <select class="select2-select-00 col-md-4 full-width-fix" id="selectTahun">
+                                                          <option></option>
+                                                      </select>
+                                                </div>
+                                                <div class="col-xs-2" style="">
+                                                      Nomor Formulir
+                                                      <input class="form-control" id="NomorFormulir" placeholder="All..." "="">
+                                                </div>
+                                                <div class="col-xs-2" style="">
+                                                      Nama Pendistribusi Formulir
+                                                      <input class="form-control" id="NamaStaffAdmisi" placeholder="All..." "="">
+                                                </div>
+                                                <div class="col-xs-2" style="">
+                                                      Status Activated by Candidate
+                                                      <select class="select2-select-00 col-md-4 full-width-fix" id="selectStatus">
+                                                          <option value= "%" selected>All</option>
+                                                          <option value= "0">No</option>
+                                                          <option value= "1">Yes</option>
+                                                      </select>
+                                                </div>
+                                                <div class="col-xs-2" style="">
+                                                      Status Jual
+                                                      <select class="select2-select-00 col-md-4 full-width-fix" id="selectStatusJual">
+                                                          <option value= "%" selected>All</option>
+                                                          <option value= "1">SoldOut</option>
+                                                          <option value= "0">In</option>
+                                                      </select>
+                                                </div>
+                                                <div class="col-xs-2" style="">
+                                                      Nomor Formulir Ref
+                                                      <input class="form-control" id="NomorFormulirRef" placeholder="All..." "="">
+                                                </div>
+                                          </div>
+                                          <div class="row">
+                                                <div  class="col-xs-12" align="right" id="pagination_link"></div> 
+                                          </div> 
+                                          <div id= "formulir_offline_table"></div>     
+                                                <!-- <div class = "table-responsive" id= "register_document_table"></div> -->
+                                    </div>
+                                </div>    
+                            </div>
+                                        
+                        </div>
+                  </div>
+            </div>
+      </div>      
+</div>            
+
 <script type="text/javascript">
 	window.temp1 = '';
 	window.temp2 = '';
@@ -584,6 +588,16 @@
 	  
 	 });
 
+      $(document).on("keyup", "#NomorFormulirRef", function(event){
+            var nama = $('#NomorFormulirRef').val();
+            var n = nama.length;
+            console.log(n);
+            if( this.value.length < 3 && this.value.length != 0 ) return;
+               /* code to run below */
+             loadData(1);
+        
+      });
+
     $(document).on("keyup", "#NamaStaffAdmisi", function(event){
     	var nama = $('#NamaStaffAdmisi').val();
     	var n = nama.length;
@@ -605,12 +619,16 @@
 		var NamaStaffAdmisi = $("#NamaStaffAdmisi").val();
 		if (NamaStaffAdmisi == '') {NamaStaffAdmisi = '%'};
 		var selectStatus = $("#selectStatus").find(':selected').val();
+            var NomorFormulirRef = $("#NomorFormulirRef").val();
+            if (NomorFormulirRef == '') {NomorFormulirRef = '%'};
+
 		var data = {
 					selectTahun : selectTahun,
 					NomorFormulir : NomorFormulir,
 					NamaStaffAdmisi : NamaStaffAdmisi,
 					selectStatus : selectStatus,
-                              selectStatusJual : selectStatusJual					
+                              selectStatusJual : selectStatusJual,
+                              NomorFormulirRef : NomorFormulirRef,					
 					};
 		var token = jwt_encode(data,"UAP)(*");			
 		$.post(url,{token:token},function (data_json) {
@@ -698,5 +716,43 @@
                  $('#NotificationModal').modal('hide');
               },2000);
           });
+    });
+
+    $(document).on('click','.btn-print', function () {
+      $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Number Form ! </b> <br>' +
+          '<input type = "number" class = "form-control" id ="NumForm" style="margin: 0px 0px 15px; height: 30px; width: 329px;"><br>'+
+          '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+          '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+          '</div>');
+      $('#NotificationModal').modal('show');
+      var url = base_url_js+'admission/export_kwitansi_formuliroffline';
+      var NoFormRef = $(this).attr('ref');
+      var namalengkap = $(this).attr('namalengkap');
+      var hp = $(this).attr('hp');
+      var jurusan = $(this).attr('jurusan');
+      var pembayaran = $(this).attr('pembayaran');
+      var jenis = $(this).attr('jenis');
+      var jumlah = $(this).attr('jumlah');
+      var date = $(this).attr('date');
+
+      $("#confirmYes").click(function(){
+          var NumForm = $('#NumForm').val();
+          data = {
+            NoFormRef : NoFormRef ,
+            namalengkap : namalengkap ,
+            hp : hp ,
+            jurusan :  jurusan ,
+            pembayaran :  pembayaran,
+            jenis : jenis ,
+            jumlah : jumlah ,
+            date : date,
+            NumForm : NumForm,
+          }
+          var token = jwt_encode(data,"UAP)(*");
+          FormSubmitAuto(url, 'POST', [
+              { name: 'token', value: token },
+          ]);  
+      })
+      
     });
 </script>
