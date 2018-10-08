@@ -361,7 +361,7 @@ class C_login extends CI_Controller {
                                     $client->close();
                                     
                                   }
-
+                                  
                                   // find data apakah memiliki beberapa cicilan
                                   $ID_payment = $getData[0]['ID_payment'];
                                   $getData3 = $this->m_finance->findDatapayment_studentsBaseID_payment($ID_payment);
