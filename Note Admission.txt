@@ -1,0 +1,11 @@
+--file report_payment_data
+	Form dan NIM
+	laporan keuangan & cicilan
+	
+--file report_penjualan_data & report_penjualan_finance
+	report penjualan formulir offline
+
+Table Clear
+db_admission
+
+	

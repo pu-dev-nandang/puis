@@ -6,6 +6,7 @@
     		<th style="width: 15px;">No</th>
     		<th>Tahun</th>
     		<th>Formulir Code</th>
+    		<th>Ref</th>
     		<th>Link</th>
     		<th>Status</th>
     		<th>Print</th>
@@ -60,6 +61,7 @@
 						'<td>'+no+'</td>'+
 						'<td>'+response[i]['Years']+'</td>'+
 						'<td>'+response[i]['FormulirCode']+'</td>'+
+						'<td>'+response[i]['No_Ref']+'</td>'+
 						'<td>'+response[i]['Link']+'</td>'+
 						status+
 						'<td>'+print+'</td>'+

@@ -359,7 +359,7 @@ class M_master extends CI_Model {
     {
         $yy = substr($tahun,2,2);
         $code = "O";
-        for ($i=strlen($increment); $i < 3; $i++) {
+        for ($i=strlen($increment); $i < 4; $i++) {
             $increment = "0".$increment;
         }
         $dataSave = array(
@@ -373,7 +373,7 @@ class M_master extends CI_Model {
 
     public function getDataFormulirOffline($tahun)
     {
-        $sql = "select a.ID,a.Years,a.FormulirCode,a.Status,a.CreateAT,b.Name,a.Link,a.Print from db_admission.formulir_number_offline_m as a join db_employees.employees as b on a.CreatedBY = b.NIP where a.Years = ?";
+        $sql = "select a.No_Ref,a.ID,a.Years,a.FormulirCode,a.Status,a.CreateAT,b.Name,a.Link,a.Print from db_admission.formulir_number_offline_m as a join db_employees.employees as b on a.CreatedBY = b.NIP where a.Years = ?";
         $query=$this->db->query($sql, array($tahun))->result_array();
         return $query;
     }
@@ -414,7 +414,7 @@ class M_master extends CI_Model {
     {
         $yy = substr($tahun,2,2);
         $code = "M";
-        for ($i=strlen($increment); $i < 3; $i++) {
+        for ($i=strlen($increment); $i < 4; $i++) {
             $increment = "0".$increment;
         }
         $this->load->library('JWT');
@@ -2402,6 +2402,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $arr_bulan = array(
             'Jan','Feb','March','April','May','June','July','August','Sep','Oct','Nov','Des'
         );
+
         $MonthNumber = $MonthNumber - 1;
         $MonthName = '';
         try
@@ -2414,5 +2415,48 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         }
 
         return $MonthName;
+    }
+
+    //============================ FORMATTER ============================
+    public function moneySay($x) {
+        $abil = array("", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas");
+        if ($x < 12)
+            return " " . $abil[$x];
+        elseif ($x < 20)
+            return $this->moneySay($x - 10) . "belas";
+        elseif ($x < 100)
+            return $this->moneySay($x / 10) . " puluh" . $this->moneySay($x % 10);
+        elseif ($x < 200)
+            return " seratus" . $this->moneySay($x - 100);
+        elseif ($x < 1000)
+            return $this->moneySay($x / 100) . " ratus" . $this->moneySay($x % 100);
+        elseif ($x < 2000)
+            return " seribu" . $this->moneySay($x - 1000);
+        elseif ($x < 1000000)
+            return $this->moneySay($x / 1000) . " ribu" . $this->moneySay($x % 1000);
+        elseif ($x < 1000000000)
+            return $this->moneySay($x / 1000000) . " juta" . $this->moneySay($x % 1000000);
+    }
+    
+    public function romawiNumber($get = NULL) {
+        $rmw[1] = 'I';
+        $rmw[2] = 'II';
+        $rmw[3] = 'III';
+        $rmw[4] = 'IV';
+        $rmw[5] = 'V';
+        $rmw[6] = 'VI';
+        $rmw[7] = 'VII';
+        $rmw[8] = 'VIII';
+        $rmw[9] = 'IX';
+        $rmw[10] = 'X';
+        $rmw[11] = 'XI';
+        $rmw[12] = 'XII';
+        
+        if (is_null($get)) {
+            return $rmw;
+        }
+        else {
+            return $rmw[intval($get)];
+        }
     }
 }

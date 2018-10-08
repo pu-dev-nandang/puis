@@ -410,6 +410,7 @@ $route['admission/distribusi-formulir/formulir-offline/selectPIC'] = 'page/admis
 
 $route['admission/mastercalonmahasiswa/generate-nim'] = 'page/admission/c_admission/generatenim';
 $route['admission/mastercalonmahasiswa/submit_import_excel_File_generate_nim'] = 'page/admission/c_admission/submit_import_excel_File_generate_nim';
+$route['admission/export_kwitansi_formuliroffline'] = 'c_save_to_pdf/export_kwitansi_formuliroffline';
 
 
 
@@ -1007,3 +1008,4 @@ foreach( $result as $row )
 }
 
 $route['ApiServerToServer'] = 'c_login/ApiServerToServer';
+$route['importFormulirManual'] = 'page/admission/c_admission/importFormulirManual';

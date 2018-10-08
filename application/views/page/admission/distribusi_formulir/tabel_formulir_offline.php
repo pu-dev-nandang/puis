@@ -23,20 +23,22 @@
 			<!-- <caption><strong>List Dokumen</strong></caption> -->
 			<thead>
 				<tr style="background: #333;color: #fff;">
-					<th>Tahun</th>
-					<th>Formulir Code</th>
-					<th style="width: 100px;">Activated by Candidate</th>
-					<th>Status Jual</th>
+					<th>Code</th>
+					<th>Ref</th>
+					<th>Prodi</th>
+					<th style="width: 100px;">Activated</th>
+					<th>Status</th>
 					<th>Sales</th>
-					<th>Harga Jual</th>
-					<th>Tanggal Jual</th>
-					<th>Nama Pembeli</th>
-					<th>Hp Pembeli</th>
+					<th>Harga</th>
+					<th>Tanggal</th>
+					<th>Pembeli</th>
+					<th>Iklan</th>
+					<!-- <th>Hp Pembeli</th>
 					<th>Telp Rumah Pembeli</th>
 					<th>Email Pembeli</th>
-					<th>Nama Candidate</th>
-					<th>Email</th>
-					<th>Sekolah</th>
+					<th>Nama Candidate</th> -->
+					<!-- <th>Data Pendaftaran</th> -->
+					<!-- <th>Sekolah</th> -->
 					<?php if ($actiontbl == 1): ?>
 					<th>Action</th>
 					<?php endif ?>
@@ -45,8 +47,9 @@
 			<tbody> 
 				<?php for ($i = 0; $i < count($datadb); $i++): ?>
 							 <tr>
-							 	<td><?php echo $datadb[$i]['Years'] ?></td>
 							 	<td><?php echo $datadb[$i]['FormulirCode'] ?></td>
+							 	<td><?php echo $datadb[$i]['No_Ref'] ?></td>
+							 	<td><?php echo $datadb[$i]['NameProdi'] ?></td>
 							 	<?php if ($datadb[$i]['StatusUsed'] == 0): ?>
 							 		<?php $status_used = '<td style="color:  green;">No</td>'; ?>
 							 	<?php else: ?>
@@ -62,20 +65,33 @@
 							 	<td><?php echo $datadb[$i]['Sales'] ?></td>
 							 	<td><?php echo number_format($datadb[$i]['Price_Form'],0,',','.') ?></td>
 							 	<td><?php echo $datadb[$i]['DateSale'] ?></td>
-							 	<td><?php echo $datadb[$i]['NamaPembeli'] ?></td>
-							 	<td><?php echo $datadb[$i]['PhoneNumberPembeli'] ?></td>
+							 	<td><?php echo $datadb[$i]['NamaPembeli'].'<br>'.$datadb[$i]['PhoneNumberPembeli'].'<br>'.$datadb[$i]['EmailPembeli'].'<br>'.$datadb[$i]['SchoolNameFormulir'] ?></td>
+							 	<!-- <td><?php echo $datadb[$i]['PhoneNumberPembeli'] ?></td>
 							 	<td><?php echo $datadb[$i]['HomeNumberPembeli'] ?></td>
 							 	<td><?php echo $datadb[$i]['EmailPembeli'] ?></td>
-							 	<td><?php echo $datadb[$i]['NameCandidate'] ?></td>
-							 	<td><?php echo $datadb[$i]['Email'] ?></td>
-							 	<td><?php echo $datadb[$i]['SchoolName'] ?></td>
+							 	<td><?php echo $datadb[$i]['NameCandidate'] ?></td> -->
+							 	<!-- <td><?php echo $datadb[$i]['Email'].'<br>'.$datadb[$i]['SchoolName'] ?></td> -->
+							 	<!-- <td><?php echo $datadb[$i]['SchoolName'] ?></td> -->
+							 	<td><?php echo $datadb[$i]['src_name'] ?></td>
 							 	<?php if ($actiontbl == 1): ?>
 							 	<td>
 							 		<?php if ($datadb[$i]['ID_sale_formulir_offline'] != null || $datadb[$i]['ID_sale_formulir_offline'] != ''): ?>
 							 			<div class="btn-group">
-							 			   <span data-smt="<?php echo $datadb[$i]['ID_sale_formulir_offline'] ?>" class="btn btn-xs btn-delete">
-							 			     <i class="fa fa-trash"></i> Delete Penjualan
-							 			   </span>
+							 				<div class="row">
+							 					<div class="col-md-12">
+							 						<span data-smt="<?php echo $datadb[$i]['ID_sale_formulir_offline'] ?>" class="btn btn-xs btn-delete">
+							 						  <i class="fa fa-trash"></i> Delete Penjualan
+							 						</span>
+							 					</div>
+							 				</div>
+							 			   <div class="row" style="margin-top: 10px">
+							 			   	<div class="col-md-12">
+							 			   		<span ref = "<?php echo $datadb[$i]['No_Ref'] ?>" NamaLengkap = "<?php echo $datadb[$i]['NamaPembeli'] ?>" class="btn btn-xs btn-print" phonehome = "<?php echo $datadb[$i]['HomeNumberPembeli'] ?>" hp = "<?php echo $datadb[$i]['PhoneNumberPembeli'] ?>" jurusan = "<?php echo $datadb[$i]['NameProdi'] ?>" pembayaran ="Pembelian Form(<?php echo $datadb[$i]['No_Ref'] ?>)" jenis= "Cash" jumlah = "<?php echo $datadb[$i]['Price_Form'] ?>" date = "<?php echo $datadb[$i]['DateSale'] ?>">
+								 			     <i class="fa fa-print"></i> Kwitansi
+								 			   </span>
+							 			   	</div>
+							 			   </div>
+							 			   
 							 			</div>
 							 		<?php endif ?>
 							 	</td>
