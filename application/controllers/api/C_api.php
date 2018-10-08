@@ -4387,17 +4387,27 @@ class C_api extends CI_Controller {
 
             $db_ = 'ta_'.$row['Year'];
 
+            $btnSKPI = '<div  style="text-align:center;">
+                            <a href="'.base_url('save2pdf/diploma_supplement').'" target="_blank" class="btn btn-default btn-default-warning btnDownloadSKPI"><i class="fa fa-download margin-right"></i> SKPI</a>
+                            </div>';
+
+            $btnTranscript = '<div  style="text-align:center;">
+                                                <button class="btn btn-sm btn-default btn-default-primary btnDowloadTranscript" data-db="'.$db_.'" data-npm="'.$row['NPM'].'">
+                                                    <i class="fa fa-download margin-right"></i> Transcript</button></div>';
+
+            $btnIjazah = '<div  style="text-align:center;">
+                            <a href="'.base_url('save2pdf/ijazah').'" target="_blank" class="btn btn-sm btn-default btn-default-success"><i class="fa fa-download margin-right"></i> Ijazah</a>
+                            </div>';
+
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div  style="text-align:left;"><b>'.$row['NPM'].'</b></div>';
             $nestedData[] = '<div  style="text-align:left;">
                                     <b><i class="fa fa-user margin-right"></i> '.ucwords(strtolower($row['Name'])).'</b><br/>
                                         <a>'.$row['EmailPU'].'</a></div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['ProdiNameEng'].'</div>';
-            $nestedData[] = '<div  style="text-align:center;">-</div>';
-            $nestedData[] = '<div  style="text-align:center;">
-                                                <button class="btn btn-sm btn-default btn-default-primary btnDowloadTranscript" data-db="'.$db_.'" data-npm="'.$row['NPM'].'">
-                                                    <i class="fa fa-download margin-right"></i> Transcript</button></div>';
-            $nestedData[] = '<div  style="text-align:center;"><button class="btn btn-sm btn-default btn-default-success"><i class="fa fa-download margin-right"></i> Ijazah</button></div>';
+            $nestedData[] = $btnSKPI;
+            $nestedData[] = $btnTranscript;
+            $nestedData[] = $btnIjazah;
 
             $no++;
 

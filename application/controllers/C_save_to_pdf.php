@@ -3006,6 +3006,9 @@ class C_save_to_pdf extends CI_Controller {
 
         $dataStudent = $this->m_save_to_pdf->getTranscript($data_arr['DBStudent'],$data_arr['NPM']);
 
+//        print_r($dataStudent);
+//        exit;
+
         $pdf = new FPDF('P','mm','legal');
 
         // membuat halaman baru
@@ -3459,9 +3462,9 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(190,3,'','B',1,'L');
 
         $tx = 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s
-standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a
-type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining
-essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum';
+                standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a
+                type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining
+                essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum';
         $pdf->Ln(1.5);
         $pdf->SetFont('dinprolight','',9);
         $pdf->SetWidths(array(190));
