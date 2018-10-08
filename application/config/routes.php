@@ -522,6 +522,11 @@ $route['finance/config/policysys/modalform'] =  'page/finance/c_config/policy_sy
 $route['finance/config/policysys/submit'] =  'page/finance/c_config/policy_sys_submit';
 
 
+// --- Student Life ----
+$route['student-life/diploma-supplement'] =  'page/student-life/c_studentlife/diploma_supplement';
+$route['student-life/diploma-supplement/list-student'] =  'page/student-life/c_studentlife/diploma_supplement';
+
+
 // ---global---
 $route['loadDataRegistrationBelumBayar'] =  'api/C_global/loadDataRegistrationBelumBayar';
 $route['loadDataRegistrationTelahBayar'] =  'api/C_global/load_data_registration_telah_bayar';

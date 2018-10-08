@@ -1,4 +1,5 @@
 
+
 <style>
     #tableStudent thead tr {
         background: #436888;
@@ -8,6 +9,7 @@
         text-align: center;
     }
 </style>
+
 
 <div class="row" style="margin-top: 10px;">
     <div class="col-md-12" style="text-align: right;">
@@ -32,15 +34,17 @@
     </div>
 </div>
 
+
 <div class="row">
     <div class="col-md-12">
         <div id="viewDataTr"></div>
     </div>
 </div>
 
-<script>
-    $(document).ready(function () {
 
+<script>
+
+    $(document).ready(function () {
         loadSelectOptionCurriculumASC('#filterCurriculum','');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
 
@@ -57,20 +61,6 @@
 
         },1000);
 
-    });
-
-    $('.filter-transcript').change(function () {
-        loadStudent();
-    });
-
-    $(document).on('click','.btnDowloadTranscript',function () {
-        var NPM = $(this).attr('data-npm');
-        var DBStudent = $(this).attr('data-db');
-
-        var token = jwt_encode({NPM:NPM,DBStudent:DBStudent},'UAP)(*');
-        $('#formGlobalToken').attr('action',base_url_js+'save2pdf/transcript');
-        $('#dataToken').val(token);
-        $('#formGlobalToken').submit();
     });
 
     function loadStudent() {
@@ -90,7 +80,7 @@
                     '                    <th style="width: 5%;">NIM</th>' +
                     '                    <th>Student</th>' +
                     '                    <th style="width: 13%;">Prodi</th>' +
-                    '                    <th style="width: 5%;">SKPI</th>' +
+                    '                    <th style="width: 5%;">IPK</th>' +
                     '                    <th style="width: 10%;">Transcript</th>' +
                     '                    <th style="width: 7%;">Ijazah</th>' +
                     '                </tr>' +
@@ -129,28 +119,4 @@
 
     }
 
-    function loadStudent2() {
-
-        var filterCurriculum = $('#filterCurriculum').val();
-        var filterBaseProdi = $('#filterBaseProdi').val();
-
-        if(filterCurriculum!='' && filterCurriculum!=null
-            && filterBaseProdi!='' && filterBaseProdi!=null){
-
-            var token = jwt_encode({
-                action : 'readStudent',
-                Year : filterCurriculum.split('.')[1],
-                ProdiID : filterBaseProdi.split('.')[0]
-            },'UAP)(*');
-            var url = base_url_js+'api/__crudTranscript';
-            
-            $.post(url,{token:token},function (jsonResult) {
-                console.log(jsonResult);
-            });
-
-
-
-        }
-
-    }
 </script>
