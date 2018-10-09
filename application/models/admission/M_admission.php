@@ -686,6 +686,7 @@ class M_admission extends CI_Model {
               'FormulirCodeOffline' => $input_arr['selectFormulirCode'],
               'PIC' => $input_arr['PIC'],
               'ID_ProgramStudy' => $input_arr['selectProgramStudy'],
+              'ID_ProgramStudy2' => $input_arr['selectProgramStudy2'],
               'FullName' => $input_arr['Name'],
               'Gender' => $input_arr['selectGender'],
               'HomeNumber' => $input_arr['telp_rmh'],

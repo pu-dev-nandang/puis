@@ -21,15 +21,16 @@
                   <div class="widget-content">
                         <div class="panel with-nav-tabs panel-primary">
                             <div class="panel-heading">
-                                    <ul class="nav nav-tabs">
-                                        <li class="active">
-                                          <a href="#tab1primary" data-toggle="tab">Input Penjualan</a>
-                                        </li>
-                                        <li><a href="#tab2primary" data-toggle="tab">List Penjualan</a></li>
-                                    </ul>
+                              <ul class="nav nav-tabs">
+                                  <li class="active">
+                                    <a href="#tab1primary" data-toggle="tab">Input Penjualan</a>
+                                  </li>
+                                  <li><a href="#tab2primary" data-toggle="tab">List Penjualan</a></li>
+                              </ul>
                             </div>
                             <div class="panel-body">
                                 <div class="tab-content">
+                                    <!-- tab 1-->
                                     <div class="tab-pane fade in active btn-add" id="tab1primary">
                                           <!-- <div class="panel panel-default"> -->
                                                 <div class="panel panel-primary">
@@ -38,15 +39,21 @@
                                                   </div>
                                                   <div class="panel-body">
                                                       <div class = "row">     
-                                                            <div class="col-xs-3" style="">
+                                                            <div class="col-xs-2" style="">
                                                                   Formulir Code
                                                                   <select class="select2-select-00 col-md-4 full-width-fix" id="selectFormulirCode">
                                                                       <option></option>
                                                                   </select>
                                                             </div>
                                                             <div class="col-xs-3" style="">
-                                                                  Program Study
+                                                                  Program Study 1
                                                                   <select class="select2-select-00 col-md-4 full-width-fix" id="selectProgramStudy">
+                                                                      <option></option>
+                                                                  </select>
+                                                            </div>
+                                                            <div class="col-xs-3" style="">
+                                                                  Program Study 2
+                                                                  <select class="select2-select-00 col-md-4 full-width-fix" id="selectProgramStudy2">
                                                                       <option></option>
                                                                   </select>
                                                             </div>
@@ -183,6 +190,7 @@
                                                 </div>
                                                 <!-- </div> -->
                                     </div>
+                                    <!-- tab 2-->
                                     <div class="tab-pane fade btn-read" id="tab2primary">
                                           <div class = "row">     
                                                 <div class="col-xs-2" style="">
@@ -247,7 +255,6 @@
                 {
                   for(var i=0;i<data_json.length;i++){
                       var selected = (i==0) ? 'selected' : '';
-                      //$('#selectWilayah').append('<option value="'+data_json['data'][i].kode_wilayah+'" '+selected+'>'+data_json['data'][i].nama+'</option>');
                       $('#selectFormulirCode').append('<option value="'+data_json[i].FormulirCode+'" '+''+'>'+data_json[i].FormulirCode+'</option>');
                   }
                   $('#selectFormulirCode').select2({
@@ -293,16 +300,22 @@
 	function loadProgramStudy()
 	{
 		var url = base_url_js+"api/__getBaseProdiSelectOption";
-		$('#selectProgramStudy').empty();
+            $('#selectProgramStudy').empty();
+		$('#selectProgramStudy2').empty();
+            $('#selectProgramStudy2').append('<option value="'+0+'" '+'selected'+'>'+'--No Choice--'+'</option>');
 		$.post(url,function (data_json) {
 		      for(var i=0;i<data_json.length;i++){
 		          var selected = (i==0) ? 'selected' : '';
 		          //var selected = (data_json[i].RegionName=='Kota Jakarta Pusat') ? 'selected' : '';
-		          $('#selectProgramStudy').append('<option value="'+data_json[i].ID+'" '+selected+'>'+data_json[i].Name+'</option>');
+                      $('#selectProgramStudy').append('<option value="'+data_json[i].ID+'" '+selected+'>'+data_json[i].Name+'</option>');
+		          $('#selectProgramStudy2').append('<option value="'+data_json[i].ID+'" '+''+'>'+data_json[i].Name+'</option>');
 		      }
 		      $('#selectProgramStudy').select2({
 		         //allowClear: true
 		      });
+                  $('#selectProgramStudy2').select2({
+                     //allowClear: true
+                  });
 		}).done(function () {
 		  
 		});
@@ -444,6 +457,7 @@
 		DomRadioChannel();
 		loadPIC();
 		$('#priceFormulir').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+
 	});
 
 	$(document).on('change','#selectEvent', function () {
@@ -456,7 +470,8 @@
     $(document).on('click','#btn-proses', function () {
     	loading_button('#btn-proses');
     	 var selectFormulirCode = $("#selectFormulirCode").val();
-    	 var selectProgramStudy = $("#selectProgramStudy").val();
+       var selectProgramStudy = $("#selectProgramStudy").val();
+    	 var selectProgramStudy2 = $("#selectProgramStudy2").val();
     	 var Name = $("#Name").val().trim();
     	 var hp = $("#hp").val().trim();
     	 var email = $("#email").val().trim();
@@ -482,6 +497,7 @@
     	     Action : aksi,
     	     selectFormulirCode : selectFormulirCode,
     	     selectProgramStudy:selectProgramStudy,
+           selectProgramStudy2 : selectProgramStudy2,
     	     Name : Name,
     	     hp : hp,
     	     email : email,
