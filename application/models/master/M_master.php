@@ -373,7 +373,7 @@ class M_master extends CI_Model {
 
     public function getDataFormulirOffline($tahun)
     {
-        $sql = "select a.No_Ref,a.ID,a.Years,a.FormulirCode,a.Status,a.CreateAT,b.Name,a.Link,a.Print from db_admission.formulir_number_offline_m as a join db_employees.employees as b on a.CreatedBY = b.NIP where a.Years = ?";
+        $sql = "select a.No_Ref,a.ID,a.Years,a.FormulirCode,a.Status,a.CreateAT,b.Name,a.Link,a.Print from db_admission.formulir_number_offline_m as a join db_employees.employees as b on a.CreatedBY = b.NIP where a.Years = ? order by a.Print asc,a.FormulirCode asc";
         $query=$this->db->query($sql, array($tahun))->result_array();
         return $query;
     }
