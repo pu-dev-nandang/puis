@@ -4391,7 +4391,7 @@ Phone: (021) 29200456';
         $InputDate = $input['date'];
         $InputDate = explode('-', $InputDate);
         $bulanRomawi = $this->m_master->romawiNumber($InputDate[1]);
-        $nomorWr = $InputDate[0].' / '.$bulanRomawi.'FRM'.' / '.' MKT-PU-'.$ta.' / '.$input['NumForm'];
+        $nomorWr = $InputDate[0].' / '.$bulanRomawi.' / FRM'.' / '.'MKT-PU-'.$ta.' / '.$input['NumForm'];
 
 
             $fpdf = new Fpdf('L', 'mm', array(216, 140));

@@ -743,6 +743,29 @@
       var formulir = $(this).attr('formulir');
       NoFormRef = (NoFormRef != "" || NoFormRef != null) ? NoFormRef : formulir;
 
+      $("#NumForm").keypress(function(event)
+      {
+
+           if (event.keyCode == 10 || event.keyCode == 13) {
+             var NumForm = $('#NumForm').val();
+             data = {
+               NoFormRef : NoFormRef ,
+               namalengkap : namalengkap ,
+               hp : hp ,
+               jurusan :  jurusan ,
+               pembayaran :  pembayaran,
+               jenis : jenis ,
+               jumlah : jumlah ,
+               date : date,
+               NumForm : NumForm,
+             }
+             var token = jwt_encode(data,"UAP)(*");
+             FormSubmitAuto(url, 'POST', [
+                 { name: 'token', value: token },
+             ]); 
+           }
+      }); // exit enter
+
       $("#confirmYes").click(function(){
           var NumForm = $('#NumForm').val();
           data = {
