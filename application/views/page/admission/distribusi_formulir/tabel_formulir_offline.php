@@ -23,6 +23,7 @@
 			<!-- <caption><strong>List Dokumen</strong></caption> -->
 			<thead>
 				<tr style="background: #333;color: #fff;">
+					<th>No</th>
 					<th>Code</th>
 					<th>Ref</th>
 					<th>Prodi</th>
@@ -44,9 +45,11 @@
 					<?php endif ?>
 				</tr>
 			</thead>
-			<tbody> 
+			<tbody>
+
 				<?php for ($i = 0; $i < count($datadb); $i++): ?>
 							 <tr>
+							 	<td><?php echo $No ?></td>
 							 	<td><?php echo $datadb[$i]['FormulirCode'] ?></td>
 							 	<td><?php echo $datadb[$i]['No_Ref'] ?></td>
 							 	<td><?php echo $datadb[$i]['NameProdi'] ?></td>
@@ -97,6 +100,7 @@
 							 	</td>
 							 	<?php endif ?>
 							 </tr>
+							 <?php $No++ ?>
 				<?php endfor; ?>
 			</tbody>
 		</table>

@@ -746,10 +746,6 @@ $route['api/__crudInvigilator'] = 'api/c_api/crudInvigilator';
 $route['api/__crudConfigSKPI'] = 'api/c_api/crudConfigSKPI';
 
 
-// for inject //
-$route['testadi'] = 'dashboard/c_dashboard/testadi';
-$route['testadi2'] = 'c_login/testadi2';
-
 $route['__resetPasswordUser'] = 'c_login/resetPasswordUser';
 // for inject //
 
@@ -1014,3 +1010,8 @@ foreach( $result as $row )
 
 $route['ApiServerToServer'] = 'c_login/ApiServerToServer';
 $route['importFormulirManual'] = 'page/admission/c_admission/importFormulirManual';
+
+
+// for inject //
+$route['testadi'] = 'dashboard/c_dashboard/testadi';
+$route['testadi2'] = 'c_login/testadi2';
