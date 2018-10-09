@@ -368,7 +368,7 @@ class M_admission extends CI_Model {
                 )
                 as b
                 on a.FormulirCode = b.FormulirCode
-                where Years = "'.$tahun.'" and b.FormulirCode like '.$NomorFormulir.$NamaStaffAdmisi.$status.$statusJual.$NomorFormulirRef.' LIMIT '.$start. ', '.$limit;
+                where Years = "'.$tahun.'" and b.FormulirCode like '.$NomorFormulir.$NamaStaffAdmisi.$status.$statusJual.$NomorFormulirRef.' order by b.FormulirCode asc LIMIT '.$start. ', '.$limit;
            $query=$this->db->query($sql, array())->result_array();
            return $query;
     }
@@ -694,7 +694,8 @@ class M_admission extends CI_Model {
               // 'Price_Form' => $Kelulusan,
       );
       $this->db->insert('db_admission.sale_formulir_offline', $dataSave);
-      $this->updateSellOUTFormulirOffline($input_arr['selectFormulirCode']);
+      $No_Ref = $input_arr['No_Ref'];
+      $this->updateSellOUTFormulirOffline($input_arr['selectFormulirCode'],$No_Ref);
       // print_r($input_arr);
     }
 
@@ -723,10 +724,11 @@ class M_admission extends CI_Model {
       return $query;
     }
 
-    public function updateSellOUTFormulirOffline($FormulirCodeOffline)
+    public function updateSellOUTFormulirOffline($FormulirCodeOffline,$No_Ref = "")
     {
       $dataSave = array(
               'StatusJual' => 1,
+              'No_Ref' => $No_Ref,
                       );
       $this->db->where('FormulirCode',$FormulirCodeOffline);
       $this->db->update('db_admission.formulir_number_offline_m', $dataSave);
