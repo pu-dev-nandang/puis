@@ -528,6 +528,10 @@ $route['student-life/diploma-supplement'] =  'page/student-life/c_studentlife/di
 $route['student-life/diploma-supplement/list-student'] =  'page/student-life/c_studentlife/diploma_supplement';
 
 
+// --- LPMI ----
+$route['lpmi/lecturer-evaluation/list-lecturer'] =  'page/lpmi/c_lpmi/edom_list_lecturer';
+
+
 // ---global---
 $route['loadDataRegistrationBelumBayar'] =  'api/C_global/loadDataRegistrationBelumBayar';
 $route['loadDataRegistrationTelahBayar'] =  'api/C_global/load_data_registration_telah_bayar';

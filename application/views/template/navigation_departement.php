@@ -62,14 +62,25 @@
                 </a>
             </li>
 
-            <li class="departement <?php if($departement=='cooperation'){echo 'current';} ?>"
+            <li class="departement <?php if($departement=='student-life'){echo 'current';} ?>"
                 division="16"
                 data-dpt="student-life">
                 <a href="javascript:void(0);">
-                    <span class="image"><img src="<?php echo base_url('assets/icon/student_live.png'); ?>"></span>
+                    <span class="image"><img src="<?php echo base_url('assets/icon/student_life.png'); ?>"></span>
                     <span class="title">Student Life</span>
                 </a>
-            </li>    
+            </li>
+
+
+            <li class="departement <?php if($departement=='lpmi'){echo 'current';} ?>"
+                division="5"
+                data-dpt="lpmi">
+                <a href="javascript:void(0);">
+                    <span class="image"><img src="<?php echo base_url('assets/icon/lpmi.png'); ?>"></span>
+                    <span class="title">LPMI</span>
+                </a>
+            </li>
+
             <li class="departement <?php if($departement=='purchasing'){echo 'current';} ?>"
                 division="4"
                 data-dpt="purchasing">

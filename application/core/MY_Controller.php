@@ -193,6 +193,13 @@ abstract class Student_Life extends Globalclass{
     }
 }
 
+abstract class Lpmi extends Globalclass{
+    public function __construct()
+    {
+        parent::__construct();
+    }
+}
+
 abstract class Admission_Controler extends Globalclass{
     // public $GlobalVariableAdi = array('url_registration' => 'http://10.1.10.230/register/');
     public $GlobalVariableAdi = array('url_registration' => 'http://demo.web.podomorouniversity.ac.id/registeronline/');
