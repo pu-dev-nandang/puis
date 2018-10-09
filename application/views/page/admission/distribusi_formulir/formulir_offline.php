@@ -54,6 +54,10 @@
                                                                   Tanggal
                                                                   <input type="text" name="tanggal" id= "tanggal" data-date-format="yyyy-mm-dd" placeholder="Date..." class="form-control">
                                                             </div>
+                                                            <div class="col-xs-2" style="">
+                                                                  No Ref
+                                                                  <input type="text" name="No_Ref" id= "No_Ref" placeholder="Input No Ref..." class="form-control">
+                                                            </div>
                                                       </div>
                                                       <br>
                                                       <div class="panel panel-primary">
@@ -143,8 +147,8 @@
                                                                               <tr>
                                                                                     <td>
                                                                                           <label class="radio-inline">
-                                                                                                            <input type="radio" name="tipeChannel" value = "School" class = "tipeChannel"> School
-                                                                                                      </label>
+                                                                                                <input type="radio" name="tipeChannel" value = "School" class = "tipeChannel"> School
+                                                                                          </label>
                                                                                     </td>
                                                                                     <td>
                                                                                           <input type="text" name="autoCompleteSchoolChanel" id= "autoCompleteSchoolChanel" placeholder="Autocomplete" class="form-control">
@@ -470,7 +474,8 @@
     	 var url = base_url_js+'admission/distribusi-formulir/formulir-offline/save';
     	 var PIC = $("#selectPIC").val();
     	 var priceFormulir = $("#priceFormulir").val();
-       var tanggal = $("#tanggal").val();
+       var tanggal = $("#tanggal").val(); 
+       var No_Ref = $("#No_Ref").val();
        // var output_ok = $('#output_ok').val();
         priceFormulir = priceFormulir.replace(".", "");
     	 var data = {
@@ -490,7 +495,8 @@
     	     CDID : CDID,
     	     priceFormulir : priceFormulir,
     	     PIC : PIC,
-           tanggal : tanggal
+           tanggal : tanggal,
+           No_Ref : No_Ref,
     	 };
 
     	 if (validationInput = validation2(data)) {
@@ -734,6 +740,8 @@
       var jenis = $(this).attr('jenis');
       var jumlah = $(this).attr('jumlah');
       var date = $(this).attr('date');
+      var formulir = $(this).attr('formulir');
+      NoFormRef = (NoFormRef != "" || NoFormRef != null) ? NoFormRef : formulir;
 
       $("#confirmYes").click(function(){
           var NumForm = $('#NumForm').val();

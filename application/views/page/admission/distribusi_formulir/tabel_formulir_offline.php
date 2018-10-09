@@ -86,7 +86,7 @@
 							 				</div>
 							 			   <div class="row" style="margin-top: 10px">
 							 			   	<div class="col-md-12">
-							 			   		<span ref = "<?php echo $datadb[$i]['No_Ref'] ?>" NamaLengkap = "<?php echo $datadb[$i]['NamaPembeli'] ?>" class="btn btn-xs btn-print" phonehome = "<?php echo $datadb[$i]['HomeNumberPembeli'] ?>" hp = "<?php echo $datadb[$i]['PhoneNumberPembeli'] ?>" jurusan = "<?php echo $datadb[$i]['NameProdi'] ?>" pembayaran ="Pembelian Form(<?php echo $datadb[$i]['No_Ref'] ?>)" jenis= "Cash" jumlah = "<?php echo $datadb[$i]['Price_Form'] ?>" date = "<?php echo $datadb[$i]['DateSale'] ?>">
+							 			   		<span ref = "<?php echo $datadb[$i]['No_Ref'] ?>" NamaLengkap = "<?php echo $datadb[$i]['NamaPembeli'] ?>" class="btn btn-xs btn-print" phonehome = "<?php echo $datadb[$i]['HomeNumberPembeli'] ?>" hp = "<?php echo $datadb[$i]['PhoneNumberPembeli'] ?>" jurusan = "<?php echo $datadb[$i]['NameProdi'] ?>" pembayaran ="Pembelian Form(<?php echo $datadb[$i]['No_Ref'] ?>)" jenis= "Cash" jumlah = "<?php echo $datadb[$i]['Price_Form'] ?>" date = "<?php echo $datadb[$i]['DateSale'] ?>" formulir = "<?php echo $datadb[$i]['FormulirCode'] ?>">
 								 			     <i class="fa fa-print"></i> Kwitansi
 								 			   </span>
 							 			   	</div>

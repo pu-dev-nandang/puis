@@ -324,12 +324,12 @@ class C_admission extends Admission_Controler {
               $this->m_admission->inserData_formulir_offline_sale_save($input);
               break;
           case 'edit':
-              $this->m_admission->editData_formulir_offline_sale_save($input);
+              // $this->m_admission->editData_formulir_offline_sale_save($input);
               break;
           case 'delete':
               $query = $this->m_master->caribasedprimary('db_admission.sale_formulir_offline','ID',$input['CDID']);
               $FormulirCode = $query[0]['FormulirCodeOffline'];
-              $this->m_master->delete_id_table($input['CDID'],'sale_formulir_offline');
+              $this->m_master->delete_id_table($input['CDID'],'db_admission.sale_formulir_offline');
               // print_r($FormulirCode);
               $this->m_master->updateStatusJual($FormulirCode);
               break;        
