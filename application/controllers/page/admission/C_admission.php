@@ -170,10 +170,11 @@ class C_admission extends Admission_Controler {
        }
 
        $this->load->library('pagination');
-       $config = $this->config_pagination_default_ajax($this->m_admission->totalDataFormulir_offline(),15,5);
+       $config = $this->config_pagination_default_ajax($this->m_admission->totalDataFormulir_offline2(),15,5);
        $this->pagination->initialize($config);
        $page = $this->uri->segment(5);
        $start = ($page - 1) * $config["per_page"];
+       $this->data['No'] = $start + 1;
        $this->data['datadb'] = $this->m_admission->selectDataDitribusiFormulirOffline($config["per_page"], $start,$tahun,$NomorFormulir,$NamaStaffAdmisi,$status,$statusJual,$NomorFormulirRef);
       $content = $this->load->view('page/'.'admission'.'/distribusi_formulir/tabel_formulir_offline',$this->data,true);
 
@@ -1551,7 +1552,7 @@ class C_admission extends Admission_Controler {
     {
       include APPPATH.'third_party/PHPExcel/PHPExcel.php';
       $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
-      $excel2 = $excel2->load('report_penjualan_data_18-10-02.xlsx'); // Empty Sheet
+      $excel2 = $excel2->load('report_penjualan_data_18-10-09.xlsx'); // Empty Sheet
       $objWorksheet = $excel2->setActiveSheetIndex(0);
       $CountRow = $objWorksheet->getHighestRow();
         
@@ -1689,6 +1690,15 @@ class C_admission extends Admission_Controler {
         $No_Ref = $FormulirCode;
         $FormulirCode = $query3[0]['FormulirCode'];
 
+        // check $No_Ref Unique
+        $sql23 = 'select * from db_admission.formulir_number_offline_m where No_Ref = ?';
+        $query23=$this->db->query($sql23, array($No_Ref))->result_array();
+
+        if(count($query23) > 0)
+        {
+          continue;
+        }
+
         $temp = array(
             'FormulirCodeOffline' => $FormulirCode,
             'DateSale' => $date,
@@ -1705,7 +1715,7 @@ class C_admission extends Admission_Controler {
             'price_event_ID' => '',
             'source_from_event_ID' => $source_from_event_ID,
             'SchoolIDChanel' => $SchoolID,
-            'Price_Form' => 300000,
+            'Price_Form' => 150000,
         );
         $this->db->insert('db_admission.sale_formulir_offline', $temp);
         $dataSave = array(

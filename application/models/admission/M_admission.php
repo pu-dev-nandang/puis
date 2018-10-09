@@ -234,6 +234,15 @@ class M_admission extends CI_Model {
       return $conVertINT;
     }
 
+    public function totalDataFormulir_offline2()
+    {
+      $sql = "select count(*) as total from db_admission.sale_formulir_offline
+              ";          
+      $query=$this->db->query($sql, array())->result_array();
+      $conVertINT = (int) $query[0]['total'];
+      return $conVertINT;
+    }
+
     public function totalDataFormulir_online()
     {
       $sql = "select count(*) as total from (
@@ -368,7 +377,7 @@ class M_admission extends CI_Model {
                 )
                 as b
                 on a.FormulirCode = b.FormulirCode
-                where Years = "'.$tahun.'" and b.FormulirCode like '.$NomorFormulir.$NamaStaffAdmisi.$status.$statusJual.$NomorFormulirRef.' order by b.FormulirCode asc LIMIT '.$start. ', '.$limit;
+                where Years = "'.$tahun.'" and b.FormulirCode like '.$NomorFormulir.$NamaStaffAdmisi.$status.$statusJual.$NomorFormulirRef.' and b.No_Ref != "" order by b.No_Ref asc LIMIT '.$start. ', '.$limit;
            $query=$this->db->query($sql, array())->result_array();
            return $query;
     }
