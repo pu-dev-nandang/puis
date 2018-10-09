@@ -1080,9 +1080,10 @@ class C_master extends Admission_Controler {
 
             $path = './document';
             $path = $path.'/'.$filename;
-            $this->mypdf->Output($path,'F');
+            // $this->mypdf->Output($path,'F');
             $this->m_master->updateStatusPrint($input['formulir_code']);
-            echo json_encode($filename);
+            $this->mypdf->Output($filename.'.pdf','I');
+            // echo json_encode($filename);
 
         }
         catch (Exception $e){
