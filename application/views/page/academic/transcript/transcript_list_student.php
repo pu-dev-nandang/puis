@@ -90,6 +90,7 @@
                     '                    <th style="width: 5%;">NIM</th>' +
                     '                    <th>Student</th>' +
                     '                    <th style="width: 13%;">Prodi</th>' +
+                    '                    <th style="width: 25%;">Certificate Serial Number</th>' +
                     '                    <th style="width: 5%;">SKPI</th>' +
                     '                    <th style="width: 10%;">Transcript</th>' +
                     '                    <th style="width: 7%;">Ijazah</th>' +
@@ -128,6 +129,60 @@
         },500);
 
     }
+
+
+    // CRUD CSN =======
+    // Edit
+    $(document).on('click','.btnEditCSN',function () {
+        var NPM = $(this).attr('data-npm');
+
+        $('#formCSN'+NPM+',.btnSaveCSN[data-npm='+NPM+']').removeClass('hide');
+        $('#viewCSN'+NPM+',.btnEditCSN[data-npm='+NPM+']').addClass('hide');
+
+        $('#formCSN'+NPM).focus();
+
+        $('.btnEditCSN').prop('disabled',true);
+
+    });
+
+    // Save
+    $(document).on('click','.btnSaveCSN',function () {
+       var NPM = $(this).attr('data-npm');
+
+       var formCSN = $('#formCSN'+NPM).val();
+       if(formCSN!='' && formCSN!=null){
+
+           loading_buttonSm('.btnSaveCSN[data-npm='+NPM+']');
+
+           var data = {
+             action : 'updateCSN',
+             NPM : NPM,
+             CSN : formCSN
+           };
+
+           var token = jwt_encode(data,'UAP)(*');
+           var url = base_url_js+'api/__crudTranscript';
+
+           $.post(url,{token:token},function (result) {
+
+               toastr.success('Data saved','Saved');
+               setTimeout(function () {
+                   $('#formCSN'+NPM+',.btnSaveCSN[data-npm='+NPM+']').addClass('hide');
+                   $('#viewCSN'+NPM+',.btnEditCSN[data-npm='+NPM+']').removeClass('hide');
+
+                   $('#viewCSN'+NPM).html(formCSN);
+                   $('.btnSaveCSN[data-npm='+NPM+'], .btnEditCSN').prop('disabled',false);
+                   $('.btnSaveCSN[data-npm='+NPM+']').html('<i class="fa fa-check-circle"></i>');
+               },500);
+
+           });
+
+       } else {
+           toastr.error('Form required','Error');
+           $('#formCSN'+NPM).css('border','1px solid red');
+       }
+
+    });
 
     function loadStudent2() {
 

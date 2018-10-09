@@ -4405,6 +4405,20 @@ class C_api extends CI_Controller {
                                     <b><i class="fa fa-user margin-right"></i> '.ucwords(strtolower($row['Name'])).'</b><br/>
                                         <a>'.$row['EmailPU'].'</a></div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['ProdiNameEng'].'</div>';
+            $nestedData[] = '<div  style="text-align:left;">
+                                    <div class="">
+                                        <div class="col-xs-10" style="padding-right: 0px;">
+                                            <input id="formCSN'.$row['NPM'].'" class="form-control hide" value="'.$row['CertificateSerialNumber'].'"/>
+                                            <span id="viewCSN'.$row['NPM'].'">'.$row['CertificateSerialNumber'].'</span>
+                                        </div>
+                                        <div class="col-xs-2">
+                                               
+                                            <button class="btn btn-sm btn-success btn-block btnSaveCSN hide" data-npm="'.$row['NPM'].'"><i class="fa fa-check-circle"></i></button>
+                                            <button class="btn btn-sm btn-default btn-block btnEditCSN" data-npm="'.$row['NPM'].'"><i class="fa fa-pencil-square-o"></i></button>   
+                                        </div>
+                                    </div>
+                                     
+                                    </div>';
             $nestedData[] = $btnSKPI;
             $nestedData[] = $btnTranscript;
             $nestedData[] = $btnIjazah;
@@ -4457,6 +4471,12 @@ class C_api extends CI_Controller {
                 $this->db->set('DescriptionEng', $data_arr['DescriptionEng']);
                 $this->db->where('ID', $data_arr['ID']);
                 $this->db->update('db_academic.education_level');
+                return print_r(1);
+            }
+            else if($data_arr['action']=='updateCSN'){
+                $this->db->set('CertificateSerialNumber', $data_arr['CSN']);
+                $this->db->where('NPM', $data_arr['NPM']);
+                $this->db->update('db_academic.auth_students');
                 return print_r(1);
             }
         }

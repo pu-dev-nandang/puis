@@ -3006,32 +3006,33 @@ class C_save_to_pdf extends CI_Controller {
 
         $dataStudent = $this->m_save_to_pdf->getTranscript($data_arr['DBStudent'],$data_arr['NPM']);
 
-//        print_r($dataStudent);
-//        exit;
+        $Student = $dataStudent['Student'][0];
+        $Transcript = $dataStudent['Transcript'][0];
 
         $pdf = new FPDF('P','mm','legal');
 
         // membuat halaman baru
-        $pdf->SetMargins(15,42.5,10);
+        $pdf->SetMargins(10,42.5,10);
         $pdf->AddPage();
 
         $pdf->SetFont('dinpromedium','',7);
-        $pdf->SetXY(15,5);
+        $pdf->SetXY(10,10);
         $pdf->Cell(125,7,'',0,0,'L');
         $pdf->Cell(21,7,'Nomor Transkrip / ',0,0,'L');
         $pdf->SetFont('dinlightitalic','',7);
         $pdf->Cell(21,7,'Transcript Number',0,0,'L');
         $pdf->SetFont('dinpromedium','',7);
-        $pdf->Cell(25,7,': xxxxx.xxxx.xxxx.x',0,1,'L');
+        $pdf->Cell(25,7,': '.$Student['CSN'],0,1,'L');
 
 
-        $pdf->SetFont('dinpromedium','',16);
-        $pdf->SetXY(15,20);
-        $pdf->Cell(0,7,'DAFTAR HASIL STUDI',0,1,'C');
-        $pdf->SetFont('dinlightitalic','',16);
-        $pdf->Cell(49,7,'',0,0,'C');
-        $pdf->Cell(94,7,'RECORD OF ACADEMIC ACHIEVEMENT','T',1,'C');
-        $pdf->SetXY(15,42.5);
+//        $pdf->SetFont('dinpromedium','',16);
+//        $pdf->SetXY(15,20);
+//        $pdf->Cell(0,7,'DAFTAR HASIL STUDI',0,1,'C');
+//        $pdf->SetFont('dinlightitalic','',16);
+//        $pdf->Cell(49,7,'',0,0,'C');
+//        $pdf->Cell(94,7,'RECORD OF ACADEMIC ACHIEVEMENT','T',1,'C');
+
+        $pdf->SetXY(10,43.5);
 
         $label_l = 44;
         $sparator_l = 3;
@@ -3043,8 +3044,7 @@ class C_save_to_pdf extends CI_Controller {
         $h=4;
         $border = 0;
 
-        $Student = $dataStudent['Student'][0];
-        $Transcript = $dataStudent['Transcript'][0];
+
 
         $pdf->SetFont('dinpromedium','',9);
         $pdf->Cell($label_l,$h,'Nama',$border,0,'L');
@@ -3150,8 +3150,9 @@ class C_save_to_pdf extends CI_Controller {
             $this->spasi_transcript_table($pdf,'B');
 
             if($pdf->GetY()>=310){
-                $pdf->SetMargins(15,10,10);
+                $pdf->SetMargins(10,10,10);
                 $pdf->AddPage();
+                $pdf->SetXY(10,43.5);
                 $this->header_transcript_table($pdf);
             }
         }
@@ -3225,33 +3226,36 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->Ln(7);
 
+        +$min = 25;
+        $borderttd = 0;
         $y = $pdf->GetY();
         $pdf->SetFont('dinpromedium','',9);
-        $pdf->Cell($w_Div,$h,'',0,0,'L');
-        $pdf->Cell($w_Div,$h,'Tempat dan Tanggal Diterbitkan',0,1,'L');
+        $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
+        $pdf->Cell($w_Div-$min,$h,'Tempat dan Tanggal Diterbitkan',$borderttd,1,'L');
 
 
         $pdf->SetFont('dinlightitalic','',8);
-        $pdf->Cell($w_Div,$h,'',0,0,'L');
-        $pdf->Cell($w_Div,$h,'Place Date Issued',0,1,'L');
+        $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
+        $pdf->Cell($w_Div-$min,$h,'Place Date Issued',$borderttd,1,'L');
 
         $pdf->SetFont('dinpromedium','',9);
-        $pdf->Cell($w_Div,$h,'',0,0,'L');
-        $pdf->Cell($w_Div,$h,$Transcript['PlaceIssued'].', '.strftime("%d %B %Y",strtotime($Transcript['DateIssued'])),0,1,'L');
+        $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
+        $pdf->Cell($w_Div-$min,$h,$Transcript['PlaceIssued'].', '.strftime("%d %B %Y",strtotime($Transcript['DateIssued'])),$borderttd,1,'L');
 
         $pdf->SetFont('dinlightitalic','',8);
-        $pdf->Cell($w_Div,$h,'',0,0,'L');
-        $pdf->Cell($w_Div,$h,$Transcript['PlaceIssued'].',  '.date('F d, Y',strtotime($Transcript['DateIssued'])),0,1,'L');
+        $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
+        $pdf->Cell($w_Div-$min,$h,$Transcript['PlaceIssued'].',  '.date('F d, Y',strtotime($Transcript['DateIssued'])),$borderttd,1,'L');
 
         $pdf->Ln(5);
 
+
         $pdf->SetFont('dinpromedium','',9);
-        $pdf->Cell($w_Div,$h,'Rektor',0,0,'L');
-        $pdf->Cell($w_Div,$h,'Dekan',0,1,'L');
+        $pdf->Cell($w_Div+$min,$h,'Rektor',$borderttd,0,'L');
+        $pdf->Cell($w_Div-$min,$h,'Dekan',$borderttd,1,'L');
 
         $pdf->SetFont('dinlightitalic','',8);
-        $pdf->Cell($w_Div,$h,'Rector',0,0,'L');
-        $pdf->Cell($w_Div,$h,'Dean',0,1,'L');
+        $pdf->Cell($w_Div+$min,$h,'Rector',$borderttd,0,'L');
+        $pdf->Cell($w_Div-$min,$h,'Dean',$borderttd,1,'L');
 
         $pdf->Ln(14);
 
@@ -3269,14 +3273,14 @@ class C_save_to_pdf extends CI_Controller {
 
 
         $pdf->SetFont('dinpromedium','',9);
-        $pdf->Cell($w_Div,$h,$Rektor,0,0,'L');
-        $pdf->Cell($w_Div,$h,$Dekan,0,1,'L');
+        $pdf->Cell($w_Div+$min,$h,$Rektor,$borderttd,0,'L');
+        $pdf->Cell($w_Div-$min,$h,$Dekan,$borderttd,1,'L');
 
         $pdf->SetFont('dinpromedium','',8);
-        $pdf->Cell($w_Div,$h,'NIK : '.$Rektorat['NIP'],0,0,'L');
-        $pdf->Cell($w_Div,$h,'NIK : '.$Student['NIP'],0,1,'L');
+        $pdf->Cell($w_Div+$min,$h,'NIK : '.$Rektorat['NIP'],$borderttd,0,'L');
+        $pdf->Cell($w_Div-$min,$h,'NIK : '.$Student['NIP'],$borderttd,1,'L');
 
-        $pdf->Rect(70, $y, 33, 45);
+        $pdf->Rect(90, $y, 33, 45);
 
 
         $nameF = str_replace(' ','_',strtoupper($Student['Name']));
