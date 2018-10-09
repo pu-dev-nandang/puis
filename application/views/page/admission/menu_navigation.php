@@ -4,11 +4,6 @@ if ($this->uri->segment(1) == 'dashboard') {
 }
 
 ?>
-<script type="text/javascript">
-    <?php if ($this->uri->segment(1) == 'dashboard'): ?>
-    window.location.href = base_url_js+'admission/dashboard';
-    <?php endif ?>
-</script>
 <div id="sidebar" class="sidebar-fixed">
     <div id="sidebar-content">
         <!--=== Navigation ===-->
@@ -16,79 +11,80 @@ if ($this->uri->segment(1) == 'dashboard') {
             <?php 
                 $getData  = $this->session->userdata('menu_admission_grouping');
                 for ($i=0; $i < count($getData); $i++) {
-                    $temp = array();
-                    $chkSubMenu1 = 0;
-                    $Slug = '';
-                    $uri = '';
-                    $uriSubMenu1 = ''; 
-                    $uriSubMenu2 = ''; 
-                    // check data  memiliki submenu1 dan submenu2
-                        #Submenu 1
-                        $SubMenu1_arr = $getData[$i]['Submenu'];
-                        for ($j=0; $j < count($SubMenu1_arr); $j++) {
-                            $temp2 = array(); 
-                            if ($SubMenu1_arr[$j]['SubMenu1']  != 'Empty') {
-                                $chkSubMenu1++;
-                                $temp2 = array('SubMenu1' => $SubMenu1_arr[$j]['SubMenu1']);
-                            }
-
-                            #Submenu2
-                            $chkSubMenu2 = 0;
-                            $SubMenu2_arr = $SubMenu1_arr[$j]['Submenu'];
-                            $data = array();
-                            for ($k=0; $k < count($SubMenu2_arr); $k++) { 
-                                if ($SubMenu2_arr[$k]['SubMenu2'] != 'Empty') {
-                                    $data[] = array(
-                                        'ID' => $SubMenu2_arr[$k]['ID'],
-                                        'ID_Menu' => $SubMenu2_arr[$k]['ID_Menu'],
-                                        'SubMenu1' => $SubMenu2_arr[$k]['SubMenu1'],
-                                        'SubMenu2' => $SubMenu2_arr[$k]['SubMenu2'],
-                                        'Slug' => $SubMenu2_arr[$k]['Slug'],
-                                        'Controller' => $SubMenu2_arr[$k]['Controller'],
-                                        'read' => $SubMenu2_arr[$k]['read'],
-                                        'write' => $SubMenu2_arr[$k]['write'],
-                                        'update' => $SubMenu2_arr[$k]['update'],
-                                        'delete' => $SubMenu2_arr[$k]['delete'],
-
-                                    );
-                                    $uri = $SubMenu2_arr[$k]['Slug'];
-                                    $t = explode('/', $uri);
-                                    $uriSubMenu1 = $t[1];
-                                    $uriSubMenu2 = $t[2];
-                                    $chkSubMenu2++;
-                                }
-                            }
-
-                            if ($chkSubMenu2 > 0) {
-                               $temp2 = $temp2 + array('CountSubMenu2' => $chkSubMenu2,'data' =>$data);
-                            }
-                            else
-                            {
-                                $data[] = array(
-                                        'ID' => $SubMenu2_arr[0]['ID'],
-                                        'ID_Menu' => $SubMenu2_arr[0]['ID_Menu'],
-                                        'SubMenu1' => $SubMenu2_arr[0]['SubMenu1'],
-                                        'SubMenu2' => $SubMenu2_arr[0]['SubMenu2'],
-                                        'Slug' => $SubMenu2_arr[0]['Slug'],
-                                        'Controller' => $SubMenu2_arr[0]['Controller'],
-                                        'read' => $SubMenu2_arr[0]['read'],
-                                        'write' => $SubMenu2_arr[0]['write'],
-                                        'update' => $SubMenu2_arr[0]['update'],
-                                        'delete' => $SubMenu2_arr[0]['delete'],
-
-                                );
-                                $temp2 = $temp2 + array('CountSubMenu2' => $chkSubMenu2,'data' =>$data);
-                            }
-
-                            $temp[] = $temp2;   
-                            
+                $temp = array();
+                $chkSubMenu1 = 0;
+                $Slug = '';
+                $uri = '';
+                $uriSubMenu1 = ''; 
+                $uriSubMenu2 = ''; 
+                // check data  memiliki submenu1 dan submenu2
+                    #Submenu 1
+                    $SubMenu1_arr = $getData[$i]['Submenu'];
+                    for ($j=0; $j < count($SubMenu1_arr); $j++) {
+                        $temp2 = array(); 
+                        if ($SubMenu1_arr[$j]['SubMenu1']  != 'Empty') {
+                            $chkSubMenu1++;
+                            $temp2 = array('SubMenu1' => $SubMenu1_arr[$j]['SubMenu1']);
                         }
 
-                        $open = (count($temp) > 0) ? 'open' : '';
-                    // closed php tag    
-                    ?>
-                    <?php $uriSubMenu1 = $SubMenu1_arr[0]['Submenu'][0]['Slug'] ?>
-                    <?php $uriSubMenu1 = explode('/', $uriSubMenu1)  ?>
+                        #Submenu2
+                        $chkSubMenu2 = 0;
+                        $SubMenu2_arr = $SubMenu1_arr[$j]['Submenu'];
+                        $data = array();
+                        for ($k=0; $k < count($SubMenu2_arr); $k++) { 
+                            if ($SubMenu2_arr[$k]['SubMenu2'] != 'Empty') {
+                                $data[] = array(
+                                    'ID' => $SubMenu2_arr[$k]['ID'],
+                                    'ID_Menu' => $SubMenu2_arr[$k]['ID_Menu'],
+                                    'SubMenu1' => $SubMenu2_arr[$k]['SubMenu1'],
+                                    'SubMenu2' => $SubMenu2_arr[$k]['SubMenu2'],
+                                    'Slug' => $SubMenu2_arr[$k]['Slug'],
+                                    'Controller' => $SubMenu2_arr[$k]['Controller'],
+                                    'read' => $SubMenu2_arr[$k]['read'],
+                                    'write' => $SubMenu2_arr[$k]['write'],
+                                    'update' => $SubMenu2_arr[$k]['update'],
+                                    'delete' => $SubMenu2_arr[$k]['delete'],
+
+                                );
+                                $uri = $SubMenu2_arr[$k]['Slug'];
+                                $t = explode('/', $uri);
+                                $uriSubMenu1 = $t[1];
+                                $uriSubMenu2 = $t[2];
+                                $chkSubMenu2++;
+                            }
+                        }
+
+                        if ($chkSubMenu2 > 0) {
+                           $temp2 = $temp2 + array('CountSubMenu2' => $chkSubMenu2,'data' =>$data);
+                        }
+                        else
+                        {
+                            $data[] = array(
+                                    'ID' => $SubMenu2_arr[0]['ID'],
+                                    'ID_Menu' => $SubMenu2_arr[0]['ID_Menu'],
+                                    'SubMenu1' => $SubMenu2_arr[0]['SubMenu1'],
+                                    'SubMenu2' => $SubMenu2_arr[0]['SubMenu2'],
+                                    'Slug' => $SubMenu2_arr[0]['Slug'],
+                                    'Controller' => $SubMenu2_arr[0]['Controller'],
+                                    'read' => $SubMenu2_arr[0]['read'],
+                                    'write' => $SubMenu2_arr[0]['write'],
+                                    'update' => $SubMenu2_arr[0]['update'],
+                                    'delete' => $SubMenu2_arr[0]['delete'],
+
+                            );
+                            $temp2 = $temp2 + array('CountSubMenu2' => $chkSubMenu2,'data' =>$data);
+                        }
+
+                        $temp[] = $temp2;   
+                        
+                    }
+
+                    $open = (count($temp) > 0) ? 'open' : '';
+                // closed php tag    
+                ?>
+                <?php $uriSubMenu1 = $SubMenu1_arr[0]['Submenu'][0]['Slug'] ?>
+                <?php $uriSubMenu1 = explode('/', $uriSubMenu1)  ?>
+                <?php if (array_key_exists(1, $uriSubMenu1)): ?>
                     <?php $uriSubMenu1 = $uriSubMenu1[1]  ?>
                     <li segment2 = "<?php echo $uriSubMenu1 ?>" class="<?php if($this->uri->segment(2)==$uriSubMenu1){echo "current ".$open;} ?>">
                         <a href="<?php echo $a = ($open == 'open') ? '#' : $uri ?>">
@@ -164,12 +160,21 @@ if ($this->uri->segment(1) == 'dashboard') {
                                 <?php endfor ?>    
                             </ul>        
                         <?php endif ?>
-                    </li>            
-            <?php         
+                    </li>     
+                <?php else: ?>
+                    <?php $uriSubMenu1 = $uriSubMenu1[0]  ?>
+                    <li segment1 = "<?php echo $uriSubMenu1 ?>" class="<?php if($this->uri->segment(1)==$uriSubMenu1){echo "current ";} ?>">
+                        <a href="<?php echo base_url($uriSubMenu1); ?>">
+                            <i class="<?php echo ($getData[$i]['Menu'] == '' || $getData[$i]['Menu'] == null) ? 'fa fa-globe' :  $getData[$i]['Icon'] ?>" aria-hidden="true"></i>
+                                <?php echo $getData[$i]['Menu'] ?>
+                        </a>
+                    </li>
+                <?php endif ?>
+        <?php         
 
-                }    
+            }    
 
-             ?>
+         ?>
         </ul>
         <div class="sidebar-widget align-center">
             <div class="btn-group" data-toggle="buttons" id="theme-switcher">
