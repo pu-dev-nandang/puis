@@ -4919,4 +4919,58 @@ class C_api extends CI_Controller {
         }
     }
 
+    public function getLecturerEvaluation(){
+        $requestData= $_REQUEST;
+        $data_arr = $this->getInputToken();
+
+        $dataWhere = '';
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataSearch = ' AND ( em.Name LIKE "%'.$search.'%" OR em.NIP LIKE "%'.$search.'%" )';
+        }
+
+        $queryDefault = 'SELECT s.*, mk.Name AS Course, mk.NameEng AS CourseEng, mk.MKCode,  
+                                      em.Name AS CoordinatorName
+                                      FROM db_academic.schedule_details_course sdc
+                                      LEFT JOIN db_academic.schedule s ON (s.ID = sdc.ScheduleID)
+                                      LEFT JOIN db_academic.mata_kuliah mk ON (sdc.MKID = mk.ID)
+                                      LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                      WHERE ( s.SemesterID = "'.$data_arr['SemesterID'].'"  AND sdc.ProdiID = "'.$data_arr['ProdiID'].'" ) 
+                                      '.$dataSearch.' ORDER BY s.ID ASC ';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+        $no = $requestData['start'] + 1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++) {
+            $nestedData = array();
+            $row = $query[$i];
+
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div  style="text-align:left;">'.$row['CourseEng'].'</div>';
+            $nestedData[] = '<div  style="text-align:left;">'.$row['CoordinatorName'].'</div>';
+            $nestedData[] = '<div  style="text-align:center;">-</div>';
+            $nestedData[] = '<div  style="text-align:center;">-</div>';
+
+            $no++;
+
+            $data[] = $nestedData;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+
+        echo json_encode($json_data);
+    }
+
 }
