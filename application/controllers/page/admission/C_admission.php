@@ -170,7 +170,7 @@ class C_admission extends Admission_Controler {
        }
 
        $this->load->library('pagination');
-       $config = $this->config_pagination_default_ajax($this->m_admission->totalDataFormulir_offline2(),15,5);
+       $config = $this->config_pagination_default_ajax($this->m_admission->totalDataFormulir_offline3($tahun,$NomorFormulir,$NamaStaffAdmisi,$status,$statusJual,$NomorFormulirRef),10,5);
        $this->pagination->initialize($config);
        $page = $this->uri->segment(5);
        $start = ($page - 1) * $config["per_page"];
@@ -1730,6 +1730,31 @@ class C_admission extends Admission_Controler {
       // $this->db->insert_batch('db_admission.sale_formulir_offline', $arr_temp);
       // print_r($arr_temp);
 
+    }
+
+    public function ImportupdateNoKwitansi()
+    {
+      include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+            $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+            $excel2 = $excel2->load('report_penjualan_data_18-10-09_KWITANSI.xlsx'); // Empty Sheet
+            $objWorksheet = $excel2->setActiveSheetIndex(0);
+            $CountRow = $objWorksheet->getHighestRow();
+      for ($i=2; $i < ($CountRow + 1); $i++) {
+        $No_Ref = $objWorksheet->getCellByColumnAndRow(0, $i)->getCalculatedValue();
+        $NoKwitansi = $objWorksheet->getCellByColumnAndRow(13, $i)->getCalculatedValue();
+        $CreatedBY = $objWorksheet->getCellByColumnAndRow(14, $i)->getCalculatedValue();
+        // print_r($CreatedBY);die();
+        $get = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','No_Ref',$No_Ref);
+        if (count($get) > 0) {
+          $FormulirCodeOffline = $get[0]['FormulirCode'];
+          $dataSave = array(
+              'NoKwitansi' => $NoKwitansi,
+              'CreatedBY' => $CreatedBY,
+          );
+          $this->db->where('FormulirCodeOffline', $FormulirCodeOffline);
+          $this->db->update('db_admission.sale_formulir_offline', $dataSave);
+        }
+      }
     }
 
 }

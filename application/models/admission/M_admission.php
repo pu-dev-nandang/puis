@@ -234,6 +234,91 @@ class M_admission extends CI_Model {
       return $conVertINT;
     }
 
+    public function totalDataFormulir_offline3($tahun,$NomorFormulir,$NamaStaffAdmisi,$status,$statusJual,$NomorFormulirRef)
+    {
+
+      if($NomorFormulir != '%') {
+          $NomorFormulir = '"%'.$NomorFormulir.'%"'; 
+      }
+      else
+      {
+        $NomorFormulir = '"%"'; 
+      }
+
+      if($NomorFormulirRef != '%') {
+          $NomorFormulirRef = ' and b.No_Ref like "%'.$NomorFormulirRef.'%"'; 
+      }
+      else
+      {
+        $NomorFormulirRef = ''; 
+      }
+
+      if($NamaStaffAdmisi != '%') {
+          $NamaStaffAdmisi = ' and b.Sales like "%'.$NamaStaffAdmisi.'%"'; 
+      }
+      else
+      {
+        $NamaStaffAdmisi = ''; 
+      }
+      if($status != '%') {
+        // $status = '"%'.$status.'%"'; 
+        // $status = 'StatusUsed != '.$status;
+        $status = ' and b.Status = '.$status;
+      }
+      else
+      {
+        $status = ''; 
+      }
+
+      if($statusJual != '%') {
+        // $status = '"%'.$status.'%"'; 
+        // $status = 'StatusUsed != '.$status;
+        $statusJual = ' and b.StatusJual = '.$statusJual;
+      }
+      else
+      {
+        $statusJual = ''; 
+      }
+
+      $sql = 'select count(*) as total from (
+                  select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,b.No_Ref,a.StatusReg,b.Years,b.Status as StatusUsed, b.StatusJual,
+                                  b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,b.CityNameFormulir,b.DistrictNameFormulir,
+                                  b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi
+                                  from (
+                                  select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
+                                  from db_admission.register as a 
+                                  join db_admission.register_verification as b
+                                  on a.ID = b.RegisterID
+                                  join db_admission.register_verified as c
+                                  on c.RegVerificationID = b.ID
+                                  join db_admission.school as z
+                                  on z.ID = a.SchoolID
+                                  where a.StatusReg = 1
+                                  ) as a right JOIN
+                                  (
+                                  select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,
+                                  b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,
+                                  if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,b.ID_ProgramStudy,y.Name as NameProdi
+                                  from db_admission.formulir_number_offline_m as a
+                                  left join db_admission.sale_formulir_offline as b
+                                  on a.FormulirCode = b.FormulirCodeOffline
+                                  left join db_employees.employees as c
+                                  on c.NIP = b.PIC
+                                  left join db_admission.school as z
+                                  on z.ID = b.SchoolID
+                                  left join db_academic.program_study as y
+                                  on b.ID_ProgramStudy = y.ID
+                                  )
+                                  as b
+                                  on a.FormulirCode = b.FormulirCode
+                                  where Years = "'.$tahun.'" and b.FormulirCode like '.$NomorFormulir.$NamaStaffAdmisi.$status.$statusJual.$NomorFormulirRef.'
+              ) aa
+              ';          
+      $query=$this->db->query($sql, array())->result_array();
+      $conVertINT = (int) $query[0]['total'];
+      return $conVertINT;
+    }
+
     public function totalDataFormulir_offline2()
     {
       $sql = "select count(*) as total from db_admission.sale_formulir_offline
@@ -348,8 +433,8 @@ class M_admission extends CI_Model {
       }
 
         $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,b.No_Ref,a.StatusReg,b.Years,b.Status as StatusUsed, b.StatusJual,
-                b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,
-                b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi
+                b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,b.CityNameFormulir,b.DistrictNameFormulir,
+                b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi,b.NoKwitansi
                 from (
                 select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
                 from db_admission.register as a 
@@ -362,8 +447,8 @@ class M_admission extends CI_Model {
                 where a.StatusReg = 1
                 ) as a right JOIN
                 (
-                select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,
-                b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,
+                select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,b.NoKwitansi,
+                b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,
                 if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,b.ID_ProgramStudy,y.Name as NameProdi
                 from db_admission.formulir_number_offline_m as a
                 left join db_admission.sale_formulir_offline as b
@@ -377,7 +462,7 @@ class M_admission extends CI_Model {
                 )
                 as b
                 on a.FormulirCode = b.FormulirCode
-                where Years = "'.$tahun.'" and b.FormulirCode like '.$NomorFormulir.$NamaStaffAdmisi.$status.$statusJual.$NomorFormulirRef.' and b.No_Ref != "" order by b.No_Ref asc LIMIT '.$start. ', '.$limit;
+                where Years = "'.$tahun.'" and b.FormulirCode like '.$NomorFormulir.$NamaStaffAdmisi.$status.$statusJual.$NomorFormulirRef.' order by b.No_Ref asc LIMIT '.$start. ', '.$limit;
            $query=$this->db->query($sql, array())->result_array();
            return $query;
     }
@@ -1892,6 +1977,50 @@ class M_admission extends CI_Model {
               
       $query=$this->db->query($sql, array())->result_array();
       return $query[0]['total'];    
+    }
+
+    public function getSaleFormulirOfflineBetwwen($date1,$date2,$SelectSetTa,$SelectSortBy)
+    {
+      $sql = 'select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,
+                b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,b.Gender,
+                if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,b.ID_ProgramStudy,
+                y.Name as NameProdi1,b.Channel,
+                if(b.ID_ProgramStudy2 = 0,"", (select Name from db_academic.program_study where ID = b.ID_ProgramStudy2 limit 1) ) as NameProdi2
+                from db_admission.formulir_number_offline_m as a
+                join db_admission.sale_formulir_offline as b
+                on a.FormulirCode = b.FormulirCodeOffline
+                left join db_employees.employees as c
+                on c.NIP = b.PIC
+                left join db_admission.school as z
+                on z.ID = b.SchoolID
+                left join db_academic.program_study as y
+                on b.ID_ProgramStudy = y.ID
+                where b.DateSale >= "'.$date1.'" and b.DateSale <= "'.$date2.'" and a.Years = ? order by '.$SelectSortBy.' asc
+                ';
+      $query=$this->db->query($sql, array($SelectSetTa))->result_array();
+      return $query;             
+    }
+
+    public function getSaleFormulirOfflinePerMonth($SelectMonth,$SelectYear,$SelectSetTa,$SelectSortBy)
+    {
+      $sql = 'select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,
+                b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,b.Gender,
+                if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,b.ID_ProgramStudy,
+                y.Name as NameProdi1,b.Channel,
+                if(b.ID_ProgramStudy2 = 0,"", (select Name from db_academic.program_study where ID = b.ID_ProgramStudy2 limit 1) ) as NameProdi2
+                from db_admission.formulir_number_offline_m as a
+                join db_admission.sale_formulir_offline as b
+                on a.FormulirCode = b.FormulirCodeOffline
+                left join db_employees.employees as c
+                on c.NIP = b.PIC
+                left join db_admission.school as z
+                on z.ID = b.SchoolID
+                left join db_academic.program_study as y
+                on b.ID_ProgramStudy = y.ID
+                where YEAR(b.DateSale) = "'.$SelectYear.'" AND MONTH(b.DateSale) = "'.$SelectMonth.'" and a.Years = ? order by '.$SelectSortBy.' asc
+                ';
+      $query=$this->db->query($sql, array($SelectSetTa))->result_array();
+      return $query;             
     }
 
 }

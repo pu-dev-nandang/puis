@@ -146,6 +146,7 @@
                 toastr.success('Data berhasil disimpan', 'Success!');
                 $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
                 loadTable();
+                $('#GlobalModal').modal('hide');
              },500);
          });
      }
