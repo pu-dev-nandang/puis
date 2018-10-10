@@ -3538,7 +3538,9 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinlightitalic','',$fn_i);
         $pdf->Cell($fillFull,$h,'and conferred the right and privileges pertaining to this degree.',$border,1,'L');
 
+        $y = $pdf->GetY()+7;
         $pdf->Ln(14);
+
         // 171.5
         // Tanda tangan
 
@@ -3579,6 +3581,8 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetX($x+10);
         $pdf->Cell(138.5,$h,'NIK : '.$Rektorat['NIP'],$border,0,'L');
         $pdf->Cell(41,$h,'NIK : '.$Rektorat['NIP'],$border,1,'L');
+
+        $pdf->Rect($x+95, $y, 33, 45);
 
 
         $nameF = str_replace(' ','_',strtoupper($Student['Name']));
