@@ -530,6 +530,8 @@ $route['student-life/diploma-supplement/list-student'] =  'page/student-life/c_s
 
 // --- LPMI ----
 $route['lpmi/lecturer-evaluation/list-lecturer'] =  'page/lpmi/c_lpmi/edom_list_lecturer';
+$route['lpmi/lecturer-evaluation/list-question'] =  'page/lpmi/c_lpmi/edom_list_question';
+$route['lpmi/lecturer-evaluation/crud-question/(:any)/(:num)'] =  'page/lpmi/c_lpmi/crudQuestion/$1/$2';
 
 
 // ---global---
@@ -688,6 +690,8 @@ $route['api/__crudScore'] = 'api/c_api/crudScore';
 $route['api/__crudAttendance'] = 'api/c_api/crudAttendance';
 $route['api/__crudScheduleExchange'] = 'api/c_api/crudScheduleExchange';
 $route['api/__crudLimitCredit'] = 'api/c_api/crudLimitCredit';
+
+$route['api/__crudLecturerEvaluation'] = 'api/c_api/crudLecturerEvaluation';
 
 $route['api/database/__getListStudent'] = 'api/c_api/getListStudent';
 $route['api/database/upload_photo_student'] = 'page/academic/c_akademik/upload_photo_student';

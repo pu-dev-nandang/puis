@@ -28,5 +28,19 @@ class C_lpmi extends Lpmi {
         $this->menu_edom($page);
     }
 
+    public function edom_list_question()
+    {
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/edom/question',$data,true);
+        $this->menu_edom($page);
+    }
+
+    public function crudQuestion($action,$ID)
+    {
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/edom/crudQuestion',$data,true);
+        $this->menu_edom($page);
+    }
+
 
 }

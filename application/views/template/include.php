@@ -771,6 +771,21 @@
         });
     }
 
+    function loadSelectOptionCategoryLecturerEvaluation(element,selected) {
+        var url = base_url_js+'api/__crudLecturerEvaluation';
+        var token = jwt_encode({action:'readLECategory'},'UAP)(*');
+        $.post(url,{token:token},function (jsonResult) {
+
+            if(jsonResult.length>0){
+                for(var i=0;i<jsonResult.length;i++){
+                    var d = jsonResult[i];
+                    var sc = (selected!='' && selected==d.ID) ? 'selected' : '';
+                    $(element).append('<option value="'+d.ID+'" '+sc+'>'+d.Category+'</option>');
+                }
+            }
+        });
+    }
+
     function momentRange(start,end) {
         // var fromDate = moment();
         // var toDate = moment().add(15, 'days');
