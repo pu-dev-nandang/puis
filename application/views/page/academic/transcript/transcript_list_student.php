@@ -73,6 +73,15 @@
         $('#formGlobalToken').submit();
     });
 
+    $(document).on('click','.btnDownloadIjazah',function () {
+        var NPM = $(this).attr('data-npm');
+        var DBStudent = $(this).attr('data-db');
+
+        var token = jwt_encode({NPM:NPM,DBStudent:DBStudent},'UAP)(*');
+        var url = base_url_js+'save2pdf/ijazah';
+        FormSubmitAuto(url,'POST',[{name : 'token', value : token}]);
+    });
+
     function loadStudent() {
         var filterCurriculum = $('#filterCurriculum').val();
         var filterBaseProdi = $('#filterBaseProdi').val();

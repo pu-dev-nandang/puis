@@ -4396,8 +4396,12 @@ class C_api extends CI_Controller {
                                                     <i class="fa fa-download margin-right"></i> Transcript</button></div>';
 
             $btnIjazah = '<div  style="text-align:center;">
-                            <a href="'.base_url('save2pdf/ijazah').'" target="_blank" class="btn btn-sm btn-default btn-default-success"><i class="fa fa-download margin-right"></i> Ijazah</a>
+                            <button class="btn btn-sm btn-default btn-default-success btnDownloadIjazah" data-db="'.$db_.'" data-npm="'.$row['NPM'].'"><i class="fa fa-download margin-right"></i> Ijazah</button>
                             </div>';
+
+//            $btnIjazah = '<div  style="text-align:center;">
+//                            <a href="'.base_url('save2pdf/ijazah').'" target="_blank" class="btn btn-sm btn-default btn-default-success"><i class="fa fa-download margin-right"></i> Ijazah</a>
+//                            </div>';
 
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div  style="text-align:left;"><b>'.$row['NPM'].'</b></div>';
