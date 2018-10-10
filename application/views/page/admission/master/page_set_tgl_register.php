@@ -71,6 +71,7 @@
                // jsonData = data_json;
                // var obj = JSON.parse(data_json); 
                // console.log(obj);
+               $('#GlobalModal').modal('hide');
            }).done(function() {
              loadTable(loadData);
            }).fail(function() {

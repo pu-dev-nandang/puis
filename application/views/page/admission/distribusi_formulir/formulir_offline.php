@@ -1,4 +1,4 @@
-<link href="<?php echo base_url('assets/custom/jquery-ui.css'); ?>" rel="stylesheet" type="text/css" />
+<!-- <link href="<?php echo base_url('assets/custom/jquery-ui.css'); ?>" rel="stylesheet" type="text/css" /> -->
 <!-- <script type="text/javascript" src="<?php echo base_url();?>assets/datepicker/bootstrap-datepicker.js"></script>
 <link href="<?php echo base_url();?>assets/datepicker/datepicker.css" rel="stylesheet" type="text/css"/> -->
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
@@ -218,8 +218,8 @@
                                                 <div class="col-xs-2" style="">
                                                       Status Jual
                                                       <select class="select2-select-00 col-md-4 full-width-fix" id="selectStatusJual">
-                                                          <option value= "%" selected>All</option>
-                                                          <option value= "1">SoldOut</option>
+                                                          <option value= "%">All</option>
+                                                          <option value= "1" selected>SoldOut</option>
                                                           <option value= "0">In</option>
                                                       </select>
                                                 </div>
@@ -230,8 +230,11 @@
                                           </div>
                                           <div class="row">
                                                 <div  class="col-xs-12" align="right" id="pagination_link"></div> 
+                                          </div>
+                                          <div class="row" style="margin-top: 10px;margin-left: 0px;margin-right: 0px">
+                                                <div id= "formulir_offline_table"></div>  
                                           </div> 
-                                          <div id= "formulir_offline_table"></div>     
+                                             
                                                 <!-- <div class = "table-responsive" id= "register_document_table"></div> -->
                                     </div>
                                 </div>    
@@ -741,12 +744,7 @@
     });
 
     $(document).on('click','.btn-print', function () {
-      $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Number Form ! </b> <br>' +
-          '<input type = "number" class = "form-control" id ="NumForm" style="margin: 0px 0px 15px; height: 30px; width: 329px;"><br>'+
-          '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
-          '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
-          '</div>');
-      $('#NotificationModal').modal('show');
+      var NoKwitansi = $(this).attr('nokwitansi');
       var url = base_url_js+'admission/export_kwitansi_formuliroffline';
       var NoFormRef = $(this).attr('ref');
       var namalengkap = $(this).attr('namalengkap');
@@ -758,6 +756,32 @@
       var date = $(this).attr('date');
       var formulir = $(this).attr('formulir');
       NoFormRef = (NoFormRef != "" || NoFormRef != null) ? NoFormRef : formulir;
+
+      if (NoKwitansi == "" || NoKwitansi == null) {
+          $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Number Form ! </b> <br>' +
+              '<input type = "number" class = "form-control" id ="NumForm"  maxlength="4" style="margin: 0px 0px 15px; height: 30px; width: 329px;"><br>'+
+              '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+              '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+              '</div>');
+          $('#NotificationModal').modal('show');
+      } else {
+        var NumForm = NoKwitansi;
+        data = {
+          NoFormRef : NoFormRef ,
+          namalengkap : namalengkap ,
+          hp : hp ,
+          jurusan :  jurusan ,
+          pembayaran :  pembayaran,
+          jenis : jenis ,
+          jumlah : jumlah ,
+          date : date,
+          NumForm : NumForm,
+        }
+        var token = jwt_encode(data,"UAP)(*");
+        FormSubmitAuto(url, 'POST', [
+            { name: 'token', value: token },
+        ]);
+      }
 
       $("#NumForm").keypress(function(event)
       {

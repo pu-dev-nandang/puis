@@ -1115,6 +1115,257 @@ class C_save_to_excel extends CI_Controller
         $write->save('php://output');
     }
 
+    public function export_PenjualanFormulirData()
+    {
+        $this->load->model('admission/m_admission');
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $Input = (array) $this->jwt->decode($token,$key);
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+        switch ($Input['cf']) {
+            case 0: // date range
+                $dateRange1 = $Input['dateRange1'];
+                $dateRange2 = $Input['dateRange2'];
+                $SelectSetTa = $Input['SelectSetTa'];
+                $SelectSortBy = $Input['SelectSortBy'];
+                $get = $this->m_admission->getSaleFormulirOfflineBetwwen($dateRange1,$dateRange2,$SelectSetTa,$SelectSortBy);
+                $title = 'Tanggal '.date('d M Y', strtotime($dateRange1)).' - '.date('d M Y', strtotime($dateRange2));
+                $this->exCel_PenjualanFormulirData($title,$get);
+                break;
+            case 1: // by Month
+               $SelectMonth = $Input['SelectMonth'];
+               $SelectYear = $Input['SelectYear'];
+               $SelectSetTa = $Input['SelectSetTa'];
+               $SelectSortBy = $Input['SelectSortBy'];
+               $get = $this->m_admission->getSaleFormulirOfflinePerMonth($SelectMonth,$SelectYear,$SelectSetTa,$SelectSortBy);
+               $title = 'Bulan '.date('F Y', strtotime($SelectYear.'-'.$SelectMonth.'-01'));
+               $this->exCel_PenjualanFormulirData($title,$get); 
+                break;
+            default:
+                # code...
+                break;
+        }
+    }
+
+    private function exCel_PenjualanFormulirData($title,$data)
+    {
+        // print_r($data);die();
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $objPHPExcel = new PHPExcel;
+        $sheet = $objPHPExcel->getActiveSheet();
+        $count = 5;
+        $phone = PHPExcel_Cell_DataType::TYPE_STRING;
+        
+        $sheet->setCellValue('A1', 'Laporan Penjualan Formulir');
+        $sheet->setCellValue('A2', $title);
+        
+        $sheet->setCellValue('A4', 'Form');
+        $sheet->setCellValue('B4', 'Tanggal');
+        $sheet->setCellValue('C4', 'PIC');
+        $sheet->setCellValue('D4', 'Nama');
+        $sheet->setCellValue('E4', 'Gender');
+        $sheet->setCellValue('F4', 'Jurusan 1');
+        $sheet->setCellValue('G4', 'Jurusan 2');
+        $sheet->setCellValue('H4', 'Phone Home');
+        $sheet->setCellValue('I4', 'Phone Mobile');
+        $sheet->setCellValue('J4', 'Email');
+        $sheet->setCellValue('K4', 'Sekolah');
+        $sheet->setCellValue('L4', 'Kota Sekolah');
+        $sheet->setCellValue('M4', 'Sumber Iklan');
+
+        for ($i=0; $i < count($data); $i++) { 
+            $sheet->setCellValue('A'.$count, ($data[$i]['No_Ref'] == "" || $data[$i]['No_Ref'] == null ) ? $data[$i]['FormulirCode'] : $data[$i]['No_Ref'] );
+            $sheet->setCellValue('B'.$count, date('d M Y', strtotime( $data[$i]['DateSale'] ) ) );
+            $sheet->setCellValue('C'.$count, $data[$i]['Sales']);
+            $sheet->setCellValue('D'.$count, $data[$i]['FullName']);
+            $sheet->setCellValue('E'.$count, ($data[$i]['Gender'] == "P") ? 'Perempuan' : 'Laki-Laki'  );
+            $sheet->setCellValue('F'.$count, $data[$i]['NameProdi1']);
+            $sheet->setCellValue('G'.$count, $data[$i]['NameProdi2']);
+            $sheet->setCellValueExplicit('H'.$count, $data[$i]['HomeNumber'], $phone);
+            $sheet->setCellValueExplicit('I'.$count, $data[$i]['PhoneNumber'], $phone);
+            $sheet->setCellValue('J'.$count, $data[$i]['Email']);
+            $sheet->setCellValue('K'.$count, $data[$i]['SchoolNameFormulir'].' '.$data[$i]['DistrictNameFormulir']);
+            $sheet->setCellValue('L'.$count, $data[$i]['CityNameFormulir']);
+            $sheet->setCellValue('M'.$count, $data[$i]['src_name']);
+            $count++;
+        }
+        
+        $objPHPExcel->setActiveSheetIndex(0)->mergeCells('A1:M1');
+        $objPHPExcel->setActiveSheetIndex(0)->mergeCells('A2:M2');
+        $sheet->getStyle('A1')->getFont()->setSize(16);
+        $sheet->getStyle('A2')->getFont()->setSize(12);
+        $sheet->getStyle('A1')->getFont()->setBold(true);
+        $sheet->getStyle('A2')->getFont()->setBold(true);
+        $sheet->getStyle('A4:M4')->getFont()->setBold(true);
+        
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A2')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A4:M4')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A4:M'.$count)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+        $sheet->getStyle('A4:M4')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('ABCAFF');
+        
+        $sheet->getColumnDimension('A')->setAutoSize(true);
+        $sheet->getColumnDimension('B')->setAutoSize(true);
+        $sheet->getColumnDimension('C')->setAutoSize(true);
+        $sheet->getColumnDimension('D')->setAutoSize(true);
+        $sheet->getColumnDimension('E')->setAutoSize(true);
+        $sheet->getColumnDimension('F')->setAutoSize(true);
+        $sheet->getColumnDimension('G')->setAutoSize(true);
+        $sheet->getColumnDimension('H')->setAutoSize(true);
+        $sheet->getColumnDimension('I')->setAutoSize(true);
+        $sheet->getColumnDimension('J')->setAutoSize(true);
+        $sheet->getColumnDimension('K')->setAutoSize(true);
+        $sheet->getColumnDimension('L')->setAutoSize(true);
+        $sheet->getColumnDimension('M')->setAutoSize(true);
+
+        $sheet->setTitle('Penjualan Form');
+        $objPHPExcel->setActiveSheetIndex(0);
+        $filename = 'report_penjualan_data_'.date('y-m-d').'.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="'.$filename.'"'); // Set nama file excel nya
+        header('Cache-Control: max-age=0');
+
+        $write = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $write->save('php://output');
+    }
+
+    public function export_PenjualanFormulirFinance()
+    {
+        $this->load->model('admission/m_admission');
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $Input = (array) $this->jwt->decode($token,$key);
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+        switch ($Input['cf']) {
+            case 0: // date range
+                $dateRange1 = $Input['dateRange1'];
+                $dateRange2 = $Input['dateRange2'];
+                $SelectSetTa = $Input['SelectSetTa'];
+                $SelectSortBy = $Input['SelectSortBy'];
+                $get = $this->m_admission->getSaleFormulirOfflineBetwwen($dateRange1,$dateRange2,$SelectSetTa,$SelectSortBy);
+                $title = 'Tanggal '.date('d M Y', strtotime($dateRange1)).' - '.date('d M Y', strtotime($dateRange2));
+                $this->exCel_PenjualanFormulirFinance($title,$get);
+                break;
+            case 1: // by Month
+               $SelectMonth = $Input['SelectMonth'];
+               $SelectYear = $Input['SelectYear'];
+               $SelectSetTa = $Input['SelectSetTa'];
+               $SelectSortBy = $Input['SelectSortBy'];
+               $get = $this->m_admission->getSaleFormulirOfflinePerMonth($SelectMonth,$SelectYear,$SelectSetTa,$SelectSortBy);
+               $title = 'Bulan '.date('F Y', strtotime($SelectYear.'-'.$SelectMonth.'-01'));
+               $this->exCel_PenjualanFormulirFinance($title,$get); 
+                break;
+            default:
+                # code...
+                break;
+        }
+    }
+
+    private function exCel_PenjualanFormulirFinance($title,$data)
+    {
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $objPHPExcel = new PHPExcel;
+        $sheet = $objPHPExcel->getActiveSheet();
+        $count = 5;
+        $buy = $free = 0;
+        $total = 0;
+        
+        //---------------------- table data ----------------------
+        $sheet->setCellValue('A1', 'Laporan Penjualan Formulir');
+        $sheet->setCellValue('A2', $title);
+        
+        $sheet->setCellValue('A4', 'No');
+        $sheet->setCellValue('B4', 'Tanggal');
+        $sheet->setCellValue('C4', 'Form');
+        $sheet->setCellValue('D4', 'Nama');
+        $sheet->setCellValue('E4', 'Channel');
+        $sheet->setCellValue('F4', 'Keterangan');
+        $sheet->setCellValue('G4', 'Jumlah');
+        
+        for ($i=0; $i < count($data); $i++) { 
+            $sheet->setCellValue('A'.$count, ($i + 1));
+            $sheet->setCellValue('B'.$count, date('d M Y', strtotime($data[$i]['DateSale'] )));
+            $sheet->setCellValue('C'.$count, ($data[$i]['No_Ref'] == "" || $data[$i]['No_Ref'] == null ) ? $data[$i]['FormulirCode'] : $data[$i]['No_Ref']);
+            $sheet->setCellValue('D'.$count, $data[$i]['FullName']);
+            $sheet->setCellValue('E'.$count, $data[$i]['Channel']);
+            $sheet->setCellValue('F'.$count, '');
+            $sheet->setCellValue('G'.$count, number_format($data[$i]['Price_Form']));
+            $count++;
+            $total += $data[$i]['Price_Form'];
+            if ($data[$i]['Price_Form'] > 0) {
+                $buy++;
+            }
+            else
+            {
+                $free++;
+            }
+        }
+
+        $sheet->setCellValue('A'.$count, 'Total');
+        $sheet->setCellValue('G'.$count, number_format($total));
+        
+        $objPHPExcel->setActiveSheetIndex(0)->mergeCells('A1:G1');
+        $objPHPExcel->setActiveSheetIndex(0)->mergeCells('A2:G2');
+        $objPHPExcel->setActiveSheetIndex(0)->mergeCells('A'.$count.':F'.$count);
+        $sheet->getStyle('A1')->getFont()->setSize(16);
+        $sheet->getStyle('A2')->getFont()->setSize(12);
+        $sheet->getStyle('A1')->getFont()->setBold(true);
+        $sheet->getStyle('A2')->getFont()->setBold(true);
+        $sheet->getStyle('A4:G4')->getFont()->setBold(true);
+        $sheet->getStyle('A'.$count)->getFont()->setBold(true);
+        
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A2')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A4:G4')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('G5:G'.$count)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('A'.$count)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('G'.$count)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('A4:G'.$count)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+        $sheet->getStyle('A4:G4')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('ABCAFF');
+        
+        $sheet->getColumnDimension('A')->setAutoSize(true);
+        $sheet->getColumnDimension('B')->setAutoSize(true);
+        $sheet->getColumnDimension('C')->setAutoSize(true);
+        $sheet->getColumnDimension('D')->setAutoSize(true);
+        $sheet->getColumnDimension('E')->setAutoSize(true);
+        $sheet->getColumnDimension('F')->setAutoSize(true);
+        $sheet->getColumnDimension('G')->setAutoSize(true);
+        
+        //---------------------- summary ----------------------
+        $sheet->setCellValue('I4', 'Summary');
+        $sheet->setCellValue('I5', 'Bayar');
+        $sheet->setCellValue('I6', 'Free');
+        $sheet->setCellValue('I7', 'Total form');
+        
+        $sheet->setCellValue('J4', ':');
+        $sheet->setCellValue('J5', ':');
+        $sheet->setCellValue('J6', ':');
+        $sheet->setCellValue('J7', ':');
+        
+        $sheet->setCellValue('K4', '-');
+        $sheet->setCellValue('K5', $buy);
+        $sheet->setCellValue('K6', $free);
+        $sheet->setCellValue('K7', count($data));
+        
+        $sheet->getColumnDimension('I')->setAutoSize(true);
+        $sheet->getColumnDimension('J')->setAutoSize(true);
+        $sheet->getColumnDimension('K')->setAutoSize(true);
+        
+        $objPHPExcel->setActiveSheetIndex(0)->mergeCells('I4:L4');
+
+        $sheet->setTitle('Penjualan Form');
+        $objPHPExcel->setActiveSheetIndex(0);
+        $filename = 'report_penjualan_finance_'.date('y-m-d').'.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="'.$filename.'"'); // Set nama file excel nya
+        header('Cache-Control: max-age=0');
+
+        $write = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $write->save('php://output');
+    }
+
 
 
 }
