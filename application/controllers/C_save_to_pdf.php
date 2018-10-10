@@ -3392,6 +3392,8 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetMargins(20.5,10.5,10);
         $pdf->AddPage();
 
+//        $pdf->Image(base_url('images/i.jpg'),0,0,296.5);
+
         $h = 3;
 
         $Ijazah = $dataIjazah['Ijazah'][0];
@@ -3402,7 +3404,7 @@ class C_save_to_pdf extends CI_Controller {
         $border = 0;
 
         $full_width = 266.5;
-        $w_left = 190;
+        $w_left = 205;
         $w_right = $full_width - $w_left;
 
         $pdf->SetFont('dinpromedium','',8);
@@ -3413,25 +3415,29 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_left,$h,'University Estabilshment Permit Number',$border,0,'L');
         $pdf->Cell($w_right,$h,'Cerficate Serial Number',$border,1,'L');
 
-        $pdf->Ln(30);
+        $pdf->Ln(29);
 
-        $fn_b = 11;
+        $fn_b = 11.5;
         $fn_i = 10;
 
+        $x = 60;
         $h = 4;
-
+        $full_width = 212;
+        $pdf->SetX($x);
         $pdf->SetFont('dinpromedium','',$fn_b);
         $pdf->Cell($full_width,$h,'Memberikan Ijazah Kepada',$border,1,'C');
 
+        $pdf->SetX($x);
         $pdf->SetFont('dinlightitalic','',$fn_i);
         $pdf->Cell($full_width,$h,'This certificate is awarded to',$border,1,'C');
 
+        $pdf->SetX($x);
         $pdf->SetFont('dinpromedium','',20);
-        $pdf->Cell($full_width,15,strtoupper($Student['Name']),$border,1,'C');
+        $pdf->Cell($full_width,13,strtoupper($Student['Name']),$border,1,'C');
 
         $pdf->Ln(2);
 
-        $x = 70;
+        $x = 67;
         $ln = 3;
         $label = 70;
         $sp = 1.5;
@@ -3532,7 +3538,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinlightitalic','',$fn_i);
         $pdf->Cell($fillFull,$h,'and conferred the right and privileges pertaining to this degree.',$border,1,'L');
 
-        $pdf->Ln(7);
+        $pdf->Ln(14);
         // 171.5
         // Tanda tangan
 
@@ -3541,15 +3547,15 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(171.5,$h,$Ijazah['PlaceIssued'].', '.date('d F Y',strtotime($Ijazah['DateIssued'])),$border,1,'L');
 
         $pdf->SetX($x+10);
-        $pdf->Cell(130.5,$h,'Rektor',$border,0,'L');
+        $pdf->Cell(138.5,$h,'Rektor',$border,0,'L');
         $pdf->Cell(41,$h,'Dekan',$border,1,'L');
 
         $pdf->SetFont('dinlightitalic','',$fn_i);
         $pdf->SetX($x+10);
-        $pdf->Cell(130.5,$h,'Rector',$border,0,'L');
+        $pdf->Cell(138.5,$h,'Rector',$border,0,'L');
         $pdf->Cell(41,$h,'Dean',$border,1,'L');
 
-        $pdf->Ln(17);
+        $pdf->Ln(13);
 
         // Dekan --
         $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].' ' : '';
@@ -3566,12 +3572,12 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetFont('dinpromedium','',$fn_b);
         $pdf->SetX($x+10);
-        $pdf->Cell(130.5,$h,$Rektor,$border,0,'L');
+        $pdf->Cell(138.5,$h,$Rektor,$border,0,'L');
         $pdf->Cell(41,$h,$Dekan,$border,1,'L');
 
         $pdf->SetFont('dinpromedium','',$fn_b-2);
         $pdf->SetX($x+10);
-        $pdf->Cell(130.5,$h,'NIK : '.$Rektorat['NIP'],$border,0,'L');
+        $pdf->Cell(138.5,$h,'NIK : '.$Rektorat['NIP'],$border,0,'L');
         $pdf->Cell(41,$h,'NIK : '.$Rektorat['NIP'],$border,1,'L');
 
 
