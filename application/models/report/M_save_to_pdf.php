@@ -416,7 +416,7 @@ class M_save_to_pdf extends CI_Model {
 //        exit;
 
         $IPK_Ori = (count($data)>0) ? $totalGradeValue/$totalSKS : 0 ;
-        $ipk = round($IPK_Ori);
+        $ipk = round($IPK_Ori,2);
 
 
         $grade = $this->getGraduation($ipk);
@@ -465,8 +465,12 @@ class M_save_to_pdf extends CI_Model {
 
         $dataTranscript = $this->db->get('db_academic.setting_transcript')->result_array();
 
+        // Get Rektor
+        $dataRektor = $this->db->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees',array('PositionMain' => '2.1'),1)->result_array();
+
         $result = array(
             'Student' => $dataStd,
+            'Rektorat' => $dataRektor,
             'Ijazah' => $dataTranscript
         );
 
