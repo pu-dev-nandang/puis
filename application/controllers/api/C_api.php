@@ -4875,4 +4875,48 @@ class C_api extends CI_Controller {
 
     }
 
+    public function crudLecturerEvaluation(){
+        $data_arr = $this->getInputToken();
+
+        if(count($data_arr>0)) {
+            if ($data_arr['action'] == 'readQuestion') {
+                $dataQ = $this->db->query('SELECT ec.Category, eq.* FROM db_academic.edom_question eq
+                                                      LEFT JOIN db_academic.edom_category ec 
+                                                      ON (ec.ID = eq.CategoryID) 
+                                                      ORDER BY eq.Order ASC ')->result_array();
+
+                return print_r(json_encode($dataQ));
+            }
+            else if($data_arr['action']=='readLECategory'){
+                $data = $this->db->order_by('ID','ASC')->get('db_academic.edom_category')->result_array();
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='insertQuestion'){
+                $dataForm = (array) $data_arr['dataForm'];
+                $this->db->insert('db_academic.edom_question',$dataForm);
+
+                return print_r(1);
+            }
+            else if($data_arr['action']=='loadToEdit'){
+                $ID = $data_arr['ID'];
+                $data = $this->db->get_where('db_academic.edom_question',array('ID'=>$ID),1)->result_array();
+
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='editQuestion'){
+
+                $dataForm = (array) $data_arr['dataForm'];
+
+                $this->db->where('ID', $data_arr['ID']);
+                $this->db->update('db_academic.edom_question',$dataForm);
+                return print_r(1);
+            }
+            else if($data_arr['action']=='deleteQuestion'){
+                $this->db->where('ID', $data_arr['ID']);
+                $this->db->delete('db_academic.edom_question');
+                return print_r(1);
+            }
+        }
+    }
+
 }
