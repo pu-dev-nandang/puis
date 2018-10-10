@@ -3407,7 +3407,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetFont('dinpromedium','',8);
         $pdf->Cell($w_left,$h,'Nomor Keputusan Pendirian Perguruan Tinggi : '.$Ijazah['NumberUniv'],$border,0,'L');
-        $pdf->Cell($w_right,$h,'Nomor Seri Ijazah : '.$Ijazah['NumberUniv'],$border,1,'L');
+        $pdf->Cell($w_right,$h,'Nomor Seri Ijazah : '.$Student['CSN'],$border,1,'L');
 
         $pdf->SetFont('dinlightitalic','',8);
         $pdf->Cell($w_left,$h,'University Estabilshment Permit Number',$border,0,'L');
@@ -3575,7 +3575,8 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(41,$h,'NIK : '.$Rektorat['NIP'],$border,1,'L');
 
 
-        $pdf->Output('Ijazah.pdf','I');
+        $nameF = str_replace(' ','_',strtoupper($Student['Name']));
+        $pdf->Output('IJAZAH_'.$Student['NPM'].'_'.$nameF.'.pdf','I');
     }
 
 

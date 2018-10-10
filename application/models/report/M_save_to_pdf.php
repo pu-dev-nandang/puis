@@ -453,10 +453,11 @@ class M_save_to_pdf extends CI_Model {
     }
 
     public function getIjazah($DBStudent,$NPM){
-        $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth,  
+        $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth, aus.CertificateSerialNumber AS CSN, 
                                             ps.Name AS Prodi, ps.NameEng AS ProdiEng, edl.Description AS GradeDesc, 
                                             edl.DescriptionEng AS GradeDescEng, em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind 
                                             FROM '.$DBStudent.'.students s
+                                            LEFT JOIN db_academic.auth_students aus ON (s.NPM = aus.NPM) 
                                             LEFT JOIN db_academic.program_study ps ON (s.ProdiID = ps.ID) 
                                             LEFT JOIN db_academic.education_level edl ON (edl.ID = ps.EducationLevelID)
                                             LEFT JOIN db_academic.faculty f ON (f.ID = ps.FacultyID)
