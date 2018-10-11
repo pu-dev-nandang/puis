@@ -326,6 +326,9 @@
 
         loadSelectOptionReligi('#formReligion','');
         loadSelectOptionEmployeesStatus('#formStatusEmployee','');
+
+        $('#formProgrammeStudy').append('<option value="">-- Non Academic (Employee) --</option>' +
+            '<option disabled>-------------------</option>');
         loadSelectOptionBaseProdi('#formProgrammeStudy','');
         
         var loadFirs = setInterval(function () {

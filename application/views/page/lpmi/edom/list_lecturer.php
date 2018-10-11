@@ -58,8 +58,77 @@
     $('#filterSemester,#filterProdi').change(function () {
         loadDataLEcturer();
     });
-    
+
     function loadDataLEcturer() {
+        var filterSemester = $('#filterSemester').val();
+        var filterProdi = $('#filterProdi').val();
+
+        $('#divTableLec').html('');
+
+        if(filterSemester!='' && filterSemester!=null
+            && filterProdi!='' && filterProdi!=null){
+
+            var SemesterID = filterSemester.split('.')[0];
+            var ProdiID = filterProdi.split('.')[0];
+
+            var url = base_url_js+"api/__getLecturerEvaluation";
+            $.getJSON(url,{SemesterID:SemesterID,ProdiID:ProdiID},function (jsonResult) {
+                console.log(jsonResult);
+
+                $('#divTableLec').html('<table class="table table-bordered" id="tableELecturer">' +
+                    '                <thead>' +
+                    '                <tr>' +
+                    '                    <th rowspan="2" style="width: 1%;">No</th>' +
+                    '                    <th rowspan="2" style="width: 15%;">Lecturer</th>' +
+                    '                    <th colspan="2" style="width: 20%;">Course</th>' +
+                    '                    <th style="width: 10%;">Total<br/>Student</th>' +
+                    '                    <th style="width: 10%;">Filled<br/>Edom</th>' +
+                    '                    <th style="width: 5%;">Rate</th>' +
+                    '                </tr>' +
+                    '               <tr>' +
+                    '                   <th style="width: 3%;">Group</th>' +
+                    '                   <th>Course</th>' +
+                    '               </tr>' +
+                    '                </thead>' +
+                    '                <tbody id="rwEdom"></tbody>' +
+                    '            </table>');
+
+                if(jsonResult.length>0){
+                    var no = 1;
+                    for(var i=0;i<jsonResult.length;i++){
+                        var d = jsonResult[i];
+
+                        var rwSpan = d.Course.length + 1;
+
+                        $('#rwEdom').append('<tr>' +
+                            '<td rowspan="'+rwSpan+'">'+(no++)+'</td>' +
+                            '<td style="text-align: left;" rowspan="'+rwSpan+'"><b>'+d.Name+'</b><br/>'+d.NIP+'</td>' +
+                            '</tr>');
+
+                        // Course
+                        for(var c=0;c<d.Course.length;c++){
+                            var dc = d.Course[c];
+                            $('#rwEdom').append('<tr>' +
+                                '<td>'+dc.ClassGroup+'</td>' +
+                                '<td style="text-align: left;">' +
+                                '   <b>'+dc.CourseEng+'</b><br/><i>'+dc.Course+'</i>' +
+                                '</td>' +
+                                '</tr>');
+                        }
+
+
+
+                    }
+                }
+
+
+            });
+
+
+        }
+    }
+    
+    function loadDataLEcturer2() {
         var filterSemester = $('#filterSemester').val();
         var filterProdi = $('#filterProdi').val();
 
@@ -72,8 +141,8 @@
                 '                <thead>' +
                 '                <tr>' +
                 '                    <th style="width: 1%;">No</th>' +
-                '                    <th style="width: 30px%;">Course</th>' +
                 '                    <th style="width: 15%;">Lecturer</th>' +
+                '                    <th style="width: 20%;">Course</th>' +
                 '                    <th style="width: 30%;">Pernyataan</th>' +
                 '                    <th style="width: 5%;">Rate</th>' +
                 '                </tr>' +
