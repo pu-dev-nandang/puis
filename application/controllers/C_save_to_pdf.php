@@ -3450,9 +3450,10 @@ class C_save_to_pdf extends CI_Controller {
 
         $border = 0;
 
+        $e = '%e';
         $dateOfBirth = strftime("%e %B %Y",strtotime($Student['DateOfBirth']));
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            $dateOfBirth = strftime("%#d %B %Y",strtotime($Student['DateOfBirth']));
+            $e = '%#d';
         }
 
         // ===== TTL =====
@@ -3460,7 +3461,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinpromedium','',$fn_b);
         $pdf->Cell($label,$h,'Tempat dan Tanggal Lahir',$border,0,'L');
         $pdf->Cell($sp,$h,':',$border,0,'C');
-        $pdf->Cell($fill,$h,$Student['PlaceOfBirth'].', '.$dateOfBirth,$border,1,'L');
+        $pdf->Cell($fill,$h,$Student['PlaceOfBirth'].', '.strftime($e." %B %Y",strtotime($Student['DateOfBirth'])),$border,1,'L');
 
         $pdf->SetX($x);
         $pdf->SetFont('dinlightitalic','',$fn_i);
@@ -3552,16 +3553,21 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($fillFull,$h,'and conferred the right and privileges pertaining to this degree.',$border,1,'L');
 
         $y = $pdf->GetY()+7;
-        $pdf->Ln(14);
+        $pdf->Ln(7);
 
         // 171.5
         // Tanda tangan
 
         $pdf->SetX($x+10);
         $pdf->SetFont('dinpromedium','',$fn_b);
-        $pdf->Cell(171.5,$h,$Ijazah['PlaceIssued'].', '.date('j F Y',strtotime($Ijazah['DateIssued'])),$border,1,'L');
-
+        $pdf->Cell(171.5,$h,$Ijazah['PlaceIssued'].', '.strftime($e." %B %Y",strtotime($Ijazah['DateIssued'])),$border,1,'L');
         $pdf->SetX($x+10);
+        $pdf->SetFont('dinlightitalic','',$fn_i);
+        $pdf->Cell(171.5,$h,$Ijazah['PlaceIssued'].', '.date('F j, Y',strtotime($Ijazah['DateIssued'])),$border,1,'L');
+
+        $pdf->Ln(2);
+        $pdf->SetX($x+10);
+        $pdf->SetFont('dinpromedium','',$fn_b);
         $pdf->Cell(138.5,$h,'Rektor',$border,0,'L');
         $pdf->Cell(41,$h,'Dekan',$border,1,'L');
 
