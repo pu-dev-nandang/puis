@@ -694,6 +694,7 @@ $route['api/__crudScheduleExchange'] = 'api/c_api/crudScheduleExchange';
 $route['api/__crudLimitCredit'] = 'api/c_api/crudLimitCredit';
 
 $route['api/__crudLecturerEvaluation'] = 'api/c_api/crudLecturerEvaluation';
+$route['api/__getLecturerEvaluation'] = 'api/c_api/getLecturerEvaluation';
 
 $route['api/database/__getListStudent'] = 'api/c_api/getListStudent';
 $route['api/database/upload_photo_student'] = 'page/academic/c_akademik/upload_photo_student';

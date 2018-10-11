@@ -4919,4 +4919,162 @@ class C_api extends CI_Controller {
         }
     }
 
+    public function getLecturerEvaluation(){
+
+        $SemesterID = $this->input->get('SemesterID');
+        $ProdiID = $this->input->get('ProdiID');
+
+        $dataWhere = 's.SemesterID = "'.$SemesterID.'"';
+
+        $dataSelect = 'SELECT s.ID, s.SemesterID, s.ClassGroup, mk.ID AS MKID, mk.MKCode, mk.Name AS Course, mk.NameEng AS CourseEng';
+
+        $queryDefault = 'SELECT em.NIP, em.Name FROM db_employees.employees em WHERE em.ProdiID = "'.$ProdiID.'" 
+                                                    AND em.StatusEmployeeID != "-2" 
+                                                   AND em.StatusEmployeeID != "-1" ';
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $result = [];
+
+        if(count($queryDefaultRow)>0){
+            for($i=0;$i<count($queryDefaultRow);$i++){
+                $d = $queryDefaultRow[$i];
+                $queryCourse = $dataSelect.' FROM db_academic.schedule s 
+                                                  LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                  LEFT JOIN db_academic.mata_kuliah mk ON (sdc.MKID = mk.ID)
+                                                  WHERE  '.$dataWhere.' AND s.Coordinator = "'.$d['NIP'].'" GROUP BY s.ID
+                                                  UNION ALL
+                                                  '.$dataSelect.'
+                                                  FROM db_academic.schedule_team_teaching stt
+                                                    LEFT JOIN db_academic.schedule s ON (s.ID = stt.ScheduleID)
+                                                    LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                    LEFT JOIN db_academic.mata_kuliah mk ON (sdc.MKID = mk.ID)
+                                                    WHERE '.$dataWhere.' AND stt.NIP = "'.$d['NIP'].'" GROUP BY s.ID
+                                                  ';
+                $dataCourse = $this->db->query($queryCourse)->result_array();
+
+                if(count($dataCourse)>0){
+                    for($c=0;$c<count($dataCourse);$c++){
+                        // Data Student
+                        $dataStd = $this->m_api->getStudentByScheduleID($dataCourse[$c]['SemesterID'],$dataCourse[$c]['ID'],'');
+                        $dataCourse[$c]['TotalStudent'] = count($dataStd);
+
+                        // Data Edom Answer
+                        $dataEd = $this->db->query('SELECT * FROM db_academic.edom_answer ea 
+                                                                      WHERE ea.SemesterID = "'.$dataCourse[$c]['SemesterID'].'"
+                                                                      AND ea.ScheduleID = "'.$dataCourse[$c]['ID'].'"
+                                                                      AND ea.NIP = "'.$d['NIP'].'" ')->result_array();
+
+                        $dataCourse[$c]['TotalAnswer'] = count($dataEd);
+                    }
+
+                    $queryDefaultRow[$i]['Course'] = $dataCourse;
+
+                    array_push($result,$queryDefaultRow[$i]);
+                }
+
+
+
+            }
+        }
+
+        return print_r(json_encode($result));
+
+    }
+
+    public function getLecturerEvaluation2(){
+        $requestData= $_REQUEST;
+        $data_arr = $this->getInputToken();
+
+        $dataWhere = 's.SemesterID = "'.$data_arr['SemesterID'].'"';
+
+        $dataSelect = 'SELECT s.ID, s.SemesterID, mk.ID AS MKID, mk.MKCode, mk.Name AS Course, mk.NameEng AS CourseEng';
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataSearch = ' AND ( em.Name LIKE "%'.$search.'%" OR em.NIP LIKE "%'.$search.'%" )';
+        }
+
+
+        $queryDefault = 'SELECT em.NIP, em.Name FROM db_employees.employees em WHERE em.ProdiID = "'.$data_arr['ProdiID'].'" 
+                                                    AND em.StatusEmployeeID != "-2" 
+                                                   AND em.StatusEmployeeID != "-1" ';
+
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        if(count($queryDefaultRow)>0){
+            for($i=0;$i<count($queryDefaultRow);$i++){
+                $d = $queryDefaultRow[$i];
+                $queryCourse = $dataSelect.' FROM db_academic.schedule s 
+                                                  LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                  LEFT JOIN db_academic.mata_kuliah mk ON (sdc.MKID = mk.ID)
+                                                  WHERE  '.$dataWhere.' AND s.Coordinator = "'.$d['NIP'].'" GROUP BY s.ID
+                                                  UNION ALL
+                                                  '.$dataSelect.'
+                                                  FROM db_academic.schedule_team_teaching stt
+                                                    LEFT JOIN db_academic.schedule s ON (s.ID = stt.ScheduleID)
+                                                    LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                    LEFT JOIN db_academic.mata_kuliah mk ON (sdc.MKID = mk.ID)
+                                                    WHERE '.$dataWhere.' AND stt.NIP = "'.$d['NIP'].'" GROUP BY s.ID
+                                                  ';
+                $dataCourse = $this->db->query($queryCourse)->result_array();
+
+                if(count($dataCourse)>0){
+                    for($c=0;$c<count($dataCourse);$c++){
+                        // Data Student
+                        $dataStd = $this->m_api->getStudentByScheduleID($dataCourse[$c]['SemesterID'],$dataCourse[$c]['ID'],'');
+                        $dataCourse[$c]['TotalStudent'] = count($dataStd);
+
+                        // Data Edom Answer
+                        $dataEd = $this->db->query('SELECT * FROM db_academic.edom_answer ea 
+                                                                      WHERE ea.SemesterID = "'.$dataCourse[$c]['SemesterID'].'"
+                                                                      AND ea.ScheduleID = "'.$dataCourse[$c]['ID'].'"
+                                                                      AND ea.NIP = "'.$d['NIP'].'" ')->result_array();
+
+                        $dataCourse[$c]['TotalAnswer'] = count($dataEd);
+                    }
+                }
+
+                $queryDefaultRow[$i]['Course'] = $dataCourse;
+
+            }
+        }
+
+
+        print_r($queryDefaultRow);
+        exit;
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++) {
+            $nestedData = array();
+            $row = $query[$i];
+
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div  style="text-align:left;"><b>'.$row['Name'].'</b><br/>'.$row['NIP'].'</div>';
+            $nestedData[] = '<div  style="text-align:left;">'.$row['Course'].'</div>';
+            $nestedData[] = '<div  style="text-align:center;">-</div>';
+            $nestedData[] = '<div  style="text-align:center;">-</div>';
+
+            $no++;
+
+            $data[] = $nestedData;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+
+        echo json_encode($json_data);
+    }
+
 }
