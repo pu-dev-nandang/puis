@@ -3450,12 +3450,17 @@ class C_save_to_pdf extends CI_Controller {
 
         $border = 0;
 
+        $dateOfBirth = strftime("%e %B %Y",strtotime($Student['DateOfBirth']));
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $dateOfBirth = strftime("%#d %B %Y",strtotime($Student['DateOfBirth']));
+        }
+
         // ===== TTL =====
         $pdf->SetX($x);
         $pdf->SetFont('dinpromedium','',$fn_b);
         $pdf->Cell($label,$h,'Tempat dan Tanggal Lahir',$border,0,'L');
         $pdf->Cell($sp,$h,':',$border,0,'C');
-        $pdf->Cell($fill,$h,$Student['PlaceOfBirth'].', '.strftime("%#d %B %Y",strtotime($Student['DateOfBirth'])),$border,1,'L');
+        $pdf->Cell($fill,$h,$Student['PlaceOfBirth'].', '.$dateOfBirth,$border,1,'L');
 
         $pdf->SetX($x);
         $pdf->SetFont('dinlightitalic','',$fn_i);
