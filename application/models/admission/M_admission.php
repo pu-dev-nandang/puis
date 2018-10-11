@@ -319,6 +319,57 @@ class M_admission extends CI_Model {
       return $conVertINT;
     }
 
+    public function totalDataFormulir_offline4($reqTahun,$requestData,$statusJual)
+    {
+
+      if($statusJual != '%') {
+        // $status = '"%'.$status.'%"'; 
+        // $status = 'StatusUsed != '.$status;
+        $statusJual = ' and b.StatusJual = '.$statusJual;
+      }
+      else
+      {
+        $statusJual = ''; 
+      }
+
+      $sql = 'select count(*) as total from 
+              ( 
+                select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,b.No_Ref,a.StatusReg,b.Years,b.Status as StatusUsed, 
+                b.StatusJual, b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,
+                b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,b.CityNameFormulir,b.DistrictNameFormulir, 
+                b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi from 
+                ( 
+                  select a.Name as NameCandidate,a.Email,
+                  z.SchoolName,c.FormulirCode,a.StatusReg from db_admission.register as a join db_admission.register_verification as b 
+                  on a.ID = b.RegisterID join db_admission.register_verified as c on c.RegVerificationID = b.ID join db_admission.school as z on z.ID = a.SchoolID where a.StatusReg = 1 
+                ) as a right JOIN 
+                ( 
+                  select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale, b.Email,
+                  c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as CityNameFormulir,z.DistrictName as DistrictNameFormulir, 
+                  if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,
+                  b.ID_ProgramStudy,y.Name as NameProdi from db_admission.formulir_number_offline_m as a left join db_admission.sale_formulir_offline as b 
+                  on a.FormulirCode = b.FormulirCodeOffline left join db_employees.employees as c on c.NIP = b.PIC left join db_admission.school as z on z.ID = b.SchoolID 
+                  left join db_academic.program_study as y on b.ID_ProgramStudy = y.ID 
+                ) as b on a.FormulirCode = b.FormulirCode where b.Years = "'.$reqTahun.'" AND
+                  (
+                    b.FormulirCode like "'.$requestData['search']['value'].'%" or
+                    b.No_Ref like "'.$requestData['search']['value'].'%" or
+                    b.Sales like "'.$requestData['search']['value'].'%" or
+                    a.NameCandidate like "'.$requestData['search']['value'].'%" or
+                    b.SchoolNameFormulir like "%'.$requestData['search']['value'].'%" or
+                    b.NameProdi like "'.$requestData['search']['value'].'%" or
+                    b.src_name like "'.$requestData['search']['value'].'%" or
+                    b.FullName like "'.$requestData['search']['value'].'%"
+                  )'.$statusJual.'
+
+              ) aa
+              ';
+              // print_r($sql);die();          
+      $query=$this->db->query($sql, array())->result_array();
+      $conVertINT = (int) $query[0]['total'];
+      return $conVertINT;
+    }
+
     public function totalDataFormulir_offline2()
     {
       $sql = "select count(*) as total from db_admission.sale_formulir_offline
@@ -767,6 +818,12 @@ class M_admission extends CI_Model {
 
     public function inserData_formulir_offline_sale_save($input_arr)
     {
+      // get no kwitansi terakhir
+      $sql = 'select * from db_admission.sale_formulir_offline order by NoKwitansi desc limit 1';
+      $query=$this->db->query($sql, array())->result_array();
+      $NoKwitansi = $query[0]['NoKwitansi'];
+      $NoKwitansi = ($NoKwitansi != "") ? (int)$NoKwitansi + 1 : $NoKwitansi;
+
       $dataSave = array(
               'FormulirCodeOffline' => $input_arr['selectFormulirCode'],
               'PIC' => $input_arr['PIC'],
@@ -786,12 +843,54 @@ class M_admission extends CI_Model {
               'CreateAT' => date('Y-m-d'),
               'DateSale' => $input_arr['tanggal'],
               'CreatedBY' => $this->session->userdata('NIP'),
+              'NoKwitansi' => $NoKwitansi,
               // 'Price_Form' => $Kelulusan,
       );
       $this->db->insert('db_admission.sale_formulir_offline', $dataSave);
       $No_Ref = $input_arr['No_Ref'];
+      if ($No_Ref == "") {
+        $sql = 'select * from db_admission.formulir_number_offline_m order by No_Ref desc limit 1';
+        $query=$this->db->query($sql, array())->result_array();
+        if (count($query) == 0) {
+          $this->load->model('master/m_master');
+          $tt = $this->m_master->showData_array('set_ta');
+          $yy = substr($tt[0]['Ta'],2,2);
+          $No_Ref = $yy.'0001';
+        }
+        else
+        {
+          $No_Ref = $query[0]['No_Ref'] + 1;
+        }
+      }
       $this->updateSellOUTFormulirOffline($input_arr['selectFormulirCode'],$No_Ref);
       // print_r($input_arr);
+    }
+
+    public function editData_formulir_offline_sale_save($input_arr)
+    {
+      $dataSave = array(
+              'FormulirCodeOffline' => $input_arr['selectFormulirCode'],
+              'PIC' => $input_arr['PIC'],
+              'ID_ProgramStudy' => $input_arr['selectProgramStudy'],
+              'ID_ProgramStudy2' => $input_arr['selectProgramStudy2'],
+              'FullName' => $input_arr['Name'],
+              'Gender' => $input_arr['selectGender'],
+              'HomeNumber' => $input_arr['telp_rmh'],
+              'PhoneNumber' => $input_arr['hp'],
+              'Email' => $input_arr['email'],
+              'SchoolID' => $input_arr['autoCompleteSchool'],
+              'price_event_ID' => $input_arr['selectEvent'],
+              'source_from_event_ID' => $input_arr['selectSourceFrom'],
+              'Channel' => $input_arr['tipeChannel'],
+              'SchoolIDChanel' => $input_arr['autoCompleteSchoolChanel'],
+              'Price_Form' => $input_arr['priceFormulir'],
+              'DateSale' => $input_arr['tanggal'],
+              'UpdateAT' => date('Y-m-d'),
+              'UpdatedBY' => $this->session->userdata('NIP'),
+      );
+
+      $this->db->where('ID',$input_arr['CDID']);
+      $this->db->update('db_admission.sale_formulir_offline', $dataSave);
     }
 
     public function formulir_offline_salect_PIC($input_arr)

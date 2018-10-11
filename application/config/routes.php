@@ -407,6 +407,13 @@ $route['admission/distribusi-formulir/formulir-online'] = 'page/admission/c_admi
 $route['admission/distribusi-formulir/formulir-online/pagination/(:num)'] = 'page/admission/c_admission/pagination_formulir_online/$1';
 $route['admission/distribusi-formulir/formulir-offline/save'] = 'page/admission/c_admission/formulir_offline_sale_save';
 $route['admission/distribusi-formulir/formulir-offline/selectPIC'] = 'page/admission/c_admission/formulir_offline_salect_PIC';
+$route['admission/distribusi-formulir/offline/LoadListPenjualan'] = 'page/admission/c_admission/LoadListPenjualanoffline';
+$route['admission/distribusi-formulir/offline/LoadListPenjualan/serverSide'] = 'page/admission/c_admission/LoadListPenjualanoffline_serverSide';
+$route['admission/distribusi-formulir/offline/LoadInputPenjualan'] = 'page/admission/c_admission/LoadInputPenjualanoffline';
+$route['admission/distribusi-formulir/offline/LoadImportInputPenjualan'] = 'page/admission/c_admission/LoadImportInputPenjualan';
+$route['admission/distribusi-formulir/offline/submit_import_excel_penjualan_formulir_offline'] = 'page/admission/c_admission/submit_import_excel_penjualan_formulir_offline';
+$route['admission/distribusi-formulir/offline/submit_import_excel_kwitansi_penjualan_formulir_offline'] = 'page/admission/c_admission/submit_import_excel_kwitansi_penjualan_formulir_offline';
+
 
 $route['admission/mastercalonmahasiswa/generate-nim'] = 'page/admission/c_admission/generatenim';
 $route['admission/mastercalonmahasiswa/submit_import_excel_File_generate_nim'] = 'page/admission/c_admission/submit_import_excel_File_generate_nim';
@@ -449,6 +456,9 @@ $route['finance/master/sbmt_discount'] =  'page/finance/c_finance/sbmt_discount'
 $route['finance/admission/penerimaan-pembayaran/formulir-registration/online'] =  'page/finance/c_finance/formulir_registration_online_page';
 $route['finance/confirmed-verifikasi-pembayaran-registration_online'] =  'page/finance/c_finance/confirmed_verfikasi_pembayaran_registration_online';
 $route['finance/admission/penerimaan-pembayaran/formulir-registration/offline'] =  'page/finance/c_finance/formulir_registration_offline_page';
+$route['finance/admission/distribusi-formulir/offline/LoadListPenjualan/serverSide'] =  'page/finance/c_finance/formulir_registration_offline_serverSide';
+
+
 $route['finance/admission/approved/nilai-rapor'] =  'page/finance/c_finance/nilai_rapor_page';
 $route['finance/approved/loaddata_nilai_calon_mahasiswa_verified/(:num)'] =  'page/finance/c_finance/loaddata_nilai_calon_mahasiswa_verified/$1';
 $route['finance/approved/submit_approved_nilai_rapor'] =  'page/finance/c_finance/submit_approved_nilai_rapor';
@@ -655,7 +665,7 @@ $route['api/__getScheduleIDByClassGroup/(:num)/(:any)'] = 'api/c_api/getSchedule
 $route['api/__crudPartime'] = 'api/c_api/crudPartime';
 
 $route['api/__filterStudents'] = 'api/c_api/filterStudents';
-$route['api/__getFormulirOfflineAvailable'] = 'api/c_api/getFormulirOfflineAvailable';
+$route['api/__getFormulirOfflineAvailable/(:any)'] = 'api/c_api/getFormulirOfflineAvailable/$1';
 $route['api/__getAutoCompleteSchool'] = 'api/c_api/AutoCompleteSchool';
 $route['api/__getSumberIklan'] = 'api/c_api/getSumberIklan';
 $route['api/__getPriceFormulirOffline'] = 'api/c_api/getPriceFormulirOffline';

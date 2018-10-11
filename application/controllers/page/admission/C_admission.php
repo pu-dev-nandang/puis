@@ -325,7 +325,7 @@ class C_admission extends Admission_Controler {
               $this->m_admission->inserData_formulir_offline_sale_save($input);
               break;
           case 'edit':
-              // $this->m_admission->editData_formulir_offline_sale_save($input);
+              $this->m_admission->editData_formulir_offline_sale_save($input);
               break;
           case 'delete':
               $query = $this->m_master->caribasedprimary('db_admission.sale_formulir_offline','ID',$input['CDID']);
@@ -1754,6 +1754,411 @@ class C_admission extends Admission_Controler {
           $this->db->where('FormulirCodeOffline', $FormulirCodeOffline);
           $this->db->update('db_admission.sale_formulir_offline', $dataSave);
         }
+      }
+    }
+
+    public function LoadListPenjualanoffline()
+    {
+      $this->auth_ajax();
+      $arr_result = array('html' => '','jsonPass' => '');
+      $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/distribusi_formulir/LoadListPenjualanoffline',$this->data,true);
+      echo json_encode($arr_result);
+    }
+
+    public function LoadListPenjualanoffline_serverSide()
+    {
+      $requestData= $_REQUEST;
+      $reqTahun = $this->input->post('tahun');
+      $StatusJual = $this->input->post('StatusJual');
+      $No = $requestData['start'] + 1;
+      $totalData = $this->m_admission->totalDataFormulir_offline4($reqTahun,$requestData,$StatusJual);
+
+      if($StatusJual != '%') {
+        $StatusJual = ' and b.StatusJual = '.$StatusJual;
+      }
+      else
+      {
+        $StatusJual = ''; 
+      }
+
+      $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,b.No_Ref,a.StatusReg,b.Years,b.Status as StatusUsed, b.StatusJual,
+                b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,b.CityNameFormulir,b.DistrictNameFormulir,
+                b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi,b.NoKwitansi
+                from (
+                select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
+                from db_admission.register as a 
+                join db_admission.register_verification as b
+                on a.ID = b.RegisterID
+                join db_admission.register_verified as c
+                on c.RegVerificationID = b.ID
+                join db_admission.school as z
+                on z.ID = a.SchoolID
+                where a.StatusReg = 1
+                ) as a right JOIN
+                (
+                select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,b.NoKwitansi,
+                b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,
+                if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,b.ID_ProgramStudy,y.Name as NameProdi
+                from db_admission.formulir_number_offline_m as a
+                left join db_admission.sale_formulir_offline as b
+                on a.FormulirCode = b.FormulirCodeOffline
+                left join db_employees.employees as c
+                on c.NIP = b.PIC
+                left join db_admission.school as z
+                on z.ID = b.SchoolID
+                left join db_academic.program_study as y
+                on b.ID_ProgramStudy = y.ID
+                )
+                as b
+                on a.FormulirCode = b.FormulirCode
+          ';
+
+      $sql.= 'where Years = "'.$reqTahun.'" and 
+                      (
+                        b.FormulirCode like "'.$requestData['search']['value'].'%" or
+                        b.No_Ref like "'.$requestData['search']['value'].'%" or
+                        b.Sales like "'.$requestData['search']['value'].'%" or
+                        a.NameCandidate like "'.$requestData['search']['value'].'%" or
+                        b.SchoolNameFormulir like "%'.$requestData['search']['value'].'%" or
+                        b.NameProdi like "'.$requestData['search']['value'].'%" or
+                        b.src_name like "'.$requestData['search']['value'].'%" or
+                        b.FullName like "'.$requestData['search']['value'].'%" or
+                        b.DateSale like "'.$requestData['search']['value'].'%"
+                      ) '.$StatusJual.'';
+      $sql.= ' order by b.No_Ref asc LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+      $query = $this->db->query($sql)->result_array();
+
+      $data = array();
+      for($i=0;$i<count($query);$i++){
+          $nestedData=array();
+          $row = $query[$i];
+          $nestedData[] = $No;
+          $nestedData[] = $row['FormulirCode'];
+          $nestedData[] = $row['No_Ref'];
+          $nestedData[] = $row['NameProdi'];
+          $aa = ($row['StatusUsed'] == 0) ? '<div style="color:  green;">No</div>' : '<div style="color:  red;">Yes</div>';
+          $nestedData[] = $aa;
+          $aa = ($row['StatusJual'] == 0) ? '<div style="color:  green;">IN</div>' : '<div style="color:  red;">Sold Out</div>';
+          $nestedData[] = $aa;
+          $nestedData[] = $row['Sales'];
+          $nestedData[] = number_format($row['Price_Form'],0,',','.');
+          $nestedData[] = $row['DateSale'];
+          $nestedData[] = $row['NamaPembeli'].'<br>'.$row['PhoneNumberPembeli'].'<br>'.$row['EmailPembeli'].'<br>'.$row['SchoolNameFormulir'].'<br>'.$row['DistrictNameFormulir'].' '.$row['CityNameFormulir'];
+          $nestedData[] = $row['src_name'];
+          $action = '';
+          if ($row['ID_sale_formulir_offline'] != null || $row['ID_sale_formulir_offline'] != '')
+          {
+            $action = '<div class="row">
+                        <div class="col-md-12">
+                          <span data-smt="'.$row['ID_sale_formulir_offline'].'" class="btn btn-xs btn-delete">
+                            <i class="fa fa-trash"></i> Delete Penjualan
+                          </span>
+                        </div>
+                      </div>
+                      <div class="row" style="margin-top: 10px">
+                        <div class="col-md-12">
+                          <span ref = "'.$row['No_Ref'].'" NamaLengkap = "'.$row['NamaPembeli'].'" class="btn btn-xs btn-print" phonehome = "'.$row['HomeNumberPembeli'].'" hp = "'.$row['PhoneNumberPembeli'].'" jurusan = "'.$row['NameProdi'].'" pembayaran ="Pembelian Form('.$row['No_Ref'].')" jenis= "Cash" jumlah = "'.$row['Price_Form'].'" date = "'.$row['DateSale'].'" formulir = "'.$row['FormulirCode'].'" NoKwitansi = "'.$row['NoKwitansi'].'">
+                           <i class="fa fa-print"></i> Kwitansi
+                         </span>
+                        </div>
+                      </div>
+                      <div class="row" style="margin-top: 10px">
+                        <div class="col-md-12">
+                          <span data-smt="'.$row['ID_sale_formulir_offline'].'" class="btn btn-xs btn-edit">
+                            <i class="fa fa-edit"></i> Edit Penjualan
+                          </span>
+                        </div>
+                      </div>  
+                      ';
+          }
+
+          $nestedData[] = $action;
+          $data[] = $nestedData;
+          $No++;
+      }
+
+      $json_data = array(
+          "draw"            => intval( $requestData['draw'] ),
+          "recordsTotal"    => intval($totalData),
+          "recordsFiltered" => intval($totalData ),
+          "data"            => $data
+      );
+      echo json_encode($json_data);
+    }
+
+    public function LoadInputPenjualanoffline()
+    {
+      $this->auth_ajax();
+      $arr_result = array('html' => '','jsonPass' => '');
+      $input = $this->getInputToken();
+      $this->data['action'] = $input['action'];
+      $this->data['CDID'] = $input['ID'];
+      switch ($input['action']) {
+        case 'add':
+          # code...
+          break;
+        case 'edit':
+          $get1 = $this->m_master->caribasedprimary('db_admission.sale_formulir_offline','ID',$input['ID']);
+          $get2 = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','FormulirCode',$get1[0]['FormulirCodeOffline']);
+          $this->data['get1'] = $get1;
+          $this->data['get2'] = $get2;
+          $get3 = $this->m_master->caribasedprimary('db_admission.school','ID',$get1[0]['SchoolID']);
+          $get4 = $this->m_master->caribasedprimary('db_admission.school','ID',$get1[0]['SchoolIDChanel']);
+          $this->data['get3'] = (count($get3) > 0 ) ? $get3 : $get3 = array(array('SchoolName' => ''));
+          $this->data['get4'] = (count($get4) > 0 ) ? $get4 : $get4 = array(array('SchoolName' => ''));
+          break;
+        default:
+          # code...
+          break;
+      }
+      $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/distribusi_formulir/LoadInputPenjualanoffline',$this->data,true);
+      echo json_encode($arr_result);
+    }
+
+    public function LoadImportInputPenjualan()
+    {
+      $this->auth_ajax();
+      $arr_result = array('html' => '','jsonPass' => '');
+      $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/distribusi_formulir/LoadImportInputPenjualan',$this->data,true);
+      echo json_encode($arr_result);
+    }
+
+    public function submit_import_excel_penjualan_formulir_offline()
+    {
+      // print_r($_FILES);
+      if(isset($_FILES["fileData"]["name"]))
+      {
+        $path = $_FILES["fileData"]["tmp_name"];
+        $arr_insert = array();
+        $arr_insert_auth = array();
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load($path); // Empty Sheet
+        $objWorksheet = $excel2->setActiveSheetIndex(0);
+        $CountRow = $objWorksheet->getHighestRow();
+          
+         $arr_bulan = array(
+             'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Des'
+         ); 
+
+         $arr_temp = array();
+        for ($i=5; $i < ($CountRow + 1); $i++) {
+          $FormulirCode = $objWorksheet->getCellByColumnAndRow(0, $i)->getCalculatedValue();
+          if ($FormulirCode == "" || $FormulirCode == null) {
+            break;
+          }
+
+          $No_Ref = $FormulirCode;
+          // check $No_Ref Unique
+          $sql23 = 'select * from db_admission.formulir_number_offline_m where No_Ref = ?';
+          $query23=$this->db->query($sql23, array($No_Ref))->result_array();
+
+          if(count($query23) > 0)
+          {
+            continue;
+          }
+
+          // print_r($FormulirCode.'<br>');
+          $Tanggal = $objWorksheet->getCellByColumnAndRow(1, $i)->getCalculatedValue();
+          $Tanggal = explode(" ", $Tanggal);
+          for ($k=0; $k < count($arr_bulan); $k++) { 
+            $month = $Tanggal[1];
+            if ($arr_bulan[$k] == $month) {
+              $k++;
+              break;
+            }
+          }
+
+          if (strlen($k) == 1) {
+            $k = '0'.$k;
+          }
+
+          $date = $Tanggal[2].'-'.$k.'-'.$Tanggal[0];
+          $getNIP = $this->m_master->getAllUserAutoComplete($objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue());
+
+          try {
+            if (count($getNIP) > 0) {
+              $NIP = $getNIP[0]['NIP'];
+            }
+            else
+            {
+              $NIP = $objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue();
+            }
+            
+          }
+          //catch exception
+          catch(Exception $e) {
+            $NIP = $objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue();
+          }
+
+          $program_study = $this->m_master->caribasedprimary('db_academic.program_study','Name',$objWorksheet->getCellByColumnAndRow(5, $i)->getCalculatedValue());
+          $program_study2 = $this->m_master->caribasedprimary('db_academic.program_study','Name',$objWorksheet->getCellByColumnAndRow(6, $i)->getCalculatedValue());
+
+
+          $skool1 = $objWorksheet->getCellByColumnAndRow(10, $i)->getCalculatedValue();
+          $skool = trim(str_replace("SMA","", $skool1));
+          $skool = trim(str_replace("SMK","", $skool));
+          $sql = 'select * from db_admission.school where SchoolName like "%'.$skool.'%"';
+          $query=$this->db->query($sql, array())->result_array();
+
+          $aa = $skool1;
+          if (count($query) > 0) {
+            $SchoolID = $query[0]['ID'];
+          }
+          else
+          {
+            $city = $objWorksheet->getCellByColumnAndRow(11, $i)->getCalculatedValue();
+            $CityName = $objWorksheet->getCellByColumnAndRow(11, $i)->getCalculatedValue();
+            $CityID ='';
+
+            $sql2 = 'select * from db_admission.region where RegionName like "%'.$city.'%"';
+            $query2=$this->db->query($sql2, array())->result_array();
+            if (count($query2) > 0) {
+              $CityID =$query2[0]['RegionID']; 
+            }
+            else
+            {
+              $city2 = str_replace('Kabupaten', 'Kab.', $city);
+              $sql2 = 'select * from db_admission.region where RegionName like "%'.$city2.'%"';
+              $query2=$this->db->query($sql2, array())->result_array();
+              if (count($query2) > 0) {
+                $CityID =$query2[0]['RegionID']; 
+              }
+              else
+              {
+
+              }
+              
+            }
+
+            $ProvinceID = $this->m_master->caribasedprimary('db_admission.province_region','RegionID',$CityID);
+            $ProvinceID = $ProvinceID[0]['ProvinceID'];
+            $ProvinceName = $this->m_master->caribasedprimary('db_admission.province','ProvinceID',$ProvinceID);
+            $ProvinceName = $ProvinceName[0]['ProvinceName'];
+
+            $dataSave = array(
+                'ProvinceID' => $ProvinceID,
+                'ProvinceName' => $ProvinceName,
+                'CityID' => $CityID,
+                'CityName' => $CityName,
+                'DistrictID' => '',
+                'DistrictName' => '',
+                'SchoolType' => '',
+                'SchoolName' => $skool1,
+                'SchoolAddress' => '',
+                'Created' => 0,
+                'Approved' => 1,
+                'Approver' => 0,
+            );
+            // print_r($dataSave);
+            // print_r('<br>');
+            $this->db->insert('db_admission.school', $dataSave);
+            $SchoolID = $this->db->insert_id();
+          }
+
+          $Channel = 'Event';
+          $Iklan = trim($objWorksheet->getCellByColumnAndRow(12, $i)->getCalculatedValue());
+          $aa = $this->m_master->caribasedprimary('db_admission.source_from_event','src_name',$Iklan);
+          $sqlaa = 'select * from db_admission.source_from_event where src_name like "'.$Iklan.'%" ';
+          $queryaa=$this->db->query($sqlaa, array())->result_array();
+
+          $SchoolIDChanel = '';
+          if ($Iklan == 'SEKOLAH') {
+            $Channel = 'School';
+            $SchoolIDChanel = $SchoolID;
+          }
+          // // print_r($sqlaa.'<br>');
+          // if ($i == 10) {
+          //   die();
+          // }
+          if(count($queryaa) > 0)
+          {
+            $source_from_event_ID = $queryaa[0]['ID'];
+          }
+          else
+          {
+            $source_from_event_ID = 0;
+          }
+
+          $sql3 = 'select * from db_admission.formulir_number_offline_m where StatusJual = 0 order by ID asc';
+          $query3=$this->db->query($sql3, array())->result_array();
+          $FormulirCode = $query3[0]['FormulirCode'];
+
+          $temp = array(
+              'FormulirCodeOffline' => $FormulirCode,
+              'DateSale' => $date,
+              'PIC' => $NIP,
+              'FullName' => $objWorksheet->getCellByColumnAndRow(3, $i)->getCalculatedValue(),
+              'Gender' => ($objWorksheet->getCellByColumnAndRow(4, $i)->getCalculatedValue() == 'Female') ? 'P' : 'L',
+              'ID_ProgramStudy' => $program_study[0]['ID'] ,
+              'ID_ProgramStudy2' => (count($program_study2) > 0) ? $program_study2[0]['ID'] : 0,
+              'HomeNumber' => $objWorksheet->getCellByColumnAndRow(7, $i)->getCalculatedValue(),
+              'PhoneNumber' => $objWorksheet->getCellByColumnAndRow(8, $i)->getCalculatedValue(),
+              'Email' => $objWorksheet->getCellByColumnAndRow(9, $i)->getCalculatedValue(),
+              'SchoolID' => $SchoolID,
+              'Channel' => $Channel,
+              'price_event_ID' => '',
+              'source_from_event_ID' => $source_from_event_ID,
+              'SchoolIDChanel' => $SchoolID,
+              'Price_Form' => 150000,
+          );
+          $this->db->insert('db_admission.sale_formulir_offline', $temp);
+          $dataSave = array(
+                  'No_Ref' => $No_Ref,
+                  'StatusJual' => 1,
+                  'Print' => 1
+                          );
+          $this->db->where('FormulirCode',$FormulirCode);
+          $this->db->update('db_admission.formulir_number_offline_m', $dataSave);
+
+        }
+
+        echo json_encode(array('status'=> 1,'msg' => ''));
+      }
+      else
+      {
+        exit('No direct script access allowed');
+      }
+    }
+
+    public function submit_import_excel_kwitansi_penjualan_formulir_offline()
+    {
+      if(isset($_FILES["fileData"]["name"]))
+      {
+        $path = $_FILES["fileData"]["tmp_name"];
+        $arr_insert = array();
+        $arr_insert_auth = array();
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load($path); // Empty Sheet
+        $objWorksheet = $excel2->setActiveSheetIndex(0);
+        $CountRow = $objWorksheet->getHighestRow();
+      for ($i=2; $i < ($CountRow + 1); $i++) {
+        $No_Ref = $objWorksheet->getCellByColumnAndRow(0, $i)->getCalculatedValue();
+        if ($No_Ref == "" || $No_Ref == null) {
+          break;
+        }
+        $NoKwitansi = $objWorksheet->getCellByColumnAndRow(13, $i)->getCalculatedValue();
+        $CreatedBY = $objWorksheet->getCellByColumnAndRow(14, $i)->getCalculatedValue();
+        // print_r($CreatedBY);die();
+        $get = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','No_Ref',$No_Ref);
+        if (count($get) > 0) {
+          $FormulirCodeOffline = $get[0]['FormulirCode'];
+          $dataSave = array(
+              'NoKwitansi' => $NoKwitansi,
+              'CreatedBY' => $CreatedBY,
+          );
+          $this->db->where('FormulirCodeOffline', $FormulirCodeOffline);
+          $this->db->update('db_admission.sale_formulir_offline', $dataSave);
+        }
+      }
+
+        echo json_encode(array('status'=> 1,'msg' => ''));
+      }
+      else
+      {
+        exit('No direct script access allowed');
       }
     }
 
