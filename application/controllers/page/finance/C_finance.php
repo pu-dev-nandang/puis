@@ -267,25 +267,51 @@ class C_finance extends Finnance_Controler {
         $this->mypdf->Cell(0, 0, $Personal[0]['NamePrody'], 0, 1, 'L', 0);
 
         $setY = $setY + 8;
-        // label
-        $this->mypdf->SetXY($setX,$setY);
-        $this->mypdf->SetTextColor(0,0,0);
-        $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
-        $this->mypdf->Cell(0, 0, 'Virtual Account', 0, 1, 'L', 0);
+        // check VA active atau tidak
+        if ($this->session->userdata('finance_auth_Policy_SYS') == 1) {
+            // label
+            $this->mypdf->SetXY($setX,$setY);
+            $this->mypdf->SetTextColor(0,0,0);
+            $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
+            $this->mypdf->Cell(0, 0, 'Virtual Account', 0, 1, 'L', 0);
 
-        // titik dua
-        $setXtitik2 = $setX+$setJarakX;
-        $this->mypdf->SetXY($setXtitik2,$setY);
-        $this->mypdf->SetTextColor(0,0,0);
-        $this->mypdf->SetFont('Arial','',$setFontIsian);
-        $this->mypdf->Cell(0, 0, ":", 0, 1, 'L', 0);
+            // titik dua
+            $setXtitik2 = $setX+$setJarakX;
+            $this->mypdf->SetXY($setXtitik2,$setY);
+            $this->mypdf->SetTextColor(0,0,0);
+            $this->mypdf->SetFont('Arial','',$setFontIsian);
+            $this->mypdf->Cell(0, 0, ":", 0, 1, 'L', 0);
 
-        // value
-        $setXvalue = $setXtitik2 + 2;
-        $this->mypdf->SetXY($setXvalue,$setY);
-        $this->mypdf->SetTextColor(0,0,0);
-        $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
-        $this->mypdf->Cell(0, 0, $Personal[0]['VA_number'], 0, 1, 'L', 0);
+            // value
+            $setXvalue = $setXtitik2 + 2;
+            $this->mypdf->SetXY($setXvalue,$setY);
+            $this->mypdf->SetTextColor(0,0,0);
+            $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
+            $this->mypdf->Cell(0, 0, $Personal[0]['VA_number'], 0, 1, 'L', 0);
+        }
+        else
+        {
+            // label
+            $this->mypdf->SetXY($setX,$setY);
+            $this->mypdf->SetTextColor(0,0,0);
+            $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
+            $this->mypdf->Cell(0, 0, 'Rekening', 0, 1, 'L', 0);
+
+            // titik dua
+            $setXtitik2 = $setX+$setJarakX;
+            $this->mypdf->SetXY($setXtitik2,$setY);
+            $this->mypdf->SetTextColor(0,0,0);
+            $this->mypdf->SetFont('Arial','',$setFontIsian);
+            $this->mypdf->Cell(0, 0, ":", 0, 1, 'L', 0);
+
+            // value
+            $setXvalue = $setXtitik2 + 2;
+            $this->mypdf->SetXY($setXvalue,$setY);
+            $this->mypdf->SetTextColor(0,0,0);
+            $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
+            $this->mypdf->Cell(0, 0, '161.3888.555 (BCA Yayasan Pendidikan Agung Podomoro)', 0, 1, 'L', 0);
+        }
+        
 
         $t = 0;
         for ($i=0; $i < count($TuitionFee); $i++) { 
