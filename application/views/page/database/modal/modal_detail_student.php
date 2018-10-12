@@ -128,8 +128,8 @@
                 '            <td>'+data.StatusStudentDesc+'</td>' +
                 '        </tr>' +
                 '        <tr>' +
-                '            <td>Lecturer</td>' +
-                '            <td></td>' +
+                '            <td>Mentor Academic</td>' +
+                '            <td>'+data.NIP+' - <b>'+data.Mentor+'</b><br/><span style="color: #607d8b;">'+data.EmailPU+'</span></td>' +
                 '        </tr>' +
                 '        <tr>' +
                 '            <td>Class Of</td>' +
