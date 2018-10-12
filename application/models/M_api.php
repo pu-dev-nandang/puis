@@ -1206,11 +1206,14 @@ class M_api extends CI_Model {
 
         $db = 'ta_'.$ta;
         $data = $this->db->query('SELECT s.*, au.EmailPU, p.Name AS ProdiName, p.NameEng AS ProdiNameEng,
-                                      ss.Description AS StatusStudentDesc,"'.$db.'" as ta_student
+                                      ss.Description AS StatusStudentDesc,"'.$db.'" as ta_student,
+                                      em.Name AS Mentor, em.NIP, em.EmailPU
                                       FROM '.$db.'.students s
-                                      JOIN db_academic.program_study p ON (s.ProdiID = p.ID)
-                                      JOIN db_academic.status_student ss ON (s.StatusStudentID = ss.ID)
-                                      JOIN db_academic.auth_students au ON (s.NPM = au.NPM)
+                                      LEFT JOIN db_academic.program_study p ON (s.ProdiID = p.ID)
+                                      LEFT JOIN db_academic.status_student ss ON (s.StatusStudentID = ss.ID)
+                                      LEFT JOIN db_academic.auth_students au ON (s.NPM = au.NPM)
+                                      LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM=s.NPM)
+                                      LEFT JOIN db_employees.employees em ON (em.NIP=ma.NIP)
                                       WHERE s.NPM = "'.$NPM.'" LIMIT 1');
 
         return $data->result_array();
