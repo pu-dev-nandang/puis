@@ -3599,7 +3599,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinpromedium','',$fn_b-2);
         $pdf->SetX($x+10);
         $pdf->Cell(138.5,$h,'NIK : '.$Rektorat['NIP'],$border,0,'L');
-        $pdf->Cell(41,$h,'NIK : '.$Rektorat['NIP'],$border,1,'L');
+        $pdf->Cell(41,$h,'NIK : '.$Student['NIP'],$border,1,'L');
 
         $pdf->Rect($x+95, $y, 33, 45);
 
