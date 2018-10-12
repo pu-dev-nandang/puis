@@ -1366,7 +1366,7 @@ class C_save_to_excel extends CI_Controller
         $write->save('php://output');
     }
 
-    public function export_PengembalianFormulirData
+    public function export_PengembalianFormulirData()
     {
         $this->load->model('admission/m_admission');
         $this->load->model('master/m_master');
