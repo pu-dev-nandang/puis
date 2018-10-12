@@ -94,7 +94,7 @@
   				          	</div>
 			          	</div>
 			        </div>
-			        <div class="row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
+			        <!-- <div class="row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
 			        	<div class="thumbnail" style="height: 150px">
 			        		<div class="col-xs-6">
 			        			<div class="form-group">
@@ -133,7 +133,7 @@
 			        			</div>	
 			        		</div>
 			        	</div>
-			        </div>
+			        </div> -->
 			        <!-- end widget -->
 			    </div>
 			    <hr/>

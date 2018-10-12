@@ -1381,18 +1381,18 @@ class C_save_to_excel extends CI_Controller
                 $dateRange2 = $Input['dateRange2'];
                 $SelectSetTa = $Input['SelectSetTa'];
                 $SelectSortBy = $Input['SelectSortBy'];
-                $get = $this->m_admission->getSaleFormulirOfflineBetwwen($dateRange1,$dateRange2,$SelectSetTa,$SelectSortBy);
+                $get = $this->m_admission->getRegisterData($dateRange1,$dateRange2,$SelectSetTa,$SelectSortBy);
                 $title = 'Tanggal '.date('d M Y', strtotime($dateRange1)).' - '.date('d M Y', strtotime($dateRange2));
-                $this->exCel_PenjualanFormulirFinance($title,$get);
+                $this->exCel_PengembalianFormulirData($title,$get);
                 break;
             case 1: // by Month
                $SelectMonth = $Input['SelectMonth'];
                $SelectYear = $Input['SelectYear'];
                $SelectSetTa = $Input['SelectSetTa'];
                $SelectSortBy = $Input['SelectSortBy'];
-               $get = $this->m_admission->getSaleFormulirOfflinePerMonth($SelectMonth,$SelectYear,$SelectSetTa,$SelectSortBy);
+               $get = $this->m_admission->getRegisterDataPermonth($SelectMonth,$SelectYear,$SelectSetTa,$SelectSortBy);
                $title = 'Bulan '.date('F Y', strtotime($SelectYear.'-'.$SelectMonth.'-01'));
-               $this->exCel_PenjualanFormulirFinance($title,$get); 
+               $this->exCel_PengembalianFormulirData($title,$get); 
                 break;
             default:
                 # code...
@@ -1400,13 +1400,13 @@ class C_save_to_excel extends CI_Controller
         }
     }
 
-    private function exCel_PengembalianFormulirData()
+    private function exCel_PengembalianFormulirData($title,$data)
     {
         include APPPATH.'third_party/PHPExcel/PHPExcel.php';
         $objPHPExcel = new PHPExcel;
         $sheet = $objPHPExcel->getActiveSheet();
-
-        $excel2 = $excel2->load('./uploads/finance/TemplatePembayaran.xlsx'); // Empty Sheet
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load('./uploads/admisi/report_pengembalian_data.xlsx'); // Empty Sheet
         $excel2->setActiveSheetIndex(0);
 
         $excel3 = $excel2->getActiveSheet();
@@ -1424,20 +1424,53 @@ class C_save_to_excel extends CI_Controller
           )
         );
 
+        $excel3->setCellValue('A2', $title);
+
         // start dari A7
-        $a = 8;
-        for ($i=0; $i < count($dataGenerate); $i++) {
+        $a = 6;
+        for ($i=0; $i < count($data); $i++) {
            $no = $i + 1;  
-           $excel3->setCellValue('A'.$a, $no); 
-           $excel3->setCellValue('B'.$a, $dataGenerate[$i]['Nama']);
-           $excel3->setCellValue('C'.$a, $dataGenerate[$i]['NPM']);
-           $excel3->setCellValue('D'.$a, $dataGenerate[$i]['ProdiEng']);
-           $excel3->setCellValue('E'.$a, $dataGenerate[$i]['SPP']);
-           $excel3->setCellValue('F'.$a, $dataGenerate[$i]['Another']);
-           $excel3->setCellValue('G'.$a, $dataGenerate[$i]['BPP']);
-           $excel3->setCellValue('H'.$a, $dataGenerate[$i]['BPPKet']);
-           $excel3->setCellValue('I'.$a, $dataGenerate[$i]['Credit']);
-           $excel3->setCellValue('J'.$a, $dataGenerate[$i]['CreditKet']);
+           $excel3->setCellValue('A'.$a, $data[$i]['FormulirWrite']); 
+           $excel3->setCellValue('B'.$a, '');
+           $excel3->setCellValue('C'.$a, date('d M Y', strtotime($data[$i]['RegisterAT'])));
+           $excel3->setCellValue('D'.$a, $data[$i]['Name']);
+           $excel3->setCellValue('E'.$a, $data[$i]['Gender']);
+           $excel3->setCellValue('F'.$a, $data[$i]['PlaceBirth'].', '.date('d M Y', strtotime($data[$i]['DateBirth'])) );
+           $excel3->setCellValue('G'.$a, $data[$i]['Agama']);
+           $excel3->setCellValue('H'.$a, $data[$i]['ctr_name']);
+           $excel3->setCellValue('I'.$a, $data[$i]['NameEng']);
+           $excel3->setCellValue('J'.$a, '');
+           $excel3->setCellValue('K'.$a, $data[$i]['PhoneNumber']);
+           $excel3->setCellValue('L'.$a, $data[$i]['HomeNumber']);
+           $excel3->setCellValue('M'.$a, $data[$i]['Email']);
+           $excel3->setCellValue('N'.$a, '');
+           $excel3->setCellValue('O'.$a, $data[$i]['JacketSize']);
+           $excel3->setCellValue('P'.$a, $data[$i]['src_name']);
+           $excel3->setCellValue('Q'.$a, $data[$i]['alamat']);
+           $excel3->setCellValue('R'.$a, '');
+           $excel3->setCellValue('S'.$a, $data[$i]['ProvinceName']);
+           $excel3->setCellValue('T'.$a, $data[$i]['SchoolName']);
+           $excel3->setCellValue('U'.$a, $data[$i]['CitySchool']);
+           $excel3->setCellValue('V'.$a, $data[$i]['ads_sta']);
+           $excel3->setCellValue('W'.$a, $data[$i]['raport']);
+           $excel3->setCellValue('X'.$a, $data[$i]['Ijazah']);
+           $excel3->setCellValue('Y'.$a, '');
+           $excel3->setCellValue('Z'.$a, $data[$i]['Foto']);
+           $excel3->setCellValue('AA'.$a, $data[$i]['Refletter']);
+           $excel3->setCellValue('AB'.$a, $data[$i]['SuratNarkoba']);
+           $excel3->setCellValue('AC'.$a, $data[$i]['Essay']);
+           $excel3->setCellValue('AD'.$a, $data[$i]['FatherName']);
+           $excel3->setCellValue('AE'.$a, $data[$i]['FatherStatus']);
+           $excel3->setCellValue('AF'.$a, $data[$i]['FatherPhoneNumber']);
+           $excel3->setCellValue('AG'.$a, '');
+           $excel3->setCellValue('AH'.$a, $data[$i]['FatherJob']);
+           $excel3->setCellValue('AI'.$a, $data[$i]['FatherAddress']);
+           $excel3->setCellValue('AJ'.$a, $data[$i]['MotherName']);
+           $excel3->setCellValue('AK'.$a, $data[$i]['MotherStatus']);
+           $excel3->setCellValue('AL'.$a, $data[$i]['MotherPhoneNumber']);
+           $excel3->setCellValue('AM'.$a, '');
+           $excel3->setCellValue('AN'.$a, $data[$i]['MotherJob']);
+           $excel3->setCellValue('AO'.$a, $data[$i]['MotherAddress']);
 
            // Apply style row yang telah kita buat tadi ke masing-masing baris (isi tabel)
            $excel3->getStyle('A'.$a)->applyFromArray($style_row);
@@ -1451,20 +1484,48 @@ class C_save_to_excel extends CI_Controller
            $excel3->getStyle('I'.$a)->applyFromArray($style_row);
            $excel3->getStyle('J'.$a)->applyFromArray($style_row);
            $excel3->getStyle('K'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('L'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('M'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('N'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('O'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('P'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('Q'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('R'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('S'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('T'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('U'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('V'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('W'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('X'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('Y'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('Z'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AA'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AB'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AC'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AD'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AE'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AF'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AG'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AH'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AI'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AJ'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AK'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AL'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AM'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AN'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AO'.$a)->applyFromArray($style_row);
 
            $a = $a + 1; 
         }
+
+        $filename = 'report_pengembalian_formulir_'.date('y-m-d').'.xlsx';
 
         $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
         // We'll be outputting an excel file  
         header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
         // It will be called file.xlss
-        header('Content-Disposition: attachment; filename="file.xlsx"'); // jalan ketika tidak menggunakan ajax
-        //$filename = 'PenerimaanPembayaran.xlsx';
-        //$objWriter->save('./document/'.$filename);
+        header('Content-Disposition: attachment; filename="'.$filename.'"'); // jalan ketika tidak menggunakan ajax
         $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
-
-
     }
 
 
