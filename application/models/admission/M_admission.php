@@ -912,7 +912,8 @@ class M_admission extends CI_Model {
       else
       {
         // tampilkan sales secara keseluruhan
-        $query = $this->m_api->getEmployeesBy('10','13');
+        // $query = $this->m_api->getEmployeesBy('10','13');
+        $query = $this->m_api->getEmployeesPICAdmissionBy();
       }
 
       return $query;
