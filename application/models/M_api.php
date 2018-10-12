@@ -2102,6 +2102,16 @@ class M_api extends CI_Model {
         return $query;
     }
 
+    public function getEmployeesPICAdmissionBy()
+    {
+        $sql = "select a.* from db_employees.employees as a where a.PositionMain like '%10%'
+                UNION
+                select a.* from db_employees.employees as a where a.PositionMain like '%18%'
+        "; 
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
+    }
+
     public function getFormulirOfflineAvailable($StatusJual = 0)
     {
         // GET SET TA
