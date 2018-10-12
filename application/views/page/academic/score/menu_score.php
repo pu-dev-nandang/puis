@@ -20,12 +20,12 @@
                     <div class="col-xs-3">
                         <select id="filterSemester" class="form-control filter-score"></select>
                     </div>
-                    <div class="col-xs-5">
+                    <div class="col-xs-4">
                         <select id="filterBaseProdi" class="form-control filter-score">
                             <option value="">-- All Programme Study --</option>
                         </select>
                     </div>
-                    <div class="col-xs-4">
+                    <div class="col-xs-3">
                         <!-- 0 = Plan, 1 = waiting appr, 2 = Approval, -2 = Returned -->
                         <select class="form-control filter-score" id="filterStatusGrade">
                             <option value="">-- All Status Syllabus & RPS --</option>
@@ -36,6 +36,25 @@
                             <option value="2" style="background: #bdf3bd;">Approved</option>
                             <option disabled>------------------------</option>
                             <option value="-2" style="background: #ffa5a5;">Not Approved</option>
+                        </select>
+                    </div>
+                    <div class="col-xs-2">
+                        <select class="form-control filter-score" id="filterType">
+                            <option value="">-- All Status --</option>
+                            <option disabled>----------------------------</option>
+                            <optgroup label="Mid Exam Score">
+                                <option value="11">Already Input</option>
+                                <option value="10">Not Yet Input</option>
+                                <option value="12">Approve</option>
+                                <option value="13">Not Approve</option>
+                            </optgroup>
+                            <option disabled>----------------------------</option>
+                            <optgroup label="Final Exam">
+                                <option value="21">Already Input</option>
+                                <option value="20">Not Yet Input</option>
+                                <option value="22">Approve</option>
+                                <option value="23">Not Approve</option>
+                            </optgroup>
                         </select>
                     </div>
                 </div>
@@ -83,18 +102,28 @@
 
             var filterStatusGrade = $('#filterStatusGrade').val();
 
+            var filterType = $('#filterType').val();
+
             $('#divPageScore').html('<div class="">' +
-                '                <table class="table table-bordered" id="tableScore">' +
+                '                <table class="table table-bordered table-striped" id="tableScore">' +
                 '                    <thead>' +
                 '                    <tr>' +
-                '                        <th style="width: 1%;">No</th>' +
-                '                        <th>Course</th>' +
-                '                        <th  style="width: 9%;">Group</th>' +
-                '                        <th style="width: 5%;">Credit</th>' +
-                '                        <th style="width: 25%;">Lecturer</th>' +
-                '                        <th style="width: 5%;">Student</th>' +
-                '                        <th style="width: 7%;">Action</th>' +
-                '                        <th style="width: 5%;">Syllabus <br/>& RPS</th>' +
+                '                        <th rowspan="2" style="width: 1%;">No</th>' +
+                '                        <th rowspan="2">Course</th>' +
+                '                        <th rowspan="2" style="width: 9%;">Group</th>' +
+                '                        <th rowspan="2" style="width: 5%;">Credit</th>' +
+                '                        <th rowspan="2" style="width: 20%;">Lecturer</th>' +
+                '                        <th rowspan="2" style="width: 5%;">Student</th>' +
+                '                        <th colspan="2" style="width: 7%;">Mid Exam</th>' +
+                '                        <th colspan="2" style="width: 7%;">Final Exam</th>' +
+                '                        <th rowspan="2" style="width: 7%;">Action</th>' +
+                '                        <th rowspan="2" style="width: 5%;">Syllabus & RPS</th>' +
+                '                    </tr>' +
+                '                    <tr>' +
+                '                       <th style="1%;">I</th>' +
+                '                       <th style="1%;">A</th>' +
+                '                       <th style="1%;">I</th>' +
+                '                       <th style="1%;">A</th>' +
                 '                    </tr>' +
                 '                    </thead>' +
                 '                    <tbody id="trExam"></tbody>' +
@@ -105,7 +134,8 @@
                 SemesterID : filterSemester.split('.')[0],
                 ProdiID : ProdiID,
                 StatusGrade : filterStatusGrade,
-                IsSemesterAntara : '0'
+                IsSemesterAntara : '0',
+                Type : filterType
             };
 
             var token = jwt_encode(data,'UAP)(*');

@@ -4280,11 +4280,36 @@ class C_api extends CI_Controller {
               OR em.Name LIKE "%'.$search.'%" ) ';
         }
 
+        // Load Type
+        $whereType = '';
+        if($data_arr['Type']==10){
+            $whereType = ' AND (ris_uts.NIP IS NULL)';
+        } else if($data_arr['Type']==11){
+            $whereType = ' AND (ris_uts.NIP IS NOT NULL)';
+        } else if($data_arr['Type']==12){
+            $whereType = ' AND (ris_uts.Status = "1")';
+        } else if($data_arr['Type']==13){
+            $whereType = ' AND (ris_uts.Status = "0")';
+        }
+
+
+        else if($data_arr['Type']==20){
+            $whereType = ' AND (ris_uas.NIP IS NULL)';
+        } else if($data_arr['Type']==21){
+            $whereType = ' AND (ris_uas.NIP IS NOT NULL)';
+        } else if($data_arr['Type']==22){
+            $whereType = ' AND (ris_uas.Status = "1")';
+        } else if($data_arr['Type']==22){
+            $whereType = ' AND (ris_uas.Status = "0")';
+        }
+
         $queryDefault = 'SELECT sc.Classgroup,sc.TotalAssigment,
                                         sdc.*,cd.TotalSKS AS Credit, mk.MKCode, mk.Name AS MKName,
                                         mk.NameEng AS MKNameEng, sc.Coordinator, 
                                         em.Name AS CoordinatorName,
-                                        gc.ID AS GradeID, gc.Status AS StatusGrade 
+                                        gc.ID AS GradeID, gc.Status AS StatusGrade,
+                                        ris_uts.NIP AS uts_UpdateBy, ris_uts.UpdateAt AS uts_UpdateAt, ris_uts.Status AS uts_Status, 
+                                        ris_uas.NIP AS uas_UpdateBy, ris_uas.UpdateAt AS uas_UpdateAt, ris_uas.Status AS uas_Status 
                                         FROM db_academic.schedule_details_course sdc 
                                         LEFT JOIN db_academic.schedule sc ON (sc.ID = sdc.ScheduleID)
                                         LEFT JOIN db_employees.employees em ON (em.NIP = sc.Coordinator)
@@ -4292,7 +4317,11 @@ class C_api extends CI_Controller {
                                         LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
                                         LEFT JOIN db_academic.grade_course gc 
                                           ON (gc.SemesterID = sc.SemesterID AND gc.ScheduleID = sc.ID)
-                                        WHERE ('.$whereP.' ) '.$dataSearch.' '.$orderBy.' ';
+                                          LEFT JOIN db_academic.record_input_score ris_uts ON (ris_uts.ScheduleID = sc.ID AND ris_uts.Type="uts")
+                                          LEFT JOIN db_academic.record_input_score ris_uas ON (ris_uas.ScheduleID = sc.ID AND ris_uas.Type="uas")
+                                        WHERE ('.$whereP.' ) '.$whereType.' '.$dataSearch.' '.$orderBy.' ';
+
+//        echo $queryDefault;
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
@@ -4329,12 +4358,23 @@ class C_api extends CI_Controller {
             // Student
             $dataStudent = $this->m_api->getDataStudents_Schedule($data_arr['SemesterID'],$row['ScheduleID']);
 
+            $inputUTS = ($row['uts_UpdateBy']!=null && $row['uts_UpdateBy']!='') ? '<i class="fa fa-check-square-o" style="color: forestgreen;"></i>' : '-';
+            $inputUAS = ($row['uas_UpdateBy']!=null && $row['uas_UpdateBy']!='') ? '<i class="fa fa-check-square-o" style="color: forestgreen;"></i>' : '-';
+
+            $AppUTS = ($row['uts_Status']!=null && $row['uts_Status']!='' && $row['uts_Status']!='0') ? '<i class="fa fa-check-square-o" style="color: forestgreen;"></i>' : '-';
+            $AppUAS = ($row['uas_Status']!=null && $row['uas_Status']!='' && $row['uas_Status']!='0') ? '<i class="fa fa-check-square-o" style="color: forestgreen;"></i>' : '-';
+
+
             $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div style="text-align:left;"><b>'.$row['MKNameEng'].'</b><br/>'.$row['MKName'].'</div>';
             $nestedData[] = '<div style="text-align:center;">'.$row['Classgroup'].'</div>';
             $nestedData[] = '<div style="text-align:center;">'.$row['Credit'].'</div>';
             $nestedData[] = '<div style="text-align:left;">'.$row['CoordinatorName'].'</div>';
             $nestedData[] = '<div style="text-align:center;">'.count($dataStudent).'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$inputUTS.'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$AppUTS.'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$inputUAS.'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$AppUAS.'</div>';
             $nestedData[] = '<div style="text-align:center;">'.$btnAct.'</div>';
             $nestedData[] = '<div style="text-align:center;">'.$StatusGrade.'</div>';
 
