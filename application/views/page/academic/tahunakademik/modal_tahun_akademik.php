@@ -45,7 +45,7 @@
 
         // Sebelumnya
         // for(var i=0;i>=-1;i--){
-        for(var i=0;i>=-4;i--){
+        for(var i=2;i>=-1;i--){
             var sel ='';
             var n = (i>=0) ? Math.abs(i+1) : -Math.abs(i+1) ;
             var n1 = (i>=0) ? Math.abs(i) : -Math.abs(i) ;
