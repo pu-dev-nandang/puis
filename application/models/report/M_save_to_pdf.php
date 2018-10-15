@@ -355,7 +355,7 @@ class M_save_to_pdf extends CI_Model {
         $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth, aus.CertificateSerialNumber AS CSN,  
                                             ps.Name AS Prodi, ps.NameEng AS ProdiEng, edl.Description AS GradeDesc, 
                                             edl.DescriptionEng AS GradeDescEng, em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind, 
-                                            fp.TitleInd, fp.TitleEng
+                                            fp.TitleInd, fp.TitleEng, f.Name AS FacultyName
                                             FROM '.$DBStudent.'.students s
                                             LEFT JOIN db_academic.auth_students aus ON (s.NPM = aus.NPM) 
                                             LEFT JOIN db_academic.program_study ps ON (s.ProdiID = ps.ID) 
@@ -366,7 +366,8 @@ class M_save_to_pdf extends CI_Model {
                                             WHERE s.NPM = "'.$NPM.'" ')->result_array();
 
 
-        $data = $this->db->query('SELECT sp.Credit, sp.Grade, sp.GradeValue, mk.Name AS MKName, mk.NameEng AS MKNameEng, sp.MKID 
+        $data = $this->db->query('SELECT sp.Credit, sp.Grade, sp.GradeValue, mk.Name AS MKName, mk.NameEng AS MKNameEng, 
+                                          sp.MKID, mk.MKCode 
                                           FROM '.$DBStudent.'.study_planning sp 
                                           LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sp.CDID)
                                           LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
@@ -422,7 +423,15 @@ class M_save_to_pdf extends CI_Model {
         $grade = $this->getGraduation($ipk);
 
         // Get Rektor
-        $dataRektor = $this->db->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees',array('PositionMain' => '2.1'),1)->result_array();
+//        $dataRektor = $this->db->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees',array('PositionMain' => '2.1'),1)->result_array();
+        $dataRektor = $this->db->query('SELECT em.NIP, em.Name, em.TitleAhead, em.TitleBehind FROM db_employees.employees em
+                                                    LEFT JOIN db_employees.employees_status ems ON (ems.ID = em.StatusEmployeeID)
+                                                    WHERE em.PositionMain = "2.1" AND ems.IDStatus != -1 AND ems.IDStatus != -2 ')->result_array();
+
+        // Wakil rektor akademik / Warek I
+        $dataWaRek1 = $this->db->query('SELECT em.NIP, em.Name, em.TitleAhead, em.TitleBehind FROM db_employees.employees em
+                                                    LEFT JOIN db_employees.employees_status ems ON (ems.ID = em.StatusEmployeeID)
+                                                    WHERE em.PositionMain = "2.2" AND ems.IDStatus != -1 AND ems.IDStatus != -2 ')->result_array();
 
         $dataTranscript = $this->db->get('db_academic.setting_transcript')->result_array();
 
@@ -437,6 +446,7 @@ class M_save_to_pdf extends CI_Model {
             ),
             'Transcript' => $dataTranscript,
             'Rektorat' => $dataRektor,
+            'WaRek1' => $dataWaRek1,
             'DetailCourse' => $DetailCourse
 //            'DetailCourse' => $data
         );

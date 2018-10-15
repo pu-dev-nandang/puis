@@ -4274,7 +4274,7 @@ class C_api extends CI_Controller {
         $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
             $search = $requestData['search']['value'];
-            $dataSearch = ' AND ( sc.Classgroup LIKE "%'.$search.'%" 
+            $dataSearch = ' AND ( sc.ClassGroup LIKE "%'.$search.'%" 
             OR mk.Name LIKE "%'.$search.'%"
              OR mk.NameEng LIKE "%'.$search.'%"
               OR em.Name LIKE "%'.$search.'%" ) ';
@@ -4303,7 +4303,7 @@ class C_api extends CI_Controller {
             $whereType = ' AND (ris_uas.Status = "0")';
         }
 
-        $queryDefault = 'SELECT sc.Classgroup,sc.TotalAssigment,
+        $queryDefault = 'SELECT sc.ClassGroup,sc.TotalAssigment,
                                         sdc.*,cd.TotalSKS AS Credit, mk.MKCode, mk.Name AS MKName,
                                         mk.NameEng AS MKNameEng, sc.Coordinator, 
                                         em.Name AS CoordinatorName,
@@ -4320,8 +4320,6 @@ class C_api extends CI_Controller {
                                           LEFT JOIN db_academic.record_input_score ris_uts ON (ris_uts.ScheduleID = sc.ID AND ris_uts.Type="uts")
                                           LEFT JOIN db_academic.record_input_score ris_uas ON (ris_uas.ScheduleID = sc.ID AND ris_uas.Type="uas")
                                         WHERE ('.$whereP.' ) '.$whereType.' '.$dataSearch.' '.$orderBy.' ';
-
-//        echo $queryDefault;
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
@@ -4367,7 +4365,7 @@ class C_api extends CI_Controller {
 
             $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div style="text-align:left;"><b>'.$row['MKNameEng'].'</b><br/>'.$row['MKName'].'</div>';
-            $nestedData[] = '<div style="text-align:center;">'.$row['Classgroup'].'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$row['ClassGroup'].'</div>';
             $nestedData[] = '<div style="text-align:center;">'.$row['Credit'].'</div>';
             $nestedData[] = '<div style="text-align:left;">'.$row['CoordinatorName'].'</div>';
             $nestedData[] = '<div style="text-align:center;">'.count($dataStudent).'</div>';
@@ -4390,6 +4388,111 @@ class C_api extends CI_Controller {
             "data"            => $data
         );
         echo json_encode($json_data);
+
+    }
+
+    public function getMonScoreStd(){
+        $requestData= $_REQUEST;
+
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+
+        $w_prodi = ($data_arr['ProdiID']!='') ? ' AND auts.ProdiID = "'.$data_arr['ProdiID'].'"' : '';
+
+        $whereType = '';
+        if($data_arr['Type']==10){
+            $whereType = ' AND (sp.UTS IS NULL OR sp.UTS=0 OR sp.UTS="")';
+        } else if($data_arr['Type']==11){
+            $whereType = ' AND (sp.UTS IS NOT NULL AND sp.UTS!=0 AND sp.UTS != "")';
+        }
+
+        else if($data_arr['Type']==20){
+            $whereType = ' AND (sp.UAS IS NULL OR sp.UAS=0 OR sp.UAS="")';
+        } else if($data_arr['Type']==21){
+            $whereType = ' AND (sp.UAS IS NOT NULL AND sp.UAS!=0 AND sp.UAS != "")';
+        }
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataSearch = ' AND ( s.ClassGroup LIKE "%'.$search.'%" 
+            OR auts.Name LIKE "%'.$search.'%"
+             OR auts.NPM LIKE "%'.$search.'%"
+              OR em.NIP LIKE "%'.$search.'%"
+               OR em.Name LIKE "%'.$search.'%") ';
+
+        }
+
+
+
+        $DB_ = 'ta_'.$data_arr['Year'];
+        $queryDefault = 'SELECT s.ID,auts.NPM,auts.Name, s.ClassGroup, em.Name AS CoordinatorName, 
+                                     sp.Evaluasi1, sp.Evaluasi2, sp.Evaluasi3, sp.Evaluasi4, sp.Evaluasi5, sp.UTS, sp.UAS
+                                    FROM '.$DB_.'.study_planning sp
+                                    LEFT JOIN db_academic.auth_students auts ON (auts.NPM = sp.NPM)
+                                    LEFT JOIN db_academic.schedule s ON (s.ID = sp.ScheduleID)
+                                    LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                    WHERE ( sp.SemesterID = "'.$data_arr['SemesterID'].'" '.$w_prodi.' ) '.$whereType.' '.$dataSearch.' ORDER BY sp.NPM ASC
+                                    ';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+        for($i=0;$i<count($query);$i++) {
+            $nestedData = array();
+
+            $row = $query[$i];
+
+             $rowMK = $this->db->query('SELECT  mk.Name AS MKName, mk.NameEng AS MKNameEng, mk.MKCode 
+                                                              FROM db_academic.schedule_details_course sdc
+                                                              LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                              WHERE sdc.ScheduleID = "'.$row['ID'].'"  GROUP BY sdc.ScheduleID LIMIT 1')->result_array()[0];
+
+
+
+
+            $ev1 = ($row['Evaluasi1']!=null && $row['Evaluasi1']!='' && $row['Evaluasi1']!=0 && $row['Evaluasi1']!='0') ? $row['Evaluasi1'] : '-';
+            $ev2 = ($row['Evaluasi2']!=null && $row['Evaluasi2']!='' && $row['Evaluasi2']!=0 && $row['Evaluasi2']!='0') ? $row['Evaluasi2'] : '-';
+            $ev3 = ($row['Evaluasi3']!=null && $row['Evaluasi3']!='' && $row['Evaluasi3']!=0 && $row['Evaluasi3']!='0') ? $row['Evaluasi3'] : '-';
+            $ev4 = ($row['Evaluasi4']!=null && $row['Evaluasi4']!='' && $row['Evaluasi4']!=0 && $row['Evaluasi4']!='0') ? $row['Evaluasi4'] : '-';
+            $ev5 = ($row['Evaluasi5']!=null && $row['Evaluasi5']!='' && $row['Evaluasi5']!=0 && $row['Evaluasi5']!='0') ? $row['Evaluasi5'] : '-';
+            $UTS = ($row['UTS']!=null && $row['UTS']!='' && $row['UTS']!=0 && $row['UTS']!='0') ? $row['UTS'] : '-';
+            $UAS = ($row['UAS']!=null && $row['UAS']!='' && $row['UAS']!=0 && $row['UAS']!='0') ? $row['UAS'] : '-';
+
+
+
+            $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div style="text-align:left;"><b><i class="fa fa-user margin-right"></i>'.$row['Name'].'</b><br/>'.$row['NPM'].'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$rowMK['MKCode'].'</div>';
+            $nestedData[] = '<div style="text-align:left;"><span style="color: #009688;">'.$rowMK['MKNameEng'].'</span><br/><i style="color: #9e9e9e;">'.$rowMK['MKName'].'</i></div>';
+            $nestedData[] = '<div style="text-align:center;">'.$row['ClassGroup'].'</div>';
+            $nestedData[] = '<div style="text-align:left;">'.$row['CoordinatorName'].'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$ev1.'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$ev2.'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$ev3.'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$ev4.'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$ev5.'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$UTS.'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$UAS.'</div>';
+
+            $data[] = $nestedData;
+            $no++;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+
 
     }
 
@@ -4428,12 +4531,18 @@ class C_api extends CI_Controller {
             $db_ = 'ta_'.$row['Year'];
 
             $btnSKPI = '<div  style="text-align:center;">
-                            <a href="'.base_url('save2pdf/diploma_supplement').'" target="_blank" class="btn btn-default btn-default-warning btnDownloadSKPI"><i class="fa fa-download margin-right"></i> SKPI</a>
+                            <a href="'.base_url('save2pdf/diploma_supplement').'" target="_blank" class="btn btn-default btn-sm btn-default-warning btnDownloadSKPI"><i class="fa fa-download margin-right"></i> SKPI</a>
                             </div>';
 
-            $btnTranscript = '<div  style="text-align:center;">
-                                                <button class="btn btn-sm btn-default btn-default-primary btnDowloadTranscript" data-db="'.$db_.'" data-npm="'.$row['NPM'].'">
-                                                    <i class="fa fa-download margin-right"></i> Transcript</button></div>';
+//            $btnTranscript = '<div  style="text-align:center;">
+//                                                <button class="btn btn-sm btn-default btn-default-primary btnDowloadTranscript" data-db="'.$db_.'" data-npm="'.$row['NPM'].'">
+//                                                    <i class="fa fa-download margin-right"></i> Transcript</button></div>';
+
+            $btnTranscript = '<div class="btn-group btn-sm" role="group" aria-label="...">
+                              <button type="button" class="btn btn-sm btn-default btn-default-danger btnDowloadTempTranscript" data-db="'.$db_.'" data-npm="'.$row['NPM'].'"><i class="fa fa-hourglass-half margin-right"></i> Temp.</button>
+                              <button type="button" class="btn btn-sm btn-default btn-default-primary btnDowloadTranscript" data-db="'.$db_.'" data-npm="'.$row['NPM'].'">
+                              <i class="fa fa-download margin-right"></i> Final</button>
+                            </div>';
 
             $btnIjazah = '<div  style="text-align:center;">
                             <button class="btn btn-sm btn-default btn-default-success btnDownloadIjazah" data-db="'.$db_.'" data-npm="'.$row['NPM'].'"><i class="fa fa-download margin-right"></i> Ijazah</button>
