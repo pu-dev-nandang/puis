@@ -330,7 +330,7 @@ class C_admission extends Admission_Controler {
           case 'delete':
               $query = $this->m_master->caribasedprimary('db_admission.sale_formulir_offline','ID',$input['CDID']);
               $FormulirCode = $query[0]['FormulirCodeOffline'];
-              $this->m_master->delete_id_table($input['CDID'],'db_admission.sale_formulir_offline');
+              $this->m_master->delete_id_table($input['CDID'],'sale_formulir_offline');
               // print_r($FormulirCode);
               $this->m_master->updateStatusJual($FormulirCode);
               break;        
@@ -342,7 +342,7 @@ class C_admission extends Admission_Controler {
       header('Access-Control-Allow-Origin: *');
       header('Content-Type: application/json');
       $input = $this->getInputToken();
-      $generate = $this->m_admission->formulir_offline_salect_PIC($input);
+      $generate = $this->m_admission->formulir_offline_salect_PIC_renew($input);
       return print_r(json_encode($generate));
     }
 
@@ -1781,6 +1781,22 @@ class C_admission extends Admission_Controler {
         $StatusJual = ''; 
       }
 
+      // check session division
+      $PositionMain = $this->session->userdata('PositionMain');
+      $division = $PositionMain['IDDivision'];
+        $queryDiv = "";
+        switch ($division) {
+          case 10:
+            $queryDiv = ' where LEFT(c.PositionMain ,INSTR(c.PositionMain ,".")-1) = "'.$division.'"';
+            break;
+          case 18:
+            $queryDiv = ' where LEFT(c.PositionMain ,INSTR(c.PositionMain ,".")-1) = "'.$division.'"';
+            break;
+          default:
+            $queryDiv = "";
+            break;
+        }
+
       $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,b.No_Ref,a.StatusReg,b.Years,b.Status as StatusUsed, b.StatusJual,
                 b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,b.CityNameFormulir,b.DistrictNameFormulir,
                 b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi,b.NoKwitansi
@@ -1808,6 +1824,7 @@ class C_admission extends Admission_Controler {
                 on z.ID = b.SchoolID
                 left join db_academic.program_study as y
                 on b.ID_ProgramStudy = y.ID
+                '.$queryDiv.'  
                 )
                 as b
                 on a.FormulirCode = b.FormulirCode
@@ -2166,6 +2183,21 @@ class C_admission extends Admission_Controler {
     {
       $content = $this->load->view('page/'.$this->data['department'].'/tutorial/pagetutorial',$this->data,true);
       $this->temp($content);
+    }
+
+    public function ImportPengembalianFormulir()
+    {
+      include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+            $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+            $excel2 = $excel2->load('report_penjualan_data_18-10-09_KWITANSI.xlsx'); // Empty Sheet
+            $objWorksheet = $excel2->setActiveSheetIndex(0);
+            $CountRow = $objWorksheet->getHighestRow();
+      for ($i=2; $i < ($CountRow + 1); $i++) {
+        $No_Ref = $objWorksheet->getCellByColumnAndRow(0, $i)->getCalculatedValue();
+        $NoKwitansi = $objWorksheet->getCellByColumnAndRow(13, $i)->getCalculatedValue();
+        $CreatedBY = $objWorksheet->getCellByColumnAndRow(14, $i)->getCalculatedValue();
+        
+      }
     }
 
 }

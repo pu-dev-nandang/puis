@@ -340,32 +340,87 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $this->load->model('m_api');
         $date2 = $date;
         $date2 = ($date2 == null) ? date('Y-m-d') : $date2;
-        // $sql = "select a.Room,b.NameEng,c.StartSessions,c.EndSessions,TIMEDIFF(CONCAT(curdate(),' ',EndSessions), CONCAT(curdate(),' ',StartSessions)) as time
-        //         from db_academic.classroom as a join db_academic.schedule_details as c
-        //         on a.ID = c.ClassroomID
-        //         join db_academic.days as b
-        //         on c.DayID = b.ID
-        //         where CURDATE() >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
-        //         and CURDATE() <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
-        //         and b.NameEng = ?
-        //         order by a.Room";
-        $sql = "select a.Room,b.NameEng,c.StartSessions,c.EndSessions,TIMEDIFF(CONCAT(curdate(),' ',EndSessions), CONCAT(curdate(),' ',StartSessions)) as time,
-                e.Name as NamaDosen,g.NameEng as NamaMataKuliah,d.ID as ScheduleID
-                from db_academic.classroom as a join db_academic.schedule_details as c
-                on a.ID = c.ClassroomID
-                join db_academic.days as b
-                on c.DayID = b.ID
-                left join db_academic.schedule as d on d.ID = c.ScheduleID
-                left join db_employees.employees as e on d.Coordinator = e.NIP
-                left join (select * from db_academic.schedule_details_course group by ScheduleID) as f on f.ScheduleID = d.ID
-                left join db_academic.mata_kuliah as g on g.ID = f.MKID
-                where '".$date2."' >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
-                and '".$date2."' <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
-                and b.NameEng = ?
-                and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
-                on a.ID = b.ID_Attd where b.Status = '1' and b.DateOriginal = '".$date2."')
-                order by a.Room";  
-        // print_r($sql);die();              
+        
+        // cek academic years apakah periode ujian atau tidak
+            $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+            $SemesterID = $SemesterID[0]['ID'];
+
+            $sqlWaktu = 'select * from db_academic.academic_years where SemesterID = ? and (utsStart <="'.$date2.'" and utsEnd >= "'.$date2.'")';
+            $queryWaktu=$this->db->query($sqlWaktu, array($SemesterID))->result_array();
+
+            $sqlWaktu2 = 'select * from db_academic.academic_years where SemesterID = ? and (uasStart <="'.$date2.'" and uasEnd >= "'.$date2.'")';
+            $queryWaktu2=$this->db->query($sqlWaktu2, array($SemesterID))->result_array();
+            if (count($queryWaktu) == 0) {
+                if (count($queryWaktu2) > 0) {
+                    $sql = "select a.ExamClassroomID,a.ID as ID_exam,a.ExamDate,a.ExamStart as StartSessions,a.ExamEnd as EndSessions,TIMEDIFF(CONCAT(curdate(),' ',a.ExamEnd), CONCAT(curdate(),' ',a.ExamStart)) as time,
+                            b.Name as NamaDosen,c.ScheduleID,d.NameEng as NamaHari,e.Room,f.MKID,g.NameEng as NamaMataKuliah
+                            from db_academic.exam as a
+                            join db_employees.employees as b
+                            on a.Pengawas1 = b.NIP
+                            join db_academic.exam_details as c
+                            on a.ID = c.ExamID
+                            join db_academic.days as d
+                            on d.ID = a.DayID
+                            join db_academic.classroom as e
+                            on e.ID = a.ExamClassroomID
+                            join db_academic.schedule_details_course as f
+                            on f.ScheduleID = c.ScheduleID
+                            join db_academic.mata_kuliah as g
+                            on g.ID = f.MKID
+                            where d.NameEng = ?
+                            and a.ExamDate = '".$date2."'
+                            and a.`Status` = '1'
+                            and a.SemesterID = '".$SemesterID."'
+                            group by c.ScheduleID
+                    ";
+                }
+                else
+                {
+                    $sql = "select a.Room,b.NameEng,c.StartSessions,c.EndSessions,TIMEDIFF(CONCAT(curdate(),' ',EndSessions), CONCAT(curdate(),' ',StartSessions)) as time,
+                            e.Name as NamaDosen,g.NameEng as NamaMataKuliah,d.ID as ScheduleID
+                            from db_academic.classroom as a join db_academic.schedule_details as c
+                            on a.ID = c.ClassroomID
+                            join db_academic.days as b
+                            on c.DayID = b.ID
+                            left join db_academic.schedule as d on d.ID = c.ScheduleID
+                            left join db_employees.employees as e on d.Coordinator = e.NIP
+                            left join (select * from db_academic.schedule_details_course group by ScheduleID) as f on f.ScheduleID = d.ID
+                            left join db_academic.mata_kuliah as g on g.ID = f.MKID
+                            where '".$date2."' >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
+                            and '".$date2."' <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
+                            and b.NameEng = ?
+                            and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                            on a.ID = b.ID_Attd where b.Status = '1' and b.DateOriginal = '".$date2."')
+                            order by a.Room";  
+                }
+
+                
+            }
+            else
+            {
+                $sql = "select a.ExamClassroomID,a.ID as ID_exam,a.ExamDate,a.ExamStart as StartSessions,a.ExamEnd as EndSessions,TIMEDIFF(CONCAT(curdate(),' ',a.ExamEnd), CONCAT(curdate(),' ',a.ExamStart)) as time,
+                        b.Name as NamaDosen,c.ScheduleID,d.NameEng as NamaHari,e.Room,f.MKID,g.NameEng as NamaMataKuliah
+                        from db_academic.exam as a
+                        join db_employees.employees as b
+                        on a.Pengawas1 = b.NIP
+                        join db_academic.exam_details as c
+                        on a.ID = c.ExamID
+                        join db_academic.days as d
+                        on d.ID = a.DayID
+                        join db_academic.classroom as e
+                        on e.ID = a.ExamClassroomID
+                        join db_academic.schedule_details_course as f
+                        on f.ScheduleID = c.ScheduleID
+                        join db_academic.mata_kuliah as g
+                        on g.ID = f.MKID
+                        where d.NameEng = ?
+                        and a.ExamDate = '".$date2."'
+                        and a.`Status` = '1'
+                        and a.SemesterID = '".$SemesterID."'
+                        group by c.ScheduleID
+                ";
+            }
+   
         $query=$this->db->query($sql, array($NameDay))->result_array();
         // print_r($query);die(); 
 
@@ -375,19 +430,28 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
          where a.Status in(0,1)  '.$date;
         $query2=$this->db->query($sql2, array())->result_array();
 
-        $sql3 = 'select a.Room,b.NameEng,c.StartSessions,c.EndSessions,TIMEDIFF(CONCAT(curdate()," ",EndSessions), CONCAT(curdate()," ",StartSessions)) as time,
-                f.Name as NamaDosen,h.NameEng as NamaMataKuliah,e.ID as ScheduleID 
-                from db_academic.classroom as a join db_academic.schedule_exchange as c
-                on a.ID = c.ClassroomID
-                join db_academic.days as b
-                on c.DayID = b.ID 
-                left join db_academic.attendance as d on d.ID = c.ID_Attd
-                left join db_academic.schedule as e on e.ID = d.ScheduleID
-                left join db_employees.employees as f on e.Coordinator = f.NIP
-                left join (select * from db_academic.schedule_details_course group by ScheduleID) as g on g.ScheduleID = e.ID
-                left join db_academic.mata_kuliah as h on h.ID = g.MKID
-                where c.Status = "1" and c.Date ="'.$date2.'"';
-        $query3=$this->db->query($sql3, array())->result_array();
+        if (count($queryWaktu) == 0 && count($queryWaktu2) == 0 ) {
+           $sql3 = 'select a.Room,b.NameEng,c.StartSessions,c.EndSessions,TIMEDIFF(CONCAT(curdate()," ",EndSessions), CONCAT(curdate()," ",StartSessions)) as time,
+                   f.Name as NamaDosen,h.NameEng as NamaMataKuliah,e.ID as ScheduleID 
+                   from db_academic.classroom as a join db_academic.schedule_exchange as c
+                   on a.ID = c.ClassroomID
+                   join db_academic.days as b
+                   on c.DayID = b.ID 
+                   left join db_academic.attendance as d on d.ID = c.ID_Attd
+                   left join db_academic.schedule as e on e.ID = d.ScheduleID
+                   left join db_employees.employees as f on e.Coordinator = f.NIP
+                   left join (select * from db_academic.schedule_details_course group by ScheduleID) as g on g.ScheduleID = e.ID
+                   left join db_academic.mata_kuliah as h on h.ID = g.MKID
+                   where c.Status = "1" and c.Date ="'.$date2.'"';
+            $query3=$this->db->query($sql3, array())->result_array();       
+        }
+        else
+        {
+            $query3 = array();
+        }
+
+
+        
 
         for ($i=0; $i < count($query); $i++) { 
             $time = $query[$i]['time'];
@@ -411,13 +475,18 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $arrMhs = $this->m_api->__getStudentByScheduleID($query[$i]['ScheduleID']);
             $jumlahMHS = count($arrMhs);
 
+            $agenda = 'Study';
+            if (count($queryWaktu) > 0 || count($queryWaktu2) > 0) {
+                $agenda = 'Exam';
+            }
+
             $dt = array(
                 'user'  => 'Academic TimeTables',
                 'start' => $start,
                 'end'   => $end,
                 'time'  => $time,
                 'colspan' => $colspan,
-                'agenda' => 'Study',
+                'agenda' => $agenda,
                 'room' => $query[$i]['Room'],
                 'approved' => 1,
                 'NIP' => '0',
@@ -496,7 +565,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $bool = true;
         $NotIDMyself = ($NotIDMyself == '') ? '' : ' and a.ID != '.$NotIDMyself;
         for ($xx=0; $xx < 3; $xx++) {  // check twice
-            // get 
+
             $TimeStart = date("H:i:s", strtotime($Start));
             $TimeEnd = date("H:i:s", strtotime($End));
 
@@ -506,14 +575,90 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 $NameDay = $datetime->format('l');
                 $date2 = date("Y-m-d", strtotime($Start));
 
-                $sql = 'select count(*) as total from db_academic.classroom as a join db_academic.schedule_details as c
-                        on a.ID = c.ClassroomID
-                        join db_academic.days as b
-                        on c.DayID = b.ID
-                        where "'.$date2.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
-                        and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
-                        and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
-                on a.ID = b.ID_Attd where b.Status = "1" and b.DateOriginal = "'.$date2.'")';
+                // cek academic years apakah periode ujian atau tidak
+                    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+                    $SemesterID = $SemesterID[0]['ID'];
+
+                    $sqlWaktu = 'select * from db_academic.academic_years where SemesterID = ? and (utsStart <="'.$date2.'" and utsEnd >= "'.$date2.'")';
+                    $queryWaktu=$this->db->query($sqlWaktu, array($SemesterID))->result_array();
+
+                    $sqlWaktu2 = 'select * from db_academic.academic_years where SemesterID = ? and (uasStart <="'.$date2.'" and uasEnd >= "'.$date2.'")';
+                    $queryWaktu2=$this->db->query($sqlWaktu2, array($SemesterID))->result_array();
+
+                if (count($sqlWaktu) == 0) {
+                    if (count($sqlWaktu2) > 0) {
+                        $sql = "select count(*) as total from
+                               (select a.ExamClassroomID,a.ID as ID_exam,a.ExamDate,a.ExamStart as StartSessions,a.ExamEnd as EndSessions,TIMEDIFF(CONCAT(curdate(),' ',a.ExamEnd), CONCAT(curdate(),' ',a.ExamStart)) as time,
+                                b.Name as NamaDosen,c.ScheduleID,d.NameEng as NamaHari,e.Room,f.MKID,g.NameEng as NamaMataKuliah
+                                from db_academic.exam as a
+                                join db_employees.employees as b
+                                on a.Pengawas1 = b.NIP
+                                join db_academic.exam_details as c
+                                on a.ID = c.ExamID
+                                join db_academic.days as d
+                                on d.ID = a.DayID
+                                join db_academic.classroom as e
+                                on e.ID = a.ExamClassroomID
+                                join db_academic.schedule_details_course as f
+                                on f.ScheduleID = c.ScheduleID
+                                join db_academic.mata_kuliah as g
+                                on g.ID = f.MKID
+                                where d.NameEng = '".$NameDay."'
+                                and a.ExamDate = '".$date2."'
+                                and a.`Status` = '1'
+                                and a.SemesterID = '".$SemesterID."'
+                                and ((a.ExamStart >= '".$TimeStart."'  and a.ExamStart < '".$TimeEnd."' ) 
+                                   or  (a.ExamEnd > '".$TimeStart."'  and a.ExamEnd <= '".$TimeEnd."' )
+                                ) and e.Room  = '".$Room."' 
+                                group by c.ScheduleID
+                               )
+                                aa
+                        ";
+                    }
+                    else
+                    {
+                        $sql = 'select count(*) as total from db_academic.classroom as a join db_academic.schedule_details as c
+                                on a.ID = c.ClassroomID
+                                join db_academic.days as b
+                                on c.DayID = b.ID
+                                where "'.$date2.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
+                                and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
+                                and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                        on a.ID = b.ID_Attd where b.Status = "1" and b.DateOriginal = "'.$date2.'")';
+                    }
+                }
+                else
+                {
+                    $sql = "select count(*) as total from
+                               (select a.ExamClassroomID,a.ID as ID_exam,a.ExamDate,a.ExamStart as StartSessions,a.ExamEnd as EndSessions,TIMEDIFF(CONCAT(curdate(),' ',a.ExamEnd), CONCAT(curdate(),' ',a.ExamStart)) as time,
+                                b.Name as NamaDosen,c.ScheduleID,d.NameEng as NamaHari,e.Room,f.MKID,g.NameEng as NamaMataKuliah
+                                from db_academic.exam as a
+                                join db_employees.employees as b
+                                on a.Pengawas1 = b.NIP
+                                join db_academic.exam_details as c
+                                on a.ID = c.ExamID
+                                join db_academic.days as d
+                                on d.ID = a.DayID
+                                join db_academic.classroom as e
+                                on e.ID = a.ExamClassroomID
+                                join db_academic.schedule_details_course as f
+                                on f.ScheduleID = c.ScheduleID
+                                join db_academic.mata_kuliah as g
+                                on g.ID = f.MKID
+                                where d.NameEng = '".$NameDay."'
+                                and a.ExamDate = '".$date2."'
+                                and a.`Status` = '1'
+                                and a.SemesterID = '".$SemesterID."'
+                                and ((a.ExamStart >= '".$TimeStart."'  and a.ExamStart < '".$TimeEnd."' ) 
+                                   or  (a.ExamEnd > '".$TimeStart."'  and a.ExamEnd <= '".$TimeEnd."' )
+                                ) and e.Room  = '".$Room."' 
+                                group by c.ScheduleID
+                               )
+                                aa
+                        ";
+                } // exit cek date academic
+                // print_r($sql);die();
+
                 $query=$this->db->query($sql, array())->result_array();
 
                 if ($query[0]['total'] > 0) {
@@ -547,7 +692,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             }
             else
             {
-
+                // looping
                 // check academic timeline untuk data satu
                 $datetime = DateTime::createFromFormat('Y-m-d H:i:s', $Start);
                 $NameDay = $datetime->format('l');

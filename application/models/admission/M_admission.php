@@ -332,6 +332,23 @@ class M_admission extends CI_Model {
         $statusJual = ''; 
       }
 
+      // check session division
+      $PositionMain = $this->session->userdata('PositionMain');
+      $division = $PositionMain['IDDivision'];
+        $queryDiv = "";
+        switch ($division) {
+          case 10:
+            $queryDiv = ' where LEFT(c.PositionMain ,INSTR(c.PositionMain ,".")-1) = "'.$division.'"';
+            break;
+          case 18:
+            $queryDiv = ' where LEFT(c.PositionMain ,INSTR(c.PositionMain ,".")-1) = "'.$division.'"';
+            break;
+          default:
+            $queryDiv = "";
+            break;
+        }
+
+
       $sql = 'select count(*) as total from 
               ( 
                 select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,b.No_Ref,a.StatusReg,b.Years,b.Status as StatusUsed, 
@@ -349,7 +366,8 @@ class M_admission extends CI_Model {
                   if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,
                   b.ID_ProgramStudy,y.Name as NameProdi from db_admission.formulir_number_offline_m as a left join db_admission.sale_formulir_offline as b 
                   on a.FormulirCode = b.FormulirCodeOffline left join db_employees.employees as c on c.NIP = b.PIC left join db_admission.school as z on z.ID = b.SchoolID 
-                  left join db_academic.program_study as y on b.ID_ProgramStudy = y.ID 
+                  left join db_academic.program_study as y on b.ID_ProgramStudy = y.ID
+                  '.$queryDiv.'  
                 ) as b on a.FormulirCode = b.FormulirCode where b.Years = "'.$reqTahun.'" AND
                   (
                     b.FormulirCode like "'.$requestData['search']['value'].'%" or
@@ -891,6 +909,8 @@ class M_admission extends CI_Model {
 
       $this->db->where('ID',$input_arr['CDID']);
       $this->db->update('db_admission.sale_formulir_offline', $dataSave);
+
+      $this->updateSellOUTFormulirOffline($input_arr['selectFormulirCode'],$input_arr['No_Ref']);
     }
 
     public function formulir_offline_salect_PIC($input_arr)
@@ -914,6 +934,60 @@ class M_admission extends CI_Model {
         // tampilkan sales secara keseluruhan
         // $query = $this->m_api->getEmployeesBy('10','13');
         $query = $this->m_api->getEmployeesPICAdmissionBy();
+      }
+
+      return $query;
+    }
+
+    public function formulir_offline_salect_PIC_renew($input_arr)
+    {
+      $this->load->model('m_api');
+      $PositionMain = $this->session->userdata('PositionMain');
+      $division = $PositionMain['IDDivision'];
+
+        $queryDiv = "";
+      $SchoolID = $input_arr['School'];
+      if ($SchoolID != '') {
+        // cari sales berdasarkan wilayah, jika tidak ada maka tampilkan sales secara keseluruhan
+            $sql = 'select b.NIP,b.Name from db_admission.sales_school_m as a
+                    join db_employees.employees as b
+                    on a.SalesNIP = b.NIP where a.SchoolID = ? ';
+            $query=$this->db->query($sql, array($SchoolID))->result_array();
+            if (count($query) == 0) {
+              // $query = $this->m_api->getEmployeesBy('10','13');
+              $sql = 'select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 10
+                      union
+                      select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 18 
+                    ';
+              $query=$this->db->query($sql, array())->result_array();
+            }
+            // print_r($query);
+      }
+      else
+      {
+        $sql = 'select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 10
+                union
+                select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 18 
+              ';
+        // tampilkan sales secara keseluruhan
+        // $query = $this->m_api->getEmployeesBy('10','13');
+        // $query = $this->m_api->getEmployeesPICAdmissionBy();
+        // check session division
+        $PositionMain = $this->session->userdata('PositionMain');
+        $division = $PositionMain['IDDivision'];
+        $queryDiv = "";
+          switch ($division) {
+            case 10:
+              $sql = 'select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 10';
+              break;
+            case 18:
+              $sql = 'select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 18';
+              break;
+            default:
+              break;
+          }
+
+          $query=$this->db->query($sql, array())->result_array();
       }
 
       return $query;
