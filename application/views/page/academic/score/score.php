@@ -250,7 +250,7 @@
                                 '  </button>' +
                                 '  <ul class="dropdown-menu">' +
                                 '    <li><a href="javascript:void(0);" class="btnInputScore" data-nip="'+dataC.Coordinator+'" data-smt="'+SemesterID+'" data-id="'+dataC.ScheduleID+'">Input Score</a></li>' +
-                                '    <li><a href="javascript:void(0);" class="btnGrade" data-page="InputGrade1" data-group="'+dataC.Classgroup+'" data-id="'+dataC.ScheduleID+'">Approval - Score Weighted</a></li>' +
+                                '    <li><a href="javascript:void(0);" class="btnGrade" data-page="InputGrade1" data-group="'+dataC.ClassGroup+'" data-id="'+dataC.ScheduleID+'">Approval - Score Weighted</a></li>' +
                                 '    <li role="separator" class="divider"></li>' +
                                 '    <li><a href="javascript:void(0);" class="inputScheduleExchange" data-no="'+i+'" data-id="">Cetak Report UTS</a></li>' +
                                 '    <li><a href="javascript:void(0);" class="inputScheduleExchange" data-no="'+i+'" data-id="">Cetak Report UAS</a></li>' +

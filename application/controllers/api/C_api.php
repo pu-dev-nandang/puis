@@ -4270,7 +4270,7 @@ class C_api extends CI_Controller {
         $whereP = ($data_arr['ProdiID'] !='' && $data_arr['ProdiID']!=null)
             ? ' sc.SemesterID = "'.$data_arr['SemesterID'].'" '.$whereStatusGrade.' AND sc.IsSemesterAntara = "'.$data_arr['IsSemesterAntara'].'" AND sdc.ProdiID = "'.$data_arr['ProdiID'].'" '
             : ' sc.SemesterID = "'.$data_arr['SemesterID'].'" '.$whereStatusGrade.' AND sc.IsSemesterAntara = "'.$data_arr['IsSemesterAntara'].'" ';
-        $orderBy = ' GROUP BY sc.ID ORDER BY sc.Classgroup, sdc.ID ASC ';
+        $orderBy = ' GROUP BY sc.ID ORDER BY sc.ClassGroup, sdc.ID ASC ';
         $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
             $search = $requestData['search']['value'];
@@ -4346,7 +4346,7 @@ class C_api extends CI_Controller {
             $btnAct = '<div class="btn-group"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> <span class="caret"></span></button>
                 <ul class="dropdown-menu">
                 <li><a href="javascript:void(0);" class="btnInputScore" data-nip="'.$row['Coordinator'].'" data-smt="'.$data_arr['SemesterID'].'" data-id="'.$row['ScheduleID'].'">Input Score</a></li>
-                <li><a href="javascript:void(0);" class="btnGrade" data-page="InputGrade1" data-group="'.$row['Classgroup'].'" data-id="'.$row['ScheduleID'].'">Approval - Score Weighted</a></li>
+                <li><a href="javascript:void(0);" class="btnGrade" data-page="InputGrade1" data-group="'.$row['ClassGroup'].'" data-id="'.$row['ScheduleID'].'">Approval - Score Weighted</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="javascript:void(0);" class="inputScheduleExchange" data-no="'.$no.'" data-id="">Cetak Report UTS</a></li>
                 <li><a href="javascript:void(0);" class="inputScheduleExchange" data-no="'.$no.'" data-id="">Cetak Report UAS</a></li>
