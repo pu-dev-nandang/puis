@@ -1140,6 +1140,7 @@ class C_save_to_excel extends CI_Controller
         $write->save('php://output');
     }
 
+
     public function monitoring_score()
     {
 
@@ -1297,6 +1298,418 @@ class C_save_to_excel extends CI_Controller
         //echo json_encode(array('file' => $filename));
 
         // exit else ajax
+    }
+    public function export_PenjualanFormulirData()
+    {
+        $this->load->model('admission/m_admission');
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $Input = (array) $this->jwt->decode($token,$key);
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+        switch ($Input['cf']) {
+            case 0: // date range
+                $dateRange1 = $Input['dateRange1'];
+                $dateRange2 = $Input['dateRange2'];
+                $SelectSetTa = $Input['SelectSetTa'];
+                $SelectSortBy = $Input['SelectSortBy'];
+                $get = $this->m_admission->getSaleFormulirOfflineBetwwen($dateRange1,$dateRange2,$SelectSetTa,$SelectSortBy);
+                $title = 'Tanggal '.date('d M Y', strtotime($dateRange1)).' - '.date('d M Y', strtotime($dateRange2));
+                $this->exCel_PenjualanFormulirData($title,$get);
+                break;
+            case 1: // by Month
+               $SelectMonth = $Input['SelectMonth'];
+               $SelectYear = $Input['SelectYear'];
+               $SelectSetTa = $Input['SelectSetTa'];
+               $SelectSortBy = $Input['SelectSortBy'];
+               $get = $this->m_admission->getSaleFormulirOfflinePerMonth($SelectMonth,$SelectYear,$SelectSetTa,$SelectSortBy);
+               $title = 'Bulan '.date('F Y', strtotime($SelectYear.'-'.$SelectMonth.'-01'));
+               $this->exCel_PenjualanFormulirData($title,$get); 
+                break;
+            default:
+                # code...
+                break;
+        }
+    }
+
+    private function exCel_PenjualanFormulirData($title,$data)
+    {
+        // print_r($data);die();
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $objPHPExcel = new PHPExcel;
+        $sheet = $objPHPExcel->getActiveSheet();
+        $count = 5;
+        $phone = PHPExcel_Cell_DataType::TYPE_STRING;
+        
+        $sheet->setCellValue('A1', 'Laporan Penjualan Formulir');
+        $sheet->setCellValue('A2', $title);
+        
+        $sheet->setCellValue('A4', 'Form');
+        $sheet->setCellValue('B4', 'Tanggal');
+        $sheet->setCellValue('C4', 'PIC');
+        $sheet->setCellValue('D4', 'Nama');
+        $sheet->setCellValue('E4', 'Gender');
+        $sheet->setCellValue('F4', 'Jurusan 1');
+        $sheet->setCellValue('G4', 'Jurusan 2');
+        $sheet->setCellValue('H4', 'Phone Home');
+        $sheet->setCellValue('I4', 'Phone Mobile');
+        $sheet->setCellValue('J4', 'Email');
+        $sheet->setCellValue('K4', 'Sekolah');
+        $sheet->setCellValue('L4', 'Kota Sekolah');
+        $sheet->setCellValue('M4', 'Sumber Iklan');
+
+        for ($i=0; $i < count($data); $i++) { 
+            $sheet->setCellValue('A'.$count, ($data[$i]['No_Ref'] == "" || $data[$i]['No_Ref'] == null ) ? $data[$i]['FormulirCode'] : $data[$i]['No_Ref'] );
+            $sheet->setCellValue('B'.$count, date('d M Y', strtotime( $data[$i]['DateSale'] ) ) );
+            $sheet->setCellValue('C'.$count, $data[$i]['Sales']);
+            $sheet->setCellValue('D'.$count, $data[$i]['FullName']);
+            $sheet->setCellValue('E'.$count, ($data[$i]['Gender'] == "P") ? 'Perempuan' : 'Laki-Laki'  );
+            $sheet->setCellValue('F'.$count, $data[$i]['NameProdi1']);
+            $sheet->setCellValue('G'.$count, $data[$i]['NameProdi2']);
+            $sheet->setCellValueExplicit('H'.$count, $data[$i]['HomeNumber'], $phone);
+            $sheet->setCellValueExplicit('I'.$count, $data[$i]['PhoneNumber'], $phone);
+            $sheet->setCellValue('J'.$count, $data[$i]['Email']);
+            $sheet->setCellValue('K'.$count, $data[$i]['SchoolNameFormulir'].' '.$data[$i]['DistrictNameFormulir']);
+            $sheet->setCellValue('L'.$count, $data[$i]['CityNameFormulir']);
+            $sheet->setCellValue('M'.$count, $data[$i]['src_name']);
+            $count++;
+        }
+        
+        $objPHPExcel->setActiveSheetIndex(0)->mergeCells('A1:M1');
+        $objPHPExcel->setActiveSheetIndex(0)->mergeCells('A2:M2');
+        $sheet->getStyle('A1')->getFont()->setSize(16);
+        $sheet->getStyle('A2')->getFont()->setSize(12);
+        $sheet->getStyle('A1')->getFont()->setBold(true);
+        $sheet->getStyle('A2')->getFont()->setBold(true);
+        $sheet->getStyle('A4:M4')->getFont()->setBold(true);
+        
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A2')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A4:M4')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A4:M'.$count)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+        $sheet->getStyle('A4:M4')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('ABCAFF');
+        
+        $sheet->getColumnDimension('A')->setAutoSize(true);
+        $sheet->getColumnDimension('B')->setAutoSize(true);
+        $sheet->getColumnDimension('C')->setAutoSize(true);
+        $sheet->getColumnDimension('D')->setAutoSize(true);
+        $sheet->getColumnDimension('E')->setAutoSize(true);
+        $sheet->getColumnDimension('F')->setAutoSize(true);
+        $sheet->getColumnDimension('G')->setAutoSize(true);
+        $sheet->getColumnDimension('H')->setAutoSize(true);
+        $sheet->getColumnDimension('I')->setAutoSize(true);
+        $sheet->getColumnDimension('J')->setAutoSize(true);
+        $sheet->getColumnDimension('K')->setAutoSize(true);
+        $sheet->getColumnDimension('L')->setAutoSize(true);
+        $sheet->getColumnDimension('M')->setAutoSize(true);
+
+        $sheet->setTitle('Penjualan Form');
+        $objPHPExcel->setActiveSheetIndex(0);
+        $filename = 'report_penjualan_data_'.date('y-m-d').'.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="'.$filename.'"'); // Set nama file excel nya
+        header('Cache-Control: max-age=0');
+
+        $write = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $write->save('php://output');
+    }
+
+    public function export_PenjualanFormulirFinance()
+    {
+        $this->load->model('admission/m_admission');
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $Input = (array) $this->jwt->decode($token,$key);
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+        switch ($Input['cf']) {
+            case 0: // date range
+                $dateRange1 = $Input['dateRange1'];
+                $dateRange2 = $Input['dateRange2'];
+                $SelectSetTa = $Input['SelectSetTa'];
+                $SelectSortBy = $Input['SelectSortBy'];
+                $get = $this->m_admission->getSaleFormulirOfflineBetwwen($dateRange1,$dateRange2,$SelectSetTa,$SelectSortBy);
+                $title = 'Tanggal '.date('d M Y', strtotime($dateRange1)).' - '.date('d M Y', strtotime($dateRange2));
+                $this->exCel_PenjualanFormulirFinance($title,$get);
+                break;
+            case 1: // by Month
+               $SelectMonth = $Input['SelectMonth'];
+               $SelectYear = $Input['SelectYear'];
+               $SelectSetTa = $Input['SelectSetTa'];
+               $SelectSortBy = $Input['SelectSortBy'];
+               $get = $this->m_admission->getSaleFormulirOfflinePerMonth($SelectMonth,$SelectYear,$SelectSetTa,$SelectSortBy);
+               $title = 'Bulan '.date('F Y', strtotime($SelectYear.'-'.$SelectMonth.'-01'));
+               $this->exCel_PenjualanFormulirFinance($title,$get); 
+                break;
+            default:
+                # code...
+                break;
+        }
+    }
+
+    private function exCel_PenjualanFormulirFinance($title,$data)
+    {
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $objPHPExcel = new PHPExcel;
+        $sheet = $objPHPExcel->getActiveSheet();
+        $count = 5;
+        $buy = $free = 0;
+        $total = 0;
+        
+        //---------------------- table data ----------------------
+        $sheet->setCellValue('A1', 'Laporan Penjualan Formulir');
+        $sheet->setCellValue('A2', $title);
+        
+        $sheet->setCellValue('A4', 'No');
+        $sheet->setCellValue('B4', 'Tanggal');
+        $sheet->setCellValue('C4', 'Form');
+        $sheet->setCellValue('D4', 'Nama');
+        $sheet->setCellValue('E4', 'Channel');
+        $sheet->setCellValue('F4', 'Keterangan');
+        $sheet->setCellValue('G4', 'Jumlah');
+        
+        for ($i=0; $i < count($data); $i++) { 
+            $sheet->setCellValue('A'.$count, ($i + 1));
+            $sheet->setCellValue('B'.$count, date('d M Y', strtotime($data[$i]['DateSale'] )));
+            $sheet->setCellValue('C'.$count, ($data[$i]['No_Ref'] == "" || $data[$i]['No_Ref'] == null ) ? $data[$i]['FormulirCode'] : $data[$i]['No_Ref']);
+            $sheet->setCellValue('D'.$count, $data[$i]['FullName']);
+            $sheet->setCellValue('E'.$count, $data[$i]['Channel']);
+            $sheet->setCellValue('F'.$count, '');
+            $sheet->setCellValue('G'.$count, number_format($data[$i]['Price_Form']));
+            $count++;
+            $total += $data[$i]['Price_Form'];
+            if ($data[$i]['Price_Form'] > 0) {
+                $buy++;
+            }
+            else
+            {
+                $free++;
+            }
+        }
+
+        $sheet->setCellValue('A'.$count, 'Total');
+        $sheet->setCellValue('G'.$count, number_format($total));
+        
+        $objPHPExcel->setActiveSheetIndex(0)->mergeCells('A1:G1');
+        $objPHPExcel->setActiveSheetIndex(0)->mergeCells('A2:G2');
+        $objPHPExcel->setActiveSheetIndex(0)->mergeCells('A'.$count.':F'.$count);
+        $sheet->getStyle('A1')->getFont()->setSize(16);
+        $sheet->getStyle('A2')->getFont()->setSize(12);
+        $sheet->getStyle('A1')->getFont()->setBold(true);
+        $sheet->getStyle('A2')->getFont()->setBold(true);
+        $sheet->getStyle('A4:G4')->getFont()->setBold(true);
+        $sheet->getStyle('A'.$count)->getFont()->setBold(true);
+        
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A2')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A4:G4')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('G5:G'.$count)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('A'.$count)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('G'.$count)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('A4:G'.$count)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+        $sheet->getStyle('A4:G4')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('ABCAFF');
+        
+        $sheet->getColumnDimension('A')->setAutoSize(true);
+        $sheet->getColumnDimension('B')->setAutoSize(true);
+        $sheet->getColumnDimension('C')->setAutoSize(true);
+        $sheet->getColumnDimension('D')->setAutoSize(true);
+        $sheet->getColumnDimension('E')->setAutoSize(true);
+        $sheet->getColumnDimension('F')->setAutoSize(true);
+        $sheet->getColumnDimension('G')->setAutoSize(true);
+        
+        //---------------------- summary ----------------------
+        $sheet->setCellValue('I4', 'Summary');
+        $sheet->setCellValue('I5', 'Bayar');
+        $sheet->setCellValue('I6', 'Free');
+        $sheet->setCellValue('I7', 'Total form');
+        
+        $sheet->setCellValue('J4', ':');
+        $sheet->setCellValue('J5', ':');
+        $sheet->setCellValue('J6', ':');
+        $sheet->setCellValue('J7', ':');
+        
+        $sheet->setCellValue('K4', '-');
+        $sheet->setCellValue('K5', $buy);
+        $sheet->setCellValue('K6', $free);
+        $sheet->setCellValue('K7', count($data));
+        
+        $sheet->getColumnDimension('I')->setAutoSize(true);
+        $sheet->getColumnDimension('J')->setAutoSize(true);
+        $sheet->getColumnDimension('K')->setAutoSize(true);
+        
+        $objPHPExcel->setActiveSheetIndex(0)->mergeCells('I4:L4');
+
+        $sheet->setTitle('Penjualan Form');
+        $objPHPExcel->setActiveSheetIndex(0);
+        $filename = 'report_penjualan_finance_'.date('y-m-d').'.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="'.$filename.'"'); // Set nama file excel nya
+        header('Cache-Control: max-age=0');
+
+        $write = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $write->save('php://output');
+    }
+
+    public function export_PengembalianFormulirData()
+    {
+        $this->load->model('admission/m_admission');
+        $this->load->model('master/m_master');
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $Input = (array) $this->jwt->decode($token,$key);
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+        switch ($Input['cf']) {
+            case 0: // date range
+                $dateRange1 = $Input['dateRange1'];
+                $dateRange2 = $Input['dateRange2'];
+                $SelectSetTa = $Input['SelectSetTa'];
+                $SelectSortBy = $Input['SelectSortBy'];
+                $get = $this->m_admission->getRegisterData($dateRange1,$dateRange2,$SelectSetTa,$SelectSortBy);
+                $title = 'Tanggal '.date('d M Y', strtotime($dateRange1)).' - '.date('d M Y', strtotime($dateRange2));
+                $this->exCel_PengembalianFormulirData($title,$get);
+                break;
+            case 1: // by Month
+               $SelectMonth = $Input['SelectMonth'];
+               $SelectYear = $Input['SelectYear'];
+               $SelectSetTa = $Input['SelectSetTa'];
+               $SelectSortBy = $Input['SelectSortBy'];
+               $get = $this->m_admission->getRegisterDataPermonth($SelectMonth,$SelectYear,$SelectSetTa,$SelectSortBy);
+               $title = 'Bulan '.date('F Y', strtotime($SelectYear.'-'.$SelectMonth.'-01'));
+               $this->exCel_PengembalianFormulirData($title,$get); 
+                break;
+            default:
+                # code...
+                break;
+        }
+    }
+
+    private function exCel_PengembalianFormulirData($title,$data)
+    {
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $objPHPExcel = new PHPExcel;
+        $sheet = $objPHPExcel->getActiveSheet();
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load('./uploads/admisi/report_pengembalian_data.xlsx'); // Empty Sheet
+        $excel2->setActiveSheetIndex(0);
+
+        $excel3 = $excel2->getActiveSheet();
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+        $style_row = array(
+          'alignment' => array(
+            'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+          ),
+          'borders' => array(
+            'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+            'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+            'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+            'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+          )
+        );
+
+        $excel3->setCellValue('A2', $title);
+
+        // start dari A7
+        $a = 6;
+        for ($i=0; $i < count($data); $i++) {
+           $no = $i + 1;  
+           $excel3->setCellValue('A'.$a, $data[$i]['FormulirWrite']); 
+           $excel3->setCellValue('B'.$a, '');
+           $excel3->setCellValue('C'.$a, date('d M Y', strtotime($data[$i]['RegisterAT'])));
+           $excel3->setCellValue('D'.$a, $data[$i]['Name']);
+           $excel3->setCellValue('E'.$a, $data[$i]['Gender']);
+           $excel3->setCellValue('F'.$a, $data[$i]['PlaceBirth'].', '.date('d M Y', strtotime($data[$i]['DateBirth'])) );
+           $excel3->setCellValue('G'.$a, $data[$i]['Agama']);
+           $excel3->setCellValue('H'.$a, $data[$i]['ctr_name']);
+           $excel3->setCellValue('I'.$a, $data[$i]['NameEng']);
+           $excel3->setCellValue('J'.$a, '');
+           $excel3->setCellValue('K'.$a, $data[$i]['PhoneNumber']);
+           $excel3->setCellValue('L'.$a, $data[$i]['HomeNumber']);
+           $excel3->setCellValue('M'.$a, $data[$i]['Email']);
+           $excel3->setCellValue('N'.$a, '');
+           $excel3->setCellValue('O'.$a, $data[$i]['JacketSize']);
+           $excel3->setCellValue('P'.$a, $data[$i]['src_name']);
+           $excel3->setCellValue('Q'.$a, $data[$i]['alamat']);
+           $excel3->setCellValue('R'.$a, '');
+           $excel3->setCellValue('S'.$a, $data[$i]['ProvinceName']);
+           $excel3->setCellValue('T'.$a, $data[$i]['SchoolName']);
+           $excel3->setCellValue('U'.$a, $data[$i]['CitySchool']);
+           $excel3->setCellValue('V'.$a, $data[$i]['ads_sta']);
+           $excel3->setCellValue('W'.$a, $data[$i]['raport']);
+           $excel3->setCellValue('X'.$a, $data[$i]['Ijazah']);
+           $excel3->setCellValue('Y'.$a, '');
+           $excel3->setCellValue('Z'.$a, $data[$i]['Foto']);
+           $excel3->setCellValue('AA'.$a, $data[$i]['Refletter']);
+           $excel3->setCellValue('AB'.$a, $data[$i]['SuratNarkoba']);
+           $excel3->setCellValue('AC'.$a, $data[$i]['Essay']);
+           $excel3->setCellValue('AD'.$a, $data[$i]['FatherName']);
+           $excel3->setCellValue('AE'.$a, $data[$i]['FatherStatus']);
+           $excel3->setCellValue('AF'.$a, $data[$i]['FatherPhoneNumber']);
+           $excel3->setCellValue('AG'.$a, '');
+           $excel3->setCellValue('AH'.$a, $data[$i]['FatherJob']);
+           $excel3->setCellValue('AI'.$a, $data[$i]['FatherAddress']);
+           $excel3->setCellValue('AJ'.$a, $data[$i]['MotherName']);
+           $excel3->setCellValue('AK'.$a, $data[$i]['MotherStatus']);
+           $excel3->setCellValue('AL'.$a, $data[$i]['MotherPhoneNumber']);
+           $excel3->setCellValue('AM'.$a, '');
+           $excel3->setCellValue('AN'.$a, $data[$i]['MotherJob']);
+           $excel3->setCellValue('AO'.$a, $data[$i]['MotherAddress']);
+
+           // Apply style row yang telah kita buat tadi ke masing-masing baris (isi tabel)
+           $excel3->getStyle('A'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('B'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('C'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('D'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('E'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('F'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('G'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('H'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('I'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('J'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('K'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('L'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('M'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('N'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('O'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('P'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('Q'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('R'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('S'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('T'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('U'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('V'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('W'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('X'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('Y'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('Z'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AA'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AB'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AC'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AD'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AE'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AF'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AG'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AH'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AI'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AJ'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AK'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AL'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AM'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AN'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('AO'.$a)->applyFromArray($style_row);
+
+           $a = $a + 1; 
+        }
+
+        $filename = 'report_pengembalian_formulir_'.date('y-m-d').'.xlsx';
+
+        $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
+        // We'll be outputting an excel file  
+        header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
+        // It will be called file.xlss
+        header('Content-Disposition: attachment; filename="'.$filename.'"'); // jalan ketika tidak menggunakan ajax
+        $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
     }
 
 

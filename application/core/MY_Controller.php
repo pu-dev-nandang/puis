@@ -288,7 +288,7 @@ abstract class Admission_Controler extends Globalclass{
             $submenu1 = $this->m_master->getSubmenu1BaseMenu_grouping($DataDB[$i]['ID_menu'],'db_admission');
             $arr2 = array();
             for ($k=0; $k < count($submenu1); $k++) { 
-                $submenu2 = $this->m_master->getSubmenu2BaseSubmenu1_grouping($submenu1[$k]['SubMenu1'],'db_admission');
+                $submenu2 = $this->m_master->getSubmenu2BaseSubmenu1_grouping($submenu1[$k]['SubMenu1'],'db_admission',$DataDB[$i]['ID_menu']);
                 $arr2[] = array(
                     'SubMenu1' => $submenu1[$k]['SubMenu1'],
                     'Submenu' => $submenu2,

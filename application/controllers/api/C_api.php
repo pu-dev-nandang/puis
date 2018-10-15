@@ -2770,9 +2770,9 @@ class C_api extends CI_Controller {
 
     }
 
-    public function getFormulirOfflineAvailable()
+    public function getFormulirOfflineAvailable($StatusJual = 0)
     {
-        $getData = $this->m_api->getFormulirOfflineAvailable();
+        $getData = $this->m_api->getFormulirOfflineAvailable($StatusJual);
         echo json_encode($getData);
     }
 

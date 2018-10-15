@@ -151,6 +151,7 @@
                 toastr.success('Data berhasil disimpan', 'Success!');
                 $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
                 loadTableJPA(loadDataJPA);
+                $('#GlobalModal').modal('hide');
              },500);
          });
      }

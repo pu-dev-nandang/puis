@@ -267,25 +267,51 @@ class C_finance extends Finnance_Controler {
         $this->mypdf->Cell(0, 0, $Personal[0]['NamePrody'], 0, 1, 'L', 0);
 
         $setY = $setY + 8;
-        // label
-        $this->mypdf->SetXY($setX,$setY);
-        $this->mypdf->SetTextColor(0,0,0);
-        $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
-        $this->mypdf->Cell(0, 0, 'Virtual Account', 0, 1, 'L', 0);
+        // check VA active atau tidak
+        if ($this->session->userdata('finance_auth_Policy_SYS') == 1) {
+            // label
+            $this->mypdf->SetXY($setX,$setY);
+            $this->mypdf->SetTextColor(0,0,0);
+            $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
+            $this->mypdf->Cell(0, 0, 'Virtual Account', 0, 1, 'L', 0);
 
-        // titik dua
-        $setXtitik2 = $setX+$setJarakX;
-        $this->mypdf->SetXY($setXtitik2,$setY);
-        $this->mypdf->SetTextColor(0,0,0);
-        $this->mypdf->SetFont('Arial','',$setFontIsian);
-        $this->mypdf->Cell(0, 0, ":", 0, 1, 'L', 0);
+            // titik dua
+            $setXtitik2 = $setX+$setJarakX;
+            $this->mypdf->SetXY($setXtitik2,$setY);
+            $this->mypdf->SetTextColor(0,0,0);
+            $this->mypdf->SetFont('Arial','',$setFontIsian);
+            $this->mypdf->Cell(0, 0, ":", 0, 1, 'L', 0);
 
-        // value
-        $setXvalue = $setXtitik2 + 2;
-        $this->mypdf->SetXY($setXvalue,$setY);
-        $this->mypdf->SetTextColor(0,0,0);
-        $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
-        $this->mypdf->Cell(0, 0, $Personal[0]['VA_number'], 0, 1, 'L', 0);
+            // value
+            $setXvalue = $setXtitik2 + 2;
+            $this->mypdf->SetXY($setXvalue,$setY);
+            $this->mypdf->SetTextColor(0,0,0);
+            $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
+            $this->mypdf->Cell(0, 0, $Personal[0]['VA_number'], 0, 1, 'L', 0);
+        }
+        else
+        {
+            // label
+            $this->mypdf->SetXY($setX,$setY);
+            $this->mypdf->SetTextColor(0,0,0);
+            $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
+            $this->mypdf->Cell(0, 0, 'Rekening', 0, 1, 'L', 0);
+
+            // titik dua
+            $setXtitik2 = $setX+$setJarakX;
+            $this->mypdf->SetXY($setXtitik2,$setY);
+            $this->mypdf->SetTextColor(0,0,0);
+            $this->mypdf->SetFont('Arial','',$setFontIsian);
+            $this->mypdf->Cell(0, 0, ":", 0, 1, 'L', 0);
+
+            // value
+            $setXvalue = $setXtitik2 + 2;
+            $this->mypdf->SetXY($setXvalue,$setY);
+            $this->mypdf->SetTextColor(0,0,0);
+            $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
+            $this->mypdf->Cell(0, 0, '161.3888.555 (BCA Yayasan Pendidikan Agung Podomoro)', 0, 1, 'L', 0);
+        }
+        
 
         $t = 0;
         for ($i=0; $i < count($TuitionFee); $i++) { 
@@ -1715,6 +1741,114 @@ class C_finance extends Finnance_Controler {
         'loadtable'   => $data,
         );
         echo json_encode($output);
+    }
+
+    public function formulir_registration_offline_serverSide()
+    {
+        $requestData= $_REQUEST;
+        $reqTahun = $this->input->post('tahun');
+        $StatusJual = $this->input->post('StatusJual');
+        $No = $requestData['start'] + 1;
+        $totalData = $this->m_admission->totalDataFormulir_offline4($reqTahun,$requestData,$StatusJual);
+
+        if($StatusJual != '%') {
+          $StatusJual = ' and b.StatusJual = '.$StatusJual;
+        }
+        else
+        {
+          $StatusJual = ''; 
+        }
+
+        $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,b.No_Ref,a.StatusReg,b.Years,b.Status as StatusUsed, b.StatusJual,
+                  b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,b.CityNameFormulir,b.DistrictNameFormulir,
+                  b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi,b.NoKwitansi
+                  from (
+                  select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
+                  from db_admission.register as a 
+                  join db_admission.register_verification as b
+                  on a.ID = b.RegisterID
+                  join db_admission.register_verified as c
+                  on c.RegVerificationID = b.ID
+                  join db_admission.school as z
+                  on z.ID = a.SchoolID
+                  where a.StatusReg = 1
+                  ) as a right JOIN
+                  (
+                  select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,b.NoKwitansi,
+                  b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,
+                  if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,b.ID_ProgramStudy,y.Name as NameProdi
+                  from db_admission.formulir_number_offline_m as a
+                  left join db_admission.sale_formulir_offline as b
+                  on a.FormulirCode = b.FormulirCodeOffline
+                  left join db_employees.employees as c
+                  on c.NIP = b.PIC
+                  left join db_admission.school as z
+                  on z.ID = b.SchoolID
+                  left join db_academic.program_study as y
+                  on b.ID_ProgramStudy = y.ID
+                  )
+                  as b
+                  on a.FormulirCode = b.FormulirCode
+            ';
+
+        $sql.= 'where Years = "'.$reqTahun.'" and 
+                        (
+                          b.FormulirCode like "'.$requestData['search']['value'].'%" or
+                          b.No_Ref like "'.$requestData['search']['value'].'%" or
+                          b.Sales like "'.$requestData['search']['value'].'%" or
+                          a.NameCandidate like "'.$requestData['search']['value'].'%" or
+                          b.SchoolNameFormulir like "%'.$requestData['search']['value'].'%" or
+                          b.NameProdi like "'.$requestData['search']['value'].'%" or
+                          b.src_name like "'.$requestData['search']['value'].'%" or
+                          b.FullName like "'.$requestData['search']['value'].'%" or
+                          b.DateSale like "'.$requestData['search']['value'].'%"
+                        ) '.$StatusJual.'';
+        $sql.= ' order by b.No_Ref asc LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+            $nestedData[] = $No;
+            $nestedData[] = $row['FormulirCode'];
+            $nestedData[] = $row['No_Ref'];
+            $nestedData[] = $row['NameProdi'];
+            $aa = ($row['StatusUsed'] == 0) ? '<div style="color:  green;">No</div>' : '<div style="color:  red;">Yes</div>';
+            $nestedData[] = $aa;
+            $aa = ($row['StatusJual'] == 0) ? '<div style="color:  green;">IN</div>' : '<div style="color:  red;">Sold Out</div>';
+            $nestedData[] = $aa;
+            $nestedData[] = $row['Sales'];
+            $nestedData[] = number_format($row['Price_Form'],0,',','.');
+            $nestedData[] = $row['DateSale'];
+            $nestedData[] = $row['NamaPembeli'].'<br>'.$row['PhoneNumberPembeli'].'<br>'.$row['EmailPembeli'].'<br>'.$row['SchoolNameFormulir'].'<br>'.$row['DistrictNameFormulir'].' '.$row['CityNameFormulir'];
+            $nestedData[] = $row['src_name'];
+            $action = '';
+            if ($row['ID_sale_formulir_offline'] != null || $row['ID_sale_formulir_offline'] != '')
+            {
+              $action = '<div class="row" style="margin-top: 10px">
+                          <div class="col-md-12">
+                            <span ref = "'.$row['No_Ref'].'" NamaLengkap = "'.$row['NamaPembeli'].'" class="btn btn-xs btn-print" phonehome = "'.$row['HomeNumberPembeli'].'" hp = "'.$row['PhoneNumberPembeli'].'" jurusan = "'.$row['NameProdi'].'" pembayaran ="Pembelian Form('.$row['No_Ref'].')" jenis= "Cash" jumlah = "'.$row['Price_Form'].'" date = "'.$row['DateSale'].'" formulir = "'.$row['FormulirCode'].'" NoKwitansi = "'.$row['NoKwitansi'].'">
+                             <i class="fa fa-print"></i> Kwitansi
+                           </span>
+                          </div>
+                        </div>
+                        ';
+            }
+
+            $nestedData[] = $action;
+            $data[] = $nestedData;
+            $No++;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalData ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
     }
 
 }

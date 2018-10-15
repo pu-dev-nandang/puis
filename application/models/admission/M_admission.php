@@ -234,6 +234,160 @@ class M_admission extends CI_Model {
       return $conVertINT;
     }
 
+    public function totalDataFormulir_offline3($tahun,$NomorFormulir,$NamaStaffAdmisi,$status,$statusJual,$NomorFormulirRef)
+    {
+
+      if($NomorFormulir != '%') {
+          $NomorFormulir = '"%'.$NomorFormulir.'%"'; 
+      }
+      else
+      {
+        $NomorFormulir = '"%"'; 
+      }
+
+      if($NomorFormulirRef != '%') {
+          $NomorFormulirRef = ' and b.No_Ref like "%'.$NomorFormulirRef.'%"'; 
+      }
+      else
+      {
+        $NomorFormulirRef = ''; 
+      }
+
+      if($NamaStaffAdmisi != '%') {
+          $NamaStaffAdmisi = ' and b.Sales like "%'.$NamaStaffAdmisi.'%"'; 
+      }
+      else
+      {
+        $NamaStaffAdmisi = ''; 
+      }
+      if($status != '%') {
+        // $status = '"%'.$status.'%"'; 
+        // $status = 'StatusUsed != '.$status;
+        $status = ' and b.Status = '.$status;
+      }
+      else
+      {
+        $status = ''; 
+      }
+
+      if($statusJual != '%') {
+        // $status = '"%'.$status.'%"'; 
+        // $status = 'StatusUsed != '.$status;
+        $statusJual = ' and b.StatusJual = '.$statusJual;
+      }
+      else
+      {
+        $statusJual = ''; 
+      }
+
+      $sql = 'select count(*) as total from (
+                  select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,b.No_Ref,a.StatusReg,b.Years,b.Status as StatusUsed, b.StatusJual,
+                                  b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,b.CityNameFormulir,b.DistrictNameFormulir,
+                                  b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi
+                                  from (
+                                  select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
+                                  from db_admission.register as a 
+                                  join db_admission.register_verification as b
+                                  on a.ID = b.RegisterID
+                                  join db_admission.register_verified as c
+                                  on c.RegVerificationID = b.ID
+                                  join db_admission.school as z
+                                  on z.ID = a.SchoolID
+                                  where a.StatusReg = 1
+                                  ) as a right JOIN
+                                  (
+                                  select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,
+                                  b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,
+                                  if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,b.ID_ProgramStudy,y.Name as NameProdi
+                                  from db_admission.formulir_number_offline_m as a
+                                  left join db_admission.sale_formulir_offline as b
+                                  on a.FormulirCode = b.FormulirCodeOffline
+                                  left join db_employees.employees as c
+                                  on c.NIP = b.PIC
+                                  left join db_admission.school as z
+                                  on z.ID = b.SchoolID
+                                  left join db_academic.program_study as y
+                                  on b.ID_ProgramStudy = y.ID
+                                  )
+                                  as b
+                                  on a.FormulirCode = b.FormulirCode
+                                  where Years = "'.$tahun.'" and b.FormulirCode like '.$NomorFormulir.$NamaStaffAdmisi.$status.$statusJual.$NomorFormulirRef.'
+              ) aa
+              ';          
+      $query=$this->db->query($sql, array())->result_array();
+      $conVertINT = (int) $query[0]['total'];
+      return $conVertINT;
+    }
+
+    public function totalDataFormulir_offline4($reqTahun,$requestData,$statusJual)
+    {
+
+      if($statusJual != '%') {
+        // $status = '"%'.$status.'%"'; 
+        // $status = 'StatusUsed != '.$status;
+        $statusJual = ' and b.StatusJual = '.$statusJual;
+      }
+      else
+      {
+        $statusJual = ''; 
+      }
+
+      // check session division
+      $PositionMain = $this->session->userdata('PositionMain');
+      $division = $PositionMain['IDDivision'];
+        $queryDiv = "";
+        switch ($division) {
+          case 10:
+            $queryDiv = ' where LEFT(c.PositionMain ,INSTR(c.PositionMain ,".")-1) = "'.$division.'"';
+            break;
+          case 18:
+            $queryDiv = ' where LEFT(c.PositionMain ,INSTR(c.PositionMain ,".")-1) = "'.$division.'"';
+            break;
+          default:
+            $queryDiv = "";
+            break;
+        }
+
+
+      $sql = 'select count(*) as total from 
+              ( 
+                select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,b.No_Ref,a.StatusReg,b.Years,b.Status as StatusUsed, 
+                b.StatusJual, b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,
+                b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,b.CityNameFormulir,b.DistrictNameFormulir, 
+                b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi from 
+                ( 
+                  select a.Name as NameCandidate,a.Email,
+                  z.SchoolName,c.FormulirCode,a.StatusReg from db_admission.register as a join db_admission.register_verification as b 
+                  on a.ID = b.RegisterID join db_admission.register_verified as c on c.RegVerificationID = b.ID join db_admission.school as z on z.ID = a.SchoolID where a.StatusReg = 1 
+                ) as a right JOIN 
+                ( 
+                  select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale, b.Email,
+                  c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as CityNameFormulir,z.DistrictName as DistrictNameFormulir, 
+                  if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,
+                  b.ID_ProgramStudy,y.Name as NameProdi from db_admission.formulir_number_offline_m as a left join db_admission.sale_formulir_offline as b 
+                  on a.FormulirCode = b.FormulirCodeOffline left join db_employees.employees as c on c.NIP = b.PIC left join db_admission.school as z on z.ID = b.SchoolID 
+                  left join db_academic.program_study as y on b.ID_ProgramStudy = y.ID
+                  '.$queryDiv.'  
+                ) as b on a.FormulirCode = b.FormulirCode where b.Years = "'.$reqTahun.'" AND
+                  (
+                    b.FormulirCode like "'.$requestData['search']['value'].'%" or
+                    b.No_Ref like "'.$requestData['search']['value'].'%" or
+                    b.Sales like "'.$requestData['search']['value'].'%" or
+                    a.NameCandidate like "'.$requestData['search']['value'].'%" or
+                    b.SchoolNameFormulir like "%'.$requestData['search']['value'].'%" or
+                    b.NameProdi like "'.$requestData['search']['value'].'%" or
+                    b.src_name like "'.$requestData['search']['value'].'%" or
+                    b.FullName like "'.$requestData['search']['value'].'%"
+                  )'.$statusJual.'
+
+              ) aa
+              ';
+              // print_r($sql);die();          
+      $query=$this->db->query($sql, array())->result_array();
+      $conVertINT = (int) $query[0]['total'];
+      return $conVertINT;
+    }
+
     public function totalDataFormulir_offline2()
     {
       $sql = "select count(*) as total from db_admission.sale_formulir_offline
@@ -348,8 +502,8 @@ class M_admission extends CI_Model {
       }
 
         $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,b.No_Ref,a.StatusReg,b.Years,b.Status as StatusUsed, b.StatusJual,
-                b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,
-                b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi
+                b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,b.CityNameFormulir,b.DistrictNameFormulir,
+                b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi,b.NoKwitansi
                 from (
                 select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
                 from db_admission.register as a 
@@ -362,8 +516,8 @@ class M_admission extends CI_Model {
                 where a.StatusReg = 1
                 ) as a right JOIN
                 (
-                select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,
-                b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,
+                select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,b.NoKwitansi,
+                b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,
                 if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,b.ID_ProgramStudy,y.Name as NameProdi
                 from db_admission.formulir_number_offline_m as a
                 left join db_admission.sale_formulir_offline as b
@@ -377,7 +531,7 @@ class M_admission extends CI_Model {
                 )
                 as b
                 on a.FormulirCode = b.FormulirCode
-                where Years = "'.$tahun.'" and b.FormulirCode like '.$NomorFormulir.$NamaStaffAdmisi.$status.$statusJual.$NomorFormulirRef.' and b.No_Ref != "" order by b.No_Ref asc LIMIT '.$start. ', '.$limit;
+                where Years = "'.$tahun.'" and b.FormulirCode like '.$NomorFormulir.$NamaStaffAdmisi.$status.$statusJual.$NomorFormulirRef.' order by b.No_Ref asc LIMIT '.$start. ', '.$limit;
            $query=$this->db->query($sql, array())->result_array();
            return $query;
     }
@@ -682,6 +836,12 @@ class M_admission extends CI_Model {
 
     public function inserData_formulir_offline_sale_save($input_arr)
     {
+      // get no kwitansi terakhir
+      $sql = 'select * from db_admission.sale_formulir_offline order by NoKwitansi desc limit 1';
+      $query=$this->db->query($sql, array())->result_array();
+      $NoKwitansi = $query[0]['NoKwitansi'];
+      $NoKwitansi = ($NoKwitansi != "") ? (int)$NoKwitansi + 1 : $NoKwitansi;
+
       $dataSave = array(
               'FormulirCodeOffline' => $input_arr['selectFormulirCode'],
               'PIC' => $input_arr['PIC'],
@@ -701,12 +861,56 @@ class M_admission extends CI_Model {
               'CreateAT' => date('Y-m-d'),
               'DateSale' => $input_arr['tanggal'],
               'CreatedBY' => $this->session->userdata('NIP'),
+              'NoKwitansi' => $NoKwitansi,
               // 'Price_Form' => $Kelulusan,
       );
       $this->db->insert('db_admission.sale_formulir_offline', $dataSave);
       $No_Ref = $input_arr['No_Ref'];
+      if ($No_Ref == "") {
+        $sql = 'select * from db_admission.formulir_number_offline_m order by No_Ref desc limit 1';
+        $query=$this->db->query($sql, array())->result_array();
+        if (count($query) == 0) {
+          $this->load->model('master/m_master');
+          $tt = $this->m_master->showData_array('set_ta');
+          $yy = substr($tt[0]['Ta'],2,2);
+          $No_Ref = $yy.'0001';
+        }
+        else
+        {
+          $No_Ref = $query[0]['No_Ref'] + 1;
+        }
+      }
       $this->updateSellOUTFormulirOffline($input_arr['selectFormulirCode'],$No_Ref);
       // print_r($input_arr);
+    }
+
+    public function editData_formulir_offline_sale_save($input_arr)
+    {
+      $dataSave = array(
+              'FormulirCodeOffline' => $input_arr['selectFormulirCode'],
+              'PIC' => $input_arr['PIC'],
+              'ID_ProgramStudy' => $input_arr['selectProgramStudy'],
+              'ID_ProgramStudy2' => $input_arr['selectProgramStudy2'],
+              'FullName' => $input_arr['Name'],
+              'Gender' => $input_arr['selectGender'],
+              'HomeNumber' => $input_arr['telp_rmh'],
+              'PhoneNumber' => $input_arr['hp'],
+              'Email' => $input_arr['email'],
+              'SchoolID' => $input_arr['autoCompleteSchool'],
+              'price_event_ID' => $input_arr['selectEvent'],
+              'source_from_event_ID' => $input_arr['selectSourceFrom'],
+              'Channel' => $input_arr['tipeChannel'],
+              'SchoolIDChanel' => $input_arr['autoCompleteSchoolChanel'],
+              'Price_Form' => $input_arr['priceFormulir'],
+              'DateSale' => $input_arr['tanggal'],
+              'UpdateAT' => date('Y-m-d'),
+              'UpdatedBY' => $this->session->userdata('NIP'),
+      );
+
+      $this->db->where('ID',$input_arr['CDID']);
+      $this->db->update('db_admission.sale_formulir_offline', $dataSave);
+
+      $this->updateSellOUTFormulirOffline($input_arr['selectFormulirCode'],$input_arr['No_Ref']);
     }
 
     public function formulir_offline_salect_PIC($input_arr)
@@ -728,7 +932,62 @@ class M_admission extends CI_Model {
       else
       {
         // tampilkan sales secara keseluruhan
-        $query = $this->m_api->getEmployeesBy('10','13');
+        // $query = $this->m_api->getEmployeesBy('10','13');
+        $query = $this->m_api->getEmployeesPICAdmissionBy();
+      }
+
+      return $query;
+    }
+
+    public function formulir_offline_salect_PIC_renew($input_arr)
+    {
+      $this->load->model('m_api');
+      $PositionMain = $this->session->userdata('PositionMain');
+      $division = $PositionMain['IDDivision'];
+
+        $queryDiv = "";
+      $SchoolID = $input_arr['School'];
+      if ($SchoolID != '') {
+        // cari sales berdasarkan wilayah, jika tidak ada maka tampilkan sales secara keseluruhan
+            $sql = 'select b.NIP,b.Name from db_admission.sales_school_m as a
+                    join db_employees.employees as b
+                    on a.SalesNIP = b.NIP where a.SchoolID = ? ';
+            $query=$this->db->query($sql, array($SchoolID))->result_array();
+            if (count($query) == 0) {
+              // $query = $this->m_api->getEmployeesBy('10','13');
+              $sql = 'select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 10
+                      union
+                      select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 18 
+                    ';
+              $query=$this->db->query($sql, array())->result_array();
+            }
+            // print_r($query);
+      }
+      else
+      {
+        $sql = 'select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 10
+                union
+                select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 18 
+              ';
+        // tampilkan sales secara keseluruhan
+        // $query = $this->m_api->getEmployeesBy('10','13');
+        // $query = $this->m_api->getEmployeesPICAdmissionBy();
+        // check session division
+        $PositionMain = $this->session->userdata('PositionMain');
+        $division = $PositionMain['IDDivision'];
+        $queryDiv = "";
+          switch ($division) {
+            case 10:
+              $sql = 'select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 10';
+              break;
+            case 18:
+              $sql = 'select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 18';
+              break;
+            default:
+              break;
+          }
+
+          $query=$this->db->query($sql, array())->result_array();
       }
 
       return $query;
@@ -1892,6 +2151,353 @@ class M_admission extends CI_Model {
               
       $query=$this->db->query($sql, array())->result_array();
       return $query[0]['total'];    
+    }
+
+    public function getSaleFormulirOfflineBetwwen($date1,$date2,$SelectSetTa,$SelectSortBy)
+    {
+      $sql = 'select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,
+                b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,b.Gender,
+                if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,b.ID_ProgramStudy,
+                y.Name as NameProdi1,b.Channel,
+                if(b.ID_ProgramStudy2 = 0,"", (select Name from db_academic.program_study where ID = b.ID_ProgramStudy2 limit 1) ) as NameProdi2
+                from db_admission.formulir_number_offline_m as a
+                join db_admission.sale_formulir_offline as b
+                on a.FormulirCode = b.FormulirCodeOffline
+                left join db_employees.employees as c
+                on c.NIP = b.PIC
+                left join db_admission.school as z
+                on z.ID = b.SchoolID
+                left join db_academic.program_study as y
+                on b.ID_ProgramStudy = y.ID
+                where b.DateSale >= "'.$date1.'" and b.DateSale <= "'.$date2.'" and a.Years = ? order by '.$SelectSortBy.' asc
+                ';
+      $query=$this->db->query($sql, array($SelectSetTa))->result_array();
+      return $query;             
+    }
+
+    public function getSaleFormulirOfflinePerMonth($SelectMonth,$SelectYear,$SelectSetTa,$SelectSortBy)
+    {
+      $sql = 'select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,
+                b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,b.Gender,
+                if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,b.ID_ProgramStudy,
+                y.Name as NameProdi1,b.Channel,
+                if(b.ID_ProgramStudy2 = 0,"", (select Name from db_academic.program_study where ID = b.ID_ProgramStudy2 limit 1) ) as NameProdi2
+                from db_admission.formulir_number_offline_m as a
+                join db_admission.sale_formulir_offline as b
+                on a.FormulirCode = b.FormulirCodeOffline
+                left join db_employees.employees as c
+                on c.NIP = b.PIC
+                left join db_admission.school as z
+                on z.ID = b.SchoolID
+                left join db_academic.program_study as y
+                on b.ID_ProgramStudy = y.ID
+                where YEAR(b.DateSale) = "'.$SelectYear.'" AND MONTH(b.DateSale) = "'.$SelectMonth.'" and a.Years = ? order by '.$SelectSortBy.' asc
+                ';
+      $query=$this->db->query($sql, array($SelectSetTa))->result_array();
+      return $query;             
+    }
+
+    public function getRegisterData($date1,$date2,$SelectSetTa,$SelectSortBy)
+    {
+      $SelectSortBy = explode(".", $SelectSortBy);
+      $SelectSortBy = ($SelectSortBy[1] == "No_Ref" || $SelectSortBy[1] == "FormulirCode") ? 'c.FormulirCode' : 'a.RegisterAT';
+      $this->load->model('master/m_master');
+      $sql = '
+              select c.FormulirCode,a.RegisterAT,a.Name,e.Gender,e.PlaceBirth,e.DateBirth,ac.Nama as Agama,ad.ctr_name,d.NameEng, e.PhoneNumber,xz.HomeNumber,
+            a.Email,ae.JacketSize,ab.src_name,CONCAT(e.Address," ",e.District," ",af.DistrictName) as alamat,ag.ProvinceName,
+            xx.Name as NameSales,a.StatusReg,a.SchoolID,e.ID as ID_register_formulir,
+            e.FatherName,e.FatherStatus,e.FatherPhoneNumber,ah.ocu_name as FatherJob,e.FatherAddress,e.MotherName,MotherStatus,e.MotherPhoneNumber,
+            ai.ocu_name as MotherJob,e.MotherAddress
+            from db_admission.register as a
+            join db_admission.school as b
+            on a.SchoolID = b.ID
+            LEFT JOIN db_admission.register_verification as z
+            on a.ID = z.RegisterID
+            LEFT JOIN db_admission.register_verified as c
+            on z.ID = c.RegVerificationID
+            LEFT JOIN db_admission.register_formulir as e
+            on c.ID = e.ID_register_verified
+            LEFT join db_academic.program_study as d
+            on e.ID_program_study = d.ID
+            left join db_admission.sale_formulir_offline as xz
+             on c.FormulirCode = xz.FormulirCodeOffline
+            LEFT JOIN db_employees.employees as xx
+            on xz.PIC = xx.NIP
+            left join db_admission.source_from_event as ab
+            on xz.source_from_event_ID = ab.ID
+            LEFT JOIN db_admission.agama as ac
+            on e.ReligionID = ac.ID
+            left join db_admission.country as ad
+            on ad.ctr_code = e.NationalityID
+            LEFT JOIN db_admission.register_jacket_size_m as ae
+            on ae.ID = e.ID_register_jacket_size_m
+            LEFT JOIN db_admission.district af
+            on af.DistrictID = e.ID_districts
+            LEFT JOIN db_admission.province as ag
+            on ag.ProvinceID = e.ID_province
+            LEFT JOIN db_admission.occupation as ah
+            on ah.ocu_code = e.Father_ID_occupation
+            LEFT JOIN db_admission.occupation as ai
+            on ai.ocu_code = e.Mother_ID_occupation
+            where a.SetTa = ? and a.RegisterAT >= "'.$date1.'" and a.RegisterAT <= "'.$date2.'" order by '.$SelectSortBy.' asc
+            ';
+      $query=$this->db->query($sql, array($SelectSetTa))->result_array();
+      for ($i=0; $i < count($query); $i++) { 
+          // check no ref jika offline
+          $row = $query[$i];
+          $Off = $row['StatusReg']; // 1 offline, 0 online
+          $arr_temp = array('FormulirWrite' => $row['FormulirCode']);
+          if ($Off == 1) {
+            $get1 = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','FormulirCode',$row['FormulirCode']);
+            $No_Ref = $get1[0]['No_Ref'];
+            if ($No_Ref != "" || $No_Ref != null) {
+              $arr_temp = array('FormulirWrite' => $No_Ref);
+            }
+          }
+
+          $get2 = $this->m_master->caribasedprimary('db_admission.school','ID',$row['SchoolID']);
+          $arr_temp = $arr_temp + array('SchoolName' => $get2[0]['SchoolName'],'CitySchool' => $get2[0]['CityName']);
+
+          // find document
+          $get3 = $this->m_master->caribasedprimary('db_admission.register_document','ID_register_formulir',$row['ID_register_formulir']);
+          /*
+            7 = Admission Statement
+            2 = 1 Fotocopi Raport Semester Terakhir Yang Dilegalisir
+            3 = 1 Fotocopi Ijazah Yang Dilegalisir
+            ID = ""
+            5 = 3 Pas Foto Terbaru Ukuran 3x4 Dengan Warna Latar Belakang Merah
+            9 = 1 Surat Rekomendasi Dari Sekolah
+            8 = 1 Surat Pernyataan Bebas Narkoba
+            6 = 1 Lembar Essay Mengenai 
+          */
+            for ($j=0; $j < count($get3); $j++) { 
+              switch ($get3[$j]['ID_reg_doc_checklist']) {
+                case 7:
+                  if ($get3[$j]['Status'] == "Done") {
+                    $arr_temp = $arr_temp + array('ads_sta' => 'v');
+                  }
+                  else
+                  {
+                    $arr_temp = $arr_temp + array('ads_sta' => '');
+                  }
+                  break;
+                case 2:
+                  if ($get3[$j]['Status'] == "Done") {
+                    $arr_temp = $arr_temp + array('raport' => 'v');
+                  }
+                  else
+                  {
+                    $arr_temp = $arr_temp + array('raport' => '');
+                  }
+                  break;
+                case 3:
+                  if ($get3[$j]['Status'] == "Done") {
+                    $arr_temp = $arr_temp + array('Ijazah' => 'v');
+                  }
+                  else
+                  {
+                    $arr_temp = $arr_temp + array('Ijazah' => '');
+                  }
+                  break;
+                case 5:
+                  if ($get3[$j]['Status'] == "Done") {
+                    $arr_temp = $arr_temp + array('Foto' => 'v');
+                  }
+                  else
+                  {
+                    $arr_temp = $arr_temp + array('Foto' => '');
+                  }
+                  break;
+                case 9:
+                  if ($get3[$j]['Status'] == "Done") {
+                    $arr_temp = $arr_temp + array('Refletter' => 'v');
+                  }
+                  else
+                  {
+                    $arr_temp = $arr_temp + array('Refletter' =>'');
+                  }
+                  break;
+                case 8:
+                  if ($get3[$j]['Status'] == "Done") {
+                    $arr_temp = $arr_temp + array('SuratNarkoba' => 'v');
+                  }
+                  else
+                  {
+                    $arr_temp = $arr_temp + array('SuratNarkoba' => '');
+                  }
+                  break;
+              case 6:
+                if ($get3[$j]['Status'] == "Done") {
+                  $arr_temp = $arr_temp + array('Essay' => 'v');
+                }
+                else
+                {
+                  $arr_temp = $arr_temp + array('Essay' => '');
+                }
+                break;               
+                default:
+                  # code...
+                  break;
+              }
+            }
+
+            $query[$i] = $query[$i] + $arr_temp;
+
+      } // exit loop
+
+      return $query;        
+
+    }
+
+    public function getRegisterDataPermonth($SelectMonth,$SelectYear,$SelectSetTa,$SelectSortBy)
+    {
+      $SelectSortBy = explode(".", $SelectSortBy);
+      $SelectSortBy = ($SelectSortBy[1] == "No_Ref" || $SelectSortBy[1] == "FormulirCode") ? 'c.FormulirCode' : 'a.RegisterAT';
+      $this->load->model('master/m_master');
+      $sql = '
+              select c.FormulirCode,a.RegisterAT,a.Name,e.Gender,e.PlaceBirth,e.DateBirth,ac.Nama as Agama,ad.ctr_name,d.NameEng, e.PhoneNumber,xz.HomeNumber,
+            a.Email,ae.JacketSize,ab.src_name,CONCAT(e.Address," ",e.District," ",af.DistrictName) as alamat,ag.ProvinceName,
+            xx.Name as NameSales,a.StatusReg,a.SchoolID,e.ID as ID_register_formulir,
+            e.FatherName,e.FatherStatus,e.FatherPhoneNumber,ah.ocu_name as FatherJob,e.FatherAddress,e.MotherName,MotherStatus,e.MotherPhoneNumber,
+            ai.ocu_name as MotherJob,e.MotherAddress
+            from db_admission.register as a
+            join db_admission.school as b
+            on a.SchoolID = b.ID
+            LEFT JOIN db_admission.register_verification as z
+            on a.ID = z.RegisterID
+            LEFT JOIN db_admission.register_verified as c
+            on z.ID = c.RegVerificationID
+            LEFT JOIN db_admission.register_formulir as e
+            on c.ID = e.ID_register_verified
+            LEFT join db_academic.program_study as d
+            on e.ID_program_study = d.ID
+            left join db_admission.sale_formulir_offline as xz
+             on c.FormulirCode = xz.FormulirCodeOffline
+            LEFT JOIN db_employees.employees as xx
+            on xz.PIC = xx.NIP
+            left join db_admission.source_from_event as ab
+            on xz.source_from_event_ID = ab.ID
+            LEFT JOIN db_admission.agama as ac
+            on e.ReligionID = ac.ID
+            left join db_admission.country as ad
+            on ad.ctr_code = e.NationalityID
+            LEFT JOIN db_admission.register_jacket_size_m as ae
+            on ae.ID = e.ID_register_jacket_size_m
+            LEFT JOIN db_admission.district af
+            on af.DistrictID = e.ID_districts
+            LEFT JOIN db_admission.province as ag
+            on ag.ProvinceID = e.ID_province
+            LEFT JOIN db_admission.occupation as ah
+            on ah.ocu_code = e.Father_ID_occupation
+            LEFT JOIN db_admission.occupation as ai
+            on ai.ocu_code = e.Mother_ID_occupation
+            where a.SetTa = ? and YEAR(a.RegisterAT) = "'.$SelectYear.'" AND MONTH(a.RegisterAT) = "'.$SelectMonth.'" order by '.$SelectSortBy.' asc
+            ';
+      $query=$this->db->query($sql, array($SelectSetTa))->result_array();
+      for ($i=0; $i < count($query); $i++) { 
+          // check no ref jika offline
+          $row = $query[$i];
+          $Off = $row['StatusReg']; // 1 offline, 0 online
+          $arr_temp = array('FormulirWrite' => $row['FormulirCode']);
+          if ($Off == 1) {
+            $get1 = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','FormulirCode',$row['FormulirCode']);
+            $No_Ref = $get1[0]['No_Ref'];
+            if ($No_Ref != "" || $No_Ref != null) {
+              $arr_temp = array('FormulirWrite' => $No_Ref);
+            }
+          }
+
+          $get2 = $this->m_master->caribasedprimary('db_admission.school','ID',$row['SchoolID']);
+          $arr_temp = $arr_temp + array('SchoolName' => $get2[0]['SchoolName'],'CitySchool' => $get2[0]['CityName']);
+
+          // find document
+          $get3 = $this->m_master->caribasedprimary('db_admission.register_document','ID_register_formulir',$row['ID_register_formulir']);
+          /*
+            7 = Admission Statement
+            2 = 1 Fotocopi Raport Semester Terakhir Yang Dilegalisir
+            3 = 1 Fotocopi Ijazah Yang Dilegalisir
+            ID = ""
+            5 = 3 Pas Foto Terbaru Ukuran 3x4 Dengan Warna Latar Belakang Merah
+            9 = 1 Surat Rekomendasi Dari Sekolah
+            8 = 1 Surat Pernyataan Bebas Narkoba
+            6 = 1 Lembar Essay Mengenai 
+          */
+            for ($j=0; $j < count($get3); $j++) { 
+              switch ($get3[$j]['ID_reg_doc_checklist']) {
+                case 7:
+                  if ($get3[$j]['Status'] == "Done") {
+                    $arr_temp = $arr_temp + array('ads_sta' => 'v');
+                  }
+                  else
+                  {
+                    $arr_temp = $arr_temp + array('ads_sta' => '');
+                  }
+                  break;
+                case 2:
+                  if ($get3[$j]['Status'] == "Done") {
+                    $arr_temp = $arr_temp + array('raport' => 'v');
+                  }
+                  else
+                  {
+                    $arr_temp = $arr_temp + array('raport' => '');
+                  }
+                  break;
+                case 3:
+                  if ($get3[$j]['Status'] == "Done") {
+                    $arr_temp = $arr_temp + array('Ijazah' => 'v');
+                  }
+                  else
+                  {
+                    $arr_temp = $arr_temp + array('Ijazah' => '');
+                  }
+                  break;
+                case 5:
+                  if ($get3[$j]['Status'] == "Done") {
+                    $arr_temp = $arr_temp + array('Foto' => 'v');
+                  }
+                  else
+                  {
+                    $arr_temp = $arr_temp + array('Foto' => '');
+                  }
+                  break;
+                case 9:
+                  if ($get3[$j]['Status'] == "Done") {
+                    $arr_temp = $arr_temp + array('Refletter' => 'v');
+                  }
+                  else
+                  {
+                    $arr_temp = $arr_temp + array('Refletter' =>'');
+                  }
+                  break;
+                case 8:
+                  if ($get3[$j]['Status'] == "Done") {
+                    $arr_temp = $arr_temp + array('SuratNarkoba' => 'v');
+                  }
+                  else
+                  {
+                    $arr_temp = $arr_temp + array('SuratNarkoba' => '');
+                  }
+                  break;
+              case 6:
+                if ($get3[$j]['Status'] == "Done") {
+                  $arr_temp = $arr_temp + array('Essay' => 'v');
+                }
+                else
+                {
+                  $arr_temp = $arr_temp + array('Essay' => '');
+                }
+                break;               
+                default:
+                  # code...
+                  break;
+              }
+            }
+
+            $query[$i] = $query[$i] + $arr_temp;
+
+      } // exit loop
+
+      return $query; 
     }
 
 }
