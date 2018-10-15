@@ -510,6 +510,17 @@
         });
     }
 
+    function loadSelectOptionForce(element,selected) {
+        var url = base_url_js+"api/__getKurikulumSelectOption";
+        $.get(url,function (data_json) {
+            // console.log(data_json);
+            for(var i=0;i<data_json.length;i++){
+                var selected = (data_json[i].ID==selected) ? 'selected' : '';
+                $(element).append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'" '+selected+'>Asc. Year - '+data_json[i].Year+'</option>');
+            }
+        });
+    }
+
     function loadSelectOptionCurriculumASC(element,selected) {
         var url = base_url_js+"api/__getKurikulumSelectOptionASC";
         $.get(url,function (data_json) {

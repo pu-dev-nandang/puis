@@ -13,6 +13,7 @@ class C_save_to_pdf extends CI_Controller {
         $this->load->model('report/m_save_to_pdf');
 
         date_default_timezone_set("Asia/Jakarta");
+        setlocale(LC_ALL, 'id_ID.UTF8', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', 'IND.UTF-8', 'IND.8859-1', 'IND', 'Indonesian.UTF8', 'Indonesian.UTF-8', 'Indonesian.8859-1', 'Indonesian', 'Indonesia', 'id', 'ID', 'en_US.UTF8', 'en_US.UTF-8', 'en_US.8859-1', 'en_US', 'American', 'ENG', 'English');
     }
 
     private function getInputToken($token)
@@ -2994,12 +2995,223 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Output('document_recap_exam_schedule.pdf','I');
     }
 
+    // ==== Penutup Rekap Exam Schedule =====
+
+
+    // ====== Transcript Semestera =======
+
+    public function temp_transcript(){
+
+
+        $token = $this->input->post('token');
+        $data_arr = $this->getInputToken($token);
+
+        $dataStudent = $this->m_save_to_pdf->getTranscript($data_arr['DBStudent'],$data_arr['NPM']);
+        $Student = $dataStudent['Student'][0];
+
+//        print_r($dataStudent);
+//        exit;
+
+        $pdf = new FPDF('P','mm','A4');
+
+        // membuat halaman baru
+        $pdf->SetMargins(10,5,10);
+        $pdf->AddPage();
+
+        $this->header_temp_transcript('ind',$pdf,$Student);
+        $this->body_temp_transcript('ind',$pdf,$dataStudent);
+
+
+        // +++++++ ENGLISH ++++++++
+
+        // membuat halaman baru
+        $pdf->SetMargins(10,5,10);
+        $pdf->AddPage();
+
+        $this->header_temp_transcript('eng',$pdf,$Student);
+        $this->body_temp_transcript('eng',$pdf,$dataStudent);
+
+
+
+
+        $nameF = str_replace(' ','_',strtoupper($Student['Name']));
+        $pdf->Output('TEMP_TRNSCPT_'.$Student['NPM'].'_'.$nameF.'.pdf','I');
+    }
+
+    private function header_temp_transcript($lang,$pdf,$Student){
+        $pdf->Image(base_url('images/logo.png'),10,5,40);
+
+        $h=3.5;
+        $pdf->Ln(5);
+        $pdf->SetFont('dinpromedium','',9);
+
+        $tr = ($lang=='ind') ? 'TRANSKRIP SEMENTERA' : 'RECORD OF ACADEMIC ACHIEVEMENT';
+
+        $pdf->Cell(190,$h,$tr,0,1,'C');
+
+        $pdf->SetFont('dinprolight','',7);
+        $pdf->Cell(190,$h,'No. : XXXX/UAP/AKD-TS/Bulan/Tahun',0,1,'C');
+
+        $border = 0;
+
+        $l_left = 38;
+        $sp_left = 1;
+        $fill_left = 93;
+
+        $l_right = 22;
+        $sp_right = 1;
+        $fill_right = 35;
+
+        $h=3.3;
+        $pdf->SetFont('dinpromedium','',7);
+        $pdf->Ln(3.5);
+
+        if($lang=='ind'){
+            $pdf->Cell($l_left,$h,'Nama',$border,0,'L');
+            $pdf->Cell($sp_left,$h,':',$border,0,'C');
+            $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['Name'])),$border,0,'L');
+            $pdf->Cell($l_right,$h,'Fakultas',$border,0,'L');
+            $pdf->Cell($sp_right,$h,':',$border,0,'C');
+            $pdf->Cell($fill_right,$h,$Student['FacultyName'],$border,1,'L');
+
+
+            $pdf->Cell($l_left,$h,'NIM',$border,0,'L');
+            $pdf->Cell($sp_left,$h,':',$border,0,'C');
+            $pdf->Cell($fill_left,$h,$Student['NPM'],$border,0,'L');
+            $pdf->Cell($l_right,$h,'Program Studi',$border,0,'L');
+            $pdf->Cell($sp_right,$h,':',$border,0,'C');
+            $pdf->Cell($fill_right,$h,ucwords(strtolower($Student['Prodi'])),$border,1,'L');
+
+            $e = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '%#d' : '%e';
+            $pdf->Cell($l_left,$h,'Tempat dan Tanggal Lahir',$border,0,'L');
+            $pdf->Cell($sp_left,$h,':',$border,0,'C');
+            $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['PlaceOfBirth'])).', '.strftime($e." %B %Y",strtotime($Student['DateOfBirth'])),$border,1,'L');
+
+
+
+        } else {
+            $pdf->Cell($l_left,$h,'Name',$border,0,'L');
+            $pdf->Cell($sp_left,$h,':',$border,0,'C');
+            $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['Name'])),$border,0,'L');
+            $pdf->Cell($l_right,$h,'Faculty',$border,0,'L');
+            $pdf->Cell($sp_right,$h,':',$border,0,'C');
+            $pdf->Cell($fill_right,$h,$Student['FacultyName'],$border,1,'L');
+
+
+            $pdf->Cell($l_left,$h,'Student ID',$border,0,'L');
+            $pdf->Cell($sp_left,$h,':',$border,0,'C');
+            $pdf->Cell($fill_left,$h,$Student['NPM'],$border,0,'L');
+            $pdf->Cell($l_right,$h,'Department',$border,0,'L');
+            $pdf->Cell($sp_right,$h,':',$border,0,'C');
+            $pdf->Cell($fill_right,$h,ucwords(strtolower($Student['ProdiEng'])),$border,1,'L');
+
+            $pdf->Cell($l_left,$h,'Place, Date of Birth',$border,0,'L');
+            $pdf->Cell($sp_left,$h,':',$border,0,'C');
+            $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['PlaceOfBirth'])).', '.date('F j, Y',strtotime($Student['DateOfBirth'])),$border,1,'L');
+        }
+
+
+
+        $pdf->Ln(3.5);
+
+        $border = 1;
+
+        $w_no = 8;
+        $w_smt = 8;
+        $w_kode = 20;
+        $w_mk = 103;
+        $w_f = 11;
+        $w_fv = 18;
+        $h=4.3;
+        $pdf->SetFillColor(226, 226, 226);
+        $pdf->Cell($w_no,$h,'No.',$border,0,'C',true);
+//        $pdf->Cell($w_smt,$h,'Smt',$border,0,'C',true);
+        $pdf->Cell($w_kode,$h,'Kode',$border,0,'C',true);
+        $pdf->Cell($w_mk+$w_smt,$h,'Mata Kuliah',$border,0,'C',true);
+        $pdf->Cell($w_f,$h,'SKS',$border,0,'C',true);
+        $pdf->Cell($w_f,$h,'Nilai',$border,0,'C',true);
+        $pdf->Cell($w_f,$h,'Bobot',$border,0,'C',true);
+        $pdf->Cell($w_fv,$h,'SKS X Bobot',$border,1,'C',true);
+
+        $pdf->SetFont('dinprolight','',7);
+    }
+
+    private function body_temp_transcript($lang,$pdf,$dataStudent){
+
+        $mk = ($lang=='ind')? '' : 'Eng';
+
+
+        $Student = $dataStudent['Student'][0];
+        $Transcript = $dataStudent['Transcript'][0];
+        $DetailCourse = $dataStudent['DetailCourse'];
+        $Result = $dataStudent['Result'];
+        $Warek1 = $dataStudent['WaRek1'][0];
+
+        $border = 1;
+        $w_no = 8;
+        $w_smt = 8;
+        $w_kode = 20;
+        $w_mk = 103;
+        $w_f = 11;
+        $w_fv = 18;
+        $h=5;
+
+        $no = 1;
+        for($i=0;$i<count($DetailCourse);$i++){
+            $d = $DetailCourse[$i];
+
+            $pdf->Cell($w_no,$h,($no++),$border,0,'C');
+//            $pdf->Cell($w_smt,$h,'1',$border,0,'C');
+            $pdf->Cell($w_kode,$h,$d['MKCode'],$border,0,'C');
+            $pdf->Cell($w_mk+$w_smt,$h,$d['MKName'.$mk],$border,0,'L');
+            $pdf->Cell($w_f,$h,$d['Credit'],$border,0,'C');
+            $pdf->Cell($w_f,$h,$d['Grade'],$border,0,'C');
+            $pdf->Cell($w_f,$h,$d['GradeValue'],$border,0,'C');
+            $pdf->Cell($w_fv,$h,$d['Point'],$border,1,'C');
+
+            if($pdf->GetY()>228){
+                // membuat halaman baru
+                $pdf->SetMargins(10,5,10);
+                $pdf->AddPage();
+                $this->header_temp_transcript('eng',$pdf,$Student);
+            }
+
+        }
+
+        $pdf->SetFont('dinpromedium','',8);
+        $pdf->Cell($w_smt+$w_no+$w_kode+$w_mk,$h,'Total',$border,0,'R',true);
+        $pdf->Cell($w_f,$h,$Result['TotalSKS'],$border,0,'C',true);
+        $pdf->Cell($w_f,$h,'-',$border,0,'C',true);
+        $pdf->Cell($w_f,$h,'-',$border,0,'C',true);
+        $pdf->Cell($w_fv,$h,$Result['TotalGradeValue'],$border,1,'C',true);
+
+        $ipkLabel = ($lang=='ind')? 'Indeks Prestasi Kumulatif' : 'Cummulative Grade Point Average';
+        $h = 6;
+        $pdf->Cell($w_smt+$w_no+$w_kode+$w_mk+(3*$w_f)+$w_fv,$h,$ipkLabel.' : '.$Result['IPK'],$border,1,'C',true);
+
+
+        $h = 3.5;
+        $pdf->Ln(3.5);
+        $border = 0;
+        $pdf->SetFont('dinprolight','',8);
+        $pdf->Cell($w_smt+$w_no+$w_kode+$w_mk,$h,'',$border,0,'R');
+        $pdf->Cell((3*$w_f)+$w_fv,$h,'Jakarta, 9 Januari 2018',$border,1,'L');
+
+
+        $ttdb = ($lang=='ind')? 'Wakil Rektor Bidang Akademik' : 'Vice Rector of Academic Affairs';
+        $pdf->Cell($w_smt+$w_no+$w_kode+$w_mk,$h,'',$border,0,'R');
+        $pdf->Cell((3*$w_f)+$w_fv,$h,$ttdb,$border,1,'L');
+
+        $pdf->Ln(20);
+
+        $nm = $Warek1['TitleAhead'].' '.ucwords(strtolower($Warek1['Name'])).', '.$Warek1['TitleBehind'];
+        $pdf->Cell($w_smt+$w_no+$w_kode+$w_mk,$h,'',$border,0,'R');
+        $pdf->Cell((3*$w_f)+$w_fv,$h,trim($nm),$border,1,'L');
+    }
 
     // ====== Transcript =======
 
     public function transcript(){
-
-        setlocale(LC_ALL, 'id_ID.UTF8', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', 'IND.UTF-8', 'IND.8859-1', 'IND', 'Indonesian.UTF8', 'Indonesian.UTF-8', 'Indonesian.8859-1', 'Indonesian', 'Indonesia', 'id', 'ID', 'en_US.UTF8', 'en_US.UTF-8', 'en_US.8859-1', 'en_US', 'American', 'ENG', 'English');
 
         $token = $this->input->post('token');
         $data_arr = $this->getInputToken($token);
@@ -3376,7 +3588,6 @@ class C_save_to_pdf extends CI_Controller {
     // ====== Ijazah =======
     public function ijazah(){
 
-        setlocale(LC_ALL, 'id_ID.UTF8', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', 'IND.UTF-8', 'IND.8859-1', 'IND', 'Indonesian.UTF8', 'Indonesian.UTF-8', 'Indonesian.8859-1', 'Indonesian', 'Indonesia', 'id', 'ID', 'en_US.UTF8', 'en_US.UTF-8', 'en_US.8859-1', 'en_US', 'American', 'ENG', 'English');
 
         $token = $this->input->post('token');
         $data_arr = $this->getInputToken($token);

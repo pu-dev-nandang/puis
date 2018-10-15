@@ -86,6 +86,7 @@ $route['academic/exam-schedule/edit-exam-schedule/(:num)'] = 'page/academic/c_ja
 // ---- Score ----
 $route['academic/score'] =  'page/academic/c_score';
 $route['academic/inputScore'] =  'page/academic/c_score/inputScore';
+$route['academic/monitoring-score'] =  'page/academic/c_score/monitoring_score';
 
 // ---- Transcript ----
 $route['academic/transcript'] =  'page/academic/c_transcript';
@@ -560,6 +561,7 @@ $route['save2pdf/answer-sheet'] =  'c_save_to_pdf/answer_sheet';
 $route['save2pdf/news-event'] =  'c_save_to_pdf/news_event';
 $route['save2pdf/attendance-list'] =  'c_save_to_pdf/attendance_list';
 $route['save2pdf/transcript'] =  'c_save_to_pdf/transcript';
+$route['save2pdf/temp_transcript'] =  'c_save_to_pdf/temp_transcript';
 $route['save2pdf/ijazah'] =  'c_save_to_pdf/ijazah';
 $route['save2pdf/diploma_supplement'] =  'c_save_to_pdf/diploma_supplement';
 
@@ -634,6 +636,7 @@ $route['api/__getScheduleExamWaitingApproval'] = 'api/c_api/getScheduleExamWaiti
 $route['api/__getScheduleExamLecturer'] = 'api/c_api/getScheduleExamLecturer';
 
 $route['api/__getListCourseInScore'] = 'api/c_api/getListCourseInScore';
+$route['api/__getMonScoreStd'] = 'api/c_api/getMonScoreStd';
 
 $route['api/__crudProgramCampus'] = 'api/c_api/crudProgramCampus';
 $route['api/__crudSemester'] = 'api/c_api/crudSemester';

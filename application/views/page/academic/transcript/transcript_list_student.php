@@ -73,6 +73,16 @@
         $('#formGlobalToken').submit();
     });
 
+    $(document).on('click','.btnDowloadTempTranscript',function () {
+        var NPM = $(this).attr('data-npm');
+        var DBStudent = $(this).attr('data-db');
+
+        var token = jwt_encode({NPM:NPM,DBStudent:DBStudent},'UAP)(*');
+        $('#formGlobalToken').attr('action',base_url_js+'save2pdf/temp_transcript');
+        $('#dataToken').val(token);
+        $('#formGlobalToken').submit();
+    });
+
     $(document).on('click','.btnDownloadIjazah',function () {
         var NPM = $(this).attr('data-npm');
         var DBStudent = $(this).attr('data-db');
@@ -101,7 +111,7 @@
                     '                    <th style="width: 13%;">Prodi</th>' +
                     '                    <th style="width: 25%;">Certificate Serial Number</th>' +
                     '                    <th style="width: 5%;">SKPI</th>' +
-                    '                    <th style="width: 10%;">Transcript</th>' +
+                    '                    <th style="width: 15%;">Transcript</th>' +
                     '                    <th style="width: 7%;">Ijazah</th>' +
                     '                </tr>' +
                     '                </thead>' +
