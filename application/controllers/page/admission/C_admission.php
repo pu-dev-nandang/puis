@@ -2162,4 +2162,10 @@ class C_admission extends Admission_Controler {
       }
     }
 
+    public function tutorial()
+    {
+      $content = $this->load->view('page/'.$this->data['department'].'/tutorial/pagetutorial',$this->data,true);
+      $this->temp($content);
+    }
+
 }
