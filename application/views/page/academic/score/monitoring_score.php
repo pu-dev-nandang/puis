@@ -14,16 +14,16 @@
 </style>
 
 <div class="row">
-    <div class="col-md-8 col-md-offset-2">
+    <div class="col-md-10 col-md-offset-1">
         <div class="well">
             <div class="row">
-                <div class="col-xs-3">
+                <div class="col-xs-2">
                     <select class="form-control filter-mon-score" id="filterSemester"></select>
                 </div>
                 <div class="col-xs-2">
                     <select class="form-control filter-mon-score" id="filterAscYear"></select>
                 </div>
-                <div class="col-xs-5">
+                <div class="col-xs-4">
                     <select class="form-control filter-mon-score" id="filterBaseProdi">
                         <option value="">--- All Programme Study ---</option>
                         <option disabled>-------------------</option>
@@ -42,6 +42,9 @@
                             <option value="20">Not Yet Input</option>
                         </optgroup>
                     </select>
+                </div>
+                <div class="col-xs-2">
+                    <button class="btn btn-block btn-default" id="btnSave2ExcelMonScore"><i class="fa fa-download margin-right"></i> to Excel</button>
                 </div>
             </div>
         </div>
@@ -73,6 +76,31 @@
 
     $(document).on('change','.filter-mon-score',function () {
         loadData();
+    });
+
+    $('#btnSave2ExcelMonScore').click(function () {
+        var filterSemester = $('#filterSemester').val();
+        var filterAscYear = $('#filterAscYear').val();
+        if(filterSemester!='' && filterSemester!=null && filterAscYear!='' && filterAscYear!=null){
+
+            var filterBaseProdi = $('#filterBaseProdi').val();
+            var ProdiID = (filterBaseProdi!='' && filterBaseProdi!=null) ? filterBaseProdi.split('.')[0] : '' ;
+            var Year = filterAscYear.split('.')[1];
+            var filterType = $('#filterType').val();
+
+            var data = {
+                SemesterID : filterSemester.split('.')[0],
+                ProdiID : ProdiID,
+                Year : Year,
+                Type : filterType
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'save2excel/monitoring_score';
+            FormSubmitAuto(url, 'POST', [
+                { name: 'token', value: token },
+            ]);
+        }
     });
 
     function loadData() {
