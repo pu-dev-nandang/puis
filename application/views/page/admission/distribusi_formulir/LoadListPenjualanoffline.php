@@ -176,7 +176,7 @@
 			 	    setTimeout(function () {
 			 	       toastr.options.fadeOut = 10000;
 			 	       toastr.success('Data berhasil disimpan', 'Success!');
-			 	       loadData(1)
+			 	       LoadTablesServerSide();
 			 	       $('#NotificationModal').modal('hide');
 			 	    },2000);
 			 	});
