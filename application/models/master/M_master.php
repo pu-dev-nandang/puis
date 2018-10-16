@@ -1256,6 +1256,17 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $this->db->update('db_admission.formulir_number_offline_m', $dataSave);
     }
 
+    public function updateStatusJual2($FormulirCode)
+    {
+        $dataSave = array(
+            'StatusJual' => 0,
+            'Status' => 0,
+            'No_Ref' => '',
+        );
+        $this->db->where('FormulirCode', $FormulirCode);
+        $this->db->update('db_admission.formulir_number_offline_m', $dataSave);
+    }
+
     public function recycleDataVa($limit,$start)
     {
         $sql = "select * from db_admission.register_deleted where VA_recycle = 0

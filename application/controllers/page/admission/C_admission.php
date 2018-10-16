@@ -330,9 +330,9 @@ class C_admission extends Admission_Controler {
           case 'delete':
               $query = $this->m_master->caribasedprimary('db_admission.sale_formulir_offline','ID',$input['CDID']);
               $FormulirCode = $query[0]['FormulirCodeOffline'];
+              $this->m_master->updateStatusJual2($FormulirCode);
               $this->m_master->delete_id_table($input['CDID'],'sale_formulir_offline');
               // print_r($FormulirCode);
-              $this->m_master->updateStatusJual($FormulirCode);
               break;        
       }
     }
@@ -1840,9 +1840,10 @@ class C_admission extends Admission_Controler {
                         b.NameProdi like "'.$requestData['search']['value'].'%" or
                         b.src_name like "'.$requestData['search']['value'].'%" or
                         b.FullName like "'.$requestData['search']['value'].'%" or
-                        b.DateSale like "'.$requestData['search']['value'].'%"
+                        b.DateSale like "'.$requestData['search']['value'].'%" or
+                        b.NoKwitansi like "'.$requestData['search']['value'].'%"
                       ) '.$StatusJual.'';
-      $sql.= ' order by b.No_Ref asc LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+      $sql.= ' order by b.NoKwitansi desc LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
       $query = $this->db->query($sql)->result_array();
 
@@ -1853,6 +1854,7 @@ class C_admission extends Admission_Controler {
           $nestedData[] = $No;
           $nestedData[] = $row['FormulirCode'];
           $nestedData[] = $row['No_Ref'];
+          $nestedData[] = $row['NoKwitansi'];
           $nestedData[] = $row['NameProdi'];
           $aa = ($row['StatusUsed'] == 0) ? '<div style="color:  green;">No</div>' : '<div style="color:  red;">Yes</div>';
           $nestedData[] = $aa;
