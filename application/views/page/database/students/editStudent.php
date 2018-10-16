@@ -58,7 +58,8 @@
                         <th>Date of Birth</th>
                         <th>:</th>
                         <td>
-                            <input class="form-control formBiodata" id="formDateOfBirth">
+                            <input class="form-control hide" id="formDateOfBirthValue" readonly>
+                            <input class="form-control formBiodata" data-desc="bio" id="formDateOfBirth">
                         </td>
                     </tr>
 
@@ -339,7 +340,7 @@
 
             var formGender = $('input[type=radio][name=formGender]:checked').val();
             var formPlaceOfBirth = $('#formPlaceOfBirth').val();
-            var formDateOfBirth = $('#formDateOfBirth').val();
+            var formDateOfBirthValue = $('#formDateOfBirthValue').val();
             var formPhone = $('#formPhone').val();
             var formHP = $('#formHP').val();
             var formEmail = $('#formEmail').val();
@@ -354,7 +355,7 @@
                     Name : formName,
                     Gender : formGender,
                     PlaceOfBirth : formPlaceOfBirth,
-                    DateOfBirth : formDateOfBirth,
+                    DateOfBirth : formDateOfBirthValue,
                     Phone : formPhone,
                     HP : formHP,
                     Email : formEmail,
@@ -391,20 +392,42 @@
         var url = base_url_js+'api/__crudStudent';
         
         $.post(url,{token:token},function (jsonResult) {
-            console.log(jsonResult);
+            // console.log(jsonResult);
             if(jsonResult.length>0){
                 var d = jsonResult[0];
                 $('#formNPM').val(d.NPM);
                 $('#formName').val(d.Name);
                 $('input[type=radio][name=formGender][value='+d.Gender+']').prop('checked',true);
                 $('#formPlaceOfBirth').val(d.PlaceOfBirth);
-                $('#formDateOfBirth').val(d.DateOfBirth);
+                $('#formDateOfBirthValue').val(d.DateOfBirth);
                 $('#formPhone').val(d.Phone);
                 $('#formHP').val(d.HP);
                 $('#formEmail').val(d.Email);
                 $('#formEmailPU').val(d.EmailPU);
                 $('#formAddress').val(d.Address);
                 $('#formJacket').val(d.Jacket);
+
+                $( "#formDateOfBirth" )
+                    .datepicker({
+                        showOtherMonths:true,
+                        autoSize: true,
+                        dateFormat: 'dd MM yy',
+                        onSelect : function () {
+                            var data_date = $(this).val().split(' ');
+                            var CustomMoment = moment(data_date[2]+'-'+(parseInt(convertDateMMtomm(data_date[1])) + 1)+'-'+data_date[0]).format('YYYY-MM-DD');
+                            var Desc = $(this).attr('data-desc');
+
+                            var elm = '#formDateOfBirthValue';
+                            if(Desc=='Issue') {
+                                elm = '#formSTDateIssuedValue';
+                            } else if(Desc=='TempTS'){
+                                elm = '#formTemp_TsDateValue';
+                            }
+
+                            $(elm).val(CustomMoment);
+                        }
+                    });
+                $('#formDateOfBirth').datepicker('setDate',new Date(d.DateOfBirth));
 
                 $('#viewImage').attr('data-src',base_url_js+'uploads/students/'+DB_Student+'/'+d.Photo);
                 $('#viewImage').imgFitter({
