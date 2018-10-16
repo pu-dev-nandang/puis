@@ -1798,7 +1798,7 @@ class C_admission extends Admission_Controler {
         }
 
       $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,b.No_Ref,a.StatusReg,b.Years,b.Status as StatusUsed, b.StatusJual,
-                b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,b.CityNameFormulir,b.DistrictNameFormulir,
+                b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,b.CityNameFormulir,b.DistrictNameFormulir,b.TypePay,
                 b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi,b.NoKwitansi
                 from (
                 select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
@@ -1813,7 +1813,7 @@ class C_admission extends Admission_Controler {
                 ) as a right JOIN
                 (
                 select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,b.NoKwitansi,
-                b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,
+                b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,b.TypePay,
                 if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,b.ID_ProgramStudy,y.Name as NameProdi
                 from db_admission.formulir_number_offline_m as a
                 left join db_admission.sale_formulir_offline as b
@@ -1877,7 +1877,7 @@ class C_admission extends Admission_Controler {
                       </div>
                       <div class="row" style="margin-top: 10px">
                         <div class="col-md-12">
-                          <span ref = "'.$row['No_Ref'].'" NamaLengkap = "'.$row['NamaPembeli'].'" class="btn btn-xs btn-print" phonehome = "'.$row['HomeNumberPembeli'].'" hp = "'.$row['PhoneNumberPembeli'].'" jurusan = "'.$row['NameProdi'].'" pembayaran ="Pembelian Form('.$row['No_Ref'].')" jenis= "Cash" jumlah = "'.$row['Price_Form'].'" date = "'.$row['DateSale'].'" formulir = "'.$row['FormulirCode'].'" NoKwitansi = "'.$row['NoKwitansi'].'">
+                          <span ref = "'.$row['No_Ref'].'" NamaLengkap = "'.$row['NamaPembeli'].'" class="btn btn-xs btn-print" phonehome = "'.$row['HomeNumberPembeli'].'" hp = "'.$row['PhoneNumberPembeli'].'" jurusan = "'.$row['NameProdi'].'" pembayaran ="Pembelian Formulir Pendaftaran('.$row['NameProdi'].')" jenis= "'.$row['TypePay'].'" jumlah = "'.$row['Price_Form'].'" date = "'.$row['DateSale'].'" formulir = "'.$row['FormulirCode'].'" NoKwitansi = "'.$row['NoKwitansi'].'">
                            <i class="fa fa-print"></i> Kwitansi
                          </span>
                         </div>

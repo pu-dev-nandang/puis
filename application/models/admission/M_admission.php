@@ -862,6 +862,7 @@ class M_admission extends CI_Model {
               'DateSale' => $input_arr['tanggal'],
               'CreatedBY' => $this->session->userdata('NIP'),
               'NoKwitansi' => $NoKwitansi,
+              'TypePay' => $input_arr['TypePay'],
               // 'Price_Form' => $Kelulusan,
       );
       $this->db->insert('db_admission.sale_formulir_offline', $dataSave);
@@ -902,6 +903,7 @@ class M_admission extends CI_Model {
               'Channel' => $input_arr['tipeChannel'],
               'SchoolIDChanel' => $input_arr['autoCompleteSchoolChanel'],
               'Price_Form' => $input_arr['priceFormulir'],
+              'TypePay' => $input_arr['TypePay'],
               'DateSale' => $input_arr['tanggal'],
               'UpdateAT' => date('Y-m-d'),
               'UpdatedBY' => $this->session->userdata('NIP'),

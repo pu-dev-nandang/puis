@@ -4959,9 +4959,9 @@ Phone: (021) 29200456';
             $fpdf->ln(1);
             $fpdf->Cell(206, 7, 'TANDA TERIMA PEMBAYARAN', 0, 0, 'C');
             $fpdf->ln(7);
-            $fpdf->Line(65, 12.5, 163, 12.5);
+            // $fpdf->Line(65, 12.5, 163, 12.5);
             $fpdf->SetFont('Arial', '', 12);
-            $fpdf->Cell(206, 5, 'Nomor: '.$nomorWr, 0, 0, 'C');
+            $fpdf->Cell(206, 15, 'Nomor: '.$nomorWr, 0, 0, 'C');
             
             // //====================== CONTENT ======================
             // if ($data['form'] == NULL) {
@@ -4973,52 +4973,50 @@ Phone: (021) 29200456';
             //     $no_txt = $data['form'];
             // }
             
-            $fpdf->SetFont('Arial', '', 14);
-            $fpdf->Text(23, 28, 'Telah terima dari,');
+            // $fpdf->SetFont('Arial', '', 14);
+            // $fpdf->Text(23, 28, 'Telah terima dari,');
             $no_lbl = 'No Form';
             
             $fpdf->SetFont('Arial', '', 14);
             $fpdf->Text(23, 36, $no_lbl);
             $fpdf->Text(23, 43, 'Nama lengkap');
-            $fpdf->Text(23, 50, 'Tlp / HP');
-            $fpdf->Text(23, 57, 'Jurusan');
-            $fpdf->Text(23, 64, 'Pembayaran');
-            $fpdf->Text(23, 71, 'Jenis');
-            $fpdf->Text(23, 78, 'Jumlah');
-            $fpdf->Text(23, 85, 'Terbilang');
+            // $fpdf->Text(23, 50, 'Tlp / HP');
+            // $fpdf->Text(23, 57, 'Jurusan');
+            $fpdf->Text(23, 50, 'Pembayaran');
+            $fpdf->Text(23, 57, 'Jumlah');
+            $fpdf->Text(23, 64, 'Cara Pembayaran');
+            $fpdf->Text(23, 71, 'Terbilang');
         
-
-        
-            $fpdf->Text(59, 36, ':');
-            $fpdf->Text(59, 43, ':');
-            $fpdf->Text(59, 50, ':');
-            $fpdf->Text(59, 57, ':');
-            $fpdf->Text(59, 64, ':');
-            $fpdf->Text(59, 71, ':');
-            $fpdf->Text(59, 78, ':');
-            $fpdf->Text(59, 85, ':');
+            $fpdf->Text(63, 36, ':');
+            $fpdf->Text(63, 43, ':');
+            // $fpdf->Tex63t(59, 50, ':');
+            // $fpdf->Text(59, 57, ':');
+            $fpdf->Text(63, 50, ':');
+            $fpdf->Text(63, 57, ':');
+            $fpdf->Text(63, 64, ':');
+            $fpdf->Text(63, 71, ':');
             
             $terbilang = $this->m_master->moneySay($input['jumlah']);
-            $fpdf->Text(64, 36, $input['NoFormRef'] );
-            $fpdf->Text(64, 43, $input['namalengkap']);
-            $fpdf->Text(64, 50, $input['hp']);
-            $fpdf->Text(64, 57, $input['jurusan']);
-            $fpdf->Text(64, 64, $input['pembayaran']);
-            $fpdf->Text(64, 71, $input['jenis']);
-            $fpdf->Text(64, 78, 'Rp '.number_format($input['jumlah'],2,',','.').',-');
-            $fpdf->Text(64, 85, $terbilang);
+            $fpdf->Text(69, 36, $input['NoFormRef'] );
+            $fpdf->Text(69, 43, $input['namalengkap']);
+            // $fpdf->Text(64, 50, $input['hp']);
+            // $fpdf->Text(64, 57, $input['jurusan']);
+            $fpdf->Text(69, 50, $input['jenis']);
+            $fpdf->Text(69, 57, $input['pembayaran']);
+            $fpdf->Text(69, 64, 'Rp '.number_format($input['jumlah'],2,',','.').',-');
+            $fpdf->Text(69, 71, $terbilang);
             
             
             
             
-            $fpdf->Line(63, 37, 195, 37);
-            $fpdf->Line(63, 44, 195, 44);
-            $fpdf->Line(63, 51, 195, 51);
-            $fpdf->Line(63, 58, 195, 58);
-            $fpdf->Line(63, 65, 195, 65);
-            $fpdf->Line(63, 72, 195, 72);
-            $fpdf->Line(63, 79, 195, 79);
-            $fpdf->Line(63, 86, 195, 86);
+            $fpdf->Line(69, 37, 195, 37);
+            $fpdf->Line(69, 44, 195, 44);
+            // $fpdf->Line(63, 51, 195, 51);
+            // $fpdf->Line(63, 58, 195, 58);
+            $fpdf->Line(69, 51, 195, 51);
+            $fpdf->Line(69, 58, 195, 58);
+            $fpdf->Line(69, 65, 195, 65);
+            $fpdf->Line(69, 72, 195, 72);
             
             //====================== FOOTER / SIGN ======================
             $printDate = $this->m_master->getIndoBulan(date('Y-m-d'));

@@ -168,6 +168,27 @@
 	           			                </div>
 	           			            </div>
 	           			            <div class="form-group">
+	           			                <label class="col-sm-1 control-label">Tipe Pembayaran </label>
+	           			                <div class="col-md-3">
+	           			                  <table>
+	           			                        <tr>
+	           			                              <td>
+	           			                                    <label class="radio-inline">
+   			                                                      <input type="radio" name="TypePay" value = "Cash" class = "TypePay" checked> Cash
+   			                                                </label>
+	           			                              </td>
+	           			                        </tr>
+	           			                        <tr>
+	           			                              <td>
+           			                                   		<label class="radio-inline">
+           			                                            <input type="radio" name="TypePay" value = "Transfer" class = "TypePay"> Transfer
+           			                                        </label>
+	           			                              </td>
+	           			                        </tr>
+	           			                  </table>
+	           			                </div>
+	           			            </div>
+	           			            <div class="form-group">
 	           			                  <label class="col-sm-1 control-label">Harga Formulir </label>
 	           			                  <div class="col-md-3">
 	           			                        <input type="text" name="priceFormulir" id= "priceFormulir" placeholder="" class="form-control">
@@ -504,6 +525,7 @@
 			  temp2 = "<?php echo $get1[0]['SchoolIDChanel'] ?>";
 			  $("#priceFormulir").val("<?php echo $get1[0]['Price_Form'] ?>");
 			  $('#priceFormulir').maskMoney('mask', '9894');
+			  $('input:radio[name="TypePay"][value ="<?php echo $get1[0]['TypePay'] ?>"]').prop("checked", true);
 			<?php endif ?>
 
 		});
@@ -562,6 +584,7 @@
 					 var selectGender = $("#selectGender").val();
 					 var telp_rmh = $("#telp_rmh").val().trim();
 					 var tipeChannel = $('input[name=tipeChannel]:checked').val(); ;
+					 var TypePay = $('input[name=TypePay]:checked').val(); ;
 					 var selectEvent = $("#selectEvent").val();
 					 // var autoCompleteSchoolChanel = $("#autoCompleteSchoolChanel").val();
 					 var autoCompleteSchoolChanel = temp2;
@@ -594,6 +617,7 @@
 					     PIC : PIC,
 				       tanggal : tanggal,
 				       No_Ref : No_Ref,
+				       TypePay : TypePay,
 					 };
 
 					 if (validationInput = validation2(data)) {
