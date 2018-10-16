@@ -129,7 +129,7 @@
                 '        </tr>' +
                 '        <tr>' +
                 '            <td>Mentor Academic</td>' +
-                '            <td>'+data.NIP+' - <b>'+data.Mentor+'</b><br/><span style="color: #607d8b;">'+data.EmailPU+'</span></td>' +
+                '            <td>'+data.NIP+' - <b>'+data.Mentor+'</b><br/><span style="color: #607d8b;">'+data.MentorEmailPU+'</span></td>' +
                 '        </tr>' +
                 '        <tr>' +
                 '            <td>Class Of</td>' +
