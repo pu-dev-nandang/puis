@@ -413,6 +413,8 @@ $route['admission/distribusi-formulir/offline/LoadInputPenjualan'] = 'page/admis
 $route['admission/distribusi-formulir/offline/LoadImportInputPenjualan'] = 'page/admission/c_admission/LoadImportInputPenjualan';
 $route['admission/distribusi-formulir/offline/submit_import_excel_penjualan_formulir_offline'] = 'page/admission/c_admission/submit_import_excel_penjualan_formulir_offline';
 $route['admission/distribusi-formulir/offline/submit_import_excel_kwitansi_penjualan_formulir_offline'] = 'page/admission/c_admission/submit_import_excel_kwitansi_penjualan_formulir_offline';
+$route['admission/distribusi-formulir/offline/submit_import_excel_pengembalian_formulir_offline'] = 'page/admission/c_admission/submit_import_excel_pengembalian_formulir_offline';
+
 
 
 $route['admission/mastercalonmahasiswa/generate-nim'] = 'page/admission/c_admission/generatenim';
