@@ -1207,7 +1207,7 @@ class M_api extends CI_Model {
         $db = 'ta_'.$ta;
         $data = $this->db->query('SELECT s.*, au.EmailPU, p.Name AS ProdiName, p.NameEng AS ProdiNameEng,
                                       ss.Description AS StatusStudentDesc,"'.$db.'" as ta_student,
-                                      em.Name AS Mentor, em.NIP, em.EmailPU
+                                      em.Name AS Mentor, em.NIP, em.EmailPU AS MentorEmailPU
                                       FROM '.$db.'.students s
                                       LEFT JOIN db_academic.program_study p ON (s.ProdiID = p.ID)
                                       LEFT JOIN db_academic.status_student ss ON (s.StatusStudentID = ss.ID)
