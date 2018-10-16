@@ -3268,7 +3268,7 @@ class C_save_to_pdf extends CI_Controller {
                 // membuat halaman baru
                 $pdf->SetMargins(10,5,10);
                 $pdf->AddPage();
-                $this->header_temp_transcript($lang,$pdf,$Student);
+                $this->header_temp_transcript($lang,$pdf,$Student,$dataTempTr);
             }
 
         }

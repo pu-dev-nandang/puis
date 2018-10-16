@@ -176,19 +176,20 @@
                 <hr/>
                 <div class="form-group">
                     <label>No Transcript</label>
-                    <input class="form-control" />
+                    <input class="form-control" id="formTemp_No" value="<?php echo $TempTranscript['No']; ?>" />
                 </div>
                 <div class="form-group">
-                    <label>Tempat terbit</label>
-                    <input class="form-control" />
+                    <label>Tempat Terbit</label>
+                    <input class="form-control" id="formTemp_Place" value="<?php echo $TempTranscript['Place']; ?>" />
                 </div>
                 <div class="form-group">
-                    <label>Tanggal terbit</label>
-                    <input class="form-control" />
+                    <label>Tanggal Terbit</label>
+                    <input id="formTemp_TsDateValue" value="<?php echo $TempTranscript['Date']; ?>" class="form-control hide" readonly>
+                    <input id="formTemp_TsDate" data-desc="TempTS" class="form-control">
                 </div>
                 <hr/>
                 <div style="text-align: right;">
-                    <button class="btn btn-success">Save</button>
+                    <button class="btn btn-success" id="btnSaveTemp_TS">Save</button>
                 </div>
             </div>
         </div>
@@ -242,7 +243,7 @@
 
 <script>
     $(document).ready(function () {
-        $( "#formSTDateIssued,#formSTDateOfYudisium" )
+        $( "#formSTDateIssued,#formSTDateOfYudisium,#formTemp_TsDate" )
             .datepicker({
                 showOtherMonths:true,
                 autoSize: true,
@@ -251,12 +252,20 @@
                     var data_date = $(this).val().split(' ');
                     var CustomMoment = moment(data_date[2]+'-'+(parseInt(convertDateMMtomm(data_date[1])) + 1)+'-'+data_date[0]).format('YYYY-MM-DD');
                     var Desc = $(this).attr('data-desc');
-                    var elm = (Desc=='Issue') ? '#formSTDateIssuedValue' : '#formSTDateOfYudisiumValue';
+
+                    var elm = '#formSTDateOfYudisiumValue';
+                    if(Desc=='Issue') {
+                        elm = '#formSTDateIssuedValue';
+                    } else if(Desc=='TempTS'){
+                        elm = '#formTemp_TsDateValue';
+                    }
+
                     $(elm).val(CustomMoment);
                 }
             });
         $('#formSTDateIssued').datepicker('setDate',new Date("<?php echo $Transcript['DateIssued']; ?>"));
         $('#formSTDateOfYudisium').datepicker('setDate',new Date("<?php echo $Transcript['DateOfYudisium']; ?>"));
+        $('#formTemp_TsDate').datepicker('setDate',new Date("<?php echo $TempTranscript['Date']; ?>"));
 
         var loadFirsSKPI = setInterval(function () {
 
@@ -365,6 +374,40 @@
                 $('.formST,#btnSaveST').prop('disabled',false);
             },500);
         });
+
+    });
+
+    // ====== Save Setting Temp Transcript ======
+    $('#btnSaveTemp_TS').click(function () {
+
+        var formTemp_No = $('#formTemp_No').val();
+        var formTemp_Place = $('#formTemp_Place').val();
+        var formTemp_TsDateValue = $('#formTemp_TsDateValue').val();
+
+        loading_buttonSm('#btnSaveTemp_TS');
+        $('#formTemp_No,#formTemp_Place,#formTemp_TsDate').prop('disabled',true);
+
+        var data = {
+            action : 'updateTempTranscript',
+            dataForm : {
+                No : formTemp_No,
+                Place : formTemp_Place,
+                Date : formTemp_TsDateValue,
+                UpdateBy : sessionNIP,
+                UpdateAt : dateTimeNow()
+            }
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api/__crudTranscript';
+
+        $.post(url,{token:token},function (result) {
+            setTimeout(function () {
+                $('#btnSaveTemp_TS').html('Save');
+                $('#formTemp_No,#formTemp_Place,#formTemp_TsDate,#btnSaveTemp_TS').prop('disabled',false);
+            },500);
+        });
+
 
     });
 
