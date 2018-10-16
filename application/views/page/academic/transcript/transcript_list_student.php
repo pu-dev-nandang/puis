@@ -11,7 +11,7 @@
 
 <div class="row" style="margin-top: 10px;">
     <div class="col-md-12" style="text-align: right;">
-        <a href="<?php echo base_url('academic/setting-transcript'); ?>" class="btn btn-info"><i class="fa fa-cog margin-right"></i> Setting</a>
+        <a href="<?php echo base_url('academic/transcript/setting-transcript'); ?>" class="btn btn-info"><i class="fa fa-cog margin-right"></i> Setting</a>
     </div>
 </div>
 
