@@ -3229,12 +3229,13 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetFont('dinpromedium','',7);
         $pdf->SetXY(10,10);
-        $pdf->Cell(125,7,'',0,0,'L');
+        $pdf->Cell(123,7,'',0,0,'L');
         $pdf->Cell(21,7,'Nomor Transkrip / ',0,0,'L');
         $pdf->SetFont('dinlightitalic','',7);
         $pdf->Cell(21,7,'Transcript Number',0,0,'L');
         $pdf->SetFont('dinpromedium','',7);
-        $pdf->Cell(25,7,': '.$Student['CSN'],0,1,'L');
+        $pdf->Cell(2,7,' : ',0,0,'C');
+        $pdf->Cell(25,7,$Student['CSN'],0,1,'R');
 
 
 //        $pdf->SetFont('dinpromedium','',16);
@@ -3256,6 +3257,7 @@ class C_save_to_pdf extends CI_Controller {
         $h=4;
         $border = 0;
 
+        $e = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '%#d' : '%e';
 
 
         $pdf->SetFont('dinpromedium','',9);
@@ -3279,7 +3281,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinpromedium','',9);
         $pdf->Cell($label_l,$h,'Tempat dan Tanggal Lahir',$border,0,'L');
         $pdf->Cell($sparator_l,$h,':',$border,0,'C');
-        $pdf->Cell($fill_l,$h,$Student['PlaceOfBirth'].', '.strftime("%d %B %Y",strtotime($Student['DateOfBirth'])),$border,0,'L');
+        $pdf->Cell($fill_l,$h,ucwords(strtolower($Student['PlaceOfBirth'])).', '.strftime($e." %B %Y",strtotime($Student['DateOfBirth'])),$border,0,'L');
         $pdf->Cell($label_r,$h,'Program Studi',$border,0,'L');
         $pdf->Cell($sparator_r,$h,':',$border,0,'C');
         $pdf->Cell($fill_r,$h,$Student['Prodi'],$border,1,'L');
@@ -3287,7 +3289,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinlightitalic','',8);
         $pdf->Cell($label_l,$h,'Place and Date of Birth',$border,0,'L');
         $pdf->Cell($sparator_l,$h,':',$border,0,'C');
-        $pdf->Cell($fill_l,$h,$Student['PlaceOfBirth'].', '.date('F d, Y',strtotime($Student['DateOfBirth'])),$border,0,'L');
+        $pdf->Cell($fill_l,$h,ucwords(strtolower($Student['PlaceOfBirth'])).', '.date('F j, Y',strtotime($Student['DateOfBirth'])),$border,0,'L');
         $pdf->Cell($label_r,$h,'Study Program',$border,0,'L');
         $pdf->Cell($sparator_r,$h,':',$border,0,'C');
         $pdf->Cell($fill_r,$h,$Student['ProdiEng'],$border,1,'L');
@@ -3452,11 +3454,11 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetFont('dinpromedium','',9);
         $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
-        $pdf->Cell($w_Div-$min,$h,$Transcript['PlaceIssued'].', '.strftime("%d %B %Y",strtotime($Transcript['DateIssued'])),$borderttd,1,'L');
+        $pdf->Cell($w_Div-$min,$h,ucwords(strtolower($Transcript['PlaceIssued'])).', '.strftime($e." %B %Y",strtotime($Transcript['DateIssued'])),$borderttd,1,'L');
 
         $pdf->SetFont('dinlightitalic','',8);
         $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
-        $pdf->Cell($w_Div-$min,$h,$Transcript['PlaceIssued'].',  '.date('F d, Y',strtotime($Transcript['DateIssued'])),$borderttd,1,'L');
+        $pdf->Cell($w_Div-$min,$h,ucwords(strtolower($Transcript['PlaceIssued'])).',  '.date('F j, Y',strtotime($Transcript['DateIssued'])),$borderttd,1,'L');
 
         $pdf->Ln(5);
 
@@ -3492,7 +3494,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_Div+$min,$h,'NIK : '.$Rektorat['NIP'],$borderttd,0,'L');
         $pdf->Cell($w_Div-$min,$h,'NIK : '.$Student['NIP'],$borderttd,1,'L');
 
-        $pdf->Rect(90, $y, 33, 45);
+        $pdf->Rect(77, $y, 33, 45);
 
 
         $nameF = str_replace(' ','_',strtoupper($Student['Name']));
@@ -3513,14 +3515,19 @@ class C_save_to_pdf extends CI_Controller {
 
         $this->spasi_transcript_table($pdf,'T');
 
+
         $h = 3;
         $pdf->SetFont('dinpromedium','',9);
-        $pdf->Cell($w_no,$h,'No.',$border_fill,0,'C');
+
+
+        $pdf->Cell($w_no,$h,'',$border_fill,0,'C');
         $pdf->Cell($w_course,$h,'Mata Kuliah',$border_fill,0,'C');
         $pdf->Cell($w_credit,$h,'SKS',$border_fill,0,'C');
         $pdf->Cell($w_grade,$h,'Nilai',$border_fill,0,'C');
         $pdf->Cell($w_score,$h,'Angka',$border_fill,0,'C');
         $pdf->Cell($w_point,$h,'SKS x Angka',$border_fill,1,'C');
+        $ytext = $pdf->GetY()+0.5;
+        $pdf->Text(14,$ytext,'No.');
 
         $pdf->SetFont('dinlightitalic','',8);
         $pdf->Cell($w_no,$h,'',$border_fill,0,'C');
@@ -3661,11 +3668,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $border = 0;
 
-        $e = '%e';
-        $dateOfBirth = strftime("%e %B %Y",strtotime($Student['DateOfBirth']));
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            $e = '%#d';
-        }
+        $e = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '%#d' : '%e';
 
         // ===== TTL =====
         $pdf->SetX($x);
