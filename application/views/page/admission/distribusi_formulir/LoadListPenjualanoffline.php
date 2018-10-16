@@ -89,6 +89,7 @@
 		                '<th>No</th>'+
 		                '<th>Code</th>'+
 		                '<th>Ref</th>'+
+		                '<th>Kwitansi</th>'+
 		                '<th>Prodi</th>'+
 		                '<th>Activated</th>'+
 		                '<th>Status</th>'+
