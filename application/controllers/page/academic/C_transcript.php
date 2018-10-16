@@ -30,6 +30,7 @@ class C_transcript extends Academic_Controler {
     }
 
     public function setting_transcript(){
+        $data['TempTranscript'] = $this->db->get('db_academic.setting_temp_transcript')->result_array()[0];
         $data['Transcript'] = $this->db->get('db_academic.setting_transcript')->result_array()[0];
         $data['Graduation'] = $this->db->get('db_academic.graduation')->result_array();
         $data['Education'] = $this->db->get('db_academic.education_level')->result_array();
