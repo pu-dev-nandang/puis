@@ -90,7 +90,7 @@ $route['academic/monitoring-score'] =  'page/academic/c_score/monitoring_score';
 
 // ---- Transcript ----
 $route['academic/transcript'] =  'page/academic/c_transcript';
-$route['academic/setting-transcript'] =  'page/academic/c_transcript/setting_transcript';
+$route['academic/transcript/setting-transcript'] =  'page/academic/c_transcript/setting_transcript';
 
 // ---- Final Project ----
 $route['academic/final-project'] =  'page/academic/c_final_project';
@@ -124,6 +124,9 @@ $route['database/employees/form_input_add'] = 'page/database/c_database/form_inp
 $route['database/employees/form_input_add/(:any)'] = 'page/database/c_database/form_input_employees/$1';
 $route['database/employees/form_input_submit'] = 'page/database/c_database/form_input_submit_employees';
 $route['database/employees/changestatus'] = 'page/database/c_database/changestatus';
+
+$route['database/students/edit-students/(:any)/(:any)/(:any)'] = 'page/database/c_database/edit_students/$1/$2/$3';
+
 
 
 
@@ -676,6 +679,7 @@ $route['api/__crudStudyPlanning'] = 'api/c_api/crudStudyPlanning';
 $route['api/__getClassGroupAutoComplete/(:num)'] = 'api/c_api/getClassGroupAutoComplete/$1';
 $route['api/__getScheduleIDByClassGroup/(:num)/(:any)'] = 'api/c_api/getScheduleIDByClassGroup/$1/$2';
 $route['api/__crudPartime'] = 'api/c_api/crudPartime';
+$route['api/__crudStudent'] = 'api/c_api/crudStudent';
 
 $route['api/__filterStudents'] = 'api/c_api/filterStudents';
 $route['api/__getFormulirOfflineAvailable/(:any)'] = 'api/c_api/getFormulirOfflineAvailable/$1';

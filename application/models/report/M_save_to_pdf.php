@@ -423,7 +423,6 @@ class M_save_to_pdf extends CI_Model {
         $grade = $this->getGraduation($ipk);
 
         // Get Rektor
-//        $dataRektor = $this->db->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees',array('PositionMain' => '2.1'),1)->result_array();
         $dataRektor = $this->db->query('SELECT em.NIP, em.Name, em.TitleAhead, em.TitleBehind FROM db_employees.employees em
                                                     LEFT JOIN db_employees.employees_status ems ON (ems.ID = em.StatusEmployeeID)
                                                     WHERE em.PositionMain = "2.1" AND ems.IDStatus != -1 AND ems.IDStatus != -2 ')->result_array();
@@ -433,7 +432,8 @@ class M_save_to_pdf extends CI_Model {
                                                     LEFT JOIN db_employees.employees_status ems ON (ems.ID = em.StatusEmployeeID)
                                                     WHERE em.PositionMain = "2.2" AND ems.IDStatus != -1 AND ems.IDStatus != -2 ')->result_array();
 
-        $dataTranscript = $this->db->get('db_academic.setting_transcript')->result_array();
+        $dataTranscript = $this->db->limit(1)->get('db_academic.setting_transcript')->result_array();
+        $dataTempTranscript = $this->db->limit(1)->get('db_academic.setting_temp_transcript')->result_array();
 
         $result = array(
             'Student' => $dataStd,
@@ -445,6 +445,7 @@ class M_save_to_pdf extends CI_Model {
                 'Grading' => $grade
             ),
             'Transcript' => $dataTranscript,
+            'TempTranscript' => $dataTempTranscript,
             'Rektorat' => $dataRektor,
             'WaRek1' => $dataWaRek1,
             'DetailCourse' => $DetailCourse

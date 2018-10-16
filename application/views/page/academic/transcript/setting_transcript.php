@@ -29,7 +29,7 @@
 <div class="row">
     <div class="col-md-4">
         <div class="thumbnail" style="padding: 0px">
-            <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;">Setting Transcript</span>
+            <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;"><i class="fa fa-cog margin-right"></i> Transcript & Ijazah</span>
 
             <div style="margin: 15px">
                 <table class="table table-setting">
@@ -77,7 +77,7 @@
 
     <div class="col-md-4">
         <div class="thumbnail" style="padding: 0px">
-            <span class="label-success" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;">Setting Graduation Honor</span>
+            <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;"><i class="fa fa-cog margin-right"></i>  Graduation Honor</span>
 
             <div style="margin: 5px;margin-top: 15px;">
                 <table class="table table-bordered" id="tableHonor">
@@ -127,9 +127,9 @@
 
     <div class="col-md-4">
         <div class="thumbnail" style="padding: 0px">
-            <span class="label-success" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;">Setting Education Program</span>
+            <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;"><i class="fa fa-cog margin-right"></i>  Education Program</span>
 
-            <div style="margin: 15px">
+            <div style="margin: 5px;margin-top: 15px;">
                 <table class="table table-bordered" id="tableEducation">
                     <tr>
                         <th style="width: 10%">Program Indo</th>
@@ -169,9 +169,33 @@
 </div>
 
 <div class="row">
+    <div class="col-md-2">
+        <div class="thumbnail" style="padding: 0px">
+            <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;"><i class="fa fa-cog margin-right"></i> Temp. Transcript</span>
+            <div style="padding: 10px;">
+                <hr/>
+                <div class="form-group">
+                    <label>No Transcript</label>
+                    <input class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Tempat terbit</label>
+                    <input class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Tanggal terbit</label>
+                    <input class="form-control" />
+                </div>
+                <hr/>
+                <div style="text-align: right;">
+                    <button class="btn btn-success">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="col-md-6">
         <div class="thumbnail" style="padding: 0px;min-height: 100px;">
-            <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;">Setting SKPI</span>
+            <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;"><i class="fa fa-cog margin-right"></i>  SKPI</span>
 
             <div class="row">
                 <div class="col-md-8 col-md-offset-2" style="margin-top: 20px;">

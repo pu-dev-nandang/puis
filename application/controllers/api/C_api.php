@@ -4862,13 +4862,14 @@ class C_api extends CI_Controller {
 
             $disBtnEmail = ($row['EmailPU']=='' || $row['EmailPU']=='') ? 'disabled' : '';
 
+            $nameS = str_replace(' ','-',ucwords(strtolower($row['Name'])));
             $btnAct = '<div class="btn-group">
                           <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
                           </button>
                           <ul class="dropdown-menu">
                             <li class="'.$disBtnEmail.'"><a href="javascript:void(0);" '.$disBtnEmail.' class="btn-reset-password '.$disBtnEmail.'" data-token="'.$token.'">Reset Password</a></li>
-                            <li><a href="#">Edit (Coming Soon)</a></li>
+                            <li><a href="'.base_url('database/students/edit-students/'.$db_.'/'.$row['NPM'].'/'.$nameS).'">Edit (Coming Soon)</a></li>
                             <li role="separator" class="divider"></li>
                             <li><a href="javascript:void(0);" class="btn-change-status " data-emailpu="'.$row['EmailPU'].'" 
                             data-year="'.$row['Year'].'" data-npm="'.$row['NPM'].'" data-name="'.ucwords(strtolower($row['Name'])).'" 
@@ -5224,6 +5225,41 @@ class C_api extends CI_Controller {
         );
 
         echo json_encode($json_data);
+    }
+
+    public function crudStudent(){
+        $data_arr = $this->getInputToken();
+
+        if(count($data_arr>0)) {
+            if ($data_arr['action'] == 'readDataStudent') {
+
+                $DB_Student = $data_arr['DB_Student'];
+                $NPM = $data_arr['NPM'];
+                $data = $this->db->query('SELECT std.*, auts.EmailPU FROM '.$DB_Student.'.students std 
+                                                  LEFT JOIN db_academic.auth_students auts ON (auts.NPM = std.NPM)
+                                                  WHERE std.NPM = "'.$NPM.'" LIMIT 1')->result_array();
+
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action'] == 'updateBiodataStudent'){
+
+                $DB_Student = $data_arr['DB_Student'];
+                $NPM = $data_arr['NPM'];
+
+                $dataUpdate = $data_arr['dataForm'];
+                $this->db->where('NPM', $NPM);
+                $this->db->update($DB_Student.'.students',$dataUpdate);
+
+
+                $dataUpdtAuth = array('EmailPU' => $data_arr['EmailPU']);
+                $this->db->where('NPM', $NPM);
+                $this->db->update('db_academic.auth_students',$dataUpdtAuth);
+
+
+                return print_r(1);
+
+            }
+        }
     }
 
 }
