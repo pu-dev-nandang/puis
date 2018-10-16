@@ -1960,6 +1960,7 @@ class C_admission extends Admission_Controler {
          ); 
 
          $arr_temp = array();
+         $No_Ref = '';
         for ($i=5; $i < ($CountRow + 1); $i++) {
           $FormulirCode = $objWorksheet->getCellByColumnAndRow(0, $i)->getCalculatedValue();
           if ($FormulirCode == "" || $FormulirCode == null) {
@@ -2131,7 +2132,7 @@ class C_admission extends Admission_Controler {
 
         }
 
-        echo json_encode(array('status'=> 1,'msg' => ''));
+        echo json_encode(array('status'=> 1,'msg' => '','No_Ref' => $No_Ref));
       }
       else
       {
@@ -2151,13 +2152,14 @@ class C_admission extends Admission_Controler {
         $excel2 = $excel2->load($path); // Empty Sheet
         $objWorksheet = $excel2->setActiveSheetIndex(0);
         $CountRow = $objWorksheet->getHighestRow();
-      for ($i=2; $i < ($CountRow + 1); $i++) {
+        $No_Ref = '';
+      for ($i=5; $i < ($CountRow + 1); $i++) {
         $No_Ref = $objWorksheet->getCellByColumnAndRow(0, $i)->getCalculatedValue();
         if ($No_Ref == "" || $No_Ref == null) {
           break;
         }
         $NoKwitansi = $objWorksheet->getCellByColumnAndRow(13, $i)->getCalculatedValue();
-        $CreatedBY = $objWorksheet->getCellByColumnAndRow(14, $i)->getCalculatedValue();
+        $CreatedBY = '0';
         // print_r($CreatedBY);die();
         $get = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','No_Ref',$No_Ref);
         if (count($get) > 0) {
@@ -2171,7 +2173,7 @@ class C_admission extends Admission_Controler {
         }
       }
 
-        echo json_encode(array('status'=> 1,'msg' => ''));
+        echo json_encode(array('status'=> 1,'msg' => '','No_Ref' => $No_Ref));
       }
       else
       {
