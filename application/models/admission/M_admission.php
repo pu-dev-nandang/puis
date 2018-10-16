@@ -1035,33 +1035,33 @@ class M_admission extends CI_Model {
             a.District as DistrictAddress,a.Address,a.ZipCode,a.PhoneNumber,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
             n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto
             from db_admission.register_formulir as a
-            JOIN db_admission.register_verified as b 
+            left JOIN db_admission.register_verified as b 
             ON a.ID_register_verified = b.ID
-            JOIN db_admission.register_verification as c
+            left JOIN db_admission.register_verification as c
             ON b.RegVerificationID = c.ID
-            JOIN db_admission.register as d
+            left JOIN db_admission.register as d
             ON c.RegisterID = d.ID
-            JOIN db_admission.country as e
+            left JOIN db_admission.country as e
             ON a.NationalityID = e.ctr_code
-            JOIN db_employees.religion as f
+            left JOIN db_employees.religion as f
             ON a.ReligionID = f.IDReligion
-            JOIN db_admission.register_jtinggal_m as g
+            left JOIN db_admission.register_jtinggal_m as g
             ON a.ID_register_jtinggal_m = g.ID
-            JOIN db_admission.country as h
+            left JOIN db_admission.country as h
             ON a.ID_country_address = h.ctr_code
-            JOIN db_admission.province as i
+            left JOIN db_admission.province as i
             ON a.ID_province = i.ProvinceID
-            JOIN db_admission.region as j
+            left JOIN db_admission.region as j
             ON a.ID_region = j.RegionID
-            JOIN db_admission.district as k
+            left JOIN db_admission.district as k
             ON a.ID_districts = k.DistrictID
-            JOIN db_admission.school_type as l
+            left JOIN db_admission.school_type as l
             ON l.sct_code = a.ID_school_type
-            JOIN db_admission.register_major_school as m
+            left JOIN db_admission.register_major_school as m
             ON m.ID = a.ID_register_major_school
-            JOIN db_admission.school as n
+            left JOIN db_admission.school as n
             ON n.ID = d.SchoolID
-            join db_academic.program_study as o
+            left join db_academic.program_study as o
             on o.ID = a.ID_program_study
             where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID not in (select ID_register_formulir from db_admission.register_butuh_ujian) and  a.ID not in (select ID_register_formulir from db_admission.register_nilai) LIMIT '.$start. ', '.$limit;
            $query=$this->db->query($sql, array())->result_array();
