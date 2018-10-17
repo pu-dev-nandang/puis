@@ -2013,8 +2013,18 @@ class C_admission extends Admission_Controler {
             $NIP = $objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue();
           }
 
-          $program_study = $this->m_master->caribasedprimary('db_academic.program_study','Name',$objWorksheet->getCellByColumnAndRow(5, $i)->getCalculatedValue());
-          $program_study2 = $this->m_master->caribasedprimary('db_academic.program_study','Name',$objWorksheet->getCellByColumnAndRow(6, $i)->getCalculatedValue());
+          $Jurusan1 = $objWorksheet->getCellByColumnAndRow(5, $i)->getCalculatedValue();
+          if (strpos($Jurusan1, 'Managemen dan Rekayasa') !== false) {
+              $Jurusan1 = 'Manajemen Rekayasa dan Konstruksi';
+          }
+
+          $Jurusan2 = $objWorksheet->getCellByColumnAndRow(6, $i)->getCalculatedValue();
+          if (strpos($Jurusan2, 'Managemen dan Rekayasa') !== false) {
+              $Jurusan2 = 'Manajemen Rekayasa dan Konstruksi';
+          }
+
+          $program_study = $this->m_master->caribasedprimary('db_academic.program_study','Name',$Jurusan1);
+          $program_study2 = $this->m_master->caribasedprimary('db_academic.program_study','Name',$Jurusan2);
 
 
           $skool1 = $objWorksheet->getCellByColumnAndRow(10, $i)->getCalculatedValue();
