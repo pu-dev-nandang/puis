@@ -916,17 +916,18 @@ class M_admission extends CI_Model {
       $query=$this->db->query($sql, array())->result_array();
       $NoKwitansi = $query[0]['NoKwitansi'];
       $NoKwitansi = ($NoKwitansi != "") ? (int)$NoKwitansi + 1 : $NoKwitansi;
+      $FullName = strtolower($input_arr['Name']);
 
       $dataSave = array(
               'FormulirCodeOffline' => $input_arr['selectFormulirCode'],
               'PIC' => $input_arr['PIC'],
               'ID_ProgramStudy' => $input_arr['selectProgramStudy'],
               'ID_ProgramStudy2' => $input_arr['selectProgramStudy2'],
-              'FullName' => $input_arr['Name'],
+              'FullName' => ucwords($FullName) ,
               'Gender' => $input_arr['selectGender'],
               'HomeNumber' => $input_arr['telp_rmh'],
               'PhoneNumber' => $input_arr['hp'],
-              'Email' => $input_arr['email'],
+              'Email' => strtolower($input_arr['email']),
               'SchoolID' => $input_arr['autoCompleteSchool'],
               'price_event_ID' => $input_arr['selectEvent'],
               'source_from_event_ID' => $input_arr['selectSourceFrom'],
@@ -962,16 +963,17 @@ class M_admission extends CI_Model {
 
     public function editData_formulir_offline_sale_save($input_arr)
     {
+      $FullName = strtolower($input_arr['Name']);
       $dataSave = array(
               'FormulirCodeOffline' => $input_arr['selectFormulirCode'],
               'PIC' => $input_arr['PIC'],
               'ID_ProgramStudy' => $input_arr['selectProgramStudy'],
               'ID_ProgramStudy2' => $input_arr['selectProgramStudy2'],
-              'FullName' => $input_arr['Name'],
+              'FullName' => ucwords($FullName),
               'Gender' => $input_arr['selectGender'],
               'HomeNumber' => $input_arr['telp_rmh'],
               'PhoneNumber' => $input_arr['hp'],
-              'Email' => $input_arr['email'],
+              'Email' => strtolower($input_arr['email']),
               'SchoolID' => $input_arr['autoCompleteSchool'],
               'price_event_ID' => $input_arr['selectEvent'],
               'source_from_event_ID' => $input_arr['selectSourceFrom'],

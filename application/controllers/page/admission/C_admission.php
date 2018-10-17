@@ -2115,18 +2115,18 @@ class C_admission extends Admission_Controler {
           $sql3 = 'select * from db_admission.formulir_number_offline_m where StatusJual = 0 order by ID asc';
           $query3=$this->db->query($sql3, array())->result_array();
           $FormulirCode = $query3[0]['FormulirCode'];
-
+          $FullName = strtolower($objWorksheet->getCellByColumnAndRow(3, $i)->getCalculatedValue()) ;
           $temp = array(
               'FormulirCodeOffline' => $FormulirCode,
               'DateSale' => $date,
               'PIC' => $NIP,
-              'FullName' => $objWorksheet->getCellByColumnAndRow(3, $i)->getCalculatedValue(),
+              'FullName' => ucwords( $FullName ) ,
               'Gender' => ($objWorksheet->getCellByColumnAndRow(4, $i)->getCalculatedValue() == 'Female') ? 'P' : 'L',
               'ID_ProgramStudy' => $program_study[0]['ID'] ,
               'ID_ProgramStudy2' => (count($program_study2) > 0) ? $program_study2[0]['ID'] : 0,
               'HomeNumber' => $objWorksheet->getCellByColumnAndRow(7, $i)->getCalculatedValue(),
               'PhoneNumber' => $objWorksheet->getCellByColumnAndRow(8, $i)->getCalculatedValue(),
-              'Email' => $objWorksheet->getCellByColumnAndRow(9, $i)->getCalculatedValue(),
+              'Email' => strtolower($objWorksheet->getCellByColumnAndRow(9, $i)->getCalculatedValue() ),
               'SchoolID' => $SchoolID,
               'Channel' => $Channel,
               'price_event_ID' => '',
@@ -2235,6 +2235,8 @@ class C_admission extends Admission_Controler {
         $Tanggal = $objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue();
         $Tanggal = date('Y-m-d', strtotime($Tanggal));
         $Nama = $objWorksheet->getCellByColumnAndRow(3, $i)->getCalculatedValue();
+        $Nama = strtolower($Nama);
+        $Nama = ucwords($Nama);
         $Gender = $objWorksheet->getCellByColumnAndRow(4, $i)->getCalculatedValue();
         $Gender = (substr($Gender, 0,1) == 'M') ? 'L' : 'P';
         $TTLahir = $objWorksheet->getCellByColumnAndRow(5, $i)->getCalculatedValue();
@@ -2346,7 +2348,7 @@ class C_admission extends Admission_Controler {
           $SchoolID = $this->db->insert_id();
         }
         $ID_school_type = 1;
-        $FatherName = $objWorksheet->getCellByColumnAndRow(29, $i)->getCalculatedValue();
+        $FatherName = strtolower($objWorksheet->getCellByColumnAndRow(29, $i)->getCalculatedValue() );
         $FatherStatus = ( $objWorksheet->getCellByColumnAndRow(30, $i)->getCalculatedValue() == 'Alive' ) ? 'Alive' : 'Died';
         $FatherPhoneNumber = $objWorksheet->getCellByColumnAndRow(31, $i)->getCalculatedValue();
         $Father_occupation = $objWorksheet->getCellByColumnAndRow(33, $i)->getCalculatedValue();
@@ -2361,7 +2363,7 @@ class C_admission extends Admission_Controler {
         $FatherAddress = $objWorksheet->getCellByColumnAndRow(34, $i)->getCalculatedValue();
 
 
-        $MotherName = $objWorksheet->getCellByColumnAndRow(35, $i)->getCalculatedValue();
+        $MotherName = strtolower($objWorksheet->getCellByColumnAndRow(35, $i)->getCalculatedValue());
         $MotherStatus = ( $objWorksheet->getCellByColumnAndRow(36, $i)->getCalculatedValue() == 'Alive' ) ? 'Alive' : 'Died';
         $MotherPhoneNumber = $objWorksheet->getCellByColumnAndRow(37, $i)->getCalculatedValue();
         $Mother_occupation = $objWorksheet->getCellByColumnAndRow(39, $i)->getCalculatedValue();
@@ -2451,7 +2453,7 @@ class C_admission extends Admission_Controler {
                          'YearGraduate' => 0,
                          'KPSReceiverStatus' => 'Tidak',
                          'ID_register_jacket_size_m' => $ID_register_jacket_size_m,
-                         'FatherName' => $FatherName,
+                         'FatherName' => ucwords($FatherName),
                          'FatherNIK' => '',
                          'FatherPlaceBirth' => '',
                          'FatherDateBirth' => '1945-08-17',
@@ -2460,7 +2462,7 @@ class C_admission extends Admission_Controler {
                          'Father_ID_occupation' => $Father_ID_occupation,
                          'Father_ID_register_income_m' => 0,
                          'FatherAddress' => $FatherAddress,
-                         'MotherName' => $MotherName,
+                         'MotherName' => ucwords($MotherName),
                          'MotherNik' => '',
                          'MotherPlaceBirth' => '',
                          'MotherDateBirth' => '1945-08-17',
