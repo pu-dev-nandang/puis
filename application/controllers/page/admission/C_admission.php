@@ -2224,6 +2224,13 @@ class C_admission extends Admission_Controler {
         $get = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','No_Ref',$No_Ref);
         if(count($get) == 0){$arr_key_list_err[] = array('err' => 'Nomor Formulir tidak ditemukan','No_Ref' => $No_Ref);continue;}
         $FormulirCode = $get[0]['FormulirCode'];
+
+        // find FormulirCode pada register_verified
+        $chkFormulir = $this->m_master->caribasedprimary('db_admission.register_verified','FormulirCode',$FormulirCode);
+        if (count($chkFormulir) > 0) {
+          continue;
+        }
+        
         // NIM masih null
         $Tanggal = $objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue();
         $Tanggal = date('Y-m-d', strtotime($Tanggal));
