@@ -427,14 +427,14 @@ class M_admission extends CI_Model {
                 select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,b.No_Ref,a.StatusReg,b.Years,b.Status as StatusUsed, 
                 b.StatusJual, b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,
                 b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,b.CityNameFormulir,b.DistrictNameFormulir, 
-                b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi from 
+                b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi,b.NoKwitansi from 
                 ( 
                   select a.Name as NameCandidate,a.Email,
                   z.SchoolName,c.FormulirCode,a.StatusReg from db_admission.register as a join db_admission.register_verification as b 
                   on a.ID = b.RegisterID join db_admission.register_verified as c on c.RegVerificationID = b.ID join db_admission.school as z on z.ID = a.SchoolID where a.StatusReg = 1 
                 ) as a right JOIN 
                 ( 
-                  select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale, b.Email,
+                  select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,b.NoKwitansi, b.Email,
                   c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as CityNameFormulir,z.DistrictName as DistrictNameFormulir, 
                   if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,
                   b.ID_ProgramStudy,y.Name as NameProdi from db_admission.formulir_number_offline_m as a left join db_admission.sale_formulir_offline as b 
@@ -450,7 +450,9 @@ class M_admission extends CI_Model {
                     b.SchoolNameFormulir like "%'.$requestData['search']['value'].'%" or
                     b.NameProdi like "'.$requestData['search']['value'].'%" or
                     b.src_name like "'.$requestData['search']['value'].'%" or
-                    b.FullName like "'.$requestData['search']['value'].'%"
+                    b.FullName like "'.$requestData['search']['value'].'%" or
+                    b.DateSale like "'.$requestData['search']['value'].'%" or
+                    b.NoKwitansi like "'.$requestData['search']['value'].'%"
                   )'.$statusJual.'
 
               ) aa
