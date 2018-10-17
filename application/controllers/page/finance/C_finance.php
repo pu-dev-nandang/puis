@@ -1851,4 +1851,31 @@ class C_finance extends Finnance_Controler {
         echo json_encode($json_data);
     }
 
+    public function copy_last_tuition_fee()
+    {
+        $input = $this->getInputToken();
+        if ($input['verify'] == 'CreateTuitionFee') {
+            $year = date('Y');
+            $YearNext = (int) $year + 1;
+            $msg = '';
+            $get = $this->m_master->caribasedprimary('db_finance.tuition_fee','ClassOf',$YearNext);
+            if (count($get) == 0) {
+                $sql = "INSERT INTO db_finance.tuition_fee (ID, PTID, ProdiID, ClassOf,Cost,Pay_Cond)
+                        SELECT null, PTID, ProdiID, ?,Cost,Pay_Cond
+                        FROM db_finance.tuition_fee 
+                        WHERE ClassOf = ?";
+                $query=$this->db->query($sql, array($YearNext,$year));   
+            }
+            else
+             {
+                $msg = 'The data is already exist';
+             }
+             echo json_encode($msg);
+        }
+        else
+        {
+            exit('No direct script access allowed');
+        }
+    }
+
 }

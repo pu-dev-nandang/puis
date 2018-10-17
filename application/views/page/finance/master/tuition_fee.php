@@ -16,6 +16,11 @@
         <hr/>
         <div align="right">
             <div class="btn-group">
+                <button type="button" class="btn btn-info copyLastTf" id = "copyLastTf">
+                  <span class="glyphicon glyphicon-plus"></span> Copy Last Tuition Fee
+                </button>
+            </div>
+            <div class="btn-group">
                 <button type="button" class="btn btn-info btn-add">
                   <span class="glyphicon glyphicon-plus"></span> Add
                 </button>
@@ -41,8 +46,43 @@
 
 <script>
     $(document).ready(function () {
-        loadSelectOptionCurriculum('#selectCurriculum','');
+        loadSelectOptionCurriculum2('#selectCurriculum','');
     });
+
+    
+    $(document).on('click','#copyLastTf', function () {
+      loading_button('#copyLastTf');
+       var url = base_url_js+'finance/master/copy-last-tuition_fee';
+       var data = {
+          verify : 'CreateTuitionFee',
+       }
+       var token = jwt_encode(data,"UAP)(*");
+        $.post(url,{token:token},function (data_json) {
+         var data_json = jQuery.parseJSON(data_json);
+            setTimeout(function () {
+               toastr.options.fadeOut = 10000;
+               if(data_json == '')
+               {
+                 toastr.success('Data berhasil disimpan', 'Success!');
+               }
+               else
+               {
+                 toastr.error(data_json, 'Failed!!');
+               }
+                 $('#copyLastTf').prop('disabled',false).html('Copy Last Tuition Fee');
+                 var thisYear = (new Date()).getFullYear();
+                 var Tahun = parseInt(thisYear) + parseInt(1);
+                 Tahun = 'Curriculum ' + Tahun;
+                 $("#selectCurriculum option").filter(function() {
+                   //may want to use $.trim in here
+                   return $(this).text() == Tahun; 
+                 }).prop("selected", true);
+
+                 loadData();
+            },500);
+        });
+    });
+
 
     $(document).on('click','.btn-add', function () {
        modal_generate('add','Add Master Tagihan Mahasiswa');
