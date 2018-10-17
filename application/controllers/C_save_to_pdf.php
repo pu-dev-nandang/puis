@@ -3023,7 +3023,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetMargins(10,5,10);
         $pdf->AddPage();
 
-        $this->header_temp_transcript('ind',$pdf,$Student,$dataTempTr);
+        $this->header_temp_transcript($pdf,$dataTempTr);
 
         $h=3.5;
         $pdf->Ln(5);
@@ -3081,7 +3081,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetMargins(10,5,10);
         $pdf->AddPage();
 
-        $this->header_temp_transcript('eng',$pdf,$Student,$dataTempTr);
+        $this->header_temp_transcript($pdf,$dataTempTr);
 
         $h=3.5;
         $pdf->Ln(5);
@@ -3248,9 +3248,13 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinprolight','',7);
     }
 
-    private function header_temp_transcript($lang,$pdf,$Student){
-        $pdf->SetFont('dinpromedium','',9);
+    private function header_temp_transcript($pdf,$dataTempTr){
+        $pdf->SetFont('dinpromedium','',6);
+
         $pdf->Image(base_url('images/logo.png'),10,5,40);
+
+        $pdf->SetXY(100,3);
+        $pdf->Cell(100,5,$dataTempTr['NoForm'],0,1,'R');
 
     }
 
@@ -3291,7 +3295,7 @@ class C_save_to_pdf extends CI_Controller {
                 // membuat halaman baru
                 $pdf->SetMargins(10,5,10);
                 $pdf->AddPage();
-                $this->header_temp_transcript($lang,$pdf,$Student,$dataTempTr);
+                $this->header_temp_transcript($pdf,$dataTempTr);
                 $pdf->Ln(15);
                 $this->headerTable($pdf);
             }
