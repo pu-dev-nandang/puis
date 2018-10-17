@@ -1981,20 +1981,21 @@ class C_admission extends Admission_Controler {
 
           // print_r($FormulirCode.'<br>');
           $Tanggal = $objWorksheet->getCellByColumnAndRow(1, $i)->getCalculatedValue();
-          $Tanggal = explode(" ", $Tanggal);
-          for ($k=0; $k < count($arr_bulan); $k++) { 
-            $month = $Tanggal[1];
-            if ($arr_bulan[$k] == $month) {
-              $k++;
-              break;
-            }
-          }
+          $date =  date('Y-m-d', strtotime($Tanggal));
+          // $Tanggal = explode(" ", $Tanggal);
+          // for ($k=0; $k < count($arr_bulan); $k++) { 
+          //   $month = $Tanggal[1];
+          //   if ($arr_bulan[$k] == $month) {
+          //     $k++;
+          //     break;
+          //   }
+          // }
 
-          if (strlen($k) == 1) {
-            $k = '0'.$k;
-          }
+          // if (strlen($k) == 1) {
+          //   $k = '0'.$k;
+          // }
 
-          $date = $Tanggal[2].'-'.$k.'-'.$Tanggal[0];
+          // $date = $Tanggal[2].'-'.$k.'-'.$Tanggal[0];
           $getNIP = $this->m_master->getAllUserAutoComplete($objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue());
 
           try {
