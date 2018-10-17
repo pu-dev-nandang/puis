@@ -3003,6 +3003,8 @@ class C_save_to_pdf extends CI_Controller {
     public function temp_transcript(){
 
 
+
+
         $token = $this->input->post('token');
         $data_arr = $this->getInputToken($token);
 
@@ -3010,6 +3012,8 @@ class C_save_to_pdf extends CI_Controller {
         $Student = $dataStudent['Student'][0];
         $dataTempTr = $dataStudent['TempTranscript'][0];
 
+//        printf("%.1f", 165);
+//        exit;
 //        print_r($dataStudent);
 //        exit;
 
@@ -3020,6 +3024,54 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->AddPage();
 
         $this->header_temp_transcript('ind',$pdf,$Student,$dataTempTr);
+
+        $h=3.5;
+        $pdf->Ln(5);
+
+
+        $tr = 'TRANSKRIP SEMENTARA';
+
+        $pdf->Cell(190,$h,$tr,0,1,'C');
+
+        $pdf->SetFont('dinprolight','',7);
+        $pdf->Cell(190,$h,'No. : XXXX/UAP/AKD-TS/Bulan/Tahun',0,1,'C');
+
+        $border = 0;
+
+        $l_left = 38;
+        $sp_left = 1;
+        $fill_left = 75;
+
+        $l_right = 22;
+        $sp_right = 1;
+        $fill_right = 53;
+
+        $h=3.3;
+        $pdf->SetFont('dinpromedium','',7);
+        $pdf->Ln(3.5);
+
+        $pdf->Cell($l_left,$h,'Nama',$border,0,'L');
+        $pdf->Cell($sp_left,$h,':',$border,0,'C');
+        $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['Name'])),$border,0,'L');
+        $pdf->Cell($l_right,$h,'Fakultas',$border,0,'L');
+        $pdf->Cell($sp_right,$h,':',$border,0,'C');
+        $pdf->Cell($fill_right,$h,$Student['FacultyName'],$border,1,'L');
+
+        $pdf->Cell($l_left,$h,'NIM',$border,0,'L');
+        $pdf->Cell($sp_left,$h,':',$border,0,'C');
+        $pdf->Cell($fill_left,$h,$Student['NPM'],$border,0,'L');
+        $pdf->Cell($l_right,$h,'Program Studi',$border,0,'L');
+        $pdf->Cell($sp_right,$h,':',$border,0,'C');
+        $pdf->Cell($fill_right,$h,ucwords(strtolower($Student['Prodi'])),$border,1,'L');
+
+        $e = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '%#d' : '%e';
+        $pdf->Cell($l_left,$h,'Tempat dan Tanggal Lahir',$border,0,'L');
+        $pdf->Cell($sp_left,$h,':',$border,0,'C');
+        $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['PlaceOfBirth'])).', '.strftime($e." %B %Y",strtotime($Student['DateOfBirth'])),$border,1,'L');
+
+        $pdf->Ln(3.5);
+
+        $this->headerTable($pdf);
         $this->body_temp_transcript('ind',$pdf,$dataStudent,$dataTempTr);
 
 
@@ -3030,6 +3082,47 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->AddPage();
 
         $this->header_temp_transcript('eng',$pdf,$Student,$dataTempTr);
+
+        $h=3.5;
+        $pdf->Ln(5);
+
+
+        $tr = 'RECORD OF ACADEMIC ACHIEVEMENT';
+
+        $pdf->Cell(190,$h,$tr,0,1,'C');
+
+        $pdf->SetFont('dinprolight','',7);
+        $pdf->Cell(190,$h,'No. : XXXX/UAP/AKD-TS/Bulan/Tahun',0,1,'C');
+
+        $border = 0;
+
+
+        $h=3.3;
+        $pdf->SetFont('dinpromedium','',7);
+        $pdf->Ln(3.5);
+
+        $pdf->Cell($l_left,$h,'Name',$border,0,'L');
+        $pdf->Cell($sp_left,$h,':',$border,0,'C');
+        $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['Name'])),$border,0,'L');
+        $pdf->Cell($l_right,$h,'Faculty',$border,0,'L');
+        $pdf->Cell($sp_right,$h,':',$border,0,'C');
+        $pdf->Cell($fill_right,$h,$Student['FacultyName'],$border,1,'L');
+
+
+        $pdf->Cell($l_left,$h,'Student ID',$border,0,'L');
+        $pdf->Cell($sp_left,$h,':',$border,0,'C');
+        $pdf->Cell($fill_left,$h,$Student['NPM'],$border,0,'L');
+        $pdf->Cell($l_right,$h,'Department',$border,0,'L');
+        $pdf->Cell($sp_right,$h,':',$border,0,'C');
+        $pdf->Cell($fill_right,$h,ucwords(strtolower($Student['ProdiEng'])),$border,1,'L');
+
+        $pdf->Cell($l_left,$h,'Place, Date of Birth',$border,0,'L');
+        $pdf->Cell($sp_left,$h,':',$border,0,'C');
+        $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['PlaceOfBirth'])).', '.date('F j, Y',strtotime($Student['DateOfBirth'])),$border,1,'L');
+
+        $pdf->Ln(3.5);
+
+        $this->headerTable($pdf);
         $this->body_temp_transcript('eng',$pdf,$dataStudent,$dataTempTr);
 
 
@@ -3039,7 +3132,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Output('TEMP_TRNSCPT_'.$Student['NPM'].'_'.$nameF.'.pdf','I');
     }
 
-    private function header_temp_transcript($lang,$pdf,$Student,$dataTempTr){
+    private function header_temp_transcript2($lang,$pdf,$Student,$dataTempTr){
         $pdf->Image(base_url('images/logo.png'),10,5,40);
 
         $h=3.5;
@@ -3132,83 +3225,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinprolight','',7);
     }
 
-    private function header_temp_transcript2($lang,$pdf,$Student){
-        $pdf->Image(base_url('images/logo.png'),10,5,40);
-
-        $h=3.5;
-        $pdf->Ln(5);
-        $pdf->SetFont('dinpromedium','',9);
-
-        $tr = ($lang=='ind') ? 'TRANSKRIP SEMENTARA' : 'RECORD OF ACADEMIC ACHIEVEMENT';
-
-        $pdf->Cell(190,$h,$tr,0,1,'C');
-
-        $pdf->SetFont('dinprolight','',7);
-        $pdf->Cell(190,$h,'No. : XXXX/UAP/AKD-TS/Bulan/Tahun',0,1,'C');
-
-        $border = 0;
-
-        $l_left = 38;
-        $sp_left = 1;
-        $fill_left = 93;
-
-        $l_right = 22;
-        $sp_right = 1;
-        $fill_right = 35;
-
-        $h=3.3;
-        $pdf->SetFont('dinpromedium','',7);
-        $pdf->Ln(3.5);
-
-        if($lang=='ind'){
-            $pdf->Cell($l_left,$h,'Nama',$border,0,'L');
-            $pdf->Cell($sp_left,$h,':',$border,0,'C');
-            $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['Name'])),$border,0,'L');
-            $pdf->Cell($l_right,$h,'Fakultas',$border,0,'L');
-            $pdf->Cell($sp_right,$h,':',$border,0,'C');
-            $pdf->Cell($fill_right,$h,$Student['FacultyName'],$border,1,'L');
-
-
-            $pdf->Cell($l_left,$h,'NIM',$border,0,'L');
-            $pdf->Cell($sp_left,$h,':',$border,0,'C');
-            $pdf->Cell($fill_left,$h,$Student['NPM'],$border,0,'L');
-            $pdf->Cell($l_right,$h,'Program Studi',$border,0,'L');
-            $pdf->Cell($sp_right,$h,':',$border,0,'C');
-            $pdf->Cell($fill_right,$h,ucwords(strtolower($Student['Prodi'])),$border,1,'L');
-
-            $e = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '%#d' : '%e';
-            $pdf->Cell($l_left,$h,'Tempat dan Tanggal Lahir',$border,0,'L');
-            $pdf->Cell($sp_left,$h,':',$border,0,'C');
-            $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['PlaceOfBirth'])).', '.strftime($e." %B %Y",strtotime($Student['DateOfBirth'])),$border,1,'L');
-
-
-
-        }
-        else {
-            $pdf->Cell($l_left,$h,'Name',$border,0,'L');
-            $pdf->Cell($sp_left,$h,':',$border,0,'C');
-            $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['Name'])),$border,0,'L');
-            $pdf->Cell($l_right,$h,'Faculty',$border,0,'L');
-            $pdf->Cell($sp_right,$h,':',$border,0,'C');
-            $pdf->Cell($fill_right,$h,$Student['FacultyName'],$border,1,'L');
-
-
-            $pdf->Cell($l_left,$h,'Student ID',$border,0,'L');
-            $pdf->Cell($sp_left,$h,':',$border,0,'C');
-            $pdf->Cell($fill_left,$h,$Student['NPM'],$border,0,'L');
-            $pdf->Cell($l_right,$h,'Department',$border,0,'L');
-            $pdf->Cell($sp_right,$h,':',$border,0,'C');
-            $pdf->Cell($fill_right,$h,ucwords(strtolower($Student['ProdiEng'])),$border,1,'L');
-
-            $pdf->Cell($l_left,$h,'Place, Date of Birth',$border,0,'L');
-            $pdf->Cell($sp_left,$h,':',$border,0,'C');
-            $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['PlaceOfBirth'])).', '.date('F j, Y',strtotime($Student['DateOfBirth'])),$border,1,'L');
-        }
-
-
-
-        $pdf->Ln(3.5);
-
+    private function headerTable($pdf){
         $border = 1;
 
         $w_no = 8;
@@ -3229,6 +3246,12 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_fv,$h,'SKS X Bobot',$border,1,'C',true);
 
         $pdf->SetFont('dinprolight','',7);
+    }
+
+    private function header_temp_transcript($lang,$pdf,$Student){
+        $pdf->SetFont('dinpromedium','',9);
+        $pdf->Image(base_url('images/logo.png'),10,5,40);
+
     }
 
     private function body_temp_transcript($lang,$pdf,$dataStudent,$dataTempTr){
@@ -3264,11 +3287,13 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Cell($w_f,$h,$d['GradeValue'],$border,0,'C');
             $pdf->Cell($w_fv,$h,$d['Point'],$border,1,'C');
 
-            if($pdf->GetY()>228){
+            if($pdf->GetY()>235){
                 // membuat halaman baru
                 $pdf->SetMargins(10,5,10);
                 $pdf->AddPage();
                 $this->header_temp_transcript($lang,$pdf,$Student,$dataTempTr);
+                $pdf->Ln(15);
+                $this->headerTable($pdf);
             }
 
         }
@@ -3278,11 +3303,12 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_f,$h,$Result['TotalSKS'],$border,0,'C',true);
         $pdf->Cell($w_f,$h,'-',$border,0,'C',true);
         $pdf->Cell($w_f,$h,'-',$border,0,'C',true);
-        $pdf->Cell($w_fv,$h,$Result['TotalGradeValue'],$border,1,'C',true);
+        $pdf->Cell($w_fv,$h,number_format($Result['TotalGradeValue'],2),$border,1,'C',true);
 
         $ipkLabel = ($lang=='ind')? 'Indeks Prestasi Kumulatif' : 'Cummulative Grade Point Average';
         $h = 6;
-        $pdf->Cell($w_smt+$w_no+$w_kode+$w_mk+(3*$w_f)+$w_fv,$h,$ipkLabel.' : '.$Result['IPK'],$border,1,'C',true);
+
+        $pdf->Cell($w_smt+$w_no+$w_kode+$w_mk+(3*$w_f)+$w_fv,$h,$ipkLabel.' : '.number_format($Result['IPK'],2),$border,1,'C',true);
 
 
         $h = 3.5;
@@ -3344,13 +3370,13 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetXY(10,43.5);
 
-        $label_l = 44;
-        $sparator_l = 3;
-        $fill_l = 62;
+        $label_l = 40;
+        $sparator_l = 1;
+        $fill_l = 50;
 
-        $label_r = 50;
-        $sparator_r = 3;
-        $fill_r = 32;
+        $label_r = 43;
+        $sparator_r = 1;
+        $fill_r = 56;
         $h=4;
         $border = 0;
 
@@ -3419,7 +3445,7 @@ class C_save_to_pdf extends CI_Controller {
 
 
         // Table
-        $pdf->Ln(7);
+        $pdf->Ln(3);
 
         $w_no = 13;
         $w_course = 110;
@@ -3427,6 +3453,9 @@ class C_save_to_pdf extends CI_Controller {
         $w_grade = 15;
         $w_score = 15;
         $w_point = 23;
+
+        $font_medium = 8;
+        $font_medium_i = 7;
 
 
         $border_fill = 'LR';
@@ -3442,15 +3471,15 @@ class C_save_to_pdf extends CI_Controller {
             $this->spasi_transcript_table($pdf,'T');
 
             $h = 3.5;
-            $pdf->SetFont('dinprolight','',9);
+            $pdf->SetFont('dinprolight','',$font_medium);
             $pdf->Cell($w_no,$h,($no++),$border_fill,0,'C');
-            $pdf->Cell($w_course,$h,$ds['MKName'],$border_fill,0,'L');
+            $pdf->Cell($w_course,$h,$ds['MKName'].'-'.$pdf->GetY(),$border_fill,0,'L');
             $pdf->Cell($w_credit,$h,$ds['Credit'],$border_fill,0,'C');
             $pdf->Cell($w_grade,$h,$ds['Grade'],$border_fill,0,'C');
             $pdf->Cell($w_score,$h,$ds['GradeValue'],$border_fill,0,'C');
             $pdf->Cell($w_point,$h,round(($ds['Credit'] * $ds['GradeValue']),2),$border_fill,1,'C');
 
-            $pdf->SetFont('dinlightitalic','',8);
+            $pdf->SetFont('dinlightitalic','',$font_medium_i);
             $pdf->Cell($w_no,$h,'',$border_fill,0,'C');
             $pdf->Cell($w_course,$h,$ds['MKNameEng'],$border_fill,0,'L');
             $pdf->Cell($w_credit,$h,'',$border_fill,0,'C');
@@ -3460,7 +3489,7 @@ class C_save_to_pdf extends CI_Controller {
 
             $this->spasi_transcript_table($pdf,'B');
 
-            if($pdf->GetY()>=310){
+            if($pdf->GetY()>=324){
                 $pdf->SetMargins(10,10,10);
                 $pdf->AddPage();
                 $pdf->SetXY(10,43.5);
@@ -3471,14 +3500,14 @@ class C_save_to_pdf extends CI_Controller {
         $Result = $dataStudent['Result'];
 
         $this->spasi_transcript_table($pdf,'TR');
-        $pdf->SetFont('dinprolight','',9);
+        $pdf->SetFont('dinprolight','',$font_medium);
         $pdf->Cell($w_course+$w_no,$h,'Jumlah',$border_fill,0,'R');
         $pdf->Cell($w_credit,$h,$Result['TotalSKS'],$border_fill,0,'C');
         $pdf->Cell($w_grade,$h,'-',$border_fill,0,'C');
         $pdf->Cell($w_score,$h,'-',$border_fill,0,'C');
         $pdf->Cell($w_point,$h,$Result['TotalGradeValue'],$border_fill,1,'C');
 
-        $pdf->SetFont('dinlightitalic','',8);
+        $pdf->SetFont('dinlightitalic','',$font_medium_i);
         $pdf->Cell($w_course+$w_no,$h,'Total',$border_fill,0,'R');
         $pdf->Cell($w_credit,$h,'',$border_fill,0,'C');
         $pdf->Cell($w_grade,$h,'',$border_fill,0,'C');
@@ -3650,7 +3679,7 @@ class C_save_to_pdf extends CI_Controller {
         $border_fill_b = 'LRB';
 
         if(strtolower($desc)=='t'){
-            $h = 1.3;
+            $h = 0.6;
 
             $pdf->Cell($w_no,$h,'',$border_fill_t,0,'C');
             $pdf->Cell($w_course,$h,'',$border_fill_t,0,'C');
@@ -3659,7 +3688,7 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Cell($w_score,$h,'',$border_fill_t,0,'C');
             $pdf->Cell($w_point,$h,'',$border_fill_t,1,'C');
         } else if(strtolower($desc)=='b') {
-            $h = 1.3;
+            $h = 0.6;
 
             $pdf->Cell($w_no,$h,'',$border_fill_b,0,'C');
             $pdf->Cell($w_course,$h,'',$border_fill_b,0,'C');
@@ -3800,13 +3829,13 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinpromedium','',$fn_b);
         $pdf->Cell($label,$h,'Program Studi',$border,0,'L');
         $pdf->Cell($sp,$h,':',$border,0,'C');
-        $pdf->Cell($fill,$h,ucwords(strtolower($Student['Prodi'])),$border,1,'L');
+        $pdf->Cell($fill,$h,$Student['Prodi'],$border,1,'L');
 
         $pdf->SetX($x);
         $pdf->SetFont('dinlightitalic','',$fn_i);
         $pdf->Cell($label,$h,'Study Program',$border,0,'L');
         $pdf->Cell($sp,$h,':',$border,0,'C');
-        $pdf->Cell($fill,$h,ucwords(strtolower($Student['ProdiEng'])),$border,1,'L');
+        $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,1,'L');
         $pdf->Ln($ln);
 
         // ===== Program Pendidikan =====
@@ -3820,7 +3849,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinlightitalic','',$fn_i);
         $pdf->Cell($label,$h,'Education Program',$border,0,'L');
         $pdf->Cell($sp,$h,':',$border,0,'C');
-        $pdf->Cell($fill,$h,ucwords(strtolower($Student['GradeDescEng'])),$border,1,'L');
+        $pdf->Cell($fill,$h,$Student['GradeDescEng'],$border,1,'L');
         $pdf->Ln($ln);
 
         // ===== Tanggal Yudisium =====
@@ -4922,115 +4951,115 @@ Phone: (021) 29200456';
         $maxLen = 4;
         $NoKwitansi = $input['NumForm'];
         $aa = strlen($NoKwitansi);
-        for ($i=0; $i < ( $maxLen - $aa ); $i++) { 
+        for ($i=0; $i < ( $maxLen - $aa ); $i++) {
             $NoKwitansi = '0'.$NoKwitansi;
         }
         $nomorWr = $InputDate[0].' / '.$bulanRomawi.' / FRM'.' / '.'MKT-PU-'.$ta.' / '.$NoKwitansi;
 
 
-            $fpdf = new Fpdf('L', 'mm', array(216, 140));
-            //$fpdf = new Fpdf('P', 'mm', 'A4');
-            //$fpdf = new Fpdf('P', 'mm', array(215,140));
-            
-            //$fpdf->SetMargins(0, 0);
-            //$fpdf->SetDisplayMode('real');
-            $fpdf->SetAutoPageBreak(true, 0);
-            $fpdf->AddPage();
-            
-            //====================== WATERMARK ======================
-            // if ($data['print'] > 2) {
-            //     $fpdf->SetTextColor(209, 209, 209);
-            //     $fpdf->SetFont('Arial', '', 100);
-            //     $fpdf->Text(42, 70, 'C O P Y');
-            // }
-            // rahmat 23 Februari 2016
-            //====================== Nomor Form ======================
-            $fpdf->SetFont('Arial', 'B', 8);
-            $fpdf->SetTextColor(0, 0, 0);
-            $fpdf->SetXY(1, 5);
-            $fpdf->Cell(206, 7, 'FM-UAP/KEU-06-03', 0, 0, 'R');
+        $fpdf = new Fpdf('L', 'mm', array(216, 140));
+        //$fpdf = new Fpdf('P', 'mm', 'A4');
+        //$fpdf = new Fpdf('P', 'mm', array(215,140));
 
-            // End rahmat
-            
-            //====================== HEADER ======================
-            $fpdf->SetFont('Arial', 'B', 18);
-            $fpdf->SetTextColor(0, 0, 0);
-            $fpdf->SetXY(5, 5);
-            $fpdf->ln(1);
-            $fpdf->Cell(206, 7, 'TANDA TERIMA PEMBAYARAN', 0, 0, 'C');
-            $fpdf->ln(7);
-            $fpdf->Line(65, 12.5, 163, 12.5);
-            $fpdf->SetFont('Arial', '', 12);
-            $fpdf->Cell(206, 5, 'Nomor: '.$nomorWr, 0, 0, 'C');
-            
-            // //====================== CONTENT ======================
-            // if ($data['form'] == NULL) {
-            //     $no_lbl = 'NIM';
-            //     $no_txt = $data['nim'];
-            // }
-            // else {
-            //     $no_lbl = 'No Form';
-            //     $no_txt = $data['form'];
-            // }
-            
-            $fpdf->SetFont('Arial', '', 14);
-            $fpdf->Text(23, 28, 'Telah terima dari,');
-            $no_lbl = 'No Form';
-            
-            $fpdf->SetFont('Arial', '', 14);
-            $fpdf->Text(23, 36, $no_lbl);
-            $fpdf->Text(23, 43, 'Nama lengkap');
-            $fpdf->Text(23, 50, 'Tlp / HP');
-            $fpdf->Text(23, 57, 'Jurusan');
-            $fpdf->Text(23, 64, 'Pembayaran');
-            $fpdf->Text(23, 71, 'Jenis');
-            $fpdf->Text(23, 78, 'Jumlah');
-            $fpdf->Text(23, 85, 'Terbilang');
-        
+        //$fpdf->SetMargins(0, 0);
+        //$fpdf->SetDisplayMode('real');
+        $fpdf->SetAutoPageBreak(true, 0);
+        $fpdf->AddPage();
 
-        
-            $fpdf->Text(59, 36, ':');
-            $fpdf->Text(59, 43, ':');
-            $fpdf->Text(59, 50, ':');
-            $fpdf->Text(59, 57, ':');
-            $fpdf->Text(59, 64, ':');
-            $fpdf->Text(59, 71, ':');
-            $fpdf->Text(59, 78, ':');
-            $fpdf->Text(59, 85, ':');
-            
-            $terbilang = $this->m_master->moneySay($input['jumlah']);
-            $fpdf->Text(64, 36, $input['NoFormRef'] );
-            $fpdf->Text(64, 43, $input['namalengkap']);
-            $fpdf->Text(64, 50, $input['hp']);
-            $fpdf->Text(64, 57, $input['jurusan']);
-            $fpdf->Text(64, 64, $input['pembayaran']);
-            $fpdf->Text(64, 71, $input['jenis']);
-            $fpdf->Text(64, 78, 'Rp '.number_format($input['jumlah'],2,',','.').',-');
-            $fpdf->Text(64, 85, $terbilang);
-            
-            
-            
-            
-            $fpdf->Line(63, 37, 195, 37);
-            $fpdf->Line(63, 44, 195, 44);
-            $fpdf->Line(63, 51, 195, 51);
-            $fpdf->Line(63, 58, 195, 58);
-            $fpdf->Line(63, 65, 195, 65);
-            $fpdf->Line(63, 72, 195, 72);
-            $fpdf->Line(63, 79, 195, 79);
-            $fpdf->Line(63, 86, 195, 86);
-            
-            //====================== FOOTER / SIGN ======================
-            $printDate = $this->m_master->getIndoBulan(date('Y-m-d'));
-            $fpdf->SetFont('Arial', '', 14);
-            $fpdf->SetXY(140, 92);
-            $fpdf->Cell(60, 5, 'Jakarta, '.$printDate, 0, 0, 'C');
-            $fpdf->SetXY(140, 116);
-            $fpdf->SetFont('Arial', 'U', 14);
-            $fpdf->Cell(60, 5, '( '.$this->session->userdata('Name').' )', 0, 0, 'C');
-            
-            //====================== FINISH ======================
-        
+        //====================== WATERMARK ======================
+        // if ($data['print'] > 2) {
+        //     $fpdf->SetTextColor(209, 209, 209);
+        //     $fpdf->SetFont('Arial', '', 100);
+        //     $fpdf->Text(42, 70, 'C O P Y');
+        // }
+        // rahmat 23 Februari 2016
+        //====================== Nomor Form ======================
+        $fpdf->SetFont('Arial', 'B', 8);
+        $fpdf->SetTextColor(0, 0, 0);
+        $fpdf->SetXY(1, 5);
+        $fpdf->Cell(206, 7, 'FM-UAP/KEU-06-03', 0, 0, 'R');
+
+        // End rahmat
+
+        //====================== HEADER ======================
+        $fpdf->SetFont('Arial', 'B', 18);
+        $fpdf->SetTextColor(0, 0, 0);
+        $fpdf->SetXY(5, 5);
+        $fpdf->ln(1);
+        $fpdf->Cell(206, 7, 'TANDA TERIMA PEMBAYARAN', 0, 0, 'C');
+        $fpdf->ln(7);
+        $fpdf->Line(65, 12.5, 163, 12.5);
+        $fpdf->SetFont('Arial', '', 12);
+        $fpdf->Cell(206, 5, 'Nomor: '.$nomorWr, 0, 0, 'C');
+
+        // //====================== CONTENT ======================
+        // if ($data['form'] == NULL) {
+        //     $no_lbl = 'NIM';
+        //     $no_txt = $data['nim'];
+        // }
+        // else {
+        //     $no_lbl = 'No Form';
+        //     $no_txt = $data['form'];
+        // }
+
+        $fpdf->SetFont('Arial', '', 14);
+        $fpdf->Text(23, 28, 'Telah terima dari,');
+        $no_lbl = 'No Form';
+
+        $fpdf->SetFont('Arial', '', 14);
+        $fpdf->Text(23, 36, $no_lbl);
+        $fpdf->Text(23, 43, 'Nama lengkap');
+        $fpdf->Text(23, 50, 'Tlp / HP');
+        $fpdf->Text(23, 57, 'Jurusan');
+        $fpdf->Text(23, 64, 'Pembayaran');
+        $fpdf->Text(23, 71, 'Jenis');
+        $fpdf->Text(23, 78, 'Jumlah');
+        $fpdf->Text(23, 85, 'Terbilang');
+
+
+
+        $fpdf->Text(59, 36, ':');
+        $fpdf->Text(59, 43, ':');
+        $fpdf->Text(59, 50, ':');
+        $fpdf->Text(59, 57, ':');
+        $fpdf->Text(59, 64, ':');
+        $fpdf->Text(59, 71, ':');
+        $fpdf->Text(59, 78, ':');
+        $fpdf->Text(59, 85, ':');
+
+        $terbilang = $this->m_master->moneySay($input['jumlah']);
+        $fpdf->Text(64, 36, $input['NoFormRef'] );
+        $fpdf->Text(64, 43, $input['namalengkap']);
+        $fpdf->Text(64, 50, $input['hp']);
+        $fpdf->Text(64, 57, $input['jurusan']);
+        $fpdf->Text(64, 64, $input['pembayaran']);
+        $fpdf->Text(64, 71, $input['jenis']);
+        $fpdf->Text(64, 78, 'Rp '.number_format($input['jumlah'],2,',','.').',-');
+        $fpdf->Text(64, 85, $terbilang);
+
+
+
+
+        $fpdf->Line(63, 37, 195, 37);
+        $fpdf->Line(63, 44, 195, 44);
+        $fpdf->Line(63, 51, 195, 51);
+        $fpdf->Line(63, 58, 195, 58);
+        $fpdf->Line(63, 65, 195, 65);
+        $fpdf->Line(63, 72, 195, 72);
+        $fpdf->Line(63, 79, 195, 79);
+        $fpdf->Line(63, 86, 195, 86);
+
+        //====================== FOOTER / SIGN ======================
+        $printDate = $this->m_master->getIndoBulan(date('Y-m-d'));
+        $fpdf->SetFont('Arial', '', 14);
+        $fpdf->SetXY(140, 92);
+        $fpdf->Cell(60, 5, 'Jakarta, '.$printDate, 0, 0, 'C');
+        $fpdf->SetXY(140, 116);
+        $fpdf->SetFont('Arial', 'U', 14);
+        $fpdf->Cell(60, 5, '( '.$this->session->userdata('Name').' )', 0, 0, 'C');
+
+        //====================== FINISH ======================
+
         $fpdf->Output('receipt.pdf','I');
     }
 
