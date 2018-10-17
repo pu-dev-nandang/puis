@@ -1149,10 +1149,6 @@ class C_save_to_excel extends CI_Controller
 
         $dataM = $this->m_save_to_excel->getMonitoringScore($data_arr);
 
-//        print_r($dataM);
-//        exit;
-
-
         include APPPATH.'third_party/PHPExcel/PHPExcel.php';
         ini_set('memory_limit', '-1');
         ini_set('max_execution_time', 600); //600 seconds = 10 minutes
@@ -1160,7 +1156,7 @@ class C_save_to_excel extends CI_Controller
         // Panggil class PHPExcel nya
         $excel = new PHPExcel();
 
-        $pr = 'REKAP NILAI';
+        $pr = 'SCORE RECAP ACADEMIC YEAR '.$data_arr['Year'];
 
         // Settingan awal fil excel
         $excel->getProperties()->setCreator('IT PU')
@@ -1185,8 +1181,8 @@ class C_save_to_excel extends CI_Controller
             )
         );
 
-        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
-        $style_row = array(
+
+        $style_col_fill = array(
             'alignment' => array(
                 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
             ),
@@ -1261,6 +1257,23 @@ class C_save_to_excel extends CI_Controller
                 $excel->setActiveSheetIndex(0)->setCellValue('N'.$numrow, $d['Score']);
                 $excel->setActiveSheetIndex(0)->setCellValue('O'.$numrow, $d['Grade']);
 
+                // Apply style header yang telah kita buat tadi ke masing-masing kolom header
+                $excel->getActiveSheet()->getStyle('A'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('B'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('C'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('D'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('E'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('F'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('G'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('H'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('I'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('J'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('K'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('L'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('M'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('N'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('O'.$numrow)->applyFromArray($style_col_fill);
+
                 $numrow += 1;
             }
         }
@@ -1285,10 +1298,10 @@ class C_save_to_excel extends CI_Controller
         }
 
         // Proses file excel
-        $filename = "Rekap_Data_Karyawan.xlsx";
+        $filename = str_replace(' ','_',$pr).".xlsx";
         //$FILEpath = "./dokument/".$filename;
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename=test.xlsx'); // Set nama file excel nya
+        header('Content-Disposition: attachment; filename='.$filename); // Set nama file excel nya
         header('Cache-Control: max-age=0');
 
         $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
