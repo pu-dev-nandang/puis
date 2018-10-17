@@ -199,7 +199,7 @@
 			NoFormRef = (NoFormRef != "" || NoFormRef != null) ? NoFormRef : formulir;
 
 			if (NoKwitansi == "" || NoKwitansi == null) {
-			    $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Number Form ! </b> <br>' +
+			    $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Number Kwitansi ! </b> <br>' +
 			        '<input type = "number" class = "form-control" id ="NumForm"  maxlength="4" style="margin: 0px 0px 15px; height: 30px; width: 329px;"><br>'+
 			        '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
 			        '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
