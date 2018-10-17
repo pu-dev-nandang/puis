@@ -43,7 +43,7 @@ class C_admission extends Admission_Controler {
         $status = $input['selectStatus'];
 
         $this->load->library('pagination');
-        $config = $this->config_pagination_default_ajax(1000,2,6);
+        $config = $this->config_pagination_default_ajax($this->m_admission->CountSelectDataCalonMahasiswa($tahun,$nama,$status),2,6);
   
         $this->pagination->initialize($config);
         $page = $this->uri->segment(6);

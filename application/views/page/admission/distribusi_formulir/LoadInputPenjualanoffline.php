@@ -37,7 +37,7 @@
            			  				      <input type="text" name="tanggal" id= "tanggal" data-date-format="yyyy-mm-dd" placeholder="Date..." class="form-control">
            			  				</div>
            			  				<div class="col-xs-4">
-           			  					<div class="col-xs-3">
+           			  					<div class="col-xs-4">
 	           			  					<label>No Ref</label>
 	           			  					<?php if ($action == "add"): ?>
 	           			  						<div class="row">
@@ -52,8 +52,8 @@
 	           			  					</div>
 	           			  					<?php endif ?>
            			  					</div>
-           			  					<div class="col-xs-9">
-           			  						<div class="row <?php echo ($action == "add") ? "hide" : "" ?>" style="margin-top: 5px" id = "InputRef">
+           			  					<div class="col-xs-7">
+           			  						<div class="row <?php echo ($action == "add") ? "hide" : "" ?>" style="margin-top: 5px; margin-left: 10px;" id = "InputRef">
            			  							<input type="text" name="No_Ref" id= "No_Ref"  class="form-control">
            			  						</div>
            			  					</div>

@@ -4996,7 +4996,8 @@ Phone: (021) 29200456';
             $fpdf->Text(63, 64, ':');
             $fpdf->Text(63, 71, ':');
             
-            $terbilang = $this->m_master->moneySay($input['jumlah']);
+            $terbilang = $this->m_master->moneySay($input['jumlah']).'Rupiah';
+            $terbilang = trim(ucwords($terbilang));
             $fpdf->Text(69, 36, $input['NoFormRef'] );
             $fpdf->Text(69, 43, $input['namalengkap']);
             // $fpdf->Text(64, 50, $input['hp']);
