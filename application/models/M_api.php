@@ -198,9 +198,19 @@ class M_api extends CI_Model {
     }
 
     public function __getKurikulumSelectOption(){
-        $data = $this->db->query('SELECT * FROM db_academic.curriculum ORDER BY Year DESC');
+        $data = $this->db->query('SELECT * FROM db_academic.curriculum ORDER BY Year DESC')->result_array();
 
-        return $data->result_array();
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+                $dataS = $this->db->query('SELECT s.Status FROM db_academic.semester s 
+                                                      WHERE s.Year = "'.$data[$i]['Year'].'" 
+                                                      ORDER BY s.Status DESC LIMIT 1 ')
+                                ->result_array();
+                $data[$i]['StatusSemester'] = (count($dataS)>0) ? $dataS[0]['Status'] : '0';
+            }
+        }
+
+        return $data;
     }
 
     public function __getKurikulumSelectOptionASC(){
