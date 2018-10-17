@@ -233,6 +233,42 @@ class C_global extends CI_Controller {
 
     }
 
+    public function testInject2()
+    {
+        $get = $this->m_master->showData_array('db_admission.sale_formulir_offline');
+        for ($i=0; $i < count($get); $i++) { 
+            $ID = $get[$i]['ID'];
+            $FullName = strtolower($get[$i]['FullName']);
+            $FullName = ucwords($FullName);
+            $dataSave = array(
+                    'FullName' => ucwords($FullName),
+                    'Email' => strtolower($get[$i]['Email'])
+                            );
+            $this->db->where('ID',$ID);
+            $this->db->update('db_admission.sale_formulir_offline', $dataSave);
+        }
+
+
+    }
+
+    public function testInject3()
+    {
+        $get = $this->m_master->showData_array('db_admission.register');
+        for ($i=0; $i < count($get); $i++) { 
+            $ID = $get[$i]['ID'];
+            $FullName = strtolower($get[$i]['Name']);
+            $FullName = ucwords($FullName);
+            $dataSave = array(
+                    'Name' => ucwords($FullName),
+                    'Email' => strtolower($get[$i]['Email'])
+                            );
+            $this->db->where('ID',$ID);
+            $this->db->update('db_admission.register', $dataSave);
+        }
+
+
+    }
+
     // public function page_mahasiswa()
     // {
     //     $content = $this->load->view('page/academic'.'/master/students/students','',true);

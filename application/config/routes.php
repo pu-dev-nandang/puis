@@ -871,6 +871,8 @@ $route['vreservation/config/policy/submit'] = 'page/vreservation/c_config/policy
 // test
 $route['testApprove'] = 'page/finance/c_finance/testApprove';
 $route['testInject'] = 'api/c_global/testInject';
+$route['testInject2'] = 'api/c_global/testInject2';
+$route['testInject3'] = 'api/c_global/testInject3';
 
 
 // Pengawas Ujian
