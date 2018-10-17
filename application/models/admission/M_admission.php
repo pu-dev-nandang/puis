@@ -27,6 +27,75 @@ class M_admission extends CI_Model {
         return $conVertINT;
     }
 
+    public function CountSelectDataCalonMahasiswa($tahun,$nama,$status)
+    {
+      if($nama != '%') {
+          $nama = '"%'.$nama.'%"'; 
+      }
+      else
+      {
+        $nama = '"%"'; 
+      }
+      if($status == 'Belum Done') {
+        $status = 'Status != "Done"';
+      }
+      else
+      {
+        $status = 'Status = "Done"';
+      }
+
+      $tahun = 'year(RegisterAT) = '.$tahun;
+      $sql = "select count(*) as total from (
+                select * from (
+                select a.ID,z.name as name_programstudy,b.FormulirCode, 
+                (select count(*) as total from db_admission.register_document 
+                where ".$status." and ID_register_formulir = a.ID
+                GROUP BY ID_register_formulir limit 1) as document_undone,
+                (select count(*) as total from db_admission.register_document 
+                where Status = 'Progress Checking' and ID_register_formulir = a.ID
+                GROUP BY ID_register_formulir limit 1) as document_progress,
+                a.ID_program_study,d.Name,a.IdentityCard,e.ctr_name as Nationality,concat(a.PlaceBirth,',',a.DateBirth) as PlaceDateBirth,g.JenisTempatTinggal,
+                h.ctr_name as CountryAddress,i.ProvinceName as ProvinceAddress,j.RegionName as RegionAddress,k.DistrictName as DistrictsAddress,
+                            a.District as DistrictAddress,a.Address,a.ZipCode,a.PhoneNumber,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,
+                n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,IF(a.KPSReceiverStatus = 'YA',CONCAT('No KPS : ',a.NoKPS),'Tidak') as KPSReceiver,
+                a.UploadFoto,d.RegisterAT
+                from db_admission.register_formulir as a
+                Left JOIN db_admission.register_verified as b 
+                ON a.ID_register_verified = b.ID
+                Left JOIN db_admission.register_verification as c
+                ON b.RegVerificationID = c.ID
+                Left JOIN db_admission.register as d
+                ON c.RegisterID = d.ID
+                Left JOIN db_admission.country as e
+                ON a.NationalityID = e.ctr_code
+                Left JOIN db_admission.register_jtinggal_m as g
+                ON a.ID_register_jtinggal_m = g.ID
+                Left JOIN db_admission.country as h
+                ON a.ID_country_address = h.ctr_code
+                Left JOIN db_admission.province as i
+                ON a.ID_province = i.ProvinceID
+                Left JOIN db_admission.region as j
+                ON a.ID_region = j.RegionID
+                Left JOIN db_admission.district as k
+                ON a.ID_districts = k.DistrictID
+                Left JOIN db_admission.school_type as l
+                ON l.sct_code = a.ID_school_type
+                Left JOIN db_admission.register_major_school as m
+                ON m.ID = a.ID_register_major_school
+                Left JOIN db_admission.school as n
+                ON n.ID = d.SchoolID
+                Left JOIN db_academic.program_study as z
+                on a.ID_program_study = z.id
+                ) as a
+                where document_undone > 0 and Name like ".$nama." and ".$tahun."
+                and FormulirCode not in(select FormulirCode from db_admission.to_be_mhs)
+              ) aa
+              "; // query undone
+
+        $query=$this->db->query($sql, array())->result_array();
+        return $query[0]['total'];
+    }
+
     public function selectDataCalonMahasiswa($limit,$start,$tahun,$nama,$status)
     {
       $arr_temp = array('data' => array());
@@ -58,34 +127,36 @@ class M_admission extends CI_Model {
               h.ctr_name as CountryAddress,i.ProvinceName as ProvinceAddress,j.RegionName as RegionAddress,k.DistrictName as DistrictsAddress,
                           a.District as DistrictAddress,a.Address,a.ZipCode,a.PhoneNumber,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,
               n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,IF(a.KPSReceiverStatus = 'YA',CONCAT('No KPS : ',a.NoKPS),'Tidak') as KPSReceiver,
-              a.UploadFoto,d.RegisterAT
+              a.UploadFoto,d.RegisterAT,az.No_Ref
               from db_admission.register_formulir as a
-              JOIN db_admission.register_verified as b 
+              Left JOIN db_admission.register_verified as b 
               ON a.ID_register_verified = b.ID
-              JOIN db_admission.register_verification as c
+              Left JOIN db_admission.register_verification as c
               ON b.RegVerificationID = c.ID
-              JOIN db_admission.register as d
+              Left JOIN db_admission.register as d
               ON c.RegisterID = d.ID
-              JOIN db_admission.country as e
+              Left JOIN db_admission.country as e
               ON a.NationalityID = e.ctr_code
-              JOIN db_admission.register_jtinggal_m as g
+              Left JOIN db_admission.register_jtinggal_m as g
               ON a.ID_register_jtinggal_m = g.ID
-              JOIN db_admission.country as h
+              Left JOIN db_admission.country as h
               ON a.ID_country_address = h.ctr_code
-              JOIN db_admission.province as i
+              Left JOIN db_admission.province as i
               ON a.ID_province = i.ProvinceID
-              JOIN db_admission.region as j
+              Left JOIN db_admission.region as j
               ON a.ID_region = j.RegionID
-              JOIN db_admission.district as k
+              Left JOIN db_admission.district as k
               ON a.ID_districts = k.DistrictID
-              JOIN db_admission.school_type as l
+              Left JOIN db_admission.school_type as l
               ON l.sct_code = a.ID_school_type
-              JOIN db_admission.register_major_school as m
+              Left JOIN db_admission.register_major_school as m
               ON m.ID = a.ID_register_major_school
-              JOIN db_admission.school as n
+              Left JOIN db_admission.school as n
               ON n.ID = d.SchoolID
-              JOIN db_academic.program_study as z
+              Left JOIN db_academic.program_study as z
               on a.ID_program_study = z.id
+              Left JOIN db_admission.formulir_number_offline_m as az
+              on b.FormulirCode = az.FormulirCode
               ) as a
               where document_undone > 0 and Name like ".$nama." and ".$tahun."
               and FormulirCode not in(select FormulirCode from db_admission.to_be_mhs)
@@ -118,6 +189,8 @@ class M_admission extends CI_Model {
                               'Alamat' => $key->Address." Kelurahan ".$key->DistrictAddress." ".$key->DistrictsAddress." ".$key->RegionAddress." ".$key->ProvinceAddress,
                               'SMA' => $key->SchoolName." ".$key->SchoolRegion." ".$key->SchoolProvince,
                               'document' => $arr_document,
+                              'FormulirCode' => $key->FormulirCode,
+                              'No_Ref' => $key->No_Ref,
                   );
                           
                   $b++;

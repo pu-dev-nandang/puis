@@ -25,7 +25,7 @@
 			<br>
 			<label class="control-label"><?php echo $datadb['data'][$i]['Name'] ?> </label>
 		</div>
-		<div class="col-xs-3" style="">
+		<div class="col-xs-2" style="">
 			<label class="control-label">Email :</label>
 			<br>
 			<label class="control-label"><?php echo $datadb['data'][$i]['Email'] ?> </label>
@@ -34,6 +34,17 @@
 			<label class="control-label">No Hp :</label>
 			<br>
 			<label class="control-label"><?php echo $datadb['data'][$i]['PhoneNumber'] ?> </label>
+		</div>
+		<div class="col-xs-2" style="">
+			<label class="control-label">Nomor Formulir :</label>
+			<br>
+			<?php $code = $datadb['data'][$i]['FormulirCode'] ;
+				if ($datadb['data'][$i]['No_Ref'] != "" || $datadb['data'][$i]['No_Ref'] != null) {
+					$code = $datadb['data'][$i]['FormulirCode'].' / '.$datadb['data'][$i]['No_Ref'];
+				}
+			?>
+
+			<label class="control-label"><?php echo $code ?> </label>
 		</div>
 	</div>
 	<br>
