@@ -60,7 +60,8 @@
 <script>
     $(document).ready(function () {
         loSelectOptionSemester('#filterSemester','');
-        loadSelectOptionForce('#filterAscYear','');
+        // loadSelectOptionForce('#filterAscYear','');
+        loadSelectOptionCurriculum('#filterAscYear','');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
 
         var loadFirst = setInterval(function () {
