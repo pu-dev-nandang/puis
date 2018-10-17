@@ -502,10 +502,17 @@
     function loadSelectOptionCurriculum(element,selected) {
         var url = base_url_js+"api/__getKurikulumSelectOption";
         $.get(url,function (data_json) {
-            // console.log(data_json);
+            console.log(data_json);
             for(var i=0;i<data_json.length;i++){
-                var selected = (data_json[i].ID==selected) ? 'selected' : '';
-                $(element).append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'" '+selected+'>'+data_json[i].NameEng+'</option>');
+
+                var sc = '';
+                if(selected!='' && selected!=null && typeof selected !== undefined){
+                    sc = (data_json[i].ID==selected) ? 'selected' : '';
+                } else {
+                    sc = (data_json[i].StatusSemester=='1') ? 'selected' : '';
+                }
+
+                $(element).append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'" '+sc+'>'+data_json[i].NameEng+'</option>');
             }
         });
     }
