@@ -4977,7 +4977,7 @@ Phone: (021) 29200456';
             // $fpdf->Text(23, 28, 'Telah terima dari,');
             $no_lbl = 'No Form';
             
-            $fpdf->SetFont('Arial', '', 14);
+            $fpdf->SetFont('Arial', '', 11);
             $fpdf->Text(23, 36, $no_lbl);
             $fpdf->Text(23, 43, 'Nama lengkap');
             // $fpdf->Text(23, 50, 'Tlp / HP');
@@ -5002,9 +5002,9 @@ Phone: (021) 29200456';
             $fpdf->Text(69, 43, $input['namalengkap']);
             // $fpdf->Text(64, 50, $input['hp']);
             // $fpdf->Text(64, 57, $input['jurusan']);
-            $fpdf->Text(69, 50, $input['jenis']);
-            $fpdf->Text(69, 57, $input['pembayaran']);
-            $fpdf->Text(69, 64, 'Rp '.number_format($input['jumlah'],2,',','.').',-');
+            $fpdf->Text(69, 50, $input['pembayaran']);
+            $fpdf->Text(69, 57, 'Rp '.number_format($input['jumlah'],2,',','.').',-');
+            $fpdf->Text(69, 64, $input['jenis']);
             $fpdf->Text(69, 71, $terbilang);
             
             
