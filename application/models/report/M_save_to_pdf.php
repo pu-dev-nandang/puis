@@ -417,7 +417,8 @@ class M_save_to_pdf extends CI_Model {
 //        exit;
 
         $IPK_Ori = (count($data)>0) ? $totalGradeValue/$totalSKS : 0 ;
-        $ipk = round($IPK_Ori,2);
+        $ipk = round($IPK_Ori,2,PHP_ROUND_HALF_UP);
+//        $ipk = printf('%.2f', $IPK_Ori);
 
 
         $grade = $this->getGraduation($ipk);
