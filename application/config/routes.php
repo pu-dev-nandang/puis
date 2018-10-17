@@ -417,6 +417,8 @@ $route['admission/distribusi-formulir/offline/LoadInputPenjualan'] = 'page/admis
 $route['admission/distribusi-formulir/offline/LoadImportInputPenjualan'] = 'page/admission/c_admission/LoadImportInputPenjualan';
 $route['admission/distribusi-formulir/offline/submit_import_excel_penjualan_formulir_offline'] = 'page/admission/c_admission/submit_import_excel_penjualan_formulir_offline';
 $route['admission/distribusi-formulir/offline/submit_import_excel_kwitansi_penjualan_formulir_offline'] = 'page/admission/c_admission/submit_import_excel_kwitansi_penjualan_formulir_offline';
+$route['admission/distribusi-formulir/offline/submit_import_excel_pengembalian_formulir_offline'] = 'page/admission/c_admission/submit_import_excel_pengembalian_formulir_offline';
+
 
 
 $route['admission/mastercalonmahasiswa/generate-nim'] = 'page/admission/c_admission/generatenim';
@@ -455,6 +457,7 @@ $route['finance/master/discount'] =  'page/finance/c_finance/page_master_discoun
 $route['finance/master/load_discount'] =  'page/finance/c_finance/load_discount';
 $route['finance/master/modalform_discount'] =  'page/finance/c_finance/modalform_discount';
 $route['finance/master/sbmt_discount'] =  'page/finance/c_finance/sbmt_discount';
+$route['finance/master/copy-last-tuition_fee'] =  'page/finance/c_finance/copy_last_tuition_fee';
 
 
 

@@ -43,7 +43,7 @@ class C_admission extends Admission_Controler {
         $status = $input['selectStatus'];
 
         $this->load->library('pagination');
-        $config = $this->config_pagination_default_ajax(1000,2,6);
+        $config = $this->config_pagination_default_ajax($this->m_admission->CountSelectDataCalonMahasiswa($tahun,$nama,$status),2,6);
   
         $this->pagination->initialize($config);
         $page = $this->uri->segment(6);
@@ -330,9 +330,9 @@ class C_admission extends Admission_Controler {
           case 'delete':
               $query = $this->m_master->caribasedprimary('db_admission.sale_formulir_offline','ID',$input['CDID']);
               $FormulirCode = $query[0]['FormulirCodeOffline'];
+              $this->m_master->updateStatusJual2($FormulirCode);
               $this->m_master->delete_id_table($input['CDID'],'sale_formulir_offline');
               // print_r($FormulirCode);
-              $this->m_master->updateStatusJual($FormulirCode);
               break;        
       }
     }
@@ -1798,7 +1798,7 @@ class C_admission extends Admission_Controler {
         }
 
       $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,b.No_Ref,a.StatusReg,b.Years,b.Status as StatusUsed, b.StatusJual,
-                b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,b.CityNameFormulir,b.DistrictNameFormulir,
+                b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,b.CityNameFormulir,b.DistrictNameFormulir,b.TypePay,
                 b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi,b.NoKwitansi
                 from (
                 select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
@@ -1813,7 +1813,7 @@ class C_admission extends Admission_Controler {
                 ) as a right JOIN
                 (
                 select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,b.NoKwitansi,
-                b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,
+                b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,b.TypePay,
                 if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,b.ID_ProgramStudy,y.Name as NameProdi
                 from db_admission.formulir_number_offline_m as a
                 left join db_admission.sale_formulir_offline as b
@@ -1840,9 +1840,10 @@ class C_admission extends Admission_Controler {
                         b.NameProdi like "'.$requestData['search']['value'].'%" or
                         b.src_name like "'.$requestData['search']['value'].'%" or
                         b.FullName like "'.$requestData['search']['value'].'%" or
-                        b.DateSale like "'.$requestData['search']['value'].'%"
+                        b.DateSale like "'.$requestData['search']['value'].'%" or
+                        b.NoKwitansi like "'.$requestData['search']['value'].'%"
                       ) '.$StatusJual.'';
-      $sql.= ' order by b.No_Ref asc LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+      $sql.= ' order by b.NoKwitansi desc LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
       $query = $this->db->query($sql)->result_array();
 
@@ -1853,6 +1854,7 @@ class C_admission extends Admission_Controler {
           $nestedData[] = $No;
           $nestedData[] = $row['FormulirCode'];
           $nestedData[] = $row['No_Ref'];
+          $nestedData[] = $row['NoKwitansi'];
           $nestedData[] = $row['NameProdi'];
           $aa = ($row['StatusUsed'] == 0) ? '<div style="color:  green;">No</div>' : '<div style="color:  red;">Yes</div>';
           $nestedData[] = $aa;
@@ -1875,7 +1877,7 @@ class C_admission extends Admission_Controler {
                       </div>
                       <div class="row" style="margin-top: 10px">
                         <div class="col-md-12">
-                          <span ref = "'.$row['No_Ref'].'" NamaLengkap = "'.$row['NamaPembeli'].'" class="btn btn-xs btn-print" phonehome = "'.$row['HomeNumberPembeli'].'" hp = "'.$row['PhoneNumberPembeli'].'" jurusan = "'.$row['NameProdi'].'" pembayaran ="Pembelian Form('.$row['No_Ref'].')" jenis= "Cash" jumlah = "'.$row['Price_Form'].'" date = "'.$row['DateSale'].'" formulir = "'.$row['FormulirCode'].'" NoKwitansi = "'.$row['NoKwitansi'].'">
+                          <span ref = "'.$row['No_Ref'].'" NamaLengkap = "'.$row['NamaPembeli'].'" class="btn btn-xs btn-print" phonehome = "'.$row['HomeNumberPembeli'].'" hp = "'.$row['PhoneNumberPembeli'].'" jurusan = "'.$row['NameProdi'].'" pembayaran ="Pembelian Formulir Pendaftaran('.$row['NameProdi'].')" jenis= "'.$row['TypePay'].'" jumlah = "'.$row['Price_Form'].'" date = "'.$row['DateSale'].'" formulir = "'.$row['FormulirCode'].'" NoKwitansi = "'.$row['NoKwitansi'].'">
                            <i class="fa fa-print"></i> Kwitansi
                          </span>
                         </div>
@@ -1979,20 +1981,21 @@ class C_admission extends Admission_Controler {
 
           // print_r($FormulirCode.'<br>');
           $Tanggal = $objWorksheet->getCellByColumnAndRow(1, $i)->getCalculatedValue();
-          $Tanggal = explode(" ", $Tanggal);
-          for ($k=0; $k < count($arr_bulan); $k++) { 
-            $month = $Tanggal[1];
-            if ($arr_bulan[$k] == $month) {
-              $k++;
-              break;
-            }
-          }
+          $date =  date('Y-m-d', strtotime($Tanggal));
+          // $Tanggal = explode(" ", $Tanggal);
+          // for ($k=0; $k < count($arr_bulan); $k++) { 
+          //   $month = $Tanggal[1];
+          //   if ($arr_bulan[$k] == $month) {
+          //     $k++;
+          //     break;
+          //   }
+          // }
 
-          if (strlen($k) == 1) {
-            $k = '0'.$k;
-          }
+          // if (strlen($k) == 1) {
+          //   $k = '0'.$k;
+          // }
 
-          $date = $Tanggal[2].'-'.$k.'-'.$Tanggal[0];
+          // $date = $Tanggal[2].'-'.$k.'-'.$Tanggal[0];
           $getNIP = $this->m_master->getAllUserAutoComplete($objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue());
 
           try {
@@ -2010,8 +2013,18 @@ class C_admission extends Admission_Controler {
             $NIP = $objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue();
           }
 
-          $program_study = $this->m_master->caribasedprimary('db_academic.program_study','Name',$objWorksheet->getCellByColumnAndRow(5, $i)->getCalculatedValue());
-          $program_study2 = $this->m_master->caribasedprimary('db_academic.program_study','Name',$objWorksheet->getCellByColumnAndRow(6, $i)->getCalculatedValue());
+          $Jurusan1 = $objWorksheet->getCellByColumnAndRow(5, $i)->getCalculatedValue();
+          if (strpos($Jurusan1, 'Managemen dan Rekayasa') !== false) {
+              $Jurusan1 = 'Manajemen Rekayasa dan Konstruksi';
+          }
+
+          $Jurusan2 = $objWorksheet->getCellByColumnAndRow(6, $i)->getCalculatedValue();
+          if (strpos($Jurusan2, 'Managemen dan Rekayasa') !== false) {
+              $Jurusan2 = 'Manajemen Rekayasa dan Konstruksi';
+          }
+
+          $program_study = $this->m_master->caribasedprimary('db_academic.program_study','Name',$Jurusan1);
+          $program_study2 = $this->m_master->caribasedprimary('db_academic.program_study','Name',$Jurusan2);
 
 
           $skool1 = $objWorksheet->getCellByColumnAndRow(10, $i)->getCalculatedValue();
@@ -2187,18 +2200,296 @@ class C_admission extends Admission_Controler {
       $this->temp($content);
     }
 
-    public function ImportPengembalianFormulir()
+    public function submit_import_excel_pengembalian_formulir_offline()
     {
-      include APPPATH.'third_party/PHPExcel/PHPExcel.php';
-            $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
-            $excel2 = $excel2->load('report_penjualan_data_18-10-09_KWITANSI.xlsx'); // Empty Sheet
-            $objWorksheet = $excel2->setActiveSheetIndex(0);
-            $CountRow = $objWorksheet->getHighestRow();
-      for ($i=2; $i < ($CountRow + 1); $i++) {
+      if(isset($_FILES["fileData"]["name"]))
+      {
+        $path = $_FILES["fileData"]["tmp_name"];
+        $arr_insert = array();
+        $arr_insert_auth = array();
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load($path); // Empty Sheet
+        $objWorksheet = $excel2->setActiveSheetIndex(0);
+        $CountRow = $objWorksheet->getHighestRow();
+        $No_RefWr = '';
+        $arr_key_list_err = array();
+      for ($i=6; $i < ($CountRow + 1); $i++) {
         $No_Ref = $objWorksheet->getCellByColumnAndRow(0, $i)->getCalculatedValue();
-        $NoKwitansi = $objWorksheet->getCellByColumnAndRow(13, $i)->getCalculatedValue();
-        $CreatedBY = $objWorksheet->getCellByColumnAndRow(14, $i)->getCalculatedValue();
+        if ($No_Ref == "" || $No_Ref == null) {
+          break;
+        }
+        $No_RefWr = $No_Ref;
+        // cari No Formulir
+        $get = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','No_Ref',$No_Ref);
+        if(count($get) == 0){$arr_key_list_err[] = array('err' => 'Nomor Formulir tidak ditemukan','No_Ref' => $No_Ref);continue;}
+        $FormulirCode = $get[0]['FormulirCode'];
+
+        // find FormulirCode pada register_verified
+        $chkFormulir = $this->m_master->caribasedprimary('db_admission.register_verified','FormulirCode',$FormulirCode);
+        if (count($chkFormulir) > 0) {
+          continue;
+        }
         
+        // NIM masih null
+        $Tanggal = $objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue();
+        $Tanggal = date('Y-m-d', strtotime($Tanggal));
+        $Nama = $objWorksheet->getCellByColumnAndRow(3, $i)->getCalculatedValue();
+        $Gender = $objWorksheet->getCellByColumnAndRow(4, $i)->getCalculatedValue();
+        $Gender = (substr($Gender, 0,1) == 'M') ? 'L' : 'P';
+        $TTLahir = $objWorksheet->getCellByColumnAndRow(5, $i)->getCalculatedValue();
+        $TTLahir = explode(',', $TTLahir);
+        $PlaceBirth = $TTLahir[0];
+        $DateBirth = date('Y-m-d', strtotime($TTLahir[1]));
+        $Religion = $objWorksheet->getCellByColumnAndRow(6, $i)->getCalculatedValue();
+        $get = $this->m_master->caribasedprimary('db_admission.agama','Nama',$Religion);
+        if(count($get) == 0){$arr_key_list_err[] = array('err' => 'Agama tidak ditemukan','No_Ref' => $No_Ref);continue;}
+        $ReligionID = $get[0]['ID'];
+        $Nationality = $objWorksheet->getCellByColumnAndRow(7, $i)->getCalculatedValue();
+        $get = $this->m_master->caribasedprimary('db_admission.country','ctr_name',$Nationality);
+        if(count($get) == 0){$arr_key_list_err[] = array('err' => 'Negara tidak ditemukan','No_Ref' => $No_Ref);continue;}
+        $NationalityID = $get[0]['ctr_code'];
+        $Jurusan1 = $objWorksheet->getCellByColumnAndRow(8, $i)->getCalculatedValue();
+        if (strpos($Jurusan1, 'Managemen dan Rekayasa') !== false) {
+            $Jurusan1 = 'Manajemen Rekayasa dan Konstruksi';
+        }
+        $get = $this->m_master->caribasedprimary('db_academic.program_study','Name',$Jurusan1);
+        if(count($get) == 0){$arr_key_list_err[] = array('err' => 'Prodi tidak ditemukan','No_Ref' => $No_Ref);continue;}
+        $ID_program_study = $get[0]['ID'];
+        $Jurusan2 = ''; 
+        $PhoneNumber = $objWorksheet->getCellByColumnAndRow(10, $i)->getCalculatedValue();
+        $PhoneNumber2 = $objWorksheet->getCellByColumnAndRow(11, $i)->getCalculatedValue();
+        $PhoneNumber = $PhoneNumber.' / '.$PhoneNumber2;
+        $Email = $objWorksheet->getCellByColumnAndRow(12, $i)->getCalculatedValue();
+        if($Email == '' || $Email == null){$arr_key_list_err[] = array('err' => 'Email kosong','No_Ref' => $No_Ref);continue;}
+        $jacket_size = $objWorksheet->getCellByColumnAndRow(14, $i)->getCalculatedValue();
+        $get = $this->m_master->caribasedprimary('db_admission.register_jacket_size_m','JacketSize',$jacket_size);
+        if(count($get) == 0){$arr_key_list_err[] = array('err' => 'Jacket Size tidak ditemukan','No_Ref' => $No_Ref);continue;}
+        $ID_register_jacket_size_m = $get[0]['ID'];
+        $Address = $objWorksheet->getCellByColumnAndRow(16, $i)->getCalculatedValue();
+        $RTRW = $objWorksheet->getCellByColumnAndRow(17, $i)->getCalculatedValue();
+        $Address = 'RT/RW '.$RTRW.', '.$Address;
+        $region_Prov = $objWorksheet->getCellByColumnAndRow(18, $i)->getCalculatedValue();
+        $region_Prov = explode('-', $region_Prov);;
+        $region = $region_Prov[0];
+        $region = str_replace('Kabupaten', 'Kab.', $region);
+        $get = $this->m_master->caribasedprimary('db_admission.region','RegionName',$region);
+        if(count($get) == 0){$arr_key_list_err[] = array('err' => 'Region tidak ditemukan','No_Ref' => $No_Ref);continue;}
+        $ID_region = $get[0]['ID'];
+        $Prov = $region_Prov[1];
+        $sql = 'select * from db_admission.province where ProvinceName like "%'.$Prov.'%" ';
+        $get = $this->db->query($sql, array())->result_array();
+        if(count($get) == 0){$arr_key_list_err[] = array('err' => 'Provinsi tidak ditemukan','No_Ref' => $No_Ref);continue;}
+        $ID_province = $get[0]['ProvinceID'];
+
+        $skool1 = $objWorksheet->getCellByColumnAndRow(19, $i)->getCalculatedValue();
+        $skool = trim(str_replace("SMA","", $skool1));
+        $skool = trim(str_replace("SMAS","", $skool1));
+        $skool = trim(str_replace("SMAN","", $skool1));
+        $skool = trim(str_replace("SMK","", $skool));
+        $skool = trim(str_replace("SMKN","", $skool));
+        $skool = trim(str_replace("SMKS","", $skool));
+        $sql = 'select * from db_admission.school where SchoolName like "%'.$skool.'%"';
+        $query=$this->db->query($sql, array())->result_array();
+
+        if (count($query) > 0) {
+          $SchoolID = $query[0]['ID'];
+        }
+        else
+        {
+          $city = $objWorksheet->getCellByColumnAndRow(20, $i)->getCalculatedValue();
+          $CityName = $objWorksheet->getCellByColumnAndRow(20, $i)->getCalculatedValue();
+          $CityID ='';
+
+          $sql2 = 'select * from db_admission.region where RegionName like "%'.$city.'%"';
+          $query2=$this->db->query($sql2, array())->result_array();
+          if (count($query2) > 0) {
+            $CityID =$query2[0]['RegionID']; 
+          }
+          else
+          {
+            $city2 = str_replace('Kabupaten', 'Kab.', $city);
+            $sql2 = 'select * from db_admission.region where RegionName like "%'.$city2.'%"';
+            $query2=$this->db->query($sql2, array())->result_array();
+            if (count($query2) > 0) {
+              $CityID =$query2[0]['RegionID']; 
+            }
+            else
+            {
+
+            }
+            
+          }
+
+          $ProvinceID = $this->m_master->caribasedprimary('db_admission.province_region','RegionID',$CityID);
+          $ProvinceID = $ProvinceID[0]['ProvinceID'];
+          $ProvinceName = $this->m_master->caribasedprimary('db_admission.province','ProvinceID',$ProvinceID);
+          $ProvinceName = $ProvinceName[0]['ProvinceName'];
+
+          $dataSave = array(
+              'ProvinceID' => $ProvinceID,
+              'ProvinceName' => $ProvinceName,
+              'CityID' => $CityID,
+              'CityName' => $CityName,
+              'DistrictID' => '',
+              'DistrictName' => '',
+              'SchoolType' => '',
+              'SchoolName' => $skool1,
+              'SchoolAddress' => '',
+              'Created' => 0,
+              'Approved' => 1,
+              'Approver' => 0,
+          );
+          // print_r($dataSave);
+          // print_r('<br>');
+          $this->db->insert('db_admission.school', $dataSave);
+          $SchoolID = $this->db->insert_id();
+        }
+        $ID_school_type = 1;
+        $FatherName = $objWorksheet->getCellByColumnAndRow(29, $i)->getCalculatedValue();
+        $FatherStatus = ( $objWorksheet->getCellByColumnAndRow(30, $i)->getCalculatedValue() == 'Alive' ) ? 'Alive' : 'Died';
+        $FatherPhoneNumber = $objWorksheet->getCellByColumnAndRow(31, $i)->getCalculatedValue();
+        $Father_occupation = $objWorksheet->getCellByColumnAndRow(33, $i)->getCalculatedValue();
+        $Father_ID_occupation = 0;
+        if ($Father_occupation != '' || $Father_occupation != null) {
+          $get = $this->m_master->caribasedprimary('db_admission.occupation','ocu_name',$Father_occupation);
+          if(count($get) == 0){$arr_key_list_err[] = array('err' => 'Jenis Pekerjaan Ayah tidak ditemukan','No_Ref' => $No_Ref);continue;}
+
+          $Father_ID_occupation = $get[0]['ocu_code'];
+        }
+        
+        $FatherAddress = $objWorksheet->getCellByColumnAndRow(34, $i)->getCalculatedValue();
+
+
+        $MotherName = $objWorksheet->getCellByColumnAndRow(35, $i)->getCalculatedValue();
+        $MotherStatus = ( $objWorksheet->getCellByColumnAndRow(36, $i)->getCalculatedValue() == 'Alive' ) ? 'Alive' : 'Died';
+        $MotherPhoneNumber = $objWorksheet->getCellByColumnAndRow(37, $i)->getCalculatedValue();
+        $Mother_occupation = $objWorksheet->getCellByColumnAndRow(39, $i)->getCalculatedValue();
+        $Mother_ID_occupation = 0;
+        if ($Mother_occupation != '' || $Mother_occupation != null) {
+          $get = $this->m_master->caribasedprimary('db_admission.occupation','ocu_name',$Mother_occupation);
+          if(count($get) == 0){$arr_key_list_err[] = array('err' => 'Jenis Pekerjaan Ibu tidak ditemukan','No_Ref' => $No_Ref);continue;}
+
+          $Mother_ID_occupation = $get[0]['ocu_code'];
+        }
+        $MotherAddress = $objWorksheet->getCellByColumnAndRow(40, $i)->getCalculatedValue();
+
+        // save to db register
+            $sql23 = "select PriceFormulir from db_admission.price_formulir_offline as a where a.active = 1 order by a.CreateAT desc limit 1";
+            $query23=$this->db->query($sql23, array())->result_array();
+
+            $sql33 = 'select * from db_admission.va_generate where VA_Status = 1 order by ID asc limit 1';
+            $query33=$this->db->query($sql33, array())->result_array();
+            if (count($query33) == 0) {
+                $sql33 = 'select * from db_admission.va_generate where VA_Status = 3 order by ID asc limit 1';
+                $query33=$this->db->query($sql33, array())->result_array();
+            }
+
+            $SetTa= $this->m_master->showData_array('db_admission.set_ta');
+            $dataSave = array(
+                    'Name' => $Nama,
+                    'Email' => strtolower($Email),
+                    'MomenUnix' => '',
+                    'SchoolID' => $SchoolID,
+                    'PriceFormulir' => $query23[0]['PriceFormulir'],
+                    'VA_number' => $query33[0]['VA'],
+                    'RegisterAT' => $Tanggal,
+                    'StatusReg' => 1,
+                    'SetTa' => $SetTa[0]['Ta']
+                            );
+
+            $this->db->insert('db_admission.register', $dataSave);
+            $RegisterID = $this->db->insert_id();
+
+            $sqlxx = "update db_admission.va_generate set VA_Status = 2 where VA = ? ";
+            $queryxx=$this->db->query($sqlxx, array($query33[0]['VA']));
+
+            $dataSave = array(
+                    'RegisterID' => $RegisterID,
+                    'FileUpload' => '',
+                    'CreateAT' => date("Y-m-d"),
+                            );
+
+            $this->db->insert('db_admission.register_verification', $dataSave);
+            $RegVerificationID = $this->db->insert_id();
+
+            $dataSave = array(
+                         'RegVerificationID' => $RegVerificationID,
+                         'FormulirCode' => $FormulirCode,
+                         // 'VerificationBY' => $this->session->userdata('NIP'),
+                         // 'VerificationAT' => date('Y-m-d H:i:s'),
+                                 );
+            $this->db->insert('db_admission.register_verified', $dataSave);
+            $ID_register_verified = $this->db->insert_id();
+
+            $dataSave = array(
+                    'Status' => 1,
+                            );
+            $this->db->where('FormulirCode',$FormulirCode);
+            $this->db->update('db_admission.formulir_number_offline_m', $dataSave);
+
+            $dataSave = array(
+                         'ID_register_verified' => $ID_register_verified,
+                         'ID_program_study' => $ID_program_study,
+                         'Gender' => $Gender,
+                         'IdentityCard' => '',
+                         'NationalityID' => $NationalityID,
+                         'ReligionID' => $ReligionID,
+                         'PlaceBirth' => $PlaceBirth,
+                         'DateBirth' => $DateBirth,
+                         'ID_register_jtinggal_m' => 1,
+                         'ID_country_address' => $NationalityID,
+                         'ID_province' => $ID_province,
+                         'ID_region' => $ID_region,
+                         'ID_districts' => 0,
+                         'District' => '',
+                         'Address' => $Address,
+                         'ZipCode' => 0,
+                         'PhoneNumber' => $PhoneNumber,
+                         'ID_school_type' => $ID_school_type,
+                         'ID_register_major_school' => 0,
+                         'YearGraduate' => 0,
+                         'KPSReceiverStatus' => 'Tidak',
+                         'ID_register_jacket_size_m' => $ID_register_jacket_size_m,
+                         'FatherName' => $FatherName,
+                         'FatherNIK' => '',
+                         'FatherPlaceBirth' => '',
+                         'FatherDateBirth' => '1945-08-17',
+                         'FatherStatus' => $FatherStatus,
+                         'FatherPhoneNumber' => $FatherPhoneNumber,
+                         'Father_ID_occupation' => $Father_ID_occupation,
+                         'Father_ID_register_income_m' => 0,
+                         'FatherAddress' => $FatherAddress,
+                         'MotherName' => $MotherName,
+                         'MotherNik' => '',
+                         'MotherPlaceBirth' => '',
+                         'MotherDateBirth' => '1945-08-17',
+                         'MotherStatus' => $MotherStatus,
+                         'MotherPhoneNumber' => $MotherPhoneNumber,
+                         'Mother_ID_occupation' => $Mother_ID_occupation,
+                         'Mother_ID_register_income_m' => 0,
+                         'MotherAddress' => $MotherAddress,
+                                 );
+            $this->db->insert('db_admission.register_formulir', $dataSave);
+            $ID_register_formulir = $this->db->insert_id();
+
+            $arrID_reg_doc_checklist = $this->m_master->caribasedprimary('db_admission.reg_doc_checklist','Active',1);
+            for ($xy=0; $xy < count($arrID_reg_doc_checklist); $xy++) { 
+                $dataSave = array(
+                        'ID_register_formulir' => $ID_register_formulir,
+                        'ID_reg_doc_checklist' => $arrID_reg_doc_checklist[$xy]['ID'],
+                                );
+
+                $this->db->insert('db_admission.register_document', $dataSave);
+            }
+
+      }
+
+        echo json_encode(array('status'=> 1,'msg' => '','No_Ref' => $No_RefWr,'arr_key_list_err' => $arr_key_list_err));
+      }
+      else
+      {
+        exit('No direct script access allowed');
       }
     }
 
