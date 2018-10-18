@@ -67,15 +67,18 @@ class M_save_to_excel extends CI_Model {
         $dataWhere = '';
         if($data_arr['ProdiID']!='' && $data_arr['ProdiID']!=null &&
             $data_arr['StatusStudentID']!='' && $data_arr['StatusStudentID']!=null){
-            $dataWhere = 'WHERE ProdiID = "'.$data_arr['ProdiID'].'" 
-            AND StatusStudentID = "'.$data_arr['StatusStudentID'].'" ';
+            $dataWhere = 'WHERE s.ProdiID = "'.$data_arr['ProdiID'].'" 
+            AND s.StatusStudentID = "'.$data_arr['StatusStudentID'].'" ';
         } else if($data_arr['ProdiID']!='' && $data_arr['ProdiID']!=null){
-            $dataWhere = 'WHERE ProdiID = "'.$data_arr['ProdiID'].'" ';
+            $dataWhere = 'WHERE s.ProdiID = "'.$data_arr['ProdiID'].'" ';
         } else if($data_arr['StatusStudentID']!='' && $data_arr['StatusStudentID']!=null){
-            $dataWhere = 'WHERE StatusStudentID = "'.$data_arr['StatusStudentID'].'" ';
+            $dataWhere = 'WHERE s.StatusStudentID = "'.$data_arr['StatusStudentID'].'" ';
         }
 
-        $dataStd = $this->db->query('SELECT NPM,Name FROM '.$DB_.'.students '.$dataWhere)->result_array();
+        $dataStd = $this->db->query('SELECT s.NPM,s.Name, ps.Name AS ProdiName FROM '.$DB_.'.students s 
+                                                        LEFT JOIN db_academic.program_study ps ON (ps.ID = s.ProdiID)
+                                                        '.$dataWhere.' 
+                                                        ORDER BY s.NPM ASC')->result_array();
 
         if(count($dataStd)>0){
             for($i=0;$i<count($dataStd);$i++){

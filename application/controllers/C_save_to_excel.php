@@ -1796,10 +1796,11 @@ class C_save_to_excel extends CI_Controller
         // Buat header tabel nya pada baris ke 3
         $excel->setActiveSheetIndex(0)->setCellValue('A3', "NIM"); // Set kolom A3 dengan tulisan "NIK"
         $excel->setActiveSheetIndex(0)->setCellValue('B3', "Nama");
-        $excel->setActiveSheetIndex(0)->setCellValue('C3', "SKS IPS");
-        $excel->setActiveSheetIndex(0)->setCellValue('D3', "IPS");
-        $excel->setActiveSheetIndex(0)->setCellValue('E3', "Total SKS");
-        $excel->setActiveSheetIndex(0)->setCellValue('F3', "IPK");
+        $excel->setActiveSheetIndex(0)->setCellValue('C3', "Program Studi");
+        $excel->setActiveSheetIndex(0)->setCellValue('D3', "SKS IPS");
+        $excel->setActiveSheetIndex(0)->setCellValue('E3', "IPS");
+        $excel->setActiveSheetIndex(0)->setCellValue('F3', "Total SKS");
+        $excel->setActiveSheetIndex(0)->setCellValue('G3', "IPK");
 
         // Apply style header yang telah kita buat tadi ke masing-masing kolom header
         $excel->getActiveSheet()->getStyle('A3')->applyFromArray($style_col);
@@ -1808,6 +1809,7 @@ class C_save_to_excel extends CI_Controller
         $excel->getActiveSheet()->getStyle('D3')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('E3')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('F3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('G3')->applyFromArray($style_col);
 
         $numrow = 4; // Set baris pertama untuk isi tabel adalah baris ke 4
 
@@ -1815,11 +1817,12 @@ class C_save_to_excel extends CI_Controller
             foreach ($data AS $item){
                 // Buat header tabel nya pada baris ke 3
                 $excel->setActiveSheetIndex(0)->setCellValue('A'.$numrow, $item['NPM']);
-                $excel->setActiveSheetIndex(0)->setCellValue('B'.$numrow, $item['Name']);
-                $excel->setActiveSheetIndex(0)->setCellValue('C'.$numrow, $item['IPS_TotalCredit']);
-                $excel->setActiveSheetIndex(0)->setCellValue('D'.$numrow, $item['IPS']);
-                $excel->setActiveSheetIndex(0)->setCellValue('E'.$numrow, $item['IPK_TotalCredit']);
-                $excel->setActiveSheetIndex(0)->setCellValue('F'.$numrow, $item['IPK']);
+                $excel->setActiveSheetIndex(0)->setCellValue('B'.$numrow, ucwords(strtolower($item['Name'])));
+                $excel->setActiveSheetIndex(0)->setCellValue('C'.$numrow, ucwords(strtolower($item['ProdiName'])));
+                $excel->setActiveSheetIndex(0)->setCellValue('D'.$numrow, $item['IPS_TotalCredit']);
+                $excel->setActiveSheetIndex(0)->setCellValue('E'.$numrow, $item['IPS']);
+                $excel->setActiveSheetIndex(0)->setCellValue('F'.$numrow, $item['IPK_TotalCredit']);
+                $excel->setActiveSheetIndex(0)->setCellValue('G'.$numrow, $item['IPK']);
 
                 // Apply style header yang telah kita buat tadi ke masing-masing kolom header
                 $excel->getActiveSheet()->getStyle('A'.$numrow)->applyFromArray($style_col_fill);
@@ -1828,6 +1831,7 @@ class C_save_to_excel extends CI_Controller
                 $excel->getActiveSheet()->getStyle('D'.$numrow)->applyFromArray($style_col_fill);
                 $excel->getActiveSheet()->getStyle('E'.$numrow)->applyFromArray($style_col_fill);
                 $excel->getActiveSheet()->getStyle('F'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('G'.$numrow)->applyFromArray($style_col_fill);
                 $numrow += 1;
             };
         }
