@@ -202,4 +202,40 @@ class M_save_to_excel extends CI_Model {
 
         return $result;
     }
+
+    // ======= Student ====
+    public function _getStudentRecap($data_arr){
+
+        $DB_ = 'ta_'.$data_arr['Year'];
+
+        $dataWhere = '';
+        if($data_arr['ProdiID']!='' && $data_arr['ProdiID']!=null &&
+            $data_arr['StatusStudentID']!='' && $data_arr['StatusStudentID']!=null){
+            $dataWhere = 'WHERE s.ProdiID = "'.$data_arr['ProdiID'].'" 
+            AND s.StatusStudentID = "'.$data_arr['StatusStudentID'].'" ';
+        } else if($data_arr['ProdiID']!='' && $data_arr['ProdiID']!=null){
+            $dataWhere = 'WHERE s.ProdiID = "'.$data_arr['ProdiID'].'" ';
+        } else if($data_arr['StatusStudentID']!='' && $data_arr['StatusStudentID']!=null){
+            $dataWhere = 'WHERE s.StatusStudentID = "'.$data_arr['StatusStudentID'].'" ';
+        }
+
+        $dataStd = $this->db->query('SELECT s.NPM,s.Name, ps.Name AS ProdiName, pc.Name AS Program, el.Name AS Level,
+                                                        s.Gender, r.Religion, s.PlaceOfBirth, s.DateOfBirth, s.Address,
+                                                        s.Phone, s.HP, s.Email, aust.EmailPU, sst.Description AS StatusDesc,
+                                                        s.AnakKe, s.JumlahSaudara, s.IjazahNumber, s.Father, s.PhoneFather, 
+                                                        s.OccupationFather, s.EducationFather, s.AddressFather, s.Mother, s.PhoneMother, 
+                                                        s.OccupationMother, s.EducationMother, s.AddressMother
+                                                        FROM '.$DB_.'.students s 
+                                                        LEFT JOIN db_academic.programs_campus pc ON (pc.ID = s.ProgramID)
+                                                        LEFT JOIN db_academic.program_study ps ON (ps.ID = s.ProdiID)
+                                                        LEFT JOIN db_academic.education_level el ON (el.ID = s.LevelStudyID)
+                                                        LEFT JOIN db_employees.religion r ON (r.IDReligion = s.ReligionID)
+                                                        LEFT JOIN db_academic.auth_students aust ON (aust.NPM = s.NPM)
+                                                        LEFT JOIN db_academic.status_student sst ON (sst.ID = s.StatusStudentID)
+                                                        '.$dataWhere.' 
+                                                        ORDER BY s.NPM ASC')->result_array();
+
+        return $dataStd;
+
+    }
 }

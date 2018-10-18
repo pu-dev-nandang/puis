@@ -1854,4 +1854,272 @@ class C_save_to_excel extends CI_Controller
     }
 
     // ===== PENUTUP REKAP IPS IPK ======
+
+    // ===== DATA STUDENT ======
+
+    public function student_recap(){
+
+        $token = $this->input->post('token');
+        $data_arr = $this->getInputToken($token);
+
+        $data = $this->m_save_to_excel->_getStudentRecap($data_arr);
+
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+
+
+        // Panggil class PHPExcel nya
+        $excel = new PHPExcel();
+
+//        $pr = 'REKAP IPS IPK '.$data_arr['Year'];
+        $pr = 'REKAP IPS IPK ';
+
+        // Settingan awal fil excel
+        $excel->getProperties()->setCreator('IT PU')
+            ->setLastModifiedBy('IT PU')
+            ->setTitle($pr)
+            ->setSubject($pr)
+            ->setDescription($pr)
+            ->setKeywords($pr);
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari header tabel
+        $style_col = array(
+            'font' => array('bold' => true), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            ),
+            'fill' => array(
+                'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                'color' => array('rgb' => '00ffcc')
+            )
+        );
+
+        $style_col_ayah = array(
+            'font' => array('bold' => true), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            ),
+            'fill' => array(
+                'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                'color' => array('rgb' => 'd6d6c2')
+            )
+        );
+
+        $style_col_ibu = array(
+            'font' => array('bold' => true), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            ),
+            'fill' => array(
+                'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                'color' => array('rgb' => 'ffebcc')
+            )
+        );
+
+
+        $style_col_fill = array(
+            'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        $excel->setActiveSheetIndex(0)->setCellValue('A1', $pr); // Set kolom A1 dengan tulisan "DATA KARYAWAN"
+        $excel->getActiveSheet()->mergeCells('A1:F1'); // Set Merge Cell pada kolom A1 sampai O1
+        $excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(TRUE); // Set bold kolom A1
+        $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(15); // Set font size 15 untuk kolom A1
+        $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER); // Set text center untuk kolom A1
+
+
+        // Buat header tabel nya pada baris ke 3
+        $excel->setActiveSheetIndex(0)->setCellValue('A3', "No.");
+        $excel->setActiveSheetIndex(0)->setCellValue('B3', "NIM");
+        $excel->setActiveSheetIndex(0)->setCellValue('C3', "Name");
+        $excel->setActiveSheetIndex(0)->setCellValue('D3', "Prodi");
+        $excel->setActiveSheetIndex(0)->setCellValue('E3', "Program");
+        $excel->setActiveSheetIndex(0)->setCellValue('F3', "Jenjang");
+        $excel->setActiveSheetIndex(0)->setCellValue('G3', "JK");
+        $excel->setActiveSheetIndex(0)->setCellValue('H3', "Agama");
+        $excel->setActiveSheetIndex(0)->setCellValue('I3', "Tempat Lahir");
+        $excel->setActiveSheetIndex(0)->setCellValue('J3', "Tanggal Lahir");
+        $excel->setActiveSheetIndex(0)->setCellValue('K3', "Alamat");
+        $excel->setActiveSheetIndex(0)->setCellValue('L3', "Telepon");
+        $excel->setActiveSheetIndex(0)->setCellValue('M3', "HP");
+        $excel->setActiveSheetIndex(0)->setCellValue('N3', "Email");
+        $excel->setActiveSheetIndex(0)->setCellValue('O3', "EmailPU");
+        $excel->setActiveSheetIndex(0)->setCellValue('P3', "Status");
+        $excel->setActiveSheetIndex(0)->setCellValue('Q3', "Anak Ke");
+        $excel->setActiveSheetIndex(0)->setCellValue('R3', "Jumlah Saudara");
+        $excel->setActiveSheetIndex(0)->setCellValue('S3', "Nomor Ijazah");
+
+        $excel->setActiveSheetIndex(0)->setCellValue('T3', "Ayah");
+        $excel->setActiveSheetIndex(0)->setCellValue('U3', "Telepon Ayah");
+        $excel->setActiveSheetIndex(0)->setCellValue('V3', "Pekerjaan Ayah");
+        $excel->setActiveSheetIndex(0)->setCellValue('W3', "Pendidikan Ayah");
+        $excel->setActiveSheetIndex(0)->setCellValue('X3', "Alamat Ayah");
+
+        $excel->setActiveSheetIndex(0)->setCellValue('Y3', "Ibu");
+        $excel->setActiveSheetIndex(0)->setCellValue('Z3', "Telepon Ibu");
+        $excel->setActiveSheetIndex(0)->setCellValue('AA3', "Pekerjaan Ibu");
+        $excel->setActiveSheetIndex(0)->setCellValue('AB3', "Pendidikan Ibu");
+        $excel->setActiveSheetIndex(0)->setCellValue('AC3', "Alamat Ibu");
+
+        // Apply style header yang telah kita buat tadi ke masing-masing kolom header
+        $excel->getActiveSheet()->getStyle('A3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('B3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('C3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('D3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('E3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('F3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('G3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('H3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('I3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('J3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('K3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('L3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('M3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('N3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('O3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('P3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('Q3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('R3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('S3')->applyFromArray($style_col);
+
+        $excel->getActiveSheet()->getStyle('T3')->applyFromArray($style_col_ayah);
+        $excel->getActiveSheet()->getStyle('U3')->applyFromArray($style_col_ayah);
+        $excel->getActiveSheet()->getStyle('V3')->applyFromArray($style_col_ayah);
+        $excel->getActiveSheet()->getStyle('W3')->applyFromArray($style_col_ayah);
+        $excel->getActiveSheet()->getStyle('X3')->applyFromArray($style_col_ayah);
+
+        $excel->getActiveSheet()->getStyle('Y3')->applyFromArray($style_col_ibu);
+        $excel->getActiveSheet()->getStyle('Z3')->applyFromArray($style_col_ibu);
+        $excel->getActiveSheet()->getStyle('AA3')->applyFromArray($style_col_ibu);
+        $excel->getActiveSheet()->getStyle('AB3')->applyFromArray($style_col_ibu);
+        $excel->getActiveSheet()->getStyle('AC3')->applyFromArray($style_col_ibu);
+
+        $numrow = 4; // Set baris pertama untuk isi tabel adalah baris ke 4
+
+        if(count($data)>0){
+            $no = 1;
+            foreach ($data AS $item){
+                // Buat header tabel nya pada baris ke 3
+                $excel->setActiveSheetIndex(0)->setCellValue('A'.$numrow, $no);
+                $excel->setActiveSheetIndex(0)->setCellValue('B'.$numrow,$item['NPM']);
+                $excel->setActiveSheetIndex(0)->setCellValue('C'.$numrow,$item['Name']);
+                $excel->setActiveSheetIndex(0)->setCellValue('D'.$numrow,$item['ProdiName']);
+                $excel->setActiveSheetIndex(0)->setCellValue('E'.$numrow,$item['Program']);
+                $excel->setActiveSheetIndex(0)->setCellValue('F'.$numrow,$item['Level']);
+                $excel->setActiveSheetIndex(0)->setCellValue('G'.$numrow,$item['Gender']);
+                $excel->setActiveSheetIndex(0)->setCellValue('H'.$numrow,$item['Religion']);
+                $excel->setActiveSheetIndex(0)->setCellValue('I'.$numrow,$item['PlaceOfBirth']);
+                $excel->setActiveSheetIndex(0)->setCellValue('J'.$numrow,$item['DateOfBirth']);
+                $excel->setActiveSheetIndex(0)->setCellValue('K'.$numrow,$item['Address']);
+                $excel->setActiveSheetIndex(0)->setCellValue('L'.$numrow,$item['Phone']);
+                $excel->setActiveSheetIndex(0)->setCellValue('M'.$numrow,$item['HP']);
+                $excel->setActiveSheetIndex(0)->setCellValue('N'.$numrow,$item['Email']);
+                $excel->setActiveSheetIndex(0)->setCellValue('O'.$numrow,$item['EmailPU']);
+                $excel->setActiveSheetIndex(0)->setCellValue('P'.$numrow,$item['StatusDesc']);
+                $excel->setActiveSheetIndex(0)->setCellValue('Q'.$numrow,$item['AnakKe']);
+                $excel->setActiveSheetIndex(0)->setCellValue('R'.$numrow,$item['JumlahSaudara']);
+                $excel->setActiveSheetIndex(0)->setCellValue('S'.$numrow,$item['IjazahNumber']);
+
+                $excel->setActiveSheetIndex(0)->setCellValue('T'.$numrow,$item['Father']);
+                $excel->setActiveSheetIndex(0)->setCellValue('U'.$numrow,$item['PhoneFather']);
+                $excel->setActiveSheetIndex(0)->setCellValue('V'.$numrow,$item['OccupationFather']);
+                $excel->setActiveSheetIndex(0)->setCellValue('W'.$numrow,$item['EducationFather']);
+                $excel->setActiveSheetIndex(0)->setCellValue('X'.$numrow,$item['AddressFather']);
+
+                $excel->setActiveSheetIndex(0)->setCellValue('Y'.$numrow,$item['Mother']);
+                $excel->setActiveSheetIndex(0)->setCellValue('Z'.$numrow,$item['PhoneMother']);
+                $excel->setActiveSheetIndex(0)->setCellValue('AA'.$numrow,$item['OccupationMother']);
+                $excel->setActiveSheetIndex(0)->setCellValue('AB'.$numrow,$item['EducationMother']);
+                $excel->setActiveSheetIndex(0)->setCellValue('AC'.$numrow,$item['AddressMother']);
+
+                $excel->getActiveSheet()->getStyle('A'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('B'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('C'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('D'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('E'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('F'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('G'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('H'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('I'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('J'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('K'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('L'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('M'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('N'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('O'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('P'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('Q'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('R'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('S'.$numrow)->applyFromArray($style_col_fill);
+
+                $excel->getActiveSheet()->getStyle('T'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('U'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('V'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('W'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('X'.$numrow)->applyFromArray($style_col_fill);
+
+                $excel->getActiveSheet()->getStyle('Y'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('Z'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('AA'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('AB'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('AC'.$numrow)->applyFromArray($style_col_fill);
+
+                $no += 1;
+                $numrow += 1;
+            }
+        }
+
+        $rangeS = range('A','Z');
+        $rangeS[26] = 'AA';
+        $rangeS[27] = 'AB';
+        $rangeS[28] = 'AC';
+        foreach( $rangeS as $columnID) {
+            $excel->getActiveSheet()->getColumnDimension($columnID)
+                ->setAutoSize(true);
+        }
+
+        // Proses file excel
+        $filename = str_replace(' ','_',$pr).".xlsx";
+        //$FILEpath = "./dokument/".$filename;
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename='.$filename); // Set nama file excel nya
+        header('Cache-Control: max-age=0');
+
+        $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $write->save('php://output');
+
+
+    }
+
+    // ===== PENUTUP DATA STUDENT ======
 }
