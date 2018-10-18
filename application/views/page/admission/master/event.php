@@ -3,11 +3,11 @@
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i>Master Event</h4>
+                <h4 class="header"><i class="icon-reorder"></i><?php echo $NameMenu ?></h4>
                 <div class="toolbar no-padding">
                     <div class="btn-group">
                       <span data-smt="" class="btn btn-xs btn-add-event btn-add">
-                        <i class="icon-plus"></i> Add Event
+                        <i class="icon-plus"></i> Add
                        </span>
                     </div>
                 </div>

@@ -12,6 +12,7 @@ class C_admission extends Admission_Controler {
         $this->load->model('m_sendemail');
         $this->data['department'] = parent::__getDepartement(); 
         $this->load->model('m_api');
+        $this->data['NameMenu'] = $this->GlobalData['NameMenu'];
     }
 
     public function dashboard()
@@ -293,7 +294,7 @@ class C_admission extends Admission_Controler {
        $selectPrody = $input['selectPrody'];
 
        $this->load->library('pagination');
-       $config = $this->config_pagination_default_ajax(1000,5,6);
+       $config = $this->config_pagination_default_ajax($this->m_admission->count_daftar_set_nilai_ujian_load_data_paging($selectPrody),5,6);
        $this->pagination->initialize($config);
        $page = $this->uri->segment(6);
        $start = ($page - 1) * $config["per_page"];
@@ -359,7 +360,7 @@ class C_admission extends Admission_Controler {
        $selectProgramStudy = $input['selectProgramStudy'];
        $Sekolah = $input['Sekolah'];
        $this->load->library('pagination');
-       $config = $this->config_pagination_default_ajax(1000,25,4);
+       $config = $this->config_pagination_default_ajax($this->m_admission->count_loadData_calon_mahasiswa($Nama,$selectProgramStudy,$Sekolah),25,4);
        $this->pagination->initialize($config);
        $page = $this->uri->segment(4);
        $start = ($page - 1) * $config["per_page"];
@@ -395,7 +396,7 @@ class C_admission extends Admission_Controler {
        $selectPrody = $input['selectPrody'];
 
        $this->load->library('pagination');
-       $config = $this->config_pagination_default_ajax(1000,10,5);
+       $config = $this->config_pagination_default_ajax($this->m_admission->count_daftar_set_nilai_rapor_load_data_paging($selectPrody),10,5);
        $this->pagination->initialize($config);
        $page = $this->uri->segment(5);
        $start = ($page - 1) * $config["per_page"];
@@ -433,7 +434,7 @@ class C_admission extends Admission_Controler {
        $selectProgramStudy = $input['selectProgramStudy'];
        $Sekolah = $input['Sekolah'];
        $this->load->library('pagination');
-       $config = $this->config_pagination_default_ajax(1000,25,4);
+       $config = $this->config_pagination_default_ajax($this->m_admission->count_loadData_calon_mahasiswa_created($Nama,$selectProgramStudy,$Sekolah),25,4);
        $this->pagination->initialize($config);
        $page = $this->uri->segment(4);
        $start = ($page - 1) * $config["per_page"];
@@ -560,7 +561,7 @@ class C_admission extends Admission_Controler {
     public function set_tuition_fee_approved($page = null)
     {
       $this->load->library('pagination');
-      $config = $this->config_pagination_default_ajax(1000,15,5);
+      $config = $this->config_pagination_default_ajax($this->m_admission->count_getDataCalonMhsTuitionFee_approved(),15,5);
       $this->pagination->initialize($config);
       $page = $this->uri->segment(5);
       $start = ($page - 1) * $config["per_page"];
@@ -1231,6 +1232,7 @@ class C_admission extends Admission_Controler {
       //check existing db
           // get setting ta
           $taDB = $this->m_master->showData_array('db_admission.set_ta');
+          $YearAuth = $taDB[0]['Ta'];
           $ta = $taDB[0]['Ta'];
           $ta = 'ta_'.$ta;
 
@@ -1399,10 +1401,12 @@ class C_admission extends Admission_Controler {
                 'NPM' => $NPM,
                 'Password' => $pass,
                 'Password_Old' => md5($pasword_old),
-                'Year' => date('Y'),
+                'Year' => $YearAuth,
                 'EmailPU' => $NPM.'@podomorouniversity.ac.id',
                 'StatusStudentID' => 3,
                 'Status' => '-1',
+                'Name' => $Name,
+                'ProdiID' => $ProdiID,
             );
 
             $arr_insert_auth[] = $temp2;

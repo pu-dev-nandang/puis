@@ -38,7 +38,7 @@
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i> Set Ujian</h4>
+                <h4 class="header"><i class="icon-reorder"></i> <?php echo $NameMenu ?></h4>
             </div>
             <div class="widget-content">
                 <div class = "row">
@@ -58,9 +58,12 @@
                         </div>
                     <div  class="col-xs-6" align="right" id="pagination_link"></div>
                 </div>
-                <div id="pageData">
-                    
+                <div class="row" style="margin-top: 10px;margin-left: 0px;margin-right: 0px">
+                    <div id="pageData">
+                        
+                    </div>
                 </div>
+                
                 <br>
                 <div class="col-xs-12" align = "right">
                    <button class="btn btn-inverse btn-notification btn-submit" id="btn-submit">Submit</button>

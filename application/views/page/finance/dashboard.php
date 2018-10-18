@@ -10,6 +10,11 @@
 <script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/easy-pie-chart/jquery.easy-pie-chart.min.js"></script>
 
 <!--=== Bars ===-->
+<div class="row" style="margin-left: 0px;margin-right: 0px;margin-top: -30px">
+	<div class="col-xs-6 col-md-offset-5">
+		<h2>Semester <?php echo $getSemester[0]['Name'] ?></h2>
+	</div>
+</div>
 <div class="row">
 	<div class="col-md-6">
 		<div class="widget box">

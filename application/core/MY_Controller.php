@@ -203,6 +203,7 @@ abstract class Lpmi extends Globalclass{
 abstract class Admission_Controler extends Globalclass{
     // public $GlobalVariableAdi = array('url_registration' => 'http://10.1.10.230/register/');
     public $GlobalVariableAdi = array('url_registration' => 'http://demo.web.podomorouniversity.ac.id/registeronline/');
+    public $GlobalData = array('NameMenu' => '');
 
     public function __construct()
     {
@@ -221,9 +222,29 @@ abstract class Admission_Controler extends Globalclass{
                 }
             }
         }
+
+        $this->GetNameMenu();
     }
 
     public $path_upload_regOnline = path_register_online.'document/';
+
+    private function GetNameMenu()
+    {
+        $this->load->model('master/m_master');
+        $currentURL = current_url();
+        $Slug = str_replace(serverRoot.'/', '', $currentURL);
+        $get = $this->m_master->caribasedprimary('db_admission.cfg_sub_menu','Slug',$Slug);
+        if (count($get) > 0) {
+            if ($get[0]['SubMenu2'] == 'Empty') {
+                $this->GlobalData['NameMenu'] = $get[0]['SubMenu1'];
+            }
+            else
+            {
+                $this->GlobalData['NameMenu'] = $get[0]['SubMenu1'].'-'.$get[0]['SubMenu2'];
+            }
+            
+        }
+    }
 
     private function authAdmission()
     {
