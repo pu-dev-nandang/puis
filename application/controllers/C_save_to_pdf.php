@@ -3012,13 +3012,7 @@ class C_save_to_pdf extends CI_Controller {
         $Student = $dataStudent['Student'][0];
         $dataTempTr = $dataStudent['TempTranscript'][0];
 
-//        printf("%.1f", 165);
-//        exit;
-//        print_r($dataStudent);
-//        exit;
-
-//        $pdf = new FPDF('P','mm','A4');
-        $pdf = new FPDF('P','mm','legal');
+        $pdf = new FPDF('P','mm','A4');
 
         // membuat halaman baru
         $pdf->SetMargins(10,5,10);
@@ -3305,7 +3299,8 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Cell($w_f,$h, number_format($d['GradeValue'],2),$border,0,'C');
             $pdf->Cell($w_fv,$h, number_format($d['Point'],2),$border,1,'C');
 
-            if($pdf->GetY()>287){
+//            if($pdf->GetY()>287){
+            if($pdf->GetY()>240){
                 // membuat halaman baru
                 $pdf->SetMargins(10,5,10);
                 $pdf->AddPage();
