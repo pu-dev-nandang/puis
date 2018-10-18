@@ -588,6 +588,7 @@ $route['save2pdf/getpdfkwitansi/(:any)'] =  'c_save_to_pdf/getpdfkwitansi/$1';
 // ---- Save to EXCEL
 $route['save2excel/test'] =  'c_save_to_excel/test2';
 $route['save2excel/monitoring_score'] =  'c_save_to_excel/monitoring_score';
+$route['save2excel/cumulative-recap'] =  'c_save_to_excel/cumulative_recap';
 
 
 // ====== API ======

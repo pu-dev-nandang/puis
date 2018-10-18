@@ -380,20 +380,14 @@ class M_save_to_pdf extends CI_Model {
         $arrDetailCourseID = [];
         $DetailCourse = [];
 
-
-
-
         if(count($data)>0){
             for($i=0;$i<count($data);$i++){
                 $d = $data[$i];
-
-//                echo $d['MKID'];
 
                 if(in_array($d['MKID'],$arrDetailCourseID)!=-1){
                     $dataScore = $dataScore = $this->db->order_by('Score', 'DESC')
                         ->get_where($DBStudent.'.study_planning',array('NPM' => $NPM,'MKID'=>$d['MKID']))->result_array();
 
-//                $Score = ($dataScore[0]['Score']!='' && $dataScore[0]['Score']!=null) ? $dataScore[0]['Score'] : 0;
                     $Grade = ($dataScore[0]['Grade']!='' && $dataScore[0]['Grade']!=null) ? $dataScore[0]['Grade'] : 'E';
                     $GradeValue = ($dataScore[0]['GradeValue']!='' && $dataScore[0]['GradeValue']!=null) ? $dataScore[0]['GradeValue'] : 0;
                     $Point = $d['Credit'] * $GradeValue;
@@ -413,13 +407,8 @@ class M_save_to_pdf extends CI_Model {
             }
         }
 
-//        print_r($DetailCourse);
-//        exit;
-
         $IPK_Ori = (count($data)>0) ? $totalGradeValue/$totalSKS : 0 ;
-        $ipk = round($IPK_Ori,2,PHP_ROUND_HALF_UP);
-//        $ipk = printf('%.2f', $IPK_Ori);
-
+        $ipk = round($IPK_Ori,2);
 
         $grade = $this->getGraduation($ipk);
 
