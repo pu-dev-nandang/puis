@@ -391,7 +391,7 @@ class C_finance extends Finnance_Controler {
          $text = 'Dear '.$Personal[0]['Name'].',<br><br>
                      Plase find attached your Tuition Fee.<br>
                      For Detail your payment, please see in '.url_registration."login/";
-         $to = $Personal[0]['Email'];
+         $to = $Personal[0]['Email'].','.'admission@podomorouniversity.ac.id';
          $subject = "Podomoro University Tuition Fee";
          $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,$path);
 

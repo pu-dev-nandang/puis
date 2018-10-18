@@ -2267,11 +2267,20 @@ class C_admission extends Admission_Controler {
         $PhoneNumber2 = $objWorksheet->getCellByColumnAndRow(11, $i)->getCalculatedValue();
         $PhoneNumber = $PhoneNumber.' / '.$PhoneNumber2;
         $Email = $objWorksheet->getCellByColumnAndRow(12, $i)->getCalculatedValue();
-        if($Email == '' || $Email == null){$arr_key_list_err[] = array('err' => 'Email kosong','No_Ref' => $No_Ref);continue;}
+        // if($Email == '' || $Email == null){$arr_key_list_err[] = array('err' => 'Email kosong','No_Ref' => $No_Ref);continue;}
+        if($Email == '' || $Email == null){$Email = 'admission@podomorouniversity.ac.id';}
         $jacket_size = $objWorksheet->getCellByColumnAndRow(14, $i)->getCalculatedValue();
         $get = $this->m_master->caribasedprimary('db_admission.register_jacket_size_m','JacketSize',$jacket_size);
-        if(count($get) == 0){$arr_key_list_err[] = array('err' => 'Jacket Size tidak ditemukan','No_Ref' => $No_Ref);continue;}
-        $ID_register_jacket_size_m = $get[0]['ID'];
+        // if(count($get) == 0){$arr_key_list_err[] = array('err' => 'Jacket Size tidak ditemukan','No_Ref' => $No_Ref);continue;}
+        if(count($get) == 0)
+        {
+          $ID_register_jacket_size_m = 0;
+        }
+        else
+        {
+          $ID_register_jacket_size_m = $get[0]['ID'];
+        }
+        
         $Address = $objWorksheet->getCellByColumnAndRow(16, $i)->getCalculatedValue();
         $RTRW = $objWorksheet->getCellByColumnAndRow(17, $i)->getCalculatedValue();
         $Address = 'RT/RW '.$RTRW.', '.$Address;
@@ -2280,13 +2289,28 @@ class C_admission extends Admission_Controler {
         $region = $region_Prov[0];
         $region = str_replace('Kabupaten', 'Kab.', $region);
         $get = $this->m_master->caribasedprimary('db_admission.region','RegionName',$region);
-        if(count($get) == 0){$arr_key_list_err[] = array('err' => 'Region tidak ditemukan','No_Ref' => $No_Ref);continue;}
-        $ID_region = $get[0]['ID'];
+        // if(count($get) == 0){$arr_key_list_err[] = array('err' => 'Region tidak ditemukan','No_Ref' => $No_Ref);continue;}
+        if (count($get) > 0) {
+          $ID_region = $get[0]['ID'];
+        }
+        else
+        {
+          $ID_region = 0;
+        }
+        
         $Prov = $region_Prov[1];
         $sql = 'select * from db_admission.province where ProvinceName like "%'.$Prov.'%" ';
         $get = $this->db->query($sql, array())->result_array();
-        if(count($get) == 0){$arr_key_list_err[] = array('err' => 'Provinsi tidak ditemukan','No_Ref' => $No_Ref);continue;}
-        $ID_province = $get[0]['ProvinceID'];
+        // if(count($get) == 0){$arr_key_list_err[] = array('err' => 'Provinsi tidak ditemukan','No_Ref' => $No_Ref);continue;}
+        if(count($get) > 0)
+        {
+          $ID_province = $get[0]['ProvinceID'];
+        }
+        else
+        {
+          $ID_province = 0;
+        }
+        
 
         $skool1 = $objWorksheet->getCellByColumnAndRow(19, $i)->getCalculatedValue();
         $skool = trim(str_replace("SMA","", $skool1));
@@ -2328,9 +2352,18 @@ class C_admission extends Admission_Controler {
           }
 
           $ProvinceID = $this->m_master->caribasedprimary('db_admission.province_region','RegionID',$CityID);
-          $ProvinceID = $ProvinceID[0]['ProvinceID'];
-          $ProvinceName = $this->m_master->caribasedprimary('db_admission.province','ProvinceID',$ProvinceID);
-          $ProvinceName = $ProvinceName[0]['ProvinceName'];
+          if (count($ProvinceID) > 0) {
+            $ProvinceID = $ProvinceID[0]['ProvinceID'];
+            $ProvinceName = $this->m_master->caribasedprimary('db_admission.province','ProvinceID',$ProvinceID);
+            $ProvinceName = $ProvinceName[0]['ProvinceName'];
+          }
+          else
+          {
+            $ProvinceID = 0;
+            $ProvinceName = '';
+          }
+          
+          
 
           $dataSave = array(
               'ProvinceID' => $ProvinceID,
@@ -2359,9 +2392,16 @@ class C_admission extends Admission_Controler {
         $Father_ID_occupation = 0;
         if ($Father_occupation != '' || $Father_occupation != null) {
           $get = $this->m_master->caribasedprimary('db_admission.occupation','ocu_name',$Father_occupation);
-          if(count($get) == 0){$arr_key_list_err[] = array('err' => 'Jenis Pekerjaan Ayah tidak ditemukan','No_Ref' => $No_Ref);continue;}
-
-          $Father_ID_occupation = $get[0]['ocu_code'];
+          // if(count($get) == 0){$arr_key_list_err[] = array('err' => 'Jenis Pekerjaan Ayah tidak ditemukan','No_Ref' => $No_Ref);continue;}
+          if(count($get) > 0)
+          {
+            $Father_ID_occupation = $get[0]['ocu_code'];
+          }
+          else
+          {
+            $Father_ID_occupation = 0;
+          }
+          
         }
         
         $FatherAddress = $objWorksheet->getCellByColumnAndRow(34, $i)->getCalculatedValue();
@@ -2381,8 +2421,18 @@ class C_admission extends Admission_Controler {
         $MotherAddress = $objWorksheet->getCellByColumnAndRow(40, $i)->getCalculatedValue();
 
         // save to db register
-            $sql23 = "select PriceFormulir from db_admission.price_formulir_offline as a where a.active = 1 order by a.CreateAT desc limit 1";
-            $query23=$this->db->query($sql23, array())->result_array();
+            // check priceForm dari sale_formulir_offline
+            $get1234 = $this->m_master->caribasedprimary('db_admission.sale_formulir_offline','FormulirCodeOffline',$FormulirCode);
+            $query23 = array();
+            if (count($get1234) == 0) {
+              $sql23 = "select PriceFormulir from db_admission.price_formulir_offline as a where a.active = 1 order by a.CreateAT desc limit 1";
+              $query23=$this->db->query($sql23, array())->result_array();
+            }
+            else
+            {
+              $query23[0]['PriceFormulir'] = $get1234[0]['Price_Form'];
+            }
+            
 
             $sql33 = 'select * from db_admission.va_generate where VA_Status = 1 order by ID asc limit 1';
             $query33=$this->db->query($sql33, array())->result_array();
