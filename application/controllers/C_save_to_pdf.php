@@ -3262,7 +3262,6 @@ class C_save_to_pdf extends CI_Controller {
 
         $mk = ($lang=='ind')? '' : 'Eng';
 
-
         $Student = $dataStudent['Student'][0];
         $Transcript = $dataStudent['Transcript'][0];
         $DetailCourse = $dataStudent['DetailCourse'];
@@ -3739,23 +3738,16 @@ class C_save_to_pdf extends CI_Controller {
 
         $dataIjazah = $this->m_save_to_pdf->getIjazah($data_arr['DBStudent'],$data_arr['NPM']);
 
-//        print_r($dataIjazah);
-//        exit;
-
         $pdf = new FPDF('L','mm','A4');
 
         // membuat halaman baru
         $pdf->SetMargins(20.5,10.5,10);
         $pdf->AddPage();
 
-//        $pdf->Image(base_url('images/i.jpg'),0,0,296.5);
-
         $h = 3;
 
         $Ijazah = $dataIjazah['Ijazah'][0];
         $Student = $dataIjazah['Student'][0];
-
-
 
         $border = 0;
 
@@ -3934,13 +3926,15 @@ class C_save_to_pdf extends CI_Controller {
         $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].' ' : '';
         $titleB = ($Student['TitleBehind']!='') ? ' '.$Student['TitleBehind'] : '' ;
 
-        $Dekan = $titleA.''.$Student['Dekan'].' '.$titleB;
+        $komaDekan = ($titleB!='') ? ',' : '';
+        $Dekan = $titleA.''.$Student['Dekan'].''.$komaDekan.''.$titleB;
 
         // Rektor
         $Rektorat = $dataIjazah['Rektorat'][0];
         $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].' ' : '';
         $titleBRektor = ($Rektorat['TitleBehind']!='')? ' '.$Rektorat['TitleBehind'] : '';
-        $Rektor = $titleARektor.''.$Rektorat['Name'].''.$titleBRektor;
+        $komaRektor = ($titleBRektor!='') ? ',' : '';
+        $Rektor = $titleARektor.''.$Rektorat['Name'].''.$komaRektor.''.$titleBRektor;
         // ----
 
         $pdf->SetFont('dinpromedium','',$fn_b);
