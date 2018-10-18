@@ -391,7 +391,13 @@ class C_finance extends Finnance_Controler {
          $text = 'Dear '.$Personal[0]['Name'].',<br><br>
                      Plase find attached your Tuition Fee.<br>
                      For Detail your payment, please see in '.url_registration."login/";
-         $to = $Personal[0]['Email'].','.'admission@podomorouniversity.ac.id';
+         if($_SERVER['SERVER_NAME']!='localhost' && $_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {            
+            $to = $Personal[0]['Email'].','.'admission@podomorouniversity.ac.id';
+         }
+         else
+         {
+            $to = 'alhadirahman22@gmail.com,alhadi.rahman@podomorouniversity.ac.id';
+         }
          $subject = "Podomoro University Tuition Fee";
          $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,$path);
 
@@ -1463,25 +1469,25 @@ class C_finance extends Finnance_Controler {
                 if( (select count(*) as total from db_finance.payment_pre where ID_register_formulir = a.ID limit 1) > 1,"Cicilan","Tidak Cicilan") as cicilan,
                 if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment
                 from db_admission.register_formulir as a
-                JOIN db_admission.register_verified as b 
+                left JOIN db_admission.register_verified as b 
                 ON a.ID_register_verified = b.ID
-                JOIN db_admission.register_verification as c
+                left JOIN db_admission.register_verification as c
                 ON b.RegVerificationID = c.ID
-                JOIN db_admission.register as d
+                left JOIN db_admission.register as d
                 ON c.RegisterID = d.ID
-                JOIN db_admission.country as e
+                left JOIN db_admission.country as e
                 ON a.NationalityID = e.ctr_code
-                JOIN db_employees.religion as f
+                left JOIN db_employees.religion as f
                 ON a.ReligionID = f.IDReligion
-                JOIN db_admission.school_type as l
+                left JOIN db_admission.school_type as l
                 ON l.sct_code = a.ID_school_type
-                JOIN db_admission.register_major_school as m
+                left JOIN db_admission.register_major_school as m
                 ON m.ID = a.ID_register_major_school
-                JOIN db_admission.school as n
+                left JOIN db_admission.school as n
                 ON n.ID = d.SchoolID
-                join db_academic.program_study as o
+                left join db_academic.program_study as o
                 on o.ID = a.ID_program_study
-                join db_finance.register_admisi as p
+                left join db_finance.register_admisi as p
                 on a.ID = p.ID_register_formulir
                 where p.Status = "Approved"  and d.SetTa = "'.$reqTahun.'" group by a.ID
 

@@ -559,6 +559,7 @@ $route['loadDataRegistrationBelumBayar'] =  'api/C_global/loadDataRegistrationBe
 $route['loadDataRegistrationTelahBayar'] =  'api/C_global/load_data_registration_telah_bayar';
 $route['loadDataRegistrationFormulirOffline'] =  'api/C_global/load_data_registration_formulir_offline';
 $route['get_detail_cicilan_fee_admisi'] =  'api/C_global/get_detail_cicilan_fee_admisi';
+$route['get_nilai_from_admission'] =  'api/C_global/get_nilai_from_admission';
 
 
 // ---- Save to PDF ---

@@ -73,7 +73,7 @@
 			}
 
 			if (getDataCalonMhs[i]['getFile'] != '-') {
-				showFile = '<a href="javascript:void(0)" class="show_a_href" id = "show'+getDataCalonMhs[i]['ID_register_formulir']+'" filee = "'+getDataCalonMhs[i]['getFile']+'" Email = "'+getDataCalonMhs[i]['Email']+'">Show</a>';
+				showFile = '<a href="javascript:void(0)" class="show_a_href" id = "show'+getDataCalonMhs[i]['ID_register_formulir']+'" filee = "'+getDataCalonMhs[i]['getFile']+'" Email = "'+getDataCalonMhs[i]['Email']+'">File</a>';
 			}
 			else
 			{
