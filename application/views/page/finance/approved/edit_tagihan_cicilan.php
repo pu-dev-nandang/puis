@@ -271,7 +271,7 @@
        $.post(url,{token:token},function (data_json) {
           var CanBeDelete = 1;
           // make html
-          var mhtml = '<div id = "inputCicilan">'+
+          var mhtml = '<br><div id = "inputCicilan">'+
                         '<div class="widget box widget_'+Uniformvaluee+' widget_delete">'+
                             '<div class="widget-header">'+
                                 '<h4 class="header"><i class="icon-reorder"></i>Edit Payment '+Nama+'</h4>'+

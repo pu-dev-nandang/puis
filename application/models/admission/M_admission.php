@@ -822,6 +822,32 @@ class M_admission extends CI_Model {
 
     }
 
+    public function count_daftar_set_nilai_ujian_load_data_paging($ID_ProgramStudy)
+    {
+      $sql = 'select count(*) as total from (
+                select c.Name as prody
+                from db_admission.register_jadwal_ujian as a 
+                RIGHT JOIN db_admission.ujian_perprody_m as b
+                on a.ID_ujian_perprody = b.ID
+                join db_academic.program_study as c
+                on c.ID = b.ID_ProgramStudy
+                join db_admission.register_formulir_jadwal_ujian as d
+                ON a.ID = d.ID_register_jadwal_ujian
+                JOIN db_admission.register_formulir as e
+                on e.ID = d.ID_register_formulir
+                join db_admission.register_verified as f
+                on e.ID_register_verified = f.ID
+                join db_admission.register_verification as g
+                on g.ID = f.RegVerificationID
+                join db_admission.register as h
+                on h.ID = g.RegisterID
+                where b.ID_ProgramStudy = ? and b.Active = 1 and d.ID not in(select ID_register_formulir_jadwal_ujian from db_admission.register_hasil_ujian)
+                GROUP by e.ID
+              )aa';
+      $query=$this->db->query($sql, array($ID_ProgramStudy))->result_array();
+      return $query[0]['total'];
+    }
+
     public function daftar_set_nilai_ujian_load_data_paging($limit, $start,$ID_ProgramStudy)
     {
       $sql = 'select c.Name as prody,a.ID_ujian_perprody,DATE(a.DateTimeTest) as tanggal
@@ -1082,6 +1108,69 @@ class M_admission extends CI_Model {
       $this->db->update('db_admission.formulir_number_offline_m', $dataSave);
     }
 
+    public function count_loadData_calon_mahasiswa($Nama,$selectProgramStudy,$Sekolah)
+    {
+      if($Nama != '%') {
+          $Nama = '"%'.$Nama.'%"'; 
+      }
+      else
+      {
+        $Nama = '"%"'; 
+      }
+      
+      if($selectProgramStudy != '%') {
+        $selectProgramStudy = '"%'.$selectProgramStudy.'%"'; 
+      }
+      else
+      {
+        $selectProgramStudy = '"%"'; 
+      }
+
+      if($Sekolah != '%') {
+        $Sekolah = '"%'.$Sekolah.'%"'; 
+      }
+      else
+      {
+        $Sekolah = '"%"'; 
+      }
+
+        $sql = 'select count(*) as total from (
+              select a.ID as ID_register_formulir
+              from db_admission.register_formulir as a
+              left JOIN db_admission.register_verified as b 
+              ON a.ID_register_verified = b.ID
+              left JOIN db_admission.register_verification as c
+              ON b.RegVerificationID = c.ID
+              left JOIN db_admission.register as d
+              ON c.RegisterID = d.ID
+              left JOIN db_admission.country as e
+              ON a.NationalityID = e.ctr_code
+              left JOIN db_employees.religion as f
+              ON a.ReligionID = f.IDReligion
+              left JOIN db_admission.register_jtinggal_m as g
+              ON a.ID_register_jtinggal_m = g.ID
+              left JOIN db_admission.country as h
+              ON a.ID_country_address = h.ctr_code
+              left JOIN db_admission.province as i
+              ON a.ID_province = i.ProvinceID
+              left JOIN db_admission.region as j
+              ON a.ID_region = j.RegionID
+              left JOIN db_admission.district as k
+              ON a.ID_districts = k.DistrictID
+              left JOIN db_admission.school_type as l
+              ON l.sct_code = a.ID_school_type
+              left JOIN db_admission.register_major_school as m
+              ON m.ID = a.ID_register_major_school
+              left JOIN db_admission.school as n
+              ON n.ID = d.SchoolID
+              left join db_academic.program_study as o
+              on o.ID = a.ID_program_study
+              where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID not in (select ID_register_formulir from db_admission.register_butuh_ujian) and  a.ID not in (select ID_register_formulir from db_admission.register_nilai) 
+            ) aa';
+           $query=$this->db->query($sql, array())->result_array();
+           return $query[0]['total'];
+    }
+
     public function loadData_calon_mahasiswa($limit, $start,$Nama,$selectProgramStudy,$Sekolah)
     {
       $arr_temp = array('data' => array());
@@ -1157,6 +1246,29 @@ class M_admission extends CI_Model {
       }
     }
 
+    public function count_daftar_set_nilai_rapor_load_data_paging($ID_ProgramStudy)
+    {
+      $sql = 'select count(*) as total from (
+                  select a.Name as NameCandidate,a.Email, d.ID as ID_register_formulir, e.bobot as Bobot, e.NamaUjian,f.SchoolName,f.CityName
+                  from db_admission.register as a
+                  join db_admission.register_verification as b
+                  on a.ID = b.RegisterID
+                  join db_admission.register_verified as c
+                  on b.ID = c.RegVerificationID
+                  join db_admission.register_formulir as d
+                  on c.ID = d.ID_register_verified
+                  join db_admission.ujian_perprody_m as e
+                  on e.ID_ProgramStudy = d.ID_program_study
+                  join db_admission.school as f
+                  on a.SchoolID = f.ID
+                  where d.ID_program_study = ? and e.Active = 1 and d.ID not in(select ID_register_formulir from db_admission.register_nilai)
+                  and  d.ID not in (select ID_register_formulir from db_admission.register_butuh_ujian)
+                  GROUP by d.ID
+              ) aa';
+      $query=$this->db->query($sql, array($ID_ProgramStudy))->result_array();
+      return $query[0]['total'];
+    }
+
     public function daftar_set_nilai_rapor_load_data_paging($limit, $start,$ID_ProgramStudy)
     {
       $sql = 'select a.Name as NameCandidate,a.Email, d.ID as ID_register_formulir, e.bobot as Bobot, e.NamaUjian,f.SchoolName,f.CityName
@@ -1227,6 +1339,69 @@ class M_admission extends CI_Model {
             $this->db->insert('db_admission.register_rangking', $dataSave);
           }
       } 
+    }
+
+    public function count_loadData_calon_mahasiswa_created($Nama,$selectProgramStudy,$Sekolah)
+    {
+      if($Nama != '%') {
+          $Nama = '"%'.$Nama.'%"'; 
+      }
+      else
+      {
+        $Nama = '"%"'; 
+      }
+      
+      if($selectProgramStudy != '%') {
+        $selectProgramStudy = '"%'.$selectProgramStudy.'%"'; 
+      }
+      else
+      {
+        $selectProgramStudy = '"%"'; 
+      }
+
+      if($Sekolah != '%') {
+        $Sekolah = '"%'.$Sekolah.'%"'; 
+      }
+      else
+      {
+        $Sekolah = '"%"'; 
+      }
+
+        $sql = 'select count(*) as total from (
+                  select a.ID as ID_register_formulir
+                from db_admission.register_formulir as a
+                Left JOIN db_admission.register_verified as b 
+                ON a.ID_register_verified = b.ID
+                Left JOIN db_admission.register_verification as c
+                ON b.RegVerificationID = c.ID
+                Left JOIN db_admission.register as d
+                ON c.RegisterID = d.ID
+                Left JOIN db_admission.country as e
+                ON a.NationalityID = e.ctr_code
+                Left JOIN db_employees.religion as f
+                ON a.ReligionID = f.IDReligion
+                Left JOIN db_admission.register_jtinggal_m as g
+                ON a.ID_register_jtinggal_m = g.ID
+                Left JOIN db_admission.country as h
+                ON a.ID_country_address = h.ctr_code
+                Left JOIN db_admission.province as i
+                ON a.ID_province = i.ProvinceID
+                Left JOIN db_admission.region as j
+                ON a.ID_region = j.RegionID
+                Left JOIN db_admission.district as k
+                ON a.ID_districts = k.DistrictID
+                Left JOIN db_admission.school_type as l
+                ON l.sct_code = a.ID_school_type
+                Left JOIN db_admission.register_major_school as m
+                ON m.ID = a.ID_register_major_school
+                Left JOIN db_admission.school as n
+                ON n.ID = d.SchoolID
+                Left join db_academic.program_study as o
+                on o.ID = a.ID_program_study
+                where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID in (select ID_register_formulir from db_admission.register_nilai where Status != "Verified") 
+              )aa';
+           $query=$this->db->query($sql, array())->result_array();
+           return $query[0]['total'];
     }
 
     public function loadData_calon_mahasiswa_created($limit, $start,$Nama,$selectProgramStudy,$Sekolah)
@@ -1829,6 +2004,17 @@ class M_admission extends CI_Model {
       }
      }
 
+     public function count_getDataCalonMhsTuitionFee_approved()
+     {
+      $sql= ' select count(*) as total from (
+              select ID from db_finance.register_admisi
+              where Status = "Approved"
+              group by ID_register_formulir
+            )aa';
+           $query=$this->db->query($sql, array())->result_array();
+      return $query[0]['total'];
+     }
+
     public function getDataCalonMhsTuitionFee_approved($limit, $start)
     {
      $arr_temp = array();
@@ -1858,7 +2044,7 @@ class M_admission extends CI_Model {
              on o.ID = a.ID_program_study
              join db_finance.register_admisi as p
              on a.ID = p.ID_register_formulir
-             where p.Status = "Approved" group by a.ID LIMIT '.$start. ', '.$limit;
+             where p.Status = "Approved" group by a.ID order by a.ID desc LIMIT '.$start. ', '.$limit;
      $query=$this->db->query($sql, array())->result_array();
      $this->load->model('master/m_master');
      $jpa = $this->m_master->showData_array('db_admission.register_dsn_jpa');

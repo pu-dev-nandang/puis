@@ -10,6 +10,7 @@ class C_dashboard extends Globalclass {
     public function temp($content)
     {
         parent::template($content);
+        $this->load->model('master/m_master');
     }
 
     public function index()
@@ -17,6 +18,8 @@ class C_dashboard extends Globalclass {
         $data['department'] = parent::__getDepartement();
         // print_r(APPPATH.'views/page/'.$data['department'].'/dashboard.php');die();
         if (file_exists(APPPATH.'views/page/'.$data['department'].'/dashboard.php')) {
+            $getSemester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+            $data['getSemester'] = $getSemester;
             $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
             $this->temp($content);
         }
@@ -304,6 +307,12 @@ class C_dashboard extends Globalclass {
         }
 
         rsort($arrDB);
+        $taDb = $this->m_master->showData_array('db_admission.set_ta');
+        $taDb = $taDb[0]['Ta'];
+         if(!in_array($taDb, $arrDB))
+           {
+              $arrDB[] = $taDb;
+           }
         // get paid off
         $Paid_Off = array();
         $Unpaid_Off = array();
@@ -393,6 +402,13 @@ class C_dashboard extends Globalclass {
         }
 
         rsort($arrDB);
+        $taDb = $this->m_master->showData_array('db_admission.set_ta');
+        $taDb = $taDb[0]['Ta'];
+         if(!in_array($taDb,$arrDB))
+           {
+              $arrDB[] = $taDb;
+           }
+
         $Paid_Off = array();
         for ($i=0; $i < count($arrDB); $i++) { 
             // lunas

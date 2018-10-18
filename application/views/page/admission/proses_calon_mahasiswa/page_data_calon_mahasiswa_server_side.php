@@ -4,7 +4,7 @@
     <div class="col-md-12 formAddFormKD">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i> Data Registrasi Mahasiswa</h4>
+                <h4 class="header"><i class="icon-reorder"></i> <?php echo $NameMenu ?></h4>
                 <!-- <div class="toolbar no-padding">
                     <div class="btn-group">
                       <span data-smt="" class="btn btn-xs btn-add">
@@ -120,8 +120,8 @@
                                '<th>Beasiswa</th>'+
                                '<th>Document</th>'+
                                '<th>Tagihan</th>'+
-                               '<th>Detail Payment</th>'+
-                               '<th>Status Payment</th>'+
+                               '<th>Detail</th>'+
+                               '<th>Status</th>'+
                                '<th>Login</th>'+
                            '</tr>'+
                            '</thead>'+

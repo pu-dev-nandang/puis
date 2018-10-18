@@ -3,7 +3,7 @@
     <div class="col-md-12 formAddFormKD">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i> Set Tuition Fee</h4>
+                <h4 class="header"><i class="icon-reorder"></i> <?php echo $NameMenu ?></h4>
             </div>
             <div class="widget-content">
                 <!--  -->

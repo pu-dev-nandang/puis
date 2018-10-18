@@ -877,6 +877,7 @@ $route['testApprove'] = 'page/finance/c_finance/testApprove';
 $route['testInject'] = 'api/c_global/testInject';
 $route['testInject2'] = 'api/c_global/testInject2';
 $route['testInject3'] = 'api/c_global/testInject3';
+$route['testInject4'] = 'api/c_global/testInject4';
 
 
 // Pengawas Ujian

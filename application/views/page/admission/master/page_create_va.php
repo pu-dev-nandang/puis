@@ -37,7 +37,7 @@
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i> Create VA Register Online</h4>
+                <h4 class="header"><i class="icon-reorder"></i> <?php echo $NameMenu ?></h4>
             </div>
             <div class="widget-content">
                 <!--  -->

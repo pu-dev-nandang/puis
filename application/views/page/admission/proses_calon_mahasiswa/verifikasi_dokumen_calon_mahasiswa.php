@@ -2,7 +2,7 @@
 	<div class="col-md-12">
 		<div class="widget box">
 			<div class="widget-header">
-				<h4><i class="icon-reorder"></i>Verifikasi Dokumen Calon Mahasiswa</h4>
+				<h4><i class="icon-reorder"></i><?php echo $NameMenu ?></h4>
 			</div>
 			<div class="widget-content">
 				<div class = "row">	

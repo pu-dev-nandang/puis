@@ -8,7 +8,7 @@
 	<div class="col-md-12">
 		<div class="widget box">
 			<div class="widget-header">
-				<h4><i class="icon-reorder"></i>Set Nilai Ujian</h4>
+				<h4><i class="icon-reorder"></i><?php echo $NameMenu ?></h4>
 			</div>
 			<div class="widget-content">
 				<div class = "row">	
@@ -21,11 +21,10 @@
 					<!-- <div  class="col-xs-4" align="right" id="pagination_link"></div>	 -->
 					<!-- <div class = "table-responsive" id= "register_document_table"></div> -->
 				</div>
-				<br>	
-				<div class = 'row'>
+				<div class = 'row' style="margin-top: 10px">
 					<div  class="col-xs-12" align="right" id="pagination_link"></div>
 				</div>
-				<div class = 'row'>
+				<div class = 'row' style="margin-top: 10px">
 					<div id='loadTableData' class="col-md-12"></div>
 				</div>
 			</div>

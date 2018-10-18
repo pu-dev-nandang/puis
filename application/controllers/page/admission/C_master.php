@@ -11,6 +11,7 @@ class C_master extends Admission_Controler {
         $this->load->model('m_sendemail');
         $this->load->model('master/m_master');
         $this->data['department'] = parent::__getDepartement();
+        $this->data['NameMenu'] = $this->GlobalData['NameMenu'];
         //$this->checkAuth_user();
     }
 

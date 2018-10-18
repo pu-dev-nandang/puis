@@ -37,12 +37,12 @@
     <div class="col-md-12 formAddFormKD">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i> SMA / SMK</h4>
+                <h4 class="header"><i class="icon-reorder"></i> <?php echo $NameMenu ?></h4>
                 <?php if ($approval == 0): ?>
                     <div class="toolbar no-padding">
                         <div class="btn-group">
                           <span data-smt="" class="btn btn-xs btn-add">
-                            <i class="icon-plus"></i> Add Sekolah
+                            <i class="icon-plus"></i> Add
                            </span>
                         </div>
                     </div>

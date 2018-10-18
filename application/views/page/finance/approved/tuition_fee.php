@@ -13,10 +13,14 @@
                             <li role="presentation" class="active"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee/1">Approve Tuition Fee</a></li>
                             <li role="presentation"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee_approved/1">Tuition Fee Approved</a></li>
                         </ul>
-                        <div  class="col-xs-12" align="right" id="pagination_link"></div>
-                        <div id="dataPageLoad" style="margin-top:0px;">
-                            
-                        </div>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 10px;margin-left: 0px;margin-right: 10px">
+                  <div  class="col-xs-12" align="right" id="pagination_link"></div>  
+                </div>
+                <div class="row" style="margin-top: 10px;margin-left: 0px;margin-right: 10px">
+                    <div id="dataPageLoad" style="margin-top:0px;">
+                        
                     </div>
                 </div>
             </div>

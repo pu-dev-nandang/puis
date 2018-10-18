@@ -269,6 +269,20 @@ class C_global extends CI_Controller {
 
     }
 
+    public function testInject4()
+    {
+        $get = $this->m_master->showData_array('db_admission.formulir_number_offline_m');
+        for ($i=0; $i < count($get); $i++) { 
+            $Link = $get[$i]['Link'];
+            $Link = str_replace('http://admission.podomorouniversity.ac.id/', 'http://localhost/registeronline/', $Link);
+            $dataSave = array(
+                    'Link' => $Link,
+                            );
+            $this->db->where('ID',$get[$i]['ID']);
+            $this->db->update('db_admission.formulir_number_offline_m', $dataSave);
+        }
+    }
+
     // public function page_mahasiswa()
     // {
     //     $content = $this->load->view('page/academic'.'/master/students/students','',true);

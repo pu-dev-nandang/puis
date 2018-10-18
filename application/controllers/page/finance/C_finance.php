@@ -142,7 +142,7 @@ class C_finance extends Finnance_Controler {
     public function tuition_fee_approve($page = null)
     {
         $this->load->library('pagination');
-        $config = $this->config_pagination_default_ajax(1000,5,5);
+        $config = $this->config_pagination_default_ajax($this->m_admission->count_getDataCalonMhsTuitionFee_delete(),5,5);
         $this->pagination->initialize($config);
         $page = $this->uri->segment(5);
         $start = ($page - 1) * $config["per_page"];
@@ -400,7 +400,7 @@ class C_finance extends Finnance_Controler {
     public function tuition_fee_approved()
     {
         $this->load->library('pagination');
-        $config = $this->config_pagination_default_ajax(1000,15,5);
+        $config = $this->config_pagination_default_ajax($this->m_admission->count_getDataCalonMhsTuitionFee_approved(),15,5);
         $this->pagination->initialize($config);
         $page = $this->uri->segment(5);
         $start = ($page - 1) * $config["per_page"];
