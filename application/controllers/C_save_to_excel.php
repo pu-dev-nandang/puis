@@ -1312,6 +1312,7 @@ class C_save_to_excel extends CI_Controller
 
         // exit else ajax
     }
+
     public function export_PenjualanFormulirData()
     {
         $this->load->model('admission/m_admission');
@@ -1727,4 +1728,126 @@ class C_save_to_excel extends CI_Controller
 
 
 
+    // ===== REKAP IPS IPK ======
+
+    public function cumulative_recap(){
+        $token = $this->input->post('token');
+        $data_arr = $this->getInputToken($token);
+
+        $data = $this->m_save_to_excel->_getCumulativeRecap($data_arr);
+
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+
+
+        // Panggil class PHPExcel nya
+        $excel = new PHPExcel();
+
+        $pr = 'REKAP IPS IPK '.$data_arr['Year'];
+
+        // Settingan awal fil excel
+        $excel->getProperties()->setCreator('IT PU')
+            ->setLastModifiedBy('IT PU')
+            ->setTitle($pr)
+            ->setSubject($pr)
+            ->setDescription($pr)
+            ->setKeywords($pr);
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari header tabel
+        $style_col = array(
+            'font' => array('bold' => true), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            ),
+            'fill' => array(
+                'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                'color' => array('rgb' => '33cccc')
+            )
+        );
+
+
+        $style_col_fill = array(
+            'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        $excel->setActiveSheetIndex(0)->setCellValue('A1', $pr); // Set kolom A1 dengan tulisan "DATA KARYAWAN"
+        $excel->getActiveSheet()->mergeCells('A1:F1'); // Set Merge Cell pada kolom A1 sampai O1
+        $excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(TRUE); // Set bold kolom A1
+        $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(15); // Set font size 15 untuk kolom A1
+        $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER); // Set text center untuk kolom A1
+
+
+        // Buat header tabel nya pada baris ke 3
+        $excel->setActiveSheetIndex(0)->setCellValue('A3', "NIM"); // Set kolom A3 dengan tulisan "NIK"
+        $excel->setActiveSheetIndex(0)->setCellValue('B3', "Nama");
+        $excel->setActiveSheetIndex(0)->setCellValue('C3', "SKS IPS");
+        $excel->setActiveSheetIndex(0)->setCellValue('D3', "IPS");
+        $excel->setActiveSheetIndex(0)->setCellValue('E3', "Total SKS");
+        $excel->setActiveSheetIndex(0)->setCellValue('F3', "IPK");
+
+        // Apply style header yang telah kita buat tadi ke masing-masing kolom header
+        $excel->getActiveSheet()->getStyle('A3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('B3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('C3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('D3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('E3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('F3')->applyFromArray($style_col);
+
+        $numrow = 4; // Set baris pertama untuk isi tabel adalah baris ke 4
+
+        if(count($data)>0){
+            foreach ($data AS $item){
+                // Buat header tabel nya pada baris ke 3
+                $excel->setActiveSheetIndex(0)->setCellValue('A'.$numrow, $item['NPM']);
+                $excel->setActiveSheetIndex(0)->setCellValue('B'.$numrow, $item['Name']);
+                $excel->setActiveSheetIndex(0)->setCellValue('C'.$numrow, $item['IPS_TotalCredit']);
+                $excel->setActiveSheetIndex(0)->setCellValue('D'.$numrow, $item['IPS']);
+                $excel->setActiveSheetIndex(0)->setCellValue('E'.$numrow, $item['IPK_TotalCredit']);
+                $excel->setActiveSheetIndex(0)->setCellValue('F'.$numrow, $item['IPK']);
+
+                // Apply style header yang telah kita buat tadi ke masing-masing kolom header
+                $excel->getActiveSheet()->getStyle('A'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('B'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('C'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('D'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('E'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('F'.$numrow)->applyFromArray($style_col_fill);
+                $numrow += 1;
+            };
+        }
+
+        foreach(range('A','Z') as $columnID) {
+            $excel->getActiveSheet()->getColumnDimension($columnID)
+                ->setAutoSize(true);
+        }
+
+        // Proses file excel
+        $filename = str_replace(' ','_',$pr).".xlsx";
+        //$FILEpath = "./dokument/".$filename;
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename='.$filename); // Set nama file excel nya
+        header('Cache-Control: max-age=0');
+
+        $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $write->save('php://output');
+
+    }
+
+    // ===== PENUTUP REKAP IPS IPK ======
 }

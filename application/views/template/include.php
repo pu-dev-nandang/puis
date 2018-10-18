@@ -502,7 +502,7 @@
     function loadSelectOptionCurriculum(element,selected) {
         var url = base_url_js+"api/__getKurikulumSelectOption";
         $.get(url,function (data_json) {
-            console.log(data_json);
+            // console.log(data_json);
             for(var i=0;i<data_json.length;i++){
 
                 var sc = '';
@@ -513,6 +513,16 @@
                 }
 
                 $(element).append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'" '+sc+'>'+data_json[i].NameEng+'</option>');
+            }
+        });
+    }
+
+    function loadSelectOptionCurriculumNoSelect(element) {
+        var url = base_url_js+"api/__getKurikulumSelectOption";
+        $.get(url,function (data_json) {
+            // console.log(data_json);
+            for(var i=0;i<data_json.length;i++){
+                $(element).append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'">'+data_json[i].NameEng+'</option>');
             }
         });
     }

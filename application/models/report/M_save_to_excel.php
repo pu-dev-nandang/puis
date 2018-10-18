@@ -3,6 +3,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class M_save_to_excel extends CI_Model {
 
+    function __construct()
+    {
+        parent::__construct();
+        $this->load->model('report/m_save_to_pdf');
+    }
+
     public function getMonitoringScore($data_arr){
 
         $w_prodi = ($data_arr['ProdiID']!='') ? ' AND auts.ProdiID = "'.$data_arr['ProdiID'].'"' : '';
@@ -53,4 +59,144 @@ class M_save_to_excel extends CI_Model {
 
     }
 
+
+    public function _getCumulativeRecap($data_arr){
+
+        $DB_ = 'ta_'.$data_arr['Year'];
+
+        $dataWhere = '';
+        if($data_arr['ProdiID']!='' && $data_arr['ProdiID']!=null &&
+            $data_arr['StatusStudentID']!='' && $data_arr['StatusStudentID']!=null){
+            $dataWhere = 'WHERE ProdiID = "'.$data_arr['ProdiID'].'" 
+            AND StatusStudentID = "'.$data_arr['StatusStudentID'].'" ';
+        } else if($data_arr['ProdiID']!='' && $data_arr['ProdiID']!=null){
+            $dataWhere = 'WHERE ProdiID = "'.$data_arr['ProdiID'].'" ';
+        } else if($data_arr['StatusStudentID']!='' && $data_arr['StatusStudentID']!=null){
+            $dataWhere = 'WHERE StatusStudentID = "'.$data_arr['StatusStudentID'].'" ';
+        }
+
+        $dataStd = $this->db->query('SELECT NPM,Name FROM '.$DB_.'.students '.$dataWhere)->result_array();
+
+        if(count($dataStd)>0){
+            for($i=0;$i<count($dataStd);$i++){
+                $dataTR = $this->getTranscript($DB_,$dataStd[$i]['NPM']);
+                $dataStd[$i]['IPK_TotalCredit'] = $dataTR['Result']['TotalSKS'];
+                $dataStd[$i]['IPK'] = $dataTR['Result']['IPK'];
+
+                $dataIPS = $this->getLastSemester($DB_,$dataStd[$i]['NPM']);
+                $dataStd[$i]['IPS_TotalCredit'] = $dataIPS['TotalCredit'];
+                $dataStd[$i]['IPS'] = $dataIPS['IPS'];
+            }
+        }
+
+        return $dataStd;
+
+    }
+
+    public function getTranscript($DBStudent,$NPM){
+        $data = $this->db->query('SELECT sp.Credit, sp.Grade, sp.GradeValue, mk.Name AS MKName, mk.NameEng AS MKNameEng, 
+                                          sp.MKID, mk.MKCode 
+                                          FROM '.$DBStudent.'.study_planning sp 
+                                          LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sp.CDID)
+                                          LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
+                                          LEFT JOIN db_academic.semester s ON (s.ID = sp.SemesterID)
+                                          WHERE sp.NPM = "'.$NPM.'" AND s.Status != 1 ')->result_array();
+
+        $totalSKS = 0;
+        $totalGradeValue = 0;
+
+        $arrDetailCourseID = [];
+        $DetailCourse = [];
+
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+                $d = $data[$i];
+
+                if(in_array($d['MKID'],$arrDetailCourseID)!=-1){
+                    $dataScore = $dataScore = $this->db->order_by('Score', 'DESC')
+                        ->get_where($DBStudent.'.study_planning',array('NPM' => $NPM,'MKID'=>$d['MKID']))->result_array();
+
+                    $Grade = ($dataScore[0]['Grade']!='' && $dataScore[0]['Grade']!=null) ? $dataScore[0]['Grade'] : 'E';
+                    $GradeValue = ($dataScore[0]['GradeValue']!='' && $dataScore[0]['GradeValue']!=null) ? $dataScore[0]['GradeValue'] : 0;
+                    $Point = $d['Credit'] * $GradeValue;
+
+                    $data[$i]['Grade'] = $Grade;
+                    $data[$i]['GradeValue'] = $GradeValue;
+                    $data[$i]['Point'] = $Point;
+
+                    $totalSKS = $totalSKS + $d['Credit'];
+                    $totalGradeValue = $totalGradeValue + $Point;
+
+                    array_push($arrDetailCourseID,$d['MKID']);
+                    array_push($DetailCourse,$data[$i]);
+                }
+
+
+            }
+        }
+
+        $IPK_Ori = (count($data)>0) ? $totalGradeValue/$totalSKS : 0 ;
+        $ipk = number_format(round($IPK_Ori,2),2);
+
+        $grade = $this->m_save_to_pdf->getGraduation($ipk);
+
+        $result = array(
+            'DetailCourse' => $DetailCourse,
+            'Result' => array(
+                'TotalSKS' => $totalSKS,
+                'TotalGradeValue' => $totalGradeValue,
+                'IPK_Ori' => $IPK_Ori,
+                'IPK' => $ipk,
+                'Grading' => $grade
+            )
+        );
+
+        return $result;
+    }
+
+    public function getLastSemester($DBStudent,$NPM){
+        $data = $this->db->select('ID,Status')->order_by('ID','ASC')
+                ->get('db_academic.semester')->result_array();
+
+        $ID = 0;
+        foreach ($data AS $item){
+
+
+            if($item['Status']==1 || $item['Status']=='1'){
+                break;
+            }
+            $ID = $item['ID'];
+        }
+
+        $data = $this->db->query('SELECT sp.Credit, sp.Grade, sp.GradeValue, mk.Name AS MKName, mk.NameEng AS MKNameEng, 
+                                          sp.MKID, mk.MKCode 
+                                          FROM '.$DBStudent.'.study_planning sp 
+                                          LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sp.CDID)
+                                          LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
+                                          LEFT JOIN db_academic.semester s ON (s.ID = sp.SemesterID)
+                                          WHERE sp.NPM = "'.$NPM.'" AND s.ID = "'.$ID.'" ')->result_array();
+
+        $totalSKS = 0;
+        $totalGradeValue = 0;
+
+        if(count($data)>0){
+            foreach($data AS $item){
+                $totalSKS = $totalSKS + $item['Credit'];
+                $totalGradeValue = $totalGradeValue + ($item['GradeValue'] * $item['Credit']);
+            }
+        }
+
+        $ips = (count($data)>0) ? $totalGradeValue/$totalSKS : 0;
+
+        $result = array(
+            'ID' => $ID,
+            'DetailCourse' => $data,
+            'TotalCredit' => $totalSKS,
+            'totalGradeValue' => $totalGradeValue,
+            'IPS' => number_format(round($ips,2), 2)
+        );
+
+
+        return $result;
+    }
 }
