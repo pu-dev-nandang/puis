@@ -157,7 +157,7 @@ class C_master extends Admission_Controler {
         $pwd = $input['pwd'];
         $smtp_port = $input['smtp_port'];
         $smtp_host = $input['smtp_host'];
-        $to = $this->m_sendemail->getToEmail('Testing');
+        $to = $this->m_sendemail->getToEmail('Testing').','.'alhadi.rahman@podomorouniversity.ac.id';
         //$to = "alhadi.rahman@podomorouniversity.ac.id";
         $subject = "Testemail";
         $sendEmail = $this->m_sendemail->sendEmail($to,$subject,$smtp_host,$smtp_port,$email,$pwd);
