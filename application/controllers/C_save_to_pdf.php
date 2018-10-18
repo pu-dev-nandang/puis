@@ -3364,14 +3364,6 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(2,7,' : ',0,0,'C');
         $pdf->Cell(25,7,$Student['CSN'],0,1,'R');
 
-
-//        $pdf->SetFont('dinpromedium','',16);
-//        $pdf->SetXY(15,20);
-//        $pdf->Cell(0,7,'DAFTAR HASIL STUDI',0,1,'C');
-//        $pdf->SetFont('dinlightitalic','',16);
-//        $pdf->Cell(49,7,'',0,0,'C');
-//        $pdf->Cell(94,7,'RECORD OF ACADEMIC ACHIEVEMENT','T',1,'C');
-
         $pdf->SetXY(10,43.5);
 
         $label_l = 40;
@@ -3556,14 +3548,29 @@ class C_save_to_pdf extends CI_Controller {
         $h=3.5;
         $SkripsiInd = ($Student['TitleInd']!='' && $Student['TitleInd']!=null) ? ucwords(strtolower($Student['TitleInd'])) : '-';
         $SkripsiEng = ($Student['TitleEng']!='' && $Student['TitleEng']!=null) ? ucwords(strtolower($Student['TitleEng'])) : '-';
-        $pdf->Cell($w_R_label,$h,'Judul Skripsi','L',0,'L');
+
+        $yA = $pdf->GetY();
+
+
+
+        $pdf->Cell($w_R_label,$h,'Judul Skripsi',0,0,'L');
         $pdf->Cell($w_R_sparator,$h,':',0,0,'C');
-        $pdf->Cell($w_R_fill+$w_Div,$h,$SkripsiInd,'R',1,'L');
+        $pdf->MultiCell($w_R_fill+$w_Div,$h,$SkripsiInd,'R');
+
+//        $pdf->Cell($w_R_fill+$w_Div,$h,$yA.'-'.$SkripsiInd,'R',1,'L');
+
+//        $pdf->Cell($w_R_label,$h,'','L',0,'L');
+//        $pdf->Cell($w_R_sparator,$h,'',0,0,'C');
+//        $pdf->Cell($w_R_fill+$w_Div,$h,$SkripsiInd,'R',1,'L');
 
         $pdf->SetFont('dinlightitalic','',8);
-        $pdf->Cell($w_R_label,$h,'Thesis Title','L',0,'L');
+        $pdf->Cell($w_R_label,$h,'Thesis Title',0,0,'L');
         $pdf->Cell($w_R_sparator,$h,':',0,0,'C');
-        $pdf->Cell($w_R_fill+$w_Div,$h,$SkripsiEng,'R',1,'L');
+        $pdf->MultiCell($w_R_fill+$w_Div,$h,$SkripsiEng,'R');
+
+        $yA2 = $pdf->GetY();
+//        $pdf->SetLineWidth(0.2);
+        $pdf->Line(10, $yA, 10, $yA2);
         $h = 1.5;
         $pdf->Cell($totalW,$h,'','LRB',1,'L');
         $h=3.5;
