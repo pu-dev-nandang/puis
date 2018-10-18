@@ -1,11 +1,11 @@
 
 <div class="tabbable tabbable-custom tabbable-full-width">
     <ul class="nav nav-tabs">
-        <li class="<?php if($this->uri->segment(2)=='score') { echo 'active'; } ?>">
+        <li class="<?php if($this->uri->segment(2)=='score' && $this->uri->segment(3)=='') { echo 'active'; } ?>">
             <a href="<?php echo base_url('academic/score'); ?>">Score</a>
         </li>
-        <li class="<?php if($this->uri->segment(2)=='monitoring-score') { echo 'active'; } ?>">
-            <a href="<?php echo base_url('academic/monitoring-score'); ?>">Monitoring Score</a>
+        <li class="<?php if($this->uri->segment(3)=='monitoring-score') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('academic/score/monitoring-score'); ?>">Monitoring Score</a>
         </li>
     </ul>
     <div style="border-top: 1px solid #cccccc">

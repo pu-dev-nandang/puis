@@ -131,7 +131,10 @@
                     '                <th rowspan="2" style="width: 7%;">Group</th>' +
                     '                <th rowspan="2" style="width: 15%;">Lecturer</th>' +
                     '                <th colspan="5" style="width: 10%;">Assignment Score</th>' +
-                    '                <th colspan="2" style="width: 10%;">Exam Score</th>' +
+                    '                <th colspan="2" style="width: 10%;">Exam</th>' +
+                    '                <th rowspan="2" style="width: 5%;">Score</th>' +
+                    '                <th rowspan="2" style="width: 5%;">Grade</th>' +
+
                     '            </tr>' +
                     '            <tr>' +
                     '                <th style="width: 3%;">1</th>' +

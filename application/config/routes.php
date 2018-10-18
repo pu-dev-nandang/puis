@@ -86,7 +86,7 @@ $route['academic/exam-schedule/edit-exam-schedule/(:num)'] = 'page/academic/c_ja
 // ---- Score ----
 $route['academic/score'] =  'page/academic/c_score';
 $route['academic/inputScore'] =  'page/academic/c_score/inputScore';
-$route['academic/monitoring-score'] =  'page/academic/c_score/monitoring_score';
+$route['academic/score/monitoring-score'] =  'page/academic/c_score/monitoring_score';
 
 // ---- Transcript ----
 $route['academic/transcript'] =  'page/academic/c_transcript';

@@ -4428,7 +4428,8 @@ class C_api extends CI_Controller {
 
         $DB_ = 'ta_'.$data_arr['Year'];
         $queryDefault = 'SELECT s.ID,auts.NPM,auts.Name, s.ClassGroup, em.Name AS CoordinatorName, 
-                                     sp.Evaluasi1, sp.Evaluasi2, sp.Evaluasi3, sp.Evaluasi4, sp.Evaluasi5, sp.UTS, sp.UAS
+                                     sp.Evaluasi1, sp.Evaluasi2, sp.Evaluasi3, sp.Evaluasi4, sp.Evaluasi5, sp.UTS, sp.UAS,
+                                      sp.Score, sp.Grade
                                     FROM '.$DB_.'.study_planning sp
                                     LEFT JOIN db_academic.auth_students auts ON (auts.NPM = sp.NPM)
                                     LEFT JOIN db_academic.schedule s ON (s.ID = sp.ScheduleID)
@@ -4479,6 +4480,8 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div style="text-align:center;">'.$ev5.'</div>';
             $nestedData[] = '<div style="text-align:center;">'.$UTS.'</div>';
             $nestedData[] = '<div style="text-align:center;">'.$UAS.'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$row['Score'].'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$row['Grade'].'</div>';
 
             $data[] = $nestedData;
             $no++;

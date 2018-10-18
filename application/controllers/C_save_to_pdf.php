@@ -3017,7 +3017,8 @@ class C_save_to_pdf extends CI_Controller {
 //        print_r($dataStudent);
 //        exit;
 
-        $pdf = new FPDF('P','mm','A4');
+//        $pdf = new FPDF('P','mm','A4');
+        $pdf = new FPDF('P','mm','legal');
 
         // membuat halaman baru
         $pdf->SetMargins(10,5,10);
@@ -3295,7 +3296,7 @@ class C_save_to_pdf extends CI_Controller {
 
             $pdf->Cell($w_no,$h,($no++),$border,0,'C');
 //            $pdf->Cell($w_smt,$h,'1',$border,0,'C');
-            $pdf->Cell($w_kode,$h,$d['MKCode'],$border,0,'C');
+            $pdf->Cell($w_kode,$h,$pdf->GetY().''.$d['MKCode'],$border,0,'C');
             $pdf->Cell($w_mk+$w_smt,$h,$d['MKName'.$mk],$border,0,'L');
             $pdf->Cell($w_f,$h,$d['Credit'],$border,0,'C');
             $pdf->Cell($w_f,$h,$d['Grade'],$border,0,'C');
@@ -3304,7 +3305,7 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Cell($w_f,$h, number_format($d['GradeValue'],2),$border,0,'C');
             $pdf->Cell($w_fv,$h, number_format($d['Point'],2),$border,1,'C');
 
-            if($pdf->GetY()>235){
+            if($pdf->GetY()>287){
                 // membuat halaman baru
                 $pdf->SetMargins(10,5,10);
                 $pdf->AddPage();
@@ -3342,7 +3343,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_smt+$w_no+$w_kode+$w_mk,$h,'',$border,0,'R');
         $pdf->Cell((3*$w_f)+$w_fv,$h,$ttdb,$border,1,'L');
 
-        $pdf->Ln(20);
+        $pdf->Ln(15);
 
         $nm = $Warek1['TitleAhead'].' '.ucwords(strtolower($Warek1['Name'])).', '.$Warek1['TitleBehind'];
         $pdf->Cell($w_smt+$w_no+$w_kode+$w_mk,$h,'',$border,0,'R');
@@ -3501,7 +3502,7 @@ class C_save_to_pdf extends CI_Controller {
             if($pdf->GetY()>=324){
                 $pdf->SetMargins(10,10,10);
                 $pdf->AddPage();
-                $pdf->SetXY(10,43.5);
+//                $pdf->SetXY(10,43.5);
                 $this->header_transcript_table($pdf);
             }
         }
