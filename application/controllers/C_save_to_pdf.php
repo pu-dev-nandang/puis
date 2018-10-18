@@ -3546,8 +3546,8 @@ class C_save_to_pdf extends CI_Controller {
         $h = 1.5;
         $pdf->Cell($totalW,$h,'','LRT',1,'L');
         $h=3.5;
-        $SkripsiInd = ($Student['TitleInd']!='' && $Student['TitleInd']!=null) ? ucwords(strtolower($Student['TitleInd'])) : '-';
-        $SkripsiEng = ($Student['TitleEng']!='' && $Student['TitleEng']!=null) ? ucwords(strtolower($Student['TitleEng'])) : '-';
+        $SkripsiInd = ($Student['TitleInd']!='' && $Student['TitleInd']!=null) ? $Student['TitleInd'] : '-';
+        $SkripsiEng = ($Student['TitleEng']!='' && $Student['TitleEng']!=null) ? $Student['TitleEng'] : '-';
 
         $yA = $pdf->GetY();
 
@@ -3555,7 +3555,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->Cell($w_R_label,$h,'Judul Skripsi',0,0,'L');
         $pdf->Cell($w_R_sparator,$h,':',0,0,'C');
-        $pdf->MultiCell($w_R_fill+$w_Div,$h,$SkripsiInd,'R');
+        $pdf->MultiCell($w_R_fill+$w_Div-2,$h,$SkripsiInd,0);
 
 //        $pdf->Cell($w_R_fill+$w_Div,$h,$yA.'-'.$SkripsiInd,'R',1,'L');
 
@@ -3566,11 +3566,12 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinlightitalic','',8);
         $pdf->Cell($w_R_label,$h,'Thesis Title',0,0,'L');
         $pdf->Cell($w_R_sparator,$h,':',0,0,'C');
-        $pdf->MultiCell($w_R_fill+$w_Div,$h,$SkripsiEng,'R');
+        $pdf->MultiCell($w_R_fill+$w_Div-2,$h,$SkripsiEng,0);
 
         $yA2 = $pdf->GetY();
 //        $pdf->SetLineWidth(0.2);
         $pdf->Line(10, $yA, 10, $yA2);
+        $pdf->Line(10+$w_R_label+$w_R_sparator+$w_R_fill+$w_Div, $yA, 10+$w_R_label+$w_R_sparator+$w_R_fill+$w_Div, $yA2);
         $h = 1.5;
         $pdf->Cell($totalW,$h,'','LRB',1,'L');
         $h=3.5;
