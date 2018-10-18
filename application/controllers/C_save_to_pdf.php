@@ -3071,7 +3071,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->Ln(3.5);
 
-        $this->headerTable($pdf);
+        $this->headerTable('ind',$pdf);
         $this->body_temp_transcript('ind',$pdf,$dataStudent,$dataTempTr);
 
 
@@ -3122,7 +3122,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->Ln(3.5);
 
-        $this->headerTable($pdf);
+        $this->headerTable('eng',$pdf);
         $this->body_temp_transcript('eng',$pdf,$dataStudent,$dataTempTr);
 
 
@@ -3225,7 +3225,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinprolight','',7);
     }
 
-    private function headerTable($pdf){
+    private function headerTable($lang,$pdf){
         $border = 1;
 
         $w_no = 8;
@@ -3236,14 +3236,26 @@ class C_save_to_pdf extends CI_Controller {
         $w_fv = 18;
         $h=4.3;
         $pdf->SetFillColor(226, 226, 226);
-        $pdf->Cell($w_no,$h,'No.',$border,0,'C',true);
-//        $pdf->Cell($w_smt,$h,'Smt',$border,0,'C',true);
-        $pdf->Cell($w_kode,$h,'Kode',$border,0,'C',true);
-        $pdf->Cell($w_mk+$w_smt,$h,'Mata Kuliah',$border,0,'C',true);
-        $pdf->Cell($w_f,$h,'SKS',$border,0,'C',true);
-        $pdf->Cell($w_f,$h,'Nilai',$border,0,'C',true);
-        $pdf->Cell($w_f,$h,'Bobot',$border,0,'C',true);
-        $pdf->Cell($w_fv,$h,'SKS X Bobot',$border,1,'C',true);
+
+        if($lang=='ind') {
+            $pdf->Cell($w_no,$h,'No.',$border,0,'C',true);
+            $pdf->Cell($w_kode,$h,'Kode',$border,0,'C',true);
+            $pdf->Cell($w_mk+$w_smt,$h,'Mata Kuliah',$border,0,'C',true);
+            $pdf->Cell($w_f,$h,'SKS',$border,0,'C',true);
+            $pdf->Cell($w_f,$h,'Nilai',$border,0,'C',true);
+            $pdf->Cell($w_f,$h,'Bobot',$border,0,'C',true);
+            $pdf->Cell($w_fv,$h,'SKS X Bobot',$border,1,'C',true);
+        } else {
+            $pdf->Cell($w_no,$h,'No.',$border,0,'C',true);
+            $pdf->Cell($w_kode,$h,'Code',$border,0,'C',true);
+            $pdf->Cell($w_mk+$w_smt,$h,'Course',$border,0,'C',true);
+            $pdf->Cell($w_f,$h,'Credit',$border,0,'C',true);
+            $pdf->Cell($w_f,$h,'Grade',$border,0,'C',true);
+            $pdf->Cell($w_f,$h,'Score',$border,0,'C',true);
+            $pdf->Cell($w_fv,$h,'Point',$border,1,'C',true);
+        }
+
+
 
         $pdf->SetFont('dinprolight','',7);
     }
@@ -3287,8 +3299,10 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Cell($w_mk+$w_smt,$h,$d['MKName'.$mk],$border,0,'L');
             $pdf->Cell($w_f,$h,$d['Credit'],$border,0,'C');
             $pdf->Cell($w_f,$h,$d['Grade'],$border,0,'C');
-            $pdf->Cell($w_f,$h,$d['GradeValue'],$border,0,'C');
-            $pdf->Cell($w_fv,$h,$d['Point'],$border,1,'C');
+//            $pdf->Cell($w_f,$h, (is_int($d['GradeValue'])) ? $d['GradeValue'] : number_format($d['GradeValue'],2),$border,0,'C');
+//            $pdf->Cell($w_fv,$h, (is_int($d['Point'])) ? $d['Point'] : number_format($d['Point'],2),$border,1,'C');
+            $pdf->Cell($w_f,$h, number_format($d['GradeValue'],2),$border,0,'C');
+            $pdf->Cell($w_fv,$h, number_format($d['Point'],2),$border,1,'C');
 
             if($pdf->GetY()>235){
                 // membuat halaman baru
@@ -3296,7 +3310,7 @@ class C_save_to_pdf extends CI_Controller {
                 $pdf->AddPage();
                 $this->header_temp_transcript($pdf,$dataTempTr);
                 $pdf->Ln(15);
-                $this->headerTable($pdf);
+                $this->headerTable($lang,$pdf);
             }
 
         }
