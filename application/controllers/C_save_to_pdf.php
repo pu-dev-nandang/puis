@@ -3939,17 +3939,16 @@ class C_save_to_pdf extends CI_Controller {
 
         // Dekan --
         $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].' ' : '';
-        $titleB = ($Student['TitleBehind']!='') ? ' '.$Student['TitleBehind'] : '' ;
+        $titleB = ($Student['TitleBehind']!='') ? $Student['TitleBehind'] : '' ;
 
-        $komaDekan = ($titleB!='') ? ',' : '';
-        $Dekan = $titleA.''.$Student['Dekan'].''.$komaDekan.''.$titleB;
+        $Dekan = $titleA.''.$Student['Dekan'].''.$titleB;
 
         // Rektor
         $Rektorat = $dataIjazah['Rektorat'][0];
         $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].' ' : '';
-        $titleBRektor = ($Rektorat['TitleBehind']!='')? ' '.$Rektorat['TitleBehind'] : '';
+        $titleBRektor = ($Rektorat['TitleBehind']!='')? $Rektorat['TitleBehind'] : '';
         $komaRektor = ($titleBRektor!='') ? ',' : '';
-        $Rektor = $titleARektor.''.$Rektorat['Name'].''.$komaRektor.''.$titleBRektor;
+        $Rektor = $titleARektor.''.$Rektorat['Name'].''.$titleBRektor;
         // ----
 
         $pdf->SetFont('dinpromedium','',$fn_b);
