@@ -3034,7 +3034,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(190,$h,$tr,0,1,'C');
 
         $pdf->SetFont('dinprolight','',7);
-        $pdf->Cell(190,$h,'No. : XXXX/UAP/AKD-TS/Bulan/Tahun',0,1,'C');
+        $pdf->Cell(190,$h,'No. : '.$dataTempTr['No'],0,1,'C');
 
         $border = 0;
 
@@ -3092,7 +3092,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(190,$h,$tr,0,1,'C');
 
         $pdf->SetFont('dinprolight','',7);
-        $pdf->Cell(190,$h,'No. : XXXX/UAP/AKD-TS/Bulan/Tahun',0,1,'C');
+        $pdf->Cell(190,$h,'No. : '.$dataTempTr['No'],0,1,'C');
 
         $border = 0;
 
