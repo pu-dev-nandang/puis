@@ -30,7 +30,7 @@
 	    	        '<th style="width: 5px;">No  <!--<input type="checkbox" class="uniform" value="nothing" id ="dataResultCheckAll">--></th>'+
 	    	        '<th style="width: 55px;">Nama,Prodi & Sekolah</th>'+
 	    	        '<th style="width: 55px;">Formulir Code</th>'+
-	    	        '<th style="width: 10%;">Beasiswa & File</th>'
+	    	        '<th style="width: 10%;">Beasiswa, File & Rangking</th>'
 	    	for (var i = 0; i < payment_type.length; i++) {
 	    	    table += '<th style="width: 75px;">'+payment_type[i].Abbreviation+'</th>' ;
 	    	    //table += '<th style="width: 70px;">Pot</th>';	
@@ -79,12 +79,14 @@
 				showFile = '-';
 			}
 
+			var Code = (getDataCalonMhs[i]['No_Ref'] != '') ? getDataCalonMhs[i]['FormulirCode'] + ' / ' + getDataCalonMhs[i]['No_Ref'] : getDataCalonMhs[i]['FormulirCode'];
+			var Rangking = (getDataCalonMhs[i]['RangkingRapor'] != 0) ? 'Rangking : '+getDataCalonMhs[i]['RangkingRapor'] : "";
 			$(".tableData tbody").append(
 					'<tr>'+
 						'<td align= "center">'+no+'&nbsp<input type="checkbox" class="uniform" nama ="'+getDataCalonMhs[i]['Name']+'" value ="'+getDataCalonMhs[i]['ID_register_formulir']+'" </td>'+
 						'<td>'+getDataCalonMhs[i]['Name']+'<br>'+getDataCalonMhs[i]['NamePrody']+'<br>'+getDataCalonMhs[i]['SchoolName']+'</td>'+
-						'<td>'+getDataCalonMhs[i]['FormulirCode']+'</td>'+
-						'<td>'+getDataCalonMhs[i]['getBeasiswa']+'<br>'+showFile+'</td>'+
+						'<td>'+Code+'</td>'+
+						'<td>'+getDataCalonMhs[i]['getBeasiswa']+'<br><br>'+Rangking+'<br><br>'+showFile+'</td>'+
 						isi_payment+
 					'</tr>' 	
 			);

@@ -141,6 +141,7 @@ class C_finance extends Finnance_Controler {
 
     public function tuition_fee_approve($page = null)
     {
+        // get grade
         $this->load->library('pagination');
         $config = $this->config_pagination_default_ajax($this->m_admission->count_getDataCalonMhsTuitionFee_delete(),5,5);
         $this->pagination->initialize($config);
@@ -153,6 +154,7 @@ class C_finance extends Finnance_Controler {
         $output = array(
         'pagination_link'  => $this->pagination->create_links(),
         'loadtable'   => $content,
+        'Grade' => $this->m_master->showData_array('db_academic.grade'),
         );
         echo json_encode($output);
     }

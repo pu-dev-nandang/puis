@@ -208,7 +208,7 @@ class C_global extends CI_Controller {
             $get2 = $this->m_master->caribasedprimary('db_admission.register_nilai','ID_register_formulir',$ID_register_formulir);
             for ($i=0; $i < count($get2); $i++) { 
                 $NamaUjian = $this->m_master->caribasedprimary('db_admission.ujian_perprody_m','ID',$get2[$i]['ID_ujian_perprody']);
-                $get2[$i] = $get2[$i] + array('NamaUjian' => $NamaUjian[0]['NamaUjian']);
+                $get2[$i] = $get2[$i] + array('NamaUjian' => $NamaUjian[0]['NamaUjian'],'Bobot' => $NamaUjian[0]['Bobot']);
             }
             $query = $get2;
         }

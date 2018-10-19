@@ -24,7 +24,7 @@
 			<thead>
 				<tr>
 					<th style="width: 10px;">No</th>
-					<th style="width: 200px;">Nama</th>
+					<th style="width: 200px;">Data</th>
 					<?php for ($i = 0; $i < count($mataujian); $i++): ?>
 						<?php 
 							$NamaUjian = (strlen($mataujian[$i]['NamaUjian']) > 15) ? substr($mataujian[$i]['NamaUjian'], 0,15).'...' : $mataujian[$i]['NamaUjian'] ;
@@ -48,7 +48,12 @@
 								<br>
 								<?php echo $datadb[$i]['SchoolName'] ?>
 								<br>
-								<?php echo $datadb[$i]['CityName'] ?>	
+								<?php echo $datadb[$i]['CityName'] ?>
+								<br>
+								<?php 
+								$Code = ($datadb[$i]['No_Ref'] != "") ? $datadb[$i]['FormulirCode'].' / '.$datadb[$i]['No_Ref'] : $datadb[$i]['FormulirCode'];
+								echo $Code;
+								 ?>	
 								</td>
 							<?php for ($j = 0; $j < count($mataujian); $j++): ?>
 								<td>

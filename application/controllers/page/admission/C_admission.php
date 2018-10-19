@@ -1029,7 +1029,8 @@ class C_admission extends Admission_Controler {
                         "Belum Lunas"
                   ) as chklunas,
                 (select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID ) as Cicilan
-                ,xx.Name as NameSales
+                ,xx.Name as NameSales,
+                if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,""  ) as No_Ref
                 from db_admission.register as a
                 join db_admission.school as b
                 on a.SchoolID = b.ID
@@ -1058,7 +1059,9 @@ class C_admission extends Admission_Controler {
         $sql.= ' where Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
                 or FormulirCode LIKE "'.$requestData['search']['value'].'%" or SchoolName LIKE "%'.$requestData['search']['value'].'%"
                 or chklunas LIKE "'.$requestData['search']['value'].'%" or DiscountType LIKE "'.$requestData['search']['value'].'%"
-                or NameSales LIKE "'.$requestData['search']['value'].'%"';
+                or NameSales LIKE "'.$requestData['search']['value'].'%"
+                or No_Ref LIKE "'.$requestData['search']['value'].'%"
+                ';
         $sql.= ' ORDER BY chklunas ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
         $query = $this->db->query($sql)->result_array();
@@ -1070,9 +1073,10 @@ class C_admission extends Admission_Controler {
 
             // $nestedData[] = '<input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'">';
             // $nestedData[] = $row['NamePrody'];
+            $Code = ($row['No_Ref'] != "") ? $row['FormulirCode'].' / '.$row['No_Ref'] : $row['FormulirCode'];
             $nestedData[] = $No;
             $nestedData[] = $row['Name'].'<br>'.$row['Email'].'<br>'.$row['SchoolName'];
-            $nestedData[] = $row['NamePrody'].'<br>'.$row['FormulirCode'].'<br>'.$row['VA_number'];
+            $nestedData[] = $row['NamePrody'].'<br>'.$Code.'<br>'.$row['VA_number'];
             $nestedData[] = $row['NameSales'];
             $nestedData[] = $row['Rangking'];
             $nestedData[] = $row['DiscountType'];
@@ -1097,7 +1101,7 @@ class C_admission extends Admission_Controler {
              }
             $nestedData[] = $cicilan;
             $nestedData[] = $row['chklunas'];
-            $nestedData[] = '<div style="text-align: center;"><button class="btn btn-sm btn-primary btnLoginPortalRegister " data-xx="'.$row['Email'].'"><i class="fa fa-sign-in right-margin"></i> Login Portal</button></div>';
+            $nestedData[] = '<div style="text-align: center;"><button class="btn btn-sm btn-primary btnLoginPortalRegister " data-xx="'.$row['Email'].'" data-xx2="'.$row['FormulirCode'].'"  ><i class="fa fa-sign-in right-margin"></i> Login Portal</button></div>';
             $data[] = $nestedData;
             $No++;
         }

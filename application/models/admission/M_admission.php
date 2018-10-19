@@ -1201,7 +1201,8 @@ class M_admission extends CI_Model {
         $sql = 'select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,g.JenisTempatTinggal,
             h.ctr_name as CountryAddress,i.ProvinceName as ProvinceAddress,j.RegionName as RegionAddress,k.DistrictName as DistrictsAddress,
             a.District as DistrictAddress,a.Address,a.ZipCode,a.PhoneNumber,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
-            n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto
+            n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
+             b.FormulirCode,  if(d.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = b.FormulirCode limit 1) ,""  ) as No_Ref
             from db_admission.register_formulir as a
             left JOIN db_admission.register_verified as b 
             ON a.ID_register_verified = b.ID
@@ -1271,7 +1272,8 @@ class M_admission extends CI_Model {
 
     public function daftar_set_nilai_rapor_load_data_paging($limit, $start,$ID_ProgramStudy)
     {
-      $sql = 'select a.Name as NameCandidate,a.Email, d.ID as ID_register_formulir, e.bobot as Bobot, e.NamaUjian,f.SchoolName,f.CityName
+      $sql = 'select a.Name as NameCandidate,a.Email, d.ID as ID_register_formulir, e.bobot as Bobot, e.NamaUjian,f.SchoolName,f.CityName,
+              c.FormulirCode,  if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,""  ) as No_Ref
               from db_admission.register as a
               join db_admission.register_verification as b
               on a.ID = b.RegisterID
@@ -1434,7 +1436,8 @@ class M_admission extends CI_Model {
         $sql = 'select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,g.JenisTempatTinggal,
             h.ctr_name as CountryAddress,i.ProvinceName as ProvinceAddress,j.RegionName as RegionAddress,k.DistrictName as DistrictsAddress,
             a.District as DistrictAddress,a.Address,a.ZipCode,a.PhoneNumber,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
-            n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto
+            n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
+            b.FormulirCode,  if(d.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = b.FormulirCode limit 1) ,""  ) as No_Ref
             from db_admission.register_formulir as a
             Left JOIN db_admission.register_verified as b 
             ON a.ID_register_verified = b.ID
@@ -1643,7 +1646,8 @@ class M_admission extends CI_Model {
               a.District as DistrictAddress,a.Address,a.ZipCode,a.PhoneNumber,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
               n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
               if((select count(*) as total from db_admission.register_nilai where Status = "Verified" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
-              as status1,b.FormulirCode
+              as status1,b.FormulirCode,
+              if(d.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = b.FormulirCode limit 1) ,""  ) as No_Ref
               from db_admission.register_formulir as a
               left JOIN db_admission.register_verified as b 
               ON a.ID_register_verified = b.ID
@@ -1730,6 +1734,7 @@ class M_admission extends CI_Model {
               'RangkingRapor' => $getRangking,
               'getDiscount' =>$getDiscount,
               'FormulirCode' => $query[$i]['FormulirCode'],
+              'No_Ref' => $query[$i]['No_Ref'],
               'Document' => $Document,
               'Attachment' => $Attachment,
               'getBeasiswa' => $getBeasiswa,
@@ -1749,6 +1754,7 @@ class M_admission extends CI_Model {
               'RangkingRapor' => 0,
               'getDiscount' =>$getDiscount,
               'FormulirCode' => $query[$i]['FormulirCode'],
+              'No_Ref' => $query[$i]['No_Ref'],
               'Document' => $Document,
               'Attachment' => $Attachment,
               'getBeasiswa' => $getBeasiswa,
@@ -1889,7 +1895,8 @@ class M_admission extends CI_Model {
               f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
               n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
               if((select count(*) as total from db_admission.register_nilai where Status = "Verified" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
-              as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa
+              as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,
+              if(d.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = b.FormulirCode limit 1) ,""  ) as No_Ref
               from db_admission.register_formulir as a
               left JOIN db_admission.register_verified as b 
               ON a.ID_register_verified = b.ID
@@ -1962,6 +1969,7 @@ class M_admission extends CI_Model {
               // 'DiskonSPP' => $DiskonSPP,
               'RangkingRapor' => $getRangking,
               'FormulirCode' => $query[$i]['FormulirCode'],
+              'No_Ref' => $query[$i]['No_Ref'],
               'getBeasiswa' => $getBeasiswa,
               'getFile' => $getFile,
               'Email' => $query[$i]['Email']
@@ -1978,6 +1986,7 @@ class M_admission extends CI_Model {
               // 'DiskonSPP' => $DiskonSPP,
               'RangkingRapor' => 0,
               'FormulirCode' => $query[$i]['FormulirCode'],
+              'No_Ref' => $query[$i]['No_Ref'],
               'getBeasiswa' => $getBeasiswa,
               'getFile' => $getFile,
               'Email' => $query[$i]['Email'],
@@ -2021,8 +2030,9 @@ class M_admission extends CI_Model {
      $sql= 'select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,
              f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
              n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
-             if((select count(*) as total from db_admission.register_nilai where Status = "Approved" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
-             as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa
+             if((select count(*) as total from db_admission.register_nilai where Status = "Verified" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
+             as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,
+             if(d.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = b.FormulirCode limit 1) ,""  ) as No_Ref
              from db_admission.register_formulir as a
              left JOIN db_admission.register_verified as b 
              ON a.ID_register_verified = b.ID
@@ -2095,6 +2105,7 @@ class M_admission extends CI_Model {
             // 'DiskonSPP' => $DiskonSPP,
             'RangkingRapor' => $getRangking,
             'FormulirCode' => $query[$i]['FormulirCode'],
+            'No_Ref' => $query[$i]['No_Ref'],
             'getBeasiswa' => $getBeasiswa,
             'getFile' => $getFile,
             'Email' => $query[$i]['Email']
@@ -2111,6 +2122,7 @@ class M_admission extends CI_Model {
              // 'DiskonSPP' => $DiskonSPP,
              'RangkingRapor' => 0,
              'FormulirCode' => $query[$i]['FormulirCode'],
+             'No_Ref' => $query[$i]['No_Ref'],
              'getBeasiswa' => $getBeasiswa,
              'getFile' => $getFile,
              'Email' => $query[$i]['Email'],

@@ -58,13 +58,16 @@
                         </div>
                     <div  class="col-xs-6" align="right" id="pagination_link"></div>
                 </div>
-                <div id="pageData">
-                    
+                <div class="row" style="margin-top: 10px;margin-left: 0px;,margin-right: 0px">
+                    <div id="pageData">
+                        
+                    </div>
                 </div>
-                <br>
-                <div class="col-xs-12" align = "right">
-                   <button class="btn btn-inverse btn-notification btn-submit" id="btn-submit">Submit</button>
-                </div>
+                <div class="row" style="margin-top: 10px;margin-left: 0px;,margin-right: 0px">
+                    <div class="col-xs-12" align = "right">
+                       <button class="btn btn-inverse btn-notification btn-submit" id="btn-submit">Submit</button>
+                    </div>
+                </div>    
             </div>
         </div>
     </div>
