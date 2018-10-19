@@ -3349,10 +3349,15 @@ class C_save_to_pdf extends CI_Controller {
 
         $dataStudent = $this->m_save_to_pdf->getTranscript($data_arr['DBStudent'],$data_arr['NPM']);
 
+//        print_r($dataStudent);
+//        exit;
+
         $Student = $dataStudent['Student'][0];
         $Transcript = $dataStudent['Transcript'][0];
 
         $pdf = new FPDF('P','mm','legal');
+
+        $pdf->AddFont('dinproExpBold','','dinproExpBold.php');
 
         // membuat halaman baru
         $pdf->SetMargins(10,42.5,10);
@@ -3370,20 +3375,20 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetXY(10,43.5);
 
-        $label_l = 40;
+        $label_l = 39;
         $sparator_l = 1;
-        $fill_l = 50;
+        $fill_l = 51;
 
         $label_r = 43;
         $sparator_r = 1;
         $fill_r = 56;
-        $h=4;
+        $h=3.3;
         $border = 0;
 
         $e = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '%#d' : '%e';
 
 
-        $pdf->SetFont('dinpromedium','',9);
+        $pdf->SetFont('dinpromedium','',8);
         $pdf->Cell($label_l,$h,'Nama',$border,0,'L');
         $pdf->Cell($sparator_l,$h,':',$border,0,'C');
         $pdf->Cell($fill_l,$h,ucwords(strtolower($Student['Name'])),$border,0,'L');
@@ -3391,7 +3396,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($sparator_r,$h,':',$border,0,'C');
         $pdf->Cell($fill_r,$h,$Student['GradeDesc'],$border,1,'L');
 
-        $pdf->SetFont('dinlightitalic','',8);
+        $pdf->SetFont('dinlightitalic','',7);
         $pdf->Cell($label_l,$h,'Name',$border,0,'L');
         $pdf->Cell($sparator_l,$h,'',$border,0,'C');
         $pdf->Cell($fill_l,$h,'',$border,0,'L');
@@ -3470,14 +3475,32 @@ class C_save_to_pdf extends CI_Controller {
 
             $this->spasi_transcript_table($pdf,'T');
 
-            $h = 3.5;
-            $pdf->SetFont('dinprolight','',$font_medium);
-            $pdf->Cell($w_no,$h,($no++),$border_fill,0,'C');
-            $pdf->Cell($w_course,$h,$ds['MKName'].'-'.$pdf->GetY(),$border_fill,0,'L');
-            $pdf->Cell($w_credit,$h,$ds['Credit'],$border_fill,0,'C');
-            $pdf->Cell($w_grade,$h,$ds['Grade'],$border_fill,0,'C');
-            $pdf->Cell($w_score,$h,$ds['GradeValue'],$border_fill,0,'C');
-            $pdf->Cell($w_point,$h,round(($ds['Credit'] * $ds['GradeValue']),2),$border_fill,1,'C');
+            $h = 3;
+            $pdf->SetFont('dinproExpBold','',$font_medium);
+            $ytext = $pdf->GetY()+3.5;
+            $pdf->Text(15,$ytext,($no++));
+            $pdf->Cell($w_no,$h,'',$border_fill,0,'C');
+            $pdf->Cell($w_course,$h,$ds['MKName'],$border_fill,0,'L');
+
+            $ytext = $pdf->GetY()+3.5;
+            $xtext = $pdf->GetX()+7;
+            $pdf->Text($xtext,$ytext,$ds['Credit']);
+            $pdf->Cell($w_credit,$h,'',$border_fill,0,'C');
+
+            $ytext = $pdf->GetY()+3.5;
+            $xtext = $pdf->GetX()+6.5;
+            $pdf->Text($xtext,$ytext,$ds['Grade']);
+            $pdf->Cell($w_grade,$h,'',$border_fill,0,'C');
+
+            $ytext = $pdf->GetY()+3.5;
+            $xtext = $pdf->GetX()+6.3;
+            $pdf->Text($xtext,$ytext,$ds['GradeValue']);
+            $pdf->Cell($w_score,$h,'',$border_fill,0,'C');
+
+            $ytext = $pdf->GetY()+3.5;
+            $xtext = $pdf->GetX()+9.5;
+            $pdf->Text($xtext,$ytext,$ds['Point']);
+            $pdf->Cell($w_point,$h,'',$border_fill,1,'C');
 
             $pdf->SetFont('dinlightitalic','',$font_medium_i);
             $pdf->Cell($w_no,$h,'',$border_fill,0,'C');
@@ -3490,7 +3513,7 @@ class C_save_to_pdf extends CI_Controller {
             $this->spasi_transcript_table($pdf,'B');
 
             if($pdf->GetY()>=324){
-                $pdf->SetMargins(10,10,10);
+                $pdf->SetMargins(10,20,10);
                 $pdf->AddPage();
 //                $pdf->SetXY(10,43.5);
                 $this->header_transcript_table($pdf);
@@ -3500,12 +3523,26 @@ class C_save_to_pdf extends CI_Controller {
         $Result = $dataStudent['Result'];
 
         $this->spasi_transcript_table($pdf,'TR');
-        $pdf->SetFont('dinprolight','',$font_medium);
+        $pdf->SetFont('dinproExpBold','',$font_medium);
         $pdf->Cell($w_course+$w_no,$h,'Jumlah',$border_fill,0,'R');
-        $pdf->Cell($w_credit,$h,$Result['TotalSKS'],$border_fill,0,'C');
-        $pdf->Cell($w_grade,$h,'-',$border_fill,0,'C');
-        $pdf->Cell($w_score,$h,'-',$border_fill,0,'C');
-        $pdf->Cell($w_point,$h,$Result['TotalGradeValue'],$border_fill,1,'C');
+        $ytext = $pdf->GetY()+3.5;
+        $xtext = $pdf->GetX()+5.5;
+        $pdf->Text($xtext,$ytext,$Result['TotalSKS']);
+        $pdf->Cell($w_credit,$h,'',$border_fill,0,'C');
+
+        $ytext = $pdf->GetY()+3.5;
+        $xtext = $pdf->GetX()+7;
+        $pdf->Text($xtext,$ytext,'-');
+        $pdf->Cell($w_grade,$h,'',$border_fill,0,'C');
+        $ytext = $pdf->GetY()+3.5;
+        $xtext = $pdf->GetX()+7;
+        $pdf->Text($xtext,$ytext,'-');
+        $pdf->Cell($w_score,$h,'',$border_fill,0,'C');
+
+        $ytext = $pdf->GetY()+3.5;
+        $xtext = $pdf->GetX()+7.5;
+        $pdf->Text($xtext,$ytext,$Result['TotalGradeValue']);
+        $pdf->Cell($w_point,$h,'',$border_fill,1,'C');
 
         $pdf->SetFont('dinlightitalic','',$font_medium_i);
         $pdf->Cell($w_course+$w_no,$h,'Total',$border_fill,0,'R');
@@ -3567,7 +3604,8 @@ class C_save_to_pdf extends CI_Controller {
 //        $pdf->Cell($w_R_sparator,$h,'',0,0,'C');
 //        $pdf->Cell($w_R_fill+$w_Div,$h,$SkripsiInd,'R',1,'L');
 
-        $pdf->SetFont('dinlightitalic','',8);
+//        $pdf->SetFont('dinlightitalic','',8);
+        $pdf->SetFont('dinprolight','',8);
         $pdf->Cell($w_R_label,$h,'Thesis Title',0,0,'L');
         $pdf->Cell($w_R_sparator,$h,':',0,0,'C');
         $pdf->MultiCell($w_R_fill+$w_Div-2,$h,$SkripsiEng,0);
