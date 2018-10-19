@@ -3036,9 +3036,9 @@ class C_save_to_pdf extends CI_Controller {
         $sp_right = 1;
         $fill_right = 53;
 
-        $h=3.3;
+        $h=3;
         $pdf->SetFont('dinpromedium','',7);
-        $pdf->Ln(5);
+        $pdf->Ln(1);
 
         $pdf->Cell($l_left,$h,'Nama',$border,0,'L');
         $pdf->Cell($sp_left,$h,':',$border,0,'C');
@@ -3073,7 +3073,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $this->header_temp_transcript($pdf,$dataTempTr);
 
-        $h=3.5;
+        $h=2.5;
 
         $tr = 'RECORD OF ACADEMIC ACHIEVEMENT';
 
@@ -3085,9 +3085,9 @@ class C_save_to_pdf extends CI_Controller {
         $border = 0;
 
 
-        $h=3.3;
+        $h=3;
         $pdf->SetFont('dinpromedium','',7);
-        $pdf->Ln(5);
+        $pdf->Ln(1);
 
         $pdf->Cell($l_left,$h,'Name',$border,0,'L');
         $pdf->Cell($sp_left,$h,':',$border,0,'C');
@@ -3108,7 +3108,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($sp_left,$h,':',$border,0,'C');
         $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['PlaceOfBirth'])).', '.date('F j, Y',strtotime($Student['DateOfBirth'])),$border,1,'L');
 
-        $pdf->Ln(2);
+        $pdf->Ln(1.5);
 
         $this->headerTable('eng',$pdf);
         $this->body_temp_transcript('eng',$pdf,$dataStudent,$dataTempTr);
@@ -3118,99 +3118,6 @@ class C_save_to_pdf extends CI_Controller {
 
         $nameF = str_replace(' ','_',strtoupper($Student['Name']));
         $pdf->Output('TEMP_TRNSCPT_'.$Student['NPM'].'_'.$nameF.'.pdf','I');
-    }
-
-    private function header_temp_transcript2($lang,$pdf,$Student,$dataTempTr){
-        $pdf->Image(base_url('images/logo.png'),10,5,40);
-
-        $h=3.5;
-        $pdf->Ln(5);
-        $pdf->SetFont('dinpromedium','',9);
-
-        $tr = ($lang=='ind') ? 'TRANSKRIP SEMENTARA' : 'RECORD OF ACADEMIC ACHIEVEMENT';
-
-        $pdf->Cell(190,$h,$tr,0,1,'C');
-
-        $pdf->SetFont('dinprolight','',7);
-        $pdf->Cell(190,$h,'No. : '.$dataTempTr['No'],0,1,'C');
-
-
-        $border = 0;
-
-        $l_left = 38;
-        $sp_left = 1;
-        $fill_left = 93;
-
-        $l_right = 22;
-        $sp_right = 1;
-        $fill_right = 35;
-
-        $h=3.3;
-        $pdf->SetFont('dinpromedium','',7);
-        $pdf->Ln(1.5);
-
-        if($lang=='ind'){
-
-            $pdf->Cell(190,$h,'Fakultas : '.$Student['FacultyName'],0,1,'C');
-            $pdf->Cell(190,$h,'Program Studi : '.ucwords(strtolower($Student['Prodi'])),0,1,'C');
-            $pdf->Ln(1.5);
-
-            $pdf->Cell($l_left,$h,'Nama',$border,0,'L');
-            $pdf->Cell($sp_left,$h,':',$border,0,'C');
-            $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['Name'])),$border,0,'L');
-            $pdf->Cell($l_right,$h,'NIM',$border,0,'L');
-            $pdf->Cell($sp_right,$h,':',$border,0,'C');
-            $pdf->Cell($fill_right,$h,$Student['NPM'],$border,1,'L');
-
-            $e = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '%#d' : '%e';
-            $pdf->Cell($l_left,$h,'Tempat dan Tanggal Lahir',$border,0,'L');
-            $pdf->Cell($sp_left,$h,':',$border,0,'C');
-            $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['PlaceOfBirth'])).', '.strftime($e." %B %Y",strtotime($Student['DateOfBirth'])),$border,1,'L');
-
-
-
-        }
-        else if($lang=='eng'){
-            $pdf->Cell(190,$h,'Faculty : '.$Student['FacultyName'],0,1,'C');
-            $pdf->Cell(190,$h,'Department : '.ucwords(strtolower($Student['ProdiEng'])),0,1,'C');
-            $pdf->Ln(1.5);
-
-            $pdf->Cell($l_left,$h,'Name',$border,0,'L');
-            $pdf->Cell($sp_left,$h,':',$border,0,'C');
-            $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['Name'])),$border,0,'L');
-            $pdf->Cell($l_right,$h,'Student ID',$border,0,'L');
-            $pdf->Cell($sp_right,$h,':',$border,0,'C');
-            $pdf->Cell($fill_right,$h,$Student['NPM'],$border,1,'L');
-
-            $pdf->Cell($l_left,$h,'Place, Date of Birth',$border,0,'L');
-            $pdf->Cell($sp_left,$h,':',$border,0,'C');
-            $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['PlaceOfBirth'])).', '.date('F j, Y',strtotime($Student['DateOfBirth'])),$border,1,'L');
-        }
-
-
-
-        $pdf->Ln(2.5);
-
-        $border = 1;
-
-        $w_no = 8;
-        $w_smt = 8;
-        $w_kode = 20;
-        $w_mk = 103;
-        $w_f = 11;
-        $w_fv = 18;
-        $h=4.3;
-        $pdf->SetFillColor(226, 226, 226);
-        $pdf->Cell($w_no,$h,'No.',$border,0,'C',true);
-//        $pdf->Cell($w_smt,$h,'Smt',$border,0,'C',true);
-        $pdf->Cell($w_kode,$h,'Kode',$border,0,'C',true);
-        $pdf->Cell($w_mk+$w_smt,$h,'Mata Kuliah',$border,0,'C',true);
-        $pdf->Cell($w_f,$h,'SKS',$border,0,'C',true);
-        $pdf->Cell($w_f,$h,'Nilai',$border,0,'C',true);
-        $pdf->Cell($w_f,$h,'Bobot',$border,0,'C',true);
-        $pdf->Cell($w_fv,$h,'SKS X Bobot',$border,1,'C',true);
-
-        $pdf->SetFont('dinprolight','',7);
     }
 
     private function headerTable($lang,$pdf){
@@ -3251,7 +3158,7 @@ class C_save_to_pdf extends CI_Controller {
     private function header_temp_transcript($pdf,$dataTempTr){
         $pdf->SetFont('dinpromedium','',6);
 
-        $pdf->Image(base_url('images/logo.png'),10,5,40);
+        $pdf->Image(base_url('images/logo.png'),10,1,40);
 
         $pdf->SetXY(100,3);
         $pdf->Cell(100,5,$dataTempTr['NoForm'],0,1,'R');
@@ -3615,12 +3522,12 @@ class C_save_to_pdf extends CI_Controller {
         $h = 1.5;
         $pdf->Cell($totalW,$h,'','LRB',1,'L');
         $h=3;
-
-        $pdf->Ln(7);
-
-        +$min = 25;
-        $borderttd = 0;
         $y = $pdf->GetY();
+        $pdf->Ln(17);
+
+        $min = 25;
+        $borderttd = 0;
+
         $pdf->SetFont('dinpromedium','',$font_medium);
         $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
         $pdf->Cell($w_Div-$min,$h,'Tempat dan Tanggal Diterbitkan',$borderttd,1,'L');
@@ -3649,7 +3556,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_Div+$min,$h,'Rector',$borderttd,0,'L');
         $pdf->Cell($w_Div-$min,$h,'Dean',$borderttd,1,'L');
 
-        $pdf->Ln(14);
+        $pdf->Ln(17);
 
         $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].' ' : '';
         $titleB = ($Student['TitleBehind']!='') ? ' '.$Student['TitleBehind'] : '' ;
@@ -3672,7 +3579,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_Div+$min,$h,'NIK : '.$Rektorat['NIP'],$borderttd,0,'L');
         $pdf->Cell($w_Div-$min,$h,'NIK : '.$Student['NIP'],$borderttd,1,'L');
 
-        $pdf->Rect(77, $y, 33, 45);
+        $pdf->Rect(77, $y+5, 40, 60);
 
 
         $nameF = str_replace(' ','_',strtoupper($Student['Name']));
@@ -3787,6 +3694,8 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetMargins(20.5,10.5,10);
         $pdf->AddPage();
 
+//        $pdf->Image(base_url('images/i.jpg'),0,0,300);
+
         $h = 3;
 
         $Ijazah = $dataIjazah['Ijazah'][0];
@@ -3829,10 +3738,10 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinproExpBold','',20);
         $pdf->Cell($full_width,13,ucwords(strtolower($Student['Name'])),$border,1,'C');
 
-        $pdf->Ln(2);
+        $pdf->Ln(1.5);
 
         $x = 67;
-        $ln = 3;
+        $ln = 1.5;
         $label = 70;
         $sp = 1.5;
         $fill = 100;
@@ -3915,7 +3824,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,date('F j, Y',strtotime($Ijazah['DateOfYudisium'])),$border,1,'L');
 //        $pdf->Cell($fill,$h,date('d/m/Y',strtotime($Ijazah['DateOfYudisium'])),$border,1,'L');
-        $pdf->Ln($ln);
+        $pdf->Ln(4);
 
         // ===== Ket 1 =====
         // 171.5
@@ -3942,7 +3851,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($fillFull,$h,'and conferred the right and privileges pertaining to this degree.',$border,1,'L');
 
         $y = $pdf->GetY()+7;
-        $pdf->Ln(7);
+        $pdf->Ln(15);
 
         // 171.5
         // Tanda tangan
@@ -3954,7 +3863,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinlightitalic','',$fn_i);
         $pdf->Cell(171.5,$h,$Ijazah['PlaceIssued'].', '.date('F j, Y',strtotime($Ijazah['DateIssued'])),$border,1,'L');
 
-        $pdf->Ln(2);
+        $pdf->Ln(3);
         $pdf->SetX($x+10);
         $pdf->SetFont('dinpromedium','',$fn_b);
         $pdf->Cell(138.5,$h,'Rektor',$border,0,'L');
@@ -3983,7 +3892,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetFont('dinpromedium','',$fn_b);
 
-        $yy = 13;
+        $yy = 15;
         $xx = 57;
 
         $ytext = $pdf->GetY()+$yy;
@@ -4006,9 +3915,6 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinpromedium','',$fn_b-2);
         $pdf->Text($xtext,$ytext,'NIK : '.$Student['NIP']);
 
-
-
-
 //        $pdf->SetX($x+10);
 //        $pdf->Cell(138.5,$h,$Rektor,$border,0,'L');
 //        $pdf->Cell(41,$h,$Dekan,$border,1,'L');
@@ -4018,7 +3924,8 @@ class C_save_to_pdf extends CI_Controller {
 //        $pdf->Cell(138.5,$h,'NIK : '.$Rektorat['NIP'],$border,0,'L');
 //        $pdf->Cell(41,$h,'NIK : '.$Student['NIP'],$border,1,'L');
 
-        $pdf->Rect($x+95, $y, 33, 45);
+        $pdf->Rect($x+95, $y, 40, 60);
+//        $pdf->Image(base_url('images/46.png'),$x+95,$y,40,60);
 
 
         $nameF = str_replace(' ','_',strtoupper($Student['Name']));
