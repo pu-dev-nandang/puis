@@ -434,7 +434,7 @@
             '<div class = "row" id="pageSetCicilan'+data[0]['id_formulir']+'">'+
             '</div>'
 
-        var html = '<div class="widget box widget_'+data[0]['id_formulir']+'">'+
+        var html = '<div class="widget box widget_'+data[0]['id_formulir']+' widget_delete">'+
             '<div class="widget-header">'+
                 '<h4 class="header"><i class="icon-reorder"></i> Set Payment '+data[0]['Nama']+'</h4>'+
             '</div>'+

@@ -882,25 +882,25 @@ class M_finance extends CI_Model {
             if((select count(*) as total from db_admission.register_nilai where Status = "Approved" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
             as status1,p.CreateAT,p.CreateBY,d.VA_number,b.FormulirCode
             from db_admission.register_formulir as a
-            JOIN db_admission.register_verified as b 
+            left JOIN db_admission.register_verified as b 
             ON a.ID_register_verified = b.ID
-            JOIN db_admission.register_verification as c
+            left JOIN db_admission.register_verification as c
             ON b.RegVerificationID = c.ID
-            JOIN db_admission.register as d
+            left JOIN db_admission.register as d
             ON c.RegisterID = d.ID
-            JOIN db_admission.country as e
+            left JOIN db_admission.country as e
             ON a.NationalityID = e.ctr_code
-            JOIN db_employees.religion as f
+            left JOIN db_employees.religion as f
             ON a.ReligionID = f.IDReligion
-            JOIN db_admission.school_type as l
+            left JOIN db_admission.school_type as l
             ON l.sct_code = a.ID_school_type
-            JOIN db_admission.register_major_school as m
+            left JOIN db_admission.register_major_school as m
             ON m.ID = a.ID_register_major_school
-            JOIN db_admission.school as n
+            left JOIN db_admission.school as n
             ON n.ID = d.SchoolID
-            join db_academic.program_study as o
+            left join db_academic.program_study as o
             on o.ID = a.ID_program_study
-            join db_finance.register_admisi as p
+            left join db_finance.register_admisi as p
             on a.ID = p.ID_register_formulir
             where p.Status = "Created" and a.ID = ? group by a.ID';
        $query=$this->db->query($sql, array($ID_program_study))->result_array();

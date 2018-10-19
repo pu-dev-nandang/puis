@@ -48,7 +48,13 @@
 							 	<?php if (isset($chkActive)): ?>
 							 	<td><?php echo $no++ ?> <input type="checkbox" class="uniform" value ="<?php echo $datadb[$i]['ID_register_formulir'] ?>"></td>
 							 	<?php endif ?>
-							 	<td><?php echo $datadb[$i]['Name'] ?></td>
+							 	<td>
+							 		<?php echo $datadb[$i]['Name'] ?><br>
+							 			<?php 
+							 			$Code = ($datadb[$i]['No_Ref'] != "") ? $datadb[$i]['FormulirCode'].' / '.$datadb[$i]['No_Ref'] : $datadb[$i]['FormulirCode'];
+							 			echo $Code;
+							 			 ?>	
+							 	</td>
 							 	<td><?php echo $datadb[$i]['NamePrody'] ?></td>
 							 	<td><?php echo $datadb[$i]['Gender'] ?></td>
 							 	<td><?php echo $datadb[$i]['IdentityCard'] ?></td>

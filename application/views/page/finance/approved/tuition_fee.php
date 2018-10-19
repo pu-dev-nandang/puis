@@ -30,6 +30,7 @@
 
 <script type="text/javascript">
     window.pageHtml = '';
+    window.Grade = [];
     $(document).ready(function () {
         if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
             $('#panel_web').addClass('wrap');
@@ -56,6 +57,7 @@
                     var obj = jQuery.parseJSON(data_json);
                     $("#dataPageLoad").html(obj.loadtable);
                     $("#pagination_link").html(obj.pagination_link);
+                    Grade = obj.Grade;
                     $('#NotificationModal').modal('hide');
                 });
                 break;
@@ -239,39 +241,126 @@
                $.post(url,{token:token},function (data_json) {
                    // jsonData = data_json;
                    var obj = JSON.parse(data_json);
-                   console.log(obj);
-                   var bbb = '';
-                   for (var i = 0; i < obj.length; i++) {
-                       bbb += '<tr>'+
-                                 '<td>'+ (parseInt(i)+1) + '</td>'+
-                                 '<td>'+ formatRupiah(obj[i]['Invoice']) + '</td>'+
-                                 '<td>'+ obj[i]['Deadline']+'</td>'+
-                               '</tr>';  
+                   // console.log(obj);
+                   var url2 = base_url_js + "get_nilai_from_admission";
+                   var data2 = {
+                       ID_register_formulir : Uniformvaluee,
                    }
-                   var aaa = '<!--<div class = "row">-->'+
-                                '<div id = "tblData" class="table-responsive">'+
-                                    '<table class="table table-striped table-bordered table-hover table-checkable">'+
-                                    '<thead>'+
-                                      '<tr>'+
-                                        '<th style="width: 5px;">Cicilan ke </th>'+
-                                        '<th style="width: 5px;">Invoice </th>'+
-                                        '<th style="width: 5px;">Deadline </th>'+
-                                       '<tr>'+ 
-                                    '</thead>'+
-                                    '<tbody>'+
-                                    bbb+
-                                    '</tbody>'+'</table></div>'+
-                             '<!--</div>-->';
+                   var token2 = jwt_encode(data2,"UAP)(*");
+                   $.post(url2,{token:token2},function (json) {
+                        console.log(Grade);
 
-                   var html = '<div class="widget box widget_'+Uniformvaluee+' widget_delete">'+
-                       '<div class="widget-header">'+
-                           '<h4 class="header"><i class="icon-reorder"></i> Detail Payment '+Nama+'</h4>'+
-                       '</div>'+
-                       '<div class="widget-content">'+
-                           aaa
-                       '</div>'+
-                   '</div>';
-                   $(".formAddFormKD").append(html);
+                        var json2 = JSON.parse(json);
+                        // console.log(json2);
+                        var bagi = 12 / json2.length;
+                        var bagi = parseInt(bagi);
+                        // var sisa = 12 % json2.length;
+                        // if (sisa > 0) {
+                        //     bagi++;
+                        // }
+
+                        var divNilai = '<div class = "row" style = "margin-top:10px;margin-left:0px;margin-right:0px">'+
+                                            '<div class = "col-md-12">'+
+                                                '<h4>Nilai</h4>'+
+                                                '<div class = "row">';
+                        var l = 0;
+                        var jml_bobot = 0;
+                        var Nilai_bobot = 0;
+                        var Indeks_Nilai = '';
+                        for (var i = 0; i < json2.length; i++) {
+                                // divNilai += '<li>'+json2[i]['NamaUjian']+ ' : '+json2[i]['Value']+'</li>';
+                                if (l > 12) {
+                                    var ascdee = parseInt(l) - 12;
+                                    divNilai += '<div class = "col-xs-'+ascdee+'">'+
+                                        '<label>'+json2[i]['NamaUjian']+'('+json2[i]['Bobot']+')'+ ' : '+json2[i]['Value']+'</label>'+
+                                        '</div>';
+                                }
+                                else
+                                {
+                                    divNilai += '<div class = "col-xs-'+bagi+'">'+
+                                        '<label>'+json2[i]['NamaUjian']+'('+json2[i]['Bobot']+')'+ ' : '+json2[i]['Value']+'</label>'+
+                                        '</div>';
+                                    l = parseInt(l) + parseInt(bagi);    
+                                }
+
+                            l++; 
+                            // get total
+                            jml_bobot = jml_bobot + parseInt(json2[i]['Bobot']);
+                            Nilai_bobot = Nilai_bobot + ( parseInt( json2[i]['Value'] )   *  parseInt( json2[i]['Bobot'] ) )
+                        }
+
+                        // find grade
+                            var nilai = Nilai_bobot / jml_bobot;
+                            var Description = '';
+                            for (var k = 0; k < Grade.length; k++) {
+                                if (nilai >= Grade[k]['StartRange'] && nilai <= Grade[k]['EndRange'] ) {
+                                    Indeks_Nilai = Grade[k]['Grade'];
+                                    Description = Grade[k]['Description'];
+                                    break;
+                                }
+                            }
+
+                        divNilai += '</div></div></div>';
+
+                        divNilai += '<div class = "row" style = "margin-top:10px;margin-left:0px;margin-right:0px">'+
+                                        '<div class = "col-md-12">'+
+                                            '<h4>Grade & Score</h4>'+
+                                            '<div class = "row">'+
+                                                '<div class = "col-xs-2">'+
+                                                    '<label>Jumlah Bobot : '+jml_bobot+'</label>'+
+                                                '</div>'+
+                                                '<div class = "col-xs-2">'+
+                                                    '<label>Nilai Bobot : '+Nilai_bobot+'</label>'+
+                                                '</div>'+
+                                                '<div class = "col-xs-2">'+
+                                                    '<label>Score & Grade : '+nilai+' & '+Indeks_Nilai+'</label>'+
+                                                '</div>'+
+                                                '<div class = "col-xs-2">'+
+                                                    '<label>Desc : '+Description+'</label>'+
+                                                '</div>'+
+                                            '</div>'+
+                                        '</div></div>';    
+
+
+                        var bbb = '';
+                        for (var i = 0; i < obj.length; i++) {
+                            bbb += '<tr>'+
+                                      '<td>'+ (parseInt(i)+1) + '</td>'+
+                                      '<td>'+ formatRupiah(obj[i]['Invoice']) + '</td>'+
+                                      '<td>'+ obj[i]['Deadline']+'</td>'+
+                                    '</tr>';  
+                        }
+                        var aaa = '<div class = "row" style = "margin-right : 0px;margin-left : 0px;margin-top:10px">'+
+                                    '<div class = "col-md-12">'+
+                                        '<h4>Payment</h4>'+  
+                                     '<div id = "tblData" class="table-responsive">'+
+                                         '<table class="table table-striped table-bordered table-hover table-checkable">'+
+                                         '<thead>'+
+                                           '<tr>'+
+                                             '<th style="width: 5px;">Cicilan ke </th>'+
+                                             '<th style="width: 5px;">Invoice </th>'+
+                                             '<th style="width: 5px;">Deadline </th>'+
+                                            '<tr>'+ 
+                                         '</thead>'+
+                                         '<tbody>'+
+                                         bbb+
+                                         '</tbody>'+'</table></div>'+
+                                    '</div>'+        
+                                  '</div>';
+
+                        var html = '<div class="widget box widget_'+Uniformvaluee+' widget_delete">'+
+                            '<div class="widget-header">'+
+                                '<h4 class="header"><i class="icon-reorder"></i> Detail Nilai & Payment '+Nama+'</h4>'+
+                            '</div>'+
+                            '<div class="widget-content">'+
+                                divNilai+aaa
+                            '</div>'+
+                        '</div>';
+                        $(".formAddFormKD").append(html);
+
+
+                   }) // exit post nilai
+   
                }).done(function() {
                  
                }).fail(function() {
@@ -306,7 +395,8 @@
                                   '<td>'+ obj[i]['Deadline']+'</td>'+
                                 '</tr>';  
                     }
-                    var aaa = '<!--<div class = "row">-->'+
+                    var aaa = '<div class = "row" style = "margin-right : 0px;margin-left : 0px;margin-top:0px">'+
+                                '<div class = "col-md-12">'+    
                                  '<div id = "tblData" class="table-responsive">'+
                                      '<table class="table table-striped table-bordered table-hover table-checkable">'+
                                      '<thead>'+
@@ -319,7 +409,8 @@
                                      '<tbody>'+
                                      bbb+
                                      '</tbody>'+'</table></div>'+
-                              '<!--</div>-->';
+                                '</div>'+     
+                              '</div>';
 
                     var html = '<div class="widget box widget_'+Uniformvaluee+' widget_delete">'+
                         '<div class="widget-header">'+

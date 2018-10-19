@@ -568,8 +568,10 @@
     $(document).on("click", ".btnLoginPortalRegister", function(event){
       var url = '<?php echo url_registration; ?>'+'auth/loginByPcam';
       var Email = $(this).attr('data-xx');
+      var Code = $(this).attr('data-xx2');
       data = {
         Email : Email,
+        Code : Code,
       }
       var token = jwt_encode(data,"UAP)(*");
       submit(url, 'POST', [
