@@ -5278,4 +5278,68 @@ class C_api extends CI_Controller {
         }
     }
 
+    public function getTimetables(){
+        $requestData= $_REQUEST;
+        $data_arr = $this->getInputToken();
+
+//        print_r($data_arr);
+
+        $dataSearch = '';
+
+        $queryDefault = 'SELECT s.ID, s.CombinedClasses, s.ClassGroup, cl.Room, d.NameEng AS DayEng, s.Coordinator, em.Name AS CoordinatorName,
+                                      s.TeamTeaching, s.SubSesi, cd.TotalSKS AS Credit, mk.Name AS MKName, mk.NameEng AS MKNameEng,
+                                      sd.StartSessions, sd.EndSessions
+                                      FROM db_academic.schedule s
+                                      LEFT JOIN db_academic.schedule_details sd ON (sd.ScheduleID = s.ID)
+                                      LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+                                      LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
+                                      LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                      LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                      LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                      
+                                      LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                      
+                                      WHERE ( s.ProgramsCampusID = "'.$data_arr['ProgramCampusID'].'" 
+                                      AND s.SemesterID = "'.$data_arr['SemesterID'].'" ) '.$dataSearch.' 
+                                      GROUP BY s.ID
+                                      ORDER BY d.ID,sd.StartSessions, sd.EndSessions, s.ClassGroup ASC ';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$row['ClassGroup'].'</div>';
+            $nestedData[] = '<div  style="text-align:left;"><b>'.$row['MKName'].'</b><br/><i>'.$row['MKNameEng'].'</i></div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$row['Credit'].'</div>';
+            $nestedData[] = '<div  style="text-align:center;">-</div>';
+            $nestedData[] = '<div  style="text-align:center;">-</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$row['DayEng'].', '.substr($row['StartSessions'],0,5).' - '.substr($row['EndSessions'],0,5).'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$row['Room'].'</div>';
+
+            $no++;
+
+            $data[] = $nestedData;
+
+
+        }
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+
+        echo json_encode($json_data);
+
+
+    }
+
 }

@@ -68,6 +68,8 @@ $route['academic/ModalKetersediaanDosen'] = 'page/academic/c_akademik/Modal_Kete
 
 $route['academic/timetables'] = 'page/academic/c_jadwal';
 
+$route['academic/list-timetables'] = 'page/academic/c_timetables/list_timetables';
+
 $route['academic/study-planning'] = 'page/academic/c_study_planning';
 
 $route['academic/references'] = 'page/academic/c_reference';
@@ -657,6 +659,13 @@ $route['api/__getSchedulePerSemester'] = 'api/c_api/getSchedulePerSemester';
 $route['api/__getScheduleExam'] = 'api/c_api/getScheduleExam';
 $route['api/__getScheduleExamWaitingApproval'] = 'api/c_api/getScheduleExamWaitingApproval';
 $route['api/__getScheduleExamLecturer'] = 'api/c_api/getScheduleExamLecturer';
+
+// === Timetables ====
+
+$route['api/__getTimetables'] = 'api/c_api/getTimetables';
+
+
+// === Penutup Timetables ====
 
 $route['api/__getListCourseInScore'] = 'api/c_api/getListCourseInScore';
 $route['api/__getMonScoreStd'] = 'api/c_api/getMonScoreStd';
