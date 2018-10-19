@@ -46,9 +46,7 @@
 							<td>
 								<?php echo $datadb[$i]['NameCandidate'] ?>
 								<br>
-								<?php echo $datadb[$i]['SchoolName'] ?>
-								<br>
-								<?php echo $datadb[$i]['CityName'] ?>
+								<?php echo $datadb[$i]['NamePrody'] ?>	
 								<br>
 								<?php 
 								$Code = ($datadb[$i]['No_Ref'] != "") ? $datadb[$i]['FormulirCode'].' / '.$datadb[$i]['No_Ref'] : $datadb[$i]['FormulirCode'];

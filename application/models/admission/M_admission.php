@@ -27,8 +27,16 @@ class M_admission extends CI_Model {
         return $conVertINT;
     }
 
-    public function CountSelectDataCalonMahasiswa($tahun,$nama,$status)
+    public function CountSelectDataCalonMahasiswa($tahun,$nama,$status,$FormulirCode)
     {
+      if($FormulirCode != '%') {
+          $FormulirCode = '"%'.$FormulirCode.'%"'; 
+      }
+      else
+      {
+        $FormulirCode = '"%"'; 
+      }
+
       if($nama != '%') {
           $nama = '"%'.$nama.'%"'; 
       }
@@ -58,7 +66,7 @@ class M_admission extends CI_Model {
                 h.ctr_name as CountryAddress,i.ProvinceName as ProvinceAddress,j.RegionName as RegionAddress,k.DistrictName as DistrictsAddress,
                             a.District as DistrictAddress,a.Address,a.ZipCode,a.PhoneNumber,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,
                 n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,IF(a.KPSReceiverStatus = 'YA',CONCAT('No KPS : ',a.NoKPS),'Tidak') as KPSReceiver,
-                a.UploadFoto,d.RegisterAT
+                a.UploadFoto,d.RegisterAT,az.No_Ref
                 from db_admission.register_formulir as a
                 Left JOIN db_admission.register_verified as b 
                 ON a.ID_register_verified = b.ID
@@ -86,9 +94,11 @@ class M_admission extends CI_Model {
                 ON n.ID = d.SchoolID
                 Left JOIN db_academic.program_study as z
                 on a.ID_program_study = z.id
+                Left JOIN db_admission.formulir_number_offline_m as az
+                on b.FormulirCode = az.FormulirCode
                 ) as a
                 where document_undone > 0 and Name like ".$nama." and ".$tahun."
-                and FormulirCode not in(select FormulirCode from db_admission.to_be_mhs)
+                and FormulirCode not in(select FormulirCode from db_admission.to_be_mhs) and (FormulirCode like ".$FormulirCode." or No_Ref like ".$FormulirCode.")
               ) aa
               "; // query undone
 
@@ -96,9 +106,17 @@ class M_admission extends CI_Model {
         return $query[0]['total'];
     }
 
-    public function selectDataCalonMahasiswa($limit,$start,$tahun,$nama,$status)
+    public function selectDataCalonMahasiswa($limit,$start,$tahun,$nama,$status,$FormulirCode)
     {
       $arr_temp = array('data' => array());
+      if($FormulirCode != '%') {
+          $FormulirCode = '"%'.$FormulirCode.'%"'; 
+      }
+      else
+      {
+        $FormulirCode = '"%"'; 
+      }
+
       if($nama != '%') {
           $nama = '"%'.$nama.'%"'; 
       }
@@ -159,7 +177,7 @@ class M_admission extends CI_Model {
               on b.FormulirCode = az.FormulirCode
               ) as a
               where document_undone > 0 and Name like ".$nama." and ".$tahun."
-              and FormulirCode not in(select FormulirCode from db_admission.to_be_mhs)
+              and FormulirCode not in(select FormulirCode from db_admission.to_be_mhs) and (FormulirCode like ".$FormulirCode." or No_Ref like ".$FormulirCode.")
               order by document_progress desc
               LIMIT ".$start. ", ".$limit; // query undone
 
@@ -1247,33 +1265,55 @@ class M_admission extends CI_Model {
       }
     }
 
-    public function count_daftar_set_nilai_rapor_load_data_paging($ID_ProgramStudy)
+    public function count_daftar_set_nilai_rapor_load_data_paging($ID_ProgramStudy,$FormulirCode)
     {
+      if ($FormulirCode == "") {
+        $addQ = 'where ID_program_study ="'.$ID_ProgramStudy.'"';
+      }
+      else
+      {
+        $addQ = 'where ( FormulirCode = "'.$FormulirCode.'" or No_Ref = "'.$FormulirCode.'")';
+      }
       $sql = 'select count(*) as total from (
-                  select a.Name as NameCandidate,a.Email, d.ID as ID_register_formulir, e.bobot as Bobot, e.NamaUjian,f.SchoolName,f.CityName
-                  from db_admission.register as a
-                  join db_admission.register_verification as b
-                  on a.ID = b.RegisterID
-                  join db_admission.register_verified as c
-                  on b.ID = c.RegVerificationID
-                  join db_admission.register_formulir as d
-                  on c.ID = d.ID_register_verified
-                  join db_admission.ujian_perprody_m as e
-                  on e.ID_ProgramStudy = d.ID_program_study
-                  join db_admission.school as f
-                  on a.SchoolID = f.ID
-                  where d.ID_program_study = ? and e.Active = 1 and d.ID not in(select ID_register_formulir from db_admission.register_nilai)
-                  and  d.ID not in (select ID_register_formulir from db_admission.register_butuh_ujian)
-                  GROUP by d.ID
+                  select * from
+                  (
+                    select a.Name as NameCandidate,a.Email, d.ID as ID_register_formulir, e.bobot as Bobot, e.NamaUjian,f.SchoolName,f.CityName,
+                    c.FormulirCode,  if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,""  ) as No_Ref,d.ID_program_study
+                    from db_admission.register as a
+                    join db_admission.register_verification as b
+                    on a.ID = b.RegisterID
+                    join db_admission.register_verified as c
+                    on b.ID = c.RegVerificationID
+                    join db_admission.register_formulir as d
+                    on c.ID = d.ID_register_verified
+                    join db_admission.ujian_perprody_m as e
+                    on e.ID_ProgramStudy = d.ID_program_study
+                    join db_admission.school as f
+                    on a.SchoolID = f.ID
+                    where e.Active = 1 and d.ID not in(select ID_register_formulir from db_admission.register_nilai)
+                    and  d.ID not in (select ID_register_formulir from db_admission.register_butuh_ujian)
+                    GROUP by d.ID
+                  ) bb 
+                  '.$addQ.'
               ) aa';
-      $query=$this->db->query($sql, array($ID_ProgramStudy))->result_array();
+      $query=$this->db->query($sql, array())->result_array();
       return $query[0]['total'];
     }
 
-    public function daftar_set_nilai_rapor_load_data_paging($limit, $start,$ID_ProgramStudy)
+    public function daftar_set_nilai_rapor_load_data_paging($limit, $start,$ID_ProgramStudy,$FormulirCode)
     {
-      $sql = 'select a.Name as NameCandidate,a.Email, d.ID as ID_register_formulir, e.bobot as Bobot, e.NamaUjian,f.SchoolName,f.CityName,
-              c.FormulirCode,  if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,""  ) as No_Ref
+      $arr_temp = array();
+      if ($FormulirCode == "") {
+        $addQ = 'where ID_program_study ="'.$ID_ProgramStudy.'"';
+      }
+      else
+      {
+        $addQ = 'where ( FormulirCode like "'.$FormulirCode.'" or No_Ref = "'.$FormulirCode.'")';
+      }
+      $sql = 'select * from
+              (
+              select a.Name as NameCandidate,a.Email, d.ID as ID_register_formulir, e.bobot as Bobot, e.NamaUjian,f.SchoolName,f.CityName,
+              c.FormulirCode,  if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,""  ) as No_Ref,d.ID_program_study,g.Name as NamePrody
               from db_admission.register as a
               join db_admission.register_verification as b
               on a.ID = b.RegisterID
@@ -1285,12 +1325,17 @@ class M_admission extends CI_Model {
               on e.ID_ProgramStudy = d.ID_program_study
               join db_admission.school as f
               on a.SchoolID = f.ID
-              where d.ID_program_study = ? and e.Active = 1 and d.ID not in(select ID_register_formulir from db_admission.register_nilai)
+              join db_academic.program_study as g
+              on e.ID_ProgramStudy = g.ID
+              where e.Active = 1 and d.ID not in(select ID_register_formulir from db_admission.register_nilai)
               and  d.ID not in (select ID_register_formulir from db_admission.register_butuh_ujian)
               GROUP by d.ID
+             )aa '.$addQ.'
               LIMIT '.$start. ', '.$limit;
-      $query=$this->db->query($sql, array($ID_ProgramStudy))->result_array();
-      return $query;
+      // print_r($sql);die();        
+      $query=$this->db->query($sql, array())->result_array();
+      $arr_temp = array('query' => $query,'Prodi' => ($FormulirCode == "") ? $ID_ProgramStudy : $query[0]['ID_program_study']  );
+      return $arr_temp;
     }
 
     public function saveDataNilaRapor($arr)
@@ -1343,8 +1388,16 @@ class M_admission extends CI_Model {
       } 
     }
 
-    public function count_loadData_calon_mahasiswa_created($Nama,$selectProgramStudy,$Sekolah)
+    public function count_loadData_calon_mahasiswa_created($Nama,$selectProgramStudy,$Sekolah,$FormulirCode)
     {
+      if($FormulirCode != '%') {
+          $FormulirCode = '"%'.$FormulirCode.'%"'; 
+      }
+      else
+      {
+        $FormulirCode = '"%"'; 
+      }
+
       if($Nama != '%') {
           $Nama = '"%'.$Nama.'%"'; 
       }
@@ -1400,15 +1453,26 @@ class M_admission extends CI_Model {
                 ON n.ID = d.SchoolID
                 Left join db_academic.program_study as o
                 on o.ID = a.ID_program_study
+                left join db_admission.formulir_number_offline_m as pq
+                on b.FormulirCode = pq.FormulirCode
                 where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID in (select ID_register_formulir from db_admission.register_nilai where Status != "Verified") 
+                  and ( b.FormulirCode like '.$FormulirCode.' or pq.No_Ref like '.$FormulirCode.' )
               )aa';
            $query=$this->db->query($sql, array())->result_array();
            return $query[0]['total'];
     }
 
-    public function loadData_calon_mahasiswa_created($limit, $start,$Nama,$selectProgramStudy,$Sekolah)
+    public function loadData_calon_mahasiswa_created($limit, $start,$Nama,$selectProgramStudy,$Sekolah,$FormulirCode)
     {
       $arr_temp = array('data' => array());
+      if($FormulirCode != '%') {
+          $FormulirCode = '"%'.$FormulirCode.'%"'; 
+      }
+      else
+      {
+        $FormulirCode = '"%"'; 
+      }
+
       if($Nama != '%') {
           $Nama = '"%'.$Nama.'%"'; 
       }
@@ -1433,7 +1497,7 @@ class M_admission extends CI_Model {
         $Sekolah = '"%"'; 
       }
 
-        $sql = 'select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,g.JenisTempatTinggal,
+        $sql = ' select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,g.JenisTempatTinggal,
             h.ctr_name as CountryAddress,i.ProvinceName as ProvinceAddress,j.RegionName as RegionAddress,k.DistrictName as DistrictsAddress,
             a.District as DistrictAddress,a.Address,a.ZipCode,a.PhoneNumber,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
             n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
@@ -1467,7 +1531,11 @@ class M_admission extends CI_Model {
             ON n.ID = d.SchoolID
             Left join db_academic.program_study as o
             on o.ID = a.ID_program_study
-            where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID in (select ID_register_formulir from db_admission.register_nilai where Status != "Verified") LIMIT '.$start. ', '.$limit;
+            left join db_admission.formulir_number_offline_m as pq
+            on b.FormulirCode = pq.FormulirCode
+            where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID in (select ID_register_formulir from db_admission.register_nilai where Status != "Verified") 
+              and ( b.FormulirCode like '.$FormulirCode.' or pq.No_Ref like '.$FormulirCode.' )
+            LIMIT '.$start. ', '.$limit;
            $query=$this->db->query($sql, array())->result_array();
            return $query;
     }

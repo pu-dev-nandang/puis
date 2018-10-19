@@ -10,10 +10,14 @@
 			<div class="widget-content">
 				<div class = "row">	
 					<div class="col-xs-3" style="">
-						PilIh Prodi
+						Pilih Prodi
 						<select class="select2-select-00 col-md-4 full-width-fix" id="selectPrody">
 						    <option></option>
 						</select>
+					</div>
+					<div class="col-xs-3" style="">
+						Formulir Code
+						<input class="form-control" id="FormulirCode" placeholder="All...">
 					</div>
 					<!-- <div  class="col-xs-4" align="right" id="pagination_link"></div>	 -->
 					<!-- <div class = "table-responsive" id= "register_document_table"></div> -->
@@ -62,12 +66,13 @@
 	function loadDataPrody()
 	{
 	    var url = base_url_js+"api/__getBaseProdiSelectOption";
-	    $('#selectPrody').empty()
+	    $('#selectPrody').empty();
+	     $('#selectPrody').append('<option value="'+'0'+'" '+''+'>'+'--Select Prodi--'+'</option>');
 	    $.post(url,function (data_json) {
 	          for(var i=0;i<data_json.length;i++){
 	              var selected = (i==0) ? 'selected' : '';
 	              //var selected = (data_json[i].RegionName=='Kota Jakarta Pusat') ? 'selected' : '';
-	              $('#selectPrody').append('<option value="'+data_json[i].ID+'" '+selected+'>'+data_json[i].Name+'</option>');
+	              $('#selectPrody').append('<option value="'+data_json[i].ID+'" '+''+'>'+data_json[i].Name+'</option>');
 	          }
 	          $('#selectPrody').select2({
 	             //allowClear: true
@@ -78,14 +83,26 @@
 	    });
 	}
 
+	$(document).on("keyup", "#FormulirCode", function(event){
+    	var FormulirCode = $('#FormulirCode').val();
+    	var n = FormulirCode.length;
+    	console.log(n);
+    	if( this.value.length < 6 && this.value.length != 0 ) return;
+    	   /* code to run below */
+    	loadTableData(1);
+	  
+	});
+
 	function loadTableData(page)
 	{
 		// $.removeCookie('__tawkuuid', { path: '/' });
 		loading_page('#loadTableData');
 		var url = base_url_js+'admission/proses-calon-mahasiswa/set-nilai-rapor/pagination/'+page;
 		var selectPrody = $("#selectPrody").find(':selected').val();
+		var FormulirCode = $("#FormulirCode").val();
 		var data = {
 					selectPrody : selectPrody,
+					FormulirCode : FormulirCode,
 					};
 		var token = jwt_encode(data,"UAP)(*");			
 		$.post(url,{token:token},function (data_json) {
