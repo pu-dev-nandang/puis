@@ -3036,9 +3036,9 @@ class C_save_to_pdf extends CI_Controller {
         $sp_right = 1;
         $fill_right = 53;
 
-        $h=3.3;
+        $h=3;
         $pdf->SetFont('dinpromedium','',7);
-        $pdf->Ln(5);
+        $pdf->Ln(1);
 
         $pdf->Cell($l_left,$h,'Nama',$border,0,'L');
         $pdf->Cell($sp_left,$h,':',$border,0,'C');
@@ -3073,7 +3073,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $this->header_temp_transcript($pdf,$dataTempTr);
 
-        $h=3.5;
+        $h=2.5;
 
         $tr = 'RECORD OF ACADEMIC ACHIEVEMENT';
 
@@ -3085,9 +3085,9 @@ class C_save_to_pdf extends CI_Controller {
         $border = 0;
 
 
-        $h=3.3;
+        $h=3;
         $pdf->SetFont('dinpromedium','',7);
-        $pdf->Ln(5);
+        $pdf->Ln(1);
 
         $pdf->Cell($l_left,$h,'Name',$border,0,'L');
         $pdf->Cell($sp_left,$h,':',$border,0,'C');
@@ -3108,7 +3108,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($sp_left,$h,':',$border,0,'C');
         $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['PlaceOfBirth'])).', '.date('F j, Y',strtotime($Student['DateOfBirth'])),$border,1,'L');
 
-        $pdf->Ln(2);
+        $pdf->Ln(1.5);
 
         $this->headerTable('eng',$pdf);
         $this->body_temp_transcript('eng',$pdf,$dataStudent,$dataTempTr);
@@ -3118,99 +3118,6 @@ class C_save_to_pdf extends CI_Controller {
 
         $nameF = str_replace(' ','_',strtoupper($Student['Name']));
         $pdf->Output('TEMP_TRNSCPT_'.$Student['NPM'].'_'.$nameF.'.pdf','I');
-    }
-
-    private function header_temp_transcript2($lang,$pdf,$Student,$dataTempTr){
-        $pdf->Image(base_url('images/logo.png'),10,5,40);
-
-        $h=3.5;
-        $pdf->Ln(5);
-        $pdf->SetFont('dinpromedium','',9);
-
-        $tr = ($lang=='ind') ? 'TRANSKRIP SEMENTARA' : 'RECORD OF ACADEMIC ACHIEVEMENT';
-
-        $pdf->Cell(190,$h,$tr,0,1,'C');
-
-        $pdf->SetFont('dinprolight','',7);
-        $pdf->Cell(190,$h,'No. : '.$dataTempTr['No'],0,1,'C');
-
-
-        $border = 0;
-
-        $l_left = 38;
-        $sp_left = 1;
-        $fill_left = 93;
-
-        $l_right = 22;
-        $sp_right = 1;
-        $fill_right = 35;
-
-        $h=3.3;
-        $pdf->SetFont('dinpromedium','',7);
-        $pdf->Ln(1.5);
-
-        if($lang=='ind'){
-
-            $pdf->Cell(190,$h,'Fakultas : '.$Student['FacultyName'],0,1,'C');
-            $pdf->Cell(190,$h,'Program Studi : '.ucwords(strtolower($Student['Prodi'])),0,1,'C');
-            $pdf->Ln(1.5);
-
-            $pdf->Cell($l_left,$h,'Nama',$border,0,'L');
-            $pdf->Cell($sp_left,$h,':',$border,0,'C');
-            $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['Name'])),$border,0,'L');
-            $pdf->Cell($l_right,$h,'NIM',$border,0,'L');
-            $pdf->Cell($sp_right,$h,':',$border,0,'C');
-            $pdf->Cell($fill_right,$h,$Student['NPM'],$border,1,'L');
-
-            $e = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '%#d' : '%e';
-            $pdf->Cell($l_left,$h,'Tempat dan Tanggal Lahir',$border,0,'L');
-            $pdf->Cell($sp_left,$h,':',$border,0,'C');
-            $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['PlaceOfBirth'])).', '.strftime($e." %B %Y",strtotime($Student['DateOfBirth'])),$border,1,'L');
-
-
-
-        }
-        else if($lang=='eng'){
-            $pdf->Cell(190,$h,'Faculty : '.$Student['FacultyName'],0,1,'C');
-            $pdf->Cell(190,$h,'Department : '.ucwords(strtolower($Student['ProdiEng'])),0,1,'C');
-            $pdf->Ln(1.5);
-
-            $pdf->Cell($l_left,$h,'Name',$border,0,'L');
-            $pdf->Cell($sp_left,$h,':',$border,0,'C');
-            $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['Name'])),$border,0,'L');
-            $pdf->Cell($l_right,$h,'Student ID',$border,0,'L');
-            $pdf->Cell($sp_right,$h,':',$border,0,'C');
-            $pdf->Cell($fill_right,$h,$Student['NPM'],$border,1,'L');
-
-            $pdf->Cell($l_left,$h,'Place, Date of Birth',$border,0,'L');
-            $pdf->Cell($sp_left,$h,':',$border,0,'C');
-            $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['PlaceOfBirth'])).', '.date('F j, Y',strtotime($Student['DateOfBirth'])),$border,1,'L');
-        }
-
-
-
-        $pdf->Ln(2.5);
-
-        $border = 1;
-
-        $w_no = 8;
-        $w_smt = 8;
-        $w_kode = 20;
-        $w_mk = 103;
-        $w_f = 11;
-        $w_fv = 18;
-        $h=4.3;
-        $pdf->SetFillColor(226, 226, 226);
-        $pdf->Cell($w_no,$h,'No.',$border,0,'C',true);
-//        $pdf->Cell($w_smt,$h,'Smt',$border,0,'C',true);
-        $pdf->Cell($w_kode,$h,'Kode',$border,0,'C',true);
-        $pdf->Cell($w_mk+$w_smt,$h,'Mata Kuliah',$border,0,'C',true);
-        $pdf->Cell($w_f,$h,'SKS',$border,0,'C',true);
-        $pdf->Cell($w_f,$h,'Nilai',$border,0,'C',true);
-        $pdf->Cell($w_f,$h,'Bobot',$border,0,'C',true);
-        $pdf->Cell($w_fv,$h,'SKS X Bobot',$border,1,'C',true);
-
-        $pdf->SetFont('dinprolight','',7);
     }
 
     private function headerTable($lang,$pdf){
@@ -3251,7 +3158,7 @@ class C_save_to_pdf extends CI_Controller {
     private function header_temp_transcript($pdf,$dataTempTr){
         $pdf->SetFont('dinpromedium','',6);
 
-        $pdf->Image(base_url('images/logo.png'),10,5,40);
+        $pdf->Image(base_url('images/logo.png'),10,1,40);
 
         $pdf->SetXY(100,3);
         $pdf->Cell(100,5,$dataTempTr['NoForm'],0,1,'R');
