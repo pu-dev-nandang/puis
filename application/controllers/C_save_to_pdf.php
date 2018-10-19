@@ -3614,7 +3614,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Line(10+$w_R_label+$w_R_sparator+$w_R_fill+$w_Div, $yA, 10+$w_R_label+$w_R_sparator+$w_R_fill+$w_Div, $yA2);
         $h = 1.5;
         $pdf->Cell($totalW,$h,'','LRB',1,'L');
-        $h=3.5;
+        $h=3;
 
         $pdf->Ln(7);
 
@@ -3978,14 +3978,41 @@ class C_save_to_pdf extends CI_Controller {
         // ----
 
         $pdf->SetFont('dinpromedium','',$fn_b);
-        $pdf->SetX($x+10);
-        $pdf->Cell(138.5,$h,$Rektor,$border,0,'L');
-        $pdf->Cell(41,$h,$Dekan,$border,1,'L');
 
+        $yy = 13;
+        $xx = 57;
+
+        $ytext = $pdf->GetY()+$yy;
+        $xtext = $pdf->GetX()+$xx;
+        $pdf->Text($xtext,$ytext,$Rektor);
+
+        $ytext = $pdf->GetY()+$yy+4;
+        $xtext = $pdf->GetX()+$xx;
         $pdf->SetFont('dinpromedium','',$fn_b-2);
-        $pdf->SetX($x+10);
-        $pdf->Cell(138.5,$h,'NIK : '.$Rektorat['NIP'],$border,0,'L');
-        $pdf->Cell(41,$h,'NIK : '.$Student['NIP'],$border,1,'L');
+        $pdf->Text($xtext,$ytext,'NIK : '.$Rektorat['NIP']);
+
+
+        $pdf->SetFont('dinpromedium','',$fn_b);
+        $ytext = $pdf->GetY()+$yy;
+        $xtext = $pdf->GetX()+$xx+138;
+        $pdf->Text($xtext,$ytext,$Dekan);
+
+        $ytext = $pdf->GetY()+$yy+4;
+        $xtext = $pdf->GetX()+$xx+138;
+        $pdf->SetFont('dinpromedium','',$fn_b-2);
+        $pdf->Text($xtext,$ytext,'NIK : '.$Student['NIP']);
+
+
+
+
+//        $pdf->SetX($x+10);
+//        $pdf->Cell(138.5,$h,$Rektor,$border,0,'L');
+//        $pdf->Cell(41,$h,$Dekan,$border,1,'L');
+
+//        $pdf->SetFont('dinpromedium','',$fn_b-2);
+//        $pdf->SetX($x+10);
+//        $pdf->Cell(138.5,$h,'NIK : '.$Rektorat['NIP'],$border,0,'L');
+//        $pdf->Cell(41,$h,'NIK : '.$Student['NIP'],$border,1,'L');
 
         $pdf->Rect($x+95, $y, 33, 45);
 
