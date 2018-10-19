@@ -160,7 +160,7 @@
                 var dataTable = $('#tableMonScore').DataTable( {
                     "processing": true,
                     "serverSide": true,
-                    "iDisplayLength" : 25,
+                    "iDisplayLength" : 10,
                     "ordering" : false,
                     "language": {
                         "searchPlaceholder": "NIM, Student, Group, Lecturer"
