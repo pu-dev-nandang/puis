@@ -110,10 +110,11 @@
 				?>
 					<tr>
 						<td class="checkbox-column">
-							<?php if ($datadb['data'][$i]['document'][$j]['Status'] == 'Done'): ?>
+							<!-- <?php if ($datadb['data'][$i]['document'][$j]['Status'] == 'Done'): ?>
 							<?php else: ?>
 								<input type="checkbox" class="uniform<?php echo $i ?>" value ="<?php echo $datadb['data'][$i]['document'][$j]['ID_register_document'] ?>;<?php echo $namaFile ?>">
-							<?php endif ?>
+							<?php endif ?> -->
+							<input type="checkbox" class="uniform<?php echo $i ?>" value ="<?php echo $datadb['data'][$i]['document'][$j]['ID_register_document'] ?>;<?php echo $namaFile ?>">
 					  	</td>
 						<td><?php echo $no ?></td>
 						<td><?php echo $datadb['data'][$i]['document'][$j]['DocumentChecklist'] ?></td>
@@ -129,10 +130,35 @@
 	<div class="col-xs-12" align = "right">
 	   <button class="btn btn-inverse btn-notification btn-reject" id="btn-reject<?php echo $i ?>">Reject</button>
 	   <button class="btn btn-inverse btn-notification btn-approve" id="btn-approve<?php echo $i ?>">Approve</button>
+	   <button class="btn btn-danger btn-notification btn-unpprove" id="btn-unpprove<?php echo $i ?>">Unapprove</button>
 	</div>
 	<!-- <br> -->
 	<hr class="style-eight" />
 	<script type="text/javascript">
+		$(document).ready(function () {
+			$('#btn-unpprove<?php echo $i ?>').click(function(){
+					loading_button('#btn-unpprove<?php echo $i ?>');
+					var ID_register_document = getValueChecbox<?php echo $i ?>('.tableData<?php echo $i ?>');
+					  // console.log(ID_register_document);
+					 if (ID_register_document.length == 0) {
+					 	toastr.error("Silahkan checked dahulu", 'Failed!!');
+					 }
+					 else
+					 {
+					 	var msg = '';
+					 	//var getAllRegisterID;
+					 	$('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Apakah anda yakin untuk melakukan request ini ?? </b> ' +
+					 	    '<button type="button" id="confirmYesProcess" class="btn btn-primary" style="margin-right: 5px;" data-pass = "'+ID_register_document+'" action = "unapprove">Yes</button>' +
+					 	    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+					 	    '</div>');
+					 	$('#NotificationModal').modal('show');
+					 	
+				 		 
+					 }
+					 $('#btn-unpprove<?php echo $i ?>').prop('disabled',false).html('Unapprove');
+			})
+		});
+
 		$(document).on('click','#dataResultCheckAll<?php echo $i ?>', function () {
 			$('input.uniform<?php echo $i ?>').not(this).prop('checked', this.checked);
 		});

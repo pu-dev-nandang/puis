@@ -42,14 +42,15 @@ class C_admission extends Admission_Controler {
         $tahun = $input['selectTahun'];
         $nama = $input['NamaCandidate'];
         $status = $input['selectStatus'];
+        $FormulirCode = $input['FormulirCode'];
 
         $this->load->library('pagination');
-        $config = $this->config_pagination_default_ajax($this->m_admission->CountSelectDataCalonMahasiswa($tahun,$nama,$status),2,6);
+        $config = $this->config_pagination_default_ajax($this->m_admission->CountSelectDataCalonMahasiswa($tahun,$nama,$status,$FormulirCode),2,6);
   
         $this->pagination->initialize($config);
         $page = $this->uri->segment(6);
         $start = ($page - 1) * $config["per_page"];
-        $this->data['datadb'] = $this->m_admission->selectDataCalonMahasiswa($config["per_page"], $start,$tahun,$nama,$status);
+        $this->data['datadb'] = $this->m_admission->selectDataCalonMahasiswa($config["per_page"], $start,$tahun,$nama,$status,$FormulirCode);
        $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_verifikasi_dokumen',$this->data,true);
 
         $output = array(
@@ -73,9 +74,13 @@ class C_admission extends Admission_Controler {
       if ($action ==  'approve') {
         $Status = "Done";
       }
-      else
+      else if($action ==  'reject')
       {
         $Status = "Reject";
+      }
+      else
+      {
+        $Status = "Progress Checking";
       }
 
       $this->m_admission->updateStatusVeriDokumen($data_arr,$Status);
@@ -91,15 +96,17 @@ class C_admission extends Admission_Controler {
 
       // send email
       if ($Status == "Reject") {
-          $text = 'Dear Candidate,<br><br>
-                      You have document not approved yet, Please send your valid document.<br>
-                      '.url_registration."formulir-registration/".$keyURL['url'].'
-                  ';
-          $to = $keyURL['email'];
-          $subject = "Podomoro University Document Upload";
-          $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);        
+          if($_SERVER['SERVER_NAME']!='localhost') {
+            $text = 'Dear Candidate,<br><br>
+                        You have document not approved yet, Please send your valid document.<br>
+                        '.url_registration."formulir-registration/".$keyURL['url'].'
+                    ';
+            $to = $keyURL['email'];
+            $subject = "Podomoro University Document Upload";
+            $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text); 
+         }          
       }
-      else
+      else if($Status == 'Done')
       { 
         // check status if all done
         $check = $this->m_admission->checkAllstatusDoneVeriDoc($ID_register_document);
@@ -394,14 +401,16 @@ class C_admission extends Admission_Controler {
        $input =  $this->getInputToken();
        $Nama = $input['selectPrody'];
        $selectPrody = $input['selectPrody'];
+       $FormulirCode = $input['FormulirCode'];
 
        $this->load->library('pagination');
-       $config = $this->config_pagination_default_ajax($this->m_admission->count_daftar_set_nilai_rapor_load_data_paging($selectPrody),10,5);
+       $config = $this->config_pagination_default_ajax($this->m_admission->count_daftar_set_nilai_rapor_load_data_paging($selectPrody,$FormulirCode),10,5);
        $this->pagination->initialize($config);
        $page = $this->uri->segment(5);
        $start = ($page - 1) * $config["per_page"];
-       $this->data['datadb'] = $this->m_admission->daftar_set_nilai_rapor_load_data_paging($config["per_page"], $start,$selectPrody);
-       $this->data['mataujian'] = $this->m_admission->select_mataUjian($selectPrody);
+       $datadb = $this->m_admission->daftar_set_nilai_rapor_load_data_paging($config["per_page"], $start,$selectPrody,$FormulirCode);
+       $this->data['datadb'] = $datadb['query'];
+       $this->data['mataujian'] = $this->m_admission->select_mataUjian($datadb['Prodi']);
        $this->data['grade'] = json_encode($this->m_admission->showData('db_academic.grade'));
       $this->data['no'] = $start + 1;
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/daftar_nilai_rapor_load_data_paging',$this->data,true);
@@ -431,15 +440,16 @@ class C_admission extends Admission_Controler {
     {
        $input =  $this->getInputToken();
        $Nama = $input['Nama'];
+       $FormulirCode = $input['FormulirCode'];
        $selectProgramStudy = $input['selectProgramStudy'];
        $Sekolah = $input['Sekolah'];
        $this->load->library('pagination');
-       $config = $this->config_pagination_default_ajax($this->m_admission->count_loadData_calon_mahasiswa_created($Nama,$selectProgramStudy,$Sekolah),25,4);
+       $config = $this->config_pagination_default_ajax($this->m_admission->count_loadData_calon_mahasiswa_created($Nama,$selectProgramStudy,$Sekolah,$FormulirCode),25,4);
        $this->pagination->initialize($config);
        $page = $this->uri->segment(4);
        $start = ($page - 1) * $config["per_page"];
        $this->data['url_registration'] = url_registration;
-       $this->data['datadb'] = $this->m_admission->loadData_calon_mahasiswa_created($config["per_page"], $start,$Nama,$selectProgramStudy,$Sekolah);
+       $this->data['datadb'] = $this->m_admission->loadData_calon_mahasiswa_created($config["per_page"], $start,$Nama,$selectProgramStudy,$Sekolah,$FormulirCode);
        $this->data['mataujian'] = $this->m_admission->select_mataUjian($selectProgramStudy);
        $this->data['grade'] = $this->m_admission->showData('db_academic.grade');
       $this->data['no'] = $start + 1;

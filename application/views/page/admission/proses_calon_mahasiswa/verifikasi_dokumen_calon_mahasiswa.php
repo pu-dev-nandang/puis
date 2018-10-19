@@ -5,7 +5,11 @@
 				<h4><i class="icon-reorder"></i><?php echo $NameMenu ?></h4>
 			</div>
 			<div class="widget-content">
-				<div class = "row">	
+				<div class = "row">
+					<div class="col-xs-2" style="">
+						Formulir Code
+						<input class="form-control" id="FormulirCode" placeholder="All..." "="">
+					</div>	
 					<div class="col-xs-2" style="">
 						Tahun
 						<select class="select2-select-00 col-md-4 full-width-fix" id="selectTahun">
@@ -47,6 +51,16 @@
     	loadData_register_document(1);
     });
 
+    $(document).on("keyup", "#FormulirCode", function(event){
+    	var FormulirCode = $('#FormulirCode').val();
+    	var n = FormulirCode.length;
+    	console.log(n);
+    	if( this.value.length < 6 && this.value.length != 0 ) return;
+    	   /* code to run below */
+    	 loadData_register_document(1);
+	  
+	});
+
     $(document).on("keyup", "#Nama", function(event){
     	var nama = $('#Nama').val();
     	var n = nama.length;
@@ -63,12 +77,15 @@
 		var url = base_url_js+'admission/proses-calon-mahasiswa/verifikasi-dokument/register_document_table/pagination/'+page;
 		var selectTahun = $("#selectTahun").find(':selected').val();
 		var NamaCandidate = $("#Nama").val();
+		var FormulirCode = $("#FormulirCode").val();
+		if (FormulirCode == '') {FormulirCode = '%'};
 		 if (NamaCandidate == '') {NamaCandidate = '%'};
 		var selectStatus = $("#selectStatus").find(':selected').val();
 		var data = {
 					selectTahun : selectTahun,
 					NamaCandidate : NamaCandidate,
-					selectStatus : selectStatus,					
+					selectStatus : selectStatus,
+					FormulirCode : FormulirCode,					
 					};
 		var token = jwt_encode(data,"UAP)(*");			
 		$.post(url,{token:token},function (data_json) {

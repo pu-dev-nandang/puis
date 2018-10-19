@@ -49,13 +49,19 @@
                             </select>
                         </div>
                         <div class="col-xs-2" style="">
+                            Formulir Code
+                            <input class="form-control" id="FormulirCode" placeholder="All...">
+                        </div>
+                        <div class="col-xs-2" style="">
                             Nama
-                            <input class="form-control" id="Nama" placeholder="All..." "="">
+                            <input class="form-control" id="Nama" placeholder="All...">
                         </div>
                         <div class="col-xs-2" style="">
                             Sekolah
-                            <input class="form-control" id="Sekolah" placeholder="All..." "="">
+                            <input class="form-control" id="Sekolah" placeholder="All...">
                         </div>
+                </div>
+                <div class="row" style="margin-top: 10px;margin-left: 0px;,margin-right: 0px">
                     <div  class="col-xs-6" align="right" id="pagination_link"></div>
                 </div>
                 <div class="row" style="margin-top: 10px;margin-left: 0px;,margin-right: 0px">
@@ -102,11 +108,22 @@
          return allVals;
     }
 
+    $(document).on("keyup", "#FormulirCode", function(event){
+        var FormulirCode = $('#FormulirCode').val();
+        var n = FormulirCode.length;
+        console.log(n);
+        if( this.value.length < 6 && this.value.length != 0 ) return;
+           /* code to run below */
+        loadData(1);
+      
+    });
+
     function loadData(page)
     {
         loading_page('#pageData');
         var url = base_url_js+'admission/proses-calon-mahasiswa/loaddata_nilai_calon_mahasiswa/'+page;
         var Nama = $("#Nama").val();
+        var FormulirCode = $("#FormulirCode").val();
         var selectProgramStudy = $("#selectProgramStudy").val();
         selectProgramStudy = (selectProgramStudy == '') ? '%' : selectProgramStudy;
         // var Sekolah = $("#Sekolah").val();
@@ -114,6 +131,7 @@
             Nama : Nama,
             selectProgramStudy : selectProgramStudy,
             Sekolah : temp,
+            FormulirCode : FormulirCode,
         }
         var token = jwt_encode(data,"UAP)(*");
         $.post(url,{token:token},function (data_json) {
