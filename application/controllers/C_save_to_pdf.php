@@ -3615,12 +3615,12 @@ class C_save_to_pdf extends CI_Controller {
         $h = 1.5;
         $pdf->Cell($totalW,$h,'','LRB',1,'L');
         $h=3;
-
-        $pdf->Ln(7);
-
-        +$min = 25;
-        $borderttd = 0;
         $y = $pdf->GetY();
+        $pdf->Ln(17);
+
+        $min = 25;
+        $borderttd = 0;
+
         $pdf->SetFont('dinpromedium','',$font_medium);
         $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
         $pdf->Cell($w_Div-$min,$h,'Tempat dan Tanggal Diterbitkan',$borderttd,1,'L');
@@ -3649,7 +3649,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_Div+$min,$h,'Rector',$borderttd,0,'L');
         $pdf->Cell($w_Div-$min,$h,'Dean',$borderttd,1,'L');
 
-        $pdf->Ln(14);
+        $pdf->Ln(17);
 
         $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].' ' : '';
         $titleB = ($Student['TitleBehind']!='') ? ' '.$Student['TitleBehind'] : '' ;
@@ -3672,7 +3672,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_Div+$min,$h,'NIK : '.$Rektorat['NIP'],$borderttd,0,'L');
         $pdf->Cell($w_Div-$min,$h,'NIK : '.$Student['NIP'],$borderttd,1,'L');
 
-        $pdf->Rect(77, $y, 33, 45);
+        $pdf->Rect(77, $y+5, 40, 60);
 
 
         $nameF = str_replace(' ','_',strtoupper($Student['Name']));
@@ -3787,6 +3787,8 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetMargins(20.5,10.5,10);
         $pdf->AddPage();
 
+//        $pdf->Image(base_url('images/i.jpg'),0,0,300);
+
         $h = 3;
 
         $Ijazah = $dataIjazah['Ijazah'][0];
@@ -3829,10 +3831,10 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinproExpBold','',20);
         $pdf->Cell($full_width,13,ucwords(strtolower($Student['Name'])),$border,1,'C');
 
-        $pdf->Ln(2);
+        $pdf->Ln(1.5);
 
         $x = 67;
-        $ln = 3;
+        $ln = 1.5;
         $label = 70;
         $sp = 1.5;
         $fill = 100;
@@ -3915,7 +3917,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,date('F j, Y',strtotime($Ijazah['DateOfYudisium'])),$border,1,'L');
 //        $pdf->Cell($fill,$h,date('d/m/Y',strtotime($Ijazah['DateOfYudisium'])),$border,1,'L');
-        $pdf->Ln($ln);
+        $pdf->Ln(4);
 
         // ===== Ket 1 =====
         // 171.5
@@ -3942,7 +3944,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($fillFull,$h,'and conferred the right and privileges pertaining to this degree.',$border,1,'L');
 
         $y = $pdf->GetY()+7;
-        $pdf->Ln(7);
+        $pdf->Ln(15);
 
         // 171.5
         // Tanda tangan
@@ -3954,7 +3956,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinlightitalic','',$fn_i);
         $pdf->Cell(171.5,$h,$Ijazah['PlaceIssued'].', '.date('F j, Y',strtotime($Ijazah['DateIssued'])),$border,1,'L');
 
-        $pdf->Ln(2);
+        $pdf->Ln(3);
         $pdf->SetX($x+10);
         $pdf->SetFont('dinpromedium','',$fn_b);
         $pdf->Cell(138.5,$h,'Rektor',$border,0,'L');
@@ -3983,7 +3985,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetFont('dinpromedium','',$fn_b);
 
-        $yy = 13;
+        $yy = 15;
         $xx = 57;
 
         $ytext = $pdf->GetY()+$yy;
@@ -4006,9 +4008,6 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinpromedium','',$fn_b-2);
         $pdf->Text($xtext,$ytext,'NIK : '.$Student['NIP']);
 
-
-
-
 //        $pdf->SetX($x+10);
 //        $pdf->Cell(138.5,$h,$Rektor,$border,0,'L');
 //        $pdf->Cell(41,$h,$Dekan,$border,1,'L');
@@ -4018,7 +4017,8 @@ class C_save_to_pdf extends CI_Controller {
 //        $pdf->Cell(138.5,$h,'NIK : '.$Rektorat['NIP'],$border,0,'L');
 //        $pdf->Cell(41,$h,'NIK : '.$Student['NIP'],$border,1,'L');
 
-        $pdf->Rect($x+95, $y, 33, 45);
+        $pdf->Rect($x+95, $y, 40, 60);
+//        $pdf->Image(base_url('images/46.png'),$x+95,$y,40,60);
 
 
         $nameF = str_replace(' ','_',strtoupper($Student['Name']));
