@@ -4398,36 +4398,40 @@ class C_api extends CI_Controller {
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
 
-        $w_prodi = ($data_arr['ProdiID']!='') ? ' AND auts.ProdiID = "'.$data_arr['ProdiID'].'"' : '';
+        $queryDefaultRow = [];
+        $data = [];
 
-        $whereType = '';
-        if($data_arr['Type']==10){
-            $whereType = ' AND (sp.UTS IS NULL OR sp.UTS=0 OR sp.UTS="")';
-        } else if($data_arr['Type']==11){
-            $whereType = ' AND (sp.UTS IS NOT NULL AND sp.UTS!=0 AND sp.UTS != "")';
-        }
+        if($data_arr['SemesterID']>=13){
+            $w_prodi = ($data_arr['ProdiID']!='') ? ' AND auts.ProdiID = "'.$data_arr['ProdiID'].'"' : '';
 
-        else if($data_arr['Type']==20){
-            $whereType = ' AND (sp.UAS IS NULL OR sp.UAS=0 OR sp.UAS="")';
-        } else if($data_arr['Type']==21){
-            $whereType = ' AND (sp.UAS IS NOT NULL AND sp.UAS!=0 AND sp.UAS != "")';
-        }
+            $whereType = '';
+            if($data_arr['Type']==10){
+                $whereType = ' AND (sp.UTS IS NULL OR sp.UTS=0 OR sp.UTS="")';
+            } else if($data_arr['Type']==11){
+                $whereType = ' AND (sp.UTS IS NOT NULL AND sp.UTS!=0 AND sp.UTS != "")';
+            }
 
-        $dataSearch = '';
-        if( !empty($requestData['search']['value']) ) {
-            $search = $requestData['search']['value'];
-            $dataSearch = ' AND ( s.ClassGroup LIKE "%'.$search.'%" 
+            else if($data_arr['Type']==20){
+                $whereType = ' AND (sp.UAS IS NULL OR sp.UAS=0 OR sp.UAS="")';
+            } else if($data_arr['Type']==21){
+                $whereType = ' AND (sp.UAS IS NOT NULL AND sp.UAS!=0 AND sp.UAS != "")';
+            }
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataSearch = ' AND ( s.ClassGroup LIKE "%'.$search.'%" 
             OR auts.Name LIKE "%'.$search.'%"
              OR auts.NPM LIKE "%'.$search.'%"
               OR em.NIP LIKE "%'.$search.'%"
                OR em.Name LIKE "%'.$search.'%") ';
 
-        }
+            }
 
 
 
-        $DB_ = 'ta_'.$data_arr['Year'];
-        $queryDefault = 'SELECT s.ID,auts.NPM,auts.Name, s.ClassGroup, em.Name AS CoordinatorName, 
+            $DB_ = 'ta_'.$data_arr['Year'];
+            $queryDefault = 'SELECT s.ID,auts.NPM,auts.Name, s.ClassGroup, em.Name AS CoordinatorName, 
                                      sp.Evaluasi1, sp.Evaluasi2, sp.Evaluasi3, sp.Evaluasi4, sp.Evaluasi5, sp.UTS, sp.UAS,
                                       sp.Score, sp.Grade
                                     FROM '.$DB_.'.study_planning sp
@@ -4437,56 +4441,56 @@ class C_api extends CI_Controller {
                                     WHERE ( sp.SemesterID = "'.$data_arr['SemesterID'].'" '.$w_prodi.' ) '.$whereType.' '.$dataSearch.' ORDER BY sp.NPM ASC
                                     ';
 
-        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
-        $query = $this->db->query($sql)->result_array();
-        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefault)->result_array();
 
-        $no = $requestData['start'] + 1;
-        $data = array();
-        for($i=0;$i<count($query);$i++) {
-            $nestedData = array();
+            $no = $requestData['start'] + 1;
+            $data = array();
+            for($i=0;$i<count($query);$i++) {
+                $nestedData = array();
 
-            $row = $query[$i];
+                $row = $query[$i];
 
-             $rowMK = $this->db->query('SELECT  mk.Name AS MKName, mk.NameEng AS MKNameEng, mk.MKCode 
+                $rowMK = $this->db->query('SELECT  mk.Name AS MKName, mk.NameEng AS MKNameEng, mk.MKCode 
                                                               FROM db_academic.schedule_details_course sdc
                                                               LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
                                                               WHERE sdc.ScheduleID = "'.$row['ID'].'"  GROUP BY sdc.ScheduleID LIMIT 1')->result_array()[0];
 
+                $ev1 = ($row['Evaluasi1']!=null && $row['Evaluasi1']!='' && $row['Evaluasi1']!=0 && $row['Evaluasi1']!='0') ? $row['Evaluasi1'] : '-';
+                $ev2 = ($row['Evaluasi2']!=null && $row['Evaluasi2']!='' && $row['Evaluasi2']!=0 && $row['Evaluasi2']!='0') ? $row['Evaluasi2'] : '-';
+                $ev3 = ($row['Evaluasi3']!=null && $row['Evaluasi3']!='' && $row['Evaluasi3']!=0 && $row['Evaluasi3']!='0') ? $row['Evaluasi3'] : '-';
+                $ev4 = ($row['Evaluasi4']!=null && $row['Evaluasi4']!='' && $row['Evaluasi4']!=0 && $row['Evaluasi4']!='0') ? $row['Evaluasi4'] : '-';
+                $ev5 = ($row['Evaluasi5']!=null && $row['Evaluasi5']!='' && $row['Evaluasi5']!=0 && $row['Evaluasi5']!='0') ? $row['Evaluasi5'] : '-';
+                $UTS = ($row['UTS']!=null && $row['UTS']!='' && $row['UTS']!=0 && $row['UTS']!='0') ? $row['UTS'] : '-';
+                $UAS = ($row['UAS']!=null && $row['UAS']!='' && $row['UAS']!=0 && $row['UAS']!='0') ? $row['UAS'] : '-';
 
 
 
-            $ev1 = ($row['Evaluasi1']!=null && $row['Evaluasi1']!='' && $row['Evaluasi1']!=0 && $row['Evaluasi1']!='0') ? $row['Evaluasi1'] : '-';
-            $ev2 = ($row['Evaluasi2']!=null && $row['Evaluasi2']!='' && $row['Evaluasi2']!=0 && $row['Evaluasi2']!='0') ? $row['Evaluasi2'] : '-';
-            $ev3 = ($row['Evaluasi3']!=null && $row['Evaluasi3']!='' && $row['Evaluasi3']!=0 && $row['Evaluasi3']!='0') ? $row['Evaluasi3'] : '-';
-            $ev4 = ($row['Evaluasi4']!=null && $row['Evaluasi4']!='' && $row['Evaluasi4']!=0 && $row['Evaluasi4']!='0') ? $row['Evaluasi4'] : '-';
-            $ev5 = ($row['Evaluasi5']!=null && $row['Evaluasi5']!='' && $row['Evaluasi5']!=0 && $row['Evaluasi5']!='0') ? $row['Evaluasi5'] : '-';
-            $UTS = ($row['UTS']!=null && $row['UTS']!='' && $row['UTS']!=0 && $row['UTS']!='0') ? $row['UTS'] : '-';
-            $UAS = ($row['UAS']!=null && $row['UAS']!='' && $row['UAS']!=0 && $row['UAS']!='0') ? $row['UAS'] : '-';
+                $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
+                $nestedData[] = '<div style="text-align:left;"><b><i class="fa fa-user margin-right"></i>'.$row['Name'].'</b><br/>'.$row['NPM'].'</div>';
+                $nestedData[] = '<div style="text-align:center;">'.$rowMK['MKCode'].'</div>';
+                $nestedData[] = '<div style="text-align:left;"><span style="color: #009688;">'.$rowMK['MKNameEng'].'</span><br/><i style="color: #9e9e9e;">'.$rowMK['MKName'].'</i></div>';
+                $nestedData[] = '<div style="text-align:center;">'.$row['ClassGroup'].'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.$row['CoordinatorName'].'</div>';
+                $nestedData[] = '<div style="text-align:center;">'.$ev1.'</div>';
+                $nestedData[] = '<div style="text-align:center;">'.$ev2.'</div>';
+                $nestedData[] = '<div style="text-align:center;">'.$ev3.'</div>';
+                $nestedData[] = '<div style="text-align:center;">'.$ev4.'</div>';
+                $nestedData[] = '<div style="text-align:center;">'.$ev5.'</div>';
+                $nestedData[] = '<div style="text-align:center;">'.$UTS.'</div>';
+                $nestedData[] = '<div style="text-align:center;">'.$UAS.'</div>';
+                $nestedData[] = '<div style="text-align:center;">'.$row['Score'].'</div>';
+                $nestedData[] = '<div style="text-align:center;">'.$row['Grade'].'</div>';
 
+                $data[] = $nestedData;
+                $no++;
 
-
-            $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
-            $nestedData[] = '<div style="text-align:left;"><b><i class="fa fa-user margin-right"></i>'.$row['Name'].'</b><br/>'.$row['NPM'].'</div>';
-            $nestedData[] = '<div style="text-align:center;">'.$rowMK['MKCode'].'</div>';
-            $nestedData[] = '<div style="text-align:left;"><span style="color: #009688;">'.$rowMK['MKNameEng'].'</span><br/><i style="color: #9e9e9e;">'.$rowMK['MKName'].'</i></div>';
-            $nestedData[] = '<div style="text-align:center;">'.$row['ClassGroup'].'</div>';
-            $nestedData[] = '<div style="text-align:left;">'.$row['CoordinatorName'].'</div>';
-            $nestedData[] = '<div style="text-align:center;">'.$ev1.'</div>';
-            $nestedData[] = '<div style="text-align:center;">'.$ev2.'</div>';
-            $nestedData[] = '<div style="text-align:center;">'.$ev3.'</div>';
-            $nestedData[] = '<div style="text-align:center;">'.$ev4.'</div>';
-            $nestedData[] = '<div style="text-align:center;">'.$ev5.'</div>';
-            $nestedData[] = '<div style="text-align:center;">'.$UTS.'</div>';
-            $nestedData[] = '<div style="text-align:center;">'.$UAS.'</div>';
-            $nestedData[] = '<div style="text-align:center;">'.$row['Score'].'</div>';
-            $nestedData[] = '<div style="text-align:center;">'.$row['Grade'].'</div>';
-
-            $data[] = $nestedData;
-            $no++;
-
+            }
         }
+
+
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),

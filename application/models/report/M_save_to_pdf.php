@@ -393,6 +393,8 @@ class M_save_to_pdf extends CI_Model {
                     $Point = $d['Credit'] * $GradeValue;
 
                     $data[$i]['Grade'] = $Grade;
+//                    $data[$i]['GradeValue'] = (is_int($GradeValue)) ? $GradeValue : number_format($GradeValue,2);
+//                    $data[$i]['Point'] = (is_int($Point)) ? $Point : number_format($Point,2);
                     $data[$i]['GradeValue'] = $GradeValue;
                     $data[$i]['Point'] = $Point;
 
