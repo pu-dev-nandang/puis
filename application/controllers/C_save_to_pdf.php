@@ -3781,6 +3781,8 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf = new FPDF('L','mm','A4');
 
+        $pdf->AddFont('dinproExpBold','','dinproExpBold.php');
+
         // membuat halaman baru
         $pdf->SetMargins(20.5,10.5,10);
         $pdf->AddPage();
@@ -3815,6 +3817,7 @@ class C_save_to_pdf extends CI_Controller {
         $full_width = 212;
         $pdf->SetXY($x,45.5);
         $pdf->SetFont('dinpromedium','',$fn_b);
+
         $pdf->Cell($full_width,$h,'Memberikan Ijazah Kepada',$border,1,'C');
 
         $pdf->SetX($x);
@@ -3822,7 +3825,8 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($full_width,$h,'This certificate is awarded to',$border,1,'C');
 
         $pdf->SetX($x);
-        $pdf->SetFont('dinpromedium','',20);
+//        $pdf->SetFont('dinpromedium','',20);
+        $pdf->SetFont('dinproExpBold','',20);
         $pdf->Cell($full_width,13,ucwords(strtolower($Student['Name'])),$border,1,'C');
 
         $pdf->Ln(2);
