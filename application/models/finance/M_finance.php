@@ -873,14 +873,16 @@ class M_finance extends CI_Model {
        return $errorMSG;
    }
 
-   public function tuition_fee_calon_mhs_by_ID($ID_program_study)
+   public function tuition_fee_calon_mhs_by_ID($ID_register_formulir)
    {
        $arr_temp = array();
        $sql = 'select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,
             f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
             n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
-            if((select count(*) as total from db_admission.register_nilai where Status = "Approved" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
-            as status1,p.CreateAT,p.CreateBY,d.VA_number,b.FormulirCode
+            if((select count(*) as total from db_admission.register_nilai where Status = "Verified" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
+            as status1,p.CreateAT,p.CreateBY,d.VA_number,b.FormulirCode,
+            a.Address,a.ID_province as IDPRovAddress,a.ID_region as IDRegionAddress,
+            a.PhoneNumber,d.SetTa,px.No_Ref
             from db_admission.register_formulir as a
             left JOIN db_admission.register_verified as b 
             ON a.ID_register_verified = b.ID
@@ -902,9 +904,12 @@ class M_finance extends CI_Model {
             on o.ID = a.ID_program_study
             left join db_finance.register_admisi as p
             on a.ID = p.ID_register_formulir
+            left join db_admission.formulir_number_offline_m as px
+            on b.FormulirCode = px.FormulirCode
             where p.Status = "Created" and a.ID = ? group by a.ID';
-       $query=$this->db->query($sql, array($ID_program_study))->result_array();
-
+       $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
+       // print_r($query);die();
+       $this->load->model('master/m_master');
        for ($i=0; $i < count($query); $i++) { 
          $DiskonSPP = 0;
          // get Price
@@ -913,10 +918,36 @@ class M_finance extends CI_Model {
              for ($k=0; $k < count($getPaymentType_Cost); $k++) { 
                // $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Cost']);
                $arr_temp2 = $arr_temp2 + array(
-                 $getPaymentType_Cost[$k]['Abbreviation'] => number_format($getPaymentType_Cost[$k]['Pay_tuition_fee'],2,',','.'),
-                 'Discount-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Discount']
+                 // $getPaymentType_Cost[$k]['Abbreviation'] => number_format($getPaymentType_Cost[$k]['Pay_tuition_fee'],2,',','.'),
+                 $getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Pay_tuition_fee'],
+                 'Discount-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Discount'],
                );
              }
+
+             // get region and province
+                $RegionAddress = '';
+                $ProvinceAddress = '';
+                $getRegion = $this->m_master->caribasedprimary('db_admission.region','ID',$query[$i]['IDRegionAddress']);
+                $getProv = $this->m_master->caribasedprimary('db_admission.province','ProvinceID',$query[$i]['IDPRovAddress']);
+                if (count($getRegion) > 0 && count($getProv) > 0) {
+                  $RegionAddress = $getRegion[0]['RegionName'];
+                  $ProvinceAddress = $getProv[0]['ProvinceName'];
+                }
+
+              // tahun akademik
+                 $TahunAkademik = $this->m_master->caribasedprimary('db_academic.semester','Year',$query[$i]['SetTa']);
+                 $NamaTahunAkademik = $query[$i]['SetTa'];
+                 for ($b=0; $b < count($TahunAkademik); $b++) { 
+                   if ($TahunAkademik[$b]['Code'] == 1) {
+                     $NamaTahunAkademik = $TahunAkademik[$b]['Name'];
+                     break;
+                   }
+                 }
+
+              // cicilan 
+              $Cicilan = $this->checkPayment_admisi($query[$i]['ID_register_formulir']);   
+
+
          if ($query[$i]['status1'] == 'Rapor') {
            // check rangking
              $getRangking = $this->getRangking_calon_mhs($query[$i]['ID_register_formulir']);
@@ -932,7 +963,15 @@ class M_finance extends CI_Model {
                'VA_number' => $query[$i]['VA_number'],
                // 'DiskonSPP' => $DiskonSPP,
                'RangkingRapor' => $getRangking,
-               'FormulirCode' => $query[$i]['FormulirCode'],
+               'FormulirCode' => ($query[$i]['No_Ref'] == "" || $query[$i]['No_Ref'] == null) ? $query[$i]['FormulirCode'] : $query[$i]['No_Ref'],
+               'Address' => $query[$i]['Address'],
+               'RegionAddress' => $RegionAddress,
+               'ProvinceAddress' => $ProvinceAddress,
+               'PhoneNumber' => $query[$i]['PhoneNumber'],
+               'NamaTahunAkademik' => $NamaTahunAkademik,
+               'ID_program_study' => $query[$i]['ID_program_study'],
+               'SetTa' => $query[$i]['SetTa'],
+               
              );
          }
          else
@@ -947,7 +986,15 @@ class M_finance extends CI_Model {
                'VA_number' => $query[$i]['VA_number'],
                // 'DiskonSPP' => $DiskonSPP,
                'RangkingRapor' => 0,
-               'FormulirCode' => $query[$i]['FormulirCode'],
+               'FormulirCode' => ($query[$i]['No_Ref'] == "" || $query[$i]['No_Ref'] == null) ? $query[$i]['FormulirCode'] : $query[$i]['No_Ref'],
+               'Address' => $query[$i]['Address'],
+               'RegionAddress' => $RegionAddress,
+               'ProvinceAddress' => $ProvinceAddress,
+               'PhoneNumber' => $query[$i]['PhoneNumber'],
+               'NamaTahunAkademik' => $NamaTahunAkademik,
+               'ID_program_study' => $query[$i]['ID_program_study'],
+               'SetTa' => $query[$i]['SetTa'],
+               
              );
          }
 

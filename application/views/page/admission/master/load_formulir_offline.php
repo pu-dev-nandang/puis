@@ -4,7 +4,7 @@
     	<thead>
     		<tr>
     		<th style="width: 15px;">No</th>
-    		<th>Tahun</th>
+    		<th>Angkatan</th>
     		<th>Formulir Code</th>
     		<th>Ref</th>
     		<th>Link</th>

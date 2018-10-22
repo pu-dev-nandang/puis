@@ -11,7 +11,7 @@
                     <div class="form-group">
                       <div class="row">
                         <div class="col-xs-4 col-md-offset-2">
-                              <label>Tahun</label>
+                              <label>Angkatan</label>
                               <select class="select2-select-00 full-width-fix" id="selectTahun">
                                   <option></option>
                               </select>

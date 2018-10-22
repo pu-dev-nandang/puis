@@ -6,7 +6,7 @@
 	window.getDataCalonMhs = <?php echo $getDataCalonMhs ?>;
 	$(document).ready(function () {
 		// console.log(payment_type);
-		// console.log(getDataCalonMhs);
+		console.log(getDataCalonMhs);
 		loadtable_header(loadDataTable);
 	});
 
@@ -35,7 +35,7 @@
 	    	    table += '<th style="width: 75px;">'+payment_type[i].Abbreviation+'</th>' ;
 	    	    //table += '<th style="width: 70px;">Pot</th>';	
 	    	}
-	    		
+	    	table += '<th style="width: 10%;">Keterangan</th>'	
 	    	table += '</tr>' ;	
 	    	table += '</thead>' ;	
 	    	table += '<tbody>' ;	
@@ -84,6 +84,7 @@
 						'<td>'+Code+'</td>'+
 						'<td>'+getDataCalonMhs[i]['getBeasiswa']+'<br><br>'+Rangking+'<br><br>'+showFile+'</td>'+
 						isi_payment+
+						'<td>'+getDataCalonMhs[i]['Desc']+'</td>'+
 					'</tr>' 	
 			);
 

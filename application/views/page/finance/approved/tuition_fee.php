@@ -59,6 +59,8 @@
                     $("#pagination_link").html(obj.pagination_link);
                     Grade = obj.Grade;
                     $('#NotificationModal').modal('hide');
+                    FunEvClickBtnSave();
+                    FunEvClickBtnReject();
                 });
                 break;
             case 'tuition_fee_approved':
@@ -85,66 +87,72 @@
       // loadData_register_document(page);
     });
 
-    $(document).on('click','#btn-Save', function () {
-        switch(pageHtml)
-        {
-         case "tuition_fee" :
-            process_tuition_fee();
-         break;      
-         case  "tuition_fee_delete" :
-               // process_tuition_fee_delete();
-         break;
-        }
-    });
+    function FunEvClickBtnSave()
+    {
+        $("#btn-Save").click(function(){
+            switch(pageHtml)
+            {
+             case "tuition_fee" :
+                process_tuition_fee();
+             break;      
+             case  "tuition_fee_delete" :
+                   // process_tuition_fee_delete();
+             break;
+            }
+        })
+    }
 
-    $(document).on('click','#btn-reject', function () {
-        var arrValueCHK = getValueChecbox();
-        if (arrValueCHK.length > 0) {
-            $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Apakah anda yakin untuk melakukan request ini ?? </b> ' +
-                '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
-                '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
-                '</div>');
-            $('#NotificationModal').modal('show');
+    function FunEvClickBtnReject()
+    {
+        $("#btn-reject").click(function(){
+            var arrValueCHK = getValueChecbox();
+            if (arrValueCHK.length > 0) {
+                $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Apakah anda yakin untuk melakukan request ini ?? </b> ' +
+                    '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+                    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+                    '</div>');
+                $('#NotificationModal').modal('show');
 
-            $("#confirmYes").click(function(){
-                $('#NotificationModal .modal-header').addClass('hide');
-                $('#NotificationModal .modal-body').html('<center>' +
-                    '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
-                    '                    <br/>' +
-                    '                    Loading Data . . .' +
-                    '                </center>');
-                $('#NotificationModal .modal-footer').addClass('hide');
-                $('#NotificationModal').modal({
-                    'backdrop' : 'static',
-                    'show' : true
-                });
+                $("#confirmYes").click(function(){
+                    $('#NotificationModal .modal-header').addClass('hide');
+                    $('#NotificationModal .modal-body').html('<center>' +
+                        '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+                        '                    <br/>' +
+                        '                    Loading Data . . .' +
+                        '                </center>');
+                    $('#NotificationModal .modal-footer').addClass('hide');
+                    $('#NotificationModal').modal({
+                        'backdrop' : 'static',
+                        'show' : true
+                    });
 
-                var url = base_url_js+'finance/admission/set_tuition_fee/delete_data';
-                var data = arrValueCHK;
-                var token = jwt_encode(data,"UAP)(*");
-                $.post(url,{token:token},function (data_json) {
-                    setTimeout(function () {
-                       toastr.options.fadeOut = 10000;
-                       toastr.success('Data berhasil disimpan', 'Success!');
-                       loadPage('tuition_fee/1');
-                       $(".widget_delete").remove();
-                       $('#NotificationModal').modal('hide');
-                    },500);
-                }).done(function() {
-                  
-                }).fail(function() {
-                  toastr.error('The Database connection error, please try again', 'Failed!!');
-                }).always(function() {
-                  $('#NotificationModal').modal('hide');
-                });
-            })
+                    var url = base_url_js+'finance/admission/set_tuition_fee/delete_data';
+                    var data = arrValueCHK;
+                    var token = jwt_encode(data,"UAP)(*");
+                    $.post(url,{token:token},function (data_json) {
+                        setTimeout(function () {
+                           toastr.options.fadeOut = 10000;
+                           toastr.success('Data berhasil disimpan', 'Success!');
+                           loadPage('tuition_fee/1');
+                           $(".widget_delete").remove();
+                           $('#NotificationModal').modal('hide');
+                        },500);
+                    }).done(function() {
+                      
+                    }).fail(function() {
+                      toastr.error('The Database connection error, please try again', 'Failed!!');
+                    }).always(function() {
+                      $('#NotificationModal').modal('hide');
+                    });
+                })
 
-        }
-        else
-        {
-            toastr.error("Silahkan checked dahulu", 'Failed!!');
-        }
-    });
+            }
+            else
+            {
+                toastr.error("Silahkan checked dahulu", 'Failed!!');
+            }
+        }) // exit click btn-reject
+    }
 
     function process_tuition_fee()
     {
@@ -170,18 +178,14 @@
                 });
 
                 var inc = 1;
+                var timeOut = 800;
                 var url = base_url_js+'finance/approved/tuition-fee/approve_save';
                 for (var i = 0; i < arrValueCHK.length; i++) {
                     var data = arrValueCHK[i];
                     var token = jwt_encode(data,"UAP)(*");
                     $.post(url,{token:token},function (data_json) {
-                        setTimeout(function () {
-                           // toastr.options.fadeOut = 10000;
-                           // toastr.success('Data berhasil disimpan', 'Success!');
-                           // loadPage('tuition_fee/1');
-                           // $('#NotificationModal').modal('hide');
-                           // window.open(base_url_js+'fileGet/Tuition_fee.pdf','_blank');
-                        },500);
+                        // var obj = JSON.parse(data_json);
+                        // window.open(base_url_js+'fileGet/'+obj,'_blank');
                     }).done(function() {
                       
                     }).fail(function() {
@@ -192,9 +196,12 @@
                     inc++;
                 }
 
-                $(".widget_delete").remove();
-
-                loadPage('tuition_fee/1');
+                var aa = parseInt(inc) * parseInt(timeOut);
+                setTimeout(function () {
+                     $(".widget_delete").remove();
+                     loadPage('tuition_fee/1'); 
+                },aa);
+               
                 // $('#NotificationModal').modal('hide');
                 
             })
@@ -291,6 +298,7 @@
 
                         // find grade
                             var nilai = Nilai_bobot / jml_bobot;
+                            nilai = nilai.toFixed(2);
                             var Description = '';
                             for (var k = 0; k < Grade.length; k++) {
                                 if (nilai >= Grade[k]['StartRange'] && nilai <= Grade[k]['EndRange'] ) {

@@ -36,6 +36,7 @@
                         '<th>Cicilan</th>'+
                         '<th>Document</th>'+
                         '<th>Status</th>'+
+                        '<th>Action</th>'+
                         // '<th>Detail Payment</th>'+
                     '</tr>'+
                     '</thead>'+
@@ -114,6 +115,45 @@
       //    }
       // });          
   }
+
+  $(document).on('click', '.btn_cancel_tui', function () {
+        var arrValueCHK = [];
+        arrValueCHK.push($(this).attr('id-register-formulir'));
+        $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Apakah anda yakin untuk melakukan request ini ?? </b> ' +
+            '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+            '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+            '</div>');
+        $('#NotificationModal').modal('show');
+
+        $("#confirmYes").click(function(){
+            $('#NotificationModal .modal-header').addClass('hide');
+            $('#NotificationModal .modal-body').html('<center>' +
+                '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+                '                    <br/>' +
+                '                    Loading Data . . .' +
+                '                </center>');
+            $('#NotificationModal .modal-footer').addClass('hide');
+            $('#NotificationModal').modal({
+                'backdrop' : 'static',
+                'show' : true
+            });
+            var url = base_url_js+'finance/admission/set_tuition_fee/delete_data';
+            var data = arrValueCHK;
+            var token = jwt_encode(data,"UAP)(*");
+            $.post(url,{token:token},function (data_json) {
+                setTimeout(function () {
+                   loadTableHeader(loadData);
+                   $('#NotificationModal').modal('hide');
+                },500);
+            }).done(function() {
+              
+            }).fail(function() {
+              toastr.error('The Database connection error, please try again', 'Failed!!');
+            }).always(function() {
+              $('#NotificationModal').modal('hide');
+            });
+        })
+  });  
 
   $(document).on('click','.btn-show', function () {
       var ID_register_formulir = $(this).attr('id-register-formulir');
