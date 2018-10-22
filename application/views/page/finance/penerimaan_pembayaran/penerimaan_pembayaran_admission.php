@@ -8,7 +8,7 @@
         <hr/>
         <div class="row">
             <div class="col-xs-2" style="">
-              Tahun
+              Angkatan
               <select class="select2-select-00 col-xs-2 full-width-fix" id="selectTahun">
                   <option></option>
               </select>
