@@ -560,6 +560,9 @@ class M_rest extends CI_Model {
 
         $dataSemester = $this->db->query('SELECT s.* FROM db_academic.semester s ORDER BY s.ID ASC')->result_array();
 
+//        print_r($dataSemester);
+//        exit;
+
         $result = [];
         for($i=0;$i<count($dataSemester);$i++){
             if($dataSemester[$i]['ID']<13){
@@ -647,6 +650,11 @@ class M_rest extends CI_Model {
 
                 array_push($result,$arr_p);
 
+            }
+
+
+            if($dataSemester[$i]['Status']==1 || $dataSemester[$i]['Status']=='1'){
+                break;
             }
         }
 
