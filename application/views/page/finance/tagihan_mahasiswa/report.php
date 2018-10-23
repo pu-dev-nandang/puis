@@ -110,7 +110,7 @@
     window.summary = '';
     window.PostPassing = '';
     $(document).ready(function () {
-        loadSelectOptionCurriculum('#selectCurriculum','');
+        loadSelectOptionCurriculum2('#selectCurriculum','');
         loadSelectOptionBaseProdi('#selectProdi','');
         loadSelectOptionPaymentTypeAll('#selectPTID','');
         loadSelectOptionSemesterByload('#selectSemester',1);
