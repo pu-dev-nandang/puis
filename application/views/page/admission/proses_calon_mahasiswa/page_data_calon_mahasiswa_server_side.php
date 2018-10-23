@@ -19,7 +19,7 @@
                     <div id="panel_web" class="" style="padding:30px;padding-top:0px;">
                          <ul class="nav nav-tabs">
                             <li role="presentation" class="active"><a href="javascript:void(0)" class="tab-btn-submenu-page" data-page="data-calon-mhs/1">Data</a></li>
-                            <li role="presentation"><a href="javascript:void(0)" class="tab-btn-submenu-page" data-page="to-be-mhs/1">To Be Mahasiswa</a></li>
+                            <li role="presentation"><a href="javascript:void(0)" class="tab-btn-submenu-page" data-page="to-be-mhs/1">To Be Student</a></li>
                             <!--<li role="presentation"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee_delete/1">Register</a></li>
                             <li role="presentation"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee_delete/1">Register Recycled</a></li>-->
                          </ul>
