@@ -229,7 +229,7 @@
                     </li>
                 </ul>
             </li>
-            <li class="<?php if($this->uri->segment(2)=='check-va'){echo "current";} ?>">
+            <!-- <li class="<?php if($this->uri->segment(2)=='check-va'){echo "current";} ?>">
                 <a href="<?php echo base_url('finance/check-va'); ?>">
                     <i class="fa fa-refresh"></i>
                     Check VA
@@ -240,7 +240,7 @@
                     <i class="fa fa-cloud-download"></i>
                     Download Log VA
                 </a>
-            </li>
+            </li> -->
         </ul>
         <div class="sidebar-widget align-center">
             <div class="btn-group" data-toggle="buttons" id="theme-switcher">
