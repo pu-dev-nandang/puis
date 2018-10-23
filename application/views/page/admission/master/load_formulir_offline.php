@@ -7,7 +7,7 @@
     		<th>Angkatan</th>
     		<th>Formulir Code</th>
     		<th>Ref</th>
-    		<th>Link</th>
+    		<!-- <th>Link</th> -->
     		<th>Status</th>
     		<th>Print</th>
     		<th>Create At</th>
@@ -62,7 +62,7 @@
 						'<td>'+response[i]['Years']+'</td>'+
 						'<td>'+response[i]['FormulirCode']+'</td>'+
 						'<td>'+response[i]['No_Ref']+'</td>'+
-						'<td>'+response[i]['Link']+'</td>'+
+						// '<td>'+response[i]['Link']+'</td>'+
 						status+
 						'<td>'+print+'</td>'+
 						'<td>'+response[i]['CreateAT']+'</td>'+

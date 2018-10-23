@@ -141,15 +141,17 @@ class C_finance extends Finnance_Controler {
 
     public function tuition_fee_approve($page = null)
     {
+        $input = $this->getInputToken();
+        $FormulirCode = $input['FormulirCode'];
         // get grade
         $this->load->library('pagination');
-        $config = $this->config_pagination_default_ajax($this->m_admission->count_getDataCalonMhsTuitionFee_delete(),5,5);
+        $config = $this->config_pagination_default_ajax($this->m_admission->count_getDataCalonMhsTuitionFee_delete($FormulirCode,'p.Status = "Created"'),5,5);
         $this->pagination->initialize($config);
         $page = $this->uri->segment(5);
         $start = ($page - 1) * $config["per_page"];
 
         $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
-        $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee_delete($config["per_page"], $start));
+        $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee_delete($config["per_page"], $start,$FormulirCode,'p.Status = "Created"'));
         $content = $this->load->view('page/'.$this->data['department'].'/approved/page_tuition_fee_approve',$this->data,true);
         $output = array(
         'pagination_link'  => $this->pagination->create_links(),
@@ -302,6 +304,7 @@ class C_finance extends Finnance_Controler {
         // cek potongan discount
         $chkDiscount = 0;
         $arr_discount = array();
+        $arr_discount2 = array();
         foreach ($Personal[0] as $key => $value) {
             $key = explode('-', $key);
             if ($key[0] == 'Discount') {
@@ -309,6 +312,7 @@ class C_finance extends Finnance_Controler {
                    $chkDiscount = 1;
                    $arr_discount[$key[1]] = $value;
                 }
+                $arr_discount2[$key[1]] = $value;
             }
         }
 
@@ -409,7 +413,7 @@ class C_finance extends Finnance_Controler {
             $this->mypdf->Cell(50,$height,'Beasiswa yang diterima',1,0,'L',true);
 
             $totalTuitionFee = 0;
-            foreach ($arr_discount as $key => $value) {
+            foreach ($arr_discount2 as $key => $value) {
 
                 foreach ($arr_pay as $keya => $valuea) {
 
@@ -672,14 +676,17 @@ class C_finance extends Finnance_Controler {
 
     public function tuition_fee_approved()
     {
+        $input = $this->getInputToken();
+        $FormulirCode = $input['FormulirCode'];
+
         $this->load->library('pagination');
-        $config = $this->config_pagination_default_ajax($this->m_admission->count_getDataCalonMhsTuitionFee_approved(),15,5);
+        $config = $this->config_pagination_default_ajax($this->m_admission->count_getDataCalonMhsTuitionFee_delete($FormulirCode,'p.Status = "Approved"'),15,5);
         $this->pagination->initialize($config);
         $page = $this->uri->segment(5);
         $start = ($page - 1) * $config["per_page"];
 
         $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
-        $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee_approved($config["per_page"], $start));
+        $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee_approved($config["per_page"], $start,$FormulirCode,'p.Status = "Approved"'));
         $content = $this->load->view('page/'.$this->data['department'].'/approved/page_tuition_fee_approved',$this->data,true);
         $output = array(
         'pagination_link'  => $this->pagination->create_links(),
@@ -1791,31 +1798,9 @@ class C_finance extends Finnance_Controler {
             $nestedData[] = '<button class="btn btn-inverse btn-notification btn-show" id-register-formulir = "'.$row['ID_register_formulir'].'" email = "'.$row['Email'].'" Nama = "'.$row['Name'].'">Show</button>';
             $nestedData[] = $row['StatusPayment'];
             $nestedData[] = '<button class = "btn btn-primary btn-payment" id-register-formulir = "'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">Detail</button>';
-
-
-            // $combo = '<select class="full-width-fix select grouPAuth btn-edit" NIP = "'.$row['NIP'].'">';
-            // for ($j=0; $j < count($getGroupUser); $j++) { 
-            //     if ($getGroupUser[$j]['ID'] == $row['G_user']) {
-            //          $combo .= '<option value = "'.$getGroupUser[$j]['ID'].'" selected>'.$getGroupUser[$j]['GroupAuth'].'</option>';
-            //     }
-            //     else
-            //     {
-            //         $combo .= '<option value = "'.$getGroupUser[$j]['ID'].'">'.$getGroupUser[$j]['GroupAuth'].'</option>';
-            //     }
-            // }
-
-            // $combo .= '</select>';
-
-            // $nestedData[] = $combo;
-
-            // $btn = '<button class="btn btn-danger btn-sm btn-delete btn-delete-group" NIP = "'.$row['NIP'].'"><i class="fa fa-trash" aria-hidden="true"></i></button>';  
-
-            // $nestedData[] = $btn;
-            // $data[] = $nestedData;
+           
             $data[] = $nestedData;
         }
-
-        // print_r($data);
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
@@ -1830,7 +1815,6 @@ class C_finance extends Finnance_Controler {
     public function getPayment_admission_edit_cicilan()
     {
         $requestData= $_REQUEST;
-        // print_r($requestData);
         $totalData = $this->m_finance->getCountAllPayment_admission();
 
         $sql = 'select * from (
@@ -1896,32 +1880,11 @@ class C_finance extends Finnance_Controler {
             $nestedData[] = $row['cicilan'];
             $nestedData[] = '<button class="btn btn-inverse btn-notification btn-show" id-register-formulir = "'.$row['ID_register_formulir'].'" email = "'.$row['Email'].'" Nama = "'.$row['Name'].'">Show</button>';
             $nestedData[] = $row['StatusPayment'];
-            // $nestedData[] = '<button class = "btn btn-primary btn-payment" id-register-formulir = "'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">Detail</button>';
-
-
-            // $combo = '<select class="full-width-fix select grouPAuth btn-edit" NIP = "'.$row['NIP'].'">';
-            // for ($j=0; $j < count($getGroupUser); $j++) { 
-            //     if ($getGroupUser[$j]['ID'] == $row['G_user']) {
-            //          $combo .= '<option value = "'.$getGroupUser[$j]['ID'].'" selected>'.$getGroupUser[$j]['GroupAuth'].'</option>';
-            //     }
-            //     else
-            //     {
-            //         $combo .= '<option value = "'.$getGroupUser[$j]['ID'].'">'.$getGroupUser[$j]['GroupAuth'].'</option>';
-            //     }
-            // }
-
-            // $combo .= '</select>';
-
-            // $nestedData[] = $combo;
-
             $btn = '<button class="btn btn-danger btn-sm btn-delete btn_cancel_tui" id-register-formulir = "'.$row['ID_register_formulir'].'"><i class="fa fa-trash" aria-hidden="true"></i> Cancel</button>';  
 
             $nestedData[] = $btn;
-            // $data[] = $nestedData;
             $data[] = $nestedData;
         }
-
-        // print_r($data);
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),

@@ -6,9 +6,18 @@
 	window.getDataCalonMhs = <?php echo $getDataCalonMhs ?>;
 	$(document).ready(function () {
 		// console.log(payment_type);
-		console.log(getDataCalonMhs);
+		// console.log(getDataCalonMhs);
 		loadtable_header(loadDataTable);
+		funcBtnPrint();
 	});
+
+	function funcBtnPrint()
+	{
+		$(".btn-print").click(function(){
+			var obj = 'Tuition_fee_'+$(this).attr('data-smt')+'.pdf';
+			window.open(base_url_js+'fileGet/'+obj,'_blank');
+		})
+	}
 
 	function loadtable_header(callback)
 	{
@@ -36,6 +45,7 @@
 	    	    //table += '<th style="width: 70px;">Pot</th>';	
 	    	}
 	    	table += '<th style="width: 10%;">Keterangan</th>'	
+	    	table += '<th style="width: 10%;">Print</th>'	
 	    	table += '</tr>' ;	
 	    	table += '</thead>' ;	
 	    	table += '<tbody>' ;	
@@ -75,8 +85,9 @@
 			}
 
 			var Code = (getDataCalonMhs[i]['No_Ref'] != '') ? getDataCalonMhs[i]['FormulirCode'] + ' / ' + getDataCalonMhs[i]['No_Ref'] : getDataCalonMhs[i]['FormulirCode'];
+			var Code2 = (getDataCalonMhs[i]['No_Ref'] != '') ? getDataCalonMhs[i]['No_Ref'] : getDataCalonMhs[i]['FormulirCode'];
 			var Rangking = (getDataCalonMhs[i]['RangkingRapor'] != 0) ? 'Rangking : '+getDataCalonMhs[i]['RangkingRapor'] : "";
-			
+			var btn_print = '<span data-smt="'+Code2+'" class="btn btn-xs btn-print btn-read"><i class="fa fa-print"></i> Print</span>'
 			$(".tableData tbody").append(
 					'<tr>'+
 						'<td align= "center">'+no+'&nbsp<input type="checkbox" class="uniform" nama ="'+getDataCalonMhs[i]['Name']+'" value ="'+getDataCalonMhs[i]['ID_register_formulir']+'" </td>'+
@@ -85,6 +96,7 @@
 						'<td>'+getDataCalonMhs[i]['getBeasiswa']+'<br><br>'+Rangking+'<br><br>'+showFile+'</td>'+
 						isi_payment+
 						'<td>'+getDataCalonMhs[i]['Desc']+'</td>'+
+						'<td>'+btn_print+'</td>'+
 					'</tr>' 	
 			);
 

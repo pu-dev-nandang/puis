@@ -14,11 +14,24 @@
                             <li role="presentation"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee_delete/1">Delete Tuition Fee</a></li>
                             <li role="presentation"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee_approved/1">Tuition Fee Approved</a></li>
                         </ul>
-                        <br>
-                        <div  class="col-xs-12" align="right" id="pagination_link"></div>
-                        <div id="dataPageLoad" style="margin-top:0px;">
-                            
+                        <div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
+                            <div  class="col-xs-12" align="right" id="pagination_link"></div>
                         </div>
+                        <div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
+                          <div class="col-xs-6 col-md-offset-3">
+                            <div class="thumbnail" style="height: 80px">
+                              <div class="col-xs-6 col-md-offset-3">
+                                <label>Formulir Code</label>
+                                <input type="text" name="FormulirCode" id = "FormulirCode" class="form-control" placeholder="All...">
+                              </div>  
+                            </div>   
+                          </div>
+                        </div>
+                        <div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
+                          <div id="dataPageLoad" style="margin-top:0px;">
+                              
+                          </div>
+                        </div>  
                     </div>
                 </div>
             </div>
@@ -35,7 +48,19 @@
             $('#panel_web').css({"padding": "0px", "padding-right": "20px"});
         }
         loadPage('tuition_fee/1');
+
+        FuncSearch();
+
     });
+
+    function FuncSearch()
+    {
+      $("#FormulirCode").keyup(function(){
+        if( this.value.length < 5 && this.value.length != 0 ) return;
+           /* code to run below */
+         loadPage(pageHtml+'/1'); 
+      })
+    }
 
     $('.tab-btn-tuition-fee').click(function () {
         var page = $(this).attr('data-page');
@@ -51,7 +76,12 @@
         switch(res[0]) {
             case 'tuition_fee':
                 var url = base_url_js+'admission/proses-calon-mahasiswa/set_tuition_fee/input/'+res[1];
-                $.post(url,{page:page},function (data_json) {
+                var FormulirCode = $("#FormulirCode").val();
+                var data = {
+                    FormulirCode : FormulirCode,
+                };
+                var token = jwt_encode(data,"UAP)(*"); 
+                $.post(url,{page:page,token:token},function (data_json) {
                     var obj = jQuery.parseJSON(data_json);
                     $("#dataPageLoad").html(obj.loadtable);
                     $("#pagination_link").html(obj.pagination_link);
@@ -59,7 +89,12 @@
                 break;
             case 'tuition_fee_delete':
                 var url = base_url_js+'admission/proses-calon-mahasiswa/set_tuition_fee/delete/'+res[1];
-                $.post(url,{page:page},function (data_json) {
+                var FormulirCode = $("#FormulirCode").val();
+                var data = {
+                    FormulirCode : FormulirCode,
+                };
+                var token = jwt_encode(data,"UAP)(*"); 
+                $.post(url,{page:page,token:token},function (data_json) {
                     var obj = jQuery.parseJSON(data_json);
                     $("#dataPageLoad").html(obj.loadtable);
                     $("#pagination_link").html(obj.pagination_link);
@@ -67,7 +102,12 @@
                 break;
             case 'tuition_fee_approved':
                 var url = base_url_js+'admission/proses-calon-mahasiswa/set_tuition_fee/approved/'+res[1];
-                $.post(url,{page:page},function (data_json) {
+                var FormulirCode = $("#FormulirCode").val();
+                var data = {
+                    FormulirCode : FormulirCode,
+                };
+                var token = jwt_encode(data,"UAP)(*");
+                $.post(url,{page:page,token:token},function (data_json) {
                     var obj = jQuery.parseJSON(data_json);
                     $("#dataPageLoad").html(obj.loadtable);
                     $("#pagination_link").html(obj.pagination_link);

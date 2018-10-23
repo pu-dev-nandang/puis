@@ -477,44 +477,20 @@ class C_admission extends Admission_Controler {
       $this->temp($content);
     }
 
-    /*public function set_tuition_fee_input($page = null)
-    {
-      $this->load->library('pagination');
-      $config = $this->config_pagination_default_ajax(1000,5,5);
-      $this->pagination->initialize($config);
-      $page = $this->uri->segment(5);
-      $start = ($page - 1) * $config["per_page"];
-
-      $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
-      $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee($config["per_page"], $start));
-      $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_tuition_fee_input',$this->data,true);
-
-      $pagination = '';
-      if (count($this->m_admission->getDataCalonMhsTuitionFee($config["per_page"], $start)) > 0) {
-        $pagination = $this->pagination->create_links();
-      }
-
-      $output = array(
-      'pagination_link'  => $pagination,
-      'loadtable'   => $content,
-      );
-      echo json_encode($output);
-
-    }*/
-
     public function set_tuition_fee_input($page = null)
     {
+      $input = $this->getInputToken();
+      $FormulirCode = $input['FormulirCode'];
       $this->load->library('pagination');
       $page_Count = 5;
-      $countData = $this->m_admission->count_getDataCalonMhsTuitionFee();
+      $countData = $this->m_admission->count_getDataCalonMhsTuitionFee($FormulirCode);
       $config = $this->config_pagination_default_ajax($countData,$page_Count,5);
       $this->pagination->initialize($config);
       $page = $this->uri->segment(5);
       $start = ($page - 1) * $config["per_page"];
 
       $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
-      $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee($config["per_page"], $start));
-      // $this->m_admission->getDataCalonMhsAll($config["per_page"], $start,$input);
+      $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee($config["per_page"], $start,$FormulirCode));
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_tuition_fee_input',$this->data,true);
 
       $output = array(
@@ -543,16 +519,19 @@ class C_admission extends Admission_Controler {
 
     public function set_tuition_fee_delete($page = null)
     {
+      $input = $this->getInputToken();
+      $FormulirCode = $input['FormulirCode'];
+
       $this->load->library('pagination');
       $page_Count = 5;
-      $countData = $this->m_admission->count_getDataCalonMhsTuitionFee_delete();
+      $countData = $this->m_admission->count_getDataCalonMhsTuitionFee_delete($FormulirCode);
       $config = $this->config_pagination_default_ajax($countData,$page_Count,5);
       $this->pagination->initialize($config);
       $page = $this->uri->segment(5);
       $start = ($page - 1) * $config["per_page"];
 
       $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
-      $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee_delete($config["per_page"], $start));
+      $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee_delete($config["per_page"], $start,$FormulirCode));
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_tuition_fee_delete',$this->data,true);
 
       $output = array(
@@ -570,14 +549,17 @@ class C_admission extends Admission_Controler {
 
     public function set_tuition_fee_approved($page = null)
     {
+      $input = $this->getInputToken();
+      $FormulirCode = $input['FormulirCode'];
+
       $this->load->library('pagination');
-      $config = $this->config_pagination_default_ajax($this->m_admission->count_getDataCalonMhsTuitionFee_approved(),15,5);
+      $config = $this->config_pagination_default_ajax($this->m_admission->count_getDataCalonMhsTuitionFee_delete($FormulirCode,'p.Status = "Approved"'),15,5);
       $this->pagination->initialize($config);
       $page = $this->uri->segment(5);
       $start = ($page - 1) * $config["per_page"];
 
       $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
-      $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee_approved($config["per_page"], $start));
+      $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee_approved($config["per_page"], $start,$FormulirCode,'p.Status = "Approved"'));
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_tuition_fee_approved',$this->data,true);
       $output = array(
       'pagination_link'  => $this->pagination->create_links(),
@@ -1817,7 +1799,7 @@ class C_admission extends Admission_Controler {
 
       $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,b.No_Ref,a.StatusReg,b.Years,b.Status as StatusUsed, b.StatusJual,
                 b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,b.CityNameFormulir,b.DistrictNameFormulir,b.TypePay,
-                b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi,b.NoKwitansi
+                b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi,b.NoKwitansi,b.Link
                 from (
                 select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
                 from db_admission.register as a 
@@ -1831,7 +1813,7 @@ class C_admission extends Admission_Controler {
                 ) as a right JOIN
                 (
                 select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,b.NoKwitansi,
-                b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,b.TypePay,
+                b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,b.TypePay,a.Link,
                 if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,b.ID_ProgramStudy,y.Name as NameProdi
                 from db_admission.formulir_number_offline_m as a
                 left join db_admission.sale_formulir_offline as b
@@ -1888,7 +1870,14 @@ class C_admission extends Admission_Controler {
           {
             $action = '<div class="row">
                         <div class="col-md-12">
-                          <span data-smt="'.$row['ID_sale_formulir_offline'].'" class="btn btn-xs btn-delete">
+                          <span data-smt="'.$row['Link'].'" class="btn btn-xs btn-delete inputFormulir">
+                            <i class="fa fa-sign-in right-margin"></i> Input Formulir
+                          </span>
+                        </div>
+                      </div>
+                      <div class="row" style="margin-top: 10px">
+                        <div class="col-md-12">
+                          <span data-smt="'.$row['ID_sale_formulir_offline'].'" class="btn btn-xs btn-delete deletepenjualan">
                             <i class="fa fa-trash"></i> Delete Penjualan
                           </span>
                         </div>

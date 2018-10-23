@@ -18,6 +18,16 @@
                 <div class="row" style="margin-top: 10px;margin-left: 0px;margin-right: 10px">
                   <div  class="col-xs-12" align="right" id="pagination_link"></div>  
                 </div>
+                <div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
+                  <div class="col-xs-6 col-md-offset-3">
+                    <div class="thumbnail" style="height: 80px">
+                      <div class="col-xs-6 col-md-offset-3">
+                        <label>Formulir Code</label>
+                        <input type="text" name="FormulirCode" id = "FormulirCode" class="form-control" placeholder="All...">
+                      </div>  
+                    </div>   
+                  </div>
+                </div>
                 <div class="row" style="margin-top: 10px;margin-left: 0px;margin-right: 10px">
                     <div id="dataPageLoad" style="margin-top:0px;">
                         
@@ -37,6 +47,7 @@
             $('#panel_web').css({"padding": "0px", "padding-right": "20px"});
         }
         loadPage('tuition_fee/1');
+        FuncSearch();
     });
 
     $('.tab-btn-tuition-fee').click(function () {
@@ -53,7 +64,12 @@
         switch(res[0]) {
             case 'tuition_fee':
                 var url = base_url_js+'finance/approved/tuition-fee/approve/'+res[1];
-                $.post(url,{page:page},function (data_json) {
+                var FormulirCode = $("#FormulirCode").val();
+                var data = {
+                    FormulirCode : FormulirCode,
+                };
+                var token = jwt_encode(data,"UAP)(*"); 
+                $.post(url,{page:page,token:token},function (data_json) {
                     var obj = jQuery.parseJSON(data_json);
                     $("#dataPageLoad").html(obj.loadtable);
                     $("#pagination_link").html(obj.pagination_link);
@@ -65,7 +81,12 @@
                 break;
             case 'tuition_fee_approved':
                 var url = base_url_js+'finance/approved/tuition-fee/approved/'+res[1];
-                $.post(url,{page:page},function (data_json) {
+                var FormulirCode = $("#FormulirCode").val();
+                var data = {
+                    FormulirCode : FormulirCode,
+                };
+                var token = jwt_encode(data,"UAP)(*"); 
+                $.post(url,{page:page,token:token},function (data_json) {
                     var obj = jQuery.parseJSON(data_json);
                     $("#dataPageLoad").html(obj.loadtable);
                     $("#pagination_link").html(obj.pagination_link);
@@ -78,6 +99,15 @@
 
         $(".widget_delete").remove();
         
+    }
+
+    function FuncSearch()
+    {
+      $("#FormulirCode").keyup(function(){
+        if( this.value.length < 5 && this.value.length != 0 ) return;
+           /* code to run below */
+         loadPage(pageHtml+'/1'); 
+      })
     }
 
     $(document).on("click", ".pagination li a", function(event){
