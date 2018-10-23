@@ -145,7 +145,7 @@
 		    },
 		} );
 
-		$('#tableData4 tbody').on('click', '.btn-delete', function () {
+		$('#tableData4 tbody').on('click', '.deletepenjualan', function () {
 			var ID = $(this).attr('data-smt');
 			 $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Apakah anda yakin untuk melakukan request ini ?? </b> ' +
 			     '<button type="button" id="confirmYesDelete" class="btn btn-primary" style="margin-right: 5px;" data-smt = "'+ID+'">Yes</button>' +
@@ -271,6 +271,11 @@
 			$(".menu li").removeClass('active');
 			$('.pageAnchor[page = "InputPenjualan"]').parent().addClass('active');
 			LoadInputPenjualan(action = 'edit',ID = $(this).attr('data-smt') );
+		});
+
+		$('#tableData4 tbody').on('click', '.inputFormulir', function () {
+			var obj = $(this).attr('data-smt')
+			window.open(obj,'_blank');
 		});		
 
     }

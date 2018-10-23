@@ -1596,117 +1596,16 @@ class M_admission extends CI_Model {
       }
      }
 
-     /*public function getDataCalonMhsTuitionFee($limit, $start)
+     public function getDataCalonMhsTuitionFee($limit, $start,$FormulirCode)
      {
-      $arr_temp = array();
-      $sql= 'select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,
-              f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,g.JenisTempatTinggal,
-              h.ctr_name as CountryAddress,i.ProvinceName as ProvinceAddress,j.RegionName as RegionAddress,k.DistrictName as DistrictsAddress,
-              a.District as DistrictAddress,a.Address,a.ZipCode,a.PhoneNumber,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
-              n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
-              if((select count(*) as total from db_admission.register_nilai where Status = "Verified" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
-              as status1
-              from db_admission.register_formulir as a
-              JOIN db_admission.register_verified as b 
-              ON a.ID_register_verified = b.ID
-              JOIN db_admission.register_verification as c
-              ON b.RegVerificationID = c.ID
-              JOIN db_admission.register as d
-              ON c.RegisterID = d.ID
-              JOIN db_admission.country as e
-              ON a.NationalityID = e.ctr_code
-              JOIN db_employees.religion as f
-              ON a.ReligionID = f.IDReligion
-              JOIN db_admission.register_jtinggal_m as g
-              ON a.ID_register_jtinggal_m = g.ID
-              JOIN db_admission.country as h
-              ON a.ID_country_address = h.ctr_code
-              JOIN db_admission.province as i
-              ON a.ID_province = i.ProvinceID
-              JOIN db_admission.region as j
-              ON a.ID_region = j.RegionID
-              JOIN db_admission.district as k
-              ON a.ID_districts = k.DistrictID
-              JOIN db_admission.school_type as l
-              ON l.sct_code = a.ID_school_type
-              JOIN db_admission.register_major_school as m
-              ON m.ID = a.ID_register_major_school
-              JOIN db_admission.school as n
-              ON n.ID = d.SchoolID
-              join db_academic.program_study as o
-              on o.ID = a.ID_program_study
-              where ( a.ID in (select ID_register_formulir from db_admission.register_nilai where Status = "Verified") 
-              or a.ID in (select ID_register_formulir from db_admission.register_kelulusan_ujian where Kelulusan = "Lulus") ) and a.ID not in (select ID_register_formulir from db_finance.payment_register) LIMIT '.$start. ', '.$limit;
-      $query=$this->db->query($sql, array())->result_array();
-      //print_r($query);
-      //die();
-
-      $this->load->model('master/m_master');
-      $jpa = $this->m_master->showData_array('db_admission.register_dsn_jpa');
-      for ($i=0; $i < count($query); $i++) { 
-
-        // get SKS
-        $ID_program_study = $query[$i]['ID_program_study'];
-        $ccc = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ID_program_study);
-        $Credit = $ccc[0]['DefaultCredit'];
-
-        $DiskonSPP = 0;
-        // get Price
-            $getPaymentType_Cost = $this->getPaymentType_Cost($query[$i]['ID_program_study']);
-            $arr_temp2 = array();
-            for ($k=0; $k < count($getPaymentType_Cost); $k++) {
-              if ($getPaymentType_Cost[$k]['Abbreviation'] == 'Credit') {
-                 $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => (int)$getPaymentType_Cost[$k]['Cost'] * (int) $Credit.'.00');
-               }
-               else
-               {
-                $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Cost']);
-               } 
-              
-            }
-        if ($query[$i]['status1'] == 'Rapor') {
-          // check rangking
-            $getRangking = $this->getRangking($query[$i]['ID_register_formulir']);
-            $getRangking = $getRangking[0]['Rangking'];
-          // get Discount
-            for ($j=0; $j < count($jpa); $j++) { 
-              if ($getRangking >= $jpa[$j]['StartRange'] && $getRangking <= $jpa[$j]['EndRange'] ) {
-                $DiskonSPP = $jpa[$j]['DiskonSPP'];
-                break;
-              }
-            }
-            
-            $arr_temp[$i] = array(
-              'ID_register_formulir' => $query[$i]['ID_register_formulir'],
-              'Name' => $query[$i]['Name'],
-              'NamePrody' => $query[$i]['NamePrody'],
-              'SchoolName' => $query[$i]['SchoolName'],
-              'Status1' => $query[$i]['status1'],
-              'DiskonSPP' => $DiskonSPP,
-              'RangkingRapor' => $getRangking,
-            );
-        }
-        else
-        {
-            $arr_temp[$i] = array(
-              'ID_register_formulir' => $query[$i]['ID_register_formulir'],
-              'Name' => $query[$i]['Name'],
-              'NamePrody' => $query[$i]['NamePrody'],
-              'SchoolName' => $query[$i]['SchoolName'],
-              'Status1' => $query[$i]['status1'],
-              'DiskonSPP' => $DiskonSPP,
-              'RangkingRapor' => 0,
-            );
-        }
-
-        $arr_temp[$i] = $arr_temp[$i] + $arr_temp2;
+      if($FormulirCode != '%') {
+          $FormulirCode = '"%'.$FormulirCode.'%"'; 
       }
-      return $arr_temp;
+      else
+      {
+        $FormulirCode = '"%"'; 
+      }
 
-     }*/
-
-     public function getDataCalonMhsTuitionFee($limit, $start)
-     {
       $arr_temp = array();
       $sql= 'select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,
               f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,g.JenisTempatTinggal,
@@ -1745,8 +1644,12 @@ class M_admission extends CI_Model {
               ON n.ID = d.SchoolID
               left join db_academic.program_study as o
               on o.ID = a.ID_program_study
+              left join db_admission.formulir_number_offline_m as px
+              on b.FormulirCode = px.FormulirCode
               where ( a.ID in (select ID_register_formulir from db_admission.register_nilai where Status = "Verified") 
-              or a.ID in (select ID_register_formulir from db_admission.register_kelulusan_ujian where Kelulusan = "Lulus") ) and a.ID not in (select ID_register_formulir from db_finance.register_admisi) LIMIT '.$start. ', '.$limit;
+              or a.ID in (select ID_register_formulir from db_admission.register_kelulusan_ujian where Kelulusan = "Lulus") ) and a.ID not in (select ID_register_formulir from db_finance.register_admisi) 
+              and ( b.FormulirCode like '.$FormulirCode.' or px.No_Ref like '.$FormulirCode.' )
+              LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array())->result_array();
 
       $this->load->model('master/m_master');
@@ -1882,8 +1785,17 @@ class M_admission extends CI_Model {
       }
      }
 
-     public function count_getDataCalonMhsTuitionFee()
+     public function count_getDataCalonMhsTuitionFee($FormulirCode)
      {
+
+      if($FormulirCode != '%') {
+          $FormulirCode = '"%'.$FormulirCode.'%"'; 
+      }
+      else
+      {
+        $FormulirCode = '"%"'; 
+      }
+
       $sql= 'select count(*) as total
               from db_admission.register_formulir as a
               left JOIN db_admission.register_verified as b 
@@ -1914,14 +1826,25 @@ class M_admission extends CI_Model {
               ON n.ID = d.SchoolID
               left join db_academic.program_study as o
               on o.ID = a.ID_program_study
+              left join db_admission.formulir_number_offline_m as px
+              on b.FormulirCode = px.FormulirCode
               where ( a.ID in (select ID_register_formulir from db_admission.register_nilai where Status = "Verified") 
-              or a.ID in (select ID_register_formulir from db_admission.register_kelulusan_ujian where Kelulusan = "Lulus") ) and a.ID not in (select ID_register_formulir from db_finance.register_admisi)';
+              or a.ID in (select ID_register_formulir from db_admission.register_kelulusan_ujian where Kelulusan = "Lulus") ) and a.ID not in (select ID_register_formulir from db_finance.register_admisi) and ( b.FormulirCode like '.$FormulirCode.' or px.No_Ref like '.$FormulirCode.' )';
       $query=$this->db->query($sql, array())->result_array();
       return $query[0]['total'];
      }
 
-     public function count_getDataCalonMhsTuitionFee_delete()
+     public function count_getDataCalonMhsTuitionFee_delete($FormulirCode,$Status = 'p.Status = "Created" or p.Status = "Approved"')
      {
+
+      if($FormulirCode != '%') {
+          $FormulirCode = '"%'.$FormulirCode.'%"'; 
+      }
+      else
+      {
+        $FormulirCode = '"%"'; 
+      }
+
       $sql= 'select count(*) as total
               from db_admission.register_formulir as a
               left JOIN db_admission.register_verified as b 
@@ -1944,7 +1867,12 @@ class M_admission extends CI_Model {
               on o.ID = a.ID_program_study
               left join db_finance.register_admisi as p
               on a.ID = p.ID_register_formulir
-              where p.Status = "Created" group by a.ID';
+              left join db_admission.formulir_number_offline_m as px
+              on px.FormulirCode = b.FormulirCode
+              where ('.$Status.') 
+              and ( b.FormulirCode like '.$FormulirCode.' or px.No_Ref like '.$FormulirCode.' )
+              and b.FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)
+              group by a.ID';
       $query=$this->db->query($sql, array())->result_array();
       if (count($query) > 0) {
         return $query[0]['total'];
@@ -1956,8 +1884,17 @@ class M_admission extends CI_Model {
       
      }
 
-     public function getDataCalonMhsTuitionFee_delete($limit, $start)
+     public function getDataCalonMhsTuitionFee_delete($limit, $start,$FormulirCode,$Status = 'p.Status = "Created" or p.Status = "Approved"')
      {
+
+      if($FormulirCode != '%') {
+          $FormulirCode = '"%'.$FormulirCode.'%"'; 
+      }
+      else
+      {
+        $FormulirCode = '"%"'; 
+      }
+
       $arr_temp = array();
       $sql= 'select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,
               f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
@@ -1986,7 +1923,12 @@ class M_admission extends CI_Model {
               on o.ID = a.ID_program_study
               left join db_finance.register_admisi as p
               on a.ID = p.ID_register_formulir
-              where p.Status = "Created" group by a.ID LIMIT '.$start. ', '.$limit;
+              left join db_admission.formulir_number_offline_m as px
+              on px.FormulirCode = b.FormulirCode
+              where ('.$Status.') 
+              and ( b.FormulirCode like '.$FormulirCode.' or px.No_Ref like '.$FormulirCode.' )
+              and b.FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)
+              group by a.ID LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array())->result_array();
       $this->load->model('master/m_master');
       $jpa = $this->m_master->showData_array('db_admission.register_dsn_jpa');
@@ -2083,8 +2025,17 @@ class M_admission extends CI_Model {
       }
      }
 
-     public function count_getDataCalonMhsTuitionFee_approved()
+     public function count_getDataCalonMhsTuitionFee_approved($FormulirCode)
      {
+
+      if($FormulirCode != '%') {
+          $FormulirCode = '"%'.$FormulirCode.'%"'; 
+      }
+      else
+      {
+        $FormulirCode = '"%"'; 
+      }
+
       $sql= ' select count(*) as total from (
               select ID from db_finance.register_admisi
               where Status = "Approved"
@@ -2094,8 +2045,16 @@ class M_admission extends CI_Model {
       return $query[0]['total'];
      }
 
-    public function getDataCalonMhsTuitionFee_approved($limit, $start)
+    public function getDataCalonMhsTuitionFee_approved($limit, $start,$FormulirCode,$Status = 'p.Status = "Created" or p.Status = "Approved"')
     {
+      if($FormulirCode != '%') {
+          $FormulirCode = '"%'.$FormulirCode.'%"'; 
+      }
+      else
+      {
+        $FormulirCode = '"%"'; 
+      }
+
      $arr_temp = array();
      $sql= 'select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,
              f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
@@ -2124,7 +2083,12 @@ class M_admission extends CI_Model {
              on o.ID = a.ID_program_study
              left join db_finance.register_admisi as p
              on a.ID = p.ID_register_formulir
-             where p.Status = "Approved" group by a.ID order by a.ID desc LIMIT '.$start. ', '.$limit;
+             left join db_admission.formulir_number_offline_m as px
+              on px.FormulirCode = b.FormulirCode
+              where ('.$Status.') 
+              and ( b.FormulirCode like '.$FormulirCode.' or px.No_Ref like '.$FormulirCode.' )
+              and b.FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)
+             group by a.ID order by a.ID desc LIMIT '.$start. ', '.$limit;
      $query=$this->db->query($sql, array())->result_array();
      $this->load->model('master/m_master');
      $jpa = $this->m_master->showData_array('db_admission.register_dsn_jpa');
