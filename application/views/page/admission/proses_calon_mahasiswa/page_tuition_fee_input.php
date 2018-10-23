@@ -152,7 +152,7 @@
 				showFile = '<a href="javascript:void(0)" class="show_a_href" id = "show'+getDataCalonMhs[i]['ID_register_formulir']+'" filee = "'+getDataCalonMhs[i]['Attachment']+'" Email = "'+getDataCalonMhs[i]['Email']+'">Show</a>';
 			}
 
-			var textArea = '<textarea rows="2" cols="5" name="textarea" class="limited form-control ket" data-limit="50" maxlength="50" id-formulir = "'+getDataCalonMhs[i]['ID_register_formulir']+'" id = "ket'+getDataCalonMhs[i]['ID_register_formulir']+'"></textarea><span id="chars">Max 50</span> characters';	
+			var textArea = '<textarea rows="2" cols="5" name="textarea" class="limited form-control ket" data-limit="50" maxlength="50" id-formulir = "'+getDataCalonMhs[i]['ID_register_formulir']+'" id = "ket'+getDataCalonMhs[i]['ID_register_formulir']+'"></textarea>Max<span id="chars'+getDataCalonMhs[i]['ID_register_formulir']+'">50</span> characters';	
 
 			var Code = (getDataCalonMhs[i]['No_Ref'] != '') ? getDataCalonMhs[i]['FormulirCode'] + ' / ' + getDataCalonMhs[i]['No_Ref'] : getDataCalonMhs[i]['FormulirCode'];
 			var Rangking = (getDataCalonMhs[i]['RangkingRapor'] != 0) ? 'Rangking : '+getDataCalonMhs[i]['RangkingRapor'] : "";
@@ -175,7 +175,21 @@
 
 		$('.costInput').maskMoney({thousands:'.', decimal:',', precision:2,allowZero: true});
 		$('.costInput').maskMoney('mask', '9894');
+
+		EvkeyketTable();
+
 		pageHtml = 'tuition_fee';
+	}
+
+	function EvkeyketTable()
+	{
+		$(".ket").keyup(function(){
+			var maxLength = $(this).attr('maxlength');
+			var length = $(this).val().length;
+			var id_formulir = $(this).attr('id-formulir');
+			var length = maxLength-length;
+			$('#chars'+id_formulir).text(length);
+		})
 	}
 
 	$(document).on('change','.selecTOption', function () {

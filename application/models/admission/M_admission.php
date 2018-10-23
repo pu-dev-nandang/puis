@@ -1963,7 +1963,7 @@ class M_admission extends CI_Model {
               f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
               n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
               if((select count(*) as total from db_admission.register_nilai where Status = "Verified" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
-              as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,
+              as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,p.Desc,
               if(d.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = b.FormulirCode limit 1) ,""  ) as No_Ref
               from db_admission.register_formulir as a
               left JOIN db_admission.register_verified as b 
@@ -2040,7 +2040,8 @@ class M_admission extends CI_Model {
               'No_Ref' => $query[$i]['No_Ref'],
               'getBeasiswa' => $getBeasiswa,
               'getFile' => $getFile,
-              'Email' => $query[$i]['Email']
+              'Email' => $query[$i]['Email'],
+              'Desc' => $query[$i]['Desc'],
             );
         }
         else
@@ -2058,6 +2059,7 @@ class M_admission extends CI_Model {
               'getBeasiswa' => $getBeasiswa,
               'getFile' => $getFile,
               'Email' => $query[$i]['Email'],
+              'Desc' => $query[$i]['Desc'],
             );
         }
 
@@ -2099,7 +2101,7 @@ class M_admission extends CI_Model {
              f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
              n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
              if((select count(*) as total from db_admission.register_nilai where Status = "Verified" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
-             as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,
+             as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,p.Desc,
              if(d.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = b.FormulirCode limit 1) ,""  ) as No_Ref
              from db_admission.register_formulir as a
              left JOIN db_admission.register_verified as b 
@@ -2176,7 +2178,8 @@ class M_admission extends CI_Model {
             'No_Ref' => $query[$i]['No_Ref'],
             'getBeasiswa' => $getBeasiswa,
             'getFile' => $getFile,
-            'Email' => $query[$i]['Email']
+            'Email' => $query[$i]['Email'],
+            'Desc' => $query[$i]['Desc'],
            );
        }
        else
@@ -2194,6 +2197,7 @@ class M_admission extends CI_Model {
              'getBeasiswa' => $getBeasiswa,
              'getFile' => $getFile,
              'Email' => $query[$i]['Email'],
+             'Desc' => $query[$i]['Desc'],
            );
        }
 

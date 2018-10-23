@@ -42,7 +42,7 @@
             <div class="widget-content">
                 <!--  -->
                 <div class="row row-sma">
-                    <label class="col-xs-3 control-label">Tahun</label>
+                    <label class="col-xs-3 control-label">Angkatan</label>
                     <div class="col-xs-9">
                         <div class="row">
                             <div class="col-xs-4">
