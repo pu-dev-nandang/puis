@@ -3535,7 +3535,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetFont('dinlightitalic','',$font_medium_i);
         $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
-        $pdf->Cell($w_Div-$min,$h,'Place Date Issued',$borderttd,1,'L');
+        $pdf->Cell($w_Div-$min,$h,'Place and Date Issued',$borderttd,1,'L');
 
         $pdf->SetFont('dinpromedium','',$font_medium);
         $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
@@ -3559,13 +3559,13 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Ln(17);
 
         $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].' ' : '';
-        $titleB = ($Student['TitleBehind']!='') ? ' '.$Student['TitleBehind'] : '' ;
+        $titleB = ($Student['TitleBehind']!='') ? $Student['TitleBehind'] : '' ;
 
-        $Dekan = $titleA.''.$Student['Dekan'].' '.$titleB;
+        $Dekan = $titleA.''.$Student['Dekan'].''.$titleB;
 
         $Rektorat = $dataStudent['Rektorat'][0];
         $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].' ' : '';
-        $titleBRektor = ($Rektorat['TitleBehind']!='')? ' '.$Rektorat['TitleBehind'] : '';
+        $titleBRektor = ($Rektorat['TitleBehind']!='')? $Rektorat['TitleBehind'] : '';
         $Rektor = $titleARektor.''.$Rektorat['Name'].''.$titleBRektor;
 
         // Foto
