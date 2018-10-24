@@ -202,8 +202,8 @@
    		   	bars: {
    		   		show: true,
    		   		barWidth: 0.2,
-   		   		order: 3
-   		   	}
+   		   		order: 3,
+   		   	},
    		   });
 
 		   // console.log(ds);
