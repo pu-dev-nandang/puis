@@ -485,7 +485,7 @@ class M_api extends CI_Model {
                                                       LEFT JOIN db_academic.mata_kuliah mk ON (cd.MKID = mk.ID)
                                                       LEFT JOIN db_academic.schedule_details_course sdc1 ON (sdc1.MKID = mk.ID)
                                                       LEFT JOIN db_academic.schedule s1 ON (sdc1.ScheduleID = s1.ID)
-                                                      WHERE cd.ID = "'.$Course[$i].'" 
+                                                      WHERE s1.SemesterID = "'.$SemesterID.'" AND cd.ID = "'.$Course[$i].'" 
                                                       AND cd.ID IN (
                                                             SELECT sdc.CDID FROM db_academic.schedule_details_course sdc 
                                                             LEFT JOIN db_academic.schedule s ON (sdc.ScheduleID = s.ID) 
@@ -3187,6 +3187,8 @@ class M_api extends CI_Model {
 
     public function __getStudentByScheduleID($ScheduleID){
 
+        // Fungsi ini mengambil student dari yang sudah di approve dan dari yang masih planning
+
         $getSmtAct = $this->_getSemesterActive();
 
         $dataCL = $this->getClassOf();
@@ -3220,8 +3222,47 @@ class M_api extends CI_Model {
 
         return $res;
 
+    }
+
+    public function __getStudentByScheduleIDApproved($SemesterID,$ScheduleID){
 
 
+        $dataCL = $this->getClassOf();
+
+        $res = [];
+        for($c=0;$c<count($dataCL);$c++){
+            $d = $dataCL[$c];
+            $db_ = 'ta_'.$d['Year'];
+
+            // Cek DB Exist
+            $dbExist = $this->db->query('SELECT SCHEMA_NAME 
+                                                    FROM INFORMATION_SCHEMA.SCHEMATA 
+                                                    WHERE SCHEMA_NAME = "'.$db_.'" ')->result_array();
+
+            if(count($dbExist)>0){
+                $dataSP = $this->db->query('SELECT s.NPM,s.ClassOf,s.Name FROM '.$db_.'.study_planning sp 
+                                                            LEFT JOIN  '.$db_.'.students s ON (s.NPM = sp.NPM) 
+                                                            WHERE sp.SemesterID = "'.$SemesterID.'" 
+                                                            AND sp.ScheduleID = "'.$ScheduleID.'" ')->result_array();
+                if(count($dataSP)>0){
+                    for($s=0;$s<count($dataSP);$s++){
+                        array_push($res,$dataSP[$s]);
+                    }
+                }
+            }
+
+        }
+        return $res;
+    }
+
+    public function __getStudentByScheduleIDInStudyPlanning($SemesterID,$ScheduleID)
+    {
+
+        $data = $this->db->query('SELECT aut_s.ID, aut_s.NPM, aut_s.Name, aut_s.Year AS ClassOf FROM db_academic.std_krs std_k 
+                                                LEFT JOIN db_academic.auth_students aut_s ON (aut_s.NPM = std_k.NPM)
+                                                WHERE std_k.SemesterID = "'.$SemesterID.'" 
+                                                AND std_k.ScheduleID = "'.$ScheduleID.'" ')->result_array();
+        return $data;
     }
 
     public function _getSeemsterByClassOf($Year){
@@ -3337,10 +3378,6 @@ class M_api extends CI_Model {
 
     public function getStudentsAttendance($SemesterID,$ScheduleID){
 
-//        $dataAttd = $this->db->select('ID')->get_where('db_academic.attendance',array(
-//            'SemesterID' => $SemesterID,
-//            'ScheduleID' => $ScheduleID
-//        ));
 
         $dataCourse = $this->db->query('SELECT mk.NameEng, mk.MKCode, sdc.MKID, s.ClassGroup, smt.Name AS Semester, 
                                                   em.Name AS Lecturer
@@ -3514,5 +3551,7 @@ class M_api extends CI_Model {
 
         return $dataExamDetail;
     }
+
+    
 
 }

@@ -4,8 +4,11 @@
         <li class="<?php if($this->uri->segment(3)=='list') { echo 'active'; } ?>">
             <a href="<?php echo base_url('academic/timetables/list'); ?>">Timetables</a>
         </li>
-        <li class="<?php if($this->uri->segment(3)=='monitoring-score') { echo 'active'; } ?>">
-            <a href="<?php echo base_url('academic/score/monitoring-score'); ?>">Course Offer</a>
+        <li class="<?php if($this->uri->segment(3)=='course-offer') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('academic/timetables/course-offer'); ?>">Course Offer</a>
+        </li>
+        <li class="<?php if($this->uri->segment(3)=='setting-timetable') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('academic/timetables/setting-timetable'); ?>">Set Timetable</a>
         </li>
     </ul>
     <div style="border-top: 1px solid #cccccc">

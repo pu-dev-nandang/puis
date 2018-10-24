@@ -351,7 +351,6 @@
 
 
 
-
         $('input[type=radio][name=formCombinedClasses]').change(function () {
             loadformCombinedClasses($(this).val());
         });
@@ -904,14 +903,6 @@
                             UpdateBy : UpdateBy,
                             UpdateAt : UpdateAt
                         },
-                        // schedule_class_group : {
-                        //     ScheduleID : 0,
-                        //     ProdiCode : dataClassGroup[0],
-                        //     Type : typeParalel,
-                        //     Numeric : dataClassGroup[1],
-                        //     Alphabet : (typeParalel=='1') ? dataClassGroup[2] : null,
-                        //     Group : ClassGroup
-                        // },
                         schedule_details : dataScheduleDetailsArray,
                         schedule_details_course : schedule_details_course,
                         schedule_team_teaching : teamTeachingArray

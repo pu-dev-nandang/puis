@@ -69,6 +69,10 @@ $route['academic/ModalKetersediaanDosen'] = 'page/academic/c_akademik/Modal_Kete
 $route['academic/timetables'] = 'page/academic/c_jadwal';
 
 $route['academic/timetables/list'] = 'page/academic/c_timetables/list_timetables';
+$route['academic/timetables/list/edit/(:num)/(:num)/(:any)'] = 'page/academic/c_timetables/edit_course/$1/$2/$3';
+
+$route['academic/timetables/course-offer'] = 'page/academic/c_timetables/course_offer';
+$route['academic/timetables/setting-timetable'] = 'page/academic/c_timetables/setting_timetable';
 
 $route['academic/study-planning'] = 'page/academic/c_study_planning';
 
