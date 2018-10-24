@@ -119,8 +119,8 @@
                                '<th>Rangking</th>'+
                                '<th>Beasiswa</th>'+
                                '<th>Document</th>'+
-                               '<th>Tagihan</th>'+
-                               '<th>Detail</th>'+
+                               '<th width = "13%">Tagihan</th>'+
+                               '<th>Detail Payment</th>'+
                                '<th>Status</th>'+
                                '<th>Login</th>'+
                            '</tr>'+
@@ -189,7 +189,7 @@
                                 '<th>Rangking</th>'+
                                 '<th>Beasiswa</th>'+
                                 '<th>Document</th>'+
-                                '<th>Tagihan</th>'+
+                                '<th width = "13%">Tagihan</th>'+
                                 '<th>Detail Payment</th>'+
                                 '<th>Status Payment</th>'+
                             '</tr>'+
@@ -303,13 +303,27 @@
                              var token = jwt_encode(data,"UAP)(*");
                               $.post(url,{token:token},function (data_json) {
                                  // $('#generateToBEMhs').prop('disabled',false).html('Generate');
+                                 var json = jQuery.parseJSON(data_json);
+                                 if(json == 'Error'){
+                                  toastr.error('Please check the completeness of the data', 'Failed!!');
+                                 }
+                                 else if(json == '')
+                                 {
+                                  toastr.success('Generate ok', 'Success!');
+                                 }
+                                 else
+                                 {
+                                  toastr.success('Proses Finish', 'Success!');
+                                 }
                                  $('#NotificationModal').modal('hide');
                              }).done(function() {
                                loadPage('to-be-mhs/1');
+                               $('#NotificationModal').modal('hide');
                              }).fail(function() {
-                               toastr.error('The Database connection error, please try again', 'Failed!!');
+                               toastr.error('Please check the completeness of the data', 'Failed!!');
+                               $('#NotificationModal').modal('hide');
                              }).always(function() {
-                              // $('#generateToBEMhs').prop('disabled',false).html('Generate');
+                              $('#NotificationModal').modal('hide');
 
                              });
                          })
