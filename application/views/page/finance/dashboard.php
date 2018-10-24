@@ -104,7 +104,6 @@
         var url = base_url_js+'finance/summary_payment';
 		$.post(url,function (resultJson) {
 		   var response = jQuery.parseJSON(resultJson);
-		   console.log(response);
 		   var ds = new Array();
 
 		   ds.push({
@@ -223,6 +222,7 @@
         var url = base_url_js+'finance/summary_payment_admission';
 		$.post(url,function (resultJson) {
 		   var response = jQuery.parseJSON(resultJson);
+		   console.log(response);
 		   var ds = new Array();
 
 		   ds.push({
@@ -242,6 +242,16 @@
 		   		show: true,
 		   		barWidth: 0.2,
 		   		order: 2
+		   	}
+		   });
+
+		   ds.push({
+		   	label: "Unset Paid",
+		   	data: response['Unset_Paid'],
+		   	bars: {
+		   		show: true,
+		   		barWidth: 0.2,
+		   		order: 3
 		   	}
 		   });
 
