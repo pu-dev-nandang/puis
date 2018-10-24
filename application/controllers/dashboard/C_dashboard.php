@@ -316,31 +316,32 @@ class C_dashboard extends Globalclass {
         // get paid off
         $Paid_Off = array();
         $Unpaid_Off = array();
+        $Unset_Paid = array();
         for ($i=0; $i < count($arrDB); $i++) {
             // lunas 
             $sqlPaid_Off = 'select count(*) as total from (
                     select a.ID as ID_register_formulir,
                     if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment
                     from db_admission.register_formulir as a
-                    JOIN db_admission.register_verified as b 
+                    left JOIN db_admission.register_verified as b 
                     ON a.ID_register_verified = b.ID
-                    JOIN db_admission.register_verification as c
+                    left JOIN db_admission.register_verification as c
                     ON b.RegVerificationID = c.ID
-                    JOIN db_admission.register as d
+                    left JOIN db_admission.register as d
                     ON c.RegisterID = d.ID
-                    JOIN db_admission.country as e
+                    left JOIN db_admission.country as e
                     ON a.NationalityID = e.ctr_code
-                    JOIN db_employees.religion as f
+                    left JOIN db_employees.religion as f
                     ON a.ReligionID = f.IDReligion
-                    JOIN db_admission.school_type as l
+                    left JOIN db_admission.school_type as l
                     ON l.sct_code = a.ID_school_type
-                    JOIN db_admission.register_major_school as m
+                    left JOIN db_admission.register_major_school as m
                     ON m.ID = a.ID_register_major_school
-                    JOIN db_admission.school as n
+                    left JOIN db_admission.school as n
                     ON n.ID = d.SchoolID
-                    join db_academic.program_study as o
+                    left join db_academic.program_study as o
                     on o.ID = a.ID_program_study
-                    join db_finance.register_admisi as p
+                    left join db_finance.register_admisi as p
                     on a.ID = p.ID_register_formulir
                     where p.Status = "Approved"  and d.SetTa = "'.$arrDB[$i].'" group by a.ID
 
@@ -352,37 +353,67 @@ class C_dashboard extends Globalclass {
                     select a.ID as ID_register_formulir,
                     if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment
                     from db_admission.register_formulir as a
-                    JOIN db_admission.register_verified as b 
+                    left JOIN db_admission.register_verified as b 
                     ON a.ID_register_verified = b.ID
-                    JOIN db_admission.register_verification as c
+                    left JOIN db_admission.register_verification as c
                     ON b.RegVerificationID = c.ID
-                    JOIN db_admission.register as d
+                    left JOIN db_admission.register as d
                     ON c.RegisterID = d.ID
-                    JOIN db_admission.country as e
+                    left JOIN db_admission.country as e
                     ON a.NationalityID = e.ctr_code
-                    JOIN db_employees.religion as f
+                    left JOIN db_employees.religion as f
                     ON a.ReligionID = f.IDReligion
-                    JOIN db_admission.school_type as l
+                    left JOIN db_admission.school_type as l
                     ON l.sct_code = a.ID_school_type
-                    JOIN db_admission.register_major_school as m
+                    left JOIN db_admission.register_major_school as m
                     ON m.ID = a.ID_register_major_school
-                    JOIN db_admission.school as n
+                    left JOIN db_admission.school as n
                     ON n.ID = d.SchoolID
-                    join db_academic.program_study as o
+                    left join db_academic.program_study as o
                     on o.ID = a.ID_program_study
-                    join db_finance.register_admisi as p
+                    left join db_finance.register_admisi as p
                     on a.ID = p.ID_register_formulir
                     where p.Status = "Approved"  and d.SetTa = "'.$arrDB[$i].'" group by a.ID
 
                     ) SubQuery where StatusPayment = "Belum Lunas";
                 ';
-            $queryUnpaid_Off = $this->db->query($sqlUnpaid_Off)->result_array();    
+            $queryUnpaid_Off = $this->db->query($sqlUnpaid_Off)->result_array(); 
+
+            $sqlUnset_Paid = 'select count(*) as total from (
+                    select a.ID as ID_register_formulir
+                    from db_admission.register_formulir as a
+                    left JOIN db_admission.register_verified as b 
+                    ON a.ID_register_verified = b.ID
+                    left JOIN db_admission.register_verification as c
+                    ON b.RegVerificationID = c.ID
+                    left JOIN db_admission.register as d
+                    ON c.RegisterID = d.ID
+                    left JOIN db_admission.country as e
+                    ON a.NationalityID = e.ctr_code
+                    left JOIN db_employees.religion as f
+                    ON a.ReligionID = f.IDReligion
+                    left JOIN db_admission.school_type as l
+                    ON l.sct_code = a.ID_school_type
+                    left JOIN db_admission.register_major_school as m
+                    ON m.ID = a.ID_register_major_school
+                    left JOIN db_admission.school as n
+                    ON n.ID = d.SchoolID
+                    left join db_academic.program_study as o
+                    on o.ID = a.ID_program_study
+                    left join db_finance.register_admisi as p
+                    on a.ID = p.ID_register_formulir
+                    where (p.Status = "Created"  or  a.ID not in (select ID_register_formulir from db_finance.register_admisi)  ) and d.SetTa = "'.$arrDB[$i].'" group by a.ID
+
+                    ) SubQuery;
+                ';
+            $queryUnset_Paid = $this->db->query($sqlUnset_Paid)->result_array();   
 
              $Paid_Off[] = array($arrDB[$i],$queryPaid_Off[0]['total']);
              $Unpaid_Off[] = array($arrDB[$i],$queryUnpaid_Off[0]['total']);
+             $Unset_Paid[] = array($arrDB[$i],$queryUnset_Paid[0]['total']);
         }
 
-        $arr_json = array('Paid_Off'=> $Paid_Off,'Unpaid_Off' => $Unpaid_Off);
+        $arr_json = array('Paid_Off'=> $Paid_Off,'Unpaid_Off' => $Unpaid_Off,'Unset_Paid' => $Unset_Paid);
         echo json_encode($arr_json);
     }
 
