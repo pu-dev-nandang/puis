@@ -1217,14 +1217,6 @@ class C_admission extends Admission_Controler {
     public function generate_to_be_mhs()
     {
       $input = $this->getInputToken();
-       // $this->db->query('CREATE TABLE ta_2018.docstd (
-       //                        `ID`  int(11) NOT NULL ,
-       //                        `NPM`  varchar(255) NULL ,
-       //                        `ID_doc_checklist`  int(11) NULL ,
-       //                        `Path`  varchar(255) NULL ,
-       //                        PRIMARY KEY (`ID`)
-       //                      ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1');
-
       //check existing db
           // get setting ta
           $taDB = $this->m_master->showData_array('db_admission.set_ta');
@@ -1261,6 +1253,10 @@ class C_admission extends Admission_Controler {
                 if (count($Q_getLastNPM) == 0) {
                     // search NPM dengan 2 Pertama kode Prodi CodeID
                     // 2 kedua tahun angkatan ambil 2 digit terakhir
+                    if (count($Q_Prodi) == 0) {
+                      echo json_encode('Error');
+                      die();
+                    }
                     $CodeID = $Q_Prodi[0]['CodeID'];
                     $strLenTA = strlen($ta) - 2; // last 2 digit
                     $P_ang = substr($ta, $strLenTA,2); // last 2 digit
@@ -1288,19 +1284,39 @@ class C_admission extends Admission_Controler {
             $CityID = $data[0]['ID_region'];
             $HighSchoolID = $data2[0]['SchoolID'];
             $SchoolName = $this->m_master->caribasedprimary('db_admission.school','ID',$HighSchoolID);
+            if (count($SchoolName) == 0) {
+              echo json_encode('Error');
+              die();
+            }
 
             $HighSchool = $SchoolName[0]['SchoolName'];
             $MajorsHighSchool = $this->m_master->caribasedprimary('db_admission.register_major_school','ID',$data[0]['ID_register_major_school']);
+            if (count($MajorsHighSchool) == 0) {
+              echo json_encode('Error');
+              die();
+            }
             $MajorsHighSchool = $MajorsHighSchool[0]['SchoolMajor'];
             $Name = $data2[0]['Name'];
 
             $Kelurahan = ' Kelurahan : '.$data[0]['District'];
             $DistrictID = $data[0]['ID_districts'];
             $DistrictID = $this->m_master->caribasedprimary('db_admission.district','DistrictID',$DistrictID);
+            if (count($DistrictID) == 0) {
+              echo json_encode('Error');
+              die();
+            }
             $DistrictID = ' Kecamatan : '.$DistrictID[0]['DistrictName'];
             $RegionID = $this->m_master->caribasedprimary('db_admission.region','RegionID',$data[0]['ID_region']);
+            if (count($RegionID) == 0) {
+              echo 'Error';
+              die();
+            }
             $RegionID = $RegionID[0]['RegionName'];
             $ID_province = $this->m_master->caribasedprimary('db_admission.province','ProvinceID',$data[0]['ID_province']);
+            if (count($ID_province) == 0) {
+              echo json_encode('Error');
+              die();
+            }
             $ID_province = $ID_province[0]['ProvinceName'];
 
             $Address = $data[0]['Address'].$Kelurahan.$DistrictID.' '.$RegionID.' '.$ID_province;
@@ -1313,7 +1329,14 @@ class C_admission extends Admission_Controler {
             $ClassOf  = $taDB[0]['Ta'];
             $Email = $data2[0]['Email'];
             $Jacket = $this->m_master->caribasedprimary('db_admission.register_jacket_size_m','ID',$data[0]['ID_register_jacket_size_m']);
-            $Jacket = $Jacket[0]['JacketSize'];
+            if (count($Jacket) == 0) {
+              $Jacket = '';
+            }
+            else
+            {
+              $Jacket = $Jacket[0]['JacketSize'];
+            }
+            
             $AnakKe = '';
             $JumlahSaudara = '';
             $NationExamValue = '';
@@ -1326,9 +1349,23 @@ class C_admission extends Admission_Controler {
             $PhoneFather = $data[0]['FatherPhoneNumber'];
             $PhoneMother = $data[0]['MotherPhoneNumber'];
             $OccupationFather  = $this->m_master->caribasedprimary('db_admission.occupation','ocu_code',$data[0]['Father_ID_occupation']);
-            $OccupationFather  = $OccupationFather[0]['ocu_name'];
+            if (count($OccupationFather) == 0) {
+              $OccupationFather  = '';
+            }
+            else
+            {
+              $OccupationFather  = $OccupationFather[0]['ocu_name'];
+            }
+            
             $OccupationMother = $this->m_master->caribasedprimary('db_admission.occupation','ocu_code',$data[0]['Mother_ID_occupation']);
-            $OccupationMother = $OccupationMother[0]['ocu_name'];
+            if (count($OccupationMother) == 0) {
+              $OccupationMother  = '';
+            }
+            else
+            {
+              $OccupationMother = $OccupationMother[0]['ocu_name'];
+            }
+            
             $EducationFather = '';
             $EducationMother = '';
             $AddressFather = $data[0]['FatherAddress'];
@@ -1537,7 +1574,11 @@ class C_admission extends Admission_Controler {
                           ';
                   $to = $Email;
                   $subject = "Podomoro University Registration";
-                  $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);  
+                  $ServerName = $_SERVER['SERVER_NAME'];
+                  if ($ServerName == 'pcam.podomorouniversity.ac.id') {
+                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);  
+                  }
+                  
             $aa++;
           }
           // print_r($arr);
@@ -1545,6 +1586,7 @@ class C_admission extends Admission_Controler {
 
           // $this->db->insert_batch($ta.'.students', $arr);
           $this->db->insert_batch('db_academic.auth_students', $arr_insert_auth);
+          echo json_encode('');
 
     }
 
