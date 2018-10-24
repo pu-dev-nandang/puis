@@ -1741,7 +1741,7 @@ class C_finance extends Finnance_Controler {
                 if((select count(*) as total from db_admission.register_nilai where Status = "Approved" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
                 as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,
                 if( (select count(*) as total from db_finance.payment_pre where ID_register_formulir = a.ID limit 1) > 1,"Cicilan","Tidak Cicilan") as cicilan,
-                if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment
+                if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment,px.No_Ref
                 from db_admission.register_formulir as a
                 left JOIN db_admission.register_verified as b 
                 ON a.ID_register_verified = b.ID
@@ -1763,6 +1763,8 @@ class C_finance extends Finnance_Controler {
                 on o.ID = a.ID_program_study
                 left join db_finance.register_admisi as p
                 on a.ID = p.ID_register_formulir
+                left join db_admission.formulir_number_offline_m as px
+                on px.FormulirCode = b.FormulirCode
                 where p.Status = "Approved"  and d.SetTa = "'.$reqTahun.'" group by a.ID
 
                 ) SubQuery
@@ -1770,7 +1772,9 @@ class C_finance extends Finnance_Controler {
 
         $sql.= ' where (Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
                 or FormulirCode LIKE "'.$requestData['search']['value'].'%" or SchoolName LIKE "%'.$requestData['search']['value'].'%"
-                or StatusPayment LIKE "'.$requestData['search']['value'].'%" or cicilan LIKE "'.$requestData['search']['value'].'%")
+                or StatusPayment LIKE "'.$requestData['search']['value'].'%" or cicilan LIKE "'.$requestData['search']['value'].'%"
+                or No_Ref LIKE "'.$requestData['search']['value'].'%" 
+                )
                 ';
         $sql.= ' ORDER BY StatusPayment ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
@@ -1784,7 +1788,8 @@ class C_finance extends Finnance_Controler {
             // $nestedData[] = '<input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'">';
             $nestedData[] = $row['NamePrody'];
             $nestedData[] = $row['Name'].'<br>'.$row['Email'];
-            $nestedData[] = $row['FormulirCode'];
+            $FormulirCode = ($row['No_Ref'] != "" || $row['No_Ref'] != null ) ? $row['FormulirCode'].' / '.$row['No_Ref'] : $row['FormulirCode'];
+            $nestedData[] = $FormulirCode;
 
             // get tagihan
             $getTagihan = $this->m_admission->getPaymentType_Cost_created($row['ID_register_formulir']);
