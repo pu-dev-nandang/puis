@@ -173,15 +173,36 @@
         var url = base_url_js+'finance/summary_payment_formulir';
 		$.post(url,function (resultJson) {
 		   var response = jQuery.parseJSON(resultJson);
+		   console.log(response);
 		   var ds = new Array();
 
 		   ds.push({
-   		   	label: "Paid Off",
+   		   	label: "Sold Out",
    		   	data: response['Paid_Off'],
    		   	bars: {
    		   		show: true,
    		   		barWidth: 0.2,
    		   		order: 1
+   		   	}
+   		   });
+
+   		   ds.push({
+   		   	label: "",
+   		   	data: response['Return_Formulir'],
+   		   	bars: {
+   		   		// show: true,
+   		   		barWidth: 0.2,
+   		   		order: 2
+   		   	}
+   		   });
+
+   		   ds.push({
+   		   	label: "Return",
+   		   	data: response['Return_Formulir'],
+   		   	bars: {
+   		   		show: true,
+   		   		barWidth: 0.2,
+   		   		order: 3
    		   	}
    		   });
 
@@ -222,7 +243,6 @@
         var url = base_url_js+'finance/summary_payment_admission';
 		$.post(url,function (resultJson) {
 		   var response = jQuery.parseJSON(resultJson);
-		   console.log(response);
 		   var ds = new Array();
 
 		   ds.push({

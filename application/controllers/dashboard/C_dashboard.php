@@ -441,6 +441,7 @@ class C_dashboard extends Globalclass {
            }
 
         $Paid_Off = array();
+        $Return_Formulir = array();
         for ($i=0; $i < count($arrDB); $i++) { 
             // lunas
             $sql = 'select count(*) as total from(
@@ -450,10 +451,26 @@ class C_dashboard extends Globalclass {
             ) subquery';
 
             $query=$this->db->query($sql, array())->result_array();
+
+            $sqlReturn_Formulir = 'select count(*) as total from(
+                        select a.ID as ID_register_formulir
+                        from db_admission.register_formulir as a
+                        left JOIN db_admission.register_verified as b 
+                        ON a.ID_register_verified = b.ID
+                        left JOIN db_admission.register_verification as c
+                        ON b.RegVerificationID = c.ID
+                        left JOIN db_admission.register as d
+                        ON c.RegisterID = d.ID
+                        where d.SetTa = "'.$arrDB[$i].'"
+                    ) subquery';
+
+            $queryReturn_Formulir=$this->db->query($sqlReturn_Formulir, array())->result_array();
+
             $Paid_Off[] = array($arrDB[$i],$query[0]['total']);
+            $Return_Formulir[] = array($arrDB[$i],$queryReturn_Formulir[0]['total']);
             
         }
-        $arr_json = array('Paid_Off'=> $Paid_Off);
+        $arr_json = array('Paid_Off'=> $Paid_Off,'Return_Formulir' => $Return_Formulir);
         echo json_encode($arr_json);
         
 
