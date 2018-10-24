@@ -1131,7 +1131,7 @@ class C_admission extends Admission_Controler {
                       "Belum Lunas"
                 ) as chklunas,
               (select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID ) as Cicilan
-              ,xx.Name as NameSales
+              ,xx.Name as NameSales,px.No_Ref
               from db_admission.register as a
               join db_admission.school as b
               on a.SchoolID = b.ID
@@ -1152,14 +1152,20 @@ class C_admission extends Admission_Controler {
               LEFT JOIN db_finance.register_admisi as xy
               on e.ID = xy.ID_register_formulir
               LEFT JOIN db_admission.register_dsn_type_m as xq
-              on xq.ID = xy.TypeBeasiswa where a.SetTa = "'.$reqTahun.'"
+              on xq.ID = xy.TypeBeasiswa 
+              left join db_admission.formulir_number_offline_m as px
+              on px.FormulirCode = c.FormulirCode
+              where a.SetTa = "'.$reqTahun.'"
             ) ccc
           ';
 
       $sql.= ' where (Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
               or FormulirCode LIKE "'.$requestData['search']['value'].'%" or SchoolName LIKE "%'.$requestData['search']['value'].'%"
               or chklunas LIKE "'.$requestData['search']['value'].'%" or DiscountType LIKE "'.$requestData['search']['value'].'%"
-              or NameSales LIKE "'.$requestData['search']['value'].'%") and chklunas in ("Lunas","Belum Lunas") and FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)';
+              or NameSales LIKE "'.$requestData['search']['value'].'%"
+              or No_Ref LIKE "'.$requestData['search']['value'].'%"
+                )
+             and chklunas in ("Lunas","Belum Lunas") and FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)';
       $sql.= ' ORDER BY chklunas Desc LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
       $query = $this->db->query($sql)->result_array();
@@ -1173,7 +1179,8 @@ class C_admission extends Admission_Controler {
           // $nestedData[] = $row['NamePrody'];
           $nestedData[] = $No.' &nbsp <input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'">';
           $nestedData[] = $row['Name'].'<br>'.$row['Email'].'<br>'.$row['SchoolName'];
-          $nestedData[] = $row['NamePrody'].'<br>'.$row['FormulirCode'].'<br>'.$row['VA_number'];
+          $FormulirCode = ($row['No_Ref'] != "" || $row['No_Ref'] != null ) ? $row['FormulirCode'].' / '.$row['No_Ref'] : $row['FormulirCode'];
+          $nestedData[] = $row['NamePrody'].'<br>'.$FormulirCode.'<br>'.$row['VA_number'];
           $nestedData[] = $row['NameSales'];
           $nestedData[] = $row['Rangking'];
           $nestedData[] = $row['DiscountType'];
