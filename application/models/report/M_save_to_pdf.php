@@ -412,7 +412,7 @@ class M_save_to_pdf extends CI_Model {
         $IPK_Ori = (count($data)>0) ? $totalGradeValue/$totalSKS : 0 ;
         $ipk = round($IPK_Ori,2);
 
-        $grade = $this->getGraduation($ipk);
+        $grade = $this->getGraduation(number_format($ipk,2,'.',''));
 
         // Get Rektor
         $dataRektor = $this->db->query('SELECT em.NIP, em.Name, em.TitleAhead, em.TitleBehind FROM db_employees.employees em
@@ -448,6 +448,7 @@ class M_save_to_pdf extends CI_Model {
     }
 
     public function getGraduation($IPK){
+
         $dataGrade = $this->db->query('SELECT * FROM db_academic.graduation g 
                                                   WHERE g.IPKStart <= "'.$IPK.'" AND g.IPKEnd >= "'.$IPK.'"
                                                    LIMIT 1')->result_array();
