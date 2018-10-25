@@ -77,7 +77,7 @@
     window.dataaModal = '';
     $(document).ready(function () {
         loadData(1);
-        loadSelectOptionCurriculum('#selectCurriculum','');
+        loadSelectOptionCurriculum2('#selectCurriculum','');
         loadSelectOptionBaseProdi('#selectProdi','');
         loadSelectOptionPaymentTypeMHS('#selectPTID','');
         getReloadTableSocket();
