@@ -491,6 +491,7 @@ class C_admission extends Admission_Controler {
 
       $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
       $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee($config["per_page"], $start,$FormulirCode));
+      $this->data['no'] = $start + 1;
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_tuition_fee_input',$this->data,true);
 
       $output = array(
@@ -532,6 +533,7 @@ class C_admission extends Admission_Controler {
 
       $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
       $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee_delete($config["per_page"], $start,$FormulirCode));
+      $this->data['no'] = $start + 1;
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_tuition_fee_delete',$this->data,true);
 
       $output = array(
@@ -2350,7 +2352,15 @@ class C_admission extends Admission_Controler {
           $ID_region = 0;
         }
         
-        $Prov = $region_Prov[1];
+        if(array_key_exists(1,$region_Prov))
+        {
+          $Prov = $region_Prov[1];
+        }
+        else
+        {
+          $Prov = "";
+        }
+
         $sql = 'select * from db_admission.province where ProvinceName like "%'.$Prov.'%" ';
         $get = $this->db->query($sql, array())->result_array();
         // if(count($get) == 0){$arr_key_list_err[] = array('err' => 'Provinsi tidak ditemukan','No_Ref' => $No_Ref);continue;}

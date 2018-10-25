@@ -77,7 +77,7 @@
 							</td>
 							<td>
 								<select id='FileRapor<?php echo $datadb[$i]['ID_register_formulir'] ?>' class="FileRapor select2-select-00 col-md-4 full-width-fix" id-formulir = '<?php echo $datadb[$i]['ID_register_formulir'] ?>' >
-									<option value ="" selected >--File--</option>
+									<option value ="0" selected >--File--</option>
 								<?php $getDokument = $this->m_admission->getDataDokumentRegister($datadb[$i]['ID_register_formulir'])  ?>
 								<?php for ($l = 0; $l < count($getDokument); $l++): ?>
 									<option  value="<?php echo $getDokument[$l]['ID'] ?>"><?php echo $getDokument[$l]['Attachment'] ?></option>
@@ -109,6 +109,35 @@
 		   //allowClear: true
 		});
 		// console.log(grade);
+
+		$("#btn-Hitung").click(function(){
+			prosesData();
+		})
+
+		$("#btn-Save").click(function(){
+		  loading_button('#btn-Save');
+		  var data = {
+		  					processs1 : processs,
+		  					rangking : processs1
+		  			};
+		  var token = jwt_encode(data,"UAP)(*");
+		  var url = base_url_js+'admission/proses-calon-mahasiswa/set-nilai-rapor/save';
+		  	$.post(url,{token:token},function (data_json) {
+		        var response = jQuery.parseJSON(data_json);
+		        toastr.success('Data berhasil disimpan', 'Success!');
+		        // loadTableData(1);
+		        $('#btn-Save').prop('disabled',false).html('Save');
+	      	}).done(function() {
+	      	      loadTableData(1);
+	      	      $('#btn-Save').prop('disabled',false).html('Save');
+	  	    }).fail(function() {
+	  	      toastr.error('The Database connection error, please try again', 'Failed!!');
+	  	    }).always(function() {
+	  	      $('#btn-Save').prop('disabled',false).html('Save');
+	  	    });
+		})
+
+		
 	});
 
 </script>

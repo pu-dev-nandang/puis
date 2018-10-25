@@ -486,6 +486,7 @@ $route['finance/getPayment_detail_admission'] =  'page/finance/c_finance/getPaym
 $route['finance/getPayment_detail_admission2'] =  'page/finance/c_finance/getPayment_detail_admission2';
 $route['finance/admission/approved/edit'] =  'page/finance/c_finance/approved_edit';
 $route['finance/admission/approved/edit_submit'] =  'page/finance/c_finance/approved_edit_submit';
+$route['finance/getRevision_detail_admission'] =  'api/c_global/getRevision_detail_admission';
 
 
 $route['finance/tagihan-mhs/set-tagihan-mhs'] =  'page/finance/c_finance/page_set_tagihan_mhs';
@@ -590,12 +591,14 @@ $route['save2pdf/diploma_supplement'] =  'c_save_to_pdf/diploma_supplement';
 $route['save2pdf/report-uts'] =  'c_save_to_pdf/report_uts';
 
 $route['save2pdf/getpdfkwitansi/(:any)'] =  'c_save_to_pdf/getpdfkwitansi/$1';
+$route['save2pdf/print/tuitionFeeAdmission'] =  'C_save_to_pdf2/tuitionFeeAdmission';
 
 // ---- Save to EXCEL
 $route['save2excel/test'] =  'c_save_to_excel/test2';
 $route['save2excel/monitoring_score'] =  'c_save_to_excel/monitoring_score';
 $route['save2excel/cumulative-recap'] =  'c_save_to_excel/cumulative_recap';
 $route['save2excel/student-recap'] =  'c_save_to_excel/student_recap';
+
 
 
 // ====== API ======

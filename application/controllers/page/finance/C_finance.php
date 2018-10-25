@@ -226,10 +226,12 @@ class C_finance extends Finnance_Controler {
         $this->mypdf->SetFont('Arial','',$setFont);
         $this->mypdf->Cell(0, 0, ':', 0, 1, 'L', 0);
 
+        $getNumber = $this->m_master->caribasedprimary('db_finance.register_admisi','ID_register_formulir',$Personal[0]['ID_register_formulir']);
+        $No_Surat = $this->m_finance->ShowNumberTuitionFee( $getNumber[0]['No_Surat'] );
         $this->mypdf->SetXY(45,29);
         $this->mypdf->SetTextColor(0,0,0);
         $this->mypdf->SetFont('Arial','',$setFont);
-        $this->mypdf->Cell(0, 0, '061/MKT-PMB-B-19/PU/X/2018', 0, 1, 'L', 0);
+        $this->mypdf->Cell(0, 0, $No_Surat.'/MKT-PMB-B-19/PU/X/2018', 0, 1, 'L', 0);
 
         $this->mypdf->SetXY(45,35);
         $this->mypdf->SetTextColor(0,0,0);
@@ -359,7 +361,7 @@ class C_finance extends Finnance_Controler {
         $this->mypdf->writeHTML('Total pembayaran untuk <b>"Semester Pertama"</b> dalam 1x pembayaran :');
 
         $setY = $setY + 5;
-        
+        $height = $setY;
         $this->mypdf->SetXY($setX,$setY); 
         $this->mypdf->SetFillColor(255, 255, 255);
         $this->mypdf->SetFont('Arial','B',$setFont);
@@ -1661,7 +1663,26 @@ class C_finance extends Finnance_Controler {
     public function set_tuition_fee_delete_data()
     {
       $input = $this->getInputToken();
+      $ID_register_formulir = $input[0];
+      $InputReason = $this->input->post('InputReason');
+      $dataGet = $this->m_master->caribasedprimary('db_finance.register_admisi_rev','ID_register_formulir',$ID_register_formulir);
+      $count = count($dataGet);
+      $arr_Count = $count - 1;
+      $RevNo = (count($dataGet) == 0) ? 1 : $dataGet[$arr_Count]['RevNo'] + 1;
+      $dataSave = array(  
+          'ID_register_formulir' => $ID_register_formulir,
+          'RevNo' => $RevNo,
+          'Note' => 'Cancel / Reject, '.$InputReason,
+          'RevBy' => $this->session->userdata('NIP'),
+          'RevAt' => date('Y-m-d H:i:s'),
+      );
+      $this->db->insert('db_finance.register_admisi_rev', $dataSave);
+
+
       $this->m_admission->set_tuition_fee_delete_data($input);
+
+      // save di register_admisi_rev
+
 
       // send email to admission
       $getEmailDB = $this->m_master->caribasedprimary('db_admission.email_to','Function','Admisi');
@@ -1682,10 +1703,12 @@ class C_finance extends Finnance_Controler {
       
 
       // $table = "<table class=MsoTableGrid border=1 cellspacing=0 cellpadding=0 style='border-collapse:collapse;border:none'><tr><td width=35 valign=top style='width:26.6pt;border:solid windowtext 1.0pt;padding:0in 5.4pt 0in 5.4pt'><p class=MsoNormal>NO<o:p></o:p></p></td><td width=270 valign=top style='width:202.5pt;border:solid windowtext 1.0pt;border-left:none;padding:0in 5.4pt 0in 5.4pt'><p class=MsoNormal>Nama<o:p></o:p></p></td><td width=162 valign=top style='width:121.5pt;border:solid windowtext 1.0pt;border-left:none;padding:0in 5.4pt 0in 5.4pt'><p class=MsoNormal>Prody<o:p></o:p></p></td><td width=156 valign=top style='width:116.9pt;border:solid windowtext 1.0pt;border-left:none;padding:0in 5.4pt 0in 5.4pt'><p class=MsoNormal>Formulir Code<o:p></o:p></p></td></tr></table>";
-
-      $Email = $getEmailDB[0]['EmailTo'];
+      $Email = 'alhadi.rahman@podomorouniversity.ac.id';
+      if($_SERVER['SERVER_NAME']!='localhost' && $_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {  
+        $Email = 'admission@podomorouniversity.ac.id';
+      }
       $to = $Email;
-      $subject = "Podomoro University Notification Bills";
+      $subject = "Podomoro University Notification Reject Tuition Fee";
       $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
     }
 
@@ -1829,7 +1852,7 @@ class C_finance extends Finnance_Controler {
                 if((select count(*) as total from db_admission.register_nilai where Status = "Approved" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
                 as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,
                 if( (select count(*) as total from db_finance.payment_pre where ID_register_formulir = a.ID limit 1) > 1,"Cicilan","Tidak Cicilan") as cicilan,
-                if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment
+                if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment,px.No_Ref,p.RevID
                 from db_admission.register_formulir as a
                 left JOIN db_admission.register_verified as b 
                 ON a.ID_register_verified = b.ID
@@ -1851,6 +1874,8 @@ class C_finance extends Finnance_Controler {
                 on o.ID = a.ID_program_study
                 left join db_finance.register_admisi as p
                 on a.ID = p.ID_register_formulir
+                left join db_admission.formulir_number_offline_m as px
+                on px.FormulirCode = b.FormulirCode
                 where p.Status = "Approved" group by a.ID
 
                 ) SubQuery
@@ -1858,7 +1883,9 @@ class C_finance extends Finnance_Controler {
 
         $sql.= ' where (Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
                 or FormulirCode LIKE "'.$requestData['search']['value'].'%" or SchoolName LIKE "%'.$requestData['search']['value'].'%"
-                or StatusPayment LIKE "'.$requestData['search']['value'].'%" or cicilan LIKE "'.$requestData['search']['value'].'%")
+                or StatusPayment LIKE "'.$requestData['search']['value'].'%" or cicilan LIKE "'.$requestData['search']['value'].'%"
+                or No_Ref LIKE "'.$requestData['search']['value'].'%"
+                )
                 and FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)
                 ';
         $sql.= ' ORDER BY StatusPayment ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
@@ -1873,7 +1900,8 @@ class C_finance extends Finnance_Controler {
             $nestedData[] = '<input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">';
             $nestedData[] = $row['NamePrody'];
             $nestedData[] = $row['Name'].'<br>'.$row['Email'];
-            $nestedData[] = $row['FormulirCode'];
+            $FormulirCode = ($row['No_Ref'] != "" || $row['No_Ref'] != null ) ? $row['FormulirCode'].' / '.$row['No_Ref'] : $row['FormulirCode'];
+            $nestedData[] = $FormulirCode;
             // get tagihan
             $getTagihan = $this->m_admission->getPaymentType_Cost_created($row['ID_register_formulir']);
             $tagihan = '';
@@ -1884,7 +1912,14 @@ class C_finance extends Finnance_Controler {
             $nestedData[] = $tagihan;
             $nestedData[] = $row['cicilan'];
             $nestedData[] = '<button class="btn btn-inverse btn-notification btn-show" id-register-formulir = "'.$row['ID_register_formulir'].'" email = "'.$row['Email'].'" Nama = "'.$row['Name'].'">Show</button>';
-            $nestedData[] = $row['StatusPayment'];
+
+            $Revision = $row['RevID'];
+            $RevWr = '';
+            if ($Revision != 0) {
+                $getData = $this->m_master->caribasedprimary('db_finance.register_admisi_rev','ID_register_formulir',$row['ID_register_formulir']);
+                $RevWr = '<a href = "javascript:void(0)" class = "showModal" id-register-formulir = "'.$row['ID_register_formulir'].'">Revision '.count($getData).'x';
+            }
+            $nestedData[] = $row['StatusPayment'].'<br>'.$RevWr;
             $btn = '<button class="btn btn-danger btn-sm btn-delete btn_cancel_tui" id-register-formulir = "'.$row['ID_register_formulir'].'"><i class="fa fa-trash" aria-hidden="true"></i> Cancel</button>';  
 
             $nestedData[] = $btn;
@@ -1953,7 +1988,7 @@ class C_finance extends Finnance_Controler {
     {
         $Input = $this->getInputToken();
         $msg = '';
-        $proses = $this->m_finance->edit_cicilan_tagihan_admission_submit($Input);
+        $proses = $this->m_finance->edit_cicilan_tagihan_admission_submit2($Input);
         $msg = $proses['msg'];
         echo json_encode($msg);
     }

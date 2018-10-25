@@ -15,9 +15,6 @@
                         </ul>
                     </div>
                 </div>
-                <div class="row" style="margin-top: 10px;margin-left: 0px;margin-right: 10px">
-                  <div  class="col-xs-12" align="right" id="pagination_link"></div>  
-                </div>
                 <div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
                   <div class="col-xs-6 col-md-offset-3">
                     <div class="thumbnail" style="height: 80px">
@@ -31,6 +28,9 @@
                 <div class="row" style="margin-top: 10px;margin-left: 0px;margin-right: 10px">
                     <div id="dataPageLoad" style="margin-top:0px;">
                         
+                    </div>
+                    <div class="row" style="margin-top: 10px;margin-left: 0px;margin-right: 10px">
+                      <div  class="col-xs-12" align="right" id="pagination_link"></div>  
                     </div>
                 </div>
             </div>
@@ -137,13 +137,14 @@
         $("#btn-reject").click(function(){
             var arrValueCHK = getValueChecbox();
             if (arrValueCHK.length > 0) {
-                $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Apakah anda yakin untuk melakukan request ini ?? </b> ' +
+                $('#NotificationModal .modal-body').html('<div style="text-align: center;"><p>Input Reason</p><input type="text"  id="InputReason" class="form-control"><br>' +
                     '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
                     '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
                     '</div>');
                 $('#NotificationModal').modal('show');
 
                 $("#confirmYes").click(function(){
+                    var InputReason = $("#InputReason").val();
                     $('#NotificationModal .modal-header').addClass('hide');
                     $('#NotificationModal .modal-body').html('<center>' +
                         '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
@@ -159,7 +160,7 @@
                     var url = base_url_js+'finance/admission/set_tuition_fee/delete_data';
                     var data = arrValueCHK;
                     var token = jwt_encode(data,"UAP)(*");
-                    $.post(url,{token:token},function (data_json) {
+                    $.post(url,{token:token,InputReason : InputReason},function (data_json) {
                         setTimeout(function () {
                            toastr.options.fadeOut = 10000;
                            toastr.success('Data berhasil disimpan', 'Success!');
@@ -395,6 +396,7 @@
                             '</div>'+
                         '</div>';
                         $(".formAddFormKD").append(html);
+                        $('html, body').animate({ scrollTop: $(".widget_"+Uniformvaluee).offset().top }, 'slow');
 
 
                    }) // exit post nilai
@@ -459,6 +461,7 @@
                         '</div>'+
                     '</div>';
                     $(".formAddFormKD").append(html);
+                    $('html, body').animate({ scrollTop: $(".widget_"+Uniformvaluee).offset().top }, 'slow');
                 }).done(function() {
                   
                 }).fail(function() {
@@ -493,6 +496,63 @@
             window.open('<?php echo url_registration ?>'+'document/'+emaiil+'/'+file__,'_blank');
         }
         
+    });
+
+    $(document).on('click','.showModal', function () {
+      var ID_register_formulir = $(this).attr('id-register-formulir');
+      var html = '';
+      var table = '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+                    '<thead>'+
+                        '<tr>'+
+                            '<th style="width: 5px;">No</th>'+
+                            '<th style="width: 55px;">Note</th>'+
+                            '<th style="width: 55px;">Rev By</th>'+
+                            '<th style="width: 55px;">Rev At</th>';
+      table += '</tr>' ;  
+      table += '</thead>' ; 
+      table += '<tbody>' ;
+
+      var url = base_url_js+'finance/getRevision_detail_admission';
+      var data = {
+          ID_register_formulir : ID_register_formulir,
+      };
+      var token = jwt_encode(data,'UAP)(*');
+      $.post(url,{token:token},function (resultJson) {
+         var DetailArr = jQuery.parseJSON(resultJson);
+         
+         var isi = '';
+         for (var j = 0; j < DetailArr.length; j++) {
+           isi += '<tr>'+
+                   '<td>'+DetailArr[j]['RevNo'] + '</td>'+
+                   '<td>'+DetailArr[j]['Note'] + '</td>'+
+                   '<td>'+DetailArr[j]['Name'] + '</td>'+
+                   '<td>'+DetailArr[j]['RevAt'] + '</td>'+
+                '<tr>'; 
+         }
+
+         table += isi+'</tbody>' ; 
+         table += '</table>' ;
+
+         html += table;
+
+         var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+             '';
+
+         $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Detail Revision</h4>');
+         $('#GlobalModalLarge .modal-body').html(html);
+         $('#GlobalModalLarge .modal-footer').html(footer);
+         $('#GlobalModalLarge').modal({
+             'show' : true,
+             'backdrop' : 'static'
+         });   
+
+      }).fail(function() {
+        toastr.info('No Action...'); 
+        // toastr.error('The Database connection error, please try again', 'Failed!!');
+      }).always(function() {
+
+      });
+
     });
     
 </script>

@@ -956,8 +956,14 @@ class M_admission extends CI_Model {
     public function inserData_formulir_offline_sale_save($input_arr)
     {
       // get no kwitansi terakhir
-      $sql = 'select * from db_admission.sale_formulir_offline order by NoKwitansi desc limit 1';
-      $query=$this->db->query($sql, array())->result_array();
+      $this->load->model('master/m_master');
+      $getDatax = $this->m_master->showData_array('db_admission.set_ta');
+      $sql = 'select a.* from db_admission.sale_formulir_offline as a
+              left join db_admission.formulir_number_offline_m as b
+              on a.FormulirCodeOffline = b.FormulirCode
+              where b.Years = ?
+              order by a.NoKwitansi desc limit 1';
+      $query=$this->db->query($sql, array($getDatax[0]['Ta']))->result_array();
       $NoKwitansi = $query[0]['NoKwitansi'];
       $NoKwitansi = ($NoKwitansi != "") ? (int)$NoKwitansi + 1 : $NoKwitansi;
       $FullName = strtolower($input_arr['Name']);
@@ -1581,7 +1587,7 @@ class M_admission extends CI_Model {
 
      public function getRangking($ID_register_formulir)
      {
-      $sql= "select a.*,b.Attachment from db_admission.register_rangking as a join db_admission.register_document as b
+      $sql= "select a.*,b.Attachment from db_admission.register_rangking as a left join db_admission.register_document as b
              on a.FileRapor = b.ID where a.ID_register_formulir = ?
             ";
       $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
@@ -1684,7 +1690,8 @@ class M_admission extends CI_Model {
         if ($query[$i]['status1'] == 'Rapor') {
           // check rangking
             $getRangking = $this->getRangking($query[$i]['ID_register_formulir']);
-            $Attachment = $getRangking[0]['Attachment'];
+            // $Attachment = $getRangking[0]['Attachment'];
+            $Attachment = (count($getRangking) == 0) ? 'Empty' : $getRangking[0]['Attachment'];
             $getRangking = $getRangking[0]['Rangking'];
 
           // get Discount
@@ -1694,7 +1701,16 @@ class M_admission extends CI_Model {
                 break;
               }
             }
-            
+
+          // get revision terakhir jika ada
+            $NoteRev = '';
+            $dataGet = $this->m_master->caribasedprimary('db_finance.register_admisi_rev','ID_register_formulir',$query[$i]['ID_register_formulir']);
+            $count = count($dataGet);
+            $arr_Count = $count - 1;
+            if (count($dataGet) != 0) {
+             $NoteRev = $dataGet[$arr_Count]['Note'];
+            }
+
             $arr_temp[$i] = array(
               'ID_register_formulir' => $query[$i]['ID_register_formulir'],
               'Name' => $query[$i]['Name'],
@@ -1710,7 +1726,8 @@ class M_admission extends CI_Model {
               'Attachment' => $Attachment,
               'getBeasiswa' => $getBeasiswa,
               'Email' => $query[$i]['Email'],
-              'getMaxCicilan' => $getMaxCicilan
+              'getMaxCicilan' => $getMaxCicilan,
+              'NoteRev' => $NoteRev,
             );
         }
         else
@@ -1731,6 +1748,7 @@ class M_admission extends CI_Model {
               'getBeasiswa' => $getBeasiswa,
               'Email' => $query[$i]['Email'],
               'getMaxCicilan' => $getMaxCicilan,
+              'NoteRev' => $NoteRev,
             );
         }
 
@@ -1845,34 +1863,38 @@ class M_admission extends CI_Model {
         $FormulirCode = '"%"'; 
       }
 
-      $sql= 'select count(*) as total
-              from db_admission.register_formulir as a
-              left JOIN db_admission.register_verified as b 
-              ON a.ID_register_verified = b.ID
-              left JOIN db_admission.register_verification as c
-              ON b.RegVerificationID = c.ID
-              left JOIN db_admission.register as d
-              ON c.RegisterID = d.ID
-              left JOIN db_admission.country as e
-              ON a.NationalityID = e.ctr_code
-              left JOIN db_employees.religion as f
-              ON a.ReligionID = f.IDReligion
-              left JOIN db_admission.school_type as l
-              ON l.sct_code = a.ID_school_type
-              left JOIN db_admission.register_major_school as m
-              ON m.ID = a.ID_register_major_school
-              left JOIN db_admission.school as n
-              ON n.ID = d.SchoolID
-              left join db_academic.program_study as o
-              on o.ID = a.ID_program_study
-              left join db_finance.register_admisi as p
-              on a.ID = p.ID_register_formulir
-              left join db_admission.formulir_number_offline_m as px
-              on px.FormulirCode = b.FormulirCode
-              where ('.$Status.') 
-              and ( b.FormulirCode like '.$FormulirCode.' or px.No_Ref like '.$FormulirCode.' )
-              and b.FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)
-              group by a.ID';
+      $sql= 'select count(*) as total from
+              (
+                 select a.ID 
+                 from db_admission.register_formulir as a
+                 left JOIN db_admission.register_verified as b 
+                 ON a.ID_register_verified = b.ID
+                 left JOIN db_admission.register_verification as c
+                 ON b.RegVerificationID = c.ID
+                 left JOIN db_admission.register as d
+                 ON c.RegisterID = d.ID
+                 left JOIN db_admission.country as e
+                 ON a.NationalityID = e.ctr_code
+                 left JOIN db_employees.religion as f
+                 ON a.ReligionID = f.IDReligion
+                 left JOIN db_admission.school_type as l
+                 ON l.sct_code = a.ID_school_type
+                 left JOIN db_admission.register_major_school as m
+                 ON m.ID = a.ID_register_major_school
+                 left JOIN db_admission.school as n
+                 ON n.ID = d.SchoolID
+                 left join db_academic.program_study as o
+                 on o.ID = a.ID_program_study
+                 left join db_finance.register_admisi as p
+                 on a.ID = p.ID_register_formulir
+                 left join db_admission.formulir_number_offline_m as px
+                 on px.FormulirCode = b.FormulirCode
+                 where ('.$Status.') 
+                 and ( b.FormulirCode like '.$FormulirCode.' or px.No_Ref like '.$FormulirCode.' )
+                 and b.FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)
+                 group by a.ID 
+              ) aa 
+              ';
       $query=$this->db->query($sql, array())->result_array();
       if (count($query) > 0) {
         return $query[0]['total'];
@@ -2061,7 +2083,7 @@ class M_admission extends CI_Model {
              n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
              if((select count(*) as total from db_admission.register_nilai where Status = "Verified" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
              as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,p.Desc,
-             if(d.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = b.FormulirCode limit 1) ,""  ) as No_Ref
+             if(d.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = b.FormulirCode limit 1) ,""  ) as No_Ref,p.RevID
              from db_admission.register_formulir as a
              left JOIN db_admission.register_verified as b 
              ON a.ID_register_verified = b.ID
@@ -2125,6 +2147,9 @@ class M_admission extends CI_Model {
              $getFile = '-'; 
             }
 
+            // check Revision
+            $rev = $this->m_master->caribasedprimary('db_finance.register_admisi_rev','ID_register_formulir',$query[$i]['ID_register_formulir']);
+
        if ($query[$i]['status1'] == 'Rapor') {
          // check rangking
            $getRangking = $this->getRangking($query[$i]['ID_register_formulir']);
@@ -2144,6 +2169,7 @@ class M_admission extends CI_Model {
             'getFile' => $getFile,
             'Email' => $query[$i]['Email'],
             'Desc' => $query[$i]['Desc'],
+            'Rev' => count($rev),
            );
        }
        else
@@ -2162,6 +2188,7 @@ class M_admission extends CI_Model {
              'getFile' => $getFile,
              'Email' => $query[$i]['Email'],
              'Desc' => $query[$i]['Desc'],
+             'Rev'  =>count($rev),
            );
        }
 
