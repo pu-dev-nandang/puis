@@ -1126,12 +1126,6 @@ class C_api extends CI_Controller {
                 $this->db->insert('db_academic.schedule',$insertSchedule);
                 $insert_id = $this->db->insert_id();
 
-                //schedule_class_group
-//                $dataGroup = (array) $formData['schedule_class_group'];
-//                $dataGroup['ScheduleID'] = $insert_id;
-//                $this->db->insert('db_academic.schedule_class_group',$dataGroup);
-
-
                 // schedule_details
                 $dataScheduleDetails = (array) $formData['schedule_details'];
                 for($s=0;$s<count($dataScheduleDetails);$s++){
@@ -1345,8 +1339,9 @@ class C_api extends CI_Controller {
 //                $dataG = $this->db->get_where('',
 //                        array('ClassGroup' => ))->result_array();
 
-                $dataG = $this->db->query('SELECT * FROM db_academic.schedule 
-                                                WHERE ClassGroup LIKE "'.$data_arr['Group'].'"  ')
+                $dataG = $this->db->query('SELECT s.ID FROM db_academic.schedule s 
+                                                WHERE s.ClassGroup LIKE "'.$data_arr['Group'].'" 
+                                                AND s.SemesterID = (SELECT ID FROM db_academic.semester WHERE Status = 1)')
                                             ->result_array();
                 return print_r(json_encode($dataG));
             }
@@ -1375,6 +1370,242 @@ class C_api extends CI_Controller {
                                                    ORDER BY s.ClassGroup ASC ')->result_array();
 
                 return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='checkStudentToDelete'){
+                $ScheduleID = $data_arr['ScheduleID'];
+                $SemesterID = $data_arr['SemesterID'];
+                $dataApprove = $this->m_api->__getStudentByScheduleIDApproved($SemesterID,$ScheduleID);
+                $dataPlan = $this->m_api->__getStudentByScheduleIDInStudyPlanning($SemesterID,$ScheduleID);
+
+                $result = array(
+                    'Approve' => $dataApprove,
+                    'Plan' => $dataPlan
+                );
+
+                return print_r(json_encode($result));
+
+            }
+            else if($data_arr['action']=='deleteTimettables'){
+                $SemesterID = $data_arr['SemesterID'];
+                $ScheduleID = $data_arr['ScheduleID'];
+
+                $arrWhere = array('SemesterID'=>$SemesterID,'ScheduleID'=>$ScheduleID);
+                $this->db->where($arrWhere);
+                $this->db->delete('db_academic.std_krs');
+
+                // == Approved ==
+                $dataCL = $this->m_api->getClassOf();
+
+                for($c=0;$c<count($dataCL);$c++){
+                    $d = $dataCL[$c];
+                    $db_ = 'ta_'.$d['Year'];
+
+                    // Cek DB Exist
+                    $dbExist = $this->db->query('SELECT SCHEMA_NAME 
+                                                    FROM INFORMATION_SCHEMA.SCHEMATA 
+                                                    WHERE SCHEMA_NAME = "'.$db_.'" ')->result_array();
+
+                    if(count($dbExist)>0){
+                        $this->db->where($arrWhere);
+                        $this->db->delete($db_.'.study_planning');
+                    }
+
+                }
+
+                // Delete Schedulenya
+                $this->db->where(array('ID' => $ScheduleID, 'SemesterID' => $SemesterID));
+                $this->db->delete('db_academic.schedule');
+
+                $tables = array('db_academic.schedule_details', 'db_academic.schedule_details_course',
+                    'db_academic.schedule_material','db_academic.schedule_team_teaching');
+                $this->db->where('ScheduleID', $ScheduleID);
+                $this->db->delete($tables);
+
+                return print_r(1);
+            }
+            else if($data_arr['action']=='loadEditCourse'){
+                $SemesterID = $data_arr['SemesterID'];
+                $ScheduleID = $data_arr['ScheduleID'];
+
+                $data = $this->db->query('SELECT sdc.ID AS SDCID, sdc.CDID, mk.NameEng AS MKNameEng, mk.Name AS MKName, cd.Semester, ps.Name AS Prodi, co.Semester AS Offerto   
+                                                    FROM db_academic.schedule_details_course sdc
+                                                    LEFT JOIN db_academic.schedule s ON (s.ID = sdc.ScheduleID)
+                                                    LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
+                                                    LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                    LEFT JOIN db_academic.course_offerings co ON (co.SemesterID = s.SemesterID AND co.ProdiID = sdc.ProdiID 
+                                                    AND co.CurriculumID = cd.CurriculumID)
+                                                    WHERE sdc.ScheduleID = "'.$ScheduleID.'" AND s.SemesterID = "'.$SemesterID.'"
+                                                    ORDER BY sdc.ProdiID, cd.Semester ASC ')->result_array();
+
+                if(count($data)>0){
+                    for($i=0;$i<count($data);$i++){
+                        $dataApprove = $this->m_api->__getStudentByScheduleIDApproved_details($SemesterID,$ScheduleID,$data[$i]['CDID']);
+                        $dataPlan = $this->m_api->__getStudentByScheduleIDInStudyPlanning_details($SemesterID,$ScheduleID,$data[$i]['CDID']);
+
+                        $data[$i]['TotalStd_Approve'] = $dataApprove;
+                        $data[$i]['TotalStd_Plan'] = $dataPlan;
+                    }
+                }
+
+                $result = array(
+                    'ScheduleDetails' => $data
+                );
+                return print_r(json_encode($result));
+
+            }
+            else if($data_arr['action']=='loadEditCourseSchedule'){
+                $SemesterID = $data_arr['SemesterID'];
+                $ScheduleID = $data_arr['ScheduleID'];
+
+                $dataProgram = $this->db->query('SELECT s.ID AS ScheduleID, s.ProgramsCampusID, sem.Name AS SemesterName, 
+                                                              s.ClassGroup, s.Coordinator, s.TeamTeaching,
+                                                             s.SemesterID, mk.NameEng AS CourseEng, cd.TotalSKS AS TotalCredit
+                                                            FROM db_academic.schedule s
+                                                            LEFT JOIN db_academic.semester sem ON (sem.ID = s.SemesterID)
+                                                            LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                            LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                                            LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                            WHERE s.ID = "'.$ScheduleID.'" AND SemesterID = "'.$SemesterID.'"
+                                                             GROUP BY s.ID ')
+                    ->result_array();
+
+
+                if(count($dataProgram)>0){
+                    $detailTeamTeaching = [];
+                    $dataTTC = $this->db->select('NIP')->get_where('db_academic.schedule_team_teaching',array('ScheduleID'=>$dataProgram[0]['ScheduleID']))
+                        ->result_array();
+                    if(count($dataTTC)>0){
+                        foreach ($dataTTC as $item){
+                            array_push($detailTeamTeaching,$item['NIP']);
+                        }
+                    }
+                    $dataProgram[0]['detailTeamTeaching'] = $detailTeamTeaching;
+
+                }
+
+                $result = array(
+                    'Schedule' => $dataProgram
+                );
+                return print_r(json_encode($result));
+            }
+            else if($data_arr['action']=='checktoAddNewCourse'){
+                $dataWhere = (array) $data_arr['dataWhere'];
+                $data = $this->db->get_where('db_academic.schedule_details_course',$dataWhere)->result_array();
+
+                if(count($data)>0){
+                    $result = array(
+                        'Status' => '0'
+                    );
+                } else {
+                    // Insert
+                    $this->db->insert('db_academic.schedule_details_course',$dataWhere);
+                    $result = array(
+                        'Status' => '1'
+                    );
+                }
+
+                return print_r(json_encode($result));
+            }
+            else if($data_arr['action']=='deleteInEditCourse'){
+                $SemesterID = $data_arr['SemesterID'];
+                $ScheduleID = $data_arr['ScheduleID'];
+                $SDCID = $data_arr['SDCID'];
+
+                // GET CDID
+                $dataCDID = $this->db->select('CDID')->get_where('db_academic.schedule_details_course',array('ID'=>$SDCID),1)->result_array()[0];
+
+                // Delete Planning
+                $whereDelete = array('SemesterID'=>$SemesterID,'ScheduleID'=>$ScheduleID,'CDID'=>$dataCDID['CDID']);
+                $this->db->where($whereDelete);
+                $this->db->delete('db_academic.std_krs');
+
+                // Delete KRS yang sudah approve
+                $dataCL = $this->m_api->getClassOf();
+                foreach ($dataCL AS $itm){
+
+                    $db_ = 'ta_'.$itm['Year'];
+                    // Cek DB Exist
+                    $dbExist = $this->db->query('SELECT SCHEMA_NAME 
+                                                    FROM INFORMATION_SCHEMA.SCHEMATA 
+                                                    WHERE SCHEMA_NAME = "'.$db_.'" ')->result_array();
+                    if(count($dbExist)>0){
+                        $this->db->where($whereDelete);
+                        $this->db->delete($db_.'.study_planning');
+                    }
+                }
+
+                // Delete
+                $this->db->where('ID',$SDCID);
+                $this->db->delete('db_academic.schedule_details_course');
+
+                return print_r(1);
+
+            }
+            else if($data_arr['action']=='updateInfoInEditCourse'){
+
+                // Cek apakah Class Group Sudah digunakan
+                $UpdateForm = (array) $data_arr['UpdateForm'];
+                $dataG = $this->db->query('SELECT ID FROM db_academic.schedule s 
+                                                      WHERE s.SemesterID = "'.$data_arr['SemesterID'].'" 
+                                                      AND s.ClassGroup LIKE "'.$UpdateForm['ClassGroup'].'"
+                                                       AND s.ID != "'.$data_arr['ScheduleID'].'" ')->result_array();
+
+                if(count($dataG)>0){
+                    $result = array(
+                        'Status' => 0
+                    );
+                } else {
+
+                    // Update Schedule
+                    $this->db->where('ID', $data_arr['ScheduleID']);
+                    $this->db->update('db_academic.schedule',$UpdateForm);
+
+                    // Update Untuk Team Teachingnya
+                    // -- Delete Team --
+                    $this->db->where('ScheduleID',$data_arr['ScheduleID']);
+                    $this->db->delete('db_academic.schedule_team_teaching');
+
+                    // -- Insert yg baru --
+                    for ($i=0;$i<count($data_arr['dataTeamTeaching']);$i++){
+                        $f_i = (array) $data_arr['dataTeamTeaching'][$i];
+                        $this->db->insert('db_academic.schedule_team_teaching',$f_i);
+                    }
+                    $result = array(
+                        'Status' => 1
+                    );
+                }
+
+                return print_r(json_encode($result));
+
+            }
+            else if($data_arr['action']=='loadEditSchedule'){
+                $SemesterID = $data_arr['SemesterID'];
+                $ScheduleID = $data_arr['ScheduleID'];
+
+                $dataSchedule = $this->db->query('SELECT sd.ClassroomID, sd.Credit, sd.DayID, sd.EndSessions,  
+                                                              sd.StartSessions, sd.TimePerCredit, sd.ID AS SDID, cl.Room,
+                                                              d.NameEng AS DayEng
+                                                              FROM db_academic.schedule_details sd
+                                                              LEFT JOIN db_academic.schedule s ON (s.ID = sd.ScheduleID)
+                                                              LEFT JOIN db_academic.days d ON (d.ID=sd.DayID)
+                                                              LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+                                                              WHERE s.ID = "'.$ScheduleID.'" 
+                                                              AND s.SemesterID = "'.$SemesterID.'" ')->result_array();
+
+                $result = array(
+                    'dataSchedule' => $dataSchedule
+                );
+                return print_r(json_encode($result));
+            }
+            else if($data_arr['action']=='updateEditCourse'){
+
+                // Cek bentrok belum
+                $arrUpdate = (array) $data_arr['formInsert'];
+                $this->db->where('ID', $data_arr['ID']);
+                $this->db->update('db_academic.schedule_details',$arrUpdate);
+                return print_r(1);
+
             }
         }
     }
@@ -5355,19 +5586,50 @@ class C_api extends CI_Controller {
             }
 
             // Daftar Prodi
-            $dataProdi = $this->db->query('SELECT ps.Code FROM db_academic.schedule_details_course sdc 
+            $dataProdi = $this->db->query('SELECT ps.ID AS ProdiID, ps.Code FROM db_academic.schedule_details_course sdc 
                                                     LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
                                                     WHERE sdc.ScheduleID = "'.$row['ID'].'" 
                                                     GROUP BY sdc.ProdiID ORDER BY ps.Code ASC ')->result_array();
             $Prodi = '';
             if(count($dataProdi)>0){
                 for($p=0;$p<count($dataProdi);$p++){
+
+                    // Get Semester
+                    $dataSMT = $this->db->query('SELECT co.Semester  
+                                                    FROM db_academic.schedule_details_course sdc
+                                                    LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                                    LEFT JOIN db_academic.course_offerings co ON (co.CurriculumID = cd.CurriculumID)
+                                                    WHERE sdc.ScheduleID = "'.$row['ID'].'" AND co.ProdiID = "'.$dataProdi[$p]['ProdiID'].'"
+                                                    AND co.SemesterID = "'.$data_arr['SemesterID'].'"
+                                                    ORDER BY co.Semester ASC ')->result_array();
+                    $smt = '';
+                    if(count($dataSMT)>0){
+                        $k = true;
+                        foreach ($dataSMT AS $itsm){
+                            $smt = $smt.''.(($k==true) ? "" : ", ").''.$itsm['Semester'];
+                            $k = false;
+                        }
+                    }
+
                     $koma = ($p!=0)? ',' : '';
-                    $Prodi = $Prodi.''.$koma.' '.$dataProdi[$p]['Code'];
+                    $Prodi = $Prodi.''.$koma.' '.$dataProdi[$p]['Code'].' ('.$smt.')';
                 }
             }
 
             $Student = $this->m_api->__getStudentByScheduleID($row['ID']);
+
+            $btnAct = '<div class="btn-group">
+                      <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-edit"></i> <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a href="'.base_url('academic/timetables/list/edit/'.$data_arr['SemesterID'].'/'.$row['ID'].'/'.str_replace(" ","-",$row['MKNameEng'])).'">Edit Course</a></li>
+                        <li><a href="'.base_url('academic/timetables/list/edit-schedule/'.$data_arr['SemesterID'].'/'.$row['ID'].'/'.str_replace(" ","-",$row['MKNameEng'])).'">Edit Schedule</a></li>
+                        
+                        <li role="separator" class="divider"></li>
+                        <li><a href="javascript:void(0);" class="btnTimetablesEditDelete" data-id="'.$row['ID'].'">Delete</a></li>
+                      </ul>
+                    </div>';
 
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['ClassGroup'].'<br/>'.$SubSesi.'</div>';
@@ -5376,6 +5638,7 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div  style="text-align:center;">'.$row['Credit'].'</div>';
             $nestedData[] = '<div  style="text-align:left;"><span style="color:#0968b3;">(Co) '.$row['CoordinatorName'].'</span>'.$TeamTeaching.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.count($Student).'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$btnAct.'</div>';
             $nestedData[] = '<div  style="text-align:right;">'.$ScheduleDetails.'</div>';
 //            $nestedData[] = '<div  style="text-align:center;">'.$row['Room'].'</div>';
 

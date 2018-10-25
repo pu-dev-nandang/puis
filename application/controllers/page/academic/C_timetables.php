@@ -31,15 +31,39 @@ class C_timetables extends Academic_Controler {
         $this->menu_timetables($page);
     }
 
-//    public function inputScore(){
-//        $data_arr = $this->getInputToken();
-//        $this->load->view('page/academic/score/inputScore',$data_arr);
-//    }
-//
-//    public function monitoring_score(){
-//        $data['department'] = parent::__getDepartement();
-//        $page = $this->load->view('page/'.$data['department'].'/score/monitoring_score',$data,true);
-//        $this->menu_score($page);
-//    }
+    public function edit_course($SemesterID,$ScheduleID,$Course){
+
+        $data['department'] = parent::__getDepartement();
+        $data['SemesterID'] = $SemesterID;
+        $data['ScheduleID'] = $ScheduleID;
+        $page = $this->load->view('page/'.$data['department'].'/timetables/edit_course',$data,true);
+        $this->menu_timetables($page);
+    }
+
+    public function edit_schedule($SemesterID,$ScheduleID,$Course){
+        $data['department'] = parent::__getDepartement();
+        $data['SemesterID'] = $SemesterID;
+        $data['ScheduleID'] = $ScheduleID;
+        $page = $this->load->view('page/'.$data['department'].'/timetables/edit_schedule',$data,true);
+        $this->menu_timetables($page);
+    }
+
+    public function course_offer()
+    {
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/timetables/course_offer',$data,true);
+        $this->menu_timetables($page);
+    }
+
+    public function setting_timetable()
+    {
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/timetables/setting_timetable',$data,true);
+        $this->menu_timetables($page);
+    }
+
+
+
+
 
 }

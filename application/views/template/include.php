@@ -754,7 +754,7 @@
         var option = $(''+element);
         $.post(url,{token:token},function (data_json) {
             if(data_json.length>0){
-                $(element).empty();
+                // $(element).empty();
                 for(var i=0;i<data_json.length;i++){
                     var selec = (selected==data_json[i].ID) ? 'selected' : '';
                     option.append('<option value="'+data_json[i].ID+'" '+selec+'>'+data_json[i].Room+' | Seat : '+data_json[i].Seat+' | Exam : '+data_json[i].SeatForExam+'</option>');
@@ -789,7 +789,7 @@
         var option = $(''+element);
         $.post(url,{token:token},function (data_json) {
             if(data_json.length>0){
-                $(element).empty();
+                // $(element).empty();
                 for(var i=0;i<data_json.length;i++){
                     var selec = (selected==data_json[i].Time) ? 'selected' : '';
                     option.append('<option value="'+data_json[i].Time+'" '+selec+'>'+data_json[i].Time+' minute</option>');

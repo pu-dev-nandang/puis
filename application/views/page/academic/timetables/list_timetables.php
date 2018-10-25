@@ -63,14 +63,93 @@
                 clearInterval(loadFirst);
             }
 
-
-
         },1000);
 
     });
 
     $('.option-filter').change(function () {
         loadTimetables();
+    });
+
+    $(document).on('click','.btnTimetablesEditDelete',function () {
+
+        var ScheduleID = $(this).attr('data-id');
+        var SemesterID = $('#filterSemester').val();
+
+        if(ScheduleID!='' && ScheduleID!=null &&
+            SemesterID!='' && SemesterID!=null) {
+            var data = {
+                action : 'checkStudentToDelete',
+                ScheduleID : ScheduleID,
+                SemesterID : SemesterID.split('.')[0]
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__crudSchedule';
+
+            $.post(url,{token:token},function (jsonResult) {
+                var ap = jsonResult.Approve.length;
+                var pl = jsonResult.Plan.length;
+
+                $('#NotificationModal .modal-body').html('<div class="row">' +
+                    '<div class="col-md-12">' +
+                    '<table class="table">' +
+                    '<tr>' +
+                    '   <td>KRS Approveed</td>' +
+                    '   <td style="width:30%;">'+ap+' Students</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                    '   <td>KRS Not Yet Approved</td>' +
+                    '   <td>'+pl+' Students</td>' +
+                    '</tr>' +
+                    '</table></div>' +
+                    '</div>' +
+                    '<div style="text-align: center;"><div style="background:lightyellow;padding:10px;border:1px solid red;margin-bottom:15px;"><span style="color:red;">*) If you delete this data, then the data student in the study planning will be deleted too</span></div> ' +
+                    '<button type="button" class="btn btn-danger" id="btnActDeleteTimeTables" data-id="'+ScheduleID+'" style="margin-right: 5px;">Yes</button>' +
+                    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+                    '</div>');
+
+                $('#NotificationModal').modal({
+                    'backdrop' : 'static',
+                    'show' : true
+                });
+
+            });
+
+        }
+
+    });
+
+    $(document).on('click','#btnActDeleteTimeTables',function () {
+
+
+
+        var ScheduleID = $(this).attr('data-id');
+        var SemesterID = $('#filterSemester').val();
+
+        if(ScheduleID!='' && ScheduleID!=null &&
+            SemesterID!='' && SemesterID!=null) {
+
+            loading_button('#btnActDeleteTimeTables');
+            $('button[data-dismiss=modal]').prop('disabled',true);
+
+            var data = {
+                action : 'deleteTimettables',
+                ScheduleID : ScheduleID,
+                SemesterID : SemesterID.split('.')[0]
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__crudSchedule';
+            $.post(url,{token:token},function (jsonResult) {
+                loadTimetables();
+                setTimeout(function () {
+                    $('#NotificationModal').modal('hide');
+                },500);
+            });
+
+        }
+
     });
     
     function loadTimetables() {
@@ -116,10 +195,8 @@
                 '        <th style="width:5%;" class="th-center">Credit</th>' +
                 '        <th style="width:20%;" class="th-center">Lecturers</th>' +
                 '        <th style="width:5%;" class="th-center">Students</th>' +
+                '        <th style="width:5%;" class="th-center">Action</th>' +
                 '        <th style="width:17%;" class="th-center">Day, Time</th>' +
-                // '        <th style="width:7%;" class="th-center">Room</th>' +
-
-                // '        <th class="th-center">Action</th>' +
                 '    </tr>' +
                 '    </thead>' +
                 '    <tbody id="trDataSc"></tbody>' +
@@ -162,10 +239,6 @@
                     }
                 }
             } );
-
-            // $.post(url,{token:token},function (jsonResult) {
-            //     console.log(jsonResult);
-            // });
 
         }
     }
