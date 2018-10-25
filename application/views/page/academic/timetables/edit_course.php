@@ -76,6 +76,7 @@
                 <th rowspan="2">Course</th>
                 <th rowspan="2" style="width: 20%;">Prodi</th>
                 <th rowspan="2" style="width: 7%;">Semester</th>
+                <th rowspan="2" style="width: 7%;">Offer to <br/> <small>(Semester)</small></th>
                 <th colspan="2" style="width: 16%;">Student</th>
                 <th rowspan="2" style="width: 7%;">Action</th>
             </tr>
@@ -105,41 +106,17 @@
                 </td>
             </tr>
             <tr>
-                <td>Team Teaching ?</td>
+                <td>Team Teaching</td>
                 <td>:</td>
                 <td>
-
-
-<!--                    <table class="table table-bordered" id="tableTeamTeaching">-->
-<!--                        <thead>-->
-<!--                        <tr>-->
-<!--                            <th style="width: 1%">No</th>-->
-<!--                            <th>Teacher</th>-->
-<!--                            <th style="width: 3%">Action</th>-->
-<!--                        </tr>-->
-<!--                        </thead>-->
-<!--                    </table>-->
-
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label class="radio-inline">
-                                <input type="radio" class="form-jadwal-edit-sc" fm="dtt-form-edit-sc" name="formteamTeaching" value="0" checked> Tidak
-                            </label>
-                            <label class="radio-inline">
-                                <input type="radio" class="form-jadwal-edit-sc"  fm="dtt-form-edit-sc" name="formteamTeaching" value="1"> Ya
-                            </label>
-                        </div>
-                        <div class="col-md-8">
-                            <select class="select2-select-00 full-width-fix form-jadwal-edit-sc"
-                                    size="5" multiple id="formTeamTeaching" disabled></select>
-                        </div>
-                    </div>
+                    <select class="select2-select-00 full-width-fix form-jadwal-edit-sc"
+                            size="5" multiple id="formTeamTeaching"></select>
                 </td>
             </tr>
             <tr>
                 <td colspan="3">
                     <div style="text-align: right;">
-                        <button class="btn btn-success">Save</button>
+                        <button class="btn btn-success" id="btnSaveEditInfo">Save</button>
                     </div>
                 </td>
             </tr>
@@ -156,6 +133,9 @@
         loadEditCourse();
         loadSelectOptionBaseProdi('#formBaseProdi');
     });
+
+
+    // ==== Control Edit Course ====
 
     $(document).on('change','#formBaseProdi',function () {
 
@@ -203,9 +183,6 @@
 
         }
 
-        console.log(formBaseProdi);
-        console.log(formMataKuliah);
-
     });
 
     $(document).on('click','.btnDelEditCourse',function () {
@@ -229,6 +206,37 @@
             'backdrop' : 'static',
             'show' : true
         });
+
+    });
+
+    $(document).on('click','#btnActionDeleteEditCourse',function () {
+        var SemesterID = parseInt("<?php echo $SemesterID ?>");
+        var ScheduleID = parseInt("<?php echo $ScheduleID ?>");
+        var SDCID = $(this).attr('data-id');
+
+        if(SemesterID!='' && SemesterID!=null &&
+            ScheduleID!='' && ScheduleID!=null &&
+            SDCID!='' && SDCID!=null){
+
+            loading_button('#btnActionDeleteEditCourse');
+            $('button[data-dismiss=modal]').prop('disabled',true);
+
+            var data = {
+                action : 'deleteInEditCourse',
+                SemesterID : SemesterID,
+                ScheduleID : ScheduleID,
+                SDCID : SDCID
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__crudSchedule';
+            $.post(url,{token:token},function (result) {
+                loadEditCourse();
+                setTimeout(function () {
+                    $('#NotificationModal').modal('hide');
+                },500);
+            });
+        }
 
     });
     
@@ -257,55 +265,14 @@
                        '<td style="text-align: left;"><b>'+d.MKNameEng+'</b><br/><i>'+d.MKNameEng+'</i></td>' +
                        '<td style="text-align: left;">'+d.Prodi+'</td>' +
                        '<td>'+d.Semester+'</td>' +
-                       '<td>'+d.Semester+'</td>' +
-                       '<td>'+d.Semester+'</td>' +
+                       '<td style="background: lightyellow;">'+d.Offerto+'</td>' +
+                       '<td>'+d.TotalStd_Plan.length+'</td>' +
+                       '<td>'+d.TotalStd_Approve.length+'</td>' +
                        '<td><button class="btn btn-sm btn-default btn-default-danger btnDelEditCourse" data-totalcourse="'+jsonResult.ScheduleDetails.length+'" data-sdc="'+d.SDCID+'"><i class="fa fa-trash"></i></button></td>' +
                        '</tr>');
 
                }
            }
-
-        });
-
-    }
-
-    function loadEditCourseSchedule() {
-
-        var SemesterID = parseInt("<?php echo $SemesterID ?>");
-        var ScheduleID = parseInt("<?php echo $ScheduleID ?>");
-
-        var data = {
-            action : 'loadEditCourseSchedule',
-            SemesterID : SemesterID,
-            ScheduleID : ScheduleID
-        };
-
-        var token = jwt_encode(data,'UAP)(*');
-        var url = base_url_js+'api/__crudSchedule';
-
-        $.post(url,{token:token},function (jsonResult) {
-
-            var s = jsonResult.Schedule[0];
-            loadSelectOptionConf('#formProgramsCampusID','programs_campus',s.ProgramsCampusID);
-            $('#viewSemester').text(s.SemesterName);
-            $('#formSemesterID').val(s.SemesterID);
-            $('#formClassGroup').val(s.ClassGroup);
-            $('#formScheduleID').val(s.ScheduleID);
-
-            loadSelectOptionLecturersSingle('#formCoordinator',s.Coordinator);
-            $('#formCoordinator').select2({allowClear: true});
-
-            if(s.TeamTeaching==1) {
-                $('#formTeamTeaching').empty();
-                $('#formTeamTeaching').prop('disabled',false);
-                $('input[name=formteamTeaching][value=1]').prop('checked',true);
-                loadSelectOptionLecturersSingle('#formTeamTeaching',s.detailTeamTeaching);
-                $('#formTeamTeaching').select2({allowClear: true});
-            } else {
-                $('#formTeamTeaching').prop('disabled',true);
-                $('input[name=formteamTeaching][value=0]').prop('checked',true);
-            }
-
 
         });
 
@@ -354,5 +321,116 @@
             }
         });
     }
+
+    // ===========================
+
+
+
+    // ===== Control Edit Group, Coordinator, Team Teaching
+
+    $('#btnSaveEditInfo').click(function () {
+
+        var SemesterID = parseInt("<?php echo $SemesterID ?>");
+        var ScheduleID = parseInt("<?php echo $ScheduleID ?>");
+
+        var formClassGroup = $('#formClassGroup').val();
+        var formCoordinator = $('#formCoordinator').val();
+        var formTeamTeaching = $('#formTeamTeaching').val();
+
+        if(formClassGroup!='' && formClassGroup!=null &&
+            formCoordinator!='' && formCoordinator!=null){
+
+            loading_button('#btnSaveEditInfo');
+
+            var TeamTeaching = '0';
+            var dataTeamTeaching = [];
+            if(formTeamTeaching!=null){
+                TeamTeaching = '1';
+                for(var i=0;i<formTeamTeaching.length;i++){
+                    var d = formTeamTeaching[i];
+                    var arr = {
+                        ScheduleID : ScheduleID,
+                        NIP : d,
+                        Status : '0'
+                    };
+                    dataTeamTeaching.push(arr);
+                }
+            }
+
+            var data = {
+                action : 'updateInfoInEditCourse',
+                SemesterID : SemesterID,
+                ScheduleID : ScheduleID,
+                UpdateForm : {
+                    ClassGroup : formClassGroup,
+                    Coordinator : formCoordinator,
+                    TeamTeaching : TeamTeaching
+                },
+                dataTeamTeaching : dataTeamTeaching
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__crudSchedule';
+            $.post(url,{token:token},function (jsonResult) {
+
+                $('#formClassGroup').css('border','1px solid #ccc');
+
+                setTimeout(function () {
+
+                    if(jsonResult.Status==0 || jsonResult.Status=='0'){
+                        toastr.warning('Class Group is exist','Warning');
+                        $('#formClassGroup').css('border','1px solid red');
+                    } else {
+                        toastr.success('Update data saved','Success');
+                    }
+
+                    $('#btnSaveEditInfo').prop('disabled',false).html('Save');
+                },500);
+            });
+
+        }
+
+    });
+
+    function loadEditCourseSchedule() {
+
+        var SemesterID = parseInt("<?php echo $SemesterID ?>");
+        var ScheduleID = parseInt("<?php echo $ScheduleID ?>");
+
+        var data = {
+            action : 'loadEditCourseSchedule',
+            SemesterID : SemesterID,
+            ScheduleID : ScheduleID
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api/__crudSchedule';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            var s = jsonResult.Schedule[0];
+            loadSelectOptionConf('#formProgramsCampusID','programs_campus',s.ProgramsCampusID);
+            $('#viewSemester').text(s.SemesterName);
+            $('#formSemesterID').val(s.SemesterID);
+            $('#formClassGroup').val(s.ClassGroup);
+            $('#formScheduleID').val(s.ScheduleID);
+
+            loadSelectOptionLecturersSingle('#formCoordinator',s.Coordinator);
+            $('#formCoordinator').select2({allowClear: true});
+
+            var team = '';
+            if(s.TeamTeaching==1) {
+                team = s.detailTeamTeaching;
+            }
+
+            loadSelectOptionLecturersSingle('#formTeamTeaching',team);
+            $('#formTeamTeaching').select2({allowClear: true});
+
+
+        });
+
+    }
+
+
 
 </script>

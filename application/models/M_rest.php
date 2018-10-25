@@ -99,10 +99,11 @@ class M_rest extends CI_Model {
                                                             WHERE gc.ScheduleID = "'.$data[$sc]['ScheduleID'].'"
                                                              ')->result_array();
 
+                        $meeting = 0;
+                        $Totalpresen = 0;
                         // Get Attendance
                         if(count($dataSchedule)>0){
-                            $meeting = 0;
-                            $Totalpresen = 0;
+
                             for($sds=0;$sds<count($dataSchedule);$sds++){
                                 $dataAttd = $this->db->query('SELECT attd_s.* FROM db_academic.attendance_students attd_s 
                                                           LEFT JOIN db_academic.attendance attd ON (attd.ID = attd_s.ID_Attd)

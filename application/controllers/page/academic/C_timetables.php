@@ -40,6 +40,14 @@ class C_timetables extends Academic_Controler {
         $this->menu_timetables($page);
     }
 
+    public function edit_schedule($SemesterID,$ScheduleID,$Course){
+        $data['department'] = parent::__getDepartement();
+        $data['SemesterID'] = $SemesterID;
+        $data['ScheduleID'] = $ScheduleID;
+        $page = $this->load->view('page/'.$data['department'].'/timetables/edit_schedule',$data,true);
+        $this->menu_timetables($page);
+    }
+
     public function course_offer()
     {
         $data['department'] = parent::__getDepartement();

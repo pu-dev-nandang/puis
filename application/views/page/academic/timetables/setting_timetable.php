@@ -505,6 +505,8 @@
         $('#formParalel').prop('checked',false);
         $('#formClassGroup,#formCredit1,#formSesiAwal1,#formSesiAkhir1,#textTotalSKSMK').val('');
         $('#formTeamTeaching').prop('disabled',true);
+        $('#formTeamTeaching').select2("val", null);
+        $('input[type=radio][name=formteamTeaching][value=0]').prop('checked',true);
 
         dataSesi=1;
         $('#subsesi1').addClass('hide');
@@ -977,10 +979,10 @@
         }
 
         var Coordinator = $('#formCoordinator').val();
-        if(Coordinator=='' || Coordinator==null){
-            requiredForm('#s2id_formCoordinator a');
-                process.push(0);
-        }
+        // if(Coordinator=='' || Coordinator==null){
+        //     requiredForm('#s2id_formCoordinator a');
+        //         process.push(0);
+        // }
 
         var TeamTeaching = $('input[name=formteamTeaching]:checked').val();
         var UpdateBy = sessionNIP;
@@ -1034,9 +1036,9 @@
             dataScheduleDetailsArray.push(arrSesi);
         }
 
-        if(textTotalSKSMK!=totalCredit){
+        if(textTotalSKSMK<totalCredit){
             process.push(0);
-            toastr.error('Credit must be equal '+textTotalSKSMK,'Error');
+            toastr.error('Credit must be less than equal '+textTotalSKSMK,'Error');
         }
 
         if($.inArray(0,process)==-1){

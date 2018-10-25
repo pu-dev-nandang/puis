@@ -3226,7 +3226,6 @@ class M_api extends CI_Model {
 
     public function __getStudentByScheduleIDApproved($SemesterID,$ScheduleID){
 
-
         $dataCL = $this->getClassOf();
 
         $res = [];
@@ -3254,6 +3253,36 @@ class M_api extends CI_Model {
         }
         return $res;
     }
+    public function __getStudentByScheduleIDApproved_details($SemesterID,$ScheduleID,$CDID){
+
+        $dataCL = $this->getClassOf();
+
+        $res = [];
+        for($c=0;$c<count($dataCL);$c++){
+            $d = $dataCL[$c];
+            $db_ = 'ta_'.$d['Year'];
+
+            // Cek DB Exist
+            $dbExist = $this->db->query('SELECT SCHEMA_NAME 
+                                                    FROM INFORMATION_SCHEMA.SCHEMATA 
+                                                    WHERE SCHEMA_NAME = "'.$db_.'" ')->result_array();
+
+            if(count($dbExist)>0){
+                $dataSP = $this->db->query('SELECT s.NPM,s.ClassOf,s.Name FROM '.$db_.'.study_planning sp 
+                                                            LEFT JOIN  '.$db_.'.students s ON (s.NPM = sp.NPM) 
+                                                            WHERE sp.SemesterID = "'.$SemesterID.'" 
+                                                            AND sp.ScheduleID = "'.$ScheduleID.'"
+                                                             AND sp.CDID = "'.$CDID.'" ')->result_array();
+                if(count($dataSP)>0){
+                    for($s=0;$s<count($dataSP);$s++){
+                        array_push($res,$dataSP[$s]);
+                    }
+                }
+            }
+
+        }
+        return $res;
+    }
 
     public function __getStudentByScheduleIDInStudyPlanning($SemesterID,$ScheduleID)
     {
@@ -3262,6 +3291,16 @@ class M_api extends CI_Model {
                                                 LEFT JOIN db_academic.auth_students aut_s ON (aut_s.NPM = std_k.NPM)
                                                 WHERE std_k.SemesterID = "'.$SemesterID.'" 
                                                 AND std_k.ScheduleID = "'.$ScheduleID.'" ')->result_array();
+        return $data;
+    }
+    public function __getStudentByScheduleIDInStudyPlanning_details($SemesterID,$ScheduleID,$CDID)
+    {
+
+        $data = $this->db->query('SELECT aut_s.ID, aut_s.NPM, aut_s.Name, aut_s.Year AS ClassOf FROM db_academic.std_krs std_k 
+                                                LEFT JOIN db_academic.auth_students aut_s ON (aut_s.NPM = std_k.NPM)
+                                                WHERE std_k.SemesterID = "'.$SemesterID.'" 
+                                                AND std_k.ScheduleID = "'.$ScheduleID.'"
+                                                 AND std_k.CDID = "'.$CDID.'" ')->result_array();
         return $data;
     }
 
