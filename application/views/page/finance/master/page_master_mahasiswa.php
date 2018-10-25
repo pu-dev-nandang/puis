@@ -55,7 +55,7 @@
 
 <script>
     $(document).ready(function () {
-        loadSelectOptionCurriculum('#selectCurriculum','');
+        loadSelectOptionCurriculum2('#selectCurriculum','');
         loadSelectOptionBaseProdi('#selectProdi','');
         // $("#btn-submit").addClass('hide');
     });
