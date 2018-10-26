@@ -119,13 +119,14 @@
   $(document).on('click', '.btn_cancel_tui', function () {
         var arrValueCHK = [];
         arrValueCHK.push($(this).attr('id-register-formulir'));
-        $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Apakah anda yakin untuk melakukan request ini ?? </b> ' +
+        $('#NotificationModal .modal-body').html('<div style="text-align: center;"><p>Input Reason</p><input type="text" id="InputReason" class="form-control"><br>' +
             '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
             '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
             '</div>');
         $('#NotificationModal').modal('show');
 
         $("#confirmYes").click(function(){
+            var InputReason = $("#InputReason").val();
             $('#NotificationModal .modal-header').addClass('hide');
             $('#NotificationModal .modal-body').html('<center>' +
                 '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
@@ -138,9 +139,10 @@
                 'show' : true
             });
             var url = base_url_js+'finance/admission/set_tuition_fee/delete_data';
+            console.log(InputReason);
             var data = arrValueCHK;
             var token = jwt_encode(data,"UAP)(*");
-            $.post(url,{token:token},function (data_json) {
+            $.post(url,{token:token,InputReason : InputReason},function (data_json) {
                 setTimeout(function () {
                    loadTableHeader(loadData);
                    $('#NotificationModal').modal('hide');
@@ -277,27 +279,62 @@
 
   });
 
-  // $(document).on('click','.bayar', function () {
-  //     var IDStudent = $(this).attr('IDStudent');
-  //     var bayar = $(this).attr('bayar');
-  //     loading_button(".bayar[IDStudent='"+IDStudent+"']");
-  //     var url = base_url_js+'finance/bayar_manual_mahasiswa_admission';
-  //     var data = {
-  //         IDStudent : IDStudent,
-  //         bayar : bayar,
-  //     };
-  //     var token = jwt_encode(data,'UAP)(*');
-  //     $.post(url,{token:token},function (resultJson) {
-  //        // var resultJson = jQuery.parseJSON(resultJson);
-  //        loadTableHeader(loadData);
-  //        $(".bayar[IDStudent='"+IDStudent+"']").remove();
-  //     }).fail(function() {
-  //       toastr.info('No Action...'); 
-  //       // toastr.error('The Database connection error, please try again', 'Failed!!');
-  //     }).always(function() {
+  $(document).on('click','#datatable2 .showModal', function () {
+    var ID_register_formulir = $(this).attr('id-register-formulir');
+    var html = '';
+    var table = '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+                  '<thead>'+
+                      '<tr>'+
+                          '<th style="width: 5px;">No</th>'+
+                          '<th style="width: 55px;">Note</th>'+
+                          '<th style="width: 55px;">Rev By</th>'+
+                          '<th style="width: 55px;">Rev At</th>';
+    table += '</tr>' ;  
+    table += '</thead>' ; 
+    table += '<tbody>' ;
 
-  //     }); 
-  // });
+    var url = base_url_js+'finance/getRevision_detail_admission';
+    var data = {
+        ID_register_formulir : ID_register_formulir,
+    };
+    var token = jwt_encode(data,'UAP)(*');
+    $.post(url,{token:token},function (resultJson) {
+       var DetailArr = jQuery.parseJSON(resultJson);
+       
+       var isi = '';
+       for (var j = 0; j < DetailArr.length; j++) {
+         isi += '<tr>'+
+                 '<td>'+DetailArr[j]['RevNo'] + '</td>'+
+                 '<td>'+DetailArr[j]['Note'] + '</td>'+
+                 '<td>'+DetailArr[j]['Name'] + '</td>'+
+                 '<td>'+DetailArr[j]['RevAt'] + '</td>'+
+              '<tr>'; 
+       }
+
+       table += isi+'</tbody>' ; 
+       table += '</table>' ;
+
+       html += table;
+
+       var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+           '';
+
+       $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Detail Revision</h4>');
+       $('#GlobalModalLarge .modal-body').html(html);
+       $('#GlobalModalLarge .modal-footer').html(footer);
+       $('#GlobalModalLarge').modal({
+           'show' : true,
+           'backdrop' : 'static'
+       });   
+
+    }).fail(function() {
+      toastr.info('No Action...'); 
+      // toastr.error('The Database connection error, please try again', 'Failed!!');
+    }).always(function() {
+
+    });
+
+  });
 
   $(document).on('change','#datatable2 input[type=checkbox]', function () {
     var Uniformvaluee = $(this).val();
@@ -344,6 +381,7 @@
              // var n = get_Invoice.indexOf(".");
              // get_Invoice = get_Invoice.substring(0, n);  
 
+             table += '<th style="width: 70px;">Note</th>';  
              table += '<th style="width: 70px;">Action</th>';  
              table += '</tr>' ;  
              table += '</thead>' ; 
@@ -354,6 +392,7 @@
 
                var tbodyTbl = '<tr>';
                totMin = 0;
+               console.log(DetailPayment);
                for (var i = 0; i < DetailPayment.length; i++) {
                  var cicilan = parseInt(i) + 1;
                  var Cost = DetailPayment[i]['Invoice'];
@@ -384,8 +423,10 @@
                                    '</span>';
                // var btn_delete = '<span class="btn btn-xs btn-delete delete_'+Uniformvaluee+'">'+
                //                       '<i class="fa fa-trash"></i> Delete'+
-               //                      '</span>'; 
+               //
+               var textArea = '<textarea rows="2" cols="5" name="textarea" class="limited form-control ket" id-formulir = "'+DetailPayment[0]['ID_register_formulir']+'"></textarea>'
                var btn_delete = '';                 
+               tbodyTbl += '<td>'+textArea+'</td>';
                tbodyTbl += '<td>'+btn_edit+btn_delete+'</td>';
                tbodyTbl += '</tr>';
                $(".tableData_"+Uniformvaluee+" tbody").append(tbodyTbl);
@@ -460,6 +501,9 @@
                $('.edit_'+Uniformvaluee).click(function(){
                   loading_button('.edit_'+Uniformvaluee); 
                   // get all input
+                  // get keterangan
+                  var keterangan = $('.ket[id-formulir = "'+Uniformvaluee+'"]').val();
+                  console.log(keterangan);
                    var arrTemp = [];
                    $('.costInput_'+Uniformvaluee).each(function(){
                        var Invoice = $(this).val();
@@ -481,7 +525,7 @@
                        arrTemp.push(data);
                    })
 
-                   console.log(arrTemp);
+                   // console.log(arrTemp);
                    // check cicilan != 0 dan Deadline is empty
                      var bool = true;
                      var msg = '';
@@ -500,7 +544,7 @@
                      }
 
                      if (bool) {
-                       console.log(arrTemp);
+                       // console.log(arrTemp);
                        // hitung tanggal tidak boleh melewati cicilan sebelumnya
                          var bool2 = true;
                          for (var i = 0; i < arrTemp.length; i++) {
@@ -515,10 +559,10 @@
                                 var endDate = moment(date2, "YYYY-MM-DD");
                                 var result = endDate.diff(startDate, 'days');
                                 result = parseInt(result);
-                                console.log(result);
+                                // console.log(result);
                                 if (result <= 0) {
                                  bool2 = false;
-                                 console.log('i ' + date1 + '< j : ' + date2);
+                                 // console.log('i ' + date1 + '< j : ' + date2);
                                  break;
                                 } 
                              }
@@ -527,7 +571,7 @@
 
                             if (!bool2) {
                                break;
-                               console.log('i < j');
+                               // console.log('i < j');
                             }
 
                          }
@@ -538,7 +582,7 @@
                          var url = base_url_js + "finance/admission/approved/edit_submit";
                          var data = arrTemp
                          var token = jwt_encode(data,"UAP)(*");
-                         $.post(url,{token:token},function (data_json) {
+                         $.post(url,{token:token,keterangan : keterangan,ID_register_formulir : Uniformvaluee},function (data_json) {
                              // jsonData = data_json;
                              var obj = JSON.parse(data_json); 
                              if(obj != ''){
@@ -547,7 +591,9 @@
                              }
                              else
                              {
-                                 //window.location.reload(true); 
+                                 //window.location.reload(true);
+                                 $(".widget_delete").remove();
+                                 loadTableHeader(loadData); 
                                  toastr.success('Data berhasil disimpan', 'Success!');
                              }
 

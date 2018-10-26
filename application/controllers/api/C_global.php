@@ -318,4 +318,17 @@ class C_global extends CI_Controller {
 
     // }
 
+    public function getRevision_detail_admission()
+    {
+        $input = $this->getInputToken();
+        $ID_register_formulir = $input['ID_register_formulir'];
+        
+        $sql = 'select a.*,b.Name from db_finance.register_admisi_rev as a
+                left join db_employees.employees as b
+                on a.RevBy = b.NIP
+                where a.ID_register_formulir = ? order by a.RevNo asc';
+        $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
+        echo json_encode($query);
+    }
+
 }

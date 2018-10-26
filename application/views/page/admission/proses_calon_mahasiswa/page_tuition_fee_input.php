@@ -56,7 +56,7 @@
 
 	function loadDataTable()
 	{
-		var no = 1;
+		var no = <?php echo $no ?>;
 		max_cicilan = getDataCalonMhs[0]['getMaxCicilan'];
 		for (var i = 0; i < getDataCalonMhs.length; i++) {
 			var DiskonSPP = getDataCalonMhs[i]['DiskonSPP'];
@@ -129,17 +129,10 @@
 			selecTOption += '</select>';
 
 			var selecTOption2 = '<select class="getDokumen" id-formulir = "'+getDataCalonMhs[i]['ID_register_formulir']+'" style="width: 260px;"" id = "getDokumen'+getDataCalonMhs[i]['ID_register_formulir']+'" >';
+				selecTOption2 += '<option value="'+'0'+'" '+'selected'+'>'+'--File Uploaded--'+''+'</option>';
 			for (var k = 0; k < getDocument.length; k++) {
 				if (getDataCalonMhs[i]['RangkingRapor'] != 0) {
 					var selected = (getDocument[k]['Attachment']==getDataCalonMhs[i]['Attachment']) ? 'selected' : '';
-				}
-				else
-				{
-					var selected = (k==0) ? 'selected' : '';
-				}
-
-				if (k == 0) {
-					selecTOption2 += '<option value="'+'0'+'" '+selected+'>'+'----'+''+'</option>';
 				}
 
 				selecTOption2 += '<option value="'+getDocument[k]['ID']+'" '+selected+'>'+getDocument[k]['Attachment']+''+'</option>';
@@ -152,7 +145,7 @@
 				showFile = '<a href="javascript:void(0)" class="show_a_href" id = "show'+getDataCalonMhs[i]['ID_register_formulir']+'" filee = "'+getDataCalonMhs[i]['Attachment']+'" Email = "'+getDataCalonMhs[i]['Email']+'">Show</a>';
 			}
 
-			var textArea = '<textarea rows="2" cols="5" name="textarea" class="limited form-control ket" data-limit="50" maxlength="50" id-formulir = "'+getDataCalonMhs[i]['ID_register_formulir']+'" id = "ket'+getDataCalonMhs[i]['ID_register_formulir']+'"></textarea>Max<span id="chars'+getDataCalonMhs[i]['ID_register_formulir']+'">50</span> characters';	
+			var textArea = '<textarea rows="2" cols="5" name="textarea" class="limited form-control ket" data-limit="50" maxlength="50" id-formulir = "'+getDataCalonMhs[i]['ID_register_formulir']+'" id = "ket'+getDataCalonMhs[i]['ID_register_formulir']+'">'+getDataCalonMhs[i]['NoteRev']+'</textarea>Max<span id="chars'+getDataCalonMhs[i]['ID_register_formulir']+'">50</span> characters';	
 
 			var Code = (getDataCalonMhs[i]['No_Ref'] != '') ? getDataCalonMhs[i]['FormulirCode'] + ' / ' + getDataCalonMhs[i]['No_Ref'] : getDataCalonMhs[i]['FormulirCode'];
 			var Rangking = (getDataCalonMhs[i]['RangkingRapor'] != 0) ? 'Rangking : '+getDataCalonMhs[i]['RangkingRapor'] : "";

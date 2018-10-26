@@ -54,7 +54,7 @@
 
 	function loadDataTable()
 	{
-		var no = 1;
+		var no = <?php echo $no ?>;
 		for (var i = 0; i < getDataCalonMhs.length; i++) {
 			var DiskonSPP = getDataCalonMhs[i]['Discount-SPP'];
 			var isi_payment = '';

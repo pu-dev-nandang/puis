@@ -122,9 +122,9 @@
 	    });
 	}
 
-	$(document).on('click','#btn-Hitung', function () {
-		prosesData();
-	});
+	// $(document).on('click','#btn-Hitung', function () {
+	// 	prosesData();
+	// });
 
 	function prosesData()
 	{
@@ -258,28 +258,28 @@
 		// console.log(bobot_nilai);
 	}
 
-	$(document).on('click','#btn-Save', function () {
-		loading_button('#btn-Save');
-		  var data = {
-		  					processs1 : processs,
-		  					rangking : processs1
-		  			};
-		  var token = jwt_encode(data,"UAP)(*");
-		  var url = base_url_js+'admission/proses-calon-mahasiswa/set-nilai-rapor/save';
-		  	$.post(url,{token:token},function (data_json) {
-		        var response = jQuery.parseJSON(data_json);
-		        toastr.success('Data berhasil disimpan', 'Success!');
-		        loadTableData(1);
-		        $('#btn-Save').prop('disabled',false).html('Save');
-	      	}).done(function() {
-	      	      loadTableData(1);
-	      	      $('#btn-Save').prop('disabled',false).html('Save');
-	  	    }).fail(function() {
-	  	      toastr.error('The Database connection error, please try again', 'Failed!!');
-	  	    }).always(function() {
-	  	      $('#btn-Save').prop('disabled',false).html('Save');
-	  	    });
-	});
+	// $(document).on('click','#btn-Save', function () {
+	// 	loading_button('#btn-Save');
+	// 	  var data = {
+	// 	  					processs1 : processs,
+	// 	  					rangking : processs1
+	// 	  			};
+	// 	  var token = jwt_encode(data,"UAP)(*");
+	// 	  var url = base_url_js+'admission/proses-calon-mahasiswa/set-nilai-rapor/save';
+	// 	  	$.post(url,{token:token},function (data_json) {
+	// 	        var response = jQuery.parseJSON(data_json);
+	// 	        toastr.success('Data berhasil disimpan', 'Success!');
+	// 	        loadTableData(1);
+	// 	        $('#btn-Save').prop('disabled',false).html('Save');
+	//       	}).done(function() {
+	//       	      loadTableData(1);
+	//       	      $('#btn-Save').prop('disabled',false).html('Save');
+	//   	    }).fail(function() {
+	//   	      toastr.error('The Database connection error, please try again', 'Failed!!');
+	//   	    }).always(function() {
+	//   	      $('#btn-Save').prop('disabled',false).html('Save');
+	//   	    });
+	// });
 
 	$(document).on('change','.FileRapor', function () {
 		var id_formulir = $(this).attr('id-formulir');
