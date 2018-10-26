@@ -1598,14 +1598,23 @@ class C_api extends CI_Controller {
                 );
                 return print_r(json_encode($result));
             }
-            else if($data_arr['action']=='updateEditCourse'){
+            else if($data_arr['action']=='updateCourse_Edit'){
 
-                // Cek bentrok belum
                 $arrUpdate = (array) $data_arr['formInsert'];
                 $this->db->where('ID', $data_arr['ID']);
                 $this->db->update('db_academic.schedule_details',$arrUpdate);
                 return print_r(1);
 
+            } else if($data_arr['action']=='updateCourse_Add'){
+                $formInsert = (array) $data_arr['formInsert'];
+                $formInsert['ScheduleID'] = $data_arr['ScheduleID'];
+                $this->db->insert('db_academic.schedule_details',$formInsert);
+                return print_r(1);
+
+            } else if($data_arr['action']=='deleteScheduleCourse'){
+                $this->db->where('ID', $data_arr['SDID']);
+                $this->db->delete('db_academic.schedule_details');
+                return print_r(1);
             }
         }
     }
