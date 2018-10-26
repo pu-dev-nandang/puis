@@ -332,7 +332,7 @@ class C_save_to_pdf2 extends CI_Controller {
         $this->mypdf->Cell(60,$height,'Tanggal',1,0,'C',true);
         $this->mypdf->Cell(70,$height,'Jumlan',1,1,'C',true);
 
-        $cicilan_tulis = array('Cicilan Pertama','Cicilan Kedua','Cicilan Ketiga','Cicilan Keempat');
+        $cicilan_tulis = array('Cicilan Pertama','Cicilan Kedua','Cicilan Ketiga','Cicilan Keempat','Cicilan Kelima','Cicilan Keenam','Cicilan Ketujuh');
 
         for ($i=0; $i < count($arr_cicilan); $i++) {
             $setY = $setY + $height; 
