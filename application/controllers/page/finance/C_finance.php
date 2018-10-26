@@ -1507,6 +1507,8 @@ class C_finance extends Finnance_Controler {
 
     public function mahasiswa()
     {
+        $getSemester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+        $data['getSemester'] = $getSemester;
         $content = $this->load->view('page/'.$this->data['department'].'/master/page_master_mahasiswa',$this->data,true);
         $this->temp($content);
     }
@@ -1514,7 +1516,6 @@ class C_finance extends Finnance_Controler {
     public function mahasiswa_list($page = null)
     {
         $input = $this->getInputToken();
-
         $this->load->library('pagination');
         // cari count
         $count = $this->m_finance->count_mahasiswa_list($input['ta'],$input['prodi'],$input['NPM']);
@@ -1993,31 +1994,31 @@ class C_finance extends Finnance_Controler {
         echo json_encode($msg);
     }
 
-    public function report()
-    {
-        $content = $this->load->view('page/'.$this->data['department'].'/tagihan_mahasiswa/report',$this->data,true);
-        $this->temp($content);
-    }
+    // public function report()
+    // {
+    //     $content = $this->load->view('page/'.$this->data['department'].'/tagihan_mahasiswa/report',$this->data,true);
+    //     $this->temp($content);
+    // }
 
-    public function get_reporting($page = null)
-    {
-        $input = $this->getInputToken();
-        $this->load->library('pagination');
-        // per page 2 database
-        $sqlCount = 'show databases like "%ta_2%"';
-        $queryCount=$this->db->query($sqlCount, array())->result_array();
+    // public function get_reporting($page = null)
+    // {
+    //     $input = $this->getInputToken();
+    //     $this->load->library('pagination');
+    //     // per page 2 database
+    //     $sqlCount = 'show databases like "%ta_2%"';
+    //     $queryCount=$this->db->query($sqlCount, array())->result_array();
 
-        $config = $this->config_pagination_default_ajax(count($queryCount),1,3);
-        $this->pagination->initialize($config);
-        $page = $this->uri->segment(3);
-        $start = ($page - 1) * $config["per_page"];
-        $data = $this->m_finance->get_report_pembayaran_mhs($input['ta'],$input['prodi'],$input['NIM'],$input['Semester'],$input['Status'],$config["per_page"], $start);
-        $output = array(
-        'pagination_link'  => $this->pagination->create_links(),
-        'loadtable'   => $data,
-        );
-        echo json_encode($output);
-    }
+    //     $config = $this->config_pagination_default_ajax(count($queryCount),1,3);
+    //     $this->pagination->initialize($config);
+    //     $page = $this->uri->segment(3);
+    //     $start = ($page - 1) * $config["per_page"];
+    //     $data = $this->m_finance->get_report_pembayaran_mhs($input['ta'],$input['prodi'],$input['NIM'],$input['Semester'],$input['Status'],$config["per_page"], $start);
+    //     $output = array(
+    //     'pagination_link'  => $this->pagination->create_links(),
+    //     'loadtable'   => $data,
+    //     );
+    //     echo json_encode($output);
+    // }
 
     public function formulir_registration_offline_serverSide()
     {

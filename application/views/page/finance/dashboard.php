@@ -104,6 +104,7 @@
         var url = base_url_js+'finance/summary_payment';
 		$.post(url,function (resultJson) {
 		   var response = jQuery.parseJSON(resultJson);
+		   console.log(response);
 		   var ds = new Array();
 
 		   ds.push({

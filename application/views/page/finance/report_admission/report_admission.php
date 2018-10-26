@@ -64,11 +64,8 @@
   				          	<div class="col-xs-6">
   				          		<div class="form-group">
   				          			<div class="row" style="margin-top: 10px">
-  				          				<div class="col-xs-4 col-md-offset-4">
-  				          					<label>Data</label>
-  				          				</div>
   				          				<div class="col-xs-4">
-  				          					<label>Finance</label>
+  				          					<!-- <label>Finance</label> -->
   				          				</div>
   				          			</div>
   				          			<div class="row">
@@ -76,18 +73,7 @@
   				          					<label>Penjualan Formulir</label>
   				          				</div>
   				          				<div class="col-xs-4">
-  				          					<button class="btn btn-primary" id= "btnPenjualanFormulirData"> <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel</button>
-  				          				</div>
-  				          				<div class="col-xs-4">
   				          					<button class="btn btn-primary" id= "btnPenjualanFormulirFinance"> <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel</button>
-  				          				</div>
-  				          			</div>
-  				          			<div class="row" style="margin-top: 10px">
-  				          				<div class="col-xs-4">
-  				          					<label>Registrasi (Pengembalian Form)</label>
-  				          				</div>
-  				          				<div class="col-xs-4">
-  				          					<button class="btn btn-primary" id= "btnPengembalianFormulirData"> <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel</button>
   				          				</div>
   				          			</div>
   				          		</div>		

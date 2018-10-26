@@ -106,17 +106,22 @@ class C_dashboard extends Globalclass {
         $arr_json = array();
         $arrDB = array();
         $sqlDB = 'show databases like "%ta_2%"';
+        $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+        $SemesterYear = $SemesterID[0]['Year'];
         $queryDB=$this->db->query($sqlDB, array())->result_array();
         foreach ($queryDB as $key) {
           foreach ($key as $keyB ) {
-            $arrDB[] = $keyB;
+            $YearDB = explode('_', $keyB);
+            $YearDB = $YearDB[1];
+            if ($SemesterYear >= $YearDB) {
+                $arrDB[] = $keyB;
+            }
           }
           
         }
 
         rsort($arrDB);
         $Year = 'ta_'.date('Y');
-        $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
         $Semester = $SemesterID[0]['ID'];
         $Semester = ' and SemesterID = '.$Semester;
         $unk = 1;
@@ -126,7 +131,7 @@ class C_dashboard extends Globalclass {
         $Unpaid_Off = array();
         $unsetPaid = array();
         for ($i=0; $i < count($arrDB); $i++) { 
-            if ($arrDB[$i] != $Year) {
+            // if ($arrDB[$i] != $Year) {
 
                 $a_Paid_Off = 0;
                 $a_Unpaid_Off = 0;
@@ -234,7 +239,7 @@ class C_dashboard extends Globalclass {
                 $unsetPaid[] = array($YearDB,$a_unsetPaid);
                 $unk++;
 
-            }
+            // }
         }
 
         $arr_json = array('Paid_Off'=> $Paid_Off,'Unpaid_Off' => $Unpaid_Off,'unsetPaid' => $unsetPaid);

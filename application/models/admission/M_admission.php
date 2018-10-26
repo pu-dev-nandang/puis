@@ -1655,6 +1655,7 @@ class M_admission extends CI_Model {
               where ( a.ID in (select ID_register_formulir from db_admission.register_nilai where Status = "Verified") 
               or a.ID in (select ID_register_formulir from db_admission.register_kelulusan_ujian where Kelulusan = "Lulus") ) and a.ID not in (select ID_register_formulir from db_finance.register_admisi) 
               and ( b.FormulirCode like '.$FormulirCode.' or px.No_Ref like '.$FormulirCode.' )
+              order by a.ID desc
               LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array())->result_array();
 
@@ -1950,7 +1951,9 @@ class M_admission extends CI_Model {
               where ('.$Status.') 
               and ( b.FormulirCode like '.$FormulirCode.' or px.No_Ref like '.$FormulirCode.' )
               and b.FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)
-              group by a.ID LIMIT '.$start. ', '.$limit;
+              group by a.ID 
+              order by a.ID desc
+              LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array())->result_array();
       $this->load->model('master/m_master');
       $jpa = $this->m_master->showData_array('db_admission.register_dsn_jpa');
@@ -2852,6 +2855,143 @@ class M_admission extends CI_Model {
             where c.ID_register_formulir = ? ';
         $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
         return $query;       
+    }
+
+    public function getDataCalonMhsTuitionFee_approved_ALL($Year,$Prodi,$Status = 'p.Status = "Created" or p.Status = "Approved"')
+    {
+      $Prodi = ($Prodi == 0) ? '' : ' and a.ID_program_study = "'.$Prodi.'"';
+     $arr_temp = array();
+     $sql= 'select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,
+             f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
+             n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
+             if((select count(*) as total from db_admission.register_nilai where Status = "Verified" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
+             as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,p.Desc,
+             if(d.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = b.FormulirCode limit 1) ,""  ) as No_Ref,p.RevID,n.CityName as CitySchool
+             from db_admission.register_formulir as a
+             left JOIN db_admission.register_verified as b 
+             ON a.ID_register_verified = b.ID
+             left JOIN db_admission.register_verification as c
+             ON b.RegVerificationID = c.ID
+             left JOIN db_admission.register as d
+             ON c.RegisterID = d.ID
+             left JOIN db_admission.country as e
+             ON a.NationalityID = e.ctr_code
+             left JOIN db_employees.religion as f
+             ON a.ReligionID = f.IDReligion
+             left JOIN db_admission.school_type as l
+             ON l.sct_code = a.ID_school_type
+             left JOIN db_admission.register_major_school as m
+             ON m.ID = a.ID_register_major_school
+             left JOIN db_admission.school as n
+             ON n.ID = d.SchoolID
+             left join db_academic.program_study as o
+             on o.ID = a.ID_program_study
+             left join db_finance.register_admisi as p
+             on a.ID = p.ID_register_formulir
+             left join db_admission.formulir_number_offline_m as px
+              on px.FormulirCode = b.FormulirCode
+              where ('.$Status.') and d.SetTa = ? '.$Prodi.' 
+             group by a.ID order by a.ID desc';
+     $query=$this->db->query($sql, array($Year))->result_array();
+     $this->load->model('master/m_master');
+     $jpa = $this->m_master->showData_array('db_admission.register_dsn_jpa');
+     for ($i=0; $i < count($query); $i++) { 
+       $DiskonSPP = 0;
+       // get Price
+           $getPaymentType_Cost = $this->getPaymentType_Cost_created($query[$i]['ID_register_formulir']);
+           $arr_temp2 = array();
+           for ($k=0; $k < count($getPaymentType_Cost); $k++) { 
+             // $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Cost']);
+             $arr_temp2 = $arr_temp2 + array(
+               $getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Pay_tuition_fee'],
+               'Discount-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Discount']
+             );
+           }
+
+           // get file dan type beasiswa
+            $getBeasiswa = $this->m_master->caribasedprimary('db_admission.register_dsn_type_m','ID',$query[$i]['TypeBeasiswa']);
+            if (count($getBeasiswa) > 0) {
+              $getBeasiswa = $getBeasiswa[0]['DiscountType']; 
+            }
+            else
+            {
+             $getBeasiswa = '-'; 
+            }
+
+            // get File
+            $getFile = $this->m_master->caribasedprimary('db_admission.register_document','ID',$query[$i]['FileBeasiswa']);
+            if (count($getFile) > 0) {
+              $getFile = $getFile[0]['Attachment']; 
+            }
+            else
+            {
+             $getFile = '-'; 
+            }
+
+            // check Revision
+            $rev = $this->m_master->caribasedprimary('db_finance.register_admisi_rev','ID_register_formulir',$query[$i]['ID_register_formulir']);
+
+            // event
+              $Event = "";
+              $ee = $this->m_master->caribasedprimary('db_admission.sale_formulir_offline','FormulirCodeOffline',$query[$i]['FormulirCode']);
+              if (count($ee) > 0) {
+                $source_from_event_ID = $ee[0]['source_from_event_ID'];
+                $ff = $this->m_master->caribasedprimary('db_admission.source_from_event','ID',$source_from_event_ID);
+                if (count($ff) > 0) {
+                  $Event = $ff[0]['src_name'];
+                }
+              }
+
+       if ($query[$i]['status1'] == 'Rapor') {
+         // check rangking
+           $getRangking = $this->getRangking($query[$i]['ID_register_formulir']);
+           $getRangking = $getRangking[0]['Rangking'];
+           
+           $arr_temp[$i] = array(
+            'ID_register_formulir' => $query[$i]['ID_register_formulir'],
+            'Name' => $query[$i]['Name'],
+            'NamePrody' => $query[$i]['NamePrody'],
+            'SchoolName' => $query[$i]['SchoolName'],
+            'Status1' => $query[$i]['status1'],
+            // 'DiskonSPP' => $DiskonSPP,
+            'RangkingRapor' => $getRangking,
+            'FormulirCode' => $query[$i]['FormulirCode'],
+            'No_Ref' => $query[$i]['No_Ref'],
+            'getBeasiswa' => $getBeasiswa,
+            'getFile' => $getFile,
+            'Email' => $query[$i]['Email'],
+            'Desc' => $query[$i]['Desc'],
+            'Rev' => count($rev),
+            'CitySchool' => $query[$i]['CitySchool'],
+            'Event' => $Event,
+           );
+       }
+       else
+       {
+           $arr_temp[$i] = array(
+             'ID_register_formulir' => $query[$i]['ID_register_formulir'],
+             'Name' => $query[$i]['Name'],
+             'NamePrody' => $query[$i]['NamePrody'],
+             'SchoolName' => $query[$i]['SchoolName'],
+             'Status1' => $query[$i]['status1'],
+             // 'DiskonSPP' => $DiskonSPP,
+             'RangkingRapor' => 0,
+             'FormulirCode' => $query[$i]['FormulirCode'],
+             'No_Ref' => $query[$i]['No_Ref'],
+             'getBeasiswa' => $getBeasiswa,
+             'getFile' => $getFile,
+             'Email' => $query[$i]['Email'],
+             'Desc' => $query[$i]['Desc'],
+             'Rev'  =>count($rev),
+             'CitySchool' => $query[$i]['CitySchool'],
+             'Event' => $Event,
+           );
+       }
+
+       $arr_temp[$i] = $arr_temp[$i] + $arr_temp2;
+     }
+     return $arr_temp;
+
     }
 
 }
