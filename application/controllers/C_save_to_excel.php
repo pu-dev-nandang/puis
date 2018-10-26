@@ -2122,4 +2122,309 @@ class C_save_to_excel extends CI_Controller
     }
 
     // ===== PENUTUP DATA STUDENT ======
+
+    public function export_TuitionFee_Excel()
+    {
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $input = (array) $this->jwt->decode($token,$key);
+        $GetDateNow = date('Y-m-d');
+        $this->load->model('master/m_master');
+        $this->load->model('finance/m_finance');
+        $this->load->model('admission/m_admission');
+        $GetDateNow = $this->m_master->getIndoBulan($GetDateNow);
+        // print_r($input['Data']);die();
+
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load('./uploads/admisi/rekap_tuition_fee.xlsx'); // Empty Sheet
+        $excel2->setActiveSheetIndex(0);
+
+        $excel3 = $excel2->getActiveSheet();
+        // $excel3->setCellValue('A3', $GetDateNow.' Jam '.date('H:i'));
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+        $style_row = array(
+            'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        // start dari A4
+        $Year = $input['Year'];
+        $Prodi = $input['Prodi'];
+        $a = 4;
+        $Filaname = 'Intake_'.$Year.'.xlsx';
+        $getData = $this->m_admission->getDataCalonMhsTuitionFee_approved_ALL($Year,$Prodi);
+        $keyM = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+        // print_r($getData);die();
+        $SumTotalTagihan = 0;
+        $SumTotalPembayaran = 0;
+        $SumTotalSisaTagihan = 0;
+        for ($i=0; $i < count($getData); $i++) { 
+            $ID_register_formulir = $getData[$i]['ID_register_formulir'];
+            $output = $this->m_master->caribasedprimary('db_finance.payment_pre','ID_register_formulir',$ID_register_formulir);
+            $no = $i + 1;
+            $FormulirCode = ($getData[$i]['No_Ref'] == "" || $getData[$i]['No_Ref'] == null) ? $getData[$i]['FormulirCode'] : $getData[$i]['No_Ref'];
+            $GetPayment = "SPP : Rp ".number_format($getData[$i]['SPP'],2,',','.')."\n"."BPP : Rp ".number_format($getData[$i]['BPP'],2,',','.')."\n"."SKS : Rp ".number_format($getData[$i]['Credit'],2,',','.')."\n"."Lain-Lain : Rp ".number_format($getData[$i]['Another'],2,',','.')."\n" ;
+            $Beasiswa = ($getData[$i]['getBeasiswa'] == "-") ? "" : "Beasiswa ".$getData[$i]['getBeasiswa']."\n";
+            $Discount = "";
+            if ($getData[$i]['Discount-SPP'] > 0) {
+                $Discount .= 'SPP : '.$getData[$i]['Discount-SPP'].'%';
+            }
+
+            if ($getData[$i]['Discount-BPP'] > 0) {
+                $aa = "";
+                if ($Discount != "") {
+                    $aa = "\n";
+                }
+                $Discount .= $aa.'BPP : '.$getData[$i]['Discount-BPP'].'%';
+            }
+
+            if ($getData[$i]['Discount-Credit'] > 0) {
+                $aa = "";
+                if ($Discount != "") {
+                    $aa = "\n";
+                }
+                $Discount .= $aa.'SKS : '.$getData[$i]['Discount-Credit'].'%';
+            }
+
+            if ($getData[$i]['Discount-Another'] > 0) {
+                $aa = "";
+                if ($Discount != "") {
+                    $aa = "\n";
+                }
+                $Discount .= $aa.'Lain-lain : '.$getData[$i]['Discount-Another'].'%';
+            }
+            
+            $excel3->setCellValue('A'.$a, $no); 
+            $excel3->setCellValue('B'.$a, $FormulirCode);
+            $excel3->setCellValue('C'.$a, $getData[$i]['Name']);
+            $excel3->setCellValue('D'.$a, $getData[$i]['NamePrody']);
+            $excel3->setCellValue('E'.$a, $getData[$i]['SchoolName']);
+            $excel3->setCellValue('F'.$a, $getData[$i]['CitySchool']);
+            $excel3->setCellValue('G'.$a, $GetPayment);
+            $excel3->setCellValue('H'.$a, $Beasiswa.$Discount);
+
+            // cicilan start array key 8 yaitu I
+            $keyI = 8;
+            $TotalBayar = 0;
+            $TotalAll = 0;
+            for ($j=0; $j < count($output); $j++) { 
+               $tt = '';
+               $byr = '';
+               $as = $keyI + 1;
+               if ($output[$j]['Status'] == 1) {
+                   $tt = date('d M Y', strtotime($output[$j]['UpdateAt']));
+                   $byr = "Rp. ".number_format($output[$j]['Invoice'],2,',','.');
+                   $TotalBayar = $TotalBayar + $output[$j]['Invoice'];
+               }
+               $TotalAll = $TotalAll + $output[$j]['Invoice'];
+
+               $excel3->setCellValue($keyM[$keyI].$a, $tt);
+               $excel3->setCellValue($keyM[$as].$a, $byr);
+               $keyI = $keyI + 2;
+            }
+
+            $ss = 7 - count($output);
+            for ($j=0; $j < $ss; $j++) {
+               $as = $keyI + 1; 
+               $excel3->setCellValue($keyM[$keyI].$a, "");
+               $excel3->setCellValue($keyM[$as].$a, "");
+               $keyI = $keyI + 2;
+            }
+            $SisaTagihan = $TotalAll - $TotalBayar;
+            $SumTotalTagihan = $SumTotalTagihan + $TotalAll;
+            $SumTotalPembayaran = $SumTotalPembayaran + $TotalBayar;
+            $SumTotalSisaTagihan = $SumTotalSisaTagihan + $SisaTagihan;
+            $excel3->setCellValue('W'.$a, "Rp. ".number_format($TotalAll,2,',','.'));
+            $excel3->setCellValue('X'.$a, "Rp. ".number_format($TotalBayar,2,',','.'));
+            $excel3->setCellValue('Y'.$a, "Rp. ".number_format($SisaTagihan,2,',','.'));
+            $excel3->setCellValue('Z'.$a, ($SisaTagihan > 0) ? "Belum lunas" : "Lunas" );
+            $excel3->setCellValue('AA'.$a, $getData[$i]['Event']);
+
+            // Apply style row yang telah kita buat tadi ke masing-masing baris (isi tabel)
+            $excel3->getStyle('A'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('B'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('C'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('D'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('E'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('F'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('G'.$a)->applyFromArray($style_row);
+             $excel3->getStyle('G'.$a)->getAlignment()->setWrapText(true);
+            $excel3->getStyle('H'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('H'.$a)->getAlignment()->setWrapText(true);
+            $excel3->getStyle('I'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('J'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('K'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('L'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('M'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('N'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('O'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('P'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('Q'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('R'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('S'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('T'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('U'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('V'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('W'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('X'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('Y'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('Z'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('AA'.$a)->applyFromArray($style_row);
+            $a = $a + 1; 
+        }
+
+        $excel3->setCellValue('W'.$a, "Rp. ".number_format($SumTotalTagihan,2,',','.'));
+        $excel3->setCellValue('X'.$a, "Rp. ".number_format($SumTotalPembayaran,2,',','.'));
+        $excel3->setCellValue('Y'.$a, "Rp. ".number_format($SumTotalSisaTagihan,2,',','.'));
+
+        foreach(range('A','Z') as $columnID) {
+            $excel2->getActiveSheet()->getColumnDimension($columnID)
+                ->setAutoSize(true);
+        }
+
+        $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
+        // We'll be outputting an excel file
+        header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
+        // It will be called file.xlss
+        header('Content-Disposition: attachment; filename="'.$Filaname.'"'); // jalan ketika tidak menggunakan ajax
+        //$filename = 'PenerimaanPembayaran.xlsx';
+        //$objWriter->save('./document/'.$filename);
+        $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
+
+        // print_r($input['summary']);
+    }
+
+    public function excel_data_mahasiswa_fin()
+    {
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $input = (array) $this->jwt->decode($token,$key);
+        $GetDateNow = date('Y-m-d');
+        $this->load->model('master/m_master');
+        $this->load->model('finance/m_finance');
+        $this->load->model('admission/m_admission');
+        $GetDateNow = $this->m_master->getIndoBulan($GetDateNow);
+        // print_r($input['Data']);die();
+
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load('./uploads/finance/TemplateDataMahasiswa.xlsx'); // Empty Sheet
+        $excel2->setActiveSheetIndex(0);
+
+        $excel3 = $excel2->getActiveSheet();
+        $excel3->setCellValue('A3', 'Data Mahasiswa Angkatan '.$input['Year']);
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+        $style_row = array(
+            'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        // start dari A4
+        $Year = $input['Year'];
+        $Prodi = $input['Prodi'];
+        $NPM = $input['NPM'];
+        $a = 5;
+        $Filaname = 'Data_MHS_'.$Year.'.xlsx';
+        $getData = $this->m_finance->mahasiswa_list_all($Year,$Prodi,$NPM);
+        $keyM = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+        $getStatus = $this->m_master->showData_array('db_academic.status_student');
+        $Bin1 = 0;
+        $Bin2 = 0;
+        $arrxx = array();
+        for ($i=0; $i < count($getData); $i++) { 
+            $no = $i + 1;
+            // number_format($getData[$i]['SPP'],2,',','.')
+            
+            $excel3->setCellValue('A'.$a, $no); 
+            $excel3->setCellValue('B'.$a, $getData[$i]['NPM']);
+            $excel3->setCellValue('C'.$a, $getData[$i]['Name']);
+            $excel3->setCellValue('D'.$a, $getData[$i]['VA']);
+            $excel3->setCellValue('E'.$a, $getData[$i]['ProdiEng']);
+            $excel3->setCellValue('F'.$a, number_format($getData[$i]['IPS'],2,',','.'));
+            $excel3->setCellValue('G'.$a, number_format($getData[$i]['IPK'],2,',','.'));
+            $excel3->setCellValue('H'.$a, $getData[$i]['Credit']);
+            $excel3->setCellValue('I'.$a, $getData[$i]['StatusStudentName']);
+            $PriceList = ($getData[$i]['Pay_Cond'] == 1) ? "*" : "**";
+            if ($getData[$i]['Pay_Cond'] == 1) {
+                $Bin1++;
+            }
+            if ($getData[$i]['Pay_Cond'] == 2) {
+                $Bin2++;
+            }
+
+            for ($l=0; $l < count($getStatus); $l++) {
+                // find StudentID
+                if ($getStatus[$l]['ID'] == $getData[$i]['StatusStudentID']) {
+                    $Name =  $getStatus[$l]['Description'];
+                    $Name =  str_replace(" ", "", $Name);
+                    if(array_key_exists($Name,$arrxx))
+                    {
+                        $arrxx[$Name] = $arrxx[$Name] + 1 ;
+                    }
+                    else
+                    {
+                       $arrxx[$Name] = 1;
+                    }
+                }
+                
+            }
+
+            $excel3->setCellValue('J'.$a, $PriceList);
+            $excel3->setCellValue('K'.$a, number_format($getData[$i]['Bea_BPP'],2,',','.'));
+            $excel3->setCellValue('L'.$a, number_format($getData[$i]['Bea_Credit']));
+
+            // Apply style row yang telah kita buat tadi ke masing-masing baris (isi tabel)
+            $excel3->getStyle('A'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('B'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('C'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('D'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('E'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('F'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('G'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('H'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('I'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('J'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('K'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('L'.$a)->applyFromArray($style_row);
+            $a = $a + 1; 
+        }
+            
+        $excel3->setCellValue('O'.'5', 'Bintang 1 : '.$Bin1);   
+        $excel3->setCellValue('O'.'6', 'Bintang 2 : '.$Bin2);
+        $aaaa = 7;
+        foreach ($arrxx as $key => $value) {
+            $excel3->setCellValue('O'.$aaaa, $key.' : '.$value);     
+            $aaaa++;
+        }  
+        // foreach(range('A','Z') as $columnID) {
+        //     $excel2->getActiveSheet()->getColumnDimension($columnID)
+        //         ->setAutoSize(true);
+        // }
+
+        $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
+        // We'll be outputting an excel file
+        header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
+        // It will be called file.xlss
+        header('Content-Disposition: attachment; filename="'.$Filaname.'"'); // jalan ketika tidak menggunakan ajax
+        //$filename = 'PenerimaanPembayaran.xlsx';
+        //$objWriter->save('./document/'.$filename);
+        $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
+    }
 }

@@ -18,7 +18,7 @@ class C_admission extends Admission_Controler {
     public function dashboard()
     {
       $data['department'] = parent::__getDepartement();
-      $content = $this->load->view('dashboard/dashboard',$data,true);
+      $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
       $this->temp($content);
     }
 
@@ -1056,7 +1056,7 @@ class C_admission extends Admission_Controler {
                 or NameSales LIKE "'.$requestData['search']['value'].'%"
                 or No_Ref LIKE "'.$requestData['search']['value'].'%"
                 ';
-        $sql.= ' ORDER BY chklunas ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+        $sql.= ' ORDER BY chklunas ASC, RegisterID DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
         $query = $this->db->query($sql)->result_array();
 
@@ -1168,7 +1168,7 @@ class C_admission extends Admission_Controler {
               or No_Ref LIKE "'.$requestData['search']['value'].'%"
                 )
              and chklunas in ("Lunas","Belum Lunas") and FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)';
-      $sql.= ' ORDER BY chklunas Desc LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+      $sql.= ' ORDER BY chklunas Desc,RegisterID DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
       $query = $this->db->query($sql)->result_array();
 
@@ -1898,6 +1898,10 @@ class C_admission extends Admission_Controler {
 
       $query = $this->db->query($sql)->result_array();
 
+      // cek semester year tahun 2019 aktif untuk hide action
+         $semester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+         $semesterYear = $semester[0]['Year']; 
+
       $data = array();
       for($i=0;$i<count($query);$i++){
           $nestedData=array();
@@ -1917,16 +1921,25 @@ class C_admission extends Admission_Controler {
           $nestedData[] = $row['NamaPembeli'].'<br>'.$row['PhoneNumberPembeli'].'<br>'.$row['EmailPembeli'].'<br>'.$row['SchoolNameFormulir'].'<br>'.$row['DistrictNameFormulir'].' '.$row['CityNameFormulir'];
           $nestedData[] = $row['src_name'];
           $action = '';
+          $hide = '';
+          $cek = $this->m_master->caribasedprimary('db_admission.register_verified','FormulirCode',$row['FormulirCode']);
+            if (count($cek) > 0) {
+              $hide = 'hide';
+            }
+            if ($semesterYear >= $reqTahun) {
+              $hide = 'hide';
+            }
+
           if ($row['ID_sale_formulir_offline'] != null || $row['ID_sale_formulir_offline'] != '')
           {
-            $action = '<div class="row">
+            $action = '<div class="row '.$hide.'">
                         <div class="col-md-12">
                           <span data-smt="'.$row['Link'].'" class="btn btn-xs btn-delete inputFormulir">
                             <i class="fa fa-sign-in right-margin"></i> Input Formulir
                           </span>
                         </div>
                       </div>
-                      <div class="row" style="margin-top: 10px">
+                      <div class="row '.$hide.'" style="margin-top: 10px">
                         <div class="col-md-12">
                           <span data-smt="'.$row['ID_sale_formulir_offline'].'" class="btn btn-xs btn-delete deletepenjualan">
                             <i class="fa fa-trash"></i> Delete Penjualan
@@ -1940,7 +1953,7 @@ class C_admission extends Admission_Controler {
                          </span>
                         </div>
                       </div>
-                      <div class="row" style="margin-top: 10px">
+                      <div class="row '.$hide.'" style="margin-top: 10px">
                         <div class="col-md-12">
                           <span data-smt="'.$row['ID_sale_formulir_offline'].'" class="btn btn-xs btn-edit">
                             <i class="fa fa-edit"></i> Edit Penjualan

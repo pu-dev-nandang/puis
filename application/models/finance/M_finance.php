@@ -1862,7 +1862,7 @@ class M_finance extends CI_Model {
     $dataSave = array(
             'Invoice' => $trx_amount,
             'Deadline' => $datetime_expired,
-            'UpdateAt' => date('Y-m-d H:i:s'),
+            // 'UpdateAt' => date('Y-m-d H:i:s'),
                     );
     $this->db->where('BilingID',$BilingID);
     $this->db->update('db_finance.payment_pre', $dataSave);
@@ -1960,6 +1960,17 @@ class M_finance extends CI_Model {
             'Invoice' => $trx_amount,
             'Deadline' => $datetime_expired,
             'UpdateAt' => date('Y-m-d H:i:s'),
+            'BilingID' => $BilingID,
+                    );
+    $this->db->where('ID',$ID);
+    $this->db->update('db_finance.payment_pre', $dataSave);
+   }
+
+   public function UpdateCicilan_admission_byID2($ID,$BilingID,$trx_amount,$datetime_expired)
+   {
+    $dataSave = array(
+            'Invoice' => $trx_amount,
+            'Deadline' => $datetime_expired,
             'BilingID' => $BilingID,
                     );
     $this->db->where('ID',$ID);
@@ -2738,14 +2749,14 @@ class M_finance extends CI_Model {
     $ta = $ta1[1];
     $db = 'ta_'.$ta.'.students';
     $db2 = 'ta_'.$ta;
-    $field = 'StatusStudentID';
-    $value = 3;
+    // $field = 'StatusStudentID';
+    // $value = 3;
     $NPM = ($NPM == "" || $NPM == null) ? '' : ' and a.NPM = "'.$NPM.'"';
 
     $queryAdd = '';
     if ($prodi == '') {
      $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM
-             where a.StatusStudentID in (3,2,8)   '.$NPM.$queryAdd.'
+             where a.StatusStudentID like "%%"   '.$NPM.$queryAdd.'
              order by a.NPM asc
              LIMIT '.$start. ', '.$limit;
       // print_r($sql);       
@@ -2754,7 +2765,7 @@ class M_finance extends CI_Model {
     else
     {
       $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM 
-              where a.StatusStudentID in (3,2,8)  and a.ProdiID = ? '.$NPM.$queryAdd.'
+              where a.StatusStudentID like "%%"  and a.ProdiID = ? '.$NPM.$queryAdd.'
               order by a.NPM asc 
               LIMIT '.$start. ', '.$limit;
       $Data_mhs=$this->db->query($sql, array($prodi))->result_array();
@@ -2765,6 +2776,7 @@ class M_finance extends CI_Model {
 
     // $SemesterID = $SemesterID[0]['ID'];
     $Discount = $this->m_master->showData_array('db_finance.discount');
+    $db = 'ta_'.$ta;
     for ($i=0; $i < count($Data_mhs); $i++) { 
       $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$Data_mhs[$i]['ProdiID']);
       $array = array('ProdiEng' => $ProdiEng[0]['NameEng']);
@@ -2773,6 +2785,23 @@ class M_finance extends CI_Model {
       // get VA Mahasiwa
         $VA = $Const_VA[0]['Const_VA'].$Data_mhs[$i]['NPM'];
         $Data_mhs[$i] = $Data_mhs[$i] + array('VA' => $VA);
+
+      // get IPS Mahasiswa
+        $IPS = $this->getIPSMahasiswa($db,$Data_mhs[$i]['NPM']);
+        $Data_mhs[$i] = $Data_mhs[$i] + array('IPS' => $IPS);
+
+      // get IPS Mahasiswa
+        $IPK = $this->getIPKMahasiswa($db,$Data_mhs[$i]['NPM']);
+        $Data_mhs[$i] = $Data_mhs[$i] + array('IPK' => $IPK);
+
+      // get Status 
+          $StatusStudentID =   $Data_mhs[$i]['StatusStudentID'];
+          $aa = $this->m_master->caribasedprimary('db_academic.status_student','ID',$StatusStudentID);
+          $Data_mhs[$i] = $Data_mhs[$i] + array('StatusStudentName' => $aa[0]['Description']);
+
+      // get sks yang diambil
+         $Credit = $this->getSKSMahasiswa($db2,$Data_mhs[$i]['NPM']);
+         $Data_mhs[$i] = $Data_mhs[$i] + array('Credit' => $Credit);      
 
     }
     $arr['Data_mhs'] = $Data_mhs;
@@ -2911,7 +2940,7 @@ class M_finance extends CI_Model {
         $ID = $Input[$i]->ID;
         $trx_amount = $Input[$i]->Invoice;
         $datetime_expired = $Input[$i]->Deadline;
-        $this->m_finance->UpdateCicilan_admission_byID($ID,$BilingID,$trx_amount,$datetime_expired);
+        $this->m_finance->UpdateCicilan_admission_byID2($ID,$BilingID,$trx_amount,$datetime_expired);
       }
     }
 
@@ -3102,9 +3131,73 @@ class M_finance extends CI_Model {
       } // loop per mhs
 
     }
-
-    // print_r($arr);die();
     return $arr;
+   }
+
+   public function mahasiswa_list_all($ta,$prodi,$NPM)
+   {
+    // error_reporting(0);
+    $arr = array();
+    $this->load->model('master/m_master');
+    // $ta1 = explode('.', $ta);
+    // $ta = $ta1[1];
+    $db = 'ta_'.$ta.'.students';
+    $db2 = 'ta_'.$ta;
+    // $field = 'StatusStudentID';
+    // $value = 3;
+    $NPM = ($NPM == "" || $NPM == null) ? '' : ' and a.NPM = "'.$NPM.'"';
+
+    $queryAdd = '';
+    if ($prodi == '') {
+     $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM
+             where a.StatusStudentID like "%%"   '.$NPM.$queryAdd.'
+             order by a.NPM asc
+             ';
+      // print_r($sql);       
+     $Data_mhs=$this->db->query($sql, array())->result_array();
+    }
+    else
+    {
+      $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM 
+              where a.StatusStudentID like "%%"  and a.ProdiID = ? '.$NPM.$queryAdd.'
+              order by a.NPM asc 
+              ';
+      $Data_mhs=$this->db->query($sql, array($prodi))->result_array();
+    }
+    // get Number VA Mahasiswa
+    $Const_VA = $this->m_master->showData_array('db_va.master_va');
+
+    // $SemesterID = $SemesterID[0]['ID'];
+    $Discount = $this->m_master->showData_array('db_finance.discount');
+    $db = 'ta_'.$ta;
+    for ($i=0; $i < count($Data_mhs); $i++) { 
+      $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$Data_mhs[$i]['ProdiID']);
+      $array = array('ProdiEng' => $ProdiEng[0]['NameEng']);
+      $Data_mhs[$i] = $Data_mhs[$i] + $array;
+
+      // get VA Mahasiwa
+        $VA = $Const_VA[0]['Const_VA'].$Data_mhs[$i]['NPM'];
+        $Data_mhs[$i] = $Data_mhs[$i] + array('VA' => $VA);
+
+      // get IPS Mahasiswa
+        $IPS = $this->getIPSMahasiswa($db,$Data_mhs[$i]['NPM']);
+        $Data_mhs[$i] = $Data_mhs[$i] + array('IPS' => $IPS);
+
+      // get IPS Mahasiswa
+        $IPK = $this->getIPKMahasiswa($db,$Data_mhs[$i]['NPM']);
+        $Data_mhs[$i] = $Data_mhs[$i] + array('IPK' => $IPK);
+
+      // get Status 
+          $StatusStudentID =   $Data_mhs[$i]['StatusStudentID'];
+          $aa = $this->m_master->caribasedprimary('db_academic.status_student','ID',$StatusStudentID);
+          $Data_mhs[$i] = $Data_mhs[$i] + array('StatusStudentName' => $aa[0]['Description']);
+
+      // get sks yang diambil
+         $Credit = $this->getSKSMahasiswa($db2,$Data_mhs[$i]['NPM']);
+         $Data_mhs[$i] = $Data_mhs[$i] + array('Credit' => $Credit);      
+
+    }
+    return $Data_mhs;
    }
 
 }

@@ -434,6 +434,7 @@ $route['admission/export_kwitansi_formuliroffline'] = 'c_save_to_pdf/export_kwit
 $route['admission/export_PenjualanFormulirData'] = 'c_save_to_excel/export_PenjualanFormulirData';
 $route['admission/export_PenjualanFormulirFinance'] = 'c_save_to_excel/export_PenjualanFormulirFinance';
 $route['admission/export_PengembalianFormulirData'] = 'c_save_to_excel/export_PengembalianFormulirData';
+$route['admission/TuitionFee_Excel'] = 'c_save_to_excel/export_TuitionFee_Excel';
 
 
 
@@ -454,6 +455,8 @@ $route['finance/master/modal-tagihan-mhs-submit'] =  'page/finance/c_tuition_fee
 $route['finance/master/edited-tagihan-mhs-submit'] =  'page/finance/c_tuition_fee/edited_tagihan_mhs_submit';
 $route['finance/master/deleted-tagihan-mhs-submit'] =  'page/finance/c_tuition_fee/deleted_tagihan_mhs_submit';
 $route['finance/master/mahasiswa'] =  'page/finance/c_finance/mahasiswa';
+$route['finance/excel_data_mahasiswa'] =  'c_save_to_excel/excel_data_mahasiswa_fin';
+
 $route['finance/master/import_price_list_mhs'] =  'page/finance/c_finance/import_price_list_mhs';
 $route['finance/master/import_beasiswa_mahasiswa'] =  'page/finance/c_finance/import_beasiswa_mahasiswa';
 $route['finance/master/mahasiswa_list/(:num)'] =  'page/finance/c_finance/mahasiswa_list/$1';
@@ -472,6 +475,9 @@ $route['finance/admission/penerimaan-pembayaran/formulir-registration/online'] =
 $route['finance/confirmed-verifikasi-pembayaran-registration_online'] =  'page/finance/c_finance/confirmed_verfikasi_pembayaran_registration_online';
 $route['finance/admission/penerimaan-pembayaran/formulir-registration/offline'] =  'page/finance/c_finance/formulir_registration_offline_page';
 $route['finance/admission/distribusi-formulir/offline/LoadListPenjualan/serverSide'] =  'page/finance/c_finance/formulir_registration_offline_serverSide';
+
+$route['finance/admission/report'] =  'page/finance/c_report/report_admission';
+$route['finance/admission/report/tuition-fee'] =  'page/finance/c_report/tuition_fee_admission';
 
 
 $route['finance/admission/approved/nilai-rapor'] =  'page/finance/c_finance/nilai_rapor_page';
@@ -533,10 +539,8 @@ $route['finance/bayar_manual_mahasiswa_admission'] =  'page/finance/c_finance/ba
 
 $route['finance/tagihan-mhs/import_pembayaran_lain'] =  'page/finance/c_finance/import_pembayaran_lain';
 $route['finance/tagihan-mhs/submit_import_pembayaran_lain'] =  'page/finance/c_finance/submit_import_pembayaran_lain';
-$route['finance/tagihan-mhs/report'] =  'page/finance/c_finance/report';
-$route['finance/get_reporting/(:num)'] =  'page/finance/c_finance/get_reporting/$1';
-
-
+$route['finance/tagihan-mhs/report'] =  'page/finance/c_report/reportTagihanMHS';
+$route['finance/get_reporting/(:num)'] =  'page/finance/c_report/get_reportingTagihanMHS/$1';
 
 
 $route['finance/tagihan-mhs/submit_import_beasiswa_mahasiswa'] =  'page/finance/c_finance/submit_import_beasiswa_mahasiswa';

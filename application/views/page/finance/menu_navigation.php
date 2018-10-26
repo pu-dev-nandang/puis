@@ -30,7 +30,7 @@
             ?>
 
 
-            <?php if ($authIT == 12 ): ?>
+            <?php if ($this->session->userdata('NIP') == '2018018' ): ?>
                 <li class="<?php if($this->uri->segment(2)=='config'){echo "current open";} ?>">
                     <a href="javascript:void(0);">
                         <i class="fa fa-wrench"></i>
@@ -155,6 +155,12 @@
                                 </a>
                             </li>
                         </ul>
+                    </li>
+                    <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "report"){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/admission/report'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Report
+                        </a>
                     </li>
                 </ul>
             </li>
