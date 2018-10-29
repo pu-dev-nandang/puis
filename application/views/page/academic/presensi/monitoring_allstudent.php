@@ -68,7 +68,7 @@
 
     });
 
-    $('.filterMonitoring').change(function () {
+    $('.filterMonitoring,#formPercentage').change(function () {
         loadDataStudent();
     });
 
@@ -113,8 +113,6 @@
                 ProdiID : ProdiID,
                 Percentage : formPercentage
             };
-
-            console.log(data);
 
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'api/__getMonitoringAllStudent';
