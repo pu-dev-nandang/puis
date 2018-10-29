@@ -479,7 +479,7 @@ class C_login extends CI_Controller {
             'ruleUser' => $ruleUser,
             'menuDepartement' => (count($ruleUser)>1) ? false : true ,
             'departementNavigation' => $dataSession[0]['MenuNavigation'],
-            'IDdepartementNavigation' => $dataSession[0]['IDDivision'],
+            'IDdepartementNavigation' => $dataSession[0]['IDMenuNavigation'],
             'LoginAt' => date("Y-m-d H:i:s"),
             'loggedIn' => true
         );
