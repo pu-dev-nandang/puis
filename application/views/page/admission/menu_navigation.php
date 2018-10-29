@@ -1,8 +1,3 @@
-<?php
-if ($this->uri->segment(1) == 'dashboard') {
-    redirect(base_url().'admission/dashboard');
-}
-?>
 <div id="sidebar" class="sidebar-fixed">
     <div id="sidebar-content">
         <!--=== Navigation ===-->
@@ -191,7 +186,7 @@ if ($this->uri->segment(1) == 'dashboard') {
 </div>
 <!-- /Sidebar -->
 <?php 
-$this->m_master->checkAuth_user();
+$this->m_menu->checkAuth_user('db_admission');
 
  ?>
 

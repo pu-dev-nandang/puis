@@ -15,13 +15,6 @@ class C_admission extends Admission_Controler {
         $this->data['NameMenu'] = $this->GlobalData['NameMenu'];
     }
 
-    public function dashboard()
-    {
-      $data['department'] = parent::__getDepartement();
-      $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
-      $this->temp($content);
-    }
-
     public function index()
     {
         $data['department'] = parent::__getDepartement();
