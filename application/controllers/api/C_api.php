@@ -5701,10 +5701,11 @@ class C_api extends CI_Controller {
             $row = $query[$i];
 
             $db_ = 'ta_'.$row['Year'];
-            $dataCourse = $this->db->query('SELECT mk.MKCode, mk.NameEng, s.ClassGroup, s.ID AS ScheduleID  FROM '.$db_.'.study_planning sp 
+            $dataCourse = $this->db->query('SELECT mk.MKCode, mk.NameEng, s.ClassGroup, s.ID AS ScheduleID, em.Name AS Lecturer  FROM '.$db_.'.study_planning sp 
                                                         LEFT JOIN db_academic.schedule s ON (s.ID = sp.ScheduleID)
                                                         LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                                         LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                        LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                                         WHERE sp.SemesterID = "'.$data_arr['SemesterID'].'" 
                                                         AND sp.NPM = "'.$row['NPM'].'"
                                                          GROUP BY sp.ScheduleID ORDER BY mk.MKCode ASC ')->result_array();
@@ -5753,7 +5754,7 @@ class C_api extends CI_Controller {
                     $PersenHadir = ($TotalMeet!=0) ? round($TotalMeet/$MaxMeet,2) * 100 : 0;
 
                     if($PersenHadir <= $data_arr['Percentage']){
-                        $course = $course.' - '.$d['ClassGroup'].' | <span style="color:#03a9f4;">'.$d['MKCode'].' - '.$d['NameEng'].'</span> | Attendance : <b>'.$PersenHadir.' %</b><br/>';
+                        $course = $course.' - '.$d['ClassGroup'].' | <span style="color:#03a9f4;">'.$d['MKCode'].' - '.$d['NameEng'].'</span> | <span style="color:#009688;"><i class="fa fa-user margin-right"></i> '.$d['Lecturer'].' </span>| Attendance : <b>'.$PersenHadir.' %</b><br/>';
                     }
 
                 }
