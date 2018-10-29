@@ -1598,14 +1598,23 @@ class C_api extends CI_Controller {
                 );
                 return print_r(json_encode($result));
             }
-            else if($data_arr['action']=='updateEditCourse'){
+            else if($data_arr['action']=='updateCourse_Edit'){
 
-                // Cek bentrok belum
                 $arrUpdate = (array) $data_arr['formInsert'];
                 $this->db->where('ID', $data_arr['ID']);
                 $this->db->update('db_academic.schedule_details',$arrUpdate);
                 return print_r(1);
 
+            } else if($data_arr['action']=='updateCourse_Add'){
+                $formInsert = (array) $data_arr['formInsert'];
+                $formInsert['ScheduleID'] = $data_arr['ScheduleID'];
+                $this->db->insert('db_academic.schedule_details',$formInsert);
+                return print_r(1);
+
+            } else if($data_arr['action']=='deleteScheduleCourse'){
+                $this->db->where('ID', $data_arr['SDID']);
+                $this->db->delete('db_academic.schedule_details');
+                return print_r(1);
             }
         }
     }
@@ -5658,6 +5667,120 @@ class C_api extends CI_Controller {
         echo json_encode($json_data);
 
 
+    }
+
+    public function getMonitoringAllStudent(){
+        $requestData= $_REQUEST;
+        $data_arr = $this->getInputToken();
+
+//        print_r($data_arr);
+//        exit;
+
+//        $queryDefault = 'SELECT mk.MKCode, s.ID, s.ClassGroup, mk.NameEng FROM db_academic.schedule s
+//                                          LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+//                                          LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+//                                          WHERE s.SemesterID = "'.$data_arr['SemesterID'].'"
+//                                          GROUP BY s.ID ';
+
+        $w_year = ($data_arr['Year']!='' && $data_arr['Year']!=null) ? ' AND auts.Year = "'.$data_arr['Year'].'" ' : '';
+
+        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year 
+                                          FROM db_academic.auth_students auts 
+                                          WHERE auts.StatusStudentID = "3" '.$w_year.' 
+                                          ORDER BY NPM ASC';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+        for($i=0;$i<count($query);$i++) {
+            $nestedData = array();
+            $row = $query[$i];
+
+            $db_ = 'ta_'.$row['Year'];
+            $dataCourse = $this->db->query('SELECT mk.MKCode, mk.NameEng, s.ClassGroup, s.ID AS ScheduleID, em.Name AS Lecturer  FROM '.$db_.'.study_planning sp 
+                                                        LEFT JOIN db_academic.schedule s ON (s.ID = sp.ScheduleID)
+                                                        LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                        LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                        LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                                        WHERE sp.SemesterID = "'.$data_arr['SemesterID'].'" 
+                                                        AND sp.NPM = "'.$row['NPM'].'"
+                                                         GROUP BY sp.ScheduleID ORDER BY mk.MKCode ASC ')->result_array();
+
+            $course = '';
+            if(count($dataCourse)>0){
+                for($c=0;$c<count($dataCourse);$c++){
+                    $d = $dataCourse[$c];
+
+//                    echo 'SELECT attd_s.M1, attd_s.M2, attd_s.M3, attd_s.M4, attd_s.M5, attd_s.M6, attd_s.M7, attd_s.M8, attd_s.M9,
+//                                                            attd_s.M10, attd_s.M11, attd_s.M12, attd_s.M13, attd_s.M14
+//                                                            FROM  db_academic.attendance_students attd_s
+//                                                            LEFT JOIN db_academic.attendance attd ON (attd_s.ID_Attd = attd.ID)
+//                                                            WHERE attd_s.NPM = "'.$row['NPM'].'" AND attd.ScheduleID = "'.$d['ScheduleID'].'"';
+
+                    // Get Attendance
+                    $dataAttd = $this->db->query('SELECT attd_s.M1, attd_s.M2, attd_s.M3, attd_s.M4, attd_s.M5, attd_s.M6, attd_s.M7, attd_s.M8, attd_s.M9,
+                                                            attd_s.M10, attd_s.M11, attd_s.M12, attd_s.M13, attd_s.M14
+                                                            FROM  db_academic.attendance_students attd_s
+                                                            LEFT JOIN db_academic.attendance attd ON (attd_s.ID_Attd = attd.ID)
+                                                            WHERE attd_s.NPM = "'.$row['NPM'].'" AND attd.ScheduleID = "'.$d['ScheduleID'].'" ')->result_array();
+
+                    $dataCourse[$c]['Details'] = $dataAttd;
+
+                    $MaxMeet = 14 * count($dataAttd);
+                    $TotalMeet = 0;
+                    foreach ($dataAttd AS $item){
+
+                        $TotalMeet = ($item['M1']=='1' || $item['M1']==1) ? $TotalMeet + 1 : $TotalMeet + 0;
+                        $TotalMeet = ($item['M2']=='1' || $item['M2']==1) ? $TotalMeet + 1 : $TotalMeet + 0;
+                        $TotalMeet = ($item['M3']=='1' || $item['M3']==1) ? $TotalMeet + 1 : $TotalMeet + 0;
+                        $TotalMeet = ($item['M4']=='1' || $item['M4']==1) ? $TotalMeet + 1 : $TotalMeet + 0;
+                        $TotalMeet = ($item['M5']=='1' || $item['M5']==1) ? $TotalMeet + 1 : $TotalMeet + 0;
+                        $TotalMeet = ($item['M6']=='1' || $item['M6']==1) ? $TotalMeet + 1 : $TotalMeet + 0;
+                        $TotalMeet = ($item['M7']=='1' || $item['M7']==1) ? $TotalMeet + 1 : $TotalMeet + 0;
+                        $TotalMeet = ($item['M8']=='1' || $item['M8']==1) ? $TotalMeet + 1 : $TotalMeet + 0;
+                        $TotalMeet = ($item['M9']=='1' || $item['M9']==1) ? $TotalMeet + 1 : $TotalMeet + 0;
+                        $TotalMeet =  ($item['M10']=='1' || $item['M10']==1) ? $TotalMeet + 1 : $TotalMeet + 0;
+                        $TotalMeet =  ($item['M11']=='1' || $item['M11']==1) ? $TotalMeet + 1 : $TotalMeet + 0;
+                        $TotalMeet =  ($item['M12']=='1' || $item['M12']==1) ? $TotalMeet + 1 : $TotalMeet + 0;
+                        $TotalMeet =  ($item['M13']=='1' || $item['M13']==1) ? $TotalMeet + 1 : $TotalMeet + 0;
+                        $TotalMeet =  ($item['M14']=='1' || $item['M14']==1) ? $TotalMeet + 1 : $TotalMeet + 0;
+
+                    }
+
+                    $PersenHadir = ($TotalMeet!=0) ? round($TotalMeet/$MaxMeet,2) * 100 : 0;
+
+                    if($PersenHadir <= $data_arr['Percentage']){
+                        $course = $course.' - '.$d['ClassGroup'].' | <span style="color:#03a9f4;">'.$d['MKCode'].' - '.$d['NameEng'].'</span> | <span style="color:#009688;"><i class="fa fa-user margin-right"></i> '.$d['Lecturer'].' </span>| Attendance : <b>'.$PersenHadir.' %</b><br/>';
+                    }
+
+                }
+            }
+
+//            print_r($dataCourse);
+//            exit;
+
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$row['NPM'].'</div>';
+            $nestedData[] = '<div  style="text-align:left;">'.$row['Name'].'</div>';
+            $nestedData[] = '<div  style="text-align:left;">'.$course.'</div>';
+
+            $no++;
+            $data[] = $nestedData;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+
+        echo json_encode($json_data);
     }
 
 }

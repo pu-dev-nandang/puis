@@ -392,7 +392,7 @@
             setTimeout(function () {
                 $('#NotificationModal').modal('hide');
                 window.location.href = base_url_js+'dashboard';
-            },1500);
+            },500);
         });
 
 
