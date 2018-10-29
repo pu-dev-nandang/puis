@@ -1455,6 +1455,12 @@ class C_save_to_excel extends CI_Controller
                $title = 'Bulan '.date('F Y', strtotime($SelectYear.'-'.$SelectMonth.'-01'));
                $this->exCel_PenjualanFormulirFinance($title,$get); 
                 break;
+            case 3: // dashboard / per ta
+               $SelectSetTa = $Input['SelectSetTa'];
+               $get = $this->m_admission->getSaleFormulirOfflinePerTA($SelectSetTa);
+               $title = 'Angkatan : '.$SelectSetTa;
+               $this->exCel_PenjualanFormulirFinance($title,$get); 
+                break;    
             default:
                 # code...
                 break;
@@ -2128,10 +2134,18 @@ class C_save_to_excel extends CI_Controller
         $token = $this->input->post('token');
         $key = "UAP)(*";
         $input = (array) $this->jwt->decode($token,$key);
+        $this->load->model('admission/m_admission');
+        // start dari A4
+        $Year = $input['Year'];
+        $Prodi = $input['Prodi'];
+        $getData = $this->m_admission->getDataCalonMhsTuitionFee_approved_ALL($Year,$Prodi);
+        $this->getExcelTuition_fee_admission($getData,$Year,$Prodi);
+    }
+
+    public function getExcelTuition_fee_admission($getData,$Year,$Prodi)
+    {
         $GetDateNow = date('Y-m-d');
         $this->load->model('master/m_master');
-        $this->load->model('finance/m_finance');
-        $this->load->model('admission/m_admission');
         $GetDateNow = $this->m_master->getIndoBulan($GetDateNow);
         // print_r($input['Data']);die();
 
@@ -2157,8 +2171,6 @@ class C_save_to_excel extends CI_Controller
         );
 
         // start dari A4
-        $Year = $input['Year'];
-        $Prodi = $input['Prodi'];
         $a = 4;
         $Filaname = 'Intake_'.$Year.'.xlsx';
         $getData = $this->m_admission->getDataCalonMhsTuitionFee_approved_ALL($Year,$Prodi);

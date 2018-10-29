@@ -174,7 +174,7 @@
         var url = base_url_js+'finance/summary_payment_formulir';
 		$.post(url,function (resultJson) {
 		   var response = jQuery.parseJSON(resultJson);
-		   console.log(response);
+		   // console.log(response);
 		   var ds = new Array();
 
 		   ds.push({

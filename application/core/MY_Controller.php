@@ -18,6 +18,7 @@ class MY_Controller extends CI_Controller {
             // define config Virtual Account
             if (!defined('VA_client_id')) {
                 $this->load->model('master/m_master');
+                $this->load->model('m_menu');
                 $getCFGVA = $this->m_master->showData_array('db_va.cfg_bank');
                 define('VA_client_id',$getCFGVA[0]['client_id'] ,true);
                 define('VA_secret_key',$getCFGVA[0]['secret_key'] ,true);
@@ -201,27 +202,13 @@ abstract class Lpmi extends Globalclass{
 }
 
 abstract class Admission_Controler extends Globalclass{
-    // public $GlobalVariableAdi = array('url_registration' => 'http://10.1.10.230/register/');
     public $GlobalVariableAdi = array('url_registration' => 'http://demo.web.podomorouniversity.ac.id/registeronline/');
     public $GlobalData = array('NameMenu' => '');
 
     public function __construct()
     {
         parent::__construct();
-        // check user auth
-        if (!$this->session->userdata('admission_sess')) {
-            $check = $this->authAdmission();
-            if (!$check) {
-                // not authorize
-                redirect(base_url().'dashboard');
-            }
-            else
-            {
-                if (!$this->session->userdata('auth_admission_sess')) {
-                    $this->getAuthAdmission();
-                }
-            }
-        }
+        $this->m_menu->set_model('admission_sess','auth_admission_sess','menu_admission_sess','menu_admission_grouping','db_admission');
 
         $this->GetNameMenu();
     }
@@ -244,19 +231,6 @@ abstract class Admission_Controler extends Globalclass{
             }
             
         }
-    }
-
-    private function authAdmission()
-    {
-        $NIP = $this->session->userdata('NIP');
-        $this->load->model('master/m_master');
-        $getData = $this->m_master->getUserAdmissionAuth($NIP);
-        if (count($getData) > 0) {
-            $this->session->set_userdata('admission_sess',1);
-            return true;
-        }
-
-        return false;
     }
 
     public function temp($content)
@@ -287,83 +261,11 @@ abstract class Admission_Controler extends Globalclass{
         return $page;
     }
 
-    private function getAuthAdmission()
-    {
-        $data = array();
-        $this->load->model('master/m_master');
-        $getDataMenu = $this->m_master->getMenuGroupUser($this->session->userdata('NIP'),'db_admission');
-        $data_sess = array();
-        if (count($getDataMenu) > 0) {
-            $this->session->set_userdata('auth_admission_sess',1);
-            $this->session->set_userdata('menu_admission_sess',$getDataMenu);
-            $this->session->set_userdata('menu_admission_grouping',$this->groupBYMenu_sess());
-        }
-    }
-
-    public function groupBYMenu_sess()
-    {
-        $DataDB = $this->session->userdata('menu_admission_sess');
-        $this->load->model('master/m_master');
-        $arr = array();
-        for ($i=0; $i < count($DataDB); $i++) {
-            $submenu1 = $this->m_master->getSubmenu1BaseMenu_grouping($DataDB[$i]['ID_menu'],'db_admission');
-            $arr2 = array();
-            for ($k=0; $k < count($submenu1); $k++) { 
-                $submenu2 = $this->m_master->getSubmenu2BaseSubmenu1_grouping($submenu1[$k]['SubMenu1'],'db_admission',$DataDB[$i]['ID_menu']);
-                $arr2[] = array(
-                    'SubMenu1' => $submenu1[$k]['SubMenu1'],
-                    'Submenu' => $submenu2,
-                );
-            }
-
-            if ($i == 0) {
-                // SORTING ASC
-                    usort($arr2, function($a, $b) {
-                        return $a['SubMenu1'] - $b['SubMenu1'];
-                    });
-            }
-            
-
-            $arr[] =array(
-                'Menu' => $DataDB[$i]['Menu'],
-                'Icon' => $DataDB[$i]['Icon'],
-                'Submenu' => $arr2
-
-            );
-            
-        }
-
-        return $arr;
-    }
-
     public function auth_ajax()
     {
         if (!$this->input->is_ajax_request()) {
             exit('No direct script access allowed');
         }
-    }
-
-    public function checkAuth_user()
-    {
-        $base_url = base_url();
-        $currentURL = current_url();
-        $getURL = str_replace($base_url,"",$currentURL);
-        $this->load->model('master/m_master');
-        $chk = $this->m_master->chkAuthDB_Base_URL($getURL);
-
-        if (!$this->input->is_ajax_request()) {
-            if (count($chk) == 0) {
-                show_404($log_error = TRUE); 
-            }
-            else
-            {
-                if ($chk[0]['read'] == 0) {
-                   show_404($log_error = TRUE); 
-                }
-            }
-            
-        }
-        
     }
 
 }

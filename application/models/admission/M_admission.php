@@ -2540,6 +2540,28 @@ class M_admission extends CI_Model {
       return $query;             
     }
 
+    public function getSaleFormulirOfflinePerTA($SelectSetTa)
+    {
+      $sql = 'select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,
+                b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,b.Gender,
+                if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,b.ID_ProgramStudy,
+                y.Name as NameProdi1,b.Channel,
+                if(b.ID_ProgramStudy2 = 0,"", (select Name from db_academic.program_study where ID = b.ID_ProgramStudy2 limit 1) ) as NameProdi2
+                from db_admission.formulir_number_offline_m as a
+                join db_admission.sale_formulir_offline as b
+                on a.FormulirCode = b.FormulirCodeOffline
+                left join db_employees.employees as c
+                on c.NIP = b.PIC
+                left join db_admission.school as z
+                on z.ID = b.SchoolID
+                left join db_academic.program_study as y
+                on b.ID_ProgramStudy = y.ID
+                where a.Years = ? order by a.No_Ref asc
+                ';
+      $query=$this->db->query($sql, array($SelectSetTa))->result_array();
+      return $query;             
+    }
+
     public function getRegisterData($date1,$date2,$SelectSetTa,$SelectSortBy)
     {
       $SelectSortBy = explode(".", $SelectSortBy);

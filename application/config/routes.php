@@ -188,6 +188,10 @@ foreach( $result as $row )
 
 }
 // test routes from db
+$route['admisssion/SummaryFormulirPerSales'] = 'dashboard/c_dashboard/SummaryFormulirPerSales';
+$route['admisssion/SummaryBox'] = 'dashboard/c_dashboard/SummaryBox';
+$route['admission/export_MoreTuitionFee'] = 'c_save_to_excel/export_MoreTuitionFee_admission';
+
 
 $route['admission/database/loadPageStudents'] = 'page/database/c_database/loadPageStudents_admission';
 
@@ -430,11 +434,6 @@ $route['admission/export_PenjualanFormulirData'] = 'c_save_to_excel/export_Penju
 $route['admission/export_PenjualanFormulirFinance'] = 'c_save_to_excel/export_PenjualanFormulirFinance';
 $route['admission/export_PengembalianFormulirData'] = 'c_save_to_excel/export_PengembalianFormulirData';
 $route['admission/TuitionFee_Excel'] = 'c_save_to_excel/export_TuitionFee_Excel';
-
-
-
-
-
 // ---Finance----
 
 $route['finance/dashboard_getoutstanding_today'] =  'dashboard/c_dashboard/dashboard_getoutstanding_today';

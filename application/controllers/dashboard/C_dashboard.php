@@ -11,17 +11,32 @@ class C_dashboard extends Globalclass {
     {
         parent::template($content);
         $this->load->model('master/m_master');
+        $this->load->model('m_menu');
     }
 
     public function index()
     {
         $data['department'] = parent::__getDepartement();
+        $dpt = $this->session->userdata('IDdepartementNavigation');
         // print_r(APPPATH.'views/page/'.$data['department'].'/dashboard.php');die();
         if (file_exists(APPPATH.'views/page/'.$data['department'].'/dashboard.php')) {
-            $getSemester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
-            $data['getSemester'] = $getSemester;
-            $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
-            $this->temp($content);
+            switch ($dpt) {
+                case 10: // admission
+                    $set_ta = $this->m_master->showData_array('db_admission.set_ta');
+                    $data['set_ta'] = $set_ta[0]['Ta'];
+                    $this->m_menu->set_model('admission_sess','auth_admission_sess','menu_admission_sess','menu_admission_grouping','db_admission');
+                    $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
+                    $this->temp($content);
+                    break;
+                
+                default:
+                    $getSemester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+                    $data['getSemester'] = $getSemester;
+                    $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
+                    $this->temp($content);
+                    break;
+            }
+           
         }
         else
         {
@@ -481,9 +496,64 @@ class C_dashboard extends Globalclass {
 
     }
 
-    public function JsonLoadTable($table)
+    public function SummaryFormulirPerSales()
     {
-        
+        $arr_result = array();   
+        // get all grouping from sales
+            $set_ta = $this->m_master->showData_array('db_admission.set_ta');
+            $Ta = $set_ta[0]['Ta'];
+            $sql = 'select a.PIC,if(b.Name IS NULL or b.Name = "","Unknown",b.Name) as Name,count(*) as total from db_admission.sale_formulir_offline as a 
+                    left join db_employees.employees as b on a.PIC = b.NIP
+                    left join db_admission.formulir_number_offline_m as c
+                    on a.FormulirCodeOffline = c.FormulirCode
+                    where c.Years = ?
+                    group by a.PIC
+                    ';
+            $query=$this->db->query($sql, array($Ta))->result_array();
+            for ($i=0; $i < count($query); $i++) { 
+                $Name = explode(" ", trim($query[$i]['Name']));
+                $Name = $Name[0];
+                $arr_result[] = array($i,$query[$i]['total'],$Name);
+            }
+        $arr_json = array('arr_result'=> $arr_result);
+        echo json_encode($arr_json);             
+
+    }
+
+    public function SummaryBox()
+    {
+        $set_ta = $this->m_master->showData_array('db_admission.set_ta');
+        $Ta = $set_ta[0]['Ta'];
+        // valueFormulir
+            $sql = 'select sum(Price_Form) as total from
+                    (
+                        select a.Price_Form from db_admission.sale_formulir_offline as a 
+                            left join db_admission.formulir_number_offline_m as c
+                            on a.FormulirCodeOffline = c.FormulirCode
+                            where c.Years = ?
+                    )aa
+                    ';
+            $query=$this->db->query($sql, array($Ta))->result_array();
+
+        // value tuition fee
+            $sqlTuitionFee = 'select sum(Invoice) as total from(
+                        select e.Invoice
+                        from db_admission.register_formulir as a
+                        left JOIN db_admission.register_verified as b 
+                        ON a.ID_register_verified = b.ID
+                        left JOIN db_admission.register_verification as c
+                        ON b.RegVerificationID = c.ID
+                        left JOIN db_admission.register as d
+                        ON c.RegisterID = d.ID
+                        left join db_finance.payment_pre as e
+                        on a.ID = e.ID_register_formulir
+                        where d.SetTa = ? and e.Status = 1
+                    ) subquery';
+
+            $queryTuitionFee=$this->db->query($sqlTuitionFee, array($Ta))->result_array();
+
+        $arr_json = array('Formulir'=> ($query[0]['total'] == null || $query[0]['total'] == "") ? 0 : $query[0]['total'],'tuition_fee' => ($queryTuitionFee[0]['total'] == null || $queryTuitionFee[0]['total'] == "") ? 0 : $queryTuitionFee[0]['total']);
+        echo json_encode($arr_json);         
     }
 
 
