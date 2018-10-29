@@ -123,7 +123,7 @@
                 "iDisplayLength" : 10,
                 "ordering" : false,
                 "language": {
-                    "searchPlaceholder": "Group, (Co)Lecturer, Classroom"
+                    "searchPlaceholder": "NIM , Name Student"
                 },
                 "ajax":{
                     url : url, // json datasource
