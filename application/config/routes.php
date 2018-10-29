@@ -147,6 +147,7 @@ $route['academic/loadPagePresensi'] = 'page/academic/c_presensi/loadPagePresensi
 
 $route['academic/attendance/monitoring-attendace-lecturer'] = 'page/academic/c_presensi/monitoring_lecturer';
 $route['academic/attendance/monitoring-attendace-student'] = 'page/academic/c_presensi/monitoring_student';
+$route['academic/attendance/monitoring-all-student'] = 'page/academic/c_presensi/monitoring_allstudent';
 $route['academic/attendance/monitoring-schedule-exchange'] = 'page/academic/c_presensi/monitoring_exchange';
 
 
@@ -669,8 +670,13 @@ $route['api/__getScheduleExamLecturer'] = 'api/c_api/getScheduleExamLecturer';
 
 $route['api/__getTimetables'] = 'api/c_api/getTimetables';
 
-
 // === Penutup Timetables ====
+
+// === Monitoring All Student ===
+
+$route['api/__getMonitoringAllStudent'] = 'api/c_api/getMonitoringAllStudent';
+
+// ============================
 
 $route['api/__getListCourseInScore'] = 'api/c_api/getListCourseInScore';
 $route['api/__getMonScoreStd'] = 'api/c_api/getMonScoreStd';

@@ -10,6 +10,9 @@
         <li class="<?php if($this->uri->segment(3)=='monitoring-attendace-student') { echo 'active'; } ?>">
             <a href="<?php echo base_url('academic/attendance/monitoring-attendace-student'); ?>">Monitoring Attd. Student</a>
         </li>
+        <li class="<?php if($this->uri->segment(3)=='monitoring-all-student') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('academic/attendance/monitoring-all-student'); ?>">Monitoring All Student</a>
+        </li>
         <li class="<?php if($this->uri->segment(3)=='monitoring-schedule-exchange') { echo 'active'; } ?>">
             <a href="<?php echo base_url('academic/attendance/monitoring-schedule-exchange'); ?>">Monitoring Schedule Exchange</a>
         </li>

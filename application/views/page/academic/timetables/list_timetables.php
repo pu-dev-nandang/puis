@@ -122,8 +122,6 @@
 
     $(document).on('click','#btnActDeleteTimeTables',function () {
 
-
-
         var ScheduleID = $(this).attr('data-id');
         var SemesterID = $('#filterSemester').val();
 
