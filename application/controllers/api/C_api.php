@@ -5673,21 +5673,21 @@ class C_api extends CI_Controller {
         $requestData= $_REQUEST;
         $data_arr = $this->getInputToken();
 
-//        print_r($data_arr);
-//        exit;
-
-//        $queryDefault = 'SELECT mk.MKCode, s.ID, s.ClassGroup, mk.NameEng FROM db_academic.schedule s
-//                                          LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
-//                                          LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
-//                                          WHERE s.SemesterID = "'.$data_arr['SemesterID'].'"
-//                                          GROUP BY s.ID ';
 
         $w_year = ($data_arr['Year']!='' && $data_arr['Year']!=null) ? ' AND auts.Year = "'.$data_arr['Year'].'" ' : '';
         $w_prodi = ($data_arr['ProdiID']!='' && $data_arr['ProdiID']!=null) ? ' AND auts.ProdiID = "'.$data_arr['ProdiID'].'" ' : '';
 
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $wl = 'LIKE "%'.$search.'%"';
+            $dataSearch = ' AND (auts.NPM '.$wl.' 
+                                    OR auts.Name '.$wl.')';
+        }
+
         $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year 
                                           FROM db_academic.auth_students auts 
-                                          WHERE auts.StatusStudentID = "3" '.$w_year.' '.$w_prodi.' 
+                                          WHERE ( auts.StatusStudentID = "3" '.$w_year.' '.$w_prodi.' ) '.$dataSearch.' 
                                           ORDER BY NPM ASC';
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
