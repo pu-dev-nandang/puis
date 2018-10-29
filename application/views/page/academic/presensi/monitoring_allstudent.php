@@ -28,7 +28,7 @@
                 </div>
                 <div class="col-md-2">
                     <div class="input-group">
-                        <span class="input-group-addon">Under</span>
+                        <span class="input-group-addon">&le;</span>
                         <input type="number" id="formPercentage" class="form-control" placeholder="Under" value="100">
                         <span class="input-group-addon" id="basic-addon2">%</span>
                     </div>
