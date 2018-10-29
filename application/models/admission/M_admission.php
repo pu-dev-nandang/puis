@@ -2568,7 +2568,7 @@ class M_admission extends CI_Model {
       $SelectSortBy = ($SelectSortBy[1] == "No_Ref" || $SelectSortBy[1] == "FormulirCode") ? 'c.FormulirCode' : 'a.RegisterAT';
       $this->load->model('master/m_master');
       $sql = '
-              select c.FormulirCode,a.RegisterAT,a.Name,e.Gender,e.PlaceBirth,e.DateBirth,ac.Nama as Agama,ad.ctr_name,d.NameEng, e.PhoneNumber,xz.HomeNumber,
+              select c.FormulirCode,a.RegisterAT,a.Name,e.Gender,e.PlaceBirth,e.DateBirth,ac.Nama as Agama,ad.ctr_name,d.NameEng,d.Name as NamaProdi, e.PhoneNumber,xz.HomeNumber,
             a.Email,ae.JacketSize,ab.src_name,CONCAT(e.Address," ",e.District," ",af.DistrictName) as alamat,ag.ProvinceName,
             xx.Name as NameSales,a.StatusReg,a.SchoolID,e.ID as ID_register_formulir,
             e.FatherName,e.FatherStatus,e.FatherPhoneNumber,ah.ocu_name as FatherJob,e.FatherAddress,e.MotherName,MotherStatus,e.MotherPhoneNumber,
@@ -2720,7 +2720,7 @@ class M_admission extends CI_Model {
       $SelectSortBy = ($SelectSortBy[1] == "No_Ref" || $SelectSortBy[1] == "FormulirCode") ? 'c.FormulirCode' : 'a.RegisterAT';
       $this->load->model('master/m_master');
       $sql = '
-              select c.FormulirCode,a.RegisterAT,a.Name,e.Gender,e.PlaceBirth,e.DateBirth,ac.Nama as Agama,ad.ctr_name,d.NameEng, e.PhoneNumber,xz.HomeNumber,
+              select c.FormulirCode,a.RegisterAT,a.Name,e.Gender,e.PlaceBirth,e.DateBirth,ac.Nama as Agama,ad.ctr_name,d.NameEng,d.Name as NamaProdi, e.PhoneNumber,xz.HomeNumber,
             a.Email,ae.JacketSize,ab.src_name,CONCAT(e.Address," ",e.District," ",af.DistrictName) as alamat,ag.ProvinceName,
             xx.Name as NameSales,a.StatusReg,a.SchoolID,e.ID as ID_register_formulir,
             e.FatherName,e.FatherStatus,e.FatherPhoneNumber,ah.ocu_name as FatherJob,e.FatherAddress,e.MotherName,MotherStatus,e.MotherPhoneNumber,

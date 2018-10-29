@@ -1642,7 +1642,7 @@ class C_save_to_excel extends CI_Controller
            $excel3->setCellValue('F'.$a, $data[$i]['PlaceBirth'].', '.date('d M Y', strtotime($data[$i]['DateBirth'])) );
            $excel3->setCellValue('G'.$a, $data[$i]['Agama']);
            $excel3->setCellValue('H'.$a, $data[$i]['ctr_name']);
-           $excel3->setCellValue('I'.$a, $data[$i]['NameEng']);
+           $excel3->setCellValue('I'.$a, $data[$i]['NamaProdi']);
            $excel3->setCellValue('J'.$a, '');
            $excel3->setCellValue('K'.$a, $data[$i]['PhoneNumber']);
            $excel3->setCellValue('L'.$a, $data[$i]['HomeNumber']);

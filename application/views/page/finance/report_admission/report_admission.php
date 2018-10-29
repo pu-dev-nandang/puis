@@ -276,7 +276,8 @@
 	    $('#SelectYear').empty();
 	    for (var i = 0; i <= selisih; i++) {
 	      var selected = (i==(selisih)) ? 'selected' : '';
-	      $('#SelectYear').append('<option value="'+ ( parseInt(startTahun) + parseInt(i) ) +'" '+selected+'>'+( parseInt(startTahun) + parseInt(i) )+'</option>');
+	      var selected2 = (i==(selisih - 1)) ? 'selected' : '';
+	      $('#SelectYear').append('<option value="'+ ( parseInt(startTahun) + parseInt(i) ) +'" '+selected2+'>'+( parseInt(startTahun) + parseInt(i) )+'</option>');
 	      $('#SelectSetTa').append('<option value="'+ ( parseInt(startTahun) + parseInt(i) ) +'" '+selected+'>'+( parseInt(startTahun) + parseInt(i) )+'</option>');
 	      $('#SelectYearDataMHS').append('<option value="'+ ( parseInt(startTahun) + parseInt(i) ) +'" '+selected+'>'+( parseInt(startTahun) + parseInt(i) )+'</option>');
 	    }
