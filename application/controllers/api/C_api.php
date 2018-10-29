@@ -5683,10 +5683,11 @@ class C_api extends CI_Controller {
 //                                          GROUP BY s.ID ';
 
         $w_year = ($data_arr['Year']!='' && $data_arr['Year']!=null) ? ' AND auts.Year = "'.$data_arr['Year'].'" ' : '';
+        $w_prodi = ($data_arr['ProdiID']!='' && $data_arr['ProdiID']!=null) ? ' AND auts.ProdiID = "'.$data_arr['ProdiID'].'" ' : '';
 
         $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year 
                                           FROM db_academic.auth_students auts 
-                                          WHERE auts.StatusStudentID = "3" '.$w_year.' 
+                                          WHERE auts.StatusStudentID = "3" '.$w_year.' '.$w_prodi.' 
                                           ORDER BY NPM ASC';
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
@@ -5754,7 +5755,9 @@ class C_api extends CI_Controller {
                     $PersenHadir = ($TotalMeet!=0) ? round($TotalMeet/$MaxMeet,2) * 100 : 0;
 
                     if($PersenHadir <= $data_arr['Percentage']){
-                        $course = $course.' - '.$d['ClassGroup'].' | <span style="color:#03a9f4;">'.$d['MKCode'].' - '.$d['NameEng'].'</span> | <span style="color:#009688;"><i class="fa fa-user margin-right"></i> '.$d['Lecturer'].' </span>| Attendance : <b>'.$PersenHadir.' %</b><br/>';
+                        $course = $course.'<div> - '.$d['ClassGroup'].' | <span style="color:#03a9f4;">'.$d['MKCode'].' - '.$d['NameEng'].'</span> | <span style="color:#009688;"><i class="fa fa-user margin-right"></i> '.$d['Lecturer'].' </span>| Attendance : <b>'.$PersenHadir.' %</b></div>';
+                    } else if($PersenHadir > $data_arr['Percentage']){
+                        $course = $course.' <div style="color:#ccc;">- '.$d['ClassGroup'].' | '.$d['MKCode'].' - '.$d['NameEng'].' | <i class="fa fa-user margin-right"></i> '.$d['Lecturer'].' | Attendance : <b>'.$PersenHadir.' %</b></div>';
                     }
 
                 }
