@@ -410,7 +410,7 @@
             var kurikulum = $('#selectKurikulum').find(':selected').val().split('.');
             var CurriculumID = kurikulum[0];
             var Semester = '<?php echo $semester; ?>';
-            var CurriculumTypeID = $('#ModalJenisKurikulum').find(':selected').val();
+            var CurriculumTypeID = $('#ModalJenisKurikulum').val();
 
 
             var ModalSelectProdi = $('#ModalSelectProdi').find(':selected').val();
@@ -458,7 +458,8 @@
         // var LecturerNIP = $('#ModalLecturers').val();
         // process = formRequiredError(LecturerNIP,'#s2id_ModalLecturers');
 
-        var CoursesGroupsID = $('#ModalKelompokMK').find(':selected').val();
+        var ModalKelompokMK = $('#ModalKelompokMK').val();
+        var CoursesGroupsID = (ModalKelompokMK!='' && ModalKelompokMK!=null) ? ModalKelompokMK : null;
         var TotalSKS = $('#ModalFormTotalSKS').val();
         process.push(formRequiredError(TotalSKS,'#ModalFormTotalSKS'));
         var SKSTeori = $('#ModalFormSKSTeori').val();
