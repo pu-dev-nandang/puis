@@ -45,7 +45,7 @@ class M_menu extends CI_Model {
           $check = $this->auth();
           if (!$check) {
               // not authorize
-              redirect(base_url().'dashboard');
+              redirect(base_url().'/');
           }
           else
           {
