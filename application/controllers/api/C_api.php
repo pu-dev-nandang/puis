@@ -5639,7 +5639,7 @@ class C_api extends CI_Controller {
                                                     FROM db_academic.schedule_details_course sdc
                                                     LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                                     LEFT JOIN db_academic.course_offerings co ON (co.CurriculumID = cd.CurriculumID)
-                                                    WHERE sdc.ScheduleID = "'.$row['ID'].'" AND SDC.pRODIid = "'.$dataProdi[$p]['ProdiID'].'" 
+                                                    WHERE sdc.ScheduleID = "'.$row['ID'].'" AND sdc.ProdiID = "'.$dataProdi[$p]['ProdiID'].'" 
                                                     AND co.ProdiID = "'.$dataProdi[$p]['ProdiID'].'" AND co.SemesterID = "'.$data_arr['SemesterID'].'"
                                                     ORDER BY co.Semester ASC ')->result_array();
                     $smt = '';
