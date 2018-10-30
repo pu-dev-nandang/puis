@@ -141,7 +141,6 @@
 
         var Prodi = $(this).val();
         if(Prodi!=''){
-
             var ProdiID = Prodi.split('.')[0];
             getCourseOfferings(ProdiID,'');
         }
@@ -256,7 +255,6 @@
 
         $.post(url,{token:token},function (jsonResult) {
 
-
            if(jsonResult.ScheduleDetails.length>0){
                $('#dataRow').empty();
                for(var i=0;i<jsonResult.ScheduleDetails.length;i++){
@@ -270,7 +268,6 @@
                        '<td>'+d.TotalStd_Approve.length+'</td>' +
                        '<td><button class="btn btn-sm btn-default btn-default-danger btnDelEditCourse" data-totalcourse="'+jsonResult.ScheduleDetails.length+'" data-sdc="'+d.SDCID+'"><i class="fa fa-trash"></i></button></td>' +
                        '</tr>');
-
                }
            }
 
@@ -374,16 +371,13 @@
             $.post(url,{token:token},function (jsonResult) {
 
                 $('#formClassGroup').css('border','1px solid #ccc');
-
                 setTimeout(function () {
-
                     if(jsonResult.Status==0 || jsonResult.Status=='0'){
                         toastr.warning('Class Group is exist','Warning');
                         $('#formClassGroup').css('border','1px solid red');
                     } else {
                         toastr.success('Update data saved','Success');
                     }
-
                     $('#btnSaveEditInfo').prop('disabled',false).html('Save');
                 },500);
             });

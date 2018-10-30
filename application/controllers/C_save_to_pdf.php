@@ -27,10 +27,12 @@ class C_save_to_pdf extends CI_Controller {
     public function schedulePDF(){
 
         $token = $this->input->get('token');
+
+        if(!isset($token)){
+            $token = $this->input->post('token');
+        }
+
         $data_arr = $this->getInputToken($token);
-
-
-
 
         $pdf = new FPDF('l','mm','A4');
 
@@ -54,7 +56,6 @@ class C_save_to_pdf extends CI_Controller {
                 for($m=0;$m<count($dataCourse);$m++){
 
                     $d_course = $dataCourse[$m];
-
 
                     $w = (count($d_course['detailTeamTeaching'])>0) ? (count($d_course['detailTeamTeaching'])+1) * $deft_w : $deft_w;
 

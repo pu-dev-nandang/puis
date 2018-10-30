@@ -1421,6 +1421,21 @@ class C_api extends CI_Controller {
                 $this->db->where('ScheduleID', $ScheduleID);
                 $this->db->delete($tables);
 
+
+                // Delete Attendance
+                $dataAttd = $this->db->query('SELECT attd.ID FROM db_academic.attendance attd 
+                                                            WHERE attd.SemesterID = "'.$SemesterID.'" 
+                                                            AND attd.ScheduleID = "'.$ScheduleID.'" ')->result_array();
+
+                if(count($dataAttd)>0){
+                    for($i=0;$i<count($dataAttd);$i++){
+                        // Delete Attendance Students
+                        $this->db->where('ID_Attd',$dataAttd[$i]['ID']);
+                        $this->db->delete('db_academic.attendance_students');
+                        $this->db->reset_query();
+                    }
+                }
+
                 return print_r(1);
             }
             else if($data_arr['action']=='loadEditCourse'){
@@ -1523,7 +1538,6 @@ class C_api extends CI_Controller {
                 // Delete KRS yang sudah approve
                 $dataCL = $this->m_api->getClassOf();
                 foreach ($dataCL AS $itm){
-
                     $db_ = 'ta_'.$itm['Year'];
                     // Cek DB Exist
                     $dbExist = $this->db->query('SELECT SCHEMA_NAME 
@@ -1532,12 +1546,28 @@ class C_api extends CI_Controller {
                     if(count($dbExist)>0){
                         $this->db->where($whereDelete);
                         $this->db->delete($db_.'.study_planning');
+                        $this->db->reset_query();
                     }
                 }
 
                 // Delete
                 $this->db->where('ID',$SDCID);
                 $this->db->delete('db_academic.schedule_details_course');
+
+
+                // Delete Attendance
+                $dataAttd = $this->db->query('SELECT attd.ID FROM db_academic.attendance attd 
+                                                            WHERE attd.SemesterID = "'.$SemesterID.'" 
+                                                            AND attd.ScheduleID = "'.$ScheduleID.'" ')->result_array();
+
+                if(count($dataAttd)>0){
+                    for($i=0;$i<count($dataAttd);$i++){
+                        // Delete Attendance Students
+                        $this->db->where('ID_Attd',$dataAttd[$i]['ID']);
+                        $this->db->delete('db_academic.attendance_students');
+                        $this->db->reset_query();
+                    }
+                }
 
                 return print_r(1);
 
@@ -1591,7 +1621,8 @@ class C_api extends CI_Controller {
                                                               LEFT JOIN db_academic.days d ON (d.ID=sd.DayID)
                                                               LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
                                                               WHERE s.ID = "'.$ScheduleID.'" 
-                                                              AND s.SemesterID = "'.$SemesterID.'" ')->result_array();
+                                                              AND s.SemesterID = "'.$SemesterID.'"
+                                                              ORDER BY d.ID ASC ')->result_array();
 
                 $result = array(
                     'dataSchedule' => $dataSchedule
@@ -5608,8 +5639,8 @@ class C_api extends CI_Controller {
                                                     FROM db_academic.schedule_details_course sdc
                                                     LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                                     LEFT JOIN db_academic.course_offerings co ON (co.CurriculumID = cd.CurriculumID)
-                                                    WHERE sdc.ScheduleID = "'.$row['ID'].'" AND co.ProdiID = "'.$dataProdi[$p]['ProdiID'].'"
-                                                    AND co.SemesterID = "'.$data_arr['SemesterID'].'"
+                                                    WHERE sdc.ScheduleID = "'.$row['ID'].'" AND SDC.pRODIid = "'.$dataProdi[$p]['ProdiID'].'" 
+                                                    AND co.ProdiID = "'.$dataProdi[$p]['ProdiID'].'" AND co.SemesterID = "'.$data_arr['SemesterID'].'"
                                                     ORDER BY co.Semester ASC ')->result_array();
                     $smt = '';
                     if(count($dataSMT)>0){
