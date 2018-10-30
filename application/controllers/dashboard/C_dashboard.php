@@ -22,7 +22,7 @@ class C_dashboard extends Globalclass {
         if (file_exists(APPPATH.'views/page/'.$data['department'].'/dashboard.php')) {
             switch ($dpt) {
                 case 10: // admission
-                case 18: // admission
+                case 18: // BA
                     $set_ta = $this->m_master->showData_array('db_admission.set_ta');
                     $data['set_ta'] = $set_ta[0]['Ta'];
                     $this->m_menu->set_model('admission_sess','auth_admission_sess','menu_admission_sess','menu_admission_grouping','db_admission');
