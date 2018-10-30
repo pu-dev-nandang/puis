@@ -2470,4 +2470,11 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             return $rmw[intval($get)];
         }
     }
+
+    public function dateDiffDays ($d1, $d2) {   
+    // Return the number of days between the two dates:
+
+      return round(abs(strtotime($d1)-strtotime($d2))/86400);
+
+    }  // end function dateDiff
 }

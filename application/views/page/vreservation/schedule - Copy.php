@@ -21,8 +21,20 @@
 		color: #fff;
 		font-weight: bold;
 		text-align: center;
-		padding: 7px;
+		padding: 1px;
 		background: #e98180;
+	    /*max-width: 100px;*/
+	    height: 45px;
+	    border: 1px dotted #333;
+	}
+
+	.panel-green {
+		font-size: 10px;
+		color: #fff;
+		font-weight: bold;
+		text-align: center;
+		padding: 1px;
+		background: #20c51b;
 	    /*max-width: 100px;*/
 	    height: 45px;
 	    border: 1px dotted #333;
@@ -32,7 +44,7 @@
 		color: #fff;
 		font-weight: bold;
 		text-align: center;
-		padding: 7px;
+		padding: 1px;
 		background: #6ba5c1;
 	    /*max-width: 100px;*/
 	    height: 45px;
@@ -43,84 +55,130 @@
 		color: #fff;
 		font-weight: bold;
 		text-align: center;
-		padding: 7px;
+		padding: 1px;
 		background: #ffb848;
 	    /*max-width: 100px;*/
 	    height: 45px;
 	    border: 1px dotted #333;
 	}
 
-	.table-responsive {
-	  height: 500px;
+	/*.table-responsive {
+	  
+	  height: auto !important;  
+	  max-height: 450px;
 	  overflow-y: auto;
-	}
+	}*/
 
+	.pointer {cursor: pointer;}
+
+
+	#tblFreeze tbody {
+	    display:block;
+	    height:520px;
+	    overflow:auto;
+	}
+	#tblFreeze thead,#tblFreeze tbody tr {
+	    display:table;
+	    width:100%;
+	    table-layout:fixed; /* even columns width , fix width of table too*/
+	}
+	#tblFreeze thead {
+	    /*width: calc( 100% - 1em ) scrollbar is average 1em/16px width, remove it from thead width */
+	     width: calc( 100% - 1.2em )
+	}
+	#tblFreeze table {
+	    width:400px;
+	}
 
 </style>
 
-
-<div class="table-responsive" style="overflow-x:auto;">
-	<table class="table table-bordered table2">
+<div class="table-responsive table-area" style="overflow-x:auto;">
+	<table class="table table-bordered table2" id = "tblFreeze">
 	    <thead>
-	    	<th class="fixed-side">
-	    		Room
-	    	</th>
-	    	<?php for($i = 0; $i < count($arrHours); $i++): ?>
-	    		<th colspan="2" style="text-align: center;"><?php echo $arrHours[$i] ?></th>
-	    	<?php endfor ?>   
+	    	<tr>
+	    		<!-- <pre><?php //print_r($data_pass) ?></pre> -->
+		    	<th width="6%">
+		    		Room
+		    	</th>
+		    	<?php for($i = 0; $i < count($arrHours); $i= $i + 2): ?>
+		    		<th colspan="2" style="text-align: left;"><?php echo $arrHours[$i] ?></th>
+		    	<?php endfor ?>
+		    </tr>	   
 	    </thead>
 	    <tbody>
 	    	<?php for($i = 0; $i < count($getRoom); $i++): ?>
 	    		<tr>
-	    			<td width="4%"><?php echo $getRoom[$i]['Room'] ?></td>
-	    			<?php $a = $i ?>
-	    			<?php $b = $i ?>
-	    			<?php $countTD = count($arrHours) * 2 ?>
-	    			<?php $colspan = 2 ?>
-	    			<?php for($j = 0; $j < count($arrHours); $j++): ?>
-	    				<?php if ($countTD <= 1): ?>
-	    					<?php $colspan = 1 ?>
-	    				<?php endif ?>
-	    				<?php if ($j == $a): ?>
-	    					<?php if ($i > 5): ?>
-	    						<td><div class="panel-blue" id = "droppable"><span>Available</span></div></td>
-	    						<td style="width: 72px;height: 20px;" colspan="<?php echo $colspan ?>">
-	    							<div class="panel-red" id = "draggable"><span>Booked <br>by User 3</span></div>
-	    						</td>
-	    						<?php $countTD = $countTD - $colspan + 1 ?>	
-	    					<?php else: ?>
-	    						<td style="width: 72px;height: 20px;" colspan="<?php echo $colspan ?>">
-	    							<div class="panel-red" id = "draggable"><span>Booked <br>by User 1</span></div>
-	    						</td>
-	    						<?php $countTD = $countTD - $colspan ?>	
-	    					<?php endif ?>
-	    					<?php $a= $a+2 ?>
-	    				<?php elseif($j == $b): ?>
-		    				<td style="width: 72px;height: 20px;" colspan="<?php echo $colspan ?>">
-		    					<div class="panel-orange"><span>Requested <br>by User 2</span></div>
-		    				</td>
-		    				<?php $a = $a -1 ?>	
-		    				<?php $b = $b -1 ?>
-		    				<?php $countTD = $countTD - $colspan ?>	
-		    			<?php else: ?>
-		    				<td style="width: 72px;height: 20px;">
-		    					<div class="panel-blue" id = "droppable"><span>Available</span></div>
-							</td>
-		    				<td>
-		    					<div class="panel-blue" id = "droppable"><span>Available</span></div>
-		    				</td>
-		    				<?php $countTD = $countTD - 2 ?>	
-		    				<?php $b = $b+3 ?>
-		    				<?php $a = $a-2 ?>	
-	    				<?php endif ?>
-	    				<?php $a++ ?>
-	    			<?php endfor ?>  	
+	    			<td width="6%"><?php echo $getRoom[$i]['Room'] ?></td>
+					<?php $countTD =  count($arrHours) ?>
+						<?php for($j = 0; $j < $countTD; $j++): ?>
+							<?php $bool = false ?>
+							<?php for($k = 0; $k < count($data_pass); $k++): ?>
+								<?php $implode = implode('@@', $data_pass[$k]) ?>
+								<?php $converDTS = date("h:i a", strtotime($data_pass[$k]['start'])); ?>
+								<?php $converDTE = date("h:i a", strtotime($data_pass[$k]['end'])); ?>
+								<?php if ($data_pass[$k]['room'] == $getRoom[$i]['Room'] && $converDTS == $arrHours[$j]): ?>
+									<?php if ($data_pass[$k]['approved'] == 1): ?>
+										<?php 
+											$bc = '#e98180';
+											$bc2 = 'panel-red';
+											if ($data_pass[$k]['NIP'] != 0) {
+												$bc = '#20c51b';
+												$bc2 = 'panel-green';
+												$NamaMataKuliah = '';
+												$NamaDosen = '';
+												$jumlahMHS = '';
+												$Details = $data_pass[$k]['user'];
+											}
+											else
+											{
+												$NamaMataKuliah = $data_pass[$k]['NamaMataKuliah'];
+												$NamaDosen = $data_pass[$k]['NamaDosen'];
+												$jumlahMHS = $data_pass[$k]['jumlahMHS'];
+												$Details = $NamaMataKuliah.' / '.$NamaDosen.' / '.$jumlahMHS;
+												if ($data_pass[$k]['user'] == 'Academic TimeTables EX') {
+													$Details = $data_pass[$k]['user'].'<br>'.$NamaMataKuliah.' / '.$NamaDosen.' / '.$jumlahMHS;
+												}
+											}
+										?>
+										<td class="<?php echo $bc2 ?> pointer" style="background-color: <?php echo $bc ?>;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>&#013;<?php echo 'Request : '.$data_pass[$k]['user'] ?>&#013;Agenda : <?php echo $data_pass[$k]['agenda'] ?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>">
+											<?php echo $Details ?>
+											<!-- <div class="panel-red pointer" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>"><span><?php echo $data_pass[$k]['user'] ?></span></div> -->
+										</td>
+										<?php $bool = true ?>
+										<?php $j = $j + (int)$data_pass[$k]['colspan'] - 1 ?>
+										<?php break; ?>
+									<?php else: ?>
+										<td class="panel-orange pointer" style="background-color: #ffb848;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $converDTS ?>-<?php echo $converDTE?>&#013;<?php echo 'Request : '.$data_pass[$k]['user'] ?>&#013;Agenda : <?php echo $data_pass[$k]['agenda'] ?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>"><span><?php echo $data_pass[$k]['user'] ?></span>
+											<!-- <div class="panel-orange pointer" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $converDTS ?>-<?php echo $converDTE?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>"><span><?php echo $data_pass[$k]['user'] ?></span></div> -->
+										</td>
+										<?php $bool = true ?>
+										<?php $j = $j + (int)$data_pass[$k]['colspan'] - 1 ?>
+										<?php break; ?>	
+									<?php endif ?>
+								<?php endif ?>
+							<?php endfor ?>
+							<?php if (!$bool): ?>
+								<td style="background-color: #6ba5c1;" class="panel-blue pointer" id = "droppable" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $arrHours[$j]?>">
+		    							<!-- <div class="panel-blue pointer" id = "droppable" room = "<?php echo $getRoom[$i]['Room'] ?>" title="<?php echo $arrHours[$j]?>"><span></span></div> -->
+								</td>			
+							<?php endif ?>	
+						<?php endfor ?>		
 	    		</tr>
 	    	<?php endfor ?>   
 	    </tbody>
 	</table>
 </div>
 <script type="text/javascript">
+	getRoom = <?php echo json_encode($getRoom)  ?>;
+	arrHours = <?php echo json_encode($arrHours)  ?>;
+	data_pass = <?php echo json_encode($data_pass)  ?>;
+
+	$( function() {
+    	//$( document ).tooltip();
+    	$(".panel-red").hover();
+    	$(".panel-blue").hover();
+    	$(".panel-orange").hover();
+  	} );
 	// $( "#draggable" ).draggable();
 	//$( "#draggable3" ).draggable({ containment: "#containment-wrapper", scroll: false });
 	/*$( ".panel-red" ).draggable({
@@ -134,14 +192,17 @@
     });*/
 
 
-    $( "tr" ).sortable({
+    /*$( "tr" ).sortable({
           revert: true
-    });
+    });*/
     /*$( ".panel-red" ).draggable({
       connectToSortable: "tr",
       helper: "clone",
       revert: "invalid"
     });*/
-    $( "tr" ).disableSelection();
+    // $( "tr" ).disableSelection();
 
+    /*$(document).ready(function () {
+        LoaddataTableStandard('.table2');
+    });*/
 </script>

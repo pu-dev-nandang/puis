@@ -723,9 +723,9 @@ class C_transaksi extends Vreservation_Controler {
         $content = $this->load->view($this->pathView.'transaksi/page_booking_cancel','',true);
         $this->temp($content);
     }
-    public function cancel_reservation()
+    public function data_reservation()
     {
-        $content = $this->load->view($this->pathView.'transaksi/page_cancel_reservation','',true);
+        $content = $this->load->view($this->pathView.'transaksi/page_data_reservation','',true);
         $this->temp($content);
     }
 

@@ -115,7 +115,7 @@
                         <?php } ?>
                         <?php if(in_array(5,$rule_service)){ ?>
                             <li class="<?php if($this->uri->segment(1)=='vreservation'){echo 'active';} ?>">
-                                <a href="<?php echo base_url('vreservation/dashboard/view'); ?>"><i class="fa fa-th-large" aria-hidden="true"></i> Venue Reservation</a>
+                                <a href="<?php echo base_url('vreservation'); ?>"><i class="fa fa-th-large" aria-hidden="true"></i> Venue Reservation</a>
                             </li>
 <!--                            <li class="divider"></li>-->
                         <?php } ?>

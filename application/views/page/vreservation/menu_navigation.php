@@ -1,6 +1,8 @@
 <div id="sidebar" class="sidebar-fixed">
     <div id="sidebar-content">
+
         <!--=== Navigation ===-->
+
         <ul id="nav">
             <?php 
                 $getData  = $this->session->userdata('menu_vreservation_grouping');
@@ -78,82 +80,92 @@
                     ?>
                     <?php $uriSubMenu1 = $SubMenu1_arr[0]['Submenu'][0]['Slug'] ?>
                     <?php $uriSubMenu1 = explode('/', $uriSubMenu1)  ?>
-                    <?php $uriSubMenu1 = $uriSubMenu1[1]  ?>
-                    <li segment2 = "<?php echo $uriSubMenu1 ?>" class="<?php if($this->uri->segment(2)==$uriSubMenu1){echo "current ".$open;} ?>">
-                        <a href="<?php echo $a = ($open == 'open') ? '#' : $uri ?>">
-                            <i class="<?php echo ($getData[$i]['Menu'] == '' || $getData[$i]['Menu'] == null) ? 'fa fa-globe' :  $getData[$i]['Icon'] ?>" aria-hidden="true"></i>
-                                <?php echo $getData[$i]['Menu'] ?>
-                        </a>
-                        <?php if (count($temp) > 0 ): ?>
-                            <ul class="sub-menu">
-                                <?php for($z = 0; $z < count($temp); $z++): ?>
-                                    <?php if ($temp[$z]['CountSubMenu2'] > 0): ?>
-                                        <?php $uriSubMenu2 = $temp[$z]['data'][0]['Slug'] ?>
-                                        <?php $uriSubMenu2 = explode('/', $temp[$z]['data'][0]['Slug'])  ?>
-                                        <?php $uriSubMenu2 = $uriSubMenu2[2]  ?>
-                                        <li class="<?php if($this->uri->segment(2)==$uriSubMenu1 && $this->uri->segment(3) == $uriSubMenu2 ){echo "open-default";} ?>">
-                                            <a href="javascript:void(0);">
-                                                <i class="icon-angle-right"></i>
-                                                    <?php echo $temp[$z]['SubMenu1'] ?>
-                                            </a>
-                                            <ul class="sub-menu">
-                                                <?php $countS2 = $temp[$z]['data'] ?>
-                                                <?php for($x = 0; $x < count($countS2); $x++): ?>
-                                                    <?php $Uri3 = $countS2[$x]['Slug'] ?>
-                                                    <?php $t = explode('/', $Uri3)  ?>
-                                                    <?php $Uri3 = $t[3]  ?>
-                                                    <?php 
-                                                    $URI_Slug = $countS2[$x]['Slug'];
-                                                    $URI_Slug = explode('/', $URI_Slug);
-                                                    $URISlug = $countS2[$x]['Slug'];
-                                                    if (in_array('(:any)', $URI_Slug)) {
-                                                       $a = count($URI_Slug) - 1;
-                                                       $URISlug = '';
-                                                       for ($ii=0; $ii < $a; $ii++) { 
-                                                        $URISlug .= $URI_Slug[$ii].'/';
-                                                       }
-                                                       $URISlug = $URISlug.'1';
-                                                    }
+                    <?php if (array_key_exists(1, $uriSubMenu1)): ?>
+                        <?php $uriSubMenu1 = $uriSubMenu1[1]  ?>
+                        <li segment2 = "<?php echo $uriSubMenu1 ?>" class="<?php if($this->uri->segment(2)==$uriSubMenu1){echo "current ".$open;} ?>">
+                            <a href="<?php echo $a = ($open == 'open') ? '#' : $uri ?>">
+                                <i class="<?php echo ($getData[$i]['Menu'] == '' || $getData[$i]['Menu'] == null) ? 'fa fa-globe' :  $getData[$i]['Icon'] ?>" aria-hidden="true"></i>
+                                    <?php echo $getData[$i]['Menu'] ?>
+                            </a>
+                            <?php if (count($temp) > 0 ): ?>
+                                <ul class="sub-menu">
+                                    <?php for($z = 0; $z < count($temp); $z++): ?>
+                                        <?php if ($temp[$z]['CountSubMenu2'] > 0): ?>
+                                            <?php $uriSubMenu2 = $temp[$z]['data'][0]['Slug'] ?>
+                                            <?php $uriSubMenu2 = explode('/', $temp[$z]['data'][0]['Slug'])  ?>
+                                            <?php $uriSubMenu2 = $uriSubMenu2[2]  ?>
+                                            <li class="<?php if($this->uri->segment(2)==$uriSubMenu1 && $this->uri->segment(3) == $uriSubMenu2 ){echo "open-default";} ?>">
+                                                <a href="javascript:void(0);">
+                                                    <i class="icon-angle-right"></i>
+                                                        <?php echo $temp[$z]['SubMenu1'] ?>
+                                                </a>
+                                                <ul class="sub-menu">
+                                                    <?php $countS2 = $temp[$z]['data'] ?>
+                                                    <?php for($x = 0; $x < count($countS2); $x++): ?>
+                                                        <?php $Uri3 = $countS2[$x]['Slug'] ?>
+                                                        <?php $t = explode('/', $Uri3)  ?>
+                                                        <?php $Uri3 = $t[3]  ?>
+                                                        <?php 
+                                                        $URI_Slug = $countS2[$x]['Slug'];
+                                                        $URI_Slug = explode('/', $URI_Slug);
+                                                        $URISlug = $countS2[$x]['Slug'];
+                                                        if (in_array('(:any)', $URI_Slug)) {
+                                                           $a = count($URI_Slug) - 1;
+                                                           $URISlug = '';
+                                                           for ($ii=0; $ii < $a; $ii++) { 
+                                                            $URISlug .= $URI_Slug[$ii].'/';
+                                                           }
+                                                           $URISlug = $URISlug.'1';
+                                                        }
 
-                                                     ?>
-                                                    <li segment2 = "<?php echo $uriSubMenu1 ?>" segment3  = "<?php echo $Uri3 ?>" class="<?php if($this->uri->segment(2)==$uriSubMenu1 && $this->uri->segment(3) == $uriSubMenu2 && $this->uri->segment(4) == $Uri3 && $this->uri->segment(5) == ""){echo "current";} ?>">
-                                                        <a href="<?php echo base_url($URISlug); ?>">
-                                                            <i class="icon-angle-right"></i>
-                                                            <?php echo $countS2[$x]['SubMenu2'] ?>
-                                                        </a>
-                                                    </li>
-                                                <?php endfor ?>      
-                                            </ul>
-                                        </li>
-                                    <?php else: ?>
-                                        <?php $uriSubMenu2 = $temp[$z]['data'][0]['Slug'] ?>
-                                        <?php $uriSubMenu2 = explode('/', $temp[$z]['data'][0]['Slug'])  ?>
-                                        <?php $uriSubMenu2 = $uriSubMenu2[2]  ?>
-                                        <?php 
-                                        $URI_Slug = $temp[$z]['data'][0]['Slug'];
-                                        $URI_Slug = explode('/', $URI_Slug);
-                                        $URISlug = $temp[$z]['data'][0]['Slug'];
-                                        if (in_array('(:any)', $URI_Slug)) {
-                                           $a = count($URI_Slug) - 1;
-                                           $URISlug = '';
-                                           for ($i=0; $i < $a; $i++) { 
-                                            $URISlug .= $URI_Slug[$i].'/';
-                                           }
-                                           $URISlug = $URISlug.'1';
-                                        }
+                                                         ?>
+                                                        <li segment2 = "<?php echo $uriSubMenu1 ?>" segment3  = "<?php echo $Uri3 ?>" class="<?php if($this->uri->segment(2)==$uriSubMenu1 && $this->uri->segment(3) == $uriSubMenu2 && $this->uri->segment(4) == $Uri3 && $this->uri->segment(5) == ""){echo "current";} ?>">
+                                                            <a href="<?php echo base_url($URISlug); ?>">
+                                                                <i class="icon-angle-right"></i>
+                                                                <?php echo $countS2[$x]['SubMenu2'] ?>
+                                                            </a>
+                                                        </li>
+                                                    <?php endfor ?>      
+                                                </ul>
+                                            </li>
+                                        <?php else: ?>
+                                            <?php $uriSubMenu2 = $temp[$z]['data'][0]['Slug'] ?>
+                                            <?php $uriSubMenu2 = explode('/', $temp[$z]['data'][0]['Slug'])  ?>
+                                            <?php $uriSubMenu2 = $uriSubMenu2[2]  ?>
+                                            <?php 
+                                            $URI_Slug = $temp[$z]['data'][0]['Slug'];
+                                            $URI_Slug = explode('/', $URI_Slug);
+                                            $URISlug = $temp[$z]['data'][0]['Slug'];
+                                            if (in_array('(:any)', $URI_Slug)) {
+                                               $a = count($URI_Slug) - 1;
+                                               $URISlug = '';
+                                               for ($i=0; $i < $a; $i++) { 
+                                                $URISlug .= $URI_Slug[$i].'/';
+                                               }
+                                               $URISlug = $URISlug.'1';
+                                            }
 
-                                         ?>
-                                        <li segment2 = "<?php echo $uriSubMenu1 ?>" segment3  = "<?php echo $uriSubMenu2 ?>" class="<?php if($this->uri->segment(2)==$uriSubMenu1 && $this->uri->segment(3) == $uriSubMenu2 ){echo "current";} ?>">
-                                            <a href="<?php echo base_url($URISlug); ?>"> 
-                                                <i class="icon-angle-right"></i>
-                                                    <?php echo $temp[$z]['SubMenu1'] ?>
-                                            </a>
-                                        </li>                           
-                                    <?php endif ?>
-                                <?php endfor ?>    
-                            </ul>        
-                        <?php endif ?>
-                    </li>            
+                                             ?>
+                                            <li segment2 = "<?php echo $uriSubMenu1 ?>" segment3  = "<?php echo $uriSubMenu2 ?>" class="<?php if($this->uri->segment(2)==$uriSubMenu1 && $this->uri->segment(3) == $uriSubMenu2 ){echo "current";} ?>">
+                                                <a href="<?php echo base_url($URISlug); ?>"> 
+                                                    <i class="icon-angle-right"></i>
+                                                        <?php echo $temp[$z]['SubMenu1'] ?>
+                                                </a>
+                                            </li>                           
+                                        <?php endif ?>
+                                    <?php endfor ?>    
+                                </ul>        
+                            <?php endif ?>
+                        </li>     
+                    <?php else: ?>
+                        <?php $uriSubMenu1 = $uriSubMenu1[0]  ?>
+                        <li segment1 = "<?php echo $uriSubMenu1 ?>" class="<?php if($this->uri->segment(1)==$uriSubMenu1){echo "current ";} ?>">
+                            <a href="<?php echo base_url($uriSubMenu1); ?>">
+                                <i class="<?php echo ($getData[$i]['Menu'] == '' || $getData[$i]['Menu'] == null) ? 'fa fa-globe' :  $getData[$i]['Icon'] ?>" aria-hidden="true"></i>
+                                    <?php echo $getData[$i]['Menu'] ?>
+                            </a>
+                        </li>
+                    <?php endif ?>
             <?php         
 
                 }    
@@ -170,6 +182,7 @@
                 </label>
             </div>
         </div>
+
     </div>
     <div id="divider" class="resizeable"></div>
 </div>
@@ -183,7 +196,8 @@ $this->m_reservation->checkAuth_user_vreservation();
  <script type="text/javascript">
      function loadDataSchedule(divHtml,date = '')
      {  
-        divHtml.html('');
+        // divHtml.html('');
+        loading_page(divHtml);
         var url = base_url_js+'vreservation/getschedule';
         if (date != '') {
             url = base_url_js+'vreservation/getschedule/'+date;
@@ -192,7 +206,12 @@ $this->m_reservation->checkAuth_user_vreservation();
             var response = jQuery.parseJSON(data_json);
             divHtml.html(response);
         }).done(function() {
-            loadRoomStatus(loadDataRoomStatus);
+            if ($("#classroom_view").length) {
+              loadRoomStatus2(loadDataRoomStatus2);
+            } else {
+              loadRoomStatus(loadDataRoomStatus);
+            }
+            
         })
      }
 
@@ -238,41 +257,13 @@ $this->m_reservation->checkAuth_user_vreservation();
          });
      })
 
-     $(document).ready(function () {
-         // socket_messages();
-         // countApprove();
-     });
-
-     // function socket_messages()
-     // {
-     //     var socket = io.connect( 'http://'+window.location.hostname+':3000' );
-     //     // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
-     //     socket.on( 'update_schedule_notifikasi', function( data ) {
-
-     //         //$( "#new_count_message" ).html( data.new_count_message );
-     //         //$('#notif_audio')[0].play();
-     //         if (data.update_schedule_notifikasi == 1) {
-     //             // action
-     //             var getDate = data.date;
-     //             if (getDate == '') {
-     //                getDate = "<?php echo date('Y-m-d') ?>";
-     //             }
-     //             // $("#CaptionTBL").html('<strong>'+getDate+'</strong>');
-     //             var divHtml = $("#schedule");
-     //             loadDataSchedule(divHtml);
-     //             countApprove();
-     //             // loadDataListApprove();
-     //         }
-
-     //     }); // exit socket
-     // }
 
      function countApprove()
      {
         var url = base_url_js+'vreservation/getCountApprove';
         $.post(url,function (data_json) {
             var response = jQuery.parseJSON(data_json);
-            $("#countRequest").html('<b>Total Request : <a href="javascript:void(0)" class="btn-action btn-get-link" data-page="transaksi/approve">'+response+'</a></b>');
+            $("#countRequest").html('<b>Total Request : <a href="javascript:void(0)" class="btn-action btn-get-link" data-page="transaksi/data_reservation">'+response+'</a></b>');
         }).done(function() {
 
         })
