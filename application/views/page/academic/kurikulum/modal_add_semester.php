@@ -413,7 +413,7 @@
             var CurriculumTypeID = $('#ModalJenisKurikulum').find(':selected').val();
 
 
-            var ProdiID = $('#ModalSelectProdi').find(':selected').val();
+            var ModalSelectProdi = $('#ModalSelectProdi').find(':selected').val();
             process.push(formRequiredError(ProdiID,'#ModalSelectProdi'));
 
             // var EducationLevelID = $('#ModalSelectJenjang').find(':selected').val();
@@ -482,6 +482,7 @@
             var data;
 
             if(action=='add'){
+                var ProdiID = (ModalSelectProdi!='' && ModalSelectProdi!=null) ? ModalSelectProdi.split('.')[0] : '';
                 data = {
                     action : action,
                     ID : ID,

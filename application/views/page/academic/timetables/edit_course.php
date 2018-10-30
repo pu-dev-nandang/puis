@@ -255,12 +255,14 @@
 
         $.post(url,{token:token},function (jsonResult) {
 
+            console.log(jsonResult);
+
            if(jsonResult.ScheduleDetails.length>0){
                $('#dataRow').empty();
                for(var i=0;i<jsonResult.ScheduleDetails.length;i++){
                    var d = jsonResult.ScheduleDetails[i]
                    $('#dataRow').append('<tr>' +
-                       '<td style="text-align: left;"><b>'+d.MKNameEng+'</b><br/><i>'+d.MKNameEng+'</i></td>' +
+                       '<td style="text-align: left;"><b>'+d.MKCode+' - '+d.MKNameEng+'</b><br/><i>'+d.MKNameEng+'</i></td>' +
                        '<td style="text-align: left;">'+d.Prodi+'</td>' +
                        '<td>'+d.Semester+'</td>' +
                        '<td style="background: lightyellow;">'+d.Offerto+'</td>' +
