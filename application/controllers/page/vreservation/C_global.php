@@ -3,16 +3,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class C_global extends Vreservation_Controler {
 
-    // private $data = array();
-
     function __construct()
     {
         parent::__construct();
         $this->load->model('m_sendemail');
         $this->load->model('m_api');
         $this->load->library('JWT');
-        // $this->load->model('master/m_master');
-        // $this->load->model('vreservation/m_reservation');
     }
 
 
@@ -22,211 +18,14 @@ class C_global extends Vreservation_Controler {
         $this->temp($content);
     }
 
-    public function getroom()
-    {
-        // $date = date('Y-m-d');
-        // $datetime = DateTime::createFromFormat('Y-m-d', $date);
-        // $NameDay = $datetime->format('l');
-        // $data1 = $this->m_reservation->getDataClassroomAcademic($NameDay,$date);
-
-        // $arr_json = array();
-        // $arrHours = array();
-        // $getRoom = $this->m_master->showData_array('db_academic.classroom');
-        // $endTime = '20';
-        // for ($i=7; $i < $endTime; $i++) { 
-        //     // check len
-        //     $a = $i;
-        //     for ($j=0; $j < 2 - strlen($i); $j++) { 
-        //         $a = '0'.$a;
-        //     }
-        //     $d = $a.':30';
-        //     $a = $a.':00';
-        //     $arrHours[] = date("h:i a", strtotime($a));
-        //     //$arrHours[] = date("h:i a", strtotime($d));
-        //     if ($i != $endTime) {
-        //         $arrHours[] = date("h:i a", strtotime($d));
-        //     }
-        // }
-
-        // $data_pass = $data1;
-        // // SORTING ASC
-        //     usort($data_pass, function($a, $b) {
-        //         return $a['room'] - $b['room'];
-        //     });
-
-        // for ($i=0; $i <count($getRoom) ; $i++) { 
-        //     $loopArr = array();
-        //     for ($j=0; $j <count($arrHours) ; $j++) { 
-        //         $bool = false;
-        //         for ($k=0; $k < count($data_pass); $k++) { 
-        //             # code...
-        //         }
-        //     }
-        // }
-
-
-        $arrHours = '';
-        echo json_encode($arrHours);
-
-    }
-
-    // public function getroom()
-    // {
-    //     $arr = array();
-    //     $getData = $this->m_master->showData_array('db_academic.classroom');
-    //     $a = 0;
-    //     for ($i=0; $i < count($getData); $i++) { 
-    //         $room = $getData[$i]['Room'];
-    //         $status = '<span class="label label-success">Available</span>';
-    //         $BookedBy = '-';
-    //         $Ends = '-';
-    //         if ($i == $a) {
-    //             $status = '<span class="label label-danger">Booked</span>';
-    //             $BookedBy = 'Alhadi Rahman';
-    //             $Ends = date('Y-m-d H:i:s', time() + 2 * 3600);
-    //             $a = $a + 2;
-    //         }    
-    //         $arr[] = array(
-    //             'room' => $room,
-    //             'status' => $status,
-    //             'BookedBy' => $BookedBy,
-    //             'Ends' => $Ends
-    //         );
-    //     }
-    //     echo json_encode($arr);
-
-    // }
-
-    // public function getschedule()
-    // {
-    //     // get room
-    //     $getRoom = $this->m_master->showData_array('db_academic.classroom');
-    //     $endTime = '18';
-    //     $getHoursNow = date('H');
-    //     $getHoursNow = (int)$getHoursNow;
-    //     $data['getRoom'] = $getRoom;
-    //     $arrHours = array();
-
-    //     // array list booked and requested
-    //     $data_pass = array(
-    //         array(
-    //             'user'  => 'User 1',
-    //             'start' => '10.30',
-    //             'end'   => '12.00',
-    //             'time'  => 90,
-    //             'colspan' => 3,
-    //             'agenda' => 'meeting',
-    //             'room' => 503,
-    //             'approved' => 1
-    //         ),
-    //         array(
-    //             'user'  => 'User 6',
-    //             'start' => '08.00',
-    //             'end'   => '10.00',
-    //             'time'  => 120,
-    //             'colspan' => 4,
-    //             'agenda' => 'meeting',
-    //             'room' => 504,
-    //             'approved' => 1
-    //         ),
-
-    //         array(
-    //             'user'  => 'User 5',
-    //             'start' => '13.00',
-    //             'end'   => '15.30',
-    //             'time'  => 150,
-    //             'colspan' => 5,
-    //             'agenda' => 'meeting',
-    //             'room' => 503,
-    //             'approved' => 1
-    //         ),
-            
-    //         array(
-    //             'user'  => 'User 1',
-    //             'start' => '13.00',
-    //             'end'   => '15.00',
-    //             'time'  => 120,
-    //             'colspan' => 4,
-    //             'agenda' => 'meeting',
-    //             'room' => 506,
-    //             'approved' => 1
-    //         ),
-
-    //         array(
-    //             'user'  => 'User 1',
-    //             'start' => '10.30',
-    //             'end'   => '12.00',
-    //             'time'  => 90,
-    //             'colspan' => 3,
-    //             'agenda' => 'meeting',
-    //             'room' => 505,
-    //             'approved' => 0
-    //         ),
-    //         array(
-    //             'user'  => 'User 4',
-    //             'start' => '16.30',
-    //             'end'   => '17.00',
-    //             'time'  => 120,
-    //             'colspan' => 1,
-    //             'agenda' => 'requested',
-    //             'room' => 503,
-    //             'approved' => 0
-    //         ),
-
-    //         array(
-    //             'user'  => 'User 3',
-    //             'start' => '13.00',
-    //             'end'   => '15.00',
-    //             'time'  => 120,
-    //             'colspan' => 4,
-    //             'agenda' => 'requested',
-    //             'room' => 507,
-    //             'approved' => 0
-    //         ),
-            
-    //         array(
-    //             'user'  => 'User 2',
-    //             'start' => '13.00',
-    //             'end'   => '14.30',
-    //             'time'  => 90,
-    //             'colspan' => 3,
-    //             'agenda' => 'requested',
-    //             'room' => 508,
-    //             'approved' => 0
-    //         ),
-    //     );
-
-    //     // SORTING ASC
-    //     usort($data_pass, function($a, $b) {
-    //         return $a['room'] - $b['room'];
-    //     });
-
-    //     for ($i=7; $i < $endTime; $i++) { 
-    //         // check len
-    //         $a = $i;
-    //         for ($j=0; $j < 2 - strlen($i); $j++) { 
-    //             $a = '0'.$a;
-    //         }
-    //         $d = $a.':30';
-    //         $a = $a.':00';
-    //         $arrHours[] = date("h:i a", strtotime($a));
-    //         //$arrHours[] = date("h:i a", strtotime($d));
-    //         if ($i != $endTime) {
-    //             $arrHours[] = date("h:i a", strtotime($d));
-    //         }
-    //     }
-    //     $data['arrHours'] = $arrHours;
-    //     $data['data_pass'] = $data_pass;
-    //     $content = $this->load->view($this->pathView.'schedule',$data,true);
-    //     echo json_encode($content);
-    // }
-
     public function getschedule($date = null)
     {
         // get room
         // $getRoom = $this->m_master->showData_array('db_academic.classroom');
         $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','L_Venue',1);
         // get data classroom
+        $NextDate = '';
+        $PreviousDate = '';
         if ($date== null) {
             $date = date('Y-m-d');
         }
@@ -267,6 +66,17 @@ class C_global extends Vreservation_Controler {
         $data['arrHours'] = $arrHours;
         $data['data_pass'] = $data_pass;
         $data['date'] = $date;
+        // previous & next
+        $NextDate = date('Y-m-d', strtotime($date . ' +1 day'));
+        $PreviousDate = date('Y-m-d', strtotime($date . ' -1 day'));
+        $data['NextDate'] = $NextDate;
+        $data['PreviousDate'] = $PreviousDate;
+        $chkDate = 0;
+        if(strtotime($date) >= strtotime(date('Y-m-d')) )
+        {
+            $chkDate =  1;
+        }
+        $data['chkDate'] = $chkDate;
         $content = $this->load->view($this->pathView.'schedule',$data,true);
         echo json_encode($content);
     }

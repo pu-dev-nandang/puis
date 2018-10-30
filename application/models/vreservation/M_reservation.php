@@ -928,21 +928,26 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     {
         $arr_result = array();
         $this->load->model('master/m_master');
+        $NIP = $this->session->userdata('NIP');
+        // check Auth berdasarkan grouping user
+            $add_where = '';
+            if ($this->session->userdata('ID_group_user') > 3) {
+                $add_where = ' and a.CreatedBy = "'.$NIP.'"';
+            }
+
         $Start = ($Start == null) ? ' and Start >= timestamp(DATE_SUB(NOW(), INTERVAL 30 MINUTE))' : ' and Start like "%'.$Start.'%"';
         if ($both == '') {
-            $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP where a.Status = ?
-                     '.$Start;
+            $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP where a.Status = ? '.$add_where.'
+                     '.$Start.' order by a.Status asc,a.Start asc';
             $query=$this->db->query($sql, array($Status))->result_array();         
         }
         else
         {
-            $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP where a.Status like "%"
-                     '.$Start;
+            $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP where a.Status like "%" '.$add_where.'
+                     '.$Start.' order by a.Status asc,a.Start asc';
             $query=$this->db->query($sql, array())->result_array();           
         }
         
-        
-        // print_r($query);die();
         for ($i=0; $i < count($query); $i++) { 
             $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['Start']);
             $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['End']);
@@ -956,12 +961,6 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 $Name_equipment_add = '<ul>';
                 for ($j=0; $j < count($ID_equipment_add); $j++) { 
                     $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add[$j]);
-                    // print_r($ID_equipment_add);die();
-                    // $ID_m_equipment = $get[0]['ID_m_equipment'];
-                    // $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
-                    // $Name_equipment_add .= '<li>'.$get[0]['Equipment'].'</li>';
-
-                    // print_r($ID_equipment_add);die();
                     $ID_m_equipment = $get[0]['ID_m_equipment'];
                     $Owner = $get[0]['Owner'];
                     $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$Owner);
@@ -1367,11 +1366,13 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $query=$this->db->query($sql, array($NIP))->result_array();
         $arr = array(
             'V_BookingDay' => 1,
+            'ID_group_user' => 4,
         );
 
         if (count($query) > 0) {
             $arr = array(
                 'V_BookingDay' => $query[0]['BookingDay'],
+                'ID_group_user' => $query[0]['ID_group_user'],
             );
         }
 

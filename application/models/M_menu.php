@@ -145,7 +145,7 @@ class M_menu extends CI_Model {
       return $arr;
   }
 
-  private function getSubmenu1BaseMenu_grouping($ID_Menu,$db='db_admission')
+  public function getSubmenu1BaseMenu_grouping($ID_Menu,$db='db_admission')
   {
       $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
       from '.$db.'.cfg_sub_menu as a join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
@@ -154,7 +154,7 @@ class M_menu extends CI_Model {
       return $query;
   }
 
-  private function getSubmenu2BaseSubmenu1_grouping($submenu1,$db='db_admission',$IDmenu = null)
+  public function getSubmenu2BaseSubmenu1_grouping($submenu1,$db='db_admission',$IDmenu = null)
   {
       if ($IDmenu != null) {
           $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
