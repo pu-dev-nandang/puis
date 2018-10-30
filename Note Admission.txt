@@ -1,0 +1,34 @@
+Syarat untuk jalankan register online dan offline
+Table Clear
+db_admission
+- doc_mhs => field data document calon mhs yang telah jadi mhs
+- formulir_number_online_m
+- verifify isian data pada table reg_doc_checklist sudah cukup atau belum
+- register
+- register_butuh_ujian
+- register_deleted
+- register_document
+- register_dsn
+- register_formulir
+- register_formulir_jadwal_ujian
+- register_hasil_ujian
+- register_jadwal_ujian
+- register_kelulusan_ujian
+- register_nilai
+- register_rangking
+- register_verification
+- register_verification_rejected
+- register_verified
+- set isian set set_ta
+- to_be_mhs
+- va_generate
+
+db_finance
+- payment_admisi
+- payment_pre
+- register_admisi
+
+Buat Curiculum baru untuk calon mahasiswa di academic
+Buat New Semester baru untuk calon mahasiswa di academic
+Finance menentukan tagihan spp,bpp,credit and other untuk calon mahasiswa
+	

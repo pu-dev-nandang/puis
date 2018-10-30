@@ -5,7 +5,7 @@
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i>Set Tanggal Register</h4>
+                <h4 class="header"><i class="icon-reorder"></i><?php echo $NameMenu ?></h4>
                 <div class="toolbar no-padding">
                     <div class="btn-group">
                       <span data-smt="" class="btn btn-xs btn-add-event">
@@ -71,6 +71,7 @@
                // jsonData = data_json;
                // var obj = JSON.parse(data_json); 
                // console.log(obj);
+               $('#GlobalModal').modal('hide');
            }).done(function() {
              loadTable(loadData);
            }).fail(function() {

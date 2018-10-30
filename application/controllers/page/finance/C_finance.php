@@ -141,18 +141,22 @@ class C_finance extends Finnance_Controler {
 
     public function tuition_fee_approve($page = null)
     {
+        $input = $this->getInputToken();
+        $FormulirCode = $input['FormulirCode'];
+        // get grade
         $this->load->library('pagination');
-        $config = $this->config_pagination_default_ajax(1000,5,5);
+        $config = $this->config_pagination_default_ajax($this->m_admission->count_getDataCalonMhsTuitionFee_delete($FormulirCode,'p.Status = "Created"'),5,5);
         $this->pagination->initialize($config);
         $page = $this->uri->segment(5);
         $start = ($page - 1) * $config["per_page"];
 
         $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
-        $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee_delete($config["per_page"], $start));
+        $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee_delete($config["per_page"], $start,$FormulirCode,'p.Status = "Created"'));
         $content = $this->load->view('page/'.$this->data['department'].'/approved/page_tuition_fee_approve',$this->data,true);
         $output = array(
         'pagination_link'  => $this->pagination->create_links(),
         'loadtable'   => $content,
+        'Grade' => $this->m_master->showData_array('db_academic.grade'),
         );
         echo json_encode($output);
     }
@@ -166,6 +170,7 @@ class C_finance extends Finnance_Controler {
 
         $cicilan = $this->m_master->caribasedprimary('db_finance.payment_pre','ID_register_formulir',$input[0]);
         $proses = $this->m_finance->process_tuition_fee_calon_mhs($getData,$cicilan);
+        // $proses = '';
         if ($proses == '') {
             // create pdf & send email
             $this->Tuition_PDF_SendEmail($getData,$cicilan);
@@ -180,192 +185,492 @@ class C_finance extends Finnance_Controler {
         $filename = 'Tuition_fee_'.$Personal[0]['FormulirCode'].'.pdf';
         $getData = $this->m_master->showData_array('db_admission.set_label_token_off');
 
-        $setXAwal = 10;
-        $setYAwal = 18;
-        $setJarakY = 5;
-        $setJarakX = 40;
-        $setFontIsian = 12;
 
-        $config=array('orientation'=>'P','size'=>'A4');
+        $config=array('orientation'=>'P','size'=>'A5');
         $this->load->library('mypdf',$config);
         $this->mypdf->SetMargins(10,10,10,10);
         $this->mypdf->SetAutoPageBreak(true, 0);
         $this->mypdf->AddPage();
         // Logo
         $this->mypdf->Image('./images/logo_tr.png',10,10,50);
-        $this->mypdf->SetFont('Arial','B',10);
-        $this->mypdf->Text(150, 17, 'Formulir Number : '.$Personal[0]['FormulirCode']);
+
+        $setFont = 8;
+
+        // date
+        $DateIndo = $this->m_master->getIndoBulan(date('Y-m-d'));
+        $this->mypdf->SetXY(150,20);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, 'Jakarta, '.$DateIndo, 0, 0, 'L', 0);
 
         // Line break
         $this->mypdf->Ln(20);
 
+        $this->mypdf->SetXY(22,29);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, 'Nomor', 0, 1, 'L', 0);
+
+        $this->mypdf->SetXY(22,35);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, 'Hal', 0, 1, 'L', 0);
+
+        $this->mypdf->SetXY(42,29);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, ':', 0, 1, 'L', 0);
+
+        $this->mypdf->SetXY(42,35);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, ':', 0, 1, 'L', 0);
+
+        $getNumber = $this->m_master->caribasedprimary('db_finance.register_admisi','ID_register_formulir',$Personal[0]['ID_register_formulir']);
+        $No_Surat = $this->m_finance->ShowNumberTuitionFee( $getNumber[0]['No_Surat'] );
+        $this->mypdf->SetXY(45,29);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, $No_Surat.'/MKT-PMB-B-19/PU/X/2018', 0, 1, 'L', 0);
+
+        $this->mypdf->SetXY(45,35);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, 'Surat Keputusan Penerimaan Beasiswa di Podomoro University', 0, 1, 'L', 0);
+
+
+        $setXAwal = 22;
+        $setYAwal = 45;
+        $setJarakY = 5;
+        $setJarakX = 40;
+        $setFontIsian = 12;
+
         // isian
-        $setY = $setYAwal + 20;
+        $setY = $setYAwal;
         $setX = $setXAwal;
 
         // label
         $this->mypdf->SetXY($setX,$setY);
         $this->mypdf->SetTextColor(0,0,0);
-        $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
-        $this->mypdf->Cell(0, 0, 'Nama', 0, 1, 'L', 0);
+        $this->mypdf->SetFont('Arial','B',$setFont);
+        $this->mypdf->Cell(0, 0, 'Kepada Yth.', 0, 1, 'L', 0);
 
-        // titik dua
-        $setXtitik2 = $setX+$setJarakX;
-        $this->mypdf->SetXY($setXtitik2,$setY);
-        $this->mypdf->SetTextColor(0,0,0);
-        $this->mypdf->SetFont('Arial','',$setFontIsian);
-        $this->mypdf->Cell(0, 0, ":", 0, 1, 'L', 0);
-
-        // value
-        $setXvalue = $setXtitik2 + 2;
+        // Nama
+        $setXvalue = $setX;
+        $setY = $setY + 5;
         $this->mypdf->SetXY($setXvalue,$setY);
         $this->mypdf->SetTextColor(0,0,0);
-        $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
-        $this->mypdf->Cell(0, 0, $Personal[0]['Name'], 0, 1, 'L', 0); 
+        $this->mypdf->SetFont('Arial','B',$setFont);
+        $this->mypdf->Cell(0, 0, $Personal[0]['Name'].'-'.$Personal[0]['FormulirCode'], 0, 1, 'L', 0); 
 
-        $setY = $setY + 8;
-
-        // label
-        $this->mypdf->SetXY($setX,$setY);
-        $this->mypdf->SetTextColor(0,0,0);
-        $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
-        $this->mypdf->Cell(0, 0, 'Sekolah', 0, 1, 'L', 0);
-
-        // titik dua
-        $setXtitik2 = $setX+$setJarakX;
-        $this->mypdf->SetXY($setXtitik2,$setY);
-        $this->mypdf->SetTextColor(0,0,0);
-        $this->mypdf->SetFont('Arial','',$setFontIsian);
-        $this->mypdf->Cell(0, 0, ":", 0, 1, 'L', 0);
-
-        // value
-        $setXvalue = $setXtitik2 + 2;
+        // Address
+        $setXvalue = $setX;
+        $setY = $setY + 5;
         $this->mypdf->SetXY($setXvalue,$setY);
         $this->mypdf->SetTextColor(0,0,0);
-        $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
-        $this->mypdf->Cell(0, 0, $Personal[0]['SchoolName'], 0, 1, 'L', 0);
+        $this->mypdf->SetFont('Arial','B',$setFont);
+        $this->mypdf->Cell(0, 0, $Personal[0]['Address'], 0, 1, 'L', 0); 
 
-        $setY = $setY + 8;
-        // label
-        $this->mypdf->SetXY($setX,$setY);
-        $this->mypdf->SetTextColor(0,0,0);
-        $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
-        $this->mypdf->Cell(0, 0, 'Program Studi', 0, 1, 'L', 0);
-
-        // titik dua
-        $setXtitik2 = $setX+$setJarakX;
-        $this->mypdf->SetXY($setXtitik2,$setY);
-        $this->mypdf->SetTextColor(0,0,0);
-        $this->mypdf->SetFont('Arial','',$setFontIsian);
-        $this->mypdf->Cell(0, 0, ":", 0, 1, 'L', 0);
-
-        // value
-        $setXvalue = $setXtitik2 + 2;
+        // City
+        $setXvalue = $setX;
+        $setY = $setY + 5;
         $this->mypdf->SetXY($setXvalue,$setY);
         $this->mypdf->SetTextColor(0,0,0);
-        $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
-        $this->mypdf->Cell(0, 0, $Personal[0]['NamePrody'], 0, 1, 'L', 0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, $Personal[0]['RegionAddress'].' '.$Personal[0]['ProvinceAddress'], 0, 1, 'L', 0); 
 
-        $setY = $setY + 8;
-        // label
-        $this->mypdf->SetXY($setX,$setY);
-        $this->mypdf->SetTextColor(0,0,0);
-        $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
-        $this->mypdf->Cell(0, 0, 'Virtual Account', 0, 1, 'L', 0);
-
-        // titik dua
-        $setXtitik2 = $setX+$setJarakX;
-        $this->mypdf->SetXY($setXtitik2,$setY);
-        $this->mypdf->SetTextColor(0,0,0);
-        $this->mypdf->SetFont('Arial','',$setFontIsian);
-        $this->mypdf->Cell(0, 0, ":", 0, 1, 'L', 0);
-
-        // value
-        $setXvalue = $setXtitik2 + 2;
+        // School
+        $setXvalue = $setX;
+        $setY = $setY + 5;
         $this->mypdf->SetXY($setXvalue,$setY);
         $this->mypdf->SetTextColor(0,0,0);
-        $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
-        $this->mypdf->Cell(0, 0, $Personal[0]['VA_number'], 0, 1, 'L', 0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, $Personal[0]['SchoolName'], 0, 1, 'L', 0); 
 
-        $t = 0;
-        for ($i=0; $i < count($TuitionFee); $i++) { 
-            $t = $t + $TuitionFee[$i]['Pay_tuition_fee'];
+        // Hp
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, 'No.Tlp/Hp     : '.$Personal[0]['PhoneNumber'], 0, 1, 'L', 0); 
+
+        // Hp
+        $setXvalue = $setX;
+        $setY = $setY + 7;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, 'Dengan hormat,', 0, 1, 'L', 0);
+
+        // cek potongan discount
+        $chkDiscount = 0;
+        $arr_discount = array();
+        $arr_discount2 = array();
+        foreach ($Personal[0] as $key => $value) {
+            $key = explode('-', $key);
+            if ($key[0] == 'Discount') {
+                if ($value > 0 ) {
+                   $chkDiscount = 1;
+                   $arr_discount[$key[1]] = $value;
+                }
+                $arr_discount2[$key[1]] = $value;
+            }
         }
 
-        $setY = $setY + 8;
-        // label
-        $this->mypdf->SetXY($setX,$setY);
-        $this->mypdf->SetTextColor(0,0,0);
-        $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
-        $this->mypdf->Cell(0, 0, 'Total Tagihan', 0, 1, 'L', 0);
+        if ($chkDiscount == 1) {
+            $Status = 'rata-rata raport kelas XI';
+            if ($Personal[0]['RangkingRapor'] != 0) {
+                $Status = 'Rangking paralel '.$Personal[0]['RangkingRapor'].' kelas XI';
+            }
 
-        // titik dua
-        $setXtitik2 = $setX+$setJarakX;
-        $this->mypdf->SetXY($setXtitik2,$setY);
-        $this->mypdf->SetTextColor(0,0,0);
-        $this->mypdf->SetFont('Arial','',$setFontIsian);
-        $this->mypdf->Cell(0, 0, ":", 0, 1, 'L', 0);
+            $setXvalue = $setX;
+            $setY = $setY + 2;
+            $this->mypdf->SetXY($setXvalue,$setY);
+            $this->mypdf->SetTextColor(0,0,0);
+            $this->mypdf->SetFont('Arial','',$setFont);
+            // MultiCell( 140, 2, $arr_value[$getRowDB], 0,'L');
+            $this->mypdf->MultiCell(0, 5, 'Selamat, Anda mendapatkan beasiswa potongan di Podomoro University tahun akademik '.$Personal[0]['NamaTahunAkademik'].' berdasarkan '.$Status.', dengan rincian sebagai berikut:', 0,'L');
 
-        // value
-        $setXvalue = $setXtitik2 + 2;
+            $setY = $setY + 10;
+            $height = 5;
+            $this->mypdf->SetXY($setX,$setY); 
+            $this->mypdf->SetFillColor(255, 255, 255);
+            $this->mypdf->Cell(50,$height,'Nama Lengkap - Nomor Formulir',1,0,'C',true);
+            $this->mypdf->Cell(40,$height,'Program Study',1,0,'C',true);
+            $this->mypdf->Cell(80,$height,'Beasiswa',1,1,'C',true);
+
+            $NameTbl = $Personal[0]['Name'].'-'.$Personal[0]['FormulirCode'];
+            $ProdiTbl = $Personal[0]['NamePrody'];
+            foreach ($arr_discount as $key => $value) {
+                $setY = $setY + $height;
+                $this->mypdf->SetXY($setX,$setY); 
+                $this->mypdf->SetFillColor(255, 255, 255);
+                $this->mypdf->Cell(50,$height,$NameTbl,1,0,'C',true);
+                $this->mypdf->Cell(40,$height,$ProdiTbl,1,0,'C',true);
+                $this->mypdf->Cell(80,$height,'Beasiswa Pot '.$key.' '.(int)$value.'%',1,1,'C',true);
+            } 
+
+        }
+
+        $setXvalue = $setX;
+        $setY = $setY + 7;
         $this->mypdf->SetXY($setXvalue,$setY);
         $this->mypdf->SetTextColor(0,0,0);
-        $this->mypdf->SetFont('Arial','',$getData[0]['setFont1']);
-        $this->mypdf->Cell(0, 0, 'Rp '.number_format($t,2,',','.'), 0, 1, 'L', 0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('Total pembayaran untuk <b>"Semester Pertama"</b> dalam 1x pembayaran :');
 
-         $setY = $setY + 10;
+        $setY = $setY + 5;
+        $height = $setY;
+        $this->mypdf->SetXY($setX,$setY); 
+        $this->mypdf->SetFillColor(255, 255, 255);
+        $this->mypdf->SetFont('Arial','B',$setFont);
+        $this->mypdf->Cell(50,$height,'Pembayaran Semester 1',1,0,'C',true);
+        $this->mypdf->Cell(25,$height,'SPP',1,0,'C',true);
+        $this->mypdf->Cell(25,$height,'BPP Semester',1,0,'C',true); 
+        $this->mypdf->Cell(25,$height,'Biaya SKS',1,0,'C',true); 
+        $this->mypdf->Cell(25,$height,'Lain-lain',1,0,'C',true); 
+        $this->mypdf->Cell(25,$height,'Total Biaya',1,1,'C',true); 
+
+        $setY = $setY + $height;
+        $this->mypdf->SetXY($setX,$setY); 
+        $this->mypdf->SetFillColor(255, 255, 255);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(50,$height,'Biaya Normal',1,0,'L',true);
+        
+        // get tuition fee
+        
+           $sql23 = 'select a.Abbreviation,b.Cost from db_finance.payment_type as a join db_finance.tuition_fee as b on a.ID = b.PTID where ClassOf = ? and ProdiID = ?';
+           $query23=$this->db->query($sql23, array($Personal[0]['SetTa'],$Personal[0]['ID_program_study']))->result_array();
+           $totalTuitionFee = 0;
+           $arr_pay = array();
+
+           // get SKS
+           $ID_program_study = $Personal[0]['ID_program_study'];
+           $ccc = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ID_program_study);
+           $Credit = $ccc[0]['DefaultCredit'];
+
+            foreach ($query23 as $keya) {
+                $arr_pay[$keya['Abbreviation']] = $keya['Cost'];
+                if ($keya['Abbreviation'] == 'Credit') {
+                    $CreditHarga = $keya['Cost'] * $Credit;
+                    $this->mypdf->Cell(25,$height,number_format($CreditHarga,2,',','.'),1,0,'L',true);
+                    $totalTuitionFee = $totalTuitionFee + $CreditHarga;
+                }
+                else
+                {
+                    $this->mypdf->Cell(25,$height,number_format($keya['Cost'],2,',','.'),1,0,'L',true);
+                    $totalTuitionFee = $totalTuitionFee + $keya['Cost'];
+                }
+                
+            }
+            // total
+                 $this->mypdf->Cell(25,$height,number_format($totalTuitionFee,2,',','.'),1,0,'L',true);
+
+
+            $setY = $setY + $height;
+            $this->mypdf->SetXY($setX,$setY); 
+            $this->mypdf->SetFillColor(255, 255, 255);
+            $this->mypdf->SetFont('Arial','',$setFont);
+            $this->mypdf->Cell(50,$height,'Beasiswa yang diterima',1,0,'L',true);
+
+            $totalTuitionFee = 0;
+            foreach ($arr_discount2 as $key => $value) {
+
+                foreach ($arr_pay as $keya => $valuea) {
+
+                    if ($keya == $key) {
+                        if ($key == 'Credit') {
+                            $cost = $Credit * $valuea;
+                            $cost = $value * $cost / 100;
+                            $this->mypdf->Cell(25,$height,number_format($cost,2,',','.'),1,0,'L',true);
+                        }
+                        else
+                        {
+                            $cost = $value * $valuea / 100;
+                            $this->mypdf->Cell(25,$height,number_format($cost,2,',','.'),1,0,'L',true);
+                        }
+                        $totalTuitionFee = $totalTuitionFee + $cost;
+                    }
+                }
+                
+            }
+            $this->mypdf->Cell(25,$height,number_format($totalTuitionFee,2,',','.'),1,0,'L',true); 
+
+
+        $setY = $setY + $height;
+        $this->mypdf->SetXY($setX,$setY); 
+        $this->mypdf->SetFillColor(255, 255, 255);
+        $this->mypdf->SetFont('Arial','B',$setFont);
+        $this->mypdf->Cell(50,$height,'Biaya yang harus dibayar',1,0,'L',true);
+        $totalTuitionFee = 0;
+        $PTIDSelect = $this->m_master->showData_array('db_finance.payment_type');
+        for ($i=0; $i < count($PTIDSelect); $i++) {
+            foreach ($Personal[0] as $key => $value) {
+                if ($PTIDSelect[$i]['Abbreviation'] == $key ) {
+                    $this->mypdf->Cell(25,$height,number_format($Personal[0][$key],2,',','.'),1,0,'L',true);
+                    $totalTuitionFee = $totalTuitionFee + $Personal[0][$key];
+                } 
+            } 
+           
+        }
+
+        $this->mypdf->Cell(25,$height,number_format($totalTuitionFee,2,',','.'),1,0,'L',true); 
+
+        $setXvalue = $setX;
+        $setY = $setY + 7;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('Jadwal pembayaran untuk semester pertama dengan cicilan :');
+
+         $setY = $setY + $height;
 
         $this->mypdf->SetXY($setX,$setY); 
         $this->mypdf->SetFillColor(226, 226, 226);
-        $this->mypdf->Cell(8,9,'No',1,0,'C',true);
-        $this->mypdf->Cell(80,9,'Invoice',1,0,'C',true);
-        $this->mypdf->Cell(60,9,'Deadline',1,1,'C',true);
+        $this->mypdf->Cell(40,$height,'Pembayaran',1,0,'C',true);
+        $this->mypdf->Cell(60,$height,'Tanggal',1,0,'C',true);
+        $this->mypdf->Cell(70,$height,'Jumlan',1,1,'C',true);
 
-        for ($i=0; $i < count($arr_cicilan); $i++) { 
-            $no = $i + 1;
+        $cicilan_tulis = array('Cicilan Pertama','Cicilan Kedua','Cicilan Ketiga','Cicilan Keempat');
+
+        for ($i=0; $i < count($arr_cicilan); $i++) {
+            $setY = $setY + $height; 
+            $this->mypdf->SetXY($setX,$setY); 
             $this->mypdf->SetFillColor(255, 255, 255);
-            $this->mypdf->Cell(8,9,$no,1,0,'C',true);
-            $this->mypdf->Cell(80,9,'Rp '.number_format($arr_cicilan[$i]['Invoice'],2,',','.'),1,0,'L',true);
-            $this->mypdf->Cell(60,9,$arr_cicilan[$i]['Deadline'],1,1,'L',true);
+            $this->mypdf->Cell(40,$height,$cicilan_tulis[$i],1,0,'L',true);
+            $Deadline = date('Y-m-d', strtotime($arr_cicilan[$i]['Deadline']));
+            $this->mypdf->Cell(60,$height,$this->m_master->getIndoBulan($Deadline),1,0,'L',true);
+            $this->mypdf->Cell(70,$height,'Rp '.number_format($arr_cicilan[$i]['Invoice'],2,',','.'),1,1,'L',true);
 
         }
 
-        $this->mypdf->Cell(60,9,'',0,1,'L',true); // enter
-        $this->mypdf->Cell(60,9,'',0,1,'L',true); // enter
 
-        $this->mypdf->Cell(25,5,'Note : ',0,1,'L',true);
-        $this->mypdf->SetFont('Arial','',9);
-        $this->mypdf->Cell(100,5,'* Biaya kuliah per semester : Biaya BPP + (Biaya per SKS (Credit) * Jumlah SKS) +  Biaya lain-lain persemester,',0,1,'L',true);
-        $this->mypdf->Cell(100,5,'* Jika calon mahasiswa tidak lulus Ujian Nasional (UN) maka biaya yang telah dibayarkan akan dikembalikan dan ',0,1,'L',true);
-        $this->mypdf->Cell(100,5,'  dipotong biaya administrasi sebesar Rp 500.000,00 setelah menunjukan surat keterangan dari sekolah, ',0,1,'L',true);
-        $this->mypdf->Cell(100,5,'* Apabila diterima di Perguruan Tinggi Negri (PTN) yaitu UI,ITB,UNPAD,UNDIP,IPB,UGM,UNAIR,ITS melalui ',0,1,'L',true);
-        $this->mypdf->Cell(100,5,'  jalur SNMPTN & SBMPTN (tidak termasuk jalur Ujian Mandiri, program diploma & politeknik negri) maka biaya yang telah',0,1,'L',true);
-        $this->mypdf->Cell(100,5,'  dibayarkan akan dikembalikan & dipotong biaya administrasi Rp 1.500.000,00 ',0,1,'L',true);
-        $this->mypdf->Cell(100,5,'  (dengan menunjukan surat penerimaan dari universitas terkait) ',0,1,'L',true);
+        $setXvalue = $setX;
+        $setY = $setY + 7;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('Pembayaran dapat dilakukan melalui transfer ke Bank BCA : ');
+
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('-. Atas Nama');
+
+        $setXvalue = $setXvalue + 25;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML(':');
+
+        $setXvalue = $setXvalue + 3;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('<b>Yayasan Pendidikan Agung Podomro</b>');
+
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('-. Nomor Account');
+
+        $setXvalue = $setXvalue + 25;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML(':');
+
+        $setXvalue = $setXvalue + 3;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('<b>161.3888.555</b>');
+
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('-. Keterangan');
+
+        $setXvalue = $setXvalue + 25;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML(':');
+
+        $setXvalue = $setXvalue + 3;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('<b>'.$NameTbl.'</b>');
+
+
         
-         
-         $this->mypdf->Line(20, 280, 190, 280);
-         $setY = 282;
-         $this->mypdf->SetFont('Arial','',6);
-         $this->mypdf->SetXY(40,$setY);
-         $this->mypdf->SetTextColor(0,0,0);
-         // $this->mypdf->SetFillColor(0,0,0);
-         $this->mypdf->Cell(190, 5, 'Admission Office :  Central Park Mall, Lantai 3, Unit 112, Podomoro City, JL Letjen S. Parman Kav.28, Jakarta Barat 11470', 0, 1, 'L', 0);
-         $setY = 285;
-         $this->mypdf->SetFont('Arial','',6);
-         $this->mypdf->SetXY(43,$setY);
-         $this->mypdf->SetTextColor(0,0,0);
-         // $this->mypdf->SetFillColor(0,0,0);
-         $this->mypdf->Cell(190, 5, 'Telp : (021) 292 00 456    Email : admission@podomorouniversity.ac.id   Website : www.podomorouniversity.ac.id', 0, 1, 'L', 0);
+        $setXvalue = $setX;
+        $setY = $setY + 10;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('Note: Mohon bukti pembayaran difax ke nomor 021-29200455 atau diemail ke admissions@podomorouniversity.com dengan subyek');
+
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('<b>Pembayaran Uang Kuliah atas Nama '.$NameTbl.'.');
+
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('Untuk info lebih lanjut dapat menghubungi Podomoro University di 021-29200456 ext 101-103/HP : 0821 1256 4900');
+
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('Selamat bergabung di Keluarga Besar Podomoro university');
+
+        $setXvalue = $setX;
+        $setY = $setY + 10;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('Hormat Kami,');
+
+        $setXvalue = $setX;
+        $setY = $setY + 15;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('Dept. of Admissions and Marketing');
+
+        $setXvalue = $setX;
+        $setY = $setY + 10;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('<b>Perhatian:</b>');
+
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('1.');
+        $setXvalue = $setXvalue + 3;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->MultiCell(0, 5, 'Beasiswa berlaku untuk pembayaran sesuai dengan tanggal yang telah ditentukan di atas. Apabila melewati batas waktu yang telah ditentukan maka mengikuti program pembayaran pada gelombang tersebut.', 0,'L');
+
+        $setXvalue = $setX;
+        $setY = $setY + 10;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('2.');
+        $setXvalue = $setXvalue + 3;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->MultiCell(0, 5, 'Pembayaran dianggap valid saat dana efektif pada rekening YPAP, bukan berdasarkan tanggal slip setoran / bukti transfer.', 0,'L');
+
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('3.');
+        $setXvalue = $setXvalue + 3;
+        // $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('Jika sampai kegiatan perkuliahan dimulai masih ada kewajiban biaya studi yang belum diselesaikan, maka mahasiswa tersebut dianggap');
+        $setXvalue = $setX + 3;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('<u>mengundurkan diri</u>');
+
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('4.');
+        $setXvalue = $setXvalue + 3;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->MultiCell(0, 5, 'Surat ini dicetak otomatis oleh komputer dan tidak memerlukan tanda tangan pejabat yang berwenang.', 0,'L');
 
          $path = './document';
          $path = $path.'/'.$filename;
          $this->mypdf->Output($path,'F');
-
+         // echo json_encode($filename);
          $text = 'Dear '.$Personal[0]['Name'].',<br><br>
                      Plase find attached your Tuition Fee.<br>
                      For Detail your payment, please see in '.url_registration."login/";
-         $to = $Personal[0]['Email'];
+         if($_SERVER['SERVER_NAME']!='localhost' && $_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {            
+            // $to = $Personal[0]['Email'].','.'admission@podomorouniversity.ac.id';
+            $to = 'admission@podomorouniversity.ac.id';
+         }
+         else
+         {
+            $to = 'alhadirahman22@gmail.com,alhadi.rahman@podomorouniversity.ac.id';
+         }
          $subject = "Podomoro University Tuition Fee";
          $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,$path);
 
@@ -373,14 +678,17 @@ class C_finance extends Finnance_Controler {
 
     public function tuition_fee_approved()
     {
+        $input = $this->getInputToken();
+        $FormulirCode = $input['FormulirCode'];
+
         $this->load->library('pagination');
-        $config = $this->config_pagination_default_ajax(1000,15,5);
+        $config = $this->config_pagination_default_ajax($this->m_admission->count_getDataCalonMhsTuitionFee_delete($FormulirCode,'p.Status = "Approved"'),15,5);
         $this->pagination->initialize($config);
         $page = $this->uri->segment(5);
         $start = ($page - 1) * $config["per_page"];
 
         $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
-        $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee_approved($config["per_page"], $start));
+        $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee_approved($config["per_page"], $start,$FormulirCode,'p.Status = "Approved"'));
         $content = $this->load->view('page/'.$this->data['department'].'/approved/page_tuition_fee_approved',$this->data,true);
         $output = array(
         'pagination_link'  => $this->pagination->create_links(),
@@ -1199,6 +1507,8 @@ class C_finance extends Finnance_Controler {
 
     public function mahasiswa()
     {
+        $getSemester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+        $data['getSemester'] = $getSemester;
         $content = $this->load->view('page/'.$this->data['department'].'/master/page_master_mahasiswa',$this->data,true);
         $this->temp($content);
     }
@@ -1206,7 +1516,6 @@ class C_finance extends Finnance_Controler {
     public function mahasiswa_list($page = null)
     {
         $input = $this->getInputToken();
-
         $this->load->library('pagination');
         // cari count
         $count = $this->m_finance->count_mahasiswa_list($input['ta'],$input['prodi'],$input['NPM']);
@@ -1355,7 +1664,26 @@ class C_finance extends Finnance_Controler {
     public function set_tuition_fee_delete_data()
     {
       $input = $this->getInputToken();
+      $ID_register_formulir = $input[0];
+      $InputReason = $this->input->post('InputReason');
+      $dataGet = $this->m_master->caribasedprimary('db_finance.register_admisi_rev','ID_register_formulir',$ID_register_formulir);
+      $count = count($dataGet);
+      $arr_Count = $count - 1;
+      $RevNo = (count($dataGet) == 0) ? 1 : $dataGet[$arr_Count]['RevNo'] + 1;
+      $dataSave = array(  
+          'ID_register_formulir' => $ID_register_formulir,
+          'RevNo' => $RevNo,
+          'Note' => 'Cancel / Reject, '.$InputReason,
+          'RevBy' => $this->session->userdata('NIP'),
+          'RevAt' => date('Y-m-d H:i:s'),
+      );
+      $this->db->insert('db_finance.register_admisi_rev', $dataSave);
+
+
       $this->m_admission->set_tuition_fee_delete_data($input);
+
+      // save di register_admisi_rev
+
 
       // send email to admission
       $getEmailDB = $this->m_master->caribasedprimary('db_admission.email_to','Function','Admisi');
@@ -1376,10 +1704,12 @@ class C_finance extends Finnance_Controler {
       
 
       // $table = "<table class=MsoTableGrid border=1 cellspacing=0 cellpadding=0 style='border-collapse:collapse;border:none'><tr><td width=35 valign=top style='width:26.6pt;border:solid windowtext 1.0pt;padding:0in 5.4pt 0in 5.4pt'><p class=MsoNormal>NO<o:p></o:p></p></td><td width=270 valign=top style='width:202.5pt;border:solid windowtext 1.0pt;border-left:none;padding:0in 5.4pt 0in 5.4pt'><p class=MsoNormal>Nama<o:p></o:p></p></td><td width=162 valign=top style='width:121.5pt;border:solid windowtext 1.0pt;border-left:none;padding:0in 5.4pt 0in 5.4pt'><p class=MsoNormal>Prody<o:p></o:p></p></td><td width=156 valign=top style='width:116.9pt;border:solid windowtext 1.0pt;border-left:none;padding:0in 5.4pt 0in 5.4pt'><p class=MsoNormal>Formulir Code<o:p></o:p></p></td></tr></table>";
-
-      $Email = $getEmailDB[0]['EmailTo'];
+      $Email = 'alhadi.rahman@podomorouniversity.ac.id';
+      if($_SERVER['SERVER_NAME']!='localhost' && $_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {  
+        $Email = 'admission@podomorouniversity.ac.id';
+      }
       $to = $Email;
-      $subject = "Podomoro University Notification Bills";
+      $subject = "Podomoro University Notification Reject Tuition Fee";
       $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
     }
 
@@ -1435,28 +1765,30 @@ class C_finance extends Finnance_Controler {
                 if((select count(*) as total from db_admission.register_nilai where Status = "Approved" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
                 as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,
                 if( (select count(*) as total from db_finance.payment_pre where ID_register_formulir = a.ID limit 1) > 1,"Cicilan","Tidak Cicilan") as cicilan,
-                if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment
+                if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment,px.No_Ref
                 from db_admission.register_formulir as a
-                JOIN db_admission.register_verified as b 
+                left JOIN db_admission.register_verified as b 
                 ON a.ID_register_verified = b.ID
-                JOIN db_admission.register_verification as c
+                left JOIN db_admission.register_verification as c
                 ON b.RegVerificationID = c.ID
-                JOIN db_admission.register as d
+                left JOIN db_admission.register as d
                 ON c.RegisterID = d.ID
-                JOIN db_admission.country as e
+                left JOIN db_admission.country as e
                 ON a.NationalityID = e.ctr_code
-                JOIN db_employees.religion as f
+                left JOIN db_employees.religion as f
                 ON a.ReligionID = f.IDReligion
-                JOIN db_admission.school_type as l
+                left JOIN db_admission.school_type as l
                 ON l.sct_code = a.ID_school_type
-                JOIN db_admission.register_major_school as m
+                left JOIN db_admission.register_major_school as m
                 ON m.ID = a.ID_register_major_school
-                JOIN db_admission.school as n
+                left JOIN db_admission.school as n
                 ON n.ID = d.SchoolID
-                join db_academic.program_study as o
+                left join db_academic.program_study as o
                 on o.ID = a.ID_program_study
-                join db_finance.register_admisi as p
+                left join db_finance.register_admisi as p
                 on a.ID = p.ID_register_formulir
+                left join db_admission.formulir_number_offline_m as px
+                on px.FormulirCode = b.FormulirCode
                 where p.Status = "Approved"  and d.SetTa = "'.$reqTahun.'" group by a.ID
 
                 ) SubQuery
@@ -1464,7 +1796,9 @@ class C_finance extends Finnance_Controler {
 
         $sql.= ' where (Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
                 or FormulirCode LIKE "'.$requestData['search']['value'].'%" or SchoolName LIKE "%'.$requestData['search']['value'].'%"
-                or StatusPayment LIKE "'.$requestData['search']['value'].'%" or cicilan LIKE "'.$requestData['search']['value'].'%")
+                or StatusPayment LIKE "'.$requestData['search']['value'].'%" or cicilan LIKE "'.$requestData['search']['value'].'%"
+                or No_Ref LIKE "'.$requestData['search']['value'].'%" 
+                )
                 ';
         $sql.= ' ORDER BY StatusPayment ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
@@ -1478,7 +1812,8 @@ class C_finance extends Finnance_Controler {
             // $nestedData[] = '<input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'">';
             $nestedData[] = $row['NamePrody'];
             $nestedData[] = $row['Name'].'<br>'.$row['Email'];
-            $nestedData[] = $row['FormulirCode'];
+            $FormulirCode = ($row['No_Ref'] != "" || $row['No_Ref'] != null ) ? $row['FormulirCode'].' / '.$row['No_Ref'] : $row['FormulirCode'];
+            $nestedData[] = $FormulirCode;
 
             // get tagihan
             $getTagihan = $this->m_admission->getPaymentType_Cost_created($row['ID_register_formulir']);
@@ -1492,31 +1827,9 @@ class C_finance extends Finnance_Controler {
             $nestedData[] = '<button class="btn btn-inverse btn-notification btn-show" id-register-formulir = "'.$row['ID_register_formulir'].'" email = "'.$row['Email'].'" Nama = "'.$row['Name'].'">Show</button>';
             $nestedData[] = $row['StatusPayment'];
             $nestedData[] = '<button class = "btn btn-primary btn-payment" id-register-formulir = "'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">Detail</button>';
-
-
-            // $combo = '<select class="full-width-fix select grouPAuth btn-edit" NIP = "'.$row['NIP'].'">';
-            // for ($j=0; $j < count($getGroupUser); $j++) { 
-            //     if ($getGroupUser[$j]['ID'] == $row['G_user']) {
-            //          $combo .= '<option value = "'.$getGroupUser[$j]['ID'].'" selected>'.$getGroupUser[$j]['GroupAuth'].'</option>';
-            //     }
-            //     else
-            //     {
-            //         $combo .= '<option value = "'.$getGroupUser[$j]['ID'].'">'.$getGroupUser[$j]['GroupAuth'].'</option>';
-            //     }
-            // }
-
-            // $combo .= '</select>';
-
-            // $nestedData[] = $combo;
-
-            // $btn = '<button class="btn btn-danger btn-sm btn-delete btn-delete-group" NIP = "'.$row['NIP'].'"><i class="fa fa-trash" aria-hidden="true"></i></button>';  
-
-            // $nestedData[] = $btn;
-            // $data[] = $nestedData;
+           
             $data[] = $nestedData;
         }
-
-        // print_r($data);
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
@@ -1531,7 +1844,6 @@ class C_finance extends Finnance_Controler {
     public function getPayment_admission_edit_cicilan()
     {
         $requestData= $_REQUEST;
-        // print_r($requestData);
         $totalData = $this->m_finance->getCountAllPayment_admission();
 
         $sql = 'select * from (
@@ -1541,28 +1853,30 @@ class C_finance extends Finnance_Controler {
                 if((select count(*) as total from db_admission.register_nilai where Status = "Approved" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
                 as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,
                 if( (select count(*) as total from db_finance.payment_pre where ID_register_formulir = a.ID limit 1) > 1,"Cicilan","Tidak Cicilan") as cicilan,
-                if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment
+                if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment,px.No_Ref,p.RevID
                 from db_admission.register_formulir as a
-                JOIN db_admission.register_verified as b 
+                left JOIN db_admission.register_verified as b 
                 ON a.ID_register_verified = b.ID
-                JOIN db_admission.register_verification as c
+                left JOIN db_admission.register_verification as c
                 ON b.RegVerificationID = c.ID
-                JOIN db_admission.register as d
+                left JOIN db_admission.register as d
                 ON c.RegisterID = d.ID
-                JOIN db_admission.country as e
+                left JOIN db_admission.country as e
                 ON a.NationalityID = e.ctr_code
-                JOIN db_employees.religion as f
+                left JOIN db_employees.religion as f
                 ON a.ReligionID = f.IDReligion
-                JOIN db_admission.school_type as l
+                left JOIN db_admission.school_type as l
                 ON l.sct_code = a.ID_school_type
-                JOIN db_admission.register_major_school as m
+                left JOIN db_admission.register_major_school as m
                 ON m.ID = a.ID_register_major_school
-                JOIN db_admission.school as n
+                left JOIN db_admission.school as n
                 ON n.ID = d.SchoolID
-                join db_academic.program_study as o
+                left join db_academic.program_study as o
                 on o.ID = a.ID_program_study
-                join db_finance.register_admisi as p
+                left join db_finance.register_admisi as p
                 on a.ID = p.ID_register_formulir
+                left join db_admission.formulir_number_offline_m as px
+                on px.FormulirCode = b.FormulirCode
                 where p.Status = "Approved" group by a.ID
 
                 ) SubQuery
@@ -1570,7 +1884,9 @@ class C_finance extends Finnance_Controler {
 
         $sql.= ' where (Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
                 or FormulirCode LIKE "'.$requestData['search']['value'].'%" or SchoolName LIKE "%'.$requestData['search']['value'].'%"
-                or StatusPayment LIKE "'.$requestData['search']['value'].'%" or cicilan LIKE "'.$requestData['search']['value'].'%")
+                or StatusPayment LIKE "'.$requestData['search']['value'].'%" or cicilan LIKE "'.$requestData['search']['value'].'%"
+                or No_Ref LIKE "'.$requestData['search']['value'].'%"
+                )
                 and FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)
                 ';
         $sql.= ' ORDER BY StatusPayment ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
@@ -1585,7 +1901,8 @@ class C_finance extends Finnance_Controler {
             $nestedData[] = '<input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">';
             $nestedData[] = $row['NamePrody'];
             $nestedData[] = $row['Name'].'<br>'.$row['Email'];
-            $nestedData[] = $row['FormulirCode'];
+            $FormulirCode = ($row['No_Ref'] != "" || $row['No_Ref'] != null ) ? $row['FormulirCode'].' / '.$row['No_Ref'] : $row['FormulirCode'];
+            $nestedData[] = $FormulirCode;
             // get tagihan
             $getTagihan = $this->m_admission->getPaymentType_Cost_created($row['ID_register_formulir']);
             $tagihan = '';
@@ -1596,33 +1913,19 @@ class C_finance extends Finnance_Controler {
             $nestedData[] = $tagihan;
             $nestedData[] = $row['cicilan'];
             $nestedData[] = '<button class="btn btn-inverse btn-notification btn-show" id-register-formulir = "'.$row['ID_register_formulir'].'" email = "'.$row['Email'].'" Nama = "'.$row['Name'].'">Show</button>';
-            $nestedData[] = $row['StatusPayment'];
-            // $nestedData[] = '<button class = "btn btn-primary btn-payment" id-register-formulir = "'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">Detail</button>';
 
+            $Revision = $row['RevID'];
+            $RevWr = '';
+            if ($Revision != 0) {
+                $getData = $this->m_master->caribasedprimary('db_finance.register_admisi_rev','ID_register_formulir',$row['ID_register_formulir']);
+                $RevWr = '<a href = "javascript:void(0)" class = "showModal" id-register-formulir = "'.$row['ID_register_formulir'].'">Revision '.count($getData).'x';
+            }
+            $nestedData[] = $row['StatusPayment'].'<br>'.$RevWr;
+            $btn = '<button class="btn btn-danger btn-sm btn-delete btn_cancel_tui" id-register-formulir = "'.$row['ID_register_formulir'].'"><i class="fa fa-trash" aria-hidden="true"></i> Cancel</button>';  
 
-            // $combo = '<select class="full-width-fix select grouPAuth btn-edit" NIP = "'.$row['NIP'].'">';
-            // for ($j=0; $j < count($getGroupUser); $j++) { 
-            //     if ($getGroupUser[$j]['ID'] == $row['G_user']) {
-            //          $combo .= '<option value = "'.$getGroupUser[$j]['ID'].'" selected>'.$getGroupUser[$j]['GroupAuth'].'</option>';
-            //     }
-            //     else
-            //     {
-            //         $combo .= '<option value = "'.$getGroupUser[$j]['ID'].'">'.$getGroupUser[$j]['GroupAuth'].'</option>';
-            //     }
-            // }
-
-            // $combo .= '</select>';
-
-            // $nestedData[] = $combo;
-
-            // $btn = '<button class="btn btn-danger btn-sm btn-delete btn-delete-group" NIP = "'.$row['NIP'].'"><i class="fa fa-trash" aria-hidden="true"></i></button>';  
-
-            // $nestedData[] = $btn;
-            // $data[] = $nestedData;
+            $nestedData[] = $btn;
             $data[] = $nestedData;
         }
-
-        // print_r($data);
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
@@ -1686,35 +1989,172 @@ class C_finance extends Finnance_Controler {
     {
         $Input = $this->getInputToken();
         $msg = '';
-        $proses = $this->m_finance->edit_cicilan_tagihan_admission_submit($Input);
+        $proses = $this->m_finance->edit_cicilan_tagihan_admission_submit2($Input);
         $msg = $proses['msg'];
         echo json_encode($msg);
     }
 
-    public function report()
+    // public function report()
+    // {
+    //     $content = $this->load->view('page/'.$this->data['department'].'/tagihan_mahasiswa/report',$this->data,true);
+    //     $this->temp($content);
+    // }
+
+    // public function get_reporting($page = null)
+    // {
+    //     $input = $this->getInputToken();
+    //     $this->load->library('pagination');
+    //     // per page 2 database
+    //     $sqlCount = 'show databases like "%ta_2%"';
+    //     $queryCount=$this->db->query($sqlCount, array())->result_array();
+
+    //     $config = $this->config_pagination_default_ajax(count($queryCount),1,3);
+    //     $this->pagination->initialize($config);
+    //     $page = $this->uri->segment(3);
+    //     $start = ($page - 1) * $config["per_page"];
+    //     $data = $this->m_finance->get_report_pembayaran_mhs($input['ta'],$input['prodi'],$input['NIM'],$input['Semester'],$input['Status'],$config["per_page"], $start);
+    //     $output = array(
+    //     'pagination_link'  => $this->pagination->create_links(),
+    //     'loadtable'   => $data,
+    //     );
+    //     echo json_encode($output);
+    // }
+
+    public function formulir_registration_offline_serverSide()
     {
-        $content = $this->load->view('page/'.$this->data['department'].'/tagihan_mahasiswa/report',$this->data,true);
-        $this->temp($content);
+        $requestData= $_REQUEST;
+        $reqTahun = $this->input->post('tahun');
+        $StatusJual = $this->input->post('StatusJual');
+        $No = $requestData['start'] + 1;
+        $totalData = $this->m_admission->totalDataFormulir_offline4($reqTahun,$requestData,$StatusJual);
+
+        if($StatusJual != '%') {
+          $StatusJual = ' and b.StatusJual = '.$StatusJual;
+        }
+        else
+        {
+          $StatusJual = ''; 
+        }
+
+        $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,b.No_Ref,a.StatusReg,b.Years,b.Status as StatusUsed, b.StatusJual,
+                  b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,b.CityNameFormulir,b.DistrictNameFormulir,b.TypePay,
+                  b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi,b.NoKwitansi
+                  from (
+                  select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
+                  from db_admission.register as a 
+                  join db_admission.register_verification as b
+                  on a.ID = b.RegisterID
+                  join db_admission.register_verified as c
+                  on c.RegVerificationID = b.ID
+                  join db_admission.school as z
+                  on z.ID = a.SchoolID
+                  where a.StatusReg = 1
+                  ) as a right JOIN
+                  (
+                  select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,b.NoKwitansi,
+                  b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,b.TypePay,
+                  if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,b.ID_ProgramStudy,y.Name as NameProdi
+                  from db_admission.formulir_number_offline_m as a
+                  left join db_admission.sale_formulir_offline as b
+                  on a.FormulirCode = b.FormulirCodeOffline
+                  left join db_employees.employees as c
+                  on c.NIP = b.PIC
+                  left join db_admission.school as z
+                  on z.ID = b.SchoolID
+                  left join db_academic.program_study as y
+                  on b.ID_ProgramStudy = y.ID
+                  )
+                  as b
+                  on a.FormulirCode = b.FormulirCode
+            ';
+
+        $sql.= 'where Years = "'.$reqTahun.'" and 
+                        (
+                          b.FormulirCode like "'.$requestData['search']['value'].'%" or
+                          b.No_Ref like "'.$requestData['search']['value'].'%" or
+                          b.Sales like "'.$requestData['search']['value'].'%" or
+                          a.NameCandidate like "'.$requestData['search']['value'].'%" or
+                          b.SchoolNameFormulir like "%'.$requestData['search']['value'].'%" or
+                          b.NameProdi like "'.$requestData['search']['value'].'%" or
+                          b.src_name like "'.$requestData['search']['value'].'%" or
+                          b.FullName like "'.$requestData['search']['value'].'%" or
+                          b.DateSale like "'.$requestData['search']['value'].'%" or
+                          b.NoKwitansi like "'.$requestData['search']['value'].'%"
+                        ) '.$StatusJual.'';
+        $sql.= ' order by b.NoKwitansi desc LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+            $nestedData[] = $No;
+            $nestedData[] = $row['FormulirCode'];
+            $nestedData[] = $row['No_Ref'];
+            $nestedData[] = $row['NoKwitansi'];
+            $nestedData[] = $row['NameProdi'];
+            $aa = ($row['StatusUsed'] == 0) ? '<div style="color:  green;">No</div>' : '<div style="color:  red;">Yes</div>';
+            $nestedData[] = $aa;
+            $aa = ($row['StatusJual'] == 0) ? '<div style="color:  green;">IN</div>' : '<div style="color:  red;">Sold Out</div>';
+            $nestedData[] = $aa;
+            $nestedData[] = $row['Sales'];
+            $nestedData[] = number_format($row['Price_Form'],0,',','.');
+            $nestedData[] = $row['DateSale'];
+            $nestedData[] = $row['NamaPembeli'].'<br>'.$row['PhoneNumberPembeli'].'<br>'.$row['EmailPembeli'].'<br>'.$row['SchoolNameFormulir'].'<br>'.$row['DistrictNameFormulir'].' '.$row['CityNameFormulir'];
+            $nestedData[] = $row['src_name'];
+            $action = '';
+            if ($row['ID_sale_formulir_offline'] != null || $row['ID_sale_formulir_offline'] != '')
+            {
+              $action = '<div class="row" style="margin-top: 10px">
+                          <div class="col-md-12">
+                            <span ref = "'.$row['No_Ref'].'" NamaLengkap = "'.$row['NamaPembeli'].'" class="btn btn-xs btn-print" phonehome = "'.$row['HomeNumberPembeli'].'" hp = "'.$row['PhoneNumberPembeli'].'" jurusan = "'.$row['NameProdi'].'" pembayaran ="Pembelian Formulir Pendaftaran('.$row['NameProdi'].')" jenis= "'.$row['TypePay'].'" jumlah = "'.$row['Price_Form'].'" date = "'.$row['DateSale'].'" formulir = "'.$row['FormulirCode'].'" NoKwitansi = "'.$row['NoKwitansi'].'">
+                             <i class="fa fa-print"></i> Kwitansi
+                           </span>
+                          </div>
+                        </div>
+                        ';
+            }
+
+            $nestedData[] = $action;
+            $data[] = $nestedData;
+            $No++;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalData ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
     }
 
-    public function get_reporting($page = null)
+    public function copy_last_tuition_fee()
     {
         $input = $this->getInputToken();
-        $this->load->library('pagination');
-        // per page 2 database
-        $sqlCount = 'show databases like "%ta_2%"';
-        $queryCount=$this->db->query($sqlCount, array())->result_array();
-
-        $config = $this->config_pagination_default_ajax(count($queryCount),1,3);
-        $this->pagination->initialize($config);
-        $page = $this->uri->segment(3);
-        $start = ($page - 1) * $config["per_page"];
-        $data = $this->m_finance->get_report_pembayaran_mhs($input['ta'],$input['prodi'],$input['NIM'],$input['Semester'],$input['Status'],$config["per_page"], $start);
-        $output = array(
-        'pagination_link'  => $this->pagination->create_links(),
-        'loadtable'   => $data,
-        );
-        echo json_encode($output);
+        if ($input['verify'] == 'CreateTuitionFee') {
+            $year = date('Y');
+            $YearNext = (int) $year + 1;
+            $msg = '';
+            $get = $this->m_master->caribasedprimary('db_finance.tuition_fee','ClassOf',$YearNext);
+            if (count($get) == 0) {
+                $sql = "INSERT INTO db_finance.tuition_fee (ID, PTID, ProdiID, ClassOf,Cost,Pay_Cond)
+                        SELECT null, PTID, ProdiID, ?,Cost,Pay_Cond
+                        FROM db_finance.tuition_fee 
+                        WHERE ClassOf = ?";
+                $query=$this->db->query($sql, array($YearNext,$year));   
+            }
+            else
+             {
+                $msg = 'The data is already exist';
+             }
+             echo json_encode($msg);
+        }
+        else
+        {
+            exit('No direct script access allowed');
+        }
     }
 
 }

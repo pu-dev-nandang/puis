@@ -352,11 +352,12 @@ class M_save_to_pdf extends CI_Model {
 
     public function getTranscript($DBStudent,$NPM){
 
-        $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth,  
+        $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth, aus.CertificateSerialNumber AS CSN,  
                                             ps.Name AS Prodi, ps.NameEng AS ProdiEng, edl.Description AS GradeDesc, 
                                             edl.DescriptionEng AS GradeDescEng, em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind, 
-                                            fp.TitleInd, fp.TitleEng
+                                            fp.TitleInd, fp.TitleEng, f.Name AS FacultyName
                                             FROM '.$DBStudent.'.students s
+                                            LEFT JOIN db_academic.auth_students aus ON (s.NPM = aus.NPM) 
                                             LEFT JOIN db_academic.program_study ps ON (s.ProdiID = ps.ID) 
                                             LEFT JOIN db_academic.education_level edl ON (edl.ID = ps.EducationLevelID)
                                             LEFT JOIN db_academic.faculty f ON (f.ID = ps.FacultyID)
@@ -365,51 +366,89 @@ class M_save_to_pdf extends CI_Model {
                                             WHERE s.NPM = "'.$NPM.'" ')->result_array();
 
 
-        $data = $this->db->query('SELECT sp.Credit, sp.Grade, sp.GradeValue, mk.Name AS MKName, mk.NameEng AS MKNameEng 
+        $data = $this->db->query('SELECT sp.Credit, sp.Grade, sp.GradeValue, mk.Name AS MKName, mk.NameEng AS MKNameEng, 
+                                          sp.MKID, mk.MKCode 
                                           FROM '.$DBStudent.'.study_planning sp 
                                           LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sp.CDID)
                                           LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
-                                          WHERE sp.NPM = "'.$NPM.'" ')->result_array();
+                                          LEFT JOIN db_academic.semester s ON (s.ID = sp.SemesterID)
+                                          WHERE sp.NPM = "'.$NPM.'" AND s.Status != 1 ')->result_array();
 
         $totalSKS = 0;
         $totalGradeValue = 0;
+
+        $arrDetailCourseID = [];
+        $DetailCourse = [];
 
         if(count($data)>0){
             for($i=0;$i<count($data);$i++){
                 $d = $data[$i];
 
-                $totalSKS = $totalSKS + $d['Credit'];
-                $totalGradeValue = $totalGradeValue + ($d['Credit'] * $d['GradeValue']);
+                if(in_array($d['MKID'],$arrDetailCourseID)!=-1){
+                    $dataScore = $dataScore = $this->db->order_by('Score', 'DESC')
+                        ->get_where($DBStudent.'.study_planning',array('NPM' => $NPM,'MKID'=>$d['MKID']))->result_array();
+
+                    $Grade = ($dataScore[0]['Grade']!='' && $dataScore[0]['Grade']!=null) ? $dataScore[0]['Grade'] : 'E';
+                    $GradeValue = ($dataScore[0]['GradeValue']!='' && $dataScore[0]['GradeValue']!=null) ? $dataScore[0]['GradeValue'] : 0;
+                    $Point = $d['Credit'] * $GradeValue;
+
+                    $data[$i]['Grade'] = $Grade;
+//                    $data[$i]['GradeValue'] = (is_int($GradeValue)) ? $GradeValue : number_format($GradeValue,2);
+//                    $data[$i]['Point'] = (is_int($Point)) ? $Point : number_format($Point,2);
+                    $data[$i]['GradeValue'] = $GradeValue;
+                    $data[$i]['Point'] = $Point;
+
+                    $totalSKS = $totalSKS + $d['Credit'];
+                    $totalGradeValue = $totalGradeValue + $Point;
+
+                    array_push($arrDetailCourseID,$d['MKID']);
+                    array_push($DetailCourse,$data[$i]);
+                }
+
+
             }
         }
 
-        $ipk = (count($data)>0) ? $totalGradeValue/$totalSKS : 0 ;
+        $IPK_Ori = (count($data)>0) ? $totalGradeValue/$totalSKS : 0 ;
+        $ipk = round($IPK_Ori,2);
 
-        $grade = $this->getGraduation($ipk);
+        $grade = $this->getGraduation(number_format($ipk,2,'.',''));
 
         // Get Rektor
-        $dataRektor = $this->db->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees',array('PositionMain' => '2.1'),1)->result_array();
+        $dataRektor = $this->db->query('SELECT em.NIP, em.Name, em.TitleAhead, em.TitleBehind FROM db_employees.employees em
+                                                    LEFT JOIN db_employees.employees_status ems ON (ems.ID = em.StatusEmployeeID)
+                                                    WHERE em.PositionMain = "2.1" AND ems.IDStatus != -1 AND ems.IDStatus != -2 ')->result_array();
 
-        $dataTranscript = $this->db->get('db_academic.setting_transcript')->result_array();
+        // Wakil rektor akademik / Warek I
+        $dataWaRek1 = $this->db->query('SELECT em.NIP, em.Name, em.TitleAhead, em.TitleBehind FROM db_employees.employees em
+                                                    LEFT JOIN db_employees.employees_status ems ON (ems.ID = em.StatusEmployeeID)
+                                                    WHERE em.PositionMain = "2.2" AND ems.IDStatus != -1 AND ems.IDStatus != -2 ')->result_array();
+
+        $dataTranscript = $this->db->limit(1)->get('db_academic.setting_transcript')->result_array();
+        $dataTempTranscript = $this->db->limit(1)->get('db_academic.setting_temp_transcript')->result_array();
 
         $result = array(
             'Student' => $dataStd,
             'Result' => array(
                 'TotalSKS' => $totalSKS,
                 'TotalGradeValue' => $totalGradeValue,
-                'IPK_Ori' => $ipk,
-                'IPK' => round($ipk,2),
+                'IPK_Ori' => $IPK_Ori,
+                'IPK' => $ipk,
                 'Grading' => $grade
             ),
             'Transcript' => $dataTranscript,
+            'TempTranscript' => $dataTempTranscript,
             'Rektorat' => $dataRektor,
-            'DetailCourse' => $data
+            'WaRek1' => $dataWaRek1,
+            'DetailCourse' => $DetailCourse
+//            'DetailCourse' => $data
         );
 
         return $result;
     }
 
     public function getGraduation($IPK){
+
         $dataGrade = $this->db->query('SELECT * FROM db_academic.graduation g 
                                                   WHERE g.IPKStart <= "'.$IPK.'" AND g.IPKEnd >= "'.$IPK.'"
                                                    LIMIT 1')->result_array();
@@ -418,10 +457,13 @@ class M_save_to_pdf extends CI_Model {
     }
 
     public function getIjazah($DBStudent,$NPM){
-        $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth,  
-                                            ps.Name AS Prodi, ps.NameEng AS ProdiEng, edl.Description AS GradeDesc, 
-                                            edl.DescriptionEng AS GradeDescEng, em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind 
+        $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth, aus.CertificateSerialNumber AS CSN, 
+                                            ps.Name AS Prodi, ps.NameEng AS ProdiEng, 
+                                            ps.Degree, ps.TitleDegree, ps.DegreeEng, ps.TitleDegreeEng, 
+                                            edl.Description AS GradeDesc, edl.DescriptionEng AS GradeDescEng, 
+                                            em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind 
                                             FROM '.$DBStudent.'.students s
+                                            LEFT JOIN db_academic.auth_students aus ON (s.NPM = aus.NPM) 
                                             LEFT JOIN db_academic.program_study ps ON (s.ProdiID = ps.ID) 
                                             LEFT JOIN db_academic.education_level edl ON (edl.ID = ps.EducationLevelID)
                                             LEFT JOIN db_academic.faculty f ON (f.ID = ps.FacultyID)
@@ -430,8 +472,12 @@ class M_save_to_pdf extends CI_Model {
 
         $dataTranscript = $this->db->get('db_academic.setting_transcript')->result_array();
 
+        // Get Rektor
+        $dataRektor = $this->db->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees',array('PositionMain' => '2.1'),1)->result_array();
+
         $result = array(
             'Student' => $dataStd,
+            'Rektorat' => $dataRektor,
             'Ijazah' => $dataTranscript
         );
 

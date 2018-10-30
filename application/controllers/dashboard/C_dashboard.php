@@ -10,15 +10,34 @@ class C_dashboard extends Globalclass {
     public function temp($content)
     {
         parent::template($content);
+        $this->load->model('master/m_master');
+        $this->load->model('m_menu');
     }
 
     public function index()
     {
         $data['department'] = parent::__getDepartement();
+        $dpt = $this->session->userdata('IDdepartementNavigation');
         // print_r(APPPATH.'views/page/'.$data['department'].'/dashboard.php');die();
         if (file_exists(APPPATH.'views/page/'.$data['department'].'/dashboard.php')) {
-            $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
-            $this->temp($content);
+            switch ($dpt) {
+                case 10: // admission
+                case 18: // BA
+                    $set_ta = $this->m_master->showData_array('db_admission.set_ta');
+                    $data['set_ta'] = $set_ta[0]['Ta'];
+                    $this->m_menu->set_model('admission_sess','auth_admission_sess','menu_admission_sess','menu_admission_grouping','db_admission');
+                    $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
+                    $this->temp($content);
+                    break;
+                
+                default:
+                    $getSemester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+                    $data['getSemester'] = $getSemester;
+                    $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
+                    $this->temp($content);
+                    break;
+            }
+           
         }
         else
         {
@@ -103,17 +122,22 @@ class C_dashboard extends Globalclass {
         $arr_json = array();
         $arrDB = array();
         $sqlDB = 'show databases like "%ta_2%"';
+        $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+        $SemesterYear = $SemesterID[0]['Year'];
         $queryDB=$this->db->query($sqlDB, array())->result_array();
         foreach ($queryDB as $key) {
           foreach ($key as $keyB ) {
-            $arrDB[] = $keyB;
+            $YearDB = explode('_', $keyB);
+            $YearDB = $YearDB[1];
+            if ($SemesterYear >= $YearDB) {
+                $arrDB[] = $keyB;
+            }
           }
           
         }
 
         rsort($arrDB);
         $Year = 'ta_'.date('Y');
-        $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
         $Semester = $SemesterID[0]['ID'];
         $Semester = ' and SemesterID = '.$Semester;
         $unk = 1;
@@ -123,7 +147,7 @@ class C_dashboard extends Globalclass {
         $Unpaid_Off = array();
         $unsetPaid = array();
         for ($i=0; $i < count($arrDB); $i++) { 
-            if ($arrDB[$i] != $Year) {
+            // if ($arrDB[$i] != $Year) {
 
                 $a_Paid_Off = 0;
                 $a_Unpaid_Off = 0;
@@ -231,7 +255,7 @@ class C_dashboard extends Globalclass {
                 $unsetPaid[] = array($YearDB,$a_unsetPaid);
                 $unk++;
 
-            }
+            // }
         }
 
         $arr_json = array('Paid_Off'=> $Paid_Off,'Unpaid_Off' => $Unpaid_Off,'unsetPaid' => $unsetPaid);
@@ -304,34 +328,41 @@ class C_dashboard extends Globalclass {
         }
 
         rsort($arrDB);
+        $taDb = $this->m_master->showData_array('db_admission.set_ta');
+        $taDb = $taDb[0]['Ta'];
+         if(!in_array($taDb, $arrDB))
+           {
+              $arrDB[] = $taDb;
+           }
         // get paid off
         $Paid_Off = array();
         $Unpaid_Off = array();
+        $Unset_Paid = array();
         for ($i=0; $i < count($arrDB); $i++) {
             // lunas 
             $sqlPaid_Off = 'select count(*) as total from (
                     select a.ID as ID_register_formulir,
                     if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment
                     from db_admission.register_formulir as a
-                    JOIN db_admission.register_verified as b 
+                    left JOIN db_admission.register_verified as b 
                     ON a.ID_register_verified = b.ID
-                    JOIN db_admission.register_verification as c
+                    left JOIN db_admission.register_verification as c
                     ON b.RegVerificationID = c.ID
-                    JOIN db_admission.register as d
+                    left JOIN db_admission.register as d
                     ON c.RegisterID = d.ID
-                    JOIN db_admission.country as e
+                    left JOIN db_admission.country as e
                     ON a.NationalityID = e.ctr_code
-                    JOIN db_employees.religion as f
+                    left JOIN db_employees.religion as f
                     ON a.ReligionID = f.IDReligion
-                    JOIN db_admission.school_type as l
+                    left JOIN db_admission.school_type as l
                     ON l.sct_code = a.ID_school_type
-                    JOIN db_admission.register_major_school as m
+                    left JOIN db_admission.register_major_school as m
                     ON m.ID = a.ID_register_major_school
-                    JOIN db_admission.school as n
+                    left JOIN db_admission.school as n
                     ON n.ID = d.SchoolID
-                    join db_academic.program_study as o
+                    left join db_academic.program_study as o
                     on o.ID = a.ID_program_study
-                    join db_finance.register_admisi as p
+                    left join db_finance.register_admisi as p
                     on a.ID = p.ID_register_formulir
                     where p.Status = "Approved"  and d.SetTa = "'.$arrDB[$i].'" group by a.ID
 
@@ -343,37 +374,67 @@ class C_dashboard extends Globalclass {
                     select a.ID as ID_register_formulir,
                     if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment
                     from db_admission.register_formulir as a
-                    JOIN db_admission.register_verified as b 
+                    left JOIN db_admission.register_verified as b 
                     ON a.ID_register_verified = b.ID
-                    JOIN db_admission.register_verification as c
+                    left JOIN db_admission.register_verification as c
                     ON b.RegVerificationID = c.ID
-                    JOIN db_admission.register as d
+                    left JOIN db_admission.register as d
                     ON c.RegisterID = d.ID
-                    JOIN db_admission.country as e
+                    left JOIN db_admission.country as e
                     ON a.NationalityID = e.ctr_code
-                    JOIN db_employees.religion as f
+                    left JOIN db_employees.religion as f
                     ON a.ReligionID = f.IDReligion
-                    JOIN db_admission.school_type as l
+                    left JOIN db_admission.school_type as l
                     ON l.sct_code = a.ID_school_type
-                    JOIN db_admission.register_major_school as m
+                    left JOIN db_admission.register_major_school as m
                     ON m.ID = a.ID_register_major_school
-                    JOIN db_admission.school as n
+                    left JOIN db_admission.school as n
                     ON n.ID = d.SchoolID
-                    join db_academic.program_study as o
+                    left join db_academic.program_study as o
                     on o.ID = a.ID_program_study
-                    join db_finance.register_admisi as p
+                    left join db_finance.register_admisi as p
                     on a.ID = p.ID_register_formulir
                     where p.Status = "Approved"  and d.SetTa = "'.$arrDB[$i].'" group by a.ID
 
                     ) SubQuery where StatusPayment = "Belum Lunas";
                 ';
-            $queryUnpaid_Off = $this->db->query($sqlUnpaid_Off)->result_array();    
+            $queryUnpaid_Off = $this->db->query($sqlUnpaid_Off)->result_array(); 
+
+            $sqlUnset_Paid = 'select count(*) as total from (
+                    select a.ID as ID_register_formulir
+                    from db_admission.register_formulir as a
+                    left JOIN db_admission.register_verified as b 
+                    ON a.ID_register_verified = b.ID
+                    left JOIN db_admission.register_verification as c
+                    ON b.RegVerificationID = c.ID
+                    left JOIN db_admission.register as d
+                    ON c.RegisterID = d.ID
+                    left JOIN db_admission.country as e
+                    ON a.NationalityID = e.ctr_code
+                    left JOIN db_employees.religion as f
+                    ON a.ReligionID = f.IDReligion
+                    left JOIN db_admission.school_type as l
+                    ON l.sct_code = a.ID_school_type
+                    left JOIN db_admission.register_major_school as m
+                    ON m.ID = a.ID_register_major_school
+                    left JOIN db_admission.school as n
+                    ON n.ID = d.SchoolID
+                    left join db_academic.program_study as o
+                    on o.ID = a.ID_program_study
+                    left join db_finance.register_admisi as p
+                    on a.ID = p.ID_register_formulir
+                    where (p.Status = "Created"  or  a.ID not in (select ID_register_formulir from db_finance.register_admisi)  ) and d.SetTa = "'.$arrDB[$i].'" group by a.ID
+
+                    ) SubQuery;
+                ';
+            $queryUnset_Paid = $this->db->query($sqlUnset_Paid)->result_array();   
 
              $Paid_Off[] = array($arrDB[$i],$queryPaid_Off[0]['total']);
              $Unpaid_Off[] = array($arrDB[$i],$queryUnpaid_Off[0]['total']);
+             $Unset_Paid[] = array($arrDB[$i],$queryUnset_Paid[0]['total']);
         }
 
-        $arr_json = array('Paid_Off'=> $Paid_Off,'Unpaid_Off' => $Unpaid_Off);
+        $arr_json = array('Paid_Off'=> $Paid_Off,'Unpaid_Off' => $Unpaid_Off,'Unset_Paid' => $Unset_Paid);
         echo json_encode($arr_json);
     }
 
@@ -393,7 +454,15 @@ class C_dashboard extends Globalclass {
         }
 
         rsort($arrDB);
+        $taDb = $this->m_master->showData_array('db_admission.set_ta');
+        $taDb = $taDb[0]['Ta'];
+         if(!in_array($taDb,$arrDB))
+           {
+              $arrDB[] = $taDb;
+           }
+
         $Paid_Off = array();
+        $Return_Formulir = array();
         for ($i=0; $i < count($arrDB); $i++) { 
             // lunas
             $sql = 'select count(*) as total from(
@@ -403,18 +472,89 @@ class C_dashboard extends Globalclass {
             ) subquery';
 
             $query=$this->db->query($sql, array())->result_array();
+
+            $sqlReturn_Formulir = 'select count(*) as total from(
+                        select a.ID as ID_register_formulir
+                        from db_admission.register_formulir as a
+                        left JOIN db_admission.register_verified as b 
+                        ON a.ID_register_verified = b.ID
+                        left JOIN db_admission.register_verification as c
+                        ON b.RegVerificationID = c.ID
+                        left JOIN db_admission.register as d
+                        ON c.RegisterID = d.ID
+                        where d.SetTa = "'.$arrDB[$i].'"
+                    ) subquery';
+
+            $queryReturn_Formulir=$this->db->query($sqlReturn_Formulir, array())->result_array();
+
             $Paid_Off[] = array($arrDB[$i],$query[0]['total']);
+            $Return_Formulir[] = array($arrDB[$i],$queryReturn_Formulir[0]['total']);
             
         }
-        $arr_json = array('Paid_Off'=> $Paid_Off);
+        $arr_json = array('Paid_Off'=> $Paid_Off,'Return_Formulir' => $Return_Formulir);
         echo json_encode($arr_json);
         
 
     }
 
-    public function JsonLoadTable($table)
+    public function SummaryFormulirPerSales()
     {
-        
+        $arr_result = array();   
+        // get all grouping from sales
+            $set_ta = $this->m_master->showData_array('db_admission.set_ta');
+            $Ta = $set_ta[0]['Ta'];
+            $sql = 'select a.PIC,if(b.Name IS NULL or b.Name = "","Unknown",b.Name) as Name,count(*) as total from db_admission.sale_formulir_offline as a 
+                    left join db_employees.employees as b on a.PIC = b.NIP
+                    left join db_admission.formulir_number_offline_m as c
+                    on a.FormulirCodeOffline = c.FormulirCode
+                    where c.Years = ?
+                    group by a.PIC
+                    ';
+            $query=$this->db->query($sql, array($Ta))->result_array();
+            for ($i=0; $i < count($query); $i++) { 
+                $Name = explode(" ", trim($query[$i]['Name']));
+                $Name = $Name[0];
+                $arr_result[] = array($i,$query[$i]['total'],$Name);
+            }
+        $arr_json = array('arr_result'=> $arr_result);
+        echo json_encode($arr_json);             
+
+    }
+
+    public function SummaryBox()
+    {
+        $set_ta = $this->m_master->showData_array('db_admission.set_ta');
+        $Ta = $set_ta[0]['Ta'];
+        // valueFormulir
+            $sql = 'select sum(Price_Form) as total from
+                    (
+                        select a.Price_Form from db_admission.sale_formulir_offline as a 
+                            left join db_admission.formulir_number_offline_m as c
+                            on a.FormulirCodeOffline = c.FormulirCode
+                            where c.Years = ?
+                    )aa
+                    ';
+            $query=$this->db->query($sql, array($Ta))->result_array();
+
+        // value tuition fee
+            $sqlTuitionFee = 'select sum(Invoice) as total from(
+                        select e.Invoice
+                        from db_admission.register_formulir as a
+                        left JOIN db_admission.register_verified as b 
+                        ON a.ID_register_verified = b.ID
+                        left JOIN db_admission.register_verification as c
+                        ON b.RegVerificationID = c.ID
+                        left JOIN db_admission.register as d
+                        ON c.RegisterID = d.ID
+                        left join db_finance.payment_pre as e
+                        on a.ID = e.ID_register_formulir
+                        where d.SetTa = ? and e.Status = 1
+                    ) subquery';
+
+            $queryTuitionFee=$this->db->query($sqlTuitionFee, array($Ta))->result_array();
+
+        $arr_json = array('Formulir'=> ($query[0]['total'] == null || $query[0]['total'] == "") ? 0 : $query[0]['total'],'tuition_fee' => ($queryTuitionFee[0]['total'] == null || $queryTuitionFee[0]['total'] == "") ? 0 : $queryTuitionFee[0]['total']);
+        echo json_encode($arr_json);         
     }
 
 

@@ -4,8 +4,8 @@
         <!--=== Navigation ===-->
 
         <ul id="nav">
-            <li class="<?php if($this->uri->segment(2)=='employees'){echo"current";}?>">
-                <a href="<?php echo base_url('human-resources/employees');?>">
+            <li class="<?php if($this->uri->segment(2)=='diploma-supplement'){echo"current";}?>">
+                <a href="<?php echo base_url('student-life/diploma-supplement/list-student');?>">
                     <i class="fa fa-paperclip"></i>
                     Diploma Supplement
                 </a>

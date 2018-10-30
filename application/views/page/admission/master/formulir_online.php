@@ -37,12 +37,12 @@
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i> Formulir Online</h4>
+                <h4 class="header"><i class="icon-reorder"></i> <?php echo $NameMenu ?></h4>
             </div>
             <div class="widget-content">
                 <!--  -->
                 <div class="row row-sma">
-                    <label class="col-xs-3 control-label">Tahun</label>
+                    <label class="col-xs-3 control-label">Angkatan</label>
                     <div class="col-xs-9">
                         <div class="row">
                             <div class="col-xs-4">

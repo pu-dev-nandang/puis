@@ -68,6 +68,13 @@ $route['academic/ModalKetersediaanDosen'] = 'page/academic/c_akademik/Modal_Kete
 
 $route['academic/timetables'] = 'page/academic/c_jadwal';
 
+$route['academic/timetables/list'] = 'page/academic/c_timetables/list_timetables';
+$route['academic/timetables/list/edit/(:num)/(:num)/(:any)'] = 'page/academic/c_timetables/edit_course/$1/$2/$3';
+$route['academic/timetables/list/edit-schedule/(:num)/(:num)/(:any)'] = 'page/academic/c_timetables/edit_schedule/$1/$2/$3';
+
+$route['academic/timetables/course-offer'] = 'page/academic/c_timetables/course_offer';
+$route['academic/timetables/setting-timetable'] = 'page/academic/c_timetables/setting_timetable';
+
 $route['academic/study-planning'] = 'page/academic/c_study_planning';
 
 $route['academic/references'] = 'page/academic/c_reference';
@@ -86,10 +93,11 @@ $route['academic/exam-schedule/edit-exam-schedule/(:num)'] = 'page/academic/c_ja
 // ---- Score ----
 $route['academic/score'] =  'page/academic/c_score';
 $route['academic/inputScore'] =  'page/academic/c_score/inputScore';
+$route['academic/score/monitoring-score'] =  'page/academic/c_score/monitoring_score';
 
 // ---- Transcript ----
 $route['academic/transcript'] =  'page/academic/c_transcript';
-$route['academic/setting-transcript'] =  'page/academic/c_transcript/setting_transcript';
+$route['academic/transcript/setting-transcript'] =  'page/academic/c_transcript/setting_transcript';
 
 // ---- Final Project ----
 $route['academic/final-project'] =  'page/academic/c_final_project';
@@ -124,6 +132,9 @@ $route['database/employees/form_input_add/(:any)'] = 'page/database/c_database/f
 $route['database/employees/form_input_submit'] = 'page/database/c_database/form_input_submit_employees';
 $route['database/employees/changestatus'] = 'page/database/c_database/changestatus';
 
+$route['database/students/edit-students/(:any)/(:any)/(:any)'] = 'page/database/c_database/edit_students/$1/$2/$3';
+
+
 
 
 
@@ -136,6 +147,7 @@ $route['academic/loadPagePresensi'] = 'page/academic/c_presensi/loadPagePresensi
 
 $route['academic/attendance/monitoring-attendace-lecturer'] = 'page/academic/c_presensi/monitoring_lecturer';
 $route['academic/attendance/monitoring-attendace-student'] = 'page/academic/c_presensi/monitoring_student';
+$route['academic/attendance/monitoring-all-student'] = 'page/academic/c_presensi/monitoring_allstudent';
 $route['academic/attendance/monitoring-schedule-exchange'] = 'page/academic/c_presensi/monitoring_exchange';
 
 
@@ -182,6 +194,10 @@ foreach( $result as $row )
 
 }
 // test routes from db
+$route['admisssion/SummaryFormulirPerSales'] = 'dashboard/c_dashboard/SummaryFormulirPerSales';
+$route['admisssion/SummaryBox'] = 'dashboard/c_dashboard/SummaryBox';
+$route['admission/export_MoreTuitionFee'] = 'c_save_to_excel/export_MoreTuitionFee_admission';
+
 
 $route['admission/database/loadPageStudents'] = 'page/database/c_database/loadPageStudents_admission';
 
@@ -407,14 +423,23 @@ $route['admission/distribusi-formulir/formulir-online'] = 'page/admission/c_admi
 $route['admission/distribusi-formulir/formulir-online/pagination/(:num)'] = 'page/admission/c_admission/pagination_formulir_online/$1';
 $route['admission/distribusi-formulir/formulir-offline/save'] = 'page/admission/c_admission/formulir_offline_sale_save';
 $route['admission/distribusi-formulir/formulir-offline/selectPIC'] = 'page/admission/c_admission/formulir_offline_salect_PIC';
+$route['admission/distribusi-formulir/offline/LoadListPenjualan'] = 'page/admission/c_admission/LoadListPenjualanoffline';
+$route['admission/distribusi-formulir/offline/LoadListPenjualan/serverSide'] = 'page/admission/c_admission/LoadListPenjualanoffline_serverSide';
+$route['admission/distribusi-formulir/offline/LoadInputPenjualan'] = 'page/admission/c_admission/LoadInputPenjualanoffline';
+$route['admission/distribusi-formulir/offline/LoadImportInputPenjualan'] = 'page/admission/c_admission/LoadImportInputPenjualan';
+$route['admission/distribusi-formulir/offline/submit_import_excel_penjualan_formulir_offline'] = 'page/admission/c_admission/submit_import_excel_penjualan_formulir_offline';
+$route['admission/distribusi-formulir/offline/submit_import_excel_kwitansi_penjualan_formulir_offline'] = 'page/admission/c_admission/submit_import_excel_kwitansi_penjualan_formulir_offline';
+$route['admission/distribusi-formulir/offline/submit_import_excel_pengembalian_formulir_offline'] = 'page/admission/c_admission/submit_import_excel_pengembalian_formulir_offline';
+
+
 
 $route['admission/mastercalonmahasiswa/generate-nim'] = 'page/admission/c_admission/generatenim';
 $route['admission/mastercalonmahasiswa/submit_import_excel_File_generate_nim'] = 'page/admission/c_admission/submit_import_excel_File_generate_nim';
-
-
-
-
-
+$route['admission/export_kwitansi_formuliroffline'] = 'c_save_to_pdf/export_kwitansi_formuliroffline';
+$route['admission/export_PenjualanFormulirData'] = 'c_save_to_excel/export_PenjualanFormulirData';
+$route['admission/export_PenjualanFormulirFinance'] = 'c_save_to_excel/export_PenjualanFormulirFinance';
+$route['admission/export_PengembalianFormulirData'] = 'c_save_to_excel/export_PengembalianFormulirData';
+$route['admission/TuitionFee_Excel'] = 'c_save_to_excel/export_TuitionFee_Excel';
 // ---Finance----
 
 $route['finance/dashboard_getoutstanding_today'] =  'dashboard/c_dashboard/dashboard_getoutstanding_today';
@@ -430,6 +455,8 @@ $route['finance/master/modal-tagihan-mhs-submit'] =  'page/finance/c_tuition_fee
 $route['finance/master/edited-tagihan-mhs-submit'] =  'page/finance/c_tuition_fee/edited_tagihan_mhs_submit';
 $route['finance/master/deleted-tagihan-mhs-submit'] =  'page/finance/c_tuition_fee/deleted_tagihan_mhs_submit';
 $route['finance/master/mahasiswa'] =  'page/finance/c_finance/mahasiswa';
+$route['finance/excel_data_mahasiswa'] =  'c_save_to_excel/excel_data_mahasiswa_fin';
+
 $route['finance/master/import_price_list_mhs'] =  'page/finance/c_finance/import_price_list_mhs';
 $route['finance/master/import_beasiswa_mahasiswa'] =  'page/finance/c_finance/import_beasiswa_mahasiswa';
 $route['finance/master/mahasiswa_list/(:num)'] =  'page/finance/c_finance/mahasiswa_list/$1';
@@ -440,12 +467,19 @@ $route['finance/master/discount'] =  'page/finance/c_finance/page_master_discoun
 $route['finance/master/load_discount'] =  'page/finance/c_finance/load_discount';
 $route['finance/master/modalform_discount'] =  'page/finance/c_finance/modalform_discount';
 $route['finance/master/sbmt_discount'] =  'page/finance/c_finance/sbmt_discount';
+$route['finance/master/copy-last-tuition_fee'] =  'page/finance/c_finance/copy_last_tuition_fee';
 
 
 
 $route['finance/admission/penerimaan-pembayaran/formulir-registration/online'] =  'page/finance/c_finance/formulir_registration_online_page';
 $route['finance/confirmed-verifikasi-pembayaran-registration_online'] =  'page/finance/c_finance/confirmed_verfikasi_pembayaran_registration_online';
 $route['finance/admission/penerimaan-pembayaran/formulir-registration/offline'] =  'page/finance/c_finance/formulir_registration_offline_page';
+$route['finance/admission/distribusi-formulir/offline/LoadListPenjualan/serverSide'] =  'page/finance/c_finance/formulir_registration_offline_serverSide';
+
+$route['finance/admission/report'] =  'page/finance/c_report/report_admission';
+$route['finance/admission/report/tuition-fee'] =  'page/finance/c_report/tuition_fee_admission';
+
+
 $route['finance/admission/approved/nilai-rapor'] =  'page/finance/c_finance/nilai_rapor_page';
 $route['finance/approved/loaddata_nilai_calon_mahasiswa_verified/(:num)'] =  'page/finance/c_finance/loaddata_nilai_calon_mahasiswa_verified/$1';
 $route['finance/approved/submit_approved_nilai_rapor'] =  'page/finance/c_finance/submit_approved_nilai_rapor';
@@ -463,6 +497,7 @@ $route['finance/getPayment_detail_admission'] =  'page/finance/c_finance/getPaym
 $route['finance/getPayment_detail_admission2'] =  'page/finance/c_finance/getPayment_detail_admission2';
 $route['finance/admission/approved/edit'] =  'page/finance/c_finance/approved_edit';
 $route['finance/admission/approved/edit_submit'] =  'page/finance/c_finance/approved_edit_submit';
+$route['finance/getRevision_detail_admission'] =  'api/c_global/getRevision_detail_admission';
 
 
 $route['finance/tagihan-mhs/set-tagihan-mhs'] =  'page/finance/c_finance/page_set_tagihan_mhs';
@@ -504,10 +539,8 @@ $route['finance/bayar_manual_mahasiswa_admission'] =  'page/finance/c_finance/ba
 
 $route['finance/tagihan-mhs/import_pembayaran_lain'] =  'page/finance/c_finance/import_pembayaran_lain';
 $route['finance/tagihan-mhs/submit_import_pembayaran_lain'] =  'page/finance/c_finance/submit_import_pembayaran_lain';
-$route['finance/tagihan-mhs/report'] =  'page/finance/c_finance/report';
-$route['finance/get_reporting/(:num)'] =  'page/finance/c_finance/get_reporting/$1';
-
-
+$route['finance/tagihan-mhs/report'] =  'page/finance/c_report/reportTagihanMHS';
+$route['finance/get_reporting/(:num)'] =  'page/finance/c_report/get_reportingTagihanMHS/$1';
 
 
 $route['finance/tagihan-mhs/submit_import_beasiswa_mahasiswa'] =  'page/finance/c_finance/submit_import_beasiswa_mahasiswa';
@@ -522,11 +555,23 @@ $route['finance/config/policysys/modalform'] =  'page/finance/c_config/policy_sy
 $route['finance/config/policysys/submit'] =  'page/finance/c_config/policy_sys_submit';
 
 
+// --- Student Life ----
+$route['student-life/diploma-supplement'] =  'page/student-life/c_studentlife/diploma_supplement';
+$route['student-life/diploma-supplement/list-student'] =  'page/student-life/c_studentlife/diploma_supplement';
+
+
+// --- LPMI ----
+$route['lpmi/lecturer-evaluation/list-lecturer'] =  'page/lpmi/c_lpmi/edom_list_lecturer';
+$route['lpmi/lecturer-evaluation/list-question'] =  'page/lpmi/c_lpmi/edom_list_question';
+$route['lpmi/lecturer-evaluation/crud-question/(:any)/(:num)'] =  'page/lpmi/c_lpmi/crudQuestion/$1/$2';
+
+
 // ---global---
 $route['loadDataRegistrationBelumBayar'] =  'api/C_global/loadDataRegistrationBelumBayar';
 $route['loadDataRegistrationTelahBayar'] =  'api/C_global/load_data_registration_telah_bayar';
 $route['loadDataRegistrationFormulirOffline'] =  'api/C_global/load_data_registration_formulir_offline';
 $route['get_detail_cicilan_fee_admisi'] =  'api/C_global/get_detail_cicilan_fee_admisi';
+$route['get_nilai_from_admission'] =  'api/C_global/get_nilai_from_admission';
 
 
 // ---- Save to PDF ---
@@ -548,15 +593,21 @@ $route['save2pdf/answer-sheet'] =  'c_save_to_pdf/answer_sheet';
 $route['save2pdf/news-event'] =  'c_save_to_pdf/news_event';
 $route['save2pdf/attendance-list'] =  'c_save_to_pdf/attendance_list';
 $route['save2pdf/transcript'] =  'c_save_to_pdf/transcript';
+$route['save2pdf/temp_transcript'] =  'c_save_to_pdf/temp_transcript';
 $route['save2pdf/ijazah'] =  'c_save_to_pdf/ijazah';
 $route['save2pdf/diploma_supplement'] =  'c_save_to_pdf/diploma_supplement';
 
 $route['save2pdf/report-uts'] =  'c_save_to_pdf/report_uts';
 
 $route['save2pdf/getpdfkwitansi/(:any)'] =  'c_save_to_pdf/getpdfkwitansi/$1';
+$route['save2pdf/print/tuitionFeeAdmission'] =  'C_save_to_pdf2/tuitionFeeAdmission';
 
 // ---- Save to EXCEL
 $route['save2excel/test'] =  'c_save_to_excel/test2';
+$route['save2excel/monitoring_score'] =  'c_save_to_excel/monitoring_score';
+$route['save2excel/cumulative-recap'] =  'c_save_to_excel/cumulative_recap';
+$route['save2excel/student-recap'] =  'c_save_to_excel/student_recap';
+
 
 
 // ====== API ======
@@ -621,7 +672,20 @@ $route['api/__getScheduleExam'] = 'api/c_api/getScheduleExam';
 $route['api/__getScheduleExamWaitingApproval'] = 'api/c_api/getScheduleExamWaitingApproval';
 $route['api/__getScheduleExamLecturer'] = 'api/c_api/getScheduleExamLecturer';
 
+// === Timetables ====
+
+$route['api/__getTimetables'] = 'api/c_api/getTimetables';
+
+// === Penutup Timetables ====
+
+// === Monitoring All Student ===
+
+$route['api/__getMonitoringAllStudent'] = 'api/c_api/getMonitoringAllStudent';
+
+// ============================
+
 $route['api/__getListCourseInScore'] = 'api/c_api/getListCourseInScore';
+$route['api/__getMonScoreStd'] = 'api/c_api/getMonScoreStd';
 
 $route['api/__crudProgramCampus'] = 'api/c_api/crudProgramCampus';
 $route['api/__crudSemester'] = 'api/c_api/crudSemester';
@@ -645,9 +709,10 @@ $route['api/__crudStudyPlanning'] = 'api/c_api/crudStudyPlanning';
 $route['api/__getClassGroupAutoComplete/(:num)'] = 'api/c_api/getClassGroupAutoComplete/$1';
 $route['api/__getScheduleIDByClassGroup/(:num)/(:any)'] = 'api/c_api/getScheduleIDByClassGroup/$1/$2';
 $route['api/__crudPartime'] = 'api/c_api/crudPartime';
+$route['api/__crudStudent'] = 'api/c_api/crudStudent';
 
 $route['api/__filterStudents'] = 'api/c_api/filterStudents';
-$route['api/__getFormulirOfflineAvailable'] = 'api/c_api/getFormulirOfflineAvailable';
+$route['api/__getFormulirOfflineAvailable/(:any)'] = 'api/c_api/getFormulirOfflineAvailable/$1';
 $route['api/__getAutoCompleteSchool'] = 'api/c_api/AutoCompleteSchool';
 $route['api/__getSumberIklan'] = 'api/c_api/getSumberIklan';
 $route['api/__getPriceFormulirOffline'] = 'api/c_api/getPriceFormulirOffline';
@@ -678,6 +743,9 @@ $route['api/__crudScore'] = 'api/c_api/crudScore';
 $route['api/__crudAttendance'] = 'api/c_api/crudAttendance';
 $route['api/__crudScheduleExchange'] = 'api/c_api/crudScheduleExchange';
 $route['api/__crudLimitCredit'] = 'api/c_api/crudLimitCredit';
+
+$route['api/__crudLecturerEvaluation'] = 'api/c_api/crudLecturerEvaluation';
+$route['api/__getLecturerEvaluation'] = 'api/c_api/getLecturerEvaluation';
 
 $route['api/database/__getListStudent'] = 'api/c_api/getListStudent';
 $route['api/database/upload_photo_student'] = 'page/academic/c_akademik/upload_photo_student';
@@ -739,10 +807,6 @@ $route['api/__crudInvigilator'] = 'api/c_api/crudInvigilator';
 
 $route['api/__crudConfigSKPI'] = 'api/c_api/crudConfigSKPI';
 
-
-// for inject //
-$route['testadi'] = 'dashboard/c_dashboard/testadi';
-$route['testadi2'] = 'c_login/testadi2';
 
 $route['__resetPasswordUser'] = 'c_login/resetPasswordUser';
 // for inject //
@@ -840,6 +904,9 @@ $route['vreservation/config/policy/submit'] = 'page/vreservation/c_config/policy
 // test
 $route['testApprove'] = 'page/finance/c_finance/testApprove';
 $route['testInject'] = 'api/c_global/testInject';
+$route['testInject2'] = 'api/c_global/testInject2';
+$route['testInject3'] = 'api/c_global/testInject3';
+$route['testInject4'] = 'api/c_global/testInject4';
 
 
 // Pengawas Ujian
@@ -1007,3 +1074,10 @@ foreach( $result as $row )
 }
 
 $route['ApiServerToServer'] = 'c_login/ApiServerToServer';
+$route['importFormulirManual'] = 'page/admission/c_admission/importFormulirManual';
+$route['ImportupdateNoKwitansi'] = 'page/admission/c_admission/ImportupdateNoKwitansi';
+
+
+// for inject //
+$route['testadi'] = 'dashboard/c_dashboard/testadi';
+$route['testadi2'] = 'c_login/testadi2';

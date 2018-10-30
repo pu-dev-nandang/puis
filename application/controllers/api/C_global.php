@@ -197,6 +197,30 @@ class C_global extends CI_Controller {
 
     }
 
+    public function get_nilai_from_admission()
+    {
+        $input = $this->getInputToken();
+        $ID_register_formulir = $input['ID_register_formulir'];
+        $query = array();
+        // cek apakah ikut ujian atau tidak
+        $get = $this->m_master->caribasedprimary('db_admission.register_butuh_ujian','ID_register_formulir',$ID_register_formulir);
+        if (count($get) == 0) {
+            $get2 = $this->m_master->caribasedprimary('db_admission.register_nilai','ID_register_formulir',$ID_register_formulir);
+            for ($i=0; $i < count($get2); $i++) { 
+                $NamaUjian = $this->m_master->caribasedprimary('db_admission.ujian_perprody_m','ID',$get2[$i]['ID_ujian_perprody']);
+                $get2[$i] = $get2[$i] + array('NamaUjian' => $NamaUjian[0]['NamaUjian'],'Bobot' => $NamaUjian[0]['Bobot']);
+            }
+            $query = $get2;
+        }
+        else
+        {
+            $this->load->model('admission/m_admission');
+            $get2 = $this->m_admission->getHasilUjian($ID_register_formulir);
+            $query = $get2;
+        }
+        echo json_encode($query);
+    }
+
     public function autocompleteAllUser()
     {
         $input = $this->getInputToken();
@@ -233,6 +257,72 @@ class C_global extends CI_Controller {
 
     }
 
+    public function testInject2()
+    {
+        $get = $this->m_master->showData_array('db_admission.sale_formulir_offline');
+        for ($i=0; $i < count($get); $i++) { 
+            $ID = $get[$i]['ID'];
+            $FullName = strtolower($get[$i]['FullName']);
+            $FullName = ucwords($FullName);
+            $dataSave = array(
+                    'FullName' => ucwords($FullName),
+                    'Email' => strtolower($get[$i]['Email'])
+                            );
+            $this->db->where('ID',$ID);
+            $this->db->update('db_admission.sale_formulir_offline', $dataSave);
+        }
+
+
+    }
+
+    public function testInject3()
+    {
+        $get = $this->m_master->showData_array('db_admission.register');
+        for ($i=0; $i < count($get); $i++) { 
+            $ID = $get[$i]['ID'];
+            $FullName = strtolower($get[$i]['Name']);
+            $FullName = ucwords($FullName);
+            $dataSave = array(
+                    'Name' => ucwords($FullName),
+                    'Email' => strtolower($get[$i]['Email'])
+                            );
+            $this->db->where('ID',$ID);
+            $this->db->update('db_admission.register', $dataSave);
+        }
+
+
+    }
+
+    public function testInject4()
+    {
+        // $get = $this->m_master->showData_array('db_admission.formulir_number_offline_m');
+        // for ($i=0; $i < count($get); $i++) { 
+        //     $Link = $get[$i]['Link'];
+        //     $Link = str_replace('http://admission.podomorouniversity.ac.id/', 'http://localhost/registeronline/', $Link);
+        //     $dataSave = array(
+        //             'Link' => $Link,
+        //                     );
+        //     $this->db->where('ID',$get[$i]['ID']);
+        //     $this->db->update('db_admission.formulir_number_offline_m', $dataSave);
+        // }
+
+        $sql = 'select ID from db_admission.register_formulir where ID not in (select ID_register_formulir from db_admission.register_document)';
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) {
+            $ID_register_formulir = $query[$i]['ID']; 
+            $arrID_reg_doc_checklist = $this->m_master->caribasedprimary('db_admission.reg_doc_checklist','Active',1);
+            for ($xy=0; $xy < count($arrID_reg_doc_checklist); $xy++) { 
+                $dataSave = array(
+                        'ID_register_formulir' => $ID_register_formulir,
+                        'ID_reg_doc_checklist' => $arrID_reg_doc_checklist[$xy]['ID'],
+                                );
+
+                $this->db->insert('db_admission.register_document', $dataSave);
+            }
+        }
+        
+    }
+
     // public function page_mahasiswa()
     // {
     //     $content = $this->load->view('page/academic'.'/master/students/students','',true);
@@ -243,5 +333,18 @@ class C_global extends CI_Controller {
     // {
 
     // }
+
+    public function getRevision_detail_admission()
+    {
+        $input = $this->getInputToken();
+        $ID_register_formulir = $input['ID_register_formulir'];
+        
+        $sql = 'select a.*,b.Name from db_finance.register_admisi_rev as a
+                left join db_employees.employees as b
+                on a.RevBy = b.NIP
+                where a.ID_register_formulir = ? order by a.RevNo asc';
+        $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
+        echo json_encode($query);
+    }
 
 }

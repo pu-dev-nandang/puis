@@ -54,80 +54,73 @@
  * NOTE: If you change these, also change the error_reporting() code below
  */
 	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
-	if($_SERVER['SERVER_NAME']!='localhost' && $_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
-        define("url_registration","http://admission.podomorouniversity.ac.id/", true);
-        define("serverRoot","http://pcam.podomorouniversity.ac.id", true);
-        define("url_pas","http://pcam.podomorouniversity.ac.id/", true);
-        define("url_img_employees",url_pas."uploads/employees/", true);
-        define("url_img_students",url_pas."uploads/students/", true);
 
-        define("url_pcam","http://pcam.podomorouniversity.ac.id/dashboard", true);
-        define("url_students","http://studentpu.podomorouniversity.ac.id/home", true);
-        define("url_lecturers","http://lecturerpu.podomorouniversity.ac.id/home", true);
-        define("url_sign_out","http://portal.podomorouniversity.ac.id/", true);
-//
-        define("url_sign_in_lecturers","http://lecturerpu.podomorouniversity.ac.id/", true);
-        define("url_sign_in_students","http://studentpu.podomorouniversity.ac.id/", true);
-        
-        define("path_register_online","/var/www/html/registeronline/", true);
-    } 
-    elseif ($_SERVER['SERVER_NAME'] == '10.1.10.230' || $_SERVER['SERVER_NAME'] ==  'demo.web.podomorouniversity.ac.id') {
-    		    $port_user = ($_SERVER['SERVER_PORT']!='80') ? ':'.$_SERVER['SERVER_PORT'] : '';
-    		    $folder_user = ($_SERVER['SERVER_PORT']!='80') ? 'siak3' : 'puis';
-    		    $portal_user = ($_SERVER['SERVER_PORT']!='80') ? 'login3' : 'portal';
-    	        define("port",$port_user, true);
+	$ServerName = $_SERVER['SERVER_NAME'];
+	switch ($ServerName) {
+		case 'localhost':
+		    $port_user = ($_SERVER['SERVER_PORT']!='80') ? ':'.$_SERVER['SERVER_PORT'] : '';
+		    $folder_user = ($_SERVER['SERVER_PORT']!='80') ? 'siak3' : 'puis';
+		    $portal_user = ($_SERVER['SERVER_PORT']!='80') ? 'login3' : 'portal';
+	        define("port",$port_user, true);
 
-    	        // Local Nandang
-    	        define("url_registration","http://".$_SERVER['SERVER_NAME']."/registeronline/", true);
-    	        define("serverRoot","http://".$_SERVER['SERVER_NAME'].port."/".$folder_user, true);
-    	        define("url_pas","http://".$_SERVER['SERVER_NAME'].port."/".$folder_user."/", true);
-    	        define("url_img_employees",url_pas."uploads/employees/", true);
-    	        define("url_img_students",url_pas."uploads/employees/", true);
+	        // Local Nandang
+	        define("url_registration","http://localhost/registeronline/", true);
+	        define("serverRoot","http://localhost".port."/".$folder_user, true);
+	        define("url_pas","http://localhost".port."/".$folder_user."/", true);
+	        define("url_img_employees",url_pas."uploads/employees/", true);
+	        define("url_img_students",url_pas."uploads/employees/", true);
 
-    	        define("url_pcam",url_pas."dashboard", true);
+	        define("url_pcam",url_pas."dashboard", true);
 
-    	        define("url_sign_out","http://".$_SERVER['SERVER_NAME'].port."/".$portal_user."/", true);
+	        define("url_sign_out","http://localhost".port."/".$portal_user."/", true);
 
-    	        // Auth From PCAM
-    	        define("url_sign_in_lecturers","http://".$_SERVER['SERVER_NAME'].port."/lecturer/", true);
-    	        define("url_sign_in_students","http://".$_SERVER['SERVER_NAME'].port."/students/", true);
+	        // Auth From PCAM
+	        define("url_sign_in_lecturers","http://localhost".port."/lecturer/", true);
+	        define("url_sign_in_students","http://localhost".port."/students/", true);
 
-    	        define("url_lecturers",url_sign_in_lecturers."home", true);
-    	        define("url_students",url_sign_in_students."home", true);
+	        define("url_lecturers",url_sign_in_lecturers."home", true);
+	        define("url_students",url_sign_in_students."home", true);
 
-    	        define("path_register_online","c:/xampp/htdocs/registeronline/", true);
-    }
-    else {
+	        define("path_register_online","c:/xampp/htdocs/registeronline/", true);
+			break;
+		case 'pcam.podomorouniversity.ac.id':
+		    define("url_registration","http://admission.podomorouniversity.ac.id/", true);
+            define("serverRoot","http://pcam.podomorouniversity.ac.id", true);
+            define("url_pas","http://pcam.podomorouniversity.ac.id/", true);
+            define("url_img_employees",url_pas."uploads/employees/", true);
+            define("url_img_students",url_pas."uploads/students/", true);
 
-	    $port_user = ($_SERVER['SERVER_PORT']!='80') ? ':'.$_SERVER['SERVER_PORT'] : '';
-	    $folder_user = ($_SERVER['SERVER_PORT']!='80') ? 'siak3' : 'puis';
-	    $portal_user = ($_SERVER['SERVER_PORT']!='80') ? 'login3' : 'portal';
-        define("port",$port_user, true);
+            define("url_pcam","http://pcam.podomorouniversity.ac.id/dashboard", true);
+            define("url_students","http://studentpu.podomorouniversity.ac.id/home", true);
+            define("url_lecturers","http://lecturerpu.podomorouniversity.ac.id/home", true);
+            define("url_sign_out","http://portal.podomorouniversity.ac.id/", true);
+    //
+            define("url_sign_in_lecturers","http://lecturerpu.podomorouniversity.ac.id/", true);
+            define("url_sign_in_students","http://studentpu.podomorouniversity.ac.id/", true);
+            
+            define("path_register_online","/var/www/html/registeronline/", true);
+			break;
+		case 'demo.pcam.podomorouniversity.ac.id':
+		    define("url_registration","http://demo.admission.podomorouniversity.ac.id/", true);
+            define("serverRoot","http://demo.pcam.podomorouniversity.ac.id", true);
+            define("url_pas","http://demo.pcam.podomorouniversity.ac.id/", true);
+            define("url_img_employees",url_pas."uploads/employees/", true);
+            define("url_img_students",url_pas."uploads/students/", true);
 
-        // Local Nandang
-        define("url_registration","http://localhost/registeronline/", true);
-        define("serverRoot","http://localhost".port."/".$folder_user, true);
-        define("url_pas","http://localhost".port."/".$folder_user."/", true);
-        define("url_img_employees",url_pas."uploads/employees/", true);
-        define("url_img_students",url_pas."uploads/employees/", true);
-
-        define("url_pcam",url_pas."dashboard", true);
-
-        define("url_sign_out","http://localhost".port."/".$portal_user."/", true);
-
-        // Auth From PCAM
-        define("url_sign_in_lecturers","http://localhost".port."/lecturer/", true);
-        define("url_sign_in_students","http://localhost".port."/students/", true);
-
-        define("url_lecturers",url_sign_in_lecturers."home", true);
-        define("url_students",url_sign_in_students."home", true);
-
-        define("path_register_online","c:/xampp/htdocs/registeronline/", true);
-    }
-
-
-
-
+            define("url_pcam","http://demo.pcam.podomorouniversity.ac.id/dashboard", true);
+            define("url_students","http://demo.studentpu.podomorouniversity.ac.id/home", true);
+            define("url_lecturers","http://demo.lecturerpu.podomorouniversity.ac.id/home", true);
+            define("url_sign_out","http://demo.portal.podomorouniversity.ac.id/", true);
+    //
+            define("url_sign_in_lecturers","http://demo.lecturerpu.podomorouniversity.ac.id/", true);
+            define("url_sign_in_students","http://demo.studentpu.podomorouniversity.ac.id/", true);
+            
+            define("path_register_online","C:/nginx/html/registeronline/", true);
+			break;		
+		default:
+			# code...
+			break;
+	}
 
 /*
  *---------------------------------------------------------------

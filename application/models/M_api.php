@@ -198,9 +198,19 @@ class M_api extends CI_Model {
     }
 
     public function __getKurikulumSelectOption(){
-        $data = $this->db->query('SELECT * FROM db_academic.curriculum ORDER BY Year DESC');
+        $data = $this->db->query('SELECT * FROM db_academic.curriculum ORDER BY Year DESC')->result_array();
 
-        return $data->result_array();
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+                $dataS = $this->db->query('SELECT s.Status FROM db_academic.semester s 
+                                                      WHERE s.Year = "'.$data[$i]['Year'].'" 
+                                                      ORDER BY s.Status DESC LIMIT 1 ')
+                                ->result_array();
+                $data[$i]['StatusSemester'] = (count($dataS)>0) ? $dataS[0]['Status'] : '0';
+            }
+        }
+
+        return $data;
     }
 
     public function __getKurikulumSelectOptionASC(){
@@ -475,7 +485,7 @@ class M_api extends CI_Model {
                                                       LEFT JOIN db_academic.mata_kuliah mk ON (cd.MKID = mk.ID)
                                                       LEFT JOIN db_academic.schedule_details_course sdc1 ON (sdc1.MKID = mk.ID)
                                                       LEFT JOIN db_academic.schedule s1 ON (sdc1.ScheduleID = s1.ID)
-                                                      WHERE cd.ID = "'.$Course[$i].'" 
+                                                      WHERE s1.SemesterID = "'.$SemesterID.'" AND cd.ID = "'.$Course[$i].'" 
                                                       AND cd.ID IN (
                                                             SELECT sdc.CDID FROM db_academic.schedule_details_course sdc 
                                                             LEFT JOIN db_academic.schedule s ON (sdc.ScheduleID = s.ID) 
@@ -1206,11 +1216,14 @@ class M_api extends CI_Model {
 
         $db = 'ta_'.$ta;
         $data = $this->db->query('SELECT s.*, au.EmailPU, p.Name AS ProdiName, p.NameEng AS ProdiNameEng,
-                                      ss.Description AS StatusStudentDesc,"'.$db.'" as ta_student
+                                      ss.Description AS StatusStudentDesc,"'.$db.'" as ta_student,
+                                      em.Name AS Mentor, em.NIP, em.EmailPU AS MentorEmailPU
                                       FROM '.$db.'.students s
-                                      JOIN db_academic.program_study p ON (s.ProdiID = p.ID)
-                                      JOIN db_academic.status_student ss ON (s.StatusStudentID = ss.ID)
-                                      JOIN db_academic.auth_students au ON (s.NPM = au.NPM)
+                                      LEFT JOIN db_academic.program_study p ON (s.ProdiID = p.ID)
+                                      LEFT JOIN db_academic.status_student ss ON (s.StatusStudentID = ss.ID)
+                                      LEFT JOIN db_academic.auth_students au ON (s.NPM = au.NPM)
+                                      LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM=s.NPM)
+                                      LEFT JOIN db_employees.employees em ON (em.NIP=ma.NIP)
                                       WHERE s.NPM = "'.$NPM.'" LIMIT 1');
 
         return $data->result_array();
@@ -2102,14 +2115,24 @@ class M_api extends CI_Model {
         return $query;
     }
 
-    public function getFormulirOfflineAvailable()
+    public function getEmployeesPICAdmissionBy()
+    {
+        $sql = "select a.* from db_employees.employees as a where a.PositionMain like '%10%'
+                UNION
+                select a.* from db_employees.employees as a where a.PositionMain like '%18%'
+        "; 
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
+    }
+
+    public function getFormulirOfflineAvailable($StatusJual = 0)
     {
         // GET SET TA
         $this->load->model('master/m_master');
         $Q_Years = $this->m_master->showData_array('db_admission.set_ta');
         $Years = ' and Years = "'.$Q_Years[0]['Ta'].'"';
 
-        $sql = "select FormulirCode from db_admission.formulir_number_offline_m where StatusJual = 0 and Print = 1 ".$Years;        
+        $sql = "select FormulirCode from db_admission.formulir_number_offline_m where StatusJual = ".$StatusJual." and Print = 1 ".$Years;        
         $query=$this->db->query($sql, array())->result_array();
         return $query;
     }
@@ -3164,6 +3187,8 @@ class M_api extends CI_Model {
 
     public function __getStudentByScheduleID($ScheduleID){
 
+        // Fungsi ini mengambil student dari yang sudah di approve dan dari yang masih planning
+
         $getSmtAct = $this->_getSemesterActive();
 
         $dataCL = $this->getClassOf();
@@ -3197,8 +3222,86 @@ class M_api extends CI_Model {
 
         return $res;
 
+    }
 
+    public function __getStudentByScheduleIDApproved($SemesterID,$ScheduleID){
 
+        $dataCL = $this->getClassOf();
+
+        $res = [];
+        for($c=0;$c<count($dataCL);$c++){
+            $d = $dataCL[$c];
+            $db_ = 'ta_'.$d['Year'];
+
+            // Cek DB Exist
+            $dbExist = $this->db->query('SELECT SCHEMA_NAME 
+                                                    FROM INFORMATION_SCHEMA.SCHEMATA 
+                                                    WHERE SCHEMA_NAME = "'.$db_.'" ')->result_array();
+
+            if(count($dbExist)>0){
+                $dataSP = $this->db->query('SELECT s.NPM,s.ClassOf,s.Name FROM '.$db_.'.study_planning sp 
+                                                            LEFT JOIN  '.$db_.'.students s ON (s.NPM = sp.NPM) 
+                                                            WHERE sp.SemesterID = "'.$SemesterID.'" 
+                                                            AND sp.ScheduleID = "'.$ScheduleID.'" ')->result_array();
+                if(count($dataSP)>0){
+                    for($s=0;$s<count($dataSP);$s++){
+                        array_push($res,$dataSP[$s]);
+                    }
+                }
+            }
+
+        }
+        return $res;
+    }
+    public function __getStudentByScheduleIDApproved_details($SemesterID,$ScheduleID,$CDID){
+
+        $dataCL = $this->getClassOf();
+
+        $res = [];
+        for($c=0;$c<count($dataCL);$c++){
+            $d = $dataCL[$c];
+            $db_ = 'ta_'.$d['Year'];
+
+            // Cek DB Exist
+            $dbExist = $this->db->query('SELECT SCHEMA_NAME 
+                                                    FROM INFORMATION_SCHEMA.SCHEMATA 
+                                                    WHERE SCHEMA_NAME = "'.$db_.'" ')->result_array();
+
+            if(count($dbExist)>0){
+                $dataSP = $this->db->query('SELECT s.NPM,s.ClassOf,s.Name FROM '.$db_.'.study_planning sp 
+                                                            LEFT JOIN  '.$db_.'.students s ON (s.NPM = sp.NPM) 
+                                                            WHERE sp.SemesterID = "'.$SemesterID.'" 
+                                                            AND sp.ScheduleID = "'.$ScheduleID.'"
+                                                             AND sp.CDID = "'.$CDID.'" ')->result_array();
+                if(count($dataSP)>0){
+                    for($s=0;$s<count($dataSP);$s++){
+                        array_push($res,$dataSP[$s]);
+                    }
+                }
+            }
+
+        }
+        return $res;
+    }
+
+    public function __getStudentByScheduleIDInStudyPlanning($SemesterID,$ScheduleID)
+    {
+
+        $data = $this->db->query('SELECT aut_s.ID, aut_s.NPM, aut_s.Name, aut_s.Year AS ClassOf FROM db_academic.std_krs std_k 
+                                                LEFT JOIN db_academic.auth_students aut_s ON (aut_s.NPM = std_k.NPM)
+                                                WHERE std_k.SemesterID = "'.$SemesterID.'" 
+                                                AND std_k.ScheduleID = "'.$ScheduleID.'" ')->result_array();
+        return $data;
+    }
+    public function __getStudentByScheduleIDInStudyPlanning_details($SemesterID,$ScheduleID,$CDID)
+    {
+
+        $data = $this->db->query('SELECT aut_s.ID, aut_s.NPM, aut_s.Name, aut_s.Year AS ClassOf FROM db_academic.std_krs std_k 
+                                                LEFT JOIN db_academic.auth_students aut_s ON (aut_s.NPM = std_k.NPM)
+                                                WHERE std_k.SemesterID = "'.$SemesterID.'" 
+                                                AND std_k.ScheduleID = "'.$ScheduleID.'"
+                                                 AND std_k.CDID = "'.$CDID.'" ')->result_array();
+        return $data;
     }
 
     public function _getSeemsterByClassOf($Year){
@@ -3314,10 +3417,6 @@ class M_api extends CI_Model {
 
     public function getStudentsAttendance($SemesterID,$ScheduleID){
 
-//        $dataAttd = $this->db->select('ID')->get_where('db_academic.attendance',array(
-//            'SemesterID' => $SemesterID,
-//            'ScheduleID' => $ScheduleID
-//        ));
 
         $dataCourse = $this->db->query('SELECT mk.NameEng, mk.MKCode, sdc.MKID, s.ClassGroup, smt.Name AS Semester, 
                                                   em.Name AS Lecturer
@@ -3491,5 +3590,7 @@ class M_api extends CI_Model {
 
         return $dataExamDetail;
     }
+
+    
 
 }

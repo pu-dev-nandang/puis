@@ -83,3 +83,10 @@
     background-color: #fff;
     border: 1px solid #e25856;
 }
+
+h3.left-warning {
+    margin-top: 0px;
+    border-left: 11px solid #ff9800;
+    padding-left: 10px;
+    font-weight: bold;
+}

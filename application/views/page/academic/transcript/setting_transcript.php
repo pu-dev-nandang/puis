@@ -29,7 +29,7 @@
 <div class="row">
     <div class="col-md-4">
         <div class="thumbnail" style="padding: 0px">
-            <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;">Setting Transcript</span>
+            <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;"><i class="fa fa-cog margin-right"></i> Transcript & Ijazah</span>
 
             <div style="margin: 15px">
                 <table class="table table-setting">
@@ -77,7 +77,7 @@
 
     <div class="col-md-4">
         <div class="thumbnail" style="padding: 0px">
-            <span class="label-success" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;">Setting Graduation Honor</span>
+            <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;"><i class="fa fa-cog margin-right"></i>  Graduation Honor</span>
 
             <div style="margin: 5px;margin-top: 15px;">
                 <table class="table table-bordered" id="tableHonor">
@@ -127,9 +127,9 @@
 
     <div class="col-md-4">
         <div class="thumbnail" style="padding: 0px">
-            <span class="label-success" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;">Setting Education Program</span>
+            <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;"><i class="fa fa-cog margin-right"></i>  Education Program</span>
 
-            <div style="margin: 15px">
+            <div style="margin: 5px;margin-top: 15px;">
                 <table class="table table-bordered" id="tableEducation">
                     <tr>
                         <th style="width: 10%">Program Indo</th>
@@ -169,9 +169,34 @@
 </div>
 
 <div class="row">
+    <div class="col-md-2">
+        <div class="thumbnail" style="padding: 0px">
+            <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;"><i class="fa fa-cog margin-right"></i> Temp. Transcript</span>
+            <div style="padding: 10px;">
+                <hr/>
+                <div class="form-group">
+                    <label>No Transcript</label>
+                    <input class="form-control" id="formTemp_No" value="<?php echo $TempTranscript['No']; ?>" />
+                </div>
+                <div class="form-group">
+                    <label>Tempat Terbit</label>
+                    <input class="form-control" id="formTemp_Place" value="<?php echo $TempTranscript['Place']; ?>" />
+                </div>
+                <div class="form-group">
+                    <label>Tanggal Terbit</label>
+                    <input id="formTemp_TsDateValue" value="<?php echo $TempTranscript['Date']; ?>" class="form-control hide" readonly>
+                    <input id="formTemp_TsDate" data-desc="TempTS" class="form-control">
+                </div>
+                <hr/>
+                <div style="text-align: right;">
+                    <button class="btn btn-success" id="btnSaveTemp_TS">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="col-md-6">
         <div class="thumbnail" style="padding: 0px;min-height: 100px;">
-            <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;">Setting SKPI</span>
+            <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;"><i class="fa fa-cog margin-right"></i>  SKPI</span>
 
             <div class="row">
                 <div class="col-md-8 col-md-offset-2" style="margin-top: 20px;">
@@ -218,7 +243,7 @@
 
 <script>
     $(document).ready(function () {
-        $( "#formSTDateIssued,#formSTDateOfYudisium" )
+        $( "#formSTDateIssued,#formSTDateOfYudisium,#formTemp_TsDate" )
             .datepicker({
                 showOtherMonths:true,
                 autoSize: true,
@@ -227,12 +252,20 @@
                     var data_date = $(this).val().split(' ');
                     var CustomMoment = moment(data_date[2]+'-'+(parseInt(convertDateMMtomm(data_date[1])) + 1)+'-'+data_date[0]).format('YYYY-MM-DD');
                     var Desc = $(this).attr('data-desc');
-                    var elm = (Desc=='Issue') ? '#formSTDateIssuedValue' : '#formSTDateOfYudisiumValue';
+
+                    var elm = '#formSTDateOfYudisiumValue';
+                    if(Desc=='Issue') {
+                        elm = '#formSTDateIssuedValue';
+                    } else if(Desc=='TempTS'){
+                        elm = '#formTemp_TsDateValue';
+                    }
+
                     $(elm).val(CustomMoment);
                 }
             });
         $('#formSTDateIssued').datepicker('setDate',new Date("<?php echo $Transcript['DateIssued']; ?>"));
         $('#formSTDateOfYudisium').datepicker('setDate',new Date("<?php echo $Transcript['DateOfYudisium']; ?>"));
+        $('#formTemp_TsDate').datepicker('setDate',new Date("<?php echo $TempTranscript['Date']; ?>"));
 
         var loadFirsSKPI = setInterval(function () {
 
@@ -341,6 +374,40 @@
                 $('.formST,#btnSaveST').prop('disabled',false);
             },500);
         });
+
+    });
+
+    // ====== Save Setting Temp Transcript ======
+    $('#btnSaveTemp_TS').click(function () {
+
+        var formTemp_No = $('#formTemp_No').val();
+        var formTemp_Place = $('#formTemp_Place').val();
+        var formTemp_TsDateValue = $('#formTemp_TsDateValue').val();
+
+        loading_buttonSm('#btnSaveTemp_TS');
+        $('#formTemp_No,#formTemp_Place,#formTemp_TsDate').prop('disabled',true);
+
+        var data = {
+            action : 'updateTempTranscript',
+            dataForm : {
+                No : formTemp_No,
+                Place : formTemp_Place,
+                Date : formTemp_TsDateValue,
+                UpdateBy : sessionNIP,
+                UpdateAt : dateTimeNow()
+            }
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api/__crudTranscript';
+
+        $.post(url,{token:token},function (result) {
+            setTimeout(function () {
+                $('#btnSaveTemp_TS').html('Save');
+                $('#formTemp_No,#formTemp_Place,#formTemp_TsDate,#btnSaveTemp_TS').prop('disabled',false);
+            },500);
+        });
+
 
     });
 

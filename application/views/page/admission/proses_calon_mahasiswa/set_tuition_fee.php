@@ -3,7 +3,7 @@
     <div class="col-md-12 formAddFormKD">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i> Set Tuition Fee</h4>
+                <h4 class="header"><i class="icon-reorder"></i> <?php echo $NameMenu ?></h4>
             </div>
             <div class="widget-content">
                 <!--  -->
@@ -14,11 +14,24 @@
                             <li role="presentation"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee_delete/1">Delete Tuition Fee</a></li>
                             <li role="presentation"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee_approved/1">Tuition Fee Approved</a></li>
                         </ul>
-                        <br>
-                        <div  class="col-xs-12" align="right" id="pagination_link"></div>
-                        <div id="dataPageLoad" style="margin-top:0px;">
-                            
+                        <div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
+                          <div class="col-xs-6 col-md-offset-3">
+                            <div class="thumbnail" style="height: 80px">
+                              <div class="col-xs-6 col-md-offset-3">
+                                <label>Formulir Code</label>
+                                <input type="text" name="FormulirCode" id = "FormulirCode" class="form-control" placeholder="All...">
+                              </div>  
+                            </div>   
+                          </div>
                         </div>
+                        <div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
+                          <div id="dataPageLoad" style="margin-top:0px;">
+                              
+                          </div>
+                        </div> 
+                        <div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
+                            <div  class="col-xs-12" align="right" id="pagination_link"></div>
+                        </div> 
                     </div>
                 </div>
             </div>
@@ -35,7 +48,19 @@
             $('#panel_web').css({"padding": "0px", "padding-right": "20px"});
         }
         loadPage('tuition_fee/1');
+
+        FuncSearch();
+
     });
+
+    function FuncSearch()
+    {
+      $("#FormulirCode").keyup(function(){
+        if( this.value.length < 5 && this.value.length != 0 ) return;
+           /* code to run below */
+         loadPage(pageHtml+'/1'); 
+      })
+    }
 
     $('.tab-btn-tuition-fee').click(function () {
         var page = $(this).attr('data-page');
@@ -51,7 +76,12 @@
         switch(res[0]) {
             case 'tuition_fee':
                 var url = base_url_js+'admission/proses-calon-mahasiswa/set_tuition_fee/input/'+res[1];
-                $.post(url,{page:page},function (data_json) {
+                var FormulirCode = $("#FormulirCode").val();
+                var data = {
+                    FormulirCode : FormulirCode,
+                };
+                var token = jwt_encode(data,"UAP)(*"); 
+                $.post(url,{page:page,token:token},function (data_json) {
                     var obj = jQuery.parseJSON(data_json);
                     $("#dataPageLoad").html(obj.loadtable);
                     $("#pagination_link").html(obj.pagination_link);
@@ -59,7 +89,12 @@
                 break;
             case 'tuition_fee_delete':
                 var url = base_url_js+'admission/proses-calon-mahasiswa/set_tuition_fee/delete/'+res[1];
-                $.post(url,{page:page},function (data_json) {
+                var FormulirCode = $("#FormulirCode").val();
+                var data = {
+                    FormulirCode : FormulirCode,
+                };
+                var token = jwt_encode(data,"UAP)(*"); 
+                $.post(url,{page:page,token:token},function (data_json) {
                     var obj = jQuery.parseJSON(data_json);
                     $("#dataPageLoad").html(obj.loadtable);
                     $("#pagination_link").html(obj.pagination_link);
@@ -67,7 +102,12 @@
                 break;
             case 'tuition_fee_approved':
                 var url = base_url_js+'admission/proses-calon-mahasiswa/set_tuition_fee/approved/'+res[1];
-                $.post(url,{page:page},function (data_json) {
+                var FormulirCode = $("#FormulirCode").val();
+                var data = {
+                    FormulirCode : FormulirCode,
+                };
+                var token = jwt_encode(data,"UAP)(*");
+                $.post(url,{page:page,token:token},function (data_json) {
                     var obj = jQuery.parseJSON(data_json);
                     $("#dataPageLoad").html(obj.loadtable);
                     $("#pagination_link").html(obj.pagination_link);
@@ -360,6 +400,7 @@
                        '</div>'+
                    '</div>';
                    $(".formAddFormKD").append(html);
+                   $('html, body').animate({ scrollTop: $(".widget_"+Uniformvaluee).offset().top }, 'slow');
                }).done(function() {
                  
                }).fail(function() {
@@ -434,7 +475,7 @@
             '<div class = "row" id="pageSetCicilan'+data[0]['id_formulir']+'">'+
             '</div>'
 
-        var html = '<div class="widget box widget_'+data[0]['id_formulir']+'">'+
+        var html = '<div class="widget box widget_'+data[0]['id_formulir']+' widget_delete">'+
             '<div class="widget-header">'+
                 '<h4 class="header"><i class="icon-reorder"></i> Set Payment '+data[0]['Nama']+'</h4>'+
             '</div>'+
@@ -443,6 +484,7 @@
             '</div>'+
         '</div>';
         $(".formAddFormKD").append(html);
+        $('html, body').animate({ scrollTop: $(".widget_"+data[0]['id_formulir']).offset().top }, 'slow');
     }
 
     $(document).on('change','.jml_cicilan', function () {
@@ -709,6 +751,63 @@
             window.open('<?php echo url_registration ?>'+'document/'+emaiil+'/'+file__,'_blank');
         }
         
+    });
+
+    $(document).on('click','.showModal', function () {
+      var ID_register_formulir = $(this).attr('id-register-formulir');
+      var html = '';
+      var table = '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+                    '<thead>'+
+                        '<tr>'+
+                            '<th style="width: 5px;">No</th>'+
+                            '<th style="width: 55px;">Note</th>'+
+                            '<th style="width: 55px;">Rev By</th>'+
+                            '<th style="width: 55px;">Rev At</th>';
+      table += '</tr>' ;  
+      table += '</thead>' ; 
+      table += '<tbody>' ;
+
+      var url = base_url_js+'finance/getRevision_detail_admission';
+      var data = {
+          ID_register_formulir : ID_register_formulir,
+      };
+      var token = jwt_encode(data,'UAP)(*');
+      $.post(url,{token:token},function (resultJson) {
+         var DetailArr = jQuery.parseJSON(resultJson);
+         
+         var isi = '';
+         for (var j = 0; j < DetailArr.length; j++) {
+           isi += '<tr>'+
+                   '<td>'+DetailArr[j]['RevNo'] + '</td>'+
+                   '<td>'+DetailArr[j]['Note'] + '</td>'+
+                   '<td>'+DetailArr[j]['Name'] + '</td>'+
+                   '<td>'+DetailArr[j]['RevAt'] + '</td>'+
+                '<tr>'; 
+         }
+
+         table += isi+'</tbody>' ; 
+         table += '</table>' ;
+
+         html += table;
+
+         var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+             '';
+
+         $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Detail Revision</h4>');
+         $('#GlobalModalLarge .modal-body').html(html);
+         $('#GlobalModalLarge .modal-footer').html(footer);
+         $('#GlobalModalLarge').modal({
+             'show' : true,
+             'backdrop' : 'static'
+         });   
+
+      }).fail(function() {
+        toastr.info('No Action...'); 
+        // toastr.error('The Database connection error, please try again', 'Failed!!');
+      }).always(function() {
+
+      });
+
     });
     
 </script>

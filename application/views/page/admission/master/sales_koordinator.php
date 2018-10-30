@@ -2,11 +2,11 @@
 	<div class="col-md-12">
 		<div class="widget box">
 			<div class="widget-header">
-				<h4><i class="icon-reorder"></i>Master Sales Koordinator</h4>
+				<h4><i class="icon-reorder"></i><?php echo $NameMenu ?></h4>
 				<div class="toolbar no-padding">
 				    <div class="btn-group">
 				      <span data-smt="" class="btn btn-xs btn-add-event btn-add">
-				        <i class="icon-plus"></i> Add Sales Koordinator
+				        <i class="icon-plus"></i> Add
 				       </span>
 				    </div>
 				</div>
@@ -15,7 +15,7 @@
 				<div class = "row">	
 					<div class="col-xs-2" style="">
 						Wilayah
-						<select class="select2-select-00 col-md-4 full-width-fix" id="selectWilayah">]
+						<select class="select2-select-00 col-md-4 full-width-fix" id="selectWilayah">
 							<option value= "%" selected>All</option>
 						    <option></option>
 						</select>
@@ -187,7 +187,7 @@
                // jsonData = data_json;
                // var obj = JSON.parse(data_json); 
                // console.log(obj);
-
+               $('#GlobalModal').modal('hide');
            }).done(function() {
              loadData(1);
            }).fail(function() {

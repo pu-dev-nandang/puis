@@ -114,7 +114,7 @@ function __construct($orientation='P', $unit='mm', $size='A4')
 		$this->fontpath = '';
 	// Core fonts
 	$this->CoreFonts = array('courier', 'helvetica', 'times', 'symbol', 'zapfdingbats', 'dinpromedium',
-		'din-medium', 'dinprolight', 'dinlig', 'dinlightitalic','dinpromediumitalic');
+		'din-medium', 'dinprolight', 'dinlig', 'dinlightitalic','dinpromediumitalic','dinproExpBold');
 	// Scale factor
 	if($unit=='pt')
 		$this->k = 1;

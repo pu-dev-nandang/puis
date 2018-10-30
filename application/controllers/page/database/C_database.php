@@ -221,6 +221,16 @@ class C_database extends Globalclass {
         $this->temp($content);
     }
 
+    public function edit_students($DB_Student,$NPM,$Name){
+
+        $data['DB_Student'] = $DB_Student;
+        $data['NPM'] = $NPM;
+        $data['Name'] = $Name;
+
+        $content = $this->load->view('page/database/students/editStudent',$data,true);
+        $this->temp($content);
+    }
+
     public function loadPageStudents(){
         $data['dataForm'] = $this->input->post('data');
         $this->load->view('page/database/students/students_details',$data);

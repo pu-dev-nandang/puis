@@ -8,7 +8,7 @@
 </style>
 
 <div class="row">
-    <div class="col-md-8 col-md-offset-2">
+    <div class="col-md-8">
         <div class="well">
             <div class="row">
                 <div class="col-xs-4">
@@ -32,6 +32,18 @@
             </div>
         </div>
     </div>
+    <div class="col-md-4">
+        <div class="well">
+            <div class="row">
+                <div class="col-xs-6">
+                    <button class="btn btn-block btn-default" id="btnStdDownloadtoExcel"><i class="fa fa-download margin-right"></i> Student to Excel</button>
+                </div>
+                <div class="col-xs-6">
+                    <button class="btn btn-block btn-default" id="btnIPSIPKDownloadtoExcel"><i class="fa fa-download margin-right"></i> IPS/IPK to Excel</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="row">
@@ -45,14 +57,81 @@
 
 <script>
     $(document).ready(function () {
-        loadSelectOptionCurriculum('#filterCurriculum','');
+        loadSelectOptionCurriculumNoSelect('#filterCurriculum','');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
         loadSelectOptionStatusStudent('#filterStatus','');
         loadStudent();
+
     });
 
     $('.filter-db-std').change(function () {
         loadStudent();
+    });
+
+    // ===== Download PDF =====
+    $('#btnIPSIPKDownloadtoExcel').click(function () {
+        var filterCurriculum = $('#filterCurriculum').val();
+        var filterBaseProdi = $('#filterBaseProdi').val();
+        var filterStatus = $('#filterStatus').val();
+
+        if(filterCurriculum!='' && filterCurriculum!=null){
+
+            var ProdiID = (filterBaseProdi!='' && filterBaseProdi!= null) ? filterBaseProdi.split('.')[0] : '';
+
+            var data = {
+                Year : filterCurriculum.split('.')[1],
+                ProdiID : ProdiID,
+                StatusStudentID : filterStatus
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'save2excel/cumulative-recap';
+
+            FormSubmitAuto(url, 'POST', [{ name: 'token', value: token },]);
+
+        } else {
+
+            $('#filterCurriculum').animateCss('shake').css('border','1px solid red');
+
+            toastr.warning('Select curriculum','Warning');
+
+            setTimeout(function (args) {
+                $('#filterCurriculum').css('border','1px solid #ccc');
+            },5000);
+        }
+
+    });
+
+    $('#btnStdDownloadtoExcel').click(function () {
+        var filterCurriculum = $('#filterCurriculum').val();
+        var filterBaseProdi = $('#filterBaseProdi').val();
+        var filterStatus = $('#filterStatus').val();
+
+        if(filterCurriculum!='' && filterCurriculum!=null){
+
+            var ProdiID = (filterBaseProdi!='' && filterBaseProdi!= null) ? filterBaseProdi.split('.')[0] : '';
+
+            var data = {
+                Year : filterCurriculum.split('.')[1],
+                ProdiID : ProdiID,
+                StatusStudentID : filterStatus
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'save2excel/student-recap';
+
+            FormSubmitAuto(url, 'POST', [{ name: 'token', value: token },]);
+
+        } else {
+
+            $('#filterCurriculum').animateCss('shake').css('border','1px solid red');
+
+            toastr.warning('Select curriculum','Warning');
+
+            setTimeout(function (args) {
+                $('#filterCurriculum').css('border','1px solid #ccc');
+            },5000);
+        }
     });
 
     // === Show Details

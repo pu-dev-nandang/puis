@@ -21,44 +21,77 @@
             <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM" value="">
         </div>
     </div>
+    <div class="col-md-3">
+        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+            <button class="btn btn-block btn-default" id="btnStdDownloadtoExcel"><i class="fa fa-download margin-right"></i>Excel</button>
+        </div>
+    </div>
 </div>
 
 <div class="row">
     <div class="col-md-12">
         <hr/>
-        <!-- <div class="col-md-3 col-md-offset-8"> -->
-          <!-- <input type="text" name="NPM" placeholder="Input NPM" id = "NPM" class="form-control"> -->
-        <!-- </div>   -->
-        <table class="table table-bordered datatable2 hide" id = "datatable2">
-            <thead>
-            <tr style="background: #333;color: #fff;">
-                <th style="width: 12%;">Program Study</th>
-                <!-- <th style="width: 10%;">Semester</th> -->
-                <th style="width: 20%;">Nama,NPM & VA</th>
-                <!-- <th style="width: 5%;">NPM</th> -->
-                <!-- <th style="width: 5%;">Year</th> -->
-                <th style="width: 5%;">Foto</th>
-                <th style="width: 15%;">Email PU</th>
-                <th style="width: 5%;">No HP</th>
-                <th style="width: 5%;">Bintang</th>
-                <th style="width: 5%;">Beasiswa BPP</th>
-                <th style="width: 5%;">Beasiswa Credit</th>
-            </tr>
-            </thead>
-            <tbody id="dataRow"></tbody>
-        </table>
+        <div class="row" style="margin-top: 0px;margin-right: 0px;margin-left: 0px">
+          <div class="col-md-12">
+            <table class="table table-bordered datatable2 hide" id = "datatable2">
+                <thead>
+                <tr style="background: #333;color: #fff;">
+                    <th style="width: 12%;">Program Study</th>
+                    <!-- <th style="width: 10%;">Semester</th> -->
+                    <th style="width: 20%;">Nama,NPM & VA</th>
+                    <th style="width: 5%;">Foto</th>
+                    <th style="width: 5%;">IPS</th>
+                    <th style="width: 5%;">IPK</th>
+                    <th style="width: 5%;">Credit</th>
+                    <th style="width: 5%;">Status</th>
+                    <!-- <th style="width: 15%;">Email PU</th> -->
+                    <!-- <th style="width: 5%;">No HP</th> -->
+                    <th style="width: 5%;">Bintang</th>
+                    <th style="width: 5%;">Beasiswa BPP</th>
+                    <th style="width: 5%;">Beasiswa Credit</th>
+                </tr>
+                </thead>
+                <tbody id="dataRow"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px;margin-right: 0px;margin-left: 0px">
+          <div  class="col-xs-12" align="right" id="pagination_link"></div>
+        </div>
     </div>
-    <div  class="col-xs-12" align="right" id="pagination_link"></div>
-    <br>
 </div>
 
 
 <script>
     $(document).ready(function () {
-        loadSelectOptionCurriculum('#selectCurriculum','');
+        loadSelectOptionCurriculum2('#selectCurriculum','');
         loadSelectOptionBaseProdi('#selectProdi','');
         // $("#btn-submit").addClass('hide');
+        FuncbtnStdDownloadtoExcel();
     });
+
+    function FuncbtnStdDownloadtoExcel()
+    {
+      $("#btnStdDownloadtoExcel").click(function(){
+        var selectCurriculum = $("#selectCurriculum").val();
+        if (selectCurriculum == "" || selectCurriculum == null) {toastr.error('Please select Curriculum', 'Failed!!');return};
+
+        var Year = selectCurriculum.split(".");
+        Year = Year[1];
+        var prodi = $('#selectProdi').val();
+        var NPM = $('#NIM').val();
+        var url = base_url_js+'finance/excel_data_mahasiswa';
+        data = {
+          Year : Year,
+          Prodi : prodi,
+          NPM : NPM
+        }
+        var token = jwt_encode(data,"UAP)(*");
+        FormSubmitAuto(url, 'POST', [
+            { name: 'token', value: token },
+        ]);
+      })
+    }
 
     $('#selectCurriculum').change(function () {
         loadData(1);
@@ -183,7 +216,19 @@
 
                         // show bintang
                         var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
-
+                        var IPS = 0
+                        var IPK = 0
+                        var Credit = 0
+                        try {
+                             IPS = Data_mhs[i]['IPS'].toFixed(2);
+                             IPK = Data_mhs[i]['IPK'].toFixed(2);
+                             Credit = Data_mhs[i]['Credit'];
+                        }
+                        catch(err) {
+                            IPS = 0;
+                            IPK = 0
+                            Credit = 0
+                        }
                        $('#dataRow').append('<tr>' +
                            '<td>'+Data_mhs[i]['ProdiEng']+'</td>' +
                            // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
@@ -191,8 +236,12 @@
                            // '<td>'+Data_mhs[i]['NPM']+'</td>' +
                            // '<td>'+Data_mhs[i]['ClassOf']+'</td>' +
                            '<td>'+img+'</td>' +
-                           '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
-                           '<td>'+Data_mhs[i]['HP']+'</td>' +
+                           '<td>'+IPS+'</td>' +
+                           '<td>'+IPK+'</td>' +
+                           '<td>'+Credit+'</td>' +
+                           '<td>'+Data_mhs[i]['StatusStudentName']+'</td>' +
+                           // '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
+                           // '<td>'+Data_mhs[i]['HP']+'</td>' +
                            '<td>'+selecTOptionBintang+'</td>' +
                            '<td>'+selecTOption+'</td>' +
                            '<td>'+selecTOptionCredit+'</td>' +

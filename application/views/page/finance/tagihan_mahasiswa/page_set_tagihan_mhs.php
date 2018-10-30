@@ -68,7 +68,7 @@
 
 <script>
     $(document).ready(function () {
-        loadSelectOptionCurriculum('#selectCurriculum','');
+        loadSelectOptionCurriculum2('#selectCurriculum','');
         loadSelectOptionBaseProdi('#selectProdi','');
         loadSelectOptionPaymentTypeMHS('#selectPTID','');
         // $("#btn-submit").addClass('hide');

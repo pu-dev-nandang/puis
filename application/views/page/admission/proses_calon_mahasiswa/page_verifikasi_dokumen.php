@@ -25,7 +25,7 @@
 			<br>
 			<label class="control-label"><?php echo $datadb['data'][$i]['Name'] ?> </label>
 		</div>
-		<div class="col-xs-3" style="">
+		<div class="col-xs-2" style="">
 			<label class="control-label">Email :</label>
 			<br>
 			<label class="control-label"><?php echo $datadb['data'][$i]['Email'] ?> </label>
@@ -34,6 +34,17 @@
 			<label class="control-label">No Hp :</label>
 			<br>
 			<label class="control-label"><?php echo $datadb['data'][$i]['PhoneNumber'] ?> </label>
+		</div>
+		<div class="col-xs-2" style="">
+			<label class="control-label">Nomor Formulir :</label>
+			<br>
+			<?php $code = $datadb['data'][$i]['FormulirCode'] ;
+				if ($datadb['data'][$i]['No_Ref'] != "" || $datadb['data'][$i]['No_Ref'] != null) {
+					$code = $datadb['data'][$i]['FormulirCode'].' / '.$datadb['data'][$i]['No_Ref'];
+				}
+			?>
+
+			<label class="control-label"><?php echo $code ?> </label>
 		</div>
 	</div>
 	<br>
@@ -99,10 +110,11 @@
 				?>
 					<tr>
 						<td class="checkbox-column">
-							<?php if ($datadb['data'][$i]['document'][$j]['Status'] == 'Done'): ?>
+							<!-- <?php if ($datadb['data'][$i]['document'][$j]['Status'] == 'Done'): ?>
 							<?php else: ?>
 								<input type="checkbox" class="uniform<?php echo $i ?>" value ="<?php echo $datadb['data'][$i]['document'][$j]['ID_register_document'] ?>;<?php echo $namaFile ?>">
-							<?php endif ?>
+							<?php endif ?> -->
+							<input type="checkbox" class="uniform<?php echo $i ?>" value ="<?php echo $datadb['data'][$i]['document'][$j]['ID_register_document'] ?>;<?php echo $namaFile ?>">
 					  	</td>
 						<td><?php echo $no ?></td>
 						<td><?php echo $datadb['data'][$i]['document'][$j]['DocumentChecklist'] ?></td>
@@ -118,10 +130,35 @@
 	<div class="col-xs-12" align = "right">
 	   <button class="btn btn-inverse btn-notification btn-reject" id="btn-reject<?php echo $i ?>">Reject</button>
 	   <button class="btn btn-inverse btn-notification btn-approve" id="btn-approve<?php echo $i ?>">Approve</button>
+	   <button class="btn btn-danger btn-notification btn-unpprove" id="btn-unpprove<?php echo $i ?>">Unapprove</button>
 	</div>
 	<!-- <br> -->
 	<hr class="style-eight" />
 	<script type="text/javascript">
+		$(document).ready(function () {
+			$('#btn-unpprove<?php echo $i ?>').click(function(){
+					loading_button('#btn-unpprove<?php echo $i ?>');
+					var ID_register_document = getValueChecbox<?php echo $i ?>('.tableData<?php echo $i ?>');
+					  // console.log(ID_register_document);
+					 if (ID_register_document.length == 0) {
+					 	toastr.error("Silahkan checked dahulu", 'Failed!!');
+					 }
+					 else
+					 {
+					 	var msg = '';
+					 	//var getAllRegisterID;
+					 	$('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Apakah anda yakin untuk melakukan request ini ?? </b> ' +
+					 	    '<button type="button" id="confirmYesProcess" class="btn btn-primary" style="margin-right: 5px;" data-pass = "'+ID_register_document+'" action = "unapprove">Yes</button>' +
+					 	    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+					 	    '</div>');
+					 	$('#NotificationModal').modal('show');
+					 	
+				 		 
+					 }
+					 $('#btn-unpprove<?php echo $i ?>').prop('disabled',false).html('Unapprove');
+			})
+		});
+
 		$(document).on('click','#dataResultCheckAll<?php echo $i ?>', function () {
 			$('input.uniform<?php echo $i ?>').not(this).prop('checked', this.checked);
 		});

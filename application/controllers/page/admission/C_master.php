@@ -11,6 +11,7 @@ class C_master extends Admission_Controler {
         $this->load->model('m_sendemail');
         $this->load->model('master/m_master');
         $this->data['department'] = parent::__getDepartement();
+        $this->data['NameMenu'] = $this->GlobalData['NameMenu'];
         //$this->checkAuth_user();
     }
 
@@ -156,7 +157,7 @@ class C_master extends Admission_Controler {
         $pwd = $input['pwd'];
         $smtp_port = $input['smtp_port'];
         $smtp_host = $input['smtp_host'];
-        $to = $this->m_sendemail->getToEmail('Testing');
+        $to = $this->m_sendemail->getToEmail('Testing').','.'alhadi.rahman@podomorouniversity.ac.id';
         //$to = "alhadi.rahman@podomorouniversity.ac.id";
         $subject = "Testemail";
         $sendEmail = $this->m_sendemail->sendEmail($to,$subject,$smtp_host,$smtp_port,$email,$pwd);
@@ -510,6 +511,8 @@ class C_master extends Admission_Controler {
 
     public function formulir_offline()
     {
+        $totalData = $this->m_master->caribasedprimary('db_admission.count_account','Active',1);
+        $this->data['totalData'] = (int) $totalData[0]['CountAccount'];
         $content = $this->load->view('page/'.$this->data['department'].'/master/formulir_offline',$this->data,true);
         $this->temp($content);
     }
@@ -1078,9 +1081,10 @@ class C_master extends Admission_Controler {
 
             $path = './document';
             $path = $path.'/'.$filename;
-            $this->mypdf->Output($path,'F');
+            // $this->mypdf->Output($path,'F');
             $this->m_master->updateStatusPrint($input['formulir_code']);
-            echo json_encode($filename);
+            $this->mypdf->Output($filename.'.pdf','I');
+            // echo json_encode($filename);
 
         }
         catch (Exception $e){

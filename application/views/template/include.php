@@ -504,8 +504,36 @@
         $.get(url,function (data_json) {
             // console.log(data_json);
             for(var i=0;i<data_json.length;i++){
+
+                var sc = '';
+                if(selected!='' && selected!=null && typeof selected !== undefined){
+                    sc = (data_json[i].ID==selected) ? 'selected' : '';
+                } else {
+                    sc = (data_json[i].StatusSemester=='1') ? 'selected' : '';
+                }
+
+                $(element).append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'" '+sc+'>'+data_json[i].NameEng+'</option>');
+            }
+        });
+    }
+
+    function loadSelectOptionCurriculumNoSelect(element) {
+        var url = base_url_js+"api/__getKurikulumSelectOption";
+        $.get(url,function (data_json) {
+            // console.log(data_json);
+            for(var i=0;i<data_json.length;i++){
+                $(element).append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'">'+data_json[i].NameEng+'</option>');
+            }
+        });
+    }
+
+    function loadSelectOptionForce(element,selected) {
+        var url = base_url_js+"api/__getKurikulumSelectOption";
+        $.get(url,function (data_json) {
+            // console.log(data_json);
+            for(var i=0;i<data_json.length;i++){
                 var selected = (data_json[i].ID==selected) ? 'selected' : '';
-                $(element).append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'" '+selected+'>'+data_json[i].NameEng+'</option>');
+                $(element).append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'" '+selected+'>Asc. Year - '+data_json[i].Year+'</option>');
             }
         });
     }
@@ -726,7 +754,7 @@
         var option = $(''+element);
         $.post(url,{token:token},function (data_json) {
             if(data_json.length>0){
-                $(element).empty();
+                // $(element).empty();
                 for(var i=0;i<data_json.length;i++){
                     var selec = (selected==data_json[i].ID) ? 'selected' : '';
                     option.append('<option value="'+data_json[i].ID+'" '+selec+'>'+data_json[i].Room+' | Seat : '+data_json[i].Seat+' | Exam : '+data_json[i].SeatForExam+'</option>');
@@ -761,13 +789,28 @@
         var option = $(''+element);
         $.post(url,{token:token},function (data_json) {
             if(data_json.length>0){
-                $(element).empty();
+                // $(element).empty();
                 for(var i=0;i<data_json.length;i++){
                     var selec = (selected==data_json[i].Time) ? 'selected' : '';
                     option.append('<option value="'+data_json[i].Time+'" '+selec+'>'+data_json[i].Time+' minute</option>');
                 }
             }
 
+        });
+    }
+
+    function loadSelectOptionCategoryLecturerEvaluation(element,selected) {
+        var url = base_url_js+'api/__crudLecturerEvaluation';
+        var token = jwt_encode({action:'readLECategory'},'UAP)(*');
+        $.post(url,{token:token},function (jsonResult) {
+
+            if(jsonResult.length>0){
+                for(var i=0;i<jsonResult.length;i++){
+                    var d = jsonResult[i];
+                    var sc = (selected!='' && selected==d.ID) ? 'selected' : '';
+                    $(element).append('<option value="'+d.ID+'" '+sc+'>'+d.Category+'</option>');
+                }
+            }
         });
     }
 
@@ -800,6 +843,8 @@
         var token = jwt_encode({action:'read',order:'DESC'},'UAP)(*');
 
         $.post(url,{token:token},function (data_json) {
+
+            console.log(data_json);
             var option = $(element);
             if(data_json.length>0){
                 for(var i=0;i<data_json.length;i++){
@@ -808,8 +853,15 @@
                         selc = (data_json[i].Status==1) ? 'selected' : '';
 
                     } else {
-                        selc = (selected==data_json[i].ID) ? 'selected' : '';
+                        if(selected!='' && selected!=null && typeof selected !== undefined){
+                            selc = (selected==data_json[i].ID) ? 'selected' : '';
+                        } else {
+                            selc = (data_json[i].Status==1) ? 'selected' : '';
+                        }
+
                     }
+
+
 
                     option.append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'.'+data_json[i].Code+'" '+selc+'>'+data_json[i].Name+'</option>');
 
@@ -1262,5 +1314,15 @@
           { name: 'token', value: token },
       ]);*/
 
+    function loadSelectOptionCurriculum2(element,selected) {
+        var url = base_url_js+"api/__getKurikulumSelectOption";
+        $.get(url,function (data_json) {
+            // console.log(data_json);
+            for(var i=0;i<data_json.length;i++){
+                var selected = (data_json[i].ID==selected) ? 'selected' : '';
+                $(element).append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'" '+selected+'>'+data_json[i].NameEng+'</option>');
+            }
+        });
+    }  
 
 </script>

@@ -4,7 +4,7 @@
     <div class="col-md-12 formAddFormKD">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i> Data Registrasi Mahasiswa</h4>
+                <h4 class="header"><i class="icon-reorder"></i> <?php echo $NameMenu ?></h4>
                 <!-- <div class="toolbar no-padding">
                     <div class="btn-group">
                       <span data-smt="" class="btn btn-xs btn-add">
@@ -19,7 +19,7 @@
                     <div id="panel_web" class="" style="padding:30px;padding-top:0px;">
                          <ul class="nav nav-tabs">
                             <li role="presentation" class="active"><a href="javascript:void(0)" class="tab-btn-submenu-page" data-page="data-calon-mhs/1">Data</a></li>
-                            <li role="presentation"><a href="javascript:void(0)" class="tab-btn-submenu-page" data-page="to-be-mhs/1">To Be Mahasiswa</a></li>
+                            <li role="presentation"><a href="javascript:void(0)" class="tab-btn-submenu-page" data-page="to-be-mhs/1">To Be Student</a></li>
                             <!--<li role="presentation"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee_delete/1">Register</a></li>
                             <li role="presentation"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee_delete/1">Register Recycled</a></li>-->
                          </ul>
@@ -30,7 +30,7 @@
                          <br>
                          <div class="row">
                             <div class="col-xs-2" style="">
-                              Tahun
+                              Angkatan
                               <select class="select2-select-00 col-xs-2 full-width-fix" id="selectTahun">
                                   <option></option>
                               </select>
@@ -119,9 +119,9 @@
                                '<th>Rangking</th>'+
                                '<th>Beasiswa</th>'+
                                '<th>Document</th>'+
-                               '<th>Tagihan</th>'+
+                               '<th width = "13%">Tagihan</th>'+
                                '<th>Detail Payment</th>'+
-                               '<th>Status Payment</th>'+
+                               '<th>Status</th>'+
                                '<th>Login</th>'+
                            '</tr>'+
                            '</thead>'+
@@ -189,7 +189,7 @@
                                 '<th>Rangking</th>'+
                                 '<th>Beasiswa</th>'+
                                 '<th>Document</th>'+
-                                '<th>Tagihan</th>'+
+                                '<th width = "13%">Tagihan</th>'+
                                 '<th>Detail Payment</th>'+
                                 '<th>Status Payment</th>'+
                             '</tr>'+
@@ -303,13 +303,27 @@
                              var token = jwt_encode(data,"UAP)(*");
                               $.post(url,{token:token},function (data_json) {
                                  // $('#generateToBEMhs').prop('disabled',false).html('Generate');
+                                 var json = jQuery.parseJSON(data_json);
+                                 if(json == 'Error'){
+                                  toastr.error('Please check the completeness of the data', 'Failed!!');
+                                 }
+                                 else if(json == '')
+                                 {
+                                  toastr.success('Generate ok', 'Success!');
+                                 }
+                                 else
+                                 {
+                                  toastr.success('Proses Finish', 'Success!');
+                                 }
                                  $('#NotificationModal').modal('hide');
                              }).done(function() {
                                loadPage('to-be-mhs/1');
+                               $('#NotificationModal').modal('hide');
                              }).fail(function() {
-                               toastr.error('The Database connection error, please try again', 'Failed!!');
+                               toastr.error('Please check the completeness of the data', 'Failed!!');
+                               $('#NotificationModal').modal('hide');
                              }).always(function() {
-                              // $('#generateToBEMhs').prop('disabled',false).html('Generate');
+                              $('#NotificationModal').modal('hide');
 
                              });
                          })
@@ -568,8 +582,10 @@
     $(document).on("click", ".btnLoginPortalRegister", function(event){
       var url = '<?php echo url_registration; ?>'+'auth/loginByPcam';
       var Email = $(this).attr('data-xx');
+      var Code = $(this).attr('data-xx2');
       data = {
         Email : Email,
+        Code : Code,
       }
       var token = jwt_encode(data,"UAP)(*");
       submit(url, 'POST', [

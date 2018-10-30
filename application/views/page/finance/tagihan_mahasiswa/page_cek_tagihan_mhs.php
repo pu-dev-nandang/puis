@@ -71,6 +71,7 @@
                 <!-- <th style="width: 5%;">Year</th> -->
                 <th style="width: 8%;">Payment Type</th>
                 <!-- <th style="width: 15%;">Email PU</th> -->
+                <th style="width: 5%;">Credit</th>
                 <th style="width: 5%;">IPS</th>
                 <th style="width: 5%;">IPK</th>
                 <th style="width: 5%;">Discount</th>
@@ -95,7 +96,7 @@
     window.dataaModal = '';
     $(document).ready(function () {
         loadData(1);
-        loadSelectOptionCurriculum('#selectCurriculum','');
+        loadSelectOptionCurriculum2('#selectCurriculum','');
         loadSelectOptionBaseProdi('#selectProdi','');
         loadSelectOptionPaymentTypeAll('#selectPTID','');
         getReloadTableSocket();
@@ -307,6 +308,7 @@
                        // '<td>'+Data_mhs[i]['NPM']+'</td>' +
                        // '<td>'+Data_mhs[i]['Year']+'</td>' +
                        '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +
+                       '<td>'+Data_mhs[i]['Credit']+'</td>' +
                        // '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
                        '<td>'+IPS+'</td>' +
                        '<td>'+IPK+'</td>' +

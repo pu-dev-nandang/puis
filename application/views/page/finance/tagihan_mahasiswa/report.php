@@ -110,10 +110,10 @@
     window.summary = '';
     window.PostPassing = '';
     $(document).ready(function () {
-        loadSelectOptionCurriculum('#selectCurriculum','');
+        loadSelectOptionCurriculum2('#selectCurriculum','');
         loadSelectOptionBaseProdi('#selectProdi','');
         loadSelectOptionPaymentTypeAll('#selectPTID','');
-        loadSelectOptionSemesterByload('#selectSemester',0);
+        loadSelectOptionSemesterByload('#selectSemester',1);
         getReloadTableSocket();
     });
 
@@ -126,7 +126,7 @@
            if(jsonResult.length>0){
                for(var i=0;i<jsonResult.length;i++){
                    var dt = jsonResult[i];
-                   var sc = (selected==dt.ID) ? 'selected' : '';
+                   var sc = (selected==dt.Status) ? 'selected' : '';
                    // var v = (option=="Name") ? dt.Name : dt.ID;
                    $(element).append('<option value="'+dt.ID+'.'+dt.Name+'" '+sc+'>'+dt.Name+'</option>');
                }

@@ -1,155 +1,232 @@
-<legend>Pembayaran Formulir Verify By Sales & Admission</legend>
-<div class="row" style="margin-top: 30px;">
-    <div class="col-md-12">
-        <div class="widget box">
-            <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i>List Penjualan Formulir Offline
-                </h4>
-            </div>
-            <div class="widget-content">
-                <div class = "row"> 
-                    <div class="col-xs-2" style="">
-                        Tahun
-                        <select class="select2-select-00 col-md-4 full-width-fix" id="selectTahun">
-                            <option></option>
-                        </select>
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel panel-primary">
+          <div class="panel-heading clearfix">
+              <h4 class="panel-title pull-left" style="padding-top: 7.5px;">List Penjualan Formulir</h4>
+          </div>
+          <div class="panel-body">
+             <div class = "row" style="margin-left: 0px;margin-right: 0px">
+                <div class="col-xs-6 col-md-offset-3">
+                  <div class="thumbnail" style="height: 100px">
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-xs-4 col-md-offset-2">
+                              <label>Angkatan</label>
+                              <select class="select2-select-00 full-width-fix" id="selectTahun">
+                                  <option></option>
+                              </select>
+                        </div>
+                        <div class="col-xs-4" style="">
+                            <label>Status Jual</label>
+                              <select class="select2-select-00 full-width-fix" id="selectStatusJual">
+                                  <option value= "%">All</option>
+                                  <option value= "1" selected>SoldOut</option>
+                                  <option value= "0">In</option>
+                              </select>
+                        </div>
+                      </div>
                     </div>
-                    <div class="col-xs-2" style="">
-                        Nomor Formulir
-                        <input class="form-control" id="NomorFormulir" placeholder="All..." "="">
-                    </div>
-                    <div class="col-xs-2" style="">
-                        Nama Pendistribusi Formulir
-                        <input class="form-control" id="NamaStaffAdmisi" placeholder="All..." "="">
-                    </div>
-                    <div class="col-xs-2" style="">
-                        Status Activated by Candidate
-                        <select class="select2-select-00 col-md-4 full-width-fix" id="selectStatus">
-                            <option value= "%" selected>All</option>
-                            <option value= "0">No</option>
-                            <option value= "1">Yes</option>
-                        </select>
-                    </div>
-                          <div class="col-xs-2" style="">
-                                Status Jual
-                                <select class="select2-select-00 col-md-4 full-width-fix" id="selectStatusJual">
-                                    <option value= "%" selected>All</option>
-                                    <option value= "1">SoldOut</option>
-                                    <option value= "0">In</option>
-                                </select>
-                          </div>
-                    <div  class="col-xs-4" align="right" id="pagination_link"></div>    
-                    <!-- <div class = "table-responsive" id= "register_document_table"></div> -->
+                  </div>   
                 </div>
-                <br>    
-                <div id= "formulir_offline_table"></div>
-            </div>
-            </div>
-        </div>
+             </div>
+             <div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px" id = "pageSubContent">
+
+             </div>          
+          </div>
     </div>
+  </div>
 </div>
-
 <script type="text/javascript">
-	$(document).ready(function () {
-        loadTahun();
-	    loadDataFormulirOffline(1);
-	});
+  $(document).ready(function() {
+    LoadFirst();
 
-	function loadDataFormulirOffline(page)
-	{
-		loading_page('#formulir_offline_table');
-        var url = base_url_js+'admission/distribusi-formulir/formulir-offline/pagination/'+page;
-            var selectTahun = $("#selectTahun").find(':selected').val();
-        var selectStatusJual = $("#selectStatusJual").find(':selected').val();
-        var NomorFormulir = $("#NomorFormulir").val();
-        if (NomorFormulir == '') {NomorFormulir = '%'};
-        var NamaStaffAdmisi = $("#NamaStaffAdmisi").val();
-        if (NamaStaffAdmisi == '') {NamaStaffAdmisi = '%'};
-        var selectStatus = $("#selectStatus").find(':selected').val();
-        var data = {
-                    selectTahun : selectTahun,
-                    NomorFormulir : NomorFormulir,
-                    NamaStaffAdmisi : NamaStaffAdmisi,
-                    selectStatus : selectStatus,
-                      selectStatusJual : selectStatusJual,
-                      action : 0                   
-                    };
-        var token = jwt_encode(data,"UAP)(*");          
-        $.post(url,{token:token},function (data_json) {
-            // jsonData = data_json;
-            var obj = JSON.parse(data_json); 
-            // console.log(obj);
-            setTimeout(function () {
-                $("#formulir_offline_table").html(obj.tabel_formulir_offline);
-                $("#pagination_link").html(obj.pagination_link);
-            },500);
-        }).done(function() {
-          
-        }).fail(function() {
-          toastr.error('The Database connection error, please try again', 'Failed!!');
-        }).always(function() {
-          // $('#btn-dwnformulir').prop('disabled',false).html('Formulir');
-        });
-	}
+    $('#selectStatusJual').change(function(){
+      LoadTablesServerSide();
+    })
 
-    $(document).on("click", ".pagination li a", function(event){
-      event.preventDefault();
-      var page = $(this).data("ci-pagination-page");
-      loadDataFormulirOffline(page)
-      // loadData_register_document(page);
-    });
+    $('#selectTahun').change(function(){
+      LoadTablesServerSide();
+    })
+  }); // exit document Function
 
-    function loadTahun()
+
+  function LoadFirst()
+  {
+    loadTahun();
+    LoadTablesServerSide();
+  }
+
+  function loadTahun()
     {
-         var thisYear = (new Date()).getFullYear();
-          var startTahun = parseInt(thisYear);
-          var selisih = (2018 < parseInt(thisYear)) ? parseInt(1) + (parseInt(thisYear) - parseInt(2018)) : 1;
-          for (var i = 0; i <= selisih; i++) {
+      var thisYear = (new Date()).getFullYear();
+      var startTahun = parseInt(thisYear);
+       var selisih = (2018 < parseInt(thisYear)) ? parseInt(1) + (parseInt(thisYear) - parseInt(2018)) : 1;
+       for (var i = 0; i <= selisih; i++) {
             var selected = (i==1) ? 'selected' : '';
             $('#selectTahun').append('<option value="'+ ( parseInt(startTahun) + parseInt(i) ) +'" '+selected+'>'+( parseInt(startTahun) + parseInt(i) )+'</option>');
-          }
+        }
 
-          $('#selectTahun').select2({
-           // allowClear: true
-          });
+       $('#selectTahun').select2({
+         // allowClear: true
+       });
 
-        $('#selectStatus').select2({
+        $('#selectStatusJual').select2({
           // allowClear: true
         });
     }
 
+    function LoadTablesServerSide()
+    {
+      $("#pageSubContent").empty();
+      var div = '<div class="col-md-12">'+
+          '<div class="table-responsive" id = "DivTable">'+
+          '</div>'+
+        '</div>';
+    $("#pageSubContent").html(div);
+    var table = '<table class="table table-bordered datatable2" id = "tableData4">'+
+                '<thead>'+
+                '<tr style="background: #333;color: #fff;">'+
+                    '<th>No</th>'+
+                    '<th>Code</th>'+
+                    '<th>Ref</th>'+
+                    '<th>Kwitansi</th>'+
+                    '<th>Prodi</th>'+
+                    '<th>Activated</th>'+
+                    '<th>Status</th>'+
+                    '<th>Sales</th>'+
+                    '<th>Harga</th>'+
+                    '<th>Tanggal</th>'+
+                    '<th>Pembeli</th>'+
+                    '<th>Iklan</th>'+
+                    '<th>Action</th>'+
+                '</tr>'+
+                '</thead>'+
+                '<tbody id="dataRow"></tbody>'+
+            '</table>';
+    $("#DivTable").html(table);
 
-    $(document).on('change','#selectStatus', function () {
-         loadDataFormulirOffline(1);
+    $.fn.dataTable.ext.errMode = 'throw';
+    //alert('hsdjad');
+    $.fn.dataTableExt.oApi.fnPagingInfo = function (oSettings)
+    {
+        return {
+            "iStart": oSettings._iDisplayStart,
+            "iEnd": oSettings.fnDisplayEnd(),
+            "iLength": oSettings._iDisplayLength,
+            "iTotal": oSettings.fnRecordsTotal(),
+            "iFilteredTotal": oSettings.fnRecordsDisplay(),
+            "iPage": Math.ceil(oSettings._iDisplayStart / oSettings._iDisplayLength),
+            "iTotalPages": Math.ceil(oSettings.fnRecordsDisplay() / oSettings._iDisplayLength)
+        };
+    };
+
+    var table = $('#tableData4').DataTable( {
+        "processing": true,
+        "destroy": true,
+        "serverSide": true,
+        "iDisplayLength" : 5,
+        "ordering" : false,
+        "ajax":{
+            url : base_url_js+"finance/admission/distribusi-formulir/offline/LoadListPenjualan/serverSide", // json datasource
+            ordering : false,
+            type: "post",  // method  , by default get
+            data : {tahun : $("#selectTahun").val(),StatusJual : $("#selectStatusJual").val() },
+            error: function(){  // error handling
+                $(".employee-grid-error").html("");
+                $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                $("#employee-grid_processing").css("display","none");
+            }
+        },
+        'createdRow': function( row, data, dataIndex ) {
+              // if(data[6] == 'Lunas')
+              // {
+              //   $(row).attr('style', 'background-color: #8ED6EA; color: black;');
+              // }
+        },
+    } );
+
+    $('#tableData4 tbody').on('click', '.btn-print', function () {
+      var NoKwitansi = $(this).attr('nokwitansi');
+      var url = base_url_js+'admission/export_kwitansi_formuliroffline';
+      var NoFormRef = $(this).attr('ref');
+      var namalengkap = $(this).attr('namalengkap');
+      var hp = $(this).attr('hp');
+      var jurusan = $(this).attr('jurusan');
+      var pembayaran = $(this).attr('pembayaran');
+      var jenis = $(this).attr('jenis');
+      var jumlah = $(this).attr('jumlah');
+      var date = $(this).attr('date');
+      var formulir = $(this).attr('formulir');
+      NoFormRef = (NoFormRef != "" || NoFormRef != null) ? NoFormRef : formulir;
+
+      if (NoKwitansi == "" || NoKwitansi == null) {
+          $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Number Kwitansi ! </b> <br>' +
+              '<input type = "number" class = "form-control" id ="NumForm"  maxlength="4" style="margin: 0px 0px 15px; height: 30px; width: 329px;"><br>'+
+              '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+              '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+              '</div>');
+          $('#NotificationModal').modal('show');
+      } else {
+        var NumForm = NoKwitansi;
+        data = {
+          NoFormRef : NoFormRef ,
+          namalengkap : namalengkap ,
+          hp : hp ,
+          jurusan :  jurusan ,
+          pembayaran :  pembayaran,
+          jenis : jenis ,
+          jumlah : jumlah ,
+          date : date,
+          NumForm : NumForm,
+        }
+        var token = jwt_encode(data,"UAP)(*");
+        FormSubmitAuto(url, 'POST', [
+            { name: 'token', value: token },
+        ]);
+      }
+
+      $("#NumForm").keypress(function(event)
+      {
+
+           if (event.keyCode == 10 || event.keyCode == 13) {
+             var NumForm = $('#NumForm').val();
+             data = {
+               NoFormRef : NoFormRef ,
+               namalengkap : namalengkap ,
+               hp : hp ,
+               jurusan :  jurusan ,
+               pembayaran :  pembayaran,
+               jenis : jenis ,
+               jumlah : jumlah ,
+               date : date,
+               NumForm : NumForm,
+             }
+             var token = jwt_encode(data,"UAP)(*");
+             FormSubmitAuto(url, 'POST', [
+                 { name: 'token', value: token },
+             ]); 
+           }
+      }); // exit enter
+
+      $("#confirmYes").click(function(){
+          var NumForm = $('#NumForm').val();
+          data = {
+            NoFormRef : NoFormRef ,
+            namalengkap : namalengkap ,
+            hp : hp ,
+            jurusan :  jurusan ,
+            pembayaran :  pembayaran,
+            jenis : jenis ,
+            jumlah : jumlah ,
+            date : date,
+            NumForm : NumForm,
+          }
+          var token = jwt_encode(data,"UAP)(*");
+          FormSubmitAuto(url, 'POST', [
+              { name: 'token', value: token },
+          ]);  
+      })
     });
 
-    $(document).on('change','#selectStatusJual', function () {
-        loadDataFormulirOffline(1);
-    });
-
-    $(document).on('change','#selectTahun', function () {
-        loadDataFormulirOffline(1);
-    });
-
-    $(document).on("keyup", "#NomorFormulir", function(event){
-        var nama = $('#NomorFormulir').val();
-        var n = nama.length;
-        console.log(n);
-        if( this.value.length < 3 && this.value.length != 0 ) return;
-           /* code to run below */
-         loadDataFormulirOffline(1);
-      
-     });
-
-    $(document).on("keyup", "#NamaStaffAdmisi", function(event){
-        var nama = $('#NamaStaffAdmisi').val();
-        var n = nama.length;
-        console.log(n);
-        if( this.value.length < 3 && this.value.length != 0 ) return;
-           /* code to run below */
-         loadDataFormulirOffline(1);
-      
-     });
-
-	
+    }
 </script>

@@ -10,6 +10,11 @@
 <script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/easy-pie-chart/jquery.easy-pie-chart.min.js"></script>
 
 <!--=== Bars ===-->
+<div class="row" style="margin-left: 0px;margin-right: 0px;margin-top: -30px">
+	<div class="col-xs-6 col-md-offset-5">
+		<h2>Semester <?php echo $getSemester[0]['Name'] ?></h2>
+	</div>
+</div>
 <div class="row">
 	<div class="col-md-6">
 		<div class="widget box">
@@ -169,16 +174,37 @@
         var url = base_url_js+'finance/summary_payment_formulir';
 		$.post(url,function (resultJson) {
 		   var response = jQuery.parseJSON(resultJson);
+		   // console.log(response);
 		   var ds = new Array();
 
 		   ds.push({
-   		   	label: "Paid Off",
+   		   	label: "Sold Out",
    		   	data: response['Paid_Off'],
    		   	bars: {
    		   		show: true,
    		   		barWidth: 0.2,
    		   		order: 1
    		   	}
+   		   });
+
+   		   ds.push({
+   		   	label: "",
+   		   	data: response['Return_Formulir'],
+   		   	bars: {
+   		   		// show: true,
+   		   		barWidth: 0.2,
+   		   		order: 2
+   		   	}
+   		   });
+
+   		   ds.push({
+   		   	label: "Return",
+   		   	data: response['Return_Formulir'],
+   		   	bars: {
+   		   		show: true,
+   		   		barWidth: 0.2,
+   		   		order: 3,
+   		   	},
    		   });
 
 		   // console.log(ds);
@@ -237,6 +263,16 @@
 		   		show: true,
 		   		barWidth: 0.2,
 		   		order: 2
+		   	}
+		   });
+
+		   ds.push({
+		   	label: "Unset Paid",
+		   	data: response['Unset_Paid'],
+		   	bars: {
+		   		show: true,
+		   		barWidth: 0.2,
+		   		order: 3
 		   	}
 		   });
 

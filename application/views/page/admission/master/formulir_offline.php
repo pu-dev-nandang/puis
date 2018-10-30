@@ -37,12 +37,12 @@
     <div class="col-md-12 formAddFormKD">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i> Formulir Offline</h4>
+                <h4 class="header"><i class="icon-reorder"></i> <?php echo $NameMenu ?></h4>
             </div>
             <div class="widget-content">
                 <!--  -->
                 <div class="row row-sma">
-                    <label class="col-sm-1 control-label">Tahun</label>
+                    <label class="col-sm-1 control-label">Angkatan</label>
                     <div class="col-xs-12">
                         <div class="row">
                             <div class="col-xs-3">
@@ -132,7 +132,9 @@
     function loadQty()
     {
         $('#selectqty').empty();
-        for (var i = 5; i <= 1000; i =  i + 5) {
+        var totaldata = "<?php echo $totalData ?>";
+        totaldata = parseInt(totaldata);
+        for (var i = 5; i <= totaldata; i =  i + 5) {
             var selected = (i==0) ? 'selected' : '';
             $('#selectqty').append('<option value="'+ i +'" '+selected+'>'+i+'</option>');
         }
@@ -167,18 +169,21 @@
          url_token : url_token
        };
        var token = jwt_encode(data,"UAP)(*");
-       $.post(url,{token:token},function (data_json) {
-         var response = jQuery.parseJSON(data_json);
-         //console.log(response);
-         //window.location.href = base_url_js+'fileGet/'+response;
-         window.open(base_url_js+'fileGet/'+response,'_blank');
-         loadNumberFormulir();
-       }).done(function() {
-         toastr.success('The Download processing success', 'Success!');
-       }).fail(function() {
-         toastr.error('The Download Processing error, please try again', 'Failed!!');
-       }).always(function() {
-         // $('#btn-dwnformulir').prop('disabled',false).html('Formulir');
-       });
+       FormSubmitAuto(url, 'POST', [
+           { name: 'token', value: token },
+       ]);
+       // $.post(url,{token:token},function (data_json) {
+       //   var response = jQuery.parseJSON(data_json);
+       //   //console.log(response);
+       //   //window.location.href = base_url_js+'fileGet/'+response;
+       //   window.open(base_url_js+'fileGet/'+response,'_blank');
+       //   loadNumberFormulir();
+       // }).done(function() {
+       //   toastr.success('The Download processing success', 'Success!');
+       // }).fail(function() {
+       //   toastr.error('The Download Processing error, please try again', 'Failed!!');
+       // }).always(function() {
+       //   // $('#btn-dwnformulir').prop('disabled',false).html('Formulir');
+       // });
     });
 </script>

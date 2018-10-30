@@ -2,19 +2,19 @@
 	<div class="col-md-12">
 		<div class="widget box">
 			<div class="widget-header">
-				<h4><i class="icon-reorder"></i>List Formulir Online</h4>
+				<h4><i class="icon-reorder"></i><?php echo $NameMenu ?></h4>
 			</div>
 			<div class="widget-content">
 				<div class = "row">	
 					<div class="col-xs-2" style="">
-						Tahun
+						Angkatan
 						<select class="select2-select-00 col-md-4 full-width-fix" id="selectTahun">
 						    <option></option>
 						</select>
 					</div>
 					<div class="col-xs-2" style="">
 						Nomor Formulir
-						<input class="form-control" id="NomorFormulir" placeholder="All..." "="">
+						<input class="form-control" id="NomorFormulir" placeholder="All...">
 					</div>
 					<div class="col-xs-2" style="">
 						Status Activated by Candidate

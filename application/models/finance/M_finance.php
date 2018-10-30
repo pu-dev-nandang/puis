@@ -807,7 +807,7 @@ class M_finance extends CI_Model {
 
    public function getRangking_calon_mhs($ID_register_formulir)
    {
-    $sql= "select a.*,b.Attachment from db_admission.register_rangking as a join db_admission.register_document as b
+    $sql= "select a.*,b.Attachment from db_admission.register_rangking as a left join db_admission.register_document as b
            on a.FileRapor = b.ID where a.ID_register_formulir = ?
           ";
     $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
@@ -827,6 +827,56 @@ class M_finance extends CI_Model {
       return $query;      
    }
 
+   public function getNumberSuratTuitionFee($ID_register_formulir)
+   {
+    $sql = 'select a.SetTa
+            from db_finance.register_admisi as f
+            LEFT JOIN db_admission.register_formulir as e
+            on f.ID_register_formulir = e.ID
+            LEFT JOIN db_admission.register_verified as c
+            on c.ID = e.ID_register_verified
+            LEFT JOIN db_admission.register_verification as z
+            on c.RegVerificationID = z.ID
+            left join db_admission.register as a
+            on z.RegisterID = a.ID
+            where e.ID = ?
+            ';
+    $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
+    $set_ta = $query[0]['SetTa'];
+    $sql = 'select f.*
+            from db_finance.register_admisi as f
+            LEFT JOIN db_admission.register_formulir as e
+            on f.ID_register_formulir = e.ID
+            LEFT JOIN db_admission.register_verified as c
+            on c.ID = e.ID_register_verified
+            LEFT JOIN db_admission.register_verification as z
+            on c.RegVerificationID = z.ID
+            left join db_admission.register as a
+            on z.RegisterID = a.ID
+            where a.SetTa = ? and  f.No_Surat IS NOT NULL order by f.No_Surat desc limit 1
+            ';
+    $query=$this->db->query($sql, array($set_ta))->result_array();
+    if (count($query) > 0 ) {
+        $No_Surat = $query[0]['No_Surat'] + 1;
+    }
+    else
+    {
+      $No_Surat = 1;
+    }        
+    
+    return $No_Surat;  
+   }
+
+   public function ShowNumberTuitionFee($string)
+   {
+    $max = 3;
+    $len = strlen($string);
+    for ($i=0; $i < ($max - $len); $i++) { 
+        $string = '0'.$string;
+    }
+    return $string;  
+   }
+
    public function process_tuition_fee_calon_mhs($arrDataPersonal,$arrDataInvoice)
    {
     // print_r($arrDataInvoice);die();
@@ -835,6 +885,10 @@ class M_finance extends CI_Model {
        $payment = $arrDataInvoice[0]['Invoice'];
        $DeadLinePayment = $arrDataInvoice[0]['Deadline'];
        // $process = $this->create_va_Payment($payment,$DeadLinePayment);
+
+      // get number surat
+       $No_Surat = $this->getNumberSuratTuitionFee($arrDataPersonal[0]['ID_register_formulir']);
+
        if ($this->session->userdata('finance_auth_Policy_SYS') == 1) {
            $process = $this->create_va_Payment($payment,$DeadLinePayment, $arrDataPersonal[0]['Name'], $arrDataPersonal[0]['Email'],$arrDataPersonal[0]['VA_number']);
             if ($process['status']) {
@@ -848,6 +902,7 @@ class M_finance extends CI_Model {
 
                 $dataSave = array(
                         'Status' => 'Approved',
+                        'No_Surat' => $No_Surat,
                         'ApprovedBY' => $this->session->userdata('NIP'),
                         'ApprovedAT' => date('Y-m-d'),
                                 );
@@ -864,6 +919,9 @@ class M_finance extends CI_Model {
        {
            $dataSave = array(
                    'Status' => 'Approved',
+                   'No_Surat' => $No_Surat,
+                   'ApprovedBY' => $this->session->userdata('NIP'),
+                   'ApprovedAT' => date('Y-m-d'),
                            );
            $this->db->where('ID_register_formulir',$arrDataPersonal[0]['ID_register_formulir']);
            $this->db->update('db_finance.register_admisi', $dataSave);
@@ -873,38 +931,43 @@ class M_finance extends CI_Model {
        return $errorMSG;
    }
 
-   public function tuition_fee_calon_mhs_by_ID($ID_program_study)
+   public function tuition_fee_calon_mhs_by_ID($ID_register_formulir,$status = 'p.Status = "Created"')
    {
        $arr_temp = array();
        $sql = 'select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,
             f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
             n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
-            if((select count(*) as total from db_admission.register_nilai where Status = "Approved" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
-            as status1,p.CreateAT,p.CreateBY,d.VA_number,b.FormulirCode
+            if((select count(*) as total from db_admission.register_nilai where Status = "Verified" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
+            as status1,p.CreateAT,p.CreateBY,d.VA_number,b.FormulirCode,
+            a.Address,a.ID_province as IDPRovAddress,a.ID_region as IDRegionAddress,
+            a.PhoneNumber,d.SetTa,px.No_Ref
             from db_admission.register_formulir as a
-            JOIN db_admission.register_verified as b 
+            left JOIN db_admission.register_verified as b 
             ON a.ID_register_verified = b.ID
-            JOIN db_admission.register_verification as c
+            left JOIN db_admission.register_verification as c
             ON b.RegVerificationID = c.ID
-            JOIN db_admission.register as d
+            left JOIN db_admission.register as d
             ON c.RegisterID = d.ID
-            JOIN db_admission.country as e
+            left JOIN db_admission.country as e
             ON a.NationalityID = e.ctr_code
-            JOIN db_employees.religion as f
+            left JOIN db_employees.religion as f
             ON a.ReligionID = f.IDReligion
-            JOIN db_admission.school_type as l
+            left JOIN db_admission.school_type as l
             ON l.sct_code = a.ID_school_type
-            JOIN db_admission.register_major_school as m
+            left JOIN db_admission.register_major_school as m
             ON m.ID = a.ID_register_major_school
-            JOIN db_admission.school as n
+            left JOIN db_admission.school as n
             ON n.ID = d.SchoolID
-            join db_academic.program_study as o
+            left join db_academic.program_study as o
             on o.ID = a.ID_program_study
-            join db_finance.register_admisi as p
+            left join db_finance.register_admisi as p
             on a.ID = p.ID_register_formulir
-            where p.Status = "Created" and a.ID = ? group by a.ID';
-       $query=$this->db->query($sql, array($ID_program_study))->result_array();
-
+            left join db_admission.formulir_number_offline_m as px
+            on b.FormulirCode = px.FormulirCode
+            where '.$status.' and a.ID = ? group by a.ID';
+       $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
+       // print_r($query);die();
+       $this->load->model('master/m_master');
        for ($i=0; $i < count($query); $i++) { 
          $DiskonSPP = 0;
          // get Price
@@ -913,10 +976,36 @@ class M_finance extends CI_Model {
              for ($k=0; $k < count($getPaymentType_Cost); $k++) { 
                // $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Cost']);
                $arr_temp2 = $arr_temp2 + array(
-                 $getPaymentType_Cost[$k]['Abbreviation'] => number_format($getPaymentType_Cost[$k]['Pay_tuition_fee'],2,',','.'),
-                 'Discount-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Discount']
+                 // $getPaymentType_Cost[$k]['Abbreviation'] => number_format($getPaymentType_Cost[$k]['Pay_tuition_fee'],2,',','.'),
+                 $getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Pay_tuition_fee'],
+                 'Discount-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Discount'],
                );
              }
+
+             // get region and province
+                $RegionAddress = '';
+                $ProvinceAddress = '';
+                $getRegion = $this->m_master->caribasedprimary('db_admission.region','ID',$query[$i]['IDRegionAddress']);
+                $getProv = $this->m_master->caribasedprimary('db_admission.province','ProvinceID',$query[$i]['IDPRovAddress']);
+                if (count($getRegion) > 0 && count($getProv) > 0) {
+                  $RegionAddress = $getRegion[0]['RegionName'];
+                  $ProvinceAddress = $getProv[0]['ProvinceName'];
+                }
+
+              // tahun akademik
+                 $TahunAkademik = $this->m_master->caribasedprimary('db_academic.semester','Year',$query[$i]['SetTa']);
+                 $NamaTahunAkademik = $query[$i]['SetTa'];
+                 for ($b=0; $b < count($TahunAkademik); $b++) { 
+                   if ($TahunAkademik[$b]['Code'] == 1) {
+                     $NamaTahunAkademik = $TahunAkademik[$b]['Name'];
+                     break;
+                   }
+                 }
+
+              // cicilan 
+              $Cicilan = $this->checkPayment_admisi($query[$i]['ID_register_formulir']);   
+
+
          if ($query[$i]['status1'] == 'Rapor') {
            // check rangking
              $getRangking = $this->getRangking_calon_mhs($query[$i]['ID_register_formulir']);
@@ -932,7 +1021,15 @@ class M_finance extends CI_Model {
                'VA_number' => $query[$i]['VA_number'],
                // 'DiskonSPP' => $DiskonSPP,
                'RangkingRapor' => $getRangking,
-               'FormulirCode' => $query[$i]['FormulirCode'],
+               'FormulirCode' => ($query[$i]['No_Ref'] == "" || $query[$i]['No_Ref'] == null) ? $query[$i]['FormulirCode'] : $query[$i]['No_Ref'],
+               'Address' => $query[$i]['Address'],
+               'RegionAddress' => $RegionAddress,
+               'ProvinceAddress' => $ProvinceAddress,
+               'PhoneNumber' => $query[$i]['PhoneNumber'],
+               'NamaTahunAkademik' => $NamaTahunAkademik,
+               'ID_program_study' => $query[$i]['ID_program_study'],
+               'SetTa' => $query[$i]['SetTa'],
+               
              );
          }
          else
@@ -947,7 +1044,15 @@ class M_finance extends CI_Model {
                'VA_number' => $query[$i]['VA_number'],
                // 'DiskonSPP' => $DiskonSPP,
                'RangkingRapor' => 0,
-               'FormulirCode' => $query[$i]['FormulirCode'],
+               'FormulirCode' => ($query[$i]['No_Ref'] == "" || $query[$i]['No_Ref'] == null) ? $query[$i]['FormulirCode'] : $query[$i]['No_Ref'],
+               'Address' => $query[$i]['Address'],
+               'RegionAddress' => $RegionAddress,
+               'ProvinceAddress' => $ProvinceAddress,
+               'PhoneNumber' => $query[$i]['PhoneNumber'],
+               'NamaTahunAkademik' => $NamaTahunAkademik,
+               'ID_program_study' => $query[$i]['ID_program_study'],
+               'SetTa' => $query[$i]['SetTa'],
+               
              );
          }
 
@@ -1757,7 +1862,7 @@ class M_finance extends CI_Model {
     $dataSave = array(
             'Invoice' => $trx_amount,
             'Deadline' => $datetime_expired,
-            'UpdateAt' => date('Y-m-d H:i:s'),
+            // 'UpdateAt' => date('Y-m-d H:i:s'),
                     );
     $this->db->where('BilingID',$BilingID);
     $this->db->update('db_finance.payment_pre', $dataSave);
@@ -1855,6 +1960,17 @@ class M_finance extends CI_Model {
             'Invoice' => $trx_amount,
             'Deadline' => $datetime_expired,
             'UpdateAt' => date('Y-m-d H:i:s'),
+            'BilingID' => $BilingID,
+                    );
+    $this->db->where('ID',$ID);
+    $this->db->update('db_finance.payment_pre', $dataSave);
+   }
+
+   public function UpdateCicilan_admission_byID2($ID,$BilingID,$trx_amount,$datetime_expired)
+   {
+    $dataSave = array(
+            'Invoice' => $trx_amount,
+            'Deadline' => $datetime_expired,
             'BilingID' => $BilingID,
                     );
     $this->db->where('ID',$ID);
@@ -2633,14 +2749,14 @@ class M_finance extends CI_Model {
     $ta = $ta1[1];
     $db = 'ta_'.$ta.'.students';
     $db2 = 'ta_'.$ta;
-    $field = 'StatusStudentID';
-    $value = 3;
+    // $field = 'StatusStudentID';
+    // $value = 3;
     $NPM = ($NPM == "" || $NPM == null) ? '' : ' and a.NPM = "'.$NPM.'"';
 
     $queryAdd = '';
     if ($prodi == '') {
      $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM
-             where a.StatusStudentID in (3,2,8)   '.$NPM.$queryAdd.'
+             where a.StatusStudentID like "%%"   '.$NPM.$queryAdd.'
              order by a.NPM asc
              LIMIT '.$start. ', '.$limit;
       // print_r($sql);       
@@ -2649,7 +2765,7 @@ class M_finance extends CI_Model {
     else
     {
       $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM 
-              where a.StatusStudentID in (3,2,8)  and a.ProdiID = ? '.$NPM.$queryAdd.'
+              where a.StatusStudentID like "%%"  and a.ProdiID = ? '.$NPM.$queryAdd.'
               order by a.NPM asc 
               LIMIT '.$start. ', '.$limit;
       $Data_mhs=$this->db->query($sql, array($prodi))->result_array();
@@ -2660,6 +2776,7 @@ class M_finance extends CI_Model {
 
     // $SemesterID = $SemesterID[0]['ID'];
     $Discount = $this->m_master->showData_array('db_finance.discount');
+    $db = 'ta_'.$ta;
     for ($i=0; $i < count($Data_mhs); $i++) { 
       $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$Data_mhs[$i]['ProdiID']);
       $array = array('ProdiEng' => $ProdiEng[0]['NameEng']);
@@ -2668,6 +2785,23 @@ class M_finance extends CI_Model {
       // get VA Mahasiwa
         $VA = $Const_VA[0]['Const_VA'].$Data_mhs[$i]['NPM'];
         $Data_mhs[$i] = $Data_mhs[$i] + array('VA' => $VA);
+
+      // get IPS Mahasiswa
+        $IPS = $this->getIPSMahasiswa($db,$Data_mhs[$i]['NPM']);
+        $Data_mhs[$i] = $Data_mhs[$i] + array('IPS' => $IPS);
+
+      // get IPS Mahasiswa
+        $IPK = $this->getIPKMahasiswa($db,$Data_mhs[$i]['NPM']);
+        $Data_mhs[$i] = $Data_mhs[$i] + array('IPK' => $IPK);
+
+      // get Status 
+          $StatusStudentID =   $Data_mhs[$i]['StatusStudentID'];
+          $aa = $this->m_master->caribasedprimary('db_academic.status_student','ID',$StatusStudentID);
+          $Data_mhs[$i] = $Data_mhs[$i] + array('StatusStudentName' => $aa[0]['Description']);
+
+      // get sks yang diambil
+         $Credit = $this->getSKSMahasiswa($db2,$Data_mhs[$i]['NPM']);
+         $Data_mhs[$i] = $Data_mhs[$i] + array('Credit' => $Credit);      
 
     }
     $arr['Data_mhs'] = $Data_mhs;
@@ -2742,6 +2876,94 @@ class M_finance extends CI_Model {
         $this->m_finance->UpdateCicilan_admission_byID($ID,$BilingID,$trx_amount,$datetime_expired);
       }
     }
+
+    return $arr;
+
+   }
+
+   public function edit_cicilan_tagihan_admission_submit2($Input)
+   {
+    $this->load->model('master/m_master');
+    $arr = array();
+    $arr['msg']  = '';
+    $keterangan = $this->input->post('keterangan');
+    $ID_register_formulir = $this->input->post('ID_register_formulir');
+    for ($i=0; $i < count($Input); $i++) { 
+      // check yang memiliki bilingId
+      // jika memiliki bilingID maka update VA, jika tidak maka update database aja
+      if ($Input[$i]->BilingID != 0) {
+        // update VA
+        $BilingID = $Input[$i]->BilingID;
+        $getData= $this->m_master->caribasedprimary('db_va.va_log','trx_id',$BilingID);
+        // get datetime
+        $expDatetime = $getData[0]['datetime_expired'];
+        $now = date('Y-m-d H:i:s');
+        $chkdate = $this->m_master->chkTgl($now,$expDatetime);
+        $trx_amount = $Input[$i]->Invoice;
+        $datetime_expired = $Input[$i]->Deadline;
+        $customer_name = $getData[0]['customer_name'];
+        $desc = 'Add,Expired Biling '.$getData[0]['description'];
+        $customer_email = $getData[0]['customer_email'];
+        $VA_number = $getData[0]['virtual_account'];
+        if (!$chkdate) {
+         $create_va_Payment = $this->create_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$VA_number,$desc,'db_finance.payment_pre');
+         if ($create_va_Payment['status']) {
+           // update biling and Deadline di payment Student
+           $dataSave = array(
+                   'BilingID' =>$create_va_Payment['msg']['trx_id'],
+                   'Invoice' => $trx_amount,
+                   'Deadline' => $datetime_expired,
+                   'UpdateAt' => date('Y-m-d H:i:s'),
+                           );
+           $this->db->where('BilingID',$BilingID);
+           $this->db->update('db_finance.payment_students', $dataSave);
+         }
+          
+        }
+        else
+        {
+          $update = $this->m_finance->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_pre',$desc);
+          if ($update['status'] == 1) {
+            // update data pada table db_finance.payment_students
+              $this->m_finance->updateCicilanMHS_admission($BilingID,$trx_amount,$datetime_expired);
+          }
+          else
+          {
+            $arr['msg'] .= 'Va tidak bisa di update, error koneksi ke BNI with Name : '.$customer_name.'<br>';
+          }
+        }
+        
+      }
+      else
+      {
+        $BilingID = $Input[$i]->BilingID;
+        $ID = $Input[$i]->ID;
+        $trx_amount = $Input[$i]->Invoice;
+        $datetime_expired = $Input[$i]->Deadline;
+        $this->m_finance->UpdateCicilan_admission_byID2($ID,$BilingID,$trx_amount,$datetime_expired);
+      }
+    }
+
+    // update db_finance.register_admisi and db_finance.register_admisi_rev
+    $dataGet = $this->m_master->caribasedprimary('db_finance.register_admisi_rev','ID_register_formulir',$ID_register_formulir);
+    $count = count($dataGet);
+    $arr_Count = $count - 1;
+    $RevNo = (count($dataGet) == 0) ? 1 : $dataGet[$arr_Count]['RevNo'] + 1;
+    $dataSave = array(  
+        'ID_register_formulir' => $ID_register_formulir,
+        'RevNo' => $RevNo,
+        'Note' => $keterangan,
+        'RevBy' => $this->session->userdata('NIP'),
+        'RevAt' => date('Y-m-d H:i:s'),
+    );
+    $this->db->insert('db_finance.register_admisi_rev', $dataSave);
+    $insert_id = $this->db->insert_id();
+
+    $dataSave = array(
+            'RevID' => $insert_id,
+                    );
+    $this->db->where('ID_register_formulir',$ID_register_formulir);
+    $this->db->update('db_finance.register_admisi', $dataSave);
 
     return $arr;
 
@@ -2909,9 +3131,73 @@ class M_finance extends CI_Model {
       } // loop per mhs
 
     }
-
-    // print_r($arr);die();
     return $arr;
+   }
+
+   public function mahasiswa_list_all($ta,$prodi,$NPM)
+   {
+    // error_reporting(0);
+    $arr = array();
+    $this->load->model('master/m_master');
+    // $ta1 = explode('.', $ta);
+    // $ta = $ta1[1];
+    $db = 'ta_'.$ta.'.students';
+    $db2 = 'ta_'.$ta;
+    // $field = 'StatusStudentID';
+    // $value = 3;
+    $NPM = ($NPM == "" || $NPM == null) ? '' : ' and a.NPM = "'.$NPM.'"';
+
+    $queryAdd = '';
+    if ($prodi == '') {
+     $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM
+             where a.StatusStudentID like "%%"   '.$NPM.$queryAdd.'
+             order by a.NPM asc
+             ';
+      // print_r($sql);       
+     $Data_mhs=$this->db->query($sql, array())->result_array();
+    }
+    else
+    {
+      $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM 
+              where a.StatusStudentID like "%%"  and a.ProdiID = ? '.$NPM.$queryAdd.'
+              order by a.NPM asc 
+              ';
+      $Data_mhs=$this->db->query($sql, array($prodi))->result_array();
+    }
+    // get Number VA Mahasiswa
+    $Const_VA = $this->m_master->showData_array('db_va.master_va');
+
+    // $SemesterID = $SemesterID[0]['ID'];
+    $Discount = $this->m_master->showData_array('db_finance.discount');
+    $db = 'ta_'.$ta;
+    for ($i=0; $i < count($Data_mhs); $i++) { 
+      $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$Data_mhs[$i]['ProdiID']);
+      $array = array('ProdiEng' => $ProdiEng[0]['NameEng']);
+      $Data_mhs[$i] = $Data_mhs[$i] + $array;
+
+      // get VA Mahasiwa
+        $VA = $Const_VA[0]['Const_VA'].$Data_mhs[$i]['NPM'];
+        $Data_mhs[$i] = $Data_mhs[$i] + array('VA' => $VA);
+
+      // get IPS Mahasiswa
+        $IPS = $this->getIPSMahasiswa($db,$Data_mhs[$i]['NPM']);
+        $Data_mhs[$i] = $Data_mhs[$i] + array('IPS' => $IPS);
+
+      // get IPS Mahasiswa
+        $IPK = $this->getIPKMahasiswa($db,$Data_mhs[$i]['NPM']);
+        $Data_mhs[$i] = $Data_mhs[$i] + array('IPK' => $IPK);
+
+      // get Status 
+          $StatusStudentID =   $Data_mhs[$i]['StatusStudentID'];
+          $aa = $this->m_master->caribasedprimary('db_academic.status_student','ID',$StatusStudentID);
+          $Data_mhs[$i] = $Data_mhs[$i] + array('StatusStudentName' => $aa[0]['Description']);
+
+      // get sks yang diambil
+         $Credit = $this->getSKSMahasiswa($db2,$Data_mhs[$i]['NPM']);
+         $Data_mhs[$i] = $Data_mhs[$i] + array('Credit' => $Credit);      
+
+    }
+    return $Data_mhs;
    }
 
 }

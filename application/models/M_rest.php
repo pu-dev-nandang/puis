@@ -99,10 +99,11 @@ class M_rest extends CI_Model {
                                                             WHERE gc.ScheduleID = "'.$data[$sc]['ScheduleID'].'"
                                                              ')->result_array();
 
+                        $meeting = 0;
+                        $Totalpresen = 0;
                         // Get Attendance
                         if(count($dataSchedule)>0){
-                            $meeting = 0;
-                            $Totalpresen = 0;
+
                             for($sds=0;$sds<count($dataSchedule);$sds++){
                                 $dataAttd = $this->db->query('SELECT attd_s.* FROM db_academic.attendance_students attd_s 
                                                           LEFT JOIN db_academic.attendance attd ON (attd.ID = attd_s.ID_Attd)
@@ -560,6 +561,9 @@ class M_rest extends CI_Model {
 
         $dataSemester = $this->db->query('SELECT s.* FROM db_academic.semester s ORDER BY s.ID ASC')->result_array();
 
+//        print_r($dataSemester);
+//        exit;
+
         $result = [];
         for($i=0;$i<count($dataSemester);$i++){
             if($dataSemester[$i]['ID']<13){
@@ -647,6 +651,11 @@ class M_rest extends CI_Model {
 
                 array_push($result,$arr_p);
 
+            }
+
+
+            if($dataSemester[$i]['Status']==1 || $dataSemester[$i]['Status']=='1'){
+                break;
             }
         }
 
