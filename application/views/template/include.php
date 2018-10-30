@@ -844,7 +844,6 @@
 
         $.post(url,{token:token},function (data_json) {
 
-            console.log(data_json);
             var option = $(element);
             if(data_json.length>0){
                 for(var i=0;i<data_json.length;i++){
