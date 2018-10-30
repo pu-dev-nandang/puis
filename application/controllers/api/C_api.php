@@ -1442,7 +1442,7 @@ class C_api extends CI_Controller {
                 $SemesterID = $data_arr['SemesterID'];
                 $ScheduleID = $data_arr['ScheduleID'];
 
-                $data = $this->db->query('SELECT sdc.ID AS SDCID, sdc.CDID, mk.NameEng AS MKNameEng, mk.Name AS MKName, cd.Semester, ps.Name AS Prodi, co.Semester AS Offerto   
+                $data = $this->db->query('SELECT sdc.ID AS SDCID, sdc.CDID, mk.MKCode, mk.NameEng AS MKNameEng, mk.Name AS MKName, cd.Semester, ps.Name AS Prodi, co.Semester AS Offerto   
                                                     FROM db_academic.schedule_details_course sdc
                                                     LEFT JOIN db_academic.schedule s ON (s.ID = sdc.ScheduleID)
                                                     LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
