@@ -414,7 +414,7 @@
 
 
             var ModalSelectProdi = $('#ModalSelectProdi').find(':selected').val();
-            process.push(formRequiredError(ProdiID,'#ModalSelectProdi'));
+            process.push(formRequiredError(ModalSelectProdi,'#ModalSelectProdi'));
 
             // var EducationLevelID = $('#ModalSelectJenjang').find(':selected').val();
             // process.push(formRequiredError(EducationLevelID,'#ModalSelectJenjang'));
