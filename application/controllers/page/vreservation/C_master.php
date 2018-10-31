@@ -10,9 +10,6 @@ class C_master extends Vreservation_Controler {
         parent::__construct();
         $this->load->model('m_sendemail');
         $this->load->model('m_api');
-        // $this->load->library('JWT');
-        // $this->load->model('master/m_master');
-        // $this->load->model('vreservation/m_reservation');
     }
 
     public function equipment_master()
@@ -76,7 +73,8 @@ class C_master extends Vreservation_Controler {
 
     public function ruangan()
     {
-        $content = $this->load->view($this->pathView.'master/ruangan','',true);
+        $data['CategoryRoom'] = $this->m_master->showData_array('db_reservation.category_room');
+        $content = $this->load->view($this->pathView.'master/ruangan',$data,true);
         $this->temp($content);
     }
 

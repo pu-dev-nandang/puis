@@ -2491,7 +2491,8 @@ class C_api extends CI_Controller {
 
         if(count($data_arr)>0) {
             if($data_arr['action'] == 'read') {
-                $data = $this->m_api->__getAllClassRoom();
+                $data = $this->m_api->__getAllClassRoomCategory();
+
                 return print_r(json_encode($data));
             }
             else if($data_arr['action'] == 'add'){
@@ -5784,6 +5785,45 @@ class C_api extends CI_Controller {
         );
 
         echo json_encode($json_data);
+    }
+
+    public function crudCategoryClassroomVreservation()
+    {
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+
+        if(count($data_arr)>0) {
+            if($data_arr['action'] == 'read') {
+                $data = $this->m_master->showData_array('db_reservation.category_room');
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action'] == 'add'){
+                $result = '';
+                $formData = (array) $data_arr['formData'];
+                $this->db->insert('db_reservation.category_room',$formData);
+                return print_r(json_encode($result));
+            }
+            else if($data_arr['action'] == 'edit'){
+                $formData = (array) $data_arr['formData'];
+                $ID = $data_arr['ID'];
+                $this->db->where('ID', $ID);
+                $this->db->update('db_reservation.category_room',$formData);
+                $result = array(
+                    'inserID' => $ID
+                );
+
+                return print_r(json_encode($result));
+
+            }
+            else if($data_arr['action'] == 'delete'){
+                $ID = $data_arr['ID'];
+                $this->db->where('ID', $ID);
+                $this->db->delete('db_reservation.category_room');
+                return print_r($ID);
+            }
+
+        }
     }
 
 }

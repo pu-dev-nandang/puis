@@ -21,8 +21,15 @@ class C_global extends Vreservation_Controler {
     public function getschedule($date = null)
     {
         // get room
-        // $getRoom = $this->m_master->showData_array('db_academic.classroom');
-        $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','L_Venue',1);
+            // get categoryRoom based Policy
+            $getCfgPolicy = $this->m_master->caribasedprimary('db_reservation.cfg_policy','ID_group_user',$this->session->userdata('ID_group_user'));
+            $CategoryRoom = json_decode($getCfgPolicy[0]['CategoryRoom']);
+            $CategoryRoom = implode(',', $CategoryRoom);
+            $sql = 'select * from db_academic.classroom where ID_CategoryRoom in ('.$CategoryRoom.')';
+            $getRoom = $this->db->query($sql, array())->result_array();
+
+            // $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','L_Venue',1);
+
         // get data classroom
         $NextDate = '';
         $PreviousDate = '';
@@ -32,8 +39,6 @@ class C_global extends Vreservation_Controler {
             $datetime = DateTime::createFromFormat('Y-m-d', $date);
             $NameDay = $datetime->format('l');
             $data1 = $this->m_reservation->getDataClassroomAcademic($NameDay,$date);
-
-
 
         $endTime = '20';
         $getHoursNow = date('H');

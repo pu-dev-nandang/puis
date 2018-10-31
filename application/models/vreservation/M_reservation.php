@@ -1124,6 +1124,13 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $query;
     }
 
+    public function getDataWithoutSuperAdmin2($ID)
+    {
+        $sql = 'select * from db_reservation.cfg_group_user where ID >= "'.$ID.'"';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
+    }
+
     public function chkAuthDB_Base_URL_vreservation($URL)
     {
         $a = explode('/', $URL);

@@ -87,11 +87,11 @@ class C_transaksi extends Vreservation_Controler {
         if (is_array($uploadFile)) {
             $filename = $uploadFile['file_name'];
         }
-
+        
+        $filenamemarkomm = ''; 
         if (array_key_exists('fileDataMarkomm',$_FILES)) {
             // upload file markomm
             $uploadFile2 = $this->uploadDokumenMultiple('GraphicDesign');
-            $filenamemarkomm = ''; 
             if (is_array($uploadFile2)) {
                 $filenamemarkomm = implode(';', $uploadFile2);
             }
@@ -496,43 +496,6 @@ class C_transaksi extends Vreservation_Controler {
                             );
             $this->db->where('ID',$ID);
             $this->db->update('db_reservation.t_booking', $dataSave);
-
-            // // add Qty
-            // $getE_additional = $this->m_master->caribasedprimary('db_reservation.t_booking_eq_additional','ID_t_booking',$ID);
-            // if (count($getE_additional) > 0) {
-            //     $bool = true; // check qty ready
-            //     for ($i=0; $i < count($getE_additional); $i++) { 
-            //         // add Qty
-            //         $ID_equipment_additional = $getE_additional[$i]['ID_equipment_additional'];
-            //         $Qty_T = $getE_additional[$i]['Qty'];
-            //         $getM_equip_add = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_additional);
-            //         if ($getM_equip_add < $Qty_T || $getM_equip_add ==  0) {
-            //             $bool = false;
-            //             break;
-            //         }
-            //     }
-
-            //     if ($bool) {
-            //         for ($i=0; $i < count($getE_additional); $i++) { 
-            //             // add Qty
-            //             $ID_equipment_additional = $getE_additional[$i]['ID_equipment_additional'];
-            //             $Qty_T = $getE_additional[$i]['Qty'];
-            //             $getM_equip_add = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_additional);
-            //             $QTY_Upd = $getM_equip_add[0]['Qty'] - $Qty_T;
-            //             $dataSave = array(
-            //                 'Qty' => $QTY_Upd,
-            //             );
-            //             $this->db->where('ID', $ID_equipment_additional);
-            //             $this->db->update('db_reservation.m_equipment_additional', $dataSave);
-            //         }
-            //     }
-            //     else
-            //     {
-            //         $msg = 'This Equipment Additional isnot enough to quantity, Please check';
-            //     }
-                
-
-            // }
 
             // send email approve to user
             $getUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$get[0]['CreatedBy']);
