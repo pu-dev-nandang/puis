@@ -492,7 +492,7 @@ class C_transaksi extends Vreservation_Controler {
             $dataSave = array(
                     'Status' => 1,
                     'ApprovedBy' => $this->session->userdata('NIP'),
-                    'ApprovedBy' => date('Y-m-d H:i:s'),
+                    'ApprovedAt' => date('Y-m-d H:i:s'),
                             );
             $this->db->where('ID',$ID);
             $this->db->update('db_reservation.t_booking', $dataSave);
