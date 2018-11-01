@@ -185,19 +185,7 @@ class C_global extends Vreservation_Controler {
                     $ID_add_personel = '-';
                     $Name_add_personel = '-';
                     if ($get[0]['ID_add_personel'] != '' || $get[0]['ID_add_personel'] != null) {
-                        $ID_add_personel = explode(',', $get[0]['ID_add_personel']);
-                        $Name_add_personel = '';
-                        for ($j=0; $j < count($ID_add_personel); $j++) { 
-                            $get2 = $this->m_master->caribasedprimary('db_employees.division','ID',$ID_add_personel[$j]);
-                            if ($j != count($ID_add_personel) - 1) {
-                                $Name_add_personel .= $get2[0]['Division'].',';
-                            }
-                            else
-                            {
-                                $Name_add_personel .= $get2[0]['Division'];
-                            }
-                        }
-
+                        $Name_add_personel = $get[0]['ID_add_personel'];
                     }
                     $this->data['Name_add_personel'] = $Name_add_personel;
 
@@ -241,6 +229,15 @@ class C_global extends Vreservation_Controler {
                         $MarkomSupport .= '</ul>';
 
                     }
+                    $KetAdditional = $get[0]['KetAdditional'];
+                    $KetAdditional = json_decode($KetAdditional);
+                    $UserType = $KetAdditional->ParticipantType;
+                    $UserClasification = $KetAdditional->ParticipantClasification;
+                    $Note = $KetAdditional->ParticipantDesc;
+
+                    $this->data['UserType'] = $UserType;
+                    $this->data['UserClasification'] = $UserClasification;
+                    $this->data['Note'] = $Note;
                     $this->data['MarkomSupport'] = $MarkomSupport;
                     $this->data['Req_layout'] = $Req_layout;
                     $this->data['ID'] = $get[0]['ID'];

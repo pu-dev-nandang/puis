@@ -159,6 +159,45 @@
                 </div>
             </div>
         </div>
+        <div class="form-group"> 
+            <div class="row">
+                <div class="col-sm-3">
+                    <label class="control-label">Desc Additional:</label>
+                </div>    
+                <div class="col-sm-8">
+                    <div class="form-group">
+                       <div class="row">
+                           <div class="col-xs-12">
+                               <label class="control-label">Participant Type</label>
+                               <select id = "UserType" class="form-control">
+                                   <option value="" selected>--No Selected--</option>
+                                   <option value="Internal" >Internal</option>
+                                   <option value="Eksternal">Eksternal</option>
+                               </select>
+                           </div>
+                       </div>
+                       <div class="row">
+                           <div class="col-xs-12">
+                               <label class="control-label">Participant Clasification</label>
+                               <select id = "UserClasification" class="form-control">
+                                   <option value="" selected>--No Selected--</option>
+                                   <option value="VVIP" >VVIP</option>
+                                   <option value="VIP">VIP</option>
+                                   <option value="PIC">PIC</option>
+                               </select>
+                               <!-- <input type="text" id = "Seat" class="form-control" value=""> -->
+                           </div>
+                       </div>
+                       <div class="row">
+                           <div class="col-xs-12">
+                               <label class="control-label">Participant Desc</label>
+                               <input type="text" id = "NoteDescAdd" class="form-control" value="">
+                           </div>
+                       </div>
+                    </div>    
+                </div>
+            </div>
+        </div>
         <div style="text-align: center;">       
     		<div class="col-sm-12" id="BtnFooter">
                 <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>

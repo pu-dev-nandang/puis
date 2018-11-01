@@ -146,6 +146,35 @@
                 </div>
             </div>
         </div>
+        <div class="form-group"> 
+            <div class="row">
+                <div class="col-sm-3">
+                    <label class="control-label">Desc Additional:</label>
+                </div>    
+                <div class="col-sm-8">
+                    <div class="form-group">
+                       <div class="row">
+                           <div class="col-xs-12">
+                               <label class="control-label">Participant Type</label>
+                               <input type="text" class="form-control" readonly="" value="<?php echo $UserType ?>">
+                           </div>
+                       </div>
+                       <div class="row">
+                           <div class="col-xs-12">
+                               <label class="control-label">Participant Clasification</label>
+                               <input type="text" class="form-control" readonly="" value="<?php echo $UserClasification ?>">
+                           </div>
+                       </div>
+                       <div class="row">
+                           <div class="col-xs-12">
+                               <label class="control-label">Participant Desc</label>
+                               <input type="text" class="form-control" readonly="" value="<?php echo $Note ?>">
+                           </div>
+                       </div>
+                    </div>    
+                </div>
+            </div>
+        </div>
         <div style="text-align: center;">       
     		<div class="col-sm-12" id="BtnFooter">
                 <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>

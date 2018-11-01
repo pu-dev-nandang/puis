@@ -126,15 +126,20 @@
 
     // console.log(chk_e_additional);
 
+    // var chk_person_support = '';
+    // if ($('#person_supportYA').is(':checked')) {
+    //   var chk_person_support = [];
+    //   $('.chk_person_support_td').each(function() {
+    //      if ($(this).is(':checked')) {
+    //         var valuee = $(this).val();
+    //         chk_person_support.push(valuee);
+    //      }
+    //   });
+    // }
+
     var chk_person_support = '';
     if ($('#person_supportYA').is(':checked')) {
-      var chk_person_support = [];
-      $('.chk_person_support_td').each(function() {
-         if ($(this).is(':checked')) {
-            var valuee = $(this).val();
-            chk_person_support.push(valuee);
-         }
-      });
+      var chk_person_support = $('.chk_person_support_td').val();
     }
 
     var chk_markom_support = '';
@@ -146,6 +151,10 @@
             chk_markom_support.push(valuee);
          }
       });
+      var chk_markom_support_td_add = $(".chk_markom_support_td_add").val();
+      if (chk_markom_support_td_add != "" || chk_markom_support_td_add != null) {
+        chk_markom_support.push('Note : '+chk_markom_support_td_add);
+      }
     }
 
      // console.log(chk_person_support);
@@ -158,6 +167,11 @@
     //      chk_e_multiple.push(valuee);
     //   });
     // }
+    var KetAdditional = {
+      ParticipantType : $("#UserType").val(),
+      ParticipantClasification :$("#UserClasification").val(), 
+      ParticipantDesc :$("#NoteDescAdd").val(), 
+    };
 
    var data = {
        Room : Room,
@@ -171,6 +185,7 @@
        date : $('#datetime_deadline1').val(),
        Participant : $("#Participant").val(),
        chk_markom_support : chk_markom_support,
+       KetAdditional : KetAdditional,
    };
 
    console.log(data);
@@ -182,7 +197,6 @@
           var token = jwt_encode(data,"UAP)(*");
           form_data.append('token',token);
           form_data.append('fileData',fileData);
-
           if ( $( "#ExFileMarkomm" ).length ) {
               var filesMarkomm = $('#'+'ExFileMarkomm')[0].files;
               for(var count = 0; count<filesMarkomm.length; count++)
@@ -303,11 +317,23 @@
               }
               break;
         case  "chk_person_support" :
+              // if ($('#person_supportYA').is(':checked')) {
+              //   // check lenght lebih dari satu
+              //   var aa = arr[key];
+              //   if (aa.length == 0) {
+              //     toatString += 'Please check Person Support' + "<br>";
+              //   }
+              // }
+              // else
+              // {
+              //   if($("#person_supportTDK"). prop("checked") == false){
+              //     toatString += 'Please Choices Person Support' + "<br>";
+              //   }
+              // }
               if ($('#person_supportYA').is(':checked')) {
-                // check lenght lebih dari satu
-                var aa = arr[key];
-                if (aa.length == 0) {
-                  toatString += 'Please check Person Support' + "<br>";
+                result = Validation_required(arr[key],'Input Person Support');
+                if (result['status'] == 0) {
+                  toatString += result['messages'] + "<br>";
                 }
               }
               else
@@ -637,41 +663,47 @@
 
     $(document).on('change','#person_supportYA', function () {
         if(this.checked) {
-            //equipment_additional = [];
-            $('#divperson_support').remove();
-            // get data m_equipment_additional
-            var url = base_url_js+"api/__m_additional_personel";
-            $.post(url,function (data_json) {
-              var response = data_json;
-              var splitBagi = 3;
-              var split = parseInt(response.length / splitBagi);
-              var sisa = response.length % splitBagi;
+            // //equipment_additional = [];
+            // $('#divperson_support').remove();
+            // // get data m_equipment_additional
+            // var url = base_url_js+"api/__m_additional_personel";
+            // $.post(url,function (data_json) {
+            //   var response = data_json;
+            //   var splitBagi = 3;
+            //   var split = parseInt(response.length / splitBagi);
+            //   var sisa = response.length % splitBagi;
               
-              if (sisa > 0) {
-                    split++;
-              }
-              var getRow = 0;
-              var divE_additional = '<div class="col-md-6" id="divperson_support" style="width: 500px;"><strong>Choices Person Support</strong></div>';
+            //   if (sisa > 0) {
+            //         split++;
+            //   }
+            //   var getRow = 0;
+            //   var divE_additional = '<div class="col-md-6" id="divperson_support" style="width: 500px;"><strong>Choices Person Support</strong></div>';
+            //   $('#person_support').after(divE_additional);
+            //   $('#divperson_support').append('<table class="table" id ="tablechk_divperson_support">');
+            //   for (var i = 0; i < split; i++) {
+            //     if ((sisa > 0) && ((i + 1) == split) ) {
+            //                         splitBagi = sisa;    
+            //     }
+            //     $('#tablechk_divperson_support').append('<tr id = "psa'+i+'">');
+            //     for (var k = 0; k < splitBagi; k++) {
+            //         $('#psa'+i).append('<td>'+
+            //                             '<input type="checkbox" class = "chk_person_support_td" name="chk_person_support_td" value = "'+response[getRow].ID+'">&nbsp'+ response[getRow].Division+
+            //                          '</td>'
+            //                         );
+            //         getRow++;
+            //     }
+            //     $('#psa'+i).append('</tr>');
+            //   }
+            //   $('#tablechk_divperson_support').append('</table>');
+            // }).done(function () {
+            //   //loadAlamatSekolah();
+            // });
+            $('#divperson_support').remove();
+              var divE_additional = '<div class="col-md-6" id="divperson_support" style="width: 500px;"><strong>Input Person Support</strong></div>';
               $('#person_support').after(divE_additional);
-              $('#divperson_support').append('<table class="table" id ="tablechk_divperson_support">');
-              for (var i = 0; i < split; i++) {
-                if ((sisa > 0) && ((i + 1) == split) ) {
-                                    splitBagi = sisa;    
-                }
-                $('#tablechk_divperson_support').append('<tr id = "psa'+i+'">');
-                for (var k = 0; k < splitBagi; k++) {
-                    $('#psa'+i).append('<td>'+
-                                        '<input type="checkbox" class = "chk_person_support_td" name="chk_person_support_td" value = "'+response[getRow].ID+'">&nbsp'+ response[getRow].Division+
-                                     '</td>'
-                                    );
-                    getRow++;
-                }
-                $('#psa'+i).append('</tr>');
-              }
-              $('#tablechk_divperson_support').append('</table>');
-            }).done(function () {
-              //loadAlamatSekolah();
-            });
+              $('#divperson_support').append('<input type = "text" class = "form-control chk_person_support_td" >');
+
+
         }
 
     });
@@ -707,6 +739,7 @@
               $('#msa'+i).append('</tr>');
             }
             $('#tablechk_divmarkom_support').append('</table>');
+            $('#divmarkom_support').append('<label><strong>Input Note</strong></label><input type = "text" class = "form-control chk_markom_support_td_add"><p style = "color : red">* Please using comma(,) as delimiter');
         }
 
     });

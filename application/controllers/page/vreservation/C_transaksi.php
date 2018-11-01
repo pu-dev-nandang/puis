@@ -127,10 +127,11 @@ class C_transaksi extends Vreservation_Controler {
             $ID_equipment_add = implode(',', $yy);
         }
         
-        $ID_add_personel = '';
-        if (is_array($input['chk_person_support'])) {
-            $ID_add_personel = implode(',', $input['chk_person_support']);
-        }
+        // $ID_add_personel = '';
+        // if (is_array($input['chk_person_support'])) {
+        //     $ID_add_personel = implode(',', $input['chk_person_support']);
+        // }
+        $ID_add_personel = $input['chk_person_support'];
 
         $chk_markom_support = '';
         if (is_array($input['chk_markom_support'])) {
@@ -175,251 +176,187 @@ class C_transaksi extends Vreservation_Controler {
             }
         }
 
+        $KetAdditional = $input['KetAdditional'];
         // check data bentrok dengan jam lain
         // $chk = $this->m_reservation->checkBentrok($Start,$End,$input['chk_e_multiple'],$input['Room']);
         $chk = $this->m_reservation->checkBentrok($Start,$End,'',$input['Room']);
         if ($chk) {
-            $Multiple = '';
-            // if (is_array($input['chk_e_multiple'])) {
-            $boolArray = false;
-            if ($boolArray) {
-                for ($i=0; $i < count($input['chk_e_multiple']); $i++) { 
-                   if ($i == 0) {
-                        $dataSave = array(
-                            'Start' => $Start,
-                            'End' => $End,
-                            'Time' => $time,
-                            'Colspan' => $Colspan,
-                            'Agenda' => $input['Agenda'],
-                            'Room' => $input['Room'],
-                            'ID_equipment_add' => $ID_equipment_add,
-                            'ID_add_personel' => $ID_add_personel,
-                            'Req_date' => date('Y-m-d'),
-                            'CreatedBy' => $this->session->userdata('NIP'),
-                            'Req_layout' => $filename,
-                        );
-                        $this->db->insert('db_reservation.t_booking', $dataSave);
-                        $insert_id = $this->db->insert_id();
-                        $Multiple = $insert_id;
+            $dataSave = array(
+                'Start' => $Start,
+                'End' => $End,
+                'Time' => $time,
+                'Colspan' => $Colspan,
+                'Agenda' => $input['Agenda'],
+                'Room' => $input['Room'],
+                'ID_equipment_add' => $ID_equipment_add,
+                'ID_add_personel' => $ID_add_personel,
+                'Req_date' => date('Y-m-d'),
+                'CreatedBy' => $this->session->userdata('NIP'),
+                'Req_layout' => $filename,
+                'ParticipantQty' => $input['Participant'],
+                'MarcommSupport' => $chk_markom_support,
+                'KetAdditional' => json_encode($KetAdditional),
+            );
+            $this->db->insert('db_reservation.t_booking', $dataSave);
+            $ID_t_booking = $this->db->insert_id();
 
-                        $dataSave = array(
-                            'Multiple' => $insert_id,
-                        );
-                        $this->db->where('ID', $insert_id);
-                        $this->db->update('db_reservation.t_booking', $dataSave);
-
-                       $get = $input['chk_e_multiple'][$i];
-                       $Start = date("Y-m-d H:i:s", strtotime($get.$input['Start']));
-                       $End = date("Y-m-d H:i:s", strtotime($get.$input['End']));
-                        
-                       $dataSave = array(
-                           'Start' => $Start,
-                           'End' => $End,
-                           'Time' => $time,
-                           'Colspan' => $Colspan,
-                           'Agenda' => $input['Agenda'],
-                           'Room' => $input['Room'],
-                           'ID_equipment_add' => $ID_equipment_add,
-                           'ID_add_personel' => $ID_add_personel,
-                           'Req_date' => date('Y-m-d'),
-                           'CreatedBy' => $this->session->userdata('NIP'),
-                           'Multiple' => $Multiple,
-                           'Req_layout' => $filename,
-                       );
-                       $this->db->insert('db_reservation.t_booking', $dataSave);
-
-                    }
-                    else
-                    {
-                        $get = $input['chk_e_multiple'][$i];
-                        $Start = date("Y-m-d H:i:s", strtotime($get.$input['Start']));
-                        $End = date("Y-m-d H:i:s", strtotime($get.$input['End']));
-                        $dataSave = array(
-                            'Start' => $Start,
-                            'End' => $End,
-                            'Time' => $time,
-                            'Colspan' => $Colspan,
-                            'Agenda' => $input['Agenda'],
-                            'Room' => $input['Room'],
-                            'ID_equipment_add' => $ID_equipment_add,
-                            'ID_add_personel' => $ID_add_personel,
-                            'Req_date' => date('Y-m-d'),
-                            'CreatedBy' => $this->session->userdata('NIP'),
-                            'Multiple' => $Multiple,
-                            'Req_layout' => $filename,
-                        );
-                        $this->db->insert('db_reservation.t_booking', $dataSave);
-                    }
+            if (is_array($input['chk_e_additional'])) {
+                // save data t_booking_eq_additional
+                $xx = $input['chk_e_additional'];
+                $yy = array();
+                for ($i=0; $i < count($xx); $i++) { 
+                    $yy[] = array('ID_t_booking' =>$ID_t_booking,'ID_equipment_additional' => $xx[$i]->ID_equipment_add,'Qty' =>  $xx[$i]->Qty);
                 }
+                // $this->db->insert('db_reservation.t_booking_eq_additional', $yy);
+                $this->db->insert_batch('db_reservation.t_booking_eq_additional', $yy);
+            }
+
+            $EmailKetAdditional = '';
+            if ($KetAdditional != '') {
+                foreach ($KetAdditional as $key => $value) {
+                    if ($value != "" || $value != null) {
+                        $EmailKetAdditional .= '<br>*   '.$key.'('.$value.')';  
+                    }  
+                }
+            }
+            // define for email
+            $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $Start);
+            $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $End);
+            $StartNameDay = $Startdatetime->format('l');
+            $EndNameDay = $Enddatetime->format('l');
+
+            $MarkomEmail ='';
+            if (is_array($input['chk_markom_support'])) {
+                $ss = implode(',', $input['chk_markom_support']);
+                $MarkomEmail = '<li>Documentation  : '.$ss.'</li>';
+            }
+            if($_SERVER['SERVER_NAME']!='localhost') {
+                // email to ga
+                $Email = 'ga@podomorouniversity.ac.id';
+                $text = 'Dear GA Team,<br><br>
+                            Please Approve Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
+                            Details Schedule : <br><ul>
+                            <li>Start  : '.$StartNameDay.', '.$Start.'</li>
+                            <li>End  : '.$EndNameDay.', '.$End.'</li>
+                            <li>Room  : '.$input['Room'].'</li>
+                            <li>Agenda  : '.$input['Agenda'].'</li>
+                            '.$MarkomEmail.'
+                            </ul>
+                            '.$EmailKetAdditional.'
+                        ';        
+                $to = $Email;
+                $subject = "Podomoro University Venue Reservation Notification";
+                $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
 
             }
             else
             {
-                $dataSave = array(
-                    'Start' => $Start,
-                    'End' => $End,
-                    'Time' => $time,
-                    'Colspan' => $Colspan,
-                    'Agenda' => $input['Agenda'],
-                    'Room' => $input['Room'],
-                    'ID_equipment_add' => $ID_equipment_add,
-                    'ID_add_personel' => $ID_add_personel,
-                    'Req_date' => date('Y-m-d'),
-                    'CreatedBy' => $this->session->userdata('NIP'),
-                    'Req_layout' => $filename,
-                    'ParticipantQty' => $input['Participant'],
-                    'MarcommSupport' => $chk_markom_support,
-                );
-                $this->db->insert('db_reservation.t_booking', $dataSave);
-                $ID_t_booking = $this->db->insert_id();
+                $Email = 'alhadi.rahman@podomorouniversity.ac.id';
+                $text = 'Dear GA Team,<br><br>
+                            Please Approve Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
+                            Details Schedule : <br><ul>
+                            <li>Start  : '.$StartNameDay.', '.$Start.'</li>
+                            <li>End  : '.$EndNameDay.', '.$End.'</li>
+                            <li>Room  : '.$input['Room'].'</li>
+                            <li>Agenda  : '.$input['Agenda'].'</li>
+                            '.$MarkomEmail.'
+                            </ul>
+                            '.$EmailKetAdditional.'
+                        ';        
+                $to = $Email;
+                $subject = "Podomoro University Venue Reservation Notification";
+                $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+            }
 
-                if (is_array($input['chk_e_additional'])) {
-                    // save data t_booking_eq_additional
-                    $xx = $input['chk_e_additional'];
-                    $yy = array();
-                    for ($i=0; $i < count($xx); $i++) { 
-                        $yy[] = array('ID_t_booking' =>$ID_t_booking,'ID_equipment_additional' => $xx[$i]->ID_equipment_add,'Qty' =>  $xx[$i]->Qty);
-                    }
-                    // $this->db->insert('db_reservation.t_booking_eq_additional', $yy);
-                    $this->db->insert_batch('db_reservation.t_booking_eq_additional', $yy);
+            // if (is_array($input['chk_person_support'])) {
+            //     if($_SERVER['SERVER_NAME']!='localhost') {
+            //         for ($i=0; $i < count($input['chk_person_support']); $i++) { 
+            //            $nested = $input['chk_person_support'];
+            //            $getDataDB = $this->m_master->caribasedprimary('db_employees.division','ID',$nested[$i]);
+            //            $Email = $getDataDB[0]['Email'];
+            //            $text = 'Dear '.$getDataDB[0]['Division'].',<br><br>
+            //                        Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
+            //                        Details Schedule : <br><ul>
+            //                        <li>Start  : '.$StartNameDay.', '.$Start.'</li>
+            //                        <li>End  : '.$EndNameDay.', '.$End.'</li>
+            //                        <li>Room  : '.$input['Room'].'</li>
+            //                        <li>Agenda  : '.$input['Agenda'].'</li>
+            //                        <li>Note : <strong>Need Person Support</strong></li>
+            //                        </ul>
+            //                    ';        
+            //            $to = $Email;
+            //            $subject = "Podomoro University Venue Reservation Person Support";
+            //            $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+
+            //         }
+            //     }
+            //     else{
+            //         $Email = 'alhadi.rahman@podomorouniversity.ac.id';
+            //         $text = 'Dear IT,<br><br>
+            //                     Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
+            //                     Details Schedule : <br><ul>
+            //                     <li>Start  : '.$StartNameDay.', '.$Start.'</li>
+            //                     <li>End  : '.$EndNameDay.', '.$End.'</li>
+            //                     <li>Room  : '.$input['Room'].'</li>
+            //                     <li>Agenda  : '.$input['Agenda'].'</li>
+            //                     <li>Note : <strong>Need Person Support</strong></li>
+            //                     </ul>
+            //                 ';        
+            //         $to = $Email;
+            //         $subject = "Podomoro University Venue Reservation Person Support";
+            //         $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+            //     }    
+                
+            // }
+
+            if (array_key_exists('fileDataMarkomm',$_FILES)) {
+                // email notification to markom
+                $exFile =explode(';', $filenamemarkomm);
+                $MarkomSupport = '<ul>';
+                for ($m=0; $m < count($exFile); $m++) { 
+                    $MarkomSupport .= '<li>'.'<a href="'.base_url("fileGetAny/vreservation-".$exFile[$m]).'" target="_blank"></i>'.$exFile[$m].'</a></li>';
                 }
+                $MarkomSupport .= '</ul></li>';
 
-
-                // define for email
-                $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $Start);
-                $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $End);
-                $StartNameDay = $Startdatetime->format('l');
-                $EndNameDay = $Enddatetime->format('l');
-
-                $MarkomEmail ='';
-                if (is_array($input['chk_markom_support'])) {
-                    $ss = implode(',', $input['chk_markom_support']);
-                    $MarkomEmail = '<li>Documentation  : '.$ss.'</li>';
-                }
                 if($_SERVER['SERVER_NAME']!='localhost') {
-                    // email to ga
-                    $Email = 'ga@podomorouniversity.ac.id';
-                    $text = 'Dear GA Team,<br><br>
-                                Please Approve Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
-                                Details Schedule : <br><ul>
-                                <li>Start  : '.$StartNameDay.', '.$Start.'</li>
-                                <li>End  : '.$EndNameDay.', '.$End.'</li>
-                                <li>Room  : '.$input['Room'].'</li>
-                                <li>Agenda  : '.$input['Agenda'].'</li>
-                                '.$MarkomEmail.'
-                                </ul>
-                            ';        
-                    $to = $Email;
-                    $subject = "Podomoro University Venue Reservation Notification";
-                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
-
+                      $getDataDB = $this->m_master->caribasedprimary('db_reservation.email_to','Ownership','Markom');
+                      $Email = $getDataDB[0]['Email'];
+                      $text = 'Dear Team,<br><br>
+                                  Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
+                                  Details Schedule : <br><ul>
+                                  <li>Start                       : '.$StartNameDay.', '.$Start.'</li>
+                                  <li>End                         : '.$EndNameDay.', '.$End.'</li>
+                                  <li>Room                        : '.$input['Room'].'</li>
+                                  <li>Agenda                      : '.$input['Agenda'].'</li>
+                                  '.$MarkomEmail.'
+                                  <li>Documentation               : <strong>Please Click link below to download these files</strong>
+                                  '.$MarkomSupport.'
+                                  </ul>
+                                  '.$EmailKetAdditional.'
+                              ';        
+                      $to = $Email;
+                      $subject = "Podomoro University Venue Reservation Marcomm Support";
+                      $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
                 }
-                else
-                {
+                else{
                     $Email = 'alhadi.rahman@podomorouniversity.ac.id';
-                    $text = 'Dear GA Team,<br><br>
-                                Please Approve Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
+                    $text = 'Dear Team,<br><br>
+                                Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
                                 Details Schedule : <br><ul>
-                                <li>Start  : '.$StartNameDay.', '.$Start.'</li>
-                                <li>End  : '.$EndNameDay.', '.$End.'</li>
-                                <li>Room  : '.$input['Room'].'</li>
-                                <li>Agenda  : '.$input['Agenda'].'</li>
+                                <li>Start                       : '.$StartNameDay.', '.$Start.'</li>
+                                <li>End                         : '.$EndNameDay.', '.$End.'</li>
+                                <li>Room                        : '.$input['Room'].'</li>
+                                <li>Agenda                      : '.$input['Agenda'].'</li>
                                 '.$MarkomEmail.'
+                                <li>Graphic Design      : <strong>Please Click link below to download these files</strong>
+                                '.$MarkomSupport.'
                                 </ul>
+                                '.$EmailKetAdditional.'
                             ';        
                     $to = $Email;
-                    $subject = "Podomoro University Venue Reservation Notification";
+                    $subject = "Podomoro University Venue Reservation Marcomm Support";
                     $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
-                }
-
-                if (is_array($input['chk_person_support'])) {
-                    if($_SERVER['SERVER_NAME']!='localhost') {
-                        for ($i=0; $i < count($input['chk_person_support']); $i++) { 
-                           $nested = $input['chk_person_support'];
-                           $getDataDB = $this->m_master->caribasedprimary('db_employees.division','ID',$nested[$i]);
-                           $Email = $getDataDB[0]['Email'];
-                           $text = 'Dear '.$getDataDB[0]['Division'].',<br><br>
-                                       Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
-                                       Details Schedule : <br><ul>
-                                       <li>Start  : '.$StartNameDay.', '.$Start.'</li>
-                                       <li>End  : '.$EndNameDay.', '.$End.'</li>
-                                       <li>Room  : '.$input['Room'].'</li>
-                                       <li>Agenda  : '.$input['Agenda'].'</li>
-                                       <li>Note : <strong>Need Person Support</strong></li>
-                                       </ul>
-                                   ';        
-                           $to = $Email;
-                           $subject = "Podomoro University Venue Reservation Person Support";
-                           $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
-
-                        }
-                    }
-                    else{
-                        $Email = 'alhadi.rahman@podomorouniversity.ac.id';
-                        $text = 'Dear IT,<br><br>
-                                    Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
-                                    Details Schedule : <br><ul>
-                                    <li>Start  : '.$StartNameDay.', '.$Start.'</li>
-                                    <li>End  : '.$EndNameDay.', '.$End.'</li>
-                                    <li>Room  : '.$input['Room'].'</li>
-                                    <li>Agenda  : '.$input['Agenda'].'</li>
-                                    <li>Note : <strong>Need Person Support</strong></li>
-                                    </ul>
-                                ';        
-                        $to = $Email;
-                        $subject = "Podomoro University Venue Reservation Person Support";
-                        $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
-                    }    
-                    
-                }
-
-                if (array_key_exists('fileDataMarkomm',$_FILES)) {
-                    // email notification to markom
-                    $exFile =explode(';', $filenamemarkomm);
-                    $MarkomSupport = '<ul>';
-                    for ($m=0; $m < count($exFile); $m++) { 
-                        $MarkomSupport .= '<li>'.'<a href="'.base_url("fileGetAny/vreservation-".$exFile[$m]).'" target="_blank"></i>'.$exFile[$m].'</a></li>';
-                    }
-                    $MarkomSupport .= '</ul></li>';
-
-                    if($_SERVER['SERVER_NAME']!='localhost') {
-                          $getDataDB = $this->m_master->caribasedprimary('db_reservation.email_to','Ownership','Markom');
-                          $Email = $getDataDB[0]['Email'];
-                          $text = 'Dear Team,<br><br>
-                                      Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
-                                      Details Schedule : <br><ul>
-                                      <li>Start                       : '.$StartNameDay.', '.$Start.'</li>
-                                      <li>End                         : '.$EndNameDay.', '.$End.'</li>
-                                      <li>Room                        : '.$input['Room'].'</li>
-                                      <li>Agenda                      : '.$input['Agenda'].'</li>
-                                      <li>Documentation               : <strong>Please Click link below to download these files</strong>
-                                      '.$MarkomSupport.'
-                                      </ul>
-
-                                  ';        
-                          $to = $Email;
-                          $subject = "Podomoro University Venue Reservation Marcomm Support";
-                          $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
-                    }
-                    else{
-                        $Email = 'alhadi.rahman@podomorouniversity.ac.id';
-                        $text = 'Dear Team,<br><br>
-                                    Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
-                                    Details Schedule : <br><ul>
-                                    <li>Start                       : '.$StartNameDay.', '.$Start.'</li>
-                                    <li>End                         : '.$EndNameDay.', '.$End.'</li>
-                                    <li>Room                        : '.$input['Room'].'</li>
-                                    <li>Agenda                      : '.$input['Agenda'].'</li>
-                                    <li>Documentation      : <strong>Please Click link below to download these files</strong>
-                                    '.$MarkomSupport.'
-                                    </ul>
-
-                                ';        
-                        $to = $Email;
-                        $subject = "Podomoro University Venue Reservation Marcomm Support";
-                        $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
-                    } 
-                }
+                } 
             }
             echo json_encode(array('msg' => 'The Proses Finish','status' => 1));
         }
@@ -484,8 +421,69 @@ class C_transaksi extends Vreservation_Controler {
         $msg = '';
         $input = $this->getInputToken();
         $ID = $input['ID_tbl'];
-        // check approve bentrok
+        $ListDelEquipment = $input['ListDelEquipment'];
+        $ListDelMarkom = $input['ListDelMarkom'];
         $get = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$ID);
+        $EmailAdd = '';
+        $arr_add = array();
+        if (count($ListDelMarkom) > 0 || count($ListDelEquipment) >0 ) {
+            $ID_equipment_add = $get[0]['ID_equipment_add'];
+            $ID_equipment_add = explode(",", $ID_equipment_add);
+            $MarcommSupport = $get[0]['MarcommSupport'];
+            $MarcommSupport = explode(',', $MarcommSupport);
+            $EmailAdd .= '<br><br>Note :<br>';
+            $aa = array();
+            for ($i=0; $i < count($ListDelEquipment); $i++) {
+                if ($i==0) {
+                    $EmailAdd .= '* Equipment not approve : <br>&nbsp&nbsp   -&nbsp     ';
+                }
+                $g = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ListDelEquipment[$i]);
+                $NameEq =  $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$g[0]['ID_m_equipment']);
+                $aa[] = $NameEq[0]['Equipment'];
+
+                if (($key = array_search($ListDelEquipment[$i], $ID_equipment_add)) !== false) {
+                    unset($ID_equipment_add[$key]);
+                }
+            }
+            $aa = implode("<br>&nbsp&nbsp   -&nbsp     ", $aa);
+            $EmailAdd .= $aa;
+
+            $bb = array();
+            for ($i=0; $i <count($ListDelMarkom) ; $i++) { 
+                if ($i==0) {
+                    $EmailAdd .= '<br>* Marcom not approve : <br>&nbsp&nbsp   -&nbsp     ';
+                } 
+                $bb[] = $ListDelMarkom[$i];
+                if (($key = array_search($ListDelMarkom[$i], $MarcommSupport)) !== false) {
+                    unset($MarcommSupport[$key]);
+                }
+            }
+            $bb = implode("<br>&nbsp&nbsp   -&nbsp     ", $bb);
+            $EmailAdd .= $bb;
+
+            $ID_equipment_add = array_values($ID_equipment_add); // 'reindex' array
+            $MarcommSupport = array_values($MarcommSupport); // 'reindex' array
+            $ID_equipment_add = implode(",", $ID_equipment_add);
+            $MarcommSupport = implode(",", $MarcommSupport);
+            $arr_add = array(
+                'ID_equipment_add' => $ID_equipment_add,
+                'MarcommSupport' => $MarcommSupport,
+                    );
+        }
+
+        $KetAdditional = json_decode($get[0]['KetAdditional']);    
+        $EmailKetAdditional = '';
+        if ($KetAdditional != '') {
+            if (count($KetAdditional) > 0) {
+                foreach ($KetAdditional as $key => $value) {
+                    if ($value != "" || $value != null) {
+                        $EmailKetAdditional .= '<br>*   '.$key.'('.$value.')';  
+                    }  
+                }
+            }
+            
+        }
+        // check approve bentrok
         $Start = $get[0]['Start'];$End = $get[0]['End'];$chk_e_multiple = '';$Room = $get[0]['Room'];
         $chk = $this->m_reservation->checkBentrok($Start,$End,$chk_e_multiple,$Room,$ID);
         if ($chk) {
@@ -494,9 +492,10 @@ class C_transaksi extends Vreservation_Controler {
                     'ApprovedBy' => $this->session->userdata('NIP'),
                     'ApprovedAt' => date('Y-m-d H:i:s'),
                             );
+            $dataSave = $dataSave + $arr_add;
+            // print_r($dataSave);die();
             $this->db->where('ID',$ID);
             $this->db->update('db_reservation.t_booking', $dataSave);
-
             // send email approve to user
             $getUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$get[0]['CreatedBy']);
             $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['Start']);
@@ -512,6 +511,7 @@ class C_transaksi extends Vreservation_Controler {
                         <li>End  : '.$EndNameDay.', '.$get[0]['End'].'</li>
                         <li>Room  : '.$get[0]['Room'].'</li>
                         </ul>
+                        '.$EmailAdd.$EmailKetAdditional.'
                     ';        
             $to = $Email;
             $subject = "Podomoro University Venue Reservation Approved";
@@ -535,6 +535,19 @@ class C_transaksi extends Vreservation_Controler {
             $get = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$input['ID_tbl']);
             $getUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$get[0]['CreatedBy']);
             $getE_additional = $this->m_master->caribasedprimary('db_reservation.t_booking_eq_additional','ID_t_booking',$get[0]['ID']);
+
+            $KetAdditional = json_decode($get[0]['KetAdditional']);    
+            $EmailKetAdditional = '';
+            if ($KetAdditional != '') {
+                if (count($KetAdditional) > 0) {
+                    foreach ($KetAdditional as $key => $value) {
+                        if ($value != "" || $value != null) {
+                            $EmailKetAdditional .= '<br>*   '.$key.'('.$value.')';  
+                        }  
+                    }
+                }
+                
+            }
 
             $Reason = 'Cancel by yourself';
             if(array_key_exists("Reason",$input))
@@ -614,6 +627,7 @@ class C_transaksi extends Vreservation_Controler {
                 'Req_layout' => $get[0]['Req_layout'],
                 'Status' => $get[0]['Status'],
                 'MarcommSupport' => $get[0]['MarcommSupport'],
+                'KetAdditional' => $get[0]['KetAdditional'],
             );
             $this->db->insert('db_reservation.t_booking_delete', $dataSave); 
 
@@ -634,6 +648,8 @@ class C_transaksi extends Vreservation_Controler {
                         <li>Room  : '.$get[0]['Room'].'</li>
                         <li>Reason : '.$Reason.'</li>
                         </ul>
+
+                        '.$EmailKetAdditional.'
                     ';        
             $to = $Email;
             $subject = "Podomoro University Venue Reservation Cancel Reservation";
@@ -653,6 +669,8 @@ class C_transaksi extends Vreservation_Controler {
                                      <li>Room  : '.$get[0]['Room'].'</li>
                                      <li>Reason : '.$Reason.'</li>
                                      </ul>
+
+                                     '.$EmailKetAdditional.'
                                  ';        
                          $to = $Email;
                          $subject = "Podomoro University Venue Reservation Cancel Reservation";
@@ -672,6 +690,8 @@ class C_transaksi extends Vreservation_Controler {
                             <li>Room  : '.$get[0]['Room'].'</li>
                             <li>Reason : '.$Reason.'</li>
                             </ul>
+
+                            '.$EmailKetAdditional.'
                         ';        
                 $to = $Email;
                 $subject = "Podomoro University Venue Reservation Cancel Reservation";

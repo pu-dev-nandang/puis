@@ -248,7 +248,20 @@
                 '                                <div class="form-group"><label>NameEng</label>' +
                 '                                <input type="text" class="form-control" value="'+NameEng+'" '+''+' style="color:#333;" id="formNameEng">' +
                 '                            </div></div>' +
-                '                        </div>');
+                '                        </div>'+
+                '                         <div class = "row">'+
+                '                           <div class = "col-xs-8">'+
+                '                                <div class="form-group"><label>Approver 1</label>' +
+                '                               <select class="select2-select-00 col-md-4 full-width-fix form-control Approver1">'+
+                '                                   <option></option>'+
+                '                               </select></div>'+
+                '                           </div>'+
+                '                           <div class = "col-xs-4">'+
+                '                               <button class="btn btn-default" id = "addApprover" style = "margin-top : 23px"><i class="icon-plus"></i> Add</button>'+
+                '                           </div>'+
+                '                        </div>'        
+
+                                    );
             $('#GlobalModal .modal-footer').html('<button type="button" id="btnCloseCategoryClassroom" class="btn btn-default" data-dismiss="modal">Close</button>' +
                 '<button type="button" class="btn btn-success" data-id="'+ID+'" data-action="'+action+'" id="btnSaveCategoryClassroom">Save</button>');
             $('#GlobalModal').modal({

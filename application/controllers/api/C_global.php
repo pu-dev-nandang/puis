@@ -83,10 +83,11 @@ class C_global extends CI_Controller {
 
     public function fileGetAny($file)
     {
+        error_reporting(0);
         //check session ID_register_formulir ada atau tidak
         // check session token untuk download
         $file = str_replace('-', '/', $file);
-
+        // print_r($file);die();
         $path = $file;
         $ext = pathinfo($path, PATHINFO_EXTENSION);
         if ($ext == 'pdf') {
@@ -116,22 +117,17 @@ class C_global extends CI_Controller {
         }
         else
         {
-            $imageData = base64_encode(file_get_contents(FCPATH.'uploads/'.$path));
-            echo '<img src="data:image/jpeg;base64,'.$imageData.'">';
+            if (file_exists('./uploads/'.$file)) {
+                $imageData = base64_encode(file_get_contents(FCPATH.'uploads/'.$path));
+                echo '<img src="data:image/jpeg;base64,'.$imageData.'">';
+                
+            }
+            else
+            {
+                show_404($log_error = TRUE);
+            }
+            
         }
-
-        // // Check File exist atau tidak
-        // if (file_exists('./uploads/'.$file)) {
-        //     // $this->load->helper('download');
-        //     // $data   = file_get_contents('./document/'.$namaFolder.'/'.$file);
-        //     // $name   = $file;
-        //     // force_download($name, $data); // script download file
-        //     $this->showFile2($file);
-        // }
-        // else
-        // {
-        //     show_404($log_error = TRUE);
-        // }
     }
 
     private function showFile2($file)

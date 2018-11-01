@@ -31,6 +31,10 @@
     .filter-time {
         padding-left: 0px;
     }
+
+    li{
+        margin: 10px 0;
+    }
 </style>
 
 <div class="row" style="margin-top: 30px;">
@@ -55,6 +59,8 @@
 
 
 <script type="text/javascript">
+    var tempEquipment = [];
+    var tempMarkom = [];
     $(document).ready(function () {
         loadDataListApprove();
         socket_messages2();
@@ -136,7 +142,11 @@
               'show' : true
           });
           var url =base_url_js+'vreservation/approve_submit';
-          var data = {ID_tbl : ID_tbl};
+          var data = {
+                        ID_tbl : ID_tbl,
+                        ListDelEquipment : tempEquipment,
+                        ListDelMarkom    : tempMarkom,
+                      };
           var token = jwt_encode(data,'UAP)(*');
           $.post(url,{token:token},function (data_json) {
             var response = jQuery.parseJSON(data_json);
@@ -189,14 +199,15 @@
                                 '<thead>'+
                                     '<tr>'+
                                     // '<th style="width: 15px;">No</th>'+
-                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Start</th>'+
-                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">End</th>'+
+                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Start - End</th>'+
+                                   // ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">End</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Time</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Agenda</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Room</th>'+
-                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Equipment</th>'+
-                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Support</th>'+
-                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Markom</th>'+
+                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;" width = "25%">Equipment</th>'+
+                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;" width = "15%">Support</th>'+
+                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;" width = "15%">Markom</th>'+
+                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;" width = "15%">Participant</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Req Date</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Layout</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Action</th>'+
@@ -227,21 +238,22 @@
                                       '<i class="fa fa-times"></i> Cancel'+
                                      '</span>'+
                         '</div>';            
-                var Req_layout = (response[i]['Req_layout'] == '') ? 'Default' : '<a href="javascript:void(0)" class="btn-action btn-edit btn-get-link" data-page="fileGetAny/vreservation/'+response[i]['Req_layout']+'">Request Layout</a>'; 
+                var Req_layout = (response[i]['Req_layout'] == '') ? 'Default' : '<a href="javascript:void(0)" class="btn-action btn-get-link2" data-page="fileGetAny/vreservation-'+response[i]['Req_layout']+'">Request Layout</a>'; 
                 var tr = '<tr>';
                 if (response[i]['Status'] ==  1) {
                   tr = '<tr style="background-color: #8ED6EA; color: black;">';
                 }
                 $(".datatable tbody").append(
                     tr+
-                        '<td>'+response[i]['Start']+'</td>'+
-                        '<td>'+response[i]['End']+'</td>'+
+                        '<td>'+response[i]['Start']+'<br>-<br>'+response[i]['End']+'</td>'+
+                        // '<td>'+response[i]['End']+'</td>'+
                         '<td>'+response[i]['Time']+'</td>'+
                         '<td>'+response[i]['Agenda']+'</td>'+
                         '<td>'+response[i]['Room']+'</td>'+
                         '<td>'+response[i]['Equipment_add']+'</td>'+
                         '<td>'+response[i]['Persone_add']+'</td>'+
                         '<td>'+response[i]['MarkomSupport']+'</td>'+
+                        '<td>'+response[i]['Participant']+'</td>'+
                         '<td>'+response[i]['Req_date']+'</td>'+
                         '<td>'+Req_layout+'</td>'+
                         '<td>'+btn+'</td>'+
@@ -254,6 +266,31 @@
                 'ordering' : false,
                 });
             },500);
+
         });
     }
+
+    $(document).on('click','.btn-get-link2', function () {
+       var page = $(this).attr('data-page');
+       window.open(base_url_js+page,'_blank');
+    });
+
+    // click function delete in table
+      $(document).on('click','.btnEquipment', function () {
+        var ID_equipment_add = $(this).attr('ID_equipment_add');
+        // console.log(ID_equipment_add);
+        tempEquipment.push(ID_equipment_add);
+        $(this)
+          .parent().remove();
+          // console.log(tempEquipment);
+      });
+
+      $(document).on('click','.btnMarkomSupport', function () {
+        var MarcommSupport = $(this).attr('MarcommSupport');
+        // console.log(ID_equipment_add);
+        tempMarkom.push(MarcommSupport);
+        $(this)
+          .parent().remove();
+          // console.log(tempMarkom);
+      });
 </script>
