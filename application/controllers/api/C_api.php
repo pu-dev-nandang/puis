@@ -4781,8 +4781,8 @@ class C_api extends CI_Controller {
         $data_arr = $this->getInputToken();
 
         $dataWhere = ($data_arr['ProdiID']!='' && $data_arr['ProdiID']!=null)
-            ? 'aut_s.Year = "'.$data_arr['Year'].'" AND aut_s.StatusStudentID = "3" AND aut_s.ProdiID = "'.$data_arr['ProdiID'].'" '
-            : 'aut_s.Year = "'.$data_arr['Year'].'" AND aut_s.StatusStudentID = "3" ' ;
+            ? 'aut_s.Year = "'.$data_arr['Year'].'" AND ( aut_s.StatusStudentID = "3" OR aut_s.StatusStudentID = "1" ) AND aut_s.ProdiID = "'.$data_arr['ProdiID'].'" '
+            : 'aut_s.Year = "'.$data_arr['Year'].'" AND ( aut_s.StatusStudentID = "3" OR aut_s.StatusStudentID = "1" ) ' ;
 
         $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
