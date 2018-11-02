@@ -1674,13 +1674,13 @@ class M_api extends CI_Model {
 
     }
 
-    private function getPayment($SemesterID,$NPM){
+    public function getPayment($SemesterID,$NPM){
         $data = $this->db->query('SELECT p.PTID,p.Status FROM db_finance.payment p WHERE p.NPM = "'.$NPM.'" 
                                             AND p.SemesterID = "'.$SemesterID.'"');
         return $data->result_array();
     }
 
-    private function getMaxCredit($db_ta,$NPM,$ClassOf,$smtActID,$ProdiID){
+    public function getMaxCredit($db_ta,$NPM,$ClassOf,$smtActID,$ProdiID){
 
 
         $dataIDLast = $this->db->query('SELECT * FROM db_academic.semester s 
@@ -1691,7 +1691,7 @@ class M_api extends CI_Model {
         if(count($dataIDLast)>0){
             $dataResult = $this->db->query('SELECT s.GradeValue,s.SemesterID,cd.TotalSKS AS Credit FROM '.$db_ta.'.study_planning s
                                                 LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = s.CDID) 
-                                                WHERE s.NPM = "'.$NPM.'" ORDER BY s.SemesterID ASC ')->result_array();
+                                                WHERE s.NPM = "'.$NPM.'" AND s.SemesterID <= "'.$smtActID.'" ORDER BY s.SemesterID ASC ')->result_array();
 
 //            print_r($dataResult);
             $TotalSKS=0;

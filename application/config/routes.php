@@ -798,6 +798,9 @@ $route['api/__getTranscript'] = 'api/c_api/getTranscript';
 $route['api/__crudFinalProject'] = 'api/c_api/crudFinalProject';
 $route['api/__getFinalProject'] = 'api/c_api/getFinalProject';
 
+// ==== Study Planning ===
+$route['api/__getDataStudyPlanning'] = 'api/c_api/getDataStudyPlanning';
+
 $route['api/__crudInvigilator'] = 'api/c_api/crudInvigilator';
 
 
