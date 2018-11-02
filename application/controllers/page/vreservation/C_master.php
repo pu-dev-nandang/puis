@@ -74,6 +74,10 @@ class C_master extends Vreservation_Controler {
     public function ruangan()
     {
         $data['CategoryRoom'] = $this->m_master->showData_array('db_reservation.category_room');
+        // get employees all
+            $Status = array(1,2,3);
+            $data['employees'] = $this->m_master->getEmployeesBaseStatus($Status);
+            $data['division'] = $this->m_master->showData_array('db_employees.division');
         $content = $this->load->view($this->pathView.'master/ruangan',$data,true);
         $this->temp($content);
     }

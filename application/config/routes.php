@@ -909,6 +909,7 @@ $route['testInject'] = 'api/c_global/testInject';
 $route['testInject2'] = 'api/c_global/testInject2';
 $route['testInject3'] = 'api/c_global/testInject3';
 $route['testInject4'] = 'api/c_global/testInject4';
+$route['testInject5'] = 'api/c_global/testInject5';
 
 
 // Pengawas Ujian

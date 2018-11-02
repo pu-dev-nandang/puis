@@ -228,8 +228,16 @@ $this->m_reservation->checkAuth_user_vreservation();
      $(document).on('click','.btn-apppove', function () {
         loading_button('.btn-apppove');   
         var id_table = $(this).attr('id_table');
+        var approveaccess = $(this).attr('approveaccess');
          var url =base_url_js+'vreservation/approve_submit';
-         var data = {ID_tbl : id_table};
+         var tempEquipment = [];
+         var tempMarkom = [];
+         var data = {
+                        ID_tbl : id_table,
+                        ListDelEquipment : tempEquipment,
+                        ListDelMarkom    : tempMarkom,
+                        approveaccess : approveaccess,
+                    };
          var token = jwt_encode(data,'UAP)(*');
          $.post(url,{token:token},function (data_json) {
             var response = jQuery.parseJSON(data_json);

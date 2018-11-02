@@ -41,7 +41,10 @@
 
 <script type="text/javascript">
     var CategoryRoom = <?php echo json_encode($CategoryRoom)  ?>;
+    var employees = <?php echo json_encode($employees)  ?>;
+    var division = <?php echo json_encode($division)  ?>;
     $(document).ready(function () {
+        // console.log(employees);
         loadDataCategoryClassroom();
         loadDataClassroom();
     });
@@ -237,7 +240,55 @@
         var ID = (action=='edit' || action=='delete') ? classroom[0] : '';
         var Name = (action=='edit' || action=='delete') ? classroom[1] : '';
         var NameEng = (action=='edit' || action=='delete') ? classroom[2] : '';
+        var Approver1 = (action=='edit' || action=='delete') ? classroom[3].split(',') : '';
+        var Approver2 = (action=='edit' || action=='delete') ? classroom[4].split(',') : '';
         if(action=='add' || action=='edit'){
+            // option value employees
+            var selected1 = (action=='add') ? '' :Approver1[0]; 
+            var selected2 = (action=='add') ? '' :Approver2[0]; 
+                var getEmployees = function(selected1){
+                    var aa = '';
+                    for(var i=0;i< employees.length;i++){
+                        if (selected1 == '') {
+                            aa+= '<option value="'+employees[i].NIP+'" '+''+'>'+employees[i].NIP+' | '+employees[i].Name+'</option>';
+                        }
+                        else
+                        {
+                            if (employees[i].NIP == selected1) {
+                                aa+= '<option value="'+employees[i].NIP+'" '+'selected'+'>'+employees[i].NIP+' | '+employees[i].Name+'</option>';
+                            }
+                            else
+                            {
+                                aa+= '<option value="'+employees[i].NIP+'" '+''+'>'+employees[i].NIP+' | '+employees[i].Name+'</option>';
+                            }
+                        }
+                        
+                    }
+                    return aa;
+                }
+
+                var getDivision = function(selected2){
+                    var aa = '';
+                    for(var i=0;i< division.length;i++){
+                        if (selected2 == '') {
+                            aa+= '<option value="'+division[i].ID+'" '+''+'>'+division[i].Division+'</option>';
+                        }
+                        else
+                        {
+                            if (division[i].ID == selected2) {
+                                aa+= '<option value="'+division[i].ID+'" '+'selected'+'>'+division[i].Division+'</option>';
+                            }
+                            else
+                            {
+                                aa+= '<option value="'+division[i].ID+'" '+''+'>'+division[i].Division+'</option>';
+                            }
+                        }
+                        
+                    }
+                    return aa;
+                }
+
+
             $('#GlobalModal .modal-header').html('<h4 class="modal-title">Category Classroom</h4>');
             $('#GlobalModal .modal-body').html('<div class="row">' +
                 '                            <div class="col-xs-6">' +
@@ -252,14 +303,27 @@
                 '                         <div class = "row">'+
                 '                           <div class = "col-xs-8">'+
                 '                                <div class="form-group"><label>Approver 1</label>' +
-                '                               <select class="select2-select-00 col-md-4 full-width-fix form-control Approver1">'+
-                '                                   <option></option>'+
+                '                               <select class=" form-control Approver1">'+
+                '                                   <option value = "0" selected>-- No Selected --</option>'+getEmployees(selected1)+
                 '                               </select></div>'+
                 '                           </div>'+
                 '                           <div class = "col-xs-4">'+
-                '                               <button class="btn btn-default" id = "addApprover" style = "margin-top : 23px"><i class="icon-plus"></i> Add</button>'+
+                '                               <button class="btn btn-default" id = "addApprover1" style = "margin-top : 23px"><i class="icon-plus"></i> Add</button>'+
                 '                           </div>'+
-                '                        </div>'        
+                '                        </div>'+
+                '                         <div id = "AddApprover1"></div><hr>'+
+                '                         <div class = "row" style="margin-top: 10px">'+
+                '                           <div class = "col-xs-8">'+
+                '                                <div class="form-group"><label>Approver 2</label>' +
+                '                               <select class=" form-control Approver2">'+
+                '                                   <option value = "0" selected>-- No Selected --</option>'+getDivision(selected2)+
+                '                               </select></div>'+
+                '                           </div>'+
+                '                           <div class = "col-xs-4">'+
+                '                               <button class="btn btn-default" id = "addApprover2" style = "margin-top : 23px"><i class="icon-plus"></i> Add</button>'+
+                '                           </div>'+
+                '                        </div>'+
+                '                         <div id = "AddApprover2"></div>'        
 
                                     );
             $('#GlobalModal .modal-footer').html('<button type="button" id="btnCloseCategoryClassroom" class="btn btn-default" data-dismiss="modal">Close</button>' +
@@ -268,6 +332,124 @@
                 'show' : true,
                 'backdrop' : 'static'
             });
+
+            $('.Approver1').select2({
+               //allowClear: true
+            });
+
+            $('.Approver2').select2({
+               //allowClear: true
+            });
+
+            if (action=='edit') {
+                // approver 1
+                for (var i = 1; i < Approver1.length; i++) {
+                    var Input = '<div class = "row" style="margin-top: 5px">'+
+                                    '<div class="col-xs-12">'+
+                                        '<div class="col-xs-8" style = "margin-left : -15px">'+
+                                            '                               <select class=" form-control Approver1">'+
+                                            '                                   <option value = "0" selected>-- No Selected --</option>'+getEmployees(Approver1[i])+
+                                            '                               </select>'+
+                                        '</div>'+
+                                        '<div class="col-xs-4">'+
+                                            '<button type="button" class="btn btn-danger btn-deleteAuto"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>'+
+                                        '</div>'+
+                                    '</div>'+       
+                                '</div>';
+
+                    $("#AddApprover1").append(Input); 
+
+                    $('select[tabindex!="-1"]').select2({
+                        //allowClear: true
+                    });
+
+                    $(".btn-deleteAuto").click(function(){
+                        $(this)
+                          .parentsUntil( 'div[class="row"]' ).remove();
+                    })
+                }
+
+                // approver 2
+                for (var i = 1; i < Approver2.length; i++) {
+                    var Input = '<div class = "row" style="margin-top: 5px">'+
+                                    '<div class="col-xs-12">'+
+                                        '<div class="col-xs-8" style = "margin-left : -15px">'+
+                                            '                               <select class=" form-control Approver2">'+
+                                            '                                   <option value = "0" selected>-- No Selected --</option>'+getDivision(Approver2[i])+
+                                            '                               </select>'+
+                                        '</div>'+
+                                        '<div class="col-xs-4">'+
+                                            '<button type="button" class="btn btn-danger btn-deleteAuto2"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>'+
+                                        '</div>'+
+                                    '</div>'+       
+                                '</div>';
+
+                    $("#AddApprover2").append(Input); 
+
+                    $('select[tabindex!="-1"]').select2({
+                        //allowClear: true
+                    });
+
+                    $(".btn-deleteAuto2").click(function(){
+                        $(this)
+                          .parentsUntil( 'div[class="row"]' ).remove();
+                    })
+                }
+            } // edit
+
+
+            $("#addApprover1").click(function(){
+                var Input = '<div class = "row" style="margin-top: 5px">'+
+                                '<div class="col-xs-12">'+
+                                    '<div class="col-xs-8" style = "margin-left : -15px">'+
+                                        '                               <select class=" form-control Approver1">'+
+                                        '                                   <option value = "0" selected>-- No Selected --</option>'+getEmployees('')+
+                                        '                               </select>'+
+                                    '</div>'+
+                                    '<div class="col-xs-4">'+
+                                        '<button type="button" class="btn btn-danger btn-deleteAuto"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>'+
+                                    '</div>'+
+                                '</div>'+       
+                            '</div>';
+
+                $("#AddApprover1").append(Input); 
+
+                $('select[tabindex!="-1"]').select2({
+                    //allowClear: true
+                });
+
+                $(".btn-deleteAuto").click(function(){
+                    $(this)
+                      .parentsUntil( 'div[class="row"]' ).remove();
+                })      
+            })
+
+            $("#addApprover2").click(function(){
+                var Input = '<div class = "row" style="margin-top: 5px">'+
+                                '<div class="col-xs-12">'+
+                                    '<div class="col-xs-8" style = "margin-left : -15px">'+
+                                        '                               <select class=" form-control Approver2">'+
+                                        '                                   <option value = "0" selected>-- No Selected --</option>'+getDivision('')+
+                                        '                               </select>'+
+                                    '</div>'+
+                                    '<div class="col-xs-4">'+
+                                        '<button type="button" class="btn btn-danger btn-deleteAuto2"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>'+
+                                    '</div>'+
+                                '</div>'+       
+                            '</div>';
+
+                $("#AddApprover2").append(Input); 
+
+                $('select[tabindex!="-1"]').select2({
+                    //allowClear: true
+                });
+
+                $(".btn-deleteAuto2").click(function(){
+                    $(this)
+                      .parentsUntil( 'div[class="row"]' ).remove();
+                })      
+            })  
+             
 
         }
         else {
@@ -289,8 +471,23 @@
 
         var Name = $('#formName').val(); process = (Name=='') ? errorInput('#formName') : true ;
         var NameEng = $('#formNameEng').val(); process = (Name=='') ? errorInput('#formNameEng') : true ;
-
-        if(Name!='' && NameEng != ''){
+        var Approver1 = [];
+        $(".Approver1").each(function(){
+            if ($(this).val() != 0) {
+                Approver1.push($(this).val());
+            }
+            
+        })
+        
+        var Approver2 = [];
+        $(".Approver2").each(function(){
+            if ($(this).val() != 0) {
+                Approver2.push($(this).val());
+            }
+            
+        })
+        
+        if(Name!='' && NameEng != '' && Approver1.length > 0 && Approver2.length > 0){
             $('#formName,#formNameEng').prop('disabled',true);
             loading_button('#btnSaveCategoryClassroom');
             loading_page('#viewCategoryClassroom');
@@ -301,7 +498,9 @@
                 formData : {
                     Name : Name,
                     NameEng : NameEng,
-                }
+                },
+                Approver1 : Approver1,
+                Approver2 : Approver2,
             };
 
             var token = jwt_encode(data,'UAP)(*');
@@ -399,6 +598,7 @@
         var token = jwt_encode({action:'read'},"UAP)(*");
         var url = base_url_js+'api/__crudCategoryClassroomVreservation';
         $.post(url,{token:token},function (json_result) {
+            // console.log(json_result);
             if(json_result.length>0){
                 $('#viewCategoryClassroom').html('<table class="table table-bordered" id="tbCategoryClassroom">' +
                     '                        <thead>' +
@@ -406,6 +606,8 @@
                     '                            <th class="th-center" style="width:5px;">No</th>' +
                     '                            <th class="th-center" style="width:15px;">Name</th>' +
                     '                            <th class="th-center" style="width:15px;">Name Eng</th>' +
+                    '                            <th class="th-center" style="width:15px;">Approver 1</th>' +
+                    '                            <th class="th-center" style="width:15px;">Approver 2(Div)</th>' +
                     '                            <th class="th-center" style="width: 110px;">Action</th>' +
                     '                        </tr>' +
                     '                        </thead>' +
@@ -420,9 +622,11 @@
                         '<td class="td-center">'+(no++)+'</td>' +
                         '<td class="td-left">'+data.Name+'</td>' +
                         '<td class="td-left">'+data.NameEng+'</td>' +
+                        '<td class="td-left">'+data.Approver1+'</td>' +
+                        '<td class="td-left">'+data.Approver2+'</td>' +
                         '<td class="td-left">' +
-                        '<button class="btn btn-default btn-default-success btn-Categoryclassroom btn-edit" data-action="edit" data-form="'+data.ID+'|'+data.Name+'|'+data.NameEng+'"><i class="fa fa-pencil" aria-hidden="true"></i></button> ' +
-                        ' <button class="btn btn-default btn-default-danger btn-Categoryclassroom btn-delete" data-action="delete" data-form="'+data.ID+'|'+data.Name+'|'+data.NameEng+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>' +
+                        '<button class="btn btn-default btn-default-success btn-Categoryclassroom btn-edit" data-action="edit" data-form="'+data.ID+'|'+data.Name+'|'+data.NameEng+'|'+data.Approver1_ori+'|'+data.Approver2_ori+'"><i class="fa fa-pencil" aria-hidden="true"></i></button> ' +
+                        ' <button class="btn btn-default btn-default-danger btn-Categoryclassroom btn-delete" data-action="delete" data-form="'+data.ID+'|'+data.Name+'|'+data.NameEng+'|'+data.Approver1+'|'+data.Approver2+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>' +
                         '</td>' +
                         '</tr>');
                 }

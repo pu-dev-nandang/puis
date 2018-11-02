@@ -122,6 +122,7 @@
 
     $(document).on('click','.btn-edit', function () {
       //loading_button('.btn-edit');
+      var approveaccess = $(this).attr('approveaccess');
       ID_tbl = $(this).attr('idtbooking');
       $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Are you sure ? </b> ' +
           '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
@@ -146,6 +147,7 @@
                         ID_tbl : ID_tbl,
                         ListDelEquipment : tempEquipment,
                         ListDelMarkom    : tempMarkom,
+                        approveaccess : approveaccess,
                       };
           var token = jwt_encode(data,'UAP)(*');
           $.post(url,{token:token},function (data_json) {
@@ -199,7 +201,7 @@
                                 '<thead>'+
                                     '<tr>'+
                                     // '<th style="width: 15px;">No</th>'+
-                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Start - End</th>'+
+                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Start - End & Req Date</th>'+
                                    // ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">End</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Time</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Agenda</th>'+
@@ -208,7 +210,7 @@
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;" width = "15%">Support</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;" width = "15%">Markom</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;" width = "15%">Participant</th>'+
-                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Req Date</th>'+
+                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Layout</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Action</th>'+
                                     '</tr>'+
@@ -222,22 +224,46 @@
         $.post(url,function (data_json) {
             setTimeout(function () {
                 var response = jQuery.parseJSON(data_json);
+                console.log(response);
                $("#pageData").html(html_table);
                for (var i = 0; i < response.length; i++) {
                 var btn  = ''  ;
-                if (response[i]['Status'] == 0) {
+                <?php 
+                  $DivisionID = $this->session->userdata('PositionMain');
+                  $DivisionID = $DivisionID['IDDivision'];   
+
+                 ?>
+                 var DivisionID = "<?php echo $DivisionID ?>";
+                 if (DivisionID == 12) {
                   btn += '<div class = "row" style = "margin-left : 0px;margin-right : 0px">'+
-                            '<span class="btn btn-primary btn-xs btn-edit" idtbooking ="'+response[i]['ID']+'" >'+
+                            '<span class="btn btn-primary btn-xs btn-edit" idtbooking ="'+response[i]['ID']+'" ApproveAccess = "'+response[i]['ApproveAccess']+'">'+
                                                                 '<i class="fa fa-pencil-square-o"></i> Approve'+
                                                                '</span>'+
                           '</div>'                                     
                         ;
-                }
-                btn += '<div class = "row" style = "margin-top : 5px;margin-left : 0px;margin-right : 0px">'+
-                          '<span class="btn btn-danger btn-xs btn-delete" idtbooking ="'+response[i]['ID']+'" >'+
-                                      '<i class="fa fa-times"></i> Cancel'+
-                                     '</span>'+
-                        '</div>';            
+                  btn += '<div class = "row" style = "margin-top : 5px;margin-left : 0px;margin-right : 0px">'+
+                            '<span class="btn btn-danger btn-xs btn-delete" idtbooking ="'+response[i]['ID']+'" >'+
+                                        '<i class="fa fa-times"></i> Cancel'+
+                                       '</span>'+
+                          '</div>'; 
+                 }
+                 else
+                 {
+                  if (response[i]['ApproveAccess'] == 2 || response[i]['ApproveAccess'] == 4) {
+                    btn += '<div class = "row" style = "margin-left : 0px;margin-right : 0px">'+
+                              '<span class="btn btn-primary btn-xs btn-edit" idtbooking ="'+response[i]['ID']+'" ApproveAccess = "'+response[i]['ApproveAccess']+'">'+
+                                                                  '<i class="fa fa-pencil-square-o"></i> Approve'+
+                                                                 '</span>'+
+                            '</div>'                                     
+                          ;
+                    btn += '<div class = "row" style = "margin-top : 5px;margin-left : 0px;margin-right : 0px">'+
+                              '<span class="btn btn-danger btn-xs btn-delete" idtbooking ="'+response[i]['ID']+'" >'+
+                                          '<i class="fa fa-times"></i> Cancel'+
+                                         '</span>'+
+                            '</div>';       
+                  }
+                 }
+
                 var Req_layout = (response[i]['Req_layout'] == '') ? 'Default' : '<a href="javascript:void(0)" class="btn-action btn-get-link2" data-page="fileGetAny/vreservation-'+response[i]['Req_layout']+'">Request Layout</a>'; 
                 var tr = '<tr>';
                 if (response[i]['Status'] ==  1) {
@@ -245,7 +271,7 @@
                 }
                 $(".datatable tbody").append(
                     tr+
-                        '<td>'+response[i]['Start']+'<br>-<br>'+response[i]['End']+'</td>'+
+                        '<td>'+response[i]['Start']+'<br>-<br>'+response[i]['End']+'<hr>Req & Date :<br>'+response[i]['Req_date']+'</td>'+
                         // '<td>'+response[i]['End']+'</td>'+
                         '<td>'+response[i]['Time']+'</td>'+
                         '<td>'+response[i]['Agenda']+'</td>'+
@@ -254,7 +280,7 @@
                         '<td>'+response[i]['Persone_add']+'</td>'+
                         '<td>'+response[i]['MarkomSupport']+'</td>'+
                         '<td>'+response[i]['Participant']+'</td>'+
-                        '<td>'+response[i]['Req_date']+'</td>'+
+                        '<td>'+response[i]['StatusBooking']+'</td>'+
                         '<td>'+Req_layout+'</td>'+
                         '<td>'+btn+'</td>'+
                     '</tr>' 

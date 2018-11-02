@@ -5796,16 +5796,47 @@ class C_api extends CI_Controller {
         if(count($data_arr)>0) {
             if($data_arr['action'] == 'read') {
                 $data = $this->m_master->showData_array('db_reservation.category_room');
+                for ($i=0; $i < count($data); $i++) {
+                    if ($data[$i]['Approver1']) {
+                       $y= json_decode($data[$i]['Approver1']);
+                       $x = array();
+                       for ($l=0; $l < count($y); $l++) {
+                        $Name = $this->m_master->caribasedprimary('db_employees.employees','NIP',$y[$l]);
+                        $tanda = ($l==0) ? '*   ' : '';
+                        $x[] = $tanda.$Name[0]['NIP'].' - '.$Name[0]['Name'];
+                       }
+                       $data[$i]['Approver1'] = implode('<br>*  ', $x);
+                       $data[$i]['Approver1_ori'] = $y;
+                    }
+                    if ($data[$i]['Approver2']) {
+                       $y= json_decode($data[$i]['Approver2']);
+                       $x = array();
+                       for ($l=0; $l < count($y); $l++) {
+                        $Name = $this->m_master->caribasedprimary('db_employees.division','ID',$y[$l]);
+                        $tanda = ($l==0) ? '*   ' : '';
+                        $x[] = $tanda.$Name[0]['Division'];
+                       }
+                       $data[$i]['Approver2'] = implode('<br>*  ', $x);
+                       $data[$i]['Approver2_ori'] = $y;
+                    }
+                }
+
                 return print_r(json_encode($data));
             }
             else if($data_arr['action'] == 'add'){
                 $result = '';
                 $formData = (array) $data_arr['formData'];
+                $Approver1 = json_encode($data_arr['Approver1']) ;
+                $Approver2 = json_encode($data_arr['Approver2']) ;
+                $formData = $formData + array('Approver1' => $Approver1,'Approver2' => $Approver2);
                 $this->db->insert('db_reservation.category_room',$formData);
                 return print_r(json_encode($result));
             }
             else if($data_arr['action'] == 'edit'){
                 $formData = (array) $data_arr['formData'];
+                $Approver1 = json_encode($data_arr['Approver1']) ;
+                $Approver2 = json_encode($data_arr['Approver2']) ;
+                $formData = $formData + array('Approver1' => $Approver1,'Approver2' => $Approver2);
                 $ID = $data_arr['ID'];
                 $this->db->where('ID', $ID);
                 $this->db->update('db_reservation.category_room',$formData);

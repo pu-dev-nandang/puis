@@ -319,6 +319,11 @@ class C_global extends CI_Controller {
         
     }
 
+    public function testInject5()
+    {
+        $sql = 'update db_academic.classroom set ID_CategoryRoom = 3 where Room like "%lab%"';
+    }
+
     // public function page_mahasiswa()
     // {
     //     $content = $this->load->view('page/academic'.'/master/students/students','',true);

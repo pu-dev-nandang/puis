@@ -931,7 +931,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $NIP = $this->session->userdata('NIP');
         // check Auth berdasarkan grouping user
             $add_where = '';
-            if ($this->session->userdata('ID_group_user') > 3) {
+            // if ( !in_array($cd_akses, array(1,2,3,4,10)) ) {
+            //      show_404($log_error = TRUE);
+            // }
+            if ($this->session->userdata('ID_group_user') == 4) {
                 $add_where = ' and a.CreatedBy = "'.$NIP.'"';
             }
 
@@ -945,6 +948,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         {
             $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP where a.Status like "%" '.$add_where.'
                      '.$Start.' order by a.Status asc,a.Start asc';
+            // print_r($sql);die();         
             $query=$this->db->query($sql, array())->result_array();           
         }
         
@@ -1044,6 +1048,90 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             }
             $Participant .= '</ul>';
 
+            $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','Room',$query[$i]['Room']);
+            // cek ApproveAccess
+            $Status1 = $query[$i]['Status1'];
+            $Status = $query[$i]['Status'];
+                $ApproveAccess = function($getRoom,$Status1,$Status){
+                    // get Category Room to approver
+                        $ApproveAccess = 0;
+                        $ID_group_user = $this->session->userdata('ID_group_user');
+                        $getPolicy = $this->m_master->caribasedprimary('db_reservation.cfg_policy','ID_group_user',$ID_group_user);
+                        $CategoryRoom = $getPolicy[0]['CategoryRoom'];
+                        $CategoryRoom = json_decode($CategoryRoom);
+                        $CategoryRoomByRoom = $getRoom[0]['ID_CategoryRoom'];
+                        $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
+                        // find access
+                            $find = 0;
+                                for ($l=0; $l < count($CategoryRoom); $l++) { 
+                                    if ($CategoryRoomByRoom == $CategoryRoom[$l]) {
+                                        $find++;    
+                                        break;
+                                    }
+                                }
+
+                                if ($find == 1) {
+                                    // get status 
+                                    if ($Status1 == 0) {
+                                       // find approver1
+                                           $Approver1 = $getDataCategoryRoom[0]['Approver1'];
+                                           $Approver1 = json_decode($Approver1);
+                                           $NIP = $this->session->userdata('NIP');
+                                           for ($l=0; $l < count($Approver1); $l++) { 
+                                               if ($NIP == $Approver1[$l]) {
+                                                   $find++;    
+                                                   break;
+                                               }
+                                           }
+                                    }
+                                    else
+                                    {
+                                        $find = $find + 2;  
+                                    }
+                                }
+
+                                if ($find == 3) {
+                                   // find approver2
+                                       $Approver2 = $getDataCategoryRoom[0]['Approver2'];
+                                       $Approver2 = json_decode($Approver2);
+                                       $DivisionID = $this->session->userdata('PositionMain');
+                                       $DivisionID = $DivisionID['IDDivision'];
+                                       if ($Status == 0) {
+                                            for ($l=0; $l < count($Approver2); $l++) { 
+                                                if ($DivisionID == $Approver2[$l]) {
+                                                    $find++;    
+                                                    break;
+                                                }
+                                            }
+                                       }
+                                       else
+                                       {
+                                        $find = $find + 2;
+                                       }
+                                       
+                                }
+                    $ApproveAccess = $find;
+                    return $ApproveAccess;            
+                };
+            $StatusBooking = '';
+            switch ($ApproveAccess($getRoom,$Status1,$Status)) {
+                case 0:
+                case 1:
+                case 2:
+                    $StatusBooking = 'Awaiting approval 1';
+                    break;
+                case 3:
+                case 4:
+                    $StatusBooking = 'Awaiting approval 2';
+                    break;
+                case 5:
+                    $StatusBooking = 'Approved';
+                    break;    
+                default:
+                    # code...
+                    break;
+            }
+                
             $arr_result[] = array(
                     'Start' => $StartNameDay.', '.$query[$i]['Start'],
                     'End' => $EndNameDay.', '.$query[$i]['End'],
@@ -1058,6 +1146,8 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     'Status' => $query[$i]['Status'],
                     'MarkomSupport' => $MarkomSupport,
                     'Participant' => $Participant,
+                    'ApproveAccess' => $ApproveAccess($getRoom,$Status1,$Status),
+                    'StatusBooking' => $StatusBooking,
             );
         }
 

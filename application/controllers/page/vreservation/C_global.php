@@ -144,14 +144,84 @@ class C_global extends Vreservation_Controler {
                     break;
                 case 'view':
                     $data = $input['dt'];
+                    $ID = $data[9];
+                    $get = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$ID);
+                    // cek ApproveAccess
+                        $ApproveAccess = function($getRoom,$get){
+                            // get Category Room to approver
+                                $ApproveAccess = 0;
+                                $ID_group_user = $this->session->userdata('ID_group_user');
+                                $getPolicy = $this->m_master->caribasedprimary('db_reservation.cfg_policy','ID_group_user',$ID_group_user);
+                                $CategoryRoom = $getPolicy[0]['CategoryRoom'];
+                                $CategoryRoom = json_decode($CategoryRoom);
+                                $CategoryRoomByRoom = $getRoom[0]['ID_CategoryRoom'];
+                                $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
+                                // find access
+                                    $find = 0;
+                                        for ($l=0; $l < count($CategoryRoom); $l++) { 
+                                            if ($CategoryRoomByRoom == $CategoryRoom[$l]) {
+                                                $find++;    
+                                                break;
+                                            }
+                                        }
+
+                                        if ($find == 1) {
+                                            // get status 
+                                            $Status1 = $get[0]['Status1'];
+                                            if ($Status1 == 0) {
+                                               // find approver1
+                                                   $Approver1 = $getDataCategoryRoom[0]['Approver1'];
+                                                   $Approver1 = json_decode($Approver1);
+                                                   $NIP = $this->session->userdata('NIP');
+                                                   for ($l=0; $l < count($Approver1); $l++) { 
+                                                       if ($NIP == $Approver1[$l]) {
+                                                           $find++;    
+                                                           break;
+                                                       }
+                                                   }
+                                            }
+                                            else
+                                            {
+                                                $find = $find + 2;  
+                                            }
+                                        }
+
+                                        if ($find == 3) {
+                                           // find approver2
+                                               $Approver2 = $getDataCategoryRoom[0]['Approver2'];
+                                               $Approver2 = json_decode($Approver2);
+                                               $DivisionID = $this->session->userdata('PositionMain');
+                                               $DivisionID = $DivisionID['IDDivision'];
+                                               $Status = $get[0]['Status'];
+                                               if ($Status == 0) {
+                                                   for ($l=0; $l < count($Approver2); $l++) { 
+                                                       if ($DivisionID == $Approver2[$l]) {
+                                                           $find++;    
+                                                           break;
+                                                       }
+                                                   }
+                                               }
+                                               {
+                                                $find = $find + 2;
+                                               }
+                                               
+                                        }
+                            $ApproveAccess = $find;
+                            return $ApproveAccess;            
+                        };
+
+                    $DivisionID = $this->session->userdata('PositionMain');
+                    $DivisionID = $DivisionID['IDDivision'];    
+                    $this->data['ApproveAccess'] = $ApproveAccess($getRoom,$get);
+                    $this->data['DivisionID'] = $DivisionID;
+
+
                     $Start = $data[1];
                     $End = $data[2];
                     $this->data['End'] = date("h:i a", strtotime($End));
                     $this->data['Start'] = date("h:i a", strtotime($Start));
                     $this->data['Agenda'] = $data[5];
                     $this->data['User'] = $data[0];
-                    $ID = $data[9];
-                    $get = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$ID);
                     $this->data['ParticipantQty'] = $get[0]['ParticipantQty'];
                     // get data Equipment Additional
                     $Name_equipment_add = '-';
