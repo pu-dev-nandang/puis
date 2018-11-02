@@ -623,40 +623,7 @@ class C_auth extends Globalclass {
 
 
         }
-        else if($table=='khs'){
-            $angkatan = 2014;
 
-            $db_lokal = 'ta_'.$angkatan;
-
-            $data = $this->db_server->query('SELECT hs.TahunID AS SemesterID, m.NPM, hs.SKSIPS AS SKS, hs.IPS, hs.IPK , hs.SKSIPK AS TotalSKS, j.MKID
-                                        FROM siak4.hasilstudi hs
-                                        LEFT JOIN siak4.mahasiswa m ON(hs.MhswID = m.ID)
-                                        LEFT JOIN siak4.rencanastudi r ON (r.MhswID = hs.MhswID)
-                                        LEFT JOIN siak4.jadwal j ON (r.JadwalID=j.ID)
-                                        WHERE m.TahunMasuk='.$angkatan)->result_array();
-
-            print_r($data);
-            exit;
-            $this->db->truncate($db_lokal.'.study_results');
-
-            for ($i=0;$i<count($data);$i++){
-
-                //Cek apakah apak ngulang
-                $cekulang = $this->db_server->query('SELECT ID FROM rencanastudi WHERE MhswID="'.$data[$i]['ID'].'" AND MKID="'.$data[$i]['MKID'].'" AND TahunID < 12');
-
-                $dataInsert = array(
-                    'NPM' => $data[$i]['NPM'],
-                    'SemesterID' => $data[$i]['SemesterID'],
-                    'CreditSemester' => $data[$i]['SKS'],
-                    'IPS' => $data[$i]['IPS'],
-                    'IPK' => $data[$i]['IPK'],
-                    'TotalSKS' => $data[$i]['TotalSKS']
-                );
-
-                $this->db->insert($db_lokal.'.study_results',$dataInsert);
-            }
-
-        }
         else if($table=='krs'){
 
             $max_execution_time = 360;

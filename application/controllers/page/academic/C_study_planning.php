@@ -15,6 +15,21 @@ class C_study_planning extends Academic_Controler {
         parent::template($content);
     }
 
+
+    public function menu_studyplan($page){
+        $department = parent::__getDepartement();
+        $data['page'] = $page;
+        $content = $this->load->view('page/'.$department.'/studyplanning/menu_studyplan',$data,true);
+        $this->temp($content);
+    }
+
+    public function liststudent(){
+        $department = parent::__getDepartement();
+        $data[''] = '';
+        $page = $this->load->view('page/'.$department.'/studyplanning/liststudent',$data,true);
+        $this->menu_studyplan($page);
+    }
+
     public function index()
     {
         $department = parent::__getDepartement();

@@ -77,6 +77,8 @@ $route['academic/timetables/setting-timetable'] = 'page/academic/c_timetables/se
 
 $route['academic/study-planning'] = 'page/academic/c_study_planning';
 
+$route['academic/study-planning/list-student'] = 'page/academic/c_study_planning/liststudent';
+
 $route['academic/references'] = 'page/academic/c_reference';
 
 
