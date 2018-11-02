@@ -3064,10 +3064,9 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($sp_right,$h,':',$border,0,'C');
         $pdf->Cell($fill_right,$h,ucwords(strtolower($Student['Prodi'])),$border,1,'L');
 
-        $e = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '%#d' : '%e';
         $pdf->Cell($l_left,$h,'Tempat dan Tanggal Lahir',$border,0,'L');
         $pdf->Cell($sp_left,$h,':',$border,0,'C');
-        $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['PlaceOfBirth'])).', '.strftime($e." %B %Y",strtotime($Student['DateOfBirth'])),$border,1,'L');
+        $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['PlaceOfBirth'])).', '.$this->getDateIndonesian($Student['DateOfBirth']),$border,1,'L');
 
         $pdf->Ln(2);
 
@@ -3241,8 +3240,8 @@ class C_save_to_pdf extends CI_Controller {
         $border = 0;
         $pdf->SetFont('dinprolight','',8);
         $pdf->Cell($w_smt+$w_no+$w_kode+$w_mk,$h,'',$border,0,'R');
-        $e = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '%#d' : '%e';
-        $dateT = ($lang=='ind') ? strftime($e." %B %Y",strtotime($dataTempTr['Date'])) : date('F j, Y',strtotime($dataTempTr['Date']));
+
+        $dateT = ($lang=='ind') ? $this->getDateIndonesian($dataTempTr['Date']) : date('F j, Y',strtotime($dataTempTr['Date']));
         $pdf->Cell((3*$w_f)+$w_fv,$h,ucwords(strtolower($dataTempTr['Place'])).', '.$dateT,$border,1,'L');
 
 
@@ -3821,7 +3820,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($label,$h,'Tanggal Yudisium',$border,0,'L');
         $pdf->Cell($sp,$h,':',$border,0,'C');
 //        $pdf->Cell($fill,$h,date('d/m/Y',strtotime($Ijazah['DateOfYudisium'])),$border,1,'L');
-        $pdf->Cell($fill,$h,strftime("%d %B %Y",strtotime($Ijazah['DateOfYudisium'])),$border,1,'L');
+        $pdf->Cell($fill,$h,$this->getDateIndonesian($Ijazah['DateOfYudisium']),$border,1,'L');
 
         $pdf->SetX($x);
         $pdf->SetFont('dinlightitalic','',$fn_i);
