@@ -86,7 +86,7 @@
 <!--            </li>-->
             <li class="<?php if($this->uri->segment(2)=='study-planning'){echo "current";} ?>">
                 <a href="<?php echo base_url('academic/study-planning'); ?>">
-                    <i class="fa fa-tasks"></i>
+                    <i class="fa fa-edit"></i>
                     Study Plan
                 </a>
             </li>
