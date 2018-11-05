@@ -958,95 +958,6 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $StartNameDay = $Startdatetime->format('l');
             $EndNameDay = $Enddatetime->format('l');
             $Time = $query[$i]['Time'].' Minutes';
-            $ID_equipment_add = '-';
-            $Name_equipment_add = '-';
-            if ($query[$i]['ID_equipment_add'] != '' || $query[$i]['ID_equipment_add'] != null) {
-                $ID_equipment_add = explode(',', $query[$i]['ID_equipment_add']);
-                $Name_equipment_add = '<ul style = "margin-left : -28px">';
-                $btnEquipment = '';
-                for ($j=0; $j < count($ID_equipment_add); $j++) {
-                    if ($this->session->userdata('ID_group_user') <= 3) {
-                        $btnEquipment = '<button class = "btn btn-danger btnEquipment btn-xs" ID_equipment_add = "'.$ID_equipment_add[$j].'" ><i class="fa fa-times"></i> </button>';
-                    }  
-                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add[$j]);
-                    $ID_m_equipment = $get[0]['ID_m_equipment'];
-                    $Owner = $get[0]['Owner'];
-                    $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$Owner);
-                    $Owner = $getX[0]['Division'];
-
-                    $Qty = $get[0]['Qty'];
-                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
-                    $Name_equipment_add .= '<li>'.$get[0]['Equipment'].' by '.$Owner.'['.$Qty.'] &nbsp'.$btnEquipment.'</li>';
-                }
-                $Name_equipment_add .= '</ul>';
-            }
-
-            $ID_add_personel = '-';
-            $Name_add_personel = '-';
-            // if ($query[$i]['ID_add_personel'] != '' || $query[$i]['ID_add_personel'] != null) {
-            //     $ID_add_personel = explode(',', $query[$i]['ID_add_personel']);
-            //     $Name_add_personel = '<ul>';
-            //     for ($j=0; $j < count($ID_add_personel); $j++) {
-            //         $get = $this->m_master->caribasedprimary('db_employees.division','ID',$ID_add_personel[$j]);
-            //         $Name_add_personel .= '<li>'.$get[0]['Division'].'</li>';
-            //     }
-
-            //     $Name_add_personel .= '</ul>';
-            // }
-
-            if ($query[$i]['ID_add_personel'] != '' || $query[$i]['ID_add_personel'] != null) {
-                $Name_add_personel = $query[$i]['ID_add_personel'];
-            }
-
-            $Reqdatetime = DateTime::createFromFormat('Y-m-d', $query[$i]['Req_date']);
-            $ReqdateNameDay = $Reqdatetime->format('l');
-
-            $MarkomSupport = '<label>No</Label>';
-            if ($query[$i]['MarcommSupport'] != '') {
-                $MarkomSupport = '<ul style = "margin-left : -28px">';
-                $dd = explode(',', $query[$i]['MarcommSupport']);
-                $btnMarkomSupport = '';
-                for ($zx=0; $zx < count($dd); $zx++) {
-                    $a = 'How are you?';
-                    if ($this->session->userdata('ID_group_user') <= 3) {
-                        $btnMarkomSupport = '<button class = "btn btn-danger btnMarkomSupport btn-xs" MarcommSupport = "'.$dd[$zx].'" ><i class="fa fa-times"></i> </button>';
-                    }  
-                    if (strpos($dd[$zx], 'Graphic Design') !== false) {
-                         $pos = strpos($dd[$zx],'[');
-                         $li = substr($dd[$zx], 0,$pos);
-                         $posE = strpos($dd[$zx],']');
-                         $ISIe = substr($dd[$zx], ($pos+1), $posE);
-                         $length = strlen($ISIe);
-                         $ISIe = substr($ISIe, 0, ($length - 1));
-                         // print_r($ISIe);die();
-                         $MarkomSupport .= '<li>'.$li.'&nbsp'.$btnMarkomSupport;
-                         $FileMarkom = explode(';', $ISIe);
-                         $MarkomSupport .= '<ul style = "margin-left : -28px">';
-                         for ($vc=0; $vc < count($FileMarkom); $vc++) { 
-                            $MarkomSupport .= '<li>'.'<a href="'.base_url("fileGetAny/vreservation-".$FileMarkom[$vc]).'" target="_blank"></i>'.$FileMarkom[$vc].'</a>';
-                         }
-                         $MarkomSupport .= '</ul></li>';
-                    } 
-                    else{
-                      $MarkomSupport .= '<li>'.$dd[$zx].'&nbsp'.$btnMarkomSupport.'</li>';  
-                    }
-                    
-                }
-                $MarkomSupport .= '</ul>';
-
-            }
-
-            $KetAdditional = $query[$i]['KetAdditional'];
-            $KetAdditional = json_decode($KetAdditional);
-            $Participant = '<ul><li>Participant Qty : '.$query[$i]['ParticipantQty'].'</li>';
-            if (count($KetAdditional) > 0) {
-                foreach ($KetAdditional as $key => $value) {
-                    if ($value != "" || $value != null) {
-                        $Participant .= '<li>'.$key.' : '.$value.'</li>';
-                    }
-                }
-            }
-            $Participant .= '</ul>';
 
             $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','Room',$query[$i]['Room']);
             // cek ApproveAccess
@@ -1113,24 +1024,136 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     $ApproveAccess = $find;
                     return $ApproveAccess;            
                 };
-            $StatusBooking = '';
-            switch ($ApproveAccess($getRoom,$Status1,$Status)) {
-                case 0:
-                case 1:
-                case 2:
-                    $StatusBooking = 'Awaiting approval 1';
-                    break;
-                case 3:
-                case 4:
-                    $StatusBooking = 'Awaiting approval 2';
-                    break;
-                case 5:
-                    $StatusBooking = 'Approved';
-                    break;    
-                default:
-                    # code...
-                    break;
+
+                $StatusBooking = '';
+                $CaseApproveAccess = $ApproveAccess($getRoom,$Status1,$Status);
+                switch ($CaseApproveAccess) {
+                    case 0:
+                    case 1:
+                    case 2:
+                        $StatusBooking = 'Awaiting approval 1';
+                        break;
+                    case 3:
+                    case 4:
+                        $StatusBooking = 'Awaiting approval 2';
+                        break;
+                    case 5:
+                        $StatusBooking = 'Approved';
+                        break;    
+                    default:
+                        # code...
+                        break;
+                }
+
+            $ID_equipment_add = '-';
+            $Name_equipment_add = '-';
+            if ($query[$i]['ID_equipment_add'] != '' || $query[$i]['ID_equipment_add'] != null) {
+                $ID_equipment_add = explode(',', $query[$i]['ID_equipment_add']);
+                $Name_equipment_add = '<ul style = "margin-left : -28px">';
+                $btnEquipment = '';
+                for ($j=0; $j < count($ID_equipment_add); $j++) {
+                    if ($this->session->userdata('ID_group_user') <= 3) {
+                        if ($this->session->userdata('ID_group_user') != 3) {
+                            $btnEquipment = '<button class = "btn btn-danger btnEquipment btn-xs" ID_equipment_add = "'.$ID_equipment_add[$j].'" ><i class="fa fa-times"></i> </button>';
+                        }
+                        else
+                        {
+                            if ($CaseApproveAccess == 2 || $CaseApproveAccess == 4) {
+                                $btnEquipment = '<button class = "btn btn-danger btnEquipment btn-xs" ID_equipment_add = "'.$ID_equipment_add[$j].'" ><i class="fa fa-times"></i> </button>';
+                            }
+                        }
+                        
+                    }
+                    else{
+                        if ($CaseApproveAccess == 2 || $CaseApproveAccess == 4) {
+                            $btnEquipment = '<button class = "btn btn-danger btnEquipment btn-xs" ID_equipment_add = "'.$ID_equipment_add[$j].'" ><i class="fa fa-times"></i> </button>';
+                        }
+                    }  
+                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add[$j]);
+                    $ID_m_equipment = $get[0]['ID_m_equipment'];
+                    $Owner = $get[0]['Owner'];
+                    $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$Owner);
+                    $Owner = $getX[0]['Division'];
+
+                    $Qty = $get[0]['Qty'];
+                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
+                    $Name_equipment_add .= '<li>'.$get[0]['Equipment'].' by '.$Owner.'['.$Qty.'] &nbsp'.$btnEquipment.'</li>';
+                }
+                $Name_equipment_add .= '</ul>';
             }
+
+            $ID_add_personel = '-';
+            $Name_add_personel = '-';
+
+            if ($query[$i]['ID_add_personel'] != '' || $query[$i]['ID_add_personel'] != null) {
+                $Name_add_personel = $query[$i]['ID_add_personel'];
+            }
+
+            $Reqdatetime = DateTime::createFromFormat('Y-m-d', $query[$i]['Req_date']);
+            $ReqdateNameDay = $Reqdatetime->format('l');
+
+            $MarkomSupport = '<label>No</Label>';
+            if ($query[$i]['MarcommSupport'] != '') {
+                $MarkomSupport = '<ul style = "margin-left : -28px">';
+                $dd = explode(',', $query[$i]['MarcommSupport']);
+                $btnMarkomSupport = '';
+                for ($zx=0; $zx < count($dd); $zx++) {
+                    $a = 'How are you?';
+                    if ($this->session->userdata('ID_group_user') <= 3) {
+                        if ($this->session->userdata('ID_group_user') != 3) {
+                            $btnMarkomSupport = '<button class = "btn btn-danger btnMarkomSupport btn-xs" MarcommSupport = "'.$dd[$zx].'" ><i class="fa fa-times"></i> </button>';
+                        }
+                        else
+                        {
+                            if ($CaseApproveAccess == 2 || $CaseApproveAccess == 4) {
+                                $btnMarkomSupport = '<button class = "btn btn-danger btnMarkomSupport btn-xs" MarcommSupport = "'.$dd[$zx].'" ><i class="fa fa-times"></i> </button>';
+                            }
+                        }
+                        
+                    }
+                    else
+                    {
+                        if ($CaseApproveAccess == 2 || $CaseApproveAccess == 4) {
+                            $btnMarkomSupport = '<button class = "btn btn-danger btnMarkomSupport btn-xs" MarcommSupport = "'.$dd[$zx].'" ><i class="fa fa-times"></i> </button>';
+                        }
+                    }
+
+                    if (strpos($dd[$zx], 'Graphic Design') !== false) {
+                         $pos = strpos($dd[$zx],'[');
+                         $li = substr($dd[$zx], 0,$pos);
+                         $posE = strpos($dd[$zx],']');
+                         $ISIe = substr($dd[$zx], ($pos+1), $posE);
+                         $length = strlen($ISIe);
+                         $ISIe = substr($ISIe, 0, ($length - 1));
+                         // print_r($ISIe);die();
+                         $MarkomSupport .= '<li>'.$li.'&nbsp'.$btnMarkomSupport;
+                         $FileMarkom = explode(';', $ISIe);
+                         $MarkomSupport .= '<ul style = "margin-left : -28px">';
+                         for ($vc=0; $vc < count($FileMarkom); $vc++) { 
+                            $MarkomSupport .= '<li>'.'<a href="'.base_url("fileGetAny/vreservation-".$FileMarkom[$vc]).'" target="_blank"></i>'.$FileMarkom[$vc].'</a>';
+                         }
+                         $MarkomSupport .= '</ul></li>';
+                    } 
+                    else{
+                      $MarkomSupport .= '<li>'.$dd[$zx].'&nbsp'.$btnMarkomSupport.'</li>';  
+                    }
+                    
+                }
+                $MarkomSupport .= '</ul>';
+
+            }
+
+            $KetAdditional = $query[$i]['KetAdditional'];
+            $KetAdditional = json_decode($KetAdditional);
+            $Participant = '<ul><li>Participant Qty : '.$query[$i]['ParticipantQty'].'</li>';
+            if (count($KetAdditional) > 0) {
+                foreach ($KetAdditional as $key => $value) {
+                    if ($value != "" || $value != null) {
+                        $Participant .= '<li>'.$key.' : '.$value.'</li>';
+                    }
+                }
+            }
+            $Participant .= '</ul>';
                 
             $arr_result[] = array(
                     'Start' => $StartNameDay.', '.$query[$i]['Start'],
@@ -1146,7 +1169,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     'Status' => $query[$i]['Status'],
                     'MarkomSupport' => $MarkomSupport,
                     'Participant' => $Participant,
-                    'ApproveAccess' => $ApproveAccess($getRoom,$Status1,$Status),
+                    'ApproveAccess' => $CaseApproveAccess,
                     'StatusBooking' => $StatusBooking,
             );
         }
