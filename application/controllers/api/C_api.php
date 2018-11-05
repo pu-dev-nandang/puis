@@ -5817,4 +5817,124 @@ class C_api extends CI_Controller {
         echo json_encode($json_data);
     }
 
+
+    public function getDataStudyPlanning(){
+        $requestData= $_REQUEST;
+        $data_arr = $this->getInputToken();
+
+        $w_year = ($data_arr['Year']!='') ? ' AND auts.Year = "'.$data_arr['Year'].'" ' : '' ;
+        $w_prodi = ($data_arr['ProdiID']!='') ? ' AND auts.ProdiID = "'.$data_arr['ProdiID'].'" ' : '' ;
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $wl = 'LIKE "%'.$search.'%"';
+            $dataSearch = ' AND (auts.NPM '.$wl.' 
+                                    OR auts.Name '.$wl.')';
+        }
+
+        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, em.Name AS MentorName, em.NIP AS MentorNIP 
+                                          FROM db_academic.auth_students auts 
+                                          LEFT JOIN db_academic.mentor_academic mac ON (mac.NPM = auts.NPM)
+                                          LEFT JOIN db_employees.employees em ON (em.NIP = mac.NIP)
+                                          WHERE ( auts.StatusStudentID = "3" '.$w_year.' '.$w_prodi.' ) '.$dataSearch.' 
+                                          ORDER BY NPM ASC';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+        for($i=0;$i<count($query);$i++) {
+            $nestedData = array();
+            $row = $query[$i];
+
+
+            // Credit
+            $dataCredit = $this->m_api->getMaxCredit('ta_'.$row['Year'],$row['NPM'],$data_arr['Year'],$data_arr['SemesterID'],$data_arr['ProdiID']);
+
+            // Get Course in std_krs
+            $dataCourse = $this->db->query('SELECT sk.Status, mk.NameEng AS CourseEng, cd.TotalSKS AS Credit FROM db_academic.std_krs sk 
+                                                            LEFT JOIN db_academic.schedule s ON (s.ID = sk.ScheduleID)
+                                                            LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                            LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                            LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                                            WHERE sk.NPM = "'.$row['NPM'].'" AND sk.SemesterID = "'.$data_arr['SemesterID'].'"
+                                                             GROUP BY sk.ScheduleID ORDER BY mk.MKCode ASC')
+                                    ->result_array();
+
+            $totalCreditSP = 0;
+            $course = '';
+            if(count($dataCourse)>0){
+                foreach ($dataCourse AS $item){
+
+                    $statusKRS = 'Student not yet sent';
+                    if($item['Status']=='1'){
+                        $statusKRS = 'Waiting approved by Mentor';
+                    } else if($item['Status']=='2'){
+                        $statusKRS = 'Waiting approved by Kaprodi';
+                    } else if($item['Status']=='3'){
+                        $statusKRS = 'Study Plan has been approved';
+                    } else if($item['Status']=='-2'){
+                        $statusKRS = 'Rejected by Mentor';
+                    } else if($item['Status']=='-3'){
+                        $statusKRS = 'Rejected by Kaprodi';
+                    }
+
+                    $course = $course.'<div><b>'.$item['CourseEng'].' ('.$item['Credit'].')</b> | Status : '.$statusKRS.'</div>';
+                    $totalCreditSP = $totalCreditSP + $item['Credit'];
+                }
+            }
+
+            // Get Payment
+            $datapayment = $this->m_api->getPayment($data_arr['SemesterID'],$row['NPM']);
+
+            $BPPPay_Status = '';
+            $CreditPay_Status = '';
+
+            if(count($datapayment)>0){
+                foreach ($datapayment AS $item){
+                    if($item['PTID']==2 || $item['PTID']=='2'){
+                        $BPPPay_Status = $item['Status'];
+                    } else if ($item['PTID']==3 || $item['PTID']=='3'){
+                        $CreditPay_Status = $item['Status'];
+                    }
+                }
+            }
+
+            $BPPPay = ($BPPPay_Status!='' && $BPPPay_Status!='0' && $BPPPay_Status!=0) ? '<i class="fa fa-check" style="color: green;"></i>' : '-';
+            $CreditPay = ($CreditPay_Status!='' && $CreditPay_Status!='0' && $CreditPay_Status!=0) ? '<i class="fa fa-check" style="color: green;"></i>' : '-';
+
+
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div  style="text-align:left;"><b>'.$row['Name'].'</b><br/>'
+                .$row['NPM'].'<br/><span style="color: #0b97c4;">Last IPS : '.number_format(round($dataCredit['LastIPS'],2),2).
+                ' | IPK : '.number_format(round($dataCredit['IPK'],2),2).'</span></div>';
+            $nestedData[] = '<div  style="text-align:left;">'.$row['MentorName'].'<br/>'.$row['MentorNIP'].'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$BPPPay.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$CreditPay.'</div>';
+            $nestedData[] = '<div  style="text-align:left;">'.$course.'</div>';
+            $nestedData[] = '<div  style="text-align:center;"><u style="color: #2196f3;">'.$totalCreditSP.'</u> of '.$dataCredit['MaxCredit']['Credit'].'</div>';
+            $nestedData[] = '<div  style="text-align:center;"><button class="btn btn-sm btn-default"><i class="fa fa-pencil"></i></button></div>';
+
+
+            $no++;
+            $data[] = $nestedData;
+
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+
+        echo json_encode($json_data);
+    }
+
 }

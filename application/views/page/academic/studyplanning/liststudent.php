@@ -1,25 +1,51 @@
 
+<style>
+    #tableListStd thead tr th {
+        text-align: center;
+        background-color: #436888;
+        color: #ffffff;
+    }
+    #tableListStd tbody tr td {
+        text-align: center;
+    }
+</style>
+
 <div class="row">
-    <div class="col-md-2">
-        <button class="btn btn-block btn-default btn-default-warning" id="btnLimitCredit" disabled>Set Limit Credit</button>
+    <div class="col-md-2 col-md-offset-1">
+        <div class="well">
+            <button class="btn btn-block btn-default btn-default-primary" id="btnLimitCredit" disabled>Set Limit Credit</button>
+        </div>
     </div>
-    <div class="col-md-10">
+    <div class="col-md-8">
         <div class="well">
             <div class="row">
-                <div class="col-md-3">
-                    <select class="form-control" id="filterProgramCampus"></select>
+                <div class="col-md-2">
+                    <select class="form-control filterSP" id="filterProgramCampus"></select>
                 </div>
                 <div class="col-md-3">
-                    <select class="form-control" id="filterSemester"></select>
+                    <select class="form-control filterSP" id="filterSemester"></select>
                 </div>
                 <div class="col-md-3">
-                    <select class="form-control" id="filterBaseProdi"></select>
+                    <select class="form-control filterSP" id="filterCurriculum">
+                        <option value="">--- All Curriculum ---</option>
+                        <option disabled>-----------------------------</option>
+                    </select>
                 </div>
-                <div class="col-md-3">
-                    <select class="form-control" id="filterSemesterSchedule"></select>
+                <div class="col-md-4">
+                    <select class="form-control filterSP" id="filterBaseProdi">
+                        <option value="">-- All Programme Study --</option>
+                        <option disabled>-----------------------------</option>
+                    </select>
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <hr/>
+        <div id="loadTable"></div>
     </div>
 </div>
 
@@ -31,38 +57,101 @@
 
         loadSelectOptionProgramCampus('#filterProgramCampus','');
         loSelectOptionSemester('#filterSemester','');
+        loadSelectOptionCurriculumNoSelect('#filterCurriculum','');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
 
         var loadFirst = setInterval(function () {
 
             var filterSemester = $('#filterSemester').val();
             if(filterSemester!='' && filterSemester!=null){
-                loadSemester();
+                getStudents();
                 $('#btnLimitCredit').attr('data-semesterid',filterSemester.split('.')[0]);
                 $('#btnLimitCredit').prop('disabled',false);
 
                 clearInterval(loadFirst);
-                var filterSemesterSchedule = $('#filterSemesterSchedule').val();
-                if(filterSemesterSchedule!='' && filterSemesterSchedule!=null){
-                    clearInterval(loadFirst);
-                    // getStudents();
-                }
+
             }
 
         },1000);
 
     });
 
-    function loadSemester() {
-        var Semester = $('#filterSemester').val();
-        if(Semester!='' && Semester!=null){
-            var SemesterID = (Semester!='' && Semester!= null) ? Semester.split('.')[0] : '';
-            $('#filterSemesterSchedule').empty();
-            loadSelectOPtionAllSemester('#filterSemesterSchedule','',SemesterID,SemesterAntara);
-        }
-    }
+    $(document).on('change','.filterSP',function () {
+        getStudents();
+    });
 
     function getStudents() {
+
+        var filterProgramCampus = $('#filterProgramCampus').val();
+        var filterSemester = $('#filterSemester').val();
+
+
+        if(filterProgramCampus!='' && filterProgramCampus!=null
+            && filterSemester!='' && filterSemester!=null){
+
+
+            $('#loadTable').html('<table class="table table-bordered table-striped" id="tableListStd">' +
+                '            <thead>' +
+                '            <tr>' +
+                '                <th rowspan="2" style="width: 3%;">No</th>' +
+                '                <th rowspan="2" style="width: 15%;">Students</th>' +
+                '                <th rowspan="2" style="width: 15%;">Mentor</th>' +
+                '                <th colspan="2">Payment</th>' +
+                '                <th rowspan="2">Course</th>' +
+                '                <th rowspan="2" style="width: 7%;">Credit</th>' +
+                '                <th rowspan="2" style="width: 5%;">Action</th>' +
+                '            </tr>' +
+                '            <tr>' +
+                '                <th style="width: 5%;">BPP</th>' +
+                '                <th style="width: 5%;">Credit</th>' +
+                '            </tr>' +
+                '            </thead>' +
+                '            <tbody></tbody>' +
+                '        </table>');
+
+            var filterBaseProdi = $('#filterBaseProdi').val();
+            var ProdiID = (filterBaseProdi!='' && filterBaseProdi!=null) ? filterBaseProdi.split('.')[0] : '';
+
+            var filterCurriculum = $('#filterCurriculum').val();
+            var Year = (filterCurriculum!='' && filterCurriculum!=null) ? filterCurriculum.split('.')[1] : '';
+
+            var exSemester = filterSemester.split('.');
+            var data = {
+                ProgramID : filterProgramCampus,
+                SemesterID : exSemester[0],
+                Year : Year,
+                ProdiID : ProdiID
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__getDataStudyPlanning';
+
+            var dataTable = $('#tableListStd').DataTable( {
+                "processing": true,
+                "serverSide": true,
+                "iDisplayLength" : 10,
+                "ordering" : false,
+                "language": {
+                    "searchPlaceholder": "NIM , Name Student"
+                },
+                "ajax":{
+                    url : url, // json datasource
+                    data : {token:token},
+                    ordering : false,
+                    type: "post",  // method  , by default get
+                    error: function(){  // error handling
+                        $(".employee-grid-error").html("");
+                        $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                        $("#employee-grid_processing").css("display","none");
+                    }
+                }
+            } );
+        }
+
+
+    }
+
+    function getStudents2() {
 
         var ProgramID = $('#filterProgramCampus').val();
         // var ProdiID = $('#filterBaseProdi').val().split('.')[0];
