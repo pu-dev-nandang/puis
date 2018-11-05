@@ -173,6 +173,7 @@
                                    <option value="" selected>--No Selected--</option>
                                    <option value="Internal" >Internal</option>
                                    <option value="Eksternal">Eksternal</option>
+                                   <option value="Internal + Eksternal">Internal + Eksternal</option>
                                </select>
                            </div>
                        </div>

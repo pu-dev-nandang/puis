@@ -498,9 +498,9 @@ class C_transaksi extends Vreservation_Controler {
         if ($chk) {
             $dataSave = $arr_status;
             $dataSave = $dataSave + $arr_add;
-            // print_r($dataSave);die();
             $this->db->where('ID',$ID);
             $this->db->update('db_reservation.t_booking', $dataSave);
+
             // send email approve to user
             $getUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$get[0]['CreatedBy']);
             $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['Start']);
@@ -508,19 +508,45 @@ class C_transaksi extends Vreservation_Controler {
             $StartNameDay = $Startdatetime->format('l');
             $EndNameDay = $Enddatetime->format('l');
 
-            $Email = $getUser[0]['EmailPU'];
-            $text = 'Dear Mr/Mrs '.$getUser[0]['Name'].',<br><br>
-                        Your Venue Reservation approved by '.$this->session->userdata('Name').$ApprovalWr.',<br><br>
-                        Details Schedule : <br><ul>
-                        <li>Start  : '.$StartNameDay.', '.$get[0]['Start'].'</li>
-                        <li>End  : '.$EndNameDay.', '.$get[0]['End'].'</li>
-                        <li>Room  : '.$get[0]['Room'].'</li>
-                        </ul>
-                        '.$EmailAdd.$EmailKetAdditional.'
-                    ';        
-            $to = $Email;
-            $subject = "Podomoro University Venue Reservation Approved";
-            $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+            if ($approveaccess == 4) {
+                // send by Ical
+                $Email = $getUser[0]['EmailPU'];
+                $text = 'Dear Mr/Mrs '.$getUser[0]['Name'].',<br><br>
+                            Your Venue Reservation approved by '.$this->session->userdata('Name').$ApprovalWr.',<br><br>
+                            Details Schedule : <br><ul>
+                            <li>Start  : '.$StartNameDay.', '.$get[0]['Start'].'</li>
+                            <li>End  : '.$EndNameDay.', '.$get[0]['End'].'</li>
+                            <li>Room  : '.$get[0]['Room'].'</li>
+                            </ul>
+                            '.$EmailAdd.$EmailKetAdditional.'
+                        ';        
+                $to = $Email;
+                $subject = "Podomoro University Venue Reservation Approved";
+                $place  = $get[0]['Room'];
+                $StartIcal = date("Ymd", strtotime($get[0]['Start']));
+                $StartTimeIcal = date("His", strtotime($get[0]['Start']));
+                $EndIcal = date("Ymd", strtotime($get[0]['End']));
+                $EndTimeIcal = date("His", strtotime($get[0]['End']));
+                // print_r($EndTimeIcal);die();
+                $sendEmail = $this->m_sendemail->sendEmailIcal($to,$subject,$text, $place,$StartIcal,$StartTimeIcal,$EndIcal,$EndTimeIcal);
+            }
+            else
+            {
+                $Email = $getUser[0]['EmailPU'];
+                $text = 'Dear Mr/Mrs '.$getUser[0]['Name'].',<br><br>
+                            Your Venue Reservation approved by '.$this->session->userdata('Name').$ApprovalWr.',<br><br>
+                            Details Schedule : <br><ul>
+                            <li>Start  : '.$StartNameDay.', '.$get[0]['Start'].'</li>
+                            <li>End  : '.$EndNameDay.', '.$get[0]['End'].'</li>
+                            <li>Room  : '.$get[0]['Room'].'</li>
+                            </ul>
+                            '.$EmailAdd.$EmailKetAdditional.'
+                        ';        
+                $to = $Email;
+                $subject = "Podomoro University Venue Reservation Approved";
+                $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+            }
+            
 
             if ($approveaccess == 2) {
                 if($_SERVER['SERVER_NAME']!='localhost') {

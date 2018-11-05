@@ -1,5 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 class M_sendemail extends CI_Model {
 
@@ -275,6 +277,137 @@ class M_sendemail extends CI_Model {
 
         return $result;
 
+    }
+
+    public function sendEmailIcal($to = null,$subject = null,$text = null, $place,$Start,$StartTime,$End,$EndTime,$attach = null,$title = null,$smtp_host = null,$smtp_port = null,$smtp_user = null,$smtp_pass = null)
+    {
+
+        // $Start = date("Y-m-d H:i:s", strtotime($input['date'].$input['Start']));
+
+        $arr = array(
+            'status' => 1,
+            'msg'=>''
+        );
+        // $this->VariableClass['smtp_host'] = $smtp_host;
+        // $this->VariableClass['smtp_port'] = $smtp_port;
+        // $this->VariableClass['smtp_user'] = $smtp_user;
+        // $this->VariableClass['smtp_pass'] = $smtp_pass;
+        $this->VariableClass['text'] = $text;
+
+        $config_email = $this->loadEmailConfig();
+        $textEmail = $this->textEmail($this->VariableClass['text'],$title);
+        
+        //Load Composer's autoloader
+        include_once APPPATH.'vendor/autoload.php';
+
+        $mail = new PHPMailer(true);     
+        $event_id = 1234;
+        $sequence = 0;
+        $status = 'TENTATIVE';
+        // event params
+        $BilingID = mt_rand();// unique number
+        $subject = $subject.' '.$BilingID;
+        $summary = $subject;
+        $venue = $place;
+        $start = $Start; // 20181105
+        $start_time = $StartTime; // 143530
+        $end = $End; // 20181105
+        $end_time = $EndTime; // 150630
+
+        $mail->SMTPDebug = 0;                                 // Enable verbose debug output
+        $mail->isSMTP();                                      // Set mailer to use SMTP
+        $mail->Host = 'ssl://smtp.gmail.com';  // Specify main and backup SMTP servers
+        $mail->SMTPAuth = true;                               // Enable SMTP authentication
+        $mail->Username = 'ithelpdesk.notif@podomorouniversity.ac.id';                 // SMTP username
+        $mail->Password = '4dm1n5!S';                           // SMTP password
+        $mail->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
+        $mail->Port = 465;
+        $mail->IsHTML(true);
+        $mail->msgHTML($textEmail);    
+
+        // $mail->SMTPDebug = 0;                                 // Enable verbose debug output
+        // $mail->isSMTP();                                      // Set mailer to use SMTP
+        // $mail->Host = $this->VariableClass['smtp_host'];  // Specify main and backup SMTP servers
+        // $mail->SMTPAuth = true;                               // Enable SMTP authentication
+        // $mail->Username = $this->VariableClass['smtp_user'];                 // SMTP username
+        // $mail->Password = $this->VariableClass['smtp_pass'];                           // SMTP password
+        // $mail->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
+        // $mail->Port = $this->VariableClass['smtp_port'];    
+        // $mail->IsHTML(false);
+
+        $mail->setFrom('ithelpdesk.notif@podomorouniversity.ac.id', 'IT');
+        // $mail->addReplyTo('alhadi.rahman@podomorouniversity.ac.id', 'IT');
+        $to = explode(',', $to);
+        $EmailToArr = array();
+        for ($i=0; $i < count($to); $i++) { 
+            $mail->addAddress($to[$i],'User '.$i);
+            $EmailToArr[] = $to[$i];
+        }
+       
+        $EmailTo = implode(',', $EmailToArr);
+        $mail->ContentType = 'text/calendar';
+
+        $mail->Subject = $subject ;
+        // $mail->addCustomHeader('MIME-version',"1.0");
+        // $mail->addCustomHeader('Content-type',"text/calendar; method=REQUEST; charset=UTF-8");
+        // $mail->addCustomHeader('Content-Transfer-Encoding',"7bit");
+        // $mail->addCustomHeader('X-Mailer',"Microsoft Office Outlook 12.0");
+        // $mail->addCustomHeader("Content-class: urn:content-classes:calendarmessage");
+
+        $ical = "BEGIN:VCALENDAR\r\n";
+        $ical .= "VERSION:2.0\r\n";
+        $ical .= "PRODID:-//YourCassavaLtd//EateriesDept//EN\r\n";
+        $ical .= "METHOD:REQUEST\r\n";
+        $ical .= "BEGIN:VEVENT\r\n";
+        $ical .= "ORGANIZER;SENT-BY=\"MAILTO:it@podomorouniversity.ac.id\":MAILTO:it@podomorouniversity.ac.id\r\n";
+        $ical .= "ATTENDEE;CN=".$EmailTo.";ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE:mailto:".$EmailTo."\r\n";
+        $ical .= "UID:".strtoupper(md5($event_id))."-podomorouniversity.ac.id\r\n";
+        $ical .= "SEQUENCE:".$sequence."\r\n";
+        $ical .= "STATUS:".$status."\r\n";
+        $ical .= "DTSTAMPTZID=Asia/Jakarta:".date('Y-m-d').'T'.date('H:i:s')."\r\n";
+        $ical .= "DTSTART:".$start."T".$start_time."\r\n";
+        $ical .= "DTEND:".$end."T".$end_time."\r\n";
+        $ical .= "LOCATION:".$venue."\r\n";
+        $ical .= "SUMMARY:".$summary."\r\n";
+        // $ical .= "DESCRIPTION:".$textEmail."\r\n"; 
+        $ical .= "X-ALT-DESC;FMTTYPE=text/html:".$textEmail."\r\n"; 
+        $ical .= "BEGIN:VALARM\r\n";
+        $ical .= "TRIGGER:-PT15M\r\n";
+        $ical .= "ACTION:DISPLAY\r\n";
+        $ical .= "DESCRIPTION:Reminder\r\n";
+        $ical .= "END:VALARM\r\n";
+        $ical .= "END:VEVENT\r\n";
+        $ical .= "END:VCALENDAR\r\n";
+        // print_r($ical);die();
+        // $mail->Body = $ical;
+        $mail->addStringAttachment($ical,'ical.ics','base64','text/calendar');
+        //send the message, check for errors
+        if(!$mail->send()) {
+            $arr['status'] = 0;
+            $arr['msg'] = "Email error : ".$mail->ErrorInfo;
+            // $this->error = "Mailer Error: " . $mail->ErrorInfo;
+            // return false;
+        } else {
+            $arr['status'] = 1;
+            $arr['msg'] = "Email Send";
+            // $this->error = "Message sent!";
+            // return true;
+        }
+
+    }
+
+    public function abc($htmlMsg)
+    {
+        $temp = str_replace(array("\r\n"),"\n",$htmlMsg);
+        $lines = explode("\n",$temp);
+        $new_lines =array();
+        foreach($lines as $i => $line)
+        {
+            if(!empty($line))
+            $new_lines[]=trim($line);
+        }
+        $desc = implode("\r\n ",$new_lines);
+        return $desc;
     }
 
 
