@@ -3486,7 +3486,7 @@ class C_save_to_pdf extends CI_Controller {
         } else if(strlen($Result['IPK'])==3){
             $IPKFinal = $Result['IPK'].'0';
         }
-        
+
         $h=3;
         $pdf->SetFont('dinpromedium','',$font_medium);
         $pdf->Cell($w_R_label,$h,' Indeks Prestasi Kumulatif','L',0,'L');
