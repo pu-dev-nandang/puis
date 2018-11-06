@@ -47,6 +47,10 @@
 
     });
 
+    $(document).on('change','.filter-transcript',function () {
+        loadDataStudent();
+    });
+
     function loadDataStudent() {
         var filterCurriculum = $('#filterCurriculum').val();
         var filterBaseProdi = $('#filterBaseProdi').val();

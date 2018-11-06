@@ -141,7 +141,6 @@
 
         var Prodi = $(this).val();
         if(Prodi!=''){
-
             var ProdiID = Prodi.split('.')[0];
             getCourseOfferings(ProdiID,'');
         }
@@ -256,13 +255,14 @@
 
         $.post(url,{token:token},function (jsonResult) {
 
+            console.log(jsonResult);
 
            if(jsonResult.ScheduleDetails.length>0){
                $('#dataRow').empty();
                for(var i=0;i<jsonResult.ScheduleDetails.length;i++){
                    var d = jsonResult.ScheduleDetails[i]
                    $('#dataRow').append('<tr>' +
-                       '<td style="text-align: left;"><b>'+d.MKNameEng+'</b><br/><i>'+d.MKNameEng+'</i></td>' +
+                       '<td style="text-align: left;"><b>'+d.MKCode+' - '+d.MKNameEng+'</b><br/><i>'+d.MKNameEng+'</i></td>' +
                        '<td style="text-align: left;">'+d.Prodi+'</td>' +
                        '<td>'+d.Semester+'</td>' +
                        '<td style="background: lightyellow;">'+d.Offerto+'</td>' +
@@ -270,7 +270,6 @@
                        '<td>'+d.TotalStd_Approve.length+'</td>' +
                        '<td><button class="btn btn-sm btn-default btn-default-danger btnDelEditCourse" data-totalcourse="'+jsonResult.ScheduleDetails.length+'" data-sdc="'+d.SDCID+'"><i class="fa fa-trash"></i></button></td>' +
                        '</tr>');
-
                }
            }
 
@@ -374,16 +373,13 @@
             $.post(url,{token:token},function (jsonResult) {
 
                 $('#formClassGroup').css('border','1px solid #ccc');
-
                 setTimeout(function () {
-
                     if(jsonResult.Status==0 || jsonResult.Status=='0'){
                         toastr.warning('Class Group is exist','Warning');
                         $('#formClassGroup').css('border','1px solid red');
                     } else {
                         toastr.success('Update data saved','Success');
                     }
-
                     $('#btnSaveEditInfo').prop('disabled',false).html('Save');
                 },500);
             });

@@ -10,7 +10,7 @@
                 <div class="col-xs-2">
                     <select class="form-control option-filter" id="filterSemester"></select>
                 </div>
-                <div class="col-xs-3">
+                <div class="col-xs-4">
                     <select class="form-control option-filter" id="filterBaseProdi">
                         <option value="">-- All Programme Study --</option>
                         <option disabled>------------------------------------------</option>
@@ -28,9 +28,6 @@
                         <option value="">-- Show All Day --</option>
                         <option disabled>-------------------</option>
                     </select>
-                </div>
-                <div class="col-xs-1">
-                    <button class="btn btn-block btn-default"><i class="fa fa-download"></i></button>
                 </div>
             </div>
 
@@ -176,8 +173,8 @@
                 '        <h4 class=""><span class="" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;">Mo</span></h4>' +
                 '       <div class="toolbar no-padding">' +
                 '           <div class="btn-group">' +
-                '               <a href="'+base_url_js+'save2pdf/schedule-pdf?token=" target="_blank"><span class="btn btn-xs" id="btn_addmk">' +
-                '                   <i class="icon-download"></i> Download PDF' +
+                '               <a href="javacript:void(0);" id="btnDownloadLecturerAttendance"><span class="btn btn-xs" id="btn_addmk">' +
+                '                   <i class="fa fa-download margin-right"></i> Lecturer Attendance' +
                 '               </span></a>' +
                 '           </div>' +
                 '       </div>' +
@@ -240,4 +237,44 @@
 
         }
     }
+
+
+    $(document).on('click','#btnDownloadLecturerAttendance',function () {
+        $('#NotificationModal .modal-body').html('<div style="text-align: center;">' +
+            '<div class="row"><div class="col-xs-4">Select day : </div><div class="col-xs-8"> <select class="form-control" id="selectdayToPDF"></select></div></div>' +
+            '<div class="row"><div class="col-xs-12">' +
+            '<hr/>' +
+            '<button type="button" class="btn btn-success" id="btnSaveToPDF" style="margin-right: 5px;">Save PDF</button> | ' +
+            '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
+            '</div>' +
+            '</div>' +
+            '</div>');
+        $('#NotificationModal').modal({
+            'backdrop' : 'static',
+            'show' : true
+        });
+
+        fillDays('#selectdayToPDF','Eng','');
+    });
+
+    $(document).on('click','#btnSaveToPDF',function () {
+        var filterSemester = $('#filterSemester').val();
+        var selectdayToPDF = $('#selectdayToPDF').val();
+
+        if(filterSemester!='' && filterSemester!=null &&
+            selectdayToPDF!='' && selectdayToPDF!=null){
+
+            var url = base_url_js+'save2pdf/schedule-pdf';
+            var data = {
+                SemesterID : filterSemester.split('.')[0],
+                DayID : selectdayToPDF
+            };
+            var token = jwt_encode(data,"UAP)(*");
+            FormSubmitAuto(url, 'POST', [
+                { name: 'token', value: token },
+            ]);
+
+        }
+
+    });
 </script>

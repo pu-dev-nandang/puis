@@ -77,6 +77,8 @@ $route['academic/timetables/setting-timetable'] = 'page/academic/c_timetables/se
 
 $route['academic/study-planning'] = 'page/academic/c_study_planning';
 
+$route['academic/study-planning/list-student'] = 'page/academic/c_study_planning/liststudent';
+
 $route['academic/references'] = 'page/academic/c_reference';
 
 
@@ -803,6 +805,9 @@ $route['api/__getTranscript'] = 'api/c_api/getTranscript';
 
 $route['api/__crudFinalProject'] = 'api/c_api/crudFinalProject';
 $route['api/__getFinalProject'] = 'api/c_api/getFinalProject';
+
+// ==== Study Planning ===
+$route['api/__getDataStudyPlanning'] = 'api/c_api/getDataStudyPlanning';
 
 $route['api/__crudInvigilator'] = 'api/c_api/crudInvigilator';
 

@@ -196,7 +196,8 @@
             }
 
             $('#dataUseCredit').val(dataUseCredit);
-            $('#formCredit').val(sisaCredit);
+            $('#formCredit').val(maxCredit);
+            // $('#formCredit').val(sisaCredit);
             var sv = (sisaCredit==0) ? true : false;
             $('#btnAddSchedule').prop('disabled',sv)
             $('#formSDID,#formClassroom,#formDay,#formTimePerCredit').val('');
@@ -225,7 +226,7 @@
         $.post(url,{token:token},function (jsonResult) {
 
             var course = jsonResult.Schedule[0];
-            $('#viewCourse').html(course.CourseEng+' | <small>Max credit : '+course.TotalCredit+'</small>');
+            $('#viewCourse').html(course.CourseEng+' | <small>Credit : '+course.TotalCredit+'</small>');
             // $('#formCredit').val(course.TotalCredit);
             $('#dataMaxCredit').val(course.TotalCredit);
         });
@@ -284,7 +285,7 @@
 
 
         var newCredit = dataUseCredit + formCredit;
-        if(newCredit <= maxCredit){
+        if(formCredit <= maxCredit){
             loading_buttonSm('#btnAddSchedule');
 
             var data = {

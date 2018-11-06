@@ -269,7 +269,7 @@
             '                <thead>' +
             '                <tr style="background: #438882;color: #fff;">' +
             '                    <th>User</th>' +
-            '                    <th style="width: 5%;">Action</th>' +
+            '                    <th style="width: 25%;">Status</th>' +
             '                    <th style="width: 5%;">Portal</th>' +
             '                </tr>' +
             '                </thead>' +
@@ -309,18 +309,18 @@
 
                         var btnLoginPortal = '-';
                         if(d.Flag=='std'){
-                            btnLoginPortal = '<button class="btn btn-block btn-primary btnLoginPortalStudents" data-npm="'+d.Username+'"><i class="fa fa-sign-in right-margin"></i> Login Portal</button>';
+                            btnLoginPortal = '<button class="btn btn-block btn-primary btnLoginPortalStudents" data-npm="'+d.Username+'"><i class="fa fa-sign-in right-margin"></i> Portal</button>';
                         } else {
                             bg = '#ffeb3b3b';
 
                             if($.inArray('14.7',d.Position)!=-1 || $.inArray('14.6',d.Position)!=-1 || $.inArray('14.5',d.Position)!=-1){
-                                btnLoginPortal = '<button class="btn btn-block btn-success btnLoginPortal" data-nip="'+d.Username+'" data-password="'+d.Token+'"><i class="fa fa-sign-in right-margin"></i> Login Portal</button>';
+                                btnLoginPortal = '<button class="btn btn-block btn-success btnLoginPortal" data-nip="'+d.Username+'" data-password="'+d.Token+'"><i class="fa fa-sign-in right-margin"></i> Portal</button>';
                             }
                         }
 
                         $('#trDataUser').append('<tr style="background: '+bg+';">' +
                             '<td style="text-align: left;"><b>'+d.Name+'</b><br/><span>'+d.Username+'</span></td>' +
-                            '<td></td>' +
+                            '<td>'+d.Status+'</td>' +
                             '<td>'+btnLoginPortal+'</td>' +
                             '</tr>');
                     }

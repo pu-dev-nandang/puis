@@ -23,14 +23,26 @@ class C_save_to_pdf extends CI_Controller {
         return $data_arr;
     }
 
+    public function getDateIndonesian($date){
+        $e = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '%#d' : '%e';
+        $data = strftime($e." %B %Y",strtotime($date));
+
+        $result = str_replace('Pebruari', 'Februari', $data);
+
+        return $result;
+
+    }
+
     // ==== PDF Schedule ====
     public function schedulePDF(){
 
         $token = $this->input->get('token');
+
+        if(!isset($token)){
+            $token = $this->input->post('token');
+        }
+
         $data_arr = $this->getInputToken($token);
-
-
-
 
         $pdf = new FPDF('l','mm','A4');
 
@@ -54,7 +66,6 @@ class C_save_to_pdf extends CI_Controller {
                 for($m=0;$m<count($dataCourse);$m++){
 
                     $d_course = $dataCourse[$m];
-
 
                     $w = (count($d_course['detailTeamTeaching'])>0) ? (count($d_course['detailTeamTeaching'])+1) * $deft_w : $deft_w;
 
@@ -350,7 +361,6 @@ class C_save_to_pdf extends CI_Controller {
 
     public function monitoringStudent(){
 
-//        $token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJDb3Vyc2UiOlt7Ik5hbWVFbmciOiJBcmNoaXRlY3R1cmUgRGVzaWduIFN0dWRpbyA1IiwiTUtDb2RlIjoiQVJDMzExNSIsIk1LSUQiOiIxOTEiLCJDbGFzc0dyb3VwIjoiQVJDMTAiLCJTZW1lc3RlciI6IjIwMTgvMjAxOSBHYW5qaWwiLCJMZWN0dXJlciI6Illhc2VyaSBEYWhsaWEgQXByaXRhc2FyaSJ9XSwiU3R1ZGVudCI6W3siTlBNIjoiMjExNDAwMTAiLCJOYW1lIjoiS0VMVklOIFBBVUxVUyIsIkF0dGVuZGFuY2UiOlt7Ik0xIjoiMSIsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6Ik1vbmRheSJ9LHsiTTEiOm51bGwsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6IldlZG5lc2RheSJ9LHsiTTEiOiIyIiwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiRnJpZGF5In1dLCJUYXJnZXQiOjQyLCJUb3RhbF9BdHRkIjoxLCJQZXJjZW50IjoiMiAlIn0seyJOUE0iOiIyMTE1MDAxNiIsIk5hbWUiOiJBTEVTU0FORFJPIiwiQXR0ZW5kYW5jZSI6W3siTTEiOiIxIiwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiTW9uZGF5In0seyJNMSI6bnVsbCwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiV2VkbmVzZGF5In0seyJNMSI6IjEiLCJNMiI6bnVsbCwiTTMiOm51bGwsIk00IjpudWxsLCJNNSI6bnVsbCwiTTYiOm51bGwsIk03IjpudWxsLCJNOCI6bnVsbCwiTTkiOm51bGwsIk0xMCI6bnVsbCwiTTExIjpudWxsLCJNMTIiOm51bGwsIk0xMyI6bnVsbCwiTTE0IjpudWxsLCJEYXlFbmciOiJGcmlkYXkifV0sIlRhcmdldCI6NDIsIlRvdGFsX0F0dGQiOjIsIlBlcmNlbnQiOiI1ICUifSx7Ik5QTSI6IjIxMTUwMDMwIiwiTmFtZSI6IkpVU1RZTkUiLCJBdHRlbmRhbmNlIjpbeyJNMSI6IjEiLCJNMiI6bnVsbCwiTTMiOm51bGwsIk00IjpudWxsLCJNNSI6bnVsbCwiTTYiOm51bGwsIk03IjpudWxsLCJNOCI6bnVsbCwiTTkiOm51bGwsIk0xMCI6bnVsbCwiTTExIjpudWxsLCJNMTIiOm51bGwsIk0xMyI6bnVsbCwiTTE0IjpudWxsLCJEYXlFbmciOiJNb25kYXkifSx7Ik0xIjpudWxsLCJNMiI6bnVsbCwiTTMiOm51bGwsIk00IjpudWxsLCJNNSI6bnVsbCwiTTYiOm51bGwsIk03IjpudWxsLCJNOCI6bnVsbCwiTTkiOm51bGwsIk0xMCI6bnVsbCwiTTExIjpudWxsLCJNMTIiOm51bGwsIk0xMyI6bnVsbCwiTTE0IjpudWxsLCJEYXlFbmciOiJXZWRuZXNkYXkifSx7Ik0xIjoiMSIsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6IkZyaWRheSJ9XSwiVGFyZ2V0Ijo0MiwiVG90YWxfQXR0ZCI6MiwiUGVyY2VudCI6IjUgJSJ9LHsiTlBNIjoiMjExNTAwMzIiLCJOYW1lIjoiQ0FUSExFRU4gQ0hBUklUWSBDSEFORFJBIiwiQXR0ZW5kYW5jZSI6W3siTTEiOiIxIiwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiTW9uZGF5In0seyJNMSI6bnVsbCwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiV2VkbmVzZGF5In0seyJNMSI6IjIiLCJNMiI6bnVsbCwiTTMiOm51bGwsIk00IjpudWxsLCJNNSI6bnVsbCwiTTYiOm51bGwsIk03IjpudWxsLCJNOCI6bnVsbCwiTTkiOm51bGwsIk0xMCI6bnVsbCwiTTExIjpudWxsLCJNMTIiOm51bGwsIk0xMyI6bnVsbCwiTTE0IjpudWxsLCJEYXlFbmciOiJGcmlkYXkifV0sIlRhcmdldCI6NDIsIlRvdGFsX0F0dGQiOjEsIlBlcmNlbnQiOiIyICUifSx7Ik5QTSI6IjIxMTUwMDQyIiwiTmFtZSI6IlNPUEhJQSBTQU1CQVJBIiwiQXR0ZW5kYW5jZSI6W3siTTEiOiIyIiwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiTW9uZGF5In0seyJNMSI6bnVsbCwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiV2VkbmVzZGF5In0seyJNMSI6IjEiLCJNMiI6bnVsbCwiTTMiOm51bGwsIk00IjpudWxsLCJNNSI6bnVsbCwiTTYiOm51bGwsIk03IjpudWxsLCJNOCI6bnVsbCwiTTkiOm51bGwsIk0xMCI6bnVsbCwiTTExIjpudWxsLCJNMTIiOm51bGwsIk0xMyI6bnVsbCwiTTE0IjpudWxsLCJEYXlFbmciOiJGcmlkYXkifV0sIlRhcmdldCI6NDIsIlRvdGFsX0F0dGQiOjEsIlBlcmNlbnQiOiIyICUifSx7Ik5QTSI6IjIxMTYwMDAxIiwiTmFtZSI6Ik9MSVZFUiBLRU5OWSIsIkF0dGVuZGFuY2UiOlt7Ik0xIjoiMSIsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6Ik1vbmRheSJ9LHsiTTEiOm51bGwsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6IldlZG5lc2RheSJ9LHsiTTEiOiIyIiwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiRnJpZGF5In1dLCJUYXJnZXQiOjQyLCJUb3RhbF9BdHRkIjoxLCJQZXJjZW50IjoiMiAlIn0seyJOUE0iOiIyMTE2MDAwMiIsIk5hbWUiOiJWQVJSRU4gQU5BU1RBU0lBIiwiQXR0ZW5kYW5jZSI6W3siTTEiOiIxIiwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiTW9uZGF5In0seyJNMSI6bnVsbCwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiV2VkbmVzZGF5In0seyJNMSI6IjEiLCJNMiI6bnVsbCwiTTMiOm51bGwsIk00IjpudWxsLCJNNSI6bnVsbCwiTTYiOm51bGwsIk03IjpudWxsLCJNOCI6bnVsbCwiTTkiOm51bGwsIk0xMCI6bnVsbCwiTTExIjpudWxsLCJNMTIiOm51bGwsIk0xMyI6bnVsbCwiTTE0IjpudWxsLCJEYXlFbmciOiJGcmlkYXkifV0sIlRhcmdldCI6NDIsIlRvdGFsX0F0dGQiOjIsIlBlcmNlbnQiOiI1ICUifSx7Ik5QTSI6IjIxMTYwMDAzIiwiTmFtZSI6Ik1FTElTQSIsIkF0dGVuZGFuY2UiOlt7Ik0xIjoiMSIsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6Ik1vbmRheSJ9LHsiTTEiOm51bGwsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6IldlZG5lc2RheSJ9LHsiTTEiOiIxIiwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiRnJpZGF5In1dLCJUYXJnZXQiOjQyLCJUb3RhbF9BdHRkIjoyLCJQZXJjZW50IjoiNSAlIn0seyJOUE0iOiIyMTE2MDAwNiIsIk5hbWUiOiJBTEVYQU5ERVIgQk9ORyIsIkF0dGVuZGFuY2UiOlt7Ik0xIjoiMSIsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6Ik1vbmRheSJ9LHsiTTEiOm51bGwsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6IldlZG5lc2RheSJ9LHsiTTEiOiIxIiwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiRnJpZGF5In1dLCJUYXJnZXQiOjQyLCJUb3RhbF9BdHRkIjoyLCJQZXJjZW50IjoiNSAlIn0seyJOUE0iOiIyMTE2MDAwNyIsIk5hbWUiOiJTVEVWRU4gVkVSRElBTlRBIiwiQXR0ZW5kYW5jZSI6W3siTTEiOiIxIiwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiTW9uZGF5In0seyJNMSI6bnVsbCwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiV2VkbmVzZGF5In0seyJNMSI6IjEiLCJNMiI6bnVsbCwiTTMiOm51bGwsIk00IjpudWxsLCJNNSI6bnVsbCwiTTYiOm51bGwsIk03IjpudWxsLCJNOCI6bnVsbCwiTTkiOm51bGwsIk0xMCI6bnVsbCwiTTExIjpudWxsLCJNMTIiOm51bGwsIk0xMyI6bnVsbCwiTTE0IjpudWxsLCJEYXlFbmciOiJGcmlkYXkifV0sIlRhcmdldCI6NDIsIlRvdGFsX0F0dGQiOjIsIlBlcmNlbnQiOiI1ICUifSx7Ik5QTSI6IjIxMTYwMDA4IiwiTmFtZSI6IkRFTk5JUyBPV0VOIiwiQXR0ZW5kYW5jZSI6W3siTTEiOiIxIiwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiTW9uZGF5In0seyJNMSI6bnVsbCwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiV2VkbmVzZGF5In0seyJNMSI6IjEiLCJNMiI6bnVsbCwiTTMiOm51bGwsIk00IjpudWxsLCJNNSI6bnVsbCwiTTYiOm51bGwsIk03IjpudWxsLCJNOCI6bnVsbCwiTTkiOm51bGwsIk0xMCI6bnVsbCwiTTExIjpudWxsLCJNMTIiOm51bGwsIk0xMyI6bnVsbCwiTTE0IjpudWxsLCJEYXlFbmciOiJGcmlkYXkifV0sIlRhcmdldCI6NDIsIlRvdGFsX0F0dGQiOjIsIlBlcmNlbnQiOiI1ICUifSx7Ik5QTSI6IjIxMTYwMDA5IiwiTmFtZSI6IllFTlNFTiBGRUJSSUFOIiwiQXR0ZW5kYW5jZSI6W3siTTEiOiIxIiwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiTW9uZGF5In0seyJNMSI6bnVsbCwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiV2VkbmVzZGF5In0seyJNMSI6IjEiLCJNMiI6bnVsbCwiTTMiOm51bGwsIk00IjpudWxsLCJNNSI6bnVsbCwiTTYiOm51bGwsIk03IjpudWxsLCJNOCI6bnVsbCwiTTkiOm51bGwsIk0xMCI6bnVsbCwiTTExIjpudWxsLCJNMTIiOm51bGwsIk0xMyI6bnVsbCwiTTE0IjpudWxsLCJEYXlFbmciOiJGcmlkYXkifV0sIlRhcmdldCI6NDIsIlRvdGFsX0F0dGQiOjIsIlBlcmNlbnQiOiI1ICUifSx7Ik5QTSI6IjIxMTYwMDEwIiwiTmFtZSI6IkNJTkRZIE1BUkdBUkVUSEEiLCJBdHRlbmRhbmNlIjpbeyJNMSI6IjEiLCJNMiI6bnVsbCwiTTMiOm51bGwsIk00IjpudWxsLCJNNSI6bnVsbCwiTTYiOm51bGwsIk03IjpudWxsLCJNOCI6bnVsbCwiTTkiOm51bGwsIk0xMCI6bnVsbCwiTTExIjpudWxsLCJNMTIiOm51bGwsIk0xMyI6bnVsbCwiTTE0IjpudWxsLCJEYXlFbmciOiJNb25kYXkifSx7Ik0xIjpudWxsLCJNMiI6bnVsbCwiTTMiOm51bGwsIk00IjpudWxsLCJNNSI6bnVsbCwiTTYiOm51bGwsIk03IjpudWxsLCJNOCI6bnVsbCwiTTkiOm51bGwsIk0xMCI6bnVsbCwiTTExIjpudWxsLCJNMTIiOm51bGwsIk0xMyI6bnVsbCwiTTE0IjpudWxsLCJEYXlFbmciOiJXZWRuZXNkYXkifSx7Ik0xIjoiMSIsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6IkZyaWRheSJ9XSwiVGFyZ2V0Ijo0MiwiVG90YWxfQXR0ZCI6MiwiUGVyY2VudCI6IjUgJSJ9LHsiTlBNIjoiMjExNjAwMTMiLCJOYW1lIjoiQklMTEkgS1VSTklBV0FOIiwiQXR0ZW5kYW5jZSI6W3siTTEiOiIxIiwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiTW9uZGF5In0seyJNMSI6bnVsbCwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiV2VkbmVzZGF5In0seyJNMSI6IjEiLCJNMiI6bnVsbCwiTTMiOm51bGwsIk00IjpudWxsLCJNNSI6bnVsbCwiTTYiOm51bGwsIk03IjpudWxsLCJNOCI6bnVsbCwiTTkiOm51bGwsIk0xMCI6bnVsbCwiTTExIjpudWxsLCJNMTIiOm51bGwsIk0xMyI6bnVsbCwiTTE0IjpudWxsLCJEYXlFbmciOiJGcmlkYXkifV0sIlRhcmdldCI6NDIsIlRvdGFsX0F0dGQiOjIsIlBlcmNlbnQiOiI1ICUifSx7Ik5QTSI6IjIxMTYwMDE2IiwiTmFtZSI6IlBBUkFNSVRBIFNIRVJFTlRZQSIsIkF0dGVuZGFuY2UiOlt7Ik0xIjoiMSIsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6Ik1vbmRheSJ9LHsiTTEiOm51bGwsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6IldlZG5lc2RheSJ9LHsiTTEiOiIxIiwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiRnJpZGF5In1dLCJUYXJnZXQiOjQyLCJUb3RhbF9BdHRkIjoyLCJQZXJjZW50IjoiNSAlIn0seyJOUE0iOiIyMTE2MDAxNyIsIk5hbWUiOiJLRVpJQSBGRUJSSUFOWSIsIkF0dGVuZGFuY2UiOlt7Ik0xIjoiMSIsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6Ik1vbmRheSJ9LHsiTTEiOm51bGwsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6IldlZG5lc2RheSJ9LHsiTTEiOiIyIiwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiRnJpZGF5In1dLCJUYXJnZXQiOjQyLCJUb3RhbF9BdHRkIjoxLCJQZXJjZW50IjoiMiAlIn0seyJOUE0iOiIyMTE2MDAxOSIsIk5hbWUiOiJLRUxWSU4iLCJBdHRlbmRhbmNlIjpbeyJNMSI6IjEiLCJNMiI6bnVsbCwiTTMiOm51bGwsIk00IjpudWxsLCJNNSI6bnVsbCwiTTYiOm51bGwsIk03IjpudWxsLCJNOCI6bnVsbCwiTTkiOm51bGwsIk0xMCI6bnVsbCwiTTExIjpudWxsLCJNMTIiOm51bGwsIk0xMyI6bnVsbCwiTTE0IjpudWxsLCJEYXlFbmciOiJNb25kYXkifSx7Ik0xIjpudWxsLCJNMiI6bnVsbCwiTTMiOm51bGwsIk00IjpudWxsLCJNNSI6bnVsbCwiTTYiOm51bGwsIk03IjpudWxsLCJNOCI6bnVsbCwiTTkiOm51bGwsIk0xMCI6bnVsbCwiTTExIjpudWxsLCJNMTIiOm51bGwsIk0xMyI6bnVsbCwiTTE0IjpudWxsLCJEYXlFbmciOiJXZWRuZXNkYXkifSx7Ik0xIjoiMSIsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6IkZyaWRheSJ9XSwiVGFyZ2V0Ijo0MiwiVG90YWxfQXR0ZCI6MiwiUGVyY2VudCI6IjUgJSJ9LHsiTlBNIjoiMjExNjAwMjAiLCJOYW1lIjoiUklPIENIUklTVElBTiBSQUVNQSIsIkF0dGVuZGFuY2UiOlt7Ik0xIjoiMSIsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6Ik1vbmRheSJ9LHsiTTEiOm51bGwsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6IldlZG5lc2RheSJ9LHsiTTEiOiIxIiwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiRnJpZGF5In1dLCJUYXJnZXQiOjQyLCJUb3RhbF9BdHRkIjoyLCJQZXJjZW50IjoiNSAlIn0seyJOUE0iOiIyMTE2MDAyMSIsIk5hbWUiOiJEQVZJRCBOSUNPREVNVVMiLCJBdHRlbmRhbmNlIjpbeyJNMSI6IjEiLCJNMiI6bnVsbCwiTTMiOm51bGwsIk00IjpudWxsLCJNNSI6bnVsbCwiTTYiOm51bGwsIk03IjpudWxsLCJNOCI6bnVsbCwiTTkiOm51bGwsIk0xMCI6bnVsbCwiTTExIjpudWxsLCJNMTIiOm51bGwsIk0xMyI6bnVsbCwiTTE0IjpudWxsLCJEYXlFbmciOiJNb25kYXkifSx7Ik0xIjpudWxsLCJNMiI6bnVsbCwiTTMiOm51bGwsIk00IjpudWxsLCJNNSI6bnVsbCwiTTYiOm51bGwsIk03IjpudWxsLCJNOCI6bnVsbCwiTTkiOm51bGwsIk0xMCI6bnVsbCwiTTExIjpudWxsLCJNMTIiOm51bGwsIk0xMyI6bnVsbCwiTTE0IjpudWxsLCJEYXlFbmciOiJXZWRuZXNkYXkifSx7Ik0xIjoiMSIsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6IkZyaWRheSJ9XSwiVGFyZ2V0Ijo0MiwiVG90YWxfQXR0ZCI6MiwiUGVyY2VudCI6IjUgJSJ9LHsiTlBNIjoiMjExNjAwMjUiLCJOYW1lIjoiTUlDSEFFTCBBRFJJQU4gSEVSWUFOVE8iLCJBdHRlbmRhbmNlIjpbeyJNMSI6IjEiLCJNMiI6bnVsbCwiTTMiOm51bGwsIk00IjpudWxsLCJNNSI6bnVsbCwiTTYiOm51bGwsIk03IjpudWxsLCJNOCI6bnVsbCwiTTkiOm51bGwsIk0xMCI6bnVsbCwiTTExIjpudWxsLCJNMTIiOm51bGwsIk0xMyI6bnVsbCwiTTE0IjpudWxsLCJEYXlFbmciOiJNb25kYXkifSx7Ik0xIjpudWxsLCJNMiI6bnVsbCwiTTMiOm51bGwsIk00IjpudWxsLCJNNSI6bnVsbCwiTTYiOm51bGwsIk03IjpudWxsLCJNOCI6bnVsbCwiTTkiOm51bGwsIk0xMCI6bnVsbCwiTTExIjpudWxsLCJNMTIiOm51bGwsIk0xMyI6bnVsbCwiTTE0IjpudWxsLCJEYXlFbmciOiJXZWRuZXNkYXkifSx7Ik0xIjoiMSIsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6IkZyaWRheSJ9XSwiVGFyZ2V0Ijo0MiwiVG90YWxfQXR0ZCI6MiwiUGVyY2VudCI6IjUgJSJ9LHsiTlBNIjoiMjExNjAwMjYiLCJOYW1lIjoiQVJOT1RUIEZFUkVMUyIsIkF0dGVuZGFuY2UiOlt7Ik0xIjoiMSIsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6Ik1vbmRheSJ9LHsiTTEiOm51bGwsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6IldlZG5lc2RheSJ9LHsiTTEiOiIxIiwiTTIiOm51bGwsIk0zIjpudWxsLCJNNCI6bnVsbCwiTTUiOm51bGwsIk02IjpudWxsLCJNNyI6bnVsbCwiTTgiOm51bGwsIk05IjpudWxsLCJNMTAiOm51bGwsIk0xMSI6bnVsbCwiTTEyIjpudWxsLCJNMTMiOm51bGwsIk0xNCI6bnVsbCwiRGF5RW5nIjoiRnJpZGF5In1dLCJUYXJnZXQiOjQyLCJUb3RhbF9BdHRkIjoyLCJQZXJjZW50IjoiNSAlIn0seyJOUE0iOiIyMTE2MDAyNyIsIk5hbWUiOiJWRVJOQU5ETyBBTlRPTkkiLCJBdHRlbmRhbmNlIjpbeyJNMSI6IjEiLCJNMiI6bnVsbCwiTTMiOm51bGwsIk00IjpudWxsLCJNNSI6bnVsbCwiTTYiOm51bGwsIk03IjpudWxsLCJNOCI6bnVsbCwiTTkiOm51bGwsIk0xMCI6bnVsbCwiTTExIjpudWxsLCJNMTIiOm51bGwsIk0xMyI6bnVsbCwiTTE0IjpudWxsLCJEYXlFbmciOiJNb25kYXkifSx7Ik0xIjpudWxsLCJNMiI6bnVsbCwiTTMiOm51bGwsIk00IjpudWxsLCJNNSI6bnVsbCwiTTYiOm51bGwsIk03IjpudWxsLCJNOCI6bnVsbCwiTTkiOm51bGwsIk0xMCI6bnVsbCwiTTExIjpudWxsLCJNMTIiOm51bGwsIk0xMyI6bnVsbCwiTTE0IjpudWxsLCJEYXlFbmciOiJXZWRuZXNkYXkifSx7Ik0xIjoiMSIsIk0yIjpudWxsLCJNMyI6bnVsbCwiTTQiOm51bGwsIk01IjpudWxsLCJNNiI6bnVsbCwiTTciOm51bGwsIk04IjpudWxsLCJNOSI6bnVsbCwiTTEwIjpudWxsLCJNMTEiOm51bGwsIk0xMiI6bnVsbCwiTTEzIjpudWxsLCJNMTQiOm51bGwsIkRheUVuZyI6IkZyaWRheSJ9XSwiVGFyZ2V0Ijo0MiwiVG90YWxfQXR0ZCI6MiwiUGVyY2VudCI6IjUgJSJ9XX0.bCvFK08D3Tk02y4ZaH-USvmPx7kjUxIpUbQ_KDQz3kg';
         $token = $this->input->post('token');
         $data_arr = $this->getInputToken($token);
 
@@ -3054,10 +3064,9 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($sp_right,$h,':',$border,0,'C');
         $pdf->Cell($fill_right,$h,ucwords(strtolower($Student['Prodi'])),$border,1,'L');
 
-        $e = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '%#d' : '%e';
         $pdf->Cell($l_left,$h,'Tempat dan Tanggal Lahir',$border,0,'L');
         $pdf->Cell($sp_left,$h,':',$border,0,'C');
-        $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['PlaceOfBirth'])).', '.strftime($e." %B %Y",strtotime($Student['DateOfBirth'])),$border,1,'L');
+        $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['PlaceOfBirth'])).', '.$this->getDateIndonesian($Student['DateOfBirth']),$border,1,'L');
 
         $pdf->Ln(2);
 
@@ -3231,8 +3240,8 @@ class C_save_to_pdf extends CI_Controller {
         $border = 0;
         $pdf->SetFont('dinprolight','',8);
         $pdf->Cell($w_smt+$w_no+$w_kode+$w_mk,$h,'',$border,0,'R');
-        $e = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '%#d' : '%e';
-        $dateT = ($lang=='ind') ? strftime($e." %B %Y",strtotime($dataTempTr['Date'])) : date('F j, Y',strtotime($dataTempTr['Date']));
+
+        $dateT = ($lang=='ind') ? $this->getDateIndonesian($dataTempTr['Date']) : date('F j, Y',strtotime($dataTempTr['Date']));
         $pdf->Cell((3*$w_f)+$w_fv,$h,ucwords(strtolower($dataTempTr['Place'])).', '.$dateT,$border,1,'L');
 
 
@@ -3293,9 +3302,6 @@ class C_save_to_pdf extends CI_Controller {
         $ln = 1;
         $border = 0;
 
-        $e = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '%#d' : '%e';
-
-
         $f_title = 8;
         $f_title_i = 7;
         $pdf->SetFont('dinpromedium','',$f_title);
@@ -3319,7 +3325,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinpromedium','',$f_title);
         $pdf->Cell($label_l,$h,'Tempat dan Tanggal Lahir',$border,0,'L');
         $pdf->Cell($sparator_l,$h,':',$border,0,'C');
-        $pdf->Cell($fill_l,$h,ucwords(strtolower($Student['PlaceOfBirth'])).', '.strftime($e." %B %Y",strtotime($Student['DateOfBirth'])),$border,0,'L');
+        $pdf->Cell($fill_l,$h,ucwords(strtolower($Student['PlaceOfBirth'])).', '.$this->getDateIndonesian($Student['DateOfBirth']),$border,0,'L');
         $pdf->Cell($label_r,$h,'Program Studi',$border,0,'L');
         $pdf->Cell($sparator_r,$h,':',$border,0,'C');
         $pdf->Cell($fill_r,$h,$Student['Prodi'],$border,1,'L');
@@ -3539,7 +3545,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetFont('dinpromedium','',$font_medium);
         $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
-        $pdf->Cell($w_Div-$min,$h,ucwords(strtolower($Transcript['PlaceIssued'])).', '.strftime($e." %B %Y",strtotime($Transcript['DateIssued'])),$borderttd,1,'L');
+        $pdf->Cell($w_Div-$min,$h,ucwords(strtolower($Transcript['PlaceIssued'])).', '.$this->getDateIndonesian($Transcript['DateIssued']),$borderttd,1,'L');
 
         $pdf->SetFont('dinlightitalic','',$font_medium_i);
         $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
@@ -3752,14 +3758,12 @@ class C_save_to_pdf extends CI_Controller {
 
         $border = 0;
 
-        $e = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '%#d' : '%e';
-
         // ===== TTL =====
         $pdf->SetX($x);
         $pdf->SetFont('dinpromedium','',$fn_b);
         $pdf->Cell($label,$h,'Tempat dan Tanggal Lahir',$border,0,'L');
         $pdf->Cell($sp,$h,':',$border,0,'C');
-        $pdf->Cell($fill,$h,$Student['PlaceOfBirth'].', '.strftime($e." %B %Y",strtotime($Student['DateOfBirth'])),$border,1,'L');
+        $pdf->Cell($fill,$h,$Student['PlaceOfBirth'].', '.$this->getDateIndonesian($Student['DateOfBirth']),$border,1,'L');
 
         $pdf->SetX($x);
         $pdf->SetFont('dinlightitalic','',$fn_i);
@@ -3816,7 +3820,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($label,$h,'Tanggal Yudisium',$border,0,'L');
         $pdf->Cell($sp,$h,':',$border,0,'C');
 //        $pdf->Cell($fill,$h,date('d/m/Y',strtotime($Ijazah['DateOfYudisium'])),$border,1,'L');
-        $pdf->Cell($fill,$h,strftime("%d %B %Y",strtotime($Ijazah['DateOfYudisium'])),$border,1,'L');
+        $pdf->Cell($fill,$h,$this->getDateIndonesian($Ijazah['DateOfYudisium']),$border,1,'L');
 
         $pdf->SetX($x);
         $pdf->SetFont('dinlightitalic','',$fn_i);
@@ -3858,7 +3862,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetX($x+10);
         $pdf->SetFont('dinpromedium','',$fn_b);
-        $pdf->Cell(171.5,$h,$Ijazah['PlaceIssued'].', '.strftime($e." %B %Y",strtotime($Ijazah['DateIssued'])),$border,1,'L');
+        $pdf->Cell(171.5,$h,$Ijazah['PlaceIssued'].', '.$this->getDateIndonesian($Ijazah['DateIssued']),$border,1,'L');
         $pdf->SetX($x+10);
         $pdf->SetFont('dinlightitalic','',$fn_i);
         $pdf->Cell(171.5,$h,$Ijazah['PlaceIssued'].', '.date('F j, Y',strtotime($Ijazah['DateIssued'])),$border,1,'L');
@@ -3915,18 +3919,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinpromedium','',$fn_b-2);
         $pdf->Text($xtext,$ytext,'NIK : '.$Student['NIP']);
 
-//        $pdf->SetX($x+10);
-//        $pdf->Cell(138.5,$h,$Rektor,$border,0,'L');
-//        $pdf->Cell(41,$h,$Dekan,$border,1,'L');
-
-//        $pdf->SetFont('dinpromedium','',$fn_b-2);
-//        $pdf->SetX($x+10);
-//        $pdf->Cell(138.5,$h,'NIK : '.$Rektorat['NIP'],$border,0,'L');
-//        $pdf->Cell(41,$h,'NIK : '.$Student['NIP'],$border,1,'L');
-
         $pdf->Rect($x+95, $y, 40, 60);
-//        $pdf->Image(base_url('images/46.png'),$x+95,$y,40,60);
-
 
         $nameF = str_replace(' ','_',strtoupper($Student['Name']));
         $pdf->Output('IJAZAH_'.$Student['NPM'].'_'.$nameF.'.pdf','I');

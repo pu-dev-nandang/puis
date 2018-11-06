@@ -1680,13 +1680,13 @@ class M_api extends CI_Model {
 
     }
 
-    private function getPayment($SemesterID,$NPM){
+    public function getPayment($SemesterID,$NPM){
         $data = $this->db->query('SELECT p.PTID,p.Status FROM db_finance.payment p WHERE p.NPM = "'.$NPM.'" 
                                             AND p.SemesterID = "'.$SemesterID.'"');
         return $data->result_array();
     }
 
-    private function getMaxCredit($db_ta,$NPM,$ClassOf,$smtActID,$ProdiID){
+    public function getMaxCredit($db_ta,$NPM,$ClassOf,$smtActID,$ProdiID){
 
 
         $dataIDLast = $this->db->query('SELECT * FROM db_academic.semester s 
@@ -1697,7 +1697,7 @@ class M_api extends CI_Model {
         if(count($dataIDLast)>0){
             $dataResult = $this->db->query('SELECT s.GradeValue,s.SemesterID,cd.TotalSKS AS Credit FROM '.$db_ta.'.study_planning s
                                                 LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = s.CDID) 
-                                                WHERE s.NPM = "'.$NPM.'" ORDER BY s.SemesterID ASC ')->result_array();
+                                                WHERE s.NPM = "'.$NPM.'" AND s.SemesterID <= "'.$smtActID.'" ORDER BY s.SemesterID ASC ')->result_array();
 
 //            print_r($dataResult);
             $TotalSKS=0;
@@ -2832,7 +2832,8 @@ class M_api extends CI_Model {
             $whereStd = $whereStd.' '.$w;
         }
 
-        $dataS = $this->db->query('SELECT '.$selcStd.' ast.NPM FROM db_academic.auth_students ast '.$joinStd.'
+        $dataS = $this->db->query('SELECT '.$selcStd.' ast.NPM, ss.Description AS StatusStudent FROM db_academic.auth_students ast '.$joinStd.'
+                                    LEFT JOIN db_academic.status_student ss ON (ss.ID = ast.StatusStudentID)
                                     WHERE  '.$whereStd.' ast.NPM LIKE "%'.$key.'%" 
                                     LIMIT 5')->result_array();
 
@@ -2851,6 +2852,7 @@ class M_api extends CI_Model {
                 $arr = array(
                     'Name' => $Name,
                     'Username' => $d['NPM'],
+                    'Status' => ucwords(strtolower($d['StatusStudent'])),
                     'Flag' => 'std'
                 );
 
@@ -2859,7 +2861,8 @@ class M_api extends CI_Model {
 
         }
 
-        $dataEm = $this->db->query('SELECT em.NIP, em.Name, em.Password, em.PositionMain, em.PositionOther1, em.PositionOther2, em.PositionOther3 FROM db_employees.employees em 
+        $dataEm = $this->db->query('SELECT em.NIP, em.Name, em.Password, em.PositionMain, em.PositionOther1, em.PositionOther2, em.PositionOther3, ems.Description AS StatusEmployee FROM db_employees.employees em 
+                                              LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID)
                                               WHERE em.StatusEmployeeID != -1 AND em.StatusEmployeeID != -2 AND ( em.Name LIKE "%'.$key.'%" OR em.NIP LIKE "%'.$key.'%" )
                                                LIMIT 5')->result_array();
 
@@ -2870,6 +2873,7 @@ class M_api extends CI_Model {
                     'Name' => $d['Name'],
                     'Username' => $d['NIP'],
                     'Token' => $d['Password'],
+                    'Status' => ucwords(strtolower($d['StatusEmployee'])),
                     'Flag' => 'emp',
                     'Position' => [$d['PositionMain'],$d['PositionOther1'],$d['PositionOther2'],$d['PositionOther3']]
                 );
