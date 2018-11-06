@@ -5887,6 +5887,7 @@ class C_api extends CI_Controller {
             }
 
         }
+    }    
 
 
     public function getDataStudyPlanning(){
