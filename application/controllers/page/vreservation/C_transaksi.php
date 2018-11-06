@@ -234,7 +234,7 @@ class C_transaksi extends Vreservation_Controler {
 
             if($_SERVER['SERVER_NAME']!='localhost') {
                 // email to approval 1
-                    $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','Room',$input['room']);
+                    $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','Room',$input['Room']);
                     $CategoryRoomByRoom = $getRoom[0]['ID_CategoryRoom'];
                     $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
                     $Approver1 = $getDataCategoryRoom[0]['Approver1'];
