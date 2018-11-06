@@ -153,24 +153,14 @@
                 </div>    
                 <div class="col-sm-8">
                     <div class="form-group">
-                       <div class="row">
-                           <div class="col-xs-12">
-                               <label class="control-label">Participant Type</label>
-                               <input type="text" class="form-control" readonly="" value="<?php echo $UserType ?>">
-                           </div>
-                       </div>
-                       <div class="row">
-                           <div class="col-xs-12">
-                               <label class="control-label">Participant Clasification</label>
-                               <input type="text" class="form-control" readonly="" value="<?php echo $UserClasification ?>">
-                           </div>
-                       </div>
-                       <div class="row">
-                           <div class="col-xs-12">
-                               <label class="control-label">Participant Desc</label>
-                               <input type="text" class="form-control" readonly="" value="<?php echo $Note ?>">
-                           </div>
-                       </div>
+                        <?php foreach ($KetAdditional as $key => $value): ?>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <label class="control-label"><?php echo str_replace("_", " ", $key) ?></label>
+                                    <input type="text" class="form-control" readonly="" value="<?php echo $value ?>">
+                                </div>
+                            </div>
+                        <?php endforeach ?>
                     </div>    
                 </div>
             </div>

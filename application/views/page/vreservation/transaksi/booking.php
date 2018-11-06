@@ -167,11 +167,21 @@
     //      chk_e_multiple.push(valuee);
     //   });
     // }
-    var KetAdditional = {
-      ParticipantType : $("#UserType").val(),
-      ParticipantClasification :$("#UserClasification").val(), 
-      ParticipantDesc :$("#NoteDescAdd").val(), 
+    var KetAdditional = {};
+    var dataArr = {
+      Participant_Type : $("#UserType").val(),
+      VVIP :$(".VVIP").val(), 
+      VIP :$(".VIP").val(), 
+      PIC :$(".PIC").val(), 
+      PIC_Info :$(".PICInfo").val(), 
+      Note :$("#NoteDescAdd").val(), 
     };
+
+    for(var key in dataArr) {
+      if (dataArr[key] != "") {
+        KetAdditional[key] = dataArr[key];
+      }
+    }
 
    var data = {
        Room : Room,

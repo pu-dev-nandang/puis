@@ -170,8 +170,7 @@
                            <div class="col-xs-12">
                                <label class="control-label">Participant Type</label>
                                <select id = "UserType" class="form-control">
-                                   <option value="" selected>--No Selected--</option>
-                                   <option value="Internal" >Internal</option>
+                                   <option value="Internal" selected>Internal</option>
                                    <option value="Eksternal">Eksternal</option>
                                    <option value="Internal + Eksternal">Internal + Eksternal</option>
                                </select>
@@ -179,20 +178,30 @@
                        </div>
                        <div class="row">
                            <div class="col-xs-12">
-                               <label class="control-label">Participant Clasification</label>
-                               <select id = "UserClasification" class="form-control">
-                                   <option value="" selected>--No Selected--</option>
-                                   <option value="VVIP" >VVIP</option>
-                                   <option value="VIP">VIP</option>
-                                   <option value="PIC">PIC</option>
-                               </select>
-                               <!-- <input type="text" id = "Seat" class="form-control" value=""> -->
+                               <label class="control-label">VVIP</label>
+                               <input type="text" class="form-control VVIP" placeholder="Input...">
                            </div>
                        </div>
                        <div class="row">
                            <div class="col-xs-12">
-                               <label class="control-label">Participant Desc</label>
-                               <input type="text" id = "NoteDescAdd" class="form-control" value="">
+                               <label class="control-label">VIP</label>
+                               <input type="text" class="form-control VIP" placeholder="Input...">
+                           </div>
+                       </div>
+                       <div class="row">
+                           <div class="col-xs-6">
+                               <label class="control-label">PIC</label>
+                               <input type="text" class="form-control PIC" placeholder="Input..." >
+                           </div>
+                           <div class="col-xs-6">
+                               <label class="control-label">PIC Info</label>
+                               <input type="text" class="form-control PICInfo" placeholder="Input...">
+                           </div>
+                       </div>
+                       <div class="row">
+                           <div class="col-xs-12">
+                               <label class="control-label">Note</label>
+                               <input type="text" id = "NoteDescAdd" class="form-control" placeholder="Input...">
                            </div>
                        </div>
                     </div>    

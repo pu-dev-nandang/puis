@@ -1149,7 +1149,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             if (count($KetAdditional) > 0) {
                 foreach ($KetAdditional as $key => $value) {
                     if ($value != "" || $value != null) {
-                        $Participant .= '<li>'.$key.' : '.$value.'</li>';
+                        $Participant .= '<li>'.str_replace("_", " ", $key).' : '.$value.'</li>';
                     }
                 }
             }

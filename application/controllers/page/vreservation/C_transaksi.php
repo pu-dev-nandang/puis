@@ -215,7 +215,8 @@ class C_transaksi extends Vreservation_Controler {
             if ($KetAdditional != '') {
                 foreach ($KetAdditional as $key => $value) {
                     if ($value != "" || $value != null) {
-                        $EmailKetAdditional .= '<br>*   '.$key.'('.$value.')';  
+                        $EmailKetAdditional .= '<br>*   '.str_replace("_", " ", $key).' : '.$value;  
+                        // $EmailKetAdditional .= '<br>*   '.$key.'('.$value.')';  
                     }  
                 }
             }
@@ -426,6 +427,7 @@ class C_transaksi extends Vreservation_Controler {
                 if ($find == 1) {
                     $arr_status = $arr_status + array('Status' => 1,'ApprovedAt' => date('Y-m-d H:i:s'),'ApprovedBy' => $this->session->userdata('NIP') );
                     $ApprovalWr = ' as Approval 1 & Approval 2';
+                    $approveaccess = 4;
                 }
                 break;
             case 4:
@@ -440,7 +442,7 @@ class C_transaksi extends Vreservation_Controler {
             $ID_equipment_add = explode(",", $ID_equipment_add);
             $MarcommSupport = $get[0]['MarcommSupport'];
             $MarcommSupport = explode(',', $MarcommSupport);
-            $EmailAdd .= '<br><br>Note :<br>';
+            $EmailAdd .= '<br>Note :<br>';
             $aa = array();
             for ($i=0; $i < count($ListDelEquipment); $i++) {
                 if ($i==0) {
@@ -481,12 +483,13 @@ class C_transaksi extends Vreservation_Controler {
         }
 
         $KetAdditional = json_decode($get[0]['KetAdditional']);    
-        $EmailKetAdditional = '';
+        $EmailKetAdditional = '<br>';
         if ($KetAdditional != '') {
             if (count($KetAdditional) > 0) {
                 foreach ($KetAdditional as $key => $value) {
                     if ($value != "" || $value != null) {
-                        $EmailKetAdditional .= '<br>*   '.$key.'('.$value.')';  
+                        // $EmailKetAdditional .= '<br>*   '.$key.' : '.$value;
+                        $EmailKetAdditional .= '<br>*   '.str_replace("_", " ", $key).' : '.$value;    
                     }  
                 }
             }
@@ -507,7 +510,7 @@ class C_transaksi extends Vreservation_Controler {
             $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['End']);
             $StartNameDay = $Startdatetime->format('l');
             $EndNameDay = $Enddatetime->format('l');
-
+            
             if ($approveaccess == 4) {
                 // send by Ical
                 $Email = $getUser[0]['EmailPU'];
@@ -553,7 +556,7 @@ class C_transaksi extends Vreservation_Controler {
                     // email to ga
                     $Email = 'ga@podomorouniversity.ac.id';
                     $text = 'Dear GA Team,<br><br>
-                                Please Approve Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
+                                Please Approve Venue Reservation,<br><br>
                                 Details Schedule : <br><ul>
                                 <li>Start  : '.$StartNameDay.', '.$Start.'</li>
                                 <li>End  : '.$EndNameDay.', '.$End.'</li>
@@ -571,7 +574,7 @@ class C_transaksi extends Vreservation_Controler {
                 {
                     $Email = 'alhadi.rahman@podomorouniversity.ac.id';
                     $text = 'Dear GA Team,<br><br>
-                                Please Approve Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
+                                Please Approve Venue Reservation,<br><br>
                                 Details Schedule : <br><ul>
                                 <li>Start  : '.$StartNameDay.', '.$Start.'</li>
                                 <li>End  : '.$EndNameDay.', '.$End.'</li>
@@ -610,7 +613,8 @@ class C_transaksi extends Vreservation_Controler {
                 if (count($KetAdditional) > 0) {
                     foreach ($KetAdditional as $key => $value) {
                         if ($value != "" || $value != null) {
-                            $EmailKetAdditional .= '<br>*   '.$key.'('.$value.')';  
+                            // $EmailKetAdditional .= '<br>*   '.$key.'('.$value.')';
+                            $EmailKetAdditional .= '<br>*   '.str_replace("_", " ", $key).' : '.$value;    
                         }  
                     }
                 }

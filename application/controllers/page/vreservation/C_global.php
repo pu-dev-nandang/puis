@@ -301,13 +301,8 @@ class C_global extends Vreservation_Controler {
                     }
                     $KetAdditional = $get[0]['KetAdditional'];
                     $KetAdditional = json_decode($KetAdditional);
-                    $UserType = $KetAdditional->ParticipantType;
-                    $UserClasification = $KetAdditional->ParticipantClasification;
-                    $Note = $KetAdditional->ParticipantDesc;
 
-                    $this->data['UserType'] = $UserType;
-                    $this->data['UserClasification'] = $UserClasification;
-                    $this->data['Note'] = $Note;
+                    $this->data['KetAdditional'] = $KetAdditional;
                     $this->data['MarkomSupport'] = $MarkomSupport;
                     $this->data['Req_layout'] = $Req_layout;
                     $this->data['ID'] = $get[0]['ID'];
