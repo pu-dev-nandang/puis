@@ -1277,6 +1277,12 @@ class M_api extends CI_Model {
         return $data->result_array();
     }
 
+    public function __getAllClassRoomCategory(){
+        $data = $this->db->query('SELECT a.*,b.Name,b.NameEng FROM db_academic.classroom as a join db_reservation.category_room
+            as b on a.ID_CategoryRoom = b.ID');
+        return $data->result_array();
+    }
+
     public function __getAllGrade(){
         $data = $this->db->query('SELECT * FROM db_academic.grade ORDER BY EndRange DESC');
         return $data->result_array();

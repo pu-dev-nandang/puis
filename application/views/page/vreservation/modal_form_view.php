@@ -146,10 +146,45 @@
                 </div>
             </div>
         </div>
+        <div class="form-group"> 
+            <div class="row">
+                <div class="col-sm-3">
+                    <label class="control-label">Desc Additional:</label>
+                </div>    
+                <div class="col-sm-8">
+                    <div class="form-group">
+                        <?php foreach ($KetAdditional as $key => $value): ?>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <label class="control-label"><?php echo str_replace("_", " ", $key) ?></label>
+                                    <input type="text" class="form-control" readonly="" value="<?php echo $value ?>">
+                                </div>
+                            </div>
+                        <?php endforeach ?>
+                    </div>    
+                </div>
+            </div>
+        </div>
         <div style="text-align: center;">       
     		<div class="col-sm-12" id="BtnFooter">
                 <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>
-                <button type="button" class="btn btn-success btn-edit btn-apppove" id_table = "<?php echo $ID ?>">Approve</button>
+                <?php if ($DivisionID == 12): ?>
+                    <button type="button" class="btn btn-success btn-edit btn-apppove" id_table = "<?php echo $ID ?>" ApproveAccess = <?php echo $ApproveAccess ?> >Approve</button>
+                <?php else: ?>
+                    <?php switch($ApproveAccess): 
+                    case 0: ?>
+                    <?php case 1: ?>
+                    <?php break; ?>
+                    <?php case 2: ?>
+                        <button type="button" class="btn btn-success btn-edit btn-apppove" id_table = "<?php echo $ID ?>" ApproveAccess = <?php echo $ApproveAccess ?> >Approve</button>
+                    <?php case 3: ?>
+                        
+                    <?php break; ?>
+                    <?php case 4: ?>
+                        <button type="button" class="btn btn-success btn-edit btn-apppove" id_table = "<?php echo $ID ?>" ApproveAccess = <?php echo $ApproveAccess ?> >Approve</button>
+                    <?php break; ?>
+                    <?php endswitch; ?>    
+                <?php endif ?>
     		</div>
         </div>    
     </form>

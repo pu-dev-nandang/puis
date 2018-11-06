@@ -159,6 +159,55 @@
                 </div>
             </div>
         </div>
+        <div class="form-group"> 
+            <div class="row">
+                <div class="col-sm-3">
+                    <label class="control-label">Desc Additional:</label>
+                </div>    
+                <div class="col-sm-8">
+                    <div class="form-group">
+                       <div class="row">
+                           <div class="col-xs-12">
+                               <label class="control-label">Participant Type</label>
+                               <select id = "UserType" class="form-control">
+                                   <option value="Internal" selected>Internal</option>
+                                   <option value="Eksternal">Eksternal</option>
+                                   <option value="Internal + Eksternal">Internal + Eksternal</option>
+                               </select>
+                           </div>
+                       </div>
+                       <div class="row">
+                           <div class="col-xs-12">
+                               <label class="control-label">VVIP</label>
+                               <input type="text" class="form-control VVIP" placeholder="Input...">
+                           </div>
+                       </div>
+                       <div class="row">
+                           <div class="col-xs-12">
+                               <label class="control-label">VIP</label>
+                               <input type="text" class="form-control VIP" placeholder="Input...">
+                           </div>
+                       </div>
+                       <div class="row">
+                           <div class="col-xs-6">
+                               <label class="control-label">PIC</label>
+                               <input type="text" class="form-control PIC" placeholder="Input..." >
+                           </div>
+                           <div class="col-xs-6">
+                               <label class="control-label">PIC Info</label>
+                               <input type="text" class="form-control PICInfo" placeholder="Input...">
+                           </div>
+                       </div>
+                       <div class="row">
+                           <div class="col-xs-12">
+                               <label class="control-label">Note</label>
+                               <input type="text" id = "NoteDescAdd" class="form-control" placeholder="Input...">
+                           </div>
+                       </div>
+                    </div>    
+                </div>
+            </div>
+        </div>
         <div style="text-align: center;">       
     		<div class="col-sm-12" id="BtnFooter">
                 <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>

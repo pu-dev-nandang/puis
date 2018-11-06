@@ -3,7 +3,6 @@
   {
     font-size: 12px;
   }
-  
 </style>
 <div class="row" style="margin-top: 30px;">
     <div class="col-md-2"></div>
@@ -14,7 +13,7 @@
                 <div class="toolbar no-padding">
                     <div class="btn-group">
                       <span data-smt="" class="btn btn-xs btn-add">
-                        <i class="icon-plus"></i> Add Policy
+                        <i class="icon-plus"></i> Add
                        </span>
                     </div>
                 </div>
@@ -92,12 +91,21 @@
      var selectGroupuUser = $("#selectGroupuUser").val();
      var BookingDay = $("#BookingDay").val();
 
+     var CategoryRoom = [];
+     $('.chke_category_room').each(function() {
+        if ($(this).is(':checked')) {
+           var valuee = $(this).val();
+           CategoryRoom.push(valuee);
+        }
+     });
+
      var url = base_url_js+'vreservation/config/policy/submit';
      var data = {
          Action : aksi,
          CDID : id,
          selectGroupuUser:selectGroupuUser,
          BookingDay:BookingDay,
+         CategoryRoom : CategoryRoom,
      };
 
      if (validationInput = validation(data)) {
@@ -142,6 +150,11 @@
                 toatString += result['messages'] + "<br>";
               }
               break;
+        case  "CategoryRoom" :
+              if (arr[key].length == 0) {
+                toatString += 'Please choice Category Room Access' + "<br>";
+              }
+              break;      
        }
 
     }
@@ -181,6 +194,7 @@
           '<tr>'+
               '<th style="width: 106px;">Group User</th>'+
               '<th style="width: 106px;">Booking Day</th>'+
+              '<th style="width: 106px;">Category Room</th>'+
               '<th style="width: 15px;">Action</th>'+
           '</tr>'+
       '</thead>'+
@@ -189,10 +203,6 @@
       '</table></div></div>';
       //$("#loadtableNow").empty();
       $("#pageData").html(table);
-
-      /*if (typeof callback === 'function') { 
-          callback(); 
-      }*/
       callback();
   }
 
@@ -202,7 +212,7 @@
   // loading_page('#loadtableNow');
       $.post(url,function (data_json) {
           var response = jQuery.parseJSON(data_json);
-          // $("#loadingProcess").remove();
+          // console.log(response);
           for (var i = 0; i < response.length; i++) {
              var btn_edit = '<span data-smt="'+response[i]['ID']+'" class="btn btn-xs btn-edit"><i class="fa fa-pencil-square-o"></i> Edit</span>';
              var btn_delete = '<span data-smt="'+response[i]['ID']+'"  class="btn btn-xs btn-delete"><i class="fa fa-trash"> Delete</i></span>';
@@ -210,6 +220,7 @@
                   '<tr>'+
                       '<td>'+response[i]['GroupAuth']+'</td>'+
                       '<td>'+response[i]['BookingDay']+'</td>'+
+                      '<td>'+response[i]['NameCategory']+'</td>'+
                       '<td>'+btn_edit+btn_delete+'</td>'+
                   '</tr>' 
                   );

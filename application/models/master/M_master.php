@@ -2477,4 +2477,12 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
       return round(abs(strtotime($d1)-strtotime($d2))/86400);
 
     }  // end function dateDiff
+
+    public function getEmployeesBaseStatus($Status)
+    {
+        $Status = implode(",", $Status);
+        $sql = 'select * from db_employees.employees where StatusEmployeeID in ('.$Status.')';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query; 
+    }
 }

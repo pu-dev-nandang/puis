@@ -797,6 +797,8 @@ $route['api/__m_additional_personel'] = 'api/c_api/m_additional_personel';
 $route['api/__room_equipment'] = 'api/c_api/room_equipment';
 $route['api/__checkBentrokScheduleAPI'] = 'api/c_api/checkBentrokScheduleAPI';
 $route['api/__crudClassroomVreservation'] = 'api/c_api/crudClassroomVreservation';
+$route['api/__crudCategoryClassroomVreservation'] = 'api/c_api/crudCategoryClassroomVreservation';
+
 
 $route['api/__crudTranscript'] = 'api/c_api/crudTranscript';
 $route['api/__getTranscript'] = 'api/c_api/getTranscript';
@@ -912,6 +914,7 @@ $route['testInject'] = 'api/c_global/testInject';
 $route['testInject2'] = 'api/c_global/testInject2';
 $route['testInject3'] = 'api/c_global/testInject3';
 $route['testInject4'] = 'api/c_global/testInject4';
+$route['testInject5'] = 'api/c_global/testInject5';
 
 
 // Pengawas Ujian

@@ -83,7 +83,7 @@ class C_config extends Vreservation_Controler {
         }
         else
         {
-            $generate = $this->m_reservation->getDataWithoutSuperAdmin();
+            $generate = $this->m_reservation->getDataWithoutSuperAdmin2($get[0]['G_user']);
         }
         
         echo json_encode($generate);
@@ -169,70 +169,23 @@ class C_config extends Vreservation_Controler {
     public function getAuthDataTables()
     {
         $requestData= $_REQUEST;
+        $ID_group_user = $this->session->userdata('ID_group_user');
         // print_r($requestData);
         $totalData = $this->m_reservation->getCountAllDataAuth();
 
         // get NIP
         $NIP = $this->session->userdata('NIP');
         $get = $this->m_master->caribasedprimary('db_reservation.previleges_guser','NIP',$NIP);
-        if ($get[0]['G_user'] == 1) {
-            if( !empty($requestData['search']['value']) ) {
-                $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_reservation.previleges_guser as a join db_employees.employees as b
-                        on a.NIP = b.NIP ';
+        $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_reservation.previleges_guser as a join db_employees.employees as b
+                on a.NIP = b.NIP ';
 
-                $sql.= ' where a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%"';
-                $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
-
-            }
-            else {
-                 $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_reservation.previleges_guser as a join db_employees.employees as b
-                         on a.NIP = b.NIP ';
-                 $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
-
-            }
-        }
-        else
-        {
-            if( !empty($requestData['search']['value']) ) {
-                $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_reservation.previleges_guser as a join db_employees.employees as b
-                        on a.NIP = b.NIP ';
-
-                $sql.= ' where a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%" and a.G_user != 1';
-                $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
-
-            }
-            else {
-                 $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_reservation.previleges_guser as a join db_employees.employees as b
-                         on a.NIP = b.NIP and a.G_user != 1';
-                 $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
-
-            }
-        }
-
-        // if( !empty($requestData['search']['value']) ) {
-        //     $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_reservation.previleges_guser as a join db_employees.employees as b
-        //             on a.NIP = b.NIP ';
-
-        //     $sql.= ' where a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%"';
-        //     $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
-
-        // }
-        // else {
-        //      $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_reservation.previleges_guser as a join db_employees.employees as b
-        //              on a.NIP = b.NIP ';
-        //      $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
-
-        // }
+        $sql.= ' where (a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%") and a.G_user >= "'.$ID_group_user.'"';
+        $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
         $query = $this->db->query($sql)->result_array();
 
-        if ($get[0]['G_user'] == 1) {
-            $getGroupUser = $this->m_master->showData_array('db_reservation.cfg_group_user');
-        }
-        else
-        {
-            $getGroupUser = $this->m_reservation->getDataWithoutSuperAdmin();
-        }
+        $sqlGroupuser = 'select * from db_reservation.cfg_group_user where ID >= "'.$ID_group_user.'"';
+        $getGroupUser = $this->db->query($sqlGroupuser, array())->result_array();
 
         $data = array();
         for($i=0;$i<count($query);$i++){
@@ -311,8 +264,29 @@ class C_config extends Vreservation_Controler {
 
     public function policy_json_data()
     {
-        $sql = 'select a.*,b.GroupAuth from db_reservation.cfg_policy as a join db_reservation.cfg_group_user as b on a.ID_group_user = b.ID';
+        // cek auth
+        $arr_temp = array();
+        $ID_group_user = $this->session->userdata('ID_group_user');
+        $QueryAdd = ' where a.ID_group_user >= "'.$ID_group_user.'"';
+        $sql = 'select a.*,b.GroupAuth from db_reservation.cfg_policy as a join db_reservation.cfg_group_user as b on a.ID_group_user = b.ID '.$QueryAdd;
         $query=$this->db->query($sql, array())->result_array();
+        $Q_catetegory = $this->m_master->showData_array('db_reservation.category_room');
+        for ($i=0; $i < count($query); $i++) { 
+            $CategoryRoom = $query[$i]['CategoryRoom'];
+            $CategoryRoom = json_decode($CategoryRoom);
+            $NameCategory = array();
+            for ($l=0; $l < count($CategoryRoom); $l++) { 
+                
+                for ($k=0; $k < count($Q_catetegory); $k++) { 
+                    if ($CategoryRoom[$l] ==  $Q_catetegory[$k]['ID'] ) {
+                        $NameCategory[] = $Q_catetegory[$k]['NameEng'];
+                        break; 
+                    }
+                }
+            }
+            $NameCategory = implode("<br>", $NameCategory);
+            $query[$i] = $query[$i] + array('NameCategory' => $NameCategory );
+        }
         echo json_encode($query);
     }
 
@@ -330,29 +304,27 @@ class C_config extends Vreservation_Controler {
     public function policy_submit()
     {
         $input = $this->getInputToken();
+        $CategoryRoom = json_encode($input['CategoryRoom']);
         switch ($input['Action']) {
             case 'add':
-                //$this->m_master->inserData_jenis_tempat_tinggal($input['Equipment']);
             $dataSave = array(
                 'ID_group_user' => $input['selectGroupuUser'],
                 'BookingDay' => $input['BookingDay'],
+                'CategoryRoom' => $CategoryRoom,
             );
             $this->db->insert('db_reservation.cfg_policy', $dataSave);
                 break;
             case 'edit':
-                //$this->m_master->editData_jenis_tempat_tinggal($input['Equipment'],$input['CDID']);
                 $dataSave = array(
                     'ID_group_user' => $input['selectGroupuUser'],
                     'BookingDay' => $input['BookingDay'],
+                    'CategoryRoom' => $CategoryRoom,
                 );
                 $this->db->where('ID', $input['CDID']);
                 $this->db->update('db_reservation.cfg_policy', $dataSave);
                 break;
             case 'delete':
                 $this->m_master->delete_id_table_all_db($input['CDID'],'db_reservation.cfg_policy');
-                break;
-            case 'getactive':
-                // $this->m_master->getActive_id_activeAll_table_allDB($input['CDID'],$input['Active'],'db_reservation.m_equipment');
                 break;
             default:
                 # code...

@@ -1,6 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 class C_global extends CI_Controller {
 
     private $data = array();
@@ -83,10 +84,11 @@ class C_global extends CI_Controller {
 
     public function fileGetAny($file)
     {
+        error_reporting(0);
         //check session ID_register_formulir ada atau tidak
         // check session token untuk download
         $file = str_replace('-', '/', $file);
-
+        // print_r($file);die();
         $path = $file;
         $ext = pathinfo($path, PATHINFO_EXTENSION);
         if ($ext == 'pdf') {
@@ -116,22 +118,17 @@ class C_global extends CI_Controller {
         }
         else
         {
-            $imageData = base64_encode(file_get_contents(FCPATH.'uploads/'.$path));
-            echo '<img src="data:image/jpeg;base64,'.$imageData.'">';
+            if (file_exists('./uploads/'.$file)) {
+                $imageData = base64_encode(file_get_contents(FCPATH.'uploads/'.$path));
+                echo '<img src="data:image/jpeg;base64,'.$imageData.'">';
+                
+            }
+            else
+            {
+                show_404($log_error = TRUE);
+            }
+            
         }
-
-        // // Check File exist atau tidak
-        // if (file_exists('./uploads/'.$file)) {
-        //     // $this->load->helper('download');
-        //     // $data   = file_get_contents('./document/'.$namaFolder.'/'.$file);
-        //     // $name   = $file;
-        //     // force_download($name, $data); // script download file
-        //     $this->showFile2($file);
-        // }
-        // else
-        // {
-        //     show_404($log_error = TRUE);
-        // }
     }
 
     private function showFile2($file)
@@ -321,6 +318,84 @@ class C_global extends CI_Controller {
             }
         }
         
+    }
+
+    public function testInject5()
+    {
+        //Load Composer's autoloader
+        include_once APPPATH.'vendor/autoload.php';
+
+        $mail = new PHPMailer(true);                
+        $event_id = 1234;
+        $sequence = 0;
+        $status = 'TENTATIVE';
+        // event params
+        $summary = 'Summary of the 161330';
+        $venue = 'Jakarta';
+        $start = '20181105';
+        $start_time = '161330';
+        $end = '20181105';
+        $end_time = '170630';
+
+        //PHPMailer
+       //Server settings
+           $mail->SMTPDebug = 0;                                 // Enable verbose debug output
+           $mail->isSMTP();                                      // Set mailer to use SMTP
+           $mail->Host = 'ssl://smtp.gmail.com';  // Specify main and backup SMTP servers
+           $mail->SMTPAuth = true;                               // Enable SMTP authentication
+           $mail->Username = 'ithelpdesk.notif@podomorouniversity.ac.id';                 // SMTP username
+           $mail->Password = '4dm1n5!S';                           // SMTP password
+           $mail->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
+           $mail->Port = 465;    
+           $mail->IsHTML(false);                                // TCP port to connect to
+        $mail->setFrom('ithelpdesk.notif@podomorouniversity.ac.id', 'IT');
+        $mail->addReplyTo('alhadi.rahman@podomorouniversity.ac.id', 'IT');
+        $mail->addAddress('alhadi.rahman@podomorouniversity.ac.id','IT');
+        $mail->addAddress('alhadirahman22@gmail.com','adi');
+        $mail->addAddress('rqul22@gmail.com','RF');
+        $mail->ContentType = 'text/calendar';
+
+        $mail->Subject = "Outlooked Event";
+        $mail->addCustomHeader('MIME-version',"1.0");
+        $mail->addCustomHeader('Content-type',"text/calendar; method=REQUEST; charset=UTF-8");
+        $mail->addCustomHeader('Content-Transfer-Encoding',"7bit");
+        $mail->addCustomHeader('X-Mailer',"Microsoft Office Outlook 12.0");
+        $mail->addCustomHeader("Content-class: urn:content-classes:calendarmessage");
+
+        $ical = "BEGIN:VCALENDAR\r\n";
+        $ical .= "VERSION:2.0\r\n";
+        $ical .= "PRODID:-//YourCassavaLtd//EateriesDept//EN\r\n";
+        $ical .= "METHOD:REQUEST\r\n";
+        $ical .= "BEGIN:VEVENT\r\n";
+        $ical .= "ORGANIZER;SENT-BY=\"MAILTO:it@podomorouniversity.ac.id\":MAILTO:it@podomorouniversity.ac.id\r\n";
+        $ical .= "ATTENDEE;CN=it@podomorouniversity.ac.id.com;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE:mailto:it@podomorouniversity.ac.id\r\n";
+        $ical .= "UID:".strtoupper(md5($event_id))."-podomorouniversity.ac.id\r\n";
+        $ical .= "SEQUENCE:".$sequence."\r\n";
+        $ical .= "STATUS:".$status."\r\n";
+        $ical .= "DTSTAMPTZID=Africa/Nairobi:".date('Ymd').'T'.date('His')."\r\n";
+        $ical .= "DTSTART:".$start."T".$start_time."\r\n";
+        $ical .= "DTEND:".$end."T".$end_time."\r\n";
+        $ical .= "LOCATION:".$venue."\r\n";
+        $ical .= "SUMMARY:".$summary."\r\n";
+        $ical .= "DESCRIPTION:".'Test Description'."\r\n"; 
+        $ical .= "BEGIN:VALARM\r\n";
+        $ical .= "TRIGGER:-PT15M\r\n";
+        $ical .= "ACTION:DISPLAY\r\n";
+        $ical .= "DESCRIPTION:Reminder\r\n";
+        $ical .= "END:VALARM\r\n";
+        $ical .= "END:VEVENT\r\n";
+        $ical .= "END:VCALENDAR\r\n";
+
+        $mail->Body = $ical;
+
+        //send the message, check for errors
+        if(!$mail->send()) {
+        $this->error = "Mailer Error: " . $mail->ErrorInfo;
+        return false;
+        } else {
+        $this->error = "Message sent!";
+        return true;
+        }
     }
 
     // public function page_mahasiswa()

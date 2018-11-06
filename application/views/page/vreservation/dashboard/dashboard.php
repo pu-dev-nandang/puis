@@ -3,16 +3,14 @@
 	<div class="col-md-12">
 		<div class="widget">
 			<div class="row">
-				<div class="col-md-4 col-md-offset-8">
-					<b>Status : </b><br>
+				<div class="col-xs-7 col-md-offset-5" align="right">
+					<b style="margin-right: 280px">Status : </b><br>
 					<i class="fa fa-circle" style="color:#6ba5c1;"></i> Available || 
 					<i class="fa fa-circle" style="color:#e98180;"></i> Booked ||
 					<i class="fa fa-circle" style="color:#20c51b;"></i> Booked ||
 					<i class="fa fa-circle" style="color:#ffb848;"></i> Requested 
-
 				</div>
 			</div>
-			
 			<div class="widget-header">
 					<h4 id = 'schdate'><i class="icon-calendar"></i> Schedule Date : <?php echo date('Y-m-d') ?></h4>
 					<div class="thumbnail" style="padding: 10px;" id = "countRequest">

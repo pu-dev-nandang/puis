@@ -6,11 +6,11 @@
                 <h4 class="header"><i class="icon-reorder"></i>Add User Previleges</h4>
             </div>
             <div class="widget-content">
-                <div class = "row">	
-					<div class="col-xs-3" style="">
-						Name
-						<input class="form-control" id="Nama" placeholder="Input Name..." "="">
-					</div>
+                <div class = "row btn-add">	
+          					<div class="col-xs-3" style="">
+          						Name
+          						<input class="form-control" id="Nama" placeholder="Input Name..." "="">
+          					</div>
                     <div class="col-xs-3">
                         Choice Group User Previleges :
                         <select class="full-width-fix" id="selectGroupuUser">
@@ -22,11 +22,10 @@
                         <button class="btn btn-primary btn-add" id="btn-save"><i class="fa fa-floppy-o" aria-hidden="true"></i>
                         Save</button>
                     </div>    
-				</div>
-                <br>
-                <!-- <div class = "row"> -->
+				        </div>
+                <div class = "row" style="margin-top: 10px">
                     <div id='LoadTblGroupUser'></div> 
-                <!-- </div> -->
+                </div>
                 <div class="row" id='LoadBtnSbmt'></div>
             </div>
         </div>
