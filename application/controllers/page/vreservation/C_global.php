@@ -20,15 +20,24 @@ class C_global extends Vreservation_Controler {
 
     public function getschedule($date = null)
     {
+        $PostCategory = '0';
         // get room
             // get categoryRoom based Policy
             $getCfgPolicy = $this->m_master->caribasedprimary('db_reservation.cfg_policy','ID_group_user',$this->session->userdata('ID_group_user'));
             $CategoryRoom = json_decode($getCfgPolicy[0]['CategoryRoom']);
             $CategoryRoom = implode(',', $CategoryRoom);
+            $OpCategory = $this->m_reservation->OpCategorybyIN($CategoryRoom);
+        if (empty($_POST) ) {
             $sql = 'select * from db_academic.classroom where ID_CategoryRoom in ('.$CategoryRoom.')';
             $getRoom = $this->db->query($sql, array())->result_array();
-
-            // $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','L_Venue',1);
+        }
+        else
+        {
+            $PostCategory = $this->input->post('CategoryRoom');
+            $sql = 'select * from db_academic.classroom where ID_CategoryRoom in ('.$PostCategory.')';
+            $getRoom = $this->db->query($sql, array())->result_array();
+        }
+            
 
         // get data classroom
         $NextDate = '';
@@ -76,6 +85,8 @@ class C_global extends Vreservation_Controler {
         $PreviousDate = date('Y-m-d', strtotime($date . ' -1 day'));
         $data['NextDate'] = $NextDate;
         $data['PreviousDate'] = $PreviousDate;
+        $data['OpCategory'] = $OpCategory;
+        $data['PostCategory'] = $PostCategory;
         $chkDate = 0;
         if(strtotime($date) >= strtotime(date('Y-m-d')) )
         {

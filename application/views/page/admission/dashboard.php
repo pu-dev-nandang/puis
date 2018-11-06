@@ -8,6 +8,7 @@
 <script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/flot/jquery.flot.selection.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/flot/jquery.flot.growraf.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/easy-pie-chart/jquery.easy-pie-chart.min.js"></script>
+<!-- <button class="btn btn-primary testPost">test</button> -->
 <div class="row" style="margin-left: 0px;margin-right: 0px;margin-top: -30px">
 	<div class="col-xs-6 col-md-offset-5">
 		<h2>Angkatan <?php echo $set_ta ?></h2>
@@ -96,6 +97,20 @@
 		loadChartSummaryFormulirAdmission();
 		loadChartSummaryFormulirPerSales();
 		loadSumBox();
+
+		$(".testPost").click(function(){
+			var url = 'http://localhost/library/index.php?p=member';
+			data = {
+			  memberID : '23160002',
+			  memberPassWord : '123456',
+			}
+			var token = jwt_encode(data,"UAP)(*");
+			FormSubmitAuto(url, 'POST', [
+			    { name: 'memberID', value: '23160002' },
+			    { name: 'memberPassWord', value: '123456' },
+			    {name : 'logMeIn',value : 'Login'},
+			]);
+		})
 
 	});
 

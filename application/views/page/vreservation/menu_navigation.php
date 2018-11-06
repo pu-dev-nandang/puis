@@ -194,7 +194,7 @@ $this->m_reservation->checkAuth_user_vreservation();
  ?>
 
  <script type="text/javascript">
-     function loadDataSchedule(divHtml,date = '')
+     function loadDataSchedule(divHtml,date = '',CategoryRoom = '0')
      {  
         // divHtml.html('');
         loading_page(divHtml);
@@ -202,17 +202,34 @@ $this->m_reservation->checkAuth_user_vreservation();
         if (date != '') {
             url = base_url_js+'vreservation/getschedule/'+date;
         }
-        $.post(url,function (data_json) {
-            var response = jQuery.parseJSON(data_json);
-            divHtml.html(response);
-        }).done(function() {
-            if ($("#classroom_view").length) {
-              loadRoomStatus2(loadDataRoomStatus2);
-            } else {
-              loadRoomStatus(loadDataRoomStatus);
-            }
-            
-        })
+        if (CategoryRoom == 0) {
+            $.post(url,function (data_json) {
+                var response = jQuery.parseJSON(data_json);
+                divHtml.html(response);
+            }).done(function() {
+                if ($("#classroom_view").length) {
+                  loadRoomStatus2(loadDataRoomStatus2);
+                } else {
+                  loadRoomStatus(loadDataRoomStatus);
+                }
+                
+            })
+        }
+        else
+        {
+            $.post(url,{CategoryRoom : CategoryRoom},function (data_json) {
+                var response = jQuery.parseJSON(data_json);
+                divHtml.html(response);
+            }).done(function() {
+                if ($("#classroom_view").length) {
+                  loadRoomStatus2(loadDataRoomStatus2);
+                } else {
+                  loadRoomStatus(loadDataRoomStatus);
+                }
+                
+            })
+        }
+        
      }
 
      function loadRoomStatus(loadDataRoomStatus)
