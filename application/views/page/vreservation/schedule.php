@@ -101,10 +101,22 @@
 <div class="row">
 	<div class="col-md-12">
 		<div class="row">
-			<div class="col-xs-2">
+			<div class="col-xs-2" style="margin-top: 40px">
 				<button id = "PreviousDate" class="btn btn-success dateSearch" date = "<?php echo $PreviousDate ?>"> << Previous</button>
 			</div>
-			<div class="col-xs-2 col-md-offset-8" align="right">
+			<div class="col-xs-3 col-md-offset-2">
+				<div class="form-group">
+					<label>Category Room</label>
+					<select class="form-control" id = "OpCategoryRoom">
+						<option value="0">All</option>
+						<?php for($i = 0; $i < count($OpCategory); $i++): ?>
+							<option value="<?php echo $OpCategory[$i]['ID'] ?>"><?php echo $OpCategory[$i]['NameEng'] ?></option>	
+						<?php endfor ?>  
+					</select>
+				</div>
+				
+			</div>
+			<div class="col-xs-2 col-md-offset-3" align="right" style="margin-top: 40px">
 				<button id = "NextDate" class="btn btn-success dateSearch" date = "<?php echo $NextDate ?>"> Next >></button>
 			</div>
 		</div>
@@ -204,6 +216,19 @@
   			$('.panel-blue').click(function(){return false;});
   			$('.panel-orange').click(function(){return false;});
   		}
+
+  		// get CategoryRoom
+  			$("#OpCategoryRoom option").filter(function() {
+  			   //may want to use $.trim in here
+  			   return $(this).val() == "<?php echo $PostCategory ?>"; 
+  			 }).prop("selected", true);
+  			
+	  		$("#OpCategoryRoom").change(function(){
+	  			var divHtml = $("#schedule");
+	  			var value = $(this).val();
+	  			loading_page("#classroom_view");
+	  			loadDataSchedule(divHtml,'<?php echo $date ?>',value);
+	  		})
   	});
 
   	function FuncSearchBtnDate()

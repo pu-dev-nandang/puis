@@ -1522,4 +1522,11 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
         $this->session->set_userdata($arr);
     }
+
+    public function OpCategorybyIN($CategoryRoom)
+    {
+        $sql = 'select * from db_reservation.category_room where ID in ('.$CategoryRoom.')';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
+    }
 }
