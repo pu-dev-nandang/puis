@@ -3480,11 +3480,18 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_Div,$h,'','LRT',0,'L');
         $pdf->Cell($w_Div,$h,'','LRT',1,'L');
 
+        $IPKFinal = $Result['IPK'];
+        if(strlen($Result['IPK'])==2) {
+            $IPKFinal = $Result['IPK'].'00';
+        } else if(strlen($Result['IPK'])==3){
+            $IPKFinal = $Result['IPK'].'0';
+        }
+        
         $h=3;
         $pdf->SetFont('dinpromedium','',$font_medium);
         $pdf->Cell($w_R_label,$h,' Indeks Prestasi Kumulatif','L',0,'L');
         $pdf->Cell($w_R_sparator,$h,':',0,0,'L');
-        $pdf->Cell($w_R_fill,$h,$Result['IPK'],'R',0,'L');
+        $pdf->Cell($w_R_fill,$h,$IPKFinal,'R',0,'L');
         $pdf->Cell($w_R_label,$h,' Predikat Kelulusan','L',0,'L');
         $pdf->Cell($w_R_sparator,$h,':',0,0,'C');
         $pdf->Cell($w_R_fill,$h,$Result['Grading'][0]['Description'],'R',1,'L');
