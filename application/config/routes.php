@@ -819,6 +819,7 @@ $route['__resetPasswordUser'] = 'c_login/resetPasswordUser';
 // for inject //
 
 //Venue Reservation // 
+$route['loginToVenue'] = 'c_login/loginToVenue';
 $route['venue_reservation'] = 'page/vreservation/c_global';
 $query = $db->get('db_reservation.cfg_sub_menu');
 $result = $query->result();
