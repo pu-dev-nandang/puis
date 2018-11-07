@@ -3276,7 +3276,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->AddFont('dinproExpBold','','dinproExpBold.php');
 
         // membuat halaman baru
-        $pdf->SetMargins(10,42.5,10);
+        $pdf->SetMargins(12,40.5,10);
         $pdf->AddPage();
 
         $pdf->SetFont('dinpromedium','',7);
@@ -3289,7 +3289,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(2,7,' : ',0,0,'C');
         $pdf->Cell(25,7,$Student['CSN'],0,1,'R');
 
-        $pdf->SetXY(10,43.5);
+        $pdf->SetXY(12,41.5);
 
         $label_l = 35;
         $sparator_l = 1;
@@ -3430,7 +3430,8 @@ class C_save_to_pdf extends CI_Controller {
             $this->spasi_transcript_table($pdf,'B');
 
             if($pdf->GetY()>=324){
-                $pdf->SetMargins(10,20,10);
+//                $pdf->SetMargins(12,40.5,10);
+                $pdf->SetMargins(12,18,10);
                 $pdf->AddPage();
 //                $pdf->SetXY(10,43.5);
                 $this->header_transcript_table($pdf);
@@ -3530,8 +3531,8 @@ class C_save_to_pdf extends CI_Controller {
 
         $yA2 = $pdf->GetY();
 //        $pdf->SetLineWidth(0.2);
-        $pdf->Line(10, $yA, 10, $yA2);
-        $pdf->Line(10+$w_R_label+$w_R_sparator+$w_R_fill+$w_Div, $yA, 10+$w_R_label+$w_R_sparator+$w_R_fill+$w_Div, $yA2);
+        $pdf->Line(12, $yA, 12, $yA2);
+        $pdf->Line(12+$w_R_label+$w_R_sparator+$w_R_fill+$w_Div, $yA, 12+$w_R_label+$w_R_sparator+$w_R_fill+$w_Div, $yA2);
         $h = 1.5;
         $pdf->Cell($totalW,$h,'','LRB',1,'L');
         $h=3;
