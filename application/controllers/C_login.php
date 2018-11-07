@@ -20,10 +20,9 @@ class C_login extends CI_Controller {
         $this->load->library('google');
         $this->load->model('m_auth');
         date_default_timezone_set("Asia/Jakarta");
-
+        $this->load->model('master/m_master');
         // define config Virtual Account
         if (!defined('VA_client_id')) {
-            $this->load->model('master/m_master');
             $getCFGVA = $this->m_master->showData_array('db_va.cfg_bank');
             define('VA_client_id',$getCFGVA[0]['client_id'] ,true);
             define('VA_secret_key',$getCFGVA[0]['secret_key'] ,true);
@@ -256,7 +255,7 @@ class C_login extends CI_Controller {
                 }
                 else {
                   // content berhasil
-                  $this->load->model('master/m_master');
+                  // $this->load->model('master/m_master');
                   $this->load->model('finance/m_finance');
                   $this->load->model('m_sendemail');
                   $BNIdbLog = $this->m_master->caribasedprimary('db_va.va_log','trx_id',$data_asli['trx_id']);
@@ -490,10 +489,6 @@ class C_login extends CI_Controller {
 
     public function ApiServerToServer()
     {        
-        // $data = '{"client_id":"10.1.30.102","data":["eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhZGkiOiJhZGkifQ.JW9wQXbxUqxmbzNVRIWd0UJzErziJ19z6P_BJesBcmI"]}';
-        // $data_json = json_decode($data,true);
-        // print_r($data_json);
-        // die();
         $data = file_get_contents('php://input');
 
         $data_json = json_decode($data,true);
@@ -533,6 +528,32 @@ class C_login extends CI_Controller {
             }
             
           }
+    }
+
+    public function loginToVenue()
+    {
+      try {
+        $token = $this->input->post('token');
+        $key = "s3Cr3T-G4N";
+        $input = (array) $this->jwt->decode($token,$key);
+        if ($input['url'] != url_pas.'loginToVenue') {
+          echo '{"status":"Key is wrong"}';
+        }
+        else
+        {
+          $dataUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$input['NIP']);
+          if (count($dataUser) > 0) {
+            $this->setSession($dataUser[0]['ID'],$dataUser[0]['NIP']);
+            redirect(base_url().'vreservation');
+          }
+        }
+
+      }
+      //catch exception
+      catch(Exception $e) {
+        // handling orang iseng
+        echo '{"status":"999","message":"jangan iseng :D"}';
+      }
     }
 
 }
