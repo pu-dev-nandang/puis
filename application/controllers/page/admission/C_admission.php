@@ -1588,6 +1588,7 @@ class C_admission extends Admission_Controler {
 
           // $this->db->insert_batch($ta.'.students', $arr);
           $this->db->insert_batch('db_academic.auth_students', $arr_insert_auth);
+          $this->m_admission->insert_to_Library($arr_insert_auth);
           echo json_encode('');
 
     }
