@@ -3016,4 +3016,30 @@ class M_admission extends CI_Model {
 
     }
 
+    public function insert_to_Library($arr_data)
+    {
+      $this->db_server22 = $this->load->database('server22', TRUE); 
+      $member_since_date = date('Y-m-d');
+      $aa = explode("-", $member_since_date);
+      $expire_date = $aa[0] + 4;
+      $expire_date = $expire_date.'-'.$aa[1].'-'.$aa[2];
+      for ($i=0; $i < count($arr_data); $i++) { 
+        $dataSave = array(
+            'member_id' => $arr_data[$i]['NPM'],
+            'member_name' => $arr_data[$i]['Name'],
+            'gender' => 0,
+            'member_type_id' => 2,
+            'member_mail_address' => $arr_data[$i]['EmailPU'],
+            'inst_name' => 'Podomoro University',
+            'member_since_date' => $member_since_date,
+            'register_date' => $member_since_date,
+            'expire_date' => $expire_date,
+            'mpasswd' => $arr_data[$i]['Password_Old'],
+            'input_date' =>$member_since_date,
+        );
+        $this->db_server22->insert('library.member', $dataSave);
+      }
+      
+    }
+
 }
