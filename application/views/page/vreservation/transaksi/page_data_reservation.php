@@ -44,9 +44,9 @@
                 <h4 class="header"><i class="icon-reorder"></i>  Data<!--List Vreservation User --> </h4>
             </div>
             <div class="widget-content">
-                <div class="thumbnail" style="padding: 10px;">
+               <!--  <div class="thumbnail" style="padding: 10px;">
                     <b>Status : </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Approve 
-                </div>
+                </div> -->
                 <br>
                 <div id="pageData">
                                 
@@ -269,9 +269,9 @@
 
                 var Req_layout = (response[i]['Req_layout'] == '') ? 'Default' : '<a href="javascript:void(0)" class="btn-action btn-get-link2" data-page="fileGetAny/vreservation-'+response[i]['Req_layout']+'">Request Layout</a>'; 
                 var tr = '<tr>';
-                if (response[i]['Status'] ==  1) {
-                  tr = '<tr style="background-color: #8ED6EA; color: black;">';
-                }
+                // if (response[i]['Status'] ==  1) {
+                //   tr = '<tr style="background-color: #8ED6EA; color: black;">';
+                // }
                 $(".datatable tbody").append(
                     tr+
                         '<td>'+response[i]['Start']+'<br>-<br>'+response[i]['End']+'<hr>Req & Date :<br>'+response[i]['Req_date']+'</td>'+
