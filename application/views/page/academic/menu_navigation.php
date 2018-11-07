@@ -72,24 +72,34 @@
             <span>Academic Transactions</span>
         </div>
         <ul id="nav">
+<!--            <li class="--><?php //if($this->uri->segment(2)=='timetables'){echo "current";} ?><!--">-->
+<!--                <a href="--><?php //echo base_url('academic/timetables'); ?><!--">-->
+<!--                    <i class="fa fa-calendar"></i>-->
+<!--                    Timetables-->
+<!--                </a>-->
+<!--            </li>-->
+
             <li class="<?php if($this->uri->segment(2)=='timetables'){echo "current";} ?>">
-                <a href="<?php echo base_url('academic/timetables'); ?>">
+                <a href="<?php echo base_url('academic/timetables/list'); ?>">
                     <i class="fa fa-calendar"></i>
                     Timetables
                 </a>
             </li>
-<!--            <li class="">-->
-<!--                <a href="#">-->
-<!--                    <i class="fa fa-refresh"></i>-->
-<!--                    Kelas Pengganti-->
+
+
+<!--            <li class="--><?php //if($this->uri->segment(2)=='study-planning'){echo "current";} ?><!--">-->
+<!--                <a href="--><?php //echo base_url('academic/study-planning'); ?><!--">-->
+<!--                    <i class="fa fa-edit"></i>-->
+<!--                    Study Plan-->
 <!--                </a>-->
 <!--            </li>-->
             <li class="<?php if($this->uri->segment(2)=='study-planning'){echo "current";} ?>">
-                <a href="<?php echo base_url('academic/study-planning'); ?>">
+                <a href="<?php echo base_url('academic/study-planning/list-student'); ?>">
                     <i class="fa fa-edit"></i>
                     Study Plan
                 </a>
             </li>
+
             <li class="<?php if($this->uri->segment(2)=='attendance'){echo "current";} ?>">
                 <a href="<?php echo base_url('academic/attendance/input-attendace'); ?>">
                     <i class="fa fa-users"></i>

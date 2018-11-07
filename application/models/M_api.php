@@ -3601,6 +3601,176 @@ class M_api extends CI_Model {
         return $dataExamDetail;
     }
 
-    
+    public function getDataAuthStudent($NPM){
+
+        $data = $this->db->query('SELECT auts.NPM,auts.Name,auts.ProgramID,auts.ProdiID,auts.Year, ps.NameEng, 
+                                              em.Name AS Mentor
+                                              FROM db_academic.auth_students auts
+                                              LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
+                                              LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = auts.NPM)
+                                              LEFT JOIN db_employees.employees em ON (em.NIP = ma.NIP)
+                                              WHERE auts.NPM = "'.$NPM.'" LIMIT 1 ')->result_array();
+
+        if(count($data)>0){
+            $dataStd = $this->db->select('ID')->get_where('ta_'.$data[0]['Year'].'.students',
+                array('NPM' => $data[0]['NPM']), 1)->result_array();
+            $data[0]['MhswID'] = $dataStd[0]['ID'];
+        }
+
+        return $data;
+    }
+
+    public function __getAvailabelCourse($SemesterID,$NPM,$ProgramCampusID,$ProdiID,$Semester,$IsSemesterAntara,$ClassOf){
+        ini_set('max_execution_time', 300);
+
+        $student_DB = 'ta_'.$ClassOf;
+
+        $data = $this->db->query('SELECT co.Arr_CDID FROM db_academic.course_offerings co 
+                                            LEFT JOIN db_academic.curriculum c ON (c.ID = co.CurriculumID)
+                                            WHERE co.SemesterID = "'.$SemesterID.'" 
+                                            AND co.ProgramsCampusID = "'.$ProgramCampusID.'"
+                                             AND co.ProdiID = "'.$ProdiID.'"
+                                              AND co.Semester = "'.$Semester.'"
+                                               AND co.IsSemesterAntara = "'.$IsSemesterAntara.'"
+                                                AND c.Year = "'.$ClassOf.'" LIMIT 1 ')->result_array();
+
+        $result = [];
+        if(count($data)>0){
+            $dataCDID = json_decode($data[0]['Arr_CDID']);
+            $result = $data[0];
+            $arrSchedule = [];
+            for($i=0;$i<count($dataCDID);$i++){
+                $dataSch = $this->getDetailScheduleByCDID($SemesterID,$NPM,$student_DB,$dataCDID[$i]);
+                if(count($dataSch)>0){
+                    for($s=0;$s<count($dataSch);$s++){
+                        array_push($arrSchedule,$dataSch[$s]);
+                    }
+                }
+            }
+
+            usort($arrSchedule,array($this, "cmp"));
+            $result['Schedule'] = $arrSchedule;
+
+            // DrafKRS
+            $DetailDrafKRS = $this->db->query('SELECT sk.ID AS SKID, sk.ScheduleID, sk.CDID, sk.Status, sk.TypeSP, cd.TotalSKS AS Credit, 
+                                                          skc.ID AS ReasonID, skc.Reason
+                                                          FROM db_academic.std_krs sk 
+                                                          LEFT JOIN db_academic.curriculum_details cd 
+                                                          ON (cd.ID = sk.CDID)
+                                                          LEFT JOIN db_academic.std_krs_comment skc ON (skc.KRSID = sk.ID)
+                                                          WHERE sk.SemesterID = "'.$SemesterID.'" 
+                                                          AND sk.NPM = "'.$NPM.'" ');
+            $result['ScheduleDraf'] = $DetailDrafKRS->result_array();
+
+
+        }
+
+        return $result;
+    }
+
+    private function getDetailScheduleByCDID($SemesterID,$NPM,$student_DB,$CDID){
+
+        $data = $this->db->query('SELECT s.ID, s.SemesterID, s.TeamTeaching, s.ClassGroup, 
+                                            cd.ID AS CDID, cd.MKType, cd.Semester ,cd.TotalSKS AS Credit, cd.StatusPrecondition, cd.DataPrecondition, 
+                                            mk.ID AS MKID, mk.MKCode, mk.Name AS MKName, mk.NameEng AS MKNameEng
+                                            FROM db_academic.schedule_details_course sdc
+                                            LEFT JOIN db_academic.schedule s ON (s.ID = sdc.ScheduleID)
+                                            LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                            LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
+                                            WHERE sdc.CDID = "'.$CDID.'" AND s.SemesterID = "'.$SemesterID.'"')->result_array();
+
+        $result = [];
+        if(count($data)>0){
+
+            for($s=0;$s<count($data);$s++){
+                $d = $data[$s];
+                if($d['StatusPrecondition']==1){
+                    $dataPre = json_decode($d['DataPrecondition']);
+
+                    $pre_arr = [];
+                    $cek_arr = [];
+                    for($i=0;$i<count($dataPre);$i++){
+                        $exp = explode('.',$dataPre[$i]);
+                        $pre = $this->db->query('SELECT ID,MKcode,Name,NameEng FROM db_academic.mata_kuliah 
+                                            WHERE ID="'.$exp[0].'"')->result_array();
+
+                        // Cek apakah prasyarat sudah diambil atau belum
+                        $cekPre = $this->db
+                            ->get_where($student_DB.'.study_planning', array('NPM'=>$NPM,'MKID'=>$exp[0]),1)
+                            ->result_array();
+
+                        if(count($cekPre)>0){
+                            array_push($cek_arr,1);
+                        } else {
+                            array_push($cek_arr,0);
+                        }
+
+                        array_push($pre_arr,$pre[0]);
+                    }
+
+                    $d['DetailPrecondition'] = $pre_arr;
+                    if(in_array(0, $cek_arr)){
+                        $d['AllowPrecondition'] = 0;
+                    } else {
+                        $d['AllowPrecondition'] = 1;
+                    }
+                }
+
+                $dataMK = $this->db
+                    ->get_where($student_DB.'.study_planning', array('NPM'=>$NPM,'MKID'=>$d['MKID']),1)
+                    ->result_array();
+
+                $d['SPID'] = (count($dataMK)>0)? $dataMK[0]['ID'] : null ;
+
+                //Status KRS
+                $dataStatus = $this->db->get_where('db_academic.std_krs',array('NPM'=>$NPM,'CDID'=>$CDID),1)->result_array();
+                $d['DetailKRS'] = (count($dataStatus)>0)? $dataStatus[0] : $dataStatus;
+
+                // Get Sesi
+                $dataSesi = $this->db->query('SELECT d.Name AS DayName,d.NameEng AS DayNameEng, cl.Room, cl.Seat, 
+                                                  sd.StartSessions, sd.EndSessions, sd.ClassroomID, sd.DayID
+                                                    FROM db_academic.schedule_details sd 
+                                                    LEFT JOIN db_academic.days d ON (d.ID=sd.DayID)
+                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID=sd.ClassroomID)
+                                                    WHERE sd.ScheduleID = "'.$d['ID'].'" ')->result_array();
+
+                for($s2=0;$s2<count($dataSesi);$s2++){
+                    $whereCheck = array(
+                        'SemesterID' => $d['SemesterID'],
+                        'ScheduleID' => $d['ID'],
+                        'CDID' => $CDID
+                    );
+                    $querySeat = $this->db->get_where('db_academic.std_krs', $whereCheck)->result_array();
+                    $dataSesi[$s2]['CountSeat'] = count($querySeat);
+                }
+
+                $d['ScheduleDetails'] = $dataSesi;
+
+
+                if($d['TeamTeaching']=='1'){
+                    $dataTT = $this->db->query('SELECT * FROM db_academic.schedule_team_teaching stt WHERE stt.ScheduleID = "'.$d['ID'].'" ')->result_array();
+                    $d['TeamTeachingDetails'] = $dataTT;
+                }
+
+                array_push($result,$d);
+            }
+
+        }
+
+        return $result;
+
+    }
+
+    public function getSemesterStudentByYear($SemesterID,$Year){
+        $data = $this->db->get_where('db_academic.semester',
+            array('Year >=' => $Year,'ID <=' => $SemesterID))->result_array();
+
+        return count($data);
+    }
+
+    public function cmp($a, $b)
+    {
+        return strcmp($a['Semester'], $b['Semester']);
+    }
 
 }
