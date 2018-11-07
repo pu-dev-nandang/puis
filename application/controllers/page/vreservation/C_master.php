@@ -74,6 +74,10 @@ class C_master extends Vreservation_Controler {
     public function ruangan()
     {
         $data['CategoryRoom'] = $this->m_master->showData_array('db_reservation.category_room');
+        $sqlGroupuser = 'select * from db_reservation.cfg_group_user where ID >= 3';
+        $getGroupUser = $this->db->query($sqlGroupuser, array())->result_array();
+        $data['GroupUser'] = $getGroupUser;
+        $data['PositionUser'] = $this->m_master->showData_array('db_employees.position');
         // get employees all
             $Status = array(1,2,3);
             $data['employees'] = $this->m_master->getEmployeesBaseStatus($Status);

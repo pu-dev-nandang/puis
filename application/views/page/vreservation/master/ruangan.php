@@ -43,6 +43,8 @@
     var CategoryRoom = <?php echo json_encode($CategoryRoom)  ?>;
     var employees = <?php echo json_encode($employees)  ?>;
     var division = <?php echo json_encode($division)  ?>;
+    var GroupUser = <?php echo json_encode($GroupUser)  ?>;
+    var PositionUser = <?php echo json_encode($PositionUser)  ?>;
     $(document).ready(function () {
         // console.log(employees);
         loadDataCategoryClassroom();
@@ -245,7 +247,23 @@
         if(action=='add' || action=='edit'){
             // option value employees
             var selected1 = (action=='add') ? '' :Approver1[0]; 
-            var selected2 = (action=='add') ? '' :Approver2[0]; 
+            var selected2 = (action=='add') ? '' :Approver2[0];
+                var getPositionUser = (function(){
+                    var aa = '';
+                    for (var i = 0; i < PositionUser.length; i++) {
+                        aa+= '<option value="'+PositionUser[i].ID+'" '+''+'>'+PositionUser[i].Position+'</option>';
+                    }
+                    return aa;
+                })
+
+                var getGroupUser = (function(){
+                    var aa = '';
+                    for (var i = 0; i < GroupUser.length; i++) {
+                        aa+= '<option value="'+GroupUser[i].ID+'" '+''+'>'+GroupUser[i].GroupAuth+'</option>';
+                    }
+                    return aa;
+                })
+
                 var getEmployees = function(selected1){
                     var aa = '';
                     for(var i=0;i< employees.length;i++){
@@ -302,13 +320,38 @@
                 '                        </div>'+
                 '                         <div class = "row">'+
                 '                           <div class = "col-xs-8">'+
-                '                                <div class="form-group"><label>Approver 1</label>' +
-                '                               <select class=" form-control Approver1">'+
-                '                                   <option value = "0" selected>-- No Selected --</option>'+getEmployees(selected1)+
-                '                               </select></div>'+
-                '                           </div>'+
+                                                '<div class = "row">'+
+                                                    '<div class = "col-xs-12">'+
+                                                        '<label>Approver 1</label>'+
+                                                    '</div>'+
+                                                '</div>'+
+                                                '<div class = "row" style = "margin-top : 10px">'+
+                                                    '<div class = "col-xs-12">'+
+                                                        '<div class = "form-group">'+
+                                                            '<label>User Type</label>'+
+                                                            '<select class=" form-control UserTypeApprover1">'+
+                                                                '<option value = "0" selected>-- Choice Group User --</option>'+
+                                                                getGroupUser()+    
+                                                            '</select>'+
+                                                        '</div>'+    
+                                                    '</div>'+
+                                                '</div>'+
+                                                '<div class = "row" style = "margin-top : 5px">'+
+                                                    '<div class = "col-xs-12">'+
+                                                        '<div class = "form-group">'+
+                                                            '<label>Approver Type</label>'+
+                                                            '<select class=" form-control TypeApprover1">'+
+                                                                '<option value = "0" selected>-- Choice Type Approver--</option>'+
+                                                                '<option value ="Position">Position</option>'+
+                                                                '<option value = "Employees">Employees</option>'+
+                                                                '<option value = "Division">Division</option>'+      
+                                                            '</select>'+
+                                                        '</div>'+    
+                                                    '</div>'+
+                                                '</div>'+
+                                            '</div>'+    
                 '                           <div class = "col-xs-4">'+
-                '                               <button class="btn btn-default" id = "addApprover1" style = "margin-top : 23px"><i class="icon-plus"></i> Add</button>'+
+                '                               <button class="btn btn-default" id = "addApprover1" style = "margin-top : 57px"><i class="icon-plus"></i> Add</button>'+
                 '                           </div>'+
                 '                        </div>'+
                 '                         <div id = "AddApprover1"></div><hr>'+
@@ -333,7 +376,11 @@
                 'backdrop' : 'static'
             });
 
-            $('.Approver1').select2({
+            $('.UserTypeApprover1').select2({
+               //allowClear: true
+            });
+
+            $('.TypeApprover1').select2({
                //allowClear: true
             });
 
@@ -448,6 +495,38 @@
                     $(this)
                       .parentsUntil( 'div[class="row"]' ).remove();
                 })      
+            })
+
+            $(".TypeApprover1").change(function(){
+                var aa = $(this).val();
+                var Op = getDivision('');
+                switch(aa) {
+                    case 'Position':
+                        Op = getPositionUser();
+                        break;
+                    case 'Employees':
+                        Op = getEmployees('');
+                        break;
+                    case 'Division':
+                       Op = getDivision('');
+                        break;
+                }
+                var Input = '<div class = "row" style="margin-top: 5px">'+
+                                '<div class="col-xs-8">'+
+                                    '<div class = "form-group">'+
+                                        '<label>Choice Approver 1</label>'+
+                                        '<select class=" form-control Approver1">'+
+                                        '   <option value = "0" selected>-- No Selected --</option>'+Op+
+                                        '</select>'+
+                                    '</div>'+    
+                                '</div>'+       
+                            '</div>';
+
+                $("#AddApprover1").html(Input); 
+
+                $('select[tabindex!="-1"]').select2({
+                    //allowClear: true
+                });
             })  
              
 
