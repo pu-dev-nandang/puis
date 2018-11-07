@@ -1052,6 +1052,7 @@ $route['purchasing/page/supplier/DataIntable/server_side'] = 'page/purchasing/c_
 $route['purchasing/page/supplier/ApprovalSupplier'] = 'page/purchasing/c_master/ApprovalSupplier';
 $route['purchasing/table_all/(:any)'] = 'page/purchasing/c_purchasing/LoadTable_db_purchasing_all/$1/$2';
 $route['purchasing/table_all/(:any)/(:any)'] = 'page/purchasing/c_purchasing/LoadTable_db_purchasing_all/$1/$2';
+
 // IT
 $query = $db->get('db_it.cfg_sub_menu');
 $result = $query->result();
@@ -1082,6 +1083,10 @@ foreach( $result as $row )
 	}
 
 }
+
+$route['it/rule_service/PageDivision'] = 'page/it/c_rule_service/Page';
+
+// end it
 
 $route['ApiServerToServer'] = 'c_login/ApiServerToServer';
 $route['importFormulirManual'] = 'page/admission/c_admission/importFormulirManual';
