@@ -193,5 +193,7 @@ if ($this->uri->segment(1) == 'dashboard') {
     <div id="divider" class="resizeable"></div>
 </div>
 <!-- /Sidebar -->
-
+<?php 
+$this->m_menu->checkAuth_user('db_it');
+ ?>
 
