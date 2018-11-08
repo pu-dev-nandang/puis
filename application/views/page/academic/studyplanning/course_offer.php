@@ -156,9 +156,9 @@
 
                     var d = Course[t];
 
-                    var draf = CourseDraf.findIndex(x => x.ScheduleID === d.ID);
+                        var draf = CourseDraf.findIndex(x => x.ScheduleID === d.ID);
 
-                    if(draf!=-1){
+                        if(draf!=-1){
 
                         var viewSchedule = '';
                         var detailSchedule = d.ScheduleDetails;
@@ -329,7 +329,7 @@
         var TokenBtn = $(this).attr('data-token');
         var dataToken = jwt_decode(TokenBtn);
 
-        console.log(dataToken);
+        // console.log(dataToken);
 
         var data = {
             action : 'chekSeat',

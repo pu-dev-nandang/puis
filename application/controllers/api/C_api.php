@@ -2953,6 +2953,51 @@ class C_api extends CI_Controller {
                 return print_r(1);
             }
 
+            else if($data_arr['action']=='ApprovedByMentorAll'){
+
+                $ArrToApproveAll = (array) $data_arr['ArrToApproveAll'];
+
+                if(count($ArrToApproveAll)>0){
+                    for($i=0;$i<count($ArrToApproveAll);$i++){
+                        $arrUpdate = array(
+                            'Status' => '2',
+                            'ApprovalPA_At' => $data_arr['ApprovalPA_At']
+                        );
+                        $this->db->where('ID', $ArrToApproveAll[$i]);
+                        $this->db->update('db_academic.std_krs',$arrUpdate);
+                    }
+                }
+
+                return print_r(1);
+            }
+            else if($data_arr['action']=='ApprovedByMentor'){
+                $arrUpdate = array(
+                    'Status' => '2',
+                    'ApprovalPA_At' => $data_arr['ApprovalPA_At']
+                );
+                $this->db->where('ID', $data_arr['ID']);
+                $this->db->update('db_academic.std_krs',$arrUpdate);
+                return print_r(1);
+            }
+            else if($data_arr['action']=='RejectedByMentor'){
+
+                $arrUpdate = array(
+                    'Status' => '-2'
+                );
+                $this->db->where('ID', $data_arr['ID']);
+                $this->db->update('db_academic.std_krs',$arrUpdate);
+
+                $dataInsert = array(
+                    'KRSID' => $data_arr['ID'],
+                    'Reason' => $data_arr['Reason'],
+                    'UpdateBy' => $data_arr['UpdateBy'],
+                    'UpdateAt' => $data_arr['UpdateAt']
+                );
+                $this->db->insert('db_academic.std_krs_comment',$dataInsert);
+
+                return print_r(1);
+            }
+
             else if($data_arr['action']=='deleteAvailabelCourse'){
                 $SKID = $data_arr['SKID'];
                 $dataStd = $this->db->query('SELECT sk.SemesterID, sk.NPM, sk.ScheduleID, sk.CDID, 
@@ -6094,6 +6139,119 @@ class C_api extends CI_Controller {
         );
 
         echo json_encode($json_data);
+    }
+
+    public function getListStudentKrsOnline(){
+
+        $requestData= $_REQUEST;
+
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+
+        $w_status = ($data_arr['Status']!='') ? ' AND auts.StatusStudentID = "'.$data_arr['Status'].'"' : '';
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataSearch = ' AND ( auts.Name LIKE "%'.$search.'%" OR auts.NPM LIKE "%'.$search.'%") ';
+        }
+
+        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, ps.NameEng AS Prodi, ss.Description AS StatusStudent  
+                              FROM db_academic.mentor_academic ma
+                              LEFT JOIN db_academic.auth_students auts ON (ma.NPM = auts.NPM)
+                              LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
+                              LEFT JOIN db_academic.status_student ss ON (ss.ID = auts.StatusStudentID)
+                              WHERE ( ma.NIP = "'.$data_arr['NIP'].'" '.$w_status.' ) '.$dataSearch.' ORDER BY ma.NPM ASC';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $no = $requestData['start']+1;
+        $data = array();
+        for($i=0;$i<count($query);$i++) {
+            $nestedData = array();
+            $row = $query[$i];
+
+            // Get Photo
+            $DBStudent = 'ta_'.$row['Year'];
+            $dataPhoto = $this->db->select('Photo')->get_where($DBStudent.'.students',array('NPM' => $row['NPM']),1)->result_array();
+            $path = 'uploads/students/'.$DBStudent.'/'.$dataPhoto[0]['Photo'];
+            $Photo = base_url('images/icon/student.png');
+            if(file_exists($path) && $dataPhoto[0]['Photo']!=''){
+                $Photo = base_url('uploads/students/'.$DBStudent.'/'.$dataPhoto[0]['Photo']);
+            }
+
+            // Semester
+            $Semester = $this->m_api->getSemesterStudentByYear($data_arr['SemesterID'],$row['Year']);
+
+            $token_npm = $this->jwt->encode(array('SemesterID' => $data_arr['SemesterID'],'NPM' => $row['NPM']),'UAP)(*');
+            $btn = '<a href="'.url_sign_in_lecturers.'krs-online/list-student/approved-mentor/'.$token_npm.'" class="btn btn-sm btn-default">
+                        <i class="fa fa-edit"></i>
+                      </a>';
+
+            $dataCourse = $this->db->query('SELECT mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup, stdk.Status FROM db_academic.std_krs stdk 
+                                                      LEFT JOIN db_academic.schedule s ON (s.ID = stdk.ScheduleID)
+                                                      LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = stdk.ScheduleID)
+                                                      LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                      WHERE stdk.SemesterID = "'.$data_arr['SemesterID'].'" 
+                                                      AND stdk.NPM = "'.$row['NPM'].'"
+                                                       GROUP BY stdk.ScheduleID
+                                                       ORDER BY mk.MKCode ')->result_array();
+
+            $course = '';
+            if(count($dataCourse)>0){
+                foreach ($dataCourse AS $item){
+
+                    $Status = '-';
+                    if($item['Status']==0 || $item['Status']=='0'){
+                        $Status = '<span style="color: #9e9e9e;"><i class="fa fa-hourglass-half"></i> Student not yet send</span>';
+                    }
+                    else if($item['Status']==1 || $item['Status']=='1'){
+                        $Status = '<span style="color: #00bcd4;"><i class="fa fa-clock-o"></i> Waiting approval</span>';
+                    }
+                    else if($item['Status']==-2 || $item['Status']=='-2'){
+                        $Status = '<span style="color: darkred;"><i class="fa fa-repeat margin-right"></i> Rejected by Mentor</span>';
+                    }
+                    else if($item['Status']==-3 || $item['Status']=='-3'){
+                        $Status = '<span style="color: darkred;"><i class="fa fa-repeat margin-right"></i> Rejected by Kaprodi</span>';
+                    }
+                    else if($item['Status']==2 || $item['Status']=='2'){
+                        $Status = '<span style="color: green;"><i class="fa fa-check-circle"></i> Approved by Mentor</span>';
+                    }
+                    else if($item['Status']==3 || $item['Status']=='3'){
+                        $Status = '<span style="color: green;"><i class="fa fa-check-circle"></i> Approved by Kaprodi</span>';
+                    }
+
+                    $course = $course.'<div>'.$item['ClassGroup'].' | <span style="color: #2196f3;">'.$item['MKCode'].' - '.$item['CourseEng'].'</span> | Status : '.$Status.'</div>';
+                }
+            } else {
+                $course = '-';
+            }
+
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div  style="text-align:center;"><img data-src="'.$Photo.'" class="img-rounded img-fitter" width="40" height="50"></div>';
+            $nestedData[] = '<div  style="text-align:left;"><b>'.$row['Name'].'</b><br/><span>'.$row['NPM'].'</span><br/>'.$row['Prodi'].'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$Semester.'</div>';
+            $nestedData[] = '<div  style="text-align:left;">'.$course.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$btn.'</div>';
+            $nestedData[] = '<div  style="text-align:center;font-size: 12px;">'.ucwords(strtolower($row['StatusStudent'])).'</div>';
+
+            $no++;
+
+            $data[] = $nestedData;
+        }
+
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+
     }
 
 }

@@ -3606,9 +3606,18 @@ class M_api extends CI_Model {
                                               WHERE auts.NPM = "'.$NPM.'" LIMIT 1 ')->result_array();
 
         if(count($data)>0){
-            $dataStd = $this->db->select('ID')->get_where('ta_'.$data[0]['Year'].'.students',
+            $DBStudent = 'ta_'.$data[0]['Year'];
+            $dataStd = $this->db->select('ID,Photo')->get_where($DBStudent.'.students',
                 array('NPM' => $data[0]['NPM']), 1)->result_array();
             $data[0]['MhswID'] = $dataStd[0]['ID'];
+            $data[0]['Photo'] = $dataStd[0]['Photo'];
+
+            $path = 'uploads/students/'.$DBStudent.'/'.$dataStd[0]['Photo'];
+            $Photo = base_url('images/icon/student.png');
+            if(file_exists($path) && $dataStd[0]['Photo']!=''){
+                $Photo = base_url('uploads/students/'.$DBStudent.'/'.$dataStd[0]['Photo']);
+            }
+            $data[0]['URLPhoto'] = $Photo;
         }
 
         return $data;

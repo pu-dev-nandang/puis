@@ -1,7 +1,7 @@
 
 <div class="tabbable tabbable-custom tabbable-full-width">
     <ul class="nav nav-tabs">
-        <li class="<?php if($this->uri->segment(3)=='list-student') { echo 'active'; } ?>">
+        <li class="<?php if($this->uri->segment(3)=='list-student' || $this->uri->segment(3)=='course-offe') { echo 'active'; } ?>">
             <a href="<?php echo base_url('academic/study-planning/list-student'); ?>">List Student</a>
         </li>
     </ul>
