@@ -934,9 +934,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             // if ( !in_array($cd_akses, array(1,2,3,4,10)) ) {
             //      show_404($log_error = TRUE);
             // }
-            if ($this->session->userdata('ID_group_user') == 4) {
-                $add_where = ' and a.CreatedBy = "'.$NIP.'"';
-            }
+
+            // if ($this->session->userdata('ID_group_user') == 4) {
+            //     $add_where = ' and a.CreatedBy = "'.$NIP.'"';
+            // }
 
         $Start = ($Start == null) ? ' and Start >= timestamp(DATE_SUB(NOW(), INTERVAL 30 MINUTE))' : ' and Start like "%'.$Start.'%"';
         if ($both == '') {
@@ -951,7 +952,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             // print_r($sql);die();         
             $query=$this->db->query($sql, array())->result_array();           
         }
-        
+       
         for ($i=0; $i < count($query); $i++) { 
             $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['Start']);
             $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['End']);
@@ -963,7 +964,11 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             // cek ApproveAccess
             $Status1 = $query[$i]['Status1'];
             $Status = $query[$i]['Status'];
-                $ApproveAccess = function($getRoom,$Status1,$Status){
+                $ApproveAccess = function($getRoom,$Status1,$Status,$CreatedBy){
+                    $PositionMain = $this->session->userdata('PositionMain');
+                    $IDDivision = $PositionMain['IDDivision'];
+                    $Position = $PositionMain['IDPosition'];
+                    $NIP = $this->session->userdata('NIP');
                     // get Category Room to approver
                         $ApproveAccess = 0;
                         $ID_group_user = $this->session->userdata('ID_group_user');
@@ -973,13 +978,13 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                         $CategoryRoomByRoom = $getRoom[0]['ID_CategoryRoom'];
                         $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
                         // find access
-                            $find = 0;
-                                for ($l=0; $l < count($CategoryRoom); $l++) { 
-                                    if ($CategoryRoomByRoom == $CategoryRoom[$l]) {
-                                        $find++;    
-                                        break;
-                                    }
-                                }
+                            $find = 1;
+                                // for ($l=0; $l < count($CategoryRoom); $l++) { 
+                                //     if ($CategoryRoomByRoom == $CategoryRoom[$l]) {
+                                //         $find++;    
+                                //         break;
+                                //     }
+                                // }
 
                                 if ($find == 1) {
                                     // get status 
@@ -987,13 +992,87 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                        // find approver1
                                            $Approver1 = $getDataCategoryRoom[0]['Approver1'];
                                            $Approver1 = json_decode($Approver1);
-                                           $NIP = $this->session->userdata('NIP');
-                                           for ($l=0; $l < count($Approver1); $l++) { 
-                                               if ($NIP == $Approver1[$l]) {
-                                                   $find++;    
-                                                   break;
-                                               }
-                                           }
+
+                                           // $NIP = $this->session->userdata('NIP');
+                                           // for ($l=0; $l < count($Approver1); $l++) { 
+                                           //     if ($NIP == $Approver1[$l]) {
+                                           //         $find++;    
+                                           //         break;
+                                           //     }
+                                           // } // old
+
+                                           $dataApprover = array();
+                                           // find by ID_group_user
+                                                // $CreatedBy = $query[$i]['CreatedBy'];
+                                                $cc = $this->m_master->caribasedprimary('db_reservation.previleges_guser','NIP',$CreatedBy);
+                                                $dd = $this->m_master->caribasedprimary('db_employees.employees','NIP',$CreatedBy);
+                                                $ID_group_user = (count($cc) > 0) ? $cc[0]['G_user'] : '';
+                                            // stop loop
+                                            $getLoop = true;    
+                                           for ($l=0; $l < count($Approver1); $l++) {
+                                                   if ($ID_group_user == $Approver1[$l]->UserType) {
+                                                       // get TypeApprover
+                                                       $TypeApprover = $Approver1[$l]->TypeApprover;
+                                                       switch ($TypeApprover) {
+                                                           case 'Position':
+                                                               // get Division to access position approval
+                                                                   $DivisionCreated = $dd[0]['PositionMain'];
+                                                                   $DivisionCreated = explode(".", $DivisionCreated);
+
+                                                                   $IDPositionApprover = $Approver1[$l]->Approver;
+
+                                                                   if ($DivisionCreated[0] == 15) { // if prodi
+                                                                       // find prodi
+                                                                       $gg = $this->m_master->caribasedprimary('db_academic.program_study','AdminID',$CreatedBy);
+                                                                       if (count($gg) > 0) {
+                                                                           for ($k=0; $k < count($gg); $k++) { 
+                                                                               $Kaprodi = $gg[$k]['KaprodiID'];
+                                                                               if ($Kaprodi == $NIP) {
+                                                                                   $find++;
+                                                                                   $getLoop = false;     
+                                                                                   break;
+                                                                               }
+                                                                           }
+                                                                           
+                                                                       }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        // find by division and position
+                                                                        if ($DivisionCreated[0] == $IDDivision) {
+                                                                           // compare Position
+                                                                           if ($IDPositionApprover == $Position) {
+                                                                               $find++;
+                                                                               $getLoop = false;    
+                                                                               break;
+                                                                           }
+                                                                        }
+                                                                    }
+                                                               break;
+                                                           
+                                                           case 'Division':
+                                                               if ($Approver1[$l]->Approver == $IDDivision) {
+                                                                   $find++;
+                                                                   $getLoop = false;    
+                                                                   break;
+                                                               }
+                                                               break;
+
+                                                           case 'Employees':
+                                                               if ($NIP == $Approver1[$l]->Approver) {
+                                                                   $find++;
+                                                                   $getLoop = false;    
+                                                                   break;
+                                                               }
+                                                               break;    
+                                                       }
+                                                   }
+
+                                                   if (!$getLoop) { // stop loop
+                                                       break;
+                                                   }
+                                           } // end loop for
+
                                     }
                                     else
                                     {
@@ -1026,7 +1105,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 };
 
                 $StatusBooking = '';
-                $CaseApproveAccess = $ApproveAccess($getRoom,$Status1,$Status);
+                $CaseApproveAccess = $ApproveAccess($getRoom,$Status1,$Status,$query[$i]['CreatedBy']);
                 switch ($CaseApproveAccess) {
                     case 0:
                     case 1:

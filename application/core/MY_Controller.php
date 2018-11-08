@@ -11,10 +11,6 @@ class MY_Controller extends CI_Controller {
 
         if($this->session->userdata('loggedIn')){
             $departement = $this->__getDepartement();
-            if($departement==''){
-//                $this->session->set_userdata('departementNavigation', 'academic');
-            }
-
             // define config Virtual Account
             if (!defined('VA_client_id')) {
                 $this->load->model('master/m_master');
@@ -88,9 +84,6 @@ abstract class Globalclass extends MyAbstract{
 
 
     protected function menu_header(){
-//        $data_departement ['departement'] = $this->m_master->get_departement();
-//        $data_nav['departement'] = $this->load->view('template/menu/departement',$data_departement,true);
-
         $this->load->model('master/m_master');
 
         $nav_departement['departement'] = $this->__getDepartement();
@@ -272,7 +265,6 @@ abstract class Admission_Controler extends Globalclass{
 
 
 abstract class Finnance_Controler extends Globalclass{
-    // public $GlobalVariableAdi = array('url_registration' => 'http://10.1.10.230/register/');
     public $GlobalVariableAdi = array('url_registration' => 'http://demo.web.podomorouniversity.ac.id/registeronline/');
 
     public function __construct()
@@ -307,7 +299,6 @@ abstract class Vreservation_Controler extends Globalclass{
         if (!$this->session->userdata('auth_vreservation_sess')) {
             $this->getAuthVreservation();
         }
-        // $this->checkAuth_user();
         // read policy
         $dayPolicy = $this->session->userdata('V_BookingDay');
         $dateDay = date('Y-m-d');
@@ -384,7 +375,6 @@ abstract class Vreservation_Controler extends Globalclass{
             );
             
         }
-        //print_r($arr);die();
         return $arr;
     }
 

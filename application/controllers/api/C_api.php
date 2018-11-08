@@ -5988,14 +5988,38 @@ class C_api extends CI_Controller {
                 for ($i=0; $i < count($data); $i++) {
                     if ($data[$i]['Approver1']) {
                        $y= json_decode($data[$i]['Approver1']);
+                       $z = $data[$i]['Approver1'];
                        $x = array();
                        for ($l=0; $l < count($y); $l++) {
-                        $Name = $this->m_master->caribasedprimary('db_employees.employees','NIP',$y[$l]);
+                        // Find User Type
+                            $UserType = $this->m_master->caribasedprimary('db_reservation.cfg_group_user','ID',$y[$l]->UserType);
+                            $UserType = $UserType[0]['GroupAuth'];
+
+                        // cek Type Approver
+                            $TypeApprover = $y[$l]->TypeApprover;
+                            $ApproverGet = $y[$l]->Approver;
+                            switch ($TypeApprover) {
+                                    case 'Division':
+                                        $Approver = $this->m_master->caribasedprimary('db_employees.division','ID',$ApproverGet);
+                                        $Approver = $Approver[0]['Division'];
+                                        break;
+                                    
+                                   case 'Position':
+                                       $Approver = $this->m_master->caribasedprimary('db_employees.position','ID',$ApproverGet);
+                                       $Approver = $Approver[0]['Position'];
+                                       break;
+                                    case 'Employees':
+                                        $Approver = $this->m_master->caribasedprimary('db_employees.employees','NIP',$ApproverGet);
+                                        $Approver = $Approver[0]['NIP'].' - '.$Approver[0]['Name'];
+                                        break;   
+                                       
+                                }    
+
                         $tanda = ($l==0) ? '*   ' : '';
-                        $x[] = $tanda.$Name[0]['NIP'].' - '.$Name[0]['Name'];
+                        $x[] = $tanda.$UserType.' -> '.$TypeApprover.' -> '.$Approver;
                        }
                        $data[$i]['Approver1'] = implode('<br>*  ', $x);
-                       $data[$i]['Approver1_ori'] = $y;
+                       $data[$i]['Approver1_ori'] = str_replace('"', "'", $z) ;
                     }
                     if ($data[$i]['Approver2']) {
                        $y= json_decode($data[$i]['Approver2']);
