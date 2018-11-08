@@ -675,6 +675,8 @@ $route['api/__getScheduleExam'] = 'api/c_api/getScheduleExam';
 $route['api/__getScheduleExamWaitingApproval'] = 'api/c_api/getScheduleExamWaitingApproval';
 $route['api/__getScheduleExamLecturer'] = 'api/c_api/getScheduleExamLecturer';
 
+$route['api/__getListStudentKrsOnline'] = 'api/c_api/getListStudentKrsOnline';
+
 // === Timetables ====
 
 $route['api/__getTimetables'] = 'api/c_api/getTimetables';
