@@ -3276,7 +3276,8 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->AddFont('dinproExpBold','','dinproExpBold.php');
 
         // membuat halaman baru
-        $pdf->SetMargins(12,40.5,10);
+    $margin_left = 15.315;
+        $pdf->SetMargins($margin_left,40.5,10);
         $pdf->AddPage();
 
         $pdf->SetFont('dinpromedium','',7);
@@ -3289,7 +3290,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(2,7,' : ',0,0,'C');
         $pdf->Cell(25,7,$Student['CSN'],0,1,'R');
 
-        $pdf->SetXY(12,41.5);
+        $pdf->SetXY($margin_left,41.5);
 
         $label_l = 35;
         $sparator_l = 1;
@@ -3394,7 +3395,7 @@ class C_save_to_pdf extends CI_Controller {
             $h = 3;
             $pdf->SetFont('dinproExpBold','',$font_medium);
             $ytext = $pdf->GetY()+3.5;
-            $x_ = ($i<9) ? 16 : 15;
+            $x_ = ($i<9) ? 21 : 20;
             $pdf->Text($x_,$ytext,($no++));
             $pdf->Cell($w_no,$h,'',$border_fill,0,'C');
             $pdf->Cell($w_course,$h,$ds['MKName'],$border_fill,0,'L');
@@ -3430,8 +3431,8 @@ class C_save_to_pdf extends CI_Controller {
             $this->spasi_transcript_table($pdf,'B');
 
             if($pdf->GetY()>=324){
-//                $pdf->SetMargins(12,40.5,10);
-                $pdf->SetMargins(12,18,10);
+//                $pdf->SetMargins($margin_left,40.5,10);
+                $pdf->SetMargins($margin_left,18,10);
                 $pdf->AddPage();
 //                $pdf->SetXY(10,43.5);
                 $this->header_transcript_table($pdf);
@@ -3531,8 +3532,8 @@ class C_save_to_pdf extends CI_Controller {
 
         $yA2 = $pdf->GetY();
 //        $pdf->SetLineWidth(0.2);
-        $pdf->Line(12, $yA, 12, $yA2);
-        $pdf->Line(12+$w_R_label+$w_R_sparator+$w_R_fill+$w_Div, $yA, 12+$w_R_label+$w_R_sparator+$w_R_fill+$w_Div, $yA2);
+        $pdf->Line($margin_left, $yA, $margin_left, $yA2);
+        $pdf->Line($margin_left+$w_R_label+$w_R_sparator+$w_R_fill+$w_Div, $yA, $margin_left+$w_R_label+$w_R_sparator+$w_R_fill+$w_Div, $yA2);
         $h = 1.5;
         $pdf->Cell($totalW,$h,'','LRB',1,'L');
         $h=3;
@@ -3626,7 +3627,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_score,$h,'Angka',$border_fill,0,'C');
         $pdf->Cell($w_point,$h,'SKS x Angka',$border_fill,1,'C');
         $ytext = $pdf->GetY()+0.5;
-        $pdf->Text(14,$ytext,'No.');
+        $pdf->Text(19,$ytext,'No.');
 
         $pdf->SetFont('dinlightitalic','',8);
         $pdf->Cell($w_no,$h,'',$border_fill,0,'C');
