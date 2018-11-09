@@ -231,7 +231,8 @@
                 // toastr.options.fadeOut = 100000;
                 toastr.success(data.msg, 'Success!');
                 var divHtml = $("#schedule");
-                loadDataSchedule(divHtml,'<?php echo $dateDay ?>');
+                var OpCategory = $("#OpCategoryRoom").val();
+                loadDataSchedule(divHtml,<?php echo $dateDay ?>,OpCategory);
                 // send notification other school from client
                 var socket = io.connect( 'http://'+window.location.hostname+':3000' );
                 // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
