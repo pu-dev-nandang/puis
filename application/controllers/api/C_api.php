@@ -3320,6 +3320,45 @@ class C_api extends CI_Controller {
                     ->__checkDataCourseForExam($data_arr['ScheduleID'],$data_arr['Type']);
                 return print_r(json_encode($data));
             }
+            else if($data_arr['action']=='showDataClassGroupInExam'){
+
+                // Get Exam ID
+
+                $dataExam = $this->db->query('SELECT ex.ID AS ExamID, s.ID AS ScheduleID, s.ClassGroup, mk.NameEng AS CourseEng, mk.Name AS Course FROM db_academic.exam_group exg 
+                                                            LEFT JOIN db_academic.exam ex ON (ex.ID = exg.ExamID)
+                                                            LEFT JOIN db_academic.schedule s ON (s.ID = exg.ScheduleID)
+                                                            LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = exg.ScheduleID)
+                                                            LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                            WHERE ex.SemesterID = "'.$data_arr['SemesterID'].'"
+                                                             AND ex.Type = "'.strtolower($data_arr['Type']).'" ')->result_array();
+
+                return print_r(json_encode($dataExam));
+
+            }
+
+            else if($data_arr['action']=='showDataExamByGroup'){
+                $ExamID = $data_arr['ExamID'];
+
+                $data = $this->db->query('SELECT ex.ExamDate, cl.Room, ex.ExamStart, ex.ExamEnd, 
+                                                          em1.Name AS Inv1, em2.Name AS Inv2 FROM db_academic.exam ex
+                                                          LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
+                                                          LEFT JOIN db_employees.employees em1 ON (em1.NIP = ex.Pengawas1)
+                                                          LEFT JOIN db_employees.employees em2 ON (em2.NIP = ex.Pengawas2)
+                                                          WHERE ex.ID = "'.$ExamID.'" LIMIT 1 ')->result_array();
+
+                if(count($data)>0){
+                    $dataCourse = $this->db->query('SELECT mk.MKCode, mk.NameEng AS CourseEng, mk.Name AS Course, s.ClassGroup
+                                                                        FROM db_academic.exam_group exd
+                                                                        LEFT JOIN db_academic.schedule s ON (s.ID = exd.ScheduleID)
+                                                                        LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = exd.ScheduleID)
+                                                                        LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                                        WHERE exd.ExamID = "'.$ExamID.'" GROUP BY exd.ScheduleID')->result_array();
+                    $data[0]['Course'] = $dataCourse;
+                }
+
+                return print_r(json_encode($data));
+            }
+
             else if($data_arr['action']=='add'){
                 $formData = (array) $data_arr['formData'];
                 $dataStudents = (array) $data_arr['dataStudents'];
