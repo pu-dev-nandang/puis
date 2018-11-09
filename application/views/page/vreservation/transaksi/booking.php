@@ -53,7 +53,7 @@
 
 		var divHtml = $("#schedule");
 		loadDataSchedule(divHtml,'<?php echo $dateDay ?>');
-    socket_messages_tbooking();
+    // socket_messages_tbooking();
 		Date.prototype.addDays = function(days) {
 	          var date = new Date(this.valueOf());
 	          date.setDate(date.getDate() + days);
@@ -231,9 +231,9 @@
               if(data.status == 1) {
                 // toastr.options.fadeOut = 100000;
                 toastr.success(data.msg, 'Success!');
-                // var divHtml = $("#schedule");
-                // var OpCategory = $("#OpCategoryRoom").val();
-                // loadDataSchedule(divHtml,<?php echo $dateDay ?>,OpCategory);
+                var divHtml = $("#schedule");
+                var OpCategory = $("#OpCategoryRoom").val();
+                loadDataSchedule(divHtml,<?php echo $dateDay ?>,OpCategory);
                 // send notification other school from client
                 var socket = io.connect( 'http://'+window.location.hostname+':3000' );
                 // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
