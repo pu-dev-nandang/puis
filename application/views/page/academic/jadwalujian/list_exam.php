@@ -16,7 +16,7 @@
 </style>
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-4">
         <div class="well" style="margin-bottom: 10px;">
             <div class="row">
                 <div class="col-xs-4" style="">
@@ -29,22 +29,20 @@
                         <option value="uas">UAS</option>
                     </select>
                 </div>
-                <div class="col-xs-4">
+                <div class="col-xs-5">
                     <select class="form-control" id="form2PDFDate"></select>
                 </div>
-                <div class="col-xs-1 hide">
-                    <button class="btn btn-default"><i class="fa fa-download"></i></button>
-                </div>
+
             </div>
         </div>
         <hr/>
-
     </div>
 
-    <div class="col-md-4">
+
+    <div class="col-md-3">
         <div class="well" style="margin-bottom: 10px;min-height: 20px;">
             <div class="row">
-                <div class="col-xs-7">
+                <div class="col-xs-9">
                     <select class="form-control" id="formPDFTypeDocument">
                         <option value="5">Tamplate Map Soal</option>
                         <option value="1">Berita Acara Penyerahan</option>
@@ -54,12 +52,28 @@
                         <option value="4">Pengawas</option>
                     </select>
                 </div>
-                <div class="col-xs-5">
-                    <button class="btn btn-default btn-block btn-default-success" id="btnSavePDFDocument">Download to PDF</button>
+                <div class="col-xs-3">
+                    <button class="btn btn-default btn-block btn-default-success" id="btnSavePDFDocument"><i class="fa fa-download"></i></button>
                 </div>
             </div>
         </div>
     </div>
+
+
+    <div class="col-md-3">
+        <div class="well" style="min-height: 50px;">
+            <div class="row">
+                <div class="col-md-9">
+                    <div id="divClassGroup"></div>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-default" disabled id="btnShowClassGroup">Show</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
     <div class="col-md-2">
         <div class="thumbnail" style="padding: 15px;">
             <div class="row">
@@ -98,6 +112,8 @@
             var filterSemester = $('#filterSemester').val();
             var form2PDFDate = $('#form2PDFDate').val();
             if(filterSemester!='' && filterSemester!=null && form2PDFDate==null){
+                loadClassGroup();
+
                 load__DateExam();
                 clearInterval(loadFirst);
             }
@@ -267,6 +283,24 @@
         });
     });
 
+    $(document).on('click','#deleteExamonModal',function () {
+       if(confirm('Are you sure to delete?')){
+           loading_buttonSm('#deleteExamonModal');
+           $('.btnINModal').prop('disabled',true);
+
+           var ExamID = $(this).attr('data-id');
+           var token = jwt_encode({action : 'deleteExamInExamList', ExamID : ExamID},'UAP)(*');
+           var url = base_url_js+'api/__crudJadwalUjian';
+           $.post(url,{token:token},function (result) {
+               loadDataExam();
+               loadClassGroup();
+               setTimeout(function () {
+                   $('#GlobalModal').modal('hide');
+               },500);
+           });
+       }
+    });
+
     $(document).on('click','#btnDeleteExam',function () {
 
         loading_buttonSm('#btnDeleteExam');
@@ -277,6 +311,7 @@
         var url = base_url_js+'api/__crudJadwalUjian';
         $.post(url,{token:token},function (result) {
             loadDataExam();
+            loadClassGroup();
             setTimeout(function () {
                 $('#NotificationModal').modal('hide');
             },500);
@@ -334,6 +369,7 @@
 
             loading_page('#divTable');
 
+
             setTimeout(function () {
                 $('#divTable').html('<div class="">' +
                     '                <table class="table table-bordered" id="tableShowExam">' +
@@ -341,7 +377,7 @@
                     '                    <tr style="background: #437e88;color: #ffffff;">' +
                     '                        <th style="width: 1%;">No</th>' +
                     '                        <th>Course</th>' +
-                    '                        <th style="width: 20%;">Pengawas</th>' +
+                    '                        <th style="width: 20%;">Invigilator</th>' +
                     '                        <th style="width: 5%;">Student</th>' +
                     '                        <th style="width: 5%;">Action</th>' +
                     '                        <th style="width: 15%;">Day, Date ,Time</th>' +
@@ -374,7 +410,7 @@
                     "iDisplayLength" : 10,
                     "ordering" : false,
                     "language": {
-                        "searchPlaceholder": "Day, Room, Name / NIP Pengawas"
+                        "searchPlaceholder": "Day, Room, Name / NIP Invigilator"
                     },
                     "ajax":{
                         url : base_url_js+"api/__getScheduleExam", // json datasource
@@ -388,9 +424,144 @@
                         }
                     }
                 } );
+
+                // === Load Filter
+
+
             },500);
 
 
         }
+    }
+
+
+    // === Class Group ===
+    // $('#filterSemester').change(function () {
+    //     loadClassGroup();
+    // });
+    $(document).on('change','#filterSemester, #filterExam',function () {
+        loadClassGroup();
+    });
+
+    $(document).on('click','#btnShowClassGroup',function () {
+        var filterClassGroup = $('#filterClassGroup').val();
+
+
+        if(filterClassGroup!='' && filterClassGroup!=null){
+            var ExamID = filterClassGroup.split('.')[0];
+            var data = {
+                action : 'showDataExamByGroup',
+                ExamID : ExamID,
+                ScheduleID : filterClassGroup.split('.')[1]
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+
+            var url = base_url_js+'api/__crudJadwalUjian';
+
+            $.post(url,{token:token},function (jsonResult) {
+
+                console.log(jsonResult);
+
+                if(jsonResult.length>0){
+                    var d = jsonResult[0];
+
+
+                    var tb = '<table class="table">' +
+                        '<tr>' +
+                        '<td style="width: 17%;">Course</td>' +
+                        '<td style="width: 1%;">:</td>' +
+                        '<td><b>'+d.Course[0].MKCode+' - '+d.Course[0].CourseEng+'</b><br/>'+d.Course[0].Course+'</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '<td>Group</td>' +
+                        '<td>:</td>' +
+                        '<td>'+d.Course[0].ClassGroup+'</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '<td>Day, Date</td>' +
+                        '<td>:</td>' +
+                        '<td>'+moment(d.ExamDate).format('dddd, DD-MMM-YYYY')+'</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '<td>Time</td>' +
+                        '<td>:</td>' +
+                        '<td>'+d.ExamStart.substr(0,5)+' - '+d.ExamEnd.substr(0,5)+'</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '<td>Invigilator 1</td>' +
+                        '<td>:</td>' +
+                        '<td>'+d.Inv1+'</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '<td>Invigilator 2</td>' +
+                        '<td>:</td>' +
+                        '<td>'+d.Inv2+'</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '<td colspan="3" style="text-align: center;">' +
+                        '<a href="'+base_url_js+'academic/exam-schedule/edit-exam-schedule/'+ExamID+'" class="btn btn-primary btnINModal">Edit Exam Schedule</a> ' +
+                        '<button class="btn btn-danger" data-id="'+ExamID+'" id="deleteExamonModal">Delete Exam Schedule</button>' +
+                        '</td>' +
+                        '</tr>' +
+                        '</table>';
+
+                    $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                        '<h4 class="modal-title">'+d.Course[0].ClassGroup+'</h4>');
+                    $('#GlobalModal .modal-body').html(tb);
+                    $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default btnINModal" data-dismiss="modal">Close</button>');
+                    $('#GlobalModal').modal({
+                        'show' : true,
+                        'backdrop' : 'static'
+                    });
+
+                }
+
+            });
+
+        }
+
+    });
+
+    function loadClassGroup() {
+
+        var filterSemester = $('#filterSemester').val();
+        var filterExam = $('#filterExam').val();
+
+        if(filterSemester!='' && filterSemester!=null &&
+            filterExam!='' && filterExam!=null){
+
+            $('#divClassGroup').html('loading group...');
+
+            var data = {
+                action : 'showDataClassGroupInExam',
+                SemesterID : filterSemester.split('.')[0],
+                Type : filterExam
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+
+            var url = base_url_js+'api/__crudJadwalUjian';
+            $.post(url,{token:token},function (jsonResult) {
+
+                $('#divClassGroup').html('<select class="select2-select-00 full-width-fix" size="5" id="filterClassGroup">' +
+                    '                        <option value=""></option>' +
+                    '                    </select>');
+
+                var tr = (jsonResult.length>0) ? false : true;
+                $('#btnShowClassGroup').prop('disabled',tr);
+
+                for(var i=0;i<jsonResult.length;i++){
+                    var d = jsonResult[i];
+                    $('#filterClassGroup').append('<option value="'+d.ExamID+'.'+d.ScheduleID+'">'+d.ClassGroup+' - '+d.CourseEng+'</option>');
+                }
+
+                $('#filterClassGroup').select2({allowClear: true});
+
+            });
+
+        }
+
+
     }
 </script>
