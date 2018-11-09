@@ -1080,13 +1080,13 @@ class M_admission extends CI_Model {
         // cari sales berdasarkan wilayah, jika tidak ada maka tampilkan sales secara keseluruhan
             $sql = 'select b.NIP,b.Name from db_admission.sales_school_m as a
                     join db_employees.employees as b
-                    on a.SalesNIP = b.NIP where a.SchoolID = ? ';
+                    on a.SalesNIP = b.NIP where a.SchoolID = ? and b.StatusEmployeeID not in (-1,-2) ';
             $query=$this->db->query($sql, array($SchoolID))->result_array();
             if (count($query) == 0) {
               // $query = $this->m_api->getEmployeesBy('10','13');
-              $sql = 'select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 10
+              $sql = 'select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 10 and StatusEmployeeID not in (-1,-2) 
                       union
-                      select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 18 
+                      select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 18  and StatusEmployeeID not in (-1,-2)
                     ';
               $query=$this->db->query($sql, array())->result_array();
             }
@@ -1094,9 +1094,9 @@ class M_admission extends CI_Model {
       }
       else
       {
-        $sql = 'select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 10
+        $sql = 'select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 10 and StatusEmployeeID not in (-1,-2) 
                 union
-                select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 18 
+                select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 18  and StatusEmployeeID not in (-1,-2) 
               ';
         // tampilkan sales secara keseluruhan
         // $query = $this->m_api->getEmployeesBy('10','13');
@@ -1107,10 +1107,10 @@ class M_admission extends CI_Model {
         $queryDiv = "";
           switch ($division) {
             case 10:
-              $sql = 'select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 10';
+              $sql = 'select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 10 and StatusEmployeeID not in (-1,-2)';
               break;
             case 18:
-              $sql = 'select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 18';
+              $sql = 'select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 18 and StatusEmployeeID not in (-1,-2)';
               break;
             default:
               break;
