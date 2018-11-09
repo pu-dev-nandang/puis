@@ -775,7 +775,7 @@ class C_transaksi extends Vreservation_Controler {
                 for ($i=0; $i < count($getEmail); $i++) {
                     if ($i != 0) {
                          $Email = $getEmail[$i]['Email'];
-                         $text = 'Dear '.$getEmail[$i]['Ownership'].',<br><br>
+                         $text = 'Dear Mr/Mrs '.$getEmail[$i]['Ownership'].',<br><br>
                                      Venue Reservation was Cancel by '.$this->session->userdata('Name').',<br><br>
                                      Details Schedule : <br><ul>
                                      <li>Start  : '.$StartNameDay.', '.$get[0]['Start'].'</li>
@@ -796,7 +796,7 @@ class C_transaksi extends Vreservation_Controler {
             else
             {
                 $Email = $getEmail[0]['Email'];
-                $text = 'Dear '.$getEmail[0]['Ownership'].',<br><br>
+                $text = 'Dear Mr/Mrs '.$getEmail[0]['Ownership'].',<br><br>
                             Venue Reservation was Cancel by '.$this->session->userdata('Name').',<br><br>
                             Details Schedule : <br><ul>
                             <li>Start  : '.$StartNameDay.', '.$get[0]['Start'].'</li>

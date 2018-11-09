@@ -3546,7 +3546,38 @@ class C_api extends CI_Controller {
                 } else {
                     $formInsert['Password_Old'] = md5($formInsert['Password_Old']);
                     $this->db->insert('db_employees.employees',$formInsert);
+                    // check fill admin Prodi
+                    $ProdiArr = (array) $data_arr['arr_Prodi'];
+                    $PositionMain = $formInsert['PositionMain'];
+                    $PositionMain = explode('.', $PositionMain);
+                    $Position = $PositionMain[1];
+                    $Division = $PositionMain[0];
+                    if ($Position == 6 || $Division == 15) {
+                        if ($Division == 15) {
+                             for($i=0;$i<count($ProdiArr);$i++){
+                                 // update Per ID Prodi
+                                 $dataSave = array(
+                                     'AdminID' => $NIP,
+                                 );
+                                 $this->db->where('ID', $ProdiArr[$i]);
+                                 $this->db->update('db_academic.program_study',$dataSave);
 
+                             }   
+                        }
+                        else
+                        {
+                            for($i=0;$i<count($ProdiArr);$i++){
+                                // update Per ID Prodi
+                                $dataSave = array(
+                                    'KaprodiID' => $NIP,
+                                );
+                                $this->db->where('ID', $ProdiArr[$i]);
+                                $this->db->update('db_academic.program_study',$dataSave);
+
+                            }
+                        }
+                    }
+                    
                     return print_r(1);
                 }
             }
@@ -3567,6 +3598,49 @@ class C_api extends CI_Controller {
 
                 $this->db->where('NIP', $data_arr['NIP']);
                 $this->db->update('db_employees.employees',$formUpdate);
+
+                // check fill admin Prodi / Ka prodi
+                    $PositionMain = $formUpdate['PositionMain'];
+                    $PositionMain = explode('.', $PositionMain);
+                    $Position = $PositionMain[1];
+                    $Division = $PositionMain[0];
+                    if ($Position == 6 || $Division == 15) {
+                        $ProdiArr = (array) $data_arr['arr_Prodi'];
+                        if ($Division == 15) {
+                                $dataSave = array(
+                                    'AdminID' => null,
+                                );
+                                $this->db->where('AdminID', $data_arr['NIP']);
+                                $this->db->update('db_academic.program_study',$dataSave);
+                                    for($i=0;$i<count($ProdiArr);$i++){
+                                        // update Per ID Prodi
+                                        $dataSave = array(
+                                            'AdminID' => $data_arr['NIP'],
+                                        );
+                                        $this->db->where('ID', $ProdiArr[$i]);
+                                        $this->db->update('db_academic.program_study',$dataSave);
+
+                                    }
+                        }
+                        else
+                        {
+
+                            $dataSave = array(
+                                'KaprodiID' => null,
+                            );
+                            $this->db->where('KaprodiID', $data_arr['NIP']);
+                            $this->db->update('db_academic.program_study',$dataSave);
+                                for($i=0;$i<count($ProdiArr);$i++){
+                                    // update Per ID Prodi
+                                    $dataSave = array(
+                                        'KaprodiID' => $data_arr['NIP'],
+                                    );
+                                    $this->db->where('ID', $ProdiArr[$i]);
+                                    $this->db->update('db_academic.program_study',$dataSave);
+
+                                }
+                        }
+                    }
 
                 return print_r(1);
 

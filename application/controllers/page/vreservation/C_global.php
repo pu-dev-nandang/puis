@@ -27,31 +27,36 @@ class C_global extends Vreservation_Controler {
             $CategoryRoom = json_decode($getCfgPolicy[0]['CategoryRoom']);
             $CategoryRoom = implode(',', $CategoryRoom);
             $OpCategory = $this->m_reservation->OpCategorybyIN($CategoryRoom);
-        if (empty($_POST) ) {
-            $sql = 'select * from db_academic.classroom where ID_CategoryRoom in ('.$CategoryRoom.')';
-            $getRoom = $this->db->query($sql, array())->result_array();
+        if (empty($_POST) || $this->input->post('CategoryRoom') == 0) {
+            // $sql = 'select * from db_academic.classroom where ID_CategoryRoom in ('.$CategoryRoom.')';
+            // $getRoom = $this->db->query($sql, array())->result_array();
+            $getRoom = array();
+            $endTime = '0';
+            $data1 = array();
+            $date = date('Y-m-d');
         }
-        else
+        else if($this->input->post('CategoryRoom') != 0)
         {
             $PostCategory = $this->input->post('CategoryRoom');
             $sql = 'select * from db_academic.classroom where ID_CategoryRoom in ('.$PostCategory.')';
             $getRoom = $this->db->query($sql, array())->result_array();
+
+            if ($date== null) {
+                $date = date('Y-m-d');
+            }
+                $datetime = DateTime::createFromFormat('Y-m-d', $date);
+                $NameDay = $datetime->format('l');
+                $data1 = $this->m_reservation->getDataClassroomAcademic($NameDay,$date);
+
+            $endTime = '20';
+            $getHoursNow = date('H');
+            $getHoursNow = ($date == date('Y-m-d')) ? (int)$getHoursNow : 7;
         }
             
 
         // get data classroom
         $NextDate = '';
         $PreviousDate = '';
-        if ($date== null) {
-            $date = date('Y-m-d');
-        }
-            $datetime = DateTime::createFromFormat('Y-m-d', $date);
-            $NameDay = $datetime->format('l');
-            $data1 = $this->m_reservation->getDataClassroomAcademic($NameDay,$date);
-
-        $endTime = '20';
-        $getHoursNow = date('H');
-        $getHoursNow = ($date == date('Y-m-d')) ? (int)$getHoursNow : 7;
         $data['getRoom'] = $getRoom;
         $arrHours = array();
 
