@@ -3331,7 +3331,7 @@ class C_api extends CI_Controller {
                                                             LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = exg.ScheduleID)
                                                             LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
                                                             WHERE ex.SemesterID = "'.$data_arr['SemesterID'].'"
-                                                             AND ex.Type = "'.strtolower($data_arr['Type']).'" ')->result_array();
+                                                             AND ex.Type = "'.strtolower($data_arr['Type']).'" GROUP BY ex.ID')->result_array();
 
                 return print_r(json_encode($dataExam));
 
