@@ -175,6 +175,9 @@
                                     </div>
                                 </div>
                             </div>
+                            <div id = "AddingProdi">
+                                
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -307,6 +310,13 @@
 </div>
 
 <script>
+    var Prodi = <?php echo json_encode($ProdiArr) ?>;
+    var splitBagi = 5;
+    var split = parseInt(Prodi.length / splitBagi);
+    var sisa = Prodi.length % splitBagi;
+    if (sisa > 0) {
+          split++;
+    }
     $(document).ready(function () {
         loadYearOfBirth('#formYearBirth');
         loadMonthBirth('#formMontBirth');
@@ -339,8 +349,61 @@
                 clearInterval(loadFirs);
             }
         },1000);
-        
+        FuncEvform_MainDivision();
     });
+
+    function FuncEvform_MainDivision()
+    {
+            var Opform_MainDivision = function(NIP,Type = 'AdminID'){
+                var getRow = 0;
+                $("#AddingProdi").empty();
+                var InputHtml = '<div class = "row">'+
+                                    '<div class = "col-xs-12">'+
+                                        '<table class="table" id ="tablechkAddingProdi">'
+                                        ;
+                $("#AddingProdi").append(InputHtml);                
+                for (var i = 0; i < split; i++) {
+                    if ((sisa > 0) && ((i+1) == split) ) {
+                                        splitBagi = sisa;
+                    }
+                    $('#tablechkAddingProdi').append('<tr id = "Prodi'+i+'">');
+                    for (var k = 0; k < splitBagi; k++) {
+                        var selected = (NIP == Prodi[getRow][Type]) ? 'checked' : '';
+                        $('#Prodi'+i).append('<td>'+
+                                            '<input type="checkbox" class = "chkProdi" name="chkProdi" value = "'+Prodi[getRow].ID+'" '+selected+'>&nbsp'+ Prodi[getRow].NameEng+
+                                         '</td>'
+                                        );
+                        getRow++;
+                    }
+                    $('#Prodi'+i).append('</tr>');
+                }
+                $('#AddingProdi').append('</table></div></div>');   
+            }
+
+        $("#form_MainDivision").change(function(){
+            var getValue = $(this).val();
+            var form_MainPosition = $("#form_MainPosition").val();
+            if (getValue == 15 || form_MainPosition == 6) { // if selected Admin Prodi
+                 Opform_MainDivision('');
+            }
+            else
+            {
+                $("#AddingProdi").empty();
+            }
+        })
+
+        $("#form_MainPosition").change(function(){
+            var getValue = $(this).val();
+            var form_MainDivision = $("#form_MainDivision").val();
+            if (getValue == 6 || form_MainDivision == 15) { // if selected Admin Prodi
+                 Opform_MainDivision('');
+            }
+            else
+            {
+                $("#AddingProdi").empty();
+            }
+        })
+    }
 
     $(document).on('change','#formYearBirth,#formMontBirth',function () {
         loadCountDays();
@@ -423,6 +486,20 @@
 
             var PositionMain = form_MainDivision+'.'+form_MainPosition;
 
+            // check validation Admin Prodi
+                var arr_Prodi = [];
+                if (form_MainDivision == 15 || form_MainPosition == 6) {
+                    $(".chkProdi:checked").each(function(){
+                        valuee = this.value;
+                        arr_Prodi.push(valuee);
+                    })
+
+                    // if (arr_Prodi.length == 0) {
+                    //     toastr.error('Please fill Type Admin Prodi','Error');
+                    //     return;
+                    // }
+                }
+
             var DateOfBirht = formYearBirth+'-'+formMontBirth+'-'+formDateBirth;
             var Password_Old = formDateBirth+''+formMontBirth+''+formYearBirth.substr(2,2);
 
@@ -445,6 +522,7 @@
                 ? formEmailPU+'@podomorouniversity.ac.id'
                 : '';
             var data = {
+                arr_Prodi : arr_Prodi,
                 action : 'addEmployees',
                 formInsert : {
                     ReligionID : formReligion,

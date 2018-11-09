@@ -96,7 +96,8 @@
   $(document).on('click','#search', function () {
     var get = $('#datetime_deadline1').val();
     var divHtml = $("#schedule");
-    loadDataSchedule(divHtml,get);
+    var OpCategory = $("#OpCategoryRoom").val();
+    loadDataSchedule(divHtml,get,OpCategory);
     $("#schdate").html('<i class="icon-calendar"></i> Schedule Date : '+ get);
   });
 
@@ -230,7 +231,8 @@
                 // toastr.options.fadeOut = 100000;
                 toastr.success(data.msg, 'Success!');
                 var divHtml = $("#schedule");
-                loadDataSchedule(divHtml,'<?php echo $dateDay ?>');
+                var OpCategory = $("#OpCategoryRoom").val();
+                loadDataSchedule(divHtml,<?php echo $dateDay ?>,OpCategory);
                 // send notification other school from client
                 var socket = io.connect( 'http://'+window.location.hostname+':3000' );
                 // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );

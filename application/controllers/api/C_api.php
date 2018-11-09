@@ -3591,7 +3591,38 @@ class C_api extends CI_Controller {
                 } else {
                     $formInsert['Password_Old'] = md5($formInsert['Password_Old']);
                     $this->db->insert('db_employees.employees',$formInsert);
+                    // check fill admin Prodi
+                    $ProdiArr = (array) $data_arr['arr_Prodi'];
+                    $PositionMain = $formInsert['PositionMain'];
+                    $PositionMain = explode('.', $PositionMain);
+                    $Position = $PositionMain[1];
+                    $Division = $PositionMain[0];
+                    if ($Position == 6 || $Division == 15) {
+                        if ($Division == 15) {
+                             for($i=0;$i<count($ProdiArr);$i++){
+                                 // update Per ID Prodi
+                                 $dataSave = array(
+                                     'AdminID' => $NIP,
+                                 );
+                                 $this->db->where('ID', $ProdiArr[$i]);
+                                 $this->db->update('db_academic.program_study',$dataSave);
 
+                             }   
+                        }
+                        else
+                        {
+                            for($i=0;$i<count($ProdiArr);$i++){
+                                // update Per ID Prodi
+                                $dataSave = array(
+                                    'KaprodiID' => $NIP,
+                                );
+                                $this->db->where('ID', $ProdiArr[$i]);
+                                $this->db->update('db_academic.program_study',$dataSave);
+
+                            }
+                        }
+                    }
+                    
                     return print_r(1);
                 }
             }
@@ -3612,6 +3643,49 @@ class C_api extends CI_Controller {
 
                 $this->db->where('NIP', $data_arr['NIP']);
                 $this->db->update('db_employees.employees',$formUpdate);
+
+                // check fill admin Prodi / Ka prodi
+                    $PositionMain = $formUpdate['PositionMain'];
+                    $PositionMain = explode('.', $PositionMain);
+                    $Position = $PositionMain[1];
+                    $Division = $PositionMain[0];
+                    if ($Position == 6 || $Division == 15) {
+                        $ProdiArr = (array) $data_arr['arr_Prodi'];
+                        if ($Division == 15) {
+                                $dataSave = array(
+                                    'AdminID' => null,
+                                );
+                                $this->db->where('AdminID', $data_arr['NIP']);
+                                $this->db->update('db_academic.program_study',$dataSave);
+                                    for($i=0;$i<count($ProdiArr);$i++){
+                                        // update Per ID Prodi
+                                        $dataSave = array(
+                                            'AdminID' => $data_arr['NIP'],
+                                        );
+                                        $this->db->where('ID', $ProdiArr[$i]);
+                                        $this->db->update('db_academic.program_study',$dataSave);
+
+                                    }
+                        }
+                        else
+                        {
+
+                            $dataSave = array(
+                                'KaprodiID' => null,
+                            );
+                            $this->db->where('KaprodiID', $data_arr['NIP']);
+                            $this->db->update('db_academic.program_study',$dataSave);
+                                for($i=0;$i<count($ProdiArr);$i++){
+                                    // update Per ID Prodi
+                                    $dataSave = array(
+                                        'KaprodiID' => $data_arr['NIP'],
+                                    );
+                                    $this->db->where('ID', $ProdiArr[$i]);
+                                    $this->db->update('db_academic.program_study',$dataSave);
+
+                                }
+                        }
+                    }
 
                 return print_r(1);
 
@@ -6033,14 +6107,38 @@ class C_api extends CI_Controller {
                 for ($i=0; $i < count($data); $i++) {
                     if ($data[$i]['Approver1']) {
                        $y= json_decode($data[$i]['Approver1']);
+                       $z = $data[$i]['Approver1'];
                        $x = array();
                        for ($l=0; $l < count($y); $l++) {
-                        $Name = $this->m_master->caribasedprimary('db_employees.employees','NIP',$y[$l]);
+                        // Find User Type
+                            $UserType = $this->m_master->caribasedprimary('db_reservation.cfg_group_user','ID',$y[$l]->UserType);
+                            $UserType = $UserType[0]['GroupAuth'];
+
+                        // cek Type Approver
+                            $TypeApprover = $y[$l]->TypeApprover;
+                            $ApproverGet = $y[$l]->Approver;
+                            switch ($TypeApprover) {
+                                    case 'Division':
+                                        $Approver = $this->m_master->caribasedprimary('db_employees.division','ID',$ApproverGet);
+                                        $Approver = $Approver[0]['Division'];
+                                        break;
+                                    
+                                   case 'Position':
+                                       $Approver = $this->m_master->caribasedprimary('db_employees.position','ID',$ApproverGet);
+                                       $Approver = $Approver[0]['Position'];
+                                       break;
+                                    case 'Employees':
+                                        $Approver = $this->m_master->caribasedprimary('db_employees.employees','NIP',$ApproverGet);
+                                        $Approver = $Approver[0]['NIP'].' - '.$Approver[0]['Name'];
+                                        break;   
+                                       
+                                }    
+
                         $tanda = ($l==0) ? '*   ' : '';
-                        $x[] = $tanda.$Name[0]['NIP'].' - '.$Name[0]['Name'];
+                        $x[] = $tanda.$UserType.' -> '.$TypeApprover.' -> '.$Approver;
                        }
                        $data[$i]['Approver1'] = implode('<br>*  ', $x);
-                       $data[$i]['Approver1_ori'] = $y;
+                       $data[$i]['Approver1_ori'] = str_replace('"', "'", $z) ;
                     }
                     if ($data[$i]['Approver2']) {
                        $y= json_decode($data[$i]['Approver2']);

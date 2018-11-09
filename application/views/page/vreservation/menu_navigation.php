@@ -270,7 +270,9 @@ $this->m_reservation->checkAuth_user_vreservation();
                        date : '',
                      });
                    var divHtml = $("#schedule");
-                   loadDataSchedule(divHtml);  
+                   // loadDataSchedule(divHtml);
+                   var OpCategory = $("#OpCategoryRoom").val();
+                   loadDataSchedule(divHtml,<?php echo $dateDay ?>,OpCategory);  
                    $('#GlobalModalLarge').modal('hide');
                 },500);
             }

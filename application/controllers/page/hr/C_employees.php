@@ -9,6 +9,7 @@ class C_employees extends HR_Controler {
 //        $this->session->set_userdata('departement_nav', 'academic');
         $this->load->model('akademik/m_akademik');
         $this->load->model('hr/m_hr');
+        $this->load->model('master/m_master');
     }
 
 
@@ -35,12 +36,16 @@ class C_employees extends HR_Controler {
 
     public function input_employees(){
         $department = parent::__getDepartement();
-        $page = $this->load->view('page/'.$department.'/employees/inputEmployees','',true);
+        // get Prodi
+        $data['ProdiArr'] = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
+        $page = $this->load->view('page/'.$department.'/employees/inputEmployees',$data,true);
         $this->tab_menu($page);
     }
 
     public function edit_employees($NIP){
         $department = parent::__getDepartement();
+        // get Prodi
+        $data['ProdiArr'] = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
         $arrEmp = $this->db->get_where('db_employees.employees',array('NIP'=>$NIP),1)->result_array();
         $data['arrEmp'] = (count($arrEmp)>0) ? $arrEmp[0] : [];
 
