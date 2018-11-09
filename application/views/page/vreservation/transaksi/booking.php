@@ -96,7 +96,8 @@
   $(document).on('click','#search', function () {
     var get = $('#datetime_deadline1').val();
     var divHtml = $("#schedule");
-    loadDataSchedule(divHtml,get);
+    var OpCategory = $("#OpCategoryRoom").val();
+    loadDataSchedule(divHtml,get,OpCategory);
     $("#schdate").html('<i class="icon-calendar"></i> Schedule Date : '+ get);
   });
 
