@@ -283,6 +283,24 @@
         });
     });
 
+    $(document).on('click','#deleteExamonModal',function () {
+       if(confirm('Are you sure to delete?')){
+           loading_buttonSm('#deleteExamonModal');
+           $('.btnINModal').prop('disabled',true);
+
+           var ExamID = $(this).attr('data-id');
+           var token = jwt_encode({action : 'deleteExamInExamList', ExamID : ExamID},'UAP)(*');
+           var url = base_url_js+'api/__crudJadwalUjian';
+           $.post(url,{token:token},function (result) {
+               loadDataExam();
+               loadClassGroup();
+               setTimeout(function () {
+                   $('#GlobalModal').modal('hide');
+               },500);
+           });
+       }
+    });
+
     $(document).on('click','#btnDeleteExam',function () {
 
         loading_buttonSm('#btnDeleteExam');
@@ -293,6 +311,7 @@
         var url = base_url_js+'api/__crudJadwalUjian';
         $.post(url,{token:token},function (result) {
             loadDataExam();
+            loadClassGroup();
             setTimeout(function () {
                 $('#NotificationModal').modal('hide');
             },500);
@@ -429,10 +448,10 @@
 
 
         if(filterClassGroup!='' && filterClassGroup!=null){
-
+            var ExamID = filterClassGroup.split('.')[0];
             var data = {
                 action : 'showDataExamByGroup',
-                ExamID : filterClassGroup.split('.')[0],
+                ExamID : ExamID,
                 ScheduleID : filterClassGroup.split('.')[1]
             };
 
@@ -446,7 +465,6 @@
 
                 if(jsonResult.length>0){
                     var d = jsonResult[0];
-
 
 
                     var tb = '<table class="table">' +
@@ -480,12 +498,18 @@
                         '<td>:</td>' +
                         '<td>'+d.Inv2+'</td>' +
                         '</tr>' +
+                        '<tr>' +
+                        '<td colspan="3" style="text-align: center;">' +
+                        '<a href="'+base_url_js+'academic/exam-schedule/edit-exam-schedule/'+ExamID+'" class="btn btn-primary btnINModal">Edit Exam Schedule</a> ' +
+                        '<button class="btn btn-danger" data-id="'+ExamID+'" id="deleteExamonModal">Delete Exam Schedule</button>' +
+                        '</td>' +
+                        '</tr>' +
                         '</table>';
 
                     $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
                         '<h4 class="modal-title">'+d.Course[0].ClassGroup+'</h4>');
                     $('#GlobalModal .modal-body').html(tb);
-                    $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+                    $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default btnINModal" data-dismiss="modal">Close</button>');
                     $('#GlobalModal').modal({
                         'show' : true,
                         'backdrop' : 'static'
