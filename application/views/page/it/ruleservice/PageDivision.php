@@ -57,7 +57,7 @@ $(document).ready(function() {
 			var DivFormAdd = '<div id = "FormAdd"></div>';
 			if (resultJson.length > 0) {
 				EditBtn = '<button type="button" class="btn btn-warning btn-edit"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
-				SaveBtn = '<div class = "row" style = "margin-left : 0px;margin-right : 0px;margin-top:10px"><div class = "col-xs-1 col-md-offset-11"> <button type="button" id="btnSaveTable" class="btn btn-success">Save</button></div></div>';
+				SaveBtn = '<div class = "row" style = "margin-left : 0px;margin-right : 0px;margin-top:10px" id = "rowSaveEdit"></div>';
 				
 			}
 	    	var Mode = '<div class = "row" style = "margin-left : 0px;margin-right : 0px">'+
@@ -153,10 +153,11 @@ $(document).ready(function() {
     		})	
 
     		$("#btnSaveAdd").click(function(){
+                loading_button('#btnSaveAdd');
     			var MenuNavigation = $("#AddMenuNavigation").val();
     			MenuNavigation = MenuNavigation.split(';');
-    			var IDMenuNavigation = MenuNavigation[1];
-    			MenuNavigation = MenuNavigation[0];
+    			var IDMenuNavigation = MenuNavigation[0];
+    			MenuNavigation = MenuNavigation[1];
     			var StatusDiv = $("#AddStatusDiv").val();
     			var Division = $("#addDivision").val();
     			var Description = $("#addDescription").val();
@@ -176,9 +177,104 @@ $(document).ready(function() {
     			    CDID : id,
     			   SaveForm : SaveForm
     			};
+                var token = jwt_encode(data,"UAP)(*");
+                if (validationInput = validation(SaveForm)) {
+                    $.post(url,{token:token},function (resultJson) {
+                        LoadTableData();
+                        $('#btnSaveAdd').prop('disabled',false).html('Save');
+                    }).fail(function() {
+                      toastr.info('Error Processing'); 
+                    }).always(function() {
+                                    
+                    });
+                }
+                else
+                {
+                    $('#btnSaveAdd').prop('disabled',false).html('Save');
+                } 
+
     		})						
-    	})
+    	}) // exit add click function
+
+        $(".btn-edit").click(function(){
+            var SaveBtn = '<div class = "col-xs-1 col-md-offset-11"> <button type="button" id="btnSaveTable" class="btn btn-success">Save</button></div>';
+            $("#rowSaveEdit").html(SaveBtn);
+            $(".Division").each(function(){
+                var valText = $(this).text();
+                var Input = '<input type = "text" class = "form-control textDivision" value = "'+valText+'" >';
+                $(this).html(Input);
+            })
+
+            $(".Description").each(function(){
+                var valText = $(this).text();
+                var Input = '<input type = "text" class = "form-control textDescription" value = "'+valText+'" >';
+                $(this).html(Input);
+            })
+
+            $(".MenuNavigation").each(function(){
+                var valText = $(this).text();
+                var OPMenuNavigation = '<select class = "form-control textMenuNavigation">';
+                for (var i = 0; i < arr_menu_nav.length; i++) {
+                    var selected = (arr_menu_nav[i]['MenuNavigation'] == valText) ? 'selected' : '';
+                    OPMenuNavigation += '<option value = "'+arr_menu_nav[i]['IDMenuNavigation']+';'+arr_menu_nav[i]['MenuNavigation']+'" '+selected+'>'+arr_menu_nav[i]['MenuNavigation']+'</option>';
+                }
+                OPMenuNavigation += '</select>';
+                $(this).html(OPMenuNavigation);
+            })
+
+            $(".Email").each(function(){
+                var valText = $(this).text();
+                var Input = '<input type = "text" class = "form-control textEmail" value = "'+valText+'" >';
+                $(this).html(Input);
+            })
+
+            $(".StatusDiv").each(function(){
+                var valText = $(this).text();
+                console.log(valText);
+                var OPStatusDiv = '<select class = "form-control textStatusDiv">';
+                    for (var i = 0; i < 2; i++) {
+                       if (i == 0) {
+                        var selected = (valText == 1) ? 'selected' : '';
+                        OPStatusDiv += '<option value = "1" '+selected+'>Show</option>'; 
+                        
+                       }
+
+                       if (i == 1) {
+                            var selected = (valText == 0) ? 'selected' : '';
+                            OPStatusDiv += '<option value = "0"'+selected+'>Not Show</option>';
+                       }
+                    }
+                    OPStatusDiv += '</select>';
+                $(this).html(OPStatusDiv);
+            })
+
+        })
+            
     }
 
 }); // exit document Function
+
+function validation(arr)
+{
+  var toatString = "";
+  var result = "";
+  for(var key in arr) {
+     switch(key)
+     {
+      default :
+            result = Validation_required(arr[key],key);
+            if (result['status'] == 0) {
+              toatString += result['messages'] + "<br>";
+            }
+     }
+
+  }
+  if (toatString != "") {
+    toastr.error(toatString, 'Failed!!');
+    return false;
+  }
+
+  return true;
+}
+
 </script>

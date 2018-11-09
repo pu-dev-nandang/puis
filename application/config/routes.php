@@ -1087,6 +1087,7 @@ foreach( $result as $row )
 }
 
 $route['it/rule_service/PageDivision'] = 'page/it/c_rule_service/Page';
+$route['it/saveDivision'] = 'page/it/c_rule_service/saveDivision';
 
 // end it
 

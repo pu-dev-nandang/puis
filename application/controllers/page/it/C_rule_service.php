@@ -22,4 +22,19 @@ class C_rule_service extends It_Controler {
       echo json_encode($arr_result);
     }
 
+    public function saveDivision()
+    {
+     $input = $this->getInputToken();
+     switch ($input['Action']) {
+        case 'add':
+          $FormSave = (array) $input['SaveForm'];
+          $this->db->insert('db_employees.division', $FormSave);
+          break;
+        
+        default:
+          # code...
+          break;
+      } 
+    }
+
 }
