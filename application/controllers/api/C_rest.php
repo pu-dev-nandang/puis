@@ -24,6 +24,14 @@ class C_rest extends CI_Controller {
         return $data_arr;
     }
 
+    private function getInputToken2()
+    {
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+        return $data_arr;
+    }
+
     private function cekAuthAPI($dataAuth){
 
         $auth = (array) $dataAuth;
@@ -219,6 +227,138 @@ class C_rest extends CI_Controller {
             );
             return print_r(json_encode($msg));
         }
+    }
+
+    public function getTableData($db = null,$table = null)
+    {
+        error_reporting(0);
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $json = array();
+                if ( ($db != null || $db != '') && ($table != null || $table != '')  ) {
+                    $json = $this->m_master->showData_array($db.'.'.$table);
+                }
+                echo json_encode($json);
+                
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    public function rule_service()
+    {
+        error_reporting(0);
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $json = $this->m_master->getData_rule_service();
+                echo json_encode($json);
+                
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    public function rule_users()
+    {
+        error_reporting(0);
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $json = $this->datatableSSRuleUser();
+                echo json_encode($json);
+                
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    private function datatableSSRuleUser()
+    {
+        $requestData= $_REQUEST;
+        $gettotalData = function($requestData){
+                $sql = 'select count(*) as total from (
+                        select a.ID,a.NIP,a.IDDivision,a.privilege,b.Name,c.Division from
+                        db_employees.rule_users as a left join 
+                        db_employees.employees as b on 
+                        a.NIP = b.NIP 
+                        left join db_employees.division as c 
+                        on a.IDDivision = c.ID
+                        where 
+                        b.Name like "%'.$requestData['search']['value'].'%" or a.NIP like "%'.$requestData['search']['value'].'%" or c.Division like "%'.$requestData['search']['value'].'%"
+                )aa';
+                $query=$this->db->query($sql, array())->result_array();
+                return $query[0]['total'];
+        };
+        $totalData = $gettotalData($requestData);
+        $sql = 'select a.ID,a.NIP,a.IDDivision,a.privilege,b.Name,c.Division from
+                db_employees.rule_users as a left join 
+                db_employees.employees as b on 
+                a.NIP = b.NIP 
+                left join db_employees.division as c 
+                on a.IDDivision = c.ID
+                where 
+                b.Name like "%'.$requestData['search']['value'].'%" or a.NIP like "%'.$requestData['search']['value'].'%" or c.Division like "%'.$requestData['search']['value'].'%"';
+        $sql.= ' order by a.NIP desc LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+        $query = $this->db->query($sql)->result_array();
+
+        $data = array();
+        $No = $requestData['start'] + 1;
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+            $nestedData[] = $No;
+            $nestedData[] = $row['NIP'].' || '.$row['Name'];
+            $nestedData[] = $row['Division'];
+            $action = '<button type="button" class="btn btn-danger btn-delete" data-sbmt="'.$row['ID'].'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
+
+            $nestedData[] = $action;
+            $nestedData[] = $row['NIP'];
+            $nestedData[] = $row['IDDivision'];
+            $nestedData[] = $row['ID'];
+            $data[] = $nestedData;
+            $No++;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalData ),
+            "data"            => $data
+        );
+        return $json_data;
+        // echo json_encode($json_data);
     }
 
 

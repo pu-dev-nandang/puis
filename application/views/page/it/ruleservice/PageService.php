@@ -18,40 +18,18 @@ $(document).ready(function() {
     										'<thead>'+
     										'<tr>'+
     											'<th width = "3%">No</th>'+
-    				                            '<th>Division</th>'+
+    				                            '<th>Name</th>'+
     				                            '<th>Description</th>'+
-    											'<th>Menu Navigation</th>'+
-    											'<th>Email</th>'+
-    											'<th>Status Div</th>'+
     											'<th>Action</th>'+
     										'</tr></thead>'	
     								;
     	TableGenerate += '<tbody>';
-    	var url = base_url_js+"api/__getDivision";
-		$.post(url,function (resultJson) {
-			var arr_menu_nav = [];
-			for (var i = 0; i < resultJson.length; i++) {
-				// check exist Menu Navigation
-				var find = 1; 
-				for (var l = 0; l < arr_menu_nav.length; l++) {
-					var IDMenuNavigation = resultJson[i].IDMenuNavigation;
-					if (IDMenuNavigation == arr_menu_nav[l].IDMenuNavigation) {
-						find = 0;
-						break;
-					}
-				}
-
-				if (find == 1) {
-					if (resultJson[i].MenuNavigation != null) {
-						var temp = {
-							IDMenuNavigation :resultJson[i].IDMenuNavigation,
-							MenuNavigation : resultJson[i].MenuNavigation, 
-						}
-
-						arr_menu_nav.push(temp);
-					}
-				}
-			}
+    	var url = base_url_js+"rest/__getTableData/db_employees/service";
+        var data = {
+                        auth : 's3Cr3T-G4N',
+                   };
+        var token = jwt_encode(data,"UAP)(*");
+		$.post(url,{token:token},function (resultJson) {
 			var EditBtn = '';
 			var SaveBtn = '';
 			var DivFormAdd = '<div id = "FormAdd"></div>';
@@ -68,14 +46,10 @@ $(document).ready(function() {
 					        '</div>'+
 					    '</div>';
 			for (var i = 0; i < resultJson.length; i++) {
-				var StatusDiv = (resultJson[i].StatusDiv == 0) ? 'Not Show' : 'Show';		    
 				TableGenerate += '<tr>'+
 									'<td width = "3%">'+ (parseInt(i) + 1)+'</td>'+
-									'<td class = "Division" iddiv = "'+resultJson[i].ID+'">'+ resultJson[i].Division+'</td>'+
+									'<td class = "Name" idget = "'+resultJson[i].ID+'">'+ resultJson[i].Name+'</td>'+
 									'<td class = "Description">'+ resultJson[i].Description+'</td>'+
-									'<td class = "MenuNavigation" value = "'+resultJson[i].IDMenuNavigation+'">'+resultJson[i].MenuNavigation+'</td>'+
-									'<td class = "Email">'+ resultJson[i].Email+'</td>'+
-									'<td class = "StatusDiv">'+ StatusDiv+'</td>'+
 									'<td class = "Action">'+ '<button type="button" class="btn btn-danger btn-delete" data-sbmt="'+resultJson[i].ID+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>'+'</td>'+
 								'</tr>';
 			}
@@ -105,7 +79,7 @@ $(document).ready(function() {
                           'show' : true
                       });
 
-                      var url = base_url_js+'it/saveDivision';
+                      var url = base_url_js+'it/saveService';
                       var aksi = "delete";
                       var data = {
                           Action : aksi,
@@ -124,7 +98,7 @@ $(document).ready(function() {
                      })
              });
              
-			 FuncAddClickFunction(arr_menu_nav);
+			 FuncAddClickFunction();
 
     	}).fail(function() {
 		  toastr.info('No Result Data'); 
@@ -133,23 +107,12 @@ $(document).ready(function() {
 		});								
     }
 
-    function FuncAddClickFunction(arr_menu_nav)
+    function FuncAddClickFunction()
     {
     	$(".btn-add").click(function(){
     		$("#FormAdd").empty();
             $("#btnSaveTable").remove();
-    		var Thumbnail = '<div class="thumbnail" style="height: 200px;margin-top:10px;margin-left:10px;margin-right:10px"><b>Form Add</b>';
-    		var OPMenuNavigation = '<select class = "form-control" id = "AddMenuNavigation">';
-    		OPMenuNavigation += '<option value = "" selected>--Choice Menu Navigation--</option>';
-    		for (var i = 0; i < arr_menu_nav.length; i++) {
-    			OPMenuNavigation += '<option value = "'+arr_menu_nav[i]['IDMenuNavigation']+';'+arr_menu_nav[i]['MenuNavigation']+'" >'+arr_menu_nav[i]['MenuNavigation']+'</option>';
-
-    		}
-    		OPMenuNavigation += '</select>';
-    		var OPStatusDiv = '<select class = "form-control" id = "AddStatusDiv">'+
-    							'<option value = "1" selected>Show</option>'+
-    							'<option value = "0">Not Show</option>'+
-    						  '</select>';	
+            var Thumbnail = '<div class="thumbnail" style="height: 200px;margin-top:10px;margin-left:10px;margin-right:10px"><b>Form Add</b>';
     		var Btn = '<div class = "row" style = "margin-left:10px;margin-right:0px;margin-top : 0px">'+
 	    						'<div clas = "col-xs-4">'+
 	    							'<button type="button" id="btnSaveAdd" class="btn btn-success">Save</button>'+
@@ -163,24 +126,12 @@ $(document).ready(function() {
     							'<div class = "col-xs-12">'+
     								'<div class = "row">'+
     									'<div class = "col-xs-3">'+
-    										'<label>Division</label>'+
-    										'<input type = "text" class = "form-control" id = "addDivision">'+
+    										'<label>Name</label>'+
+    										'<input type = "text" class = "form-control" id = "addName">'+
     									'</div>'+
     									'<div class = "col-xs-3">'+
     										'<label>Description</label>'+
     										'<input type = "text" class = "form-control" id = "addDescription">'+
-    									'</div>'+
-    									'<div class = "col-xs-3">'+
-    										'<label>Menu Navigation</label>'+
-    										OPMenuNavigation+
-    									'</div>'+
-    									'<div class = "col-xs-3">'+
-    										'<label>Email</label>'+
-    										'<input type = "text" class = "form-control" id = "addEmail">'+
-    									'</div>'+
-    									'<div class = "col-xs-3">'+
-    										'<label>Status Division</label>'+
-    										OPStatusDiv+
     									'</div>'+
     								'</div>'+
     							'</div>'+
@@ -194,28 +145,19 @@ $(document).ready(function() {
 
     		$("#btnSaveAdd").click(function(){
                 loading_button('#btnSaveAdd');
-    			var MenuNavigation = $("#AddMenuNavigation").val();
-    			MenuNavigation = MenuNavigation.split(';');
-    			var IDMenuNavigation = MenuNavigation[0];
-    			MenuNavigation = MenuNavigation[1];
-    			var StatusDiv = $("#AddStatusDiv").val();
-    			var Division = $("#addDivision").val();
+    			var Name = $("#addName").val();
     			var Description = $("#addDescription").val();
-    			var Email = $("#addEmail").val();
     			var Action = 'add';
     			var id = '';
-    			var url = base_url_js+'it/saveDivision';
+    			var url = base_url_js+'it/saveService';
     			var SaveForm = {
-    				Division:Division,
+    				Name:Name,
     				Description:Description,
-    				Email : Email,
-    				MenuNavigation : MenuNavigation,
-    				IDMenuNavigation : IDMenuNavigation,
     			}
     			var data = {
     			    Action : Action,
     			    CDID : id,
-    			   SaveForm : SaveForm
+    			    SaveForm : SaveForm
     			};
                 var token = jwt_encode(data,"UAP)(*");
                 if (validationInput = validation(SaveForm)) {
@@ -242,10 +184,10 @@ $(document).ready(function() {
             if ((editi % 2) == 0 ) {LoadTableData();return;}
             var SaveBtn = '<div class = "col-xs-1 col-md-offset-11"> <button type="button" id="btnSaveTable" class="btn btn-success">Save</button></div>';
             $("#rowSaveEdit").html(SaveBtn);
-            $(".Division").each(function(){
+            $(".Name").each(function(){
                 var valText = $(this).text();
-                var iddiv = $(this).attr('idDiv');
-                var Input = '<input type = "text" class = "form-control textDivision" value = "'+valText+'" iddiv="'+iddiv+'">';
+                var idget = $(this).attr('idget');
+                var Input = '<input type = "text" class = "form-control textName" value = "'+valText+'" idget="'+idget+'">';
                 $(this).html(Input);
             })
 
@@ -255,51 +197,13 @@ $(document).ready(function() {
                 $(this).html(Input);
             })
 
-            $(".MenuNavigation").each(function(){
-                var valText = $(this).text();
-                var OPMenuNavigation = '<select class = "form-control textMenuNavigation">';
-                for (var i = 0; i < arr_menu_nav.length; i++) {
-                    var selected = (arr_menu_nav[i]['MenuNavigation'] == valText) ? 'selected' : '';
-                    OPMenuNavigation += '<option value = "'+arr_menu_nav[i]['IDMenuNavigation']+';'+arr_menu_nav[i]['MenuNavigation']+'" '+selected+'>'+arr_menu_nav[i]['MenuNavigation']+'</option>';
-                }
-                OPMenuNavigation += '</select>';
-                $(this).html(OPMenuNavigation);
-            })
-
-            $(".Email").each(function(){
-                var valText = $(this).text();
-                var Input = '<input type = "text" class = "form-control textEmail" value = "'+valText+'" >';
-                $(this).html(Input);
-            })
-
-            $(".StatusDiv").each(function(){
-                var valText = $(this).text();
-                valText = (valText == 'Show') ? 1 : 0 ;
-                console.log(valText);
-                var OPStatusDiv = '<select class = "form-control textStatusDiv">';
-                    for (var i = 0; i < 2; i++) {
-                       if (i == 0) {
-                        var selected = (valText == 1) ? 'selected' : '';
-                        OPStatusDiv += '<option value = "1" '+selected+'>Show</option>'; 
-                        
-                       }
-
-                       if (i == 1) {
-                            var selected = (valText == 0) ? 'selected' : '';
-                            OPStatusDiv += '<option value = "0"'+selected+'>Not Show</option>';
-                       }
-                    }
-                    OPStatusDiv += '</select>';
-                $(this).html(OPStatusDiv);
-            })
-
             $("#btnSaveTable").click(function(){
                 loading_button('#btnSaveTable');
-                var textDivision = [];
+                var textName = [];
                 var textID = [];
-                $(".textDivision").each(function(){
-                    textDivision.push($(this).val());
-                    textID.push($(this).attr('iddiv'));
+                $(".textName").each(function(){
+                    textName.push($(this).val());
+                    textID.push($(this).attr('idget'));
                 })
 
                 var textDescription = [];
@@ -307,42 +211,19 @@ $(document).ready(function() {
                     textDescription.push($(this).val());
                 })
 
-                var textMenuNavigation = [];
-                var textIDMenuNavigation = [];
-                $(".textMenuNavigation").each(function(){
-                    var valuee = $(this).val();
-                    valuee = valuee.split(';');
-                    textIDMenuNavigation .push(valuee[0]);
-                    textMenuNavigation.push(valuee[1]);
-                })
-
-                var textEmail = [];
-                $(".textEmail").each(function(){
-                    textEmail.push($(this).val());
-                })
-
-                var textStatusDiv = [];
-                $(".textStatusDiv").each(function(){
-                    textStatusDiv.push($(this).val());
-                })
-
                 // get Push array
                 var FormUpdate = [];
-                for (var i = 0; i < textDivision.length; i++) {
+                for (var i = 0; i < textName.length; i++) {
                     var temp = {
-                        Division : textDivision[i],
+                        Name : textName[i],
                         Description : textDescription[i],
-                        MenuNavigation : textMenuNavigation[i],
-                        IDMenuNavigation : textIDMenuNavigation[i],
-                        Email :  textEmail[i],
-                        StatusDiv : textStatusDiv[i],
                         ID : textID[i],
                     }
                     FormUpdate.push(temp);
                 }
 
                 var Action = 'edit';
-                var url = base_url_js+'it/saveDivision';
+                var url = base_url_js+'it/saveService';
                 var data = {
                     Action : Action,
                     FormUpdate : FormUpdate

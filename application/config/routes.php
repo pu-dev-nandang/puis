@@ -766,6 +766,9 @@ $route['rest/__getExamSchedule'] = 'api/c_rest/getExamSchedule';
 $route['rest/__getKSM'] = 'api/c_rest/getKSM';
 $route['rest/__getExamScheduleForStudent'] = 'api/c_rest/getExamScheduleForStudent';
 $route['rest/__cek_deadline_paymentNPM'] = 'api/c_rest/cek_deadline_paymentNPM';
+$route['rest/__getTableData/(:any)/(:any)'] = 'api/c_rest/getTableData/$1/$2';
+$route['rest/__rule_service'] = 'api/c_rest/rule_service';
+$route['rest/__rule_users'] = 'api/c_rest/rule_users';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
@@ -1086,8 +1089,10 @@ foreach( $result as $row )
 
 }
 
-$route['it/rule_service/PageDivision'] = 'page/it/c_rule_service/Page';
+$route['it/rule_service/(:any)'] = 'page/it/c_rule_service/Page';
 $route['it/saveDivision'] = 'page/it/c_rule_service/saveDivision';
+$route['it/saveService'] = 'page/it/c_rule_service/saveService';
+$route['it/saveRuleService'] = 'page/it/c_rule_service/saveRuleService';
 
 // end it
 

@@ -490,7 +490,7 @@ class C_login extends CI_Controller {
     public function ApiServerToServer()
     {        
         $data = file_get_contents('php://input');
-
+        
         $data_json = json_decode($data,true);
 
         if (!$data_json) {
