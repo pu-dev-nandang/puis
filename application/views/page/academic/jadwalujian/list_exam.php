@@ -461,7 +461,6 @@
 
             $.post(url,{token:token},function (jsonResult) {
 
-                console.log(jsonResult);
 
                 if(jsonResult.length>0){
                     var d = jsonResult[0];
@@ -482,6 +481,11 @@
                         '<td>Day, Date</td>' +
                         '<td>:</td>' +
                         '<td>'+moment(d.ExamDate).format('dddd, DD-MMM-YYYY')+'</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '<td>Room</td>' +
+                        '<td>:</td>' +
+                        '<td>'+d.Room+'</td>' +
                         '</tr>' +
                         '<tr>' +
                         '<td>Time</td>' +
