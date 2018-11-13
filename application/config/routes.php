@@ -769,6 +769,7 @@ $route['rest/__cek_deadline_paymentNPM'] = 'api/c_rest/cek_deadline_paymentNPM';
 $route['rest/__getTableData/(:any)/(:any)'] = 'api/c_rest/getTableData/$1/$2';
 $route['rest/__rule_service'] = 'api/c_rest/rule_service';
 $route['rest/__rule_users'] = 'api/c_rest/rule_users';
+$route['rest/__getEmployees/(:any)'] = 'api/c_rest/getEmployees/$1';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
@@ -1093,6 +1094,7 @@ $route['it/rule_service/(:any)'] = 'page/it/c_rule_service/Page';
 $route['it/saveDivision'] = 'page/it/c_rule_service/saveDivision';
 $route['it/saveService'] = 'page/it/c_rule_service/saveService';
 $route['it/saveRuleService'] = 'page/it/c_rule_service/saveRuleService';
+$route['it/saveRuleUser'] = 'page/it/c_rule_service/saveRuleUser';
 
 // end it
 

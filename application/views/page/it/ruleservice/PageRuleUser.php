@@ -73,13 +73,56 @@ $(document).ready(function() {
                   $(row).attr('NIP', data[4]);
                   $(row).attr('IDDivision', data[5]);
                   $(row).attr('IDPri', data[6]);
-                  // console.log(data);
-                  // if(data[6] == 'Lunas')
-                  // {
-                  //   $(row).attr('style', 'background-color: #8ED6EA; color: black;');
-                  // }
+
+                  $( row ).find('td:eq(1)')
+                              .attr('class', 'E_NIP')
+                              .attr('NIP', data[4])
+                              .attr('IDPri', data[6]);
+                  $( row ).find('td:eq(2)')
+                              .attr('class', 'IDDivision')            
+                              .attr('IDDivision', data[5]);            
+                              //.addClass('asset-context box');
             },
         } );
+
+        $('#tableData4').on('click', '.btn-delete', function(){
+           var ID = $(this).attr('data-sbmt');
+            $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Apakah anda yakin untuk melakukan request ini ?? </b> ' +
+                '<button type="button" id="confirmYesDelete" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+                '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+                '</div>');
+            $('#NotificationModal').modal('show');
+                $("#confirmYesDelete").click(function(){
+                 $('#NotificationModal .modal-header').addClass('hide');
+                 $('#NotificationModal .modal-body').html('<center>' +
+                     '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+                     '                    <br/>' +
+                     '                    Loading Data . . .' +
+                     '                </center>');
+                 $('#NotificationModal .modal-footer').addClass('hide');
+                 $('#NotificationModal').modal({
+                     'backdrop' : 'static',
+                     'show' : true
+                 });
+
+                 var url = base_url_js+'it/saveRuleUser';
+                 var aksi = "delete";
+                 var data = {
+                     Action : aksi,
+                     CDID : ID,
+                 };
+                 var token = jwt_encode(data,"UAP)(*");
+                 $.post(url,{token:token},function (data_json) {
+                     setTimeout(function () {
+                        toastr.options.fadeOut = 10000;
+                        toastr.success('Data berhasil disimpan', 'Success!');
+                        LoadTableData();
+                        $('#NotificationModal').modal('hide');
+                     },500);
+                 });
+
+                })
+        });
 
         FuncAddClickFunction();							
     } 
@@ -90,21 +133,21 @@ $(document).ready(function() {
     		$("#FormAdd").empty();
             $("#btnSaveTable").remove();
             // get data division & service
-                var url = base_url_js+"rest/__getTableData/db_employees/division";
+                var url = base_url_js+"rest/__getEmployees/aktif";
                 var data = {
                                 auth : 's3Cr3T-G4N',
                            };
                 var token = jwt_encode(data,"UAP)(*");
                 $.post(url,{token:token},function (resultJson) {
-                    var OpDiv = resultJson;
-                    var url = base_url_js+"rest/__getTableData/db_employees/service";
+                    var OpEmployees = resultJson;
+                    var url = base_url_js+"rest/__getTableData/db_employees/division";
                                     var data = {
                                                     auth : 's3Cr3T-G4N',
                                                };
                                     var token = jwt_encode(data,"UAP)(*");
                     $.post(url,{token:token},function (resultJson) {
-                        var OpService = resultJson;
-                        var Thumbnail = '<div class="thumbnail" style="height: 200px;margin-top:10px;margin-left:10px;margin-right:10px"><b>Form Add</b>';
+                        var OpDiv = resultJson;
+                        var Thumbnail = '<div class="thumbnail" style="height: 130px;margin-top:10px;margin-left:10px;margin-right:10px"><b>Form Add</b>';
                         var Btn = '<div class = "row" style = "margin-left:10px;margin-right:0px;margin-top : 0px">'+
                                   '<div clas = "col-xs-4">'+
                                     '<button type="button" id="btnSaveAdd" class="btn btn-success">Save</button>'+
@@ -122,11 +165,11 @@ $(document).ready(function() {
                           return aa;
                         }
                         
-                        var selectService = function(selected = null){
+                        var selectEmployees= function(selected = null){
                           var aa = '';
-                          for (var i = 0; i < OpService.length; i++) {
-                            var selected = (OpService[i].ID == selected) ? 'selected' : '';
-                             aa += '<option value = "'+OpService[i].ID+'" '+selected+'>'+OpService[i].Name+'</option>';
+                          for (var i = 0; i < OpEmployees.length; i++) {
+                            var selected = (OpEmployees[i].NIP == selected) ? 'selected' : '';
+                             aa += '<option value = "'+OpEmployees[i].NIP+'" '+selected+'>'+OpEmployees[i].NIP+' || '+OpEmployees[i].Name+'</option>';
                           } 
                           return aa;
                         }
@@ -137,14 +180,14 @@ $(document).ready(function() {
                                     '<div class = "row">'+
                                       '<div class = "col-xs-3">'+
                                         '<label>Division</label>'+
-                                        '<select ID="addDivision">'+
-                                        selectDiv()+
+                                        '<select ID="addEmployees">'+
+                                        selectEmployees()+
                                         '</select>'+
                                       '</div>'+
                                       '<div class = "col-xs-3">'+
-                                        '<label>Service</label>'+
-                                        '<select ID="addName">'+
-                                        selectService()+
+                                        '<label>Division Access</label>'+
+                                        '<select ID="addDivision">'+
+                                        selectDiv()+
                                         '</select>'+
                                       '</div>'+
                                     '</div>'+
@@ -153,21 +196,26 @@ $(document).ready(function() {
                               '</div>';
                         var EndThumbnail = '</div>';      
                         $("#FormAdd").html(Thumbnail+html+Btn+EndThumbnail);
+                        $('select[tabindex!="-1"]').select2({
+                            //allowClear: true
+                        });
+
+
                         $("#btnCancelAdd").click(function(){
                           $("#FormAdd").empty();
                         })  
 
                         $("#btnSaveAdd").click(function(){
                           loading_button('#btnSaveAdd');
-                          var IDService = $("#addName").val();
+                          var NIP = $("#addEmployees").val();
                           var IDDivision = $("#addDivision").val();
                           var Action = 'add';
                           var id = '';
-                          var url = base_url_js+'it/saveRuleService';
+                          var url = base_url_js+'it/saveRuleUser';
                           var SaveForm = {
-                            IDService:IDService,
+                            NIP:NIP,
                             IDDivision:IDDivision,
-                            Status : '1',
+                            privilege : '1',
                           }
                           var data = {
                               Action : Action,
@@ -219,13 +267,13 @@ $(document).ready(function() {
           var token = jwt_encode(data,"UAP)(*");
           $.post(url,{token:token},function (resultJson) {
               var OpDiv = resultJson;
-              var url = base_url_js+"rest/__getTableData/db_employees/service";
+              var url = base_url_js+"rest/__getEmployees/aktif";
               var data = {
                               auth : 's3Cr3T-G4N',
                          };
               var token = jwt_encode(data,"UAP)(*");
               $.post(url,{token:token},function (resultJson) {
-                var OpService = resultJson;
+                var OpEmployees = resultJson;
                 var selectDiv = function(selected = null){
                   var aa = '';
                   var cc = selected;
@@ -235,58 +283,61 @@ $(document).ready(function() {
                   }
                   return aa;
                 }
-                
-                var selectService = function(selected = null){
+
+                var selectEmployees= function(selected = null){
                   var aa = '';
                   var cc = selected;
-                  for (var i = 0; i < OpService.length; i++) {
-                    var selected = (OpService[i].ID == cc) ? 'selected' : '';
-                     aa += '<option value = "'+OpService[i].ID+'" '+selected+'>'+OpService[i].Name+'</option>';
+                  for (var i = 0; i < OpEmployees.length; i++) {
+                    var selected = (OpEmployees[i].NIP == cc) ? 'selected' : '';
+                     aa += '<option value = "'+OpEmployees[i].NIP+'" '+selected+'>'+OpEmployees[i].NIP+' || '+OpEmployees[i].Name+'</option>';
                   } 
                   return aa;
                 }
 
-                $(".Division").each(function(){
+                $(".IDDivision").each(function(){
                     var IDDivision = $(this).attr('iddivision');
-                    var idget = $(this).attr('idget');
-                    var Input = '<select class = "iddivision" idget = "'+idget+'">'+selectDiv(IDDivision)+'</select>';
+                    var Input = '<select class = "cmbdivision">'+selectDiv(IDDivision)+'</select>';
                     $(this).html(Input);
                 })
 
-                $(".Name").each(function(){
-                    var IDService = $(this).attr('idservice');
-                    var Input = '<select class = "idservice">'+selectService(IDService)+'</select>';
+                $(".E_NIP").each(function(){
+                    var NIP = $(this).attr('nip');
+                    var IDpri = $(this).attr('idpri');
+                    var Input = '<select class = "cmbNIP" IDpri = "'+IDpri+'">'+selectEmployees(NIP)+'</select>';
                     $(this).html(Input);
                 })
+
+                $('select[tabindex!="-1"]').select2({
+                    //allowClear: true
+                });
 
                 $("#btnSaveTable").click(function(){
                     loading_button('#btnSaveTable');
                     var IDDivision = [];
-                    var ID = [];
-                    $(".iddivision").each(function(){
+                    $("select.cmbdivision").each(function(){
                         IDDivision.push($(this).val());
-                        ID.push($(this).attr('idget'));
                     })
 
-                    var IDService = [];
-                    $(".idservice").each(function(){
-                        IDService.push($(this).val());
+                    var IDNIP = [];
+                    var ID = [];
+                    $("select.cmbNIP").each(function(){
+                        IDNIP.push($(this).val());
+                        ID.push($(this).attr('idpri'))
                     })
-
 
                     // get Push array
                     var FormUpdate = [];
                     for (var i = 0; i < IDDivision.length; i++) {
                         var temp = {
                             IDDivision : IDDivision[i],
-                            IDService : IDService[i],
+                            NIP : IDNIP[i],
                             ID : ID[i],
                         }
                         FormUpdate.push(temp);
                     }
 
                     var Action = 'edit';
-                    var url = base_url_js+'it/saveRuleService';
+                    var url = base_url_js+'it/saveRuleUser';
                     var data = {
                         Action : Action,
                         FormUpdate : FormUpdate

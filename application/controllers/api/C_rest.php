@@ -361,5 +361,47 @@ class C_rest extends CI_Controller {
         // echo json_encode($json_data);
     }
 
+    public function getEmployees($Status = 'aktif')
+    {
+        error_reporting(0);
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                if ($Status == 'aktif') {
+                    $AddSql = ' where StatusEmployeeID not in (-1,-2,4,6)';
+                }
+                else
+                {
+                    $AddSql = ' where StatusEmployeeID = "'.$Status.'"';
+                }
+
+                $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
+                            ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.Address, ems.Description, em.StatusEmployeeID
+                            FROM db_employees.employees em 
+                            LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                            LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID) 
+                            ';
+
+                $sql.= $AddSql;
+                $query=$this->db->query($sql, array())->result_array();
+
+                echo json_encode($query);
+                
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+        
+    }
+
 
 }

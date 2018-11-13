@@ -129,7 +129,7 @@ $(document).ready(function() {
                                     var token = jwt_encode(data,"UAP)(*");
                     $.post(url,{token:token},function (resultJson) {
                         var OpService = resultJson;
-                        var Thumbnail = '<div class="thumbnail" style="height: 200px;margin-top:10px;margin-left:10px;margin-right:10px"><b>Form Add</b>';
+                        var Thumbnail = '<div class="thumbnail" style="height: 130px;margin-top:10px;margin-left:10px;margin-right:10px"><b>Form Add</b>';
                         var Btn = '<div class = "row" style = "margin-left:10px;margin-right:0px;margin-top : 0px">'+
                                   '<div clas = "col-xs-4">'+
                                     '<button type="button" id="btnSaveAdd" class="btn btn-success">Save</button>'+

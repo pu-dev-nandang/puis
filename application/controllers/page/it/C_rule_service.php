@@ -178,4 +178,97 @@ class C_rule_service extends It_Controler {
        }
     }
 
+    public function saveRuleUser()
+    {
+      $input = $this->getInputToken();
+      $msg = '';
+      switch ($input['Action']) {
+         case 'add':
+           $FormSave = (array) $input['SaveForm'];
+            // check data exist
+           $chk = function($FormSave){
+            $sql = 'select * from db_employees.rule_users where IDDivision = ? and NIP = ?';
+            $query=$this->db->query($sql, array($FormSave['IDDivision'],$FormSave['NIP']))->result_array();
+            if (count($query) == 0) {
+              return true;
+            }
+            else
+            {
+              return false;
+            }
+           };
+
+           $chk1 = $chk($FormSave);
+           if ($chk1) {
+             $this->db->insert('db_employees.rule_users', $FormSave);
+           }
+           else
+           {
+            $msg = 'Data Duplicate';
+           }
+           echo json_encode($msg);
+           break;
+         case 'edit':
+           $FormUpdate = (array) $input['FormUpdate'];
+           $chk = function($FormUpdate){
+            $find = true;
+            for ($i=0; $i < count($FormUpdate); $i++) {
+              $find2 = true; 
+              for ($j=$i+1; $j < count($FormUpdate); $j++) {
+                $IDDivision1 = $FormUpdate[$i]->IDDivision;
+                $NIP1 = $FormUpdate[$i]->NIP;
+                $IDDivision2 = $FormUpdate[$j]->IDDivision;
+                $NIP2 = $FormUpdate[$j]->NIP;
+                if ($IDDivision1 == $IDDivision2 && $NIP1 == $NIP2) {
+                   // print_r($IDDivision1.'=='.$IDDivision2.' ; '.$NIP1.'=='.$NIP2.' ; '.$i.' -> '.$j);die();
+                  $find2 = false;
+                  break; 
+                }
+              }
+              if (!$find2) {
+                $find = false;
+                break;
+              }
+              else
+              {
+                $sql = 'select * from db_employees.rule_users where IDDivision = ? and NIP = ? and ID != ?';
+                $query=$this->db->query($sql, array($FormUpdate[$i]->IDDivision,$FormUpdate[$i]->NIP,$FormUpdate[$i]->ID))->result_array();
+                if (count($query) > 0) {
+                  $find = false;
+                  break;
+                }
+              }
+            }
+            return $find;
+           };
+           $chk1 = $chk($FormUpdate);
+           if ($chk1) {
+             for ($i=0; $i < count($FormUpdate); $i++) { 
+               $dataSave = array();
+               $ID = $FormUpdate[$i]->ID;
+               foreach ($FormUpdate[$i] as $key => $value) {
+                 if ($key != 'ID') {
+                   $dataSave[$key] = $value;
+                 }
+               }
+               // print_r($dataSave);die();
+               $this->db->where('ID',$ID);
+               $this->db->update('db_employees.rule_users', $dataSave);
+             }
+           }
+           else
+           {
+            $msg = 'Data Duplicate';
+           }
+           echo json_encode($msg);
+           break;
+           case 'delete':
+             $this->m_master->delete_id_table_all_db($input['CDID'],'db_employees.rule_users');
+           break;
+         default:
+           # code...
+           break;
+       }
+    }
+
 }
