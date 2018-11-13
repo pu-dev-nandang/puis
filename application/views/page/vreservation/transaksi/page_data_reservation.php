@@ -201,8 +201,9 @@
                                 '<thead>'+
                                     '<tr>'+
                                     // '<th style="width: 15px;">No</th>'+
-                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Start - End & Req Date</th>'+
-                                   // ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">End</th>'+
+                                   ' <th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
+                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Start</th>'+
+                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">End</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Time</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Agenda</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Room</th>'+
@@ -212,6 +213,7 @@
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;" width = "15%">Participant</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Layout</th>'+
+                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Requester</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Action</th>'+
                                     '</tr>'+
                                ' </thead>'+
@@ -272,10 +274,12 @@
                 // if (response[i]['Status'] ==  1) {
                 //   tr = '<tr style="background-color: #8ED6EA; color: black;">';
                 // }
+                var No = parseInt(i)+1;
                 $(".datatable tbody").append(
                     tr+
-                        '<td>'+response[i]['Start']+'<br>-<br>'+response[i]['End']+'<hr>Req & Date :<br>'+response[i]['Req_date']+'</td>'+
-                        // '<td>'+response[i]['End']+'</td>'+
+                        '<td>'+No+'</td>'+
+                        '<td>'+response[i]['Start']+'</td>'+
+                        '<td>'+response[i]['End']+'</td>'+
                         '<td>'+response[i]['Time']+'</td>'+
                         '<td>'+response[i]['Agenda']+'</td>'+
                         '<td>'+response[i]['Room']+'</td>'+
@@ -285,6 +289,7 @@
                         '<td>'+response[i]['Participant']+'</td>'+
                         '<td>'+response[i]['StatusBooking']+'</td>'+
                         '<td>'+Req_layout+'</td>'+
+                        '<td>'+response[i]['Req_date']+'</td>'+
                         '<td>'+btn+'</td>'+
                     '</tr>' 
                     );

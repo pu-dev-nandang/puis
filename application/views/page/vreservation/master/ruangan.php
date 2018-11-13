@@ -401,40 +401,45 @@
                 '                            </div></div>' +
                 '                        </div>'+
                 '                         <div class = "row">'+
-                '                           <div class = "col-xs-8">'+
+                '                           <div class = "col-xs-12">'+
                                                 '<div class = "row">'+
                                                     '<div class = "col-xs-12">'+
                                                         '<label>Approver 1</label>'+
                                                     '</div>'+
                                                 '</div>'+
                                                 '<div class = "row" style = "margin-top : 10px">'+
-                                                    '<div class = "col-xs-12">'+
+                                                    '<div class = "col-xs-4">'+
                                                         '<div class = "form-group">'+
-                                                            '<label>User Type</label>'+
+                                                            '<label>Group User</label>'+
                                                             '<select class=" form-control UserTypeApprover1">'+
-                                                                '<option value = "0" selected>-- Choice Group User --</option>'+
+                                                                '<option value = "0" selected>-- Chooices Group User --</option>'+
                                                                 getGroupUser(UserType1Edit)+    
                                                             '</select>'+
                                                         '</div>'+    
                                                     '</div>'+
-                                                '</div>'+
-                                                '<div class = "row" style = "margin-top : 5px">'+
-                                                    '<div class = "col-xs-12">'+
+                                                    '<div class = "col-xs-4">'+
                                                         '<div class = "form-group">'+
-                                                            '<label>Approver Type</label>'+
+                                                            '<label>Category Approver</label>'+
                                                             '<select class=" form-control TypeApprover1">'+
-                                                                '<option value = "0" selected>-- Choice Type Approver--</option>'+
+                                                                '<option value = "0" selected>-- Chooices Type Approver--</option>'+
                                                                 OPselectedTypeApprover1(TypeApprover1Edit)+
                                                             '</select>'+
                                                         '</div>'+    
                                                     '</div>'+
+                                                    '<div id = "AddApprover1" class = "col-xs-4"></div>'+
+                                                '</div>'+
+                                                '<div class = "row" style = "margin-top : 5px">'+
+                                                    
                                                 '</div>'+
                                             '</div>'+    
-                '                           <div class = "col-xs-4">'+
-                '                               <button class="btn btn-default" id = "addApprover1" style = "margin-top : 57px"><i class="icon-plus"></i> Add</button>'+
-                '                           </div>'+
                 '                        </div>'+
-                '                         <div id = "AddApprover1"></div><div id = "AddingApprover"></div><hr>'+
+                '                         <div id = "AddingApprover"></div>'+
+                '                           <div class = "row">'+
+                        '                           <div class = "col-xs-3">'+
+                        '                               <button class="btn btn-default" id = "addApprover1" style = "margin-top : 5px"><i class="icon-plus"></i> Add</button>'+
+                        '                           </div>'+
+                '                            </div>'+
+                                            '<hr>'+
                 '                         <div class = "row" style="margin-top: 10px">'+
                 '                           <div class = "col-xs-8">'+
                 '                                <div class="form-group"><label>Approver 2</label>' +
@@ -484,9 +489,9 @@
                         break;
                 }
                 var Input = '<div class = "row" style="margin-top: 5px">'+
-                                '<div class="col-xs-8">'+
+                                '<div class="col-xs-12">'+
                                     '<div class = "form-group">'+
-                                        '<label>Choice Approver 1</label>'+
+                                        '<label>Chooices Approver 1</label>'+
                                         '<select class=" form-control Approver1">'+
                                         '   <option value = "0" selected>-- No Selected --</option>'+Op+
                                         '</select>'+
@@ -514,9 +519,9 @@
                             break;
                     }
                     var InputApprover1 = '<div class = "row" style="margin-left : 0px">'+
-                                    '<div class="col-xs-8">'+
+                                    '<div class="col-xs-12">'+
                                         '<div class = "form-group">'+
-                                            '<label>Choice Approver 1</label>'+
+                                            '<label>Chooices Approver 1</label>'+
                                             '<select class=" form-control Approver1">'+
                                             '   <option value = "0" selected>-- No Selected --</option>'+Op+
                                             '</select>'+
@@ -525,31 +530,30 @@
                                 '</div>';
 
 
-                    var Input = '<div class="thumbnail" style="height: 220px;margin-top : 10px"><div class = "row" style = "margin-top : 10px;margin-left : 0px">'+
-                                    '<div class = "col-xs-8">'+
+                    var Input = '<div class="thumbnail" style="height: 100px;margin-top : 10px"><div class = "row" style = "margin-top : 10px;margin-left : 0px">'+
+                                    '<div class = "col-xs-3">'+
                                         '<div class = "form-group">'+
-                                            '<label>User Type</label>'+
+                                            '<label>Group User</label>'+
                                             '<select class=" form-control UserTypeApprover1">'+
-                                                '<option value = "0" selected>-- Choice Group User --</option>'+
+                                                '<option value = "0" selected>-- Chooices Group User --</option>'+
                                                 getGroupUser(selected1[i].UserType)+    
                                             '</select>'+
                                         '</div>'+    
                                     '</div>'+
-                                '</div>'+
-                                '<div class = "row" style = "margin-top : 5px;margin-left : 0px">'+
-                                    '<div class = "col-xs-8">'+
+                                    '<div class = "col-xs-3">'+
                                         '<div class = "form-group">'+
-                                            '<label>Approver Type</label>'+
+                                            '<label>Category Approver</label>'+
                                             '<select class=" form-control TypeApprover1">'+
-                                                '<option value = "0" selected>-- Choice Type Approver--</option>'+
+                                                '<option value = "0" selected>-- Chooices Type Approver--</option>'+
                                                 OPselectedTypeApprover1(selected1[i].TypeApprover)+     
                                             '</select>'+
                                         '</div>'+    
                                     '</div>'+
-                                    '<div class="col-xs-4">'+
+                                    '<div class = "col-xs-4 AppendApprover1">'+InputApprover1+'</div>'+ // exit row
+                                    '<div class="col-xs-2">'+
                                         '<button type="button" class="btn btn-danger btn-deleteAuto" style = "margin-top : 23px"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>'+
                                     '</div>'+
-                                '</div><div class = "AppendApprover1">'+InputApprover1+ // exit row
+                                '</div>'+
                             '</div>';
 
                     $("#AddingApprover").append(Input); 
@@ -598,34 +602,32 @@
 
 
             $("#addApprover1").click(function(){
-                var Input = '<div class="thumbnail" style="height: 220px;margin-top : 10px"><div class = "row" style = "margin-top : 10px;margin-left : 0px">'+
-                                '<div class = "col-xs-8">'+
+                var Input = '<div class="thumbnail" style="height: 100px;margin-top : 10px"><div class = "row" style = "margin-top : 10px;margin-left : 0px">'+
+                                '<div class = "col-xs-3">'+
                                     '<div class = "form-group">'+
-                                        '<label>User Type</label>'+
+                                        '<label>Group User</label>'+
                                         '<select class=" form-control UserTypeApprover1">'+
-                                            '<option value = "0" selected>-- Choice Group User --</option>'+
+                                            '<option value = "0" selected>-- Chooices Group User --</option>'+
                                             getGroupUser('')+    
                                         '</select>'+
                                     '</div>'+    
                                 '</div>'+
-                            '</div>'+
-                            '<div class = "row" style = "margin-top : 5px;margin-left : 0px">'+
-                                '<div class = "col-xs-8">'+
+                                '<div class = "col-xs-3">'+
                                     '<div class = "form-group">'+
-                                        '<label>Approver Type</label>'+
+                                        '<label>Category Approver</label>'+
                                         '<select class=" form-control TypeApprover1">'+
-                                            '<option value = "0" selected>-- Choice Type Approver--</option>'+
+                                            '<option value = "0" selected>-- Chooices Type Approver--</option>'+
                                             '<option value ="Position">Position</option>'+
                                             '<option value = "Employees">Employees</option>'+
                                             '<option value = "Division">Division</option>'+      
                                         '</select>'+
                                     '</div>'+    
                                 '</div>'+
-                                '<div class="col-xs-4">'+
+                                '<div class = "col-xs-4 AppendApprover1"></div>'+
+                                '<div class="col-xs-2">'+   
                                     '<button type="button" class="btn btn-danger btn-deleteAuto" style = "margin-top : 23px"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>'+
                                 '</div>'+
-                            '</div><div class = "AppendApprover1">'+ // exit row
-                        '</div>';
+                        '</div></div>';
 
                 $("#AddingApprover").append(Input); 
 
@@ -656,9 +658,9 @@
                             break;
                     }
                     var Input = '<div class = "row" style="margin-left : 0px">'+
-                                    '<div class="col-xs-8">'+
+                                    '<div class="col-xs-12">'+
                                         '<div class = "form-group">'+
-                                            '<label>Choice Approver 1</label>'+
+                                            '<label>Chooices Approver 1</label>'+
                                             '<select class=" form-control Approver1">'+
                                             '   <option value = "0" selected>-- No Selected --</option>'+Op+
                                             '</select>'+
@@ -721,9 +723,9 @@
                         break;
                 }
                 var Input = '<div class = "row" style="margin-top: 5px">'+
-                                '<div class="col-xs-8">'+
+                                '<div class="col-xs-12">'+
                                     '<div class = "form-group">'+
-                                        '<label>Choice Approver 1</label>'+
+                                        '<label>Chooices Approver 1</label>'+
                                         '<select class=" form-control Approver1">'+
                                         '   <option value = "0" selected>-- No Selected --</option>'+Op+
                                         '</select>'+
@@ -782,7 +784,7 @@
                     Approver1.push($(this).val());
                 })
 
-                // CHECK user type double
+                // CHECK Group User double
                 var find = true;
                 // for (var l = 0; l < UserTypeApprover1.length; l++) {
                 //     for (var i = l+1; i < UserTypeApprover1.length; i++) {
