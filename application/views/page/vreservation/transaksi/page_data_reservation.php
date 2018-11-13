@@ -202,6 +202,7 @@
                                     '<tr>'+
                                     // '<th style="width: 15px;">No</th>'+
                                    ' <th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
+                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Action</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Start</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">End</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Time</th>'+
@@ -214,7 +215,6 @@
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Layout</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Requester</th>'+
-                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Action</th>'+
                                     '</tr>'+
                                ' </thead>'+
                                 '<tbody>'+
@@ -278,6 +278,7 @@
                 $(".datatable tbody").append(
                     tr+
                         '<td>'+No+'</td>'+
+                        '<td>'+btn+'</td>'+
                         '<td>'+response[i]['Start']+'</td>'+
                         '<td>'+response[i]['End']+'</td>'+
                         '<td>'+response[i]['Time']+'</td>'+
@@ -290,7 +291,6 @@
                         '<td>'+response[i]['StatusBooking']+'</td>'+
                         '<td>'+Req_layout+'</td>'+
                         '<td>'+response[i]['Req_date']+'</td>'+
-                        '<td>'+btn+'</td>'+
                     '</tr>' 
                     );
             }
