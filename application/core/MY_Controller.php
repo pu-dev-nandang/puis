@@ -418,6 +418,7 @@ abstract class Budgeting_Controler extends Globalclass{
     {
         parent::__construct();
         $this->load->model('budgeting/m_budgeting');
+        $this->load->model('master/m_master');
     }
 
     public function temp($content)
@@ -622,7 +623,6 @@ abstract class It_Controler extends Globalclass{
     {
         parent::__construct();
         $this->load->model('master/m_master');
-        // $this->load->model('budgeting/m_budgeting');
         // check user auth
         if (!$this->session->userdata('it_sess')) {
             $check = $this->authIT();
