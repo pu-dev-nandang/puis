@@ -2485,4 +2485,36 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $query=$this->db->query($sql, array())->result_array();
         return $query; 
     }
+
+    public function AuthAPI($arr_content)
+    {
+        $key = 's3Cr3T-G4N';
+        if(array_key_exists("auth",$arr_content))
+        {    
+            if ($arr_content['auth'] == $key) {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public function getData_rule_service()
+    {
+        $sql = 'select a.ID as IDPri,a.*,b.*,c.* from db_employees.rule_service as a
+                left join db_employees.division as b on 
+                a.IDDivision = b.ID
+                left join db_employees.service as c
+                on a.IDService = c.ID
+                order by b.ID asc
+                ';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;         
+    }
 }

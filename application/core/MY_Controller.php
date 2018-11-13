@@ -7,8 +7,6 @@ class MY_Controller extends CI_Controller {
     {
         parent::__construct();
 
-
-
         if($this->session->userdata('loggedIn')){
             $departement = $this->__getDepartement();
             // define config Virtual Account

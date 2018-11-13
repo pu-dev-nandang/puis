@@ -53,8 +53,7 @@
  *
  * NOTE: If you change these, also change the error_reporting() code below
  */
-	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
-
+	// define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
 	$ServerName = $_SERVER['SERVER_NAME'];
 	switch ($ServerName) {
 		case 'localhost':
@@ -82,6 +81,8 @@
 	        define("url_students",url_sign_in_students."home", true);
 
 	        define("path_register_online","c:/xampp/htdocs/registeronline/", true);
+	        define('ENVIRONMENT', 'development',true);
+
 			break;
 		case 'pcam.podomorouniversity.ac.id':
 		    define("url_registration","http://admission.podomorouniversity.ac.id/", true);
@@ -99,6 +100,7 @@
             define("url_sign_in_students","http://studentpu.podomorouniversity.ac.id/", true);
             
             define("path_register_online","/var/www/html/registeronline/", true);
+            define('ENVIRONMENT', 'production',true);
 			break;
 		case 'demo.pcam.podomorouniversity.ac.id':
 		    define("url_registration","http://demo.admission.podomorouniversity.ac.id/", true);
@@ -116,11 +118,13 @@
             define("url_sign_in_students","http://demo.studentpu.podomorouniversity.ac.id/", true);
             
             define("path_register_online","C:/nginx/html/registeronline/", true);
+            define('ENVIRONMENT', 'development',true);
 			break;		
 		default:
 			# code...
 			break;
 	}
+
 
 /*
  *---------------------------------------------------------------
