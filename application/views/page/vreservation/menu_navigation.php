@@ -212,7 +212,6 @@ $this->m_reservation->checkAuth_user_vreservation();
                 } else {
                   loadRoomStatus(loadDataRoomStatus);
                 }
-                
             })
         }
         else

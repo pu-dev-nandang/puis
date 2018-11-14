@@ -214,7 +214,7 @@
   		FuncSearchBtnDate();
   		if (clickChk == 0) {
   			$('.panel-blue').click(function(){return false;});
-  			$('.panel-orange').click(function(){return false;});
+  			//$('.panel-orange').click(function(){return false;});
   		}
 
   		// get CategoryRoom
@@ -227,7 +227,14 @@
 	  			var divHtml = $("#schedule");
 	  			var value = $(this).val();
 	  			loading_page("#classroom_view");
-	  			loadDataSchedule(divHtml,'<?php echo $date ?>',value);
+	  			if ($("#datetime_deadline1").length) {
+	  				var dateD = $("#datetime_deadline1").val();
+	  			}
+	  			else
+	  			{
+	  				var dateD = '<?php echo $date ?>';
+	  			}
+	  			loadDataSchedule(divHtml,dateD,value);
 	  		})
   	});
 
@@ -239,6 +246,9 @@
   			var divHtml = $("#schedule");
   			loading_page("#classroom_view");
   			loadDataSchedule(divHtml,get,OpCategory);
+  			if ($("#datetime_deadline1").length) {
+  				$("#datetime_deadline1").val(get);
+  			}
   			$("#schdate").html('<i class="icon-calendar"></i> Schedule Date : '+ get);
   		})
   	}

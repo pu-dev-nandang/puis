@@ -87,7 +87,7 @@
               // $("#CaptionTBL").html('<strong>'+getDate+'</strong>');
               var divHtml = $("#schedule");
               var OpCategory = $("#OpCategoryRoom").val();
-              loadDataSchedule(divHtml,'<?php echo $dateDay ?>',OpCategory);
+              loadDataSchedule(divHtml,getDate,OpCategory);
               // loadDataListApprove();
           }
 
@@ -233,7 +233,7 @@
                 toastr.success(data.msg, 'Success!');
                 var divHtml = $("#schedule");
                 var OpCategory = $("#OpCategoryRoom").val();
-                loadDataSchedule(divHtml,<?php echo $dateDay ?>,OpCategory);
+                loadDataSchedule(divHtml,$('#datetime_deadline1').val(),OpCategory);
                 // send notification other school from client
                 var socket = io.connect( 'http://'+window.location.hostname+':3000' );
                 // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
