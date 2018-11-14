@@ -1050,14 +1050,15 @@ class C_budgeting extends Budgeting_Controler {
         echo json_encode($arr_result);
     }
 
-    public function getLoadApprovalBudget()
+    public function getLoadApprovalBudget($Year = null)
     {
         $Input = $this->getInputToken();
         $Departement = $Input['Departement'];
         $arr_result = array('html' => '','jsonPass' => '');
+        $this->data['arr_Year'] = $this->m_master->showData_array('db_budgeting.cfg_dateperiod');
         $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
         $arr_bulan = $this->m_master->getShowIntervalBulan($get[0]['StartPeriod'],$get[0]['EndPeriod']);
-        $Year = $get[0]['Year'];
+        $Year = ($Year == null ) ? $get[0]['Year'] : $Year;
         $get = $this->m_budgeting->getPostDepartementForDomApproval($Year,$Departement);
         $this->data['fin'] = 0;
         $DepartementSess = $this->session->userdata('IDDepartementPUBudget');
