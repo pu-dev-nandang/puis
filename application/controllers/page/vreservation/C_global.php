@@ -93,7 +93,9 @@ class C_global extends Vreservation_Controler {
         $data['OpCategory'] = $OpCategory;
         $data['PostCategory'] = $PostCategory;
         $chkDate = 0;
-        if(strtotime($date) >= strtotime(date('Y-m-d')) )
+        // get booking day
+        $DateTPolicy = $this->data['dateDay'];
+        if(strtotime($date) >= strtotime($DateTPolicy) )
         {
             $chkDate =  1;
         }

@@ -342,7 +342,7 @@ class C_transaksi extends Vreservation_Controler {
                 }
                 
                 if ($EmailPU != '' || $EmailPU != null) {
-                    $Email = $EmailPU;
+                    $Email = 'alhadi.rahman@podomorouniversity.ac.id';
                     $text = 'Dear Mr/Mrs '.$NameEmail.',<br><br>
                                 Please help to approve Venue Reservation requested by '.$this->session->userdata('Name').',<br><br>
                                 Details Schedule : <br><ul>
