@@ -306,7 +306,7 @@ class C_transaksi extends Vreservation_Controler {
                 if ($EmailPU != '' || $EmailPU != null) {
                     $Email = $EmailPU;
                     $text = 'Dear Mr/Mrs '.$NameEmail.',<br><br>
-                                Please Approve Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
+                                Please help to approve Venue Reservation requested by '.$this->session->userdata('Name').',<br><br>
                                 Details Schedule : <br><ul>
                                 <li>Start  : '.$StartNameDay.', '.$Start.'</li>
                                 <li>End  : '.$EndNameDay.', '.$End.'</li>
@@ -344,7 +344,7 @@ class C_transaksi extends Vreservation_Controler {
                 if ($EmailPU != '' || $EmailPU != null) {
                     $Email = $EmailPU;
                     $text = 'Dear Mr/Mrs '.$NameEmail.',<br><br>
-                                Please Approve Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
+                                Please help to approve Venue Reservation requested by '.$this->session->userdata('Name').',<br><br>
                                 Details Schedule : <br><ul>
                                 <li>Start  : '.$StartNameDay.', '.$Start.'</li>
                                 <li>End  : '.$EndNameDay.', '.$End.'</li>
@@ -636,7 +636,7 @@ class C_transaksi extends Vreservation_Controler {
                     // email to ga
                     $Email = 'ga@podomorouniversity.ac.id';
                     $text = 'Dear GA Team,<br><br>
-                                Please Approve Venue Reservation,<br><br>
+                                Please help to approve Venue Reservation,<br><br>
                                 Details Schedule : <br><ul>
                                 <li>Start  : '.$StartNameDay.', '.$Start.'</li>
                                 <li>End  : '.$EndNameDay.', '.$End.'</li>
@@ -654,7 +654,7 @@ class C_transaksi extends Vreservation_Controler {
                 {
                     $Email = 'alhadi.rahman@podomorouniversity.ac.id';
                     $text = 'Dear GA Team,<br><br>
-                                Please Approve Venue Reservation,<br><br>
+                                Please help to approve Venue Reservation,<br><br>
                                 Details Schedule : <br><ul>
                                 <li>Start  : '.$StartNameDay.', '.$Start.'</li>
                                 <li>End  : '.$EndNameDay.', '.$End.'</li>

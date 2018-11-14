@@ -22,7 +22,7 @@
         <div class="col-md-12">
             <div class="widget box">
                 <div class="widget-header">
-                    <h4><i class="icon-reorder"></i> Classroom</h4>
+                    <h4><i class="icon-reorder"></i> Room</h4>
                     <div class="toolbar no-padding">
                         <div class="btn-group">
                             <span class="btn btn-xs" style="background: #083f88;color: #fff;">
@@ -412,7 +412,7 @@
                                                         '<div class = "form-group">'+
                                                             '<label>Group User</label>'+
                                                             '<select class=" form-control UserTypeApprover1">'+
-                                                                '<option value = "0" selected>-- Chooices Group User --</option>'+
+                                                                '<option value = "0" selected>-- Choose Group User --</option>'+
                                                                 getGroupUser(UserType1Edit)+    
                                                             '</select>'+
                                                         '</div>'+    
@@ -421,7 +421,7 @@
                                                         '<div class = "form-group">'+
                                                             '<label>Category Approver</label>'+
                                                             '<select class=" form-control TypeApprover1">'+
-                                                                '<option value = "0" selected>-- Chooices Type Approver--</option>'+
+                                                                '<option value = "0" selected>-- Choose Type Approver--</option>'+
                                                                 OPselectedTypeApprover1(TypeApprover1Edit)+
                                                             '</select>'+
                                                         '</div>'+    
@@ -491,7 +491,7 @@
                 var Input = '<div class = "row" style="margin-top: 5px">'+
                                 '<div class="col-xs-12">'+
                                     '<div class = "form-group">'+
-                                        '<label>Chooices Approver 1</label>'+
+                                        '<label>Choose Approver 1</label>'+
                                         '<select class=" form-control Approver1">'+
                                         '   <option value = "0" selected>-- No Selected --</option>'+Op+
                                         '</select>'+
@@ -521,7 +521,7 @@
                     var InputApprover1 = '<div class = "row" style="margin-left : 0px">'+
                                     '<div class="col-xs-12">'+
                                         '<div class = "form-group">'+
-                                            '<label>Chooices Approver 1</label>'+
+                                            '<label>Choose Approver 1</label>'+
                                             '<select class=" form-control Approver1">'+
                                             '   <option value = "0" selected>-- No Selected --</option>'+Op+
                                             '</select>'+
@@ -535,7 +535,7 @@
                                         '<div class = "form-group">'+
                                             '<label>Group User</label>'+
                                             '<select class=" form-control UserTypeApprover1">'+
-                                                '<option value = "0" selected>-- Chooices Group User --</option>'+
+                                                '<option value = "0" selected>-- Choose Group User --</option>'+
                                                 getGroupUser(selected1[i].UserType)+    
                                             '</select>'+
                                         '</div>'+    
@@ -544,7 +544,7 @@
                                         '<div class = "form-group">'+
                                             '<label>Category Approver</label>'+
                                             '<select class=" form-control TypeApprover1">'+
-                                                '<option value = "0" selected>-- Chooices Type Approver--</option>'+
+                                                '<option value = "0" selected>-- Choose Type Approver--</option>'+
                                                 OPselectedTypeApprover1(selected1[i].TypeApprover)+     
                                             '</select>'+
                                         '</div>'+    
@@ -607,7 +607,7 @@
                                     '<div class = "form-group">'+
                                         '<label>Group User</label>'+
                                         '<select class=" form-control UserTypeApprover1">'+
-                                            '<option value = "0" selected>-- Chooices Group User --</option>'+
+                                            '<option value = "0" selected>-- Choose Group User --</option>'+
                                             getGroupUser('')+    
                                         '</select>'+
                                     '</div>'+    
@@ -616,7 +616,7 @@
                                     '<div class = "form-group">'+
                                         '<label>Category Approver</label>'+
                                         '<select class=" form-control TypeApprover1">'+
-                                            '<option value = "0" selected>-- Chooices Type Approver--</option>'+
+                                            '<option value = "0" selected>-- Choose Type Approver--</option>'+
                                             '<option value ="Position">Position</option>'+
                                             '<option value = "Employees">Employees</option>'+
                                             '<option value = "Division">Division</option>'+      
@@ -660,7 +660,7 @@
                     var Input = '<div class = "row" style="margin-left : 0px">'+
                                     '<div class="col-xs-12">'+
                                         '<div class = "form-group">'+
-                                            '<label>Chooices Approver 1</label>'+
+                                            '<label>Choose Approver 1</label>'+
                                             '<select class=" form-control Approver1">'+
                                             '   <option value = "0" selected>-- No Selected --</option>'+Op+
                                             '</select>'+
@@ -725,7 +725,7 @@
                 var Input = '<div class = "row" style="margin-top: 5px">'+
                                 '<div class="col-xs-12">'+
                                     '<div class = "form-group">'+
-                                        '<label>Chooices Approver 1</label>'+
+                                        '<label>Choose Approver 1</label>'+
                                         '<select class=" form-control Approver1">'+
                                         '   <option value = "0" selected>-- No Selected --</option>'+Op+
                                         '</select>'+
@@ -900,10 +900,13 @@
                     '                        <tr>' +
                     '                            <th class="th-center" style="width:5px;">No</th>' +
                     '                            <th class="th-center" style="width: ">Category</th>' +
-                    '                            <th class="th-center" style="width: ">Class</th>' +
-                    '                            <th class="th-center">Seat</th>' +
-                    '                            <th class="th-center">Seat For Exam</th>' +
-                    '                            <th class="th-center">Deret For Exam</th>' +
+                    '                            <th class="th-center" style="width: ">Desc</th>' +
+                    // '                            <th class="th-center">Seat</th>' +
+                    '                            <th class="th-center">Seat No</th>' +
+                    // '                            <th class="th-center">Seat For Exam</th>' +
+                    '                            <th class="th-center">Exam Seat No</th>' +
+                    // '                            <th class="th-center">Deret For Exam</th>' +
+                    '                            <th class="th-center">Exam Seat Row</th>' +
                     '                            <th class="th-center">Lecture Desk</th>' +
                     '                            <th class="th-center">Layout</th>' +
                     '                            <th class="th-center" style="width: 110px;">Action</th>' +
@@ -941,7 +944,7 @@
                     'pageLength' : 7
                 });
 
-                $('.dataTables_header .col-md-3').html('<button class="btn btn-default btn-default-primary btn-classroom btn-add" data-action="add"><i class="fa fa-plus-circle fa-right" aria-hidden="true"></i> Add Classroom</button>');
+                $('.dataTables_header .col-md-3').html('<button class="btn btn-default btn-default-primary btn-classroom btn-add" data-action="add"><i class="fa fa-plus-circle fa-right" aria-hidden="true"></i> Add Room</button>');
             }
 
 

@@ -3662,6 +3662,13 @@ class C_api extends CI_Controller {
                         }
                     }
                     
+                    // insert to db venue for user access
+                    $dataSave = array(
+                        'NIP' => $NIP,
+                        'G_user' => 4,
+                    );
+                    $this->db->insert('db_reservation.previleges_guser', $dataSave);
+
                     return print_r(1);
                 }
             }

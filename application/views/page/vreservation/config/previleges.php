@@ -3,7 +3,7 @@
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i>Add User Previleges</h4>
+                <h4 class="header"><i class="icon-reorder"></i>Add User Privileges</h4>
             </div>
             <div class="widget-content">
                 <div class = "row btn-add">	
@@ -12,7 +12,7 @@
           						<input class="form-control" id="Nama" placeholder="Input Name..." "="">
           					</div>
                     <div class="col-xs-3">
-                        Choice Group User Previleges :
+                        Choose Group User Privileges :
                         <select class="full-width-fix" id="selectGroupuUser">
                             <option></option>
                         </select>
@@ -179,7 +179,7 @@
             '<tr>'+
                 '<th style="width: 106px;">NIP</th>'+
                 '<th style="width: 106px;">Name</th>'+
-                '<th style="width: 15px;" class = "btn-edit">Group Previleges</th>'+
+                '<th style="width: 15px;" class = "btn-edit">Group Privileges</th>'+
                 '<th style="width: 15px;" class = "btn-delete">Action</th>'+
             '</tr>'+
         '</thead>'+
