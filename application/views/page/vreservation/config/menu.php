@@ -25,11 +25,11 @@
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i>Group Previleges</h4>
+                <h4 class="header"><i class="icon-reorder"></i>Group Privileges</h4>
                 <div class="toolbar no-padding">
                     <div class="btn-group">
                       <span data-smt="" class="btn btn-xs btn-add-groupP btn-add">
-                        <i class="icon-plus"></i> Add Group Previleges
+                        <i class="icon-plus"></i> Add Group Privileges
                        </span>
                     </div>
                 </div>
@@ -44,18 +44,18 @@
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i>Setting Group User Previleges</h4>
+                <h4 class="header"><i class="icon-reorder"></i>Setting Group User Privileges</h4>
             </div>
             <div class="widget-content">
                 <div class = "row"> 
                     <div class="col-xs-3">
-                        Choice Group User Previleges :
+                        Choose Group User Previleges :
                         <select class="full-width-fix" id="selectGroupuUser">
                             <option></option>
                         </select>
                     </div> 
                     <div class="col-xs-3">
-                        Choice Menu :
+                        Choose Menu :
                         <select class="full-width-fix" id="selectMenuUser">
                             <option></option>
                         </select>
@@ -74,12 +74,12 @@
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i>Edit & List Group User Previleges</h4>
+                <h4 class="header"><i class="icon-reorder"></i>Edit & List Group User Privileges</h4>
             </div>
             <div class="widget-content">
                 <div class = "row"> 
                     <div class="col-xs-3">
-                        Choice Group User Previleges :
+                        Choose Group User Privileges :
                         <select class="full-width-fix" id="selectGroupuUser2">
                             <option></option>
                         </select>

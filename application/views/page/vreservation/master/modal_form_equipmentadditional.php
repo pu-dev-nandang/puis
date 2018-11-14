@@ -12,7 +12,7 @@
             </div>   
             <div class="row">
                 <div class="col-sm-4">
-                    <label class="control-label">Choice Division:</label>
+                    <label class="control-label">Choose Division:</label>
                 </div>    
                 <div class="col-sm-6">
                    <select class="select2-select-00 col-md-4 full-width-fix" id="selectDivision">
@@ -27,7 +27,7 @@
             </div>   
             <div class="row">
                 <div class="col-sm-4">
-                    <label class="control-label">Choice Equipment Item:</label>
+                    <label class="control-label">Choose Equipment Item:</label>
                 </div>    
                 <div class="col-sm-6">
                    <select class="select2-select-00 col-md-4 full-width-fix" id="selectEquipmentItem">
