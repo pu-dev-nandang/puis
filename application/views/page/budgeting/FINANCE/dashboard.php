@@ -24,9 +24,18 @@
 	    color: #FFFFFF;
 
 	}
+
+	.tableDepartement > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
+	   background-color: #f5f5f5;
+	}
 </style>
 <div class="row">
 		<h2 align="center">Period Sep 2018 - Aug 2019</h2>
+</div>
+<div class="row">
+	<div class="col-md-2">
+		<p style="color: red;font-size: 20px">(.000)</p>
+	</div>
 </div>
 <div class="row">
 	<div class="col-xs-12">
@@ -90,7 +99,7 @@
 		];
 
 		var Start = 9;
-		var tblHeader = ['Departement'];
+		var tblHeader = ['Department'];
 		for (var i = 0; i < month.length; i++) {
 			var StartIndeks = parseInt(Start) - 1;
 			tblHeader.push(month[StartIndeks]);
@@ -138,18 +147,19 @@
 		for (var i = 0; i < data.length; i++) {
 			tbl += '<tr>';
 			for (var j = 0; j < tblHeader.length; j++) {
-				tbl += (j == 0) ? '<td style="width: 8%;">'+data[i][tblHeader[j]]+'</td>' : '<td>'+formatRupiah(data[i][tblHeader[j]])+'</td>';
+				var valuee = parseInt(data[i][tblHeader[j]] / 1000);
+				tbl += (j == 0) ? '<td style="width: 8%;">'+data[i][tblHeader[j]]+'</td>' : '<td>'+formatRupiah(valuee)+'</td>';
 				if (j != 0) {
 					var bool = total.hasOwnProperty(tblHeader[j]); // check array key object
 					if (bool) {
-						total[tblHeader[j]] = parseInt(total[tblHeader[j]]) + parseInt(data[i][tblHeader[j]]);
+						total[tblHeader[j]] = parseInt(total[tblHeader[j]]) + parseInt(valuee);
 					}
 					else
 					{	
-						total[tblHeader[j]] = data[i][tblHeader[j]];
+						total[tblHeader[j]] = valuee;
 					}
 
-					totalAll = parseInt(totalAll) + parseInt(data[i][tblHeader[j]]);
+					totalAll = parseInt(totalAll) + parseInt(valuee);
 				}
 				
 			}

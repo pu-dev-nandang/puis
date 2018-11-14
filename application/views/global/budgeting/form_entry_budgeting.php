@@ -3,6 +3,7 @@
 </div>
 
 <script type="text/javascript">
+	var arr_Year = <?php echo json_encode($arr_Year) ?>;
 	$(document).ready(function() {
 		var arr_PostBudget = [];
 		arr_PostBudget = <?php echo json_encode($arr_PostBudget) ?>;
@@ -53,9 +54,18 @@
 				OPFreq += '<option value = "'+i+'" '+selected+'>'+i+'</option>';
 			}
 
+			var OPYear = '';
+			for (var i = 0; i < arr_Year.length; i++) {
+				var selected = (arr_Year[i].Year == "<?php echo $Year ?>") ? 'selected' : '';
+				OPYear += '<option value ="'+arr_Year[i].Year+'" '+selected+'>'+arr_Year[i].Year+'</option>';
+			}
+
 			// make dom legend status limit & subtotal
 			var domLegend = '<div class = "row">'+
-								'<div class = "col-xs-3 col-md-offset-9">'+
+								'<div class = "col-md-3 col-md-offset-3">'+
+									'<select class = "form-control" id = "Year">'+OPYear+'</select>'+
+								'</div>'+
+								'<div class = "col-md-3 col-md-offset-4">'+
 									'<b>Status : </b><br>'+
 									'<i class="fa fa-check-circle" style="color: green;"></i>'+
 									' Pass Limit || '+

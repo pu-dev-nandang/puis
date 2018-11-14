@@ -3,7 +3,7 @@
 <div class="col-xs-12" >
 	<div class="panel panel-primary">
         <div class="panel-heading clearfix">
-            <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Set User Role Departement</h4>
+            <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Set User Role Department</h4>
         </div>
         <div class="panel-body">
             <div class="tabbable tabbable-custom tabbable-full-width btn-read setUserRoleDepartement">

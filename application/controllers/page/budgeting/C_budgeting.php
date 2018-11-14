@@ -1002,7 +1002,6 @@ class C_budgeting extends Budgeting_Controler {
 
     public function entry_budgeting($Request = null)
     {
-        // print_r($this->session->userdata('IDDepartementPUBudget'));
         $arr = array('EntryBudget',
                     'Approval',
                     'ListBudgetDepartement',
@@ -1021,13 +1020,14 @@ class C_budgeting extends Budgeting_Controler {
        
     }
 
-    public function EntryBudget()
+    public function EntryBudget($Year = null)
     {
         $this->auth_ajax();
         $arr_result = array('html' => '','jsonPass' => '');
         $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
         $arr_bulan = $this->m_master->getShowIntervalBulan($get[0]['StartPeriod'],$get[0]['EndPeriod']);
-        $Year = $get[0]['Year'];
+        $this->data['arr_Year'] = $this->m_master->showData_array('db_budgeting.cfg_dateperiod');
+        $Year = ($Year == null ) ? $get[0]['Year'] : $Year;
         $Departement = $this->session->userdata('IDDepartementPUBudget');
         $get = $this->m_budgeting->getPostDepartementForDomApproval($Year,$Departement);
         $this->data['fin'] = 0;

@@ -10,7 +10,7 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-sm-4">
-                    <label class="control-label">Post Realization Code:</label>
+                    <label class="control-label">Post Item Code:</label>
                 </div>
                 <?php if ($action == 'add'): ?>
                   <div class="col-sm-6">
@@ -37,7 +37,7 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-sm-4">
-                    <label class="control-label">Post Item:</label>
+                    <label class="control-label">Post :</label>
                 </div>    
                 <div class="col-sm-6">
                    <select class="select2-select-00 full-width-fix" id="PostItem">
@@ -49,7 +49,7 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-sm-4">
-                    <label class="control-label">RealisasiPostName:</label>
+                    <label class="control-label">ItemPostName:</label>
                 </div>    
                 <div class="col-sm-6">
                    <input type="text" name="PostName" id= "RealisasiPostName" placeholder="RealisasiPostName" class="form-control">
@@ -59,7 +59,7 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-sm-4">
-                    <label class="control-label">Departement:</label>
+                    <label class="control-label">Department:</label>
                 </div>    
                 <div class="col-sm-6">
                    <select class="select2-select-00 full-width-fix" id="Departement">

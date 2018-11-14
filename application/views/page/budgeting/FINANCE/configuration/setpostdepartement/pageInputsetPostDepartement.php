@@ -33,7 +33,7 @@
 			</div>
 			<div class="col-xs-6">
 				<div class="form-group">
-					<label>Departement</label>
+					<label>Department</label>
 					<select class="select2-select-00 full-width-fix" id="DepartementPost">
 					     <!-- <option></option> -->
 					 </select>
@@ -113,32 +113,6 @@
 
 		$("#loadPageTable").empty();
 
-		// var Export = '<div class="col-lg-3 col-md-3 col-xs-4">'+
-		// 					'<h4 class="header"><i class="icon-reorder"></i> Export</h4>'+
-		// 					'<div class="col-xs-12">'+
-		// 						'<button class = "btn btn-default"><i class="fa fa-download" aria-hidden="true"></i> Excel</button>&nbsp'+
-		// 						'<button class = "btn btn-default"><i class="fa fa-download" aria-hidden="true"></i> PDF</button>'+
-		// 					'</div>'+
-		// 			 '</div>';	      
-
-		// var setLastYear = '<div class="col-md-12">'+
-		// 						'<div class="thumbnail" style="min-height: 130px;padding: 10px;">'+
-		// 							'<div class="col-lg-3 col-md-3 col-xs-4">'+
-		//                                 '<h4 class="header"><i class="icon-reorder"></i> Get Budget Last Year</h4>'+
-		//                                 '<div class = "col-xs-12"> <br>'+
-		//                                       '<button class = "btn btn-success btn-edit" id = "generateBudgetLastYear">Take</button>'+
-		//                                 '</div>'+
-		//                             '</div>'+
-		//                             '<div class="col-lg-3 col-md-3 col-xs-4">'+
-		//                                 '<h4 class="header"><i class="icon-reorder"></i> Add</h4>'+
-		//                                 '<div class = "col-xs-12">'+
-		//                                       '<button class = "btn btn-default btn-add" id = "addRow"><i class="fa fa-plus" aria-hidden="true"></i> Add</button>'+
-		//                                 '</div>'+
-		//                             '</div>'+      
-	 //                                Export+  
-  //                               '</div>'+
-  //                          '</div>';
-
   		var setLastYear = '';
 
 		var TableGenerate = '<div class="col-md-12" id = "pageForTable">'+
@@ -147,9 +121,9 @@
 									'<thead>'+
 									'<tr>'+
 										'<th width = "3%">No</th>'+
-			                            '<th>Departement</th>'+
+			                            '<th>Department</th>'+
 			                            '<th>Code</th>'+
-										'<th>Post Realization</th>'+
+										'<th>Post Item</th>'+
 										'<th>Year</th>'+
 										'<th>Budget</th>'+
 										'<th>Action</th>'+
