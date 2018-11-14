@@ -3598,7 +3598,7 @@ class M_api extends CI_Model {
     public function getDataAuthStudent($NPM){
 
         $data = $this->db->query('SELECT auts.NPM,auts.Name,auts.ProgramID,auts.ProdiID,auts.Year, ps.NameEng, 
-                                              em.Name AS Mentor
+                                              em.Name AS MentorName, em.NIP AS MentorNIP
                                               FROM db_academic.auth_students auts
                                               LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
                                               LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = auts.NPM)

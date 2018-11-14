@@ -1036,10 +1036,10 @@
             dataScheduleDetailsArray.push(arrSesi);
         }
 
-        if(textTotalSKSMK<totalCredit){
-            process.push(0);
-            toastr.error('Credit must be less than equal '+textTotalSKSMK,'Error');
-        }
+        // if(textTotalSKSMK<totalCredit){
+        //     process.push(0);
+        //     toastr.error('Credit must be less than equal '+textTotalSKSMK,'Error');
+        // }
 
         if($.inArray(0,process)==-1){
 

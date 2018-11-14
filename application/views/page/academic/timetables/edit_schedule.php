@@ -283,40 +283,51 @@
         var formSesiAwal = $('#formSesiAwal').val();
         var formSesiAkhir = $('#formSesiAkhir').val();
 
+        if(formClassroom!='' && formClassroom!=null
+        && formDay!='' && formDay!=null && formSesiAkhir!='' && formSesiAkhir!=null
+            && formTimePerCredit!='' && formTimePerCredit!=null  && formCredit!=''
+            && formCredit!=null ){
+            var newCredit = dataUseCredit + formCredit;
+            if(formCredit <= maxCredit){
+                loading_buttonSm('#btnAddSchedule');
 
-        var newCredit = dataUseCredit + formCredit;
-        if(formCredit <= maxCredit){
-            loading_buttonSm('#btnAddSchedule');
+                var data = {
+                    action : action,
+                    ID : formSDID,
+                    SemesterID : SemesterID,
+                    ScheduleID : ScheduleID,
+                    formInsert : {
+                        ClassroomID : formClassroom,
+                        Credit : formCredit,
+                        DayID : formDay,
+                        TimePerCredit : formTimePerCredit,
+                        StartSessions : formSesiAwal,
+                        EndSessions : formSesiAkhir
+                    },
+                    UpdateLog : {
+                        UpdateBy : sessionNIP,
+                        UpdateAt : dateTimeNow()
+                    }
+                };
 
-            var data = {
-                action : action,
-                ID : formSDID,
-                SemesterID : SemesterID,
-                ScheduleID : ScheduleID,
-                formInsert : {
-                    ClassroomID : formClassroom,
-                    Credit : formCredit,
-                    DayID : formDay,
-                    TimePerCredit : formTimePerCredit,
-                    StartSessions : formSesiAwal,
-                    EndSessions : formSesiAkhir
-                }
-            };
-            var token = jwt_encode(data,'UAP)(*');
-            var url = base_url_js+'api/__crudSchedule';
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api/__crudSchedule';
 
-            $.post(url,{token:token},function (jsonResult) {
-                toastr.success('Data saved','Success');
-                setTimeout(function () {
-                    $('#btnAddSchedule').html('Save');
-                    loadDataScheduleDetails();
-                },500);
-            });
-        } else {
-            toastr.warning('Credit can not mare then maximum credit','Warning');
+                $.post(url,{token:token},function (jsonResult) {
+                    toastr.success('Data saved','Success');
+                    setTimeout(function () {
+                        $('#btnAddSchedule').html('Save');
+                        loadDataScheduleDetails();
+                    },500);
+                });
+            }
+            else {
+                toastr.warning('Credit can not mare then maximum credit','Warning');
+            }
         }
-
-
+        else {
+            toastr.warning('All form schedule are required, please check your data','Warning!');
+        }
 
     });
 
@@ -495,11 +506,21 @@
         loading_buttonSm('#btnDeleteActionCourse');
         $('button[data-dismiss=modal]').prop('disabled',true);
 
+        var SemesterID = parseInt("<?php echo $SemesterID ?>");
+        var ScheduleID = parseInt("<?php echo $ScheduleID ?>");
         var SDID = $(this).attr('data-id');
+
 
         var data = {
             action : 'deleteScheduleCourse',
-            SDID : SDID
+            SemesterID : SemesterID,
+            ScheduleID : ScheduleID,
+            SDID : SDID,
+            UpdateLog : {
+                UpdateBy : sessionNIP,
+                UpdateAt : dateTimeNow()
+            }
+
         };
 
         var token = jwt_encode(data,'UAP)(*');
