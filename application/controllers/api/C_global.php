@@ -494,10 +494,10 @@ class C_global extends CI_Controller {
                                                                     <a href="'.url_pas.'approve_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >Approve</a>
                                                                 </td>
                                                                 <td>
-                                                                   &nbsp
+                                                                   -
                                                                 </td>
-                                                                <td bgcolor="#e98180" align="center">
-                                                                    <a href="'.url_pas.'cancel_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #e98180;" target="_blank" >Reject</a>
+                                                                <td bgcolor="#de4341" align="center">
+                                                                    <a href="'.url_pas.'cancel_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #de4341;" target="_blank" >Reject</a>
                                                                 </td>
                                                             </tr>
                                                             </tbody>

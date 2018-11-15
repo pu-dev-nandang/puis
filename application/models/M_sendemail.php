@@ -183,12 +183,12 @@ class M_sendemail extends CI_Model {
         $max_execution_time = 630;
         ini_set('memory_limit', '-1');
         ini_set('max_execution_time', $max_execution_time); //60 seconds = 1 minutes
-
+        $BilingID = mt_rand();// unique number
         $this->load->library('email', $config_email['setting']);
         $this->email->set_newline("\r\n");
         $this->email->from('it@podomorouniversity.ac.id','IT Podomoro University');
         $this->email->to($to);
-        $this->email->subject($subject);
+        $this->email->subject($subject.' - '.$BilingID);
         $this->email->message($this->VariableClass['text']);
         if ($attach != null) {
             $this->email->attach($attach);
