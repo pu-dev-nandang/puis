@@ -166,6 +166,10 @@
                     ProdiID : ProdiID,
                     CDID : CDID,
                     MKID : MKID
+                },
+                UpdateLog : {
+                    UpdateBy : sessionNIP,
+                    UpdateAt : dateTimeNow()
                 }
             };
 
@@ -224,7 +228,11 @@
                 action : 'deleteInEditCourse',
                 SemesterID : SemesterID,
                 ScheduleID : ScheduleID,
-                SDCID : SDCID
+                SDCID : SDCID,
+                UpdateLog : {
+                    UpdateBy : sessionNIP,
+                    UpdateAt : dateTimeNow()
+                }
             };
 
             var token = jwt_encode(data,'UAP)(*');
@@ -365,7 +373,11 @@
                     Coordinator : formCoordinator,
                     TeamTeaching : TeamTeaching
                 },
-                dataTeamTeaching : dataTeamTeaching
+                dataTeamTeaching : dataTeamTeaching,
+                UpdateLog : {
+                    UpdateBy : sessionNIP,
+                    UpdateAt : dateTimeNow()
+                }
             };
 
             var token = jwt_encode(data,'UAP)(*');

@@ -1392,6 +1392,7 @@ class C_api extends CI_Controller {
                 $arrWhere = array('SemesterID'=>$SemesterID,'ScheduleID'=>$ScheduleID);
                 $this->db->where($arrWhere);
                 $this->db->delete('db_academic.std_krs');
+                $this->db->reset_query();
 
                 // == Approved ==
                 $dataCL = $this->m_api->getClassOf();
@@ -1408,6 +1409,7 @@ class C_api extends CI_Controller {
                     if(count($dbExist)>0){
                         $this->db->where($arrWhere);
                         $this->db->delete($db_.'.study_planning');
+                        $this->db->reset_query();
                     }
 
                 }
@@ -1415,12 +1417,13 @@ class C_api extends CI_Controller {
                 // Delete Schedulenya
                 $this->db->where(array('ID' => $ScheduleID, 'SemesterID' => $SemesterID));
                 $this->db->delete('db_academic.schedule');
+                $this->db->reset_query();
 
                 $tables = array('db_academic.schedule_details', 'db_academic.schedule_details_course',
                     'db_academic.schedule_material','db_academic.schedule_team_teaching');
                 $this->db->where('ScheduleID', $ScheduleID);
                 $this->db->delete($tables);
-
+                $this->db->reset_query();
 
                 // Delete Attendance
                 $dataAttd = $this->db->query('SELECT attd.ID FROM db_academic.attendance attd 
@@ -1515,6 +1518,12 @@ class C_api extends CI_Controller {
                 } else {
                     // Insert
                     $this->db->insert('db_academic.schedule_details_course',$dataWhere);
+
+                    // Update Action
+                    $UpdateLog = (array) $data_arr['UpdateLog'];
+                    $this->db->where('ID', $dataWhere['ScheduleID']);
+                    $this->db->update('db_academic.schedule',$UpdateLog);
+
                     $result = array(
                         'Status' => '1'
                     );
@@ -1534,6 +1543,7 @@ class C_api extends CI_Controller {
                 $whereDelete = array('SemesterID'=>$SemesterID,'ScheduleID'=>$ScheduleID,'CDID'=>$dataCDID['CDID']);
                 $this->db->where($whereDelete);
                 $this->db->delete('db_academic.std_krs');
+                $this->db->reset_query();
 
                 // Delete KRS yang sudah approve
                 $dataCL = $this->m_api->getClassOf();
@@ -1553,7 +1563,7 @@ class C_api extends CI_Controller {
                 // Delete
                 $this->db->where('ID',$SDCID);
                 $this->db->delete('db_academic.schedule_details_course');
-
+                $this->db->reset_query();
 
                 // Delete Attendance
                 $dataAttd = $this->db->query('SELECT attd.ID FROM db_academic.attendance attd 
@@ -1568,6 +1578,11 @@ class C_api extends CI_Controller {
                         $this->db->reset_query();
                     }
                 }
+
+                // Update Action
+                $UpdateLog = (array) $data_arr['UpdateLog'];
+                $this->db->where('ID', $data_arr['ScheduleID']);
+                $this->db->update('db_academic.schedule',$UpdateLog);
 
                 return print_r(1);
 
@@ -1590,17 +1605,25 @@ class C_api extends CI_Controller {
                     // Update Schedule
                     $this->db->where('ID', $data_arr['ScheduleID']);
                     $this->db->update('db_academic.schedule',$UpdateForm);
+                    $this->db->reset_query();
 
                     // Update Untuk Team Teachingnya
                     // -- Delete Team --
                     $this->db->where('ScheduleID',$data_arr['ScheduleID']);
                     $this->db->delete('db_academic.schedule_team_teaching');
+                    $this->db->reset_query();
 
                     // -- Insert yg baru --
                     for ($i=0;$i<count($data_arr['dataTeamTeaching']);$i++){
                         $f_i = (array) $data_arr['dataTeamTeaching'][$i];
                         $this->db->insert('db_academic.schedule_team_teaching',$f_i);
                     }
+
+                    // Update Action
+                    $UpdateLog = (array) $data_arr['UpdateLog'];
+                    $this->db->where('ID', $data_arr['ScheduleID']);
+                    $this->db->update('db_academic.schedule',$UpdateLog);
+
                     $result = array(
                         'Status' => 1
                     );
@@ -1634,17 +1657,87 @@ class C_api extends CI_Controller {
                 $arrUpdate = (array) $data_arr['formInsert'];
                 $this->db->where('ID', $data_arr['ID']);
                 $this->db->update('db_academic.schedule_details',$arrUpdate);
+                $this->db->reset_query();
+
+                // Update Action
+                $UpdateLog = (array) $data_arr['UpdateLog'];
+                $this->db->where('ID', $data_arr['ScheduleID']);
+                $this->db->update('db_academic.schedule',$UpdateLog);
+
                 return print_r(1);
 
             } else if($data_arr['action']=='updateCourse_Add'){
                 $formInsert = (array) $data_arr['formInsert'];
+
+                // Add TO schedule_details
                 $formInsert['ScheduleID'] = $data_arr['ScheduleID'];
                 $this->db->insert('db_academic.schedule_details',$formInsert);
+                $insert_id = $this->db->insert_id();
+
+                // Add to attendance
+                $dataInsertAttd = array(
+                    'SemesterID' => $data_arr['SemesterID'],
+                    'ScheduleID' => $data_arr['ScheduleID'],
+                    'SDID' => $insert_id
+                );
+                $this->db->insert('db_academic.attendance',$dataInsertAttd);
+                $insert_id_attdID = $this->db->insert_id();
+
+                // Cek student yang sudah ngambil siapa aja lalu insert semua
+                // Get Student
+                $data_attd = $this->db->select('ID')->get_where('db_academic.attendance',array(
+                    'SemesterID' => $data_arr['SemesterID'],
+                    'ScheduleID' => $data_arr['ScheduleID'])
+                ,1)->result_array();
+
+                $dataStudnet = $this->db->select('NPM')->get_where('db_academic.attendance_students',array('ID_Attd'=> $data_attd[0]['ID']))->result_array();
+
+                // insert student to attendance
+                if(count($dataStudnet)>0){
+                    foreach ($dataStudnet as $itemS){
+                        $arrIns = array(
+                            'ID_Attd' => $insert_id_attdID,
+                            'NPM' => $itemS['NPM']
+                        );
+                        $this->db->insert('db_academic.attendance_students',$arrIns);
+                    }
+                }
+
+
+                // Update Action
+                $UpdateLog = (array) $data_arr['UpdateLog'];
+                $this->db->where('ID', $data_arr['ScheduleID']);
+                $this->db->update('db_academic.schedule',$UpdateLog);
+
                 return print_r(1);
 
             } else if($data_arr['action']=='deleteScheduleCourse'){
+
+                // Get ID Attendance
+                $data_attd = $this->db->select('ID')->get_where('db_academic.attendance',array(
+                        'SemesterID' => $data_arr['SemesterID'],
+                        'ScheduleID' => $data_arr['ScheduleID'],
+                        'SDID' => $data_arr['SDID']
+                        )
+                    ,1)->result_array();
+
+                $this->db->where('ID_Attd', $data_attd[0]['ID']);
+                $this->db->delete('db_academic.attendance_students');
+                $this->db->reset_query();
+
+                $this->db->where('ID', $data_attd[0]['ID']);
+                $this->db->delete('db_academic.attendance');
+                $this->db->reset_query();
+
                 $this->db->where('ID', $data_arr['SDID']);
                 $this->db->delete('db_academic.schedule_details');
+                $this->db->reset_query();
+
+                // Update Action
+                $UpdateLog = (array) $data_arr['UpdateLog'];
+                $this->db->where('ID', $data_arr['ScheduleID']);
+                $this->db->update('db_academic.schedule',$UpdateLog);
+
                 return print_r(1);
             }
         }
@@ -2921,6 +3014,7 @@ class C_api extends CI_Controller {
                         array('SemesterID' => $dataInsert['SemesterID'],
                             'ScheduleID' => $dataInsert['ScheduleID']))->result_array();
 
+                    // Insert Ke Attendance
                     foreach ($dataAttd AS $itemA) {
                         $dataAins = array(
                             'ID_Attd' => $itemA['ID'],
@@ -2928,8 +3022,6 @@ class C_api extends CI_Controller {
                         );
                         $this->db->insert('db_academic.attendance_students', $dataAins);
                     }
-
-                    // Insert Ke Attendance
 
                     // - get MKID
                     $dataC = $this->db->select('MKID')->get_where('db_academic.curriculum_details',
@@ -2980,10 +3072,53 @@ class C_api extends CI_Controller {
                 $this->db->update('db_academic.std_krs',$arrUpdate);
                 return print_r(1);
             }
+
+            else if($data_arr['action']=='ApprovedByKaprodiAll'){
+
+                $ArrToApproveAll = (array) $data_arr['ArrToApproveAll'];
+
+                if(count($ArrToApproveAll)>0){
+                    for($i=0;$i<count($ArrToApproveAll);$i++){
+
+                        $this->approveByKaprodi($ArrToApproveAll[$i]
+                            ,$data_arr['MhswID'],$data_arr['ApprovalAt']);
+
+                    }
+                }
+
+                return print_r(1);
+
+            }
+
+            else if($data_arr['action']=='ApprovedByKaprodi'){
+                $this->approveByKaprodi($data_arr['ID']
+                    ,$data_arr['MhswID'],$data_arr['ApprovalAt']);
+                return print_r(1);
+            }
+
             else if($data_arr['action']=='RejectedByMentor'){
 
                 $arrUpdate = array(
                     'Status' => '-2'
+                );
+                $this->db->where('ID', $data_arr['ID']);
+                $this->db->update('db_academic.std_krs',$arrUpdate);
+
+                $dataInsert = array(
+                    'KRSID' => $data_arr['ID'],
+                    'Reason' => $data_arr['Reason'],
+                    'UpdateBy' => $data_arr['UpdateBy'],
+                    'UpdateAt' => $data_arr['UpdateAt']
+                );
+                $this->db->insert('db_academic.std_krs_comment',$dataInsert);
+
+                return print_r(1);
+            }
+
+            else if($data_arr['action']=='RejectedByKaprodi'){
+
+                $arrUpdate = array(
+                    'Status' => '-3'
                 );
                 $this->db->where('ID', $data_arr['ID']);
                 $this->db->update('db_academic.std_krs',$arrUpdate);
@@ -3114,6 +3249,57 @@ class C_api extends CI_Controller {
             }
         }
 
+    }
+
+    public function approveByKaprodi($SKID,$MhswID,$ApprovalAt){
+        $dataInsert = $this->db->query('SELECT sk.*, auts.Year FROM db_academic.std_krs sk
+                                                                    LEFT JOIN db_academic.auth_students auts ON (auts.NPM = sk.NPM)
+                                                                    WHERE sk.ID = "'.$SKID.'" LIMIT 1 ')->result_array()[0];
+
+        // Get Attendance Attendance
+        $dataAttd = $this->db->get_where('db_academic.attendance',
+            array('SemesterID' => $dataInsert['SemesterID'],
+                'ScheduleID' => $dataInsert['ScheduleID']))->result_array();
+
+        // Insert Ke Attendance
+        foreach ($dataAttd AS $itemA) {
+            $dataAins = array(
+                'ID_Attd' => $itemA['ID'],
+                'NPM' => $dataInsert['NPM']
+            );
+            $this->db->insert('db_academic.attendance_students', $dataAins);
+            $this->db->reset_query();
+        }
+
+
+        // - get MKID
+        $dataC = $this->db->select('MKID')->get_where('db_academic.curriculum_details',
+            array('ID' => $dataInsert['CDID']),1)->result_array();
+
+        $dataUpdateKRS = array(
+            'SemesterID' => $dataInsert['SemesterID'],
+            'MhswID' => $MhswID,
+            'NPM' => $dataInsert['NPM'],
+            'ScheduleID' => $dataInsert['ScheduleID'],
+            'TypeSchedule' => $dataInsert['TypeSP'],
+            'CDID' => $dataInsert['CDID'],
+            'MKID' => $dataC[0]['MKID'],
+            'Approval' => '0',
+            'StatusSystem' => '1',
+            'Status' => '1'
+        );
+
+        $DBStudent = 'ta_'.$dataInsert['Year'];
+        $this->db->insert($DBStudent.'.study_planning', $dataUpdateKRS);
+        $this->db->reset_query();
+
+        $arrUpdate = array(
+            'Status' => '3',
+            'ApprovalKaprodi_At' => $ApprovalAt
+        );
+        $this->db->where('ID', $SKID);
+        $this->db->update('db_academic.std_krs',$arrUpdate);
+        $this->db->reset_query();
     }
 
     public function crudYearAcademic()
@@ -6404,9 +6590,9 @@ class C_api extends CI_Controller {
             $Semester = $this->m_api->getSemesterStudentByYear($data_arr['SemesterID'],$row['Year']);
 
             $token_npm = $this->jwt->encode(array('SemesterID' => $data_arr['SemesterID'],'NPM' => $row['NPM']),'UAP)(*');
-            $btn = '<a href="'.url_sign_in_lecturers.'krs-online/list-student/approved-mentor/'.$token_npm.'" class="btn btn-sm btn-default">
+            $btn = ($data_arr['Status']!='' && $data_arr['Status']==3) ? '<a href="'.url_sign_in_lecturers.'krs-online/list-student/approved-mentor/'.$token_npm.'" class="btn btn-sm btn-default">
                         <i class="fa fa-edit"></i>
-                      </a>';
+                      </a>' : '-';
 
             $dataCourse = $this->db->query('SELECT mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup, stdk.Status FROM db_academic.std_krs stdk 
                                                       LEFT JOIN db_academic.schedule s ON (s.ID = stdk.ScheduleID)
@@ -6460,6 +6646,124 @@ class C_api extends CI_Controller {
             $data[] = $nestedData;
         }
 
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+
+    }
+
+    public function getListStudentKrsOnlineKaprodi(){
+        $requestData= $_REQUEST;
+
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+
+        $w_status = ($data_arr['Status']!='') ? ' AND auts.StatusStudentID = "'.$data_arr['Status'].'"' : '';
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataSearch = ' AND ( auts.Name LIKE "%'.$search.'%" OR auts.NPM LIKE "%'.$search.'%") ';
+        }
+
+        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, ps.NameEng AS Prodi, ss.Description AS StatusStudent, em.Name AS MentorName,   
+                              ma.NIP AS MentorNIP
+                              FROM  db_academic.auth_students auts 
+                              LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
+                              LEFT JOIN db_academic.status_student ss ON (ss.ID = auts.StatusStudentID)
+                              LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = auts.NPM)
+                              LEFT JOIN db_employees.employees em ON (em.NIP = ma.NIP)
+                              WHERE ( auts.ProdiID = "'.$data_arr['ProdiID'].'" '.$w_status.' ) '.$dataSearch.' ORDER BY auts.NPM ASC';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $no = $requestData['start']+1;
+        $data = array();
+        for($i=0;$i<count($query);$i++) {
+            $nestedData = array();
+            $row = $query[$i];
+
+            // Get Photo
+            $DBStudent = 'ta_'.$row['Year'];
+            $dataPhoto = $this->db->select('Photo')->get_where($DBStudent.'.students',array('NPM' => $row['NPM']),1)->result_array();
+            $path = 'uploads/students/'.$DBStudent.'/'.$dataPhoto[0]['Photo'];
+            $Photo = base_url('images/icon/student.png');
+            if(file_exists($path) && $dataPhoto[0]['Photo']!=''){
+                $Photo = base_url('uploads/students/'.$DBStudent.'/'.$dataPhoto[0]['Photo']);
+            }
+
+            // Semester
+            $Semester = $this->m_api->getSemesterStudentByYear($data_arr['SemesterID'],$row['Year']);
+
+
+            // Course
+            $dataCourse = $this->db->query('SELECT mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup, stdk.Status FROM db_academic.std_krs stdk 
+                                                      LEFT JOIN db_academic.schedule s ON (s.ID = stdk.ScheduleID)
+                                                      LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = stdk.ScheduleID)
+                                                      LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                      WHERE stdk.SemesterID = "'.$data_arr['SemesterID'].'" 
+                                                      AND stdk.NPM = "'.$row['NPM'].'"
+                                                       GROUP BY stdk.ScheduleID
+                                                       ORDER BY mk.MKCode ')->result_array();
+
+            $course = '';
+            if(count($dataCourse)>0){
+                foreach ($dataCourse AS $item){
+
+                    $Status = '-';
+                    if($item['Status']==0 || $item['Status']=='0'){
+                        $Status = '<span style="color: #9e9e9e;"><i class="fa fa-hourglass-half"></i> Student not yet send</span>';
+                    }
+                    else if($item['Status']==1 || $item['Status']=='1'){
+                        $Status = '<span style="color: #9e9e9e;"><i class="fa fa-clock-o"></i> Waiting approval <b>mentor</b></span>';
+                        if($row['MentorNIP'] == $data_arr['NIP']){
+                            $Status = '<span style="color: #00bcd4;"><i class="fa fa-clock-o"></i> Waiting approval <b>kaprodi</b></span>';
+                        }
+
+                    }
+                    else if($item['Status']==-2 || $item['Status']=='-2'){
+                        $Status = '<span style="color: darkred;"><i class="fa fa-repeat margin-right"></i> Rejected by Mentor</span>';
+                    }
+                    else if($item['Status']==-3 || $item['Status']=='-3'){
+                        $Status = '<span style="color: darkred;"><i class="fa fa-repeat margin-right"></i> Rejected by Kaprodi</span>';
+                    }
+                    else if($item['Status']==2 || $item['Status']=='2'){
+                        $Status = '<span style="color: #00bcd4;"><i class="fa fa-clock-o"></i> Waiting approval <b>kaprodi</b></span>';
+                    }
+                    else if($item['Status']==3 || $item['Status']=='3'){
+                        $Status = '<span style="color: green;"><i class="fa fa-check-circle"></i> Approved by Kaprodi</span>';
+                    }
+
+                    $course = $course.'<div>'.$item['ClassGroup'].' | <span style="color: #2196f3;">'.$item['MKCode'].' - '.$item['CourseEng'].'</span> | Status : '.$Status.'</div>';
+                }
+            } else {
+                $course = '-';
+            }
+
+            $token_npm = $this->jwt->encode(array('SemesterID' => $data_arr['SemesterID'],'NPM' => $row['NPM']),'UAP)(*');
+            $btn = ($data_arr['Status']!='' && $data_arr['Status']==3) ? '<a href="'.url_sign_in_lecturers.'krs-online/list-student/approved-kaprodi/'.$token_npm.'" class="btn btn-sm btn-default">
+                        <i class="fa fa-edit"></i>
+                      </a>' : '-';
+
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div  style="text-align:center;"><img data-src="'.$Photo.'" class="img-rounded img-fitter" width="40" height="50"></div>';
+            $nestedData[] = '<div  style="text-align:left;"><b>'.$row['Name'].'</b><br/><span>'.$row['NPM'].'</span><br/><span class="label label-info" style="position: relative;left: 0px;">Mentor : '.$row['MentorName'].'</span></div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$Semester.'</div>';
+            $nestedData[] = '<div  style="text-align:left;">'.$course.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$btn.'</div>';
+            $nestedData[] = '<div  style="text-align:center;font-size: 12px;">'.ucwords(strtolower($row['StatusStudent'])).'</div>';
+
+            $no++;
+            $data[] = $nestedData;
+        }
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
