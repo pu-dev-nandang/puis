@@ -335,7 +335,7 @@ class C_transaksi extends Vreservation_Controler {
                                             <a href="'.url_pas.'approve_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >Approve</a>
                                         </td>
                                         <td bgcolor="#51a351" align="center">
-                                           &nbsp
+                                           -
                                         </td>
                                         <td bgcolor="#red" align="center">
                                             <a href="'.url_pas.'cancel_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #red;" target="_blank" >Reject</a>
@@ -400,7 +400,7 @@ class C_transaksi extends Vreservation_Controler {
                                             <a href="'.url_pas.'approve_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >Approve</a>
                                         </td>
                                         <td>
-                                           &nbsp
+                                          -
                                         </td>
                                         <td bgcolor="#e98180" align="center">
                                             <a href="'.url_pas.'cancel_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #e98180;" target="_blank" >Reject</a>
@@ -718,7 +718,7 @@ class C_transaksi extends Vreservation_Controler {
                                             <a href="'.url_pas.'approve_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >Approve</a>
                                         </td>
                                         <td>
-                                           &nbsp
+                                           -
                                         </td>
                                         <td bgcolor="#e98180" align="center">
                                             <a href="'.url_pas.'cancel_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #e98180;" target="_blank" >Reject</a>
@@ -751,7 +751,7 @@ class C_transaksi extends Vreservation_Controler {
                                             <a href="'.url_pas.'approve_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >Approve</a>
                                         </td>
                                         <td>
-                                           &nbsp
+                                           -
                                         </td>
                                         <td bgcolor="#e98180" align="center">
                                             <a href="'.url_pas.'cancel_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #e98180;" target="_blank" >Reject</a>
