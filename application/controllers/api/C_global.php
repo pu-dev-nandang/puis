@@ -422,4 +422,382 @@ class C_global extends CI_Controller {
         echo json_encode($query);
     }
 
+    public function approve_venue($token)
+    {
+        error_reporting(0);
+        try 
+        {
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($token,$key);
+            // cek status
+            $t_booking = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$data_arr['ID_t_booking']);
+            
+            if (count($t_booking ) > 0) {
+                $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $t_booking[0]['Start']);
+                $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $t_booking[0]['End']);
+                $StartNameDay = $Startdatetime->format('l');
+                $EndNameDay = $Enddatetime->format('l');
+                $KetAdditional = json_decode($t_booking[0]['KetAdditional']);    
+                $EmailKetAdditional = '<br>';
+                if ($KetAdditional != '') {
+                    if (count($KetAdditional) > 0) {
+                        foreach ($KetAdditional as $key => $value) {
+                            if ($value != "" || $value != null) {
+                                // $EmailKetAdditional .= '<br>*   '.$key.' : '.$value;
+                                $EmailKetAdditional .= '<br>*   '.str_replace("_", " ", $key).' : '.$value;    
+                            }  
+                        }
+                    }
+                    
+                }
+                // cek Approval
+                $FieldTbl = array();
+                $FieldTbl = ($data_arr['approvalNo'] == 1) ? array('Status1' => 1,'ApprovedAt1' => date('Y-m-d H:i:s'),'ApprovedBy1' => $data_arr['Code']) : array('Status' => 1,'ApprovedAt' => date('Y-m-d H:i:s'),'ApprovedBy' => $data_arr['Code']);
+                if ($data_arr['approvalNo'] == 1) {
+                    if ($t_booking[0]['Status1'] == 1) {
+                        show_404($log_error = TRUE);
+                    }
+                    else
+                    {
+                        $this->db->where('ID',$data_arr['ID_t_booking']);
+                        $this->db->update('db_reservation.t_booking', $FieldTbl);
+                        if ($this->db->affected_rows() > 0 )
+                         {
+                            // find approval 1 sama dengan approval 2
+                                $Code = explode(";", $data_arr['Code']);
+                                
+                                // send email to approval 2 and user
+                                    // send email to approval 2
+                                        $token = array(
+                                            'EmailPU' => 'ga@podomorouniversity.ac.id',
+                                            'Code' => 8,
+                                            'ID_t_booking' => $data_arr['ID_t_booking'],
+                                            'approvalNo' => 2,
+                                        );
+                                        $token = $this->jwt->encode($token,'UAP)(*');
+                                        if($_SERVER['SERVER_NAME']!='localhost') {
+                                            // email to ga
+                                            $Email = 'ga@podomorouniversity.ac.id';
+                                            $text = 'Dear GA Team,<br><br>
+                                                        Please help to approve Venue Reservation,<br><br>
+                                                        Details Schedule : <br><ul>
+                                                        <li>Start  : '.$StartNameDay.', '.$t_booking[0]['Start'].'</li>
+                                                        <li>End  : '.$EndNameDay.', '.$t_booking[0]['End'].'</li>
+                                                        <li>Room  : '.$t_booking[0]['Room'].'</li>
+                                                        <li>Agenda  : '.$t_booking[0]['Agenda'].'</li>
+                                                        </ul>
+                                                        '.$EmailKetAdditional.' </br>
+                                                       <table width="200" cellspacing="0" cellpadding="12" border="0">
+                                                            <tbody>
+                                                            <tr>
+                                                                <td bgcolor="#51a351" align="center">
+                                                                    <a href="'.url_pas.'approve_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >Approve</a>
+                                                                </td>
+                                                                <td>
+                                                                   &nbsp
+                                                                </td>
+                                                                <td bgcolor="#e98180" align="center">
+                                                                    <a href="'.url_pas.'cancel_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #e98180;" target="_blank" >Reject</a>
+                                                                </td>
+                                                            </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    ';        
+                                            $to = $Email;
+                                            $subject = "Podomoro University Venue Reservation Approval 2";
+                                            $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+
+                                        }
+                                        else
+                                        {
+                                            $Email = 'alhadi.rahman@podomorouniversity.ac.id';
+                                            $text = 'Dear GA Team,<br><br>
+                                                        Please help to approve Venue Reservation,<br><br>
+                                                        Details Schedule : <br><ul>
+                                                        <li>Start  : '.$StartNameDay.', '.$t_booking[0]['Start'].'</li>
+                                                        <li>End  : '.$EndNameDay.', '.$t_booking[0]['End'].'</li>
+                                                        <li>Room  : '.$t_booking[0]['Room'].'</li>
+                                                        <li>Agenda  : '.$t_booking[0]['Agenda'].'</li>
+                                                        </ul>
+                                                        '.$EmailKetAdditional.' </br>
+                                                        <table width="50" cellspacing="0" cellpadding="12" border="0">
+                                                            <tbody>
+                                                            <tr>
+                                                                <td bgcolor="#51a351" align="center">
+                                                                    <a href="'.url_pas.'approve_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >Approve</a>
+                                                                </td>
+                                                            </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    ';        
+                                            $to = $Email;
+                                            $subject = "Podomoro University Venue Reservation Approval 2";
+                                            $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                                        }
+
+                                    // user
+                                        $getUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$t_booking[0]['CreatedBy']);
+                                        $Email = $getUser[0]['EmailPU'];
+
+                                        $text = 'Dear Mr/Mrs '.$getUser[0]['Name'].',<br><br>
+                                                    Your Venue Reservation approved by '.'Approver 1'.',<br><br>
+                                                    Details Schedule : <br><ul>
+                                                    <li>Start  : '.$StartNameDay.', '.$t_booking[0]['Start'].'</li>
+                                                    <li>End  : '.$EndNameDay.', '.$t_booking[0]['End'].'</li>
+                                                    <li>Room  : '.$t_booking[0]['Room'].'</li>
+                                                    <li>Agenda  : '.$t_booking[0]['Agenda'].'</li>
+                                                    </ul>
+                                                    '.$EmailKetAdditional.'
+                                                ';        
+                                        $to = $Email;
+                                        $subject = "Podomoro University Venue Reservation Approved";
+                                        $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+
+                            $data['include'] = $this->load->view('template/include','',true);
+                            $this->load->view('template/venue_approve_page',$data);
+                         }
+                         else
+                         {
+                            print_r('<h2><b>Please Try Again !!!</b2></h2>');
+                         }
+                    }
+                }
+                elseif ($data_arr['approvalNo'] == 2) {
+                    if ($t_booking[0]['Status'] == 1) {
+                        show_404($log_error = TRUE);
+                    }
+                    else
+                    {
+                        $this->db->where('ID',$data_arr['ID_t_booking']);
+                        $this->db->update('db_reservation.t_booking', $FieldTbl);
+                        if ($this->db->affected_rows() > 0 )
+                         {
+                            // send by Ical
+                            $getUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$t_booking[0]['CreatedBy']);
+                            $Email = $getUser[0]['EmailPU'];
+                            $text = 'Dear Mr/Mrs '.$getUser[0]['Name'].',<br><br>
+                                        Your Venue Reservation approved by Approver 2,<br><br>
+                                        Details Schedule : <br><ul>
+                                        <li>Start  : '.$StartNameDay.', '.$t_booking[0]['Start'].'</li>
+                                        <li>End  : '.$EndNameDay.', '.$t_booking[0]['End'].'</li>
+                                        <li>Agenda  : '.$t_booking[0]['Agenda'].'</li>
+                                        <li>Room  : '.$t_booking[0]['Room'].'</li>
+                                        </ul>
+                                        '.$EmailKetAdditional.'
+                                    ';        
+                            $to = $Email;
+                            $subject = "Podomoro University Venue Reservation Approved";
+                            $place  = $t_booking[0]['Room'];
+                            $StartIcal = date("Ymd", strtotime($t_booking[0]['Start']));
+                            $StartTimeIcal = date("His", strtotime($t_booking[0]['Start']));
+                            $EndIcal = date("Ymd", strtotime($t_booking[0]['End']));
+                            $EndTimeIcal = date("His", strtotime($t_booking[0]['End']));
+                            // print_r($EndTimeIcal);die();
+                            $sendEmail = $this->m_sendemail->sendEmailIcal($to,$subject,$text, $place,$StartIcal,$StartTimeIcal,$EndIcal,$EndTimeIcal);
+                            $data['include'] = $this->load->view('template/include','',true);
+                            $this->load->view('template/venue_approve_page',$data);
+                         }
+                         else
+                         {
+                            print_r('<h2><b>Please Try Again !!!</b2></h2>');
+                         }
+                    }
+                }
+                else
+                {
+                    show_404($log_error = TRUE);
+                }
+            }
+            else{
+                // handling orang iseng
+                echo '{"status":"999","message":"Data doesn\'t exist "}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    public function cancel_venue($token)
+    {
+        // error_reporting(0);
+        try 
+        {
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($token,$key);
+            // cek status
+            $t_booking = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$data_arr['ID_t_booking']);
+            
+            if (count($t_booking ) > 0) {
+                $data['include'] = $this->load->view('template/include','',true);
+                $data['t_booking'] = $t_booking;
+                $data['Code'] = $data_arr['Code'];
+                $data['Approver'] = ($data_arr['approvalNo'] == 2) ? 'Approver 2' : 'Approver 1';
+                $this->load->view('template/cancel_approve_page',$data);
+            }
+            else{
+                // handling orang iseng
+                echo '{"status":"999","message":"Data doesn\'t exist "}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    public function submitcancelvenue()
+    {
+        // error_reporting(0);
+        try {
+            $dataToken = $this->getInputToken();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $get = $dataToken['t_booking'];
+                $getUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$get[0]->CreatedBy);
+                $getE_additional = $this->m_master->caribasedprimary('db_reservation.t_booking_eq_additional','ID_t_booking',$get[0]->ID);
+                $KetAdditional = json_decode($get[0]->KetAdditional);    
+                $EmailKetAdditional = '';
+                if ($KetAdditional != '') {
+                    if (count($KetAdditional) > 0) {
+                        foreach ($KetAdditional as $key => $value) {
+                            if ($value != "" || $value != null) {
+                                // $EmailKetAdditional .= '<br>*   '.$key.'('.$value.')';
+                                $EmailKetAdditional .= '<br>*   '.str_replace("_", " ", $key).' : '.$value;    
+                            }  
+                        }
+                    }
+                    
+                }
+
+                $Reason = 'Cancel by yourself';
+                if(array_key_exists("Reason",$input))
+                {
+                    $Reason = $input['Reason'];
+                }
+
+                for ($i=0; $i < count($getE_additional); $i++) { 
+                    $dataSave = array(
+                        'ID_t_booking_eq_add' => $getE_additional[$i]['ID'],
+                        'ID_t_booking' => $get[0]->ID,
+                        'ID_equipment_additional' => $getE_additional[$i]['ID_equipment_additional'],
+                        'Qty' => $getE_additional[$i]['Qty'],
+                    );
+                    $this->db->insert('db_reservation.t_booking_eq_additional_delete', $dataSave); 
+                }
+                
+                $sql = "delete from db_reservation.t_booking_eq_additional where ID_t_booking = ".$get[0]->ID;
+                $query=$this->db->query($sql, array());
+
+                $dataSave = array(
+                    'Start' => $get[0]->Start,
+                    'End' => $get[0]->End,
+                    'Time' => $get[0]->Time,
+                    'Colspan' => $get[0]->Colspan,
+                    'Agenda' => $get[0]->Agenda,
+                    'Room' => $get[0]->Room,
+                    'ID_equipment_add' => $get[0]->ID_equipment_add,
+                    'ID_add_personel' => $get[0]->ID_add_personel,
+                    'Req_date' => $get[0]->Req_date,
+                    'CreatedBy' => $get[0]->CreatedBy,
+                    'ID_t_booking' => $get[0]->ID,
+                    'Note_deleted' => 'Cancel By User##'.$Reason,
+                    'DeletedBy' => $dataToken['Code'],
+                    'Req_layout' => $get[0]->Req_layout,
+                    'Status' => $get[0]->Status,
+                    'MarcommSupport' => $get[0]->MarcommSupport,
+                    'KetAdditional' => $get[0]->KetAdditional,
+                );
+                $this->db->insert('db_reservation.t_booking_delete', $dataSave); 
+
+                $this->m_master->delete_id_table_all_db($get[0]->ID,'db_reservation.t_booking');
+            // send email
+                
+                $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]->Start);
+                $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]->End);
+                $StartNameDay = $Startdatetime->format('l');
+                $EndNameDay = $Enddatetime->format('l');
+
+                $Email = 'alhadi.rahman@podomorouniversity.ac.id';
+                if($_SERVER['SERVER_NAME']!='localhost') {
+                    $Email = $getUser[0]['EmailPU'];
+                }
+                
+                $text = 'Dear Mr/Mrs '.$getUser[0]['Name'].',<br><br>
+                            Your Venue Reservation was Cancel by '.$dataToken['Approver'].',<br><br>
+                            Details Schedule : <br><ul>
+                            <li>Start  : '.$StartNameDay.', '.$get[0]->Start.'</li>
+                            <li>End  : '.$EndNameDay.', '.$get[0]->End.'</li>
+                            <li>Room  : '.$get[0]->Room.'</li>
+                            <li>Agenda  : '.$get[0]->Agenda.'</li>
+                            <li>Reason : '.$Reason.'</li>
+                            </ul>
+
+                            '.$EmailKetAdditional.'
+                        ';        
+                $to = $Email;
+                $subject = "Podomoro University Venue Reservation Cancel Reservation";
+                $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);    
+
+                // send email to administratif
+                $getEmail = $this->m_master->showData_array('db_reservation.email_to');
+                if($_SERVER['SERVER_NAME']!='localhost') {
+                    for ($i=0; $i < count($getEmail); $i++) {
+                        if ($i != 0) {
+                             $Email = $getEmail[$i]['Email'];
+                             $text = 'Dear Mr/Mrs '.$getEmail[$i]['Ownership'].',<br><br>
+                                         Venue Reservation was Cancel by '.$dataToken['Approver'].',<br><br>
+                                         Details Schedule : <br><ul>
+                                         <li>Start  : '.$StartNameDay.', '.$get[0]->Start.'</li>
+                                         <li>End  : '.$EndNameDay.', '.$get[0]->End.'</li>
+                                         <li>Room  : '.$get[0]->Room.'</li>
+                                         <li>Agenda  : '.$get[0]->Agenda.'</li>
+                                         <li>Reason : '.$Reason.'</li>
+                                         </ul>
+
+                                         '.$EmailKetAdditional.'
+                                     ';        
+                             $to = $Email;
+                             $subject = "Podomoro University Venue Reservation Cancel Reservation";
+                             $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                        } 
+                    }
+
+                }
+                else
+                {
+                    $Email = $getEmail[0]['Email'];
+                    $text = 'Dear Mr/Mrs '.$getEmail[0]['Ownership'].',<br><br>
+                                Venue Reservation was Cancel by '.$dataToken['Approver'].',<br><br>
+                                Details Schedule : <br><ul>
+                                <li>Start  : '.$StartNameDay.', '.$get[0]->Start.'</li>
+                                <li>End  : '.$EndNameDay.', '.$get[0]->End.'</li>
+                                <li>Room  : '.$get[0]->Room.'</li>
+                                <li>Agenda  : '.$get[0]->Agenda.'</li>
+                                <li>Reason : '.$Reason.'</li>
+                                </ul>
+
+                                '.$EmailKetAdditional.'
+                            ';        
+                    $to = $Email;
+                    $subject = "Podomoro University Venue Reservation Cancel Reservation";
+                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                }
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
 }

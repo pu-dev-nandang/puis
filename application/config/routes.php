@@ -914,6 +914,9 @@ $route['vreservation/master/submit_select_venue_room'] = 'page/vreservation/c_ma
 $route['vreservation/config/policy_json_data'] = 'page/vreservation/c_config/policy_json_data';
 $route['vreservation/config/policy/modalform'] = 'page/vreservation/c_config/policy_modalform';
 $route['vreservation/config/policy/submit'] = 'page/vreservation/c_config/policy_submit';
+$route['approve_venue/(:any)'] = 'api/c_global/approve_venue/$1';
+$route['cancel_venue/(:any)'] = 'api/c_global/cancel_venue/$1';
+$route['submitcancelvenue'] = 'api/c_global/submitcancelvenue';
 
 
 // test
