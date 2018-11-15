@@ -45,6 +45,7 @@
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
             <input value="<?php echo $d['ID']; ?>" id="formExamID" class="hide" hidden readonly>
+            <input value="<?php echo $d['SemesterID']; ?>" id="formSemesterID" class="hide" hidden readonly>
             <table class="table" id="tbInput">
                 <tr>
                     <th style="width: 10%;">Exam | Date</th>
@@ -993,8 +994,10 @@
 
         function dateInputJadwal_() {
             var dataForm = $('input[name=formExam]:checked').val();
+            var formSemesterID = $('#formSemesterID').val();
+
             var url = base_url_js+'api/__crudJadwalUjian';
-            var token = jwt_encode({action:'checkDateExam'},'UAP)(*');
+            var token = jwt_encode({action:'checkDateExam',SemesterID:formSemesterID},'UAP)(*');
 
             $( "#formDate" ).val('');
             $( "#formDate" ).datepicker( "destroy" );
