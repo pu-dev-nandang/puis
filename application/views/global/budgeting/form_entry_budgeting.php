@@ -80,9 +80,9 @@
 								'<div class = "col-md-3 col-md-offset-4">'+
 									'<b>Status : </b><br>'+
 									'<i class="fa fa-check-circle" style="color: green;"></i>'+
-									' Pass Limit || '+
+									' On Budget limit || '+
 									'<i class="fa fa-minus-circle" style="color: red;"></i>'+
-									' Exceeded Limit'+
+									' Exceeded Budget Limit'+
 								'</div>'+
 							'<div>'		
 								;
@@ -487,9 +487,9 @@
 							'<div class = "col-md-3 col-md-offset-2">'+
 								'<b>Status : </b><br>'+
 								'<i class="fa fa-check-circle" style="color: green;"></i>'+
-								' Pass Limit || '+
+								' On Budget limit || '+
 								'<i class="fa fa-minus-circle" style="color: red;"></i>'+
-								' Exceeded Limit'+
+								' Exceeded Budget Limit'+
 							'</div>'+
 						'<div>'		
 							;
