@@ -564,7 +564,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     {
         $bool = true;
         $NotIDMyself = ($NotIDMyself == '') ? '' : ' and a.ID != '.$NotIDMyself;
-        for ($xx=0; $xx < 3; $xx++) {  // check twice
+        for ($xx=0; $xx < 1; $xx++) {  // check twice
 
             $TimeStart = date("H:i:s", strtotime($Start));
             $TimeEnd = date("H:i:s", strtotime($End));
@@ -588,8 +588,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 if (count($sqlWaktu) == 0) {
                     if (count($sqlWaktu2) > 0) {
                         $sql = "select count(*) as total from
-                               (select a.ExamClassroomID,a.ID as ID_exam,a.ExamDate,a.ExamStart as StartSessions,a.ExamEnd as EndSessions,TIMEDIFF(CONCAT(curdate(),' ',a.ExamEnd), CONCAT(curdate(),' ',a.ExamStart)) as time,
-                                b.Name as NamaDosen,c.ScheduleID,d.NameEng as NamaHari,e.Room,f.MKID,g.NameEng as NamaMataKuliah
+                               (select a.ExamClassroomID,a.ID as ID_exam
                                 from db_academic.exam as a
                                 join db_employees.employees as b
                                 on a.Pengawas1 = b.NIP
@@ -630,8 +629,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 else
                 {
                     $sql = "select count(*) as total from
-                               (select a.ExamClassroomID,a.ID as ID_exam,a.ExamDate,a.ExamStart as StartSessions,a.ExamEnd as EndSessions,TIMEDIFF(CONCAT(curdate(),' ',a.ExamEnd), CONCAT(curdate(),' ',a.ExamStart)) as time,
-                                b.Name as NamaDosen,c.ScheduleID,d.NameEng as NamaHari,e.Room,f.MKID,g.NameEng as NamaMataKuliah
+                               (select a.ExamClassroomID,a.ID as ID_exam
                                 from db_academic.exam as a
                                 join db_employees.employees as b
                                 on a.Pengawas1 = b.NIP
@@ -798,7 +796,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     }
                 }
             }
-            usleep( 1000 );
+            usleep( 500 );
         }
 
         return $bool;

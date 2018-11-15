@@ -248,7 +248,7 @@ class C_transaksi extends Vreservation_Controler {
                                                     $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Kaprodi);
                                                     for ($m=0; $m < count($getApprover1); $m++) { 
                                                         if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
-                                                             $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name']);
+                                                             $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name'],'Code' => $Kaprodi,'TypeApprover' => $TypeApprover);
                                                         }
                                                     }
                                                 }
@@ -261,7 +261,7 @@ class C_transaksi extends Vreservation_Controler {
                                             $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionMain',$IDDivision.'.'.$IDPositionApprover);
                                             for ($k=0; $k < count($getApprover1); $k++) {
                                                 if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
-                                                     $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name']);
+                                                     $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name'],'Code' => $getApprover1[$k]['NIP'],'TypeApprover' => $TypeApprover);
                                                 } 
                                                
                                             }
@@ -271,14 +271,14 @@ class C_transaksi extends Vreservation_Controler {
                                 case 'Division':
                                     $getApprover1 = $this->m_master->caribasedprimary('db_employees.division','ID',$Approver1[$l]->Approver);
                                     for ($k=0; $k < count($getApprover1); $k++) { 
-                                       $dataApprover[] = array('Email' => $getApprover1[$k]['Email'],'Name' => $getApprover1[$k]['Division']);
+                                       $dataApprover[] = array('Email' => $getApprover1[$k]['Email'],'Name' => $getApprover1[$k]['Division'],'Code' => $getApprover1[$k]['ID'],'TypeApprover' => $TypeApprover);
                                     }
                                     break;
 
                                 case 'Employees':
                                     $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','ID',$Approver1[$l]->Approver);
                                     for ($k=0; $k < count($getApprover1); $k++) { 
-                                       $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name']);
+                                       $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name'],'Code' => $getApprover1[$k]['NIP'],'TypeApprover' => $TypeApprover);
                                     }
                                     break;    
                             }
@@ -289,21 +289,34 @@ class C_transaksi extends Vreservation_Controler {
                 // send email
                 $EmailPU = '';
                 $NameEmail = '';
+                $Code = '';
+                $TypeApproverE = '';
                 if (count($dataApprover) > 0) {
                     $temp = array();
                     $temp2 = array();
+                    $temp3 = array();
                     for ($k=0; $k < count($dataApprover); $k++) { 
                         $EM = $dataApprover[$k]['Email'];
                         $NM = $dataApprover[$k]['Name'];
+                        $Code = $dataApprover[$k]['Code'];
                         $temp[] = $EM;
                         $temp2[] = $NM;
+                        $temp3[] = $Code;
                     }
                      
                     $EmailPU = implode(",", $temp);
                     $NameEmail = implode(" / ", $temp2);
+                    $Code = implode(";", $temp3);
                 }
                 
                 if ($EmailPU != '' || $EmailPU != null) {
+                    $token = array(
+                        'EmailPU' => $EmailPU,
+                        'Code' => $Code,
+                        'ID_t_booking' => $ID_t_booking,
+                        'approvalNo' => 1,
+                    );
+                    $token = $this->jwt->encode($token,'UAP)(*');
                     $Email = $EmailPU;
                     $text = 'Dear Mr/Mrs '.$NameEmail.',<br><br>
                                 Please help to approve Venue Reservation requested by '.$this->session->userdata('Name').',<br><br>
@@ -314,7 +327,22 @@ class C_transaksi extends Vreservation_Controler {
                                 <li>Agenda  : '.$input['Agenda'].'</li>
                                 '.$MarkomEmail.'
                                 </ul>
-                                '.$EmailKetAdditional.'
+                                '.$EmailKetAdditional.' </br>
+                                <table width="100" cellspacing="0" cellpadding="12" border="0">
+                                    <tbody>
+                                    <tr>
+                                        <td bgcolor="#51a351" align="center">
+                                            <a href="'.url_pas.'approve_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >Approve</a>
+                                        </td>
+                                        <td bgcolor="#51a351" align="center">
+                                           &nbsp
+                                        </td>
+                                        <td bgcolor="#red" align="center">
+                                            <a href="'.url_pas.'cancel_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #red;" target="_blank" >Reject</a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             ';        
                     $to = $Email;
                     $subject = "Podomoro University Venue Reservation Approval 1";
@@ -327,21 +355,33 @@ class C_transaksi extends Vreservation_Controler {
                 // send email
                 $EmailPU = '';
                 $NameEmail = '';
+                $Code = '';
                 if (count($dataApprover) > 0) {
                     $temp = array();
                     $temp2 = array();
+                    $temp3 = array();
                     for ($k=0; $k < count($dataApprover); $k++) { 
                         $EM = $dataApprover[$k]['Email'];
                         $NM = $dataApprover[$k]['Name'];
+                        $Code = $dataApprover[$k]['Code'];
                         $temp[] = $EM;
                         $temp2[] = $NM;
+                        $temp3[] = $Code;
                     }
                      
                     $EmailPU = implode(",", $temp);
                     $NameEmail = implode(" / ", $temp2);
+                    $Code = implode(";", $temp3);
                 }
                 
                 if ($EmailPU != '' || $EmailPU != null) {
+                    $token = array(
+                        'EmailPU' => $EmailPU,
+                        'Code' => $Code,
+                        'ID_t_booking' => $ID_t_booking,
+                        'approvalNo' => 1,
+                    );
+                    $token = $this->jwt->encode($token,'UAP)(*');
                     $Email = 'alhadi.rahman@podomorouniversity.ac.id';
                     $text = 'Dear Mr/Mrs '.$NameEmail.',<br><br>
                                 Please help to approve Venue Reservation requested by '.$this->session->userdata('Name').',<br><br>
@@ -352,7 +392,22 @@ class C_transaksi extends Vreservation_Controler {
                                 <li>Agenda  : '.$input['Agenda'].'</li>
                                 '.$MarkomEmail.'
                                 </ul>
-                                '.$EmailKetAdditional.'
+                                '.$EmailKetAdditional.'</br>
+                                <table width="200" cellspacing="0" cellpadding="12" border="0">
+                                    <tbody>
+                                    <tr>
+                                        <td bgcolor="#51a351" align="center">
+                                            <a href="'.url_pas.'approve_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >Approve</a>
+                                        </td>
+                                        <td>
+                                           &nbsp
+                                        </td>
+                                        <td bgcolor="#e98180" align="center">
+                                            <a href="'.url_pas.'cancel_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #e98180;" target="_blank" >Reject</a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             ';        
                     $to = $Email;
                     $subject = "Podomoro University Venue Reservation Approval 1";
@@ -483,6 +538,7 @@ class C_transaksi extends Vreservation_Controler {
         $ApprovalWr = '';
         switch ($approveaccess) {
             case 2:
+            case 1:
                 $arr_status = array('Status1' => 1,'ApprovedAt1' => date('Y-m-d H:i:s'),'ApprovedBy1' => $this->session->userdata('NIP') );
                 $ApprovalWr = ' as Approval 1';
 
@@ -577,10 +633,12 @@ class C_transaksi extends Vreservation_Controler {
         }
         // check approve bentrok
         $Start = $get[0]['Start'];$End = $get[0]['End'];$chk_e_multiple = '';$Room = $get[0]['Room'];
-        $chk = $this->m_reservation->checkBentrok($Start,$End,$chk_e_multiple,$Room,$ID);
+        // $chk = $this->m_reservation->checkBentrok($Start,$End,$chk_e_multiple,$Room,$ID);
+        $chk =true;
         if ($chk) {
             $dataSave = $arr_status;
             $dataSave = $dataSave + $arr_add;
+            // print_r($dataSave);die();
             $this->db->where('ID',$ID);
             $this->db->update('db_reservation.t_booking', $dataSave);
 
@@ -600,6 +658,7 @@ class C_transaksi extends Vreservation_Controler {
                             <li>Start  : '.$StartNameDay.', '.$get[0]['Start'].'</li>
                             <li>End  : '.$EndNameDay.', '.$get[0]['End'].'</li>
                             <li>Room  : '.$get[0]['Room'].'</li>
+                            <li>Agenda  : '.$get[0]['Agenda'].'</li>
                             </ul>
                             '.$EmailAdd.$EmailKetAdditional.'
                         ';        
@@ -622,6 +681,7 @@ class C_transaksi extends Vreservation_Controler {
                             <li>Start  : '.$StartNameDay.', '.$get[0]['Start'].'</li>
                             <li>End  : '.$EndNameDay.', '.$get[0]['End'].'</li>
                             <li>Room  : '.$get[0]['Room'].'</li>
+                            <li>Agenda  : '.$get[0]['Agenda'].'</li>
                             </ul>
                             '.$EmailAdd.$EmailKetAdditional.'
                         ';        
@@ -630,6 +690,13 @@ class C_transaksi extends Vreservation_Controler {
                 $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
             }
             
+            $token = array(
+                    'EmailPU' => 'ga@podomorouniversity.ac.id',
+                    'Code' => 8,
+                    'ID_t_booking' => $ID,
+                    'approvalNo' => 2,
+            );
+            $token = $this->jwt->encode($token,'UAP)(*');
 
             if ($approveaccess == 2) {
                 if($_SERVER['SERVER_NAME']!='localhost') {
@@ -643,7 +710,22 @@ class C_transaksi extends Vreservation_Controler {
                                 <li>Room  : '.$get[0]['Room'].'</li>
                                 <li>Agenda  : '.$get[0]['Agenda'].'</li>
                                 </ul>
-                                '.$EmailAdd.$EmailKetAdditional.'
+                                '.$EmailAdd.$EmailKetAdditional.' <br>
+                                <table width="200" cellspacing="0" cellpadding="12" border="0">
+                                    <tbody>
+                                    <tr>
+                                        <td bgcolor="#51a351" align="center">
+                                            <a href="'.url_pas.'approve_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >Approve</a>
+                                        </td>
+                                        <td>
+                                           &nbsp
+                                        </td>
+                                        <td bgcolor="#e98180" align="center">
+                                            <a href="'.url_pas.'cancel_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #e98180;" target="_blank" >Reject</a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             ';        
                     $to = $Email;
                     $subject = "Podomoro University Venue Reservation Approval 2";
@@ -661,7 +743,22 @@ class C_transaksi extends Vreservation_Controler {
                                 <li>Room  : '.$get[0]['Room'].'</li>
                                 <li>Agenda  : '.$get[0]['Agenda'].'</li>
                                 </ul>
-                                '.$EmailAdd.$EmailKetAdditional.'
+                                '.$EmailAdd.$EmailKetAdditional.' <br>
+                                <table width="200" cellspacing="0" cellpadding="12" border="0">
+                                    <tbody>
+                                    <tr>
+                                        <td bgcolor="#51a351" align="center">
+                                            <a href="'.url_pas.'approve_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >Approve</a>
+                                        </td>
+                                        <td>
+                                           &nbsp
+                                        </td>
+                                        <td bgcolor="#e98180" align="center">
+                                            <a href="'.url_pas.'cancel_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #e98180;" target="_blank" >Reject</a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             ';        
                     $to = $Email;
                     $subject = "Podomoro University Venue Reservation Approval 2";
@@ -760,6 +857,7 @@ class C_transaksi extends Vreservation_Controler {
                         <li>Start  : '.$StartNameDay.', '.$get[0]['Start'].'</li>
                         <li>End  : '.$EndNameDay.', '.$get[0]['End'].'</li>
                         <li>Room  : '.$get[0]['Room'].'</li>
+                        <li>Agenda  : '.$get[0]['Agenda'].'</li>
                         <li>Reason : '.$Reason.'</li>
                         </ul>
 
@@ -802,6 +900,7 @@ class C_transaksi extends Vreservation_Controler {
                             <li>Start  : '.$StartNameDay.', '.$get[0]['Start'].'</li>
                             <li>End  : '.$EndNameDay.', '.$get[0]['End'].'</li>
                             <li>Room  : '.$get[0]['Room'].'</li>
+                            <li>Agenda  : '.$get[0]['Agenda'].'</li>
                             <li>Reason : '.$Reason.'</li>
                             </ul>
 
