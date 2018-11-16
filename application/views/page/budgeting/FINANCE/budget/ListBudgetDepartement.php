@@ -2,16 +2,23 @@
 	<div class="col-md-12">
 		<div class="col-md-6 col-md-offset-3">
 			<div class="thumbnail" style="height: 100px">
-				<div class="col-xs-6 col-md-offset-3">
-					<div class="form-group">
-						<label>Year</label>
-						<select class="select2-select-00 full-width-fix" id="Years">
-						     <!-- <option></option> -->
-						 </select>
-					</div>	
+				<div class="row">
+					<div class="col-md-6 col-md-offset-3">
+						<div class="form-group">
+							<label>Year</label>
+							<select class="select2-select-00 full-width-fix" id="Years">
+							     <!-- <option></option> -->
+							 </select>
+						</div>	
+					</div>
 				</div>
-				<div class="col-xs-10 col-md-offset-3">
-					<b>Status Budget: </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Approve | <i class="fa fa-circle" style="color: #eade8e;"></i> Not Approve | <i class="fa fa-circle" style="color: #da2948;"></i> Not Set
+				<div class="row">
+					<div class="col-md-2">
+						<p style="color: red;font-size: 20px">(.000)</p>
+					</div>
+					<div class="col-md-8 col-md-offset-1">
+						<b>Status Budget: </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Approve | <i class="fa fa-circle" style="color: #eade8e;"></i> Not Approve | <i class="fa fa-circle" style="color: #da2948;"></i> Not Set
+					</div>
 				</div>
 			</div>
 		</div>
@@ -65,7 +72,7 @@
 		var token = jwt_encode(data,'UAP)(*');
 		$.post(url,{token:token},function (resultJson) {
 			var response = jQuery.parseJSON(resultJson);
-			var test = '<div class = "row"><div class="col-md-12"><div class="col-xs-1 col-md-offset-11" align = "right"><button class = "btn btn-excel-all" Year = "'+data['Year']+'" ><i class="fa fa-download"></i> Excel</button></div></div></div>';
+			var test = '<div class = "row"><div class="col-md-12"><div class="col-md-1 col-md-offset-11" align = "right"><button class = "btn btn-excel-all" Year = "'+data['Year']+'" ><i class="fa fa-download"></i> Excel</button></div></div></div>';
 			var TableGenerate = '<div class = "row"style = "margin-top : 10px"><div class="col-md-12" id = "pageForTable">'+
 									'<div class="table-responsive">'+
 										'<table class="table table-bordered tableData" id ="tableData3">'+
@@ -96,10 +103,11 @@
 				{
 					st = '<i class="fa fa-circle" style="color: #da2948;"></i>';
 				}
+				var GrandTotal = parseInt(response[i].GrandTotal) / 1000;
 				TableGenerate += '<tr>'+
 									'<td width = "3%">'+ (parseInt(i) + 1)+'</td>'+
 									'<td>'+ response[i].NameDepartement+'</td>'+
-									'<td>'+ formatRupiah(response[i].GrandTotal) +'</td>'+
+									'<td>'+ formatRupiah(GrandTotal) +'</td>'+
 									'<td>'+ st+'</td>'+
 									'<td>'+ Print+'</td>'+
 								'</tr>';

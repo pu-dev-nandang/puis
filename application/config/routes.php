@@ -1012,6 +1012,7 @@ $route['budgeting/EntryBudget/BudgetLeft'] = 'page/budgeting/c_budgeting/BudgetL
 $route['budgeting/getListBudgetingRemaining'] = 'page/budgeting/c_budgeting/getListBudgetingRemaining';
 $route['budgeting/detail_budgeting_remaining'] = 'page/budgeting/c_budgeting/detail_budgeting_remaining';
 $route['budgeting/export_excel_budget_remaining'] = 'C_save_to_excel/export_excel_budget_remaining';
+$route['budgeting/configRule'] = 'page/budgeting/c_budgeting/configRule';
 
 
 // Purchasing

@@ -1,8 +1,4 @@
 <style type="text/css">
-	.thumbnail {
-	    height: 100px;
-	}
-
 	.row {
 	    margin-right: 0px;
 	    margin-left: 0px;
@@ -23,24 +19,32 @@
 <div class="row">
 	<div class="col-md-6 col-md-offset-3">
 		<div class="thumbnail">
-			<div class="col-xs-6">
-				<div class="form-group">
-					<label>Year</label>
-					<select class="select2-select-00 full-width-fix" id="YearPostDepartement">
-					     <!-- <option></option> -->
-					 </select>
+			<div class="row">
+				<div class="col-xs-6">
+					<div class="form-group">
+						<label>Year</label>
+						<select class="select2-select-00 full-width-fix" id="YearPostDepartement">
+						     <!-- <option></option> -->
+						 </select>
+					</div>	
 				</div>	
+				<div class="col-xs-6">
+					<div class="form-group">
+						<label>Department</label>
+						<select class="select2-select-00 full-width-fix" id="DepartementPost">
+						     <!-- <option></option> -->
+						 </select>
+					</div>	
+				</div>
 			</div>
-			<div class="col-xs-6">
-				<div class="form-group">
-					<label>Department</label>
-					<select class="select2-select-00 full-width-fix" id="DepartementPost">
-					     <!-- <option></option> -->
-					 </select>
-				</div>	
-			</div>
-			<div class="col-xs-10 col-md-offset-3">
-				<b>Status : </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Already Set | <i class="fa fa-circle" style="color: #eade8e;"></i> Unset
+			<div class="row">
+				<div class="col-md-2">
+				<p style="color: red;font-size: 20px">(.000)</p>
+				</div>
+				<div class="col-md-8 col-md-offset-2">
+					<b>Status : </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Already Set | <i class="fa fa-circle" style="color: #eade8e;"></i> Unset
+				</div>
+
 			</div>
 		</div>
 	</div>
@@ -142,8 +146,10 @@
 			var SumBudget = 0;
 
 			for (var i = 0; i < dataDB.length; i++) {
+				// format ribuan to show
+				var Budget_value = parseInt(dataDB[i].Budget) / 1000 ;
 				var CodePostBudget = (dataDB[i].CodePostBudget == null) ? 'Unset' : dataDB[i].CodePostBudget;
-				var Budget = (dataDB[i].Budget == null) ? '<td class = "Budget'+dataDB[i].CodePostRealisasi+'">'+ 'Unset'+'</td>' : '<td class = "Budget'+CodePostBudget+'">'+ formatRupiah(dataDB[i].Budget)+'</td>';
+				var Budget = (dataDB[i].Budget == null) ? '<td class = "Budget'+dataDB[i].CodePostRealisasi+'">'+ 'Unset'+'</td>' : '<td class = "Budget'+CodePostBudget+'">'+ formatRupiah(Budget_value)+'</td>';
 				var Action = '';
 				if(CodePostBudget == 'Unset')
 				{
@@ -178,7 +184,7 @@
 			$("#pageForTable").append('<div class="col-md-3 col-md-offset-9" style="background-color : #20485A; min-height : 50px;color: #FFFFFF;" align="center"><h4>Total : '+SumBudget+'</h4></div>');
 			// LoaddataTableStandard("#tableData1");
 			var t = $('#tableData3').DataTable({
-				"pageLength": 5
+				"pageLength": 10
 			});
 			    // var counter = 1;
 			 	
@@ -343,7 +349,7 @@
 				 getBudget = getBudget.replace(".", "");
 				 
 				}
-
+				getBudget = parseInt(getBudget) * 1000 // untuk ribuan
 				var Year = $("#YearPostDepartement").val();
 				if (confirm("Are you sure?") == true) {
 					loadingStart();

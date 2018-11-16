@@ -5,7 +5,7 @@
         font-size: 100%;
     }
 </style>
-<p class="hide" id = "legendCode" style="color: red"><strong>The Code Auto will be get it after submit</strong></p>
+<p class="hide" id = "legendCode" style="color: red"><strong>The Code will be get it after submit</strong></p>
     <form class="form-horizontal" id="formModal">
         <div class="form-group">
             <div class="row">

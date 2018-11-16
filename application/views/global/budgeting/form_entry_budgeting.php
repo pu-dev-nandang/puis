@@ -56,7 +56,7 @@
 		arr_bulan = <?php echo json_encode($arr_bulan) ?>;
 		// var Dom = '';
 			var OPFreq = '';
-			for (var i = 0; i <= 12; i++) {
+			for (var i = 0; i <= 50; i++) {
 				var selected = (i == 0) ? 'selected' : '';
 				OPFreq += '<option value = "'+i+'" '+selected+'>'+i+'</option>';
 			}
@@ -74,10 +74,13 @@
 
 			// make dom legend status limit & subtotal
 			var domLegend = '<div class = "row">'+
-								'<div class = "col-md-3 col-md-offset-3">'+
+								'<div class="col-md-2">'+
+									'<p style="color: red;font-size: 20px">(.000)</p>'+
+								'</div>'+
+								'<div class = "col-md-3 col-md-offset-2">'+
 									OPYear+
 								'</div>'+
-								'<div class = "col-md-3 col-md-offset-4">'+
+								'<div class = "col-md-3 col-md-offset-2">'+
 									'<b>Status : </b><br>'+
 									'<i class="fa fa-check-circle" style="color: green;"></i>'+
 									' On Budget limit || '+
@@ -305,6 +308,7 @@
 					break;
 				}
 
+				UnitCost = UnitCost * 1000; // for ribuan
 				var Total = parseInt(UnitCost * Freq);
 
 				var creator_budget = {
@@ -334,6 +338,7 @@
 				ID : ID,
 				action : action,
 				};
+			// console.log(data);loadingEnd(1000);return;	
 			var token = jwt_encode(data,'UAP)(*');
 			$.post(url,{token:token},function (resultJson) {
 				var response = jQuery.parseJSON(resultJson);
@@ -403,14 +408,16 @@
 		else
 		{
 			var domStatusLimit = '';
+			Budget = Budget / 1000 // for ribuan
+			var Sisa = parseInt(Total) - parseInt(Budget); 
+			var Sisa2 = parseInt(Budget) - parseInt(Total); 
 			if (Total > Budget) {
-				var Sisa = parseInt(Total) - parseInt(Budget) 
 				domStatusLimit = '<p><i class="fa fa-minus-circle" style="color: red;"></i> ('+formatDigitNumber(Sisa)+')</p>';
 
 			}
 			else
 			{
-				domStatusLimit = '<p><i class="fa fa-check-circle" style="color: green;"></i></p>';
+				domStatusLimit = '<p><i class="fa fa-check-circle" style="color: green;"></i> ('+formatDigitNumber(Sisa2)+')</p>';
 			}
 
 			$("#Subtotal"+code).html('<p>'+ formatDigitNumber(Total)+'</p>'+domStatusLimit);
@@ -436,6 +443,7 @@
 				var Count = parseInt(val) * parseInt(UnitCost);
 				SubTotalMonth = parseInt(SubTotalMonth) + parseInt(Count);
 			})
+			// SubTotalMonth = SubTotalMonth * 1000 // for ribuan
 			var fr = formatDigitNumber(SubTotalMonth);
 			// fr = findAndReplace(fr,"Rp.","" );
 			// fr = findAndReplace(fr," ","");
@@ -454,6 +462,7 @@
 			var subTotal = $("#InputSubtotal"+code).attr('total');
 			GrandTotal = parseInt(GrandTotal) + parseInt(subTotal);
 		}
+		GrandTotal = GrandTotal * 1000 // untuk ribuan
 		// get all total
 		$("#GrandTotal").html('<p style = "color : green">'+'Grand Total : <br>'+formatRupiah(GrandTotal)+'</p>');
 	}
@@ -481,7 +490,10 @@
 
 		// make dom legend status limit & subtotal
 		var domLegend = '<div class = "row">'+
-							'<div class = "col-md-3 col-md-offset-4">'+
+							'<div class="col-md-3">'+
+								'<p style="color: red;font-size: 20px">(.000)</p>'+
+							'</div>'+
+							'<div class = "col-md-3 col-md-offset-2">'+
 								OPYear+
 							'</div>'+
 							'<div class = "col-md-3 col-md-offset-2">'+
@@ -504,6 +516,7 @@
 				var Cost = creator_budget[i]['UnitCost'];
 				var n = Cost.indexOf(".");
 				var Cost = Cost.substring(0, n);
+				Cost = parseInt(Cost) / 1000; // for ribuan
 				for (var j = 0; j < arr_bulan.length; j++) {
 					if (i == 0) {
 						divBulan += '<div class = "col-md-1">'+
@@ -524,7 +537,7 @@
 				divBulan += '</div></div>';
 
 				var OPFreq = '';
-					for (var y = 0; y <= 12; y++) {
+					for (var y = 0; y <= 50; y++) {
 						var selected = (y == creator_budget[i]['Freq']) ? 'selected' : '';
 						OPFreq += '<option value = "'+y+'" '+selected+'>'+y+'</option>';
 					}

@@ -2,13 +2,20 @@
 	<div class="col-md-12">
 		<div class="col-md-6 col-md-offset-3">
 			<div class="thumbnail" style="height: 100px">
-				<div class="col-xs-6 col-md-offset-3">
-					<div class="form-group">
-						<label>Year</label>
-						<select class="select2-select-00 full-width-fix" id="Years">
-						     <!-- <option></option> -->
-						 </select>
-					</div>	
+				<div class="row">
+					<div class="col-md-6 col-md-offset-3">
+						<div class="form-group">
+							<label>Year</label>
+							<select class="select2-select-00 full-width-fix" id="Years">
+							     <!-- <option></option> -->
+							 </select>
+						</div>	
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6">
+						<p style="color: red;font-size: 20px">(.000)</p>	
+					</div>
 				</div>
 			</div>
 		</div>
@@ -67,7 +74,7 @@
 		var token = jwt_encode(data,'UAP)(*');
 		$.post(url,{token:token},function (resultJson) {
 			var response = jQuery.parseJSON(resultJson);
-			var test = '<div class = "row"><div class="col-md-12"><div class="col-xs-1 col-md-offset-11" align = "right"><button class = "btn btn-excel-all" Year = "'+data['Year']+'" ><i class="fa fa-download"></i> Excel</button></div></div></div>';
+			var test = '<div class = "row"><div class="col-md-12"><div class="col-md-1 col-md-offset-11" align = "right"><button class = "btn btn-excel-all" Year = "'+data['Year']+'" ><i class="fa fa-download"></i> Excel</button></div></div></div>';
 			var TableGenerate = '<div class = "row"style = "margin-top : 10px"><div class="col-md-12" id = "pageForTable">'+
 									'<div class="table-responsive">'+
 										'<table class="table table-bordered tableData" id ="tableData3">'+
@@ -98,10 +105,12 @@
 				{
 					st = '';
 				}
+
+				var GrandTotal = parseInt(response[i].GrandTotal) / 1000 // for ribuan
 				TableGenerate += '<tr>'+
 									'<td width = "3%">'+ (parseInt(i) + 1)+'</td>'+
 									'<td>'+ response[i].NameDepartement+'</td>'+
-									'<td>'+ formatRupiah(response[i].GrandTotal) +'</td>'+
+									'<td>'+ formatRupiah(GrandTotal) +'</td>'+
 									'<td>'+ st+'</td>'+
 									'<td>'+ Print+'</td>'+
 								'</tr>';
@@ -212,7 +221,8 @@
 						;
 			var Detail = getData[i].Detail;
 			for (var j = 0; j < Detail.length; j++) {
-				var valueee = formatRupiah(Detail[j].Value);
+				var valueee = parseInt(Detail[j].Value) / 1000; // for ribuan
+				var valueee = formatRupiah(valueee);
 				var AhrefRealization = '<a href="javascript:void(0);" class = "btn-realization" CodePostBudget = "'+getData[i].CodePostBudget+'" YearsMonth = "'+Detail[j].YearsMonth+'" value = "'+Detail[j].Value+'">'+valueee+'</a>'
 				TableGenerate += '<td>'+AhrefRealization+'</td>';
 			}

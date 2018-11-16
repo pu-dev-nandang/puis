@@ -882,6 +882,7 @@ class C_budgeting extends Budgeting_Controler {
     {
         $this->auth_ajax();
         $arr_result = array('html' => '','jsonPass' => '');
+        // pass check data existing
         $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/configuration/setuserrole/LoadMasterUserRoleDepartement',$this->data,true);
         echo json_encode($arr_result);
     }

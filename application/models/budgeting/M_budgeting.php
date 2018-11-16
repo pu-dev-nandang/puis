@@ -36,7 +36,7 @@ class M_budgeting extends CI_Model {
         $arr_result = array();
         $Active = ($Active == null) ? '' : ' where a.Active = "'.$Active.'"';
         $sql = 'select a.CodePostRealisasi,a.CodePost,b.PostName,a.RealisasiPostName,a.Departement from db_budgeting.cfg_postrealisasi as a join db_budgeting.cfg_post as b on a.CodePost = b.CodePost
-                '.$Active;
+                '.$Active.' order by a.CodePostRealisasi desc';
         $query=$this->db->query($sql, array())->result_array();
         for ($i=0; $i < count($query); $i++) { 
             $Departement = $query[$i]['Departement'];
@@ -173,7 +173,7 @@ class M_budgeting extends CI_Model {
         $sql = 'select a.CodePostBudget,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
                 from db_budgeting.cfg_postrealisasi as b left join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
                 join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
-                where b.Departement = ? order by a.CodePostBudget asc
+                where b.Departement = ? and b.Active = 1 order by a.CodePostBudget asc
                 ';
         $query=$this->db->query($sql, array($Year,$Departement))->result_array();
         $arr_result = array('data' => $query,'OpPostRealisasi' => $get_Data);
