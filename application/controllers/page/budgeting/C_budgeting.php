@@ -883,6 +883,7 @@ class C_budgeting extends Budgeting_Controler {
         $this->auth_ajax();
         $arr_result = array('html' => '','jsonPass' => '');
         // pass check data existing
+        $this->data['dt'] = $this->m_master->showData_array('db_budgeting.cfg_set_userrole');
         $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/configuration/setuserrole/LoadMasterUserRoleDepartement',$this->data,true);
         echo json_encode($arr_result);
     }
@@ -1280,6 +1281,39 @@ class C_budgeting extends Budgeting_Controler {
         $arr_bulan = $this->m_master->getShowIntervalBulan($get[0]['StartPeriod'],$get[0]['EndPeriod']);
         $arr_result = array('data' =>$getData,'arr_bulan' => $arr_bulan);
         echo json_encode($arr_result);
+    }
+
+    public function userroledepart_submit()
+    {
+       $this->auth_ajax();
+       $Msg = '';
+       try {
+        $Input = $this->getInputToken();
+        $dataSave = array();
+        if (count($Input) > 0) {
+            $table = 'db_budgeting.cfg_set_userrole';
+            $sql = "TRUNCATE TABLE ".$table;
+            $query=$this->db->query($sql, array());
+            foreach ($Input as $key) {
+                $temp = array();
+                foreach ($key as $keya => $value) {
+                   $temp[$keya] = $value; 
+                }
+                $dataSave[] = $temp;
+            }
+            $this->db->insert_batch('db_budgeting.cfg_set_userrole', $dataSave);  
+        }
+        else
+        {
+            $Msg = 'No data action';
+        }
+
+       } catch (Exception $e) {
+            $Msg = $this->Msg['Error'];
+       }
+
+       echo json_encode($Msg);
+       
     }
 
 }
