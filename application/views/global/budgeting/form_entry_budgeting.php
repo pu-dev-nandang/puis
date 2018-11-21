@@ -77,7 +77,7 @@
 								'<div class="col-md-2">'+
 									'<p style="color: red;font-size: 20px">(.000)</p>'+
 								'</div>'+
-								'<div class = "col-md-3 col-md-offset-2">'+
+								'<div class = "col-md-3 col-md-offset-1">'+
 									OPYear+
 								'</div>'+
 								'<div class = "col-md-3 col-md-offset-2">'+
@@ -493,7 +493,7 @@
 							'<div class="col-md-3">'+
 								'<p style="color: red;font-size: 20px">(.000)</p>'+
 							'</div>'+
-							'<div class = "col-md-3 col-md-offset-2">'+
+							'<div class = "col-md-3 col-md-offset-1">'+
 								OPYear+
 							'</div>'+
 							'<div class = "col-md-3 col-md-offset-2">'+

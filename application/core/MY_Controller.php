@@ -419,6 +419,14 @@ abstract class Budgeting_Controler extends Globalclass{
         parent::__construct();
         $this->load->model('budgeting/m_budgeting');
         $this->load->model('master/m_master');
+        $PositionMain = $this->session->userdata('PositionMain');
+        $DivisionPage = $PositionMain['Division'];
+        $this->data['department'] = ($PositionMain['IDDivision'] == 12)? $this->session->userdata('departementNavigation') : $DivisionPage;
+        $this->data['department'] = strtolower($this->data['department']);
+        $this->data['department'] = str_replace(" ", "-", $this->data['department']);
+        $this->data['IDdepartment'] = $PositionMain['IDDivision'];
+        // set session division 
+        $this->session->set_userdata('IDDepartement',$PositionMain['IDDivision']);
     }
 
     public function temp($content)

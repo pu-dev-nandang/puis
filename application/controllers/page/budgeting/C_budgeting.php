@@ -11,12 +11,6 @@ class C_budgeting extends Budgeting_Controler {
     public function __construct()
     {
         parent::__construct();
-        $PositionMain = $this->session->userdata('PositionMain');
-        $DivisionPage = $PositionMain['Division'];
-        $this->data['department'] = ($PositionMain['IDDivision'] == 12)? $this->session->userdata('departementNavigation') : $DivisionPage;
-        $this->data['IDdepartment'] = $PositionMain['IDDivision'];
-        // set session division 
-        $this->session->set_userdata('IDDepartement',$PositionMain['IDDivision']);
     }
 
     public function index()
