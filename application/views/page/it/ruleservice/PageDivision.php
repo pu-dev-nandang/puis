@@ -68,7 +68,7 @@ $(document).ready(function() {
 					        '</div>'+
 					    '</div>';
 			for (var i = 0; i < resultJson.length; i++) {
-				var StatusDiv = (resultJson[i].StatusDiv == 0) ? 'Not Show' : 'Show';		    
+				var StatusDiv = (resultJson[i].StatusDiv == 0) ? 'Not Budgeting' : 'Budgeting';		    
 				TableGenerate += '<tr>'+
 									'<td width = "3%">'+ (parseInt(i) + 1)+'</td>'+
 									'<td class = "Division" iddiv = "'+resultJson[i].ID+'">'+ resultJson[i].Division+'</td>'+
@@ -147,8 +147,8 @@ $(document).ready(function() {
     		}
     		OPMenuNavigation += '</select>';
     		var OPStatusDiv = '<select class = "form-control" id = "AddStatusDiv">'+
-    							'<option value = "1" selected>Show</option>'+
-    							'<option value = "0">Not Show</option>'+
+    							'<option value = "1" selected>Budgeting</option>'+
+    							'<option value = "0">Not Budgeting</option>'+
     						  '</select>';	
     		var Btn = '<div class = "row" style = "margin-left:10px;margin-right:0px;margin-top : 0px">'+
 	    						'<div clas = "col-xs-4">'+
@@ -274,19 +274,19 @@ $(document).ready(function() {
 
             $(".StatusDiv").each(function(){
                 var valText = $(this).text();
-                valText = (valText == 'Show') ? 1 : 0 ;
+                valText = (valText == 'Budgeting') ? 1 : 0 ;
                 console.log(valText);
                 var OPStatusDiv = '<select class = "form-control textStatusDiv">';
                     for (var i = 0; i < 2; i++) {
                        if (i == 0) {
                         var selected = (valText == 1) ? 'selected' : '';
-                        OPStatusDiv += '<option value = "1" '+selected+'>Show</option>'; 
+                        OPStatusDiv += '<option value = "1" '+selected+'>Budgeting</option>'; 
                         
                        }
 
                        if (i == 1) {
                             var selected = (valText == 0) ? 'selected' : '';
-                            OPStatusDiv += '<option value = "0"'+selected+'>Not Show</option>';
+                            OPStatusDiv += '<option value = "0"'+selected+'>Not Budgeting</option>';
                        }
                     }
                     OPStatusDiv += '</select>';
