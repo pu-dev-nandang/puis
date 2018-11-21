@@ -38,7 +38,7 @@ function loadTable()
 						'<thead>'+
 						'<tr>'+
 							'<th>Post</th>'+
-                            '<th>Post Realization</th>'+
+                            '<th>Post Item</th>'+
                             '<th>Post Budgeting</th>'+
                             // '<th>Catalog</th>'+
 							'<th>Supplier</th>'+

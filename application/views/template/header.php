@@ -120,7 +120,7 @@
 <!--                            <li class="divider"></li>-->
                         <?php } ?>
                         <?php if(in_array(6,$rule_service)){ ?>
-                            <li class="<?php if($this->uri->segment(1)=='budgeting'){echo 'active';} ?>">
+                            <li class="<?php if($this->uri->segment(1)=='budgeting'){echo 'active';} ?>" id = "PageServiceBudgeting">
                                 <a href="<?php echo base_url('budgeting'); ?>"><i class="fa fa-money" aria-hidden="true"></i> Budgeting</a>
                             </li>
 <!--                            <li class="divider"></li>-->
@@ -224,6 +224,7 @@
         loadAllowDivision();
         showHTMLMessagesDivision();
         socket_messages();
+        wrDepartmentAdmProdi();
 
         if($.cookie("theme")==null || $.cookie("theme") =='' || $.cookie("theme")=='dark'){
             $('#theme-switcher label').addClass('btn-inverse active');
@@ -486,5 +487,22 @@
             }// exit if
 
         })
+    }
+
+    function wrDepartmentAdmProdi()
+    {
+        <?php 
+            $PositionMain = $this->session->userdata('PositionMain');
+            $DivisionID = $PositionMain['IDDivision'];
+         ?>
+         <?php if ($DivisionID == 15 || $DivisionID == 14): ?>
+             var NameDiv = "<?php echo $this->session->userdata('prodi_active') ?>";
+             var aa = $("#wrDepartment").text();
+             $("#wrDepartment").html(aa + ' '+NameDiv);
+         <?php else: ?>
+            var NameDiv = "<?php echo $this->session->userdata('prodi_active') ?>";
+            var aa = 'Admin Prodi';
+            $("#wrDepartment").html(aa + ' '+NameDiv);
+         <?php endif ?>
     }
 </script>

@@ -97,6 +97,14 @@
                     <span class="title">IT</span>
                 </a>
             </li>
+            <li class="departement <?php if($departement=='admin-prodi'){echo 'current';} ?>"
+                division="15"
+                data-dpt="admin-prodi">
+                <a href="javascript:void(0);">
+                    <span class="image"><img src="<?php echo base_url('assets/icon/admin.png'); ?>"></span>
+                    <span class="title">Prodi</span>
+                </a>
+            </li>
         </ul>
     </div> <!-- /#frame -->
 </div> <!-- /#project-switcher -->

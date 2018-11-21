@@ -16,7 +16,7 @@
 		<div class="thumbnail" style="height: 90px">
 			<div class="col-md-6 col-md-offset-3">
 				<div class="form-group">
-					<label>Departement</label>
+					<label>Department</label>
 					<select class="select2-select-00 full-width-fix" id="DepartementUserRole">
 					     <!-- <option></option> -->
 					 </select>

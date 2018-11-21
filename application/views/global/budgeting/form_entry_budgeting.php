@@ -3,10 +3,12 @@
 </div>
 
 <script type="text/javascript">
+	var arr_Year = <?php echo json_encode($arr_Year) ?>;
 	$(document).ready(function() {
 		var arr_PostBudget = [];
 		arr_PostBudget = <?php echo json_encode($arr_PostBudget) ?>;
 		LoadFirstLoad(arr_PostBudget);
+
 	}); // exit document Function
 
 	function LoadFirstLoad(arr_PostBudget)
@@ -39,6 +41,12 @@
 				}
 				
 			}
+
+			$("#Year").change(function(){
+				var valuee = $(this).val();
+				LoadPage('EntryBudget/'+valuee);
+			})
+
 		}); 
 	}
 
@@ -48,36 +56,53 @@
 		arr_bulan = <?php echo json_encode($arr_bulan) ?>;
 		// var Dom = '';
 			var OPFreq = '';
-			for (var i = 0; i <= 12; i++) {
+			for (var i = 0; i <= 50; i++) {
 				var selected = (i == 0) ? 'selected' : '';
 				OPFreq += '<option value = "'+i+'" '+selected+'>'+i+'</option>';
 			}
 
+			var OPYear = '';
+			if (!$("#Departement").length) {
+				OPYear = '<select class = "form-control" id = "Year">';
+				for (var i = 0; i < arr_Year.length; i++) {
+					var selected = (arr_Year[i].Year == "<?php echo $Year ?>") ? 'selected' : '';
+					OPYear += '<option value ="'+arr_Year[i].Year+'" '+selected+'>'+arr_Year[i].Year+'</option>';
+				}
+				OPYear += '</select>';
+			}
+			
+
 			// make dom legend status limit & subtotal
 			var domLegend = '<div class = "row">'+
-								'<div class = "col-xs-3 col-md-offset-9">'+
+								'<div class="col-md-2">'+
+									'<p style="color: red;font-size: 20px">(.000)</p>'+
+								'</div>'+
+								'<div class = "col-md-3 col-md-offset-2">'+
+									OPYear+
+								'</div>'+
+								'<div class = "col-md-3 col-md-offset-2">'+
 									'<b>Status : </b><br>'+
 									'<i class="fa fa-check-circle" style="color: green;"></i>'+
-									' Pass Limit || '+
+									' On Budget limit || '+
 									'<i class="fa fa-minus-circle" style="color: red;"></i>'+
-									' Exceeded Limit'+
+									' Exceeded Budget Limit'+
 								'</div>'+
 							'<div>'		
 								;
 			$("#pageInput").append(domLegend);
 
 			for (var i = 0; i < arr_PostBudget.length; i++) {
-				var divBulan = '<div class = "row">'+'<div class = "col-xs-12">';
+				var divBulan = '<div class = "row">'+'<div class = "col-md-12">';
 				for (var j = 0; j < arr_bulan.length; j++) {
 					if (i == 0) {
-						divBulan += '<div class = "col-xs-1">'+
+						divBulan += '<div class = "col-md-1">'+
 										'<div class="form-group">'+	
 											'<label>'+arr_bulan[j].MonthName+'</label>'+
 											'<input type = "text" class = "form-control InputBulan'+arr_PostBudget[i]['CodePostBudget']+'" placeholder="Input Unit Cost..." value = "0" keyValue = "'+arr_bulan[j].keyValueFirst+'" code = "'+arr_PostBudget[i]['CodePostBudget']+'">'+
 										'</div>'+
 									'</div>';				
 					} else {							
-						divBulan += '<div class = "col-xs-1">'+
+						divBulan += '<div class = "col-md-1">'+
 										'<div class="form-group">'+	
 											// '<label>'+arr_bulan[j]+'</label>'+
 											'<input type = "text" class = "form-control InputBulan'+arr_PostBudget[i]['CodePostBudget']+'" placeholder="Input Unit Cost..." value = "0" keyValue = "'+arr_bulan[j].keyValueFirst+'" code = "'+arr_PostBudget[i]['CodePostBudget']+'">'+
@@ -89,7 +114,7 @@
 					if(i == 0)
 					{
 						var Dom = '<div class="row" code = "'+arr_PostBudget[i]['CodePostBudget']+'" style = "margin-top : 10px;">'+
-									  	'<div class="col-xs-2">'+
+									  	'<div class="col-md-2">'+
 											'<div class="form-group">'+
 												'<label>Post Budget</label>'+
 												'<select class="select2-select-00 full-width-fix" id="PostBudget'+arr_PostBudget[i]['CodePostBudget']+'">'+
@@ -97,13 +122,13 @@
 												 '</select>'+
 											'</div>'+
 										'</div>'+
-										'<div class="col-xs-1">'+
+										'<div class="col-md-1">'+
 											'<div class="form-group">'+
 												'<label>Unit Cost</label>'+
 												'<input type = "text" class = "form-control" id = "UnitCost'+arr_PostBudget[i]['CodePostBudget']+'" placeholder="Input Unit Cost..." value = "0">'+	
 											'</div>'+	
 										'</div>'+
-										'<div class="col-xs-1">'+
+										'<div class="col-md-1">'+
 											'<div class="form-group">'+
 												'<label>Freq</label>'+
 												'<select class="select2-select-00 full-width-fix" id = "Freq'+arr_PostBudget[i]['CodePostBudget']+'">'+
@@ -111,10 +136,10 @@
 												'</select>'+
 											'</div>'+	
 										'</div>'+
-										'<div class="col-xs-7" id = "tblInputBulan'+arr_PostBudget[i]['CodePostBudget']+'">'+
+										'<div class="col-md-7" id = "tblInputBulan'+arr_PostBudget[i]['CodePostBudget']+'">'+
 											divBulan+
 										'</div>'+
-										'<div class="col-xs-1" id = "InputSubtotal'+arr_PostBudget[i]['CodePostBudget']+'" budget = "'+arr_PostBudget[i]['Budget']+'" total = "0" style = "font-size: 12px;">'+
+										'<div class="col-md-1" id = "InputSubtotal'+arr_PostBudget[i]['CodePostBudget']+'" budget = "'+arr_PostBudget[i]['Budget']+'" total = "0" style = "font-size: 12px;">'+
 											'<div class="form-group">'+
 												'<label>Subtotal</label>'+
 												'<p id = "Subtotal'+arr_PostBudget[i]['CodePostBudget']+'">0</p>'+
@@ -126,7 +151,7 @@
 					else
 					{
 						var Dom = '<div class="row" code = "'+arr_PostBudget[i]['CodePostBudget']+'">'+
-									  	'<div class="col-xs-2">'+
+									  	'<div class="col-md-2">'+
 											'<div class="form-group">'+
 												// '<label>Post Budget</label>'+
 												'<select class="select2-select-00 full-width-fix" id="PostBudget">'+
@@ -134,13 +159,13 @@
 												 '</select>'+
 											'</div>'+
 										'</div>'+
-										'<div class="col-xs-1">'+
+										'<div class="col-md-1">'+
 											'<div class="form-group">'+
 												// '<label>Unit Cost</label>'+
 												'<input type = "text" class = "form-control" id = "UnitCost'+arr_PostBudget[i]['CodePostBudget']+'" placeholder="Input Unit Cost..." value = "0">'+
 											'</div>'+	
 										'</div>'+
-										'<div class="col-xs-1">'+
+										'<div class="col-md-1">'+
 											'<div class="form-group">'+
 												// '<label>Freq</label>'+
 												'<select class="select2-select-00 full-width-fix" id = "Freq'+arr_PostBudget[i]['CodePostBudget']+'">'+
@@ -148,10 +173,10 @@
 												'</select>'+
 											'</div>'+	
 										'</div>'+
-										'<div class="col-xs-7" id = "tblInputBulan'+arr_PostBudget[i]['CodePostBudget']+'">'+
+										'<div class="col-md-7" id = "tblInputBulan'+arr_PostBudget[i]['CodePostBudget']+'">'+
 											divBulan+
 										'</div>'+
-										'<div class="col-xs-1" id = "InputSubtotal'+arr_PostBudget[i]['CodePostBudget']+'" budget = "'+arr_PostBudget[i]['Budget']+'" total = "0" style = "font-size: 12px;">'+
+										'<div class="col-md-1" id = "InputSubtotal'+arr_PostBudget[i]['CodePostBudget']+'" budget = "'+arr_PostBudget[i]['Budget']+'" total = "0" style = "font-size: 12px;">'+
 											'<div class="form-group">'+
 												'<p id = "Subtotal'+arr_PostBudget[i]['CodePostBudget']+'">0</p>'+
 											'</div>'+	
@@ -164,10 +189,10 @@
 				if(i == arr_PostBudget.length - 1)
 				{
 					var DomsubTotalPermonth = '<div class = "row">'+
-												'<div class = "col-xs-7 col-md-offset-4">'						
+												'<div class = "col-md-7 col-md-offset-4">'						
 											;
 					for (var j = 0; j < arr_bulan.length; j++) {
-						DomsubTotalPermonth += '<div class = "col-xs-1">'+
+						DomsubTotalPermonth += '<div class = "col-md-1">'+
 													'<div class="form-group subTotalPermonth" keyValue = "'+arr_bulan[j].keyValueFirst+'" style = "font-size: 12px;">'+	
 														
 													'</div>'+
@@ -202,21 +227,21 @@
 		// pPageInput After
 		var Note = '<div id = "pageNote"><div class = "row" >'+
 						'<div class = "col-md-12">'+
-							'<div class = "col-xs-4">'+
+							'<div class = "col-md-4">'+
 								'<div class="form-group">'+
 									'<label>Note</label>'+
 									'<input type = "text" class = "form-control" id = "Note" placeholder="Input Note..." maxlength="70">'+
 									'<span id="charsNote">70</span> characters remaining'+
 								'</div>'+
 							'</div>'+	
-							'<div class = "col-xs-2 col-md-offset-10" id = "GrandTotal">'+
+							'<div class = "col-md-2 col-md-offset-10" id = "GrandTotal">'+
 							
 							'</div>'+
 						'</div>'+
 					'</div>'+
 					'<div class = "row">'+
 						'<div class = "col-md-12">'+
-							'<div class = "col-xs-2 col-md-offset-10">'+
+							'<div class = "col-md-2 col-md-offset-10">'+
 								'<button class = "btn btn-success" id = "SaveBudget">Submit</button>'+
 							'</div>'+
 						'</div>'+
@@ -283,6 +308,7 @@
 					break;
 				}
 
+				UnitCost = UnitCost * 1000; // for ribuan
 				var Total = parseInt(UnitCost * Freq);
 
 				var creator_budget = {
@@ -312,6 +338,7 @@
 				ID : ID,
 				action : action,
 				};
+			// console.log(data);loadingEnd(1000);return;	
 			var token = jwt_encode(data,'UAP)(*');
 			$.post(url,{token:token},function (resultJson) {
 				var response = jQuery.parseJSON(resultJson);
@@ -381,14 +408,16 @@
 		else
 		{
 			var domStatusLimit = '';
+			Budget = Budget / 1000 // for ribuan
+			var Sisa = parseInt(Total) - parseInt(Budget); 
+			var Sisa2 = parseInt(Budget) - parseInt(Total); 
 			if (Total > Budget) {
-				var Sisa = parseInt(Total) - parseInt(Budget) 
 				domStatusLimit = '<p><i class="fa fa-minus-circle" style="color: red;"></i> ('+formatDigitNumber(Sisa)+')</p>';
 
 			}
 			else
 			{
-				domStatusLimit = '<p><i class="fa fa-check-circle" style="color: green;"></i></p>';
+				domStatusLimit = '<p><i class="fa fa-check-circle" style="color: green;"></i> ('+formatDigitNumber(Sisa2)+')</p>';
 			}
 
 			$("#Subtotal"+code).html('<p>'+ formatDigitNumber(Total)+'</p>'+domStatusLimit);
@@ -414,6 +443,7 @@
 				var Count = parseInt(val) * parseInt(UnitCost);
 				SubTotalMonth = parseInt(SubTotalMonth) + parseInt(Count);
 			})
+			// SubTotalMonth = SubTotalMonth * 1000 // for ribuan
 			var fr = formatDigitNumber(SubTotalMonth);
 			// fr = findAndReplace(fr,"Rp.","" );
 			// fr = findAndReplace(fr," ","");
@@ -432,6 +462,7 @@
 			var subTotal = $("#InputSubtotal"+code).attr('total');
 			GrandTotal = parseInt(GrandTotal) + parseInt(subTotal);
 		}
+		GrandTotal = GrandTotal * 1000 // untuk ribuan
 		// get all total
 		$("#GrandTotal").html('<p style = "color : green">'+'Grand Total : <br>'+formatRupiah(GrandTotal)+'</p>');
 	}
@@ -447,37 +478,55 @@
 		var arr_bulan = [];
 		arr_bulan = <?php echo json_encode($arr_bulan) ?>;
 
+		var OPYear = '';
+		if (!$("#Departement").length) {
+			OPYear = '<select class = "form-control" id = "Year">';
+			for (var i = 0; i < arr_Year.length; i++) {
+				var selected = (arr_Year[i].Year == "<?php echo $Year ?>") ? 'selected' : '';
+				OPYear += '<option value ="'+arr_Year[i].Year+'" '+selected+'>'+arr_Year[i].Year+'</option>';
+			}
+			OPYear += '</select>';
+		}
+
 		// make dom legend status limit & subtotal
 		var domLegend = '<div class = "row">'+
-							'<div class = "col-xs-3 col-md-offset-9">'+
+							'<div class="col-md-3">'+
+								'<p style="color: red;font-size: 20px">(.000)</p>'+
+							'</div>'+
+							'<div class = "col-md-3 col-md-offset-2">'+
+								OPYear+
+							'</div>'+
+							'<div class = "col-md-3 col-md-offset-2">'+
 								'<b>Status : </b><br>'+
 								'<i class="fa fa-check-circle" style="color: green;"></i>'+
-								' Pass Limit || '+
+								' On Budget limit || '+
 								'<i class="fa fa-minus-circle" style="color: red;"></i>'+
-								' Exceeded Limit'+
+								' Exceeded Budget Limit'+
 							'</div>'+
 						'<div>'		
-								;
+							;
+
 			$("#pageInput").append(domLegend);
 
 			for (var i = 0; i < arr_PostBudget.length; i++) {
-				var divBulan = '<div class = "row">'+'<div class = "col-xs-12">';
+				var divBulan = '<div class = "row">'+'<div class = "col-md-12">';
 				var DetailMonth = creator_budget[i]['DetailMonth'];
 				DetailMonth = jQuery.parseJSON(DetailMonth);
 
 				var Cost = creator_budget[i]['UnitCost'];
 				var n = Cost.indexOf(".");
 				var Cost = Cost.substring(0, n);
+				Cost = parseInt(Cost) / 1000; // for ribuan
 				for (var j = 0; j < arr_bulan.length; j++) {
 					if (i == 0) {
-						divBulan += '<div class = "col-xs-1">'+
+						divBulan += '<div class = "col-md-1">'+
 										'<div class="form-group">'+	
 											'<label>'+arr_bulan[j].MonthName+'</label>'+
 											'<input type = "text" class = "form-control InputBulan'+arr_PostBudget[i]['CodePostBudget']+'" placeholder="Input Unit Cost..." value = "'+DetailMonth[j].value+'" keyValue = "'+arr_bulan[j].keyValueFirst+'" code = "'+arr_PostBudget[i]['CodePostBudget']+'" keyvalueD = "'+DetailMonth[j].month+'">'+
 										'</div>'+
 									'</div>';				
 					} else {							
-						divBulan += '<div class = "col-xs-1">'+
+						divBulan += '<div class = "col-md-1">'+
 										'<div class="form-group">'+	
 											// '<label>'+arr_bulan[j]+'</label>'+
 											'<input type = "text" class = "form-control InputBulan'+arr_PostBudget[i]['CodePostBudget']+'" placeholder="Input Unit Cost..." value = "'+DetailMonth[j].value+'" keyValue = "'+arr_bulan[j].keyValueFirst+'" code = "'+arr_PostBudget[i]['CodePostBudget']+'" keyvalueD = "'+DetailMonth[j].month+'">'+
@@ -488,7 +537,7 @@
 				divBulan += '</div></div>';
 
 				var OPFreq = '';
-					for (var y = 0; y <= 12; y++) {
+					for (var y = 0; y <= 50; y++) {
 						var selected = (y == creator_budget[i]['Freq']) ? 'selected' : '';
 						OPFreq += '<option value = "'+y+'" '+selected+'>'+y+'</option>';
 					}
@@ -496,7 +545,7 @@
 					if(i == 0)
 					{
 						var Dom = '<div class="row" code = "'+arr_PostBudget[i]['CodePostBudget']+'" style = "margin-top : 10px;">'+
-									  	'<div class="col-xs-2">'+
+									  	'<div class="col-md-2">'+
 											'<div class="form-group">'+
 												'<label>Post Budget</label>'+
 												'<select class="select2-select-00 full-width-fix" id="PostBudget'+arr_PostBudget[i]['CodePostBudget']+'">'+
@@ -504,13 +553,13 @@
 												 '</select>'+
 											'</div>'+
 										'</div>'+
-										'<div class="col-xs-1">'+
+										'<div class="col-md-1">'+
 											'<div class="form-group">'+
 												'<label>Unit Cost</label>'+
 												'<input type = "text" class = "form-control" id = "UnitCost'+arr_PostBudget[i]['CodePostBudget']+'" placeholder="Input Unit Cost..." value = "'+Cost +'">'+	
 											'</div>'+	
 										'</div>'+
-										'<div class="col-xs-1">'+
+										'<div class="col-md-1">'+
 											'<div class="form-group">'+
 												'<label>Freq</label>'+
 												'<select class="select2-select-00 full-width-fix" id = "Freq'+arr_PostBudget[i]['CodePostBudget']+'">'+
@@ -518,10 +567,10 @@
 												'</select>'+
 											'</div>'+	
 										'</div>'+
-										'<div class="col-xs-7" id = "tblInputBulan'+arr_PostBudget[i]['CodePostBudget']+'">'+
+										'<div class="col-md-7" id = "tblInputBulan'+arr_PostBudget[i]['CodePostBudget']+'">'+
 											divBulan+
 										'</div>'+
-										'<div class="col-xs-1" id = "InputSubtotal'+arr_PostBudget[i]['CodePostBudget']+'" budget = "'+arr_PostBudget[i]['Budget']+'" total = "'+creator_budget[i]['SubTotal']+'" style = "font-size: 12px;">'+
+										'<div class="col-md-1" id = "InputSubtotal'+arr_PostBudget[i]['CodePostBudget']+'" budget = "'+arr_PostBudget[i]['Budget']+'" total = "'+creator_budget[i]['SubTotal']+'" style = "font-size: 12px;">'+
 											// '<br><p>Limit : '+formatRupiah(arr_PostBudget[i]['Budget'])+'</p>'+
 											// '<p id = "Subtotal'+arr_PostBudget[i]['CodePostBudget']+'">'+formatRupiah(creator_budget[i]['SubTotal'])+'</p>'+
 											'<div class="form-group">'+
@@ -529,7 +578,7 @@
 												'<p id = "Subtotal'+arr_PostBudget[i]['CodePostBudget']+'">'+formatDigitNumber(creator_budget[i]['SubTotal'])+'</p>'+
 											'</div>'+
 										'</div>'+
-										// '<div class="col-xs-1" id = "BatasMax'+arr_PostBudget[i]['CodePostBudget']+'">'
+										// '<div class="col-md-1" id = "BatasMax'+arr_PostBudget[i]['CodePostBudget']+'">'
 
 										// '</div>'+
 								'</div>';
@@ -538,7 +587,7 @@
 					else
 					{
 						var Dom = '<div class="row" code = "'+arr_PostBudget[i]['CodePostBudget']+'">'+
-									  	'<div class="col-xs-2">'+
+									  	'<div class="col-md-2">'+
 											'<div class="form-group">'+
 												// '<label>Post Budget</label>'+
 												'<select class="select2-select-00 full-width-fix" id="PostBudget">'+
@@ -546,13 +595,13 @@
 												 '</select>'+
 											'</div>'+
 										'</div>'+
-										'<div class="col-xs-1">'+
+										'<div class="col-md-1">'+
 											'<div class="form-group">'+
 												// '<label>Unit Cost</label>'+
 												'<input type = "text" class = "form-control" id = "UnitCost'+arr_PostBudget[i]['CodePostBudget']+'" placeholder="Input Unit Cost..." value = "'+ Cost +'">'+
 											'</div>'+	
 										'</div>'+
-										'<div class="col-xs-1">'+
+										'<div class="col-md-1">'+
 											'<div class="form-group">'+
 												// '<label>Freq</label>'+
 												'<select class="select2-select-00 full-width-fix" id = "Freq'+arr_PostBudget[i]['CodePostBudget']+'">'+
@@ -560,17 +609,17 @@
 												'</select>'+
 											'</div>'+	
 										'</div>'+
-										'<div class="col-xs-7" id = "tblInputBulan'+arr_PostBudget[i]['CodePostBudget']+'">'+
+										'<div class="col-md-7" id = "tblInputBulan'+arr_PostBudget[i]['CodePostBudget']+'">'+
 											divBulan+
 										'</div>'+
-										'<div class="col-xs-1" id = "InputSubtotal'+arr_PostBudget[i]['CodePostBudget']+'" budget = "'+arr_PostBudget[i]['Budget']+'" total = "'+creator_budget[i]['SubTotal']+'" style = "font-size: 12px;">'+
+										'<div class="col-md-1" id = "InputSubtotal'+arr_PostBudget[i]['CodePostBudget']+'" budget = "'+arr_PostBudget[i]['Budget']+'" total = "'+creator_budget[i]['SubTotal']+'" style = "font-size: 12px;">'+
 											// '<p>Limit : '+formatRupiah(arr_PostBudget[i]['Budget'])+'</p>'+
 											// '<p id = "Subtotal'+arr_PostBudget[i]['CodePostBudget']+'">'+formatRupiah(creator_budget[i]['SubTotal'])+'</p>'+
 											'<div class="form-group">'+
 												'<p id = "Subtotal'+arr_PostBudget[i]['CodePostBudget']+'">'+formatDigitNumber(creator_budget[i]['SubTotal'])+'</p>'+
 											'</div>'+
 										'</div>'+
-										// '<div class="col-xs-1" id = "BatasMax'+arr_PostBudget[i]['CodePostBudget']+'">'
+										// '<div class="col-md-1" id = "BatasMax'+arr_PostBudget[i]['CodePostBudget']+'">'
 
 										// '</div>'+
 								'</div>';
@@ -581,10 +630,10 @@
 				if(i == arr_PostBudget.length - 1)
 				{
 					var DomsubTotalPermonth = '<div class = "row">'+
-												'<div class = "col-xs-7 col-md-offset-4">'						
+												'<div class = "col-md-7 col-md-offset-4">'						
 											;
 					for (var j = 0; j < arr_bulan.length; j++) {
-						DomsubTotalPermonth += '<div class = "col-xs-1">'+
+						DomsubTotalPermonth += '<div class = "col-md-1">'+
 													'<div class="form-group subTotalPermonth" keyValue = "'+arr_bulan[j].keyValueFirst+'" style = "font-size: 12px;">'+	
 														
 													'</div>'+
@@ -625,29 +674,29 @@
 
 		var StatusApproval = creator_budget_approval[0]['Approval'];	
 		// pageInput After
-		var ApprovalBtn = (fin == "1") ? '<div class = "col-xs-4">'+'<button type="button" class="btn btn-default" code="'+code+'" ID = "ApprovalBtn"> <i class="fa fa-handshake-o" aria-hidden="true"></i> Approve</button></div>' : '';
-		var ExportExcel = (StatusApproval == 1) ? '<div class = "col-xs-4">'+'<button type="button" class="btn btn-default" ID = "ExportExcel" Year = "'+creator_budget_approval[0]['Year']+'" Departement = "'+creator_budget_approval[0]['Departement']+'"> <i class="fa fa-file-excel-o"></i> Excel</button></div>' : '';
+		var ApprovalBtn = (fin == "1") ? '<div class = "col-md-4">'+'<button type="button" class="btn btn-default" code="'+code+'" ID = "ApprovalBtn"> <i class="fa fa-handshake-o" aria-hidden="true"></i> Approve</button></div>' : '';
+		var ExportExcel = (StatusApproval == 1) ? '<div class = "col-md-4">'+'<button type="button" class="btn btn-default" ID = "ExportExcel" Year = "'+creator_budget_approval[0]['Year']+'" Departement = "'+creator_budget_approval[0]['Departement']+'"> <i class="fa fa-file-excel-o"></i> Excel</button></div>' : '';
 		if (StatusApproval == 1) {
 			ApprovalBtn = ExportExcel;
 		}
 		var Note = '<div id = "pageNote"><div class = "row">'+
 						'<div class = "col-md-12">'+
-							'<div class = "col-xs-4">'+
+							'<div class = "col-md-4">'+
 								'<div class="form-group">'+
 									'<label>Note</label>'+
 									'<input type = "text" class = "form-control" id = "Note" placeholder="Input Note..." maxlength="70" value = "'+creator_budget_approval[0]['Note']+'">'+
 									'<span id="charsNote">70</span> characters remaining'+
 								'</div>'+
 							'</div>'+	
-							'<div class = "col-xs-2 col-md-offset-10" id = "GrandTotal">'+
+							'<div class = "col-md-2 col-md-offset-10" id = "GrandTotal">'+
 							
 							'</div>'+
 						'</div>'+
 					'</div>'+
 					'<div class = "row">'+
 						'<div class = "col-md-12">'+
-							'<div class = "col-xs-2 col-md-offset-10">'+
-								'<div class = "col-xs-4">'+
+							'<div class = "col-md-2 col-md-offset-10">'+
+								'<div class = "col-md-4">'+
 									'<button class = "btn btn-success" id = "SaveBudget">Submit</button>'+
 								'</div>'+	
 								ApprovalBtn
@@ -729,7 +778,7 @@
 				$(this).attr('disabled',true);
 			})
 
-			$("#pageInputApproval select").each(function(){
+			$("#pageInputApproval select:not(#Year)").each(function(){
 				$(this).attr('readonly',true);
 				$(this).attr('disabled',true);
 			})
@@ -746,12 +795,10 @@
 				$(this).attr('disabled',true);
 			})
 
-			$("#pageInput select").each(function(){
+			$("#pageInput select:not(#Year)").each(function(){
 				$(this).attr('readonly',true);
 				$(this).attr('disabled',true);
 			})
 		}
-
-		
 	}
 </script>

@@ -18,7 +18,6 @@ class C_dashboard extends Globalclass {
     {
         $data['department'] = parent::__getDepartement();
         $dpt = $this->session->userdata('IDdepartementNavigation');
-        // print_r(APPPATH.'views/page/'.$data['department'].'/dashboard.php');die();
         if (file_exists(APPPATH.'views/page/'.$data['department'].'/dashboard.php')) {
             switch ($dpt) {
                 case 10: // admission
@@ -29,7 +28,73 @@ class C_dashboard extends Globalclass {
                     $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
                     $this->temp($content);
                     break;
-                
+                case 15: // Admin Prodi
+                    // check session admin prodi
+                    $this->load->model('prodi/m_prodi');
+                    if ($this->session->userdata('prodi_get')) {
+                        // check multiple akses
+                        if (count($this->session->userdata('prodi_get')) > 1) {
+                            if (empty($_POST)) {
+                                $content = $this->load->view('global/switch_prodi',$data,true);
+                                $this->temp($content);
+                            }
+                            else
+                            {
+                                $prodi_active_id =  $this->input->post('Prodi');
+                                $get = $this->m_master->caribasedprimary('db_academic.program_study','ID',$prodi_active_id);
+                                $this->session->set_userdata('prodi_active',$get[0]['Name']);
+                                $this->session->set_userdata('prodi_active_id',$get[0]['ID']);
+                                $data['NameProdi'] = $get[0]['Name'];
+                                $data['NameProdi'] = strtolower($data['NameProdi'] );
+                                $data['NameProdi']  = str_replace(" ", "-", $data['NameProdi'] );
+                                if (file_exists(APPPATH.'views/page/'.$data['department'].'/'.$data['NameProdi'].'/dashboard.php')) {
+                                    $content = $this->load->view('page/'.$data['department'].'/'.$data['NameProdi'].'/dashboard',$data,true);
+                                }
+                                else
+                                {
+                                    $content = $this->load->view('dashboard/dashboard',$data,true);
+                                }
+                                $this->temp($content);
+                            }    
+                        }
+                        else
+                        {
+                            $data['NameProdi'] = $this->session->userdata('prodi_active');
+                            if (file_exists(APPPATH.'views/page/'.$data['department'].'/'.$data['NameProdi'].'/dashboard.php')) {
+                                $content = $this->load->view('page/'.$data['department'].'/'.$data['NameProdi'].'/dashboard',$data,true);
+                            }
+                            else
+                            {
+                                $content = $this->load->view('dashboard/dashboard',$data,true);
+                            }
+                            $this->temp($content);
+                        }
+                        
+                    }
+                    else
+                    {
+                        $this->m_prodi->auth(); // get session
+                        // check multiple akses
+                        if (count($this->session->userdata('prodi_get')) > 1) {
+                            $content = $this->load->view('global/switch_prodi',$data,true);
+                            $this->temp($content);
+                        }
+                        else
+                        {
+                            $data['NameProdi']  = $this->session->userdata('prodi_active');
+                            if (file_exists(APPPATH.'views/page/'.$data['department'].'/'.$data['NameProdi'].'/dashboard.php')) {
+                                $content = $this->load->view('page/'.$data['department'].'/'.$data['NameProdi'].'/dashboard',$data,true);
+                            }
+                            else
+                            {
+                                $content = $this->load->view('dashboard/dashboard',$data,true);
+                            }
+                            
+                            $this->temp($content);
+                        }
+                    }
+                    break;
+
                 default:
                     $getSemester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
                     $data['getSemester'] = $getSemester;

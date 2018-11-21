@@ -11,10 +11,10 @@
         </li>
         <?php if ($this->session->userdata('IDDepartementPUBudget') == 'NA.9'): ?>
         <li class="<?php if($request=='Approval'){echo "active";} ?>">
-            <a href="javascript:void(0)" class="pageAnchor" page = "Approval">Approval</a>
+            <a href="javascript:void(0)" class="pageAnchor" page = "Approval">Request Approval</a>
         </li>
         <li class="<?php if($request=='ListBudgetDepartement'){echo "active";} ?>">
-            <a href="javascript:void(0)" class="pageAnchor" page = "ListBudgetDepartement">Budget Departement Created</a>
+            <a href="javascript:void(0)" class="pageAnchor" page = "ListBudgetDepartement">Budget Approved</a>
         </li>
         <?php endif ?>
         <li class="<?php if($request=='BudgetLeft'){echo "active";} ?>">
@@ -40,6 +40,7 @@
 <script type="text/javascript">
     $(document).ready(function() {
         $("#container").attr('class','fixed-header sidebar-closed');
+        $("#sidebar").remove();
         <?php if ($request == null): ?>
             LoadPage('EntryBudget');
         <?php else: ?>

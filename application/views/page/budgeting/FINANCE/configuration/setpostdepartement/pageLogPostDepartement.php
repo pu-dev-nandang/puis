@@ -35,7 +35,7 @@
 		            '<thead>'+
 		            '<tr>'+
 		                '<th>Code</th>'+
-		                '<th>Post Realization</th>'+
+		                '<th>Post Item</th>'+
 		                '<th>Action By</th>'+
 		                '<th>Action Time</th>'+
 		                '<th>Detail</th>'+

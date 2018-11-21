@@ -18,7 +18,7 @@
 <div class="col-xs-12" >
 	<div class="panel panel-primary">
         <div class="panel-heading clearfix">
-            <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Item Post</h4>
+            <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Post</h4>
             <div class="toolbar no-padding pull-right">
                 <span data-smt="" class="btn btn-add btn-add-master-post">
                     <i class="icon-plus"></i> Add
@@ -35,7 +35,7 @@
 <div class="col-xs-12" >
     <div class="panel panel-primary">
         <div class="panel-heading clearfix">
-            <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Realization Post</h4>
+            <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Post Item</h4>
             <div class="toolbar no-padding pull-right">
                 <span data-smt="" class="btn btn-add btn-add-realization-Post">
                     <i class="icon-plus"></i> Add
@@ -385,10 +385,10 @@ function loadTable2()
                         '<thead>'+
                         '<tr>'+
                             '<th width = "3%">No</th>'+
-                            '<th>Post Code Realization</th>'+
+                            '<th>Post Code Item</th>'+
                             '<th>Post Code & Name</th>'+
-                            '<th>Realization Name</th>'+
-                            '<th>Departement</th>'+
+                            '<th>Item Name</th>'+
+                            '<th>Department</th>'+
                             '<th>Action</th>'+
                         '</tr></thead>' 
                         ;

@@ -11,8 +11,6 @@ class C_budgeting extends Budgeting_Controler {
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('master/m_master');
-        $this->data['department'] = parent::__getDepartement(); 
     }
 
     public function index()
@@ -21,54 +19,15 @@ class C_budgeting extends Budgeting_Controler {
         $this->session->unset_userdata('menu_budgeting_sess');
         $this->session->unset_userdata('menu_budgeting_grouping');
         $this->session->unset_userdata('role_user_budgeting');
-        $IDdepartementNavigation = $this->session->userdata('IDdepartementNavigation');
-        switch ($IDdepartementNavigation) {
-            case 12: // IT
-                // print_r($IDdepartementNavigation);
-                $this->BudgetingIT();
-                break;
-            case 9: // Finance
-                // print_r($IDdepartementNavigation);
-                $this->BudgetingFinance();
-                break;   
-            case 8: // Adum
-                // print_r($IDdepartementNavigation);
-                $this->BudgetingAdum();
-                break;     
-            default:
-                # code...
-                break;
+        $MenuDepartement= ($this->data['IDdepartment'] == 12) ? 'NA.'.$this->session->userdata('IDdepartementNavigation'):'NA.'.$this->data['IDdepartment']; 
+
+        if ($this->data['IDdepartment'] == 15 || $this->data['IDdepartment'] == 14) {
+            $MenuDepartement= 'AC.'.$this->session->userdata('prodi_active_id');
         }
+        $this->getAuthSession($MenuDepartement);
+        $content = $this->load->view('page/budgeting/'.$this->data['department'].'/dashboard',$this->data,true);
+        $this->temp($content);
         
-    }
-
-    public function BudgetingIT()
-    {
-         // echo __FUNCTION__;
-        // get previleges for menu and content
-        $MenuDepartement= 'NA.'.$this->session->userdata('IDdepartementNavigation');
-        $this->getAuthSession($MenuDepartement);
-        // $content = '<pre>'.print_r($this->session->userdata('menu_budgeting_grouping')).'</pre>';
-        $content = $this->load->view('page/'.$this->data['department'].'/budgeting/dashboard',$this->data,true);
-        $this->temp($content);
-    }
-
-    public function BudgetingFinance()
-    {
-        // get previleges for menu and content
-        $MenuDepartement= 'NA.'.$this->session->userdata('IDdepartementNavigation');
-        $this->getAuthSession($MenuDepartement);
-        // $content = '<pre>'.print_r($this->session->userdata('menu_budgeting_grouping')).'</pre>';
-        $content = $this->load->view('page/'.$this->data['department'].'/budgeting/dashboard',$this->data,true);
-        $this->temp($content);
-    }
-
-    public function BudgetingAdum()
-    {
-        $MenuDepartement= 'NA.'.$this->session->userdata('IDdepartementNavigation');
-        $this->getAuthSession($MenuDepartement);
-        $content = $this->load->view('page/'.$this->data['department'].'/budgeting/dashboard',$this->data,true);
-        $this->temp($content);
     }
 
     public function configfinance($Request = null)
@@ -84,7 +43,7 @@ class C_budgeting extends Budgeting_Controler {
         if (in_array($Request, $arr_menuConfig))
           {
             $this->data['request'] = $Request;
-            $content = $this->load->view('page/'.$this->data['department'].'/budgeting/configfinance',$this->data,true);
+            $content = $this->load->view('page/budgeting/'.$this->data['department'].'/configfinance',$this->data,true);
             $this->temp($content);
           }
         else
@@ -97,7 +56,7 @@ class C_budgeting extends Budgeting_Controler {
     {
         $this->auth_ajax();
         $arr_result = array('html' => '','jsonPass' => '');
-        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/pageLoadTimePeriod',$this->data,true);
+        $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/configuration/pageLoadTimePeriod',$this->data,true);
         echo json_encode($arr_result);
     }
 
@@ -112,7 +71,7 @@ class C_budgeting extends Budgeting_Controler {
             $query=$this->db->query($sql, array($this->data['id']))->result_array();
             $this->data['getData'] = $query;
         }
-        echo $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/modalform_timeperiod',$this->data,true);
+        echo $this->load->view('page/budgeting/'.$this->data['department'].'/configuration/modalform_timeperiod',$this->data,true);
     }
 
     public function modal_pageLoadTimePeriod_save()
@@ -271,7 +230,7 @@ class C_budgeting extends Budgeting_Controler {
         $arr_result = array('html' => '','jsonPass' => '');
         $this->data['loadData'] = $this->m_master->showData_array('db_budgeting.cfg_codeprefix');
         $this->data['loadData'] = json_encode($this->data['loadData']);
-        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/pageloadCodePrefix',$this->data,true);
+        $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/configuration/pageloadCodePrefix',$this->data,true);
         echo json_encode($arr_result);
     }
 
@@ -279,7 +238,7 @@ class C_budgeting extends Budgeting_Controler {
     {
         $this->auth_ajax();
         $arr_result = array('html' => '','jsonPass' => '');
-        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/pageloadMasterPost',$this->data,true);
+        $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/configuration/pageloadMasterPost',$this->data,true);
         echo json_encode($arr_result);
     }
 
@@ -395,7 +354,7 @@ class C_budgeting extends Budgeting_Controler {
             $query=$this->db->query($sql, array($this->data['id']))->result_array();
             $this->data['getData'] = $query;
         }
-        echo $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/modalform_masterpost',$this->data,true);
+        echo $this->load->view('page/budgeting/'.$this->data['department'].'/configuration/modalform_masterpost',$this->data,true);
 
     }
 
@@ -506,7 +465,7 @@ class C_budgeting extends Budgeting_Controler {
             $query=$this->db->query($sql, array($this->data['id']))->result_array();
             $this->data['getData'] = $query;
         }
-        echo $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/modal_postrealisasi',$this->data,true);
+        echo $this->load->view('page/budgeting/'.$this->data['department'].'/configuration/modal_postrealisasi',$this->data,true);
     }
 
     public function save_postrealisasi()
@@ -620,7 +579,7 @@ class C_budgeting extends Budgeting_Controler {
     {
         $this->auth_ajax();
         $arr_result = array('html' => '','jsonPass' => '');
-        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/pageSetPostDepartement',$this->data,true);
+        $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/configuration/pageSetPostDepartement',$this->data,true);
         echo json_encode($arr_result);
     }
 
@@ -628,7 +587,7 @@ class C_budgeting extends Budgeting_Controler {
     {
         $this->auth_ajax();
         $arr_result = array('html' => '','jsonPass' => '');
-        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/setpostdepartement/pageInputsetPostDepartement',$this->data,true);
+        $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/configuration/setpostdepartement/pageInputsetPostDepartement',$this->data,true);
         echo json_encode($arr_result);
     }
 
@@ -792,7 +751,7 @@ class C_budgeting extends Budgeting_Controler {
     {
         $this->auth_ajax();
         $arr_result = array('html' => '','jsonPass' => '');
-        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/setpostdepartement/pageLogPostDepartement',$this->data,true);
+        $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/configuration/setpostdepartement/pageLogPostDepartement',$this->data,true);
         echo json_encode($arr_result);
     }
 
@@ -886,7 +845,7 @@ class C_budgeting extends Budgeting_Controler {
     {
         $this->auth_ajax();
         $arr_result = array('html' => '','jsonPass' => '');
-        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/pageLoadSetUserRole',$this->data,true);
+        $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/configuration/pageLoadSetUserRole',$this->data,true);
         echo json_encode($arr_result);
     }
 
@@ -894,7 +853,9 @@ class C_budgeting extends Budgeting_Controler {
     {
         $this->auth_ajax();
         $arr_result = array('html' => '','jsonPass' => '');
-        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/setuserrole/LoadMasterUserRoleDepartement',$this->data,true);
+        // pass check data existing
+        $this->data['dt'] = $this->m_master->showData_array('db_budgeting.cfg_set_userrole');
+        $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/configuration/setuserrole/LoadMasterUserRoleDepartement',$this->data,true);
         echo json_encode($arr_result);
     }
 
@@ -948,7 +909,7 @@ class C_budgeting extends Budgeting_Controler {
     {
         $this->auth_ajax();
         $arr_result = array('html' => '','jsonPass' => '');
-        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/configuration/setuserrole/LoadSetUserActionDepartement',$this->data,true);
+        $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/configuration/setuserrole/LoadSetUserActionDepartement',$this->data,true);
         echo json_encode($arr_result);
     }
 
@@ -1014,7 +975,6 @@ class C_budgeting extends Budgeting_Controler {
 
     public function entry_budgeting($Request = null)
     {
-        // print_r($this->session->userdata('IDDepartementPUBudget'));
         $arr = array('EntryBudget',
                     'Approval',
                     'ListBudgetDepartement',
@@ -1033,13 +993,14 @@ class C_budgeting extends Budgeting_Controler {
        
     }
 
-    public function EntryBudget()
+    public function EntryBudget($Year = null)
     {
         $this->auth_ajax();
         $arr_result = array('html' => '','jsonPass' => '');
         $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
         $arr_bulan = $this->m_master->getShowIntervalBulan($get[0]['StartPeriod'],$get[0]['EndPeriod']);
-        $Year = $get[0]['Year'];
+        $this->data['arr_Year'] = $this->m_master->showData_array('db_budgeting.cfg_dateperiod');
+        $Year = ($Year == null ) ? $get[0]['Year'] : $Year;
         $Departement = $this->session->userdata('IDDepartementPUBudget');
         $get = $this->m_budgeting->getPostDepartementForDomApproval($Year,$Departement);
         $this->data['fin'] = 0;
@@ -1062,14 +1023,15 @@ class C_budgeting extends Budgeting_Controler {
         echo json_encode($arr_result);
     }
 
-    public function getLoadApprovalBudget()
+    public function getLoadApprovalBudget($Year = null)
     {
         $Input = $this->getInputToken();
         $Departement = $Input['Departement'];
         $arr_result = array('html' => '','jsonPass' => '');
+        $this->data['arr_Year'] = $this->m_master->showData_array('db_budgeting.cfg_dateperiod');
         $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
         $arr_bulan = $this->m_master->getShowIntervalBulan($get[0]['StartPeriod'],$get[0]['EndPeriod']);
-        $Year = $get[0]['Year'];
+        $Year = ($Year == null ) ? $get[0]['Year'] : $Year;
         $get = $this->m_budgeting->getPostDepartementForDomApproval($Year,$Departement);
         $this->data['fin'] = 0;
         $DepartementSess = $this->session->userdata('IDDepartementPUBudget');
@@ -1206,7 +1168,6 @@ class C_budgeting extends Budgeting_Controler {
                     $ValueCode = $get2[$i]['CodePostBudget'];
                     $this->m_budgeting->makeCanBeDelete($tbl,$fieldCode,$ValueCode);
                 }
-
                 break;    
             default:
                 # code...
@@ -1220,7 +1181,7 @@ class C_budgeting extends Budgeting_Controler {
         $this->auth_ajax();
         $this->authFin();
         $arr_result = array('html' => '','jsonPass' => '');
-        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/budget/ListBudgetDepartement',$this->data,true);
+        $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/budget/ListBudgetDepartement',$this->data,true);
         echo json_encode($arr_result);
     }
 
@@ -1260,7 +1221,7 @@ class C_budgeting extends Budgeting_Controler {
     public function BudgetRemainingFinance()
     {
         $arr_result = array('html' => '','jsonPass' => '');
-        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/budgeting/budget/BudgetRemaining',$this->data,true);
+        $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/budget/BudgetRemaining',$this->data,true);
         echo json_encode($arr_result);
     }
 
@@ -1290,6 +1251,39 @@ class C_budgeting extends Budgeting_Controler {
         $arr_bulan = $this->m_master->getShowIntervalBulan($get[0]['StartPeriod'],$get[0]['EndPeriod']);
         $arr_result = array('data' =>$getData,'arr_bulan' => $arr_bulan);
         echo json_encode($arr_result);
+    }
+
+    public function userroledepart_submit()
+    {
+       $this->auth_ajax();
+       $Msg = '';
+       try {
+        $Input = $this->getInputToken();
+        $dataSave = array();
+        if (count($Input) > 0) {
+            $table = 'db_budgeting.cfg_set_userrole';
+            $sql = "TRUNCATE TABLE ".$table;
+            $query=$this->db->query($sql, array());
+            foreach ($Input as $key) {
+                $temp = array();
+                foreach ($key as $keya => $value) {
+                   $temp[$keya] = $value; 
+                }
+                $dataSave[] = $temp;
+            }
+            $this->db->insert_batch('db_budgeting.cfg_set_userrole', $dataSave);  
+        }
+        else
+        {
+            $Msg = 'No data action';
+        }
+
+       } catch (Exception $e) {
+            $Msg = $this->Msg['Error'];
+       }
+
+       echo json_encode($Msg);
+       
     }
 
 }

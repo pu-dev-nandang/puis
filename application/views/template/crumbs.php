@@ -10,7 +10,7 @@
     <ul id="breadcrumbs" class="breadcrumb">
         <li>
             <i class="icon-home"></i>
-            <a href="<?php echo base_url(); ?>">Dashboard</a>
+            <a href="<?php echo base_url().'dashboard'; ?>">Dashboard</a>
         </li>
         <?php for($i=1;$i<=count($segment);$i++){
             if($i!=1) { ?>
@@ -26,7 +26,7 @@
 
     <ul class="crumb-buttons">
         <li><a href="javascript:void(0);" title="">Department :
-                <span style="color:#ff1100;"><?php echo ucwords(strtolower(str_replace('-',' ',$departement))); ?>
+                <span style="color:#ff1100;" id = "wrDepartment"><?php echo ucwords(strtolower(str_replace('-',' ',$departement))); ?>
                 </span><span></span></a></li>
     </ul>
 

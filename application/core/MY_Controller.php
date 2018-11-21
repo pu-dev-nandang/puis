@@ -418,6 +418,15 @@ abstract class Budgeting_Controler extends Globalclass{
     {
         parent::__construct();
         $this->load->model('budgeting/m_budgeting');
+        $this->load->model('master/m_master');
+        $PositionMain = $this->session->userdata('PositionMain');
+        $DivisionPage = $PositionMain['Division'];
+        $this->data['department'] = ($PositionMain['IDDivision'] == 12)? $this->session->userdata('departementNavigation') : $DivisionPage;
+        $this->data['department'] = strtolower($this->data['department']);
+        $this->data['department'] = str_replace(" ", "-", $this->data['department']);
+        $this->data['IDdepartment'] = $PositionMain['IDDivision'];
+        // set session division 
+        $this->session->set_userdata('IDDepartement',$PositionMain['IDDivision']);
     }
 
     public function temp($content)
@@ -458,6 +467,9 @@ abstract class Budgeting_Controler extends Globalclass{
     public function getAuthSession($MenuDepartement)
     {
         $data = array();
+        if ($MenuDepartement == 'NA.15' || $MenuDepartement == 'NA.14') {
+            $MenuDepartement = 'AC.'.$this->session->userdata('prodi_active_id');
+        }
         $getDataMenu = $this->m_budgeting->getMenuGroupUser($this->session->userdata('NIP'),$MenuDepartement);
         $this->session->set_userdata('IDDepartementPUBudget',$MenuDepartement);
         $data_sess = array();
@@ -622,7 +634,6 @@ abstract class It_Controler extends Globalclass{
     {
         parent::__construct();
         $this->load->model('master/m_master');
-        // $this->load->model('budgeting/m_budgeting');
         // check user auth
         if (!$this->session->userdata('it_sess')) {
             $check = $this->authIT();
@@ -722,6 +733,22 @@ abstract class It_Controler extends Globalclass{
             
         }
         return $arr;
+    }
+
+}
+
+
+abstract class Prodi_Controler extends Globalclass{
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('master/m_master');
+        $this->load->model('prodi/m_prodi');
+        if (!$this->session->userdata('prodi_get')) {
+          $this->m_prodi->auth();  
+        }
+        
     }
 
 }
