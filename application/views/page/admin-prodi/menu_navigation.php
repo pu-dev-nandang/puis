@@ -2,7 +2,12 @@
     <div id="sidebar-content">
         <!--=== Navigation ===-->
         <ul id="nav">
-            <!-- list menu -->
+            <li class="<?php if($this->uri->segment(1)=='dashboard'){echo "current";} ?>">
+                <a href="<?php echo base_url('dashboard'); ?>">
+                    <i class="fa fa-tachometer"></i>
+                    Dashboard
+                </a>
+            </li>
         </ul>
         <div class="sidebar-widget align-center">
             <div class="btn-group" data-toggle="buttons" id="theme-switcher">

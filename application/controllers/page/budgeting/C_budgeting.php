@@ -20,32 +20,9 @@ class C_budgeting extends Budgeting_Controler {
         $this->session->unset_userdata('menu_budgeting_grouping');
         $this->session->unset_userdata('role_user_budgeting');
         $MenuDepartement= ($this->data['IDdepartment'] == 12) ? 'NA.'.$this->session->userdata('IDdepartementNavigation'):'NA.'.$this->data['IDdepartment']; 
-        if ($this->data['IDdepartment'] == 15 || $this->data['IDdepartment'] == 14 || $this->data['IDdepartment'] == 34) {
-            // for prodi
-            $this->data['MultiBudget'] = ($this->data['IDdepartment'] == 12)?  $this->m_master->caribasedprimary('db_academic.program_study','Status',1):array();
-            // check Prodi
-            $NIP = $this->session->userdata('NIP');
-            $a_ID = $this->m_master->caribasedprimary('db_academic.program_study','AdminID',$NIP);
-            $k_ID = $this->m_master->caribasedprimary('db_academic.program_study','KaprodiID',$NIP);
-            if (count($a_ID) > 0) {
-                if (count($a_ID) > 1) {
-                    $this->data['MultiBudget'] = $a_ID;
-                }
-                $MenuDepartement= 'AC.'.$a_ID[0]['ID'];
-            }
-            elseif (count($k_ID) > 0) {
-                if (count($k_ID) > 1) {
-                    $this->data['MultiBudget'] = $k_ID;
-                }
-                $MenuDepartement= 'AC.'.$k_ID[0]['ID'];
-            }
-            else
-            {
-                if ($this->data['IDdepartment'] != 12) {
-                   redirect(base_url().'page404');die();
-                }
-            }
-            //redirect(base_url().'page404');
+
+        if ($this->data['IDdepartment'] == 15 || $this->data['IDdepartment'] == 14) {
+            $MenuDepartement= 'AC.'.$this->session->userdata('prodi_active_id');
         }
         $this->getAuthSession($MenuDepartement);
         $content = $this->load->view('page/budgeting/'.$this->data['department'].'/dashboard',$this->data,true);
@@ -1191,7 +1168,6 @@ class C_budgeting extends Budgeting_Controler {
                     $ValueCode = $get2[$i]['CodePostBudget'];
                     $this->m_budgeting->makeCanBeDelete($tbl,$fieldCode,$ValueCode);
                 }
-
                 break;    
             default:
                 # code...

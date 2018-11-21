@@ -467,6 +467,9 @@ abstract class Budgeting_Controler extends Globalclass{
     public function getAuthSession($MenuDepartement)
     {
         $data = array();
+        if ($MenuDepartement == 'NA.15' || $MenuDepartement == 'NA.14') {
+            $MenuDepartement = 'AC.'.$this->session->userdata('prodi_active_id');
+        }
         $getDataMenu = $this->m_budgeting->getMenuGroupUser($this->session->userdata('NIP'),$MenuDepartement);
         $this->session->set_userdata('IDDepartementPUBudget',$MenuDepartement);
         $data_sess = array();
@@ -730,6 +733,22 @@ abstract class It_Controler extends Globalclass{
             
         }
         return $arr;
+    }
+
+}
+
+
+abstract class Prodi_Controler extends Globalclass{
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('master/m_master');
+        $this->load->model('prodi/m_prodi');
+        if (!$this->session->userdata('prodi_get')) {
+          $this->m_prodi->auth();  
+        }
+        
     }
 
 }

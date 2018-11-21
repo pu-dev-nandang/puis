@@ -1285,7 +1285,7 @@
         return value && typeof value === 'object' && value.constructor === Object;
     }
 
-    function FormSubmitAuto(action, method, values) {
+    function FormSubmitAuto(action, method, values,blank = '_blank') {
         var form = $('<form/>', {
             action: action,
             method: method
@@ -1297,7 +1297,7 @@
                 value: this.value
             }));    
         });
-        form.attr('target', '_blank');
+        form.attr('target', blank);
         form.appendTo('body').submit();
     }
 
