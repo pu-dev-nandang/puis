@@ -1105,7 +1105,6 @@ $route['it/saveRuleService'] = 'page/it/c_rule_service/saveRuleService';
 $route['it/saveRuleUser'] = 'page/it/c_rule_service/saveRuleUser';
 
 // end it
-
 $route['ApiServerToServer'] = 'c_login/ApiServerToServer';
 $route['importFormulirManual'] = 'page/admission/c_admission/importFormulirManual';
 $route['ImportupdateNoKwitansi'] = 'page/admission/c_admission/ImportupdateNoKwitansi';
@@ -1114,3 +1113,7 @@ $route['ImportupdateNoKwitansi'] = 'page/admission/c_admission/ImportupdateNoKwi
 // for inject //
 $route['testadi'] = 'dashboard/c_dashboard/testadi';
 $route['testadi2'] = 'c_login/testadi2';
+
+
+// admin prodi
+$route['loginToAdminProdi'] = 'c_login/loginToAdminProdi';
