@@ -495,14 +495,10 @@
             $PositionMain = $this->session->userdata('PositionMain');
             $DivisionID = $PositionMain['IDDivision'];
          ?>
-         <?php if ($DivisionID == 15 || $DivisionID == 14): ?>
+         <?php if ($this->session->userdata('IDdepartementNavigation') == 15): ?>
              var NameDiv = "<?php echo $this->session->userdata('prodi_active') ?>";
              var aa = $("#wrDepartment").text();
              $("#wrDepartment").html(aa + ' '+NameDiv);
-         <?php else: ?>
-            var NameDiv = "<?php echo $this->session->userdata('prodi_active') ?>";
-            var aa = 'Admin Prodi';
-            $("#wrDepartment").html(aa + ' '+NameDiv);
          <?php endif ?>
     }
 </script>
