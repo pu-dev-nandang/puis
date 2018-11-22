@@ -556,4 +556,34 @@ class C_login extends CI_Controller {
       }
     }
 
+    public function loginToAdminProdi()
+    {
+      try {
+        $token = $this->input->post('token');
+        $key = "s3Cr3T-G4N";
+        $input = (array) $this->jwt->decode($token,$key);
+        if ($input['url'] != url_pas.'loginToAdminProdi') {
+          echo '{"status":"Key is wrong"}';
+        }
+        else
+        {
+          $dataUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$input['NIP']);
+          if (count($dataUser) > 0) {
+            $this->setSession($dataUser[0]['ID'],$dataUser[0]['NIP']);
+            $this->load->model('prodi/m_prodi');
+            $this->session->set_userdata('IDdepartementNavigation','15');
+            $this->session->set_userdata('departementNavigation','admin-prodi');
+            $this->m_prodi->auth(); // get session
+            redirect(base_url().'dashboard');
+          }
+        }
+
+      }
+      //catch exception
+      catch(Exception $e) {
+        // handling orang iseng
+        echo '{"status":"999","message":"jangan iseng :D"}';
+      }
+    }
+
 }
