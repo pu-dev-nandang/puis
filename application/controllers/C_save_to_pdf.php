@@ -3167,7 +3167,7 @@ class C_save_to_pdf extends CI_Controller {
     private function header_temp_transcript($pdf,$dataTempTr){
         $pdf->SetFont('dinpromedium','',6);
 
-        $pdf->Image(base_url('images/logo.png'),10,1,40);
+        $pdf->Image(base_url('images/logo.png'),10,3,35);
 
         $pdf->SetXY(100,3);
         $pdf->Cell(100,5,$dataTempTr['NoForm'],0,1,'R');
@@ -4582,7 +4582,7 @@ class C_save_to_pdf extends CI_Controller {
                 Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
 
                 The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
-                
+
                 It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using \'Content here, content here\', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for \'lorem ipsum\' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
                 ';
 
@@ -4945,12 +4945,12 @@ Phone: (021) 29200456';
             $fpdf = new Fpdf('L', 'mm', array(216, 140));
             //$fpdf = new Fpdf('P', 'mm', 'A4');
             //$fpdf = new Fpdf('P', 'mm', array(215,140));
-            
+
             //$fpdf->SetMargins(0, 0);
             //$fpdf->SetDisplayMode('real');
             $fpdf->SetAutoPageBreak(true, 0);
             $fpdf->AddPage();
-            
+
             //====================== WATERMARK ======================
             // if ($data['print'] > 2) {
             //     $fpdf->SetTextColor(209, 209, 209);
@@ -4965,7 +4965,7 @@ Phone: (021) 29200456';
             $fpdf->Cell(206, 7, 'FM-UAP/KEU-06-03', 0, 0, 'R');
 
             // End rahmat
-            
+
             //====================== HEADER ======================
             $fpdf->SetFont('Arial', 'B', 18);
             $fpdf->SetTextColor(0, 0, 0);
@@ -4976,7 +4976,7 @@ Phone: (021) 29200456';
             // $fpdf->Line(65, 12.5, 163, 12.5);
             $fpdf->SetFont('Arial', '', 12);
             $fpdf->Cell(206, 15, 'Nomor: '.$nomorWr, 0, 0, 'C');
-            
+
             // //====================== CONTENT ======================
             // if ($data['form'] == NULL) {
             //     $no_lbl = 'NIM';
@@ -4986,11 +4986,11 @@ Phone: (021) 29200456';
             //     $no_lbl = 'No Form';
             //     $no_txt = $data['form'];
             // }
-            
+
             // $fpdf->SetFont('Arial', '', 14);
             // $fpdf->Text(23, 28, 'Telah terima dari,');
             $no_lbl = 'No Form';
-            
+
             $fpdf->SetFont('Arial', '', 11);
             $fpdf->Text(23, 36, $no_lbl);
             $fpdf->Text(23, 43, 'Nama lengkap');
@@ -5000,7 +5000,7 @@ Phone: (021) 29200456';
             $fpdf->Text(23, 57, 'Jumlah');
             $fpdf->Text(23, 64, 'Cara Pembayaran');
             $fpdf->Text(23, 71, 'Terbilang');
-        
+
             $fpdf->Text(63, 36, ':');
             $fpdf->Text(63, 43, ':');
             // $fpdf->Tex63t(59, 50, ':');
@@ -5009,7 +5009,7 @@ Phone: (021) 29200456';
             $fpdf->Text(63, 57, ':');
             $fpdf->Text(63, 64, ':');
             $fpdf->Text(63, 71, ':');
-            
+
             $terbilang = $this->m_master->moneySay($input['jumlah']).'Rupiah';
             $terbilang = trim(ucwords($terbilang));
             $fpdf->Text(69, 36, $input['NoFormRef'] );
@@ -5020,10 +5020,10 @@ Phone: (021) 29200456';
             $fpdf->Text(69, 57, 'Rp '.number_format($input['jumlah'],2,',','.').',-');
             $fpdf->Text(69, 64, $input['jenis']);
             $fpdf->Text(69, 71, $terbilang);
-            
-            
-            
-            
+
+
+
+
             $fpdf->Line(69, 37, 195, 37);
             $fpdf->Line(69, 44, 195, 44);
             // $fpdf->Line(63, 51, 195, 51);
@@ -5032,7 +5032,7 @@ Phone: (021) 29200456';
             $fpdf->Line(69, 58, 195, 58);
             $fpdf->Line(69, 65, 195, 65);
             $fpdf->Line(69, 72, 195, 72);
-            
+
             //====================== FOOTER / SIGN ======================
             $printDate = $this->m_master->getIndoBulan(date('Y-m-d'));
             $fpdf->SetFont('Arial', '', 14);
@@ -5041,9 +5041,9 @@ Phone: (021) 29200456';
             $fpdf->SetXY(140, 116);
             $fpdf->SetFont('Arial', 'U', 14);
             $fpdf->Cell(60, 5, '( '.$this->session->userdata('Name').' )', 0, 0, 'C');
-            
+
             //====================== FINISH ======================
-        
+
 
         $fpdf->Output('receipt.pdf','I');
     }
