@@ -676,41 +676,6 @@
 
     $(document).on('change','#person_supportYA', function () {
         if(this.checked) {
-            // //equipment_additional = [];
-            // $('#divperson_support').remove();
-            // // get data m_equipment_additional
-            // var url = base_url_js+"api/__m_additional_personel";
-            // $.post(url,function (data_json) {
-            //   var response = data_json;
-            //   var splitBagi = 3;
-            //   var split = parseInt(response.length / splitBagi);
-            //   var sisa = response.length % splitBagi;
-              
-            //   if (sisa > 0) {
-            //         split++;
-            //   }
-            //   var getRow = 0;
-            //   var divE_additional = '<div class="col-md-6" id="divperson_support" style="width: 500px;"><strong>Choices Person Support</strong></div>';
-            //   $('#person_support').after(divE_additional);
-            //   $('#divperson_support').append('<table class="table" id ="tablechk_divperson_support">');
-            //   for (var i = 0; i < split; i++) {
-            //     if ((sisa > 0) && ((i + 1) == split) ) {
-            //                         splitBagi = sisa;    
-            //     }
-            //     $('#tablechk_divperson_support').append('<tr id = "psa'+i+'">');
-            //     for (var k = 0; k < splitBagi; k++) {
-            //         $('#psa'+i).append('<td>'+
-            //                             '<input type="checkbox" class = "chk_person_support_td" name="chk_person_support_td" value = "'+response[getRow].ID+'">&nbsp'+ response[getRow].Division+
-            //                          '</td>'
-            //                         );
-            //         getRow++;
-            //     }
-            //     $('#psa'+i).append('</tr>');
-            //   }
-            //   $('#tablechk_divperson_support').append('</table>');
-            // }).done(function () {
-            //   //loadAlamatSekolah();
-            // });
             $('#divperson_support').remove();
               var divE_additional = '<div class="col-md-6" id="divperson_support" style="width: 500px;"><strong>Input Person Support</strong></div>';
               $('#person_support').after(divE_additional);
@@ -725,7 +690,7 @@
         if(this.checked) {
             //equipment_additional = [];
             $('#divmarkom_support').remove();
-            var response = ['Video','Photo','Full Duration','Graphic Design'];
+            var response = ['Video (Working time 14 Days)','Photo (Days - 1)','Full Duration (Days - 3)','Graphic Design (Working time 7 Days)'];
             var splitBagi = 3;
             var split = parseInt(response.length / splitBagi);
             var sisa = response.length % splitBagi;
@@ -734,7 +699,7 @@
                   split++;
             }
             var getRow = 0;
-            var divE_additional = '<div class="col-md-6" id="divmarkom_support" style="width: 500px;"><strong>Choices Support by Marcomm</strong></div>';
+            var divE_additional = '<div class="col-md-6" id="divmarkom_support" style="width: 600px;"><strong>Choices Support by Marcomm</strong></div>';
             $('#markom_support').after(divE_additional);
             $('#divmarkom_support').append('<table class="table" id ="tablechk_divmarkom_support">');
             for (var i = 0; i < split; i++) {
@@ -752,7 +717,7 @@
               $('#msa'+i).append('</tr>');
             }
             $('#tablechk_divmarkom_support').append('</table>');
-            $('#divmarkom_support').append('<label><strong>Input Note</strong></label><input type = "text" class = "form-control chk_markom_support_td_add"><p style = "color : red">* Please using comma(,) as delimiter');
+            $('#divmarkom_support').append('<label><strong>Input Note</strong></label><textarea class = "form-control chk_markom_support_td_add"></textarea><p style = "color : red">* Please using comma(,) as delimiter');
         }
 
     });
