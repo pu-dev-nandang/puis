@@ -925,8 +925,8 @@ class C_save_to_pdf extends CI_Controller {
 
         $h = 4;
         $pdf->SetFont('Times','',8);
-        $pdf->Cell(296,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28 Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
-        $pdf->Cell(296,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
+        $pdf->Cell(296,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28 Tlp: 021 292 00456 Fax: 021 292 00455',0,1,'C');
+        $pdf->Cell(296,$h,'website : www.podomorouniversity.ac.id, email : admissions@podomorouniversity.ac.id',0,1,'C');
 
         $pdf->Line(10,27,296,27);
 
@@ -949,8 +949,8 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetFont('Times','',10);
         $pdf->Cell(195,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
-        $pdf->Cell(195,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
-        $pdf->Cell(195,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
+        $pdf->Cell(195,$h,'Tlp: 021 292 00456 Fax: 021 292 00455',0,1,'C');
+        $pdf->Cell(195,$h,'website : www.podomorouniversity.ac.id, email : admissions@podomorouniversity.ac.id',0,1,'C');
 
         $pdf->Line(10,35,205,35);
 
@@ -1144,13 +1144,13 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(17,$h,'',0,0);
         $pdf->Cell(135,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
 
-        $pdf->Cell(135,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,0,'C');
+        $pdf->Cell(135,$h,'Tlp: 021 292 00456 Fax: 021 292 00455',0,0,'C');
         $pdf->Cell(17,$h,'',0,0);
-        $pdf->Cell(135,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
+        $pdf->Cell(135,$h,'Tlp: 021 292 00456 Fax: 021 292 00455',0,1,'C');
 
-        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,0,'C');
+        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id, email : admissions@podomorouniversity.ac.id',0,0,'C');
         $pdf->Cell(17,$h,'',0,0);
-        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
+        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id, email : admissions@podomorouniversity.ac.id',0,1,'C');
 
         $pdf->Line(3,33,143,33);
         $pdf->Line(155,33,295,33);
@@ -1329,8 +1329,8 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetFont('Times','',10);
         $pdf->Cell(195,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
-        $pdf->Cell(195,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
-        $pdf->Cell(195,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
+        $pdf->Cell(195,$h,'Tlp: 021 292 00456 Fax: 021 292 00455',0,1,'C');
+        $pdf->Cell(195,$h,'website : www.podomorouniversity.ac.id, email : admissions@podomorouniversity.ac.id',0,1,'C');
 
         $pdf->Line(10,35,205,35);
 
@@ -1580,8 +1580,8 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetFont('Times','',10);
         $pdf->Cell(282,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
-        $pdf->Cell(282,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
-        $pdf->Cell(282,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
+        $pdf->Cell(282,$h,'Tlp: 021 292 00456 Fax: 021 292 00455',0,1,'C');
+        $pdf->Cell(282,$h,'website : www.podomorouniversity.ac.id, email : admissions@podomorouniversity.ac.id',0,1,'C');
 
         $pdf->Line(10,25,292,25);
 
@@ -1633,8 +1633,8 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetFont('Times','',10);
         $pdf->Cell(205,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
-        $pdf->Cell(205,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
-        $pdf->Cell(205,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
+        $pdf->Cell(205,$h,'Tlp: 021 292 00456 Fax: 021 292 00455',0,1,'C');
+        $pdf->Cell(205,$h,'website : www.podomorouniversity.ac.id, email : admissions@podomorouniversity.ac.id',0,1,'C');
 
         $pdf->Line(3,25,207,25);
 
@@ -1797,13 +1797,13 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(17,$h,'',0,0);
         $pdf->Cell(135,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
 
-        $pdf->Cell(135,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,0,'C');
+        $pdf->Cell(135,$h,'Tlp: 021 292 00456 Fax: 021 292 00455',0,0,'C');
         $pdf->Cell(17,$h,'',0,0);
-        $pdf->Cell(135,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
+        $pdf->Cell(135,$h,'Tlp: 021 292 00456 Fax: 021 292 00455',0,1,'C');
 
-        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,0,'C');
+        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id, email : admissions@podomorouniversity.ac.id',0,0,'C');
         $pdf->Cell(17,$h,'',0,0);
-        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
+        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id, email : admissions@podomorouniversity.ac.id',0,1,'C');
 
         $pdf->Line(3,25,143,25);
         $pdf->Line(155,25,295,25);
@@ -2233,9 +2233,9 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(35,5,'',0,0,'C');
         $pdf->Cell(150,5,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
         $pdf->Cell(35,5,'',0,0,'C');
-        $pdf->Cell(150,5,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
+        $pdf->Cell(150,5,'Tlp: 021 292 00456 Fax: 021 292 00455',0,1,'C');
         $pdf->Cell(35,5,'',0,0,'C');
-        $pdf->Cell(150,5,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
+        $pdf->Cell(150,5,'website : www.podomorouniversity.ac.id, email : admissions@podomorouniversity.ac.id',0,1,'C');
 
         $pdf->Cell(185,7,'',0,1);
         $pdf->Cell(185,0.3,'',1,1);
@@ -2275,13 +2275,13 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(17,$h,'',0,0);
         $pdf->Cell(135,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
 
-        $pdf->Cell(135,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,0,'C');
+        $pdf->Cell(135,$h,'Tlp: 021 292 00456 Fax: 021 292 00455',0,0,'C');
         $pdf->Cell(17,$h,'',0,0);
-        $pdf->Cell(135,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
+        $pdf->Cell(135,$h,'Tlp: 021 292 00456 Fax: 021 292 00455',0,1,'C');
 
-        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,0,'C');
+        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id, email : admissions@podomorouniversity.ac.id',0,0,'C');
         $pdf->Cell(17,$h,'',0,0);
-        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
+        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id, email : admissions@podomorouniversity.ac.id',0,1,'C');
 
         $pdf->Line(3,27,143,27);
         $pdf->Line(155,27,295,27);
@@ -2572,13 +2572,13 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(17,$h,'',0,0);
         $pdf->Cell(135,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
 
-        $pdf->Cell(135,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,0,'C');
+        $pdf->Cell(135,$h,'Tlp: 021 292 00456 Fax: 021 292 00455',0,0,'C');
         $pdf->Cell(17,$h,'',0,0);
-        $pdf->Cell(135,$h,'Tel: 021 292 00456 Fax: 021 292 00455',0,1,'C');
+        $pdf->Cell(135,$h,'Tlp: 021 292 00456 Fax: 021 292 00455',0,1,'C');
 
-        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,0,'C');
+        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id, email : admissions@podomorouniversity.ac.id',0,0,'C');
         $pdf->Cell(17,$h,'',0,0);
-        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id email : admissions@podomorouniversity.ac.id',0,1,'C');
+        $pdf->Cell(135,$h,'website : www.podomorouniversity.ac.id, email : admissions@podomorouniversity.ac.id',0,1,'C');
 
         $pdf->Line(3,27,143,27);
         $pdf->Line(155,27,295,27);
