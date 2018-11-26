@@ -2333,6 +2333,9 @@ class C_save_to_excel extends CI_Controller
         $excel2->setActiveSheetIndex(0);
 
         $excel3 = $excel2->getActiveSheet();
+        // write date export 
+        $DatePrint = date('d M Y', strtotime($GetDateNow));
+        $excel3->setCellValue('A2', 'Tanggal : '.$DatePrint);
         $excel3->setCellValue('A3', 'Data Mahasiswa Angkatan '.$input['Year']);
 
         // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
