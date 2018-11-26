@@ -918,6 +918,8 @@ $route['vreservation/config/policy/submit'] = 'page/vreservation/c_config/policy
 $route['approve_venue/(:any)'] = 'api/c_global/approve_venue/$1';
 $route['cancel_venue/(:any)'] = 'api/c_global/cancel_venue/$1';
 $route['submitcancelvenue'] = 'api/c_global/submitcancelvenue';
+$route['approve_venue_markom/(:any)'] = 'api/c_global/approve_venue_markom/$1';
+$route['cancel_venue_markom/(:any)'] = 'api/c_global/cancel_venue_markom/$1';
 
 
 // test

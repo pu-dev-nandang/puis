@@ -369,7 +369,7 @@
                   // Graphic Design
                   var bool = 0;
                   for (var x = 0; x < aa.length; x++) {
-                    if (aa[x] == 'Graphic Design') {bool = 1; break;}
+                    if (aa[x] == 'Graphic Design (Working time 7 Days)') {bool = 1; break;}
                   }
                   if (bool == 1) {
                     // try{
@@ -717,12 +717,12 @@
               $('#msa'+i).append('</tr>');
             }
             $('#tablechk_divmarkom_support').append('</table>');
-            $('#divmarkom_support').append('<label><strong>Input Note</strong></label><textarea class = "form-control chk_markom_support_td_add"></textarea><p style = "color : red">* Please using comma(,) as delimiter');
+            $('#divmarkom_support').append('<label><strong>Input Note</strong></label><textarea class = "form-control chk_markom_support_td_add"></textarea>');
         }
 
     });
 
-    $(document).on('change','.chk_markom_support_td[value="Graphic Design"]', function () {
+    $(document).on('change','.chk_markom_support_td[value="Graphic Design (Working time 7 Days)"]', function () {
         if(this.checked) {
            // console.log('Graphic Design');
            var divE_Upload = '<div class="col-md-6" id="divmarkom_supportUpload" style="width: 500px;"><strong>Upload File</strong>';
