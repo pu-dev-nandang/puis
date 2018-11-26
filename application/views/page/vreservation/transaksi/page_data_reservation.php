@@ -254,6 +254,24 @@
                  }
                  else
                  {
+
+                  if (DivisionID == 17) {
+                    if (response[i]['ApproveAccess'] == 0) {
+                      btn += '<div class = "row" style = "margin-left : 0px;margin-right : 0px">'+
+                                '<span class="btn btn-primary btn-xs btn-edit" idtbooking ="'+response[i]['ID']+'" ApproveAccess = "'+response[i]['ApproveAccess']+'">'+
+                                                                    '<i class="fa fa-pencil-square-o"></i> Approve'+
+                                                                   '</span>'+
+                              '</div>'                                     
+                            ;
+                      btn += '<div class = "row" style = "margin-top : 5px;margin-left : 0px;margin-right : 0px">'+
+                                '<span class="btn btn-danger btn-xs btn-delete" idtbooking ="'+response[i]['ID']+'" >'+
+                                            '<i class="fa fa-times"></i> Cancel'+
+                                           '</span>'+
+                              '</div>';
+                    }
+                  }
+                  
+
                   if (response[i]['ApproveAccess'] == 2 || response[i]['ApproveAccess'] == 4) {
                     btn += '<div class = "row" style = "margin-left : 0px;margin-right : 0px">'+
                               '<span class="btn btn-primary btn-xs btn-edit" idtbooking ="'+response[i]['ID']+'" ApproveAccess = "'+response[i]['ApproveAccess']+'">'+

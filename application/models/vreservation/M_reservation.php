@@ -962,7 +962,12 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             // cek ApproveAccess
             $Status1 = $query[$i]['Status1'];
             $Status = $query[$i]['Status'];
-                $ApproveAccess = function($getRoom,$Status1,$Status,$CreatedBy){
+            $MarcommStatus = $query[$i]['MarcommStatus'];
+                $ApproveAccess = function($getRoom,$Status1,$Status,$CreatedBy,$MarcommStatus){
+                    if ($MarcommStatus == 1) {
+                        return $find = 0;
+                    }
+
                     $PositionMain = $this->session->userdata('PositionMain');
                     $IDDivision = $PositionMain['IDDivision'];
                     $Position = $PositionMain['IDPosition'];
@@ -1103,9 +1108,11 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 };
 
                 $StatusBooking = '';
-                $CaseApproveAccess = $ApproveAccess($getRoom,$Status1,$Status,$query[$i]['CreatedBy']);
+                $CaseApproveAccess = $ApproveAccess($getRoom,$Status1,$Status,$query[$i]['CreatedBy'],$MarcommStatus);
                 switch ($CaseApproveAccess) {
                     case 0:
+                         $StatusBooking = 'Awaiting approval Marcomm Division';
+                         break;
                     case 1:
                     case 2:
                         $StatusBooking = 'Awaiting approval 1';
@@ -1190,8 +1197,17 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     }
                     else
                     {
-                        if ($CaseApproveAccess == 2 || $CaseApproveAccess == 4) {
-                            $btnMarkomSupport = '<button class = "btn btn-danger btnMarkomSupport btn-xs" MarcommSupport = "'.$dd[$zx].'" ><i class="fa fa-times"></i> </button>';
+                        // if ($CaseApproveAccess == 2 || $CaseApproveAccess == 4) {
+                        //     $btnMarkomSupport = '<button class = "btn btn-danger btnMarkomSupport btn-xs" MarcommSupport = "'.$dd[$zx].'" ><i class="fa fa-times"></i> </button>';
+                        // }
+
+                        if ($CaseApproveAccess == 0) {
+                            $PositionMain = $this->session->userdata('PositionMain');
+                            $IDDivision = $PositionMain['IDDivision'];
+                            if ($IDDivision == 17) {
+                                 $btnMarkomSupport = '<button class = "btn btn-danger btnMarkomSupport btn-xs" MarcommSupport = "'.$dd[$zx].'" ><i class="fa fa-times"></i> </button>';
+                            } 
+                            
                         }
                     }
 
@@ -1212,12 +1228,15 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                          $MarkomSupport .= '</ul></li>';
                     } 
                     else{
+                        if (strpos($dd[$zx], 'Note') !== false) {
+                            $pos = strpos($dd[$zx],':');
+                            $dd[$zx] = substr($dd[$zx], 0,$pos+1).'<br>'.substr($dd[$zx], $pos+1,strlen($dd[$zx]));
+                        }
                       $MarkomSupport .= '<li>'.$dd[$zx].'&nbsp'.$btnMarkomSupport.'</li>';  
                     }
                     
                 }
                 $MarkomSupport .= '</ul>';
-
             }
 
             $KetAdditional = $query[$i]['KetAdditional'];
