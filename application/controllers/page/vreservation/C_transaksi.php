@@ -11,8 +11,6 @@ class C_transaksi extends Vreservation_Controler {
         $this->load->model('m_sendemail');
         $this->load->model('m_api');
         $this->load->library('JWT');
-        // $this->load->model('master/m_master');
-        // $this->load->model('vreservation/m_reservation');
     }
 
 
@@ -132,7 +130,7 @@ class C_transaksi extends Vreservation_Controler {
                 $s = $input['chk_markom_support'];
                 for ($x=0; $x < count($s); $x++) { 
                     if ($x == 0 ) {
-                        if ($s[$x] == 'Graphic Design') {
+                        if (strpos($s[$x], 'Graphic Design') !== false) {
                             $chk_markom_support = $s[$x].'['.$filenamemarkomm.']'; 
                         }
                         else
@@ -143,7 +141,7 @@ class C_transaksi extends Vreservation_Controler {
                     }
                     elseif($x == (count($s) - 1))
                     {
-                        if ($s[$x] == 'Graphic Design') {
+                        if (strpos($s[$x], 'Graphic Design') !== false) {
                             $chk_markom_support = $chk_markom_support.','.$s[$x].'['.$filenamemarkomm.']'; 
                         }
                         else
@@ -153,7 +151,7 @@ class C_transaksi extends Vreservation_Controler {
                     }
                     else
                     {
-                        if ($s[$x] == 'Graphic Design') {
+                        if (strpos($s[$x], 'Graphic Design') !== false) {
                             $chk_markom_support = $chk_markom_support.','.$s[$x].'['.$filenamemarkomm.']'; 
                         }
                         else
@@ -166,6 +164,8 @@ class C_transaksi extends Vreservation_Controler {
         }
 
         $KetAdditional = $input['KetAdditional'];
+        $chk_markom_support = trim(nl2br($chk_markom_support)); // for text area
+
         // check data bentrok dengan jam lain
         $chk = $this->m_reservation->checkBentrok($Start,$End,'',$input['Room']);
         if ($chk) {
@@ -183,6 +183,7 @@ class C_transaksi extends Vreservation_Controler {
                 'Req_layout' => $filename,
                 'ParticipantQty' => $input['Participant'],
                 'MarcommSupport' => $chk_markom_support,
+                'MarcommStatus' => ($chk_markom_support == '') ? 0 : 1, 
                 'KetAdditional' => json_encode($KetAdditional),
             );
             $this->db->insert('db_reservation.t_booking', $dataSave);
@@ -207,264 +208,328 @@ class C_transaksi extends Vreservation_Controler {
                     }  
                 }
             }
-            // define for email
-            $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $Start);
-            $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $End);
-            $StartNameDay = $Startdatetime->format('l');
-            $EndNameDay = $Enddatetime->format('l');
 
-            $MarkomEmail ='';
-            if (is_array($input['chk_markom_support'])) {
-                $ss = implode(',', $input['chk_markom_support']);
-                $MarkomEmail = '<li>Documentation  : '.$ss.'</li>';
-            }
+            // Start define for email
+                $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $Start);
+                $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $End);
+                $StartNameDay = $Startdatetime->format('l');
+                $EndNameDay = $Enddatetime->format('l');
 
-            // email to approval 1
-                $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','Room',$input['Room']);
-                $CategoryRoomByRoom = $getRoom[0]['ID_CategoryRoom'];
-                $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
-                $Approver1 = $getDataCategoryRoom[0]['Approver1'];
-                $Approver1 = json_decode($Approver1);
-                // get user type
-                $ID_group_user = $this->session->userdata('ID_group_user');
-                $dataApprover = array();
-                for ($l=0; $l < count($Approver1); $l++) {
-                    // find by ID_group_user
-                        if ($ID_group_user == $Approver1[$l]->UserType) {
-                            // get TypeApprover
-                            $TypeApprover = $Approver1[$l]->TypeApprover;
-                            switch ($TypeApprover) {
-                                case 'Position':
-                                    // get Division to access position approval
-                                        $PositionMain = $this->session->userdata('PositionMain');
-                                        $IDDivision = $PositionMain['IDDivision'];
-                                        $IDPositionApprover = $Approver1[$l]->Approver; 
-                                        if ($IDDivision == 15) { // if prodi
-                                            // find prodi
-                                            $gg = $this->m_master->caribasedprimary('db_academic.program_study','AdminID',$this->session->userdata('NIP'));
-                                            if (count($gg) > 0) {
-                                                for ($k=0; $k < count($gg); $k++) { 
-                                                    $Kaprodi = $gg[$k]['KaprodiID'];
-                                                    $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Kaprodi);
-                                                    for ($m=0; $m < count($getApprover1); $m++) { 
-                                                        if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
-                                                             $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name'],'Code' => $Kaprodi,'TypeApprover' => $TypeApprover);
+                $MarkomEmail ='';
+                if (is_array($input['chk_markom_support'])) {
+                    $ss = $input['chk_markom_support'];
+                    $MarkomEmail ='<li>Documentation<ul>';
+                    for ($z=0; $z < count($ss); $z++) {
+                        $ss[$z] = trim(nl2br($ss[$z])); 
+                        $MarkomEmail .='<li>'.$ss[$z].'</li>';
+                    }
+                    $MarkomEmail .= '</ul></li>';
+                }
+
+                // if markom support yes, then markom support as approver 1
+                    if ($MarkomEmail == '')
+                    {
+                        // email to approval 1
+                            $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','Room',$input['Room']);
+                            $CategoryRoomByRoom = $getRoom[0]['ID_CategoryRoom'];
+                            $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
+                            $Approver1 = $getDataCategoryRoom[0]['Approver1'];
+                            $Approver1 = json_decode($Approver1);
+                            // get user type
+                            $ID_group_user = $this->session->userdata('ID_group_user');
+                            $dataApprover = array();
+                            for ($l=0; $l < count($Approver1); $l++) {
+                                // find by ID_group_user
+                                    if ($ID_group_user == $Approver1[$l]->UserType) {
+                                        // get TypeApprover
+                                        $TypeApprover = $Approver1[$l]->TypeApprover;
+                                        switch ($TypeApprover) {
+                                            case 'Position':
+                                                // get Division to access position approval
+                                                    $PositionMain = $this->session->userdata('PositionMain');
+                                                    $IDDivision = $PositionMain['IDDivision'];
+                                                    $IDPositionApprover = $Approver1[$l]->Approver; 
+                                                    if ($IDDivision == 15) { // if prodi
+                                                        // find prodi
+                                                        // $gg = $this->m_master->caribasedprimary('db_academic.program_study','AdminID',$this->session->userdata('NIP'));
+                                                        $sqlgg = 'select * from db_academic.program_study where AdminID = ? or KaprodiID = ?';
+                                                        $gg=$this->db->query($sql, array($this->session->userdata('NIP'),$this->session->userdata('NIP')))->result_array();
+                                                        if (count($gg) > 0) {
+                                                            for ($k=0; $k < count($gg); $k++) { 
+                                                                $Kaprodi = $gg[$k]['KaprodiID'];
+                                                                $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Kaprodi);
+                                                                for ($m=0; $m < count($getApprover1); $m++) { 
+                                                                    if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
+                                                                         $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name'],'Code' => $Kaprodi,'TypeApprover' => $TypeApprover);
+                                                                    }
+                                                                }
+                                                            }
+                                                            
                                                         }
                                                     }
+                                                    else
+                                                    {
+                                                        // find by division and position
+                                                        $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionMain',$IDDivision.'.'.$IDPositionApprover);
+                                                        for ($k=0; $k < count($getApprover1); $k++) {
+                                                            if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
+                                                                 $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name'],'Code' => $getApprover1[$k]['NIP'],'TypeApprover' => $TypeApprover);
+                                                            } 
+                                                           
+                                                        }
+                                                    }
+                                                break;
+                                            
+                                            case 'Division':
+                                                $getApprover1 = $this->m_master->caribasedprimary('db_employees.division','ID',$Approver1[$l]->Approver);
+                                                for ($k=0; $k < count($getApprover1); $k++) { 
+                                                   $dataApprover[] = array('Email' => $getApprover1[$k]['Email'],'Name' => $getApprover1[$k]['Division'],'Code' => $getApprover1[$k]['ID'],'TypeApprover' => $TypeApprover);
                                                 }
-                                                
-                                            }
-                                        }
-                                        else
-                                        {
-                                            // find by division and position
-                                            $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionMain',$IDDivision.'.'.$IDPositionApprover);
-                                            for ($k=0; $k < count($getApprover1); $k++) {
-                                                if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
-                                                     $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name'],'Code' => $getApprover1[$k]['NIP'],'TypeApprover' => $TypeApprover);
-                                                } 
-                                               
-                                            }
-                                        }
-                                    break;
-                                
-                                case 'Division':
-                                    $getApprover1 = $this->m_master->caribasedprimary('db_employees.division','ID',$Approver1[$l]->Approver);
-                                    for ($k=0; $k < count($getApprover1); $k++) { 
-                                       $dataApprover[] = array('Email' => $getApprover1[$k]['Email'],'Name' => $getApprover1[$k]['Division'],'Code' => $getApprover1[$k]['ID'],'TypeApprover' => $TypeApprover);
-                                    }
-                                    break;
+                                                break;
 
-                                case 'Employees':
-                                    $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','ID',$Approver1[$l]->Approver);
-                                    for ($k=0; $k < count($getApprover1); $k++) { 
-                                       $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name'],'Code' => $getApprover1[$k]['NIP'],'TypeApprover' => $TypeApprover);
+                                            case 'Employees':
+                                                $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Approver1[$l]->Approver);
+                                                for ($k=0; $k < count($getApprover1); $k++) { 
+                                                   $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name'],'Code' => $getApprover1[$k]['NIP'],'TypeApprover' => $TypeApprover);
+                                                }
+                                                break;    
+                                        }
                                     }
-                                    break;    
+                            } // end loop for
+                    
+                        if($_SERVER['SERVER_NAME']!='localhost') {
+                            // send email
+                            $EmailPU = '';
+                            $NameEmail = '';
+                            $Code = '';
+                            $TypeApproverE = '';
+                            if (count($dataApprover) > 0) {
+                                $temp = array();
+                                $temp2 = array();
+                                $temp3 = array();
+                                for ($k=0; $k < count($dataApprover); $k++) { 
+                                    $EM = $dataApprover[$k]['Email'];
+                                    $NM = $dataApprover[$k]['Name'];
+                                    $Code = $dataApprover[$k]['Code'];
+                                    $temp[] = $EM;
+                                    $temp2[] = $NM;
+                                    $temp3[] = $Code;
+                                }
+                                 
+                                $EmailPU = implode(",", $temp);
+                                $NameEmail = implode(" / ", $temp2);
+                                $Code = implode(";", $temp3);
+                            }
+                            
+                            if ($EmailPU != '' || $EmailPU != null) {
+                                $token = array(
+                                    'EmailPU' => $EmailPU,
+                                    'Code' => $Code,
+                                    'ID_t_booking' => $ID_t_booking,
+                                    'approvalNo' => 1,
+                                );
+                                $token = $this->jwt->encode($token,'UAP)(*');
+                                $Email = $EmailPU;
+                                $text = 'Dear Mr/Mrs '.$NameEmail.',<br><br>
+                                            Please help to approve Venue Reservation requested by '.$this->session->userdata('Name').',<br><br>
+                                            Details Schedule : <br><ul>
+                                            <li>Start  : '.$StartNameDay.', '.$Start.'</li>
+                                            <li>End  : '.$EndNameDay.', '.$End.'</li>
+                                            <li>Room  : '.$input['Room'].'</li>
+                                            <li>Agenda  : '.$input['Agenda'].'</li>
+                                            '.$MarkomEmail.'
+                                            </ul>
+                                            '.$EmailKetAdditional.' </br>
+                                            <table width="100" cellspacing="0" cellpadding="12" border="0">
+                                                <tbody>
+                                                <tr>
+                                                    <td bgcolor="#51a351" align="center">
+                                                        <a href="'.url_pas.'approve_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >Approve</a>
+                                                    </td>
+                                                    <td align="center">
+                                                       -
+                                                    </td>
+                                                    <td bgcolor="#de4341" align="center">
+                                                        <a href="'.url_pas.'cancel_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #de4341;" target="_blank" >Reject</a>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        ';        
+                                $to = $Email;
+                                $subject = "Podomoro University Venue Reservation Approval 1";
+                                $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+
                             }
                         }
-                } // end loop for
-            // print_r($dataApprover);die();
-            if($_SERVER['SERVER_NAME']!='localhost') {
-                // send email
-                $EmailPU = '';
-                $NameEmail = '';
-                $Code = '';
-                $TypeApproverE = '';
-                if (count($dataApprover) > 0) {
-                    $temp = array();
-                    $temp2 = array();
-                    $temp3 = array();
-                    for ($k=0; $k < count($dataApprover); $k++) { 
-                        $EM = $dataApprover[$k]['Email'];
-                        $NM = $dataApprover[$k]['Name'];
-                        $Code = $dataApprover[$k]['Code'];
-                        $temp[] = $EM;
-                        $temp2[] = $NM;
-                        $temp3[] = $Code;
+                        else
+                        {
+                            // send email
+                            $EmailPU = '';
+                            $NameEmail = '';
+                            $Code = '';
+                            if (count($dataApprover) > 0) {
+                                $temp = array();
+                                $temp2 = array();
+                                $temp3 = array();
+                                for ($k=0; $k < count($dataApprover); $k++) { 
+                                    $EM = $dataApprover[$k]['Email'];
+                                    $NM = $dataApprover[$k]['Name'];
+                                    $Code = $dataApprover[$k]['Code'];
+                                    $temp[] = $EM;
+                                    $temp2[] = $NM;
+                                    $temp3[] = $Code;
+                                }
+                                 
+                                $EmailPU = implode(",", $temp);
+                                $NameEmail = implode(" / ", $temp2);
+                                $Code = implode(";", $temp3);
+                            }
+                            
+                            if ($EmailPU != '' || $EmailPU != null) {
+                                $token = array(
+                                    'EmailPU' => $EmailPU,
+                                    'Code' => $Code,
+                                    'ID_t_booking' => $ID_t_booking,
+                                    'approvalNo' => 1,
+                                );
+                                $token = $this->jwt->encode($token,'UAP)(*');
+                                $Email = 'alhadi.rahman@podomorouniversity.ac.id';
+                                $text = 'Dear Mr/Mrs '.$NameEmail.',<br><br>
+                                            Please help to approve Venue Reservation requested by '.$this->session->userdata('Name').',<br><br>
+                                            Details Schedule : <br><ul>
+                                            <li>Start  : '.$StartNameDay.', '.$Start.'</li>
+                                            <li>End  : '.$EndNameDay.', '.$End.'</li>
+                                            <li>Room  : '.$input['Room'].'</li>
+                                            <li>Agenda  : '.$input['Agenda'].'</li>
+                                            '.$MarkomEmail.'
+                                            </ul>
+                                            '.$EmailKetAdditional.'</br>
+                                            <table width="200" cellspacing="0" cellpadding="12" border="0">
+                                                <tbody>
+                                                <tr>
+                                                    <td bgcolor="#51a351" align="center">
+                                                        <a href="'.url_pas.'approve_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >Approve</a>
+                                                    </td>
+                                                    <td align="center">
+                                                      -
+                                                    </td>
+                                                    <td bgcolor="#de4341" align="center">
+                                                        <a href="'.url_pas.'cancel_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #de4341;" target="_blank" >Reject</a>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        ';        
+                                $to = $Email;
+                                $subject = "Podomoro University Venue Reservation Approval 1";
+                                $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+
+                            }
+                        }
                     }
-                     
-                    $EmailPU = implode(",", $temp);
-                    $NameEmail = implode(" / ", $temp2);
-                    $Code = implode(";", $temp3);
-                }
-                
-                if ($EmailPU != '' || $EmailPU != null) {
-                    $token = array(
-                        'EmailPU' => $EmailPU,
-                        'Code' => $Code,
-                        'ID_t_booking' => $ID_t_booking,
-                        'approvalNo' => 1,
-                    );
-                    $token = $this->jwt->encode($token,'UAP)(*');
-                    $Email = $EmailPU;
-                    $text = 'Dear Mr/Mrs '.$NameEmail.',<br><br>
-                                Please help to approve Venue Reservation requested by '.$this->session->userdata('Name').',<br><br>
-                                Details Schedule : <br><ul>
-                                <li>Start  : '.$StartNameDay.', '.$Start.'</li>
-                                <li>End  : '.$EndNameDay.', '.$End.'</li>
-                                <li>Room  : '.$input['Room'].'</li>
-                                <li>Agenda  : '.$input['Agenda'].'</li>
-                                '.$MarkomEmail.'
-                                </ul>
-                                '.$EmailKetAdditional.' </br>
-                                <table width="100" cellspacing="0" cellpadding="12" border="0">
-                                    <tbody>
-                                    <tr>
-                                        <td bgcolor="#51a351" align="center">
-                                            <a href="'.url_pas.'approve_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >Approve</a>
-                                        </td>
-                                        <td bgcolor="#51a351" align="center">
-                                           -
-                                        </td>
-                                        <td bgcolor="#red" align="center">
-                                            <a href="'.url_pas.'cancel_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #red;" target="_blank" >Reject</a>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            ';        
-                    $to = $Email;
-                    $subject = "Podomoro University Venue Reservation Approval 1";
-                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                    else
+                    {
+                        if (array_key_exists('fileDataMarkomm',$_FILES)) {
+                            // email notification to markom
+                            $exFile =explode(';', $filenamemarkomm);
+                            $MarkomSupport = '<ul>';
+                            for ($m=0; $m < count($exFile); $m++) { 
+                                $MarkomSupport .= '<li>'.'<a href="'.base_url("fileGetAny/vreservation-".$exFile[$m]).'" target="_blank"></i>'.$exFile[$m].'</a></li>';
+                            }
+                            $MarkomSupport .= '</ul></li>';
 
-                }
-            }
-            else
-            {
-                // send email
-                $EmailPU = '';
-                $NameEmail = '';
-                $Code = '';
-                if (count($dataApprover) > 0) {
-                    $temp = array();
-                    $temp2 = array();
-                    $temp3 = array();
-                    for ($k=0; $k < count($dataApprover); $k++) { 
-                        $EM = $dataApprover[$k]['Email'];
-                        $NM = $dataApprover[$k]['Name'];
-                        $Code = $dataApprover[$k]['Code'];
-                        $temp[] = $EM;
-                        $temp2[] = $NM;
-                        $temp3[] = $Code;
-                    }
-                     
-                    $EmailPU = implode(",", $temp);
-                    $NameEmail = implode(" / ", $temp2);
-                    $Code = implode(";", $temp3);
-                }
-                
-                if ($EmailPU != '' || $EmailPU != null) {
-                    $token = array(
-                        'EmailPU' => $EmailPU,
-                        'Code' => $Code,
-                        'ID_t_booking' => $ID_t_booking,
-                        'approvalNo' => 1,
-                    );
-                    $token = $this->jwt->encode($token,'UAP)(*');
-                    $Email = 'alhadi.rahman@podomorouniversity.ac.id';
-                    $text = 'Dear Mr/Mrs '.$NameEmail.',<br><br>
-                                Please help to approve Venue Reservation requested by '.$this->session->userdata('Name').',<br><br>
-                                Details Schedule : <br><ul>
-                                <li>Start  : '.$StartNameDay.', '.$Start.'</li>
-                                <li>End  : '.$EndNameDay.', '.$End.'</li>
-                                <li>Room  : '.$input['Room'].'</li>
-                                <li>Agenda  : '.$input['Agenda'].'</li>
-                                '.$MarkomEmail.'
-                                </ul>
-                                '.$EmailKetAdditional.'</br>
-                                <table width="200" cellspacing="0" cellpadding="12" border="0">
-                                    <tbody>
-                                    <tr>
-                                        <td bgcolor="#51a351" align="center">
-                                            <a href="'.url_pas.'approve_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >Approve</a>
-                                        </td>
-                                        <td>
-                                          -
-                                        </td>
-                                        <td bgcolor="#e98180" align="center">
-                                            <a href="'.url_pas.'cancel_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #e98180;" target="_blank" >Reject</a>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            ';        
-                    $to = $Email;
-                    $subject = "Podomoro University Venue Reservation Approval 1";
-                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
-
-                }
-            }
-
-            if (array_key_exists('fileDataMarkomm',$_FILES)) {
-                // email notification to markom
-                $exFile =explode(';', $filenamemarkomm);
-                $MarkomSupport = '<ul>';
-                for ($m=0; $m < count($exFile); $m++) { 
-                    $MarkomSupport .= '<li>'.'<a href="'.base_url("fileGetAny/vreservation-".$exFile[$m]).'" target="_blank"></i>'.$exFile[$m].'</a></li>';
-                }
-                $MarkomSupport .= '</ul></li>';
-
-                if($_SERVER['SERVER_NAME']!='localhost') {
-                      $getDataDB = $this->m_master->caribasedprimary('db_reservation.email_to','Ownership','Markom');
-                      $Email = $getDataDB[0]['Email'];
-                      $text = 'Dear Team,<br><br>
-                                  Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
-                                  Details Schedule : <br><ul>
-                                  <li>Start                       : '.$StartNameDay.', '.$Start.'</li>
-                                  <li>End                         : '.$EndNameDay.', '.$End.'</li>
-                                  <li>Room                        : '.$input['Room'].'</li>
-                                  <li>Agenda                      : '.$input['Agenda'].'</li>
-                                  '.$MarkomEmail.'
-                                  <li>Documentation               : <strong>Please Click link below to download these files</strong>
-                                  '.$MarkomSupport.'
-                                  </ul>
-                                  '.$EmailKetAdditional.'
-                              ';        
-                      $to = $Email;
-                      $subject = "Podomoro University Venue Reservation Marcomm Support";
-                      $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
-                }
-                else{
-                    $Email = 'alhadi.rahman@podomorouniversity.ac.id';
-                    $text = 'Dear Team,<br><br>
-                                Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
-                                Details Schedule : <br><ul>
-                                <li>Start                       : '.$StartNameDay.', '.$Start.'</li>
-                                <li>End                         : '.$EndNameDay.', '.$End.'</li>
-                                <li>Room                        : '.$input['Room'].'</li>
-                                <li>Agenda                      : '.$input['Agenda'].'</li>
-                                '.$MarkomEmail.'
-                                <li>Graphic Design      : <strong>Please Click link below to download these files</strong>
-                                '.$MarkomSupport.'
-                                </ul>
-                                '.$EmailKetAdditional.'
-                            ';        
-                    $to = $Email;
-                    $subject = "Podomoro University Venue Reservation Marcomm Support";
-                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
-                } 
-            }
+                            if($_SERVER['SERVER_NAME']!='localhost') {
+                                  $getDataDB = $this->m_master->caribasedprimary('db_reservation.email_to','Ownership','Markom');
+                                  $Email = $getDataDB[0]['Email'];
+                                  $token = array(
+                                      'EmailPU' => $Email,
+                                      'Code' => 'Auth-Markom',
+                                      'ID_t_booking' => $ID_t_booking,
+                                      'approvalNo' => 0,
+                                      'MarkomEmail' => $MarkomEmail,
+                                      'EmailKetAdditional' => $EmailKetAdditional,
+                                  );
+                                  $token = $this->jwt->encode($token,'UAP)(*');
+                                  $text = 'Dear Team,<br><br>
+                                              Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
+                                              Details Schedule : <br><ul>
+                                              <li>Start                       : '.$StartNameDay.', '.$Start.'</li>
+                                              <li>End                         : '.$EndNameDay.', '.$End.'</li>
+                                              <li>Room                        : '.$input['Room'].'</li>
+                                              <li>Agenda                      : '.$input['Agenda'].'</li>
+                                              '.$MarkomEmail.'
+                                              <li>Documentation               : <strong>Please Click link below to download these files</strong>
+                                              '.$MarkomSupport.'
+                                              </ul>
+                                              '.$EmailKetAdditional.' </br>
+                                                <table width="100" cellspacing="0" cellpadding="12" border="0">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td bgcolor="#51a351" align="center">
+                                                            <a href="'.url_pas.'approve_venue_markom/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >Approve</a>
+                                                        </td>
+                                                        <td align="center">
+                                                           -
+                                                        </td>
+                                                        <td bgcolor="#de4341" align="center">
+                                                            <a href="'.url_pas.'cancel_venue_markom/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #de4341;" target="_blank" >Reject</a>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                          ';        
+                                  $to = $Email;
+                                  $subject = "Podomoro University Venue Reservation Marcomm Support";
+                                  $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                            }
+                            else{
+                                $Email = 'alhadi.rahman@podomorouniversity.ac.id';
+                                $token = array(
+                                    'EmailPU' => $Email,
+                                    'Code' => 'Auth-Markom',
+                                    'ID_t_booking' => $ID_t_booking,
+                                    'approvalNo' => 0,
+                                    'MarkomEmail' => $MarkomEmail,
+                                    'EmailKetAdditional' => $EmailKetAdditional,
+                                );
+                                $token = $this->jwt->encode($token,'UAP)(*');
+                                $text = 'Dear Team,<br><br>
+                                            Venue Reservation request by '.$this->session->userdata('Name').',<br><br>
+                                            Details Schedule : <br><ul>
+                                            <li>Start                       : '.$StartNameDay.', '.$Start.'</li>
+                                            <li>End                         : '.$EndNameDay.', '.$End.'</li>
+                                            <li>Room                        : '.$input['Room'].'</li>
+                                            <li>Agenda                      : '.$input['Agenda'].'</li>
+                                            '.$MarkomEmail.'
+                                            <li>Graphic Design (Working time 7 Days)      : <strong>Please Click link below to download these files</strong>
+                                            '.$MarkomSupport.'
+                                            </ul>
+                                            '.$EmailKetAdditional.' </br>
+                                            <table width="100" cellspacing="0" cellpadding="12" border="0">
+                                                <tbody>
+                                                <tr>
+                                                    <td bgcolor="#51a351" align="center">
+                                                        <a href="'.url_pas.'approve_venue_markom/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >Approve</a>
+                                                    </td>
+                                                    <td align="center">
+                                                       -
+                                                    </td>
+                                                    <td bgcolor="#de4341" align="center">
+                                                        <a href="'.url_pas.'cancel_venue_markom/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #de4341;" target="_blank" >Reject</a>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        ';        
+                                $to = $Email;
+                                $subject = "Podomoro University Venue Reservation Marcomm Support";
+                                $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                            } 
+                        }
+                    }    
+                // end
+            // end start define email        
             echo json_encode(array('msg' => 'The Proses Finish','status' => 1));
         }
         else
@@ -537,6 +602,10 @@ class C_transaksi extends Vreservation_Controler {
         $arr_status = array();
         $ApprovalWr = '';
         switch ($approveaccess) {
+            case 0:
+                $arr_status = array('MarcommStatus' => 2);
+                $ApprovalWr = ' as Marcomm Division';
+                break;
             case 2:
             case 1:
                 $arr_status = array('Status1' => 1,'ApprovedAt1' => date('Y-m-d H:i:s'),'ApprovedBy1' => $this->session->userdata('NIP') );
@@ -764,6 +833,221 @@ class C_transaksi extends Vreservation_Controler {
                     $subject = "Podomoro University Venue Reservation Approval 2";
                     $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
                 }
+            }
+            else if($approveaccess == 0) // send to approver 1
+            {
+                $ID_t_booking = $ID;
+               $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['Start']);
+               $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['End']);
+               $StartNameDay = $Startdatetime->format('l');
+               $EndNameDay = $Enddatetime->format('l');
+
+               // send email to approval 1
+                  // email to approval 1
+                        $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','Room',$get[0]['Room']);
+                        $CategoryRoomByRoom = $getRoom[0]['ID_CategoryRoom'];
+                        $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
+                        $Approver1 = $getDataCategoryRoom[0]['Approver1'];
+                        $Approver1 = json_decode($Approver1);
+                        // get user type
+                            $CreatedBy = $get[0]['CreatedBy'];
+                            $getCreatedBy = $this->m_master->caribasedprimary('db_employees.employees','NIP',$CreatedBy);
+                            $sql = 'select a.* from db_reservation.cfg_policy as a join db_reservation.cfg_group_user as b on a.ID_group_user = b.ID join db_reservation.previleges_guser as c 
+                                    on b.ID = c.G_user where c.NIP = ? limit 1';
+                            $query=$this->db->query($sql, array($CreatedBy))->result_array();
+                            
+                        $ID_group_user = $query[0]['ID_group_user'];
+                        $dataApprover = array();
+                        for ($l=0; $l < count($Approver1); $l++) {
+                            // find by ID_group_user
+                                if ($ID_group_user == $Approver1[$l]->UserType) {
+                                    // get TypeApprover
+                                    $TypeApprover = $Approver1[$l]->TypeApprover;
+                                    switch ($TypeApprover) {
+                                        case 'Position':
+                                            // get Division to access position approval
+                                                $PositionMain = $getCreatedBy[0]['PositionMain'];
+                                                $PositionMain = explode('.', $PositionMain);
+                                                $IDDivision = $PositionMain[0];
+                                                $IDPositionApprover = $Approver1[$l]->Approver; 
+                                                if ($IDDivision == 15) { // if prodi
+                                                    // find prodi
+                                                    $sqlgg = 'select * from db_academic.program_study where AdminID = ? or KaprodiID = ?';
+                                                    $gg=$this->db->query($sql, array($CreatedBy,$CreatedBy))->result_array();
+                                                    if (count($gg) > 0) {
+                                                        for ($k=0; $k < count($gg); $k++) { 
+                                                            $Kaprodi = $gg[$k]['KaprodiID'];
+                                                            $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Kaprodi);
+                                                            for ($m=0; $m < count($getApprover1); $m++) { 
+                                                                if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
+                                                                     $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name'],'Code' => $Kaprodi,'TypeApprover' => $TypeApprover);
+                                                                }
+                                                            }
+                                                        }
+                                                        
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    // find by division and position
+                                                    $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionMain',$IDDivision.'.'.$IDPositionApprover);
+                                                    for ($k=0; $k < count($getApprover1); $k++) {
+                                                        if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
+                                                             $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name'],'Code' => $getApprover1[$k]['NIP'],'TypeApprover' => $TypeApprover);
+                                                        } 
+                                                       
+                                                    }
+                                                }
+                                            break;
+                                        
+                                        case 'Division':
+                                            $getApprover1 = $this->m_master->caribasedprimary('db_employees.division','ID',$Approver1[$l]->Approver);
+                                            for ($k=0; $k < count($getApprover1); $k++) { 
+                                               $dataApprover[] = array('Email' => $getApprover1[$k]['Email'],'Name' => $getApprover1[$k]['Division'],'Code' => $getApprover1[$k]['ID'],'TypeApprover' => $TypeApprover);
+                                            }
+                                            break;
+
+                                        case 'Employees':
+                                            $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Approver1[$l]->Approver);
+                                            for ($k=0; $k < count($getApprover1); $k++) { 
+                                               $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name'],'Code' => $getApprover1[$k]['NIP'],'TypeApprover' => $TypeApprover);
+                                            }
+                                            break;    
+                                    }
+                                }
+                        } // end loop for
+                
+                        if($_SERVER['SERVER_NAME']!='localhost') {
+                            // send email
+                            $EmailPU = '';
+                            $NameEmail = '';
+                            $Code = '';
+                            $TypeApproverE = '';
+                            if (count($dataApprover) > 0) {
+                                $temp = array();
+                                $temp2 = array();
+                                $temp3 = array();
+                                for ($k=0; $k < count($dataApprover); $k++) { 
+                                    $EM = $dataApprover[$k]['Email'];
+                                    $NM = $dataApprover[$k]['Name'];
+                                    $Code = $dataApprover[$k]['Code'];
+                                    $temp[] = $EM;
+                                    $temp2[] = $NM;
+                                    $temp3[] = $Code;
+                                }
+                                 
+                                $EmailPU = implode(",", $temp);
+                                $NameEmail = implode(" / ", $temp2);
+                                $Code = implode(";", $temp3);
+                            }
+                            
+                            if ($EmailPU != '' || $EmailPU != null) {
+                                $token = array(
+                                    'EmailPU' => $EmailPU,
+                                    'Code' => $Code,
+                                    'ID_t_booking' => $ID_t_booking,
+                                    'approvalNo' => 1,
+                                );
+                                $token = $this->jwt->encode($token,'UAP)(*');
+                                $Email = $EmailPU;
+                                $text = 'Dear Mr/Mrs '.$NameEmail.',<br><br>
+                                            Please help to approve Venue Reservation requested by '.$getCreatedBy[0]['Name'].',<br><br>
+                                            Details Schedule : <br><ul>
+                                            <li>Start  : '.$StartNameDay.', '.$get[0]['Start'].'</li>
+                                            <li>End  : '.$EndNameDay.', '.$get[0]['End'].'</li>
+                                            <li>Room  : '.$get[0]['Room'].'</li>
+                                            <li>Agenda  : '.$get[0]['Agenda'].'</li>
+                                            '.$EmailAdd.'
+                                            </ul>
+                                            '.$EmailKetAdditional.' </br>
+                                            <table width="100" cellspacing="0" cellpadding="12" border="0">
+                                                <tbody>
+                                                <tr>
+                                                    <td bgcolor="#51a351" align="center">
+                                                        <a href="'.url_pas.'approve_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >Approve</a>
+                                                    </td>
+                                                    <td align="center">
+                                                       -
+                                                    </td>
+                                                    <td bgcolor="#red" align="center">
+                                                        <a href="'.url_pas.'cancel_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #red;" target="_blank" >Reject</a>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        ';        
+                                $to = $Email;
+                                $subject = "Podomoro University Venue Reservation Approval 1";
+                                $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+
+                            }
+                        }
+                        else
+                        {
+                            // send email
+                            $EmailPU = '';
+                            $NameEmail = '';
+                            $Code = '';
+                            if (count($dataApprover) > 0) {
+                                $temp = array();
+                                $temp2 = array();
+                                $temp3 = array();
+                                for ($k=0; $k < count($dataApprover); $k++) { 
+                                    $EM = $dataApprover[$k]['Email'];
+                                    $NM = $dataApprover[$k]['Name'];
+                                    $Code = $dataApprover[$k]['Code'];
+                                    $temp[] = $EM;
+                                    $temp2[] = $NM;
+                                    $temp3[] = $Code;
+                                }
+                                 
+                                $EmailPU = implode(",", $temp);
+                                $NameEmail = implode(" / ", $temp2);
+                                $Code = implode(";", $temp3);
+                            }
+                            
+                            if ($EmailPU != '' || $EmailPU != null) {
+                                $token = array(
+                                    'EmailPU' => $EmailPU,
+                                    'Code' => $Code,
+                                    'ID_t_booking' => $ID_t_booking,
+                                    'approvalNo' => 1,
+                                );
+                                $token = $this->jwt->encode($token,'UAP)(*');
+                                $Email = 'alhadi.rahman@podomorouniversity.ac.id';
+                                $text = 'Dear Mr/Mrs '.$NameEmail.',<br><br>
+                                            Please help to approve Venue Reservation requested by '.$getCreatedBy[0]['Name'].',<br><br>
+                                            Details Schedule : <br><ul>
+                                            <li>Start  : '.$StartNameDay.', '.$get[0]['Start'].'</li>
+                                            <li>End  : '.$EndNameDay.', '.$get[0]['End'].'</li>
+                                            <li>Room  : '.$get[0]['Room'].'</li>
+                                            <li>Agenda  : '.$get[0]['Agenda'].'</li>
+                                            '.$EmailAdd.'
+                                            </ul>
+                                            '.$EmailKetAdditional.' </br>
+                                            <table width="200" cellspacing="0" cellpadding="12" border="0">
+                                                <tbody>
+                                                <tr>
+                                                    <td bgcolor="#51a351" align="center">
+                                                        <a href="'.url_pas.'approve_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >Approve</a>
+                                                    </td>
+                                                    <td align="center">
+                                                      -
+                                                    </td>
+                                                    <td bgcolor="#e98180" align="center">
+                                                        <a href="'.url_pas.'cancel_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #e98180;" target="_blank" >Reject</a>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        ';        
+                                $to = $Email;
+                                $subject = "Podomoro University Venue Reservation Approval 1";
+                                $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+
+                            }
+                        }
+
             }
         }
         else
