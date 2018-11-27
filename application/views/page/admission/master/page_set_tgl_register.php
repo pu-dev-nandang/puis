@@ -27,6 +27,8 @@
 <script type="text/javascript">
     $(document).ready(function () {
         loadTable(loadData);
+        Global_CantAction('.btn-add-event');
+        Global_CantAction('.btn-delete');
     });
 
    $(document).on('click','.btn-add-event', function () {

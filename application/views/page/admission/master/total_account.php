@@ -35,6 +35,8 @@
 <script type="text/javascript">
   $(document).ready(function() {
     loadTable();
+    Global_CantAction('.btn-add-event');
+    Global_CantAction('.btn-add');
   }); // exit document Function
 
   $(document).on('click','.btn-add', function () {

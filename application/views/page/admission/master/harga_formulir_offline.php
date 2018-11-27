@@ -33,6 +33,9 @@
 <script type="text/javascript">
   $(document).ready(function() {
     loadTable();
+    Global_CantAction('.btn-add');
+    Global_CantAction('.btn-delete');
+    Global_CantAction('.btn-Active');
   }); // exit document Function
 
   $(document).on('click','.btn-add', function () {

@@ -501,4 +501,23 @@
              $("#wrDepartment").html(aa + ' '+NameDiv);
          <?php endif ?>
     }
+
+    function Global_CantAction(element)
+    {
+        // cannot delete action
+          var waitForEl = function(selector, callback) {
+            if (jQuery(selector).length) {
+              callback();
+            } else {
+              setTimeout(function() {
+                waitForEl(selector, callback);
+              }, 100);
+            }
+          };
+
+          waitForEl(element, function() {
+            $(element).remove();
+          });
+        // end cannot delete action   
+    }
 </script>

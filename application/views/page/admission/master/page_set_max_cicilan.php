@@ -1,6 +1,5 @@
 <link href="<?php echo base_url('assets/custom/jquery-ui.css'); ?>" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="<?php echo base_url();?>assets/datepicker/bootstrap-datepicker.js"></script>
-<link href="<?php echo base_url();?>assets/datepicker/datepicker.css" rel="stylesheet" type="text/css"/>
+
 <div class="row" style="margin-top: 5px;">
     <div class="col-md-12">
         <div class="widget box">
@@ -27,6 +26,9 @@
 <script type="text/javascript">
     $(document).ready(function () {
         loadTable(loadData);
+        Global_CantAction('.btn-add');
+        Global_CantAction('.btn-delete');
+        Global_CantAction('.btn-Active');
     });
 
    $(document).on('click','.btn-add', function () {
@@ -218,7 +220,7 @@
                '<th style="width: 106px;">No</th>'+
                '<th style="width: 106px;">Max Cicilan</th>'+
                '<th style="width: 106px;">Status</th>'+
-               '<th style="width: 15px;">Created</th>'+
+               // '<th style="width: 15px;">Created</th>'+
                '<th style="width: 15px;">Action</th>'+
            '</tr>'+
        '</thead>'+
@@ -256,7 +258,7 @@
                        '<td>'+no+'</td>'+
                        '<td>'+response[i]['max_cicilan']+'</td>'+
                        '<td>'+status+'</td>'+
-                       '<td>'+response[i]['CreateAT']+'</td>'+
+                       // '<td>'+response[i]['CreateAT']+'</td>'+
                        '<td><div class="btn-group">'+btn_edit+btn_status+btn_delete+'</div></td>'+
                    '</tr>' 
                    );
