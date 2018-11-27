@@ -40,7 +40,7 @@
 <script type="text/javascript">
   $(document).ready(function() {
     loadTable();
-    Global_CantAction('.btn-add-event');
+    Global_CantAction('.btn-delete');
     Global_CantAction('.btn-add');
   }); // exit document Function
 
