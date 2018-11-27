@@ -365,6 +365,7 @@ $route['admission/edit_auth_user'] = 'page/admission/c_master/edit_auth_user';
 $route['admission/add_auth_user'] = 'page/admission/c_master/add_auth_user';
 $route['admission/delete_authUser'] = 'page/admission/c_master/delete_authUser';
 $route['admission/config/getAuthDataTables'] = 'page/admission/c_master/getAuthDataTables';
+$route['admission/master/generate_formulir_global'] = 'page/admission/c_master/generate_formulir_global';
 
 
 
@@ -771,6 +772,7 @@ $route['rest/__getTableData/(:any)/(:any)'] = 'api/c_rest/getTableData/$1/$2';
 $route['rest/__rule_service'] = 'api/c_rest/rule_service';
 $route['rest/__rule_users'] = 'api/c_rest/rule_users';
 $route['rest/__getEmployees/(:any)'] = 'api/c_rest/getEmployees/$1';
+$route['rest/__loadDataFormulirGlobal'] = 'api/c_rest/loadDataFormulirGlobal';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
