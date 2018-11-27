@@ -6,17 +6,17 @@
 	        </div>
 	        <div class="panel-body">
 	           <div class = "row" style="margin-left: 0px;margin-right: 0px">
-	           		<div class="col-xs-6 col-md-offset-3">
-	           			<div class="thumbnail" style="height: 100px">
-	           				<div class="form-group">
+	           		<div class="col-md-6 col-md-offset-3">
+	           			<div class="thumbnail" style="height: 125px">
+	           				<!-- <div class="form-group"> -->
 	           					<div class="row">
-	           						<div class="col-xs-4 col-md-offset-2">
+	           						<div class="col-md-4 col-md-offset-2">
 	           						      <label>Angkatan</label>
 	           						      <select class="select2-select-00 full-width-fix" id="selectTahun">
 	           						          <option></option>
 	           						      </select>
 	           						</div>
-	           						<div class="col-xs-4" style="">
+	           						<div class="col-md-4" style="">
 	           							  <label>Status Jual</label>
 	           						      <select class="select2-select-00 full-width-fix" id="selectStatusJual">
 	           						          <option value= "%">All</option>
@@ -25,7 +25,7 @@
 	           						      </select>
 	           						</div>
 	           					</div>
-	           				</div>
+	           				<!-- </div> -->
 	           			</div>   
 	           		</div>
 	           </div>

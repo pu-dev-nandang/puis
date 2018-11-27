@@ -11,7 +11,7 @@
 			</div>
 			<div class="widget-content">
 				<div class = "row">	
-					<div class="col-xs-6" style="">
+					<div class="col-md-6" style="">
 						Pilih Program Study
 						<div id="program_study">
 						</div>
@@ -19,7 +19,7 @@
 				</div>
 				<br>
 				<div class = "row">		
-					<div class="col-xs-2" style="">
+					<div class="col-md-2" style="">
 						Waktu Ujian
 <!--						<input class="form-control" id="datetime_ujian" placeholder="All..." "="">-->
                         <div id="datetimepicker1" class="input-group input-append date">
@@ -30,15 +30,15 @@
                             </span>
                         </div>
 					</div>
-					<div class="col-xs-6" style="">
+					<div class="col-md-6" style="">
 						Lokasi
 						<textarea rows="3" cols="5" name="textarea" class="limited form-control" data-limit="150" maxlength="150" id = "Lokasi"></textarea>
 					</div>
-					<div  class="col-xs-4" align="right" id="pagination_link"></div>
+					<div  class="col-md-4" align="right" id="pagination_link"></div>
 				</div>
 				<br>
 				<div  class="row">
-					<div class="col-xs-12" align = "left">
+					<div class="col-md-12" align = "left">
 					   <button class="btn btn-inverse btn-notification btn-save" id="btn-save">Save</button>
 					</div>
 				</div>
@@ -162,7 +162,7 @@
     	            split++;
     	      }
     	      var getRow = 0;
-    	      $('#program_study').append('<table class="table" id ="tablechkProStudy">');
+    	      $('#program_study').append('<div class = "table-responsive"><table class="table" id ="tablechkProStudy">');
     	      for (var i = 0; i < split; i++) {
     	      	if ((sisa > 0) && ((i + 1) == split) ) {
     	      	                    splitBagi = sisa;    
@@ -177,7 +177,7 @@
     	      	}
     	      	$('#a'+i).append('</tr>');
     	      }
-    	      $('#tablechkProStudy').append('</table>');
+    	      $('#tablechkProStudy').append('</table></div>');
     	  }).always(function() {
     	  	loadTableJson(1);
     	  });

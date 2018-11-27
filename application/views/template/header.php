@@ -231,8 +231,6 @@
             $('#theme-switcher label:first-child').removeClass('active');
         }
 
-
-
         // $('#theme-switcher').children()[0].removeClass('active').addClass('btn-inverse');
         // $('#theme-switcher').children()[1].addClass('btn-inverse active');
         // $('.sidebar-widget #theme-switcher .btn').removeClass('active');

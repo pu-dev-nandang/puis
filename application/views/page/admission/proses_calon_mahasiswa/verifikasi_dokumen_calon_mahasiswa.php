@@ -6,28 +6,28 @@
 			</div>
 			<div class="widget-content">
 				<div class = "row">
-					<div class="col-xs-2" style="">
+					<div class="col-md-2" style="">
 						Formulir Code
 						<input class="form-control" id="FormulirCode" placeholder="All..." "="">
 					</div>	
-					<div class="col-xs-2" style="">
+					<div class="col-md-2" style="">
 						Tahun
 						<select class="select2-select-00 col-md-4 full-width-fix" id="selectTahun">
 						    <option></option>
 						</select>
 					</div>
-					<div class="col-xs-2" style="">
+					<div class="col-md-2" style="">
 						Nama
 						<input class="form-control" id="Nama" placeholder="All..." "="">
 					</div>
-					<div class="col-xs-2" style="">
+					<div class="col-md-2" style="">
 						Status
 						<select class="select2-select-00 col-md-4 full-width-fix" id="selectStatus">
 						    <option value= "Belum Done" selected>Belum Done</option>
 						    <option value= "Done">Done</option>
 						</select>
 					</div>
-					<div  class="col-xs-6" align="right" id="pagination_link"></div>	
+					<div  class="col-md-6" align="right" id="pagination_link"></div>	
 					<!-- <div class = "table-responsive" id= "register_document_table"></div> -->
 				</div>
 				<br>	

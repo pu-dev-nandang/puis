@@ -15,9 +15,9 @@
                             <li role="presentation"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee_approved/1">Tuition Fee Approved</a></li>
                         </ul>
                         <div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
-                          <div class="col-xs-6 col-md-offset-3">
+                          <div class="col-md-6 col-md-offset-3">
                             <div class="thumbnail" style="height: 80px">
-                              <div class="col-xs-6 col-md-offset-3">
+                              <div class="col-md-6 col-md-offset-3">
                                 <label>Formulir Code</label>
                                 <input type="text" name="FormulirCode" id = "FormulirCode" class="form-control" placeholder="All...">
                               </div>  
@@ -30,7 +30,7 @@
                           </div>
                         </div> 
                         <div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
-                            <div  class="col-xs-12" align="right" id="pagination_link"></div>
+                            <div  class="col-md-12" align="right" id="pagination_link"></div>
                         </div> 
                     </div>
                 </div>
@@ -466,8 +466,8 @@
 
         var aaa = '<div class = "row">'+
                 '<div class="form-group">'+
-                    '<label class="col-xs-1 control-label">Set Payment</label>'+  
-                    '<div class = "col-xs-2">'+
+                    '<label class="col-md-1 control-label">Set Payment</label>'+  
+                    '<div class = "col-md-2">'+
                        sss+
                     '</div>'+  
                 '</div>'+    
@@ -516,7 +516,7 @@
                 if (i == Val) {
                     cost_value = parseInt(get_Invoice) - parseInt(cost);
                 }
-                input += '<label class="col-xs-1 control-label">Cicilan '+i+'</label><div class="col-xs-2"><input type="text" id = "cost'+data[0]['id_formulir']+'_'+i+'" value = "'+cost_value+'" class = "form-control costInput2'+'_'+data[0]['id_formulir']+'"><br>Deadline<div id="datetimepicker'+data[0]['id_formulir']+'_'+i+'" class="input-group input-append date datetimepicker">'+
+                input += '<label class="col-md-1 control-label">Cicilan '+i+'</label><div class="col-md-2"><input type="text" id = "cost'+data[0]['id_formulir']+'_'+i+'" value = "'+cost_value+'" class = "form-control costInput2'+'_'+data[0]['id_formulir']+'"><br>Deadline<div id="datetimepicker'+data[0]['id_formulir']+'_'+i+'" class="input-group input-append date datetimepicker">'+
                             '<input data-format="yyyy-MM-dd hh:mm:ss" class="form-control" id="datetime_deadline'+data[0]['id_formulir']+'_'+i+'" type="text"></input>'+
                             '<span class="input-group-addon add-on">'+
                               '<i data-time-icon="icon-time" data-date-icon="icon-calendar">'+
@@ -531,7 +531,7 @@
            $("#pageSetCicilan"+data[0]['id_formulir']).html(input);
 
            var dataParsing = jwt_encode(data,'UAP)(*');
-           $("#pageSetCicilan"+data[0]['id_formulir']).after('<br><div class = "col-xs-12" align = "right" id="btn-div'+data[0]['id_formulir']+'"><button class="btn btn-success btn-notification btn-Save" id="btn-Save'+data[0]['id_formulir']+'" data = "'+dataParsing+'"><i class="icon-pencil icon-white"></i> Submit</button></div>');
+           $("#pageSetCicilan"+data[0]['id_formulir']).after('<br><div class = "col-md-12" align = "right" id="btn-div'+data[0]['id_formulir']+'"><button class="btn btn-success btn-notification btn-Save" id="btn-Save'+data[0]['id_formulir']+'" data = "'+dataParsing+'"><i class="icon-pencil icon-white"></i> Submit</button></div>');
 
            $('.costInput2'+'_'+data[0]['id_formulir']).maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
            $('.costInput2'+'_'+data[0]['id_formulir']).maskMoney('mask', '9894');

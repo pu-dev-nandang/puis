@@ -1747,4 +1747,9 @@ class C_master extends Admission_Controler {
         }
     }
 
+    public function globalformulir()
+    {
+        
+    }
+
 }
