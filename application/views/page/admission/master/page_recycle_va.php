@@ -46,10 +46,12 @@
                 <div id="pageData">
                     
                 </div>
-                <br>
-                <div class="col-xs-12" align = "right">
-                   <button class="btn btn-inverse btn-notification btn-recycle btn-add" id="btn-recycle">Recycle</button>
-                </div>
+                <?php if (count($datadb) > 0): ?>
+                    <br>
+                    <div class="col-xs-12" align = "right">
+                       <button class="btn btn-inverse btn-notification btn-recycle btn-add" id="btn-recycle">Recycle</button>
+                    </div>
+                <?php endif ?>
             </div>
         </div>
     </div>

@@ -10,31 +10,33 @@
 				</div>
 			</div>
 			<div class="widget-content">
-				<div class="form-horizontal">
-					<div class="form-group">
-							<div class="col-xs-2" style="">
-							    Prody
-							    <select class="select2-select-00 col-md-4 full-width-fix" id="selectProgramStudy">
-							        <option></option>
-							    </select>
+				<div class="row" style="margin-left: 5px;margin-right: 0px">
+					<div class="form-horizontal">
+						<div class="form-group">
+								<div class="col-md-2" style="">
+								    Prody
+								    <select class="select2-select-00 col-md-4 full-width-fix" id="selectProgramStudy">
+								        <option></option>
+								    </select>
+								</div>
+								<div class="col-md-2" style="">
+								    Tahun Angkatan
+								    <select class="select2-select-00 col-md-4 full-width-fix" id="selectTa">
+								        <option></option>
+								    </select>
+								</div>
+								<div class="col-md-2" style="">
+									<label class="control-label">Upload File:</label>
+									<input type="file" data-style="fileinput" id="ExFile">
+								</div>
+								<a href="<?php echo base_url('download_template/admisi-t_import_mhs.xlsm'); ?>">File Template</a>
+								<div class="col-md-1">
+									<button class="btn btn-inverse btn-notification" id="btn-proses">Proses</button>
+								</div>
+								
 							</div>
-							<div class="col-xs-2" style="">
-							    Tahun Angkatan
-							    <select class="select2-select-00 col-md-4 full-width-fix" id="selectTa">
-							        <option></option>
-							    </select>
-							</div>
-							<div class="col-xs-2" style="">
-								<label class="control-label">Upload File:</label>
-								<input type="file" data-style="fileinput" id="ExFile">
-							</div>
-							<a href="<?php echo base_url('download_template/admisi-t_import_mhs.xlsm'); ?>">File Template</a>
-							<div class="col-xs-1">
-								<button class="btn btn-inverse btn-notification" id="btn-proses">Proses</button>
-							</div>
-							
-						</div>
-					<!-- </div> -->
+						<!-- </div> -->
+					</div>
 				</div>
 			</div>
 		</div>

@@ -6,17 +6,17 @@
 			</div>
 			<div class="widget-content">
 				<div class = "row">	
-					<div class="col-xs-2" style="">
+					<div class="col-md-2" style="">
 						Angkatan
 						<select class="select2-select-00 col-md-4 full-width-fix" id="selectTahun">
 						    <option></option>
 						</select>
 					</div>
-					<div class="col-xs-2" style="">
+					<div class="col-md-2" style="">
 						Nomor Formulir
 						<input class="form-control" id="NomorFormulir" placeholder="All...">
 					</div>
-					<div class="col-xs-2" style="">
+					<div class="col-md-2" style="">
 						Status Activated by Candidate
 						<select class="select2-select-00 col-md-4 full-width-fix" id="selectStatus">
 						    <option value= "%" selected>All</option>
@@ -24,11 +24,14 @@
 						    <option value= "1">Yes</option>
 						</select>
 					</div>
-					<div  class="col-xs-4" align="right" id="pagination_link"></div>	
+					<div  class="col-md-4" align="right" id="pagination_link"></div>	
 					<!-- <div class = "table-responsive" id= "register_document_table"></div> -->
 				</div>
-				<br>	
-				<div id= "formulir_online_table"></div>
+				<div class="row" style="margin-top: 10px">
+					<div class="col-md-12">
+						<div id= "formulir_online_table"></div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div> <!-- /.col-md-6 -->

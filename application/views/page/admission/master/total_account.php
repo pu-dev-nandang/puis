@@ -23,7 +23,12 @@
             </div>
             <div class="widget-content">
                 <!--  -->
-                  <div id = "pageTotalAccount"></div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div id = "pageTotalAccount"></div>
+                  </div>
+                </div>
+                  
                 <!-- end widget -->
             </div>
             <hr/>
@@ -35,6 +40,8 @@
 <script type="text/javascript">
   $(document).ready(function() {
     loadTable();
+    Global_CantAction('.btn-add-event');
+    Global_CantAction('.btn-add');
   }); // exit document Function
 
   $(document).on('click','.btn-add', function () {

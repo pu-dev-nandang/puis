@@ -29,9 +29,9 @@
                          </div>
                          <br>
                          <div class="row">
-                            <div class="col-xs-2" style="">
+                            <div class="col-md-2" style="">
                               Angkatan
-                              <select class="select2-select-00 col-xs-2 full-width-fix" id="selectTahun">
+                              <select class="select2-select-00 col-md-2 full-width-fix" id="selectTahun">
                                   <option></option>
                               </select>
                             </div>
@@ -46,7 +46,7 @@
                             </div>
                           </div>
                         </div>    
-                        <!-- <div  class="col-xs-12" align="right" id="pagination_link"></div> -->
+                        <!-- <div  class="col-md-12" align="right" id="pagination_link"></div> -->
                     </div>
                 </div>
             </div>

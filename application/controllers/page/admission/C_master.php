@@ -1211,6 +1211,7 @@ class C_master extends Admission_Controler {
 
     public function page_recycle_va()
     {
+        $this->data['datadb'] = $this->m_master->recycleDataVa(1, 0);
         $content = $this->load->view('page/'.$this->data['department'].'/master/page_recycle_va',$this->data,true);
         $this->temp($content);
     }
@@ -1218,7 +1219,9 @@ class C_master extends Admission_Controler {
     public function loadDataVA_deleted($page)
     {
         $this->load->library('pagination');
-        $config = $this->config_pagination_default_ajax(999,18,4);
+        $sql = 'select count(*) as total from db_admission.register_deleted';
+        $query=$this->db->query($sql, array())->result_array();
+        $config = $this->config_pagination_default_ajax($query[0]['total'],18,4);
 
         $this->pagination->initialize($config);
         $page = $this->uri->segment(4);
@@ -1742,6 +1745,11 @@ class C_master extends Admission_Controler {
             
             
         }
+    }
+
+    public function globalformulir()
+    {
+        
     }
 
 }

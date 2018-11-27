@@ -12,17 +12,17 @@
 			</div>
 			<div class="widget-content">
 				<div class = "row">	
-					<div class="col-xs-3" style="">
+					<div class="col-md-3" style="">
 						PilIh Prodi
 						<select class="select2-select-00 col-md-4 full-width-fix" id="selectPrody">
 						    <option></option>
 						</select>
 					</div>
-					<!-- <div  class="col-xs-4" align="right" id="pagination_link"></div>	 -->
+					<!-- <div  class="col-md-4" align="right" id="pagination_link"></div>	 -->
 					<!-- <div class = "table-responsive" id= "register_document_table"></div> -->
 				</div>
 				<div class = 'row' style="margin-top: 10px">
-					<div  class="col-xs-12" align="right" id="pagination_link"></div>
+					<div  class="col-md-12" align="right" id="pagination_link"></div>
 				</div>
 				<div class = 'row' style="margin-top: 10px">
 					<div id='loadTableData' class="col-md-12"></div>

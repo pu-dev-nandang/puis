@@ -231,8 +231,6 @@
             $('#theme-switcher label:first-child').removeClass('active');
         }
 
-
-
         // $('#theme-switcher').children()[0].removeClass('active').addClass('btn-inverse');
         // $('#theme-switcher').children()[1].addClass('btn-inverse active');
         // $('.sidebar-widget #theme-switcher .btn').removeClass('active');
@@ -500,5 +498,24 @@
              var aa = $("#wrDepartment").text();
              $("#wrDepartment").html(aa + ' '+NameDiv);
          <?php endif ?>
+    }
+
+    function Global_CantAction(element)
+    {
+        // cannot delete action
+          var waitForEl = function(selector, callback) {
+            if (jQuery(selector).length) {
+              callback();
+            } else {
+              setTimeout(function() {
+                waitForEl(selector, callback);
+              }, 100);
+            }
+          };
+
+          waitForEl(element, function() {
+            $(element).remove();
+          });
+        // end cannot delete action   
     }
 </script>

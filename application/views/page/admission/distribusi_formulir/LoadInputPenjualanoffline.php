@@ -14,30 +14,30 @@
 	           			  <div class="panel-body">
            			  		<div class="form-group">
            			  			<div class="row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
-           			  				<div class="col-xs-2">
+           			  				<div class="col-md-2">
            			  					  <label>Formulir Code</label>
            			  				      <select class="select2-select-00 col-md-4 full-width-fix" id="selectFormulirCode">
            			  				          <option></option>
            			  				      </select>
            			  				</div>
-           			  				<div class="col-xs-2">
+           			  				<div class="col-md-2">
            			  					  <label>Program Study 1</label>
            			  				      <select class="select2-select-00 col-md-4 full-width-fix" id="selectProgramStudy">
            			  				          <option></option>
            			  				      </select>
            			  				</div>
-           			  				<div class="col-xs-2">
+           			  				<div class="col-md-2">
            			  				      <label>Program Study 2</label>
            			  				      <select class="select2-select-00 col-md-4 full-width-fix" id="selectProgramStudy2">
            			  				          <option></option>
            			  				      </select>
            			  				</div>
-           			  				<div class="col-xs-2">
+           			  				<div class="col-md-2">
            			  				      <label>Tanggal</label>
            			  				      <input type="text" name="tanggal" id= "tanggal" data-date-format="yyyy-mm-dd" placeholder="Date..." class="form-control">
            			  				</div>
-           			  				<div class="col-xs-4">
-           			  					<div class="col-xs-4">
+           			  				<div class="col-md-4">
+           			  					<div class="col-md-4">
 	           			  					<label>No Ref</label>
 	           			  					<?php if ($action == "add"): ?>
 	           			  						<div class="row">
@@ -52,7 +52,7 @@
 	           			  					</div>
 	           			  					<?php endif ?>
            			  					</div>
-           			  					<div class="col-xs-7">
+           			  					<div class="col-md-7">
            			  						<div class="row <?php echo ($action == "add") ? "hide" : "" ?>" style="margin-top: 5px; margin-left: 10px;" id = "InputRef">
            			  							<input type="text" name="No_Ref" id= "No_Ref"  class="form-control">
            			  						</div>
