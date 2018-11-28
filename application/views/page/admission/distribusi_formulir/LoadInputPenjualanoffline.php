@@ -215,7 +215,7 @@
 			    var division = <?php echo $Division ?>;
 			<?php endif ?>
             var selectTahun = '<?php echo $Ta ?>';
-            var url = base_url_js+'rest/__loadDataFormulirGlobal';
+            var url = base_url_js+'rest/__loadDataFormulirGlobal_available';
             var data = {
                 selectTahun : selectTahun,
                 auth : 's3Cr3T-G4N',
@@ -591,7 +591,8 @@
 
 			$('#btn-proses').click(function(){
 				var cf = $(".RefCode:checked").val();
-				var bool = (cf == '' || cf == null) ? false : true;
+				// var bool = (cf == '' || cf == null) ? false : true;
+				var bool = true;
 				<?php if ($action == 'edit'): ?>
 					bool = true;
 				<?php endif ?>
