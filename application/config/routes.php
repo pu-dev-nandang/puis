@@ -779,6 +779,7 @@ $route['rest/__rule_service'] = 'api/c_rest/rule_service';
 $route['rest/__rule_users'] = 'api/c_rest/rule_users';
 $route['rest/__getEmployees/(:any)'] = 'api/c_rest/getEmployees/$1';
 $route['rest/__loadDataFormulirGlobal'] = 'api/c_rest/loadDataFormulirGlobal';
+$route['rest/__loadDataFormulirGlobal_available'] = 'api/c_rest/loadDataFormulirGlobal_available';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
