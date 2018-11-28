@@ -1,81 +1,91 @@
-<legend>Pembayaran Formulir Verify By Virtual Account (VA)</legend>
-
 <div class="row">
-	<div class="col-md-3">
-	    <div class="thumbnail" style="min-height: 80px;padding: 10px;">
-	    	Angkatan
-	        <select class="select2-select-00 col-xs-2 full-width-fix" id="selectTahun">
-                  <option></option>
-            </select>
-	    </div>
-	</div>
-</div>	
-<div class="row" style="margin-top: 30px;">
-	<div class="col-md-12">
-		<div class="widget box">
-			<div class="widget-header">
-				<h4><i class="icon-reorder"></i>Belum Bayar Formulir</h4>
-				<div class="toolbar no-padding">
-					<!--<div class="btn-group">
-						<span class="btn btn-xs widget-collapse"><i class="icon-angle-down"></i></span>
-					</div>-->
-				</div>
-			</div>
-			<div class="widget-content">
-				<div id="dataBelumBayar">
-				    
-				</div>
-			</div>
-			<div id = "tblResultCSV" class = "col-md-12 hide">
-				<table class="table table-striped table-bordered table-hover table-checkable datatable2">
-					<caption><strong>Hasil Pencarian Ke File CSV</strong></caption>
-					<thead>
-						<tr>
-							<th class="checkbox-column">
-								<input type="checkbox" class="uniform" value="nothing;nothing;nothing;nothing;nothing" id ="dataResultCheckAll">
-							</th>
-							<th class="hidden-xs">Nama</th>
-							<th>Email</th>
-							<th>Price Formulir</th>
-							<th>File Upload</th>
-							<th>Sekolah</th>
-							<th>Register At</th>
-							<th>Upload At</th>
-							<th>Total Searching</th>
-						</tr>
-					</thead>
-					<tbody>
-					</tbody>
-				</table>
-			</div>
-				<div class="col-xs-12" align = "right">
-				   <button class="btn btn-inverse btn-notification hide" id="btn-confirm">Confirm</button>
-				</div>
-				<br>
-		</div>
-	</div> <!-- /.col-md-6 -->
-</div>
-<hr>
-<div class="row" style="margin-top: 30px;">
-    <div class="col-md-12">
-        <div class="widget box">
-            <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i>Telah Bayar Formulir
-                </h4>
+    <div class="col-xs-12" >
+        <div class="panel panel-primary">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Pembayaran Formulir Verify By Virtual Account (VA)</h4>
             </div>
-            <div class="widget-content">
-                <!--  -->
-                <div id="dataRegTelahBayar">
+            <div class="panel-body">
+                <div class="row">
+                	<div class="col-md-3">
+                	    <div class="thumbnail" style="min-height: 80px;padding: 10px;">
+                	    	Angkatan
+                	        <select class="select2-select-00 col-xs-2 full-width-fix" id="selectTahun">
+                                  <option></option>
+                            </select>
+                	    </div>
+                	</div>
+                </div>	
+                <div class="row" style="margin-top: 30px;">
+                	<div class="col-md-12">
+                		<div class="widget box">
+                			<div class="widget-header">
+                				<h4><i class="icon-reorder"></i>Belum Bayar Formulir</h4>
+                				<div class="toolbar no-padding">
+                					<!--<div class="btn-group">
+                						<span class="btn btn-xs widget-collapse"><i class="icon-angle-down"></i></span>
+                					</div>-->
+                				</div>
+                			</div>
+                			<div class="widget-content">
+                				<div id="dataBelumBayar">
+                				    
+                				</div>
+                			</div>
+                			<div id = "tblResultCSV" class = "col-md-12 hide">
+                				<table class="table table-striped table-bordered table-hover table-checkable datatable2">
+                					<caption><strong>Hasil Pencarian Ke File CSV</strong></caption>
+                					<thead>
+                						<tr>
+                							<th class="checkbox-column">
+                								<input type="checkbox" class="uniform" value="nothing;nothing;nothing;nothing;nothing" id ="dataResultCheckAll">
+                							</th>
+                							<th class="hidden-xs">Nama</th>
+                							<th>Email</th>
+                							<th>Price Formulir</th>
+                							<th>File Upload</th>
+                							<th>Sekolah</th>
+                							<th>Register At</th>
+                							<th>Upload At</th>
+                							<th>Total Searching</th>
+                						</tr>
+                					</thead>
+                					<tbody>
+                					</tbody>
+                				</table>
+                			</div>
+                				<div class="col-xs-12" align = "right">
+                				   <button class="btn btn-inverse btn-notification hide" id="btn-confirm">Confirm</button>
+                				</div>
+                				<br>
+                		</div>
+                	</div> <!-- /.col-md-6 -->
                 </div>
-                <!-- -->
-            </div>
-            <hr/>
-            <div id="page">
-                
+                <hr>
+                <div class="row" style="margin-top: 30px;">
+                    <div class="col-md-12">
+                        <div class="widget box">
+                            <div class="widget-header">
+                                <h4 class="header"><i class="icon-reorder"></i>Telah Bayar Formulir
+                                </h4>
+                            </div>
+                            <div class="widget-content">
+                                <!--  -->
+                                <div id="dataRegTelahBayar">
+                                </div>
+                                <!-- -->
+                            </div>
+                            <hr/>
+                            <div id="page">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>           
             </div>
         </div>
     </div>
 </div>
+
 
 <script type="text/javascript">
 	window.dataGet; // deklarasi menampus file table

@@ -1749,7 +1749,47 @@ class C_master extends Admission_Controler {
 
     public function globalformulir()
     {
-        
+        $content = $this->load->view('page/'.$this->data['department'].'/master/globalformulir',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function generate_formulir_global()
+    {
+        $input = $this->getInputToken();
+        $prefix = substr($input['Angkatan'], 2,4);
+        for ($i=$input['Start']; $i <= $input['End']; $i++) { 
+           // check length max 4
+            $code = $i;
+            $c = strlen($i);
+            for ($j=0; $j < 4-$c; $j++) { 
+                $code = '0'.$code;
+            }
+            $code = $prefix.$code;
+
+            // check data already exist in table formulir_number_global
+            $chk = $this->m_master->caribasedprimary('db_admission.formulir_number_global','FormulirCodeGlobal',$code);
+            if (count($chk) == 1) {
+                continue;
+            }
+            else
+            {
+                $arr_field = array(
+                    'FormulirCodeGlobal' => $code,
+                    'Years' => $input['Angkatan'],
+                    'Status' => 0,
+                    'Division' => $input['division'],
+                );
+                // check data already using in formulir_number_offline_m
+                  $chk2 = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','No_Ref',$code);
+                  if (count($chk2) == 1) {
+                      $arr_field['Status'] = 1;
+                  }
+
+                  $this->db->insert('db_admission.formulir_number_global', $arr_field);
+            }
+
+        }
+
     }
 
 }

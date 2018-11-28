@@ -1,26 +1,34 @@
-
-<div class="thumbnail" style="padding: 10px;">
-    <b>Status : </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Paid Off 
-</div>
-
 <div class="row">
-    <div class="col-md-12">
-        <hr/>
-        <div class="row">
-            <div class="col-xs-2" style="">
-              Angkatan
-              <select class="select2-select-00 col-xs-2 full-width-fix" id="selectTahun">
-                  <option></option>
-              </select>
+    <div class="col-xs-12" >
+        <div class="panel panel-primary">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Penerimaan Pembayaran Intake</h4>
             </div>
-        </div>  
-         <br>
-        <div id = "pageTable">
-          
+            <div class="panel-body">
+                <div class="thumbnail" style="padding: 10px;">
+                    <b>Status : </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Paid Off 
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <hr/>
+                        <div class="row">
+                            <div class="col-xs-2" style="">
+                              Angkatan
+                              <select class="select2-select-00 col-xs-2 full-width-fix" id="selectTahun">
+                                  <option></option>
+                              </select>
+                            </div>
+                        </div>  
+                         <br>
+                        <div id = "pageTable">
+                          
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-
 
 <script type="text/javascript">
     $(document).ready(function () {
@@ -62,6 +70,7 @@
                     '<thead>'+
                     '<tr style="background: #333;color: #fff;">'+
                         // '<th><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>'+
+                        '<th>No</th>'+
                         '<th>Program Study</th>'+
                         '<th>Nama & Email</th>'+
                         '<th>Formulir Number</th>'+

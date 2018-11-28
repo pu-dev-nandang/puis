@@ -4,67 +4,79 @@
     background-color: #1ace37;
   }
 </style>
-<div class="row" style="margin-top: 30px;">
-    <div class="col-md-3">
-        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM">
+<div class="row">
+    <div class="col-xs-12" >
+        <div class="panel panel-primary">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Report</h4>
+            </div>
+            <div class="panel-body">
+               <div class="row" style="margin-top: 30px;">
+                   <div class="col-md-3">
+                       <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                           <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM">
+                       </div>
+                   </div>
+               </div>
+               <br>
+               <div class="row">
+                 <div class="col-md-12" align="right">
+                   <button type="button" class="btn btn-default" id = 'idbtn-cari'><span class="glyphicon glyphicon-search"></span> Cari</button>
+                 </div>
+               </div>
+               <div class="row" style="margin-top: 10px">
+                   <div class="col-md-12">
+                       <table class="table table-bordered datatable2 hide" id = "datatable2">
+                           <thead>
+                           <tr style="background: #333;color: #fff;">
+                               <th style="width: 1%;">Choose</th>
+                               <th style="width: 12%;">Program Study</th>
+                               <!-- <th style="width: 10%;">Semester</th> -->
+                               <th style="width: 20%;">Nama,NPM &  VA</th>
+                               <!-- <th style="width: 5%;">NPM</th> -->
+                               <!-- <th style="width: 5%;">Year</th> -->
+                               <th style="width: 15%;">Payment Type</th>
+                               <th style="width: 15%;">Email PU</th>
+                               <th style="width: 15%;">IPS</th>
+                               <th style="width: 15%;">IPK</th>
+                               <th style="width: 10%;">Discount</th>
+                               <th style="width: 10%;">Invoice</th>
+                               <th style="width: 10%;">Status</th>
+                               <th style="width: 10%;">Detail Payment</th>
+                           </tr>
+                           </thead>
+                           <tbody id="dataRow"></tbody>
+                       </table>
+                       <hr>
+                       <div id = "inputCicilan" class="hide">
+                         <div class="widget box">
+                             <div class="widget-header">
+                                 <h4 class="header"><i class="icon-reorder"></i>Input Cicilan</h4>
+                             </div>
+                             <div class="widget-content">
+                                 <!--  -->
+                                  
+                                 <!-- end widget -->
+                             </div>
+                             <hr/>
+                         </div>
+                       </div>
+                   </div>
+               </div>
+            </div>
         </div>
     </div>
-</div>
-<br>
-<div class="row">
-  <div class="col-md-12" align="right">
-    <button type="button" class="btn btn-default" id = 'idbtn-cari'><span class="glyphicon glyphicon-search"></span> Cari</button>
-  </div>
 </div>
 
-<div class="row">
-    <div class="col-md-12">
-        <hr/>
-        <table class="table table-bordered datatable2 hide" id = "datatable2">
-            <thead>
-            <tr style="background: #333;color: #fff;">
-                <!-- <th style="width: 3%;"></th> -->
-                <th style="width: 12%;">Program Study</th>
-                <!-- <th style="width: 10%;">Semester</th> -->
-                <th style="width: 20%;">Nama,NPM &  VA</th>
-                <!-- <th style="width: 5%;">NPM</th> -->
-                <!-- <th style="width: 5%;">Year</th> -->
-                <th style="width: 15%;">Payment Type</th>
-                <th style="width: 15%;">Email PU</th>
-                <th style="width: 15%;">IPS</th>
-                <th style="width: 15%;">IPK</th>
-                <th style="width: 10%;">Discount</th>
-                <th style="width: 10%;">Invoice</th>
-                <th style="width: 10%;">Status</th>
-                <th style="width: 10%;">Detail Payment</th>
-            </tr>
-            </thead>
-            <tbody id="dataRow"></tbody>
-        </table>
-        <hr>
-        <div id = "inputCicilan" class="hide">
-          <div class="widget box">
-              <div class="widget-header">
-                  <h4 class="header"><i class="icon-reorder"></i>Input Cicilan</h4>
-              </div>
-              <div class="widget-content">
-                  <!--  -->
-                   
-                  <!-- end widget -->
-              </div>
-              <hr/>
-          </div>
-        </div>
-    </div>
-    
-</div>
+
+
 
 <script>
     window.dataa = '';
     window.dataaModal = '';
     window.get_Invoice = '';
     window.max_cicilan = '<?php echo $max_cicilan ?>';
+    var checkApprove = 0;
     $(document).ready(function () {
         
     });
@@ -125,10 +137,10 @@
                     for(var i=0;i<Data_mhs.length;i++){
                          var ccc = 0;
                          var yy = (Data_mhs[i]['InvoicePayment'] != '') ? formatRupiah(Data_mhs[i]['InvoicePayment']) : '-';
-                         get_Invoice = Data_mhs[i]['InvoicePayment'];
-                          var n = get_Invoice.indexOf(".");
-                         get_Invoice = get_Invoice.substring(0, n);
-                         dataa = {ID : Data_mhs[i]['PaymentID'],PTID : Data_mhs[i]['PTID'],SemesterID : Data_mhs[i]['SemesterID']};
+                         // get_Invoice = Data_mhs[i]['InvoicePayment'];
+                         //  var n = get_Invoice.indexOf(".");
+                         // get_Invoice = get_Invoice.substring(0, n);
+                         // dataa = {ID : Data_mhs[i]['PaymentID'],PTID : Data_mhs[i]['PTID'],SemesterID : Data_mhs[i]['SemesterID']};
                          // proses status
                          var status = '';
                          if(Data_mhs[i]['StatusPayment'] == 0)
@@ -183,7 +195,7 @@
                            var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
                            if (Data_mhs[i]['DetailPayment'].length == 1) { // menandakan untuk setting cicilan maka harus memiliki satu detail payment
                                $('#dataRow').append(tr +
-                                                      // '<td>'+inputCHK+'</td>' +
+                                                      '<td>'+inputCHK+'</td>' +
                                                       '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
                                                       // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
                                                       '<td>'+bintang+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
@@ -207,27 +219,28 @@
                     {
                       if(Data_mhs[0]['StatusPayment'] == 0) {// menandakan belum approve
                         if (Data_mhs[0]['DetailPayment'].length == 1) {
+                             checkApprove = 1;
                               $('#datatable2').removeClass('hide');
-                              var sss = '<select class = "full-width-fix" id = "jml_cicilan">'+
-                                                 ' <option value = "" disabled selected>--Pilih Jumlah Cicilan--</option>';
-                              for (var l = 2; l <= max_cicilan; l++) {
-                                  sss += ' <option value = "'+l+'">'+l+'</option>'
-                              }
+                              // var sss = '<select class = "full-width-fix" id = "jml_cicilan">'+
+                              //                    ' <option value = "" disabled selected>--Pilih Jumlah Cicilan--</option>';
+                              // for (var l = 2; l <= max_cicilan; l++) {
+                              //     sss += ' <option value = "'+l+'">'+l+'</option>'
+                              // }
 
-                              sss += '</select>';                   
+                              // sss += '</select>';                   
 
-                              var aaa = '<div class = "row">'+
-                                      '<div class="form-group">'+
-                                          '<label class="col-xs-1 control-label">Set Cicilan</label>'+  
-                                          '<div class = "col-xs-2">'+
-                                             sss+
-                                          '</div>'+  
-                                      '</div>'+    
-                                  '</div><br>'+
-                                  '<div class = "row" id="pageSetCicilan">'+
-                                  '</div>'
-                              $(".widget-content").html(aaa);
-                              $("#inputCicilan").removeClass('hide');
+                              // var aaa = '<div class = "row">'+
+                              //         '<div class="form-group">'+
+                              //             '<label class="col-xs-1 control-label">Set Cicilan</label>'+  
+                              //             '<div class = "col-xs-2">'+
+                              //                sss+
+                              //             '</div>'+  
+                              //         '</div>'+    
+                              //     '</div><br>'+
+                              //     '<div class = "row" id="pageSetCicilan">'+
+                              //     '</div>'
+                              // $(".widget-content").html(aaa);
+                              // $("#inputCicilan").removeClass('hide');
 
                         } 
                       }
@@ -244,6 +257,36 @@
                 $('#NotificationModal').modal('hide');
             });
     }
+
+    $(document).on('click','.uniform', function () {
+      $('input.uniform').prop('checked', false);
+      $(this).prop('checked',true);
+      var sss = '<select class = "full-width-fix" id = "jml_cicilan">'+
+                         ' <option value = "" disabled selected>--Pilih Jumlah Cicilan--</option>';
+      for (var l = 2; l <= max_cicilan; l++) {
+          sss += ' <option value = "'+l+'">'+l+'</option>'
+      }
+
+      sss += '</select>';                   
+
+      var aaa = '<div class = "row">'+
+              '<div class="form-group">'+
+                  '<label class="col-xs-1 control-label">Set Cicilan</label>'+  
+                  '<div class = "col-xs-2">'+
+                     sss+
+                  '</div>'+  
+              '</div>'+    
+          '</div><br>'+
+          '<div class = "row" id="pageSetCicilan">'+
+          '</div>'
+      $(".widget-content").html(aaa);
+      $("#inputCicilan").removeClass('hide');
+      get_Invoice = $(this).attr('invoice');
+      var n = get_Invoice.indexOf(".");
+      get_Invoice = get_Invoice.substring(0, n);
+      dataa = {ID : $(this).attr('paymentid'),PTID : $(this).attr('ptid'),SemesterID : $(this).attr('semester')};
+    });
+
 
     $(document).on('change','#jml_cicilan', function () {
         $("#btn-div").remove();

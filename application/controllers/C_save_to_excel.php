@@ -2370,7 +2370,7 @@ class C_save_to_excel extends CI_Controller
             $excel3->setCellValue('A'.$a, $no); 
             $excel3->setCellValue('B'.$a, $getData[$i]['NPM']);
             $excel3->setCellValue('C'.$a, $getData[$i]['Name']);
-            $excel3->setCellValue('D'.$a, $getData[$i]['VA']);
+            $excel3->setCellValue('D'.$a, (string)$getData[$i]['VA']);
             $excel3->setCellValue('E'.$a, $getData[$i]['ProdiEng']);
             $excel3->setCellValue('F'.$a, number_format($getData[$i]['IPS'],2,',','.'));
             $excel3->setCellValue('G'.$a, number_format($getData[$i]['IPK'],2,',','.'));

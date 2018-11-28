@@ -1,5 +1,5 @@
 <div class="row">
-	<div class="col-md-12">
+	<div class="col-xs-12">
 		<div class="widget box">
 		    <div class="widget-header">
 		        <h4 class="header"><i class="icon-reorder"></i>LAPORAN - Export to Excel</h4>
@@ -8,75 +8,78 @@
 		        <!--  -->
 		        <div class="row" style="margin-left: 0px;margin-right: 0px">
 		          	<div class="thumbnail" style="height: 250px">
-				          	<div class="col-xs-6">
-				          		<div class="form-group">
-				          			<div class="row" style="margin-top: 10px">
-				          				<div class="col-xs-4">
-				          					<label class="checkbox-inline">
-				          					     <input type="checkbox" class = "dateOP" name="dateOP" id = "dateOPRange" value = "0"> Date range
-				          					</label>
-				          				</div>
-				          				<div class="col-xs-4">
-				          					<input type="text" name="dateRange1" id= "dateRange1" data-date-format="yyyy-mm-dd" placeholder="Date Start" class="form-control" readonly="true" value="<?php echo date('Y-m-d') ?>">
-				          				</div>
-				          				<div class="col-xs-4">
-				          					<input type="text" name="dateRange2" id= "dateRange2" data-date-format="yyyy-mm-dd" placeholder="Date End" class="form-control" readonly="true" value="<?php echo date('Y-m-d') ?>">
-				          				</div>
-				          			</div>
-				          			<div class="row" style="margin-top: 10px">
-				          				<div class="col-xs-4">
-				          					<label class="checkbox-inline">
-				          					     <input type="checkbox" class = "dateOP" name="dateOP" id = "dateOPMonth" value = "1"> By Month
-				          					</label>
-				          				</div>
-				          				<div class="col-xs-4">
-				          					<select class="select2-select-00 full-width-fix" id="SelectMonth">
-		                                         <option></option>
-		                                    </select>
-				          				</div>
-				          				<div class="col-xs-4">
-				          					<select class="select2-select-00 full-width-fix" id="SelectYear">
-		                                         <option></option>
-		                                    </select>
-				          				</div>
-				          			</div>
-				          			<div class="row" style="margin-top: 10px">
-				          				<div class="col-xs-4 col-md-offset-4">
-				          					<label>Angkatan</label>
-				          					<select class="select2-select-00 full-width-fix" id="SelectSetTa">
-		                                         <option></option>
-		                                    </select>
-				          				</div>
-				          			</div>
-				          			<div class="row" style="margin-top: 10px">
-				          				<div class="col-xs-4 col-md-offset-4">
-				          					<label>Sort By</label>
-				          					<select class="select2-select-00 full-width-fix" id="SelectSortBy">
-		                                         <option value="a.No_Ref" selected>No Ref</option>
-		                                         <option value="a.FormulirCode">Form Number</option>
-		                                         <option value="b.DateSale">Date</option>
-		                                    </select>
-				          				</div>
-				          			</div>
-				          		</div>
-				          	</div>
-				          	<div class="col-xs-6">
-				          		<div class="form-group">
-				          			<div class="row" style="margin-top: 10px">
-				          				<div class="col-xs-4">
-				          					<!-- <label>Finance</label> -->
-				          				</div>
-				          			</div>
-				          			<div class="row">
-				          				<div class="col-xs-4">
-				          					<label>Penjualan Formulir</label>
-				          				</div>
-				          				<div class="col-xs-4">
-				          					<button class="btn btn-primary" id= "btnPenjualanFormulirFinance"> <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel</button>
-				          				</div>
-				          			</div>
-				          		</div>		
-				          	</div>
+		          		<div class="row">
+					          	<div class="col-xs-6">
+					          		<div class="form-group">
+					          			<div class="row" style="margin-top: 10px">
+					          				<div class="col-xs-4">
+					          					<label class="checkbox-inline">
+					          					     <input type="checkbox" class = "dateOP" name="dateOP" id = "dateOPRange" value = "0"> Date range
+					          					</label>
+					          				</div>
+					          				<div class="col-xs-4">
+					          					<input type="text" name="dateRange1" id= "dateRange1" data-date-format="yyyy-mm-dd" placeholder="Date Start" class="form-control" readonly="true" value="<?php echo date('Y-m-d') ?>">
+					          				</div>
+					          				<div class="col-xs-4">
+					          					<input type="text" name="dateRange2" id= "dateRange2" data-date-format="yyyy-mm-dd" placeholder="Date End" class="form-control" readonly="true" value="<?php echo date('Y-m-d') ?>">
+					          				</div>
+					          			</div>
+					          			<div class="row" style="margin-top: 10px">
+					          				<div class="col-xs-4">
+					          					<label class="checkbox-inline">
+					          					     <input type="checkbox" class = "dateOP" name="dateOP" id = "dateOPMonth" value = "1"> By Month
+					          					</label>
+					          				</div>
+					          				<div class="col-xs-4">
+					          					<select class="select2-select-00 full-width-fix" id="SelectMonth">
+			                                         <option></option>
+			                                    </select>
+					          				</div>
+					          				<div class="col-xs-4">
+					          					<select class="select2-select-00 full-width-fix" id="SelectYear">
+			                                         <option></option>
+			                                    </select>
+					          				</div>
+					          			</div>
+					          			<div class="row" style="margin-top: 10px">
+					          				<div class="col-xs-4 col-xs-offset-4">
+					          					<label>Angkatan</label>
+					          					<select class="select2-select-00 full-width-fix" id="SelectSetTa">
+			                                         <option></option>
+			                                    </select>
+					          				</div>
+					          			</div>
+					          			<div class="row" style="margin-top: 10px">
+					          				<div class="col-xs-4 col-xs-offset-4">
+					          					<label>Sort By</label>
+					          					<select class="select2-select-00 full-width-fix" id="SelectSortBy">
+			                                         <option value="a.No_Ref" selected>No Ref</option>
+			                                         <option value="a.FormulirCode">Form Number</option>
+			                                         <option value="b.DateSale">Date</option>
+			                                    </select>
+					          				</div>
+					          			</div>
+					          		</div>
+					          	</div>
+					          	<div class="col-xs-6">
+					          		<div class="form-group">
+					          			<div class="row" style="margin-top: 10px">
+					          				<div class="col-xs-4">
+					          					<!-- <label>Finance</label> -->
+					          				</div>
+					          			</div> 	
+					          			<div class="row">
+					          				<div class="col-xs-4">
+					          					<label>Penjualan Formulir</label>
+					          				</div>
+					          				<div class="col-xs-4">
+					          					<button class="btn btn-primary" id= "btnPenjualanFormulirFinance"> <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel</button>
+					          				</div>
+					          			</div>
+					          		</div>		
+					          	</div>
+		          		</div>
+				          	
 		          	</div>
 		        </div>
 		        <div class="row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
@@ -93,26 +96,25 @@
 		                                    </select>
 		        					</div>
 		        				</div>
-		        				<div class="row" style="margin-top: 10px">
-		        					<div class="col-xs-4">
-		        						<label>Major</label>
-		        					</div>
-		        					<div class="col-xs-4">
-		        						<select class="select2-select-00 full-width-fix" id="Prodi">
-		                                         <option></option>
-		                                    </select>
-		        					</div>
-		        				</div>
 		        			</div>
 		        		</div>
 		        		<div class="col-xs-6">
 		        			<div class="form-group">
 		        				<div class="row" style="margin-top: 10px">
 		        					<div class="col-xs-4">
-		        						<label>Tuition Fee</label>
+		        						<label>Rekap Intake</label>
 		        					</div>
 		        					<div class="col-xs-4">
-		        						<button class="btn btn-primary" id= "btnTuitionFee"> <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel</button>
+		        						<button class="btn btn-primary" id= "btnRekapIntake"> <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel</button>
+		        					</div>	
+		        				</div>
+		        				<div class="row" style="margin-top: 10px">
+		        					<div class="col-xs-4">
+		        						<label>Daily Penerimaan Bank</label>
+		        						<div id="datetimepicker" class="input-group input-append date datetimepicker"><input data-format="yyyy-MM-dd" class="form-control" id="DailyTgl" type=" text" readonly="" value="<?php echo date('Y-m-d') ?>"><span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span></div>
+		        					</div>
+		        					<div class="col-xs-4">
+		        						<button class="btn btn-primary" id= "btnRekapIntake"> <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel</button>
 		        					</div>	
 		        				</div>
 		        			</div>	
@@ -134,6 +136,10 @@
 		FuncClickbtnPenjualanFormulirFinance();
 		FuncClickbtnPengembalianFormulirData();
 		FuncClickBtnTuitionFee();
+
+		$('#datetimepicker').datetimepicker({
+		  format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+		});
 	});
 
 	function FuncClickBtnTuitionFee()

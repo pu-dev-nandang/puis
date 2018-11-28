@@ -16,77 +16,62 @@
 	</div>
 </div>
 <div class="row">
-	<div class="col-md-6">
-		<div class="widget box">
-			<div class="widget-header">
-				<h4><i class="icon-reorder"></i> Summary Payment Students</h4>
-				<!-- <div class="toolbar no-padding">
-					<div class="btn-group">
-						<span class="btn btn-xs widget-collapse"><i class="icon-angle-down"></i></span>
-					</div>
-				</div> -->
-			</div>
-			<div class="widget-content">
-				<div id="chart_bars_vertical" class="chart" style="padding: 0px;position: relative;min-height: 400px;"></div>
-				<!-- <div id="page_load_sum_pay_chart" class="chart"></div> -->
-			</div>
-		</div>
-	</div>
-
-	<div class="col-md-6">
-		<div class="widget box">
-			<div class="widget-header">
-					<h4><i class="icon-reorder"></i>Outstanding Payment Students</h4>
-			</div>
-			<div class="widget-content" style="min-height: 400px;">
-				<!-- <div id="page_load_tbl"></div> -->
-				<div class="table-responsive">
-					<table class="table table-bordered datatable2" id = "datatable2">
-					    <thead>
-					    <tr>
-					        <!-- <th style="width: 12%;">Program Study</th> -->
-					        <th style="width: 20%;">Nama & NPM</th>
-					        <th style="width: 15%;">Payment Type</th>
-					        <th style="width: 15%;">Semester</th>
-					        <th style="width: 10%;">Action</th>
-					    </tr>
-					    </thead>
-					    <tbody id="dataRow"></tbody>
-					</table>
-				</div>
-			</div>
-		</div> <!-- /.widget box -->
-	</div> <!-- /.col-md-6 -->
+    <div class="col-md-6">
+        <div class="panel panel-primary">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Summary Payment Students</h4>
+            </div>
+            <div class="panel-body">
+                <div id="chart_bars_vertical" class="chart" style="padding: 0px;position: relative;min-height: 400px;"></div> 
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="panel panel-primary">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Outstanding Payment Students</h4>
+            </div>
+            <div class="panel-body" style="min-height: 400px;">
+                <div class="table-responsive">
+                	<table class="table table-bordered datatable2" id = "datatable2">
+                	    <thead>
+                	    <tr>
+                	        <!-- <th style="width: 12%;">Program Study</th> -->
+                	        <th style="width: 20%;">Nama & NPM</th>
+                	        <th style="width: 15%;">Payment Type</th>
+                	        <th style="width: 15%;">Semester</th>
+                	        <th style="width: 10%;">Action</th>
+                	    </tr>
+                	    </thead>
+                	    <tbody id="dataRow"></tbody>
+                	</table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="row">
-	<div class="col-md-6">
-		<div class="widget box">
-			<div class="widget-header">
-				<h4><i class="icon-reorder"></i> Summary Payment Intake</h4>
-				<!-- <div class="toolbar no-padding">
-					<div class="btn-group">
-						<span class="btn btn-xs widget-collapse"><i class="icon-angle-down"></i></span>
-					</div>
-				</div> -->
-			</div>
-			<div class="widget-content">
-				<!-- <div id="chart_bars_vertical" class="chart"></div> -->
-				<div id="page_load_sum_pay_admission_chart" class="chart"></div>
-			</div>
-		</div>
-	</div>
-
-	<div class="col-md-6">
-		<div class="widget box">
-			<div class="widget-header">
-					<h4><i class="icon-reorder"></i> Summary Formulir Intake</h4>
-			</div>
-			<div class="widget-content">
-				<div id="page_load_sum_formulir_admission" class="chart"></div>
-			</div>
-		</div> <!-- /.widget box -->
-	</div> <!-- /.col-md-6 -->
+    <div class="col-md-6">
+        <div class="panel panel-primary">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Summary Payment Intake</h4>
+            </div>
+            <div class="panel-body">
+              <div id="page_load_sum_pay_admission_chart" class="chart"></div>             
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="panel panel-primary">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Summary Formulir Intake</h4>
+            </div>
+            <div class="panel-body">
+              <div id="page_load_sum_formulir_admission" class="chart"></div>            
+            </div>
+        </div>
+    </div>
 </div>
 
 <script type="text/javascript">

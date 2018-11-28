@@ -95,7 +95,8 @@
                     '<th>Status</th>'+
                     '<th>Sales</th>'+
                     '<th>Harga</th>'+
-                    '<th>Tanggal</th>'+
+                    '<th>Tgl Admisi</th>'+
+                    '<th>Tgl Finance</th>'+
                     '<th>Pembeli</th>'+
                     '<th>Iklan</th>'+
                     '<th>Action</th>'+
@@ -226,6 +227,55 @@
               { name: 'token', value: token },
           ]);  
       })
+    });
+
+    $('#tableData4 tbody').on('click', '.btn-setdate', function () {
+          var idget = $(this).attr('idget');
+          var html = '<div class="col-xs-12">'+
+                        '<div id="datetimepicker1'+idget+'" class="input-group input-append date datetimepicker">'+
+                            '<input data-format="yyyy-MM-dd" class="form-control" id="tgl'+idget+'" type=" text" readonly="" value = "<?php echo date('Y-m-d') ?>">'+
+                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
+                        '</div>'+
+                      '</div>';
+          var btn_save = '<div class = "row" style = "margin-top : 10px"><div class = "col-xs-12"><button class = "btn btn-success save'+idget+'" idget = "'+idget+'">Save</button></div></div>';
+          var rowhead = $( this )
+            .closest('.row');
+          var td = $( this )
+            .closest('td')
+          rowhead
+            .html(html)
+            .after(btn_save);
+
+            $('#datetimepicker1'+idget).datetimepicker({
+              format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+            });
+
+            $('.save'+idget).click(function(){
+              var idget = $(this).attr('idget');
+              loading_button('.save'+idget);
+              var tgl = $("#tgl"+idget).val();
+              var url = base_url_js + "finance/admission/submit-tgl-finance-formulir-offline";
+              var data = {
+                DateFin : tgl,
+              };
+              var arr = {
+                data : data,
+                ID : idget
+              }
+              var token = jwt_encode(arr,"UAP)(*");
+              if (tgl == '') {toastr.error('Please fill the textbox', 'Failed!!');return;}
+              $.post(url,{token:token},function (data_json) {
+                td
+                  .html(tgl)
+              }).done(function() {
+                // $('#btn-Save').prop('disabled',false).html('Submit');
+              }).fail(function() {
+                $('.save'+idget).prop('disabled',false).html('Save');  
+                toastr.error('The Database connection error, please try again', 'Failed!!');
+              }).always(function() {
+               $('.save'+idget).prop('disabled',false).html('save');
+              });
+            })
     });
 
     }

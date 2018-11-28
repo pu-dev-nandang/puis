@@ -171,18 +171,5 @@
        FormSubmitAuto(url, 'POST', [
            { name: 'token', value: token },
        ]);
-       // $.post(url,{token:token},function (data_json) {
-       //   var response = jQuery.parseJSON(data_json);
-       //   //console.log(response);
-       //   //window.location.href = base_url_js+'fileGet/'+response;
-       //   window.open(base_url_js+'fileGet/'+response,'_blank');
-       //   loadNumberFormulir();
-       // }).done(function() {
-       //   toastr.success('The Download processing success', 'Success!');
-       // }).fail(function() {
-       //   toastr.error('The Download Processing error, please try again', 'Failed!!');
-       // }).always(function() {
-       //   // $('#btn-dwnformulir').prop('disabled',false).html('Formulir');
-       // });
     });
 </script>

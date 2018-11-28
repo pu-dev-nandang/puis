@@ -1,68 +1,63 @@
-<div class="row" style="margin-top: 30px;">
-	<div class="col-md-12">
-		<div class="widget box">
-			<div class="widget-header">
-				<h4><i class="icon-reorder"></i>Import Pembayaran Manual Mahasiswa</h4>
-				<div class="toolbar no-padding">
-					<!--<div class="btn-group">
-						<span class="btn btn-xs widget-collapse"><i class="icon-angle-down"></i></span>
-					</div>-->
-				</div>
-			</div>
-			<div class="widget-content">
-				<div class="form-horizontal">
-					<div class="form-group">
-						<div class="col-xs-12">
-							<div class="thumbnail" style="padding: 10px;">
-							    <b>Note : </b>
-							    <p><b>Data yang diimport ke system adalah data pembayaran yang telah lunas</b> </p> 
-							</div>
-						</div>
-					</div>	
-					<div class="form-group">
-							<div class="col-xs-2">
-						        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-						            <select class="form-control" id="selectPTID">
-						                <option selected value = ''>--- Payment Type ---</option>
-						                <option disabled>------</option>
-						            </select>
-						        </div>
-							</div>
-							<div class="col-xs-2">
-						        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-						            <select class="form-control" id="selectSemester">
-						                <option selected value = ''>--- Semester Type ---</option>
-						                <option disabled>------</option>
-						            </select>
-						        </div>
-							</div>
-							<div class="col-xs-1" style="">
-								<label class="control-label">Upload File:</label>
-								<input type="file" data-style="fileinput" id="ExFile">
-							</div>
-							<div class="col-xs-1">
-								<label class="control-label"><a href="<?php echo base_url('download_template/finance-Template_import_pembayaran_manual.xlsx'); ?>">Template</a></label>
-							</div>	
-							<!-- <div class="col-xs-2">
-								<button class="btn btn-inverse btn-notification" id="btn-proses">Proses</button>
-							</div> -->
-						</div>
-						<div class="form-group">
-							<div class="form-check col-xs-2">
-							    <input type="checkbox" class="form-check-input" id="maba">
-							    <label class="form-check-label" for="exampleCheck1">Mahasiswa Baru</label>
-							</div>
-						</div>
-						<div class="form-group">
-							<div class="form-check col-xs-2">
-								<button class="btn btn-inverse btn-notification" id="btn-proses">Proses</button>
-							</div>
-						</div>
-					<!-- </div> -->
-				</div>
-			</div>
-		</div>
-	</div> <!-- /.col-md-6 -->
+<div class="row">
+    <div class="col-xs-12" >
+        <div class="panel panel-primary">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Import Pembayaran Manual Mahasiswa</h4>
+            </div>
+            <div class="panel-body">
+               <div class="form-horizontal">
+               	<div class="form-group">
+               		<div class="col-xs-12">
+               			<div class="thumbnail" style="padding: 10px;">
+               			    <b>Note : </b>
+               			    <p><b>Data yang diimport ke system adalah data pembayaran yang telah lunas</b> </p> 
+               			</div>
+               		</div>
+               	</div>	
+               	<div class="form-group">
+               			<div class="col-xs-2">
+               		        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+               		            <select class="form-control" id="selectPTID">
+               		                <option selected value = ''>--- Payment Type ---</option>
+               		                <option disabled>------</option>
+               		            </select>
+               		        </div>
+               			</div>
+               			<div class="col-xs-2">
+               		        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+               		            <select class="form-control" id="selectSemester">
+               		                <option selected value = ''>--- Semester Type ---</option>
+               		                <option disabled>------</option>
+               		            </select>
+               		        </div>
+               			</div>
+               			<div class="col-xs-1" style="">
+               				<label class="control-label">Upload File:</label>
+               				<input type="file" data-style="fileinput" id="ExFile">
+               			</div>
+               			<div class="col-xs-1">
+               				<label class="control-label"><a href="<?php echo base_url('download_template/finance-Template_import_pembayaran_manual.xlsx'); ?>">Template</a></label>
+               			</div>	
+               			<!-- <div class="col-xs-2">
+               				<button class="btn btn-inverse btn-notification" id="btn-proses">Proses</button>
+               			</div> -->
+               		</div>
+               		<div class="form-group">
+               			<div class="form-check col-xs-2">
+               			    <input type="checkbox" class="form-check-input" id="maba">
+               			    <label class="form-check-label" for="exampleCheck1">Mahasiswa Baru</label>
+               			</div>
+               		</div>
+               		<div class="form-group">
+               			<div class="form-check col-xs-2">
+               				<button class="btn btn-inverse btn-notification" id="btn-proses">Proses</button>
+               			</div>
+               		</div>
+               	<!-- </div> -->
+               </div>            
+            </div>
+        </div>
+    </div>
 </div>
 
 <script type="text/javascript">

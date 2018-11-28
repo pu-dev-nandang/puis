@@ -403,5 +403,30 @@ class C_rest extends CI_Controller {
         
     }
 
+    public function loadDataFormulirGlobal()
+    {
+        // error_reporting(0);
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $where = (!array_key_exists("division",$dataToken)) ? '' : ' where a.Division ="'.$dataToken['division'].'"';
+                $sql = 'SELECT a.*,b.FormulirCode from db_admission.formulir_number_global as a left join db_admission.formulir_number_offline_m as b on a.FormulirCodeGlobal = b.No_Ref'.$where;
+                $query=$this->db->query($sql, array())->result_array();
+                echo json_encode($query);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
 
 }

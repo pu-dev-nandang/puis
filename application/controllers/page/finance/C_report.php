@@ -47,10 +47,19 @@ class C_report extends Finnance_Controler {
         echo json_encode($output);
     }
 
-    public function report_admission()
+    public function page_report_admission()
     {
-        $content = $this->load->view('page/'.$this->data['department'].'/report_admission/report_admission',$this->data,true);
+        $content = $this->load->view('page/'.$this->data['department'].'/report_admission/page_report',$this->data,true);
         $this->temp($content);
+    }
+
+    public function report_admission($page)
+    {
+        $arr_result = array('html' => '','jsonPass' => '');
+        $uri = $page;
+        $content = $this->load->view('page/'.$this->data['department'].'/report_admission/'.$uri,$this->data,true);
+        $arr_result['html'] = $content;
+        echo json_encode($arr_result);
     }
 
 }

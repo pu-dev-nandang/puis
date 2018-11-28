@@ -13,96 +13,84 @@
           
     }    
 </style>
-<div class="row noprint" style="margin-top: 30px;">
-    <div class="col-md-3">
-        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <select class="form-control" id="selectCurriculum">
-                <option selected value = ''>--- All Curriculum ---</option>
-                <option disabled>------</option>
-            </select>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <select class="form-control" id="selectProdi">
-                <option selected value = ''>--- All Prodi---</option>
-                <option disabled>------</option>
-            </select>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <select class="form-control" id="selectStatus">
-                <option value = ''>--All Status--</option>
-                <option selected value = '0'>Tidak Lunas</option>
-                <option value="1">Lunas</option>
-            </select>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM">
-        </div>
-    </div>
-</div>
-
-<div class="col-md-12 noprint">
-      <hr/>
-      <div class="col-md-12">
-        <div class="DTTT btn-group">
-          <button type="button" class="btn btn-convert" id="export_excel"><i class="fa fa-download" aria-hidden="true"></i> Excel</button>
-          <!--<a class="btn DTTT_button_pdf" id="ToolTables_DataTables_Table_0_1">
-            <span><i class="fa fa-download" aria-hidden="true"></i> PDF
-            </span>
-          </a>-->
-        </div>
-        <div id="DataTables_Table_0_filter" class="dataTables_filter">
-          <label>
-            <div class="input-group">
-              <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-                  <select class="form-control" id="selectSemester">
-                  </select>
-              </div>
+<div class="row">
+    <div class="col-xs-12" >
+        <div class="panel panel-primary">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Report</h4>
             </div>
-          </label>
-        </div>
-      </div>  
-</div>                        
-<br>
-<br>
-<br>
-<br>
-<div class="row" id='conTainJS'>
-    <!--<div class="col-md-12">
-        <hr/>
-        <div align="right">
-            <div class="btn-group">
-                <button type="button" class="btn btn-convert">
-                  <i class="fa fa-download" aria-hidden="true"></i> Excel
-                </button>
-                <button type="button" class="btn btn-convert">
-                  <i class="fa fa-download" aria-hidden="true"></i> PDF
-                </button>
+            <div class="panel-body">
+               <div class="row noprint">
+                 <div class="col-md-12">
+                  <div class="well">
+                    <h5>Search</h5>
+                    <div class="row">
+                      <div class="col-md-3">
+                          <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                              <select class="form-control" id="selectCurriculum">
+                                  <option selected value = ''>--- All Curriculum ---</option>
+                                  <option disabled>------</option>
+                              </select>
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                              <select class="form-control" id="selectProdi">
+                                  <option selected value = ''>--- All Prodi---</option>
+                                  <option disabled>------</option>
+                              </select>
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                              <select class="form-control" id="selectStatus">
+                                  <option value = ''>--All Status--</option>
+                                  <option selected value = '0'>Tidak Lunas</option>
+                                  <option value="1">Lunas</option>
+                              </select>
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                              <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM">
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+                 </div>
+               </div>
+               <div class="row noprint">
+                 <div class="col-md-12 noprint">
+                       <hr/>
+                       <div class="col-md-12">
+                         <div class="DTTT btn-group">
+                           <button type="button" class="btn btn-convert" id="export_excel"><i class="fa fa-download" aria-hidden="true"></i> Excel</button>
+                           <!--<a class="btn DTTT_button_pdf" id="ToolTables_DataTables_Table_0_1">
+                             <span><i class="fa fa-download" aria-hidden="true"></i> PDF
+                             </span>
+                           </a>-->
+                         </div>
+                         <div id="DataTables_Table_0_filter" class="dataTables_filter">
+                           <label>
+                             <div class="input-group">
+                               <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                                   <select class="form-control" id="selectSemester">
+                                   </select>
+                               </div>
+                             </div>
+                           </label>
+                         </div>
+                       </div>  
+                 </div>  
+               </div>
+               <div class="row" style="margin-top: 15px">
+                 <div id='conTainJS'>
+                     
+                 </div>
+               </div>            
             </div>
         </div>
-        <br>
-        <table class="table table-bordered datatable2 " id = "datatable2">
-            <thead>
-            <tr style="background: #333;color: #fff;">
-                <th style="width: 12%;">Program Study</th>
-                <th style="width: 20%;">Nama</th>
-                <th style="width: 5%;">Payment Type</th>
-                <th style="width: 5%;">BilingID</th>
-                <th style="width: 10%;">Invoice</th>
-                <th style="width: 5%;">Status</th>
-                <th style="width: 20%;">Ket</th>
-                <th style="width: 5%;">Cetak Faktur</th>
-            </tr>
-            </thead>
-            <tbody id="dataRow"></tbody>
-        </table>
     </div>
-    <div  class="col-xs-12" align="right" id="pagination_link"></div>-->
 </div>
 
 <script type="text/javascript">
@@ -181,18 +169,6 @@
     }
 
     $(document).on("click", "#export_excel", function(event){
-      /*loading_button('#export_excel');
-      $('#NotificationModal .modal-header').addClass('hide');
-      $('#NotificationModal .modal-body').html('<center>' +
-          '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
-          '                    <br/>' +
-          '                    Loading Data . . .' +
-          '                </center>');
-      $('#NotificationModal .modal-footer').addClass('hide');
-      $('#NotificationModal').modal({
-          'backdrop' : 'static',
-          'show' : true
-      });*/
       var url = base_url_js+'finance/export_excel_report';
       data = {
         Data : dataa,
@@ -293,7 +269,7 @@
             Status : $('#selectStatus').val(),
         };
         var token = jwt_encode(data,'UAP)(*');
-        var htmlDy = '<div class="col-md-12">'+
+        var htmlDy = '<div class="col-md-12"><div class = "table-responsive">'+
                         '<table class="table table-bordered datatable2 " id = "datatable2">'+
                             '<caption id ="CaptionTa"></caption>'+
                             '<thead>'+
@@ -314,7 +290,7 @@
                             '</thead>'+
                             '<tbody id="dataRow"></tbody>'+
                         '</table>'+
-                    '</div>'+
+                    '</div></div>'+
                     '<div  class="col-xs-12 noprint" align="right" id="pagination_link"></div>';
    
         $.post(url,{token:token},function (resultJson) {
