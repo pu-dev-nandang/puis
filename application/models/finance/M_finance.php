@@ -2745,6 +2745,7 @@ class M_finance extends CI_Model {
     // error_reporting(0);
     $arr = array();
     $this->load->model('master/m_master');
+    $No = $start + 1;
     $ta1 = explode('.', $ta);
     $ta = $ta1[1];
     $db = 'ta_'.$ta.'.students';
@@ -2782,6 +2783,9 @@ class M_finance extends CI_Model {
       $array = array('ProdiEng' => $ProdiEng[0]['NameEng']);
       $Data_mhs[$i] = $Data_mhs[$i] + $array;
 
+      // No 
+        $Data_mhs[$i] = $Data_mhs[$i] + array('No' => $No);
+
       // get VA Mahasiwa
         $VA = $Const_VA[0]['Const_VA'].$Data_mhs[$i]['NPM'];
         $Data_mhs[$i] = $Data_mhs[$i] + array('VA' => $VA);
@@ -2802,7 +2806,7 @@ class M_finance extends CI_Model {
       // get sks yang diambil
          $Credit = $this->getSKSMahasiswa($db2,$Data_mhs[$i]['NPM']);
          $Data_mhs[$i] = $Data_mhs[$i] + array('Credit' => $Credit);      
-
+      $No++;   
     }
     $arr['Data_mhs'] = $Data_mhs;
     $arr['Discount'] = $Discount;

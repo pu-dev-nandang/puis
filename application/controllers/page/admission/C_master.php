@@ -1756,7 +1756,6 @@ class C_master extends Admission_Controler {
     public function generate_formulir_global()
     {
         $input = $this->getInputToken();
-        $msg = '';
         $prefix = substr($input['Angkatan'], 2,4);
         for ($i=$input['Start']; $i <= $input['End']; $i++) { 
            // check length max 4
@@ -1774,9 +1773,19 @@ class C_master extends Admission_Controler {
             }
             else
             {
+                $arr_field = array(
+                    'FormulirCodeGlobal' => $code,
+                    'Years' => $input['Angkatan'],
+                    'Status' => 0,
+                    'Division' => $input['division'],
+                );
                 // check data already using in formulir_number_offline_m
                   $chk2 = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','No_Ref',$code);
-                  // lanjut besok  
+                  if (count($chk2) == 1) {
+                      $arr_field['Status'] = 1;
+                  }
+
+                  $this->db->insert('db_admission.formulir_number_global', $arr_field);
             }
 
         }

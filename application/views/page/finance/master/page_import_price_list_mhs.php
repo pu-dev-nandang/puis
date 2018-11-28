@@ -1,54 +1,55 @@
-<div class="row" style="margin-top: 30px;">
-	<div class="col-md-12">
-		<div class="widget box">
-			<div class="widget-header">
-				<h4><i class="icon-reorder"></i>Import Price List Mahasiswa</h4>
-				<div class="toolbar no-padding">
-					<!--<div class="btn-group">
-						<span class="btn btn-xs widget-collapse"><i class="icon-angle-down"></i></span>
-					</div>-->
-				</div>
-			</div>
-			<div class="widget-content">
-				<div class="form-horizontal">
-					<div class="form-group">
-							<div class="col-xs-2" style="">
-							    Kategory
-							    <select class="select2-select-00 col-md-4 full-width-fix" id="selectKategory">
-							        <option value="1">*</option>
-							        <option value="2">**</option>
-							    </select>
-							</div>
-							<div class="col-xs-2" style="">
-								<label class="control-label">Upload File:</label>
-								<input type="file" data-style="fileinput" id="ExFile">
-							</div>
-							<a href="<?php echo base_url('download_template/finance-Template_import_price_list_mhs.xlsx'); ?>">File Template</a>
-							<div class="col-xs-1">
-								<button class="btn btn-inverse btn-notification" id="btn-proses">Proses</button>
-							</div>
-						</div>
-					<!-- </div> -->
-				</div>
-			</div>
-		</div>
-	</div> <!-- /.col-md-6 -->
+<div class="row">
+    <div class="col-xs-12" >
+        <div class="panel panel-primary">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Report</h4>
+            </div>
+            <div class="panel-body">
+               <div class="row" style="margin-top: 30px;">
+	               	<div class="col-md-12">
+	               		<div class="widget box">
+	               			<div class="widget-header">
+	               				<h4><i class="icon-reorder"></i>Import Price List Mahasiswa</h4>
+	               				<div class="toolbar no-padding">
+	               					<!--<div class="btn-group">
+	               						<span class="btn btn-xs widget-collapse"><i class="icon-angle-down"></i></span>
+	               					</div>-->
+	               				</div>
+	               			</div>
+	               			<div class="widget-content">
+	               				<div class="form-horizontal">
+	               					<div class="form-group">
+	               							<div class="col-xs-2" style="">
+	               							    Kategory
+	               							    <select class="select2-select-00 col-md-4 full-width-fix" id="selectKategory">
+	               							        <option value="1">*</option>
+	               							        <option value="2">**</option>
+	               							    </select>
+	               							</div>
+	               							<div class="col-xs-2" style="">
+	               								<label class="control-label">Upload File:</label>
+	               								<input type="file" data-style="fileinput" id="ExFile">
+	               							</div>
+	               							<a href="<?php echo base_url('download_template/finance-Template_import_price_list_mhs.xlsx'); ?>">File Template</a>
+	               							<div class="col-xs-1">
+	               								<button class="btn btn-inverse btn-notification" id="btn-proses">Proses</button>
+	               							</div>
+	               						</div>
+	               					<!-- </div> -->
+	               				</div>
+	               			</div>
+	               		</div>
+	               	</div>
+               </div>         
+            </div>
+        </div>
+    </div>
 </div>
+
 
 <script type="text/javascript">
 	$(document).ready(function () {
-	    /*var url = base_url_js+'api/__cek_deadline_paymentNPM';
-	    var data = {
-	        NPM : '11160002',
-	    };
-	    var token = jwt_encode(data,'UAP)(*');
-	    $.post(url,{token:token},function (resultJson) {
-	       console.log(resultJson);
-	    }).fail(function() {
-	      
-	    }).always(function() {
-	        
-	    });*/
+	   
 	});
 
 	$(document).on('click','#btn-proses', function () {

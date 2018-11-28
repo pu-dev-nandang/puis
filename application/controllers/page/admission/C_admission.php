@@ -1978,6 +1978,8 @@ class C_admission extends Admission_Controler {
       $input = $this->getInputToken();
       $this->data['action'] = $input['action'];
       $this->data['CDID'] = $input['ID'];
+      $Ta = $this->m_master->showData_array('db_admission.set_ta');
+      $this->data['Ta'] = $Ta[0]['Ta'];
       switch ($input['action']) {
         case 'add':
           # code...

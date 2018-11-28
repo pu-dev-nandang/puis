@@ -480,7 +480,7 @@ $route['finance/confirmed-verifikasi-pembayaran-registration_online'] =  'page/f
 $route['finance/admission/penerimaan-pembayaran/formulir-registration/offline'] =  'page/finance/c_finance/formulir_registration_offline_page';
 $route['finance/admission/distribusi-formulir/offline/LoadListPenjualan/serverSide'] =  'page/finance/c_finance/formulir_registration_offline_serverSide';
 
-$route['finance/admission/report'] =  'page/finance/c_report/report_admission';
+$route['finance/admission/report'] =  'page/finance/c_report/page_report_admission';
 $route['finance/admission/report/tuition-fee'] =  'page/finance/c_report/tuition_fee_admission';
 
 
@@ -502,6 +502,7 @@ $route['finance/getPayment_detail_admission2'] =  'page/finance/c_finance/getPay
 $route['finance/admission/approved/edit'] =  'page/finance/c_finance/approved_edit';
 $route['finance/admission/approved/edit_submit'] =  'page/finance/c_finance/approved_edit_submit';
 $route['finance/getRevision_detail_admission'] =  'api/c_global/getRevision_detail_admission';
+$route['finance/admission/submit-tgl-finance-formulir-offline'] =  'page/finance/c_finance/save_tgl_formulir_offline';
 
 
 $route['finance/tagihan-mhs/set-tagihan-mhs'] =  'page/finance/c_finance/page_set_tagihan_mhs';
@@ -557,6 +558,11 @@ $route['finance/config/policysys'] =  'page/finance/c_config/policysys';
 $route['finance/config/policy_sys_json_data'] =  'page/finance/c_config/policy_sys_json_data';
 $route['finance/config/policysys/modalform'] =  'page/finance/c_config/policy_sys_modalform';
 $route['finance/config/policysys/submit'] =  'page/finance/c_config/policy_sys_submit';
+
+// -- report admission to finance
+$route['finance/report_admission/(:any)'] =  'page/finance/c_report/report_admission/$1';
+
+
 
 
 // --- Student Life ----

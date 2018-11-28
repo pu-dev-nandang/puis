@@ -43,10 +43,7 @@ $Division = $this->session->userdata('PositionMain')['IDDivision'];
                               </div>
                           </div>
                           <div class="form-group" style="margin-left: 10px">
-                            <div class="col-md-1">
-                                <button class="btn btn-warning btn-edit" id="Reset">Reset</button>
-                            </div>
-                            <div class="col-md-1">
+                            <div class="col-xs-2 col-md-1">
                                 <button class="btn btn-inverse btn-notification btn-add" id="generate">Generate Formulir Code</button>
                             </div>
                           </div>
@@ -69,6 +66,7 @@ $Division = $this->session->userdata('PositionMain')['IDDivision'];
         loadData();
 
         $("#generate").click(function(){
+            loading_button('#generate');
             var Angkatan = $("#selectTahun").val();
             //var prefix = $("#prefix").val();
             var Start = $("#Start").val();
@@ -82,22 +80,28 @@ $Division = $this->session->userdata('PositionMain')['IDDivision'];
                 Angkatan : Angkatan,
                 // prefix : prefix,
                 Start : Start,
-                End : End
+                End : End,
+                division : division,
             };
             var token = jwt_encode(data,"UAP)(*");
             var url = base_url_js+'admission/master/generate_formulir_global';
             if (Start != '' && End != '') {
                 $.post(url,{token:token},function (data_json) {
-                    
+                    loadData();
+                    $('#generate').prop('disabled',false).html('Generate Formulir Code');  
                 });
             }
             else
             {
-                toastr.error('Prefix and Code Number Required','!Failed');
+                toastr.error('Code Number Required','!Failed');
+                $('#generate').prop('disabled',false).html('Generate Formulir Code');  
             }
             
 
         })
+
+
+
     });
 
     function loadTahun()
@@ -136,7 +140,6 @@ $Division = $this->session->userdata('PositionMain')['IDDivision'];
                      // allowClear: true
                    });
                    var division = $('#Division').val();
-                   $("#pageContent").empty();
                    var selectTahun = $("#selectTahun").val();
                    var url = base_url_js+'rest/__loadDataFormulirGlobal';
                    var data = {
@@ -161,6 +164,7 @@ $Division = $this->session->userdata('PositionMain')['IDDivision'];
                                        '</tbody>'+
                                    '</table></div>';
                        setTimeout(function () {
+                          $("#pageContent").empty();
                           $("#pageContent").html(html);
                           for (var i = 0; i < data_json.length; i++) {
                               var no = i+1;
@@ -168,7 +172,7 @@ $Division = $this->session->userdata('PositionMain')['IDDivision'];
                                                'color:  green;'+
                                                '">IN'+
                                              '</td>';
-                               if (response[i]['Status'] == 1 ) {
+                               if (data_json[i]['Status'] == 1 ) {
                                    status = '<td style="'+
                                                'color:  red;'+
                                                '">Sold Out'+
@@ -177,14 +181,11 @@ $Division = $this->session->userdata('PositionMain')['IDDivision'];
                               $(".datatable tbody").append(
                                '<tr>'+
                                    '<td>'+no+'</td>'+
-                                   '<td>'+response[i]['Years']+'</td>'+
-                                   '<td>'+response[i]['FormulirCodeGlobal']+'</td>'+
-                                   '<td>'+response[i]['FormulirCode']+'</td>'+
+                                   '<td>'+data_json[i]['Years']+'</td>'+
+                                   '<td>'+data_json[i]['FormulirCodeGlobal']+'</td>'+
+                                   '<td>'+data_json[i]['FormulirCode']+'</td>'+
                                    status+
-                                   '<td>'+print+'</td>'+
-                                   '<td>'+response[i]['CreateAT']+'</td>'+
-                                   '<td>'+response[i]['Name']+'</td>'+
-                                   '<td>'+btn_print+'</td>'+
+                                   '<td>'+''+'</td>'+
                                '</tr>' 
                                );
                               no++;
@@ -196,7 +197,6 @@ $Division = $this->session->userdata('PositionMain')['IDDivision'];
             
         <?php else: ?>
             var division = <?php echo $Division ?>;
-            $("#pageContent").empty();
             var selectTahun = $("#selectTahun").val();
             var url = base_url_js+'rest/__loadDataFormulirGlobal';
             var data = {
@@ -221,6 +221,7 @@ $Division = $this->session->userdata('PositionMain')['IDDivision'];
                                 '</tbody>'+
                             '</table></div>';
                 setTimeout(function () {
+                   $("#pageContent").empty(); 
                    $("#pageContent").html(html);
                    for (var i = 0; i < data_json.length; i++) {
                        var no = i+1;
@@ -228,7 +229,7 @@ $Division = $this->session->userdata('PositionMain')['IDDivision'];
                                         'color:  green;'+
                                         '">IN'+
                                       '</td>';
-                        if (response[i]['Status'] == 1 ) {
+                        if (data_json[i]['Status'] == 1 ) {
                             status = '<td style="'+
                                         'color:  red;'+
                                         '">Sold Out'+
@@ -237,14 +238,11 @@ $Division = $this->session->userdata('PositionMain')['IDDivision'];
                        $(".datatable tbody").append(
                         '<tr>'+
                             '<td>'+no+'</td>'+
-                            '<td>'+response[i]['Years']+'</td>'+
-                            '<td>'+response[i]['FormulirCodeGlobal']+'</td>'+
-                            '<td>'+response[i]['FormulirCode']+'</td>'+
+                            '<td>'+data_json[i]['Years']+'</td>'+
+                            '<td>'+data_json[i]['FormulirCodeGlobal']+'</td>'+
+                            '<td>'+data_json[i]['FormulirCode']+'</td>'+
                             status+
-                            '<td>'+print+'</td>'+
-                            '<td>'+response[i]['CreateAT']+'</td>'+
-                            '<td>'+response[i]['Name']+'</td>'+
-                            '<td>'+btn_print+'</td>'+
+                           '<td>'+''+'</td>'+
                         '</tr>' 
                         );
                        no++;

@@ -711,7 +711,7 @@ class C_finance extends Finnance_Controler {
         // count all
         $count = $this->m_finance->count_get_tagihan_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NPM']);
 
-        $config = $this->config_pagination_default_ajax($count,20,3);
+        $config = $this->config_pagination_default_ajax($count,10,3);
         $this->pagination->initialize($config);
         $page = $this->uri->segment(3);
         $start = ($page - 1) * $config["per_page"];
@@ -758,7 +758,7 @@ class C_finance extends Finnance_Controler {
                         break;
                 }
 
-                if ($fieldEND != '')
+                if ($fieldEND == 'bayarEnd' || $fieldEND == 'bayarBPPEnd')
                 {
                     $getDeadlineTagihanDB = $this->m_finance->getDeadlineTagihanDB($fieldEND,$SemesterID[0]['ID']);
                     // check Deadline Tagihan telah melewati tanggal sekarang atau belum
@@ -818,6 +818,48 @@ class C_finance extends Finnance_Controler {
 
                     
                 }
+                else
+                {
+                    $getDataMhsBYNPM = $this->m_master->getDataMhsBYNPM($Input[$i]->NPM,$Input[$i]->ta);
+                    $payment = str_replace("Rp.","", $Input[$i]->Invoice);
+                    $payment = trim(str_replace(",-","", $payment));
+                    $payment = trim(str_replace(".","", $payment));
+                    $DeadLinePayment = $Input[$i]->Deadline.' 23:59:00';
+
+                    if ($payment == 0) {
+                        $aa = $this->m_finance->insertaDataPayment($Input[$i]->PTID,$Input[$i]->semester,$Input[$i]->NPM,$payment,$Input[$i]->Discount,"1",0);
+                        $ab = $this->m_finance->insertaDataPaymentStudents($aa,$payment,0,$DeadLinePayment,1);
+                    }
+                    else
+                    {
+                        $Name = $getDataMhsBYNPM[0]['Name'];
+                        $Email = $getDataMhsBYNPM[0]['EmailPU'];
+                        $VA_number = $this->m_finance->getVANumberMHS($Input[$i]->NPM);
+
+                        // cek VA policy
+                        if ($this->session->userdata('finance_auth_Policy_SYS') == 1) {
+                            $create_va = $this->m_finance->create_va_Payment($payment,$DeadLinePayment, $Name, $Email,$VA_number,$description = $desc,$tableRoutes = 'db_finance.payment_students');
+                            if ($create_va['status']) {
+                                // After create va insert data to db_finance.payment  and db_finance.payment_students
+                                $countSuccessVA++;
+                                $aa = $this->m_finance->insertaDataPayment($Input[$i]->PTID,$Input[$i]->semester,$Input[$i]->NPM,$payment,$Input[$i]->Discount);
+                                $ab = $this->m_finance->insertaDataPaymentStudents($aa,$payment,$create_va['msg']['trx_id'],$create_va['msg']['datetime_expired']);
+                            }
+                            else
+                            {
+                                $msg .= 'Tidak bisa Create VA dengan Nama : '.$Name.' dan NPM : '.$Input[$i]->NPM.'<br>';
+                            }
+                        }
+                        else
+                        {
+                            $countSuccessVA++;
+                            $aa = $this->m_finance->insertaDataPayment($Input[$i]->PTID,$Input[$i]->semester,$Input[$i]->NPM,$payment,$Input[$i]->Discount);
+                            $ab = $this->m_finance->insertaDataPaymentStudents($aa,$payment,0,$DeadLinePayment);
+                        }
+                        
+                    }
+
+                }
                 
             }
             echo json_encode($msg);
@@ -837,7 +879,7 @@ class C_finance extends Finnance_Controler {
         $this->load->library('pagination');
         // count
         $count = $this->m_finance->count_get_created_tagihan_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NIM']);
-        $config = $this->config_pagination_default_ajax($count,20,3);
+        $config = $this->config_pagination_default_ajax($count,5,3);
         $this->pagination->initialize($config);
         $page = $this->uri->segment(3);
         $start = ($page - 1) * $config["per_page"];
@@ -855,7 +897,7 @@ class C_finance extends Finnance_Controler {
         $this->load->library('pagination');
         // count
         $count = $this->m_finance->count_get_created_tagihan_mhs_not_approved($input['ta'],$input['prodi'],$input['PTID'],$input['NIM']);
-        $config = $this->config_pagination_default_ajax($count,50,3);
+        $config = $this->config_pagination_default_ajax($count,5,3);
         $this->pagination->initialize($config);
         $page = $this->uri->segment(3);
         $start = ($page - 1) * $config["per_page"];
@@ -935,24 +977,28 @@ class C_finance extends Finnance_Controler {
                                 $desc = '';
                                 break;
                         }
-            if ($DeadLinePayment == '') {
-                $getDeadlineTagihanDB = $this->m_finance->getDeadlineTagihanDB($fieldEND,$Input[$i]->SemesterID);
-                $DeadLinePayment = $getDeadlineTagihanDB.' 23:59:00';  
+
+            if ($fieldEND == 'bayarEnd' || $fieldEND == 'bayarBPPEnd') {
+                    if ($DeadLinePayment == '') {
+                        $getDeadlineTagihanDB = $this->m_finance->getDeadlineTagihanDB($fieldEND,$Input[$i]->SemesterID);
+                        $DeadLinePayment = $getDeadlineTagihanDB.' 23:59:00';  
+                    }            
+                       
+                    // check Deadline Input telah melewati tanggal Deadline
+                    if ($this->session->userdata('finance_auth_Policy_SYS') == 1) {
+                        $aaa = $this->m_master->chkTgl($Input[$i]->Deadline,$DeadLinePayment);
+                    }
+                    else
+                    {
+                        $aaa = true;
+                    }
+                    
+                    if (!$aaa) {
+                        $bool = false;
+                        break;
+                    }
             }            
-               
-            // check Deadline Input telah melewati tanggal Deadline
-            if ($this->session->userdata('finance_auth_Policy_SYS') == 1) {
-                $aaa = $this->m_master->chkTgl($Input[$i]->Deadline,$DeadLinePayment);
-            }
-            else
-            {
-                $aaa = true;
-            }
             
-            if (!$aaa) {
-                $bool = false;
-                break;
-            }
         }
 
         if ($bool) {
@@ -1519,7 +1565,7 @@ class C_finance extends Finnance_Controler {
         $this->load->library('pagination');
         // cari count
         $count = $this->m_finance->count_mahasiswa_list($input['ta'],$input['prodi'],$input['NPM']);
-        $config = $this->config_pagination_default_ajax($count,20,4);   
+        $config = $this->config_pagination_default_ajax($count,5,4);   
         $this->pagination->initialize($config);
         $page = $this->uri->segment(4);
         $start = ($page - 1) * $config["per_page"];
@@ -1803,13 +1849,14 @@ class C_finance extends Finnance_Controler {
         $sql.= ' ORDER BY StatusPayment ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
         $query = $this->db->query($sql)->result_array();
-
+        $No = $requestData['start'] + 1;
         $data = array();
         for($i=0;$i<count($query);$i++){
             $nestedData=array();
             $row = $query[$i];
 
             // $nestedData[] = '<input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'">';
+            $nestedData[] = $No;
             $nestedData[] = $row['NamePrody'];
             $nestedData[] = $row['Name'].'<br>'.$row['Email'];
             $FormulirCode = ($row['No_Ref'] != "" || $row['No_Ref'] != null ) ? $row['FormulirCode'].' / '.$row['No_Ref'] : $row['FormulirCode'];
@@ -1829,6 +1876,7 @@ class C_finance extends Finnance_Controler {
             $nestedData[] = '<button class = "btn btn-primary btn-payment" id-register-formulir = "'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">Detail</button>';
            
             $data[] = $nestedData;
+            $No++;
         }
 
         $json_data = array(
@@ -2038,7 +2086,7 @@ class C_finance extends Finnance_Controler {
 
         $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,b.No_Ref,a.StatusReg,b.Years,b.Status as StatusUsed, b.StatusJual,
                   b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,b.CityNameFormulir,b.DistrictNameFormulir,b.TypePay,
-                  b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi,b.NoKwitansi
+                  b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi,b.NoKwitansi,b.DateFin
                   from (
                   select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
                   from db_admission.register as a 
@@ -2051,7 +2099,7 @@ class C_finance extends Finnance_Controler {
                   where a.StatusReg = 1
                   ) as a right JOIN
                   (
-                  select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,b.NoKwitansi,
+                  select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,b.NoKwitansi,b.DateFin,
                   b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,b.TypePay,
                   if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,b.ID_ProgramStudy,y.Name as NameProdi
                   from db_admission.formulir_number_offline_m as a
@@ -2101,6 +2149,13 @@ class C_finance extends Finnance_Controler {
             $nestedData[] = $row['Sales'];
             $nestedData[] = number_format($row['Price_Form'],0,',','.');
             $nestedData[] = $row['DateSale'];
+            $nestedData[] = ($row['DateFin'] == '' || $row['DateFin'] == null || $row['DateFin'] == '0000-00-00') ? '<div class="row" style="margin-top: 10px">
+                          <div class="col-md-12">
+                            <span IDget = "'.$row['ID_sale_formulir_offline'].'" class="btn btn-xs btn-primary btn-setdate">
+                             <i class="fa fa-user-o"></i> Set Date Finance
+                           </span>
+                          </div>
+                        </div>' : $row['DateFin'];
             $nestedData[] = $row['NamaPembeli'].'<br>'.$row['PhoneNumberPembeli'].'<br>'.$row['EmailPembeli'].'<br>'.$row['SchoolNameFormulir'].'<br>'.$row['DistrictNameFormulir'].' '.$row['CityNameFormulir'];
             $nestedData[] = $row['src_name'];
             $action = '';
@@ -2155,6 +2210,15 @@ class C_finance extends Finnance_Controler {
         {
             exit('No direct script access allowed');
         }
+    }
+
+    public function save_tgl_formulir_offline()
+    {
+        $input = $this->getInputToken();
+        $formUpdate = $input['data'];
+        $ID = $input['ID'];
+        $this->db->where('ID',$ID);
+        $this->db->update('db_admission.sale_formulir_offline', $formUpdate);
     }
 
 }

@@ -1,76 +1,91 @@
-
-<div class="row" style="margin-top: 30px;">
-    <div class="col-md-3">
-        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <select class="form-control" id="selectCurriculum">
-                <option selected value = ''>--- Curriculum ---</option>
-                <option disabled>------</option>
-            </select>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <select class="form-control" id="selectProdi">
-                <option selected value = ''>--- Prodi---</option>
-                <option disabled>------</option>
-            </select>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <select class="form-control" id="selectPTID">
-                <option selected value = ''>--- Payment Type ---</option>
-                <option disabled>------</option>
-            </select>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM" value="">
-        </div>
-    </div>
-</div>
-
 <div class="row">
-    <div class="col-md-12">
-        <hr/>
-        <!-- <div class="col-md-3 col-md-offset-8"> -->
-          <!-- <input type="text" name="NPM" placeholder="Input NPM" id = "NPM" class="form-control"> -->
-        <!-- </div>   -->
-        <table class="table table-bordered datatable2 hide" id = "datatable2">
-            <thead>
-            <tr style="background: #333;color: #fff;">
-                <th style="width: 3%;"><input type="checkbox" class="uniform" value="nothing" id ="dataResultCheckAll"></th>
-                <th style="width: 12%;">Program Study</th>
-                <!-- <th style="width: 10%;">Semester</th> -->
-                <th style="width: 20%;">Nama,NPM & VA</th>
-                <!-- <th style="width: 5%;">NPM</th> -->
-                <!-- <th style="width: 5%;">Year</th> -->
-                <th style="width: 5%;">Foto</th>
-                <th style="width: 15%;">Email PU</th>
-                <th style="width: 5%;">No HP</th>
-                <th style="width: 5%;">IPS</th>
-                <th style="width: 5%;">IPK</th>
-                <th style="width: 5%;">Credit</th>
-                <th style="width: 5%;">Price</th>
-                <th style="width: 5%;">Discount</th>
-                <th style="width: 20%;">Invoice</th>
-            </tr>
-            </thead>
-            <tbody id="dataRow"></tbody>
-        </table>
+    <div class="col-xs-12" >
+        <div class="panel panel-primary">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Set Tagihan Mahasiswa</h4>
+            </div>
+            <div class="panel-body">
+               <div class="row">
+                  <div class="col-md-12">
+                    <div class="well">
+                      <h5>Search</h5>
+                      <div class="row">
+                        <div class="col-md-3">
+                            <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                                <select class="form-control" id="selectCurriculum">
+                                    <option selected value = ''>--- Curriculum ---</option>
+                                    <option disabled>------</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                                <select class="form-control" id="selectProdi">
+                                    <option selected value = ''>--- Prodi---</option>
+                                    <option disabled>------</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                                <select class="form-control" id="selectPTID">
+                                    <option selected value = ''>--- Payment Type ---</option>
+                                    <option disabled>------</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                                <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM" value="">
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+               </div>
+
+               <div class="row">
+                    <hr/> 
+                   <div  class="col-xs-12" align="right" id="pagination_link"></div>
+                   <div class="col-md-12">
+                       <table class="table table-bordered datatable2 hide" id = "datatable2">
+                           <thead>
+                           <tr style="background: #333;color: #fff;">
+                               <th style="width: 3%;"><input type="checkbox" class="uniform" value="nothing" id ="dataResultCheckAll"></th>
+                               <th style="width: 12%;">Program Study</th>
+                               <!-- <th style="width: 10%;">Semester</th> -->
+                               <th style="width: 20%;">Nama,NPM & VA</th>
+                               <!-- <th style="width: 5%;">NPM</th> -->
+                               <!-- <th style="width: 5%;">Year</th> -->
+                               <th style="width: 5%;">Foto</th>
+                               <th style="width: 15%;">Email PU</th>
+                               <th style="width: 5%;">No HP</th>
+                               <th style="width: 5%;">IPS</th>
+                               <th style="width: 5%;">IPK</th>
+                               <th style="width: 5%;">Credit</th>
+                               <th style="width: 5%;">Price</th>
+                               <th style="width: 5%;">Discount</th>
+                               <th style="width: 20%;">Invoice</th>
+                           </tr>
+                           </thead>
+                           <tbody id="dataRow"></tbody>
+                       </table>
+                   </div>
+                   <div  class="col-xs-12" align="right"><button class="btn btn-success  btn-submit hide" id="btn-submit"> <i class="icon-pencil icon-white"></i> <span><strong>Submit</strong></span></button></div>
+                   <br>
+               </div>           
+            </div>
+        </div>
     </div>
-    <div  class="col-xs-12" align="right" id="pagination_link"></div>
-    <div  class="col-xs-12" align="right"><button class="btn btn-success  btn-submit hide" id="btn-submit"> <i class="icon-pencil icon-white"></i> <span><strong>Submit</strong></span></button></div>
-    <br>
 </div>
+
 
 
 <script>
     $(document).ready(function () {
         loadSelectOptionCurriculum2('#selectCurriculum','');
         loadSelectOptionBaseProdi('#selectProdi','');
-        loadSelectOptionPaymentTypeMHS('#selectPTID','');
+        loadSelectOptionPaymentTypeAll('#selectPTID','');
         // $("#btn-submit").addClass('hide');
     });
 
@@ -298,8 +313,13 @@
     }
 
     $(document).on('click','#btn-submit', function () {
+        var PTID = $("#selectPTID").val();
         var arrValueCHK = getChecboxNPM();
         console.log(arrValueCHK);
+        var thDate = '';
+        if (PTID == 1 || PTID == 4) {
+          thDate = '<th style="width: 55px;">Deadline</th>';
+        }
         if (arrValueCHK.length > 0) {
             var html = '';
             var table = '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
@@ -310,12 +330,24 @@
                                   '<th style="width: 55px;">NIM</th>'+
                                   '<th style="width: 55px;">Prodi</th>'+
                                   '<th style="width: 55px;">Discount</th>'+
-                                  '<th style="width: 55px;">Invoice</th>';
+                                  '<th style="width: 55px;">Invoice</th>'+
+                                  thDate;
             table += '</tr>' ;  
             table += '</thead>' ; 
             table += '<tbody>' ;
             var isi = '';
             for (var i = 0; i < arrValueCHK.length ; i++) {
+                var tdDate = '';
+                if (PTID == 1 || PTID == 4) {
+                  tdDate = '<td>'+
+                              '<div class="col-xs-12">'+
+                                '<div id="datetimepicker1'+arrValueCHK[i]['NPM']+'" class="input-group input-append date datetimepicker">'+
+                                    '<input data-format="yyyy-MM-dd" class="form-control" id="tgl'+arrValueCHK[i]['NPM']+'" type=" text" readonly="" npm = "'+arrValueCHK[i]['NPM']+'">'+
+                                    '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
+                                '</div>'+
+                              '</div>'+
+                            '</td>';
+                }
                 isi += '<tr>'+
                       '<td>'+ (i+1) + '</td>'+
                       '<td>'+ (arrValueCHK[i]['Nama']) + '</td>'+
@@ -323,8 +355,8 @@
                       '<td>'+ (arrValueCHK[i]['Prodi']) + '</td>'+
                       '<td>'+ (arrValueCHK[i]['Discount']) + ' %</td>'+
                       '<td>'+ (arrValueCHK[i]['Invoice']) + '</td>'+
+                      tdDate
                     '<tr>';  
-                
             }
 
             table += isi+'</tbody>' ; 
@@ -343,8 +375,21 @@
                'backdrop' : 'static'
            });
 
+           $('.datetimepicker').datetimepicker({
+             format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+           });
+
            $( "#ModalbtnSaveForm" ).click(function() {
             loading_button('#ModalbtnSaveForm');
+            if (PTID == 1 || PTID == 4) {
+              for (var i = 0; i < arrValueCHK.length; i++) {
+                var Deadline = $('#tgl'+arrValueCHK[i]['NPM']).val();
+                if (Deadline == '') {
+                  toastr.error('Please fill date textbox','!Failed');$('#ModalbtnSaveForm').prop('disabled',false).html('Save');return;
+                }
+                arrValueCHK[i]['Deadline'] = Deadline;
+              }
+            }
             var url = base_url_js+'finance/submit_tagihan_mhs';
             var data = {
                 arrValueCHK : arrValueCHK,

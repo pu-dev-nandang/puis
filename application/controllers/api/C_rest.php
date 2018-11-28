@@ -411,7 +411,7 @@ class C_rest extends CI_Controller {
             $auth = $this->m_master->AuthAPI($dataToken);
             if ($auth) {
                 $where = (!array_key_exists("division",$dataToken)) ? '' : ' where a.Division ="'.$dataToken['division'].'"';
-                $sql = 'SELECT a.*,b.FormulirCode from db_admission.formulir_number_global as a left join db_admission.formulir_number_offline_m as b on a.FormulirCodeGlobal = b.FormulirCode'.$where;
+                $sql = 'SELECT a.*,b.FormulirCode from db_admission.formulir_number_global as a left join db_admission.formulir_number_offline_m as b on a.FormulirCodeGlobal = b.No_Ref'.$where;
                 $query=$this->db->query($sql, array())->result_array();
                 echo json_encode($query);
             }
