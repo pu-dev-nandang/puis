@@ -242,6 +242,13 @@
             .closest('.row');
           var td = $( this )
             .closest('td')
+            var htmlFirst = '<div class="row" style="margin-top: 10px">'+
+                          '<div class="col-md-12">'+
+                            '<span idget="'+idget+'" class="btn btn-xs btn-primary btn-setdate">'+
+                             '<i class="fa fa-user-o"></i> Set Date Finance'+
+                           '</span>'+
+                          '</div>'+
+                        '</div>';
           rowhead
             .html(html)
             .after(btn_save);
@@ -266,7 +273,7 @@
               if (tgl == '') {toastr.error('Please fill the textbox', 'Failed!!');return;}
               $.post(url,{token:token},function (data_json) {
                 td
-                  .html(tgl)
+                  .html(tgl+htmlFirst)
               }).done(function() {
                 // $('#btn-Save').prop('disabled',false).html('Submit');
               }).fail(function() {

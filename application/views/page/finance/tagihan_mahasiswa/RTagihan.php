@@ -1,97 +1,71 @@
-<style type="text/css">
-    table {
-            border:solid #000 !important;
-            border-width:1px 0 0 1px !important;
-            font-size: 12px;
-            }
-        th, td {
-          border:solid #000 !important;
-          border-width:0 1px 1px 0 !important;
-        }
-     @media print {
-      .noprint { display:none };
-          
-    }    
-</style>
-<div class="row">
-    <div class="col-xs-12" >
-        <div class="panel panel-primary">
-            <div class="panel-heading clearfix">
-                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Report</h4>
-            </div>
-            <div class="panel-body">
-               <div class="row noprint">
-                 <div class="col-md-12">
-                  <div class="well">
-                    <h5>Search</h5>
-                    <div class="row">
-                      <div class="col-md-3">
-                          <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-                              <select class="form-control" id="selectCurriculum">
-                                  <option selected value = ''>--- All Curriculum ---</option>
-                                  <option disabled>------</option>
-                              </select>
-                          </div>
-                      </div>
-                      <div class="col-md-3">
-                          <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-                              <select class="form-control" id="selectProdi">
-                                  <option selected value = ''>--- All Prodi---</option>
-                                  <option disabled>------</option>
-                              </select>
-                          </div>
-                      </div>
-                      <div class="col-md-3">
-                          <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-                              <select class="form-control" id="selectStatus">
-                                  <option value = ''>--All Status--</option>
-                                  <option selected value = '0'>Tidak Lunas</option>
-                                  <option value="1">Lunas</option>
-                              </select>
-                          </div>
-                      </div>
-                      <div class="col-md-3">
-                          <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-                              <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM">
-                          </div>
-                      </div>
-                    </div>
-                  </div>
-                 </div>
-               </div>
-               <div class="row noprint">
-                 <div class="col-md-12 noprint">
-                       <hr/>
-                       <div class="col-md-12">
-                         <div class="DTTT btn-group">
-                           <button type="button" class="btn btn-convert" id="export_excel"><i class="fa fa-download" aria-hidden="true"></i> Excel</button>
-                           <!--<a class="btn DTTT_button_pdf" id="ToolTables_DataTables_Table_0_1">
-                             <span><i class="fa fa-download" aria-hidden="true"></i> PDF
-                             </span>
-                           </a>-->
-                         </div>
-                         <div id="DataTables_Table_0_filter" class="dataTables_filter">
-                           <label>
-                             <div class="input-group">
-                               <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-                                   <select class="form-control" id="selectSemester">
-                                   </select>
-                               </div>
-                             </div>
-                           </label>
-                         </div>
-                       </div>  
-                 </div>  
-               </div>
-               <div class="row" style="margin-top: 15px">
-                 <div id='conTainJS'>
-                     
-                 </div>
-               </div>            
-            </div>
-        </div>
-    </div>
+<div class="row noprint">
+  <div class="col-md-12">
+   <div class="well">
+     <h5>Search</h5>
+     <div class="row">
+       <div class="col-md-3">
+           <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+               <select class="form-control" id="selectCurriculum">
+                   <option selected value = ''>--- All Curriculum ---</option>
+                   <option disabled>------</option>
+               </select>
+           </div>
+       </div>
+       <div class="col-md-3">
+           <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+               <select class="form-control" id="selectProdi">
+                   <option selected value = ''>--- All Prodi---</option>
+                   <option disabled>------</option>
+               </select>
+           </div>
+       </div>
+       <div class="col-md-3">
+           <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+               <select class="form-control" id="selectStatus">
+                   <option value = ''>--All Status--</option>
+                   <option selected value = '0'>Tidak Lunas</option>
+                   <option value="1">Lunas</option>
+               </select>
+           </div>
+       </div>
+       <div class="col-md-3">
+           <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+               <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM">
+           </div>
+       </div>
+     </div>
+   </div>
+  </div>
 </div>
+<div class="row noprint">
+  <div class="col-md-12 noprint">
+        <hr/>
+        <div class="col-md-12">
+          <div class="DTTT btn-group">
+            <button type="button" class="btn btn-convert" id="export_excel"><i class="fa fa-download" aria-hidden="true"></i> Excel</button>
+            <!--<a class="btn DTTT_button_pdf" id="ToolTables_DataTables_Table_0_1">
+              <span><i class="fa fa-download" aria-hidden="true"></i> PDF
+              </span>
+            </a>-->
+          </div>
+          <div id="DataTables_Table_0_filter" class="dataTables_filter">
+            <label>
+              <div class="input-group">
+                <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                    <select class="form-control" id="selectSemester">
+                    </select>
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>  
+  </div>  
+</div>
+<div class="row" style="margin-top: 15px">
+  <div id='conTainJS'>
+      
+  </div>
+</div> 
 
 <script type="text/javascript">
     window.dataa = '';
@@ -270,22 +244,29 @@
         };
         var token = jwt_encode(data,'UAP)(*');
         var htmlDy = '<div class="col-md-12"><div class = "table-responsive">'+
-                        '<table class="table table-bordered datatable2 " id = "datatable2">'+
+                        '<table class="table table-bordered datatable2 " id = "datatableReport2">'+
                             '<caption id ="CaptionTa"></caption>'+
                             '<thead>'+
                             '<tr style="background: #333;color: #fff;">'+
                             '    <th style="width: 1%;" rowspan = "2">No</th>'+
-                            '    <th style="width: 25%;" rowspan = "2">Nama & NPM</th>'+
+                            '    <th style="width: 15%;" rowspan = "2">Nama & NPM</th>'+
                             '    <th style="width: 5%;" rowspan = "2">Jurusan</th>'+
-                            '    <th style="width: 20%;text-align:center" rowspan = "1" colspan = "2">Tagihan</th>'+
-                            '    <th style="width: 10%;" rowspan = "2">Total Tagihan</th>'+
-                            '    <th style="width: 10%;" rowspan = "2">Total Pembayaran</th>'+
-                            '    <th style="width: 10%;" rowspan = "2">Piutang</th>'+
+                            '    <th style="width: 20%;text-align:center" rowspan = "1" colspan = "8">Tagihan</th>'+
+                            '    <th style="width: 7%;" rowspan = "2">Total Tagihan</th>'+
+                            '    <th style="width: 7%;" rowspan = "2">Total Pembayaran</th>'+
+                            '    <th style="width: 7%;" rowspan = "2">Piutang</th>'+
+                            '    <th rowspan = "2" width="10%">Aging</th>'+
                             '    <th rowspan = "2">Keterangan</th>'+
                             '</tr>'+
                             '<tr style="background: #333;color: #fff;">'+
                               '<th>BPP</th>'+
+                              '<th width = "10%">DueDate</th>'+
                               '<th>Credit</th>'+
+                              '<th width = "10%">DueDate</th>'+
+                              '<th>SPP</th>'+
+                              '<th width = "10%">DueDate</th>'+
+                              '<th>Lain-Lain</th>'+
+                              '<th width = "10%">DueDate</th>'+
                             '</tr>'+  
                             '</thead>'+
                             '<tbody id="dataRow"></tbody>'+
@@ -315,11 +296,11 @@
                             // var timee = (Data_mhs[i]['Time'] == null) ? '-' : Data_mhs[i]['Time'];
                             // var yy = (Data_mhs[i]['InvoiceStudents'] != '') ? formatRupiah(Data_mhs[i]['InvoiceStudents']) : '-';
                             // var btnPrint = '<span data-smt="'+Data_mhs[i]['ID_payment_students']+'" class="btn btn-xs btn-print" NPM = "'+Data_mhs[i]['NPM']+'" Semester = "'+Data_mhs[i]['SemesterName']+'" PTID = "'+Data_mhs[i]['PTIDDesc']+'" VA = "'+Data_mhs[i]['VA']+'" BilingID = "'+Data_mhs[i]['BilingID']+'" Invoice = "'+yy+'" Nama = "'+Data_mhs[i]['Nama']+'"  Prodi = "'+Data_mhs[i]['ProdiEng']+'" Time = "'+timee+'"><i class="fa fa-print"></i> Print</span>';
-                            var Total_tagihan = parseInt(Data_mhs[i]['BPP'])  + parseInt(Data_mhs[i]['Cr']) ;
+                            var Total_tagihan = parseInt(Data_mhs[i]['BPP'])  + parseInt(Data_mhs[i]['Cr']) + parseInt(Data_mhs[i]['SPP']) + parseInt(Data_mhs[i]['An']) ;
                             sumTagihan = sumTagihan + Total_tagihan;
-                            var Total_pembayaran = parseInt(Data_mhs[i]['PayBPP'])  + parseInt(Data_mhs[i]['PayCr']) ;
+                            var Total_pembayaran = parseInt(Data_mhs[i]['PayBPP'])  + parseInt(Data_mhs[i]['PayCr']) + parseInt(Data_mhs[i]['PaySPP']) + parseInt(Data_mhs[i]['PayAn']);
                             sumPembayaran = sumPembayaran + Total_pembayaran;
-                            var Piutang = parseInt(Data_mhs[i]['SisaCr'])  + parseInt(Data_mhs[i]['SisaBPP']) ;
+                            var Piutang = parseInt(Data_mhs[i]['SisaCr'])  + parseInt(Data_mhs[i]['SisaBPP']) + parseInt(Data_mhs[i]['SisaSPP']) + parseInt(Data_mhs[i]['SisaAn']);
                             sumPiutang = sumPiutang + Piutang;
                             var keterangan = '';
                             var ketEXcel = "";
@@ -406,10 +387,17 @@
                                 '<td>'+Data_mhs[i]['Name']+'<br>'+Data_mhs[i]['NPM']+'<br>'+'</td>' +
                                 '<td>'+Data_mhs[i]['ProdiENG']+'</td>' +
                                 '<td>'+formatRupiah(Data_mhs[i]['BPP'])+'</td>' +
+                                '<td>'+Data_mhs[i]['DueDateBPP']+'</td>' +
                                 '<td>'+formatRupiah(Data_mhs[i]['Cr'])+'</td>' +
+                                '<td>'+Data_mhs[i]['DueDateCR']+'</td>' +
+                                '<td>'+formatRupiah(Data_mhs[i]['SPP'])+'</td>' +
+                                '<td>'+Data_mhs[i]['DueDateSPP']+'</td>' +
+                                '<td>'+formatRupiah(Data_mhs[i]['An'])+'</td>' +
+                                '<td>'+Data_mhs[i]['DueDateAn']+'</td>' +
                                 '<td>'+formatRupiah(Total_tagihan)+'</td>' +
                                 '<td>'+formatRupiah(Total_pembayaran)+'</td>' +
                                 '<td>'+formatRupiah(Piutang)+'</td>' +
+                                '<td>'+Data_mhs[i]['AgingBPP']+'<br>'+Data_mhs[i]['AgingCr']+'<br>'+Data_mhs[i]['AgingSPP']+'<br>'+Data_mhs[i]['AgingAn']+'</td>' +
                                 '<td>'+keterangan+'</td>' +
                                 '</tr>');
                             var valueToPush = new Array();
@@ -422,10 +410,11 @@
                         $('#NIM').focus();
                         $('#CaptionTa').html('<h2>'+taShow+'</h2>');
                         $("#dataRow").append('<tr style="background: #333;color: #fff;">'+
-                            '<td colspan = "5" style="text-align:center">Total '+taShow+'</td>'+
+                            '<td colspan = "11" style="text-align:center">Total '+taShow+'</td>'+
                             '<td>'+formatRupiah(sumTagihan)+'</td>' +
                             '<td>'+formatRupiah(sumPembayaran)+'</td>' +
                             '<td>'+formatRupiah(sumPiutang)+'</td>' +
+                            '<td></td>'+
                             '<td></td>'+
                             '</tr>'  
                           );
@@ -438,7 +427,7 @@
                         };
 
                 } else {
-                    $('#dataRow').append('<tr><td colspan="9" align = "center">No Result Data</td></tr>');
+                    $('#dataRow').append('<tr><td colspan="16" align = "center">No Result Data</td></tr>');
                 }
             },500);    
         }).fail(function() {
