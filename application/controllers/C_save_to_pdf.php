@@ -3709,7 +3709,7 @@ class C_save_to_pdf extends CI_Controller {
         $full_width = 266.5;
         $w_left = 205;
         $w_right = $full_width - $w_left;
-        $pdf->SetY(8.5); //novie
+        $pdf->SetY(8); //novie
         $pdf->SetFont('dinpromedium','',8);
         $pdf->Cell($w_left,$h,'Nomor Keputusan Pendirian Perguruan Tinggi : '.$Ijazah['NumberUniv'],$border,0,'L');
         $pdf->Cell($w_right,$h,'Nomor Seri Ijazah : '.$Student['CSN'],$border,1,'L');
@@ -3854,7 +3854,7 @@ class C_save_to_pdf extends CI_Controller {
         $Rektor = $titleARektor.''.$Rektorat['Name'].''.$titleBRektor;
         // ----
         $pdf->SetFont('dinpromedium','',$fn_b);
-        $yy = 13; // novie
+        $yy = 9.2; // novie
         $xx = 57;
         $ytext = $pdf->GetY()+$yy;
         $xtext = $pdf->GetX()+$xx;
