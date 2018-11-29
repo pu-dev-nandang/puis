@@ -3499,7 +3499,6 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_R_fill,$h,$Result['Grading'][0]['Description'],'R',1,'L');
 
         $pdf->SetFont('dinlightitalic','',$font_medium_i);
-        $pdf->Cell($w_Div,$h,' Grade Point Average','L',0,'L');
         $pdf->Cell($w_R_label,$h,' Graduation Honor','L',0,'L');
         $pdf->Cell($w_R_sparator,$h,':',0,0,'C');
         $pdf->Cell($w_R_fill,$h,$Result['Grading'][0]['DescriptionEng'],'R',1,'L');
@@ -3693,136 +3692,102 @@ class C_save_to_pdf extends CI_Controller {
 
 
     // ====== Ijazah =======
-    public function ijazah(){
-
-
+  public function ijazah(){
         $token = $this->input->post('token');
         $data_arr = $this->getInputToken($token);
-
         $dataIjazah = $this->m_save_to_pdf->getIjazah($data_arr['DBStudent'],$data_arr['NPM']);
-
         $pdf = new FPDF('L','mm','A4');
-
         $pdf->AddFont('dinproExpBold','','dinproExpBold.php');
-
         // membuat halaman baru
         $pdf->SetMargins(20.5,10.5,10);
         $pdf->AddPage();
-
 //        $pdf->Image(base_url('images/i.jpg'),0,0,300);
-
         $h = 3;
-
         $Ijazah = $dataIjazah['Ijazah'][0];
         $Student = $dataIjazah['Student'][0];
-
         $border = 0;
-
         $full_width = 266.5;
         $w_left = 205;
         $w_right = $full_width - $w_left;
-
-        $pdf->SetY(7);
+        $pdf->SetY(8.5); //novie
         $pdf->SetFont('dinpromedium','',8);
         $pdf->Cell($w_left,$h,'Nomor Keputusan Pendirian Perguruan Tinggi : '.$Ijazah['NumberUniv'],$border,0,'L');
         $pdf->Cell($w_right,$h,'Nomor Seri Ijazah : '.$Student['CSN'],$border,1,'L');
-
         $pdf->SetFont('dinlightitalic','',8);
         $pdf->Cell($w_left,$h,'University Estabilshment Permit Number',$border,0,'L');
         $pdf->Cell($w_right,$h,'Cerficate Serial Number',$border,1,'L');
-
         $pdf->Ln(29);
-
         $fn_b = 11.5;
         $fn_i = 10;
-
         $x = 60;
         $h = 4;
         $full_width = 212;
         $pdf->SetXY($x,45.5);
         $pdf->SetFont('dinpromedium','',$fn_b);
-
         $pdf->Cell($full_width,$h,'Memberikan Ijazah Kepada',$border,1,'C');
-
         $pdf->SetX($x);
         $pdf->SetFont('dinlightitalic','',$fn_i);
         $pdf->Cell($full_width,$h,'This certificate is awarded to',$border,1,'C');
-
         $pdf->SetX($x);
 //        $pdf->SetFont('dinpromedium','',20);
         $pdf->SetFont('dinproExpBold','',20);
         $pdf->Cell($full_width,13,ucwords(strtolower($Student['Name'])),$border,1,'C');
-
         $pdf->Ln(1.5);
-
         $x = 67;
         $ln = 1.5;
         $label = 70;
         $sp = 1.5;
         $fill = 100;
-
         $fillFull = $label + $sp + $fill;
-
-
-
         $border = 0;
-
         // ===== TTL =====
         $pdf->SetX($x);
         $pdf->SetFont('dinpromedium','',$fn_b);
         $pdf->Cell($label,$h,'Tempat dan Tanggal Lahir',$border,0,'L');
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,$Student['PlaceOfBirth'].', '.$this->getDateIndonesian($Student['DateOfBirth']),$border,1,'L');
-
         $pdf->SetX($x);
         $pdf->SetFont('dinlightitalic','',$fn_i);
         $pdf->Cell($label,$h,'Place and Date of Birth',$border,0,'L');
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,$Student['PlaceOfBirth'].', '.date('F j, Y',strtotime($Student['DateOfBirth'])),$border,1,'L');
         $pdf->Ln($ln);
-
         // ===== NIM =====
         $pdf->SetX($x);
         $pdf->SetFont('dinpromedium','',$fn_b);
         $pdf->Cell($label,$h,'Nomor Induk Mahasiswa',$border,0,'L');
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,$Student['NPM'],$border,1,'L');
-
         $pdf->SetX($x);
         $pdf->SetFont('dinlightitalic','',$fn_i);
         $pdf->Cell($label,$h,'Student Identification Number',$border,0,'L');
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,$Student['NPM'],$border,1,'L');
         $pdf->Ln($ln);
-
         // ===== Prodi =====
         $pdf->SetX($x);
         $pdf->SetFont('dinpromedium','',$fn_b);
         $pdf->Cell($label,$h,'Program Studi',$border,0,'L');
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,$Student['Prodi'],$border,1,'L');
-
         $pdf->SetX($x);
         $pdf->SetFont('dinlightitalic','',$fn_i);
         $pdf->Cell($label,$h,'Study Program',$border,0,'L');
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,1,'L');
         $pdf->Ln($ln);
-
         // ===== Program Pendidikan =====
         $pdf->SetX($x);
         $pdf->SetFont('dinpromedium','',$fn_b);
         $pdf->Cell($label,$h,'Program Pendidikan',$border,0,'L');
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,$Student['GradeDesc'],$border,1,'L');
-
         $pdf->SetX($x);
         $pdf->SetFont('dinlightitalic','',$fn_i);
         $pdf->Cell($label,$h,'Education Program',$border,0,'L');
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,$Student['GradeDescEng'],$border,1,'L');
         $pdf->Ln($ln);
-
         // ===== Tanggal Yudisium =====
         $pdf->SetX($x);
         $pdf->SetFont('dinpromedium','',$fn_b);
@@ -3830,7 +3795,6 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($sp,$h,':',$border,0,'C');
 //        $pdf->Cell($fill,$h,date('d/m/Y',strtotime($Ijazah['DateOfYudisium'])),$border,1,'L');
         $pdf->Cell($fill,$h,$this->getDateIndonesian($Ijazah['DateOfYudisium']),$border,1,'L');
-
         $pdf->SetX($x);
         $pdf->SetFont('dinlightitalic','',$fn_i);
         $pdf->Cell($label,$h,'Date of Yudisiom',$border,0,'L');
@@ -3838,7 +3802,6 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($fill,$h,date('F j, Y',strtotime($Ijazah['DateOfYudisium'])),$border,1,'L');
 //        $pdf->Cell($fill,$h,date('d/m/Y',strtotime($Ijazah['DateOfYudisium'])),$border,1,'L');
         $pdf->Ln(4);
-
         // ===== Ket 1 =====
         // 171.5
         $pdf->SetX($x);
@@ -3846,55 +3809,43 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(135,$h,'Dengan demikian yang bersangkutan berhak memakai gelar Akademik : ',$border,0,'L');
         $pdf->Cell(15,$h,'',$border,0,'L');
         $pdf->Cell(50,$h,$Student['Degree'].' ('.$Student['TitleDegree'].')',$border,1,'L');
-
         $pdf->SetX($x);
         $pdf->SetFont('dinlightitalic','',$fn_i);
         $pdf->Cell(135,$h,'Henceforth the conferee is entitled to use the academic degree of',$border,0,'L');
         $pdf->Cell(15,$h,'',$border,0,'L');
         $pdf->Cell(50,$h,$Student['DegreeEng'].' ('.$Student['TitleDegreeEng'].')',$border,1,'L');
         $pdf->Ln($ln);
-
         // ===== Ket 2 =====
         $pdf->SetX($x);
         $pdf->SetFont('dinpromedium','',$fn_b);
         $pdf->Cell($fillFull,$h,'dan diberikan hak serta wewenang yang berhubungan dengan gelar yang dimilikinya.',$border,1,'L');
-
         $pdf->SetX($x);
         $pdf->SetFont('dinlightitalic','',$fn_i);
         $pdf->Cell($fillFull,$h,'and conferred the right and privileges pertaining to this degree.',$border,1,'L');
-
         $y = $pdf->GetY()+7;
         $pdf->Ln(15);
-
         // 171.5
         // Tanda tangan
-
         $pdf->SetX($x+10);
         $pdf->SetFont('dinpromedium','',$fn_b);
         $pdf->Cell(171.5,$h,$Ijazah['PlaceIssued'].', '.$this->getDateIndonesian($Ijazah['DateIssued']),$border,1,'L');
         $pdf->SetX($x+10);
         $pdf->SetFont('dinlightitalic','',$fn_i);
         $pdf->Cell(171.5,$h,$Ijazah['PlaceIssued'].', '.date('F j, Y',strtotime($Ijazah['DateIssued'])),$border,1,'L');
-
         $pdf->Ln(3);
         $pdf->SetX($x+10);
         $pdf->SetFont('dinpromedium','',$fn_b);
         $pdf->Cell(138.5,$h,'Rektor',$border,0,'L');
         $pdf->Cell(41,$h,'Dekan',$border,1,'L');
-
         $pdf->SetFont('dinlightitalic','',$fn_i);
         $pdf->SetX($x+10);
         $pdf->Cell(138.5,$h,'Rector',$border,0,'L');
         $pdf->Cell(41,$h,'Dean',$border,1,'L');
-
         $pdf->Ln(13);
-
         // Dekan --
         $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].' ' : '';
         $titleB = ($Student['TitleBehind']!='') ? $Student['TitleBehind'] : '' ;
-
         $Dekan = $titleA.''.$Student['Dekan'].''.$titleB;
-
         // Rektor
         $Rektorat = $dataIjazah['Rektorat'][0];
         $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].' ' : '';
@@ -3902,34 +3853,25 @@ class C_save_to_pdf extends CI_Controller {
         $komaRektor = ($titleBRektor!='') ? ',' : '';
         $Rektor = $titleARektor.''.$Rektorat['Name'].''.$titleBRektor;
         // ----
-
         $pdf->SetFont('dinpromedium','',$fn_b);
-
-        $yy = 15;
+        $yy = 13; // novie
         $xx = 57;
-
         $ytext = $pdf->GetY()+$yy;
         $xtext = $pdf->GetX()+$xx;
         $pdf->Text($xtext,$ytext,$Rektor);
-
         $ytext = $pdf->GetY()+$yy+4;
         $xtext = $pdf->GetX()+$xx;
         $pdf->SetFont('dinpromedium','',$fn_b-2);
         $pdf->Text($xtext,$ytext,'NIK : '.$Rektorat['NIP']);
-
-
         $pdf->SetFont('dinpromedium','',$fn_b);
         $ytext = $pdf->GetY()+$yy;
         $xtext = $pdf->GetX()+$xx+138;
         $pdf->Text($xtext,$ytext,$Dekan);
-
         $ytext = $pdf->GetY()+$yy+4;
         $xtext = $pdf->GetX()+$xx+138;
         $pdf->SetFont('dinpromedium','',$fn_b-2);
         $pdf->Text($xtext,$ytext,'NIK : '.$Student['NIP']);
-
         $pdf->Rect($x+95, $y, 40, 60);
-
         $nameF = str_replace(' ','_',strtoupper($Student['Name']));
         $pdf->Output('IJAZAH_'.$Student['NPM'].'_'.$nameF.'.pdf','I');
     }
