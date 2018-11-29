@@ -2155,7 +2155,13 @@ class C_finance extends Finnance_Controler {
                              <i class="fa fa-user-o"></i> Set Date Finance
                            </span>
                           </div>
-                        </div>' : $row['DateFin'];
+                        </div>' : '<div class = "row"><div class = "col-md-12">'.$row['DateFin'].'</div></div>'.'<div class="row" style="margin-top: 10px">
+                          <div class="col-md-12">
+                            <span IDget = "'.$row['ID_sale_formulir_offline'].'" class="btn btn-xs btn-primary btn-setdate">
+                             <i class="fa fa-user-o"></i> Set Date Finance
+                           </span>
+                          </div>
+                        </div>';
             $nestedData[] = $row['NamaPembeli'].'<br>'.$row['PhoneNumberPembeli'].'<br>'.$row['EmailPembeli'].'<br>'.$row['SchoolNameFormulir'].'<br>'.$row['DistrictNameFormulir'].' '.$row['CityNameFormulir'];
             $nestedData[] = $row['src_name'];
             $action = '';

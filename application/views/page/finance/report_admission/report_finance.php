@@ -42,7 +42,7 @@
 					          				</div>
 					          			</div>
 					          			<div class="row" style="margin-top: 10px">
-					          				<div class="col-xs-4 col-xs-offset-4">
+					          				<div class="col-xs-4 col-md-offset-4">
 					          					<label>Angkatan</label>
 					          					<select class="select2-select-00 full-width-fix" id="SelectSetTa">
 			                                         <option></option>
@@ -50,7 +50,7 @@
 					          				</div>
 					          			</div>
 					          			<div class="row" style="margin-top: 10px">
-					          				<div class="col-xs-4 col-xs-offset-4">
+					          				<div class="col-xs-4 col-md-offset-4">
 					          					<label>Sort By</label>
 					          					<select class="select2-select-00 full-width-fix" id="SelectSortBy">
 			                                         <option value="a.No_Ref" selected>No Ref</option>
@@ -162,17 +162,8 @@
 	function FuncClickbtnPenjualanFormulirFinance()
 	{
 		$("#btnPenjualanFormulirFinance").click(function(){
-			var cf = $(".dateOP:checked").val();
-			if (cf == '' || cf == null) {
-				toastr.error('Mohon pilih Date Range atau By Month','Failed!')
-			} else {
-				var url = base_url_js+'admission/export_PenjualanFormulirFinance';
+				var url = base_url_js+'finance/export_PenjualanFormulir';
 				data = {
-				  cf : cf,
-				  dateRange1 : $("#dateRange1").val(),
-				  dateRange2 : $("#dateRange2").val(),
-				  SelectMonth : $("#SelectMonth").val(),
-				  SelectYear : $("#SelectYear").val(),
 				  SelectSetTa : $("#SelectSetTa").val(),
 				  SelectSortBy : $("#SelectSortBy").val(),
 				}
@@ -180,7 +171,6 @@
 				FormSubmitAuto(url, 'POST', [
 				    { name: 'token', value: token },
 				]);
-			}
 			
 		})
 	}
