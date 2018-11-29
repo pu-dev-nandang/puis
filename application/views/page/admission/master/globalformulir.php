@@ -100,7 +100,9 @@ $Division = $this->session->userdata('PositionMain')['IDDivision'];
 
         })
 
-
+        $("#selectTahun").change(function(){
+          loadData();
+        })
 
     });
 

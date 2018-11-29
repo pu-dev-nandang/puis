@@ -410,8 +410,8 @@ class C_rest extends CI_Controller {
             $dataToken = $this->getInputToken2();
             $auth = $this->m_master->AuthAPI($dataToken);
             if ($auth) {
-                $where = (!array_key_exists("division",$dataToken)) ? '' : ' where a.Division ="'.$dataToken['division'].'"';
-                $sql = 'SELECT a.*,b.FormulirCode from db_admission.formulir_number_global as a left join db_admission.formulir_number_offline_m as b on a.FormulirCodeGlobal = b.No_Ref'.$where;
+                $where = (!array_key_exists("division",$dataToken)) ? ' where a.Years = "'.$dataToken['selectTahun'].'"' : ' where a.Division ="'.$dataToken['division'].'" and a.Years = "'.$dataToken['selectTahun'].'" ';
+                $sql = 'SELECT a.*,b.FormulirCode from db_admission.formulir_number_global as a left join db_admission.formulir_number_offline_m as b on a.FormulirCodeGlobal = b.No_Ref'.$where.' group by a.FormulirCodeGlobal';
                 $query=$this->db->query($sql, array())->result_array();
                 echo json_encode($query);
             }
@@ -435,8 +435,10 @@ class C_rest extends CI_Controller {
             $dataToken = $this->getInputToken2();
             $auth = $this->m_master->AuthAPI($dataToken);
             if ($auth) {
-                $where = (!array_key_exists("division",$dataToken)) ? ' where a.Status = 0' : ' where a.Division ="'.$dataToken['division'].'" and a.Status = 0';
-                $sql = 'SELECT a.*,b.FormulirCode from db_admission.formulir_number_global as a left join db_admission.formulir_number_offline_m as b on a.FormulirCodeGlobal = b.No_Ref'.$where;
+                $Ta = $this->m_master->showData_array('db_admission.set_ta');
+                $Ta = $Ta[0]['Ta'];
+                $where = (!array_key_exists("division",$dataToken)) ? ' where a.Status = 0 and a.Years = "'.$Ta.'"' : ' where a.Division ="'.$dataToken['division'].'" and a.Status = 0 and a.Years = "'.$Ta.'"';
+                $sql = 'SELECT a.*,b.FormulirCode from db_admission.formulir_number_global as a left join db_admission.formulir_number_offline_m as b on a.FormulirCodeGlobal = b.No_Ref'.$where.' group by a.FormulirCodeGlobal';
                 $query=$this->db->query($sql, array())->result_array();
                 echo json_encode($query);
             }
