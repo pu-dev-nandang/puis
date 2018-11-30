@@ -3370,7 +3370,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Ln(3);
 
         $w_no = 13;
-        $w_course = 110;
+        $w_course = 105;
         $w_credit = 15;
         $w_grade = 15;
         $w_score = 15;
@@ -3474,8 +3474,8 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Ln(3);
         $totalW = $w_course+$w_no+$w_credit+$w_grade+$w_score+$w_point;
         $w_Div = $totalW/2;
-        $w_R_label = 40;
-        $w_R_sparator = 3;
+        $w_R_label = 35.5;
+        $w_R_sparator = 5;
         $w_R_fill = 52.5;
 
         $h = 1.5;
@@ -3498,7 +3498,11 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_R_sparator,$h,':',0,0,'C');
         $pdf->Cell($w_R_fill,$h,$Result['Grading'][0]['Description'],'R',1,'L');
 
+        $h=3;
         $pdf->SetFont('dinlightitalic','',$font_medium_i);
+        $pdf->Cell($w_R_label,$h,' Grade Point Average','L',0,'L');
+        $pdf->Cell($w_R_sparator,$h,'',0,0,'C');
+        $pdf->Cell($w_R_fill,$h,'','R',0,'L');
         $pdf->Cell($w_R_label,$h,' Graduation Honor','L',0,'L');
         $pdf->Cell($w_R_sparator,$h,':',0,0,'C');
         $pdf->Cell($w_R_fill,$h,$Result['Grading'][0]['DescriptionEng'],'R',1,'L');
@@ -3593,7 +3597,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_Div+$min,$h,'NIK : '.$Rektorat['NIP'],$borderttd,0,'L');
         $pdf->Cell($w_Div-$min,$h,'NIK : '.$Student['NIP'],$borderttd,1,'L');
 
-        $pdf->Rect(77, $y+5, 40, 60);
+        $pdf->Rect(77, $y+5, 40, 58);
 
 
         $nameF = str_replace(' ','_',strtoupper($Student['Name']));
@@ -3603,7 +3607,7 @@ class C_save_to_pdf extends CI_Controller {
     private function header_transcript_table($pdf){
 
         $w_no = 13;
-        $w_course = 110;
+        $w_course = 105;
         $w_credit = 15;
         $w_grade = 15;
         $w_score = 15;
@@ -3642,7 +3646,7 @@ class C_save_to_pdf extends CI_Controller {
     private function spasi_transcript_table($pdf,$desc){
 
         $w_no = 13;
-        $w_course = 110;
+        $w_course = 105;
         $w_credit = 15;
         $w_grade = 15;
         $w_score = 15;
