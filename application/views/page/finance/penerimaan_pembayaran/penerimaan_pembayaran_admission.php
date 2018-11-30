@@ -127,7 +127,8 @@
               }
           },
           'createdRow': function( row, data, dataIndex ) {
-                if(data[6] == 'Lunas')
+                // console.log(data[6]);
+                if(data[7] == 'Lunas')
                 {
                   $(row).attr('style', 'background-color: #8ED6EA; color: black;');
                 }
@@ -219,6 +220,7 @@
                             '<th style="width: 55px;">BilingID</th>'+
                             '<th style="width: 55px;">Status</th>'+
                             '<th style="width: 55px;">Deadline</th>'+
+                            '<th style="width: 55px;">Payment Date</th>'+
                             '<th style="width: 55px;">UpdateAt</th>';
       <?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
         table += '<th style="width: 55px;">Action</th>' ;                        
@@ -245,6 +247,10 @@
            {
             btn_bayar = (DetailPaymentArr[j]['Status'] == 0) ? '<button class = "bayar" IDStudent = "'+DetailPaymentArr[j]['ID']+'" bayar = "1">Bayar</button>' : '<button class = "bayar" IDStudent = "'+DetailPaymentArr[j]['ID']+'" bayar = "0">Tidak Bayar</button>';
            }
+
+           var PaymentDate = (DetailPaymentArr[j]['DatePayment'] == '' || DetailPaymentArr[j]['DatePayment'] == null || DetailPaymentArr[j]['DatePayment'] == '0000-00-00 00:00:00') ? '' : DetailPaymentArr[j]['DatePayment'];
+           var Deadline = (DetailPaymentArr[j]['Deadline'] == '' || DetailPaymentArr[j]['Deadline'] == null || DetailPaymentArr[j]['Deadline'] == '0000-00-00 00:00:00') ? '' : DetailPaymentArr[j]['Deadline'];
+           var UpdateAt = (DetailPaymentArr[j]['UpdateAt'] == '' || DetailPaymentArr[j]['UpdateAt'] == null || DetailPaymentArr[j]['UpdateAt'] == '0000-00-00 00:00:00') ? '' : DetailPaymentArr[j]['UpdateAt']
            
            isi += '<tr>'+
                  '<td>'+ (j+1) + '</td>'+
@@ -252,8 +258,9 @@
                  '<td>'+ yy + '</td>'+
                  '<td>'+ DetailPaymentArr[j]['BilingID'] + '</td>'+
                  '<td>'+ status + '</td>'+
-                 '<td>'+ DetailPaymentArr[j]['Deadline'] + '</td>'+
-                 '<td>'+ DetailPaymentArr[j]['UpdateAt'] + '</td>'+
+                 '<td>'+ Deadline + '</td>'+
+                 '<td>'+ PaymentDate + '</td>'+
+                 '<td>'+ UpdateAt + '</td>'+
                  <?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
                  '<td>'+ btn_bayar + '</td>'+
                  <?php endif ?>  
@@ -288,23 +295,69 @@
   $(document).on('click','.bayar', function () {
       var IDStudent = $(this).attr('IDStudent');
       var bayar = $(this).attr('bayar');
-      loading_button(".bayar[IDStudent='"+IDStudent+"']");
-      var url = base_url_js+'finance/bayar_manual_mahasiswa_admission';
-      var data = {
-          IDStudent : IDStudent,
-          bayar : bayar,
-      };
-      var token = jwt_encode(data,'UAP)(*');
-      $.post(url,{token:token},function (resultJson) {
-         // var resultJson = jQuery.parseJSON(resultJson);
-         loadTableHeader(loadData);
-         $(".bayar[IDStudent='"+IDStudent+"']").remove();
-      }).fail(function() {
-        toastr.info('No Action...'); 
-        // toastr.error('The Database connection error, please try again', 'Failed!!');
-      }).always(function() {
+      var idget = $(this).attr('IDStudent');
+      if (bayar == 1) {
+        var html = '<div class="col-xs-12">'+
+                      '<div id="datetimepicker1'+idget+'" class="input-group input-append date datetimepicker">'+
+                          '<input data-format="yyyy-MM-dd" class="form-control" id="tgl'+idget+'" type=" text" readonly="" value = "<?php echo date('Y-m-d') ?>">'+
+                          '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
+                      '</div>'+
+                    '</div>';
+        var btn_save = '<div class = "row" style = "margin-top : 10px"><div class = "col-xs-12"><button class = "btn btn-success save'+idget+'" idget = "'+idget+'">Save</button></div></div>';
+        var rowhead = $( this )
+          .closest('.row');
+        var td = $( this )
+          .closest('td')
+          var htmlFirst = '';
+        td
+          .html(html+btn_save)
 
-      }); 
+          $('#datetimepicker1'+idget).datetimepicker({
+            format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+          });
+
+          $('.save'+idget).click(function(){
+            loading_button('.save'+idget);
+            var url = base_url_js+'finance/bayar_manual_mahasiswa_admission';
+            var data = {
+                IDStudent : IDStudent,
+                bayar : bayar,
+                DatePayment :  $("#tgl"+idget).val(),
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            $.post(url,{token:token},function (resultJson) {
+               // var resultJson = jQuery.parseJSON(resultJson);
+               loadTableHeader(loadData);
+               // $(".bayar[IDStudent='"+IDStudent+"']").remove();
+               td.empty();
+            }).fail(function() {
+              toastr.info('No Action...'); 
+              // toastr.error('The Database connection error, please try again', 'Failed!!');
+            }).always(function() {
+
+            }); 
+          })
+      }
+      else
+      {
+        loading_button(".bayar[IDStudent='"+IDStudent+"']");
+        var url = base_url_js+'finance/bayar_manual_mahasiswa_admission';
+        var data = {
+            IDStudent : IDStudent,
+            bayar : bayar,
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        $.post(url,{token:token},function (resultJson) {
+           // var resultJson = jQuery.parseJSON(resultJson);
+           loadTableHeader(loadData);
+           $(".bayar[IDStudent='"+IDStudent+"']").remove();
+        }).fail(function() {
+          toastr.info('No Action...'); 
+          // toastr.error('The Database connection error, please try again', 'Failed!!');
+        }).always(function() {
+
+        }); 
+      }
   });
 
   $(document).on('click','.show_a_href', function () {

@@ -553,6 +553,7 @@ $route['finance/report_get/(:any)'] =  'page/finance/c_report/report_get/$1';
 $route['finance/tagihan-mhs/submit_import_beasiswa_mahasiswa'] =  'page/finance/c_finance/submit_import_beasiswa_mahasiswa';
 $route['finance/download-log-va'] =  'page/finance/c_finance/download_log_va';
 $route['finance/listfile_va'] =  'page/finance/c_finance/listfile_va';
+$route['finance/admission/dailypenerimaanBank'] =  'c_save_to_excel/dailypenerimaanBank_admission';
 
 
 // -- config --
