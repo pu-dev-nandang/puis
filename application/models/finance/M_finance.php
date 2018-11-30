@@ -3226,12 +3226,12 @@ class M_finance extends CI_Model {
               $arr[] = $arrMHS + $arrBPP + $arrCr + $arrAn + $arrSPP; 
               break;
             case 0:  // Tidak Lunas
-              if ($arrBPP['DetailPaymentBPP'] == '' || $arrCr['DetailPaymentCr'] == '' ||  $arrBPP['SisaBPP'] > 0 || $arrCr['SisaCr'] > 0  ||  $arrSPP['DetailPaymentSPP'] == '' || $arrAn['DetailPaymentAn'] == '' ||  $arrSPP['SisaSPP'] > 0 || $arrAn['SisaAn'] > 0 ) {
+              if ($arrBPP['DetailPaymentBPP'] == '' || $arrCr['DetailPaymentCr'] == '' ||  $arrBPP['SisaBPP'] > 0 || $arrCr['SisaCr'] > 0  ||  $arrSPP['SisaSPP'] > 0 || $arrAn['SisaAn'] > 0 ) {
                 $arr[] = $arrMHS + $arrBPP + $arrCr + $arrAn + $arrSPP; 
               }
               break;
             case 1:  // Lunas
-              if ($arrBPP['DetailPaymentBPP'] != '' && $arrCr['DetailPaymentCr'] != '' &&  $arrBPP['SisaBPP'] == 0 && $arrCr['SisaCr'] == 0  && $arrSPP['DetailPaymentSPP'] != '' && $arrAn['DetailPaymentAn'] != '' &&  $arrSPP['SisaSPP'] == 0 && $arrAn['SisaAn'] == 0 ) {
+              if ($arrBPP['DetailPaymentBPP'] != '' && $arrCr['DetailPaymentCr'] != '' &&  $arrBPP['SisaBPP'] == 0 && $arrCr['SisaCr'] == 0   &&  $arrSPP['SisaSPP'] == 0 && $arrAn['SisaAn'] == 0 ) {
                 $arr[] = $arrMHS + $arrBPP + $arrCr + $arrAn + $arrSPP; 
               }
               // $arr[] = $arrMHS + $arrBPP + $arrCr ; 
