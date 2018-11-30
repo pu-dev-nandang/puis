@@ -61,11 +61,10 @@
         </div>  
   </div>  
 </div>
-<div class="row" style="margin-top: 15px">
-  <div id='conTainJS'>
-      
-  </div>
-</div> 
+<div id='conTainJS'>
+    
+</div>
+
 
 <script type="text/javascript">
     window.dataa = '';
@@ -153,23 +152,6 @@
       submit(url, 'POST', [
           { name: 'token', value: token },
       ]);
-      //window.open(url+'/'+token,'_blank');
-     
-
-          /*$.post(url,{token:token},function (data_json) {
-              var response = jQuery.parseJSON(data_json);
-              //console.log(response);
-              //window.location.href = base_url_js+'fileGet/'+response;
-              window.open(base_url_js+'download/'+response,'_blank');
-          }).done(function() {
-            // loadTableEvent(loadDataEvent);
-          }).fail(function() {
-            toastr.error('The Database connection error, please try again', 'Failed!!');
-          }).always(function() {
-           $('#export_excel').prop('disabled',false).html('<i class="fa fa-download" aria-hidden="true"></i> Excel');
-
-          });*/
-
     });
 
     $(document).on("click", ".btn-print", function(event){
@@ -243,7 +225,12 @@
             Status : $('#selectStatus').val(),
         };
         var token = jwt_encode(data,'UAP)(*');
-        var htmlDy = '<div class="col-md-12"><div class = "table-responsive">'+
+        var htmlDy = '<div class = "row">'+
+                        '<div  class="col-xs-12 noprint" align="right" id="pagination_link"></div>'+
+                        '</div>'+
+                      '</div>'+
+                      '<div class = "row">'+
+                      '<div class="col-md-12"><div class = "table-responsive">'+
                         '<table class="table table-bordered datatable2 " id = "datatableReport2">'+
                             '<caption id ="CaptionTa"></caption>'+
                             '<thead>'+
@@ -271,8 +258,8 @@
                             '</thead>'+
                             '<tbody id="dataRow"></tbody>'+
                         '</table>'+
-                    '</div></div>'+
-                    '<div  class="col-xs-12 noprint" align="right" id="pagination_link"></div>';
+                    '</div></div></div>'+
+                    '';
    
         $.post(url,{token:token},function (resultJson) {
             var resultJson = jQuery.parseJSON(resultJson);
@@ -401,7 +388,9 @@
                                 '<td>'+keterangan+'</td>' +
                                 '</tr>');
                             var valueToPush = new Array();
-                            valueToPush = [no,Data_mhs[i]['Name'],Data_mhs[i]['NPM'],Data_mhs[i]['ProdiENG'],Data_mhs[i]['BPP'],Data_mhs[i]['Cr'],Total_tagihan,Total_pembayaran,Piutang,ketEXcel,Data_mhs[i]['Year']];
+                            var agingPass = Data_mhs[i]['AgingBPP']+'\n'+Data_mhs[i]['AgingCr']+'\n'+Data_mhs[i]['AgingSPP']+'\n'+Data_mhs[i]['AgingAn'];
+                            valueToPush = [no,Data_mhs[i]['Name'],Data_mhs[i]['NPM'],Data_mhs[i]['ProdiENG'],Data_mhs[i]['BPP'],Data_mhs[i]['Cr'],Total_tagihan,Total_pembayaran,Piutang,ketEXcel,Data_mhs[i]['Year'],Data_mhs[i]['DueDateBPP'],Data_mhs[i]['DueDateCR'],Data_mhs[i]['SPP'],Data_mhs[i]['DueDateSPP'],Data_mhs[i]['An'],Data_mhs[i]['DueDateAn'],agingPass];
+                            // 11
                             // console.log(valueToPush);
                             // dataa[] = [no,Data_mhs[i]['Name'],Data_mhs[i]['NPM']];
                             dataa.push(valueToPush);
@@ -410,7 +399,7 @@
                         $('#NIM').focus();
                         $('#CaptionTa').html('<h2>'+taShow+'</h2>');
                         $("#dataRow").append('<tr style="background: #333;color: #fff;">'+
-                            '<td colspan = "11" style="text-align:center">Total '+taShow+'</td>'+
+                            '<td colspan = "11" style="text-align:center">Total Tagihan '+taShow+'</td>'+
                             '<td>'+formatRupiah(sumTagihan)+'</td>' +
                             '<td>'+formatRupiah(sumPembayaran)+'</td>' +
                             '<td>'+formatRupiah(sumPiutang)+'</td>' +
@@ -423,7 +412,7 @@
                           sumTagihan : sumTagihan,
                           sumPembayaran : sumPembayaran,
                           sumPiutang : sumPiutang,
-                          taShow : 'Total '+taShow
+                          taShow : 'Total Tagihan '+taShow
                         };
 
                 } else {

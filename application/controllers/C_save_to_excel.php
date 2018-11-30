@@ -224,11 +224,10 @@ class C_save_to_excel extends CI_Controller
         $this->load->model('master/m_master');
         $this->load->model('finance/m_finance');
         $GetDateNow = $this->m_master->getIndoBulan($GetDateNow);
-        // print_r($input['Data']);die();
 
         include APPPATH.'third_party/PHPExcel/PHPExcel.php';
         $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
-        $excel2 = $excel2->load('./uploads/finance/Template_report.xlsx'); // Empty Sheet
+        $excel2 = $excel2->load('./uploads/finance/Template_report_rev1.xlsx'); // Empty Sheet
         $excel2->setActiveSheetIndex(0);
 
         $excel3 = $excel2->getActiveSheet();
@@ -263,14 +262,22 @@ class C_save_to_excel extends CI_Controller
             $excel3->setCellValue('C'.$a, $dataGenerate[$i][2]);
             $excel3->setCellValue('D'.$a, $dataGenerate[$i][3]);
             $excel3->setCellValue('E'.$a, $dataGenerate[$i][4]);
-            $excel3->setCellValue('F'.$a, $dataGenerate[$i][5]);
-            $excel3->setCellValue('G'.$a, $dataGenerate[$i][6]);
-            $excel3->setCellValue('H'.$a, $dataGenerate[$i][7]);
-            $excel3->setCellValue('I'.$a, $dataGenerate[$i][8]);
+            $excel3->setCellValue('F'.$a, $dataGenerate[$i][11]);
+            $excel3->setCellValue('G'.$a, $dataGenerate[$i][5]);
+            $excel3->setCellValue('H'.$a, $dataGenerate[$i][12]);
+            $excel3->setCellValue('I'.$a, $dataGenerate[$i][13]);
+            $excel3->setCellValue('J'.$a, $dataGenerate[$i][14]);
+            $excel3->setCellValue('K'.$a, $dataGenerate[$i][15]);
+            $excel3->setCellValue('L'.$a, $dataGenerate[$i][16]);
+            $excel3->setCellValue('M'.$a, $dataGenerate[$i][6]);
+            $excel3->setCellValue('N'.$a, $dataGenerate[$i][7]);
+            $excel3->setCellValue('O'.$a, $dataGenerate[$i][8]);
+            $excel3->setCellValue('P'.$a, $dataGenerate[$i][17]);
+
 
             // $ket = "adi\nresa";
 
-            $excel3->setCellValue('J'.$a, $dataGenerate[$i][9]);
+            $excel3->setCellValue('Q'.$a, $dataGenerate[$i][9]);
 
             // Apply style row yang telah kita buat tadi ke masing-masing baris (isi tabel)
             $excel3->getStyle('A'.$a)->applyFromArray($style_row);
@@ -283,13 +290,22 @@ class C_save_to_excel extends CI_Controller
             $excel3->getStyle('H'.$a)->applyFromArray($style_row);
             $excel3->getStyle('I'.$a)->applyFromArray($style_row);
             $excel3->getStyle('J'.$a)->applyFromArray($style_row);
-            $excel3->getStyle('J'.$a)->getAlignment()->setWrapText(true);
+            $excel3->getStyle('K'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('L'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('M'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('N'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('O'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('P'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('P'.$a)->getAlignment()->setWrapText(true);
+            $excel3->getStyle('Q'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('Q'.$a)->getAlignment()->setWrapText(true);
+
             // $excel3->getStyle('K'.$a)->applyFromArray($style_row);
 
             $a = $a + 1;
         }
 
-        $excel3->mergeCells('A'.$a.':F'.$a); // Set Merge Cell pada kolom A1 sampai E1
+        $excel3->mergeCells('A'.$a.':L'.$a); // Set Merge Cell pada kolom A1 sampai E1
         $setTA = $summary->taShow;
         $excel3->setCellValue('A'.$a, $setTA);
         $excel3->getStyle('A'.$a)->applyFromArray($style_row);
@@ -298,16 +314,24 @@ class C_save_to_excel extends CI_Controller
         $excel3->getStyle('D'.$a)->applyFromArray($style_row);
         $excel3->getStyle('E'.$a)->applyFromArray($style_row);
         $excel3->getStyle('F'.$a)->applyFromArray($style_row);
-        // $excel3->getStyle('A'.$a)->applyFromArray($style_row);
-        $excel3->setCellValue('G'.$a, $summary->sumTagihan);
-        $excel3->setCellValue('H'.$a, $summary->sumPembayaran);
-        $excel3->setCellValue('I'.$a, $summary->sumPiutang);
-        $excel3->setCellValue('J'.$a, '');
-
         $excel3->getStyle('G'.$a)->applyFromArray($style_row);
         $excel3->getStyle('H'.$a)->applyFromArray($style_row);
         $excel3->getStyle('I'.$a)->applyFromArray($style_row);
         $excel3->getStyle('J'.$a)->applyFromArray($style_row);
+        $excel3->getStyle('K'.$a)->applyFromArray($style_row);
+        $excel3->getStyle('L'.$a)->applyFromArray($style_row);
+        // $excel3->getStyle('A'.$a)->applyFromArray($style_row);
+        $excel3->setCellValue('M'.$a, $summary->sumTagihan);
+        $excel3->setCellValue('N'.$a, $summary->sumPembayaran);
+        $excel3->setCellValue('O'.$a, $summary->sumPiutang);
+        $excel3->setCellValue('P'.$a, '');
+        $excel3->setCellValue('Q'.$a, '');
+
+        $excel3->getStyle('M'.$a)->applyFromArray($style_row);
+        $excel3->getStyle('N'.$a)->applyFromArray($style_row);
+        $excel3->getStyle('O'.$a)->applyFromArray($style_row);
+        $excel3->getStyle('P'.$a)->applyFromArray($style_row);
+        $excel3->getStyle('Q'.$a)->applyFromArray($style_row);
 
         $sumTagihanAll = $sumTagihanAll + $summary->sumTagihan;
         $sumPembayaranAll = $sumPembayaranAll +$summary->sumPembayaran;
@@ -347,11 +371,13 @@ class C_save_to_excel extends CI_Controller
                         $excel3->mergeCells('A'.$a.':A'.$aa); // Set Merge Cell pada kolom A1 sampai E1
                         $excel3->mergeCells('B'.$a.':B'.$aa); // Set Merge Cell pada kolom A1 sampai E1
                         $excel3->mergeCells('C'.$a.':C'.$aa); // Set Merge Cell pada kolom A1 sampai E1
-                        $excel3->mergeCells('E'.$a.':F'.$a); // Set Merge Cell pada kolom A1 sampai E1
-                        $excel3->mergeCells('G'.$a.':G'.$aa); // Set Merge Cell pada kolom A1 sampai E1
-                        $excel3->mergeCells('H'.$a.':H'.$aa); // Set Merge Cell pada kolom A1 sampai E1
-                        $excel3->mergeCells('I'.$a.':I'.$aa); // Set Merge Cell pada kolom A1 sampai E1
-                        $excel3->mergeCells('J'.$a.':J'.$aa); // Set Merge Cell pada kolom A1 sampai E1
+                        $excel3->mergeCells('E'.$a.':L'.$a); // Set Merge Cell pada kolom A1 sampai E1
+
+                        $excel3->mergeCells('M'.$a.':M'.$aa); // Set Merge Cell pada kolom A1 sampai E1
+                        $excel3->mergeCells('N'.$a.':N'.$aa); // Set Merge Cell pada kolom A1 sampai E1
+                        $excel3->mergeCells('O'.$a.':O'.$aa); // Set Merge Cell pada kolom A1 sampai E1
+                        $excel3->mergeCells('P'.$a.':P'.$aa); // Set Merge Cell pada kolom A1 sampai E1
+                        $excel3->mergeCells('Q'.$a.':Q'.$aa); // Set Merge Cell pada kolom A1 sampai E1
 
                         $excel3->setCellValue('A'.$a, 'No');
                         $excel3->setCellValue('B'.$a, 'NAMA');
@@ -359,11 +385,18 @@ class C_save_to_excel extends CI_Controller
                         $excel3->setCellValue('D'.$a, 'JURUSAN');
                         $excel3->setCellValue('E'.$a, 'TAGIHAN');
                         $excel3->setCellValue('E'.$aa, 'BPP');
-                        $excel3->setCellValue('F'.$aa, 'SKS');
-                        $excel3->setCellValue('G'.$a, 'TOTAL TAGIHAN');
-                        $excel3->setCellValue('H'.$a, 'TOTAL PEMBAYARAN');
-                        $excel3->setCellValue('I'.$a, 'PIUTANG');
-                        $excel3->setCellValue('J'.$a, 'KETERANGAN');
+                        $excel3->setCellValue('F'.$aa, 'DueDate');
+                        $excel3->setCellValue('G'.$aa, 'SKS');
+                        $excel3->setCellValue('H'.$aa, 'DueDate');
+                        $excel3->setCellValue('I'.$aa, 'SPP');
+                        $excel3->setCellValue('J'.$aa, 'DueDate');
+                        $excel3->setCellValue('K'.$aa, 'Lain-Lain');
+                        $excel3->setCellValue('L'.$aa, 'DueDate');
+                        $excel3->setCellValue('M'.$a, 'TOTAL TAGIHAN');
+                        $excel3->setCellValue('N'.$a, 'TOTAL PEMBAYARAN');
+                        $excel3->setCellValue('O'.$a, 'PIUTANG');
+                        $excel3->setCellValue('P'.$a, 'Aging');
+                        $excel3->setCellValue('Q'.$a, 'KETERANGAN');
 
                         $excel3->getStyle('A'.$a)->applyFromArray($style_row);
                         $excel3->getStyle('A'.$aa)->applyFromArray($style_row);
@@ -377,15 +410,31 @@ class C_save_to_excel extends CI_Controller
                         $excel3->getStyle('E'.$aa)->applyFromArray($style_row);
                         $excel3->getStyle('F'.$aa)->applyFromArray($style_row);
                         $excel3->getStyle('F'.$a)->applyFromArray($style_row);
-                        $excel3->getStyle('G'.$a)->applyFromArray($style_row);
                         $excel3->getStyle('G'.$aa)->applyFromArray($style_row);
-                        $excel3->getStyle('H'.$a)->applyFromArray($style_row);
+                        $excel3->getStyle('G'.$a)->applyFromArray($style_row);
                         $excel3->getStyle('H'.$aa)->applyFromArray($style_row);
-                        $excel3->getStyle('I'.$a)->applyFromArray($style_row);
+                        $excel3->getStyle('H'.$a)->applyFromArray($style_row);
                         $excel3->getStyle('I'.$aa)->applyFromArray($style_row);
-                        $excel3->getStyle('J'.$a)->applyFromArray($style_row);
+                        $excel3->getStyle('I'.$a)->applyFromArray($style_row);
                         $excel3->getStyle('J'.$aa)->applyFromArray($style_row);
-                        $excel3->getStyle('J'.$a)->getAlignment()->setWrapText(true);
+                        $excel3->getStyle('J'.$a)->applyFromArray($style_row);
+                        $excel3->getStyle('K'.$aa)->applyFromArray($style_row);
+                        $excel3->getStyle('K'.$a)->applyFromArray($style_row);
+                        $excel3->getStyle('L'.$aa)->applyFromArray($style_row);
+                        $excel3->getStyle('L'.$a)->applyFromArray($style_row);    
+
+                        $excel3->getStyle('M'.$a)->applyFromArray($style_row);
+                        $excel3->getStyle('M'.$aa)->applyFromArray($style_row);
+                        $excel3->getStyle('N'.$a)->applyFromArray($style_row);
+                        $excel3->getStyle('N'.$aa)->applyFromArray($style_row);
+                        $excel3->getStyle('O'.$a)->applyFromArray($style_row);
+                        $excel3->getStyle('O'.$aa)->applyFromArray($style_row);
+                        $excel3->getStyle('P'.$a)->applyFromArray($style_row);
+                        $excel3->getStyle('P'.$aa)->applyFromArray($style_row);
+                        $excel3->getStyle('P'.$a)->getAlignment()->setWrapText(true);
+                        $excel3->getStyle('Q'.$a)->applyFromArray($style_row);
+                        $excel3->getStyle('Q'.$aa)->applyFromArray($style_row);
+                        $excel3->getStyle('Q'.$a)->getAlignment()->setWrapText(true);
 
                         $a = $aa + 1;
 
@@ -395,11 +444,11 @@ class C_save_to_excel extends CI_Controller
                         $sumPiutang = 0;
                         for ($z=0; $z < count($data); $z++) {
                             $no = $z+1;
-                            $Total_tagihan = $data[$z]['BPP']  + $data[$z]['Cr'] ;
+                            $Total_tagihan = $data[$z]['BPP']  + $data[$z]['Cr'] +$data[$z]['SPP'] + $data[$z]['An'] ;
                             $sumTagihan = $sumTagihan + $Total_tagihan;
-                            $Total_pembayaran = $data[$z]['PayBPP']  + $data[$z]['PayCr'] ;
+                            $Total_pembayaran = $data[$z]['PayBPP']  + $data[$z]['PayCr'] + $data[$z]['PayAn'] + $data[$z]['PaySPP'];
                             $sumPembayaran = $sumPembayaran + $Total_pembayaran;
-                            $Piutang = $Data_mhs[$z]['SisaCr']  + $Data_mhs[$z]['SisaBPP'] ;
+                            $Piutang = $data[$z]['SisaCr']  + $data[$z]['SisaBPP'] + $data[$z]['SisaAn'] + $data[$z]['SisaSPP'];
                             $sumPiutang = $sumPiutang + $Piutang;
                             $ketEXcel = "";
 
@@ -459,21 +508,31 @@ class C_save_to_excel extends CI_Controller
 
                             }
                             $ketEXcel = $keteranganBPPEX.$keteranganCrEX;
+                            $Aging = $data[$z]['AgingBPP']."\n".$data[$z]['AgingCr']."\n".$data[$z]['AgingSPP']."\n".$data[$z]['AgingAn'];
 
                             $excel3->setCellValue('A'.$a, $no);
                             $excel3->setCellValue('B'.$a, $data[$z]['Name']);
                             $excel3->setCellValue('C'.$a, $data[$z]['NPM']);
                             $excel3->setCellValue('D'.$a, $data[$z]['ProdiENG']);
                             $excel3->setCellValue('E'.$a, $data[$z]['BPP']);
-                            $excel3->setCellValue('F'.$a, $data[$z]['Cr']);
-                            $excel3->setCellValue('G'.$a, $Total_tagihan);
-                            $excel3->setCellValue('H'.$a, $Total_pembayaran);
-                            $excel3->setCellValue('I'.$a, $Piutang);
+                            $excel3->setCellValue('F'.$a, $data[$z]['DueDateBPP']);
+                            $excel3->setCellValue('G'.$a, $data[$z]['Cr']);
+                            $excel3->setCellValue('H'.$a, $data[$z]['DueDateCR']);
+                            $excel3->setCellValue('I'.$a, $data[$z]['SPP']);
+                            $excel3->setCellValue('J'.$a, $data[$z]['DueDateSPP']);
+                            $excel3->setCellValue('K'.$a, $data[$z]['An']);
+                            $excel3->setCellValue('L'.$a, $data[$z]['DueDateAn']);
+
+                            $excel3->setCellValue('M'.$a, $Total_tagihan);
+                            $excel3->setCellValue('N'.$a, $Total_pembayaran);
+                            $excel3->setCellValue('O'.$a, $Piutang);
+                            $excel3->setCellValue('P'.$a, $Aging);
 
                             // $ket = "adi\nresa";
 
-                            $excel3->setCellValue('J'.$a, $ketEXcel);
+                            $excel3->setCellValue('Q'.$a, $ketEXcel);
 
+                            // Apply style row yang telah kita buat tadi ke masing-masing baris (isi tabel)
                             // Apply style row yang telah kita buat tadi ke masing-masing baris (isi tabel)
                             $excel3->getStyle('A'.$a)->applyFromArray($style_row);
                             $excel3->getStyle('B'.$a)->applyFromArray($style_row);
@@ -485,17 +544,23 @@ class C_save_to_excel extends CI_Controller
                             $excel3->getStyle('H'.$a)->applyFromArray($style_row);
                             $excel3->getStyle('I'.$a)->applyFromArray($style_row);
                             $excel3->getStyle('J'.$a)->applyFromArray($style_row);
-                            $excel3->getStyle('J'.$a)->getAlignment()->setWrapText(true);
-                            // $excel3->getStyle('K'.$a)->applyFromArray($style_row);
-
+                            $excel3->getStyle('K'.$a)->applyFromArray($style_row);
+                            $excel3->getStyle('L'.$a)->applyFromArray($style_row);
+                            $excel3->getStyle('M'.$a)->applyFromArray($style_row);
+                            $excel3->getStyle('N'.$a)->applyFromArray($style_row);
+                            $excel3->getStyle('O'.$a)->applyFromArray($style_row);
+                            $excel3->getStyle('P'.$a)->applyFromArray($style_row);
+                            $excel3->getStyle('P'.$a)->getAlignment()->setWrapText(true);
+                            $excel3->getStyle('Q'.$a)->applyFromArray($style_row);
+                            $excel3->getStyle('Q'.$a)->getAlignment()->setWrapText(true);
                             $a = $a + 1;
 
                         }
 
-                        $taShow = "Mahasiswa TA ".$data[0]['Year'];
+                        $taShow = "Total Tagihan Mahasiswa TA ".$data[0]['Year'];
 
-                        $excel3->mergeCells('A'.$a.':F'.$a); // Set Merge Cell pada kolom A1 sampai E1
-                        $setTA = $taShow;
+                        $excel3->mergeCells('A'.$a.':L'.$a); // Set Merge Cell pada kolom A1 sampai E1
+                        $setTA = $summary->taShow;
                         $excel3->setCellValue('A'.$a, $setTA);
                         $excel3->getStyle('A'.$a)->applyFromArray($style_row);
                         $excel3->getStyle('B'.$a)->applyFromArray($style_row);
@@ -503,16 +568,24 @@ class C_save_to_excel extends CI_Controller
                         $excel3->getStyle('D'.$a)->applyFromArray($style_row);
                         $excel3->getStyle('E'.$a)->applyFromArray($style_row);
                         $excel3->getStyle('F'.$a)->applyFromArray($style_row);
-                        // $excel3->getStyle('A'.$a)->applyFromArray($style_row);
-                        $excel3->setCellValue('G'.$a, $sumTagihan);
-                        $excel3->setCellValue('H'.$a, $sumPembayaran);
-                        $excel3->setCellValue('I'.$a, $sumPiutang);
-                        $excel3->setCellValue('J'.$a, '');
-
                         $excel3->getStyle('G'.$a)->applyFromArray($style_row);
                         $excel3->getStyle('H'.$a)->applyFromArray($style_row);
                         $excel3->getStyle('I'.$a)->applyFromArray($style_row);
                         $excel3->getStyle('J'.$a)->applyFromArray($style_row);
+                        $excel3->getStyle('K'.$a)->applyFromArray($style_row);
+                        $excel3->getStyle('L'.$a)->applyFromArray($style_row);
+                        // $excel3->getStyle('A'.$a)->applyFromArray($style_row);
+                        $excel3->setCellValue('M'.$a, $sumTagihan);
+                        $excel3->setCellValue('N'.$a, $sumPembayaran);
+                        $excel3->setCellValue('O'.$a, $sumPiutang);
+                        $excel3->setCellValue('P'.$a, '');
+                        $excel3->setCellValue('Q'.$a, '');
+
+                        $excel3->getStyle('M'.$a)->applyFromArray($style_row);
+                        $excel3->getStyle('N'.$a)->applyFromArray($style_row);
+                        $excel3->getStyle('O'.$a)->applyFromArray($style_row);
+                        $excel3->getStyle('P'.$a)->applyFromArray($style_row);
+                        $excel3->getStyle('Q'.$a)->applyFromArray($style_row);
 
                         $sumTagihanAll = $sumTagihanAll + $sumTagihan;
                         $sumPembayaranAll = $sumPembayaranAll +$sumPembayaran;
@@ -532,7 +605,7 @@ class C_save_to_excel extends CI_Controller
         $a = $a + 1;
         $taShow = "Summary All";
 
-        $excel3->mergeCells('A'.$a.':F'.$a); // Set Merge Cell pada kolom A1 sampai E1
+        $excel3->mergeCells('A'.$a.':L'.$a); // Set Merge Cell pada kolom A1 sampai E1
         $setTA = $taShow;
         $excel3->setCellValue('A'.$a, $setTA);
         $excel3->getStyle('A'.$a)->applyFromArray($style_row);
@@ -541,26 +614,48 @@ class C_save_to_excel extends CI_Controller
         $excel3->getStyle('D'.$a)->applyFromArray($style_row);
         $excel3->getStyle('E'.$a)->applyFromArray($style_row);
         $excel3->getStyle('F'.$a)->applyFromArray($style_row);
-        // $excel3->getStyle('A'.$a)->applyFromArray($style_row);
-        $excel3->setCellValue('G'.$a, $sumTagihanAll);
-        $excel3->setCellValue('H'.$a, $sumPembayaranAll);
-        $excel3->setCellValue('I'.$a, $sumPiutangAll);
-        $excel3->setCellValue('J'.$a, '');
-
         $excel3->getStyle('G'.$a)->applyFromArray($style_row);
         $excel3->getStyle('H'.$a)->applyFromArray($style_row);
         $excel3->getStyle('I'.$a)->applyFromArray($style_row);
         $excel3->getStyle('J'.$a)->applyFromArray($style_row);
+        $excel3->getStyle('K'.$a)->applyFromArray($style_row);
+        $excel3->getStyle('L'.$a)->applyFromArray($style_row);
+        // $excel3->getStyle('A'.$a)->applyFromArray($style_row);
+        $excel3->setCellValue('M'.$a, $sumTagihanAll);
+        $excel3->setCellValue('N'.$a, $sumPembayaranAll);
+        $excel3->setCellValue('O'.$a, $sumPiutangAll);
+        $excel3->setCellValue('P'.$a, '');
+        $excel3->setCellValue('Q'.$a, '');
+
+        $excel3->getStyle('M'.$a)->applyFromArray($style_row);
+        $excel3->getStyle('N'.$a)->applyFromArray($style_row);
+        $excel3->getStyle('O'.$a)->applyFromArray($style_row);
+        $excel3->getStyle('P'.$a)->applyFromArray($style_row);
+        $excel3->getStyle('Q'.$a)->applyFromArray($style_row);
 
         // print_r($bigData);
         // die();
 
 
         $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
+        $aa = date('YmdHis');
+        if ($PostPassing->ta == '' && $PostPassing->NIM == '') {
+            $aa = 'All_'.$aa; 
+        }
+
+        if ($PostPassing->NIM != '') {
+            $aa = 'NPM_'.$PostPassing->NIM.'_'.$aa; 
+        }
+
+        if ($PostPassing->ta  != '') {
+            $aa = 'ta_'.$PostPassing->ta.'_'.$aa; 
+        }
+
+        $Filename = 'Report_Tagihan_Mhs_'.$aa.'.xlsx';
         // We'll be outputting an excel file
         header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
         // It will be called file.xlss
-        header('Content-Disposition: attachment; filename="file.xlsx"'); // jalan ketika tidak menggunakan ajax
+        header('Content-Disposition: attachment; filename="'.$Filename.'"'); // jalan ketika tidak menggunakan ajax
         //$filename = 'PenerimaanPembayaran.xlsx';
         //$objWriter->save('./document/'.$filename);
         $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax

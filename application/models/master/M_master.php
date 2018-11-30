@@ -2478,6 +2478,18 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
     }  // end function dateDiff
 
+    public function dateDiffDays_ ($d1, $d2) {   
+    // Return the number of days between the two dates:
+      // check date d1 sudah melewati hari
+      $result = round(abs(strtotime($d1)-strtotime($d2))/86400);
+      $chktgl = $this->chktgl($d2,$d1);
+      if (!$chktgl) {
+            $result = $result -($result * 2);
+      }  
+      return $result;
+
+    }  // end function dateDiff
+
     public function getEmployeesBaseStatus($Status)
     {
         $Status = implode(",", $Status);
