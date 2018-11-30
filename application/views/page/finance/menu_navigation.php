@@ -4,26 +4,6 @@
         <!--=== Navigation ===-->
 
         <ul id="nav">
-            <!--<li class="<?php if($this->uri->segment(2)=='master'){echo "current open";} ?>">
-                <a href="javascript:void(0);">
-                    <i class="fa fa-wrench" aria-hidden="true"></i>
-                    Configuration
-                </a>
-                <ul class="sub-menu">
-                    <li class="<?php if($this->uri->segment(2)=='configuration' && $this->uri->segment(3) == "#" ){echo "current";} ?>">
-                        <a href="<?php echo base_url('finance/configuration/#'); ?>">
-                        <i class="icon-angle-right"></i>
-                        Bank
-                        </a>
-                    </li>
-                    <li class="<?php if($this->uri->segment(2)=='configuration' && $this->uri->segment(3) == "#" ){echo "current";} ?>">
-                        <a href="<?php echo base_url('finance/configuration/#'); ?>">
-                        <i class="icon-angle-right"></i>
-                        Prefix VA
-                        </a>
-                    </li>
-                </ul>
-            </li>-->
             <?php 
             $authIT =  $this->session->userdata('PositionMain');
             $authIT =  $authIT['IDDivision'];
@@ -93,13 +73,13 @@
             <li class="<?php if($this->uri->segment(2)=='admission'){echo "current open";} ?>">
                 <a href="javascript:void(0);">
                     <i class="fa fa-address-book-o"></i>
-                    Admission
+                    Intake
                 </a>
                 <ul class="sub-menu">
                     <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "approved" ){echo "open-default";} ?>">
                         <a href="javascript:void(0);">
                         <i class="icon-angle-right"></i>
-                        Approved
+                        Approval
                         </a>
                         <ul class="sub-menu">
                             <!--<li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "approved" && $this->uri->segment(4) == "nilai-rapor" && $this->uri->segment(5) == ""){echo "current";} ?>">

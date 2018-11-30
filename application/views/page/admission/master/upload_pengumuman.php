@@ -10,21 +10,20 @@
 				</div>
 			</div>
 			<div class="widget-content">
-				<div class="form-horizontal">
-					<div class="form-group">
-						<!-- <div class = "row"> -->
-							<div class="col-xs-2" style="">
-								<label class="control-label">Upload File :</label>
+				<div class = "row" style="margin-left: 0px;margin-right: 0px;">
+					<div class="form-horizontal">
+						<div class="form-group">
+							<div class="col-md-2">
+									<label class="control-label">Upload File :</label>
 							</div>
-							<div class="col-xs-2">
-								<input type="file" data-style="fileinput" id="fileAnnouncement">
+							<div class="col-md-2">
+									<input type="file" data-style="fileinput" id="fileAnnouncement">
 							</div>
-							<div class="col-xs-1">
-								<button class="btn btn-inverse btn-notification" id="btn-proses">Proses</button>
+							<div class="col-md-1">
+									<button class="btn btn-inverse btn-notification" id="btn-proses">Proses</button>
 							</div>
-							
 						</div>
-					<!-- </div> -->
+					</div>
 				</div>
 			</div>
 		</div>

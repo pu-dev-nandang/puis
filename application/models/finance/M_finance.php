@@ -2745,6 +2745,7 @@ class M_finance extends CI_Model {
     // error_reporting(0);
     $arr = array();
     $this->load->model('master/m_master');
+    $No = $start + 1;
     $ta1 = explode('.', $ta);
     $ta = $ta1[1];
     $db = 'ta_'.$ta.'.students';
@@ -2782,6 +2783,9 @@ class M_finance extends CI_Model {
       $array = array('ProdiEng' => $ProdiEng[0]['NameEng']);
       $Data_mhs[$i] = $Data_mhs[$i] + $array;
 
+      // No 
+        $Data_mhs[$i] = $Data_mhs[$i] + array('No' => $No);
+
       // get VA Mahasiwa
         $VA = $Const_VA[0]['Const_VA'].$Data_mhs[$i]['NPM'];
         $Data_mhs[$i] = $Data_mhs[$i] + array('VA' => $VA);
@@ -2802,7 +2806,7 @@ class M_finance extends CI_Model {
       // get sks yang diambil
          $Credit = $this->getSKSMahasiswa($db2,$Data_mhs[$i]['NPM']);
          $Data_mhs[$i] = $Data_mhs[$i] + array('Credit' => $Credit);      
-
+      $No++;   
     }
     $arr['Data_mhs'] = $Data_mhs;
     $arr['Discount'] = $Discount;
@@ -2971,7 +2975,7 @@ class M_finance extends CI_Model {
 
    public function get_report_pembayaran_mhs($ta,$prodi,$NIM,$Semester,$Status,$limit, $start)
    {
-    error_reporting(0);
+    // error_reporting(0);
     $arr = array();
     $this->load->model('master/m_master');
     // print_r($start.' - '.$limit);die();
@@ -3040,6 +3044,8 @@ class M_finance extends CI_Model {
           'PayBPP' => '0',
           'SisaBPP' => '0',
           'DetailPaymentBPP' => '',
+          'DueDateBPP' => '',
+          'AgingBPP' => 'BPP : 0',
         );
           if (count($queryBPP) > 0) {
               for ($t=0; $t < count($queryBPP); $t++) { 
@@ -3047,6 +3053,8 @@ class M_finance extends CI_Model {
                 $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$queryBPP[$t]['ID']);
                 $PayBPP = 0;
                 $SisaBPP = 0;
+                $last = count($Q_invStudent) - 1;
+                $DueDateBPP = ($Q_invStudent[$last]['Deadline'] != '' && $Q_invStudent[$last]['Deadline'] != null && strpos($Q_invStudent[$last]['Deadline'],'0000-00-00') === false) ? date('d M Y H:i:s', strtotime($Q_invStudent[$last]['Deadline'])) : '';
                 for ($r=0; $r < count($Q_invStudent); $r++) { 
                   if ($Q_invStudent[$r]['Status'] == 1) { // lunas
                     $PayBPP = $PayBPP + $Q_invStudent[$r]['Invoice'];
@@ -3057,11 +3065,18 @@ class M_finance extends CI_Model {
                   }
                 }
 
+                $Aging = 'BPP : 0';
+                if ($DueDateBPP != '' && $SisaBPP > 0) {
+                  $Aging = 'BPP : '.$this->m_master->dateDiffDays(date('Y-m-d', strtotime($Q_invStudent[$last]['Deadline'])),date('Y-m-d'));
+                }
+
                 $arrBPP = array(
                   'BPP' => (int)$queryBPP[$t]['Invoice'],
                   'PayBPP' => (int)$PayBPP,
                   'SisaBPP' => (int)$SisaBPP,
                   'DetailPaymentBPP' => $Q_invStudent,
+                  'DueDateBPP' => $DueDateBPP,
+                  'AgingBPP' => $Aging,
                 );
 
               }
@@ -3075,6 +3090,8 @@ class M_finance extends CI_Model {
           'PayCr' => '0',
           'SisaCr' => '0',
           'DetailPaymentCr' => '',
+          'DueDateCR' => '',
+          'AgingCr' => 'Credit : 0',
         );
           if (count($queryCr) > 0) {
               for ($t=0; $t < count($queryCr); $t++) { 
@@ -3082,6 +3099,8 @@ class M_finance extends CI_Model {
                 $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$queryCr[$t]['ID']);
                 $PayCr = 0;
                 $SisaCr = 0;
+                $last = count($Q_invStudent) - 1;
+                $DueDateCR = ($Q_invStudent[$last]['Deadline'] != '' && $Q_invStudent[$last]['Deadline'] != null && strpos($Q_invStudent[$last]['Deadline'],'0000-00-00') === false) ? date('d M Y H:i:s', strtotime($Q_invStudent[$last]['Deadline'])) : '';
                 for ($r=0; $r < count($Q_invStudent); $r++) { 
                   if ($Q_invStudent[$r]['Status'] == 1) { // lunas
                     $PayCr = $PayCr + $Q_invStudent[$r]['Invoice'];
@@ -3092,29 +3111,128 @@ class M_finance extends CI_Model {
                   }
                 }
 
+                $Aging = 'Credit : 0';
+                if ($DueDateCR != '' && $SisaCr > 0) {
+                  $Aging = 'Credit : '.$this->m_master->dateDiffDays(date('Y-m-d', strtotime($Q_invStudent[$last]['Deadline'])),date('Y-m-d'));
+                }
+
                 $arrCr = array(
                   'Cr' => (int)$queryCr[$t]['Invoice'],
                   'PayCr' => (int)$PayCr,
                   'SisaCr' => (int)$SisaCr,
                   'DetailPaymentCr' => $Q_invStudent,
+                  'DueDateCR' => $DueDateCR,
+                  'AgingCr' => $Aging,
                 );
 
               }
           }
 
+          // cek lain-lain
+          $sqlAn = 'select * from db_finance.payment where PTID = 4 and NPM = ? '.$Semester; // limit 1
+          $queryAn=$this->db->query($sqlAn, array($query[$u]['NPM']))->result_array();
+          $arrAn = array(
+            'An' => '0',
+            'PayAn' => '0',
+            'SisaAn' => '0',
+            'DetailPaymentAn' => '',
+            'DueDateAn' => '',
+            'AgingAn' => 'lain-lain : 0',
+          );
+            if (count($queryAn) > 0) {
+                for ($t=0; $t < count($queryAn); $t++) { 
+                  // cek payment students
+                  $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$queryAn[$t]['ID']);
+                  $PayAn = 0;
+                  $SisaAn = 0;
+                  $last = count($Q_invStudent) - 1;
+                  $DueDateAn = ($Q_invStudent[$last]['Deadline'] != '' && $Q_invStudent[$last]['Deadline'] != null && strpos($Q_invStudent[$last]['Deadline'],'0000-00-00') === false) ? date('d M Y H:i:s', strtotime($Q_invStudent[$last]['Deadline'])) : '';
+                  for ($r=0; $r < count($Q_invStudent); $r++) { 
+                    if ($Q_invStudent[$r]['Status'] == 1) { // lunas
+                      $PayAn = $PayAn + $Q_invStudent[$r]['Invoice'];
+                    }
+                    else
+                    {
+                      $SisaAn = $SisaAn + $Q_invStudent[$r]['Invoice'];
+                    }
+                  }
+
+                  $Aging = 'lain-lain : 0';
+                  if ($DueDateAn != '' && $SisaAn > 0) {
+                    $Aging = 'lain-lain : '.$this->m_master->dateDiffDays(date('Y-m-d', strtotime($Q_invStudent[$last]['Deadline'])),date('Y-m-d'));
+                  }
+
+                  $arrAn = array(
+                    'An' => (int)$queryAn[$t]['Invoice'],
+                    'PayAn' => (int)$PayAn,
+                    'SisaAn' => (int)$SisaAn,
+                    'DetailPaymentAn' => $Q_invStudent,
+                    'DueDateAn' => $DueDateAn,
+                    'AgingAn' => $Aging,
+                  );
+
+                }
+            }
+
+            // cek SPP
+            $sqlSPP = 'select * from db_finance.payment where PTID = 1 and NPM = ? '.$Semester; // limit 1
+            $querySPP=$this->db->query($sqlSPP, array($query[$u]['NPM']))->result_array();
+            $arrSPP = array(
+              'SPP' => '0',
+              'PaySPP' => '0',
+              'SisaSPP' => '0',
+              'DetailPaymentSPP' => '',
+              'DueDateSPP' => '',
+              'AgingSPP' => 'SPP : 0',
+            );
+              if (count($querySPP) > 0) {
+                  for ($t=0; $t < count($querySPP); $t++) { 
+                    // cek payment students
+                    $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$querySPP[$t]['ID']);
+                    $PaySPP = 0;
+                    $SisaSPP = 0;
+                    $last = count($Q_invStudent) - 1;
+                    $DueDateSPP = ($Q_invStudent[$last]['Deadline'] != '' && $Q_invStudent[$last]['Deadline'] != null && strpos($Q_invStudent[$last]['Deadline'],'0000-00-00') === false) ? date('d M Y H:i:s', strtotime($Q_invStudent[$last]['Deadline'])) : '';
+                    for ($r=0; $r < count($Q_invStudent); $r++) { 
+                      if ($Q_invStudent[$r]['Status'] == 1) { // lunas
+                        $PaySPP = $PaySPP + $Q_invStudent[$r]['Invoice'];
+                      }
+                      else
+                      {
+                        $SisaSPP = $SisaSPP + $Q_invStudent[$r]['Invoice'];
+                      }
+                    }
+
+                    $Aging = 'SPP : 0';
+                    if ($DueDateSPP != '' && $SisaAn > 0) {
+                      $Aging = 'SPP : '.$this->m_master->dateDiffDays(date('Y-m-d', strtotime($Q_invStudent[$last]['Deadline'])),date('Y-m-d'));
+                    }
+
+                    $arrSPP = array(
+                      'SPP' => (int)$querySPP[$t]['Invoice'],
+                      'PaySPP' => (int)$PaySPP,
+                      'SisaSPP' => (int)$SisaSPP,
+                      'DetailPaymentSPP' => $Q_invStudent,
+                      'DueDateSPP' => $DueDateSPP,
+                      'AgingSPP' => $Aging,
+                    );
+
+                  }
+              }
+
           // if($Status == 0) // tidak lunas
           switch ($Status) {
             case '': // All
-              $arr[] = $arrMHS + $arrBPP + $arrCr ; 
+              $arr[] = $arrMHS + $arrBPP + $arrCr + $arrAn + $arrSPP; 
               break;
             case 0:  // Tidak Lunas
-              if ($arrBPP['DetailPaymentBPP'] == '' || $arrCr['DetailPaymentCr'] == '' ||  $arrBPP['SisaBPP'] > 0 || $arrCr['SisaCr'] > 0) {
-                $arr[] = $arrMHS + $arrBPP + $arrCr ; 
+              if ($arrBPP['DetailPaymentBPP'] == '' || $arrCr['DetailPaymentCr'] == '' ||  $arrBPP['SisaBPP'] > 0 || $arrCr['SisaCr'] > 0  ||  $arrSPP['DetailPaymentSPP'] == '' || $arrAn['DetailPaymentAn'] == '' ||  $arrSPP['SisaSPP'] > 0 || $arrAn['SisaAn'] > 0 ) {
+                $arr[] = $arrMHS + $arrBPP + $arrCr + $arrAn + $arrSPP; 
               }
               break;
             case 1:  // Lunas
-              if ($arrBPP['DetailPaymentBPP'] != '' && $arrCr['DetailPaymentCr'] != '' &&  $arrBPP['SisaBPP'] == 0 && $arrCr['SisaCr'] == 0) {
-                $arr[] = $arrMHS + $arrBPP + $arrCr ; 
+              if ($arrBPP['DetailPaymentBPP'] != '' && $arrCr['DetailPaymentCr'] != '' &&  $arrBPP['SisaBPP'] == 0 && $arrCr['SisaCr'] == 0  && $arrSPP['DetailPaymentSPP'] != '' && $arrAn['DetailPaymentAn'] != '' &&  $arrSPP['SisaSPP'] == 0 && $arrAn['SisaAn'] == 0 ) {
+                $arr[] = $arrMHS + $arrBPP + $arrCr + $arrAn + $arrSPP; 
               }
               // $arr[] = $arrMHS + $arrBPP + $arrCr ; 
               break;  
@@ -3198,6 +3316,40 @@ class M_finance extends CI_Model {
 
     }
     return $Data_mhs;
+   }
+
+   public function getSaleFormulirOffline($SelectSetTa,$SelectSortBy)
+   {
+    $SelectSortBy = explode('.', $SelectSortBy);
+    switch ($SelectSortBy) {
+      case 'No_Ref':
+      case 'FormulirCode':
+        $SelectSortBy = ' order by a.FormulirCodeGlobal asc';
+        break;
+      case 'DateSale':
+        $SelectSortBy = ' order by b.DateFin asc';
+        break;
+      default:
+        $SelectSortBy = '';
+        break;
+    }
+     $sql = 'select a.FormulirCodeGlobal,a.Years,a.Status as StatusGlobalFormulir,
+              b.No_Ref,b.Sales,b.PIC,b.DateFin,b.FullName
+              from db_admission.formulir_number_global as a
+              LEFT JOIN
+              (
+                             select a.No_Ref,c.Name as Sales,b.PIC,b.DateFin,b.FullName
+                             from db_admission.formulir_number_offline_m as a
+                             join db_admission.sale_formulir_offline as b
+                             on a.FormulirCode = b.FormulirCodeOffline
+                             left join db_employees.employees as c
+                             on c.NIP = b.PIC
+                             where a.Years = ?
+              ) as b
+              on a.FormulirCodeGlobal = b.No_Ref
+               ';
+     $query=$this->db->query($sql, array($SelectSetTa))->result_array();
+     return $query;             
    }
 
 }

@@ -42,21 +42,21 @@
             </div>
             <div class="widget-content">
                 <div class = "row">
-                        <div class="col-xs-2" style="">
+                        <div class="col-md-2" style="">
                             Prody
                             <select class="select2-select-00 col-md-4 full-width-fix" id="selectProgramStudy">
                                 <option></option>
                             </select>
                         </div>
-                        <div class="col-xs-2" style="">
+                        <div class="col-md-2" style="">
                             Nama
                             <input class="form-control" id="Nama" placeholder="All..." "="">
                         </div>
-                        <div class="col-xs-2" style="">
+                        <div class="col-md-2" style="">
                             Sekolah
                             <input class="form-control" id="Sekolah" placeholder="All..." "="">
                         </div>
-                    <div  class="col-xs-6" align="right" id="pagination_link"></div>
+                    <div  class="col-md-6" align="right" id="pagination_link"></div>
                 </div>
                 <div class="row" style="margin-top: 10px;margin-left: 0px;margin-right: 0px">
                     <div id="pageData">
@@ -65,7 +65,7 @@
                 </div>
                 
                 <br>
-                <div class="col-xs-12" align = "right">
+                <div class="col-md-12" align = "right">
                    <button class="btn btn-inverse btn-notification btn-submit" id="btn-submit">Submit</button>
                 </div>
             </div>

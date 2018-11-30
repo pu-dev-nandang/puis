@@ -6,31 +6,41 @@
   }
   
 </style>
-<div class="row" style="margin-top: 30px;">
-    <div class="col-md-2"></div>
-    <div class="col-md-8">
-        <div class="widget box">
-            <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i>Master Discount</h4>
-                <div class="toolbar no-padding">
-                    <div class="btn-group">
-                      <span data-smt="" class="btn btn-xs btn-add">
-                        <i class="icon-plus"></i> Add Discount
-                       </span>
-                    </div>
-                </div>
+<div class="row">
+    <div class="col-xs-12" >
+        <div class="panel panel-primary">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Discount</h4>
             </div>
-            <div class="widget-content">
-                <!-- <div class = 'row'> -->
-                  <div id= "loadtable"></div>
-                <!-- </div> -->
-                <!-- -->
+            <div class="panel-body">
+                  <div class="row" style="margin-top: 30px;">
+                      <div class="col-md-8 col-md-offset-2">
+                          <div class="widget box">
+                              <div class="widget-header">
+                                  <h4 class="header"><i class="icon-reorder"></i>Master Discount</h4>
+                                  <div class="toolbar no-padding">
+                                      <div class="btn-group">
+                                        <span data-smt="" class="btn btn-xs btn-add">
+                                          <i class="icon-plus"></i> Add Discount
+                                         </span>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="widget-content">
+                                  <!-- <div class = 'row'> -->
+                                    <div id= "loadtable"></div>
+                                  <!-- </div> -->
+                                  <!-- -->
+                              </div>
+                              <hr/>
+                          </div>
+                      </div>
+                  </div>         
             </div>
-            <hr/>
         </div>
     </div>
-    <div class="col-md-2"></div>
 </div>
+
 
 <script type="text/javascript">
   $(document).ready(function() {

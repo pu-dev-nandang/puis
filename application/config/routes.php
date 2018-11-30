@@ -365,6 +365,7 @@ $route['admission/edit_auth_user'] = 'page/admission/c_master/edit_auth_user';
 $route['admission/add_auth_user'] = 'page/admission/c_master/add_auth_user';
 $route['admission/delete_authUser'] = 'page/admission/c_master/delete_authUser';
 $route['admission/config/getAuthDataTables'] = 'page/admission/c_master/getAuthDataTables';
+$route['admission/master/generate_formulir_global'] = 'page/admission/c_master/generate_formulir_global';
 
 
 
@@ -441,6 +442,7 @@ $route['admission/mastercalonmahasiswa/submit_import_excel_File_generate_nim'] =
 $route['admission/export_kwitansi_formuliroffline'] = 'c_save_to_pdf/export_kwitansi_formuliroffline';
 $route['admission/export_PenjualanFormulirData'] = 'c_save_to_excel/export_PenjualanFormulirData';
 $route['admission/export_PenjualanFormulirFinance'] = 'c_save_to_excel/export_PenjualanFormulirFinance';
+$route['finance/export_PenjualanFormulir'] = 'c_save_to_excel/v_Finance_export_PenjualanFormulir';
 $route['admission/export_PengembalianFormulirData'] = 'c_save_to_excel/export_PengembalianFormulirData';
 $route['admission/TuitionFee_Excel'] = 'c_save_to_excel/export_TuitionFee_Excel';
 // ---Finance----
@@ -479,7 +481,7 @@ $route['finance/confirmed-verifikasi-pembayaran-registration_online'] =  'page/f
 $route['finance/admission/penerimaan-pembayaran/formulir-registration/offline'] =  'page/finance/c_finance/formulir_registration_offline_page';
 $route['finance/admission/distribusi-formulir/offline/LoadListPenjualan/serverSide'] =  'page/finance/c_finance/formulir_registration_offline_serverSide';
 
-$route['finance/admission/report'] =  'page/finance/c_report/report_admission';
+$route['finance/admission/report'] =  'page/finance/c_report/page_report_admission';
 $route['finance/admission/report/tuition-fee'] =  'page/finance/c_report/tuition_fee_admission';
 
 
@@ -501,6 +503,7 @@ $route['finance/getPayment_detail_admission2'] =  'page/finance/c_finance/getPay
 $route['finance/admission/approved/edit'] =  'page/finance/c_finance/approved_edit';
 $route['finance/admission/approved/edit_submit'] =  'page/finance/c_finance/approved_edit_submit';
 $route['finance/getRevision_detail_admission'] =  'api/c_global/getRevision_detail_admission';
+$route['finance/admission/submit-tgl-finance-formulir-offline'] =  'page/finance/c_finance/save_tgl_formulir_offline';
 
 
 $route['finance/tagihan-mhs/set-tagihan-mhs'] =  'page/finance/c_finance/page_set_tagihan_mhs';
@@ -544,6 +547,7 @@ $route['finance/tagihan-mhs/import_pembayaran_lain'] =  'page/finance/c_finance/
 $route['finance/tagihan-mhs/submit_import_pembayaran_lain'] =  'page/finance/c_finance/submit_import_pembayaran_lain';
 $route['finance/tagihan-mhs/report'] =  'page/finance/c_report/reportTagihanMHS';
 $route['finance/get_reporting/(:num)'] =  'page/finance/c_report/get_reportingTagihanMHS/$1';
+$route['finance/report_get/(:any)'] =  'page/finance/c_report/report_get/$1';
 
 
 $route['finance/tagihan-mhs/submit_import_beasiswa_mahasiswa'] =  'page/finance/c_finance/submit_import_beasiswa_mahasiswa';
@@ -556,6 +560,11 @@ $route['finance/config/policysys'] =  'page/finance/c_config/policysys';
 $route['finance/config/policy_sys_json_data'] =  'page/finance/c_config/policy_sys_json_data';
 $route['finance/config/policysys/modalform'] =  'page/finance/c_config/policy_sys_modalform';
 $route['finance/config/policysys/submit'] =  'page/finance/c_config/policy_sys_submit';
+
+// -- report admission to finance
+$route['finance/report_admission/(:any)'] =  'page/finance/c_report/report_admission/$1';
+
+
 
 
 // --- Student Life ----
@@ -771,6 +780,8 @@ $route['rest/__getTableData/(:any)/(:any)'] = 'api/c_rest/getTableData/$1/$2';
 $route['rest/__rule_service'] = 'api/c_rest/rule_service';
 $route['rest/__rule_users'] = 'api/c_rest/rule_users';
 $route['rest/__getEmployees/(:any)'] = 'api/c_rest/getEmployees/$1';
+$route['rest/__loadDataFormulirGlobal'] = 'api/c_rest/loadDataFormulirGlobal';
+$route['rest/__loadDataFormulirGlobal_available'] = 'api/c_rest/loadDataFormulirGlobal_available';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';

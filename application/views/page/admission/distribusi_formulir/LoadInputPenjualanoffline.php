@@ -14,49 +14,33 @@
 	           			  <div class="panel-body">
            			  		<div class="form-group">
            			  			<div class="row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
-           			  				<div class="col-xs-2">
+           			  				<div class="col-md-2">
            			  					  <label>Formulir Code</label>
            			  				      <select class="select2-select-00 col-md-4 full-width-fix" id="selectFormulirCode">
            			  				          <option></option>
            			  				      </select>
            			  				</div>
-           			  				<div class="col-xs-2">
+           			  				<div class="col-md-2">
            			  					  <label>Program Study 1</label>
            			  				      <select class="select2-select-00 col-md-4 full-width-fix" id="selectProgramStudy">
            			  				          <option></option>
            			  				      </select>
            			  				</div>
-           			  				<div class="col-xs-2">
+           			  				<div class="col-md-2">
            			  				      <label>Program Study 2</label>
            			  				      <select class="select2-select-00 col-md-4 full-width-fix" id="selectProgramStudy2">
            			  				          <option></option>
            			  				      </select>
            			  				</div>
-           			  				<div class="col-xs-2">
+           			  				<div class="col-md-2">
            			  				      <label>Tanggal</label>
            			  				      <input type="text" name="tanggal" id= "tanggal" data-date-format="yyyy-mm-dd" placeholder="Date..." class="form-control">
            			  				</div>
-           			  				<div class="col-xs-4">
-           			  					<div class="col-xs-4">
+           			  				<div class="col-md-2">
 	           			  					<label>No Ref</label>
-	           			  					<?php if ($action == "add"): ?>
-	           			  						<div class="row">
-	           			  						<label class="checkbox-inline">
-							          					<input type="checkbox" class="RefCode" name="RefCode" value="0"> CodeManual
-							          			</label>
-	           			  					</div>
-	           			  					<div class="row" style="margin-top: 5px">
-	           			  						<label class="checkbox-inline">
-					          					     <input type="checkbox" class="RefCode" name="RefCode" value="1"> CodeAuto
-					          					</label>
-	           			  					</div>
-	           			  					<?php endif ?>
-           			  					</div>
-           			  					<div class="col-xs-7">
-           			  						<div class="row <?php echo ($action == "add") ? "hide" : "" ?>" style="margin-top: 5px; margin-left: 10px;" id = "InputRef">
-           			  							<input type="text" name="No_Ref" id= "No_Ref"  class="form-control">
-           			  						</div>
-           			  					</div>
+	           			  					<select class="select2-select-00 col-md-4 full-width-fix" id="No_Ref">
+	           			  					    <option></option>
+	           			  					</select>
            			  				</div>
            			  			</div>
            			  		</div>
@@ -219,6 +203,49 @@
 <script type="text/javascript">
 	window.temp1 = '';
 	window.temp2 = '';
+		function loadFormulirCodeGlobal()
+		{
+			<?php 
+			$Division = $this->session->userdata('PositionMain')['IDDivision'];
+			?>
+			$("No_Ref").empty();
+			<?php if ($Division == 12): ?>
+			    var division = $('#Division').val();
+			<?php else: ?>
+			    var division = <?php echo $Division ?>;
+			<?php endif ?>
+            var selectTahun = '<?php echo $Ta ?>';
+            var url = base_url_js+'rest/__loadDataFormulirGlobal_available';
+            var data = {
+                selectTahun : selectTahun,
+                auth : 's3Cr3T-G4N',
+                division : division,
+            };
+            var token = jwt_encode(data,"UAP)(*");
+            $.post(url,{token:token},function (data_json) {
+            	for (var i = 0; i < data_json.length; i++) {
+            		var selected = (i==0) ? 'selected' : '';
+            		$('#No_Ref').append('<option value="'+data_json[i].FormulirCodeGlobal+'" '+selected+'>'+data_json[i].FormulirCodeGlobal+'</option>');
+            	}
+
+            	$('#No_Ref').select2({
+            	   // allowClear: true
+            	});
+
+            	<?php if ($action == 'edit'): ?>
+            	   $("#No_Ref option").filter(function() {
+            	      //may want to use $.trim in here
+            	      return $(this).val() == "<?php echo $get2[0]['No_Ref'] ?>"; 
+            	    }).prop("selected", true);
+            	   $('#No_Ref').select2({
+            	      // allowClear: true
+            	   });
+            	<?php endif ?>
+
+            	loadingEnd(1000);
+			});
+		}
+
 		function loadFormulirCode()
 		{
 			$("#selectFormulirCode").empty();
@@ -488,6 +515,7 @@
 		}
 
 		$(document).ready(function () {
+			  loadingStart();
 		      $('#tanggal').prop('readonly',true);
 		      $("#tanggal").datepicker({
 				    dateFormat: 'yy-mm-dd',
@@ -504,10 +532,11 @@
 			$('#priceFormulir').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 
 			FuncEventDom();
+			loadFormulirCodeGlobal();
 
 			<?php if ($action == 'edit'): ?>
 			  $('#tanggal').val("<?php echo $get1[0]['DateSale'] ?>");
-			  $("#No_Ref").val("<?php echo $get2[0]['No_Ref'] ?>");
+			  // $("#No_Ref").val("<?php echo $get2[0]['No_Ref'] ?>");
 			  $("#Name").val("<?php echo $get1[0]['FullName'] ?>");
 			  $("#hp").val("<?php echo $get1[0]['PhoneNumber'] ?>");
 			  $("#email").val("<?php echo $get1[0]['Email'] ?>");
@@ -562,7 +591,8 @@
 
 			$('#btn-proses').click(function(){
 				var cf = $(".RefCode:checked").val();
-				var bool = (cf == '' || cf == null) ? false : true;
+				// var bool = (cf == '' || cf == null) ? false : true;
+				var bool = true;
 				<?php if ($action == 'edit'): ?>
 					bool = true;
 				<?php endif ?>

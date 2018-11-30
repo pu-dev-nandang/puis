@@ -15,7 +15,7 @@
 				</div>
 			</div>
 			<hr/>
-				<div class="col-xs-12" align = "right">
+				<div class="col-md-12" align = "right">
 				   <button class="btn btn-inverse btn-notification hide" id="btn-confirm">Confirm</button>
 				</div>
 				<br>
@@ -30,15 +30,15 @@
             </div>
             <div class="widget-content">
                 <div class = "row">	
-					<div class="col-xs-3" style="">
+					<div class="col-md-3" style="">
 						Nama / Sekolah
 						<input class="form-control" id="Nama" placeholder="All..." "="">
 					</div>
-					<div class="col-xs-3" style="">
+					<div class="col-md-3" style="">
 						No Formulir
 						<input class="form-control" id="FormulirCode" placeholder="All..." "="">
 					</div>
-					<div  class="col-xs-6" align="right" id="pagination_link"></div>	
+					<div  class="col-md-6" align="right" id="pagination_link"></div>	
 					<!-- <div class = "table-responsive" id= "register_document_table"></div> -->
 				</div>
                 <!-- <div class = 'row'> -->
@@ -58,7 +58,7 @@
 	function loadDataUjianNOW(callback) {
 	    // Some code
 	    // console.log('test');
-	    var table = '<table class="table table-striped table-bordered table-hover table-checkable datatable">'+
+	    var table = '<div class = "table-responsive"><table class="table table-striped table-bordered table-hover table-checkable datatable">'+
     	'<thead>'+
     		'<tr>'+
     			'<th style="width: 15px;">No</th>'+
@@ -74,7 +74,7 @@
     	'</thead>'+
     	'<tbody>'+
     	'</tbody>'+
-    	'</table>';
+    	'</table></div>';
     	//$("#loadtableNow").empty();
     	$("#loadtableNow").html(table);
 	    if (typeof callback === 'function') { 

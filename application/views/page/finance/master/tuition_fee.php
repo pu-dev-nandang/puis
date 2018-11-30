@@ -1,47 +1,57 @@
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
-<!--coba-->
-<div class="row" style="margin-top: 30px;">
-    <div class="col-md-4 col-md-offset-4">
-        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <select class="form-control" id="selectCurriculum">
-                <option selected disabled>--- Curriculum ---</option>
-                <option disabled>------</option>
-            </select>
+<div class="row">
+    <div class="col-xs-12" >
+        <div class="panel panel-primary">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Tagihan Mahasiswa</h4>
+            </div>
+            <div class="panel-body">
+                <div class="row" style="margin-top: 30px;">
+                    <div class="col-md-4 col-md-offset-4">
+                        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                            <select class="form-control" id="selectCurriculum">
+                                <option selected disabled>--- Curriculum ---</option>
+                                <option disabled>------</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <hr/>
+                        <div align="right">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-info copyLastTf" id = "copyLastTf">
+                                  <span class="glyphicon glyphicon-plus"></span> Copy Last Tuition Fee
+                                </button>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-info btn-add">
+                                  <span class="glyphicon glyphicon-plus"></span> Add
+                                </button>
+                            </div>
+                        </div>
+                        <br>
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr style="background: #333;color: #fff;">
+                                <th style="">Program Study</th>
+                                <th style="width: 10%;">SPP</th>
+                                <th style="width: 10%;">BPP</th>
+                                <th style="width: 10%;">Credit</th>
+                                <th style="width: 10%;">Another</th>
+                                <th style="width: 10%;">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody id="dataRow"></tbody>
+                        </table>
+                    </div>
+                </div>           
+            </div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-12">
-        <hr/>
-        <div align="right">
-            <div class="btn-group">
-                <button type="button" class="btn btn-info copyLastTf" id = "copyLastTf">
-                  <span class="glyphicon glyphicon-plus"></span> Copy Last Tuition Fee
-                </button>
-            </div>
-            <div class="btn-group">
-                <button type="button" class="btn btn-info btn-add">
-                  <span class="glyphicon glyphicon-plus"></span> Add
-                </button>
-            </div>
-        </div>
-        <br>
-        <table class="table table-bordered">
-            <thead>
-            <tr style="background: #333;color: #fff;">
-                <th style="">Program Study</th>
-                <th style="width: 10%;">SPP</th>
-                <th style="width: 10%;">BPP</th>
-                <th style="width: 10%;">Credit</th>
-                <th style="width: 10%;">Another</th>
-                <th style="width: 10%;">Action</th>
-            </tr>
-            </thead>
-            <tbody id="dataRow"></tbody>
-        </table>
-    </div>
-</div>
 
 
 <script>

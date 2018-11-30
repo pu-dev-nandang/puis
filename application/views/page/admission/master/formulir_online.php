@@ -56,11 +56,10 @@
                         </div>
                     </div>
                 </div>
-
-            </div>
-            <hr/>
-            <div id="pageData">
-                
+                <hr/>
+                <div id="pageData">
+                    
+                </div>
             </div>
         </div>
     </div>

@@ -1,16 +1,15 @@
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
-<div class="row" style="margin-top: 30px;">
-    <div class="col-md-12 formAddFormKD">
-        <div class="widget box">
-            <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i> Tagihan & Cicilan </h4>
+<div class="row">
+    <div class="col-xs-12" >
+        <div class="panel panel-primary">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Approval</h4>
             </div>
-            <div class="widget-content">
-                <!--  -->
+            <div class="panel-body">
                 <div class="row">
                     <div id="panel_web" class="" style="padding:30px;padding-top:0px;">
                         <ul class="nav nav-tabs">
-                            <li role="presentation" class="active"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee/1">Approve Tuition Fee</a></li>
+                            <li role="presentation" class="active"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee/1">Approval Tuition Fee</a></li>
                             <li role="presentation"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee_approved/1">Tuition Fee Approved</a></li>
                         </ul>
                     </div>
@@ -32,12 +31,11 @@
                     <div class="row" style="margin-top: 10px;margin-left: 0px;margin-right: 10px">
                       <div  class="col-xs-12" align="right" id="pagination_link"></div>  
                     </div>
-                </div>
+                </div>          
             </div>
         </div>
     </div>
 </div>
-
 <script type="text/javascript">
     window.pageHtml = '';
     window.Grade = [];

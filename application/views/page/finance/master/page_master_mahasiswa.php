@@ -1,66 +1,78 @@
-
-<div class="row" style="margin-top: 30px;">
-    <div class="col-md-3">
-        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <select class="form-control" id="selectCurriculum">
-                <option selected value = ''>--- Curriculum ---</option>
-                <option disabled>------</option>
-            </select>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <select class="form-control" id="selectProdi">
-                <option selected value = ''>--- Prodi---</option>
-                <option disabled>------</option>
-            </select>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM" value="">
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <button class="btn btn-block btn-default" id="btnStdDownloadtoExcel"><i class="fa fa-download margin-right"></i>Excel</button>
-        </div>
-    </div>
-</div>
-
 <div class="row">
-    <div class="col-md-12">
-        <hr/>
-        <div class="row" style="margin-top: 0px;margin-right: 0px;margin-left: 0px">
-          <div class="col-md-12">
-            <table class="table table-bordered datatable2 hide" id = "datatable2">
-                <thead>
-                <tr style="background: #333;color: #fff;">
-                    <th style="width: 12%;">Program Study</th>
-                    <!-- <th style="width: 10%;">Semester</th> -->
-                    <th style="width: 20%;">Nama,NPM & VA</th>
-                    <th style="width: 5%;">Foto</th>
-                    <th style="width: 5%;">IPS</th>
-                    <th style="width: 5%;">IPK</th>
-                    <th style="width: 5%;">Credit</th>
-                    <th style="width: 5%;">Status</th>
-                    <!-- <th style="width: 15%;">Email PU</th> -->
-                    <!-- <th style="width: 5%;">No HP</th> -->
-                    <th style="width: 5%;">Bintang</th>
-                    <th style="width: 5%;">Beasiswa BPP</th>
-                    <th style="width: 5%;">Beasiswa Credit</th>
-                </tr>
-                </thead>
-                <tbody id="dataRow"></tbody>
-            </table>
-          </div>
-        </div>
-        <div class="row" style="margin-top:10px;margin-right: 0px;margin-left: 0px">
-          <div  class="col-xs-12" align="right" id="pagination_link"></div>
+    <div class="col-xs-12" >
+        <div class="panel panel-primary">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Master - Mahasiswa</h4>
+            </div>
+            <div class="panel-body">
+              <div class="row">
+                <div class="col-md-8">
+                  <div class="well">
+                    <h5>Search</h5>
+                    <div class="row">
+                      <div class="col-md-4">
+                              <select class="form-control" id="selectCurriculum">
+                                  <option selected value = ''>--- Curriculum ---</option>
+                                  <option disabled>------</option>
+                              </select>
+                      </div>
+                      <div class="col-md-4">
+                              <select class="form-control" id="selectProdi">
+                                  <option selected value = ''>--- Prodi---</option>
+                                  <option disabled>------</option>
+                              </select>
+                      </div>
+                      <div class="col-md-4">
+                              <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM" value="">
+                      </div>
+                    </div>
+                  </div>  
+                </div>
+                <div class="col-md-4">
+                  <div class="well">
+                    <h5>Export</h5>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <button class="btn btn-block btn-default" id="btnStdDownloadtoExcel"><i class="fa fa-download margin-right"></i>Excel</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row" style="margin-top:0px;margin-right: 0px;margin-left: 0px">
+                <div  class="col-xs-12" align="right" id="pagination_link"></div>
+              </div>
+              <div class="row" style="margin-top: 0px">
+                <div class="col-md-12">
+                  <div class="table-responsive">
+                    <table class="table table-bordered datatable2 hide" id = "datatable2">
+                        <thead>
+                        <tr style="background: #333;color: #fff;">
+                            <th style="width: 1%;">No</th>
+                            <th style="width: 12%;">Program Study</th>
+                            <!-- <th style="width: 10%;">Semester</th> -->
+                            <th style="width: 20%;">Nama,NPM & VA</th>
+                            <th style="width: 5%;">Foto</th>
+                            <th style="width: 5%;">IPS</th>
+                            <th style="width: 5%;">IPK</th>
+                            <th style="width: 5%;">Credit</th>
+                            <th style="width: 5%;">Status</th>
+                            <!-- <th style="width: 15%;">Email PU</th> -->
+                            <!-- <th style="width: 5%;">No HP</th> -->
+                            <th style="width: 5%;">Bintang</th>
+                            <th style="width: 5%;">Beasiswa BPP</th>
+                            <th style="width: 5%;">Beasiswa Credit</th>
+                        </tr>
+                        </thead>
+                        <tbody id="dataRow"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
         </div>
     </div>
 </div>
-
 
 <script>
     $(document).ready(function () {
@@ -230,6 +242,7 @@
                             Credit = 0
                         }
                        $('#dataRow').append('<tr>' +
+                           '<td>'+Data_mhs[i]['No']+'</td>' +
                            '<td>'+Data_mhs[i]['ProdiEng']+'</td>' +
                            // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
                            '<td>'+bintang+Data_mhs[i]['Name']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +

@@ -1211,6 +1211,7 @@ class C_master extends Admission_Controler {
 
     public function page_recycle_va()
     {
+        $this->data['datadb'] = $this->m_master->recycleDataVa(1, 0);
         $content = $this->load->view('page/'.$this->data['department'].'/master/page_recycle_va',$this->data,true);
         $this->temp($content);
     }
@@ -1218,7 +1219,9 @@ class C_master extends Admission_Controler {
     public function loadDataVA_deleted($page)
     {
         $this->load->library('pagination');
-        $config = $this->config_pagination_default_ajax(999,18,4);
+        $sql = 'select count(*) as total from db_admission.register_deleted';
+        $query=$this->db->query($sql, array())->result_array();
+        $config = $this->config_pagination_default_ajax($query[0]['total'],18,4);
 
         $this->pagination->initialize($config);
         $page = $this->uri->segment(4);
@@ -1742,6 +1745,51 @@ class C_master extends Admission_Controler {
             
             
         }
+    }
+
+    public function globalformulir()
+    {
+        $content = $this->load->view('page/'.$this->data['department'].'/master/globalformulir',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function generate_formulir_global()
+    {
+        $input = $this->getInputToken();
+        $prefix = substr($input['Angkatan'], 2,4);
+        for ($i=$input['Start']; $i <= $input['End']; $i++) { 
+           // check length max 4
+            $code = $i;
+            $c = strlen($i);
+            for ($j=0; $j < 4-$c; $j++) { 
+                $code = '0'.$code;
+            }
+            $code = $prefix.$code;
+
+            // check data already exist in table formulir_number_global
+            $chk = $this->m_master->caribasedprimary('db_admission.formulir_number_global','FormulirCodeGlobal',$code);
+            if (count($chk) == 1) {
+                continue;
+            }
+            else
+            {
+                $arr_field = array(
+                    'FormulirCodeGlobal' => $code,
+                    'Years' => $input['Angkatan'],
+                    'Status' => 0,
+                    'Division' => $input['division'],
+                );
+                // check data already using in formulir_number_offline_m
+                  $chk2 = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','No_Ref',$code);
+                  if (count($chk2) == 1) {
+                      $arr_field['Status'] = 1;
+                  }
+
+                  $this->db->insert('db_admission.formulir_number_global', $arr_field);
+            }
+
+        }
+
     }
 
 }

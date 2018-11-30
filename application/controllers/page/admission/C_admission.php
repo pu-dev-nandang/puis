@@ -1844,7 +1844,7 @@ class C_admission extends Admission_Controler {
 
       $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,b.No_Ref,a.StatusReg,b.Years,b.Status as StatusUsed, b.StatusJual,
                 b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,b.CityNameFormulir,b.DistrictNameFormulir,b.TypePay,
-                b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi,b.NoKwitansi,b.Link
+                b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi,b.NoKwitansi,b.Link,b.DateFin
                 from (
                 select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
                 from db_admission.register as a 
@@ -1857,7 +1857,7 @@ class C_admission extends Admission_Controler {
                 where a.StatusReg = 1
                 ) as a right JOIN
                 (
-                select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,b.NoKwitansi,
+                select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,b.NoKwitansi,b.DateFin,
                 b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,b.TypePay,a.Link,
                 if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,b.ID_ProgramStudy,y.Name as NameProdi
                 from db_admission.formulir_number_offline_m as a
@@ -1924,6 +1924,13 @@ class C_admission extends Admission_Controler {
               $hide = 'hide';
             }
 
+            // auth by finance
+              $hide2 = '';
+              $DateFin = $row['DateFin'];
+              if ($DateFin != '' && $DateFin != null && $DateFin != '0000-00-00') {
+                $hide2 = 'hide';
+              }
+
           if ($row['ID_sale_formulir_offline'] != null || $row['ID_sale_formulir_offline'] != '')
           {
             $action = '<div class="row '.$hide.'">
@@ -1933,7 +1940,7 @@ class C_admission extends Admission_Controler {
                           </span>
                         </div>
                       </div>
-                      <div class="row '.$hide.'" style="margin-top: 10px">
+                      <div class="row '.$hide.' '.$hide2.'" style="margin-top: 10px">
                         <div class="col-md-12">
                           <span data-smt="'.$row['ID_sale_formulir_offline'].'" class="btn btn-xs btn-delete deletepenjualan">
                             <i class="fa fa-trash"></i> Delete Penjualan
@@ -1947,7 +1954,7 @@ class C_admission extends Admission_Controler {
                          </span>
                         </div>
                       </div>
-                      <div class="row '.$hide.'" style="margin-top: 10px">
+                      <div class="row '.$hide.' '.$hide2.'" style="margin-top: 10px">
                         <div class="col-md-12">
                           <span data-smt="'.$row['ID_sale_formulir_offline'].'" class="btn btn-xs btn-edit">
                             <i class="fa fa-edit"></i> Edit Penjualan
@@ -1978,6 +1985,8 @@ class C_admission extends Admission_Controler {
       $input = $this->getInputToken();
       $this->data['action'] = $input['action'];
       $this->data['CDID'] = $input['ID'];
+      $Ta = $this->m_master->showData_array('db_admission.set_ta');
+      $this->data['Ta'] = $Ta[0]['Ta'];
       switch ($input['action']) {
         case 'add':
           # code...

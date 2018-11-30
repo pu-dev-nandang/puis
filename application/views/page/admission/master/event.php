@@ -13,9 +13,11 @@
                 </div>
             </div>
             <div class="widget-content">
-                <!-- <div class = 'row'> -->
-                	<div id= "loadtableMenu"></div>
-                <!-- </div> -->
+                <div class = 'row'>
+                  <div class="col-md-12">
+                    <div id= "loadtableMenu"></div>
+                  </div>
+                </div>
                 <!-- -->
             </div>
         </div>
@@ -210,7 +212,7 @@
        // Some code
        // console.log('test');
        $("#loadtableMenu").empty();
-       var table = '<table class="table table-striped table-bordered table-hover table-checkable datatable" id ="EventTbl">'+
+       var table = '<div class = "table-responsive"><table class="table table-striped table-bordered table-hover table-checkable datatable" id ="EventTbl">'+
        '<thead>'+
            '<tr>'+
                '<th style="width: 106px;">No</th>'+
@@ -224,7 +226,7 @@
        '</thead>'+
        '<tbody>'+
        '</tbody>'+
-       '</table>';
+       '</table></div>';
        //$("#loadtableNow").empty();
        $("#loadtableMenu").html(table);
 

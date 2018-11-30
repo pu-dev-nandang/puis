@@ -1,24 +1,29 @@
-<div id = "loadingProcess"></div>
-<div class="col-md-12">
-    <table class="table table-striped table-bordered table-hover table-checkable datatable">
-    	<thead>
-    		<tr>
-    		<th style="width: 15px;">No</th>
-    		<th>Angkatan</th>
-    		<th>Formulir Code</th>
-    		<th>Ref</th>
-    		<!-- <th>Link</th> -->
-    		<th>Status</th>
-    		<th>Print</th>
-    		<th>Create At</th>
-    		<th>Created By</th>
-    		<th>Action</th>
-    		</tr>
-    	</thead>
-    	<tbody>
-    	</tbody>
-    </table>
+<div class="row">
+	<div id = "loadingProcess"></div>
+	<div class="col-md-12">
+		<div class="table-responsive">
+			<table class="table table-striped table-bordered table-hover table-checkable datatable">
+				<thead>
+					<tr>
+					<th style="width: 15px;">No</th>
+					<th>Angkatan</th>
+					<th>Formulir Code</th>
+					<!-- <th>Ref</th> -->
+					<!-- <th>Link</th> -->
+					<th>Status</th>
+					<th>Print</th>
+					<th>Create At</th>
+					<th>Created By</th>
+					<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+	</div>
 </div>
+
 	
 <script type="text/javascript">
 
@@ -61,7 +66,7 @@
 						'<td>'+no+'</td>'+
 						'<td>'+response[i]['Years']+'</td>'+
 						'<td>'+response[i]['FormulirCode']+'</td>'+
-						'<td>'+response[i]['No_Ref']+'</td>'+
+						// '<td>'+response[i]['No_Ref']+'</td>'+
 						// '<td>'+response[i]['Link']+'</td>'+
 						status+
 						'<td>'+print+'</td>'+

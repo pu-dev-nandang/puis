@@ -6,70 +6,86 @@
 
   .btn-unapprove { background-color: hsl(41, 85%, 35%) !important; background-repeat: repeat-x; filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#efb73d", endColorstr="#a5750d"); background-image: -khtml-gradient(linear, left top, left bottom, from(#efb73d), to(#a5750d)); background-image: -moz-linear-gradient(top, #efb73d, #a5750d); background-image: -ms-linear-gradient(top, #efb73d, #a5750d); background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #efb73d), color-stop(100%, #a5750d)); background-image: -webkit-linear-gradient(top, #efb73d, #a5750d); background-image: -o-linear-gradient(top, #efb73d, #a5750d); background-image: linear-gradient(#efb73d, #a5750d); border-color: #a5750d #a5750d hsl(41, 85%, 29%); color: #fff !important; text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.39); -webkit-font-smoothing: antialiased; }
 </style>
-<div class="row" style="margin-top: 30px;">
-    <div class="col-md-3">
-        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <select class="form-control" id="selectCurriculum">
-                <option selected value = ''>--- All Curriculum ---</option>
-                <option disabled>------</option>
-            </select>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <select class="form-control" id="selectProdi">
-                <option selected value = ''>--- All Prodi---</option>
-                <option disabled>------</option>
-            </select>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <select class="form-control" id="selectPTID">
-                <option selected value = ''>--- All Payment Type ---</option>
-                <option disabled>------</option>
-            </select>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-            <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM">
-        </div>
-    </div>
-</div>
-<br>
-<!-- <div class="thumbnail" style="padding: 10px;">
-    <b>Status : </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Approve & Paid Off | <i class="fa fa-circle" style="color: #eade8e;"></i> Approve & Not Yet Paid Off  
-</div> -->
-
 <div class="row">
-    <div class="col-md-12">
-        <hr/>
-        <table class="table table-bordered datatable2 hide" id = "datatable2">
-            <thead>
-            <tr style="background: #333;color: #fff;">
-                <th style="width: 3%;"><input type="checkbox" class="uniform" value="nothing" id ="dataResultCheckAll"></th>
-                <th style="width: 12%;">Program Study</th>
-                <!-- <th style="width: 10%;">Semester</th> -->
-                <th style="width: 20%;">Nama,NPM &  VA</th>
-                <!-- <th style="width: 5%;">NPM</th> -->
-                <!-- <th style="width: 5%;">Year</th> -->
-                <th style="width: 15%;">Payment Type</th>
-                <th style="width: 15%;">Email PU</th>
-                <th style="width: 15%;">IPS</th>
-                <th style="width: 15%;">IPK</th>
-                <th style="width: 10%;">Discount</th>
-                <th style="width: 10%;">Invoice</th>
-                <th style="width: 10%;">Status</th>
-                <th style="width: 10%;">Detail Payment</th>
-            </tr>
-            </thead>
-            <tbody id="dataRow"></tbody>
-        </table>
+    <div class="col-xs-12" >
+        <div class="panel panel-primary">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Batal Tagihan</h4>
+            </div>
+            <div class="panel-body">
+                <div class="row" style="margin-top: 30px;">
+                  <div class="col-md-12">
+                    <div class="well">
+                        <h5>Search</h5>
+                        <div class="row">
+                          <div class="col-md-3">
+                              <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                                  <select class="form-control" id="selectCurriculum">
+                                      <option selected value = ''>--- All Curriculum ---</option>
+                                      <option disabled>------</option>
+                                  </select>
+                              </div>
+                          </div>
+                          <div class="col-md-3">
+                              <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                                  <select class="form-control" id="selectProdi">
+                                      <option selected value = ''>--- All Prodi---</option>
+                                      <option disabled>------</option>
+                                  </select>
+                              </div>
+                          </div>
+                          <div class="col-md-3">
+                              <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                                  <select class="form-control" id="selectPTID">
+                                      <option selected value = ''>--- All Payment Type ---</option>
+                                      <option disabled>------</option>
+                                  </select>
+                              </div>
+                          </div>
+                          <div class="col-md-3">
+                              <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                                  <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM">
+                              </div>
+                          </div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div  class="col-xs-12" align="right" id="pagination_link"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-bordered datatable2 hide" id = "datatable2">
+                            <thead>
+                            <tr style="background: #333;color: #fff;">
+                                <th style="width: 3%;"><input type="checkbox" class="uniform" value="nothing" id ="dataResultCheckAll"></th>
+                                <th style="width: 12%;">Program Study</th>
+                                <!-- <th style="width: 10%;">Semester</th> -->
+                                <th style="width: 20%;">Nama,NPM &  VA</th>
+                                <!-- <th style="width: 5%;">NPM</th> -->
+                                <!-- <th style="width: 5%;">Year</th> -->
+                                <th style="width: 15%;">Payment Type</th>
+                                <th style="width: 15%;">Email PU</th>
+                                <th style="width: 15%;">IPS</th>
+                                <th style="width: 15%;">IPK</th>
+                                <th style="width: 10%;">Discount</th>
+                                <th style="width: 10%;">Invoice</th>
+                                <th style="width: 10%;">Status</th>
+                                <th style="width: 10%;">Detail Payment</th>
+                            </tr>
+                            </thead>
+                            <tbody id="dataRow"></tbody>
+                        </table>
+                    </div>
+                    <div  class="col-xs-12" align="right"><button class="btn btn-unapprove btn-cancel hide" id="btn-cancel"> <i class="fa fa-times" aria-hidden="true"></i> Cancel</button></div>
+                </div>           
+            </div>
+        </div>
     </div>
-    <div  class="col-xs-12" align="right" id="pagination_link"></div>
-    <div  class="col-xs-12" align="right"><button class="btn btn-unapprove btn-cancel hide" id="btn-cancel"> <i class="fa fa-times" aria-hidden="true"></i> Cancel</button></div>
 </div>
+
+
 
 
 <script>

@@ -2,17 +2,25 @@
 <div class="thumbnail" style="padding: 10px;">
     <b>Status : </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Paid Off 
 </div>
-
-<div class="row">
-    <div class="col-md-12">
-        <hr/>
-        <div id = "pageTable">
-          
+<div class="row" style="margin-top: 10px">
+    <div class="col-xs-12" >
+        <div class="panel panel-primary">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Edit Tagihan & Cicilan</h4>
+            </div>
+            <div class="panel-body">
+               <div class="row">
+                   <div class="col-md-12">
+                       <hr/>
+                       <div id = "pageTable">
+                         
+                       </div>
+                   </div>
+               </div>            
+            </div>
         </div>
     </div>
 </div>
-
-
 <script type="text/javascript">
     $(document).ready(function () {
       loadTableHeader(loadData);

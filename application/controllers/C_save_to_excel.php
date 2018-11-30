@@ -1467,6 +1467,113 @@ class C_save_to_excel extends CI_Controller
         }
     }
 
+    public function v_Finance_export_PenjualanFormulir()
+    {
+        $this->load->model('finance/m_finance');
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $Input = (array) $this->jwt->decode($token,$key);
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+        $title1 = 'Form Pendaftaran TA '.$Input['SelectSetTa'].'/'.($Input['SelectSetTa']+1);
+        $title2 = 'Per Tanggal '.date('d M Y', strtotime(date('Y-m-d')));
+        $SelectSetTa = $Input['SelectSetTa'];
+        $SelectSortBy = $Input['SelectSortBy'];
+        $get = $this->m_finance->getSaleFormulirOffline($SelectSetTa,$SelectSortBy);
+        $this->exCel_v_Finance_export_PenjualanFormulirFinance($title1,$title2,$get);
+    }
+
+    private function exCel_v_Finance_export_PenjualanFormulirFinance($title1 = '',$title2 = '',$get= array())
+    {
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $objPHPExcel = new PHPExcel;
+        $sheet = $objPHPExcel->getActiveSheet();
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load('./uploads/finance/TemplateRekapFormulir.xlsx'); // Empty Sheet
+        $excel2->setActiveSheetIndex(0);
+
+        $excel3 = $excel2->getActiveSheet();
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+        $style_row = array(
+          'alignment' => array(
+            'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+          ),
+          'borders' => array(
+            'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+            'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+            'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+            'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+          )
+        );
+
+        $excel3->setCellValue('B1', $title1);
+        $excel3->setCellValue('B2', $title2);
+
+        // start dari B6
+        $a = 6;
+        $data = $get;
+        $fill =  array(
+                'fill' => array(
+                    'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                    'color' => array('rgb' => 'FFFF00')
+                )
+            );
+        $countNotSell = 0;
+        $countFormulir = 0;
+        $countSell = 0;
+        for ($i=0; $i < count($data); $i++) {
+            // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+            $style_row2 = array(
+              'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+              ),
+              'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+              )
+            );
+           $no = $i + 1;  
+           $excel3->setCellValue('B'.$a, $no);
+           $excel3->setCellValue('C'.$a, $data[$i]['FormulirCodeGlobal']);
+           $excel3->setCellValue('D'.$a, $data[$i]['FullName']);
+           $dateFin = ($data[$i]['DateFin'] != '' || $data[$i]['DateFin'] != null) ? date('d M Y', strtotime($data[$i]['DateFin'])) : '';
+           $excel3->setCellValue('E'.$a, $dateFin);
+           $excel3->setCellValue('F'.$a, $data[$i]['Sales']);
+
+           // Apply style row yang telah kita buat tadi ke masing-masing baris (isi tabel)
+           if ($data[$i]['StatusGlobalFormulir'] == 0) {
+               $countNotSell++;
+               $style_row2 = $style_row2 + $fill;
+           }
+           else
+           {
+            $countSell++;
+           }
+           $excel3->getStyle('B'.$a)->applyFromArray($style_row2);
+           $excel3->getStyle('C'.$a)->applyFromArray($style_row2);
+           $excel3->getStyle('D'.$a)->applyFromArray($style_row2);
+           $excel3->getStyle('E'.$a)->applyFromArray($style_row2);
+           $excel3->getStyle('F'.$a)->applyFromArray($style_row2);
+           $a = $a + 1;
+           $countFormulir++; 
+        }
+
+        $excel3->setCellValue('H7', 'Terjual :'.$countSell);
+        $excel3->setCellValue('H8', 'Tidak Terjual :'.$countNotSell);
+        $excel3->setCellValue('H9', 'Total :'.$countFormulir);
+        $filename = 'Rekap_Formulir_'.date('y-m-d').'.xlsx';
+
+        $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
+        // We'll be outputting an excel file  
+        header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
+        // It will be called file.xlss
+        header('Content-Disposition: attachment; filename="'.$filename.'"'); // jalan ketika tidak menggunakan ajax
+        $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
+    }
+
     private function exCel_PenjualanFormulirFinance($title,$data)
     {
         include APPPATH.'third_party/PHPExcel/PHPExcel.php';
@@ -2370,7 +2477,7 @@ class C_save_to_excel extends CI_Controller
             $excel3->setCellValue('A'.$a, $no); 
             $excel3->setCellValue('B'.$a, $getData[$i]['NPM']);
             $excel3->setCellValue('C'.$a, $getData[$i]['Name']);
-            $excel3->setCellValue('D'.$a, $getData[$i]['VA']);
+            $excel3->setCellValue('D'.$a, (string)$getData[$i]['VA']);
             $excel3->setCellValue('E'.$a, $getData[$i]['ProdiEng']);
             $excel3->setCellValue('F'.$a, number_format($getData[$i]['IPS'],2,',','.'));
             $excel3->setCellValue('G'.$a, number_format($getData[$i]['IPK'],2,',','.'));

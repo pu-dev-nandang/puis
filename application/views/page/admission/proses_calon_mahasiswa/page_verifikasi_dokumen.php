@@ -20,22 +20,22 @@
 <hr class="style-eight" />
 <?php for ($i = 0; $i < count($datadb['data']); $i++): ?>
 	<div class = "row">
-		<div class="col-xs-2" style="">
+		<div class="col-md-2" style="">
 			<label class="control-label">Nama :</label>
 			<br>
 			<label class="control-label"><?php echo $datadb['data'][$i]['Name'] ?> </label>
 		</div>
-		<div class="col-xs-2" style="">
+		<div class="col-md-2" style="">
 			<label class="control-label">Email :</label>
 			<br>
 			<label class="control-label"><?php echo $datadb['data'][$i]['Email'] ?> </label>
 		</div>
-		<div class="col-xs-2" style="">
+		<div class="col-md-2" style="">
 			<label class="control-label">No Hp :</label>
 			<br>
 			<label class="control-label"><?php echo $datadb['data'][$i]['PhoneNumber'] ?> </label>
 		</div>
-		<div class="col-xs-2" style="">
+		<div class="col-md-2" style="">
 			<label class="control-label">Nomor Formulir :</label>
 			<br>
 			<?php $code = $datadb['data'][$i]['FormulirCode'] ;
@@ -49,17 +49,17 @@
 	</div>
 	<br>
 	<div class = "row">	
-		<div class="col-xs-2" style="">
+		<div class="col-md-2" style="">
 			<label class="control-label">Program Study :</label>
 			<br>
 			<label class="control-label"><?php echo $datadb['data'][$i]['Name_programstudy'] ?> </label>
 		</div>
-		<div class="col-xs-2" style="">
+		<div class="col-md-2" style="">
 			<label class="control-label">Alamat :</label>
 			<br>
 			<label class="control-label"><?php echo $datadb['data'][$i]['Alamat'] ?> </label>
 		</div>
-		<div class="col-xs-2" style="">
+		<div class="col-md-2" style="">
 			<label class="control-label">Sekolah :</label>
 			<br>
 			<label class="control-label"><?php echo $datadb['data'][$i]['SMA'] ?> </label>
@@ -127,7 +127,7 @@
 			</tbody>
 		</table>
 	</div>
-	<div class="col-xs-12" align = "right">
+	<div class="col-md-12" align = "right">
 	   <button class="btn btn-inverse btn-notification btn-reject" id="btn-reject<?php echo $i ?>">Reject</button>
 	   <button class="btn btn-inverse btn-notification btn-approve" id="btn-approve<?php echo $i ?>">Approve</button>
 	   <button class="btn btn-danger btn-notification btn-unpprove" id="btn-unpprove<?php echo $i ?>">Unapprove</button>
