@@ -390,9 +390,6 @@
                             var valueToPush = new Array();
                             var agingPass = Data_mhs[i]['AgingBPP']+'\n'+Data_mhs[i]['AgingCr']+'\n'+Data_mhs[i]['AgingSPP']+'\n'+Data_mhs[i]['AgingAn'];
                             valueToPush = [no,Data_mhs[i]['Name'],Data_mhs[i]['NPM'],Data_mhs[i]['ProdiENG'],Data_mhs[i]['BPP'],Data_mhs[i]['Cr'],Total_tagihan,Total_pembayaran,Piutang,ketEXcel,Data_mhs[i]['Year'],Data_mhs[i]['DueDateBPP'],Data_mhs[i]['DueDateCR'],Data_mhs[i]['SPP'],Data_mhs[i]['DueDateSPP'],Data_mhs[i]['An'],Data_mhs[i]['DueDateAn'],agingPass];
-                            // 11
-                            // console.log(valueToPush);
-                            // dataa[] = [no,Data_mhs[i]['Name'],Data_mhs[i]['NPM']];
                             dataa.push(valueToPush);
                         }
                         // console.log(dataa);

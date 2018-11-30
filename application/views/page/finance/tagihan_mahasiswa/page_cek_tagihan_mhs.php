@@ -484,24 +484,71 @@
 
     $(document).on('click','.bayar', function () {
         var IDStudent = $(this).attr('IDStudent');
+        var idget = $(this).attr('IDStudent');
         var bayar = $(this).attr('bayar');
-        loading_button(".bayar[IDStudent='"+IDStudent+"']");
-        var url = base_url_js+'finance/bayar_manual_mahasiswa';
-        var data = {
-            IDStudent : IDStudent,
-            bayar : bayar,
-        };
-        var token = jwt_encode(data,'UAP)(*');
-        $.post(url,{token:token},function (resultJson) {
-           // var resultJson = jQuery.parseJSON(resultJson);
-           loadData(1);
-           $(".bayar[IDStudent='"+IDStudent+"']").remove();
-        }).fail(function() {
-          toastr.info('No Action...'); 
-          // toastr.error('The Database connection error, please try again', 'Failed!!');
-        }).always(function() {
+        if (bayar == 1) {
+          var html = '<div class="col-xs-12">'+
+                        '<div id="datetimepicker1'+idget+'" class="input-group input-append date datetimepicker">'+
+                            '<input data-format="yyyy-MM-dd" class="form-control" id="tgl'+idget+'" type=" text" readonly="" value = "<?php echo date('Y-m-d') ?>">'+
+                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
+                        '</div>'+
+                      '</div>';
+          var btn_save = '<div class = "row" style = "margin-top : 10px"><div class = "col-xs-12"><button class = "btn btn-success save'+idget+'" idget = "'+idget+'">Save</button></div></div>';
+          var rowhead = $( this )
+            .closest('.row');
+          var td = $( this )
+            .closest('td')
+            var htmlFirst = '';
+          td
+            .html(html+btn_save)
 
-        }); 
+            $('#datetimepicker1'+idget).datetimepicker({
+              format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+            });
+
+            $('.save'+idget).click(function(){
+              loading_button('.save'+idget);
+              var url = base_url_js+'finance/bayar_manual_mahasiswa';
+              var data = {
+                  IDStudent : IDStudent,
+                  bayar : bayar,
+                  DatePayment :  $("#tgl"+idget).val()
+              };
+              var token = jwt_encode(data,'UAP)(*');
+              $.post(url,{token:token},function (resultJson) {
+                 // var resultJson = jQuery.parseJSON(resultJson);
+                 loadData(1);
+                 // $(".bayar[IDStudent='"+IDStudent+"']").remove();
+                 td.empty();
+              }).fail(function() {
+                toastr.info('No Action...'); 
+                // toastr.error('The Database connection error, please try again', 'Failed!!');
+              }).always(function() {
+
+              }); 
+            })
+        }
+        else
+        {
+          loading_button(".bayar[IDStudent='"+IDStudent+"']");
+          var url = base_url_js+'finance/bayar_manual_mahasiswa';
+          var data = {
+              IDStudent : IDStudent,
+              bayar : bayar,
+          };
+          var token = jwt_encode(data,'UAP)(*');
+          $.post(url,{token:token},function (resultJson) {
+             // var resultJson = jQuery.parseJSON(resultJson);
+             loadData(1);
+             $(".bayar[IDStudent='"+IDStudent+"']").remove();
+          }).fail(function() {
+            toastr.info('No Action...'); 
+            // toastr.error('The Database connection error, please try again', 'Failed!!');
+          }).always(function() {
+
+          }); 
+        }
+        
     });
 
     $(document).on('click','#btn-submit', function () {
