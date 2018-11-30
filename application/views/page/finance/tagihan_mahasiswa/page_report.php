@@ -10,7 +10,6 @@
         }
      @media print {
       .noprint { display:none };
-          
     }    
 </style>
 <div class="row">

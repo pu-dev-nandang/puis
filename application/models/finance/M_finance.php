@@ -3067,7 +3067,7 @@ class M_finance extends CI_Model {
 
                 $Aging = 'BPP : 0';
                 if ($DueDateBPP != '' && $SisaBPP > 0) {
-                  $Aging = 'BPP : '.$this->m_master->dateDiffDays(date('Y-m-d', strtotime($Q_invStudent[$last]['Deadline'])),date('Y-m-d'));
+                  $Aging = 'BPP : '.$this->m_master->dateDiffDays_(date('Y-m-d', strtotime($Q_invStudent[$last]['Deadline'])),date('Y-m-d'));
                 }
 
                 $arrBPP = array(
@@ -3113,7 +3113,7 @@ class M_finance extends CI_Model {
 
                 $Aging = 'Credit : 0';
                 if ($DueDateCR != '' && $SisaCr > 0) {
-                  $Aging = 'Credit : '.$this->m_master->dateDiffDays(date('Y-m-d', strtotime($Q_invStudent[$last]['Deadline'])),date('Y-m-d'));
+                  $Aging = 'Credit : '.$this->m_master->dateDiffDays_(date('Y-m-d', strtotime($Q_invStudent[$last]['Deadline'])),date('Y-m-d'));
                 }
 
                 $arrCr = array(
@@ -3159,7 +3159,7 @@ class M_finance extends CI_Model {
 
                   $Aging = 'lain-lain : 0';
                   if ($DueDateAn != '' && $SisaAn > 0) {
-                    $Aging = 'lain-lain : '.$this->m_master->dateDiffDays(date('Y-m-d', strtotime($Q_invStudent[$last]['Deadline'])),date('Y-m-d'));
+                    $Aging = 'lain-lain : '.$this->m_master->dateDiffDays_(date('Y-m-d', strtotime($Q_invStudent[$last]['Deadline'])),date('Y-m-d'));
                   }
 
                   $arrAn = array(
@@ -3205,7 +3205,7 @@ class M_finance extends CI_Model {
 
                     $Aging = 'SPP : 0';
                     if ($DueDateSPP != '' && $SisaAn > 0) {
-                      $Aging = 'SPP : '.$this->m_master->dateDiffDays(date('Y-m-d', strtotime($Q_invStudent[$last]['Deadline'])),date('Y-m-d'));
+                      $Aging = 'SPP : '.$this->m_master->dateDiffDays_(date('Y-m-d', strtotime($Q_invStudent[$last]['Deadline'])),date('Y-m-d'));
                     }
 
                     $arrSPP = array(
