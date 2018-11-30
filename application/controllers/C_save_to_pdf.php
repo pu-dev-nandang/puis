@@ -3871,7 +3871,8 @@ class C_save_to_pdf extends CI_Controller {
         $xtext = $pdf->GetX()+$xx+138;
         $pdf->SetFont('dinpromedium','',$fn_b-2);
         $pdf->Text($xtext,$ytext,'NIK : '.$Student['NIP']);
-        $pdf->Rect($x+95, $y, 40, 60);
+        //foto
+        $pdf->Rect($x+95, $y, 40, 58);
         $nameF = str_replace(' ','_',strtoupper($Student['Name']));
         $pdf->Output('IJAZAH_'.$Student['NPM'].'_'.$nameF.'.pdf','I');
     }
