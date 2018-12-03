@@ -66,4 +66,26 @@ function LoadPage(Page)
         $("#pageSet").html(html);
     }); // exit spost
 }
+
+function loadSelectOptionSemesterByload(element,selected,load = "loadData") {
+
+    var token = jwt_encode({action:'read'},'UAP)(*');
+    var url = base_url_js+'api/__crudTahunAkademik';
+    $.post(url,{token:token},function (jsonResult) {
+
+       if(jsonResult.length>0){
+           for(var i=0;i<jsonResult.length;i++){
+               var dt = jsonResult[i];
+               var sc = (selected==dt.Status) ? 'selected' : '';
+               // var v = (option=="Name") ? dt.Name : dt.ID;
+               $(element).append('<option value="'+dt.ID+'.'+dt.Name+'" '+sc+'>'+dt.Name+'</option>');
+           }
+       }
+       if (load == 'loadData') {
+        loadData(1);
+       }
+       
+    });
+
+}
 </script>

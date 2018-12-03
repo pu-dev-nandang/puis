@@ -527,6 +527,7 @@ $route['finance/get_pembayaran_mhs/(:num)'] =  'page/finance/c_finance/get_pemba
 //$route['finance/export_excel'] =  'page/finance/c_finance/export_excel';
 $route['finance/export_excel'] =  'C_save_to_excel/export_excel_payment_received';
 $route['finance/export_excel_report'] =  'C_save_to_excel/export_excel_report_finance';
+$route['finance/export_excel_report_daily'] =  'C_save_to_excel/export_excel_report_daily';
 
 
 $route['finance/check-va'] =  'page/finance/c_finance/check_va';

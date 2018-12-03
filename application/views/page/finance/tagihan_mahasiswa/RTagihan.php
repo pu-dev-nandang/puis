@@ -78,24 +78,7 @@
         getReloadTableSocket();
     });
 
-    function loadSelectOptionSemesterByload(element,selected) {
 
-        var token = jwt_encode({action:'read'},'UAP)(*');
-        var url = base_url_js+'api/__crudTahunAkademik';
-        $.post(url,{token:token},function (jsonResult) {
-
-           if(jsonResult.length>0){
-               for(var i=0;i<jsonResult.length;i++){
-                   var dt = jsonResult[i];
-                   var sc = (selected==dt.Status) ? 'selected' : '';
-                   // var v = (option=="Name") ? dt.Name : dt.ID;
-                   $(element).append('<option value="'+dt.ID+'.'+dt.Name+'" '+sc+'>'+dt.Name+'</option>');
-               }
-           }
-           loadData(1);
-        });
-
-    }
 
     $('#selectCurriculum').change(function () {
         loadData(1);
