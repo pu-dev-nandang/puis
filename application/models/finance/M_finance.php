@@ -1459,6 +1459,9 @@ class M_finance extends CI_Model {
 
     // join dengan table auth terlebih dahulu
     $PTID = ($PTID == '' || $PTID == Null) ? '' : ' and a.PTID = '.$PTID;
+    $prodiex = explode(".", $prodi);
+    $prodiex = $prodiex[0];
+    $prodiex = ($prodi == '' || $prodi == Null) ? '' : ' and b.ProdiID = '.$prodiex;
     $NIM = ($NIM == '' || $NIM == Null) ? 'where a.NPM like "%"' : ' where  a.NPM = '.$NIM;
     $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
     $SemesterID = $SemesterID[0]['ID'];
@@ -1475,7 +1478,7 @@ class M_finance extends CI_Model {
       $sql = 'select count(*) as total 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and c.ID = ?';
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and c.ID = ?';
       $query=$this->db->query($sql, array($SemesterID))->result_array();
 
     }
@@ -1484,7 +1487,7 @@ class M_finance extends CI_Model {
       $sql = 'select count(*) as total 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? and c.ID = ? ';
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and b.Year = ? and c.ID = ? ';
       $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
     }
     return $query[0]['total'];
@@ -1499,6 +1502,9 @@ class M_finance extends CI_Model {
 
     // join dengan table auth terlebih dahulu
     $PTID = ($PTID == '' || $PTID == Null) ? '' : ' and a.PTID = '.$PTID;
+    $prodiex = explode(".", $prodi);
+    $prodiex = $prodiex[0];
+    $prodiex = ($prodi == '' || $prodi == Null) ? '' : ' and b.ProdiID = '.$prodiex;
     $NIM = ($NIM == '' || $NIM == Null) ? 'where a.NPM like "%"' : ' where  a.NPM = '.$NIM;
     $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
     $SemesterID = $SemesterID[0]['ID'];
@@ -1515,7 +1521,7 @@ class M_finance extends CI_Model {
       $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' group by a.PTID,a.SemesterID,a.NPM order by c.ID desc,a.Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' group by a.PTID,a.SemesterID,a.NPM order by c.ID desc,a.Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
       $query=$this->db->query($sql, array())->result_array();
 
     }
@@ -1524,7 +1530,7 @@ class M_finance extends CI_Model {
       $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? group by a.PTID,a.SemesterID,a.NPM order by a.Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and b.Year = ? group by a.PTID,a.SemesterID,a.NPM order by a.Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
       $query=$this->db->query($sql, array($ta1))->result_array();
     }
     // print_r($sql);die();
@@ -3453,6 +3459,106 @@ class M_finance extends CI_Model {
         }
         // print_r($arr_result);die();
          return $arr_result;    
+   }
+
+   public function getPayment_Daily_mhs($Semester,$DailyTgl)
+   {
+      $arr_result = array();
+      $SemesterID = explode('.', $Semester);
+      $SemesterID = $SemesterID[0];
+      $this->load->model('master/m_master');
+      $sql = 'select a.*, b.Name as NamaMHS,b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description ,e.DatePayment,e.ID_payment,b.ProdiID,f.Name as NamePrody,e.ID as ID_payment_students,b.Year
+              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+              join db_academic.semester as c on a.SemesterID = c.ID
+              join db_finance.payment_type as d on a.PTID = d.ID
+              join db_finance.payment_students as e on a.ID = e.ID_payment
+              join db_academic.program_study as f on b.ProdiID = f.ID
+              where e.`Status` = 1  and a.SemesterID = ? and e.DatePayment like "'.$DailyTgl.'%"
+              order by b.ProdiID asc,a.NPM asc,e.ID_payment asc,e.ID asc';
+      // print_r($sql);die();
+              //and a.SemesterID = ? and e.DatePayment like "'.$DailyTgl.'%"
+      $query=$this->db->query($sql, array($SemesterID))->result_array();
+      $f_Pembayaranke = function($ID_payment,$ID_payment_students){
+         $sql = 'select * from db_finance.payment_students where ID_payment = ?';
+         $query=$this->db->query($sql, array($ID_payment))->result_array();
+         if (count($query) > 0) {
+           $payno = 0;
+           for ($i=0; $i < count($query); $i++) { 
+            if ($query[$i]['ID'] == $ID_payment_students) {
+                $payno = $i+1;
+                break;
+              }
+           }
+           return $payno;
+         }
+         return false;
+      };
+
+      $f_findSemester = function($SemesterID,$Year){
+          $sql = 'select * from db_academic.semester order by ID asc';
+          $query=$this->db->query($sql, array())->result_array();
+          $semester = 0;
+          // finc sequence year
+          $S_year = 0;
+          for ($i=0; $i < count($query); $i++) { 
+            if ($query[$i]['Year'] == $Year && $query[$i]['Code'] == 1) {
+              $S_year = $i + 1;
+              break;
+            }
+          }
+
+          $S_semester = 0;
+          for ($i=0; $i < count($query); $i++) { 
+            if ($query[$i]['ID'] == $SemesterID) {
+              $S_semester = $i + 1;
+              break;
+            }
+          }
+          $semester = $S_semester -  $S_year + 1 ;
+          return $semester;
+      };
+
+      for ($i=0; $i < count($query); $i++) { 
+        $ID_program_study1 = $query[$i]['ProdiID'];
+        $arr = array(
+            'data' => array(),
+            'subtotal' => 0,
+        );
+        $data = $arr['data'];
+        $subtotal = $arr['subtotal'];
+        $Pembayaranke = $f_Pembayaranke($query[$i]['ID_payment'],$query[$i]['ID_payment_students']); // query berdasarkan ID payment
+        $semesterCount = $f_findSemester($query[$i]['SemesterID'],$query[$i]['Year']);
+        $data[] = $query[$i] + array('Pembayaranke' => $Pembayaranke,'semesterCount' => $semesterCount);
+        $subtotal = $subtotal + $query[$i]['Invoice'];
+        $NPM1 = $query[$i]['NPM'];
+
+        for ($j=$i + 1; $j < count($query); $j++) { // search by prodi
+          $ID_program_study2 = $query[$j]['ProdiID'];
+          if ($ID_program_study1 == $ID_program_study2) {
+            $Pembayaranke =  $f_Pembayaranke($query[$j]['ID_payment'],$query[$j]['ID_payment_students']); // query berdasarkan ID payment
+            $semesterCount = $f_findSemester($query[$j]['SemesterID'],$query[$j]['Year']);
+            $data[] = $query[$j] + array('Pembayaranke' => $Pembayaranke,'semesterCount' => $semesterCount);
+            $subtotal = $subtotal + $query[$j]['Invoice'];
+
+          }
+          else
+          {
+            $i = $j-1;
+            break;
+          }
+          $i = $j;
+        }
+
+        $arr = array(
+            'data' => $data,
+            'subtotal' => $subtotal,
+        );
+
+        $arr_result[] = $arr;
+
+      }
+      // print_r($arr_result);die();
+       return $arr_result;          
    }
 
 }
