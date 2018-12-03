@@ -88,7 +88,7 @@
 		        			<div class="form-group">
 		        				<div class="row" style="margin-top: 10px">
 		        					<div class="col-xs-4">
-		        						<label>Year</label>
+		        						<label>Angkatan</label>
 		        					</div>
 		        					<div class="col-xs-4">
 		        						<select class="select2-select-00 full-width-fix" id="SelectYearDataMHS">
@@ -114,7 +114,7 @@
 		        						<div id="datetimepicker" class="input-group input-append date datetimepicker"><input data-format="yyyy-MM-dd" class="form-control" id="DailyTgl" type=" text" readonly="" value="<?php echo date('Y-m-d') ?>"><span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span></div>
 		        					</div>
 		        					<div class="col-xs-4">
-		        						<button class="btn btn-primary" id= "btnRekapIntake"> <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel</button>
+		        						<button class="btn btn-primary" id= "btnDailyPenerimaanBank"> <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel</button>
 		        					</div>	
 		        				</div>
 		        			</div>	
@@ -136,11 +136,29 @@
 		FuncClickbtnPenjualanFormulirFinance();
 		FuncClickbtnPengembalianFormulirData();
 		FuncClickBtnTuitionFee();
+		FuncClickbtnDailyPenerimaanBank();
 
 		$('#datetimepicker').datetimepicker({
 		  format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
 		});
 	});
+
+	function FuncClickbtnDailyPenerimaanBank()
+	{
+		$("#btnDailyPenerimaanBank").click(function(){
+			var url = base_url_js+'finance/admission/dailypenerimaanBank';
+			var SelectYearDataMHS = $("#SelectYearDataMHS").val();
+			var DailyTgl = $("#DailyTgl").val();
+			data = {
+			  Year : SelectYearDataMHS,
+			  DailyTgl : DailyTgl,
+			}
+			var token = jwt_encode(data,"UAP)(*");
+			FormSubmitAuto(url, 'POST', [
+			    { name: 'token', value: token },
+			]);
+		})
+	}
 
 	function FuncClickBtnTuitionFee()
 	{

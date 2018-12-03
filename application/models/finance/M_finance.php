@@ -211,6 +211,7 @@ class M_finance extends CI_Model {
       $dataSave = array(
               'Status' => 1,
               'UpdateAt' => date('Y-m-d H:i:s'),
+              'DatePayment' => date('Y-m-d H:i:s'),
                       );
       $this->db->where('BilingID',$BilingID);
       $this->db->update('db_finance.payment_pre', $dataSave);
@@ -3350,6 +3351,108 @@ class M_finance extends CI_Model {
                ';
      $query=$this->db->query($sql, array($SelectSetTa))->result_array();
      return $query;             
+   }
+
+   public function getPayment_Daily_admission($Year,$DailyTgl)
+   {
+    $arr_result = array();
+    $sql = 'select * from (
+            select * from (
+            select * from (
+            select a.ID as ID_register_formulir2,a.ID_program_study,o.Name as NamePrody,d.Name,1 as StatusTbl
+            from db_admission.register_formulir as a
+            left JOIN db_admission.register_verified as b 
+            ON a.ID_register_verified = b.ID
+            left JOIN db_admission.register_verification as c
+            ON b.RegVerificationID = c.ID
+            left JOIN db_admission.register as d
+            ON c.RegisterID = d.ID
+            left join db_academic.program_study as o
+            on o.ID = a.ID_program_study
+            where d.SetTa = "'.$Year.'" group by a.ID
+
+            ) aa
+            join db_finance.payment_pre as bb 
+            on aa.ID_register_formulir2 = bb.ID_register_formulir
+            where bb.Status = 1 and bb.DatePayment like "'.$DailyTgl.'%"
+            ORDER BY bb.ID_register_formulir,bb.ID
+            ) aa
+            UNION
+            select a.ID,a.ID_ProgramStudy,o.Name as NamePrody,a.FullName,0,"","",a.Price_Form,"",1,a.DateFin,"",""
+            from db_admission.sale_formulir_offline as a join db_academic.program_study  as o on 
+            a.ID_ProgramStudy = o.ID where a.DateFin like "'.$DailyTgl.'%" and SUBSTRING(a.FormulirCodeOffline, 1, 2) = "'.substr($Year, 2,4).'"
+            ) bb ORDER BY ID_program_study asc ,ID_register_formulir asc,ID asc
+        ';
+        // print_r($sql);die();
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) { 
+          $ID_program_study1 = $query[$i]['ID_program_study'];
+          $arr = array(
+              'data' => array(),
+              'subtotal' => 0,
+          );
+          $data = $arr['data'];
+          $subtotal = $arr['subtotal'];
+          $Pembayaranke = 1;
+          $data[] = $query[$i] + array('Pembayaranke' => $Pembayaranke);
+          $subtotal = $subtotal + $query[$i]['Invoice'];
+          $ID_register_formulir1 = $query[$i]['ID_register_formulir'];
+
+          for ($j=$i + 1; $j < count($query); $j++) { // search by prodi
+            $ID_program_study2 = $query[$j]['ID_program_study'];
+            if ($ID_program_study1 == $ID_program_study2) {
+              $ID_register_formulir2 = $query[$j]['ID_register_formulir'];
+              if ($ID_register_formulir1 == $ID_register_formulir2) {
+                $Pembayaranke++;
+                $data[] = $query[$j] + array('Pembayaranke' => $Pembayaranke);
+                $subtotal = $subtotal + $query[$j]['Invoice'];
+
+                // search by ID_register_formulir
+                for ($k=$j+1; $k < count($query); $k++) { 
+                  $ID_register_formulir3 = $query[$k]['ID_register_formulir'];
+                  if ($ID_register_formulir3 == $ID_register_formulir2) {
+                    $Pembayaranke++;
+                    $data[] = $query[$j] + array('Pembayaranke' => $Pembayaranke);
+                    $subtotal = $subtotal + $query[$j]['Invoice'];
+                  }
+                  else
+                  {
+                    $j = $k -1;
+                    $ID_register_formulir1 = $ID_register_formulir3;
+                    $Pembayaranke =0;
+                    break;
+                  }
+                  $j = $k;
+                }
+
+              }
+              else
+              {
+                $Pembayaranke =  1;
+                $data[] = $query[$j] + array('Pembayaranke' => $Pembayaranke,'ID_register_formulir2j' => $ID_register_formulir2,'ID_register_formulir1i'=>$ID_register_formulir1);
+                $subtotal = $subtotal + $query[$j]['Invoice'];
+                $ID_register_formulir1 = $ID_register_formulir2;
+              }
+
+            }
+            else
+            {
+              $i = $j-1;
+              break;
+            }
+            $i = $j;
+          }
+
+          $arr = array(
+              'data' => $data,
+              'subtotal' => $subtotal,
+          );
+
+          $arr_result[] = $arr;
+
+        }
+        // print_r($arr_result);die();
+         return $arr_result;    
    }
 
 }

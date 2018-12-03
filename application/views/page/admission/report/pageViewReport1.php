@@ -100,7 +100,7 @@
 			        			<div class="form-group">
 			        				<div class="row" style="margin-top: 10px">
 			        					<div class="col-xs-4">
-			        						<label>Year</label>
+			        						<label>Angkatan</label>
 			        					</div>
 			        					<div class="col-xs-4">
 			        						<select class="select2-select-00 full-width-fix" id="SelectYearDataMHS">

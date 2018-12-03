@@ -392,6 +392,7 @@
                               '<th style="width: 55px;">BilingID</th>'+
                               '<th style="width: 55px;">Status</th>'+
                               '<th style="width: 55px;">Deadline</th>'+
+                              '<th style="width: 55px;">Payment Date</th>'+
                               '<th style="width: 55px;">UpdateAt</th>';
         <?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
           table += '<th style="width: 55px;">Action</th>' ;                        
@@ -409,14 +410,18 @@
               var yy = (DetailPaymentArr[j]['Invoice'] != '') ? formatRupiah(DetailPaymentArr[j]['Invoice']) : '-';
               var status = (DetailPaymentArr[j]['Status'] == 0) ? 'Belum Bayar' : 'Sudah Bayar';
               var btn_bayar = (DetailPaymentArr[j]['Status'] == 0) ? '<button class = "bayar" IDStudent = "'+DetailPaymentArr[j]['ID']+'" bayar = "1">Bayar</button>' : '<button class = "bayar" IDStudent = "'+DetailPaymentArr[j]['ID']+'" bayar = "0">Tidak Bayar</button>';
+              var PaymentDate = (DetailPaymentArr[j]['DatePayment'] == '' || DetailPaymentArr[j]['DatePayment'] == null || DetailPaymentArr[j]['DatePayment'] == '0000-00-00 00:00:00') ? '' : DetailPaymentArr[j]['DatePayment'];
+              var Deadline = (DetailPaymentArr[j]['Deadline'] == '' || DetailPaymentArr[j]['Deadline'] == null || DetailPaymentArr[j]['Deadline'] == '0000-00-00 00:00:00') ? '' : DetailPaymentArr[j]['Deadline'];
+              var UpdateAt = (DetailPaymentArr[j]['UpdateAt'] == '' || DetailPaymentArr[j]['UpdateAt'] == null || DetailPaymentArr[j]['UpdateAt'] == '0000-00-00 00:00:00') ? '' : DetailPaymentArr[j]['UpdateAt']
               isi += '<tr>'+
                     '<td>'+ (j+1) + '</td>'+
                     '<td>'+ Nama + '</td>'+
                     '<td>'+ yy + '</td>'+
                     '<td>'+ DetailPaymentArr[j]['BilingID'] + '</td>'+
                     '<td>'+ status + '</td>'+
-                    '<td>'+ DetailPaymentArr[j]['Deadline'] + '</td>'+
-                    '<td>'+ DetailPaymentArr[j]['UpdateAt'] + '</td>'+
+                    '<td>'+ Deadline + '</td>'+
+                    '<td>'+ PaymentDate + '</td>'+
+                    '<td>'+UpdateAt + '</td>'+
                     <?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
                     '<td>'+ btn_bayar + '</td>'+
                     <?php endif ?>  
