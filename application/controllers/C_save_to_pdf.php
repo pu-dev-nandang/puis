@@ -3281,7 +3281,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->AddPage();
 
         $pdf->SetFont('dinpromedium','',7);
-        $pdf->SetXY(10,10);
+        $pdf->SetXY(10,8.5);
         $pdf->Cell(123,7,'',0,0,'L');
         $pdf->Cell(21,7,'Nomor Transkrip / ',0,0,'L');
         $pdf->SetFont('dinlightitalic','',7);
