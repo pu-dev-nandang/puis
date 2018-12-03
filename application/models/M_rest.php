@@ -218,8 +218,8 @@ class M_rest extends CI_Model {
                                                                     LEFT JOIN db_academic.schedule sc ON (sc.ID = sp.ScheduleID)
                                                                     LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sp.MKID)
                                                                     WHERE sp.SemesterID = "'.$dataSemester[$i]['ID'].'" 
-                                                                    AND sp.NPM = "'.$NPM.'"
-                                                                     ORDER BY mk.MKCode ASC ')->result_array();
+                                                                    AND sp.NPM = "'.$NPM.'"   AND ex.ExamDate IS NOT NULL
+                                                                    ORDER BY mk.MKCode ASC ')->result_array();
 
 
                         if(count($ExamSchedule)>0){
@@ -303,8 +303,8 @@ class M_rest extends CI_Model {
                                                                     LEFT JOIN db_academic.schedule sc ON (sc.ID = sp.ScheduleID)
                                                                     LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sp.MKID)
                                                                     WHERE sp.SemesterID = "'.$dataSemester[$i]['ID'].'" 
-                                                                    AND sp.NPM = "'.$NPM.'"
-                                                                     ORDER BY mk.MKCode ASC ')->result_array();
+                                                                    AND sp.NPM = "'.$NPM.'"  AND ex.ExamDate IS NOT NULL
+                                                                    ORDER BY mk.MKCode ASC ')->result_array();
 
 
                             if(count($ExamSchedule)>0){
@@ -379,6 +379,7 @@ class M_rest extends CI_Model {
                 }
 
             }
+
 
             // =======
             $dataArr = array(
