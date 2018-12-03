@@ -3378,7 +3378,7 @@ class M_finance extends CI_Model {
             ORDER BY bb.ID_register_formulir,bb.ID
             ) aa
             UNION
-            select a.ID,a.ID_ProgramStudy,o.Name as NamePrody,a.FullName,0,"","",a.Price_Form,"",1,a.DateFin,"",""
+            select a.ID,a.ID_ProgramStudy,o.Name as NamePrody,a.FullName,0,"","",a.Price_Form,"",1,"",a.DateFin,""
             from db_admission.sale_formulir_offline as a join db_academic.program_study  as o on 
             a.ID_ProgramStudy = o.ID where a.DateFin like "'.$DailyTgl.'%" and SUBSTRING(a.FormulirCodeOffline, 1, 2) = "'.substr($Year, 2,4).'"
             ) bb ORDER BY ID_program_study asc ,ID_register_formulir asc,ID asc
