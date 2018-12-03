@@ -185,7 +185,6 @@ class C_finance extends Finnance_Controler {
         $filename = 'Tuition_fee_'.$Personal[0]['FormulirCode'].'.pdf';
         $getData = $this->m_master->showData_array('db_admission.set_label_token_off');
 
-
         $config=array('orientation'=>'P','size'=>'A5');
         $this->load->library('mypdf',$config);
         $this->mypdf->SetMargins(10,10,10,10);
@@ -307,6 +306,7 @@ class C_finance extends Finnance_Controler {
         $chkDiscount = 0;
         $arr_discount = array();
         $arr_discount2 = array();
+        $NameTbl = $Personal[0]['Name'].'-'.$Personal[0]['FormulirCode'];
         foreach ($Personal[0] as $key => $value) {
             $key = explode('-', $key);
             if ($key[0] == 'Discount') {
@@ -340,7 +340,6 @@ class C_finance extends Finnance_Controler {
             $this->mypdf->Cell(40,$height,'Program Study',1,0,'C',true);
             $this->mypdf->Cell(80,$height,'Beasiswa',1,1,'C',true);
 
-            $NameTbl = $Personal[0]['Name'].'-'.$Personal[0]['FormulirCode'];
             $ProdiTbl = $Personal[0]['NamePrody'];
             foreach ($arr_discount as $key => $value) {
                 $setY = $setY + $height;
@@ -361,7 +360,8 @@ class C_finance extends Finnance_Controler {
         $this->mypdf->writeHTML('Total pembayaran untuk <b>"Semester Pertama"</b> dalam 1x pembayaran :');
 
         $setY = $setY + 5;
-        $height = $setY;
+        $height = 5;
+        
         $this->mypdf->SetXY($setX,$setY); 
         $this->mypdf->SetFillColor(255, 255, 255);
         $this->mypdf->SetFont('Arial','B',$setFont);
@@ -472,7 +472,7 @@ class C_finance extends Finnance_Controler {
         $this->mypdf->Cell(60,$height,'Tanggal',1,0,'C',true);
         $this->mypdf->Cell(70,$height,'Jumlan',1,1,'C',true);
 
-        $cicilan_tulis = array('Cicilan Pertama','Cicilan Kedua','Cicilan Ketiga','Cicilan Keempat');
+        $cicilan_tulis = array('Cicilan Pertama','Cicilan Kedua','Cicilan Ketiga','Cicilan Keempat','Cicilan Kelima','Cicilan Keenam','Cicilan Ketujuh');
 
         for ($i=0; $i < count($arr_cicilan); $i++) {
             $setY = $setY + $height; 

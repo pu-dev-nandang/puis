@@ -1,4 +1,4 @@
-<div class="col-md-12">
+<div class="col-md-12 formAddFormKD">
 	<div id = "divTableData"></div>
 </div>
 <script type="text/javascript">

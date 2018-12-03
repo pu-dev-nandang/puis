@@ -2664,7 +2664,7 @@ class C_save_to_excel extends CI_Controller
         // write date export 
         $PerTgl = 'Per tgl '.date('d M Y', strtotime($input['DailyTgl']));
         $DatePrint = date('d M Y', strtotime($GetDateNow));
-        $excel3->setCellValue('A3', $PerTgl);
+        $excel3->setCellValue('A4', $PerTgl);
 
         // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
         $style_row = array(
@@ -2696,45 +2696,55 @@ class C_save_to_excel extends CI_Controller
         // start dari A8
         $Year = $input['Year'];
         $DailyTgl = $input['DailyTgl'];
+        $excel3->setCellValue('A6', 'Intake: '.$Year.'/'.($Year+1));
         $a = 7;
-        $Filaname = 'DailyPenerimaanBank_'.$Year.'_'.$DailyTgl.'.xlsx';
+        $Filaname = 'DailyPenerimaanBank_Intake_'.$Year.'_'.$DailyTgl.'.xlsx';
         $getData = $this->m_finance->getPayment_Daily_admission($Year,$DailyTgl);
         $keyM = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
         $arrxx = array();
         $Total = 0;
         for ($i=0; $i < count($getData); $i++) { 
             $data =$getData[$i]['data'];
-            for ($j=0; $j < count($data); $j++) { 
-                $excel3->setCellValue('A'.$a, 'No'); 
-                $excel3->setCellValue('B'.$a, 'Tgl');
-                $excel3->setCellValue('C'.$a, 'Nama');
-                $excel3->setCellValue('D'.$a, 'Semester');
-                $excel3->setCellValue('E'.$a, 'Jurusan');
-                $excel3->setCellValue('F'.$a, 'Keterangan');
-                $excel3->setCellValue('G'.$a, 'Jumlah');
-
-                $a = $a + 1; // untuk isi
+            $excel3->setCellValue('A'.$a, 'No'); 
+            $excel3->setCellValue('B'.$a, 'Tgl');
+            $excel3->setCellValue('C'.$a, 'Nama');
+            $excel3->setCellValue('D'.$a, 'Semester');
+            $excel3->setCellValue('E'.$a, 'Jurusan');
+            $excel3->setCellValue('F'.$a, 'Keterangan');
+            $excel3->setCellValue('G'.$a, 'Jumlah');
+            $excel3->getStyle('A'.$a)->applyFromArray($style_col);
+            $excel3->getStyle('B'.$a)->applyFromArray($style_col);
+            $excel3->getStyle('C'.$a)->applyFromArray($style_col);
+            $excel3->getStyle('D'.$a)->applyFromArray($style_col);
+            $excel3->getStyle('E'.$a)->applyFromArray($style_col);
+            $excel3->getStyle('F'.$a)->applyFromArray($style_col);
+            $excel3->getStyle('G'.$a)->applyFromArray($style_col);
+            $a = $a + 1; // untuk isi
+            for ($j=0; $j < count($data); $j++) {
                 $no = $j + 1;
                 $excel3->setCellValue('A'.$a, $no); 
-                $excel3->setCellValue('B'.$a, date('d M Y', strtotime($getData[$i]['DatePayment'])));
-                $excel3->setCellValue('C'.$a, $getData[$i]['Name']);
+                $excel3->setCellValue('B'.$a, date('d M Y', strtotime($data[$j]['DatePayment'])));
+                $excel3->setCellValue('C'.$a, $data[$j]['Name']);
                 $excel3->setCellValue('D'.$a, (string)1);
-                $excel3->setCellValue('E'.$a, $getData[$i]['NamePrody']);
-                
+                $excel3->setCellValue('E'.$a, $data[$j]['NamePrody']);
+                $Pembayaranke = 'ke'.$this->m_master->moneySay($data[$j]['Pembayaranke']);
+                $ket = ($data[$j]['StatusTbl'] == 1) ? 'Cicilan '.$Pembayaranke : 'Pembayaran Formulir';
+                $excel3->setCellValue('F'.$a, $ket);
+                $excel3->setCellValue('G'.$a, $data[$j]['Invoice']);
 
+                $excel3->getStyle('A'.$a)->applyFromArray($style_row);
+                $excel3->getStyle('B'.$a)->applyFromArray($style_row);
+                $excel3->getStyle('C'.$a)->applyFromArray($style_row);
+                $excel3->getStyle('D'.$a)->applyFromArray($style_row);
+                $excel3->getStyle('E'.$a)->applyFromArray($style_row);
+                $excel3->getStyle('F'.$a)->applyFromArray($style_row);
+                $excel3->getStyle('G'.$a)->applyFromArray($style_row);
+                $a = $a + 1; 
             }
-            // number_format($getData[$i]['SPP'],2,',','.')
-            
-            $excel3->setCellValue('A'.$a, $no); 
-            $excel3->setCellValue('B'.$a, date('d M Y', strtotime($getData[$i]['DatePayment'])));
-            $excel3->setCellValue('C'.$a, $getData[$i]['Name']);
-            $excel3->setCellValue('D'.$a, (string)1);
-            $excel3->setCellValue('E'.$a, $getData[$i]['NamePrody']);
-            
-            $excel3->setCellValue('K'.$a, number_format($getData[$i]['Bea_BPP'],2,',','.'));
-            $excel3->setCellValue('L'.$a, number_format($getData[$i]['Bea_Credit']));
 
-            // Apply style row yang telah kita buat tadi ke masing-masing baris (isi tabel)
+            $excel3->setCellValue('A'.$a, 'SUBTOTAL '.$data[0]['NamePrody']); 
+            $excel3->setCellValue('G'.$a, $getData[$i]['subtotal']); 
+            $excel3->mergeCells('A'.$a.':F'.$a);
             $excel3->getStyle('A'.$a)->applyFromArray($style_row);
             $excel3->getStyle('B'.$a)->applyFromArray($style_row);
             $excel3->getStyle('C'.$a)->applyFromArray($style_row);
@@ -2742,33 +2752,19 @@ class C_save_to_excel extends CI_Controller
             $excel3->getStyle('E'.$a)->applyFromArray($style_row);
             $excel3->getStyle('F'.$a)->applyFromArray($style_row);
             $excel3->getStyle('G'.$a)->applyFromArray($style_row);
-            $excel3->getStyle('H'.$a)->applyFromArray($style_row);
-            $excel3->getStyle('I'.$a)->applyFromArray($style_row);
-            $excel3->getStyle('J'.$a)->applyFromArray($style_row);
-            $excel3->getStyle('K'.$a)->applyFromArray($style_row);
-            $excel3->getStyle('L'.$a)->applyFromArray($style_row);
             $a = $a + 1; 
+            
         }
             
-        $excel3->setCellValue('O'.'5', 'Bintang 1 : '.$Bin1);   
-        $excel3->setCellValue('O'.'6', 'Bintang 2 : '.$Bin2);
-        $aaaa = 7;
-        foreach ($arrxx as $key => $value) {
-            $excel3->setCellValue('O'.$aaaa, $key.' : '.$value);     
-            $aaaa++;
-        }  
+        $excel3->setCellValue('F'.($a+3), 'Print Date,'.$DatePrint);
         // foreach(range('A','Z') as $columnID) {
         //     $excel2->getActiveSheet()->getColumnDimension($columnID)
         //         ->setAutoSize(true);
         // }
 
         $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
-        // We'll be outputting an excel file
         header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
-        // It will be called file.xlss
         header('Content-Disposition: attachment; filename="'.$Filaname.'"'); // jalan ketika tidak menggunakan ajax
-        //$filename = 'PenerimaanPembayaran.xlsx';
-        //$objWriter->save('./document/'.$filename);
-        $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
+        $objWriter->save('php://output');
     }
 }

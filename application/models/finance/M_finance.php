@@ -3381,8 +3381,9 @@ class M_finance extends CI_Model {
             select a.ID,a.ID_ProgramStudy,o.Name as NamePrody,a.FullName,0,"","",a.Price_Form,"",1,a.DateFin,"",""
             from db_admission.sale_formulir_offline as a join db_academic.program_study  as o on 
             a.ID_ProgramStudy = o.ID where a.DateFin like "'.$DailyTgl.'%" and SUBSTRING(a.FormulirCodeOffline, 1, 2) = "'.substr($Year, 2,4).'"
-            ) bb ORDER BY NamePrody
+            ) bb ORDER BY ID_program_study asc ,ID_register_formulir asc,ID asc
         ';
+        // print_r($sql);die();
         $query=$this->db->query($sql, array())->result_array();
         for ($i=0; $i < count($query); $i++) { 
           $ID_program_study1 = $query[$i]['ID_program_study'];
@@ -3395,32 +3396,51 @@ class M_finance extends CI_Model {
           $Pembayaranke = 1;
           $data[] = $query[$i] + array('Pembayaranke' => $Pembayaranke);
           $subtotal = $subtotal + $query[$i]['Invoice'];
-          for ($j=$i+1; $j < count($query); $j++) { 
+          $ID_register_formulir1 = $query[$i]['ID_register_formulir'];
+
+          for ($j=$i + 1; $j < count($query); $j++) { // search by prodi
             $ID_program_study2 = $query[$j]['ID_program_study'];
             if ($ID_program_study1 == $ID_program_study2) {
-              // check data sebelumnya
-              $aa = count($data) - 1;
-              $Pembayaranke = ($data[$aa]['ID_register_formulir'] == $query[$j]['ID_register_formulir']) ? $Pembayaranke = $Pembayaranke + 1 : 1;
-              $data[] = $query[$j] + array('Pembayaranke' => $Pembayaranke);
-              $subtotal = $subtotal + $query[$j]['Invoice'];
-              for ($k=$j+1; $k < count($query); $k++) { 
-                if ($query[$k]['ID_register_formulir'] == $query[$j]['ID_register_formulir']) {
-                  $Pembayaranke++;
-                  $data[] = $query[$k] + array('Pembayaranke' => $Pembayaranke);
-                  $subtotal = $subtotal + $query[$k]['Invoice'];
+              $ID_register_formulir2 = $query[$j]['ID_register_formulir'];
+              if ($ID_register_formulir1 == $ID_register_formulir2) {
+                $Pembayaranke++;
+                $data[] = $query[$j] + array('Pembayaranke' => $Pembayaranke);
+                $subtotal = $subtotal + $query[$j]['Invoice'];
+
+                // search by ID_register_formulir
+                for ($k=$j+1; $k < count($query); $k++) { 
+                  $ID_register_formulir3 = $query[$k]['ID_register_formulir'];
+                  if ($ID_register_formulir3 == $ID_register_formulir2) {
+                    $Pembayaranke++;
+                    $data[] = $query[$j] + array('Pembayaranke' => $Pembayaranke);
+                    $subtotal = $subtotal + $query[$j]['Invoice'];
+                  }
+                  else
+                  {
+                    $j = $k -1;
+                    $ID_register_formulir1 = $ID_register_formulir3;
+                    $Pembayaranke =0;
+                    break;
+                  }
+                  $j = $k;
                 }
-                else
-                {
-                  $j = $k + 1;
-                  break;
-                }
+
               }
+              else
+              {
+                $Pembayaranke =  1;
+                $data[] = $query[$j] + array('Pembayaranke' => $Pembayaranke,'ID_register_formulir2j' => $ID_register_formulir2,'ID_register_formulir1i'=>$ID_register_formulir1);
+                $subtotal = $subtotal + $query[$j]['Invoice'];
+                $ID_register_formulir1 = $ID_register_formulir2;
+              }
+
             }
             else
             {
-              $i = $j + 1;
+              $i = $j-1;
               break;
             }
+            $i = $j;
           }
 
           $arr = array(
@@ -3431,8 +3451,8 @@ class M_finance extends CI_Model {
           $arr_result[] = $arr;
 
         }
-        print_r($arr_result);die();
-        // return $arr_result;    
+        // print_r($arr_result);die();
+         return $arr_result;    
    }
 
 }
