@@ -3272,6 +3272,7 @@ class C_save_to_pdf extends CI_Controller {
         $Transcript = $dataStudent['Transcript'][0];
 
         $pdf = new FPDF('P','mm','legal');
+        //$pdf = new FPDF('P','mm',array(215,330));  // novie
 
         $pdf->AddFont('dinproExpBold','','dinproExpBold.php');
 
@@ -3281,7 +3282,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->AddPage();
 
         $pdf->SetFont('dinpromedium','',7);
-        $pdf->SetXY(10,8.5);
+        $pdf->SetXY(10,3);
         $pdf->Cell(123,7,'',0,0,'L');
         $pdf->Cell(21,7,'Nomor Transkrip / ',0,0,'L');
         $pdf->SetFont('dinlightitalic','',7);
@@ -3290,7 +3291,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(2,7,' : ',0,0,'C');
         $pdf->Cell(25,7,$Student['CSN'],0,1,'R');
 
-        $pdf->SetXY($margin_left,41.5);
+        $pdf->SetXY($margin_left,34);
 
         $label_l = 35;
         $sparator_l = 1;
@@ -3298,7 +3299,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $label_r = 38;
         $sparator_r = 1;
-        $fill_r = 55;
+        $fill_r = 1;
         $h=3.3;
         $ln = 1;
         $border = 0;
