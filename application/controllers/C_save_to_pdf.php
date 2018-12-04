@@ -3291,7 +3291,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(2,7,' : ',0,0,'C');
         $pdf->Cell(25,7,$Student['CSN'],0,1,'R');
 
-        $pdf->SetXY($margin_left,33); // novie
+        $pdf->SetXY($margin_left,35); // novie
 
         $label_l = 35;
         $sparator_l = 1;
