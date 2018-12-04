@@ -791,6 +791,7 @@ class C_admission extends Admission_Controler {
 
     public function submit_import_excel_File_generate_nim()
     {
+      die();
       // print_r($_FILES);
       if(isset($_FILES["fileData"]["name"]))
       {

@@ -455,5 +455,144 @@ class C_rest extends CI_Controller {
         }
     }
 
+    public function rekapintake()
+    {
+        // error_reporting(0);
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('statistik/m_statistik');
+                $Year = $dataToken['Year'];
+                $result = $this->m_statistik->ShowRekapIntake($Year);
+                echo json_encode($result);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    public function rekapintake_reset()
+    {
+        $data = file_get_contents('php://input');
+        
+        $data_json = json_decode($data,true);
+
+        if (!$data_json) {
+            // handling orang iseng
+            echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+        else {
+            try {
+                $getData = $data_json['data'];
+                $token = $getData;
+                $key = "UAP)(*";
+                $dataToken = (array) $this->jwt->decode($token,$key);
+                $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $this->load->model('statistik/m_statistik');
+                    $Year = $dataToken['Year'];
+                    if ($dataToken['action'] == 'reset') {
+                       // drop table
+                        $this->m_statistik->droptablerekapintake($Year);
+                    }
+                     //$this->m_statistik->droptablerekapintake($Year);
+                     $result = $this->m_statistik->ShowRekapIntake($Year);
+
+                    echo '{"status":"000"}';
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
+                }
+
+            }
+            catch(Exception $e) {
+              // handling orang iseng
+              echo '{"status":"999","message":"jangan iseng :D"}';
+            }
+        }
+    }
+
+    public function rekapintake_reset_client()
+    {
+        // error_reporting(0);
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('statistik/m_statistik');
+                if ($dataToken['action'] == 'reset') {
+                   // drop table
+                    $this->m_statistik->droptablerekapintake($Year);
+                }
+                $Year = $dataToken['Year'];
+                $result = $this->m_statistik->ShowRekapIntake($Year);
+                echo json_encode($result);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    public function trigger_formulir()
+    {
+        $data = file_get_contents('php://input');
+        
+        $data_json = json_decode($data,true);
+
+        if (!$data_json) {
+            // handling orang iseng
+            echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+        else {
+            try {
+                $getData = $data_json['data'];
+                $token = $getData;
+                $key = "UAP)(*";
+                $dataToken = (array) $this->jwt->decode($token,$key);
+                $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $this->load->model('statistik/m_statistik');
+                    $ta = $dataToken['ta'];
+                    // month & year
+                    $month = $dataToken['month'];
+                    $year = $dataToken['year'];
+                    $ProdiID = $dataToken['ProdiID'];
+                    $action = $dataToken['action'];
+                    $this->m_statistik->trigger_formulir($ta,$month,$year,$ProdiID,$action);
+                    echo '{"status":"000"}';
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
+                }
+
+            }
+            catch(Exception $e) {
+              // handling orang iseng
+              echo '{"status":"999","message":"jangan iseng :D"}';
+            }
+        }
+    }
+
 
 }

@@ -1320,7 +1320,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $arr_temp;
     }
 
-    private function get_content($url, $post = '') {
+    public function get_content($url, $post = '') {
         $usecookie = __DIR__ . "/cookie.txt";
         $header[] = 'Content-Type: application/json';
         $header[] = "Accept-Encoding: gzip, deflate";
