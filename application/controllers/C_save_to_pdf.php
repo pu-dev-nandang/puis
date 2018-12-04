@@ -3299,7 +3299,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $label_r = 38;
         $sparator_r = 1;
-        $fill_r = 1;
+        $fill_r = 55;
         $h=3.3;
         $ln = 1;
         $border = 0;
@@ -3431,7 +3431,7 @@ class C_save_to_pdf extends CI_Controller {
 
             $this->spasi_transcript_table($pdf,'B');
 
-            if($pdf->GetY()>=324){
+            if($pdf->GetY()>=320){ // novie
 //                $pdf->SetMargins($margin_left,40.5,10);
                 $pdf->SetMargins($margin_left,18,10);
                 $pdf->AddPage();
