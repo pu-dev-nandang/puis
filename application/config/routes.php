@@ -787,6 +787,9 @@ $route['rest/__loadDataFormulirGlobal_available'] = 'api/c_rest/loadDataFormulir
 $route['rest/__rekapintake'] = 'api/c_rest/rekapintake';
 $route['rest/__rekapintake_reset'] = 'api/c_rest/rekapintake_reset';
 $route['rest/__trigger_formulir'] = 'api/c_rest/trigger_formulir';
+$route['rest/__rekapintake_beasiswa'] = 'api/c_rest/rekapintake_beasiswa';
+$route['rest/__rekapintake_perschool'] = 'api/c_rest/rekapintake_perschool';
+
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';

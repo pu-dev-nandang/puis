@@ -594,5 +594,71 @@ class C_rest extends CI_Controller {
         }
     }
 
+    public function rekapintake_beasiswa()
+    {
+        // error_reporting(0);
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('statistik/m_statistik');
+                $Year = $dataToken['Year'];
+                if(array_key_exists("action",$dataToken))
+                {
+                    if ($dataToken['action'] == 'reset') {
+                        $tblname = 'rekapintake_bea_'.$Year;
+                       // drop table
+                        $this->m_statistik->droptable($tblname);
+                    }
+                }
+                $result = $this->m_statistik->ShowRekapIntake_Beasiswa($Year);
+                echo json_encode($result);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    public function rekapintake_perschool()
+    {
+        // error_reporting(0);
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('statistik/m_statistik');
+                $Year = $dataToken['Year'];
+                if(array_key_exists("action",$dataToken))
+                {
+                    if ($dataToken['action'] == 'reset') {
+                        $tblname = 'rekapintake_sch_'.$Year;
+                       // drop table
+                        $this->m_statistik->droptable($tblname);
+                    }
+                }
+                $result = $this->m_statistik->ShowRekapIntake_School($Year);
+                echo json_encode($result);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
 
 }
