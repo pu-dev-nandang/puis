@@ -2225,8 +2225,94 @@ class C_finance extends Finnance_Controler {
         $input = $this->getInputToken();
         $formUpdate = $input['data'];
         $ID = $input['ID'];
+        $bf = $this->m_master->caribasedprimary('db_admission.sale_formulir_offline','ID',$ID);
+        // cek data telah pernah diupdate atau belum
+        $booltrigger = ($bf[0]['DateFin'] == null || $bf[0]['DateFin'] == '') ? true : false;
         $this->db->where('ID',$ID);
         $this->db->update('db_admission.sale_formulir_offline', $formUpdate);
+        if ($booltrigger) {
+                $get = $this->m_master->caribasedprimary('db_admission.sale_formulir_offline','ID',$ID);
+                // cek data exist di table register_verified
+                $f = $this->m_master->caribasedprimary('db_admission.register_verified','RegVerificationID',$get[0]['FormulirCodeOffline']);
+                if (count($f) == 1) {
+                    $s = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','FormulirCode',$get[0]['FormulirCodeOffline']);
+                    $ta = $s[0]['Years'];
+                    $month = date('m', strtotime($get[0]['DateFin']));
+                    $year = date('Y', strtotime($get[0]['DateFin']));
+                    $action = 'add';
+                    $c = $this->m_master->caribasedprimary('db_admission.register_formulir','ID_register_verified',$f[0]['ID']);
+                    $ProdiID = $c[0]['ID_program_study'];
+                    $url = url_pas.'rest/__trigger_formulir';
+                    $data = array(
+                            'ta' => $ta,
+                            'month' => $month,
+                            'year' => $year,
+                            'action' => $action,
+                            'ProdiID' => $ProdiID,
+                            'auth' => 's3Cr3T-G4N',
+                        );
+                    $Input = $this->jwt->encode($data,"UAP)(*");
+                    $data = array(
+                        'data' => $Input,
+                    );
+
+                    $this->m_master->get_content($url, json_encode($data));
+                }
+        }
+        else
+        {
+                $get = $this->m_master->caribasedprimary('db_admission.sale_formulir_offline','ID',$ID);
+
+                // cek data exist di table register_verified
+                $f = $this->m_master->caribasedprimary('db_admission.register_verified','RegVerificationID',$get[0]['FormulirCodeOffline']);
+                if (count($f) == 1) {
+                    // delete dahulu
+                        $s = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','FormulirCode',$get[0]['FormulirCodeOffline']);
+                        $ta = $s[0]['Years'];
+                        $month = date('m', strtotime($bf[0]['DateFin']));
+                        $year = date('Y', strtotime($bf[0]['DateFin']));
+                        $action = 'delete';
+                        $c = $this->m_master->caribasedprimary('db_admission.register_formulir','ID_register_verified',$f[0]['ID']);
+                        $ProdiID = $c[0]['ID_program_study'];
+                        $url = url_pas.'rest/__trigger_formulir';
+                        $data = array(
+                                'ta' => $ta,
+                                'month' => $month,
+                                'year' => $year,
+                                'action' => $action,
+                                'ProdiID' => $ProdiID,
+                                'auth' => 's3Cr3T-G4N',
+                            );
+                        $Input = $this->jwt->encode($data,"UAP)(*");
+                        $data = array(
+                            'data' => $Input,
+                        );
+
+                        $this->m_master->get_content($url, json_encode($data));
+
+                    // add sesuai bulan dan tanggal
+                        $month = date('m', strtotime($get[0]['DateFin']));
+                        $year = date('Y', strtotime($get[0]['DateFin']));
+                        $action = 'add';
+                        $ProdiID = $c[0]['ID_program_study'];
+                        $url = url_pas.'rest/__trigger_formulir';
+                        $data = array(
+                                'ta' => $ta,
+                                'month' => $month,
+                                'year' => $year,
+                                'action' => $action,
+                                'ProdiID' => $ProdiID,
+                                'auth' => 's3Cr3T-G4N',
+                            );
+                        $Input = $this->jwt->encode($data,"UAP)(*");
+                        $data = array(
+                            'data' => $Input,
+                        );
+
+                        $this->m_master->get_content($url, json_encode($data));
+                }
+        }
+            
     }
 
 }

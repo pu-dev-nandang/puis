@@ -87,6 +87,22 @@ switch ($ServerName) {
             'failover' => array(),
             'save_queries' => TRUE
         );
+
+        $db['statistik']['hostname'] = 'localhost';
+        $db['statistik']['username'] = 'root';
+        $db['statistik']['password'] = '';
+        $db['statistik']['database'] = 'db_statistik';
+        $db['statistik']['dbdriver'] = 'mysqli';// support with MYSQl,POSTGRE SQL, ORACLE,SQL SERVER
+        $db['statistik']['dbprefix'] = '';
+        $db['statistik']['pconnect'] = TRUE;
+        $db['statistik']['db_debug'] = TRUE;
+        $db['statistik']['cache_on'] = FALSE;
+        $db['statistik']['cachedir'] = '';
+        $db['statistik']['char_set'] = 'utf8';
+        $db['statistik']['dbcollat'] = 'utf8_general_ci';
+        $db['statistik']['swap_pre'] = '';
+        $db['statistik']['autoinit'] = TRUE;
+        $db['statistik']['stricton'] = FALSE;
         break;
     case 'pcam.podomorouniversity.ac.id':
         $db['default']['hostname'] = '10.1.30.18';
@@ -96,7 +112,7 @@ switch ($ServerName) {
         $db['default']['dbdriver'] = 'mysqli';// support with MYSQl,POSTGRE SQL, ORACLE,SQL SERVER
         $db['default']['dbprefix'] = '';
         $db['default']['pconnect'] = TRUE;
-        $db['default']['db_debug'] = TRUE;
+        $db['default']['db_debug'] = FALSE;
         $db['default']['cache_on'] = FALSE;
         $db['default']['cachedir'] = '';
         $db['default']['char_set'] = 'utf8';
@@ -104,6 +120,23 @@ switch ($ServerName) {
         $db['default']['swap_pre'] = '';
         $db['default']['autoinit'] = TRUE;
         $db['default']['stricton'] = FALSE;
+
+        $db['statistik']['hostname'] = '10.1.30.18';
+        $db['statistik']['username'] = 'db_itpu';
+        $db['statistik']['password'] = 'Uap)(*&^%';
+        $db['statistik']['database'] = 'db_statistik';
+        $db['statistik']['dbdriver'] = 'mysqli';// support with MYSQl,POSTGRE SQL, ORACLE,SQL SERVER
+        $db['statistik']['dbprefix'] = '';
+        $db['statistik']['pconnect'] = TRUE;
+        $db['statistik']['db_debug'] = FALSE;
+        $db['statistik']['cache_on'] = FALSE;
+        $db['statistik']['cachedir'] = '';
+        $db['statistik']['char_set'] = 'utf8';
+        $db['statistik']['dbcollat'] = 'utf8_general_ci';
+        $db['statistik']['swap_pre'] = '';
+        $db['statistik']['autoinit'] = TRUE;
+        $db['statistik']['stricton'] = FALSE;
+
         break;
     case 'demo.pcam.podomorouniversity.ac.id':
         $db['default']['hostname'] = 'localhost';

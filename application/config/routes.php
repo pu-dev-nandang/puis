@@ -784,6 +784,12 @@ $route['rest/__rule_users'] = 'api/c_rest/rule_users';
 $route['rest/__getEmployees/(:any)'] = 'api/c_rest/getEmployees/$1';
 $route['rest/__loadDataFormulirGlobal'] = 'api/c_rest/loadDataFormulirGlobal';
 $route['rest/__loadDataFormulirGlobal_available'] = 'api/c_rest/loadDataFormulirGlobal_available';
+$route['rest/__rekapintake'] = 'api/c_rest/rekapintake';
+$route['rest/__rekapintake_reset'] = 'api/c_rest/rekapintake_reset';
+$route['rest/__trigger_formulir'] = 'api/c_rest/trigger_formulir';
+$route['rest/__rekapintake_beasiswa'] = 'api/c_rest/rekapintake_beasiswa';
+$route['rest/__rekapintake_perschool'] = 'api/c_rest/rekapintake_perschool';
+
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
