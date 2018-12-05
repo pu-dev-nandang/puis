@@ -182,148 +182,242 @@ class C_dashboard extends Globalclass {
 
     }
 
+    // public function summary_payment()
+    // {
+    //     $arr_json = array();
+    //     $arrDB = array();
+    //     $sqlDB = 'show databases like "%ta_2%"';
+    //     $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+    //     $SemesterYear = $SemesterID[0]['Year'];
+    //     $queryDB=$this->db->query($sqlDB, array())->result_array();
+    //     foreach ($queryDB as $key) {
+    //       foreach ($key as $keyB ) {
+    //         $YearDB = explode('_', $keyB);
+    //         $YearDB = $YearDB[1];
+    //         if ($SemesterYear >= $YearDB) {
+    //             $arrDB[] = $keyB;
+    //         }
+    //       }
+          
+    //     }
+
+    //     rsort($arrDB);
+    //     $Year = 'ta_'.date('Y');
+    //     $Semester = $SemesterID[0]['ID'];
+    //     $Semester = ' and SemesterID = '.$Semester;
+    //     $unk = 1;
+
+    //     // get paid off
+    //     $Paid_Off = array();
+    //     $Unpaid_Off = array();
+    //     $unsetPaid = array();
+    //     for ($i=0; $i < count($arrDB); $i++) { 
+    //         // if ($arrDB[$i] != $Year) {
+
+    //             $a_Paid_Off = 0;
+    //             $a_Unpaid_Off = 0;
+    //             $a_unsetPaid = 0;
+    //                 // get Data Mahasiswa
+    //                 $sql = 'select a.NPM,a.Name,b.NameEng from '.$arrDB[$i].'.students as a join db_academic.program_study as b on a.ProdiID = b.ID where a.StatusStudentID in (3,2,8) ';
+    //                 $query=$this->db->query($sql, array())->result_array();
+    //                 for ($u=0; $u < count($query); $u++) { 
+
+    //                   // cek BPP 
+    //                   $sqlBPP = 'select * from db_finance.payment where PTID = 2 and NPM = ? '.$Semester; //  limit 1
+    //                   $queryBPP=$this->db->query($sqlBPP, array($query[$u]['NPM']))->result_array();
+    //                   $arrBPP = array(
+    //                     'BPP' => '0',
+    //                     'PayBPP' => '0',
+    //                     'SisaBPP' => '0',
+    //                     'DetailPaymentBPP' => '',
+    //                   );
+    //                     if (count($queryBPP) > 0) {
+    //                         for ($t=0; $t < count($queryBPP); $t++) { 
+    //                           // cek payment students
+    //                           $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$queryBPP[$t]['ID']);
+    //                           $PayBPP = 0;
+    //                           $SisaBPP = 0;
+    //                           for ($r=0; $r < count($Q_invStudent); $r++) { 
+    //                             if ($Q_invStudent[$r]['Status'] == 1) { // lunas
+    //                               $PayBPP = $PayBPP + $Q_invStudent[$r]['Invoice'];
+    //                             }
+    //                             else
+    //                             {
+    //                               $SisaBPP = $SisaBPP + $Q_invStudent[$r]['Invoice'];
+    //                             }
+    //                           }
+                              
+    //                           $arrBPP = array(
+    //                             'BPP' => (int)$queryBPP[$t]['Invoice'],
+    //                             'PayBPP' => (int)$PayBPP,
+    //                             'SisaBPP' => (int)$SisaBPP,
+    //                             'DetailPaymentBPP' => $Q_invStudent,
+    //                           );
+
+    //                         }
+    //                     }
+
+    //                   // cek Credit 
+    //                   $sqlCr = 'select * from db_finance.payment where PTID = 3 and NPM = ? '.$Semester; // limit 1
+    //                   $queryCr=$this->db->query($sqlCr, array($query[$u]['NPM']))->result_array();
+    //                   $arrCr = array(
+    //                     'Cr' => '0',
+    //                     'PayCr' => '0',
+    //                     'SisaCr' => '0',
+    //                     'DetailPaymentCr' => '',
+    //                   );
+    //                     if (count($queryCr) > 0) {
+    //                         for ($t=0; $t < count($queryCr); $t++) { 
+    //                           // cek payment students
+    //                           $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$queryCr[$t]['ID']);
+    //                           $PayCr = 0;
+    //                           $SisaCr = 0;
+    //                           for ($r=0; $r < count($Q_invStudent); $r++) { 
+    //                             if ($Q_invStudent[$r]['Status'] == 1) { // lunas
+    //                               $PayCr = $PayCr + $Q_invStudent[$r]['Invoice'];
+    //                             }
+    //                             else
+    //                             {
+    //                               $SisaCr = $SisaCr + $Q_invStudent[$r]['Invoice'];
+    //                             }
+    //                           }
+
+    //                           $arrCr = array(
+    //                             'Cr' => (int)$queryCr[$t]['Invoice'],
+    //                             'PayCr' => (int)$PayCr,
+    //                             'SisaCr' => (int)$SisaCr,
+    //                             'DetailPaymentCr' => $Q_invStudent,
+    //                           );
+
+    //                         }
+    //                     }
+
+
+    //                     // cek SPP 
+    //                     $sqlSPP = 'select * from db_finance.payment where PTID = 1 and NPM = ? '.$Semester; //  limit 1
+    //                     $querySPP=$this->db->query($sqlSPP, array($query[$u]['NPM']))->result_array();
+    //                     $arrSPP = array(
+    //                       'SPP' => '0',
+    //                       'PaySPP' => '0',
+    //                       'SisaSPP' => '0',
+    //                       'DetailPaymentSPP' => '',
+    //                     );
+    //                       if (count($querySPP) > 0) {
+    //                           for ($t=0; $t < count($querySPP); $t++) { 
+    //                             // cek payment students
+    //                             $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$querySPP[$t]['ID']);
+    //                             $PaySPP = 0;
+    //                             $SisaSPP = 0;
+    //                             for ($r=0; $r < count($Q_invStudent); $r++) { 
+    //                               if ($Q_invStudent[$r]['Status'] == 1) { // lunas
+    //                                 $PaySPP = $PaySPP + $Q_invStudent[$r]['Invoice'];
+    //                               }
+    //                               else
+    //                               {
+    //                                 $SisaSPP = $SisaSPP + $Q_invStudent[$r]['Invoice'];
+    //                               }
+    //                             }
+                                
+    //                             $arrSPP = array(
+    //                               'SPP' => (int)$querySPP[$t]['Invoice'],
+    //                               'PaySPP' => (int)$PaySPP,
+    //                               'SisaSPP' => (int)$SisaSPP,
+    //                               'DetailPaymentSPP' => $Q_invStudent,
+    //                             );
+
+    //                           }
+    //                       }
+
+    //                       // cek lain-lain 
+    //                       $sqlAn = 'select * from db_finance.payment where PTID = 4 and NPM = ? '.$Semester; //  limit 1
+    //                       $queryAn=$this->db->query($sqlAn, array($query[$u]['NPM']))->result_array();
+    //                       $arrAn = array(
+    //                         'An' => '0',
+    //                         'PayAn' => '0',
+    //                         'SisaAn' => '0',
+    //                         'DetailPaymentAn' => '',
+    //                       );
+    //                         if (count($queryAn) > 0) {
+    //                             for ($t=0; $t < count($queryAn); $t++) { 
+    //                               // cek payment students
+    //                               $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$queryAn[$t]['ID']);
+    //                               $PayAn = 0;
+    //                               $SisaAn = 0;
+    //                               for ($r=0; $r < count($Q_invStudent); $r++) { 
+    //                                 if ($Q_invStudent[$r]['Status'] == 1) { // lunas
+    //                                   $PayAn = $PayAn + $Q_invStudent[$r]['Invoice'];
+    //                                 }
+    //                                 else
+    //                                 {
+    //                                   $SisaAn = $SisaAn + $Q_invStudent[$r]['Invoice'];
+    //                                 }
+    //                               }
+                                  
+    //                               $arrAn = array(
+    //                                 'An' => (int)$queryAn[$t]['Invoice'],
+    //                                 'PayAn' => (int)$PayAn,
+    //                                 'SisaAn' => (int)$SisaAn,
+    //                                 'DetailPaymentAn' => $Q_invStudent,
+    //                               );
+
+    //                             }
+    //                         }
+
+    //                     if ($arrBPP['DetailPaymentBPP'] == '' || $arrCr['DetailPaymentCr'] == '') { // unset paid
+    //                       $a_unsetPaid = $a_unsetPaid + 1;
+
+    //                     }
+    //                     else
+    //                     {
+    //                         if ($arrBPP['DetailPaymentBPP'] != '' && $arrCr['DetailPaymentCr'] != '' &&  $arrBPP['SisaBPP'] == 0 && $arrCr['SisaCr'] == 0 &&  $arrSPP['SisaSPP'] == 0 && $arrAn['SisaAn'] == 0) { // lunas
+    //                           $a_Paid_Off = $a_Paid_Off + 1;
+
+    //                         }
+    //                         elseif ( $arrBPP['DetailPaymentBPP'] != '' || $arrCr['DetailPaymentCr'] != '' ||  $arrBPP['SisaBPP'] > 0 || $arrCr['SisaCr'] > 0 ||  $arrSPP['SisaSPP'] > 0 || $arrAn['SisaAn'] > 0) { // belum lunas
+    //                           $a_Unpaid_Off = $a_Unpaid_Off + 1;
+
+    //                         }     
+                            
+    //                     }  
+
+    //                 } // loop per mhs    
+
+    //             $strUnk = $unk.'.6818181818181817';
+    //             $YearDB = explode('_', $arrDB[$i]);
+    //             $YearDB = $YearDB[1];
+
+    //             $Paid_Off[] = array($YearDB,$a_Paid_Off);
+    //             $Unpaid_Off[] = array($YearDB,$a_Unpaid_Off);
+    //             $unsetPaid[] = array($YearDB,$a_unsetPaid);
+    //             $unk++;
+
+    //         // }
+    //     }
+
+    //     $arr_json = array('Paid_Off'=> $Paid_Off,'Unpaid_Off' => $Unpaid_Off,'unsetPaid' => $unsetPaid);
+    //     echo json_encode($arr_json);
+    // }
+
     public function summary_payment()
     {
         $arr_json = array();
-        $arrDB = array();
-        $sqlDB = 'show databases like "%ta_2%"';
-        $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
-        $SemesterYear = $SemesterID[0]['Year'];
-        $queryDB=$this->db->query($sqlDB, array())->result_array();
-        foreach ($queryDB as $key) {
-          foreach ($key as $keyB ) {
-            $YearDB = explode('_', $keyB);
-            $YearDB = $YearDB[1];
-            if ($SemesterYear >= $YearDB) {
-                $arrDB[] = $keyB;
-            }
-          }
-          
-        }
+        $url = url_pas.'rest/__rekapmhspayment';
+        $data = array(
+                'auth' => 's3Cr3T-G4N',
+            );
+        $Input = $this->jwt->encode($data,"UAP)(*");
+        $ch = curl_init();
 
-        rsort($arrDB);
-        $Year = 'ta_'.date('Y');
-        $Semester = $SemesterID[0]['ID'];
-        $Semester = ' and SemesterID = '.$Semester;
-        $unk = 1;
-
-        // get paid off
-        $Paid_Off = array();
-        $Unpaid_Off = array();
-        $unsetPaid = array();
-        for ($i=0; $i < count($arrDB); $i++) { 
-            // if ($arrDB[$i] != $Year) {
-
-                $a_Paid_Off = 0;
-                $a_Unpaid_Off = 0;
-                $a_unsetPaid = 0;
-                    // get Data Mahasiswa
-                    $sql = 'select a.NPM,a.Name,b.NameEng from '.$arrDB[$i].'.students as a join db_academic.program_study as b on a.ProdiID = b.ID where a.StatusStudentID in (3,2,8) ';
-                    $query=$this->db->query($sql, array())->result_array();
-                    for ($u=0; $u < count($query); $u++) { 
-
-                      // cek BPP 
-                      $sqlBPP = 'select * from db_finance.payment where PTID = 2 and NPM = ? '.$Semester; //  limit 1
-                      $queryBPP=$this->db->query($sqlBPP, array($query[$u]['NPM']))->result_array();
-                      $arrBPP = array(
-                        'BPP' => '0',
-                        'PayBPP' => '0',
-                        'SisaBPP' => '0',
-                        'DetailPaymentBPP' => '',
-                      );
-                        if (count($queryBPP) > 0) {
-                            for ($t=0; $t < count($queryBPP); $t++) { 
-                              // cek payment students
-                              $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$queryBPP[$t]['ID']);
-                              $PayBPP = 0;
-                              $SisaBPP = 0;
-                              for ($r=0; $r < count($Q_invStudent); $r++) { 
-                                if ($Q_invStudent[$r]['Status'] == 1) { // lunas
-                                  $PayBPP = $PayBPP + $Q_invStudent[$r]['Invoice'];
-                                }
-                                else
-                                {
-                                  $SisaBPP = $SisaBPP + $Q_invStudent[$r]['Invoice'];
-                                }
-                              }
-                              
-                              $arrBPP = array(
-                                'BPP' => (int)$queryBPP[$t]['Invoice'],
-                                'PayBPP' => (int)$PayBPP,
-                                'SisaBPP' => (int)$SisaBPP,
-                                'DetailPaymentBPP' => $Q_invStudent,
-                              );
-
-                            }
-                        }
-
-                      // cek Credit 
-                      $sqlCr = 'select * from db_finance.payment where PTID = 3 and NPM = ? '.$Semester; // limit 1
-                      $queryCr=$this->db->query($sqlCr, array($query[$u]['NPM']))->result_array();
-                      $arrCr = array(
-                        'Cr' => '0',
-                        'PayCr' => '0',
-                        'SisaCr' => '0',
-                        'DetailPaymentCr' => '',
-                      );
-                        if (count($queryCr) > 0) {
-                            for ($t=0; $t < count($queryCr); $t++) { 
-                              // cek payment students
-                              $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$queryCr[$t]['ID']);
-                              $PayCr = 0;
-                              $SisaCr = 0;
-                              for ($r=0; $r < count($Q_invStudent); $r++) { 
-                                if ($Q_invStudent[$r]['Status'] == 1) { // lunas
-                                  $PayCr = $PayCr + $Q_invStudent[$r]['Invoice'];
-                                }
-                                else
-                                {
-                                  $SisaCr = $SisaCr + $Q_invStudent[$r]['Invoice'];
-                                }
-                              }
-
-                              $arrCr = array(
-                                'Cr' => (int)$queryCr[$t]['Invoice'],
-                                'PayCr' => (int)$PayCr,
-                                'SisaCr' => (int)$SisaCr,
-                                'DetailPaymentCr' => $Q_invStudent,
-                              );
-
-                            }
-                        }
-
-                        if ($arrBPP['DetailPaymentBPP'] == '' || $arrCr['DetailPaymentCr'] == '') { // unset paid
-                          $a_unsetPaid = $a_unsetPaid + 1;
-
-                        }
-                        else
-                        {
-                            if ($arrBPP['DetailPaymentBPP'] != '' && $arrCr['DetailPaymentCr'] != '' &&  $arrBPP['SisaBPP'] == 0 && $arrCr['SisaCr'] == 0) { // lunas
-                              $a_Paid_Off = $a_Paid_Off + 1;
-
-                            }
-                            elseif ( $arrBPP['DetailPaymentBPP'] != '' || $arrCr['DetailPaymentCr'] != '' ||  $arrBPP['SisaBPP'] > 0 || $arrCr['SisaCr'] > 0 ) { // belum lunas
-                              $a_Unpaid_Off = $a_Unpaid_Off + 1;
-
-                            }     
-                            
-                        }  
-
-                    } // loop per mhs    
-
-                $strUnk = $unk.'.6818181818181817';
-                $YearDB = explode('_', $arrDB[$i]);
-                $YearDB = $YearDB[1];
-
-                $Paid_Off[] = array($YearDB,$a_Paid_Off);
-                $Unpaid_Off[] = array($YearDB,$a_Unpaid_Off);
-                $unsetPaid[] = array($YearDB,$a_unsetPaid);
-                $unk++;
-
-            // }
-        }
-
-        $arr_json = array('Paid_Off'=> $Paid_Off,'Unpaid_Off' => $Unpaid_Off,'unsetPaid' => $unsetPaid);
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS,
+                    "token=".$Input);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $get = curl_exec($ch);
+        $get =json_decode($get, True);
+        $get =(array)$get;
+        curl_close ($ch);
+        $arr_json = array('Paid_Off'=> json_decode($get[0]['Paid_Off']),'Unpaid_Off' => json_decode($get[0]['Unpaid_Off']),'unsetPaid' => json_decode($get[0]['unsetPaid']));
         echo json_encode($arr_json);
     }
 

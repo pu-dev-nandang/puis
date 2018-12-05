@@ -660,5 +660,36 @@ class C_rest extends CI_Controller {
         }
     }
 
+    public function rekapmhspayment()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('statistik/m_statistik');
+                if(array_key_exists("action",$dataToken))
+                {
+                    if ($dataToken['action'] == 'reset') {
+                        $tblname = 'summary_payment_mhs';
+                       // drop table
+                        $this->m_statistik->droptable($tblname);
+                    }
+                }
+                $result = $this->m_statistik->ShowRekap_summary_payment_mhs();
+                echo json_encode($result);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
 
 }
