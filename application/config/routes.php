@@ -555,6 +555,7 @@ $route['finance/tagihan-mhs/submit_import_beasiswa_mahasiswa'] =  'page/finance/
 $route['finance/download-log-va'] =  'page/finance/c_finance/download_log_va';
 $route['finance/listfile_va'] =  'page/finance/c_finance/listfile_va';
 $route['finance/admission/dailypenerimaanBank'] =  'c_save_to_excel/dailypenerimaanBank_admission';
+$route['finance/admission/RekapIntake'] =  'c_save_to_excel/RekapIntake';
 
 
 // -- config --
@@ -785,13 +786,13 @@ $route['rest/__getEmployees/(:any)'] = 'api/c_rest/getEmployees/$1';
 $route['rest/__loadDataFormulirGlobal'] = 'api/c_rest/loadDataFormulirGlobal';
 $route['rest/__loadDataFormulirGlobal_available'] = 'api/c_rest/loadDataFormulirGlobal_available';
 $route['rest/__rekapintake'] = 'api/c_rest/rekapintake';
+$route['rest/__rekapintake_reset_client'] = 'api/c_rest/rekapintake_reset_client';
+
 $route['rest/__rekapintake_reset'] = 'api/c_rest/rekapintake_reset';
 $route['rest/__trigger_formulir'] = 'api/c_rest/trigger_formulir';
 $route['rest/__rekapintake_beasiswa'] = 'api/c_rest/rekapintake_beasiswa';
 $route['rest/__rekapintake_perschool'] = 'api/c_rest/rekapintake_perschool';
 $route['rest/__rekapmhspayment'] = 'api/c_rest/rekapmhspayment';
-
-
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
 $route['api/__getRegionByProv'] = 'api/c_api/getRegionByProv';

@@ -137,11 +137,26 @@
 		FuncClickbtnPengembalianFormulirData();
 		FuncClickBtnTuitionFee();
 		FuncClickbtnDailyPenerimaanBank();
-
+		FuncClickbtnbtnRekapIntake();
 		$('#datetimepicker').datetimepicker({
 		  format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
 		});
 	});
+
+	function FuncClickbtnbtnRekapIntake()
+	{
+		$("#btnRekapIntake").click(function(){
+			var url = base_url_js+'finance/admission/RekapIntake';
+			var SelectYearDataMHS = $("#SelectYearDataMHS").val();
+			data = {
+			  Year : SelectYearDataMHS,
+			}
+			var token = jwt_encode(data,"UAP)(*");
+			FormSubmitAuto(url, 'POST', [
+			    { name: 'token', value: token },
+			]);
+		})
+	}
 
 	function FuncClickbtnDailyPenerimaanBank()
 	{
