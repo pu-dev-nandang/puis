@@ -65,7 +65,7 @@ class M_statistik extends CI_Model {
             for ($j=0; $j < count($field); $j++) { 
                 if ($field[$j] != 'ID' && $field[$j] != 'ProdiID') {
                     $aa =  $field[$j];
-                    if (strpos($aa, '_') !== true ) {
+                    if (strpos($aa, '_') !== false ) {
                         $monthQ = substr($aa, 0,strpos($aa, '_'));
                         $YearQ = $Year - 1;
                     }
@@ -102,6 +102,9 @@ class M_statistik extends CI_Model {
                             $query=$this->db->query($sql, array($ProdiID))->result_array();
                             $total = $query[0]['total'];
                             $datasave[$field[$j]] = $total;
+                            // if ($j == 3) {
+                            //     print_r($YearQ);die();
+                            // }
                             // print_r($monthQ);die();
                     
                 }

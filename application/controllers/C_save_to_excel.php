@@ -2915,4 +2915,134 @@ class C_save_to_excel extends CI_Controller
         header('Content-Disposition: attachment; filename="'.$Filaname.'"'); // jalan ketika tidak menggunakan ajax
         $objWriter->save('php://output');
     }
+
+    public function RekapIntake()
+    {
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $input = (array) $this->jwt->decode($token,$key);
+        $GetDateNow = date('Y-m-d');
+        $this->load->model('master/m_master');
+        $this->load->model('finance/m_finance');
+        $this->load->model('admission/m_admission');
+
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load('./uploads/finance/TemplateRekapIntake.xlsx'); // Empty Sheet
+        $excel2->setActiveSheetIndex(0);
+
+        $excel3 = $excel2->getActiveSheet();
+        // write date export 
+        $Year = $input['Year'];
+        $excel3->setCellValue('A3', 'Intake: '.$Year.'/'.($Year+1));
+        $PerTgl = 'Per tgl '.date('d M Y', strtotime($GetDateNow));
+        $DatePrint = date('d M Y', strtotime($GetDateNow));
+        $excel3->setCellValue('A4', $PerTgl);
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+        $style_row = array(
+            'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        $style_col = array(
+            'font' => array('bold' => true), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        // start dari A5
+        $a = 5;
+        $Filaname = 'Rekap_Intake_'.$Year.'_'.$GetDateNow.'.xlsx';
+        $keyM = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+        $rekapintake_ = $this->m_master->showData_array('db_statistik.rekapintake_'.$Year);    
+        $rekapintake_bea_ = $this->m_master->showData_array('db_statistik.rekapintake_bea_'.$Year);    
+        $rekapintake_sch_ = $this->m_master->showData_array('db_statistik.rekapintake_sch_'.$Year);
+        $arrxx = array();
+
+        // rekapintake_
+        $getColoumn = $this->m_master->getColumnTable('db_statistik.rekapintake_'.$Year);
+        $field = $getColoumn['field'];
+        $getProdi = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
+        $excel3->setCellValue('A'.$a, '');
+        $excel3->getStyle('A'.$a)->applyFromArray($style_col);
+        for ($j=0; $j < count($getProdi); $j++) { 
+             $z = $j + 1;
+             $excel3->setCellValue($keyM[$z].$a, $getProdi[$j]['Name']);
+             $excel3->getStyle($keyM[$z].$a)->applyFromArray($style_col);
+         }
+
+        $a = $a + 1;
+        $arr_total = array();
+        for ($i=0; $i < count($field); $i++) { 
+            if ($field[$i] != 'ID' && $field[$i] != 'ProdiID') {
+                $aa =  $field[$i];
+                $z = 0;
+                $MonthName = $aa.' '.$Year;
+                 if (strpos($aa, '_') !== false ) {
+                     $monthQ = substr($aa, 0,strpos($aa, '_'));
+                     $YearQ = $Year - 1;
+                     $MonthName = $monthQ.' '.$YearQ;
+                 }
+                 // else
+                 // {
+                 //    $MonthName = $aa.' '.$Year;
+                 // }
+                  $excel3->setCellValue($keyM[$z].$a, $MonthName);
+                  $excel3->getStyle($keyM[$z].$a)->applyFromArray($style_row);
+                  $f = true;
+                  for ($j=0; $j < count($getProdi); $j++) {
+                    if ($getProdi[$j]['ID'] == $rekapintake_[$j]['ProdiID']) {
+                         $z++;
+                         $value = ($rekapintake_[$j][$aa] == 0) ? '-' : $rekapintake_[$j][$aa];
+                         $excel3->setCellValue($keyM[$z].$a, $value);
+                         $excel3->getStyle($keyM[$z].$a)->applyFromArray($style_row);
+                         if(array_key_exists($rekapintake_[$j]['ProdiID'],$arr_total)){
+                            $arr_total[$rekapintake_[$j]['ProdiID']] = $arr_total[$rekapintake_[$j]['ProdiID']] + $value;
+                         }
+                         else
+                         {
+                            $arr_total[$rekapintake_[$j]['ProdiID']] = $value;
+                         }
+                     } 
+                      
+                  }
+               $a = $a + 1;   
+            }   
+        }
+
+        $excel3->setCellValue('A'.$a, 'Total');
+        $excel3->getStyle('A'.$a)->applyFromArray($style_col);
+        for ($j=0; $j < count($getProdi); $j++) {
+             $z = $j + 1;
+             $excel3->setCellValue($keyM[$z].$a, $arr_total[$getProdi[$j]['ID']]);
+             $excel3->getStyle($keyM[$z].$a)->applyFromArray($style_col);
+        }
+
+        $excel3->setCellValue('F'.($a+3), 'Print Date,'.$DatePrint);
+        // foreach(range('A','Z') as $columnID) {
+        //     $excel2->getActiveSheet()->getColumnDimension($columnID)
+        //         ->setAutoSize(true);
+        // }
+
+        $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
+        header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
+        header('Content-Disposition: attachment; filename="'.$Filaname.'"'); // jalan ketika tidak menggunakan ajax
+        $objWriter->save('php://output');
+    }
 }

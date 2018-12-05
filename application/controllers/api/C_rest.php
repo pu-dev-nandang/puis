@@ -531,11 +531,11 @@ class C_rest extends CI_Controller {
             $auth = $this->m_master->AuthAPI($dataToken);
             if ($auth) {
                 $this->load->model('statistik/m_statistik');
+                $Year = $dataToken['Year'];
                 if ($dataToken['action'] == 'reset') {
                    // drop table
                     $this->m_statistik->droptablerekapintake($Year);
                 }
-                $Year = $dataToken['Year'];
                 $result = $this->m_statistik->ShowRekapIntake($Year);
                 echo json_encode($result);
             }
