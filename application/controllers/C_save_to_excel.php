@@ -2526,7 +2526,7 @@ class C_save_to_excel extends CI_Controller
         $this->load->model('master/m_master');
         $this->load->model('finance/m_finance');
         $this->load->model('admission/m_admission');
-        $GetDateNow = $this->m_master->getIndoBulan($GetDateNow);
+        //$GetDateNow = $this->m_master->getIndoBulan($GetDateNow);
         // print_r($input['Data']);die();
 
         include APPPATH.'third_party/PHPExcel/PHPExcel.php';
