@@ -2975,10 +2975,29 @@ class C_save_to_excel extends CI_Controller
         $rekapintake_sch_ = $this->m_master->showData_array('db_statistik.rekapintake_sch_'.$Year);
         $arrxx = array();
 
+        // get last update
+        $lastupdate = $this->m_master->showData_array('db_statistik.lastupdated');
+        $rekapintake_ls = '';
+        $rekapintake_bea_ls = '';
+        $rekapintake_sch_ls = '';
+        for ($i=0; $i < count($lastupdate); $i++) { 
+            if ($lastupdate[$i]['TableName'] == 'rekapintake_'.$Year) {
+                $rekapintake_ls = $lastupdate[$i]['LastUpdated'];
+            }
+            elseif ($lastupdate[$i]['TableName'] == 'rekapintake_bea_'.$Year) {
+                $rekapintake_bea_ls = $lastupdate[$i]['LastUpdated'];
+            }
+            elseif ($lastupdate[$i]['TableName'] == 'rekapintake_sch_'.$Year) {
+                $rekapintake_sch_ls = $lastupdate[$i]['LastUpdated'];
+            }
+        }
+
         // rekapintake_
         $getColoumn = $this->m_master->getColumnTable('db_statistik.rekapintake_'.$Year);
         $field = $getColoumn['field'];
         $getProdi = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
+        $excel3->setCellValue('A'.$a, 'Last Updated : '.$rekapintake_ls);
+        $a = $a + 1;
         $excel3->setCellValue('A'.$a, '');
         $excel3->getStyle('A'.$a)->applyFromArray($style_col);
         for ($j=0; $j < count($getProdi); $j++) { 
@@ -3034,8 +3053,117 @@ class C_save_to_excel extends CI_Controller
              $excel3->getStyle($keyM[$z].$a)->applyFromArray($style_col);
         }
 
+        // rekapintake_bea
+        $arr_total = array();
+        $a = $a + 2;
+        $excel3->setCellValue('A'.$a, 'Last Updated : '.$rekapintake_bea_ls);
+        $a = $a + 1;  
+        $excel3->setCellValue('A'.$a, '');
+        $excel3->getStyle('A'.$a)->applyFromArray($style_col);
+        for ($j=0; $j < count($getProdi); $j++) { 
+             $z = $j + 1;
+             $excel3->setCellValue($keyM[$z].$a, $getProdi[$j]['Name']);
+             $excel3->getStyle($keyM[$z].$a)->applyFromArray($style_col);
+        }
+        $a = $a + 1; 
+        // get type beasiswa
+            $dtFirst = json_decode($rekapintake_bea_[0]['Detail'],true);
+            $arr_y = array();
+            foreach ($dtFirst as $key => $value) {
+                $arr_y[] =  $key;
+            }
+
+            for ($i=0; $i < count($arr_y); $i++) { 
+                $typebea = $arr_y[$i];
+                $z = 0;
+                $namebea = ($typebea == 'Beasiswa_0%') ? 'Reguler' : str_replace('_', ' ', $typebea);
+                $excel3->setCellValue($keyM[$z].$a, $namebea);
+                $excel3->getStyle($keyM[$z].$a)->applyFromArray($style_row);
+                for ($j=0; $j < count($getProdi); $j++) { 
+                    $ProdiID = $getProdi[$j]['ID'];
+                    for ($l=0; $l < count($rekapintake_bea_); $l++) {
+                        $f1 = true; 
+                        $ProdiIDBea = $rekapintake_bea_[$l]['ProdiID'];
+                        $Detail = json_decode($rekapintake_bea_[$l]['Detail'],true);
+                        foreach ($Detail as $key => $value) {
+                            if ($ProdiIDBea == $ProdiID && $key == $typebea) {
+                                $z++;
+                               $value = ($value == 0) ? '-' : $value;
+                               $excel3->setCellValue($keyM[$z].$a, $value);
+                               $excel3->getStyle($keyM[$z].$a)->applyFromArray($style_row);
+                               $f1 = false;
+                               if(array_key_exists($ProdiIDBea,$arr_total)){
+                                  $arr_total[$ProdiIDBea] = $arr_total[$ProdiIDBea] + $value;
+                               }
+                               else
+                               {
+                                  $arr_total[$ProdiIDBea] = $value;
+                               }
+                               break;
+                            }
+                        }
+                        
+                        if  (!$f1) {
+                            break;
+                        }    
+
+                    }
+                }
+
+                $a = $a + 1; 
+            }
+
+            $excel3->setCellValue('A'.$a, 'Total');
+            $excel3->getStyle('A'.$a)->applyFromArray($style_col);
+            for ($j=0; $j < count($getProdi); $j++) {
+                 $z = $j + 1;
+                 if(array_key_exists($getProdi[$j]['ID'],$arr_total)){
+                    $excel3->setCellValue($keyM[$z].$a, $arr_total[$getProdi[$j]['ID']]);
+                    $excel3->getStyle($keyM[$z].$a)->applyFromArray($style_col);
+                 }
+            }
+            $a = $a + 2;
+
+        //rekapintake_sch_
+        $excel3->setCellValue('A'.$a, 'Last Updated : '.$rekapintake_sch_ls);
+        $a = $a + 1;  
+        for ($i=0; $i < count($rekapintake_sch_); $i++) {
+            $Qty = $rekapintake_sch_[$i]['Qty']; 
+            if ($Qty > 0) {
+                $ProvinceID = $rekapintake_sch_[$i]['ProvinceID']; 
+                $Detail = json_decode($rekapintake_sch_[$i]['Detail']);
+                $g = $this->m_master->caribasedprimary('db_admission.province','ProvinceID',$ProvinceID);
+                $ProvinceName = $g[0]['ProvinceName'];
+                $xTotal = $a;
+                $excel3->setCellValue('A'.$xTotal, $ProvinceName);
+                $excel3->getStyle('A'.$xTotal)->applyFromArray($style_col);
+                $excel3->setCellValue('B'.$xTotal, '');
+                $excel3->getStyle('B'.$xTotal)->applyFromArray($style_col);
+                $excel3->setCellValue('C'.$xTotal, $Qty);
+                $excel3->getStyle('C'.$xTotal)->applyFromArray($style_col);
+                $a = $a + 1;
+                foreach ($Detail as $key => $value) {
+                    if ($value > 0) {
+                        $RegionID = $key;
+                        $gg = $this->m_master->caribasedprimary('db_admission.region','RegionID',$RegionID);
+                        $RegionName = $gg[0]['RegionName'];
+                        $value = ($value == 0) ? '-' : $value;
+                        $excel3->setCellValue('A'.$a, $RegionName);
+                        $excel3->getStyle('A'.$a)->applyFromArray($style_row);
+                        $excel3->setCellValue('B'.$a, $value);
+                        $excel3->getStyle('B'.$a)->applyFromArray($style_row);
+                        $excel3->setCellValue('C'.$a, '');
+                        $excel3->getStyle('C'.$a)->applyFromArray($style_row);
+                        $a = $a + 1;
+                    }
+                    
+                }
+                $a = $a + 1;
+            }
+        }
+
         $excel3->setCellValue('F'.($a+3), 'Print Date,'.$DatePrint);
-        // foreach(range('A','Z') as $columnID) {
+        // foreach(range('B','Z') as $columnID) {
         //     $excel2->getActiveSheet()->getColumnDimension($columnID)
         //         ->setAutoSize(true);
         // }
