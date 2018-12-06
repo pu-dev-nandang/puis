@@ -27,9 +27,9 @@
                         <li class="">
                             <a href="javascript:void(0)" class="PageNav" page = "RDaily">Daily</a>
                         </li>
-                        <li class="">
+                        <!-- <li class="">
                             <a href="javascript:void(0)" class="PageNav" page = "RSummary">Summary</a>
-                        </li>
+                        </li> -->
                     </ul>
                     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
                         <div class="row" id = "pageSet" style="margin-left: 0px;margin-right: 0px">
