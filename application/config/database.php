@@ -139,8 +139,8 @@ switch ($ServerName) {
 
         break;
     case 'demo.pcam.podomorouniversity.ac.id':
-        $db['default']['hostname'] = 'localhost';
-        $db['default']['username'] = 'root';
+        $db['default']['hostname'] = '10.142.0.4';
+        $db['default']['username'] = 'db_itpu';
         $db['default']['password'] = 'Uap)(*&^%';
         $db['default']['database'] = 'db_academic';
         $db['default']['dbdriver'] = 'mysqli';// support with MYSQl,POSTGRE SQL, ORACLE,SQL SERVER
@@ -154,6 +154,22 @@ switch ($ServerName) {
         $db['default']['swap_pre'] = '';
         $db['default']['autoinit'] = TRUE;
         $db['default']['stricton'] = FALSE;
+
+        $db['statistik']['hostname'] = '10.142.0.4';
+        $db['statistik']['username'] = 'db_itpu';
+        $db['statistik']['password'] = 'Uap)(*&^%';
+        $db['statistik']['database'] = 'db_statistik';
+        $db['statistik']['dbdriver'] = 'mysqli';// support with MYSQl,POSTGRE SQL, ORACLE,SQL SERVER
+        $db['statistik']['dbprefix'] = '';
+        $db['statistik']['pconnect'] = TRUE;
+        $db['statistik']['db_debug'] = FALSE;
+        $db['statistik']['cache_on'] = FALSE;
+        $db['statistik']['cachedir'] = '';
+        $db['statistik']['char_set'] = 'utf8';
+        $db['statistik']['dbcollat'] = 'utf8_general_ci';
+        $db['statistik']['swap_pre'] = '';
+        $db['statistik']['autoinit'] = TRUE;
+        $db['statistik']['stricton'] = FALSE;
         break;    
     default:
         # code...
