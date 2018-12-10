@@ -48,9 +48,17 @@
                 <td>Programme Study</td>
                 <td>:</td>
                 <td>
-                    <select class="form-control" id="formBaseProdi">
-                        <option value="" selected disabled>--- Select Programme Study ---</option>
-                    </select>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <select class="form-control" id="formBaseProdi">
+                                <option value="" selected disabled>--- Select Programme Study ---</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-control" id="formGroupProdi" style="max-width: 200px;" disabled><option selected disabled>-- Select Group Prodi --</option></select>
+                            <input class="hide" readonly value="0" id="viewGroupProdi" />
+                        </div>
+                    </div>
                 </td>
             </tr>
             <tr>
@@ -75,8 +83,9 @@
             <tr>
                 <th rowspan="2">Course</th>
                 <th rowspan="2" style="width: 20%;">Prodi</th>
-                <th rowspan="2" style="width: 7%;">Semester</th>
-                <th rowspan="2" style="width: 7%;">Offer to <br/> <small>(Semester)</small></th>
+                <th rowspan="2" style="width: 10%;">Class Of</th>
+                <th rowspan="2" style="width: 7%;">Smt</th>
+                <th rowspan="2" style="width: 7%;">Offer to <br/> <small>(Smt)</small></th>
                 <th colspan="2" style="width: 16%;">Student</th>
                 <th rowspan="2" style="width: 7%;">Action</th>
             </tr>
@@ -143,47 +152,125 @@
         if(Prodi!=''){
             var ProdiID = Prodi.split('.')[0];
             getCourseOfferings(ProdiID,'');
+            loadProdiGroup(ProdiID,'');
         }
 
     });
+
+    function loadProdiGroup(ProdiID,divNum) {
+        var data = {
+            action : 'readProdiGroup',
+            ProdiID : ProdiID
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api/__crudSchedule';
+        $('#formGroupProdi'+divNum).empty();
+        $('#formGroupProdi'+divNum).append('<option selected disabled>-- Select Group Prodi --</option>');
+        $.post(url,{token:token},function (jsonResult) {
+            if(jsonResult.length>0){
+                $('#formGroupProdi'+divNum).prop('disabled',false);
+                $('#viewGroupProdi'+divNum).val(1);
+                for(var i=0; i<jsonResult.length;i++){
+                    var d = jsonResult[i];
+                    $('#formGroupProdi'+divNum).append('<option value="'+d.ID+'">'+d.Code+'</option>');
+                }
+            } else {
+                $('#formGroupProdi'+divNum).prop('disabled',true);
+                $('#viewGroupProdi'+divNum).val(0);
+            }
+        });
+    }
 
     $('#btnAddNewCourse').click(function () {
         var formScheduleID = $('#formScheduleID').val();
         var formBaseProdi = $('#formBaseProdi').val();
         var formMataKuliah = $('#formMataKuliah').val();
 
-        if(formBaseProdi!='' && formBaseProdi!=null &&
-            formMataKuliah!='' && formMataKuliah!=null){
+        var viewGroupProdi = parseInt($('#viewGroupProdi').val());
+        var formGroupProdi = $('#formGroupProdi').val();
 
-            var ProdiID = formBaseProdi.split('.')[0];
-            var CDID = formMataKuliah.split('|')[0];
-            var MKID = formMataKuliah.split('|')[1];
+        if(viewGroupProdi==1){
+            if(formBaseProdi!='' && formBaseProdi!=null &&
+                formMataKuliah!='' && formMataKuliah!=null &&
+                formGroupProdi!='' && formGroupProdi!=null
+            ){
 
-            var data = {
-                action : 'checktoAddNewCourse',
-                dataWhere : {
+                var ProdiID = formBaseProdi.split('.')[0];
+                var CDID = formMataKuliah.split('|')[0];
+                var MKID = formMataKuliah.split('|')[1];
+
+                var dataWhere = {
                     ScheduleID : formScheduleID,
                     ProdiID : ProdiID,
                     CDID : CDID,
                     MKID : MKID
-                },
-                UpdateLog : {
-                    UpdateBy : sessionNIP,
-                    UpdateAt : dateTimeNow()
+                };
+                if(viewGroupProdi==1){
+                    dataWhere.ProdiGroupID = formGroupProdi;
                 }
-            };
 
-            var token = jwt_encode(data,'UAP)(*');
-            var url = base_url_js+'api/__crudSchedule';
-            $.post(url,{token:token},function (jsonResult) {
-                if(jsonResult.Status==0 || jsonResult.Status=='0'){
-                    toastr.warning('This course exist in schedule','Warning');
-                } else {
-                    loadEditCourse();
-                    toastr.success('Data saved','Success');
-                }
-            });
+                var data = {
+                    action : 'checktoAddNewCourse',
+                    dataWhere : dataWhere,
+                    UpdateLog : {
+                        UpdateBy : sessionNIP,
+                        UpdateAt : dateTimeNow()
+                    }
+                };
 
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api/__crudSchedule';
+                $.post(url,{token:token},function (jsonResult) {
+                    if(jsonResult.Status==0 || jsonResult.Status=='0'){
+                        toastr.warning('This course exist in schedule','Warning');
+                    } else {
+                        loadEditCourse();
+                        toastr.success('Data saved','Success');
+                    }
+                });
+
+            } else {
+                toastr.error('All form required','Error');
+            }
+        }
+        else {
+            if(formBaseProdi!='' && formBaseProdi!=null &&
+                formMataKuliah!='' && formMataKuliah!=null){
+
+                var ProdiID = formBaseProdi.split('.')[0];
+                var CDID = formMataKuliah.split('|')[0];
+                var MKID = formMataKuliah.split('|')[1];
+
+                var dataWhere = {
+                    ScheduleID : formScheduleID,
+                    ProdiID : ProdiID,
+                    CDID : CDID,
+                    MKID : MKID
+                };
+
+                var data = {
+                    action : 'checktoAddNewCourse',
+                    dataWhere : dataWhere,
+                    UpdateLog : {
+                        UpdateBy : sessionNIP,
+                        UpdateAt : dateTimeNow()
+                    }
+                };
+
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api/__crudSchedule';
+                $.post(url,{token:token},function (jsonResult) {
+                    if(jsonResult.Status==0 || jsonResult.Status=='0'){
+                        toastr.warning('This course exist in schedule','Warning');
+                    } else {
+                        loadEditCourse();
+                        toastr.success('Data saved','Success');
+                    }
+                });
+
+            } else {
+                toastr.error('All form required','Error');
+            }
         }
 
     });
@@ -268,10 +355,14 @@
            if(jsonResult.ScheduleDetails.length>0){
                $('#dataRow').empty();
                for(var i=0;i<jsonResult.ScheduleDetails.length;i++){
-                   var d = jsonResult.ScheduleDetails[i]
+                   var d = jsonResult.ScheduleDetails[i];
+
+                   var c_of = (d.ProdiGroup!=null && d.ProdiGroup!='') ? d.Year+' - <span style="color: #2196f3;"><b>'+d.ProdiGroup+'</b></span>' : d.Year;
+
                    $('#dataRow').append('<tr>' +
                        '<td style="text-align: left;"><b>'+d.MKCode+' - '+d.MKNameEng+'</b><br/><i>'+d.MKNameEng+'</i></td>' +
                        '<td style="text-align: left;">'+d.Prodi+'</td>' +
+                       '<td>'+c_of+'</td>' +
                        '<td>'+d.Semester+'</td>' +
                        '<td style="background: lightyellow;">'+d.Offerto+'</td>' +
                        '<td>'+d.TotalStd_Plan.length+'</td>' +
