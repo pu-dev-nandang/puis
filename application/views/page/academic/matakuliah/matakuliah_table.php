@@ -8,6 +8,7 @@
             <th>Name (Indonesian)</th>
             <th>Name (English)</th>
             <th>Study Programme</th>
+            <th style="width: 50px;">Type</th>
         </tr>
         </thead>
         <tbody>
@@ -32,6 +33,7 @@
 
 <!--                <td>--><?php //echo $item_mk['Code'].' | '.$item_mk['NameProdiEng']; ?><!--</td>-->
                 <td><?php echo $item_mk['NameProdiEng']; ?></td>
+                <td><?php echo ($item_mk['IsMKU']=='1') ? 'MKU' : '-'; ?></td>
             </tr>
         <?php } ?>
         </tbody>

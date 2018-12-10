@@ -59,9 +59,17 @@
                 <td>Programme Study</td>
                 <td>:</td>
                 <td>
-                    <select class="form-control fm-prodi" data-id="1" id="formBaseProdi1">
-                        <option value="" selected disabled>--- Select Programme Study ---</option>
-                    </select>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <select class="form-control fm-prodi" data-id="1" id="formBaseProdi1">
+                                <option value="" selected disabled>--- Select Programme Study ---</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-control" id="formGroupProdi1" style="max-width: 200px;" disabled><option selected disabled>-- Select Group Prodi --</option></select>
+                            <input class="hide" readonly value="0" id="viewGroupProdi1">
+                        </div>
+                    </div>
                 </td>
             </tr>
             <tr class="">
@@ -497,6 +505,8 @@
         $('#divGabugan').addClass('hide');
 
         $('#formBaseProdi1').val('');
+        $('#formGroupProdi1').empty();
+        $('#formGroupProdi1').append('<option selected disabled>-- Select Group Prodi --</option>');
         $('#formCoordinator').select2("val","");
         $('#formMataKuliah1').select2("val","");
 
@@ -539,7 +549,13 @@
             '                <td>Program Studi</td>' +
             '                <td>:</td>' +
             '                <td>' +
-            '                    <select class="form-control fm-prodi" data-id="'+dataProdi+'" id="formBaseProdi'+dataProdi+'"><option value="" selected disabled>--- Select Programme Study ---</option></select>' +
+            '<div class="row">' +
+            '<div class="col-md-6"><select class="form-control fm-prodi" data-id="'+dataProdi+'" id="formBaseProdi'+dataProdi+'"><option value="" selected disabled>--- Select Programme Study ---</option></select></div>' +
+            '<div class="col-md-6">' +
+            '   <select class="form-control" id="formGroupProdi'+dataProdi+'" style="max-width: 200px;" disabled><option selected disabled>-- Select Group Prodi --</option></select>' +
+            '   <input class="hide" readonly value="0" id="viewGroupProdi'+dataProdi+'">' +
+            '</div>' +
+            '</div>' +
             '                </td>' +
             '            </tr>' +
             '            <tr class="tr-prodi tr-p'+dataProdi+'">' +
@@ -630,6 +646,8 @@
 
             var ProdiID = Prodi.split('.')[0];
             getCourseOfferings(ProdiID,divNum);
+            loadProdiGroup(ProdiID,divNum);
+
             if(dataProdi==1){
 
                 $('#viewClassGroup').text('-');
@@ -641,6 +659,30 @@
         }
 
     });
+
+    function loadProdiGroup(ProdiID,divNum) {
+        var data = {
+            action : 'readProdiGroup',
+            ProdiID : ProdiID
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api/__crudSchedule';
+        $('#formGroupProdi'+divNum).empty();
+        $('#formGroupProdi'+divNum).append('<option selected disabled>-- Select Group Prodi --</option>');
+        $.post(url,{token:token},function (jsonResult) {
+            if(jsonResult.length>0){
+                $('#formGroupProdi'+divNum).prop('disabled',false);
+                $('#viewGroupProdi'+divNum).val(1);
+                for(var i=0; i<jsonResult.length;i++){
+                    var d = jsonResult[i];
+                    $('#formGroupProdi'+divNum).append('<option value="'+d.ID+'">'+d.Code+'</option>');
+                }
+            } else {
+                $('#formGroupProdi'+divNum).prop('disabled',true);
+                $('#viewGroupProdi'+divNum).val(0);
+            }
+        });
+    }
 </script>
 
 <!-- CLASS GROUP -->
@@ -946,30 +988,69 @@
             var formBaseProdi = $('#formBaseProdi'+p).val();
             var formMataKuliah = $('#formMataKuliah'+p).val();
 
-            if(formBaseProdi!=null && formBaseProdi!='' &&
-                formMataKuliah!=null && formMataKuliah!=''){
+            var viewGroupProdi = parseInt($('#viewGroupProdi'+p).val());
+            var formGroupProdi = $('#formGroupProdi'+p).val();
 
-                var CDID = formMataKuliah.split('|')[0];
+            // Jika Prodi memiliki Group Prodi
+            if(viewGroupProdi==1){
+                if(formBaseProdi!=null && formBaseProdi!='' &&
+                    formMataKuliah!=null && formMataKuliah!='' &&
+                    formGroupProdi!=null && formGroupProdi!=''){
 
-                if($.inArray(CDID,arrCDID)==-1){
-                    var cdArr = {
-                        ScheduleID : 0,
-                        ProdiID : formBaseProdi.split('.')[0],
-                        CDID : CDID,
-                        MKID : formMataKuliah.split('|')[1]
-                    };
-                    schedule_details_course.push(cdArr);
-                    arrCDID.push(CDID);
+                    var CDID = formMataKuliah.split('|')[0];
+
+                    if($.inArray(CDID,arrCDID)==-1){
+                        var cdArr = {
+                            ScheduleID : 0,
+                            ProdiID : formBaseProdi.split('.')[0],
+                            ProdiGroupID : formGroupProdi,
+                            CDID : CDID,
+                            MKID : formMataKuliah.split('|')[1]
+                        };
+                        schedule_details_course.push(cdArr);
+                        arrCDID.push(CDID);
+                    } else {
+                        toastr.error('Please check course, course can not same','Error');
+                        process.push(0);
+                    }
+
                 } else {
-                    toastr.error('Please check course, course can not same','Error');
+                    requiredForm('#formBaseProdi'+p);
+                    requiredForm('#formGroupProdi'+p);
+                    requiredForm('#s2id_formMataKuliah'+p+' a');
                     process.push(0);
                 }
-
-            } else {
-                requiredForm('#formBaseProdi'+p);
-                requiredForm('#s2id_formMataKuliah'+p+' a');
-                process.push(0);
             }
+            // Jika Prodi TIDAK memiliki Group Prodi
+            else {
+                if(formBaseProdi!=null && formBaseProdi!='' &&
+                    formMataKuliah!=null && formMataKuliah!=''){
+
+                    var CDID = formMataKuliah.split('|')[0];
+
+                    if($.inArray(CDID,arrCDID)==-1){
+                        var cdArr = {
+                            ScheduleID : 0,
+                            ProdiID : formBaseProdi.split('.')[0],
+                            CDID : CDID,
+                            MKID : formMataKuliah.split('|')[1]
+                        };
+                        schedule_details_course.push(cdArr);
+                        arrCDID.push(CDID);
+                    } else {
+                        toastr.error('Please check course, course can not same','Error');
+                        process.push(0);
+                    }
+
+                }
+                else {
+                    requiredForm('#formBaseProdi'+p);
+                    requiredForm('#s2id_formMataKuliah'+p+' a');
+                    process.push(0);
+                }
+            }
+
+
         }
 
         var ClassGroup = $('#formClassGroupCadangan').val();

@@ -1188,6 +1188,13 @@ class C_api extends CI_Controller {
 
                 return print_r(json_encode($data));
             }
+            else if($data_arr['action']=='readProdiGroup'){
+                $dataGroupProdi = $this->db->order_by('Code','ASC')
+                    ->get_where('db_academic.prodi_group',
+                        array('ProdiID'=>$data_arr['ProdiID']))->result_array();
+
+                return print_r(json_encode($dataGroupProdi));
+            }
             else if($data_arr['action']=='delete'){
                 $ID = $data_arr['ScheduleID'];
 
