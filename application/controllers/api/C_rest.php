@@ -691,5 +691,58 @@ class C_rest extends CI_Controller {
         }
     }
 
+    public function sendEmail()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('m_sendemail');
+                $arr = array('to','subject','text');
+                $bool = true;
+                foreach ($dataToken as $key => $value) {
+                    if ($key != 'auth' && $key != 'attach') {
+                        if(!in_array($key,$arr))
+                        {
+                            $bool = false;
+                            $msg ='Field is not match, the field is : '.$key;
+                            break;
+                        }
+                    }
+                }
+
+                if ($bool) {
+                    $to = $dataToken['to'];
+                    $subject = $dataToken['to'];
+                    $text = $dataToken['text'];
+                    if (array_key_exists('attach',$dataToken)) {
+                        $path = $dataToken['attach'];
+                        $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,$path);
+                    }
+                    else
+                    {
+                        $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                    }
+
+                   $msg =  $sendEmail['msg'];
+                    
+                }
+
+                echo json_encode($msg);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
 
 }
