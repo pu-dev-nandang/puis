@@ -1286,4 +1286,24 @@ class C_budgeting extends Budgeting_Controler {
        
     }
 
+    public function pr()
+    {
+        $content = $this->load->view('global/budgeting/pr/page',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function page_pr()
+    {
+      $this->auth_ajax();
+      $this->data['arr_Year'] = $this->m_master->showData_array('db_budgeting.cfg_dateperiod');
+      $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
+      $Year = $get[0]['Year'];
+      $this->data['Year'] = $Year;
+      $arr_result = array('html' => '','jsonPass' => '');
+      $uri = $this->uri->segment(3);
+      $content = $this->load->view('global/budgeting/pr/'.$uri,$this->data,true);
+      $arr_result['html'] = $content;
+      echo json_encode($arr_result);
+    }
+
 }
