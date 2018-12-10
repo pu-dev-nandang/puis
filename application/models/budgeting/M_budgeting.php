@@ -344,4 +344,29 @@ class M_budgeting extends CI_Model {
             $YearsMonth = explode("-", $YearsMonth);
         }
     }
+
+    public function PostBudgetThisMonth_Department($Departement,$PostBudget,$Month)
+    {
+        $sql = 'select dd.ID,cc.CodePostBudget,cc.Year,cc.RealisasiPostName,cc.PostName,dd.ID_creator_budget,dd.YearsMonth,dd.Value,cc.CodePost from
+                        (
+                               select * from db_budgeting.creator_budget as a join (
+                               select a.CodePostBudget as CodePostBudget2,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
+                               from db_budgeting.cfg_postrealisasi as b left join db_budgeting.cfg_set_post as a on a.CodeSubPost = b.CodePostRealisasi
+                               join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
+                               where b.Departement = "'.$Departement.'"     
+                            ) as  b on a.CodePostBudget = b.CodePostBudget2 order by a.CodePostBudget asc
+                        ) cc join db_budgeting.budget_left as dd on cc.ID = dd.ID_creator_budget
+            where dd.YearsMonth like "'.$Month.'%" and cc.CodePost ="'.$PostBudget.'"';
+            $query=$this->db->query($sql, array())->result_array();
+            return $query;
+    }
+
+    public function getPostBudgetDepartement($Departement,$Year)
+    {
+        $sql = 'select a.* from db_budgeting.cfg_post as a left join db_budgeting.cfg_postrealisasi as b on a.CodePost = b.CodePost 
+            left join db_budgeting.cfg_set_post as c on b.CodePostRealisasi = c.CodeSubPost
+            where b.Departement = ? and c.Year = ? group by a.CodePost';
+        $query=$this->db->query($sql, array($Departement,$Year))->result_array();
+        return $query;
+    }
 }

@@ -1101,6 +1101,12 @@ class C_budgeting extends Budgeting_Controler {
                     'Note' => $creator_budget_approval->Note,
                 );
                 $this->db->insert('db_budgeting.creator_budget_approval', $dataSave);
+
+
+                // save date period
+                    $update = array('Status' => 0);
+                    $this->db->where('Year', $creator_budget_approval->Year);
+                    $this->db->update('db_budgeting.cfg_dateperiod', $update);
                 break;
             case 'edit':
                 $ID = $Input['ID'];
@@ -1168,6 +1174,11 @@ class C_budgeting extends Budgeting_Controler {
                     $ValueCode = $get2[$i]['CodePostBudget'];
                     $this->m_budgeting->makeCanBeDelete($tbl,$fieldCode,$ValueCode);
                 }
+
+                // save date period
+                    $update = array('Status' => 0);
+                    $this->db->where('Year', $Year);
+                    $this->db->update('db_budgeting.cfg_dateperiod', $update);
                 break;    
             default:
                 # code...
@@ -1304,6 +1315,27 @@ class C_budgeting extends Budgeting_Controler {
       $content = $this->load->view('global/budgeting/pr/'.$uri,$this->data,true);
       $arr_result['html'] = $content;
       echo json_encode($arr_result);
+    }
+
+    public function PostBudgetThisMonth_Department()
+    {
+        $this->auth_ajax();
+        $Input = $this->getInputToken();
+        $Month = date('Y-m');
+        $Departement = $Input['Departement'];
+        $PostBudget = $Input['PostBudget'];
+        $get = $this->m_budgeting->PostBudgetThisMonth_Department($Departement,$PostBudget,$Month);
+        echo json_encode($get);
+    }
+
+    public function getPostBudgetDepartement()
+    {
+        $this->auth_ajax();
+        $Input = $this->getInputToken();
+        $Departement = $Input['Departement'];
+        $Year = $Input['Year'];
+        $get = $this->m_budgeting->getPostBudgetDepartement($Departement,$Year);
+        echo json_encode($get);
     }
 
 }
