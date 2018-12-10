@@ -793,6 +793,7 @@ $route['rest/__trigger_formulir'] = 'api/c_rest/trigger_formulir';
 $route['rest/__rekapintake_beasiswa'] = 'api/c_rest/rekapintake_beasiswa';
 $route['rest/__rekapintake_perschool'] = 'api/c_rest/rekapintake_perschool';
 $route['rest/__rekapmhspayment'] = 'api/c_rest/rekapmhspayment';
+$route['rest/__sendEmail'] = 'api/c_rest/sendEmail';
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
 $route['api/__getRegionByProv'] = 'api/c_api/getRegionByProv';
