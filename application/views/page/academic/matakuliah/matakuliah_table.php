@@ -12,7 +12,14 @@
         </tr>
         </thead>
         <tbody>
-        <?php $no=1; foreach ($data_mk as $item_mk) { ?>
+        <?php $no=1; foreach ($data_mk as $item_mk) {
+            $TypeMK = '<span class="label label-default">Mandiri</span>';
+            if($item_mk['TypeMK']=='2'){
+                $TypeMK = '<span class="label label-primary"><b>MKDU</b></span>';
+            } else if($item_mk['TypeMK']=='3'){
+                    $TypeMK = '<span class="label label-warning"><b>MKU</b></span>';
+                }
+            ?>
             <tr>
                 <td class="td-center">
                     <div><?php echo $no++; ?></div>
@@ -33,7 +40,7 @@
 
 <!--                <td>--><?php //echo $item_mk['Code'].' | '.$item_mk['NameProdiEng']; ?><!--</td>-->
                 <td><?php echo $item_mk['NameProdiEng']; ?></td>
-                <td><?php echo ($item_mk['IsMKU']=='1') ? 'MKU' : '-'; ?></td>
+                <td><?php echo $TypeMK; ?></td>
             </tr>
         <?php } ?>
         </tbody>

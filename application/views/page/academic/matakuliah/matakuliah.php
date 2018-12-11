@@ -70,18 +70,17 @@
             '<td><input class="form-control" id="formNameEng"></td>' +
             '</tr>' +
             '<tr>' +
-            '<td></td>' +
-            '<td></td>' +
-            '<td><div class="checkbox">' +
-            '    <label>' +
-            '      <input type="checkbox" id="formIsMKU">Is <b>MKU</b> Course' +
-            '    </label>' +
-            '  </div></td>' +
+            '<td>Type</td>' +
+            '<td>:</td>' +
+            '<td>' +
+            '<select id="formTypeMK" class="form-control form-mk" style="max-width: 150px;"></select>' +
+            '</td>' +
             '</tr>' +
             '</table>' +
             '</div>');
 
         loadSelectOptionBaseProdiAll('#FormBaseProdi','');
+        loadSelectOptionTypeMK('#formTypeMK');
 
         $('#GlobalModal .modal-footer').html('<button type="button" id="btnClose" class="btn btn-default" data-dismiss="modal">Close</button>' +
             '<button type="button" class="btn btn-success" data-act="add" id="btnAddMK">Save</button>');
@@ -98,8 +97,6 @@
         var url = base_url_js+'api/__getMKByID';
         $.post(url,{idMK:idMK},function (data) {
             var valueMK = data[0];
-
-            var mku = (valueMK.IsMKU==1 || valueMK.IsMKU=='1') ? 'checked' : '';
 
             $('#GlobalModal .modal-header').html('<h4 class="modal-title">Mata Kuliah</h4>');
 
@@ -128,23 +125,24 @@
                 '<td><input class="form-control form-mk" id="formNameEng" value="'+valueMK.NameEng+'"></td>' +
                 '</tr>' +
                 '<tr>' +
-                '<td></td>' +
-                '<td></td>' +
-                '<td><div class="checkbox">' +
-                '    <label>' +
-                '      <input type="checkbox" id="formIsMKU" '+mku+'>Is <b>MKU</b> Course' +
-                '    </label>' +
-                '  </div></td>' +
+                '<td>Type</td>' +
+                '<td>:</td>' +
+                '<td>' +
+                '<select id="formTypeMK" class="form-control form-mk" style="max-width: 150px;"></select>' +
+                '</td>' +
                 '</tr>' +
                 '</table>' +
                 '</div>');
             loadSelectOptionBaseProdi('#FormBaseProdi',valueMK.BaseProdiID);
-            $('.form-mk,#formIsMKU').prop('disabled',true).css('color','#333');
+            $('.form-mk').prop('disabled',true).css('color','#333');
             $('#GlobalModal .modal-footer').html('<button type="button" id="btnClose" class="btn btn-default" data-dismiss="modal">Close</button>' +
                 '<button type="button" class="btn btn-success hide" data-act="edit" data-id="'+idMK+'" id="btnAddMK">Save</button>' +
                 '<button type="button" class="btn btn-info" id="btnEditMK">Edit Data</button>' +
                 // '<button type="button" class="btn btn-danger" data-act="delete" data-id="'+idMK+'" id="btnDeleteMK" style="float: left;">Delete</button>' +
                 '');
+
+            loadSelectOptionTypeMK('#formTypeMK',valueMK.TypeMK);
+
             $('#GlobalModal').modal({
                 'show' : true,
                 'backdrop' : 'static'
@@ -174,9 +172,9 @@
 
         var NameEng = $('#formNameEng').val();
 
-        var IsMKU = ($('input#formIsMKU').is(':checked')) ? '1' : '0';
+        var formTypeMK = $('#formTypeMK').val();
 
-        process = formRequired('#formCode,#formName,#formNameEng');
+        process = formRequired('#formCode,#formName,#formNameEng,#formTypeMK');
 
         if(process){
             // Cek Kesamaan Kode MK
@@ -195,7 +193,7 @@
                             Name : Name,
                             NameEng : NameEng,
                             BaseProdiID : prodi[0].trim(),
-                            IsMKU : IsMKU,
+                            TypeMK : formTypeMK,
                             UpdateBy : sessionNIP,
                             UpdateAt : dateTimeNow()
                         }
@@ -203,7 +201,7 @@
                     };
 
                     loading_button('#btnAddMK');
-                    $('#btnClose, #btnDeleteMK, #FormBaseProdi, #formCode, #formName, #formNameEng')
+                    $('#btnClose, #btnDeleteMK, .form-mk')
                         .prop('disabled',true);
 
                     var token = jwt_encode(data,'UAP)(*');
@@ -213,7 +211,7 @@
                         setTimeout(function () {
 
                             $('#btnAddMK').html('Save');
-                            $('#btnAddMK, #btnDeleteMK, #btnClose, #FormBaseProdi, #formCode, #formName, #formNameEng')
+                            $('#btnAddMK, #btnDeleteMK, #btnClose, .form-mk')
                                 .prop('disabled',false);
 
                             if(action=='add'){
@@ -299,7 +297,7 @@
     $(document).on('click','#btnEditMK',function () {
         $('#btnAddMK').removeClass('hide');
         $('#btnEditMK').addClass('hide');
-        $('.form-mk,#formIsMKU').prop('disabled',false).css('color','#333');
+        $('.form-mk').prop('disabled',false).css('color','#333');
     });
 
     function loadDataTableMK() {
