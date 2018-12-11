@@ -5642,24 +5642,26 @@ class C_api extends CI_Controller {
         $requestData= $_REQUEST;
         $data_arr = $this->getInputToken();
 
+
         $dataWhere = '';
 
-        if($data_arr['Year']!='' && $data_arr['ProdiID']=='' && $data_arr['StatusStudents']==''){
-            $dataWhere =  'WHERE (aut_s.Year = "'.$data_arr['Year'].'")';
-        } else if ($data_arr['Year']!='' && $data_arr['ProdiID']!='' && $data_arr['StatusStudents']==''){
-            $dataWhere =  'WHERE (aut_s.Year = "'.$data_arr['Year'].'" AND aut_s.ProdiID = "'.$data_arr['ProdiID'].'")';
-        } else if ($data_arr['Year']!='' && $data_arr['ProdiID']=='' && $data_arr['StatusStudents']!=''){
-            $dataWhere =  'WHERE (aut_s.Year = "'.$data_arr['Year'].'" AND aut_s.StatusStudentID = "'.$data_arr['StatusStudents'].'")';
-        } else if ($data_arr['Year']!='' && $data_arr['ProdiID']!='' && $data_arr['StatusStudents']!=''){
-            $dataWhere =  'WHERE (aut_s.Year = "'.$data_arr['Year'].'" AND aut_s.ProdiID = "'.$data_arr['ProdiID'].'" AND aut_s.StatusStudentID = "'.$data_arr['StatusStudents'].'")';
-        }
+        if($data_arr['Year']!='' || $data_arr['ProdiID']!='' || $data_arr['GroupProdiID']!='' || $data_arr['StatusStudents']!=''){
+            $w_Year = ($data_arr['Year']!='') ?  ' AND aut_s.Year = "'.$data_arr['Year'].'"' : '';
+            $w_ProdiID = ($data_arr['ProdiID']!='') ?  ' AND aut_s.ProdiID = "'.$data_arr['ProdiID'].'"' : '';
+            $w_GroupProdiID = ($data_arr['GroupProdiID']!='') ?  ' AND aut_s.ProdiGroupID = "'.$data_arr['GroupProdiID'].'"' : '';
+            $w_StatusStudents = ($data_arr['StatusStudents']!='') ?  ' AND aut_s.StatusStudentID = "'.$data_arr['StatusStudents'].'"' : '';
 
-        else if($data_arr['Year']=='' && $data_arr['ProdiID']!='' && $data_arr['StatusStudents']==''){
-            $dataWhere =  'WHERE (aut_s.ProdiID = "'.$data_arr['ProdiID'].'")';
-        } else if($data_arr['Year']=='' && $data_arr['ProdiID']!='' && $data_arr['StatusStudents']!=''){
-            $dataWhere =  'WHERE (aut_s.ProdiID = "'.$data_arr['ProdiID'].'" AND aut_s.StatusStudentID = "'.$data_arr['StatusStudents'].'")';
-        } else if($data_arr['Year']=='' && $data_arr['ProdiID']=='' && $data_arr['StatusStudents']!=''){
-            $dataWhere =  'WHERE (aut_s.StatusStudentID = "'.$data_arr['StatusStudents'].'")';
+            $dataWherePlan = 'WHERE ('.$w_Year.''.$w_ProdiID.''.$w_GroupProdiID.''.$w_StatusStudents.')';
+
+            $exp_w = explode(' ',$dataWherePlan);
+            if(count($exp_w)>0){
+                for($i=0;$i<count($exp_w);$i++){
+                    if($i!=2){
+                        $dataWhere = $dataWhere.' '.trim($exp_w[$i]);
+                    }
+                }
+            }
+
         }
 
 
@@ -5678,9 +5680,11 @@ class C_api extends CI_Controller {
 
         }
 
-        $queryDefault = 'SELECT aut_s.*, ps.Name AS ProdiName, ps.NameEng AS ProdiNameEng, ss.Description AS StatusStudent  
+        $queryDefault = 'SELECT aut_s.*, ps.Name AS ProdiName, ps.NameEng AS ProdiNameEng, ss.Description AS StatusStudent,  
+                                      pg.Code AS ProdiGroup
                                       FROM db_academic.auth_students aut_s
                                       LEFT JOIN db_academic.program_study ps ON (ps.ID = aut_s.ProdiID)
+                                      LEFT JOIN db_academic.prodi_group pg ON (pg.ID = aut_s.ProdiGroupID)
                                       LEFT JOIN db_academic.status_student ss ON (ss.ID = aut_s.StatusStudentID)
                                       '.$dataWhere.' '.$dataSearch.' ORDER BY aut_s.NPM ASC ';
 
@@ -5740,10 +5744,13 @@ class C_api extends CI_Controller {
                                 </div>
                             </form>';
 
+            $gp = ($row['ProdiGroupID']!='' && $row['ProdiGroupID']!=null) ? ' - '.$row['ProdiGroup'] : '';
+
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['NPM'].'</div>';
             $nestedData[] = '<div  style="text-align:center;"><img id="imgThum'.$row['NPM'].'" src="'.$srcImage.'" style="max-width: 35px;" class="img-rounded"></div>';
             $nestedData[] = '<div  style="text-align:left;"><a href="javascript:void(0);" data-npm="'.$row['NPM'].'" data-ta="'.$row['Year'].'" class="btnDetailStudent"><b>'.ucwords(strtolower($row['Name'])).'</b></a><br/><span style="color: #c77905;">'.$row['EmailPU'].'</span></div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$row['Year'].''.$gp.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['ProdiNameEng'].'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$fm.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$btnAct.'</div>';

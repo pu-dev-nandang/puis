@@ -1507,25 +1507,64 @@ class M_api extends CI_Model {
         return $query;
     }
 
-    public function __checkDateKRS($SemesterIDActive,$date,$ProdiID,$NPM,$DB_std){
+    public function __checkDateKRS($SemesterIDActive,$date,$ProdiID,$GroupProdiID,$ClassOf,$NPM,$DB_std){
 
-        // Cek apakah ada special casenya
-        $dataSC = $this->db->query('SELECT * FROM db_academic.academic_years_special_case WHERE SemesterID = "'.$SemesterIDActive.'"
-                                              AND AcademicDescID = 1 AND UserID = "'.$ProdiID.'" AND Status = "2"
-                                               AND Start <= "'.$date.'" AND End >= "'.$date.'" ')->result_array();
+        // Cek special case ke group prodi
+        $dataGroupSP = $this->db->query('SELECT * FROM db_academic.academic_years_sp_krs_1 aysk 
+                                              WHERE aysk.SemesterID = "'.$SemesterIDActive.'" AND
+                                               aysk.ClassOf = "'.$ClassOf.'" AND
+                                               aysk.ProdiID = "'.$ProdiID.'" AND
+                                                aysk.ProdiGroupID = "'.$GroupProdiID.'" LIMIT 1')
+                            ->result_array();
 
-        if(count($dataSC)>0){
+        $data[0] = [];
+
+        if(count($dataGroupSP)>0){
+
             $data[0] = array(
                 'SemesterID' => $SemesterIDActive,
-                'krsStart' => $dataSC[0]['Start'],
-                'krsEnd' => $dataSC[0]['End'],
+                'krsStart' => $dataGroupSP[0]['StartDate'],
+                'krsEnd' => $dataGroupSP[0]['EndDate'],
+                'Description' => 'SC : Group Prodi'
             );
-        }
-        else {
-            $data = $this->db->query('SELECT ay.krsStart,ay.krsEnd,ay.SemesterID FROM  db_academic.academic_years ay
+
+        } else {
+
+            $dataProdi = $this->db->query('SELECT * FROM db_academic.academic_years_sp_krs_1 aysk 
+                                              WHERE aysk.SemesterID = "'.$SemesterIDActive.'" AND
+                                               aysk.ClassOf = "'.$ClassOf.'" AND
+                                               aysk.ProdiID = "'.$ProdiID.'"  LIMIT 1')
+                ->result_array();
+
+            if(count($dataProdi)>0){
+
+                $data[0] = array(
+                    'SemesterID' => $SemesterIDActive,
+                    'krsStart' => $dataProdi[0]['StartDate'],
+                    'krsEnd' => $dataProdi[0]['EndDate'],
+                    'Description' => 'SC : Prodi'
+                );
+
+            } else {
+                $dataCL = $this->db->query('SELECT * FROM db_academic.academic_years_sp_krs_1 aysk 
+                                              WHERE aysk.SemesterID = "'.$SemesterIDActive.'" AND
+                                               aysk.ClassOf = "'.$ClassOf.'"')
+                    ->result_array();
+                if(count($dataCL)>0){
+                    $data[0] = array(
+                        'SemesterID' => $SemesterIDActive,
+                        'krsStart' => $dataCL[0]['StartDate'],
+                        'krsEnd' => $dataCL[0]['EndDate'],
+                        'Description' => 'SC : Class Of'
+                    );
+                } else {
+                    $data = $this->db->query('SELECT ay.krsStart,ay.krsEnd,ay.SemesterID FROM  db_academic.academic_years ay
                                             WHERE ay.krsStart <= "'.$date.'" 
                                             AND ay.krsEnd >= "'.$date.'" 
-                                            AND ay.SemesterID = "'.$SemesterIDActive.'" ')->result_array();
+                                            AND ay.SemesterID = "'.$SemesterIDActive.'" LIMIT 1')->result_array();
+                }
+            }
+
         }
 
 
@@ -1538,10 +1577,7 @@ class M_api extends CI_Model {
                                                     AND s.Status = 1 ')->result_array();
             $data[0]['PaymentDetails'] = $dataCekbayarBPP;
         }
-//        else {
-//            $data = $this->db->query('SELECT ay.krsStart,ay.krsEnd,ay.SemesterID FROM  db_academic.academic_years ay
-//                                            WHERE ay.SemesterID = "'.$SemesterIDActive.'" ')->result_array();
-//        }
+
         return $data;
     }
 
