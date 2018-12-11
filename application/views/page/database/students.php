@@ -11,19 +11,25 @@
     <div class="col-md-8">
         <div class="well">
             <div class="row">
-                <div class="col-xs-4">
+                <div class="col-xs-3">
                     <select class="form-control filter-db-std" id="filterCurriculum">
-                        <option value="">-- All Curriculum --</option>
+                        <option value="">-- All Class Of --</option>
                         <option disabled>------------------------</option>
                     </select>
                 </div>
-                <div class="col-xs-5">
+                <div class="col-xs-4">
                     <select class="form-control filter-db-std" id="filterBaseProdi">
                         <option value="">-- All Programme Study --</option>
                         <option disabled>------------------------</option>
                     </select>
                 </div>
                 <div class="col-xs-3">
+                    <select class="form-control filter-db-std" id="filterGroupProdi">
+                        <option value="">-- All Group Student --</option>
+                        <option disabled>------------------------</option>
+                    </select>
+                </div>
+                <div class="col-xs-2">
                     <select class="form-control filter-db-std" id="filterStatus">
                         <option value="">-- All Status --</option>
                         <option disabled>------------------------</option>
@@ -48,20 +54,26 @@
 
 <div class="row">
     <div class="col-md-12">
-        <div id="divDataStudent">
-
-        </div>
+        <div id="divDataStudent"></div>
     </div>
 </div>
 
 
 <script>
     $(document).ready(function () {
-        loadSelectOptionCurriculumNoSelect('#filterCurriculum','');
+        loadSelectOptionClassOf_ASC('#filterCurriculum','');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
         loadSelectOptionStatusStudent('#filterStatus','');
         loadStudent();
 
+    });
+
+    $(document).on('change','#filterBaseProdi',function () {
+        var filterBaseProdi = $('#filterBaseProdi').val();
+        $('#filterGroupProdi').empty();
+        $('#filterGroupProdi').append('<option value="">-- All Group Student --</option>' +
+            '                        <option disabled>------------------------</option>');
+        load_SO_ProdiGroup(filterBaseProdi.split('.')[0],'#filterGroupProdi','');
     });
 
     $('.filter-db-std').change(function () {
@@ -248,6 +260,7 @@
         loading_page('#divDataStudent');
         var filterCurriculum = $('#filterCurriculum').val();
         var filterBaseProdi = $('#filterBaseProdi').val();
+        var filterGroupProdi = $('#filterGroupProdi').val();
         var filterStatus = $('#filterStatus').val();
 
         var Year = (filterCurriculum!='' && filterCurriculum!=null)
@@ -265,6 +278,7 @@
                 '                    <th style="width: 7%;">NIM</th>' +
                 '                    <th style="width: 5%;">Photo</th>' +
                 '                    <th style="">Name</th>' +
+                '                    <th style="width: 7%;">Class Of</th>' +
                 '                    <th style="width: 15%;">Progamme Study</th>' +
                 '                    <th style="width: 5%;">Upload Photo</th>' +
                 '                    <th style="width: 5%;">Action</th>' +
@@ -277,6 +291,7 @@
             var data = {
                 Year : Year,
                 ProdiID : ProdiID,
+                GroupProdiID : filterGroupProdi,
                 StatusStudents : StatusStudents
             };
             var token = jwt_encode(data,'UAP)(*');
@@ -301,7 +316,7 @@
                     }
                 }
             } );
-        },1000);
+        },500);
 
     }
 
