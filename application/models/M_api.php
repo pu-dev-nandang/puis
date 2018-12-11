@@ -1514,7 +1514,7 @@ class M_api extends CI_Model {
                                               WHERE aysk.SemesterID = "'.$SemesterIDActive.'" AND
                                                aysk.ClassOf = "'.$ClassOf.'" AND
                                                aysk.ProdiID = "'.$ProdiID.'" AND
-                                                aysk.ProdiGroupID = "'.$GroupProdiID.'" LIMIT 1')
+                                                aysk.ProdiGroupID = "'.$GroupProdiID.'" ORDER BY ID DESC LIMIT 1')
                             ->result_array();
 
         $data[0] = [];
@@ -1533,7 +1533,7 @@ class M_api extends CI_Model {
             $dataProdi = $this->db->query('SELECT * FROM db_academic.academic_years_sp_krs_1 aysk 
                                               WHERE aysk.SemesterID = "'.$SemesterIDActive.'" AND
                                                aysk.ClassOf = "'.$ClassOf.'" AND
-                                               aysk.ProdiID = "'.$ProdiID.'"  LIMIT 1')
+                                               aysk.ProdiID = "'.$ProdiID.'"  ORDER BY ID DESC LIMIT 1')
                 ->result_array();
 
             if(count($dataProdi)>0){
@@ -1548,7 +1548,8 @@ class M_api extends CI_Model {
             } else {
                 $dataCL = $this->db->query('SELECT * FROM db_academic.academic_years_sp_krs_1 aysk 
                                               WHERE aysk.SemesterID = "'.$SemesterIDActive.'" AND
-                                               aysk.ClassOf = "'.$ClassOf.'"')
+                                               aysk.ClassOf = "'.$ClassOf.'"
+                                                ORDER BY ID DESC LIMIT 1')
                     ->result_array();
                 if(count($dataCL)>0){
                     $data[0] = array(
