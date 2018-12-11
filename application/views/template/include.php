@@ -609,6 +609,28 @@
             }
 
         });
+    }
+
+    function loadSelectOptionTypeMK(element,selected) {
+
+        var dataTypeMK = [
+            {
+                ID : '1',
+                Type:'Mandiri'},
+            {
+                ID : '2',
+                Type:'MKDU'},
+            {
+                ID : '3',
+                Type:'MKU'}];
+
+        for(var i=0;i<dataTypeMK.length;i++){
+            var d = dataTypeMK[i];
+            var sc = (selected!='' && typeof selected !== 'undefined' && d.ID==selected) ? 'selected' : '';
+            $(element).append('<option value="'+d.ID+'" '+sc+'>'+d.Type+'</option>');
+        }
+
+
 
     }
 
