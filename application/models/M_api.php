@@ -1512,9 +1512,10 @@ class M_api extends CI_Model {
         // Cek special case ke group prodi
         $dataGroupSP = $this->db->query('SELECT * FROM db_academic.academic_years_sp_krs_1 aysk 
                                               WHERE aysk.SemesterID = "'.$SemesterIDActive.'" AND
-                                               aysk.ClassOf = "'.$ClassOf.'" AND
-                                               aysk.ProdiID = "'.$ProdiID.'" AND
-                                                aysk.ProdiGroupID = "'.$GroupProdiID.'" ORDER BY ID DESC LIMIT 1')
+                                              aysk.ClassOf = "'.$ClassOf.'" AND
+                                              aysk.ProdiID = "'.$ProdiID.'" AND
+                                              aysk.ProdiGroupID = "'.$GroupProdiID.'" 
+                                              ORDER BY ID DESC LIMIT 1')
                             ->result_array();
 
         $data[0] = [];
@@ -1533,7 +1534,9 @@ class M_api extends CI_Model {
             $dataProdi = $this->db->query('SELECT * FROM db_academic.academic_years_sp_krs_1 aysk 
                                               WHERE aysk.SemesterID = "'.$SemesterIDActive.'" AND
                                                aysk.ClassOf = "'.$ClassOf.'" AND
-                                               aysk.ProdiID = "'.$ProdiID.'"  ORDER BY ID DESC LIMIT 1')
+                                               aysk.ProdiID = "'.$ProdiID.'" AND
+                                               aysk.ProdiGroupID IS NULL
+                                                 ORDER BY ID DESC LIMIT 1')
                 ->result_array();
 
             if(count($dataProdi)>0){
@@ -1548,7 +1551,9 @@ class M_api extends CI_Model {
             } else {
                 $dataCL = $this->db->query('SELECT * FROM db_academic.academic_years_sp_krs_1 aysk 
                                               WHERE aysk.SemesterID = "'.$SemesterIDActive.'" AND
-                                               aysk.ClassOf = "'.$ClassOf.'"
+                                               aysk.ClassOf = "'.$ClassOf.'" AND
+                                               aysk.ProdiID IS NULL AND
+                                               aysk.ProdiGroupID IS NULL
                                                 ORDER BY ID DESC LIMIT 1')
                     ->result_array();
                 if(count($dataCL)>0){
@@ -1560,9 +1565,7 @@ class M_api extends CI_Model {
                     );
                 } else {
                     $data = $this->db->query('SELECT ay.krsStart,ay.krsEnd,ay.SemesterID FROM  db_academic.academic_years ay
-                                            WHERE ay.krsStart <= "'.$date.'" 
-                                            AND ay.krsEnd >= "'.$date.'" 
-                                            AND ay.SemesterID = "'.$SemesterIDActive.'" LIMIT 1')->result_array();
+                                            WHERE ay.SemesterID = "'.$SemesterIDActive.'" LIMIT 1')->result_array();
                 }
             }
 
@@ -1577,6 +1580,25 @@ class M_api extends CI_Model {
                                                     AND p.NPM = "'.$NPM.'" 
                                                     AND s.Status = 1 ')->result_array();
             $data[0]['PaymentDetails'] = $dataCekbayarBPP;
+
+
+            $todayDate = date('Y-m-d');
+            $today = date('Y-m-d', strtotime($todayDate));
+
+            $contractDateBegin = date('Y-m-d', strtotime($data[0]['krsStart']));
+            $contractDateEnd = date('Y-m-d', strtotime($data[0]['krsEnd']));
+
+            if (($today >= $contractDateBegin) && ($today <= $contractDateEnd)){
+                $data[0]['Status'] = 1;
+            }else{
+                $data[0]['Status'] = 0;
+            }
+
+//            if($data[0]['krsStart'] <= $data && $data[0]['krsEnd'] >= $data){
+//                $data[0]['Status'] = 1;
+//            } else {
+//                $data[0]['Status'] = 0;
+//            }
         }
 
         return $data;
