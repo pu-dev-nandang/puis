@@ -448,33 +448,51 @@
 
     // ===== Save BTN Special Case KRS ======
     $(document).on('click','#btnSave_SPKRS',function () {
-        var formProdi_SPKRS = $('#formProdi_SPKRS').val();
+
+        var formSPClassOf = $('#formSPClassOf').val();
         var formStart_SPKRS = $('#formStart_SPKRS').datepicker("getDate");
         var formEnd_SPKRS = $('#formEnd_SPKRS').datepicker("getDate");
 
-        if(formProdi_SPKRS!=null && formProdi_SPKRS!=''
+        if(formSPClassOf!=null && formSPClassOf!=''
             && formStart_SPKRS!=null && formStart_SPKRS!=''
             && formEnd_SPKRS!=null && formEnd_SPKRS!=''){
-            var ProdiID = formProdi_SPKRS.split('.')[0];
+
+            var formSPProdiID = $('#formSPProdiID').val();
+            var ProdiID = (formSPProdiID!='' && formSPProdiID!=null)
+                ? formSPProdiID.split('.')[0]
+                : null ;
+
+            var formSPGroupProdiID = $('#formSPGroupProdiID').val();
+            var ProdiGroupID = (formSPGroupProdiID!='' && formSPGroupProdiID!=null)
+                ? formSPGroupProdiID : null;
+
+            var CurriculumID = formSPClassOf.split('.')[0];
+            var ClassOf = formSPClassOf.split('.')[1];
+
             var Start = moment(formStart_SPKRS).format('YYYY-MM-DD');
             var End = moment(formEnd_SPKRS).format('YYYY-MM-DD');
 
             var data = {
-                action : 'insertSCKRS',
+                action : 'insertSP_KRS',
                 dataForm : {
                     SemesterID : ID,
-                    AcademicDescID : 1, // Lihat di tabel academic_years_desc
-                    UserID : ProdiID,
-                    DataID : 0,
-                    Start : Start,
-                    End : End,
-                    Status : '2' // Lihat di comment table academic_special_case
+                    CurriculumID : CurriculumID,
+                    ClassOf : ClassOf,
+
+                    ProdiID : ProdiID,
+                    ProdiGroupID : ProdiGroupID,
+
+                    StartDate : Start,
+                    EndDate : End,
+                    CreateBy : sessionNIP,
+                    CreateAt : dateTimeNow()
                 }
             };
 
             loading_buttonSm('#btnSave_SPKRS');
             var token = jwt_encode(data,'UAP)(*');
-            var url = base_url_js+'api/__crudDataDetailTahunAkademik';
+            var url = base_url_js+'api/__crudSpecialCaseKRS';
+
             $.post(url,{token:token},function (jsonResult) {
                 $('#formProdi_SPKRS').val('');
                 loadDataSPKRS();
@@ -488,20 +506,26 @@
     });
 
     $(document).on('click','.btn-delete-aysc-krs',function () {
-        var ID = $(this).attr('data-id');
-        var data = {
-            action : 'deleteSCKRS',
-            ID : ID
-        };
-        var url = base_url_js+'api/__crudDataDetailTahunAkademik';
-        var token = jwt_encode(data,'UAP)(*');
-        loading_buttonSm('button[data-id='+ID+']');
-        $.post(url,{token:token},function (result) {
-            toastr.success('Data deleted','Success');
-            setTimeout(function () {
-                $('#rwTr'+ID).remove();
-            },1000);
-        });
+
+        if(confirm('Are you sure to delete this data?')){
+
+            var ID = $(this).attr('data-id');
+            var data = {
+                action : 'deleteSP_KRS',
+                ID : ID
+            };
+
+            var url = base_url_js+'api/__crudSpecialCaseKRS';
+            var token = jwt_encode(data,'UAP)(*');
+            loading_buttonSm('button[data-id='+ID+']');
+            $.post(url,{token:token},function (result) {
+                toastr.success('Data deleted','Success');
+                setTimeout(function () {
+                    loadDataSPKRS();
+                },500);
+            });
+
+        }
 
     });
     //=====================
@@ -555,4 +579,18 @@
         });
 
     }
+
+    // === Load Prodi Group di Special Case KRS ===
+    $(document).on('change','#formSPProdiID',function () {
+
+        $('#formSPGroupProdiID').empty();
+        $('#formSPGroupProdiID').append('<option value="" selected>All Group</option>' +
+            '<option value="" disabled>-------------</option>');
+        var formSPProdiID = $('#formSPProdiID').val();
+        if(formSPProdiID!='' && formSPProdiID!=null){
+            load_SO_ProdiGroup(formSPProdiID.split('.')[0],'#formSPGroupProdiID');
+        }
+
+
+    });
 </script>

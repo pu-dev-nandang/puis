@@ -674,6 +674,8 @@ $route['api/__crudMataKuliah'] = 'api/c_api/crudMataKuliah';
 
 $route['api/__crudTahunAkademik'] = 'api/c_api/crudTahunAkademik';
 $route['api/__crudStatusStudents'] = 'api/c_api/crudStatusStudents';
+$route['api/__crudProdiGroup'] = 'api/c_api/crudProdiGroup';
+$route['api/__crudSpecialCaseKRS'] = 'api/c_api/crudSpecialCaseKRS';
 
 $route['api/__crudDataDetailTahunAkademik'] = 'api/c_api/crudDataDetailTahunAkademik';
 

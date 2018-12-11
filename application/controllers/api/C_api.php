@@ -969,6 +969,46 @@ class C_api extends CI_Controller {
         }
     }
 
+    public function crudSpecialCaseKRS(){
+        $data_arr = $this->getInputToken();
+
+        if(count($data_arr)>0){
+            if($data_arr['action']=='insertSP_KRS'){
+                $dataForm = (array) $data_arr['dataForm'];
+                $this->db->insert('db_academic.academic_years_sp_krs_1', $dataForm);
+                return print_r(1);
+            }
+            else if($data_arr['action']=='readSP_KRS'){
+
+                $data = $this->db->query('SELECT aysk.*, ps.NameEng AS ProdiEng, pg.Code AS ProdiGroup FROM db_academic.academic_years_sp_krs_1 aysk 
+                                                          LEFT JOIN db_academic.program_study ps ON (ps.ID = aysk.ProdiID)
+                                                          LEFT JOIN db_academic.prodi_group pg ON (pg.ID = aysk.ProdiGroupID)
+                                                          WHERE aysk.SemesterID = "'.$data_arr['SemesterID'].'" 
+                                                          ORDER BY aysk.ID ASC ')->result_array();
+
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='deleteSP_KRS'){
+                $ID = $data_arr['ID'];
+                $this->db->delete('db_academic.academic_years_sp_krs_1',
+                    array('ID'=>$ID));
+                return print_r(1);
+            }
+        }
+    }
+
+    public function crudProdiGroup(){
+        $data_arr = $this->getInputToken();
+
+        if(count($data_arr)>0){
+            if($data_arr['action']=='readProdiGroup'){
+                $data = $this->db->order_by('Code','ASC')->get_where('db_academic.prodi_group',array('ProdiID'=>$data_arr['ProdiID']))
+                    ->result_array();
+                return print_r(json_encode($data));
+            }
+        }
+    }
+
     public function crudDataDetailTahunAkademik(){
 
         $token = $this->input->post('token');
