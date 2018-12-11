@@ -157,16 +157,19 @@
 													$NamaMataKuliah = '';
 													$NamaDosen = '';
 													$jumlahMHS = '';
-													$Details = $data_pass[$k]['user'];
+													//$Details = $data_pass[$k]['user'];
+													$Details = '';
 												}
 												else
 												{
 													$NamaMataKuliah = $data_pass[$k]['NamaMataKuliah'];
 													$NamaDosen = $data_pass[$k]['NamaDosen'];
 													$jumlahMHS = $data_pass[$k]['jumlahMHS'];
-													$Details = $NamaMataKuliah.' / '.$NamaDosen.' / '.$jumlahMHS;
+													// $Details = $NamaMataKuliah.' / '.$NamaDosen.' / '.$jumlahMHS;
+													$Details = '';
 													if ($data_pass[$k]['user'] == 'Academic TimeTables EX') {
-														$Details = $data_pass[$k]['user'].'<br>'.$NamaMataKuliah.' / '.$NamaDosen.' / '.$jumlahMHS;
+														//$Details = $data_pass[$k]['user'].'<br>'.$NamaMataKuliah.' / '.$NamaDosen.' / '.$jumlahMHS;
+														$Details = '';
 													}
 												}
 											?>
