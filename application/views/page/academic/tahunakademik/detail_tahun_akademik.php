@@ -252,7 +252,7 @@
         }
         var token = jwt_encode(data,'UAP)(*');
         $.post(url,{token:token}, function (data) {
-            // console.log(data);
+
             $('#nameTahunAkademik').html(data.TahunAkademik.Name);
 
             (data.DetailTA.bayarBPPStart!=='0000-00-00' && data.DetailTA.bayarBPPStart!==null) ? $('#bpp_start').datepicker('setDate',new Date(data.DetailTA.bayarBPPStart)) : '';
@@ -320,12 +320,66 @@
 
 </script>
 
+
+
 <script>
     $('#idBtnSPKRS').click(function () {
 
         loadDataSPKRS();
-
-        var dataBody = '<div class="well">' +
+        var dataBody = '<div class="well" style="padding: 10px;">' +
+            '    <div class="row">' +
+            '        <div class="col-md-3">' +
+            '            <div class="form-group">' +
+            '                <label>Class Of</label>' +
+            '                <select class="form-control" id="formSPClassOf"></select>' +
+            '            </div>' +
+            '        </div>' +
+            '        <div class="col-md-6">' +
+            '            <div class="form-group">' +
+            '                <label>Programme Study</label>' +
+            '                <select class="form-control" id="formSPProdiID"></select>' +
+            '            </div>' +
+            '        </div>' +
+            '        <div class="col-md-3">' +
+            '            <div class="form-group">' +
+            '                <label>Prodi Group</label>' +
+            '                <select class="form-control" id="formSPGroupProdiID"><option value="" selected>All Group</option></select>' +
+            '            </div>' +
+            '        </div>' +
+            '    </div>' +
+            '    <div class="row">' +
+            '        <div class="col-md-6">' +
+            '            <div class="form-group">' +
+            '                <label>Start</label>' +
+            '                <input id="formStart_SPKRS" class="form-control form-tahun-akademik" readonly>' +
+            '            </div>' +
+            '        </div>' +
+            '        <div class="col-md-6">' +
+            '            <div class="form-group">' +
+            '                <label>End</label>' +
+            '                <input id="formEnd_SPKRS" class="form-control form-tahun-akademik" readonly>' +
+            '               <button id="btnSave_SPKRS" class="btn btn-primary" style="float: right;margin-top:15px;">Save</button>' +
+            '            </div>' +
+            '        </div>' +
+            '    </div>' +
+            '</div>' +
+            '<div class="row">' +
+            '    <div class="col-md-12">' +
+            '        <table class="table table-bordered table-striped" id="tableSPKRS">' +
+            '            <thead>' +
+            '            <tr style="background: #437e88;color: #ffffff;">' +
+            '                <th style="width: 8%;">No</th>' +
+            '                <th style="width: 17%;">Class Of</th>' +
+            '                <th>Prodi</th>' +
+            '                <th style="width: 29%;">Date</th>' +
+            '                <th style="width: 8%;"><i class="fa fa-cog"></i></th>' +
+            '            </tr>' +
+            '            </thead>' +
+            '            <tbody id="dataTrSPKRS"></tbody>' +
+            '        </table>' +
+            '    </div>' +
+            '</div>';
+        var dataBody2 = '<div class="well">' +
             '    <div class="row">' +
             '        <div class="col-xs-12">' +
             '            <div class="form-group">' +
@@ -364,12 +418,16 @@
             '<span aria-hidden="true">&times;</span></button>' +
             '<h4 class="modal-title">Special Case - KRS</h4>');
         $('#GlobalModal .modal-body').html(dataBody);
+
+        loadSelectOptionClassOf_ASC('#formSPClassOf','');
+
+        $('#formSPProdiID').append('<option value="" selected>--- All Programme Study ---</option>' +
+            '<option disabled>------------------------------------------</option>');
+        loadSelectOptionBaseProdi('#formSPProdiID','');
+
+
         $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
 
-        $('#formProdi_SPKRS').empty();
-        $('#formProdi_SPKRS').append('<option value="" disabled selected>--- Select Program Study ---</option>' +
-            '<option disabled>------------------------------------------</option>');
-        loadSelectOptionBaseProdi('#formProdi_SPKRS','');
 
         $('#formStart_SPKRS').datepicker({
             showOtherMonths:true,
@@ -390,15 +448,46 @@
 
     function loadDataSPKRS() {
 
-        var url = base_url_js+'api/__crudDataDetailTahunAkademik';
+        var url = base_url_js+'api/__crudSpecialCaseKRS';
         var data = {
-            action : 'readSCKRS',
+            action : 'readSP_KRS',
             SemesterID : ID
         };
 
         var token = jwt_encode(data,'UAP)(*');
         $('#dataTrSPKRS').empty();
         $.post(url,{token:token},function (jsonResult) {
+
+            $('#dataTrSPKRS').empty();
+            if(jsonResult.length>0){
+                var no = 1;
+                for(var i=0;i<jsonResult.length;i++){
+                    var d = jsonResult[i];
+
+
+                    var prodi = (d.ProdiID!='' && d.ProdiID!=null)
+                        ? d.ProdiEng : '<b style="color:red;">All Progamme Study</b>';
+
+                    var groupP = (d.ProdiGroupID!='' && d.ProdiGroupID!=null)
+                        ? ' - <b>'+d.ProdiGroup+'</b>' : '';
+
+
+                    $('#dataTrSPKRS').append('<tr>' +
+                        '<td>'+(no++)+'</td>' +
+                        '<td>'+d.ClassOf+''+groupP+'</td>' +
+                        '<td style="text-align: left;">'+prodi+'</td>' +
+                        '<td style="text-align: left;">' +
+                        '<div>Start : <b>'+moment(d.StartDate).format('DD MMM YYYY')+'</b></div>' +
+                        '<div>End : <b>'+moment(d.EndDate).format('DD MMM YYYY')+'</b></div>' +
+                        '</td>' +
+                        '<td><button class="btn btn-sm btn-danger btn-delete-aysc-krs" data-id="'+d.ID+'"><i class="fa fa-trash"></i></button></td>' +
+                        '</tr>');
+                }
+            } else {
+                $('#dataTrSPKRS').append('<tr><td colspan="4">-- Data Not Yet --</td></tr>');
+            }
+
+            return false;
 
             if(jsonResult.length>0){
                 for(var i=0;i<jsonResult.length;i++){
