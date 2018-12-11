@@ -69,6 +69,15 @@
             '<td>:</td>' +
             '<td><input class="form-control" id="formNameEng"></td>' +
             '</tr>' +
+            '<tr>' +
+            '<td></td>' +
+            '<td></td>' +
+            '<td><div class="checkbox">' +
+            '    <label>' +
+            '      <input type="checkbox" id="formIsMKU">Is <b>MKU</b> Course' +
+            '    </label>' +
+            '  </div></td>' +
+            '</tr>' +
             '</table>' +
             '</div>');
 
@@ -89,6 +98,8 @@
         var url = base_url_js+'api/__getMKByID';
         $.post(url,{idMK:idMK},function (data) {
             var valueMK = data[0];
+
+            var mku = (valueMK.IsMKU==1 || valueMK.IsMKU=='1') ? 'checked' : '';
 
             $('#GlobalModal .modal-header').html('<h4 class="modal-title">Mata Kuliah</h4>');
 
@@ -116,10 +127,19 @@
                 '<td>:</td>' +
                 '<td><input class="form-control form-mk" id="formNameEng" value="'+valueMK.NameEng+'"></td>' +
                 '</tr>' +
+                '<tr>' +
+                '<td></td>' +
+                '<td></td>' +
+                '<td><div class="checkbox">' +
+                '    <label>' +
+                '      <input type="checkbox" id="formIsMKU" '+mku+'>Is <b>MKU</b> Course' +
+                '    </label>' +
+                '  </div></td>' +
+                '</tr>' +
                 '</table>' +
                 '</div>');
             loadSelectOptionBaseProdi('#FormBaseProdi',valueMK.BaseProdiID);
-            $('.form-mk').prop('disabled',true).css('color','#333');
+            $('.form-mk,#formIsMKU').prop('disabled',true).css('color','#333');
             $('#GlobalModal .modal-footer').html('<button type="button" id="btnClose" class="btn btn-default" data-dismiss="modal">Close</button>' +
                 '<button type="button" class="btn btn-success hide" data-act="edit" data-id="'+idMK+'" id="btnAddMK">Save</button>' +
                 '<button type="button" class="btn btn-info" id="btnEditMK">Edit Data</button>' +
@@ -154,6 +174,8 @@
 
         var NameEng = $('#formNameEng').val();
 
+        var IsMKU = ($('input#formIsMKU').is(':checked')) ? '1' : '0';
+
         process = formRequired('#formCode,#formName,#formNameEng');
 
         if(process){
@@ -173,6 +195,7 @@
                             Name : Name,
                             NameEng : NameEng,
                             BaseProdiID : prodi[0].trim(),
+                            IsMKU : IsMKU,
                             UpdateBy : sessionNIP,
                             UpdateAt : dateTimeNow()
                         }
@@ -276,7 +299,7 @@
     $(document).on('click','#btnEditMK',function () {
         $('#btnAddMK').removeClass('hide');
         $('#btnEditMK').addClass('hide');
-        $('.form-mk').prop('disabled',false).css('color','#333');
+        $('.form-mk,#formIsMKU').prop('disabled',false).css('color','#333');
     });
 
     function loadDataTableMK() {
@@ -292,7 +315,7 @@
             $.get(url,function (html) {
                 $('#loadTableMK').html(html);
             });
-        },1000);
+        },500);
 
 
     }
@@ -307,11 +330,9 @@
 
         var elementArr = element.split(',');
 
-        console.log(elementArr);
-
         var res;
         for(var i=0;i<elementArr.length;i++){
-            console.log(elementArr[i]);
+
             var val = $(elementArr[i]).val();
             if(val==''){
                 $(''+elementArr[i]).css('border','1px solid red');

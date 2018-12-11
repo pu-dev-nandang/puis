@@ -172,7 +172,7 @@
 
 <hr/>
 <div style="text-align: right;">
-    <a href="<?php echo base_url('academic/tahun-akademik'); ?>" id="btnBack" class="btn btn-info"><i class="fa fa-arrow-circle-left right-margin" aria-hidden="true"></i> Back</a>
+    <a href="<?php echo base_url('academic/academic-year'); ?>" id="btnBack" class="btn btn-info"><i class="fa fa-arrow-circle-left right-margin" aria-hidden="true"></i> Back</a>
     <button class="btn btn-success" id="btnSaveDetail">Save</button>
 </div>
 
@@ -235,6 +235,7 @@
         var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'api/__crudDataDetailTahunAkademik';
         $.post(url,{token:token},function (data) {
+            toastr.success('Data saved','Success!');
             setTimeout(function () {
                 $('#btnSaveDetail').prop('disabled',false).html('Save');
                 $('.form-tahun-akademik,#btnBack').prop('disabled',false);

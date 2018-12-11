@@ -1188,6 +1188,13 @@ class C_api extends CI_Controller {
 
                 return print_r(json_encode($data));
             }
+            else if($data_arr['action']=='readProdiGroup'){
+                $dataGroupProdi = $this->db->order_by('Code','ASC')
+                    ->get_where('db_academic.prodi_group',
+                        array('ProdiID'=>$data_arr['ProdiID']))->result_array();
+
+                return print_r(json_encode($dataGroupProdi));
+            }
             else if($data_arr['action']=='delete'){
                 $ID = $data_arr['ScheduleID'];
 
@@ -1445,14 +1452,17 @@ class C_api extends CI_Controller {
                 $SemesterID = $data_arr['SemesterID'];
                 $ScheduleID = $data_arr['ScheduleID'];
 
-                $data = $this->db->query('SELECT sdc.ID AS SDCID, sdc.CDID, mk.MKCode, mk.NameEng AS MKNameEng, mk.Name AS MKName, cd.Semester, ps.Name AS Prodi, co.Semester AS Offerto   
+                $data = $this->db->query('SELECT sdc.ID AS SDCID, sdc.CDID, mk.MKCode, mk.NameEng AS MKNameEng, mk.Name AS MKName, cd.Semester, ps.Name AS Prodi, 
+                                                    co.Semester AS Offerto, sdc.ProdiGroupID, pg.Code AS ProdiGroup, crr.Year
                                                     FROM db_academic.schedule_details_course sdc
+                                                    LEFT JOIN db_academic.prodi_group pg ON (pg.ID = sdc.ProdiGroupID)
                                                     LEFT JOIN db_academic.schedule s ON (s.ID = sdc.ScheduleID)
                                                     LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
                                                     LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                                     LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
                                                     LEFT JOIN db_academic.course_offerings co ON (co.SemesterID = s.SemesterID AND co.ProdiID = sdc.ProdiID 
                                                     AND co.CurriculumID = cd.CurriculumID)
+                                                    LEFT JOIN db_academic.curriculum crr ON (crr.ID = cd.CurriculumID)
                                                     WHERE sdc.ScheduleID = "'.$ScheduleID.'" AND s.SemesterID = "'.$SemesterID.'"
                                                     ORDER BY sdc.ProdiID, cd.Semester ASC ')->result_array();
 
