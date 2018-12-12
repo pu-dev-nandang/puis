@@ -1118,4 +1118,41 @@ class C_global extends CI_Controller {
         }
     }
 
+    public function vreservation_confirm_eq_additional()
+    {
+        try {
+            $dataToken = $this->getInputToken();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $msg = '';
+                $idtbooking = $dataToken['idtbooking'];
+                $action = $dataToken['action'];
+                $arr_eq = (array)$dataToken['arr_eq'];
+                for ($i=0; $i < count($arr_eq); $i++) { 
+                    $datasave = array(
+                        'ApproveBy' => $this->session->userdata('NIP'),
+                        'ApproveAt' => date('Y-m-d H:i:s'),
+                        'Status' => ($action == 'Confirm') ? 1 : 2,
+                    );
+
+                    $this->db->where('ID_t_booking',$idtbooking);
+                    $this->db->where('ID_equipment_additional',$arr_eq[$i]);
+                    $this->db->update('db_reservation.t_booking_eq_additional', $datasave);
+
+                }
+                echo json_encode($msg);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
 }

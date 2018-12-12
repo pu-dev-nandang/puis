@@ -246,7 +246,8 @@ class C_global extends Vreservation_Controler {
                     if ($get[0]['ID_equipment_add'] != '' || $get[0]['ID_equipment_add'] != null) {
                         $ID_equipment_add = explode(',', $get[0]['ID_equipment_add']);
                         $Name_equipment_add = '';
-                        for ($j=0; $j < count($ID_equipment_add); $j++) { 
+                        for ($j=0; $j < count($ID_equipment_add); $j++) {
+                            $getQTY = $this->m_reservation->gett_booking_eq_additional($ID_equipment_add[$j],$get[0]['ID']); 
                             $get2 = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add[$j]);
                             // print_r($ID_equipment_add);die();
                             $ID_m_equipment = $get2[0]['ID_m_equipment'];
@@ -255,14 +256,14 @@ class C_global extends Vreservation_Controler {
                                 $Owner = $get2[0]['Owner'];
                                 $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$Owner);
                                 $Owner = $getX[0]['Division'];
-                                $Name_equipment_add .= $get3[0]['Equipment'].' by '.$Owner.'['.$get2[0]['Qty'].'] , ';
+                                $Name_equipment_add .= $get3[0]['Equipment'].' by '.$Owner.'['.$getQTY[0]['Qty'].'] , ';
                             }
                             else
                             {
                                 $Owner = $get2[0]['Owner'];
                                 $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$Owner);
                                 $Owner = $getX[0]['Division'];
-                                $Name_equipment_add .= $get3[0]['Equipment'].' by '.$Owner.'['.$get2[0]['Qty'].']';
+                                $Name_equipment_add .= $get3[0]['Equipment'].' by '.$Owner.'['.$getQTY[0]['Qty'].']';
                             }
                             
                         }
@@ -324,6 +325,7 @@ class C_global extends Vreservation_Controler {
                     $this->data['MarkomSupport'] = $MarkomSupport;
                     $this->data['Req_layout'] = $Req_layout;
                     $this->data['ID'] = $get[0]['ID'];
+                    // print_r($this->data);die();
                     echo $this->load->view($this->pathView.'modal_form_view',$this->data,true);
                     break;
                 default:

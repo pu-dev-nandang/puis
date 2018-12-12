@@ -195,8 +195,34 @@ class C_transaksi extends Vreservation_Controler {
                 $yy = array();
                 for ($i=0; $i < count($xx); $i++) { 
                     $yy[] = array('ID_t_booking' =>$ID_t_booking,'ID_equipment_additional' => $xx[$i]->ID_equipment_add,'Qty' =>  $xx[$i]->Qty);
-                }
+                }    
                 $this->db->insert_batch('db_reservation.t_booking_eq_additional', $yy);
+            }
+
+            $KetAdditional_eq = '';
+            $arr_to_eq_add = array();
+            $arr_to_eq_add_ID_DIV = array();
+            if (is_array($input['chk_e_additional'])) {
+                // save data t_booking_eq_additional
+                $KetAdditional_eq = '<ul>Equipment Additional';
+                $xx = $input['chk_e_additional'];
+                $yy = array();
+                for ($i=0; $i < count($xx); $i++) { 
+                    $gett_booking_eq_additional = $this->m_reservation->gett_booking_eq_additional($xx[$i]->ID_equipment_add,$ID_t_booking);
+                    $Qty = $gett_booking_eq_additional[0]['Qty'];
+                    $ID_equipment_additional = $gett_booking_eq_additional[0]['ID_equipment_additional'];
+                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_additional);
+                    $OwnerID = $get[0]['Owner'];
+                    $arr_to_eq_add_ID_DIV[] = $OwnerID;
+                    $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$OwnerID);
+                    $arr_to_eq_add[] = $getX[0]['Email'];
+                    $Owner = $getX[0]['Division'];
+                    $ID_m_equipment = $get[0]['ID_m_equipment'];
+                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
+                    $KetAdditional_eq .= '<li>'.$get[0]['Equipment'].' by '.$Owner.'['.$Qty.']</li>';
+
+                }
+                $KetAdditional_eq .= '</ul>';
             }
 
             $EmailKetAdditional = '';
@@ -253,7 +279,7 @@ class C_transaksi extends Vreservation_Controler {
                                                         // find prodi
                                                         // $gg = $this->m_master->caribasedprimary('db_academic.program_study','AdminID',$this->session->userdata('NIP'));
                                                         $sqlgg = 'select * from db_academic.program_study where AdminID = ? or KaprodiID = ?';
-                                                        $gg=$this->db->query($sql, array($this->session->userdata('NIP'),$this->session->userdata('NIP')))->result_array();
+                                                        $gg=$this->db->query($sqlgg, array($this->session->userdata('NIP'),$this->session->userdata('NIP')))->result_array();
                                                         if (count($gg) > 0) {
                                                             for ($k=0; $k < count($gg); $k++) { 
                                                                 $Kaprodi = $gg[$k]['KaprodiID'];
@@ -340,6 +366,7 @@ class C_transaksi extends Vreservation_Controler {
                                             '.$MarkomEmail.'
                                             </ul>
                                             '.$EmailKetAdditional.' </br>
+                                            '.$KetAdditional_eq.'</br>
                                             <table width="100" cellspacing="0" cellpadding="12" border="0">
                                                 <tbody>
                                                 <tr>
@@ -360,6 +387,41 @@ class C_transaksi extends Vreservation_Controler {
                                 $subject = "Podomoro University Venue Reservation Approval 1";
                                 $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
 
+                                // equipment additional
+                                for ($zn=0; $zn < count($arr_to_eq_add); $zn++) { 
+                                    $token = array(
+                                        'EmailPU' => $EmailPU,
+                                        'ID_t_booking' => $ID_t_booking,
+                                        'DivisionID' => $arr_to_eq_add_ID_DIV[$zn],
+                                    );
+                                    $token = $this->jwt->encode($token,'UAP)(*');
+                                    $Email = $arr_to_eq_add[$zn];
+                                    $text = 'Dear Team,<br><br>
+                                                Please help to Confirm Equipment Additional from Venue Reservation requested by '.$this->session->userdata('Name').',<br><br>
+                                                Details Schedule : <br><ul>
+                                                <li>Start  : '.$StartNameDay.', '.$Start.'</li>
+                                                <li>End  : '.$EndNameDay.', '.$End.'</li>
+                                                <li>Room  : '.$input['Room'].'</li>
+                                                <li>Agenda  : '.$input['Agenda'].'</li>
+                                                '.$MarkomEmail.'
+                                                </ul>
+                                                '.$EmailKetAdditional.' </br>
+                                                '.$KetAdditional_eq.'</br>
+                                                <table width="100" cellspacing="0" cellpadding="12" border="0">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td bgcolor="#51a351" align="center">
+                                                            <a href="'.url_pas.'view_eq_additional/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >View</a>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            ';        
+                                    $to = $Email;
+                                    $subject = "Podomoro University Venue Reservation Equipment Additional";
+                                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                                }
+                                // equipment additional
                             }
                         }
                         else
@@ -405,6 +467,7 @@ class C_transaksi extends Vreservation_Controler {
                                             '.$MarkomEmail.'
                                             </ul>
                                             '.$EmailKetAdditional.'</br>
+                                            '.$KetAdditional_eq.'</br>
                                             <table width="200" cellspacing="0" cellpadding="12" border="0">
                                                 <tbody>
                                                 <tr>
@@ -424,6 +487,42 @@ class C_transaksi extends Vreservation_Controler {
                                 $to = $Email;
                                 $subject = "Podomoro University Venue Reservation Approval 1";
                                 $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+
+                                // equipment additional
+                                for ($zn=0; $zn < count($arr_to_eq_add); $zn++) { 
+                                    $token = array(
+                                        'EmailPU' => $EmailPU,
+                                        'ID_t_booking' => $ID_t_booking,
+                                        'DivisionID' => $arr_to_eq_add_ID_DIV[$zn],
+                                    );
+                                    $token = $this->jwt->encode($token,'UAP)(*');
+                                    $Email = $arr_to_eq_add[$zn];
+                                    $text = 'Dear Team,<br><br>
+                                                Please help to Confirm Equipment Additional from Venue Reservation requested by '.$this->session->userdata('Name').',<br><br>
+                                                Details Schedule : <br><ul>
+                                                <li>Start  : '.$StartNameDay.', '.$Start.'</li>
+                                                <li>End  : '.$EndNameDay.', '.$End.'</li>
+                                                <li>Room  : '.$input['Room'].'</li>
+                                                <li>Agenda  : '.$input['Agenda'].'</li>
+                                                '.$MarkomEmail.'
+                                                </ul>
+                                                '.$EmailKetAdditional.' </br>
+                                                '.$KetAdditional_eq.'</br>
+                                                <table width="100" cellspacing="0" cellpadding="12" border="0">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td bgcolor="#51a351" align="center">
+                                                            <a href="'.url_pas.'view_eq_additional/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >View</a>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            ';        
+                                    $to = $Email;
+                                    $subject = "Podomoro University Venue Reservation Equipment Additional";
+                                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                                }
+                                // equipment additional
 
                             }
                         }
@@ -463,6 +562,7 @@ class C_transaksi extends Vreservation_Controler {
                                               '.$MarkomSupport.'
                                               </ul>
                                               '.$EmailKetAdditional.' </br>
+                                              '.$KetAdditional_eq.'</br>
                                                 <table width="100" cellspacing="0" cellpadding="12" border="0">
                                                     <tbody>
                                                     <tr>
@@ -506,6 +606,7 @@ class C_transaksi extends Vreservation_Controler {
                                             '.$MarkomSupport.'
                                             </ul>
                                             '.$EmailKetAdditional.' </br>
+                                            '.$KetAdditional_eq.'</br>
                                             <table width="100" cellspacing="0" cellpadding="12" border="0">
                                                 <tbody>
                                                 <tr>
@@ -593,7 +694,7 @@ class C_transaksi extends Vreservation_Controler {
         $msg = '';
         $input = $this->getInputToken();
         $ID = $input['ID_tbl'];
-        $ListDelEquipment = $input['ListDelEquipment'];
+        //$ListDelEquipment = $input['ListDelEquipment'];
         $ListDelMarkom = $input['ListDelMarkom'];
         $get = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$ID);
         $EmailAdd = '';
@@ -642,28 +743,10 @@ class C_transaksi extends Vreservation_Controler {
         }
 
 
-        if (count($ListDelMarkom) > 0 || count($ListDelEquipment) >0 ) {
-            $ID_equipment_add = $get[0]['ID_equipment_add'];
-            $ID_equipment_add = explode(",", $ID_equipment_add);
+        if (count($ListDelMarkom) > 0) {
             $MarcommSupport = $get[0]['MarcommSupport'];
             $MarcommSupport = explode(',', $MarcommSupport);
             $EmailAdd .= '<br>Note :<br>';
-            $aa = array();
-            for ($i=0; $i < count($ListDelEquipment); $i++) {
-                if ($i==0) {
-                    $EmailAdd .= '* Equipment not approve : <br>&nbsp&nbsp   -&nbsp     ';
-                }
-                $g = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ListDelEquipment[$i]);
-                $NameEq =  $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$g[0]['ID_m_equipment']);
-                $aa[] = $NameEq[0]['Equipment'];
-
-                if (($key = array_search($ListDelEquipment[$i], $ID_equipment_add)) !== false) {
-                    unset($ID_equipment_add[$key]);
-                }
-            }
-            $aa = implode("<br>&nbsp&nbsp   -&nbsp     ", $aa);
-            $EmailAdd .= $aa;
-
             $bb = array();
             for ($i=0; $i <count($ListDelMarkom) ; $i++) { 
                 if ($i==0) {
@@ -677,12 +760,9 @@ class C_transaksi extends Vreservation_Controler {
             $bb = implode("<br>&nbsp&nbsp   -&nbsp     ", $bb);
             $EmailAdd .= $bb;
 
-            $ID_equipment_add = array_values($ID_equipment_add); // 'reindex' array
             $MarcommSupport = array_values($MarcommSupport); // 'reindex' array
-            $ID_equipment_add = implode(",", $ID_equipment_add);
             $MarcommSupport = implode(",", $MarcommSupport);
             $arr_add = array(
-                'ID_equipment_add' => $ID_equipment_add,
                 'MarcommSupport' => $MarcommSupport,
                     );
         }
@@ -1208,6 +1288,5 @@ class C_transaksi extends Vreservation_Controler {
         $content = $this->load->view($this->pathView.'transaksi/page_data_reservation','',true);
         $this->temp($content);
     }
-
 
 }

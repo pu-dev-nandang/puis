@@ -929,14 +929,6 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $NIP = $this->session->userdata('NIP');
         // check Auth berdasarkan grouping user
             $add_where = '';
-            // if ( !in_array($cd_akses, array(1,2,3,4,10)) ) {
-            //      show_404($log_error = TRUE);
-            // }
-
-            // if ($this->session->userdata('ID_group_user') == 4) {
-            //     $add_where = ' and a.CreatedBy = "'.$NIP.'"';
-            // }
-
         $Start = ($Start == null) ? ' and Start >= timestamp(DATE_SUB(NOW(), INTERVAL 30 MINUTE))' : ' and Start like "%'.$Start.'%"';
         if ($both == '') {
             $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP where a.Status = ? '.$add_where.'
@@ -950,8 +942,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             // print_r($sql);die();         
             $query=$this->db->query($sql, array())->result_array();           
         }
-       
-        for ($i=0; $i < count($query); $i++) { 
+        for ($i=0; $i < count($query); $i++) {
+            $Detail = $this->getDataPass($query[$i]['ID']);
+            $Detail = implode('@@', $Detail);
             $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['Start']);
             $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['End']);
             $StartNameDay = $Startdatetime->format('l');
@@ -982,27 +975,12 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                         $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
                         // find access
                             $find = 1;
-                                // for ($l=0; $l < count($CategoryRoom); $l++) { 
-                                //     if ($CategoryRoomByRoom == $CategoryRoom[$l]) {
-                                //         $find++;    
-                                //         break;
-                                //     }
-                                // }
-
                                 if ($find == 1) {
                                     // get status 
                                     if ($Status1 == 0) {
                                        // find approver1
                                            $Approver1 = $getDataCategoryRoom[0]['Approver1'];
                                            $Approver1 = json_decode($Approver1);
-
-                                           // $NIP = $this->session->userdata('NIP');
-                                           // for ($l=0; $l < count($Approver1); $l++) { 
-                                           //     if ($NIP == $Approver1[$l]) {
-                                           //         $find++;    
-                                           //         break;
-                                           //     }
-                                           // } // old
 
                                            $dataApprover = array();
                                            // find by ID_group_user
@@ -1131,39 +1109,70 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
             $ID_equipment_add = '-';
             $Name_equipment_add = '-';
+            $boolAuthEq = 0;
             if ($query[$i]['ID_equipment_add'] != '' || $query[$i]['ID_equipment_add'] != null) {
                 $ID_equipment_add = explode(',', $query[$i]['ID_equipment_add']);
                 $Name_equipment_add = '<ul style = "margin-left : -28px">';
                 $btnEquipment = '';
                 for ($j=0; $j < count($ID_equipment_add); $j++) {
-                    if ($this->session->userdata('ID_group_user') <= 3) {
-                        if ($this->session->userdata('ID_group_user') != 3) {
-                            $btnEquipment = '<button class = "btn btn-danger btnEquipment btn-xs" ID_equipment_add = "'.$ID_equipment_add[$j].'" ><i class="fa fa-times"></i> </button>';
+                    $btnEquipment = '';
+                    // qty penggunaan
+                    $gett_booking_eq_additional = $this->gett_booking_eq_additional($ID_equipment_add[$j],$query[$i]['ID']);
+                    if ($gett_booking_eq_additional[0]['Status'] == 0) {
+                        $Status_eq_additional = 'Not Confirm';
+                    }
+                    elseif ($gett_booking_eq_additional[0]['Status'] == 1) {
+                        $Status_eq_additional = 'Confirm';
+                    }
+                    else
+                    {
+                        $Status_eq_additional = 'Reject';
+                    }
+                    $Qty = $gett_booking_eq_additional[0]['Qty'];
+                    $ID_equipment_additional = $gett_booking_eq_additional[0]['ID_equipment_additional'];
+                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_additional);
+                    $OwnerID = $get[0]['Owner'];
+                    $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$OwnerID);
+                    $Owner = $getX[0]['Division'];
+                    if ($this->session->userdata('ID_group_user') < 3) {
+                        if ($query[$i]['Status'] != 1) {
+                            $btnEquipment = '<input type = "checkbox" class = "chkEquipment_'.$query[$i]['ID'].'" value = "'.$ID_equipment_add[$j].'">';
                         }
-                        else
-                        {
-                            if ($CaseApproveAccess == 2 || $CaseApproveAccess == 4) {
-                                $btnEquipment = '<button class = "btn btn-danger btnEquipment btn-xs" ID_equipment_add = "'.$ID_equipment_add[$j].'" ><i class="fa fa-times"></i> </button>';
-                            }
-                        }
+                        $boolAuthEq = 1;
                         
                     }
                     else{
-                        if ($CaseApproveAccess == 2 || $CaseApproveAccess == 4) {
-                            $btnEquipment = '<button class = "btn btn-danger btnEquipment btn-xs" ID_equipment_add = "'.$ID_equipment_add[$j].'" ><i class="fa fa-times"></i> </button>';
-                        }
-                    }  
-                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add[$j]);
-                    $ID_m_equipment = $get[0]['ID_m_equipment'];
-                    $Owner = $get[0]['Owner'];
-                    $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$Owner);
-                    $Owner = $getX[0]['Division'];
+                        $DivisionID = $this->session->userdata('PositionMain');
+                            $DivisionID = $DivisionID['IDDivision'];
+                            if ($DivisionID == $OwnerID) {
+                                if ($query[$i]['Status'] != 1) {
+                                    $btnEquipment = '<input type = "checkbox" class = "chkEquipment_'.$query[$i]['ID'].'" value = "'.$ID_equipment_add[$j].'">';
+                                }
+                                $boolAuthEq = 1;
+                            }
+                    } 
 
-                    $Qty = $get[0]['Qty'];
+                    $ID_m_equipment = $get[0]['ID_m_equipment'];
                     $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
-                    $Name_equipment_add .= '<li>'.$get[0]['Equipment'].' by '.$Owner.'['.$Qty.'] &nbsp'.$btnEquipment.'</li>';
+                    $Name_equipment_add .= '<li>'.$get[0]['Equipment'].' by '.$Owner.'['.$Qty.']&nbsp ('.$Status_eq_additional.') &nbsp'.$btnEquipment.'</li>';
                 }
                 $Name_equipment_add .= '</ul>';
+                if ($boolAuthEq == 1) {
+                    if ($query[$i]['Status'] != 1) {
+                        $Name_equipment_add .= '<div class = "row"><div class = "col-md-6">
+                                        <span class="btn btn-primary btn-xs btn_eq_additional_submit" idtbooking ="'.$query[$i]['ID'].'" action = "Confirm">
+                                            <i class="fa fa-pencil-square-o"></i> Confirm
+                                           </span>
+                                                </div>
+                                            <div class = "col-md-6">
+                                                <span class="btn btn-danger btn-xs btn_eq_additional_submit" idtbooking ="'.$query[$i]['ID'].'" action = "Reject">
+                                                    <i class="fa fa-pencil-square-o"></i> Reject
+                                                   </span>
+                                            </div>    
+                                            </div>';
+                    }
+                }
+                
             }
 
             $ID_add_personel = '-';
@@ -1177,6 +1186,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $ReqdateNameDay = $Reqdatetime->format('l');
 
             $MarkomSupport = '<label>No</Label>';
+            $boolAuthMarkom = 0;
             if ($query[$i]['MarcommSupport'] != '') {
                 $MarkomSupport = '<ul style = "margin-left : -28px">';
                 $dd = explode(',', $query[$i]['MarcommSupport']);
@@ -1197,10 +1207,6 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     }
                     else
                     {
-                        // if ($CaseApproveAccess == 2 || $CaseApproveAccess == 4) {
-                        //     $btnMarkomSupport = '<button class = "btn btn-danger btnMarkomSupport btn-xs" MarcommSupport = "'.$dd[$zx].'" ><i class="fa fa-times"></i> </button>';
-                        // }
-
                         if ($CaseApproveAccess == 0) {
                             $PositionMain = $this->session->userdata('PositionMain');
                             $IDDivision = $PositionMain['IDDivision'];
@@ -1239,6 +1245,12 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 $MarkomSupport .= '</ul>';
             }
 
+            $DivisionID = $this->session->userdata('PositionMain');
+            $DivisionID = $DivisionID['IDDivision'];
+            if ($MarkomSupport != '' && $DivisionID == 17) {
+                $boolAuthMarkom = 1;
+            }
+
             $KetAdditional = $query[$i]['KetAdditional'];
             $KetAdditional = json_decode($KetAdditional);
             $Participant = '<ul><li>Participant Qty : '.$query[$i]['ParticipantQty'].'</li>';
@@ -1250,27 +1262,91 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 }
             }
             $Participant .= '</ul>';
-                
-            $arr_result[] = array(
-                    'Start' => $StartNameDay.', '.$query[$i]['Start'],
-                    'End' => $EndNameDay.', '.$query[$i]['End'],
-                    'Time' => $Time,
-                    'Agenda' => $query[$i]['Agenda'],
-                    'Room' => $query[$i]['Room'],
-                    'Equipment_add' => $Name_equipment_add,
-                    'Persone_add' => $Name_add_personel,
-                    'Req_date' => $query[$i]['Name'].'<br>'.$ReqdateNameDay.', '.$query[$i]['Req_date'],
-                    'Req_layout' => $query[$i]['Req_layout'],
-                    'ID' => $query[$i]['ID'],
-                    'Status' => $query[$i]['Status'],
-                    'MarkomSupport' => $MarkomSupport,
-                    'Participant' => $Participant,
-                    'ApproveAccess' => $CaseApproveAccess,
-                    'StatusBooking' => $StatusBooking,
-            );
+            $boolAuth = $this->boolAuthData($query[$i]['CreatedBy'],$CaseApproveAccess,$boolAuthEq,$boolAuthMarkom);
+            if ($boolAuth) {
+                   $arr_result[] = array(
+                           'Start' => $StartNameDay.', '.$query[$i]['Start'],
+                           'End' => $EndNameDay.', '.$query[$i]['End'],
+                           'Time' => $Time,
+                           'Agenda' => $query[$i]['Agenda'],
+                           'Room' => $query[$i]['Room'],
+                           'Equipment_add' => $Name_equipment_add,
+                           'Persone_add' => $Name_add_personel,
+                           'Req_date' => $query[$i]['Name'].'<br>'.$ReqdateNameDay.', '.$query[$i]['Req_date'],
+                           'Req_layout' => $query[$i]['Req_layout'],
+                           'ID' => $query[$i]['ID'],
+                           'Status' => $query[$i]['Status'],
+                           'MarkomSupport' => $MarkomSupport,
+                           'Participant' => $Participant,
+                           'ApproveAccess' => $CaseApproveAccess,
+                           'StatusBooking' => $StatusBooking,
+                           'CreatedBy' => $query[$i]['CreatedBy'],
+                           'Detail' => $Detail,
+                   );
+            }   
+            
         }
 
         return $arr_result;         
+    }
+
+    private function getDataPass($ID)
+    {
+        $sql2 = 'select a.*,b.Name from db_reservation.t_booking as a
+                 join db_employees.employees as b on a.CreatedBy = b.NIP
+                 where a.ID = ? limit 1';
+        $query2=$this->db->query($sql2, array($ID))->result_array();
+        $arr = array();
+        for ($i=0; $i < count($query2); $i++) {
+                    $tgl = date("Y-m-d", strtotime($query2[$i]['Start'])); 
+                    $dt = array(
+                        'user'  => $query2[$i]['Name'],
+                        'start' => $query2[$i]['Start'],
+                        'end'   => $query2[$i]['End'],
+                        'time'  => $query2[$i]['Time'],
+                        'colspan' => $query2[$i]['Colspan'],
+                        'agenda' => $query2[$i]['Agenda'],
+                        'room' => $query2[$i]['Room'],
+                        'approved' => $query2[$i]['Status'],
+                        'NIP' => $query2[$i]['CreatedBy'],
+                        'ID' => $query2[$i]['ID'],
+                        'tgl' => $tgl,
+                        //'NameEng' => $query[$i]['NameEng'],
+                    );
+            $arr= $dt;        
+        }
+
+        return $arr;
+    }
+
+    private function boolAuthData($CreatedBy,$CaseApproveAccess,$boolAuthEq,$boolAuthMarkom)
+    {
+        $bool = false;
+        $arr = array();
+        if ($CreatedBy == $this->session->userdata('NIP')) {
+            $arr[] = 1;
+        }
+        else
+        {
+            $arr[] = 0;
+        }
+
+        if ($CaseApproveAccess == 2 || $CaseApproveAccess == 4) {
+            $arr[] = 1;
+        }
+        else
+        {
+             $arr[] = 0;
+        }
+
+        $arr[] = $boolAuthEq;
+        $arr[] = $boolAuthMarkom;
+        if (in_array(1, $arr))
+        {
+            $bool = true;
+        }
+
+        return $bool;
     }
 
     public function get_m_room_equipment($room)
@@ -1623,6 +1699,13 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     {
         $sql = 'select * from db_reservation.category_room where ID in ('.$CategoryRoom.')';
         $query=$this->db->query($sql, array())->result_array();
+        return $query;
+    }
+
+    public function gett_booking_eq_additional($ID_equipment_add,$ID)
+    {
+        $sql = 'select * from db_reservation.t_booking_eq_additional where ID_t_booking = ? and ID_equipment_additional = ?';
+        $query=$this->db->query($sql, array($ID,$ID_equipment_add))->result_array();
         return $query;
     }
 }

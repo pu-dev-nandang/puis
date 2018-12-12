@@ -934,6 +934,7 @@ $route['vreservation/master/modal_form_equipmentadditional'] = 'page/vreservatio
 $route['vreservation/master/EquipmentAdditional/submit'] = 'page/vreservation/c_master/EquipmentAdditional_submit';
 $route['vreservation/master/getRoomItem'] = 'page/vreservation/c_master/getRoomItem';
 $route['vreservation/master/submit_select_venue_room'] = 'page/vreservation/c_master/submit_select_venue_room';
+$route['vreservation/delete_eq_additional'] = 'page/vreservation/c_transaksi/delete_eq_additional';
 
 
 $route['vreservation/config/policy_json_data'] = 'page/vreservation/c_config/policy_json_data';
@@ -944,6 +945,8 @@ $route['cancel_venue/(:any)'] = 'api/c_global/cancel_venue/$1';
 $route['submitcancelvenue'] = 'api/c_global/submitcancelvenue';
 $route['approve_venue_markom/(:any)'] = 'api/c_global/approve_venue_markom/$1';
 $route['cancel_venue_markom/(:any)'] = 'api/c_global/cancel_venue_markom/$1';
+$route['vreservation/confirm_eq_additional'] = 'api/c_global/vreservation_confirm_eq_additional';
+
 
 
 // test
