@@ -265,6 +265,155 @@ class C_rest extends CI_Controller {
         }
     }
 
+    // Nandang - digunakan khusus untuk selec2.js
+    public function geTStudent_ServerSide(){
+
+        $term = $this->input->get('term');
+
+        $data = $this->db->query('SELECT * FROM db_academic.auth_students auts WHERE 
+                                                  auts.NPM LIKE "%'.$term.'%" 
+                                                  OR auts.Name LIKE "%'.$term.'%" LIMIT 15 ')->result_array();
+
+        $result = [];
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+                $d = $data[$i];
+                $arr = array(
+                    'id' => $d['NPM'],
+                    'text' => $d['NPM'].' - '.$d['Name']
+                );
+                array_push($result,$arr);
+            }
+        }
+
+        $data_result = array(
+            'results' => $result
+        );
+
+        return print_r(json_encode($data_result));
+
+    }
+
+    public function crudCounseling(){
+        $dataToken = $this->getInputToken();
+        $cekUser = $this->cekAuthAPI($dataToken['auth']);
+
+        if($cekUser){
+            if($dataToken['action']=='insertToNewTopic'){
+
+                $dataTopic = (array) $dataToken['dataTopic'];
+
+                $this->db->insert('db_academic.counseling_topic', $dataTopic);
+                $insert_id = $this->db->insert_id();
+
+                // Insert Lecturer
+                $this->db->insert('db_academic.counseling_user', array(
+                    'TopicID' => $insert_id,
+                    'UserID' => $dataTopic['CreateBy'],
+                    'ReadComment' => 0,
+                    'Status' => '1'
+                ));
+
+                // Cek Invite To
+                if($dataTopic['InviteTo']==1 || $dataTopic['InviteTo']=='1'){
+                    $formSelectStudent = $dataToken['formSelectStudent'];
+                    for($u=0;$u<count($formSelectStudent);$u++){
+                        $dataIns = array(
+                            'TopicID' => $insert_id,
+                            'UserID' => $formSelectStudent[$u],
+                            'ReadComment' => 0,
+                            'Status' => '2'
+                        );
+                        $this->db->insert('db_academic.counseling_user',$dataIns);
+                    }
+                }
+                else if($dataTopic['InviteTo']==2 || $dataTopic['InviteTo']=='2'){
+                    $dataStudent = $this->m_rest->__getStudentByScheduleID($dataToken['SemesterID'],$dataTopic['ScheduleID']);
+                    if(count($dataStudent)>0){
+                        for($s=0;$s<count($dataStudent);$s++){
+                            $d_s = $dataStudent[$s];
+                            $dataIns = array(
+                                'TopicID' => $insert_id,
+                                'UserID' => $d_s['NPM'],
+                                'ReadComment' => 0,
+                                'Status' => '2'
+                            );
+                            $this->db->insert('db_academic.counseling_user',$dataIns);
+                        }
+                    }
+                }
+                else {
+                    $dataStdMentor = $this->db->select('NPM')->get_where('db_academic.mentor_academic'
+                        ,array('NIP' => $dataTopic['CreateBy']))->result_array();
+
+                    if(count($dataStdMentor)>0){
+                        for($m=0;$m<count($dataStdMentor);$m++){
+                            $d_m = $dataStdMentor[$m];
+                            $dataIns = array(
+                                'TopicID' => $insert_id,
+                                'UserID' => $d_m['NPM'],
+                                'ReadComment' => 0,
+                                'Status' => '2'
+                            );
+                            $this->db->insert('db_academic.counseling_user',$dataIns);
+                        }
+                    }
+                }
+                return print_r(1);
+            }
+            else if($dataToken['action']=='readTopic'){
+
+                $requestData= $_REQUEST;
+
+                $UserID = $dataToken['UserID'];
+
+                $queryDefault = 'SELECT cu.ReadComment, ct.* FROM db_academic.counseling_user cu
+                                              LEFT JOIN db_academic.counseling_topic ct 
+                                              ON (ct.ID = cu.TopicID)
+                                              WHERE cu.UserID = "'.$UserID.'"
+                                               ORDER BY cu.TopicID DESC';
+
+                $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+                $query = $this->db->query($sql)->result_array();
+                $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+                $no = $requestData['start'] + 1;
+                $data = array();
+
+                for($i=0;$i<count($query);$i++) {
+                    $nestedData = array();
+                    $row = $query[$i];
+
+                    $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+                    $nestedData[] = '<div  style="text-align:left;"><b>'.$row['Topic'].'</b></div>';
+                    $nestedData[] = '<div  style="text-align:center;">-</div>';
+                    $nestedData[] = '<div  style="text-align:center;">-</div>';
+
+                    $no++;
+
+                    $data[] = $nestedData;
+                }
+
+                $json_data = array(
+                    "draw"            => intval( $requestData['draw'] ),
+                    "recordsTotal"    => intval(count($queryDefaultRow)),
+                    "recordsFiltered" => intval( count($queryDefaultRow) ),
+                    "data"            => $data
+                );
+
+                echo json_encode($json_data);
+//                $data = $this->m_rest->getTopicByUserID($UserID);
+//                return print_r(json_encode($data));
+            }
+        } else {
+            $msg = array(
+                'msg' => 'Error'
+            );
+            return print_r(json_encode($msg));
+        }
+    }
+
     public function getTableData($db = null,$table = null)
     {
         error_reporting(0);

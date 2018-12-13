@@ -757,6 +757,37 @@ class M_rest extends CI_Model {
         return $dataAssg;
     }
 
+    public function __getStudentByScheduleID($SemesterID,$ScheduleID){
+        $this->load->model('m_api');
+        $dataCl = $this->m_api->getClassOf();
+
+        $arrDataStd = [];
+        if(count($dataCl)>0){
+            for($i=0;$i<count($dataCl);$i++){
+                $db_ = 'ta_'.$dataCl[$i]['Year'];
+
+                $data = $this->db->query('SELECT s.NPM, s.Name, sp.Evaluasi1, sp.Evaluasi2, 
+                                                    sp.Evaluasi3, sp.Evaluasi4, sp.Evaluasi5, sp.UTS, sp.UAS,
+                                                    sp.Score, sp.Grade, sp.Approval 
+                                                    FROM '.$db_.'.study_planning sp 
+                                                    LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
+                                                    WHERE sp.SemesterID ="'.$SemesterID.'" 
+                                                    AND sp.ScheduleID = "'.$ScheduleID.'"
+                                                    ORDER BY s.NPM ASC
+                                                     ')->result_array();
+
+                if(count($data)>0){
+                    for($s=0;$s<count($data);$s++){
+                        array_push($arrDataStd,$data[$s]);
+                    }
+                }
+
+            }
+        }
+
+        return $arrDataStd;
+    }
+
 
     public function __getExamSchedule($NIP,$Type)
     {
@@ -1083,5 +1114,16 @@ class M_rest extends CI_Model {
 
 
 
+    public function getTopicByUserID($UserID){
+
+        $data = $this->db->query('SELECT cu.ReadComment, ct.* FROM db_academic.counseling_user cu
+                                              LEFT JOIN db_academic.counseling_topic ct 
+                                              ON (ct.ID = cu.TopicID)
+                                              WHERE cu.UserID = "'.$UserID.'"
+                                               ORDER BY cu.TopicID DESC')->result_array();
+
+        return $data;
+
+    }
 
 }
