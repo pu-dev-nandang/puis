@@ -31,6 +31,11 @@ class C_login extends CI_Controller {
 
     }
 
+    public function page404r(){
+        $data['include'] = $this->load->view('template/include','',true);
+        $this->load->view('template/404page',$data);
+    }
+
     public function temp($content){
 
         $data['include'] = $this->load->view('template/include','',true);

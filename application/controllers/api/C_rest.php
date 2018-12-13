@@ -231,6 +231,23 @@ class C_rest extends CI_Controller {
         }
     }
 
+    public function getStudyResult(){
+        $dataToken = $this->getInputToken();
+        $cekUser = $this->cekAuthAPI($dataToken['auth']);
+
+        if($cekUser){
+
+            $data = $this->m_rest->getDetailStudyResultByNPM($dataToken['ClassOf'],$dataToken['NPM']);
+            return print_r(json_encode($data));
+
+        } else {
+            $msg = array(
+                'msg' => 'Error'
+            );
+            return print_r(json_encode($msg));
+        }
+    }
+
     public function getTableData($db = null,$table = null)
     {
         error_reporting(0);

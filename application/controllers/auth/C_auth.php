@@ -124,6 +124,9 @@ class C_auth extends Globalclass {
                 $this->db->insert('db_employees.employees',$arr);
             }
         }
+        else if($table=='parent'){
+//            $data
+        }
         else if($table=='dosen'){
             $data = $this->db_server->query('SELECT k.*, u.Password AS Password_Old, u.Lock
                                                         FROM siak4.dosen k
