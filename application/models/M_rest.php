@@ -5,7 +5,6 @@ class M_rest extends CI_Model {
 
     private function _getSemesterActive(){
         $data = $this->db->get_where('db_academic.semester', array('Status'=>'1'),1);
-
         return $data->result_array()[0];
     }
 
@@ -846,6 +845,171 @@ class M_rest extends CI_Model {
 
         return $result;
 
+    }
+
+    public function getDetailStudyResultByNPM($ClassOf,$NPM){
+        $order = 'ASC';
+
+        $data = $this->db->query('SELECT s.* FROM db_academic.semester s WHERE s.ID >= (SELECT s2.ID FROM db_academic.semester s2 
+                                        WHERE s2.Year="'.$ClassOf.'" LIMIT 1) ORDER BY s.ID '.$order)->result_array();
+
+        $db = 'ta_'.$ClassOf;
+        $smt = 1;
+        $res = [];
+        for($i=0;$i<count($data);$i++){
+
+            $System = ($data[$i]['ID']>=13) ? 1 : 0;
+            $khs = $this->getDataKHS($db,$NPM,$data[$i]['ID'],$data[$i]['Status'],$System);
+
+//            if(count($khs)>0){
+            $result[$i]['semester'] = $smt;
+            $result[$i]['SemesterID'] = $data[$i]['ID'];
+            $result[$i]['SemesterName'] = $data[$i]['Name'];
+            $result[$i]['semesterDetail'] = $khs;
+
+            array_push($res,$result[$i]);
+//            }
+            $smt += 1;
+            if($data[$i]['Status']=='1' || $data[$i]['Status']==1){
+                break;
+            }
+
+        }
+
+        return $res;
+    }
+
+    private function getDataKHS($db,$NPM,$SemesterID,$Status,$System){
+
+        date_default_timezone_set("Asia/Jakarta");
+
+
+        $data = $this->db->query('SELECT sp.*,mk.MKCode, mk.Name, mk.NameEng, s.TotalAssigment 
+                                        FROM '.$db.'.study_planning sp 
+                                        LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sp.CDID)
+                                        LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID) 
+                                        LEFT JOIN db_academic.schedule s ON (s.ID = sp.ScheduleID)
+                                        WHERE sp.NPM = "'.$NPM.'" 
+                                        AND sp.SemesterID="'.$SemesterID.'" 
+                                        AND sp.CDID IS NOT NULL 
+                                        ORDER BY mk.MKCode ASC ')->result_array();
+
+        $dateNow = date("Y-m-d");
+        $showUTS = false;
+        $showUAS = false;
+        if($System=='1'){
+            // cek tanggal show nilai UTS & UAS
+            $dataAY = $this->db->get_where('db_academic.academic_years',
+                array('SemesterID' => $SemesterID),1)->result_array();
+            if(count($dataAY)>0 && $dataAY[0]['showNilaiUts']<=$dateNow){
+                $showUTS = true;
+            }
+
+            if(count($dataAY)>0 && $dataAY[0]['showNilaiUas']<=$dateNow){
+                $showUAS = true;
+            }
+
+        }
+
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+                $dt = $data[$i];
+
+                if($System==1){
+                    if(($showUTS && $dt['Approval']=='1') || ($showUAS && $dt['Approval']=='2')){
+
+                        for($d=1;$d<=5;$d++){
+                            $n = '-';
+                            if($d<=$dt['TotalAssigment'] && $dt['Evaluasi'.$d]!=null && $dt['Evaluasi'.$d]!=''){
+                                $n = $data[$i]['Evaluasi'.$d];
+                            }
+                            $data[$i]['Evaluasi'.$d] = $n;
+                        }
+
+                        if($dt['UTS']==null || $dt['UTS']==''){
+                            $data[$i]['UTS'] = 0;
+                        }
+
+                        // ======== UAS =========
+                        if($showUAS && $dt['Approval']=='2'){
+                            if($dt['UAS']==null || $dt['UAS']==''){
+                                $data[$i]['UAS'] = 0;
+                            }
+
+                            if($dt['Score']==null || $dt['Score']==''){
+                                $data[$i]['Score'] = 0;
+                            }
+                            if($dt['Grade']==null || $dt['Grade']==''){
+                                $data[$i]['Grade'] = 'E';
+                            }
+                            if($dt['GradeValue']==null || $dt['GradeValue']==''){
+                                $data[$i]['GradeValue'] = 0;
+                            }
+
+                        }
+                        else {
+                            $data[$i]['UAS'] = '-';
+                            $data[$i]['Score'] = '-';
+                            $data[$i]['Grade'] = '-';
+                            $data[$i]['GradeValue'] = 0;
+                        }
+                        // ======== UAS =========
+
+                    }
+                    else {
+
+                        $data[$i]['Evaluasi1'] = '-';
+                        $data[$i]['Evaluasi2'] = '-';
+                        $data[$i]['Evaluasi3'] = '-';
+                        $data[$i]['Evaluasi4'] = '-';
+                        $data[$i]['Evaluasi5'] = '-';
+                        $data[$i]['UTS'] = '-';
+                        $data[$i]['UAS'] = '-';
+                        $data[$i]['Score'] = '-';
+                        $data[$i]['Grade'] = '-';
+                        $data[$i]['GradeValue'] = 0;
+
+                    }
+                } else {
+                    if($dt['Evaluasi1']==null || $dt['Evaluasi1']==''){
+                        $data[$i]['Evaluasi1'] = '-';
+                    }
+                    if($dt['Evaluasi2']==null || $dt['Evaluasi2']==''){
+                        $data[$i]['Evaluasi2'] = '-';
+                    }
+                    if($dt['Evaluasi3']==null || $dt['Evaluasi3']==''){
+                        $data[$i]['Evaluasi3'] = '-';
+                    }
+                    if($dt['Evaluasi4']==null || $dt['Evaluasi4']==''){
+                        $data[$i]['Evaluasi4'] = '-';
+                    }
+                    if($dt['Evaluasi5']==null || $dt['Evaluasi5']==''){
+                        $data[$i]['Evaluasi5'] = '-';
+                    }
+
+                    if($dt['UTS']==null || $dt['UTS']==''){
+                        $data[$i]['UTS'] = '-';
+                    }
+
+
+                    if($dt['UAS']==null || $dt['UAS']==''){
+                        $data[$i]['UAS'] = 0;
+                    }
+                    if($dt['Score']==null || $dt['Score']==''){
+                        $data[$i]['Score'] = 0;
+                    }
+                    if($dt['Grade']==null || $dt['Grade']==''){
+                        $data[$i]['Grade'] = 'E';
+                    }
+                    if($dt['GradeValue']==null || $dt['GradeValue']==''){
+                        $data[$i]['GradeValue'] = 0;
+                    }
+                }
+
+            }
+        }
+
+        return $data;
     }
 
 

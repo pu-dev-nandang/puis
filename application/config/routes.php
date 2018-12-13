@@ -3,6 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 $route['default_controller'] = 'c_login';
 $route['404_override'] = 'dashboard/c_dashboard/page404';
+$route['404_override'] = 'c_login/page404r';
 $route['translate_uri_dashes'] = FALSE;
 
 
@@ -779,6 +780,7 @@ $route['rest/__getDetailKRS'] = 'api/c_rest/getDetailKRS';
 $route['rest/__geTimetable'] = 'api/c_rest/geTimetable';
 $route['rest/__getExamSchedule'] = 'api/c_rest/getExamSchedule';
 $route['rest/__getKSM'] = 'api/c_rest/getKSM';
+$route['rest/__getStudyResult'] = 'api/c_rest/getStudyResult';
 $route['rest/__getExamScheduleForStudent'] = 'api/c_rest/getExamScheduleForStudent';
 $route['rest/__cek_deadline_paymentNPM'] = 'api/c_rest/cek_deadline_paymentNPM';
 $route['rest/__getTableData/(:any)/(:any)'] = 'api/c_rest/getTableData/$1/$2';
