@@ -1128,16 +1128,26 @@ class C_global extends CI_Controller {
                 $idtbooking = $dataToken['idtbooking'];
                 $action = $dataToken['action'];
                 $arr_eq = (array)$dataToken['arr_eq'];
-                for ($i=0; $i < count($arr_eq); $i++) { 
-                    $datasave = array(
-                        'ApproveBy' => $this->session->userdata('NIP'),
-                        'ApproveAt' => date('Y-m-d H:i:s'),
-                        'Status' => ($action == 'Confirm') ? 1 : 2,
-                    );
+                $this->load->model('vreservation/m_reservation');
+                for ($i=0; $i < count($arr_eq); $i++) {
+                    $chkQty = $this->m_reservation->chkQty_eq_additional($idtbooking,$arr_eq[$i]);
+                    if ($chkQty) {
+                        $datasave = array(
+                            'ApproveBy' => $this->session->userdata('NIP'),
+                            'ApproveAt' => date('Y-m-d H:i:s'),
+                            'Status' => ($action == 'Confirm') ? 1 : 2,
+                        );
 
-                    $this->db->where('ID_t_booking',$idtbooking);
-                    $this->db->where('ID_equipment_additional',$arr_eq[$i]);
-                    $this->db->update('db_reservation.t_booking_eq_additional', $datasave);
+                        $this->db->where('ID_t_booking',$idtbooking);
+                        $this->db->where('ID_equipment_additional',$arr_eq[$i]);
+                        $this->db->update('db_reservation.t_booking_eq_additional', $datasave);
+                    }
+                    else
+                    {
+                        $msg = 'Qty is not enough';
+                        break;
+                    }
+                    
 
                 }
                 echo json_encode($msg);
@@ -1146,6 +1156,36 @@ class C_global extends CI_Controller {
             {
                 // handling orang iseng
                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    public function view_eq_additional($token)
+    {
+        // error_reporting(0);
+        try 
+        {
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($token,$key);
+            // cek status
+            $t_booking = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$data_arr['ID_t_booking']);
+            if (count($t_booking ) > 0) {
+                if ($t_booking[0]['Status'] == 0) {
+                    $data['include'] = $this->load->view('template/include','',true);
+                    $data['ID_t_booking'] = $data_arr['ID_t_booking'];
+                    $data['EmailPU'] = $data_arr['EmailPU'];
+                    $data['DivisionID'] = $data_arr['DivisionID'];
+                    $this->load->view('page/vreservation/t_view_eq_additional',$data);
+                }
+            }
+            else{
+                // handling orang iseng
+                echo '{"status":"999","message":"Data doesn\'t exist "}';
             }
         }
         //catch exception

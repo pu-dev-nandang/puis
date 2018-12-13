@@ -347,7 +347,8 @@ class C_global extends Vreservation_Controler {
 
     public function getCountApprove()
     {
-        $getData= $this->m_reservation->getCountApprove();
+        //$getData= $this->m_reservation->getCountApprove();
+        $getData= count($this->m_reservation->getDataT_booking(null,'',2));
         echo json_encode($getData);
     }
 

@@ -746,5 +746,28 @@ class C_rest extends CI_Controller {
         }
     }
 
+    public function v_reservation_json_list_booking()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('vreservation/m_reservation');
+                $getData = $this->m_reservation->getDataT_booking_Api($dataToken['ID_t_booking'],$dataToken['DivisionID']);
+                echo json_encode($getData);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
 
 }

@@ -895,6 +895,8 @@ $route['vreservation/approve_submit'] = 'page/vreservation/c_transaksi/approve_s
 $route['vreservation/json_list_booking_by_user'] = 'page/vreservation/c_transaksi/json_list_booking_by_user';
 $route['vreservation/cancel_submit'] = 'page/vreservation/c_transaksi/cancel_submit';
 $route['vreservation/json_list_booking'] = 'page/vreservation/c_transaksi/json_list_booking';
+$route['api/vreservation/json_list_booking'] = 'api/c_rest/v_reservation_json_list_booking';
+
 
 $route['vreservation/config/modalform_previleges'] = 'page/vreservation/c_config/modal_form_previleges';
 $route['vreservation/config/menu-previleges/get_menu'] = 'page/vreservation/c_config/get_menu';
@@ -946,6 +948,11 @@ $route['submitcancelvenue'] = 'api/c_global/submitcancelvenue';
 $route['approve_venue_markom/(:any)'] = 'api/c_global/approve_venue_markom/$1';
 $route['cancel_venue_markom/(:any)'] = 'api/c_global/cancel_venue_markom/$1';
 $route['vreservation/confirm_eq_additional'] = 'api/c_global/vreservation_confirm_eq_additional';
+$route['view_eq_additional/(:any)'] = 'api/c_global/view_eq_additional/$1';
+$route['vreservation/return_eq'] = 'page/vreservation/c_transaksi/return_eq_show';
+$route['vreservation/modal_form_return_eq'] = 'page/vreservation/c_transaksi/modal_form_return_eq';
+$route['vreservation/modal_form_return_eq_save'] = 'page/vreservation/c_transaksi/modal_form_return_eq_save';
+$route['vreservation/t_eq/(:any)'] = 'page/vreservation/c_transaksi/t_eq/$1';
 
 
 

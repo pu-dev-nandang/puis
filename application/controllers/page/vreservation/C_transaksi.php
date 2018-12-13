@@ -204,7 +204,7 @@ class C_transaksi extends Vreservation_Controler {
             $arr_to_eq_add_ID_DIV = array();
             if (is_array($input['chk_e_additional'])) {
                 // save data t_booking_eq_additional
-                $KetAdditional_eq = '<ul>Equipment Additional';
+                $KetAdditional_eq = '<br><br>*  Equipment Additional<ul>';
                 $xx = $input['chk_e_additional'];
                 $yy = array();
                 for ($i=0; $i < count($xx); $i++) { 
@@ -213,7 +213,9 @@ class C_transaksi extends Vreservation_Controler {
                     $ID_equipment_additional = $gett_booking_eq_additional[0]['ID_equipment_additional'];
                     $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_additional);
                     $OwnerID = $get[0]['Owner'];
-                    $arr_to_eq_add_ID_DIV[] = $OwnerID;
+                    if (!in_array($OwnerID, $arr_to_eq_add_ID_DIV)) {
+                        $arr_to_eq_add_ID_DIV[] = $OwnerID;
+                    }
                     $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$OwnerID);
                     $arr_to_eq_add[] = $getX[0]['Email'];
                     $Owner = $getX[0]['Division'];
@@ -276,8 +278,6 @@ class C_transaksi extends Vreservation_Controler {
                                                     $IDDivision = $PositionMain['IDDivision'];
                                                     $IDPositionApprover = $Approver1[$l]->Approver; 
                                                     if ($IDDivision == 15) { // if prodi
-                                                        // find prodi
-                                                        // $gg = $this->m_master->caribasedprimary('db_academic.program_study','AdminID',$this->session->userdata('NIP'));
                                                         $sqlgg = 'select * from db_academic.program_study where AdminID = ? or KaprodiID = ?';
                                                         $gg=$this->db->query($sqlgg, array($this->session->userdata('NIP'),$this->session->userdata('NIP')))->result_array();
                                                         if (count($gg) > 0) {
@@ -365,7 +365,7 @@ class C_transaksi extends Vreservation_Controler {
                                             <li>Agenda  : '.$input['Agenda'].'</li>
                                             '.$MarkomEmail.'
                                             </ul>
-                                            '.$EmailKetAdditional.' </br>
+                                            '.$EmailKetAdditional.'
                                             '.$KetAdditional_eq.'</br>
                                             <table width="100" cellspacing="0" cellpadding="12" border="0">
                                                 <tbody>
@@ -405,7 +405,7 @@ class C_transaksi extends Vreservation_Controler {
                                                 <li>Agenda  : '.$input['Agenda'].'</li>
                                                 '.$MarkomEmail.'
                                                 </ul>
-                                                '.$EmailKetAdditional.' </br>
+                                                '.$EmailKetAdditional.'
                                                 '.$KetAdditional_eq.'</br>
                                                 <table width="100" cellspacing="0" cellpadding="12" border="0">
                                                     <tbody>
@@ -466,7 +466,7 @@ class C_transaksi extends Vreservation_Controler {
                                             <li>Agenda  : '.$input['Agenda'].'</li>
                                             '.$MarkomEmail.'
                                             </ul>
-                                            '.$EmailKetAdditional.'</br>
+                                            '.$EmailKetAdditional.'
                                             '.$KetAdditional_eq.'</br>
                                             <table width="200" cellspacing="0" cellpadding="12" border="0">
                                                 <tbody>
@@ -506,7 +506,7 @@ class C_transaksi extends Vreservation_Controler {
                                                 <li>Agenda  : '.$input['Agenda'].'</li>
                                                 '.$MarkomEmail.'
                                                 </ul>
-                                                '.$EmailKetAdditional.' </br>
+                                                '.$EmailKetAdditional.'
                                                 '.$KetAdditional_eq.'</br>
                                                 <table width="100" cellspacing="0" cellpadding="12" border="0">
                                                     <tbody>
@@ -561,8 +561,8 @@ class C_transaksi extends Vreservation_Controler {
                                               <li>Documentation               : <strong>Please Click link below to download these files</strong>
                                               '.$MarkomSupport.'
                                               </ul>
-                                              '.$EmailKetAdditional.' </br>
-                                              '.$KetAdditional_eq.'</br>
+                                              '.$EmailKetAdditional.'
+                                                '.$KetAdditional_eq.'</br>
                                                 <table width="100" cellspacing="0" cellpadding="12" border="0">
                                                     <tbody>
                                                     <tr>
@@ -605,8 +605,8 @@ class C_transaksi extends Vreservation_Controler {
                                             <li>Graphic Design (Working time 7 Days)      : <strong>Please Click link below to download these files</strong>
                                             '.$MarkomSupport.'
                                             </ul>
-                                            '.$EmailKetAdditional.' </br>
-                                            '.$KetAdditional_eq.'</br>
+                                            '.$EmailKetAdditional.'
+                                                '.$KetAdditional_eq.'</br>
                                             <table width="100" cellspacing="0" cellpadding="12" border="0">
                                                 <tbody>
                                                 <tr>
@@ -1287,6 +1287,82 @@ class C_transaksi extends Vreservation_Controler {
     {
         $content = $this->load->view($this->pathView.'transaksi/page_data_reservation','',true);
         $this->temp($content);
+    }
+
+
+    public function return_eq()
+    {
+        $content = $this->load->view($this->pathView.'transaksi/return_eq','',true);
+        $this->temp($content);
+    }
+
+    public function return_eq_show()
+    {
+        $getData= $this->m_reservation->getForReturn_eq();
+        echo json_encode($getData);
+    }
+
+    public function modal_form_return_eq()
+    {
+        $arr = array();
+        $input = $this->getInputToken();
+        $ID = $input['ID'];
+        $query = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$ID);
+        for ($i=0; $i < count($query); $i++) { 
+            $ID_equipment_add = explode(',', $query[$i]['ID_equipment_add']);
+            for ($j=0; $j < count($ID_equipment_add); $j++) {
+                $gett_booking_eq_additional = $this->m_reservation->gett_booking_eq_additional($ID_equipment_add[$j],$query[$i]['ID']);
+                if ($gett_booking_eq_additional[0]['Status'] == 1) {
+                    // print_r($gett_booking_eq_additional);
+                    $Qty = $gett_booking_eq_additional[0]['Qty'];
+                    $ID_equipment_additional = $gett_booking_eq_additional[0]['ID_equipment_additional'];
+                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_additional);
+                    $OwnerID = $get[0]['Owner'];
+                    $DivisionID = $this->session->userdata('PositionMain');
+                        $DivisionID = $DivisionID['IDDivision'];
+                        if ($DivisionID == $OwnerID) {
+                            $ID_m_equipment = $get[0]['ID_m_equipment'];
+                            $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
+                            $temp = array(
+                                'ID_equipment_additional' => $ID_equipment_add[$j],
+                                'Name' => $get[0]['Equipment'],
+                                'Qty' => $Qty,
+                                'IDTable' => $gett_booking_eq_additional[0]['ID'],
+                            );
+                            $arr[] = $temp;
+                        }
+                }
+            }
+        }
+
+        echo json_encode($arr);
+    }
+
+    public function modal_form_return_eq_save()
+    {
+        $input = $this->getInputToken();
+        $ID_t_booking = $input['ID'];
+        $ID_tbl_t_booking_eq_additional = $input['IDTable'];
+        $Desc = $input['Desc'];
+
+        $dataSave = array(
+            'ID_t_booking_eq_additional'=> $ID_tbl_t_booking_eq_additional,
+            'Desc' => $Desc,
+            'Time' => date('Y-m-d H:i:s'),
+            'By' => $this->session->userdata('NIP'),
+        );
+
+        $this->db->insert('db_reservation.t_return_eq', $dataSave); 
+
+    }
+
+    public function t_eq($page)
+    {
+          $arr_result = array('html' => '','jsonPass' => '');
+          $uri = $this->uri->segment(3);
+          $content = $this->load->view($this->pathView.'transaksi/'.$uri,'',true);
+          $arr_result['html'] = $content;
+          echo json_encode($arr_result);
     }
 
 }
