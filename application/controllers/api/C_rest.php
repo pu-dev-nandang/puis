@@ -248,6 +248,23 @@ class C_rest extends CI_Controller {
         }
     }
 
+    public function getTranscript(){
+        $dataToken = $this->getInputToken();
+        $cekUser = $this->cekAuthAPI($dataToken['auth']);
+
+        if($cekUser){
+
+            $data = $this->m_rest->getTranscript($dataToken['ClassOf'],$dataToken['NPM'],'ASC');
+            return print_r(json_encode($data));
+
+        } else {
+            $msg = array(
+                'msg' => 'Error'
+            );
+            return print_r(json_encode($msg));
+        }
+    }
+
     public function getTableData($db = null,$table = null)
     {
         error_reporting(0);

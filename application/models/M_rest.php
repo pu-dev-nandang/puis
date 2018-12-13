@@ -879,6 +879,75 @@ class M_rest extends CI_Model {
         return $res;
     }
 
+    public function getTranscript($ClassOf,$NPM,$order){
+
+
+        $data = $this->db->query('SELECT s.* FROM db_academic.semester s WHERE s.ID >= (SELECT s2.ID FROM db_academic.semester s2 
+                                        WHERE s2.Year="'.$ClassOf.'" LIMIT 1) ORDER BY s.ID '.$order)->result_array();
+
+        $db = 'ta_'.$ClassOf;
+        $dataSmtActive = $this->_getSemesterActive();
+
+        $transcript = [];
+        $arrTranscriptID = [];
+
+        $smt = ($order=='ASC') ? 0 : count($data) + 1;
+        for($i=0;$i<count($data);$i++){
+
+            $System = ($data[$i]['ID']>=13) ? 1 : 0;
+            $khs = $this->getDataKHS($db,$NPM,$data[$i]['ID'],'',$System);
+
+            if(count($khs)>0){
+                $smt = ($order=='ASC') ? $smt + 1 : $smt - 1;
+                if($data[$i]['Status']!=1 && $data[$i]['Status']!='1'){
+
+                    // Cek apakah ada mata kuliha ngulang apa engga
+                    for($k=0;$k<count($khs);$k++){
+                        $d = $khs[$k];
+
+                        // cek akaha sudah ada di list transcript atau belum, jika belim lanjutkan
+                        if(in_array($d['MKID'],$arrTranscriptID)!=-1){
+
+                            // cek apakah MKID punya lebih dari 1 jika maka ambil nilai tertingginya
+                            $dataScore = $this->db->order_by('Score', 'DESC')
+                                ->get_where($db.'.study_planning',array('NPM' => $NPM,'MKID'=>$d['MKID'],'SemesterID !='=>$dataSmtActive['ID']))->result_array();
+
+                            $Score = ($dataScore[0]['Score']!='' && $dataScore[0]['Score']!=null) ? $dataScore[0]['Score'] : 0;
+                            $Grade = ($dataScore[0]['Grade']!='' && $dataScore[0]['Grade']!=null) ? $dataScore[0]['Grade'] : 'E';
+                            $GradeValue = ($dataScore[0]['GradeValue']!='' && $dataScore[0]['GradeValue']!=null) ? $dataScore[0]['GradeValue'] : 0;
+
+                            $arrTr = array(
+                                'MKID' => $d['MKID'],
+                                'MKCode' => $d['MKCode'],
+                                'Course' => $d['Name'],
+                                'CourseEng' => $d['NameEng'],
+                                'Credit' => $d['Credit'],
+                                'Score' => $Score,
+                                'Grade' => $Grade,
+                                'GradeValue' => $GradeValue,
+                                'Point' => ($d['Credit']* $GradeValue)
+                            );
+                            array_push($arrTranscriptID,$d['MKID']);
+                            array_push($transcript,$arrTr);
+
+
+                        }
+
+                    }
+
+
+                }
+
+            }
+
+
+        }
+
+
+        return $transcript;
+    }
+
+
     private function getDataKHS($db,$NPM,$SemesterID,$Status,$System){
 
         date_default_timezone_set("Asia/Jakarta");
@@ -1011,6 +1080,8 @@ class M_rest extends CI_Model {
 
         return $data;
     }
+
+
 
 
 }
