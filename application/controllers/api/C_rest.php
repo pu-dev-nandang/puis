@@ -458,13 +458,15 @@ class C_rest extends CI_Controller {
                                                                 WHERE cc.TopicID = "'.$dataToken['TopicID'].'"
                                                                 ORDER BY cc.ID ASC ')->result_array();
 
+
                     if(count($dataComment)>0){
                         for($i=0;$i<count($dataComment);$i++){
 
                             if($dataComment[$i]['Status']==2 || $dataComment[$i]['Status']=='2'){
                                 // Get Photo Student
                                 $db_std = 'ta_'.$dataComment[$i]['Year'];
-                                $dataPhoto = $this->db->select('Photo')->get_where($db_std.'.students',array('NPM'=>$dataComment[$i]['UserID'],1))->result_array();
+
+                                $dataPhoto = $this->db->query('SELECT Photo FROM '.$db_std.'.students WHERE NPM = "'.$dataComment[$i]['UserID'].'" LIMIT 1')->result_array();
 
                                 $dataComment[$i]['Photo'] = url_img_students.''.$dataPhoto[0]['Photo'];
                             } else {
