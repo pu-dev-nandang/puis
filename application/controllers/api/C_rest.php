@@ -435,14 +435,7 @@ class C_rest extends CI_Controller {
             }
             else if($dataToken['action']=='readDetailTopic'){
 
-                // Update total comment
-                $this->db->set('ReadComment', $dataToken['TotalComment']);
-                $this->db->where(array(
-                    'TopicID' => $dataToken['TopicID'],
-                    'UserID' => $dataToken['UserID']
-                ));
-                $this->db->update('db_academic.counseling_user');
-                $this->db->reset_query();
+
 
                 $dataTopic = $this->db->query('SELECT * FROM db_academic.counseling_topic ct 
                                                           WHERE ct.ID = "'.$dataToken['TopicID'].'" LIMIT 1 ')->result_array();
@@ -457,6 +450,16 @@ class C_rest extends CI_Controller {
                                                                 LEFT JOIN db_employees.employees em ON (em.NIP = cc.UserID)
                                                                 WHERE cc.TopicID = "'.$dataToken['TopicID'].'"
                                                                 ORDER BY cc.ID ASC ')->result_array();
+
+
+                    // Update total comment
+                    $this->db->set('ReadComment', count($dataComment));
+                    $this->db->where(array(
+                        'TopicID' => $dataToken['TopicID'],
+                        'UserID' => $dataToken['UserID']
+                    ));
+                    $this->db->update('db_academic.counseling_user');
+                    $this->db->reset_query();
 
 
                     if(count($dataComment)>0){
