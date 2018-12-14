@@ -753,7 +753,15 @@ class C_rest extends CI_Controller {
             $auth = $this->m_master->AuthAPI($dataToken);
             if ($auth) {
                 $this->load->model('vreservation/m_reservation');
-                $getData = $this->m_reservation->getDataT_booking_Api($dataToken['ID_t_booking'],$dataToken['DivisionID']);
+                if(array_key_exists("DivisionID",$dataToken))
+                {
+                    $getData = $this->m_reservation->getDataT_booking_Api($dataToken['ID_t_booking'],$dataToken['DivisionID']);
+                }
+                else
+                {
+                    $getData = $this->m_reservation->getDataT_booking_Api($dataToken['ID_t_booking'],17);
+                }
+                
                 echo json_encode($getData);
             }
             else

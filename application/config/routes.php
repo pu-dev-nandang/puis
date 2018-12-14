@@ -945,14 +945,15 @@ $route['vreservation/config/policy/submit'] = 'page/vreservation/c_config/policy
 $route['approve_venue/(:any)'] = 'api/c_global/approve_venue/$1';
 $route['cancel_venue/(:any)'] = 'api/c_global/cancel_venue/$1';
 $route['submitcancelvenue'] = 'api/c_global/submitcancelvenue';
-$route['approve_venue_markom/(:any)'] = 'api/c_global/approve_venue_markom/$1';
-$route['cancel_venue_markom/(:any)'] = 'api/c_global/cancel_venue_markom/$1';
+$route['view_venue_markom/(:any)'] = 'api/c_global/view_venue_markom/$1';
+//$route['cancel_venue_markom/(:any)'] = 'api/c_global/cancel_venue_markom/$1';
 $route['vreservation/confirm_eq_additional'] = 'api/c_global/vreservation_confirm_eq_additional';
 $route['view_eq_additional/(:any)'] = 'api/c_global/view_eq_additional/$1';
 $route['vreservation/return_eq'] = 'page/vreservation/c_transaksi/return_eq_show';
 $route['vreservation/modal_form_return_eq'] = 'page/vreservation/c_transaksi/modal_form_return_eq';
 $route['vreservation/modal_form_return_eq_save'] = 'page/vreservation/c_transaksi/modal_form_return_eq_save';
 $route['vreservation/t_eq/(:any)'] = 'page/vreservation/c_transaksi/t_eq/$1';
+$route['vreservation/master/markom_support'] = 'page/vreservation/c_master/markom_support';
 
 
 

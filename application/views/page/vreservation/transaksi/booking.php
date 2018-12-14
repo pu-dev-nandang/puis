@@ -700,34 +700,39 @@
         if(this.checked) {
             //equipment_additional = [];
             $('#divmarkom_support').remove();
-            var response = ['Video (Working time 14 Days)','Photo (Days - 1)','Full Duration (Days - 3)','Graphic Design (Working time 7 Days)'];
-            var splitBagi = 3;
-            var split = parseInt(response.length / splitBagi);
-            var sisa = response.length % splitBagi;
-            
-            if (sisa > 0) {
-                  split++;
-            }
-            var getRow = 0;
-            var divE_additional = '<div class="col-md-6" id="divmarkom_support" style="width: 600px;"><strong>Choices Support by Marcomm</strong></div>';
-            $('#markom_support').after(divE_additional);
-            $('#divmarkom_support').append('<table class="table" id ="tablechk_divmarkom_support">');
-            for (var i = 0; i < split; i++) {
-              if ((sisa > 0) && ((i + 1) == split) ) {
-                                  splitBagi = sisa;    
+             // var response = ['Photo (Days - 1)','Full Duration (Days - 3)'];
+             var url =base_url_js+'vreservation/master/markom_support';
+             $.post(url,function (data_json) {
+              var response = jQuery.parseJSON(data_json);
+              var splitBagi = 3;
+              var split = parseInt(response.length / splitBagi);
+              var sisa = response.length % splitBagi;
+              
+              if (sisa > 0) {
+                    split++;
               }
-              $('#tablechk_divmarkom_support').append('<tr id = "msa'+i+'">');
-              for (var k = 0; k < splitBagi; k++) {
-                  $('#msa'+i).append('<td>'+
-                                      '<input type="checkbox" class = "chk_markom_support_td" name="chk_markom_support_td" value = "'+response[getRow]+'">&nbsp'+ response[getRow]+
-                                   '</td>'
-                                  );
-                  getRow++;
+              var getRow = 0;
+              var divE_additional = '<div class="col-md-6" id="divmarkom_support" style="width: 600px;"><strong>Choices Support by Marcomm</strong></div>';
+              $('#markom_support').after(divE_additional);
+              $('#divmarkom_support').append('<table class="table" id ="tablechk_divmarkom_support">');
+              for (var i = 0; i < split; i++) {
+                if ((sisa > 0) && ((i + 1) == split) ) {
+                                    splitBagi = sisa;    
+                }
+                $('#tablechk_divmarkom_support').append('<tr id = "msa'+i+'">');
+                for (var k = 0; k < splitBagi; k++) {
+                    $('#msa'+i).append('<td>'+
+                                        '<input type="checkbox" class = "chk_markom_support_td" name="chk_markom_support_td" value = "'+response[getRow]['ID']+'">&nbsp'+ response[getRow]['Name']+
+                                     '</td>'
+                                    );
+                    getRow++;
+                }
+                $('#msa'+i).append('</tr>');
               }
-              $('#msa'+i).append('</tr>');
-            }
-            $('#tablechk_divmarkom_support').append('</table>');
-            $('#divmarkom_support').append('<label><strong>Input Note</strong></label><textarea class = "form-control chk_markom_support_td_add"></textarea>');
+              $('#tablechk_divmarkom_support').append('</table>');
+              $('#divmarkom_support').append('<label><strong>Input Note</strong></label><textarea class = "form-control chk_markom_support_td_add"></textarea>');
+             });
+
         }
 
     });

@@ -1343,11 +1343,8 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             // cek ApproveAccess
             $Status1 = $query[$i]['Status1'];
             $Status = $query[$i]['Status'];
-            $MarcommStatus = $query[$i]['MarcommStatus'];
-                $ApproveAccess = function($getRoom,$Status1,$Status,$CreatedBy,$MarcommStatus,$DivisionID){
-                    if ($MarcommStatus == 1) {
-                        return $find = 0;
-                    }
+            //$MarcommStatus = $query[$i]['MarcommStatus'];
+                $ApproveAccess = function($getRoom,$Status1,$Status,$CreatedBy,$DivisionID){
 
                     $PositionMain = '@';
                     $IDDivision = $DivisionID;
@@ -1474,7 +1471,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 };
 
                 $StatusBooking = '';
-                $CaseApproveAccess = $ApproveAccess($getRoom,$Status1,$Status,$query[$i]['CreatedBy'],$MarcommStatus,$DivisionID);
+                $CaseApproveAccess = $ApproveAccess($getRoom,$Status1,$Status,$query[$i]['CreatedBy'],$DivisionID);
                 switch ($CaseApproveAccess) {
                     case 0:
                          $StatusBooking = 'Awaiting approval Marcomm Division';
@@ -1590,8 +1587,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     else
                     {
                         if ($CaseApproveAccess == 0) {
-                            $PositionMain = $this->session->userdata('PositionMain');
-                            $IDDivision = $PositionMain['IDDivision'];
+                            $IDDivision = $DivisionID;
                             if ($IDDivision == 17) {
                                  $btnMarkomSupport = '<button class = "btn btn-danger btnMarkomSupport btn-xs" MarcommSupport = "'.$dd[$zx].'" ><i class="fa fa-times"></i> </button>';
                             } 
@@ -1620,6 +1616,11 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                             $pos = strpos($dd[$zx],':');
                             $dd[$zx] = substr($dd[$zx], 0,$pos+1).'<br>'.substr($dd[$zx], $pos+1,strlen($dd[$zx]));
                         }
+                        else
+                        {
+                            $c = $this->m_master->caribasedprimary('db_reservation.m_markom_support','ID',$dd[$zx]);
+                            $dd[$zx] = $c[0]['Name'];
+                        }
                       $MarkomSupport .= '<li>'.$dd[$zx].'&nbsp'.$btnMarkomSupport.'</li>';  
                     }
                     
@@ -1627,8 +1628,6 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 $MarkomSupport .= '</ul>';
             }
 
-            $DivisionID = $this->session->userdata('PositionMain');
-            $DivisionID = $DivisionID['IDDivision'];
             if ($MarkomSupport != '' && $DivisionID == 17) {
                 $boolAuthMarkom = 1;
             }
@@ -1704,11 +1703,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             // cek ApproveAccess
             $Status1 = $query[$i]['Status1'];
             $Status = $query[$i]['Status'];
-            $MarcommStatus = $query[$i]['MarcommStatus'];
-                $ApproveAccess = function($getRoom,$Status1,$Status,$CreatedBy,$MarcommStatus){
-                    if ($MarcommStatus == 1) {
-                        return $find = 0;
-                    }
+                $ApproveAccess = function($getRoom,$Status1,$Status,$CreatedBy){
+                    // if ($MarcommStatus == 1) {
+                    //     return $find = 0;
+                    // }
 
                     $PositionMain = $this->session->userdata('PositionMain');
                     $IDDivision = $PositionMain['IDDivision'];
@@ -1835,7 +1833,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 };
 
                 $StatusBooking = '';
-                $CaseApproveAccess = $ApproveAccess($getRoom,$Status1,$Status,$query[$i]['CreatedBy'],$MarcommStatus);
+                $CaseApproveAccess = $ApproveAccess($getRoom,$Status1,$Status,$query[$i]['CreatedBy']);
                 switch ($CaseApproveAccess) {
                     case 0:
                          $StatusBooking = 'Awaiting approval Marcomm Division';
@@ -1987,6 +1985,11 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                             $pos = strpos($dd[$zx],':');
                             $dd[$zx] = substr($dd[$zx], 0,$pos+1).'<br>'.substr($dd[$zx], $pos+1,strlen($dd[$zx]));
                         }
+                        else
+                        {
+                            $c = $this->m_master->caribasedprimary('db_reservation.m_markom_support','ID',$dd[$zx]);
+                            $dd[$zx] = $c[0]['Name'];
+                        }
                       $MarkomSupport .= '<li>'.$dd[$zx].'&nbsp'.$btnMarkomSupport.'</li>';  
                     }
                     
@@ -1996,7 +1999,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
             $DivisionID = $this->session->userdata('PositionMain');
             $DivisionID = $DivisionID['IDDivision'];
-            if ($MarkomSupport != '' && $DivisionID == 17) {
+            if ( ($MarkomSupport != '' && $DivisionID == 17) || $this->session->userdata('ID_group_user') < 3) {
                 $boolAuthMarkom = 1;
             }
 
