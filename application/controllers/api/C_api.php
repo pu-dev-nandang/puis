@@ -2346,8 +2346,6 @@ class C_api extends CI_Controller {
                 </div>';
             }
 
-
-
             $nestedData[] = $viewCourse;
             $nestedData[] = $invigilator;
             $nestedData[] = '<div  style="text-align:center;">'.$totalStudent.'</div>';

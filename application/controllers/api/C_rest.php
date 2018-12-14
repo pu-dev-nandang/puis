@@ -367,10 +367,16 @@ class C_rest extends CI_Controller {
 
                 $UserID = $dataToken['UserID'];
 
+                $dataSearch = '';
+                if( !empty($requestData['search']['value']) ) {
+                    $search = $requestData['search']['value'];
+                    $dataSearch = ' AND ( ct.Topic LIKE "%'.$search.'%" )';
+                }
+
                 $queryDefault = 'SELECT cu.ReadComment, ct.* FROM db_academic.counseling_user cu
                                               LEFT JOIN db_academic.counseling_topic ct 
                                               ON (ct.ID = cu.TopicID)
-                                              WHERE cu.UserID = "'.$UserID.'"
+                                              WHERE ( cu.UserID = "'.$UserID.'" ) '.$dataSearch.'
                                                ORDER BY cu.TopicID DESC';
 
                 $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
@@ -385,10 +391,31 @@ class C_rest extends CI_Controller {
                     $nestedData = array();
                     $row = $query[$i];
 
+                    $dataTotalUser = $this->db->select('ID')->get_where('db_academic.counseling_user',array('TopicID' => $row['ID'], 'Status' => '2'))->result_array();
+                    $dataComment = $this->db->select('ID')->get_where('db_academic.counseling_comment',array('TopicID' => $row['ID']))->result_array();
+
+                    $dataToken = array(
+                        'TopicID' => $row['ID'],
+                        'TotalComment' => count($dataComment)
+                    );
+
+                    $ReadComment = (int) $row['ReadComment'];
+                    $ur = count($dataComment) - $ReadComment;
+                    $unread = ($ur>0) ? ' - <span style="color: #ff5722;">'.$ur.' unread comments</span>' : '';
+
+                    $key = "s3Cr3T-G4N";
+                    $token = $this->jwt->encode($dataToken,$key);
+
+
+                    $topic = '<a href="'.url_sign_in_lecturers.'counseling/detail-topic/'.$token.'">'.$row['Topic'].'</a>
+                              <br/><span style="font-size: 12px;color: #9e9e9e;">'.date('D, d M Y',strtotime($row['CreateAt'])).'</span>'.$unread;
+
+                    $btnAction = '<button class="btn btn-sm btn-default btn-default-primary btn-act"><i class="fa fa-pencil"></i></button> | <button class="btn btn-sm btn-default btn-default-danger btn-act"><i class="fa fa-trash"></i></button>';
                     $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
-                    $nestedData[] = '<div  style="text-align:left;"><b>'.$row['Topic'].'</b></div>';
-                    $nestedData[] = '<div  style="text-align:center;">-</div>';
-                    $nestedData[] = '<div  style="text-align:center;">-</div>';
+                    $nestedData[] = '<div  style="text-align:left;">'.$topic.'</div>';
+                    $nestedData[] = '<div  style="text-align:center;"><i class="fa fa-user"></i> <span>'.count($dataTotalUser).'</span></div>';
+                    $nestedData[] = '<div  style="text-align:center;"><i class="fa fa-comments"></i> <span>'.count($dataComment).'</span></div>';
+                    $nestedData[] = '<div  style="text-align:center;">'.$btnAction.'</div>';
 
                     $no++;
 
@@ -405,6 +432,71 @@ class C_rest extends CI_Controller {
                 echo json_encode($json_data);
 //                $data = $this->m_rest->getTopicByUserID($UserID);
 //                return print_r(json_encode($data));
+            }
+            else if($dataToken['action']=='readDetailTopic'){
+
+                // Update total comment
+                $this->db->set('ReadComment', $dataToken['TotalComment']);
+                $this->db->where(array(
+                    'TopicID' => $dataToken['TopicID'],
+                    'UserID' => $dataToken['UserID']
+                ));
+                $this->db->update('db_academic.counseling_user');
+                $this->db->reset_query();
+
+                $dataTopic = $this->db->query('SELECT * FROM db_academic.counseling_topic ct 
+                                                          WHERE ct.ID = "'.$dataToken['TopicID'].'" LIMIT 1 ')->result_array();
+
+
+                // Read Comment
+                if(count($dataTopic)>0){
+
+                    $dataComment = $this->db->query('SELECT cc.*, cu.Status, em.Name AS Lecturer, em.Photo AS EmPhoto , auts.Name AS Student, auts.Year FROM db_academic.counseling_comment cc 
+                                                                LEFT JOIN db_academic.counseling_user cu ON (cu.TopicID = cc.TopicID AND cu.UserID = cc.UserID) 
+                                                                LEFT JOIN db_academic.auth_students auts ON (auts.NPM = cc.UserID)
+                                                                LEFT JOIN db_employees.employees em ON (em.NIP = cc.UserID)
+                                                                WHERE cc.TopicID = "'.$dataToken['TopicID'].'"
+                                                                ORDER BY cc.ID ASC ')->result_array();
+
+                    if(count($dataComment)>0){
+                        for($i=0;$i<count($dataComment);$i++){
+
+                            if($dataComment[$i]['Status']==2 || $dataComment[$i]['Status']=='2'){
+                                // Get Photo Student
+                                $db_std = 'ta_'.$dataComment[$i]['Year'];
+                                $dataPhoto = $this->db->select('Photo')->get_where($db_std.'.students',array('NPM'=>$dataComment[$i]['UserID'],1))->result_array();
+
+                                $dataComment[$i]['Photo'] = url_img_students.''.$dataPhoto[0]['Photo'];
+                            } else {
+                                $dataComment[$i]['Photo'] = url_img_employees.''.$dataComment[$i]['EmPhoto'];
+                            }
+
+
+
+                            if($dataComment[$i]['CommentID']!=null && $dataComment[$i]['CommentID']!=''){
+                                $dataQuote = $this->db->query('SELECT cc.*, cu.Status, em.Name AS Lecturer, auts.Name AS Student FROM db_academic.counseling_comment cc 
+                                                                LEFT JOIN db_academic.counseling_user cu ON (cu.TopicID = cc.TopicID AND cu.UserID = cc.UserID) 
+                                                                LEFT JOIN db_academic.auth_students auts ON (auts.NPM = cc.UserID)
+                                                                LEFT JOIN db_employees.employees em ON (em.NIP = cc.UserID)
+                                                                WHERE cc.ID = "'.$dataComment[$i]['CommentID'].'" ')->result_array();
+                                $dataComment[$i]['Quote'] = $dataQuote;
+                            }
+                        }
+                    }
+
+                    $dataTopic[0]['Comment'] = $dataComment;
+                }
+
+                return print_r(json_encode($dataTopic));
+
+
+            }
+            else if($dataToken['action']=='addComment'){
+
+                $dataForm = (array) $dataToken['dataForm'];
+                $this->db->insert('db_academic.counseling_comment',$dataForm);
+
+                return print_r(1);
             }
         } else {
             $msg = array(
