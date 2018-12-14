@@ -626,16 +626,26 @@
                 $('#tablechk_e_additional').append('<tr id = "a'+i+'">');
                 for (var k = 0; k < splitBagi; k++) {
                     $('#a'+i).append('<td>'+
-                                        '<input type="checkbox" min = "1" class = "chke_additional" name="chke_additional" value = "'+response[getRow].ID_add+'">&nbsp'+ response[getRow].Equipment+' By '+response[getRow].Division+
+                                        '<input type="checkbox" min = "1" class = "chke_additional" name="chke_additional" value = "'+response[getRow].ID_add+'" max ="'+response[getRow].Qty+'">&nbsp'+ response[getRow].Equipment+' By '+response[getRow].Division+
                                      '</td>'+
                                      '<td>'+
-                                        ' <input type="number" min = "1" class="form-control chke_additional'+response[getRow].ID_add+' hide"  value="1" id = "chke_additional'+response[getRow].ID_add+'">'+'</td>'
+                                        ' <input type="number" min = "1" class="form-control chke_additional_number chke_additional'+response[getRow].ID_add+' hide"  value="1" id = "chke_additional'+response[getRow].ID_add+'" max ="'+response[getRow].Qty+'">'+'</td>'
                                     );
                     getRow++;
                 }
                 $('#a'+i).append('</tr>');
               }
               $('#tablechk_e_additional').append('</table>');
+
+              $(".chke_additional_number").keyup(function(){
+                var maxx = $(this).attr('max');
+                var eval = $(this).val();
+                var regexx =  /^\d+$/;
+                if (!eval.match(regexx) || parseInt(eval) > parseInt(maxx) ) {
+                    $(this).val(maxx);
+                }
+              })
+
             }).done(function () {
               //loadAlamatSekolah();
             });

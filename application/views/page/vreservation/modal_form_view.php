@@ -167,21 +167,21 @@
         </div>
         <div style="text-align: center;">       
     		<div class="col-sm-12" id="BtnFooter">
-                <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>
+                <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>
                 <?php if ($this->session->userdata('ID_group_user') < 3): ?>
-                    <button type="button" class="btn btn-success btn-edit btn-apppove" id_table = "<?php echo $ID ?>" ApproveAccess = <?php echo $ApproveAccess ?> >Approve</button>
+                    <!-- <button type="button" class="btn btn-success btn-edit btn-apppove" id_table = "<?php echo $ID ?>" ApproveAccess = <?php echo $ApproveAccess ?> >Approve</button> -->
                 <?php else: ?>
                     <?php switch($ApproveAccess): 
                     case 0: ?>
                     <?php case 1: ?>
                     <?php break; ?>
                     <?php case 2: ?>
-                        <button type="button" class="btn btn-success btn-edit btn-apppove" id_table = "<?php echo $ID ?>" ApproveAccess = <?php echo $ApproveAccess ?> >Approve</button>
+                        <!-- <button type="button" class="btn btn-success btn-edit btn-apppove" id_table = "<?php echo $ID ?>" ApproveAccess = <?php echo $ApproveAccess ?> >Approve</button> -->
                     <?php case 3: ?>
                         
                     <?php break; ?>
                     <?php case 4: ?>
-                        <button type="button" class="btn btn-success btn-edit btn-apppove" id_table = "<?php echo $ID ?>" ApproveAccess = <?php echo $ApproveAccess ?> >Approve</button>
+                        <!-- <button type="button" class="btn btn-success btn-edit btn-apppove" id_table = "<?php echo $ID ?>" ApproveAccess = <?php echo $ApproveAccess ?> >Approve</button> -->
                     <?php break; ?>
                     <?php endswitch; ?>    
                 <?php endif ?>

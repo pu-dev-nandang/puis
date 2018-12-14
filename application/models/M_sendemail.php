@@ -372,7 +372,7 @@ class M_sendemail extends CI_Model {
         // $ical .= "DESCRIPTION:".$textEmail."\r\n"; 
         $ical .= "X-ALT-DESC;FMTTYPE=text/html:".$textEmail."\r\n"; 
         $ical .= "BEGIN:VALARM\r\n";
-        $ical .= "TRIGGER:-PT720M\r\n";
+        $ical .= "TRIGGER:-PT1440M\r\n";
         //$ical .= "TRIGGER:-PT15M\r\n";
         $ical .= "ACTION:DISPLAY\r\n";
         $ical .= "DESCRIPTION:Reminder\r\n";

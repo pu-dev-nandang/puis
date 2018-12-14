@@ -154,7 +154,7 @@
 	               var token = jwt_encode(data,"UAP)(*");
 	               $.post(url,{ token:token }, function (data_json) {
 	               	$('.id_'+IDTable).remove();
-	               	
+	               	loadDataListApprove();
 	               	
 	               })
 

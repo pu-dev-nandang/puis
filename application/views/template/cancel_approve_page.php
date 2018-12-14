@@ -83,6 +83,12 @@
 				$.post(url,{token:token},function (resultJson) {
 					$("#contentIsi").html('<h3>Thank for your appreciated</h3>');
 					$("#cancel").remove();
+					var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+					// var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
+					  socket.emit('update_schedule_notifikasi', { 
+					    update_schedule_notifikasi: '1',
+					    date : '',
+					  });
 					loadingEnd(1000);
 				});
 			}

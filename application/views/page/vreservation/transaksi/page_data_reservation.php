@@ -396,7 +396,7 @@
                     setTimeout(function () {
                        toastr.options.fadeOut = 10000;
                        toastr.success('Data berhasil disimpan', 'Success!');
-                       loadDataListApprove();
+                       //loadDataListApprove();
                        // send notification other school from client
                        var socket = io.connect( 'http://'+window.location.hostname+':3000' );
                        // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );

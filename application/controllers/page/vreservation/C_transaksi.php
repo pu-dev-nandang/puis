@@ -213,11 +213,11 @@ class C_transaksi extends Vreservation_Controler {
                     $ID_equipment_additional = $gett_booking_eq_additional[0]['ID_equipment_additional'];
                     $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_additional);
                     $OwnerID = $get[0]['Owner'];
+                    $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$OwnerID);
                     if (!in_array($OwnerID, $arr_to_eq_add_ID_DIV)) {
                         $arr_to_eq_add_ID_DIV[] = $OwnerID;
+                        $arr_to_eq_add[] = $getX[0]['Email'];
                     }
-                    $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$OwnerID);
-                    $arr_to_eq_add[] = $getX[0]['Email'];
                     $Owner = $getX[0]['Division'];
                     $ID_m_equipment = $get[0]['ID_m_equipment'];
                     $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
@@ -388,7 +388,7 @@ class C_transaksi extends Vreservation_Controler {
                                 $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
 
                                 // equipment additional
-                                for ($zn=0; $zn < count($arr_to_eq_add); $zn++) { 
+                                for ($zn=0; $zn < count($arr_to_eq_add_ID_DIV); $zn++) { 
                                     $token = array(
                                         'EmailPU' => $EmailPU,
                                         'ID_t_booking' => $ID_t_booking,
@@ -489,7 +489,7 @@ class C_transaksi extends Vreservation_Controler {
                                 $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
 
                                 // equipment additional
-                                for ($zn=0; $zn < count($arr_to_eq_add); $zn++) { 
+                                 for ($zn=0; $zn < count($arr_to_eq_add_ID_DIV); $zn++) { 
                                     $token = array(
                                         'EmailPU' => $EmailPU,
                                         'ID_t_booking' => $ID_t_booking,
@@ -1168,7 +1168,23 @@ class C_transaksi extends Vreservation_Controler {
                 $Reason = $input['Reason'];
             }
 
+            $KetAdditional_eq = '';
             for ($i=0; $i < count($getE_additional); $i++) { 
+                if ($i == 0) {
+                    $KetAdditional_eq = '<br><br>*  Equipment Additional<ul>';
+                }
+                $gett_booking_eq_additional = $this->m_reservation->gett_booking_eq_additional($getE_additional[$i]['ID_equipment_additional'],$get[0]['ID']);
+                $Qty = $gett_booking_eq_additional[0]['Qty'];
+                $ID_equipment_additional = $gett_booking_eq_additional[0]['ID_equipment_additional'];
+                $get123 = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_additional);
+                $OwnerID = $get123[0]['Owner'];
+                $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$OwnerID);
+                $Owner = $getX[0]['Division'];
+                $ID_m_equipment = $get123[0]['ID_m_equipment'];
+                $get123 = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
+                $KetAdditional_eq .= '<li>'.$get123[0]['Equipment'].' by '.$Owner.'['.$Qty.']</li>';
+
+
                 $dataSave = array(
                     'ID_t_booking_eq_add' => $getE_additional[$i]['ID'],
                     'ID_t_booking' => $get[0]['ID'],
@@ -1177,6 +1193,7 @@ class C_transaksi extends Vreservation_Controler {
                 );
                 $this->db->insert('db_reservation.t_booking_eq_additional_delete', $dataSave); 
             }
+            $KetAdditional_eq .= '</ul>';
             
             $sql = "delete from db_reservation.t_booking_eq_additional where ID_t_booking = ".$get[0]['ID'];
             $query=$this->db->query($sql, array());
@@ -1203,8 +1220,35 @@ class C_transaksi extends Vreservation_Controler {
             $this->db->insert('db_reservation.t_booking_delete', $dataSave); 
 
             $this->m_master->delete_id_table_all_db($get[0]['ID'],'db_reservation.t_booking');
+            $this->m_master->delete_id_table_all_db($get[0]['ID'],'db_reservation.t_booking_eq_additional');
 // send email
-            
+            //suggestion room
+                $ParticipantQty = $get[0]['ParticipantQty'];
+                //find room besar >= ParticipantQty and category room sama
+                $sg_room = function($ParticipantQty,$Room){
+                    $result = '';
+                    $r = array();
+                    $a = $this->m_master->caribasedprimary('db_academic.classroom','Room',$Room);
+                    $ID_CategoryRoom = $a[0]['ID_CategoryRoom'];
+                    $b = $this->m_master->caribasedprimary('db_academic.classroom','ID_CategoryRoom',$ID_CategoryRoom);
+                    for ($i=0; $i < count($b); $i++) { 
+                        if ($b[$i]['Seat'] > $ParticipantQty) {
+                            $r[] = $b[$i]['Room'];
+                        }
+                    }
+
+                    if (count($r) > 0) {
+                        $result = 'Following suggestion from our room :<ul>';
+                        for ($i=0; $i < count($r); $i++) { 
+                            $result .= '<li>'.$r[$i].'</li>';
+                        }
+                        $result .='</ul>';
+                    }
+
+                    return $result;
+                };
+                $sg_room = $sg_room($ParticipantQty,$get[0]['Room']);
+            //suggestion room
             $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['Start']);
             $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['End']);
             $StartNameDay = $Startdatetime->format('l');
@@ -1226,6 +1270,9 @@ class C_transaksi extends Vreservation_Controler {
                         </ul>
 
                         '.$EmailKetAdditional.'
+                        '.$KetAdditional_eq.'</br>
+                        <br>
+                            Please Create new schedule, if you need it and '.$sg_room.'
                     ';        
             $to = $Email;
             $subject = "Podomoro University Venue Reservation Cancel Reservation";
@@ -1247,6 +1294,9 @@ class C_transaksi extends Vreservation_Controler {
                                      </ul>
 
                                      '.$EmailKetAdditional.'
+                                     '.$KetAdditional_eq.'</br>
+                                     <br>
+                                         Please Create new schedule, if you need it and '.$sg_room.'
                                  ';        
                          $to = $Email;
                          $subject = "Podomoro University Venue Reservation Cancel Reservation";
@@ -1269,6 +1319,9 @@ class C_transaksi extends Vreservation_Controler {
                             </ul>
 
                             '.$EmailKetAdditional.'
+                            '.$KetAdditional_eq.'</br>
+                            <br>
+                            Please Create new schedule, if you need it and '.$sg_room.'
                         ';        
                 $to = $Email;
                 $subject = "Podomoro University Venue Reservation Cancel Reservation";
@@ -1321,15 +1374,38 @@ class C_transaksi extends Vreservation_Controler {
                     $DivisionID = $this->session->userdata('PositionMain');
                         $DivisionID = $DivisionID['IDDivision'];
                         if ($DivisionID == $OwnerID) {
-                            $ID_m_equipment = $get[0]['ID_m_equipment'];
-                            $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
-                            $temp = array(
-                                'ID_equipment_additional' => $ID_equipment_add[$j],
-                                'Name' => $get[0]['Equipment'],
-                                'Qty' => $Qty,
-                                'IDTable' => $gett_booking_eq_additional[0]['ID'],
-                            );
-                            $arr[] = $temp;
+                            // check data existing in t_return_eq
+                            $g =$this->m_master->caribasedprimary('db_reservation.t_return_eq','ID_t_booking_eq_additional',$gett_booking_eq_additional[0]['ID']);
+                            if (count($g) == 0 ) {
+                                $ID_m_equipment = $get[0]['ID_m_equipment'];
+                                $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
+                                $temp = array(
+                                    'ID_equipment_additional' => $ID_equipment_add[$j],
+                                    'Name' => $get[0]['Equipment'],
+                                    'Qty' => $Qty,
+                                    'IDTable' => $gett_booking_eq_additional[0]['ID'],
+                                );
+                                $arr[] = $temp;
+                            }
+                            
+                        }
+                        else
+                        {
+                            if ($this->session->userdata('ID_group_user') < 3) {
+                                // check data existing in t_return_eq
+                                $g =$this->m_master->caribasedprimary('db_reservation.t_return_eq','ID_t_booking_eq_additional',$gett_booking_eq_additional[0]['ID']);
+                                if (count($g) == 0 ) {
+                                    $ID_m_equipment = $get[0]['ID_m_equipment'];
+                                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
+                                    $temp = array(
+                                        'ID_equipment_additional' => $ID_equipment_add[$j],
+                                        'Name' => $get[0]['Equipment'],
+                                        'Qty' => $Qty,
+                                        'IDTable' => $gett_booking_eq_additional[0]['ID'],
+                                    );
+                                    $arr[] = $temp;
+                                }
+                            }
                         }
                 }
             }

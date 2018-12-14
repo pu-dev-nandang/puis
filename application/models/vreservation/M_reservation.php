@@ -938,6 +938,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 join db_reservation.t_booking_eq_additional as c on a.ID = c.ID_t_booking
                  where '.$StatusQ.''.$add_where.' and c.ID not in (select ID_t_booking_eq_additional from db_reservation.t_return_eq) and c.Status = 1 group by a.ID
                 order by a.Status asc,a.Start asc';
+                // print_r($sql);die();
         $query=$this->db->query($sql, array())->result_array();
         $NIP = '@';
         for ($i=0; $i < count($query); $i++) {
@@ -1132,7 +1133,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     $OwnerID = $get[0]['Owner'];
                     $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$OwnerID);
                     $Owner = $getX[0]['Division'];
-                        if ($DivisionID == $OwnerID) {
+                        if ($this->session->userdata('ID_group_user') < 3) {
                             if ($query[$i]['Status'] != 1) {
                                 $btnEquipment = '<input type = "checkbox" class = "chkEquipment_'.$query[$i]['ID'].'" value = "'.$ID_equipment_add[$j].'">';
                             }
@@ -1142,8 +1143,23 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                 }
                             }
                             
-                            
-                        } 
+                        }
+                        else
+                        {
+                            if ($DivisionID == $OwnerID) {
+                                if ($query[$i]['Status'] != 1) {
+                                    $btnEquipment = '<input type = "checkbox" class = "chkEquipment_'.$query[$i]['ID'].'" value = "'.$ID_equipment_add[$j].'">';
+                                }
+                                if ($gett_booking_eq_additional[0]['Status'] == 1) {
+                                    if ($boolAuthEq == 0) {
+                                        $boolAuthEq = 1;
+                                    }
+                                }
+                                
+                                
+                            } 
+                        }
+                        
 
                     $ID_m_equipment = $get[0]['ID_m_equipment'];
                     $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);

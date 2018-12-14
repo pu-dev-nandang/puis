@@ -261,6 +261,13 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/snap.svg/0.3.0/snap.svg-min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/gsap/1.16.1/TweenMax.min.js"></script>
 <script>
+	var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+	// var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
+	  socket.emit('update_schedule_notifikasi', { 
+	    update_schedule_notifikasi: '1',
+	    date : '',
+	  });
+	
     //GSAP variables
     var master = new TimelineMax({delay:1.5}),
         student = $("#student"),
