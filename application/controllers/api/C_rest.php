@@ -464,7 +464,10 @@ class C_rest extends CI_Controller {
                               <span style="font-size: 12px;color: #9e9e9e;">'.date('D, d M Y',strtotime($row['CreateAt'])).'</span>'.$unread.'
                               ';
 
-                    $btnAction = '<button class="btn btn-sm btn-default btn-default-danger btn-act-delete" data-id="'.$row['ID'].'"><i class="fa fa-trash"></i></button>';
+                    $btnAction = ($row['CreateBy']==$UserID)
+                        ? '<button class="btn btn-sm btn-default btn-default-danger btn-act-delete" data-id="'.$row['ID'].'"><i class="fa fa-trash"></i></button>'
+                        : '-';
+
                     $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
                     $nestedData[] = '<div  style="text-align:left;">'.$topic.'</div>';
                     $nestedData[] = '<div  style="text-align:left;">
