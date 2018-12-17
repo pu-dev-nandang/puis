@@ -265,8 +265,8 @@ class C_rest extends CI_Controller {
         }
     }
 
-    // Nandang - digunakan khusus untuk selec2.js
-    public function geTStudent_ServerSide(){
+    // Nandang - Get Student digunakan khusus untuk selec2.js
+    public function getStudent_ServerSide(){
 
         $term = $this->input->get('term');
 
@@ -281,6 +281,38 @@ class C_rest extends CI_Controller {
                 $arr = array(
                     'id' => $d['NPM'],
                     'text' => $d['NPM'].' - '.$d['Name']
+                );
+                array_push($result,$arr);
+            }
+        }
+
+        $data_result = array(
+            'results' => $result
+        );
+
+        return print_r(json_encode($data_result));
+
+    }
+
+    // Nandang - Get Lecturer digunakan khusus untuk selec2.js
+    public function getLecturer_ServerSide(){
+
+        $term = $this->input->get('term');
+
+        $data = $this->db->query('SELECT * FROM db_employees.employees em WHERE (em.StatusEmployeeID = "3"  
+                                                  OR em.StatusEmployeeID = "4" 
+                                                  OR em.StatusEmployeeID = "5"
+                                                  OR em.StatusEmployeeID = "6" ) AND (
+                                                  em.NIP LIKE "%'.$term.'%" 
+                                                  OR em.Name LIKE "%'.$term.'%" ) LIMIT 15 ')->result_array();
+
+        $result = [];
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+                $d = $data[$i];
+                $arr = array(
+                    'id' => $d['NIP'],
+                    'text' => $d['NIP'].' - '.$d['Name']
                 );
                 array_push($result,$arr);
             }
@@ -374,8 +406,10 @@ class C_rest extends CI_Controller {
                     $dataSearch = ' AND ( ct.Topic LIKE "%'.$search.'%" )';
                 }
 
-                $queryDefault = 'SELECT cu.ReadComment, ct.* FROM db_academic.counseling_user cu
-                                              LEFT JOIN db_academic.counseling_topic ct 
+                $queryDefault = 'SELECT cu.ReadComment, ct.*, em.Name AS Owner 
+                                              FROM db_academic.counseling_user cu
+                                              LEFT JOIN db_academic.counseling_topic ct
+                                              LEFT JOIN db_employees.employees em ON (em.NIP = ct.CreateBy)
                                               ON (ct.ID = cu.TopicID)
                                               WHERE ( cu.UserID = "'.$UserID.'" ) '.$dataSearch.'
                                                ORDER BY cu.TopicID DESC';
@@ -392,9 +426,18 @@ class C_rest extends CI_Controller {
                     $nestedData = array();
                     $row = $query[$i];
 
-                    $dataTotalUser = $this->db->select('ID')->get_where('db_academic.counseling_user',array('TopicID' => $row['ID'], 'Status' => '2'))->result_array();
-                    $dataComment = $this->db->select('ID')->get_where('db_academic.counseling_comment',array('TopicID' => $row['ID']))->result_array();
+                    $dataTotalUser = $this->db->query('SELECT cu.ID, auts.NPM, auts.Name FROM db_academic.counseling_user cu 
+                                                                  LEFT JOIN db_academic.auth_students auts ON (auts.NPM = cu.UserID)
+                                                                  WHERE cu.TopicID = "'.$row['ID'].'" AND cu.Status = "2" 
+                                                                  ORDER BY auts.NPM ASC')->result_array();
 
+                    $dataTotalLecturer = $this->db->query('SELECT cu.ID, em.NIP, em.Name FROM db_academic.counseling_user cu 
+                                                                  LEFT JOIN db_employees.employees em ON (em.NIP = cu.UserID)
+                                                                  WHERE cu.TopicID = "'.$row['ID'].'" AND cu.Status = "1" 
+                                                                  ORDER BY cu.ID ASC')->result_array();
+
+                        $this->db->select('ID')->get_where('db_academic.counseling_user',array('TopicID' => $row['ID'], 'Status' => '1'))->result_array();
+                    $dataComment = $this->db->select('ID')->get_where('db_academic.counseling_comment',array('TopicID' => $row['ID']))->result_array();
 
 
                     $dataToken = array(
@@ -409,18 +452,34 @@ class C_rest extends CI_Controller {
                     $key = "s3Cr3T-G4N";
                     $token = $this->jwt->encode($dataToken,$key);
 
+                    $tokenLecturer = $this->jwt->encode($dataTotalLecturer,$key);
+                    $tokenStudent = $this->jwt->encode($dataTotalUser,$key);
 
                     $urlDetail = ($user=='lecturer') ? url_sign_in_lecturers : url_sign_in_students;
 
                     $topic = '<a href="'.$urlDetail.'counseling/detail-topic/'.$token.'">'.$row['Topic'].'</a>
-                              <br/><span style="font-size: 12px;color: #9e9e9e;">'.date('D, d M Y',strtotime($row['CreateAt'])).'</span>'.$unread;
+                              <br/>
+                              <span style="font-size: 12px;color: #9e9e9e;">Owner : '.$row['Owner'].'</span>
+                              <br/>
+                              <span style="font-size: 12px;color: #9e9e9e;">'.date('D, d M Y',strtotime($row['CreateAt'])).'</span>'.$unread.'
+                              ';
 
-                    $btnAction = '<button class="btn btn-sm btn-default btn-default-primary btn-act"><i class="fa fa-pencil"></i></button> | <button class="btn btn-sm btn-default btn-default-danger btn-act"><i class="fa fa-trash"></i></button>';
+                    $btnAction = '<button class="btn btn-sm btn-default btn-default-danger btn-act-delete" data-id="'.$row['ID'].'"><i class="fa fa-trash"></i></button>';
                     $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
                     $nestedData[] = '<div  style="text-align:left;">'.$topic.'</div>';
-                    $nestedData[] = '<div  style="text-align:center;"><i class="fa fa-user"></i> <span>'.count($dataTotalUser).'</span></div>';
+                    $nestedData[] = '<div  style="text-align:left;">
+                                            <span style="font-size: 12px;">Lecturer : <a href="javascript:void(0);" data-id="'.$row['ID'].'" class="a-user btnShowLecturer">'.count($dataTotalLecturer).'</a></span>
+                                            <br/><span style="font-size: 12px;">Students : <a href="javascript:void(0);" data-id="'.$row['ID'].'" class="a-user btnShowStudent">'.count($dataTotalUser).'</a></span>
+                                            <textarea id="showLecturer'.$row['ID'].'" class="hide" readonly>'.$tokenLecturer.'</textarea>
+                                            <textarea id="showStudent'.$row['ID'].'" class="hide" readonly>'.$tokenStudent.'</textarea>
+                                            <input id="owner'.$row['ID'].'" class="hide" value="'.$row['CreateBy'].'" readonly/>
+                                      </div>';
                     $nestedData[] = '<div  style="text-align:center;"><i class="fa fa-comments"></i> <span>'.count($dataComment).'</span></div>';
-                    $nestedData[] = '<div  style="text-align:center;">'.$btnAction.'</div>';
+
+                    if($user=='lecturer'){
+                        $nestedData[] = '<div  style="text-align:center;">'.$btnAction.'</div>';
+                    }
+
 
                     $no++;
 
@@ -500,6 +559,46 @@ class C_rest extends CI_Controller {
                 $this->db->insert('db_academic.counseling_comment',$dataForm);
 
                 return print_r(1);
+            }
+            else if($dataToken['action']=='inviteLecturer'){
+
+                $TopicID = $dataToken['TopicID'];
+                $formSelectLecturer = (array) $dataToken['formSelectLecturer'];
+
+                if(count($formSelectLecturer)>0){
+                    for($i=0;$i<count($formSelectLecturer);$i++){
+                        $arr = array(
+                            'TopicID' => $TopicID,
+                            'UserID' => $formSelectLecturer[$i],
+                            'ReadComment' => 0,
+                            'Status' => '1'
+                        );
+
+                        $this->db->insert('db_academic.counseling_user',$arr);
+                    }
+                }
+
+                return print_r(1);
+
+            }
+            else if($dataToken['action']=='removeLecturer'){
+                $ID = $dataToken['CUID'];
+
+                $this->db->where('ID', $ID);
+                $this->db->delete('db_academic.counseling_user');
+                return print_r(1);
+            }
+            else if($dataToken['action']=='deleteTopic'){
+                $TopicID = $dataToken['TopicID'];
+                $this->db->where('TopicID', $TopicID);
+                $this->db->delete(array('db_academic.counseling_comment','db_academic.counseling_user'));
+                $this->db->reset_query();
+
+                $this->db->where('ID', $TopicID);
+                $this->db->delete('db_academic.counseling_topic');
+
+                return print_r(1);
+
             }
         } else {
             $msg = array(
