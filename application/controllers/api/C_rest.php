@@ -468,7 +468,6 @@ class C_rest extends CI_Controller {
                             if($dataComment[$i]['Status']==2 || $dataComment[$i]['Status']=='2'){
                                 // Get Photo Student
                                 $db_std = 'ta_'.$dataComment[$i]['Year'];
-
                                 $dataPhoto = $this->db->query('SELECT Photo FROM '.$db_std.'.students WHERE NPM = "'.$dataComment[$i]['UserID'].'" LIMIT 1')->result_array();
 
                                 $dataComment[$i]['Photo'] = url_img_students.''.$db_std.'/'.$dataPhoto[0]['Photo'];
