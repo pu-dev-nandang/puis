@@ -471,7 +471,7 @@ class C_rest extends CI_Controller {
 
                                 $dataPhoto = $this->db->query('SELECT Photo FROM '.$db_std.'.students WHERE NPM = "'.$dataComment[$i]['UserID'].'" LIMIT 1')->result_array();
 
-                                $dataComment[$i]['Photo'] = url_img_students.''.$dataPhoto[0]['Photo'];
+                                $dataComment[$i]['Photo'] = url_img_students.''.$db_std.'/'.$dataPhoto[0]['Photo'];
                             } else {
                                 $dataComment[$i]['Photo'] = url_img_employees.''.$dataComment[$i]['EmPhoto'];
                             }
