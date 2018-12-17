@@ -422,12 +422,72 @@
        
     });
 
-      $(document).on('click','.btnMarkomSupport', function () {
-        var MarcommSupport = $(this).attr('MarcommSupport');
-        // console.log(ID_equipment_add);
-        tempMarkom.push(MarcommSupport);
-        $(this)
-          .parent().remove();
-          // console.log(tempMarkom);
-      });
+    $(document).on('click','.btn_markom_submit', function () {
+       var idtbooking = $(this).attr('idtbooking');
+       var action = $(this).attr('action');
+       var arr_eq = [];
+       $(".MarkomSupport_"+idtbooking).each(function(){
+        if(this.checked){
+          arr_eq.push($(this).val())
+        }
+       });
+       if (arr_eq.length > 0) {
+          $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Are you sure ? </b> ' +
+              '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+              '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+              '</div>');
+          $('#NotificationModal').modal('show');
+
+          $("#confirmYes").click(function(){
+              $('#NotificationModal .modal-header').addClass('hide');
+              $('#NotificationModal .modal-body').html('<center>' +
+                  '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+                  '                    <br/>' +
+                  '                    Loading Data . . .' +
+                  '                </center>');
+              $('#NotificationModal .modal-footer').addClass('hide');
+              $('#NotificationModal').modal({
+                  'backdrop' : 'static',
+                  'show' : true
+              });
+              var url =base_url_js+'vreservation/confirm_markom_support';
+              var data = {
+                            idtbooking : idtbooking,
+                            action    : action,
+                            arr_eq : arr_eq,
+                            auth : 's3Cr3T-G4N',
+                          };
+              var token = jwt_encode(data,'UAP)(*');
+              $.post(url,{token:token},function (data_json) {
+                var response = jQuery.parseJSON(data_json);
+                if (response == '') {
+                    setTimeout(function () {
+                       toastr.options.fadeOut = 10000;
+                       toastr.success('Data berhasil disimpan', 'Success!');
+                       //loadDataListApprove();
+                       // send notification other school from client
+                       var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+                       // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
+                         socket.emit('update_schedule_notifikasi', { 
+                           update_schedule_notifikasi: '1',
+                           date : '',
+                         });
+                         $("#pageData").html('<h3 align = "center">Thank for your appreciated</h3>');
+                       $('#NotificationModal').modal('hide');
+                    },500);
+                }
+                else
+                  {
+                    toastr.error(response, 'Failed!!');
+                    $('#NotificationModal').modal('hide');
+                  }
+              });
+          })
+       }
+       else
+       {
+        toastr.info('Please choose equipment');
+       }
+       
+    });
 </script>

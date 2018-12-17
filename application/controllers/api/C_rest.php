@@ -777,5 +777,30 @@ class C_rest extends CI_Controller {
         }
     }
 
+    public function remind_vreservation()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                // action 
+                    $this->load->model('vreservation/m_reservation');
+                    $Q_remind_vreservation = $this->m_reservation->remind_vreservation();
+                echo json_encode($msg);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
 
 }

@@ -297,25 +297,31 @@ class C_transaksi extends Vreservation_Controler {
                                     }
                                 }
                         } // end loop for
-                    
+                        
+                        // print_r($dataApprover);die();
                         if($_SERVER['SERVER_NAME']!='localhost') {
                             // send email
                             $EmailPU = '';
                             $NameEmail = '';
                             $Code = '';
-                            $TypeApproverE = '';
                             if (count($dataApprover) > 0) {
                                 $temp = array();
                                 $temp2 = array();
                                 $temp3 = array();
-                                for ($k=0; $k < count($dataApprover); $k++) { 
-                                    $EM = $dataApprover[$k]['Email'];
-                                    $NM = $dataApprover[$k]['Name'];
-                                    $Code = $dataApprover[$k]['Code'];
-                                    $temp[] = $EM;
-                                    $temp2[] = $NM;
-                                    $temp3[] = $Code;
-                                }
+                                // for ($k=0; $k < count($dataApprover); $k++) { 
+                                //     $EM = $dataApprover[$k]['Email'];
+                                //     $NM = $dataApprover[$k]['Name'];
+                                //     $Code = $dataApprover[$k]['Code'];
+                                //     $temp[] = $EM;
+                                //     $temp2[] = $NM;
+                                //     $temp3[] = $Code;
+                                // }
+                                $EM = $dataApprover[0]['Email'];
+                                $NM = $dataApprover[0]['Name'];
+                                $Code = $dataApprover[0]['Code'];
+                                $temp[] = $EM;
+                                $temp2[] = $NM;
+                                $temp3[] = $Code;
                                  
                                 $EmailPU = implode(",", $temp);
                                 $NameEmail = implode(" / ", $temp2);
@@ -328,6 +334,10 @@ class C_transaksi extends Vreservation_Controler {
                                     'Code' => $Code,
                                     'ID_t_booking' => $ID_t_booking,
                                     'approvalNo' => 1,
+                                    'Email_add_person' => $Email_add_person,
+                                    'MarkomEmail' => $MarkomEmail,
+                                    'EmailKetAdditional' => $EmailKetAdditional,
+                                    'KetAdditional_eq' => $KetAdditional_eq,
                                 );
                                 $token = $this->jwt->encode($token,'UAP)(*');
                                 $Email = $EmailPU;
@@ -411,14 +421,20 @@ class C_transaksi extends Vreservation_Controler {
                                 $temp = array();
                                 $temp2 = array();
                                 $temp3 = array();
-                                for ($k=0; $k < count($dataApprover); $k++) { 
-                                    $EM = $dataApprover[$k]['Email'];
-                                    $NM = $dataApprover[$k]['Name'];
-                                    $Code = $dataApprover[$k]['Code'];
-                                    $temp[] = $EM;
-                                    $temp2[] = $NM;
-                                    $temp3[] = $Code;
-                                }
+                                // for ($k=0; $k < count($dataApprover); $k++) { 
+                                //     $EM = $dataApprover[$k]['Email'];
+                                //     $NM = $dataApprover[$k]['Name'];
+                                //     $Code = $dataApprover[$k]['Code'];
+                                //     $temp[] = $EM;
+                                //     $temp2[] = $NM;
+                                //     $temp3[] = $Code;
+                                // }
+                                $EM = $dataApprover[0]['Email'];
+                                $NM = $dataApprover[0]['Name'];
+                                $Code = $dataApprover[0]['Code'];
+                                $temp[] = $EM;
+                                $temp2[] = $NM;
+                                $temp3[] = $Code;
                                  
                                 $EmailPU = implode(",", $temp);
                                 $NameEmail = implode(" / ", $temp2);
@@ -431,6 +447,10 @@ class C_transaksi extends Vreservation_Controler {
                                     'Code' => $Code,
                                     'ID_t_booking' => $ID_t_booking,
                                     'approvalNo' => 1,
+                                    'Email_add_person' => $Email_add_person,
+                                    'MarkomEmail' => $MarkomEmail,
+                                    'EmailKetAdditional' => $EmailKetAdditional,
+                                    'KetAdditional_eq' => $KetAdditional_eq,
                                 );
                                 $token = $this->jwt->encode($token,'UAP)(*');
                                 $Email = 'alhadi.rahman@podomorouniversity.ac.id';

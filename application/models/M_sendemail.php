@@ -335,12 +335,18 @@ class M_sendemail extends CI_Model {
         // $mail->Port = $this->VariableClass['smtp_port'];    
         // $mail->IsHTML(false);
 
-        $mail->setFrom('ithelpdesk.notif@podomorouniversity.ac.id', 'IT');
+        $mail->setFrom('ithelpdesk.notif@podomorouniversity.ac.id', 'IT Podomoro University');
         // $mail->addReplyTo('alhadi.rahman@podomorouniversity.ac.id', 'IT');
         $to = explode(',', $to);
+        // print_r($to);die(); 
         $EmailToArr = array();
-        for ($i=0; $i < count($to); $i++) { 
-            $mail->addAddress($to[$i],'User '.$i);
+        for ($i=0; $i < count($to); $i++) {
+            if ($i == 0) {
+                 $mail->addAddress($to[$i],'User '.$i);
+            }
+            else{
+                $mail->AddCC($to[$i]);
+            } 
             $EmailToArr[] = $to[$i];
         }
        
@@ -372,8 +378,8 @@ class M_sendemail extends CI_Model {
         // $ical .= "DESCRIPTION:".$textEmail."\r\n"; 
         $ical .= "X-ALT-DESC;FMTTYPE=text/html:".$textEmail."\r\n"; 
         $ical .= "BEGIN:VALARM\r\n";
-        $ical .= "TRIGGER:-PT1440M\r\n";
-        //$ical .= "TRIGGER:-PT15M\r\n";
+        // $ical .= "TRIGGER:-PT1440M\r\n";
+        $ical .= "TRIGGER:-PT15M\r\n";
         $ical .= "ACTION:DISPLAY\r\n";
         $ical .= "DESCRIPTION:Reminder\r\n";
         $ical .= "END:VALARM\r\n";

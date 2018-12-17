@@ -954,6 +954,7 @@ $route['vreservation/modal_form_return_eq'] = 'page/vreservation/c_transaksi/mod
 $route['vreservation/modal_form_return_eq_save'] = 'page/vreservation/c_transaksi/modal_form_return_eq_save';
 $route['vreservation/t_eq/(:any)'] = 'page/vreservation/c_transaksi/t_eq/$1';
 $route['vreservation/master/markom_support'] = 'page/vreservation/c_master/markom_support';
+$route['vreservation/confirm_markom_support'] = 'api/c_global/vreservation_confirm_markom_support';
 
 
 

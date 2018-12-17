@@ -954,11 +954,11 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             // cek ApproveAccess
             $Status1 = $query[$i]['Status1'];
             $Status = $query[$i]['Status'];
-            $MarcommStatus = $query[$i]['MarcommStatus'];
-                $ApproveAccess = function($getRoom,$Status1,$Status,$CreatedBy,$MarcommStatus,$DivisionID){
-                    if ($MarcommStatus == 1) {
-                        return $find = 0;
-                    }
+            //$MarcommStatus = $query[$i]['MarcommStatus'];
+                $ApproveAccess = function($getRoom,$Status1,$Status,$CreatedBy,$DivisionID){
+                    // if ($MarcommStatus == 1) {
+                    //     return $find = 0;
+                    // }
 
                     $PositionMain = '@';
                     $IDDivision = $DivisionID;
@@ -1085,7 +1085,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 };
 
                 $StatusBooking = '';
-                $CaseApproveAccess = $ApproveAccess($getRoom,$Status1,$Status,$query[$i]['CreatedBy'],$MarcommStatus,$DivisionID);
+                $CaseApproveAccess = $ApproveAccess($getRoom,$Status1,$Status,$query[$i]['CreatedBy'],$DivisionID);
                 switch ($CaseApproveAccess) {
                     case 0:
                          $StatusBooking = 'Awaiting approval Marcomm Division';
@@ -1569,67 +1569,58 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             if ($query[$i]['MarcommSupport'] != '') {
                 $MarkomSupport = '<ul style = "margin-left : -28px">';
                 $dd = explode(',', $query[$i]['MarcommSupport']);
-                $btnMarkomSupport = '';
                 for ($zx=0; $zx < count($dd); $zx++) {
-                    $a = 'How are you?';
-                    if ($this->session->userdata('ID_group_user') <= 3) {
-                        if ($this->session->userdata('ID_group_user') != 3) {
-                            $btnMarkomSupport = '<button class = "btn btn-danger btnMarkomSupport btn-xs" MarcommSupport = "'.$dd[$zx].'" ><i class="fa fa-times"></i> </button>';
-                        }
-                        else
-                        {
-                            if ($CaseApproveAccess == 2 || $CaseApproveAccess == 4) {
-                                $btnMarkomSupport = '<button class = "btn btn-danger btnMarkomSupport btn-xs" MarcommSupport = "'.$dd[$zx].'" ><i class="fa fa-times"></i> </button>';
-                            }
-                        }
-                        
-                    }
-                    else
-                    {
-                        if ($CaseApproveAccess == 0) {
-                            $IDDivision = $DivisionID;
-                            if ($IDDivision == 17) {
-                                 $btnMarkomSupport = '<button class = "btn btn-danger btnMarkomSupport btn-xs" MarcommSupport = "'.$dd[$zx].'" ><i class="fa fa-times"></i> </button>';
-                            } 
-                            
-                        }
-                    }
-
-                    if (strpos($dd[$zx], 'Graphic Design') !== false) {
-                         $pos = strpos($dd[$zx],'[');
-                         $li = substr($dd[$zx], 0,$pos);
-                         $posE = strpos($dd[$zx],']');
-                         $ISIe = substr($dd[$zx], ($pos+1), $posE);
-                         $length = strlen($ISIe);
-                         $ISIe = substr($ISIe, 0, ($length - 1));
-                         // print_r($ISIe);die();
-                         $MarkomSupport .= '<li>'.$li.'&nbsp'.$btnMarkomSupport;
-                         $FileMarkom = explode(';', $ISIe);
-                         $MarkomSupport .= '<ul style = "margin-left : -28px">';
-                         for ($vc=0; $vc < count($FileMarkom); $vc++) { 
-                            $MarkomSupport .= '<li>'.'<a href="'.base_url("fileGetAny/vreservation-".$FileMarkom[$vc]).'" target="_blank"></i>'.$FileMarkom[$vc].'</a>';
+                    // check status
+                     $Status_markom = '';
+                     $btnMarkomSupport = '';
+                     if (strpos($dd[$zx], 'Note') === false) {
+                         $g_markom = $this->g_markom($dd[$zx],$query[$i]['ID']);
+                         if ($g_markom[0]['StatusMarkom'] == 0) {
+                             $Status_markom = '{Not Confirm}';
                          }
-                         $MarkomSupport .= '</ul></li>';
-                    } 
-                    else{
-                        if (strpos($dd[$zx], 'Note') !== false) {
-                            $pos = strpos($dd[$zx],':');
-                            $dd[$zx] = substr($dd[$zx], 0,$pos+1).'<br>'.substr($dd[$zx], $pos+1,strlen($dd[$zx]));
-                        }
-                        else
-                        {
-                            $c = $this->m_master->caribasedprimary('db_reservation.m_markom_support','ID',$dd[$zx]);
-                            $dd[$zx] = $c[0]['Name'];
-                        }
-                      $MarkomSupport .= '<li>'.$dd[$zx].'&nbsp'.$btnMarkomSupport.'</li>';  
-                    }
-                    
+                         elseif ($g_markom[0]['StatusMarkom'] == 1) {
+                             $Status_markom = '{Confirm}';
+                         }
+                         else
+                         {
+                             $Status_markom = '{Reject}';
+                         }
+
+                         //if ($g_markom[0]['StatusMarkom'] != 1) {
+                            $btnMarkomSupport = '<input type = "checkbox" class = "MarkomSupport_'.$query[$i]['ID'].'" value = "'.$dd[$zx].'">';
+                         //}
+                         $dd[$zx] = $g_markom[0]['Name'];   
+                     }
+                     else
+                     {
+                        $pos = strpos($dd[$zx],':');
+                        $dd[$zx] = substr($dd[$zx], 0,$pos+1).'<br>'.substr($dd[$zx], $pos+1,strlen($dd[$zx]));
+                     }
+
+                     $MarkomSupport .= '<li>'.$dd[$zx].$Status_markom.'&nbsp'.$btnMarkomSupport.'</li>';    
+
                 }
                 $MarkomSupport .= '</ul>';
             }
 
             if ($MarkomSupport != '' && $DivisionID == 17) {
                 $boolAuthMarkom = 1;
+            }
+
+            if ($boolAuthMarkom == 1) {
+                if ($query[$i]['Status'] != 1) {
+                    $MarkomSupport .= '<div class = "row"><div class = "col-md-6">
+                                    <span class="btn btn-primary btn-xs btn_markom_submit" idtbooking ="'.$query[$i]['ID'].'" action = "Confirm">
+                                        <i class="fa fa-pencil-square-o"></i> Confirm
+                                       </span>
+                                            </div>
+                                        <div class = "col-md-6">
+                                            <span class="btn btn-danger btn-xs btn_markom_submit" idtbooking ="'.$query[$i]['ID'].'" action = "Reject">
+                                                <i class="fa fa-pencil-square-o"></i> Reject
+                                               </span>
+                                        </div>    
+                                        </div>';
+                }
             }
 
             $KetAdditional = $query[$i]['KetAdditional'];
@@ -1669,6 +1660,13 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         }
 
         return $arr_result;  
+    }
+
+    public function g_markom($ID_m_markom,$ID_t_booking)
+    {
+        $sql = 'select a.ID as ID_m_markom,a.Name,b.Status as StatusMarkom,c.* from db_reservation.m_markom_support as a join db_reservation.t_markom_support as b on a.ID = b.ID_m_markom_support join db_reservation.t_booking as c on c.ID = b.ID_t_booking where a.ID = "'.$ID_m_markom.'" and c.ID = "'.$ID_t_booking.'"  ';
+        $query=$this->db->query($sql, array())->result_array();  
+        return $query;
     }
 
     public function getDataT_booking($Start = null,$Status = 0,$both = '')
@@ -1937,71 +1935,74 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             if ($query[$i]['MarcommSupport'] != '') {
                 $MarkomSupport = '<ul style = "margin-left : -28px">';
                 $dd = explode(',', $query[$i]['MarcommSupport']);
-                $btnMarkomSupport = '';
                 for ($zx=0; $zx < count($dd); $zx++) {
-                    $a = 'How are you?';
-                    if ($this->session->userdata('ID_group_user') <= 3) {
-                        if ($this->session->userdata('ID_group_user') != 3) {
-                            $btnMarkomSupport = '<button class = "btn btn-danger btnMarkomSupport btn-xs" MarcommSupport = "'.$dd[$zx].'" ><i class="fa fa-times"></i> </button>';
-                        }
-                        else
-                        {
-                            if ($CaseApproveAccess == 2 || $CaseApproveAccess == 4) {
-                                $btnMarkomSupport = '<button class = "btn btn-danger btnMarkomSupport btn-xs" MarcommSupport = "'.$dd[$zx].'" ><i class="fa fa-times"></i> </button>';
-                            }
-                        }
-                        
-                    }
-                    else
-                    {
-                        if ($CaseApproveAccess == 0) {
-                            $PositionMain = $this->session->userdata('PositionMain');
-                            $IDDivision = $PositionMain['IDDivision'];
-                            if ($IDDivision == 17) {
-                                 $btnMarkomSupport = '<button class = "btn btn-danger btnMarkomSupport btn-xs" MarcommSupport = "'.$dd[$zx].'" ><i class="fa fa-times"></i> </button>';
-                            } 
-                            
-                        }
-                    }
-
-                    if (strpos($dd[$zx], 'Graphic Design') !== false) {
-                         $pos = strpos($dd[$zx],'[');
-                         $li = substr($dd[$zx], 0,$pos);
-                         $posE = strpos($dd[$zx],']');
-                         $ISIe = substr($dd[$zx], ($pos+1), $posE);
-                         $length = strlen($ISIe);
-                         $ISIe = substr($ISIe, 0, ($length - 1));
-                         // print_r($ISIe);die();
-                         $MarkomSupport .= '<li>'.$li.'&nbsp'.$btnMarkomSupport;
-                         $FileMarkom = explode(';', $ISIe);
-                         $MarkomSupport .= '<ul style = "margin-left : -28px">';
-                         for ($vc=0; $vc < count($FileMarkom); $vc++) { 
-                            $MarkomSupport .= '<li>'.'<a href="'.base_url("fileGetAny/vreservation-".$FileMarkom[$vc]).'" target="_blank"></i>'.$FileMarkom[$vc].'</a>';
+                    // check status
+                     $Status_markom = '';
+                     $btnMarkomSupport = '';
+                     if (strpos($dd[$zx], 'Note') === false) {
+                         $g_markom = $this->g_markom($dd[$zx],$query[$i]['ID']);
+                         if ($g_markom[0]['StatusMarkom'] == 0) {
+                             $Status_markom = '{Not Confirm}';
                          }
-                         $MarkomSupport .= '</ul></li>';
-                    } 
-                    else{
-                        if (strpos($dd[$zx], 'Note') !== false) {
-                            $pos = strpos($dd[$zx],':');
-                            $dd[$zx] = substr($dd[$zx], 0,$pos+1).'<br>'.substr($dd[$zx], $pos+1,strlen($dd[$zx]));
-                        }
-                        else
-                        {
-                            $c = $this->m_master->caribasedprimary('db_reservation.m_markom_support','ID',$dd[$zx]);
-                            $dd[$zx] = $c[0]['Name'];
-                        }
-                      $MarkomSupport .= '<li>'.$dd[$zx].'&nbsp'.$btnMarkomSupport.'</li>';  
-                    }
-                    
+                         elseif ($g_markom[0]['StatusMarkom'] == 1) {
+                             $Status_markom = '{Confirm}';
+                         }
+                         else
+                         {
+                             $Status_markom = '{Reject}';
+                         }
+
+                         //if ($g_markom[0]['StatusMarkom'] != 1) {
+                            if ($this->session->userdata('ID_group_user') < 3) {
+                                $btnMarkomSupport = '<input type = "checkbox" class = "MarkomSupport_'.$query[$i]['ID'].'" value = "'.$dd[$zx].'">';
+                                if ($boolAuthMarkom == 0) {
+                                    $boolAuthMarkom = 1;
+                                }
+                            }
+                            else
+                            {
+                                $DivisionID = $this->session->userdata('PositionMain');
+                                $DivisionID = $DivisionID['IDDivision'];
+                                if ($DivisionID == 17) {
+                                    $btnMarkomSupport = '<input type = "checkbox" class = "MarkomSupport_'.$query[$i]['ID'].'" value = "'.$dd[$zx].'">';
+                                    if ($boolAuthMarkom == 0) {
+                                        $boolAuthMarkom = 1;
+                                    }
+                                }
+                            }
+                            
+                            
+                         //}
+                         $dd[$zx] = $g_markom[0]['Name'];   
+                     }
+                     else
+                     {
+                        $pos = strpos($dd[$zx],':');
+                        $dd[$zx] = substr($dd[$zx], 0,$pos+1).'<br>'.substr($dd[$zx], $pos+1,strlen($dd[$zx]));
+                     }
+
+                     $MarkomSupport .= '<li>'.$dd[$zx].$Status_markom.'&nbsp'.$btnMarkomSupport.'</li>';    
+
                 }
                 $MarkomSupport .= '</ul>';
             }
 
-            $DivisionID = $this->session->userdata('PositionMain');
-            $DivisionID = $DivisionID['IDDivision'];
-            if ( ($MarkomSupport != '' && $DivisionID == 17) || $this->session->userdata('ID_group_user') < 3) {
-                $boolAuthMarkom = 1;
+            if ($boolAuthMarkom == 1) {
+                if ($query[$i]['Status'] != 1) {
+                    $MarkomSupport .= '<div class = "row"><div class = "col-md-6">
+                                    <span class="btn btn-primary btn-xs btn_markom_submit" idtbooking ="'.$query[$i]['ID'].'" action = "Confirm">
+                                        <i class="fa fa-pencil-square-o"></i> Confirm
+                                       </span>
+                                            </div>
+                                        <div class = "col-md-6">
+                                            <span class="btn btn-danger btn-xs btn_markom_submit" idtbooking ="'.$query[$i]['ID'].'" action = "Reject">
+                                                <i class="fa fa-pencil-square-o"></i> Reject
+                                               </span>
+                                        </div>    
+                                        </div>';
+                }
             }
+            
 
             $KetAdditional = $query[$i]['KetAdditional'];
             $KetAdditional = json_decode($KetAdditional);
@@ -2474,5 +2475,13 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $bool = true;
         }
         return $bool;
+    }
+
+    public function remind_vreservation()
+    {
+        $arr_result = array('msg' => '','error' => false);
+        $g = $this->getDataT_booking();
+        print_r($g);die();
+
     }
 }
