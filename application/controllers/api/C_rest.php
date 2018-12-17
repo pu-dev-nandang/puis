@@ -366,6 +366,7 @@ class C_rest extends CI_Controller {
                 $requestData= $_REQUEST;
 
                 $UserID = $dataToken['UserID'];
+                $user =  $dataToken['auth']->user;
 
                 $dataSearch = '';
                 if( !empty($requestData['search']['value']) ) {
@@ -394,6 +395,8 @@ class C_rest extends CI_Controller {
                     $dataTotalUser = $this->db->select('ID')->get_where('db_academic.counseling_user',array('TopicID' => $row['ID'], 'Status' => '2'))->result_array();
                     $dataComment = $this->db->select('ID')->get_where('db_academic.counseling_comment',array('TopicID' => $row['ID']))->result_array();
 
+
+
                     $dataToken = array(
                         'TopicID' => $row['ID'],
                         'TotalComment' => count($dataComment)
@@ -407,7 +410,9 @@ class C_rest extends CI_Controller {
                     $token = $this->jwt->encode($dataToken,$key);
 
 
-                    $topic = '<a href="'.url_sign_in_lecturers.'counseling/detail-topic/'.$token.'">'.$row['Topic'].'</a>
+                    $urlDetail = ($user=='lecturer') ? url_sign_in_lecturers : url_sign_in_students;
+
+                    $topic = '<a href="'.$urlDetail.'counseling/detail-topic/'.$token.'">'.$row['Topic'].'</a>
                               <br/><span style="font-size: 12px;color: #9e9e9e;">'.date('D, d M Y',strtotime($row['CreateAt'])).'</span>'.$unread;
 
                     $btnAction = '<button class="btn btn-sm btn-default btn-default-primary btn-act"><i class="fa fa-pencil"></i></button> | <button class="btn btn-sm btn-default btn-default-danger btn-act"><i class="fa fa-trash"></i></button>';
@@ -435,8 +440,6 @@ class C_rest extends CI_Controller {
             }
             else if($dataToken['action']=='readDetailTopic'){
 
-
-
                 $dataTopic = $this->db->query('SELECT * FROM db_academic.counseling_topic ct 
                                                           WHERE ct.ID = "'.$dataToken['TopicID'].'" LIMIT 1 ')->result_array();
 
@@ -451,7 +454,6 @@ class C_rest extends CI_Controller {
                                                                 WHERE cc.TopicID = "'.$dataToken['TopicID'].'"
                                                                 ORDER BY cc.ID ASC ')->result_array();
 
-
                     // Update total comment
                     $this->db->set('ReadComment', count($dataComment));
                     $this->db->where(array(
@@ -460,7 +462,6 @@ class C_rest extends CI_Controller {
                     ));
                     $this->db->update('db_academic.counseling_user');
                     $this->db->reset_query();
-
 
                     if(count($dataComment)>0){
                         for($i=0;$i<count($dataComment);$i++){
@@ -474,8 +475,6 @@ class C_rest extends CI_Controller {
                             } else {
                                 $dataComment[$i]['Photo'] = url_img_employees.''.$dataComment[$i]['EmPhoto'];
                             }
-
-
 
                             if($dataComment[$i]['CommentID']!=null && $dataComment[$i]['CommentID']!=''){
                                 $dataQuote = $this->db->query('SELECT cc.*, cu.Status, em.Name AS Lecturer, auts.Name AS Student FROM db_academic.counseling_comment cc 
