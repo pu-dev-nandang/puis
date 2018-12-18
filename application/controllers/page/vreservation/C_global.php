@@ -243,30 +243,41 @@ class C_global extends Vreservation_Controler {
                     $this->data['ParticipantQty'] = $get[0]['ParticipantQty'];
                     // get data Equipment Additional
                     $Name_equipment_add = '-';
-                    if ($get[0]['ID_equipment_add'] != '' || $get[0]['ID_equipment_add'] != null) {
-                        $ID_equipment_add = explode(',', $get[0]['ID_equipment_add']);
-                        $Name_equipment_add = '';
-                        for ($j=0; $j < count($ID_equipment_add); $j++) {
-                            $getQTY = $this->m_reservation->gett_booking_eq_additional($ID_equipment_add[$j],$get[0]['ID']); 
-                            $get2 = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add[$j]);
-                            // print_r($ID_equipment_add);die();
-                            $ID_m_equipment = $get2[0]['ID_m_equipment'];
-                            $get3 = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
-                            if ($j != count($ID_equipment_add) - 1) {
-                                $Owner = $get2[0]['Owner'];
-                                $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$Owner);
-                                $Owner = $getX[0]['Division'];
-                                $Name_equipment_add .= $get3[0]['Equipment'].' by '.$Owner.'['.$getQTY[0]['Qty'].'] , ';
+                    $keq_add = $get[0]['ID_equipment_add'];
+                    if ($keq_add != '' && $keq_add != NULL) {
+                        $keq_add = explode(",",$keq_add);
+                    }
+                    $e_div = array();
+                    if (is_array($keq_add)) {
+                        // save data t_booking_eq_additional
+                        $Name_equipment_add = '<ul>';
+                        $xx = $keq_add;
+                        $ID_t_booking = $get[0]['ID'];
+                        for ($i=0; $i < count($xx); $i++) { 
+                            $gett_booking_eq_additional = $this->m_reservation->gett_booking_eq_additional($xx[$i],$ID_t_booking);
+                            if ($gett_booking_eq_additional[0]['Status'] == 0) {
+                                $Status_eq_additional = '{Not Confirm}';
+                            }
+                            elseif ($gett_booking_eq_additional[0]['Status'] == 1) {
+                                $Status_eq_additional = '{Confirm}';
                             }
                             else
                             {
-                                $Owner = $get2[0]['Owner'];
-                                $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$Owner);
-                                $Owner = $getX[0]['Division'];
-                                $Name_equipment_add .= $get3[0]['Equipment'].' by '.$Owner.'['.$getQTY[0]['Qty'].']';
+                                $Status_eq_additional = '{Reject}';
                             }
-                            
+                            $Qty = $gett_booking_eq_additional[0]['Qty'];
+                            $ID_equipment_additional = $gett_booking_eq_additional[0]['ID_equipment_additional'];
+                            $get_eq_add = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_additional);
+                            $OwnerID = $get_eq_add[0]['Owner'];
+                            $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$OwnerID);
+                            $e_div[] = $getX[0]['Email'];
+                            $Owner = $getX[0]['Division'];
+                            $ID_m_equipment = $get_eq_add[0]['ID_m_equipment'];
+                            $ge_eq_m = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
+                            $Name_equipment_add .= '<li>'.$ge_eq_m[0]['Equipment'].' by '.$Owner.'['.$Qty.']'.$Status_eq_additional.'</li>';
+
                         }
+                        $Name_equipment_add .= '</ul>';
                     }
                     $this->data['Name_equipment_add'] = $Name_equipment_add;
 
@@ -288,39 +299,42 @@ class C_global extends Vreservation_Controler {
                     }
                     
                     $MarkomSupport = '<label>No</Label>';
-                    if ($get[0]['MarcommSupport'] != '') {
-                        $MarkomSupport = '<ul>';
-                        $dd = explode(',', $get[0]['MarcommSupport']);
-                        for ($zx=0; $zx < count($dd); $zx++) {
-                            $a = 'How are you?';
-
-                            if (strpos($dd[$zx], 'Graphic Design') !== false) {
-                                 $pos = strpos($dd[$zx],'[');
-                                 $li = substr($dd[$zx], 0,$pos);
-                                 $posE = strpos($dd[$zx],']');
-                                 $ISIe = substr($dd[$zx], ($pos+1), $posE);
-                                 $length = strlen($ISIe);
-                                 $ISIe = substr($ISIe, 0, ($length - 1));
-                                 // print_r($ISIe);die();
-                                 $MarkomSupport .= '<li>'.$li;
-                                 $FileMarkom = explode(';', $ISIe);
-                                 $MarkomSupport .= '<ul>';
-                                 for ($vc=0; $vc < count($FileMarkom); $vc++) { 
-                                    $MarkomSupport .= '<li>'.'<a href="'.base_url("fileGetAny/vreservation-".$FileMarkom[$vc]).'" target="_blank"></i>'.$FileMarkom[$vc].'</a>';
-                                 }
-                                 $MarkomSupport .= '</ul></li>';
-                            } 
-                            else{
-                              $MarkomSupport .= '<li>'.$dd[$zx].'</li>';  
+                    $mks = $get[0]['MarcommSupport'];
+                    if ($mks != '' && $mks != NULL ) {
+                        $mks = explode(",", $mks); 
+                    }
+                    // $MarkomEmail ='';
+                    if (is_array($mks)) {
+                        $xx = $mks;
+                        $MarkomSupport ='<ul>';
+                        for ($i=0; $i < count($xx); $i++) { 
+                            if(strpos($xx[$i], 'Note') === false) {
+                                $g_markom = $this->m_reservation->g_markom($xx[$i],$get[0]['ID']);
+                                if ($g_markom[0]['StatusMarkom'] == 0) {
+                                    $Status_markom = '{Not Confirm}';
+                                }
+                                elseif ($g_markom[0]['StatusMarkom'] == 1) {
+                                    $Status_markom = '{Confirm}';
+                                }
+                                else
+                                {
+                                    $Status_markom = '{Reject}';
+                                }
+                                $MarkomSupport .='<li>'.$g_markom[0]['Name'].$Status_markom.'</li>';
                             }
-                            
+                            else
+                            {
+                                $MarkomSupport .='<li>'.nl2br($xx[$i]).'</li>';
+                            }
                         }
                         $MarkomSupport .= '</ul>';
-
                     }
+
                     $KetAdditional = $get[0]['KetAdditional'];
                     $KetAdditional = json_decode($KetAdditional);
-
+                    $files_invitation = $get[0]['Invitation'];
+                    $Email_invitation = $this->m_reservation->Email_invitation($files_invitation);
+                    $this->data['Email_invitation'] = $Email_invitation;
                     $this->data['KetAdditional'] = $KetAdditional;
                     $this->data['MarkomSupport'] = $MarkomSupport;
                     $this->data['Req_layout'] = $Req_layout;

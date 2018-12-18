@@ -165,6 +165,18 @@
                 </div>
             </div>
         </div>
+        <?php if ($Email_invitation != ''): ?>
+            <div class="form-group"> 
+                <div class="row">
+                    <div class="col-sm-3">
+                        <label class="control-label">Attachment:</label>
+                    </div>    
+                    <div class="col-sm-6">
+                        <?php echo $Email_invitation ?>
+                    </div>
+                </div>
+            </div>
+        <?php endif ?>
         <div style="text-align: center;">       
     		<div class="col-sm-12" id="BtnFooter">
                 <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>

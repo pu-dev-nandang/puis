@@ -155,6 +155,7 @@
 	               $.post(url,{ token:token }, function (data_json) {
 	               	$('.id_'+IDTable).remove();
 	               	loadDataListApprove();
+	               	$('#GlobalModalLarge .modal-body').html('Done');
 	               	
 	               })
 

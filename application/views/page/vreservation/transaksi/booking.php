@@ -103,6 +103,57 @@
   });
 
   
+  function file_validation2(ID_element)
+  {
+    //console.log('etestestest');
+      var files = $('#'+ID_element)[0].files;
+      var error = '';
+      var msgStr = '';
+      var max_upload_per_file = 4;
+      if (files.length > max_upload_per_file) {
+        msgStr += '1 Document should not be more than 4 Files<br>';
+
+      }
+      else
+      {
+        for(var count = 0; count<files.length; count++)
+        {
+         var no = parseInt(count) + 1;
+         var name = files[count].name;
+         console.log(name);
+         var extension = name.split('.').pop().toLowerCase();
+         if(jQuery.inArray(extension, ['pdf','jpg']) == -1)
+         {
+          msgStr += 'File Number '+ no + ' Invalid Type File<br>';
+          //toastr.error("Invalid Image File", 'Failed!!');
+          // return false;
+         }
+
+         var oFReader = new FileReader();
+         oFReader.readAsDataURL(files[count]);
+         var f = files[count];
+         var fsize = f.size||f.fileSize;
+         console.log(fsize);
+
+         if(fsize > 2000000) // 2mb
+         {
+          msgStr += 'File Number '+ no + ' Image File Size is very big<br>';
+          //toastr.error("Image File Size is very big", 'Failed!!');
+          //return false;
+         }
+         
+        }
+      }
+
+      if (msgStr != '') {
+        toastr.error(msgStr, 'Failed!!');
+        return false;
+      }
+      else
+      {
+        return true;
+      }
+  }  
 
   $(document).on('click','#ModalbtnSaveForm', function () {
     loading_button('#ModalbtnSaveForm');
@@ -126,19 +177,6 @@
       });
     }
 
-    // console.log(chk_e_additional);
-
-    // var chk_person_support = '';
-    // if ($('#person_supportYA').is(':checked')) {
-    //   var chk_person_support = [];
-    //   $('.chk_person_support_td').each(function() {
-    //      if ($(this).is(':checked')) {
-    //         var valuee = $(this).val();
-    //         chk_person_support.push(valuee);
-    //      }
-    //   });
-    // }
-
     var chk_person_support = '';
     if ($('#person_supportYA').is(':checked')) {
       var chk_person_support = $('.chk_person_support_td').val();
@@ -159,16 +197,6 @@
       }
     }
 
-     // console.log(chk_person_support);
-
-    // var chk_e_multiple = '';
-    // if ($('#multipleYA').is(':checked')) {
-    //   var chk_e_multiple = [];
-    //   $('.datetime_deadlineMulti').each(function() {
-    //      var valuee = $(this).val();
-    //      chk_e_multiple.push(valuee);
-    //   });
-    // }
     var KetAdditional = {};
     var dataArr = {
       Participant_Type : $("#UserType").val(),
@@ -215,7 +243,24 @@
               {
                form_data.append("fileDataMarkomm[]", filesMarkomm[count]);
               }
-           
+          }
+
+          if ( $( "#ExFile_invitation" ).length ) {
+              if (file_validation2("ExFile_invitation") ) {
+                var files_invitation = $('#'+'ExFile_invitation')[0].files;
+                for(var count = 0; count<files_invitation.length; count++)
+                {
+                 form_data.append("files_invitation[]", files_invitation[count]);
+                }
+                // toastr.info('ok');
+                // $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
+                // return;
+              }
+              else
+              {
+                $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
+                return;
+              }
           }
           
           $.ajax({
@@ -372,27 +417,6 @@
                     if (aa[x] == 'Graphic Design (Working time 7 Days)') {bool = 1; break;}
                   }
                   if (bool == 1) {
-                    // try{
-                    //   var name = document.getElementById("ExFileMarkomm").files[0].name;
-                    //   var ext = name.split('.').pop().toLowerCase();
-                    //   if(jQuery.inArray(ext, ['jpeg','jpeg','JPG','jpg','PNG','png','pdf','PDF']) == -1) 
-                    //   {
-                    //     toatString += 'Invalid File Marcomm' + "<br>";
-                    //   }
-                    //   var oFReader = new FileReader();
-                    //   oFReader.readAsDataURL(document.getElementById("ExFileMarkomm").files[0]);
-                    //   var f = document.getElementById("ExFileMarkomm").files[0];
-                    //   var fsize = f.size||f.fileSize;
-                    //   if(fsize > 2000000) // 2mb
-                    //   {
-                    //    toatString += 'Image File Size Marcomm is very big ' + "<br>";
-                    //   }
-
-                    // }
-                    // catch(err)
-                    // {
-                    //   toatString += 'Invalid File Marcomm' + "<br>";
-                    // }
                     var ID_element = 'ExFileMarkomm';
                     var files = $('#'+ID_element)[0].files;
                     var error = '';

@@ -1594,7 +1594,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                      else
                      {
                         $pos = strpos($dd[$zx],':');
-                        $dd[$zx] = substr($dd[$zx], 0,$pos+1).'<br>'.substr($dd[$zx], $pos+1,strlen($dd[$zx]));
+                        $dd[$zx] = substr($dd[$zx], 0,$pos+1).'<br>'.nl2br(substr($dd[$zx], $pos+1,strlen($dd[$zx])));
                      }
 
                      $MarkomSupport .= '<li>'.$dd[$zx].$Status_markom.'&nbsp'.$btnMarkomSupport.'</li>';    
@@ -1863,6 +1863,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     $btnEquipment = '';
                     // qty penggunaan
                     $gett_booking_eq_additional = $this->gett_booking_eq_additional($ID_equipment_add[$j],$query[$i]['ID']);
+                    //print_r($ID_equipment_add[$j].'--'.$query[$i]['ID']);
                     if ($gett_booking_eq_additional[0]['Status'] == 0) {
                         $Status_eq_additional = 'Not Confirm';
                     }
@@ -1873,6 +1874,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     {
                         $Status_eq_additional = 'Reject';
                     }
+
                     $Qty = $gett_booking_eq_additional[0]['Qty'];
                     $ID_equipment_additional = $gett_booking_eq_additional[0]['ID_equipment_additional'];
                     $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_additional);
@@ -1954,7 +1956,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
                          //if ($g_markom[0]['StatusMarkom'] != 1) {
                             if ($this->session->userdata('ID_group_user') < 3) {
-                                $btnMarkomSupport = '<input type = "checkbox" class = "MarkomSupport_'.$query[$i]['ID'].'" value = "'.$dd[$zx].'">';
+                                if ($query[$i]['Status'] != 1) {
+                                    $btnMarkomSupport = '<input type = "checkbox" class = "MarkomSupport_'.$query[$i]['ID'].'" value = "'.$dd[$zx].'">';
+                                }
+                               
                                 if ($boolAuthMarkom == 0) {
                                     $boolAuthMarkom = 1;
                                 }
@@ -1964,7 +1969,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                 $DivisionID = $this->session->userdata('PositionMain');
                                 $DivisionID = $DivisionID['IDDivision'];
                                 if ($DivisionID == 17) {
-                                    $btnMarkomSupport = '<input type = "checkbox" class = "MarkomSupport_'.$query[$i]['ID'].'" value = "'.$dd[$zx].'">';
+                                    if ($query[$i]['Status'] != 1) {
+                                        $btnMarkomSupport = '<input type = "checkbox" class = "MarkomSupport_'.$query[$i]['ID'].'" value = "'.$dd[$zx].'">';
+                                    }
                                     if ($boolAuthMarkom == 0) {
                                         $boolAuthMarkom = 1;
                                     }
@@ -1978,7 +1985,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                      else
                      {
                         $pos = strpos($dd[$zx],':');
-                        $dd[$zx] = substr($dd[$zx], 0,$pos+1).'<br>'.substr($dd[$zx], $pos+1,strlen($dd[$zx]));
+                        $dd[$zx] = substr($dd[$zx], 0,$pos+1).'<br>'.nl2br(substr($dd[$zx], $pos+1,strlen($dd[$zx])));
                      }
 
                      $MarkomSupport .= '<li>'.$dd[$zx].$Status_markom.'&nbsp'.$btnMarkomSupport.'</li>';    
@@ -2015,6 +2022,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 }
             }
             $Participant .= '</ul>';
+            // print_r($CaseApproveAccess);die();
             $boolAuth = $this->boolAuthData($query[$i]['CreatedBy'],$CaseApproveAccess,$boolAuthEq,$boolAuthMarkom);
             if ($boolAuth) {
                    $arr_result[] = array(
@@ -2483,5 +2491,163 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $g = $this->getDataT_booking();
         print_r($g);die();
 
+    }
+
+    public function Email_invitation($files_invitation)
+    {
+        $rs = '';
+        if ($files_invitation != '') {
+            $files_invitation = explode(';', $files_invitation);
+            for ($i=0; $i < count($files_invitation); $i++) {
+                if ($i == 0) {
+                    $rs .= '<br>Attachment : <ul>';
+                } 
+                $rs .= '<li><a href="'.base_url("fileGetAny/vreservation-".$files_invitation[$i]).'" target="_blank"></i>'.$files_invitation[$i].'</a></li>';
+
+                // last
+                if ( (count($files_invitation) - 1 ) == $i  ) {
+                   $rs .= '</ul>';
+                }
+            }
+        }
+        return $rs;
+    }
+
+    public function venue__fill_feedback()
+    {
+        $arr_result =array();
+        $sql = 'select a.*,b.Name,b.EmailPU,DATE_ADD(DATE_FORMAT(Now(),"%Y-%m-%d"),INTERVAL 1 DAY) as Datelimit    
+                from db_reservation.t_booking as a 
+                join db_employees.employees as b on a.CreatedBy = b.NIP 
+                where a.Status = 1 and a.End <= NOW() and a.Feedback IS NULL and a.End >= DATE_SUB(NOW(), INTERVAL 1 DAY) order by a.CreatedBy asc';
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) {
+            $Detail = $this->getDataPass($query[$i]['ID']);
+            $Detail = implode('@@', $Detail);
+            $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['Start']);
+            $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['End']);
+            $StartNameDay = $Startdatetime->format('l');
+            $EndNameDay = $Enddatetime->format('l');
+            $Time = $query[$i]['Time'].' Minutes';
+
+            $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','Room',$query[$i]['Room']);
+
+            $ID_equipment_add = '-';
+            $Name_equipment_add = '-';
+            $boolAuthEq = 0;
+            if ($query[$i]['ID_equipment_add'] != '' || $query[$i]['ID_equipment_add'] != null) {
+                $ID_equipment_add = explode(',', $query[$i]['ID_equipment_add']);
+                $Name_equipment_add = '<ul style = "margin-left : -28px">';
+                for ($j=0; $j < count($ID_equipment_add); $j++) {
+                    $btnEquipment = '';
+                    // qty penggunaan
+                    $gett_booking_eq_additional = $this->gett_booking_eq_additional($ID_equipment_add[$j],$query[$i]['ID']);
+                    //print_r($ID_equipment_add[$j].'--'.$query[$i]['ID']);
+                    if ($gett_booking_eq_additional[0]['Status'] == 0) {
+                        $Status_eq_additional = 'Not Confirm';
+                    }
+                    elseif ($gett_booking_eq_additional[0]['Status'] == 1) {
+                        $Status_eq_additional = 'Confirm';
+                    }
+                    else
+                    {
+                        $Status_eq_additional = 'Reject';
+                    }
+
+                    $Qty = $gett_booking_eq_additional[0]['Qty'];
+                    $ID_equipment_additional = $gett_booking_eq_additional[0]['ID_equipment_additional'];
+                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_additional);
+                    $OwnerID = $get[0]['Owner'];
+                    $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$OwnerID);
+                    $Owner = $getX[0]['Division'];
+
+                    $ID_m_equipment = $get[0]['ID_m_equipment'];
+                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
+                    $Name_equipment_add .= '<li>'.$get[0]['Equipment'].' by '.$Owner.'['.$Qty.']&nbsp ('.$Status_eq_additional.')</li>';
+                }
+                $Name_equipment_add .= '</ul>';
+                
+            }
+
+            $ID_add_personel = '-';
+            $Name_add_personel = '-';
+
+            if ($query[$i]['ID_add_personel'] != '' || $query[$i]['ID_add_personel'] != null) {
+                $Name_add_personel = $query[$i]['ID_add_personel'];
+            }
+
+            $Reqdatetime = DateTime::createFromFormat('Y-m-d', $query[$i]['Req_date']);
+            $ReqdateNameDay = $Reqdatetime->format('l');
+
+            $MarkomSupport = '<label>No</Label>';
+            if ($query[$i]['MarcommSupport'] != '') {
+                $MarkomSupport = '<ul style = "margin-left : -28px">';
+                $dd = explode(',', $query[$i]['MarcommSupport']);
+                for ($zx=0; $zx < count($dd); $zx++) {
+                    // check status
+                     $Status_markom = '';
+                     if (strpos($dd[$zx], 'Note') === false) {
+                         $g_markom = $this->g_markom($dd[$zx],$query[$i]['ID']);
+                         if ($g_markom[0]['StatusMarkom'] == 0) {
+                             $Status_markom = '{Not Confirm}';
+                         }
+                         elseif ($g_markom[0]['StatusMarkom'] == 1) {
+                             $Status_markom = '{Confirm}';
+                         }
+                         else
+                         {
+                             $Status_markom = '{Reject}';
+                         }
+
+                         $dd[$zx] = $g_markom[0]['Name'];   
+                     }
+                     else
+                     {
+                        $pos = strpos($dd[$zx],':');
+                        $dd[$zx] = substr($dd[$zx], 0,$pos+1).'<br>'.substr($dd[$zx], $pos+1,strlen($dd[$zx]));
+                     }
+
+                     $MarkomSupport .= '<li>'.$dd[$zx].$Status_markom.'</li>';    
+
+                }
+                $MarkomSupport .= '</ul>';
+            }
+            
+
+            $KetAdditional = $query[$i]['KetAdditional'];
+            $KetAdditional = json_decode($KetAdditional);
+            $Participant = '<ul><li>Participant Qty : '.$query[$i]['ParticipantQty'].'</li>';
+            if (count($KetAdditional) > 0) {
+                foreach ($KetAdditional as $key => $value) {
+                    if ($value != "" || $value != null) {
+                        $Participant .= '<li>'.str_replace("_", " ", $key).' : '.$value.'</li>';
+                    }
+                }
+            }
+            $Participant .= '</ul>';
+            $arr_result[] = array(
+                    'Start' => $StartNameDay.', '.$query[$i]['Start'],
+                    'End' => $EndNameDay.', '.$query[$i]['End'],
+                    'Time' => $Time,
+                    'Agenda' => $query[$i]['Agenda'],
+                    'Room' => $query[$i]['Room'],
+                    'Equipment_add' => $Name_equipment_add,
+                    'Persone_add' => $Name_add_personel,
+                    'Req_date' => $query[$i]['Name'].'<br>'.$ReqdateNameDay.', '.$query[$i]['Req_date'],
+                    'Req_layout' => $query[$i]['Req_layout'],
+                    'ID' => $query[$i]['ID'],
+                    'Status' => $query[$i]['Status'],
+                    'MarkomSupport' => $MarkomSupport,
+                    'Participant' => $Participant,
+                    'CreatedBy' => $query[$i]['CreatedBy'],
+                    'Detail' => $Detail,
+                    'EmailPU' => $query[$i]['EmailPU'],
+                    'Name' => $query[$i]['Name'],
+                    'Datelimit' => $query[$i]['Datelimit'],
+            );  
+            
+        }
+
+        return $arr_result;   
     }
 }

@@ -802,5 +802,135 @@ class C_rest extends CI_Controller {
         }
     }
 
+    public function venue__fill_feedback()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('vreservation/m_reservation');
+                $this->load->model('m_sendemail');
+                // get data done besar sama dengan hari ini dan kecil sama dengan dua hari lagi
+                $gg = $this->m_reservation->venue__fill_feedback();
+                // ambil email requester / created by untuk email.
+                // body email berisi token dengan auth via get dan passing ID
+                if (count($gg) > 0) {
+                    for ($i=0; $i < count($gg); $i++) { // and grouping by Created by
+                        $data = array();
+                        $data[] = $gg[$i];
+                        $Email = $gg[$i]['EmailPU'];
+                        $CreatedBy = $gg[$i]['CreatedBy'];
+                        $Name = $gg[$i]['Name'];
+                        $DateLimit = $gg[$i]['Datelimit'].' 23:59:59';
+                        $DateLimitCreated = DateTime::createFromFormat('Y-m-d', $gg[$i]['Datelimit']);
+                        // print_r($DateLimit);die();
+                        $NameDayDateLimit =$DateLimitCreated->format('l');
+                        for ($j=$i+1; $j < count($gg); $j++) { 
+                            if ($CreatedBy == $gg[$j]['CreatedBy']) {
+                                $data[] = $gg[$j];
+                            }
+                            else
+                            {
+                                $i = $j - 1;
+                                break;
+                            }
+
+                        }
+
+                        $token = array(
+                            'CreatedBy' => $CreatedBy,
+                            'data' => $data,
+                            'auth' => 's3Cr3T-G4N',
+                            'Datelimit' => $gg[$i]['Datelimit'],
+                        );
+                        $token = $this->jwt->encode($token,'UAP)(*');
+                        $text = 'Dear Mr/Mrs '.$Name.',<br><br>
+                                    Thanks for using Venue Reservation Apps.<br><br>
+                                    Please give me feedback about Room which you are  using with click View Button below.<br>
+                                    <table width="200" cellspacing="0" cellpadding="12" border="0">
+                                         <tbody>
+                                         <tr>
+                                             <td bgcolor="#51a351" align="center">
+                                                 <a href="'.url_pas.'vreservation/feedback/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >View</a>
+                                             </td>
+                                         </tr>
+                                         </tbody>
+                                     </table><br><br>
+                                     <strong> Link will be active on '.$NameDayDateLimit.','.$DateLimit.'
+                                ';        
+                        if($_SERVER['SERVER_NAME']!='localhost') {
+                            $to = 'alhadi.rahman@podomorouniversity.ac.id';
+                            $subject = "Podomoro University Venue Reservation Feedback";
+                            $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                            
+                        }
+                        else
+                        {
+                            $to = $Email;
+                            $subject = "Podomoro University Venue Reservation Feedback";
+                            $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                        }
+                    }
+                }
+                
+                echo json_encode($gg);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    private function get_content($url, $post = '') {
+        $usecookie = __DIR__ . "/cookie.txt";
+        $header[] = 'Content-Type: application/json';
+        $header[] = "Accept-Encoding: gzip, deflate";
+        $header[] = "Cache-Control: max-age=0";
+        $header[] = "Connection: keep-alive";
+        $header[] = "Accept-Language: en-US,en;q=0.8,id;q=0.6";
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_VERBOSE, false);
+        // curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_ENCODING, true);
+        curl_setopt($ch, CURLOPT_AUTOREFERER, true);
+        curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
+
+        curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36");
+
+        if ($post)
+        {
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        }
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+        $rs = curl_exec($ch);
+
+        if(empty($rs)){
+            var_dump($rs, curl_error($ch));
+            curl_close($ch);
+            return false;
+        }
+        curl_close($ch);
+        return $rs;
+    }
+
 
 }

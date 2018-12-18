@@ -796,6 +796,8 @@ $route['rest/__rekapintake_beasiswa'] = 'api/c_rest/rekapintake_beasiswa';
 $route['rest/__rekapintake_perschool'] = 'api/c_rest/rekapintake_perschool';
 $route['rest/__rekapmhspayment'] = 'api/c_rest/rekapmhspayment';
 $route['rest/__sendEmail'] = 'api/c_rest/sendEmail';
+$route['rest/venue/__fill_feedback'] = 'api/c_rest/venue__fill_feedback';
+
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
 $route['api/__getRegionByProv'] = 'api/c_api/getRegionByProv';
@@ -955,6 +957,8 @@ $route['vreservation/modal_form_return_eq_save'] = 'page/vreservation/c_transaks
 $route['vreservation/t_eq/(:any)'] = 'page/vreservation/c_transaksi/t_eq/$1';
 $route['vreservation/master/markom_support'] = 'page/vreservation/c_master/markom_support';
 $route['vreservation/confirm_markom_support'] = 'api/c_global/vreservation_confirm_markom_support';
+$route['vreservation/feedback/(:any)'] = 'api/c_global/vreservation_page_feedback/$1';
+$route['vreservation/api-feedback'] = 'api/c_global/vreservation_api_feedback';
 
 
 

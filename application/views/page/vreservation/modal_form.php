@@ -208,6 +208,16 @@
                 </div>
             </div>
         </div>
+        <div class="form-group"> 
+            <div class="row">
+                <div class="col-sm-3">
+                    <label class="control-label">Attachment :</label>
+                </div>    
+                <div class="col-sm-3">
+                   <input type="file" data-style="fileinput" id="ExFile_invitation" multiple>
+                </div>
+            </div>
+        </div>
         <div style="text-align: center;">       
     		<div class="col-sm-12" id="BtnFooter">
                 <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>

@@ -510,7 +510,7 @@ class C_global extends CI_Controller {
                         }
                         else
                         {
-                            $MarkomEmail .='<li>'.$xx[$i].'</li>';
+                            $MarkomEmail .='<li>'.nl2br($xx[$i]).'</li>';
                         }
                     }
                     $MarkomEmail .= '</ul></li>';
@@ -554,7 +554,8 @@ class C_global extends CI_Controller {
                     $KetAdditional_eq .= '</ul>';
                 }
 
-
+                $files_invitation = $t_booking[0]['Invitation'];
+                $Email_invitation = $this->m_reservation->Email_invitation($files_invitation);
                 // cek Approval
                 $FieldTbl = array();
                 $FieldTbl = ($data_arr['approvalNo'] == 1) ? array('Status1' => 1,'ApprovedAt1' => date('Y-m-d H:i:s'),'ApprovedBy1' => $data_arr['Code']) : array('Status' => 1,'ApprovedAt' => date('Y-m-d H:i:s'),'ApprovedBy' => $data_arr['Code']);
@@ -598,7 +599,8 @@ class C_global extends CI_Controller {
                                                         '.$MarkomEmail.'
                                                         </ul>
                                                         '.$EmailKetAdditional.'
-                                                        '.$KetAdditional_eq.'</br>
+                                                        '.$KetAdditional_eq.
+                                                        $Email_invitation.'</br>
                                                        <table width="200" cellspacing="0" cellpadding="12" border="0">
                                                             <tbody>
                                                             <tr>
@@ -634,7 +636,8 @@ class C_global extends CI_Controller {
                                                         '.$MarkomEmail.'
                                                         </ul>
                                                         '.$EmailKetAdditional.'
-                                                        '.$KetAdditional_eq.'</br>
+                                                        '.$KetAdditional_eq.
+                                                        $Email_invitation.'</br>
                                                         <table width="50" cellspacing="0" cellpadding="12" border="0">
                                                             <tbody>
                                                             <tr>
@@ -665,7 +668,8 @@ class C_global extends CI_Controller {
                                                     '.$MarkomEmail.'
                                                     </ul>
                                                     '.$EmailKetAdditional.'
-                                                    '.$KetAdditional_eq.'</br>
+                                                    '.$KetAdditional_eq.
+                                                    $Email_invitation.'</br>
                                                 ';        
                                         $to = $Email;
                                         $subject = "Podomoro University Venue Reservation Approved";
@@ -712,7 +716,8 @@ class C_global extends CI_Controller {
                                            '.$MarkomEmail.'
                                            </ul>
                                            '.$EmailKetAdditional.'
-                                           '.$KetAdditional_eq.'</br>
+                                           '.$KetAdditional_eq.
+                                           $Email_invitation.'</br>
                                        ';
                                $sendEmail = $this->m_sendemail->sendEmailIcal($to,$subject,$text, $place,$StartIcal,$StartTimeIcal,$EndIcal,$EndTimeIcal);
 
@@ -728,7 +733,8 @@ class C_global extends CI_Controller {
                                         '.$MarkomEmail.'
                                         </ul>
                                         '.$EmailKetAdditional.'
-                                        '.$KetAdditional_eq.'</br>
+                                        '.$KetAdditional_eq.
+                                        $Email_invitation.'</br>
                                     ';        
                             //$to = $Email;
                             $subject = "Podomoro University Venue Reservation Approved";
@@ -762,7 +768,8 @@ class C_global extends CI_Controller {
                                                 '.$MarkomEmail.'
                                                 </ul>
                                                 '.$EmailKetAdditional.'
-                                                '.$KetAdditional_eq.'</br>
+                                                '.$KetAdditional_eq.
+                                                $Email_invitation.'</br>
                                             ';
                                     $sendEmail = $this->m_sendemail->sendEmailIcal($to,$subject,$text, $place,$StartIcal,$StartTimeIcal,$EndIcal,$EndTimeIcal);
 
@@ -778,7 +785,8 @@ class C_global extends CI_Controller {
                                                 '.$MarkomEmail.'
                                                 </ul>
                                                 '.$EmailKetAdditional.'
-                                                '.$KetAdditional_eq.'</br>
+                                                '.$KetAdditional_eq.
+                                                $Email_invitation.'</br>
                                             '; 
                                     $subject = "Podomoro University Venue Reservation Approved";
                                     $StartTimeIcal = date("His", strtotime($t_booking[0]['Start']));
@@ -805,7 +813,8 @@ class C_global extends CI_Controller {
                                                    '.$MarkomEmail.'
                                                    </ul>
                                                    '.$EmailKetAdditional.'
-                                                   '.$KetAdditional_eq.'</br>
+                                                   '.$KetAdditional_eq.
+                                                   $Email_invitation.'</br>
                                                ';
                                        $StartTimeIcal = '073000';
                                        $EndTimeIcal = '083000';
@@ -824,7 +833,8 @@ class C_global extends CI_Controller {
                                                    '.$MarkomEmail.'
                                                    </ul>
                                                    '.$EmailKetAdditional.'
-                                                   '.$KetAdditional_eq.'</br>
+                                                   '.$KetAdditional_eq.
+                                                   $Email_invitation.'</br>
                                                ';
                                         $StartTimeIcal = date("His", strtotime($t_booking[0]['Start']));
                                         $EndTimeIcal = date("His", strtotime($t_booking[0]['End']));   
@@ -1242,6 +1252,76 @@ class C_global extends CI_Controller {
             else{
                 // handling orang iseng
                 echo '{"status":"999","message":"Data doesn\'t exist "}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    public function vreservation_page_feedback($token)
+    {
+        try {
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($token,$key);
+            $auth = $this->m_master->AuthAPI($data_arr);
+            if ($auth) {
+                $data = $data_arr['data'];
+                $DateLimit = $data_arr['Datelimit'];
+                $chk = $this->m_master->chkTgl(date('Y-m-d'),$DateLimit);
+                // updated data if exist
+                if ($chk) {
+                    for ($i=0; $i < count($data); $i++) { 
+                        $c = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$data[$i]->ID);
+                        $fbck =  $c[0]['Feedback'];
+                        $data[$i]->Feedback = $fbck;
+                    }
+                    $this->data['data'] = $data;
+                    $this->data['include'] = $this->load->view('template/include','',true);
+                    $this->load->view('page/vreservation/t_view_feedback',$this->data);
+                }
+                else
+                {
+                    echo '{"status":"404","message":"Link expired"}';
+                }
+                
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+        
+
+    }
+
+    public function vreservation_api_feedback()
+    {
+        try {
+            $key = "UAP)(*";
+            $data_arr = $this->getInputToken();
+            $auth = $this->m_master->AuthAPI($data_arr);
+            if ($auth) {
+                $datasave = array(
+                    'Feedback' => $data_arr['Feedback'],
+                    'FeedbackAt' => date('Y-m-d H:i:s')
+                );
+                $this->db->where('ID',$data_arr['id_key']);
+                $this->db->update('db_reservation.t_booking', $datasave);
+                
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
             }
         }
         //catch exception
