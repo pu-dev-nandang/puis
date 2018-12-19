@@ -14,6 +14,10 @@
     .table tbody+tbody {
         border-top: 1px solid #ddd;
     }
+
+    .radio, .checkbox {
+        margin-top: 0px;
+    }
 </style>
 
 <div class="row">
@@ -106,6 +110,20 @@
                 </td>
             </tr>
 
+
+            <tr>
+                <td>Attendance</td>
+                <td>:</td>
+                <td>
+                    <div class="checkbox checbox-switch switch-primary">
+                        <label>
+                            <input type="checkbox" id="formAttendance" checked>
+                            <span></span>
+                            <i> | Filter Attendance in UAS (75%)</i>
+                        </label>
+                    </div>
+                </td>
+            </tr>
             <tr>
                 <td>Class Group</td>
                 <td>:</td>
@@ -498,7 +516,7 @@
     }
 
     function resetFormSetSchedule() {
-        $('input[type=radio][name=formCombinedClasses][value=0]').prop('checked',true);
+        $('input[type=radio][name=formCombinedClasses][value=0],#formAttendance').prop('checked',true);
         dataProdi = 1;
         $('#bodyAddProdi').remove();
         $('#btnControlProdi').addClass('hide');
@@ -1128,6 +1146,8 @@
             $('#removeNewSesi,#addNewSesi').prop('disabled',true);
             var SubSesi = (dataSesi>1) ? '1' : '0';
 
+            var Attendance = ($('#formAttendance').is(':checked')) ? '1' : '0';
+
             var data = {
                 action : 'add',
                 ID : '',
@@ -1143,6 +1163,7 @@
                             SubSesi : SubSesi,
                             TotalAssigment : 5,
                             IsSemesterAntara : ''+SemesterAntara,
+                            Attendance : Attendance,
                             UpdateBy : UpdateBy,
                             UpdateAt : UpdateAt
                         },

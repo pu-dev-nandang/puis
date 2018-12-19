@@ -18,6 +18,10 @@
     #formProgramsCampusID, #formBaseProdi {
         max-width: 250px;
     }
+
+    .radio, .checkbox {
+        margin-top: 0px;
+    }
 </style>
 
 <div class="row">
@@ -100,8 +104,21 @@
         <hr/>
         <table class="table">
             <tr>
-                <td style="width: 20%;">Class Group</td>
+                <td style="width: 20%;">Attendance</td>
                 <td style="width: 1%;">:</td>
+                <td>
+                    <div class="checkbox checbox-switch switch-primary">
+                        <label>
+                            <input type="checkbox" id="formAttendance">
+                            <span></span>
+                            <i> | Filter Attendance in UAS (75%)</i>
+                        </label>
+                    </div>
+                </td>
+
+            <tr>
+                <td>Class Group</td>
+                <td>:</td>
                 <td><input class="form-control" id="formClassGroup" style="max-width: 130px;"/> </td>
             </tr>
             <tr>
@@ -455,11 +472,14 @@
                 }
             }
 
+            var Attendance = ($('#formAttendance').is(':checked')) ? '1' : '0';
+
             var data = {
                 action : 'updateInfoInEditCourse',
                 SemesterID : SemesterID,
                 ScheduleID : ScheduleID,
                 UpdateForm : {
+                    Attendance : Attendance,
                     ClassGroup : formClassGroup,
                     Coordinator : formCoordinator,
                     TeamTeaching : TeamTeaching
@@ -511,6 +531,10 @@
             loadSelectOptionConf('#formProgramsCampusID','programs_campus',s.ProgramsCampusID);
             $('#viewSemester').text(s.SemesterName);
             $('#formSemesterID').val(s.SemesterID);
+
+            var ct_attenance = (s.Attendance=='1') ? true : false;
+            $('#formAttendance').prop('checked',ct_attenance);
+
             $('#formClassGroup').val(s.ClassGroup);
             $('#formScheduleID').val(s.ScheduleID);
 

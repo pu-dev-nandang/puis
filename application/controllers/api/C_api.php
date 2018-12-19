@@ -1528,7 +1528,7 @@ class C_api extends CI_Controller {
 
                 $dataProgram = $this->db->query('SELECT s.ID AS ScheduleID, s.ProgramsCampusID, sem.Name AS SemesterName, 
                                                               s.ClassGroup, s.Coordinator, s.TeamTeaching,
-                                                             s.SemesterID, mk.NameEng AS CourseEng, cd.TotalSKS AS TotalCredit
+                                                             s.SemesterID, s.Attendance , mk.NameEng AS CourseEng, cd.TotalSKS AS TotalCredit
                                                             FROM db_academic.schedule s
                                                             LEFT JOIN db_academic.semester sem ON (sem.ID = s.SemesterID)
                                                             LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
@@ -6134,7 +6134,7 @@ class C_api extends CI_Controller {
         }
 
         $queryDefault = 'SELECT s.ID, s.CombinedClasses, s.ClassGroup, s.Coordinator, em.Name AS CoordinatorName,
-                                      s.TeamTeaching, s.SubSesi, cd.TotalSKS AS Credit, mk.MKCode, mk.Name AS MKName, mk.NameEng AS MKNameEng
+                                      s.TeamTeaching, s.SubSesi, s.Attendance, cd.TotalSKS AS Credit, mk.MKCode, mk.Name AS MKName, mk.NameEng AS MKNameEng
                                       FROM db_academic.schedule s
                                       LEFT JOIN db_academic.schedule_details sd ON (sd.ScheduleID = s.ID)
                                       LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
@@ -6161,7 +6161,8 @@ class C_api extends CI_Controller {
             $nestedData=array();
             $row = $query[$i];
 
-            $SubSesi = ($row['SubSesi']=='1') ? '<span class="label label-warning">Sub-Sesi</span>' : '';
+            $SubSesi = ($row['SubSesi']=='1') ? '<br/><span class="label label-warning">Sub-Sesi</span>' : '';
+            $Attendance = ($row['Attendance']=='0') ? '<br/><span class="label label-danger"><i class="fa fa-filter margin-right"></i> No Attd</span>' : '';
 
             $dataSchedule = $this->db->query('SELECT cl.Room, d.NameEng AS DayEng, sd.StartSessions, sd.EndSessions 
                                                                       FROM db_academic.schedule_details sd
@@ -6236,7 +6237,7 @@ class C_api extends CI_Controller {
                     </div>';
 
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
-            $nestedData[] = '<div  style="text-align:center;">'.$row['ClassGroup'].'<br/>'.$SubSesi.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$row['ClassGroup'].''.$SubSesi.''.$Attendance.'</div>';
             $nestedData[] = '<div  style="text-align:left;"><b>'.$row['MKCode'].' - '.$row['MKName'].'</b><br/><i style="color: #9e9e9e;">'.$row['MKNameEng'].'</i>
                                                     <br/><span>Prodi : '.$Prodi.'</span></div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['Credit'].'</div>';
