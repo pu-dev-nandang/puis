@@ -1467,20 +1467,21 @@ class C_finance extends Finnance_Controler {
                $ta = $this->m_master->caribasedprimary($db,'NPM',$NPM);
                $ProdiID = $ta[0]['ProdiID'];
 
-               $payment = $this->m_finance->getPriceBaseBintang($selectPTID,$ProdiID,$Year,$Pay_Cond);
+               //$payment = $this->m_finance->getPriceBaseBintang($selectPTID,$ProdiID,$Year,$Pay_Cond);
                // check PTID, jika SKS / Credit dikali per sks yang diambil // 3 credit
                   // check checklist mahasiswa baru atau tidak
+               $payment = $objWorksheet->getCellByColumnAndRow(3, $i)->getCalculatedValue();
                 if ($selectPTID == 3) {
                     if ($maba == 1) {
                         $ProStuDefaultCredit = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
                         $DefaultCredit = $ProStuDefaultCredit[0]['DefaultCredit'];
-                        $payment = (int)$payment * (int)$DefaultCredit;
+                        //$payment = (int)$payment * (int)$DefaultCredit;
                     }
                     else
                     {
                         // '.$db.'.study_planning
                         $Credit = $this->m_finance->getSKSMahasiswa('ta_'.$Year,$NPM);
-                        $payment = (int)$payment * (int)$Credit;
+                        //$payment = (int)$payment * (int)$Credit;
                     }
                 }
 
