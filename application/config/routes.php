@@ -959,6 +959,7 @@ $route['vreservation/master/markom_support'] = 'page/vreservation/c_master/marko
 $route['vreservation/confirm_markom_support'] = 'api/c_global/vreservation_confirm_markom_support';
 $route['vreservation/feedback/(:any)'] = 'api/c_global/vreservation_page_feedback/$1';
 $route['vreservation/api-feedback'] = 'api/c_global/vreservation_api_feedback';
+$route['vreservation/list_eq_history'] = 'page/vreservation/c_transaksi/list_eq_history';
 
 
 

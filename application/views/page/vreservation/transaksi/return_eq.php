@@ -48,7 +48,7 @@
                     <div id="panel_web" class="" style="padding:30px;padding-top:0px;">
                          <ul class="nav nav-tabs">
                             <li role="presentation" class="active"><a href="javascript:void(0)" class="tab-btn-submenu-page" data-page="set_return">Set Return</a></li>
-                            <li role="presentation"><a href="javascript:void(0)" class="tab-btn-submenu-page" data-page="history">History</a></li>
+                            <li role="presentation"><a href="javascript:void(0)" class="tab-btn-submenu-page" data-page="eq_history">History</a></li>
                          </ul>
                          <br>
                          <div id="PageNav" class="btn-read">

@@ -1264,6 +1264,7 @@ class C_global extends CI_Controller {
     public function vreservation_page_feedback($token)
     {
         try {
+            //print_r($token);die();
             $key = "UAP)(*";
             $data_arr = (array) $this->jwt->decode($token,$key);
             $auth = $this->m_master->AuthAPI($data_arr);

@@ -96,6 +96,10 @@
                    var Qty = "<?php echo $getDataEdit[0]['Qty'] ?>";
                    $("#Qty").val(Qty);
             <?php endif ?>
+
+
+            $('#selectDivision')
+                    .attr("disabled", true);
         }).done(function () {
               
         });

@@ -2516,7 +2516,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     public function venue__fill_feedback()
     {
         $arr_result =array();
-        $sql = 'select a.*,b.Name,b.EmailPU,DATE_ADD(DATE_FORMAT(Now(),"%Y-%m-%d"),INTERVAL 1 DAY) as Datelimit    
+        $sql = 'select a.*,b.Name,b.EmailPU,DATE_ADD(DATE_FORMAT(Now(),"%Y-%m-%d"),INTERVAL 2 DAY) as Datelimit    
                 from db_reservation.t_booking as a 
                 join db_employees.employees as b on a.CreatedBy = b.NIP 
                 where a.Status = 1 and a.End <= NOW() and a.Feedback IS NULL and a.End >= DATE_SUB(NOW(), INTERVAL 1 DAY) order by a.CreatedBy asc';
@@ -2631,16 +2631,16 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     'Time' => $Time,
                     'Agenda' => $query[$i]['Agenda'],
                     'Room' => $query[$i]['Room'],
-                    'Equipment_add' => $Name_equipment_add,
-                    'Persone_add' => $Name_add_personel,
-                    'Req_date' => $query[$i]['Name'].'<br>'.$ReqdateNameDay.', '.$query[$i]['Req_date'],
-                    'Req_layout' => $query[$i]['Req_layout'],
+                    //'Equipment_add' => $Name_equipment_add,
+                    //'Persone_add' => $Name_add_personel,
+                    //'Req_date' => $query[$i]['Name'].'<br>'.$ReqdateNameDay.', '.$query[$i]['Req_date'],
+                    //'Req_layout' => $query[$i]['Req_layout'],
                     'ID' => $query[$i]['ID'],
-                    'Status' => $query[$i]['Status'],
-                    'MarkomSupport' => $MarkomSupport,
-                    'Participant' => $Participant,
+                    //'Status' => $query[$i]['Status'],
+                    //'MarkomSupport' => $MarkomSupport,
+                    //'Participant' => $Participant,
                     'CreatedBy' => $query[$i]['CreatedBy'],
-                    'Detail' => $Detail,
+                    //'Detail' => $Detail,
                     'EmailPU' => $query[$i]['EmailPU'],
                     'Name' => $query[$i]['Name'],
                     'Datelimit' => $query[$i]['Datelimit'],
@@ -2649,5 +2649,23 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         }
 
         return $arr_result;   
+    }
+
+    public function get_list_eq_history()
+    {
+        $this->load->model('master/m_master');
+        $g = $this->get_JSonEquipment_additional();
+        $rs = array();
+        for ($i=0; $i < count($g); $i++) { 
+            $ID_m_equipment = $g[$i]['ID'];
+            $sql = 'select count(*) as total from (
+                        select ID_equipment_additional from db_reservation.t_booking_eq_additional where ID_equipment_additional = "'.$ID_m_equipment.'" and Status = 1 and ID_t_booking in (select ID from db_reservation.t_booking where Status = 1) group by ID_t_booking
+                    ) aa';
+            $query=$this->db->query($sql, array())->result_array();
+            $g[$i]['Usage'] = $query[0]['total'];
+            $rs[] = $g[$i];        
+        }
+
+        return $rs;
     }
 }

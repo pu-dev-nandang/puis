@@ -1639,4 +1639,10 @@ class C_transaksi extends Vreservation_Controler {
           echo json_encode($arr_result);
     }
 
+    public function list_eq_history()
+    {
+        $g = $this->m_reservation->get_list_eq_history();
+        echo json_encode($g);
+    }
+
 }

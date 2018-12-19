@@ -832,10 +832,9 @@ class C_rest extends CI_Controller {
                             }
                             else
                             {
-                                $i = $j - 1;
                                 break;
                             }
-
+                            $i = $j;
                         }
 
                         $token = array(
@@ -857,7 +856,7 @@ class C_rest extends CI_Controller {
                                          </tr>
                                          </tbody>
                                      </table><br><br>
-                                     <strong> Link will be active on '.$NameDayDateLimit.','.$DateLimit.'
+                                     <strong> Link will be deactive on '.$NameDayDateLimit.','.$DateLimit.'
                                 ';        
                         if($_SERVER['SERVER_NAME']!='localhost') {
                             $to = 'alhadi.rahman@podomorouniversity.ac.id';
@@ -871,6 +870,7 @@ class C_rest extends CI_Controller {
                             $subject = "Podomoro University Venue Reservation Feedback";
                             $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
                         }
+                        //print_r($data);
                     }
                 }
                 
