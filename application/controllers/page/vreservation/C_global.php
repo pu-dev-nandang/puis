@@ -366,4 +366,19 @@ class C_global extends Vreservation_Controler {
         echo json_encode($getData);
     }
 
+    public function vreservation_report_page()
+    {
+        $content = $this->load->view($this->pathView.'report/page','',true);
+        $this->temp($content);
+    }
+
+    public function report($page)
+    {
+        $arr_result = array('html' => '','jsonPass' => '');
+        $uri = $this->uri->segment(3);
+        $content = $this->load->view($this->pathView.'report/'.$uri,'',true);
+        $arr_result['html'] = $content;
+        echo json_encode($arr_result);
+    }
+
 }

@@ -1645,4 +1645,19 @@ class C_transaksi extends Vreservation_Controler {
         echo json_encode($g);
     }
 
+    public function detail_historis()
+    {
+        $input = $this->getInputToken();
+        $rs = array();
+        $ID_equipment_additional = $input['ID_equipment_additional'];
+        $sql = 'select * from db_reservation.t_booking_eq_additional where ID_equipment_additional = "'.$ID_equipment_additional.'" and Status = 1 and ID_t_booking in (select ID from db_reservation.t_booking where Status = 1) group by ID_t_booking';
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) { 
+            $g= $this->m_reservation->getDataT_info($query[$i]['ID_t_booking']);
+            $rs[] = $g[0];
+        }
+
+        echo json_encode($rs);
+    }
+
 }

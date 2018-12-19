@@ -1332,4 +1332,60 @@ class C_global extends CI_Controller {
         }
     }
 
+    public function summary_use_room()
+    {
+        try {
+            $key = "UAP)(*";
+            $data_arr = $this->getInputToken();
+            $auth = $this->m_master->AuthAPI($data_arr);
+            if ($auth) {
+                $rs = array();
+                $this->load->model('vreservation/m_reservation');
+
+                $url = url_pas.'api/__crudClassroomVreservation';
+                $data = array(
+                        'action' => 'read',
+                    );
+                $JWT = new JWT();
+                $Input = $JWT->encode($data,"UAP)(*");
+                $ch = curl_init();
+
+                curl_setopt($ch, CURLOPT_URL,$url);
+                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_POSTFIELDS,
+                            "token=".$Input);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                $r = curl_exec($ch);
+                $r = (array)json_decode($r,true);
+                //print_r($pr);
+                curl_close ($ch);
+
+
+                $condition = array(
+                    'date1' => $data_arr['date1'],
+                    'date2' => $data_arr['date2'],
+                );
+                for ($i=0; $i < count($r); $i++) { 
+                   $Room = $r[$i]['Room'];
+                   $Usage = $this->m_reservation->getUsagePerRoom($Room,$condition);
+                   $r[$i]['Usage'] = $Usage;
+                   $rs[] = $r[$i];
+                }
+
+                echo json_encode($rs);
+                
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
 }

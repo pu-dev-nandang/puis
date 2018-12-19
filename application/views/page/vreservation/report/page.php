@@ -41,19 +41,18 @@
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i> Transaction Equipment </h4>
+                <h4 class="header"><i class="icon-reorder"></i> Report </h4>
             </div>
             <div class="widget-content">
                 <div class="row">
                     <div id="panel_web" class="" style="padding:30px;padding-top:0px;">
                          <ul class="nav nav-tabs">
-                            <li role="presentation" class="active"><a href="javascript:void(0)" class="tab-btn-submenu-page" data-page="set_return">Set Return</a></li>
-                            <li role="presentation"><a href="javascript:void(0)" class="tab-btn-submenu-page" data-page="eq_history">History</a></li>
+                            <li role="presentation" class="active"><a href="javascript:void(0)" class="tab-btn-submenu-page" data-page="summary_use_room">Summary Use Room</a></li>
                          </ul>
                          <br>
                          <div id="PageNav" class="btn-read">
                                                                  
-                          </div>
+                         </div>
                         <!-- <div id="pageData" class="btn-read">
                                         
                         </div> -->
@@ -68,8 +67,7 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-        //loadDataListApprove();
-        LoadPage('set_return');
+        LoadPage('summary_use_room');
     });
 
     $('.tab-btn-submenu-page').click(function () {
@@ -84,7 +82,7 @@
     {
         $("#PageNav").empty();
         loading_page("#PageNav");
-        var url = base_url_js+'vreservation/t_eq/'+Page;
+        var url = base_url_js+'vreservation/report/'+Page;
         $.post(url,function (resultJson) {
             var response = jQuery.parseJSON(resultJson);
             var html = response.html;

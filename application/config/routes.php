@@ -960,6 +960,9 @@ $route['vreservation/confirm_markom_support'] = 'api/c_global/vreservation_confi
 $route['vreservation/feedback/(:any)'] = 'api/c_global/vreservation_page_feedback/$1';
 $route['vreservation/api-feedback'] = 'api/c_global/vreservation_api_feedback';
 $route['vreservation/list_eq_history'] = 'page/vreservation/c_transaksi/list_eq_history';
+$route['vreservation/detail_historis'] = 'page/vreservation/c_transaksi/detail_historis';
+$route['vreservation/report/(:any)'] = 'page/vreservation/c_global/report/$1';
+$route['api/vreservation/summary_use_room'] = 'api/c_global/summary_use_room';
 
 
 

@@ -11,7 +11,7 @@
 	{
 	    $("#pageData").empty();
 	    loading_page('#pageData');
-	    var html_table ='<div class="col-md-12">'+
+	    var html_table ='<div class = "row"><div class="col-md-12">'+
 	                     '<div class="table-responsive">'+
 	                        '<table class="table table-bordered table-hover table-checkable datatable">'+
 	                            '<thead>'+
@@ -37,7 +37,7 @@
 	                            '</tbody>'+
 	                        '</table>'+
 	                     '</div>'+   
-	                    '</div>';
+	                    '</div></div>';
 	    var url = base_url_js+'vreservation/return_eq';
 	    $.post(url,function (data_json) {
 	        setTimeout(function () {
@@ -84,15 +84,6 @@
 
 	    });
 	}
-
-	$(document).on('click','.Detail', function () {
-	   var dataJson = $(this).attr('data');
-	   var dtarr = dataJson.split('@@');
-	   var room = dtarr[6];
-	   var tgl = dtarr[10];;
-	   var time =  dtarr[1];
-	   modal_generate('view','Form Booking Reservation',room,time,tgl,'',dtarr);
-	});
 
 	$(document).on('click','.return_eq', function () {
 	   var ID = $(this).attr('data');
