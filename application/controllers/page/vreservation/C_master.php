@@ -3,8 +3,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class C_master extends Vreservation_Controler {
 
-    // private $data = array();
-
+    // private $data = array(); asd
+ 
     function __construct()
     {
         parent::__construct();
