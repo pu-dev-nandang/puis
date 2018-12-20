@@ -1388,4 +1388,37 @@ class C_global extends CI_Controller {
         }
     }
 
+    public function detailroom()
+    {
+        try {
+            $key = "UAP)(*";
+            $data_arr = $this->getInputToken();
+            $auth = $this->m_master->AuthAPI($data_arr);
+            if ($auth) {
+                $rs = array();
+                $this->load->model('vreservation/m_reservation');
+                $con1 = '';
+                if (array_key_exists('date1', $data_arr) && array_key_exists('date2', $data_arr)) {
+                    if ($data_arr['date1'] != '' && $data_arr['date2'] != '') {
+                        $con1 = 'DATE_FORMAT(a.Start,"%Y-%m-%d") >= "'.$data_arr['date1'].'" and DATE_FORMAT(a.Start,"%Y-%m-%d") <= "'.$data_arr['date2'].'" and ';
+                    }
+                }
+                $condition = $con1.' a.Status = 1 and a.Room = "'.$data_arr['room'].'"';
+                $g = $this->m_reservation->getDataT_info('','',$condition);
+                echo json_encode($g);
+                
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
 }

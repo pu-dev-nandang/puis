@@ -155,10 +155,21 @@ class C_global extends Vreservation_Controler {
         $this->data['RoomDB'] = $getRoom;
         $file = $getRoom[0]['Layout'];
         $this->data['Layout'] = $file;
-        if ($time > -30) {
             switch ($input['Action']) {
                 case 'add':
-                    echo $this->load->view($this->pathView.'modal_form',$this->data,true);
+                    if ($time > -30) {
+                        echo $this->load->view($this->pathView.'modal_form',$this->data,true);
+                    }
+                    else
+                    {
+                            $html = '<div>Time date selected is less than present time</div><br><div style="text-align: center;">       
+                            <div class="col-sm-12" id="BtnFooter">
+                                <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>
+                            </div>
+                        </div>';
+                        echo $html;
+                    }
+                    
                     break;
                 case 'view':
                     $data = $input['dt'];
@@ -346,16 +357,6 @@ class C_global extends Vreservation_Controler {
                     # code...
                     break;
             }
-        }
-        else
-        {
-            $html = '<div>Time date selected is less than present time</div><br><div style="text-align: center;">       
-            <div class="col-sm-12" id="BtnFooter">
-                <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>
-            </div>
-        </div>';
-        echo $html;
-        }
         
     }
 
@@ -379,6 +380,58 @@ class C_global extends Vreservation_Controler {
         $content = $this->load->view($this->pathView.'report/'.$uri,'',true);
         $arr_result['html'] = $content;
         echo json_encode($arr_result);
+    }
+
+    public function datafeedback()
+    {
+        $requestData= $_REQUEST;
+        // print_r($requestData);
+        $s = 'select count(*) as total from db_reservation.t_booking where Status = 1';
+        $query = $this->db->query($s)->result_array();
+        $totalData = $query[0]['total'];
+
+        $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP 
+                where a.Status = 1 and (a.CreatedBy LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%"  or  a.Room LIKE "'.$requestData['search']['value'].'%" or a.Start LIKE "'.$requestData['search']['value'].'%" )
+                order by a.FeedbackAt desc,a.Feedback desc,a.Start Desc LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+        $query = $this->db->query($sql)->result_array();
+
+        $data = array();
+        $No = $requestData['start'] + 1;
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+            $Detail = $this->m_reservation->getDataPass($row['ID']);
+            $Detail = implode('@@', $Detail);
+            $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['Start']);
+            $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['End']);
+            $StartNameDay = $Startdatetime->format('l');
+            $EndNameDay = $Enddatetime->format('l');
+            $Time = $query[$i]['Time'].' Minutes';
+            $Reqdatetime = DateTime::createFromFormat('Y-m-d', $query[$i]['Req_date']);
+            $ReqdateNameDay = $Reqdatetime->format('l');
+
+            $nestedData[] = $No;
+            $nestedData[] = $StartNameDay.', '.$query[$i]['Start'];
+            $nestedData[] = $EndNameDay.', '.$query[$i]['End'];
+            $nestedData[] = $query[$i]['Agenda'];
+            $nestedData[] = $query[$i]['Room'];
+            $nestedData[] = $query[$i]['Name'].'<br>'.$ReqdateNameDay.', '.$query[$i]['Req_date'];
+            $nestedData[] = nl2br($query[$i]['Feedback']);
+            $nestedData[] = $query[$i]['FeedbackAt'];
+            $nestedData[] = $Detail;
+            $data[] = $nestedData;
+            $No++;
+        }
+
+        // print_r($data);
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalData ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
     }
 
 }

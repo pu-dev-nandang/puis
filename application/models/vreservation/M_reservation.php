@@ -2051,7 +2051,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $arr_result;         
     }
 
-    private function getDataPass($ID)
+    public function getDataPass($ID)
     {
         $sql2 = 'select a.*,b.Name from db_reservation.t_booking as a
                  join db_employees.employees as b on a.CreatedBy = b.NIP
@@ -2084,29 +2084,34 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     {
         $bool = false;
         $arr = array();
-        if ($CreatedBy == $this->session->userdata('NIP')) {
-            $arr[] = 1;
-        }
-        else
-        {
-            $arr[] = 0;
-        }
-
-        if ($CaseApproveAccess == 2 || $CaseApproveAccess == 4) {
-            $arr[] = 1;
-        }
-        else
-        {
-             $arr[] = 0;
-        }
-
-        $arr[] = $boolAuthEq;
-        $arr[] = $boolAuthMarkom;
-        if (in_array(1, $arr))
-        {
+        if ($this->session->userdata('ID_group_user') <= 3) {
             $bool = true;
         }
+        else
+        {
+            if ($CreatedBy == $this->session->userdata('NIP')) {
+                $arr[] = 1;
+            }
+            else
+            {
+                $arr[] = 0;
+            }
 
+            if ($CaseApproveAccess == 2 || $CaseApproveAccess == 4) {
+                $arr[] = 1;
+            }
+            else
+            {
+                 $arr[] = 0;
+            }
+
+            $arr[] = $boolAuthEq;
+            $arr[] = $boolAuthMarkom;
+            if (in_array(1, $arr))
+            {
+                $bool = true;
+            }
+        }
         return $bool;
     }
 
@@ -2715,6 +2720,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             
         
         $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP '.$add_where.' order by a.Status asc,a.Start Desc';
+        // print_r($sql);die();
         $query=$this->db->query($sql, array())->result_array();
         $NIP = '@';
         for ($i=0; $i < count($query); $i++) {
@@ -3021,7 +3027,8 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 }
             }
             $Participant .= '</ul>';
-            $boolAuth = $this->boolAuthData($query[$i]['CreatedBy'],$CaseApproveAccess,$boolAuthEq,$boolAuthMarkom);
+            // $boolAuth = $this->boolAuthData($query[$i]['CreatedBy'],$CaseApproveAccess,$boolAuthEq,$boolAuthMarkom);
+            $boolAuth = true;
             if ($boolAuth) {
                    $arr_result[] = array(
                            'Start' => $StartNameDay.', '.$query[$i]['Start'],

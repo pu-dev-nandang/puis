@@ -963,7 +963,8 @@ $route['vreservation/list_eq_history'] = 'page/vreservation/c_transaksi/list_eq_
 $route['vreservation/detail_historis'] = 'page/vreservation/c_transaksi/detail_historis';
 $route['vreservation/report/(:any)'] = 'page/vreservation/c_global/report/$1';
 $route['api/vreservation/summary_use_room'] = 'api/c_global/summary_use_room';
-
+$route['api/vreservation/detailroom'] = 'api/c_global/detailroom';
+$route['vreservation/datafeedback'] = 'page/vreservation/c_global/datafeedback';
 
 
 // test

@@ -146,25 +146,28 @@
                 </div>
             </div>
         </div>
-        <div class="form-group"> 
-            <div class="row">
-                <div class="col-sm-3">
-                    <label class="control-label">Desc Additional:</label>
-                </div>    
-                <div class="col-sm-8">
-                    <div class="form-group">
-                        <?php foreach ($KetAdditional as $key => $value): ?>
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <label class="control-label"><?php echo str_replace("_", " ", $key) ?></label>
-                                    <input type="text" class="form-control" readonly="" value="<?php echo $value ?>">
-                                </div>
-                            </div>
-                        <?php endforeach ?>
+        <?php if (count($KetAdditional) > 0): ?>
+            <div class="form-group"> 
+                <div class="row">
+                    <div class="col-sm-3">
+                        <label class="control-label">Desc Additional:</label>
                     </div>    
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            <?php foreach ($KetAdditional as $key => $value): ?>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="control-label"><?php echo str_replace("_", " ", $key) ?></label>
+                                        <input type="text" class="form-control" readonly="" value="<?php echo $value ?>">
+                                    </div>
+                                </div>
+                            <?php endforeach ?>
+                        </div>    
+                    </div>
                 </div>
             </div>
-        </div>
+        <?php endif ?>
+        
         <?php if ($Email_invitation != ''): ?>
             <div class="form-group"> 
                 <div class="row">

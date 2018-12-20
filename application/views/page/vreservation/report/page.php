@@ -48,6 +48,7 @@
                     <div id="panel_web" class="" style="padding:30px;padding-top:0px;">
                          <ul class="nav nav-tabs">
                             <li role="presentation" class="active"><a href="javascript:void(0)" class="tab-btn-submenu-page" data-page="summary_use_room">Summary Use Room</a></li>
+                            <li role="presentation"><a href="javascript:void(0)" class="tab-btn-submenu-page" data-page="feedback">Feedback</a></li>
                          </ul>
                          <br>
                          <div id="PageNav" class="btn-read">
