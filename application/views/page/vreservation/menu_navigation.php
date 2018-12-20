@@ -300,14 +300,14 @@ $this->m_reservation->checkAuth_user_vreservation();
         window.open(base_url_js+'vreservation/'+page,'_blank');
      });
 
-    $(document).on('click','.panel-orange', function () {
-        var dataJson = $(this).attr('data');
-        var room = $(this).attr('room');
-        var tgl = $("#datetime_deadline1").val();
-        var dtarr = dataJson.split('@@');
-        var time =  dtarr[1];
-        modal_generate('view','Form Booking Reservation',room,time,tgl,'',dtarr);
-    });
+    // $(document).on('click','.panel-orange', function () {
+    //     var dataJson = $(this).attr('data');
+    //     var room = $(this).attr('room');
+    //     var tgl = $("#datetime_deadline1").val();
+    //     var dtarr = dataJson.split('@@');
+    //     var time =  dtarr[1];
+    //     modal_generate('view','Form Booking Reservation',room,time,tgl,'',dtarr);
+    // });
 
     function modal_generate(action,title,room,time,tgl,user = '',dt = []) {
         var url = base_url_js+"vreservation/modal_form";

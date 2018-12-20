@@ -155,10 +155,21 @@ class C_global extends Vreservation_Controler {
         $this->data['RoomDB'] = $getRoom;
         $file = $getRoom[0]['Layout'];
         $this->data['Layout'] = $file;
-        if ($time > -30) {
             switch ($input['Action']) {
                 case 'add':
-                    echo $this->load->view($this->pathView.'modal_form',$this->data,true);
+                    if ($time > -30) {
+                        echo $this->load->view($this->pathView.'modal_form',$this->data,true);
+                    }
+                    else
+                    {
+                            $html = '<div>Time date selected is less than present time</div><br><div style="text-align: center;">       
+                            <div class="col-sm-12" id="BtnFooter">
+                                <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>
+                            </div>
+                        </div>';
+                        echo $html;
+                    }
+                    
                     break;
                 case 'view':
                     $data = $input['dt'];
@@ -243,29 +254,41 @@ class C_global extends Vreservation_Controler {
                     $this->data['ParticipantQty'] = $get[0]['ParticipantQty'];
                     // get data Equipment Additional
                     $Name_equipment_add = '-';
-                    if ($get[0]['ID_equipment_add'] != '' || $get[0]['ID_equipment_add'] != null) {
-                        $ID_equipment_add = explode(',', $get[0]['ID_equipment_add']);
-                        $Name_equipment_add = '';
-                        for ($j=0; $j < count($ID_equipment_add); $j++) { 
-                            $get2 = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add[$j]);
-                            // print_r($ID_equipment_add);die();
-                            $ID_m_equipment = $get2[0]['ID_m_equipment'];
-                            $get3 = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
-                            if ($j != count($ID_equipment_add) - 1) {
-                                $Owner = $get2[0]['Owner'];
-                                $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$Owner);
-                                $Owner = $getX[0]['Division'];
-                                $Name_equipment_add .= $get3[0]['Equipment'].' by '.$Owner.'['.$get2[0]['Qty'].'] , ';
+                    $keq_add = $get[0]['ID_equipment_add'];
+                    if ($keq_add != '' && $keq_add != NULL) {
+                        $keq_add = explode(",",$keq_add);
+                    }
+                    $e_div = array();
+                    if (is_array($keq_add)) {
+                        // save data t_booking_eq_additional
+                        $Name_equipment_add = '<ul>';
+                        $xx = $keq_add;
+                        $ID_t_booking = $get[0]['ID'];
+                        for ($i=0; $i < count($xx); $i++) { 
+                            $gett_booking_eq_additional = $this->m_reservation->gett_booking_eq_additional($xx[$i],$ID_t_booking);
+                            if ($gett_booking_eq_additional[0]['Status'] == 0) {
+                                $Status_eq_additional = '{Not Confirm}';
+                            }
+                            elseif ($gett_booking_eq_additional[0]['Status'] == 1) {
+                                $Status_eq_additional = '{Confirm}';
                             }
                             else
                             {
-                                $Owner = $get2[0]['Owner'];
-                                $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$Owner);
-                                $Owner = $getX[0]['Division'];
-                                $Name_equipment_add .= $get3[0]['Equipment'].' by '.$Owner.'['.$get2[0]['Qty'].']';
+                                $Status_eq_additional = '{Reject}';
                             }
-                            
+                            $Qty = $gett_booking_eq_additional[0]['Qty'];
+                            $ID_equipment_additional = $gett_booking_eq_additional[0]['ID_equipment_additional'];
+                            $get_eq_add = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_additional);
+                            $OwnerID = $get_eq_add[0]['Owner'];
+                            $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$OwnerID);
+                            $e_div[] = $getX[0]['Email'];
+                            $Owner = $getX[0]['Division'];
+                            $ID_m_equipment = $get_eq_add[0]['ID_m_equipment'];
+                            $ge_eq_m = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
+                            $Name_equipment_add .= '<li>'.$ge_eq_m[0]['Equipment'].' by '.$Owner.'['.$Qty.']'.$Status_eq_additional.'</li>';
+
                         }
+                        $Name_equipment_add .= '</ul>';
                     }
                     $this->data['Name_equipment_add'] = $Name_equipment_add;
 
@@ -287,66 +310,128 @@ class C_global extends Vreservation_Controler {
                     }
                     
                     $MarkomSupport = '<label>No</Label>';
-                    if ($get[0]['MarcommSupport'] != '') {
-                        $MarkomSupport = '<ul>';
-                        $dd = explode(',', $get[0]['MarcommSupport']);
-                        for ($zx=0; $zx < count($dd); $zx++) {
-                            $a = 'How are you?';
-
-                            if (strpos($dd[$zx], 'Graphic Design') !== false) {
-                                 $pos = strpos($dd[$zx],'[');
-                                 $li = substr($dd[$zx], 0,$pos);
-                                 $posE = strpos($dd[$zx],']');
-                                 $ISIe = substr($dd[$zx], ($pos+1), $posE);
-                                 $length = strlen($ISIe);
-                                 $ISIe = substr($ISIe, 0, ($length - 1));
-                                 // print_r($ISIe);die();
-                                 $MarkomSupport .= '<li>'.$li;
-                                 $FileMarkom = explode(';', $ISIe);
-                                 $MarkomSupport .= '<ul>';
-                                 for ($vc=0; $vc < count($FileMarkom); $vc++) { 
-                                    $MarkomSupport .= '<li>'.'<a href="'.base_url("fileGetAny/vreservation-".$FileMarkom[$vc]).'" target="_blank"></i>'.$FileMarkom[$vc].'</a>';
-                                 }
-                                 $MarkomSupport .= '</ul></li>';
-                            } 
-                            else{
-                              $MarkomSupport .= '<li>'.$dd[$zx].'</li>';  
+                    $mks = $get[0]['MarcommSupport'];
+                    if ($mks != '' && $mks != NULL ) {
+                        $mks = explode(",", $mks); 
+                    }
+                    // $MarkomEmail ='';
+                    if (is_array($mks)) {
+                        $xx = $mks;
+                        $MarkomSupport ='<ul>';
+                        for ($i=0; $i < count($xx); $i++) { 
+                            if(strpos($xx[$i], 'Note') === false) {
+                                $g_markom = $this->m_reservation->g_markom($xx[$i],$get[0]['ID']);
+                                if ($g_markom[0]['StatusMarkom'] == 0) {
+                                    $Status_markom = '{Not Confirm}';
+                                }
+                                elseif ($g_markom[0]['StatusMarkom'] == 1) {
+                                    $Status_markom = '{Confirm}';
+                                }
+                                else
+                                {
+                                    $Status_markom = '{Reject}';
+                                }
+                                $MarkomSupport .='<li>'.$g_markom[0]['Name'].$Status_markom.'</li>';
                             }
-                            
+                            else
+                            {
+                                $MarkomSupport .='<li>'.nl2br($xx[$i]).'</li>';
+                            }
                         }
                         $MarkomSupport .= '</ul>';
-
                     }
+
                     $KetAdditional = $get[0]['KetAdditional'];
                     $KetAdditional = json_decode($KetAdditional);
-
+                    $files_invitation = $get[0]['Invitation'];
+                    $Email_invitation = $this->m_reservation->Email_invitation($files_invitation);
+                    $this->data['Email_invitation'] = $Email_invitation;
                     $this->data['KetAdditional'] = $KetAdditional;
                     $this->data['MarkomSupport'] = $MarkomSupport;
                     $this->data['Req_layout'] = $Req_layout;
                     $this->data['ID'] = $get[0]['ID'];
+                    // print_r($this->data);die();
                     echo $this->load->view($this->pathView.'modal_form_view',$this->data,true);
                     break;
                 default:
                     # code...
                     break;
             }
-        }
-        else
-        {
-            $html = '<div>Time date selected is less than present time</div><br><div style="text-align: center;">       
-            <div class="col-sm-12" id="BtnFooter">
-                <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>
-            </div>
-        </div>';
-        echo $html;
-        }
         
     }
 
     public function getCountApprove()
     {
-        $getData= $this->m_reservation->getCountApprove();
+        //$getData= $this->m_reservation->getCountApprove();
+        $getData= count($this->m_reservation->getDataT_booking(null,'',2));
         echo json_encode($getData);
+    }
+
+    public function vreservation_report_page()
+    {
+        $content = $this->load->view($this->pathView.'report/page','',true);
+        $this->temp($content);
+    }
+
+    public function report($page)
+    {
+        $arr_result = array('html' => '','jsonPass' => '');
+        $uri = $this->uri->segment(3);
+        $content = $this->load->view($this->pathView.'report/'.$uri,'',true);
+        $arr_result['html'] = $content;
+        echo json_encode($arr_result);
+    }
+
+    public function datafeedback()
+    {
+        $requestData= $_REQUEST;
+        // print_r($requestData);
+        $s = 'select count(*) as total from db_reservation.t_booking where Status = 1';
+        $query = $this->db->query($s)->result_array();
+        $totalData = $query[0]['total'];
+
+        $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP 
+                where a.Status = 1 and (a.CreatedBy LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%"  or  a.Room LIKE "'.$requestData['search']['value'].'%" or a.Start LIKE "'.$requestData['search']['value'].'%" )
+                order by a.FeedbackAt desc,a.Feedback desc,a.Start Desc LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+        $query = $this->db->query($sql)->result_array();
+
+        $data = array();
+        $No = $requestData['start'] + 1;
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+            $Detail = $this->m_reservation->getDataPass($row['ID']);
+            $Detail = implode('@@', $Detail);
+            $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['Start']);
+            $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['End']);
+            $StartNameDay = $Startdatetime->format('l');
+            $EndNameDay = $Enddatetime->format('l');
+            $Time = $query[$i]['Time'].' Minutes';
+            $Reqdatetime = DateTime::createFromFormat('Y-m-d', $query[$i]['Req_date']);
+            $ReqdateNameDay = $Reqdatetime->format('l');
+
+            $nestedData[] = $No;
+            $nestedData[] = $StartNameDay.', '.$query[$i]['Start'];
+            $nestedData[] = $EndNameDay.', '.$query[$i]['End'];
+            $nestedData[] = $query[$i]['Agenda'];
+            $nestedData[] = $query[$i]['Room'];
+            $nestedData[] = $query[$i]['Name'].'<br>'.$ReqdateNameDay.', '.$query[$i]['Req_date'];
+            $nestedData[] = nl2br($query[$i]['Feedback']);
+            $nestedData[] = $query[$i]['FeedbackAt'];
+            $nestedData[] = $Detail;
+            $data[] = $nestedData;
+            $No++;
+        }
+
+        // print_r($data);
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalData ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
     }
 
 }

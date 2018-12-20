@@ -340,4 +340,10 @@ class C_master extends Vreservation_Controler {
 
     }
 
+    public function markom_support()
+    {
+        $get = $this->m_master->showData_array('db_reservation.m_markom_support');
+        echo json_encode($get);
+    }
+
 }

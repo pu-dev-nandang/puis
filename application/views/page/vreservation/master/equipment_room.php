@@ -184,10 +184,10 @@
                '<th style="width: 106px;">Equipment</th>'+
                '<th style="width: 106px;">Qty</th>'+
                '<th style="width: 106px;">Note</th>'+
-               '<th style="width: 15px;">Created BY</th>'+
+               //'<th style="width: 15px;">Created BY</th>'+
                '<th style="width: 15px;">Created AT</th>'+
-               '<th style="width: 15px;">Updated BY</th>'+
-               '<th style="width: 15px;">Updated AT</th>'+
+               // '<th style="width: 15px;">Updated BY</th>'+
+               // '<th style="width: 15px;">Updated AT</th>'+
                '<th style="width: 15px;">Action</th>'+
            '</tr>'+
        '</thead>'+
@@ -217,10 +217,10 @@
                        '<td>'+response[i]['Equipment']+'</td>'+
                        '<td>'+response[i]['qty']+'</td>'+
                        '<td>'+response[i]['Note']+'</td>'+
-                       '<td>'+response[i]['NameCreated']+'</td>'+
+                       //'<td>'+response[i]['NameCreated']+'</td>'+
                        '<td>'+response[i]['CreatedAt']+'</td>'+
-                       '<td>'+response[i]['NameUpdated']+'</td>'+
-                       '<td>'+response[i]['UpdatedAt']+'</td>'+
+                       //'<td>'+response[i]['NameUpdated']+'</td>'+
+                       //'<td>'+response[i]['UpdatedAt']+'</td>'+
                        '<td><div class="btn-group">'+btn_edit+btn_delete+'</div></td>'+
                    '</tr>' 
                    );

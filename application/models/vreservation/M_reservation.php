@@ -8,6 +8,7 @@ class M_reservation extends CI_Model {
     function __construct()
     {
         parent::__construct();
+
     }
 
     public function getdataMenu()
@@ -922,36 +923,27 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $arr_result;         
     }
 
-    public function getDataT_booking($Start = null,$Status = 0,$both = '')
+    public function getForReturn_eq()
     {
         $arr_result = array();
         $this->load->model('master/m_master');
-        $NIP = $this->session->userdata('NIP');
-        // check Auth berdasarkan grouping user
             $add_where = '';
-            // if ( !in_array($cd_akses, array(1,2,3,4,10)) ) {
-            //      show_404($log_error = TRUE);
-            // }
 
-            // if ($this->session->userdata('ID_group_user') == 4) {
-            //     $add_where = ' and a.CreatedBy = "'.$NIP.'"';
-            // }
-
-        $Start = ($Start == null) ? ' and Start >= timestamp(DATE_SUB(NOW(), INTERVAL 30 MINUTE))' : ' and Start like "%'.$Start.'%"';
-        if ($both == '') {
-            $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP where a.Status = ? '.$add_where.'
-                     '.$Start.' order by a.Status asc,a.Start asc';
-            $query=$this->db->query($sql, array($Status))->result_array();         
-        }
-        else
-        {
-            $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP where a.Status like "%" '.$add_where.'
-                     '.$Start.' order by a.Status asc,a.Start asc';
-            // print_r($sql);die();         
-            $query=$this->db->query($sql, array())->result_array();           
-        }
-       
-        for ($i=0; $i < count($query); $i++) { 
+            $DivisionID = $this->session->userdata('PositionMain');
+            $DivisionID = $DivisionID['IDDivision'];
+            // print_r($DivisionID);
+        $StatusQ = 'a.Status = 1';     
+        
+        $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP
+                join db_reservation.t_booking_eq_additional as c on a.ID = c.ID_t_booking
+                 where '.$StatusQ.''.$add_where.' and c.ID not in (select ID_t_booking_eq_additional from db_reservation.t_return_eq) and c.Status = 1 group by a.ID
+                order by a.Status asc,a.Start asc';
+                // print_r($sql);die();
+        $query=$this->db->query($sql, array())->result_array();
+        $NIP = '@';
+        for ($i=0; $i < count($query); $i++) {
+            $Detail = $this->getDataPass($query[$i]['ID']);
+            $Detail = implode('@@', $Detail);
             $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['Start']);
             $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['End']);
             $StartNameDay = $Startdatetime->format('l');
@@ -962,16 +954,16 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             // cek ApproveAccess
             $Status1 = $query[$i]['Status1'];
             $Status = $query[$i]['Status'];
-            $MarcommStatus = $query[$i]['MarcommStatus'];
-                $ApproveAccess = function($getRoom,$Status1,$Status,$CreatedBy,$MarcommStatus){
-                    if ($MarcommStatus == 1) {
-                        return $find = 0;
-                    }
+            //$MarcommStatus = $query[$i]['MarcommStatus'];
+                $ApproveAccess = function($getRoom,$Status1,$Status,$CreatedBy,$DivisionID){
+                    // if ($MarcommStatus == 1) {
+                    //     return $find = 0;
+                    // }
 
-                    $PositionMain = $this->session->userdata('PositionMain');
-                    $IDDivision = $PositionMain['IDDivision'];
-                    $Position = $PositionMain['IDPosition'];
-                    $NIP = $this->session->userdata('NIP');
+                    $PositionMain = '@';
+                    $IDDivision = $DivisionID;
+                    $Position = '@';
+                    $NIP = '@';
                     // get Category Room to approver
                         $ApproveAccess = 0;
                         $ID_group_user = $this->session->userdata('ID_group_user');
@@ -982,27 +974,12 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                         $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
                         // find access
                             $find = 1;
-                                // for ($l=0; $l < count($CategoryRoom); $l++) { 
-                                //     if ($CategoryRoomByRoom == $CategoryRoom[$l]) {
-                                //         $find++;    
-                                //         break;
-                                //     }
-                                // }
-
                                 if ($find == 1) {
                                     // get status 
                                     if ($Status1 == 0) {
                                        // find approver1
                                            $Approver1 = $getDataCategoryRoom[0]['Approver1'];
                                            $Approver1 = json_decode($Approver1);
-
-                                           // $NIP = $this->session->userdata('NIP');
-                                           // for ($l=0; $l < count($Approver1); $l++) { 
-                                           //     if ($NIP == $Approver1[$l]) {
-                                           //         $find++;    
-                                           //         break;
-                                           //     }
-                                           // } // old
 
                                            $dataApprover = array();
                                            // find by ID_group_user
@@ -1108,7 +1085,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 };
 
                 $StatusBooking = '';
-                $CaseApproveAccess = $ApproveAccess($getRoom,$Status1,$Status,$query[$i]['CreatedBy'],$MarcommStatus);
+                $CaseApproveAccess = $ApproveAccess($getRoom,$Status1,$Status,$query[$i]['CreatedBy'],$DivisionID);
                 switch ($CaseApproveAccess) {
                     case 0:
                          $StatusBooking = 'Awaiting approval Marcomm Division';
@@ -1131,39 +1108,82 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
             $ID_equipment_add = '-';
             $Name_equipment_add = '-';
+            $boolAuthEq = 0;
             if ($query[$i]['ID_equipment_add'] != '' || $query[$i]['ID_equipment_add'] != null) {
                 $ID_equipment_add = explode(',', $query[$i]['ID_equipment_add']);
                 $Name_equipment_add = '<ul style = "margin-left : -28px">';
                 $btnEquipment = '';
                 for ($j=0; $j < count($ID_equipment_add); $j++) {
-                    if ($this->session->userdata('ID_group_user') <= 3) {
-                        if ($this->session->userdata('ID_group_user') != 3) {
-                            $btnEquipment = '<button class = "btn btn-danger btnEquipment btn-xs" ID_equipment_add = "'.$ID_equipment_add[$j].'" ><i class="fa fa-times"></i> </button>';
+                    $btnEquipment = '';
+                    // qty penggunaan
+                    $gett_booking_eq_additional = $this->gett_booking_eq_additional($ID_equipment_add[$j],$query[$i]['ID']);
+                    if ($gett_booking_eq_additional[0]['Status'] == 0) {
+                        $Status_eq_additional = 'Not Confirm';
+                    }
+                    elseif ($gett_booking_eq_additional[0]['Status'] == 1) {
+                        $Status_eq_additional = 'Confirm';
+                    }
+                    else
+                    {
+                        $Status_eq_additional = 'Reject';
+                    }
+                    $Qty = $gett_booking_eq_additional[0]['Qty'];
+                    $ID_equipment_additional = $gett_booking_eq_additional[0]['ID_equipment_additional'];
+                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_additional);
+                    $OwnerID = $get[0]['Owner'];
+                    $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$OwnerID);
+                    $Owner = $getX[0]['Division'];
+                        if ($this->session->userdata('ID_group_user') < 3) {
+                            if ($query[$i]['Status'] != 1) {
+                                $btnEquipment = '<input type = "checkbox" class = "chkEquipment_'.$query[$i]['ID'].'" value = "'.$ID_equipment_add[$j].'">';
+                            }
+                            if ($gett_booking_eq_additional[0]['Status'] == 1) {
+                                if ($boolAuthEq == 0) {
+                                    $boolAuthEq = 1;
+                                }
+                            }
+                            
                         }
                         else
                         {
-                            if ($CaseApproveAccess == 2 || $CaseApproveAccess == 4) {
-                                $btnEquipment = '<button class = "btn btn-danger btnEquipment btn-xs" ID_equipment_add = "'.$ID_equipment_add[$j].'" ><i class="fa fa-times"></i> </button>';
-                            }
+                            if ($DivisionID == $OwnerID) {
+                                if ($query[$i]['Status'] != 1) {
+                                    $btnEquipment = '<input type = "checkbox" class = "chkEquipment_'.$query[$i]['ID'].'" value = "'.$ID_equipment_add[$j].'">';
+                                }
+                                if ($gett_booking_eq_additional[0]['Status'] == 1) {
+                                    if ($boolAuthEq == 0) {
+                                        $boolAuthEq = 1;
+                                    }
+                                }
+                                
+                                
+                            } 
                         }
                         
-                    }
-                    else{
-                        if ($CaseApproveAccess == 2 || $CaseApproveAccess == 4) {
-                            $btnEquipment = '<button class = "btn btn-danger btnEquipment btn-xs" ID_equipment_add = "'.$ID_equipment_add[$j].'" ><i class="fa fa-times"></i> </button>';
-                        }
-                    }  
-                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add[$j]);
-                    $ID_m_equipment = $get[0]['ID_m_equipment'];
-                    $Owner = $get[0]['Owner'];
-                    $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$Owner);
-                    $Owner = $getX[0]['Division'];
 
-                    $Qty = $get[0]['Qty'];
+                    $ID_m_equipment = $get[0]['ID_m_equipment'];
                     $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
-                    $Name_equipment_add .= '<li>'.$get[0]['Equipment'].' by '.$Owner.'['.$Qty.'] &nbsp'.$btnEquipment.'</li>';
+                    $Name_equipment_add .= '<li>'.$get[0]['Equipment'].' by '.$Owner.'['.$Qty.']&nbsp ('.$Status_eq_additional.') &nbsp'.$btnEquipment.'</li>';
+                    // print_r('-div:-'.$DivisionID.'=OW:'.$OwnerID.'--ID:'.$query[$i]['ID'].'---');
                 }
                 $Name_equipment_add .= '</ul>';
+                // print_r('---'.$boolAuthEq.'---');
+                if ($boolAuthEq == 1) {
+                    if ($query[$i]['Status'] != 1) {
+                        $Name_equipment_add .= '<div class = "row"><div class = "col-md-6">
+                                        <span class="btn btn-primary btn-xs btn_eq_additional_submit" idtbooking ="'.$query[$i]['ID'].'" action = "Confirm">
+                                            <i class="fa fa-pencil-square-o"></i> Confirm
+                                           </span>
+                                                </div>
+                                            <div class = "col-md-6">
+                                                <span class="btn btn-danger btn-xs btn_eq_additional_submit" idtbooking ="'.$query[$i]['ID'].'" action = "Reject">
+                                                    <i class="fa fa-pencil-square-o"></i> Reject
+                                                   </span>
+                                            </div>    
+                                            </div>';
+                    }
+                }
+                
             }
 
             $ID_add_personel = '-';
@@ -1177,6 +1197,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $ReqdateNameDay = $Reqdatetime->format('l');
 
             $MarkomSupport = '<label>No</Label>';
+            $boolAuthMarkom = 0;
             if ($query[$i]['MarcommSupport'] != '') {
                 $MarkomSupport = '<ul style = "margin-left : -28px">';
                 $dd = explode(',', $query[$i]['MarcommSupport']);
@@ -1197,10 +1218,6 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     }
                     else
                     {
-                        // if ($CaseApproveAccess == 2 || $CaseApproveAccess == 4) {
-                        //     $btnMarkomSupport = '<button class = "btn btn-danger btnMarkomSupport btn-xs" MarcommSupport = "'.$dd[$zx].'" ><i class="fa fa-times"></i> </button>';
-                        // }
-
                         if ($CaseApproveAccess == 0) {
                             $PositionMain = $this->session->userdata('PositionMain');
                             $IDDivision = $PositionMain['IDDivision'];
@@ -1239,6 +1256,12 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 $MarkomSupport .= '</ul>';
             }
 
+            $DivisionID = $this->session->userdata('PositionMain');
+            $DivisionID = $DivisionID['IDDivision'];
+            if ($MarkomSupport != '' && $DivisionID == 17) {
+                $boolAuthMarkom = 1;
+            }
+
             $KetAdditional = $query[$i]['KetAdditional'];
             $KetAdditional = json_decode($KetAdditional);
             $Participant = '<ul><li>Participant Qty : '.$query[$i]['ParticipantQty'].'</li>';
@@ -1250,27 +1273,846 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 }
             }
             $Participant .= '</ul>';
+            $boolAuth = $this->boolAuthData($query[$i]['CreatedBy'],$CaseApproveAccess,$boolAuthEq,$boolAuthMarkom);
+            if ($boolAuth) {
+                   $arr_result[] = array(
+                           'Start' => $StartNameDay.', '.$query[$i]['Start'],
+                           'End' => $EndNameDay.', '.$query[$i]['End'],
+                           'Time' => $Time,
+                           'Agenda' => $query[$i]['Agenda'],
+                           'Room' => $query[$i]['Room'],
+                           'Equipment_add' => $Name_equipment_add,
+                           'Persone_add' => $Name_add_personel,
+                           'Req_date' => $query[$i]['Name'].'<br>'.$ReqdateNameDay.', '.$query[$i]['Req_date'],
+                           'Req_layout' => $query[$i]['Req_layout'],
+                           'ID' => $query[$i]['ID'],
+                           'Status' => $query[$i]['Status'],
+                           'MarkomSupport' => $MarkomSupport,
+                           'Participant' => $Participant,
+                           'ApproveAccess' => $CaseApproveAccess,
+                           'StatusBooking' => $StatusBooking,
+                           'CreatedBy' => $query[$i]['CreatedBy'],
+                           'Detail' => $Detail,
+                   );
+            }   
+            
+        }
+
+        return $arr_result;  
+    }
+
+    public function getDataT_booking_Api($ID_t_booking = '',$DivisionID = '',$end = '')
+    {
+        $arr_result = array();
+        $this->load->model('master/m_master');
+            $add_where = '';
+            if ($ID_t_booking != '') {
+                $add_where = ' and a.ID = "'.$ID_t_booking.'"';
+            }
+
+            if ($DivisionID == '') {
+                $DivisionID = $this->session->userdata('PositionMain');
+                $DivisionID = $DivisionID['IDDivision'];
+            }
+            // print_r($DivisionID);
+        
+        $StatusQ = 'a.Status like "%"';    
+        if ($end == '') {
+            $Start = ' and Start >= timestamp(DATE_SUB(NOW(), INTERVAL 30 MINUTE))';
+        }
+        else{
+            $end = ' and End >= timestamp(DATE_SUB(NOW(), INTERVAL '.$end.' MINUTE)) ';
+            $Start = $end;
+            $StatusQ = 'a.Status = 1'; 
+        }    
+        
+        $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP where '.$StatusQ.''.$add_where.'
+                 '.$Start.' order by a.Status asc,a.Start asc';
+        $query=$this->db->query($sql, array())->result_array();
+        $NIP = '@';
+        for ($i=0; $i < count($query); $i++) {
+            $Detail = $this->getDataPass($query[$i]['ID']);
+            $Detail = implode('@@', $Detail);
+            $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['Start']);
+            $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['End']);
+            $StartNameDay = $Startdatetime->format('l');
+            $EndNameDay = $Enddatetime->format('l');
+            $Time = $query[$i]['Time'].' Minutes';
+
+            $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','Room',$query[$i]['Room']);
+            // cek ApproveAccess
+            $Status1 = $query[$i]['Status1'];
+            $Status = $query[$i]['Status'];
+            //$MarcommStatus = $query[$i]['MarcommStatus'];
+                $ApproveAccess = function($getRoom,$Status1,$Status,$CreatedBy,$DivisionID){
+
+                    $PositionMain = '@';
+                    $IDDivision = $DivisionID;
+                    $Position = '@';
+                    $NIP = '@';
+                    // get Category Room to approver
+                        $ApproveAccess = 0;
+                        $ID_group_user = $this->session->userdata('ID_group_user');
+                        $getPolicy = $this->m_master->caribasedprimary('db_reservation.cfg_policy','ID_group_user',$ID_group_user);
+                        $CategoryRoom = $getPolicy[0]['CategoryRoom'];
+                        $CategoryRoom = json_decode($CategoryRoom);
+                        $CategoryRoomByRoom = $getRoom[0]['ID_CategoryRoom'];
+                        $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
+                        // find access
+                            $find = 1;
+                                if ($find == 1) {
+                                    // get status 
+                                    if ($Status1 == 0) {
+                                       // find approver1
+                                           $Approver1 = $getDataCategoryRoom[0]['Approver1'];
+                                           $Approver1 = json_decode($Approver1);
+
+                                           $dataApprover = array();
+                                           // find by ID_group_user
+                                                // $CreatedBy = $query[$i]['CreatedBy'];
+                                                $cc = $this->m_master->caribasedprimary('db_reservation.previleges_guser','NIP',$CreatedBy);
+                                                $dd = $this->m_master->caribasedprimary('db_employees.employees','NIP',$CreatedBy);
+                                                $ID_group_user = (count($cc) > 0) ? $cc[0]['G_user'] : '';
+                                            // stop loop
+                                            $getLoop = true;    
+                                           for ($l=0; $l < count($Approver1); $l++) {
+                                                   if ($ID_group_user == $Approver1[$l]->UserType) {
+                                                       // get TypeApprover
+                                                       $TypeApprover = $Approver1[$l]->TypeApprover;
+                                                       switch ($TypeApprover) {
+                                                           case 'Position':
+                                                               // get Division to access position approval
+                                                                   $DivisionCreated = $dd[0]['PositionMain'];
+                                                                   $DivisionCreated = explode(".", $DivisionCreated);
+
+                                                                   $IDPositionApprover = $Approver1[$l]->Approver;
+
+                                                                   if ($DivisionCreated[0] == 15) { // if prodi
+                                                                       // find prodi
+                                                                       $gg = $this->m_master->caribasedprimary('db_academic.program_study','AdminID',$CreatedBy);
+                                                                       if (count($gg) > 0) {
+                                                                           for ($k=0; $k < count($gg); $k++) { 
+                                                                               $Kaprodi = $gg[$k]['KaprodiID'];
+                                                                               if ($Kaprodi == $NIP) {
+                                                                                   $find++;
+                                                                                   $getLoop = false;     
+                                                                                   break;
+                                                                               }
+                                                                           }
+                                                                           
+                                                                       }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        // find by division and position
+                                                                        if ($DivisionCreated[0] == $IDDivision) {
+                                                                           // compare Position
+                                                                           if ($IDPositionApprover == $Position) {
+                                                                               $find++;
+                                                                               $getLoop = false;    
+                                                                               break;
+                                                                           }
+                                                                        }
+                                                                    }
+                                                               break;
+                                                           
+                                                           case 'Division':
+                                                               if ($Approver1[$l]->Approver == $IDDivision) {
+                                                                   $find++;
+                                                                   $getLoop = false;    
+                                                                   break;
+                                                               }
+                                                               break;
+
+                                                           case 'Employees':
+                                                               if ($NIP == $Approver1[$l]->Approver) {
+                                                                   $find++;
+                                                                   $getLoop = false;    
+                                                                   break;
+                                                               }
+                                                               break;    
+                                                       }
+                                                   }
+
+                                                   if (!$getLoop) { // stop loop
+                                                       break;
+                                                   }
+                                           } // end loop for
+
+                                    }
+                                    else
+                                    {
+                                        $find = $find + 2;  
+                                    }
+                                }
+
+                                if ($find == 3) {
+                                   // find approver2
+                                       $Approver2 = $getDataCategoryRoom[0]['Approver2'];
+                                       $Approver2 = json_decode($Approver2);
+                                       $DivisionID = $this->session->userdata('PositionMain');
+                                       $DivisionID = $DivisionID['IDDivision'];
+                                       if ($Status == 0) {
+                                            for ($l=0; $l < count($Approver2); $l++) { 
+                                                if ($DivisionID == $Approver2[$l]) {
+                                                    $find++;    
+                                                    break;
+                                                }
+                                            }
+                                       }
+                                       else
+                                       {
+                                        $find = $find + 2;
+                                       }
+                                       
+                                }
+                    $ApproveAccess = $find;
+                    return $ApproveAccess;            
+                };
+
+                $StatusBooking = '';
+                $CaseApproveAccess = $ApproveAccess($getRoom,$Status1,$Status,$query[$i]['CreatedBy'],$DivisionID);
+                switch ($CaseApproveAccess) {
+                    case 0:
+                         $StatusBooking = 'Awaiting approval Marcomm Division';
+                         break;
+                    case 1:
+                    case 2:
+                        $StatusBooking = 'Awaiting approval 1';
+                        break;
+                    case 3:
+                    case 4:
+                        $StatusBooking = 'Awaiting approval 2';
+                        break;
+                    case 5:
+                        $StatusBooking = 'Approved';
+                        break;    
+                    default:
+                        # code...
+                        break;
+                }
+
+            $ID_equipment_add = '-';
+            $Name_equipment_add = '-';
+            $boolAuthEq = 0;
+            if ($query[$i]['ID_equipment_add'] != '' || $query[$i]['ID_equipment_add'] != null) {
+                $ID_equipment_add = explode(',', $query[$i]['ID_equipment_add']);
+                $Name_equipment_add = '<ul style = "margin-left : -28px">';
+                $btnEquipment = '';
+                for ($j=0; $j < count($ID_equipment_add); $j++) {
+                    $btnEquipment = '';
+                    // qty penggunaan
+                    $gett_booking_eq_additional = $this->gett_booking_eq_additional($ID_equipment_add[$j],$query[$i]['ID']);
+                    if ($gett_booking_eq_additional[0]['Status'] == 0) {
+                        $Status_eq_additional = 'Not Confirm';
+                    }
+                    elseif ($gett_booking_eq_additional[0]['Status'] == 1) {
+                        $Status_eq_additional = 'Confirm';
+                    }
+                    else
+                    {
+                        $Status_eq_additional = 'Reject';
+                    }
+                    $Qty = $gett_booking_eq_additional[0]['Qty'];
+                    $ID_equipment_additional = $gett_booking_eq_additional[0]['ID_equipment_additional'];
+                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_additional);
+                    $OwnerID = $get[0]['Owner'];
+                    $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$OwnerID);
+                    $Owner = $getX[0]['Division'];
+                        if ($DivisionID == $OwnerID) {
+                            if ($query[$i]['Status'] != 1) {
+                                $btnEquipment = '<input type = "checkbox" class = "chkEquipment_'.$query[$i]['ID'].'" value = "'.$ID_equipment_add[$j].'">';
+                            }
+                            if ($boolAuthEq == 0) {
+                                $boolAuthEq = 1;
+                            }
+                            
+                        } 
+
+                    $ID_m_equipment = $get[0]['ID_m_equipment'];
+                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
+                    $Name_equipment_add .= '<li>'.$get[0]['Equipment'].' by '.$Owner.'['.$Qty.']&nbsp ('.$Status_eq_additional.') &nbsp'.$btnEquipment.'</li>';
+                    // print_r('-div:-'.$DivisionID.'=OW:'.$OwnerID.'--ID:'.$query[$i]['ID'].'---');
+                }
+                $Name_equipment_add .= '</ul>';
+                // print_r('---'.$boolAuthEq.'---');
+                if ($boolAuthEq == 1) {
+                    if ($query[$i]['Status'] != 1) {
+                        $Name_equipment_add .= '<div class = "row"><div class = "col-md-6">
+                                        <span class="btn btn-primary btn-xs btn_eq_additional_submit" idtbooking ="'.$query[$i]['ID'].'" action = "Confirm">
+                                            <i class="fa fa-pencil-square-o"></i> Confirm
+                                           </span>
+                                                </div>
+                                            <div class = "col-md-6">
+                                                <span class="btn btn-danger btn-xs btn_eq_additional_submit" idtbooking ="'.$query[$i]['ID'].'" action = "Reject">
+                                                    <i class="fa fa-pencil-square-o"></i> Reject
+                                                   </span>
+                                            </div>    
+                                            </div>';
+                    }
+                }
                 
-            $arr_result[] = array(
-                    'Start' => $StartNameDay.', '.$query[$i]['Start'],
-                    'End' => $EndNameDay.', '.$query[$i]['End'],
-                    'Time' => $Time,
-                    'Agenda' => $query[$i]['Agenda'],
-                    'Room' => $query[$i]['Room'],
-                    'Equipment_add' => $Name_equipment_add,
-                    'Persone_add' => $Name_add_personel,
-                    'Req_date' => $query[$i]['Name'].'<br>'.$ReqdateNameDay.', '.$query[$i]['Req_date'],
-                    'Req_layout' => $query[$i]['Req_layout'],
-                    'ID' => $query[$i]['ID'],
-                    'Status' => $query[$i]['Status'],
-                    'MarkomSupport' => $MarkomSupport,
-                    'Participant' => $Participant,
-                    'ApproveAccess' => $CaseApproveAccess,
-                    'StatusBooking' => $StatusBooking,
-            );
+            }
+
+            $ID_add_personel = '-';
+            $Name_add_personel = '-';
+
+            if ($query[$i]['ID_add_personel'] != '' || $query[$i]['ID_add_personel'] != null) {
+                $Name_add_personel = $query[$i]['ID_add_personel'];
+            }
+
+            $Reqdatetime = DateTime::createFromFormat('Y-m-d', $query[$i]['Req_date']);
+            $ReqdateNameDay = $Reqdatetime->format('l');
+
+            $MarkomSupport = '<label>No</Label>';
+            $boolAuthMarkom = 0;
+            if ($query[$i]['MarcommSupport'] != '') {
+                $MarkomSupport = '<ul style = "margin-left : -28px">';
+                $dd = explode(',', $query[$i]['MarcommSupport']);
+                for ($zx=0; $zx < count($dd); $zx++) {
+                    // check status
+                     $Status_markom = '';
+                     $btnMarkomSupport = '';
+                     if (strpos($dd[$zx], 'Note') === false) {
+                         $g_markom = $this->g_markom($dd[$zx],$query[$i]['ID']);
+                         if ($g_markom[0]['StatusMarkom'] == 0) {
+                             $Status_markom = '{Not Confirm}';
+                         }
+                         elseif ($g_markom[0]['StatusMarkom'] == 1) {
+                             $Status_markom = '{Confirm}';
+                         }
+                         else
+                         {
+                             $Status_markom = '{Reject}';
+                         }
+
+                         //if ($g_markom[0]['StatusMarkom'] != 1) {
+                            $btnMarkomSupport = '<input type = "checkbox" class = "MarkomSupport_'.$query[$i]['ID'].'" value = "'.$dd[$zx].'">';
+                         //}
+                         $dd[$zx] = $g_markom[0]['Name'];   
+                     }
+                     else
+                     {
+                        $pos = strpos($dd[$zx],':');
+                        $dd[$zx] = substr($dd[$zx], 0,$pos+1).'<br>'.nl2br(substr($dd[$zx], $pos+1,strlen($dd[$zx])));
+                     }
+
+                     $MarkomSupport .= '<li>'.$dd[$zx].$Status_markom.'&nbsp'.$btnMarkomSupport.'</li>';    
+
+                }
+                $MarkomSupport .= '</ul>';
+            }
+
+            if ($MarkomSupport != '' && $DivisionID == 17) {
+                $boolAuthMarkom = 1;
+            }
+
+            if ($boolAuthMarkom == 1) {
+                if ($query[$i]['Status'] != 1) {
+                    $MarkomSupport .= '<div class = "row"><div class = "col-md-6">
+                                    <span class="btn btn-primary btn-xs btn_markom_submit" idtbooking ="'.$query[$i]['ID'].'" action = "Confirm">
+                                        <i class="fa fa-pencil-square-o"></i> Confirm
+                                       </span>
+                                            </div>
+                                        <div class = "col-md-6">
+                                            <span class="btn btn-danger btn-xs btn_markom_submit" idtbooking ="'.$query[$i]['ID'].'" action = "Reject">
+                                                <i class="fa fa-pencil-square-o"></i> Reject
+                                               </span>
+                                        </div>    
+                                        </div>';
+                }
+            }
+
+            $KetAdditional = $query[$i]['KetAdditional'];
+            $KetAdditional = json_decode($KetAdditional);
+            $Participant = '<ul><li>Participant Qty : '.$query[$i]['ParticipantQty'].'</li>';
+            if (count($KetAdditional) > 0) {
+                foreach ($KetAdditional as $key => $value) {
+                    if ($value != "" || $value != null) {
+                        $Participant .= '<li>'.str_replace("_", " ", $key).' : '.$value.'</li>';
+                    }
+                }
+            }
+            $Participant .= '</ul>';
+            $boolAuth = $this->boolAuthData($query[$i]['CreatedBy'],$CaseApproveAccess,$boolAuthEq,$boolAuthMarkom);
+            if ($boolAuth) {
+                   $arr_result[] = array(
+                           'Start' => $StartNameDay.', '.$query[$i]['Start'],
+                           'End' => $EndNameDay.', '.$query[$i]['End'],
+                           'Time' => $Time,
+                           'Agenda' => $query[$i]['Agenda'],
+                           'Room' => $query[$i]['Room'],
+                           'Equipment_add' => $Name_equipment_add,
+                           'Persone_add' => $Name_add_personel,
+                           'Req_date' => $query[$i]['Name'].'<br>'.$ReqdateNameDay.', '.$query[$i]['Req_date'],
+                           'Req_layout' => $query[$i]['Req_layout'],
+                           'ID' => $query[$i]['ID'],
+                           'Status' => $query[$i]['Status'],
+                           'MarkomSupport' => $MarkomSupport,
+                           'Participant' => $Participant,
+                           'ApproveAccess' => $CaseApproveAccess,
+                           'StatusBooking' => $StatusBooking,
+                           'CreatedBy' => $query[$i]['CreatedBy'],
+                           'Detail' => $Detail,
+                   );
+            }   
+            
+        }
+
+        return $arr_result;  
+    }
+
+    public function g_markom($ID_m_markom,$ID_t_booking)
+    {
+        $sql = 'select a.ID as ID_m_markom,a.Name,b.Status as StatusMarkom,c.* from db_reservation.m_markom_support as a join db_reservation.t_markom_support as b on a.ID = b.ID_m_markom_support join db_reservation.t_booking as c on c.ID = b.ID_t_booking where a.ID = "'.$ID_m_markom.'" and c.ID = "'.$ID_t_booking.'"  ';
+        $query=$this->db->query($sql, array())->result_array();  
+        return $query;
+    }
+
+    public function getDataT_booking($Start = null,$Status = 0,$both = '')
+    {
+        $arr_result = array();
+        $this->load->model('master/m_master');
+        $NIP = $this->session->userdata('NIP');
+            $add_where = '';
+        $Start = ($Start == null) ? ' and Start >= timestamp(DATE_SUB(NOW(), INTERVAL 30 MINUTE))' : ' and Start like "%'.$Start.'%"';
+        if ($both == '') {
+            $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP where a.Status = ? '.$add_where.'
+                     '.$Start.' order by a.Status asc,a.Start asc';
+            $query=$this->db->query($sql, array($Status))->result_array();         
+        }
+        else
+        {
+            $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP where a.Status like "%" '.$add_where.'
+                     '.$Start.' order by a.Status asc,a.Start asc';
+            // print_r($sql);die();         
+            $query=$this->db->query($sql, array())->result_array();           
+        }
+        for ($i=0; $i < count($query); $i++) {
+            $Detail = $this->getDataPass($query[$i]['ID']);
+            $Detail = implode('@@', $Detail);
+            $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['Start']);
+            $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['End']);
+            $StartNameDay = $Startdatetime->format('l');
+            $EndNameDay = $Enddatetime->format('l');
+            $Time = $query[$i]['Time'].' Minutes';
+
+            $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','Room',$query[$i]['Room']);
+            // cek ApproveAccess
+            $Status1 = $query[$i]['Status1'];
+            $Status = $query[$i]['Status'];
+                $ApproveAccess = function($getRoom,$Status1,$Status,$CreatedBy){
+                    // if ($MarcommStatus == 1) {
+                    //     return $find = 0;
+                    // }
+
+                    $PositionMain = $this->session->userdata('PositionMain');
+                    $IDDivision = $PositionMain['IDDivision'];
+                    $Position = $PositionMain['IDPosition'];
+                    $NIP = $this->session->userdata('NIP');
+                    // get Category Room to approver
+                        $ApproveAccess = 0;
+                        $ID_group_user = $this->session->userdata('ID_group_user');
+                        $getPolicy = $this->m_master->caribasedprimary('db_reservation.cfg_policy','ID_group_user',$ID_group_user);
+                        $CategoryRoom = $getPolicy[0]['CategoryRoom'];
+                        $CategoryRoom = json_decode($CategoryRoom);
+                        $CategoryRoomByRoom = $getRoom[0]['ID_CategoryRoom'];
+                        $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
+                        // find access
+                            $find = 1;
+                                if ($find == 1) {
+                                    // get status 
+                                    if ($Status1 == 0) {
+                                       // find approver1
+                                           $Approver1 = $getDataCategoryRoom[0]['Approver1'];
+                                           $Approver1 = json_decode($Approver1);
+
+                                           $dataApprover = array();
+                                           // find by ID_group_user
+                                                // $CreatedBy = $query[$i]['CreatedBy'];
+                                                $cc = $this->m_master->caribasedprimary('db_reservation.previleges_guser','NIP',$CreatedBy);
+                                                $dd = $this->m_master->caribasedprimary('db_employees.employees','NIP',$CreatedBy);
+                                                $ID_group_user = (count($cc) > 0) ? $cc[0]['G_user'] : '';
+                                            // stop loop
+                                            $getLoop = true;    
+                                           for ($l=0; $l < count($Approver1); $l++) {
+                                                   if ($ID_group_user == $Approver1[$l]->UserType) {
+                                                       // get TypeApprover
+                                                       $TypeApprover = $Approver1[$l]->TypeApprover;
+                                                       switch ($TypeApprover) {
+                                                           case 'Position':
+                                                               // get Division to access position approval
+                                                                   $DivisionCreated = $dd[0]['PositionMain'];
+                                                                   $DivisionCreated = explode(".", $DivisionCreated);
+
+                                                                   $IDPositionApprover = $Approver1[$l]->Approver;
+
+                                                                   if ($DivisionCreated[0] == 15) { // if prodi
+                                                                       // find prodi
+                                                                       $gg = $this->m_master->caribasedprimary('db_academic.program_study','AdminID',$CreatedBy);
+                                                                       if (count($gg) > 0) {
+                                                                           for ($k=0; $k < count($gg); $k++) { 
+                                                                               $Kaprodi = $gg[$k]['KaprodiID'];
+                                                                               if ($Kaprodi == $NIP) {
+                                                                                   $find++;
+                                                                                   $getLoop = false;     
+                                                                                   break;
+                                                                               }
+                                                                           }
+                                                                           
+                                                                       }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        // find by division and position
+                                                                        if ($DivisionCreated[0] == $IDDivision) {
+                                                                           // compare Position
+                                                                           if ($IDPositionApprover == $Position) {
+                                                                               $find++;
+                                                                               $getLoop = false;    
+                                                                               break;
+                                                                           }
+                                                                        }
+                                                                    }
+                                                               break;
+                                                           
+                                                           case 'Division':
+                                                               if ($Approver1[$l]->Approver == $IDDivision) {
+                                                                   $find++;
+                                                                   $getLoop = false;    
+                                                                   break;
+                                                               }
+                                                               break;
+
+                                                           case 'Employees':
+                                                               if ($NIP == $Approver1[$l]->Approver) {
+                                                                   $find++;
+                                                                   $getLoop = false;    
+                                                                   break;
+                                                               }
+                                                               break;    
+                                                       }
+                                                   }
+
+                                                   if (!$getLoop) { // stop loop
+                                                       break;
+                                                   }
+                                           } // end loop for
+
+                                    }
+                                    else
+                                    {
+                                        $find = $find + 2;  
+                                    }
+                                }
+
+                                if ($find == 3) {
+                                   // find approver2
+                                       $Approver2 = $getDataCategoryRoom[0]['Approver2'];
+                                       $Approver2 = json_decode($Approver2);
+                                       $DivisionID = $this->session->userdata('PositionMain');
+                                       $DivisionID = $DivisionID['IDDivision'];
+                                       if ($Status == 0) {
+                                            for ($l=0; $l < count($Approver2); $l++) { 
+                                                if ($DivisionID == $Approver2[$l]) {
+                                                    $find++;    
+                                                    break;
+                                                }
+                                            }
+                                       }
+                                       else
+                                       {
+                                        $find = $find + 2;
+                                       }
+                                       
+                                }
+                    $ApproveAccess = $find;
+                    return $ApproveAccess;            
+                };
+
+                $StatusBooking = '';
+                $CaseApproveAccess = $ApproveAccess($getRoom,$Status1,$Status,$query[$i]['CreatedBy']);
+                switch ($CaseApproveAccess) {
+                    case 0:
+                         $StatusBooking = 'Awaiting approval Marcomm Division';
+                         break;
+                    case 1:
+                    case 2:
+                        $StatusBooking = 'Awaiting approval 1';
+                        break;
+                    case 3:
+                    case 4:
+                        $StatusBooking = 'Awaiting approval 2';
+                        break;
+                    case 5:
+                        $StatusBooking = 'Approved';
+                        break;    
+                    default:
+                        # code...
+                        break;
+                }
+
+            $ID_equipment_add = '-';
+            $Name_equipment_add = '-';
+            $boolAuthEq = 0;
+            if ($query[$i]['ID_equipment_add'] != '' || $query[$i]['ID_equipment_add'] != null) {
+                $ID_equipment_add = explode(',', $query[$i]['ID_equipment_add']);
+                $Name_equipment_add = '<ul style = "margin-left : -28px">';
+                $btnEquipment = '';
+                for ($j=0; $j < count($ID_equipment_add); $j++) {
+                    $btnEquipment = '';
+                    // qty penggunaan
+                    $gett_booking_eq_additional = $this->gett_booking_eq_additional($ID_equipment_add[$j],$query[$i]['ID']);
+                    //print_r($ID_equipment_add[$j].'--'.$query[$i]['ID']);
+                    if ($gett_booking_eq_additional[0]['Status'] == 0) {
+                        $Status_eq_additional = 'Not Confirm';
+                    }
+                    elseif ($gett_booking_eq_additional[0]['Status'] == 1) {
+                        $Status_eq_additional = 'Confirm';
+                    }
+                    else
+                    {
+                        $Status_eq_additional = 'Reject';
+                    }
+
+                    $Qty = $gett_booking_eq_additional[0]['Qty'];
+                    $ID_equipment_additional = $gett_booking_eq_additional[0]['ID_equipment_additional'];
+                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_additional);
+                    $OwnerID = $get[0]['Owner'];
+                    $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$OwnerID);
+                    $Owner = $getX[0]['Division'];
+                    if ($this->session->userdata('ID_group_user') < 3) {
+                        if ($query[$i]['Status'] != 1) {
+                            $btnEquipment = '<input type = "checkbox" class = "chkEquipment_'.$query[$i]['ID'].'" value = "'.$ID_equipment_add[$j].'">';
+                        }
+                        $boolAuthEq = 1;
+                        
+                    }
+                    else{
+                        $DivisionID = $this->session->userdata('PositionMain');
+                            $DivisionID = $DivisionID['IDDivision'];
+                            if ($DivisionID == $OwnerID) {
+                                if ($query[$i]['Status'] != 1) {
+                                    $btnEquipment = '<input type = "checkbox" class = "chkEquipment_'.$query[$i]['ID'].'" value = "'.$ID_equipment_add[$j].'">';
+                                }
+                                $boolAuthEq = 1;
+                            }
+                    } 
+
+                    $ID_m_equipment = $get[0]['ID_m_equipment'];
+                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
+                    $Name_equipment_add .= '<li>'.$get[0]['Equipment'].' by '.$Owner.'['.$Qty.']&nbsp ('.$Status_eq_additional.') &nbsp'.$btnEquipment.'</li>';
+                }
+                $Name_equipment_add .= '</ul>';
+                if ($boolAuthEq == 1) {
+                    if ($query[$i]['Status'] != 1) {
+                        $Name_equipment_add .= '<div class = "row"><div class = "col-md-6">
+                                        <span class="btn btn-primary btn-xs btn_eq_additional_submit" idtbooking ="'.$query[$i]['ID'].'" action = "Confirm">
+                                            <i class="fa fa-pencil-square-o"></i> Confirm
+                                           </span>
+                                                </div>
+                                            <div class = "col-md-6">
+                                                <span class="btn btn-danger btn-xs btn_eq_additional_submit" idtbooking ="'.$query[$i]['ID'].'" action = "Reject">
+                                                    <i class="fa fa-pencil-square-o"></i> Reject
+                                                   </span>
+                                            </div>    
+                                            </div>';
+                    }
+                }
+                
+            }
+
+            $ID_add_personel = '-';
+            $Name_add_personel = '-';
+
+            if ($query[$i]['ID_add_personel'] != '' || $query[$i]['ID_add_personel'] != null) {
+                $Name_add_personel = $query[$i]['ID_add_personel'];
+            }
+
+            $Reqdatetime = DateTime::createFromFormat('Y-m-d', $query[$i]['Req_date']);
+            $ReqdateNameDay = $Reqdatetime->format('l');
+
+            $MarkomSupport = '<label>No</Label>';
+            $boolAuthMarkom = 0;
+            if ($query[$i]['MarcommSupport'] != '') {
+                $MarkomSupport = '<ul style = "margin-left : -28px">';
+                $dd = explode(',', $query[$i]['MarcommSupport']);
+                for ($zx=0; $zx < count($dd); $zx++) {
+                    // check status
+                     $Status_markom = '';
+                     $btnMarkomSupport = '';
+                     if (strpos($dd[$zx], 'Note') === false) {
+                         $g_markom = $this->g_markom($dd[$zx],$query[$i]['ID']);
+                         if ($g_markom[0]['StatusMarkom'] == 0) {
+                             $Status_markom = '{Not Confirm}';
+                         }
+                         elseif ($g_markom[0]['StatusMarkom'] == 1) {
+                             $Status_markom = '{Confirm}';
+                         }
+                         else
+                         {
+                             $Status_markom = '{Reject}';
+                         }
+
+                         //if ($g_markom[0]['StatusMarkom'] != 1) {
+                            if ($this->session->userdata('ID_group_user') < 3) {
+                                if ($query[$i]['Status'] != 1) {
+                                    $btnMarkomSupport = '<input type = "checkbox" class = "MarkomSupport_'.$query[$i]['ID'].'" value = "'.$dd[$zx].'">';
+                                }
+                               
+                                if ($boolAuthMarkom == 0) {
+                                    $boolAuthMarkom = 1;
+                                }
+                            }
+                            else
+                            {
+                                $DivisionID = $this->session->userdata('PositionMain');
+                                $DivisionID = $DivisionID['IDDivision'];
+                                if ($DivisionID == 17) {
+                                    if ($query[$i]['Status'] != 1) {
+                                        $btnMarkomSupport = '<input type = "checkbox" class = "MarkomSupport_'.$query[$i]['ID'].'" value = "'.$dd[$zx].'">';
+                                    }
+                                    if ($boolAuthMarkom == 0) {
+                                        $boolAuthMarkom = 1;
+                                    }
+                                }
+                            }
+                            
+                            
+                         //}
+                         $dd[$zx] = $g_markom[0]['Name'];   
+                     }
+                     else
+                     {
+                        $pos = strpos($dd[$zx],':');
+                        $dd[$zx] = substr($dd[$zx], 0,$pos+1).'<br>'.nl2br(substr($dd[$zx], $pos+1,strlen($dd[$zx])));
+                     }
+
+                     $MarkomSupport .= '<li>'.$dd[$zx].$Status_markom.'&nbsp'.$btnMarkomSupport.'</li>';    
+
+                }
+                $MarkomSupport .= '</ul>';
+            }
+
+            if ($boolAuthMarkom == 1) {
+                if ($query[$i]['Status'] != 1) {
+                    $MarkomSupport .= '<div class = "row"><div class = "col-md-6">
+                                    <span class="btn btn-primary btn-xs btn_markom_submit" idtbooking ="'.$query[$i]['ID'].'" action = "Confirm">
+                                        <i class="fa fa-pencil-square-o"></i> Confirm
+                                       </span>
+                                            </div>
+                                        <div class = "col-md-6">
+                                            <span class="btn btn-danger btn-xs btn_markom_submit" idtbooking ="'.$query[$i]['ID'].'" action = "Reject">
+                                                <i class="fa fa-pencil-square-o"></i> Reject
+                                               </span>
+                                        </div>    
+                                        </div>';
+                }
+            }
+            
+
+            $KetAdditional = $query[$i]['KetAdditional'];
+            $KetAdditional = json_decode($KetAdditional);
+            $Participant = '<ul><li>Participant Qty : '.$query[$i]['ParticipantQty'].'</li>';
+            if (count($KetAdditional) > 0) {
+                foreach ($KetAdditional as $key => $value) {
+                    if ($value != "" || $value != null) {
+                        $Participant .= '<li>'.str_replace("_", " ", $key).' : '.$value.'</li>';
+                    }
+                }
+            }
+            $Participant .= '</ul>';
+            // print_r($CaseApproveAccess);die();
+            $boolAuth = $this->boolAuthData($query[$i]['CreatedBy'],$CaseApproveAccess,$boolAuthEq,$boolAuthMarkom);
+            if ($boolAuth) {
+                   $arr_result[] = array(
+                           'Start' => $StartNameDay.', '.$query[$i]['Start'],
+                           'End' => $EndNameDay.', '.$query[$i]['End'],
+                           'Time' => $Time,
+                           'Agenda' => $query[$i]['Agenda'],
+                           'Room' => $query[$i]['Room'],
+                           'Equipment_add' => $Name_equipment_add,
+                           'Persone_add' => $Name_add_personel,
+                           'Req_date' => $query[$i]['Name'].'<br>'.$ReqdateNameDay.', '.$query[$i]['Req_date'],
+                           'Req_layout' => $query[$i]['Req_layout'],
+                           'ID' => $query[$i]['ID'],
+                           'Status' => $query[$i]['Status'],
+                           'MarkomSupport' => $MarkomSupport,
+                           'Participant' => $Participant,
+                           'ApproveAccess' => $CaseApproveAccess,
+                           'StatusBooking' => $StatusBooking,
+                           'CreatedBy' => $query[$i]['CreatedBy'],
+                           'Detail' => $Detail,
+                   );
+            }   
+            
         }
 
         return $arr_result;         
+    }
+
+    public function getDataPass($ID)
+    {
+        $sql2 = 'select a.*,b.Name from db_reservation.t_booking as a
+                 join db_employees.employees as b on a.CreatedBy = b.NIP
+                 where a.ID = ? limit 1';
+        $query2=$this->db->query($sql2, array($ID))->result_array();
+        $arr = array();
+        for ($i=0; $i < count($query2); $i++) {
+                    $tgl = date("Y-m-d", strtotime($query2[$i]['Start'])); 
+                    $dt = array(
+                        'user'  => $query2[$i]['Name'],
+                        'start' => $query2[$i]['Start'],
+                        'end'   => $query2[$i]['End'],
+                        'time'  => $query2[$i]['Time'],
+                        'colspan' => $query2[$i]['Colspan'],
+                        'agenda' => $query2[$i]['Agenda'],
+                        'room' => $query2[$i]['Room'],
+                        'approved' => $query2[$i]['Status'],
+                        'NIP' => $query2[$i]['CreatedBy'],
+                        'ID' => $query2[$i]['ID'],
+                        'tgl' => $tgl,
+                        //'NameEng' => $query[$i]['NameEng'],
+                    );
+            $arr= $dt;        
+        }
+
+        return $arr;
+    }
+
+    private function boolAuthData($CreatedBy,$CaseApproveAccess,$boolAuthEq,$boolAuthMarkom)
+    {
+        $bool = false;
+        $arr = array();
+        if ($this->session->userdata('ID_group_user') <= 3) {
+            $bool = true;
+        }
+        else
+        {
+            if ($CreatedBy == $this->session->userdata('NIP')) {
+                $arr[] = 1;
+            }
+            else
+            {
+                $arr[] = 0;
+            }
+
+            if ($CaseApproveAccess == 2 || $CaseApproveAccess == 4) {
+                $arr[] = 1;
+            }
+            else
+            {
+                 $arr[] = 0;
+            }
+
+            $arr[] = $boolAuthEq;
+            $arr[] = $boolAuthMarkom;
+            if (in_array(1, $arr))
+            {
+                $bool = true;
+            }
+        }
+        return $bool;
     }
 
     public function get_m_room_equipment($room)
@@ -1624,5 +2466,593 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $sql = 'select * from db_reservation.category_room where ID in ('.$CategoryRoom.')';
         $query=$this->db->query($sql, array())->result_array();
         return $query;
+    }
+
+    public function gett_booking_eq_additional($ID_equipment_add,$ID)
+    {
+        $sql = 'select * from db_reservation.t_booking_eq_additional where ID_t_booking = ? and ID_equipment_additional = ?';
+        $query=$this->db->query($sql, array($ID,$ID_equipment_add))->result_array();
+        return $query;
+    }
+
+    public function chkQty_eq_additional($ID,$ID_equipment_add)
+    {
+        $bool = false;
+        $this->load->model('master/m_master');
+        $get = $this->gett_booking_eq_additional($ID_equipment_add,$ID);
+        $qty = $get[0]['Qty'];
+        $getM = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add);
+        $QtyOri = $getM[0]['Qty'];
+        $r = $QtyOri - $qty ;
+        if ($r >= 0) {
+            $bool = true;
+        }
+        return $bool;
+    }
+
+    public function remind_vreservation()
+    {
+        $arr_result = array('msg' => '','error' => false);
+        $g = $this->getDataT_booking();
+        print_r($g);die();
+
+    }
+
+    public function Email_invitation($files_invitation)
+    {
+        $rs = '';
+        if ($files_invitation != '') {
+            $files_invitation = explode(';', $files_invitation);
+            for ($i=0; $i < count($files_invitation); $i++) {
+                if ($i == 0) {
+                    $rs .= '<br>Attachment : <ul>';
+                } 
+                $rs .= '<li><a href="'.base_url("fileGetAny/vreservation-".$files_invitation[$i]).'" target="_blank"></i>'.$files_invitation[$i].'</a></li>';
+
+                // last
+                if ( (count($files_invitation) - 1 ) == $i  ) {
+                   $rs .= '</ul>';
+                }
+            }
+        }
+        return $rs;
+    }
+
+    public function venue__fill_feedback()
+    {
+        $arr_result =array();
+        $sql = 'select a.*,b.Name,b.EmailPU,DATE_ADD(DATE_FORMAT(Now(),"%Y-%m-%d"),INTERVAL 2 DAY) as Datelimit    
+                from db_reservation.t_booking as a 
+                join db_employees.employees as b on a.CreatedBy = b.NIP 
+                where a.Status = 1 and a.End <= NOW() and a.Feedback IS NULL and a.End >= DATE_SUB(NOW(), INTERVAL 1 DAY) order by a.CreatedBy asc';
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) {
+            $Detail = $this->getDataPass($query[$i]['ID']);
+            $Detail = implode('@@', $Detail);
+            $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['Start']);
+            $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['End']);
+            $StartNameDay = $Startdatetime->format('l');
+            $EndNameDay = $Enddatetime->format('l');
+            $Time = $query[$i]['Time'].' Minutes';
+
+            $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','Room',$query[$i]['Room']);
+
+            $ID_equipment_add = '-';
+            $Name_equipment_add = '-';
+            $boolAuthEq = 0;
+            if ($query[$i]['ID_equipment_add'] != '' || $query[$i]['ID_equipment_add'] != null) {
+                $ID_equipment_add = explode(',', $query[$i]['ID_equipment_add']);
+                $Name_equipment_add = '<ul style = "margin-left : -28px">';
+                for ($j=0; $j < count($ID_equipment_add); $j++) {
+                    $btnEquipment = '';
+                    // qty penggunaan
+                    $gett_booking_eq_additional = $this->gett_booking_eq_additional($ID_equipment_add[$j],$query[$i]['ID']);
+                    //print_r($ID_equipment_add[$j].'--'.$query[$i]['ID']);
+                    if ($gett_booking_eq_additional[0]['Status'] == 0) {
+                        $Status_eq_additional = 'Not Confirm';
+                    }
+                    elseif ($gett_booking_eq_additional[0]['Status'] == 1) {
+                        $Status_eq_additional = 'Confirm';
+                    }
+                    else
+                    {
+                        $Status_eq_additional = 'Reject';
+                    }
+
+                    $Qty = $gett_booking_eq_additional[0]['Qty'];
+                    $ID_equipment_additional = $gett_booking_eq_additional[0]['ID_equipment_additional'];
+                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_additional);
+                    $OwnerID = $get[0]['Owner'];
+                    $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$OwnerID);
+                    $Owner = $getX[0]['Division'];
+
+                    $ID_m_equipment = $get[0]['ID_m_equipment'];
+                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
+                    $Name_equipment_add .= '<li>'.$get[0]['Equipment'].' by '.$Owner.'['.$Qty.']&nbsp ('.$Status_eq_additional.')</li>';
+                }
+                $Name_equipment_add .= '</ul>';
+                
+            }
+
+            $ID_add_personel = '-';
+            $Name_add_personel = '-';
+
+            if ($query[$i]['ID_add_personel'] != '' || $query[$i]['ID_add_personel'] != null) {
+                $Name_add_personel = $query[$i]['ID_add_personel'];
+            }
+
+            $Reqdatetime = DateTime::createFromFormat('Y-m-d', $query[$i]['Req_date']);
+            $ReqdateNameDay = $Reqdatetime->format('l');
+
+            $MarkomSupport = '<label>No</Label>';
+            if ($query[$i]['MarcommSupport'] != '') {
+                $MarkomSupport = '<ul style = "margin-left : -28px">';
+                $dd = explode(',', $query[$i]['MarcommSupport']);
+                for ($zx=0; $zx < count($dd); $zx++) {
+                    // check status
+                     $Status_markom = '';
+                     if (strpos($dd[$zx], 'Note') === false) {
+                         $g_markom = $this->g_markom($dd[$zx],$query[$i]['ID']);
+                         if ($g_markom[0]['StatusMarkom'] == 0) {
+                             $Status_markom = '{Not Confirm}';
+                         }
+                         elseif ($g_markom[0]['StatusMarkom'] == 1) {
+                             $Status_markom = '{Confirm}';
+                         }
+                         else
+                         {
+                             $Status_markom = '{Reject}';
+                         }
+
+                         $dd[$zx] = $g_markom[0]['Name'];   
+                     }
+                     else
+                     {
+                        $pos = strpos($dd[$zx],':');
+                        $dd[$zx] = substr($dd[$zx], 0,$pos+1).'<br>'.substr($dd[$zx], $pos+1,strlen($dd[$zx]));
+                     }
+
+                     $MarkomSupport .= '<li>'.$dd[$zx].$Status_markom.'</li>';    
+
+                }
+                $MarkomSupport .= '</ul>';
+            }
+            
+
+            $KetAdditional = $query[$i]['KetAdditional'];
+            $KetAdditional = json_decode($KetAdditional);
+            $Participant = '<ul><li>Participant Qty : '.$query[$i]['ParticipantQty'].'</li>';
+            if (count($KetAdditional) > 0) {
+                foreach ($KetAdditional as $key => $value) {
+                    if ($value != "" || $value != null) {
+                        $Participant .= '<li>'.str_replace("_", " ", $key).' : '.$value.'</li>';
+                    }
+                }
+            }
+            $Participant .= '</ul>';
+            $arr_result[] = array(
+                    'Start' => $StartNameDay.', '.$query[$i]['Start'],
+                    'End' => $EndNameDay.', '.$query[$i]['End'],
+                    'Time' => $Time,
+                    'Agenda' => $query[$i]['Agenda'],
+                    'Room' => $query[$i]['Room'],
+                    //'Equipment_add' => $Name_equipment_add,
+                    //'Persone_add' => $Name_add_personel,
+                    //'Req_date' => $query[$i]['Name'].'<br>'.$ReqdateNameDay.', '.$query[$i]['Req_date'],
+                    //'Req_layout' => $query[$i]['Req_layout'],
+                    'ID' => $query[$i]['ID'],
+                    //'Status' => $query[$i]['Status'],
+                    //'MarkomSupport' => $MarkomSupport,
+                    //'Participant' => $Participant,
+                    'CreatedBy' => $query[$i]['CreatedBy'],
+                    //'Detail' => $Detail,
+                    'EmailPU' => $query[$i]['EmailPU'],
+                    'Name' => $query[$i]['Name'],
+                    'Datelimit' => $query[$i]['Datelimit'],
+            );  
+            
+        }
+
+        return $arr_result;   
+    }
+
+    public function get_list_eq_history()
+    {
+        $this->load->model('master/m_master');
+        $g = $this->get_JSonEquipment_additional();
+        $rs = array();
+        for ($i=0; $i < count($g); $i++) { 
+            $ID_m_equipment = $g[$i]['ID'];
+            $sql = 'select count(*) as total from (
+                        select ID_equipment_additional from db_reservation.t_booking_eq_additional where ID_equipment_additional = "'.$ID_m_equipment.'" and Status = 1 and ID_t_booking in (select ID from db_reservation.t_booking where Status = 1) group by ID_t_booking
+                    ) aa';
+            $query=$this->db->query($sql, array())->result_array();
+            $g[$i]['Usage'] = $query[0]['total'];
+            $rs[] = $g[$i];        
+        }
+
+        return $rs;
+    }
+
+    public function getUsagePerRoom($Room,$condition = array())
+    {
+        $add_where = '';
+        if (array_key_exists('date1', $condition) && array_key_exists('date2', $condition)) {
+            if ($condition['date1'] != '' && $condition['date2'] != '') {
+                $add_where = ' and DATE_FORMAT(Start,"%Y-%m-%d") >= "'.$condition['date1'].'" and DATE_FORMAT(Start,"%Y-%m-%d") <= "'.$condition['date2'].'"';
+            }
+        }
+        
+        $sql = 'select count(*) as total from (
+                    select Room from db_reservation.t_booking where Room = "'.$Room.'" and Status = 1 '.$add_where.'
+                ) aa';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query[0]['total'];
+    }
+
+    public function getDataT_info($ID_t_booking = '',$DivisionID= '',$condition = '')
+    {
+        $arr_result = array();
+        $this->load->model('master/m_master');
+            $add_where = '';
+            if ($ID_t_booking != '') {
+                $add_where = ' where a.ID = "'.$ID_t_booking.'"';
+            }
+
+            if ($condition != '') {
+                if ($add_where == '') {
+                   $add_where .= ' where '.$condition;
+                }
+                else
+                {
+                    $add_where .= ' and '.$condition;
+                }
+            }
+
+            if ($DivisionID == '') {
+                $DivisionID = $this->session->userdata('PositionMain');
+                $DivisionID = $DivisionID['IDDivision'];
+            }
+            else
+            {
+                $DivisionID = 12;
+            }
+            
+        
+        $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP '.$add_where.' order by a.Status asc,a.Start Desc';
+        // print_r($sql);die();
+        $query=$this->db->query($sql, array())->result_array();
+        $NIP = '@';
+        for ($i=0; $i < count($query); $i++) {
+            $Detail = $this->getDataPass($query[$i]['ID']);
+            $Detail = implode('@@', $Detail);
+            $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['Start']);
+            $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['End']);
+            $StartNameDay = $Startdatetime->format('l');
+            $EndNameDay = $Enddatetime->format('l');
+            $Time = $query[$i]['Time'].' Minutes';
+
+            $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','Room',$query[$i]['Room']);
+            // cek ApproveAccess
+            $Status1 = $query[$i]['Status1'];
+            $Status = $query[$i]['Status'];
+            //$MarcommStatus = $query[$i]['MarcommStatus'];
+                $ApproveAccess = function($getRoom,$Status1,$Status,$CreatedBy,$DivisionID){
+
+                    $PositionMain = '@';
+                    $IDDivision = $DivisionID;
+                    $Position = '@';
+                    $NIP = '@';
+                    // get Category Room to approver
+                        $ApproveAccess = 0;
+                        $ID_group_user = $this->session->userdata('ID_group_user');
+                        $getPolicy = $this->m_master->caribasedprimary('db_reservation.cfg_policy','ID_group_user',$ID_group_user);
+                        $CategoryRoom = $getPolicy[0]['CategoryRoom'];
+                        $CategoryRoom = json_decode($CategoryRoom);
+                        $CategoryRoomByRoom = $getRoom[0]['ID_CategoryRoom'];
+                        $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
+                        // find access
+                            $find = 1;
+                                if ($find == 1) {
+                                    // get status 
+                                    if ($Status1 == 0) {
+                                       // find approver1
+                                           $Approver1 = $getDataCategoryRoom[0]['Approver1'];
+                                           $Approver1 = json_decode($Approver1);
+
+                                           $dataApprover = array();
+                                           // find by ID_group_user
+                                                // $CreatedBy = $query[$i]['CreatedBy'];
+                                                $cc = $this->m_master->caribasedprimary('db_reservation.previleges_guser','NIP',$CreatedBy);
+                                                $dd = $this->m_master->caribasedprimary('db_employees.employees','NIP',$CreatedBy);
+                                                $ID_group_user = (count($cc) > 0) ? $cc[0]['G_user'] : '';
+                                            // stop loop
+                                            $getLoop = true;    
+                                           for ($l=0; $l < count($Approver1); $l++) {
+                                                   if ($ID_group_user == $Approver1[$l]->UserType) {
+                                                       // get TypeApprover
+                                                       $TypeApprover = $Approver1[$l]->TypeApprover;
+                                                       switch ($TypeApprover) {
+                                                           case 'Position':
+                                                               // get Division to access position approval
+                                                                   $DivisionCreated = $dd[0]['PositionMain'];
+                                                                   $DivisionCreated = explode(".", $DivisionCreated);
+
+                                                                   $IDPositionApprover = $Approver1[$l]->Approver;
+
+                                                                   if ($DivisionCreated[0] == 15) { // if prodi
+                                                                       // find prodi
+                                                                       $gg = $this->m_master->caribasedprimary('db_academic.program_study','AdminID',$CreatedBy);
+                                                                       if (count($gg) > 0) {
+                                                                           for ($k=0; $k < count($gg); $k++) { 
+                                                                               $Kaprodi = $gg[$k]['KaprodiID'];
+                                                                               if ($Kaprodi == $NIP) {
+                                                                                   $find++;
+                                                                                   $getLoop = false;     
+                                                                                   break;
+                                                                               }
+                                                                           }
+                                                                           
+                                                                       }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        // find by division and position
+                                                                        if ($DivisionCreated[0] == $IDDivision) {
+                                                                           // compare Position
+                                                                           if ($IDPositionApprover == $Position) {
+                                                                               $find++;
+                                                                               $getLoop = false;    
+                                                                               break;
+                                                                           }
+                                                                        }
+                                                                    }
+                                                               break;
+                                                           
+                                                           case 'Division':
+                                                               if ($Approver1[$l]->Approver == $IDDivision) {
+                                                                   $find++;
+                                                                   $getLoop = false;    
+                                                                   break;
+                                                               }
+                                                               break;
+
+                                                           case 'Employees':
+                                                               if ($NIP == $Approver1[$l]->Approver) {
+                                                                   $find++;
+                                                                   $getLoop = false;    
+                                                                   break;
+                                                               }
+                                                               break;    
+                                                       }
+                                                   }
+
+                                                   if (!$getLoop) { // stop loop
+                                                       break;
+                                                   }
+                                           } // end loop for
+
+                                    }
+                                    else
+                                    {
+                                        $find = $find + 2;  
+                                    }
+                                }
+
+                                if ($find == 3) {
+                                   // find approver2
+                                       $Approver2 = $getDataCategoryRoom[0]['Approver2'];
+                                       $Approver2 = json_decode($Approver2);
+                                       $DivisionID = $this->session->userdata('PositionMain');
+                                       $DivisionID = $DivisionID['IDDivision'];
+                                       if ($Status == 0) {
+                                            for ($l=0; $l < count($Approver2); $l++) { 
+                                                if ($DivisionID == $Approver2[$l]) {
+                                                    $find++;    
+                                                    break;
+                                                }
+                                            }
+                                       }
+                                       else
+                                       {
+                                        $find = $find + 2;
+                                       }
+                                       
+                                }
+                    $ApproveAccess = $find;
+                    return $ApproveAccess;            
+                };
+
+                $StatusBooking = '';
+                $CaseApproveAccess = $ApproveAccess($getRoom,$Status1,$Status,$query[$i]['CreatedBy'],$DivisionID);
+                switch ($CaseApproveAccess) {
+                    case 0:
+                         $StatusBooking = 'Awaiting approval Marcomm Division';
+                         break;
+                    case 1:
+                    case 2:
+                        $StatusBooking = 'Awaiting approval 1';
+                        break;
+                    case 3:
+                    case 4:
+                        $StatusBooking = 'Awaiting approval 2';
+                        break;
+                    case 5:
+                        $StatusBooking = 'Approved';
+                        break;    
+                    default:
+                        # code...
+                        break;
+                }
+
+            $ID_equipment_add = '-';
+            $Name_equipment_add = '-';
+            $boolAuthEq = 0;
+            if ($query[$i]['ID_equipment_add'] != '' || $query[$i]['ID_equipment_add'] != null) {
+                $ID_equipment_add = explode(',', $query[$i]['ID_equipment_add']);
+                $Name_equipment_add = '<ul style = "margin-left : -28px">';
+                $btnEquipment = '';
+                for ($j=0; $j < count($ID_equipment_add); $j++) {
+                    $btnEquipment = '';
+                    // qty penggunaan
+                    $gett_booking_eq_additional = $this->gett_booking_eq_additional($ID_equipment_add[$j],$query[$i]['ID']);
+                    if ($gett_booking_eq_additional[0]['Status'] == 0) {
+                        $Status_eq_additional = 'Not Confirm';
+                    }
+                    elseif ($gett_booking_eq_additional[0]['Status'] == 1) {
+                        $Status_eq_additional = 'Confirm';
+                    }
+                    else
+                    {
+                        $Status_eq_additional = 'Reject';
+                    }
+                    $Qty = $gett_booking_eq_additional[0]['Qty'];
+                    $ID_equipment_additional = $gett_booking_eq_additional[0]['ID_equipment_additional'];
+                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_additional);
+                    $OwnerID = $get[0]['Owner'];
+                    $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$OwnerID);
+                    $Owner = $getX[0]['Division'];
+                        if ($DivisionID == $OwnerID) {
+                            if ($query[$i]['Status'] != 1) {
+                                $btnEquipment = '<input type = "checkbox" class = "chkEquipment_'.$query[$i]['ID'].'" value = "'.$ID_equipment_add[$j].'">';
+                            }
+                            if ($boolAuthEq == 0) {
+                                $boolAuthEq = 1;
+                            }
+                            
+                        } 
+
+                    $ID_m_equipment = $get[0]['ID_m_equipment'];
+                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
+                    $Name_equipment_add .= '<li>'.$get[0]['Equipment'].' by '.$Owner.'['.$Qty.']&nbsp ('.$Status_eq_additional.') &nbsp'.$btnEquipment.'</li>';
+                    // print_r('-div:-'.$DivisionID.'=OW:'.$OwnerID.'--ID:'.$query[$i]['ID'].'---');
+                }
+                $Name_equipment_add .= '</ul>';
+                // print_r('---'.$boolAuthEq.'---');
+                if ($boolAuthEq == 1) {
+                    if ($query[$i]['Status'] != 1) {
+                        $Name_equipment_add .= '<div class = "row"><div class = "col-md-6">
+                                        <span class="btn btn-primary btn-xs btn_eq_additional_submit" idtbooking ="'.$query[$i]['ID'].'" action = "Confirm">
+                                            <i class="fa fa-pencil-square-o"></i> Confirm
+                                           </span>
+                                                </div>
+                                            <div class = "col-md-6">
+                                                <span class="btn btn-danger btn-xs btn_eq_additional_submit" idtbooking ="'.$query[$i]['ID'].'" action = "Reject">
+                                                    <i class="fa fa-pencil-square-o"></i> Reject
+                                                   </span>
+                                            </div>    
+                                            </div>';
+                    }
+                }
+                
+            }
+
+            $ID_add_personel = '-';
+            $Name_add_personel = '-';
+
+            if ($query[$i]['ID_add_personel'] != '' || $query[$i]['ID_add_personel'] != null) {
+                $Name_add_personel = $query[$i]['ID_add_personel'];
+            }
+
+            $Reqdatetime = DateTime::createFromFormat('Y-m-d', $query[$i]['Req_date']);
+            $ReqdateNameDay = $Reqdatetime->format('l');
+
+            $MarkomSupport = '<label>No</Label>';
+            $boolAuthMarkom = 0;
+            if ($query[$i]['MarcommSupport'] != '') {
+                $MarkomSupport = '<ul style = "margin-left : -28px">';
+                $dd = explode(',', $query[$i]['MarcommSupport']);
+                for ($zx=0; $zx < count($dd); $zx++) {
+                    // check status
+                     $Status_markom = '';
+                     $btnMarkomSupport = '';
+                     if (strpos($dd[$zx], 'Note') === false) {
+                         $g_markom = $this->g_markom($dd[$zx],$query[$i]['ID']);
+                         if ($g_markom[0]['StatusMarkom'] == 0) {
+                             $Status_markom = '{Not Confirm}';
+                         }
+                         elseif ($g_markom[0]['StatusMarkom'] == 1) {
+                             $Status_markom = '{Confirm}';
+                         }
+                         else
+                         {
+                             $Status_markom = '{Reject}';
+                         }
+
+                         //if ($g_markom[0]['StatusMarkom'] != 1) {
+                            $btnMarkomSupport = '<input type = "checkbox" class = "MarkomSupport_'.$query[$i]['ID'].'" value = "'.$dd[$zx].'">';
+                         //}
+                         $dd[$zx] = $g_markom[0]['Name'];   
+                     }
+                     else
+                     {
+                        $pos = strpos($dd[$zx],':');
+                        $dd[$zx] = substr($dd[$zx], 0,$pos+1).'<br>'.nl2br(substr($dd[$zx], $pos+1,strlen($dd[$zx])));
+                     }
+
+                     $MarkomSupport .= '<li>'.$dd[$zx].$Status_markom.'&nbsp'.$btnMarkomSupport.'</li>';    
+
+                }
+                $MarkomSupport .= '</ul>';
+            }
+
+            if ($MarkomSupport != '' && $DivisionID == 17) {
+                $boolAuthMarkom = 1;
+            }
+
+            if ($boolAuthMarkom == 1) {
+                if ($query[$i]['Status'] != 1) {
+                    $MarkomSupport .= '<div class = "row"><div class = "col-md-6">
+                                    <span class="btn btn-primary btn-xs btn_markom_submit" idtbooking ="'.$query[$i]['ID'].'" action = "Confirm">
+                                        <i class="fa fa-pencil-square-o"></i> Confirm
+                                       </span>
+                                            </div>
+                                        <div class = "col-md-6">
+                                            <span class="btn btn-danger btn-xs btn_markom_submit" idtbooking ="'.$query[$i]['ID'].'" action = "Reject">
+                                                <i class="fa fa-pencil-square-o"></i> Reject
+                                               </span>
+                                        </div>    
+                                        </div>';
+                }
+            }
+
+            $KetAdditional = $query[$i]['KetAdditional'];
+            $KetAdditional = json_decode($KetAdditional);
+            $Participant = '<ul><li>Participant Qty : '.$query[$i]['ParticipantQty'].'</li>';
+            if (count($KetAdditional) > 0) {
+                foreach ($KetAdditional as $key => $value) {
+                    if ($value != "" || $value != null) {
+                        $Participant .= '<li>'.str_replace("_", " ", $key).' : '.$value.'</li>';
+                    }
+                }
+            }
+            $Participant .= '</ul>';
+            // $boolAuth = $this->boolAuthData($query[$i]['CreatedBy'],$CaseApproveAccess,$boolAuthEq,$boolAuthMarkom);
+            $boolAuth = true;
+            if ($boolAuth) {
+                   $arr_result[] = array(
+                           'Start' => $StartNameDay.', '.$query[$i]['Start'],
+                           'End' => $EndNameDay.', '.$query[$i]['End'],
+                           'Time' => $Time,
+                           'Agenda' => $query[$i]['Agenda'],
+                           'Room' => $query[$i]['Room'],
+                           'Equipment_add' => $Name_equipment_add,
+                           'Persone_add' => $Name_add_personel,
+                           'Req_date' => $query[$i]['Name'].'<br>'.$ReqdateNameDay.', '.$query[$i]['Req_date'],
+                           'Req_layout' => $query[$i]['Req_layout'],
+                           'ID' => $query[$i]['ID'],
+                           'Status' => $query[$i]['Status'],
+                           'MarkomSupport' => $MarkomSupport,
+                           'Participant' => $Participant,
+                           'ApproveAccess' => $CaseApproveAccess,
+                           'StatusBooking' => $StatusBooking,
+                           'CreatedBy' => $query[$i]['CreatedBy'],
+                           'Detail' => $Detail,
+                   );
+            }   
+            
+        }
+
+        return $arr_result;  
     }
 }
