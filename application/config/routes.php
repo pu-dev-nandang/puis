@@ -778,6 +778,7 @@ $route['rest/__checkDateKRS'] = 'api/c_rest/checkDateKRS';
 $route['rest/__getDetailKRS'] = 'api/c_rest/getDetailKRS';
 
 $route['rest/__crudCounseling'] = 'api/c_rest/crudCounseling';
+$route['rest/__getPaymentStudent'] = 'api/c_rest/getPaymentStudent';
 
 $route['rest/__getStudent_ServerSide'] = 'api/c_rest/getStudent_ServerSide';
 $route['rest/__getLecturer_ServerSide'] = 'api/c_rest/getLecturer_ServerSide';
