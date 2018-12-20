@@ -611,6 +611,48 @@ class C_rest extends CI_Controller {
         }
     }
 
+    public function getPaymentStudent(){
+        $dataToken = $this->getInputToken();
+        $cekUser = $this->cekAuthAPI($dataToken['auth']);
+
+        if($cekUser){
+
+            $data = $this->db->query('SELECT p.*, pt.Description, s.Name AS SemesterName FROM db_finance.payment p 
+                                                    LEFT JOIN db_finance.payment_type pt ON (pt.ID = p.PTID)
+                                                    LEFT JOIN db_academic.semester s ON (s.ID = p.SemesterID)
+                                                    WHERE p.NPM = "'.$dataToken['NPM'].'" ORDER BY p.SemesterID DESC, p.PTID DESC')->result_array();
+
+            $result = [];
+            if(count($data)>0){
+                for($i=0;$i<count($data);$i++){
+
+//                    print_r('SELECT * FROM db_academic.semester WHERE Year >= "'.$dataToken['ClassOf'].'"
+//                                                    AND ID <= "'.$data[$i]['SemesterID'].'"');
+
+                    // Cek semester
+                    $dataSmt = $this->db->query('SELECT * FROM db_academic.semester WHERE Year >= "'.$dataToken['ClassOf'].'" 
+                                                    AND ID <= "'.$data[$i]['SemesterID'].'" ')->result_array();
+
+                    if(count($dataSmt)>0){
+                        $data[$i]['Semester'] = count($dataSmt);
+                        $datapay = $this->db->query('SELECT Invoice, Status FROM db_finance.payment_students WHERE ID_payment = "'.$data[$i]['ID'].'" ')->result_array();
+                        $data[$i]['DetailPay'] = $datapay;
+                        array_push($result,$data[$i]);
+                    }
+
+                }
+            }
+
+            return print_r(json_encode($result));
+
+        } else {
+            $msg = array(
+                'msg' => 'Error'
+            );
+            return print_r(json_encode($msg));
+        }
+    }
+
     public function getTableData($db = null,$table = null)
     {
         error_reporting(0);
