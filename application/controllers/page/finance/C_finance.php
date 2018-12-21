@@ -935,8 +935,9 @@ class C_finance extends Finnance_Controler {
     public function cancel_created_tagihan_mhs()
     {
         $Input = $this->getInputToken();
+        $Reason = $Input['Reason'];
         $Input = $Input['arrValueCHK'];
-        $proses = $this->m_finance->cancel_created_tagihan_mhs($Input);
+        $proses = $this->m_finance->cancel_created_tagihan_mhs2($Input,$Reason);
         echo json_encode($proses);
     }
 

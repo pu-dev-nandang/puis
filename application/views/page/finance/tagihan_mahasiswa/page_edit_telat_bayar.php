@@ -493,7 +493,7 @@
     $(document).on('click','.DetailPayment', function () {
         var NPM = $(this).attr('NPM');
         var html = '';
-        var table = '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+        var table = '<div class = "row"><div class= col-md-12><table class="table table-striped table-bordered table-hover table-checkable tableData">'+
                       '<thead>'+
                           '<tr>'+
                               '<th style="width: 5px;">No</th>'+
@@ -508,9 +508,12 @@
         table += '<tbody>' ;
         var isi = '';
         // console.log(dataaModal);
+        var CancelPayment = [];
         for (var i = 0; i < dataaModal.length; i++) {
           if(dataaModal[i]['NPM'] == NPM)
           {
+            CancelPayment = dataaModal[i]['cancelPay'];
+            var totCancelPayment = CancelPayment.length;
             var DetailPaymentArr = dataaModal[i]['DetailPayment'];
             var Nama = dataaModal[i]['Nama'];
             for (var j = 0; j < DetailPaymentArr.length; j++) {
@@ -531,9 +534,34 @@
         }
 
         table += isi+'</tbody>' ; 
-        table += '</table>' ;
-
+        table += '</table></div></div>' ;
         html += table;
+
+        var htmlReason = '<div class = "row"><div class= col-md-12><h5>List Cancel Payment</h5><table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+                      '<thead>'+
+                          '<tr>'+
+                              '<th style="width: 5px;">No</th>'+
+                              '<th style="width: 55px;">Reason</th>'+
+                              '<th style="width: 55px;">CancelAt</th>'+
+                              '<th style="width: 55px;">CancelBy</th>';
+        htmlReason += '</tr>' ;  
+        htmlReason += '</thead>' ; 
+        htmlReason += '<tbody>' ;
+        for (var i = 0; i < CancelPayment.length; i++) {
+          var No = parseInt(i) + 1;
+          htmlReason += '<tr>'+
+                '<td>'+ (i+1) + '</td>'+
+                '<td>'+ CancelPayment[i]['Reason'] + '</td>'+
+                '<td>'+ CancelPayment[i]['CancelAt'] + '</td>'+
+                '<td>'+ CancelPayment[i]['Name'] + '</td>'+
+              '<tr>'; 
+        }
+
+        htmlReason += '</tbody>' ; 
+        htmlReason += '</table></div></div>' ;
+        if (CancelPayment.length > 0) {
+          html += htmlReason;
+        }
 
         var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
             '';

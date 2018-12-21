@@ -1391,6 +1391,10 @@ class M_finance extends CI_Model {
       // get sks yang diambil
          $Credit = $this->getSKSMahasiswa('ta_'.$Year,$query[$i]['NPM']);
 
+      // Detail Payment & cek cancel   
+         $DetailPayment = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']);
+         $cancelPay = $this->getCancel($query[$i]['PTID'],$query[$i]['SemesterID'],$query[$i]['NPM']);
+
       if($prodi == '' || $prodi == Null){
         $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$dt[0]['ProdiID']);
 
@@ -1411,10 +1415,11 @@ class M_finance extends CI_Model {
             'Year' => $Year,
             'IPS' => $IPS,
             'IPK' => $IPK,
-            'DetailPayment' => $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']),
+            'DetailPayment' => $DetailPayment,
             'VA' => $VA,
             'Credit' => $Credit,
             'Pay_Cond' => $query[$i]['Pay_Cond'],
+            'cancelPay' => $cancelPay,
         );
       }
       else
@@ -1440,16 +1445,23 @@ class M_finance extends CI_Model {
               'Year' => $Year,
               'IPS' => $IPS,
               'IPK' => $IPK,
-              'DetailPayment' => $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']),
+              'DetailPayment' => $DetailPayment,
               'VA' => $VA,
               'Credit' => $Credit,
               'Pay_Cond' => $query[$i]['Pay_Cond'],
+              'cancelPay' => $cancelPay,
           );
         }
       }
       
     }
     return $arr;
+   }
+
+   public function getCancel($PTID,$SemesterID,$NPM){
+    $sql = 'select a.*,b.Name from db_finance.payment_s_cancel as a left join db_employees.employees as b on a.CancelBy = b.NIP where PTID = ? and SemesterID = ? and NPM = ?';
+    $query=$this->db->query($sql, array($PTID,$SemesterID,$NPM))->result_array();
+    return $query;
    }
 
    public function count_get_created_tagihan_mhs($ta,$prodi,$PTID,$NIM)
@@ -1554,6 +1566,9 @@ class M_finance extends CI_Model {
       // get sks yang diambil
          $Credit = $this->getSKSMahasiswa('ta_'.$Year,$query[$i]['NPM']);
 
+      // cek cancel   
+         $cancelPay = $this->getCancel($query[$i]['PTID'],$query[$i]['SemesterID'],$query[$i]['NPM']);   
+
       if($prodi == '' || $prodi == Null){
         $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$dt[0]['ProdiID']);
 
@@ -1578,6 +1593,7 @@ class M_finance extends CI_Model {
             'VA' => $VA,
             'Credit' => $Credit,
             'Pay_Cond' => $query[$i]['Pay_Cond'],
+            'cancelPay' => $cancelPay,
         );
       }
       else
@@ -1607,6 +1623,7 @@ class M_finance extends CI_Model {
               'VA' => $VA,
               'Credit' => $Credit,
               'Pay_Cond' => $query[$i]['Pay_Cond'],
+              'cancelPay' => $cancelPay,
           );
         }
       }
@@ -1793,6 +1810,96 @@ class M_finance extends CI_Model {
                 $sql = 'select * from db_finance.payment as a join db_finance.payment_students as b
                         on a.ID = b.ID_payment where a.NPM = ? and a.SemesterID = ? and a.PTID = ? '.$bstatus.' order by b.ID asc limit 1';
                 $query=$this->db->query($sql, array($NPM,$SemesterID,$PTID))->result_array();
+                if (count($query) > 0 ) {
+                  $BilingID = $query[0]['BilingID'];
+                  if ($BilingID != 0) {
+                    $checkVa = $this->checkBiling($BilingID);
+                    // print_r($checkVa);
+                    // die();
+                    // va status  = 1 => active
+                    // va status = 2 => Inactive
+                    if ($checkVa['msg']['va_status'] != 2) {
+                        // cancel VA 
+                       $getData= $this->m_master->caribasedprimary('db_va.va_log','trx_id',$BilingID);
+                       $trx_amount = $getData[0]['trx_amount'];
+                       $desc = 'Closed '.$getData[0]['description'];
+                       $datetime_expired = $now;
+                       $customer_name = $getData[0]['customer_name'];
+                       $customer_email = $getData[0]['customer_email'];
+                       $update = $this->update_va_Payment($trx_amount,$datetime_expired, $customer_name, $customer_email,$BilingID,'db_finance.payment_students',$desc);
+                       if ($update['status'] == 1) {
+                         // triger VA closed berhasil, update va_log status = 2 // auto dari update_va_Payment
+                         // delete data pada table payment dan payment_students
+                            // action delete belum benar
+                         // $this->delete_id_table($query[0]['ID_payment'],'payment_students');
+                         $sqlDelete = "delete from db_finance.payment_students where ID_payment = ".$query[0]['ID_payment'];
+                         $queryDelete=$this->db->query($sqlDelete, array());
+                         $this->delete_id_table($query[0]['ID_payment'],'payment');
+                         
+                       }
+                       else
+                       {
+                         $arr['msg'] .= 'Va tidak bisa di cancel, error koneksi ke BNI <br>';
+                       }
+                    }
+                    else
+                    {
+                         //$this->delete_id_table($query[0]['ID_payment'],'payment_students');
+                         $sqlDelete = "delete from db_finance.payment_students where ID_payment = ".$query[0]['ID_payment'];
+                         $queryDelete=$this->db->query($sqlDelete, array());  
+                         $this->delete_id_table($query[0]['ID_payment'],'payment');
+                        
+                    }
+                  }
+                  else
+                  {
+                    $sqlDelete = "delete from db_finance.payment_students where ID_payment = ".$query[0]['ID_payment'];
+                    $queryDelete=$this->db->query($sqlDelete, array());
+                    $this->delete_id_table($query[0]['ID_payment'],'payment');
+                  }
+                  
+                }
+        }
+        return $arr;
+   }
+
+   public function cancel_created_tagihan_mhs2($input,$Reason)
+   {
+    $this->load->model('master/m_master');
+    $arr = array();
+    $arr['msg'] = '';
+    $now = date('Y-m-d H:i:s');
+    for ($i=0; $i < count($input); $i++) { 
+      $PTID = $input[$i]->PTID;
+      $SemesterID = $input[$i]->semester;
+      $NPM = $input[$i]->NPM;
+      // Closed VA dahulu
+          // check Status VA
+              // cari Biling ID
+                if ($this->session->userdata('finance_auth_Policy_SYS') == 0) {
+                  $bstatus = '';
+                }
+                else
+                {
+                  $bstatus = 'and b.Status  = 0';
+                }
+                $sql = 'select * from db_finance.payment as a join db_finance.payment_students as b
+                        on a.ID = b.ID_payment where a.NPM = ? and a.SemesterID = ? and a.PTID = ? '.$bstatus.' order by b.ID asc limit 1';
+                $query=$this->db->query($sql, array($NPM,$SemesterID,$PTID))->result_array();
+                // save reason
+                $PTIDR = $query[0]['PTID'];
+                $SemesterIDR = $query[0]['SemesterID'];
+                $NPMR = $query[0]['NPM'];
+                $dataSave = array(
+                  'PTID' => $PTIDR,
+                  'SemesterID' => $SemesterIDR,
+                  'NPM' => $NPMR,
+                  'Reason' => $Reason,
+                  'CancelAt' => date('Y-m-d H:i:s'),
+                  'CancelBy' => $this->session->userdata('NIP'),
+                );
+                $this->db->insert('db_finance.payment_s_cancel',$dataSave);
+
                 if (count($query) > 0 ) {
                   $BilingID = $query[0]['BilingID'];
                   if ($BilingID != 0) {
@@ -3259,6 +3366,310 @@ class M_finance extends CI_Model {
     return $arr;
    }
 
+
+   public function get_report_pembayaran_mhs2($ta,$prodi,$NIM,$Semester,$Status,$limit, $start,$StatusMHS)
+   {
+    // error_reporting(0);
+    $arr = array();
+    $this->load->model('master/m_master');
+    // print_r($start.' - '.$limit);die();
+
+    $arrDB = array();
+    $sqlDB = 'show databases like "%ta_2%"';
+    $queryDB=$this->db->query($sqlDB, array())->result_array();
+    foreach ($queryDB as $key) {
+      foreach ($key as $keyB ) {
+        $arrDB[] = $keyB;
+      }
+      
+    }
+
+    rsort($arrDB);
+    // print_r($arrDB);die();
+
+    $CountLimit = $start + $limit;
+    $CountLimit = ($CountLimit > count($queryDB)) ? count($queryDB) : $CountLimit;
+
+    // join dengan table auth terlebih dahulu
+    // $PTID = ($PTID == '' || $PTID == Null) ? '' : ' and a.PTID = '.$PTID;
+    if ($StatusMHS == "") {
+      $sMhs = '';
+      //$sMhs = 'StatusStudentID in (3,2,8)';
+    }
+    else
+    {
+      $sMhs = ' StatusStudentID = "'.$StatusMHS.'"';
+    }
+    $PTID = '';
+    if ($sMhs == '') {
+      $NIM = ($NIM == '' || $NIM == Null) ? '' : ' a.NPM = '.$NIM;
+    }
+    else
+    {
+      $NIM = ($NIM == '' || $NIM == Null) ? '' : ' and a.NPM = '.$NIM;
+    }
+    
+    if ($sMhs == '' && $NIM == '') {
+      $prodi = ($prodi == '' || $prodi == Null) ? '' : ' a.ProdiID = '.$prodi;
+    }
+    else
+    {
+      $prodi = ($prodi == '' || $prodi == Null) ? '' : ' and a.ProdiID = '.$prodi;
+    }
+    $Semester = ($Semester == '' || $Semester == Null) ? '' : ' and SemesterID = '.$Semester;
+    $where = '';
+    // get Number VA Mahasiswa
+        $Const_VA = $this->m_master->showData_array('db_va.master_va');
+        // $No = $start + 1;
+        $No = 1;
+    for ($x=$start; $x < $CountLimit; $x++) { 
+      $dbget = $arrDB[$x];
+      
+      if ($ta == '') {
+        $ex = explode('_', $dbget);
+        $ta1 = $ex[1];
+      }
+      else
+      {
+        $ta = explode('.', $ta);
+        $ta1 = $ta[1];
+        $x = $CountLimit;
+      }
+
+      if ($sMhs != '' || $NIM != '' || $prodi != '') {
+       $where = ' where ';
+      }
+
+      // get Data Mahasiswa
+      $sql = 'select a.NPM,a.Name,b.NameEng from ta_'.$ta1.'.students as a join db_academic.program_study as b on a.ProdiID = b.ID '.$where.$sMhs.' '.$NIM.$prodi;
+      //print_r($sql);die();
+      $query=$this->db->query($sql, array())->result_array();
+      // print_r($query);
+      for ($u=0; $u < count($query); $u++) { 
+        $arrMHS = array(
+            'No' => $No,
+            'NPM' => $query[$u]['NPM'],
+            'Name' => $query[$u]['Name'],
+            'ProdiENG' => $query[$u]['NameEng'],
+            'Year' => $ta1,
+        );
+
+        // cek BPP 
+        $sqlBPP = 'select * from db_finance.payment where PTID = 2 and NPM = ? '.$Semester; //  limit 1
+        $queryBPP=$this->db->query($sqlBPP, array($query[$u]['NPM']))->result_array();
+        $arrBPP = array(
+          'BPP' => '0',
+          'PayBPP' => '0',
+          'SisaBPP' => '0',
+          'DetailPaymentBPP' => '',
+          'DueDateBPP' => '',
+          'AgingBPP' => 'BPP : 0',
+        );
+          if (count($queryBPP) > 0) {
+              for ($t=0; $t < count($queryBPP); $t++) { 
+                // cek payment students
+                $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$queryBPP[$t]['ID']);
+                $PayBPP = 0;
+                $SisaBPP = 0;
+                $last = count($Q_invStudent) - 1;
+                $DueDateBPP = ($Q_invStudent[$last]['Deadline'] != '' && $Q_invStudent[$last]['Deadline'] != null && strpos($Q_invStudent[$last]['Deadline'],'0000-00-00') === false) ? date('d M Y H:i:s', strtotime($Q_invStudent[$last]['Deadline'])) : '';
+                for ($r=0; $r < count($Q_invStudent); $r++) { 
+                  if ($Q_invStudent[$r]['Status'] == 1) { // lunas
+                    $PayBPP = $PayBPP + $Q_invStudent[$r]['Invoice'];
+                  }
+                  else
+                  {
+                    $SisaBPP = $SisaBPP + $Q_invStudent[$r]['Invoice'];
+                  }
+                }
+
+                $Aging = 'BPP : 0';
+                if ($DueDateBPP != '' && $SisaBPP > 0) {
+                  $Aging = 'BPP : '.$this->m_master->dateDiffDays_(date('Y-m-d', strtotime($Q_invStudent[$last]['Deadline'])),date('Y-m-d'));
+                }
+
+                $arrBPP = array(
+                  'BPP' => (int)$queryBPP[$t]['Invoice'],
+                  'PayBPP' => (int)$PayBPP,
+                  'SisaBPP' => (int)$SisaBPP,
+                  'DetailPaymentBPP' => $Q_invStudent,
+                  'DueDateBPP' => $DueDateBPP,
+                  'AgingBPP' => $Aging,
+                );
+
+              }
+          }
+
+        // cek Credit 
+        $sqlCr = 'select * from db_finance.payment where PTID = 3 and NPM = ? '.$Semester; // limit 1
+        $queryCr=$this->db->query($sqlCr, array($query[$u]['NPM']))->result_array();
+        $arrCr = array(
+          'Cr' => '0',
+          'PayCr' => '0',
+          'SisaCr' => '0',
+          'DetailPaymentCr' => '',
+          'DueDateCR' => '',
+          'AgingCr' => 'Credit : 0',
+        );
+          if (count($queryCr) > 0) {
+              for ($t=0; $t < count($queryCr); $t++) { 
+                // cek payment students
+                $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$queryCr[$t]['ID']);
+                $PayCr = 0;
+                $SisaCr = 0;
+                $last = count($Q_invStudent) - 1;
+                $DueDateCR = ($Q_invStudent[$last]['Deadline'] != '' && $Q_invStudent[$last]['Deadline'] != null && strpos($Q_invStudent[$last]['Deadline'],'0000-00-00') === false) ? date('d M Y H:i:s', strtotime($Q_invStudent[$last]['Deadline'])) : '';
+                for ($r=0; $r < count($Q_invStudent); $r++) { 
+                  if ($Q_invStudent[$r]['Status'] == 1) { // lunas
+                    $PayCr = $PayCr + $Q_invStudent[$r]['Invoice'];
+                  }
+                  else
+                  {
+                    $SisaCr = $SisaCr + $Q_invStudent[$r]['Invoice'];
+                  }
+                }
+
+                $Aging = 'Credit : 0';
+                if ($DueDateCR != '' && $SisaCr > 0) {
+                  $Aging = 'Credit : '.$this->m_master->dateDiffDays_(date('Y-m-d', strtotime($Q_invStudent[$last]['Deadline'])),date('Y-m-d'));
+                }
+
+                $arrCr = array(
+                  'Cr' => (int)$queryCr[$t]['Invoice'],
+                  'PayCr' => (int)$PayCr,
+                  'SisaCr' => (int)$SisaCr,
+                  'DetailPaymentCr' => $Q_invStudent,
+                  'DueDateCR' => $DueDateCR,
+                  'AgingCr' => $Aging,
+                );
+
+              }
+          }
+
+          // cek lain-lain
+          $sqlAn = 'select * from db_finance.payment where PTID = 4 and NPM = ? '.$Semester; // limit 1
+          $queryAn=$this->db->query($sqlAn, array($query[$u]['NPM']))->result_array();
+          $arrAn = array(
+            'An' => '0',
+            'PayAn' => '0',
+            'SisaAn' => '0',
+            'DetailPaymentAn' => '',
+            'DueDateAn' => '',
+            'AgingAn' => 'lain-lain : 0',
+          );
+            if (count($queryAn) > 0) {
+                for ($t=0; $t < count($queryAn); $t++) { 
+                  // cek payment students
+                  $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$queryAn[$t]['ID']);
+                  $PayAn = 0;
+                  $SisaAn = 0;
+                  $last = count($Q_invStudent) - 1;
+                  $DueDateAn = ($Q_invStudent[$last]['Deadline'] != '' && $Q_invStudent[$last]['Deadline'] != null && strpos($Q_invStudent[$last]['Deadline'],'0000-00-00') === false) ? date('d M Y H:i:s', strtotime($Q_invStudent[$last]['Deadline'])) : '';
+                  for ($r=0; $r < count($Q_invStudent); $r++) { 
+                    if ($Q_invStudent[$r]['Status'] == 1) { // lunas
+                      $PayAn = $PayAn + $Q_invStudent[$r]['Invoice'];
+                    }
+                    else
+                    {
+                      $SisaAn = $SisaAn + $Q_invStudent[$r]['Invoice'];
+                    }
+                  }
+
+                  $Aging = 'lain-lain : 0';
+                  if ($DueDateAn != '' && $SisaAn > 0) {
+                    $Aging = 'lain-lain : '.$this->m_master->dateDiffDays_(date('Y-m-d', strtotime($Q_invStudent[$last]['Deadline'])),date('Y-m-d'));
+                  }
+
+                  $arrAn = array(
+                    'An' => (int)$queryAn[$t]['Invoice'],
+                    'PayAn' => (int)$PayAn,
+                    'SisaAn' => (int)$SisaAn,
+                    'DetailPaymentAn' => $Q_invStudent,
+                    'DueDateAn' => $DueDateAn,
+                    'AgingAn' => $Aging,
+                  );
+
+                }
+            }
+
+            // cek SPP
+            $sqlSPP = 'select * from db_finance.payment where PTID = 1 and NPM = ? '.$Semester; // limit 1
+            $querySPP=$this->db->query($sqlSPP, array($query[$u]['NPM']))->result_array();
+            $arrSPP = array(
+              'SPP' => '0',
+              'PaySPP' => '0',
+              'SisaSPP' => '0',
+              'DetailPaymentSPP' => '',
+              'DueDateSPP' => '',
+              'AgingSPP' => 'SPP : 0',
+            );
+              if (count($querySPP) > 0) {
+                  for ($t=0; $t < count($querySPP); $t++) { 
+                    // cek payment students
+                    $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$querySPP[$t]['ID']);
+                    $PaySPP = 0;
+                    $SisaSPP = 0;
+                    $last = count($Q_invStudent) - 1;
+                    $DueDateSPP = ($Q_invStudent[$last]['Deadline'] != '' && $Q_invStudent[$last]['Deadline'] != null && strpos($Q_invStudent[$last]['Deadline'],'0000-00-00') === false) ? date('d M Y H:i:s', strtotime($Q_invStudent[$last]['Deadline'])) : '';
+                    for ($r=0; $r < count($Q_invStudent); $r++) { 
+                      if ($Q_invStudent[$r]['Status'] == 1) { // lunas
+                        $PaySPP = $PaySPP + $Q_invStudent[$r]['Invoice'];
+                      }
+                      else
+                      {
+                        $SisaSPP = $SisaSPP + $Q_invStudent[$r]['Invoice'];
+                      }
+                    }
+
+                    $Aging = 'SPP : 0';
+                    if ($DueDateSPP != '' && $SisaAn > 0) {
+                      $Aging = 'SPP : '.$this->m_master->dateDiffDays_(date('Y-m-d', strtotime($Q_invStudent[$last]['Deadline'])),date('Y-m-d'));
+                    }
+
+                    $arrSPP = array(
+                      'SPP' => (int)$querySPP[$t]['Invoice'],
+                      'PaySPP' => (int)$PaySPP,
+                      'SisaSPP' => (int)$SisaSPP,
+                      'DetailPaymentSPP' => $Q_invStudent,
+                      'DueDateSPP' => $DueDateSPP,
+                      'AgingSPP' => $Aging,
+                    );
+
+                  }
+              }
+
+          // if($Status == 0) // tidak lunas
+          switch ($Status) {
+            case '': // All
+              $arr[] = $arrMHS + $arrBPP + $arrCr + $arrAn + $arrSPP; 
+              break;
+            case 0:  // Tidak Lunas
+              if ($arrBPP['DetailPaymentBPP'] == '' || $arrCr['DetailPaymentCr'] == '' ||  $arrBPP['SisaBPP'] > 0 || $arrCr['SisaCr'] > 0  ||  $arrSPP['SisaSPP'] > 0 || $arrAn['SisaAn'] > 0 ) {
+                $arr[] = $arrMHS + $arrBPP + $arrCr + $arrAn + $arrSPP; 
+              }
+              break;
+            case 1:  // Lunas
+              if ($arrBPP['DetailPaymentBPP'] != '' && $arrCr['DetailPaymentCr'] != '' &&  $arrBPP['SisaBPP'] == 0 && $arrCr['SisaCr'] == 0   &&  $arrSPP['SisaSPP'] == 0 && $arrAn['SisaAn'] == 0 ) {
+                $arr[] = $arrMHS + $arrBPP + $arrCr + $arrAn + $arrSPP; 
+              }
+              // $arr[] = $arrMHS + $arrBPP + $arrCr ; 
+              break;  
+            default:
+              # code...
+              break;
+          }
+
+        // if ($arrBPP['SisaBPP'] > 0 || $arrCr['SisaCr'] > 0) {
+        //     $arr[] = $arrMHS + $arrBPP + $arrCr ; 
+        // }  
+        
+        $No++;
+      } // loop per mhs
+
+    }
+    return $arr;
+   }
+
    public function mahasiswa_list_all($ta,$prodi,$NPM)
    {
     // error_reporting(0);
@@ -3355,6 +3766,79 @@ class M_finance extends CI_Model {
               ) as b
               on a.FormulirCodeGlobal = b.No_Ref
                ';
+     $query=$this->db->query($sql, array($SelectSetTa))->result_array();
+     return $query;             
+   }
+
+   public function getSaleFormulirOfflineBetwwen_fin($SelectSetTa,$SelectSortBy,$dateRange1,$dateRange2)
+   {
+    $SelectSortBy = explode('.', $SelectSortBy);
+    switch ($SelectSortBy[1]) {
+      case 'No_Ref':
+      case 'FormulirCode':
+        $SelectSortBy = ' order by a.FormulirCodeGlobal asc';
+        break;
+      case 'DateSale':
+        $SelectSortBy = ' order by b.DateFin asc';
+        break;
+      default:
+        $SelectSortBy = '';
+        break;
+    }
+     $sql = 'select a.FormulirCodeGlobal,a.Years,a.Status as StatusGlobalFormulir,
+              b.No_Ref,b.Sales,b.PIC,b.DateFin,b.FullName
+              from db_admission.formulir_number_global as a
+              LEFT JOIN
+              (
+                             select a.No_Ref,c.Name as Sales,b.PIC,b.DateFin,b.FullName
+                             from db_admission.formulir_number_offline_m as a
+                             join db_admission.sale_formulir_offline as b
+                             on a.FormulirCode = b.FormulirCodeOffline
+                             left join db_employees.employees as c
+                             on c.NIP = b.PIC
+                             where a.Years = ?
+              ) as b
+              on a.FormulirCodeGlobal = b.No_Ref
+              where b.DateFin >= "'.$dateRange1.'" and b.DateFin <= "'.$dateRange2.'"
+               '.$SelectSortBy;
+               //print_r($sql);die();
+     $query=$this->db->query($sql, array($SelectSetTa))->result_array();
+     return $query;             
+   }
+
+
+   public function getSaleFormulirOfflineMonth_fin($SelectSetTa,$SelectSortBy,$Month,$Year)
+   {
+    $SelectSortBy = explode('.', $SelectSortBy);
+    switch ($SelectSortBy[1]) {
+      case 'No_Ref':
+      case 'FormulirCode':
+        $SelectSortBy = ' order by a.FormulirCodeGlobal asc';
+        break;
+      case 'DateSale':
+        $SelectSortBy = ' order by b.DateFin asc';
+        break;
+      default:
+        $SelectSortBy = '';
+        break;
+    }
+     $sql = 'select a.FormulirCodeGlobal,a.Years,a.Status as StatusGlobalFormulir,
+              b.No_Ref,b.Sales,b.PIC,b.DateFin,b.FullName
+              from db_admission.formulir_number_global as a
+              LEFT JOIN
+              (
+                             select a.No_Ref,c.Name as Sales,b.PIC,b.DateFin,b.FullName
+                             from db_admission.formulir_number_offline_m as a
+                             join db_admission.sale_formulir_offline as b
+                             on a.FormulirCode = b.FormulirCodeOffline
+                             left join db_employees.employees as c
+                             on c.NIP = b.PIC
+                             where a.Years = ?
+              ) as b
+              on a.FormulirCodeGlobal = b.No_Ref
+              where  Month(b.DateFin) = "'.$Month.'" and Year(b.DateFin) = "'.$Year.'"
+               '.$SelectSortBy;
+               //print_r($sql);die();
      $query=$this->db->query($sql, array($SelectSetTa))->result_array();
      return $query;             
    }
