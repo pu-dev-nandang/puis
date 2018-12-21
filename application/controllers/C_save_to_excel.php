@@ -1574,11 +1574,37 @@ class C_save_to_excel extends CI_Controller
         $title2 = 'Per Tanggal '.date('d M Y', strtotime(date('Y-m-d')));
         $SelectSetTa = $Input['SelectSetTa'];
         $SelectSortBy = $Input['SelectSortBy'];
-        $get = $this->m_finance->getSaleFormulirOffline($SelectSetTa,$SelectSortBy);
-        $this->exCel_v_Finance_export_PenjualanFormulirFinance($title1,$title2,$get);
+        switch ($Input['cf']) {
+            case 0: // date range
+                $dateRange1 = $Input['dateRange1'];
+                $dateRange2 = $Input['dateRange2'];
+                $SelectSetTa = $Input['SelectSetTa'];
+                $SelectSortBy = $Input['SelectSortBy'];
+                // $get = $this->m_admission->getSaleFormulirOfflineBetwwen($dateRange1,$dateRange2,$SelectSetTa,$SelectSortBy);
+                $title = 'Search by : Tanggal '.date('d M Y', strtotime($dateRange1)).' - '.date('d M Y', strtotime($dateRange2));
+                // $this->exCel_PenjualanFormulirData($title,$get);
+                // $get = $this->m_finance->getSaleFormulirOffline($SelectSetTa,$SelectSortBy);
+                $get = $this->m_finance->getSaleFormulirOfflineBetwwen_fin($SelectSetTa,$SelectSortBy,$dateRange1,$dateRange2);
+                $this->exCel_v_Finance_export_PenjualanFormulirFinance($title1,$title2,$get,$title);
+                break;
+            case 1: // by Month
+               $SelectMonth = $Input['SelectMonth'];
+               $SelectYear = $Input['SelectYear'];
+               $SelectSetTa = $Input['SelectSetTa'];
+               $SelectSortBy = $Input['SelectSortBy'];
+               // $get = $this->m_admission->getSaleFormulirOfflinePerMonth($SelectMonth,$SelectYear,$SelectSetTa,$SelectSortBy);
+               $title = 'Search by : Bulan '.date('F Y', strtotime($SelectYear.'-'.$SelectMonth.'-01'));
+               // $this->exCel_PenjualanFormulirData($title,$get); 
+               $get = $this->m_finance->getSaleFormulirOfflineMonth_fin($SelectSetTa,$SelectSortBy,$SelectMonth,$SelectYear);
+               $this->exCel_v_Finance_export_PenjualanFormulirFinance($title1,$title2,$get,$title);
+                break;
+            default:
+                # code...
+                break;
+        }
     }
 
-    private function exCel_v_Finance_export_PenjualanFormulirFinance($title1 = '',$title2 = '',$get= array())
+    private function exCel_v_Finance_export_PenjualanFormulirFinance($title1 = '',$title2 = '',$get= array(),$title)
     {
         include APPPATH.'third_party/PHPExcel/PHPExcel.php';
         $objPHPExcel = new PHPExcel;
@@ -1604,6 +1630,7 @@ class C_save_to_excel extends CI_Controller
 
         $excel3->setCellValue('B1', $title1);
         $excel3->setCellValue('B2', $title2);
+        $excel3->setCellValue('B3', $title);
 
         // start dari B6
         $a = 6;

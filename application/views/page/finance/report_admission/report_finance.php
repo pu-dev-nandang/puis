@@ -195,15 +195,35 @@
 	function FuncClickbtnPenjualanFormulirFinance()
 	{
 		$("#btnPenjualanFormulirFinance").click(function(){
-				var url = base_url_js+'finance/export_PenjualanFormulir';
-				data = {
-				  SelectSetTa : $("#SelectSetTa").val(),
-				  SelectSortBy : $("#SelectSortBy").val(),
+				var cf = $(".dateOP:checked").val();
+				if (cf == '' || cf == null) {
+					toastr.error('Mohon pilih Date Range atau By Month','Failed!')
+				} else {
+					var url = base_url_js+'finance/export_PenjualanFormulir';
+					data = {
+					  cf : cf,
+					  dateRange1 : $("#dateRange1").val(),
+					  dateRange2 : $("#dateRange2").val(),
+					  SelectMonth : $("#SelectMonth").val(),
+					  SelectYear : $("#SelectYear").val(),
+					  SelectSetTa : $("#SelectSetTa").val(),
+					  SelectSortBy : $("#SelectSortBy").val(),
+					}
+					var token = jwt_encode(data,"UAP)(*");
+					FormSubmitAuto(url, 'POST', [
+					    { name: 'token', value: token },
+					]);
 				}
-				var token = jwt_encode(data,"UAP)(*");
-				FormSubmitAuto(url, 'POST', [
-				    { name: 'token', value: token },
-				]);
+
+				// var url = base_url_js+'finance/export_PenjualanFormulir';
+				// data = {
+				//   SelectSetTa : $("#SelectSetTa").val(),
+				//   SelectSortBy : $("#SelectSortBy").val(),
+				// }
+				// var token = jwt_encode(data,"UAP)(*");
+				// FormSubmitAuto(url, 'POST', [
+				//     { name: 'token', value: token },
+				// ]);
 			
 		})
 	}

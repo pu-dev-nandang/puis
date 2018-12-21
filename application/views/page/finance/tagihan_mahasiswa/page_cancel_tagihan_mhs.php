@@ -241,8 +241,8 @@
 
                    if(Data_mhs[i]['StatusPayment'] == 0) // menandakan belum approve
                     {
-                      // if (Data_mhs[i]['DetailPayment'].length == 1) { // menandakan bahwa yang di cancel yang bukan memiliki cicilan lebih dari satu
-                      if (Data_mhs[i]['DetailPayment'].length > 0) { // menandakan bahwa yang di cancel yang bukan memiliki cicilan lebih dari satu
+                      // if (Data_mhs[i]['DetailPayment'].length == 1) 
+                      if (Data_mhs[i]['DetailPayment'].length > 0) { 
                         // show bintang
                         var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
                         t_array.push(Data_mhs[i]['Nama']);
@@ -291,7 +291,7 @@
     $(document).on('click','.DetailPayment', function () {
         var NPM = $(this).attr('NPM');
         var html = '';
-        var table = '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+        var table = '<div class = "row"><div class= col-md-12><table class="table table-striped table-bordered table-hover table-checkable tableData">'+
                       '<thead>'+
                           '<tr>'+
                               '<th style="width: 5px;">No</th>'+
@@ -306,9 +306,12 @@
         table += '<tbody>' ;
         var isi = '';
         // console.log(dataaModal);
+        var CancelPayment = [];
         for (var i = 0; i < dataaModal.length; i++) {
           if(dataaModal[i]['NPM'] == NPM)
           {
+            CancelPayment = dataaModal[i]['cancelPay'];
+            var totCancelPayment = CancelPayment.length;
             var DetailPaymentArr = dataaModal[i]['DetailPayment'];
             var Nama = dataaModal[i]['Nama'];
             for (var j = 0; j < DetailPaymentArr.length; j++) {
@@ -329,9 +332,34 @@
         }
 
         table += isi+'</tbody>' ; 
-        table += '</table>' ;
-
+        table += '</table></div></div>' ;
         html += table;
+
+        var htmlReason = '<div class = "row"><div class= col-md-12><h5>List Cancel Payment</h5><table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+                      '<thead>'+
+                          '<tr>'+
+                              '<th style="width: 5px;">No</th>'+
+                              '<th style="width: 55px;">Reason</th>'+
+                              '<th style="width: 55px;">CancelAt</th>'+
+                              '<th style="width: 55px;">CancelBy</th>';
+        htmlReason += '</tr>' ;  
+        htmlReason += '</thead>' ; 
+        htmlReason += '<tbody>' ;
+        for (var i = 0; i < CancelPayment.length; i++) {
+          var No = parseInt(i) + 1;
+          htmlReason += '<tr>'+
+                '<td>'+ (i+1) + '</td>'+
+                '<td>'+ CancelPayment[i]['Reason'] + '</td>'+
+                '<td>'+ CancelPayment[i]['CancelAt'] + '</td>'+
+                '<td>'+ CancelPayment[i]['Name'] + '</td>'+
+              '<tr>'; 
+        }
+
+        htmlReason += '</tbody>' ; 
+        htmlReason += '</table></div></div>' ;
+        if (CancelPayment.length > 0) {
+          html += htmlReason;
+        }
 
         var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
             '';
@@ -390,7 +418,7 @@
             // check status jika 1
             var bool = true;
             var html = '';
-            var table = '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+            var table = '<div class = "row><div class = "col-md-12><table class="table table-striped table-bordered table-hover table-checkable tableData">'+
                           '<thead>'+
                               '<tr>'+
                                   '<th style="width: 5px;">No</th>'+
@@ -424,10 +452,14 @@
             }
 
             table += isi+'</tbody>' ; 
-            table += '</table>' ;
+            table += '</table></div></div>' ;
+
+            var htmlreason = '<div class ="row" style = "margin-top : 10px"><div class = "col-md-12">'+
+                                '<label>Reason</label><textarea class="form-control TextareaReason"></textarea>'+
+                              '</div></div>';  
 
             if (bool) {
-              html += table;
+              html += table+htmlreason;
 
               var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
                   '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>';
@@ -447,11 +479,15 @@
            });
          
            $( "#ModalbtnSaveForm" ).click(function() {
+            var Reason = $(".TextareaReason").val();
+            if (Reason == '') {toastr.info('Reason is required');return}
             loading_button('#ModalbtnSaveForm');
             var url = base_url_js+'finance/cancel_created_tagihan_mhs';
             var data = {
                 arrValueCHK : arrValueCHK,
+                Reason : Reason,
             };
+            console.log(data);
             var token = jwt_encode(data,'UAP)(*');
             $.post(url,{token:token},function (resultJson) {
                // var resultJson = jQuery.parseJSON(resultJson);

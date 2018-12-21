@@ -37,12 +37,13 @@ class C_report extends Finnance_Controler {
         if ($input['ta'] != '' || $input['ta'] != null || $input['NIM'] != '') {
             $total = 1;
         }
+        $StatusMHS = $input['StatusMHS'];
 
         $config = $this->config_pagination_default_ajax($total,1,3);
         $this->pagination->initialize($config);
         $page = $this->uri->segment(3);
         $start = ($page - 1) * $config["per_page"];
-        $data = $this->m_finance->get_report_pembayaran_mhs($input['ta'],$input['prodi'],$input['NIM'],$input['Semester'],$input['Status'],$config["per_page"], $start);
+        $data = $this->m_finance->get_report_pembayaran_mhs2($input['ta'],$input['prodi'],$input['NIM'],$input['Semester'],$input['Status'],$config["per_page"], $start,$StatusMHS);
         $output = array(
         'pagination_link'  => $this->pagination->create_links(),
         'loadtable'   => $data,

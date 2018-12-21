@@ -67,7 +67,7 @@ function LoadPage(Page)
     }); // exit spost
 }
 
-function loadSelectOptionSemesterByload(element,selected,load = "loadData") {
+function loadSelectOptionSemesterByload(element,selected) {
 
     var token = jwt_encode({action:'read'},'UAP)(*');
     var url = base_url_js+'api/__crudTahunAkademik';
@@ -81,11 +81,34 @@ function loadSelectOptionSemesterByload(element,selected,load = "loadData") {
                $(element).append('<option value="'+dt.ID+'.'+dt.Name+'" '+sc+'>'+dt.Name+'</option>');
            }
        }
-       if (load == 'loadData') {
-        loadData(1);
-       }
-       
+       loadSelectOptionStatusStudent('#filterStatus','');
     });
 
 }
+
+function loadSelectOptionStatusStudent(element,selected,load = "loadData") {
+
+    var url = base_url_js+'api/__crudStatusStudents';
+    var data = {
+        action : 'read'
+    };
+
+    var token = jwt_encode(data,'UAP)(*');
+
+    $.post(url,{token:token},function (jsonResult) {
+        if(jsonResult.length>0){
+            for(var s=0;s<jsonResult.length;s++){
+                var d = jsonResult[s];
+                var sc = (selected==d.ID) ? 'selected' : '';
+                $(element).append('<option value="'+d.ID+'" '+sc+'>'+d.Description+'</option>');
+            }
+        }
+
+        if (load == 'loadData') {
+         loadData(1);
+        }
+
+    });
+}
+
 </script>
