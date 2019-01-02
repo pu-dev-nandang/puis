@@ -1598,6 +1598,15 @@ class C_save_to_excel extends CI_Controller
                $get = $this->m_finance->getSaleFormulirOfflineMonth_fin($SelectSetTa,$SelectSortBy,$SelectMonth,$SelectYear);
                $this->exCel_v_Finance_export_PenjualanFormulirFinance($title1,$title2,$get,$title);
                 break;
+            case 2: // All
+               $SelectSetTa = $Input['SelectSetTa'];
+               $SelectSortBy = $Input['SelectSortBy'];
+               // $get = $this->m_admission->getSaleFormulirOfflinePerMonth($SelectMonth,$SelectYear,$SelectSetTa,$SelectSortBy);
+               $title = 'Search by : All ';
+               // $this->exCel_PenjualanFormulirData($title,$get); 
+               $get = $this->m_finance->getSaleFormulirOfflineAll_fin($SelectSetTa,$SelectSortBy);
+               $this->exCel_v_Finance_export_PenjualanFormulirFinance($title1,$title2,$get,$title);
+                break;    
             default:
                 # code...
                 break;
