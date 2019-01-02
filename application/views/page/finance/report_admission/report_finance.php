@@ -42,6 +42,13 @@
 					          				</div>
 					          			</div>
 					          			<div class="row" style="margin-top: 10px">
+					          				<div class="col-xs-4">
+					          					<label class="checkbox-inline">
+					          					     <input type="checkbox" class = "dateOP" name="dateOP" id = "dateOPRange" value = "2"> All
+					          					</label>
+					          				</div>
+					          			</div>
+					          			<div class="row" style="margin-top: 10px">
 					          				<div class="col-xs-4 col-md-offset-4">
 					          					<label>Angkatan</label>
 					          					<select class="select2-select-00 full-width-fix" id="SelectSetTa">

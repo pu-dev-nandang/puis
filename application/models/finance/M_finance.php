@@ -3799,10 +3799,10 @@ class M_finance extends CI_Model {
                              where a.Years = ?
               ) as b
               on a.FormulirCodeGlobal = b.No_Ref
-              where b.DateFin >= "'.$dateRange1.'" and b.DateFin <= "'.$dateRange2.'"
+              where b.DateFin >= "'.$dateRange1.'" and b.DateFin <= "'.$dateRange2.'" and a.Years = ?
                '.$SelectSortBy;
                //print_r($sql);die();
-     $query=$this->db->query($sql, array($SelectSetTa))->result_array();
+     $query=$this->db->query($sql, array($SelectSetTa,$SelectSetTa))->result_array();
      return $query;             
    }
 
@@ -3836,10 +3836,46 @@ class M_finance extends CI_Model {
                              where a.Years = ?
               ) as b
               on a.FormulirCodeGlobal = b.No_Ref
-              where  Month(b.DateFin) = "'.$Month.'" and Year(b.DateFin) = "'.$Year.'"
+              where  Month(b.DateFin) = "'.$Month.'" and Year(b.DateFin) = "'.$Year.'" and a.Years = ?
                '.$SelectSortBy;
                //print_r($sql);die();
-     $query=$this->db->query($sql, array($SelectSetTa))->result_array();
+     $query=$this->db->query($sql, array($SelectSetTa,$SelectSetTa))->result_array();
+     return $query;             
+   }
+
+   public function getSaleFormulirOfflineAll_fin($SelectSetTa,$SelectSortBy)
+   {
+      $SelectSortBy = explode('.', $SelectSortBy);
+      switch ($SelectSortBy[1]) {
+        case 'No_Ref':
+        case 'FormulirCode':
+          $SelectSortBy = ' order by a.FormulirCodeGlobal asc';
+          break;
+        case 'DateSale':
+          $SelectSortBy = ' order by b.DateFin asc';
+          break;
+        default:
+          $SelectSortBy = '';
+          break;
+      }
+     $sql = 'select a.FormulirCodeGlobal,a.Years,a.Status as StatusGlobalFormulir,
+              b.No_Ref,b.Sales,b.PIC,b.DateFin,b.FullName
+              from db_admission.formulir_number_global as a
+              LEFT JOIN
+              (
+                             select a.No_Ref,c.Name as Sales,b.PIC,b.DateFin,b.FullName
+                             from db_admission.formulir_number_offline_m as a
+                             join db_admission.sale_formulir_offline as b
+                             on a.FormulirCode = b.FormulirCodeOffline
+                             left join db_employees.employees as c
+                             on c.NIP = b.PIC
+                             where a.Years = ?
+              ) as b
+              on a.FormulirCodeGlobal = b.No_Ref
+              where a.Years = ?
+               '.$SelectSortBy;
+               //print_r($sql);die();
+     $query=$this->db->query($sql, array($SelectSetTa,$SelectSetTa))->result_array();
      return $query;             
    }
 
