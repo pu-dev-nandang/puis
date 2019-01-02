@@ -1074,6 +1074,8 @@ $route['budgeting/export_excel_budget_remaining'] = 'C_save_to_excel/export_exce
 $route['budgeting/configRule'] = 'page/budgeting/c_budgeting/configRule';
 $route['budgeting/configRule/userroledepart_submit'] = 'page/budgeting/c_budgeting/userroledepart_submit';
 $route['budgeting/page_pr/(:any)'] = 'page/budgeting/c_budgeting/page_pr/$1';
+$route['budgeting/PostBudgetThisMonth_Department'] = 'page/budgeting/c_budgeting/PostBudgetThisMonth_Department';
+$route['budgeting/getPostBudgetDepartement'] = 'page/budgeting/c_budgeting/getPostBudgetDepartement';
 
 
 // Purchasing
@@ -1173,3 +1175,6 @@ $route['testadi2'] = 'c_login/testadi2';
 
 // admin prodi
 $route['loginToAdminProdi'] = 'c_login/loginToAdminProdi';
+
+
+// marketing

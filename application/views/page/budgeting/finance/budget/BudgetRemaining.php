@@ -206,6 +206,7 @@
 						                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Post Budget</th>'
 							;
 		var Thbulan = generateJson['Bulan'];
+		console.log(Thbulan);
 		for (var i = 0; i < Thbulan.length; i++) {
 				TableGenerate += '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">'+Thbulan[i]['MonthName']+'</th>';
 		}
