@@ -1097,6 +1097,41 @@ class M_finance extends CI_Model {
     return $Data_mhs[0]['total'];
    }
 
+   public function count_get_tagihan_mhs2($ta,$prodi,$PTID,$NPM,$Semester)
+   {
+    $this->load->model('master/m_master');
+    $ta1 = explode('.', $ta);
+    $ta = $ta1[1];
+    $db = 'ta_'.$ta.'.students';
+    $db2 = 'ta_'.$ta;
+    $field = 'StatusStudentID';
+    $value = 3;
+    $NPM = ($NPM == "" || $NPM == null) ? '' : ' and a.NPM = "'.$NPM.'"';
+    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+
+    $queryAdd = '';
+    if ($PTID == 3) {
+      $queryAdd = ' and a.NPM in (select NPM from db_finance.payment where PTID = 2 and SemesterID = '.$Semester.' and Status = "1")';
+    }
+    if ($prodi == '') {
+     $sql = 'select count(*) as total from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
+             on a.ProdiID = c.ProdiID
+             where a.StatusStudentID in (3,2,8)  and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
+             and b.Pay_Cond = c.Pay_Cond order by a.NPM asc';
+     $Data_mhs=$this->db->query($sql, array($PTID,$Semester,$ta,$PTID))->result_array();
+    }
+    else
+    {
+      $sql = 'select count(*) as total from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
+              on a.ProdiID = c.ProdiID
+              where a.StatusStudentID in (3,2,8)  and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
+               and b.Pay_Cond = c.Pay_Cond order by a.NPM asc';
+      $Data_mhs=$this->db->query($sql, array($prodi,$PTID,$Semester,$ta,$PTID))->result_array();
+    }
+
+    return $Data_mhs[0]['total'];
+   }
+
    public function get_tagihan_mhs($ta,$prodi,$PTID,$NPM,$limit, $start)
    {
     // error_reporting(0);
@@ -1131,6 +1166,76 @@ class M_finance extends CI_Model {
                and b.Pay_Cond = c.Pay_Cond order by a.NPM asc 
               LIMIT '.$start. ', '.$limit;
       $Data_mhs=$this->db->query($sql, array($prodi,$PTID,$SemesterID[0]['ID'],$ta,$PTID))->result_array();
+    }
+
+    // get Number VA Mahasiswa
+    $Const_VA = $this->m_master->showData_array('db_va.master_va');
+
+    // $SemesterID = $SemesterID[0]['ID'];
+    $Discount = $this->m_master->showData_array('db_finance.discount');
+    for ($i=0; $i < count($Data_mhs); $i++) { 
+      $array = array('SemesterID' => $SemesterID[0]['ID'], 'SemesterName' => $SemesterID[0]['Name']);
+      $Data_mhs[$i] = $Data_mhs[$i] + $array;
+      $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$Data_mhs[$i]['ProdiID']);
+      $array = array('ProdiEng' => $ProdiEng[0]['NameEng']);
+      $Data_mhs[$i] = $Data_mhs[$i] + $array;
+
+      // get IPS Mahasiswa
+        $IPS = $this->getIPSMahasiswa($db2,$Data_mhs[$i]['NPM']);
+        $Data_mhs[$i] = $Data_mhs[$i] + array('IPS' => $IPS);
+
+      // get IPS Mahasiswa
+        $IPK = $this->getIPKMahasiswa($db2,$Data_mhs[$i]['NPM']);
+        $Data_mhs[$i] = $Data_mhs[$i] + array('IPK' => $IPK);
+
+      // get VA Mahasiwa
+        $VA = $Const_VA[0]['Const_VA'].$Data_mhs[$i]['NPM'];
+        $Data_mhs[$i] = $Data_mhs[$i] + array('VA' => $VA);
+
+      // get sks yang diambil
+         $Credit = $this->getSKSMahasiswa($db2,$Data_mhs[$i]['NPM']);
+         $Data_mhs[$i] = $Data_mhs[$i] + array('Credit' => $Credit);
+
+    }
+    $arr['Data_mhs'] = $Data_mhs;
+    $arr['Discount'] = $Discount;
+    return $arr;
+   }
+
+   public function get_tagihan_mhs2($ta,$prodi,$PTID,$NPM,$Semester,$limit, $start)
+   {
+    // error_reporting(0);
+    $arr = array();
+    $this->load->model('master/m_master');
+    $ta1 = explode('.', $ta);
+    $ta = $ta1[1];
+    $db = 'ta_'.$ta.'.students';
+    $db2 = 'ta_'.$ta;
+    $field = 'StatusStudentID';
+    $value = 3;
+    $NPM = ($NPM == "" || $NPM == null) ? '' : ' and a.NPM = "'.$NPM.'"';
+    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','ID',$Semester);
+
+    $queryAdd = '';
+    if ($PTID == 3) {
+      $queryAdd = ' and a.NPM in (select NPM from db_finance.payment where PTID = 2 and SemesterID = '.$Semester.' and Status = "1")';
+    }
+    if ($prodi == '') {
+     $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit,c.Cost from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
+             on a.ProdiID = c.ProdiID
+             where a.StatusStudentID in (3,2,8)  and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
+             and b.Pay_Cond = c.Pay_Cond order by a.NPM asc
+             LIMIT '.$start. ', '.$limit;
+     $Data_mhs=$this->db->query($sql, array($PTID,$Semester,$ta,$PTID))->result_array();
+    }
+    else
+    {
+      $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit,c.Cost from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
+              on a.ProdiID = c.ProdiID
+              where a.StatusStudentID in (3,2,8)  and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
+               and b.Pay_Cond = c.Pay_Cond order by a.NPM asc 
+              LIMIT '.$start. ', '.$limit;
+      $Data_mhs=$this->db->query($sql, array($prodi,$PTID,$Semester,$ta,$PTID))->result_array();
     }
 
     // get Number VA Mahasiswa
@@ -1288,15 +1393,18 @@ class M_finance extends CI_Model {
       $this->db->insert('db_finance.payment_students', $dataSave);
    }
 
-   public function count_get_created_tagihan_mhs_not_approved($ta,$prodi,$PTID,$NIM)
+   public function count_get_created_tagihan_mhs_not_approved($ta,$prodi,$PTID,$NIM,$Semester)
    {
     $arr = array();
     $this->load->model('master/m_master');
 
     // join dengan table auth terlebih dahulu
+    $ProdiSplit = explode('.', $prodi);
+    $ProdiSplit = $ProdiSplit[0];
     $PTID = ($PTID == '' || $PTID == Null) ? '' : ' and a.PTID = '.$PTID;
+    $ProdiID = ($ProdiSplit == '' || $ProdiSplit == Null) ? '' : ' and b.ProdiID = '.$ProdiSplit;
     $NIM = ($NIM == '' || $NIM == Null) ? 'where a.NPM like "%"' : ' where  a.NPM = '.$NIM;
-    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','ID',$Semester);
     $SemesterID = $SemesterID[0]['ID'];
     if ($ta == '') {
       $ta1 = $ta;
@@ -1308,15 +1416,16 @@ class M_finance extends CI_Model {
     }
 
     $policyStatus = 'and a.Status = "0"';
-    if ($this->session->userdata('finance_auth_Policy_SYS') ==  0) {
-      $policyStatus = '';
-    }
+    // if ($this->session->userdata('finance_auth_Policy_SYS') ==  0) {
+    //   $policyStatus = '';
+    // }
 
     if ($ta1 == '') {
       $sql = 'select count(*) as total 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and c.ID = ? '.$policyStatus;
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$ProdiID.' and c.ID = ? '.$policyStatus;
+              // print_r($sql);die();
       $query=$this->db->query($sql, array($SemesterID))->result_array();
 
     }
@@ -1325,23 +1434,27 @@ class M_finance extends CI_Model {
       $sql = 'select count(*) as total 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? and c.ID = ? '.$policyStatus;
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$ProdiID.' and b.Year = ? and c.ID = ? '.$policyStatus;
       $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
     }
+    // print_r($query);die();
     return $query[0]['total'];
 
    }
 
-   public function get_created_tagihan_mhs_not_approved($ta,$prodi,$PTID,$NIM,$limit, $start)
+   public function get_created_tagihan_mhs_not_approved($ta,$prodi,$PTID,$NIM,$Semester,$limit, $start)
    {
     // error_reporting(0);
     $arr = array();
     $this->load->model('master/m_master');
 
     // join dengan table auth terlebih dahulu
+    $ProdiSplit = explode('.', $prodi);
+    $ProdiSplit = $ProdiSplit[0];
     $PTID = ($PTID == '' || $PTID == Null) ? '' : ' and a.PTID = '.$PTID;
     $NIM = ($NIM == '' || $NIM == Null) ? 'where a.NPM like "%"' : ' where  a.NPM = '.$NIM;
-    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+    $ProdiID = ($ProdiSplit == '' || $ProdiSplit == Null) ? '' : ' and b.ProdiID = '.$ProdiSplit;
+    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','ID',$Semester);
     $SemesterID = $SemesterID[0]['ID'];
     if ($ta == '') {
       $ta1 = $ta;
@@ -1358,7 +1471,7 @@ class M_finance extends CI_Model {
       $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and c.ID = ? '.$Status.' order by a.Status asc LIMIT '.$start. ', '.$limit;
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$ProdiID.' and c.ID = ? '.$Status.' order by a.Status asc LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array($SemesterID))->result_array();
 
     }
@@ -1367,7 +1480,7 @@ class M_finance extends CI_Model {
       $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.' and b.Year = ? and c.ID = ? '.$Status.' order by a.Status asc LIMIT '.$start. ', '.$limit;
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$ProdiID.' and b.Year = ? and c.ID = ? '.$Status.' order by a.Status asc LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
     }
 
@@ -1464,7 +1577,7 @@ class M_finance extends CI_Model {
     return $query;
    }
 
-   public function count_get_created_tagihan_mhs($ta,$prodi,$PTID,$NIM)
+   public function count_get_created_tagihan_mhs($ta,$prodi,$PTID,$NIM,$Semester)
    {
     $arr = array();
     $this->load->model('master/m_master');
@@ -1475,7 +1588,7 @@ class M_finance extends CI_Model {
     $prodiex = $prodiex[0];
     $prodiex = ($prodi == '' || $prodi == Null) ? '' : ' and b.ProdiID = '.$prodiex;
     $NIM = ($NIM == '' || $NIM == Null) ? 'where a.NPM like "%"' : ' where  a.NPM = '.$NIM;
-    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','ID',$Semester);
     $SemesterID = $SemesterID[0]['ID'];
     if ($ta == '') {
       $ta1 = $ta;
@@ -1506,7 +1619,7 @@ class M_finance extends CI_Model {
 
    }
 
-   public function get_created_tagihan_mhs($ta,$prodi,$PTID,$NIM,$limit, $start)
+   public function get_created_tagihan_mhs($ta,$prodi,$PTID,$NIM,$Semester,$limit, $start)
    {
     // error_reporting(0);
     $arr = array();
@@ -1518,7 +1631,7 @@ class M_finance extends CI_Model {
     $prodiex = $prodiex[0];
     $prodiex = ($prodi == '' || $prodi == Null) ? '' : ' and b.ProdiID = '.$prodiex;
     $NIM = ($NIM == '' || $NIM == Null) ? 'where a.NPM like "%"' : ' where  a.NPM = '.$NIM;
-    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','ID',$Semester);
     $SemesterID = $SemesterID[0]['ID'];
     if ($ta == '') {
       $ta1 = $ta;
@@ -1533,8 +1646,8 @@ class M_finance extends CI_Model {
       $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' group by a.PTID,a.SemesterID,a.NPM order by c.ID desc,a.Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
-      $query=$this->db->query($sql, array())->result_array();
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and c.ID = ? group by a.PTID,a.SemesterID,a.NPM order by c.ID desc,a.Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
+      $query=$this->db->query($sql, array($SemesterID))->result_array();
 
     }
     else
@@ -1542,8 +1655,8 @@ class M_finance extends CI_Model {
       $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and b.Year = ? group by a.PTID,a.SemesterID,a.NPM order by a.Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
-      $query=$this->db->query($sql, array($ta1))->result_array();
+              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and b.Year = ? and c.ID = ? group by a.PTID,a.SemesterID,a.NPM order by a.Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
+      $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
     }
     // print_r($sql);die();
     // get Number VA Mahasiswa
