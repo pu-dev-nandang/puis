@@ -1443,6 +1443,7 @@ class C_admission extends Admission_Controler {
                 'Status' => '-1',
                 'Name' => $Name,
                 'ProdiID' => $ProdiID,
+                'ProgramID' => 1,
             );
 
             $arr_insert_auth[] = $temp2;
@@ -1466,17 +1467,24 @@ class C_admission extends Admission_Controler {
             for ($z=0; $z < count($getDoc); $z++) {
               if ($getDoc[$z]['Attachment'] != '' || !empty($getDoc[$z]['Attachment'])) {
                 $explode = explode(',', $getDoc[$z]['Attachment']);
-                if (count($explode) > 0) {
-                  for ($ee=0; $ee < count($explode); $ee++) { 
-                    copy($this->path_upload_regOnline.$Email.'/'.$explode[$ee], './uploads/document/'.$NPM.'/'.$explode[$ee]);
+                // if ($getDoc[$z]['Status'] == 'Done') {
+                  if (count($explode) > 0) {
+                    for ($ee=0; $ee < count($explode); $ee++) { 
+                      copy($this->path_upload_regOnline.$Email.'/'.$explode[$ee], './uploads/document/'.$NPM.'/'.$explode[$ee]);
+                      unlink($this->path_upload_regOnline.$Email.'/'.$explode[$ee]);
+                    }
                   }
-                }
-                else
-                {
-                  copy($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'], './uploads/document/'.$NPM.'/'.$getDoc[$z]['Attachment']);
-                }
-
-                 // copy($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'], './uploads/document/'.$NPM.'/'.$getDoc[$z]['Attachment']);
+                  else
+                  {
+                    copy($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'], './uploads/document/'.$NPM.'/'.$getDoc[$z]['Attachment']);
+                    unlink($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment']);
+                  }
+                  
+                  // if (file_exists($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'])) {
+                  //     unlink($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment']);
+                  // }
+                // }
+                
               } 
 
               $dataSave = array(  
