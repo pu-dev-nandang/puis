@@ -39,6 +39,12 @@
                                 <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM" value="">
                             </div>
                         </div>
+                        <div class="col-md-3" style="margin-top: 10px">
+                          <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                              <select class="form-control" id="selectSemester">
+                              </select>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -86,10 +92,48 @@
         loadSelectOptionCurriculum2('#selectCurriculum','');
         loadSelectOptionBaseProdi('#selectProdi','');
         loadSelectOptionPaymentTypeAll('#selectPTID','');
+        loadSelectOptionSemester('#selectSemester',1);
         // $("#btn-submit").addClass('hide');
+
+        function loadSelectOptionSemester(element,selected) {
+
+            var token = jwt_encode({action:'read'},'UAP)(*');
+            var url = base_url_js+'api/__crudTahunAkademik';
+            $.post(url,{token:token},function (jsonResult) {
+              console.log(jsonResult);
+               if(jsonResult.length>0){
+                    for (var i = 0; i < jsonResult.length; i++) {
+                      var dt = jsonResult[i];
+                      var sc = (selected==dt.Status) ? 'selected' : '';
+                      if (dt.Status == 1) {
+                        act = dt.ID;
+                        $(element).append('<option value="'+dt.ID+'.'+dt.Name+'" '+sc+'>'+dt.Name+'</option>');
+                        break;
+                      }
+                      else
+                      {
+                        $(element).append('<option value="'+dt.ID+'.'+dt.Name+'" '+sc+'>'+dt.Name+'</option>');
+                      }
+                    }
+
+                   // for(var i=0;i<jsonResult.length;i++){
+                   //     var dt = jsonResult[i];
+                   //     var sc = (selected==dt.Status) ? 'selected' : '';
+                   //     // var v = (option=="Name") ? dt.Name : dt.ID;
+                   //     $(element).append('<option value="'+dt.ID+'.'+dt.Name+'" '+sc+'>'+dt.Name+'</option>');
+                   // }
+               }
+               
+            });
+
+        }
     });
 
     $('#selectCurriculum').change(function () {
+        loadData(1);
+    });
+
+    $('#selectSemester').change(function () {
         loadData(1);
     });
 
@@ -130,7 +174,11 @@
         var prodi = $('#selectProdi').val();
         var PTID = $('#selectPTID').val();
         var NPM = $('#NIM').val();
-        if(ta!='' && ta!=null && PTID !='' && PTID != null){
+        var Semester = $('#selectSemester').val();
+        Semester = Semester.split('.');
+        Semester = Semester[0];
+
+         if(ta!='' && ta!=null && PTID !='' && PTID != null){
             // cek tanggal deadline sudah melewati atau belum
             var fieldCek = (PTID == 2) ? 'bayarBPPEnd' : 'bayarEnd';
             var url1 = base_url_js+'api/__cek_deadlineBPPSKS';
@@ -161,7 +209,8 @@
                     ta : ta,
                     prodi : prodi,
                     PTID  : PTID,
-                    NPM : NPM
+                    NPM : NPM,
+                    Semester : Semester
                 };
                 var token = jwt_encode(data,'UAP)(*');
                 $.post(url,{token:token},function (resultJson) {
@@ -233,7 +282,8 @@
                         
                        $('#dataRow').append('<tr>' +
                            '<td>'+inputCHK+'</td>' +
-                           '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
+                           // '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
+                           '<td>'+Data_mhs[i]['ProdiEng']+'</td>' +
                            // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
                            '<td>'+bintang+Data_mhs[i]['Name']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
                            // '<td>'+Data_mhs[i]['NPM']+'</td>' +
