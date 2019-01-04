@@ -199,6 +199,7 @@
     }
 
     $('#btnAddNewCourse').click(function () {
+
         var formScheduleID = $('#formScheduleID').val();
         var formBaseProdi = $('#formBaseProdi').val();
         var formMataKuliah = $('#formMataKuliah').val();
@@ -241,6 +242,15 @@
                     if(jsonResult.Status==0 || jsonResult.Status=='0'){
                         toastr.warning('This course exist in schedule','Warning');
                     } else {
+                        var formClassGroup = $('#formClassGroup').val();
+                        var arrToken = {
+                            Subject : 'Updating Timetable - Add Course | Group : '+formClassGroup,
+                            URL : 'academic/timetables/list',
+                            From : sessionName,
+                            Icon : sessionUrlPhoto
+                        };
+                        var dataToken = jwt_encode(arrToken,'UAP)(*');
+                        addNotification(dataToken,null);
                         loadEditCourse();
                         toastr.success('Data saved','Success');
                     }
@@ -280,6 +290,15 @@
                     if(jsonResult.Status==0 || jsonResult.Status=='0'){
                         toastr.warning('This course exist in schedule','Warning');
                     } else {
+                        var formClassGroup = $('#formClassGroup').val();
+                        var arrToken = {
+                            Subject : 'Updating Timetable - Add Course | Group : '+formClassGroup,
+                            URL : 'academic/timetables/list',
+                            From : sessionName,
+                            Icon : sessionUrlPhoto
+                        };
+                        var dataToken = jwt_encode(arrToken,'UAP)(*');
+                        addNotification(dataToken,null);
                         loadEditCourse();
                         toastr.success('Data saved','Success');
                     }
@@ -342,6 +361,17 @@
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'api/__crudSchedule';
             $.post(url,{token:token},function (result) {
+
+                var formClassGroup = $('#formClassGroup').val();
+                var arrToken = {
+                    Subject : 'Updating Timetable - Deleting Course | Group : '+formClassGroup,
+                    URL : 'academic/timetables/list',
+                    From : sessionName,
+                    Icon : sessionUrlPhoto
+                };
+                var dataToken = jwt_encode(arrToken,'UAP)(*');
+                addNotification(dataToken,null);
+
                 loadEditCourse();
                 setTimeout(function () {
                     $('#NotificationModal').modal('hide');
@@ -501,6 +531,16 @@
                         toastr.warning('Class Group is exist','Warning');
                         $('#formClassGroup').css('border','1px solid red');
                     } else {
+
+                        var arrToken = {
+                            Subject : 'Updating Timetable - Info Class | Group : '+formClassGroup,
+                            URL : 'academic/timetables/list',
+                            From : sessionName,
+                            Icon : sessionUrlPhoto
+                        };
+                        var dataToken = jwt_encode(arrToken,'UAP)(*');
+                        addNotification(dataToken,null);
+
                         toastr.success('Update data saved','Success');
                     }
                     $('#btnSaveEditInfo').prop('disabled',false).html('Save');

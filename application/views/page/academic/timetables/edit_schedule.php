@@ -32,6 +32,7 @@
             <input id="formSDID" class="hide" readonly/>
             <input id="dataMaxCredit" class="hide" readonly/>
             <input id="dataUseCredit" class="hide" readonly/>
+            <input id="viewClassGroup" class="hide" readonly/>
             <div class="form-group">
                 <label>Room</label>
                 <select class="form-control fm_cekbentrok" id="formClassroom" style="max-width: 350px;">
@@ -171,6 +172,7 @@
             var dataUseCredit = 0;
             if(subSesi.length>0){
                 $('#rwDataSch').empty();
+                $('#viewClassGroup').val(subSesi[0].ClassGroup);
                 for(var i=0;i<subSesi.length;i++){
                     var d = subSesi[i];
 
@@ -314,6 +316,17 @@
                 var url = base_url_js+'api/__crudSchedule';
 
                 $.post(url,{token:token},function (jsonResult) {
+
+                    var viewClassGroup = $('#viewClassGroup').val();
+                    var arrToken = {
+                        Subject : 'Updating Schedule In Timetable | Group : '+viewClassGroup,
+                        URL : 'academic/timetables/list',
+                        From : sessionName,
+                        Icon : sessionUrlPhoto
+                    };
+                    var dataToken = jwt_encode(arrToken,'UAP)(*');
+                    addNotification(dataToken,null);
+
                     toastr.success('Data saved','Success');
                     setTimeout(function () {
                         $('#btnAddSchedule').html('Save');
@@ -527,6 +540,16 @@
         var url = base_url_js+'api/__crudSchedule';
 
         $.post(url,{token:token},function (result) {
+            var viewClassGroup = $('#viewClassGroup').val();
+            var arrToken = {
+                Subject : 'Deleting Schedule In Timetable | Group : '+viewClassGroup,
+                URL : 'academic/timetables/list',
+                From : sessionName,
+                Icon : sessionUrlPhoto
+            };
+            var dataToken = jwt_encode(arrToken,'UAP)(*');
+            addNotification(dataToken,null);
+
             loadDataScheduleDetails();
             setTimeout(function () {
                 $('#NotificationModal').modal('hide');

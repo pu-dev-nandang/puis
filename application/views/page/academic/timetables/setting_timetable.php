@@ -1179,6 +1179,18 @@
             $.post(url,{token:token},function (result) {
                 resetFormSetSchedule();
                 toastr.success('Schedule Saved','Success!!');
+
+                var arrToken = {
+                    Subject : 'Adding Timetable | Group : '+ClassGroup,
+                    URL : 'academic/timetables/list',
+                    From : sessionName,
+                    Icon : sessionUrlPhoto
+                };
+
+                var dataToken = jwt_encode(arrToken,'UAP)(*');
+
+                addNotification(dataToken,null);
+
                 setTimeout(function () {
                     $('#btnSavejadwal').html('Save');
                     $('#btnSavejadwal,#removeNewSesi,#addNewSesi').prop('disabled',false);

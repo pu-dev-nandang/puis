@@ -853,6 +853,9 @@ $route['api/__crudInvigilator'] = 'api/c_api/crudInvigilator';
 
 $route['api/__crudConfigSKPI'] = 'api/c_api/crudConfigSKPI';
 
+// Crud Notification
+$route['api/__crudNotification'] = 'api/c_api/crudNotification';
+
 
 $route['__resetPasswordUser'] = 'c_login/resetPasswordUser';
 // for inject //

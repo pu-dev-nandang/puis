@@ -71,6 +71,7 @@
     $(document).on('click','.btnTimetablesEditDelete',function () {
 
         var ScheduleID = $(this).attr('data-id');
+        var ClassGroup = $(this).attr('data-group');
         var SemesterID = $('#filterSemester').val();
 
         if(ScheduleID!='' && ScheduleID!=null &&
@@ -102,7 +103,7 @@
                     '</table></div>' +
                     '</div>' +
                     '<div style="text-align: center;"><div style="background:lightyellow;padding:10px;border:1px solid red;margin-bottom:15px;"><span style="color:red;">*) If you delete this data, then the data student in the study planning will be deleted too</span></div> ' +
-                    '<button type="button" class="btn btn-danger" id="btnActDeleteTimeTables" data-id="'+ScheduleID+'" style="margin-right: 5px;">Yes</button>' +
+                    '<button type="button" class="btn btn-danger" id="btnActDeleteTimeTables" data-group="'+ClassGroup+'" data-id="'+ScheduleID+'" style="margin-right: 5px;">Yes</button>' +
                     '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
                     '</div>');
 
@@ -120,6 +121,7 @@
     $(document).on('click','#btnActDeleteTimeTables',function () {
 
         var ScheduleID = $(this).attr('data-id');
+        var ClassGroup = $(this).attr('data-group');
         var SemesterID = $('#filterSemester').val();
 
         if(ScheduleID!='' && ScheduleID!=null &&
@@ -138,6 +140,16 @@
             var url = base_url_js+'api/__crudSchedule';
             $.post(url,{token:token},function (jsonResult) {
                 loadTimetables();
+
+                var arrToken = {
+                    Subject : 'Deleting Timetable | Group : '+ClassGroup,
+                    URL : 'academic/timetables/list',
+                    From : sessionName,
+                    Icon : sessionUrlPhoto
+                };
+                var dataToken = jwt_encode(arrToken,'UAP)(*');
+                addNotification(dataToken,null);
+
                 setTimeout(function () {
                     $('#NotificationModal').modal('hide');
                 },500);

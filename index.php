@@ -56,34 +56,6 @@
 	// define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
 	$ServerName = $_SERVER['SERVER_NAME'];
 	switch ($ServerName) {
-		case 'localhost':
-		    $port_user = ($_SERVER['SERVER_PORT']!='80') ? ':'.$_SERVER['SERVER_PORT'] : '';
-		    $folder_user = ($_SERVER['SERVER_PORT']!='80') ? 'siak3' : 'puis';
-		    $portal_user = ($_SERVER['SERVER_PORT']!='80') ? 'login3' : 'portal';
-	        define("port",$port_user, true);
-
-	        // Local Nandang
-	        define("url_registration","http://localhost/registeronline/", true);
-	        define("serverRoot","http://localhost".port."/".$folder_user, true);
-	        define("url_pas","http://localhost".port."/".$folder_user."/", true);
-	        define("url_img_employees",url_pas."uploads/employees/", true);
-	        define("url_img_students",url_pas."uploads/employees/", true);
-
-	        define("url_pcam",url_pas."dashboard", true);
-
-	        define("url_sign_out","http://localhost".port."/".$portal_user."/", true);
-
-	        // Auth From PCAM
-	        define("url_sign_in_lecturers","http://localhost".port."/lecturer/", true);
-	        define("url_sign_in_students","http://localhost".port."/students/", true);
-
-	        define("url_lecturers",url_sign_in_lecturers."home", true);
-	        define("url_students",url_sign_in_students."home", true);
-
-	        define("path_register_online","c:/xampp/htdocs/registeronline/", true);
-	        define('ENVIRONMENT', 'development',true);
-
-			break;
 		case 'pcam.podomorouniversity.ac.id':
 		    define("url_registration","http://admission.podomorouniversity.ac.id/", true);
             define("serverRoot","http://pcam.podomorouniversity.ac.id", true);
@@ -121,7 +93,31 @@
             define('ENVIRONMENT', 'development',true);
 			break;		
 		default:
-			# code...
+            $port_user = ($_SERVER['SERVER_PORT']!='80') ? ':'.$_SERVER['SERVER_PORT'] : '';
+            $folder_user = ($_SERVER['SERVER_PORT']!='80') ? 'siak3' : 'puis';
+            $portal_user = ($_SERVER['SERVER_PORT']!='80') ? 'login3' : 'portal';
+            define("port",$port_user, true);
+
+            // Local Nandang
+            define("url_registration","http://localhost/registeronline/", true);
+            define("serverRoot","http://localhost".port."/".$folder_user, true);
+            define("url_pas","http://localhost".port."/".$folder_user."/", true);
+            define("url_img_employees",url_pas."uploads/employees/", true);
+            define("url_img_students",url_pas."uploads/students/", true);
+
+            define("url_pcam",url_pas."dashboard", true);
+
+            define("url_sign_out","http://localhost".port."/".$portal_user."/", true);
+
+            // Auth From PCAM
+            define("url_sign_in_lecturers","http://localhost".port."/lecturer/", true);
+            define("url_sign_in_students","http://localhost".port."/students/", true);
+
+            define("url_lecturers",url_sign_in_lecturers."home", true);
+            define("url_students",url_sign_in_students."home", true);
+
+            define("path_register_online","c:/xampp/htdocs/registeronline/", true);
+            define('ENVIRONMENT', 'development',true);
 			break;
 	}
 
