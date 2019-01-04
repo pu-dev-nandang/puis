@@ -1207,7 +1207,7 @@ class C_api extends CI_Controller {
 
 
 
-                return print_r(1);
+                return print_r($insert_id);
 
 
             }
@@ -1688,7 +1688,7 @@ class C_api extends CI_Controller {
 
                 $dataSchedule = $this->db->query('SELECT sd.ClassroomID, sd.Credit, sd.DayID, sd.EndSessions,  
                                                               sd.StartSessions, sd.TimePerCredit, sd.ID AS SDID, cl.Room,
-                                                              d.NameEng AS DayEng
+                                                              d.NameEng AS DayEng, s.ClassGroup
                                                               FROM db_academic.schedule_details sd
                                                               LEFT JOIN db_academic.schedule s ON (s.ID = sd.ScheduleID)
                                                               LEFT JOIN db_academic.days d ON (d.ID=sd.DayID)
@@ -4058,11 +4058,8 @@ class C_api extends CI_Controller {
         // $generate = json_encode($generate);
 
         $output = array(
-
             'count'  => $generateCount,
-
             'data'   => $generate,
-
         );
 
         echo json_encode($output);
@@ -6263,7 +6260,7 @@ class C_api extends CI_Controller {
                         <li><a href="'.base_url('academic/timetables/list/edit-schedule/'.$data_arr['SemesterID'].'/'.$row['ID'].'/'.str_replace(" ","-",$row['MKNameEng'])).'">Edit Schedule</a></li>
                         
                         <li role="separator" class="divider"></li>
-                        <li><a href="javascript:void(0);" class="btnTimetablesEditDelete" data-id="'.$row['ID'].'">Delete</a></li>
+                        <li><a href="javascript:void(0);" class="btnTimetablesEditDelete" data-group="'.$row['ClassGroup'].'" data-id="'.$row['ID'].'">Delete</a></li>
                       </ul>
                     </div>';
 
@@ -6859,6 +6856,51 @@ class C_api extends CI_Controller {
             "data"            => $data
         );
         echo json_encode($json_data);
+
+    }
+
+    public function crudNotification(){
+
+        $data_arr = $this->getInputToken();
+
+        if($data_arr['action']=='addNewNotification'){
+            // Get Personal
+            $IDDivision = $this->session->userdata('IDdepartementNavigation');
+            $dataUser = $this->db->select('NIP')->get_where('db_employees.rule_users',array('IDDivision' => $IDDivision))->result_array();
+
+            if(count($dataUser)>0){
+
+                $dataInsert = (array) $data_arr['dataInsert'];
+
+                $this->db->insert('db_notifikasi.notification',$dataInsert);
+                $insert_id = $this->db->insert_id();
+
+                // Add in n personal
+                for($i=0;$i<count($dataUser);$i++){
+                    $insert_n_personal = array(
+                        'ID_notification' => $insert_id,
+                        'Div' => $IDDivision,
+                        'People' => $dataUser[$i]['NIP']
+                    );
+                    $this->db->insert('db_notifikasi.n_personal',$insert_n_personal);
+                }
+
+            }
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='hideNotifBrowser'){
+
+            $this->db->set('ShowNotif', '1');
+            $this->db->where('ID', $data_arr['IDUser']);
+            $this->db->update('db_notifikasi.n_personal');
+
+            return print_r(1);
+        }
+
+
+
 
     }
 

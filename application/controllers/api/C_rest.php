@@ -339,12 +339,15 @@ class C_rest extends CI_Controller {
                 $insert_id = $this->db->insert_id();
 
                 // Insert Lecturer
-                $this->db->insert('db_academic.counseling_user', array(
-                    'TopicID' => $insert_id,
-                    'UserID' => $dataTopic['CreateBy'],
-                    'ReadComment' => 0,
-                    'Status' => '1'
-                ));
+                if($dataTopic['InviteTo']!=4 || $dataTopic['InviteTo']!='4'){
+                    $this->db->insert('db_academic.counseling_user', array(
+                        'TopicID' => $insert_id,
+                        'UserID' => $dataTopic['CreateBy'],
+                        'ReadComment' => 0,
+                        'Status' => '1'
+                    ));
+                }
+
 
                 // Cek Invite To
                 if($dataTopic['InviteTo']==1 || $dataTopic['InviteTo']=='1'){
@@ -374,7 +377,7 @@ class C_rest extends CI_Controller {
                         }
                     }
                 }
-                else {
+                else if($dataTopic['InviteTo']==3 || $dataTopic['InviteTo']=='3') {
                     $dataStdMentor = $this->db->select('NPM')->get_where('db_academic.mentor_academic'
                         ,array('NIP' => $dataTopic['CreateBy']))->result_array();
 
@@ -391,8 +394,35 @@ class C_rest extends CI_Controller {
                         }
                     }
                 }
+                else if($dataTopic['InviteTo']==4 || $dataTopic['InviteTo']=='4'){
+
+//                    print_r($dataToken['dataUsers']);
+//                    print_r(count($dataToken['dataUsers']));
+//
+//                    exit;
+
+                    $dataUsers = $dataToken['dataUsers'];
+
+                    if(count($dataUsers)){
+                        for($u=0;$u<count($dataUsers);$u++){
+
+                            $dataIns = array(
+                                'TopicID' => $insert_id,
+                                'UserID' => $dataUsers[$u],
+                                'ReadComment' => 0,
+                                'Status' => ($u==0) ? '1' : '2'
+                            );
+
+                            $this->db->insert('db_academic.counseling_user',$dataIns);
+                        }
+                    }
+
+                }
+
+
                 return print_r(1);
             }
+
             else if($dataToken['action']=='readTopic'){
 
                 $requestData= $_REQUEST;
@@ -406,13 +436,15 @@ class C_rest extends CI_Controller {
                     $dataSearch = ' AND ( ct.Topic LIKE "%'.$search.'%" )';
                 }
 
-                $queryDefault = 'SELECT cu.ReadComment, ct.*, em.Name AS Owner 
+                $queryDefault = 'SELECT cu.ReadComment, ct.* 
                                               FROM db_academic.counseling_user cu
                                               LEFT JOIN db_academic.counseling_topic ct
-                                              LEFT JOIN db_employees.employees em ON (em.NIP = ct.CreateBy)
+                                              
                                               ON (ct.ID = cu.TopicID)
                                               WHERE ( cu.UserID = "'.$UserID.'" ) '.$dataSearch.'
                                                ORDER BY cu.TopicID DESC';
+
+//    , em.Name AS Owner           LEFT JOIN db_employees.employees em ON (em.NIP = ct.CreateBy)
 
                 $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
@@ -457,9 +489,16 @@ class C_rest extends CI_Controller {
 
                     $urlDetail = ($user=='lecturer') ? url_sign_in_lecturers : url_sign_in_students;
 
+                    // Get Owner
+                    if($row['InviteTo']=='4'){
+                        $dataOwner = $this->db->select('Name')->get_where('db_academic.auth_students',array('NPM' => $row['CreateBy']))->result_array()[0];
+                    } else {
+                        $dataOwner = $this->db->select('Name')->get_where()->result_array('db_employees.employees',array('NIP' => $row['CreateBy']))[0];
+                    }
+
                     $topic = '<a href="'.$urlDetail.'counseling/detail-topic/'.$token.'">'.$row['Topic'].'</a>
                               <br/>
-                              <span style="font-size: 12px;color: #9e9e9e;">Owner : '.$row['Owner'].'</span>
+                              <span style="font-size: 12px;color: #9e9e9e;">Owner : '.$dataOwner['Name'].'</span>
                               <br/>
                               <span style="font-size: 12px;color: #9e9e9e;">'.date('D, d M Y',strtotime($row['CreateAt'])).'</span>'.$unread.'
                               ';
@@ -471,8 +510,8 @@ class C_rest extends CI_Controller {
                     $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
                     $nestedData[] = '<div  style="text-align:left;">'.$topic.'</div>';
                     $nestedData[] = '<div  style="text-align:left;">
-                                            <span style="font-size: 12px;">Lecturer : <a href="javascript:void(0);" data-id="'.$row['ID'].'" class="a-user btnShowLecturer">'.count($dataTotalLecturer).'</a></span>
-                                            <br/><span style="font-size: 12px;">Students : <a href="javascript:void(0);" data-id="'.$row['ID'].'" class="a-user btnShowStudent">'.count($dataTotalUser).'</a></span>
+                                            <span style="font-size: 12px;">Lecturer : <a href="javascript:void(0);" data-id="'.$row['ID'].'" class="a-user btnShowLecturerInDiscussionBoard">'.count($dataTotalLecturer).'</a></span>
+                                            <br/><span style="font-size: 12px;">Students : <a href="javascript:void(0);" data-id="'.$row['ID'].'" class="a-user btnShowStudentInDiscussionBoard">'.count($dataTotalUser).'</a></span>
                                             <textarea id="showLecturer'.$row['ID'].'" class="hide" readonly>'.$tokenLecturer.'</textarea>
                                             <textarea id="showStudent'.$row['ID'].'" class="hide" readonly>'.$tokenStudent.'</textarea>
                                             <input id="owner'.$row['ID'].'" class="hide" value="'.$row['CreateBy'].'" readonly/>

@@ -6,12 +6,32 @@
 
     .notificationdivisi
     {
-        height: 500px;
+        min-height: 10px;
+        max-height: 400px;
         overflow-y: auto;
     }
 
+
+
     #tableSimpleSearch tr th,#tableSimpleSearch tr td {
         text-align: center;
+    }
+
+    .dropdown-menu.extended li .photo img.img-fitter-notif {
+        height: 47px;
+        width: 40px;
+        margin-right: 10px;
+    }
+
+    .dropdown-menu.extended li a:hover {
+        background: #eaeaea;
+        color: #333333;
+    }
+    .dropdown-menu.extended li a:hover .time {
+        color: #adadad;
+    }
+    .dropdown-menu.extended li a:hover .task .percent {
+        color: #333333;
     }
 
 </style>
@@ -143,8 +163,8 @@
             <li class="dropdown user">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding-top: 8px;padding-bottom: 5px;">
                     <?php $imgProfile = (file_exists('./uploads/employees/'.$this->session->userdata('Photo')))
-                        ? url_pas.'uploads/employees/'.$this->session->userdata('Photo') :
-                        url_pas.'images/icon/no_image.png'; ?>
+                        ? url_pas.'uploads/employees/'.$this->session->userdata('Photo')
+                        : url_pas.'images/icon/no_image.png'; ?>
                     <img data-src="<?php echo $imgProfile; ?>"
                          class="img-circle img-fitter" width="35" height="35" style="max-width: 35px;border: 3px solid #0f1f4b;"/>
                     <span class="username"><?php echo $name; ?></span>
@@ -398,6 +418,66 @@
 
     });
 
+    function notifyMe(IDUser,title,body,icon) {
+        var options = {
+            body: body,
+            icon: icon,
+            dir : "rtl"
+        };
+
+        // requireInteraction : true
+
+        // Let's check if the browser supports notifications
+        if (!("Notification" in window)) {
+            alert("This browser does not support desktop notification");
+        }
+
+        // Let's check if the user is okay to get some notification
+        else if (Notification.permission === "granted") {
+            // If it's okay let's create a notification
+
+            var notification = new Notification(title,options);
+
+        }
+
+        // Otherwise, we need to ask the user for permission
+        // Note, Chrome does not implement the permission static property
+        // So we have to check for NOT 'denied' instead of 'default'
+        else if (Notification.permission !== 'denied') {
+            Notification.requestPermission(function (permission) {
+                // Whatever the user answers, we make sure we store the information
+                if (!('permission' in Notification)) {
+                    Notification.permission = permission;
+                }
+
+                // If the user is okay, let's create a notification
+                if (permission === "granted") {
+                    var notification = new Notification(title,options);
+                }
+            });
+        }
+
+        notification.onclick = function() {
+            window.location.href = '';
+            notification.close();
+        };
+        // At last, if the user already denied any notification, and you
+        // want to be respectful there is no need to bother them any more.
+
+
+        // Update show notif 1
+        var url = base_url_js+'api/__crudNotification';
+        var data = {
+            action : 'hideNotifBrowser',
+            IDUser : IDUser
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        $.post(url,{token:token},function (jsonResult) {
+
+        });
+
+    }
+
     function loadAllowDivision() {
 
         <?php
@@ -429,23 +509,39 @@
         }); // exit socket
     }
 
-    function ReadNotifDivision(IDDivision)
+
+    function ReadNotifDivision()
     {
         var url = base_url_js+'readNotificationDivision';
-        var data = {IDDivision : IDDivision};
-        var token = jwt_encode(data,"UAP)(*");
-
-        $.post(url,{token:token},function (data_json) {
+        $.get(url,function (data_json) {
             var response = jQuery.parseJSON(data_json);
             if (response == 1) {
-                // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
                 var socket = io.connect( 'http://'+window.location.hostname+':3000' );
                 socket.emit('update_notifikasi', {
                     update_notifikasi: '1'
                 });
             }
         });
+    }
 
+    function addNotification(dataToken,dataDesc) {
+        var url = base_url_js+'api/__crudNotification';
+
+        var data = {
+            action : 'addNewNotification',
+            dataInsert : {
+                PortalType : '1',
+                Token : dataToken,
+                Desc : dataDesc,
+                CreatedBy : sessionNIP,
+                Created : dateTimeNow()
+            }
+        };
+        var token = jwt_encode(data,'UAP)(*');
+
+        $.post(url,{token:token},function (jsonResult) {
+            ReadNotifDivision();
+        });
     }
 
     function showHTMLMessagesDivision()
@@ -456,32 +552,70 @@
             $("#NotificationDivisi").empty();
             var IDDivision = "<?php echo $this->session->userdata('IDdepartementNavigation') ?>";
             var htmla = '<a href="#" class="dropdown-toggle" data-toggle="dropdown" onclick = "ReadNotifDivision('+IDDivision+')">'+
-                '<i class="fa fa-envelope"></i>'+
+                '<i class="fa fa-bell"></i>'+
                 '<span class="badge">'+data_json['count']+'</span>'+
                 '</a>';
+
             if (data_json['data'].length > 0) {
                 htmla += '<ul class="dropdown-menu extended notificationdivisi" style="max-width: 400px;width: 400px;">'+
                     '<li class="title">'+
                     '<p>You have '+data_json['count']+' new messages to Division</p>'+
                     '</li>';
-                for (var i = 0; i < data_json['data'].length; i++) {
-                    var token = dataa[i]['Token'];
-                    token = jwt_decode(token,"UAP)(*");
 
-                    htmla += '<li>'+
-                        '<a href="'+'<?php echo url_pas ?>'+token['URL']+'" style="padding: 22px;">'+
-                        '<span class="photo"><img src="'+base_url_js+'images/xx.jpg" alt="" /></span>'+
-                        '<span class="subject">'+
-                        '<span class="from">'+token['From']+'</span>'+
-                        '</span>'+
-                        '<span class="text">'+token['subject']+'</span>'+
-                        '<span class="time">'+data_json['data'][i]['Created']+'</span>' +
-                        '</a>'+
-                        '</li>';
+                console.log(dataa);
+
+                for (var i = 0; i < dataa.length; i++) {
+
+                    var d = dataa[i];
+                    var token = jwt_decode(d['Token'],"UAP)(*");
+
+                    var iconNotif = (token['Icon']!='' && token['Icon']!=null && typeof token['Icon'] !== "undefined")
+                        ? '<img data-src="'+token['Icon']+'" class="img-fitter-notif" />'
+                        : '<img src="'+base_url_js+'images/xx.jpg" class="" />';
+
+                    // 9 = Finance
+                    if(d['Div']==9 || d['Div']=='9'){
+                        htmla += '<li>'+
+                            '<a href="'+'<?php echo url_pas ?>'+token['URL']+'" style="padding: 22px;">'+
+                            '<span class="photo">'+iconNotif+'</span>'+
+                            '<span class="subject">'+
+                            '<span class="from">'+token['From']+'</span>'+
+                            '</span>'+
+                            '<span class="text">'+token['subject']+'</span>'+
+                            '<span class="time">'+moment(data_json['data'][i]['Created']).format('dddd, DD MMM YYYY')+'</span>' +
+                            '</a>'+
+                            '</li>';
+                    }
+                    // 6 = akademik
+                    else if(d['Div']==6 || d['Div']=='6'){
+                        htmla += '<li>'+
+                            '<a href="'+'<?php echo url_pas ?>'+token['URL']+'" style="padding: 22px;">'+
+                            '<span class="photo">'+iconNotif+'</span>'+
+                            '<span class="subject">'+
+                            '<span class="from">'+token['From']+'</span>'+
+                            '</span>'+
+                            '<span class="text">'+token['Subject']+'</span>'+
+                            '<span class="time">'+moment(data_json['data'][i]['Created']).format('dddd, DD MMM YYYY HH:mm:ss')+'</span>' +
+                            '</a>'+
+                            '</li>';
+                    }
+
+                    if(d['ShowNotif']==0 || d['ShowNotif']=='0'){
+                        notifyMe(d['IDUser'],token['From'],token['Subject'],token['Icon']);
+                    }
+
                 }
 
-                htmla +=  '<li class="footer"><a href="#">View all messages</a></li><ul>';
+                htmla +=  '<li class="footer"><a href="#">View all notification</a></li><ul>';
                 $("#NotificationDivisi").append(htmla);
+
+                $('.img-fitter-notif').imgFitter({
+                    // CSS background position
+                    backgroundPosition: 'center center',
+                    // for image loading effect
+                    fadeinDelay: 400,
+                    fadeinTime: 1200
+                });
             }// exit if
 
         })

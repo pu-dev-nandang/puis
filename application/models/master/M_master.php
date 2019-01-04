@@ -1790,22 +1790,57 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     public function CountgetNotificationDivisi()
     {
         $IDDivision = $this->session->userdata('IDdepartementNavigation');
-        $sql = "select count(*) as total from db_notifikasi.notification as a join db_notifikasi.n_div as b on a.ID = b.ID_notification where b.StatusRead = 0 and b.Div = ? order by a.Created desc limit 20";
+        $sql = "select count(*) as total from db_notifikasi.notification as a 
+                            join db_notifikasi.n_div as b on a.ID = b.ID_notification 
+                            where b.StatusRead = 0 and b.Div = ? order by a.Created desc limit 20";
         $query=$this->db->query($sql, array($IDDivision))->result_array();
 
-        return $query[0]['total'];
+        // Get Notifikasi personal
+        $NIP = $this->session->userdata('NIP');
+        $dataNotif = $this->db->query('SELECT COUNT(*) as Total FROM db_notifikasi.n_personal np
+                                                LEFT JOIN db_notifikasi.notification n 
+                                                ON (n.ID = np.ID_notification)
+                                                WHERE np.People = "'.$NIP.'"
+                                                 AND np.StatusRead = 0 ')->result_array();
+
+        return $query[0]['total'] + $dataNotif[0]['Total'];
+    }
+
+    function cmp($a, $b)
+    {
+        return strcmp($a['ID'], $b['ID']);
     }
 
     public function getNotificationDivisi()
     {
         $IDDivision = $this->session->userdata('IDdepartementNavigation');
-        $sql = "select * from db_notifikasi.notification as a join db_notifikasi.n_div as b on a.ID = b.ID_notification where b.Div = ? order by a.Created desc limit 20";
+        $sql = "select * from db_notifikasi.notification as a 
+                          join db_notifikasi.n_div as b on a.ID = b.ID_notification 
+                          where b.Div = ? order by a.ID desc limit 10";
         $query=$this->db->query($sql, array($IDDivision))->result_array();
+
+        // Get Notifikasi personal
+        $NIP = $this->session->userdata('NIP');
+        $dataNotif = $this->db->query('SELECT np.ID AS IDUser, np.Div, np.StatusRead, np.ShowNotif, n.*  FROM db_notifikasi.n_personal np
+                                                LEFT JOIN db_notifikasi.notification n 
+                                                ON (n.ID = np.ID_notification)
+                                                WHERE np.People = "'.$NIP.'"
+                                                 ORDER BY n.ID DESC LIMIT 20 ')->result_array();
+
+        if(count($dataNotif)>0){
+            for($i=0;$i<count($dataNotif);$i++){
+                array_push($query,$dataNotif[$i]);
+            }
+        }
+
+
+
+        usort($query, array($this, "cmp"));
 
         return $query;
     }
 
-    public function readNotificationDivision($IDDivision)
+    public function readNotificationDivision()
     {
         $IDDivision = $this->session->userdata('IDdepartementNavigation');
         $sql = "select * from db_notifikasi.n_div as b where b.Div = ? and StatusRead = 0";

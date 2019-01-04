@@ -133,9 +133,8 @@ class C_dashboard extends Globalclass {
 
     public function readNotificationDivision()
     {
-        $input = $this->getInputToken();
         $this->load->model('master/m_master');
-        $this->m_master->readNotificationDivision($input['IDDivision']);
+        $this->m_master->readNotificationDivision();
         echo json_encode(1);
     }
 

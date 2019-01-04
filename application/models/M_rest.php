@@ -294,7 +294,7 @@ class M_rest extends CI_Model {
 
                             // Get data jadwal
                             $ExamSchedule = $this->db->query('SELECT sc.ID AS ScheduleID, mk.MKCode, mk.Name AS Course, mk.NameEng AS CourseEng, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room,  
-                                                                    sc.ClassGroup
+                                                                    sc.ClassGroup, sc.Attendance
                                                                     FROM '.$db.'.study_planning sp
                                                                     LEFT JOIN db_academic.exam_details exd ON (exd.ScheduleID = sp.ScheduleID AND exd.NPM = sp.NPM)
                                                                     LEFT JOIN db_academic.exam ex ON (ex.ID = exd.ExamID AND ex.Type LIKE "'.$ExamType.'")
@@ -347,7 +347,7 @@ class M_rest extends CI_Model {
 
                                         // UAS
                                         if($ExamType=='uas' || $ExamType=='UAS'){
-                                            if($PresensiArg<75){
+                                            if($PresensiArg<75 && $ExamSchedule[$g]['Attendance']=='1'){
                                                 $ExamSchedule[$g]['ExamDate'] = null;
                                                 $ExamSchedule[$g]['ExamEnd'] = null;
                                                 $ExamSchedule[$g]['ExamStart'] = null;
