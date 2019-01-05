@@ -31,6 +31,18 @@ io.on('connection', function (socket) {
         });
     });
 
+    socket.on( 'notification_student', function( data ) {
+        io.sockets.emit( 'notification_student', {
+            notification_student: data.notification_student
+        });
+    });
+
+    socket.on( 'notification_lecturer', function( data ) {
+        io.sockets.emit( 'notification_lecturer', {
+            notification_lecturer: data.notification_lecturer
+        });
+    });
+
 
     /*socket.on( 'new_message', function( data ) {
       io.sockets.emit( 'new_message', {
