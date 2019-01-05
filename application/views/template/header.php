@@ -275,9 +275,9 @@
             $('#theme-switcher label:first-child').removeClass('active');
         }
 
-        socket.emit('update_log', {
-            update_log: '1'
-        });
+        // socket.emit('update_log', {
+        //     update_log: '1'
+        // });
 
     });
 
