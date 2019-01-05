@@ -2408,7 +2408,8 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action']=='ReadSemesterActive'){
                 $formData = (array) $data_arr['formData'];
-                $data = $this->m_api->getSemesterActive($formData['CurriculumID'],$formData['ProdiID'],$formData['Semester'],$formData['IsSemesterAntara']);
+                $data = $this->m_api->getSemesterActive($formData['SemesterID'],$formData['CurriculumID'],
+                    $formData['ProdiID'],$formData['Semester'],$formData['IsSemesterAntara']);
                 return print_r(json_encode($data));
             }
         }

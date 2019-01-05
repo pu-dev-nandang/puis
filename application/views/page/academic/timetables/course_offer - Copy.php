@@ -10,13 +10,10 @@
     <div class="col-md-6 col-md-offset-3">
         <div class="well">
             <div class="row">
-                <div class="col-xs-4">
-                    <select class="form-control" id="filterSemester"></select>
-                </div>
-                <div class="col-xs-4">
+                <div class="col-xs-7">
                     <select class="form-control" id="formProdi"></select>
                 </div>
-                <div class="col-xs-4">
+                <div class="col-xs-5">
                     <select class="form-control" id="formSemester"></select>
                 </div>
             </div>
@@ -30,15 +27,7 @@
         <div class="widget box">
             <div class="widget-header">
                 <h4><i class="icon-reorder"></i> Semester <span id="textSemester"></span> <span id="textCurriculum"></span></h4>
-
-                <input id="formSemesterID" class="hide" readonly>
-
-                <input id="formCurriculumYear" class="hide" readonly>
-
-                <input id="formCurriculumID" class="hide" readonly>
-                <input id="formProdiID" class="hide" readonly>
-                <input id="formDataYear" class="hide" readonly>
-                <input id="formSemesterSearch" class="hide" readonly>
+                <input id="formSemesterID" type="hide" class="hide" readonly>
             </div>
             <div class="widget-content">
                 <div class="row">
@@ -111,9 +100,6 @@
 <script>
     $(document).ready(function () {
 
-
-        loSelectOptionSemester('#filterSemester','');
-
         $('#formProdi').append('<option value="" disabled selected>--- Select Program Study ---</option>' +
             '                        <option disabled>------------------------------------------</option>');
         loadSelectOptionBaseProdi('#formProdi','');
@@ -121,18 +107,6 @@
         $('#formSemester').append('<option value="" disabled selected>--- Select Semester ---</option>' +
             '                <option disabled>------------------------------------------</option>');
         loadSelectOPtionAllSemester('#formSemester','','',0);
-    });
-
-
-    $('#filterSemester').change(function () {
-
-        var filterSemester = $('#filterSemester').val();
-        var SemesterID = filterSemester.split('.')[0];
-
-        $('#formSemester').empty();
-        $('#formSemester').append('<option value="" disabled selected>--- Select Semester ---</option>' +
-            '                <option disabled>------------------------------------------</option>');
-        loadSelectOPtionAllSemester('#formSemester','',SemesterID,0);
     });
 
     $('#formSemester,#formProdi').change(function () {
@@ -315,15 +289,11 @@
 
     function loadDatapage() {
 
-        var filterSemester = $('#filterSemester').val();
-        var Prodi = $('#formProdi').val();
         var dataSmt = $('#formSemester').val();
 
-        if(filterSemester!=null && dataSmt!=null && Prodi!=null &&
-            filterSemester!="" && dataSmt!="" && Prodi!=""){
+        var Prodi = $('#formProdi').val();
 
-            // 5|3.2016|Curriculum 2016
-
+        if(dataSmt!=null && Prodi!=null){
             var DataYear = dataSmt.split('|')[1];
             var Semester = dataSmt.split('|')[0];
 
@@ -333,36 +303,23 @@
 
             var CurriculumID = DataYear.split('.')[0];
             var ProdiID = Prodi.split('.')[0];
+            loadCourse(Semester,DataYear,ProdiID);
 
-            $('#formCurriculumID').val(CurriculumID);
-            $('#formProdiID').val(ProdiID);
-            $('#formDataYear').val(DataYear);
-            $('#formSemesterSearch').val(Semester);
-
-            loadCourse();
-
-            getSemesterActive();
+            getSemesterActive(CurriculumID,ProdiID,Semester);
             $('.divSmt-cl').removeClass('hide');
             $('#divSmt'+Semester).addClass('hide');
             $('#OfferingDiv').removeClass('hide');
 
-            return false;
-
-            loadCourse(Semester,DataYear,ProdiID);
-
-
-
         }
     }
 
+    function loadCourse(SemesterSearch,DataYear,Prodi) {
 
-    function loadCourse() {
 
-        var SemesterSearch = $('#formSemesterSearch').val();
-        var DataYear = $('#formDataYear').val();
+        // var Prodi = $('#formProdi').val();
 
         var year = (DataYear!=null) ? DataYear.split('.')[1] : '';
-        var ProdiID = $('#formProdiID').val();
+        var ProdiID = (Prodi!=null) ? Prodi.split('.')[0] : '';
 
         var url = base_url_js+'api/__getKurikulumByYear';
 
@@ -428,32 +385,24 @@
 
         });
 
-        // var Semester = $('#formSemester').val();
+        var Semester = $('#formSemester').val();
 
-        // if(DataYear!=null && Semester!=null){
-        //     $('#box1View,#box1Storage,#box2View,#box2Storage').empty();
-        //     var CurriculumID = DataYear.split('.')[0];
-        //     // getSemesterActive(CurriculumID,ProdiID,Semester);
-        // }
+        if(DataYear!=null && Prodi!=null && Semester!=null){
+            $('#box1View,#box1Storage,#box2View,#box2Storage').empty();
+            var CurriculumID = DataYear.split('.')[0];
+            // getSemesterActive(CurriculumID,ProdiID,Semester);
+        }
 
 
     }
 
-    function getSemesterActive() {
-
-        var CurriculumID = $('#formCurriculumID').val();
-        var ProdiID = $('#formProdiID').val();
-        var Semester = $('#formSemesterSearch').val();
-
-        var filterSemester = $('#filterSemester').val();
-        var SemesterID = filterSemester.split('.')[0];
+    function getSemesterActive(CurriculumID,ProdiID,Semester) {
 
 
         var url = base_url_js+'api/__crudSemester';
         var data = {
             action : 'ReadSemesterActive',
             formData : {
-                SemesterID : SemesterID,
                 CurriculumID : CurriculumID,
                 ProdiID : ProdiID,
                 Semester : Semester,
@@ -465,7 +414,9 @@
         $.post(url,{token:token},function (jsonResult) {
 
             var SemesterActive = jsonResult.SemesterActive;
-            $('#formSemesterID').val(SemesterID);
+            $('#formSemesterID').val(SemesterActive.ID);
+
+            // getListCourseOfferings(SemesterActive.ID,CurriculumID,ProdiID,Semester);
 
             $('#box1View,#box1Storage,#box2View,#box2Storage').empty();
             for(var i=0;i<jsonResult.DetailCourses.length;i++){
@@ -480,7 +431,7 @@
 
             }
 
-            getListCourseOfferings(SemesterID,CurriculumID,ProdiID,Semester);
+            getListCourseOfferings(SemesterActive.ID,CurriculumID,ProdiID,Semester);
 
         });
     }
@@ -587,6 +538,5 @@
         });
 
     }
-
 
 </script>

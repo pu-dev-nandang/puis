@@ -27,8 +27,9 @@
                 <td style="width: 20%;">Academic Year</td>
                 <td style="width: 1%;">:</td>
                 <td>
-                    <strong id="semesterName">-</strong>
-                    <input id="formSemesterID" class="hide" type="hidden" readonly/>
+<!--                    <strong id="semesterName">-</strong>-->
+                    <input id="formSemesterID" class="hide" readonly/>
+                    <select class="form-control" id="filterSemester" style="max-width: 200px;"></select>
                 </td>
             </tr>
             <tr>
@@ -70,7 +71,7 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <select class="form-control" id="formGroupProdi1" style="max-width: 200px;" disabled><option selected disabled>-- Select Group Prodi --</option></select>
+                            <select class="form-control" id="formGroupProdi1" style="max-width: 200px;" disabled><option value="" selected disabled>-- Select Group Prodi --</option></select>
                             <input class="hide" readonly value="0" id="viewGroupProdi1">
                         </div>
                     </div>
@@ -239,7 +240,20 @@
         window.dataSesi = 1;
         window.dataProdi = 1;
 
-        loadAcademicYearOnPublish('');
+        loSelectOptionSemester('#filterSemester','');
+
+        var firsLoadSmt = setInterval(function (args) {
+            var filterSemester = $('#filterSemester').val();
+            if(filterSemester!='' && filterSemester!=null){
+                var SmtID = filterSemester.split('.')[0];
+                $('#formSemesterID').val(SmtID);
+                clearInterval(firsLoadSmt);
+            }
+
+
+        },1000);
+
+        // loadAcademicYearOnPublish('');
         loadSelectOptionConf('#formProgramsCampusID','programs_campus','');
         loadSelectOptionLecturersSingle('#formCoordinator','');
         loadSelectOptionLecturersSingle('#formTeamTeaching','');
@@ -260,6 +274,22 @@
                 setSesiAkhir(no);
                 checkSchedule(no);
             });
+    });
+
+    $('#filterSemester').change(function () {
+        var filterSemester = $('#filterSemester').val();
+        if(filterSemester!='' && filterSemester!=null){
+            var SmtID = filterSemester.split('.')[0];
+            $('#formSemesterID').val(SmtID);
+            for(var p=1;p<=dataProdi;p++){
+                var formBaseProdi = $('#formBaseProdi'+p).val();
+                if(formBaseProdi!='' && formBaseProdi!=null){
+                    var ProdiID = formBaseProdi.split('.')[0];
+                    getCourseOfferings(ProdiID,p);
+                }
+
+            }
+        }
     });
 
     $(document).on('change','.formtime',function () {
@@ -289,17 +319,17 @@
     });
 
     function loadAcademicYearOnPublish(smt) {
-        var url = base_url_js+"api/__getAcademicYearOnPublish";
-        $.getJSON(url,{smt:smt},function (data_json) {
-            if(smt=='SemesterAntara'){
-                $('#formSemesterID').val(data_json.SemesterID);
-            } else {
-                $('#formSemesterID').val(data_json.ID);
-            }
-
-            $('#semesterName').html(data_json.Year+''+data_json.Code+' | '+data_json.Name);
-
-        });
+        // var url = base_url_js+"api/__getAcademicYearOnPublish";
+        // $.getJSON(url,{smt:smt},function (data_json) {
+        //     if(smt=='SemesterAntara'){
+        //         $('#formSemesterID').val(data_json.SemesterID);
+        //     } else {
+        //         $('#formSemesterID').val(data_json.ID);
+        //     }
+        //
+        //     $('#semesterName').html(data_json.Year+''+data_json.Code+' | '+data_json.Name);
+        //
+        // });
     }
 
     function setGroupClass() {
@@ -995,7 +1025,8 @@
 
         var process = [];
 
-        var SemesterID = $('#formSemesterID').val();
+        var filterSemester = $('#filterSemester').val();
+        var SemesterID = filterSemester.split('.')[0];
         var ProgramsCampusID = $('#formProgramsCampusID').val();
         var CombinedClasses = (dataProdi>1) ? '1' : '0';
 
@@ -1078,10 +1109,6 @@
         }
 
         var Coordinator = $('#formCoordinator').val();
-        // if(Coordinator=='' || Coordinator==null){
-        //     requiredForm('#s2id_formCoordinator a');
-        //         process.push(0);
-        // }
 
         var TeamTeaching = $('input[name=formteamTeaching]:checked').val();
         var UpdateBy = sessionNIP;

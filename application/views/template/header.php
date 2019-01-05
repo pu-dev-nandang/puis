@@ -256,6 +256,11 @@
         // $('.sidebar-widget #theme-switcher .btn').removeClass('active');
         // btn-inverse active
 
+        var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+        socket.emit('update_log', {
+            update_log: '1'
+        });
+
     });
 
     $(document).on('click','#btn_announcement',function () {
@@ -498,15 +503,25 @@
         // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
 
         socket.on( 'update_notifikasi', function( data ) {
-
-            //$( "#new_count_message" ).html( data.new_count_message );
-            //$('#notif_audio')[0].play();
             if (data.update_notifikasi == 1) {
                 // action
                 showHTMLMessagesDivision();
             }
 
         }); // exit socket
+
+        socket.on( 'update_log', function( data ) {
+
+            if (data.update_log == 1) {
+                // action
+                testLog();
+            }
+
+        }); // exit socket
+    }
+
+    function testLog() {
+        console.log('log test');
     }
 
 
