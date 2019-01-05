@@ -855,6 +855,7 @@ $route['api/__crudConfigSKPI'] = 'api/c_api/crudConfigSKPI';
 
 // Crud Notification
 $route['api/__crudNotification'] = 'api/c_api/crudNotification';
+$route['api/__crudLog'] = 'api/c_api/crudLog';
 
 
 $route['__resetPasswordUser'] = 'c_login/resetPasswordUser';

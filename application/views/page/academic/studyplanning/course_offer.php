@@ -73,7 +73,7 @@
         <h4>
             <b>Study Plan</b>
             <div style="float: right;margin-bottom: 5px;">
-                <button class="btn btn-sm btn-default btn-default-primary"><span id="loadMyDraf">0</span> of 16 Credit</button>
+                <button class="btn btn-sm btn-default btn-default-primary"><span id="loadMyDraf">0</span> of <span id="viewMaksCredit">0</span> Credit</button>
             </div>
         </h4>
 
@@ -116,6 +116,7 @@
         $.post(url,{token:token},function (jsonResult) {
 
             var inputMaxCredit = jsonResult.Student.dataCredit.MaxCredit.Credit;
+            $('#viewMaksCredit').html(inputMaxCredit);
 
             var CreditInDraf = 0;
 

@@ -16,6 +16,7 @@ class C_api extends CI_Controller {
         $this->load->model('hr/m_hr');
         $this->load->model('vreservation/m_reservation');
         $this->load->model('akademik/m_tahun_akademik');
+        $this->load->model('notification/m_log');
         $this->load->library('JWT');
         $this->load->library('google');
 
@@ -6871,6 +6872,22 @@ class C_api extends CI_Controller {
 
 
 
+
+    }
+
+    public function crudLog(){
+        $data_arr = $this->getInputToken();
+
+        if($data_arr['action']=='readLog'){
+            $dataLog = $this->m_log->readDataLog();
+            return print_r(json_encode($dataLog));
+        }
+        else if($data_arr['action']=='getTotalUnreadLog'){
+            $NIP = $this->session->userdata('NIP');
+            $data = $this->db->select('ID')->get_where('db_notifikasi.logging_user',
+                array('UserID' => $NIP, "StatusRead" => "0"))->result_array();
+            return print_r(json_encode(count($data)));
+        }
 
     }
 
