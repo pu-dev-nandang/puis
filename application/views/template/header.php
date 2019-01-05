@@ -11,7 +11,17 @@
         overflow-y: auto;
     }
 
+    .label-image img {
+        max-width: 43px;
+    }
 
+    #showingLog .dropdown-menu.extended {
+        width: 390px;
+    }
+
+    #li2ShowLog .from {
+        color: #083f88;
+    }
 
     #tableSimpleSearch tr th,#tableSimpleSearch tr td {
         text-align: center;
@@ -89,10 +99,22 @@
             <!--                </a>-->
             <!--            </li>-->
 
-            <!-- Messages -->
-            <li class="dropdown hidden-xs hidden-sm" id = 'NotificationDivisi'>
 
+            <!-- Logging -->
+            <li class="dropdown" id="showingLog" >
+                <a href="#" class="dropdown-toggle" onclick="showLog();" data-toggle="dropdown">
+                    <i class="fa fa-sort-amount-asc"></i>
+                    <span class="badge totalUnreadLog">0</span>
+                </a>
+                <ul class="dropdown-menu extended notification" id="li2ShowLog">
+                    <li class="title">
+                        <p>You have <span class="totalUnreadLog">0</span> new logs</p>
+                    </li>
+                </ul>
             </li>
+
+            <!-- Messages -->
+            <li class="dropdown hidden-xs hidden-sm" id = 'NotificationDivisi'></li>
 
             <?php if(count($rule_service)>0){ ?>
                 <li class="dropdown <?php if($this->uri->segment(1)=='database'){echo 'current';} ?>">
@@ -239,6 +261,8 @@
 
 <script>
 
+     var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+
     $(document).ready(function () {
         $('.departement ,.departement1').addClass('hide');
         loadAllowDivision();
@@ -251,12 +275,6 @@
             $('#theme-switcher label:first-child').removeClass('active');
         }
 
-        // $('#theme-switcher').children()[0].removeClass('active').addClass('btn-inverse');
-        // $('#theme-switcher').children()[1].addClass('btn-inverse active');
-        // $('.sidebar-widget #theme-switcher .btn').removeClass('active');
-        // btn-inverse active
-
-        var socket = io.connect( 'http://'+window.location.hostname+':3000' );
         socket.emit('update_log', {
             update_log: '1'
         });
@@ -497,10 +515,7 @@
         }
     };
 
-    function socket_messages()
-    {
-        var socket = io.connect( 'http://'+window.location.hostname+':3000' );
-        // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
+    function socket_messages(){
 
         socket.on( 'update_notifikasi', function( data ) {
             if (data.update_notifikasi == 1) {
@@ -513,20 +528,74 @@
         socket.on( 'update_log', function( data ) {
 
             if (data.update_log == 1) {
-                // action
-                testLog();
+                showUnreadLog();
             }
 
         }); // exit socket
     }
 
-    function testLog() {
-        console.log('log test');
+    function showUnreadLog() {
+        var url = base_url_js+'api/__crudLog';
+        var data = {
+            action : 'getTotalUnreadLog'
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        $.post(url,{token:token},function (jsonResult) {
+            $('.totalUnreadLog').html(jsonResult);
+        });
+    }
+    
+    function showLog() {
+        var url = base_url_js+'api/__crudLog';
+        var data = {
+            action : 'readLog'
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        $.post(url,{token:token},function (jsonResult) {
+
+            var Details = jsonResult.Details;
+
+            $('#li2ShowLog').html('<li class="title">' +
+                '                        <p>You have <span class="totalUnreadLog">0</span> new logs</p>' +
+                '                    </li>');
+
+            if(Details.length>0){
+
+                for(var i=0;i<Details.length;i++){
+                    var d = Details[i];
+                    $('#li2ShowLog').append('<li>' +
+                    '                        <a href="javascript:void(0);">' +
+                    '                            <span class="photo"><img class="img-rounded img-fitter-notif" data-src="'+d.Icon+'"></span>' +
+                    '                            <span class="subject"><span class="from">'+d.CreateName+'</span></span>' +
+                    '                            <span class="text">'+d.Title+'</span>' +
+                    '                            <span class="time" style="position: relative;padding-left: 5px;"><i class="fa fa-clock-o"></i>' +
+                        '                           '+moment(d.CreatedAt).format('dddd, DD MMM YYYY HH:mm:ss')+'</span>' +
+                    '                        </a>' +
+                    '                    </li>');
+                }
+                $('#li2ShowLog').append('<li class="footer">' +
+                                        '<a href="javascript:void(0);">View all logs</a>' +
+                                        '</li>');
+
+                $('.img-fitter-notif').imgFitter({
+                    // CSS background position
+                    backgroundPosition: 'center center',
+                    // for image loading effect
+                    fadeinDelay: 400,
+                    fadeinTime: 1200
+                });
+            }
+
+            socket.emit('update_log', {
+                update_log: '1'
+            });
+
+
+        });
     }
 
 
-    function ReadNotifDivision()
-    {
+    function ReadNotifDivision(){
         var url = base_url_js+'readNotificationDivision';
         $.get(url,function (data_json) {
             var response = jQuery.parseJSON(data_json);
@@ -559,8 +628,7 @@
         });
     }
 
-    function showHTMLMessagesDivision()
-    {
+    function showHTMLMessagesDivision(){
         var url = base_url_js+'api/__getNotification_divisi';
         $.post(url,function (data_json) {
             var dataa = data_json['data'];
@@ -576,8 +644,6 @@
                     '<li class="title">'+
                     '<p>You have '+data_json['count']+' new messages to Division</p>'+
                     '</li>';
-
-                console.log(dataa);
 
                 for (var i = 0; i < dataa.length; i++) {
 
@@ -636,8 +702,7 @@
         })
     }
 
-    function wrDepartmentAdmProdi()
-    {
+    function wrDepartmentAdmProdi(){
         <?php 
             $PositionMain = $this->session->userdata('PositionMain');
             $DivisionID = $PositionMain['IDDivision'];
@@ -649,8 +714,7 @@
          <?php endif ?>
     }
 
-    function Global_CantAction(element)
-    {
+    function Global_CantAction(element){
         // cannot delete action
           var waitForEl = function(selector, callback) {
             if (jQuery(selector).length) {
@@ -667,4 +731,5 @@
           });
         // end cannot delete action   
     }
+
 </script>
