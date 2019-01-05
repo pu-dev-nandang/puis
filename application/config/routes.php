@@ -805,6 +805,7 @@ $route['rest/__rekapintake_perschool'] = 'api/c_rest/rekapintake_perschool';
 $route['rest/__rekapmhspayment'] = 'api/c_rest/rekapmhspayment';
 $route['rest/__sendEmail'] = 'api/c_rest/sendEmail';
 $route['rest/venue/__fill_feedback'] = 'api/c_rest/venue__fill_feedback';
+$route['rest/Catalog/__Get_Item'] = 'api/c_rest/catalog__get_item';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';

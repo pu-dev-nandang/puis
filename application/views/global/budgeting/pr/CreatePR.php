@@ -40,7 +40,11 @@
 		</div>
 	</div>
 </div>
-
+ <!-- <pre> -->
+	<?php 
+	//print_r($this->session->all_userdata());
+	 ?>
+<!-- </pre>  -->
 <div id ="Page_Input_PR" style="margin-top: 10px">
 	
 </div>
@@ -68,7 +72,7 @@
 			$('#Year').select2({
 			   //allowClear: true
 			});
-
+			$( "#Year" ).prop( "disabled", true );
 			$("#Year").change(function(){
 				loadSelectPostRealiasi();
 			})
@@ -76,18 +80,19 @@
 
 		function getAllDepartementPU()
 		{
+		  var Div = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
 		  var url = base_url_js+"api/__getAllDepartementPU";
 		  $('#DepartementPost').empty();
 		  $.post(url,function (data_json) {
 		    for (var i = 0; i < data_json.length; i++) {
-		        var selected = (i==11) ? 'selected' : '';
+		        var selected = (data_json[i]['Code']==Div) ? 'selected' : '';
 		        $('#DepartementPost').append('<option value="'+ data_json[i]['Code']  +'" '+selected+'>'+data_json[i]['Name2']+'</option>');
 		    }
 		   
 		    $('#DepartementPost').select2({
 		       //allowClear: true
 		    });
-
+		    $( "#DepartementPost" ).prop( "disabled", true );
 		    $("#DepartementPost").change(function(){
 		    	loadSelectPostRealiasi();
 		    })
@@ -133,13 +138,13 @@
 					}
 					else
 					{
-						toastr.info('No Result Data in category, please add in config navigation'); 
+						toastr.info('No Result Data in category, please add Post Budget by Finance'); 
 					}
 					
 				}
 				else
 				{
-					toastr.info('No Result Data in category, please add in config navigation'); 
+					toastr.info('No Result Data in category, please add Post Budget by Finance'); 
 				}
 
 			}).fail(function() {
@@ -232,7 +237,199 @@
 									'</tr></thead>'+
 									'<tbody></tbody></table></div></div></div>';
 			$("#Page_Input_PR").html(html);						
+			AddingTable();
 
+		}
+
+		function AddingTable()
+		{
+			var fill = '';
+			var No = 1;
+			var getfill = function(No){
+				var a = '<tr>'+
+							'<td>'+No+'</td>'+
+							'<td>'+
+								'<div class="input-group">'+
+									'<input type="text" class="form-control Item" readonly>'+
+									'<span class="input-group-btn">'+
+										'<button class="btn btn-default SearchItem" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>'+
+									'</span>'+
+								'</div>'+
+							'</td>'+
+							'<td><button class = "btn btn-primary Detail">Detail</button></td>'+
+							'<td><input type="number" min = "1" class="form-control qty"  value="1"></td>'+
+							'<td><input type="text" class="form-control UnitCost"></td>'+
+							'<td><input type="text" class="form-control SubTotal"></td>'+
+							'<td>'+
+								'<div id="datetimepicker1'+No+'" class="input-group input-append date datetimepicker">'+
+		                            '<input data-format="yyyy-MM-dd" class="form-control" id="tgl'+No+'" type=" text" readonly="" value = "<?php echo date('Y-m-d') ?>">'+
+		                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
+                        		'</div>'+
+                        	'</td>'+
+                        	'<td></td>'+
+                        	'<td><input type="file" data-style="fileinput" class = "BrowseFile"></td>'+
+                        '</tr>';	
+
+				return a;				
+			}		
+			if ($("#table_input_pr tbody").children().length == 0) {
+				fill = getfill(No);
+				$('#table_input_pr tbody').append(fill);
+			}
+
+			eventTableFunction();
+		}
+
+		function eventTableFunction()
+		{
+			$(".SearchItem").click(function(){
+				var ev = $(this);
+				var html = '';
+					html ='<div class = "row">'+
+							'<div class = "col-md-12">'+
+								'<table id="example" class="table table-bordered display select" cellspacing="0" width="100%">'+
+                       '<thead>'+
+                          '<tr>'+
+                             // '<th><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>'+
+                             '<th></th>'+
+                             '<th>Item</th>'+
+                             '<th>Desc</th>'+
+                             '<th>Estimate Value</th>'+
+                             '<th>Photo</th>'+
+                             '<th>DetailCatalog</th>'+
+                          '</tr>'+
+                       '</thead>'+
+                  '</table></div></div>';
+				$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Catalog'+'</h4>');
+				$('#GlobalModalLarge .modal-body').html(html);
+				$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+                '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>');
+				$('#GlobalModalLarge').modal({
+				    'show' : true,
+				    'backdrop' : 'static'
+				});
+
+				var url = base_url_js+'rest/Catalog/__Get_Item';
+				var data = {
+					action : 'choices',
+					auth : 's3Cr3T-G4N',
+					department : "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>"
+				};
+	    	    var token = jwt_encode(data,"UAP)(*");
+				var table = $('#example').DataTable({
+				      'ajax': {
+				         'url': url,
+				         'type' : 'POST',
+				         'data'	: {
+				         	token : token,
+				         },
+				         dataType: 'json'
+				      },
+				      'columnDefs': [{
+				         'targets': 0,
+				         'searchable': false,
+				         'orderable': false,
+				         'className': 'dt-body-center',
+				         'render': function (data, type, full, meta){
+				             // console.log(full)
+				             // return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+				             	return '<input type="checkbox" name="id[]" value="' + full[6] + '" estvalue="' + full[7] + '">';
+				             // if(full[2] == 0)
+				             // {
+				             //  return '<input type="checkbox" name="id[]" value="' + full[0] + '">';
+				             // }
+				             // else
+				             // {
+				             //  return '<input type="checkbox" name="id[]" value="' + full[0] + '" checked>';
+				             // }
+				             
+				         }
+				      }],
+				      'order': [[1, 'asc']]
+				   });
+
+				   // Handle click on "Select all" control
+				   // $('#example-select-all').on('click', function(){
+				   //    // Get all rows with search applied
+				   //    var rows = table.rows({ 'search': 'applied' }).nodes();
+				   //    // Check/uncheck checkboxes for all rows in the table
+				   //    $('input[type="checkbox"]', rows).prop('checked', this.checked);
+				   // });
+
+				   // Handle click on checkbox to set state of "Select all" control
+				   $('#example tbody').on('change', 'input[type="checkbox"]', function(){
+				   	$('input[type="checkbox"]').prop('checked', false);
+				   	$(this).prop('checked',true);
+				      // If checkbox is not checked
+				      // if(!this.checked){
+				      //    var el = $('#example-select-all').get(0);
+				      //    // If "Select all" control is checked and has 'indeterminate' property
+				      //    if(el && el.checked && ('indeterminate' in el)){
+				      //       // Set visual state of "Select all" control
+				      //       // as 'indeterminate'
+				      //       el.indeterminate = true;
+				      //    }
+				      // }
+				   });
+
+
+				   $("#ModalbtnSaveForm").click(function(){
+				   		var chkbox = $('input[type="checkbox"]:checked');
+				   		var checked = chkbox.val();
+				   		var estvalue = chkbox.attr('estvalue');
+				   		 var n = estvalue.indexOf(".");
+				   		estvalue = estvalue.substring(0, n);
+				   		var row = chkbox.closest('tr');
+				   		var Item = row.find('td:eq(1)').text();
+				   		var Desc = row.find('td:eq(2)').text();
+				   		var Est = row.find('td:eq(3)').text();
+				   		var Photo = row.find('td:eq(4)').html();
+				   		var DetailCatalog =  row.find('td:eq(5)').html();
+				   		var arr = Item+'@@'+Desc+'@@'+Est+'@@'+Photo+'@@'+DetailCatalog;
+				   		var fillItem = ev.closest('tr');
+				   		fillItem.find('td:eq(1)').find('.Item').val(Item);
+				   		fillItem.find('td:eq(1)').find('.Item').attr('savevalue',checked);
+				   		fillItem.find('td:eq(1)').find('.Item').attr('estvalue',estvalue);
+				   		fillItem.find('td:eq(2)').find('.Detail').attr('data',arr);
+				   		fillItem.find('td:eq(4)').find('.UnitCost').val(estvalue);
+				   		fillItem.find('td:eq(4)').find('.UnitCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+				   		fillItem.find('td:eq(4)').find('.UnitCost').maskMoney('mask', '9894');
+				   		$('#GlobalModalLarge').modal('hide');
+				   })
+
+			})
+
+			$(".Detail").click(function(){
+				var data = $(this).attr('data');
+				var arr = data.split('@@');
+				var html = '';
+					html ='<div class = "row">'+
+							'<div class = "col-md-12">'+
+								'<table id="example" class="table table-bordered display select" cellspacing="0" width="100%">'+
+                       '<thead>'+
+                          '<tr>'+
+                             '<th>Item</th>'+
+                             '<th>Desc</th>'+
+                             '<th>Estimate Value</th>'+
+                             '<th>Photo</th>'+
+                             '<th>DetailCatalog</th>'+
+                          '</tr>'+
+                       '</thead>'+
+                       '<tbody><tr>';
+                       		for (var i = 0; i < arr.length; i++) {
+                       			html += '<td>'+arr[i]+'</td>';
+                       		}
+                       		html += '</tr></tbody>';
+                 html += '</table></div></div>';
+				$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Catalog'+'</h4>');
+				$('#GlobalModalLarge .modal-body').html(html);
+				$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>');
+				$('#GlobalModalLarge').modal({
+				    'show' : true,
+				    'backdrop' : 'static'
+				});
+
+			})
 		}
 	}); // exit document Function
 </script>

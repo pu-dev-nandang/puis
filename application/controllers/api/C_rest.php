@@ -1393,5 +1393,85 @@ class C_rest extends CI_Controller {
         return $rs;
     }
 
+    public function catalog__get_item()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $condition = ($dataToken['department'] == 'all') ? '' : ' and a.Departement = "'.$dataToken['department'].'"';
+                $sql = 'select a.*,b.Name as NameCreated,c.NameDepartement
+                        from db_purchasing.m_catalog as a 
+                        join db_employees.employees as b on a.CreatedBy = b.NIP
+                        join (
+                        select * from (
+                        select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study
+                        UNION
+                        select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                        ) aa
+                        ) as c on a.Departement = c.ID
+                       ';
+
+                $sql.= ' where a.Active = 1 '.$condition;
+                $query = $this->db->query($sql)->result_array();
+                $data = array();
+                    for ($i=0; $i < count($query); $i++) { 
+                       $nestedData=array();
+                       $row = $query[$i];
+                        $nestedData[] = $i + 1;
+                        $nestedData[] = $row['Item'];
+                        $nestedData[] = $row['Desc'];
+                        $EstimaValue = $row['EstimaValue'];
+                        $EstimaValue = 'Rp '.number_format($EstimaValue,2,',','.');
+                        $nestedData[] = $EstimaValue;
+                        $Photo = $row['Photo'];
+                         // print_r($Photo);
+                         if ($Photo != '') {
+                             // print_r('test');
+                             $Photo = explode(",", $Photo);
+                             $htmlPhoto = '<ul>';
+                             for ($z=0; $z < count($Photo); $z++) { 
+                                 $htmlPhoto .= '<li>'.'<a href="'.base_url("fileGetAny/budgeting-catalog-".$Photo[$z]).'" target="_blank"></i>'.$Photo[$z].'</a></li>';
+                             }
+                             $htmlPhoto .= '</ul>';
+                         }
+                         else
+                         {
+                             $htmlPhoto = '';
+                         }
+                         $nestedData[] = $htmlPhoto;
+                         $DetailCatalog = $row['DetailCatalog'];
+                         $DetailCatalog = json_decode($DetailCatalog);
+                         $temp = '';
+                         if ($DetailCatalog != "" || $DetailCatalog != null) {
+                             foreach ($DetailCatalog as $key => $value) {
+                                 $temp .= $key.' :  '.$value.'<br>';
+                             }
+
+                         }
+                        $nestedData[] = $temp;
+                        $nestedData[] = $row['ID'];
+                        $nestedData[] = $row['EstimaValue'];
+                        $data[] = $nestedData;
+                    }
+                   $json_data = array(
+                       "data"            => $data
+                   );
+                    echo json_encode($json_data);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
 
 }
