@@ -50,6 +50,7 @@
 </div>
 <script type="text/javascript">
 	var arr_Year = <?php echo json_encode($arr_Year) ?>;
+	var BudgetMax = 0;
 	$(document).ready(function() {
 		LoadFirstLoad();
 
@@ -57,6 +58,23 @@
 		{
 			loadYear();
 			getAllDepartementPU();
+		}
+
+		function BudgetChoose()
+		{
+			var arr = [];
+			$(".uniform:checked").each(function(){
+				var estvalue = $(this).val();
+				 var n = estvalue.indexOf(".");
+				estvalue = estvalue.substring(0, n);
+				var id_budget_left = $(this).attr('id_table');
+				var data = {
+					estvalue : estvalue,
+					id_budget_left : id_budget_left
+				}
+				arr.push(data);
+			})
+			return arr;
 		}
 
 		function loadYear()
@@ -183,9 +201,8 @@
 		function load_budget(response)
 		{
 			$("#Page_Budget").empty();
-			var html = '<div class = row>'+
+			var html = '<div class = "row">'+
 							'<div class = "col-md-12">'+
-								'<div class = "table-responsive">'+
 									'<table class="table table-bordered tableData" id ="tableData3">'+
 										'<thead>'+
 										'<tr>'+
@@ -193,7 +210,7 @@
 				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Budget</th>'+
 				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Remaining</th>'+
 										'</tr></thead>'+
-										'<tbody></tbody></table></div></div></div>';
+										'<tbody></tbody></table></div></div>';
 			$("#Page_Budget").html(html);
 			var isi = '';
 			for (var i = 0; i < response.length; i++) {
@@ -206,20 +223,31 @@
 			}
 
 			$("#tableData3 tbody").append(isi);
-			var table = $("#tableData3").DataTable({
-			    'iDisplayLength' : 5,
-			    'ordering' : true,
-			});
+			// var table = $("#tableData3").DataTable({
+			//     'iDisplayLength' : 5,
+			//     'ordering' : true,
+			// });
 
 			loading_page("#Page_Input_PR");
 			setTimeout(function () {
 			    Load_input_PR();
 			},1000);
+
+			$(".uniform").change(function(){
+				$('.uniform').prop('checked', false);
+				$(this).prop('checked',true);
+			})
+			
 		}
 
 		function Load_input_PR()
 		{
-			var html = '<div class = "row">'+
+			var html = '<div class = "row" style = "margin-left : 0px">'+
+							'<div class = "col-md-3">'+
+								'<button type="button" class="btn btn-default btn-add-pr"> <i class="icon-plus"></i> Add</button>'+
+							'</div>'+
+						'</div>'+
+						'<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+		
 							'<div class = "col-md-12">'+
 								'<div class = "table-responsive">'+
 									'<table class="table table-bordered tableData" id ="table_input_pr">'+
@@ -231,13 +259,18 @@
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Qty</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Unit Cost</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Sub Total</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Date Needed</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Budget Status</th>'+
+			                            '<th width = "150px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Date Needed</th>'+
+			                            '<th width = "100px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Budget Status</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Upload Files</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Action</th>'+
 									'</tr></thead>'+
 									'<tbody></tbody></table></div></div></div>';
 			$("#Page_Input_PR").html(html);						
 			AddingTable();
+
+			$(".btn-add-pr").click(function(){
+				AddingTable();
+			})
 
 		}
 
@@ -246,6 +279,10 @@
 			var fill = '';
 			var No = 1;
 			var getfill = function(No){
+				var action = '<td></td>';
+				if (No > 1) {
+					action = '<td><button type="button" class="btn btn-danger btn-delete btn-delete-item"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button></td>';
+				}
 				var a = '<tr>'+
 							'<td>'+No+'</td>'+
 							'<td>'+
@@ -257,9 +294,9 @@
 								'</div>'+
 							'</td>'+
 							'<td><button class = "btn btn-primary Detail">Detail</button></td>'+
-							'<td><input type="number" min = "1" class="form-control qty"  value="1"></td>'+
-							'<td><input type="text" class="form-control UnitCost"></td>'+
-							'<td><input type="text" class="form-control SubTotal"></td>'+
+							'<td><input type="number" min = "1" class="form-control qty"  value="1" disabled></td>'+
+							'<td><input type="text" class="form-control UnitCost" disabled></td>'+
+							'<td><input type="text" class="form-control SubTotal" disabled value = "0"></td>'+
 							'<td>'+
 								'<div id="datetimepicker1'+No+'" class="input-group input-append date datetimepicker">'+
 		                            '<input data-format="yyyy-MM-dd" class="form-control" id="tgl'+No+'" type=" text" readonly="" value = "<?php echo date('Y-m-d') ?>">'+
@@ -267,14 +304,24 @@
                         		'</div>'+
                         	'</td>'+
                         	'<td></td>'+
-                        	'<td><input type="file" data-style="fileinput" class = "BrowseFile"></td>'+
+                        	'<td><input type="file" data-style="fileinput" class = "BrowseFile"></td>'+action
                         '</tr>';	
 
 				return a;				
-			}		
+			}
+
 			if ($("#table_input_pr tbody").children().length == 0) {
 				fill = getfill(No);
 				$('#table_input_pr tbody').append(fill);
+				$('.datetimepicker').datetimepicker();
+			}
+			else
+			{
+				No = $('#table_input_pr > tbody > tr:last').find('td:eq(0)').text();
+				No++;
+				fill = getfill(No);
+				$('#table_input_pr tbody').append(fill);
+				$('.datetimepicker').datetimepicker();
 			}
 
 			eventTableFunction();
@@ -282,152 +329,381 @@
 
 		function eventTableFunction()
 		{
-			$(".SearchItem").click(function(){
-				var ev = $(this);
-				var html = '';
-					html ='<div class = "row">'+
-							'<div class = "col-md-12">'+
-								'<table id="example" class="table table-bordered display select" cellspacing="0" width="100%">'+
-                       '<thead>'+
-                          '<tr>'+
-                             // '<th><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>'+
-                             '<th></th>'+
-                             '<th>Item</th>'+
-                             '<th>Desc</th>'+
-                             '<th>Estimate Value</th>'+
-                             '<th>Photo</th>'+
-                             '<th>DetailCatalog</th>'+
-                          '</tr>'+
-                       '</thead>'+
-                  '</table></div></div>';
-				$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Catalog'+'</h4>');
-				$('#GlobalModalLarge .modal-body').html(html);
-				$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
-                '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>');
-				$('#GlobalModalLarge').modal({
-				    'show' : true,
-				    'backdrop' : 'static'
+			//if ($(".SearchItem").length == 1) {
+				$(".SearchItem").click(function(){
+					$(".uniform").prop('disabled', true);
+					var GetPostBudget = BudgetChoose();
+					// console.log(GetPostBudget);
+					if (GetPostBudget.length > 0) {
+						var ev = $(this);
+						var html = '';
+							html ='<div class = "row">'+
+									'<div class = "col-md-12">'+
+										'<table id="example" class="table table-bordered display select" cellspacing="0" width="100%">'+
+		                       '<thead>'+
+		                          '<tr>'+
+		                             // '<th><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>'+
+		                             '<th></th>'+
+		                             '<th>Item</th>'+
+		                             '<th>Desc</th>'+
+		                             '<th>Estimate Value</th>'+
+		                             '<th>Photo</th>'+
+		                             '<th>DetailCatalog</th>'+
+		                          '</tr>'+
+		                       '</thead>'+
+		                  '</table></div></div>';
+						$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Catalog'+'</h4>');
+						$('#GlobalModalLarge .modal-body').html(html);
+						$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+		                '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>');
+						$('#GlobalModalLarge').modal({
+						    'show' : true,
+						    'backdrop' : 'static'
+						});
+
+						var url = base_url_js+'rest/Catalog/__Get_Item';
+						var data = {
+							action : 'choices',
+							auth : 's3Cr3T-G4N',
+							department : "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>"
+						};
+			    	    var token = jwt_encode(data,"UAP)(*");
+						var table = $('#example').DataTable({
+						      'ajax': {
+						         'url': url,
+						         'type' : 'POST',
+						         'data'	: {
+						         	token : token,
+						         },
+						         dataType: 'json'
+						      },
+						      'columnDefs': [{
+						         'targets': 0,
+						         'searchable': false,
+						         'orderable': false,
+						         'className': 'dt-body-center',
+						         'render': function (data, type, full, meta){
+						             return '<input type="checkbox" name="id[]" value="' + full[6] + '" estvalue="' + full[7] + '">';
+						         }
+						      }],
+						      'order': [[1, 'asc']]
+						   });
+
+						   // Handle click on checkbox to set state of "Select all" control
+						   $('#example tbody').on('change', 'input[type="checkbox"]', function(){
+						   	$('input[type="checkbox"]:not(.uniform)').prop('checked', false);
+						   	$(this).prop('checked',true);
+						      
+						   });
+
+
+						   $("#ModalbtnSaveForm").click(function(){
+						   		var chkbox = $('input[type="checkbox"]:checked:not(.uniform)');
+						   		var checked = chkbox.val();
+						   		var estvalue = chkbox.attr('estvalue');
+						   		var n = estvalue.indexOf(".");
+						   		estvalue = estvalue.substring(0, n);
+						   		var row = chkbox.closest('tr');
+						   		var Item = row.find('td:eq(1)').text();
+						   		var Desc = row.find('td:eq(2)').text();
+						   		var Est = row.find('td:eq(3)').text();
+						   		var Photo = row.find('td:eq(4)').html();
+						   		var DetailCatalog =  row.find('td:eq(5)').html();
+						   		var arr = Item+'@@'+Desc+'@@'+Est+'@@'+Photo+'@@'+DetailCatalog;
+						   		var fillItem = ev.closest('tr');
+						   		fillItem.find('td:eq(1)').find('.Item').val(Item);
+						   		fillItem.find('td:eq(1)').find('.Item').attr('savevalue',checked);
+						   		fillItem.find('td:eq(1)').find('.Item').attr('estvalue',estvalue);
+						   		fillItem.find('td:eq(2)').find('.Detail').attr('data',arr);
+						   		fillItem.find('td:eq(4)').find('.UnitCost').val(estvalue);
+						   		fillItem.find('td:eq(4)').find('.UnitCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+						   		fillItem.find('td:eq(4)').find('.UnitCost').maskMoney('mask', '9894');
+
+						   		fillItem.find('td:eq(3)').find('.qty').prop('disabled', false);
+						   		fillItem.find('td:eq(4)').find('.UnitCost').prop('disabled', false);
+
+						   		fillItem.find('td:eq(3)').find('.qty').trigger('keyup');
+						   		$('#GlobalModalLarge').modal('hide');
+						   })
+					}
+					else
+					{
+						toastr.error('Please choose Post Budget in table Budget These Month','!!!Failed')
+					}
+
+				})
+
+				$(".Detail").click(function(){
+					var data = $(this).attr('data');
+					var arr = data.split('@@');
+					var html = '';
+						html ='<div class = "row">'+
+								'<div class = "col-md-12">'+
+									'<table id="example" class="table table-bordered display select" cellspacing="0" width="100%">'+
+	                       '<thead>'+
+	                          '<tr>'+
+	                             '<th>Item</th>'+
+	                             '<th>Desc</th>'+
+	                             '<th>Estimate Value</th>'+
+	                             '<th>Photo</th>'+
+	                             '<th>DetailCatalog</th>'+
+	                          '</tr>'+
+	                       '</thead>'+
+	                       '<tbody><tr>';
+	                       		for (var i = 0; i < arr.length; i++) {
+	                       			html += '<td>'+arr[i]+'</td>';
+	                       		}
+	                       		html += '</tr></tbody>';
+	                 html += '</table></div></div>';
+					$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Catalog'+'</h4>');
+					$('#GlobalModalLarge .modal-body').html(html);
+					$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>');
+					$('#GlobalModalLarge').modal({
+					    'show' : true,
+					    'backdrop' : 'static'
+					});
+
+				})
+
+				$(".qty").bind('keyup mouseup', function () {
+				    var qty = $(this).val();
+				    var fillItem = $(this).closest('tr');
+				    var estvalue = fillItem.find('td:eq(4)').find('.UnitCost').val();
+				    estvalue = findAndReplace(estvalue, ".","");
+				    var SubTotal = parseInt(qty) * parseInt(estvalue);
+				    fillItem.find('td:eq(5)').find('.SubTotal').val(SubTotal);
+				    fillItem.find('td:eq(5)').find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+				    fillItem.find('td:eq(5)').find('.SubTotal').maskMoney('mask', '9894');
+				    FuncBudgetStatus(fillItem);        
 				});
+				
 
-				var url = base_url_js+'rest/Catalog/__Get_Item';
-				var data = {
-					action : 'choices',
-					auth : 's3Cr3T-G4N',
-					department : "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>"
-				};
-	    	    var token = jwt_encode(data,"UAP)(*");
-				var table = $('#example').DataTable({
-				      'ajax': {
-				         'url': url,
-				         'type' : 'POST',
-				         'data'	: {
-				         	token : token,
-				         },
-				         dataType: 'json'
-				      },
-				      'columnDefs': [{
-				         'targets': 0,
-				         'searchable': false,
-				         'orderable': false,
-				         'className': 'dt-body-center',
-				         'render': function (data, type, full, meta){
-				             // console.log(full)
-				             // return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
-				             	return '<input type="checkbox" name="id[]" value="' + full[6] + '" estvalue="' + full[7] + '">';
-				             // if(full[2] == 0)
-				             // {
-				             //  return '<input type="checkbox" name="id[]" value="' + full[0] + '">';
-				             // }
-				             // else
-				             // {
-				             //  return '<input type="checkbox" name="id[]" value="' + full[0] + '" checked>';
-				             // }
-				             
-				         }
-				      }],
-				      'order': [[1, 'asc']]
-				   });
+				$(".UnitCost").keyup(function(){
+					var fillItem = $(this).closest('tr');
+					var qty = fillItem.find('td:eq(3)').find('.qty').val();
+					var estvalue = $(this).val();
+					estvalue = findAndReplace(estvalue, ".","");
+					var SubTotal = parseInt(qty) * parseInt(estvalue);
+					fillItem.find('td:eq(5)').find('.SubTotal').val(SubTotal);
+					fillItem.find('td:eq(5)').find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+					fillItem.find('td:eq(5)').find('.SubTotal').maskMoney('mask', '9894');
+					FuncBudgetStatus(fillItem);
+				})
 
-				   // Handle click on "Select all" control
-				   // $('#example-select-all').on('click', function(){
-				   //    // Get all rows with search applied
-				   //    var rows = table.rows({ 'search': 'applied' }).nodes();
-				   //    // Check/uncheck checkboxes for all rows in the table
-				   //    $('input[type="checkbox"]', rows).prop('checked', this.checked);
-				   // });
+				$(".btn-delete-item").click(function(){
+					$( this )
+                      .closest( 'tr')
+                      .remove();
 
-				   // Handle click on checkbox to set state of "Select all" control
-				   $('#example tbody').on('change', 'input[type="checkbox"]', function(){
-				   	$('input[type="checkbox"]').prop('checked', false);
-				   	$(this).prop('checked',true);
-				      // If checkbox is not checked
-				      // if(!this.checked){
-				      //    var el = $('#example-select-all').get(0);
-				      //    // If "Select all" control is checked and has 'indeterminate' property
-				      //    if(el && el.checked && ('indeterminate' in el)){
-				      //       // Set visual state of "Select all" control
-				      //       // as 'indeterminate'
-				      //       el.indeterminate = true;
-				      //    }
-				      // }
-				   });
+                      $(".qty").each(function(){
+                      	var fillItem = $(this).closest('tr');
+                      	FuncBudgetStatus(fillItem); 
+                      })
+                      SortByNumbering();
+				})
+			//} // if not exist
+		}
 
+		function SortByNumbering()
+		{
+			var no = 1;
+			$("#table_input_pr tbody tr").each(function(){
+				var a = $(this);
+				a.find('td:eq(0)').html(no);
+				no++;
+			})
+		}
 
-				   $("#ModalbtnSaveForm").click(function(){
-				   		var chkbox = $('input[type="checkbox"]:checked');
-				   		var checked = chkbox.val();
-				   		var estvalue = chkbox.attr('estvalue');
-				   		 var n = estvalue.indexOf(".");
-				   		estvalue = estvalue.substring(0, n);
-				   		var row = chkbox.closest('tr');
-				   		var Item = row.find('td:eq(1)').text();
-				   		var Desc = row.find('td:eq(2)').text();
-				   		var Est = row.find('td:eq(3)').text();
-				   		var Photo = row.find('td:eq(4)').html();
-				   		var DetailCatalog =  row.find('td:eq(5)').html();
-				   		var arr = Item+'@@'+Desc+'@@'+Est+'@@'+Photo+'@@'+DetailCatalog;
-				   		var fillItem = ev.closest('tr');
-				   		fillItem.find('td:eq(1)').find('.Item').val(Item);
-				   		fillItem.find('td:eq(1)').find('.Item').attr('savevalue',checked);
-				   		fillItem.find('td:eq(1)').find('.Item').attr('estvalue',estvalue);
-				   		fillItem.find('td:eq(2)').find('.Detail').attr('data',arr);
-				   		fillItem.find('td:eq(4)').find('.UnitCost').val(estvalue);
-				   		fillItem.find('td:eq(4)').find('.UnitCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-				   		fillItem.find('td:eq(4)').find('.UnitCost').maskMoney('mask', '9894');
-				   		$('#GlobalModalLarge').modal('hide');
-				   })
+		function FuncBudgetStatus(fillItem)
+		{
+			var arr = [];
+			var GetPostBudget = BudgetChoose();
+			var totalPostBudget = 0;
+			for (var i = 0; i < GetPostBudget.length; i++) {
+				totalPostBudget += parseInt(GetPostBudget[i].estvalue);
+			}
 
+			var OP = [
+					{
+						name  : 'IN',
+						color : 'green'
+					},
+					{
+						name  : 'Exceed',
+						color : 'red'
+					},
+					{
+						name  : 'Cross',
+						color : 'yellow'
+					},
+				];
+
+			// var SubTotal = fillItem.find('td:eq(5)').find('.SubTotal').val(); 
+			var SubTotal = 0;
+			$(".SubTotal").each(function(){
+				var a = $(this).val();
+				a = findAndReplace(a, ".","");
+				SubTotal += parseInt(a);
+			})
+			// SubTotal = findAndReplace(SubTotal, ".","");
+			var DefaultName = (totalPostBudget >= SubTotal) ? 'IN' : 'Exceed';
+			var html = '<select class = "form-control BudgetStatus">';
+
+			for (var i = 0; i < OP.length; i++) {
+				var selected = (DefaultName == OP[i].name) ? 'selected' : '';
+				html += '<option value = "'+OP[i].name+'"'+selected+'>'+OP[i].name+'</option>';
+			}
+			html += '</select>';
+
+			fillItem.find('td:eq(7)').html(html);
+			
+			$(".BudgetStatus").change(function(){
+				var valuee = $(this).val();
+				if (valuee == 'Cross') {
+					loadSelectPostRealiasi_byCross(fillItem)
+				}
+			})
+		}
+
+		function loadSelectPostRealiasi_byCross(fillItem)
+		{
+			html = '';
+			$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Post Budget'+'</h4>');
+			$('#GlobalModalLarge .modal-body').html(html);
+			$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+'<button type="button" id="ModalbtnSaveFormCross" class="btn btn-success">Save</button>');
+			$('#GlobalModalLarge').modal({
+			    'show' : true,
+			    'backdrop' : 'static'
+			});
+			loading_page('#GlobalModalLarge .modal-body');
+			html = '<div class = "row">'+
+						'<div class = "col-md-12">'+
+							'<div class="form-group">'+
+								'<label class="control-label">Category / Group</label>'+
+								'<select class = "select2-select-00 full-width-fix" id = "PostBudgetCross">'+
+
+								'</select>'
+							'</div>'+
+						'</div>'+
+					'</div>';
+
+			var Year = $("#Year").val();
+			var Departement = $("#DepartementPost").val();
+			var url = base_url_js+"budgeting/getPostBudgetDepartement";
+
+			var data = {
+					    Year : Year,
+						Departement : Departement,
+					};
+			var token = jwt_encode(data,'UAP)(*');
+			$.post(url,{token:token},function (resultJson) {
+				var response = jQuery.parseJSON(resultJson);
+				$('#GlobalModalLarge .modal-body').html(html);
+				$("#PostBudgetCross").empty();
+				if (response.length > 0) {
+					var PostBudget = '';
+					var abc = 0;
+					for (var i = 0; i < response.length; i++) {
+						var selected = (i == 0) ? 'selected' : '';
+						PostBudget += '<option value ="'+response[i].CodePost+'" '+selected+'>'+response[i].PostName+'</option>';
+						abc++;
+						
+					}
+
+					if (abc > 0) {
+						$("#PostBudgetCross").append(PostBudget);
+						$('#PostBudgetCross').select2({
+						   //allowClear: true
+						});
+						loadPostBudgetThisMonthCross();
+						$("#PostBudgetCross").change(function(){
+							loadPostBudgetThisMonthCross();
+						})
+					}
+					else
+					{
+						toastr.info('No Result Data in category, please add Post Budget by Finance'); 
+					}
+					
+				}
+				else
+				{
+					toastr.info('No Result Data in category, please add Post Budget by Finance'); 
+				}
+
+			}).fail(function() {
+			  toastr.info('No Result Data'); 
+			}).always(function() {
+			                
+			});		
+
+		}
+
+		function loadPostBudgetThisMonthCross()
+		{
+			var Departement = $("#DepartementPost").val();
+			var PostBudget = $('#PostBudgetCross').val();
+			var url = base_url_js+"budgeting/PostBudgetThisMonth_Department";
+			var data = {
+						Departement : Departement,
+						PostBudget : PostBudget
+					};
+			var token = jwt_encode(data,'UAP)(*');
+			$.post(url,{token:token},function (resultJson) {
+				var response = jQuery.parseJSON(resultJson);
+				if (response.length > 0) {
+					load_budgetCross(response)
+				}
+				else
+				{
+					toastr.info('Budget doesn\'t exist'); 
+				}
+			}).fail(function() {
+			  toastr.info('No Result Data'); 
+			}).always(function() {
+			                
+			});
+		}
+
+		function load_budgetCross(response)
+		{
+			var html = '<div class = "row" id = "Page_BudgetCross">'+
+							'<div class = "col-md-12">'+
+									'<table class="table table-bordered tableData" id ="tableData3Cross">'+
+										'<thead>'+
+										'<tr>'+
+											'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">Choose</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Budget</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Remaining</th>'+
+										'</tr></thead>'+
+										'<tbody></tbody></table></div></div>';
+			if ($("#Page_BudgetCross").length) {
+				$("#Page_BudgetCross").remove();
+				$("#GlobalModalLarge .modal-body").append(html);
+			}
+			else
+			{
+				$("#GlobalModalLarge .modal-body").append(html);
+			}							
+			
+			var isi = '';
+			for (var i = 0; i < response.length; i++) {
+				isi += '<tr>';
+				isi += '<td><input type="checkbox" class="uniformCross" value="'+response[i]['Value']+'" id_table="'+response[i]['ID']+'">'+
+						'<td>'+response[i]['RealisasiPostName']+'</td>'+
+						'<td>'+formatRupiah(response[i]['Value'])+'</td>';
+				isi += '</tr>';		
+
+			}
+
+			$("#tableData3Cross tbody").append(isi);
+
+			$(".uniformCross").change(function(){
+				$('.uniformCross').prop('checked', false);
+				$(this).prop('checked',true);
 			})
 
-			$(".Detail").click(function(){
-				var data = $(this).attr('data');
-				var arr = data.split('@@');
-				var html = '';
-					html ='<div class = "row">'+
-							'<div class = "col-md-12">'+
-								'<table id="example" class="table table-bordered display select" cellspacing="0" width="100%">'+
-                       '<thead>'+
-                          '<tr>'+
-                             '<th>Item</th>'+
-                             '<th>Desc</th>'+
-                             '<th>Estimate Value</th>'+
-                             '<th>Photo</th>'+
-                             '<th>DetailCatalog</th>'+
-                          '</tr>'+
-                       '</thead>'+
-                       '<tbody><tr>';
-                       		for (var i = 0; i < arr.length; i++) {
-                       			html += '<td>'+arr[i]+'</td>';
-                       		}
-                       		html += '</tr></tbody>';
-                 html += '</table></div></div>';
-				$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Catalog'+'</h4>');
-				$('#GlobalModalLarge .modal-body').html(html);
-				$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>');
-				$('#GlobalModalLarge').modal({
-				    'show' : true,
-				    'backdrop' : 'static'
-				});
+			$("#ModalbtnSaveFormCross").click(function(){
 
 			})
 		}
