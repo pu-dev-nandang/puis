@@ -275,9 +275,9 @@
             $('#theme-switcher label:first-child').removeClass('active');
         }
 
-        socket.emit('update_log', {
-            update_log: '1'
-        });
+        // socket.emit('update_log', {
+        //     update_log: '1'
+        // });
 
     });
 
@@ -461,6 +461,25 @@
 
             var notification = new Notification(title,options);
 
+            notification.onclick = function() {
+                window.location.href = '';
+                notification.close();
+            };
+            // At last, if the user already denied any notification, and you
+            // want to be respectful there is no need to bother them any more.
+
+
+            // Update show notif 1
+            var url = base_url_js+'api/__crudNotification';
+            var data = {
+                action : 'hideNotifBrowser',
+                IDUser : IDUser
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            $.post(url,{token:token},function (jsonResult) {
+
+            });
+
         }
 
         // Otherwise, we need to ask the user for permission
@@ -476,28 +495,31 @@
                 // If the user is okay, let's create a notification
                 if (permission === "granted") {
                     var notification = new Notification(title,options);
+                    notification.onclick = function() {
+                        window.location.href = '';
+                        notification.close();
+                    };
+                    // At last, if the user already denied any notification, and you
+                    // want to be respectful there is no need to bother them any more.
+
+
+                    // Update show notif 1
+                    var url = base_url_js+'api/__crudNotification';
+                    var data = {
+                        action : 'hideNotifBrowser',
+                        IDUser : IDUser
+                    };
+                    var token = jwt_encode(data,'UAP)(*');
+                    $.post(url,{token:token},function (jsonResult) {
+
+                    });
                 }
             });
+
+
         }
 
-        notification.onclick = function() {
-            window.location.href = '';
-            notification.close();
-        };
-        // At last, if the user already denied any notification, and you
-        // want to be respectful there is no need to bother them any more.
 
-
-        // Update show notif 1
-        var url = base_url_js+'api/__crudNotification';
-        var data = {
-            action : 'hideNotifBrowser',
-            IDUser : IDUser
-        };
-        var token = jwt_encode(data,'UAP)(*');
-        $.post(url,{token:token},function (jsonResult) {
-
-        });
 
     }
 
@@ -566,10 +588,10 @@
                     $('#li2ShowLog').append('<li>' +
                     '                        <a href="javascript:void(0);">' +
                     '                            <span class="photo"><img class="img-rounded img-fitter-notif" data-src="'+d.Icon+'"></span>' +
-                    '                            <span class="subject"><span class="from">'+d.CreateName+'</span></span>' +
+                    '                            <span class="subject"><span class="from">'+d.CreatedName+'</span></span>' +
                     '                            <span class="text">'+d.Title+'</span>' +
-                    '                            <span class="time" style="position: relative;padding-left: 5px;"><i class="fa fa-clock-o"></i>' +
-                        '                           '+moment(d.CreatedAt).format('dddd, DD MMM YYYY HH:mm:ss')+'</span>' +
+                    '                            <div class="time" style="position: relative;padding-left: 5px;text-align: right;"><i class="fa fa-clock-o"></i>' +
+                        '                           '+moment(d.CreatedAt).format('dddd, DD MMM YYYY HH:mm:ss')+'</div>' +
                     '                        </a>' +
                     '                    </li>');
                 }
