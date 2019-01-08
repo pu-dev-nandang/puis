@@ -108,7 +108,7 @@
                 </a>
                 <ul class="dropdown-menu extended notification" id="li2ShowLog">
                     <li class="title">
-                        <p>You have <span class="totalUnreadLog">0</span> new logs</p>
+                        <p>Log not yet</p>
                     </li>
                 </ul>
             </li>
@@ -542,7 +542,7 @@
         socket.on( 'update_notifikasi', function( data ) {
             if (data.update_notifikasi == 1) {
                 // action
-                showHTMLMessagesDivision();
+                // showHTMLMessagesDivision();
             }
 
         }); // exit socket
@@ -559,7 +559,8 @@
     function showUnreadLog() {
         var url = base_url_js+'api/__crudLog';
         var data = {
-            action : 'getTotalUnreadLog'
+            action : 'getTotalUnreadLog',
+            UserID : sessionNIP
         };
         var token = jwt_encode(data,'UAP)(*');
         $.post(url,{token:token},function (jsonResult) {
@@ -570,23 +571,26 @@
     function showLog() {
         var url = base_url_js+'api/__crudLog';
         var data = {
-            action : 'readLog'
+            action : 'readLog',
+            UserID : sessionNIP
         };
         var token = jwt_encode(data,'UAP)(*');
         $.post(url,{token:token},function (jsonResult) {
 
             var Details = jsonResult.Details;
 
-            $('#li2ShowLog').html('<li class="title">' +
-                '                        <p>You have <span class="totalUnreadLog">0</span> new logs</p>' +
-                '                    </li>');
+
 
             if(Details.length>0){
+
+                $('#li2ShowLog').html('<li class="title">' +
+                    '                        <p>You have several logs</p>' +
+                    '                    </li>');
 
                 for(var i=0;i<Details.length;i++){
                     var d = Details[i];
                     $('#li2ShowLog').append('<li>' +
-                    '                        <a href="javascript:void(0);">' +
+                    '                        <a href="'+base_url_js+''+d.URLDirect+'">' +
                     '                            <span class="photo"><img class="img-rounded img-fitter-notif" data-src="'+d.Icon+'"></span>' +
                     '                            <span class="subject"><span class="from">'+d.CreatedName+'</span></span>' +
                     '                            <span class="text">'+d.Title+'</span>' +
