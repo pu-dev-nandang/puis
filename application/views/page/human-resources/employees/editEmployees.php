@@ -268,6 +268,13 @@
                 </div>
 
                 <div class="row">
+                    <div class="col-xs-12">
+                        <label>Ijazah</label>
+
+                    </div>
+                </div>
+
+                <div class="row">
                     <div class="col-xs-3" style="text-align: center;border-right: 1px solid #CCCCCC;">
                         <hr/>
                         <?php $imgPr = ($arrEmp['Photo']!='' && $arrEmp['Photo']!=null &&
@@ -283,23 +290,35 @@
                     </div>
                     <div class="col-xs-9">
                         <hr/>
+                        <label>Photo</label>
                         <div class="form-group">
-                            <label>Photo</label>
+
                             <form id="fmPhoto" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
                                 <input id="formPhoto" class="hide" value="" hidden />
-                                <div class="form-group"><label class="btn btn-sm btn-default btn-default-warning btn-upload">
-                                        <i class="fa fa-upload margin-right"></i> Upload Photo
-                                        <input type="file" id="filePhoto" name="userfile" class="uploadPhotoEmp"
-                                               style="display: none;" accept="image/*">
-                                    </label>
-                                    <p style="font-size: 12px;color: #ccc;">*) NIK / NIP must be fill before upload photo</p>
-                                </div>
+                                <label class="btn btn-sm btn-default btn-default-warning btn-upload">
+                                    <i class="fa fa-upload margin-right"></i> Upload Photo
+                                    <input type="file" id="filePhoto" name="userfile" class="uploadPhotoEmp"
+                                           style="display: none;" accept="image/*">
+                                </label>
+                                <p style="font-size: 12px;color: #ccc;">*) NIK / NIP must be fill before upload photo</p>
                             </form>
-
                         </div>
+
+                        <label>Ijazah (Maksimum Size 8 Mb)</label>
+                        <form id="fmIjazah" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
+                            <input id="formIjazahExt" class="hide" value="" />
+                            <div class="form-group">
+                                <label class="btn btn-sm btn-default btn-default-primary btn-upload">
+                                    <i class="fa fa-upload margin-right"></i> Upload Ijazah (.pdf)
+                                    <input type="file" id="fileIjazah" name="userfile" class="uploadIjazah"
+                                           style="display: none;" accept="application/pdf">
+                                </label>
+                            </div>
+                        </form>
                     </div>
 
                 </div>
+
             </div>
 
         </div>
@@ -587,6 +606,42 @@
         viewImageBeforeUpload(this,'#imgThumbnail','#imgSize','#imgType','','#formImgType');
     });
 
+    // Aksi View before upload ijazah
+    $(document).on('change','.uploadIjazah',function () {
+
+        var input = this;
+
+        if (input.files && input.files[0]) {
+            var sz = parseFloat(input.files[0].size) / 1000000; // ukuran MB
+            var ext = input.files[0].type.split('/')[1];
+
+            var ds = true;
+            if(Math.floor(sz)<=8){
+                ds = false;
+                $('#formIjazahExt').val(ext);
+            } else {
+                alert('Maksimum size 8 Mb');
+            }
+
+            $('#btnUpdate').prop('disabled',ds);
+
+            //
+            //
+            // $(el_SizeView).html(sz.toFixed(2));
+            // $(el_ExtView).html(ext);
+            //
+            // $(el_size).val(sz.toFixed(2));
+            // $(el_Ext).val(ext);
+            //
+            // var reader = new FileReader();
+            //
+            // reader.onload = function(e) {
+            //     $(el_View).attr('src', e.target.result);
+            // };
+            // reader.readAsDataURL(input.files[0]);
+        }
+    });
+
     $('#btnUpdate').click(function () {
         updateEmployees();
     });
@@ -688,6 +743,9 @@
 
             var fileName = (fileType!='') ? formNIP + '.' + fileType : LastPhoto ;
 
+            var formIjazahExt = $('#formIjazahExt').val();
+            var fileNameIjazah = (formIjazahExt!='') ? 'IJAZAH_'+formNIP+'.'+formIjazahExt : '';
+
             var data = {
                 arr_Prodi : arr_Prodi,
                 action : 'UpdateEmployees',
@@ -734,6 +792,11 @@
                     if(fileType!=''){
                         uploadPhoto(fileName);
                     }
+
+                    // Upload Ijazah
+                    if(fileNameIjazah!='' && formIjazahExt!=''){
+                        uploadIjazah(fileNameIjazah);
+                    }
                     toastr.success('Employees Saved','Success');
 
                 }
@@ -769,6 +832,42 @@
 
             var formData = new FormData( $("#fmPhoto")[0]);
             var url = base_url_js+'human-resources/upload_photo?fileName='+fileName;
+
+            $.ajax({
+                url : url,  // Controller URL
+                type : 'POST',
+                data : formData,
+                async : false,
+                cache : false,
+                contentType : false,
+                processData : false,
+                success : function(data) {
+
+                    var jsonData = JSON.parse(data);
+
+                    // if(typeof jsonData.success=='undefined'){
+                    //     toastr.error(jsonData.error,'Error');
+                    //     // alert(jsonData.error);
+                    // }
+                    // else {
+                    //     toastr.success('File Saved','Success!!');
+                    // }
+
+                }
+            });
+
+        } else {
+            toastr.error('NIK / NIK is empty','Error');
+        }
+
+    }
+
+    function uploadIjazah(fileName) {
+
+        if(fileName!='' && fileName!=null){
+
+            var formData = new FormData( $("#fmIjazah")[0]);
+            var url = base_url_js+'human-resources/upload_ijazah?fileName='+fileName;
 
             $.ajax({
                 url : url,  // Controller URL
