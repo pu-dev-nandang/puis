@@ -266,7 +266,7 @@
     $(document).ready(function () {
         $('.departement ,.departement1').addClass('hide');
         loadAllowDivision();
-        showHTMLMessagesDivision();
+        // showHTMLMessagesDivision();
         socket_messages();
         wrDepartmentAdmProdi();
 

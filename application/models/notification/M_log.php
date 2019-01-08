@@ -10,15 +10,16 @@ class M_log extends CI_Model {
         parent::__construct();
     }
 
-    public function readDataLog(){
-        $NIP = $this->session->userdata('NIP');
-        $IDDivision = $this->session->userdata('IDdepartementNavigation');
+    public function readDataLog($UserID){
 
+//        $IDDivision = $this->session->userdata('IDdepartementNavigation');
+
+        $this->db->where('UserID', $UserID);
         $this->db->update('db_notifikasi.logging_user',array('StatusRead' => '1', 'ShowNotif' => '1'));
 
         $basicQuery = 'SELECT l.* FROM db_notifikasi.logging_user lu 
                                       LEFT JOIN db_notifikasi.logging l ON (l.ID = lu.IDLogging)
-                                      WHERE lu.UserID = "'.$NIP.'" ';
+                                      WHERE lu.UserID = "'.$UserID.'" ';
         $limit = 20;
 
         $data = $this->db->query($basicQuery.' ORDER BY l.ID DESC LIMIT '.$limit)->result_array();
