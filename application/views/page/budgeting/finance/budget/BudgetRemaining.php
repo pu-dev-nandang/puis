@@ -74,7 +74,7 @@
 		var token = jwt_encode(data,'UAP)(*');
 		$.post(url,{token:token},function (resultJson) {
 			var response = jQuery.parseJSON(resultJson);
-			var test = '<div class = "row"><div class="col-md-12"><div class="col-md-1 col-md-offset-11" align = "right"><button class = "btn btn-excel-all" Year = "'+data['Year']+'" ><i class="fa fa-download"></i> Excel</button></div></div></div>';
+			// var test = '<div class = "row"><div class="col-md-12"><div class="col-md-1 col-md-offset-11" align = "right"><button class = "btn btn-excel-all" Year = "'+data['Year']+'" ><i class="fa fa-download"></i> Excel</button></div></div></div>';
 			var TableGenerate = '<div class = "row"style = "margin-top : 10px"><div class="col-md-12" id = "pageForTable">'+
 									'<div class="table-responsive">'+
 										'<table class="table table-bordered tableData" id ="tableData3">'+
@@ -119,13 +119,11 @@
 								'<div class="col-md-3 col-md-offset-9" style="background-color : #20485A; min-height : 50px;color: #FFFFFF;" align="center"><h4>Total : '+formatRupiah(total)+'</h4>'+
 								'</div>'+
 							'</div></div>';
-			$("#PageTable").html(test+TableGenerate+SumTotal);
+			$("#PageTable").html(TableGenerate+SumTotal);
 			var t = $('#tableData3').DataTable({
 				"pageLength": 10
 			});
 			// console.log(response);
-
-			funcExportExcel();
 			funcDetail();
 		});
 	}

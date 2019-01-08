@@ -144,7 +144,7 @@
 		{
 			var Year = $("#Year").val();
 			var Departement = $("#DepartementPost").val();
-			var url = base_url_js+"budgeting/get_budget_remaining_grouping";
+			var url = base_url_js+"budgeting/detail_budgeting_remaining";
 			var data = {
 					    Year : Year,
 						Departement : Departement,
@@ -152,50 +152,44 @@
 			var token = jwt_encode(data,'UAP)(*');
 			$.post(url,{token:token},function (resultJson) {
 				var response = jQuery.parseJSON(resultJson);
-				var get_PostBudgetDepartment = function(response)
-				{
-					console.log(response);
-				}
-				PostBudgetDepartment = get_PostBudgetDepartment(response);
+				PostBudgetDepartment = response.data;
+				var html = '<div class = "row" style = "margin-left : 0px">'+
+								'<div class = "col-md-3">'+
+									'<button type="button" class="btn btn-default btn-add-pr"> <i class="icon-plus"></i> Add</button>'+
+								'</div>'+
+							'</div>'+
+							'<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+		
+								'<div class = "col-md-12">'+
+									'<div class = "table-responsive">'+
+										'<table class="table table-bordered tableData" id ="table_input_pr">'+
+										'<thead>'+
+										'<tr>'+
+											'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Select Post Budget Item</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Item</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Desc</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Qty</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Unit Cost</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Sub Total</th>'+
+				                            '<th width = "150px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Date Needed</th>'+
+				                            '<th width = "100px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Budget Status</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Upload Files</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Action</th>'+
+										'</tr></thead>'+
+										'<tbody></tbody></table></div></div></div>';
+				$("#Page_Input_PR").html(html);
+
+				AddingTable();
+
+				$(".btn-add-pr").click(function(){
+					AddingTable();
+				})
 
 			}).fail(function() {
 			  toastr.info('No Result Data'); 
 			}).always(function() {
 			                
 			});
-
-
-			var html = '<div class = "row" style = "margin-left : 0px">'+
-							'<div class = "col-md-3">'+
-								'<button type="button" class="btn btn-default btn-add-pr"> <i class="icon-plus"></i> Add</button>'+
-							'</div>'+
-						'</div>'+
-						'<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+		
-							'<div class = "col-md-12">'+
-								'<div class = "table-responsive">'+
-									'<table class="table table-bordered tableData" id ="table_input_pr">'+
-									'<thead>'+
-									'<tr>'+
-										'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Select Post Budget Item</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Item</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Desc</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Qty</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Unit Cost</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Sub Total</th>'+
-			                            '<th width = "150px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Date Needed</th>'+
-			                            '<th width = "100px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Budget Status</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Upload Files</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Action</th>'+
-									'</tr></thead>'+
-									'<tbody></tbody></table></div></div></div>';
-			$("#Page_Input_PR").html(html);
-
-			AddingTable();
-
-			$(".btn-add-pr").click(function(){
-				AddingTable();
-			})
 
 		}
 
@@ -210,7 +204,14 @@
 				}
 				var a = '<tr>'+
 							'<td>'+No+'</td>'+
-							'<td></td>'+
+							'<td>'+
+								'<div class="input-group">'+
+									'<input type="text" class="form-control PostBudgetItem" readonly>'+
+									'<span class="input-group-btn">'+
+										'<button class="btn btn-default SearchPostBudget" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>'+
+									'</span>'+
+								'</div>'+
+							'</td>'+
 							'<td>'+
 								'<div class="input-group">'+
 									'<input type="text" class="form-control Item" readonly>'+
@@ -249,13 +250,89 @@
 				$('#table_input_pr tbody').append(fill);
 				$('.datetimepicker').datetimepicker();
 			}
-
 			eventTableFunction();
 		}
 
 		function eventTableFunction()
 		{
-				$(".SearchItem").click(function(){
+				$(".SearchPostBudget").unbind().click(function(){
+					var ev = $(this);
+					var html = '';
+					html ='<div class = "row">'+
+							'<div class = "col-md-12">'+
+								'<table id="example" class="table table-bordered display select" cellspacing="0" width="100%">'+
+                       '<thead>'+
+                          '<tr>'+
+                             // '<th><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>'+
+                             '<th></th>'+
+                             '<th>Post Budget Item</th>'+
+                             '<th>Remaining</th>'+
+                          '</tr>'+
+                       '</thead>'+
+                  '</table></div></div>';
+
+      				$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Post Budget Item'+'</h4>');
+      				$('#GlobalModalLarge .modal-body').html(html);
+      				$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+                      '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>');
+      				$('#GlobalModalLarge').modal({
+      				    'show' : true,
+      				    'backdrop' : 'static'
+      				});
+      				var table = $('#example').DataTable({
+      				      "data" : PostBudgetDepartment,
+      				      'columnDefs': [
+	      				      {
+	      				         'targets': 0,
+	      				         'searchable': false,
+	      				         'orderable': false,
+	      				         'className': 'dt-body-center',
+	      				         'render': function (data, type, full, meta){
+	      				             return '<input type="checkbox" name="id[]" value="' + full.ID + '" estvalue="' + full.Value + '">';
+	      				         }
+	      				      },
+	      				      {
+	      				         'targets': 1,
+	      				         'render': function (data, type, full, meta){
+	      				             return full.PostName+'-'+full.RealisasiPostName;
+	      				         }
+	      				      },
+	      				      {
+	      				         'targets': 2,
+	      				         'render': function (data, type, full, meta){
+	      				             return formatRupiah(full.Value);
+	      				         }
+	      				      },
+      				      ],
+      				      // 'order': [[1, 'asc']]
+      				});
+
+      				// Handle click on checkbox to set state of "Select all" control
+      				$('#example tbody').on('change', 'input[type="checkbox"]', function(){
+      					$('input[type="checkbox"]:not(.uniform)').prop('checked', false);
+      					$(this).prop('checked',true);
+      				   
+      				});
+
+      				$("#ModalbtnSaveForm").click(function(){
+      						var chkbox = $('input[type="checkbox"]:checked:not(.uniform)');
+      						var checked = chkbox.val();
+      						var estvalue = chkbox.attr('estvalue');
+      						var n = estvalue.indexOf(".");
+      						estvalue = estvalue.substring(0, n);
+      						var row = chkbox.closest('tr');
+      						var PostBudgetItem = row.find('td:eq(1)').text();
+      						var fillItem = ev.closest('tr');
+      						fillItem.find('td:eq(1)').find('.PostBudgetItem').val(PostBudgetItem);
+      						fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left',checked);
+      						fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('remaining',estvalue);
+      						$('#GlobalModalLarge').modal('hide');
+      				})
+      				
+
+				})
+
+				$(".SearchItem").unbind().click(function(){
 					$(".uniform").prop('disabled', true);
 					var ev = $(this);
 					var html = '';

@@ -1331,14 +1331,4 @@ class C_budgeting extends Budgeting_Controler {
         echo json_encode($get);
     }
 
-    public function get_budget_remaining_grouping()
-    {
-        $this->auth_ajax();
-        $Input = $this->getInputToken();
-        $Departement = $Input['Departement'];
-        $Year = $Input['Year'];
-        $get = $this->m_budgeting->get_budget_remaining($Year,$Departement);
-        echo json_encode($get);
-    }
-
 }
