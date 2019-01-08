@@ -65,6 +65,9 @@ class C_employees extends HR_Controler {
         $config['max_size']             = 8000; // 8 mb
         $config['file_name']            = $fileName;
 
+        if(is_file('./uploads/employees/'.$fileName)){
+            unlink('./uploads/employees/'.$fileName);
+        }
 
         $this->load->library('upload', $config);
         if ( ! $this->upload->do_upload('userfile')){
