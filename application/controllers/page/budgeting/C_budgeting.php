@@ -1156,18 +1156,13 @@ class C_budgeting extends Budgeting_Controler {
                 $get2 = $this->m_budgeting->get_creator_budget($Year,$Departement);
                 for ($i=0; $i < count($get2); $i++) { 
                     $ID_creator_budget = $get2[$i]['ID'];
-                    $DetailMonth = $get2[$i]['DetailMonth'];
-                    $DetailMonth = json_decode($DetailMonth);
-                    // print_r($DetailMonth);
-                    for ($j=0; $j < count($DetailMonth); $j++) { 
-                        $dataSave = array(
+                    $Value = $get2[$i]['SubTotal'];
+                    $dataSave = array(
                             'ID_creator_budget' => $ID_creator_budget,
-                            'YearsMonth' => $DetailMonth[$j]->month.'-01',
-                            'Value' => $DetailMonth[$j]->value * $get2[$i]['UnitCost'],
+                            'Value' => $Value,
                         );
 
-                        $this->db->insert('db_budgeting.budget_left', $dataSave);
-                    }
+                    $this->db->insert('db_budgeting.budget_left', $dataSave);
 
                     $tbl = 'db_budgeting.cfg_set_post';
                     $fieldCode = 'CodePostBudget';
@@ -1253,14 +1248,12 @@ class C_budgeting extends Budgeting_Controler {
     public function detail_budgeting_remaining()
     {
         $this->auth_ajax();
-        $arr_result = array('data' =>'','arr_bulan' => '');
+        $arr_result = array('data' =>'');
         $Input = $this->getInputToken();
         $Year = $Input['Year'];
         $Departement = $Input['Departement'];
         $getData = $this->m_budgeting->get_budget_remaining($Year,$Departement);
-        $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Year',$Year);
-        $arr_bulan = $this->m_master->getShowIntervalBulan($get[0]['StartPeriod'],$get[0]['EndPeriod']);
-        $arr_result = array('data' =>$getData,'arr_bulan' => $arr_bulan);
+        $arr_result = array('data' =>$getData);
         echo json_encode($arr_result);
     }
 
@@ -1335,6 +1328,16 @@ class C_budgeting extends Budgeting_Controler {
         $Departement = $Input['Departement'];
         $Year = $Input['Year'];
         $get = $this->m_budgeting->getPostBudgetDepartement($Departement,$Year);
+        echo json_encode($get);
+    }
+
+    public function get_budget_remaining_grouping()
+    {
+        $this->auth_ajax();
+        $Input = $this->getInputToken();
+        $Departement = $Input['Departement'];
+        $Year = $Input['Year'];
+        $get = $this->m_budgeting->get_budget_remaining($Year,$Departement);
         echo json_encode($get);
     }
 
