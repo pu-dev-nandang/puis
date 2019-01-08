@@ -131,6 +131,7 @@
                 <td>
                     <span class="btn-default-primary hide" id="viewClassGroup" style="padding-left: 5px;padding-right: 5px;"> - </span>
                     <input type="hide" class="hide" id="formClassGroup" />
+                    <input type="hide" class="hide" id="formAllowClassGroup" />
                     <input type="text" class="form-control" style="max-width: 150px;" onkeyup="this.value = this.value.toUpperCase();" id="formClassGroupCadangan" />
                     <div id="alertClassGroup"></div>
                 </td>
@@ -764,9 +765,11 @@
                 if(result.length>0){
                     $('#btnSavejadwal').prop('disabled',true);
                     $('#alertClassGroup').html('<span style="color: red;"><i class="fa fa-times-circle"></i> | Group Exist</span>');
+                    $('#formAllowClassGroup').val(0);
                 } else {
                     $('#btnSavejadwal').prop('disabled',false);
                     $('#alertClassGroup').html('<span style="color: green;"><i class="fa fa-check-circle"></i> | Group Can Use</span>');
+                    $('#formAllowClassGroup').val(1);
                 }
             });
         } else {
@@ -1172,61 +1175,68 @@
         // }
 
         if($.inArray(0,process)==-1){
+            var formAllowClassGroup = parseInt($('#formAllowClassGroup').val());
+            // Untuk mengecek group exist or not exist
+            if(formAllowClassGroup==1){
+                loading_button('#btnSavejadwal');
+                $('#removeNewSesi,#addNewSesi').prop('disabled',true);
+                var SubSesi = (dataSesi>1) ? '1' : '0';
 
-            loading_button('#btnSavejadwal');
-            $('#removeNewSesi,#addNewSesi').prop('disabled',true);
-            var SubSesi = (dataSesi>1) ? '1' : '0';
+                var Attendance = ($('#formAttendance').is(':checked')) ? '1' : '0';
 
-            var Attendance = ($('#formAttendance').is(':checked')) ? '1' : '0';
+                var data = {
+                    action : 'add',
+                    ID : '',
+                    formData :
+                        {
+                            schedule : {
+                                SemesterID : SemesterID,
+                                ProgramsCampusID : ProgramsCampusID,
+                                CombinedClasses : CombinedClasses,
+                                ClassGroup : ClassGroup,
+                                Coordinator : Coordinator,
+                                TeamTeaching : TeamTeaching,
+                                SubSesi : SubSesi,
+                                TotalAssigment : 5,
+                                IsSemesterAntara : ''+SemesterAntara,
+                                Attendance : Attendance,
+                                UpdateBy : UpdateBy,
+                                UpdateAt : UpdateAt
+                            },
+                            schedule_details : dataScheduleDetailsArray,
+                            schedule_details_course : schedule_details_course,
+                            schedule_team_teaching : teamTeachingArray
 
-            var data = {
-                action : 'add',
-                ID : '',
-                formData :
-                    {
-                        schedule : {
-                            SemesterID : SemesterID,
-                            ProgramsCampusID : ProgramsCampusID,
-                            CombinedClasses : CombinedClasses,
-                            ClassGroup : ClassGroup,
-                            Coordinator : Coordinator,
-                            TeamTeaching : TeamTeaching,
-                            SubSesi : SubSesi,
-                            TotalAssigment : 5,
-                            IsSemesterAntara : ''+SemesterAntara,
-                            Attendance : Attendance,
-                            UpdateBy : UpdateBy,
-                            UpdateAt : UpdateAt
-                        },
-                        schedule_details : dataScheduleDetailsArray,
-                        schedule_details_course : schedule_details_course,
-                        schedule_team_teaching : teamTeachingArray
-
-                    }
-            };
-
-            var token = jwt_encode(data,'UAP)(*');
-            var url = base_url_js+'api/__crudSchedule';
-            $.post(url,{token:token},function (result) {
-                resetFormSetSchedule();
-                toastr.success('Schedule Saved','Success!!');
-
-                var arrToken = {
-                    Subject : 'Adding Timetable | Group : '+ClassGroup,
-                    URL : 'academic/timetables/list',
-                    From : sessionName,
-                    Icon : sessionUrlPhoto
+                        }
                 };
 
-                var dataToken = jwt_encode(arrToken,'UAP)(*');
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api/__crudSchedule';
+                $.post(url,{token:token},function (result) {
+                    resetFormSetSchedule();
+                    toastr.success('Schedule Saved','Success!!');
 
-                addNotification(dataToken,null);
+                    var arrToken = {
+                        Subject : 'Adding Timetable | Group : '+ClassGroup,
+                        URL : 'academic/timetables/list',
+                        From : sessionName,
+                        Icon : sessionUrlPhoto
+                    };
 
-                setTimeout(function () {
-                    $('#btnSavejadwal').html('Save');
-                    $('#btnSavejadwal,#removeNewSesi,#addNewSesi').prop('disabled',false);
-                },500);
-            });
+                    var dataToken = jwt_encode(arrToken,'UAP)(*');
+
+                    addNotification(dataToken,null);
+
+                    setTimeout(function () {
+                        $('#btnSavejadwal').html('Save');
+                        $('#btnSavejadwal,#removeNewSesi,#addNewSesi').prop('disabled',false);
+                    },500);
+                });
+            } else {
+                toastr.error('Group is Exist','Error');
+            }
+
+
 
 
         } else {
