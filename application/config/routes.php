@@ -117,6 +117,7 @@ $route['human-resources/employees'] = 'page/hr/c_employees/employees';
 $route['human-resources/employees/input-employees'] = 'page/hr/c_employees/input_employees';
 $route['human-resources/employees/edit-employees/(:num)'] = 'page/hr/c_employees/edit_employees/$1';
 $route['human-resources/upload_photo'] = 'page/hr/c_employees/upload_photo';
+$route['human-resources/upload_ijazah'] = 'page/hr/c_employees/upload_ijazah';
 
 $route['human-resources/monitoring-attendance/with-range-date'] = 'page/hr/c_employees/with_range_date';
 

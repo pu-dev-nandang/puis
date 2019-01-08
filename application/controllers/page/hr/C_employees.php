@@ -66,18 +66,50 @@ class C_employees extends HR_Controler {
         $config['file_name']            = $fileName;
 
 
-            $this->load->library('upload', $config);
-            if ( ! $this->upload->do_upload('userfile')){
-                $error = array('error' => $this->upload->display_errors());
-                return print_r(json_encode($error));
-            }
-            else {
+        $this->load->library('upload', $config);
+        if ( ! $this->upload->do_upload('userfile')){
+            $error = array('error' => $this->upload->display_errors());
+            return print_r(json_encode($error));
+        }
+        else {
 
-                $success = array('success' => $this->upload->data());
-                $success['success']['formGrade'] = 0;
+            $success = array('success' => $this->upload->data());
+            $success['success']['formGrade'] = 0;
 
-                return print_r(json_encode($success));
-            }
+            return print_r(json_encode($success));
+        }
+
+
+
+    }
+
+    public function upload_ijazah(){
+
+        $fileName = $this->input->get('fileName');
+
+        $config['upload_path']          = './uploads/ijazah/';
+        $config['allowed_types']        = 'pdf';
+        $config['max_size']             = 8000; // 8 mb
+        $config['file_name']            = $fileName;
+
+//        $pathUn = realpath(APPPATH);
+        if(is_file('./uploads/ijazah/'.$fileName)){
+            unlink('./uploads/ijazah/'.$fileName);
+        }
+
+
+        $this->load->library('upload', $config);
+        if ( ! $this->upload->do_upload('userfile')){
+            $error = array('error' => $this->upload->display_errors());
+            return print_r(json_encode($error));
+        }
+        else {
+
+            $success = array('success' => $this->upload->data());
+            $success['success']['formGrade'] = 0;
+
+            return print_r(json_encode($success));
+        }
 
 
 
