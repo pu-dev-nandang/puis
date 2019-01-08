@@ -3109,8 +3109,6 @@ class C_api extends CI_Controller {
                         $this->db->where('ID', $ArrToApproveAll[$i]);
                         $this->db->update('db_academic.std_krs',$arrUpdate);
 
-                        //
-
                     }
                 }
 
@@ -3124,15 +3122,30 @@ class C_api extends CI_Controller {
                 $this->db->where('ID', $data_arr['ID']);
                 $this->db->update('db_academic.std_krs',$arrUpdate);
 
-                // Insert
-                $Logging = (array) $data_arr['Logging'];
+                // Insert Logging
+                $Log_dataInsert = (array) $data_arr['Logging'];
+                $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
+                $insert_id = $this->db->insert_id();
 
-                // Get STD KRS
-                $dataKRS = $this->db->query('SELECT sk.*, auts.Name AS StudentName FROM db_academic.std_krs sk 
-                                                        LEFT JOIN db_academic.auth_students uats ON (auts.NPM = sk.NPM)
-                                                        WHERE sk.ID = "'.$data_arr['ID'].'" ')->result_array();
+                $Log_dataUser = $this->db->select('NIP')->get_where('db_employees.rule_users',
+                    array('IDDivision' => '6'))->result_array();
 
+                $Log_arr_ins = array(
+                    'IDLogging' => $insert_id,
+                    'UserID' => $data_arr['NPM']
+                );
+                $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
 
+                if(count($Log_dataUser)>0){
+                    for($i=0;$i<count($Log_dataUser);$i++){
+                        $d = $Log_dataUser[$i]['NIP'];
+                        $Log_arr_ins = array(
+                            'IDLogging' => $insert_id,
+                            'UserID' => $d
+                        );
+                        $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+                    }
+                }
 
                 return print_r(1);
             }
@@ -3175,6 +3188,30 @@ class C_api extends CI_Controller {
                     'UpdateAt' => $data_arr['UpdateAt']
                 );
                 $this->db->insert('db_academic.std_krs_comment',$dataInsert);
+
+                $Log_dataInsert = (array) $data_arr['dataLogging'];
+                $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
+                $insert_id = $this->db->insert_id();
+
+                $Log_dataUser = $this->db->select('NIP')->get_where('db_employees.rule_users',
+                    array('IDDivision' => '6'))->result_array();
+
+                $Log_arr_ins = array(
+                    'IDLogging' => $insert_id,
+                    'UserID' => $data_arr['NPM']
+                );
+                $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+
+                if(count($Log_dataUser)>0){
+                    for($i=0;$i<count($Log_dataUser);$i++){
+                        $d = $Log_dataUser[$i]['NIP'];
+                        $Log_arr_ins = array(
+                            'IDLogging' => $insert_id,
+                            'UserID' => $d
+                        );
+                        $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+                    }
+                }
 
                 return print_r(1);
             }
