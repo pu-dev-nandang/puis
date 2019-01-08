@@ -743,11 +743,15 @@
     $(document).on('blur','#formClassGroupCadangan',function () {
         cekGroupCuy();
     });
+
     function cekGroupCuy() {
         var g = $('#formClassGroupCadangan').val();
         if(g!='' && g!=null){
+            var filterSemester = $('#filterSemester').val();
+            var SemesterID = filterSemester.split('.')[0];
             var data = {
                 action : 'checkGroup',
+                SemesterID : SemesterID,
                 Group : g
             };
             var token = jwt_encode(data,'UAP)(*');

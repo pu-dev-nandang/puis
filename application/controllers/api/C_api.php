@@ -1389,7 +1389,7 @@ class C_api extends CI_Controller {
 
                 $dataG = $this->db->query('SELECT s.ID FROM db_academic.schedule s 
                                                 WHERE s.ClassGroup LIKE "'.$data_arr['Group'].'" 
-                                                AND s.SemesterID = (SELECT ID FROM db_academic.semester WHERE Status = 1)')
+                                                AND s.SemesterID = "'.$data_arr['SemesterID'].'" ')
                                             ->result_array();
                 return print_r(json_encode($dataG));
             }
@@ -3108,6 +3108,9 @@ class C_api extends CI_Controller {
                         );
                         $this->db->where('ID', $ArrToApproveAll[$i]);
                         $this->db->update('db_academic.std_krs',$arrUpdate);
+
+                        //
+
                     }
                 }
 
@@ -3120,6 +3123,17 @@ class C_api extends CI_Controller {
                 );
                 $this->db->where('ID', $data_arr['ID']);
                 $this->db->update('db_academic.std_krs',$arrUpdate);
+
+                // Insert
+                $Logging = (array) $data_arr['Logging'];
+
+                // Get STD KRS
+                $dataKRS = $this->db->query('SELECT sk.*, auts.Name AS StudentName FROM db_academic.std_krs sk 
+                                                        LEFT JOIN db_academic.auth_students uats ON (auts.NPM = sk.NPM)
+                                                        WHERE sk.ID = "'.$data_arr['ID'].'" ')->result_array();
+
+
+
                 return print_r(1);
             }
 
@@ -6910,13 +6924,15 @@ class C_api extends CI_Controller {
         $data_arr = $this->getInputToken();
 
         if($data_arr['action']=='readLog'){
-            $dataLog = $this->m_log->readDataLog();
+            $UserID = $data_arr['UserID'];
+            $dataLog = $this->m_log->readDataLog($UserID);
             return print_r(json_encode($dataLog));
         }
         else if($data_arr['action']=='getTotalUnreadLog'){
-            $NIP = $this->session->userdata('NIP');
+
+            $UserID = $data_arr['UserID'];
             $data = $this->db->select('ID')->get_where('db_notifikasi.logging_user',
-                array('UserID' => $NIP, "StatusRead" => "0"))->result_array();
+                array('UserID' => $UserID, "StatusRead" => "0"))->result_array();
             return print_r(json_encode(count($data)));
         }
 
