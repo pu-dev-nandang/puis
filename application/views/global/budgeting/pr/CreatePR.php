@@ -57,22 +57,6 @@
 			loadShowBUdgetRemaining(BudgetRemaining);
 		}
 
-		function BudgetChoose()
-		{
-			var arr = [];
-			$(".uniform:checked").each(function(){
-				var estvalue = $(this).val();
-				 var n = estvalue.indexOf(".");
-				estvalue = estvalue.substring(0, n);
-				var id_budget_left = $(this).attr('id_table');
-				var data = {
-					estvalue : estvalue,
-					id_budget_left : id_budget_left
-				}
-				arr.push(data);
-			})
-			return arr;
-		}
 
 		function loadYear()
 		{
@@ -345,10 +329,28 @@
       							}
 
       							if (bool) { // edit
-      								BudgetRemaining[i].PostBudgetItem = PostBudgetItem;
-      								BudgetRemaining[i].Remaining = formatRupiah(estvalue);
-      								BudgetRemaining[i].id_budget_left = checked;
-      								BudgetRemaining[i].RemainingNoFormat = estvalue;
+      								// pergantian post budget item
+      								var bool3 = false;
+      								for (var i = 0; i < BudgetRemaining.length; i++) {
+      									if (checked == BudgetRemaining[i].id_budget_left) {
+      										bool3 = true;
+      										break;
+      									}
+      								}
+
+      								if (bool3) {
+      									_BudgetRemaining(checked)
+      								}
+      								else
+      								{
+      									// BudgetRemaining[i].PostBudgetItem = PostBudgetItem;
+      									// BudgetRemaining[i].Remaining = formatRupiah(estvalue);
+      									// BudgetRemaining[i].id_budget_left = checked;
+      									// BudgetRemaining[i].RemainingNoFormat = estvalue;
+      									// BudgetRemaining[i].RemainingFirst = estvalue;
+      									_BudgetRemaining(checked);
+      								}
+
       							}
       							else
       							{
@@ -369,6 +371,7 @@
       						fillItem.find('td:eq(1)').find('.PostBudgetItem').val(PostBudgetItem);
       						fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left',checked);
       						fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('remaining',estvalue);
+      						fillItem.find('td:eq(4)').find('.qty').trigger('change');
       						$('#GlobalModalLarge').modal('hide');
       				})
       				
@@ -534,15 +537,15 @@
 				$(".btn-delete-item").click(function(){
 					var fillItem = $(this).closest('tr');
 					var id_budget_left = fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left');
-					_BudgetRemaining(id_budget_left);
+
 					$( this )
                       .closest( 'tr')
                       .remove();
-
-                      $(".qty").each(function(){
-                      	var fillItem = $(this).closest('tr');
-                      	FuncBudgetStatus(fillItem); 
-                      })
+                      _BudgetRemaining(id_budget_left);
+                      // $(".qty").each(function(){
+                      // 	var fillItem = $(this).closest('tr');
+                      // 	FuncBudgetStatus(fillItem); 
+                      // })
                       SortByNumbering();
 				})
 			//} // if not exist
@@ -613,16 +616,15 @@
 
 		function _BudgetRemaining(id_budget_left)
 		{
+			loadingStart();
 			var pengurangan = 0;
 			$('.PostBudgetItem[id_budget_left="'+id_budget_left+'"]').each(function(){
 				var fillItem = $(this).closest('tr');
 				var SubTotal = fillItem.find('td:eq(6)').find('.SubTotal').val();
 				var SubTotal = findAndReplace(SubTotal, ".","");
 				pengurangan += parseInt(SubTotal);
-				console.log(pengurangan + ' ' + id_budget_left);
-
-			})
-
+			});
+			
 			for (var i = 0; i < BudgetRemaining.length; i++) {
 				if (id_budget_left == BudgetRemaining[i].id_budget_left) {
 					var estvalue = BudgetRemaining[i].RemainingFirst - pengurangan;
@@ -631,8 +633,10 @@
 					break;
 				}
 			}
-			console.log(BudgetRemaining);
+
 			loadShowBUdgetRemaining(BudgetRemaining);
+			loadingEnd(100)
+
 		}
 
 		function loadSelectPostRealiasi_byCross(fillItem)
