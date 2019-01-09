@@ -323,6 +323,49 @@
       						var row = chkbox.closest('tr');
       						var PostBudgetItem = row.find('td:eq(1)').text();
       						var fillItem = ev.closest('tr');
+
+      						var GetNO = fillItem.find('td:eq(0)').text();
+      						var dataarr = {
+      							PostBudgetItem : PostBudgetItem,
+      							Remaining : formatRupiah(estvalue),
+      							No : GetNO,
+      							id_budget_left : checked,
+      							RemainingNoFormat : estvalue,
+      							RemainingFirst : estvalue,
+      						}
+
+      						// Find Number exist
+      							var bool = false; //for numbering
+      							var bool2 = false; //for id_budget_left
+      							for (var i = 0; i < BudgetRemaining.length; i++) {
+      								if (GetNO == BudgetRemaining[i].No) {
+      									bool = true;
+      									break;
+      								}
+      							}
+
+      							if (bool) { // edit
+      								BudgetRemaining[i].PostBudgetItem = PostBudgetItem;
+      								BudgetRemaining[i].Remaining = formatRupiah(estvalue);
+      								BudgetRemaining[i].id_budget_left = checked;
+      								BudgetRemaining[i].RemainingNoFormat = estvalue;
+      							}
+      							else
+      							{
+      								for (var i = 0; i < BudgetRemaining.length; i++) {
+      									if (checked == BudgetRemaining[i].id_budget_left) {
+      										bool2 = true;
+      										break;
+      									}
+      								}
+      								if (!bool2) {
+      									BudgetRemaining.push(dataarr);
+      								}
+      								
+      							}
+
+      							loadShowBUdgetRemaining(BudgetRemaining);
+
       						fillItem.find('td:eq(1)').find('.PostBudgetItem').val(PostBudgetItem);
       						fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left',checked);
       						fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('remaining',estvalue);
@@ -410,18 +453,18 @@
 				   		var DetailCatalog =  row.find('td:eq(5)').html();
 				   		var arr = Item+'@@'+Desc+'@@'+Est+'@@'+Photo+'@@'+DetailCatalog;
 				   		var fillItem = ev.closest('tr');
-				   		fillItem.find('td:eq(1)').find('.Item').val(Item);
-				   		fillItem.find('td:eq(1)').find('.Item').attr('savevalue',checked);
-				   		fillItem.find('td:eq(1)').find('.Item').attr('estvalue',estvalue);
-				   		fillItem.find('td:eq(2)').find('.Detail').attr('data',arr);
-				   		fillItem.find('td:eq(4)').find('.UnitCost').val(estvalue);
-				   		fillItem.find('td:eq(4)').find('.UnitCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-				   		fillItem.find('td:eq(4)').find('.UnitCost').maskMoney('mask', '9894');
+				   		fillItem.find('td:eq(2)').find('.Item').val(Item);
+				   		fillItem.find('td:eq(2)').find('.Item').attr('savevalue',checked);
+				   		fillItem.find('td:eq(2)').find('.Item').attr('estvalue',estvalue);
+				   		fillItem.find('td:eq(3)').find('.Detail').attr('data',arr);
+				   		fillItem.find('td:eq(5)').find('.UnitCost').val(estvalue);
+				   		fillItem.find('td:eq(5)').find('.UnitCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+				   		fillItem.find('td:eq(5)').find('.UnitCost').maskMoney('mask', '9894');
 
-				   		fillItem.find('td:eq(3)').find('.qty').prop('disabled', false);
-				   		fillItem.find('td:eq(4)').find('.UnitCost').prop('disabled', false);
+				   		fillItem.find('td:eq(4)').find('.qty').prop('disabled', false);
+				   		fillItem.find('td:eq(5)').find('.UnitCost').prop('disabled', false);
 
-				   		fillItem.find('td:eq(3)').find('.qty').trigger('keyup');
+				   		fillItem.find('td:eq(4)').find('.qty').trigger('change');
 				   		$('#GlobalModalLarge').modal('hide');
 				   })
 
@@ -459,32 +502,39 @@
 
 				})
 
-				$(".qty").bind('keyup mouseup', function () {
+				$(".qty").change(function(){
 				    var qty = $(this).val();
 				    var fillItem = $(this).closest('tr');
-				    var estvalue = fillItem.find('td:eq(4)').find('.UnitCost').val();
+				    var estvalue = fillItem.find('td:eq(5)').find('.UnitCost').val();
 				    estvalue = findAndReplace(estvalue, ".","");
 				    var SubTotal = parseInt(qty) * parseInt(estvalue);
-				    fillItem.find('td:eq(5)').find('.SubTotal').val(SubTotal);
-				    fillItem.find('td:eq(5)').find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-				    fillItem.find('td:eq(5)').find('.SubTotal').maskMoney('mask', '9894');
-				    FuncBudgetStatus(fillItem);        
+				    fillItem.find('td:eq(6)').find('.SubTotal').val(SubTotal);
+				    fillItem.find('td:eq(6)').find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+				    fillItem.find('td:eq(6)').find('.SubTotal').maskMoney('mask', '9894');
+				    FuncBudgetStatus(fillItem);
+				    var id_budget_left = fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left');
+				    _BudgetRemaining(id_budget_left);        
 				});
 				
 
 				$(".UnitCost").keyup(function(){
 					var fillItem = $(this).closest('tr');
-					var qty = fillItem.find('td:eq(3)').find('.qty').val();
+					var qty = fillItem.find('td:eq(4)').find('.qty').val();
 					var estvalue = $(this).val();
 					estvalue = findAndReplace(estvalue, ".","");
 					var SubTotal = parseInt(qty) * parseInt(estvalue);
-					fillItem.find('td:eq(5)').find('.SubTotal').val(SubTotal);
-					fillItem.find('td:eq(5)').find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-					fillItem.find('td:eq(5)').find('.SubTotal').maskMoney('mask', '9894');
+					fillItem.find('td:eq(6)').find('.SubTotal').val(SubTotal);
+					fillItem.find('td:eq(6)').find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+					fillItem.find('td:eq(6)').find('.SubTotal').maskMoney('mask', '9894');
 					FuncBudgetStatus(fillItem);
+					var id_budget_left = fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left');
+					_BudgetRemaining(id_budget_left);
 				})
 
 				$(".btn-delete-item").click(function(){
+					var fillItem = $(this).closest('tr');
+					var id_budget_left = fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left');
+					_BudgetRemaining(id_budget_left);
 					$( this )
                       .closest( 'tr')
                       .remove();
@@ -510,12 +560,21 @@
 
 		function FuncBudgetStatus(fillItem)
 		{
-			var arr = [];
-			var GetPostBudget = BudgetChoose();
-			var totalPostBudget = 0;
-			for (var i = 0; i < GetPostBudget.length; i++) {
-				totalPostBudget += parseInt(GetPostBudget[i].estvalue);
-			}
+			var SubTotal = fillItem.find('td:eq(6)').find('.SubTotal').val(); 
+			var SubTotal = findAndReplace(SubTotal, ".","");
+			var id_budget_left = fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left');
+			var GetBudgetRemaining = function(id_budget_left,BudgetRemaining){
+				var Remaining = 0;
+				for (var i = 0; i < BudgetRemaining.length; i++) {
+					if (id_budget_left == BudgetRemaining[i].id_budget_left) {
+						Remaining = BudgetRemaining[i].RemainingNoFormat;
+						break;
+					}
+				}
+				return Remaining;
+			};
+
+			var Remaining = GetBudgetRemaining(id_budget_left,BudgetRemaining);
 
 			var OP = [
 					{
@@ -532,15 +591,7 @@
 					},
 				];
 
-			// var SubTotal = fillItem.find('td:eq(5)').find('.SubTotal').val(); 
-			var SubTotal = 0;
-			$(".SubTotal").each(function(){
-				var a = $(this).val();
-				a = findAndReplace(a, ".","");
-				SubTotal += parseInt(a);
-			})
-			// SubTotal = findAndReplace(SubTotal, ".","");
-			var DefaultName = (totalPostBudget >= SubTotal) ? 'IN' : 'Exceed';
+			var DefaultName = (Remaining >= SubTotal) ? 'IN' : 'Exceed';
 			var html = '<select class = "form-control BudgetStatus">';
 
 			for (var i = 0; i < OP.length; i++) {
@@ -549,14 +600,39 @@
 			}
 			html += '</select>';
 
-			fillItem.find('td:eq(7)').html(html);
+			fillItem.find('td:eq(8)').html(html);
+			
 			
 			$(".BudgetStatus").change(function(){
 				var valuee = $(this).val();
 				if (valuee == 'Cross') {
-					loadSelectPostRealiasi_byCross(fillItem)
+					loadSelectPostRealiasi_byCross(fillItem);
 				}
 			})
+		}
+
+		function _BudgetRemaining(id_budget_left)
+		{
+			var pengurangan = 0;
+			$('.PostBudgetItem[id_budget_left="'+id_budget_left+'"]').each(function(){
+				var fillItem = $(this).closest('tr');
+				var SubTotal = fillItem.find('td:eq(6)').find('.SubTotal').val();
+				var SubTotal = findAndReplace(SubTotal, ".","");
+				pengurangan += parseInt(SubTotal);
+				console.log(pengurangan + ' ' + id_budget_left);
+
+			})
+
+			for (var i = 0; i < BudgetRemaining.length; i++) {
+				if (id_budget_left == BudgetRemaining[i].id_budget_left) {
+					var estvalue = BudgetRemaining[i].RemainingFirst - pengurangan;
+					BudgetRemaining[i].Remaining = formatRupiah(estvalue);
+					BudgetRemaining[i].RemainingNoFormat = estvalue;
+					break;
+				}
+			}
+			console.log(BudgetRemaining);
+			loadShowBUdgetRemaining(BudgetRemaining);
 		}
 
 		function loadSelectPostRealiasi_byCross(fillItem)
