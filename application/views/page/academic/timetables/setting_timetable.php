@@ -27,8 +27,9 @@
                 <td style="width: 20%;">Academic Year</td>
                 <td style="width: 1%;">:</td>
                 <td>
-                    <strong id="semesterName">-</strong>
-                    <input id="formSemesterID" class="hide" type="hidden" readonly/>
+<!--                    <strong id="semesterName">-</strong>-->
+                    <input id="formSemesterID" class="hide" readonly/>
+                    <select class="form-control" id="filterSemester" style="max-width: 200px;"></select>
                 </td>
             </tr>
             <tr>
@@ -70,7 +71,7 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <select class="form-control" id="formGroupProdi1" style="max-width: 200px;" disabled><option selected disabled>-- Select Group Prodi --</option></select>
+                            <select class="form-control" id="formGroupProdi1" style="max-width: 200px;" disabled><option value="" selected disabled>-- Select Group Prodi --</option></select>
                             <input class="hide" readonly value="0" id="viewGroupProdi1">
                         </div>
                     </div>
@@ -130,6 +131,7 @@
                 <td>
                     <span class="btn-default-primary hide" id="viewClassGroup" style="padding-left: 5px;padding-right: 5px;"> - </span>
                     <input type="hide" class="hide" id="formClassGroup" />
+                    <input type="hide" class="hide" id="formAllowClassGroup" />
                     <input type="text" class="form-control" style="max-width: 150px;" onkeyup="this.value = this.value.toUpperCase();" id="formClassGroupCadangan" />
                     <div id="alertClassGroup"></div>
                 </td>
@@ -239,7 +241,20 @@
         window.dataSesi = 1;
         window.dataProdi = 1;
 
-        loadAcademicYearOnPublish('');
+        loSelectOptionSemester('#filterSemester','');
+
+        var firsLoadSmt = setInterval(function (args) {
+            var filterSemester = $('#filterSemester').val();
+            if(filterSemester!='' && filterSemester!=null){
+                var SmtID = filterSemester.split('.')[0];
+                $('#formSemesterID').val(SmtID);
+                clearInterval(firsLoadSmt);
+            }
+
+
+        },1000);
+
+        // loadAcademicYearOnPublish('');
         loadSelectOptionConf('#formProgramsCampusID','programs_campus','');
         loadSelectOptionLecturersSingle('#formCoordinator','');
         loadSelectOptionLecturersSingle('#formTeamTeaching','');
@@ -260,6 +275,22 @@
                 setSesiAkhir(no);
                 checkSchedule(no);
             });
+    });
+
+    $('#filterSemester').change(function () {
+        var filterSemester = $('#filterSemester').val();
+        if(filterSemester!='' && filterSemester!=null){
+            var SmtID = filterSemester.split('.')[0];
+            $('#formSemesterID').val(SmtID);
+            for(var p=1;p<=dataProdi;p++){
+                var formBaseProdi = $('#formBaseProdi'+p).val();
+                if(formBaseProdi!='' && formBaseProdi!=null){
+                    var ProdiID = formBaseProdi.split('.')[0];
+                    getCourseOfferings(ProdiID,p);
+                }
+
+            }
+        }
     });
 
     $(document).on('change','.formtime',function () {
@@ -289,17 +320,17 @@
     });
 
     function loadAcademicYearOnPublish(smt) {
-        var url = base_url_js+"api/__getAcademicYearOnPublish";
-        $.getJSON(url,{smt:smt},function (data_json) {
-            if(smt=='SemesterAntara'){
-                $('#formSemesterID').val(data_json.SemesterID);
-            } else {
-                $('#formSemesterID').val(data_json.ID);
-            }
-
-            $('#semesterName').html(data_json.Year+''+data_json.Code+' | '+data_json.Name);
-
-        });
+        // var url = base_url_js+"api/__getAcademicYearOnPublish";
+        // $.getJSON(url,{smt:smt},function (data_json) {
+        //     if(smt=='SemesterAntara'){
+        //         $('#formSemesterID').val(data_json.SemesterID);
+        //     } else {
+        //         $('#formSemesterID').val(data_json.ID);
+        //     }
+        //
+        //     $('#semesterName').html(data_json.Year+''+data_json.Code+' | '+data_json.Name);
+        //
+        // });
     }
 
     function setGroupClass() {
@@ -713,11 +744,15 @@
     $(document).on('blur','#formClassGroupCadangan',function () {
         cekGroupCuy();
     });
+
     function cekGroupCuy() {
         var g = $('#formClassGroupCadangan').val();
         if(g!='' && g!=null){
+            var filterSemester = $('#filterSemester').val();
+            var SemesterID = filterSemester.split('.')[0];
             var data = {
                 action : 'checkGroup',
+                SemesterID : SemesterID,
                 Group : g
             };
             var token = jwt_encode(data,'UAP)(*');
@@ -730,9 +765,11 @@
                 if(result.length>0){
                     $('#btnSavejadwal').prop('disabled',true);
                     $('#alertClassGroup').html('<span style="color: red;"><i class="fa fa-times-circle"></i> | Group Exist</span>');
+                    $('#formAllowClassGroup').val(0);
                 } else {
                     $('#btnSavejadwal').prop('disabled',false);
                     $('#alertClassGroup').html('<span style="color: green;"><i class="fa fa-check-circle"></i> | Group Can Use</span>');
+                    $('#formAllowClassGroup').val(1);
                 }
             });
         } else {
@@ -995,7 +1032,8 @@
 
         var process = [];
 
-        var SemesterID = $('#formSemesterID').val();
+        var filterSemester = $('#filterSemester').val();
+        var SemesterID = filterSemester.split('.')[0];
         var ProgramsCampusID = $('#formProgramsCampusID').val();
         var CombinedClasses = (dataProdi>1) ? '1' : '0';
 
@@ -1078,10 +1116,6 @@
         }
 
         var Coordinator = $('#formCoordinator').val();
-        // if(Coordinator=='' || Coordinator==null){
-        //     requiredForm('#s2id_formCoordinator a');
-        //         process.push(0);
-        // }
 
         var TeamTeaching = $('input[name=formteamTeaching]:checked').val();
         var UpdateBy = sessionNIP;
@@ -1141,61 +1175,68 @@
         // }
 
         if($.inArray(0,process)==-1){
+            var formAllowClassGroup = parseInt($('#formAllowClassGroup').val());
+            // Untuk mengecek group exist or not exist
+            if(formAllowClassGroup==1){
+                loading_button('#btnSavejadwal');
+                $('#removeNewSesi,#addNewSesi').prop('disabled',true);
+                var SubSesi = (dataSesi>1) ? '1' : '0';
 
-            loading_button('#btnSavejadwal');
-            $('#removeNewSesi,#addNewSesi').prop('disabled',true);
-            var SubSesi = (dataSesi>1) ? '1' : '0';
+                var Attendance = ($('#formAttendance').is(':checked')) ? '1' : '0';
 
-            var Attendance = ($('#formAttendance').is(':checked')) ? '1' : '0';
+                var data = {
+                    action : 'add',
+                    ID : '',
+                    formData :
+                        {
+                            schedule : {
+                                SemesterID : SemesterID,
+                                ProgramsCampusID : ProgramsCampusID,
+                                CombinedClasses : CombinedClasses,
+                                ClassGroup : ClassGroup,
+                                Coordinator : Coordinator,
+                                TeamTeaching : TeamTeaching,
+                                SubSesi : SubSesi,
+                                TotalAssigment : 5,
+                                IsSemesterAntara : ''+SemesterAntara,
+                                Attendance : Attendance,
+                                UpdateBy : UpdateBy,
+                                UpdateAt : UpdateAt
+                            },
+                            schedule_details : dataScheduleDetailsArray,
+                            schedule_details_course : schedule_details_course,
+                            schedule_team_teaching : teamTeachingArray
 
-            var data = {
-                action : 'add',
-                ID : '',
-                formData :
-                    {
-                        schedule : {
-                            SemesterID : SemesterID,
-                            ProgramsCampusID : ProgramsCampusID,
-                            CombinedClasses : CombinedClasses,
-                            ClassGroup : ClassGroup,
-                            Coordinator : Coordinator,
-                            TeamTeaching : TeamTeaching,
-                            SubSesi : SubSesi,
-                            TotalAssigment : 5,
-                            IsSemesterAntara : ''+SemesterAntara,
-                            Attendance : Attendance,
-                            UpdateBy : UpdateBy,
-                            UpdateAt : UpdateAt
-                        },
-                        schedule_details : dataScheduleDetailsArray,
-                        schedule_details_course : schedule_details_course,
-                        schedule_team_teaching : teamTeachingArray
-
-                    }
-            };
-
-            var token = jwt_encode(data,'UAP)(*');
-            var url = base_url_js+'api/__crudSchedule';
-            $.post(url,{token:token},function (result) {
-                resetFormSetSchedule();
-                toastr.success('Schedule Saved','Success!!');
-
-                var arrToken = {
-                    Subject : 'Adding Timetable | Group : '+ClassGroup,
-                    URL : 'academic/timetables/list',
-                    From : sessionName,
-                    Icon : sessionUrlPhoto
+                        }
                 };
 
-                var dataToken = jwt_encode(arrToken,'UAP)(*');
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api/__crudSchedule';
+                $.post(url,{token:token},function (result) {
+                    resetFormSetSchedule();
+                    toastr.success('Schedule Saved','Success!!');
 
-                addNotification(dataToken,null);
+                    var arrToken = {
+                        Subject : 'Adding Timetable | Group : '+ClassGroup,
+                        URL : 'academic/timetables/list',
+                        From : sessionName,
+                        Icon : sessionUrlPhoto
+                    };
 
-                setTimeout(function () {
-                    $('#btnSavejadwal').html('Save');
-                    $('#btnSavejadwal,#removeNewSesi,#addNewSesi').prop('disabled',false);
-                },500);
-            });
+                    var dataToken = jwt_encode(arrToken,'UAP)(*');
+
+                    addNotification(dataToken,null);
+
+                    setTimeout(function () {
+                        $('#btnSavejadwal').html('Save');
+                        $('#btnSavejadwal,#removeNewSesi,#addNewSesi').prop('disabled',false);
+                    },500);
+                });
+            } else {
+                toastr.error('Group is Exist','Error');
+            }
+
+
 
 
         } else {

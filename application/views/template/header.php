@@ -11,7 +11,17 @@
         overflow-y: auto;
     }
 
+    .label-image img {
+        max-width: 43px;
+    }
 
+    #showingLog .dropdown-menu.extended {
+        width: 390px;
+    }
+
+    #li2ShowLog .from {
+        color: #083f88;
+    }
 
     #tableSimpleSearch tr th,#tableSimpleSearch tr td {
         text-align: center;
@@ -89,10 +99,22 @@
             <!--                </a>-->
             <!--            </li>-->
 
-            <!-- Messages -->
-            <li class="dropdown hidden-xs hidden-sm" id = 'NotificationDivisi'>
 
+            <!-- Logging -->
+            <li class="dropdown" id="showingLog" >
+                <a href="#" class="dropdown-toggle" onclick="showLog();" data-toggle="dropdown">
+                    <i class="fa fa-sort-amount-asc"></i>
+                    <span class="badge totalUnreadLog">0</span>
+                </a>
+                <ul class="dropdown-menu extended notification" id="li2ShowLog">
+                    <li class="title">
+                        <p>Log not yet</p>
+                    </li>
+                </ul>
             </li>
+
+            <!-- Messages -->
+            <li class="dropdown hidden-xs hidden-sm" id = 'NotificationDivisi'></li>
 
             <?php if(count($rule_service)>0){ ?>
                 <li class="dropdown <?php if($this->uri->segment(1)=='database'){echo 'current';} ?>">
@@ -239,10 +261,13 @@
 
 <script>
 
+     var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+
     $(document).ready(function () {
         $('.departement ,.departement1').addClass('hide');
         loadAllowDivision();
-        showHTMLMessagesDivision();
+        // showHTMLMessagesDivision();
+        showUnreadLog();
         socket_messages();
         wrDepartmentAdmProdi();
 
@@ -251,10 +276,9 @@
             $('#theme-switcher label:first-child').removeClass('active');
         }
 
-        // $('#theme-switcher').children()[0].removeClass('active').addClass('btn-inverse');
-        // $('#theme-switcher').children()[1].addClass('btn-inverse active');
-        // $('.sidebar-widget #theme-switcher .btn').removeClass('active');
-        // btn-inverse active
+        // socket.emit('update_log', {
+        //     update_log: '1'
+        // });
 
     });
 
@@ -438,6 +462,25 @@
 
             var notification = new Notification(title,options);
 
+            notification.onclick = function() {
+                window.location.href = '';
+                notification.close();
+            };
+            // At last, if the user already denied any notification, and you
+            // want to be respectful there is no need to bother them any more.
+
+
+            // Update show notif 1
+            var url = base_url_js+'api/__crudNotification';
+            var data = {
+                action : 'hideNotifBrowser',
+                IDUser : IDUser
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            $.post(url,{token:token},function (jsonResult) {
+
+            });
+
         }
 
         // Otherwise, we need to ask the user for permission
@@ -453,28 +496,31 @@
                 // If the user is okay, let's create a notification
                 if (permission === "granted") {
                     var notification = new Notification(title,options);
+                    notification.onclick = function() {
+                        window.location.href = '';
+                        notification.close();
+                    };
+                    // At last, if the user already denied any notification, and you
+                    // want to be respectful there is no need to bother them any more.
+
+
+                    // Update show notif 1
+                    var url = base_url_js+'api/__crudNotification';
+                    var data = {
+                        action : 'hideNotifBrowser',
+                        IDUser : IDUser
+                    };
+                    var token = jwt_encode(data,'UAP)(*');
+                    $.post(url,{token:token},function (jsonResult) {
+
+                    });
                 }
             });
+
+
         }
 
-        notification.onclick = function() {
-            window.location.href = '';
-            notification.close();
-        };
-        // At last, if the user already denied any notification, and you
-        // want to be respectful there is no need to bother them any more.
 
-
-        // Update show notif 1
-        var url = base_url_js+'api/__crudNotification';
-        var data = {
-            action : 'hideNotifBrowser',
-            IDUser : IDUser
-        };
-        var token = jwt_encode(data,'UAP)(*');
-        $.post(url,{token:token},function (jsonResult) {
-
-        });
 
     }
 
@@ -492,26 +538,91 @@
         }
     };
 
-    function socket_messages()
-    {
-        var socket = io.connect( 'http://'+window.location.hostname+':3000' );
-        // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
+    function socket_messages(){
 
         socket.on( 'update_notifikasi', function( data ) {
-
-            //$( "#new_count_message" ).html( data.new_count_message );
-            //$('#notif_audio')[0].play();
             if (data.update_notifikasi == 1) {
                 // action
-                showHTMLMessagesDivision();
+                // showHTMLMessagesDivision();
+            }
+
+        }); // exit socket
+
+        socket.on( 'update_log', function( data ) {
+
+            if (data.update_log == 1) {
+                showUnreadLog();
             }
 
         }); // exit socket
     }
 
+    function showUnreadLog() {
+        var url = base_url_js+'api/__crudLog';
+        var data = {
+            action : 'getTotalUnreadLog',
+            UserID : sessionNIP
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        $.post(url,{token:token},function (jsonResult) {
+            $('.totalUnreadLog').html(jsonResult);
+        });
+    }
+    
+    function showLog() {
+        var url = base_url_js+'api/__crudLog';
+        var data = {
+            action : 'readLog',
+            UserID : sessionNIP
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        $.post(url,{token:token},function (jsonResult) {
 
-    function ReadNotifDivision()
-    {
+            var Details = jsonResult.Details;
+
+
+
+            if(Details.length>0){
+
+                $('#li2ShowLog').html('<li class="title">' +
+                    '                        <p>You have several logs</p>' +
+                    '                    </li>');
+
+                for(var i=0;i<Details.length;i++){
+                    var d = Details[i];
+                    $('#li2ShowLog').append('<li>' +
+                    '                        <a href="'+base_url_js+''+d.URLDirect+'">' +
+                    '                            <span class="photo"><img class="img-rounded img-fitter-notif" data-src="'+d.Icon+'"></span>' +
+                    '                            <span class="subject"><span class="from">'+d.CreatedName+'</span></span>' +
+                    '                            <span class="text">'+d.Title+'</span>' +
+                    '                            <div class="time" style="position: relative;padding-left: 5px;text-align: right;"><i class="fa fa-clock-o"></i>' +
+                        '                           '+moment(d.CreatedAt).format('dddd, DD MMM YYYY HH:mm:ss')+'</div>' +
+                    '                        </a>' +
+                    '                    </li>');
+                }
+                $('#li2ShowLog').append('<li class="footer">' +
+                                        '<a href="javascript:void(0);">View all logs</a>' +
+                                        '</li>');
+
+                $('.img-fitter-notif').imgFitter({
+                    // CSS background position
+                    backgroundPosition: 'center center',
+                    // for image loading effect
+                    fadeinDelay: 400,
+                    fadeinTime: 1200
+                });
+            }
+
+            socket.emit('update_log', {
+                update_log: '1'
+            });
+
+
+        });
+    }
+
+
+    function ReadNotifDivision(){
         var url = base_url_js+'readNotificationDivision';
         $.get(url,function (data_json) {
             var response = jQuery.parseJSON(data_json);
@@ -544,8 +655,7 @@
         });
     }
 
-    function showHTMLMessagesDivision()
-    {
+    function showHTMLMessagesDivision(){
         var url = base_url_js+'api/__getNotification_divisi';
         $.post(url,function (data_json) {
             var dataa = data_json['data'];
@@ -561,8 +671,6 @@
                     '<li class="title">'+
                     '<p>You have '+data_json['count']+' new messages to Division</p>'+
                     '</li>';
-
-                console.log(dataa);
 
                 for (var i = 0; i < dataa.length; i++) {
 
@@ -621,8 +729,7 @@
         })
     }
 
-    function wrDepartmentAdmProdi()
-    {
+    function wrDepartmentAdmProdi(){
         <?php 
             $PositionMain = $this->session->userdata('PositionMain');
             $DivisionID = $PositionMain['IDDivision'];
@@ -634,8 +741,7 @@
          <?php endif ?>
     }
 
-    function Global_CantAction(element)
-    {
+    function Global_CantAction(element){
         // cannot delete action
           var waitForEl = function(selector, callback) {
             if (jQuery(selector).length) {
@@ -652,4 +758,5 @@
           });
         // end cannot delete action   
     }
+
 </script>

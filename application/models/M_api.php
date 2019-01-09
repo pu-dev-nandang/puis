@@ -371,8 +371,8 @@ class M_api extends CI_Model {
         return $data->result_array();
     }
 
-    public function getSemesterActive($CurriculumID,$ProdiID,$Semester,$IsSemesterAntara){
-        $data = $this->db->query('SELECT * FROM db_academic.semester WHERE Status = 1 LIMIT 1')->result_array();
+    public function getSemesterActive($SemesterID,$CurriculumID,$ProdiID,$Semester,$IsSemesterAntara){
+        $data = $this->db->query('SELECT * FROM db_academic.semester WHERE ID = "'.$SemesterID.'" ')->result_array();
 
         $result = array(
             'SemesterActive' => $data[0],

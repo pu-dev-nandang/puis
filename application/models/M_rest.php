@@ -999,24 +999,29 @@ class M_rest extends CI_Model {
         $showUAS = false;
         if($System=='1'){
             // cek tanggal show nilai UTS & UAS
-            $dataAY = $this->db->get_where('db_academic.academic_years',
-                array('SemesterID' => $SemesterID),1)->result_array();
-            if(count($dataAY)>0 && $dataAY[0]['showNilaiUts']<=$dateNow){
+            $dataAY_UTS = $this->db->query('SELECT * FROM db_academic.academic_years 
+                            WHERE SemesterID = "'.$SemesterID.'" AND showNilaiUts <= "'.$dateNow.'" ')->result_array();
+            if(count($dataAY_UTS)>0){
                 $showUTS = true;
             }
 
-            if(count($dataAY)>0 && $dataAY[0]['showNilaiUas']<=$dateNow){
+            $dataAY_UAS = $this->db->query('SELECT * FROM db_academic.academic_years 
+                            WHERE SemesterID = "'.$SemesterID.'" AND showNilaiUas <= "'.$dateNow.'" ')->result_array();
+
+            if(count($dataAY_UAS)>0){
                 $showUAS = true;
             }
 
         }
+
+
 
         if(count($data)>0){
             for($i=0;$i<count($data);$i++){
                 $dt = $data[$i];
 
                 if($System==1){
-                    if(($showUTS && $dt['Approval']=='1') || ($showUAS && $dt['Approval']=='2')){
+                    if(($showUTS && $dt['Approval']=='1') ||($showUTS && $dt['Approval']=='2') || ($showUAS && $dt['Approval']=='2')){
 
                         for($d=1;$d<=5;$d++){
                             $n = '-';
@@ -1056,6 +1061,7 @@ class M_rest extends CI_Model {
                         // ======== UAS =========
 
                     }
+
                     else {
 
                         $data[$i]['Evaluasi1'] = '-';
@@ -1070,7 +1076,8 @@ class M_rest extends CI_Model {
                         $data[$i]['GradeValue'] = 0;
 
                     }
-                } else {
+                }
+                else {
                     if($dt['Evaluasi1']==null || $dt['Evaluasi1']==''){
                         $data[$i]['Evaluasi1'] = '-';
                     }

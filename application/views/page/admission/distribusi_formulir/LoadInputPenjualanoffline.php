@@ -233,6 +233,8 @@
             	});
 
             	<?php if ($action == 'edit'): ?>
+            	   var NoRefGlobal = "<?php echo $get2[0]['No_Ref'] ?>";
+            	   $('#No_Ref').append('<option value="'+NoRefGlobal+'" '+'selected'+'>'+NoRefGlobal+'</option>');
             	   $("#No_Ref option").filter(function() {
             	      //may want to use $.trim in here
             	      return $(this).val() == "<?php echo $get2[0]['No_Ref'] ?>"; 
@@ -240,6 +242,7 @@
             	   $('#No_Ref').select2({
             	      // allowClear: true
             	   });
+            	   $('#No_Ref').prop('disabled',true);
             	<?php endif ?>
 
             	loadingEnd(1000);

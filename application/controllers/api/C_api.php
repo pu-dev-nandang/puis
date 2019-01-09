@@ -16,6 +16,7 @@ class C_api extends CI_Controller {
         $this->load->model('hr/m_hr');
         $this->load->model('vreservation/m_reservation');
         $this->load->model('akademik/m_tahun_akademik');
+        $this->load->model('notification/m_log');
         $this->load->library('JWT');
         $this->load->library('google');
 
@@ -1388,7 +1389,7 @@ class C_api extends CI_Controller {
 
                 $dataG = $this->db->query('SELECT s.ID FROM db_academic.schedule s 
                                                 WHERE s.ClassGroup LIKE "'.$data_arr['Group'].'" 
-                                                AND s.SemesterID = (SELECT ID FROM db_academic.semester WHERE Status = 1)')
+                                                AND s.SemesterID = "'.$data_arr['SemesterID'].'" ')
                                             ->result_array();
                 return print_r(json_encode($dataG));
             }
@@ -2408,7 +2409,8 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action']=='ReadSemesterActive'){
                 $formData = (array) $data_arr['formData'];
-                $data = $this->m_api->getSemesterActive($formData['CurriculumID'],$formData['ProdiID'],$formData['Semester'],$formData['IsSemesterAntara']);
+                $data = $this->m_api->getSemesterActive($formData['SemesterID'],$formData['CurriculumID'],
+                    $formData['ProdiID'],$formData['Semester'],$formData['IsSemesterAntara']);
                 return print_r(json_encode($data));
             }
         }
@@ -3106,6 +3108,7 @@ class C_api extends CI_Controller {
                         );
                         $this->db->where('ID', $ArrToApproveAll[$i]);
                         $this->db->update('db_academic.std_krs',$arrUpdate);
+
                     }
                 }
 
@@ -3118,6 +3121,32 @@ class C_api extends CI_Controller {
                 );
                 $this->db->where('ID', $data_arr['ID']);
                 $this->db->update('db_academic.std_krs',$arrUpdate);
+
+                // Insert Logging
+                $Log_dataInsert = (array) $data_arr['Logging'];
+                $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
+                $insert_id = $this->db->insert_id();
+
+                $Log_dataUser = $this->db->select('NIP')->get_where('db_employees.rule_users',
+                    array('IDDivision' => '6'))->result_array();
+
+                $Log_arr_ins = array(
+                    'IDLogging' => $insert_id,
+                    'UserID' => $data_arr['NPM']
+                );
+                $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+
+                if(count($Log_dataUser)>0){
+                    for($i=0;$i<count($Log_dataUser);$i++){
+                        $d = $Log_dataUser[$i]['NIP'];
+                        $Log_arr_ins = array(
+                            'IDLogging' => $insert_id,
+                            'UserID' => $d
+                        );
+                        $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+                    }
+                }
+
                 return print_r(1);
             }
 
@@ -3159,6 +3188,30 @@ class C_api extends CI_Controller {
                     'UpdateAt' => $data_arr['UpdateAt']
                 );
                 $this->db->insert('db_academic.std_krs_comment',$dataInsert);
+
+                $Log_dataInsert = (array) $data_arr['dataLogging'];
+                $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
+                $insert_id = $this->db->insert_id();
+
+                $Log_dataUser = $this->db->select('NIP')->get_where('db_employees.rule_users',
+                    array('IDDivision' => '6'))->result_array();
+
+                $Log_arr_ins = array(
+                    'IDLogging' => $insert_id,
+                    'UserID' => $data_arr['NPM']
+                );
+                $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+
+                if(count($Log_dataUser)>0){
+                    for($i=0;$i<count($Log_dataUser);$i++){
+                        $d = $Log_dataUser[$i]['NIP'];
+                        $Log_arr_ins = array(
+                            'IDLogging' => $insert_id,
+                            'UserID' => $d
+                        );
+                        $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+                    }
+                }
 
                 return print_r(1);
             }
@@ -6901,6 +6954,24 @@ class C_api extends CI_Controller {
 
 
 
+
+    }
+
+    public function crudLog(){
+        $data_arr = $this->getInputToken();
+
+        if($data_arr['action']=='readLog'){
+            $UserID = $data_arr['UserID'];
+            $dataLog = $this->m_log->readDataLog($UserID);
+            return print_r(json_encode($dataLog));
+        }
+        else if($data_arr['action']=='getTotalUnreadLog'){
+
+            $UserID = $data_arr['UserID'];
+            $data = $this->db->select('ID')->get_where('db_notifikasi.logging_user',
+                array('UserID' => $UserID, "StatusRead" => "0"))->result_array();
+            return print_r(json_encode(count($data)));
+        }
 
     }
 
