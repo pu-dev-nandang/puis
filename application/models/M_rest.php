@@ -881,8 +881,11 @@ class M_rest extends CI_Model {
     public function getDetailStudyResultByNPM($ClassOf,$NPM){
         $order = 'ASC';
 
-        $data = $this->db->query('SELECT s.* FROM db_academic.semester s WHERE s.ID >= (SELECT s2.ID FROM db_academic.semester s2 
-                                        WHERE s2.Year="'.$ClassOf.'" LIMIT 1) ORDER BY s.ID '.$order)->result_array();
+        $data = $this->db->query('SELECT s.*, ay.showNilai_H, ay.showNilai_T FROM db_academic.semester s 
+                                            LEFT JOIN db_academic.academic_years ay ON (s.ID = ay.SemesterID)
+                                            WHERE s.ID >= (SELECT s2.ID FROM db_academic.semester s2 
+                                                                  WHERE s2.Year="'.$ClassOf.'" LIMIT 1) 
+                                            ORDER BY s.ID '.$order)->result_array();
 
         $db = 'ta_'.$ClassOf;
         $smt = 1;
@@ -896,6 +899,8 @@ class M_rest extends CI_Model {
             $result[$i]['semester'] = $smt;
             $result[$i]['SemesterID'] = $data[$i]['ID'];
             $result[$i]['SemesterName'] = $data[$i]['Name'];
+            $result[$i]['Show_H'] = $data[$i]['showNilai_H'];
+            $result[$i]['Show_T'] = $data[$i]['showNilai_T'];
             $result[$i]['semesterDetail'] = $khs;
 
             array_push($res,$result[$i]);

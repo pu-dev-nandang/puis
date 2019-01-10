@@ -2851,7 +2851,7 @@ class M_api extends CI_Model {
             for($i=0;$i<count($dataCl);$i++){
                 $db_ = 'ta_'.$dataCl[$i]['Year'];
 
-                $data = $this->db->query('SELECT s.NPM,s.Name FROM '.$db_.'.study_planning sp 
+                $data = $this->db->query('SELECT sp.ID AS SPID, s.NPM,s.Name, sp.StatusResign FROM '.$db_.'.study_planning sp 
                                                     LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
                                                     WHERE sp.SemesterID ="'.$SemesterID.'" 
                                                     AND sp.ScheduleID = "'.$ScheduleID.'"
@@ -2860,6 +2860,7 @@ class M_api extends CI_Model {
 
                 if(count($data)>0){
                     for($s=0;$s<count($data);$s++){
+                        $data[$s]['DB_Student'] = $db_;
                         array_push($arrDataStd,$data[$s]);
                     }
                 }
