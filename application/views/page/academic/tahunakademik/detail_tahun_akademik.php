@@ -147,6 +147,17 @@
             <a href="javascript:void(0);" data-head="Input Nilai UAS" data-type="8.1" class="btn btn-sm btn-warning btn-block more_details">Special Case</a>
         </td>
     </tr>
+
+
+    <tr>
+        <td>Maks. Date Input Tugas</td>
+        <td>
+            <input type="text" id="nilaitugas_end" nextelement="" name="regular" class="form-control form-tahun-akademik">
+        </td>
+        <td></td>
+        <td></td>
+    </tr>
+
     <tr>
         <td>Show Nilai UAS</td>
         <td>
@@ -205,7 +216,7 @@
         $('.form-tahun-akademik').prop('readonly',true);
         $( "#bpp_start,#krs_start ,#bayar_start,#kuliah_start,#edom_start," +
             "#uts_start,#show_nilai_uts,#nilaiuts_start," +
-            "#uas_start,#nilaiuas_start,#show_nilai_uas,#show_nilai_h,#show_nilai_t" )
+            "#uas_start,#nilaiuas_start,#nilaitugas_end,#show_nilai_uas,#show_nilai_h,#show_nilai_t" )
             .datepicker({
             showOtherMonths:true,
             autoSize: true,
@@ -243,6 +254,7 @@
                 uasEnd : ($('#uas_end').datepicker("getDate")!=null) ? moment($('#uas_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
                 uasInputNilaiStart : ($('#nilaiuas_start').datepicker("getDate")!=null) ? moment($('#nilaiuas_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
                 uasInputNilaiEnd : ($('#nilaiuas_end').datepicker("getDate")!=null) ? moment($('#nilaiuas_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                assgInputEnd : ($('#nilaitugas_end').datepicker("getDate")!=null) ? moment($('#nilaitugas_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
                 showNilaiUas : ($('#show_nilai_uas').datepicker("getDate")!=null) ? moment($('#show_nilai_uas').datepicker("getDate")).format('YYYY-MM-DD') : '',
                 showNilai_H : ($('#show_nilai_h').datepicker("getDate")!=null) ? moment($('#show_nilai_h').datepicker("getDate")).format('YYYY-MM-DD') : '',
                 showNilai_T : ($('#show_nilai_t').datepicker("getDate")!=null) ? moment($('#show_nilai_t').datepicker("getDate")).format('YYYY-MM-DD') : '',
@@ -310,6 +322,8 @@
             (data.DetailTA.uasInputNilaiStart !=='0000-00-00' && data.DetailTA.uasInputNilaiStart!==null) ? $('#nilaiuas_start').datepicker('setDate',new Date(data.DetailTA.uasInputNilaiStart)) : '';
             (data.DetailTA.uasInputNilaiEnd !=='0000-00-00' && data.DetailTA.uasInputNilaiEnd!==null) ? $('#nilaiuas_end').datepicker({showOtherMonths:true,autoSize: true,dateFormat: 'dd MM yy',
                 minDate: new Date(data.DetailTA.uasInputNilaiStart)}).datepicker('setDate',new Date(data.DetailTA.uasInputNilaiEnd)) : '';
+
+            (data.DetailTA.assgInputEnd !=='0000-00-00' && data.DetailTA.assgInputEnd!==null) ? $('#nilaitugas_end').datepicker('setDate',new Date(data.DetailTA.assgInputEnd)) : '';
 
             (data.DetailTA.showNilaiUas !=='0000-00-00' && data.DetailTA.showNilaiUas!==null) ? $('#show_nilai_uas').datepicker('setDate',new Date(data.DetailTA.showNilaiUas)) : '';
 

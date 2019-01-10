@@ -1399,16 +1399,29 @@ class C_api extends CI_Controller {
                 $SemesterID = $data_arr['SemesterID'];
                 $ScheduleID = $data_arr['ScheduleID'];
 
+                // sp => Study_planning
                 if($data_arr['Flag']=='sp'){
                     $data = $this->m_api->getStudentByScheduleID($SemesterID,$ScheduleID,$data_arr['CDID']);
                 } else if($data_arr['Flag']=='std'){
                     $data = $this->m_api->getTotalStdNotYetApprovePerDay($SemesterID,$ScheduleID,$data_arr['CDID']);
                 }
 
-
-
-
                 return print_r(json_encode($data));
+            }
+
+            else if($data_arr['action']=='updateStudyPlanningResignStatus'){
+
+                $ShowTranscript = ($data_arr['StatusResign']==0 || $data_arr['StatusResign']=='0') ? '1' : '0';
+
+                $arrUpdate = array(
+                    'StatusResign' => $data_arr['StatusResign'],
+                    'ShowTranscript' => $ShowTranscript
+                );
+
+                $this->db->where('ID', $data_arr['SPID']);
+                $this->db->update($data_arr['DB_Student'].'.study_planning',$arrUpdate);
+
+                return print_r(1);
             }
 
             else if($data_arr['action']=='getClassGroup'){
@@ -1847,7 +1860,14 @@ class C_api extends CI_Controller {
             $nestedData[] = $courses;
             $nestedData[] = '<div style="text-align:center;">'.$row["Credit"].'</div>';
             $nestedData[] = $coor.''.$TeamTeaching;
-            $nestedData[] = '<div style="text-align:center;"><a href="javascript:void(0)" class="btn-sw-std" data-smtid="'.$row['SemesterID'].'" data-scheduleid="'.$row['ID'].'" data-flag="sp" data-cdid="'.$row['CDID'].'">'.$Students.'</a> of <a href="javascript:void(0)" class="btn-sw-std" data-smtid="'.$row['SemesterID'].'" data-scheduleid="'.$row['ID'].'" data-flag="std" data-cdid="'.$row['CDID'].'">'.$StudentsNY.'</a></div>';
+            $nestedData[] = '<div style="text-align:center;"><a href="javascript:void(0)" 
+                                class="btn-sw-std" data-smtid="'.$row['SemesterID'].'" 
+                                data-scheduleid="'.$row['ID'].'" data-flag="sp" 
+                                data-cdid="'.$row['CDID'].'">'.$Students.'</a> of 
+                                <a href="javascript:void(0)" class="btn-sw-std" data-smtid="'.$row['SemesterID'].'" 
+                                data-scheduleid="'.$row['ID'].'" data-flag="std" 
+                                data-cdid="'.$row['CDID'].'">'.$StudentsNY.'</a></div>';
+
             $nestedData[] = '<div style="text-align:center;">'.substr($row["StartSessions"],0,5).' - '.substr($row["EndSessions"],0,5).'</div>';
             $nestedData[] = '<div style="text-align:center;">'.$row["Room"].'</div>';
 
@@ -6184,7 +6204,9 @@ class C_api extends CI_Controller {
         }
 
         $queryDefault = 'SELECT s.ID, s.CombinedClasses, s.ClassGroup, s.Coordinator, em.Name AS CoordinatorName,
-                                      s.TeamTeaching, s.SubSesi, s.Attendance, cd.TotalSKS AS Credit, mk.MKCode, mk.Name AS MKName, mk.NameEng AS MKNameEng
+                                      s.TeamTeaching, s.SubSesi, s.Attendance, cd.TotalSKS AS Credit,
+                                       mk.MKCode, mk.Name AS MKName, mk.NameEng AS MKNameEng,
+                                       cd.ID AS CDID
                                       FROM db_academic.schedule s
                                       LEFT JOIN db_academic.schedule_details sd ON (sd.ScheduleID = s.ID)
                                       LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
@@ -6292,7 +6314,19 @@ class C_api extends CI_Controller {
                                                     <br/><span>Prodi : '.$Prodi.'</span></div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['Credit'].'</div>';
             $nestedData[] = '<div  style="text-align:left;"><span style="color:#0968b3;">(Co) '.$row['CoordinatorName'].'</span>'.$TeamTeaching.'</div>';
-            $nestedData[] = '<div  style="text-align:center;">'.count($Student).'</div>';
+            $nestedData[] = '<div  style="text-align:center;"><a href="javascript:void(0);" class="showStudent" data-smtid="'.$data_arr['SemesterID'].'" 
+            data-scheduleid="'.$row['ID'].'" data-cdid="'.$row['CDID'].'" data-course="'.$row['ClassGroup'].' | '.$row['MKCode'].' - '.$row['MKNameEng'].'" >'.count($Student).'</a></div>';
+
+//            $nestedData[] = '<div style="text-align:center;">
+//                                    <a href="javascript:void(0)" class="btn-sw-std"
+//                                    data-smtid="'.$row['SemesterID'].'"
+//                                    data-scheduleid="'.$row['ID'].'"
+//                                    data-flag="sp" data-cdid="'.$row['CDID'].'">'.$Students.'</a> of
+//                                    <a href="javascript:void(0)" class="btn-sw-std"
+//                                    data-smtid="'.$row['SemesterID'].'"
+//                                    data-scheduleid="'.$row['ID'].'" data-flag="std"
+//                                    data-cdid="'.$row['CDID'].'">'.$StudentsNY.'</a></div>';
+
             $nestedData[] = '<div  style="text-align:center;">'.$btnAct.'</div>';
             $nestedData[] = '<div  style="text-align:right;">'.$ScheduleDetails.'</div>';
 //            $nestedData[] = '<div  style="text-align:center;">'.$row['Room'].'</div>';

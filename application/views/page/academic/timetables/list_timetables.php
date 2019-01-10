@@ -1,4 +1,10 @@
 
+<style>
+    #tableShowStudent tr th, #tableShowStudent tr td {
+        text-align: center;
+    }
+</style>
+
 <div class="row">
     <div class="col-md-10 col-md-offset-1">
         <div class="well">
@@ -249,6 +255,149 @@
 
         }
     }
+    
+    $(document).on('click','.showStudent',function () {
+
+        var url = base_url_js+'api/__crudSchedule';
+
+        var SemesterID = $(this).attr('data-smtid');
+        var ScheduleID = $(this).attr('data-scheduleid');
+        var CDID = $(this).attr('data-cdid');
+
+        var Course = $(this).attr('data-course');
+
+        var data = {
+            action : 'getDataStudents',
+            Flag : 'sp',
+            SemesterID : SemesterID,
+            ScheduleID : ScheduleID,
+            CDID : CDID
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        $.post(url,{token:token},function (jsonResult) {
+
+            var dataHtml = '<div id="divStudent" style="text-align: center;"><h4>Student Not Yet</h4></div>';
+
+            $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                '<h4 class="modal-title">'+Course+'</h4>');
+            $('#GlobalModal .modal-body').html(dataHtml);
+            $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+            if(jsonResult.length>0){
+                $('#divStudent').html('<div class="table-responsive">' +
+                    '    <table class="table table-striped" id="tableShowStudent">' +
+                    '        <thead>' +
+                    '        <tr>' +
+                    '            <th style="width: 1%;">No</th>' +
+                    '            <th style="width: 5%;">NIM</th>' +
+                    '            <th>Student</th>' +
+                    '            <th style="width: 25%;">Action</th>' +
+                    '        </tr>' +
+                    '        </thead>' +
+                    '        <tbody id="rowDataStudent"></tbody>' +
+                    '    </table>' +
+                    '</div>');
+                var no = 1;
+                for(var i=0;i<jsonResult.length;i++){
+                    var d = jsonResult[i];
+
+                    var btn = '<button class="btn btn-default btn-block btnActSwStd btnSetResign" id="btnActNo'+i+'" data-no="'+i+'" data-db="'+d.DB_Student+'" data-spid="'+d.SPID+'">Set Resign</button>';
+                    if(d.StatusResign==1 || d.StatusResign=='1'){
+                        btn = '<button class="btn btn-block btn-success btnActSwStd btnUnSetResign" id="btnActNo'+i+'" data-no="'+i+'" data-db="'+d.DB_Student+'" data-spid="'+d.SPID+'">Unset Resign</button>'
+                    }
+
+                    var co = (d.StatusResign==1 || d.StatusResign=='1') ? 'red' : '#3f51b5';
+
+                    $('#rowDataStudent').append('<tr>' +
+                        '<td style="color: #9e9e9e;">'+no+'</td>' +
+                        '<td>'+d.NPM+'</td>' +
+                        '<td style="text-align: left;color: '+co+';" id="viewName'+i+'">'+ucwords(d.Name)+'</td>' +
+                        '<td>'+btn+'</td>' +
+                        '</tr>');
+
+                    no++;
+                }
+            }
+
+            $('#GlobalModal').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+
+        });
+        
+    });
+    
+    $(document).on('click','.btnSetResign',function () {
+
+        if(confirm('Are you sure to submit?')){
+
+            var No = $(this).attr('data-no');
+            var SPID = $(this).attr('data-spid');
+            var DB_Student = $(this).attr('data-db');
+
+            var url = base_url_js+'api/__crudSchedule';
+            var data = {
+                action : 'updateStudyPlanningResignStatus',
+                SPID : SPID,
+                DB_Student : DB_Student,
+                StatusResign : '1'
+            };
+
+            $('.btnActSwStd, button[data-dismiss=modal]').prop('disabled',true);
+            loading_button('#btnActNo'+No);
+
+            var token = jwt_encode(data,'UAP)(*');
+
+            $.post(url,{token:token},function (jsonResult) {
+
+                $('#btnActNo'+No).removeClass('btn-default btnSetResign')
+                    .addClass('btn-success btnUnSetResign').html('Unset Resign');
+                $('#viewName'+No).css('color','red');
+
+                $('.btnActSwStd, button[data-dismiss=modal]').prop('disabled',false);
+
+            });
+
+
+        }
+
+    });
+
+    $(document).on('click','.btnUnSetResign',function () {
+        if(confirm('Are you sure to submit?')){
+
+            var No = $(this).attr('data-no');
+            var SPID = $(this).attr('data-spid');
+            var DB_Student = $(this).attr('data-db');
+
+            var url = base_url_js+'api/__crudSchedule';
+            var data = {
+                action : 'updateStudyPlanningResignStatus',
+                SPID : SPID,
+                DB_Student : DB_Student,
+                StatusResign : '0'
+            };
+
+            $('.btnActSwStd, button[data-dismiss=modal]').prop('disabled',true);
+            loading_button('#btnActNo'+No);
+
+
+
+            var token = jwt_encode(data,'UAP)(*');
+
+            $.post(url,{token:token},function (jsonResult) {
+
+                $('#btnActNo'+No).removeClass('btn-success btnUnSetResign')
+                    .addClass('btn-default btnSetResign').html('Set Resign');
+                $('#viewName'+No).css('color','#3f51b5');
+
+                $('.btnActSwStd, button[data-dismiss=modal]').prop('disabled',false);
+
+            });
+        }
+    });
 
 
     $(document).on('click','#btnDownloadLecturerAttendance',function () {
