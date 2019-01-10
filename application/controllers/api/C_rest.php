@@ -1319,7 +1319,7 @@ class C_rest extends CI_Controller {
                                      </table><br><br>
                                      <strong> Link will be deactive on '.$NameDayDateLimit.','.$DateLimit.'
                                 ';        
-                        if($_SERVER['SERVER_NAME']!='localhost') {
+                        if($_SERVER['SERVER_NAME'] =='localhost') {
                             $to = 'alhadi.rahman@podomorouniversity.ac.id';
                             $subject = "Podomoro University Venue Reservation Feedback";
                             $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
