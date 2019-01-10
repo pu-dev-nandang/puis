@@ -93,37 +93,6 @@
 		  })
 		}
 
-		function loadShowBUdgetRemaining(BudgetRemaining)
-		{
-			$("#Page_Budget_Remaining").empty();
-			var html = '<div class = "row">'+
-							'<div class = "col-md-12">'+
-								'<table class="table table-bordered tableData" id ="tableData3">'+
-									'<thead>'+
-										'<tr>'+
-											'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
-											'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Post Budget Item</th>'+
-											'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Remaining</th>'+
-										'</tr>'+
-									'</thead><tbody>';
-										
-			for (var i = 0; i < BudgetRemaining.length; i++) {
-				var No = i + 1;
-				html += '<tr>'+
-							'<td>'+No+'</td>'+
-							'<td>'+BudgetRemaining[i].PostBudgetItem+'</td>'+
-							'<td>'+BudgetRemaining[i].Remaining+'</td>'+
-						'</tr>';	
-			}
-
-			html += '</tbody>'+
-					'</table>'+
-					'</div>'+
-					'</div>';		
-
-			$("#Page_Budget_Remaining").html(html);
-		}
-
 		function Load_input_PR()
 		{
 			var Year = $("#Year").val();
@@ -162,12 +131,7 @@
 										'</tr></thead>'+
 										'<tbody></tbody></table></div></div></div>';
 				$("#Page_Input_PR").html(html);
-
 				AddingTable();
-
-				$(".btn-add-pr").click(function(){
-					AddingTable();
-				})
 
 			}).fail(function() {
 			  toastr.info('No Result Data'); 
@@ -176,6 +140,11 @@
 			});
 
 		}
+
+		// $(".btn-add-pr").click(function(){
+		$(document).off('click', '.btn-add-pr').on('click', '.btn-add-pr',function(e) {
+			AddingTable();
+		})
 
 		function AddingTable()
 		{
@@ -234,321 +203,341 @@
 				$('#table_input_pr tbody').append(fill);
 				$('.datetimepicker').datetimepicker();
 			}
-			eventTableFunction();
+			//eventTableFunction();
 		}
 
-		function eventTableFunction()
-		{
-				$(".SearchPostBudget").unbind().click(function(){
-					var ev = $(this);
-					var html = '';
-					html ='<div class = "row">'+
-							'<div class = "col-md-12">'+
-								'<table id="example" class="table table-bordered display select" cellspacing="0" width="100%">'+
-                       '<thead>'+
-                          '<tr>'+
-                             // '<th><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>'+
-                             '<th></th>'+
-                             '<th>Post Budget Item</th>'+
-                             '<th>Remaining</th>'+
-                          '</tr>'+
-                       '</thead>'+
-                  '</table></div></div>';
+		
+		$(document).off('click', '.SearchPostBudget').on('click', '.SearchPostBudget',function(e) {
+			var ev = $(this);
+			var html = '';
+			html ='<div class = "row">'+
+					'<div class = "col-md-12">'+
+						'<table id="example" class="table table-bordered display select" cellspacing="0" width="100%">'+
+               '<thead>'+
+                  '<tr>'+
+                     // '<th><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>'+
+                     '<th></th>'+
+                     '<th>Post Budget Item</th>'+
+                     '<th>Remaining</th>'+
+                  '</tr>'+
+               '</thead>'+
+          '</table></div></div>';
 
-      				$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Post Budget Item'+'</h4>');
-      				$('#GlobalModalLarge .modal-body').html(html);
-      				$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
-                      '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>');
-      				$('#GlobalModalLarge').modal({
-      				    'show' : true,
-      				    'backdrop' : 'static'
-      				});
-      				var table = $('#example').DataTable({
-      				      "data" : PostBudgetDepartment,
-      				      'columnDefs': [
-	      				      {
-	      				         'targets': 0,
-	      				         'searchable': false,
-	      				         'orderable': false,
-	      				         'className': 'dt-body-center',
-	      				         'render': function (data, type, full, meta){
-	      				             return '<input type="checkbox" name="id[]" value="' + full.ID + '" estvalue="' + full.Value + '">';
-	      				         }
-	      				      },
-	      				      {
-	      				         'targets': 1,
-	      				         'render': function (data, type, full, meta){
-	      				             return full.PostName+'-'+full.RealisasiPostName;
-	      				         }
-	      				      },
-	      				      {
-	      				         'targets': 2,
-	      				         'render': function (data, type, full, meta){
-	      				             return formatRupiah(full.Value);
-	      				         }
-	      				      },
-      				      ],
-      				      // 'order': [[1, 'asc']]
-      				});
-
-      				// Handle click on checkbox to set state of "Select all" control
-      				$('#example tbody').on('change', 'input[type="checkbox"]', function(){
-      					$('input[type="checkbox"]:not(.uniform)').prop('checked', false);
-      					$(this).prop('checked',true);
-      				   
-      				});
-
-      				$("#ModalbtnSaveForm").click(function(){
-      						var chkbox = $('input[type="checkbox"]:checked:not(.uniform)');
-      						var checked = chkbox.val();
-      						var estvalue = chkbox.attr('estvalue');
-      						var n = estvalue.indexOf(".");
-      						estvalue = estvalue.substring(0, n);
-      						var row = chkbox.closest('tr');
-      						var PostBudgetItem = row.find('td:eq(1)').text();
-      						var fillItem = ev.closest('tr');
-
-      						var GetNO = fillItem.find('td:eq(0)').text();
-      						var dataarr = {
-      							PostBudgetItem : PostBudgetItem,
-      							Remaining : formatRupiah(estvalue),
-      							No : GetNO,
-      							id_budget_left : checked,
-      							RemainingNoFormat : estvalue,
-      							RemainingFirst : estvalue,
-      						}
-
-      						// Find Number exist
-      							var bool = false; //for numbering
-      							var bool2 = false; //for id_budget_left
-      							for (var i = 0; i < BudgetRemaining.length; i++) {
-      								if (GetNO == BudgetRemaining[i].No) {
-      									bool = true;
-      									break;
-      								}
-      							}
-
-      							if (bool) { // edit
-      								// pergantian post budget item
-      								var bool3 = false;
-      								for (var i = 0; i < BudgetRemaining.length; i++) {
-      									if (checked == BudgetRemaining[i].id_budget_left) {
-      										bool3 = true;
-      										break;
-      									}
-      								}
-
-      								if (bool3) {
-      									_BudgetRemaining(checked)
-      								}
-      								else
-      								{
-      									// BudgetRemaining[i].PostBudgetItem = PostBudgetItem;
-      									// BudgetRemaining[i].Remaining = formatRupiah(estvalue);
-      									// BudgetRemaining[i].id_budget_left = checked;
-      									// BudgetRemaining[i].RemainingNoFormat = estvalue;
-      									// BudgetRemaining[i].RemainingFirst = estvalue;
-      									_BudgetRemaining(checked);
-      								}
-
-      							}
-      							else
-      							{
-      								for (var i = 0; i < BudgetRemaining.length; i++) {
-      									if (checked == BudgetRemaining[i].id_budget_left) {
-      										bool2 = true;
-      										break;
-      									}
-      								}
-      								if (!bool2) {
-      									BudgetRemaining.push(dataarr);
-      								}
-      								
-      							}
-
-      							loadShowBUdgetRemaining(BudgetRemaining);
-
-      						fillItem.find('td:eq(1)').find('.PostBudgetItem').val(PostBudgetItem);
-      						fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left',checked);
-      						fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('remaining',estvalue);
-      						fillItem.find('td:eq(4)').find('.qty').trigger('change');
-      						$('#GlobalModalLarge').modal('hide');
-      				})
-      				
-
-				})
-
-				$(".SearchItem").unbind().click(function(){
-					$(".uniform").prop('disabled', true);
-					var ev = $(this);
-					var html = '';
-					html ='<div class = "row">'+
-							'<div class = "col-md-12">'+
-								'<table id="example" class="table table-bordered display select" cellspacing="0" width="100%">'+
-                       '<thead>'+
-                          '<tr>'+
-                             // '<th><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>'+
-                             '<th></th>'+
-                             '<th>Item</th>'+
-                             '<th>Desc</th>'+
-                             '<th>Estimate Value</th>'+
-                             '<th>Photo</th>'+
-                             '<th>DetailCatalog</th>'+
-                          '</tr>'+
-                       '</thead>'+
-                  '</table></div></div>';
-				$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Catalog'+'</h4>');
+				$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Post Budget Item'+'</h4>');
 				$('#GlobalModalLarge .modal-body').html(html);
 				$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
-                '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>');
+              '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>');
 				$('#GlobalModalLarge').modal({
 				    'show' : true,
 				    'backdrop' : 'static'
 				});
 
-				var url = base_url_js+'rest/Catalog/__Get_Item';
-				var data = {
-					action : 'choices',
-					auth : 's3Cr3T-G4N',
-					department : "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>"
-				};
-	    	    var token = jwt_encode(data,"UAP)(*");
-				var table = $('#example').DataTable({
-				      'ajax': {
-				         'url': url,
-				         'type' : 'POST',
-				         'data'	: {
-				         	token : token,
-				         },
-				         dataType: 'json'
-				      },
-				      'columnDefs': [{
+			var table = $('#example').DataTable({
+			      "data" : PostBudgetDepartment,
+			      'columnDefs': [
+				      {
 				         'targets': 0,
 				         'searchable': false,
 				         'orderable': false,
 				         'className': 'dt-body-center',
 				         'render': function (data, type, full, meta){
-				             return '<input type="checkbox" name="id[]" value="' + full[6] + '" estvalue="' + full[7] + '">';
+				             return '<input type="checkbox" name="id[]" value="' + full.ID + '" estvalue="' + full.Value + '">';
 				         }
-				      }],
-				      'order': [[1, 'asc']]
-				   });
+				      },
+				      {
+				         'targets': 1,
+				         'render': function (data, type, full, meta){
+				             return full.PostName+'-'+full.RealisasiPostName;
+				         }
+				      },
+				      {
+				         'targets': 2,
+				         'render': function (data, type, full, meta){
+				             return formatRupiah(full.Value);
+				         }
+				      },
+			      ],
+			      // 'order': [[1, 'asc']]
+			});
 
-				   // Handle click on checkbox to set state of "Select all" control
-				   $('#example tbody').on('change', 'input[type="checkbox"]', function(){
-				   	$('input[type="checkbox"]:not(.uniform)').prop('checked', false);
-				   	$(this).prop('checked',true);
-				      
-				   });
+			// Handle click on checkbox to set state of "Select all" control
+			$('#example tbody').on('change', 'input[type="checkbox"]', function(){
+				$('input[type="checkbox"]:not(.uniform)').prop('checked', false);
+				$(this).prop('checked',true);
+			   
+			});
 
+			$("#ModalbtnSaveForm").click(function(){
+				var chkbox = $('input[type="checkbox"]:checked:not(.uniform)');
+				var checked = chkbox.val();
+				var estvalue = chkbox.attr('estvalue');
+				var n = estvalue.indexOf(".");
+				estvalue = estvalue.substring(0, n);
+				var row = chkbox.closest('tr');
+				var PostBudgetItem = row.find('td:eq(1)').text();
+				var fillItem = ev.closest('tr');
+				fillItem.find('td:eq(1)').find('.PostBudgetItem').val(PostBudgetItem);
+				fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left',checked);
+				fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('remaining',estvalue);
+				fillItem.find('td:eq(4)').find('.qty').trigger('change');
+				$('#GlobalModalLarge').modal('hide');
+			})
 
-				   $("#ModalbtnSaveForm").click(function(){
-				   		var chkbox = $('input[type="checkbox"]:checked:not(.uniform)');
-				   		var checked = chkbox.val();
-				   		var estvalue = chkbox.attr('estvalue');
-				   		var n = estvalue.indexOf(".");
-				   		estvalue = estvalue.substring(0, n);
-				   		var row = chkbox.closest('tr');
-				   		var Item = row.find('td:eq(1)').text();
-				   		var Desc = row.find('td:eq(2)').text();
-				   		var Est = row.find('td:eq(3)').text();
-				   		var Photo = row.find('td:eq(4)').html();
-				   		var DetailCatalog =  row.find('td:eq(5)').html();
-				   		var arr = Item+'@@'+Desc+'@@'+Est+'@@'+Photo+'@@'+DetailCatalog;
-				   		var fillItem = ev.closest('tr');
-				   		fillItem.find('td:eq(2)').find('.Item').val(Item);
-				   		fillItem.find('td:eq(2)').find('.Item').attr('savevalue',checked);
-				   		fillItem.find('td:eq(2)').find('.Item').attr('estvalue',estvalue);
-				   		fillItem.find('td:eq(3)').find('.Detail').attr('data',arr);
-				   		fillItem.find('td:eq(5)').find('.UnitCost').val(estvalue);
-				   		fillItem.find('td:eq(5)').find('.UnitCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-				   		fillItem.find('td:eq(5)').find('.UnitCost').maskMoney('mask', '9894');
+		})
 
-				   		fillItem.find('td:eq(4)').find('.qty').prop('disabled', false);
-				   		fillItem.find('td:eq(5)').find('.UnitCost').prop('disabled', false);
+		$(document).off('change keyup', '.qty').on('change keyup', '.qty',function(e) {
+			var qty = $(this).val();
+			var fillItem = $(this).closest('tr');
+			var estvalue = fillItem.find('td:eq(5)').find('.UnitCost').val();
+			estvalue = findAndReplace(estvalue, ".","");
+			var SubTotal = parseInt(qty) * parseInt(estvalue);
+			fillItem.find('td:eq(6)').find('.SubTotal').val(SubTotal);
+			fillItem.find('td:eq(6)').find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+			fillItem.find('td:eq(6)').find('.SubTotal').maskMoney('mask', '9894');
+			_BudgetRemaining();
+			FuncBudgetStatus(fillItem);
+			var id_budget_left = fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left');
+		})
 
-				   		fillItem.find('td:eq(4)').find('.qty').trigger('change');
-				   		$('#GlobalModalLarge').modal('hide');
-				   })
+		$(document).off('keyup', '.UnitCost').on('keyup', '.UnitCost',function(e) {
+			var fillItem = $(this).closest('tr');
+			var qty = fillItem.find('td:eq(4)').find('.qty').val();
+			var estvalue = $(this).val();
+			estvalue = findAndReplace(estvalue, ".","");
+			var SubTotal = parseInt(qty) * parseInt(estvalue);
+			fillItem.find('td:eq(6)').find('.SubTotal').val(SubTotal);
+			fillItem.find('td:eq(6)').find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+			fillItem.find('td:eq(6)').find('.SubTotal').maskMoney('mask', '9894');
+			_BudgetRemaining();
+			FuncBudgetStatus(fillItem);
+			var id_budget_left = fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left');
+			
+		})
 
-				})
+		function _BudgetRemaining()
+		{
+			// loadingStart();
+			loading_page('Page_Budget_Remaining');
+			BudgetRemaining = [];
+			var arr_id_budget_left = [];
+			$('.PostBudgetItem').each(function(){
+				var id_budget_left = $(this).attr('id_budget_left');
+				arr_id_budget_left.push(id_budget_left);
+			})
 
-				$(".Detail").click(function(){
-					var data = $(this).attr('data');
-					var arr = data.split('@@');
-					var html = '';
-						html ='<div class = "row">'+
-								'<div class = "col-md-12">'+
-									'<table id="example" class="table table-bordered display select" cellspacing="0" width="100%">'+
-	                       '<thead>'+
-	                          '<tr>'+
-	                             '<th>Item</th>'+
-	                             '<th>Desc</th>'+
-	                             '<th>Estimate Value</th>'+
-	                             '<th>Photo</th>'+
-	                             '<th>DetailCatalog</th>'+
-	                          '</tr>'+
-	                       '</thead>'+
-	                       '<tbody><tr>';
-	                       		for (var i = 0; i < arr.length; i++) {
-	                       			html += '<td>'+arr[i]+'</td>';
-	                       		}
-	                       		html += '</tr></tbody>';
-	                 html += '</table></div></div>';
-					$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Catalog'+'</h4>');
-					$('#GlobalModalLarge .modal-body').html(html);
-					$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>');
-					$('#GlobalModalLarge').modal({
-					    'show' : true,
-					    'backdrop' : 'static'
-					});
-
-				})
-
-				$(".qty").change(function(){
-				    var qty = $(this).val();
-				    var fillItem = $(this).closest('tr');
-				    var estvalue = fillItem.find('td:eq(5)').find('.UnitCost').val();
-				    estvalue = findAndReplace(estvalue, ".","");
-				    var SubTotal = parseInt(qty) * parseInt(estvalue);
-				    fillItem.find('td:eq(6)').find('.SubTotal').val(SubTotal);
-				    fillItem.find('td:eq(6)').find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-				    fillItem.find('td:eq(6)').find('.SubTotal').maskMoney('mask', '9894');
-				    FuncBudgetStatus(fillItem);
-				    var id_budget_left = fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left');
-				    _BudgetRemaining(id_budget_left);        
-				});
-				
-
-				$(".UnitCost").keyup(function(){
+			for (var i = 0; i < arr_id_budget_left.length; i++) {
+				var total = 0;
+				var PostBudgetItem = '';
+				var Remaining = 0;
+				var GetNO = i + 1;
+				var id_budget_left = arr_id_budget_left[i];
+				var RemainingNoFormat = 0;
+				$('.PostBudgetItem[id_budget_left="'+id_budget_left+'"]').each(function(){
 					var fillItem = $(this).closest('tr');
-					var qty = fillItem.find('td:eq(4)').find('.qty').val();
-					var estvalue = $(this).val();
-					estvalue = findAndReplace(estvalue, ".","");
-					var SubTotal = parseInt(qty) * parseInt(estvalue);
-					fillItem.find('td:eq(6)').find('.SubTotal').val(SubTotal);
-					fillItem.find('td:eq(6)').find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-					fillItem.find('td:eq(6)').find('.SubTotal').maskMoney('mask', '9894');
-					FuncBudgetStatus(fillItem);
-					var id_budget_left = fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left');
-					_BudgetRemaining(id_budget_left);
+					var SubTotal = fillItem.find('td:eq(6)').find('.SubTotal').val();
+					var SubTotal = findAndReplace(SubTotal, ".","");
+					PostBudgetItem = fillItem.find('td:eq(1)').find('.PostBudgetItem').val();
+					total += parseInt(SubTotal);
 				})
 
-				$(".btn-delete-item").click(function(){
-					var fillItem = $(this).closest('tr');
-					var id_budget_left = fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left');
+				for (var l = 0; l < PostBudgetDepartment.length; l++) { // find Value awal
+					var B_id_budget_left = PostBudgetDepartment[l].ID;
+					if (B_id_budget_left == id_budget_left) {
+						Remaining = parseInt(PostBudgetDepartment[l].Value) - parseInt(total);
+						var dataarr = {
+							PostBudgetItem : PostBudgetItem,
+							Remaining : formatRupiah(Remaining),
+							No : GetNO,
+							id_budget_left : id_budget_left,
+							RemainingNoFormat : Remaining,
+						}
 
-					$( this )
-                      .closest( 'tr')
-                      .remove();
-                      _BudgetRemaining(id_budget_left);
-                      // $(".qty").each(function(){
-                      // 	var fillItem = $(this).closest('tr');
-                      // 	FuncBudgetStatus(fillItem); 
-                      // })
-                      SortByNumbering();
-				})
-			//} // if not exist
+						// check id_budget_left existing in BudgetRemaining
+						for (var k = 0; k < BudgetRemaining.length; k++) {
+							if (BudgetRemaining[k].id_budget_left == id_budget_left) {
+								var removeItem = k;
+								BudgetRemaining = $.grep(BudgetRemaining, function(value,index) {
+								  return index != removeItem;
+								});
+								break;
+							}
+						}
+						BudgetRemaining.push(dataarr);
+						break;
+					}
+				}					
+			}
+			
+			// console.log(BudgetRemaining);
+			loadShowBUdgetRemaining(BudgetRemaining);
+			// loadingEnd(100)
+
+		}
+
+		$(document).off('click', '.SearchItem').on('click', '.SearchItem',function(e) {
+			$(".uniform").prop('disabled', true);
+			var ev = $(this);
+			var html = '';
+			html ='<div class = "row">'+
+					'<div class = "col-md-12">'+
+						'<table id="example" class="table table-bordered display select" cellspacing="0" width="100%">'+
+               '<thead>'+
+                  '<tr>'+
+                     // '<th><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>'+
+                     '<th></th>'+
+                     '<th>Item</th>'+
+                     '<th>Desc</th>'+
+                     '<th>Estimate Value</th>'+
+                     '<th>Photo</th>'+
+                     '<th>DetailCatalog</th>'+
+                  '</tr>'+
+               '</thead>'+
+          '</table></div></div>';
+			$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Catalog'+'</h4>');
+			$('#GlobalModalLarge .modal-body').html(html);
+			$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+	        '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>');
+			$('#GlobalModalLarge').modal({
+			    'show' : true,
+			    'backdrop' : 'static'
+			});
+
+			var url = base_url_js+'rest/Catalog/__Get_Item';
+			var data = {
+				action : 'choices',
+				auth : 's3Cr3T-G4N',
+				department : "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>"
+			};
+		    var token = jwt_encode(data,"UAP)(*");
+			var table = $('#example').DataTable({
+			      'ajax': {
+			         'url': url,
+			         'type' : 'POST',
+			         'data'	: {
+			         	token : token,
+			         },
+			         dataType: 'json'
+			      },
+			      'columnDefs': [{
+			         'targets': 0,
+			         'searchable': false,
+			         'orderable': false,
+			         'className': 'dt-body-center',
+			         'render': function (data, type, full, meta){
+			             return '<input type="checkbox" name="id[]" value="' + full[6] + '" estvalue="' + full[7] + '">';
+			         }
+			      }],
+			      'order': [[1, 'asc']]
+			   });
+
+			   // Handle click on checkbox to set state of "Select all" control
+			   $('#example tbody').on('change', 'input[type="checkbox"]', function(){
+			   	$('input[type="checkbox"]:not(.uniform)').prop('checked', false);
+			   	$(this).prop('checked',true);
+			      
+			   });
+
+			   $("#ModalbtnSaveForm").click(function(){
+			   		var chkbox = $('input[type="checkbox"]:checked:not(.uniform)');
+			   		var checked = chkbox.val();
+			   		var estvalue = chkbox.attr('estvalue');
+			   		var n = estvalue.indexOf(".");
+			   		estvalue = estvalue.substring(0, n);
+			   		var row = chkbox.closest('tr');
+			   		var Item = row.find('td:eq(1)').text();
+			   		var Desc = row.find('td:eq(2)').text();
+			   		var Est = row.find('td:eq(3)').text();
+			   		var Photo = row.find('td:eq(4)').html();
+			   		var DetailCatalog =  row.find('td:eq(5)').html();
+			   		var arr = Item+'@@'+Desc+'@@'+Est+'@@'+Photo+'@@'+DetailCatalog;
+			   		var fillItem = ev.closest('tr');
+			   		fillItem.find('td:eq(2)').find('.Item').val(Item);
+			   		fillItem.find('td:eq(2)').find('.Item').attr('savevalue',checked);
+			   		fillItem.find('td:eq(2)').find('.Item').attr('estvalue',estvalue);
+			   		fillItem.find('td:eq(3)').find('.Detail').attr('data',arr);
+			   		fillItem.find('td:eq(5)').find('.UnitCost').val(estvalue);
+			   		fillItem.find('td:eq(5)').find('.UnitCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+			   		fillItem.find('td:eq(5)').find('.UnitCost').maskMoney('mask', '9894');
+
+			   		fillItem.find('td:eq(4)').find('.qty').prop('disabled', false);
+			   		fillItem.find('td:eq(5)').find('.UnitCost').prop('disabled', false);
+
+			   		fillItem.find('td:eq(4)').find('.qty').trigger('change');
+			   		$('#GlobalModalLarge').modal('hide');
+			   })
+		})
+
+		$(document).off('click', '.Detail').on('click', '.Detail',function(e) {
+			var data = $(this).attr('data');
+			var arr = data.split('@@');
+			var html = '';
+				html ='<div class = "row">'+
+						'<div class = "col-md-12">'+
+							'<table id="example" class="table table-bordered display select" cellspacing="0" width="100%">'+
+	               '<thead>'+
+	                  '<tr>'+
+	                     '<th>Item</th>'+
+	                     '<th>Desc</th>'+
+	                     '<th>Estimate Value</th>'+
+	                     '<th>Photo</th>'+
+	                     '<th>DetailCatalog</th>'+
+	                  '</tr>'+
+	               '</thead>'+
+	               '<tbody><tr>';
+	               		for (var i = 0; i < arr.length; i++) {
+	               			html += '<td>'+arr[i]+'</td>';
+	               		}
+	               		html += '</tr></tbody>';
+	         html += '</table></div></div>';
+			$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Catalog'+'</h4>');
+			$('#GlobalModalLarge .modal-body').html(html);
+			$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>');
+			$('#GlobalModalLarge').modal({
+			    'show' : true,
+			    'backdrop' : 'static'
+			});
+		})
+
+		$(document).off('click', '.btn-delete-item').on('click', '.btn-delete-item',function(e) {
+			var fillItem = $(this).closest('tr');
+			var id_budget_left = fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left');
+
+			$( this )
+              .closest( 'tr')
+              .remove();
+              _BudgetRemaining();
+              SortByNumbering();
+		})
+
+		function loadShowBUdgetRemaining(BudgetRemaining)
+		{
+			$("#Page_Budget_Remaining").empty();
+			var html = '<div class = "row">'+
+							'<div class = "col-md-12">'+
+								'<table class="table table-bordered tableData" id ="tableData3">'+
+									'<thead>'+
+										'<tr>'+
+											'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
+											'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Post Budget Item</th>'+
+											'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Remaining</th>'+
+										'</tr>'+
+									'</thead><tbody>';
+										
+			for (var i = 0; i < BudgetRemaining.length; i++) {
+				var No = i + 1;
+				html += '<tr>'+
+							'<td>'+No+'</td>'+
+							'<td>'+BudgetRemaining[i].PostBudgetItem+'</td>'+
+							'<td>'+BudgetRemaining[i].Remaining+'</td>'+
+						'</tr>';	
+			}
+
+			html += '</tbody>'+
+					'</table>'+
+					'</div>'+
+					'</div>';		
+
+			$("#Page_Budget_Remaining").html(html);
 		}
 
 		function SortByNumbering()
@@ -563,8 +552,8 @@
 
 		function FuncBudgetStatus(fillItem)
 		{
-			var SubTotal = fillItem.find('td:eq(6)').find('.SubTotal').val(); 
-			var SubTotal = findAndReplace(SubTotal, ".","");
+			// var SubTotal = fillItem.find('td:eq(6)').find('.SubTotal').val(); 
+			// var SubTotal = findAndReplace(SubTotal, ".","");
 			var id_budget_left = fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left');
 			var GetBudgetRemaining = function(id_budget_left,BudgetRemaining){
 				var Remaining = 0;
@@ -578,6 +567,7 @@
 			};
 
 			var Remaining = GetBudgetRemaining(id_budget_left,BudgetRemaining);
+			console.log(Remaining);
 
 			var OP = [
 					{
@@ -594,7 +584,7 @@
 					},
 				];
 
-			var DefaultName = (Remaining >= SubTotal) ? 'IN' : 'Exceed';
+			var DefaultName = (Remaining >= 0) ? 'IN' : 'Exceed';
 			var html = '<select class = "form-control BudgetStatus">';
 
 			for (var i = 0; i < OP.length; i++) {
@@ -612,31 +602,6 @@
 					loadSelectPostRealiasi_byCross(fillItem);
 				}
 			})
-		}
-
-		function _BudgetRemaining(id_budget_left)
-		{
-			loadingStart();
-			var pengurangan = 0;
-			$('.PostBudgetItem[id_budget_left="'+id_budget_left+'"]').each(function(){
-				var fillItem = $(this).closest('tr');
-				var SubTotal = fillItem.find('td:eq(6)').find('.SubTotal').val();
-				var SubTotal = findAndReplace(SubTotal, ".","");
-				pengurangan += parseInt(SubTotal);
-			});
-			
-			for (var i = 0; i < BudgetRemaining.length; i++) {
-				if (id_budget_left == BudgetRemaining[i].id_budget_left) {
-					var estvalue = BudgetRemaining[i].RemainingFirst - pengurangan;
-					BudgetRemaining[i].Remaining = formatRupiah(estvalue);
-					BudgetRemaining[i].RemainingNoFormat = estvalue;
-					break;
-				}
-			}
-
-			loadShowBUdgetRemaining(BudgetRemaining);
-			loadingEnd(100)
-
 		}
 
 		function loadSelectPostRealiasi_byCross(fillItem)
