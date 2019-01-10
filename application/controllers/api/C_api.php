@@ -4080,6 +4080,14 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($data));
 
             }
+            else if($data_arr['action']=='getEmployeesFiles'){
+                $NIP = $data_arr['NIP'];
+                $data = $this->db->query('SELECT em.NIP AS NIPLec, em.Name, em.Photo, f.* FROM db_employees.employees em 
+                                                  LEFT JOIN db_employees.files f ON (f.NIP = em.NIP)
+                                                  WHERE em.NIP = "'.$NIP.'" ')->result_array();
+
+                return print_r(json_encode($data));
+            }
         }
 
     }
@@ -6346,7 +6354,8 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div  style="text-align:center;">'.$row['Credit'].'</div>';
             $nestedData[] = '<div  style="text-align:left;"><span style="color:#0968b3;">(Co) '.$row['CoordinatorName'].'</span>'.$TeamTeaching.'</div>';
             $nestedData[] = '<div  style="text-align:center;"><a href="javascript:void(0);" class="showStudent" data-smtid="'.$data_arr['SemesterID'].'" 
-            data-scheduleid="'.$row['ID'].'" data-cdid="'.$row['CDID'].'" data-course="'.$row['ClassGroup'].' | '.$row['MKCode'].' - '.$row['MKNameEng'].'" >'.count($Student).'</a></div>';
+                                        data-scheduleid="'.$row['ID'].'" data-cdid="'.$row['CDID'].'" data-course="'.$row['ClassGroup'].' | '.$row['MKCode'].' - '.$row['MKNameEng'].'" >'.count($Student).'</a>
+                                        </div>';
 
 //            $nestedData[] = '<div style="text-align:center;">
 //                                    <a href="javascript:void(0)" class="btn-sw-std"

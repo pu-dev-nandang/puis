@@ -114,6 +114,8 @@ $route['academic/modal-tahun-akademik-detail-lecturer'] = 'page/academic/c_akade
 // ======= human-resources ======
 $route['human-resources/lecturers'] = 'page/database/c_database/lecturers';
 $route['human-resources/employees'] = 'page/hr/c_employees/employees';
+$route['human-resources/employees/files'] = 'page/hr/c_employees/employees_files';
+$route['human-resources/employees/upload_files'] = 'page/hr/c_employees/upload_files';
 $route['human-resources/employees/input-employees'] = 'page/hr/c_employees/input_employees';
 $route['human-resources/employees/edit-employees/(:num)'] = 'page/hr/c_employees/edit_employees/$1';
 $route['human-resources/upload_photo'] = 'page/hr/c_employees/upload_photo';

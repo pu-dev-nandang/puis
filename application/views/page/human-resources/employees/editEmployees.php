@@ -624,21 +624,6 @@
             }
 
             $('#btnUpdate').prop('disabled',ds);
-
-            //
-            //
-            // $(el_SizeView).html(sz.toFixed(2));
-            // $(el_ExtView).html(ext);
-            //
-            // $(el_size).val(sz.toFixed(2));
-            // $(el_Ext).val(ext);
-            //
-            // var reader = new FileReader();
-            //
-            // reader.onload = function(e) {
-            //     $(el_View).attr('src', e.target.result);
-            // };
-            // reader.readAsDataURL(input.files[0]);
         }
     });
 
