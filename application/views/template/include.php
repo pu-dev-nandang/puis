@@ -1087,7 +1087,7 @@
     function Validation_numeric(string,theName)
     {
         var result = {status:1, messages:""};
-        var regexx =  /^\d+$/;;
+        var regexx =  /^\d+$/;
         if (!string.match(regexx)) {
             result = {status : 0,messages: theName + " only numeric! "};
         }

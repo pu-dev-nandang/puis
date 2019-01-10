@@ -130,7 +130,24 @@
 				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Action</th>'+
 										'</tr></thead>'+
 										'<tbody></tbody></table></div></div></div>';
-				$("#Page_Input_PR").html(html);
+				var SaveBtn = '<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
+									'<div class = "col-md-12">'+
+										'<div class = "pull-right">'+
+											'<button class = "btn btn-success" id = "SaveBudget">Submit</button>'+
+										'</div>'+
+									'</div>'+
+								'</div>';
+				var InputTax = 	'<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
+									'<div class = "col-sm-2">'+
+										'<div class = "form-group">'+
+											'<label>PPN</label>'+
+											'<input type = "text" class = "form-control" id = "ppn">'+
+										'</div>'+
+									'</div>'+
+								'</div>';												
+				$("#Page_Input_PR").html(html+InputTax+SaveBtn);
+				$("#ppn").maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
+				$("#ppn").maskMoney('mask', '9894');
 				AddingTable();
 
 			}).fail(function() {
@@ -205,7 +222,6 @@
 			}
 			//eventTableFunction();
 		}
-
 		
 		$(document).off('click', '.SearchPostBudget').on('click', '.SearchPostBudget',function(e) {
 			var ev = $(this);
@@ -316,8 +332,8 @@
 
 		function _BudgetRemaining()
 		{
-			// loadingStart();
-			loading_page('Page_Budget_Remaining');
+			loadingStart();
+			loading_page('#Page_Budget_Remaining');
 			BudgetRemaining = [];
 			var arr_id_budget_left = [];
 			$('.PostBudgetItem').each(function(){
@@ -370,7 +386,7 @@
 			
 			// console.log(BudgetRemaining);
 			loadShowBUdgetRemaining(BudgetRemaining);
-			// loadingEnd(100)
+			loadingEnd(500)
 
 		}
 
@@ -552,8 +568,6 @@
 
 		function FuncBudgetStatus(fillItem)
 		{
-			// var SubTotal = fillItem.find('td:eq(6)').find('.SubTotal').val(); 
-			// var SubTotal = findAndReplace(SubTotal, ".","");
 			var id_budget_left = fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left');
 			var GetBudgetRemaining = function(id_budget_left,BudgetRemaining){
 				var Remaining = 0;
@@ -567,7 +581,7 @@
 			};
 
 			var Remaining = GetBudgetRemaining(id_budget_left,BudgetRemaining);
-			console.log(Remaining);
+			// console.log(Remaining);
 
 			var OP = [
 					{
@@ -585,166 +599,34 @@
 				];
 
 			var DefaultName = (Remaining >= 0) ? 'IN' : 'Exceed';
-			var html = '<select class = "form-control BudgetStatus">';
+			var disabled = (DefaultName == 'Exceed') ? 'disabled' : '';
+			var html = '<select class = "form-control BudgetStatus"  '+disabled+'>';
 
 			for (var i = 0; i < OP.length; i++) {
+				if (DefaultName == 'IN') {
+					if (OP[i].name == 'Exceed') {
+						continue;
+					}
+				}
 				var selected = (DefaultName == OP[i].name) ? 'selected' : '';
 				html += '<option value = "'+OP[i].name+'"'+selected+'>'+OP[i].name+'</option>';
 			}
 			html += '</select>';
 
 			fillItem.find('td:eq(8)').html(html);
-			
-			
-			$(".BudgetStatus").change(function(){
-				var valuee = $(this).val();
-				if (valuee == 'Cross') {
-					loadSelectPostRealiasi_byCross(fillItem);
-				}
-			})
-		}
 
-		function loadSelectPostRealiasi_byCross(fillItem)
-		{
-			html = '';
-			$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Post Budget'+'</h4>');
-			$('#GlobalModalLarge .modal-body').html(html);
-			$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+'<button type="button" id="ModalbtnSaveFormCross" class="btn btn-success">Save</button>');
-			$('#GlobalModalLarge').modal({
-			    'show' : true,
-			    'backdrop' : 'static'
-			});
-			loading_page('#GlobalModalLarge .modal-body');
-			html = '<div class = "row">'+
-						'<div class = "col-md-12">'+
-							'<div class="form-group">'+
-								'<label class="control-label">Category / Group</label>'+
-								'<select class = "select2-select-00 full-width-fix" id = "PostBudgetCross">'+
+			// if (DefaultName == 'Exceed') {
+			// 	setTimeout(function () {
+			// 	 	$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Alert'+'</h4>');
+			// 	 	$('#GlobalModalLarge .modal-body').html('<p>Your budget is insufficient, Please check</p>');
+			// 	 	$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>');
+			// 	 	$('#GlobalModalLarge').modal({
+			// 	 	    'show' : true,
+			// 	 	    'backdrop' : 'static'
+			// 	 	});
+			// 	},500);
+			// }
 
-								'</select>'
-							'</div>'+
-						'</div>'+
-					'</div>';
-
-			var Year = $("#Year").val();
-			var Departement = $("#DepartementPost").val();
-			var url = base_url_js+"budgeting/getPostBudgetDepartement";
-
-			var data = {
-					    Year : Year,
-						Departement : Departement,
-					};
-			var token = jwt_encode(data,'UAP)(*');
-			$.post(url,{token:token},function (resultJson) {
-				var response = jQuery.parseJSON(resultJson);
-				$('#GlobalModalLarge .modal-body').html(html);
-				$("#PostBudgetCross").empty();
-				if (response.length > 0) {
-					var PostBudget = '';
-					var abc = 0;
-					for (var i = 0; i < response.length; i++) {
-						var selected = (i == 0) ? 'selected' : '';
-						PostBudget += '<option value ="'+response[i].CodePost+'" '+selected+'>'+response[i].PostName+'</option>';
-						abc++;
-						
-					}
-
-					if (abc > 0) {
-						$("#PostBudgetCross").append(PostBudget);
-						$('#PostBudgetCross').select2({
-						   //allowClear: true
-						});
-						loadPostBudgetThisMonthCross();
-						$("#PostBudgetCross").change(function(){
-							loadPostBudgetThisMonthCross();
-						})
-					}
-					else
-					{
-						toastr.info('No Result Data in category, please add Post Budget by Finance'); 
-					}
-					
-				}
-				else
-				{
-					toastr.info('No Result Data in category, please add Post Budget by Finance'); 
-				}
-
-			}).fail(function() {
-			  toastr.info('No Result Data'); 
-			}).always(function() {
-			                
-			});		
-
-		}
-
-		function loadPostBudgetThisMonthCross()
-		{
-			var Departement = $("#DepartementPost").val();
-			var PostBudget = $('#PostBudgetCross').val();
-			var url = base_url_js+"budgeting/PostBudgetThisMonth_Department";
-			var data = {
-						Departement : Departement,
-						PostBudget : PostBudget
-					};
-			var token = jwt_encode(data,'UAP)(*');
-			$.post(url,{token:token},function (resultJson) {
-				var response = jQuery.parseJSON(resultJson);
-				if (response.length > 0) {
-					load_budgetCross(response)
-				}
-				else
-				{
-					toastr.info('Budget doesn\'t exist'); 
-				}
-			}).fail(function() {
-			  toastr.info('No Result Data'); 
-			}).always(function() {
-			                
-			});
-		}
-
-		function load_budgetCross(response)
-		{
-			var html = '<div class = "row" id = "Page_BudgetCross">'+
-							'<div class = "col-md-12">'+
-									'<table class="table table-bordered tableData" id ="tableData3Cross">'+
-										'<thead>'+
-										'<tr>'+
-											'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">Choose</th>'+
-				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Budget</th>'+
-				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Remaining</th>'+
-										'</tr></thead>'+
-										'<tbody></tbody></table></div></div>';
-			if ($("#Page_BudgetCross").length) {
-				$("#Page_BudgetCross").remove();
-				$("#GlobalModalLarge .modal-body").append(html);
-			}
-			else
-			{
-				$("#GlobalModalLarge .modal-body").append(html);
-			}							
-			
-			var isi = '';
-			for (var i = 0; i < response.length; i++) {
-				isi += '<tr>';
-				isi += '<td><input type="checkbox" class="uniformCross" value="'+response[i]['Value']+'" id_table="'+response[i]['ID']+'">'+
-						'<td>'+response[i]['RealisasiPostName']+'</td>'+
-						'<td>'+formatRupiah(response[i]['Value'])+'</td>';
-				isi += '</tr>';		
-
-			}
-
-			$("#tableData3Cross tbody").append(isi);
-
-			$(".uniformCross").change(function(){
-				$('.uniformCross').prop('checked', false);
-				$(this).prop('checked',true);
-			})
-
-			$("#ModalbtnSaveFormCross").click(function(){
-
-			})
 		}
 	}); // exit document Function
 </script>
