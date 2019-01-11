@@ -614,19 +614,36 @@
 			html += '</select>';
 
 			fillItem.find('td:eq(8)').html(html);
-
-			// if (DefaultName == 'Exceed') {
-			// 	setTimeout(function () {
-			// 	 	$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Alert'+'</h4>');
-			// 	 	$('#GlobalModalLarge .modal-body').html('<p>Your budget is insufficient, Please check</p>');
-			// 	 	$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>');
-			// 	 	$('#GlobalModalLarge').modal({
-			// 	 	    'show' : true,
-			// 	 	    'backdrop' : 'static'
-			// 	 	});
-			// 	},500);
-			// }
-
 		}
+		
+		$(document).off('click', '#SaveBudget').on('click', '#SaveBudget',function(e) {
+			loading_button('#SaveBudget');
+			// Budget Status
+				if ($('.BudgetStatus').length) {
+					// check Budget status tidak boleh exceeds
+						var bool = true;
+						$(".BudgetStatus").each(function(){
+							if ($(this).val() == 'Exceed') {
+								bool = false;
+								return false;
+							}
+						})
+
+						if (!bool) {
+							toastr.error('Budget Status having value is Exceed','!!!Error');
+							$('#SaveBudget').prop('disabled',false).html('Submit');
+						}
+						else
+						{
+							// ok
+							
+						}
+				}
+				else
+				{
+					toastr.error('Budget Status is required','!!!Error');
+					$('#SaveBudget').prop('disabled',false).html('Submit');
+				}
+		})
 	}); // exit document Function
 </script>
