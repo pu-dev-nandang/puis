@@ -47,7 +47,7 @@
                         <th style="width: 30%;text-align: center;">Description</th>
                         <th style="width: 15%;text-align: center;">Files</th>
                         <th style="text-align: center;">Files</th>
-                        <th class="hide" style="text-align: center;width: 5%;">Action</th>
+                        <th style="text-align: center;width: 5%;">Action</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -65,7 +65,7 @@
                             </form>
                         </td>
                         <td id="viewKTP">-</td>
-                        <td class="hide" style="text-align: center;"><button id="btnDeleteKTP" class="btn btn-sm btn-danger" disabled><i class="fa fa-trash"></i></button></td>
+                        <td style="text-align: center;"><button id="btnDelete_KTP" class="btn btn-sm btn-danger btnDelete" disabled><i class="fa fa-trash"></i></button></td>
                     </tr>
                     <tr>
                         <td>Curriculum Vitae</td>
@@ -81,7 +81,7 @@
                             </form>
                         </td>
                         <td id="viewCV">-</td>
-                        <td class="hide" style="text-align: center;"><button id="btnDeleteCV" class="btn btn-sm btn-danger" disabled><i class="fa fa-trash"></i></button></td>
+                        <td style="text-align: center;"><button id="btnDelete_CV" class="btn btn-sm btn-danger btnDelete" disabled><i class="fa fa-trash"></i></button></td>
                     </tr>
                     <tr>
                         <td>Ijazah S1</td>
@@ -97,7 +97,7 @@
                             </form>
                         </td>
                         <td id="viewIjazahS1">-</td>
-                        <td class="hide" style="text-align: center;"><button id="btnDeleteIjazahS1" class="btn btn-sm btn-danger" disabled><i class="fa fa-trash"></i></button></td>
+                        <td style="text-align: center;"><button id="btnDelete_IjazahS1" class="btn btn-sm btn-danger btnDelete" disabled><i class="fa fa-trash"></i></button></td>
                     </tr>
                     <tr>
                         <td>Transcript S1</td>
@@ -113,7 +113,7 @@
                             </form>
                         </td>
                         <td id="viewTranscriptS1">-</td>
-                        <td class="hide" style="text-align: center;"><button id="btnDeleteTranscriptS1" class="btn btn-sm btn-danger" disabled><i class="fa fa-trash"></i></button></td>
+                        <td style="text-align: center;"><button id="btnDelete_TranscriptS1" class="btn btn-sm btn-danger btnDelete" disabled><i class="fa fa-trash"></i></button></td>
                     </tr>
                     <tr>
                         <td>Ijazah S2</td>
@@ -129,7 +129,7 @@
                             </form>
                         </td>
                         <td id="viewIjazahS2">-</td>
-                        <td class="hide" style="text-align: center;"><button id="btnDeleteIjazahS2" class="btn btn-sm btn-danger" disabled><i class="fa fa-trash"></i></button></td>
+                        <td style="text-align: center;"><button id="btnDelete_IjazahS2" class="btn btn-sm btn-danger btnDelete" disabled><i class="fa fa-trash"></i></button></td>
                     </tr>
                     <tr>
                         <td>Transcript S2</td>
@@ -145,7 +145,7 @@
                             </form>
                         </td>
                         <td id="viewTranscriptS2">-</td>
-                        <td class="hide" style="text-align: center;"><button id="btnDeleteTranscriptS2" class="btn btn-sm btn-danger" disabled><i class="fa fa-trash"></i></button></td>
+                        <td style="text-align: center;"><button id="btnDelete_TranscriptS2" class="btn btn-sm btn-danger btnDelete" disabled><i class="fa fa-trash"></i></button></td>
                     </tr>
                     <tr>
                         <td>Ijazah S3</td>
@@ -161,7 +161,7 @@
                             </form>
                         </td>
                         <td id="viewIjazahS3">-</td>
-                        <td class="hide" style="text-align: center;"><button id="btnDeleteIjazahS3" class="btn btn-sm btn-danger" disabled><i class="fa fa-trash"></i></button></td>
+                        <td style="text-align: center;"><button id="btnDelete_IjazahS3" class="btn btn-sm btn-danger btnDelete" disabled><i class="fa fa-trash"></i></button></td>
                     </tr>
                     <tr>
                         <td>Transcript S3</td>
@@ -177,7 +177,7 @@
                             </form>
                         </td>
                         <td id="viewTranscriptS3">-</td>
-                        <td class="hide" style="text-align: center;"><button id="btnDeleteTranscriptS3" class="btn btn-sm btn-danger" disabled><i class="fa fa-trash"></i></button></td>
+                        <td style="text-align: center;"><button id="btnDelete_TranscriptS3" class="btn btn-sm btn-danger btnDelete" disabled><i class="fa fa-trash"></i></button></td>
                     </tr>
                     <tr>
                         <td>Surat Pernyataan Dosen</td>
@@ -193,7 +193,7 @@
                             </form>
                         </td>
                         <td id="viewSP_Dosen">-</td>
-                        <td class="hide" style="text-align: center;"><button id="btnDeleteSP_Dosen" class="btn btn-sm btn-danger" disabled><i class="fa fa-trash"></i></button></td>
+                        <td style="text-align: center;"><button id="btnDelete_SP_Dosen" class="btn btn-sm btn-danger btnDelete" disabled><i class="fa fa-trash"></i></button></td>
                     </tr>
                     <tr>
                         <td>SK Dosen</td>
@@ -209,7 +209,7 @@
                             </form>
                         </td>
                         <td id="viewSK_Dosen">-</td>
-                        <td class="hide" style="text-align: center;"><button id="btnDeleteSK_Dosen" class="btn btn-sm btn-danger" disabled><i class="fa fa-trash"></i></button></td>
+                        <td style="text-align: center;"><button id="btnDelete_SK_Dosen" class="btn btn-sm btn-danger btnDelete" disabled><i class="fa fa-trash"></i></button></td>
                     </tr>
                     <tr>
                         <td>SK Pangkat</td>
@@ -225,7 +225,7 @@
                             </form>
                         </td>
                         <td id="viewSK_Pangkat">-</td>
-                        <td class="hide" style="text-align: center;"><button id="btnDeleteSK_Pangkat" class="btn btn-sm btn-danger" disabled><i class="fa fa-trash"></i></button></td>
+                        <td style="text-align: center;"><button id="btnDelete_SK_Pangkat" class="btn btn-sm btn-danger btnDelete" disabled><i class="fa fa-trash"></i></button></td>
                     </tr>
                     <tr>
                         <td>SK Jabatan Fungsional</td>
@@ -241,7 +241,7 @@
                             </form>
                         </td>
                         <td id="viewSK_JJA">-</td>
-                        <td class="hide" style="text-align: center;"><button id="btnDeleteSK_JJA" class="btn btn-sm btn-danger" disabled><i class="fa fa-trash"></i></button></td>
+                        <td style="text-align: center;"><button id="btnDelete_SK_JJA" class="btn btn-sm btn-danger btnDelete" disabled><i class="fa fa-trash"></i></button></td>
                     </tr>
                     </tbody>
                 </table>
@@ -325,18 +325,18 @@
                 var btnSK_JJA = (d.SK_JJA!='' && d.SK_JJA!=null) ? false : true;
 
 
-                $('#btnDeleteKTP').prop('disabled',btnKTP);
-                $('#btnDeleteCV').prop('disabled',btnCV);
-                $('#btnDeleteIjazahS1').prop('disabled',btnIjazahS1);
-                $('#btnDeleteTranscriptS1').prop('disabled',btnTranscriptS1);
-                $('#btnDeleteIjazahS2').prop('disabled',btnIjazahS2);
-                $('#btnDeleteTranscriptS2').prop('disabled',btnTranscriptS2);
-                $('#btnDeleteIjazahS3').prop('disabled',btnIjazahS3);
-                $('#btnDeleteTranscriptS3').prop('disabled',btnTranscriptS3);
-                $('#btnDeleteSP_Dosen').prop('disabled',btnSP_Dosen);
-                $('#btnDeleteSK_Dosen').prop('disabled',btnSK_Dosen);
-                $('#btnDeleteSK_Pangkat').prop('disabled',btnSK_Pangkat);
-                $('#btnDeleteSK_JJA').prop('disabled',btnSK_JJA);
+                $('#btnDelete_KTP').prop('disabled',btnKTP).attr('data-file',d.KTP);
+                $('#btnDelete_CV').prop('disabled',btnCV).attr('data-file',d.CV);
+                $('#btnDelete_IjazahS1').prop('disabled',btnIjazahS1).attr('data-file',d.IjazahS1);
+                $('#btnDelete_TranscriptS1').prop('disabled',btnTranscriptS1).attr('data-file',d.TranscriptS1);
+                $('#btnDelete_IjazahS2').prop('disabled',btnIjazahS2).attr('data-file',d.IjazahS2);
+                $('#btnDelete_TranscriptS2').prop('disabled',btnTranscriptS2).attr('data-file',d.TranscriptS2);
+                $('#btnDelete_IjazahS3').prop('disabled',btnIjazahS3).attr('data-file',d.IjazahS3);
+                $('#btnDelete_TranscriptS3').prop('disabled',btnTranscriptS3).attr('data-file',d.TranscriptS3);
+                $('#btnDelete_SP_Dosen').prop('disabled',btnSP_Dosen).attr('data-file',d.SP_Dosen);
+                $('#btnDelete_SK_Dosen').prop('disabled',btnSK_Dosen).attr('data-file',d.SK_Dosen);
+                $('#btnDelete_SK_Pangkat').prop('disabled',btnSK_Pangkat).attr('data-file',d.SK_Pangkat);
+                $('#btnDelete_SK_JJA').prop('disabled',btnSK_JJA).attr('data-file',d.SK_JJA);
 
 
             });
@@ -398,6 +398,28 @@
         } else {
             toastr.error('Plase, Select User','Eror!');
         }
+
+
+    });
+
+    $('.btnDelete').click(function () {
+
+        var formEmployees = $('#formEmployees').val();
+        var ID = $(this).attr('id');
+        var colom = ID.split('btnDelete_')[1];
+        var files = $(this).attr('data-file');
+
+        if(formEmployees!='' && formEmployees!=null && files!='' && files!=null){
+            if(confirm('Remove data?')){
+                var url = base_url_js+'human-resources/employees/remove_files?fileName='+files+
+                    '&user='+formEmployees.trim()+'&colom='+colom;
+                $.get(url,function (result) {
+                    toastr.success('Data Removed','Success');
+                    loadDataEmployees();
+                });
+            }
+        }
+
 
 
     });

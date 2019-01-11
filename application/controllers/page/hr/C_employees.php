@@ -84,6 +84,24 @@ class C_employees extends HR_Controler {
 
     }
 
+    public function remove_files(){
+        $fileName = $this->input->get('fileName');
+        $result = 0;
+        if(is_file('./uploads/files/'.$fileName)){
+            unlink('./uploads/files/'.$fileName);
+            $result = 1;
+        }
+
+        $user = $this->input->get('user');
+        $colom = $this->input->get('colom');
+
+        $this->db->set($colom, '');
+        $this->db->where('NIP', $user);
+        $this->db->update('db_employees.files');
+
+        return print_r($result);
+    }
+
     public function input_employees(){
         $department = parent::__getDepartement();
         // get Prodi
