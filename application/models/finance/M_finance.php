@@ -1251,10 +1251,10 @@ class M_finance extends CI_Model {
       $Data_mhs[$i] = $Data_mhs[$i] + $array;
 
       // get IPS Mahasiswa
-        $IPS = $this->getIPSMahasiswa($db2,$Data_mhs[$i]['NPM']);
+        $IPS = $this->getIPSMahasiswaBySemester($db2,$Data_mhs[$i]['NPM'],$SemesterID[0]['ID']);
         $Data_mhs[$i] = $Data_mhs[$i] + array('IPS' => $IPS);
 
-      // get IPS Mahasiswa
+      // get IPK Mahasiswa
         $IPK = $this->getIPKMahasiswa($db2,$Data_mhs[$i]['NPM']);
         $Data_mhs[$i] = $Data_mhs[$i] + array('IPK' => $IPK);
 
@@ -1263,7 +1263,7 @@ class M_finance extends CI_Model {
         $Data_mhs[$i] = $Data_mhs[$i] + array('VA' => $VA);
 
       // get sks yang diambil
-         $Credit = $this->getSKSMahasiswa($db2,$Data_mhs[$i]['NPM']);
+         $Credit = $this->getSKSMahasiswaBySemester($db2,$Data_mhs[$i]['NPM'],$SemesterID[0]['ID']);
          $Data_mhs[$i] = $Data_mhs[$i] + array('Credit' => $Credit);
 
     }
@@ -1279,6 +1279,21 @@ class M_finance extends CI_Model {
         $query = $this->db->query($sql, array())->result_array();
         $SemesterID = $query[0]['ID'];
 
+      $sql = 'select * from '.$db.'.study_planning where NPM = ? and SemesterID = ?';
+      $query = $this->db->query($sql, array($NPM,$SemesterID))->result_array();
+
+      $Credit = 0;
+      for ($j=0; $j < count($query); $j++) { 
+       $CreditSub = $query[$j]['Credit'];
+       $Credit = $Credit + $CreditSub;
+      }
+
+      return $Credit;
+
+   }
+
+   public function getSKSMahasiswaBySemester($db,$NPM,$SemesterID)
+   {
       $sql = 'select * from '.$db.'.study_planning where NPM = ? and SemesterID = ?';
       $query = $this->db->query($sql, array($NPM,$SemesterID))->result_array();
 
@@ -1325,6 +1340,34 @@ class M_finance extends CI_Model {
         $query = $this->db->query($sql, array())->result_array();
         $SemesterID = $query[0]['ID'];
 
+      // get query IPS
+        $sql = 'select * from '.$db.'.study_planning where NPM = ? and SemesterID = ? ';
+
+        // print_r($sql);
+        $query = $this->db->query($sql, array($NPM,$SemesterID))->result_array();
+        if (count($query) == 0) {
+          $IPS = 0;
+          return $IPS;
+        }
+
+      // proses perhitungan IPS
+        $GradeValueCredit = 0;
+        $Credit = 0;
+        for ($j=0; $j < count($query); $j++) { 
+         $GradeValue = $query[$j]['GradeValue'];
+         $CreditSub = $query[$j]['Credit'];
+         $GradeValueCredit = $GradeValueCredit + ($GradeValue * $CreditSub);
+         $Credit = $Credit + $CreditSub;
+        }
+
+      $IPS = $GradeValueCredit / $Credit;
+      return $IPS;  
+   }
+
+   public function getIPSMahasiswaBySemester($db,$NPM,$SemesterID)
+   {
+    error_reporting(0);
+    $IPS = 0;
       // get query IPS
         $sql = 'select * from '.$db.'.study_planning where NPM = ? and SemesterID = ? ';
 
@@ -1493,7 +1536,7 @@ class M_finance extends CI_Model {
       $db = 'ta_'.$Year.'.students';
       $dt = $this->m_master->caribasedprimary($db,'NPM',$query[$i]['NPM']);
       // get IPS Mahasiswa
-         $IPS = $this->getIPSMahasiswa('ta_'.$Year,$query[$i]['NPM']);
+         $IPS = $this->getIPSMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$query[$i]['SemesterID']);
 
       // get IPS Mahasiswa
          $IPK = $this->getIPKMahasiswa('ta_'.$Year,$query[$i]['NPM']);
@@ -1502,7 +1545,7 @@ class M_finance extends CI_Model {
          $VA = $Const_VA[0]['Const_VA'].$query[$i]['NPM'];
 
       // get sks yang diambil
-         $Credit = $this->getSKSMahasiswa('ta_'.$Year,$query[$i]['NPM']);
+         $Credit = $this->getSKSMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$query[$i]['SemesterID']);
 
       // Detail Payment & cek cancel   
          $DetailPayment = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']);
@@ -1668,16 +1711,16 @@ class M_finance extends CI_Model {
       $db = 'ta_'.$Year.'.students';
       $dt = $this->m_master->caribasedprimary($db,'NPM',$query[$i]['NPM']);
       // get IPS Mahasiswa
-         $IPS = $this->getIPSMahasiswa('ta_'.$Year,$query[$i]['NPM']);
+         $IPS = $this->getIPSMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$query[$i]['SemesterID']);
 
-      // get IPS Mahasiswa
+      // get IPK Mahasiswa
          $IPK = $this->getIPKMahasiswa('ta_'.$Year,$query[$i]['NPM']);
 
       // ge VA Mahasiwa
          $VA = $Const_VA[0]['Const_VA'].$query[$i]['NPM'];
 
       // get sks yang diambil
-         $Credit = $this->getSKSMahasiswa('ta_'.$Year,$query[$i]['NPM']);
+         $Credit = $this->getSKSMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$query[$i]['SemesterID']);
 
       // cek cancel   
          $cancelPay = $this->getCancel($query[$i]['PTID'],$query[$i]['SemesterID'],$query[$i]['NPM']);   

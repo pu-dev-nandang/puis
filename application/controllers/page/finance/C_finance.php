@@ -898,6 +898,11 @@ class C_finance extends Finnance_Controler {
         $input = $this->getInputToken();
         $this->load->library('pagination');
         // count
+        if (!array_key_exists('Semester', $input)) {
+            $sms = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+            $input['Semester'] = $sms[0]['ID'];
+        }
+
         $count = $this->m_finance->count_get_created_tagihan_mhs_not_approved($input['ta'],$input['prodi'],$input['PTID'],$input['NIM'],$input['Semester']);
         $config = $this->config_pagination_default_ajax($count,5,3);
         $this->pagination->initialize($config);
