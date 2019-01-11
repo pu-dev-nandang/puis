@@ -808,6 +808,7 @@ $route['rest/__rekapintake_perschool'] = 'api/c_rest/rekapintake_perschool';
 $route['rest/__rekapmhspayment'] = 'api/c_rest/rekapmhspayment';
 $route['rest/__sendEmail'] = 'api/c_rest/sendEmail';
 $route['rest/venue/__fill_feedback'] = 'api/c_rest/venue__fill_feedback';
+$route['rest/Catalog/__Get_Item'] = 'api/c_rest/catalog__get_item';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
@@ -1077,13 +1078,11 @@ $route['budgeting/export_excel_budget_creator_all'] = 'C_save_to_excel/export_ex
 $route['budgeting/EntryBudget/BudgetLeft'] = 'page/budgeting/c_budgeting/BudgetLeft';
 $route['budgeting/getListBudgetingRemaining'] = 'page/budgeting/c_budgeting/getListBudgetingRemaining';
 $route['budgeting/detail_budgeting_remaining'] = 'page/budgeting/c_budgeting/detail_budgeting_remaining';
-$route['budgeting/export_excel_budget_remaining'] = 'C_save_to_excel/export_excel_budget_remaining';
 $route['budgeting/configRule'] = 'page/budgeting/c_budgeting/configRule';
 $route['budgeting/configRule/userroledepart_submit'] = 'page/budgeting/c_budgeting/userroledepart_submit';
 $route['budgeting/page_pr/(:any)'] = 'page/budgeting/c_budgeting/page_pr/$1';
 $route['budgeting/PostBudgetThisMonth_Department'] = 'page/budgeting/c_budgeting/PostBudgetThisMonth_Department';
 $route['budgeting/getPostBudgetDepartement'] = 'page/budgeting/c_budgeting/getPostBudgetDepartement';
-
 
 // Purchasing
 $query = $db->get('db_purchasing.cfg_sub_menu');

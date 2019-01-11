@@ -979,6 +979,29 @@
     }
 
     function formatRupiah(bilangan) {
+        var ReadMinus = function(bilangan)
+        {
+            var bool = false;
+            var number_string = bilangan.toString(); 
+            var a = number_string.substr(0, 1);
+            var n = number_string.length;
+            if (a  == '-') {
+                bool = true;
+                bilangan = number_string.substr(1, n);
+            }
+
+            var dt = {
+                status : bool,
+                bilangan : bilangan,
+            };
+
+            return dt;
+        }
+
+        var chkminus = ReadMinus(bilangan);
+        var minus = (chkminus['status']) ? '- ' : '';
+        bilangan = chkminus['bilangan'];
+
         var number_string = bilangan.toString(),
             sisa    = number_string.length % 3,
             rupiah  = number_string.substr(0, sisa),
@@ -989,7 +1012,7 @@
             rupiah += separator + ribuan.join('.');
         }
 
-        return 'Rp. '+rupiah+',-';
+        return minus+'Rp. '+rupiah+',-';
     }
 
     function formatDigitNumber(bilangan) {
@@ -1064,7 +1087,7 @@
     function Validation_numeric(string,theName)
     {
         var result = {status:1, messages:""};
-        var regexx =  /^\d+$/;;
+        var regexx =  /^\d+$/;
         if (!string.match(regexx)) {
             result = {status : 0,messages: theName + " only numeric! "};
         }

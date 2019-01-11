@@ -7,7 +7,10 @@
             </a>
         </li>
         <li class="active">
-            <a href="javascript:void(0)" class="pageAnchor" page = "CreatePR">Create PR</a>
+            <a href="javascript:void(0)" class="pageAnchor" page = "form">Form</a>
+        </li>
+        <li class="">
+            <a href="javascript:void(0)" class="pageAnchor" page = "Data">Data</a>
         </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
@@ -30,7 +33,7 @@
     $(document).ready(function() {
         $("#container").attr('class','fixed-header sidebar-closed');
         $("#sidebar").remove();
-        LoadPage('CreatePR');
+        LoadPage('form');
 
         $(".pageAnchor").click(function(){
             var Page = $(this).attr('page');

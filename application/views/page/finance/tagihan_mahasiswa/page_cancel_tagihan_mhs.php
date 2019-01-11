@@ -101,7 +101,7 @@
         // loadData(1);
         loadSelectOptionCurriculum2('#selectCurriculum','');
         loadSelectOptionBaseProdi('#selectProdi','');
-        loadSelectOptionPaymentTypeMHS('#selectPTID','');
+        loadSelectOptionPaymentTypeAll('#selectPTID','');
         loadSelectOptionSemesterByload('#selectSemester',1);
         getReloadTableSocket();
         // $("#btn-submit").addClass('hide');
