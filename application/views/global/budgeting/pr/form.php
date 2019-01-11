@@ -201,7 +201,7 @@
                         		'</div>'+
                         	'</td>'+
                         	'<td></td>'+
-                        	'<td><input type="file" data-style="fileinput" class = "BrowseFile"></td>'+action
+                        	'<td><input type="file" data-style="fileinput" class = "BrowseFile" ID = "BrowseFile'+No+'" multiple></td>'+action
                         '</tr>';	
 
 				return a;				
@@ -332,7 +332,7 @@
 
 		function _BudgetRemaining()
 		{
-			loadingStart();
+			// loadingStart();
 			loading_page('#Page_Budget_Remaining');
 			BudgetRemaining = [];
 			var arr_id_budget_left = [];
@@ -386,7 +386,7 @@
 			
 			// console.log(BudgetRemaining);
 			loadShowBUdgetRemaining(BudgetRemaining);
-			loadingEnd(500)
+			// loadingEnd(500)
 
 		}
 
@@ -527,33 +527,36 @@
 
 		function loadShowBUdgetRemaining(BudgetRemaining)
 		{
-			$("#Page_Budget_Remaining").empty();
-			var html = '<div class = "row">'+
-							'<div class = "col-md-12">'+
-								'<table class="table table-bordered tableData" id ="tableData3">'+
-									'<thead>'+
-										'<tr>'+
-											'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
-											'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Post Budget Item</th>'+
-											'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Remaining</th>'+
-										'</tr>'+
-									'</thead><tbody>';
-										
-			for (var i = 0; i < BudgetRemaining.length; i++) {
-				var No = i + 1;
-				html += '<tr>'+
-							'<td>'+No+'</td>'+
-							'<td>'+BudgetRemaining[i].PostBudgetItem+'</td>'+
-							'<td>'+BudgetRemaining[i].Remaining+'</td>'+
-						'</tr>';	
-			}
+			setTimeout(function () {
+	           $("#Page_Budget_Remaining").empty();
+	           var html = '<div class = "row">'+
+	           				'<div class = "col-md-12">'+
+	           					'<table class="table table-bordered tableData" id ="tableData3">'+
+	           						'<thead>'+
+	           							'<tr>'+
+	           								'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
+	           								'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Post Budget Item</th>'+
+	           								'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Remaining</th>'+
+	           							'</tr>'+
+	           						'</thead><tbody>';
+	           							
+	           for (var i = 0; i < BudgetRemaining.length; i++) {
+	           	var No = i + 1;
+	           	html += '<tr>'+
+	           				'<td>'+No+'</td>'+
+	           				'<td>'+BudgetRemaining[i].PostBudgetItem+'</td>'+
+	           				'<td>'+BudgetRemaining[i].Remaining+'</td>'+
+	           			'</tr>';	
+	           }
 
-			html += '</tbody>'+
-					'</table>'+
-					'</div>'+
-					'</div>';		
+	           html += '</tbody>'+
+	           		'</table>'+
+	           		'</div>'+
+	           		'</div>';		
 
-			$("#Page_Budget_Remaining").html(html);
+	           $("#Page_Budget_Remaining").html(html);
+			},1000);
+			
 		}
 
 		function SortByNumbering()
@@ -636,6 +639,10 @@
 						else
 						{
 							// ok
+							var validation = validation_input();
+							if (validation) {
+								SubmitPR('','Add');
+							}
 							
 						}
 				}
@@ -645,5 +652,158 @@
 					$('#SaveBudget').prop('disabled',false).html('Submit');
 				}
 		})
+
+
+		function validation_input()
+		{
+			var find = true;
+			$(".PostBudgetItem").each(function(){
+				var fillItem = $(this).closest('tr');
+				var PostBudgetItem = $(this).val();
+				if (PostBudgetItem == '') {
+					find = false;
+					toastr.error("Post Budget Item is required",'!!!Error');
+					return false;
+				}
+
+				var Item = fillItem.find('td:eq(2)').find('.Item').val();
+				if (Item == '') {
+					find = true;
+					toastr.error("Item is required",'!!!Error');
+					return false;
+				}
+
+			})
+
+			$(".BrowseFile").each(function(){
+				var IDFile = $(this).attr('id');
+				if (!file_validation2(IDFile) ) {
+				  return false;
+				}
+			})
+
+			return find;
+
+		}
+
+		function file_validation2(ID_element)
+		{
+		    var files = $('#'+ID_element)[0].files;
+		    var error = '';
+		    var msgStr = '';
+		    var max_upload_per_file = 4;
+		    if (files.length > max_upload_per_file) {
+		      msgStr += '1 Document should not be more than 4 Files<br>';
+
+		    }
+		    else
+		    {
+		      for(var count = 0; count<files.length; count++)
+		      {
+		       var no = parseInt(count) + 1;
+		       var name = files[count].name;
+		       console.log(name);
+		       var extension = name.split('.').pop().toLowerCase();
+		       if(jQuery.inArray(extension, ['pdf','jpg']) == -1)
+		       {
+		        msgStr += 'File Number '+ no + ' Invalid Type File<br>';
+		        //toastr.error("Invalid Image File", 'Failed!!');
+		        // return false;
+		       }
+
+		       var oFReader = new FileReader();
+		       oFReader.readAsDataURL(files[count]);
+		       var f = files[count];
+		       var fsize = f.size||f.fileSize;
+		       console.log(fsize);
+
+		       if(fsize > 2000000) // 2mb
+		       {
+		        msgStr += 'File Number '+ no + ' Image File Size is very big<br>';
+		        //toastr.error("Image File Size is very big", 'Failed!!');
+		        //return false;
+		       }
+		       
+		      }
+		    }
+
+		    if (msgStr != '') {
+		      toastr.error(msgStr, 'Failed!!');
+		      return false;
+		    }
+		    else
+		    {
+		      return true;
+		    }
+		} 
+
+		function SubmitPR(PRCode,Action)
+		{
+			var Year = $("#Year").val();
+			var Departement = $("#DepartementPost").val();
+			var PPN = $("#ppn").val();
+			var FormInsertDetail = [];
+			var form_data = new FormData();
+			var PassNumber = 0;
+			$(".PostBudgetItem").each(function(){
+				var ID_budget_left = $(this).attr('id_budget_left');
+				var fillItem = $(this).closest('tr');
+				var ID_m_catalog = fillItem.find('td:eq(2)').find('.Item').attr('savevalue');
+				var Qty = fillItem.find('td:eq(4)').find('.qty').val();
+				var UnitCost = fillItem.find('td:eq(5)').find('.UnitCost').val();
+				UnitCost = findAndReplace(UnitCost, ".","");
+				var No = fillItem.find('td:eq(0)').text();
+				var SubTotal = fillItem.find('td:eq(6)').find('.SubTotal').val();
+				SubTotal = findAndReplace(SubTotal, ".","");
+				var DateNeeded = fillItem.find('td:eq(7)').find('#tgl'+No).val();
+				var BudgetStatus = fillItem.find('td:eq(8)').find('.BudgetStatus').val();
+
+				if ( $( '#'+'BrowseFile'+No ).length ) {
+					var UploadFile = $('#'+'BrowseFile'+No)[0].files;
+					for(var count = 0; count<UploadFile.length; count++)
+					{
+					 form_data.append("UploadFile"+PassNumber+"[]", UploadFile[count]);
+					}
+				}
+
+				 var data = {
+				 	ID_budget_left : ID_budget_left,
+				 	ID_m_catalog : ID_m_catalog,
+				 	Qty : Qty,
+				 	UnitCost : UnitCost,
+				 	SubTotal : SubTotal,
+				 	DateNeeded : DateNeeded,
+				 	BudgetStatus : BudgetStatus,
+				 }
+				 var token = jwt_encode(data,"UAP)(*");
+				 FormInsertDetail.push(token);
+				 PassNumber++
+
+			})
+
+			form_data.append('data',FormInsertDetail);
+			form_data.append('Action',Action);
+			form_data.append('PRCode',PRCode);
+			var url = base_url_js + "budgeting/submitpr"
+			$.ajax({
+			  type:"POST",
+			  url:url,
+			  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+			  contentType: false,       // The content type used when sending data to the server.
+			  cache: false,             // To unable request pages to be cached
+			  processData:false,
+			  dataType: "json",
+			  success:function(data)
+			  {
+			    
+
+			  },
+			  error: function (data) {
+			    toastr.error("Connection Error, Please try again", 'Error!!');
+			    $('#SaveBudget').prop('disabled',false).html('Submit');
+			  }
+			})
+
+		}
 	}); // exit document Function
 </script>

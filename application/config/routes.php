@@ -1081,6 +1081,7 @@ $route['budgeting/configRule/userroledepart_submit'] = 'page/budgeting/c_budgeti
 $route['budgeting/page_pr/(:any)'] = 'page/budgeting/c_budgeting/page_pr/$1';
 $route['budgeting/PostBudgetThisMonth_Department'] = 'page/budgeting/c_budgeting/PostBudgetThisMonth_Department';
 $route['budgeting/getPostBudgetDepartement'] = 'page/budgeting/c_budgeting/getPostBudgetDepartement';
+$route['budgeting/submitpr'] = 'page/budgeting/c_budgeting/submitpr';
 
 // Purchasing
 $query = $db->get('db_purchasing.cfg_sub_menu');

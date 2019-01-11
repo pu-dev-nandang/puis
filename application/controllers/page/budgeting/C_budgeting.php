@@ -1331,4 +1331,19 @@ class C_budgeting extends Budgeting_Controler {
         echo json_encode($get);
     }
 
+    public function submitpr()
+    {
+        $action = $this->input->post('Action');
+        print_r($_FILES);die();
+        switch ($action) {
+            case 'Add':
+                
+                break;
+            
+            default:
+                # code...
+                break;
+        }
+    }
+
 }
