@@ -3119,6 +3119,9 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='ApprovedByMentorAll'){
 
                 $ArrToApproveAll = (array) $data_arr['ArrToApproveAll'];
+                $ArrToApproveAll_Logging = (array) $data_arr['ArrToApproveAll_Logging'];
+
+
 
                 if(count($ArrToApproveAll)>0){
                     for($i=0;$i<count($ArrToApproveAll);$i++){
@@ -3129,7 +3132,54 @@ class C_api extends CI_Controller {
                         $this->db->where('ID', $ArrToApproveAll[$i]);
                         $this->db->update('db_academic.std_krs',$arrUpdate);
 
+
+                        // Insert Logging
+                        $Log_dataInsert = (array) $ArrToApproveAll_Logging[$i];
+
+                        $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
+                        $insert_id = $this->db->insert_id();
+
+                        $Log_dataUser = $this->db->select('NIP')->get_where('db_employees.rule_users',
+                            array('IDDivision' => '6'))->result_array();
+
+                        $Log_arr_ins = array(
+                            'IDLogging' => $insert_id,
+                            'UserID' => $data_arr['NPM']
+                        );
+                        $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+
+                        // Cek Kaprodi
+                        $dataKaprodi = $this->db->query('SELECT ps.KaprodiID FROM db_academic.auth_students auts
+                                                                    LEFT JOIN db_academic.program_study ps 
+                                                                    ON (ps.ID = auts.ProdiID)
+                                                                    WHERE auts.NPM = "'.$data_arr['NPM'].'" ')->result_array();
+
+                        if(count($dataKaprodi)>0){
+                            if($dataKaprodi[0]['KaprodiID']!=$data_arr['ApprovedBy']){
+                                $Log_arr_ins_kaprodi = array(
+                                    'IDLogging' => $insert_id,
+                                    'UserID' => $dataKaprodi[0]['KaprodiID']
+                                );
+                                $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins_kaprodi);
+                            }
+                        }
+
+
+                        if(count($Log_dataUser)>0){
+
+                            for($l=0;$l<count($Log_dataUser);$l++){
+                                $d = $Log_dataUser[$l]['NIP'];
+                                $Log_arr_ins = array(
+                                    'IDLogging' => $insert_id,
+                                    'UserID' => $d
+                                );
+                                $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+                            }
+
+                        }
+
                     }
+
                 }
 
                 return print_r(1);
@@ -3141,6 +3191,8 @@ class C_api extends CI_Controller {
                 );
                 $this->db->where('ID', $data_arr['ID']);
                 $this->db->update('db_academic.std_krs',$arrUpdate);
+
+
 
                 // Insert Logging
                 $Log_dataInsert = (array) $data_arr['Logging'];
@@ -3173,12 +3225,40 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='ApprovedByKaprodiAll'){
 
                 $ArrToApproveAll = (array) $data_arr['ArrToApproveAll'];
+                $ArrToApproveAll_Logging = (array) $data_arr['ArrToApproveAll_Logging'];
 
                 if(count($ArrToApproveAll)>0){
                     for($i=0;$i<count($ArrToApproveAll);$i++){
 
                         $this->approveByKaprodi($ArrToApproveAll[$i]
                             ,$data_arr['MhswID'],$data_arr['ApprovalAt']);
+
+                        // Insert Logging
+                        $Log_dataInsert = (array) $ArrToApproveAll_Logging[$i];
+                        $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
+                        $insert_id = $this->db->insert_id();
+
+                        $Log_dataUser = $this->db->select('NIP')->get_where('db_employees.rule_users',
+                            array('IDDivision' => '6'))->result_array();
+
+                        $Log_arr_ins = array(
+                            'IDLogging' => $insert_id,
+                            'UserID' => $data_arr['NPM']
+                        );
+                        $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+
+                        if(count($Log_dataUser)>0){
+
+                            for($l=0;$l<count($Log_dataUser);$l++){
+                                $d = $Log_dataUser[$l]['NIP'];
+                                $Log_arr_ins = array(
+                                    'IDLogging' => $insert_id,
+                                    'UserID' => $d
+                                );
+                                $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+                            }
+
+                        }
 
                     }
                 }
@@ -3190,6 +3270,31 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='ApprovedByKaprodi'){
                 $this->approveByKaprodi($data_arr['ID']
                     ,$data_arr['MhswID'],$data_arr['ApprovalAt']);
+
+                // Insert Logging
+                $Log_dataInsert = (array) $data_arr['Logging'];
+                $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
+                $insert_id = $this->db->insert_id();
+
+                $Log_dataUser = $this->db->select('NIP')->get_where('db_employees.rule_users',
+                    array('IDDivision' => '6'))->result_array();
+
+                $Log_arr_ins = array(
+                    'IDLogging' => $insert_id,
+                    'UserID' => $data_arr['NPM']
+                );
+                $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+                if(count($Log_dataUser)>0){
+                    for($i=0;$i<count($Log_dataUser);$i++){
+                        $d = $Log_dataUser[$i]['NIP'];
+                        $Log_arr_ins = array(
+                            'IDLogging' => $insert_id,
+                            'UserID' => $d
+                        );
+                        $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+                    }
+                }
+
                 return print_r(1);
             }
 
@@ -3209,6 +3314,7 @@ class C_api extends CI_Controller {
                 );
                 $this->db->insert('db_academic.std_krs_comment',$dataInsert);
 
+                // Insert Logging
                 $Log_dataInsert = (array) $data_arr['dataLogging'];
                 $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
                 $insert_id = $this->db->insert_id();
@@ -3251,6 +3357,31 @@ class C_api extends CI_Controller {
                     'UpdateAt' => $data_arr['UpdateAt']
                 );
                 $this->db->insert('db_academic.std_krs_comment',$dataInsert);
+
+                // Insert Logging
+                $Log_dataInsert = (array) $data_arr['dataLogging'];
+                $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
+                $insert_id = $this->db->insert_id();
+
+                $Log_dataUser = $this->db->select('NIP')->get_where('db_employees.rule_users',
+                    array('IDDivision' => '6'))->result_array();
+
+                $Log_arr_ins = array(
+                    'IDLogging' => $insert_id,
+                    'UserID' => $data_arr['NPM']
+                );
+                $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+
+                if(count($Log_dataUser)>0){
+                    for($i=0;$i<count($Log_dataUser);$i++){
+                        $d = $Log_dataUser[$i]['NIP'];
+                        $Log_arr_ins = array(
+                            'IDLogging' => $insert_id,
+                            'UserID' => $d
+                        );
+                        $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+                    }
+                }
 
                 return print_r(1);
             }
