@@ -3,8 +3,20 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class M_rest extends CI_Model {
 
+    function __construct()
+    {
+        parent::__construct();
+        date_default_timezone_set("Asia/Jakarta");
+    }
+
+
     private function _getSemesterActive(){
-        $data = $this->db->get_where('db_academic.semester', array('Status'=>'1'),1);
+        $data = $this->db->query('SELECT ay.*
+                                            FROM db_academic.semester s
+                                            LEFT JOIN db_academic.academic_years ay
+                                            ON (s.ID = ay.SemesterID)
+                                            WHERE s.Status = "1" LIMIT 1 ');
+//        $data = $this->db->get_where('db_academic.semester', array('Status'=>'1'),1);
         return $data->result_array()[0];
     }
 
@@ -557,7 +569,7 @@ class M_rest extends CI_Model {
     {
 
         $SemesterActive = $this->_getSemesterActive();
-        $SemesterID = $SemesterActive['ID'];
+        $SemesterID = $SemesterActive['SemesterID'];
 
         $dataSemester = $this->db->query('SELECT s.* FROM db_academic.semester s ORDER BY s.ID ASC')->result_array();
 
@@ -793,7 +805,7 @@ class M_rest extends CI_Model {
     {
 
         $SemesterActive = $this->_getSemesterActive();
-        $SemesterID = $SemesterActive['ID'];
+        $SemesterID = $SemesterActive['SemesterID'];
 
         $dataSemester = $this->db->query('SELECT s.ID, s.ProgramCampusID, s.Name, s.Status, ay.utsStart, ay.utsEnd, ay.uasStart, ay.uasEnd FROM db_academic.semester s 
                                                       LEFT JOIN db_academic.academic_years ay ON (ay.SemesterID = s.ID)
@@ -926,6 +938,7 @@ class M_rest extends CI_Model {
 
         $transcript = [];
         $arrTranscriptID = [];
+        $dateNow = date("Y-m-d");
 
         $smt = ($order=='ASC') ? 0 : count($data) + 1;
         for($i=0;$i<count($data);$i++){
@@ -945,8 +958,14 @@ class M_rest extends CI_Model {
                         if(in_array($d['MKID'],$arrTranscriptID)!=-1){
 
                             // cek apakah MKID punya lebih dari 1 jika maka ambil nilai tertingginya
-                            $dataScore = $this->db->order_by('Score', 'DESC')
-                                ->get_where($db.'.study_planning',array('NPM' => $NPM,'MKID'=>$d['MKID'],'SemesterID !='=>$dataSmtActive['ID']))->result_array();
+                            if($dateNow <= $dataSmtActive['updateTranscript']){
+                                $dataScore = $this->db->order_by('Score', 'DESC')
+                                    ->get_where($db.'.study_planning',array('NPM' => $NPM,'MKID'=>$d['MKID']))->result_array();
+                            } else {
+                                $dataScore = $this->db->order_by('Score', 'DESC')
+                                    ->get_where($db.'.study_planning',array('NPM' => $NPM,'MKID'=>$d['MKID'],'SemesterID !='=>$dataSmtActive['SemesterID']))->result_array();
+                            }
+
 
                             $Score = ($dataScore[0]['Score']!='' && $dataScore[0]['Score']!=null) ? $dataScore[0]['Score'] : 0;
                             $Grade = ($dataScore[0]['Grade']!='' && $dataScore[0]['Grade']!=null) ? $dataScore[0]['Grade'] : 'E';
@@ -985,9 +1004,6 @@ class M_rest extends CI_Model {
 
 
     private function getDataKHS($db,$NPM,$SemesterID,$Status,$System){
-
-        date_default_timezone_set("Asia/Jakarta");
-
 
         $data = $this->db->query('SELECT sp.*,mk.MKCode, mk.Name, mk.NameEng, s.TotalAssigment 
                                         FROM '.$db.'.study_planning sp 
