@@ -470,8 +470,8 @@ class M_rest extends CI_Model {
         }
 
         $result = array(
-          'BPP' => array('Status'=>$StatusBPP, 'Message' => $MessageBPP),
-          'Credit' => array('Status' => $StatusCredit, 'Message' => $MessageCredit)
+            'BPP' => array('Status'=>$StatusBPP, 'Message' => $MessageBPP),
+            'Credit' => array('Status' => $StatusCredit, 'Message' => $MessageCredit)
         );
 
         return $result;
@@ -698,17 +698,17 @@ class M_rest extends CI_Model {
                 $dataSch[$s]['TotalStudents'] = $this->m_api->getTotalStdPerDay($dataSch[$s]['SemesterID'],$dataSch[$s]['ID'],'');
 
 //                if($param=='Coordinator'){
-                    $team = $this->db->query('SELECT em.NIP,em.Name FROM db_academic.schedule_team_teaching stt 
+                $team = $this->db->query('SELECT em.NIP,em.Name FROM db_academic.schedule_team_teaching stt 
                                                        LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
                                                        WHERE stt.ScheduleID="' . $dataSch[$s]['ID'] . '"
                                                        ')->result_array();
-                    $dataSch[$s]['detailTeamTeaching'] = $team;
+                $dataSch[$s]['detailTeamTeaching'] = $team;
 
-                    $silabus = $this->db->query('SELECT gc.* 
+                $silabus = $this->db->query('SELECT gc.* 
                                                             FROM  db_academic.grade_course gc 
                                                             WHERE gc.ScheduleID = "'.$dataSch[$s]['ID'].'" ')->result_array();
 
-                    $dataSch[$s]['detailSilabusSAP'] = $silabus;
+                $dataSch[$s]['detailSilabusSAP'] = $silabus;
 //                }
 
             }
@@ -749,14 +749,14 @@ class M_rest extends CI_Model {
 
         // Get Total Assigment Aktif
         $dataAssg = $this->db->select('ID AS ScheduleID, ClassGroup, TotalAssigment')->get_where('db_academic.schedule',array(
-                                            'SemesterID' => $SemesterID,
-                                            'ID' => $ScheduleID
-                                        ),1)->result_array();
+            'SemesterID' => $SemesterID,
+            'ID' => $ScheduleID
+        ),1)->result_array();
 
         $dataGrade = $this->db->get_where('db_academic.grade_course',array(
-                                                'SemesterID' => $SemesterID,
-                                                'ScheduleID' => $ScheduleID
-                                            ),1)->result_array();;
+            'SemesterID' => $SemesterID,
+            'ScheduleID' => $ScheduleID
+        ),1)->result_array();;
 
 
         if(count($dataAssg)>0){
@@ -935,10 +935,10 @@ class M_rest extends CI_Model {
 
         $db = 'ta_'.$ClassOf;
         $dataSmtActive = $this->_getSemesterActive();
-
         $transcript = [];
         $arrTranscriptID = [];
         $dateNow = date("Y-m-d");
+        $showNilaiSemesterActive = ($dataSmtActive['updateTranscript'] <= $dateNow) ? 1 : 0;
 
         $smt = ($order=='ASC') ? 0 : count($data) + 1;
         for($i=0;$i<count($data);$i++){
@@ -948,17 +948,16 @@ class M_rest extends CI_Model {
 
             if(count($khs)>0){
                 $smt = ($order=='ASC') ? $smt + 1 : $smt - 1;
-                if($data[$i]['Status']!=1 && $data[$i]['Status']!='1'){
 
-                    // Cek apakah ada mata kuliha ngulang apa engga
-                    for($k=0;$k<count($khs);$k++){
-                        $d = $khs[$k];
-
+                // Cek apakah ada mata kuliha ngulang apa engga
+                for($k=0;$k<count($khs);$k++){
+                    $d = $khs[$k];
+                    if($d['ShowTranscript']==1 && $d['ShowTranscript']=='1'){
                         // cek akaha sudah ada di list transcript atau belum, jika belim lanjutkan
                         if(in_array($d['MKID'],$arrTranscriptID)!=-1){
 
                             // cek apakah MKID punya lebih dari 1 jika maka ambil nilai tertingginya
-                            if($dateNow <= $dataSmtActive['updateTranscript']){
+                            if($showNilaiSemesterActive==1){
                                 $dataScore = $this->db->order_by('Score', 'DESC')
                                     ->get_where($db.'.study_planning',array('NPM' => $NPM,'MKID'=>$d['MKID']))->result_array();
                             } else {
@@ -987,11 +986,14 @@ class M_rest extends CI_Model {
 
 
                         }
-
                     }
 
 
+
                 }
+
+
+
 
             }
 
