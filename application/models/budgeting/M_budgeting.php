@@ -369,4 +369,100 @@ class M_budgeting extends CI_Model {
         $query=$this->db->query($sql, array($Departement,$Year))->result_array();
         return $query;
     }
+
+    public function Get_PRCode($Year,$Departement)
+    {
+        /* method PR
+           Code : PRNA.12-1901000001
+           PR -> Fix
+           NA.12 -> Code Deparment in Budgeting
+           - -> Fix
+           19 -> Last two Year
+           01 -> Month
+           000001 -> Increment, Max 999.999 in one month
+        */
+        $PRCode = '';   
+        $Year = substr($Year, 2,2);
+        $Month = date('m');
+        $MaxLengthINC = 6;
+        $PRSearch = 'PR'.$Departement.'-'.$Year.$Month;
+        $sql = 'select * from db_budgeting.pr_create where PRCode like "'.$PRSearch.'%" order by PRCode desc limit 1';
+        $query=$this->db->query($sql, array())->result_array();
+
+        if (count($query) == 1) {
+            // Inc last code
+            $PRCode = $query[0]['PRCode'];
+            $C = substr($PRCode, 12,strlen($PRCode));
+            $C = (int) $C;
+            $C = $C + 1;
+            $B = strlen($C);
+            $strINC = $C;
+            for ($i=0; $i < $MaxLengthINC - $B; $i++) { 
+                $strINC = '0'.$strINC;
+            }
+
+            $PRCode = $strINC;
+            $PRCode = $PRSearch.$PRCode;
+        }
+        else
+        {
+            $C = 1;
+            $B = strlen($C);
+            $strINC = $C;
+            for ($i=0; $i < $MaxLengthINC - $B; $i++) { 
+                $strINC = '0'.$strINC;
+            }
+            $PRCode = $strINC;
+            $PRCode = $PRSearch.$PRCode;
+        }    
+
+        return $PRCode;
+    }
+
+    public function GetRuleApproval_PR_JsonStatus($Departement,$Amount)
+    {
+        $JsonStatus = array();
+        $sql = 'select * from db_budgeting.cfg_set_userrole where MaxLimit >= '.$Amount.' and Approved = 1 and Status = 1 and Active = 1
+                group by MaxLimit,ID_m_userrole order by MaxLimit,ID_m_userrole;
+                ';
+        $query=$this->db->query($sql, array())->result_array();
+        // get data to filtering MaxLimit
+            $arr = array();
+            for ($i=0; $i < count($query); $i++) {
+                $MaxLimit = $query[$i]['MaxLimit'];
+                $arr[]= $query[$i]['ID_m_userrole'];
+                $bool = false;
+                for ($j=$i+1; $j < count($query); $j++) {
+                    $MaxLimit2 = $query[$j]['MaxLimit'];
+                    if ($MaxLimit == $MaxLimit2) {
+                        $arr[]= $query[$j]['ID_m_userrole']; 
+                    }
+                    else
+                    {
+                        $bool = true;
+                        break;
+                    }
+                }
+
+                if ($bool) {
+                   break;
+                }      
+
+            }
+
+        // find approver
+            for ($i=0; $i < count($arr); $i++) { 
+               $sql = 'select * from db_budgeting.cfg_set_roleuser where Departement = "'.$Departement.'" and ID_m_userrole = '.$arr[$i];
+               $query=$this->db->query($sql, array())->result_array();
+               $NIP = $query[0]['NIP'];
+
+               $JsonStatus[] = array(
+                    'ApprovedBy' => $NIP,
+                    'Status' => 0,
+                    'ApproveAt' => ''
+                );
+            } 
+
+        return $JsonStatus;              
+    }  
 }

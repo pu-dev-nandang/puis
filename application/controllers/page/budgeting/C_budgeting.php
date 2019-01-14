@@ -1334,16 +1334,242 @@ class C_budgeting extends Budgeting_Controler {
     public function submitpr()
     {
         $action = $this->input->post('Action');
-        print_r($_FILES);die();
         switch ($action) {
-            case 'Add':
-                
+            case 0:
+                $this->AddPrToDraft();
                 break;
-            
+            case 1:
+                $this->PRToIssued();
+                break;
             default:
                 # code...
                 break;
         }
+    }
+
+    private function AddPrToDraft()
+    {
+        $input = $this->getInputToken();
+
+        $Year = $this->input->post('Year');
+        $key = "UAP)(*";
+        $Year = $this->jwt->decode($Year,$key);
+
+        $Departement = $this->input->post('Departement');
+        $key = "UAP)(*";
+        $Departement = $this->jwt->decode($Departement,$key);
+
+        $PPN = $this->input->post('PPN');
+        $key = "UAP)(*";
+        $PPN = $this->jwt->decode($PPN,$key);
+
+        $PRCode = $this->input->post('PRCode');
+        $key = "UAP)(*";
+        $PRCode = $this->jwt->decode($PRCode,$key);
+        $act = $PRCode;
+
+        $PRCode = ($act == 1) ? $this->m_budgeting->Get_PRCode($Year,$Departement) : $PRCode;
+        // print_r($PRCode);die();
+        if ($act == 1) {
+            $dataSave = array(
+                'PRCode' => $PRCode,
+                'Year' => $Year,
+                'Departement' => $Departement,
+                'CreatedBy' => $this->session->userdata('NIP'),
+                'CreatedAt' => date('Y-m-d H:i:s'),
+                'JsonStatus' => json_encode(array()),
+                'Status' => 0,
+                'PPN' => $PPN,
+                'PRPrint_Approve' => '',
+            );
+
+            $this->db->insert('db_budgeting.pr_create',$dataSave);
+            if ($this->db->affected_rows() > 0 )
+            {
+                for ($i=0; $i < count($input); $i++) {
+                    $data = $input[$i]; 
+                    $key = "UAP)(*";
+                    $data_arr = (array) $this->jwt->decode($data,$key);
+
+                    // proses upload file
+                        if (array_key_exists('UploadFile'.$i, $_FILES)) {
+                            // do upload file
+                            $uploadFile = $this->uploadDokumenMultiple(mt_rand(),'UploadFile'.$i);
+                            $data_arr['UploadFile'] = json_encode($uploadFile); 
+                        }
+                    $data_arr['PRCode'] = $PRCode;    
+                    $this->db->insert('db_budgeting.pr_detail',$data_arr);
+                }
+            }
+            else
+            {
+                //return FALSE;
+                $PRCode = '';
+            }
+        }
+        else
+        {
+            $dataSave = array(
+                'CreatedBy' => $this->session->userdata('NIP'),
+                'CreatedAt' => date('Y-m-d H:i:s'),
+                'PPN' => $PPN,
+            );
+
+            $this->db->where('PRCode',$PRCode);
+            $this->db->update('db_budgeting.pr_create',$dataSave);
+            if ($this->db->affected_rows() > 0 )
+            {
+                // remove PRCode in pr_detail
+                    $this->db->where(array('PRCode' => $PRCode));
+                    $this->db->delete('db_budgeting.pr_detail');
+                for ($i=0; $i < count($input); $i++) {
+                    $data = $input[$i]; 
+                    $key = "UAP)(*";
+                    $data_arr = (array) $this->jwt->decode($data,$key);
+
+                    // proses upload file
+                        if (array_key_exists('UploadFile'.$i, $_FILES)) {
+                            // do upload file
+                            $uploadFile = $this->uploadDokumenMultiple(mt_rand(),'UploadFile'.$i);
+                            $data_arr['UploadFile'] = json_encode($uploadFile); 
+                        }
+                    $data_arr['PRCode'] = $PRCode;    
+                    $this->db->insert('db_budgeting.pr_detail',$data_arr);
+                }
+            }
+            else
+            {
+                //return FALSE;
+                $PRCode = '';
+            }
+        }
+        echo json_encode($PRCode);
+        
+    }
+
+    private function uploadDokumenMultiple($filename,$ggFiles = 'UploadFile')
+    {
+        $path = './uploads/budgeting/pr';
+        // Count total files
+        $countfiles = count($_FILES[$ggFiles ]['name']);
+      
+      $output = array();
+      // Looping all files
+      for($i=0;$i<$countfiles;$i++){
+            $config = array();
+            if(!empty($_FILES[$ggFiles ]['name'][$i])){
+     
+              // Define new $_FILES array - $_FILES['file']
+              $_FILES['file']['name'] = $_FILES[$ggFiles]['name'][$i];
+              $_FILES['file']['type'] = $_FILES[$ggFiles]['type'][$i];
+              $_FILES['file']['tmp_name'] = $_FILES[$ggFiles]['tmp_name'][$i];
+              $_FILES['file']['error'] = $_FILES[$ggFiles]['error'][$i];
+              $_FILES['file']['size'] = $_FILES[$ggFiles]['size'][$i];
+
+              // Set preference
+              $config['upload_path'] = $path.'/';
+              $config['allowed_types'] = '*';
+              $config['overwrite'] = TRUE; 
+              $no = $i + 1;
+              $config['file_name'] = $filename.'_'.$no;
+
+              $filenameUpload = $_FILES['file']['name'];
+              $ext = pathinfo($filenameUpload, PATHINFO_EXTENSION);
+              $filenameNew = $filename.'_'.$no.'_'.mt_rand().'.'.$ext;
+     
+              //Load upload library
+              $this->load->library('upload',$config); 
+              $this->upload->initialize($config);
+     
+              // File upload
+              if($this->upload->do_upload('file')){
+                // Get data about the file
+                $uploadData = $this->upload->data();
+                $filePath = $uploadData['file_path'];
+                $filename_uploaded = $uploadData['file_name'];
+                // rename file
+                $old = $filePath.'/'.$filename_uploaded;
+                $new = $filePath.'/'.$filenameNew;
+
+                rename($old, $new);
+
+                $output[] = $filenameNew;
+              }
+            }
+        }
+        return $output;
+    }
+
+    private function PRToIssued()
+    {
+        $input = $this->getInputToken();
+
+        $Year = $this->input->post('Year');
+        $key = "UAP)(*";
+        $Year = $this->jwt->decode($Year,$key);
+
+        $Departement = $this->input->post('Departement');
+        $key = "UAP)(*";
+        $Departement = $this->jwt->decode($Departement,$key);
+
+        $PPN = $this->input->post('PPN');
+        $key = "UAP)(*";
+        $PPN = $this->jwt->decode($PPN,$key);
+
+        $PRCode = $this->input->post('PRCode');
+        $key = "UAP)(*";
+        $PRCode = $this->jwt->decode($PRCode,$key);
+
+        // RuleApproval
+            // check Subtotal
+                $Amount = 0;
+                for ($i=0; $i < count($input); $i++) {
+                    $data = $input[$i]; 
+                    $key = "UAP)(*";
+                    $data_arr = (array) $this->jwt->decode($data,$key);
+                    $SubTotal = $data_arr['SubTotal'];
+                    $Amount = $Amount + $SubTotal;
+                }
+
+            $JsonStatus = $this->m_budgeting->GetRuleApproval_PR_JsonStatus($Departement,$Amount);
+
+        $dataSave = array(
+            'CreatedBy' => $this->session->userdata('NIP'),
+            'CreatedAt' => date('Y-m-d H:i:s'),
+            'Status' => 1,
+            'JsonStatus' => json_encode($JsonStatus),
+            'PPN' => $PPN,
+        );
+
+        $this->db->where('PRCode',$PRCode);
+        $this->db->update('db_budgeting.pr_create',$dataSave);
+        if ($this->db->affected_rows() > 0 )
+        {
+            // remove PRCode in pr_detail
+                $this->db->where(array('PRCode' => $PRCode));
+                $this->db->delete('db_budgeting.pr_detail');
+            for ($i=0; $i < count($input); $i++) {
+                $data = $input[$i]; 
+                $key = "UAP)(*";
+                $data_arr = (array) $this->jwt->decode($data,$key);
+
+                // proses upload file
+                    if (array_key_exists('UploadFile'.$i, $_FILES)) {
+                        // do upload file
+                        $uploadFile = $this->uploadDokumenMultiple(mt_rand(),'UploadFile'.$i);
+                        $data_arr['UploadFile'] = json_encode($uploadFile); 
+                    }
+                $data_arr['PRCode'] = $PRCode;    
+                $this->db->insert('db_budgeting.pr_detail',$data_arr);
+            }
+        }
+        else
+        {
+            //return FALSE;
+            $PRCode = '';
+        }
+        echo json_encode($PRCode);
+        
     }
 
 }

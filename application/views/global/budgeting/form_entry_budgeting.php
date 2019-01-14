@@ -66,7 +66,7 @@
 				OPYear = '<select class = "form-control" id = "Year">';
 				for (var i = 0; i < arr_Year.length; i++) {
 					var selected = (arr_Year[i].Year == "<?php echo $Year ?>") ? 'selected' : '';
-					OPYear += '<option value ="'+arr_Year[i].Year+'" '+selected+'>'+arr_Year[i].Year+'</option>';
+					OPYear += '<option value ="'+arr_Year[i].Year+'" '+selected+'>'+arr_Year[i].Year+' - '+(parseInt(arr_Year[i].Year) + 1)+'</option>';
 				}
 				OPYear += '</select>';
 			}
@@ -483,7 +483,7 @@
 			OPYear = '<select class = "form-control" id = "Year">';
 			for (var i = 0; i < arr_Year.length; i++) {
 				var selected = (arr_Year[i].Year == "<?php echo $Year ?>") ? 'selected' : '';
-				OPYear += '<option value ="'+arr_Year[i].Year+'" '+selected+'>'+arr_Year[i].Year+'</option>';
+				OPYear += '<option value ="'+arr_Year[i].Year+'" '+selected+'>'+arr_Year[i].Year+' - '+(parseInt(arr_Year[i].Year) + 1)+'</option>';
 			}
 			OPYear += '</select>';
 		}

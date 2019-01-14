@@ -10,7 +10,7 @@
             <a href="javascript:void(0)" class="pageAnchor" page = "form">Form</a>
         </li>
         <li class="">
-            <a href="javascript:void(0)" class="pageAnchor" page = "Data">Data</a>
+            <a href="javascript:void(0)" class="pageAnchor" page = "data">Data</a>
         </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">

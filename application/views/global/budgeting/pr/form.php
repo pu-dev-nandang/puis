@@ -65,7 +65,7 @@
 			OPYear = '';
 			for (var i = 0; i < arr_Year.length; i++) {
 				var selected = (arr_Year[i].Year == "<?php echo $Year ?>") ? 'selected' : '';
-				OPYear += '<option value ="'+arr_Year[i].Year+'" '+selected+'>'+arr_Year[i].Year+'</option>';
+				OPYear += '<option value ="'+arr_Year[i].Year+'" '+selected+'>'+arr_Year[i].Year+' - '+(parseInt(arr_Year[i].Year) + 1)+'</option>';
 			}
 			$("#Year").append(OPYear);
 			$('#Year').select2({
@@ -133,7 +133,7 @@
 				var SaveBtn = '<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
 									'<div class = "col-md-12">'+
 										'<div class = "pull-right">'+
-											'<button class = "btn btn-success" id = "SaveBudget">Submit</button>'+
+											'<button class = "btn btn-success" id = "SaveBudget" action = "0">Save to Draft</button>'+
 										'</div>'+
 									'</div>'+
 								'</div>';
@@ -311,7 +311,7 @@
 			fillItem.find('td:eq(6)').find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 			fillItem.find('td:eq(6)').find('.SubTotal').maskMoney('mask', '9894');
 			_BudgetRemaining();
-			FuncBudgetStatus(fillItem);
+			FuncBudgetStatus();
 			var id_budget_left = fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left');
 		})
 
@@ -325,7 +325,7 @@
 			fillItem.find('td:eq(6)').find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 			fillItem.find('td:eq(6)').find('.SubTotal').maskMoney('mask', '9894');
 			_BudgetRemaining();
-			FuncBudgetStatus(fillItem);
+			FuncBudgetStatus();
 			var id_budget_left = fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left');
 			
 		})
@@ -569,54 +569,58 @@
 			})
 		}
 
-		function FuncBudgetStatus(fillItem)
+		function FuncBudgetStatus()
 		{
-			var id_budget_left = fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left');
-			var GetBudgetRemaining = function(id_budget_left,BudgetRemaining){
-				var Remaining = 0;
-				for (var i = 0; i < BudgetRemaining.length; i++) {
-					if (id_budget_left == BudgetRemaining[i].id_budget_left) {
-						Remaining = BudgetRemaining[i].RemainingNoFormat;
-						break;
+			$('.PostBudgetItem').each(function(){
+				var fillItem = $( this ).closest( 'tr');
+				var id_budget_left = $( this ).attr('id_budget_left');
+				var GetBudgetRemaining = function(id_budget_left,BudgetRemaining){
+					var Remaining = 0;
+					for (var i = 0; i < BudgetRemaining.length; i++) {
+						if (id_budget_left == BudgetRemaining[i].id_budget_left) {
+							Remaining = BudgetRemaining[i].RemainingNoFormat;
+							break;
+						}
 					}
-				}
-				return Remaining;
-			};
+					return Remaining;
+				};
 
-			var Remaining = GetBudgetRemaining(id_budget_left,BudgetRemaining);
-			// console.log(Remaining);
+				var Remaining = GetBudgetRemaining(id_budget_left,BudgetRemaining);
+				// console.log(Remaining);
 
-			var OP = [
-					{
-						name  : 'IN',
-						color : 'green'
-					},
-					{
-						name  : 'Exceed',
-						color : 'red'
-					},
-					{
-						name  : 'Cross',
-						color : 'yellow'
-					},
-				];
+				var OP = [
+						{
+							name  : 'IN',
+							color : 'green'
+						},
+						{
+							name  : 'Exceed',
+							color : 'red'
+						},
+						{
+							name  : 'Cross',
+							color : 'yellow'
+						},
+					];
 
-			var DefaultName = (Remaining >= 0) ? 'IN' : 'Exceed';
-			var disabled = (DefaultName == 'Exceed') ? 'disabled' : '';
-			var html = '<select class = "form-control BudgetStatus"  '+disabled+'>';
+				var DefaultName = (Remaining >= 0) ? 'IN' : 'Exceed';
+				var disabled = (DefaultName == 'Exceed') ? 'disabled' : '';
+				var html = '<select class = "form-control BudgetStatus"  '+disabled+'>';
 
-			for (var i = 0; i < OP.length; i++) {
-				if (DefaultName == 'IN') {
-					if (OP[i].name == 'Exceed') {
-						continue;
+				for (var i = 0; i < OP.length; i++) {
+					if (DefaultName == 'IN') {
+						if (OP[i].name == 'Exceed') {
+							continue;
+						}
 					}
+					var selected = (DefaultName == OP[i].name) ? 'selected' : '';
+					html += '<option value = "'+OP[i].name+'"'+selected+'>'+OP[i].name+'</option>';
 				}
-				var selected = (DefaultName == OP[i].name) ? 'selected' : '';
-				html += '<option value = "'+OP[i].name+'"'+selected+'>'+OP[i].name+'</option>';
-			}
-			html += '</select>';
+				html += '</select>';
 
-			fillItem.find('td:eq(8)').html(html);
+				fillItem.find('td:eq(8)').html(html);
+			})
+			
 		}
 		
 		$(document).off('click', '#SaveBudget').on('click', '#SaveBudget',function(e) {
@@ -634,14 +638,17 @@
 
 						if (!bool) {
 							toastr.error('Budget Status having value is Exceed','!!!Error');
-							$('#SaveBudget').prop('disabled',false).html('Submit');
+							$('#SaveBudget').prop('disabled',false).html('Save to Draft');
 						}
 						else
 						{
 							// ok
 							var validation = validation_input();
+							var action = $(this).attr('action');
+							var PRCode = $(this).attr('PRCode');
+							PRCode = (PRCode == undefined) ? 1 : PRCode;
 							if (validation) {
-								SubmitPR('','Add');
+								SubmitPR(PRCode,action,'#SaveBudget');
 							}
 							
 						}
@@ -649,7 +656,7 @@
 				else
 				{
 					toastr.error('Budget Status is required','!!!Error');
-					$('#SaveBudget').prop('disabled',false).html('Submit');
+					$('#SaveBudget').prop('disabled',false).html('Save to Draft');
 				}
 		})
 
@@ -702,7 +709,6 @@
 		      {
 		       var no = parseInt(count) + 1;
 		       var name = files[count].name;
-		       console.log(name);
 		       var extension = name.split('.').pop().toLowerCase();
 		       if(jQuery.inArray(extension, ['pdf','jpg']) == -1)
 		       {
@@ -715,7 +721,7 @@
 		       oFReader.readAsDataURL(files[count]);
 		       var f = files[count];
 		       var fsize = f.size||f.fileSize;
-		       console.log(fsize);
+		       // console.log(fsize);
 
 		       if(fsize > 2000000) // 2mb
 		       {
@@ -737,7 +743,7 @@
 		    }
 		} 
 
-		function SubmitPR(PRCode,Action)
+		function SubmitPR(PRCode,Action,ID_element)
 		{
 			var Year = $("#Year").val();
 			var Departement = $("#DepartementPost").val();
@@ -780,10 +786,23 @@
 				 PassNumber++
 
 			})
+			var token = jwt_encode(FormInsertDetail,"UAP)(*");
+			form_data.append('token',token);
 
-			form_data.append('data',FormInsertDetail);
 			form_data.append('Action',Action);
-			form_data.append('PRCode',PRCode);
+
+			token = jwt_encode(PRCode,"UAP)(*");
+			form_data.append('PRCode',token);
+
+			token = jwt_encode(Year,"UAP)(*");
+			form_data.append('Year',token);
+
+			token = jwt_encode(Departement,"UAP)(*");
+			form_data.append('Departement',token);
+
+			token = jwt_encode(PPN,"UAP)(*");
+			form_data.append('PPN',token);
+
 			var url = base_url_js + "budgeting/submitpr"
 			$.ajax({
 			  type:"POST",
@@ -795,15 +814,121 @@
 			  dataType: "json",
 			  success:function(data)
 			  {
-			    
+			    switch (Action)
+			    {
+			       case "0":
+			       		if (data == '') {
+			       			$("#pageContent select").each(function(){
+			       				$(this).attr('readonly',true);
+			       				$(this).attr('disabled',true);
+			       			})
+			       			$("#pageContent input").each(function(){
+			       				$(this).attr('readonly',true);
+			       				$(this).attr('disabled',true);
+			       			})
+			       			setTimeout(function () {
+			       				toastr.error('PRCode cannot to create, Page will be redirect in two seconds');
+			       				loading_page("#pageContent");
+			       			},2000);
+			       			setTimeout(function () {
+			       				LoadPage('form');
+			       			},2000);
+
+			       		}
+			       		else
+			       		{
+			       			if ($("#p_prcode").length) {
+			       				$("#p_prcode").html('PRCode : '+data)
+			       			}
+			       			else
+			       			{
+			       				$(".thumbnail").find('.row:first').before('<p style = "color : red" id = "p_prcode">PRCode : '+data+'</p>');
+			       			}
+			       			
+			       			var rowPullright = $(ID_element).closest('.pull-right');
+			       			rowPullright.empty();
+			       			rowPullright.append('<button class="btn btn-success" id="SaveBudget" action="0" PRCode = "'+data+'">Save to Draft</button>'+ '&nbsp&nbsp'+'<button class="btn btn-primary" id="BtnIssued" action="1" PRCode = "'+data+'">Issued</button>');
+			       		}
+			       		break;
+			       case "1":
+			       		if ($("#p_prcode").length) {
+			       			$("#p_prcode").html('PRCode : '+data);
+			       		}
+			       		else
+			       		{
+			       			$(".thumbnail").find('.row:first').before('<p style = "color : red" id = "p_prcode">PRCode : '+data+'</p>');
+			       		}
+			       		
+			       		var rowPullright = $(ID_element).closest('.pull-right');
+			       		rowPullright.empty();
+			       		rowPullright.append('<button class="btn btn-default" id="pdfprint" PRCode = "'+data+'"> <i class = "fa fa-file-pdf-o"></i> Print PDF</button>'+ '&nbsp&nbsp'+'<button class="btn btn-default" id="excelprint" PRCode = "'+data+'"><i class = "fa fa-file-excel-o"></i> Print Excel</button>');
+			       		break;
+			       case "larry": 
+			           alert('Hey');
+			       default: 
+			           alert('Default case');
+			    }
 
 			  },
 			  error: function (data) {
 			    toastr.error("Connection Error, Please try again", 'Error!!');
-			    $('#SaveBudget').prop('disabled',false).html('Submit');
+			    var nmbtn = '';
+			    if (ID_element == '#SaveBudget') {
+			    	nmbtn = 'Save to Draf';
+			    }
+			    else if(ID_element == '#BtnIssued')
+			    {
+			    	nmbtn = 'Issued';
+			    }
+			    $(ID_element).prop('disabled',false).html('Save to Draft');
 			  }
 			})
 
 		}
+
+		$(document).off('click', '#BtnIssued').on('click', '#BtnIssued',function(e) {
+			loading_button('#BtnIssued');
+			// Budget Status
+				if ($('.BudgetStatus').length) {
+					// check Budget status tidak boleh exceeds
+						var bool = true;
+						$(".BudgetStatus").each(function(){
+							if ($(this).val() == 'Exceed') {
+								bool = false;
+								return false;
+							}
+						})
+
+						if (!bool) {
+							toastr.error('Budget Status having value is Exceed','!!!Error');
+							$('#SaveBudget').prop('disabled',false).html('Save to Draft');
+						}
+						else
+						{
+							// ok
+							var validation = validation_input();
+							var action = $(this).attr('action');
+							var PRCode = $(this).attr('PRCode');
+							PRCode = (PRCode == undefined) ? 1 : PRCode;
+							if (validation) {
+								$("#pageContent select").each(function(){
+									$(this).attr('readonly',true);
+									$(this).attr('disabled',true);
+								})
+								$("#pageContent input").each(function(){
+									$(this).attr('readonly',true);
+									$(this).attr('disabled',true);
+								})
+								SubmitPR(PRCode,action,'#BtnIssued');
+							}
+							
+						}
+				}
+				else
+				{
+					toastr.error('Budget Status is required','!!!Error');
+					$('#BtnIssued').prop('disabled',false).html('Issued');
+				}
+		})
 	}); // exit document Function
 </script>

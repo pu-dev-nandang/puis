@@ -70,7 +70,7 @@
 			for(var i=0;i<response.length;i++){
 			    //var selected = (i==0) ? 'selected' : '';
 			    var selected = (response[i].Activated==1) ? 'selected' : '';
-			    $('#YearPostDepartement').append('<option value="'+response[i].Year+'" '+selected+'>'+response[i].Year+'</option>');
+			    $('#YearPostDepartement').append('<option value="'+response[i].Year+'" '+selected+'>'+response[i].Year+' - '+(parseInt(response[i].Year) + 1)+'</option>');
 			}
 			$('#YearPostDepartement').select2({
 			   //allowClear: true
