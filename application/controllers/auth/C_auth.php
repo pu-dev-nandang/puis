@@ -42,7 +42,7 @@ class C_auth extends Globalclass {
 
     }
 
-    public function db($table=''){
+    public function db__($table=''){
         $max_execution_time = 360;
         ini_set('memory_limit', '-1');
         ini_set('max_execution_time', $max_execution_time); //60 seconds = 1 minutes
@@ -1198,6 +1198,127 @@ class C_auth extends Globalclass {
             }
 
         }
+    }
+
+    public function getReportEdom($ClassOf){
+
+        $max_execution_time = 3600;
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', $max_execution_time); //60 seconds = 1 minutes
+
+        $SemesterID = 13;
+//        $ClassOf = 2014;
+
+        // AS COORDINATOR
+        // Dapeting jadwalnya dulu
+        $data = $this->db->query('SELECT s.ID, s.ClassGroup, em.NIP, em.Name AS Lecturer, mk.Name AS Course, mk.NameEng AS CourseEng, 
+                                            ps.Name AS ProdiName, mk.MKCode
+                                            FROM db_academic.schedule s
+                                            LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                            LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                            LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
+                                            LEFT JOIN db_employees.employees em ON (s.Coordinator = em.NIP)
+                                            WHERE s.SemesterID = "'.$SemesterID.'"
+                                            GROUP BY s.ID ORDER BY s.ID ASC
+                                            ')->result_array();
+
+//         AS TEAMTEACHING
+
+        $dataTeam = $this->db->query('SELECT s.ID, s.ClassGroup, s.SemesterID, em.NIP, em.Name AS Lecturer, mk.Name AS Course, mk.NameEng AS CourseEng,
+                                            ps.Name AS ProdiName, mk.MKCode
+                                            FROM db_academic.schedule_team_teaching stt
+                                            LEFT JOIN db_academic.schedule s ON (s.ID = stt.ScheduleID)
+                                            LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                            LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                            LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
+                                            LEFT JOIN db_employees.employees em ON (stt.NIP = em.NIP)
+                                            WHERE s.SemesterID = "'.$SemesterID.'"
+                                            GROUP BY s.ID ORDER BY s.ID ASC')->result_array();
+
+        for($i=0;$i<count($dataTeam);$i++){
+            array_push($data,$dataTeam[$i]);
+        }
+
+
+
+        $result = [];
+        for ($e=0;$e<count($data);$e++){
+            $d = $data[$e];
+
+            // Multiple
+            $dataQuestion = $this->db->query('SELECT * FROM db_academic.edom_question WHERE ID != 12 ')->result_array();
+
+            for($q=0;$q<count($dataQuestion);$q++){
+                $dataEdom = $this->db->query('SELECT ea.NPM, ead.Rate, ead.Essay FROM db_academic.edom_answer ea 
+                                                    LEFT JOIN db_academic.edom_answer_details ead ON (ead.EAID = ea.ID)
+                                                    LEFT JOIN db_academic.auth_students auts ON (auts.NPM = ea.NPM) 
+                                                    WHERE ea.SemesterID = "'.$SemesterID.'"
+                                                    AND ea.ScheduleID = "'.$d['ID'].'" 
+                                                    AND ea.NIP = "'.$d['NIP'].'" 
+                                                    AND ead.QuestionID = "'.$dataQuestion[$q]['ID'].'"
+                                                    AND auts.Year = "'.$ClassOf.'"
+                                                    ORDER BY ea.NPM')->result_array();
+
+
+                if(count($dataEdom)>0){
+                    $Rate = 0;
+                    $totalRate = 0;
+                    foreach ($dataEdom as $itemEd){
+                        $totalRate = $totalRate + $itemEd['Rate'];
+                    }
+
+                    $Rate = $totalRate / count($dataEdom);
+
+                    $data[$e]['Question'] = $dataQuestion[$q]['Question'];
+                    $data[$e]['TotalStudent'] = count($dataEdom);
+                    $data[$e]['Rate'] = round($Rate,2);
+                    array_push($result,$data[$e]);
+                }
+
+
+
+            }
+
+
+        }
+
+        $no = 1;
+        echo "<table border='0.5'><thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Code</th>
+                            <th>Course</th>
+                            <th>Group</th>
+                            <th>Programme Study</th>
+                            <th>Lecturer</th>
+                            <th>NIP</th>
+                            <th>Question</th>
+                            <th>TotalStudent</th>
+                            <th>Rate</th>
+                        </tr>
+                        </thead>
+                        <tbody>";
+
+        foreach ($result AS $item){
+            echo '<tr>
+                    <td>'.($no++).'</td>
+                    <td>'.$item['MKCode'].'</td>
+                    <td>'.$item['Course'].'</td>
+                    <td>'.$item['ClassGroup'].'</td>
+                    <td>'.$item['ProdiName'].'</td>
+                    <td>'.$item['Lecturer'].'</td>
+                    <td>'.$item['NIP'].'</td>
+                    <td>'.$item['Question'].'</td>
+                    <td>'.$item['TotalStudent'].'</td>
+                    <td>'.$item['Rate'].'</td>
+                 </tr>';
+        }
+
+        echo "</tbody>
+                        </table>";
+
+
+
     }
 
     public function getClassOf(){
