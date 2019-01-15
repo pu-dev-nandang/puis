@@ -17,6 +17,9 @@
 
     #showingLog .dropdown-menu.extended {
         width: 390px;
+        height: 345px;
+        overflow: scroll;
+        overflow-x: hidden;
     }
 
     #li2ShowLog .from {
