@@ -210,6 +210,116 @@
     </tbody>
 </table>
 
+<div class="row">
+    <!-- Student -->
+    <div class="col-md-6">
+        <hr/>
+        <div class="well" style="min-height: 100px;">
+            <h3 style="margin-top: 0px;border-left: 7px solid #FF9800;padding-left: 7px;">Student Attendance</h3>
+            <table>
+                <tr>
+                    <td style="width: 25%;">Attendaced In</td>
+                    <td>:</td>
+                    <td>
+                        <select class="form-control" id="form_In_Session_Std">
+                            <option value="1">Session Start</option>
+                            <option value="2">Session End</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control" id="form_In_Type_Std">
+                            <option value="before">Before</option>
+                            <option value="after">After</option>
+                        </select>
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="form_In_Time_Std">
+                            <span class="input-group-addon">minute</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Attendaced Out</td>
+                    <td>:</td>
+                    <td>
+                        <select class="form-control" id="form_Out_Session_Std">
+                            <option value="2">Session End</option>
+                            <option value="1">Session Start</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control" id="form_Out_Type_Std">
+                            <option value="before">Before</option>
+                            <option value="after">After</option>
+                        </select>
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="form_Out_Time_Std">
+                            <span class="input-group-addon">minute</span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Lecturer -->
+    <div class="col-md-6">
+        <hr/>
+        <div class="well" style="min-height: 100px;">
+            <h3 style="margin-top: 0px;border-left: 7px solid #FF9800;padding-left: 7px;">Lecturer Attendance</h3>
+            <table>
+                <tr>
+                    <td style="width: 25%;">Attendaced In</td>
+                    <td>:</td>
+                    <td>
+                        <select class="form-control" id="form_In_Session_Lec">
+                            <option value="1">Session Start</option>
+                            <option value="2">Session End</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control" id="form_In_Type_Lec">
+                            <option value="before">Before</option>
+                            <option value="after">After</option>
+                        </select>
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="form_In_Time_Lec">
+                            <span class="input-group-addon">minute</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Attendaced Out</td>
+                    <td>:</td>
+                    <td>
+                        <select class="form-control" id="form_Out_Session_Lec">
+                            <option value="2">Session End</option>
+                            <option value="1">Session Start</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control" id="form_Out_Type_Lec">
+                            <option value="before">Before</option>
+                            <option value="after">After</option>
+                        </select>
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="form_Out_Time_Lec">
+                            <span class="input-group-addon">minute</span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
 <hr/>
 <div style="text-align: right;">
     <a href="<?php echo base_url('academic/academic-year'); ?>" id="btnBack" class="btn btn-info"><i class="fa fa-arrow-circle-left right-margin" aria-hidden="true"></i> Back</a>
@@ -241,6 +351,12 @@
 
     $('#btnSaveDetail').click(function () {
 
+        var form_In_Time_Std = $('#form_In_Time_Std').val();
+        var form_Out_Time_Std = $('#form_Out_Time_Std').val();
+
+        var form_In_Time_Lec = $('#form_In_Time_Lec').val();
+        var form_Out_Time_Lec = $('#form_Out_Time_Lec').val();
+
         var data = {
             action : 'edit',
             SemesterID : ID,
@@ -270,6 +386,22 @@
                 updateTranscript : ($('#updateTranscript').datepicker("getDate")!=null) ? moment($('#updateTranscript').datepicker("getDate")).format('YYYY-MM-DD') : '',
                 edomStart : ($('#edom_start').datepicker("getDate")!=null) ? moment($('#edom_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
                 edomEnd : ($('#edom_end').datepicker("getDate")!=null) ? moment($('#edom_end').datepicker("getDate")).format('YYYY-MM-DD') : ''
+            },
+            dataFormAttd : {
+                In_Session_Std : $('#form_In_Session_Std').val(),
+                In_Type_Std : $('#form_In_Type_Std').val(),
+                In_Time_Std : (form_In_Time_Std!='' && form_In_Time_Std!=null && form_In_Time_Std!=0) ? form_In_Time_Std : 0,
+                Out_Session_Std : $('#form_Out_Session_Std').val(),
+                Out_Type_Std : $('#form_Out_Type_Std').val(),
+                Out_Time_Std :(form_Out_Time_Std!='' &&  form_Out_Time_Std!=null &&  form_Out_Time_Std!=0) ?  form_Out_Time_Std : 0,
+                In_Session_Lec : $('#form_In_Session_Lec').val(),
+                In_Type_Lec : $('#form_In_Type_Lec').val(),
+                In_Time_Lec : (form_In_Time_Lec!='' && form_In_Time_Lec!=null && form_In_Time_Lec!=0) ? form_In_Time_Lec : 0,
+                Out_Session_Lec : $('#form_Out_Session_Lec').val(),
+                Out_Type_Lec : $('#form_Out_Type_Lec').val(),
+                Out_Time_Lec :( form_Out_Time_Lec!='' &&  form_Out_Time_Lec!=null &&  form_Out_Time_Lec!=0) ?  form_Out_Time_Lec : 0,
+                UpdateBy : sessionNIP,
+                UpdateAt : dateTimeNow()
             }
         };
 
@@ -344,6 +476,33 @@
             (data.DetailTA.edomStart !=='0000-00-00' && data.DetailTA.edomStart!==null) ? $('#edom_start').datepicker('setDate',new Date(data.DetailTA.edomStart)) : '';
             (data.DetailTA.edomEnd !=='0000-00-00' && data.DetailTA.edomEnd !==null) ? $('#edom_end').datepicker({showOtherMonths:true,autoSize: true,dateFormat: 'dd MM yy',
                 minDate: new Date(data.DetailTA.edomStart)}).datepicker('setDate',new Date(data.DetailTA.edomEnd)) : '';
+
+
+            $('#form_In_Time_Lec').val(0);
+            $('#form_Out_Time_Lec').val(0);
+            $('#form_In_Time_Std').val(0);
+            $('#form_Out_Time_Std').val(0);
+
+
+            // Setting Attendace
+            if(data.AttdSetting.length>0){
+                var d = data.AttdSetting[0];
+
+                $('#form_In_Session_Std').val(d.In_Session_Std);
+                $('#form_In_Type_Std').val(d.In_Type_Std);
+                $('#form_In_Time_Std').val(d.In_Time_Std);
+                $('#form_Out_Session_Std').val(d.Out_Session_Std);
+                $('#form_Out_Type_Std').val(d.Out_Type_Std);
+                $('#form_Out_Time_Std').val(d.Out_Time_Std);
+                
+                $('#form_In_Session_Lec').val(d.In_Session_Lec);
+                $('#form_In_Type_Lec').val(d.In_Type_Lec);
+                $('#form_In_Time_Lec').val(d.In_Time_Lec);
+                $('#form_Out_Session_Lec').val(d.Out_Session_Lec);
+                $('#form_Out_Type_Lec').val(d.Out_Type_Lec);
+                $('#form_Out_Time_Lec').val(d.Out_Time_Lec);
+            }
+
 
         });
     }

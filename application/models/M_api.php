@@ -324,11 +324,15 @@ class M_api extends CI_Model {
 
 //            $dt = (count($dataDetail)>0) ? $dataDetail[0] : '';
 
+            // Get Setting Attd
+            $dataSetting = $this->db->get_where('db_academic.attendance_setting',array('SemesterID' => $id))->result_array();
+
             if(count($dataDetail)>0){
                 $result['DetailTA'] = $dataDetail[0];
             }
 
             $result['TahunAkademik'] = $data[0];
+            $result['AttdSetting'] = $dataSetting;
         } else {
             $result = false;
         }

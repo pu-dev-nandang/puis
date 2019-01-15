@@ -1025,10 +1025,25 @@ class C_api extends CI_Controller {
 
             }
             else if($data_arr['action']=='edit') {
-
+                $SemesterID = $data_arr['SemesterID'];
                 $dataForm = (array) $data_arr['dataForm'];
-                $this->db->where('SemesterID',$data_arr['SemesterID']);
+                $this->db->where('SemesterID',$SemesterID);
                 $this->db->update('db_academic.academic_years',$dataForm);
+
+                $this->db->reset_query();
+
+                // Cek apakah sudah ada atau belum jika belum maka insert
+                $cekSet = $this->db->get_where('db_academic.attendance_setting',
+                    array('SemesterID' => $SemesterID))->result_array();
+                $dataFormAttd = (array) $data_arr['dataFormAttd'];
+                if(count($cekSet)>0){
+                    $this->db->where('SemesterID',$SemesterID);
+                    $this->db->update('db_academic.attendance_setting',$dataFormAttd);
+                } else {
+                    $dataFormAttd['SemesterID'] = $SemesterID;
+                    $this->db->insert('db_academic.attendance_setting',$dataFormAttd);
+                }
+
 
                 return print_r($data_arr['SemesterID']);
             }
