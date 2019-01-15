@@ -26,6 +26,7 @@ index.php
 **/uploads/document/
 **/uploads/vreservation/
 ***/uploads/budgeting/catalog/
+***/uploads/budgeting/pr/
 document/*
 /uploads/syllabus_sap/*.pdf
 /uploads/vreservation/*.pdf

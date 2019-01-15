@@ -426,6 +426,7 @@ class M_budgeting extends CI_Model {
                 group by MaxLimit,ID_m_userrole order by MaxLimit,ID_m_userrole;
                 ';
         $query=$this->db->query($sql, array())->result_array();
+        // print_r($query);die();
         // get data to filtering MaxLimit
             $arr = array();
             for ($i=0; $i < count($query); $i++) {
@@ -464,5 +465,44 @@ class M_budgeting extends CI_Model {
             } 
 
         return $JsonStatus;              
+    }
+
+
+    public function GetPR_CreateByPRCode($PRCode)
+    {
+        $sql = 'select a.ID,a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done","Reject") ))
+                                    as StatusName,a.Status, a.JsonStatus ,a.PPN,a.PRPrint_Approve
+                                    from db_budgeting.pr_create as a 
+                join (
+                select * from (
+                select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
+                UNION
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                ) aa
+                ) as b on a.Departement = b.ID
+                join db_employees.employees as c on a.CreatedBy = c.NIP
+                where a.PRCode = ?
+                ';
+        $query = $this->db->query($sql, array($PRCode))->result_array();
+        return $query;
+    }
+
+    public function GetPR_DetailByPRCode($PRCode)
+    {
+        $sql = 'select a.ID,a.PRCode,a.ID_budget_left,b.ID_creator_budget,c.CodePostBudget,d.CodeSubPost,e.CodePost,
+                e.RealisasiPostName,f.PostName,a.ID_m_catalog,g.Item,
+                a.Qty,a.UnitCost,a.SubTotal,a.DateNeeded,a.BudgetStatus,a.UploadFile
+                from db_budgeting.pr_detail as a
+                join db_budgeting.budget_left as b on a.ID_budget_left = b.ID
+                join db_budgeting.creator_budget as c on b.ID_creator_budget = c.ID
+                join db_budgeting.cfg_set_post as d on c.CodePostBudget = d.CodePostBudget
+                join db_budgeting.cfg_postrealisasi as e on d.CodeSubPost = e.CodePostRealisasi
+                join db_budgeting.cfg_post as f on e.CodePost = f.CodePost
+                join db_purchasing.m_catalog as g on a.ID_m_catalog = g.ID
+                where a.PRCode = ?
+               ';
+        $query = $this->db->query($sql, array($PRCode))->result_array();
+        return $query;       
     }  
 }

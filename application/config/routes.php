@@ -1082,6 +1082,10 @@ $route['budgeting/page_pr/(:any)'] = 'page/budgeting/c_budgeting/page_pr/$1';
 $route['budgeting/PostBudgetThisMonth_Department'] = 'page/budgeting/c_budgeting/PostBudgetThisMonth_Department';
 $route['budgeting/getPostBudgetDepartement'] = 'page/budgeting/c_budgeting/getPostBudgetDepartement';
 $route['budgeting/submitpr'] = 'page/budgeting/c_budgeting/submitpr';
+$route['budgeting/DataPR'] = 'page/budgeting/c_budgeting/DataPR';
+$route['budgeting/FormEditPR'] = 'page/budgeting/c_budgeting/FormEditPR';
+$route['budgeting/GetDataPR'] = 'page/budgeting/c_budgeting/GetDataPR';
+
 
 // Purchasing
 $query = $db->get('db_purchasing.cfg_sub_menu');

@@ -1303,6 +1303,7 @@ class C_budgeting extends Budgeting_Controler {
       $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
       $Year = $get[0]['Year'];
       $this->data['Year'] = $Year;
+      $this->data['PRCodeVal'] = '';
       $arr_result = array('html' => '','jsonPass' => '');
       $uri = $this->uri->segment(3);
       $content = $this->load->view('global/budgeting/pr/'.$uri,$this->data,true);
@@ -1570,6 +1571,110 @@ class C_budgeting extends Budgeting_Controler {
         }
         echo json_encode($PRCode);
         
+    }
+
+    public function DataPR()
+    {
+        $requestData= $_REQUEST;
+        $sqltotalData = 'select count(*) as total from db_budgeting.pr_create';
+        $querytotalData = $this->db->query($sqltotalData)->result_array();
+        $totalData = $querytotalData[0]['total'];
+
+        $sql = 'select * from 
+                (
+                    select a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done","Reject") ))
+                                    as StatusName, a.JsonStatus 
+                                    from db_budgeting.pr_create as a 
+                    join (
+                    select * from (
+                    select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
+                    UNION
+                    select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                    ) aa
+                    ) as b on a.Departement = b.ID
+                )aa
+               ';
+
+        $sql.= ' where PRCode LIKE "%'.$requestData['search']['value'].'%" or NameDepartement LIKE "'.$requestData['search']['value'].'%" or StatusName LIKE "'.$requestData['search']['value'].'%" 
+                ';
+        $sql.= ' ORDER BY PRCode Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+        $query = $this->db->query($sql)->result_array();
+
+        $No = $requestData['start'] + 1;
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+            $nestedData[] = $No;
+            $nestedData[] = $row['PRCode'];
+            $nestedData[] = $row['NameDepartement'];
+            $nestedData[] = $row['StatusName'];
+            $JsonStatus = (array)json_decode($row['JsonStatus'],true);
+            $htmlJson = '';
+            if (count($JsonStatus) > 0) {
+                for ($j=0; $j < count($JsonStatus); $j++) {
+                    $getName = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$j]['ApprovedBy']);
+                    $Name = $getName[0]['Name'];
+                    $StatusInJson = $JsonStatus[$j]['Status'];
+                    switch ($StatusInJson) {
+                        case '1':
+                            $stjson = "Approved";
+                            break;
+                        case '2':
+                            $stjson = "Reject";
+                            break;
+                        default:
+                            $stjson = "Not yet approved";
+                            break;
+                    }
+                    $appr = $j + 1; 
+                    $htmlJson .= '<li>'.'Approver '.$appr.'<ul>'
+                                    .'<li>Approver by : '.$Name.'</li>'
+                                    .'<li>Status : '.$stjson.'</li>'
+                                    .'<li>Approve At : '.$JsonStatus[$j]['ApproveAt'].'</li>'
+                                    .'</ul>'
+                                .'</li>';   
+                }
+            }
+            $nestedData[] = $htmlJson;
+            $data[] = $nestedData;
+            $No++;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalData ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+    }
+
+    public function FormEditPR()
+    {
+        $this->auth_ajax();
+        $input = $this->getInputToken();
+        $PRCode = $input['PRCode'];
+        $this->data['arr_Year'] = $this->m_master->showData_array('db_budgeting.cfg_dateperiod');
+        $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
+        $Year = $get[0]['Year'];
+        $this->data['Year'] = $Year;
+        $this->data['PRCodeVal'] = $PRCode;
+        $arr_result = array('html' => '','jsonPass' => '');
+        $content = $this->load->view('global/budgeting/pr/form',$this->data,true);
+        $arr_result['html'] = $content;
+        echo json_encode($arr_result);
+    }
+
+    public function GetDataPR()
+    {
+        $this->auth_ajax();
+        $input = $this->getInputToken();
+        $arr_result = array('pr_create' => array(),'pr_detail' => array());
+        $arr_result['pr_create'] = $this->m_budgeting->GetPR_CreateByPRCode($input['PRCode']);
+        $arr_result['pr_detail'] = $this->m_budgeting->GetPR_DetailByPRCode($input['PRCode']);
+        echo json_encode($arr_result);
     }
 
 }

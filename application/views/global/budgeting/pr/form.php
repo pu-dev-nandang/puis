@@ -44,9 +44,15 @@
 </div>
 <script type="text/javascript">
 	var arr_Year = <?php echo json_encode($arr_Year) ?>;
+	var PRCodeVal = "<?php echo $PRCodeVal ?>"; // if fill for edit
 	var BudgetMax = 0;
 	var BudgetRemaining = [];
 	var PostBudgetDepartment = [];
+	var ResponseAjaxEdit = [];
+	var No = 1;
+	// document.addEventListener('contextmenu', function(e) {
+	//   e.preventDefault();
+	// });
 	$(document).ready(function() {
 		LoadFirstLoad();
 
@@ -106,49 +112,26 @@
 			$.post(url,{token:token},function (resultJson) {
 				var response = jQuery.parseJSON(resultJson);
 				PostBudgetDepartment = response.data;
-				var html = '<div class = "row" style = "margin-left : 0px">'+
-								'<div class = "col-md-3">'+
-									'<button type="button" class="btn btn-default btn-add-pr"> <i class="icon-plus"></i> Add</button>'+
-								'</div>'+
-							'</div>'+
-							'<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+		
-								'<div class = "col-md-12">'+
-									'<div class = "table-responsive">'+
-										'<table class="table table-bordered tableData" id ="table_input_pr">'+
-										'<thead>'+
-										'<tr>'+
-											'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
-				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Select Post Budget Item</th>'+
-				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Item</th>'+
-				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Desc</th>'+
-				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Qty</th>'+
-				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Unit Cost</th>'+
-				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Sub Total</th>'+
-				                            '<th width = "150px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Date Needed</th>'+
-				                            '<th width = "100px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Budget Status</th>'+
-				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Upload Files</th>'+
-				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Action</th>'+
-										'</tr></thead>'+
-										'<tbody></tbody></table></div></div></div>';
-				var SaveBtn = '<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
-									'<div class = "col-md-12">'+
-										'<div class = "pull-right">'+
-											'<button class = "btn btn-success" id = "SaveBudget" action = "0">Save to Draft</button>'+
-										'</div>'+
-									'</div>'+
-								'</div>';
-				var InputTax = 	'<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
-									'<div class = "col-sm-2">'+
-										'<div class = "form-group">'+
-											'<label>PPN</label>'+
-											'<input type = "text" class = "form-control" id = "ppn">'+
-										'</div>'+
-									'</div>'+
-								'</div>';												
-				$("#Page_Input_PR").html(html+InputTax+SaveBtn);
-				$("#ppn").maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
-				$("#ppn").maskMoney('mask', '9894');
-				AddingTable();
+
+				// check if edit
+					if (PRCodeVal != '') {
+						loading_page("#Page_Input_PR");
+						var PRCode = PRCodeVal;
+						var url = base_url_js+'budgeting/GetDataPR';
+						var data = {
+						    PRCode : PRCode,
+						};
+						var token = jwt_encode(data,"UAP)(*");
+						$.post(url,{ token:token },function (data_json) {
+							var response = jQuery.parseJSON(data_json);
+							ResponseAjaxEdit = response;
+							htmlPRDetail(response);
+						}); 
+					}
+					else
+					{
+						htmlPRDetail('');
+					}
 
 			}).fail(function() {
 			  toastr.info('No Result Data'); 
@@ -158,7 +141,222 @@
 
 		}
 
-		// $(".btn-add-pr").click(function(){
+		function htmlPRDetail(response)
+		{
+			var html = '<div class = "row" style = "margin-left : 0px">'+
+							'<div class = "col-md-3">'+
+								'<button type="button" class="btn btn-default btn-add-pr"> <i class="icon-plus"></i> Add</button>'+
+							'</div>'+
+						'</div>'+
+						'<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+		
+							'<div class = "col-md-12">'+
+								'<div class = "table-responsive">'+
+									'<table class="table table-bordered tableData" id ="table_input_pr">'+
+									'<thead>'+
+									'<tr>'+
+										'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Select Post Budget Item</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Item</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Desc</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Qty</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Unit Cost</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Sub Total</th>'+
+			                            '<th width = "150px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Date Needed</th>'+
+			                            '<th width = "100px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Budget Status</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Upload Files</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Action</th>'+
+									'</tr></thead>'+
+									'<tbody></tbody></table></div></div></div>';
+			var SaveBtn = '<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
+								'<div class = "col-md-12">'+
+									'<div class = "pull-right">'+
+										'<button class = "btn btn-success" id = "SaveBudget" action = "0">Save to Draft</button>'+
+									'</div>'+
+								'</div>'+
+							'</div>';
+			
+			if (response != '') { // for edit
+				var pr_create = response['pr_create'];
+				var Status = pr_create[0]['Status'];
+				switch (Status)
+				{
+				   case "0":
+				   		var SaveBtn = '<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
+				   					'<div class = "col-md-12">'+
+				   						'<div class = "pull-right">'+
+				   							'<button class="btn btn-success" id="SaveBudget" action="0" PRCode = "'+PRCodeVal+'">Save to Draft</button>'+ '&nbsp&nbsp'+'<button class="btn btn-primary" id="BtnIssued" action="1" PRCode = "'+PRCodeVal+'">Issued</button>'+
+				   						'</div>'+
+				   					'</div>'+
+				   				'</div>';
+				   		break;
+				   default:
+				   		var SaveBtn = '<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
+				   					'<div class = "col-md-12">'+
+				   						'<div class = "pull-right">'+
+				   							'<button class="btn btn-default" id="pdfprint" PRCode = "'+PRCodeVal+'"> <i class = "fa fa-file-pdf-o"></i> Print PDF</button>'+ '&nbsp&nbsp'+'<button class="btn btn-default" id="excelprint" PRCode = "'+PRCodeVal+'"><i class = "fa fa-file-excel-o"></i> Print Excel</button>'+
+				   						'</div>'+
+				   					'</div>'+
+				   				'</div>';
+				}
+			}										
+			
+			var InputTax = 	'<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
+								'<div class = "col-sm-2">'+
+									'<div class = "form-group">'+
+										'<label>PPN</label>'+
+										'<input type = "text" class = "form-control" id = "ppn">'+
+									'</div>'+
+								'</div>'+
+							'</div>';
+			var Notes = 	'<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
+								'<div class = "col-md-6">'+
+									'<div class = "form-group">'+
+										'<label>Note</label>'+
+										'<textarea id= "Notes" class = "form-control" rows = "4"></textarea>'+
+									'</div>'+
+								'</div>'+
+							'</div>';																
+			$("#Page_Input_PR").html(html+InputTax+Notes+SaveBtn);
+			$("#ppn").maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
+			$("#ppn").maskMoney('mask', '9894');
+			AddingTable();
+
+			if (response != '') { // for edit
+				var url = base_url_js+'rest/Catalog/__Get_Item';
+				var data = {
+					action : 'choices',
+					auth : 's3Cr3T-G4N',
+					department : $("#DepartementPost").val(),
+				};
+			    var token = jwt_encode(data,"UAP)(*");
+			    $.post(url,{ token:token },function (ResponseCatalog) {
+    				var pr_create = response['pr_create'];
+    				var PPN = pr_create[0]['PPN'];
+    				var n = PPN.indexOf(".");
+    				PPN = PPN.substring(0, n);
+    				$("#ppn").val(PPN);
+    				$("#ppn").maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
+    				$("#ppn").maskMoney('mask', '9894');
+
+    				var fill = '';
+    				var getfill = function(No,response,ResponseCatalog){
+    					var ID_budget_left = response['ID_budget_left'];
+    					var PostBudgetItem = response['PostName']+'-'+response['RealisasiPostName'];
+    					var ID_m_catalog = response['ID_m_catalog'];
+    					var Desc = '';
+    					var EstimaValue = '';
+    					var Photo = '';
+    					var DetailCatalog = '';
+    					var Item = response['Item'];
+    					ResponseCatalog = ResponseCatalog['data'];
+    					for (var i = 0; i < ResponseCatalog.length; i++) {
+    						if (ID_m_catalog == ResponseCatalog[i][6]) {
+    							Desc = ResponseCatalog[i][2];
+    							EstimaValue = ResponseCatalog[i][3];
+    							Photo = ResponseCatalog[i][4];
+    							DetailCatalog = ResponseCatalog[i][5];
+    							break;
+    						}
+    					}
+    					var arr = Item+'@@'+Desc+'@@'+EstimaValue+'@@'+Photo+'@@'+DetailCatalog;
+    					arr = findAndReplace(arr, "\"","'");
+
+    					var Qty = response['Qty'];
+    					var SubTotal = response['SubTotal'];
+    					var n = SubTotal.indexOf(".");
+    					SubTotal = SubTotal.substring(0, n);
+    					var UnitCost = response['UnitCost'];
+    					var n = UnitCost.indexOf(".");
+    					UnitCost = UnitCost.substring(0, n);
+    					var DateNeeded = response['DateNeeded'];
+    					var UploadFile = response['UploadFile'];
+    					UploadFile = jQuery.parseJSON(UploadFile);
+    					var htmlUploadFile = '';
+    					if (UploadFile != null) {
+    						if (UploadFile.length > 0) {
+    							for (var i = 0; i < UploadFile.length; i++) {
+    								htmlUploadFile += '<li><a href = "'+base_url_js+'fileGetAny/budgeting-pr-'+UploadFile[i]+'" target="_blank" class = "Fileexist">File '+(i+1)+'</a></li>';
+    							}
+    						}
+    					}
+		
+    					var action = '<td><button type="button" class="btn btn-danger btn-delete btn-delete-item"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button></td>';
+    					var a = '<tr>'+
+    								'<td>'+No+'</td>'+
+    								'<td>'+
+    									'<div class="input-group">'+
+    										'<input type="text" class="form-control PostBudgetItem" readonly id_budget_left = "'+ID_budget_left+'" value = "'+PostBudgetItem+'">'+
+    										'<span class="input-group-btn">'+
+    											'<button class="btn btn-default SearchPostBudget" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>'+
+    										'</span>'+
+    									'</div>'+
+    								'</td>'+
+    								'<td>'+
+    									'<div class="input-group">'+
+    										'<input type="text" class="form-control Item" readonly savevalue= "'+ID_m_catalog+'" value = "'+Item+'">'+
+    										'<span class="input-group-btn">'+
+    											'<button class="btn btn-default SearchItem" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>'+
+    										'</span>'+
+    									'</div>'+
+    								'</td>'+
+    								'<td><button class = "btn btn-primary Detail" data = "'+arr+'">Detail</button></td>'+
+    								'<td><input type="number" min = "1" class="form-control qty"  value="'+Qty+'"></td>'+
+    								'<td><input type="text" class="form-control UnitCost"  value = "'+UnitCost+'"></td>'+
+    								'<td><input type="text" class="form-control SubTotal" disabled value = "'+SubTotal+'"></td>'+
+    								'<td>'+
+    									'<div id="datetimepicker1'+No+'" class="input-group input-append date datetimepicker">'+
+    			                            '<input data-format="yyyy-MM-dd" class="form-control" id="tgl'+No+'" type=" text" readonly="" value = "<?php echo date('Y-m-d') ?>">'+
+    			                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
+    	                        		'</div>'+
+    	                        	'</td>'+
+    	                        	'<td></td>'+
+    	                        	'<td><input type="file" data-style="fileinput" class = "BrowseFile" ID = "BrowseFile'+No+'" multiple>'+htmlUploadFile+'</td>'+action
+    	                        '</tr>';	
+
+    					return a;				
+    				}
+
+    				var pr_detail = response['pr_detail'];
+    				$('#table_input_pr tbody tr:first').remove();
+    				for (var i = 0; i < pr_detail.length; i++) {
+    					fill = getfill(No,pr_detail[i],ResponseCatalog);
+    					$('#table_input_pr tbody').append(fill);
+    					$('.datetimepicker').datetimepicker();
+    					No++;
+    				}
+    				$(".SubTotal").maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+    				$(".SubTotal").maskMoney('mask', '9894');
+    				$(".UnitCost").maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+    				$(".UnitCost").maskMoney('mask', '9894');
+    				_BudgetRemaining();
+    				FuncBudgetStatus();
+    				var Status = pr_create[0]['Status'];
+    				if (Status >= 1) {
+    					$('button:not([id="pdfprint"]):not([id="excelprint"]):not([id="btnBackToHome"])').prop('disabled', true);
+    					$(".Detail").prop('disabled', false);
+    					$("input").prop('disabled', true);
+    					$("select").prop('disabled', true);
+    					$(".input-group-addon").remove();
+    				}
+    				if ($("#p_prcode").length) {
+    					$("#p_prcode").html('PRCode : '+PRCodeVal)
+    				}
+    				else
+    				{
+    					$(".thumbnail").find('.row:first').before('<p style = "color : red" id = "p_prcode">PRCode : '+PRCodeVal+'</p>');
+    				}
+
+    				if (Status == 0) {
+	    				if ($(".Fileexist").length) {
+	    					$(".btn-add-pr").after('<br><p style = "color : red">*** Please reupload file</p>')
+	    				}
+	    			}	
+    				
+			    }); 
+
+			}
+		}
+
 		$(document).off('click', '.btn-add-pr').on('click', '.btn-add-pr',function(e) {
 			AddingTable();
 		})
@@ -166,7 +364,6 @@
 		function AddingTable()
 		{
 			var fill = '';
-			var No = 1;
 			var getfill = function(No){
 				var action = '<td></td>';
 				if (No > 1) {
@@ -422,7 +619,7 @@
 			var data = {
 				action : 'choices',
 				auth : 's3Cr3T-G4N',
-				department : "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>"
+				department : $("#DepartementPost").val(),
 			};
 		    var token = jwt_encode(data,"UAP)(*");
 			var table = $('#example').DataTable({
@@ -649,6 +846,10 @@
 							PRCode = (PRCode == undefined) ? 1 : PRCode;
 							if (validation) {
 								SubmitPR(PRCode,action,'#SaveBudget');
+							}
+							else
+							{
+								$('#SaveBudget').prop('disabled',false).html('Save to Draft');
 							}
 							
 						}
@@ -880,7 +1081,7 @@
 			    {
 			    	nmbtn = 'Issued';
 			    }
-			    $(ID_element).prop('disabled',false).html('Save to Draft');
+			    $(ID_element).prop('disabled',false).html(nmbtn);
 			  }
 			})
 
@@ -919,7 +1120,17 @@
 									$(this).attr('readonly',true);
 									$(this).attr('disabled',true);
 								})
-								SubmitPR(PRCode,action,'#BtnIssued');
+								if (confirm("Are you sure ?") == true) {
+									SubmitPR(PRCode,action,'#BtnIssued');
+								}
+								else
+								{
+									$('#BtnIssued').prop('disabled',false).html('Issued');
+								}	
+							}
+							else
+							{
+								$('#BtnIssued').prop('disabled',false).html('Issued');
 							}
 							
 						}
