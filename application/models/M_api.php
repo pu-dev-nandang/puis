@@ -331,6 +331,10 @@ class M_api extends CI_Model {
                 $result['DetailTA'] = $dataDetail[0];
             }
 
+            // Get Status Employees
+            $dataStatus = $this->db->query('SELECT * FROM db_employees.employees_status WHERE IDStatus != -1 AND  IDStatus != -2 ')->result_array();
+
+            $result['StatusEmployees'] = $dataStatus;
             $result['TahunAkademik'] = $data[0];
             $result['AttdSetting'] = $dataSetting;
         } else {

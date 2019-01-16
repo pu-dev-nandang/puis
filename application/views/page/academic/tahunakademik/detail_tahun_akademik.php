@@ -315,6 +315,18 @@
                         </div>
                     </td>
                 </tr>
+                <tr>
+                    <td>User Attendance Out
+                        <input id="totalStatus" class="hide">
+                    </td>
+                    <td>:</td>
+                    <td colspan="2">
+                        <div id="showStatus1"></div>
+                    </td>
+                    <td>
+                        <div id="showStatus2"></div>
+                    </td>
+                </tr>
             </table>
         </div>
     </div>
@@ -356,6 +368,16 @@
 
         var form_In_Time_Lec = $('#form_In_Time_Lec').val();
         var form_Out_Time_Lec = $('#form_Out_Time_Lec').val();
+
+        var totalStatus = parseInt($('#totalStatus').val());
+        var Out_User_Lec = [];
+        if(totalStatus>0){
+            for(var a=0;a<totalStatus;a++){
+                if($('#formUserLec'+a).is(':checked')){
+                    Out_User_Lec.push($('#formUserLec'+a).val());
+                }
+            }
+        }
 
         var data = {
             action : 'edit',
@@ -400,6 +422,7 @@
                 Out_Session_Lec : $('#form_Out_Session_Lec').val(),
                 Out_Type_Lec : $('#form_Out_Type_Lec').val(),
                 Out_Time_Lec :( form_Out_Time_Lec!='' &&  form_Out_Time_Lec!=null &&  form_Out_Time_Lec!=0) ?  form_Out_Time_Lec : 0,
+                Out_User_Lec : JSON.stringify(Out_User_Lec),
                 UpdateBy : sessionNIP,
                 UpdateAt : dateTimeNow()
             }
@@ -425,7 +448,7 @@
         var data = {
             action : 'read',
             ID : ID
-        }
+        };
         var token = jwt_encode(data,'UAP)(*');
         $.post(url,{token:token}, function (data) {
 
@@ -484,6 +507,7 @@
             $('#form_Out_Time_Std').val(0);
 
 
+            var Out_User_Lec = [];
             // Setting Attendace
             if(data.AttdSetting.length>0){
                 var d = data.AttdSetting[0];
@@ -494,14 +518,39 @@
                 $('#form_Out_Session_Std').val(d.Out_Session_Std);
                 $('#form_Out_Type_Std').val(d.Out_Type_Std);
                 $('#form_Out_Time_Std').val(d.Out_Time_Std);
-                
+
                 $('#form_In_Session_Lec').val(d.In_Session_Lec);
                 $('#form_In_Type_Lec').val(d.In_Type_Lec);
                 $('#form_In_Time_Lec').val(d.In_Time_Lec);
                 $('#form_Out_Session_Lec').val(d.Out_Session_Lec);
                 $('#form_Out_Type_Lec').val(d.Out_Type_Lec);
                 $('#form_Out_Time_Lec').val(d.Out_Time_Lec);
+
+                Out_User_Lec = JSON.parse(d.Out_User_Lec);
+
             }
+
+
+            $('#totalStatus').val(data.StatusEmployees.length);
+            if(data.StatusEmployees.length>0){
+                for(var a=0;a<data.StatusEmployees.length;a++){
+                    var elm = $('#showStatus1');
+                    if(a>2){
+                        elm = $('#showStatus2');
+                    }
+
+                    var d_a = data.StatusEmployees[a];
+                    var sc = ($.inArray(d_a.IDStatus,Out_User_Lec)!=-1) ? 'checked' : '';
+                    elm.append('<div class="checkbox">' +
+                        '  <label>' +
+                        '    <input type="checkbox" id="formUserLec'+a+'" value="'+d_a.IDStatus+'" '+sc+' >'+d_a.Description+' ' +
+                        '  </label>' +
+                        '</div>')
+                }
+            }
+
+
+
 
 
         });
