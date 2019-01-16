@@ -1085,6 +1085,7 @@ $route['budgeting/submitpr'] = 'page/budgeting/c_budgeting/submitpr';
 $route['budgeting/DataPR'] = 'page/budgeting/c_budgeting/DataPR';
 $route['budgeting/FormEditPR'] = 'page/budgeting/c_budgeting/FormEditPR';
 $route['budgeting/GetDataPR'] = 'page/budgeting/c_budgeting/GetDataPR';
+$route['budgeting/checkruleinput'] = 'page/budgeting/c_budgeting/checkruleinput';
 
 
 // Purchasing

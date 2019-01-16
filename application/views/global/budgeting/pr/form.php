@@ -44,12 +44,15 @@
 </div>
 <script type="text/javascript">
 	var arr_Year = <?php echo json_encode($arr_Year) ?>;
-	var PRCodeVal = "<?php echo $PRCodeVal ?>"; // if fill for edit
+	var PRCodeVal = "<?php echo $PRCodeVal ?>"; // if filled for edit
 	var BudgetMax = 0;
 	var BudgetRemaining = [];
 	var PostBudgetDepartment = [];
 	var ResponseAjaxEdit = [];
 	var No = 1;
+	var UserAccess = '';
+	var RuleAccess = [];
+	var MaxLimit =0;
 	// document.addEventListener('contextmenu', function(e) {
 	//   e.preventDefault();
 	// });
@@ -58,11 +61,28 @@
 
 		function LoadFirstLoad()
 		{
-			loadYear();
-			getAllDepartementPU();
-			loadShowBUdgetRemaining(BudgetRemaining);
-		}
 
+			// check Rule for Input
+				var url = base_url_js+"budgeting/checkruleinput";
+				$.post(url,function (resultJson) {
+					var response = jQuery.parseJSON(resultJson);
+					var access = response['access'];
+					if (access.length > 0) {
+						UserAccess = access[0]['ID_m_userrole'];
+						RuleAccess = response['rule'];
+						loadYear();
+						getAllDepartementPU();
+						loadShowBUdgetRemaining(BudgetRemaining);
+					}
+					else
+					{
+						$("#pageContent").empty();
+						$("#pageContent").html('<h2 align = "center">Your not authorize these modul</h2>');
+					}
+					
+				})
+
+		}
 
 		function loadYear()
 		{
@@ -207,6 +227,9 @@
 										'<input type = "text" class = "form-control" id = "ppn">'+
 									'</div>'+
 								'</div>'+
+								'<div class = "col-sm-6 col-md-offset-4">'+
+									'<h3 id = "phtmltotal" align = "right"> Total : '+formatRupiah(0)+'</h3>'+
+								'</div>'+
 							'</div>';
 			var Notes = 	'<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
 								'<div class = "col-md-6">'+
@@ -215,7 +238,8 @@
 										'<textarea id= "Notes" class = "form-control" rows = "4"></textarea>'+
 									'</div>'+
 								'</div>'+
-							'</div>';																
+							'</div>';
+
 			$("#Page_Input_PR").html(html+InputTax+Notes+SaveBtn);
 			$("#ppn").maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
 			$("#ppn").maskMoney('mask', '9894');
@@ -237,6 +261,9 @@
     				$("#ppn").val(PPN);
     				$("#ppn").maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
     				$("#ppn").maskMoney('mask', '9894');
+
+    				var Notes = pr_create[0]['Notes'];
+    				$("#Notes").val(Notes);
 
     				var fill = '';
     				var getfill = function(No,response,ResponseCatalog){
@@ -336,8 +363,38 @@
     					$(".Detail").prop('disabled', false);
     					$("input").prop('disabled', true);
     					$("select").prop('disabled', true);
+    					$("textarea").prop('disabled', true);
     					$(".input-group-addon").remove();
+    					if (UserAccess > 1) {
+    						var NIP = "<?php echo $this->session->userdata('NIP') ?>";
+    						var JsonStatus = jQuery.parseJSON(pr_create[0]['JsonStatus']);
+    						var bool = false;
+    						var HierarkiApproval = 0; // for check hierarki approval;
+    						for (var i = 0; i < JsonStatus.length; i++) {
+    							if (JsonStatus[i]['Status'] == 0) {
+    								HierarkiApproval++;
+    								if (NIP == JsonStatus[i]['ApprovedBy']) {
+    									bool = true;
+    									break;
+    								}
+    							}
+    							
+    						}
+
+    						if (bool && HierarkiApproval == 1) {
+	    						var ApprovalBtn = '<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
+					   								'<div class = "col-md-12">'+
+					   									'<div class = "pull-right">'+
+					   										'<button class = "btn btn-default" id = "approve" userAccess = "'+UserAccess+'"> <i class = "fa fa-handshake-o"> </i> Approve</button>'+
+					   									'</div>'+
+					   								'</div>'+
+					   							 '</div>';
+					   			$('#Page_Input_PR').append(ApprovalBtn);	
+    						}
+    										
+    					}
     				}
+
     				if ($("#p_prcode").length) {
     					$("#p_prcode").html('PRCode : '+PRCodeVal)
     				}
@@ -353,12 +410,34 @@
 	    			}	
     				
 			    }); 
-
+		
 			}
+
+			// find auth entry
+				for (var i = 0; i < RuleAccess.length; i++) {
+					if (RuleAccess[i]['Entry'] == 1) {
+						MaxLimit = RuleAccess[i].MaxLimit;
+					}
+				}
+			
+			if (MaxLimit == 0) {
+				$('button:not([id="pdfprint"]):not([id="excelprint"]):not([id="btnBackToHome"])').prop('disabled', true);
+				$(".Detail").prop('disabled', false);
+				$("input").prop('disabled', true);
+				$("select").prop('disabled', true);
+				$("textarea").prop('disabled', true);
+				$(".input-group-addon").remove();
+			}
+
+			// console.log(MaxLimit);
 		}
 
 		$(document).off('click', '.btn-add-pr').on('click', '.btn-add-pr',function(e) {
 			AddingTable();
+		})
+
+		$(document).off('click', '#ppn').on('click', '#ppn',function(e) {
+			_BudgetRemaining();
 		})
 
 		function AddingTable()
@@ -538,6 +617,8 @@
 				arr_id_budget_left.push(id_budget_left);
 			})
 
+
+			var htmltotal = 0;
 			for (var i = 0; i < arr_id_budget_left.length; i++) {
 				var total = 0;
 				var PostBudgetItem = '';
@@ -545,13 +626,18 @@
 				var GetNO = i + 1;
 				var id_budget_left = arr_id_budget_left[i];
 				var RemainingNoFormat = 0;
+				var ppn = $("#ppn").val();
 				$('.PostBudgetItem[id_budget_left="'+id_budget_left+'"]').each(function(){
 					var fillItem = $(this).closest('tr');
 					var SubTotal = fillItem.find('td:eq(6)').find('.SubTotal').val();
 					var SubTotal = findAndReplace(SubTotal, ".","");
 					PostBudgetItem = fillItem.find('td:eq(1)').find('.PostBudgetItem').val();
+					var Persent = (parseInt(ppn) / 100) * SubTotal;
+					SubTotal = parseInt(SubTotal) - parseInt(Persent);
 					total += parseInt(SubTotal);
 				})
+
+				htmltotal += parseInt(total);
 
 				for (var l = 0; l < PostBudgetDepartment.length; l++) { // find Value awal
 					var B_id_budget_left = PostBudgetDepartment[l].ID;
@@ -580,7 +666,8 @@
 					}
 				}					
 			}
-			
+
+			$("#phtmltotal").html('Total : '+formatRupiah(htmltotal));
 			// console.log(BudgetRemaining);
 			loadShowBUdgetRemaining(BudgetRemaining);
 			// loadingEnd(500)
@@ -865,6 +952,8 @@
 		function validation_input()
 		{
 			var find = true;
+			var Total = 0
+			var ppn = $("#ppn").val();
 			$(".PostBudgetItem").each(function(){
 				var fillItem = $(this).closest('tr');
 				var PostBudgetItem = $(this).val();
@@ -881,7 +970,21 @@
 					return false;
 				}
 
+				// find subtotal to check maxlimit
+					var SubTotal = fillItem.find('td:eq(6)').find('.SubTotal').val();
+					SubTotal = findAndReplace(SubTotal, ".","");
+					var Persent = (parseInt(ppn) / 100) * SubTotal;
+					SubTotal = parseInt(SubTotal) - parseInt(Persent);
+					Total += parseInt(SubTotal);
+
+
 			})
+
+			if (Total > MaxLimit) {
+				var WrMaxLimit = findAndReplace(MaxLimit, ".","");
+				toastr.error("You have authorize Max Limit : "+ formatRupiah(WrMaxLimit),'!!!Error');
+				return false;
+			}
 
 			$(".BrowseFile").each(function(){
 				var IDFile = $(this).attr('id');
@@ -949,6 +1052,7 @@
 			var Year = $("#Year").val();
 			var Departement = $("#DepartementPost").val();
 			var PPN = $("#ppn").val();
+			var Notes = $("#Notes").val();
 			var FormInsertDetail = [];
 			var form_data = new FormData();
 			var PassNumber = 0;
@@ -1003,6 +1107,9 @@
 
 			token = jwt_encode(PPN,"UAP)(*");
 			form_data.append('PPN',token);
+
+			token = jwt_encode(Notes,"UAP)(*");
+			form_data.append('Notes',token);
 
 			var url = base_url_js + "budgeting/submitpr"
 			$.ajax({
@@ -1063,6 +1170,14 @@
 			       		var rowPullright = $(ID_element).closest('.pull-right');
 			       		rowPullright.empty();
 			       		rowPullright.append('<button class="btn btn-default" id="pdfprint" PRCode = "'+data+'"> <i class = "fa fa-file-pdf-o"></i> Print PDF</button>'+ '&nbsp&nbsp'+'<button class="btn btn-default" id="excelprint" PRCode = "'+data+'"><i class = "fa fa-file-excel-o"></i> Print Excel</button>');
+
+			       		$('button:not([id="pdfprint"]):not([id="excelprint"]):not([id="btnBackToHome"])').prop('disabled', true);
+			       		$(".Detail").prop('disabled', false);
+			       		$("input").prop('disabled', true);
+			       		$("select").prop('disabled', true);
+			       		$("textarea").prop('disabled', true);
+			       		$(".input-group-addon").remove();
+			       		
 			       		break;
 			       case "larry": 
 			           alert('Hey');

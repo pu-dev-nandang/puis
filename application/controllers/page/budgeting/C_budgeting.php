@@ -1369,6 +1369,10 @@ class C_budgeting extends Budgeting_Controler {
         $PRCode = $this->jwt->decode($PRCode,$key);
         $act = $PRCode;
 
+        $Notes = $this->input->post('Notes');
+        $key = "UAP)(*";
+        $Notes = $this->jwt->decode($Notes,$key);
+
         $PRCode = ($act == 1) ? $this->m_budgeting->Get_PRCode($Year,$Departement) : $PRCode;
         // print_r($PRCode);die();
         if ($act == 1) {
@@ -1382,6 +1386,7 @@ class C_budgeting extends Budgeting_Controler {
                 'Status' => 0,
                 'PPN' => $PPN,
                 'PRPrint_Approve' => '',
+                'Notes' => $Notes,
             );
 
             $this->db->insert('db_budgeting.pr_create',$dataSave);
@@ -1414,6 +1419,7 @@ class C_budgeting extends Budgeting_Controler {
                 'CreatedBy' => $this->session->userdata('NIP'),
                 'CreatedAt' => date('Y-m-d H:i:s'),
                 'PPN' => $PPN,
+                'Notes' => $Notes,
             );
 
             $this->db->where('PRCode',$PRCode);
@@ -1521,6 +1527,10 @@ class C_budgeting extends Budgeting_Controler {
         $key = "UAP)(*";
         $PRCode = $this->jwt->decode($PRCode,$key);
 
+        $Notes = $this->input->post('Notes');
+        $key = "UAP)(*";
+        $Notes = $this->jwt->decode($Notes,$key);
+
         // RuleApproval
             // check Subtotal
                 $Amount = 0;
@@ -1540,6 +1550,7 @@ class C_budgeting extends Budgeting_Controler {
             'Status' => 1,
             'JsonStatus' => json_encode($JsonStatus),
             'PPN' => $PPN,
+            'Notes' => $Notes,
         );
 
         $this->db->where('PRCode',$PRCode);
@@ -1583,8 +1594,8 @@ class C_budgeting extends Budgeting_Controler {
         $sql = 'select * from 
                 (
                     select a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,
-                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done","Reject") ))
-                                    as StatusName, a.JsonStatus 
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = 3,"Reject","Cancel") ) ))
+                                    as StatusName, a.JsonStatus,a.PostingDate 
                                     from db_budgeting.pr_create as a 
                     join (
                     select * from (
@@ -1675,6 +1686,16 @@ class C_budgeting extends Budgeting_Controler {
         $arr_result['pr_create'] = $this->m_budgeting->GetPR_CreateByPRCode($input['PRCode']);
         $arr_result['pr_detail'] = $this->m_budgeting->GetPR_DetailByPRCode($input['PRCode']);
         echo json_encode($arr_result);
+    }
+
+    public function checkruleinput()
+    {
+        $this->auth_ajax();
+        $bool = false;
+        $NIP = $this->session->userdata('NIP');
+        $Departement = $this->session->userdata('IDDepartementPUBudget');
+        $GetRuleAccess = $this->m_budgeting->GetRuleAccess($NIP,$Departement);
+        echo json_encode($GetRuleAccess);
     }
 
 }

@@ -654,7 +654,7 @@ abstract class It_Controler extends Globalclass{
     private function authIT()
     {
         $NIP = $this->session->userdata('NIP');
-        $getData = $this->m_master->getUserSessAuth($NIP,4);
+        $getData = $this->m_master->getUserSessAuth($NIP,12);
         if (count($getData) > 0) {
             $this->session->set_userdata('it_sess',1);
             return true;

@@ -472,7 +472,7 @@ class M_budgeting extends CI_Model {
     {
         $sql = 'select a.ID,a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,
                                     if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done","Reject") ))
-                                    as StatusName,a.Status, a.JsonStatus ,a.PPN,a.PRPrint_Approve
+                                    as StatusName,a.Status, a.JsonStatus ,a.PPN,a.PRPrint_Approve,a.Notes,a.PostingDate
                                     from db_budgeting.pr_create as a 
                 join (
                 select * from (
@@ -504,5 +504,15 @@ class M_budgeting extends CI_Model {
                ';
         $query = $this->db->query($sql, array($PRCode))->result_array();
         return $query;       
+    }
+
+    public function GetRuleAccess($NIP,$Departement)
+    {
+        $arr_result = array('access' => array(),'rule' => array());
+        $sql = 'select * from db_budgeting.cfg_set_roleuser where NIP = "'.$NIP.'" and Departement = "'.$Departement.'" limit 1';
+        $query = $this->db->query($sql, array())->result_array();
+        $arr_result['rule'] = $this->m_master->caribasedprimary('db_budgeting.cfg_set_userrole','ID_m_userrole',$query[0]['ID_m_userrole']);
+        $arr_result['access'] = $query;
+        return $arr_result; 
     }  
 }
