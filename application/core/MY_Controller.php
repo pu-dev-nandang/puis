@@ -488,10 +488,11 @@ abstract class Budgeting_Controler extends Globalclass{
         $this->load->model('master/m_master');
         $arr = array();
         for ($i=0; $i < count($DataDB); $i++) {
-            $submenu1 = $this->m_master->getSubmenu1BaseMenu_grouping($DataDB[$i]['ID_menu'],'db_budgeting');
+            $submenu1 = $this->m_budgeting->getSubmenu1BaseMenu_grouping($DataDB[$i]['ID_menu'],'db_budgeting');
+            // print_r($submenu1);
             $arr2 = array();
             for ($k=0; $k < count($submenu1); $k++) { 
-                $submenu2 = $this->m_master->getSubmenu2BaseSubmenu1_grouping($submenu1[$k]['SubMenu1'],'db_budgeting',$DataDB[$i]['ID_menu']);
+                $submenu2 = $this->m_budgeting->getSubmenu2BaseSubmenu1_grouping($submenu1[$k]['SubMenu1'],'db_budgeting',$DataDB[$i]['ID_menu']);
                 $arr2[] = array(
                     'SubMenu1' => $submenu1[$k]['SubMenu1'],
                     'Submenu' => $submenu2,

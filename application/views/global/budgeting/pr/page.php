@@ -17,7 +17,7 @@
         <div class="col-xs-12" >
             <div class="panel panel-primary">
                 <div class="panel-heading clearfix">
-                    <h4 class="panel-title pull-left" style="padding-top: 7.5px;">PR</h4>
+                    <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Purchase Requisition</h4>
                 </div>
                 <div class="panel-body">
                     <div class="row" id = "pageContent">

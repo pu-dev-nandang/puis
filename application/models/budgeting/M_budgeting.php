@@ -31,6 +31,34 @@ class M_budgeting extends CI_Model {
         return $query;
     }
 
+    public function getSubmenu1BaseMenu_grouping($ID_Menu,$db='db_budgeting')
+    {
+        $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
+        from '.$db.'.cfg_sub_menu as a join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
+        where a.ID_Menu = ? group by a.SubMenu1';
+        $query=$this->db->query($sql, array($ID_Menu))->result_array();
+        return $query;
+    }
+
+    public function getSubmenu2BaseSubmenu1_grouping($submenu1,$db='db_admission',$IDmenu = null)
+    {
+        if ($IDmenu != null) {
+            $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
+            from '.$db.'.cfg_sub_menu as a  join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
+             where a.SubMenu1 = ? and a.ID_Menu = ?';
+            $query=$this->db->query($sql, array($submenu1,$IDmenu))->result_array();
+        }
+        else
+        {
+            $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
+            from '.$db.'.cfg_sub_menu as a  join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
+             where a.SubMenu1 = ?';
+            $query=$this->db->query($sql, array($submenu1))->result_array();
+        }
+        
+        return $query;
+    }
+
     public function getData_cfg_postrealisasi($Active = null)
     {
         $arr_result = array();
@@ -508,6 +536,7 @@ class M_budgeting extends CI_Model {
 
     public function GetRuleAccess($NIP,$Departement)
     {
+        error_reporting(0);
         $arr_result = array('access' => array(),'rule' => array());
         $sql = 'select * from db_budgeting.cfg_set_roleuser where NIP = "'.$NIP.'" and Departement = "'.$Departement.'" limit 1';
         $query = $this->db->query($sql, array())->result_array();

@@ -606,6 +606,10 @@
 			
 		})
 
+		$(document).off('keyup', '#ppn').on('keyup', '#ppn',function(e) {
+			_BudgetRemaining();
+		})
+
 		function _BudgetRemaining()
 		{
 			// loadingStart();
