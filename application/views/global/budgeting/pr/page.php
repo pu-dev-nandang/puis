@@ -7,17 +7,17 @@
             </a>
         </li>
         <li class="active">
-            <a href="javascript:void(0)" class="pageAnchor" page = "form">Form</a>
+            <a href="javascript:void(0)" class="pageAnchor" page = "data">Data</a>
         </li>
         <li class="">
-            <a href="javascript:void(0)" class="pageAnchor" page = "Data">Data</a>
+            <a href="javascript:void(0)" class="pageAnchor" page = "form">Form</a>
         </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
         <div class="col-xs-12" >
             <div class="panel panel-primary">
                 <div class="panel-heading clearfix">
-                    <h4 class="panel-title pull-left" style="padding-top: 7.5px;">PR</h4>
+                    <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Purchase Requisition</h4>
                 </div>
                 <div class="panel-body">
                     <div class="row" id = "pageContent">
@@ -33,7 +33,7 @@
     $(document).ready(function() {
         $("#container").attr('class','fixed-header sidebar-closed');
         $("#sidebar").remove();
-        LoadPage('form');
+        LoadPage('data');
 
         $(".pageAnchor").click(function(){
             var Page = $(this).attr('page');

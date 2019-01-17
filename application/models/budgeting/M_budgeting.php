@@ -31,6 +31,34 @@ class M_budgeting extends CI_Model {
         return $query;
     }
 
+    public function getSubmenu1BaseMenu_grouping($ID_Menu,$db='db_budgeting')
+    {
+        $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
+        from '.$db.'.cfg_sub_menu as a join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
+        where a.ID_Menu = ? group by a.SubMenu1';
+        $query=$this->db->query($sql, array($ID_Menu))->result_array();
+        return $query;
+    }
+
+    public function getSubmenu2BaseSubmenu1_grouping($submenu1,$db='db_admission',$IDmenu = null)
+    {
+        if ($IDmenu != null) {
+            $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
+            from '.$db.'.cfg_sub_menu as a  join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
+             where a.SubMenu1 = ? and a.ID_Menu = ?';
+            $query=$this->db->query($sql, array($submenu1,$IDmenu))->result_array();
+        }
+        else
+        {
+            $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
+            from '.$db.'.cfg_sub_menu as a  join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
+             where a.SubMenu1 = ?';
+            $query=$this->db->query($sql, array($submenu1))->result_array();
+        }
+        
+        return $query;
+    }
+
     public function getData_cfg_postrealisasi($Active = null)
     {
         $arr_result = array();
@@ -369,4 +397,151 @@ class M_budgeting extends CI_Model {
         $query=$this->db->query($sql, array($Departement,$Year))->result_array();
         return $query;
     }
+
+    public function Get_PRCode($Year,$Departement)
+    {
+        /* method PR
+           Code : PRNA.12-1901000001
+           PR -> Fix
+           NA.12 -> Code Deparment in Budgeting
+           - -> Fix
+           19 -> Last two Year
+           01 -> Month
+           000001 -> Increment, Max 999.999 in one month
+        */
+        $PRCode = '';   
+        $Year = substr($Year, 2,2);
+        $Month = date('m');
+        $MaxLengthINC = 6;
+        $PRSearch = 'PR'.$Departement.'-'.$Year.$Month;
+        $sql = 'select * from db_budgeting.pr_create where PRCode like "'.$PRSearch.'%" order by PRCode desc limit 1';
+        $query=$this->db->query($sql, array())->result_array();
+
+        if (count($query) == 1) {
+            // Inc last code
+            $PRCode = $query[0]['PRCode'];
+            $C = substr($PRCode, 12,strlen($PRCode));
+            $C = (int) $C;
+            $C = $C + 1;
+            $B = strlen($C);
+            $strINC = $C;
+            for ($i=0; $i < $MaxLengthINC - $B; $i++) { 
+                $strINC = '0'.$strINC;
+            }
+
+            $PRCode = $strINC;
+            $PRCode = $PRSearch.$PRCode;
+        }
+        else
+        {
+            $C = 1;
+            $B = strlen($C);
+            $strINC = $C;
+            for ($i=0; $i < $MaxLengthINC - $B; $i++) { 
+                $strINC = '0'.$strINC;
+            }
+            $PRCode = $strINC;
+            $PRCode = $PRSearch.$PRCode;
+        }    
+
+        return $PRCode;
+    }
+
+    public function GetRuleApproval_PR_JsonStatus($Departement,$Amount)
+    {
+        $JsonStatus = array();
+        $sql = 'select * from db_budgeting.cfg_set_userrole where MaxLimit >= '.$Amount.' and Approved = 1 and Status = 1 and Active = 1
+                group by MaxLimit,ID_m_userrole order by MaxLimit,ID_m_userrole;
+                ';
+        $query=$this->db->query($sql, array())->result_array();
+        // print_r($query);die();
+        // get data to filtering MaxLimit
+            $arr = array();
+            for ($i=0; $i < count($query); $i++) {
+                $MaxLimit = $query[$i]['MaxLimit'];
+                $arr[]= $query[$i]['ID_m_userrole'];
+                $bool = false;
+                for ($j=$i+1; $j < count($query); $j++) {
+                    $MaxLimit2 = $query[$j]['MaxLimit'];
+                    if ($MaxLimit == $MaxLimit2) {
+                        $arr[]= $query[$j]['ID_m_userrole']; 
+                    }
+                    else
+                    {
+                        $bool = true;
+                        break;
+                    }
+                }
+
+                if ($bool) {
+                   break;
+                }      
+
+            }
+
+        // find approver
+            for ($i=0; $i < count($arr); $i++) { 
+               $sql = 'select * from db_budgeting.cfg_set_roleuser where Departement = "'.$Departement.'" and ID_m_userrole = '.$arr[$i];
+               $query=$this->db->query($sql, array())->result_array();
+               $NIP = $query[0]['NIP'];
+
+               $JsonStatus[] = array(
+                    'ApprovedBy' => $NIP,
+                    'Status' => 0,
+                    'ApproveAt' => ''
+                );
+            } 
+
+        return $JsonStatus;              
+    }
+
+
+    public function GetPR_CreateByPRCode($PRCode)
+    {
+        $sql = 'select a.ID,a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done","Reject") ))
+                                    as StatusName,a.Status, a.JsonStatus ,a.PPN,a.PRPrint_Approve,a.Notes,a.PostingDate
+                                    from db_budgeting.pr_create as a 
+                join (
+                select * from (
+                select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
+                UNION
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                ) aa
+                ) as b on a.Departement = b.ID
+                join db_employees.employees as c on a.CreatedBy = c.NIP
+                where a.PRCode = ?
+                ';
+        $query = $this->db->query($sql, array($PRCode))->result_array();
+        return $query;
+    }
+
+    public function GetPR_DetailByPRCode($PRCode)
+    {
+        $sql = 'select a.ID,a.PRCode,a.ID_budget_left,b.ID_creator_budget,c.CodePostBudget,d.CodeSubPost,e.CodePost,
+                e.RealisasiPostName,f.PostName,a.ID_m_catalog,g.Item,
+                a.Qty,a.UnitCost,a.SubTotal,a.DateNeeded,a.BudgetStatus,a.UploadFile
+                from db_budgeting.pr_detail as a
+                join db_budgeting.budget_left as b on a.ID_budget_left = b.ID
+                join db_budgeting.creator_budget as c on b.ID_creator_budget = c.ID
+                join db_budgeting.cfg_set_post as d on c.CodePostBudget = d.CodePostBudget
+                join db_budgeting.cfg_postrealisasi as e on d.CodeSubPost = e.CodePostRealisasi
+                join db_budgeting.cfg_post as f on e.CodePost = f.CodePost
+                join db_purchasing.m_catalog as g on a.ID_m_catalog = g.ID
+                where a.PRCode = ?
+               ';
+        $query = $this->db->query($sql, array($PRCode))->result_array();
+        return $query;       
+    }
+
+    public function GetRuleAccess($NIP,$Departement)
+    {
+        error_reporting(0);
+        $arr_result = array('access' => array(),'rule' => array());
+        $sql = 'select * from db_budgeting.cfg_set_roleuser where NIP = "'.$NIP.'" and Departement = "'.$Departement.'" limit 1';
+        $query = $this->db->query($sql, array())->result_array();
+        $arr_result['rule'] = $this->m_master->caribasedprimary('db_budgeting.cfg_set_userrole','ID_m_userrole',$query[0]['ID_m_userrole']);
+        $arr_result['access'] = $query;
+        return $arr_result; 
+    }  
 }

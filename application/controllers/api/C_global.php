@@ -235,7 +235,8 @@ class C_global extends CI_Controller {
 
     public function testInject()
     {
-        $sql = 'select NIP from db_employees.employees WHERE Status > 0 ';
+        $sql = 'select NIP,Name from db_employees.employees 
+                where SUBSTRING_INDEX(PositionMain,".",-1) = 6 and Status = "1" ';
         $query=$this->db->query($sql, array())->result_array();
         // 3 administrative
         for ($i=0; $i < count($query); $i++) { 
@@ -245,9 +246,17 @@ class C_global extends CI_Controller {
             if (count($get) == 0) {
                 $dataSave = array(
                     'NIP' => $NIP,
-                    'G_user' => 4,
+                    'G_user' => 9,
                 );
                 $this->db->insert('db_reservation.previleges_guser', $dataSave);
+            }
+            else
+            {
+                $dataSave = array(
+                    'G_user' => 9,
+                );
+                $this->db->where('NIP',$NIP);
+                $this->db->update('db_reservation.previleges_guser', $dataSave);
             }
 
         }
