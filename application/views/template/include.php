@@ -294,6 +294,9 @@
 <!-- Countdown -->
 <script type="text/javascript" src="<?php echo base_url('assets/'); ?>countdown/jquery.countdown.min.js"></script>
 
+<!-- BootBox -->
+<script type="text/javascript" src="<?php echo base_url('assets/'); ?>bootbox/bootbox.min.js"></script>
+
 <!-- Socket js -->
 <script type="text/javascript" src="<?php echo base_url('node_modules/socket.io/node_modules/socket.io-client/socket.io.js');?>"></script>
 <!-- Custom -->
@@ -935,6 +938,22 @@
                     var data = data_json[i];
                     option.append('<option value="'+data.NIP+'">'+data.NIP+' - '+data.Name+'</option>')
                         .val(selected).trigger('change');
+                }
+            }
+        })
+    }
+
+    function loadSelectOptionReasonTransferStudent(element,selected) {
+        var url = base_url_js+'api/__crudTransferStudent';
+        var token = jwt_encode({action:'readReason'},'UAP)(*');
+        $.post(url,{token:token},function (jsonResult) {
+            if(jsonResult.length>0){
+                for(var i=0;i<jsonResult.length;i++){
+                    var d = jsonResult[i];
+                    var sc = (typeof selected !== "undefined" && d.ID == selected) ? 'selected' : '';
+
+                    $(element).append('<option '+sc+' value="'+d.ID+'">'+d.Reason+'</option>');
+
                 }
             }
         })
