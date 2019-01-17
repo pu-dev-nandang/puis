@@ -86,6 +86,13 @@ $route['academic/study-planning/course-offer/(:num)/(:any)'] = 'page/academic/c_
 $route['academic/references'] = 'page/academic/c_reference';
 
 
+// TRANSFER STUDENT
+$route['academic/transfer-student/programme-study'] = 'page/academic/c_transfer_student/transfer_prodi';
+$route['academic/transfer-student/course-conversion/(:num)'] = 'page/academic/c_transfer_student/course_conversion/$1';
+$route['academic/transfer-student/__loadListTransferStudent'] = 'page/academic/c_transfer_student/loadListTransferStudent';
+
+
+
 // Jadwal Ujian
 $route['academic/__setPageJadwalUjian'] = 'page/academic/c_jadwal_ujian/setPageJadwal';
 $route['academic/__setPageJadwal'] = 'page/academic/c_jadwal/setPageJadwal';
@@ -866,6 +873,9 @@ $route['api/__crudConfigSKPI'] = 'api/c_api/crudConfigSKPI';
 // Crud Notification
 $route['api/__crudNotification'] = 'api/c_api/crudNotification';
 $route['api/__crudLog'] = 'api/c_api/crudLog';
+
+
+$route['api/__crudTransferStudent'] = 'api/c_api/crudTransferStudent';
 
 
 $route['__resetPasswordUser'] = 'c_login/resetPasswordUser';

@@ -12,6 +12,7 @@ class C_api extends CI_Controller {
         header('Access-Control-Allow-Origin: *');
         header('Content-Type: application/json');
         $this->load->model('m_api');
+        $this->load->model('m_rest');
         $this->load->model('master/m_master');
         $this->load->model('hr/m_hr');
         $this->load->model('vreservation/m_reservation');
@@ -7162,6 +7163,214 @@ class C_api extends CI_Controller {
             return print_r(json_encode(count($data)));
         }
 
+    }
+
+    public function crudTransferStudent(){
+
+        $data_arr = $this->getInputToken();
+
+        if (count($data_arr) > 0) {
+            if($data_arr['action'] == 'readFromStudentTransfer'){
+                $data = $this->db->select('NPM,Name')->get_where('db_academic.auth_students'
+                    ,array('Year' => $data_arr['ClassOf'] ,'ProdiID' => $data_arr['ProdiID']))->result_array();
+
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action'] == 'readReason'){
+                $data = $this->db->get('db_academic.transfer_type')->result_array();
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='checkNPMTransferStudent'){
+                $data = $this->db->select('NPM')->get_where('db_academic.auth_students'
+                    ,array('NPM' => $data_arr['NPM']))->result_array();
+
+                $dataEmb = $this->db->select('NIP')->get_where('db_employees.employees'
+                    ,array('NIP' => $data_arr['NPM']))->result_array();
+
+
+                if(count($data)>0 || count($dataEmb)>0){
+                    $result = array('Status' => 0);
+                } else {
+                    $result = array('Status' => 1);
+                }
+
+                return print_r(json_encode($result));
+            }
+
+            else if($data_arr['action']=='addingTransferStudent'){
+
+                $StatusBefore = '';
+
+                // DB TA - Get Data Student Lama
+                $db_f = 'ta_'.$data_arr['fromClassOf'];
+                $dataStd_f = $this->db->limit(1)->get_where($db_f.'.students',array('NPM' => $data_arr['fromStudent']))->result_array();
+
+                $Possword_Old = '';
+                if(count($dataStd_f)){
+                    $d = $dataStd_f[0];
+                    $StatusBefore = $dataStd_f[0]['StatusStudentID'];
+                    unset($d['ID']);
+                    $d['ProdiID'] = $data_arr['toProdi'];
+                    $d['NPM'] = $data_arr['toNewNPM'];
+                    $d['ClassOf'] = $data_arr['toClassOf'];
+                    $d['Address'] = trim($d['Address']);
+                    $d['StatusStudentID'] = 3;
+
+                    if($d['DateOfBirth']!=null && $d['DateOfBirth']!='' && $d['DateOfBirth']!='0000-00-00'){
+                        $d_exp = explode('-',$d['DateOfBirth']);
+                        $Possword_Old = md5($d_exp[2].''.$d_exp[1].''.substr($d_exp[0],2,2));
+                    }
+
+                    // Insert To
+                    $db_t = 'ta_'.$data_arr['toClassOf'];
+                    $this->db->insert($db_t.'.students',$d);
+
+                    // Update Data Lama
+                    $this->db->set('StatusStudentID', 15);
+                    $this->db->where('ID', $dataStd_f[0]['ID']);
+                    $this->db->update($db_f.'.students');
+                    $this->db->reset_query();
+
+                }
+
+
+
+                // DB AUTH Student - Get data lama
+                $d_aut_f = $this->db->get_where('db_academic.auth_students',array('NPM' => $data_arr['fromStudent']))->result_array();
+                if(count($d_aut_f)>0){
+                    $d = $d_aut_f[0];
+                    unset($d['ID']);
+                    unset($d['ProdiGroupID']);
+                    unset($d['Password']);
+                    $d['NPM'] = $data_arr['toNewNPM'];
+                    $d['Name'] = trim(ucwords($d['Name']));
+                    $d['ProdiID'] = $data_arr['toProdi'];
+                    $d['Year'] = $data_arr['toClassOf'];
+                    $d['Status'] = '-1';
+                    $d['EmailPU'] = $data_arr['toNewNPM'].'@podomorouniversity.ac.id';
+                    $d['Password_Old'] = $Possword_Old;
+                    $d['StatusStudentID'] = 3;
+
+                    if($data_arr['TransferTypeID']!=1 || $data_arr['TransferTypeID']!='1'){
+                        unset($d['Pay_Cond']);
+                    }
+
+                    // Insert Ke DB Auth
+                    $this->db->insert('db_academic.auth_students',$d);
+
+                    // Update Data Lama
+                    $this->db->set('StatusStudentID', 15);
+                    $this->db->where('ID', $d_aut_f[0]['ID']);
+                    $this->db->update('db_academic.auth_students');
+                    $this->db->reset_query();
+                }
+
+
+                // Insert Ke dalam tabel transfer
+                $dataIns = array(
+                    'TransferTypeID' => $data_arr['TransferTypeID'],
+                    'ClassOfBefore' => $data_arr['fromClassOf'],
+                    'StatusBefore' => $StatusBefore,
+                    'Before' => $data_arr['fromStudent'],
+                    'ClassOfAfter' => $data_arr['toClassOf'],
+                    'After' => $data_arr['toNewNPM'],
+                    'CreateBy' => $data_arr['CreateBy'],
+                    'CreateAt' => $data_arr['CreateAt']
+                );
+
+                $this->db->insert('db_academic.transfer_student',$dataIns);
+
+                return print_r(1);
+
+            }
+            else if($data_arr['action']=='removeTransverStudent'){
+
+                $dataTS = $this->db->get_where('db_academic.transfer_student',array('ID' => $data_arr['ID']))
+                    ->result_array();
+
+                if(count($dataTS)>0){
+                    $d = $dataTS[0];
+                    // Data After
+                    $After_NPM = $d['After'];
+                    $After_DB =  'ta_'.$d['ClassOfAfter'];
+
+                    $tables = array($After_DB.'.students', 'db_academic.auth_students');
+                    $this->db->where('NPM', $After_NPM);
+                    $this->db->delete($tables);
+                    $this->db->reset_query();
+
+                    $this->db->set('StatusStudentID', $d['StatusBefore']);
+                    $this->db->where('NPM', $d['Before']);
+                    $this->db->update('db_academic.auth_students');
+                    $this->db->reset_query();
+
+                    $Before_DB =  'ta_'.$d['ClassOfBefore'];
+                    $this->db->set('StatusStudentID', $d['StatusBefore']);
+                    $this->db->where('NPM', $d['Before']);
+                    $this->db->update($Before_DB.'.students');
+                    $this->db->reset_query();
+
+                    $this->db->where('ID', $data_arr['ID']);
+                    $this->db->delete('db_academic.transfer_student');
+                }
+
+                return print_r(1);
+
+            }
+            else if($data_arr['action']=='readDataTransferStudent'){
+                $TSID = $data_arr['TSID'];
+
+                // Get Data Transfer
+                $data = $this->db->get_where('db_academic.transfer_student',array('ID' => $TSID))->result_array();
+
+                if(count($data)>0){
+                    $dt = $data[0];
+
+                    // Get Semester Before
+                    $C_O_Before = $dt['ClassOfBefore'];
+                    $DB_B = 'ta_'.$dt['ClassOfBefore'];
+                    $NPM_B = $dt['Before'];
+                    $dSem_B = $this->db->get_where('db_academic.semester',array('Year >=' => $C_O_Before))->result_array();
+                    $arrSemester_B = [];
+                    $NoSem_B = 0;
+                    if(count($dSem_B)>0){
+                        for($i=0;$i<count($dSem_B);$i++){
+                            $dt_s = $dSem_B[$i];
+                            $NoSem_B ++;
+//                            $course = $this->db->get_where($DB_B.'.study_planning',array('NPM' => $NPM_B, 'SemesterID' => $dt_s['ID']))->result_array();
+                            $System = ($dt_s['ID']>=13) ? 1 : 0;
+                            $course = $this->m_rest->getDataKHS($DB_B,$NPM_B,$dt_s['ID'],'',$System);
+
+                            if(count($course)>0){
+                                $arr = array(
+                                    'Semester' => $NoSem_B,
+                                    'SemesterID' => $dt_s['ID'],
+                                    'SemesterName' => $dt_s['Name'],
+                                    'Course' => $course
+                                );
+
+                                array_push($arrSemester_B,$arr);
+                            }
+
+
+                            if($dt_s['Status']==1 || $dt_s['Status']=='1'){
+                                break;
+                            }
+
+                        }
+                    }
+
+                    $result = array(
+                        'Before' => $arrSemester_B
+                    );
+                }
+
+
+            return print_r(json_encode($result));
+
+            }
+
+        }
     }
 
 }

@@ -1005,7 +1005,7 @@ class M_rest extends CI_Model {
     }
 
 
-    private function getDataKHS($db,$NPM,$SemesterID,$Status,$System){
+    public function getDataKHS($db,$NPM,$SemesterID,$Status,$System){
 
         $data = $this->db->query('SELECT sp.*,mk.MKCode, mk.Name, mk.NameEng, s.TotalAssigment 
                                         FROM '.$db.'.study_planning sp 
