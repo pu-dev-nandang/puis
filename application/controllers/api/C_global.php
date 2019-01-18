@@ -235,31 +235,34 @@ class C_global extends CI_Controller {
 
     public function testInject()
     {
-        $sql = 'select NIP,Name from db_employees.employees 
-                where SUBSTRING_INDEX(PositionMain,".",-1) = 6 and Status = "1" ';
-        $query=$this->db->query($sql, array())->result_array();
-        // 3 administrative
-        for ($i=0; $i < count($query); $i++) { 
-            $NIP = $query[$i]['NIP'];
-            // check NIP existing
-            $get = $this->m_master->caribasedprimary('db_reservation.previleges_guser','NIP',$NIP);
-            if (count($get) == 0) {
-                $dataSave = array(
-                    'NIP' => $NIP,
-                    'G_user' => 9,
-                );
-                $this->db->insert('db_reservation.previleges_guser', $dataSave);
-            }
-            else
-            {
-                $dataSave = array(
-                    'G_user' => 9,
-                );
-                $this->db->where('NIP',$NIP);
-                $this->db->update('db_reservation.previleges_guser', $dataSave);
-            }
+        // $sql = 'select NIP,Name from db_employees.employees 
+        //         where SUBSTRING_INDEX(PositionMain,".",-1) = 6 and Status = "1" ';
+        // $query=$this->db->query($sql, array())->result_array();
+        // // 3 administrative
+        // for ($i=0; $i < count($query); $i++) { 
+        //     $NIP = $query[$i]['NIP'];
+        //     // check NIP existing
+        //     $get = $this->m_master->caribasedprimary('db_reservation.previleges_guser','NIP',$NIP);
+        //     if (count($get) == 0) {
+        //         $dataSave = array(
+        //             'NIP' => $NIP,
+        //             'G_user' => 9,
+        //         );
+        //         $this->db->insert('db_reservation.previleges_guser', $dataSave);
+        //     }
+        //     else
+        //     {
+        //         $dataSave = array(
+        //             'G_user' => 9,
+        //         );
+        //         $this->db->where('NIP',$NIP);
+        //         $this->db->update('db_reservation.previleges_guser', $dataSave);
+        //     }
 
-        }
+        // }
+
+
+        //$sql = 'select'
 
     }
 
