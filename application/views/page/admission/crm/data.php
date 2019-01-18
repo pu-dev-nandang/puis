@@ -201,9 +201,6 @@
 					var token = jwt_encode(data,'UAP)(*');
 					$.post(url,{token : token},function(a,b,c){
 						loadtable();
-						console.log(a);
-						console.log(b);
-						console.log(c);
 					})
 				}
 			})
