@@ -583,9 +583,18 @@ class C_global extends CI_Controller {
                                 
                                 // send email to approval 2 and user
                                     // send email to approval 2
+
+                                        $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','Room',$t_booking[0]['Room']);
+                                        $CategoryRoomByRoom = $getRoom[0]['ID_CategoryRoom'];
+                                        $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
+                                        $Approver2 = $getDataCategoryRoom[0]['Approver2'];
+                                        $Approver2 = json_decode($Approver2);
+                                        $getApprover2 = $this->m_master->caribasedprimary('db_employees.division','ID',$Approver2[0]);
+                                        $EmailApprover2 = $getApprover2[0]['Email'];
+
                                         $token = array(
-                                            'EmailPU' => 'ga@podomorouniversity.ac.id',
-                                            'Code' => 8,
+                                            'EmailPU' => $EmailApprover2,
+                                            'Code' => $Approver2[0],
                                             'ID_t_booking' => $data_arr['ID_t_booking'],
                                             'approvalNo' => 2,
                                             'Email_add_person' => $Email_add_person,
@@ -596,8 +605,8 @@ class C_global extends CI_Controller {
                                         $token = $this->jwt->encode($token,'UAP)(*');
                                         if($_SERVER['SERVER_NAME']!='localhost') {
                                             // email to ga
-                                            $Email = 'ga@podomorouniversity.ac.id';
-                                            $text = 'Dear GA Team,<br><br>
+                                            $Email = $EmailApprover2;
+                                            $text = 'Dear Team,<br><br>
                                                         Please help to approve Venue Reservation,<br><br>
                                                         Details Schedule : <br><ul>
                                                         <li>Start  : '.$StartNameDay.', '.$t_booking[0]['Start'].'</li>
@@ -634,7 +643,7 @@ class C_global extends CI_Controller {
                                         else
                                         {
                                             $Email = 'alhadi.rahman@podomorouniversity.ac.id';
-                                            $text = 'Dear GA Team,<br><br>
+                                            $text = 'Dear Team,<br><br>
                                                         Please help to approve Venue Reservation,<br><br>
                                                         Details Schedule : <br><ul>
                                                         <li>Start  : '.$StartNameDay.', '.$t_booking[0]['Start'].'</li>
