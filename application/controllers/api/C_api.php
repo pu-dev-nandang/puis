@@ -3148,15 +3148,11 @@ class C_api extends CI_Controller {
                         $this->db->where('ID', $ArrToApproveAll[$i]);
                         $this->db->update('db_academic.std_krs',$arrUpdate);
 
-
                         // Insert Logging
                         $Log_dataInsert = (array) $ArrToApproveAll_Logging[$i];
 
                         $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
                         $insert_id = $this->db->insert_id();
-
-                        $Log_dataUser = $this->db->select('NIP')->get_where('db_employees.rule_users',
-                            array('IDDivision' => '6'))->result_array();
 
                         $Log_arr_ins = array(
                             'IDLogging' => $insert_id,
@@ -3180,20 +3176,6 @@ class C_api extends CI_Controller {
                             }
                         }
 
-
-                        if(count($Log_dataUser)>0){
-
-                            for($l=0;$l<count($Log_dataUser);$l++){
-                                $d = $Log_dataUser[$l]['NIP'];
-                                $Log_arr_ins = array(
-                                    'IDLogging' => $insert_id,
-                                    'UserID' => $d
-                                );
-                                $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
-                            }
-
-                        }
-
                     }
 
                 }
@@ -3208,32 +3190,27 @@ class C_api extends CI_Controller {
                 $this->db->where('ID', $data_arr['ID']);
                 $this->db->update('db_academic.std_krs',$arrUpdate);
 
-
-
                 // Insert Logging
                 $Log_dataInsert = (array) $data_arr['Logging'];
                 $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
                 $insert_id = $this->db->insert_id();
 
-                $Log_dataUser = $this->db->select('NIP')->get_where('db_employees.rule_users',
-                    array('IDDivision' => '6'))->result_array();
-
                 $Log_arr_ins = array(
                     'IDLogging' => $insert_id,
                     'UserID' => $data_arr['NPM']
                 );
+
+                // Send Notif To Kaprodi
+
                 $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
 
-                if(count($Log_dataUser)>0){
-                    for($i=0;$i<count($Log_dataUser);$i++){
-                        $d = $Log_dataUser[$i]['NIP'];
-                        $Log_arr_ins = array(
-                            'IDLogging' => $insert_id,
-                            'UserID' => $d
-                        );
-                        $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
-                    }
-                }
+                // Cek Kaprodi
+                $dataKaprodi = $this->db->select('KaprodiID')->get_where('db_academic.program_study',array('ID' => $data_arr['ProdiID']))->result_array();
+                $Log_arr_ins_KA = array(
+                    'IDLogging' => $insert_id,
+                    'UserID' => $dataKaprodi[0]['KaprodiID']
+                );
+                $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins_KA);
 
                 return print_r(1);
             }
@@ -6855,7 +6832,7 @@ class C_api extends CI_Controller {
             $dataSearch = ' AND ( auts.Name LIKE "%'.$search.'%" OR auts.NPM LIKE "%'.$search.'%") ';
         }
 
-        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, ps.NameEng AS Prodi, ss.Description AS StatusStudent  
+        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent  
                               FROM db_academic.mentor_academic ma
                               LEFT JOIN db_academic.auth_students auts ON (ma.NPM = auts.NPM)
                               LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
@@ -6885,7 +6862,7 @@ class C_api extends CI_Controller {
             // Semester
             $Semester = $this->m_api->getSemesterStudentByYear($data_arr['SemesterID'],$row['Year']);
 
-            $token_npm = $this->jwt->encode(array('SemesterID' => $data_arr['SemesterID'],'NPM' => $row['NPM']),'UAP)(*');
+            $token_npm = $this->jwt->encode(array('SemesterID' => $data_arr['SemesterID'],'NPM' => $row['NPM'],'ProdiGroupID' => $row['ProdiGroupID']),'UAP)(*');
             $btn = ($data_arr['Status']!='' && $data_arr['Status']==3) ? '<a href="'.url_sign_in_lecturers.'krs-online/list-student/approved-mentor/'.$token_npm.'" class="btn btn-sm btn-default">
                         <i class="fa fa-edit"></i>
                       </a>' : '-';
@@ -6967,7 +6944,7 @@ class C_api extends CI_Controller {
             $dataSearch = ' AND ( auts.Name LIKE "%'.$search.'%" OR auts.NPM LIKE "%'.$search.'%") ';
         }
 
-        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, ps.NameEng AS Prodi, ss.Description AS StatusStudent, em.Name AS MentorName,   
+        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent, em.Name AS MentorName,   
                               ma.NIP AS MentorNIP
                               FROM  db_academic.auth_students auts 
                               LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
@@ -7044,7 +7021,7 @@ class C_api extends CI_Controller {
                 $course = '-';
             }
 
-            $token_npm = $this->jwt->encode(array('SemesterID' => $data_arr['SemesterID'],'NPM' => $row['NPM']),'UAP)(*');
+            $token_npm = $this->jwt->encode(array('SemesterID' => $data_arr['SemesterID'],'NPM' => $row['NPM'], 'ProdiGroupID' => $row['ProdiGroupID']),'UAP)(*');
             $btn = ($data_arr['Status']!='' && $data_arr['Status']==3) ? '<a href="'.url_sign_in_lecturers.'krs-online/list-student/approved-kaprodi/'.$token_npm.'" class="btn btn-sm btn-default">
                         <i class="fa fa-edit"></i>
                       </a>' : '-';
