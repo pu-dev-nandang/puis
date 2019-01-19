@@ -3749,12 +3749,15 @@ class M_api extends CI_Model {
 
         $data = $this->db->query('SELECT s.ID, s.SemesterID, s.TeamTeaching, s.ClassGroup, 
                                             cd.ID AS CDID, cd.MKType, cd.Semester ,cd.TotalSKS AS Credit, cd.StatusPrecondition, cd.DataPrecondition, 
-                                            mk.ID AS MKID, mk.MKCode, mk.Name AS MKName, mk.NameEng AS MKNameEng
+                                            mk.ID AS MKID, mk.MKCode, mk.Name AS MKName, mk.NameEng AS MKNameEng,
+                                            sdc.ProdiGroupID, pg.Code AS ProdiGroup
                                             FROM db_academic.schedule_details_course sdc
+                                            LEFT JOIN db_academic.prodi_group pg ON (pg.ID = sdc.ProdiGroupID)
                                             LEFT JOIN db_academic.schedule s ON (s.ID = sdc.ScheduleID)
                                             LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                             LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
-                                            WHERE sdc.CDID = "'.$CDID.'" AND s.SemesterID = "'.$SemesterID.'"')->result_array();
+                                            WHERE sdc.CDID = "'.$CDID.'" 
+                                            AND s.SemesterID = "'.$SemesterID.'"')->result_array();
 
         $result = [];
         if(count($data)>0){
