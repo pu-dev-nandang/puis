@@ -1,6 +1,3 @@
-<!-- <link href="<?php echo base_url('assets/custom/jquery-ui.css'); ?>" rel="stylesheet" type="text/css" /> -->
-<!-- <script type="text/javascript" src="<?php echo base_url();?>assets/datepicker/bootstrap-datepicker.js"></script>
-<link href="<?php echo base_url();?>assets/datepicker/datepicker.css" rel="stylesheet" type="text/css"/> -->
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
 <style type="text/css">
 	/*.form-horizontal .control-label {
@@ -11,6 +8,11 @@
 	    background-color: #f9f9f9;
 	    border-color: #bbce3b;
 	}*/
+  #tableData3.dataTable tbody tr:hover {
+     background-color:#71d1eb !important;
+     cursor: pointer;
+  }
+ 
 </style>
 <div class="row" style="margin-top: 30px;">      
       <div class="col-md-12">

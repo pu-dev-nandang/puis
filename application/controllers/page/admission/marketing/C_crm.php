@@ -12,6 +12,7 @@ class C_crm extends Admission_Controler {
         $this->load->model('m_sendemail');
         $this->data['department'] = parent::__getDepartement(); 
         $this->load->model('m_api');
+        $this->load->model('marketing/m_marketing');
         $this->data['NameMenu'] = $this->GlobalData['NameMenu'];
     }
 
