@@ -89,15 +89,16 @@
 
 <script>
     $(document).ready(function () {
-       window.SemesterIDinKRS = "<?php echo $SemesterID; ?>";
-       window.NPMinKRS = "<?php echo $NPM; ?>";
+        window.SemesterIDinKRS = "<?php echo $SemesterID; ?>";
+        window.NPMinKRS = "<?php echo $NPM; ?>";
+        window.ProdiGroupID = "<?php echo $ProdiGroupID; ?>";
 
-       var loadFirst = setInterval(function (args) {
-           if(SemesterIDinKRS!='' && NPMinKRS!=''){
-               loadAvailable();
-               clearInterval(loadFirst);
-           }
-       },1000);
+        var loadFirst = setInterval(function (args) {
+            if(SemesterIDinKRS!='' && NPMinKRS!=''){
+                loadAvailable();
+                clearInterval(loadFirst);
+            }
+        },1000);
 
     });
 
@@ -157,9 +158,16 @@
 
                     var d = Course[t];
 
-                        var draf = CourseDraf.findIndex(x => x.ScheduleID === d.ID);
+                    var draf = CourseDraf.findIndex(x => x.ScheduleID === d.ID);
 
-                        if(draf!=-1){
+                    var trueProdi = true;
+                    if(ProdiGroupID!='' && ProdiGroupID!=null && ProdiGroupID!='-' && ProdiGroupID == d.ProdiGroupID){
+                        trueProdi = true;
+                    } else if(ProdiGroupID!='' && ProdiGroupID!=null && ProdiGroupID!='-' && ProdiGroupID != d.ProdiGroupID){
+                        trueProdi = false;
+                    }
+
+                    if(draf!=-1 && trueProdi==true){
 
                         var viewSchedule = '';
                         var detailSchedule = d.ScheduleDetails;
@@ -190,7 +198,7 @@
 
 
                 }
-            } 
+            }
             else {
                 $('#dataRowDraf').append('<tr>' +
                     '<td colspan="7">--- Data not yrt ---</td>' +
@@ -406,7 +414,7 @@
 
     // === Delete KRS ====
     $(document).on('click','.btnDelete',function () {
-        
+
         if(confirm('Delete this course?')){
             var SKID = $(this).attr('data-id');
             var data = {
@@ -420,9 +428,9 @@
                 loadAvailable();
             });
         }
-        
+
     });
-    
-    
+
+
 
 </script>
