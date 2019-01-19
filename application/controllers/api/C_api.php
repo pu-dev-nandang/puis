@@ -6710,7 +6710,7 @@ class C_api extends CI_Controller {
                                     OR auts.Name '.$wl.')';
         }
 
-        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, em.Name AS MentorName, em.NIP AS MentorNIP 
+        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, em.Name AS MentorName, em.NIP AS MentorNIP 
                                           FROM db_academic.auth_students auts 
                                           LEFT JOIN db_academic.mentor_academic mac ON (mac.NPM = auts.NPM)
                                           LEFT JOIN db_employees.employees em ON (em.NIP = mac.NIP)
@@ -6784,8 +6784,9 @@ class C_api extends CI_Controller {
             $BPPPay = ($BPPPay_Status!='' && $BPPPay_Status!='0' && $BPPPay_Status!=0) ? '<i class="fa fa-check" style="color: green;"></i>' : '-';
             $CreditPay = ($CreditPay_Status!='' && $CreditPay_Status!='0' && $CreditPay_Status!=0) ? '<i class="fa fa-check" style="color: green;"></i>' : '-';
 
+            $ProdiGroupID = ($row['ProdiGroupID']!='' && $row['ProdiGroupID']!=null) ? $row['ProdiGroupID'] : '-';
             $btnAction = ($BPPPay_Status!='' && $BPPPay_Status!='0' && $BPPPay_Status!=0)
-                ? '<a href="'.base_url('academic/study-planning/course-offer/'.$data_arr['SemesterID'].'/'.$row['NPM']).'" class="btn btn-sm btn-default btn-default-primary"><i class="fa fa-pencil"></i></a>'
+                ? '<a href="'.base_url('academic/study-planning/course-offer/'.$data_arr['SemesterID'].'/'.$ProdiGroupID.'/'.$row['NPM']).'" class="btn btn-sm btn-default btn-default-primary"><i class="fa fa-pencil"></i></a>'
                 : '<span style="color: red;">BPP Unpaid</span>';
 
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
