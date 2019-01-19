@@ -366,7 +366,7 @@ class C_api extends CI_Controller {
         }
 
         $totalData = $this->db->get_where($db_.'.students',$arryWhere
-                )->result_array();
+        )->result_array();
 
         $sql = 'SELECT s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, s.StatusStudentID, 
                           ss.Description AS StatusStudent, ast.Password, ast.Password_Old, ast.Status AS StatusAuth, 
@@ -460,7 +460,7 @@ class C_api extends CI_Controller {
         }
 
         $totalData = $this->db->get_where($db_.'.students',$arryWhere
-                )->result_array();
+        )->result_array();
 
         $sql = 'SELECT asx.FormulirCode, s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, s.StatusStudentID, 
                           ss.Description AS StatusStudent, ast.Password, ast.Password_Old, ast.Status AS StatusAuth, 
@@ -521,7 +521,7 @@ class C_api extends CI_Controller {
             //                         <li role="separator" class="divider"></li>
             //                         <li><a href="javascript:void(0);" class="btn-reset-password " data-npm="'.$row["NPM"].'" data-name="'.$row["Name"].'" data-statusid="'.$row['StatusStudentID'].'">Reset Password</a></li>
             //                         <li><a href="javascript:void(0);" class="btn-change-status " data-emailpu="'.$row["EmailPU"].'" data-year="'.$dataYear.'" data-npm="'.$row["NPM"].'" data-name="'.$row["Name"].'" data-statusid="'.$row['StatusStudentID'].'">Change Status</a></li>
-                                    
+
             //                       </ul>
             //                     </div>';
 //            $nestedData[] = $row["ProdiNameEng"];
@@ -929,8 +929,8 @@ class C_api extends CI_Controller {
 
                 // Cek apakah data NPM ada di auth_students
                 $dataAuth = $this->db->get_where('db_academic.auth_students',array(
-                                                    'NPM' => $data_arr['NPM']
-                                                ),1)->result_array();
+                    'NPM' => $data_arr['NPM']
+                ),1)->result_array();
 
 
                 $statusLogin = ($data_arr['StatusID']=='3') ? '1' : '0';
@@ -1257,7 +1257,7 @@ class C_api extends CI_Controller {
 
                 // Get Attendance
                 $dataAttd = $this->db->get_where('db_academic.attendance',
-                            array('ScheduleID' => $ID))->result_array();
+                    array('ScheduleID' => $ID))->result_array();
 
                 // Delete Attendance Students
                 $this->db->delete('db_academic.attendance_students',array('ID_Attd' => $dataAttd[0]['ID']));
@@ -1406,7 +1406,7 @@ class C_api extends CI_Controller {
                 $dataG = $this->db->query('SELECT s.ID FROM db_academic.schedule s 
                                                 WHERE s.ClassGroup LIKE "'.$data_arr['Group'].'" 
                                                 AND s.SemesterID = "'.$data_arr['SemesterID'].'" ')
-                                            ->result_array();
+                    ->result_array();
                 return print_r(json_encode($dataG));
             }
 
@@ -1766,9 +1766,9 @@ class C_api extends CI_Controller {
                 // Cek student yang sudah ngambil siapa aja lalu insert semua
                 // Get Student
                 $data_attd = $this->db->select('ID')->get_where('db_academic.attendance',array(
-                    'SemesterID' => $data_arr['SemesterID'],
-                    'ScheduleID' => $data_arr['ScheduleID'])
-                ,1)->result_array();
+                        'SemesterID' => $data_arr['SemesterID'],
+                        'ScheduleID' => $data_arr['ScheduleID'])
+                    ,1)->result_array();
 
                 $dataStudnet = $this->db->select('NPM')->get_where('db_academic.attendance_students',array('ID_Attd'=> $data_attd[0]['ID']))->result_array();
 
@@ -1798,7 +1798,7 @@ class C_api extends CI_Controller {
                         'SemesterID' => $data_arr['SemesterID'],
                         'ScheduleID' => $data_arr['ScheduleID'],
                         'SDID' => $data_arr['SDID']
-                        )
+                    )
                     ,1)->result_array();
 
                 $this->db->where('ID_Attd', $data_attd[0]['ID']);
@@ -2338,7 +2338,7 @@ class C_api extends CI_Controller {
                 for($s=0;$s<count($dataC);$s++){
                     $br = ($s!=0) ? '' : '';
                     $viewCourse = $viewCourse.''.$br.''.$dataC[$s]['MKCode'].' - '.$dataC[$s]['CourseEng'].
-                            '<br/><p style="font-size:12px;color: #009688;">Group : <b>'.$dataC[$s]['ClassGroup'].
+                        '<br/><p style="font-size:12px;color: #009688;">Group : <b>'.$dataC[$s]['ClassGroup'].
                         '</b> | <i class="fa fa-user margin-right"></i> '.$dataC[$s]['Lecturer'].'</p>';
 
                     // Get Students
@@ -2404,7 +2404,7 @@ class C_api extends CI_Controller {
             "data"            => $data
         );
         echo json_encode($json_data);
-        
+
     }
 
     public function checkSchedule(){
@@ -2672,26 +2672,26 @@ class C_api extends CI_Controller {
 
     public function uploadFfile($name)
     {
-         // upload file
-         $filename = md5($name);
-         $config['upload_path']   = './uploads/vreservation/';
-         $config['overwrite'] = TRUE; 
-         $config['allowed_types'] = '*'; 
-         $config['file_name'] = $filename;
-         //$config['max_size']      = 100; 
-         //$config['max_width']     = 300; 
-         //$config['max_height']    = 300;  
-         $this->load->library('upload', $config);
-            
-         if ( ! $this->upload->do_upload('fileData')) {
-            return $error = $this->upload->display_errors(); 
-            //$this->load->view('upload_form', $error); 
-         }
-            
-         else { 
-           return $data =  $this->upload->data(); 
-            //$this->load->view('upload_success', $data); 
-         }
+        // upload file
+        $filename = md5($name);
+        $config['upload_path']   = './uploads/vreservation/';
+        $config['overwrite'] = TRUE;
+        $config['allowed_types'] = '*';
+        $config['file_name'] = $filename;
+        //$config['max_size']      = 100;
+        //$config['max_width']     = 300;
+        //$config['max_height']    = 300;
+        $this->load->library('upload', $config);
+
+        if ( ! $this->upload->do_upload('fileData')) {
+            return $error = $this->upload->display_errors();
+            //$this->load->view('upload_form', $error);
+        }
+
+        else {
+            return $data =  $this->upload->data();
+            //$this->load->view('upload_success', $data);
+        }
     }
 
     public function crudClassroomVreservation(){
@@ -2745,7 +2745,7 @@ class C_api extends CI_Controller {
                 }
                 $file = array('Layout' => $filename);
                 $formData = $formData + $file;
-                
+
                 $ID = $data_arr['ID'];
                 $this->db->where('ID', $ID);
                 $this->db->update('db_academic.classroom',$formData);
@@ -3005,9 +3005,9 @@ class C_api extends CI_Controller {
         $dataRes = [];
         for($i=0;$i<count($data);$i++){
             $arrp = array(
-               'ID' => $data[$i]['ID'],
-               'label' => $data[$i]['ClassGroup'],
-               'value' => $data[$i]['ClassGroup']
+                'ID' => $data[$i]['ID'],
+                'label' => $data[$i]['ClassGroup'],
+                'value' => $data[$i]['ClassGroup']
             );
             array_push($dataRes,$arrp);
         }
@@ -4047,7 +4047,7 @@ class C_api extends CI_Controller {
                             'ExamID' => $insert_exam_id,
                             'ScheduleID' => $ds['ScheduleID']
                         )
-                    ,1)->result_array();
+                        ,1)->result_array();
 
                     $ds['ExamID'] = $insert_exam_id;
                     $ds['ExamGroupID'] = $dg[0]['ID'];
@@ -4092,15 +4092,15 @@ class C_api extends CI_Controller {
                     $Division = $PositionMain[0];
                     if ($Position == 6 || $Division == 15) {
                         if ($Division == 15) {
-                             for($i=0;$i<count($ProdiArr);$i++){
-                                 // update Per ID Prodi
-                                 $dataSave = array(
-                                     'AdminID' => $NIP,
-                                 );
-                                 $this->db->where('ID', $ProdiArr[$i]);
-                                 $this->db->update('db_academic.program_study',$dataSave);
+                            for($i=0;$i<count($ProdiArr);$i++){
+                                // update Per ID Prodi
+                                $dataSave = array(
+                                    'AdminID' => $NIP,
+                                );
+                                $this->db->where('ID', $ProdiArr[$i]);
+                                $this->db->update('db_academic.program_study',$dataSave);
 
-                             }   
+                            }
                         }
                         else
                         {
@@ -4115,7 +4115,7 @@ class C_api extends CI_Controller {
                             }
                         }
                     }
-                    
+
                     // insert to db venue for user access
                     $dataSave = array(
                         'NIP' => $NIP,
@@ -4145,47 +4145,47 @@ class C_api extends CI_Controller {
                 $this->db->update('db_employees.employees',$formUpdate);
 
                 // check fill admin Prodi / Ka prodi
-                    $PositionMain = $formUpdate['PositionMain'];
-                    $PositionMain = explode('.', $PositionMain);
-                    $Position = $PositionMain[1];
-                    $Division = $PositionMain[0];
-                    if ($Position == 6 || $Division == 15) {
-                        $ProdiArr = (array) $data_arr['arr_Prodi'];
-                        if ($Division == 15) {
-                                $dataSave = array(
-                                    'AdminID' => null,
-                                );
-                                $this->db->where('AdminID', $data_arr['NIP']);
-                                $this->db->update('db_academic.program_study',$dataSave);
-                                    for($i=0;$i<count($ProdiArr);$i++){
-                                        // update Per ID Prodi
-                                        $dataSave = array(
-                                            'AdminID' => $data_arr['NIP'],
-                                        );
-                                        $this->db->where('ID', $ProdiArr[$i]);
-                                        $this->db->update('db_academic.program_study',$dataSave);
-
-                                    }
-                        }
-                        else
-                        {
-
+                $PositionMain = $formUpdate['PositionMain'];
+                $PositionMain = explode('.', $PositionMain);
+                $Position = $PositionMain[1];
+                $Division = $PositionMain[0];
+                if ($Position == 6 || $Division == 15) {
+                    $ProdiArr = (array) $data_arr['arr_Prodi'];
+                    if ($Division == 15) {
+                        $dataSave = array(
+                            'AdminID' => null,
+                        );
+                        $this->db->where('AdminID', $data_arr['NIP']);
+                        $this->db->update('db_academic.program_study',$dataSave);
+                        for($i=0;$i<count($ProdiArr);$i++){
+                            // update Per ID Prodi
                             $dataSave = array(
-                                'KaprodiID' => null,
+                                'AdminID' => $data_arr['NIP'],
                             );
-                            $this->db->where('KaprodiID', $data_arr['NIP']);
+                            $this->db->where('ID', $ProdiArr[$i]);
                             $this->db->update('db_academic.program_study',$dataSave);
-                                for($i=0;$i<count($ProdiArr);$i++){
-                                    // update Per ID Prodi
-                                    $dataSave = array(
-                                        'KaprodiID' => $data_arr['NIP'],
-                                    );
-                                    $this->db->where('ID', $ProdiArr[$i]);
-                                    $this->db->update('db_academic.program_study',$dataSave);
 
-                                }
                         }
                     }
+                    else
+                    {
+
+                        $dataSave = array(
+                            'KaprodiID' => null,
+                        );
+                        $this->db->where('KaprodiID', $data_arr['NIP']);
+                        $this->db->update('db_academic.program_study',$dataSave);
+                        for($i=0;$i<count($ProdiArr);$i++){
+                            // update Per ID Prodi
+                            $dataSave = array(
+                                'KaprodiID' => $data_arr['NIP'],
+                            );
+                            $this->db->where('ID', $ProdiArr[$i]);
+                            $this->db->update('db_academic.program_study',$dataSave);
+
+                        }
+                    }
+                }
 
                 return print_r(1);
 
@@ -4421,7 +4421,7 @@ class C_api extends CI_Controller {
                 $ID = $data_arr['ID'];
                 $No = $data_arr['No'];
                 $data = $this->db->get_where('db_academic.attendance',
-                            array('ID'=>$ID))->result_array();
+                    array('ID'=>$ID))->result_array();
 
 
                 $coor = $this->db->query('SELECT em.NIP,em.Name FROM db_academic.schedule s 
@@ -4463,7 +4463,7 @@ class C_api extends CI_Controller {
                         'ID_Attd' => $insertAttdLecturer['ID_Attd'],
                         'NIP' => $insertAttdLecturer['NIP'],
                         'Meet' => $insertAttdLecturer['Meet']
-                        ),1)->result_array();
+                    ),1)->result_array();
 
                 if(count($dataAttdLec)<=0){
                     $this->db->insert('db_academic.attendance_lecturers',(array) $data_arr['insertAttdLecturer']);
@@ -4509,7 +4509,7 @@ class C_api extends CI_Controller {
                     );
                     $data = $this->db->order_by('ClassGroup', 'ASC')
                         ->get_where('db_academic.schedule',
-                        $data_where)->result_array();
+                            $data_where)->result_array();
 
                     $result = $data;
                 }
@@ -4730,7 +4730,7 @@ class C_api extends CI_Controller {
                 );
 
                 $dataC = $this->db->get_where('db_academic.schedule_exchange',
-                                $dataWhere,1)->result_array();
+                    $dataWhere,1)->result_array();
 
                 if(count($dataC)>0){
                     $dataUpdate = array(
@@ -4821,15 +4821,15 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action']=='deleteKRS'){
 
-             $SemesterID = $data_arr['SemesterID'];
-             $ScheduleID = $data_arr['ScheduleID'];
-             $NPM = $data_arr['NPM'];
-             $Student_DB = $data_arr['Student_DB'];
+                $SemesterID = $data_arr['SemesterID'];
+                $ScheduleID = $data_arr['ScheduleID'];
+                $NPM = $data_arr['NPM'];
+                $Student_DB = $data_arr['Student_DB'];
 
-             // Cek di attendance untuk di delete
+                // Cek di attendance untuk di delete
                 $dataAttd = $this->db->get_where('db_academic.attendance',
-                        array('SemesterID' => $SemesterID,
-                            'ScheduleID' => $ScheduleID))->result_array();
+                    array('SemesterID' => $SemesterID,
+                        'ScheduleID' => $ScheduleID))->result_array();
 
                 if(count($dataAttd)>0){
                     for($a=0;$a<count($dataAttd);$a++){
@@ -4906,7 +4906,7 @@ class C_api extends CI_Controller {
         $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
         $SemesterID = $SemesterID[0]['ID'];
         $getDeadlineTagihanDB = $this->m_finance->getDeadlineTagihanDB($fieldCek,$SemesterID);
-        $dateFieldCek = $getDeadlineTagihanDB.' 23:59:00';  
+        $dateFieldCek = $getDeadlineTagihanDB.' 23:59:00';
         $aaa = $this->m_master->chkTgl(date('Y-m-d H:i:s'),$dateFieldCek);
         if($aaa)
         {
@@ -4924,15 +4924,15 @@ class C_api extends CI_Controller {
     {
         $arr = array();
         try {
-          $input = $this->getInputToken();
-          $NPM = $input['NPM'];
-          $arr = $this->m_api->cek_deadline_paymentNPM($NPM);
-          echo json_encode($arr);
+            $input = $this->getInputToken();
+            $NPM = $input['NPM'];
+            $arr = $this->m_api->cek_deadline_paymentNPM($NPM);
+            echo json_encode($arr);
         }
 
-        //catch exception
+            //catch exception
         catch(Exception $e) {
-          echo json_encode($arr);
+            echo json_encode($arr);
         }
 
     }
@@ -5031,7 +5031,7 @@ class C_api extends CI_Controller {
                 if(count($dataCourse)>0){
                     $dataCourse[0]['TotalProdi'] = count($dataDel);
                 }
-                
+
                 return print_r(json_encode($dataCourse));
             }
             else if($data_arr['action']=='delSDCGL'){
@@ -5057,11 +5057,11 @@ class C_api extends CI_Controller {
         $data_arr = $this->getInputToken();
         $start = $data_arr['time'];
         $aaa = explode(':', $start);
-        
+
         $arrHours = array();
         $endTime = '20';
         //$getHoursNow = date('H');
-        
+
         // $getHoursNow = (int)$aaa[0] + 1;
 
         $Start2 = date("H", strtotime($start));
@@ -5104,11 +5104,11 @@ class C_api extends CI_Controller {
         //print_r($endTime);die();
 
         // $getHoursNow = (int)$Start2 + 1;
-       
-        // for ($i=$getHoursNow; $i <= $endTime; $i++) { 
+
+        // for ($i=$getHoursNow; $i <= $endTime; $i++) {
         //         // check len
         //         $a = $i;
-        //         for ($j=0; $j < 2 - strlen($i); $j++) { 
+        //         for ($j=0; $j < 2 - strlen($i); $j++) {
         //             $a = '0'.$a;
         //         }
         //         $d = $a.':30';
@@ -5120,7 +5120,7 @@ class C_api extends CI_Controller {
         //         }
         //  }
 
-        for ($i=0; $i < count($arr); $i++) { 
+        for ($i=0; $i < count($arr); $i++) {
             $arrHours[] = date("h:i a", strtotime($arr[$i]));
         }
 
@@ -5165,41 +5165,43 @@ class C_api extends CI_Controller {
         $chk = $this->m_reservation->checkBentrokScheduleAPI();
         if (!$chk['bool']) {
             // insert table to t_booking_delete
-                $this->load->model('m_sendemail');
-                // get data user
-                $get = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$chk['ID']);
-                $getUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$get[0]['CreatedBy']);
+            $this->load->model('m_sendemail');
+            // get data user
+            $get = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$chk['ID']);
+            $getUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$get[0]['CreatedBy']);
 
-                $dataSave = array(
-                    'Start' => $get[0]['Start'],
-                    'End' => $get[0]['End'],
-                    'Time' => $get[0]['Time'],
-                    'Colspan' => $get[0]['Colspan'],
-                    'Agenda' => $get[0]['Agenda'],
-                    'Room' => $get[0]['Room'],
-                    'ID_equipment_add' => $get[0]['ID_equipment_add'],
-                    'ID_add_personel' => $get[0]['ID_add_personel'],
-                    'Req_date' => $get[0]['Req_date'],
-                    'CreatedBy' => $get[0]['CreatedBy'],
-                    'ID_t_booking' => $get[0]['ID'],
-                    'Note_deleted' => 'Conflict',
-                    'DeletedBy' => 0,
-                    'Req_layout' => $get[0]['Req_layout'],
-                    'Status' => $get[0]['Status'],
-                    'MarcommSupport' => $get[0]['MarcommSupport'],
-                );
-                $this->db->insert('db_reservation.t_booking_delete', $dataSave); 
+            $dataSave = array(
+                'Start' => $get[0]['Start'],
+                'End' => $get[0]['End'],
+                'Time' => $get[0]['Time'],
+                'Colspan' => $get[0]['Colspan'],
+                'Agenda' => $get[0]['Agenda'],
+                'Room' => $get[0]['Room'],
+                'ID_equipment_add' => $get[0]['ID_equipment_add'],
+                'ID_add_personel' => $get[0]['ID_add_personel'],
+                'Req_date' => $get[0]['Req_date'],
+                'CreatedBy' => $get[0]['CreatedBy'],
+                'ID_t_booking' => $get[0]['ID'],
+                'Note_deleted' => 'Conflict',
+                'DeletedBy' => 0,
+                'Req_layout' => $get[0]['Req_layout'],
+                'Status' => $get[0]['Status'],
+                'MarcommSupport' => $get[0]['MarcommSupport'],
+            );
+            $this->db->insert('db_reservation.t_booking_delete', $dataSave);
+
 
                 $this->m_master->delete_id_table_all_db($get[0]['ID'],'db_reservation.t_booking');
                 $this->m_master->delete_id_table_all_db($get[0]['ID'],'db_reservation.t_booking_eq_additional');
 
             // send email and update notification
-                // broadcase update js
+            // broadcase update js
             if($_SERVER['SERVER_NAME'] =='localhost') {
                 $client = new Client(new Version1X('//10.1.10.230:3000'));
             }
             else{
                 $client = new Client(new Version1X('//10.1.30.17:3000'));
+
             }    
                 $client->initialize();
                 // send message to connected clients
@@ -5243,6 +5245,7 @@ class C_api extends CI_Controller {
                 // send email
                 $Email = $getUser[0]['EmailPU'];
                 $text = 'Dear '.$getUser[0]['Name'].',<br><br>
+
                             Your Venue Reservation was conflict,<br><br>
                             <strong>Your schedule automated delete by System</strong>,<br><br>
                             Details Schedule : <br><ul>
@@ -5253,14 +5256,14 @@ class C_api extends CI_Controller {
                             <br>
                             Please Create new schedule, if you need it and '.$sg_room.' <br>
                             
-                        ';        
-                $to = $Email;
-                $subject = "Podomoro University Venue Reservation";
-                $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                        ';
+            $to = $Email;
+            $subject = "Podomoro University Venue Reservation";
+            $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
 
 
-                // send email to Adum
-                $text = 'Dear Team,<br><br>
+            // send email to Adum
+            $text = 'Dear Team,<br><br>
                             Venue Reservation was conflict,<br><br>
                             <strong>The schedule automated delete by System</strong>,<br><br>
                             Details Schedule : <br><ul>
@@ -5273,12 +5276,12 @@ class C_api extends CI_Controller {
                             Please Create new schedule, if you need it and '.$sg_room.' <br>
                             
                         ';
-                $eAdum = $this->m_master->caribasedprimary('db_reservation.email_to','Ownership','Adum');                
-                $to = $eAdum[0]['Email'];
-                $subject = "Podomoro University Venue Reservation";
-                $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
-                
-                echo json_encode(0);
+            $eAdum = $this->m_master->caribasedprimary('db_reservation.email_to','Ownership','Adum');
+            $to = $eAdum[0]['Email'];
+            $subject = "Podomoro University Venue Reservation";
+            $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+
+            echo json_encode(0);
         }
         else
         {
@@ -5823,7 +5826,7 @@ class C_api extends CI_Controller {
 
             }
         }
-    }    
+    }
 
     public function getAllDepartementPU()
     {
@@ -5831,7 +5834,7 @@ class C_api extends CI_Controller {
         // $NA = $this->m_master->showData_array('db_employees.division');
         $NA = $this->m_master->caribasedprimary('db_employees.division','StatusDiv',1);
         $AC = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
-        for ($i=0; $i < count($NA); $i++) { 
+        for ($i=0; $i < count($NA); $i++) {
             $arr_result[] = array(
                 'Code'  => 'NA.'.$NA[$i]['ID'],
                 'Name1' => $NA[$i]['Description'],
@@ -5839,7 +5842,7 @@ class C_api extends CI_Controller {
             );
         }
 
-        for ($i=0; $i < count($AC); $i++) { 
+        for ($i=0; $i < count($AC); $i++) {
             $arr_result[] = array(
                 'Code'  => 'AC.'.$AC[$i]['ID'],
                 'Name1' => $AC[$i]['Name'],
@@ -6665,50 +6668,50 @@ class C_api extends CI_Controller {
                 $data = $this->m_master->showData_array('db_reservation.category_room');
                 for ($i=0; $i < count($data); $i++) {
                     if ($data[$i]['Approver1']) {
-                       $y= json_decode($data[$i]['Approver1']);
-                       $z = $data[$i]['Approver1'];
-                       $x = array();
-                       for ($l=0; $l < count($y); $l++) {
-                        // Find User Type
+                        $y= json_decode($data[$i]['Approver1']);
+                        $z = $data[$i]['Approver1'];
+                        $x = array();
+                        for ($l=0; $l < count($y); $l++) {
+                            // Find User Type
                             $UserType = $this->m_master->caribasedprimary('db_reservation.cfg_group_user','ID',$y[$l]->UserType);
                             $UserType = $UserType[0]['GroupAuth'];
 
-                        // cek Type Approver
+                            // cek Type Approver
                             $TypeApprover = $y[$l]->TypeApprover;
                             $ApproverGet = $y[$l]->Approver;
                             switch ($TypeApprover) {
-                                    case 'Division':
-                                        $Approver = $this->m_master->caribasedprimary('db_employees.division','ID',$ApproverGet);
-                                        $Approver = $Approver[0]['Division'];
-                                        break;
-                                    
-                                   case 'Position':
-                                       $Approver = $this->m_master->caribasedprimary('db_employees.position','ID',$ApproverGet);
-                                       $Approver = $Approver[0]['Position'];
-                                       break;
-                                    case 'Employees':
-                                        $Approver = $this->m_master->caribasedprimary('db_employees.employees','NIP',$ApproverGet);
-                                        $Approver = $Approver[0]['NIP'].' - '.$Approver[0]['Name'];
-                                        break;   
-                                       
-                                }    
+                                case 'Division':
+                                    $Approver = $this->m_master->caribasedprimary('db_employees.division','ID',$ApproverGet);
+                                    $Approver = $Approver[0]['Division'];
+                                    break;
 
-                        $tanda = ($l==0) ? '*   ' : '';
-                        $x[] = $tanda.$UserType.' -> '.$TypeApprover.' -> '.$Approver;
-                       }
-                       $data[$i]['Approver1'] = implode('<br>*  ', $x);
-                       $data[$i]['Approver1_ori'] = str_replace('"', "'", $z) ;
+                                case 'Position':
+                                    $Approver = $this->m_master->caribasedprimary('db_employees.position','ID',$ApproverGet);
+                                    $Approver = $Approver[0]['Position'];
+                                    break;
+                                case 'Employees':
+                                    $Approver = $this->m_master->caribasedprimary('db_employees.employees','NIP',$ApproverGet);
+                                    $Approver = $Approver[0]['NIP'].' - '.$Approver[0]['Name'];
+                                    break;
+
+                            }
+
+                            $tanda = ($l==0) ? '*   ' : '';
+                            $x[] = $tanda.$UserType.' -> '.$TypeApprover.' -> '.$Approver;
+                        }
+                        $data[$i]['Approver1'] = implode('<br>*  ', $x);
+                        $data[$i]['Approver1_ori'] = str_replace('"', "'", $z) ;
                     }
                     if ($data[$i]['Approver2']) {
-                       $y= json_decode($data[$i]['Approver2']);
-                       $x = array();
-                       for ($l=0; $l < count($y); $l++) {
-                        $Name = $this->m_master->caribasedprimary('db_employees.division','ID',$y[$l]);
-                        $tanda = ($l==0) ? '*   ' : '';
-                        $x[] = $tanda.$Name[0]['Division'];
-                       }
-                       $data[$i]['Approver2'] = implode('<br>*  ', $x);
-                       $data[$i]['Approver2_ori'] = $y;
+                        $y= json_decode($data[$i]['Approver2']);
+                        $x = array();
+                        for ($l=0; $l < count($y); $l++) {
+                            $Name = $this->m_master->caribasedprimary('db_employees.division','ID',$y[$l]);
+                            $tanda = ($l==0) ? '*   ' : '';
+                            $x[] = $tanda.$Name[0]['Division'];
+                        }
+                        $data[$i]['Approver2'] = implode('<br>*  ', $x);
+                        $data[$i]['Approver2_ori'] = $y;
                     }
                 }
 
@@ -6746,7 +6749,7 @@ class C_api extends CI_Controller {
             }
 
         }
-    }    
+    }
 
 
     public function getDataStudyPlanning(){
@@ -6794,7 +6797,7 @@ class C_api extends CI_Controller {
                                                             LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                                             WHERE sk.NPM = "'.$row['NPM'].'" AND sk.SemesterID = "'.$data_arr['SemesterID'].'"
                                                              GROUP BY sk.ScheduleID ORDER BY mk.MKCode ASC')
-                                    ->result_array();
+                ->result_array();
 
             $totalCreditSP = 0;
             $course = '';
@@ -7271,8 +7274,10 @@ class C_api extends CI_Controller {
                     'TransferTypeID' => $data_arr['TransferTypeID'],
                     'ClassOfBefore' => $data_arr['fromClassOf'],
                     'StatusBefore' => $StatusBefore,
+                    'ProdiBefore' => $data_arr['fromProdi'],
                     'Before' => $data_arr['fromStudent'],
                     'ClassOfAfter' => $data_arr['toClassOf'],
+                    'ProdiAfter' => $data_arr['toProdi'],
                     'After' => $data_arr['toNewNPM'],
                     'CreateBy' => $data_arr['CreateBy'],
                     'CreateAt' => $data_arr['CreateAt']
@@ -7321,7 +7326,14 @@ class C_api extends CI_Controller {
                 $TSID = $data_arr['TSID'];
 
                 // Get Data Transfer
-                $data = $this->db->get_where('db_academic.transfer_student',array('ID' => $TSID))->result_array();
+                $data = $this->db->query('SELECT ts.*, ps_b.Code AS CodeProdi_B,
+                                                      ps_a.Code AS CodeProdi_A, auth.Name AS StudentName
+                                                       FROM db_academic.transfer_student ts
+                                                      LEFT JOIN db_academic.program_study ps_b ON (ps_b.ID = ts.ProdiBefore)
+                                                      LEFT JOIN db_academic.program_study ps_a ON (ps_a.ID = ts.ProdiAfter)
+                                                      LEFT JOIN db_academic.auth_students auth ON (auth.NPM = ts.After)
+                                                      WHERE ts.ID = "'.$TSID.'" LIMIT 1
+                                                      ')->result_array();
 
                 if(count($data)>0){
                     $dt = $data[0];
@@ -7360,13 +7372,130 @@ class C_api extends CI_Controller {
                         }
                     }
 
+
+
+                    // Get Semester After
+                    $C_O_After = $dt['ClassOfAfter'];
+                    $DB_A = 'ta_'.$dt['ClassOfAfter'];
+                    $NPM_A = $dt['After'];
+
+                    // Get MHSWID
+                    $dataMhsw = $this->db->select('ID')->get_where($DB_A.'.students',array('NPM' => $NPM_A))->result_array();
+                    $data[0]['MhswID'] = $dataMhsw[0]['ID'];
+
+                    $dSem_A = $this->db->get_where('db_academic.semester',array('Year >=' => $C_O_After))->result_array();
+                    $arrSemester_A = [];
+                    $NoSem_A = 0;
+                    if(count($dSem_A)>0){
+                        for($i=0;$i<count($dSem_A);$i++){
+                            $dt_s = $dSem_A[$i];
+                            $NoSem_A ++;
+
+                            $System = ($dt_s['ID']>=13) ? 1 : 0;
+                            $course = $this->m_rest->getDataKHS($DB_A,$NPM_A,$dt_s['ID'],'',$System);
+
+                            $arr = array(
+                                'Semester' => $NoSem_A,
+                                'SemesterID' => $dt_s['ID'],
+                                'SemesterName' => $dt_s['Name'],
+                                'Course' => $course
+                            );
+
+                            array_push($arrSemester_A,$arr);
+
+                            if($dt_s['Status']==1 || $dt_s['Status']=='1'){
+                                break;
+                            }
+
+
+                        }
+
+                    }
+
                     $result = array(
-                        'Before' => $arrSemester_B
+                        'DataTransfer' => $data,
+                        'Before' => $arrSemester_B,
+                        'After' => $arrSemester_A
                     );
                 }
 
 
-            return print_r(json_encode($result));
+                return print_r(json_encode($result));
+
+            }
+            else if($data_arr['action']=='getCourseTransferStudent'){
+
+                $ClassOf = $data_arr['ClassOf'];
+                $Semester = $data_arr['Semester'];
+                $ProdiID = $data_arr['ProdiID'];
+
+                $dataCourse = $this->db->query('SELECT cd.ID AS CDID, cd.MKID, cd.TotalSKS AS Credit, mk.MKCode, mk.Name, mk.NameEng  
+                                                                FROM db_academic.curriculum_details cd
+                                                                LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
+                                                                LEFT JOIN db_academic.curriculum c ON (c.ID =  cd.CurriculumID)
+                                                                WHERE cd.Semester = "'.$Semester.'" 
+                                                                 AND c.Year = "'.$ClassOf.'" 
+                                                                 AND cd.ProdiID = "'.$ProdiID.'" ORDER BY cd.MKID ASC')->result_array();
+
+
+                return print_r(json_encode($dataCourse));
+
+            }
+            else if($data_arr['action']=='replaceCourseTransferStd'){
+
+                // Get data coursenya
+                $DB_B = $data_arr['DB_B'];
+                $dataBefore = $this->db->limit(1)->get_where($DB_B.'.study_planning',array('ID' => $data_arr['SPID']))->result_array();
+
+                $insert_id = 0;
+                if(count($dataBefore)>0){
+                    $d = $dataBefore[0];
+                    $d['SemesterID'] = $data_arr['SemesterID'];
+                    $d['MhswID'] = $data_arr['MhswID'];
+                    $d['NPM'] = $data_arr['NPM_A'];
+                    $d['CDID'] = $data_arr['CDID'];
+                    $d['MKID'] = $data_arr['MKID'];
+                    $d['Credit'] = $data_arr['Credit'];
+
+                    unset($d['ID']);
+                    $this->db->insert($data_arr['DB_A'].'.study_planning',$d);
+                    $insert_id = $this->db->insert_id();
+
+                    $insertHistory = (array) $data_arr['insertHistory'];
+                    $insertHistory['SPID_After'] = $insert_id;
+
+                    $this->db->insert('db_academic.transfer_history_conversion'
+                        ,$insertHistory);
+
+                }
+
+                return print_r($insert_id);
+            }
+            else if($data_arr['action']=='removeDataTransferStudent'){
+
+                $DB_A = 'ta_'.$data_arr['ClassOf'];
+                $SPID = $data_arr['SPID'];
+
+                // Search History
+                $NPM = $data_arr['NPM_A'];
+                $dataSearch = $this->db->select('ID')->get_where('db_academic.transfer_history_conversion'
+                    ,array('NPM_After' => $NPM, 'TA_After' => $data_arr['ClassOf']
+                    , 'SPID_After' => $SPID))->result_array();
+
+                if(count($dataSearch)>0){
+                    $THCID = $dataSearch[0]['ID'];
+                    $this->db->where('ID', $THCID);
+                    $this->db->delete('db_academic.transfer_history_conversion');
+                }
+
+                // Search History
+                $this->db->where('ID', $SPID);
+                $this->db->delete($DB_A.'.study_planning');
+
+
+
+
+                return print_r(1);
 
             }
 

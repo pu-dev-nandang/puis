@@ -405,6 +405,15 @@
             '</div>');
     }
 
+    function loading_page_simple(element,position) {
+        var arrp = ['center','left','right'];
+        var p = (typeof position !== 'undefined' && position!='' && position!=null && inArray(position,arrp)!=-1)
+            ? 'text-align:'+position+';'
+            : '';
+        $(element).html('<div style="margin-top: 1px;'+p+'">' +
+            '<h5 class="animated flipInX"><i class="fa fa-circle-o-notch fa-spin fa-fw"></i> <span>Loading page . . .</span></h5>' +'</div>');
+    }
+
     function loading_text(element) {
         $(element).html('<i class="fa fa-circle-o-notch fa-spin fa-fw"></i> Loading...');
     }

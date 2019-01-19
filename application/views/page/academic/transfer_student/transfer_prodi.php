@@ -82,9 +82,7 @@
         <div class="thumbnail" style="padding: 15px;">
 <!--            <h3 class="header-blue">Course Conversion</h3>-->
 
-
             <h3 class="header-blue">List Transfer Student</h3>
-
 
             <div class="row">
                 <div class="col-md-12">
