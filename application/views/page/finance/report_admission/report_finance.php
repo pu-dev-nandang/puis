@@ -42,6 +42,13 @@
 					          				</div>
 					          			</div>
 					          			<div class="row" style="margin-top: 10px">
+					          				<div class="col-xs-4">
+					          					<label class="checkbox-inline">
+					          					     <input type="checkbox" class = "dateOP" name="dateOP" id = "dateOPRange" value = "2"> All
+					          					</label>
+					          				</div>
+					          			</div>
+					          			<div class="row" style="margin-top: 10px">
 					          				<div class="col-xs-4 col-md-offset-4">
 					          					<label>Angkatan</label>
 					          					<select class="select2-select-00 full-width-fix" id="SelectSetTa">
@@ -195,15 +202,35 @@
 	function FuncClickbtnPenjualanFormulirFinance()
 	{
 		$("#btnPenjualanFormulirFinance").click(function(){
-				var url = base_url_js+'finance/export_PenjualanFormulir';
-				data = {
-				  SelectSetTa : $("#SelectSetTa").val(),
-				  SelectSortBy : $("#SelectSortBy").val(),
+				var cf = $(".dateOP:checked").val();
+				if (cf == '' || cf == null) {
+					toastr.error('Mohon pilih Date Range atau By Month','Failed!')
+				} else {
+					var url = base_url_js+'finance/export_PenjualanFormulir';
+					data = {
+					  cf : cf,
+					  dateRange1 : $("#dateRange1").val(),
+					  dateRange2 : $("#dateRange2").val(),
+					  SelectMonth : $("#SelectMonth").val(),
+					  SelectYear : $("#SelectYear").val(),
+					  SelectSetTa : $("#SelectSetTa").val(),
+					  SelectSortBy : $("#SelectSortBy").val(),
+					}
+					var token = jwt_encode(data,"UAP)(*");
+					FormSubmitAuto(url, 'POST', [
+					    { name: 'token', value: token },
+					]);
 				}
-				var token = jwt_encode(data,"UAP)(*");
-				FormSubmitAuto(url, 'POST', [
-				    { name: 'token', value: token },
-				]);
+
+				// var url = base_url_js+'finance/export_PenjualanFormulir';
+				// data = {
+				//   SelectSetTa : $("#SelectSetTa").val(),
+				//   SelectSortBy : $("#SelectSortBy").val(),
+				// }
+				// var token = jwt_encode(data,"UAP)(*");
+				// FormSubmitAuto(url, 'POST', [
+				//     { name: 'token', value: token },
+				// ]);
 			
 		})
 	}

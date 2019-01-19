@@ -816,6 +816,10 @@ $route['rest/__trigger_formulir'] = 'api/c_rest/trigger_formulir';
 $route['rest/__rekapintake_beasiswa'] = 'api/c_rest/rekapintake_beasiswa';
 $route['rest/__rekapintake_perschool'] = 'api/c_rest/rekapintake_perschool';
 $route['rest/__rekapmhspayment'] = 'api/c_rest/rekapmhspayment';
+$route['rest/__sendEmail'] = 'api/c_rest/sendEmail';
+$route['rest/venue/__fill_feedback'] = 'api/c_rest/venue__fill_feedback';
+$route['rest/Catalog/__Get_Item'] = 'api/c_rest/catalog__get_item';
+
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
 $route['api/__getRegionByProv'] = 'api/c_api/getRegionByProv';
@@ -922,6 +926,8 @@ $route['vreservation/approve_submit'] = 'page/vreservation/c_transaksi/approve_s
 $route['vreservation/json_list_booking_by_user'] = 'page/vreservation/c_transaksi/json_list_booking_by_user';
 $route['vreservation/cancel_submit'] = 'page/vreservation/c_transaksi/cancel_submit';
 $route['vreservation/json_list_booking'] = 'page/vreservation/c_transaksi/json_list_booking';
+$route['api/vreservation/json_list_booking'] = 'api/c_rest/v_reservation_json_list_booking';
+
 
 $route['vreservation/config/modalform_previleges'] = 'page/vreservation/c_config/modal_form_previleges';
 $route['vreservation/config/menu-previleges/get_menu'] = 'page/vreservation/c_config/get_menu';
@@ -961,6 +967,7 @@ $route['vreservation/master/modal_form_equipmentadditional'] = 'page/vreservatio
 $route['vreservation/master/EquipmentAdditional/submit'] = 'page/vreservation/c_master/EquipmentAdditional_submit';
 $route['vreservation/master/getRoomItem'] = 'page/vreservation/c_master/getRoomItem';
 $route['vreservation/master/submit_select_venue_room'] = 'page/vreservation/c_master/submit_select_venue_room';
+$route['vreservation/delete_eq_additional'] = 'page/vreservation/c_transaksi/delete_eq_additional';
 
 
 $route['vreservation/config/policy_json_data'] = 'page/vreservation/c_config/policy_json_data';
@@ -969,8 +976,24 @@ $route['vreservation/config/policy/submit'] = 'page/vreservation/c_config/policy
 $route['approve_venue/(:any)'] = 'api/c_global/approve_venue/$1';
 $route['cancel_venue/(:any)'] = 'api/c_global/cancel_venue/$1';
 $route['submitcancelvenue'] = 'api/c_global/submitcancelvenue';
-$route['approve_venue_markom/(:any)'] = 'api/c_global/approve_venue_markom/$1';
-$route['cancel_venue_markom/(:any)'] = 'api/c_global/cancel_venue_markom/$1';
+$route['view_venue_markom/(:any)'] = 'api/c_global/view_venue_markom/$1';
+//$route['cancel_venue_markom/(:any)'] = 'api/c_global/cancel_venue_markom/$1';
+$route['vreservation/confirm_eq_additional'] = 'api/c_global/vreservation_confirm_eq_additional';
+$route['view_eq_additional/(:any)'] = 'api/c_global/view_eq_additional/$1';
+$route['vreservation/return_eq'] = 'page/vreservation/c_transaksi/return_eq_show';
+$route['vreservation/modal_form_return_eq'] = 'page/vreservation/c_transaksi/modal_form_return_eq';
+$route['vreservation/modal_form_return_eq_save'] = 'page/vreservation/c_transaksi/modal_form_return_eq_save';
+$route['vreservation/t_eq/(:any)'] = 'page/vreservation/c_transaksi/t_eq/$1';
+$route['vreservation/master/markom_support'] = 'page/vreservation/c_master/markom_support';
+$route['vreservation/confirm_markom_support'] = 'api/c_global/vreservation_confirm_markom_support';
+$route['vreservation/feedback/(:any)'] = 'api/c_global/vreservation_page_feedback/$1';
+$route['vreservation/api-feedback'] = 'api/c_global/vreservation_api_feedback';
+$route['vreservation/list_eq_history'] = 'page/vreservation/c_transaksi/list_eq_history';
+$route['vreservation/detail_historis'] = 'page/vreservation/c_transaksi/detail_historis';
+$route['vreservation/report/(:any)'] = 'page/vreservation/c_global/report/$1';
+$route['api/vreservation/summary_use_room'] = 'api/c_global/summary_use_room';
+$route['api/vreservation/detailroom'] = 'api/c_global/detailroom';
+$route['vreservation/datafeedback'] = 'page/vreservation/c_global/datafeedback';
 
 
 // test
@@ -1068,9 +1091,16 @@ $route['budgeting/export_excel_budget_creator_all'] = 'C_save_to_excel/export_ex
 $route['budgeting/EntryBudget/BudgetLeft'] = 'page/budgeting/c_budgeting/BudgetLeft';
 $route['budgeting/getListBudgetingRemaining'] = 'page/budgeting/c_budgeting/getListBudgetingRemaining';
 $route['budgeting/detail_budgeting_remaining'] = 'page/budgeting/c_budgeting/detail_budgeting_remaining';
-$route['budgeting/export_excel_budget_remaining'] = 'C_save_to_excel/export_excel_budget_remaining';
 $route['budgeting/configRule'] = 'page/budgeting/c_budgeting/configRule';
 $route['budgeting/configRule/userroledepart_submit'] = 'page/budgeting/c_budgeting/userroledepart_submit';
+$route['budgeting/page_pr/(:any)'] = 'page/budgeting/c_budgeting/page_pr/$1';
+$route['budgeting/PostBudgetThisMonth_Department'] = 'page/budgeting/c_budgeting/PostBudgetThisMonth_Department';
+$route['budgeting/getPostBudgetDepartement'] = 'page/budgeting/c_budgeting/getPostBudgetDepartement';
+$route['budgeting/submitpr'] = 'page/budgeting/c_budgeting/submitpr';
+$route['budgeting/DataPR'] = 'page/budgeting/c_budgeting/DataPR';
+$route['budgeting/FormEditPR'] = 'page/budgeting/c_budgeting/FormEditPR';
+$route['budgeting/GetDataPR'] = 'page/budgeting/c_budgeting/GetDataPR';
+$route['budgeting/checkruleinput'] = 'page/budgeting/c_budgeting/checkruleinput';
 
 
 // Purchasing
@@ -1170,3 +1200,6 @@ $route['testadi2'] = 'c_login/testadi2';
 
 // admin prodi
 $route['loginToAdminProdi'] = 'c_login/loginToAdminProdi';
+
+
+// marketing

@@ -87,13 +87,16 @@
 
 	function funcFillTbodyExisting(resultJson)
 	{
+		var UserType = ['Admin','Approver 1','Approver 2','Approver 3','Approver 4'];
 			// grouping MaxLimit
+			var NextInc = parseInt(resultJson.length) * parseInt(UserType.length);
+			console.log(resultJson);
 			var MaxLimit = [];
-			for (var i = 0; i < dt.length; i=i+25) {
+			for (var i = 0; i < dt.length; i=i+NextInc) {
 				MaxLimit.push(dt[i].MaxLimit)
 			}
 
-			var UserType = ['Admin','Approver 1','Approver 2','Approver 3','Approver 4'];
+
 			var FieldType = ['Entry','Approved','Cancel'];
 			var zStart = 0;
 			for (var i = 0; i < MaxLimit.length; i++) {

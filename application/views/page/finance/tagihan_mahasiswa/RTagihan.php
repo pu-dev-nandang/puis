@@ -6,8 +6,8 @@
        <div class="col-md-3">
            <div class="thumbnail" style="min-height: 30px;padding: 10px;">
                <select class="form-control" id="selectCurriculum">
-                   <option selected value = ''>--- All Curriculum ---</option>
-                   <option disabled>------</option>
+                  <!--  <option selected value = ''>--- All Curriculum ---</option>
+                   <option disabled>------</option> -->
                </select>
            </div>
        </div>
@@ -21,16 +21,26 @@
        </div>
        <div class="col-md-3">
            <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+               <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM">
+           </div>
+       </div>
+       <div class="col-md-3">
+           <div class="thumbnail" style="min-height: 30px;padding: 10px;">
                <select class="form-control" id="selectStatus">
-                   <option value = ''>--All Status--</option>
+                   <option value = ''>--All Status Payment--</option>
                    <option selected value = '0'>Tidak Lunas</option>
                    <option value="1">Lunas</option>
                </select>
            </div>
        </div>
+     </div>
+     <div class="row" style="margin-top: 20px">
        <div class="col-md-3">
            <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-               <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM">
+                <select class="form-control filter-db-std" id="filterStatus">
+                    <option value="">-- All Status Mahasiswa--</option>
+                    <option disabled>------------------------</option>
+                </select>
            </div>
        </div>
      </div>
@@ -85,6 +95,10 @@
     });
 
     $('#selectProdi').change(function () {
+        loadData(1);
+    });
+
+    $('#filterStatus').change(function () {
         loadData(1);
     });
 
@@ -192,6 +206,8 @@
           var prodi = $('#selectProdi').val();
           prodi = prodi.split('.');
           prodi = prodi[0];
+
+          var StatusMHS = $("#filterStatus").val();
         }
         catch(e)
         {
@@ -206,6 +222,7 @@
             NIM : NIM,
             Semester : Semester,
             Status : $('#selectStatus').val(),
+            StatusMHS : StatusMHS,
         };
         var token = jwt_encode(data,'UAP)(*');
         var htmlDy = '<div class = "row">'+

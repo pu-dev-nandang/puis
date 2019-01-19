@@ -3,8 +3,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class C_master extends Vreservation_Controler {
 
-    // private $data = array();
-
+    // private $data = array(); asd
+ 
     function __construct()
     {
         parent::__construct();
@@ -338,6 +338,12 @@ class C_master extends Vreservation_Controler {
         $query2=$this->db->query($sql, array());
 
 
+    }
+
+    public function markom_support()
+    {
+        $get = $this->m_master->showData_array('db_reservation.m_markom_support');
+        echo json_encode($get);
     }
 
 }

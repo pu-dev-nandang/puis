@@ -114,7 +114,7 @@
 	function loadTahun()
     {
         var thisYear = (new Date()).getFullYear();
-      	var startTahun = parseInt(thisYear);
+      	var startTahun = parseInt(thisYear) - 1;
      	 var selisih = (2018 < parseInt(thisYear)) ? parseInt(1) + (parseInt(thisYear) - parseInt(2018)) : 1;
      	 for (var i = 0; i <= selisih; i++) {
           var selected = (i==0) ? 'selected' : '';

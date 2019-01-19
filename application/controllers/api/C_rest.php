@@ -1154,5 +1154,324 @@ class C_rest extends CI_Controller {
         }
     }
 
+    public function sendEmail()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('m_sendemail');
+                $arr = array('to','subject','text');
+                $bool = true;
+                foreach ($dataToken as $key => $value) {
+                    if ($key != 'auth' && $key != 'attach') {
+                        if(!in_array($key,$arr))
+                        {
+                            $bool = false;
+                            $msg ='Field is not match, the field is : '.$key;
+                            break;
+                        }
+                    }
+                }
+
+                if ($bool) {
+                    $to = $dataToken['to'];
+                    $subject = $dataToken['to'];
+                    $text = $dataToken['text'];
+                    if (array_key_exists('attach',$dataToken)) {
+                        $path = $dataToken['attach'];
+                        $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,$path);
+                    }
+                    else
+                    {
+                        $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                    }
+
+                   $msg =  $sendEmail['msg'];
+                    
+                }
+
+                echo json_encode($msg);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    public function v_reservation_json_list_booking()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('vreservation/m_reservation');
+                if(array_key_exists("DivisionID",$dataToken))
+                {
+                    $getData = $this->m_reservation->getDataT_booking_Api($dataToken['ID_t_booking'],$dataToken['DivisionID']);
+                }
+                else
+                {
+                    $getData = $this->m_reservation->getDataT_booking_Api($dataToken['ID_t_booking'],17);
+                }
+                
+                echo json_encode($getData);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    public function remind_vreservation()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                // action 
+                    $this->load->model('vreservation/m_reservation');
+                    $Q_remind_vreservation = $this->m_reservation->remind_vreservation();
+                echo json_encode($msg);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    public function venue__fill_feedback()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('vreservation/m_reservation');
+                $this->load->model('m_sendemail');
+                // get data done besar sama dengan hari ini dan kecil sama dengan dua hari lagi
+                $gg = $this->m_reservation->venue__fill_feedback();
+                // ambil email requester / created by untuk email.
+                // body email berisi token dengan auth via get dan passing ID
+                if (count($gg) > 0) {
+                    for ($i=0; $i < count($gg); $i++) { // and grouping by Created by
+                        $data = array();
+                        $data[] = $gg[$i];
+                        $Email = $gg[$i]['EmailPU'];
+                        $CreatedBy = $gg[$i]['CreatedBy'];
+                        $Name = $gg[$i]['Name'];
+                        $DateLimit = $gg[$i]['Datelimit'].' 23:59:59';
+                        $DateLimitCreated = DateTime::createFromFormat('Y-m-d', $gg[$i]['Datelimit']);
+                        // print_r($DateLimit);die();
+                        $NameDayDateLimit =$DateLimitCreated->format('l');
+                        for ($j=$i+1; $j < count($gg); $j++) { 
+                            if ($CreatedBy == $gg[$j]['CreatedBy']) {
+                                $data[] = $gg[$j];
+                            }
+                            else
+                            {
+                                break;
+                            }
+                            $i = $j;
+                        }
+
+                        $token = array(
+                            'CreatedBy' => $CreatedBy,
+                            'data' => $data,
+                            'auth' => 's3Cr3T-G4N',
+                            'Datelimit' => $gg[$i]['Datelimit'],
+                        );
+                        $token = $this->jwt->encode($token,'UAP)(*');
+                        $text = 'Dear Mr/Mrs '.$Name.',<br><br>
+                                    Thanks for using Venue Reservation Apps.<br><br>
+                                    Please give me feedback about Room which you are  using with click View Button below.<br>
+                                    <table width="200" cellspacing="0" cellpadding="12" border="0">
+                                         <tbody>
+                                         <tr>
+                                             <td bgcolor="#51a351" align="center">
+                                                 <a href="'.url_pas.'vreservation/feedback/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >View</a>
+                                             </td>
+                                         </tr>
+                                         </tbody>
+                                     </table><br><br>
+                                     <strong> Link will be deactive on '.$NameDayDateLimit.','.$DateLimit.'
+                                ';        
+                        if($_SERVER['SERVER_NAME'] =='localhost') {
+                            $to = 'alhadi.rahman@podomorouniversity.ac.id';
+                            $subject = "Podomoro University Venue Reservation Feedback";
+                            $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                            
+                        }
+                        else
+                        {
+                            $to = $Email;
+                            $subject = "Podomoro University Venue Reservation Feedback";
+                            $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                        }
+                        //print_r($data);
+                    }
+                }
+                
+                echo json_encode($gg);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    private function get_content($url, $post = '') {
+        $usecookie = __DIR__ . "/cookie.txt";
+        $header[] = 'Content-Type: application/json';
+        $header[] = "Accept-Encoding: gzip, deflate";
+        $header[] = "Cache-Control: max-age=0";
+        $header[] = "Connection: keep-alive";
+        $header[] = "Accept-Language: en-US,en;q=0.8,id;q=0.6";
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_VERBOSE, false);
+        // curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_ENCODING, true);
+        curl_setopt($ch, CURLOPT_AUTOREFERER, true);
+        curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
+
+        curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36");
+
+        if ($post)
+        {
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        }
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+        $rs = curl_exec($ch);
+
+        if(empty($rs)){
+            var_dump($rs, curl_error($ch));
+            curl_close($ch);
+            return false;
+        }
+        curl_close($ch);
+        return $rs;
+    }
+
+    public function catalog__get_item()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $condition = ($dataToken['department'] == 'all') ? '' : ' and a.Departement = "'.$dataToken['department'].'"';
+                $sql = 'select a.*,b.Name as NameCreated,c.NameDepartement
+                        from db_purchasing.m_catalog as a 
+                        join db_employees.employees as b on a.CreatedBy = b.NIP
+                        join (
+                        select * from (
+                        select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study
+                        UNION
+                        select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                        ) aa
+                        ) as c on a.Departement = c.ID
+                       ';
+
+                $sql.= ' where a.Active = 1 '.$condition;
+                $query = $this->db->query($sql)->result_array();
+                $data = array();
+                    for ($i=0; $i < count($query); $i++) { 
+                       $nestedData=array();
+                       $row = $query[$i];
+                        $nestedData[] = $i + 1;
+                        $nestedData[] = $row['Item'];
+                        $nestedData[] = $row['Desc'];
+                        $EstimaValue = $row['EstimaValue'];
+                        $EstimaValue = 'Rp '.number_format($EstimaValue,2,',','.');
+                        $nestedData[] = $EstimaValue;
+                        $Photo = $row['Photo'];
+                         // print_r($Photo);
+                         if ($Photo != '') {
+                             // print_r('test');
+                             $Photo = explode(",", $Photo);
+                             $htmlPhoto = '<ul>';
+                             for ($z=0; $z < count($Photo); $z++) { 
+                                 $htmlPhoto .= '<li>'.'<a href="'.base_url("fileGetAny/budgeting-catalog-".$Photo[$z]).'" target="_blank"></i>'.$Photo[$z].'</a></li>';
+                             }
+                             $htmlPhoto .= '</ul>';
+                         }
+                         else
+                         {
+                             $htmlPhoto = '';
+                         }
+                         $nestedData[] = $htmlPhoto;
+                         $DetailCatalog = $row['DetailCatalog'];
+                         $DetailCatalog = json_decode($DetailCatalog);
+                         $temp = '';
+                         if ($DetailCatalog != "" || $DetailCatalog != null) {
+                             foreach ($DetailCatalog as $key => $value) {
+                                 $temp .= $key.' :  '.$value.'<br>';
+                             }
+
+                         }
+                        $nestedData[] = $temp;
+                        $nestedData[] = $row['ID'];
+                        $nestedData[] = $row['EstimaValue'];
+                        $data[] = $nestedData;
+                    }
+                   $json_data = array(
+                       "data"            => $data
+                   );
+                    echo json_encode($json_data);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
 
 }

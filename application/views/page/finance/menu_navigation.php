@@ -150,19 +150,20 @@
                     Tagihan Mahasiswa
                 </a>
                 <ul class="sub-menu">
+                    <?php if ($_SERVER['SERVER_NAME']=='localhost'): ?>
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "import_pembayaran_manual" ){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/import_pembayaran_manual'); ?>">
                         <i class="icon-angle-right"></i>
                         Import Pembayaran Manual
                         </a>
                     </li>
-                    <?php if ($_SERVER['SERVER_NAME']=='localhost'): ?>
-                        <li>
-                            <a href="<?php echo base_url('finance/tagihan-mhs/import_pembayaran_lain'); ?>">
-                            <i class="icon-angle-right"></i>
-                            Import Pembayaran lain
-                            </a>
-                        </li>
+                    
+                    <li>
+                        <a href="<?php echo base_url('finance/tagihan-mhs/import_pembayaran_lain'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Import Pembayaran lain
+                        </a>
+                    </li>
                     <?php endif ?>
                     
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "set-tagihan-mhs"){echo "current";} ?>">

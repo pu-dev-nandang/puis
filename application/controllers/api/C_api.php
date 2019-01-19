@@ -5190,8 +5190,9 @@ class C_api extends CI_Controller {
             );
             $this->db->insert('db_reservation.t_booking_delete', $dataSave);
 
-            $this->m_master->delete_id_table_all_db($get[0]['ID'],'db_reservation.t_booking');
 
+                $this->m_master->delete_id_table_all_db($get[0]['ID'],'db_reservation.t_booking');
+                $this->m_master->delete_id_table_all_db($get[0]['ID'],'db_reservation.t_booking_eq_additional');
 
             // send email and update notification
             // broadcase update js
@@ -5200,20 +5201,51 @@ class C_api extends CI_Controller {
             }
             else{
                 $client = new Client(new Version1X('//10.1.30.17:3000'));
-            }
-            $client->initialize();
-            // send message to connected clients
-            $client->emit('update_schedule_notifikasi', ['update_schedule_notifikasi' => '1','date' => '']);
-            $client->close();
 
-            $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['Start']);
-            $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['End']);
-            $StartNameDay = $Startdatetime->format('l');
-            $EndNameDay = $Enddatetime->format('l');
+            }    
+                $client->initialize();
+                // send message to connected clients
+                $client->emit('update_schedule_notifikasi', ['update_schedule_notifikasi' => '1','date' => '']);
+                $client->close();
 
-            // send email
-            $Email = $getUser[0]['EmailPU'];
-            $text = 'Dear '.$getUser[0]['Name'].',<br><br>
+                $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['Start']);
+                $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['End']);
+                $StartNameDay = $Startdatetime->format('l');
+                $EndNameDay = $Enddatetime->format('l');
+
+
+                //suggestion room
+                    $ParticipantQty = $get[0]['ParticipantQty'];
+                    //find room besar >= ParticipantQty and category room sama
+                    $sg_room = function($ParticipantQty,$Room){
+                        $result = '';
+                        $r = array();
+                        $a = $this->m_master->caribasedprimary('db_academic.classroom','Room',$Room);
+                        $ID_CategoryRoom = $a[0]['ID_CategoryRoom'];
+                        $b = $this->m_master->caribasedprimary('db_academic.classroom','ID_CategoryRoom',$ID_CategoryRoom);
+                        for ($i=0; $i < count($b); $i++) { 
+                            if ($b[$i]['Seat'] > $ParticipantQty) {
+                                $r[] = $b[$i]['Room'];
+                            }
+                        }
+
+                        if (count($r) > 0) {
+                            $result = 'Following suggestion from our room :<ul>';
+                            for ($i=0; $i < count($r); $i++) { 
+                                $result .= '<li>'.$r[$i].'</li>';
+                            }
+                            $result .='</ul>';
+                        }
+
+                        return $result;
+                    };
+                    $sg_room = $sg_room($ParticipantQty,$get[0]['Room']);
+                //suggestion room
+
+                // send email
+                $Email = $getUser[0]['EmailPU'];
+                $text = 'Dear '.$getUser[0]['Name'].',<br><br>
+
                             Your Venue Reservation was conflict,<br><br>
                             <strong>Your schedule automated delete by System</strong>,<br><br>
                             Details Schedule : <br><ul>
@@ -5221,7 +5253,8 @@ class C_api extends CI_Controller {
                             <li>End  : '.$EndNameDay.', '.$get[0]['End'].'</li>
                             <li>Room  : '.$get[0]['Room'].'</li>
                             </ul>
-                            Please Create new schedule, if you need it  <br>
+                            <br>
+                            Please Create new schedule, if you need it and '.$sg_room.' <br>
                             
                         ';
             $to = $Email;
@@ -5239,7 +5272,8 @@ class C_api extends CI_Controller {
                             <li>Room        : '.$get[0]['Room'].'</li>
                             <li>Request BY  : '.$getUser[0]['Name'].'</li>
                             </ul>
-                            Please Create new schedule, if you need it  <br>
+                            <br>
+                            Please Create new schedule, if you need it and '.$sg_room.' <br>
                             
                         ';
             $eAdum = $this->m_master->caribasedprimary('db_reservation.email_to','Ownership','Adum');

@@ -47,6 +47,7 @@ class C_dashboard extends Globalclass {
                                 $data['NameProdi'] = $get[0]['Name'];
                                 $data['NameProdi'] = strtolower($data['NameProdi'] );
                                 $data['NameProdi']  = str_replace(" ", "-", $data['NameProdi'] );
+                                // print_r($data['department']);die();
                                 if (file_exists(APPPATH.'views/page/'.$data['department'].'/'.$data['NameProdi'].'/dashboard.php')) {
                                     $content = $this->load->view('page/'.$data['department'].'/'.$data['NameProdi'].'/dashboard',$data,true);
                                 }

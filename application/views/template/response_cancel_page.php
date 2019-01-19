@@ -250,7 +250,7 @@
 			</svg>
 			<div class="row" style="margin-top: 10px">
 				<div class="col-md-12">
-					<h3>Thanks for Approval<h3>
+					<h3>Thank for your appreciated<h3>
 				</div>
 			</div>
 		</div>
