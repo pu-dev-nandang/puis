@@ -67,11 +67,12 @@ class C_crm extends Admission_Controler {
                 $Gender = $objWorksheet->getCellByColumnAndRow(6, $i)->getCalculatedValue();
                 $Gender = substr($Gender, 0,1);
                 $Gender = ($Gender == '') ? null : $Gender;
-                $Prospect_Year = null;
+                $Prospect_Year = $objWorksheet->getCellByColumnAndRow(7, $i)->getCalculatedValue();
                 $BirthPlace = $objWorksheet->getCellByColumnAndRow(8, $i)->getCalculatedValue();
                 $BirthPlace = strtolower($BirthPlace);
                 $BirthPlace = ucwords($BirthPlace);
-                $BirthDate = null;
+                $BirthDate = $objWorksheet->getCellByColumnAndRow(9, $i)->getCalculatedValue();
+                $BirthDate = ($BirthDate == '' || $BirthDate == null || $BirthDate == trim($BirthDate) && strpos($BirthDate, ' ') !== false) ? null : date('Y-m-d',PHPExcel_Shared_Date::ExcelToPHP($BirthDate));
                 $HomeAddress = $objWorksheet->getCellByColumnAndRow(11, $i)->getCalculatedValue();
                 $HomeAddress = strtolower($HomeAddress);
                 $HomeAddress = ucwords($HomeAddress);
@@ -147,9 +148,16 @@ class C_crm extends Admission_Controler {
                 $Q12B = $objWorksheet->getCellByColumnAndRow(38, $i)->getCalculatedValue();
                 $Q12B = strtolower($Q12B);
                 $Q12B = ucwords($Q12B);
-                $SchoolID = null;
-                $ItemType = $objWorksheet->getCellByColumnAndRow(42, $i)->getCalculatedValue();
-                $Path = $objWorksheet->getCellByColumnAndRow(43, $i)->getCalculatedValue();
+                $SchoolID = $objWorksheet->getCellByColumnAndRow(41, $i)->getCalculatedValue();
+                $Fu1 = $objWorksheet->getCellByColumnAndRow(42, $i)->getCalculatedValue();
+                $Fu2 = $objWorksheet->getCellByColumnAndRow(43, $i)->getCalculatedValue();
+                $Fu3 = $objWorksheet->getCellByColumnAndRow(44, $i)->getCalculatedValue();
+                $Fu4 = $objWorksheet->getCellByColumnAndRow(45, $i)->getCalculatedValue();
+                $StatusFU = $objWorksheet->getCellByColumnAndRow(46, $i)->getCalculatedValue();
+                $SetReminder = $objWorksheet->getCellByColumnAndRow(47, $i)->getCalculatedValue();
+                $SalesPerson = $objWorksheet->getCellByColumnAndRow(48, $i)->getCalculatedValue();
+                $ItemType = $objWorksheet->getCellByColumnAndRow(49, $i)->getCalculatedValue();
+                $Path = $objWorksheet->getCellByColumnAndRow(50, $i)->getCalculatedValue();
 
                 $temp = array(
                     'ID_Numbering' => $ID_Numbering,    
@@ -190,7 +198,14 @@ class C_crm extends Admission_Controler {
                     'Q11A' => $Q11A,
                     'Q12A' => $Q12A,    
                     'Q12B' => $Q12B,    
-                    'SchoolID' => $SchoolID,    
+                    'SchoolID' => $SchoolID,
+                    'Fu1' => $Fu1,    
+                    'Fu2' => $Fu2,    
+                    'Fu3' => $Fu3,    
+                    'Fu4' => $Fu4,    
+                    'StatusFU' => $StatusFU,    
+                    'SetReminder' => $SetReminder,    
+                    'SalesPerson' => $SalesPerson,    
                     'ItemType' => $ItemType,    
                     'Path' => $Path,    
                 );
