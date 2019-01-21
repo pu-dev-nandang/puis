@@ -307,17 +307,21 @@
 
     $(document).on('click','.btnRemoveData',function () {
 
-        $('.btnRemoveData').prop('disabled',true);
 
-        var ID = $(this).attr('data-id');
-        var url = base_url_js+'api/__crudTransferStudent';
-        var token = jwt_encode({action : 'removeTransverStudent', ID : ID},'UAP)(*');
+        if(confirm('Are you sure to remove?')){
+            $('.btnRemoveData').prop('disabled',true);
 
-        $.post(url,{token:token},function (jsonResult) {
-            setTimeout(function () {
-                getListStudentTransfer();
-            },500);
-        });
+            var ID = $(this).attr('data-id');
+            var url = base_url_js+'api/__crudTransferStudent';
+            var token = jwt_encode({action : 'removeTransverStudent', ID : ID},'UAP)(*');
+
+            $.post(url,{token:token},function (jsonResult) {
+                setTimeout(function () {
+                    getListStudentTransfer();
+                },500);
+            });
+        }
+
 
     });
 

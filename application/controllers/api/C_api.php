@@ -7207,13 +7207,12 @@ class C_api extends CI_Controller {
                     $this->db->insert($db_t.'.students',$d);
 
                     // Update Data Lama
-                    $this->db->set('StatusStudentID', 15);
+                    $this->db->set('StatusStudentID', 9);
                     $this->db->where('ID', $dataStd_f[0]['ID']);
                     $this->db->update($db_f.'.students');
                     $this->db->reset_query();
 
                 }
-
 
 
                 // DB AUTH Student - Get data lama
@@ -7240,7 +7239,7 @@ class C_api extends CI_Controller {
                     $this->db->insert('db_academic.auth_students',$d);
 
                     // Update Data Lama
-                    $this->db->set('StatusStudentID', 15);
+                    $this->db->set('StatusStudentID', 9);
                     $this->db->where('ID', $d_aut_f[0]['ID']);
                     $this->db->update('db_academic.auth_students');
                     $this->db->reset_query();
@@ -7262,6 +7261,56 @@ class C_api extends CI_Controller {
                 );
 
                 $this->db->insert('db_academic.transfer_student',$dataIns);
+
+
+
+                $TransferTypeID = $data_arr['TransferTypeID'];
+                // Jika transfer ID == 1, maka tagihan dan biaya kuliah prodi baru sesia dengan prodi lama
+                if($TransferTypeID==1 || $TransferTypeID=='1'){
+
+                    // m_tition_feee
+                    $dataT = $this->db->get_where('db_finance.m_tuition_fee',array('NPM' => $data_arr['fromStudent']))->result_array();
+                    if(count($dataT)>0){
+                        for($t=0;$t<count($dataT);$t++){
+                            $dIns = $dataT[$t];
+                            unset($dIns['ID']);
+                            $dIns['NPM'] = $data_arr['toNewNPM'];
+                            $this->db->insert('db_finance.m_tuition_fee',$dIns);
+                        }
+                    }
+
+                    // Payment
+                    $dataP = $this->db->get_where('db_finance.payment',array('NPM' => $data_arr['fromStudent']))->result_array();
+                    if(count($dataP)>0){
+                        for($p=0;$p<count($dataP);$p++){
+                            $dIns = $dataT[$t];
+
+                            // Get payment Student
+                            $dataPS = $this->db->get_where('db_finance.payment_students',array('ID_payment' => $dIns['ID']))
+                                ->result_array();
+
+
+                            unset($dIns['ID']);
+                            $dIns['NPM'] = $data_arr['toNewNPM'];
+                            $this->db->insert('db_finance.payment',$dIns);
+                            $insert_id = $this->db->insert_id();
+
+                            if(count($dataPS)>0){
+                                for($ps=0;$ps<count($dataPS);$ps++){
+                                    $dsInsert = $dataPS[$ps];
+                                    unset($dsInsert['ID']);
+                                    $dsInsert['ID_payment'] = $insert_id;
+                                    $this->db->insert('db_finance.payment_students',$dsInsert);
+                                }
+                            }
+
+                        }
+                    }
+
+
+
+                }
+
 
                 return print_r(1);
 
@@ -7295,6 +7344,27 @@ class C_api extends CI_Controller {
 
                     $this->db->where('ID', $data_arr['ID']);
                     $this->db->delete('db_academic.transfer_student');
+
+                    // Delete Pembayaran
+                    $dataWherePayment = $this->db->select('ID')->get_where('db_finance.payment',array('NPM' => $After_NPM))->result_array();
+                    if(count($dataWherePayment)>0){
+                        for($p=0;$p<count($dataWherePayment);$p++){
+
+                            $this->db->where('ID_payment', $dataWherePayment[$p]['ID']);
+                            $this->db->delete('db_finance.payment_students');
+                            $this->db->reset_query();
+
+                            $this->db->where('ID', $dataWherePayment[$p]['ID']);
+                            $this->db->delete('db_finance.payment');
+                            $this->db->reset_query();
+
+                        }
+                    }
+
+                    $this->db->where('NPM', $After_NPM);
+                    $this->db->delete('db_finance.m_tuition_fee');
+                    $this->db->reset_query();
+
                 }
 
                 return print_r(1);
