@@ -105,6 +105,7 @@
                 prodi : '',
                 PTID  : '<?php echo $PTID ?>',
                 NIM : NIM,
+                Semester : "<?php echo $semester ?>",
             };
             // console.log(data)
             var token = jwt_encode(data,'UAP)(*');
