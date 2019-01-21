@@ -787,14 +787,37 @@
                console.log(resultJson);
                if (resultJson != '')
                {
-                toastr.info(resultJson); 
+                //toastr.info(resultJson); 
+                  if (confirm(resultJson+', '+'Anda yakin untuk melanjutkan proses ini ?') == true) {
+                    var url = base_url_js+'finance/unapproved_created_tagihan_mhs_after_confirm';
+                    $.post(url,{token:token},function (resultJson2) {
+                         // if (resultJson2 != '')
+                         //  {
+                         //     toastr.info(resultJson2); 
+                         //  }
+                         //  else
+                         //  {
+                         //    toastr.success('Data berhasil disimpan', 'Success!');
+                         //    loadData(1);
+                         //    $('#GlobalModalLarge').modal('hide');
+                         //  }
+                         toastr.success('Data berhasil disimpan', 'Success!');
+                         loadData(1);
+                         $('#GlobalModalLarge').modal('hide');
+                    }).fail(function() {
+                      toastr.info('No Action...'); 
+                      // toastr.error('The Database connection error, please try again', 'Failed!!');
+                    }).always(function() {
+                        $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
+                    });
+                  }
                }
                else
                {
                 toastr.success('Data berhasil disimpan', 'Success!');
+                loadData(1);
+                $('#GlobalModalLarge').modal('hide');
                }
-               loadData(1);
-               $('#GlobalModalLarge').modal('hide');
             }).fail(function() {
               toastr.info('No Action...'); 
               // toastr.error('The Database connection error, please try again', 'Failed!!');

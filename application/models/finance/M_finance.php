@@ -1827,11 +1827,48 @@ class M_finance extends CI_Model {
          }
          else
          {
-          if ($msg == '') {
-            $msg = '<ul>';
-          }
-          $msg .= '<li>Proses UnApprove ditolak, Mohon cek Transaksi KRS pada Mahasiswa dengan NPM : '.$Input[$i]->NPM.'</li>';
+          // if ($msg == '') {
+          //   $msg = '<ul>';
+          // }
+          // $msg .= '<li>Proses UnApprove ditolak, Mohon cek Transaksi KRS pada Mahasiswa dengan NPM : '.$Input[$i]->NPM.'</li>';
+          $msg = 'Mahasiswa telah melakukan KRS Online';
          }
+       }
+       else
+       {
+        $dataSave = array(
+                'Status' =>"0",
+                'UpdateAt' => null,
+                'UpdatedBy' => null
+                        );
+        $this->db->where('ID',$Input[$i]->PaymentID);
+        $this->db->update('db_finance.payment', $dataSave);
+       }
+       
+    }
+
+    return $msg;
+   }
+
+   public function updatePaymentunApprove_after_confirm($Input)
+   {
+    $msg = '';
+    for ($i=0; $i < count($Input); $i++) {
+      // check Mahasiswa telah melakukan transaksi atau belum
+       $NPM = $Input[$i]->NPM;
+       $SemesterID = $Input[$i]->semester;
+       $PTID = $Input[$i]->PTID;
+       $sql = 'select count(*) as total from db_academic.std_krs where SemesterID = ? and NPM = ?';
+       $query=$this->db->query($sql, array($SemesterID,$NPM))->result_array();
+       $count = $query[0]['total'];
+       if ($PTID == 2) {
+         $dataSave = array(
+                 'Status' =>"0",
+                 'UpdateAt' => null,
+                 'UpdatedBy' => null
+                         );
+         $this->db->where('ID',$Input[$i]->PaymentID);
+         $this->db->update('db_finance.payment', $dataSave);
        }
        else
        {
