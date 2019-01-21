@@ -551,13 +551,13 @@
 
         }); // exit socket
 
-        socket.on( 'update_log', function( data ) {
+        // socket.on( 'update_log', function( data ) {
 
-            if (data.update_log == 1) {
-                showUnreadLog();
-            }
+        //     if (data.update_log == 1) {
+        //         showUnreadLog();
+        //     }
 
-        }); // exit socket
+        // }); // exit socket
     }
 
     function showUnreadLog() {
