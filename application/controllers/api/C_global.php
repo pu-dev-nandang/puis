@@ -264,60 +264,86 @@ class C_global extends CI_Controller {
         ini_set('max_execution_time', 3600); //300 seconds = 5 minutes
         ini_set('max_execution_time', 0); // for infinite time of execution 
 
-        $sql = 'select * from db_finance.payment_type';
+        // $sql = 'select * from db_finance.payment_type';
+        // $query=$this->db->query($sql, array())->result_array();
+        // for ($i=0; $i < count($query); $i++) { 
+        //     $PTID = $query[$i]['ID'];
+        //     $get = $this->m_master->showData_array('db_academic.auth_students');
+        //     for ($j=0; $j < count($get); $j++) { 
+        //         $NPM = $get[$j]['NPM'];
+        //         $sql1 = 'select b.NPM,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit,c.Cost from db_academic.auth_students as b left join db_finance.tuition_fee as c
+        //          on b.ProdiID = c.ProdiID where b.NPM = "'.$NPM.'" and c.PTID = '.$PTID.' and b.Year = c.ClassOf and b.Pay_Cond = c.Pay_Cond';
+        //          // print_r($sql1);die();
+        //          $query1=$this->db->query($sql1, array())->result_array();
+        //          $Invoice = 0;
+        //         for ($k=1; $k <= 14; $k++) {
+        //             $st = $k; 
+        //             switch ($PTID) {
+        //                 case 1:
+        //                 case 4:
+        //                     if ($k == 1) {
+        //                         $Invoice = $query1[0]['Cost'];
+        //                         $st = 15;
+        //                     }
+        //                     // else
+        //                     // {
+        //                     //     $Invoice = 0;
+        //                     // }
+        //                     break;
+        //                 case 2:
+        //                 case 3:
+        //                     $Invoice = $query1[0]['Cost'];
+        //                     break;
+        //                 default:
+        //                     $Invoice = 0;
+        //                     break;
+        //             }
+
+        //            $Semester = $k;
+        //            $Pay_Cond =  $query1[0]['Pay_Cond'];
+        //            // check data existing 
+        //                 // $sql23 = 'select count(*) as total from db_finance.m_tuition_fee where Semester = "'.$Semester.'" and PTID = "'.$PTID.'" and NPM = "'.$NPM.'"';
+        //                 // $query23=$this->db->query($sql23, array())->result_array();
+        //                 // if ($query23[0]['total'] > 0) {
+        //                 //     continue;
+        //                 // }
+
+        //            $dataSave = array(
+        //                 'Semester' => $Semester,
+        //                 'PTID' => $PTID,
+        //                 'NPM' => $NPM,
+        //                 'Invoice' => $Invoice,
+        //            );
+
+        //            $this->db->insert('db_finance.m_tuition_fee',$dataSave);
+        //            $k = $st;
+        //         }
+        //     }
+        // }
+
+        $sql = 'select * from db_finance.payment where SemesterID = 14 and Status = "0"';
         $query=$this->db->query($sql, array())->result_array();
+        // print_r($query);die();
         for ($i=0; $i < count($query); $i++) { 
-            $PTID = $query[$i]['ID'];
-            $get = $this->m_master->showData_array('db_academic.auth_students');
-            for ($j=0; $j < count($get); $j++) { 
-                $NPM = $get[$j]['NPM'];
-                $sql1 = 'select b.NPM,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit,c.Cost from db_academic.auth_students as b left join db_finance.tuition_fee as c
-                 on b.ProdiID = c.ProdiID where b.NPM = "'.$NPM.'" and c.PTID = '.$PTID.' and b.Year = c.ClassOf and b.Pay_Cond = c.Pay_Cond';
-                 // print_r($sql1);die();
-                 $query1=$this->db->query($sql1, array())->result_array();
-                 $Invoice = 0;
-                for ($k=1; $k <= 14; $k++) {
-                    $st = $k; 
-                    switch ($PTID) {
-                        case 1:
-                        case 4:
-                            if ($k == 1) {
-                                $Invoice = $query1[0]['Cost'];
-                                $st = 15;
-                            }
-                            // else
-                            // {
-                            //     $Invoice = 0;
-                            // }
-                            break;
-                        case 2:
-                        case 3:
-                            $Invoice = $query1[0]['Cost'];
-                            break;
-                        default:
-                            $Invoice = 0;
-                            break;
-                    }
+            $ID_payment = $query[$i]['ID'];
+            $Invoice = $query[$i]['Invoice'];
+            // cek data lunas
+            $get = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$ID_payment);
+            $total = 0;
+            for ($j=0; $j < count($get); $j++) {
+                if ($get[$j]['Status'] == 1) {
+                   $total = $total + $get[$j]['Invoice'];
+                } 
+            }
 
-                   $Semester = $k;
-                   $Pay_Cond =  $query1[0]['Pay_Cond'];
-                   // check data existing 
-                        // $sql23 = 'select count(*) as total from db_finance.m_tuition_fee where Semester = "'.$Semester.'" and PTID = "'.$PTID.'" and NPM = "'.$NPM.'"';
-                        // $query23=$this->db->query($sql23, array())->result_array();
-                        // if ($query23[0]['total'] > 0) {
-                        //     continue;
-                        // }
-
-                   $dataSave = array(
-                        'Semester' => $Semester,
-                        'PTID' => $PTID,
-                        'NPM' => $NPM,
-                        'Invoice' => $Invoice,
-                   );
-
-                   $this->db->insert('db_finance.m_tuition_fee',$dataSave);
-                   $k = $st;
-                }
+            if ($total >= $Invoice) {
+               $dataSave = array(
+                       'Status' =>"1",
+                       'UpdateAt' => date('Y-m-d H:i:s'),
+                       'UpdatedBy' => 0,
+                               );
+               $this->db->where('ID',$ID_payment);
+               $this->db->update('db_finance.payment', $dataSave);
             }
         }
 

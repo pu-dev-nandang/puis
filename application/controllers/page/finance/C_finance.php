@@ -1723,27 +1723,27 @@ class C_finance extends Finnance_Controler {
         }
 
         // cek lunas atau tidak
-            $GetDataPaymentSt = $this->m_master->caribasedprimary('db_finance.payment_students','ID',$IDStudent);
-            $total = 0;
-            for ($i=0; $i < count($GetDataPaymentSt); $i++) { 
-                if ($GetDataPaymentSt[$i]['Status'] == 1) {
-                    $total = $total + $GetDataPaymentSt[$i]['Invoice'];
-                }
+            // $GetDataPaymentSt = $this->m_master->caribasedprimary('db_finance.payment_students','ID',$IDStudent);
+            // $total = 0;
+            // for ($i=0; $i < count($GetDataPaymentSt); $i++) { 
+            //     if ($GetDataPaymentSt[$i]['Status'] == 1) {
+            //         $total = $total + $GetDataPaymentSt[$i]['Invoice'];
+            //     }
                 
-            }
+            // }
 
-            $ID_payment = $GetDataPaymentSt[0]['ID_payment'];
-            $GetDataPayment = $this->m_master->caribasedprimary('db_finance.payment','ID',$ID_payment);
-            $Invoice = $GetDataPayment[0]['Invoice'];
-            if ($total >= $Invoice) {
-                $dataSave = array(
-                        'Status' =>"1",
-                        'UpdateAt' => date('Y-m-d H:i:s'),
-                        'UpdatedBy' => $this->session->userdata('NIP'),
-                                );
-                $this->db->where('ID',$ID_payment);
-                $this->db->update('db_finance.payment', $dataSave);
-            }
+            // $ID_payment = $GetDataPaymentSt[0]['ID_payment'];
+            // $GetDataPayment = $this->m_master->caribasedprimary('db_finance.payment','ID',$ID_payment);
+            // $Invoice = $GetDataPayment[0]['Invoice'];
+            // if ($total >= $Invoice) {
+            //     $dataSave = array(
+            //             'Status' =>"1",
+            //             'UpdateAt' => date('Y-m-d H:i:s'),
+            //             'UpdatedBy' => $this->session->userdata('NIP'),
+            //                     );
+            //     $this->db->where('ID',$ID_payment);
+            //     $this->db->update('db_finance.payment', $dataSave);
+            // }
         
     }
 
