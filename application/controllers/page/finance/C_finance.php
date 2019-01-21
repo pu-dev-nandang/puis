@@ -928,8 +928,15 @@ class C_finance extends Finnance_Controler {
     {
         $Input = $this->getInputToken();
         $Input = $Input['arrValueCHK'];
-        // print_r($Input);die();
         $proses = $this->m_finance->updatePaymentunApprove($Input);
+        echo json_encode($proses);
+    }
+
+    public function unapproved_created_tagihan_mhs_after_confirm()
+    {
+        $Input = $this->getInputToken();
+        $Input = $Input['arrValueCHK'];
+        $proses = $this->m_finance->updatePaymentunApprove_after_confirm($Input);
         echo json_encode($proses);
     }
 
