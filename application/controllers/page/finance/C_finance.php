@@ -1770,7 +1770,6 @@ class C_finance extends Finnance_Controler {
 
       // save di register_admisi_rev
 
-
       // send email to admission
       $getEmailDB = $this->m_master->caribasedprimary('db_admission.email_to','Function','Admisi');
       $text = "Dear Team,<br><br>
