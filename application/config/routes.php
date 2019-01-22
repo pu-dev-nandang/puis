@@ -821,6 +821,8 @@ $route['rest/__rekapmhspayment'] = 'api/c_rest/rekapmhspayment';
 $route['rest/__sendEmail'] = 'api/c_rest/sendEmail';
 $route['rest/venue/__fill_feedback'] = 'api/c_rest/venue__fill_feedback';
 $route['rest/Catalog/__Get_Item'] = 'api/c_rest/catalog__get_item';
+$route['rest/__Databank'] = 'api/c_rest/Databank';
+$route['rest/__GetpaymentByID'] = 'api/c_rest/GetpaymentByID';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
