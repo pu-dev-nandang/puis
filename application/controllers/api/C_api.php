@@ -3291,6 +3291,88 @@ class C_api extends CI_Controller {
                 return print_r(1);
             }
 
+            else if($data_arr['action']=='ApproveAllStudentByKaprodi'){
+
+                $NIP = $data_arr['NIP'];
+                $SemesterID = $data_arr['SemesterID'];
+                $ProdiID = $data_arr['ProdiID'];
+                $ApprovalAt = $data_arr['ApprovalAt'];
+
+                $data = $this->db->query('SELECT sk.*, auts.Year, cd.MKID FROM db_academic.std_krs sk 
+                                                            LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sk.CDID)
+                                                            LEFT JOIN db_academic.auth_students auts ON (auts.NPM = sk.NPM)
+                                                            WHERE sk.SemesterID = "'.$SemesterID.'" 
+                                                            AND cd.ProdiID = "'.$ProdiID.'" 
+                                                            AND sk.Status = "2"  ORDER BY sk.NPM ASC')->result_array();
+
+                // Get Anak Bimbingan
+                $dataBim = $this->db->query('SELECT sk.*, auts.Year, cd.MKID FROM db_academic.mentor_academic ma 
+                                                          LEFT JOIN db_academic.std_krs sk ON (sk.NPM = ma.NPM)
+                                                          LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sk.CDID)
+                                                          LEFT JOIN db_academic.auth_students auts ON (auts.NPM = sk.NPM)
+                                                          WHERE ma.NIP = "'.$NIP.'"
+                                                          AND sk.SemesterID = "'.$SemesterID.'"
+                                                        
+                                                          AND cd.ProdiID = "'.$ProdiID.'" 
+                                                           AND sk.Status = "1"  ORDER BY sk.NPM ASC ')->result_array();
+
+                if(count($dataBim)>0){
+                    for($i=0;$i<count($dataBim);$i++){
+                        array_push($data,$dataBim[$i]);
+                    }
+                }
+
+                if(count($data)>0){
+                    foreach ($data as $item){
+
+                        // Get Attendance Attendance
+                        $dataAttd = $this->db->get_where('db_academic.attendance',
+                            array('SemesterID' => $SemesterID,
+                                'ScheduleID' => $item['ScheduleID']))->result_array();
+
+                        // Insert Student Ke Attendance
+                        foreach ($dataAttd AS $itemA) {
+                            $dataAins = array(
+                                'ID_Attd' => $itemA['ID'],
+                                'NPM' => $item['NPM']
+                            );
+                            $this->db->insert('db_academic.attendance_students', $dataAins);
+                            $this->db->reset_query();
+                        }
+
+                        $dataUpdateKRS = array(
+                            'SemesterID' => $SemesterID,
+                            'MhswID' => 0,
+                            'NPM' => $item['NPM'],
+                            'ScheduleID' => $item['ScheduleID'],
+                            'TypeSchedule' => $item['TypeSP'],
+                            'CDID' => $item['CDID'],
+                            'MKID' => $item['MKID'],
+                            'Approval' => '0',
+                            'StatusSystem' => '1',
+                            'Status' => '1'
+                        );
+
+                        $DBStudent = 'ta_'.$item['Year'];
+                        $this->db->insert($DBStudent.'.study_planning', $dataUpdateKRS);
+                        $this->db->reset_query();
+
+
+                        $arrUpdate = array(
+                            'Status' => '3',
+                            'ApprovalKaprodi_At' => $ApprovalAt
+                        );
+                        $this->db->where('ID', $item['ID']);
+                        $this->db->update('db_academic.std_krs',$arrUpdate);
+                        $this->db->reset_query();
+
+                    }
+                }
+
+                return print_r(1);
+
+            }
+
             else if($data_arr['action']=='RejectedByMentor'){
 
                 $arrUpdate = array(
@@ -7150,6 +7232,17 @@ class C_api extends CI_Controller {
                                                     GROUP BY ClassOf ORDER BY ClassOf ASC ')->result_array();
 
                 return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='getLastNIMTransferStudent'){
+                $ProdiID = $data_arr['ProdiID'];
+                $ClassOf = $data_arr['ClassOf'];
+
+                $db = 'ta_'.$ClassOf;
+                $data = $this->db->select('NPM')->order_by('NPM','DESC')->limit(1)
+                    ->get_where($db.'.students',array('ProdiID' => $ProdiID))->result_array();
+
+                return print_r(json_encode($data));
+
             }
             else if($data_arr['action']=='readBintangTransferStd'){
                 $data = $this->db->query('SELECT Pay_Cond FROM db_finance.tuition_fee
