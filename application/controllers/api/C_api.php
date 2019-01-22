@@ -7152,7 +7152,7 @@ class C_api extends CI_Controller {
 
         if (count($data_arr) > 0) {
             if($data_arr['action'] == 'readFromStudentTransfer'){
-                $data = $this->db->select('NPM,Name')->get_where('db_academic.auth_students'
+                $data = $this->db->select('NPM,Name')->order_by('NPM', 'ASC')->get_where('db_academic.auth_students'
                     ,array('Year' => $data_arr['ClassOf'] ,'ProdiID' => $data_arr['ProdiID']))->result_array();
 
                 return print_r(json_encode($data));
@@ -7176,6 +7176,22 @@ class C_api extends CI_Controller {
                 }
 
                 return print_r(json_encode($result));
+            }
+
+            else if($data_arr['action']=='readClassOfTransferStd'){
+                $data = $this->db->query('SELECT ClassOf FROM db_finance.tuition_fee 
+                                                    WHERE ProdiID = "'.$data_arr['ProdiID'].'" 
+                                                    GROUP BY ClassOf ORDER BY ClassOf ASC ')->result_array();
+
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='readBintangTransferStd'){
+                $data = $this->db->query('SELECT Pay_Cond FROM db_finance.tuition_fee
+                                                        WHERE ProdiID = "'.$data_arr['ProdiID'].'"
+                                                         AND ClassOf = "'.$data_arr['ClassOf'].'" 
+                                                         GROUP BY Pay_Cond ORDER BY Pay_Cond ASC ')->result_array();
+
+                return print_r(json_encode($data));
             }
 
             else if($data_arr['action']=='addingTransferStudent'){
@@ -7263,7 +7279,6 @@ class C_api extends CI_Controller {
                 $this->db->insert('db_academic.transfer_student',$dataIns);
 
 
-
                 $TransferTypeID = $data_arr['TransferTypeID'];
                 // Jika transfer ID == 1, maka tagihan dan biaya kuliah prodi baru sesia dengan prodi lama
                 if($TransferTypeID==1 || $TransferTypeID=='1'){
@@ -7279,36 +7294,85 @@ class C_api extends CI_Controller {
                         }
                     }
 
-                    // Payment
-                    $dataP = $this->db->get_where('db_finance.payment',array('NPM' => $data_arr['fromStudent']))->result_array();
-                    if(count($dataP)>0){
-                        for($p=0;$p<count($dataP);$p++){
-                            $dIns = $dataT[$t];
+                } else {
+                     $sql = 'select * from db_finance.payment_type';
+                     $query=$this->db->query($sql, array())->result_array();
 
-                            // Get payment Student
-                            $dataPS = $this->db->get_where('db_finance.payment_students',array('ID_payment' => $dIns['ID']))
-                                ->result_array();
+                     for ($i=0; $i < count($query); $i++) {
+                         $PTID = $query[$i]['ID'];
+
+                         $sql1 = 'SELECT * FROM db_finance.tuition_fee tf 
+                                                            WHERE 
+                                                            tf.ProdiID = "'.$data_arr['PaymentProdiID'].'" 
+                                                            AND tf.ClassOf = "'.$data_arr['PaymentClassOf'].'" 
+                                                            AND tf.Pay_Cond = "'.$data_arr['PaymentBintang'].'" 
+                                                            AND tf.PTID = "'.$PTID.'" ';
 
 
-                            unset($dIns['ID']);
-                            $dIns['NPM'] = $data_arr['toNewNPM'];
-                            $this->db->insert('db_finance.payment',$dIns);
-                            $insert_id = $this->db->insert_id();
+                         $query1=$this->db->query($sql1, array())->result_array();
+                         $Invoice = 0;
 
-                            if(count($dataPS)>0){
-                                for($ps=0;$ps<count($dataPS);$ps++){
-                                    $dsInsert = $dataPS[$ps];
-                                    unset($dsInsert['ID']);
-                                    $dsInsert['ID_payment'] = $insert_id;
-                                    $this->db->insert('db_finance.payment_students',$dsInsert);
-                                }
+                         for ($k=1; $k <= 14; $k++) {
+                             $st = $k;
+                             switch ($PTID) {
+                                 case 1:
+                                 case 4:
+                                     if ($k == 1) {
+                                         $Invoice = $query1[0]['Cost'];
+                                         $st = 15;
+                                     }
+                                     break;
+                                 case 2:
+                                 case 3:
+                                     $Invoice = $query1[0]['Cost'];
+                                     break;
+                                 default:
+                                     $Invoice = 0;
+                                     break;
+                             }
+                             $Semester = $k;
+
+                             $dataSave = array(
+                                 'Semester' => $Semester,
+                                 'PTID' => $PTID,
+                                 'NPM' => $data_arr['toNewNPM'],
+                                 'Invoice' => $Invoice,
+                             );
+                             $this->db->insert('db_finance.m_tuition_fee',$dataSave);
+                             $k = $st;
+                         }
+
+                     }
+
+                }
+
+
+                // Payment
+                $dataP = $this->db->get_where('db_finance.payment',array('NPM' => $data_arr['fromStudent']))->result_array();
+                if(count($dataP)>0){
+                    for($p=0;$p<count($dataP);$p++){
+                        $dIns = $dataP[$p];
+
+                        // Get payment Student
+                        $dataPS = $this->db->get_where('db_finance.payment_students',array('ID_payment' => $dIns['ID']))
+                            ->result_array();
+
+
+                        unset($dIns['ID']);
+                        $dIns['NPM'] = $data_arr['toNewNPM'];
+                        $this->db->insert('db_finance.payment',$dIns);
+                        $insert_id = $this->db->insert_id();
+
+                        if(count($dataPS)>0){
+                            for($ps=0;$ps<count($dataPS);$ps++){
+                                $dsInsert = $dataPS[$ps];
+                                unset($dsInsert['ID']);
+                                $dsInsert['ID_payment'] = $insert_id;
+                                $this->db->insert('db_finance.payment_students',$dsInsert);
                             }
-
                         }
+
                     }
-
-
-
                 }
 
 
