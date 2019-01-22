@@ -63,10 +63,35 @@
                             <span id="viewStatusNewNPM" style="float: right;"></span>
                             <input class="hide" id="statusNewNPM" value="0"/>
                         </div>
+
+                        <hr/>
+
+
                         <div class="form-group">
-                            <label>Reason</label>
+                            <label>Biaya sesuaikan dengan</label>
                             <select class="form-control" id="toReason"></select>
                         </div>
+
+                        <div class="hide" id="otherProdi">
+                            <div class="form-group">
+                                <label>Prodi</label>
+                                <select class="form-control" id="formPayemntProdiID"></select>
+                            </div>
+                            <div class="form_group">
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <label>Class Of</label>
+                                        <select class="form-control" id="formPayemntClassOf"></select>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label>Bintang</label>
+                                        <select class="form-control" id="formPayemntBintang"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
                     </div>
 
                     <div style="padding: 5px;">
@@ -104,6 +129,7 @@
 
         loadSelectOptionClassOf_ASC('#fromClassOf','');
         loadSelectOptionBaseProdi('#fromProdi','');
+        loadSelectOptionBaseProdi('#formPayemntProdiID','');
 
         loadSelectOptionClassOf_ASC('#toClassOf','');
         loadSelectOptionBaseProdi('#toProdi','');
@@ -192,6 +218,83 @@
 
     }
 
+    $('#toReason').change(function () {
+
+        var toReason = $('#toReason').val();
+
+        $('#otherProdi').addClass('hide');
+
+        if(toReason==2 || toReason=='2'){
+            $('#otherProdi').removeClass('hide');
+            loadNewClassOf();
+        }
+
+    });
+
+    $(document).on('change','#formPayemntProdiID',function () {
+        var formPayemntProdiID = $('#formPayemntProdiID').val();
+        // Read Class Of
+        if(formPayemntProdiID!='' && formPayemntProdiID!=null){
+            loadNewClassOf();
+        }
+    });
+
+    function loadNewClassOf() {
+        var formPayemntProdiID = $('#formPayemntProdiID').val();
+        // Read Class Of
+        if(formPayemntProdiID!='' && formPayemntProdiID!=null){
+            var data = {
+                action : 'readClassOfTransferStd',
+                ProdiID : formPayemntProdiID.split('.')[0]
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__crudTransferStudent';
+            $.post(url,{token:token},function (jsonResult) {
+
+                $('#formPayemntClassOf').empty();
+                if(jsonResult.length>0){
+                    for(var i=0;i<jsonResult.length;i++){
+                        $('#formPayemntClassOf').append('<option value="'+jsonResult[i].ClassOf+'">'+jsonResult[i].ClassOf+'</option>');
+                    }
+
+                    loadBintang();
+                }
+            });
+        }
+    }
+
+    $('#formPayemntClassOf').change(function () {
+        loadBintang();
+    });
+    
+    function loadBintang() {
+        var formPayemntProdiID = $('#formPayemntProdiID').val();
+        var formPayemntClassOf = $('#formPayemntClassOf').val();
+
+        if(formPayemntProdiID!='' && formPayemntProdiID!=null &&
+            formPayemntClassOf!='' && formPayemntClassOf!=null){
+
+            var data = {
+                action : 'readBintangTransferStd',
+                ProdiID : formPayemntProdiID.split('.')[0],
+                ClassOf : formPayemntClassOf
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__crudTransferStudent';
+
+            $.post(url,{token:token},function (jsonResult) {
+
+                $('#formPayemntBintang').empty();
+                if(jsonResult.length>0){
+                    for(var i=0;i<jsonResult.length;i++){
+                        $('#formPayemntBintang').append('<option value="'+jsonResult[i].Pay_Cond+'">'+jsonResult[i].Pay_Cond+'</option>');
+                    }
+                }
+            });
+
+        }
+    }
+
     $('#btnCreateNPM').click(function () {
         var fromClassOf = $('#fromClassOf').val();
         var fromProdi = $('#fromProdi').val();
@@ -213,9 +316,13 @@
             var statusNewNPM = $('#statusNewNPM').val();
             if(statusNewNPM==1 || statusNewNPM=='1'){
 
-                if(confirm('Are you sure to create NIM?')){
+                if(confirm('Are you sure to create NIM ?')){
 
                     loading_button('#btnCreateNPM');
+
+                    var formPayemntProdiID = $('#formPayemntProdiID').val();
+                    var formPayemntClassOf = $('#formPayemntClassOf').val();
+                    var formPayemntBintang = $('#formPayemntBintang').val();
 
                     var ProdiID_f = fromProdi.split('.')[0];
                     var ClassOf_f = fromClassOf.split('.')[1];
@@ -232,13 +339,14 @@
                         toProdi : ProdiID_t,
                         toNewNPM : toNewNPM,
                         TransferTypeID : toReason,
+                        PaymentProdiID : (formPayemntProdiID!='' && formPayemntProdiID!=null)
+                            ? formPayemntProdiID!=''.split('.')[0] : '',
+                        PaymentClassOf : formPayemntClassOf,
+                        PaymentBintang : formPayemntBintang,
                         CreateAt : dateTimeNow(),
                         CreateBy : sessionNIP
                     };
-
-                    // console.log(data);
-                    // return false;
-
+                    
                     var token = jwt_encode(data,'UAP)(*');
 
                     var url = base_url_js+'api/__crudTransferStudent';
