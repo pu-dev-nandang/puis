@@ -439,12 +439,10 @@ class C_rest extends CI_Controller {
                 $queryDefault = 'SELECT cu.ReadComment, ct.* 
                                               FROM db_academic.counseling_user cu
                                               LEFT JOIN db_academic.counseling_topic ct
-                                              
                                               ON (ct.ID = cu.TopicID)
                                               WHERE ( cu.UserID = "'.$UserID.'" ) '.$dataSearch.'
                                                ORDER BY cu.TopicID DESC';
 
-//    , em.Name AS Owner           LEFT JOIN db_employees.employees em ON (em.NIP = ct.CreateBy)
 
                 $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
@@ -493,7 +491,7 @@ class C_rest extends CI_Controller {
                     if($row['InviteTo']=='4'){
                         $dataOwner = $this->db->select('Name')->get_where('db_academic.auth_students',array('NPM' => $row['CreateBy']))->result_array()[0];
                     } else {
-                        $dataOwner = $this->db->select('Name')->get_where()->result_array('db_employees.employees',array('NIP' => $row['CreateBy']))[0];
+                        $dataOwner = $this->db->select('Name')->get_where('db_employees.employees',array('NIP' => $row['CreateBy']))->result_array()[0];
                     }
 
                     $topic = '<a href="'.$urlDetail.'counseling/detail-topic/'.$token.'">'.$row['Topic'].'</a>
