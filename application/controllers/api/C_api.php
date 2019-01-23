@@ -6900,7 +6900,7 @@ class C_api extends CI_Controller {
             $BPPPay = ($BPPPay_Status!='' && $BPPPay_Status!='0' && $BPPPay_Status!=0) ? '<i class="fa fa-check" style="color: green;"></i>' : '-';
             $CreditPay = ($CreditPay_Status!='' && $CreditPay_Status!='0' && $CreditPay_Status!=0) ? '<i class="fa fa-check" style="color: green;"></i>' : '-';
 
-            $ProdiGroupID = ($row['ProdiGroupID']!='' && $row['ProdiGroupID']!=null) ? $row['ProdiGroupID'] : '-';
+            $ProdiGroupID = ($row['ProdiGroupID']!='' && $row['ProdiGroupID']!=null && $data_arr['SemesterID']>13) ? $row['ProdiGroupID'] : '-';
             $btnAction = ($BPPPay_Status!='' && $BPPPay_Status!='0' && $BPPPay_Status!=0)
                 ? '<a href="'.base_url('academic/study-planning/course-offer/'.$data_arr['SemesterID'].'/'.$ProdiGroupID.'/'.$row['NPM']).'" class="btn btn-sm btn-default btn-default-primary"><i class="fa fa-pencil"></i></a>'
                 : '<span style="color: red;">BPP Unpaid</span>';
