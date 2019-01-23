@@ -3298,7 +3298,7 @@ class C_api extends CI_Controller {
                 $ProdiID = $data_arr['ProdiID'];
                 $ApprovalAt = $data_arr['ApprovalAt'];
 
-                $data = $this->db->query('SELECT sk.*, auts.Year, cd.MKID FROM db_academic.std_krs sk 
+                $data = $this->db->query('SELECT sk.*, auts.Year, cd.MKID, cd.TotalSKS FROM db_academic.std_krs sk 
                                                             LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sk.CDID)
                                                             LEFT JOIN db_academic.auth_students auts ON (auts.NPM = sk.NPM)
                                                             WHERE sk.SemesterID = "'.$SemesterID.'" 
@@ -3306,7 +3306,7 @@ class C_api extends CI_Controller {
                                                             AND sk.Status = "2"  ORDER BY sk.NPM ASC')->result_array();
 
                 // Get Anak Bimbingan
-                $dataBim = $this->db->query('SELECT sk.*, auts.Year, cd.MKID FROM db_academic.mentor_academic ma 
+                $dataBim = $this->db->query('SELECT sk.*, auts.Year, cd.MKID, cd.TotalSKS FROM db_academic.mentor_academic ma 
                                                           LEFT JOIN db_academic.std_krs sk ON (sk.NPM = ma.NPM)
                                                           LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sk.CDID)
                                                           LEFT JOIN db_academic.auth_students auts ON (auts.NPM = sk.NPM)
@@ -3348,6 +3348,7 @@ class C_api extends CI_Controller {
                             'TypeSchedule' => $item['TypeSP'],
                             'CDID' => $item['CDID'],
                             'MKID' => $item['MKID'],
+                            'Credit' => $item['TotalSKS'],
                             'Approval' => '0',
                             'StatusSystem' => '1',
                             'Status' => '1'
@@ -3600,7 +3601,7 @@ class C_api extends CI_Controller {
 
 
         // - get MKID
-        $dataC = $this->db->select('MKID')->get_where('db_academic.curriculum_details',
+        $dataC = $this->db->select('MKID,TotalSKS')->get_where('db_academic.curriculum_details',
             array('ID' => $dataInsert['CDID']),1)->result_array();
 
         $dataUpdateKRS = array(
@@ -3611,6 +3612,7 @@ class C_api extends CI_Controller {
             'TypeSchedule' => $dataInsert['TypeSP'],
             'CDID' => $dataInsert['CDID'],
             'MKID' => $dataC[0]['MKID'],
+            'Credit' => $dataC[0]['TotalSKS'],
             'Approval' => '0',
             'StatusSystem' => '1',
             'Status' => '1'
