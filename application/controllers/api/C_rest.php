@@ -672,13 +672,16 @@ class C_rest extends CI_Controller {
                     $dataSmt = $this->db->query('SELECT * FROM db_academic.semester WHERE Year >= "'.$dataToken['ClassOf'].'" 
                                                     AND ID <= "'.$data[$i]['SemesterID'].'" ')->result_array();
 
+                    //Cek Bukti Upload
+                        $payment_proof = $this->m_master->caribasedprimary('db_finance.payment_proof','ID_payment',$data[$i]['ID']);
+                        $data[$i]['payment_proof'] = $payment_proof;
+
                     if(count($dataSmt)>0){
                         $data[$i]['Semester'] = count($dataSmt);
                         $datapay = $this->db->query('SELECT Invoice, Status FROM db_finance.payment_students WHERE ID_payment = "'.$data[$i]['ID'].'" ')->result_array();
                         $data[$i]['DetailPay'] = $datapay;
                         array_push($result,$data[$i]);
                     }
-
                 }
             }
 
@@ -1503,6 +1506,104 @@ class C_rest extends CI_Controller {
             if ($auth) {
                 $getData = $this->m_master->caribasedprimary('db_finance.payment_proof','ID_payment',$dataToken['idpayment']);
                 echo json_encode($getData);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    public function save_upload_proof_payment()
+    {
+        $data['auth'] =$this->input->post('auth');
+        $auth = $this->m_master->AuthAPI($data);
+        if ($auth) {
+            try {
+                $msg = '';
+                $dataToken = $this->getInputToken2();
+                $action = $this->input->post('action');
+                // get nim and PTID
+                    $ID_payment = $dataToken['ID_payment'];
+                        $G_payment = $this->m_master->caribasedprimary('db_finance.payment','ID',$ID_payment);
+                        $G_PTID = $this->m_master->caribasedprimary('db_finance.payment_type','ID',$G_payment[0]['PTID']);
+                        $path = './uploads/document/'.$G_payment[0]['NPM'];
+                        if (!file_exists($path)) {
+                            mkdir($path, 0777, true);
+                        }
+
+                switch ($action) {
+                    case 'add':
+                       $uploadFile2 = $this->m_rest->uploadDokumenMultiple('BuktiBayar_'.$G_PTID[0]['Abbreviation'],'fileData',$path);
+                       $FileUpload = array();
+                       for ($i=0; $i < count($uploadFile2); $i++) { 
+                           $FileUpload[] = array(
+                            'Filename' => $uploadFile2[$i],
+                            'VerifyFinance' => 0,
+                           );
+                       }
+                       $dataToken['FileUpload'] = json_encode($FileUpload);
+                       $dataToken['Date_upload'] = date('Y-m-d H:i:s');
+                       $this->db->insert('db_finance.payment_proof',$dataToken);
+                        break;
+                    
+                    default:
+                        # code...
+                        break;
+                }        
+                
+                echo json_encode($msg);
+            }
+            //catch exception
+            catch(Exception $e) {
+              // handling orang iseng
+              echo '{"status":"999","message":"jangan iseng :D"}';
+            }
+            
+        }
+        else
+        {
+            // handling orang iseng
+            echo '{"status":"999","message":"Not Authorize"}';
+        }
+
+    }
+
+    public function delete_file_proof_payment()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $msg = '';
+                $getDataproof = $this->m_master->caribasedprimary('db_finance.payment_proof','ID_payment',$dataToken['ID_payment']);
+                $getDatapayment = $this->m_master->caribasedprimary('db_finance.payment','ID',$dataToken['ID_payment']);
+                $NPM = $getDatapayment[0]['NPM'];
+                $FileUpload = (array) json_decode($getDataproof[0]['FileUpload'],true);
+                $index = $dataToken['index'];
+                $filename = $dataToken['Filename'];
+                // print_r(FCPATH);die();
+                for ($i=0; $i < count($FileUpload); $i++) { 
+                    if ($i == $index && $FileUpload[$i]['Filename'] == $filename) {
+                        $path = FCPATH.'uploads/document/'.$NPM.'/'.$filename;
+                        unlink($path);
+                        unset($FileUpload[$i]);
+                    }
+                }
+
+                $FileUpload = array_values($FileUpload);
+                $datasave = array(
+                    'FileUpload' => json_encode($FileUpload),
+                );
+                $this->db->where('ID_payment',$dataToken['ID_payment']);
+                $this->db->update('db_finance.payment_proof',$datasave);
+                echo json_encode($msg);
             }
             else
             {
