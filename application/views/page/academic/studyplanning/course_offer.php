@@ -152,7 +152,7 @@
 
 
             // Course Draf
-            if(CourseDraf.length>0){
+            if(typeof jsonResult.Course.ScheduleDraf !== 'undefined' && CourseDraf.length>0){
 
                 for(var t=0;t<Course.length;t++){
 
@@ -201,13 +201,13 @@
             }
             else {
                 $('#dataRowDraf').append('<tr>' +
-                    '<td colspan="7">--- Data not yrt ---</td>' +
+                    '<td colspan="7">--- Data not yet ---</td>' +
                     '</tr>');
             }
 
             $('#loadMyDraf').html(CreditInDraf);
 
-            if(Course.length>0){
+            if(typeof jsonResult.Course.Schedule !== 'undefined' &&  Course.length>0){
 
                 $('#divLoadCourse').html('<div class="panel panel-primary">' +
                     '            <div class="panel-heading" style="border-radius: 0px;">' +
@@ -324,6 +324,8 @@
                             '</tr>');
                     }
                 }
+            } else {
+                $('#divLoadCourse').html('Courses not yet to offer');
             }
 
 
