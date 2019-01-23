@@ -15,7 +15,7 @@ class C_auth extends Globalclass {
     public function __construct()
     {
         parent::__construct();
-        $this->db_server = $this->load->database('server', TRUE);
+//        $this->db_server = $this->load->database('server', TRUE);
         $this->db = $this->load->database('default', TRUE);
     }
 

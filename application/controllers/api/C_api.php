@@ -6873,6 +6873,10 @@ class C_api extends CI_Controller {
                 ? '<a href="'.base_url('academic/study-planning/course-offer/'.$data_arr['SemesterID'].'/'.$ProdiGroupID.'/'.$row['NPM']).'" class="btn btn-sm btn-default btn-default-primary"><i class="fa fa-pencil"></i></a>'
                 : '<span style="color: red;">BPP Unpaid</span>';
 
+            $btnAction = ($BPPPay_Status!='' && $BPPPay_Status!='0' && $BPPPay_Status!=0)
+                ? '<a href="'.base_url('academic/study-planning/course-offer/'.$data_arr['SemesterID'].'/'.$ProdiGroupID.'/'.$row['NPM']).'" class="btn btn-sm btn-default btn-default-primary"><i class="fa fa-pencil"></i></a>'
+                : '<span style="color: red;">BPP Unpaid</span>';
+
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div  style="text-align:left;"><b>'.$row['Name'].'</b><br/>'
                 .$row['NPM'].'<br/><span style="color: #0b97c4;">Last IPS : '.number_format(round($dataCredit['LastIPS'],2),2).
@@ -6882,6 +6886,7 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div  style="text-align:center;">'.$CreditPay.'</div>';
             $nestedData[] = '<div  style="text-align:left;">'.$course.'</div>';
             $nestedData[] = '<div  style="text-align:center;"><u style="color: #2196f3;">'.$totalCreditSP.'</u> of '.$dataCredit['MaxCredit']['Credit'].'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$btnAction.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$btnAction.'</div>';
 
 
@@ -7451,10 +7456,17 @@ class C_api extends CI_Controller {
                     $After_NPM = $d['After'];
                     $After_DB =  'ta_'.$d['ClassOfAfter'];
 
-                    $tables = array($After_DB.'.students', 'db_academic.auth_students');
+                    $tables = array($After_DB.'.students', $After_DB.'.study_planning'
+                    , 'db_academic.auth_students');
                     $this->db->where('NPM', $After_NPM);
                     $this->db->delete($tables);
                     $this->db->reset_query();
+
+                    $this->db->where('TSID', $d['ID']);
+                    $this->db->delete('db_academic.transfer_history_conversion');
+                    $this->db->reset_query();
+
+
 
                     $this->db->set('StatusStudentID', $d['StatusBefore']);
                     $this->db->where('NPM', $d['Before']);
@@ -7527,12 +7539,25 @@ class C_api extends CI_Controller {
                             $course = $this->m_rest->getDataKHS($DB_B,$NPM_B,$dt_s['ID'],'',$System);
 
                             if(count($course)>0){
+
+
+                                for($c=0;$c<count($course);$c++){
+                                    $dataHistory = $this->db->query('SELECT cd.Semester FROM db_academic.transfer_history_conversion thc
+                                                                                LEFT JOIN db_academic.curriculum_details cd 
+                                                                                ON (cd.ID = thc.CDID_After)
+                                                                                WHERE thc.TSID = "'.$dt['ID'].'" 
+                                                                                AND thc.CDID_Before = "'.$course[$c]['CDID'].'"  ')->result_array();
+
+                                    $course[$c]['TransferToSemester'] = $dataHistory;
+                                }
+
                                 $arr = array(
                                     'Semester' => $NoSem_B,
                                     'SemesterID' => $dt_s['ID'],
                                     'SemesterName' => $dt_s['Name'],
                                     'Course' => $course
                                 );
+
 
                                 array_push($arrSemester_B,$arr);
                             }
@@ -7584,6 +7609,9 @@ class C_api extends CI_Controller {
                         }
 
                     }
+
+
+
 
                     $result = array(
                         'DataTransfer' => $data,
