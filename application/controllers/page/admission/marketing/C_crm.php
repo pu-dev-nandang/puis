@@ -19,7 +19,7 @@ class C_crm extends Admission_Controler {
     public function index()
     {
         $data['department'] = parent::__getDepartement();
-        $content = $this->load->view('page/'.$this->data['department'].'/crm/index',$this->data,true);
+        $content = $this->load->view('page/'.$this->data['department'].'/crm/page',$this->data,true);
         $this->temp($content);
         
     }
