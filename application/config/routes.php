@@ -825,6 +825,7 @@ $route['rest/__Databank'] = 'api/c_rest/Databank';
 $route['rest/__GetpaymentByID'] = 'api/c_rest/GetpaymentByID';
 $route['rest/__save_upload_proof_payment'] = 'api/c_rest/save_upload_proof_payment';
 $route['rest/__delete_file_proof_payment'] = 'api/c_rest/delete_file_proof_payment';
+$route['rest/__delete_all_file_proof_payment'] = 'api/c_rest/delete_all_file_proof_payment';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
