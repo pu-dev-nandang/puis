@@ -150,7 +150,6 @@
                 '            <tbody id="dataRowDraf"></tbody>' +
                 '        </table>');
 
-
             // Course Draf
             if(typeof jsonResult.Course.ScheduleDraf !== 'undefined' && CourseDraf.length>0){
 
@@ -324,11 +323,10 @@
                             '</tr>');
                     }
                 }
-            } else {
+            }
+            else {
                 $('#divLoadCourse').html('Courses not yet to offer');
             }
-
-
 
         });
     }

@@ -179,7 +179,6 @@
             var token = jwt_encode({action : 'getLastNIMTransferStudent', ProdiID : ProdiID, ClassOf : ClassOf},'UAP)(*');
 
             $.post(url,{token:token},function (jsonResult) {
-               console.log(jsonResult);
                 $('#lastNIM').html('-');
                if(jsonResult.length>0){
                    $('#lastNIM').html(jsonResult[0].NPM);
@@ -338,6 +337,17 @@
     }
 
     $('#btnCreateNPM').click(function () {
+        $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Create NIM ?</b><hr/> ' +
+            '<button type="button" class="btn btn-success" id="btnActionCreateNPM" style="margin-right: 5px;">Yes</button>' +
+            '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+            '</div>');
+        $('#NotificationModal').modal({
+            'backdrop' : 'static',
+            'show' : true
+        });
+    });
+
+    $(document).on('click','#btnActionCreateNPM',function () {
         var fromClassOf = $('#fromClassOf').val();
         var fromProdi = $('#fromProdi').val();
         var fromStudent = $('#fromStudent').val();
@@ -358,49 +368,51 @@
             var statusNewNPM = $('#statusNewNPM').val();
             if(statusNewNPM==1 || statusNewNPM=='1'){
 
-                if(confirm('Are you sure to create NIM ?')){
 
-                    loading_button('#btnCreateNPM');
 
-                    var formPayemntProdiID = $('#formPayemntProdiID').val();
-                    var formPayemntClassOf = $('#formPayemntClassOf').val();
-                    var formPayemntBintang = $('#formPayemntBintang').val();
+                loading_button('#btnCreateNPM');
+                loading_buttonSm('#btnActionCreateNPM');
+                $('button[data-dismiss=modal]').prop('disabled',true);
 
-                    var ProdiID_f = fromProdi.split('.')[0];
-                    var ClassOf_f = fromClassOf.split('.')[1];
+                var formPayemntProdiID = $('#formPayemntProdiID').val();
+                var formPayemntClassOf = $('#formPayemntClassOf').val();
+                var formPayemntBintang = $('#formPayemntBintang').val();
 
-                    var ProdiID_t = toProdi.split('.')[0];
-                    var ClassOf_t = toClassOf.split('.')[1];
+                var ProdiID_f = fromProdi.split('.')[0];
+                var ClassOf_f = fromClassOf.split('.')[1];
 
-                    var data = {
-                        action : 'addingTransferStudent',
-                        fromClassOf : ClassOf_f,
-                        fromProdi : ProdiID_f,
-                        fromStudent : fromStudent,
-                        toClassOf : ClassOf_t,
-                        toProdi : ProdiID_t,
-                        toNewNPM : toNewNPM,
-                        TransferTypeID : toReason,
-                        PaymentProdiID : (formPayemntProdiID!='' && formPayemntProdiID!=null)
-                            ? formPayemntProdiID!=''.split('.')[0] : '',
-                        PaymentClassOf : formPayemntClassOf,
-                        PaymentBintang : formPayemntBintang,
-                        CreateAt : dateTimeNow(),
-                        CreateBy : sessionNIP
-                    };
-                    
-                    var token = jwt_encode(data,'UAP)(*');
+                var ProdiID_t = toProdi.split('.')[0];
+                var ClassOf_t = toClassOf.split('.')[1];
 
-                    var url = base_url_js+'api/__crudTransferStudent';
-                    $.post(url,{token:token},function (jsonResult) {
+                var data = {
+                    action : 'addingTransferStudent',
+                    fromClassOf : ClassOf_f,
+                    fromProdi : ProdiID_f,
+                    fromStudent : fromStudent,
+                    toClassOf : ClassOf_t,
+                    toProdi : ProdiID_t,
+                    toNewNPM : toNewNPM,
+                    TransferTypeID : toReason,
+                    PaymentProdiID : (formPayemntProdiID!='' && formPayemntProdiID!=null)
+                        ? formPayemntProdiID!=''.split('.')[0] : '',
+                    PaymentClassOf : formPayemntClassOf,
+                    PaymentBintang : formPayemntBintang,
+                    CreateAt : dateTimeNow(),
+                    CreateBy : sessionNIP
+                };
 
-                        toastr.success('Create NIM','Success');
+                var token = jwt_encode(data,'UAP)(*');
 
-                        setTimeout(function () {
-                            window.location.href = '';
-                        },500);
-                    });
-                }
+                var url = base_url_js+'api/__crudTransferStudent';
+                $.post(url,{token:token},function (jsonResult) {
+
+                    toastr.success('Create NIM','Success');
+                    $('#NotificationModal').modal('hide');
+                    setTimeout(function () {
+                        window.location.href = '';
+                    },500);
+                });
+
 
             } else {
                 toastr.warning('NIM canot to use','Warning');
@@ -460,23 +472,35 @@
 
     $(document).on('click','.btnRemoveData',function () {
 
+        var ID = $(this).attr('data-id');
 
-        if(confirm('Are you sure to remove?')){
-            $('.btnRemoveData').prop('disabled',true);
+        $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Remove data ?</b><hr/> ' +
+            '<button type="button" class="btn btn-primary" id="btnActRemoveTransferStd" data-id="'+ID+'" style="margin-right: 5px;">Yes</button>' +
+            '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+            '</div>');
+        $('#NotificationModal').modal({
+            'backdrop' : 'static',
+            'show' : true
+        });
 
-            var ID = $(this).attr('data-id');
-            var url = base_url_js+'api/__crudTransferStudent';
-            var token = jwt_encode({action : 'removeTransverStudent', ID : ID},'UAP)(*');
+    });
 
-            $.post(url,{token:token},function (jsonResult) {
-                toastr.success('Remove Student Transfer','Success');
-                setTimeout(function () {
-                    getListStudentTransfer();
-                },500);
-            });
-        }
+    $(document).on('click','#btnActRemoveTransferStd',function () {
 
+        loading_buttonSm('#btnActRemoveTransferStd');
+        $('button[data-dismiss=modal]').prop('disabled',true);
 
+        var ID = $(this).attr('data-id');
+        var url = base_url_js+'api/__crudTransferStudent';
+        var token = jwt_encode({action : 'removeTransverStudent', ID : ID},'UAP)(*');
+
+        $.post(url,{token:token},function (jsonResult) {
+            toastr.success('Remove Student Transfer','Success');
+            getListStudentTransfer();
+            setTimeout(function () {
+                $('#NotificationModal').modal('hide');
+            },500);
+        });
     });
 
 </script>
