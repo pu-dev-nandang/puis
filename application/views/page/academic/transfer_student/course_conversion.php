@@ -293,10 +293,13 @@
             var url = base_url_js+'api/__crudTransferStudent';
 
             $.post(url,{token:token},function (result) {
+                toastr.success('Course Conversion','Success');
                 loadDataTransferStudent();
                 $('#GlobalModal').modal('hide');
             });
 
+        } else {
+            toastr.error('FormRequired','Error');
         }
 
 
@@ -383,6 +386,7 @@
             var url = base_url_js+'api/__crudTransferStudent';
 
             $.post(url,{token:token},function (result) {
+                toastr.success('Remove Course Conversion','Success');
                 setTimeout(function () {
                     loadDataTransferStudent();
                 },500);

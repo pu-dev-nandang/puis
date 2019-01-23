@@ -393,6 +393,9 @@
 
                     var url = base_url_js+'api/__crudTransferStudent';
                     $.post(url,{token:token},function (jsonResult) {
+
+                        toastr.success('Create NIM','Success');
+
                         setTimeout(function () {
                             window.location.href = '';
                         },500);
@@ -466,6 +469,7 @@
             var token = jwt_encode({action : 'removeTransverStudent', ID : ID},'UAP)(*');
 
             $.post(url,{token:token},function (jsonResult) {
+                toastr.success('Remove Student Transfer','Success');
                 setTimeout(function () {
                     getListStudentTransfer();
                 },500);
