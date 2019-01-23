@@ -56,6 +56,7 @@
                         <div class="form-group">
                             <label>Programme Study</label>
                             <select class="form-control" id="toProdi"></select>
+                            <p style="color: #009688;">Last NIM : <b id="lastNIM">-</b></p>
                         </div>
                         <div class="form-group">
                             <label>New NIM</label>
@@ -147,7 +148,48 @@
             }
         },1000);
 
+        var loadlastNIM = setInterval(function () {
+            var toClassOf = $('#toClassOf').val();
+            var toProdi = $('#toProdi').val();
+
+            if(toClassOf != '' && toClassOf != null &&
+                toProdi != '' && toProdi != null){
+                loadLastNIM();
+                clearInterval(loadlastNIM);
+            }
+
+        },1000);
+
     });
+
+    $('#toClassOf, #toProdi').change(function () {
+        // Load Last NIM
+        loadLastNIM();
+    });
+
+    function loadLastNIM() {
+        var toProdi = $('#toProdi').val();
+        var toClassOf = $('#toClassOf').val();
+
+        if(toProdi!='' && toProdi!=null && toClassOf!='' && toClassOf!=null){
+
+            var ProdiID = toProdi.split('.')[0];
+            var ClassOf = toClassOf.split('.')[1];
+            var url = base_url_js+'api/__crudTransferStudent';
+            var token = jwt_encode({action : 'getLastNIMTransferStudent', ProdiID : ProdiID, ClassOf : ClassOf},'UAP)(*');
+
+            $.post(url,{token:token},function (jsonResult) {
+               console.log(jsonResult);
+                $('#lastNIM').html('-');
+               if(jsonResult.length>0){
+                   $('#lastNIM').html(jsonResult[0].NPM);
+               }
+            });
+
+        }
+
+
+    }
 
     $('#toNewNPM').keyup(function () {
         var toNewNPM = $('#toNewNPM').val();
