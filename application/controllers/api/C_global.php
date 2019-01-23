@@ -352,36 +352,36 @@ class C_global extends CI_Controller {
 
     public function testInject2()
     {
-        $get = $this->m_master->showData_array('db_admission.sale_formulir_offline');
-        for ($i=0; $i < count($get); $i++) { 
-            $ID = $get[$i]['ID'];
-            $FullName = strtolower($get[$i]['FullName']);
-            $FullName = ucwords($FullName);
-            $dataSave = array(
-                    'FullName' => ucwords($FullName),
-                    'Email' => strtolower($get[$i]['Email'])
-                            );
-            $this->db->where('ID',$ID);
-            $this->db->update('db_admission.sale_formulir_offline', $dataSave);
-        }
+        // $get = $this->m_master->showData_array('db_admission.sale_formulir_offline');
+        // for ($i=0; $i < count($get); $i++) { 
+        //     $ID = $get[$i]['ID'];
+        //     $FullName = strtolower($get[$i]['FullName']);
+        //     $FullName = ucwords($FullName);
+        //     $dataSave = array(
+        //             'FullName' => ucwords($FullName),
+        //             'Email' => strtolower($get[$i]['Email'])
+        //                     );
+        //     $this->db->where('ID',$ID);
+        //     $this->db->update('db_admission.sale_formulir_offline', $dataSave);
+        // }
 
 
     }
 
     public function testInject3()
     {
-        $get = $this->m_master->showData_array('db_admission.register');
-        for ($i=0; $i < count($get); $i++) { 
-            $ID = $get[$i]['ID'];
-            $FullName = strtolower($get[$i]['Name']);
-            $FullName = ucwords($FullName);
-            $dataSave = array(
-                    'Name' => ucwords($FullName),
-                    'Email' => strtolower($get[$i]['Email'])
-                            );
-            $this->db->where('ID',$ID);
-            $this->db->update('db_admission.register', $dataSave);
-        }
+        // $get = $this->m_master->showData_array('db_admission.register');
+        // for ($i=0; $i < count($get); $i++) { 
+        //     $ID = $get[$i]['ID'];
+        //     $FullName = strtolower($get[$i]['Name']);
+        //     $FullName = ucwords($FullName);
+        //     $dataSave = array(
+        //             'Name' => ucwords($FullName),
+        //             'Email' => strtolower($get[$i]['Email'])
+        //                     );
+        //     $this->db->where('ID',$ID);
+        //     $this->db->update('db_admission.register', $dataSave);
+        // }
 
 
     }
@@ -399,20 +399,20 @@ class C_global extends CI_Controller {
         //     $this->db->update('db_admission.formulir_number_offline_m', $dataSave);
         // }
 
-        $sql = 'select ID from db_admission.register_formulir where ID not in (select ID_register_formulir from db_admission.register_document)';
-        $query=$this->db->query($sql, array())->result_array();
-        for ($i=0; $i < count($query); $i++) {
-            $ID_register_formulir = $query[$i]['ID']; 
-            $arrID_reg_doc_checklist = $this->m_master->caribasedprimary('db_admission.reg_doc_checklist','Active',1);
-            for ($xy=0; $xy < count($arrID_reg_doc_checklist); $xy++) { 
-                $dataSave = array(
-                        'ID_register_formulir' => $ID_register_formulir,
-                        'ID_reg_doc_checklist' => $arrID_reg_doc_checklist[$xy]['ID'],
-                                );
+        // $sql = 'select ID from db_admission.register_formulir where ID not in (select ID_register_formulir from db_admission.register_document)';
+        // $query=$this->db->query($sql, array())->result_array();
+        // for ($i=0; $i < count($query); $i++) {
+        //     $ID_register_formulir = $query[$i]['ID']; 
+        //     $arrID_reg_doc_checklist = $this->m_master->caribasedprimary('db_admission.reg_doc_checklist','Active',1);
+        //     for ($xy=0; $xy < count($arrID_reg_doc_checklist); $xy++) { 
+        //         $dataSave = array(
+        //                 'ID_register_formulir' => $ID_register_formulir,
+        //                 'ID_reg_doc_checklist' => $arrID_reg_doc_checklist[$xy]['ID'],
+        //                         );
 
-                $this->db->insert('db_admission.register_document', $dataSave);
-            }
-        }
+        //         $this->db->insert('db_admission.register_document', $dataSave);
+        //     }
+        // }
         
     }
 
