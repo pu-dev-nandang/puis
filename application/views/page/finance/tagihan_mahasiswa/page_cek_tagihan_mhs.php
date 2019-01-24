@@ -70,7 +70,7 @@
                         <div class="col-md-3" style="margin-top: 10px">
                           <div class="thumbnail" style="min-height: 30px;padding: 10px;">
                               <select class="form-control" id="selectStatusPayment">
-                                <option value="">All</option>
+                                <option value="">All Status Payment</option>
                                 <option value="0">Belum Lunas</option>
                                 <option value="1">Lunas</option>
                               </select>
@@ -373,6 +373,26 @@
                      var btn_view = '<button class = " btn btn-primary DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'">Pembayaran Manual </button>';
                    <?php endif ?>
 
+                   // adding status
+                      var payment_proof = Data_mhs[i]['payment_proof'];
+                      if (payment_proof.length > 0) {
+                        var boolproof = false;
+                        for (var zi = 0; zi < payment_proof.length; zi++) {
+                          if (payment_proof[zi]['VerifyFinance'] != 1) {
+                            boolproof = true;
+                            break;
+                          }
+                        }
+                        if (boolproof) {
+                          status += '<br> Bukti Upload belum verify ';
+                        }
+                        else
+                        {
+                          status += '<br> Bukti Upload telah diverify';
+                        }
+                      }
+                      
+
                    $('#dataRow').append(tr +
                        '<td>'+inputCHK+'</td>' +
                        '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
@@ -491,6 +511,56 @@
         table += '</table>' ;
 
         html += table;
+
+        // for Verify Bukti Bayar
+            var htmlPaymentProof = '<div class = "row" style = "margin-top : 10px">'+
+                                      '<div class = "col-md-12">'+
+                                          '<h5>List Proof of Payment</h5>'+
+                                            '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+                                              '<thead>'+
+                                                '<tr>'+
+                                                   '<th style="width: 5px;">No</th>'+
+                                                   '<th style="width: 55px;">File</th>'+
+                                                   '<th style="width: 55px;">Money Paid</th>'+
+                                                   '<th style="width: 55px;">Account Name</th>'+
+                                                   '<th style="width: 55px;">Account Owner</th>'+
+                                                   '<th style="width: 55px;">Transaction Date</th>'+
+                                                   '<th style="width: 55px;">Upload Date</th>'+
+                                                   '<th style="width: 55px;">Bank</th>'+
+                                                   '<th style="width: 55px;">Action</th>'+
+                                                '</tr>'+
+                                              '</thead>'+
+                                            '<tbody>';
+          var payment_proof = dataaModal[i]['payment_proof'];
+          if (payment_proof.length > 0) {
+            for (var i = 0; i < payment_proof.length; i++) {
+              var FileUpload = jQuery.parseJSON(payment_proof[i]['FileUpload']);
+              var FileAhref = '';
+              for (var j = 0; j < FileUpload.length; j++) {
+                FileAhref = '<a href ="'+base_url_js+'fileGetAny/document-'+NPM+'-'+FileUpload[j].Filename+'" target="_blank">File '+ ((i+1)+j)+'</a>';
+              }
+
+              var btnVerify = (payment_proof[i]['VerifyFinance'] == 1)? '<span style="color: green;margin-left: 12px;"><i class="fa fa-check-circle margin-right"></i> Verify</span>' : '<button class = "verify" idtable = "'+payment_proof[i]['ID']+'">Verify</button>';
+
+              htmlPaymentProof += '<tr>'+
+                                      '<td>'+(i+1)+'</td>'+
+                                      '<td>'+FileAhref+'</td>'+
+                                      '<td>'+formatRupiah(payment_proof[i]['Money'])+'</td>'+
+                                      '<td>'+payment_proof[i]['NoRek']+'</td>'+
+                                      '<td>'+payment_proof[i]['AccountOwner']+'</td>'+
+                                      '<td>'+payment_proof[i]['Date_transaction']+'</td>'+
+                                      '<td>'+payment_proof[i]['Date_upload']+'</td>'+
+                                      '<td>'+payment_proof[i]['NmBank']+'</td>'+
+                                      '<td>'+btnVerify+'</td>'+
+                                  '</tr>';    
+            }
+
+            htmlPaymentProof += '</tbody></table></div></div>';
+            html += htmlPaymentProof;
+          }                                  
+
+        // end Verify Bukti Bayar
+
         // for reason cancel payment
         var htmlReason = '<div class = "row"><div class= col-md-12><h5>List Cancel Payment</h5><table class="table table-striped table-bordered table-hover table-checkable tableData">'+
                       '<thead>'+
@@ -519,11 +589,6 @@
         }
         // end reason cancel payment
 
-        // for Verify Bukti Bayar
-            var htmlPaymentProof = '<div class = "row">';
-        // end Verify Bukti Bayar
-
-
         var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
             '';
 
@@ -534,7 +599,7 @@
             'show' : true,
             'backdrop' : 'static'
         });
-        $('#GlobalModalLarge .modal-dialog').attr('style','width : 1000px;');
+        $('#GlobalModalLarge .modal-dialog').attr('style','width : 1080px;');
     });
 
 
@@ -575,6 +640,28 @@
     }
 
 
+    $(document).on('click','.verify', function () {
+      var s = $(this);
+      var idtable = $(this).attr('idtable');
+      loading_button('.verify[idtable="'+idtable+'"]');
+      var url = base_url_js+'finance/verify_bukti_bayar';
+      var data = {
+          idtable : idtable,
+      };
+      var token = jwt_encode(data,'UAP)(*');
+      $.post(url,{token:token},function (resultJson) {
+         // var resultJson = jQuery.parseJSON(resultJson);
+         s.remove();
+         toastr.success('The data has been verified');
+         loadData(1);
+      }).fail(function() {
+        toastr.info('No Action...'); 
+        // toastr.error('The Database connection error, please try again', 'Failed!!');
+      }).always(function() {
+
+      }); 
+
+    });
     $(document).on('click','.bayar', function () {
         var IDStudent = $(this).attr('IDStudent');
         var idget = $(this).attr('IDStudent');

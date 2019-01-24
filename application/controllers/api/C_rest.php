@@ -1178,7 +1178,7 @@ class C_rest extends CI_Controller {
 
                 if ($bool) {
                     $to = $dataToken['to'];
-                    $subject = $dataToken['to'];
+                    $subject = $dataToken['subject'];
                     $text = $dataToken['text'];
                     if (array_key_exists('attach',$dataToken)) {
                         $path = $dataToken['attach'];

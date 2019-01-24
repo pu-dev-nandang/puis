@@ -879,6 +879,9 @@ class C_finance extends Finnance_Controler {
     {
         $input = $this->getInputToken();
         $this->load->library('pagination');
+        if (!array_key_exists('StatusPayment', $input)) {
+            $input['StatusPayment'] = '';
+        }
         // count
         $count = $this->m_finance->count_get_created_tagihan_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NIM'],$input['Semester'],$input['StatusPayment']);
         $config = $this->config_pagination_default_ajax($count,5,3);
@@ -2353,6 +2356,27 @@ class C_finance extends Finnance_Controler {
                 }
         }
             
+    }
+
+    public function verify_bukti_bayar()
+    {
+        $input = $this->getInputToken();
+        $ID = $input['idtable'];
+        $G_data = $this->m_master->caribasedprimary('db_finance.payment_proof','ID',$ID);
+        $FileUpload = (array) json_decode($G_data[0]['FileUpload'],true);
+        for ($i=0; $i < count($FileUpload); $i++) {
+             $FileUpload[$i]['VerifyFinance'] = 1; 
+        }
+
+        $dataSave = array(
+            'VerifyFinance' => 1,
+            'FileUpload' => json_encode($FileUpload),
+            'VerifyBy' => $this->session->userdata('NIP'),
+        );
+
+        $this->db->where('ID',$ID);
+        $this->db->update('db_finance.payment_proof',$dataSave);
+        echo json_encode('');
     }
 
 }

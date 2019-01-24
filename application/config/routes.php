@@ -579,6 +579,7 @@ $route['finance/download-log-va'] =  'page/finance/c_finance/download_log_va';
 $route['finance/listfile_va'] =  'page/finance/c_finance/listfile_va';
 $route['finance/admission/dailypenerimaanBank'] =  'c_save_to_excel/dailypenerimaanBank_admission';
 $route['finance/admission/RekapIntake'] =  'c_save_to_excel/RekapIntake';
+$route['finance/verify_bukti_bayar'] =  'page/finance/c_finance/verify_bukti_bayar';
 
 
 // -- config --
