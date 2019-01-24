@@ -3052,6 +3052,31 @@ class C_api extends CI_Controller {
 
             }
 
+            else if($data_arr['action'] == 'readAvailableKRSOnBatalTambah'){
+                $SemesterID = $data_arr['SemesterID'];
+                $NPM = $data_arr['NPM'];
+
+                // Load Auth
+                $dataAuth = $this->m_api->getDataAuthStudent($NPM);
+
+                // Load Credit
+                $dataCredit = $this->m_api->getMaxCredit('ta_'.$dataAuth[0]['Year'],$NPM,$dataAuth[0]['Year'],$SemesterID,$dataAuth[0]['ProdiID']);
+                $dataAuth[0]['dataCredit'] = $dataCredit;
+
+                $Semester = $this->m_api->getSemesterStudentByYear($SemesterID,$dataAuth[0]['Year']);
+
+                $dataSc = $this->m_api->__getAvailabelCourse($SemesterID,$NPM,$dataAuth[0]['ProgramID'],$dataAuth[0]['ProdiID'],
+                    $Semester,'0',$dataAuth[0]['Year']);
+
+                $result = array(
+                    'Student' => $dataAuth[0],
+                    'Course' => $dataSc
+                );
+
+                return print_r(json_encode($result));
+
+            }
+
             else if($data_arr['action']=='chekSeat'){
                 $dataToken = $data_arr;
                 $dataWhere = (array) $dataToken['dataWhere'];
@@ -3081,7 +3106,7 @@ class C_api extends CI_Controller {
                 $dataInsert = (array) $data_arr['dataInsert'];
 
                 // Cek apakah sudah di insert atau belum, jika sudah langsung return 1
-                // Cek apakah schedule sudah ada ataub belum jika ada maka cukup return saja
+                // Cek apakah schedule sudah ada atau belum jika ada maka cukup return saja
                 $dataWhere = array(
                     'SemesterID' => $dataInsert['SemesterID'],
                     'NPM' => $dataInsert['NPM'],
@@ -3110,7 +3135,7 @@ class C_api extends CI_Controller {
                     }
 
                     // - get MKID
-                    $dataC = $this->db->select('MKID')->get_where('db_academic.curriculum_details',
+                    $dataC = $this->db->select('MKID,TotalSKS')->get_where('db_academic.curriculum_details',
                         array('ID' => $dataInsert['CDID']),1)->result_array();
 
                     $dataUpdateKRS = array(
@@ -3121,14 +3146,23 @@ class C_api extends CI_Controller {
                         'TypeSchedule' => $dataInsert['TypeSP'],
                         'CDID' => $dataInsert['CDID'],
                         'MKID' => $dataC[0]['MKID'],
+                        'Credit' => $dataC[0]['TotalSKS'],
                         'Approval' => '0',
                         'StatusSystem' => '1',
                         'Status' => '1'
                     );
 
-                    $this->db->insert($data_arr['DBStudent'].'.study_planning', $dataUpdateKRS);
+                    $this->db->insert($DBStudent.'.study_planning', $dataUpdateKRS);
 
                 }
+                return print_r(1);
+            }
+
+            else if($data_arr['action']=='addAvailabelInBatalTambah'){
+
+                $dataInsert = (array) $data_arr['dataInsert'];
+                $this->db->insert('db_academic.std_krs_batal_tambah', $dataInsert);
+
                 return print_r(1);
             }
 
@@ -3509,6 +3543,114 @@ class C_api extends CI_Controller {
                 }
 
                 return print_r(1);
+
+            }
+
+            else if($data_arr['action']=='deleteAvailabelInBatalTambah'){
+                $SKID = $data_arr['SKID'];
+                // Trakhir hapus di std krs
+                $this->db->where('ID',$SKID);
+                $this->db->delete('db_academic.std_krs_batal_tambah');
+                $this->db->reset_query();
+
+                return print_r(1);
+
+            }
+            else if($data_arr['action']=='setAsTimetable'){
+
+                $DBStudent = $data_arr['DBStudent'];
+                $SemesterID = $data_arr['SemesterID'];
+                $NPM = $data_arr['NPM'];
+
+                // Get Data Lama
+                $dataSTDLama = $this->db->get_where('db_academic.std_krs',array('SemesterID' => $SemesterID,'NPM'=>$NPM))
+                    ->result_array();
+
+                if(count($dataSTDLama)>0){
+                    foreach ($dataSTDLama AS $std){
+                        // === Hapus Attendance ===
+                        // Get ATTD ID
+                        $dataAttd = $this->db->select('ID')->get_where('db_academic.attendance',array(
+                            'SemesterID' => $std['SemesterID'],
+                            'ScheduleID' => $std['ScheduleID']
+                        ))->result_array();
+                        if(count($dataAttd)>0){
+                            foreach($dataAttd AS $attd){
+                                $this->db->where(array(
+                                    'ID_Attd' => $attd['ID'],
+                                    'NPM' => $std['NPM']
+                                ));
+                                $this->db->delete('db_academic.attendance_students');
+                                $this->db->reset_query();
+                            }
+                        }
+
+                        // ===== Hapus di Study plan =====
+                        $this->db->where(array(
+                            'SemesterID' => $std['SemesterID'],
+                            'ScheduleID' => $std['ScheduleID'],
+                            'NPM' => $std['NPM']
+                        ));
+                        $this->db->delete($DBStudent.'.study_planning');
+                        $this->db->reset_query();
+
+                        // Trakhir hapus di std krs
+                        $this->db->where('ID',$std['ID']);
+                        $this->db->delete('db_academic.std_krs');
+                        $this->db->reset_query();
+
+                    }
+                }
+
+
+                // Insert yang baru
+                if(count($data_arr['arrToken'])>0){
+                    for($i=0;$i<count($data_arr['arrToken']);$i++){
+                        $dInsert = (array) $data_arr['arrToken'][$i];
+
+                        $this->db->insert('db_academic.std_krs', $dInsert);
+
+
+                        // Get Attendance Attendance
+                        $dataAttd = $this->db->get_where('db_academic.attendance',
+                            array('SemesterID' => $dInsert['SemesterID'],
+                                'ScheduleID' => $dInsert['ScheduleID']))->result_array();
+
+                        // Insert Ke Attendance
+                        foreach ($dataAttd AS $itemA) {
+                            $dataAins = array(
+                                'ID_Attd' => $itemA['ID'],
+                                'NPM' => $dInsert['NPM']
+                            );
+                            $this->db->insert('db_academic.attendance_students', $dataAins);
+                        }
+
+                        // - get MKID
+                        $dataC = $this->db->select('MKID,TotalSKS')->get_where('db_academic.curriculum_details',
+                            array('ID' => $dInsert['CDID']),1)->result_array();
+
+                        $dataUpdateKRS = array(
+                            'SemesterID' => $dInsert['SemesterID'],
+                            'MhswID' => $data_arr['MhswID'],
+                            'NPM' => $dInsert['NPM'],
+                            'ScheduleID' => $dInsert['ScheduleID'],
+                            'TypeSchedule' => $dInsert['TypeSP'],
+                            'CDID' => $dInsert['CDID'],
+                            'MKID' => $dataC[0]['MKID'],
+                            'Credit' => $dataC[0]['TotalSKS'],
+                            'Approval' => '0',
+                            'StatusSystem' => '1',
+                            'Status' => '1'
+                        );
+
+                        $this->db->insert($DBStudent.'.study_planning', $dataUpdateKRS);
+
+
+                    }
+                }
+
+                return print_r(1);
+
 
             }
 
@@ -6870,11 +7012,11 @@ class C_api extends CI_Controller {
 
             $ProdiGroupID = ($row['ProdiGroupID']!='' && $row['ProdiGroupID']!=null && $data_arr['SemesterID']>13) ? $row['ProdiGroupID'] : '-';
             $btnAction = ($BPPPay_Status!='' && $BPPPay_Status!='0' && $BPPPay_Status!=0)
-                ? '<a href="'.base_url('academic/study-planning/course-offer/'.$data_arr['SemesterID'].'/'.$ProdiGroupID.'/'.$row['NPM']).'" class="btn btn-sm btn-default btn-default-primary"><i class="fa fa-pencil"></i></a>'
+                ? '<a href="'.base_url('academic/study-planning/course-offer/'.$data_arr['SemesterID'].'/'.$ProdiGroupID.'/'.$row['NPM']).'" class="btn btn-sm btn-primary"><i class="fa fa-pencil"></i></a>'
                 : '<span style="color: red;">BPP Unpaid</span>';
 
-            $btnAction = ($BPPPay_Status!='' && $BPPPay_Status!='0' && $BPPPay_Status!=0)
-                ? '<a href="'.base_url('academic/study-planning/course-offer/'.$data_arr['SemesterID'].'/'.$ProdiGroupID.'/'.$row['NPM']).'" class="btn btn-sm btn-default btn-default-primary"><i class="fa fa-pencil"></i></a>'
+            $btnBatalTambah = ($BPPPay_Status!='' && $BPPPay_Status!='0' && $BPPPay_Status!=0)
+                ? '<a href="'.base_url('academic/study-planning/batal-tambah/'.$data_arr['SemesterID'].'/'.$ProdiGroupID.'/'.$row['NPM']).'" class="btn btn-sm btn-warning"><i class="fa fa-pencil"></i></a>'
                 : '<span style="color: red;">BPP Unpaid</span>';
 
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
@@ -6887,7 +7029,7 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div  style="text-align:left;">'.$course.'</div>';
             $nestedData[] = '<div  style="text-align:center;"><u style="color: #2196f3;">'.$totalCreditSP.'</u> of '.$dataCredit['MaxCredit']['Credit'].'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$btnAction.'</div>';
-            $nestedData[] = '<div  style="text-align:center;">'.$btnAction.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$btnBatalTambah.'</div>';
 
 
             $no++;

@@ -82,6 +82,7 @@ $route['academic/study-planning'] = 'page/academic/c_study_planning';
 
 $route['academic/study-planning/list-student'] = 'page/academic/c_study_planning/liststudent';
 $route['academic/study-planning/course-offer/(:num)/(:any)/(:any)'] = 'page/academic/c_study_planning/course_offer/$1/$2/$3';
+$route['academic/study-planning/batal-tambah/(:num)/(:any)/(:any)'] = 'page/academic/c_study_planning/batal_tambah/$1/$2/$3';
 
 $route['academic/references'] = 'page/academic/c_reference';
 
