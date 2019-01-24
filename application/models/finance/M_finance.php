@@ -1429,7 +1429,7 @@ class M_finance extends CI_Model {
       // get payment proof untuk update ID jika telah dicancel
          $sql = 'select * from db_finance.payment_proof where PTID = ? and SemesterID = ? and NPM = ?';
          $query=$this->db->query($sql, array($PTID,$SemesterID,$NPM))->result_array();
-         if (count($query > 0)) {
+         if (count($query) > 0) {
            $ID = $query[0]['ID'];
            $dataUpdate = array(
               'ID_payment' => $insertId,
