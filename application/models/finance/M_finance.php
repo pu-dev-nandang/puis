@@ -1644,7 +1644,7 @@ class M_finance extends CI_Model {
     return $query;
    }
 
-   public function count_get_created_tagihan_mhs($ta,$prodi,$PTID,$NIM,$Semester)
+   public function count_get_created_tagihan_mhs($ta,$prodi,$PTID,$NIM,$Semester,$StatusPayment)
    {
     $arr = array();
     $this->load->model('master/m_master');
@@ -1666,13 +1666,29 @@ class M_finance extends CI_Model {
       $ta1 = $ta[1];
     }
 
+    $AddWhereStatusPayment = '';
+    switch ($StatusPayment) {
+      case '':
+        $AddWhereStatusPayment = '';
+        break;
+      case '1':
+        $AddWhereStatusPayment = ' and a.Invoice = (select sum(Invoice) from db_finance.payment_students where ID_payment = a.ID and Status = 1)';
+        break;
+      case '0':
+        $AddWhereStatusPayment = ' and a.Invoice > (select sum(Invoice) from db_finance.payment_students where ID_payment = a.ID and Status = 0)';
+        break;  
+      default:
+        $AddWhereStatusPayment = '';
+        break;
+    }
+
     if ($ta1 == '') {
       $sql = 'select count(*) as total 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
               join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and c.ID = ?
               and b.StatusStudentID in (3,2,8)
-              ';
+              '.$AddWhereStatusPayment;
       $query=$this->db->query($sql, array($SemesterID))->result_array();
 
     }
@@ -1683,14 +1699,14 @@ class M_finance extends CI_Model {
               join db_academic.semester as c on a.SemesterID = c.ID
               join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and b.Year = ? and c.ID = ? 
               and b.StatusStudentID in (3,2,8)
-              ';
+              '.$AddWhereStatusPayment;
       $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
     }
     return $query[0]['total'];
 
    }
 
-   public function get_created_tagihan_mhs($ta,$prodi,$PTID,$NIM,$Semester,$limit, $start)
+   public function get_created_tagihan_mhs($ta,$prodi,$PTID,$NIM,$Semester,$StatusPayment,$limit, $start)
    {
     // error_reporting(0);
     $arr = array();
@@ -1713,12 +1729,28 @@ class M_finance extends CI_Model {
       $ta1 = $ta[1];
     }
 
+    $AddWhereStatusPayment = '';
+    switch ($StatusPayment) {
+      case '':
+        $AddWhereStatusPayment = '';
+        break;
+      case '1':
+        $AddWhereStatusPayment = ' and a.Invoice = (select sum(Invoice) from db_finance.payment_students where ID_payment = a.ID and Status = 1)';
+        break;
+      case '0':
+        $AddWhereStatusPayment = ' and a.Invoice > (select sum(Invoice) from db_finance.payment_students where ID_payment = a.ID and Status = 0)';
+        break;  
+      default:
+        $AddWhereStatusPayment = '';
+        break;
+    }
+
     if ($ta1 == '') {
       $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
               join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and c.ID = ? 
-              and b.StatusStudentID in (3,2,8)
+              and b.StatusStudentID in (3,2,8) '.$AddWhereStatusPayment.'
               group by a.PTID,a.SemesterID,a.NPM order by c.ID desc,a.Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
       $query=$this->db->query($sql, array($SemesterID))->result_array();
 
@@ -1729,7 +1761,7 @@ class M_finance extends CI_Model {
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
               join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and b.Year = ? and c.ID = ? 
-              and b.StatusStudentID in (3,2,8)
+              and b.StatusStudentID in (3,2,8) '.$AddWhereStatusPayment.'
               group by a.PTID,a.SemesterID,a.NPM order by a.Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
       $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
     }

@@ -67,6 +67,15 @@
                               </select>
                           </div>
                         </div>
+                        <div class="col-md-3" style="margin-top: 10px">
+                          <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                              <select class="form-control" id="selectStatusPayment">
+                                <option value="">All</option>
+                                <option value="0">Belum Lunas</option>
+                                <option value="1">Lunas</option>
+                              </select>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -77,7 +86,8 @@
                     <b>Status : </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Approve & Paid Off | <i class="fa fa-circle" style="color: #eade8e;"></i> Approve & Not Yet Paid Off  
                 </div>
                 <div class="row">
-                  <div  class="col-xs-12" align="right" id="pagination_link"></div>
+                  <div class="col-md-3" id="ShowTotalData"></div>
+                  <div  class="col-md-6 col-md-offset-3" align="right" id="pagination_link"></div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
@@ -164,6 +174,12 @@
         loadData(1);
     });
 
+    $('#selectStatusPayment').change(function () {
+        loadData(1);
+    });
+
+    
+
     $(document).on('keypress','#NIM', function (event)
     {
 
@@ -197,6 +213,7 @@
         var Semester = $('#selectSemester').val();
         Semester = Semester.split('.');
         Semester = Semester[0];
+        var StatusPayment = $("#selectStatusPayment").val();
         $('#NotificationModal .modal-header').addClass('hide');
             $('#NotificationModal .modal-body').html('<center>' +
                 '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
@@ -216,6 +233,7 @@
                 PTID  : PTID,
                 NIM : NIM,
                 Semester : Semester,
+                StatusPayment : StatusPayment,
             };
             // console.log(data);return;
             var token = jwt_encode(data,'UAP)(*');
@@ -225,6 +243,7 @@
                 var Data_mhs = resultJson.loadtable;
                 data = Data_mhs;
                 dataaModal = Data_mhs;
+                $('#ShowTotalData').html('<p style = "margin-top : 48px"><b style = "font-size : 14px">Total Record : '+resultJson.totaldata+'</b></p>');
                for(var i=0;i<Data_mhs.length;i++){
                     var ccc = 0;
                     var yy = (Data_mhs[i]['InvoicePayment'] != '') ? formatRupiah(Data_mhs[i]['InvoicePayment']) : '-';
