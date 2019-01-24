@@ -1787,7 +1787,15 @@ class M_finance extends CI_Model {
          $Credit = $this->getSKSMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$query[$i]['SemesterID']);
 
       // cek cancel   
-         $cancelPay = $this->getCancel($query[$i]['PTID'],$query[$i]['SemesterID'],$query[$i]['NPM']);   
+         $cancelPay = $this->getCancel($query[$i]['PTID'],$query[$i]['SemesterID'],$query[$i]['NPM']);
+
+      // cek Payment Proof
+              $payment_proof = $this->m_master->caribasedprimary('db_finance.payment_proof','ID_payment',$query[$i]['ID']);
+              for ($z=0; $z < count($payment_proof); $z++) { 
+                  // get nama bank
+                  $G_bank = $this->m_master->caribasedprimary('db_finance.bank','ID',$payment_proof[$z]['ID_bank']);
+                  $payment_proof[$z]['NmBank'] = $G_bank[0]['Name'];
+              }         
 
       if($prodi == '' || $prodi == Null){
         $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$dt[0]['ProdiID']);
@@ -1814,6 +1822,7 @@ class M_finance extends CI_Model {
             'Credit' => $Credit,
             'Pay_Cond' => $query[$i]['Pay_Cond'],
             'cancelPay' => $cancelPay,
+            'payment_proof' => $payment_proof,
         );
       }
       else
@@ -1844,6 +1853,7 @@ class M_finance extends CI_Model {
               'Credit' => $Credit,
               'Pay_Cond' => $query[$i]['Pay_Cond'],
               'cancelPay' => $cancelPay,
+              'payment_proof' => $payment_proof,
           );
         }
       }

@@ -491,6 +491,7 @@
         table += '</table>' ;
 
         html += table;
+        // for reason cancel payment
         var htmlReason = '<div class = "row"><div class= col-md-12><h5>List Cancel Payment</h5><table class="table table-striped table-bordered table-hover table-checkable tableData">'+
                       '<thead>'+
                           '<tr>'+
@@ -516,6 +517,13 @@
         if (CancelPayment.length > 0) {
           html += htmlReason;
         }
+        // end reason cancel payment
+
+        // for Verify Bukti Bayar
+            var htmlPaymentProof = '<div class = "row">';
+        // end Verify Bukti Bayar
+
+
         var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
             '';
 
