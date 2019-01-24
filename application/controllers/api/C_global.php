@@ -352,36 +352,36 @@ class C_global extends CI_Controller {
 
     public function testInject2()
     {
-        $get = $this->m_master->showData_array('db_admission.sale_formulir_offline');
-        for ($i=0; $i < count($get); $i++) { 
-            $ID = $get[$i]['ID'];
-            $FullName = strtolower($get[$i]['FullName']);
-            $FullName = ucwords($FullName);
-            $dataSave = array(
-                    'FullName' => ucwords($FullName),
-                    'Email' => strtolower($get[$i]['Email'])
-                            );
-            $this->db->where('ID',$ID);
-            $this->db->update('db_admission.sale_formulir_offline', $dataSave);
-        }
+        // $get = $this->m_master->showData_array('db_admission.sale_formulir_offline');
+        // for ($i=0; $i < count($get); $i++) { 
+        //     $ID = $get[$i]['ID'];
+        //     $FullName = strtolower($get[$i]['FullName']);
+        //     $FullName = ucwords($FullName);
+        //     $dataSave = array(
+        //             'FullName' => ucwords($FullName),
+        //             'Email' => strtolower($get[$i]['Email'])
+        //                     );
+        //     $this->db->where('ID',$ID);
+        //     $this->db->update('db_admission.sale_formulir_offline', $dataSave);
+        // }
 
 
     }
 
     public function testInject3()
     {
-        $get = $this->m_master->showData_array('db_admission.register');
-        for ($i=0; $i < count($get); $i++) { 
-            $ID = $get[$i]['ID'];
-            $FullName = strtolower($get[$i]['Name']);
-            $FullName = ucwords($FullName);
-            $dataSave = array(
-                    'Name' => ucwords($FullName),
-                    'Email' => strtolower($get[$i]['Email'])
-                            );
-            $this->db->where('ID',$ID);
-            $this->db->update('db_admission.register', $dataSave);
-        }
+        // $get = $this->m_master->showData_array('db_admission.register');
+        // for ($i=0; $i < count($get); $i++) { 
+        //     $ID = $get[$i]['ID'];
+        //     $FullName = strtolower($get[$i]['Name']);
+        //     $FullName = ucwords($FullName);
+        //     $dataSave = array(
+        //             'Name' => ucwords($FullName),
+        //             'Email' => strtolower($get[$i]['Email'])
+        //                     );
+        //     $this->db->where('ID',$ID);
+        //     $this->db->update('db_admission.register', $dataSave);
+        // }
 
 
     }
@@ -399,20 +399,20 @@ class C_global extends CI_Controller {
         //     $this->db->update('db_admission.formulir_number_offline_m', $dataSave);
         // }
 
-        $sql = 'select ID from db_admission.register_formulir where ID not in (select ID_register_formulir from db_admission.register_document)';
-        $query=$this->db->query($sql, array())->result_array();
-        for ($i=0; $i < count($query); $i++) {
-            $ID_register_formulir = $query[$i]['ID']; 
-            $arrID_reg_doc_checklist = $this->m_master->caribasedprimary('db_admission.reg_doc_checklist','Active',1);
-            for ($xy=0; $xy < count($arrID_reg_doc_checklist); $xy++) { 
-                $dataSave = array(
-                        'ID_register_formulir' => $ID_register_formulir,
-                        'ID_reg_doc_checklist' => $arrID_reg_doc_checklist[$xy]['ID'],
-                                );
+        // $sql = 'select ID from db_admission.register_formulir where ID not in (select ID_register_formulir from db_admission.register_document)';
+        // $query=$this->db->query($sql, array())->result_array();
+        // for ($i=0; $i < count($query); $i++) {
+        //     $ID_register_formulir = $query[$i]['ID']; 
+        //     $arrID_reg_doc_checklist = $this->m_master->caribasedprimary('db_admission.reg_doc_checklist','Active',1);
+        //     for ($xy=0; $xy < count($arrID_reg_doc_checklist); $xy++) { 
+        //         $dataSave = array(
+        //                 'ID_register_formulir' => $ID_register_formulir,
+        //                 'ID_reg_doc_checklist' => $arrID_reg_doc_checklist[$xy]['ID'],
+        //                         );
 
-                $this->db->insert('db_admission.register_document', $dataSave);
-            }
-        }
+        //         $this->db->insert('db_admission.register_document', $dataSave);
+        //     }
+        // }
         
     }
 
@@ -670,9 +670,18 @@ class C_global extends CI_Controller {
                                 
                                 // send email to approval 2 and user
                                     // send email to approval 2
+
+                                        $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','Room',$t_booking[0]['Room']);
+                                        $CategoryRoomByRoom = $getRoom[0]['ID_CategoryRoom'];
+                                        $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
+                                        $Approver2 = $getDataCategoryRoom[0]['Approver2'];
+                                        $Approver2 = json_decode($Approver2);
+                                        $getApprover2 = $this->m_master->caribasedprimary('db_employees.division','ID',$Approver2[0]);
+                                        $EmailApprover2 = $getApprover2[0]['Email'];
+
                                         $token = array(
-                                            'EmailPU' => 'ga@podomorouniversity.ac.id',
-                                            'Code' => 8,
+                                            'EmailPU' => $EmailApprover2,
+                                            'Code' => $Approver2[0],
                                             'ID_t_booking' => $data_arr['ID_t_booking'],
                                             'approvalNo' => 2,
                                             'Email_add_person' => $Email_add_person,
@@ -683,8 +692,8 @@ class C_global extends CI_Controller {
                                         $token = $this->jwt->encode($token,'UAP)(*');
                                         if($_SERVER['SERVER_NAME']!='localhost') {
                                             // email to ga
-                                            $Email = 'ga@podomorouniversity.ac.id';
-                                            $text = 'Dear GA Team,<br><br>
+                                            $Email = $EmailApprover2;
+                                            $text = 'Dear Team,<br><br>
                                                         Please help to approve Venue Reservation,<br><br>
                                                         Details Schedule : <br><ul>
                                                         <li>Start  : '.$StartNameDay.', '.$t_booking[0]['Start'].'</li>
@@ -721,7 +730,7 @@ class C_global extends CI_Controller {
                                         else
                                         {
                                             $Email = 'alhadi.rahman@podomorouniversity.ac.id';
-                                            $text = 'Dear GA Team,<br><br>
+                                            $text = 'Dear Team,<br><br>
                                                         Please help to approve Venue Reservation,<br><br>
                                                         Details Schedule : <br><ul>
                                                         <li>Start  : '.$StartNameDay.', '.$t_booking[0]['Start'].'</li>

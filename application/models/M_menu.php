@@ -84,6 +84,7 @@ class M_menu extends CI_Model {
   {
     $NIP = $this->session->userdata('NIP');
     $db = $this->dbAuth;
+    $OrderBy = ($db == 'db_admission') ? 'order by b.Sort asc' : '';
       $sql = 'SELECT b.ID as ID_menu,b.Icon,c.ID,b.Menu,c.SubMenu1,c.SubMenu2,x.`read`,x.`update`,x.`write`,x.`delete`,c.Slug,c.Controller 
               from db_employees.employees as a
               join '.$db.'.previleges_guser as d
@@ -93,7 +94,7 @@ class M_menu extends CI_Model {
               join '.$db.'.cfg_sub_menu as c
               on x.ID_cfg_sub_menu = c.ID
               join '.$db.'.cfg_menu as b
-              on b.ID = c.ID_Menu where a.NIP = ? GROUP by b.id';
+              on b.ID = c.ID_Menu where a.NIP = ? GROUP by b.id '.$OrderBy;
       $query=$this->db->query($sql, array($NIP))->result_array();
       return $query;
   }
@@ -124,7 +125,6 @@ class M_menu extends CI_Model {
                   'Submenu' => $submenu2,
               );
           }
-
           if ($i == 0) {
               // SORTING ASC
                   usort($arr2, function($a, $b) {

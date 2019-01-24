@@ -56,6 +56,7 @@
                         <div class="form-group">
                             <label>Programme Study</label>
                             <select class="form-control" id="toProdi"></select>
+                            <p style="color: #009688;">Last NIM : <b id="lastNIM">-</b></p>
                         </div>
                         <div class="form-group">
                             <label>New NIM</label>
@@ -63,10 +64,35 @@
                             <span id="viewStatusNewNPM" style="float: right;"></span>
                             <input class="hide" id="statusNewNPM" value="0"/>
                         </div>
+
+                        <hr/>
+
+
                         <div class="form-group">
-                            <label>Reason</label>
+                            <label>Biaya sesuaikan dengan</label>
                             <select class="form-control" id="toReason"></select>
                         </div>
+
+                        <div class="hide" id="otherProdi">
+                            <div class="form-group">
+                                <label>Prodi</label>
+                                <select class="form-control" id="formPayemntProdiID"></select>
+                            </div>
+                            <div class="form_group">
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <label>Class Of</label>
+                                        <select class="form-control" id="formPayemntClassOf"></select>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label>Bintang</label>
+                                        <select class="form-control" id="formPayemntBintang"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
                     </div>
 
                     <div style="padding: 5px;">
@@ -82,9 +108,7 @@
         <div class="thumbnail" style="padding: 15px;">
 <!--            <h3 class="header-blue">Course Conversion</h3>-->
 
-
             <h3 class="header-blue">List Transfer Student</h3>
-
 
             <div class="row">
                 <div class="col-md-12">
@@ -106,6 +130,7 @@
 
         loadSelectOptionClassOf_ASC('#fromClassOf','');
         loadSelectOptionBaseProdi('#fromProdi','');
+        loadSelectOptionBaseProdi('#formPayemntProdiID','');
 
         loadSelectOptionClassOf_ASC('#toClassOf','');
         loadSelectOptionBaseProdi('#toProdi','');
@@ -123,7 +148,47 @@
             }
         },1000);
 
+        var loadlastNIM = setInterval(function () {
+            var toClassOf = $('#toClassOf').val();
+            var toProdi = $('#toProdi').val();
+
+            if(toClassOf != '' && toClassOf != null &&
+                toProdi != '' && toProdi != null){
+                loadLastNIM();
+                clearInterval(loadlastNIM);
+            }
+
+        },1000);
+
     });
+
+    $('#toClassOf, #toProdi').change(function () {
+        // Load Last NIM
+        loadLastNIM();
+    });
+
+    function loadLastNIM() {
+        var toProdi = $('#toProdi').val();
+        var toClassOf = $('#toClassOf').val();
+
+        if(toProdi!='' && toProdi!=null && toClassOf!='' && toClassOf!=null){
+
+            var ProdiID = toProdi.split('.')[0];
+            var ClassOf = toClassOf.split('.')[1];
+            var url = base_url_js+'api/__crudTransferStudent';
+            var token = jwt_encode({action : 'getLastNIMTransferStudent', ProdiID : ProdiID, ClassOf : ClassOf},'UAP)(*');
+
+            $.post(url,{token:token},function (jsonResult) {
+                $('#lastNIM').html('-');
+               if(jsonResult.length>0){
+                   $('#lastNIM').html(jsonResult[0].NPM);
+               }
+            });
+
+        }
+
+
+    }
 
     $('#toNewNPM').keyup(function () {
         var toNewNPM = $('#toNewNPM').val();
@@ -194,7 +259,95 @@
 
     }
 
+    $('#toReason').change(function () {
+
+        var toReason = $('#toReason').val();
+
+        $('#otherProdi').addClass('hide');
+
+        if(toReason==2 || toReason=='2'){
+            $('#otherProdi').removeClass('hide');
+            loadNewClassOf();
+        }
+
+    });
+
+    $(document).on('change','#formPayemntProdiID',function () {
+        var formPayemntProdiID = $('#formPayemntProdiID').val();
+        // Read Class Of
+        if(formPayemntProdiID!='' && formPayemntProdiID!=null){
+            loadNewClassOf();
+        }
+    });
+
+    function loadNewClassOf() {
+        var formPayemntProdiID = $('#formPayemntProdiID').val();
+        // Read Class Of
+        if(formPayemntProdiID!='' && formPayemntProdiID!=null){
+            var data = {
+                action : 'readClassOfTransferStd',
+                ProdiID : formPayemntProdiID.split('.')[0]
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__crudTransferStudent';
+            $.post(url,{token:token},function (jsonResult) {
+
+                $('#formPayemntClassOf').empty();
+                if(jsonResult.length>0){
+                    for(var i=0;i<jsonResult.length;i++){
+                        $('#formPayemntClassOf').append('<option value="'+jsonResult[i].ClassOf+'">'+jsonResult[i].ClassOf+'</option>');
+                    }
+
+                    loadBintang();
+                }
+            });
+        }
+    }
+
+    $('#formPayemntClassOf').change(function () {
+        loadBintang();
+    });
+    
+    function loadBintang() {
+        var formPayemntProdiID = $('#formPayemntProdiID').val();
+        var formPayemntClassOf = $('#formPayemntClassOf').val();
+
+        if(formPayemntProdiID!='' && formPayemntProdiID!=null &&
+            formPayemntClassOf!='' && formPayemntClassOf!=null){
+
+            var data = {
+                action : 'readBintangTransferStd',
+                ProdiID : formPayemntProdiID.split('.')[0],
+                ClassOf : formPayemntClassOf
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__crudTransferStudent';
+
+            $.post(url,{token:token},function (jsonResult) {
+
+                $('#formPayemntBintang').empty();
+                if(jsonResult.length>0){
+                    for(var i=0;i<jsonResult.length;i++){
+                        $('#formPayemntBintang').append('<option value="'+jsonResult[i].Pay_Cond+'">'+jsonResult[i].Pay_Cond+'</option>');
+                    }
+                }
+            });
+
+        }
+    }
+
     $('#btnCreateNPM').click(function () {
+        $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Create NIM ?</b><hr/> ' +
+            '<button type="button" class="btn btn-success" id="btnActionCreateNPM" style="margin-right: 5px;">Yes</button>' +
+            '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+            '</div>');
+        $('#NotificationModal').modal({
+            'backdrop' : 'static',
+            'show' : true
+        });
+    });
+
+    $(document).on('click','#btnActionCreateNPM',function () {
         var fromClassOf = $('#fromClassOf').val();
         var fromProdi = $('#fromProdi').val();
         var fromStudent = $('#fromStudent').val();
@@ -215,41 +368,51 @@
             var statusNewNPM = $('#statusNewNPM').val();
             if(statusNewNPM==1 || statusNewNPM=='1'){
 
-                if(confirm('Are you sure to create NIM?')){
 
-                    loading_button('#btnCreateNPM');
 
-                    var ProdiID_f = fromProdi.split('.')[0];
-                    var ClassOf_f = fromClassOf.split('.')[1];
+                loading_button('#btnCreateNPM');
+                loading_buttonSm('#btnActionCreateNPM');
+                $('button[data-dismiss=modal]').prop('disabled',true);
 
-                    var ProdiID_t = toProdi.split('.')[0];
-                    var ClassOf_t = toClassOf.split('.')[1];
+                var formPayemntProdiID = $('#formPayemntProdiID').val();
+                var formPayemntClassOf = $('#formPayemntClassOf').val();
+                var formPayemntBintang = $('#formPayemntBintang').val();
 
-                    var data = {
-                        action : 'addingTransferStudent',
-                        fromClassOf : ClassOf_f,
-                        fromProdi : ProdiID_f,
-                        fromStudent : fromStudent,
-                        toClassOf : ClassOf_t,
-                        toProdi : ProdiID_t,
-                        toNewNPM : toNewNPM,
-                        TransferTypeID : toReason,
-                        CreateAt : dateTimeNow(),
-                        CreateBy : sessionNIP
-                    };
+                var ProdiID_f = fromProdi.split('.')[0];
+                var ClassOf_f = fromClassOf.split('.')[1];
 
-                    // console.log(data);
-                    // return false;
+                var ProdiID_t = toProdi.split('.')[0];
+                var ClassOf_t = toClassOf.split('.')[1];
 
-                    var token = jwt_encode(data,'UAP)(*');
+                var data = {
+                    action : 'addingTransferStudent',
+                    fromClassOf : ClassOf_f,
+                    fromProdi : ProdiID_f,
+                    fromStudent : fromStudent,
+                    toClassOf : ClassOf_t,
+                    toProdi : ProdiID_t,
+                    toNewNPM : toNewNPM,
+                    TransferTypeID : toReason,
+                    PaymentProdiID : (formPayemntProdiID!='' && formPayemntProdiID!=null)
+                        ? formPayemntProdiID!=''.split('.')[0] : '',
+                    PaymentClassOf : formPayemntClassOf,
+                    PaymentBintang : formPayemntBintang,
+                    CreateAt : dateTimeNow(),
+                    CreateBy : sessionNIP
+                };
 
-                    var url = base_url_js+'api/__crudTransferStudent';
-                    $.post(url,{token:token},function (jsonResult) {
-                        setTimeout(function () {
-                            window.location.href = '';
-                        },500);
-                    });
-                }
+                var token = jwt_encode(data,'UAP)(*');
+
+                var url = base_url_js+'api/__crudTransferStudent';
+                $.post(url,{token:token},function (jsonResult) {
+
+                    toastr.success('Create NIM','Success');
+                    $('#NotificationModal').modal('hide');
+                    setTimeout(function () {
+                        window.location.href = '';
+                    },500);
+                });
+
 
             } else {
                 toastr.warning('NIM canot to use','Warning');
@@ -309,18 +472,35 @@
 
     $(document).on('click','.btnRemoveData',function () {
 
-        $('.btnRemoveData').prop('disabled',true);
+        var ID = $(this).attr('data-id');
+
+        $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Remove data ?</b><hr/> ' +
+            '<button type="button" class="btn btn-primary" id="btnActRemoveTransferStd" data-id="'+ID+'" style="margin-right: 5px;">Yes</button>' +
+            '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+            '</div>');
+        $('#NotificationModal').modal({
+            'backdrop' : 'static',
+            'show' : true
+        });
+
+    });
+
+    $(document).on('click','#btnActRemoveTransferStd',function () {
+
+        loading_buttonSm('#btnActRemoveTransferStd');
+        $('button[data-dismiss=modal]').prop('disabled',true);
 
         var ID = $(this).attr('data-id');
         var url = base_url_js+'api/__crudTransferStudent';
         var token = jwt_encode({action : 'removeTransverStudent', ID : ID},'UAP)(*');
 
         $.post(url,{token:token},function (jsonResult) {
+            toastr.success('Remove Student Transfer','Success');
+            getListStudentTransfer();
             setTimeout(function () {
-                getListStudentTransfer();
+                $('#NotificationModal').modal('hide');
             },500);
         });
-
     });
 
 </script>

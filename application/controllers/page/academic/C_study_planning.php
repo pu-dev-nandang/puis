@@ -30,10 +30,11 @@ class C_study_planning extends Academic_Controler {
         $this->menu_studyplan($page);
     }
 
-    public function course_offer($SemesterID,$NPM){
+    public function course_offer($SemesterID,$ProdiGroupID,$NPM){
         $department = parent::__getDepartement();
         $data['NPM'] = $NPM;
         $data['SemesterID'] = $SemesterID;
+        $data['ProdiGroupID'] = $ProdiGroupID;
         $page = $this->load->view('page/'.$department.'/studyplanning/course_offer',$data,true);
         $this->menu_studyplan($page);
 

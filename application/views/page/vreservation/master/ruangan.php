@@ -477,6 +477,7 @@
             if (action=='edit') {
                 // approver 1
                 var aa = TypeApprover1Edit;
+                console.log(aa);
                 switch(aa) {
                     case 'Position':
                         Op = getPositionUser(Approver1Edit);
@@ -487,6 +488,8 @@
                     case 'Division':
                        Op = getDivision1(Approver1Edit);
                         break;
+                    default :
+                       Op = getDivision1(Approver1Edit);     
                 }
                 var Input = '<div class = "row" style="margin-top: 5px">'+
                                 '<div class="col-xs-12">'+
