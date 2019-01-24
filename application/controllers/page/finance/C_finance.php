@@ -1716,6 +1716,7 @@ class C_finance extends Finnance_Controler {
                     'Status' => 0,
                     'BilingID' => 0,
                     'UpdateAt' => date('Y-m-d H:i:s'),
+                    'DatePayment' => null,
                             );
             $this->db->where('ID',$IDStudent);
             $this->db->where('Status',1);

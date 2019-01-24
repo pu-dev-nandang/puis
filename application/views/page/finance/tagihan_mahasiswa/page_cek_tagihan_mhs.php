@@ -429,7 +429,7 @@
                               '<th style="width: 55px;">Payment Date</th>'+
                               '<th style="width: 55px;">UpdateAt</th>';
         <?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
-          table += '<th style="width: 55px;">Action</th>' ;                        
+          table += '<th style="width: 100px;">Action</th>' ;                        
         <?php endif ?>                      
         table += '</tr>' ;  
         table += '</thead>' ; 
@@ -506,8 +506,8 @@
         $('#GlobalModalLarge').modal({
             'show' : true,
             'backdrop' : 'static'
-        });    
-
+        });
+        $('#GlobalModalLarge .modal-dialog').attr('style','width : 1000px;');
     });
 
 
