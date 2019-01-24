@@ -762,7 +762,7 @@ class C_finance extends Finnance_Controler {
 
                 if ($fieldEND == 'bayarEnd' || $fieldEND == 'bayarBPPEnd')
                 {
-                    $getDeadlineTagihanDB = $this->m_finance->getDeadlineTagihanDB($fieldEND,$SemesterID[0]['ID']);
+                    $getDeadlineTagihanDB = $this->m_finance->getDeadlineTagihanDB($fieldEND,$Input[$i]->semester);
                     // check Deadline Tagihan telah melewati tanggal sekarang atau belum
                     if ($this->session->userdata('finance_auth_Policy_SYS') == 1) {
                         $chkTgl = $this->m_master->checkTglNow($getDeadlineTagihanDB);
