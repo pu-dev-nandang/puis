@@ -882,13 +882,17 @@ class C_finance extends Finnance_Controler {
         if (!array_key_exists('StatusPayment', $input)) {
             $input['StatusPayment'] = '';
         }
+
+        if (!array_key_exists('ChangeStatus', $input)) {
+            $input['ChangeStatus'] = '';
+        }
         // count
-        $count = $this->m_finance->count_get_created_tagihan_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NIM'],$input['Semester'],$input['StatusPayment']);
+        $count = $this->m_finance->count_get_created_tagihan_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NIM'],$input['Semester'],$input['StatusPayment'],$input['ChangeStatus']);
         $config = $this->config_pagination_default_ajax($count,5,3);
         $this->pagination->initialize($config);
         $page = $this->uri->segment(3);
         $start = ($page - 1) * $config["per_page"];
-        $data = $this->m_finance->get_created_tagihan_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NIM'],$input['Semester'],$input['StatusPayment'],$config["per_page"], $start);
+        $data = $this->m_finance->get_created_tagihan_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NIM'],$input['Semester'],$input['StatusPayment'],$input['ChangeStatus'],$config["per_page"], $start);
         $output = array(
         'pagination_link'  => $this->pagination->create_links(),
         'loadtable'   => $data,
@@ -941,6 +945,14 @@ class C_finance extends Finnance_Controler {
         $Input = $this->getInputToken();
         $Input = $Input['arrValueCHK'];
         $proses = $this->m_finance->updatePaymentunApprove_after_confirm($Input);
+        echo json_encode($proses);
+    }
+
+    public function assign_to_change_status_mhs()
+    {
+        $Input = $this->getInputToken();
+        $Input = $Input['arrValueCHK'];
+        $proses = $this->m_finance->assign_to_change_status_mhs($Input);
         echo json_encode($proses);
     }
 

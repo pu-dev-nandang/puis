@@ -532,11 +532,15 @@ $route['finance/get_tagihan_mhs/(:num)'] =  'page/finance/c_finance/get_tagihan_
 $route['finance/submit_tagihan_mhs'] =  'page/finance/c_finance/submit_tagihan_mhs';
 $route['finance/tagihan-mhs/cek-tagihan-mhs/(:num)'] =  'page/finance/c_finance/page_cek_tagihan_mhs/$1';
 $route['finance/tagihan-mhs/cek-tagihan-mhs'] =  'page/finance/c_finance/page_cek_tagihan_mhs';
+
+
 $route['finance/get_created_tagihan_mhs/(:num)'] =  'page/finance/c_finance/get_created_tagihan_mhs/$1';
 $route['finance/get_created_tagihan_mhs_not_approved/(:num)'] =  'page/finance/c_finance/get_created_tagihan_mhs_not_approved/$1';
 $route['finance/approved_created_tagihan_mhs'] =  'page/finance/c_finance/approved_created_tagihan_mhs';
 $route['finance/unapproved_created_tagihan_mhs'] =  'page/finance/c_finance/unapproved_created_tagihan_mhs';
 $route['finance/unapproved_created_tagihan_mhs_after_confirm'] =  'page/finance/c_finance/unapproved_created_tagihan_mhs_after_confirm';
+$route['finance/assign_to_change_status_mhs'] =  'page/finance/c_finance/assign_to_change_status_mhs';
+
 
 $route['finance/tagihan-mhs/cancel-tagihan-mhs'] =  'page/finance/c_finance/cancel_tagihan_mhs';
 $route['finance/cancel_created_tagihan_mhs'] =  'page/finance/c_finance/cancel_created_tagihan_mhs';
