@@ -3567,7 +3567,7 @@ class C_api extends CI_Controller {
                     ->result_array();
 
                 // Get Email
-                $dataEmail = $this->db->get('db_academic.batal_tambah_email')->result_array();
+                $dataEmail = $this->db->get('db_academic.std_krs_batal_tambah_email')->result_array();
 
                 if(count($dataSTDLama)>0){
                     foreach ($dataSTDLama AS $std){
@@ -3653,7 +3653,7 @@ class C_api extends CI_Controller {
                 }
 
                 $arrToHistory = (array) $data_arr['arrToHistory'];
-                $this->db->insert('db_academic.batal_tambah_history',$arrToHistory);
+                $this->db->insert('db_academic.std_krs_batal_tambah_history',$arrToHistory);
 
 
                 $result = array(
