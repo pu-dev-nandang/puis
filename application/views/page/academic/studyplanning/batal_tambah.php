@@ -74,6 +74,9 @@
             <input id="formMhswID" readonly class="hide">
         </div>
         <hr style="margin-top: 5px;" />
+
+        <textarea class="" id="emailTo"></textarea>
+
     </div>
 
     <div class="col-md-6">
@@ -109,6 +112,12 @@
 
 <script>
     $(document).ready(function () {
+
+        var v = '{"Email":[{"ID":"1","Email":"nandang.mulyadi@podomorouniversity.ac.id"},{"ID":"2","Email":"nndg.ace3@gmail.com"}]}';
+
+        var j = JSON.parse(v);
+        console.log(j);
+
         window.SemesterIDinKRS = "<?php echo $SemesterID; ?>";
         window.NPMinKRS = "<?php echo $NPM; ?>";
         window.ProdiGroupID = "<?php echo $ProdiGroupID; ?>";
@@ -568,6 +577,22 @@
 
     $(document).on('click','#btnSetAsTimetable',function () {
 
+        $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Set as timetables ?</b><hr/> ' +
+            '<button type="button" class="btn btn-success" id="btnActSetAsTimeTables" style="margin-right: 5px;">Yes</button>' +
+            '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+            '</div>');
+        $('#NotificationModal').modal({
+            'backdrop' : 'static',
+            'show' : true
+        });
+
+    });
+
+    $(document).on('click','#btnActSetAsTimeTables',function () {
+
+        loading_buttonSm('#btnActSetAsTimeTables');
+        $('button[data-dismiss=modal]').prop('disabled',true);
+
         var formDBStudent = $('#formDBStudent').val();
         var formMhswID = $('#formMhswID').val();
 
@@ -582,17 +607,23 @@
         var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'api/__crudStudyPlanning';
 
-        $.post(url,{token:token},function(res){
+        $.post(url,{token:token},function(jsonResult){
 
+            // console.log(jsonResult);
+            $('#emailTo').val(JSON.stringify(jsonResult.Email));
             // Send Mail
-            senMailNotif();
+            setTimeout(function () {
+                senMailNotif();
+            },1000);
+
 
 
         });
-
     });
 
     function senMailNotif() {
+
+
 
         var htmlB = '';
         var htmlA = '';
@@ -679,18 +710,34 @@
             '                    Updated at : '+moment().format('dddd, DD MMMM YYYY HH:mm:ss')+
             '                </div>';
 
+        var emailTo = $('#emailTo').val();
+        var jsonResult = JSON.parse(emailTo);
+
+        var Email = '';
+        if(jsonResult.length>0){
+
+            for(var s=0;s<jsonResult.length;s++){
+
+                var koma = (s!=0 && s==(jsonResult.length - 1)) ? ',' : '';
+                Email = Email+''+koma+''+jsonResult[s].Email;
+
+            }
+        }
+
+        console.log(Email);
+
+
         var data = {
-            to : 'nandang.mulyadi@podomorouniversity.ac.id',
+            to : Email,
             subject : 'test',
             text : htmlMail,
-            auth : 's3Cr3T-G4N',
-            attach : 'http://localhost/puis/uploads/employees/2018018.jpg'
+            auth : 's3Cr3T-G4N'
         };
 
         var token = jwt_encode(data,'UAP)(*');
-        var url = 'http://pcam.podomorouniversity.ac.id/rest/__sendEmail';
+        var url = base_url_js+'rest/__sendEmail';
         $.post(url,{token:token},function (result) {
-
+            $('#NotificationModal').modal('hide');
         });
     }
 

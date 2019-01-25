@@ -3566,6 +3566,9 @@ class C_api extends CI_Controller {
                 $dataSTDLama = $this->db->get_where('db_academic.std_krs',array('SemesterID' => $SemesterID,'NPM'=>$NPM))
                     ->result_array();
 
+                // Get Email
+                $dataEmail = $this->db->get('db_academic.batal_tambah_email')->result_array();
+
                 if(count($dataSTDLama)>0){
                     foreach ($dataSTDLama AS $std){
                         // === Hapus Attendance ===
@@ -3649,7 +3652,11 @@ class C_api extends CI_Controller {
                     }
                 }
 
-                return print_r(1);
+                $result = array(
+                    'Email' => $dataEmail
+                );
+
+                return print_r(json_encode($result));
 
 
             }
