@@ -62,7 +62,6 @@
     }
 </style>
 
-
 <div class="row">
 
     <div class="col-md-12">
@@ -112,11 +111,6 @@
 
 <script>
     $(document).ready(function () {
-
-        var v = '{"Email":[{"ID":"1","Email":"nandang.mulyadi@podomorouniversity.ac.id"},{"ID":"2","Email":"nndg.ace3@gmail.com"}]}';
-
-        var j = JSON.parse(v);
-        console.log(j);
 
         window.SemesterIDinKRS = "<?php echo $SemesterID; ?>";
         window.NPMinKRS = "<?php echo $NPM; ?>";
@@ -677,7 +671,7 @@
                 '                        </tr>';
         }
 
-        var htmlMail = 'Dear <span style="color: #333;">Finance, Academic and IT Department</span>,' +
+        var htmlMail = 'Dear <span style="color: #333;">Finance & Academic</span>,' +
             '                <br/>' +
             '                Perihal : <b>Batal Tambah KRS</b>' +
             '                <p style="color: #673AB7;">Berikut adalah perubahan data KRS Student <strong>'+$('#Name').text()+' ('+NPMinKRS+')</strong></p>' +
@@ -737,10 +731,9 @@
 
         console.log(Email);
 
-
         var data = {
             to : Email,
-            subject : 'test',
+            subject : 'Batal Tambah KRS | '+$('#Name').text()+' - '+NPMinKRS,
             text : htmlMail,
             auth : 's3Cr3T-G4N'
         };
