@@ -1741,20 +1741,23 @@ class C_finance extends Finnance_Controler {
 
         // cek lunas atau tidak
             $GetDataPaymentSt = $this->m_master->caribasedprimary('db_finance.payment_students','ID',$IDStudent);
+            $ID_payment = $GetDataPaymentSt[0]['ID_payment'];
+            $GetDataPaymentSt = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$ID_payment);
             $total = 0;
             for ($i=0; $i < count($GetDataPaymentSt); $i++) { 
                 if ($GetDataPaymentSt[$i]['Status'] == 1) {
-                    $total = $total + $GetDataPaymentSt[$i]['Invoice'];
+                    $total = (int)$total + (int)$GetDataPaymentSt[$i]['Invoice'];
                 }
                 
             }
 
-            $ID_payment = $GetDataPaymentSt[0]['ID_payment'];
+            // print_r($total);die();
             $GetDataPayment = $this->m_master->caribasedprimary('db_finance.payment','ID',$ID_payment);
             $Invoice = $GetDataPayment[0]['Invoice'];
             if ($total >= $Invoice) {
                 $dataSave = array(
                         'Status' =>"1",
+                        'ToChange' => 0,
                         'UpdateAt' => date('Y-m-d H:i:s'),
                         'UpdatedBy' => $this->session->userdata('NIP'),
                                 );
