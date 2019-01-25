@@ -3736,8 +3736,34 @@ class M_api extends CI_Model {
                                                           ON (cd.ID = sk.CDID)
                                                           LEFT JOIN db_academic.std_krs_comment skc ON (skc.KRSID = sk.ID)
                                                           WHERE sk.SemesterID = "'.$SemesterID.'" 
+                                                          AND sk.NPM = "'.$NPM.'" ')->result_array();
+            $result['ScheduleDraf'] = $DetailDrafKRS;
+
+            $checkBatalTambah = $this->db->select('ID')->get_where('db_academic.std_krs_batal_tambah',array('SemesterID' => $SemesterID, 'NPM' => $NPM))->result_array();
+
+
+
+            if(count($checkBatalTambah)<=0 && count($DetailDrafKRS)>0){
+                for ($i=0;$i<count($DetailDrafKRS);$i++){
+
+                    $dataIns = $this->db->get_where('db_academic.std_krs',array('ID' => $DetailDrafKRS[$i]['SKID']))->result_array();
+
+                    unset($dataIns[0]['ID']);
+
+                    $this->db->insert('db_academic.std_krs_batal_tambah',$dataIns[0]);
+                }
+            }
+
+            $DetailBatalTambah = $this->db->query('SELECT sk.ID AS SKID, sk.ScheduleID, sk.CDID, sk.Status, sk.TypeSP, cd.TotalSKS AS Credit, 
+                                                          skc.ID AS ReasonID, skc.Reason
+                                                          FROM db_academic.std_krs_batal_tambah sk 
+                                                          LEFT JOIN db_academic.curriculum_details cd 
+                                                          ON (cd.ID = sk.CDID)
+                                                          LEFT JOIN db_academic.std_krs_comment skc ON (skc.KRSID = sk.ID)
+                                                          WHERE sk.SemesterID = "'.$SemesterID.'" 
                                                           AND sk.NPM = "'.$NPM.'" ');
-            $result['ScheduleDraf'] = $DetailDrafKRS->result_array();
+
+            $result['ScheduleBatalTambah'] = $DetailBatalTambah->result_array();
 
 
         }

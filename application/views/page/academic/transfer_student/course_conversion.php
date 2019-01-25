@@ -29,10 +29,15 @@
         <a href="<?php echo base_url('academic/transfer-student/programme-study'); ?>" class="btn btn-warning">
             <i class="fa fa-arrow-left margin-right"></i>
             Back to list</a>
-
         <hr/>
         <h3 style="margin-top: 0px;border-left: 7px solid #2196F3;
     padding-left: 10px;font-weight: bold;">Course Conversion</h3>
+    </div>
+
+    <div class="col-md-6 col-md-offset-3">
+        <div style="padding: 15px; background: lightyellow;border: 2px solid orange;margin-bottom: 10px;text-align: center;">
+            <h4 style="margin-top: 3px;"><b>IPS per semester dan Jumlah SKS</b> akan otomatis menyesuaikan dengan settingan pada saat konversi mata kuliah.</h4>
+        </div>
     </div>
 </div>
 

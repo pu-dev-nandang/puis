@@ -352,7 +352,7 @@
         var url = base_url_js+'api/__crudStudyPlanning';
 
         $.post(url,{token:token},function (jsonResult) {
-            console.log(jsonResult);
+
             if(jsonResult.Status==1 || jsonResult.Status=='1'){
 
                 var Group = $('#viewGroup'+dataToken['ScheduleID']).text();
