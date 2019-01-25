@@ -75,7 +75,7 @@
         </div>
         <hr style="margin-top: 5px;" />
 
-        <textarea class="" id="emailTo"></textarea>
+        <textarea class="hide" readonly id="emailTo"></textarea>
 
     </div>
 
@@ -596,18 +596,31 @@
         var formDBStudent = $('#formDBStudent').val();
         var formMhswID = $('#formMhswID').val();
 
+        var arrToHistory = {
+            SemesterID : SemesterIDinKRS,
+            NPM : NPMinKRS,
+            Before : jwt_encode(toMail_Before,'UAP)(*'),
+            After : jwt_encode(toMail_After,'UAP)(*'),
+            CreatedBy : sessionNIP,
+            CreatedAt : dateTimeNow()
+
+        };
+
         var data = {
             action : 'setAsTimetable',
             SemesterID : SemesterIDinKRS,
             NPM : NPMinKRS,
             DBStudent : formDBStudent,
             MhswID : formMhswID,
-            arrToken : arrToken
+            arrToken : arrToken,
+            arrToHistory : arrToHistory
         };
         var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'api/__crudStudyPlanning';
 
         $.post(url,{token:token},function(jsonResult){
+
+
 
             // console.log(jsonResult);
             $('#emailTo').val(JSON.stringify(jsonResult.Email));
@@ -622,8 +635,6 @@
     });
 
     function senMailNotif() {
-
-
 
         var htmlB = '';
         var htmlA = '';

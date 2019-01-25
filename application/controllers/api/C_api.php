@@ -3652,6 +3652,10 @@ class C_api extends CI_Controller {
                     }
                 }
 
+                $arrToHistory = (array) $data_arr['arrToHistory'];
+                $this->db->insert('db_academic.batal_tambah_history',$arrToHistory);
+
+
                 $result = array(
                     'Email' => $dataEmail
                 );
