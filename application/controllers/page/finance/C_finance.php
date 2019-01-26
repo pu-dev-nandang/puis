@@ -1748,7 +1748,6 @@ class C_finance extends Finnance_Controler {
                 if ($GetDataPaymentSt[$i]['Status'] == 1) {
                     $total = (int)$total + (int)$GetDataPaymentSt[$i]['Invoice'];
                 }
-                
             }
 
             // print_r($total);die();
@@ -1784,8 +1783,6 @@ class C_finance extends Finnance_Controler {
           'RevAt' => date('Y-m-d H:i:s'),
       );
       $this->db->insert('db_finance.register_admisi_rev', $dataSave);
-
-
       $this->m_admission->set_tuition_fee_delete_data($input);
 
       // save di register_admisi_rev
@@ -2385,6 +2382,29 @@ class C_finance extends Finnance_Controler {
 
         $dataSave = array(
             'VerifyFinance' => 1,
+            'FileUpload' => json_encode($FileUpload),
+            'VerifyBy' => $this->session->userdata('NIP'),
+        );
+
+        $this->db->where('ID',$ID);
+        $this->db->update('db_finance.payment_proof',$dataSave);
+        echo json_encode('');
+    }
+
+    public function reject_bukti_bayar()
+    {
+        $input = $this->getInputToken();
+        $ID = $input['idtable'];
+        $ReasonCancel = $input['ReasonCancel'];
+        $G_data = $this->m_master->caribasedprimary('db_finance.payment_proof','ID',$ID);
+        $FileUpload = (array) json_decode($G_data[0]['FileUpload'],true);
+        for ($i=0; $i < count($FileUpload); $i++) {
+             $FileUpload[$i]['VerifyFinance'] = 2; 
+        }
+
+        $dataSave = array(
+            'VerifyFinance' => 2,
+            'ReasonCancel' => $ReasonCancel,
             'FileUpload' => json_encode($FileUpload),
             'VerifyBy' => $this->session->userdata('NIP'),
         );

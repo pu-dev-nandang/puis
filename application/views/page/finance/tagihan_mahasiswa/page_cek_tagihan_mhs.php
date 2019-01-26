@@ -549,6 +549,7 @@
                                                    '<th style="width: 55px;">Transaction Date</th>'+
                                                    '<th style="width: 55px;">Upload Date</th>'+
                                                    '<th style="width: 55px;">Bank</th>'+
+                                                   '<th style="width: 55px;">Status</th>'+
                                                    '<th style="width: 55px;">Action</th>'+
                                                 '</tr>'+
                                               '</thead>'+
@@ -558,11 +559,23 @@
             for (var i = 0; i < payment_proof.length; i++) {
               var FileUpload = jQuery.parseJSON(payment_proof[i]['FileUpload']);
               var FileAhref = '';
+
+              switch(payment_proof[i].VerifyFinance) {
+                case '1':
+                  var VerifyFinance = '<span style="color: green;"><i class="fa fa-check-circle margin-right"></i> Verify</span>';
+                  break;
+                case '2':
+                  var VerifyFinance  = '<span style="color: red;"><i class="fa fa-remove margin-right"></i>Reject</span>';
+                  break;
+                default:
+                  var VerifyFinance  = '<span style="color: green;"><i class="fa fa-info-circle margin-right"></i>Not Yet Verify</span>';
+              }
+
               for (var j = 0; j < FileUpload.length; j++) {
                 FileAhref = '<a href ="'+base_url_js+'fileGetAny/document-'+NPM+'-'+FileUpload[j].Filename+'" target="_blank">File '+ ((i+1)+j)+'</a>';
               }
 
-              var btnVerify = (payment_proof[i]['VerifyFinance'] == 1)? '<span style="color: green;margin-left: 12px;"><i class="fa fa-check-circle margin-right"></i> Verify</span>' : '<button class = "verify" idtable = "'+payment_proof[i]['ID']+'">Verify</button>';
+              var btnVerify = (payment_proof[i]['VerifyFinance'] == 1)? '' : '<button class = "verify" idtable = "'+payment_proof[i]['ID']+'">Verify</button><div style = "margin-top : 10px"><button class = "rejectverify" idtable = "'+payment_proof[i]['ID']+'">Reject</button></div>';
 
               htmlPaymentProof += '<tr>'+
                                       '<td>'+(i+1)+'</td>'+
@@ -573,6 +586,7 @@
                                       '<td>'+payment_proof[i]['Date_transaction']+'</td>'+
                                       '<td>'+payment_proof[i]['Date_upload']+'</td>'+
                                       '<td>'+payment_proof[i]['NmBank']+'</td>'+
+                                      '<td>'+VerifyFinance+'</td>'+
                                       '<td>'+btnVerify+'</td>'+
                                   '</tr>';    
             }
@@ -674,6 +688,8 @@
         var token = jwt_encode(data,'UAP)(*');
         $.post(url,{token:token},function (resultJson) {
            // var resultJson = jQuery.parseJSON(resultJson);
+           var fillitem = s.closest('tr');
+           fillitem.find('td:eq(8)').html('<span style="color: green;"><i class="fa fa-check-circle margin-right"></i> Verify</span>');
            s.remove();
            toastr.success('The data has been verified');
            loadData(1);
@@ -684,6 +700,47 @@
 
         }); 
       }
+      
+
+    });
+
+    $(document).on('click','.rejectverify', function () {
+      var idtable = $(this).attr('idtable');
+      var s = $(this);
+      var tditem = $(this).closest('td');
+      tditem.attr('style','width : 350px;');
+      tditem.append('<div style = "margin-top : 10px"><input type = "text" class = "form-control" placeholder = "Input Reason" id = "reason'+idtable+'" ></div>');
+      tditem.append('<div class = "row" style = "margin-top : 10px"><div class = "col-xs-12"><button class = "btn btn-success saverejectverify" idtable = "'+idtable+'">Save</button></div></div>');
+      s.remove();
+      $(".saverejectverify").click(function(){
+        if (confirm('Are you sure')) {
+          var idtable = $(this).attr('idtable');
+          var s = $(this);
+          var ReasonCancel = $("#reason"+idtable).val();
+          loading_button('.saverejectverify[idtable="'+idtable+'"]');
+          var url = base_url_js+'finance/reject_bukti_bayar';
+          var data = {
+              idtable : idtable,
+              ReasonCancel : ReasonCancel,
+          };
+          var token = jwt_encode(data,'UAP)(*');
+          $.post(url,{token:token},function (resultJson) {
+             // var resultJson = jQuery.parseJSON(resultJson);
+             var fillitem = s.closest('tr');
+             fillitem.find('td:eq(8)').html('<span style="color: red;"><i class="fa fa-remove margin-right"></i>Reject</span>');
+             toastr.success('The data has been verified');
+             s.remove();
+             $("#reason"+idtable).remove();
+             loadData(1);
+          }).fail(function() {
+            toastr.info('No Action...'); 
+            // toastr.error('The Database connection error, please try again', 'Failed!!');
+          }).always(function() {
+
+          }); 
+        }
+      })
+      
       
 
     });
