@@ -5117,8 +5117,9 @@ class C_api extends CI_Controller {
         $arr = array('result' => '','msg' => '');
         $input = $this->getInputToken();
         $fieldCek = $input['fieldCek'];
-        $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
-        $SemesterID = $SemesterID[0]['ID'];
+        $SemesterID = $input['Semester'];
+        // $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+        // $SemesterID = $SemesterID[0]['ID'];
         $getDeadlineTagihanDB = $this->m_finance->getDeadlineTagihanDB($fieldCek,$SemesterID);
         $dateFieldCek = $getDeadlineTagihanDB.' 23:59:00';
         $aaa = $this->m_master->chkTgl(date('Y-m-d H:i:s'),$dateFieldCek);

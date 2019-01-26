@@ -183,6 +183,7 @@
             var url1 = base_url_js+'api/__cek_deadlineBPPSKS';
             var data1 = {
                 fieldCek : fieldCek,
+                Semester : Semester,
             };
 
             var token1 = jwt_encode(data1,'UAP)(*');
@@ -227,27 +228,20 @@
 
                         var selecTOption = '<select class="selecTOption getDom" id="'+'discount_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" payment-type = "'+PTID+'" invoice = "'+Data_mhs[i]['Cost']+'">';
 
-                       var value_cost = Data_mhs[i]['Cost'] - ((Bea_BPP/100)*Data_mhs[i]['Cost']);
+                       var value_cost = Data_mhs[i]['Cost'] - ((Data_mhs[i]['Discount']/100)*Data_mhs[i]['Cost']);
                        var yy = (value_cost != '') ? formatRupiah(value_cost) : '-';
                        
                        if(PTID == 3)
                        {
                          var t = parseInt(Data_mhs[i]['Cost']) * parseInt(Data_mhs[i]['Credit']);
-                         var value_cost = t - ((Bea_Credit/100)*t);
+                         var value_cost = t - ((Data_mhs[i]['Discount']/100)*t);
                          yy = (value_cost != '') ? formatRupiah(value_cost) : '-';
                          selecTOption = '<select class="selecTOption getDom" id="'+'discount_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" payment-type = "'+PTID+'" invoice = "'+t+'">';
                        } 
                             for (var k = 0;k < xx['Discount'].length; k++)
                             {
                                 var O_discount = xx['Discount'];
-                                if(PTID == 2)
-                                {
-                                  var selected = (O_discount[k]['Discount'] == Bea_BPP) ? 'selected' : '';
-                                }
-                                else if(PTID == 3)
-                                {
-                                  var selected = (O_discount[k]['Discount'] == Bea_Credit) ? 'selected' : '';
-                                }
+                                var selected = (O_discount[k]['Discount'] == Data_mhs[i]['Discount']) ? 'selected' : '';
                                 selecTOption += '<option value="'+xx['Discount'][k]['Discount']+'" '+selected+'>'+xx['Discount'][k]['Discount']+'%'+'</option>';
                             }
                         selecTOption += '</select>';
