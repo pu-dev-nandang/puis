@@ -1,26 +1,34 @@
 <link href="<?php echo base_url('assets/custom/jquery-ui.css'); ?>" rel="stylesheet" type="text/css" />
-<div class="row" style="margin-top: 5px;">
-    <div class="col-md-12">
-        <div class="widget box">
-            <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i>Daftar Menu</h4>
-                <div class="toolbar no-padding">
-                    <div class="btn-group">
-                      <span data-smt="" class="btn btn-xs btn-add-menu btn-add btn-add-menu-auth">
-                        <i class="icon-plus"></i> Add Menu
-                       </span>
-                    </div>
-                </div>
-            </div>
-            <div class="widget-content">
-                <!-- <div class = 'row'> -->
-                	<div id= "loadtableMenu"></div>
-                <!-- </div> -->
-                <!-- -->
-            </div>
-        </div>
-    </div>
-</div>
+<?php 
+    $PositionMain = $this->session->userdata('PositionMain');
+    $IDDivision = $PositionMain['IDDivision'];
+
+ ?>
+ <?php if ($IDDivision == 12): ?>
+    <div class="row" style="margin-top: 5px;">
+         <div class="col-md-12">
+             <div class="widget box">
+                 <div class="widget-header">
+                     <h4 class="header"><i class="icon-reorder"></i>Daftar Menu</h4>
+                     <div class="toolbar no-padding">
+                         <div class="btn-group">
+                           <span data-smt="" class="btn btn-xs btn-add-menu btn-add btn-add-menu-auth">
+                             <i class="icon-plus"></i> Add Menu
+                            </span>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="widget-content">
+                     <!-- <div class = 'row'> -->
+                        <div id= "loadtableMenu"></div>
+                     <!-- </div> -->
+                     <!-- -->
+                 </div>
+             </div>
+         </div>
+     </div>
+ <?php endif ?>
+
 <div class="row" style="margin-top: 5px;">
     <div class="col-md-12">
         <div class="widget box">

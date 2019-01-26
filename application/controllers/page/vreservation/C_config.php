@@ -175,9 +175,9 @@ class C_config extends Vreservation_Controler {
         $NIP = $this->session->userdata('NIP');
         $get = $this->m_master->caribasedprimary('db_reservation.previleges_guser','NIP',$NIP);
         $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_reservation.previleges_guser as a join db_employees.employees as b
-                on a.NIP = b.NIP ';
+                on a.NIP = b.NIP join db_reservation.cfg_group_user as c on a.G_user = c.ID';
 
-        $sql.= ' where (a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%") and a.G_user >= "'.$ID_group_user.'"';
+        $sql.= ' where (a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%" or c.GroupAuth LIKE "%'.$requestData['search']['value'].'%") and a.G_user >= "'.$ID_group_user.'"';
         $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
         $query = $this->db->query($sql)->result_array();
