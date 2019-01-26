@@ -2564,4 +2564,30 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $query=$this->db->query($sql, array())->result_array();
         return $query;         
     }
+
+    public function GetSemester($Year,$SemesterSearch)
+    {
+        $get = $this->showData_array('db_academic.semester');
+        $Semester = 0;
+        for ($i=0; $i < count($get); $i++) { 
+            if ($Year == $get[$i]['Year'] && $get[$i]['Code'] == 1) {
+                $Semester++;
+            }
+            else
+            {
+                if ($Semester > 0) {
+                    if ($get[$i]['ID'] == $SemesterSearch) {
+                        $Semester++;
+                        break;
+                    }
+                    else
+                    {
+                        $Semester++;
+                    }
+                }
+            }
+        }
+
+        return $Semester;
+    }
 }
