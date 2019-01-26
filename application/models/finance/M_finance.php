@@ -1109,24 +1109,30 @@ class M_finance extends CI_Model {
     $NPM = ($NPM == "" || $NPM == null) ? '' : ' and a.NPM = "'.$NPM.'"';
     $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
 
+    // find semester id to get semester in m_tuition_fee
+        $GetSemester = $this->m_master->GetSemester($ta,$Semester);
+        if ($PTID != 2 && $PTID != 3) {
+          $GetSemester = 1;
+        }
+
     $queryAdd = '';
     if ($PTID == 3) {
       $queryAdd = ' and a.NPM in (select NPM from db_finance.payment where PTID = 2 and SemesterID = '.$Semester.' and Status = "1")';
     }
     if ($prodi == '') {
-     $sql = 'select count(*) as total from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
-             on a.ProdiID = c.ProdiID
-             where a.StatusStudentID in (3,2,8)  and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
-             and b.Pay_Cond = c.Pay_Cond order by a.NPM asc';
-     $Data_mhs=$this->db->query($sql, array($PTID,$Semester,$ta,$PTID))->result_array();
+     $sql = 'select count(*) as total from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.m_tuition_fee as c
+             on a.NPM = c.NPM
+             where a.StatusStudentID in (3,2,8)  and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.Semester = ? and c.PTID = ? '.$NPM.$queryAdd.'
+               order by a.NPM asc';
+     $Data_mhs=$this->db->query($sql, array($PTID,$Semester,$GetSemester,$PTID))->result_array();
     }
-    else
+    else 
     {
-      $sql = 'select count(*) as total from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
-              on a.ProdiID = c.ProdiID
-              where a.StatusStudentID in (3,2,8)  and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
-               and b.Pay_Cond = c.Pay_Cond order by a.NPM asc';
-      $Data_mhs=$this->db->query($sql, array($prodi,$PTID,$Semester,$ta,$PTID))->result_array();
+      $sql = 'select count(*) as total from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.m_tuition_fee as c
+                   on a.NPM = c.NPM
+                   where a.StatusStudentID in (3,2,8)  and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.Semester = ? and c.PTID = ? '.$NPM.$queryAdd.'
+                     order by a.NPM asc';
+      $Data_mhs=$this->db->query($sql, array($prodi,$PTID,$Semester,$GetSemester,$PTID))->result_array();
     }
 
     return $Data_mhs[0]['total'];
@@ -1217,25 +1223,31 @@ class M_finance extends CI_Model {
     $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','ID',$Semester);
 
     $queryAdd = '';
+    // find semester id to get semester in m_tuition_fee
+            $GetSemester = $this->m_master->GetSemester($ta,$Semester);
+            if ($PTID != 2 && $PTID != 3) {
+              $GetSemester = 1;
+            }
+
     if ($PTID == 3) {
       $queryAdd = ' and a.NPM in (select NPM from db_finance.payment where PTID = 2 and SemesterID = '.$Semester.' and Status = "1")';
     }
     if ($prodi == '') {
-     $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit,c.Cost from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
-             on a.ProdiID = c.ProdiID
-             where a.StatusStudentID in (3,2,8)  and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
-             and b.Pay_Cond = c.Pay_Cond order by a.NPM asc
+     $sql = 'select a.*,b.EmailPU,c.Invoice as Cost,c.Discount from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.m_tuition_fee as c
+             on a.NPM = c.NPM
+             where a.StatusStudentID in (3,2,8)  and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.Semester = ? and c.PTID = ? '.$NPM.$queryAdd.'
+               order by a.NPM asc
              LIMIT '.$start. ', '.$limit;
-     $Data_mhs=$this->db->query($sql, array($PTID,$Semester,$ta,$PTID))->result_array();
+     $Data_mhs=$this->db->query($sql, array($PTID,$Semester,$GetSemester,$PTID))->result_array();
     }
     else
     {
-      $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit,c.Cost from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.tuition_fee as c
-              on a.ProdiID = c.ProdiID
-              where a.StatusStudentID in (3,2,8)  and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.ClassOf = ? and c.PTID = ? '.$NPM.$queryAdd.'
-               and b.Pay_Cond = c.Pay_Cond order by a.NPM asc 
+      $sql = 'select a.*,b.EmailPU,c.Invoice as Cost,c.Discount from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.m_tuition_fee as c
+              on a.NPM = c.NPM
+              where a.StatusStudentID in (3,2,8)  and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.Semester = ? and c.PTID = ? '.$NPM.$queryAdd.'
+                order by a.NPM asc 
               LIMIT '.$start. ', '.$limit;
-      $Data_mhs=$this->db->query($sql, array($prodi,$PTID,$Semester,$ta,$PTID))->result_array();
+      $Data_mhs=$this->db->query($sql, array($prodi,$PTID,$Semester,$GetSemester,$PTID))->result_array();
     }
 
     // get Number VA Mahasiswa
@@ -1265,6 +1277,9 @@ class M_finance extends CI_Model {
       // get sks yang diambil
          $Credit = $this->getSKSMahasiswaBySemester($db2,$Data_mhs[$i]['NPM'],$SemesterID[0]['ID']);
          $Data_mhs[$i] = $Data_mhs[$i] + array('Credit' => $Credit);
+
+      // update Bea_BPP & Bea_Credit   
+         // $Data_mhs[$i]['Bea_BPP'] 
 
     }
     $arr['Data_mhs'] = $Data_mhs;
