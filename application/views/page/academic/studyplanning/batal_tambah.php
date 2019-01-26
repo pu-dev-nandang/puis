@@ -613,9 +613,6 @@
         var url = base_url_js+'api/__crudStudyPlanning';
 
         $.post(url,{token:token},function(jsonResult){
-
-
-
             // console.log(jsonResult);
             $('#emailTo').val(JSON.stringify(jsonResult.Email));
             // Send Mail
@@ -729,7 +726,7 @@
             }
         }
 
-        console.log(Email);
+        // console.log(Email);
 
         var data = {
             to : Email,
@@ -739,9 +736,16 @@
         };
 
         var token = jwt_encode(data,'UAP)(*');
-        var url = base_url_js+'rest/__sendEmail';
+
+        var url = (window.location.hostname=='localhost')
+            ? 'http://pcam.podomorouniversity.ac.id/rest/__sendEmail'
+            : base_url_js+'rest/__sendEmail' ;
+
         $.post(url,{token:token},function (result) {
-            $('#NotificationModal').modal('hide');
+            loadAvailable();
+            setTimeout(function () {
+                $('#NotificationModal').modal('hide');
+            },500);
         });
     }
 
