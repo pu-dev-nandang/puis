@@ -1644,7 +1644,7 @@ class M_finance extends CI_Model {
     return $query;
    }
 
-   public function count_get_created_tagihan_mhs($ta,$prodi,$PTID,$NIM,$Semester,$StatusPayment)
+   public function count_get_created_tagihan_mhs($ta,$prodi,$PTID,$NIM,$Semester,$StatusPayment,$ChangeStatus)
    {
     $arr = array();
     $this->load->model('master/m_master');
@@ -1682,13 +1682,17 @@ class M_finance extends CI_Model {
         break;
     }
 
+    if ($ChangeStatus != '') {
+      $ChangeStatus = ' and a.ToChange = "'.$ChangeStatus.'"';
+    }
+
     if ($ta1 == '') {
       $sql = 'select count(*) as total 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
               join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and c.ID = ?
               and b.StatusStudentID in (3,2,8)
-              '.$AddWhereStatusPayment;
+              '.$AddWhereStatusPayment.$ChangeStatus;
       $query=$this->db->query($sql, array($SemesterID))->result_array();
 
     }
@@ -1699,14 +1703,14 @@ class M_finance extends CI_Model {
               join db_academic.semester as c on a.SemesterID = c.ID
               join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and b.Year = ? and c.ID = ? 
               and b.StatusStudentID in (3,2,8)
-              '.$AddWhereStatusPayment;
+              '.$AddWhereStatusPayment.$ChangeStatus;
       $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
     }
     return $query[0]['total'];
 
    }
 
-   public function get_created_tagihan_mhs($ta,$prodi,$PTID,$NIM,$Semester,$StatusPayment,$limit, $start)
+   public function get_created_tagihan_mhs($ta,$prodi,$PTID,$NIM,$Semester,$StatusPayment,$ChangeStatus,$limit, $start)
    {
     // error_reporting(0);
     $arr = array();
@@ -1745,12 +1749,16 @@ class M_finance extends CI_Model {
         break;
     }
 
+    if ($ChangeStatus != '') {
+      $ChangeStatus = ' and a.ToChange = "'.$ChangeStatus.'"';
+    }
+
     if ($ta1 == '') {
       $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
               join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and c.ID = ? 
-              and b.StatusStudentID in (3,2,8) '.$AddWhereStatusPayment.'
+              and b.StatusStudentID in (3,2,8) '.$AddWhereStatusPayment.$ChangeStatus.'
               group by a.PTID,a.SemesterID,a.NPM order by c.ID desc,a.Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
       $query=$this->db->query($sql, array($SemesterID))->result_array();
 
@@ -1761,7 +1769,7 @@ class M_finance extends CI_Model {
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
               join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and b.Year = ? and c.ID = ? 
-              and b.StatusStudentID in (3,2,8) '.$AddWhereStatusPayment.'
+              and b.StatusStudentID in (3,2,8) '.$AddWhereStatusPayment.$ChangeStatus.'
               group by a.PTID,a.SemesterID,a.NPM order by a.Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
       $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
     }
@@ -1787,7 +1795,15 @@ class M_finance extends CI_Model {
          $Credit = $this->getSKSMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$query[$i]['SemesterID']);
 
       // cek cancel   
-         $cancelPay = $this->getCancel($query[$i]['PTID'],$query[$i]['SemesterID'],$query[$i]['NPM']);   
+         $cancelPay = $this->getCancel($query[$i]['PTID'],$query[$i]['SemesterID'],$query[$i]['NPM']);
+
+      // cek Payment Proof
+              $payment_proof = $this->m_master->caribasedprimary('db_finance.payment_proof','ID_payment',$query[$i]['ID']);
+              for ($z=0; $z < count($payment_proof); $z++) { 
+                  // get nama bank
+                  $G_bank = $this->m_master->caribasedprimary('db_finance.bank','ID',$payment_proof[$z]['ID_bank']);
+                  $payment_proof[$z]['NmBank'] = $G_bank[0]['Name'];
+              }         
 
       if($prodi == '' || $prodi == Null){
         $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$dt[0]['ProdiID']);
@@ -1814,6 +1830,7 @@ class M_finance extends CI_Model {
             'Credit' => $Credit,
             'Pay_Cond' => $query[$i]['Pay_Cond'],
             'cancelPay' => $cancelPay,
+            'payment_proof' => $payment_proof,
         );
       }
       else
@@ -1844,6 +1861,7 @@ class M_finance extends CI_Model {
               'Credit' => $Credit,
               'Pay_Cond' => $query[$i]['Pay_Cond'],
               'cancelPay' => $cancelPay,
+              'payment_proof' => $payment_proof,
           );
         }
       }
@@ -1880,8 +1898,8 @@ class M_finance extends CI_Model {
          if ($count == 0) {
            $dataSave = array(
                    'Status' =>"0",
-                   'UpdateAt' => null,
-                   'UpdatedBy' => null
+                   'UpdateAt' => date('Y-m-d H:i:s'),
+                   'UpdatedBy' => $this->session->userdata('NIP'),
                            );
            $this->db->where('ID',$Input[$i]->PaymentID);
            $this->db->update('db_finance.payment', $dataSave);
@@ -1899,8 +1917,8 @@ class M_finance extends CI_Model {
        {
         $dataSave = array(
                 'Status' =>"0",
-                'UpdateAt' => null,
-                'UpdatedBy' => null
+                'UpdateAt' => date('Y-m-d H:i:s'),
+                'UpdatedBy' => $this->session->userdata('NIP'),
                         );
         $this->db->where('ID',$Input[$i]->PaymentID);
         $this->db->update('db_finance.payment', $dataSave);
@@ -1925,8 +1943,8 @@ class M_finance extends CI_Model {
        if ($PTID == 2) {
          $dataSave = array(
                  'Status' =>"0",
-                 'UpdateAt' => null,
-                 'UpdatedBy' => null
+                 'UpdateAt' => date('Y-m-d H:i:s'),
+                 'UpdatedBy' => $this->session->userdata('NIP'),
                          );
          $this->db->where('ID',$Input[$i]->PaymentID);
          $this->db->update('db_finance.payment', $dataSave);
@@ -1934,13 +1952,34 @@ class M_finance extends CI_Model {
        else
        {
         $dataSave = array(
-                'Status' =>"0",
-                'UpdateAt' => null,
-                'UpdatedBy' => null
+               'Status' =>"0",
+               'UpdateAt' => date('Y-m-d H:i:s'),
+               'UpdatedBy' => $this->session->userdata('NIP'),
                         );
         $this->db->where('ID',$Input[$i]->PaymentID);
         $this->db->update('db_finance.payment', $dataSave);
        }
+       
+    }
+
+    return $msg;
+   }
+
+   public function assign_to_change_status_mhs($Input)
+   {
+    $msg = '';
+    for ($i=0; $i < count($Input); $i++) {
+      // check Mahasiswa telah melakukan transaksi atau belum
+       $NPM = $Input[$i]->NPM;
+       $SemesterID = $Input[$i]->semester;
+       $PTID = $Input[$i]->PTID;
+       $dataSave = array(
+               'ToChange' =>1,
+               'UpdateAt' => date('Y-m-d H:i:s'),
+               'UpdatedBy' => $this->session->userdata('NIP'),
+                       );
+       $this->db->where('ID',$Input[$i]->PaymentID);
+       $this->db->update('db_finance.payment', $dataSave);
        
     }
 

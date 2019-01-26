@@ -70,9 +70,17 @@
                         <div class="col-md-3" style="margin-top: 10px">
                           <div class="thumbnail" style="min-height: 30px;padding: 10px;">
                               <select class="form-control" id="selectStatusPayment">
-                                <option value="">All</option>
+                                <option value="">All Status Payment</option>
                                 <option value="0">Belum Lunas</option>
                                 <option value="1">Lunas</option>
+                              </select>
+                          </div>
+                        </div>
+                        <div class="col-md-3" style="margin-top: 10px">
+                          <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                              <select class="form-control" id="selectChangeStatus">
+                                <option value="">All</option>
+                                <option value="1">Request Change Status Mhs</option>
                               </select>
                           </div>
                         </div>
@@ -117,7 +125,8 @@
                           </table>
                         </div>
                     </div>
-                    <div  class="col-xs-12" align="right"><button class="btn btn-inverse btn-notification btn-unapprove hide" id="btn-submit-unapprove"><i class="fa fa-times" aria-hidden="true"></i>
+                    <div  class="col-xs-12" align="right"><button class="btn btn-inverse hide" id="btn-submit-assignmhs"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                 Change Status to Academic</button>&nbsp<button class="btn btn-inverse btn-notification btn-unapprove hide" id="btn-submit-unapprove"><i class="fa fa-times" aria-hidden="true"></i>
                  Unapprove</button>&nbsp<button class="btn btn-inverse btn-notification btn-custom btn-submit hide" id="btn-submit"> <i class="fa fa-check" aria-hidden="true"></i>
                  Approve</button></div>
                 </div>
@@ -178,8 +187,10 @@
         loadData(1);
     });
 
+    $('#selectChangeStatus').change(function () {
+        loadData(1);
+    });
     
-
     $(document).on('keypress','#NIM', function (event)
     {
 
@@ -214,6 +225,7 @@
         Semester = Semester.split('.');
         Semester = Semester[0];
         var StatusPayment = $("#selectStatusPayment").val();
+        var ChangeStatus = $("#selectChangeStatus").val();
         $('#NotificationModal .modal-header').addClass('hide');
             $('#NotificationModal .modal-body').html('<center>' +
                 '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
@@ -234,6 +246,7 @@
                 NIM : NIM,
                 Semester : Semester,
                 StatusPayment : StatusPayment,
+                ChangeStatus : ChangeStatus,
             };
             // console.log(data);return;
             var token = jwt_encode(data,'UAP)(*');
@@ -244,6 +257,15 @@
                 data = Data_mhs;
                 dataaModal = Data_mhs;
                 $('#ShowTotalData').html('<p style = "margin-top : 48px"><b style = "font-size : 14px">Total Record : '+resultJson.totaldata+'</b></p>');
+                if (Data_mhs.length > 0) {
+                  if (StatusPayment == 0 && StatusPayment != "") {
+                    $("#btn-submit-assignmhs").removeClass('hide');
+                  }
+                  else
+                  {
+                    $("#btn-submit-assignmhs").addClass('hide');
+                  }
+                }
                for(var i=0;i<Data_mhs.length;i++){
                     var ccc = 0;
                     var yy = (Data_mhs[i]['InvoicePayment'] != '') ? formatRupiah(Data_mhs[i]['InvoicePayment']) : '-';
@@ -373,6 +395,26 @@
                      var btn_view = '<button class = " btn btn-primary DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'">Pembayaran Manual </button>';
                    <?php endif ?>
 
+                   // adding status
+                      var payment_proof = Data_mhs[i]['payment_proof'];
+                      if (payment_proof.length > 0) {
+                        var boolproof = false;
+                        for (var zi = 0; zi < payment_proof.length; zi++) {
+                          if (payment_proof[zi]['VerifyFinance'] != 1) {
+                            boolproof = true;
+                            break;
+                          }
+                        }
+                        if (boolproof) {
+                          status += '<br> Bukti Upload belum verify ';
+                        }
+                        else
+                        {
+                          status += '<br> Bukti Upload telah diverify';
+                        }
+                      }
+                      
+
                    $('#dataRow').append(tr +
                        '<td>'+inputCHK+'</td>' +
                        '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
@@ -491,6 +533,71 @@
         table += '</table>' ;
 
         html += table;
+
+        // for Verify Bukti Bayar
+            var htmlPaymentProof = '<div class = "row" style = "margin-top : 10px">'+
+                                      '<div class = "col-md-12">'+
+                                          '<h5>List Proof of Payment</h5>'+
+                                            '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+                                              '<thead>'+
+                                                '<tr>'+
+                                                   '<th style="width: 5px;">No</th>'+
+                                                   '<th style="width: 55px;">File</th>'+
+                                                   '<th style="width: 55px;">Money Paid</th>'+
+                                                   '<th style="width: 55px;">Account Name</th>'+
+                                                   '<th style="width: 55px;">Account Owner</th>'+
+                                                   '<th style="width: 55px;">Transaction Date</th>'+
+                                                   '<th style="width: 55px;">Upload Date</th>'+
+                                                   '<th style="width: 55px;">Bank</th>'+
+                                                   '<th style="width: 55px;">Status</th>'+
+                                                   '<th style="width: 55px;">Action</th>'+
+                                                '</tr>'+
+                                              '</thead>'+
+                                            '<tbody>';
+          var payment_proof = dataaModal[i]['payment_proof'];
+          if (payment_proof.length > 0) {
+            for (var i = 0; i < payment_proof.length; i++) {
+              var FileUpload = jQuery.parseJSON(payment_proof[i]['FileUpload']);
+              var FileAhref = '';
+
+              switch(payment_proof[i].VerifyFinance) {
+                case '1':
+                  var VerifyFinance = '<span style="color: green;"><i class="fa fa-check-circle margin-right"></i> Verify</span>';
+                  break;
+                case '2':
+                  var VerifyFinance  = '<span style="color: red;"><i class="fa fa-remove margin-right"></i>Reject</span>';
+                  break;
+                default:
+                  var VerifyFinance  = '<span style="color: green;"><i class="fa fa-info-circle margin-right"></i>Not Yet Verify</span>';
+              }
+
+              for (var j = 0; j < FileUpload.length; j++) {
+                FileAhref = '<a href ="'+base_url_js+'fileGetAny/document-'+NPM+'-'+FileUpload[j].Filename+'" target="_blank">File '+ ((i+1)+j)+'</a>';
+              }
+
+              var btnVerify = (payment_proof[i]['VerifyFinance'] == 1)? '' : '<button class = "verify" idtable = "'+payment_proof[i]['ID']+'">Verify</button><div style = "margin-top : 10px"><button class = "rejectverify" idtable = "'+payment_proof[i]['ID']+'">Reject</button></div>';
+
+              htmlPaymentProof += '<tr>'+
+                                      '<td>'+(i+1)+'</td>'+
+                                      '<td>'+FileAhref+'</td>'+
+                                      '<td>'+formatRupiah(payment_proof[i]['Money'])+'</td>'+
+                                      '<td>'+payment_proof[i]['NoRek']+'</td>'+
+                                      '<td>'+payment_proof[i]['AccountOwner']+'</td>'+
+                                      '<td>'+payment_proof[i]['Date_transaction']+'</td>'+
+                                      '<td>'+payment_proof[i]['Date_upload']+'</td>'+
+                                      '<td>'+payment_proof[i]['NmBank']+'</td>'+
+                                      '<td>'+VerifyFinance+'</td>'+
+                                      '<td>'+btnVerify+'</td>'+
+                                  '</tr>';    
+            }
+
+            htmlPaymentProof += '</tbody></table></div></div>';
+            html += htmlPaymentProof;
+          }                                  
+
+        // end Verify Bukti Bayar
+
+        // for reason cancel payment
         var htmlReason = '<div class = "row"><div class= col-md-12><h5>List Cancel Payment</h5><table class="table table-striped table-bordered table-hover table-checkable tableData">'+
                       '<thead>'+
                           '<tr>'+
@@ -516,6 +623,8 @@
         if (CancelPayment.length > 0) {
           html += htmlReason;
         }
+        // end reason cancel payment
+
         var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
             '';
 
@@ -526,7 +635,7 @@
             'show' : true,
             'backdrop' : 'static'
         });
-        $('#GlobalModalLarge .modal-dialog').attr('style','width : 1000px;');
+        $('#GlobalModalLarge .modal-dialog').attr('style','width : 1080px;');
     });
 
 
@@ -566,6 +675,75 @@
          return allVals;
     }
 
+
+    $(document).on('click','.verify', function () {
+      if (confirm('Are you sure')) {
+        var s = $(this);
+        var idtable = $(this).attr('idtable');
+        loading_button('.verify[idtable="'+idtable+'"]');
+        var url = base_url_js+'finance/verify_bukti_bayar';
+        var data = {
+            idtable : idtable,
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        $.post(url,{token:token},function (resultJson) {
+           // var resultJson = jQuery.parseJSON(resultJson);
+           var fillitem = s.closest('tr');
+           fillitem.find('td:eq(8)').html('<span style="color: green;"><i class="fa fa-check-circle margin-right"></i> Verify</span>');
+           s.remove();
+           toastr.success('The data has been verified');
+           loadData(1);
+        }).fail(function() {
+          toastr.info('No Action...'); 
+          // toastr.error('The Database connection error, please try again', 'Failed!!');
+        }).always(function() {
+
+        }); 
+      }
+      
+
+    });
+
+    $(document).on('click','.rejectverify', function () {
+      var idtable = $(this).attr('idtable');
+      var s = $(this);
+      var tditem = $(this).closest('td');
+      tditem.attr('style','width : 350px;');
+      tditem.append('<div style = "margin-top : 10px"><input type = "text" class = "form-control" placeholder = "Input Reason" id = "reason'+idtable+'" ></div>');
+      tditem.append('<div class = "row" style = "margin-top : 10px"><div class = "col-xs-12"><button class = "btn btn-success saverejectverify" idtable = "'+idtable+'">Save</button></div></div>');
+      s.remove();
+      $(".saverejectverify").click(function(){
+        if (confirm('Are you sure')) {
+          var idtable = $(this).attr('idtable');
+          var s = $(this);
+          var ReasonCancel = $("#reason"+idtable).val();
+          loading_button('.saverejectverify[idtable="'+idtable+'"]');
+          var url = base_url_js+'finance/reject_bukti_bayar';
+          var data = {
+              idtable : idtable,
+              ReasonCancel : ReasonCancel,
+          };
+          var token = jwt_encode(data,'UAP)(*');
+          $.post(url,{token:token},function (resultJson) {
+             // var resultJson = jQuery.parseJSON(resultJson);
+             var fillitem = s.closest('tr');
+             fillitem.find('td:eq(8)').html('<span style="color: red;"><i class="fa fa-remove margin-right"></i>Reject</span>');
+             toastr.success('The data has been verified');
+             s.remove();
+             $("#reason"+idtable).remove();
+             loadData(1);
+          }).fail(function() {
+            toastr.info('No Action...'); 
+            // toastr.error('The Database connection error, please try again', 'Failed!!');
+          }).always(function() {
+
+          }); 
+        }
+      })
+      
+      
+
+    });
 
     $(document).on('click','.bayar', function () {
         var IDStudent = $(this).attr('IDStudent');
@@ -727,13 +905,7 @@
     });
 
     $(document).on('click','#btn-submit-unapprove', function () {
-      // $(".uniform[value=21150045]").addClass('hide');
-      // $("#datatable2 table > tbody > tr [input[value=21150045]]").addClass('hide');
-      // $(".uniform[value=21150045]").parent().addClass('hide');
-      // $("tr[NPM=21150045]").addClass('hide'); Ok
-
         var arrValueCHK = getChecboxNPM();
-        console.log(arrValueCHK);
         if (arrValueCHK.length > 0) {
             // check status jika 1
             var bool = true;
@@ -846,6 +1018,127 @@
              
            }); // exit click function
           
+
+        }
+        else
+        {
+            toastr.error("Silahkan checked dahulu", 'Failed!!');
+        }
+    });
+
+    $(document).on('click','#btn-submit-assignmhs', function () {
+        // console.log(dataaModal);
+        var arrValueCHK = getChecboxNPM();
+         // console.log(arrValueCHK);
+        if (arrValueCHK.length > 0) {
+            var html = '';
+            var table = '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+                          '<thead>'+
+                              '<tr>'+
+                                  '<th style="width: 5px;">No</th>'+
+                                  '<th style="width: 55px;">Nama</th>'+
+                                  '<th style="width: 55px;">NPM</th>'+
+                                  '<th style="width: 55px;">Prodi</th>'+
+                                  '<th style="width: 55px;">Payment Type</th>'+
+                                  '<th style="width: 55px;">Discount</th>'+
+                                  '<th style="width: 55px;">Invoice</th>'+
+                                  '<th style="width: 55px;">Payment</th>'+
+                                  '<th style="width: 55px;">Proof of Payment</th>';
+            table += '</tr>' ;  
+            table += '</thead>' ; 
+            table += '<tbody>' ;
+            var isi = '';
+            for (var i = 0; i < arrValueCHK.length ; i++) {
+              // search data in data to get payment and payment proof
+              var PaymentID = arrValueCHK[i]['PaymentID'];
+                  var PaymentMhs = 0;
+                  var PaymentOfProof = '';
+                  for (var zi = 0; zi < dataaModal.length; zi++) {
+                    var PaymentIDModal = dataaModal[zi].PaymentID;
+                    if (PaymentID == PaymentIDModal) {
+                       // get PaymentMhs
+                       var dd = dataaModal[zi].DetailPayment;
+                          for (var yi = 0; yi < dd.length; yi++) {
+                              if (dd[yi].Status == 1) {
+                                PaymentMhs += parseInt(dd[yi].Invoice);
+                              }
+                          }
+
+                        // Payment of Proof
+                        var dd =  dataaModal[zi].payment_proof;
+                            for (var yi = 0; yi < dd.length; yi++) {
+                               var FileUpload =jQuery.parseJSON(dd[yi].FileUpload);
+                               for (var xi = 0; xi < FileUpload.length; xi++) {
+                                 PaymentOfProof += '<li><a href ="'+base_url_js+'fileGetAny/document-'+arrValueCHK[i]['NPM']+'-'+FileUpload[xi].Filename+'" target="_blank">File '+ ((yi+1)+xi)+'</a></li>';
+                               }
+                            }  
+
+                      break;
+                    }
+                    
+                  }
+
+              var yy = (arrValueCHK[i]['Invoice'] != '') ? formatRupiah(arrValueCHK[i]['Invoice']) : '-';
+                isi += '<tr>'+
+                      '<td>'+ (i+1) + '</td>'+
+                      '<td>'+ (arrValueCHK[i]['Nama']) + '</td>'+
+                      '<td>'+ (arrValueCHK[i]['NPM']) + '</td>'+
+                      '<td>'+ (arrValueCHK[i]['Prodi']) + '</td>'+
+                      '<td>'+ (arrValueCHK[i]['PTName']) + '</td>'+
+                      '<td>'+ (arrValueCHK[i]['Discount']) + ' %</td>'+
+                      '<td>'+ yy + '</td>'+
+                      '<td>'+ formatRupiah(PaymentMhs) + '</td>'+
+                      '<td>'+ PaymentOfProof + '</td>'+
+                    '<tr>';  
+                
+            }
+
+            table += isi+'</tbody>' ; 
+            table += '</table>' ;
+
+            html += table;
+
+            var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+                '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>';
+            
+
+           $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'List Checklist Data'+'</h4>');
+           $('#GlobalModalLarge .modal-body').html(html);
+           $('#GlobalModalLarge .modal-footer').html(footer);
+           $('#GlobalModalLarge').modal({
+               'show' : true,
+               'backdrop' : 'static'
+           });
+         
+           $( "#ModalbtnSaveForm" ).click(function() {
+            loading_button('#ModalbtnSaveForm');
+            var url = base_url_js+'finance/assign_to_change_status_mhs';
+            var data = {
+                arrValueCHK : arrValueCHK,
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            $.post(url,{token:token},function (resultJson) {
+               var resultJson = jQuery.parseJSON(resultJson);
+               if (resultJson != '')
+               {
+                toastr.success('Data berhasil disimpan', 'Success!');
+                loadData(1);
+                $('#GlobalModalLarge').modal('hide');
+               }
+               else
+               {
+                toastr.success('Data berhasil disimpan', 'Success!');
+                loadData(1);
+                $('#GlobalModalLarge').modal('hide');
+               }
+            }).fail(function() {
+              toastr.info('No Action...'); 
+              // toastr.error('The Database connection error, please try again', 'Failed!!');
+            }).always(function() {
+                $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
+            });
+             
+           }); // exit click function
 
         }
         else

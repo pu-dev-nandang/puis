@@ -533,11 +533,15 @@ $route['finance/get_tagihan_mhs/(:num)'] =  'page/finance/c_finance/get_tagihan_
 $route['finance/submit_tagihan_mhs'] =  'page/finance/c_finance/submit_tagihan_mhs';
 $route['finance/tagihan-mhs/cek-tagihan-mhs/(:num)'] =  'page/finance/c_finance/page_cek_tagihan_mhs/$1';
 $route['finance/tagihan-mhs/cek-tagihan-mhs'] =  'page/finance/c_finance/page_cek_tagihan_mhs';
+
+
 $route['finance/get_created_tagihan_mhs/(:num)'] =  'page/finance/c_finance/get_created_tagihan_mhs/$1';
 $route['finance/get_created_tagihan_mhs_not_approved/(:num)'] =  'page/finance/c_finance/get_created_tagihan_mhs_not_approved/$1';
 $route['finance/approved_created_tagihan_mhs'] =  'page/finance/c_finance/approved_created_tagihan_mhs';
 $route['finance/unapproved_created_tagihan_mhs'] =  'page/finance/c_finance/unapproved_created_tagihan_mhs';
 $route['finance/unapproved_created_tagihan_mhs_after_confirm'] =  'page/finance/c_finance/unapproved_created_tagihan_mhs_after_confirm';
+$route['finance/assign_to_change_status_mhs'] =  'page/finance/c_finance/assign_to_change_status_mhs';
+
 
 $route['finance/tagihan-mhs/cancel-tagihan-mhs'] =  'page/finance/c_finance/cancel_tagihan_mhs';
 $route['finance/cancel_created_tagihan_mhs'] =  'page/finance/c_finance/cancel_created_tagihan_mhs';
@@ -580,6 +584,8 @@ $route['finance/download-log-va'] =  'page/finance/c_finance/download_log_va';
 $route['finance/listfile_va'] =  'page/finance/c_finance/listfile_va';
 $route['finance/admission/dailypenerimaanBank'] =  'c_save_to_excel/dailypenerimaanBank_admission';
 $route['finance/admission/RekapIntake'] =  'c_save_to_excel/RekapIntake';
+$route['finance/verify_bukti_bayar'] =  'page/finance/c_finance/verify_bukti_bayar';
+$route['finance/reject_bukti_bayar'] =  'page/finance/c_finance/reject_bukti_bayar';
 
 
 // -- config --
@@ -833,7 +839,7 @@ $route['rest/__Databank'] = 'api/c_rest/Databank';
 $route['rest/__GetpaymentByID'] = 'api/c_rest/GetpaymentByID';
 $route['rest/__save_upload_proof_payment'] = 'api/c_rest/save_upload_proof_payment';
 $route['rest/__delete_file_proof_payment'] = 'api/c_rest/delete_file_proof_payment';
-$route['rest/__delete_all_file_proof_payment'] = 'api/c_rest/delete_all_file_proof_payment';
+$route['rest/__delete_all_file_proof_payment_byID'] = 'api/c_rest/delete_all_file_proof_payment_byID';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';

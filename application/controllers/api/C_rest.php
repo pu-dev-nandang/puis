@@ -1178,7 +1178,7 @@ class C_rest extends CI_Controller {
 
                 if ($bool) {
                     $to = $dataToken['to'];
-                    $subject = $dataToken['to'];
+                    $subject = $dataToken['subject'];
                     $text = $dataToken['text'];
                     if (array_key_exists('attach',$dataToken)) {
                         $path = $dataToken['attach'];
@@ -1601,7 +1601,7 @@ class C_rest extends CI_Controller {
             $auth = $this->m_master->AuthAPI($dataToken);
             if ($auth) {
                 $msg = '';
-                $getDataproof = $this->m_master->caribasedprimary('db_finance.payment_proof','ID_payment',$dataToken['ID_payment']);
+                $getDataproof = $this->m_master->caribasedprimary('db_finance.payment_proof','ID',$dataToken['idtable']);
                 $getDatapayment = $this->m_master->caribasedprimary('db_finance.payment','ID',$dataToken['ID_payment']);
                 $NPM = $getDatapayment[0]['NPM'];
                 $FileUpload = (array) json_decode($getDataproof[0]['FileUpload'],true);
@@ -1616,12 +1616,20 @@ class C_rest extends CI_Controller {
                     }
                 }
 
-                $FileUpload = array_values($FileUpload);
-                $datasave = array(
-                    'FileUpload' => json_encode($FileUpload),
-                );
-                $this->db->where('ID_payment',$dataToken['ID_payment']);
-                $this->db->update('db_finance.payment_proof',$datasave);
+                if (count($FileUpload) == 0) {
+                    $this->db->where('ID', $dataToken['idtable']);
+                    $this->db->delete('db_finance.payment_proof'); 
+                }
+                else
+                {
+                    $FileUpload = array_values($FileUpload);
+                    $datasave = array(
+                        'FileUpload' => json_encode($FileUpload),
+                    );
+                    $this->db->where('ID',$dataToken['idtable']);
+                    $this->db->update('db_finance.payment_proof',$datasave);
+                }
+               
                 echo json_encode($msg);
             }
             else
@@ -1637,14 +1645,14 @@ class C_rest extends CI_Controller {
         }
     }
 
-    public function delete_all_file_proof_payment()
+    public function delete_all_file_proof_payment_byID()
     {
        try {
            $dataToken = $this->getInputToken2();
            $auth = $this->m_master->AuthAPI($dataToken);
            if ($auth) {
                $msg = '';
-               $getDataproof = $this->m_master->caribasedprimary('db_finance.payment_proof','ID_payment',$dataToken['ID_payment']);
+               $getDataproof = $this->m_master->caribasedprimary('db_finance.payment_proof','ID',$dataToken['idtable']);
                $getDatapayment = $this->m_master->caribasedprimary('db_finance.payment','ID',$dataToken['ID_payment']);
                $NPM = $getDatapayment[0]['NPM'];
                $FileUpload = (array) json_decode($getDataproof[0]['FileUpload'],true);
@@ -1660,11 +1668,10 @@ class C_rest extends CI_Controller {
                     unlink($path);
                     unset($FileUpload[$i]); 
                }
-               $datasave = array(
-                   'FileUpload' => json_encode($FileUpload),
-               );
-               $this->db->where('ID_payment',$dataToken['ID_payment']);
-               $this->db->update('db_finance.payment_proof',$datasave);
+               if (count($FileUpload) == 0) {
+                   $this->db->where('ID', $dataToken['idtable']);
+                   $this->db->delete('db_finance.payment_proof'); 
+               }
                echo json_encode($msg);
            }
            else
