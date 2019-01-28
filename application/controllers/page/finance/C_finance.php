@@ -1752,11 +1752,16 @@ class C_finance extends Finnance_Controler {
 
             // print_r($total);die();
             $GetDataPayment = $this->m_master->caribasedprimary('db_finance.payment','ID',$ID_payment);
+
+            // check ToChange
+                $ToChange = ($GetDataPayment[0]['ToChange'] == 1) ? 2 : 0; 
+
             $Invoice = $GetDataPayment[0]['Invoice'];
             if ($total >= $Invoice) {
                 $dataSave = array(
                         'Status' =>"1",
-                        'ToChange' => 0,
+                        // 'ToChange' => 0,
+                        'ToChange' => $ToChange,
                         'UpdateAt' => date('Y-m-d H:i:s'),
                         'UpdatedBy' => $this->session->userdata('NIP'),
                                 );
