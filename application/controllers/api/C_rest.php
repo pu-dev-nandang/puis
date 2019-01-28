@@ -1686,4 +1686,31 @@ class C_rest extends CI_Controller {
          echo '{"status":"999","message":"jangan iseng :D"}';
        }
     }
+
+    public function academic_fill_list_mhs_tidak_bayar()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('m_sendemail');
+                $to = $Email;
+                $subject = "Podomoro University Venue Reservation Feedback";
+                $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                
+                echo json_encode($gg);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
 }
