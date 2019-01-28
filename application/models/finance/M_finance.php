@@ -1698,8 +1698,19 @@ class M_finance extends CI_Model {
     }
 
     if ($ChangeStatus != '') {
-      $ChangeStatus = ' and a.ToChange = "'.$ChangeStatus.'"';
+      if ($ChangeStatus == 1) {
+        $ChangeStatus = ' and (a.ToChange = "'.$ChangeStatus.'"  or a.ToChange = "2" )';
+      }
+      else
+      {
+        // nothing
+        $ChangeStatus = '';
+      }
+      
     }
+    // if ($ChangeStatus != '') {
+    //   $ChangeStatus = ' and a.ToChange = "'.$ChangeStatus.'"';
+    // }
 
     if ($ta1 == '') {
       $sql = 'select count(*) as total 
@@ -1765,8 +1776,20 @@ class M_finance extends CI_Model {
     }
 
     if ($ChangeStatus != '') {
-      $ChangeStatus = ' and a.ToChange = "'.$ChangeStatus.'"';
+      if ($ChangeStatus == 1) {
+        $ChangeStatus = ' and (a.ToChange = "'.$ChangeStatus.'"  or a.ToChange = "2" )';
+      }
+      else
+      {
+        // nothing
+        $ChangeStatus = '';
+      }
+      
     }
+    
+    // if ($ChangeStatus != '') {
+    //   $ChangeStatus = ' and a.ToChange = "'.$ChangeStatus.'"';
+    // }
 
     if ($ta1 == '') {
       $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
