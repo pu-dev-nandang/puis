@@ -377,8 +377,8 @@
                    var IPS = 0;
                    var IPK = 0;
                    try {
-                       IPS = Data_mhs[i]['IPS'].toFixed(2);
-                       IPK = Data_mhs[i]['IPK'].toFixed(2);
+                       IPS = getCustomtoFixed(Data_mhs[i]['IPS'],2);
+                       IPK = getCustomtoFixed(Data_mhs[i]['IPK'],2);
                    }
                    catch(err) {
                        IPS = 0;

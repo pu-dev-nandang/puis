@@ -1429,6 +1429,33 @@
                 $(element).append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'" '+selected+'>'+data_json[i].NameEng+'</option>');
             }
         });
+    }
+
+    function getCustomtoFixed(dataValue,digit) {
+        var exTitik = dataValue.toFixed(4).toString().split('.');
+        var exKoma = dataValue.toFixed(4).toString().split(',');
+
+        var s = 0;
+        var s2 = 0;
+        var after = 0;
+
+        var result = dataValue;
+        if(exTitik.length>1){
+            s = exTitik[1].substr(digit,1);
+            s2 = exTitik[1].substr(0,digit);
+            after = (parseInt(s)<5) ? parseInt(s2) : parseInt(s2) + 1;
+            result = exTitik[0]+'.'+after;
+
+
+        } else if(exKoma.length>1){
+            s = exKoma[1].substr(digit,1);
+            s2 = exKoma[1].substr(0,digit);
+            after = (parseInt(s)<5) ? parseInt(s2) : parseInt(s2) + 1;
+            result = exKoma[0]+'.'+after;
+        }
+
+
+        return parseFloat(result);
     }  
 
 </script>
