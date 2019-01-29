@@ -260,14 +260,14 @@
                         var IPK = 0;
                         var IPS = 0;
                         try {
-                            IPK = Data_mhs[i]['IPK'].toFixed(2);
+                            IPK = getCustomtoFixed(Data_mhs[i]['IPK'],2);
                         }
                         catch(err) {
                             var IPK = 0;
                         }
 
                         try {
-                            IPS = Data_mhs[i]['IPS'].toFixed(2);
+                            IPS = getCustomtoFixed(Data_mhs[i]['IPS'],2);
                         }
                         catch(err) {
                             var IPS = 0;

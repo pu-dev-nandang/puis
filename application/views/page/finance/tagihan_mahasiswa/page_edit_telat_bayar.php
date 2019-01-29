@@ -194,8 +194,8 @@
                               var IPSTo = '';
                               var IPKTo = '';
                               try {
-                                  IPSTo = Data_mhs[i]['IPS'].toFixed(2);
-                                  IPKTo = Data_mhs[i]['IPK'].toFixed(2);
+                                  IPSTo = getCustomtoFixed(Data_mhs[i]['IPS'],2);
+                                  IPKTo = getCustomtoFixed(Data_mhs[i]['IPK'],2);
                               }
                               catch(err) {
                                   IPSTo = '';
