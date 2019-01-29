@@ -1686,4 +1686,123 @@ class C_rest extends CI_Controller {
          echo '{"status":"999","message":"jangan iseng :D"}';
        }
     }
+
+    public function academic_fill_list_mhs_tidak_bayar()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('m_sendemail');
+                $this->load->model('finance/m_finance');
+
+                $Semester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+                $SemesterActive = $Semester[0]['ID'];
+
+                // cek date bayar end
+                    $bool = false;
+                    $AcademicYears = $this->m_master->caribasedprimary('db_academic.academic_years','SemesterID',$SemesterActive);
+                    if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                        $bayarEnd = date("Y-m-d", strtotime($AcademicYears[0]['bayarEnd']));
+                        $NowDate = date('Y-m-d');
+                        if ($bayarEnd == $NowDate) {
+                            $bool = true;
+                        }
+                    }
+                    else
+                    {
+                        $bool = true;
+                        // $bayarEnd = date("Y-m-d", strtotime($AcademicYears[0]['bayarEnd']));
+                        // $NowDate = date('Y-m-d');
+                        // if ($bayarEnd == $NowDate) {
+                        //     $bool = true;
+                        // }
+                    }
+
+                if ($bool) {
+                    $G_data = $this->m_finance->PaymentTidakLunas($SemesterActive);
+
+                    if (count($G_data) > 0) {
+                        $html = 'Dear <span style="color: #333;">Finance & Academic</span>,
+                                    <br/>
+                                     Perihal : <b>List Mahasiswa Belum Lunas Semester '.$G_data[0]['NameSemester'].'</b>     
+                                     <div style="font-size: 12px;">
+                                     <br/>
+                                     <table  width="100%" cellspacing="0" cellpadding="4" border="0">
+                                        <thead>
+                                            <tr style="background: #607d8b;color: #ffffff;">
+                                                <th style="width: 3%;text-align: center;">No</th>
+                                                <th style="text-align: left;">NPM / Nama</th>
+                                                <th style="width: 10%;text-align: center;">Prodi</th>
+                                                <!--<th style="width: 10%;text-align: center;">Semester</th>-->
+                                                <th style="width: 10%;text-align: center;">Tipe Pembayaran</th>
+                                                <th style="width: 20%;text-align: left;">Invoice</th>
+                                                <th style="width: 20%;text-align: left;">Pembayaran</th>
+                                                <!--<th style="width: 10%;text-align: center;">Status</th>-->
+                                            </tr>
+                                        </thead>
+                                        <tbody>        
+                        ';
+                        for ($i=0; $i < count($G_data); $i++) { 
+                            $html .= '<tr style="background: #607d8b24;">
+                                        <td style="border-bottom: 1px solid #9e9e9e;text-align: center">
+                                            '.($i+1).
+                                        '</td>
+                                        <td style="border-bottom: 1px solid #9e9e9e;text-align: left">
+                                            '.$G_data[$i]['NPM'].' / '.$G_data[$i]['NameMHS'].
+                                        '</td>
+                                        <td style="border-bottom: 1px solid #9e9e9e;text-align: center">
+                                            '.$G_data[$i]['NameEng'].
+                                        '</td>
+                                        <!--<td style="border-bottom: 1px solid #9e9e9e;text-align: center">
+                                            '.$G_data[$i]['NameSemester'].
+                                        '</td>-->
+                                        <td style="border-bottom: 1px solid #9e9e9e;text-align: center">
+                                            '.$G_data[$i]['Description'].
+                                        '</td>
+                                        <td style="border-bottom: 1px solid #9e9e9e;text-align: left">
+                                            Rp '.number_format($G_data[$i]['Invoice'],2,',','.').
+                                        '</td>
+                                        <td style="border-bottom: 1px solid #9e9e9e;text-align: left">
+                                            Rp '.number_format($G_data[$i]['Payment'],2,',','.').
+                                        '</td>
+                                        <!--<td style="border-bottom: 1px solid #9e9e9e;text-align: center">
+                                            '.$G_data[$i]['StatusPay'].
+                                        '</td>-->
+                                    </tr>    
+                                    ';      
+                        }
+
+                        $html .= '</tbody></table></div>';
+
+                        $Email = 'alhadi.rahman@podomorouniversity.ac.id';
+                        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                            $G_fin = $this->m_master->caribasedprimary('db_employees.division','ID',9);
+                            $EmailFin = $G_fin[0]['Email'];
+                            $G_Academic = $this->m_master->caribasedprimary('db_employees.division','ID',6);
+                            $EmailAcademic = $G_Academic[0]['Email'];
+                            $Email =$EmailFin.','.$EmailAcademic.',it@podomorouniversity.ac.id';
+                        }
+                        $to = $Email;
+                        $subject = "Podomoro University Reminder";
+                        $text = $html;
+                        $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                    }
+                }     
+                
+                echo json_encode(1);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
 }
