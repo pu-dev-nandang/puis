@@ -482,4 +482,35 @@ class M_save_to_pdf extends CI_Model {
         return $result;
     }
 
+
+//======================================= tambahan SKL TGL 18-01-2019 =========================================================
+//==============================================================================================================================
+    public function getSkls($DBStudent,$NPM){
+        $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth, aus.CertificateSerialNumber AS CSN, 
+                                            ps.Name AS Prodi, ps.NameEng AS ProdiEng, 
+                                            ps.Degree, ps.TitleDegree, ps.DegreeEng, ps.TitleDegreeEng, 
+                                            edl.Description AS GradeDesc, edl.DescriptionEng AS GradeDescEng, 
+                                            em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind,f.Name AS Faculty,f.NameEng AS FacultyEng , 
+                                            s.Gender, aus.SklNumber AS SKLN
+                                            FROM '.$DBStudent.'.students s
+                                            LEFT JOIN db_academic.auth_students aus ON (s.NPM = aus.NPM) 
+                                            LEFT JOIN db_academic.program_study ps ON (s.ProdiID = ps.ID) 
+                                            LEFT JOIN db_academic.education_level edl ON (edl.ID = ps.EducationLevelID)
+                                            LEFT JOIN db_academic.faculty f ON (f.ID = ps.FacultyID)
+                                            LEFT JOIN db_employees.employees em ON (em.NIP = f.NIP)
+                                            WHERE s.NPM = "'.$NPM.'" ')->result_array();
+
+        $dataTranscript = $this->db->get('db_academic.setting_transcript')->result_array();
+
+          $result = array(
+            'Student' => $dataStd,
+            'Skls' => $dataTranscript
+        );
+
+        return $result;
+
+    }
+//==============================================================================================================================
+//==============================================================================================================================
+
 }
