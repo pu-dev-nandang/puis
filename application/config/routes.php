@@ -11,6 +11,8 @@ $route['navigation/(:num)'] = 'c_departement/navigation/$1';
 $route['profile'] = 'c_dashboard/profile';
 $route['page404'] = 'dashboard/c_dashboard/page404';
 
+
+
 // FROM PORTAL
 $route['uath/__portal4SignIn'] = 'c_login/portal4SignIn';
 
@@ -624,6 +626,7 @@ $route['save2pdf/schedule-pdf'] =  'c_save_to_pdf/schedulePDF';
 $route['save2pdf/monitoringAttdLecturer'] =  'c_save_to_pdf/monitoringAttdLecturer';
 $route['save2pdf/scheduleExchange'] =  'c_save_to_pdf/scheduleExchange';
 $route['save2pdf/monitoringStudent'] =  'c_save_to_pdf/monitoringStudent';
+
 $route['save2pdf/monitoringAttendanceByRangeDate'] =  'c_save_to_pdf/monitoringAttendanceByRangeDate';
 
 $route['save2pdf/filterDocument'] =  'c_save_to_pdf/filterDocument';
@@ -640,6 +643,10 @@ $route['save2pdf/attendance-list'] =  'c_save_to_pdf/attendance_list';
 $route['save2pdf/transcript'] =  'c_save_to_pdf/transcript';
 $route['save2pdf/temp_transcript'] =  'c_save_to_pdf/temp_transcript';
 $route['save2pdf/ijazah'] =  'c_save_to_pdf/ijazah';
+
+//========= tambahan SKL TGL 17-01-2019 =============================
+$route['save2pdf/skls'] =  'c_save_to_pdf/skls';
+//====================================================================
 $route['save2pdf/diploma_supplement'] =  'c_save_to_pdf/diploma_supplement';
 
 $route['save2pdf/report-uts'] =  'c_save_to_pdf/report_uts';
@@ -723,15 +730,11 @@ $route['api/__getListStudentKrsOnline'] = 'api/c_api/getListStudentKrsOnline';
 $route['api/__getListStudentKrsOnlineKaprodi'] = 'api/c_api/getListStudentKrsOnlineKaprodi';
 
 // === Timetables ====
-
 $route['api/__getTimetables'] = 'api/c_api/getTimetables';
-
 // === Penutup Timetables ====
 
 // === Monitoring All Student ===
-
 $route['api/__getMonitoringAllStudent'] = 'api/c_api/getMonitoringAllStudent';
-
 // ============================
 
 $route['api/__getListCourseInScore'] = 'api/c_api/getListCourseInScore';
@@ -791,6 +794,7 @@ $route['api/__crudJadwalUjian'] = 'api/c_api/crudJadwalUjian';
 $route['api/__crudEmployees'] = 'api/c_api/crudEmployees';
 $route['api/__crudScore'] = 'api/c_api/crudScore';
 $route['api/__crudAttendance'] = 'api/c_api/crudAttendance';
+
 $route['api/__crudScheduleExchange'] = 'api/c_api/crudScheduleExchange';
 $route['api/__crudLimitCredit'] = 'api/c_api/crudLimitCredit';
 
