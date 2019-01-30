@@ -3897,8 +3897,8 @@ class C_save_to_pdf extends CI_Controller {
         // ========buat tanggal header yudisium ===================
         // ========================================================
         $pdf->Ln(15);
-        $fn_b = 11;
-        $fn_i = 10;
+        $fn_b = 10;
+        $fn_i = 9;
         $x = 22;
         $h = 4;
         $border = 0;
@@ -3914,8 +3914,8 @@ class C_save_to_pdf extends CI_Controller {
 
 
         $pdf->Ln(29);
-        $fn_b = 11; //untuk ukuran huruf
-        $fn_i = 10;
+        $fn_b = 10; //untuk ukuran huruf
+        $fn_i = 9;
         $fn_e = 9; // untuk ukuran font
         $x = 40;
         $h = 4;
@@ -3943,7 +3943,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(10,4,'',0,1);//memberikan enter/jarak ke bawah
         $pdf->SetX($x);
         $pdf->SetFont('Arial','I',$fn_e);
-        $pdf->Cell(135,$h,'this is  to certify that',$border,0,'L');
+        $pdf->Cell(135,$h,'This is  to certify that',$border,0,'L');
         $pdf->Cell(15,$h,'',$border,0,'L');
         $pdf->Cell(10,7,'',0,1);
         $pdf->Ln(6);
@@ -3970,7 +3970,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetX(5);
         $pdf->SetFont('Arial','I',$fn_e);
-        $pdf->Cell(70,$h,'/ Name',$border,1,'C');
+        $pdf->Cell(68,$h,'/ Name',$border,1,'C');
 
         $pdf->Ln($ln);
         // ===== TTL =====
@@ -3979,7 +3979,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($label,$h,'Tempat, Tanggal Lahir',$border,0,'L');
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,$Student['PlaceOfBirth'].', '.$this->getDateIndonesian($Student['DateOfBirth']),$border,0,'L');
-        $pdf->SetX(63);
+        $pdf->SetX(61);
         $pdf->SetFont('Arial','I',$fn_e);
         $pdf->Cell($label,$h,'/ Date of birth',$border,1,'L');
         $pdf->Ln(1.5);
@@ -3989,7 +3989,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($label,$h,'Nomor Induk Mahasiswa',$border,0,'L');
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,$Student['NPM'],$border,0,'L');
-        $pdf->SetX(67);
+        $pdf->SetX(64);
         $pdf->SetFont('Arial','I',$fn_e);
         $pdf->Cell($label,$h,'/ Student ',$border,1,'L');
         $pdf->SetX(22);
@@ -4005,12 +4005,12 @@ class C_save_to_pdf extends CI_Controller {
 
         if ($Student['Faculty'][0]=='T') 
         {
-            $pdf->SetX(104);  
+            $pdf->SetX(103);  
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,'/',$border,0,'L');
             $pdf->Cell($fill,$h,$Student['FacultyEng'],$border,0,'L');   
         }else{
-            $pdf->SetX(103);
+            $pdf->SetX(102);
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,'/',$border,0,'L');
             $pdf->Cell($fill,$h,$Student['FacultyEng'],$border,0,'L');
@@ -4018,7 +4018,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetX(5);
         $pdf->SetFont('Arial','I',$fn_e);
-        $pdf->Cell(81,$h,'/ Faculty',$border,1,'C');
+        $pdf->Cell(78,$h,'/ Faculty',$border,1,'C');
         $pdf->Ln($ln);
 
         // ===== Prodi =====
@@ -4030,25 +4030,25 @@ class C_save_to_pdf extends CI_Controller {
 
         if ($Student['Prodi'][0]=='A') 
         {
-            $pdf->SetX(109);  
+            $pdf->SetX(108);  
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,'/',$border,0,'L');
             $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');   
         }else if ($Student['Prodi'][0]=='K')
         {
-            $pdf->SetX(119);
+            $pdf->SetX(118);
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,'/',$border,0,'L');
             $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
         }
 
-        $pdf->SetX(49);
+        $pdf->SetX(47);
         $pdf->SetFont('Arial','I',$fn_e);
-        $pdf->Cell(72,$h,'/ Study Program',$border,0,'L');
+        $pdf->Cell(67,$h,'/ Study Program',$border,0,'L');
 
         if ($Student['Prodi'][0]=='M') 
         {
-            $pdf->SetX(158);  
+            $pdf->SetX(156);  
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,'/',$border,1,'L');
 
@@ -4057,7 +4057,7 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
             $pdf->Ln(4);
         }
-        $pdf->Ln($ln);
+        $pdf->Ln(6);
 
         // ===== Program Pendidikan =====
         $pdf->SetX($x);
@@ -4068,18 +4068,18 @@ class C_save_to_pdf extends CI_Controller {
 
         if ($Student['GradeDesc'][0]=='S')
         {
-            $pdf->SetX(113);// S1
+            $pdf->SetX(112);// S1
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,' /',$border,0,'L');
             $pdf->Cell($fill,$h,$Student['GradeDescEng'],$border,0,'L');
         }else{
-            $pdf->SetX(119);// S1
+            $pdf->SetX(118);// S1
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,' /',$border,0,'L');
             $pdf->Cell($fill,$h,$Student['GradeDescEng'],$border,0,'L');
         }
 
-        $pdf->SetX(59);
+        $pdf->SetX(56);
         $pdf->SetFont('Arial','I',$fn_e);
         $pdf->Cell($label,$h,'/ Educational',$border,1,'L');
         $pdf->SetX(22.1);
@@ -4092,7 +4092,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,'Terakreditasi',$border,0,'L');
 
-        $pdf->SetX(115);
+        $pdf->SetX(113);
         $pdf->SetFont('Arial','I',$fn_e);
         $pdf->Cell($sp,$h,'/ Accredited',$border,0,'L');
 
@@ -4107,7 +4107,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,$this->getDateIndonesian($Skls['DateOfYudisium']),$border,0,'L');
 
-        $pdf->SetX(55);
+        $pdf->SetX(53);
         $pdf->SetFont('Arial','I',$fn_e);
         $pdf->Cell($label,$h,'/ Date of Conferral',$border,1,'L');
         $pdf->Cell(10,5,'',0,1);//memberikan enter/jarak ke bawah
@@ -4155,7 +4155,7 @@ class C_save_to_pdf extends CI_Controller {
         }
 
         // print_r($Kelamin);exit(); 
-        $pdf->Cell($fillFull,$h,$Kelamin. ' cetificate is in process.',$border,1,'L');
+        $pdf->Cell($fillFull,$h,$Kelamin. ' certificate is in process.',$border,1,'L');
         $y = $pdf->GetY()+7;
         $pdf->Ln(4);
         // $pdf->Cell(10,5,'',0,1);//memberikan enter/jarak ke bawah
@@ -4163,7 +4163,7 @@ class C_save_to_pdf extends CI_Controller {
         // ===== Ket 2 =====
         $pdf->SetX($x);
         $pdf->SetFont('Arial','',$fn_b);
-        $pdf->Cell($fillFull,$h,'Demekian Surat Keterangan ini dibuat untuk dapat dipergunakan sebagaimana mestinya.',$border,1,'L');
+        $pdf->Cell($fillFull,$h,'Demikian Surat Keterangan ini dibuat untuk dapat dipergunakan sebagaimana mestinya.',$border,1,'L');
         $pdf->SetX($x);
         $pdf->SetFont('Arial','I',$fn_e);
 
