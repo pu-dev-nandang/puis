@@ -1267,7 +1267,7 @@ class M_finance extends CI_Model {
         $Data_mhs[$i] = $Data_mhs[$i] + array('IPS' => $IPS);
 
       // get IPK Mahasiswa
-        $IPK = $this->getIPKMahasiswa($db2,$Data_mhs[$i]['NPM']);
+        $IPK = $this->getIPKMahasiswaBySemester($db2,$Data_mhs[$i]['NPM'],$SemesterID[0]['ID']);
         $Data_mhs[$i] = $Data_mhs[$i] + array('IPK' => $IPK);
 
       // get VA Mahasiwa
@@ -1324,6 +1324,29 @@ class M_finance extends CI_Model {
       return $Credit;
 
    }
+
+  public function getIPKMahasiswaBySemester($db,$NPM,$SemesterID)
+  {
+    error_reporting(0);
+    $IPK = 0;
+    // hitung IPK
+      // get query IPK
+        $sql = 'select * from '.$db.'.study_planning where NPM = ? and SemesterID < '.$SemesterID;
+        $query = $this->db->query($sql, array($NPM))->result_array();
+
+      // proses perhitungan IPK
+        $GradeValueCredit = 0;
+        $Credit = 0;
+        for ($j=0; $j < count($query); $j++) { 
+         $GradeValue = $query[$j]['GradeValue'];
+         $CreditSub = $query[$j]['Credit'];
+         $GradeValueCredit = $GradeValueCredit + ($GradeValue * $CreditSub);
+         $Credit = $Credit + $CreditSub;
+        }
+
+      $IPK = $GradeValueCredit / $Credit;
+      return $IPK;  
+  } 
 
   public function getIPKMahasiswa($db,$NPM)
   {
@@ -1385,6 +1408,7 @@ class M_finance extends CI_Model {
    public function getIPSMahasiswaBySemester($db,$NPM,$SemesterID)
    {
     error_reporting(0);
+    $SemesterID = $SemesterID - 1;
     $IPS = 0;
       // get query IPS
         $sql = 'select * from '.$db.'.study_planning where NPM = ? and SemesterID = ? ';
@@ -1578,7 +1602,7 @@ class M_finance extends CI_Model {
          $IPS = $this->getIPSMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$query[$i]['SemesterID']);
 
       // get IPS Mahasiswa
-         $IPK = $this->getIPKMahasiswa('ta_'.$Year,$query[$i]['NPM']);
+         $IPK = $this->getIPKMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$query[$i]['SemesterID']);
 
       // ge VA Mahasiwa
          $VA = $Const_VA[0]['Const_VA'].$query[$i]['NPM'];
@@ -1824,7 +1848,8 @@ class M_finance extends CI_Model {
          $IPS = $this->getIPSMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$query[$i]['SemesterID']);
 
       // get IPK Mahasiswa
-         $IPK = $this->getIPKMahasiswa('ta_'.$Year,$query[$i]['NPM']);
+         // $IPK = $this->getIPKMahasiswa('ta_'.$Year,$query[$i]['NPM']);
+         $IPK = $this->getIPKMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$query[$i]['SemesterID']);
 
       // ge VA Mahasiwa
          $VA = $Const_VA[0]['Const_VA'].$query[$i]['NPM'];
@@ -4414,6 +4439,36 @@ class M_finance extends CI_Model {
       }
       // print_r($arr_result);die();
        return $arr_result;          
+   }
+
+   public function GetRequestChangeStatus_Mhs($SemesterID)
+   {
+    $sql = 'select a.ID,a.PTID,b.Description,a.SemesterID,c.Name as NameSemester,a.NPM,d.Name as    NameMHS,d.ProdiID,e.NameEng,a.Invoice,a.Status,d.EmailPU,
+            a.ToChange,if(a.Invoice <= (select sum(Invoice) as Tot from db_finance.payment_students where ID_payment = a.ID and Status = 1 limit 1),"Lunas","Belum Lunas" ) as StatusPay,
+            (select sum(Invoice) as Tot from db_finance.payment_students where ID_payment = a.ID and Status = 1 limit 1) as Payment
+            from db_finance.Payment as a left join db_finance.payment_type as b on a.PTID = b.ID
+            left join db_academic.semester as c on a.SemesterID = c.ID
+            left join db_academic.auth_students as d on a.NPM = d.NPM
+            left join db_academic.program_study as e on d.ProdiID = e.ID
+            where a.ToChange = 1 and a.SemesterID = "'.$SemesterID.'"
+            ';
+      $query=$this->db->query($sql, array())->result_array();
+      return $query;      
+   }
+
+   public function PaymentTidakLunas($SemesterID)
+   {
+    $sql = 'select a.ID,a.PTID,b.Description,a.SemesterID,c.Name as NameSemester,a.NPM,d.Name as    NameMHS,d.ProdiID,e.NameEng,a.Invoice,a.Status,d.EmailPU,
+            a.ToChange,if(a.Invoice <= (select sum(Invoice) as Tot from db_finance.payment_students where ID_payment = a.ID and Status = 1 limit 1),"Lunas","Belum Lunas" ) as StatusPay,
+            (select sum(Invoice) as Tot from db_finance.payment_students where ID_payment = a.ID and Status = 1 limit 1) as Payment
+            from db_finance.Payment as a left join db_finance.payment_type as b on a.PTID = b.ID
+            left join db_academic.semester as c on a.SemesterID = c.ID
+            left join db_academic.auth_students as d on a.NPM = d.NPM
+            left join db_academic.program_study as e on d.ProdiID = e.ID
+            where a.Invoice > (select sum(Invoice) as Tot from db_finance.payment_students where ID_payment = a.ID and Status = 1 limit 1) and a.SemesterID = "'.$SemesterID.'"
+            ';
+      $query=$this->db->query($sql, array())->result_array();
+      return $query;      
    }
 
 }

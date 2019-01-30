@@ -840,6 +840,7 @@ $route['rest/__GetpaymentByID'] = 'api/c_rest/GetpaymentByID';
 $route['rest/__save_upload_proof_payment'] = 'api/c_rest/save_upload_proof_payment';
 $route['rest/__delete_file_proof_payment'] = 'api/c_rest/delete_file_proof_payment';
 $route['rest/__delete_all_file_proof_payment_byID'] = 'api/c_rest/delete_all_file_proof_payment_byID';
+$route['rest/academic/__fill_list_mhs_tidak_bayar'] = 'api/c_rest/academic_fill_list_mhs_tidak_bayar';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';

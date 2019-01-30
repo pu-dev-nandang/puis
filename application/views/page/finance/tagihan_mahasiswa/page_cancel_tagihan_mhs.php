@@ -288,8 +288,8 @@
                                                // '<td>'+Data_mhs[i]['Year']+'</td>' +
                                                '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +
                                                '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
-                                               '<td>'+Data_mhs[i]['IPS'].toFixed(2)+'</td>' +
-                                               '<td>'+Data_mhs[i]['IPK'].toFixed(2)+'</td>' +
+                                               '<td>'+getCustomtoFixed(Data_mhs[i]['IPS'],2)+'</td>' +
+                                               '<td>'+getCustomtoFixed(Data_mhs[i]['IPK'],2)+'</td>' +
                                                '<td>'+Data_mhs[i]['Discount']+'%</td>' +
                                                '<td>'+yy+'</td>' +
                                                '<td>'+status+'</td>' +
