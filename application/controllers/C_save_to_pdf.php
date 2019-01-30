@@ -696,11 +696,7 @@ class C_save_to_pdf extends CI_Controller {
 
             }
 
-
-
         }
-
-
 
         $pdf->Output('I','Monitoring_Attendance_Students.pdf');
     }
@@ -3881,6 +3877,332 @@ class C_save_to_pdf extends CI_Controller {
         $nameF = str_replace(' ','_',strtoupper($Student['Name']));
         $pdf->Output('IJAZAH_'.$Student['NPM'].'_'.$nameF.'.pdf','I');
     }
+
+
+
+//====================== tambahan TGL 17-01-2019 SKLS ==========================
+//==============================================================================
+  public function skls(){
+        $token = $this->input->post('token');
+        $data_arr = $this->getInputToken($token);
+        $dataSkls = $this->m_save_to_pdf->getSkls($data_arr['DBStudent'],$data_arr['NPM']);
+        $pdf = new FPDF('P','mm','A4');
+        $pdf->SetMargins(20.5,10.5,10);
+        $pdf->AddPage();
+        $h = 0;
+        $Skls = $dataSkls['Skls'][0];
+        $Student = $dataSkls['Student'][0];
+        $border = 0;
+
+        // ========buat tanggal header yudisium ===================
+        // ========================================================
+        $pdf->Ln(15);
+        $fn_b = 11;
+        $fn_i = 10;
+        $x = 22;
+        $h = 4;
+        $border = 0;
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell(171.5,$h,$Skls['PlaceIssued'].', '.$this->getDateIndonesian($Skls['DateOfYudisium']),$border,1,'L');
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_i);
+        $pdf->Cell(171.5,$h,'No : '.$Student['SKLN'],$border,1,'L');
+        // $pdf->Cell($w_right,$h,'Nomor Seri Ijazah : '.$Student['CSN'],$border,1,'L');
+        $pdf->SetX($x);
+        // ========================================================
+
+
+        $pdf->Ln(29);
+        $fn_b = 11; //untuk ukuran huruf
+        $fn_i = 10;
+        $fn_e = 9; // untuk ukuran font
+        $x = 40;
+        $h = 4;
+
+        $full_width = 140;
+        $pdf->SetXY($x,45.5);//untuk jarak rata kanan dan jarak header
+        $pdf->SetFont('Arial','BU',$fn_b);
+        $pdf->Cell($full_width,$h,'SURAT KETERANGAN LULUS SEMENTARA',$border,1,'C');
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell($full_width,$h,'To Whom It May Concern',$border,1,'C');
+        $pdf->SetX($x);
+        $pdf->Cell(10,7,'',0,1);//memberikan enter/jarak ke bawah
+
+
+        // ======================= Keterangan 1 ============================
+        // ======================================================================================
+        $x = 22;
+        $ln = 1.5;
+        $pdf->Ln(4);
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell(135,$h,'Yang bertandatangan di bawah ini menerangkan bahwa : ',$border,0,'L');
+        $pdf->Cell(15,$h,'',$border,0,'L');
+        $pdf->Cell(10,4,'',0,1);//memberikan enter/jarak ke bawah
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell(135,$h,'this is  to certify that',$border,0,'L');
+        $pdf->Cell(15,$h,'',$border,0,'L');
+        $pdf->Cell(10,7,'',0,1);
+        $pdf->Ln(6);
+        //========================================================================================
+        //========================================================================================
+        $pdf->Ln(1.5);
+        $x = 22;
+        $ln = 1.5;
+        $label = 65; // memberikan jarak : dengan tulisan
+        $sp = 3.5;
+        $fill = 100;
+        $fillFull = $label + $sp + $fill;
+        $border = 0;
+        $Kelamin = '';
+
+        // ===== Name =====
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($label,$h,'Nama  ',$border,0,'L');
+        $pdf->Cell($sp,$h,':',$border,0,'C');
+        // $pdf->Cell($fill,$h,$Student['Name'],$border,0,'L');
+        // $pdf->SetX(65);
+        $pdf->Cell($fill,$h,ucwords(strtolower($Student['Name'])),$border,0,'L');
+
+        $pdf->SetX(5);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell(70,$h,'/ Name',$border,1,'C');
+
+        $pdf->Ln($ln);
+        // ===== TTL =====
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($label,$h,'Tempat, Tanggal Lahir',$border,0,'L');
+        $pdf->Cell($sp,$h,':',$border,0,'C');
+        $pdf->Cell($fill,$h,$Student['PlaceOfBirth'].', '.$this->getDateIndonesian($Student['DateOfBirth']),$border,0,'L');
+        $pdf->SetX(63);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell($label,$h,'/ Date of birth',$border,1,'L');
+        $pdf->Ln(1.5);
+        // ===== NIM =====
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($label,$h,'Nomor Induk Mahasiswa',$border,0,'L');
+        $pdf->Cell($sp,$h,':',$border,0,'C');
+        $pdf->Cell($fill,$h,$Student['NPM'],$border,0,'L');
+        $pdf->SetX(67);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell($label,$h,'/ Student ',$border,1,'L');
+        $pdf->SetX(22);
+        $pdf->Cell($label,$h,'ID Number',$border,0,'L');
+        $pdf->Ln(5);
+
+         // ===== Fakultas/Faculty =====
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($label,$h,'Fakultas',$border,0,'L');
+        $pdf->Cell($sp,$h,':',$border,0,'C');
+        $pdf->Cell($fill,$h,$Student['Faculty'],$border,0,'L');
+
+        if ($Student['Faculty'][0]=='T') 
+        {
+            $pdf->SetX(104);  
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['FacultyEng'],$border,0,'L');   
+        }else{
+            $pdf->SetX(103);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['FacultyEng'],$border,0,'L');
+        }
+
+        $pdf->SetX(5);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell(81,$h,'/ Faculty',$border,1,'C');
+        $pdf->Ln($ln);
+
+        // ===== Prodi =====
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($label,$h,'Program Studi',$border,0,'L');
+        $pdf->Cell($sp,$h,':',$border,0,'C');
+        $pdf->Cell($fill,$h,$Student['Prodi'],$border,0,'L');
+
+        if ($Student['Prodi'][0]=='A') 
+        {
+            $pdf->SetX(109);  
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');   
+        }else if ($Student['Prodi'][0]=='K')
+        {
+            $pdf->SetX(119);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+        }
+
+        $pdf->SetX(49);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell(72,$h,'/ Study Program',$border,0,'L');
+
+        if ($Student['Prodi'][0]=='M') 
+        {
+            $pdf->SetX(158);  
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,1,'L');
+
+            $pdf->SetX(90.5);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+            $pdf->Ln(4);
+        }
+        $pdf->Ln($ln);
+
+        // ===== Program Pendidikan =====
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($label,$h,'Program Pendidikan',$border,0,'L');
+        $pdf->Cell($sp,$h,':',$border,0,'C');
+        $pdf->Cell($fill,$h,$Student['GradeDesc'],$border,0,'L');
+
+        if ($Student['GradeDesc'][0]=='S')
+        {
+            $pdf->SetX(113);// S1
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,' /',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['GradeDescEng'],$border,0,'L');
+        }else{
+            $pdf->SetX(119);// S1
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,' /',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['GradeDescEng'],$border,0,'L');
+        }
+
+        $pdf->SetX(59);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell($label,$h,'/ Educational',$border,1,'L');
+        $pdf->SetX(22.1);
+        $pdf->Cell($label,$h,'Program',$border,1,'L');
+        $pdf->Ln($ln);
+        // ===== Status =====
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($label,$h,'Status',$border,0,'L');
+        $pdf->Cell($sp,$h,':',$border,0,'C');
+        $pdf->Cell($fill,$h,'Terakreditasi',$border,0,'L');
+
+        $pdf->SetX(115);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell($sp,$h,'/ Accredited',$border,0,'L');
+
+        // $pdf->SetX(37);
+        // $pdf->SetFont('Arial','I',$fn_e);
+        // $pdf->Cell($label,$h,'/ Status',$border,1,'L');                                      
+        $pdf->Ln(5);
+        // ===== Tanggal Yudisium =====
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($label,$h,'Tanggal Yudisium',$border,0,'L');
+        $pdf->Cell($sp,$h,':',$border,0,'C');
+        $pdf->Cell($fill,$h,$this->getDateIndonesian($Skls['DateOfYudisium']),$border,0,'L');
+
+        $pdf->SetX(55);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell($label,$h,'/ Date of Conferral',$border,1,'L');
+        $pdf->Cell(10,5,'',0,1);//memberikan enter/jarak ke bawah
+
+        // ===== Ket 2 =====
+        // $pdf->SetX($x);
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($fillFull,$h,'Adalah benar mahasiswa yang telah menempuh studi dan menyelesaikan seluruh persyaratan',$border,1,'L');
+        $pdf->SetX($x);
+        $pdf->Cell($fillFull,$h,'kelulusan menjadi Sarjana Terapan Teknik pada Semester Genap Tahun Akademik 2017/2018',$border,1,'L');
+        $pdf->SetX($x);
+        $pdf->Cell($fillFull,$h,'di Universitas Agung Podomoro.',$border,1,'L');
+        $pdf->Ln(1);
+
+        if ($Student['Gender'][0]=='P') 
+        {
+            $Kelamin='Her'; //kolom disesuaikan      
+        }else{
+            $Kelamin='His';
+        }
+
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell($fillFull,$h,'Had completed '.$Kelamin.' studies and qualification to earn Bachelor Degree in the Even Semeter of Academic ',$border,1,'L');
+        $pdf->SetX($x);
+        $pdf->Cell($fillFull,$h,'Year 2017/2018 at Podomoro University.',$border,1,'L');
+        $y = $pdf->GetY()+7;
+        $pdf->Ln(4);
+        // $pdf->Cell(10,5,'',0,1);//memberikan enter/jarak ke bawah
+
+        // ===== Ket 2 =====
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($fillFull,$h,'Ijazah yang bersangkutan masih dalam proses.',$border,1,'L');
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','I',$fn_e);
+
+
+        if ($Student['Gender'][0]=='P') 
+        {
+            $Kelamin='Her'; //kolom disesuaikan      
+        }else{
+            $Kelamin='His';
+        }
+
+        // print_r($Kelamin);exit(); 
+        $pdf->Cell($fillFull,$h,$Kelamin. ' cetificate is in process.',$border,1,'L');
+        $y = $pdf->GetY()+7;
+        $pdf->Ln(4);
+        // $pdf->Cell(10,5,'',0,1);//memberikan enter/jarak ke bawah
+
+        // ===== Ket 2 =====
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($fillFull,$h,'Demekian Surat Keterangan ini dibuat untuk dapat dipergunakan sebagaimana mestinya.',$border,1,'L');
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','I',$fn_e);
+
+        $pdf->Cell($fillFull,$h,'This letter is issued by the Academic Administration and should be used accordingly.',$border,1,'L');
+        $y = $pdf->GetY()+7;
+        $pdf->Ln(15);
+
+        //================ Tanda tangan =======================
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($fillFull,$h,'Hormat kami,',$border,1,'L');
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','I',$fn_i);
+        $pdf->Cell($fillFull,$h,'Best Regards,',$border,1,'L');
+        $y = $pdf->GetY()+7;
+        $pdf->Ln(35);
+
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','BU',$fn_b);
+        $pdf->Cell($fillFull,$h,'Johana Rosalina Kristyanti, Ph. D',$border,1,'L');
+        //================ hormat kami ========================
+        //================ Tanda tangan =======================
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($fillFull,$h,'Wakil Rektor Akademik & Kemahasiswaan',$border,1,'L');
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','I',$fn_i);
+        $pdf->Cell($fillFull,$h,'Vice Rector of Academic & Student Affairs',$border,1,'L');
+        $y = $pdf->GetY()+7;
+        $pdf->Ln(15);
+        //================ hormat kami ========================
+        
+
+        $nameF = str_replace(' ','_',strtoupper($Student['Name']));
+        $pdf->Output('SKLS_'.$Student['NPM'].'_'.$nameF.'.pdf','I');
+    }
+//===================================================================
+//===================================================================
+
 
 
     function GenerateWord()

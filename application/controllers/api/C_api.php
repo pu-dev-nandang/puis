@@ -2546,6 +2546,7 @@ class C_api extends CI_Controller {
         }
     }
 
+
     public function getClassGroup(){
 //        $token = $this->input->post('token');
 //        $key = "UAP)(*";
@@ -4531,6 +4532,7 @@ class C_api extends CI_Controller {
         }
     }
 
+
     public function crudScheduleExchange(){
         $data_arr = $this->getInputToken();
 
@@ -5448,11 +5450,10 @@ class C_api extends CI_Controller {
 
             $btnSKPI = '<div  style="text-align:center;">
                             <a href="'.base_url('save2pdf/diploma_supplement').'" target="_blank" class="btn btn-default btn-sm btn-default-warning btnDownloadSKPI"><i class="fa fa-download margin-right"></i> SKPI</a>
+                            <a class="btn btn-default btn-sm btn-default-warning btnDownloadSkls"data-db="'.$db_.'" data-npm="'.$row['NPM'].'"><i class="fa fa-download margin-right"></i> SKL</a>
+                            
                             </div>';
 
-//            $btnTranscript = '<div  style="text-align:center;">
-//                                                <button class="btn btn-sm btn-default btn-default-primary btnDowloadTranscript" data-db="'.$db_.'" data-npm="'.$row['NPM'].'">
-//                                                    <i class="fa fa-download margin-right"></i> Transcript</button></div>';
 
             $btnTranscript = '<div class="btn-group btn-sm" role="group" aria-label="...">
                               <button type="button" class="btn btn-sm btn-default btn-default-danger btnDowloadTempTranscript" data-db="'.$db_.'" data-npm="'.$row['NPM'].'"><i class="fa fa-hourglass-half margin-right"></i> Temp.</button>
@@ -5464,9 +5465,6 @@ class C_api extends CI_Controller {
                             <button class="btn btn-sm btn-default btn-default-success btnDownloadIjazah" data-db="'.$db_.'" data-npm="'.$row['NPM'].'"><i class="fa fa-download margin-right"></i> Ijazah</button>
                             </div>';
 
-//            $btnIjazah = '<div  style="text-align:center;">
-//                            <a href="'.base_url('save2pdf/ijazah').'" target="_blank" class="btn btn-sm btn-default btn-default-success"><i class="fa fa-download margin-right"></i> Ijazah</a>
-//                            </div>';
 
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div  style="text-align:left;"><b>'.$row['NPM'].'</b></div>';
@@ -5488,6 +5486,22 @@ class C_api extends CI_Controller {
                                     </div>
                                      
                                     </div>';
+
+             $nestedData[] = '<div  style="text-align:left;">
+                                    <div class="">
+                                        <div class="col-xs-10" style="padding-right: 0px;">
+                                            <input id="formSKLN'.$row['NPM'].'" class="form-control hide" value="'.$row['SklNumber'].'"/>
+                                            <span id="viewSKLN'.$row['NPM'].'">'.$row['SklNumber'].'</span>
+                                        </div>
+                                        <div class="col-xs-2">
+                                               
+                                            <button class="btn btn-sm btn-success btn-block btnSaveSKLN hide" data-npm="'.$row['NPM'].'"><i class="fa fa-check-circle"></i></button>
+                                            <button class="btn btn-sm btn-default btn-block btnEditSKLN" data-npm="'.$row['NPM'].'"><i class="fa fa-pencil-square-o"></i></button>   
+                                        </div>
+                                    </div>
+                                     
+                                    </div>';
+
             $nestedData[] = $btnSKPI;
             $nestedData[] = $btnTranscript;
             $nestedData[] = $btnIjazah;
@@ -5544,6 +5558,12 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action']=='updateCSN'){
                 $this->db->set('CertificateSerialNumber', $data_arr['CSN']);
+                $this->db->where('NPM', $data_arr['NPM']);
+                $this->db->update('db_academic.auth_students');
+                return print_r(1);
+            }
+            else if($data_arr['action']=='updateSKLN'){
+                $this->db->set('SklNumber', $data_arr['SKLN']);
                 $this->db->where('NPM', $data_arr['NPM']);
                 $this->db->update('db_academic.auth_students');
                 return print_r(1);
@@ -6392,12 +6412,6 @@ class C_api extends CI_Controller {
             if(count($dataCourse)>0){
                 for($c=0;$c<count($dataCourse);$c++){
                     $d = $dataCourse[$c];
-
-//                    echo 'SELECT attd_s.M1, attd_s.M2, attd_s.M3, attd_s.M4, attd_s.M5, attd_s.M6, attd_s.M7, attd_s.M8, attd_s.M9,
-//                                                            attd_s.M10, attd_s.M11, attd_s.M12, attd_s.M13, attd_s.M14
-//                                                            FROM  db_academic.attendance_students attd_s
-//                                                            LEFT JOIN db_academic.attendance attd ON (attd_s.ID_Attd = attd.ID)
-//                                                            WHERE attd_s.NPM = "'.$row['NPM'].'" AND attd.ScheduleID = "'.$d['ScheduleID'].'"';
 
                     // Get Attendance
                     $dataAttd = $this->db->query('SELECT attd_s.M1, attd_s.M2, attd_s.M3, attd_s.M4, attd_s.M5, attd_s.M6, attd_s.M7, attd_s.M8, attd_s.M9,

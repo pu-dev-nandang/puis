@@ -92,6 +92,19 @@
         FormSubmitAuto(url,'POST',[{name : 'token', value : token}]);
     });
 
+//===================tambahan SKLS tgl 17-01-2019 =======================
+//=======================================================================
+    $(document).on('click','.btnDownloadSkls',function () {
+        var NPM = $(this).attr('data-npm');
+        var DBStudent = $(this).attr('data-db');
+
+        var token = jwt_encode({NPM:NPM,DBStudent:DBStudent},'UAP)(*');
+        var url = base_url_js+'save2pdf/skls';
+        FormSubmitAuto(url,'POST',[{name : 'token', value : token}]);
+    });
+//=======================================================================
+//=======================================================================
+
     function loadStudent() {
         var filterCurriculum = $('#filterCurriculum').val();
         var filterBaseProdi = $('#filterBaseProdi').val();
@@ -110,7 +123,8 @@
                     '                    <th>Student</th>' +
                     '                    <th style="width: 13%;">Prodi</th>' +
                     '                    <th style="width: 25%;">Certificate Serial Number</th>' +
-                    '                    <th style="width: 5%;">SKPI</th>' +
+                    '                    <th style="width: 20%;">SKL Number</th>' +
+                    '                    <th style="width: 15%;">SKPI</th>' +
                     '                    <th style="width: 15%;">Transcript</th>' +
                     '                    <th style="width: 7%;">Ijazah</th>' +
                     '                </tr>' +
@@ -199,6 +213,59 @@
        } else {
            toastr.error('Form required','Error');
            $('#formCSN'+NPM).css('border','1px solid red');
+       }
+
+    });
+
+    // CRUD SKLNumber =======
+    // Edit
+    $(document).on('click','.btnEditSKLN',function () {
+        var NPM = $(this).attr('data-npm');
+
+        $('#formSKLN'+NPM+',.btnSaveSKLN[data-npm='+NPM+']').removeClass('hide');
+        $('#viewSKLN'+NPM+',.btnEditSKLN[data-npm='+NPM+']').addClass('hide');
+
+        $('#formSKLN'+NPM).focus();
+
+        $('.btnEditSKLN').prop('disabled',true);
+
+    });
+
+    // Save
+    $(document).on('click','.btnSaveSKLN',function () {
+       var NPM = $(this).attr('data-npm');
+
+       var formSKLN = $('#formSKLN'+NPM).val();
+       if(formSKLN!='' && formSKLN!=null){
+
+           loading_buttonSm('.btnSaveSKLN[data-npm='+NPM+']');
+
+           var data = {
+             action : 'updateSKLN',
+             NPM : NPM,
+             SKLN : formSKLN
+           };
+
+           var token = jwt_encode(data,'UAP)(*');
+           var url = base_url_js+'api/__crudTranscript';
+
+           $.post(url,{token:token},function (result) {
+
+               toastr.success('Data saved','Saved');
+               setTimeout(function () {
+                   $('#formSKLN'+NPM+',.btnSaveSKLN[data-npm='+NPM+']').addClass('hide');
+                   $('#viewSKLN'+NPM+',.btnEditSKLN[data-npm='+NPM+']').removeClass('hide');
+
+                   $('#viewSKLN'+NPM).html(formSKLN);
+                   $('.btnSaveSKLN[data-npm='+NPM+'], .btnEditSKLN').prop('disabled',false);
+                   $('.btnSaveSKLN[data-npm='+NPM+']').html('<i class="fa fa-check-circle"></i>');
+               },500);
+
+           });
+
+       } else {
+           toastr.error('Form required','Error');
+           $('#formSKLN'+NPM).css('border','1px solid red');
        }
 
     });
