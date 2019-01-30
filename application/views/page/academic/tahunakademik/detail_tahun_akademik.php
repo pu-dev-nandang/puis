@@ -218,7 +218,7 @@
             <h3 style="margin-top: 0px;border-left: 7px solid #FF9800;padding-left: 7px;">Student Attendance</h3>
             <table>
                 <tr>
-                    <td style="width: 25%;">Attendaced In</td>
+                    <td style="width: 25%;">Open</td>
                     <td>:</td>
                     <td>
                         <select class="form-control" id="form_In_Session_Std">
@@ -240,7 +240,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Attendaced Out</td>
+                    <td>Close</td>
                     <td>:</td>
                     <td>
                         <select class="form-control" id="form_Out_Session_Std">
@@ -272,7 +272,7 @@
             <h3 style="margin-top: 0px;border-left: 7px solid #FF9800;padding-left: 7px;">Lecturer Attendance</h3>
             <table>
                 <tr>
-                    <td style="width: 25%;">Attendaced In</td>
+                    <td style="width: 25%;">Open</td>
                     <td>:</td>
                     <td>
                         <select class="form-control" id="form_In_Session_Lec">
@@ -294,7 +294,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Attendaced Out</td>
+                    <td>Close</td>
                     <td>:</td>
                     <td>
                         <select class="form-control" id="form_Out_Session_Lec">
@@ -316,7 +316,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>User Attendance Out
+                    <td>User Need Attendance
                         <input id="totalStatus" class="hide">
                     </td>
                     <td>:</td>
