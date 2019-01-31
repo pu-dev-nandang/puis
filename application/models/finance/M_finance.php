@@ -4425,7 +4425,7 @@ class M_finance extends CI_Model {
             left join db_academic.semester as c on a.SemesterID = c.ID
             left join db_academic.auth_students as d on a.NPM = d.NPM
             left join db_academic.program_study as e on d.ProdiID = e.ID
-            where a.ToChange = 1 and a.SemesterID = "'.$SemesterID.'"
+            where a.ToChange = 1 and a.SemesterID = "'.$SemesterID.'" order by a.NPM
             ';
       $query=$this->db->query($sql, array())->result_array();
       return $query;      

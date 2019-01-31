@@ -1805,4 +1805,31 @@ class C_rest extends CI_Controller {
           echo '{"status":"999","message":"jangan iseng :D"}';
         }
     }
+
+    public function assign_by_finance_change_status()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('finance/m_finance');
+
+                $Semester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+                $SemesterActive = $Semester[0]['ID'];
+                $G_data = $this->m_finance->GetRequestChangeStatus_Mhs($SemesterActive);
+                echo json_encode($G_data);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
 }
