@@ -238,7 +238,7 @@
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'api/__crudStatusStudents';
             $.post(url,{token:token},function (result) {
-                load_students();
+                loadStudent();
                 toastr.success('Status Changed','Success');
                 setTimeout(function () {
                     $('#NotificationModal').modal('hide');
