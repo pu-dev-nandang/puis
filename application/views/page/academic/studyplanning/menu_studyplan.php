@@ -11,7 +11,7 @@
             <a href="<?php echo base_url('academic/study-planning/list-student'); ?>">List Student</a>
         </li>
         <li class="<?php if($this->uri->segment(3) == 'outstanding') { echo 'active'; } ?>">
-            <a href="<?php echo base_url('academic/study-planning/outstanding'); ?>">Outstanding</a>
+            <a href="<?php echo base_url('academic/study-planning/outstanding'); ?>">Monitoring Outstanding Payment</a>
         </li>
     </ul>
     <div style="border-top: 1px solid #cccccc">
