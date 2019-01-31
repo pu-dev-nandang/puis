@@ -91,6 +91,7 @@
         }
         var token = jwt_encode(data,'UAP)(*');
          $.post(url,{token:token},function (data_json) {
+            // console.log(data_json);
             $("#tableListStd tbody").empty();
             for (var i = 0; i < data_json.length; i++) {
                var chkbox = '<input type="checkbox" name="id[]" value="' + data_json[i].NPM +';'+data_json[i].SemesterID+';'+data_json[i].NameMHS+'">';
@@ -100,14 +101,17 @@
                var BPPPayment = '-';
                var CreditInvoice = '-';
                var CreditPayment = '-';
+               var BPPStatusPay = '-';
+               var CreditStatusPay = '-';
                if (data_json[i].PTID == 2) {
                     BPPInvoice = formatRupiah(data_json[i].Invoice);
-                    BPPPayment = formatRupiah(data_json[i].Payment);
-
+                    BPPPayment = (data_json[i].Payment != null ) ? formatRupiah(data_json[i].Payment) : '-';
+                    BPPStatusPay = 'BPP : '+data_json[i].StatusPay;
                     for (var j = i+1; j < data_json.length; j++) {
                         if (data_json[j].PTID == 3 && data_json[i].NPM == data_json[j].NPM) {
                             CreditInvoice = formatRupiah(data_json[j].Invoice);
-                            CreditPayment = formatRupiah(data_json[j].Payment);
+                            CreditPayment = (data_json[j].Payment != null ) ? formatRupiah(data_json[j].Payment) : '-';
+                            CreditStatusPay = 'Credit : '+data_json[j].StatusPay;
                             i=j;
                             break;
                         }
@@ -116,11 +120,13 @@
                else if(data_json[i].PTID == 3)
                {
                     CreditInvoice = formatRupiah(data_json[i].Invoice);
-                    CreditPayment = formatRupiah(data_json[i].Payment);
+                    CreditPayment = (data_json[i].Payment != null ) ? formatRupiah(data_json[i].Payment) : '-';
+                    CreditStatusPay = 'Credit : '+data_json[i].StatusPay;
                     for (var j = i+1; j < data_json.length; j++) {
                         if (data_json[j].PTID == 2 && data_json[i].NPM == data_json[j].NPM) {
                             BPPInvoice = formatRupiah(data_json[j].Invoice);
-                            BPPPayment = formatRupiah(data_json[j].Payment);
+                           BPPPayment = (data_json[j].Payment != null ) ? formatRupiah(data_json[j].Payment) : '-';
+                            BPPStatusPay = 'BPP : '+data_json[j].StatusPay;
                             i=j;
                             break;
                         }
@@ -132,7 +138,7 @@
                     '<td>'+StudentsCol+'</td>'+
                     '<td>'+ProgrammeStudy+'</td>'+
                     '<td>'+data_json[i].StatusMhs+'</td>'+
-                    '<td>'+data_json[i].StatusPay+'</td>'+
+                    '<td>'+BPPStatusPay+'<br>'+CreditStatusPay+'</td>'+
                     '<td>'+BPPInvoice+'</td>'+
                     '<td>'+BPPPayment+'</td>'+
                     '<td>'+CreditInvoice+'</td>'+

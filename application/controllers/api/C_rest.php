@@ -1745,6 +1745,7 @@ class C_rest extends CI_Controller {
                                         <tbody>        
                         ';
                         for ($i=0; $i < count($G_data); $i++) { 
+                            $G_data[$i]['Payment'] = ($G_data[$i]['Payment'] == null || $G_data[$i]['Payment'] == 'null') ? 0 : $G_data[$i]['Payment'];
                             $html .= '<tr style="background: #607d8b24;">
                                         <td style="border-bottom: 1px solid #9e9e9e;text-align: center">
                                             '.($i+1).
