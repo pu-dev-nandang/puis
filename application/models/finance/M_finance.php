@@ -4446,7 +4446,7 @@ class M_finance extends CI_Model {
     $sql = 'select a.ID,a.PTID,b.Description,a.SemesterID,c.Name as NameSemester,a.NPM,d.Name as    NameMHS,d.ProdiID,e.NameEng,a.Invoice,a.Status,d.EmailPU,f.Description as StatusMhs, 
             a.ToChange,if(a.Invoice <= (select sum(Invoice) as Tot from db_finance.payment_students where ID_payment = a.ID and Status = 1 limit 1),"Lunas","Belum Lunas" ) as StatusPay,
             (select sum(Invoice) as Tot from db_finance.payment_students where ID_payment = a.ID and Status = 1 limit 1) as Payment
-            from db_finance.Payment as a left join db_finance.payment_type as b on a.PTID = b.ID
+             from db_finance.payment as a left join db_finance.payment_type as b on a.PTID = b.ID
             left join db_academic.semester as c on a.SemesterID = c.ID
             left join db_academic.auth_students as d on a.NPM = d.NPM
             left join db_academic.program_study as e on d.ProdiID = e.ID
