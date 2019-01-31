@@ -1714,7 +1714,7 @@ class M_finance extends CI_Model {
         $AddWhereStatusPayment = ' and a.Invoice = (select sum(Invoice) from db_finance.payment_students where ID_payment = a.ID and Status = 1)';
         break;
       case '0':
-        $AddWhereStatusPayment = ' and a.Invoice > (select sum(Invoice) from db_finance.payment_students where ID_payment = a.ID and Status = 0)';
+        $AddWhereStatusPayment = ' and a.Invoice >= (select sum(Invoice) from db_finance.payment_students where ID_payment = a.ID and Status = 0)';
         break;  
       default:
         $AddWhereStatusPayment = '';
@@ -1755,6 +1755,7 @@ class M_finance extends CI_Model {
               '.$AddWhereStatusPayment.$ChangeStatus;
       $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
     }
+    // print_r($sql);die();
     return $query[0]['total'];
 
    }
@@ -1791,7 +1792,7 @@ class M_finance extends CI_Model {
         $AddWhereStatusPayment = ' and a.Invoice = (select sum(Invoice) from db_finance.payment_students where ID_payment = a.ID and Status = 1)';
         break;
       case '0':
-        $AddWhereStatusPayment = ' and a.Invoice > (select sum(Invoice) from db_finance.payment_students where ID_payment = a.ID and Status = 0)';
+        $AddWhereStatusPayment = ' and a.Invoice >= (select sum(Invoice) from db_finance.payment_students where ID_payment = a.ID and Status = 0)';
         break;  
       default:
         $AddWhereStatusPayment = '';
@@ -4465,7 +4466,7 @@ class M_finance extends CI_Model {
             left join db_academic.semester as c on a.SemesterID = c.ID
             left join db_academic.auth_students as d on a.NPM = d.NPM
             left join db_academic.program_study as e on d.ProdiID = e.ID
-            where a.Invoice > (select sum(Invoice) as Tot from db_finance.payment_students where ID_payment = a.ID and Status = 1 limit 1) and a.SemesterID = "'.$SemesterID.'" AND d.StatusStudentID in (3,2,8) order by a.NPM
+            where a.Invoice >= (select sum(Invoice) as Tot from db_finance.payment_students where ID_payment = a.ID and Status = 0 limit 1) and a.SemesterID = "'.$SemesterID.'" AND d.StatusStudentID in (3,2,8) order by a.NPM
             ';
       $query=$this->db->query($sql, array())->result_array();
       return $query;      
