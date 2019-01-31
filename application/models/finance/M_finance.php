@@ -1727,8 +1727,7 @@ class M_finance extends CI_Model {
       }
       else
       {
-        // nothing
-        $ChangeStatus = '';
+        $ChangeStatus = ' and a.ToChange = "'.$ChangeStatus.'"';
       }
       
     }
@@ -1806,7 +1805,7 @@ class M_finance extends CI_Model {
       else
       {
         // nothing
-        $ChangeStatus = '';
+        $ChangeStatus = ' and a.ToChange = "'.$ChangeStatus.'"';
       }
       
     }
@@ -4443,14 +4442,15 @@ class M_finance extends CI_Model {
 
    public function GetRequestChangeStatus_Mhs($SemesterID)
    {
-    $sql = 'select a.ID,a.PTID,b.Description,a.SemesterID,c.Name as NameSemester,a.NPM,d.Name as    NameMHS,d.ProdiID,e.NameEng,a.Invoice,a.Status,d.EmailPU,
+    $sql = 'select a.ID,a.PTID,b.Description,a.SemesterID,c.Name as NameSemester,a.NPM,d.Name as    NameMHS,d.ProdiID,e.NameEng,a.Invoice,a.Status,d.EmailPU,f.Description as StatusMhs, 
             a.ToChange,if(a.Invoice <= (select sum(Invoice) as Tot from db_finance.payment_students where ID_payment = a.ID and Status = 1 limit 1),"Lunas","Belum Lunas" ) as StatusPay,
             (select sum(Invoice) as Tot from db_finance.payment_students where ID_payment = a.ID and Status = 1 limit 1) as Payment
             from db_finance.Payment as a left join db_finance.payment_type as b on a.PTID = b.ID
             left join db_academic.semester as c on a.SemesterID = c.ID
             left join db_academic.auth_students as d on a.NPM = d.NPM
             left join db_academic.program_study as e on d.ProdiID = e.ID
-            where a.ToChange = 1 and a.SemesterID = "'.$SemesterID.'"
+            left join db_academic.status_student as f on d.StatusStudentID = f.ID  
+            where a.ToChange = 1 and a.SemesterID = "'.$SemesterID.'" order by d.StatusStudentID asc,a.NPM
             ';
       $query=$this->db->query($sql, array())->result_array();
       return $query;      
@@ -4465,7 +4465,7 @@ class M_finance extends CI_Model {
             left join db_academic.semester as c on a.SemesterID = c.ID
             left join db_academic.auth_students as d on a.NPM = d.NPM
             left join db_academic.program_study as e on d.ProdiID = e.ID
-            where a.Invoice > (select sum(Invoice) as Tot from db_finance.payment_students where ID_payment = a.ID and Status = 1 limit 1) and a.SemesterID = "'.$SemesterID.'"
+            where a.Invoice > (select sum(Invoice) as Tot from db_finance.payment_students where ID_payment = a.ID and Status = 1 limit 1) and a.SemesterID = "'.$SemesterID.'" AND d.StatusStudentID in (3,2,8) order by a.NPM
             ';
       $query=$this->db->query($sql, array())->result_array();
       return $query;      

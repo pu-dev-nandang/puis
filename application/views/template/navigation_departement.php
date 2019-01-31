@@ -73,7 +73,7 @@
 
 
             <li class="departement <?php if($departement=='lpmi'){echo 'current';} ?>"
-                division="5"
+                division="3"
                 data-dpt="lpmi">
                 <a href="javascript:void(0);">
                     <span class="image"><img src="<?php echo base_url('assets/icon/lpmi.png'); ?>"></span>
@@ -103,6 +103,14 @@
                 <a href="javascript:void(0);">
                     <span class="image"><img src="<?php echo base_url('assets/icon/admin.png'); ?>"></span>
                     <span class="title">Prodi</span>
+                </a>
+            </li>
+            <li class="departement <?php if($departement=='rektorat'){echo 'current';} ?>"
+                division="2"
+                data-dpt="rektorat">
+                <a href="javascript:void(0);">
+                    <span class="image"><img src="<?php echo base_url('assets/icon/rector.png'); ?>"></span>
+                    <span class="title">Rektorat</span>
                 </a>
             </li>
         </ul>
