@@ -73,7 +73,7 @@
 
 
             <li class="departement <?php if($departement=='lpmi'){echo 'current';} ?>"
-                division="5"
+                division="3"
                 data-dpt="lpmi">
                 <a href="javascript:void(0);">
                     <span class="image"><img src="<?php echo base_url('assets/icon/lpmi.png'); ?>"></span>
