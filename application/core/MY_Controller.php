@@ -754,3 +754,13 @@ abstract class Prodi_Controler extends Globalclass{
     }
 
 }
+
+abstract class Ga_Controler extends Globalclass{
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('master/m_master');
+    }
+
+}

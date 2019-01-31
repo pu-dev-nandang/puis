@@ -3,6 +3,12 @@
         <!--=== Navigation ===-->
         <ul id="nav">
             <!-- list menu -->
+            <li class="<?php if($this->uri->segment(1)=='ga_schedule_exchange'){echo "current";} ?>">
+                <a href="<?php echo base_url('ga_schedule_exchange'); ?>">
+                    <i class="fa fa-tachometer"></i>
+                    Schedule Exchange
+                </a>
+            </li>
         </ul>
         <div class="sidebar-widget align-center">
             <div class="btn-group" data-toggle="buttons" id="theme-switcher">

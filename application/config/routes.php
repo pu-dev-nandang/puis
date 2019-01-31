@@ -1229,4 +1229,6 @@ $route['testadi2'] = 'c_login/testadi2';
 $route['loginToAdminProdi'] = 'c_login/loginToAdminProdi';
 
 
-// marketing
+// general affair
+$route['ga_schedule_exchange'] = 'page/ga/C_schedule_exchange/schedule_exchange_action';
+
