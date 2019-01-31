@@ -888,7 +888,7 @@ class C_finance extends Finnance_Controler {
         }
         // count
         $count = $this->m_finance->count_get_created_tagihan_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NIM'],$input['Semester'],$input['StatusPayment'],$input['ChangeStatus']);
-        $config = $this->config_pagination_default_ajax($count,5,3);
+        $config = $this->config_pagination_default_ajax($count,15,3);
         $this->pagination->initialize($config);
         $page = $this->uri->segment(3);
         $start = ($page - 1) * $config["per_page"];
