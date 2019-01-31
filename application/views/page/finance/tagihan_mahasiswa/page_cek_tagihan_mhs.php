@@ -67,23 +67,34 @@
                               </select>
                           </div>
                         </div>
-                        <div class="col-md-3" style="margin-top: 10px">
-                          <div class="thumbnail" style="min-height: 30px;padding: 10px;">
-                              <select class="form-control" id="selectStatusPayment">
-                                <option value="">All Status Payment</option>
-                                <option value="0">Belum Lunas</option>
-                                <option value="1">Lunas</option>
-                              </select>
+                        <div class="col-md-6" style="margin-top: 10px">
+                          <div class="row">
+                            <div class="col-md-6">
+                              <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                                  <select class="form-control" id="selectStatusPayment">
+                                    <option value="">All Status Payment</option>
+                                    <option value="0">Belum Lunas (All)</option>
+                                    <option value="0;1">Belum Lunas (R)</option>
+                                    <option value="0;0">Belum Lunas (NR)</option>
+                                    <option value="1">Lunas</option>
+                                  </select>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <p style="color : red">* (R) = Request Change Status</p>
+                              <p style="color : red">* (NR) = Non Request Change Status</p>
+                              <p style="color : red">* (All) = Both</p>
+                            </div>
                           </div>
                         </div>
-                        <div class="col-md-3" style="margin-top: 10px">
+                        <!-- <div class="col-md-3" style="margin-top: 10px">
                           <div class="thumbnail" style="min-height: 30px;padding: 10px;">
                               <select class="form-control" id="selectChangeStatus">
                                 <option value="">All</option>
                                 <option value="1">Request Change Status Mhs</option>
                               </select>
                           </div>
-                        </div>
+                        </div> -->
                       </div>
                     </div>
                   </div>
@@ -225,7 +236,20 @@
         Semester = Semester.split('.');
         Semester = Semester[0];
         var StatusPayment = $("#selectStatusPayment").val();
-        var ChangeStatus = $("#selectChangeStatus").val();
+        var ChangeStatus = '';
+        if (StatusPayment == '0' || StatusPayment == '1') {
+          ChangeStatus = '';
+        }
+        else
+        {
+          if (StatusPayment != '') {
+            StatusPayment2 = StatusPayment.split(';');
+            StatusPayment = StatusPayment2[0];
+            ChangeStatus = StatusPayment2[1];
+          }
+          
+        }
+        // var ChangeStatus = $("#selectChangeStatus").val();
         $('#NotificationModal .modal-header').addClass('hide');
             $('#NotificationModal .modal-body').html('<center>' +
                 '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
@@ -248,7 +272,7 @@
                 StatusPayment : StatusPayment,
                 ChangeStatus : ChangeStatus,
             };
-            // console.log(data);return;
+            console.log(data);
             var token = jwt_encode(data,'UAP)(*');
             $.post(url,{token:token},function (resultJson) {
                var resultJson = jQuery.parseJSON(resultJson);
