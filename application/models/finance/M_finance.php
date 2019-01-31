@@ -1727,8 +1727,7 @@ class M_finance extends CI_Model {
       }
       else
       {
-        // nothing
-        $ChangeStatus = '';
+        $ChangeStatus = ' and a.ToChange = "'.$ChangeStatus.'"';
       }
       
     }
@@ -1806,7 +1805,7 @@ class M_finance extends CI_Model {
       else
       {
         // nothing
-        $ChangeStatus = '';
+        $ChangeStatus = ' and a.ToChange = "'.$ChangeStatus.'"';
       }
       
     }
