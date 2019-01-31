@@ -65,7 +65,8 @@
             '                <th rowspan="3" style="width: 1%;"><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>' +
             '                <th rowspan="3" style="width: 10%;">Students</th>' +
             '                <th rowspan="3" style="width: 10%;">Programme Study</th>' +
-            '                <th rowspan="3" style="width: 5%;">Status</th>' +
+            '                <th rowspan="3" style="width: 5%;">Status Student</th>' +
+            '                <th rowspan="3" style="width: 5%;">Status Payment</th>' +
             '                <th colspan="4">Payment</th>' +
             '            </tr>' +
             '            <tr>' +
@@ -131,6 +132,7 @@
                     '<td>'+StudentsCol+'</td>'+
                     '<td>'+ProgrammeStudy+'</td>'+
                     '<td>'+data_json[i].StatusMhs+'</td>'+
+                    '<td>'+data_json[i].StatusPay+'</td>'+
                     '<td>'+BPPInvoice+'</td>'+
                     '<td>'+BPPPayment+'</td>'+
                     '<td>'+CreditInvoice+'</td>'+
@@ -157,7 +159,7 @@
             $("#loadTable").append(
                     '<div class = "row" id = "rowBtnSave">'+
                         '<div class = "col-md-12" align = "right">'+
-                            '<button class = "btn btn-primary" id = "btnsave">Save</button>'+
+                            '<button class = "btn btn-primary" id = "btnsave">Change Status</button>'+
                         '</div>'+
                     '</div>'        
             );
