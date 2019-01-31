@@ -1814,11 +1814,56 @@ class C_rest extends CI_Controller {
             $auth = $this->m_master->AuthAPI($dataToken);
             if ($auth) {
                 $this->load->model('finance/m_finance');
-
-                $Semester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
-                $SemesterActive = $Semester[0]['ID'];
+                if (array_key_exists('filterSemester', $dataToken)) {
+                    $SemesterActive = $dataToken['filterSemester'];
+                }
+                else
+                {
+                    $Semester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+                    $SemesterActive = $Semester[0]['ID'];
+                }
+                
                 $G_data = $this->m_finance->GetRequestChangeStatus_Mhs($SemesterActive);
                 echo json_encode($G_data);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    public function change_status_mhs_multiple()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $Status = $dataToken['formChangeStatus'];
+                $arr = (array)$dataToken['checkboxArr'];
+                for ($i=0; $i < count($arr); $i++) { 
+                    $NPM = $arr[$i];
+                    $NPM = explode(';', $NPM);
+                    $NPM = $NPM[0];
+                    $datasave = array(
+                         'StatusStudentID' => $Status,   
+                    );
+                    $this->db->where('NPM',$NPM);
+                    $this->db->update('db_academic.auth_students',$datasave);
+
+                    // search ta
+                        $G_Std = $this->m_master->caribasedprimary('db_academic.auth_students','NPM',$NPM);
+                        $this->db->where('NPM',$NPM);
+                        $this->db->update('ta_'.$G_Std[0]['Year'].'.students',$datasave);
+                }
+                echo json_encode(1);
             }
             else
             {
