@@ -65,11 +65,16 @@ class C_schedule_exchange extends Ga_Controler {
                         Dear <span style="color: #333;">Lecturer</span>,
                         <br/>
                         Perihal : <b>Permohonan Ruangan Untuk Kuliah Pengganti</b><br/><br/>
-                        Dengan ini Adum menyatakan bahwa permohonan ini ditolak<br/>
-                        Alasan : <br/>
-                        '.$reason.'         
+                       <div style="background: lightyellow;color: red;border: 1px solid red; text-align: center;padding: 7px;margin-bottom: 10px;">
+                           <h2 style="margin-top: 7px;margin-bottom: 0px;">Permohonan Ditolak</h2>
+                           <p style="color: blue;margin-top: 3px;">
+                               '.$reason.' 
+                           </p>
+                       </div><br/>
                         <br/>
-                        <br/>
+                        <div style="text-align: center;">
+                            <p>--- Detail permohonan ---</p>
+                        </div>
                         <div style="font-size: 14px;">
                             <table  width="100%" cellspacing="0" cellpadding="1" border="0">
                                 <tbody>
@@ -142,9 +147,9 @@ class C_schedule_exchange extends Ga_Controler {
 
                     $to = $emailrequest.','.$emailkaprodi;
                     if ($_SERVER['SERVER_NAME'] == 'localhost') {
-                        $to = $emailrequest.','.$emailkaprodi.','.'nandang.mulyadi@podomorouniversity.ac.id';
+                        $to = $emailrequest.','.$emailkaprodi.','.'nandang.mulyadi@podomorouniversity.ac.id,novita.riani@podomorouniversity.ac.id';
                     }
-                    $subject = "Permohonan Ruangan Untuk Kuliah Pengganti dari GA";
+                    $subject = "GA : Permohonan Ruangan Untuk Kuliah Pengganti";
                     $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
                 }
                  
@@ -167,7 +172,9 @@ class C_schedule_exchange extends Ga_Controler {
                      Dear <span style="color: #333;">Lecturer</span>,
                      <br/>
                      Perihal : <b>Permohonan Ruangan Untuk Kuliah Pengganti</b><br/><br/>
-                     Dengan ini Adum menyatakan bahwa permohonan ini disetujui
+                     <div style="background: lightyellow;border: 1px solid green;color: green;text-align: center;padding: 7px;margin-bottom: 10px;">
+                           <h2 style="margin-top: 7px;margin-bottom: 10px;">Permohonan diterima</h2>
+                       </div>
                      <br/>
                      <br/>
                      <div style="font-size: 14px;">
@@ -242,9 +249,9 @@ class C_schedule_exchange extends Ga_Controler {
 
                  $to = $emailrequest.','.$emailkaprodi;
                  if ($_SERVER['SERVER_NAME'] == 'localhost') {
-                     $to = $emailrequest.','.$emailkaprodi.','.'nandang.mulyadi@podomorouniversity.ac.id';
+                     $to = $emailrequest.','.$emailkaprodi.','.'nandang.mulyadi@podomorouniversity.ac.id,novita.riani@podomorouniversity.ac.id';
                  }
-                 $subject = "Permohonan Ruangan Untuk Kuliah Pengganti dari GA";
+                 $subject = "GA : Permohonan Ruangan Untuk Kuliah Pengganti";
                  $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
             }
         }

@@ -83,12 +83,13 @@
 										'<th rowspan="2">No</th>'+
 										'<th rowspan="2">Dosen</th>'+
 										'<th rowspan="2">Program Studi</th>'+
-										'<th colspan="6">Mengajukan permohonan untuk kuliah pengganti</th>'+
+										'<th colspan="7">Mengajukan permohonan untuk kuliah pengganti</th>'+
 										'<th rowspan = "2" width = "20%">Status</th>'+
 										'<th rowspan = "2" width = "20%">Action</th>'+
 									'</tr>'+
 									'<tr>'+
 										'<th>Mata Kuliah</th>'+
+										'<th>Student</th>'+
 										'<th>Group Kelas</th>'+
 										'<th>Pertemuan Ke</th>'+
 										'<th>Jadwal Semula</th>'+
@@ -198,14 +199,14 @@
     				if (response == '') {
     					var StatusWr = '';
     					if (status == '-2') {
-    						newtr.find('td:eq(9)').html('Reject'+'<br>'+reason);
+    						newtr.find('td:eq(10)').html('Reject'+'<br>'+reason);
     						// var newtdhtml = newtd.attr('tdhtml');
     						// newtd.html(newtdhtml);
     						newtd.html('');
     					}
     					else if(status == 2)
     					{
-    						newtr.find('td:eq(9)').html('Approve');
+    						newtr.find('td:eq(10)').html('Approve');
     						newtd.html('');
     					}
     				}
@@ -295,16 +296,16 @@
     				if (response == '') {
     					var StatusWr = '';
     					if (status == '-2') {
-    						newtr.find('td:eq(9)').html('Reject');
+    						newtr.find('td:eq(10)').html('Reject');
     						// var newtdhtml = newtd.attr('tdhtml');
     						// newtd.html(newtdhtml);
     						newtd.html('');
     					}
     					else if(status == 2)
     					{
-    						newtr.find('td:eq(9)').html('Approve');
-    						var st = newtr.find('td:eq(7)').html();
-    						newtr.find('td:eq(7)').html(st+' | '+roomname);
+    						newtr.find('td:eq(10)').html('Approve');
+    						var st = newtr.find('td:eq(8)').html();
+    						newtr.find('td:eq(8)').html(st+' | '+roomname);
     						newtd.html('');
     					}
     				}

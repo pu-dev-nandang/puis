@@ -1894,7 +1894,7 @@ class C_rest extends CI_Controller {
                 $sql = 'select a.ID as ScheduleExchangeID,a.NIP as NIPRequester,b.Name as NamaRequester,b.EmailPU as EmailRequster,a.Meeting,a.ClassroomID,a.Comment,c.Room,a.Status as StatusTbl,
                         a.DateOriginal,a.Date,a.DayID,d.NameEng as NamaHari,a.StartSessions,a.EndSessions,a.Reason,a.Token,
                         e.ProdiID,f.NameEng as NamaProdi,f.KaprodiID,g.Name as NameKaprodi,g.EmailPU as EmailKaprodi,h.ScheduleID as ScheduleIDAttedance,
-                        i.MKID,j.MKCode,j.NameEng as NamaMatakuliah,k.ID as ScheduleID,k.ClassGroup
+                        i.MKID,j.MKCode,j.NameEng as NamaMatakuliah,k.ID as ScheduleID,k.ClassGroup,(select count(*) as total from db_academic.std_krs where ScheduleID = k.ID and Status = "3" limit 1) as TotalStd
                         from db_academic.schedule_exchange as a
                         left join db_employees.employees as b on a.NIP = b.NIP
                         left join db_academic.classroom as c on a.ClassroomID = c.ID
@@ -1954,6 +1954,7 @@ class C_rest extends CI_Controller {
                     $nestedData[] = $row['NamaRequester'];
                     $nestedData[] = $row['NamaProdi'];
                     $nestedData[] = $row['NamaMatakuliah'];
+                    $nestedData[] = $row['TotalStd'];
                     $nestedData[] = $row['ClassGroup'];
                     $nestedData[] = $row['Meeting'];
                     $nestedData[] = $ScheduleExist;
