@@ -847,6 +847,8 @@ $route['rest/__delete_all_file_proof_payment_byID'] = 'api/c_rest/delete_all_fil
 $route['rest/academic/__fill_list_mhs_tidak_bayar'] = 'api/c_rest/academic_fill_list_mhs_tidak_bayar';
 $route['rest/academic/__assign_by_finance_change_status'] = 'api/c_rest/assign_by_finance_change_status';
 $route['rest/academic/__change_status_mhs_multiple'] = 'api/c_rest/change_status_mhs_multiple';
+$route['rest/ga/__show_schedule_exchange'] = 'api/c_rest/show_schedule_exchange';
+
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
 $route['api/__getRegionByProv'] = 'api/c_api/getRegionByProv';
@@ -1229,4 +1231,7 @@ $route['testadi2'] = 'c_login/testadi2';
 $route['loginToAdminProdi'] = 'c_login/loginToAdminProdi';
 
 
-// marketing
+// general affair
+$route['ga_schedule_exchange'] = 'page/ga/C_schedule_exchange/schedule_exchange_action';
+$route['ga/scheduleexchange/submit_change_status'] = 'page/ga/C_schedule_exchange/submit_change_status';
+

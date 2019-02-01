@@ -754,3 +754,21 @@ abstract class Prodi_Controler extends Globalclass{
     }
 
 }
+
+abstract class Ga_Controler extends Globalclass{
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('master/m_master');
+        $this->load->model('m_sendemail');
+    }
+
+    public function auth_ajax()
+    {
+        if (!$this->input->is_ajax_request()) {
+            exit('No direct script access allowed');
+        }
+    }
+
+}
