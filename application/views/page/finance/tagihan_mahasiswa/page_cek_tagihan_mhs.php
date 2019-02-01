@@ -74,15 +74,15 @@
                                   <select class="form-control" id="selectStatusPayment">
                                     <option value="">All Status Payment</option>
                                     <option value="0">Belum Lunas (All)</option>
-                                    <option value="0;1">Belum Lunas (R)</option>
-                                    <option value="0;0">Belum Lunas (NR)</option>
+                                    <option value="0;1">Belum Lunas (S)</option>
+                                    <option value="0;0">Belum Lunas (NS)</option>
                                     <option value="1">Lunas</option>
                                   </select>
                               </div>
                             </div>
                             <div class="col-md-6">
-                              <p style="color : red">* (R) = Send</p>
-                              <p style="color : red">* (NR) = Non Send</p>
+                              <p style="color : red">* (S) = Send</p>
+                              <p style="color : red">* (NS) = Non Send</p>
                               <p style="color : red">* (All) = Both</p>
                             </div>
                           </div>
@@ -98,11 +98,11 @@
                       </div>
                     </div>
                   </div>
-                </div> 
+                </div>
 
                 <br>
                 <div class="thumbnail" style="padding: 10px;">
-                    <b>Status : </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Approve & Paid Off | <i class="fa fa-circle" style="color: #eade8e;"></i> Approve & Not Yet Paid Off  
+                    <b>Status : </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Approve & Paid Off | <i class="fa fa-circle" style="color: #eade8e;"></i> Approve & Not Yet Paid Off
                 </div>
                 <div class="row">
                   <div class="col-md-3" id="ShowTotalData"></div>
@@ -201,7 +201,7 @@
     $('#selectChangeStatus').change(function () {
         loadData(1);
     });
-    
+
     $(document).on('keypress','#NIM', function (event)
     {
 
@@ -247,7 +247,7 @@
             StatusPayment = StatusPayment2[0];
             ChangeStatus = StatusPayment2[1];
           }
-          
+
         }
         // var ChangeStatus = $("#selectChangeStatus").val();
         $('#NotificationModal .modal-header').addClass('hide');
@@ -380,22 +380,22 @@
                     }
 
                    var tr = '<tr NPM = "'+Data_mhs[i]['NPM']+'">';
-                   var inputCHK = ''; 
+                   var inputCHK = '';
                    if (ccc == 0) {
                     tr = '<tr NPM = "'+Data_mhs[i]['NPM']+'">';
-                    inputCHK = '<input type="checkbox" class="uniform" value ="'+Data_mhs[i]['NPM']+'" Prodi = "'+Data_mhs[i]['ProdiEng']+'" Nama ="'+Data_mhs[i]['Nama']+'" semester = "'+Data_mhs[i]['SemesterID']+'" ta = "'+Data_mhs[i]['Year']+'" invoice = "'+Data_mhs[i]['InvoicePayment']+'" discount = "'+Data_mhs[i]['Discount']+'" PTID = "'+Data_mhs[i]['PTID']+'" PTName = "'+Data_mhs[i]['PTIDDesc']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'" Status = "'+ccc+'">'; 
+                    inputCHK = '<input type="checkbox" class="uniform" value ="'+Data_mhs[i]['NPM']+'" Prodi = "'+Data_mhs[i]['ProdiEng']+'" Nama ="'+Data_mhs[i]['Nama']+'" semester = "'+Data_mhs[i]['SemesterID']+'" ta = "'+Data_mhs[i]['Year']+'" invoice = "'+Data_mhs[i]['InvoicePayment']+'" discount = "'+Data_mhs[i]['Discount']+'" PTID = "'+Data_mhs[i]['PTID']+'" PTName = "'+Data_mhs[i]['PTIDDesc']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'" Status = "'+ccc+'">';
                    } else if(ccc == 1) {
                       tr = '<tr style="background-color: #eade8e; color: black;" NPM = "'+Data_mhs[i]['NPM']+'">';
-                      inputCHK = '<input type="checkbox" class="uniform" value ="'+Data_mhs[i]['NPM']+'" Prodi = "'+Data_mhs[i]['ProdiEng']+'" Nama ="'+Data_mhs[i]['Nama']+'" semester = "'+Data_mhs[i]['SemesterID']+'" ta = "'+Data_mhs[i]['Year']+'" invoice = "'+Data_mhs[i]['InvoicePayment']+'" discount = "'+Data_mhs[i]['Discount']+'" PTID = "'+Data_mhs[i]['PTID']+'" PTName = "'+Data_mhs[i]['PTIDDesc']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'" Status = "'+ccc+'">'; 
+                      inputCHK = '<input type="checkbox" class="uniform" value ="'+Data_mhs[i]['NPM']+'" Prodi = "'+Data_mhs[i]['ProdiEng']+'" Nama ="'+Data_mhs[i]['Nama']+'" semester = "'+Data_mhs[i]['SemesterID']+'" ta = "'+Data_mhs[i]['Year']+'" invoice = "'+Data_mhs[i]['InvoicePayment']+'" discount = "'+Data_mhs[i]['Discount']+'" PTID = "'+Data_mhs[i]['PTID']+'" PTName = "'+Data_mhs[i]['PTIDDesc']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'" Status = "'+ccc+'">';
                    }
                    else
                    {
                     tr = '<tr style="background-color: #8ED6EA; color: black;" NPM = "'+Data_mhs[i]['NPM']+'">';
                     inputCHK = '';
                     <?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
-                       inputCHK = '<input type="checkbox" class="uniform" value ="'+Data_mhs[i]['NPM']+'" Prodi = "'+Data_mhs[i]['ProdiEng']+'" Nama ="'+Data_mhs[i]['Nama']+'" semester = "'+Data_mhs[i]['SemesterID']+'" ta = "'+Data_mhs[i]['Year']+'" invoice = "'+Data_mhs[i]['InvoicePayment']+'" discount = "'+Data_mhs[i]['Discount']+'" PTID = "'+Data_mhs[i]['PTID']+'" PTName = "'+Data_mhs[i]['PTIDDesc']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'" Status = "'+ccc+'">'; 
-                     <?php endif ?> 
-                   } 
+                       inputCHK = '<input type="checkbox" class="uniform" value ="'+Data_mhs[i]['NPM']+'" Prodi = "'+Data_mhs[i]['ProdiEng']+'" Nama ="'+Data_mhs[i]['Nama']+'" semester = "'+Data_mhs[i]['SemesterID']+'" ta = "'+Data_mhs[i]['Year']+'" invoice = "'+Data_mhs[i]['InvoicePayment']+'" discount = "'+Data_mhs[i]['Discount']+'" PTID = "'+Data_mhs[i]['PTID']+'" PTName = "'+Data_mhs[i]['PTIDDesc']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'" Status = "'+ccc+'">';
+                     <?php endif ?>
+                   }
 
                    // show to fixed
                    var IPS = 0;
@@ -410,7 +410,7 @@
                    }
 
                    // show bintang
-                   var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>'; 
+                   var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
 
                    var btn_edit = '';
                    var btn_view = '<button class = "btn btn-default DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'"><i class="fa fa-search" aria-hidden="true"></i> View</button>';
@@ -437,7 +437,7 @@
                           status += '<br> Bukti Upload telah diverify';
                         }
                       }
-                      
+
 
                    $('#dataRow').append(tr +
                        '<td>'+inputCHK+'</td>' +
@@ -466,10 +466,10 @@
                 $('#datatable2').removeClass('hide');
                 $("#pagination_link").html(resultJson.pagination_link);
                }
-               
+
             }).fail(function() {
-              
-              toastr.info('No Result Data'); 
+
+              toastr.info('No Result Data');
               // toastr.error('The Database connection error, please try again', 'Failed!!');
             }).always(function() {
                 $('#NotificationModal').modal('hide');
@@ -514,10 +514,10 @@
                               '<th style="width: 55px;">Payment Date</th>'+
                               '<th style="width: 55px;">UpdateAt</th>';
         <?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
-          table += '<th style="width: 100px;">Action</th>' ;                        
-        <?php endif ?>                      
-        table += '</tr>' ;  
-        table += '</thead>' ; 
+          table += '<th style="width: 100px;">Action</th>' ;
+        <?php endif ?>
+        table += '</tr>' ;
+        table += '</thead>' ;
         table += '<tbody>' ;
         var isi = '';
         var CancelPayment = [];
@@ -546,14 +546,14 @@
                     '<td>'+UpdateAt + '</td>'+
                     <?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
                     '<td>'+ btn_bayar + '</td>'+
-                    <?php endif ?>  
-                  '<tr>'; 
+                    <?php endif ?>
+                  '<tr>';
             }
             break;
           }
         }
 
-        table += isi+'</tbody>' ; 
+        table += isi+'</tbody>' ;
         table += '</table>' ;
 
         html += table;
@@ -612,12 +612,12 @@
                                       '<td>'+payment_proof[i]['NmBank']+'</td>'+
                                       '<td>'+VerifyFinance+'</td>'+
                                       '<td>'+btnVerify+'</td>'+
-                                  '</tr>';    
+                                  '</tr>';
             }
 
             htmlPaymentProof += '</tbody></table></div></div>';
             html += htmlPaymentProof;
-          }                                  
+          }
 
         // end Verify Bukti Bayar
 
@@ -629,8 +629,8 @@
                               '<th style="width: 55px;">Reason</th>'+
                               '<th style="width: 55px;">CancelAt</th>'+
                               '<th style="width: 55px;">CancelBy</th>';
-        htmlReason += '</tr>' ;  
-        htmlReason += '</thead>' ; 
+        htmlReason += '</tr>' ;
+        htmlReason += '</thead>' ;
         htmlReason += '<tbody>' ;
         for (var i = 0; i < CancelPayment.length; i++) {
           var No = parseInt(i) + 1;
@@ -639,10 +639,10 @@
                 '<td>'+ CancelPayment[i]['Reason'] + '</td>'+
                 '<td>'+ CancelPayment[i]['CancelAt'] + '</td>'+
                 '<td>'+ CancelPayment[i]['Name'] + '</td>'+
-              '<tr>'; 
+              '<tr>';
         }
 
-        htmlReason += '</tbody>' ; 
+        htmlReason += '</tbody>' ;
         htmlReason += '</table></div></div>' ;
         if (CancelPayment.length > 0) {
           html += htmlReason;
@@ -694,7 +694,7 @@
                 };
                 allVals.push(arr);
             }
-            
+
          });
          return allVals;
     }
@@ -718,13 +718,13 @@
            toastr.success('The data has been verified');
            loadData(1);
         }).fail(function() {
-          toastr.info('No Action...'); 
+          toastr.info('No Action...');
           // toastr.error('The Database connection error, please try again', 'Failed!!');
         }).always(function() {
 
-        }); 
+        });
       }
-      
+
 
     });
 
@@ -757,15 +757,15 @@
              $("#reason"+idtable).remove();
              loadData(1);
           }).fail(function() {
-            toastr.info('No Action...'); 
+            toastr.info('No Action...');
             // toastr.error('The Database connection error, please try again', 'Failed!!');
           }).always(function() {
 
-          }); 
+          });
         }
       })
-      
-      
+
+
 
     });
 
@@ -808,11 +808,11 @@
                  // $(".bayar[IDStudent='"+IDStudent+"']").remove();
                  td.empty();
               }).fail(function() {
-                toastr.info('No Action...'); 
+                toastr.info('No Action...');
                 // toastr.error('The Database connection error, please try again', 'Failed!!');
               }).always(function() {
 
-              }); 
+              });
             })
         }
         else
@@ -829,13 +829,13 @@
              loadData(1);
              $(".bayar[IDStudent='"+IDStudent+"']").remove();
           }).fail(function() {
-            toastr.info('No Action...'); 
+            toastr.info('No Action...');
             // toastr.error('The Database connection error, please try again', 'Failed!!');
           }).always(function() {
 
-          }); 
+          });
         }
-        
+
     });
 
     $(document).on('click','#btn-submit', function () {
@@ -855,8 +855,8 @@
                                   '<th style="width: 55px;">Payment Type</th>'+
                                   '<th style="width: 55px;">Discount</th>'+
                                   '<th style="width: 55px;">Invoice</th>';
-            table += '</tr>' ;  
-            table += '</thead>' ; 
+            table += '</tr>' ;
+            table += '</thead>' ;
             table += '<tbody>' ;
             var isi = '';
             for (var i = 0; i < arrValueCHK.length ; i++) {
@@ -874,11 +874,11 @@
                       '<td>'+ (arrValueCHK[i]['PTName']) + '</td>'+
                       '<td>'+ (arrValueCHK[i]['Discount']) + ' %</td>'+
                       '<td>'+ yy + '</td>'+
-                    '<tr>';  
-                
+                    '<tr>';
+
             }
 
-            table += isi+'</tbody>' ; 
+            table += isi+'</tbody>' ;
             table += '</table>' ;
 
             if (bool) {
@@ -891,7 +891,7 @@
                   '';
                   html = "Inputan data anda memiliki Status Approve, mohon periksa kembali";
             }
-            
+
 
            $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'List Checklist Data'+'</h4>');
            $('#GlobalModalLarge .modal-body').html(html);
@@ -900,7 +900,7 @@
                'show' : true,
                'backdrop' : 'static'
            });
-         
+
            $( "#ModalbtnSaveForm" ).click(function() {
             loading_button('#ModalbtnSaveForm');
             var url = base_url_js+'finance/approved_created_tagihan_mhs';
@@ -913,12 +913,12 @@
                loadData(1);
                $('#GlobalModalLarge').modal('hide');
             }).fail(function() {
-              toastr.info('No Action...'); 
+              toastr.info('No Action...');
               // toastr.error('The Database connection error, please try again', 'Failed!!');
             }).always(function() {
                 $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
             });
-             
+
            }); // exit click function
 
         }
@@ -944,8 +944,8 @@
                                   '<th style="width: 55px;">Payment Type</th>'+
                                   '<th style="width: 55px;">Discount</th>'+
                                   '<th style="width: 55px;">Invoice</th>';
-            table += '</tr>' ;  
-            table += '</thead>' ; 
+            table += '</tr>' ;
+            table += '</thead>' ;
             table += '<tbody>' ;
             var isi = '';
             for (var i = 0; i < arrValueCHK.length ; i++) {
@@ -963,11 +963,11 @@
                       '<td>'+ (arrValueCHK[i]['PTName']) + '</td>'+
                       '<td>'+ (arrValueCHK[i]['Discount']) + ' %</td>'+
                       '<td>'+ yy + '</td>'+
-                    '<tr>';  
-                
+                    '<tr>';
+
             }
 
-            table += isi+'</tbody>' ; 
+            table += isi+'</tbody>' ;
             table += '</table>' ;
 
             if (bool) {
@@ -980,7 +980,7 @@
                   '';
                   html = "Inputan data anda memiliki Status Approve, mohon periksa kembali";
             }
-            
+
 
            $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'List Checklist Data'+'</h4>');
            $('#GlobalModalLarge .modal-body').html(html);
@@ -989,7 +989,7 @@
                'show' : true,
                'backdrop' : 'static'
            });
-         
+
            $( "#ModalbtnSaveForm" ).click(function() {
             loading_button('#ModalbtnSaveForm');
             var url = base_url_js+'finance/unapproved_created_tagihan_mhs';
@@ -1002,13 +1002,13 @@
                console.log(resultJson);
                if (resultJson != '')
                {
-                //toastr.info(resultJson); 
+                //toastr.info(resultJson);
                   if (confirm(resultJson+', '+'Anda yakin untuk melanjutkan proses ini ?') == true) {
                     var url = base_url_js+'finance/unapproved_created_tagihan_mhs_after_confirm';
                     $.post(url,{token:token},function (resultJson2) {
                          // if (resultJson2 != '')
                          //  {
-                         //     toastr.info(resultJson2); 
+                         //     toastr.info(resultJson2);
                          //  }
                          //  else
                          //  {
@@ -1020,7 +1020,7 @@
                          loadData(1);
                          $('#GlobalModalLarge').modal('hide');
                     }).fail(function() {
-                      toastr.info('No Action...'); 
+                      toastr.info('No Action...');
                       // toastr.error('The Database connection error, please try again', 'Failed!!');
                     }).always(function() {
                         $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
@@ -1034,14 +1034,14 @@
                 $('#GlobalModalLarge').modal('hide');
                }
             }).fail(function() {
-              toastr.info('No Action...'); 
+              toastr.info('No Action...');
               // toastr.error('The Database connection error, please try again', 'Failed!!');
             }).always(function() {
                 $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
             });
-             
+
            }); // exit click function
-          
+
 
         }
         else
@@ -1068,8 +1068,8 @@
                                   '<th style="width: 55px;">Invoice</th>'+
                                   '<th style="width: 55px;">Payment</th>'+
                                   '<th style="width: 55px;">Proof of Payment</th>';
-            table += '</tr>' ;  
-            table += '</thead>' ; 
+            table += '</tr>' ;
+            table += '</thead>' ;
             table += '<tbody>' ;
             var isi = '';
             for (var i = 0; i < arrValueCHK.length ; i++) {
@@ -1095,11 +1095,11 @@
                                for (var xi = 0; xi < FileUpload.length; xi++) {
                                  PaymentOfProof += '<li><a href ="'+base_url_js+'fileGetAny/document-'+arrValueCHK[i]['NPM']+'-'+FileUpload[xi].Filename+'" target="_blank">File '+ ((yi+1)+xi)+'</a></li>';
                                }
-                            }  
+                            }
 
                       break;
                     }
-                    
+
                   }
 
               var yy = (arrValueCHK[i]['Invoice'] != '') ? formatRupiah(arrValueCHK[i]['Invoice']) : '-';
@@ -1113,18 +1113,18 @@
                       '<td>'+ yy + '</td>'+
                       '<td>'+ formatRupiah(PaymentMhs) + '</td>'+
                       '<td>'+ PaymentOfProof + '</td>'+
-                    '<tr>';  
-                
+                    '<tr>';
+
             }
 
-            table += isi+'</tbody>' ; 
+            table += isi+'</tbody>' ;
             table += '</table>' ;
 
             html += table;
 
             var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
                 '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>';
-            
+
 
            $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'List Checklist Data'+'</h4>');
            $('#GlobalModalLarge .modal-body').html(html);
@@ -1133,7 +1133,7 @@
                'show' : true,
                'backdrop' : 'static'
            });
-         
+
            $( "#ModalbtnSaveForm" ).click(function() {
             loading_button('#ModalbtnSaveForm');
             var url = base_url_js+'finance/assign_to_change_status_mhs';
@@ -1156,12 +1156,12 @@
                 $('#GlobalModalLarge').modal('hide');
                }
             }).fail(function() {
-              toastr.info('No Action...'); 
+              toastr.info('No Action...');
               // toastr.error('The Database connection error, please try again', 'Failed!!');
             }).always(function() {
                 $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
             });
-             
+
            }); // exit click function
 
         }
