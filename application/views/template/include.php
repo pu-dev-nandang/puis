@@ -322,6 +322,8 @@
     window.daysEng = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
     window.daysInd = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
 
+    window.DummyEmail = 'nandang.mulyadi@podomorouniversity.ac.id';
+
     window.timeOption = {
         format : 'hh:ii',
         weekStart: 1,
