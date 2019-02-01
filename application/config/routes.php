@@ -906,6 +906,13 @@ $route['api/__crudLog'] = 'api/c_api/crudLog';
 
 $route['api/__crudTransferStudent'] = 'api/c_api/crudTransferStudent';
 
+// === API 2 ===
+
+$route['api2/__crudScheduleExchage'] = 'api/c_api2/crudScheduleExchage';
+
+
+// Penutup API 2 ===
+
 
 $route['__resetPasswordUser'] = 'c_login/resetPasswordUser';
 // for inject //
@@ -1032,6 +1039,11 @@ $route['testInject2'] = 'api/c_global/testInject2';
 $route['testInject3'] = 'api/c_global/testInject3';
 $route['testInject4'] = 'api/c_global/testInject4';
 $route['testInject5'] = 'api/c_global/testInject5';
+
+
+// Action From Email
+$route['fmail/schedule-exchange/approved/(:any)'] = 'api/c_global/exchange_approved/$1';
+$route['fmail/schedule-exchange/rejected/(:any)'] = 'api/c_global/exchange_rejected/$1';
 
 
 // Pengawas Ujian

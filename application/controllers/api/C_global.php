@@ -15,9 +15,22 @@ class C_global extends CI_Controller {
         $this->load->model('master/m_master');
     }
 
+    private function template_blank($content){
+
+        $data['content'] = $content;
+        $this->load->view('template/template_blank',$data);
+    }
+
     public function getInputToken()
     {
         $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+        return $data_arr;
+    }
+
+    public function getInputTokenGet($token)
+    {
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
         return $data_arr;
@@ -1525,5 +1538,23 @@ class C_global extends CI_Controller {
           echo '{"status":"999","message":"jangan iseng :D"}';
         }
     }
+
+
+    // ==== Exchange Schedule =====
+
+    public function exchange_approved($token){
+
+        $data_arr = $this->getInputTokenGet($token);
+        $content = $this->load->view('global/academic/schedule-exchange/ex_approve',$data_arr,true);
+        $this->template_blank($content);
+    }
+
+    public function exchange_rejected($token){
+
+        $data_arr = $this->getInputTokenGet($token);
+        $content = $this->load->view('global/academic/schedule-exchange/ex_rejected',$data_arr,true);
+        $this->template_blank($content);
+    }
+
 
 }
