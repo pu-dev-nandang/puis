@@ -3981,7 +3981,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($fill,$h,$Student['PlaceOfBirth'].', '.$this->getDateIndonesian($Student['DateOfBirth']),$border,0,'L');
         $pdf->SetX(61);
         $pdf->SetFont('Arial','I',$fn_e);
-        $pdf->Cell($label,$h,'/ Date of birth',$border,1,'L');
+        $pdf->Cell($label,$h,'/  Date of birth',$border,1,'L');
         $pdf->Ln(1.5);
         // ===== NIM =====
         $pdf->SetX($x);
@@ -3991,7 +3991,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($fill,$h,$Student['NPM'],$border,0,'L');
         $pdf->SetX(64);
         $pdf->SetFont('Arial','I',$fn_e);
-        $pdf->Cell($label,$h,'/ Student ',$border,1,'L');
+        $pdf->Cell($label,$h,'/  Student ',$border,1,'L');
         $pdf->SetX(22);
         $pdf->Cell($label,$h,'ID Number',$border,0,'L');
         $pdf->Ln(5);
@@ -4048,7 +4048,7 @@ class C_save_to_pdf extends CI_Controller {
 
         if ($Student['Prodi'][0]=='M') 
         {
-            $pdf->SetX(156);  
+            $pdf->SetX(152);  
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,'/',$border,1,'L');
 
@@ -4057,7 +4057,7 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
             $pdf->Ln(4);
         }
-        $pdf->Ln(6);
+        $pdf->Ln(1.5);
 
         // ===== Program Pendidikan =====
         $pdf->SetX($x);
@@ -4081,7 +4081,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetX(56);
         $pdf->SetFont('Arial','I',$fn_e);
-        $pdf->Cell($label,$h,'/ Educational',$border,1,'L');
+        $pdf->Cell($label,$h,'/  Educational',$border,1,'L');
         $pdf->SetX(22.1);
         $pdf->Cell($label,$h,'Program',$border,1,'L');
         $pdf->Ln($ln);
