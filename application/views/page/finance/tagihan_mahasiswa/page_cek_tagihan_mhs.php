@@ -81,8 +81,8 @@
                               </div>
                             </div>
                             <div class="col-md-6">
-                              <p style="color : red">* (R) = Request Change Status</p>
-                              <p style="color : red">* (NR) = Non Request Change Status</p>
+                              <p style="color : red">* (R) = Send</p>
+                              <p style="color : red">* (NR) = Non Send</p>
                               <p style="color : red">* (All) = Both</p>
                             </div>
                           </div>
@@ -137,7 +137,7 @@
                         </div>
                     </div>
                     <div  class="col-xs-12" align="right"><button class="btn btn-inverse hide" id="btn-submit-assignmhs"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                 Change Status to Academic</button>&nbsp<button class="btn btn-inverse btn-notification btn-unapprove hide" id="btn-submit-unapprove"><i class="fa fa-times" aria-hidden="true"></i>
+                 Send Update to Academic</button>&nbsp<button class="btn btn-inverse btn-notification btn-unapprove hide" id="btn-submit-unapprove"><i class="fa fa-times" aria-hidden="true"></i>
                  Unapprove</button>&nbsp<button class="btn btn-inverse btn-notification btn-custom btn-submit hide" id="btn-submit"> <i class="fa fa-check" aria-hidden="true"></i>
                  Approve</button></div>
                 </div>
