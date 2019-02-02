@@ -41,7 +41,9 @@ class C_api2 extends CI_Controller {
     }
 
     private function sendMailRest($data){
-        $url = base_url('rest/__sendEmail');
+        $url = ($_SERVER['SERVER_NAME']=='localhost')
+            ? 'http://pcam.podomorouniversity.ac.id/rest/__sendEmail'
+            : base_url('rest/__sendEmail');
         $Input = $this->jwt->encode($data,"UAP)(*");
 
         $ch = curl_init();
@@ -164,15 +166,16 @@ class C_api2 extends CI_Controller {
                                             </div>
                                         </div>';
 
-                        $emailGa = $this->db->select('Email')->get_where('db_employees.employees',array('ID' => 8))->result_array();
+                        $emailGa = $this->db->select('Email')->get_where('db_employees.division',array('ID' => 8))->result_array();
 
                         $mailTo = (count($emailGa)>0)
                             ? $emailGa[0]['Email']
                             : $this->DummyEmail;
 
+
                         $data = array(
                             'to' => $mailTo,
-                            'subject' => 'Permohonan Ruangan Kelas Pengganti',
+                            'subject' => 'Kaprodi : Permohonan Ruangan Kelas Pengganti',
                             'text' => $bodyEmail,
                             'auth' => 's3Cr3T-G4N'
                         );
@@ -249,7 +252,7 @@ class C_api2 extends CI_Controller {
                         array('NIP' => $data_arr['ApprovedBy']))->result_array();
 
                     $bodyEmail = '<div>
-                                            Dear <span style="color: #333;">General Affair</span>,
+                                            Dear <span style="color: #333;">'.$dataSceduleExchange[0]['Lecturer'].'</span>,
                                             <br/>
                                             Perihal : <b>Permohonan Ruangan Untuk Kuliah Pengganti</b>
                         
@@ -341,7 +344,7 @@ class C_api2 extends CI_Controller {
 
                     $data = array(
                         'to' => $mailTo,
-                        'subject' => 'Permohonan Ruangan Kelas Pengganti',
+                        'subject' => 'Kaprodi : Permohonan Ruangan Kelas Pengganti',
                         'text' => $bodyEmail,
                         'auth' => 's3Cr3T-G4N'
                     );
