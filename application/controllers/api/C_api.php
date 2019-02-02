@@ -5413,7 +5413,7 @@ class C_api extends CI_Controller {
 
             // send email and update notification
             // broadcase update js
-            if($_SERVER['SERVER_NAME'] =='localhost') {
+           /* if($_SERVER['SERVER_NAME'] =='localhost') {
                 $client = new Client(new Version1X('//10.1.10.230:3000'));
             }
             else{
@@ -5423,7 +5423,7 @@ class C_api extends CI_Controller {
                 $client->initialize();
                 // send message to connected clients
                 $client->emit('update_schedule_notifikasi', ['update_schedule_notifikasi' => '1','date' => '']);
-                $client->close();
+                $client->close();*/
 
                 $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['Start']);
                 $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['End']);

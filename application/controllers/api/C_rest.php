@@ -1887,31 +1887,35 @@ class C_rest extends CI_Controller {
             if ($auth) {
                 $Status = (array_key_exists('Status', $dataToken)) ? $dataToken['Status'] : '';
                 $requestData= $_REQUEST;
-                $totalData = $this->m_rest->count_get_schedule_exchange_by_status($Status);
+                $Semester0 = (array_key_exists('Semester', $dataToken)) ? $dataToken['Semester'] : '';    
+                $totalData = $this->m_rest->count_get_schedule_exchange_by_status($Status,$Semester0);
 
                 $Status = ($Status == '') ? '' : ' where a.Status ="'.$Status.'" ';
                 $where = ($Status == '') ? ' where' : ' and';
                 $sql = 'select a.ID as ScheduleExchangeID,a.NIP as NIPRequester,b.Name as NamaRequester,b.EmailPU as EmailRequster,a.Meeting,a.ClassroomID,a.Comment,c.Room,a.Status as StatusTbl,
                         a.DateOriginal,a.Date,a.DayID,d.NameEng as NamaHari,a.StartSessions,a.EndSessions,a.Reason,a.Token,
                         e.ProdiID,f.NameEng as NamaProdi,f.KaprodiID,g.Name as NameKaprodi,g.EmailPU as EmailKaprodi,h.ScheduleID as ScheduleIDAttedance,
-                        i.MKID,j.MKCode,j.NameEng as NamaMatakuliah,k.ID as ScheduleID,k.ClassGroup,(select count(*) as total from db_academic.std_krs where ScheduleID = k.ID and Status = "3" limit 1) as TotalStd
+                        i.MKID,j.MKCode,j.NameEng as NamaMatakuliah,k.ID as ScheduleID,k.ClassGroup,(select count(*) as total from db_academic.std_krs where ScheduleID = k.ID and Status = "3" limit 1) as TotalStd,
+                        a.Updated1By as KaprodiChoice,l.EmailPU as EmailKaprodiChoice
                         from db_academic.schedule_exchange as a
                         left join db_employees.employees as b on a.NIP = b.NIP
                         left join db_academic.classroom as c on a.ClassroomID = c.ID
                         left join db_academic.days as d on a.DayID = d.ID
-                        left join db_academic.schedule_exchange_prodi as e on a.ID = e.EXID
+                        left join (select * from db_academic.schedule_exchange_prodi group by EXID)  as e on a.ID = e.EXID
                         left join db_academic.program_study as f on e.ProdiID = f.ID
                         left join db_employees.employees as g on f.KaprodiID = g.NIP
                         left join db_academic.attendance as h on a.ID_Attd = h.ID
                         left join (select * from db_academic.schedule_details_course group by ScheduleID) as i on h.ScheduleID = i.ScheduleID
                         left join db_academic.mata_kuliah as j on i.MKID = j.ID
                         left join db_academic.schedule as k on k.ID = i.ScheduleID
+                        left join db_employees.employees as l on a.Updated1By = l.NIP
                         '.$Status;
 
                 $Semester = (array_key_exists('Semester', $dataToken)) ? ' and h.SemesterID ="'.$dataToken['Semester'].'"' : '';     
                 $sql.= $where.' (f.KaprodiID LIKE "%'.$requestData['search']['value'].'%" or a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "'.$requestData['search']['value'].'%"  or g.Name LIKE "'.$requestData['search']['value'].'%" or c.Room LIKE "'.$requestData['search']['value'].'%" or a.DateOriginal LIKE "'.$requestData['search']['value'].'%" or a.Date LIKE "'.$requestData['search']['value'].'%" or f.NameEng LIKE "'.$requestData['search']['value'].'%"
                     or j.NameEng LIKE "'.$requestData['search']['value'].'%" or k.ClassGroup LIKE "'.$requestData['search']['value'].'%"
                         ) '.$Semester;
+
                 $sql.= ' ORDER BY a.Date Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
                 // print_r($sql);die();
                 $query = $this->db->query($sql)->result_array();
@@ -1952,7 +1956,7 @@ class C_rest extends CI_Controller {
                     }
                     $nestedData[] = $No;
                     $nestedData[] = $row['NamaRequester'];
-                    $nestedData[] = $row['NamaProdi'];
+                    // $nestedData[] = $row['NamaProdi'];
                     $nestedData[] = $row['NamaMatakuliah'];
                     $nestedData[] = $row['TotalStd'];
                     $nestedData[] = $row['ClassGroup'];
@@ -1965,8 +1969,8 @@ class C_rest extends CI_Controller {
                     $btnApprove  = '';
                     $btnreject = '';
                     if ($row['StatusTbl'] == '1') {
-                        $btnApprove = '<button class = "btn btn-primary btnapprove" token = "'.$row['Token'].'" emailrequest = "'.$row['EmailRequster'].'" emailkaprodi = "'.$row['EmailKaprodi'].'" ScheduleExchangeID = "'.$row['ScheduleExchangeID'].'"><i class="fa fa-check" aria-hidden="true"></i> Approve </button>';
-                        $btnreject = '<button class = "btn btn-inverse btnreject" token = "'.$row['Token'].'" emailrequest = "'.$row['EmailRequster'].'" emailkaprodi = "'.$row['EmailKaprodi'].'" ScheduleExchangeID = "'.$row['ScheduleExchangeID'].'"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Reject </button>';
+                        $btnApprove = '<button class = "btn btn-primary btnapprove" token = "'.$row['Token'].'" emailrequest = "'.$row['EmailRequster'].'" emailkaprodi = "'.$row['EmailKaprodiChoice'].'" ScheduleExchangeID = "'.$row['ScheduleExchangeID'].'"><i class="fa fa-check" aria-hidden="true"></i> Approve </button>';
+                        $btnreject = '<button class = "btn btn-inverse btnreject" token = "'.$row['Token'].'" emailrequest = "'.$row['EmailRequster'].'" emailkaprodi = "'.$row['EmailKaprodiChoice'].'" ScheduleExchangeID = "'.$row['ScheduleExchangeID'].'"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Reject </button>';
                     }
                     
 

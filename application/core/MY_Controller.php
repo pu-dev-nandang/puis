@@ -762,6 +762,7 @@ abstract class Ga_Controler extends Globalclass{
         parent::__construct();
         $this->load->model('master/m_master');
         $this->load->model('m_sendemail');
+        $this->load->model('vreservation/m_reservation');
     }
 
     public function auth_ajax()

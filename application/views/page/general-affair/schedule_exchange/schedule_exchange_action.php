@@ -82,7 +82,7 @@
 									'<tr>'+
 										'<th rowspan="2">No</th>'+
 										'<th rowspan="2">Dosen</th>'+
-										'<th rowspan="2">Program Studi</th>'+
+										// '<th rowspan="2">Program Studi</th>'+
 										'<th colspan="7">Mengajukan permohonan untuk kuliah pengganti</th>'+
 										'<th rowspan = "2" width = "20%">Status</th>'+
 										'<th rowspan = "2" width = "20%">Action</th>'+
@@ -308,8 +308,62 @@
     						newtr.find('td:eq(8)').html(st+' | '+roomname);
     						newtd.html('');
     					}
+    					$('.btnsavedata[scheduleexchangeid="'+scheduleexchangeid+'"]').prop('disabled',false).html('Save');
     				}
-    				$('.btnsavedata[scheduleexchangeid="'+scheduleexchangeid+'"]').prop('disabled',false).html('Save');
+    				else
+    				{
+    					if (confirm(response)) {
+    							var url = base_url_js+'ga/scheduleexchange/submit_change_status';
+    							var token = newtd.attr('token');
+    						    var data = {
+    						        token : token,
+    						        emailrequest: emailrequest,
+    						        emailkaprodi : emailkaprodi,
+    						        scheduleexchangeid : scheduleexchangeid,
+    						        Room : Room,
+    						        status : status,
+    						        roomname : roomname,
+    						        confirm : 1,
+    						    }
+    						    var token = jwt_encode(data,'UAP)(*');
+    						    $.post(url,{token:token},function (data_json2) {
+    						    	var response2 = jQuery.parseJSON(data_json2);
+    						    	if (response2 == '') {
+    						    		var StatusWr = '';
+    						    		if (status == '-2') {
+    						    			newtr.find('td:eq(10)').html('Reject');
+    						    			// var newtdhtml = newtd.attr('tdhtml');
+    						    			// newtd.html(newtdhtml);
+    						    			newtd.html('');
+    						    		}
+    						    		else if(status == 2)
+    						    		{
+    						    			// action cancel auto schedule bentrok
+    						    			var url = base_url_js+'api/__checkBentrokScheduleAPI';
+    						    			$.post(url,{token:token},function (data_json3) {
+    						    				if (data_json3 == 0 || data_json3 == 1) {
+    						    					newtr.find('td:eq(10)').html('Approve');
+    						    					var st = newtr.find('td:eq(8)').html();
+    						    					newtr.find('td:eq(8)').html(st+' | '+roomname);
+    						    					newtd.html('');
+    						    				}
+    						    				
+    						    			})
+
+    						    			
+    						    		}
+    						    	}
+
+    						    	$('.btnsavedata[scheduleexchangeid="'+scheduleexchangeid+'"]').prop('disabled',false).html('Save');
+    						    	
+    						    })
+    					}
+    					else
+    					{
+    						$('.btnsavedata[scheduleexchangeid="'+scheduleexchangeid+'"]').prop('disabled',false).html('Save');
+    					}
+    				}
+		
     			}).done(function() {
     			          
     		    }).fail(function() {
