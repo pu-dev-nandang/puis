@@ -113,6 +113,22 @@
                     <span class="title">Rektorat</span>
                 </a>
             </li>
+            <li class="departement <?php if($departement=='library'){echo 'current';} ?>"
+                division="11"
+                data-dpt="library">
+                <a href="javascript:void(0);">
+                    <span class="image"><img src="<?php echo base_url('assets/icon/rector.png'); ?>"></span>
+                    <span class="title">Library</span>
+                </a>
+            </li>
+            <li class="departement <?php if($departement=='other-division'){echo 'current';} ?>"
+                division="36"
+                data-dpt="other-division">
+                <a href="javascript:void(0);">
+                    <span class="image"><img src="<?php echo base_url('assets/icon/rector.png'); ?>"></span>
+                    <span class="title">Other</span>
+                </a>
+            </li>
         </ul>
     </div> <!-- /#frame -->
 </div> <!-- /#project-switcher -->
