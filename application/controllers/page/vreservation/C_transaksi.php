@@ -694,6 +694,7 @@ class C_transaksi extends Vreservation_Controler {
         $arr_status = array();
         $ApprovalWr = '';
         $ID_t_booking = $ID;
+        
         switch ($approveaccess) {
             case 0:
                 $arr_status = array('MarcommStatus' => 2);
@@ -728,6 +729,15 @@ class C_transaksi extends Vreservation_Controler {
                     $approveaccess = 4;
                 }
                 break;
+            case 3:
+                $PositionMain = $this->session->userdata('PositionMain');
+                $IDDivision = $PositionMain['IDDivision'];
+                if ($IDDivision == 12) {
+                    $arr_status = array('Status' => 1,'ApprovedAt' => date('Y-m-d H:i:s'),'ApprovedBy' => $this->session->userdata('NIP') );
+                    $ApprovalWr = ' as Approval 2';
+                }
+                
+                break;
             case 4:
                 $arr_status = array('Status' => 1,'ApprovedAt' => date('Y-m-d H:i:s'),'ApprovedBy' => $this->session->userdata('NIP') );
                 $ApprovalWr = ' as Approval 2';
@@ -753,8 +763,8 @@ class C_transaksi extends Vreservation_Controler {
 
         // check approve bentrok
         $Start = $get[0]['Start'];$End = $get[0]['End'];$chk_e_multiple = '';$Room = $get[0]['Room'];
-        // $chk = $this->m_reservation->checkBentrok($Start,$End,$chk_e_multiple,$Room,$ID);
-        $chk =true;
+        $chk = $this->m_reservation->checkBentrok($Start,$End,$chk_e_multiple,$Room,$ID);
+        // $chk =true;
         if ($chk) {
             $dataSave = $arr_status;
             $dataSave = $dataSave + $arr_add;

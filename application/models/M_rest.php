@@ -1214,13 +1214,15 @@ class M_rest extends CI_Model {
         return $output;
     }
 
-    public function count_get_schedule_exchange_by_status($Status)
+    public function count_get_schedule_exchange_by_status($Status,$Semester)
     {
-        $Status = ($Status =='') ? '' : ' where Status = "'.$Status.'"';
-        $sql = 'select count(*) as total from db_academic.schedule_exchange
-                 '.$Status;
+        $Status = ($Status =='') ? '' : ' where a.Status = "'.$Status.'"';
+        $Semester = ($Semester =='') ? '' : ($Status =='') ? ' where b.SemesterID = "'.$Semester.'"' : ' and b.SemesterID = "'.$Semester.'"';
+        $sql = 'select count(*) as total from db_academic.schedule_exchange as a left join db_academic.attendance as b 
+                on a.ID_Attd = b.ID
+                 '.$Status.$Semester;
         $query = $this->db->query($sql)->result_array();
-        return $query;
+        return $query[0]['total'];
     }
 
 }
