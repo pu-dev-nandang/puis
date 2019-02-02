@@ -25,12 +25,32 @@ class C_api2 extends CI_Controller {
 
     }
 
+    private function dateTimeNow(){
+        $dataTime = date('Y-m-d H:i:s');
+        return $dataTime;
+    }
+
     private function getInputToken()
     {
         $token = $this->input->post('token');
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
         return $data_arr;
+    }
+
+    public function is_url_exist($url){
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_exec($ch);
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if($code == 200){
+            $status = true;
+        }else{
+            $status = false;
+        }
+        curl_close($ch);
+        return $status;
     }
 
     private function getInputTokenGet($token)
@@ -86,7 +106,7 @@ class C_api2 extends CI_Controller {
                         $dataToken = (array) $this->jwt->decode($token,$key);
 
                         // Get Name Kaprodi
-                        $dataKaprodi = $this->db->select('Name')->get_where('db_employees.employees',
+                        $dataKaprodi = $this->db->select('Name,Photo')->get_where('db_employees.employees',
                             array('NIP' => $data_arr['ApprovedBy']))->result_array();
 
                         $bodyEmail = '<div>
@@ -191,6 +211,51 @@ class C_api2 extends CI_Controller {
                         $this->db->where('ID', $data_arr['EXID']);
                         $this->db->update('db_academic.schedule_exchange',$dataUpdate);
 
+
+                        //============= Logging ==========
+                        // Insert Logging
+                        $url = base_url('uploads/employees/'.$dataKaprodi[0]['Photo']);
+                        $img_profile = ($this->is_url_exist($url) && $dataKaprodi[0]['Photo']!='')
+                            ? $url
+                            : url_server_ws.'/images/icon/lecturer.png';
+
+                        $Log_dataInsert = array(
+                            'Icon' => $img_profile,
+                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Schedule Exchange Approved',
+                            'Description' => 'Kaprodi : Schedule Exchange Approved',
+                            'URLDirect' => 'ga_schedule_exchange',
+                            'URLDirectLecturer' => 'attendance/schedule-exchange',
+                            'CreatedBy' => $data_arr['ApprovedBy'],
+                            'CreatedName' => $dataKaprodi[0]['Name'],
+                            'CreatedAt' => $data_arr['ApprovedAt'],
+                        );
+
+                        $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
+                        $insert_id_logging = $this->db->insert_id();
+
+                        // insert ke user
+                        $Log_arr_ins = array(
+                            'IDLogging' => $insert_id_logging,
+                            'UserID' => $d['NIP']
+                        );
+                        $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+
+                        // Get Member Adum
+                        $dataUserAdum = $this->db->select('NIP')->get_where('db_employees.rule_users',
+                            array('IDDivision' => 8))->result_array();
+
+                        if(count($dataUserAdum)>0){
+                            foreach ($dataUserAdum as $item){
+                                $Log_arr_ins = array(
+                                    'IDLogging' => $insert_id_logging,
+                                    'UserID' => $item['NIP']
+                                );
+                                $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+                            }
+                        }
+
+
+
                         $result = array(
                             'Status' => '1',
                             'Message' => 'Approved',
@@ -248,7 +313,7 @@ class C_api2 extends CI_Controller {
                     $dataToken = (array) $this->jwt->decode($token,$key);
 
                     // Get Name Kaprodi
-                    $dataKaprodi = $this->db->select('Name')->get_where('db_employees.employees',
+                    $dataKaprodi = $this->db->select('Name,Photo')->get_where('db_employees.employees',
                         array('NIP' => $data_arr['ApprovedBy']))->result_array();
 
                     $bodyEmail = '<div>
@@ -360,6 +425,37 @@ class C_api2 extends CI_Controller {
                     );
                     $this->db->where('ID', $data_arr['EXID']);
                     $this->db->update('db_academic.schedule_exchange',$dataUpdate);
+
+
+                    //============= Logging ==========
+                    // Insert Logging
+
+                    $url = base_url('uploads/employees/'.$dataKaprodi[0]['Photo']);
+                    $img_profile = ($this->is_url_exist($url) && $dataKaprodi[0]['Photo']!='')
+                        ? $url
+                        : url_server_ws.'/images/icon/lecturer.png';
+
+                    $Log_dataInsert = array(
+                        'Icon' => $img_profile,
+                        'Title' => '<i class="fa fa-times-circle margin-right" style="color:darkred;"></i> Schedule Exchange Rejected',
+                        'Description' => 'Kaprodi : Schedule Exchange Rejected',
+                        'URLDirect' => 'ga_schedule_exchange',
+                        'URLDirectLecturer' => 'attendance/schedule-exchange',
+                        'CreatedBy' => $data_arr['ApprovedBy'],
+                        'CreatedName' => $dataKaprodi[0]['Name'],
+                        'CreatedAt' => $data_arr['ApprovedAt'],
+                    );
+
+
+                    $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
+                    $insert_id_logging = $this->db->insert_id();
+
+                    // insert ke user
+                    $Log_arr_ins = array(
+                        'IDLogging' => $insert_id_logging,
+                        'UserID' => $dataSceduleExchange[0]['NIP']
+                    );
+                    $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
 
                 }
 
