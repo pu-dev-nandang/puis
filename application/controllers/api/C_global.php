@@ -321,31 +321,45 @@ class C_global extends CI_Controller {
         //     }
         // }
 
-        $sql = 'select * from db_finance.payment where SemesterID = 14 and Status = "0"';
-        $query=$this->db->query($sql, array())->result_array();
-        // print_r($query);die();
-        for ($i=0; $i < count($query); $i++) { 
-            $ID_payment = $query[$i]['ID'];
-            $Invoice = $query[$i]['Invoice'];
-            // cek data lunas
-            $get = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$ID_payment);
-            $total = 0;
-            for ($j=0; $j < count($get); $j++) {
-                if ($get[$j]['Status'] == 1) {
-                   $total = $total + $get[$j]['Invoice'];
-                } 
-            }
+        // $sql = 'select * from db_finance.payment where SemesterID = 14 and Status = "0"';
+        // $query=$this->db->query($sql, array())->result_array();
+        // // print_r($query);die();
+        // for ($i=0; $i < count($query); $i++) { 
+        //     $ID_payment = $query[$i]['ID'];
+        //     $Invoice = $query[$i]['Invoice'];
+        //     // cek data lunas
+        //     $get = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$ID_payment);
+        //     $total = 0;
+        //     for ($j=0; $j < count($get); $j++) {
+        //         if ($get[$j]['Status'] == 1) {
+        //            $total = $total + $get[$j]['Invoice'];
+        //         } 
+        //     }
 
-            if ($total >= $Invoice) {
-               $dataSave = array(
-                       'Status' =>"1",
-                       'UpdateAt' => date('Y-m-d H:i:s'),
-                       'UpdatedBy' => 0,
-                               );
-               $this->db->where('ID',$ID_payment);
-               $this->db->update('db_finance.payment', $dataSave);
-            }
-        }
+        //     if ($total >= $Invoice) {
+        //        $dataSave = array(
+        //                'Status' =>"1",
+        //                'UpdateAt' => date('Y-m-d H:i:s'),
+        //                'UpdatedBy' => 0,
+        //                        );
+        //        $this->db->where('ID',$ID_payment);
+        //        $this->db->update('db_finance.payment', $dataSave);
+        //     }
+        // }
+
+        // $sql = 'select a.*,b.ID as ID_payment_std from db_finance.payment as a 
+        //         left join db_finance.payment_students as b on a.ID = b.ID_payment
+        //         where a.SemesterID = 14 and b.Deadline = "2018-07-31 23:59:00" ';
+        // $query=$this->db->query($sql, array())->result_array();
+        // for ($i=0; $i < count($query); $i++) { 
+        //     $ID_payment_std = $query[$i]['ID_payment_std'];
+        //     $dataSave = array(
+        //         'Deadline' => "2019-01-15 23:59:00",
+        //     );
+        //     $this->db->where('ID',$ID_payment_std);
+        //     $this->db->update('db_finance.payment_students',$dataSave);
+
+        // }
 
 
     }
