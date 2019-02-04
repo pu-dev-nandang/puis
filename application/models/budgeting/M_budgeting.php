@@ -447,6 +447,74 @@ class M_budgeting extends CI_Model {
         return $PRCode;
     }
 
+    public function Get_PRCode2($Departement)
+    {
+        /* method PR
+           Code : 05/UAP-IT/PR/IX/2018
+           05 : Increment (Max length = 2)
+           UAP- : Fix
+           IT : Division Abbreviation
+           PR : Fix
+           IX : Bulan dalam romawi
+           2018 : Get Years Now
+        */
+        $PRCode = '';   
+        $Year = date('Y');
+        $Month = date('m');
+        $Month = $this->m_master->romawiNumber($Month);
+        $MaxLengthINC = 2;
+        
+        $sql = 'select * from db_budgeting.pr_create 
+                where Departement = ? and SPLIT_STR(PRCode, "/", 5) = ?
+                and SPLIT_STR(PRCode, "/", 4) = ?
+                order by SPLIT_STR(PRCode, "/", 1) desc
+                limit 1';
+        $query=$this->db->query($sql, array($Departement,$Year,$Month))->result_array();
+        if (count($query) == 1) {
+            // Inc last code
+            $PRCode = $query[0]['PRCode'];
+            $explode = explode('/', $PRCode);
+            $C = $explode[0];
+            $C = (int) $C;
+            $C = $C + 1;
+            $B = strlen($C);
+            $strINC = $C;
+            for ($i=0; $i < $MaxLengthINC - $B; $i++) { 
+                $strINC = '0'.$strINC;
+            }
+
+            $explode[0] = $strINC;
+            $PRCode = implode('/', $explode);
+        }
+        else
+        {
+            $C = 1;
+            $B = strlen($C);
+            $strINC = $C;
+            for ($i=0; $i < $MaxLengthINC - $B; $i++) { 
+                $strINC = '0'.$strINC;
+            }
+
+            // get abbreviation department
+                $ExpDepart = explode('.', $Departement);
+                $abbreviation_Div = '';
+                if ($ExpDepart[0] == 'NA') {
+                    $G_Div = $this->m_master->caribasedprimary('db_employees.division','ID',$ExpDepart[1]);
+                    $abbreviation_Div = $G_Div[0]['Abbreviation'];
+                }
+                else
+                {
+                    $G_Div = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ExpDepart[1]);
+                    $abbreviation_Div = $G_Div[0]['Code'];
+                }
+
+            $PRCode = $strINC.'/'.'UAP-'.$abbreviation_Div.'/'.'PR'.'/'.$Month.'/'.$Year;
+        }    
+
+        return $PRCode;        
+
+    }
+
     public function GetRuleApproval_PR_JsonStatus($Departement,$Amount)
     {
         $JsonStatus = array();
@@ -454,8 +522,9 @@ class M_budgeting extends CI_Model {
                 group by MaxLimit,ID_m_userrole order by MaxLimit,ID_m_userrole;
                 ';
         $query=$this->db->query($sql, array())->result_array();
-        // print_r($query);die();
+        
         // get data to filtering MaxLimit
+        // print_r($query);die();
             $arr = array();
             for ($i=0; $i < count($query); $i++) {
                 $MaxLimit = $query[$i]['MaxLimit'];
@@ -464,7 +533,18 @@ class M_budgeting extends CI_Model {
                 for ($j=$i+1; $j < count($query); $j++) {
                     $MaxLimit2 = $query[$j]['MaxLimit'];
                     if ($MaxLimit == $MaxLimit2) {
-                        $arr[]= $query[$j]['ID_m_userrole']; 
+                        $boolF = false;
+                        for ($z=0; $z < count($arr); $z++) {
+                            if ($arr[$z] == $query[$j]['ID_m_userrole']) {
+                                 $boolF = true;
+                                 break;
+                            } 
+                        }
+
+                        if (!$boolF) {
+                            $arr[]= $query[$j]['ID_m_userrole']; 
+                        }
+                        
                     }
                     else
                     {
@@ -479,6 +559,7 @@ class M_budgeting extends CI_Model {
 
             }
 
+            // print_r($arr);die();
         // find approver
             for ($i=0; $i < count($arr); $i++) { 
                $sql = 'select * from db_budgeting.cfg_set_roleuser where Departement = "'.$Departement.'" and ID_m_userrole = '.$arr[$i];

@@ -1246,4 +1246,4 @@ $route['loginToAdminProdi'] = 'c_login/loginToAdminProdi';
 // general affair
 $route['ga_schedule_exchange'] = 'page/ga/C_schedule_exchange/schedule_exchange_action';
 $route['ga/scheduleexchange/submit_change_status'] = 'page/ga/C_schedule_exchange/submit_change_status';
-
+$route['save2pdf/print/prdeparment'] =  'C_save_to_pdf/print_prdeparment';

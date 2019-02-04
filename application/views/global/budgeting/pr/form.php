@@ -224,7 +224,7 @@
 								'<div class = "col-sm-2">'+
 									'<div class = "form-group">'+
 										'<label>PPN</label>'+
-										'<input type = "text" class = "form-control" id = "ppn">'+
+										'<input type = "text" class = "form-control" id = "ppn"><b>%</b>'+
 									'</div>'+
 								'</div>'+
 								'<div class = "col-sm-6 col-md-offset-4">'+
@@ -577,7 +577,7 @@
 
 		})
 
-		$(document).off('change keyup', '.qty').on('change keyup', '.qty',function(e) {
+		$(document).off('change', '.qty').on('change', '.qty',function(e) {
 			var qty = $(this).val();
 			var fillItem = $(this).closest('tr');
 			var estvalue = fillItem.find('td:eq(5)').find('.UnitCost').val();
@@ -621,6 +621,14 @@
 				arr_id_budget_left.push(id_budget_left);
 			})
 
+			var uniqueArray = function(arrArg) {
+			  return arrArg.filter(function(elem, pos,arr) {
+			    return arr.indexOf(elem) == pos;
+			  });
+			};
+
+			arr_id_budget_left = uniqueArray(arr_id_budget_left);
+			console.log(arr_id_budget_left);
 
 			var htmltotal = 0;
 			for (var i = 0; i < arr_id_budget_left.length; i++) {
@@ -640,7 +648,7 @@
 					SubTotal = parseInt(SubTotal) - parseInt(Persent);
 					total += parseInt(SubTotal);
 				})
-
+				
 				htmltotal += parseInt(total);
 
 				for (var l = 0; l < PostBudgetDepartment.length; l++) { // find Value awal
@@ -983,10 +991,10 @@
 
 
 			})
-
+			
 			if (Total > MaxLimit) {
-				var WrMaxLimit = findAndReplace(MaxLimit, ".","");
-				toastr.error("You have authorize Max Limit : "+ formatRupiah(WrMaxLimit),'!!!Error');
+				// var WrMaxLimit = findAndReplace(MaxLimit, ".","");
+				toastr.error("You have authorize Max Limit : "+ formatRupiah(MaxLimit),'!!!Error');
 				return false;
 			}
 
@@ -1259,6 +1267,18 @@
 					toastr.error('Budget Status is required','!!!Error');
 					$('#BtnIssued').prop('disabled',false).html('Issued');
 				}
+		})
+
+		$(document).off('click', '#pdfprint').on('click', '#pdfprint',function(e) {
+			var url = base_url_js+'save2pdf/print/prdeparment';
+			var PRCode = $(this).attr('prcode');
+			data = {
+			  PRCode : PRCode,
+			}
+			var token = jwt_encode(data,"UAP)(*");
+			FormSubmitAuto(url, 'POST', [
+			    { name: 'token', value: token },
+			]);
 		})
 	}); // exit document Function
 </script>

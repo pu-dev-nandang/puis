@@ -1373,7 +1373,7 @@ class C_budgeting extends Budgeting_Controler {
         $key = "UAP)(*";
         $Notes = $this->jwt->decode($Notes,$key);
 
-        $PRCode = ($act == 1) ? $this->m_budgeting->Get_PRCode($Year,$Departement) : $PRCode;
+        $PRCode = ($act == 1) ? $this->m_budgeting->Get_PRCode2($Departement) : $PRCode;
         // print_r($PRCode);die();
         if ($act == 1) {
             $dataSave = array(

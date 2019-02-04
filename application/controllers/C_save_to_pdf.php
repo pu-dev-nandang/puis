@@ -5318,6 +5318,36 @@ Phone: (021) 29200456';
         $fpdf->Output('receipt.pdf','I');
     }
 
+    public function print_prdeparment()
+    {
+        try {
+          $token = $this->input->post('token');
+          $this->load->model('budgeting/m_budgeting');
+          $this->load->model('master/m_master');
+
+          $input = $this->getInputToken($token);
+          $PRCode = $input['PRCode'];
+          $PRCodeReplace = str_replace('/', '-', $PRCode);
+          $filename = '__'.$PRCodeReplace.'.pdf';  
+
+          $pr_create = $this->m_budgeting->GetPR_CreateByPRCode($PRCode);
+          $pr_detail = $this->m_budgeting->GetPR_DetailByPRCode($PRCode);
+
+          $fpdf = new Fpdf('L', 'mm', 'A4');
+          $fpdf->SetMargins(10,10,10,10);
+          $fpdf->AddPage();
+          // Logo
+          $fpdf->Image('./images/logo_tr.png',10,10,50);
+
+
+          $fpdf->Output($filename,'I');  
+
+            
+        } catch (Exception $e) {
+            // handling orang iseng
+            echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
 
 
 
