@@ -199,14 +199,14 @@
     				if (response == '') {
     					var StatusWr = '';
     					if (status == '-2') {
-    						newtr.find('td:eq(10)').html('Reject'+'<br>'+reason);
+    						newtr.find('td:eq(9)').html('Reject'+'<br>'+reason);
     						// var newtdhtml = newtd.attr('tdhtml');
     						// newtd.html(newtdhtml);
     						newtd.html('');
     					}
     					else if(status == 2)
     					{
-    						newtr.find('td:eq(10)').html('Approve');
+    						newtr.find('td:eq(9)').html('Approve');
     						newtd.html('');
     					}
     				}
@@ -296,16 +296,16 @@
     				if (response == '') {
     					var StatusWr = '';
     					if (status == '-2') {
-    						newtr.find('td:eq(10)').html('Reject');
+    						newtr.find('td:eq(9)').html('Reject');
     						// var newtdhtml = newtd.attr('tdhtml');
     						// newtd.html(newtdhtml);
     						newtd.html('');
     					}
     					else if(status == 2)
     					{
-    						newtr.find('td:eq(10)').html('Approve');
-    						var st = newtr.find('td:eq(8)').html();
-    						newtr.find('td:eq(8)').html(st+' | '+roomname);
+    						newtr.find('td:eq(9)').html('Approve');
+    						var st = newtr.find('td:eq(7)').html();
+    						newtr.find('td:eq(7)').html(st+' | '+roomname);
     						newtd.html('');
     					}
     					$('.btnsavedata[scheduleexchangeid="'+scheduleexchangeid+'"]').prop('disabled',false).html('Save');
@@ -331,7 +331,7 @@
     						    	if (response2 == '') {
     						    		var StatusWr = '';
     						    		if (status == '-2') {
-    						    			newtr.find('td:eq(10)').html('Reject');
+    						    			newtr.find('td:eq(9)').html('Reject');
     						    			// var newtdhtml = newtd.attr('tdhtml');
     						    			// newtd.html(newtdhtml);
     						    			newtd.html('');
@@ -342,9 +342,9 @@
     						    			var url = base_url_js+'api/__checkBentrokScheduleAPI';
     						    			$.post(url,{token:token},function (data_json3) {
     						    				if (data_json3 == 0 || data_json3 == 1) {
-    						    					newtr.find('td:eq(10)').html('Approve');
-    						    					var st = newtr.find('td:eq(8)').html();
-    						    					newtr.find('td:eq(8)').html(st+' | '+roomname);
+    						    					newtr.find('td:eq(9)').html('Approve');
+    						    					var st = newtr.find('td:eq(7)').html();
+    						    					newtr.find('td:eq(7)').html(st+' | '+roomname);
     						    					newtd.html('');
     						    				}
     						    				

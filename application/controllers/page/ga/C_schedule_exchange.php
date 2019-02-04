@@ -1,5 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+include_once APPPATH.'vendor/autoload.php';
+use ElephantIO\Client;
+use ElephantIO\Engine\SocketIO\Version1X;
 
 class C_schedule_exchange extends Ga_Controler {
 
