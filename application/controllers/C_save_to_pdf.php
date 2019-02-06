@@ -5336,8 +5336,132 @@ Phone: (021) 29200456';
           $fpdf = new Fpdf('L', 'mm', 'A4');
           $fpdf->SetMargins(10,10,10,10);
           $fpdf->AddPage();
+
+          $x = 10;
+          $y = 30;
+          $FontIsianHeader = 8;
+          $FontIsian = 7;
+
           // Logo
           $fpdf->Image('./images/logo_tr.png',10,10,50);
+
+          // note from finance
+          $fpdf->Rect($x,$y,130,10);
+          $fpdf->SetXY(($x+2),($y+2) );
+          $fpdf->SetFont('Arial','b',$FontIsianHeader);
+          $fpdf->Cell(0, 0, 'Notes From Finance : ', 0, 1, 'L', 0);
+
+          // Header Purchase Requisition(PR)
+          $hx = 180;
+          $hy = 15;
+          $fpdf->SetXY($hx,$hy);
+          $fpdf->SetFont('Arial','b',10);
+          $fpdf->Cell(0, 0, 'Purchase Requisition (PR)', 0, 1, 'L', 0);
+
+          $hy += 5;
+          $fpdf->SetXY($hx,$hy);
+          $fpdf->SetFont('Arial','b',$FontIsianHeader);
+          $fpdf->Cell(0, 0, 'No : '.$PRCode, 0, 1, 'L', 0);
+
+
+          $DatePR = date("d M Y", strtotime($pr_create[0]['CreatedAt']));
+          $hy += 5;
+          $fpdf->SetXY($hx,$hy);
+          $fpdf->SetFont('Arial','b',$FontIsianHeader);
+          $fpdf->Cell(0, 0, 'Date : '.$DatePR, 0, 1, 'L', 0);
+
+          // Department & Post Budget
+          $Department = $this->m_budgeting->SearchDepartementBudgeting($pr_create[0]['Departement']);
+          $Department = $Department[0]['Code'];
+          $hx = 150;
+          $hy = 30;
+          $fpdf->Rect($hx,$hy,130,10);
+          $hx = $hx + 2;
+          $hy = $hy + 2;
+          $fpdf->SetXY($hx,$hy);
+          $fpdf->SetFont('Arial','b',$FontIsianHeader);
+          $fpdf->Cell(0, 0, 'Department : '.$Department, 0, 1, 'L', 0);
+
+          $arr_postName = [];
+          for ($i=0; $i < count($pr_detail); $i++) { 
+                $PostName = $pr_detail[$i]['PostName'];
+                $bool = true;
+                for ($j=0; $j < count($arr_postName); $j++) { 
+                    if ($PostName == $arr_postName[$j]) {
+                        $bool = false;
+                        break;
+                    }
+                }
+
+                if ($bool) {
+                    $arr_postName[] = $PostName;
+                }
+
+          }
+
+          $strpostname = implode(',',$arr_postName);
+
+          $hy += 5;
+          $fpdf->SetXY($hx,$hy);
+          $fpdf->SetFont('Arial','b',$FontIsianHeader);
+          $fpdf->Cell(0, 0, 'Post Budget : '.$strpostname, 0, 1, 'L', 0);
+
+          // make table
+            $border = 1;
+            // header
+            $w_no = 8;
+            $w_smt = 8;
+            $w_desc = 65;
+            $w_spec = 65;
+            $w_date_needed = 30;
+            $w_qty = 22;
+            $w_pricest = 40;
+            $w_totalammount = 40;
+            $h=4.3;
+            $y += 15;
+            $fpdf->SetXY($x,$y);
+            $fpdf->SetFillColor(255, 255, 255);
+             $fpdf->Cell($w_no,$h,'No.',$border,0,'C',true);
+             $fpdf->Cell($w_desc,$h,'Description',$border,0,'C',true);
+             $fpdf->Cell($w_spec,$h,'Specification',$border,0,'C',true);
+             $fpdf->Cell($w_date_needed,$h,'Date Needed',$border,0,'C',true);
+             $fpdf->Cell($w_qty,$h,'Quantity',$border,0,'C',true);
+             $fpdf->Cell($w_pricest,$h,'Price Estimated',$border,0,'C',true);
+             $fpdf->Cell($w_totalammount,$h,'Total Amount',$border,1,'C',true);
+
+             // content
+              $no = 1;
+              $fpdf->SetFont('Arial','',$FontIsian);
+             for ($i=0; $i < count($pr_detail); $i++) { 
+                $fpdf->Cell($w_no,$h,$no ,$border,0,'C',true);
+                $fpdf->Cell($w_desc,$h,$pr_detail[$i]['Item'],$border,0,'C',true);
+                $DetailCatalog = (array) json_decode($pr_detail[$i]['DetailCatalog']);
+                $Spec = '';
+                $arr = array();
+                foreach ($DetailCatalog as $key => $value) {
+                    $arr[] = $key.' : '.$value; 
+                }
+
+                $Spec = implode(',', $arr);
+                $lenSpec = strlen($Spec);
+                // print_r($lenSpec);die();
+                if ($lenSpec > 25) {
+                    $Spec = substr($Spec, 0,50).'...';
+                }
+                $fpdf->Cell($w_spec,$h,$Spec,$border,0,'L',true);
+
+                $DateNeeded = date("d M Y", strtotime($pr_detail[0]['DateNeeded']));
+                $fpdf->Cell($w_date_needed,$h,$DateNeeded,$border,0,'C',true);
+                $fpdf->Cell($w_qty,$h,$pr_detail[$i]['Qty'],$border,0,'C',true);
+
+                $UnitCost = 'Rp '.number_format($pr_detail[$i]['UnitCost'],2,',','.');
+                $fpdf->Cell($w_pricest,$h,$UnitCost,$border,0,'C',true);
+
+                $Subtotal= 'Rp '.number_format($pr_detail[$i]['SubTotal'],2,',','.');
+                $fpdf->Cell($w_totalammount,$h,$Subtotal,$border,1,'C',true);
+
+                $no++; 
+             }
 
 
           $fpdf->Output($filename,'I');  
@@ -5345,7 +5469,8 @@ Phone: (021) 29200456';
             
         } catch (Exception $e) {
             // handling orang iseng
-            echo '{"status":"999","message":"jangan iseng :D"}';
+            echo $e;
+            // echo '{"status":"999","message":"jangan iseng :D"}';
         }
     }
 

@@ -848,6 +848,8 @@ $route['rest/academic/__fill_list_mhs_tidak_bayar'] = 'api/c_rest/academic_fill_
 $route['rest/academic/__assign_by_finance_change_status'] = 'api/c_rest/assign_by_finance_change_status';
 $route['rest/academic/__change_status_mhs_multiple'] = 'api/c_rest/change_status_mhs_multiple';
 $route['rest/ga/__show_schedule_exchange'] = 'api/c_rest/show_schedule_exchange';
+$route['rest/__approve_pr'] = 'api/c_rest/approve_pr';
+
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';

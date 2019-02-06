@@ -64,7 +64,17 @@
 
 			// check Rule for Input
 				var url = base_url_js+"budgeting/checkruleinput";
-				$.post(url,function (resultJson) {
+				var data = {
+					NIP : "<?php echo $this->session->userdata('NIP') ?>",
+				};
+				<?php if (isset($Departement)): ?>
+					data = {
+						NIP : "<?php echo $this->session->userdata('NIP') ?>",
+						Departement : "<?php echo $Departement ?>",
+					};
+				<?php endif ?>
+				var token = jwt_encode(data,"UAP)(*");
+				$.post(url,{ token:token },function (resultJson) {
 					var response = jQuery.parseJSON(resultJson);
 					var access = response['access'];
 					if (access.length > 0) {
@@ -102,7 +112,11 @@
 
 		function getAllDepartementPU()
 		{
-		  var Div = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
+			<?php if (isset($Departement)): ?>
+			var Div = "<?php echo $Departement ?>";
+			<?php else: ?>
+			var Div = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
+			<?php endif ?>
 		  var url = base_url_js+"api/__getAllDepartementPU";
 		  $('#DepartementPost').empty();
 		  $.post(url,function (data_json) {
@@ -385,7 +399,9 @@
 	    						var ApprovalBtn = '<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
 					   								'<div class = "col-md-12">'+
 					   									'<div class = "pull-right">'+
-					   										'<button class = "btn btn-default" id = "approve" userAccess = "'+UserAccess+'"> <i class = "fa fa-handshake-o"> </i> Approve</button>'+
+					   										'<button class = "btn btn-primary" id = "approve" userAccess = "'+UserAccess+'" PRCode = "'+PRCodeVal+'"> <i class = "fa fa-handshake-o"> </i> Approve</button>'+
+					   										'&nbsp&nbsp'+
+					   										'<button class = "btn btn-inverse" id = "reject" userAccess = "'+UserAccess+'" PRCode = "'+PRCodeVal+'"> <i class = "fa fa-remove"> </i> Reject</button>'+
 					   									'</div>'+
 					   								'</div>'+
 					   							 '</div>';
@@ -628,7 +644,7 @@
 			};
 
 			arr_id_budget_left = uniqueArray(arr_id_budget_left);
-			console.log(arr_id_budget_left);
+			// console.log(arr_id_budget_left);
 
 			var htmltotal = 0;
 			for (var i = 0; i < arr_id_budget_left.length; i++) {
@@ -1001,6 +1017,8 @@
 			$(".BrowseFile").each(function(){
 				var IDFile = $(this).attr('id');
 				if (!file_validation2(IDFile) ) {
+				  $("#SaveBudget").prop('disabled',true);
+				  find = false;
 				  return false;
 				}
 			})
@@ -1026,7 +1044,7 @@
 		       var no = parseInt(count) + 1;
 		       var name = files[count].name;
 		       var extension = name.split('.').pop().toLowerCase();
-		       if(jQuery.inArray(extension, ['pdf','jpg']) == -1)
+		       if(jQuery.inArray(extension, ['pdf','jpg' ,'png','jpeg']) == -1)
 		       {
 		        msgStr += 'File Number '+ no + ' Invalid Type File<br>';
 		        //toastr.error("Invalid Image File", 'Failed!!');
@@ -1279,6 +1297,82 @@
 			FormSubmitAuto(url, 'POST', [
 			    { name: 'token', value: token },
 			]);
+		})
+
+		$(document).off('click', '#approve').on('click', '#approve',function(e) {
+			if (confirm('Are you sure ?')) {
+				loading_button('#approve');
+				var PRCode = $(this).attr('prcode');
+				var useraccess = $(this).attr('useraccess');
+
+				var url = base_url_js + 'rest/__approve_pr';
+				var data = {
+					PRCode : PRCode,
+					useraccess : useraccess,
+					NIP : "<?php echo $this->session->userdata('NIP') ?>",
+					action : 'approve',
+					auth : 's3Cr3T-G4N',
+				}
+
+				var token = jwt_encode(data,"UAP)(*");
+				$.post(url,{ token:token },function (resultJson) {
+					if (resultJson == '') {
+						$(".menuEBudget li").removeClass('active');
+						$(".pageAnchor[page='data']").parent().addClass('active');
+						LoadPage('data');
+					}
+					else
+					{
+						$('#approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+					}
+				}).fail(function() {
+
+				  // toastr.info('No Result Data');
+				  toastr.error('The Database connection error, please try again', 'Failed!!');
+				}).always(function() {
+				    $('#approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+				});
+			}
+			
+
+		})
+
+		$(document).off('click', '#reject').on('click', '#reject',function(e) {
+			if (confirm('Are you sure ?')) {
+				loading_button('#approve');
+				var PRCode = $(this).attr('prcode');
+				var useraccess = $(this).attr('useraccess');
+
+				var url = base_url_js + 'rest/__approve_pr';
+				var data = {
+					PRCode : PRCode,
+					useraccess : useraccess,
+					NIP : "<?php echo $this->session->userdata('NIP') ?>",
+					action : 'reject',
+					auth : 's3Cr3T-G4N',
+				}
+
+				var token = jwt_encode(data,"UAP)(*");
+				$.post(url,{ token:token },function (resultJson) {
+					if (resultJson == '') {
+						$(".menuEBudget li").removeClass('active');
+						$(".pageAnchor[page='data']").parent().addClass('active');
+						LoadPage('data');
+					}
+					else
+					{
+						$('#approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+					}
+				}).fail(function() {
+
+				  // toastr.info('No Result Data');
+				  toastr.error('The Database connection error, please try again', 'Failed!!');
+				}).always(function() {
+				    $('#approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+				});
+			}
+			
+
 		})
 	}); // exit document Function
 </script>

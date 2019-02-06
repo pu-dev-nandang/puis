@@ -2002,4 +2002,87 @@ class C_rest extends CI_Controller {
           echo '{"status":"999","message":"jangan iseng :D"}';
         }
     }
+
+    public function approve_pr()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('budgeting/m_budgeting');
+                $PRCode = $dataToken['PRCode'];
+                $useraccess = $dataToken['useraccess'];
+                $NIP = $dataToken['NIP'];
+                $action = $dataToken['action'];
+
+                // get data
+                $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
+                $keyJson = $useraccess - 2; // get array index json
+                $JsonStatus = (array)json_decode($G_data[0]['JsonStatus'],true);
+                // get data update to approval
+                $arr_upd = $JsonStatus[$keyJson];
+                // print_r($keyJson);die();
+                if ($arr_upd['ApprovedBy'] == $NIP) {
+                    $arr_upd['Status'] = ($action == 'approve') ? 1 : 2;
+                    $arr_upd['ApproveAt'] = ($action == 'approve') ? date('Y-m-d H:i:s') : '-';
+                    $JsonStatus[$keyJson] = $arr_upd;
+                    $datasave = array(
+                        'JsonStatus' => json_encode($JsonStatus),
+                    );
+
+                    // check all status for update data
+                    $boolApprove = true;
+                    for ($i=0; $i < count($JsonStatus); $i++) { 
+                        $arr = $JsonStatus[$i];
+                        $Status = $arr['Status'];
+                        if ($Status == 2 || $Status == 0) {
+                            $boolApprove = false;
+                            break;
+                        }
+                    }
+
+                    if ($boolApprove) {
+                        $datasave['Status'] = 2;
+                    }
+                    else
+                    {
+                        $boolReject = false;
+                        for ($i=0; $i < count($JsonStatus); $i++) { 
+                            $arr = $JsonStatus[$i];
+                            $Status = $arr['Status'];
+                            if ($Status == 2) {
+                                $boolReject = true;
+                                break;
+                            }
+                        }
+
+                        if ($boolReject) {
+                            $datasave['Status'] = 3;
+                        }
+                    }
+
+                    $this->db->where('PRCode',$PRCode);
+                    $this->db->update('db_budgeting.pr_create',$datasave);
+
+                }
+                else
+                {
+                    $msg = 'Not Authorize';
+                }
+
+                echo json_encode($msg);    
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
 }

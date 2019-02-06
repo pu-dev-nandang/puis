@@ -530,21 +530,23 @@ class M_budgeting extends CI_Model {
                 $MaxLimit = $query[$i]['MaxLimit'];
                 $arr[]= $query[$i]['ID_m_userrole'];
                 $bool = false;
-                for ($j=$i+1; $j < count($query); $j++) {
+                for ($j=$i+1; $j < count($query); $j++) { 
                     $MaxLimit2 = $query[$j]['MaxLimit'];
                     if ($MaxLimit == $MaxLimit2) {
-                        $boolF = false;
-                        for ($z=0; $z < count($arr); $z++) {
-                            if ($arr[$z] == $query[$j]['ID_m_userrole']) {
-                                 $boolF = true;
-                                 break;
-                            } 
+                        $boolz = false;
+                        for ($z=0; $z < count($arr); $z++) { 
+                            if ($query[$j]['ID_m_userrole'] == $arr[$z]) {
+                                $boolz = true;
+                                break;
+                            }
                         }
 
-                        if (!$boolF) {
-                            $arr[]= $query[$j]['ID_m_userrole']; 
+                        if (!$boolz) {
+                            $arr[]= $query[$j]['ID_m_userrole'];
                         }
-                        
+
+                        $i = $j;
+
                     }
                     else
                     {
@@ -554,12 +556,11 @@ class M_budgeting extends CI_Model {
                 }
 
                 if ($bool) {
-                   break;
-                }      
+                    break;
+                }     
 
             }
 
-            // print_r($arr);die();
         // find approver
             for ($i=0; $i < count($arr); $i++) { 
                $sql = 'select * from db_budgeting.cfg_set_roleuser where Departement = "'.$Departement.'" and ID_m_userrole = '.$arr[$i];
@@ -600,7 +601,7 @@ class M_budgeting extends CI_Model {
     public function GetPR_DetailByPRCode($PRCode)
     {
         $sql = 'select a.ID,a.PRCode,a.ID_budget_left,b.ID_creator_budget,c.CodePostBudget,d.CodeSubPost,e.CodePost,
-                e.RealisasiPostName,f.PostName,a.ID_m_catalog,g.Item,
+                e.RealisasiPostName,f.PostName,a.ID_m_catalog,g.Item,g.Desc,g.DetailCatalog,
                 a.Qty,a.UnitCost,a.SubTotal,a.DateNeeded,a.BudgetStatus,a.UploadFile
                 from db_budgeting.pr_detail as a
                 join db_budgeting.budget_left as b on a.ID_budget_left = b.ID
@@ -624,5 +625,25 @@ class M_budgeting extends CI_Model {
         $arr_result['rule'] = $this->m_master->caribasedprimary('db_budgeting.cfg_set_userrole','ID_m_userrole',$query[0]['ID_m_userrole']);
         $arr_result['access'] = $query;
         return $arr_result; 
+    }
+
+    public function Get_m_Approver()
+    {
+        $sql = 'select * from db_budgeting.cfg_m_userrole where ID != 1';
+        $query = $this->db->query($sql, array())->result_array();
+        return $query;   
+    }
+
+    public function SearchDepartementBudgeting($DepartementBudgeting)
+    {
+        $sql = 'select * from (
+                select CONCAT("AC.",ID) as ID, NameEng as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
+                UNION
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                ) aa
+                where ID = ?
+                ';
+        $query=$this->db->query($sql, array($DepartementBudgeting))->result_array();
+        return $query;
     }  
 }
