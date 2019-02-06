@@ -4028,6 +4028,8 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,$Student['Prodi'],$border,0,'L');
 
+        // print_r($Student['Prodi'][0]);exit();
+
         if ($Student['Prodi'][0]=='A') 
         {
             $pdf->SetX(108);  
@@ -4037,6 +4039,12 @@ class C_save_to_pdf extends CI_Controller {
         }else if ($Student['Prodi'][0]=='K')
         {
             $pdf->SetX(118);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+        }else if ($Student['Prodi'][0]=='B')
+        {
+            $pdf->SetX(119);
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,'/',$border,0,'L');
             $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
@@ -4065,6 +4073,8 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($label,$h,'Program Pendidikan',$border,0,'L');
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,$Student['GradeDesc'],$border,0,'L');
+
+        // print_r($Student['GradeDesc'][0]);exit();
 
         if ($Student['GradeDesc'][0]=='S')
         {
