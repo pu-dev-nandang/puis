@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="<?php  echo base_url('assets/template/css/fontawesome/font-awesome.min.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('assets/template/css/fontawesome4/css/font-awesome.min.css'); ?>">
 
+    <!-- Animated CSS -->
+    <link href="<?php echo base_url('assets/template/plugins/animate/animate.css'); ?>" rel="stylesheet" type="text/css" />
 
 
 
@@ -67,11 +69,29 @@
             $(''+element).html('<i class="fa fa-refresh fa-spin fa-fw"></i>');
             $(''+element).prop('disabled',true);
         }
+
+        function ucwords(str) {
+            return str.toLowerCase().replace(/\b[a-z]/g, function(letter) {
+                return letter.toUpperCase();
+            });
+        }
+
     </script>
 </head>
 <body style="background: #f7f7f7;">
 
 <?php echo $content; ?>
+
+<!-- Global Modal -->
+<div class="modal fade" id="GlobalModal" role="dialog">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content animated flipInX">
+            <div class="modal-header"></div>
+            <div class="modal-body"></div>
+            <div class="modal-footer"></div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 </body>
 </html>

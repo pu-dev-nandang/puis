@@ -909,6 +909,7 @@ $route['api/__crudTransferStudent'] = 'api/c_api/crudTransferStudent';
 // === API 2 ===
 
 $route['api2/__crudScheduleExchage'] = 'api/c_api2/crudScheduleExchage';
+$route['api2/__crudModifyAttendance'] = 'api/c_api2/crudModifyAttendance';
 
 
 // Penutup API 2 ===
@@ -1044,6 +1045,8 @@ $route['testInject5'] = 'api/c_global/testInject5';
 // Action From Email
 $route['fmail/schedule-exchange/approved/(:any)'] = 'api/c_global/exchange_approved/$1';
 $route['fmail/schedule-exchange/rejected/(:any)'] = 'api/c_global/exchange_rejected/$1';
+
+$route['fmail/modify-attendance/(:any)/(:any)'] = 'api/c_global/modify_attendance/$1/$2';
 
 
 // Pengawas Ujian

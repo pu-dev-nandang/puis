@@ -38,6 +38,13 @@ class C_api2 extends CI_Controller {
         return $data_arr;
     }
 
+    private function getInputToken2($token)
+    {
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+        return $data_arr;
+    }
+
     public function is_url_exist($url){
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_NOBODY, true);
@@ -76,7 +83,6 @@ class C_api2 extends CI_Controller {
         $pr = curl_exec($ch);
         curl_close ($ch);
     }
-
 
 
     public function crudScheduleExchage(){
@@ -517,6 +523,372 @@ class C_api2 extends CI_Controller {
 
         }
 
+    }
+
+    public function crudModifyAttendance(){
+        $data_arr = $this->getInputToken();
+        if (count($data_arr) > 0) {
+
+            if ($data_arr['action'] == 'checkStatusModifyAttd') {
+
+                $IDAM = $data_arr['IDAM'];
+
+                $data = $this->db->query('SELECT am.Status, em.Name AS Lecturer, am.Reason_Reject AS Reason FROM db_academic.attendance_modify am 
+                                                    LEFT JOIN db_employees.employees em ON (em.NIP = am.Updated1By)
+                                                    WHERE am.ID = "'.$IDAM.'" ')->result_array();
+
+
+                return print_r(json_encode($data));
+
+            }
+            else if($data_arr['action']=='rejectedModifyAttd'){
+
+                $dataRequsted = $this->db->query('SELECT am.RequestBy, em.EmailPU, em.Name AS Lecturer, em.Gender, am.DataEmail FROM db_academic.attendance_modify am 
+                                                            LEFT JOIN db_employees.employees em ON (em.NIP = am.RequestBy)
+                                                            WHERE am.ID = "'.$data_arr['IDAM'].'" ')->result_array();
+
+
+                $dataUpdate = array(
+                    'Reason_Reject' => $data_arr['Reason'],
+                    'Updated1By' => $data_arr['Updated1By'],
+                    'Updated1At' => $data_arr['Updated1At'],
+                    'Status' => '-1'
+                );
+                $this->db->where('ID', $data_arr['IDAM']);
+                $this->db->update('db_academic.attendance_modify',$dataUpdate);
+
+
+                $dataKaprodi = $this->db->select('Name,Photo')->get_where('db_employees.employees',
+                    array('NIP' => $data_arr['Updated1By']))->result_array();
+
+                if(count($dataKaprodi)>0){
+
+                    $DataEmail = $this->getInputToken2($dataRequsted[0]['DataEmail']);
+
+                    //============= Logging ==========
+                    // Insert Logging
+                    $url = base_url('uploads/employees/'.$dataKaprodi[0]['Photo']);
+                    $img_profile = ($this->is_url_exist($url) && $dataKaprodi[0]['Photo']!='')
+                        ? $url
+                        : url_server_ws.'/images/icon/lecturer.png';
+
+                    $Log_dataInsert = array(
+                        'Icon' => $img_profile,
+                        'Title' => '<i class="fa fa-times-circle margin-right" style="color:darkred;"></i> Modify Attendance Rejected',
+                        'Description' => $DataEmail['Code'].' - '.$DataEmail['CourseEng'].' | Group : '.$DataEmail['Group'].' | Session : '.$DataEmail['Session'],
+                        'URLDirectLecturer' => 'attendance/list-attendance',
+                        'CreatedBy' => $data_arr['Updated1By'],
+                        'CreatedName' => $dataKaprodi[0]['Name'],
+                        'CreatedAt' => $data_arr['Updated1At'],
+                    );
+
+                    $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
+                    $insert_id_logging = $this->db->insert_id();
+
+                    // insert ke user
+                    $Log_arr_ins = array(
+                        'IDLogging' => $insert_id_logging,
+                        'UserID' => $dataRequsted[0]['RequestBy']
+                    );
+                    $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+
+                    // Send Email
+                    $mailTo = (count($dataRequsted)>0)
+                        ? $dataRequsted[0]['EmailPU']
+                        : $this->DummyEmail;
+
+
+
+
+                    $greating = ($dataRequsted[0]['Gender']=='L')  ? 'Bapak' : 'Ibu';
+                    $bodyEmail = '<div>
+                    Dear <span style="color: #333;">'.$greating.' '.ucwords($dataRequsted[0]['Lecturer']).'</span>,
+                    <br/>
+                    Perihal : <b>Perubahan Data Absensi Mahasiswa</b>
+
+                    <br/>
+                    <br/>
+
+                    <div style="background: lightyellow;color: red;border: 1px solid red; text-align: center;padding: 7px;margin-bottom: 10px;">
+                        <h2 style="margin-top: 7px;margin-bottom: 0px;">Permohonan Ditolak</h2>
+                        <p style="color: blue;margin-top: 3px;">
+                            '.$data_arr['Reason'].'
+                        </p>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <p>--- Detail permohonan ---</p>
+                    </div>
+
+                    <div style="font-size: 14px;">
+                        <table  width="100%" cellspacing="0" cellpadding="1" border="0">
+                            <tbody>
+                            <tr>
+                                <td style="width: 20%;">Dosen</td>
+                                <td style="width: 2%;">:</td>
+                                <td style="width: 40%;">'.ucwords($dataRequsted[0]['Lecturer']).'</td>
+                            </tr>
+                            <tr>
+                                <td>Kode</td>
+                                <td>:</td>
+                                <td>'.$DataEmail['Code'].'</td>
+                            </tr>
+                            <tr>
+                                <td>Mata Kuliah</td>
+                                <td>:</td>
+                                <td>'.$DataEmail['CourseEng'].'</td>
+                            </tr>
+                            <tr>
+                                <td>Group Kelas</td>
+                                <td>:</td>
+                                <td>'.$DataEmail['Group'].'</td>
+                            </tr>
+                            <tr>
+                                <td>Sesi (Pertemuan ke)</td>
+                                <td>:</td>
+                                <td>'.$DataEmail['Session'].'</td>
+                            </tr>
+                            <tr>
+                                <td>Alasan</td>
+                                <td>:</td>
+                                <td>'.$DataEmail['Reason'].'</td>
+                            </tr>
+
+
+                            <tr>
+                                <td colspan="3" style="color: #673AB7;">Mengajukan permohonan untuk perubahan daftar hadir mahasiswa</td>
+                            </tr>
+
+                            <tr>
+                                <td>Sebelumnya</td>
+                                <td>:</td>
+                                <td>'.$DataEmail['Before'].'</td>
+                            </tr>
+                            <tr>
+                                <td>Menjadi</td>
+                                <td>:</td>
+                                <td>'.$DataEmail['After'].'</td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                        <br/>
+                        <p>
+                            Demikian permohonan ini saya ajukan, mohon dapat diproses sesuai dengan ketentuan yang berlaku. Terima kasih
+                        </p>
+                        <br/>
+                        <br/>
+
+                        <table  width="100%" cellspacing="5" cellpadding="1" border="0">
+                            <tr>
+                                <td style="width: 100%;" align="center">
+                                    Rejected By
+                                    <br/>
+                                    <h3 style="color: #009688;margin-top: 7px;">'.$dataKaprodi[0]['Name'].'
+                                        <br/>
+                                        <small>'.$data_arr['Updated1By'].'</small>
+                                    </h3>
+                                </td>
+
+                            </tr>
+                        </table>
+
+                    </div>
+                </div>';
+                    $data = array(
+                        'to' => $mailTo,
+                        'subject' => 'Kaprodi : Modify Attendance Rejected',
+                        'text' => $bodyEmail,
+                        'auth' => 's3Cr3T-G4N'
+                    );
+
+                    $this->sendMailRest($data);
+                }
+
+
+                return print_r(1);
+            }
+            else if($data_arr['action']=='approvedModifyAttd'){
+                $dataRequsted = $this->db->query('SELECT am.RequestBy, em.EmailPU, em.Name AS Lecturer, em.Gender, am.DataEmail FROM db_academic.attendance_modify am 
+                                                            LEFT JOIN db_employees.employees em ON (em.NIP = am.RequestBy)
+                                                            WHERE am.ID = "'.$data_arr['IDAM'].'" ')->result_array();
+
+
+                $dataUpdate = array(
+                    'Updated1By' => $data_arr['Updated1By'],
+                    'Updated1At' => $data_arr['Updated1At'],
+                    'Status' => '1'
+                );
+
+                $this->db->where('ID', $data_arr['IDAM']);
+                $this->db->update('db_academic.attendance_modify',$dataUpdate);
+                $this->db->reset_query();
+
+                // Get Detail Modify Atttendance
+                $dataStd = $this->db->get_where('db_academic.attendance_modify_details'
+                    ,array('IDAM' => $data_arr['IDAM']))->result_array();
+
+                if(count($dataStd)>0){
+                    foreach ($dataStd AS $item){
+
+                        $dataUpdate = array(
+                            'M'.$item['Sesi'] => ''.$item['Meet'],
+                            'D'.$item['Sesi'] => $item['Reason']
+                        );
+                        $this->db->where('ID', $item['IDAS']);
+                        $this->db->update('db_academic.attendance_students',$dataUpdate);
+
+                    }
+                }
+
+
+                $dataKaprodi = $this->db->select('Name,Photo')->get_where('db_employees.employees',
+                    array('NIP' => $data_arr['Updated1By']))->result_array();
+
+                if(count($dataKaprodi)>0){
+
+                    $DataEmail = $this->getInputToken2($dataRequsted[0]['DataEmail']);
+
+                    //============= Logging ==========
+                    // Insert Logging
+                    $url = base_url('uploads/employees/'.$dataKaprodi[0]['Photo']);
+                    $img_profile = ($this->is_url_exist($url) && $dataKaprodi[0]['Photo']!='')
+                        ? $url
+                        : url_server_ws.'/images/icon/lecturer.png';
+
+                    $Log_dataInsert = array(
+                        'Icon' => $img_profile,
+                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Modify Attendance Approved',
+                        'Description' => $DataEmail['Code'].' - '.$DataEmail['CourseEng'].' | Group : '.$DataEmail['Group'].' | Session : '.$DataEmail['Session'],
+                        'URLDirectLecturer' => 'attendance/list-attendance',
+                        'CreatedBy' => $data_arr['Updated1By'],
+                        'CreatedName' => $dataKaprodi[0]['Name'],
+                        'CreatedAt' => $data_arr['Updated1At'],
+                    );
+
+                    $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
+                    $insert_id_logging = $this->db->insert_id();
+
+                    // insert ke user
+                    $Log_arr_ins = array(
+                        'IDLogging' => $insert_id_logging,
+                        'UserID' => $dataRequsted[0]['RequestBy']
+                    );
+                    $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+
+                    // Send Email
+                    $mailTo = (count($dataRequsted)>0)
+                        ? $dataRequsted[0]['EmailPU']
+                        : $this->DummyEmail;
+
+
+                    $greating = ($dataRequsted[0]['Gender']=='L')  ? 'Bapak' : 'Ibu';
+                    $bodyEmail = '<div>
+                    Dear <span style="color: #333;">'.$greating.' '.ucwords($dataRequsted[0]['Lecturer']).'</span>,
+                    <br/>
+                    Perihal : <b>Perubahan Data Absensi Mahasiswa</b>
+
+                    <br/>
+                    <br/>
+
+                    <div style="background: lightyellow;border: 1px solid green;color: green;text-align: center;padding: 7px;margin-bottom: 10px;">
+                        <h2 style="margin-top: 7px;margin-bottom: 10px;">Permohonan diterima</h2>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <p>--- Detail permohonan ---</p>
+                    </div>
+
+                    <div style="font-size: 14px;">
+                        <table  width="100%" cellspacing="0" cellpadding="1" border="0">
+                            <tbody>
+                            <tr>
+                                <td style="width: 20%;">Dosen</td>
+                                <td style="width: 2%;">:</td>
+                                <td style="width: 40%;">'.ucwords($dataRequsted[0]['Lecturer']).'</td>
+                            </tr>
+                            <tr>
+                                <td>Kode</td>
+                                <td>:</td>
+                                <td>'.$DataEmail['Code'].'</td>
+                            </tr>
+                            <tr>
+                                <td>Mata Kuliah</td>
+                                <td>:</td>
+                                <td>'.$DataEmail['CourseEng'].'</td>
+                            </tr>
+                            <tr>
+                                <td>Group Kelas</td>
+                                <td>:</td>
+                                <td>'.$DataEmail['Group'].'</td>
+                            </tr>
+                            <tr>
+                                <td>Sesi (Pertemuan ke)</td>
+                                <td>:</td>
+                                <td>'.$DataEmail['Session'].'</td>
+                            </tr>
+                            <tr>
+                                <td>Alasan</td>
+                                <td>:</td>
+                                <td>'.$DataEmail['Reason'].'</td>
+                            </tr>
+
+
+                            <tr>
+                                <td colspan="3" style="color: #673AB7;">Mengajukan permohonan untuk perubahan daftar hadir mahasiswa</td>
+                            </tr>
+
+                            <tr>
+                                <td>Sebelumnya</td>
+                                <td>:</td>
+                                <td>'.$DataEmail['Before'].'</td>
+                            </tr>
+                            <tr>
+                                <td>Menjadi</td>
+                                <td>:</td>
+                                <td>'.$DataEmail['After'].'</td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                        <br/>
+                        <p>
+                            Demikian permohonan ini saya ajukan, mohon dapat diproses sesuai dengan ketentuan yang berlaku. Terima kasih
+                        </p>
+                        <br/>
+                        <br/>
+
+                        <table  width="100%" cellspacing="5" cellpadding="1" border="0">
+                            <tr>
+                                <td style="width: 100%;" align="center">
+                                    Approved By
+                                    <br/>
+                                    <h3 style="color: #009688;margin-top: 7px;">'.$dataKaprodi[0]['Name'].'
+                                        <br/>
+                                        <small>'.$data_arr['Updated1By'].'</small>
+                                    </h3>
+                                </td>
+
+                            </tr>
+                        </table>
+
+                    </div>
+                </div>';
+                    $data = array(
+                        'to' => $mailTo,
+                        'subject' => 'Kaprodi : Modify Attendance Approved',
+                        'text' => $bodyEmail,
+                        'auth' => 's3Cr3T-G4N'
+                    );
+
+                    $this->sendMailRest($data);
+                }
+
+
+                return print_r(1);
+            }
+
+        }
     }
 
 
