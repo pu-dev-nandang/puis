@@ -4018,7 +4018,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetX(5);
         $pdf->SetFont('Arial','I',$fn_e);
-        $pdf->Cell(78,$h,'/ Faculty',$border,1,'C');
+        $pdf->Cell(78,$h,'/  Faculty',$border,1,'C');
         $pdf->Ln($ln);
 
         // ===== Prodi =====
@@ -4028,7 +4028,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,$Student['Prodi'],$border,0,'L');
 
-        // print_r($Student['Prodi'][0]);exit();
+        // print_r($Student['Prodi']);exit();
 
         if ($Student['Prodi'][0]=='A') 
         {
@@ -4036,15 +4036,52 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,'/',$border,0,'L');
             $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');   
-        }else if ($Student['Prodi'][0]=='K')
+        }
+        else if ($Student['Prodi'][0]=='K')
         {
             $pdf->SetX(118);
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,'/',$border,0,'L');
             $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
-        }else if ($Student['Prodi'][0]=='B')
+        }
+        else if ($Student['Prodi'][0]=='B')
         {
             $pdf->SetX(119);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+        }
+        else if ($Student['Prodi'][0]=='H')
+        {
+            $pdf->SetX(115);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+        }
+        else if ($Student['Prodi'][0]=='P')
+        {
+            $pdf->SetX(143);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+        }
+        else if ($Student['Prodi'][0]=='D')
+        {
+            $pdf->SetX(116);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+        }
+        else if ($Student['Prodi']=='Teknik Lingkungan')
+        {
+            $pdf->SetX(123);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+        }
+         else if ($Student['Prodi']=='Teknik Konstruksi Bangunan')
+        {
+            $pdf->SetX(137);
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,'/',$border,0,'L');
             $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
@@ -4052,7 +4089,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetX(47);
         $pdf->SetFont('Arial','I',$fn_e);
-        $pdf->Cell(67,$h,'/ Study Program',$border,0,'L');
+        $pdf->Cell(67,$h,'/  Study Program',$border,0,'L');
 
         if ($Student['Prodi'][0]=='M') 
         {
@@ -4083,7 +4120,7 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Cell($sp,$h,' /',$border,0,'L');
             $pdf->Cell($fill,$h,$Student['GradeDescEng'],$border,0,'L');
         }else{
-            $pdf->SetX(118);// S1
+            $pdf->SetX(117);// D4
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,' /',$border,0,'L');
             $pdf->Cell($fill,$h,$Student['GradeDescEng'],$border,0,'L');
@@ -4104,7 +4141,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetX(113);
         $pdf->SetFont('Arial','I',$fn_e);
-        $pdf->Cell($sp,$h,'/ Accredited',$border,0,'L');
+        $pdf->Cell($sp,$h,'/  Accredited',$border,0,'L');
 
         // $pdf->SetX(37);
         // $pdf->SetFont('Arial','I',$fn_e);
@@ -4119,16 +4156,16 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetX(53);
         $pdf->SetFont('Arial','I',$fn_e);
-        $pdf->Cell($label,$h,'/ Date of Conferral',$border,1,'L');
+        $pdf->Cell($label,$h,'/  Date of Conferral',$border,1,'L');
         $pdf->Cell(10,5,'',0,1);//memberikan enter/jarak ke bawah
 
         // ===== Ket 2 =====
         // $pdf->SetX($x);
         $pdf->SetX($x);
         $pdf->SetFont('Arial','',$fn_b);
-        $pdf->Cell($fillFull,$h,'Adalah benar mahasiswa yang telah menempuh studi dan menyelesaikan seluruh persyaratan',$border,1,'L');
+        $pdf->Cell($fillFull,$h,'Adalah benar mahasiswa yang telah menempuh studi dan menyelesaikan seluruh persyaratan kelulusan',$border,1,'L');
         $pdf->SetX($x);
-        $pdf->Cell($fillFull,$h,'kelulusan menjadi '.$Student['Degree'].' pada Semester Genap Tahun Akademik 2017/2018',$border,1,'L');
+        $pdf->Cell($fillFull,$h,'menjadi '.$Student['Degree'].' pada Semester Genap Tahun Akademik 2017/2018',$border,1,'L');
         $pdf->SetX($x);
         $pdf->Cell($fillFull,$h,'di Universitas Agung Podomoro.',$border,1,'L');
         $pdf->Ln(1);
@@ -4142,9 +4179,9 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetX($x);
         $pdf->SetFont('Arial','I',$fn_e);
-        $pdf->Cell($fillFull,$h,'Had completed '.$Kelamin.' studies and qualification to earn Bachelor Degree in the Even Semeter of Academic ',$border,1,'L');
+        $pdf->Cell($fillFull,$h,'Had completed '.$Kelamin.' studies and qualification to earn Bachelor Degree in the Even Semeter of Academic Year',$border,1,'L');
         $pdf->SetX($x);
-        $pdf->Cell($fillFull,$h,'Year 2017/2018 at Podomoro University.',$border,1,'L');
+        $pdf->Cell($fillFull,$h,'2017/2018 at Podomoro University.',$border,1,'L');
         $y = $pdf->GetY()+7;
         $pdf->Ln(4);
         // $pdf->Cell(10,5,'',0,1);//memberikan enter/jarak ke bawah
