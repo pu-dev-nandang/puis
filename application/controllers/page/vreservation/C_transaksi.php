@@ -1020,10 +1020,18 @@ class C_transaksi extends Vreservation_Controler {
                 $subject = "Podomoro University Venue Reservation Approved";
                 $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
             }
-            
+
+            // email to division choice
+            $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','Room',$get[0]['Room']);
+            $CategoryRoomByRoom = $getRoom[0]['ID_CategoryRoom'];
+            $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
+            $Approver2Div = $getDataCategoryRoom[0]['Approver2'];
+            $Approver2Div = json_decode($Approver2Div);
+            $DivisionApprove = $this->m_master->caribasedprimary('db_employees.division','ID',$Approver2Div[0]);
+
             $token = array(
-                    'EmailPU' => 'ga@podomorouniversity.ac.id',
-                    'Code' => 8,
+                    'EmailPU' => $DivisionApprove[0]['Email'],
+                    'Code' => $DivisionApprove[0]['ID'],
                     'ID_t_booking' => $ID,
                     'approvalNo' => 2,
                     'Email_add_person' => $Email_add_person,
@@ -1031,13 +1039,13 @@ class C_transaksi extends Vreservation_Controler {
                     'EmailKetAdditional' => $EmailKetAdditional,
                     'KetAdditional_eq' => $KetAdditional_eq,
             );
+            
             $token = $this->jwt->encode($token,'UAP)(*');
 
             if ($approveaccess == 2) {
                 if($_SERVER['SERVER_NAME']!='localhost') {
-                    // email to ga
-                    $Email = 'ga@podomorouniversity.ac.id';
-                    $text = 'Dear GA Team,<br><br>
+                    $Email = $DivisionApprove[0]['Email'];
+                    $text = 'Dear '.$DivisionApprove[0]['Division'].',<br><br>
                                 Please help to approve Venue Reservation,<br><br>
                                 Details Schedule : <br><ul>
                                 <li>Start  : '.$StartNameDay.', '.$Start.'</li>
@@ -1075,7 +1083,7 @@ class C_transaksi extends Vreservation_Controler {
                 else
                 {
                     $Email = 'alhadi.rahman@podomorouniversity.ac.id';
-                    $text = 'Dear GA Team,<br><br>
+                    $text = 'Dear '.$DivisionApprove[0]['Division'].',<br><br>
                                 Please help to approve Venue Reservation,<br><br>
                                 Details Schedule : <br><ul>
                                 <li>Start  : '.$StartNameDay.', '.$Start.'</li>

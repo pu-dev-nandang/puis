@@ -720,7 +720,7 @@ class C_global extends CI_Controller {
                                         if($_SERVER['SERVER_NAME']!='localhost') {
                                             // email to ga
                                             $Email = $EmailApprover2;
-                                            $text = 'Dear Team,<br><br>
+                                            $text = 'Dear '.$getApprover2[0]['Division'].',<br><br>
                                                         Please help to approve Venue Reservation,<br><br>
                                                         Details Schedule : <br><ul>
                                                         <li>Start  : '.$StartNameDay.', '.$t_booking[0]['Start'].'</li>
@@ -757,7 +757,7 @@ class C_global extends CI_Controller {
                                         else
                                         {
                                             $Email = 'alhadi.rahman@podomorouniversity.ac.id';
-                                            $text = 'Dear Team,<br><br>
+                                            $text = 'Dear '.$getApprover2[0]['Division'].',<br><br>
                                                         Please help to approve Venue Reservation,<br><br>
                                                         Details Schedule : <br><ul>
                                                         <li>Start  : '.$StartNameDay.', '.$t_booking[0]['Start'].'</li>
@@ -775,6 +775,12 @@ class C_global extends CI_Controller {
                                                             <tr>
                                                                 <td bgcolor="#51a351" align="center">
                                                                     <a href="'.url_pas.'approve_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >Approve</a>
+                                                                </td>
+                                                                <td>
+                                                                   -
+                                                                </td>
+                                                                <td bgcolor="#de4341" align="center">
+                                                                    <a href="'.url_pas.'cancel_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #de4341;" target="_blank" >Reject</a>
                                                                 </td>
                                                             </tr>
                                                             </tbody>
