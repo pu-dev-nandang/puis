@@ -4055,9 +4055,9 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->SetX(90.5);
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
-            $pdf->Ln(4);
+            // $pdf->Ln(4);
         }
-        $pdf->Ln(1.5);
+        $pdf->Ln(5.5);
 
         // ===== Program Pendidikan =====
         $pdf->SetX($x);

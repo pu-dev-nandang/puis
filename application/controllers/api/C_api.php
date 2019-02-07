@@ -5413,7 +5413,7 @@ class C_api extends CI_Controller {
 
             // send email and update notification
             // broadcase update js
-            if($_SERVER['SERVER_NAME'] =='localhost') {
+           /* if($_SERVER['SERVER_NAME'] =='localhost') {
                 $client = new Client(new Version1X('//10.1.10.230:3000'));
             }
             else{
@@ -5423,7 +5423,7 @@ class C_api extends CI_Controller {
                 $client->initialize();
                 // send message to connected clients
                 $client->emit('update_schedule_notifikasi', ['update_schedule_notifikasi' => '1','date' => '']);
-                $client->close();
+                $client->close();*/
 
                 $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['Start']);
                 $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['End']);
@@ -6933,14 +6933,35 @@ class C_api extends CI_Controller {
                     }
                     if ($data[$i]['Approver2']) {
                         $y= json_decode($data[$i]['Approver2']);
+                        $z = $data[$i]['Approver2'];
                         $x = array();
                         for ($l=0; $l < count($y); $l++) {
-                            $Name = $this->m_master->caribasedprimary('db_employees.division','ID',$y[$l]);
+
+                            // cek Type Approver
+                            $TypeApprover = $y[$l]->TypeApprover;
+                            $ApproverGet = $y[$l]->Approver;
+                            switch ($TypeApprover) {
+                                case 'Division':
+                                    $Approver = $this->m_master->caribasedprimary('db_employees.division','ID',$ApproverGet);
+                                    $Approver = $Approver[0]['Division'];
+                                    break;
+
+                                case 'Position':
+                                    $Approver = $this->m_master->caribasedprimary('db_employees.position','ID',$ApproverGet);
+                                    $Approver = $Approver[0]['Position'];
+                                    break;
+                                case 'Employees':
+                                    $Approver = $this->m_master->caribasedprimary('db_employees.employees','NIP',$ApproverGet);
+                                    $Approver = $Approver[0]['NIP'].' - '.$Approver[0]['Name'];
+                                    break;
+
+                            }
+
                             $tanda = ($l==0) ? '*   ' : '';
-                            $x[] = $tanda.$Name[0]['Division'];
+                            $x[] = $tanda.$TypeApprover.' -> '.$Approver;
                         }
                         $data[$i]['Approver2'] = implode('<br>*  ', $x);
-                        $data[$i]['Approver2_ori'] = $y;
+                        $data[$i]['Approver2_ori'] = str_replace('"', "'", $z) ;
                     }
                 }
 
