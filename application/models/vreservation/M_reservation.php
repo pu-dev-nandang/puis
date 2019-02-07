@@ -389,7 +389,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                             left join db_academic.mata_kuliah as g on g.ID = f.MKID
                             where '".$date2."' >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
                             and '".$date2."' <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
-                            and b.NameEng = ?
+                            and b.NameEng = ? and d.SemesterID = '".$SemesterID."'
                             and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
                             on a.ID = b.ID_Attd where b.Status = '2' and b.DateOriginal = '".$date2."')
                             order by a.Room";  
@@ -565,6 +565,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     {
         $bool = true;
         $NotIDMyself = ($NotIDMyself == '') ? '' : ' and a.ID != '.$NotIDMyself;
+
+        $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+        $SemesterID = $SemesterID[0]['ID'];
+
         for ($xx=0; $xx < 1; $xx++) {  // check twice
 
             $TimeStart = date("H:i:s", strtotime($Start));
@@ -586,7 +590,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     $sqlWaktu2 = 'select * from db_academic.academic_years where SemesterID = ? and (uasStart <="'.$date2.'" and uasEnd >= "'.$date2.'")';
                     $queryWaktu2=$this->db->query($sqlWaktu2, array($SemesterID))->result_array();
 
-                if (count($sqlWaktu) == 0) {
+                if (count($queryWaktu) == 0) {
                     if (count($sqlWaktu2) > 0) {
                         $sql = "select count(*) as total from
                                (select a.ExamClassroomID,a.ID as ID_exam
@@ -621,8 +625,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                 on a.ID = c.ClassroomID
                                 join db_academic.days as b
                                 on c.DayID = b.ID
+                                left join db_academic.schedule as zd on zd.ID = c.ScheduleID
                                 where "'.$date2.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
-                                and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
+                                and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'"
                                 and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
                         on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
                     }
@@ -656,7 +661,6 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                 aa
                         ";
                 } // exit cek date academic
-                // print_r($sql);die();
 
                 $query=$this->db->query($sql, array())->result_array();
 
@@ -684,6 +688,23 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                         $query2=$this->db->query($sql2, array())->result_array();
                          if ($query2[0]['total'] > 0) {
                             $bool = false;
+                         }
+                         else
+                         {
+
+                            $sql = 'select count(*) as total from db_academic.classroom as a join db_academic.schedule_details as c
+                                    on a.ID = c.ClassroomID
+                                    join db_academic.days as b
+                                    on c.DayID = b.ID
+                                    left join db_academic.schedule as zd on zd.ID = c.ScheduleID
+                                    where "'.$date2.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
+                                    and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'" 
+                                    and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                            on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
+                            $query=$this->db->query($sql, array())->result_array();
+                            if ($query[0]['total'] > 0) {
+                               $bool = false;
+                            }
                          } 
                     }
                           
@@ -701,8 +722,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                         on a.ID = c.ClassroomID
                         join db_academic.days as b
                         on c.DayID = b.ID
+                        left join db_academic.schedule as zd on zd.ID = c.ScheduleID
                         where "'.$date2.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
-                        and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
+                        and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'" 
                         and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
                 on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
                 $query=$this->db->query($sql, array())->result_array();
@@ -754,8 +776,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                             on a.ID = c.ClassroomID
                             join db_academic.days as b
                             on c.DayID = b.ID
+                            left join db_academic.schedule as zd on zd.ID = c.ScheduleID
                             where "'.$getDate.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
-                            and "'.$getDate.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
+                            and "'.$getDate.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'"
                             and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
                              on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$getDate.'")';
                     $query=$this->db->query($sql, array())->result_array();
@@ -2164,6 +2187,11 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         // get data schedule details and compare with t_booking table
         $sql = 'select * from db_reservation.t_booking where Start >= timestamp(DATE_SUB(NOW(), INTERVAL 30 MINUTE))';
         $query=$this->db->query($sql, array())->result_array();
+
+        $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+        $SemesterID = $SemesterID[0]['ID'];
+
+
         for ($i=0; $i < count($query); $i++) {
              $Start = $query[$i]['Start'];
              $End = $query[$i]['End'];
@@ -2180,8 +2208,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                         on a.ID = c.ClassroomID
                         join db_academic.days as b
                         on c.DayID = b.ID
+                        left join db_academic.schedule as zd on zd.ID = c.ScheduleID
                         where "'.$date2.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
-                        and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
+                        and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'"
                         and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
                 on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
                 $query2=$this->db->query($sql2, array())->result_array();

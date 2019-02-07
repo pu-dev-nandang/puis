@@ -12,6 +12,7 @@ class C_schedule_exchange extends Ga_Controler {
     {
         parent::__construct();
         $this->data['department'] = parent::__getDepartement();
+        $this->load->model('vreservation/m_reservation');
         
     }
 
