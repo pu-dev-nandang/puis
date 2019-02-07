@@ -30,7 +30,8 @@ class M_rest extends CI_Model {
         for($i=0;$i<count($dataSemester);$i++){
 
             if($dataSemester[$i]['ID']<13){
-                $dataSchedule = $this->db->query('SELECT zc.*,sp.TypeSchedule, mk.MKCode, mk.Name AS MKName, mk.NameEng AS MKNameEng, cd.TotalSKS AS Credit, em.Name AS Lecturer
+                $dataSchedule = $this->db->query('SELECT zc.*,sp.TypeSchedule, mk.MKCode, mk.Name AS MKName, mk.NameEng AS MKNameEng, 
+                                                            cd.TotalSKS AS Credit, em.Name AS Lecturer, sp.TransferCourse
                                                             FROM '.$db.'.study_planning sp 
                                                             LEFT JOIN db_academic.z_schedule zc ON (zc.Glue = sp.Glue) 
                                                             LEFT JOIN db_employees.employees em ON (em.NIP = zc.NIP)
@@ -84,7 +85,7 @@ class M_rest extends CI_Model {
 
                 $data = $this->db->query('SELECT sp.ScheduleID,sp.TypeSchedule,mk.MKCode,mk.Name AS MKName,mk.nameEng AS MKNameEng,cd.TotalSKS AS Credit,
                                                 sp.StatusSystem,sc.ClassGroup, sc.TeamTeaching,
-                                                em.NIP,em.Name,em.TitleAhead, em.TitleBehind, em.EmailPU
+                                                em.NIP,em.Name,em.TitleAhead, em.TitleBehind, em.EmailPU, sp.TransferCourse
                                                 FROM '.$db.'.study_planning sp
                                                 LEFT JOIN db_academic.semester s ON (s.ID = sp.SemesterID)
                                                 LEFT JOIN db_academic.schedule sc ON (sc.ID = sp.ScheduleID)
