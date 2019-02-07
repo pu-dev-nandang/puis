@@ -2044,6 +2044,7 @@ class C_rest extends CI_Controller {
 
                     if ($boolApprove) {
                         $datasave['Status'] = 2;
+                        $datasave['PostingDate'] = date('Y-m-d H:i:s');
                     }
                     else
                     {
