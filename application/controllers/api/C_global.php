@@ -1564,15 +1564,25 @@ class C_global extends CI_Controller {
 
     public function exchange_approved($token){
 
-        $data_arr = $this->getInputTokenGet($token);
-        $content = $this->load->view('global/academic/schedule-exchange/ex_approve',$data_arr,true);
+        $data = $this->getInputTokenGet($token);
+        $content = $this->load->view('global/academic/attendance/schedule_exchange_approve',$data,true);
         $this->template_blank($content);
     }
 
     public function exchange_rejected($token){
 
-        $data_arr = $this->getInputTokenGet($token);
-        $content = $this->load->view('global/academic/schedule-exchange/ex_rejected',$data_arr,true);
+        $data = $this->getInputTokenGet($token);
+        $content = $this->load->view('global/academic/attendance/schedule_exchange_rejecte',$data,true);
+        $this->template_blank($content);
+    }
+
+    public function modify_attendance($token,$action){
+
+        $data = $this->getInputTokenGet($token);
+        $data['token'] = $token;
+        $data['action'] = strtolower($action);
+
+        $content = $this->load->view('global/academic/attendance/modify_attendance',$data,true);
         $this->template_blank($content);
     }
 
