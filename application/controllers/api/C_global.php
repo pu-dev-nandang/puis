@@ -248,133 +248,14 @@ class C_global extends CI_Controller {
 
     public function testInject()
     {
-        // $sql = 'select NIP,Name from db_employees.employees 
-        //         where SUBSTRING_INDEX(PositionMain,".",-1) = 6 and Status = "1" ';
-        // $query=$this->db->query($sql, array())->result_array();
-        // // 3 administrative
-        // for ($i=0; $i < count($query); $i++) { 
-        //     $NIP = $query[$i]['NIP'];
-        //     // check NIP existing
-        //     $get = $this->m_master->caribasedprimary('db_reservation.previleges_guser','NIP',$NIP);
-        //     if (count($get) == 0) {
-        //         $dataSave = array(
-        //             'NIP' => $NIP,
-        //             'G_user' => 9,
-        //         );
-        //         $this->db->insert('db_reservation.previleges_guser', $dataSave);
-        //     }
-        //     else
-        //     {
-        //         $dataSave = array(
-        //             'G_user' => 9,
-        //         );
-        //         $this->db->where('NIP',$NIP);
-        //         $this->db->update('db_reservation.previleges_guser', $dataSave);
-        //     }
-
-        // }
-
         ini_set('max_execution_time', 3600); //300 seconds = 5 minutes
         ini_set('max_execution_time', 0); // for infinite time of execution 
 
-        // $sql = 'select * from db_finance.payment_type';
-        // $query=$this->db->query($sql, array())->result_array();
-        // for ($i=0; $i < count($query); $i++) { 
-        //     $PTID = $query[$i]['ID'];
-        //     $get = $this->m_master->showData_array('db_academic.auth_students');
-        //     for ($j=0; $j < count($get); $j++) { 
-        //         $NPM = $get[$j]['NPM'];
-        //         $sql1 = 'select b.NPM,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit,c.Cost from db_academic.auth_students as b left join db_finance.tuition_fee as c
-        //          on b.ProdiID = c.ProdiID where b.NPM = "'.$NPM.'" and c.PTID = '.$PTID.' and b.Year = c.ClassOf and b.Pay_Cond = c.Pay_Cond';
-        //          // print_r($sql1);die();
-        //          $query1=$this->db->query($sql1, array())->result_array();
-        //          $Invoice = 0;
-        //         for ($k=1; $k <= 14; $k++) {
-        //             $st = $k; 
-        //             switch ($PTID) {
-        //                 case 1:
-        //                 case 4:
-        //                     if ($k == 1) {
-        //                         $Invoice = $query1[0]['Cost'];
-        //                         $st = 15;
-        //                     }
-        //                     // else
-        //                     // {
-        //                     //     $Invoice = 0;
-        //                     // }
-        //                     break;
-        //                 case 2:
-        //                 case 3:
-        //                     $Invoice = $query1[0]['Cost'];
-        //                     break;
-        //                 default:
-        //                     $Invoice = 0;
-        //                     break;
-        //             }
-
-        //            $Semester = $k;
-        //            $Pay_Cond =  $query1[0]['Pay_Cond'];
-        //            // check data existing 
-        //                 // $sql23 = 'select count(*) as total from db_finance.m_tuition_fee where Semester = "'.$Semester.'" and PTID = "'.$PTID.'" and NPM = "'.$NPM.'"';
-        //                 // $query23=$this->db->query($sql23, array())->result_array();
-        //                 // if ($query23[0]['total'] > 0) {
-        //                 //     continue;
-        //                 // }
-
-        //            $dataSave = array(
-        //                 'Semester' => $Semester,
-        //                 'PTID' => $PTID,
-        //                 'NPM' => $NPM,
-        //                 'Invoice' => $Invoice,
-        //            );
-
-        //            $this->db->insert('db_finance.m_tuition_fee',$dataSave);
-        //            $k = $st;
-        //         }
-        //     }
-        // }
-
-        // $sql = 'select * from db_finance.payment where SemesterID = 14 and Status = "0"';
-        // $query=$this->db->query($sql, array())->result_array();
-        // // print_r($query);die();
-        // for ($i=0; $i < count($query); $i++) { 
-        //     $ID_payment = $query[$i]['ID'];
-        //     $Invoice = $query[$i]['Invoice'];
-        //     // cek data lunas
-        //     $get = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$ID_payment);
-        //     $total = 0;
-        //     for ($j=0; $j < count($get); $j++) {
-        //         if ($get[$j]['Status'] == 1) {
-        //            $total = $total + $get[$j]['Invoice'];
-        //         } 
-        //     }
-
-        //     if ($total >= $Invoice) {
-        //        $dataSave = array(
-        //                'Status' =>"1",
-        //                'UpdateAt' => date('Y-m-d H:i:s'),
-        //                'UpdatedBy' => 0,
-        //                        );
-        //        $this->db->where('ID',$ID_payment);
-        //        $this->db->update('db_finance.payment', $dataSave);
-        //     }
-        // }
-
-        // $sql = 'select a.*,b.ID as ID_payment_std from db_finance.payment as a 
-        //         left join db_finance.payment_students as b on a.ID = b.ID_payment
-        //         where a.SemesterID = 14 and b.Deadline = "2018-07-31 23:59:00" ';
-        // $query=$this->db->query($sql, array())->result_array();
-        // for ($i=0; $i < count($query); $i++) { 
-        //     $ID_payment_std = $query[$i]['ID_payment_std'];
-        //     $dataSave = array(
-        //         'Deadline' => "2019-01-15 23:59:00",
-        //     );
-        //     $this->db->where('ID',$ID_payment_std);
-        //     $this->db->update('db_finance.payment_students',$dataSave);
-
-        // }
-
-
+        // $datasave = array(
+        //     'Approver2' => '[{"TypeApprover":"Division","Approver":"37"}]',
+        // );
+        // $this->db->where('Approver2','["37"]');
+        // $this->db->update('db_reservation.category_room',$datasave);
     }
 
     public function testInject2()
@@ -703,12 +584,41 @@ class C_global extends CI_Controller {
                                         $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
                                         $Approver2 = $getDataCategoryRoom[0]['Approver2'];
                                         $Approver2 = json_decode($Approver2);
-                                        $getApprover2 = $this->m_master->caribasedprimary('db_employees.division','ID',$Approver2[0]);
-                                        $EmailApprover2 = $getApprover2[0]['Email'];
+
+                                        $EmailPUAPP2 = '';
+                                        $CodeAPP2 = '';
+                                        $NameWR = '';
+                                        for ($zz=0; $zz < count($Approver2); $zz++) { 
+                                            $rdata = $Approver2[$zz];
+                                            $TypeApprover = $rdata->TypeApprover;
+                                            $bool = false;
+                                            switch ($TypeApprover) {
+                                                case 'Division':
+                                                    $DivisionApprove = $this->m_master->caribasedprimary('db_employees.division','ID',$rdata->Approver);
+                                                    $EmailPUAPP2 = $DivisionApprove[0]['Email'];
+                                                    $CodeAPP2 = $DivisionApprove[0]['ID'];
+                                                    $NameWR = $DivisionApprove[0]['Division'].' Team';
+                                                    $bool = true;
+                                                    break;
+                                                case 'Employees':
+                                                    $NIPAPP2 = $rdata->Approver;
+                                                    $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIPAPP2);
+                                                    $EmailPUAPP2 = $G_emp[0]['EmailPU'];
+                                                    $CodeAPP2 = $NIPAPP2;
+                                                    $NameWR = 'Mr/Mrs '.$G_emp[0]['Name'];
+                                                    $bool = true;
+                                                    break;
+
+                                            }
+
+                                            if ($bool) {
+                                                break;
+                                            }
+                                        }
 
                                         $token = array(
-                                            'EmailPU' => $EmailApprover2,
-                                            'Code' => $Approver2[0],
+                                            'EmailPU' => $EmailPUAPP2,
+                                            'Code' => $CodeAPP2,
                                             'ID_t_booking' => $data_arr['ID_t_booking'],
                                             'approvalNo' => 2,
                                             'Email_add_person' => $Email_add_person,
@@ -733,8 +643,8 @@ class C_global extends CI_Controller {
 
                                         if($_SERVER['SERVER_NAME']!='localhost') {
                                             // email to ga
-                                            $Email = $EmailApprover2;
-                                            $text = 'Dear '.$getApprover2[0]['Division'].',<br><br>
+                                            $Email = $EmailPUAPP2;
+                                            $text = 'Dear '.$NameWR.',<br><br>
                                                         Venue Reservation has been approved by '.$nmapprover1.' as Approver 1,<br><br>
                                                         Please help to approve Venue Reservation,<br><br>
                                                         Details Schedule : <br><ul>
@@ -771,8 +681,8 @@ class C_global extends CI_Controller {
                                         }
                                         else
                                         {
-                                            $Email = 'alhadi.rahman@podomorouniversity.ac.id';
-                                            $text = 'Dear '.$getApprover2[0]['Division'].',<br><br>
+                                            $Email = $EmailPUAPP2;
+                                            $text = 'Dear '.$NameWR.',<br><br>
                                                         Venue Reservation has been approved by '.$nmapprover1.' as Approver 1,<br><br>
                                                         Please help to approve Venue Reservation,<br><br>
                                                         Details Schedule : <br><ul>

@@ -714,12 +714,26 @@ class C_transaksi extends Vreservation_Controler {
                     $find = 0;
                     $Approver2 = $getDataCategoryRoom[0]['Approver2'];
                     $Approver2 = json_decode($Approver2);
-                    $DivisionID = $this->session->userdata('PositionMain');
-                    $DivisionID = $DivisionID['IDDivision'];
-                    for ($l=0; $l < count($Approver2); $l++) { 
-                        if ($DivisionID == $Approver2[$l]) {
-                            $find++;    
-                            break;
+                    for ($zz=0; $zz < count($Approver2); $zz++) { 
+                        $rdata = $Approver2[$zz];
+                        $TypeApprover = $rdata->TypeApprover;
+                        switch ($TypeApprover) {
+                            case 'Division':
+                                $DivisionID = $this->session->userdata('PositionMain');
+                                $DivisionID = $DivisionID['IDDivision'];
+                                if ($DivisionID == $rdata->Approver) {
+                                    $find++;    
+                                    break;
+                                }
+                                break;
+                            case 'Employees':
+                                $NIP = $this->session->userdata('NIP');
+                                if ($NIP == $rdata->Approver) {
+                                    $find++;    
+                                    break;
+                                }
+                                break;
+
                         }
                     }
              
@@ -1027,11 +1041,42 @@ class C_transaksi extends Vreservation_Controler {
             $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
             $Approver2Div = $getDataCategoryRoom[0]['Approver2'];
             $Approver2Div = json_decode($Approver2Div);
-            $DivisionApprove = $this->m_master->caribasedprimary('db_employees.division','ID',$Approver2Div[0]);
+
+            $EmailPUAPP2 = '';
+            $CodeAPP2 = '';
+            $NameWR = '';
+            for ($zz=0; $zz < count($Approver2Div); $zz++) { 
+                $rdata = $Approver2Div[$zz];
+                $TypeApprover = $rdata->TypeApprover;
+                $bool = false;
+                switch ($TypeApprover) {
+                    case 'Division':
+                        $DivisionApprove = $this->m_master->caribasedprimary('db_employees.division','ID',$rdata->Approver);
+                        $EmailPUAPP2 = $DivisionApprove[0]['Email'];
+                        $CodeAPP2 = $DivisionApprove[0]['ID'];
+                        $NameWR = $DivisionApprove[0]['Division'].' Team';
+                        $bool = true;
+                        break;
+                    case 'Employees':
+                        $NIPAPP2 = $rdata->Approver;
+                        $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIPAPP2);
+                        $EmailPUAPP2 = $G_emp[0]['EmailPU'];
+                        $CodeAPP2 = $NIPAPP2;
+                        $NameWR = 'Mr/Mrs '.$G_emp[0]['Name'];
+                        $bool = true;
+                        break;
+
+                }
+
+                if ($bool) {
+                    break;
+                }
+            }
+
 
             $token = array(
-                    'EmailPU' => $DivisionApprove[0]['Email'],
-                    'Code' => $DivisionApprove[0]['ID'],
+                    'EmailPU' => $EmailPUAPP2,
+                    'Code' => $CodeAPP2,
                     'ID_t_booking' => $ID,
                     'approvalNo' => 2,
                     'Email_add_person' => $Email_add_person,
@@ -1044,8 +1089,8 @@ class C_transaksi extends Vreservation_Controler {
 
             if ($approveaccess == 2) {
                 if($_SERVER['SERVER_NAME']!='localhost') {
-                    $Email = $DivisionApprove[0]['Email'];
-                    $text = 'Dear '.$DivisionApprove[0]['Division'].',<br><br>
+                    $Email = $EmailPUAPP2;
+                    $text = 'Dear '.$NameWR.',<br><br>
                                 Venue Reservation has been approved by '.$this->session->userdata('Name').$ApprovalWr.',<br><br>
                                 Please help to approve Venue Reservation,<br><br>
                                 Details Schedule : <br><ul>
@@ -1084,7 +1129,7 @@ class C_transaksi extends Vreservation_Controler {
                 else
                 {
                     $Email = 'alhadi.rahman@podomorouniversity.ac.id';
-                    $text = 'Dear '.$DivisionApprove[0]['Division'].',<br><br>
+                    $text = 'Dear '.$NameWR.',<br><br>
                                 Venue Reservation has been approved by '.$this->session->userdata('Name').$ApprovalWr.',<br><br>
                                 Please help to approve Venue Reservation,<br><br>
                                 Details Schedule : <br><ul>
