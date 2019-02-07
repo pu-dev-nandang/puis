@@ -737,7 +737,6 @@ class C_api2 extends CI_Controller {
                         );
                         $this->db->where('ID', $item['IDAS']);
                         $this->db->update('db_academic.attendance_students',$dataUpdate);
-
                     }
                 }
 
@@ -886,6 +885,83 @@ class C_api2 extends CI_Controller {
 
 
                 return print_r(1);
+            }
+            else if($data_arr['action']=='approveAllModifyAttd'){
+                $ProdiID = $data_arr['ProdiID'];
+                $SemesterID = $data_arr['SemesterID'];
+
+                $dataAttd = $this->db->query('SELECT am.* 
+                                                            FROM db_academic.attendance_modify_prodi amp 
+                                                            LEFT JOIN db_academic.attendance_modify am ON (am.ID = amp.IDAM)
+                                                            LEFT JOIN db_academic.attendance attd ON (attd.ID = am.ID_Attd)
+                                                            WHERE amp.ProdiID = "'.$ProdiID.'" AND attd.SemesterID = "'.$SemesterID.'"
+                                                            AND am.Status = "0" ')->result_array();
+
+                if(count($dataAttd)>0){
+                    foreach ($dataAttd AS $item){
+
+                        // Update Attendance Student
+                        $dataStd = $this->db->get_where('db_academic.attendance_modify_details',array('IDAM' => $item['ID']))->result_array();
+                        if(count($dataStd)>0){
+                            foreach ($dataStd AS $itemStd){
+                                $dataUpdate = array(
+                                    'M'.$itemStd['Sesi'] => ''.$itemStd['Meet'],
+                                    'D'.$itemStd['Sesi'] => $itemStd['Reason']
+                                );
+                                $this->db->where('ID', $itemStd['IDAS']);
+                                $this->db->update('db_academic.attendance_students',$dataUpdate);
+                                $this->db->reset_query();
+                            }
+                        }
+
+                        // Update Status
+                        $this->db->where('ID', $item['ID']);
+                        $this->db->update('db_academic.attendance_modify',array(
+                            'Status' => '1',
+                            'Updated1By' => $data_arr['Updated1By'],
+                            'Updated1At' => $data_arr['Updated1At']
+                        ));
+                        $this->db->reset_query();
+
+                        $dataKaprodi = $this->db->select('Name,Photo')->get_where('db_employees.employees',
+                            array('NIP' => $data_arr['Updated1By']))->result_array();
+
+                        if(count($dataKaprodi)>0){
+                            $DataEmail = $this->getInputToken2($item['DataEmail']);
+
+                            //============= Logging ==========
+                            // Insert Logging
+                            $url = base_url('uploads/employees/'.$dataKaprodi[0]['Photo']);
+                            $img_profile = ($this->is_url_exist($url) && $dataKaprodi[0]['Photo']!='')
+                                ? $url
+                                : url_server_ws.'/images/icon/lecturer.png';
+
+                            $Log_dataInsert = array(
+                                'Icon' => $img_profile,
+                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Modify Attendance Approved',
+                                'Description' => $DataEmail['Code'].' - '.$DataEmail['CourseEng'].' | Group : '.$DataEmail['Group'].' | Session : '.$DataEmail['Session'],
+                                'URLDirectLecturer' => 'attendance/modify-attendance/'.$item['TokenURL'],
+                                'CreatedBy' => $data_arr['Updated1By'],
+                                'CreatedName' => $dataKaprodi[0]['Name'],
+                                'CreatedAt' => $data_arr['Updated1At']
+                            );
+                            $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
+                            $insert_id_logging = $this->db->insert_id();
+
+                            // insert ke user
+                            $Log_arr_ins = array(
+                                'IDLogging' => $insert_id_logging,
+                                'UserID' => $item['RequestBy']
+                            );
+                            $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+
+                        }
+
+                    }
+                }
+
+                return print_r(1);
+
             }
 
         }

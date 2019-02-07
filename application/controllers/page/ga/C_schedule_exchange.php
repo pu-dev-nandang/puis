@@ -149,9 +149,9 @@ class C_schedule_exchange extends Ga_Controler {
                     </div>';
 
                     $to = $emailrequest.','.$emailkaprodi;
-                    if ($_SERVER['SERVER_NAME'] == 'localhost') {
-                        $to = $emailrequest.','.$emailkaprodi.','.'nandang.mulyadi@podomorouniversity.ac.id,novita.riani@podomorouniversity.ac.id';
-                    }
+//                    if ($_SERVER['SERVER_NAME'] == 'localhost') {
+//                        $to = $emailrequest.','.$emailkaprodi.','.'nandang.mulyadi@podomorouniversity.ac.id,novita.riani@podomorouniversity.ac.id';
+//                    }
                     $subject = "GA : Permohonan Ruangan Untuk Kuliah Pengganti";
                     $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
                 }
@@ -272,9 +272,6 @@ class C_schedule_exchange extends Ga_Controler {
                      </div>';
 
                      $to = $emailrequest.','.$emailkaprodi;
-                     if ($_SERVER['SERVER_NAME'] == 'localhost') {
-                         $to = $emailrequest.','.$emailkaprodi.','.'nandang.mulyadi@podomorouniversity.ac.id,novita.riani@podomorouniversity.ac.id';
-                     }
                      $subject = "GA : Permohonan Ruangan Untuk Kuliah Pengganti";
                      $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
                 }
@@ -282,6 +279,7 @@ class C_schedule_exchange extends Ga_Controler {
             else
             {
                 $msg = 'This schedule conflict, Are you Sure ?';
+
             }
             
         }
