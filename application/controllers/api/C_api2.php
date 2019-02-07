@@ -543,7 +543,7 @@ class C_api2 extends CI_Controller {
             }
             else if($data_arr['action']=='rejectedModifyAttd'){
 
-                $dataRequsted = $this->db->query('SELECT am.RequestBy, em.EmailPU, em.Name AS Lecturer, em.Gender, am.DataEmail FROM db_academic.attendance_modify am 
+                $dataRequsted = $this->db->query('SELECT am.RequestBy, em.EmailPU, em.Name AS Lecturer, em.Gender, am.DataEmail, am.TokenURL FROM db_academic.attendance_modify am 
                                                             LEFT JOIN db_employees.employees em ON (em.NIP = am.RequestBy)
                                                             WHERE am.ID = "'.$data_arr['IDAM'].'" ')->result_array();
 
@@ -576,7 +576,7 @@ class C_api2 extends CI_Controller {
                         'Icon' => $img_profile,
                         'Title' => '<i class="fa fa-times-circle margin-right" style="color:darkred;"></i> Modify Attendance Rejected',
                         'Description' => $DataEmail['Code'].' - '.$DataEmail['CourseEng'].' | Group : '.$DataEmail['Group'].' | Session : '.$DataEmail['Session'],
-                        'URLDirectLecturer' => 'attendance/list-attendance',
+                        'URLDirectLecturer' => 'attendance/modify-attendance/'.$dataRequsted[0]['TokenURL'],
                         'CreatedBy' => $data_arr['Updated1By'],
                         'CreatedName' => $dataKaprodi[0]['Name'],
                         'CreatedAt' => $data_arr['Updated1At'],
@@ -709,7 +709,7 @@ class C_api2 extends CI_Controller {
                 return print_r(1);
             }
             else if($data_arr['action']=='approvedModifyAttd'){
-                $dataRequsted = $this->db->query('SELECT am.RequestBy, em.EmailPU, em.Name AS Lecturer, em.Gender, am.DataEmail FROM db_academic.attendance_modify am 
+                $dataRequsted = $this->db->query('SELECT am.RequestBy, em.EmailPU, em.Name AS Lecturer, em.Gender, am.DataEmail, am.TokenURL FROM db_academic.attendance_modify am 
                                                             LEFT JOIN db_employees.employees em ON (em.NIP = am.RequestBy)
                                                             WHERE am.ID = "'.$data_arr['IDAM'].'" ')->result_array();
 
@@ -760,7 +760,7 @@ class C_api2 extends CI_Controller {
                         'Icon' => $img_profile,
                         'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Modify Attendance Approved',
                         'Description' => $DataEmail['Code'].' - '.$DataEmail['CourseEng'].' | Group : '.$DataEmail['Group'].' | Session : '.$DataEmail['Session'],
-                        'URLDirectLecturer' => 'attendance/list-attendance',
+                        'URLDirectLecturer' => 'attendance/modify-attendance/'.$dataRequsted[0]['TokenURL'],
                         'CreatedBy' => $data_arr['Updated1By'],
                         'CreatedName' => $dataKaprodi[0]['Name'],
                         'CreatedAt' => $data_arr['Updated1At'],
