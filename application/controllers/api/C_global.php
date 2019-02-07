@@ -252,9 +252,9 @@ class C_global extends CI_Controller {
         ini_set('max_execution_time', 0); // for infinite time of execution 
 
         // $datasave = array(
-        //     'Approver2' => '[{"TypeApprover":"Division","Approver":"37"}]',
+        //     'Approver2' => '[{"TypeApprover":"Division","Approver":"8"}]',
         // );
-        // $this->db->where('Approver2','["37"]');
+        // $this->db->where('Approver2','["8"]');
         // $this->db->update('db_reservation.category_room',$datasave);
     }
 
