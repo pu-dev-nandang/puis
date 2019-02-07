@@ -1046,6 +1046,7 @@ class C_transaksi extends Vreservation_Controler {
                 if($_SERVER['SERVER_NAME']!='localhost') {
                     $Email = $DivisionApprove[0]['Email'];
                     $text = 'Dear '.$DivisionApprove[0]['Division'].',<br><br>
+                                Venue Reservation has been approved by '.$this->session->userdata('Name').$ApprovalWr.',<br><br>
                                 Please help to approve Venue Reservation,<br><br>
                                 Details Schedule : <br><ul>
                                 <li>Start  : '.$StartNameDay.', '.$Start.'</li>
@@ -1084,6 +1085,7 @@ class C_transaksi extends Vreservation_Controler {
                 {
                     $Email = 'alhadi.rahman@podomorouniversity.ac.id';
                     $text = 'Dear '.$DivisionApprove[0]['Division'].',<br><br>
+                                Venue Reservation has been approved by '.$this->session->userdata('Name').$ApprovalWr.',<br><br>
                                 Please help to approve Venue Reservation,<br><br>
                                 Details Schedule : <br><ul>
                                 <li>Start  : '.$StartNameDay.', '.$Start.'</li>

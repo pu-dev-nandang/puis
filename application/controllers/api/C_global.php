@@ -717,10 +717,25 @@ class C_global extends CI_Controller {
                                             'KetAdditional_eq' => $KetAdditional_eq,
                                         );
                                         $token = $this->jwt->encode($token,'UAP)(*');
+
+                                        $approver1 = $data_arr['Code'];
+                                        $nmapprover1 = '';
+                                        $strlenapprover1 = strlen($approver1);
+                                        if ($strlenapprover1 > 3) {
+                                            $G_app1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$approver1);
+                                            $nmapprover1 = $G_app1[0]['Name'];
+                                        }
+                                        else
+                                        {
+                                            $G_app1 = $this->m_master->caribasedprimary('db_employees.division','ID',$approver1);
+                                            $nmapprover1 = $G_app1[0]['Division'];
+                                        }
+
                                         if($_SERVER['SERVER_NAME']!='localhost') {
                                             // email to ga
                                             $Email = $EmailApprover2;
                                             $text = 'Dear '.$getApprover2[0]['Division'].',<br><br>
+                                                        Venue Reservation has been approved by '.$nmapprover1.' as Approver 1,<br><br>
                                                         Please help to approve Venue Reservation,<br><br>
                                                         Details Schedule : <br><ul>
                                                         <li>Start  : '.$StartNameDay.', '.$t_booking[0]['Start'].'</li>
@@ -758,6 +773,7 @@ class C_global extends CI_Controller {
                                         {
                                             $Email = 'alhadi.rahman@podomorouniversity.ac.id';
                                             $text = 'Dear '.$getApprover2[0]['Division'].',<br><br>
+                                                        Venue Reservation has been approved by '.$nmapprover1.' as Approver 1,<br><br>
                                                         Please help to approve Venue Reservation,<br><br>
                                                         Details Schedule : <br><ul>
                                                         <li>Start  : '.$StartNameDay.', '.$t_booking[0]['Start'].'</li>
