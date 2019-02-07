@@ -1453,10 +1453,24 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                        $DivisionID = $this->session->userdata('PositionMain');
                                        $DivisionID = $DivisionID['IDDivision'];
                                        if ($Status == 0) {
-                                            for ($l=0; $l < count($Approver2); $l++) { 
-                                                if ($DivisionID == $Approver2[$l]) {
-                                                    $find++;    
-                                                    break;
+                                            for ($zz=0; $zz < count($Approver2); $zz++) { 
+                                                $rdata = $Approver2[$zz];
+                                                $TypeApprover = $rdata->TypeApprover;
+                                                switch ($TypeApprover) {
+                                                    case 'Division':
+                                                        if ($DivisionID == $rdata->Approver) {
+                                                            $find++;    
+                                                            break;
+                                                        }
+                                                        break;
+                                                    case 'Employees':
+                                                        $NIP = $this->session->userdata('NIP');
+                                                        if ($NIP == $rdata->Approver) {
+                                                            $find++;    
+                                                            break;
+                                                        }
+                                                        break;
+
                                                 }
                                             }
                                        }
@@ -1813,10 +1827,24 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                        $DivisionID = $this->session->userdata('PositionMain');
                                        $DivisionID = $DivisionID['IDDivision'];
                                        if ($Status == 0) {
-                                            for ($l=0; $l < count($Approver2); $l++) { 
-                                                if ($DivisionID == $Approver2[$l]) {
-                                                    $find++;    
-                                                    break;
+                                            for ($zz=0; $zz < count($Approver2); $zz++) { 
+                                                $rdata = $Approver2[$zz];
+                                                $TypeApprover = $rdata->TypeApprover;
+                                                switch ($TypeApprover) {
+                                                    case 'Division':
+                                                        if ($DivisionID == $rdata->Approver) {
+                                                            $find++;    
+                                                            break;
+                                                        }
+                                                        break;
+                                                    case 'Employees':
+                                                        $NIP = $this->session->userdata('NIP');
+                                                        if ($NIP == $rdata->Approver) {
+                                                            $find++;    
+                                                            break;
+                                                        }
+                                                        break;
+
                                                 }
                                             }
                                        }
