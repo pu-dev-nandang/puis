@@ -1299,6 +1299,7 @@ class C_budgeting extends Budgeting_Controler {
     public function page_pr()
     {
       $this->auth_ajax();
+      $this->data['G_Approver'] = $this->m_budgeting->Get_m_Approver();
       $this->data['arr_Year'] = $this->m_master->showData_array('db_budgeting.cfg_dateperiod');
       $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
       $Year = $get[0]['Year'];
@@ -1373,7 +1374,7 @@ class C_budgeting extends Budgeting_Controler {
         $key = "UAP)(*";
         $Notes = $this->jwt->decode($Notes,$key);
 
-        $PRCode = ($act == 1) ? $this->m_budgeting->Get_PRCode($Year,$Departement) : $PRCode;
+        $PRCode = ($act == 1) ? $this->m_budgeting->Get_PRCode2($Departement) : $PRCode;
         // print_r($PRCode);die();
         if ($act == 1) {
             $dataSave = array(
@@ -1614,6 +1615,7 @@ class C_budgeting extends Budgeting_Controler {
 
         $No = $requestData['start'] + 1;
         $data = array();
+        $G_Approver = $this->m_budgeting->Get_m_Approver();
         for($i=0;$i<count($query);$i++){
             $nestedData=array();
             $row = $query[$i];
@@ -1622,7 +1624,7 @@ class C_budgeting extends Budgeting_Controler {
             $nestedData[] = $row['NameDepartement'];
             $nestedData[] = $row['StatusName'];
             $JsonStatus = (array)json_decode($row['JsonStatus'],true);
-            $htmlJson = '';
+            $arr = array();
             if (count($JsonStatus) > 0) {
                 for ($j=0; $j < count($JsonStatus); $j++) {
                     $getName = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$j]['ApprovedBy']);
@@ -1630,25 +1632,26 @@ class C_budgeting extends Budgeting_Controler {
                     $StatusInJson = $JsonStatus[$j]['Status'];
                     switch ($StatusInJson) {
                         case '1':
-                            $stjson = "Approved";
+                            $stjson = '<i class="fa fa-check" style="color: green;"></i>';
                             break;
                         case '2':
-                            $stjson = "Reject";
+                            $stjson = '<i class="fa fa-times" aria-hidden="true" style="color: red;"></i>';
                             break;
                         default:
-                            $stjson = "Not yet approved";
+                            $stjson = "-";
                             break;
                     }
-                    $appr = $j + 1; 
-                    $htmlJson .= '<li>'.'Approver '.$appr.'<ul>'
-                                    .'<li>Approver by : '.$Name.'</li>'
-                                    .'<li>Status : '.$stjson.'</li>'
-                                    .'<li>Approve At : '.$JsonStatus[$j]['ApproveAt'].'</li>'
-                                    .'</ul>'
-                                .'</li>';   
+                    $arr[] = $stjson.'<br>'.'Approver : '.$Name.'<br>'.'Approve At : '.$JsonStatus[$j]['ApproveAt'];
                 }
             }
-            $nestedData[] = $htmlJson;
+
+            $c = count($G_Approver) - count($arr);
+            for ($l=0; $l < $c; $l++) { 
+                 $arr[] = '-';
+            }
+
+            $nestedData = array_merge($nestedData,$arr);
+            $nestedData[] = $row['Departement'];
             $data[] = $nestedData;
             $No++;
         }
@@ -1667,11 +1670,13 @@ class C_budgeting extends Budgeting_Controler {
         $this->auth_ajax();
         $input = $this->getInputToken();
         $PRCode = $input['PRCode'];
+        $Departement = $input['department'];
         $this->data['arr_Year'] = $this->m_master->showData_array('db_budgeting.cfg_dateperiod');
         $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
         $Year = $get[0]['Year'];
         $this->data['Year'] = $Year;
         $this->data['PRCodeVal'] = $PRCode;
+        $this->data['Departement'] = $Departement;
         $arr_result = array('html' => '','jsonPass' => '');
         $content = $this->load->view('global/budgeting/pr/form',$this->data,true);
         $arr_result['html'] = $content;
@@ -1692,8 +1697,23 @@ class C_budgeting extends Budgeting_Controler {
     {
         $this->auth_ajax();
         $bool = false;
-        $NIP = $this->session->userdata('NIP');
-        $Departement = $this->session->userdata('IDDepartementPUBudget');
+        $input = $this->getInputToken();
+        if (!array_key_exists('NIP', $input)) {
+             $NIP = $this->session->userdata('NIP');
+        }
+        else
+        {
+            $NIP = $input['NIP'];
+        }
+
+        if (!array_key_exists('Departement', $input)) {
+             $Departement = $this->session->userdata('IDDepartementPUBudget');
+        }
+        else
+        {
+            $Departement = $input['Departement'];
+        }
+        
         $GetRuleAccess = $this->m_budgeting->GetRuleAccess($NIP,$Departement);
         echo json_encode($GetRuleAccess);
     }
