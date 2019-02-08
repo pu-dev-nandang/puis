@@ -7880,6 +7880,7 @@ class C_api extends CI_Controller {
                     $d['CDID'] = $data_arr['CDID'];
                     $d['MKID'] = $data_arr['MKID'];
                     $d['Credit'] = $data_arr['Credit'];
+                    $d['TransferCourse'] = '1';
 
                     unset($d['ID']);
                     $this->db->insert($data_arr['DB_A'].'.study_planning',$d);
