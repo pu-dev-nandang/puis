@@ -849,6 +849,7 @@ $route['rest/academic/__assign_by_finance_change_status'] = 'api/c_rest/assign_b
 $route['rest/academic/__change_status_mhs_multiple'] = 'api/c_rest/change_status_mhs_multiple';
 $route['rest/ga/__show_schedule_exchange'] = 'api/c_rest/show_schedule_exchange';
 $route['rest/__approve_pr'] = 'api/c_rest/approve_pr';
+$route['rest/__budgeting_dashboard'] = 'api/c_rest/budgeting_dashboard';
 
 
 

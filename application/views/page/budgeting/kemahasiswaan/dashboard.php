@@ -47,17 +47,6 @@
 
 	function load_table_rekap_finance()
 	{
-
-		loading_page("#pagetableDepartement");
-		var url = base_url_js+"rest/__budgeting_dashboard";
-		var data = {
-				    auth : 's3Cr3T-G4N' ,
-				};
-		var token = jwt_encode(data,'UAP)(*');
-		$.post(url,{token:token},function (resultJson) {
-			
-		});
-
 		var data = [];
 		var month = [
 		         'Jan',

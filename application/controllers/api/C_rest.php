@@ -2086,4 +2086,61 @@ class C_rest extends CI_Controller {
           echo '{"status":"999","message":"jangan iseng :D"}';
         }
     }
+
+    public function budgeting_dashboard()
+    {
+        $arrayrs = array();
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                // do action
+                $this->load->model('budgeting/m_budgeting');
+                $month = array(
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'April',
+                    'Mei',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Okt',
+                    'Nov',
+                    'Des'
+                );
+
+                $YearActivated = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
+                $Departement = $this->m_master->apiservertoserver(serverRoot.'/api/__getAllDepartementPU');
+                $data = array();
+                for ($i=0; $i < count($Departement); $i++) { 
+                    $Code = $Departement[$i]['Code'];
+                    $DepartementName = $Departement[$i]['Name1'];
+                    $get = $this->m_budgeting->get_creator_budget($YearActivated[0]['Year'],$Code);
+                    $arr_temp = array();
+                    for ($j=0; $j < count($get); $j++) { 
+                        // get data to show in dashboard
+                    }
+                    $data[] = array(
+                        'Code' => $Code,
+                        'DepartementName' => $DepartementName,
+                        'data' => $get,
+                    );
+                }
+
+                echo json_encode($data);    
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
 }

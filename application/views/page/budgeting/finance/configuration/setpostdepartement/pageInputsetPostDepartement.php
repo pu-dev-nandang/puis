@@ -386,8 +386,9 @@
 		$('#tableData3 tbody').on('click', '.btn-edit-postbudget', function () {
 			var codepostbudget = $(this).attr('codepostbudget');
 			var Cost = $(this).attr('budget');
-	         var n = Cost.indexOf(".");
-	         var Cost = Cost.substring(0, n);
+			Cost = parseInt(Cost) / 1000; // (.000)
+	         // var n = Cost.indexOf(".");
+	         // var Cost = Cost.substring(0, n);
 
 			var input = '<input type = "text" class = "form-control BudgetInput'+codepostbudget+'">';
 			$('.Budget'+codepostbudget).html(input);
@@ -407,6 +408,8 @@
 				 getBudget = getBudget.replace(".", "");
 				 
 				}
+
+				getBudget = getBudget * 1000 // (.000) 
 
 				var Year = $("#YearPostDepartement").val();
 				if (confirm("Are you sure?") == true) {

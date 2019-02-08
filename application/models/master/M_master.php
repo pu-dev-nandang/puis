@@ -2590,4 +2590,21 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
         return $Semester;
     }
+
+    public function apiservertoserver($url,$token = '')
+    {
+        $rs = array();
+        $Input = $token;
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS,
+                    "token=".$Input);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $pr = curl_exec($ch);
+        curl_close ($ch);
+        $rs = (array) json_decode($pr,true);
+        return $rs;
+    }
 }
