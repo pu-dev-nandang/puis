@@ -227,7 +227,7 @@
 				   		var SaveBtn = '<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
 				   					'<div class = "col-md-12">'+
 				   						'<div class = "pull-right">'+
-				   							'<button class="btn btn-default" id="pdfprint" PRCode = "'+PRCodeVal+'"> <i class = "fa fa-file-pdf-o"></i> Print PDF</button>'+ '&nbsp&nbsp'+'<button class="btn btn-default" id="excelprint" PRCode = "'+PRCodeVal+'"><i class = "fa fa-file-excel-o"></i> Print Excel</button>'+
+				   							'<button class="btn btn-default" id="pdfprint" PRCode = "'+PRCodeVal+'"> <i class = "fa fa-file-pdf-o"></i> Print PDF</button>'+ '&nbsp&nbsp'+'<!--<button class="btn btn-default" id="excelprint" PRCode = "'+PRCodeVal+'"><i class = "fa fa-file-excel-o"></i> Print Excel</button>-->'+
 				   						'</div>'+
 				   					'</div>'+
 				   				'</div>';
@@ -1199,7 +1199,7 @@
 			       		
 			       		var rowPullright = $(ID_element).closest('.pull-right');
 			       		rowPullright.empty();
-			       		rowPullright.append('<button class="btn btn-default" id="pdfprint" PRCode = "'+data+'"> <i class = "fa fa-file-pdf-o"></i> Print PDF</button>'+ '&nbsp&nbsp'+'<button class="btn btn-default" id="excelprint" PRCode = "'+data+'"><i class = "fa fa-file-excel-o"></i> Print Excel</button>');
+			       		rowPullright.append('<button class="btn btn-default" id="pdfprint" PRCode = "'+data+'"> <i class = "fa fa-file-pdf-o"></i> Print PDF</button>'+ '&nbsp&nbsp'+'<!--<button class="btn btn-default" id="excelprint" PRCode = "'+data+'"><i class = "fa fa-file-excel-o"></i> Print Excel</button>-->');
 
 			       		$('button:not([id="pdfprint"]):not([id="excelprint"]):not([id="btnBackToHome"])').prop('disabled', true);
 			       		$(".Detail").prop('disabled', false);
