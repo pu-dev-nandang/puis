@@ -314,7 +314,7 @@
     				{
     					var typeconflict = response['type'];
     					if (typeconflict == 'venue') {
-    						if (confirm(response)) {
+    						if (confirm('Schedule conflict with Venue Reservation, please check')) {
     								var url = base_url_js+'ga/scheduleexchange/submit_change_status';
     								var token = newtd.attr('token');
     							    var data = {
