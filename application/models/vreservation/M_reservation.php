@@ -826,6 +826,170 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $bool;
     }
 
+    public function checkBentrok2($Start,$End,$chk_e_multiple,$Room,$NotIDMyself = '')
+    {
+        $array_bool = array('bool' => true);
+        $NotIDMyself = ($NotIDMyself == '') ? '' : ' and a.ID != '.$NotIDMyself;
+
+        $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+        $SemesterID = $SemesterID[0]['ID'];
+
+        for ($xx=0; $xx < 1; $xx++) {  // check twice
+
+            $TimeStart = date("H:i:s", strtotime($Start));
+            $TimeEnd = date("H:i:s", strtotime($End));
+
+            // check academic timeline
+            $datetime = DateTime::createFromFormat('Y-m-d H:i:s', $Start);
+            $NameDay = $datetime->format('l');
+            $date2 = date("Y-m-d", strtotime($Start));
+
+            // cek academic years apakah periode ujian atau tidak
+                $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+                $SemesterID = $SemesterID[0]['ID'];
+
+                $sqlWaktu = 'select * from db_academic.academic_years where SemesterID = ? and (utsStart <="'.$date2.'" and utsEnd >= "'.$date2.'")';
+                $queryWaktu=$this->db->query($sqlWaktu, array($SemesterID))->result_array();
+
+                $sqlWaktu2 = 'select * from db_academic.academic_years where SemesterID = ? and (uasStart <="'.$date2.'" and uasEnd >= "'.$date2.'")';
+                $queryWaktu2=$this->db->query($sqlWaktu2, array($SemesterID))->result_array();
+
+            if (count($queryWaktu) == 0) {
+                if (count($sqlWaktu2) > 0) {
+                    $sql = "select count(*) as total from
+                           (select a.ExamClassroomID,a.ID as ID_exam
+                            from db_academic.exam as a
+                            join db_employees.employees as b
+                            on a.Pengawas1 = b.NIP
+                            join db_academic.exam_details as c
+                            on a.ID = c.ExamID
+                            join db_academic.days as d
+                            on d.ID = a.DayID
+                            join db_academic.classroom as e
+                            on e.ID = a.ExamClassroomID
+                            join db_academic.schedule_details_course as f
+                            on f.ScheduleID = c.ScheduleID
+                            join db_academic.mata_kuliah as g
+                            on g.ID = f.MKID
+                            where d.NameEng = '".$NameDay."'
+                            and a.ExamDate = '".$date2."'
+                            and a.`Status` = '1'
+                            and a.SemesterID = '".$SemesterID."'
+                            and ((a.ExamStart >= '".$TimeStart."'  and a.ExamStart < '".$TimeEnd."' ) 
+                               or  (a.ExamEnd > '".$TimeStart."'  and a.ExamEnd <= '".$TimeEnd."' )
+                            ) and e.Room  = '".$Room."' 
+                            group by c.ScheduleID
+                           )
+                            aa
+                    ";
+                }
+                else
+                {
+                    $sql = 'select count(*) as total from db_academic.classroom as a join db_academic.schedule_details as c
+                            on a.ID = c.ClassroomID
+                            join db_academic.days as b
+                            on c.DayID = b.ID
+                            left join db_academic.schedule as zd on zd.ID = c.ScheduleID
+                            where "'.$date2.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
+                            and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'"
+                            and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                    on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
+                }
+            }
+            else
+            {
+                $sql = "select count(*) as total from
+                           (select a.ExamClassroomID,a.ID as ID_exam
+                            from db_academic.exam as a
+                            join db_employees.employees as b
+                            on a.Pengawas1 = b.NIP
+                            join db_academic.exam_details as c
+                            on a.ID = c.ExamID
+                            join db_academic.days as d
+                            on d.ID = a.DayID
+                            join db_academic.classroom as e
+                            on e.ID = a.ExamClassroomID
+                            join db_academic.schedule_details_course as f
+                            on f.ScheduleID = c.ScheduleID
+                            join db_academic.mata_kuliah as g
+                            on g.ID = f.MKID
+                            where d.NameEng = '".$NameDay."'
+                            and a.ExamDate = '".$date2."'
+                            and a.`Status` = '1'
+                            and a.SemesterID = '".$SemesterID."'
+                            and ((a.ExamStart >= '".$TimeStart."'  and a.ExamStart < '".$TimeEnd."' ) 
+                               or  (a.ExamEnd > '".$TimeStart."'  and a.ExamEnd <= '".$TimeEnd."' )
+                            ) and e.Room  = '".$Room."' 
+                            group by c.ScheduleID
+                           )
+                            aa
+                    ";
+            } // exit cek date academic
+
+            $query=$this->db->query($sql, array())->result_array();
+
+            if ($query[0]['total'] > 0) {
+                $array_bool = array(
+                    'type' => 'academic',
+                    'bool' => false
+                );
+            }
+            else
+            {
+                $sql3 = 'select count(*) as total
+                        from db_academic.classroom as a join db_academic.schedule_exchange as c
+                        on a.ID = c.ClassroomID
+                        join db_academic.days as b
+                        on c.DayID = b.ID where c.Status = "2" and c.Date ="'.$date2.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'"';
+                //print_r($sql3);die();
+                $query3=$this->db->query($sql3, array())->result_array();
+                if ($query3[0]['total'] > 0) {
+                    $array_bool = array(
+                        'type' => 'academic',
+                        'bool' => false
+                    );
+                }
+                else
+                {
+                    $sql2 = 'select count(*) as total from db_reservation.t_booking as a
+                             join db_employees.employees as b on a.CreatedBy = b.NIP
+                             where a.Status in(0,1) and ((a.`Start` >= "'.$Start.'" and a.`Start` < "'.$End.'" ) or (a.`End` > "'.$Start.'" and a.`End` <= "'.$End.'" )) and a.Room = "'.$Room.'"'.' '.$NotIDMyself;
+                    $query2=$this->db->query($sql2, array())->result_array();
+                     if ($query2[0]['total'] > 0) {
+                        $array_bool = array(
+                            'type' => 'venue',
+                            'bool' => false
+                        );
+                     }
+                     else
+                     {
+
+                        $sql = 'select count(*) as total from db_academic.classroom as a join db_academic.schedule_details as c
+                                on a.ID = c.ClassroomID
+                                join db_academic.days as b
+                                on c.DayID = b.ID
+                                left join db_academic.schedule as zd on zd.ID = c.ScheduleID
+                                where "'.$date2.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
+                                and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'" 
+                                and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                        on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
+                        $query=$this->db->query($sql, array())->result_array();
+                        if ($query[0]['total'] > 0) {
+                           $array_bool = array(
+                               'type' => 'academic',
+                               'bool' => false
+                           );
+                        }
+                     } 
+                }
+                      
+            }
+            usleep( 500 );
+        }
+
+        return $array_bool;
+    }
+
     public function getCountApprove()
     {
         $sql = 'select count(*) as total from db_reservation.t_booking where Status = 0 and Start >= timestamp(DATE_SUB(NOW(), INTERVAL 30 MINUTE))';
