@@ -32,8 +32,8 @@
 					'<div class = "col-md-3">'+
 						'<label>Status</label>'+
 						'<select class="form-control filterSP" id="filterStatus">'+
-							'<Option value = "1" selected>Need Approve</option>'+
-							'<Option value = "2">Approve</option>'+
+							'<Option value = "1" selected>Will be Set Room</option>'+
+							'<Option value = "2">Already Set Room</option>'+
 							'<Option value = "-2">Reject</option>'+
 						'</select>'+
 					'</div>'+
@@ -206,7 +206,7 @@
     					}
     					else if(status == 2)
     					{
-    						newtr.find('td:eq(9)').html('Approve');
+    						newtr.find('td:eq(9)').html('Already Set Room');
     						newtd.html('');
     					}
     				}
@@ -303,7 +303,7 @@
     					}
     					else if(status == 2)
     					{
-    						newtr.find('td:eq(9)').html('Approve');
+    						newtr.find('td:eq(9)').html('Already Set Room');
     						var st = newtr.find('td:eq(7)').html();
     						newtr.find('td:eq(7)').html(st+' | '+roomname);
     						newtd.html('');
@@ -344,7 +344,7 @@
     							    			var url = base_url_js+'api/__checkBentrokScheduleAPI';
     							    			$.post(url,{token:token},function (data_json3) {
     							    				if (data_json3 == 0 || data_json3 == 1) {
-    							    					newtr.find('td:eq(9)').html('Approve');
+    							    					newtr.find('td:eq(9)').html('Already Set Room');
     							    					var st = newtr.find('td:eq(7)').html();
     							    					newtr.find('td:eq(7)').html(st+' | '+roomname);
     							    					newtd.html('');
