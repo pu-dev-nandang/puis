@@ -168,7 +168,7 @@ class C_schedule_exchange extends Ga_Controler {
             $roomname = $input['roomname'];
             if (array_key_exists('confirm', $input)) {
                 if ($input['confirm'] == 1) {
-                    $chk = true;
+                    $chk['bool'] = true;
                 }
                 else
                 {
