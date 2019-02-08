@@ -1939,10 +1939,10 @@ class C_rest extends CI_Controller {
                     $StatusTbl = '';
                     switch ($row['StatusTbl']) {
                         case '1':
-                           $StatusTbl = 'Need Approve<br>'.$row['Comment'];
+                           $StatusTbl = 'Will be Set Room<br>'.$row['Comment'];
                             break;
                         case '2':
-                           $StatusTbl = 'Approved<br>'.$row['Comment'];
+                           $StatusTbl = 'Already Set Room<br>'.$row['Comment'];
                             break;
                         case '-2':
                            $StatusTbl = 'Reject<br>'.$row['Comment'];
@@ -1970,7 +1970,7 @@ class C_rest extends CI_Controller {
                     $btnApprove  = '';
                     $btnreject = '';
                     if ($row['StatusTbl'] == '1') {
-                        $btnApprove = '<button class = "btn btn-primary btnapprove" token = "'.$row['Token'].'" emailrequest = "'.$row['EmailRequster'].'" emailkaprodi = "'.$row['EmailKaprodiChoice'].'" ScheduleExchangeID = "'.$row['ScheduleExchangeID'].'"><i class="fa fa-check" aria-hidden="true"></i> Approve </button>';
+                        $btnApprove = '<button class = "btn btn-primary btnapprove" token = "'.$row['Token'].'" emailrequest = "'.$row['EmailRequster'].'" emailkaprodi = "'.$row['EmailKaprodiChoice'].'" ScheduleExchangeID = "'.$row['ScheduleExchangeID'].'"><i class="fa fa-check" aria-hidden="true"></i> Set Room </button>';
                         $btnreject = '<button class = "btn btn-inverse btnreject" token = "'.$row['Token'].'" emailrequest = "'.$row['EmailRequster'].'" emailkaprodi = "'.$row['EmailKaprodiChoice'].'" ScheduleExchangeID = "'.$row['ScheduleExchangeID'].'"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Reject </button>';
                     }
                     
