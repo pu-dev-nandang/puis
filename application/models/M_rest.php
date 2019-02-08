@@ -30,15 +30,15 @@ class M_rest extends CI_Model {
         for($i=0;$i<count($dataSemester);$i++){
 
             if($dataSemester[$i]['ID']<13){
-                $dataSchedule = $this->db->query('SELECT zc.*,sp.TypeSchedule, mk.MKCode, mk.Name AS MKName, mk.NameEng AS MKNameEng, cd.TotalSKS AS Credit, em.Name AS Lecturer
+                $dataSchedule = $this->db->query('SELECT zc.*,sp.TypeSchedule, mk.MKCode, mk.Name AS MKName, mk.NameEng AS MKNameEng, 
+                                                            cd.TotalSKS AS Credit, em.Name AS Lecturer, sp.TransferCourse
                                                             FROM '.$db.'.study_planning sp 
                                                             LEFT JOIN db_academic.z_schedule zc ON (zc.Glue = sp.Glue) 
                                                             LEFT JOIN db_employees.employees em ON (em.NIP = zc.NIP)
-                                                            LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = zc.MKID)
                                                             LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sp.CDID)
+                                                            LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sp.MKID)
                                                             WHERE sp.NPM = "'.$NPM.'" 
-                                                            AND zc.SemesterID = "'.$dataSemester[$i]['ID'].'" 
-                                                            AND zc.ProdiID = "'.$ProdiID.'"
+                                                            AND sp.SemesterID = "'.$dataSemester[$i]['ID'].'"                                                             
                                                             GROUP BY mk.MKCode
                                                             ORDER BY mk.MKCode ASC
                                                             ')->result_array();
@@ -46,6 +46,7 @@ class M_rest extends CI_Model {
                 if(count($dataSchedule)>0){
 
                     for($s=0;$s<count($dataSchedule);$s++){
+                        $dataDateTime = [];
                         if($dataSchedule[$s]['IsTeamTeaching']=='1'){
                             $dataTc = $this->db->query('SELECT ztt.*,em.Name AS Lecturer, em.TitleAhead, em.TitleBehind FROM db_academic.z_team_teaching ztt
                                                             LEFT JOIN db_employees.employees em ON (ztt.NIP = em.NIP)
@@ -59,8 +60,9 @@ class M_rest extends CI_Model {
                                                                   zc.SemesterID = "'.$dataSemester[$i]['ID'].'"
                                                                   AND zc.ProdiID = "'.$ProdiID.'" 
                                                                   AND zc.Glue = "'.$dataSchedule[$s]['Glue'].'" ')->result_array();
-                            $dataSchedule[$s]['DetailDateSchedule'] = $dataDateTime;
+
                         }
+                        $dataSchedule[$s]['DetailDateSchedule'] = $dataDateTime;
                     }
 
                 }
@@ -84,7 +86,7 @@ class M_rest extends CI_Model {
 
                 $data = $this->db->query('SELECT sp.ScheduleID,sp.TypeSchedule,mk.MKCode,mk.Name AS MKName,mk.nameEng AS MKNameEng,cd.TotalSKS AS Credit,
                                                 sp.StatusSystem,sc.ClassGroup, sc.TeamTeaching,
-                                                em.NIP,em.Name,em.TitleAhead, em.TitleBehind, em.EmailPU
+                                                em.NIP,em.Name,em.TitleAhead, em.TitleBehind, em.EmailPU, sp.TransferCourse
                                                 FROM '.$db.'.study_planning sp
                                                 LEFT JOIN db_academic.semester s ON (s.ID = sp.SemesterID)
                                                 LEFT JOIN db_academic.schedule sc ON (sc.ID = sp.ScheduleID)
@@ -124,17 +126,17 @@ class M_rest extends CI_Model {
                                                           AND attd.SDID = "'.$dataSchedule[$sds]['SDID'].'"
                                                            AND attd_s.NPM = "'.$NPM.'" ')->result_array();
 
-                                if(count($dataAttd)>0){
-                                    $presen = 0;
-                                    $ArrPresensi = [];
-                                    for($m=1;$m<=14;$m++){
-                                        $meeting += 1;
-                                        if($dataAttd[0]['M'.$m]=='1'){
-                                            $presen += 1;
-                                            $Totalpresen += 1;
-                                        }
-                                        array_push($ArrPresensi,$dataAttd[0]['M'.$m]);
-                                    }
+                                            if(count($dataAttd)>0){
+                                                $presen = 0;
+                                                $ArrPresensi = [];
+                                                for($m=1;$m<=14;$m++){
+                                                    $meeting += 1;
+                                                    if($dataAttd[0]['M'.$m]=='1'){
+                                                        $presen += 1;
+                                                        $Totalpresen += 1;
+                                                    }
+                                                    array_push($ArrPresensi,$dataAttd[0]['M'.$m]);
+                                                }
 
 
                                     $dataSchedule[$sds]['Presensi'] = $presen;

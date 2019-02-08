@@ -49,24 +49,23 @@ class C_auth extends Globalclass {
 
 //        $this->load->view('md5');
 
-        if($table=='updateCredit'){
-            $Year = $this->input->get('year');
-            $DB_ = 'ta_'.$Year;
+        if($table=='updateMKtransfer'){
+            $data = $this->db->get('db_academic.transfer_history_conversion')->result_array();
 
-            $data = $this->db->query('SELECT sp.ID,cd.TotalSKS AS Credit FROM '.$DB_.'.study_planning sp 
-                                                        LEFT JOIN db_academic.curriculum_details cd 
-                                                        ON (cd.ID = sp.CDID)
-                                                        WHERE sp.SemesterID = "14" ')->result_array();
+            foreach ($data AS $item){
 
-            if(count($data)>0){
-                for($i=0;$i<count($data);$i++){
-                    $d = $data[$i];
-                    $this->db->set('Credit', $d['Credit']);
-                    $this->db->where('ID', $d['ID']);
-                    $this->db->update($DB_.'.study_planning');
-                    $this->db->reset_query();
-                }
+                $db_ = 'ta_'.$item['TA_After'];
+
+                $dataUpdate = array(
+                    'TransferCourse' => '1'
+                );
+                $this->db->where('ID', $item['SPID_After']);
+                $this->db->update($db_.'.study_planning',$dataUpdate);
+                $this->db->reset_query();
+
+
             }
+
         }
     }
 
