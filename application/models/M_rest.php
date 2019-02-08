@@ -937,6 +937,7 @@ class M_rest extends CI_Model {
 
         $db = 'ta_'.$ClassOf;
         $dataSmtActive = $this->_getSemesterActive();
+
         $transcript = [];
         $arrTranscriptID = [];
         $dateNow = date("Y-m-d");
@@ -959,32 +960,37 @@ class M_rest extends CI_Model {
                         if(in_array($d['MKID'],$arrTranscriptID)!=-1){
 
                             // cek apakah MKID punya lebih dari 1 jika maka ambil nilai tertingginya
-                            if($showNilaiSemesterActive==1){
+                            if($showNilaiSemesterActive==1 || $showNilaiSemesterActive=='1'){
                                 $dataScore = $this->db->order_by('Score', 'DESC')
                                     ->get_where($db.'.study_planning',array('NPM' => $NPM,'MKID'=>$d['MKID']))->result_array();
                             } else {
                                 $dataScore = $this->db->order_by('Score', 'DESC')
-                                    ->get_where($db.'.study_planning',array('NPM' => $NPM,'MKID'=>$d['MKID'],'SemesterID !='=>$dataSmtActive['SemesterID']))->result_array();
+                                    ->get_where($db.'.study_planning',array('NPM' => $NPM,'MKID'=>$d['MKID']
+                                    ,'SemesterID !='=>$dataSmtActive['SemesterID']))->result_array();
+                            }
+
+                            if(count($dataScore)>0){
+                                $Score = (isset($dataScore[0]['Score']) && $dataScore[0]['Score']!='' && $dataScore[0]['Score']!=null && $dataScore[0]['Score']!='-') ? $dataScore[0]['Score'] : 0;
+                                $Grade = (isset($dataScore[0]['Grade']) && $dataScore[0]['Grade']!='' && $dataScore[0]['Grade']!=null && $dataScore[0]['Grade']!='-') ? $dataScore[0]['Grade'] : 'E';
+                                $GradeValue = (isset($dataScore[0]['GradeValue']) && $dataScore[0]['GradeValue']!='' && $dataScore[0]['GradeValue']!=null && $dataScore[0]['GradeValue']!='-') ? $dataScore[0]['GradeValue'] : 0;
+
+                                $arrTr = array(
+                                    'MKID' => $d['MKID'],
+                                    'MKCode' => $d['MKCode'],
+                                    'Course' => $d['Name'],
+                                    'CourseEng' => $d['NameEng'],
+                                    'Credit' => $d['Credit'],
+                                    'Score' => $Score,
+                                    'Grade' => $Grade,
+                                    'GradeValue' => $GradeValue,
+                                    'Point' => ($d['Credit']* $GradeValue)
+                                );
+                                array_push($arrTranscriptID,$d['MKID']);
+                                array_push($transcript,$arrTr);
                             }
 
 
-                            $Score = ($dataScore[0]['Score']!='' && $dataScore[0]['Score']!=null) ? $dataScore[0]['Score'] : 0;
-                            $Grade = ($dataScore[0]['Grade']!='' && $dataScore[0]['Grade']!=null) ? $dataScore[0]['Grade'] : 'E';
-                            $GradeValue = ($dataScore[0]['GradeValue']!='' && $dataScore[0]['GradeValue']!=null) ? $dataScore[0]['GradeValue'] : 0;
 
-                            $arrTr = array(
-                                'MKID' => $d['MKID'],
-                                'MKCode' => $d['MKCode'],
-                                'Course' => $d['Name'],
-                                'CourseEng' => $d['NameEng'],
-                                'Credit' => $d['Credit'],
-                                'Score' => $Score,
-                                'Grade' => $Grade,
-                                'GradeValue' => $GradeValue,
-                                'Point' => ($d['Credit']* $GradeValue)
-                            );
-                            array_push($arrTranscriptID,$d['MKID']);
-                            array_push($transcript,$arrTr);
 
 
                         }
