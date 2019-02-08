@@ -316,7 +316,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>User Need Attendance
+                    <td>User Need Attendance Out
                         <input id="totalStatus" class="hide">
                     </td>
                     <td>:</td>
