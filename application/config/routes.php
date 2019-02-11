@@ -163,6 +163,8 @@ $route['database/mentor-academic'] = 'page/database/c_database/mentor_academic';
 
 // --- Presensi ---
 $route['academic/attendance/input-attendace'] = 'page/academic/c_presensi';
+$route['academic/attendance/details-attendace/(:num)'] = 'page/academic/c_presensi/details_attendace/$1';
+
 $route['academic/loadPagePresensi'] = 'page/academic/c_presensi/loadPagePresensi';
 
 $route['academic/attendance/monitoring-attendace-lecturer'] = 'page/academic/c_presensi/monitoring_lecturer';
@@ -794,6 +796,7 @@ $route['api/__crudJadwalUjian'] = 'api/c_api/crudJadwalUjian';
 $route['api/__crudEmployees'] = 'api/c_api/crudEmployees';
 $route['api/__crudScore'] = 'api/c_api/crudScore';
 $route['api/__crudAttendance'] = 'api/c_api/crudAttendance';
+$route['api2/__crudAttendance2'] = 'api/c_api2/crudAttendance2';
 
 $route['api/__crudScheduleExchange'] = 'api/c_api/crudScheduleExchange';
 $route['api/__crudLimitCredit'] = 'api/c_api/crudLimitCredit';
@@ -913,6 +916,9 @@ $route['api/__crudTransferStudent'] = 'api/c_api/crudTransferStudent';
 
 $route['api2/__crudScheduleExchage'] = 'api/c_api2/crudScheduleExchage';
 $route['api2/__crudModifyAttendance'] = 'api/c_api2/crudModifyAttendance';
+
+
+$route['api2/__getMonitoringAttendance'] = 'api/c_api2/getMonitoringAttendance';
 
 
 // Penutup API 2 ===

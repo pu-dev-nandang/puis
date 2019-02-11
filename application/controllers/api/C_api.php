@@ -4918,6 +4918,21 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($res));
 
             }
+
+            // Modify === 9 Feb 2019
+            else if($data_arr['action']=='readAttendance'){
+                $ID_Attd = $data_arr['ID_Attd'];
+
+                // Get Attendance Student
+                $dataSet = $this->db->query('SELECT attd_s.*, atus.Name FROM db_academic.attendance_students attd_s 
+                                                    LEFT JOIN db_academic.auth_students atus ON (atus.NPM = attd_s.NPM)
+                                                    WHERE attd_s.ID_Attd = "'.$ID_Attd.'" ')->result_array();
+
+
+                return print_r(json_encode($dataSet));
+
+            }
+
         }
     }
 
@@ -7401,9 +7416,6 @@ class C_api extends CI_Controller {
             return print_r(1);
         }
 
-
-
-
     }
 
     public function crudLog(){
@@ -7763,7 +7775,6 @@ class C_api extends CI_Controller {
 
                             if(count($course)>0){
 
-
                                 for($c=0;$c<count($course);$c++){
                                     $dataHistory = $this->db->query('SELECT cd.Semester FROM db_academic.transfer_history_conversion thc
                                                                                 LEFT JOIN db_academic.curriculum_details cd 
@@ -7792,8 +7803,6 @@ class C_api extends CI_Controller {
 
                         }
                     }
-
-
 
                     // Get Semester After
                     $C_O_After = $dt['ClassOfAfter'];
@@ -7832,9 +7841,6 @@ class C_api extends CI_Controller {
                         }
 
                     }
-
-
-
 
                     $result = array(
                         'DataTransfer' => $data,
