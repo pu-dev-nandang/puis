@@ -716,5 +716,24 @@ class C_dashboard extends Globalclass {
         echo json_encode($arr_json);         
     }
 
+    public function Help()
+    {
+        $post = $_POST;
+        if (count($post) > 0) {
+            $data['selected'] = $post['Division'];
+            $data['G_data'] = $this->m_master->UserQNA($data['selected']);
+            echo $this->load->view('global/help/content_change',$data,true);
+        }
+        else
+        {
+            $data['G_division'] = $this->m_master->caribasedprimary('db_employees.division','StatusDiv',1);
+            $data['selected'] = 6;
+             $data['G_data'] = $this->m_master->UserQNA($data['selected']);
+            $content = $this->load->view('global/help/help',$data,true);
+            $this->temp($content);
+        }
+       
+    }
+
 
 }
