@@ -1974,6 +1974,48 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                                                                break;
                                                                            }
                                                                         }
+                                                                        else
+                                                                        {
+                                                                            $PositionOther = $this->session->userdata('PositionOther1');
+                                                                            $IDDivisionOther = $PositionOther['IDDivisionOther1'];
+                                                                            $PositionOther = $PositionOther['IDPositionOther1'];
+                                                                            if ($DivisionCreated[0] == $IDDivisionOther) {
+                                                                                // compare Position
+                                                                                if ($IDPositionApprover == $PositionOther) {
+                                                                                    $find++;
+                                                                                    $getLoop = false;    
+                                                                                    break;
+                                                                                }
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                $PositionOther = $this->session->userdata('PositionOther2');
+                                                                                $IDDivisionOther = $PositionOther['IDDivisionOther2'];
+                                                                                $PositionOther = $PositionOther['IDPositionOther2'];
+                                                                                if ($DivisionCreated[0] == $IDDivisionOther) {
+                                                                                    // compare Position
+                                                                                    if ($IDPositionApprover == $PositionOther) {
+                                                                                        $find++;
+                                                                                        $getLoop = false;    
+                                                                                        break;
+                                                                                    }
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    $PositionOther = $this->session->userdata('PositionOther3');
+                                                                                    $IDDivisionOther = $PositionOther['IDDivisionOther3'];
+                                                                                    $PositionOther = $PositionOther['IDPositionOther3'];
+                                                                                    if ($DivisionCreated[0] == $IDDivisionOther) {
+                                                                                        // compare Position
+                                                                                        if ($IDPositionApprover == $PositionOther) {
+                                                                                            $find++;
+                                                                                            $getLoop = false;    
+                                                                                            break;
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
                                                                     }
                                                                break;
                                                            
