@@ -645,5 +645,25 @@ class M_budgeting extends CI_Model {
                 ';
         $query=$this->db->query($sql, array($DepartementBudgeting))->result_array();
         return $query;
+    }
+
+    public function GetPeriod()
+    {
+        $YearActivated = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
+        $st = $YearActivated[0]['StartPeriod'];
+        $st = explode('-', $st);
+        $StartMonth = (int) $st[1];
+        $StartMonth = (strlen($StartMonth) == 1 ) ? '0'.$StartMonth : $StartMonth;
+        
+        $StartMonth   = DateTime::createFromFormat('!m', $StartMonth);
+        $StartMonth = $StartMonth->format('F').' '.$st[0]; // March
+
+        $end = $YearActivated[0]['EndPeriod'];
+        $end = explode('-', $end);
+        $EndMonth = (int) $end[1];
+        $EndMonth   = DateTime::createFromFormat('!m', $EndMonth);
+        $EndMonth = $EndMonth->format('F').' '.$end[0]; // March
+
+        return array('StartMonth' => $StartMonth,'EndMonth' => $EndMonth);
     }  
 }

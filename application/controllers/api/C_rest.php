@@ -2089,7 +2089,6 @@ class C_rest extends CI_Controller {
 
     public function budgeting_dashboard()
     {
-        $arrayrs = array();
         try {
             $dataToken = $this->getInputToken2();
             $auth = $this->m_master->AuthAPI($dataToken);
@@ -2112,24 +2111,71 @@ class C_rest extends CI_Controller {
                 );
 
                 $YearActivated = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
+                
+                $StartMonth = 9;
+                $EndMonth = 8;
+
+                $st = $YearActivated[0]['StartPeriod'];
+                $st = explode('-', $st);
+                $StartMonth = (int) $st[1];
+
+                $end = $YearActivated[0]['EndPeriod'];
+                $end = explode('-', $end);
+                $EndMonth = (int) $end[1];
+
                 $Departement = $this->m_master->apiservertoserver(serverRoot.'/api/__getAllDepartementPU');
                 $data = array();
                 for ($i=0; $i < count($Departement); $i++) { 
                     $Code = $Departement[$i]['Code'];
-                    $DepartementName = $Departement[$i]['Name1'];
+                    $DepartementName = $Departement[$i]['Name2'];
                     $get = $this->m_budgeting->get_creator_budget($YearActivated[0]['Year'],$Code);
                     $arr_temp = array();
                     for ($j=0; $j < count($get); $j++) { 
-                        // get data to show in dashboard
+                        // get data to show in dashboard'
+                        $DetailMonth = (array) json_decode($get[$j]['DetailMonth'],true);
+                        $UnitCost = $get[$j]['UnitCost']; 
+                        for ($l=0; $l < count($DetailMonth); $l++) { 
+                            $month_get = $DetailMonth[$l]['month'];
+                            $aa = explode('-', $month_get);
+                            $m1 = (int)$aa[1];
+                            $value = $DetailMonth[$l]['value'];
+                            $value = $value * $UnitCost;
+
+                            // find month exist
+                            $b = false;
+                            for ($k=0; $k < count($arr_temp); $k++) { 
+                                $m2 = $arr_temp[$k]['month'];
+                                if ($m1 == $m2) {
+                                    $b = true;
+                                    break;
+                                }
+                            }
+
+                            if ($b) {
+                               // exist
+                              $arr_temp[$k]['value'] = $arr_temp[$k]['value'] + $value;
+                            }
+                            else
+                            {
+                                $arr_temp[] = array(
+                                    'month' => $m1,
+                                    'value' => $value,
+                                );
+                            }
+
+                        }
                     }
                     $data[] = array(
                         'Code' => $Code,
                         'DepartementName' => $DepartementName,
-                        'data' => $get,
+                        'data' => $arr_temp,
                     );
                 }
 
-                echo json_encode($data);    
+                echo json_encode(array(
+                    'month' => $month,'data' => $data,'StartMonth' => $StartMonth,'EndMonth' => $EndMonth
+                    )
+                );    
             }
             else
             {

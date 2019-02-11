@@ -25,7 +25,15 @@ class C_budgeting extends Budgeting_Controler {
             $MenuDepartement= 'AC.'.$this->session->userdata('prodi_active_id');
         }
         $this->getAuthSession($MenuDepartement);
-        $content = $this->load->view('page/budgeting/'.$this->data['department'].'/dashboard',$this->data,true);
+        $this->data['GetPeriod'] = $this->m_budgeting->GetPeriod();
+        if (file_exists(APPPATH.'view/page/budgeting'.$this->data['department'].'dashboard')) {
+            $content = $this->load->view('page/budgeting/'.$this->data['department'].'/dashboard',$this->data,true);
+        }
+        else
+        {
+            $content = $this->load->view('page/budgeting/dashboard',$this->data,true);
+        }
+        
         $this->temp($content);
         
     }

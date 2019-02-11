@@ -82,4 +82,45 @@
           $("#pageCatalog").html(html);
       }); // exit spost
     }
+
+    $(document).on('click','#sbmtimportfile', function () {
+      var chkfile = file_validation('ImportFile');
+      if (chkfile) {
+        
+      }
+    });
+
+    function file_validation(ID_element)
+    {
+        var files = $('#'+ID_element)[0].files;
+        var error = '';
+        var msgStr = '';
+       var name = files[0].name;
+        console.log(name);
+        var extension = name.split('.').pop().toLowerCase();
+        if(jQuery.inArray(extension, ['xlsx']) == -1)
+        {
+         msgStr += 'Invalid Type File<br>';
+        }
+
+        var oFReader = new FileReader();
+        oFReader.readAsDataURL(files[0]);
+        var f = files[0];
+        var fsize = f.size||f.fileSize;
+        console.log(fsize);
+
+        if(fsize > 2000000) // 2mb
+        {
+         msgStr += 'File Size is very big<br>';
+        }
+
+        if (msgStr != '') {
+          toastr.error(msgStr, 'Failed!!');
+          return false;
+        }
+        else
+        {
+          return true;
+        }
+    }
 </script>
