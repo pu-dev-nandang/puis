@@ -2607,4 +2607,45 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $rs = (array) json_decode($pr,true);
         return $rs;
     }
+
+    public function UserQNA($IDDivision = '')
+    {
+        $arr_result = array();
+        $Q_add = ($IDDivision == '') ? '' : ' where Division_ID = "'.$IDDivision.'" order by ID asc,Type asc';
+        $sql = 'select * from db_employees.user_qna '.$Q_add;
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) { 
+            $Type1 = $query[$i]['Type'];
+            $temp = array('Type' => $Type1);
+            $datatemp = array();
+            $datatemp[] = array(
+                'Questions' => $query[$i]['Questions'],
+                'Answers' => $query[$i]['Answers'],
+                'File' => $query[$i]['File'],
+            );
+
+            for ($j=$i+1; $j < count($query); $j++) { 
+                $Type2 = $query[$j]['Type'];
+                if ($Type1 == $Type2) {
+                  $datatemp[] = array(
+                      'Questions' => $query[$j]['Questions'],
+                      'Answers' => $query[$j]['Answers'],
+                      'File' => $query[$j]['File'],
+                  );  
+                }
+                else
+                {
+                    $i = $j-1;
+                    break;
+                }
+            }
+
+            $temp['data'] = $datatemp;
+            $arr_result[] = $temp;
+
+        }
+
+
+        return $arr_result;
+    }
 }
