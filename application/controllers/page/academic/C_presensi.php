@@ -28,9 +28,19 @@ class C_presensi extends Academic_Controler {
     public function index()
     {
         $data['department'] = parent::__getDepartement();
-        $content = $this->load->view('page/'.$data['department'].'/presensi/attendance',$data,true);
+        $content = $this->load->view('page/'.$data['department'].'/presensi/monitoring_attendance',$data,true);
+        $this->menu_presensi($content);
+        //        $content = $this->load->view('page/'.$data['department'].'/presensi/attendance',$data,true);
+    }
+
+    public function details_attendace($ScheduleID){
+        $data['department'] = parent::__getDepartement();
+        $data['ScheduleID'] = $ScheduleID;
+        $content = $this->load->view('page/'.$data['department'].'/presensi/details_attendace',$data,true);
         $this->menu_presensi($content);
     }
+
+
 
     public function monitoring_lecturer(){
         $data['department'] = parent::__getDepartement();

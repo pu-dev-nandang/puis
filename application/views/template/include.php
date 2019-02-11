@@ -242,6 +242,9 @@
 <script type="text/javascript" src="<?php echo base_url('assets/template/'); ?>plugins/datatables/DT_bootstrap.js"></script>
 <!--<script type="text/javascript" src="--><?php //echo base_url('assets/template/'); ?><!--plugins/datatables/dataTables.rowReorder.js"></script>-->
 
+<!-- Plugin DataTbales -->
+<script type="text/javascript" src="<?php echo base_url('assets/datatables/dataTables.rowsGroup.js'); ?>"></script>
+
 <!-- Forms -->
 <script type="text/javascript" src="<?php echo base_url('assets/template/'); ?>plugins/uniform/jquery.uniform.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url('assets/template/'); ?>plugins/select2/select2.min.js"></script>

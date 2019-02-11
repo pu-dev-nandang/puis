@@ -355,7 +355,7 @@
             // minDate: new Date(moment().year(),moment().month(),moment().date()),
             onSelect : function () {
                 var data_date = $(this).val().split(' ');
-                var nextelement = $(this).attr('nextelement')
+                var nextelement = $(this).attr('nextelement');
                 nextDatePick(data_date,nextelement);
             }
         });

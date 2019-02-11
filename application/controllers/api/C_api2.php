@@ -968,5 +968,388 @@ class C_api2 extends CI_Controller {
     }
 
 
+    public function getMonitoringAttendance(){
+
+        $requestData= $_REQUEST;
+
+        $data_arr = $this->getInputToken();
+
+        $ProgramsCampusID = $data_arr['ProgramsCampusID'];
+        $SemesterID = $data_arr['SemesterID'];
+        $ProdiID = $data_arr['ProdiID'];
+        $DayID = $data_arr['DayID'];
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataSearch = 'AND ( s.ClassGroup LIKE "%'.$search.'%" OR mk.MKCode LIKE "%'.$search.'%"
+                           OR mk.NameEng LIKE "%'.$search.'%" OR d.NameEng LIKE "%'.$search.'%"
+                           )';
+        }
+
+        $w_Prodi = ($ProdiID!='' && $ProdiID!=null) ? ' AND sdc.ProdiID = "'.$ProdiID.'" ' : '';
+        $w_Day = ($DayID!='' && $DayID!=null) ? ' AND sd.DayID = "'.$DayID.'" ' : '';
+
+
+
+        $queryDefault = 'SELECT s.ID AS ScheduleID, attd.ID AS ID_Attd,sd.ID AS SDID,s.Coordinator , s.ClassGroup, s.TeamTeaching, mk.MKCode, mk.NameEng AS CourseEng,  
+                                        mk.Name AS Course, d.NameEng AS DayEng, cd.TotalSKS AS Credit, sd.StartSessions, sd.EndSessions, em.Name AS Lecturer
+                                        FROM db_academic.schedule_details sd 
+                                        LEFT JOIN db_academic.schedule s ON (sd.ScheduleID = s.ID)  
+                                        LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)                               
+                                        LEFT JOIN db_academic.schedule_details_course sdc ON (s.ID = sdc.ScheduleID)
+                                        LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                        LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                        LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                        LEFT JOIN db_academic.attendance attd ON (attd.SemesterID = s.SemesterID AND attd.SDID = sd.ID)
+                                        WHERE ( s.ProgramsCampusID = "'.$ProgramsCampusID.'" AND 
+                                        s.SemesterID = "'.$SemesterID.'" '.$w_Prodi.' '.$w_Day.' ) '.$dataSearch.'
+                                        GROUP BY sd.ID
+                                        ORDER BY d.ID, sd.StartSessions, s.ID ASC ';
+
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $no = $requestData['start'];
+        $data = array();
+
+        $tempG = '';
+        for($i=0;$i<count($query);$i++) {
+            $nestedData = array();
+            $row = $query[$i];
+
+
+            if($row['ClassGroup']!=$tempG){
+                $no++;
+            }
+            $tempG = $row['ClassGroup'];
+
+
+            // ==== Attendance Lecturer ====
+
+            $arrLec = [$row['Coordinator']];
+            $arrLecName = [$row['Lecturer']];
+            if($row['TeamTeaching']==1 || $row['TeamTeaching']=='1'){
+                $dataLec = $this->db->query('SELECT em.NIP,em.Name FROM db_academic.schedule_team_teaching stt 
+                                                        LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
+                                                        WHERE stt.ScheduleID = "'.$row['ScheduleID'].'"')->result_array();
+                if(count($dataLec)>0){
+                    foreach ($dataLec AS $item){
+                        array_push($arrLec,$item['NIP']);
+                        array_push($arrLecName,$item['Name']);
+                    }
+                }
+            }
+
+            $showLec = '';
+            $dataLec = [];
+            // Load Data Teachir
+            if(count($arrLec)>0){
+                for ($t=0;$t<count($arrLec);$t++){
+                    // Get Attendance
+
+                    $dataAttd = $this->db->query('SELECT COUNT(*) AS P FROM db_academic.attendance_lecturers attd_l
+                                                              LEFT JOIN db_academic.attendance attd ON (attd.ID = attd_l.ID_Attd)
+                                                              WHERE attd.ID = "'.$row['ID_Attd'].'"
+                                                              AND attd_l.NIP = "'.$arrLec[$t].'" ')->result_array();
+
+                    $br = ($t!=0) ? '<br/>' : '';
+                    $showLec = $showLec.''.$br.''.$arrLecName[$t].' - <span style="color: orangered;">'.$dataAttd[0]['P'].'</span>';
+
+                    $arr = array(
+                        'NIP' => $arrLec[$t],
+                        'Name' => $arrLecName[$t]
+                    );
+                    array_push($dataLec,$arr);
+                }
+            }
+
+            // ==== Attendance Student ====
+            $dataStd = $this->db->query('SELECT * FROM attendance_students attd_s 
+                                                    LEFT JOIN db_academic.attendance attd ON (attd.ID = attd_s.ID_Attd)
+                                                    WHERE 
+                                                    attd.ID = "'.$row['ID_Attd'].'"
+                                                    ')->result_array();
+
+            $arrP = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+            $arrA = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+
+            if(count($dataStd)>0){
+                foreach ($dataStd as $items){
+                    $noArr = 0;
+                    for($l=1;$l<=14;$l++){
+                        if($items['M'.$l]==1 || $items['M'.$l]=='1'){
+                            $arrP[$noArr] = $arrP[$noArr]+1;
+                        }
+                        else if($items['M'.$l]==2 || $items['M'.$l]=='2'){
+                            $arrA[$noArr] = $arrA[$noArr]+1;
+                        }
+
+                        $noArr ++;
+                    }
+
+                    // UTS
+                    if($items['UTS']==1 || $items['UTS']=='1'){
+                        $arrP[14] = $arrP[14] + 1;
+                    } else if($items['UTS']==1 || $items['UTS']=='1'){
+                        $arrA[14] = $arrA[14] + 1;
+                    }
+
+                    // UAS
+                    if($items['UAS']==1 || $items['UAS']=='1'){
+                        $arrP[15] = $arrP[15] + 1;
+                    } else if($items['UAS']==1 || $items['UAS']=='1'){
+                        $arrA[15] = $arrA[15] + 1;
+                    }
+
+                }
+            }
+
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div  style="text-align:left;"><a href="'.base_url('academic/attendance/details-attendace/'.$row['ScheduleID']).'"><b>'.$row['MKCode'].' - '.$row['CourseEng'].'</b></a><br/>'.$row['Course'].'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$row['ClassGroup'].'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$row['Credit'].'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.count($dataStd).'</div>';
+            $nestedData[] = '<div  style="text-align:left;">'.$showLec.'<textarea class="hide" id="dateLec'.$row['ID_Attd'].'">'.json_encode($dataLec).'</textarea></div>';
+            $nestedData[] = '<div  style="text-align:right;"><b>'.$row['DayEng'].'</b> <button data-course="'.$row['MKCode'].' - '.$row['CourseEng'].' | '.$row['DayEng'].', '.substr($row['StartSessions'],0,5).' - '.substr($row['EndSessions'],0,5).'" 
+                data-id="'.$row['ID_Attd'].'" class="btn btn-sm btn-default btnShowDetailAttd hide"><i class="fa fa-edit"></i></button><br/>'.
+                substr($row['StartSessions'],0,5).' - '.substr($row['EndSessions'],0,5).'</div>';
+
+            for($l=0;$l<count($arrP);$l++){
+                $totalStd = $arrP[$l]+$arrA[$l];
+                if($totalStd==0){
+                    $nestedData[] = '<div  style="text-align:center;">-</div>';
+                } else {
+                    $nestedData[] = '<div  style="text-align:center;"><span class="label label-success labelAttd">'.$arrP[$l].'</span><br/><span class="label label-danger labelAttd">'.$arrA[$l].'</span></div>';
+                }
+
+            }
+
+
+            $data[] = $nestedData;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+
+        echo json_encode($json_data);
+
+
+    }
+
+    public function crudAttendance2(){
+        $data_arr = $this->getInputToken();
+        if (count($data_arr) > 0) {
+            if($data_arr['action']=='loadScheduleDetails'){
+                $ScheduleID = $data_arr['ScheduleID'];
+
+                // Get Course
+                $dataCourse = $this->db->query('SELECT mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup, em.NIP, em.Name, s.TeamTeaching FROM db_academic.schedule s 
+                                                          LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                          LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                          LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                                          WHERE s.ID = "'.$ScheduleID.'" GROUP BY s.ID LIMIT 1')->result_array();
+
+                // Get Lecturer
+                $dataLecturer = [array(
+                    'NIP' => $dataCourse[0]['NIP'],
+                    'Name' => $dataCourse[0]['Name']
+                )];
+
+                if($dataCourse[0]['TeamTeaching']==1 || $dataCourse[0]['TeamTeaching']=='1'){
+                    $dataT = $this->db->query('SELECT em.NIP,em.Name FROM db_academic.schedule_team_teaching stt 
+                                                              LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
+                                                              WHERE stt.ScheduleID = "'.$ScheduleID.'" ORDER BY em.NIP ')->result_array();
+
+                    if(count($dataT)>0){
+                        foreach ($dataT as $item){
+                            $ar = array(
+                                'NIP' => $item['NIP'],
+                                'Name' => $item['Name']
+                            );
+                            array_push($dataLecturer,$ar);
+                        }
+                    }
+                }
+
+
+                $dataSchedule = $this->db->query('SELECT attd.ID AS ID_Attd ,sd.ID AS SDID, sd.StartSessions, sd.EndSessions, cl.Room, d.NameEng AS DayEng FROM db_academic.schedule_details sd 
+                                                    LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
+                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+                                                    LEFT JOIN db_academic.attendance attd ON (attd.ScheduleID = sd.ScheduleID AND attd.SDID = sd.ID)
+                                                    WHERE sd.ScheduleID = "'.$ScheduleID.'" 
+                                                    ORDER BY sd.DayID, sd.StartSessions ASC ')->result_array();
+
+
+                $result = array(
+                    'Course' => $dataCourse,
+                    'Lecturer' => $dataLecturer,
+                    'Schedule' => $dataSchedule
+                );
+
+                return print_r(json_encode($result));
+            }
+            else if($data_arr['action']=='readDetailAttendance'){
+                $ScheduleID = $data_arr['ScheduleID'];
+                $SDID = $data_arr['SDID'];
+
+                $dataAttd = $this->db->query('SELECT * FROM db_academic.attendance attd 
+                                        WHERE attd.ScheduleID = "'.$ScheduleID.'" AND attd.SDID = "'.$SDID.'" LIMIT 1')->result_array();
+
+                $result = [];
+                if(count($dataAttd)>0){
+
+                    $ID_Attd = $dataAttd[0]['ID'];
+
+                    for ($i=1;$i<=14;$i++){
+                        $bap = $this->db->query('SELECT b.*, auts.Name AS Student, em.Name AS Lecturer
+                                                  FROM db_academic.attendance_bap b
+                                                  LEFT JOIN db_academic.auth_students auts ON (auts.NPM = b.StudentSignBy)
+                                                  LEFT JOIN db_employees.employees em ON (em.NIP = b.NIP)
+                                                  WHERE b.ID_Attd = "'.$ID_Attd.'"
+                                                   AND b.Sesi = "'.$i.'" ')->result_array();
+
+                        // Get Present
+                        $p = ' AND atts.M'.$i.' = "1" ';
+                        $present = $this->db->query('SELECT * FROM db_academic.attendance_students atts 
+                                                      WHERE atts.ID_Attd = "'.$ID_Attd.'" '.$p)->result_array();
+
+                        // Get Absent
+                        $a = ' AND atts.M'.$i.' = "2" ';
+                        $absent = $this->db->query('SELECT * FROM db_academic.attendance_students atts 
+                                                      WHERE atts.ID_Attd = "'.$ID_Attd.'" '.$a)->result_array();
+
+                        // Get Time Attendance
+                        $dataLect = $this->db->query('SELECT al.*, em.Name AS Lecturer FROM db_academic.attendance_lecturers al
+                                                      LEFT JOIN db_employees.employees em ON (em.NIP = al.NIP)
+                                                      WHERE al.ID_Attd = "'.$ID_Attd.'" AND al.Meet = "'.$i.'" ')->result_array();
+
+                        $countPresent = (count($present)==0 && count($absent)==0) ? '-' : count($present);
+                        $countAbsent = (count($present)==0 && count($absent)==0) ? '-' : count($absent);
+
+                        $arrRes = array(
+                            'Present' => $countPresent,
+                            'Absent' => $countAbsent,
+                            'Lecturer' => $dataLect,
+                            'BAP' => $bap
+                        );
+                        array_push($result,$arrRes);
+                    }
+
+                }
+
+                return print_r(json_encode($result));
+
+            }
+            else if($data_arr['action']=='updateAttendanceLecturer'){
+
+                $ID_Attd = $data_arr['ID_Attd'];
+                $Meet = $data_arr['Meet'];
+                $NIP = $data_arr['NIP'];
+
+                // Cek apakah data sudah ada
+                // 1. Jika ada maka data akan terupdate
+                // 2. Jika tidak ada maka insert
+
+                $dataAttd = $this->db->select('ID')->limit(1)->get_where('db_academic.attendance_lecturers',array(
+                    'ID_Attd' => $ID_Attd,
+                    'Meet' => $Meet,
+                    'NIP' => $NIP
+                ))->result_array();
+
+                $dataUpdate = array(
+                    'Meet' => $Meet,
+                    'Date' => $data_arr['Date'],
+                    'In' => $data_arr['In'],
+                    'Out' => $data_arr['Out']
+                );
+
+                if(count($dataAttd)>0){
+
+                    // Update
+                    $this->db->where('ID', $dataAttd[0]['ID']);
+                    $this->db->update('db_academic.attendance_lecturers',$dataUpdate);
+
+
+                } else {
+                    $dataUpdate['ID_Attd'] = $ID_Attd;
+                    $dataUpdate['NIP'] = $NIP;
+                    // Insert
+                    $this->db->insert('db_academic.attendance_lecturers', $dataUpdate);
+                }
+
+
+                // Update Attendance
+                $dataUpAt = array(
+                    'Meet'.$Meet => '1',
+                    'Date'.$Meet => $data_arr['Date']
+                );
+                $this->db->where('ID', $ID_Attd);
+                $this->db->update('db_academic.attendance',$dataUpAt);
+
+                return print_r(1);
+
+            }
+            else if($data_arr['action']=='deleteAttendanceLecturer'){
+                $ID = $data_arr['ID'];
+                $this->db->where('ID', $ID);
+                $this->db->delete('db_academic.attendance_lecturers');
+                return print_r(1);
+            }
+            else if($data_arr['action']=='readAttdStudent'){
+
+                $ID_Attd = $data_arr['ID_Attd'];
+                $Meet = $data_arr['Meet'];
+
+                //cek apakah status aatd sudah 1 atau blm
+                $dataAttd = $this->db->query('SELECT Meet'.$Meet.' AS StatusMeet FROM db_academic.attendance attd 
+                                                                    WHERE attd.ID = "'.$ID_Attd.'" LIMIT 1')->result_array();
+
+                // Get Attendance Setting
+                $dataSeting = $this->db->query('SELECT attdSet.* FROM db_academic.attendance_setting attdSet 
+                                                            LEFT JOIN db_academic.semester s ON (s.ID = attdSet.SemesterID)
+                                                            WHERE s.Status = "1" ')->result_array();
+
+                $dataStd = $this->db->query('SELECT attds.ID, ats.Name, ats.NPM, attds.D'.$Meet.' AS D, attds.M'.$Meet.' AS M FROM db_academic.attendance_students attds 
+                                                        LEFT JOIN db_academic.auth_students ats ON (ats.NPM = attds.NPM)
+                                                        WHERE attds.ID_Attd = "'.$ID_Attd.'" ORDER BY ats.NPM ASC')->result_array();
+
+                $result = array(
+                    'Attendance' => $dataAttd,
+                    'Setting' => $dataSeting,
+                    'Students' => $dataStd
+                );
+
+                return print_r(json_encode($result));
+
+            }
+            else if($data_arr['action']=='UpdateStudentAttd'){
+                $Meet = $data_arr['Meet'];
+
+                $attdStudent = (array) $data_arr['attdStudent'];
+
+                if(count($attdStudent)>0){
+                    foreach ($attdStudent AS $item){
+                        $Update = array(
+                            'M'.$Meet => $item->M,
+                            'D'.$Meet => $item->D
+                        );
+                        $this->db->where('ID', $item->ID);
+                        $this->db->update('db_academic.attendance_students',$Update);
+                    }
+                }
+
+                return print_r(1);
+
+
+            }
+        }
+    }
 
 }
