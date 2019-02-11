@@ -74,7 +74,7 @@
     });
 
     function loadDataTransferStudent() {
-
+        arrSemesterIDAfter = [];
         var token = jwt_encode({action : 'readDataTransferStudent', TSID : TSID},'UAP)(*');
         var url = base_url_js+'api/__crudTransferStudent';
         $.post(url,{token:token},function (jsonResult) {
