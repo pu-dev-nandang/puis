@@ -286,6 +286,15 @@ class C_transaksi extends Vreservation_Controler {
                                                 {
                                                     // find by division and position
                                                     $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionMain',$IDDivision.'.'.$IDPositionApprover);
+                                                    if (count($getApprover1) == 0) {
+                                                        $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionOther1',$IDDivision.'.'.$IDPositionApprover);
+                                                        if (count($getApprover1) == 0) {
+                                                            $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionOther2',$IDDivision.'.'.$IDPositionApprover);
+                                                            if (count($getApprover1) == 0) {
+                                                                $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionOther3',$IDDivision.'.'.$IDPositionApprover);
+                                                            }
+                                                        }
+                                                    }
                                                     for ($k=0; $k < count($getApprover1); $k++) {
                                                         if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
                                                              $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name'],'Code' => $getApprover1[$k]['NIP'],'TypeApprover' => $TypeApprover);
@@ -1222,6 +1231,15 @@ class C_transaksi extends Vreservation_Controler {
                                                 {
                                                     // find by division and position
                                                     $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionMain',$IDDivision.'.'.$IDPositionApprover);
+                                                    if (count($getApprover1) == 0) {
+                                                        $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionOther1',$IDDivision.'.'.$IDPositionApprover);
+                                                        if (count($getApprover1) == 0) {
+                                                            $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionOther2',$IDDivision.'.'.$IDPositionApprover);
+                                                            if (count($getApprover1) == 0) {
+                                                                $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionOther3',$IDDivision.'.'.$IDPositionApprover);
+                                                            }
+                                                        }
+                                                    }
                                                     for ($k=0; $k < count($getApprover1); $k++) {
                                                         if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
                                                              $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name'],'Code' => $getApprover1[$k]['NIP'],'TypeApprover' => $TypeApprover);
