@@ -231,7 +231,7 @@
                             '<td>'+T_Date+'<br/>'+T_Time+'</td>' +
                             '<td>'+troom+'</td>' +
                             '<td style="text-align: left;">'+d.Reason+'</td>' +
-                            '<td>'+s+' - '+d.Status+'</td>' +
+                            '<td>'+s+'</td>' +
                             '</tr>');
 
                         var arr2pdf = {
