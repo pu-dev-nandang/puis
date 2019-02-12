@@ -261,6 +261,18 @@
                         </div>
                     </td>
                 </tr>
+                <tr>
+                    <td>Default Attendance</td>
+                    <td>:</td>
+                    <td>
+                        <label class="radio-inline" style="color: red;">
+                            <input type="radio" name="form_DefaultAttendance" id="DefAbs" value="0"> Absent
+                        </label>
+                        <label class="radio-inline" style="color: green;">
+                            <input type="radio" name="form_DefaultAttendance" id="DefPres" value="1"> Present
+                        </label>
+                    </td>
+                </tr>
             </table>
         </div>
     </div>
@@ -316,7 +328,17 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>User Need Attendance Out
+                    <td colspan="4">
+                        <hr/>
+                        <div style="background: lightyellow;border: 1px solid #CCCCCC;padding: 10px;">
+                            Button "Attendance Out" akan muncul pada status yg di checklist
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        User Need Attendance Out
+
                         <input id="totalStatus" class="hide">
                     </td>
                     <td>:</td>
@@ -423,6 +445,7 @@
                 Out_Type_Lec : $('#form_Out_Type_Lec').val(),
                 Out_Time_Lec :( form_Out_Time_Lec!='' &&  form_Out_Time_Lec!=null &&  form_Out_Time_Lec!=0) ?  form_Out_Time_Lec : 0,
                 Out_User_Lec : JSON.stringify(Out_User_Lec),
+                DefaultAttendance : $("input[name=form_DefaultAttendance]:checked").val(),
                 UpdateBy : sessionNIP,
                 UpdateAt : dateTimeNow()
             }
@@ -525,6 +548,12 @@
                 $('#form_Out_Session_Lec').val(d.Out_Session_Lec);
                 $('#form_Out_Type_Lec').val(d.Out_Type_Lec);
                 $('#form_Out_Time_Lec').val(d.Out_Time_Lec);
+
+                if(d.DefaultAttendance==1 || d.DefaultAttendance=='1'){
+                    $('#DefPres').prop('checked',true);
+                } else {
+                    $('#DefAbs').prop('checked',true);
+                }
 
                 Out_User_Lec = JSON.parse(d.Out_User_Lec);
 
