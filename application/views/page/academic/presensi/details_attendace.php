@@ -37,7 +37,7 @@
 <div class="row">
     <div class="col-md-12" style="text-align: right;margin-bottom: 15px;">
         <hr/>
-        <button class="btn btn-default btnEdAttd hide" disabled id="btnBAP"><i class="fa fa-edit margin-right"></i> BAP</button> |
+        <button class="btn btn-default btnEdAttd" disabled id="btnBAP"><i class="fa fa-edit margin-right"></i> BAP</button> |
         <button class="btn btn-primary btnEdAttd" disabled id="btnLecAttd"><i class="fa fa-edit margin-right"></i> Lecturer Attendance</button> |
         <button class="btn btn-success btnEdAttd" disabled id="btnStdAttd"><i class="fa fa-edit margin-right"></i> Student Attendance</button>
     </div>
@@ -192,15 +192,120 @@
 
     $('#btnBAP').click(function () {
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-            '<h4 class="modal-title">Announcement</h4>');
-        $('#GlobalModal .modal-body').html('Announcement (Under Construction)');
-        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
-            '<button type="button" class="btn btn-primary"><i class="fa fa-paper-plane-o right-margin" aria-hidden="true"></i> Publish</button>');
+            '<h4 class="modal-title">BAP</h4>');
+        $('#GlobalModal .modal-body').html('<div class="row">' +
+            '    <div class="col-md-4 col-md-offset-4">' +
+            '        <div class="form-group">' +
+            '            <label>Sesi</label>' +
+            '            <select class="form-control" id="formBAP_Sesi"></select>' +
+            '        </div><hr/>' +
+            '    </div>' +
+            '</div>' +
+            '<div id="divViewBap"></div>' +
+            '<div class="row">' +
+            '    <div class="col-md-12" style="text-align: right;">' +
+            '        <hr/>' +
+            '        <button type="button" class="btn btn-success" id="btnActSubmitBAP">Submit</button> | ' +
+            '        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
+            '    </div>' +
+            '</div>');
+
+        for(var i=1;i<=14;i++){
+            $('#formBAP_Sesi').append('<option value="'+i+'">'+i+'</option>');
+        }
+
+        loadBAP();
+
+        $('#formBAP_Sesi').change(function () {
+            loadBAP();
+        });
+
+        $('#btnActSubmitBAP').click(function () {
+
+            var Sesi = $('#formBAP_Sesi').val();
+
+            var filterSD = $('#filterSD').val();
+            var ID_Attd = filterSD.split('.')[1];
+
+            var formBAP_Subject = $('#formBAP_Subject').val();
+            var formBAP_Material = $('#formBAP_Material').val();
+            var formBAP_Description = $('#formBAP_Description').val();
+
+            var data = {
+              action : ''
+            };
+
+        });
+
+        $('#GlobalModal .modal-footer').addClass('hide');
+        // $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
+        //     '<button type="button" class="btn btn-primary"><i class="fa fa-paper-plane-o right-margin" aria-hidden="true"></i> Publish</button>');
+
         $('#GlobalModal').modal({
             'show' : true,
             'backdrop' : 'static'
         });
     });
+
+    function loadBAP() {
+
+        loading_page('#divViewBap');
+
+        var formBAP_Sesi = $('#formBAP_Sesi').val();
+        var Sesi = (formBAP_Sesi!='' && formBAP_Sesi!=1 && formBAP_Sesi!=null && formBAP_Sesi!='1')
+            ? formBAP_Sesi
+            : 1;
+
+        var filterSD = $('#filterSD').val();
+
+        var ID_Attd = filterSD.split('.')[1];
+
+        var data = {
+            action : 'loadBAP',
+            Sesi : Sesi,
+            ID_Attd : ID_Attd
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api2/__crudAttendance2';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            setTimeout(function () {
+                $('#divViewBap').html(  '<div class="row">' +
+                    '    <div class="col-md-12">' +
+                    '        <div class="form-group">' +
+                    '            <label>Subject</label>' +
+                    '            <textarea class="form-control" id="formBAP_Subject" rows="4"></textarea>' +
+                    '        </div>' +
+                    '    </div>' +
+                    '    <div class="col-md-12">' +
+                    '        <div class="form-group">' +
+                    '            <label>Material</label>' +
+                    '            <textarea class="form-control" id="formBAP_Material" rows="4"></textarea>' +
+                    '        </div>' +
+                    '    </div>' +
+                    '    <div class="col-md-12">' +
+                    '        <div class="form-group">' +
+                    '            <label>Description</label>' +
+                    '            <textarea class="form-control" id="formBAP_Description" rows="4"></textarea>' +
+                    '        </div>' +
+                    '    </div>' +
+                    '</div>');
+
+                var formBAP_Subject = (jsonResult.length>0) ? jsonResult[0].Subject : '';
+                var formBAP_Material = (jsonResult.length>0) ? jsonResult[0].Material : '';
+                var formBAP_Description = (jsonResult.length>0) ? jsonResult[0].Description : '';
+
+                $('#formBAP_Subject').val(formBAP_Subject);
+                $('#formBAP_Material').val(formBAP_Material);
+                $('#formBAP_Description').val(formBAP_Description);
+
+            },500);
+
+        });
+
+    }
 
     $('#btnLecAttd').click(function () {
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
@@ -521,7 +626,7 @@
             for(var i=1;i<=formAttdStd_TotalStd;i++){
                 if($('#formAttdStd_Attd'+i).is(':checked')){
                     $('#trStd_'+i).css({
-                        'background': '#fffff',
+                        'background': '#ffffff',
                         'color': '#333'
                     });
                     p += 1;
@@ -537,8 +642,6 @@
         $('#viewStd').html('<span style="color: blue;">'+p+'</span> of '+formAttdStd_TotalStd);
 
     }
-
-
 
     // Remove Attendance Lecturer
     $(document).on('click','.btnDeleteAttd',function () {

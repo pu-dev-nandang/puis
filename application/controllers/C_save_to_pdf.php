@@ -321,7 +321,7 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Cell(10,$ch_atas,$d['A_Sesi'],'LRT',0,'C');
             $pdf->Cell(38,$ch_atas,$r1,'LRT',0,'L');
 
-            if($d['Status']=='1'){
+            if($d['Status']=='2'){
                 $pdf->SetFont('ZapfDingbats');
                 $pdf->Cell(10,$ch_atas,chr(52),'LRT',0,'C');
             } else {

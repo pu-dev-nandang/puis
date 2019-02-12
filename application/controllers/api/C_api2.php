@@ -1113,8 +1113,7 @@ class C_api2 extends CI_Controller {
             $nestedData[] = '<div  style="text-align:center;">'.$row['Credit'].'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.count($dataStd).'</div>';
             $nestedData[] = '<div  style="text-align:left;">'.$showLec.'<textarea class="hide" id="dateLec'.$row['ID_Attd'].'">'.json_encode($dataLec).'</textarea></div>';
-            $nestedData[] = '<div  style="text-align:right;"><b>'.$row['DayEng'].'</b> <button data-course="'.$row['MKCode'].' - '.$row['CourseEng'].' | '.$row['DayEng'].', '.substr($row['StartSessions'],0,5).' - '.substr($row['EndSessions'],0,5).'" 
-                data-id="'.$row['ID_Attd'].'" class="btn btn-sm btn-default btnShowDetailAttd hide"><i class="fa fa-edit"></i></button><br/>'.
+            $nestedData[] = '<div  style="text-align:right;"><b>'.$row['DayEng'].'</b><br/>'.
                 substr($row['StartSessions'],0,5).' - '.substr($row['EndSessions'],0,5).'</div>';
 
             for($l=0;$l<count($arrP);$l++){
@@ -1348,6 +1347,20 @@ class C_api2 extends CI_Controller {
                 return print_r(1);
 
 
+            }
+            else if($data_arr['action']=='loadBAP'){
+
+                $Sesi = $data_arr['Sesi'];
+                $ID_Attd = $data_arr['ID_Attd'];
+
+                // Cek apakah ada BAP
+                $dataBAP = $this->db->limit(1)->get_where('db_academic.attendance_bap'
+                    ,array(
+                        'ID_Attd' => $ID_Attd,
+                        'Sesi' => $Sesi
+                    ))->result_array();
+
+                return print_r(json_encode($dataBAP));
             }
         }
     }
