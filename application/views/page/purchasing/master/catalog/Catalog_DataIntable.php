@@ -12,6 +12,24 @@
 	}
 </style>
 <div class="row" style="margin-right: 0px;margin-left: 0px;margin-top: 10px">
+	<div class="well">
+		<div class="row">
+			<div class="col-md-2">
+				<label>Import</label>
+			</div>
+			<div class="col-md-2">
+				<input type="file" data-style="fileinput" id="ImportFile" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xlsm">
+				<br>
+				<a href="<?php echo base_url('download_template/budgeting-catalog-m_catalog.xlsm') ?>">Template</a>
+			</div>
+			<div class="col-md-2">
+				<button class="btn btn-inverse" id = "sbmtimportfile">Import</button>
+			</div>
+		</div>
+	</div>
+	
+</div>
+<div class="row" style="margin-right: 0px;margin-left: 0px;margin-top: 10px">
 	<div class="col-xs-12">
 		<div class="table-responsive">
 			<table class="table table-bordered tableData" id ="datatablesServer">

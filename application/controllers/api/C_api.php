@@ -6095,8 +6095,8 @@ class C_api extends CI_Controller {
         for ($i=0; $i < count($AC); $i++) {
             $arr_result[] = array(
                 'Code'  => 'AC.'.$AC[$i]['ID'],
-                'Name1' => $AC[$i]['Name'],
-                'Name2' => $AC[$i]['NameEng']
+                'Name1' => 'Prody '.$AC[$i]['Name'],
+                'Name2' => 'Prody '.$AC[$i]['NameEng']
             );
         }
 

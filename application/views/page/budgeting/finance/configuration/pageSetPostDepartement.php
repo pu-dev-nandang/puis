@@ -85,6 +85,32 @@ function LogPostDepartement()
 
 function ExportPostDepartement()
 {
-    
+    loading_page("#pageSetPostMenu");
+    var url = base_url_js+'budgeting/page/ExportPostDepartement';
+    $.post(url,function (resultJson) {
+        var response = jQuery.parseJSON(resultJson);
+        var html = response.html;
+        var jsonPass = response.jsonPass;
+        $("#pageSetPostMenu").html(html);
+    }); // exit spost
 }
+
+
+$(document).on('click','#exportexcelpost',function () {
+    var YearPostDepartement = $("#YearPostDepartement").val();
+    var YearPostDepartementText = $("#YearPostDepartement option:selected").text();
+    var DepartementPost = $("#DepartementPost").val();
+    var DepartementPostName = $("#DepartementPost option:selected").text();
+    var url = base_url_js+'budgeting/export_excel_post_department';
+    data = {
+      YearPostDepartement : YearPostDepartement,
+      YearPostDepartementText : YearPostDepartementText,
+      DepartementPost : DepartementPost,
+      DepartementPostName : DepartementPostName,
+    }
+    var token = jwt_encode(data,"UAP)(*");
+    FormSubmitAuto(url, 'POST', [
+        { name: 'token', value: token },
+    ]);
+});
 </script>

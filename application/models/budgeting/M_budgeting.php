@@ -209,6 +209,18 @@ class M_budgeting extends CI_Model {
 
     }
 
+    public function getPostDepartementEx($Year,$Departement)
+    {
+        $sql = 'select a.CodePostBudget,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
+                from db_budgeting.cfg_postrealisasi as b left join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
+                join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
+                where b.Departement = ? and b.Active = 1 order by c.CodePost asc
+                ';
+        $query=$this->db->query($sql, array($Year,$Departement))->result_array();
+        return $query;
+
+    }
+
     public function getPostDepartementForDomApproval($Year,$Departement)
     {
         $arr_result = array();
@@ -645,5 +657,38 @@ class M_budgeting extends CI_Model {
                 ';
         $query=$this->db->query($sql, array($DepartementBudgeting))->result_array();
         return $query;
+    }
+
+    public function SearchDepartementBudgetingByName($DepartementBudgeting)
+    {
+        $sql = 'select * from (
+                select CONCAT("AC.",ID) as ID, NameEng as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
+                UNION
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                ) aa
+                where NameDepartement = ?
+                ';
+        $query=$this->db->query($sql, array($DepartementBudgeting))->result_array();
+        return $query;
+    }
+
+    public function GetPeriod()
+    {
+        $YearActivated = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
+        $st = $YearActivated[0]['StartPeriod'];
+        $st = explode('-', $st);
+        $StartMonth = (int) $st[1];
+        $StartMonth = (strlen($StartMonth) == 1 ) ? '0'.$StartMonth : $StartMonth;
+        
+        $StartMonth   = DateTime::createFromFormat('!m', $StartMonth);
+        $StartMonth = $StartMonth->format('F').' '.$st[0]; // March
+
+        $end = $YearActivated[0]['EndPeriod'];
+        $end = explode('-', $end);
+        $EndMonth = (int) $end[1];
+        $EndMonth   = DateTime::createFromFormat('!m', $EndMonth);
+        $EndMonth = $EndMonth->format('F').' '.$end[0]; // March
+
+        return array('StartMonth' => $StartMonth,'EndMonth' => $EndMonth);
     }  
 }
