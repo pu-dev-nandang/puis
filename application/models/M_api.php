@@ -3441,7 +3441,16 @@ class M_api extends CI_Model {
                             ->get_where('db_academic.attendance',
                             array('SemesterID'=>$SemesterID,'ScheduleID'=>$d['ScheduleID'],'SDID' => $dCourse['ID']),1)->result_array();
 
+                        // Get Total Attendance
+                        $dataAttdTotal = $this->db->query('SELECT COUNT(*) AS TotalPresent FROM db_academic.attendance_lecturers attdl
+                                                                      WHERE attdl.NIP = "'.$d['NIP'].'" AND attdl.ID_Attd = 
+                                                                      (SELECT ID FROM db_academic.attendance attd 
+                                                                      WHERE attd.SemesterID = "'.$SemesterID.'"
+                                                                       AND attd.ScheduleID = "'.$d['ScheduleID'].'"
+                                                                        AND attd.SDID = "'.$dCourse['ID'].'" ) ')->result_array();
+
                         $dCourse['Attendance'] = $dataAttd;
+                        $dCourse['TotalPresent'] = $dataAttdTotal[0]['TotalPresent'];
                         $dataSc[$s] = $dCourse;
 
                     }
