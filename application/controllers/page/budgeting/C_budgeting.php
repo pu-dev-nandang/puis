@@ -599,6 +599,14 @@ class C_budgeting extends Budgeting_Controler {
         echo json_encode($arr_result);
     }
 
+    public function ExportPostDepartement()
+    {
+        $this->auth_ajax();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/configuration/setpostdepartement/pageExportPostDepartement',$this->data,true);
+        echo json_encode($arr_result);
+    }
+
     public function getPostDepartement()
     {
          $this->auth_ajax();

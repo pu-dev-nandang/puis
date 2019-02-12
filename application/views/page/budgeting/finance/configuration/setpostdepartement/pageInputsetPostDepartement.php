@@ -241,6 +241,7 @@
 						var Cost = response[0]['Budget'];
 				         var n = Cost.indexOf(".");
 				         var Cost = Cost.substring(0, n);
+				         Cost = Cost / 1000; // (.000)
 
 						var input = '<input type = "text" class = "form-control BudgetInput'+CodePostRealisasi+'">';
 						$('.Budget'+CodePostRealisasi).html(input);
@@ -257,6 +258,7 @@
 							for(i = 0; i <getBudget.length; i++) {
 							 
 							 getBudget = getBudget.replace(".", "");
+							 getBudget = getBudget * 1000 // (.000)
 							 
 							}
 

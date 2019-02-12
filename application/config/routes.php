@@ -1108,6 +1108,9 @@ $route['budgeting/page/loadCodePrefix'] = 'page/budgeting/c_budgeting/loadCodePr
 $route['budgeting/save_codeprefix'] = 'page/budgeting/c_budgeting/save_codeprefix';
 $route['budgeting/page/LoadSetPostDepartement'] = 'page/budgeting/c_budgeting/LoadSetPostDepartement';
 $route['budgeting/page/LoadInputsetPostDepartement'] = 'page/budgeting/c_budgeting/LoadInputsetPostDepartement';
+$route['budgeting/page/ExportPostDepartement'] = 'page/budgeting/c_budgeting/ExportPostDepartement';
+
+
 $route['budgeting/getPostDepartement'] = 'page/budgeting/c_budgeting/getPostDepartement';
 $route['budgeting/getDomPostDepartement'] = 'page/budgeting/c_budgeting/getDomPostDepartement';
 $route['budgeting/save-setpostdepartement'] = 'page/budgeting/c_budgeting/save_setpostdepartement';
@@ -1145,7 +1148,7 @@ $route['budgeting/DataPR'] = 'page/budgeting/c_budgeting/DataPR';
 $route['budgeting/FormEditPR'] = 'page/budgeting/c_budgeting/FormEditPR';
 $route['budgeting/GetDataPR'] = 'page/budgeting/c_budgeting/GetDataPR';
 $route['budgeting/checkruleinput'] = 'page/budgeting/c_budgeting/checkruleinput';
-
+$route['budgeting/export_excel_post_department'] = 'C_save_to_excel/export_excel_post_department';
 
 // Purchasing
 $query = $db->get('db_purchasing.cfg_sub_menu');
@@ -1193,6 +1196,8 @@ $route['purchasing/page/supplier/DataIntable/server_side'] = 'page/purchasing/c_
 $route['purchasing/page/supplier/ApprovalSupplier'] = 'page/purchasing/c_master/ApprovalSupplier';
 $route['purchasing/table_all/(:any)'] = 'page/purchasing/c_purchasing/LoadTable_db_purchasing_all/$1/$2';
 $route['purchasing/table_all/(:any)/(:any)'] = 'page/purchasing/c_purchasing/LoadTable_db_purchasing_all/$1/$2';
+$route['purchasing/page/catalog/import_data'] = 'page/purchasing/c_master/import_data_catalog';
+
 
 // IT
 $query = $db->get('db_it.cfg_sub_menu');
