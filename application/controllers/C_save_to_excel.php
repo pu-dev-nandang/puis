@@ -3119,18 +3119,67 @@ class C_save_to_excel extends CI_Controller
             $data = $getDataForDom;
             if (count($data) > 0) {
                 // group by codepost
+                $st = 3;
+                $strow = 4;
+                $arr_wr = array();
                 for ($j=0; $j < count($data); $j++) { 
                     $CodePost1 = $data[$j]['CodePost'];
+                    $temp = array();
+                    $temp['Post'] = $data[$j]['PostName'];
+                    $temp2 = array();
+                    $temp2[] = array('RealisasiPostName' => $data[$j]['RealisasiPostName'],'Cost' => 'Rp. '.number_format($data[$j]['Budget'],2,',','.'),'j' => $j,'k' => 0);
                     for ($k=$j+1; $k < count($data); $k++) { 
-                       $CodePost2 = $data[$k]['CodePost']; 
-                       if ($CodePost1 == $CodePost2) {
-                            
-                        } 
+                       $CodePost2 = $data[$k]['CodePost'];
+                       if ($CodePost1 == $CodePost2  ) {
+                           $temp2[] = array('RealisasiPostName' => $data[$k]['RealisasiPostName'],'Cost' => 'Rp. '.number_format($data[$k]['Budget'],2,',','.'),'j' => $j,'k' => $k);
+                       }
+                       else
+                       {
+                        $j = $k -1;
+                        break;
+                       }
+                       $j = $k;
                     }
+
+                    $temp['data'] = $temp2;
+                    $arr_wr[] = $temp;
+                }
+
+                // print_r($arr_wr);
+                for ($k=0; $k < count($arr_wr); $k++) { 
+                  $Post = $arr_wr[$k]['Post'];
+                  $exc->setCellValue('A'.$st, $Post);
+                  $dt = $arr_wr[$k]['data'];
+                  $no = 1;
+                  for ($l=0; $l < count($dt); $l++) { 
+                      // add isi data
+                      if ($l == 0) {
+                          $exc->setCellValue('A'.$strow, 'No'); 
+                          $exc->setCellValue('B'.$strow, 'Post Name'); 
+                          $exc->setCellValue('C'.$strow, 'Cost'); 
+
+                          $exc->getStyle('A'.$strow)->applyFromArray($style_col);
+                          $exc->getStyle('B'.$strow)->applyFromArray($style_col);
+                          $exc->getStyle('C'.$strow)->applyFromArray($style_col);
+                          $strow++;
+                      }
+                      $exc->setCellValue('A'.$strow, $no); 
+                      $exc->setCellValue('B'.$strow, $dt[$l]['RealisasiPostName'] ); 
+                      $exc->setCellValue('C'.$strow, $dt[$l]['Cost']); 
+
+                      $exc->getStyle('A'.$strow)->applyFromArray($style_row);
+                      $exc->getStyle('B'.$strow)->applyFromArray($style_row);
+                      $exc->getStyle('C'.$strow)->applyFromArray($style_row);
+                      $strow++;
+                      $no++;
+                  }
+                  
+                  $st= $strow + 1;
+                  $strow = $st +1;
                 }
             }
         }
-
+        // die();
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename=PostBudget'.$YearPostDepartementText.'.xlsx'); // Set nama file excel nya
         header('Cache-Control: max-age=0');
