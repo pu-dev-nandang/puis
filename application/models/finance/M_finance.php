@@ -1819,9 +1819,11 @@ class M_finance extends CI_Model {
       $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and c.ID = ? 
+              join db_finance.payment_type as d on a.PTID = d.ID 
+              left join db_finance.payment_proof as pp on a.ID = pp.ID_payment
+              '.$NIM.$PTID.$prodiex.' and c.ID = ? 
               and b.StatusStudentID in (3,2,8) '.$AddWhereStatusPayment.$ChangeStatus.'
-              group by a.PTID,a.SemesterID,a.NPM order by c.ID desc,a.Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
+              group by a.PTID,a.SemesterID,a.NPM order by pp.ID desc,c.ID desc,a.Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
       $query=$this->db->query($sql, array($SemesterID))->result_array();
 
     }
@@ -1830,9 +1832,11 @@ class M_finance extends CI_Model {
       $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and b.Year = ? and c.ID = ? 
+              join db_finance.payment_type as d on a.PTID = d.ID 
+              left join db_finance.payment_proof as pp on a.ID = pp.ID_payment
+              '.$NIM.$PTID.$prodiex.' and b.Year = ? and c.ID = ? 
               and b.StatusStudentID in (3,2,8) '.$AddWhereStatusPayment.$ChangeStatus.'
-              group by a.PTID,a.SemesterID,a.NPM order by a.Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
+              group by a.PTID,a.SemesterID,a.NPM order by pp.ID desc,a.Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
       $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
     }
     // print_r($sql);die();
