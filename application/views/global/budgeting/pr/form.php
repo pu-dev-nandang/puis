@@ -351,7 +351,7 @@
     	                        		'</div>'+
     	                        	'</td>'+
     	                        	'<td></td>'+
-    	                        	'<td><input type="file" data-style="fileinput" class = "BrowseFile" ID = "BrowseFile'+No+'" multiple>'+htmlUploadFile+'</td>'+action
+    	                        	'<td><input type="file" data-style="fileinput" class = "BrowseFile" ID = "BrowseFile'+No+'" multiple accept="image/*">'+htmlUploadFile+'</td>'+action
     	                        '</tr>';	
 
     					return a;				
@@ -386,7 +386,18 @@
     						var HierarkiApproval = 0; // for check hierarki approval;
     						for (var i = 0; i < JsonStatus.length; i++) {
     							if (JsonStatus[i]['Status'] == 0) {
-    								HierarkiApproval++;
+    								// check status before
+    								if (i > 0) {
+    									var ii = i - 1;
+    									if (JsonStatus[ii]['Status'] == 0) {
+    										HierarkiApproval++;
+    									}
+    								}
+    								else
+    								{
+    									HierarkiApproval++;
+    								}
+    								
     								if (NIP == JsonStatus[i]['ApprovedBy']) {
     									bool = true;
     									break;
@@ -493,7 +504,7 @@
                         		'</div>'+
                         	'</td>'+
                         	'<td></td>'+
-                        	'<td><input type="file" data-style="fileinput" class = "BrowseFile" ID = "BrowseFile'+No+'" multiple></td>'+action
+                        	'<td><input type="file" data-style="fileinput" class = "BrowseFile" ID = "BrowseFile'+No+'" multiple accept="image/*"></td>'+action
                         '</tr>';	
 
 				return a;				
@@ -957,8 +968,8 @@
 							// ok
 							var validation = validation_input();
 							var action = $(this).attr('action');
-							var PRCode = $(this).attr('PRCode');
-							PRCode = (PRCode == undefined) ? 1 : PRCode;
+							var PRCode = $(this).attr('prcode');
+							PRCode = (PRCode == undefined) ? '' : PRCode;
 							if (validation) {
 								SubmitPR(PRCode,action,'#SaveBudget');
 							}
@@ -993,7 +1004,7 @@
 
 				var Item = fillItem.find('td:eq(2)').find('.Item').val();
 				if (Item == '') {
-					find = true;
+					find = false;
 					toastr.error("Item is required",'!!!Error');
 					return false;
 				}
@@ -1044,7 +1055,7 @@
 		       var no = parseInt(count) + 1;
 		       var name = files[count].name;
 		       var extension = name.split('.').pop().toLowerCase();
-		       if(jQuery.inArray(extension, ['pdf','jpg' ,'png','jpeg']) == -1)
+		       if(jQuery.inArray(extension, ['jpg' ,'png','jpeg']) == -1)
 		       {
 		        msgStr += 'File Number '+ no + ' Invalid Type File<br>';
 		        //toastr.error("Invalid Image File", 'Failed!!');
@@ -1079,6 +1090,7 @@
 
 		function SubmitPR(PRCode,Action,ID_element)
 		{
+			// console.log(PRCode);
 			var Year = $("#Year").val();
 			var Departement = $("#DepartementPost").val();
 			var PPN = $("#ppn").val();

@@ -5381,7 +5381,7 @@ Phone: (021) 29200456';
           $pr_create = $this->m_budgeting->GetPR_CreateByPRCode($PRCode);
           $pr_detail = $this->m_budgeting->GetPR_DetailByPRCode($PRCode);
 
-          $fpdf = new Fpdf('L', 'mm', 'A4');
+          $fpdf = new pdf('L', 'mm', 'A4');
           $fpdf->SetMargins(10,10,10,10);
           $fpdf->AddPage();
 
@@ -5411,7 +5411,6 @@ Phone: (021) 29200456';
           $fpdf->SetXY($hx,$hy);
           $fpdf->SetFont('Arial','b',$FontIsianHeader);
           $fpdf->Cell(0, 0, 'No : '.$PRCode, 0, 1, 'L', 0);
-
 
           $DatePR = date("d M Y", strtotime($pr_create[0]['CreatedAt']));
           $hy += 5;
@@ -5610,6 +5609,17 @@ Phone: (021) 29200456';
                  $fpdf->Cell($w_approved,$h,'Date : ',$border,0,'L',true);
              }
 
+
+             // watermark
+                 // $fpdf->SetTextColor(255,192,203);
+                 // $fpdf->SetFont('Arial', '', 100);
+                 // $fpdf->Text(42, 70, 'C O P Y');
+
+                 // $fpdf->SetFont('Arial','B',50);
+                 // $fpdf->SetTextColor(255,192,203);
+                 // $fpdf->RotatedText(35,190,'Reject',35);  
+               
+
              // show image in the next page
                  $arr_image = array();
                  for ($i=0; $i < count($pr_detail); $i++) { 
@@ -5638,31 +5648,35 @@ Phone: (021) 29200456';
                      else
                      {
                         $Photo = $pr_detail[$i]['UploadFile'];
-                        $url_arr = array(
-                           'url' => './uploads/budgeting/pr/'.$Photo,
-                           'Name' => $Photo,
-                        );
-                        // search name is exist
-                        $bool = false;
-                        for ($j=0; $j < count($arr_image); $j++) { 
-                            $Name = $arr_image[$j]['Name'];
-                            if ($Name == $url_arr['Name']) {
-                                $bool = true;
-                                break;
+                        $Photo = (array)json_decode($Photo,true);
+                        
+                        for ($ll=0; $ll < count($Photo); $ll++) { 
+                            $url_arr = array(
+                               'url' => './uploads/budgeting/pr/'.$Photo[$ll],
+                               'Name' => $Photo[$ll],
+                            );
+                            // search name is exist
+                            $bool = false;
+                            for ($j=0; $j < count($arr_image); $j++) { 
+                                $Name = $arr_image[$j]['Name'];
+                                if ($Name == $url_arr['Name']) {
+                                    $bool = true;
+                                    break;
+                                }
+                            }
+                            if (!$bool) {
+                                $arr_image[] = $url_arr;
                             }
                         }
-                        if (!$bool) {
-                            $arr_image[] = $url_arr;
-                        }
+                       
                      }
                  }
                  // end show image in the next page
-           
+            // print_r($arr_image);die();     
             for ($i=0; $i < count($arr_image); $i++) { 
                 $fpdf->AddPage();
                 $fpdf->Image($arr_image[$i]['url'],100,40,100);
-            }  
-
+            }
 
           $fpdf->Output($filename,'I');  
 
