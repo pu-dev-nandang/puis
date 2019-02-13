@@ -1063,6 +1063,30 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             if ($query[$i]['MarcommSupport'] != '') {
                 $MarkomSupport = '<ul>';
                 $dd = explode(',', $query[$i]['MarcommSupport']);
+                    $dzx = array();
+                // split for note
+                    for ($xz=0; $xz < count($dd); $xz++) { 
+                        $pos1 = stripos($dd[$xz], 'Note');
+                        $exitLoop = false;
+                        if ($pos1 !== false) {
+                            $temp = array();
+                            for ($ixx = $xz; $ixx < count($dd); $ixx++) { 
+                                $temp[] = $dd[$ixx];
+                            }
+                            $dzx[] = implode(',', $temp);
+                            $exitLoop = true;
+                        }
+                        else
+                        {
+                            $dzx[] = $dd[$xz];
+                        }
+
+                        if ($exitLoop) {
+                            break;
+                        }
+                    }
+
+                    $dd = $dzx;
                 for ($zx=0; $zx < count($dd); $zx++) {
                     $a = 'How are you?';
 
@@ -1388,6 +1412,31 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             if ($query[$i]['MarcommSupport'] != '') {
                 $MarkomSupport = '<ul style = "margin-left : -28px">';
                 $dd = explode(',', $query[$i]['MarcommSupport']);
+                $dzx = array();
+                // split for note
+                    for ($xz=0; $xz < count($dd); $xz++) { 
+                        $pos1 = stripos($dd[$xz], 'Note');
+                        $exitLoop = false;
+                        if ($pos1 !== false) {
+                            $temp = array();
+                            for ($ixx = $xz; $ixx < count($dd); $ixx++) { 
+                                $temp[] = $dd[$ixx];
+                            }
+                            $dzx[] = implode(',', $temp);
+                            $exitLoop = true;
+                        }
+                        else
+                        {
+                            $dzx[] = $dd[$xz];
+                        }
+
+                        if ($exitLoop) {
+                            break;
+                        }
+                    }
+
+                    $dd = $dzx;
+
                 $btnMarkomSupport = '';
                 for ($zx=0; $zx < count($dd); $zx++) {
                     $a = 'How are you?';
@@ -1770,6 +1819,30 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             if ($query[$i]['MarcommSupport'] != '') {
                 $MarkomSupport = '<ul style = "margin-left : -28px">';
                 $dd = explode(',', $query[$i]['MarcommSupport']);
+                $dzx = array();
+                // split for note
+                    for ($xz=0; $xz < count($dd); $xz++) { 
+                        $pos1 = stripos($dd[$xz], 'Note');
+                        $exitLoop = false;
+                        if ($pos1 !== false) {
+                            $temp = array();
+                            for ($ixx = $xz; $ixx < count($dd); $ixx++) { 
+                                $temp[] = $dd[$ixx];
+                            }
+                            $dzx[] = implode(',', $temp);
+                            $exitLoop = true;
+                        }
+                        else
+                        {
+                            $dzx[] = $dd[$xz];
+                        }
+
+                        if ($exitLoop) {
+                            break;
+                        }
+                    }
+
+                    $dd = $dzx;
                 for ($zx=0; $zx < count($dd); $zx++) {
                     // check status
                      $Status_markom = '';
@@ -2194,6 +2267,31 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             if ($query[$i]['MarcommSupport'] != '') {
                 $MarkomSupport = '<ul style = "margin-left : -28px">';
                 $dd = explode(',', $query[$i]['MarcommSupport']);
+                $dzx = array();
+                // split for note
+                    for ($xz=0; $xz < count($dd); $xz++) { 
+                        $pos1 = stripos($dd[$xz], 'Note');
+                        $exitLoop = false;
+                        if ($pos1 !== false) {
+                            $temp = array();
+                            for ($ixx = $xz; $ixx < count($dd); $ixx++) { 
+                                $temp[] = $dd[$ixx];
+                            }
+                            $dzx[] = implode(',', $temp);
+                            $exitLoop = true;
+                        }
+                        else
+                        {
+                            $dzx[] = $dd[$xz];
+                        }
+
+                        if ($exitLoop) {
+                            break;
+                        }
+                    }
+
+                    $dd = $dzx;
+
                 for ($zx=0; $zx < count($dd); $zx++) {
                     // check status
                      $Status_markom = '';
