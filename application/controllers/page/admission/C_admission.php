@@ -96,7 +96,7 @@ class C_admission extends Admission_Controler {
                     ';
             $to = $keyURL['email'];
             $subject = "Podomoro University Document Upload";
-            $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text); 
+            // $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text); 
          }          
       }
       else if($Status == 'Done')
@@ -110,7 +110,7 @@ class C_admission extends Admission_Controler {
                     ';
             $to = $keyURL['email'];
             $subject = "Podomoro University Document Upload";
-            $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);   
+            // $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);   
         }
 
       }
