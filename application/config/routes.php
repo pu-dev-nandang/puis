@@ -1125,6 +1125,8 @@ $route['budgeting/page/LoadSetUserActionDepartement'] = 'page/budgeting/c_budget
 $route['budgeting/get_cfg_set_roleuser/(:any)'] = 'page/budgeting/c_budgeting/get_cfg_set_roleuser/$1';
 $route['budgeting/save_cfg_set_roleuser'] = 'page/budgeting/c_budgeting/save_cfg_set_roleuser';
 $route['budgeting/EntryBudget/EntryBudget'] = 'page/budgeting/c_budgeting/EntryBudget';
+$route['budgeting/EntryBudget/EntryPostItemBudgeting'] = 'page/budgeting/c_budgeting/EntryPostItemBudgeting';
+
 $route['budgeting/EntryBudget/EntryBudget/(:any)'] = 'page/budgeting/c_budgeting/EntryBudget/$1';
 $route['budgeting/getCreatorBudget'] = 'page/budgeting/c_budgeting/getCreatorBudget';
 $route['budgeting/saveCreatorbudget'] = 'page/budgeting/c_budgeting/saveCreatorbudget';

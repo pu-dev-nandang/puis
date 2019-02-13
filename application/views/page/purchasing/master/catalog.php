@@ -43,9 +43,9 @@
                             <li class="active">
                                 <a href="javascript:void(0)" class="pageAnchorCatalog" page = "InputCatalog">Input</a>
                             </li>
-                            <li class="">
+                            <!-- <li class="">
                                 <a href="javascript:void(0)" class="pageAnchorCatalog" page = "ApprovalCatalog">Request Approve<b style="color: red;" id= "CountApproval"></b></a>
-                            </li>
+                            </li> -->
                         </ul>
                         <div style="padding-top: 30px;border-top: 1px solid #cccccc">
                             <div id = "pageCatalog">
