@@ -1556,15 +1556,15 @@ class C_master extends Admission_Controler {
         if ($get[0]['G_user'] == 1) {
             if( !empty($requestData['search']['value']) ) {
                 $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_admission.previleges_guser as a join db_employees.employees as b
-                        on a.NIP = b.NIP ';
+                        on a.NIP = b.NIP  left join db_admission.cfg_group_user as cgu on a.G_user = cgu.ID';
 
-                $sql.= ' where a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%"';
+                $sql.= ' where a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%" or cgu.GroupAuth LIKE "%'.$requestData['search']['value'].'%"';
                 $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
             }
             else {
                  $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_admission.previleges_guser as a join db_employees.employees as b
-                         on a.NIP = b.NIP ';
+                         on a.NIP = b.NIP  left join db_admission.cfg_group_user as cgu on a.G_user = cgu.ID';
                  $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
             }
@@ -1573,15 +1573,15 @@ class C_master extends Admission_Controler {
         {
             if( !empty($requestData['search']['value']) ) {
                 $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_admission.previleges_guser as a join db_employees.employees as b
-                        on a.NIP = b.NIP ';
+                        on a.NIP = b.NIP  left join db_admission.cfg_group_user as cgu on a.G_user = cgu.ID';
 
-                $sql.= ' where a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%" and a.G_user != 1';
+                $sql.= ' where a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%" and a.G_user != 1 or cgu.GroupAuth LIKE "%'.$requestData['search']['value'].'%"';
                 $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
             }
             else {
                  $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_admission.previleges_guser as a join db_employees.employees as b
-                         on a.NIP = b.NIP and a.G_user != 1';
+                         on a.NIP = b.NIP and a.G_user != 1 left join db_admission.cfg_group_user as cgu on a.G_user = cgu.ID';
                  $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
             }
