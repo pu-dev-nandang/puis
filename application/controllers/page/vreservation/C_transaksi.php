@@ -806,9 +806,35 @@ class C_transaksi extends Vreservation_Controler {
             if ($mks != '' && $mks != NULL ) {
                 $mks = explode(",", $mks); 
             }
+            
             $MarkomEmail ='';
             if (is_array($mks)) {
                 $xx = $mks;
+                $dzx = array();
+                for ($xz=0; $xz < count($xx); $xz++) { 
+                    $pos1 = stripos($xx[$xz], 'Note');
+                    $exitLoop = false;
+                    if ($pos1 !== false) {
+                        $temp = array();
+                        for ($ixx = $xz; $ixx < count($xx); $ixx++) { 
+                            $temp[] = $xx[$ixx];
+                        }
+                        $dzx[] = implode(',', $temp);
+                        $exitLoop = true;
+                    }
+                    else
+                    {
+                        $dzx[] = $xx[$xz];
+                    }
+
+                    if ($exitLoop) {
+                        break;
+                    }
+                }
+
+                $xx = $dzx;
+
+
                 $MarkomEmail ='<li>Documentation<ul>';
                 for ($i=0; $i < count($xx); $i++) { 
                     if(strpos($xx[$i], 'Note') === false) {
