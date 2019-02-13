@@ -667,6 +667,10 @@
         loadSubMenu();
     });
 
+    $(document).on('change','#selectGroupuUser', function () {
+        loadSubMenu();
+    });
+
     function loadSubMenu()
     {
         $("#LoadSubMenu").empty();
@@ -1068,6 +1072,7 @@
                 // jsonData = data_json;
                 // var obj = JSON.parse(data_json); 
                 // console.log(obj);
+                loadSelectGroupUser();
             }).done(function() {
               loadGroupPrevileges(loadDataGroupPrevileges);
               $('#GlobalModal').modal('hide');

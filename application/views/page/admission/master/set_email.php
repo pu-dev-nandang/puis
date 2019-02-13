@@ -38,7 +38,7 @@
                       <label>Text Messages:</label>
                       <textarea rows="20" name="wysiwyg" class="form-control wysiwyg"><?php echo $email['text'] ?></textarea>
                     </div>
-                      <button type="button" class="btn btn-default" id="sbmt">Submit</button>
+                      <button type="button" class="btn btn-default btn-edit" id="sbmt">Submit</button>
                       <button type="button" class="btn btn-info" id = 'test_connection'>Test Connection</button>
                   <!--</form>-->
                 </div>
