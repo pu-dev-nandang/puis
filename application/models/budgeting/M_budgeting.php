@@ -84,6 +84,7 @@ class M_budgeting extends CI_Model {
                         'PostName' => $query[$i]['PostName'],
                         'RealisasiPostName' => $query[$i]['RealisasiPostName'],
                         'Departement' => $Departement,
+                        'CodeDepartment' => $query[$i]['Departement'],
                     );
             $arr_result[] = $temp;
         }

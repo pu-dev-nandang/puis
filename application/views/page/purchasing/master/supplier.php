@@ -43,9 +43,9 @@
                             <li class="active">
                                 <a href="javascript:void(0)" class="pageAnchorSupplier" page = "InputSupplier">Input</a>
                             </li>
-                            <li class="">
+                            <!-- <li class="">
                                 <a href="javascript:void(0)" class="pageAnchorSupplier" page = "ApprovalSupplier">Approve<b style="color: red;" id= "CountApproval"></b></a>
-                            </li>
+                            </li> -->
                         </ul>
                         <div style="padding-top: 30px;border-top: 1px solid #cccccc">
                             <div id = "pageSupplier">

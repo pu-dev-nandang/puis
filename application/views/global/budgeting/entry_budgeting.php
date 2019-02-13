@@ -6,6 +6,11 @@
                 <button class="btn btn-primary" id="btnBackToHome" name="button"><i class="fa fa-home" aria-hidden="true"></i></button>
             </a>
         </li>
+        <?php if ($this->session->userdata('IDDepartementPUBudget') != 'NA.9'): ?>
+        <li class="<?php if($request=='EntryPostItemBudgeting'){echo "active";} ?>">
+            <a href="javascript:void(0)" class="pageAnchor" page = "EntryPostItemBudgeting">Entry Master Post Item Budgeting</a>
+        </li>
+        <?php endif ?>
         <li class="<?php if($request==null || $request=='EntryBudget'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "EntryBudget">Entry Budget</a>
         </li>

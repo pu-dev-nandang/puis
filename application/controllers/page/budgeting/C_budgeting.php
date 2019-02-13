@@ -473,7 +473,7 @@ class C_budgeting extends Budgeting_Controler {
             $query=$this->db->query($sql, array($this->data['id']))->result_array();
             $this->data['getData'] = $query;
         }
-        echo $this->load->view('page/budgeting/'.$this->data['department'].'/configuration/modal_postrealisasi',$this->data,true);
+        echo $this->load->view('page/budgeting/'.'finance'.'/configuration/modal_postrealisasi',$this->data,true);
     }
 
     public function save_postrealisasi()
@@ -991,7 +991,8 @@ class C_budgeting extends Budgeting_Controler {
 
     public function entry_budgeting($Request = null)
     {
-        $arr = array('EntryBudget',
+        $arr = array('EntryPostItemBudgeting',
+                    'EntryBudget',
                     'Approval',
                     'ListBudgetDepartement',
                     null
@@ -1059,6 +1060,14 @@ class C_budgeting extends Budgeting_Controler {
         $this->data['arr_PostBudget'] = $get['data'];
         $this->data['arr_bulan'] = $arr_bulan;
         $arr_result['html'] = $this->load->view('global/budgeting/form_entry_budgeting',$this->data,true);
+        echo json_encode($arr_result);
+    }
+
+    public function EntryPostItemBudgeting()
+    {
+        $this->auth_ajax();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $arr_result['html'] = $this->load->view('global/budgeting/entry_post_item_budgeting',$this->data,true);
         echo json_encode($arr_result);
     } 
 
