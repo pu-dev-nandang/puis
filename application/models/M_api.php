@@ -3302,6 +3302,47 @@ class M_api extends CI_Model {
 
     }
 
+    public function __getStudentApprovedKRS($ScheduleID){
+        // Fungsi ini mengambil student dari yang sudah di approve dan dari yang masih planning
+
+        $getSmtAct = $this->_getSemesterActive();
+
+        $dataCL = $this->getClassOf();
+
+        $res = [];
+        for($c=0;$c<count($dataCL);$c++){
+            $d = $dataCL[$c];
+            $db_ = 'ta_'.$d['Year'];
+            $dataSP = $this->db->query('SELECT sp.NPM,s.Name FROM '.$db_.'.study_planning sp 
+                                                    LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
+                                                    WHERE sp.SemesterID = "'.$getSmtAct['ID'].'" 
+                                                    AND sp.ScheduleID = "'.$ScheduleID.'"
+                                                    ORDER BY sp.NPM ASC ')->result_array();
+
+            if(count($dataSP)>0){
+                for($s=0;$s<count($dataSP);$s++){
+                    array_push($res,$dataSP[$s]['NPM']);
+                }
+            }
+        }
+
+        return $res;
+    }
+
+    public function __getStudentNotYetApprovedKRS($ScheduleID){
+        $getSmtAct = $this->_getSemesterActive();
+
+        // Get From Std KRS
+        $dataSTD = $this->db->query('SELECT sk.NPM,auts.Name FROM db_academic.std_krs sk
+                                              LEFT JOIN db_academic.auth_students auts ON (auts.NPM = sk.NPM)
+                                              WHERE sk.SemesterID = "'.$getSmtAct['ID'].'" AND sk.ScheduleID = "'.$ScheduleID.'" 
+                                              ORDER BY sk.NPM ASC ')
+            ->result_array();
+
+
+        return $dataSTD;
+    }
+
     public function __getStudentByScheduleIDApproved($SemesterID,$ScheduleID){
 
         $dataCL = $this->getClassOf();
