@@ -1232,11 +1232,19 @@ class C_api2 extends CI_Controller {
                         $countPresent = (count($present)==0 && count($absent)==0) ? '-' : count($present);
                         $countAbsent = (count($present)==0 && count($absent)==0) ? '-' : count($absent);
 
+
+                        // Cek apakah ada kelas pengganti
+                        $dataExc = $this->db->query('SELECT exc.*,cl.Room FROM db_academic.schedule_exchange exc 
+                                                                LEFT JOIN db_academic.classroom cl ON (cl.ID = exc.ClassroomID)
+                                                                WHERE exc.ID_Attd = "'.$ID_Attd.'" AND Meeting = "'.$i.'" LIMIT 1')->result_array();
+
+
                         $arrRes = array(
                             'Present' => $countPresent,
                             'Absent' => $countAbsent,
                             'Lecturer' => $dataLect,
-                            'BAP' => $bap
+                            'BAP' => $bap,
+                            'Exchange' => $dataExc
                         );
                         array_push($result,$arrRes);
                     }
@@ -1362,6 +1370,15 @@ class C_api2 extends CI_Controller {
 
                 return print_r(json_encode($dataBAP));
             }
+            else if($data_arr['action']=='updateExhange'){
+                $EXID = $data_arr['EXID'];
+                $dataUpdate = $data_arr['dataUpdate'];
+
+                $this->db->where('ID', $EXID);
+                $this->db->update('db_academic.schedule_exchange',$dataUpdate);
+                return print_r(1);
+            }
+
         }
     }
 

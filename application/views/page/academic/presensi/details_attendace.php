@@ -12,6 +12,11 @@
         padding: 0px 4px;
         border-radius: 11px;
     }
+
+    #viewExcDateOri,#viewExcDate {
+        color: #333 !important;background: #FFFFFF !important;
+        cursor: pointer;
+    }
 </style>
 
 <div class="row">
@@ -48,6 +53,8 @@
         <div id="divLoadAttd"></div>
     </div>
 </div>
+
+
 
 <script>
     $(document).ready(function () {
@@ -122,11 +129,12 @@
                         '                <th rowspan="2" style="width: 15%;">Description</th>' +
                         '                <th colspan="2" style="width: 15%;">Attendance</th>' +
                         '                <th colspan="2">Signature</th>' +
+                        '                <th rowspan="2" style="width: 15%;">Schedule Exchange</th>' +
                         '            </tr>' +
                         '            <tr>' +
                         '                <th style="width: 5%;">P</th>' +
                         '                <th style="width: 5%;">A</th>' +
-                        '                <th style="width: 25%;">Lecturer</th>' +
+                        '                <th style="width: 15%;">Lecturer</th>' +
                         '                <th style="width: 15%;">Student</th>' +
                         '            </tr>' +
                         '            </thead>' +
@@ -163,8 +171,15 @@
                             ? '<div style="text-align: left;">'+dataBAP[0].StudentSignBy+' - '+dataBAP[0].Student+'<br/><span style="color: #9E9E9E;">'+moment(dataBAP[0].StudentSignAt).format('dddd, DD MMM YYYY HH:mm')+'</span></div>'
                             : '-';
 
+                        var exchange = (d.Exchange.length>0)
+                            ? '<a href="javascript:void(0);" data-sesi="'+i+'" class="showExchange" style="color: #607d8b;">'+moment(d.Exchange[0].Date).format('ddd, DD MMM YYYY')+'<br/>'+
+                            d.Exchange[0].StartSessions.substr(0,5)+' - '+d.Exchange[0].EndSessions.substr(0,5)+
+                            ' | <b>'+d.Exchange[0].Room+'</b></a><textarea id="viewDataExchange'+i+'" class="hide">'+JSON.stringify(d.Exchange[0])+'</textarea>'
+                            : '-';
+                        var ClassExc = (d.Exchange.length>0) ? '<br/><span class="label label-warning">Exchange</span>' : '';
+
                         $('#dataRowBAB').append('<tr>' +
-                            '<td>'+no+'</td>' +
+                            '<td>'+no+' '+ClassExc+'</td>' +
                             '<td style="text-align: left;"><span class="viewerBAP viewerBAP'+no+'" id="viewSubject'+no+'">'+Subject+'</span><textarea class="form-control hide formBAP formBAP'+no+'" rows="3" id="formSubject'+no+'">'+Subject+'</textarea></td>' +
                             '<td style="text-align: left;"><span class="viewerBAP viewerBAP'+no+'" id="viewMaterial'+no+'">'+Material+'</span><textarea class="form-control hide formBAP formBAP'+no+'" rows="3" id="formMaterial'+no+'">'+Material+'</textarea></td>' +
                             '<td style="text-align: left;"><span class="viewerBAP viewerBAP'+no+'" id="viewDescription'+no+'">'+Description+'</span><textarea class="form-control hide formBAP formBAP'+no+'" rows="3" id="formDescription'+no+'">'+Description+'</textarea></td>' +
@@ -172,6 +187,7 @@
                             '<td>'+d.Absent+'</td>' +
                             '<td style="text-align: left;">'+lecturer+'</td>' +
                             '<td>'+btnSignStudent+'</td>' +
+                            '<td>'+exchange+'</td>' +
                             '</tr>');
                         no+=1;
                     }
@@ -663,6 +679,165 @@
         }
 
 
+
+    });
+
+
+    // Echange
+    $(document).on('click','.showExchange',function () {
+        var Sesi = $(this).attr('data-sesi');
+        var viewDataExchange = $('#viewDataExchange'+Sesi).val();
+
+        var dataExch = JSON.parse(viewDataExchange);
+
+        $('#GlobalModal .modal-header').html('<h4 class="modal-title">Schedele Exchange</h4>');
+        $('#GlobalModal .modal-body').html('<div class="row">' +
+            '    <div class="col-md-12">' +
+            '        <table class="table">' +
+            '            <tr>' +
+            '                <td style="width: 20%;">Date Original</td>' +
+            '                <td style="width: 1%;">:</td>' +
+            '                <td>' +
+            '                    <input data-fm="formExcDateOri" class="form-control" id="viewExcDateOri" readonly>' +
+            '                    <input class="hide" id="formExcDateOri" readonly>' +
+            '                </td>' +
+            '            </tr>' +
+            '            <tr>' +
+            '                <td>Exchange to (date)</td>' +
+            '                <td>:</td>' +
+            '                <td>' +
+            '                    <input data-fm="formExcDate" class="form-control" id="viewExcDate" readonly>' +
+            '                    <input class="hide" id="formExcDate" readonly>' +
+            '                </td>' +
+            '            </tr>' +
+            '            <tr>' +
+            '                <td>Time</td>' +
+            '                <td>:</td>' +
+            '                <td>' +
+            '                    <div class="row">' +
+            '                        <div class="col-xs-4">' +
+            '                            <div id="div_formExcStart" data-no="1" class="input-group">' +
+            '                                <input data-format="hh:mm" type="text" id="formExcStart" class="form-control" value="'+dataExch.StartSessions.substr(0,5)+'" />' +
+            '                                <span class="add-on input-group-addon">' +
+            '                                    <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>' +
+            '                                </span>' +
+            '                            </div>' +
+            '                        </div>' +
+            '                        <div class="col-xs-4">' +
+            '                            <div id="div_formExcEnd" data-no="1" class="input-group">' +
+            '                                <input data-format="hh:mm" type="text" id="formExcEnd" class="form-control" value="'+dataExch.EndSessions.substr(0,5)+'" />' +
+            '                                <span class="add-on input-group-addon">' +
+            '                                    <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>' +
+            '                                </span>' +
+            '                            </div>' +
+            '                        </div>' +
+            '                    </div>' +
+            '                </td>' +
+            '            </tr>' +
+            '            <tr>' +
+            '                <td>Reason</td>' +
+            '                <td>:</td>' +
+            '                <td>' +
+            '                    <textarea class="form-control" rows="3" id="formExcReason"></textarea>' +
+            '                </td>' +
+            '            </tr>' +
+            '            ' +
+            '            <tr>' +
+            '                <td colspan="3" style="text-align: right;">' +
+            '                    <button class="btn btn-primary" id="btnSubmitExch">Submit</button> ' +
+            '                    <button class="btn btn-default" data-dismiss="modal">Close</button>' +
+            '                </td>' +
+            '            </tr>' +
+            '        </table>' +
+            '    </div>' +
+            '</div>');
+
+        $( "#viewExcDateOri,#viewExcDate" )
+            .datepicker({
+                showOtherMonths:true,
+                autoSize: true,
+                dateFormat: 'dd MM yy',
+                onSelect : function () {
+                    var form = $(this).attr('data-fm');
+                    var data_date = moment($(this).datepicker("getDate")).format('YYYY-MM-DD');
+                    $('#'+form).val(data_date);
+                }
+            });
+
+        $('#viewExcDateOri').datepicker('setDate',new Date(dataExch.DateOriginal));
+        $('#viewExcDate').datepicker('setDate',new Date(dataExch.Date));
+        $('#formExcDateOri').val(dataExch.DateOriginal);
+        $('#formExcDate').val(dataExch.Date);
+
+        // $('#formExcStart').val();
+        // $('#formExcEnd').val();
+
+
+        $('#div_formExcStart,#div_formExcEnd').datetimepicker({
+            pickDate: false,
+            pickSeconds : false
+        });
+
+        $('#formExcReason').val(dataExch.Reason);
+
+        $('#GlobalModal .modal-footer').addClass('hide');
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+        // console.log(JSON.parse(viewDataExchange));
+
+        $('#btnSubmitExch').click(function () {
+
+            var formExcDateOri = $('#formExcDateOri').val();
+            var formExcDate = $('#formExcDate').val();
+            var formExcStart = $('#formExcStart').val();
+            var formExcEnd = $('#formExcEnd').val();
+            var formExcReason = $('#formExcReason').val();
+
+            if(formExcDateOri!='' && formExcDateOri!=null &&
+                formExcDate!='' && formExcDate!=null &&
+                formExcStart!='' && formExcStart!=null &&
+            formExcEnd!='' && formExcEnd!=null &&
+            formExcReason!='' && formExcReason!=null){
+
+                loading_buttonSm('#btnSubmitExch');
+                $('button[data-dismiss=modal]').prop('disabled',true);
+
+                var dayID = (moment(formExcDate).days()==0) ? 7 : moment(formExcDate).days();
+
+                var data = {
+                    action : 'updateExhange',
+                    EXID : dataExch.ID,
+                    dataUpdate : {
+                        DateOriginal : formExcDateOri,
+                        Date : formExcDate,
+                        DayID : dayID,
+                        StartSessions : formExcStart,
+                        EndSessions : formExcEnd,
+                        Reason : formExcReason
+                    }
+                };
+
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api2/__crudAttendance2';
+
+                $.post(url,{token:token},function (result) {
+                    toastr.success('Data updated','Success');
+                    loadAttendace();
+                    setTimeout(function () {
+                        $('#GlobalModal').modal('hide');
+                    },500);
+                });
+
+            }
+            else {
+                toastr.error('All form required','Error');
+            }
+
+
+        });
 
     });
 
