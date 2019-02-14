@@ -4351,7 +4351,8 @@ class M_finance extends CI_Model {
       $SemesterID = explode('.', $Semester);
       $SemesterID = $SemesterID[0];
       $this->load->model('master/m_master');
-      $sql = 'select a.*, b.Name as NamaMHS,b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description ,e.DatePayment,e.ID_payment,b.ProdiID,f.Name as NamePrody,e.ID as ID_payment_students,b.Year
+      $sql = 'select a.*, b.Name as NamaMHS,b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description ,e.DatePayment,e.ID_payment,b.ProdiID,f.Name as NamePrody,e.ID as ID_payment_students
+        ,e.Invoice as PaymentMhs,b.Year
               from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
               join db_academic.semester as c on a.SemesterID = c.ID
               join db_finance.payment_type as d on a.PTID = d.ID
@@ -4413,7 +4414,7 @@ class M_finance extends CI_Model {
         $Pembayaranke = $f_Pembayaranke($query[$i]['ID_payment'],$query[$i]['ID_payment_students']); // query berdasarkan ID payment
         $semesterCount = $f_findSemester($query[$i]['SemesterID'],$query[$i]['Year']);
         $data[] = $query[$i] + array('Pembayaranke' => $Pembayaranke,'semesterCount' => $semesterCount);
-        $subtotal = $subtotal + $query[$i]['Invoice'];
+        $subtotal = $subtotal + $query[$i]['PaymentMhs'];
         $NPM1 = $query[$i]['NPM'];
 
         for ($j=$i + 1; $j < count($query); $j++) { // search by prodi
@@ -4422,7 +4423,7 @@ class M_finance extends CI_Model {
             $Pembayaranke =  $f_Pembayaranke($query[$j]['ID_payment'],$query[$j]['ID_payment_students']); // query berdasarkan ID payment
             $semesterCount = $f_findSemester($query[$j]['SemesterID'],$query[$j]['Year']);
             $data[] = $query[$j] + array('Pembayaranke' => $Pembayaranke,'semesterCount' => $semesterCount);
-            $subtotal = $subtotal + $query[$j]['Invoice'];
+            $subtotal = $subtotal + $query[$j]['PaymentMhs'];
 
           }
           else
