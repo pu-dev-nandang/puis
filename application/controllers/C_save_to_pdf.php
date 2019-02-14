@@ -4018,7 +4018,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetX(5);
         $pdf->SetFont('Arial','I',$fn_e);
-        $pdf->Cell(78,$h,'/ Faculty',$border,1,'C');
+        $pdf->Cell(78,$h,'/  Faculty',$border,1,'C');
         $pdf->Ln($ln);
 
         // ===== Prodi =====
@@ -4028,15 +4028,60 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,$Student['Prodi'],$border,0,'L');
 
+        // print_r($Student['Prodi']);exit();
+
         if ($Student['Prodi'][0]=='A') 
         {
             $pdf->SetX(108);  
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,'/',$border,0,'L');
             $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');   
-        }else if ($Student['Prodi'][0]=='K')
+        }
+        else if ($Student['Prodi'][0]=='K')
         {
             $pdf->SetX(118);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+        }
+        else if ($Student['Prodi'][0]=='B')
+        {
+            $pdf->SetX(119);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+        }
+        else if ($Student['Prodi'][0]=='H')
+        {
+            $pdf->SetX(115);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+        }
+        else if ($Student['Prodi'][0]=='P')
+        {
+            $pdf->SetX(143);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+        }
+        else if ($Student['Prodi'][0]=='D')
+        {
+            $pdf->SetX(116);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+        }
+        else if ($Student['Prodi']=='Teknik Lingkungan')
+        {
+            $pdf->SetX(123);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+        }
+         else if ($Student['Prodi']=='Teknik Konstruksi Bangunan')
+        {
+            $pdf->SetX(137);
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,'/',$border,0,'L');
             $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
@@ -4044,7 +4089,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetX(47);
         $pdf->SetFont('Arial','I',$fn_e);
-        $pdf->Cell(67,$h,'/ Study Program',$border,0,'L');
+        $pdf->Cell(67,$h,'/  Study Program',$border,0,'L');
 
         if ($Student['Prodi'][0]=='M') 
         {
@@ -4066,6 +4111,8 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,$Student['GradeDesc'],$border,0,'L');
 
+        // print_r($Student['GradeDesc'][0]);exit();
+
         if ($Student['GradeDesc'][0]=='S')
         {
             $pdf->SetX(112);// S1
@@ -4073,7 +4120,7 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Cell($sp,$h,' /',$border,0,'L');
             $pdf->Cell($fill,$h,$Student['GradeDescEng'],$border,0,'L');
         }else{
-            $pdf->SetX(118);// S1
+            $pdf->SetX(117);// D4
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,' /',$border,0,'L');
             $pdf->Cell($fill,$h,$Student['GradeDescEng'],$border,0,'L');
@@ -4094,7 +4141,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetX(113);
         $pdf->SetFont('Arial','I',$fn_e);
-        $pdf->Cell($sp,$h,'/ Accredited',$border,0,'L');
+        $pdf->Cell($sp,$h,'/  Accredited',$border,0,'L');
 
         // $pdf->SetX(37);
         // $pdf->SetFont('Arial','I',$fn_e);
@@ -4109,16 +4156,16 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetX(53);
         $pdf->SetFont('Arial','I',$fn_e);
-        $pdf->Cell($label,$h,'/ Date of Conferral',$border,1,'L');
+        $pdf->Cell($label,$h,'/  Date of Conferral',$border,1,'L');
         $pdf->Cell(10,5,'',0,1);//memberikan enter/jarak ke bawah
 
         // ===== Ket 2 =====
         // $pdf->SetX($x);
         $pdf->SetX($x);
         $pdf->SetFont('Arial','',$fn_b);
-        $pdf->Cell($fillFull,$h,'Adalah benar mahasiswa yang telah menempuh studi dan menyelesaikan seluruh persyaratan',$border,1,'L');
+        $pdf->Cell($fillFull,$h,'Adalah benar mahasiswa yang telah menempuh studi dan menyelesaikan seluruh persyaratan kelulusan',$border,1,'L');
         $pdf->SetX($x);
-        $pdf->Cell($fillFull,$h,'kelulusan menjadi '.$Student['Degree'].' pada Semester Genap Tahun Akademik 2017/2018',$border,1,'L');
+        $pdf->Cell($fillFull,$h,'menjadi '.$Student['Degree'].' pada Semester Genap Tahun Akademik 2017/2018',$border,1,'L');
         $pdf->SetX($x);
         $pdf->Cell($fillFull,$h,'di Universitas Agung Podomoro.',$border,1,'L');
         $pdf->Ln(1);
@@ -4132,9 +4179,9 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetX($x);
         $pdf->SetFont('Arial','I',$fn_e);
-        $pdf->Cell($fillFull,$h,'Had completed '.$Kelamin.' studies and qualification to earn Bachelor Degree in the Even Semeter of Academic ',$border,1,'L');
+        $pdf->Cell($fillFull,$h,'Had completed '.$Kelamin.' studies and qualification to earn Bachelor Degree in the Even Semeter of Academic Year',$border,1,'L');
         $pdf->SetX($x);
-        $pdf->Cell($fillFull,$h,'Year 2017/2018 at Podomoro University.',$border,1,'L');
+        $pdf->Cell($fillFull,$h,'2017/2018 at Podomoro University.',$border,1,'L');
         $y = $pdf->GetY()+7;
         $pdf->Ln(4);
         // $pdf->Cell(10,5,'',0,1);//memberikan enter/jarak ke bawah
@@ -5318,6 +5365,330 @@ Phone: (021) 29200456';
         $fpdf->Output('receipt.pdf','I');
     }
 
+    /* PR Budgeting */
+    public function print_prdeparment()
+    {
+        try {
+          $token = $this->input->post('token');
+          $this->load->model('budgeting/m_budgeting');
+          $this->load->model('master/m_master');
+
+          $input = $this->getInputToken($token);
+          $PRCode = $input['PRCode'];
+          $PRCodeReplace = str_replace('/', '-', $PRCode);
+          $filename = '__'.$PRCodeReplace.'.pdf';  
+
+          $pr_create = $this->m_budgeting->GetPR_CreateByPRCode($PRCode);
+          $pr_detail = $this->m_budgeting->GetPR_DetailByPRCode($PRCode);
+
+          $fpdf = new pdf('L', 'mm', 'A4');
+          $fpdf->SetMargins(10,10,10,10);
+          $fpdf->AddPage();
+
+          $x = 10;
+          $y = 30;
+          $FontIsianHeader = 8;
+          $FontIsian = 7;
+          $rect_h = 20;
+
+          // Logo
+          $fpdf->Image('./images/logo_tr.png',10,10,50);
+
+          // note from finance
+          $fpdf->Rect($x,$y,130,$rect_h);
+          $fpdf->SetXY(($x+2),($y+2) );
+          $fpdf->SetFont('Arial','b',$FontIsianHeader);
+          $fpdf->Cell(0, 0, 'Notes From Finance : ', 0, 1, 'L', 0);
+
+          // Header Purchase Requisition(PR)
+          $hx = 180;
+          $hy = 15;
+          $fpdf->SetXY($hx,$hy);
+          $fpdf->SetFont('Arial','b',10);
+          $fpdf->Cell(0, 0, 'Purchase Requisition (PR)', 0, 1, 'L', 0);
+
+          $hy += 5;
+          $fpdf->SetXY($hx,$hy);
+          $fpdf->SetFont('Arial','b',$FontIsianHeader);
+          $fpdf->Cell(0, 0, 'No : '.$PRCode, 0, 1, 'L', 0);
+
+          $DatePR = date("d M Y", strtotime($pr_create[0]['CreatedAt']));
+          $hy += 5;
+          $fpdf->SetXY($hx,$hy);
+          $fpdf->SetFont('Arial','b',$FontIsianHeader);
+          $fpdf->Cell(0, 0, 'Date : '.$DatePR, 0, 1, 'L', 0);
+
+          // Department & Post Budget
+          $Department = $this->m_budgeting->SearchDepartementBudgeting($pr_create[0]['Departement']);
+          $Department = $Department[0]['Code'];
+          $hx = 150;
+          $hy = 30;
+          $fpdf->Rect($hx,$hy,130,$rect_h);
+          $hx = $hx + 2;
+          $hy = $hy + 2;
+          $fpdf->SetXY($hx,$hy);
+          $fpdf->SetFont('Arial','b',$FontIsianHeader);
+          $fpdf->Cell(0, 0, 'Department : '.$Department, 0, 1, 'L', 0);
+
+          $arr_postName = [];
+          for ($i=0; $i < count($pr_detail); $i++) { 
+                $PostName = $pr_detail[$i]['PostName'];
+                $bool = true;
+                for ($j=0; $j < count($arr_postName); $j++) { 
+                    if ($PostName == $arr_postName[$j]) {
+                        $bool = false;
+                        break;
+                    }
+                }
+
+                if ($bool) {
+                    $arr_postName[] = $PostName;
+                }
+
+          }
+
+          $strpostname = implode(',',$arr_postName);
+
+          $hy += 5;
+          $fpdf->SetXY($hx,$hy);
+          $fpdf->SetFont('Arial','b',$FontIsianHeader);
+          $fpdf->Cell(0, 0, 'Post Budget : '.$strpostname, 0, 1, 'L', 0);
+
+          // make table
+            $border = 1;
+            // header
+            $w_no = 8;
+            $w_smt = 8;
+            $w_desc = 65;
+            $w_spec = 65;
+            $w_date_needed = 30;
+            $w_qty = 22;
+            $w_pricest = 40;
+            $w_totalammount = 40;
+            $h=4.3;
+            $y += $rect_h+2;
+            $fpdf->SetXY($x,$y);
+            $fpdf->SetFillColor(255, 255, 255);
+             $fpdf->Cell($w_no,$h,'No.',$border,0,'C',true);
+             $fpdf->Cell($w_desc,$h,'Description',$border,0,'C',true);
+             $fpdf->Cell($w_spec,$h,'Specification',$border,0,'C',true);
+             $fpdf->Cell($w_date_needed,$h,'Date Needed',$border,0,'C',true);
+             $fpdf->Cell($w_qty,$h,'Quantity',$border,0,'C',true);
+             $fpdf->Cell($w_pricest,$h,'Price Estimated',$border,0,'C',true);
+             $fpdf->Cell($w_totalammount,$h,'Total Amount',$border,1,'C',true);
+
+             // content
+              $no = 1;
+              $fpdf->SetFont('Arial','',$FontIsian);
+              $total = 0;
+             for ($i=0; $i < count($pr_detail); $i++) { 
+                $fpdf->Cell($w_no,$h,$no ,$border,0,'C',true);
+                $fpdf->Cell($w_desc,$h,$pr_detail[$i]['Item'],$border,0,'C',true);
+                $DetailCatalog = (array) json_decode($pr_detail[$i]['DetailCatalog']);
+                $Spec = '';
+                $arr = array();
+                foreach ($DetailCatalog as $key => $value) {
+                    $arr[] = $key.' : '.$value; 
+                }
+
+                $Spec = implode(',', $arr);
+                $lenSpec = strlen($Spec);
+                // print_r($lenSpec);die();
+                if ($lenSpec > 25) {
+                    $Spec = substr($Spec, 0,50).'...';
+                }
+                $fpdf->Cell($w_spec,$h,$Spec,$border,0,'L',true);
+
+                $DateNeeded = date("d M Y", strtotime($pr_detail[0]['DateNeeded']));
+                $fpdf->Cell($w_date_needed,$h,$DateNeeded,$border,0,'C',true);
+                $fpdf->Cell($w_qty,$h,$pr_detail[$i]['Qty'],$border,0,'C',true);
+
+                $UnitCost = 'Rp '.number_format($pr_detail[$i]['UnitCost'],2,',','.');
+                $fpdf->Cell($w_pricest,$h,$UnitCost,$border,0,'C',true);
+
+                $Subtotal= 'Rp '.number_format($pr_detail[$i]['SubTotal'],2,',','.');
+                $fpdf->Cell($w_totalammount,$h,$Subtotal,$border,1,'C',true);
+                $total = $total + $pr_detail[$i]['SubTotal'];
+                $no++;
+                $y += $h; 
+             }
+
+             $Max = 20;
+             for ($i=0; $i <$Max - count($pr_detail) ; $i++) { 
+                 $fpdf->Cell($w_no,$h,'' ,$border,0,'C',true);
+                 $fpdf->Cell($w_desc,$h,'',$border,0,'C',true);
+                 $fpdf->Cell($w_spec,$h,'',$border,0,'L',true);
+                 $fpdf->Cell($w_date_needed,$h,'',$border,0,'C',true);
+                 $fpdf->Cell($w_qty,$h,'',$border,0,'C',true);
+                 $fpdf->Cell($w_pricest,$h,'',$border,0,'C',true);
+                 $fpdf->Cell($w_totalammount,$h,'',$border,1,'C',true);
+                 $y += $h;
+             }
+
+             $y += $h;
+             $x = $x +$w_no+$w_desc+$w_spec;
+             $rsPPN = ($pr_create[0]['PPN'] / 100) * $total;
+             $totAfterPPN = $total - $rsPPN;
+             $totAfterPPN= 'Rp '.number_format($totAfterPPN,2,',','.');
+             $rsPPN= 'Rp '.number_format($rsPPN,2,',','.');
+             $total= 'Rp '.number_format($total,2,',','.');
+             $fpdf->SetXY($x,$y);
+             $fpdf->Cell(($w_date_needed+$w_qty+$w_pricest),$h,'Total',$border,0,'C',true);
+             $fpdf->Cell($w_totalammount,$h,$total,$border,1,'C',true);
+             // PPN
+             $y += $h;
+             $fpdf->SetXY($x,$y);
+             $fpdf->SetFillColor(226, 226, 226);
+             $fpdf->Cell(($w_date_needed+$w_qty+$w_pricest),$h,'PPN '.(int)$pr_create[0]['PPN'].'%',$border,0,'C',true);
+             $fpdf->Cell($w_totalammount,$h,$rsPPN,$border,1,'C',true);
+             // total setelah ppn
+             $y += $h;
+             $fpdf->SetXY($x,$y);
+             $fpdf->SetFillColor(255, 255, 255);
+             $fpdf->Cell(($w_date_needed+$w_qty+$w_pricest),$h,'Total setelah PPN ',$border,0,'C',true);
+             $fpdf->Cell($w_totalammount,$h,$totAfterPPN,$border,1,'C',true);
+
+             // Notes
+             $y += 10;
+             $x = 10;
+             $JsonStatus = (array) json_decode($pr_create[0]['JsonStatus'],true);
+             $maxWrec = 130;
+             $Wrec = $maxWrec - ( (count($JsonStatus) - 1) * 20 );
+             $fpdf->Rect($x,$y,$Wrec,$rect_h);
+             $fpdf->SetXY(($x+2),($y+2) );
+             $fpdf->SetFont('Arial','b',$FontIsianHeader);
+             $fpdf->Cell(0, 0, 'Notes : ', 0, 0, 'L', 0);
+
+             $fpdf->SetXY(($x+2),($y+5) );
+             $fpdf->SetFont('Arial','',$FontIsian);
+             $fpdf->MultiCell(($Wrec - 10), 3, $pr_create[0]['Notes'], 0, 1, 'L', 0);
+
+
+             // signature
+             $x = $Wrec + 20;
+             $w_requested = 30;
+             $w_approved = 40;
+             $h_signature = 15;
+             $fpdf->SetXY($x,$y);
+             $fpdf->SetFont('Arial','',$FontIsian);
+             $fpdf->SetFillColor(226, 226, 226);
+             $fpdf->Cell($w_requested,$h,'Requested By',$border,0,'C',true);
+
+             for ($i=0; $i < count($JsonStatus); $i++) { 
+                 $fpdf->Cell($w_approved,$h,'Approved By',$border,0,'C',true);
+             }
+
+             $y += $h;
+             $fpdf->SetXY($x,$y);
+             $fpdf->SetFillColor(255, 255, 255);
+             $fpdf->Cell($w_requested,$h_signature,'',$border,0,'C',true);
+             for ($i=0; $i < count($JsonStatus); $i++) {    
+                 $fpdf->Cell($w_approved,$h_signature,'',$border,0,'C',true);
+             }
+
+             $CreatedBy = $pr_create[0]['CreatedBy'];
+             $G_CreatedBy = $this->m_master->caribasedprimary('db_employees.employees','NIP',$CreatedBy);
+             $NameRequester = $G_CreatedBy[0]['Name'];
+             $y += $h_signature;
+             $fpdf->SetXY($x,$y);
+             $fpdf->SetFillColor(255, 255, 255);
+             $fpdf->Cell($w_requested,$h,$NameRequester,$border,0,'C',true);
+             for ($i=0; $i < count($JsonStatus); $i++) {
+                 $Approver = $JsonStatus[$i]['ApprovedBy'];
+                 $G_CreatedBy = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Approver);
+                 $NameApprover = $G_CreatedBy[0]['Name'];    
+                 $fpdf->Cell($w_approved,$h,$NameApprover,$border,0,'C',true);
+             }
+
+             $y += $h;
+             $fpdf->SetXY($x,$y);
+             $fpdf->SetFont('Arial','b',$FontIsianHeader);
+             $fpdf->SetFillColor(255, 255, 255);
+             $fpdf->Cell($w_requested,$h,'Date : ',$border,0,'L',true);
+             for ($i=0; $i < count($JsonStatus); $i++) {
+                 $fpdf->Cell($w_approved,$h,'Date : ',$border,0,'L',true);
+             }
+
+
+             // watermark
+                 // $fpdf->SetTextColor(255,192,203);
+                 // $fpdf->SetFont('Arial', '', 100);
+                 // $fpdf->Text(42, 70, 'C O P Y');
+
+                 // $fpdf->SetFont('Arial','B',50);
+                 // $fpdf->SetTextColor(255,192,203);
+                 // $fpdf->RotatedText(35,190,'Reject',35);  
+               
+
+             // show image in the next page
+                 $arr_image = array();
+                 for ($i=0; $i < count($pr_detail); $i++) { 
+                     if ($pr_detail[$i]['UploadFile'] == '' || $pr_detail[$i]['UploadFile'] == null) {
+                         $PhotoCatalog = $pr_detail[$i]['Photo'];
+                         if ($PhotoCatalog != '' && $PhotoCatalog != null) {
+                             $url_arr = array(
+                                'url' => './uploads/budgeting/catalog/'.$PhotoCatalog,
+                                'Name' => $PhotoCatalog,
+                             );
+                             // search name is exist
+                             $bool = false;
+                             for ($j=0; $j < count($arr_image); $j++) { 
+                                 $Name = $arr_image[$j]['Name'];
+                                 if ($Name == $url_arr['Name']) {
+                                     $bool = true;
+                                     break;
+                                 }
+                             }
+                             if (!$bool) {
+                                 $arr_image[] = $url_arr;
+                             }
+                             
+                         }
+                     }
+                     else
+                     {
+                        $Photo = $pr_detail[$i]['UploadFile'];
+                        $Photo = (array)json_decode($Photo,true);
+                        
+                        for ($ll=0; $ll < count($Photo); $ll++) { 
+                            $url_arr = array(
+                               'url' => './uploads/budgeting/pr/'.$Photo[$ll],
+                               'Name' => $Photo[$ll],
+                            );
+                            // search name is exist
+                            $bool = false;
+                            for ($j=0; $j < count($arr_image); $j++) { 
+                                $Name = $arr_image[$j]['Name'];
+                                if ($Name == $url_arr['Name']) {
+                                    $bool = true;
+                                    break;
+                                }
+                            }
+                            if (!$bool) {
+                                $arr_image[] = $url_arr;
+                            }
+                        }
+                       
+                     }
+                 }
+                 // end show image in the next page
+            // print_r($arr_image);die();     
+            for ($i=0; $i < count($arr_image); $i++) { 
+                $fpdf->AddPage();
+                $fpdf->Image($arr_image[$i]['url'],100,40,100);
+            }
+
+          $fpdf->Output($filename,'I');  
+
+            
+        } catch (Exception $e) {
+            // handling orang iseng
+            echo $e;
+            // echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    /* End PR Budgeting */
 
 
 

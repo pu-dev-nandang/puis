@@ -1939,10 +1939,10 @@ class C_rest extends CI_Controller {
                     $StatusTbl = '';
                     switch ($row['StatusTbl']) {
                         case '1':
-                           $StatusTbl = 'Need Approve<br>'.$row['Comment'];
+                           $StatusTbl = 'Will be Set Room<br>'.$row['Comment'];
                             break;
                         case '2':
-                           $StatusTbl = 'Approved<br>'.$row['Comment'];
+                           $StatusTbl = 'Already Set Room<br>'.$row['Comment'];
                             break;
                         case '-2':
                            $StatusTbl = 'Reject<br>'.$row['Comment'];
@@ -1970,7 +1970,7 @@ class C_rest extends CI_Controller {
                     $btnApprove  = '';
                     $btnreject = '';
                     if ($row['StatusTbl'] == '1') {
-                        $btnApprove = '<button class = "btn btn-primary btnapprove" token = "'.$row['Token'].'" emailrequest = "'.$row['EmailRequster'].'" emailkaprodi = "'.$row['EmailKaprodiChoice'].'" ScheduleExchangeID = "'.$row['ScheduleExchangeID'].'"><i class="fa fa-check" aria-hidden="true"></i> Approve </button>';
+                        $btnApprove = '<button class = "btn btn-primary btnapprove" token = "'.$row['Token'].'" emailrequest = "'.$row['EmailRequster'].'" emailkaprodi = "'.$row['EmailKaprodiChoice'].'" ScheduleExchangeID = "'.$row['ScheduleExchangeID'].'"><i class="fa fa-check" aria-hidden="true"></i> Set Room </button>';
                         $btnreject = '<button class = "btn btn-inverse btnreject" token = "'.$row['Token'].'" emailrequest = "'.$row['EmailRequster'].'" emailkaprodi = "'.$row['EmailKaprodiChoice'].'" ScheduleExchangeID = "'.$row['ScheduleExchangeID'].'"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Reject </button>';
                     }
                     
@@ -1989,6 +1989,193 @@ class C_rest extends CI_Controller {
                 );
                 echo json_encode($json_data);    
                 
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    public function approve_pr()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('budgeting/m_budgeting');
+                $PRCode = $dataToken['PRCode'];
+                $useraccess = $dataToken['useraccess'];
+                $NIP = $dataToken['NIP'];
+                $action = $dataToken['action'];
+
+                // get data
+                $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
+                $keyJson = $useraccess - 2; // get array index json
+                $JsonStatus = (array)json_decode($G_data[0]['JsonStatus'],true);
+                // get data update to approval
+                $arr_upd = $JsonStatus[$keyJson];
+                // print_r($keyJson);die();
+                if ($arr_upd['ApprovedBy'] == $NIP) {
+                    $arr_upd['Status'] = ($action == 'approve') ? 1 : 2;
+                    $arr_upd['ApproveAt'] = ($action == 'approve') ? date('Y-m-d H:i:s') : '-';
+                    $JsonStatus[$keyJson] = $arr_upd;
+                    $datasave = array(
+                        'JsonStatus' => json_encode($JsonStatus),
+                    );
+
+                    // check all status for update data
+                    $boolApprove = true;
+                    for ($i=0; $i < count($JsonStatus); $i++) { 
+                        $arr = $JsonStatus[$i];
+                        $Status = $arr['Status'];
+                        if ($Status == 2 || $Status == 0) {
+                            $boolApprove = false;
+                            break;
+                        }
+                    }
+
+                    if ($boolApprove) {
+                        $datasave['Status'] = 2;
+                        $datasave['PostingDate'] = date('Y-m-d H:i:s');
+                    }
+                    else
+                    {
+                        $boolReject = false;
+                        for ($i=0; $i < count($JsonStatus); $i++) { 
+                            $arr = $JsonStatus[$i];
+                            $Status = $arr['Status'];
+                            if ($Status == 2) {
+                                $boolReject = true;
+                                break;
+                            }
+                        }
+
+                        if ($boolReject) {
+                            $datasave['Status'] = 3;
+                        }
+                    }
+
+                    $this->db->where('PRCode',$PRCode);
+                    $this->db->update('db_budgeting.pr_create',$datasave);
+
+                }
+                else
+                {
+                    $msg = 'Not Authorize';
+                }
+
+                echo json_encode($msg);    
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    public function budgeting_dashboard()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                // do action
+                $this->load->model('budgeting/m_budgeting');
+                $month = array(
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'April',
+                    'Mei',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Okt',
+                    'Nov',
+                    'Des'
+                );
+
+                $YearActivated = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
+                
+                $StartMonth = 9;
+                $EndMonth = 8;
+
+                $st = $YearActivated[0]['StartPeriod'];
+                $st = explode('-', $st);
+                $StartMonth = (int) $st[1];
+
+                $end = $YearActivated[0]['EndPeriod'];
+                $end = explode('-', $end);
+                $EndMonth = (int) $end[1];
+
+                $Departement = $this->m_master->apiservertoserver(serverRoot.'/api/__getAllDepartementPU');
+                $data = array();
+                for ($i=0; $i < count($Departement); $i++) { 
+                    $Code = $Departement[$i]['Code'];
+                    $DepartementName = $Departement[$i]['Name2'];
+                    $get = $this->m_budgeting->get_creator_budget($YearActivated[0]['Year'],$Code);
+                    $arr_temp = array();
+                    for ($j=0; $j < count($get); $j++) { 
+                        // get data to show in dashboard'
+                        $DetailMonth = (array) json_decode($get[$j]['DetailMonth'],true);
+                        $UnitCost = $get[$j]['UnitCost']; 
+                        for ($l=0; $l < count($DetailMonth); $l++) { 
+                            $month_get = $DetailMonth[$l]['month'];
+                            $aa = explode('-', $month_get);
+                            $m1 = (int)$aa[1];
+                            $value = $DetailMonth[$l]['value'];
+                            $value = $value * $UnitCost;
+
+                            // find month exist
+                            $b = false;
+                            for ($k=0; $k < count($arr_temp); $k++) { 
+                                $m2 = $arr_temp[$k]['month'];
+                                if ($m1 == $m2) {
+                                    $b = true;
+                                    break;
+                                }
+                            }
+
+                            if ($b) {
+                               // exist
+                              $arr_temp[$k]['value'] = $arr_temp[$k]['value'] + $value;
+                            }
+                            else
+                            {
+                                $arr_temp[] = array(
+                                    'month' => $m1,
+                                    'value' => $value,
+                                );
+                            }
+
+                        }
+                    }
+                    $data[] = array(
+                        'Code' => $Code,
+                        'DepartementName' => $DepartementName,
+                        'data' => $arr_temp,
+                    );
+                }
+
+                echo json_encode(array(
+                    'month' => $month,'data' => $data,'StartMonth' => $StartMonth,'EndMonth' => $EndMonth
+                    )
+                );    
             }
             else
             {

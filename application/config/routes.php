@@ -851,6 +851,9 @@ $route['rest/academic/__fill_list_mhs_tidak_bayar'] = 'api/c_rest/academic_fill_
 $route['rest/academic/__assign_by_finance_change_status'] = 'api/c_rest/assign_by_finance_change_status';
 $route['rest/academic/__change_status_mhs_multiple'] = 'api/c_rest/change_status_mhs_multiple';
 $route['rest/ga/__show_schedule_exchange'] = 'api/c_rest/show_schedule_exchange';
+$route['rest/__approve_pr'] = 'api/c_rest/approve_pr';
+$route['rest/__budgeting_dashboard'] = 'api/c_rest/budgeting_dashboard';
+
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
@@ -1114,6 +1117,9 @@ $route['budgeting/page/loadCodePrefix'] = 'page/budgeting/c_budgeting/loadCodePr
 $route['budgeting/save_codeprefix'] = 'page/budgeting/c_budgeting/save_codeprefix';
 $route['budgeting/page/LoadSetPostDepartement'] = 'page/budgeting/c_budgeting/LoadSetPostDepartement';
 $route['budgeting/page/LoadInputsetPostDepartement'] = 'page/budgeting/c_budgeting/LoadInputsetPostDepartement';
+$route['budgeting/page/ExportPostDepartement'] = 'page/budgeting/c_budgeting/ExportPostDepartement';
+
+
 $route['budgeting/getPostDepartement'] = 'page/budgeting/c_budgeting/getPostDepartement';
 $route['budgeting/getDomPostDepartement'] = 'page/budgeting/c_budgeting/getDomPostDepartement';
 $route['budgeting/save-setpostdepartement'] = 'page/budgeting/c_budgeting/save_setpostdepartement';
@@ -1128,6 +1134,8 @@ $route['budgeting/page/LoadSetUserActionDepartement'] = 'page/budgeting/c_budget
 $route['budgeting/get_cfg_set_roleuser/(:any)'] = 'page/budgeting/c_budgeting/get_cfg_set_roleuser/$1';
 $route['budgeting/save_cfg_set_roleuser'] = 'page/budgeting/c_budgeting/save_cfg_set_roleuser';
 $route['budgeting/EntryBudget/EntryBudget'] = 'page/budgeting/c_budgeting/EntryBudget';
+$route['budgeting/EntryBudget/EntryPostItemBudgeting'] = 'page/budgeting/c_budgeting/EntryPostItemBudgeting';
+
 $route['budgeting/EntryBudget/EntryBudget/(:any)'] = 'page/budgeting/c_budgeting/EntryBudget/$1';
 $route['budgeting/getCreatorBudget'] = 'page/budgeting/c_budgeting/getCreatorBudget';
 $route['budgeting/saveCreatorbudget'] = 'page/budgeting/c_budgeting/saveCreatorbudget';
@@ -1151,7 +1159,7 @@ $route['budgeting/DataPR'] = 'page/budgeting/c_budgeting/DataPR';
 $route['budgeting/FormEditPR'] = 'page/budgeting/c_budgeting/FormEditPR';
 $route['budgeting/GetDataPR'] = 'page/budgeting/c_budgeting/GetDataPR';
 $route['budgeting/checkruleinput'] = 'page/budgeting/c_budgeting/checkruleinput';
-
+$route['budgeting/export_excel_post_department'] = 'C_save_to_excel/export_excel_post_department';
 
 // Purchasing
 $query = $db->get('db_purchasing.cfg_sub_menu');
@@ -1199,6 +1207,8 @@ $route['purchasing/page/supplier/DataIntable/server_side'] = 'page/purchasing/c_
 $route['purchasing/page/supplier/ApprovalSupplier'] = 'page/purchasing/c_master/ApprovalSupplier';
 $route['purchasing/table_all/(:any)'] = 'page/purchasing/c_purchasing/LoadTable_db_purchasing_all/$1/$2';
 $route['purchasing/table_all/(:any)/(:any)'] = 'page/purchasing/c_purchasing/LoadTable_db_purchasing_all/$1/$2';
+$route['purchasing/page/catalog/import_data'] = 'page/purchasing/c_master/import_data_catalog';
+
 
 // IT
 $query = $db->get('db_it.cfg_sub_menu');
@@ -1255,4 +1265,7 @@ $route['loginToAdminProdi'] = 'c_login/loginToAdminProdi';
 // general affair
 $route['ga_schedule_exchange'] = 'page/ga/C_schedule_exchange/schedule_exchange_action';
 $route['ga/scheduleexchange/submit_change_status'] = 'page/ga/C_schedule_exchange/submit_change_status';
+$route['save2pdf/print/prdeparment'] =  'C_save_to_pdf/print_prdeparment';
 
+// help
+$route['help'] =  'dashboard/C_dashboard/Help';

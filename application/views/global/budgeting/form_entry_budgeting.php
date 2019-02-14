@@ -764,10 +764,12 @@
 		};
 
 		waitForEl("#SaveBudget", function() {
+		   // console.log(0);
 		   $("#SaveBudget").remove();
 		});
 
 		waitForEl("#ApprovalBtn", function() {
+			// console.log(1);
 		   $("#ApprovalBtn").remove();
 		});
 

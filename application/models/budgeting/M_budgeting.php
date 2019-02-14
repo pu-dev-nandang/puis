@@ -84,6 +84,7 @@ class M_budgeting extends CI_Model {
                         'PostName' => $query[$i]['PostName'],
                         'RealisasiPostName' => $query[$i]['RealisasiPostName'],
                         'Departement' => $Departement,
+                        'CodeDepartment' => $query[$i]['Departement'],
                     );
             $arr_result[] = $temp;
         }
@@ -206,6 +207,18 @@ class M_budgeting extends CI_Model {
         $query=$this->db->query($sql, array($Year,$Departement))->result_array();
         $arr_result = array('data' => $query,'OpPostRealisasi' => $get_Data);
         return $arr_result;
+
+    }
+
+    public function getPostDepartementEx($Year,$Departement)
+    {
+        $sql = 'select a.CodePostBudget,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
+                from db_budgeting.cfg_postrealisasi as b left join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
+                join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
+                where b.Departement = ? and b.Active = 1 order by c.CodePost asc
+                ';
+        $query=$this->db->query($sql, array($Year,$Departement))->result_array();
+        return $query;
 
     }
 
@@ -447,6 +460,74 @@ class M_budgeting extends CI_Model {
         return $PRCode;
     }
 
+    public function Get_PRCode2($Departement)
+    {
+        /* method PR
+           Code : 05/UAP-IT/PR/IX/2018
+           05 : Increment (Max length = 2)
+           UAP- : Fix
+           IT : Division Abbreviation
+           PR : Fix
+           IX : Bulan dalam romawi
+           2018 : Get Years Now
+        */
+        $PRCode = '';   
+        $Year = date('Y');
+        $Month = date('m');
+        $Month = $this->m_master->romawiNumber($Month);
+        $MaxLengthINC = 2;
+        
+        $sql = 'select * from db_budgeting.pr_create 
+                where Departement = ? and SPLIT_STR(PRCode, "/", 5) = ?
+                and SPLIT_STR(PRCode, "/", 4) = ?
+                order by SPLIT_STR(PRCode, "/", 1) desc
+                limit 1';
+        $query=$this->db->query($sql, array($Departement,$Year,$Month))->result_array();
+        if (count($query) == 1) {
+            // Inc last code
+            $PRCode = $query[0]['PRCode'];
+            $explode = explode('/', $PRCode);
+            $C = $explode[0];
+            $C = (int) $C;
+            $C = $C + 1;
+            $B = strlen($C);
+            $strINC = $C;
+            for ($i=0; $i < $MaxLengthINC - $B; $i++) { 
+                $strINC = '0'.$strINC;
+            }
+
+            $explode[0] = $strINC;
+            $PRCode = implode('/', $explode);
+        }
+        else
+        {
+            $C = 1;
+            $B = strlen($C);
+            $strINC = $C;
+            for ($i=0; $i < $MaxLengthINC - $B; $i++) { 
+                $strINC = '0'.$strINC;
+            }
+
+            // get abbreviation department
+                $ExpDepart = explode('.', $Departement);
+                $abbreviation_Div = '';
+                if ($ExpDepart[0] == 'NA') {
+                    $G_Div = $this->m_master->caribasedprimary('db_employees.division','ID',$ExpDepart[1]);
+                    $abbreviation_Div = $G_Div[0]['Abbreviation'];
+                }
+                else
+                {
+                    $G_Div = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ExpDepart[1]);
+                    $abbreviation_Div = $G_Div[0]['Code'];
+                }
+
+            $PRCode = $strINC.'/'.'UAP-'.$abbreviation_Div.'/'.'PR'.'/'.$Month.'/'.$Year;
+        }    
+
+        return $PRCode;        
+
+    }
+
     public function GetRuleApproval_PR_JsonStatus($Departement,$Amount)
     {
         $JsonStatus = array();
@@ -454,17 +535,31 @@ class M_budgeting extends CI_Model {
                 group by MaxLimit,ID_m_userrole order by MaxLimit,ID_m_userrole;
                 ';
         $query=$this->db->query($sql, array())->result_array();
-        // print_r($query);die();
+        
         // get data to filtering MaxLimit
+        // print_r($query);die();
             $arr = array();
             for ($i=0; $i < count($query); $i++) {
                 $MaxLimit = $query[$i]['MaxLimit'];
                 $arr[]= $query[$i]['ID_m_userrole'];
                 $bool = false;
-                for ($j=$i+1; $j < count($query); $j++) {
+                for ($j=$i+1; $j < count($query); $j++) { 
                     $MaxLimit2 = $query[$j]['MaxLimit'];
                     if ($MaxLimit == $MaxLimit2) {
-                        $arr[]= $query[$j]['ID_m_userrole']; 
+                        $boolz = false;
+                        for ($z=0; $z < count($arr); $z++) { 
+                            if ($query[$j]['ID_m_userrole'] == $arr[$z]) {
+                                $boolz = true;
+                                break;
+                            }
+                        }
+
+                        if (!$boolz) {
+                            $arr[]= $query[$j]['ID_m_userrole'];
+                        }
+
+                        $i = $j;
+
                     }
                     else
                     {
@@ -474,8 +569,8 @@ class M_budgeting extends CI_Model {
                 }
 
                 if ($bool) {
-                   break;
-                }      
+                    break;
+                }     
 
             }
 
@@ -519,8 +614,8 @@ class M_budgeting extends CI_Model {
     public function GetPR_DetailByPRCode($PRCode)
     {
         $sql = 'select a.ID,a.PRCode,a.ID_budget_left,b.ID_creator_budget,c.CodePostBudget,d.CodeSubPost,e.CodePost,
-                e.RealisasiPostName,f.PostName,a.ID_m_catalog,g.Item,
-                a.Qty,a.UnitCost,a.SubTotal,a.DateNeeded,a.BudgetStatus,a.UploadFile
+                e.RealisasiPostName,f.PostName,a.ID_m_catalog,g.Item,g.Desc,g.DetailCatalog,
+                a.Qty,a.UnitCost,a.SubTotal,a.DateNeeded,a.BudgetStatus,a.UploadFile,g.Photo
                 from db_budgeting.pr_detail as a
                 join db_budgeting.budget_left as b on a.ID_budget_left = b.ID
                 join db_budgeting.creator_budget as c on b.ID_creator_budget = c.ID
@@ -543,5 +638,58 @@ class M_budgeting extends CI_Model {
         $arr_result['rule'] = $this->m_master->caribasedprimary('db_budgeting.cfg_set_userrole','ID_m_userrole',$query[0]['ID_m_userrole']);
         $arr_result['access'] = $query;
         return $arr_result; 
+    }
+
+    public function Get_m_Approver()
+    {
+        $sql = 'select * from db_budgeting.cfg_m_userrole where ID != 1';
+        $query = $this->db->query($sql, array())->result_array();
+        return $query;   
+    }
+
+    public function SearchDepartementBudgeting($DepartementBudgeting)
+    {
+        $sql = 'select * from (
+                select CONCAT("AC.",ID) as ID, NameEng as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
+                UNION
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                ) aa
+                where ID = ?
+                ';
+        $query=$this->db->query($sql, array($DepartementBudgeting))->result_array();
+        return $query;
+    }
+
+    public function SearchDepartementBudgetingByName($DepartementBudgeting)
+    {
+        $sql = 'select * from (
+                select CONCAT("AC.",ID) as ID, NameEng as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
+                UNION
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                ) aa
+                where NameDepartement = ?
+                ';
+        $query=$this->db->query($sql, array($DepartementBudgeting))->result_array();
+        return $query;
+    }
+
+    public function GetPeriod()
+    {
+        $YearActivated = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
+        $st = $YearActivated[0]['StartPeriod'];
+        $st = explode('-', $st);
+        $StartMonth = (int) $st[1];
+        $StartMonth = (strlen($StartMonth) == 1 ) ? '0'.$StartMonth : $StartMonth;
+        
+        $StartMonth   = DateTime::createFromFormat('!m', $StartMonth);
+        $StartMonth = $StartMonth->format('F').' '.$st[0]; // March
+
+        $end = $YearActivated[0]['EndPeriod'];
+        $end = explode('-', $end);
+        $EndMonth = (int) $end[1];
+        $EndMonth   = DateTime::createFromFormat('!m', $EndMonth);
+        $EndMonth = $EndMonth->format('F').' '.$end[0]; // March
+
+        return array('StartMonth' => $StartMonth,'EndMonth' => $EndMonth);
     }  
 }

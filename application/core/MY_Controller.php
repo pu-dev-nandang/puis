@@ -422,7 +422,9 @@ abstract class Budgeting_Controler extends Globalclass{
         $PositionMain = $this->session->userdata('PositionMain');
         $DivisionPage = $PositionMain['Division'];
         $IDPosition = $PositionMain['IDPosition'];
-        $this->data['department'] = ($PositionMain['IDDivision'] == 12 || $IDPosition <= 6)? $this->session->userdata('departementNavigation') : $DivisionPage;
+        $G_departementNavigation = $this->m_master->caribasedprimary('db_employees.division','ID',$this->session->userdata('IDdepartementNavigation'));
+        $departementNavigation = $G_departementNavigation[0]['Division'];
+        $this->data['department'] = ($PositionMain['IDDivision'] == 12 || $IDPosition <= 6)? $departementNavigation : $DivisionPage;
         $this->data['department'] = strtolower($this->data['department']);
         $this->data['department'] = str_replace(" ", "-", $this->data['department']);
         $this->data['IDdepartment'] = $PositionMain['IDDivision'];

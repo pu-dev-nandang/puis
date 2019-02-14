@@ -43,9 +43,9 @@
                             <li class="active">
                                 <a href="javascript:void(0)" class="pageAnchorCatalog" page = "InputCatalog">Input</a>
                             </li>
-                            <li class="">
-                                <a href="javascript:void(0)" class="pageAnchorCatalog" page = "ApprovalCatalog">Approve<b style="color: red;" id= "CountApproval"></b></a>
-                            </li>
+                            <!-- <li class="">
+                                <a href="javascript:void(0)" class="pageAnchorCatalog" page = "ApprovalCatalog">Request Approve<b style="color: red;" id= "CountApproval"></b></a>
+                            </li> -->
                         </ul>
                         <div style="padding-top: 30px;border-top: 1px solid #cccccc">
                             <div id = "pageCatalog">
@@ -81,5 +81,94 @@
           var jsonPass = response.jsonPass;
           $("#pageCatalog").html(html);
       }); // exit spost
+    }
+
+    $(document).on('click','#sbmtimportfile', function () {
+      loading_button('#sbmtimportfile');
+      var chkfile = file_validation('ImportFile');
+      if (chkfile) {
+        var form_data = new FormData();
+        var url = base_url_js + "purchasing/page/catalog/import_data";
+        var files = $('#ImportFile')[0].files;  
+        form_data.append("fileData", files[0]);
+        $.ajax({
+          type:"POST",
+          url:url,
+          data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+          contentType: false,       // The content type used when sending data to the server.
+          cache: false,             // To unable request pages to be cached
+          processData:false,
+          dataType: "json",
+          success:function(data)
+          {
+            if(data.status == 1) {
+              toastr.options.fadeOut = 100000;
+              toastr.success(data.msg, 'Success!');
+              $('.pageAnchor[page="FormInput"]').trigger('click');
+                if (CountColapses2 == 0) {
+                  $('.pageAnchor[page="DataIntable"]').trigger('click');
+                  // LoadPageCatalog('DataIntable');
+                  }
+                else
+                {
+                  LoadPageCatalog('DataIntable');
+                }
+            }
+            else
+            {
+              toastr.options.fadeOut = 100000;
+              toastr.error(data.msg, 'Failed!!');
+            }
+          setTimeout(function () {
+              toastr.clear();
+          $('#sbmtimportfile').prop('disabled',false).html('Save');
+            },1000);
+
+          },
+          error: function (data) {
+            toastr.error(data.msg, 'Connection error, please try again!!');
+            $('#sbmtimportfile').prop('disabled',false).html('Save');
+          }
+        })
+
+      }
+      else
+      {
+         $('#sbmtimportfile').prop('disabled',false).html('Save');
+      }  
+    });
+
+    function file_validation(ID_element)
+    {
+        var files = $('#'+ID_element)[0].files;
+        var error = '';
+        var msgStr = '';
+       var name = files[0].name;
+        console.log(name);
+        var extension = name.split('.').pop().toLowerCase();
+        if(jQuery.inArray(extension, ['xlsm','xlsx']) == -1)
+        {
+         msgStr += 'Invalid Type File<br>';
+        }
+
+        var oFReader = new FileReader();
+        oFReader.readAsDataURL(files[0]);
+        var f = files[0];
+        var fsize = f.size||f.fileSize;
+        console.log(fsize);
+
+        if(fsize > 2000000) // 2mb
+        {
+         msgStr += 'File Size is very big<br>';
+        }
+
+        if (msgStr != '') {
+          toastr.error(msgStr, 'Failed!!');
+          return false;
+        }
+        else
+        {
+          return true;
+        }
     }
 </script>

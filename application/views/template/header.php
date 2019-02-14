@@ -213,6 +213,9 @@
                             <span>Budgeting</span>
                         </a>
                     </li> -->
+                    <li><a href="<?php echo base_url('help'); ?>">
+                            <i class="fa fa-bookmark"></i>
+                            Help</a></li>
                     <li class="divider"></li>
                     <li><a href="javascript:void(0)" id="useLogOut"><i class="fa fa-power-off"></i> Log Out</a></li>
                 </ul>

@@ -389,10 +389,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                             left join db_academic.mata_kuliah as g on g.ID = f.MKID
                             where '".$date2."' >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
                             and '".$date2."' <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
-                            and b.NameEng = ?
+                            and b.NameEng = ? and d.SemesterID = '".$SemesterID."'
                             and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
                             on a.ID = b.ID_Attd where b.Status = '2' and b.DateOriginal = '".$date2."')
-                            order by a.Room";  
+                            order by a.Room";
                 }
 
                 
@@ -468,9 +468,11 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $start = $query[$i]['StartSessions'];
             $start = explode(':', $start);
             $start = $start[0].':'.$start[1];
+            $startWr = $start;
             $end = $query[$i]['EndSessions'];
             $end = explode(':', $end);
             $end = $end[0].':'.$end[1];
+            $endWr = $end;
 
             // get jumlah Mahasiswa
             $arrMhs = $this->m_api->__getStudentByScheduleID($query[$i]['ScheduleID']);
@@ -481,10 +483,51 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 $agenda = 'Exam';
             }
 
+                $varprocess = function($time)
+                {
+                    $t = explode(':', $time);
+                    $t2 = $t[1];
+                    $t1 = $t[0];
+                    $bool = 1;
+                    if ($t2 != '00' && $t2 != '30') {
+                        $t2 = (int) $t2;
+                        if ($t2 > 0 && $t2 < 30) {
+                            $t2 = '30';
+                            $bool = 0;
+                        }
+                        elseif ($t2 > 30) {
+                            $t2 = '00';
+                            $t1 = (int) $t1;
+                            $t1++;
+                            // make two digit
+                            $l = strlen($t1);
+                            for ($a=0; $a < 2-$l; $a++) { 
+                                $t1 = '0'.$t1;
+                            }
+                            $bool = 0;
+
+                        }
+                    }
+                    $arr = array('bool' => $bool,'time' => $t1.':'.$t2);
+                    return $arr;
+                };
+
+                $timeGet1 = $varprocess($start);
+                $start = $timeGet1['time'];
+                $timeGet2 = $varprocess($end);
+                $end = $timeGet2['time'];
+
+                $chkcolspan = $timeGet1['bool'] * $timeGet2['bool'];
+                if ($timeGet1['bool'] == 0) {
+                    $colspan = $colspan - 1;
+                }
+
             $dt = array(
                 'user'  => 'Academic TimeTables',
                 'start' => $start,
+                'startWr' => $startWr,
                 'end'   => $end,
+                'endWr'   => $endWr,
                 'time'  => $time,
                 'colspan' => $colspan,
                 'agenda' => $agenda,
@@ -503,7 +546,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $dt = array(
                 'user'  => $query2[$i]['Name'],
                 'start' => $query2[$i]['Start'],
+                'startWr' => $query2[$i]['Start'],
                 'end'   => $query2[$i]['End'],
+                'endWr'   => $query2[$i]['End'],
                 'time'  => $query2[$i]['Time'],
                 'colspan' => $query2[$i]['Colspan'],
                 'agenda' => $query2[$i]['Agenda'],
@@ -530,19 +575,62 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $start = $query3[$i]['StartSessions'];
             $start = explode(':', $start);
             $start = $start[0].':'.$start[1];
+            $startWr = $start;
             $end = $query3[$i]['EndSessions'];
             $end = explode(':', $end);
             $end = $end[0].':'.$end[1];
+            $endWr = $end;
 
             // get jumlah Mahasiswa
             // $this->load->model('m_api');
             $arrMhs = $this->m_api->__getStudentByScheduleID($query3[$i]['ScheduleID']);
             $jumlahMHS = count($arrMhs);
 
+            $varprocess = function($time)
+            {
+                $t = explode(':', $time);
+                $t2 = $t[1];
+                $t1 = $t[0];
+                $bool = 1;
+                if ($t2 != '00' && $t2 != '30') {
+                    $t2 = (int) $t2;
+                    if ($t2 > 0 && $t2 < 30) {
+                        $t2 = '30';
+                        $bool = 0;
+                    }
+                    elseif ($t2 > 30) {
+                        $t2 = '00';
+                        $t1 = (int) $t1;
+                        $t1++;
+                        // make two digit
+                        $l = strlen($t1);
+                        for ($a=0; $a < 2-$l; $a++) { 
+                            $t1 = '0'.$t1;
+                        }
+                        $bool = 0;
+
+                    }
+                }
+                $arr = array('bool' => $bool,'time' => $t1.':'.$t2);
+                return $arr;
+            };
+
+            $timeGet1 = $varprocess($start);
+            $start = $timeGet1['time'];
+            $timeGet2 = $varprocess($end);
+            $end = $timeGet2['time'];
+
+            $chkcolspan = $timeGet1['bool'] * $timeGet2['bool'];
+            if ($timeGet1['bool'] == 0) {
+                $colspan = $colspan - 1;
+            }
+
             $dt = array(
                 'user'  => 'Academic TimeTables EX',
                 'start' => $start,
+                'startWr' => $startWr,
                 'end'   => $end,
+                'endWr'   => $endWr,
                 'time'  => $time,
                 'colspan' => $colspan,
                 'agenda' => 'Study',
@@ -565,6 +653,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     {
         $bool = true;
         $NotIDMyself = ($NotIDMyself == '') ? '' : ' and a.ID != '.$NotIDMyself;
+
+        $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+        $SemesterID = $SemesterID[0]['ID'];
+
         for ($xx=0; $xx < 1; $xx++) {  // check twice
 
             $TimeStart = date("H:i:s", strtotime($Start));
@@ -586,7 +678,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     $sqlWaktu2 = 'select * from db_academic.academic_years where SemesterID = ? and (uasStart <="'.$date2.'" and uasEnd >= "'.$date2.'")';
                     $queryWaktu2=$this->db->query($sqlWaktu2, array($SemesterID))->result_array();
 
-                if (count($sqlWaktu) == 0) {
+                if (count($queryWaktu) == 0) {
                     if (count($sqlWaktu2) > 0) {
                         $sql = "select count(*) as total from
                                (select a.ExamClassroomID,a.ID as ID_exam
@@ -621,8 +713,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                 on a.ID = c.ClassroomID
                                 join db_academic.days as b
                                 on c.DayID = b.ID
+                                left join db_academic.schedule as zd on zd.ID = c.ScheduleID
                                 where "'.$date2.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
-                                and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
+                                and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'"
                                 and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
                         on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
                     }
@@ -656,7 +749,6 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                 aa
                         ";
                 } // exit cek date academic
-                // print_r($sql);die();
 
                 $query=$this->db->query($sql, array())->result_array();
 
@@ -684,6 +776,23 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                         $query2=$this->db->query($sql2, array())->result_array();
                          if ($query2[0]['total'] > 0) {
                             $bool = false;
+                         }
+                         else
+                         {
+
+                            $sql = 'select count(*) as total from db_academic.classroom as a join db_academic.schedule_details as c
+                                    on a.ID = c.ClassroomID
+                                    join db_academic.days as b
+                                    on c.DayID = b.ID
+                                    left join db_academic.schedule as zd on zd.ID = c.ScheduleID
+                                    where "'.$date2.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
+                                    and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'" 
+                                    and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                            on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
+                            $query=$this->db->query($sql, array())->result_array();
+                            if ($query[0]['total'] > 0) {
+                               $bool = false;
+                            }
                          } 
                     }
                           
@@ -701,8 +810,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                         on a.ID = c.ClassroomID
                         join db_academic.days as b
                         on c.DayID = b.ID
+                        left join db_academic.schedule as zd on zd.ID = c.ScheduleID
                         where "'.$date2.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
-                        and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
+                        and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'" 
                         and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
                 on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
                 $query=$this->db->query($sql, array())->result_array();
@@ -754,8 +864,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                             on a.ID = c.ClassroomID
                             join db_academic.days as b
                             on c.DayID = b.ID
+                            left join db_academic.schedule as zd on zd.ID = c.ScheduleID
                             where "'.$getDate.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
-                            and "'.$getDate.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
+                            and "'.$getDate.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'"
                             and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
                              on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$getDate.'")';
                     $query=$this->db->query($sql, array())->result_array();
@@ -801,6 +912,172 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         }
 
         return $bool;
+    }
+
+    public function checkBentrok2($Start,$End,$chk_e_multiple,$Room,$NotIDMyself = '')
+    {
+        $array_bool = array('bool' => true);
+        $NotIDMyself = ($NotIDMyself == '') ? '' : ' and a.ID != '.$NotIDMyself;
+
+        $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+        $SemesterID = $SemesterID[0]['ID'];
+
+        for ($xx=0; $xx < 1; $xx++) {  // check twice
+
+            $TimeStart = date("H:i:s", strtotime($Start));
+            $TimeEnd = date("H:i:s", strtotime($End));
+
+            // check academic timeline
+            $datetime = DateTime::createFromFormat('Y-m-d H:i:s', $Start);
+            $NameDay = $datetime->format('l');
+            $date2 = date("Y-m-d", strtotime($Start));
+
+            // cek academic years apakah periode ujian atau tidak
+                $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+                $SemesterID = $SemesterID[0]['ID'];
+
+                $sqlWaktu = 'select * from db_academic.academic_years where SemesterID = ? and (utsStart <="'.$date2.'" and utsEnd >= "'.$date2.'")';
+                $queryWaktu=$this->db->query($sqlWaktu, array($SemesterID))->result_array();
+
+                $sqlWaktu2 = 'select * from db_academic.academic_years where SemesterID = ? and (uasStart <="'.$date2.'" and uasEnd >= "'.$date2.'")';
+                $queryWaktu2=$this->db->query($sqlWaktu2, array($SemesterID))->result_array();
+
+            if (count($queryWaktu) == 0) {
+                if (count($sqlWaktu2) > 0) {
+                    $sql = "select count(*) as total from
+                           (select a.ExamClassroomID,a.ID as ID_exam
+                            from db_academic.exam as a
+                            join db_employees.employees as b
+                            on a.Pengawas1 = b.NIP
+                            join db_academic.exam_details as c
+                            on a.ID = c.ExamID
+                            join db_academic.days as d
+                            on d.ID = a.DayID
+                            join db_academic.classroom as e
+                            on e.ID = a.ExamClassroomID
+                            join db_academic.schedule_details_course as f
+                            on f.ScheduleID = c.ScheduleID
+                            join db_academic.mata_kuliah as g
+                            on g.ID = f.MKID
+                            where d.NameEng = '".$NameDay."'
+                            and a.ExamDate = '".$date2."'
+                            and a.`Status` = '1'
+                            and a.SemesterID = '".$SemesterID."'
+                            and ((a.ExamStart >= '".$TimeStart."'  and a.ExamStart < '".$TimeEnd."' ) 
+                               or  (a.ExamEnd > '".$TimeStart."'  and a.ExamEnd <= '".$TimeEnd."' )
+                            ) and e.Room  = '".$Room."' 
+                            group by c.ScheduleID
+                           )
+                            aa
+                    ";
+                }
+                else
+                {
+                    $sql = 'select count(*) as total from db_academic.classroom as a join db_academic.schedule_details as c
+                            on a.ID = c.ClassroomID
+                            join db_academic.days as b
+                            on c.DayID = b.ID
+                            left join db_academic.schedule as zd on zd.ID = c.ScheduleID
+                            where "'.$date2.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
+                            and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'"
+                            and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                    on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
+                }
+            }
+            else
+            {
+                $sql = "select count(*) as total from
+                           (select a.ExamClassroomID,a.ID as ID_exam
+                            from db_academic.exam as a
+                            join db_employees.employees as b
+                            on a.Pengawas1 = b.NIP
+                            join db_academic.exam_details as c
+                            on a.ID = c.ExamID
+                            join db_academic.days as d
+                            on d.ID = a.DayID
+                            join db_academic.classroom as e
+                            on e.ID = a.ExamClassroomID
+                            join db_academic.schedule_details_course as f
+                            on f.ScheduleID = c.ScheduleID
+                            join db_academic.mata_kuliah as g
+                            on g.ID = f.MKID
+                            where d.NameEng = '".$NameDay."'
+                            and a.ExamDate = '".$date2."'
+                            and a.`Status` = '1'
+                            and a.SemesterID = '".$SemesterID."'
+                            and ((a.ExamStart >= '".$TimeStart."'  and a.ExamStart < '".$TimeEnd."' ) 
+                               or  (a.ExamEnd > '".$TimeStart."'  and a.ExamEnd <= '".$TimeEnd."' )
+                            ) and e.Room  = '".$Room."' 
+                            group by c.ScheduleID
+                           )
+                            aa
+                    ";
+            } // exit cek date academic
+
+            $query=$this->db->query($sql, array())->result_array();
+
+            if ($query[0]['total'] > 0) {
+                $array_bool = array(
+                    'type' => 'academic',
+                    'bool' => false
+                );
+            }
+            else
+            {
+                $sql3 = 'select count(*) as total
+                        from db_academic.classroom as a join db_academic.schedule_exchange as c
+                        on a.ID = c.ClassroomID
+                        join db_academic.days as b
+                        on c.DayID = b.ID where c.Status = "2" and c.Date ="'.$date2.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'"';
+                //print_r($sql3);die();
+                $query3=$this->db->query($sql3, array())->result_array();
+                if ($query3[0]['total'] > 0) {
+                    $array_bool = array(
+                        'type' => 'academic',
+                        'bool' => false
+                    );
+
+                }
+                else
+                {
+                    $sql2 = 'select count(*) as total from db_reservation.t_booking as a
+                             join db_employees.employees as b on a.CreatedBy = b.NIP
+                             where a.Status in(0,1) and ((a.`Start` >= "'.$Start.'" and a.`Start` < "'.$End.'" ) or (a.`End` > "'.$Start.'" and a.`End` <= "'.$End.'" )) and a.Room = "'.$Room.'"'.' '.$NotIDMyself;
+                    $query2=$this->db->query($sql2, array())->result_array();
+                     if ($query2[0]['total'] > 0) {
+                        $array_bool = array(
+                            'type' => 'venue',
+                            'bool' => false
+                        );
+                     }
+                     else
+                     {
+
+                        $sql = 'select count(*) as total from db_academic.classroom as a join db_academic.schedule_details as c
+                                on a.ID = c.ClassroomID
+                                join db_academic.days as b
+                                on c.DayID = b.ID
+                                left join db_academic.schedule as zd on zd.ID = c.ScheduleID
+                                where "'.$date2.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
+                                and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'" 
+                                and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                        on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
+                        // print_r($sql);die();
+                        $query=$this->db->query($sql, array())->result_array();
+                        if ($query[0]['total'] > 0) {
+                           $array_bool = array(
+                               'type' => 'academic',
+                               'bool' => false
+                           );
+                        }
+                     } 
+                }
+                      
+            }
+            usleep( 500 );
+        }
+
+        return $array_bool;
     }
 
     public function getCountApprove()
@@ -876,6 +1153,30 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             if ($query[$i]['MarcommSupport'] != '') {
                 $MarkomSupport = '<ul>';
                 $dd = explode(',', $query[$i]['MarcommSupport']);
+                    $dzx = array();
+                // split for note
+                    for ($xz=0; $xz < count($dd); $xz++) { 
+                        $pos1 = stripos($dd[$xz], 'Note');
+                        $exitLoop = false;
+                        if ($pos1 !== false) {
+                            $temp = array();
+                            for ($ixx = $xz; $ixx < count($dd); $ixx++) { 
+                                $temp[] = $dd[$ixx];
+                            }
+                            $dzx[] = implode(',', $temp);
+                            $exitLoop = true;
+                        }
+                        else
+                        {
+                            $dzx[] = $dd[$xz];
+                        }
+
+                        if ($exitLoop) {
+                            break;
+                        }
+                    }
+
+                    $dd = $dzx;
                 for ($zx=0; $zx < count($dd); $zx++) {
                     $a = 'How are you?';
 
@@ -1201,6 +1502,31 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             if ($query[$i]['MarcommSupport'] != '') {
                 $MarkomSupport = '<ul style = "margin-left : -28px">';
                 $dd = explode(',', $query[$i]['MarcommSupport']);
+                $dzx = array();
+                // split for note
+                    for ($xz=0; $xz < count($dd); $xz++) { 
+                        $pos1 = stripos($dd[$xz], 'Note');
+                        $exitLoop = false;
+                        if ($pos1 !== false) {
+                            $temp = array();
+                            for ($ixx = $xz; $ixx < count($dd); $ixx++) { 
+                                $temp[] = $dd[$ixx];
+                            }
+                            $dzx[] = implode(',', $temp);
+                            $exitLoop = true;
+                        }
+                        else
+                        {
+                            $dzx[] = $dd[$xz];
+                        }
+
+                        if ($exitLoop) {
+                            break;
+                        }
+                    }
+
+                    $dd = $dzx;
+
                 $btnMarkomSupport = '';
                 for ($zx=0; $zx < count($dd); $zx++) {
                     $a = 'How are you?';
@@ -1583,6 +1909,30 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             if ($query[$i]['MarcommSupport'] != '') {
                 $MarkomSupport = '<ul style = "margin-left : -28px">';
                 $dd = explode(',', $query[$i]['MarcommSupport']);
+                $dzx = array();
+                // split for note
+                    for ($xz=0; $xz < count($dd); $xz++) { 
+                        $pos1 = stripos($dd[$xz], 'Note');
+                        $exitLoop = false;
+                        if ($pos1 !== false) {
+                            $temp = array();
+                            for ($ixx = $xz; $ixx < count($dd); $ixx++) { 
+                                $temp[] = $dd[$ixx];
+                            }
+                            $dzx[] = implode(',', $temp);
+                            $exitLoop = true;
+                        }
+                        else
+                        {
+                            $dzx[] = $dd[$xz];
+                        }
+
+                        if ($exitLoop) {
+                            break;
+                        }
+                    }
+
+                    $dd = $dzx;
                 for ($zx=0; $zx < count($dd); $zx++) {
                     // check status
                      $Status_markom = '';
@@ -1787,6 +2137,48 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                                                                break;
                                                                            }
                                                                         }
+                                                                        else
+                                                                        {
+                                                                            $PositionOther = $this->session->userdata('PositionOther1');
+                                                                            $IDDivisionOther = $PositionOther['IDDivisionOther1'];
+                                                                            $PositionOther = $PositionOther['IDPositionOther1'];
+                                                                            if ($DivisionCreated[0] == $IDDivisionOther) {
+                                                                                // compare Position
+                                                                                if ($IDPositionApprover == $PositionOther) {
+                                                                                    $find++;
+                                                                                    $getLoop = false;    
+                                                                                    break;
+                                                                                }
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                $PositionOther = $this->session->userdata('PositionOther2');
+                                                                                $IDDivisionOther = $PositionOther['IDDivisionOther2'];
+                                                                                $PositionOther = $PositionOther['IDPositionOther2'];
+                                                                                if ($DivisionCreated[0] == $IDDivisionOther) {
+                                                                                    // compare Position
+                                                                                    if ($IDPositionApprover == $PositionOther) {
+                                                                                        $find++;
+                                                                                        $getLoop = false;    
+                                                                                        break;
+                                                                                    }
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    $PositionOther = $this->session->userdata('PositionOther3');
+                                                                                    $IDDivisionOther = $PositionOther['IDDivisionOther3'];
+                                                                                    $PositionOther = $PositionOther['IDPositionOther3'];
+                                                                                    if ($DivisionCreated[0] == $IDDivisionOther) {
+                                                                                        // compare Position
+                                                                                        if ($IDPositionApprover == $PositionOther) {
+                                                                                            $find++;
+                                                                                            $getLoop = false;    
+                                                                                            break;
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
                                                                     }
                                                                break;
                                                            
@@ -1965,6 +2357,31 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             if ($query[$i]['MarcommSupport'] != '') {
                 $MarkomSupport = '<ul style = "margin-left : -28px">';
                 $dd = explode(',', $query[$i]['MarcommSupport']);
+                $dzx = array();
+                // split for note
+                    for ($xz=0; $xz < count($dd); $xz++) { 
+                        $pos1 = stripos($dd[$xz], 'Note');
+                        $exitLoop = false;
+                        if ($pos1 !== false) {
+                            $temp = array();
+                            for ($ixx = $xz; $ixx < count($dd); $ixx++) { 
+                                $temp[] = $dd[$ixx];
+                            }
+                            $dzx[] = implode(',', $temp);
+                            $exitLoop = true;
+                        }
+                        else
+                        {
+                            $dzx[] = $dd[$xz];
+                        }
+
+                        if ($exitLoop) {
+                            break;
+                        }
+                    }
+
+                    $dd = $dzx;
+
                 for ($zx=0; $zx < count($dd); $zx++) {
                     // check status
                      $Status_markom = '';
@@ -2164,6 +2581,11 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         // get data schedule details and compare with t_booking table
         $sql = 'select * from db_reservation.t_booking where Start >= timestamp(DATE_SUB(NOW(), INTERVAL 30 MINUTE))';
         $query=$this->db->query($sql, array())->result_array();
+
+        $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+        $SemesterID = $SemesterID[0]['ID'];
+
+
         for ($i=0; $i < count($query); $i++) {
              $Start = $query[$i]['Start'];
              $End = $query[$i]['End'];
@@ -2180,8 +2602,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                         on a.ID = c.ClassroomID
                         join db_academic.days as b
                         on c.DayID = b.ID
+                        left join db_academic.schedule as zd on zd.ID = c.ScheduleID
                         where "'.$date2.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
-                        and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
+                        and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'"
                         and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
                 on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
                 $query2=$this->db->query($sql2, array())->result_array();

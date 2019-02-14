@@ -601,4 +601,56 @@ class C_master extends Purchasing_Controler {
       $this->Supplier_DataIntable('non_approval');
     }
 
+    public function import_data_catalog()
+    {
+      $rs = array(
+          'status' => 0,
+          'msg' => '',
+      );
+      if(isset($_FILES["fileData"]["name"]))
+      { 
+        $path = $_FILES["fileData"]["tmp_name"];
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load($path); // Empty Sheet
+        $objWorksheet = $excel2->setActiveSheetIndex(0);
+        $CountRow = $objWorksheet->getHighestRow();
+        for ($i=2; $i < ($CountRow + 1); $i++) {
+          $Item = $objWorksheet->getCellByColumnAndRow(0, $i)->getCalculatedValue();
+          $Desc = $objWorksheet->getCellByColumnAndRow(1, $i)->getCalculatedValue();
+          $EstimaValue = $objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue();
+          $Departement = $objWorksheet->getCellByColumnAndRow(3, $i)->getCalculatedValue();
+          // check department
+          $chk = $this->m_budgeting->SearchDepartementBudgeting($Departement);
+          if (count($chk) == 0) {
+            $chk = $this->m_budgeting->SearchDepartementBudgetingByName($Departement);
+            if (count($chk) == 0) {
+              $rs['msg'] =  'Departement is unknown';
+              echo json_encode($rs);
+              die();
+            }
+          }
+          $DetailCatalog = $objWorksheet->getCellByColumnAndRow(4, $i)->getCalculatedValue();
+
+          $dataSave = array(
+            'Item' => $Item,
+            'Desc' => $Desc,
+            'EstimaValue' => $EstimaValue,
+            'Departement' => $Departement,
+            'DetailCatalog' => $DetailCatalog,
+            'Approval' => 1,
+            'ApprovalAt' => date("Y-m-d H:i:s"),
+            'ApprovalBy' => $this->session->userdata("NIP"),
+            'CreatedAt' => date("Y-m-d H:i:s"),
+            'CreatedBy' => $this->session->userdata("NIP"),
+          );
+
+          $this->db->insert('db_purchasing.m_catalog',$dataSave);
+           $rs['status'] = 1;
+        }
+        echo json_encode($rs);
+
+      }
+    }
+
 }

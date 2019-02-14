@@ -6,6 +6,8 @@
 	</div>
 </div>
 <script type="text/javascript">
+	var G_Approver = <?php echo json_encode($G_Approver) ?>;
+
 $(document).ready(function() {
 		LoadFirstLoad()
 
@@ -17,15 +19,24 @@ $(document).ready(function() {
 	function LoadDataForTable()
 	{
 		$("#DivTable").empty();
+		var LoopApprover = '';
+		for (var i = 0; i < G_Approver.length; i++) {
+			var ap = i +1;
+			LoopApprover += '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">'+ap+'</th>';
+		}
+
 		var table = '<table class="table table-bordered datatable2" id = "tableData4">'+
 		            '<thead>'+
 		            '<tr>'+
-		                '<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
-		                '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">PR Code</th>'+
-		                '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Department</th>'+
-		                '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</th>'+
-		                '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Processing</th>'+
+		                '<th rowspan = "2" width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
+		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">PR Code</th>'+
+		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Department</th>'+
+		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</th>'+
+		                '<th colspan = "'+G_Approver.length+'" style = "text-align: center;background: #20485A;color: #FFFFFF;">Approver</th>'+
 		            '</tr>'+
+		            '<tr>'+
+		            	LoopApprover+
+		            '</tr>'+	
 		            '</thead>'+
 		            '<tbody id="dataRow"></tbody>'+
 		        '</table>';
@@ -64,8 +75,9 @@ $(document).ready(function() {
 		        }
 		    },
 		    'createdRow': function( row, data, dataIndex ) {
+		    		 var endkey = (data.length) - 1;
 		    		 $( row ).find('td:eq(1)').html(
-		    		 		'<a href = "javascript:void(0)" class = "PRCode" fill = "'+data[1]+'">'+data[1]+'</a>'
+		    		 		'<a href = "javascript:void(0)" class = "PRCode" fill = "'+data[1]+'" department = "'+data[endkey]+'">'+data[1]+'</a>'
 		    		 	)
 		    },
 		} );
@@ -74,9 +86,11 @@ $(document).ready(function() {
 	$(document).off('click', '.PRCode').on('click', '.PRCode',function(e) {
 		loading_page("#pageContent");
 		var PRCode = $(this).attr('fill');
+		var department = $(this).attr('department');
 		var url = base_url_js+'budgeting/FormEditPR';
 		var data = {
 		    PRCode : PRCode,
+		    department : department,
 		};
 		var token = jwt_encode(data,"UAP)(*");
 		$.post(url,{ token:token },function (data_json) {

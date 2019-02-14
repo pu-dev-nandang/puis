@@ -12,6 +12,7 @@ class C_schedule_exchange extends Ga_Controler {
     {
         parent::__construct();
         $this->data['department'] = parent::__getDepartement();
+        $this->load->model('vreservation/m_reservation');
         
     }
 
@@ -167,19 +168,21 @@ class C_schedule_exchange extends Ga_Controler {
             $roomname = $input['roomname'];
             if (array_key_exists('confirm', $input)) {
                 if ($input['confirm'] == 1) {
-                    $chk = true;
+                    $chk['bool'] = true;
                 }
                 else
                 {
-                    $chk = $this->m_reservation->checkBentrok($Start,$End,'',$roomname);
+                    $chk = $this->m_reservation->checkBentrok2($Start,$End,'',$roomname);
                 }
             }
             else
             {
-                $chk = $this->m_reservation->checkBentrok($Start,$End,'',$roomname);
+                $chk = $this->m_reservation->checkBentrok2($Start,$End,'',$roomname);
             }
+
+            $bool = $chk['bool'];
             
-            if ($chk) {
+            if ($bool) {
                 $dataSave = array(
                       'ClassroomID' => $Room,
                       'Status' =>  $Status,
@@ -278,7 +281,7 @@ class C_schedule_exchange extends Ga_Controler {
             }
             else
             {
-                $msg = 'This schedule conflict, Are you Sure ?';
+                $msg = $chk;
 
             }
             

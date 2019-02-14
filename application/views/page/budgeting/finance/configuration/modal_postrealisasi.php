@@ -143,11 +143,26 @@
             $('#Departement').append('<option value="'+ data_json[i]['Code']  +'" '+selected+'>'+data_json[i]['Name2']+'</option>');
         }
 
+        // lock department if not finance
+        var sessIDDepartementPUBudget = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
+        if (sessIDDepartementPUBudget != 'NA.9') {
+          $("#Departement option").filter(function() {
+           //may want to use $.trim in here
+           return $(this).val() == sessIDDepartementPUBudget; 
+         }).prop("selected", true);
+         $( "#Departement" ).prop( "disabled", true );
+        }
+
         <?php if ($action == 'edit'): ?>
             $("#Departement option").filter(function() {
              //may want to use $.trim in here
              return $(this).val() == "<?php echo $getData[0]['Departement'] ?>"; 
            }).prop("selected", true);
+
+            // lock department if not finance
+               if (sessIDDepartementPUBudget != 'NA.9') {
+                $( "#Departement" ).prop( "disabled", true );
+               }
         <?php endif ?>
        
         $('#Departement').select2({

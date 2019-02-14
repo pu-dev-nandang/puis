@@ -3048,4 +3048,143 @@ class C_save_to_excel extends CI_Controller
         header('Content-Disposition: attachment; filename="'.$Filaname.'"'); // jalan ketika tidak menggunakan ajax
         $objWriter->save('php://output');
     }
+
+    public function export_excel_post_department()
+    {
+        $this->load->model('master/m_master');
+        $this->load->model('budgeting/m_budgeting');
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $Input = (array) $this->jwt->decode($token,$key);
+
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+
+        // Panggil class PHPExcel nya
+        $excel = new PHPExcel();
+        // Settingan awal fil excel
+        $excel->getProperties()->setCreator('Alhadi Rahman')
+            ->setLastModifiedBy('Alhadi Rahman')
+            ->setTitle("Podomoro University Budgeting")
+            ->setSubject('Post Budgeting')
+            ->setDescription('Post Budgeting')
+            ->setKeywords('Post Budgeting');
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari header tabel
+        $style_col = array(
+            'font' => array('bold' => true), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+        $style_row = array(
+            'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        $DepartementPost = $Input['DepartementPost'];
+        $DepartementPostName = substr($Input['DepartementPostName'], 0,20);
+        $DepartementPost = ($DepartementPost != 'all') ? array(
+                                                                array('Code' => $DepartementPost,'Name2' => $DepartementPostName,
+                                                                ),
+                                                              ) : $this->m_master->apiservertoserver(serverRoot.'/api/__getAllDepartementPU');
+        $YearPostDepartement = $Input['YearPostDepartement'];
+        $YearPostDepartementText = $Input['YearPostDepartementText'];
+        $YearPostDepartementText = str_replace(' ', '', $YearPostDepartementText);
+        $incsheet = 0;
+        // $excel->getActiveSheet();
+        for ($i=0; $i < count($DepartementPost); $i++) {
+            $exc = $excel->createSheet($i);
+            $exc->setTitle(substr($DepartementPost[$i]['Name2'],0,20) );
+            $getDataForDom = $this->m_budgeting->getPostDepartementEx($YearPostDepartement,$DepartementPost[$i]['Code']);
+            $exc->setCellValue('A1', $DepartementPost[$i]['Name2']);
+
+            $data = $getDataForDom;
+            if (count($data) > 0) {
+                // group by codepost
+                $st = 3;
+                $strow = 4;
+                $arr_wr = array();
+                for ($j=0; $j < count($data); $j++) { 
+                    $CodePost1 = $data[$j]['CodePost'];
+                    $temp = array();
+                    $temp['Post'] = $data[$j]['PostName'];
+                    $temp2 = array();
+                    $temp2[] = array('RealisasiPostName' => $data[$j]['RealisasiPostName'],'Cost' => 'Rp. '.number_format($data[$j]['Budget'],2,',','.'),'j' => $j,'k' => 0);
+                    for ($k=$j+1; $k < count($data); $k++) { 
+                       $CodePost2 = $data[$k]['CodePost'];
+                       if ($CodePost1 == $CodePost2  ) {
+                           $temp2[] = array('RealisasiPostName' => $data[$k]['RealisasiPostName'],'Cost' => 'Rp. '.number_format($data[$k]['Budget'],2,',','.'),'j' => $j,'k' => $k);
+                       }
+                       else
+                       {
+                        $j = $k -1;
+                        break;
+                       }
+                       $j = $k;
+                    }
+
+                    $temp['data'] = $temp2;
+                    $arr_wr[] = $temp;
+                }
+
+                // print_r($arr_wr);
+                for ($k=0; $k < count($arr_wr); $k++) { 
+                  $Post = $arr_wr[$k]['Post'];
+                  $exc->setCellValue('A'.$st, $Post);
+                  $dt = $arr_wr[$k]['data'];
+                  $no = 1;
+                  for ($l=0; $l < count($dt); $l++) { 
+                      // add isi data
+                      if ($l == 0) {
+                          $exc->setCellValue('A'.$strow, 'No'); 
+                          $exc->setCellValue('B'.$strow, 'Post Name'); 
+                          $exc->setCellValue('C'.$strow, 'Cost'); 
+
+                          $exc->getStyle('A'.$strow)->applyFromArray($style_col);
+                          $exc->getStyle('B'.$strow)->applyFromArray($style_col);
+                          $exc->getStyle('C'.$strow)->applyFromArray($style_col);
+                          $strow++;
+                      }
+                      $exc->setCellValue('A'.$strow, $no); 
+                      $exc->setCellValue('B'.$strow, $dt[$l]['RealisasiPostName'] ); 
+                      $exc->setCellValue('C'.$strow, $dt[$l]['Cost']); 
+
+                      $exc->getStyle('A'.$strow)->applyFromArray($style_row);
+                      $exc->getStyle('B'.$strow)->applyFromArray($style_row);
+                      $exc->getStyle('C'.$strow)->applyFromArray($style_row);
+                      $strow++;
+                      $no++;
+                  }
+                  
+                  $st= $strow + 1;
+                  $strow = $st +1;
+                }
+            }
+        }
+        // die();
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename=PostBudget'.$YearPostDepartementText.'.xlsx'); // Set nama file excel nya
+        header('Cache-Control: max-age=0');
+
+        $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $write->save('php://output');
+    }
 }
