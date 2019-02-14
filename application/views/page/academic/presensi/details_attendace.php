@@ -735,13 +735,20 @@
             '                </td>' +
             '            </tr>' +
             '            <tr>' +
+            '                <td>Room</td>' +
+            '                <td>:</td>' +
+            '                <td>' +
+            '                    <select class="select2-select-00 form-exam" style="max-width: 300px !important;" size="5"  id="formExcClassroom"></select>' +
+            '                </td>' +
+            '            </tr>' +
+            '            <tr>' +
             '                <td>Reason</td>' +
             '                <td>:</td>' +
             '                <td>' +
             '                    <textarea class="form-control" rows="3" id="formExcReason"></textarea>' +
             '                </td>' +
             '            </tr>' +
-            '            ' +
+
             '            <tr>' +
             '                <td colspan="3" style="text-align: right;">' +
             '                    <button class="btn btn-primary" id="btnSubmitExch">Submit</button> ' +
@@ -751,6 +758,14 @@
             '        </table>' +
             '    </div>' +
             '</div>');
+
+        // Load Room
+
+        // Cek apakah ruangan sudah ada atau belum
+
+        loadSelect2OptionClassroom('#formExcClassroom',dataExch.ClassroomID+'.'+dataExch.Seat+'.'+dataExch.SeatForExam);
+        $('#formExcClassroom').select2({allowClear: true});
+        //
 
         $( "#viewExcDateOri,#viewExcDate" )
             .datepicker({

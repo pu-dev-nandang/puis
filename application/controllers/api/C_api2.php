@@ -1234,7 +1234,7 @@ class C_api2 extends CI_Controller {
 
 
                         // Cek apakah ada kelas pengganti
-                        $dataExc = $this->db->query('SELECT exc.*,cl.Room FROM db_academic.schedule_exchange exc 
+                        $dataExc = $this->db->query('SELECT exc.*,cl.Room, cl.Seat, cl.SeatForExam FROM db_academic.schedule_exchange exc 
                                                                 LEFT JOIN db_academic.classroom cl ON (cl.ID = exc.ClassroomID)
                                                                 WHERE exc.ID_Attd = "'.$ID_Attd.'" AND Meeting = "'.$i.'" LIMIT 1')->result_array();
 
