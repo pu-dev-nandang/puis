@@ -2742,7 +2742,7 @@ class C_save_to_excel extends CI_Controller
                 $Pembayaranke = 'ke'.$this->m_master->moneySay($data[$j]['Pembayaranke']);
                 $ket = 'Cicilan '.$Pembayaranke.' '.$data[$j]['Description'];
                 $excel3->setCellValue('F'.$a, $ket);
-                $excel3->setCellValue('G'.$a, $data[$j]['Invoice']);
+                $excel3->setCellValue('G'.$a, $data[$j]['PaymentMhs']);
 
                 $excel3->getStyle('A'.$a)->applyFromArray($style_row);
                 $excel3->getStyle('B'.$a)->applyFromArray($style_row);
