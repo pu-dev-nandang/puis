@@ -240,6 +240,67 @@ class C_master extends Purchasing_Controler {
         echo json_encode($arr_result);
     }
 
+    public function allow_division_catalog()
+    {
+      $this->auth_ajax();
+      $arr_result = array('html' => '','jsonPass' => '');
+      $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/catalog/allow_division_catalog',$this->data,true);
+      echo json_encode($arr_result);
+    }
+
+    public function table_allow_div()
+    {
+      $this->auth_ajax();
+      $arr_result = array('html' => '','jsonPass' => '');
+      $GetDeparment = $this->m_master->apiservertoserver(url_pas.'api/__getAllDepartementPU','');
+      for ($i=0; $i < count($GetDeparment); $i++) { 
+        $CodeDepartment = $GetDeparment[$i]['Code'];
+        // check in table catalog_permission
+        $c = $this->m_master->caribasedprimary('db_purchasing.catalog_permission','Departement',$CodeDepartment);
+        $GetDeparment[$i]['No'] = $i + 1;
+        if (count($c) > 0) {
+          $st = 'Allowed';
+          $stcode = '<button class = "btn btn-inverse btnpermission" department = "'.$GetDeparment[$i]['Code'].'" stnow = "1">Not Allow</button>';
+          $GetDeparment[$i]['st'] = $st;
+          $GetDeparment[$i]['stcode'] = $stcode;
+        }
+        else
+        {
+          $st = 'Not Allowed';
+          $stcode = '<button class = "btn btn-primary btnpermission" department = "'.$GetDeparment[$i]['Code'].'" stnow = "0">Allow</button>';
+          $GetDeparment[$i]['st'] = $st;
+          $GetDeparment[$i]['stcode'] = $stcode;
+        }
+      }
+
+      $this->data['GetDeparment'] = $GetDeparment;
+      $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/catalog/table_allow_div',$this->data,true);
+      echo json_encode($arr_result);
+    }
+
+    public function submit_permission_division()
+    {
+      $this->auth_ajax();
+      $Input = $this->getInputToken();
+      $Departement = $Input['Department'];
+      switch ($Input['passaction']) {
+        case 'delete':
+           $this->db->where('Departement', $Departement);
+           $this->db->delete('db_purchasing.catalog_permission');
+          break;
+        case 'add':
+           $dataSave = array('Departement' => $Departement);
+           $this->db->insert('db_purchasing.catalog_permission',$dataSave);
+          break;
+        default:
+          # code...
+          break;
+      }
+
+      echo json_encode('');
+
+    }
+
     public function Catalog_DataIntable_server_side()
     {
         $this->auth_ajax();

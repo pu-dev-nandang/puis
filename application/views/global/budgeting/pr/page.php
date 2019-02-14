@@ -6,11 +6,14 @@
                 <button class="btn btn-primary" id="btnBackToHome" name="button"><i class="fa fa-home" aria-hidden="true"></i></button>
             </a>
         </li>
+        <li class="">
+            <a href="javascript:void(0)" class="pageAnchor" page = "entry_catalog">Entry Catalog</a>
+        </li>
         <li class="active">
-            <a href="javascript:void(0)" class="pageAnchor" page = "data">Data</a>
+            <a href="javascript:void(0)" class="pageAnchor" page = "data">List PR</a>
         </li>
         <li class="">
-            <a href="javascript:void(0)" class="pageAnchor" page = "form">Form</a>
+            <a href="javascript:void(0)" class="pageAnchor" page = "form">Entry PR</a>
         </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
