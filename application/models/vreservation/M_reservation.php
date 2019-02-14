@@ -392,7 +392,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                             and b.NameEng = ? and d.SemesterID = '".$SemesterID."'
                             and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
                             on a.ID = b.ID_Attd where b.Status = '2' and b.DateOriginal = '".$date2."')
-                            order by a.Room";  
+                            order by a.Room";
                 }
 
                 
@@ -468,9 +468,11 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $start = $query[$i]['StartSessions'];
             $start = explode(':', $start);
             $start = $start[0].':'.$start[1];
+            $startWr = $start;
             $end = $query[$i]['EndSessions'];
             $end = explode(':', $end);
             $end = $end[0].':'.$end[1];
+            $endWr = $end;
 
             // get jumlah Mahasiswa
             $arrMhs = $this->m_api->__getStudentByScheduleID($query[$i]['ScheduleID']);
@@ -481,10 +483,51 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 $agenda = 'Exam';
             }
 
+                $varprocess = function($time)
+                {
+                    $t = explode(':', $time);
+                    $t2 = $t[1];
+                    $t1 = $t[0];
+                    $bool = 1;
+                    if ($t2 != '00' && $t2 != '30') {
+                        $t2 = (int) $t2;
+                        if ($t2 > 0 && $t2 < 30) {
+                            $t2 = '30';
+                            $bool = 0;
+                        }
+                        elseif ($t2 > 30) {
+                            $t2 = '00';
+                            $t1 = (int) $t1;
+                            $t1++;
+                            // make two digit
+                            $l = strlen($t1);
+                            for ($a=0; $a < 2-$l; $a++) { 
+                                $t1 = '0'.$t1;
+                            }
+                            $bool = 0;
+
+                        }
+                    }
+                    $arr = array('bool' => $bool,'time' => $t1.':'.$t2);
+                    return $arr;
+                };
+
+                $timeGet1 = $varprocess($start);
+                $start = $timeGet1['time'];
+                $timeGet2 = $varprocess($end);
+                $end = $timeGet2['time'];
+
+                $chkcolspan = $timeGet1['bool'] * $timeGet2['bool'];
+                if ($timeGet1['bool'] == 0) {
+                    $colspan = $colspan - 1;
+                }
+
             $dt = array(
                 'user'  => 'Academic TimeTables',
                 'start' => $start,
+                'startWr' => $startWr,
                 'end'   => $end,
+                'endWr'   => $endWr,
                 'time'  => $time,
                 'colspan' => $colspan,
                 'agenda' => $agenda,
@@ -503,7 +546,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $dt = array(
                 'user'  => $query2[$i]['Name'],
                 'start' => $query2[$i]['Start'],
+                'startWr' => $query2[$i]['Start'],
                 'end'   => $query2[$i]['End'],
+                'endWr'   => $query2[$i]['End'],
                 'time'  => $query2[$i]['Time'],
                 'colspan' => $query2[$i]['Colspan'],
                 'agenda' => $query2[$i]['Agenda'],
@@ -530,19 +575,62 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $start = $query3[$i]['StartSessions'];
             $start = explode(':', $start);
             $start = $start[0].':'.$start[1];
+            $startWr = $start;
             $end = $query3[$i]['EndSessions'];
             $end = explode(':', $end);
             $end = $end[0].':'.$end[1];
+            $endWr = $end;
 
             // get jumlah Mahasiswa
             // $this->load->model('m_api');
             $arrMhs = $this->m_api->__getStudentByScheduleID($query3[$i]['ScheduleID']);
             $jumlahMHS = count($arrMhs);
 
+            $varprocess = function($time)
+            {
+                $t = explode(':', $time);
+                $t2 = $t[1];
+                $t1 = $t[0];
+                $bool = 1;
+                if ($t2 != '00' && $t2 != '30') {
+                    $t2 = (int) $t2;
+                    if ($t2 > 0 && $t2 < 30) {
+                        $t2 = '30';
+                        $bool = 0;
+                    }
+                    elseif ($t2 > 30) {
+                        $t2 = '00';
+                        $t1 = (int) $t1;
+                        $t1++;
+                        // make two digit
+                        $l = strlen($t1);
+                        for ($a=0; $a < 2-$l; $a++) { 
+                            $t1 = '0'.$t1;
+                        }
+                        $bool = 0;
+
+                    }
+                }
+                $arr = array('bool' => $bool,'time' => $t1.':'.$t2);
+                return $arr;
+            };
+
+            $timeGet1 = $varprocess($start);
+            $start = $timeGet1['time'];
+            $timeGet2 = $varprocess($end);
+            $end = $timeGet2['time'];
+
+            $chkcolspan = $timeGet1['bool'] * $timeGet2['bool'];
+            if ($timeGet1['bool'] == 0) {
+                $colspan = $colspan - 1;
+            }
+
             $dt = array(
                 'user'  => 'Academic TimeTables EX',
                 'start' => $start,
+                'startWr' => $startWr,
                 'end'   => $end,
+                'endWr'   => $endWr,
                 'time'  => $time,
                 'colspan' => $colspan,
                 'agenda' => 'Study',
@@ -948,6 +1036,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                         'type' => 'academic',
                         'bool' => false
                     );
+
                 }
                 else
                 {
@@ -973,6 +1062,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                 and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'" 
                                 and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
                         on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
+                        // print_r($sql);die();
                         $query=$this->db->query($sql, array())->result_array();
                         if ($query[0]['total'] > 0) {
                            $array_bool = array(
