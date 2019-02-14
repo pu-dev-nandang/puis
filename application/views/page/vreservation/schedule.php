@@ -145,7 +145,9 @@
 								<?php for($k = 0; $k < count($data_pass); $k++): ?>
 									<?php $implode = implode('@@', $data_pass[$k]) ?>
 									<?php $converDTS = date("h:i a", strtotime($data_pass[$k]['start'])); ?>
+									<?php $converDTSWr = date("h:i a", strtotime($data_pass[$k]['startWr'])); ?>
 									<?php $converDTE = date("h:i a", strtotime($data_pass[$k]['end'])); ?>
+									<?php $converDTEWr = date("h:i a", strtotime($data_pass[$k]['endWr'])); ?>
 									<?php if ($data_pass[$k]['room'] == $getRoom[$i]['Room'] && $converDTS == $arrHours[$j]): ?>
 										<?php if ($data_pass[$k]['approved'] == 1): ?>
 											<?php 
@@ -173,7 +175,7 @@
 													}
 												}
 											?>
-											<td class="<?php echo $bc2 ?> pointer" style="background-color: <?php echo $bc ?>;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTS ?>-<?php echo $converDTE?>&#013;<?php echo 'Request : '.$data_pass[$k]['user'] ?>&#013;Agenda : <?php echo $data_pass[$k]['agenda'] ?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>">
+											<td class="<?php echo $bc2 ?> pointer" style="background-color: <?php echo $bc ?>;" room = "<?php echo $getRoom[$i]['Room'] ?>" colspan="<?php echo $data_pass[$k]['colspan'] ?>" room = "<?php echo $getRoom[$i]['Room'] ?>" id = "draggable" title="<?php echo $converDTSWr ?>-<?php echo $converDTEWr?>&#013;<?php echo 'Request : '.$data_pass[$k]['user'] ?>&#013;Agenda : <?php echo $data_pass[$k]['agenda'] ?>" user = "<?php echo $data_pass[$k]['user'] ?>" NIP = "<?php echo $data_pass[$k]['NIP'] ?>" data = "<?php echo $implode; ?>">
 												<?php echo $Details ?>
 											</td>
 											<?php $bool = true ?>
