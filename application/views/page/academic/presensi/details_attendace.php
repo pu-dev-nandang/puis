@@ -44,7 +44,8 @@
         <hr/>
         <button class="btn btn-default btnEdAttd" disabled id="btnBAP"><i class="fa fa-edit margin-right"></i> BAP</button> |
         <button class="btn btn-primary btnEdAttd" disabled id="btnLecAttd"><i class="fa fa-edit margin-right"></i> Lecturer Attendance</button> |
-        <button class="btn btn-success btnEdAttd" disabled id="btnStdAttd"><i class="fa fa-edit margin-right"></i> Student Attendance</button>
+        <button class="btn btn-success btnEdAttd" disabled id="btnStdAttd"><i class="fa fa-edit margin-right"></i> Student Attendance</button> |
+        <button class="btn btn-danger btnEdAttd" disabled id="btnClearAttd"><i class="fa fa-trash margin-right"></i> Clear Attendance</button>
     </div>
 </div>
 
@@ -629,6 +630,89 @@
 
         });
     }
+
+    $('#btnClearAttd').click(function () {
+        $('#GlobalModal .modal-header').html('<h4 class="modal-title">BAP</h4>');
+        $('#GlobalModal .modal-body').html('<div class="row">' +
+            '    <div class="col-md-4 col-md-offset-2">' +
+            '        <div class="form-goup">' +
+            '            <label>Sesi</label>' +
+            '            <select class="form-control" id="form_Sesi"></select>' +
+            '        </div>' +
+            '    </div>' +
+            '    <div class="col-md-4">' +
+            '        <div class="form-goup">' +
+            '            <label>User</label>' +
+            '            <select class="form-control" id="form_User">' +
+            '               <option value="0">- All User -</option>' +
+            '               <option value="1">Student</option>' +
+            '               <option value="2">Lecturer</option>' +
+            '           </select>' +
+            '        </div>' +
+            '    </div>' +
+            '</div>' +
+            '<div class="row">' +
+            '    <div class="col-md-12" style="text-align: center;">' +
+            '        <hr/>' +
+            '        <button class="btn btn-danger" id="btnCleanAction">Clean</button>' +
+            '        <button class="btn btn-default" data-dismiss="modal">Close</button>' +
+            '    </div>' +
+            '</div>');
+
+        for(var i=1;i<=14;i++){
+            $('#form_Sesi').append('<option value="'+i+'">'+i+'</option>');
+        }
+
+        $('#GlobalModal .modal-footer').addClass('hide');
+
+        $('#btnCleanAction').click(function () {
+
+            if(confirm('Are you sure?')){
+                loading_buttonSm('#btnCleanAction');
+                $('button[data-dismiss=modal]').prop('disabled',true);
+
+                var Sesi = $('#form_Sesi').val();
+                var User = $('#form_User').val();
+
+                var filterSD = $('#filterSD').val();
+                var ID_Attd = filterSD.split('.')[1];
+
+                var data = {
+                    action : 'cleanAttendance',
+                    Sesi : Sesi,
+                    ID_Attd : ID_Attd,
+                    User : User
+                };
+
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api2/__crudAttendance2';
+
+                $.post(url,{token:token},function (result) {
+                    toastr.success('Attd. Cleaned','Success');
+                    loadAttendace();
+
+                    setTimeout(function () {
+                        // $('#GlobalModal').modal('hide');
+                        $('#btnCleanAction').html('Clean');
+                        $('button[data-dismiss=modal],#btnCleanAction').prop('disabled',false);
+
+                    },500);
+                });
+            }
+
+
+
+
+        });
+
+
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+    });
+
+
 
     $(document).on('change','.checkAttdStd',function () {
         checkAttd();
