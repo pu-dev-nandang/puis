@@ -23,21 +23,21 @@
             $("#pageContentCatalog").empty();
             LoadPageCatalog(Page);
         });
-
-        function LoadPageCatalog(page)
-        {
-            loading_page("#pageContentCatalog");
-            var url = base_url_js+'budgeting/page_pr_catalog/'+page;
-            $.post(url,function (resultJson) {
-                var response = jQuery.parseJSON(resultJson);
-                var html = response.html;
-                var jsonPass = response.jsonPass;
-                setTimeout(function () {
-                    $("#pageContentCatalog").empty();
-                    $("#pageContentCatalog").html(html);
-                },1000);
-                
-            }); // exit spost
-        }
     }); // exit document Function
+
+    function LoadPageCatalog(page)
+    {
+        loading_page("#pageContentCatalog");
+        var url = base_url_js+'budgeting/page_pr_catalog/'+page;
+        $.post(url,function (resultJson) {
+            var response = jQuery.parseJSON(resultJson);
+            var html = response.html;
+            var jsonPass = response.jsonPass;
+            setTimeout(function () {
+                $("#pageContentCatalog").empty();
+                $("#pageContentCatalog").html(html);
+            },1000);
+            
+        }); // exit spost
+    }
 </script>

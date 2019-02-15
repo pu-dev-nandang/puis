@@ -1365,7 +1365,7 @@ class C_budgeting extends Budgeting_Controler {
         switch ($uri) {
             case 'entry_catalog':
                 $this->data['action'] = 'add';
-                if (empty($_POST) && count($_POST) > 0 ){
+                if ( (!empty($_POST)) && count($_POST) > 0 ){
                     $Input = $this->getInputToken();
                     $this->data['action'] = $Input['action'];
                     if ($Input['action'] == 'edit') {
@@ -1481,6 +1481,12 @@ class C_budgeting extends Budgeting_Controler {
                         }
                     $data_arr['PRCode'] = $PRCode;    
                     $this->db->insert('db_budgeting.pr_detail',$data_arr);
+
+                    // make can be delete
+                       $tbl = 'db_purchasing.m_catalog';
+                       $fieldCode = 'ID';
+                       $ValueCode = $data_arr['ID_m_catalog'];
+                       $this->m_budgeting->makeCanBeDelete($tbl,$fieldCode,$ValueCode);
                 }
             }
             else

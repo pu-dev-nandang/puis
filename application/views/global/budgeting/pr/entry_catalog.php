@@ -404,7 +404,7 @@
 			    if(data.status == 1) {
 			      toastr.options.fadeOut = 100000;
 			      toastr.success(data.msg, 'Success!');
-			      	
+			      $('.pageAnchorCatalog[page="datacatalog"]').trigger('click');	
 			    }
 			    else
 			    {
