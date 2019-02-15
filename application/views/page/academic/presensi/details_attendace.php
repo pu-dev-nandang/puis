@@ -735,15 +735,23 @@
             '                </td>' +
             '            </tr>' +
             '            <tr>' +
+            '                <td>Room</td>' +
+            '                <td>:</td>' +
+            '                <td>' +
+            '                    <select class="select2-select-00 form-exam" style="max-width: 300px !important;" size="5"  id="formExcClassroom"></select>' +
+            '                </td>' +
+            '            </tr>' +
+            '            <tr>' +
             '                <td>Reason</td>' +
             '                <td>:</td>' +
             '                <td>' +
             '                    <textarea class="form-control" rows="3" id="formExcReason"></textarea>' +
             '                </td>' +
             '            </tr>' +
-            '            ' +
+
             '            <tr>' +
             '                <td colspan="3" style="text-align: right;">' +
+            '                       <button style="float: left" class="btn btn-danger" id="btnDeleteExch">Delete</button>' +
             '                    <button class="btn btn-primary" id="btnSubmitExch">Submit</button> ' +
             '                    <button class="btn btn-default" data-dismiss="modal">Close</button>' +
             '                </td>' +
@@ -751,6 +759,14 @@
             '        </table>' +
             '    </div>' +
             '</div>');
+
+        // Load Room
+
+        // Cek apakah ruangan sudah ada atau belum
+
+        loadSelect2OptionClassroom('#formExcClassroom',dataExch.ClassroomID+'.'+dataExch.Seat+'.'+dataExch.SeatForExam);
+        $('#formExcClassroom').select2({allowClear: true});
+        //
 
         $( "#viewExcDateOri,#viewExcDate" )
             .datepicker({
@@ -794,16 +810,20 @@
             var formExcDate = $('#formExcDate').val();
             var formExcStart = $('#formExcStart').val();
             var formExcEnd = $('#formExcEnd').val();
+            var formExcClassroom = $('#formExcClassroom').val();
             var formExcReason = $('#formExcReason').val();
 
             if(formExcDateOri!='' && formExcDateOri!=null &&
                 formExcDate!='' && formExcDate!=null &&
                 formExcStart!='' && formExcStart!=null &&
-            formExcEnd!='' && formExcEnd!=null &&
-            formExcReason!='' && formExcReason!=null){
+                formExcEnd!='' && formExcEnd!=null &&
+                formExcClassroom!='' && formExcClassroom!=null &&
+                formExcReason!='' && formExcReason!=null){
 
-                loading_buttonSm('#btnSubmitExch');
-                $('button[data-dismiss=modal]').prop('disabled',true);
+                var ClassroomID = formExcClassroom.split('.')[0];
+
+                // loading_buttonSm('#btnSubmitExch');
+                // $('button[data-dismiss=modal]').prop('disabled',true);
 
                 var dayID = (moment(formExcDate).days()==0) ? 7 : moment(formExcDate).days();
 
@@ -816,6 +836,7 @@
                         DayID : dayID,
                         StartSessions : formExcStart,
                         EndSessions : formExcEnd,
+                        ClassroomID : ClassroomID,
                         Reason : formExcReason
                     }
                 };
@@ -837,6 +858,44 @@
             }
 
 
+        });
+
+
+        // BTN Delete
+        $('#btnDeleteExch').click(function () {
+            if(confirm('Are you sure?')){
+
+                loading_buttonSm('#btnDeleteExch');
+                $('#btnSubmitExch,button[data-dismiss=modal]').prop('disabled',true);
+
+                var data = {
+                    action : 'delteExhange',
+                    EXID : dataExch.ID,
+                    UserID : dataExch.NIP,
+                    Updated1By : dataExch.Updated1By,
+                    Logging: {
+                        Icon: sessionUrlPhoto,
+                        Title: '<i class="fa fa-minus-circle margin-right" style="color: red;"></i> Schedule Exchange - Removed',
+                        Description: "Your request has been removed by Academic ("+sessionName+")",
+                        URLDirect: "",
+                        URLDirectStudent: "",
+                        URLDirectLecturer: "attendance/schedule-exchange",
+                        URLDirectLecturerKaprodi: "attendance/monitoring-schedule-exchange",
+                        CreatedBy: sessionNIP,
+                        CreatedName: sessionName,
+                        CreatedAt: dateTimeNow()
+                    }
+                };
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api2/__crudAttendance2';
+                $.post(url,{token:token},function (result){
+                    toastr.success('Data deleted','Success');
+                    loadAttendace();
+                    setTimeout(function () {
+                        $('#GlobalModal').modal('hide');
+                    },500);
+                });
+            }
         });
 
     });

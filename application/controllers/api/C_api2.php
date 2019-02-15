@@ -1234,7 +1234,7 @@ class C_api2 extends CI_Controller {
 
 
                         // Cek apakah ada kelas pengganti
-                        $dataExc = $this->db->query('SELECT exc.*,cl.Room FROM db_academic.schedule_exchange exc 
+                        $dataExc = $this->db->query('SELECT exc.*,cl.Room, cl.Seat, cl.SeatForExam FROM db_academic.schedule_exchange exc 
                                                                 LEFT JOIN db_academic.classroom cl ON (cl.ID = exc.ClassroomID)
                                                                 WHERE exc.ID_Attd = "'.$ID_Attd.'" AND Meeting = "'.$i.'" LIMIT 1')->result_array();
 
@@ -1371,12 +1371,114 @@ class C_api2 extends CI_Controller {
                 return print_r(json_encode($dataBAP));
             }
             else if($data_arr['action']=='updateExhange'){
+
                 $EXID = $data_arr['EXID'];
-                $dataUpdate = $data_arr['dataUpdate'];
+                $dataUpdate = (array) $data_arr['dataUpdate'];
+
+
+                // Get Semester Active
+                $SemesterActive = $this->m_api->_getSemesterActive();
+
+                // Cek bentrok
+                $dataFilter  = array(
+                    'SemesterID' => $SemesterActive['ID'],
+                    'IsSemesterAntara' => '0',
+                    'ClassroomID' =>  $dataUpdate['ClassroomID'],
+                    'DayID' =>  $dataUpdate['DayID'],
+                    'StartSessions' =>  $dataUpdate['StartSessions'],
+                    'EndSessions' => $dataUpdate['EndSessions']
+                );
+                $dataConflict1 = $this->m_api->__checkSchedule($dataFilter);
+
+                $dataGetRoom = $this->db->select('Room')->get_where('db_academic.classroom',array('ID' => $dataUpdate['ClassroomID']))->result_array();
+
+                // Cek Bentrok Sesama Exchange
+                $dataConflict2 = $this->db->query('SELECT * FROM db_academic.schedule_exchange exch 
+                                                              WHERE exch.ID != "'.$EXID.'" AND exch.Date = "'.$dataUpdate['Date'].'"
+                                                              AND exch.ClassroomID = "'.$dataUpdate['ClassroomID'].'" AND exch.Status = "2"
+                                                              AND (("'.$dataUpdate['StartSessions'].'" >= exch.StartSessions  AND "'.$dataUpdate['StartSessions'].'" <= exch.EndSessions) OR
+                                                                      ("'.$dataUpdate['EndSessions'].'" >= exch.StartSessions AND "'.$dataUpdate['EndSessions'].'" <= exch.EndSessions) OR
+                                                                      ("'.$dataUpdate['StartSessions'].'" <= exch.StartSessions AND "'.$dataUpdate['EndSessions'].'" >= exch.EndSessions)
+                                                                      ) ')->result_array();
+
+
+                $DateStart = date("Y-m-d H:i:s", strtotime($dataUpdate['Date'].$dataUpdate['StartSessions']));
+                $DateEnd = date("Y-m-d H:i:s", strtotime($dataUpdate['Date'].$dataUpdate['EndSessions']));
+                $Room = $dataGetRoom[0]['Room'];
+
+                $sql2 = 'select count(*) as total from db_reservation.t_booking as a
+                             join db_employees.employees as b on a.CreatedBy = b.NIP
+                             where a.Status in(0,1) and ((a.`Start` >= "'.$DateStart.'" and a.`Start` < "'.$DateEnd.'" ) 
+                             or (a.`End` > "'.$DateStart.'" and a.`End` <= "'.$DateEnd.'" )) 
+                             and a.Room = "'.$Room.'"'.' ';
+
+                $s = 'select count(*) as total from db_reservation.t_booking as a
+                                 join db_employees.employees as b on a.CreatedBy = b.NIP
+                                 where a.Status in(0,1) and (
+                                    (a.`Start` >= "'.$DateStart.'" and a.`Start` < "'.$DateEnd.'" ) 
+                                    or (a.`End` > "'.$DateStart.'" and a.`End` <= "'.$DataEnd.'" )
+                                    or (
+                                            a.`Start` <= "'.$DateStart.'" and a.`End` >= "'.$DataEnd.'"
+                                        )
+                                ) and a.Room = "'.$Room.'"';
+
+
+//                $query3=$this->db->query($sql2)->result_array();
+                $query3=$this->db->query($s)->result_array();
+
+                print_r($dataConflict1);
+                print_r($dataConflict2);
+                print_r($sql2);
+                print_r($query3);
+
+                exit;
+
 
                 $this->db->where('ID', $EXID);
                 $this->db->update('db_academic.schedule_exchange',$dataUpdate);
                 return print_r(1);
+            }
+            else if($data_arr['action']=='delteExhange'){
+
+                $Log_dataInsert = $data_arr['Logging'];
+                $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
+                $insert_id_logging = $this->db->insert_id();
+
+                // Insert logging
+                $Log_arr_ins = array(
+                    'IDLogging' => $insert_id_logging,
+                    'UserID' => $data_arr['UserID']
+                );
+                // Send Notif To Kaprodi
+                $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+
+                // Cek apakah kaprodi sudah Approve atau belum
+                if($data_arr['Updated1By']!='' && $data_arr['Updated1By']!=null){
+                    // Insert logging
+                    $Log_arr_ins = array(
+                        'IDLogging' => $insert_id_logging,
+                        'UserID' => $data_arr['Updated1By']
+                    );
+                    // Send Notif To Kaprodi
+                    $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+                }
+
+
+                // ==== Action remove =====
+
+
+                $EXID = $data_arr['EXID'];
+
+                $this->db->where('ID', $EXID);
+                $this->db->delete('db_academic.schedule_exchange');
+                $this->db->reset_query();
+
+                $this->db->where('EXID', $EXID);
+                $this->db->delete('db_academic.schedule_exchange_prodi');
+
+                return print_r(1);
+
+
             }
 
         }
