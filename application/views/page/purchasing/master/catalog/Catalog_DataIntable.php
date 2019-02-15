@@ -1,16 +1,4 @@
-<style type="text/css">
-	#datatablesServer thead th,#datatablesServer tfoot td {
 
-	    text-align: center;
-	    background: #20485A;
-	    color: #FFFFFF;
-
-	}
-
-	#datatablesServer>thead>tr>th, #datatablesServer>tbody>tr>th, #datatablesServer>tfoot>tr>th, #datatablesServer>thead>tr>td, #datatablesServer>tbody>tr>td, #datatablesServer>tfoot>tr>td {
-	    border: 1px solid #b7b7b7
-	}
-</style>
 <div class="row" style="margin-right: 0px;margin-left: 0px;margin-top: 10px">
 	<div class="well">
 		<div class="row">

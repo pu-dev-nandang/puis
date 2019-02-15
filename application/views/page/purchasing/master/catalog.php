@@ -29,6 +29,19 @@
   content: "\f196";
   }
 </style>
+<style type="text/css">
+  #datatablesServer thead th,#datatablesServer tfoot td {
+
+      text-align: center;
+      background: #20485A;
+      color: #FFFFFF;
+
+  }
+
+  #datatablesServer>thead>tr>th, #datatablesServer>tbody>tr>th, #datatablesServer>tfoot>tr>th, #datatablesServer>thead>tr>td, #datatablesServer>tbody>tr>td, #datatablesServer>tfoot>tr>td {
+      border: 1px solid #b7b7b7
+  }
+</style>
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
 <div style="padding-top: 30px;border-top: 1px solid #cccccc">
     <div class="row">
@@ -41,11 +54,14 @@
                     <div class="tabbable tabbable-custom tabbable-full-width btn-read MenuCatalog">
                         <ul class="nav nav-tabs">
                             <li class="active">
-                                <a href="javascript:void(0)" class="pageAnchorCatalog" page = "InputCatalog">Input</a>
+                                <a href="javascript:void(0)" class="pageAnchorCatalog" page = "InputCatalog">Entry</a>
                             </li>
-                            <!-- <li class="">
-                                <a href="javascript:void(0)" class="pageAnchorCatalog" page = "ApprovalCatalog">Request Approve<b style="color: red;" id= "CountApproval"></b></a>
-                            </li> -->
+                            <li class="">
+                                <a href="javascript:void(0)" class="pageAnchorCatalog" page = "ApprovalCatalog">Approval<b style="color: red;" id= "CountApproval"></b></a>
+                            </li>
+                            <li class="">
+                                <a href="javascript:void(0)" class="pageAnchorCatalog" page = "allow_division">Allow Division</a>
+                            </li>
                         </ul>
                         <div style="padding-top: 30px;border-top: 1px solid #cccccc">
                             <div id = "pageCatalog">
@@ -172,3 +188,6 @@
         }
     }
 </script>
+
+<!-- Script js allow division -->
+<?php $this->load->view('page/'.$this->data['department'].'/master/catalog/sc_allow_division_catalog') ?>

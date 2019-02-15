@@ -746,6 +746,7 @@
 				action : 'choices',
 				auth : 's3Cr3T-G4N',
 				department : $("#DepartementPost").val(),
+				approval : 1,
 			};
 		    var token = jwt_encode(data,"UAP)(*");
 			var table = $('#example').DataTable({
