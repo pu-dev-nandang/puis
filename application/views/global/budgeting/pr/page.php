@@ -7,7 +7,7 @@
             </a>
         </li>
         <li class="">
-            <a href="javascript:void(0)" class="pageAnchor" page = "entry_catalog">Entry Catalog</a>
+            <a href="javascript:void(0)" class="pageAnchor" page = "catalog">Catalog</a>
         </li>
         <li class="active">
             <a href="javascript:void(0)" class="pageAnchor" page = "data">List PR</a>

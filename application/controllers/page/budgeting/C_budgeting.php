@@ -1324,17 +1324,67 @@ class C_budgeting extends Budgeting_Controler {
     public function page_pr()
     {
       $this->auth_ajax();
-      $this->data['G_Approver'] = $this->m_budgeting->Get_m_Approver();
-      $this->data['arr_Year'] = $this->m_master->showData_array('db_budgeting.cfg_dateperiod');
-      $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
-      $Year = $get[0]['Year'];
-      $this->data['Year'] = $Year;
-      $this->data['PRCodeVal'] = '';
       $arr_result = array('html' => '','jsonPass' => '');
       $uri = $this->uri->segment(3);
-      $content = $this->load->view('global/budgeting/pr/'.$uri,$this->data,true);
-      $arr_result['html'] = $content;
+      switch ($uri) {
+          case 'Catalog':
+              // $this->data['action'] = 'add';
+              // if (empty($_POST) && count($_POST) > 0 ){
+              //     $Input = $this->getInputToken();
+              //     $this->data['action'] = $Input['action'];
+              //     if ($Input['action'] == 'edit') {
+              //         $this->data['get'] = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$Input['ID']);
+              //     }
+              // }
+              // $content = $this->load->view('global/budgeting/pr/'.$uri,$this->data,true);
+              // $arr_result['html'] = $content;
+              $content = $this->load->view('global/budgeting/pr/'.$uri,$this->data,true);
+              $arr_result['html'] = $content;
+              break;
+          
+          default:
+              $this->data['G_Approver'] = $this->m_budgeting->Get_m_Approver();
+              $this->data['arr_Year'] = $this->m_master->showData_array('db_budgeting.cfg_dateperiod');
+              $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
+              $Year = $get[0]['Year'];
+              $this->data['Year'] = $Year;
+              $this->data['PRCodeVal'] = '';
+              $content = $this->load->view('global/budgeting/pr/'.$uri,$this->data,true);
+              $arr_result['html'] = $content;
+              break;
+      }
+      
       echo json_encode($arr_result);
+    }
+
+    public function page_pr_catalog()
+    {
+        $this->auth_ajax();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $uri = $this->uri->segment(3);
+        switch ($uri) {
+            case 'entry_catalog':
+                $this->data['action'] = 'add';
+                if (empty($_POST) && count($_POST) > 0 ){
+                    $Input = $this->getInputToken();
+                    $this->data['action'] = $Input['action'];
+                    if ($Input['action'] == 'edit') {
+                        $this->data['get'] = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$Input['ID']);
+                    }
+                }
+                $content = $this->load->view('global/budgeting/pr/'.$uri,$this->data,true);
+                $arr_result['html'] = $content;
+                break;
+            case 'datacatalog':
+                $content = $this->load->view('global/budgeting/pr/'.$uri,$this->data,true);
+                $arr_result['html'] = $content;
+                break;
+            default:
+                # code...
+                break;
+        }
+        
+        echo json_encode($arr_result);
     }
 
     public function PostBudgetThisMonth_Department()

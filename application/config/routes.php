@@ -853,6 +853,7 @@ $route['rest/academic/__change_status_mhs_multiple'] = 'api/c_rest/change_status
 $route['rest/ga/__show_schedule_exchange'] = 'api/c_rest/show_schedule_exchange';
 $route['rest/__approve_pr'] = 'api/c_rest/approve_pr';
 $route['rest/__budgeting_dashboard'] = 'api/c_rest/budgeting_dashboard';
+$route['rest/__InputCatalog_saveFormInput'] = 'api/c_rest/InputCatalog_saveFormInput';
 
 
 
@@ -1152,6 +1153,9 @@ $route['budgeting/detail_budgeting_remaining'] = 'page/budgeting/c_budgeting/det
 $route['budgeting/configRule'] = 'page/budgeting/c_budgeting/configRule';
 $route['budgeting/configRule/userroledepart_submit'] = 'page/budgeting/c_budgeting/userroledepart_submit';
 $route['budgeting/page_pr/(:any)'] = 'page/budgeting/c_budgeting/page_pr/$1';
+$route['budgeting/page_pr_catalog/(:any)'] = 'page/budgeting/c_budgeting/page_pr_catalog/$1';
+
+
 $route['budgeting/PostBudgetThisMonth_Department'] = 'page/budgeting/c_budgeting/PostBudgetThisMonth_Department';
 $route['budgeting/getPostBudgetDepartement'] = 'page/budgeting/c_budgeting/getPostBudgetDepartement';
 $route['budgeting/submitpr'] = 'page/budgeting/c_budgeting/submitpr';

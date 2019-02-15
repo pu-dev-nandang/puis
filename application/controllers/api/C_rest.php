@@ -2189,4 +2189,160 @@ class C_rest extends CI_Controller {
           echo '{"status":"999","message":"jangan iseng :D"}';
         }
     }
+
+    public function InputCatalog_saveFormInput()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $Input = $dataToken;
+                $Item = $Input['Item'];
+                $Desc = $Input['Desc'];
+                $EstimaValue = $Input['EstimaValue'];
+                $Departement = $Input['Departement'];
+                $Detail = $Input['Detail'];
+                $user = $Input['user'];
+                $Detail = json_encode($Detail);
+
+                $filename = $Input['Item'].'_Uploaded';
+                $filename = str_replace(" ", '_', $filename);
+                $varchkApproval = function($Departement)
+                {
+                    $aa = $this->m_master->caribasedprimary('db_purchasing.catalog_permission','Departement',$Departement);
+                    if (count($aa) > 0) {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                };
+                
+                $chk = $varchkApproval($Departement);
+                switch ($Input['Action']) {
+                    case 'add':
+                        if (array_key_exists('fileData',$_FILES)) {
+                           $path = './uploads/budgeting/catalog';
+                           $uploadFile = $this->m_rest->uploadDokumenMultiple($filename,'fileData',$path);
+                           if (is_array($uploadFile)) {
+                               $uploadFile = implode(',', $uploadFile);
+                               $dataSave = array(
+                                   'Item' => $Item,
+                                   'Desc' => $Desc,
+                                   'EstimaValue' => $EstimaValue,
+                                   'Photo' => $uploadFile,
+                                   'Departement' => $Departement,
+                                   'DetailCatalog' => $Detail,
+                                   'CreatedBy' => $user,
+                                   'CreatedAt' => date('Y-m-d'),
+                                   'Approval' => ($chk) ? 1 : 0,
+                                   'ApprovalBy' => ($chk) ? $user : '',
+                                   'ApprovalAt' => ($chk) ? date('Y-m-d H:i:s') : NULL,
+                               );
+                               $this->db->insert('db_purchasing.m_catalog', $dataSave);
+                               echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+                           }
+                           else
+                           {
+                               echo json_encode(array('msg' => $uploadFile,'status' => 0));
+                           }
+                        }
+                        else{
+                            $dataSave = array(
+                                'Item' => $Item,
+                                'Desc' => $Desc,
+                                'EstimaValue' => $EstimaValue,
+                                'Photo' => '',
+                                'Departement' => $Departement,
+                                'DetailCatalog' => $Detail,
+                                'CreatedBy' => $user,
+                               'CreatedAt' => date('Y-m-d'),
+                               'Approval' => ($chk) ? 1 : 0,
+                               'ApprovalBy' => ($chk) ? $user : '',
+                               'ApprovalAt' => ($chk) ? date('Y-m-d H:i:s') : NULL,
+                            );
+                            $this->db->insert('db_purchasing.m_catalog', $dataSave);
+                            echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+                        }
+
+                        break;
+                    case 'edit':
+                        if (array_key_exists('fileData',$_FILES)) {
+                           $path = './uploads/budgeting/catalog';
+                           $uploadFile = $this->m_rest->uploadDokumenMultiple($filename,'fileData',$path);
+                           if (is_array($uploadFile)) {
+                               $uploadFile = implode(',', $uploadFile);
+                               $dataSave = array(
+                                   'Item' => $Item,
+                                   'Desc' => $Desc,
+                                   'EstimaValue' => $EstimaValue,
+                                   'Photo' => $uploadFile,
+                                   'Departement' => $Departement,
+                                   'DetailCatalog' => $Detail,
+                                   'LastUpdateBy' => $user,
+                                   'LastUpdateAt' => date('Y-m-d H:i:s'),
+                               );
+                               $this->db->where('ID', $Input['ID']);
+                               $this->db->update('db_purchasing.m_catalog', $dataSave);
+                               echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+                           }
+                           else
+                           {
+                               echo json_encode(array('msg' => $uploadFile,'status' => 0));
+                           }
+                        }
+                        else{
+                            $dataSave = array(
+                                'Item' => $Item,
+                                'Desc' => $Desc,
+                                'EstimaValue' => $EstimaValue,
+                                'Departement' => $Departement,
+                                'DetailCatalog' => $Detail,
+                                'LastUpdateBy' => $user,
+                                'LastUpdateAt' => date('Y-m-d H:i:s'),
+                            );
+                            $this->db->where('ID', $Input['ID']);
+                            $this->db->update('db_purchasing.m_catalog', $dataSave);
+                            echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+                        }
+                        break;
+                    case 'delete':
+                        $dataSave = array(
+                            'Active' => 0,
+                            'LastUpdateBy' => $user,
+                            'LastUpdateAt' => date('Y-m-d H:i:s'),
+                        );
+                        $this->db->where('ID', $Input['ID']);
+                        $this->db->update('db_purchasing.m_catalog', $dataSave);
+                        echo json_encode(array(''));
+                        break;
+                    case 'approve':
+                        $dataSave = array(
+                            'Approval' => 1,
+                            'ApprovalBy' => $user,
+                            'ApprovalAt' => date('Y-m-d H:i:s'),
+                        );
+                        $this->db->where('ID', $Input['ID']);
+                        $this->db->update('db_purchasing.m_catalog', $dataSave);
+                        echo json_encode(array(''));
+                        break;        
+                    default:
+                        # code...
+                        break;
+                }
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+
+    }
 }
