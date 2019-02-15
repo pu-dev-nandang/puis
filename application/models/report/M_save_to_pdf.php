@@ -42,7 +42,8 @@ class M_save_to_pdf extends CI_Model {
                                             LEFT JOIN db_academic.schedule_details sd ON (sd.ScheduleID = s.ID)
                                             LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                             LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ClassroomID)
-                                              WHERE ex.Date = "'.$dateSearch.'" AND (ex.Status = "2" OR ex.Status = "1") ')
+                                              WHERE ex.Date = "'.$dateSearch.'" AND (ex.Status = "2" OR ex.Status = "1") 
+                                              GROUP BY ex.ID')
             ->result_array();
 
         if(count($dataEx)>0){
@@ -51,11 +52,6 @@ class M_save_to_pdf extends CI_Model {
                 array_push($dataSc,$dataEx[$e]);
             }
         }
-
-
-
-
-
 
 
         if(count($dataSc)>0){
