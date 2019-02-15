@@ -1393,7 +1393,13 @@ class C_api2 extends CI_Controller {
                 $dataGetRoom = $this->db->select('Room')->get_where('db_academic.classroom',array('ID' => $dataUpdate['ClassroomID']))->result_array();
 
                 // Cek Bentrok Sesama Exchange
-                $dataConflict2 = $this->db->query('SELECT * FROM db_academic.schedule_exchange exch 
+                $dataConflict2 = $this->db->query('SELECT exch.ID, exch.Date, exch.StartSessions, exch.EndSessions ,mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup, cl.Room  
+                                                              FROM db_academic.schedule_exchange exch
+                                                              LEFT JOIN db_academic.attendance attd ON (attd.ID = exch.ID_Attd)
+                                                              LEFT JOIN db_academic.schedule s ON (s.ID = attd.ScheduleID)
+                                                              LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = attd.ScheduleID)
+                                                              LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                              LEFT JOIN db_academic.classroom cl ON (cl.ID = exch.ClassroomID)
                                                               WHERE exch.ID != "'.$EXID.'" AND exch.Date = "'.$dataUpdate['Date'].'"
                                                               AND exch.ClassroomID = "'.$dataUpdate['ClassroomID'].'" AND exch.Status = "2"
                                                               AND (("'.$dataUpdate['StartSessions'].'" >= exch.StartSessions  AND "'.$dataUpdate['StartSessions'].'" <= exch.EndSessions) OR
@@ -1406,37 +1412,46 @@ class C_api2 extends CI_Controller {
                 $DateEnd = date("Y-m-d H:i:s", strtotime($dataUpdate['Date'].$dataUpdate['EndSessions']));
                 $Room = $dataGetRoom[0]['Room'];
 
-                $sql2 = 'select count(*) as total from db_reservation.t_booking as a
-                             join db_employees.employees as b on a.CreatedBy = b.NIP
-                             where a.Status in(0,1) and ((a.`Start` >= "'.$DateStart.'" and a.`Start` < "'.$DateEnd.'" ) 
-                             or (a.`End` > "'.$DateStart.'" and a.`End` <= "'.$DateEnd.'" )) 
-                             and a.Room = "'.$Room.'"'.' ';
+//                $sql2 = 'select count(*) as total from db_reservation.t_booking as a
+//                             join db_employees.employees as b on a.CreatedBy = b.NIP
+//                             where a.Status in(0,1) and ((a.`Start` >= "'.$DateStart.'" and a.`Start` < "'.$DateEnd.'" )
+//                             or (a.`End` > "'.$DateStart.'" and a.`End` <= "'.$DateEnd.'" ))
+//                             and a.Room = "'.$Room.'"'.' ';
 
-                $s = 'select count(*) as total from db_reservation.t_booking as a
+                $sql2 = 'select count(*) as Total from db_reservation.t_booking as a
                                  join db_employees.employees as b on a.CreatedBy = b.NIP
                                  where a.Status in(0,1) and (
                                     (a.`Start` >= "'.$DateStart.'" and a.`Start` < "'.$DateEnd.'" ) 
-                                    or (a.`End` > "'.$DateStart.'" and a.`End` <= "'.$DataEnd.'" )
+                                    or (a.`End` > "'.$DateStart.'" and a.`End` <= "'.$DateEnd.'" )
                                     or (
-                                            a.`Start` <= "'.$DateStart.'" and a.`End` >= "'.$DataEnd.'"
+                                            a.`Start` <= "'.$DateStart.'" and a.`End` >= "'.$DateEnd.'"
                                         )
                                 ) and a.Room = "'.$Room.'"';
 
 
 //                $query3=$this->db->query($sql2)->result_array();
-                $query3=$this->db->query($s)->result_array();
+                $query3=$this->db->query($sql2)->result_array();
 
-                print_r($dataConflict1);
-                print_r($dataConflict2);
-                print_r($sql2);
-                print_r($query3);
+                if(count($dataConflict1)>0 ||
+                    count($dataConflict2)>0){
+                    $result = array(
+                        'Status' => 0,
+                        'Schedule' => $dataConflict1,
+                        'Exchange' => $dataConflict2,
+                        'Vanue' => $query3[0]['Total']
+                    );
+                } else {
+                    $this->db->where('ID', $EXID);
+                    $this->db->update('db_academic.schedule_exchange',$dataUpdate);
+                    $result = array(
+                        'Status' => 1,
+                        'Vanue' => $query3[0]['Total']
+                    );
+                }
 
-                exit;
+                return print_r(json_encode($result));
 
 
-                $this->db->where('ID', $EXID);
-                $this->db->update('db_academic.schedule_exchange',$dataUpdate);
-                return print_r(1);
             }
             else if($data_arr['action']=='delteExhange'){
 
