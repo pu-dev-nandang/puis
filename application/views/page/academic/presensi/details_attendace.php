@@ -751,6 +751,7 @@
 
             '            <tr>' +
             '                <td colspan="3" style="text-align: right;">' +
+            '                       <button style="float: left" class="btn btn-danger" id="btnDeleteExch">Delete</button>' +
             '                    <button class="btn btn-primary" id="btnSubmitExch">Submit</button> ' +
             '                    <button class="btn btn-default" data-dismiss="modal">Close</button>' +
             '                </td>' +
@@ -809,16 +810,20 @@
             var formExcDate = $('#formExcDate').val();
             var formExcStart = $('#formExcStart').val();
             var formExcEnd = $('#formExcEnd').val();
+            var formExcClassroom = $('#formExcClassroom').val();
             var formExcReason = $('#formExcReason').val();
 
             if(formExcDateOri!='' && formExcDateOri!=null &&
                 formExcDate!='' && formExcDate!=null &&
                 formExcStart!='' && formExcStart!=null &&
-            formExcEnd!='' && formExcEnd!=null &&
-            formExcReason!='' && formExcReason!=null){
+                formExcEnd!='' && formExcEnd!=null &&
+                formExcClassroom!='' && formExcClassroom!=null &&
+                formExcReason!='' && formExcReason!=null){
 
-                loading_buttonSm('#btnSubmitExch');
-                $('button[data-dismiss=modal]').prop('disabled',true);
+                var ClassroomID = formExcClassroom.split('.')[0];
+
+                // loading_buttonSm('#btnSubmitExch');
+                // $('button[data-dismiss=modal]').prop('disabled',true);
 
                 var dayID = (moment(formExcDate).days()==0) ? 7 : moment(formExcDate).days();
 
@@ -831,6 +836,7 @@
                         DayID : dayID,
                         StartSessions : formExcStart,
                         EndSessions : formExcEnd,
+                        ClassroomID : ClassroomID,
                         Reason : formExcReason
                     }
                 };
@@ -852,6 +858,30 @@
             }
 
 
+        });
+
+
+        // BTN Delete
+        $('#btnDeleteExch').click(function () {
+            if(confirm('Are you sure?')){
+
+                loading_buttonSm('#btnDeleteExch');
+                $('#btnSubmitExch,button[data-dismiss=modal]').prop('disabled',true);
+
+                var data = {
+                    action : 'delteExhange',
+                    EXID : dataExch.ID
+                };
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api2/__crudAttendance2';
+                $.post(url,{token:token},function (result){
+                    toastr.success('Data deleted','Success');
+                    loadAttendace();
+                    setTimeout(function () {
+                        $('#GlobalModal').modal('hide');
+                    },500);
+                });
+            }
         });
 
     });
