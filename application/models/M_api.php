@@ -1324,10 +1324,12 @@ class M_api extends CI_Model {
     public function __checkSchedule($dataFilter){
 
 
-        $jadwal = $this->db->query('SELECT s.ID AS ScheduleID,s.ClassGroup , sd.ID AS sdID, sd.DayID,sd.StartSessions, sd.EndSessions, cl.Room                                               
+        $jadwal = $this->db->query('SELECT s.ID AS ScheduleID,s.ClassGroup , sd.ID AS sdID,                                                
+                                              sd.DayID,sd.StartSessions, sd.EndSessions, cl.Room, d.NameEng AS DayEng
                                               FROM db_academic.schedule s
                                               RIGHT JOIN db_academic.schedule_details sd ON (s.ID=sd.ScheduleID)   
                                               LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+                                              LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
                                               WHERE s.SemesterID="'.$dataFilter['SemesterID'].'"
                                               AND s.IsSemesterAntara="'.$dataFilter['IsSemesterAntara'].'" 
                                               AND sd.ClassroomID="'.$dataFilter['ClassroomID'].'" 

@@ -632,7 +632,7 @@
     }
 
     $('#btnClearAttd').click(function () {
-        $('#GlobalModal .modal-header').html('<h4 class="modal-title">BAP</h4>');
+        $('#GlobalModal .modal-header').html('<h4 class="modal-title">Clear Attendance</h4>');
         $('#GlobalModal .modal-body').html('<div class="row">' +
             '    <div class="col-md-4 col-md-offset-2">' +
             '        <div class="form-goup">' +
@@ -644,7 +644,7 @@
             '        <div class="form-goup">' +
             '            <label>User</label>' +
             '            <select class="form-control" id="form_User">' +
-            '               <option value="0">- All User -</option>' +
+            '               <option value="0">- Clear All -</option>' +
             '               <option value="1">Student</option>' +
             '               <option value="2">Lecturer</option>' +
             '           </select>' +
@@ -654,7 +654,7 @@
             '<div class="row">' +
             '    <div class="col-md-12" style="text-align: center;">' +
             '        <hr/>' +
-            '        <button class="btn btn-danger" id="btnCleanAction">Clean</button>' +
+            '        <button class="btn btn-danger" id="btnCleanAction">Clear</button>' +
             '        <button class="btn btn-default" data-dismiss="modal">Close</button>' +
             '    </div>' +
             '</div>');
@@ -832,15 +832,18 @@
             '                    <textarea class="form-control" rows="3" id="formExcReason"></textarea>' +
             '                </td>' +
             '            </tr>' +
-
             '            <tr>' +
             '                <td colspan="3" style="text-align: right;">' +
-            '                       <button style="float: left" class="btn btn-danger" id="btnDeleteExch">Delete</button>' +
+            '                    <button style="float: left" class="btn btn-danger" id="btnDeleteExch">Delete</button>' +
             '                    <button class="btn btn-primary" id="btnSubmitExch">Submit</button> ' +
             '                    <button class="btn btn-default" data-dismiss="modal">Close</button>' +
             '                </td>' +
             '            </tr>' +
             '        </table>' +
+            '' +
+            '<div class="alert alert-danger hide" id="viewBentrolSc"></div>' +
+            '<div class="alert alert-warning hide" id="viewBentrolExc"></div>' +
+            '<div class="alert alert-info hide" id="viewVanueBentrok">Bentrok dengan venue (Tidak masalah)</div>' +
             '    </div>' +
             '</div>');
 
@@ -848,7 +851,10 @@
 
         // Cek apakah ruangan sudah ada atau belum
 
-        loadSelect2OptionClassroom('#formExcClassroom',dataExch.ClassroomID+'.'+dataExch.Seat+'.'+dataExch.SeatForExam);
+        var selectRoom = (dataExch.ClassroomID!='' && dataExch.ClassroomID!=null)
+            ? dataExch.ClassroomID+'.'+dataExch.Seat+'.'+dataExch.SeatForExam
+            : '';
+        loadSelect2OptionClassroom('#formExcClassroom',selectRoom);
         $('#formExcClassroom').select2({allowClear: true});
         //
 
@@ -906,8 +912,8 @@
 
                 var ClassroomID = formExcClassroom.split('.')[0];
 
-                // loading_buttonSm('#btnSubmitExch');
-                // $('button[data-dismiss=modal]').prop('disabled',true);
+                loading_buttonSm('#btnSubmitExch');
+                $('button[data-dismiss=modal],#btnDeleteExch').prop('disabled',true);
 
                 var dayID = (moment(formExcDate).days()==0) ? 7 : moment(formExcDate).days();
 
@@ -928,12 +934,59 @@
                 var token = jwt_encode(data,'UAP)(*');
                 var url = base_url_js+'api2/__crudAttendance2';
 
-                $.post(url,{token:token},function (result) {
-                    toastr.success('Data updated','Success');
-                    loadAttendace();
-                    setTimeout(function () {
-                        $('#GlobalModal').modal('hide');
-                    },500);
+                $.post(url,{token:token},function (jsonResult) {
+
+                    $('#viewVanueBentrok').addClass('hide');
+                    if(parseInt(jsonResult.Vanue)>0){
+                        $('#viewVanueBentrok').removeClass('hide');
+                        $.getJSON(base_url_js+'api/__checkBentrokScheduleAPI');
+                    }
+
+                    if(jsonResult.Status==1 || jsonResult.Status=='1'){
+                        toastr.success('Data updated','Success');
+                        loadAttendace();
+                        setTimeout(function () {
+                            $('#GlobalModal').modal('hide');
+                        },500);
+                    } else {
+                        $('#viewBentrolSc').addClass('hide');
+                        $('#viewBentrolExc').addClass('hide');
+
+                        var Schedule = jsonResult.Schedule;
+                        var Exchange = jsonResult.Exchange;
+
+                        if(Schedule.length>0){
+                            $('#viewBentrolSc').removeClass('hide');
+                            $('#viewBentrolSc').html('<ul id="ulBentrok"></ul>');
+                            $.each(Schedule,function (i, v) {
+
+                                var dC = v.DetailsCourse[0];
+
+                                $('#ulBentrok').append('<li>' +
+                                    '<b>'+dC.MKCode+' - '+dC.NameEng+'</b>' +
+                                    '<br/>Group : '+v.ClassGroup+
+                                    '<br/>'+v.DayEng+', '+v.StartSessions.substr(0,5)+' - ' +v.EndSessions.substr(0,5)+' | '+v.Room+
+                                    '</li>');
+                            });
+                        }
+
+                        if(Exchange.length>0){
+                            $('#viewBentrolExc').removeClass('hide');
+                            $('#viewBentrolExc').html('<ul id="ulBentrokExc"></ul>');
+                            $.each(Exchange,function (i, v) {
+                                $('#ulBentrokExc').append('<li>' +
+                                    '<b>'+v.MKCode+' - '+v.CourseEng+'</b>' +
+                                    '<br/>Group : '+v.ClassGroup+
+                                    '<br/>' +moment(v.Date).format('dddd, DD MMM YYYY')+
+                                    ' '+v.StartSessions.substr(0,5)+' - '+v.EndSessions.substr(0,5)+
+                                    ' | '+v.Room+
+                                    '</li>');
+                            });
+                        }
+
+                    }
+
+
                 });
 
             }
