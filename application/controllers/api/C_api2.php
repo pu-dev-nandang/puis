@@ -1440,6 +1440,33 @@ class C_api2 extends CI_Controller {
             }
             else if($data_arr['action']=='delteExhange'){
 
+                $Log_dataInsert = $data_arr['Logging'];
+                $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
+                $insert_id_logging = $this->db->insert_id();
+
+                // Insert logging
+                $Log_arr_ins = array(
+                    'IDLogging' => $insert_id_logging,
+                    'UserID' => $data_arr['UserID']
+                );
+                // Send Notif To Kaprodi
+                $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+
+                // Cek apakah kaprodi sudah Approve atau belum
+                if($data_arr['Updated1By']!='' && $data_arr['Updated1By']!=null){
+                    // Insert logging
+                    $Log_arr_ins = array(
+                        'IDLogging' => $insert_id_logging,
+                        'UserID' => $data_arr['Updated1By']
+                    );
+                    // Send Notif To Kaprodi
+                    $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
+                }
+
+
+                // ==== Action remove =====
+
+
                 $EXID = $data_arr['EXID'];
 
                 $this->db->where('ID', $EXID);

@@ -870,7 +870,21 @@
 
                 var data = {
                     action : 'delteExhange',
-                    EXID : dataExch.ID
+                    EXID : dataExch.ID,
+                    UserID : dataExch.NIP,
+                    Updated1By : dataExch.Updated1By,
+                    Logging: {
+                        Icon: sessionUrlPhoto,
+                        Title: '<i class="fa fa-minus-circle margin-right" style="color: red;"></i> Schedule Exchange - Removed',
+                        Description: "Your request has been removed by Academic ("+sessionName+")",
+                        URLDirect: "",
+                        URLDirectStudent: "",
+                        URLDirectLecturer: "attendance/schedule-exchange",
+                        URLDirectLecturerKaprodi: "attendance/monitoring-schedule-exchange",
+                        CreatedBy: sessionNIP,
+                        CreatedName: sessionName,
+                        CreatedAt: dateTimeNow()
+                    }
                 };
                 var token = jwt_encode(data,'UAP)(*');
                 var url = base_url_js+'api2/__crudAttendance2';
