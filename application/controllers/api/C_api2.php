@@ -1480,6 +1480,65 @@ class C_api2 extends CI_Controller {
 
 
             }
+            else if($data_arr['action']=='cleanAttendance'){
+                $Sesi = $data_arr['Sesi'];
+                $ID_Attd = $data_arr['ID_Attd'];
+                $User = $data_arr['User'];
+
+                // Cek user yg dihapus
+
+
+                if($User==0 || $User=='0'){
+
+                    // Nullkan Attd Student
+                    $this->db->where('ID_Attd',$ID_Attd);
+                    $this->db->update('db_academic.attendance_students', array(
+                        'M'.$Sesi => null,
+                        'D'.$Sesi => ''
+                    ));
+                    $this->db->reset_query();
+
+                    // Hapus Attd Lecturer
+                    $this->db->where(array(
+                        'ID_Attd' => $ID_Attd,
+                        'Meet' => $Sesi
+                    ));
+                    $this->db->delete('db_academic.attendance_lecturers');
+                    $this->db->reset_query();
+
+                    // Null kan data Attendance
+                    $this->db->where('ID',$ID_Attd);
+                    $this->db->update('db_academic.attendance', array(
+                        'Meet'.$Sesi => null,
+                        'BAP'.$Sesi => null,
+                        'Venue'.$Sesi => null,
+                        'Equipments'.$Sesi => null
+                    ));
+
+                }
+                else if($User==1 || $User=='1'){
+                    // Nullkan Attd Student
+                    $this->db->where('ID_Attd',$ID_Attd);
+                    $this->db->update('db_academic.attendance_students', array(
+                        'M'.$Sesi => null,
+                        'D'.$Sesi => null
+                    ));
+                    $this->db->reset_query();
+                }
+                else if($User==2 || $User=='2'){
+                    // Hapus Attd Lecturer
+                    $this->db->where(array(
+                        'ID_Attd' => $ID_Attd,
+                        'Meet' => $Sesi
+                    ));
+                    $this->db->delete('db_academic.attendance_lecturers');
+                    $this->db->reset_query();
+                }
+
+
+                return print_r(1);
+
+            }
 
         }
     }
