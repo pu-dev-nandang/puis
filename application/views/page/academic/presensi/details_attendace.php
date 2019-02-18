@@ -984,6 +984,10 @@
                             });
                         }
 
+                        setTimeout(function () {
+                            $('#btnSubmitExch').html('Submit');
+                            $('button[data-dismiss=modal],#btnDeleteExch,#btnSubmitExch').prop('disabled',false);
+                        },500);
                     }
 
 
