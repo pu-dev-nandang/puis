@@ -148,7 +148,7 @@
                 "iDisplayLength" : 10,
                 "ordering" : false,
                 "language": {
-                    "searchPlaceholder": "Course, lecturer"
+                    "searchPlaceholder": "Group, Code, Course"
                 },
                 columns: [
                     {
