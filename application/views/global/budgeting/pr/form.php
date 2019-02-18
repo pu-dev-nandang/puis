@@ -192,7 +192,9 @@
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Select Post Budget Item</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Item</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Desc</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Qty</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Spesification Additional</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Need</th>'+
+			                            '<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">Qty</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Unit Cost</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Sub Total</th>'+
 			                            '<th width = "150px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Date Needed</th>'+
@@ -301,8 +303,9 @@
     					}
     					var arr = Item+'@@'+Desc+'@@'+EstimaValue+'@@'+Photo+'@@'+DetailCatalog;
     					arr = findAndReplace(arr, "\"","'");
-
     					var Qty = response['Qty'];
+    					var SpecAdd = (response['Spec_add'] == '' || response['Spec_add'] == null || response['Spec_add'] == 'null') ? '' : response['Spec_add'];
+    					var Need = (response['Need'] == '' || response['Need'] == null || response['Need'] == 'null') ? '' : response['Need'];
     					var SubTotal = response['SubTotal'];
     					var n = SubTotal.indexOf(".");
     					SubTotal = SubTotal.substring(0, n);
@@ -341,6 +344,14 @@
     									'</div>'+
     								'</td>'+
     								'<td><button class = "btn btn-primary Detail" data = "'+arr+'">Detail</button></td>'+
+    								'<td>'+
+    									'<textarea class = "form-control SpecAdd" rows = "2">'+SpecAdd+'</textarea>'+
+    									// '<input type="text" class="form-control SpecAdd" value="'+SpecAdd+'">'+
+    								'</td>'+
+    								'<td>'+
+    									'<textarea class = "form-control Need" rows = "2">'+Need+'</textarea>'+
+    									// '<input type="text" class="form-control Need" value="'+Need+'">'+
+    								'</td>'+
     								'<td><input type="number" min = "1" class="form-control qty"  value="'+Qty+'"></td>'+
     								'<td><input type="text" class="form-control UnitCost"  value = "'+UnitCost+'"></td>'+
     								'<td><input type="text" class="form-control SubTotal" disabled value = "'+SubTotal+'"></td>'+
@@ -384,12 +395,14 @@
     						var JsonStatus = jQuery.parseJSON(pr_create[0]['JsonStatus']);
     						var bool = false;
     						var HierarkiApproval = 0; // for check hierarki approval;
+    						var NumberOfApproval = 0; // for check hierarki approval;
     						for (var i = 0; i < JsonStatus.length; i++) {
+    							NumberOfApproval++;
     							if (JsonStatus[i]['Status'] == 0) {
     								// check status before
     								if (i > 0) {
     									var ii = i - 1;
-    									if (JsonStatus[ii]['Status'] == 0) {
+    									if (JsonStatus[ii]['Status'] == 1) {
     										HierarkiApproval++;
     									}
     								}
@@ -403,10 +416,16 @@
     									break;
     								}
     							}
+    							else
+    							{
+    								HierarkiApproval++;
+    							}
     							
     						}
 
-    						if (bool && HierarkiApproval == 1) {
+    						// console.log(HierarkiApproval);
+
+    						if (bool && HierarkiApproval == NumberOfApproval) {
 	    						var ApprovalBtn = '<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
 					   								'<div class = "col-md-12">'+
 					   									'<div class = "pull-right">'+
@@ -494,6 +513,14 @@
 								'</div>'+
 							'</td>'+
 							'<td><button class = "btn btn-primary Detail">Detail</button></td>'+
+							'<td>'+
+								'<textarea class = "form-control SpecAdd" rows = "2"></textarea>'+
+								// '<input type="text" class="form-control SpecAdd">'+
+							'</td>'+
+							'<td>'+
+								'<textarea class = "form-control Need" rows = "2"></textarea>'+
+								// '<input type="text" class="form-control Need">'+
+							'</td>'+
 							'<td><input type="number" min = "1" class="form-control qty"  value="1" disabled></td>'+
 							'<td><input type="text" class="form-control UnitCost" disabled></td>'+
 							'<td><input type="text" class="form-control SubTotal" disabled value = "0"></td>'+
@@ -598,7 +625,7 @@
 				fillItem.find('td:eq(1)').find('.PostBudgetItem').val(PostBudgetItem);
 				fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left',checked);
 				fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('remaining',estvalue);
-				fillItem.find('td:eq(4)').find('.qty').trigger('change');
+				fillItem.find('td:eq(6)').find('.qty').trigger('change');
 				$('#GlobalModalLarge').modal('hide');
 			})
 
@@ -607,12 +634,12 @@
 		$(document).off('change', '.qty').on('change', '.qty',function(e) {
 			var qty = $(this).val();
 			var fillItem = $(this).closest('tr');
-			var estvalue = fillItem.find('td:eq(5)').find('.UnitCost').val();
+			var estvalue = fillItem.find('td:eq(7)').find('.UnitCost').val();
 			estvalue = findAndReplace(estvalue, ".","");
 			var SubTotal = parseInt(qty) * parseInt(estvalue);
-			fillItem.find('td:eq(6)').find('.SubTotal').val(SubTotal);
-			fillItem.find('td:eq(6)').find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-			fillItem.find('td:eq(6)').find('.SubTotal').maskMoney('mask', '9894');
+			fillItem.find('td:eq(8)').find('.SubTotal').val(SubTotal);
+			fillItem.find('td:eq(8)').find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+			fillItem.find('td:eq(8)').find('.SubTotal').maskMoney('mask', '9894');
 			_BudgetRemaining();
 			FuncBudgetStatus();
 			var id_budget_left = fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left');
@@ -620,13 +647,13 @@
 
 		$(document).off('keyup', '.UnitCost').on('keyup', '.UnitCost',function(e) {
 			var fillItem = $(this).closest('tr');
-			var qty = fillItem.find('td:eq(4)').find('.qty').val();
+			var qty = fillItem.find('td:eq(6)').find('.qty').val();
 			var estvalue = $(this).val();
 			estvalue = findAndReplace(estvalue, ".","");
 			var SubTotal = parseInt(qty) * parseInt(estvalue);
-			fillItem.find('td:eq(6)').find('.SubTotal').val(SubTotal);
-			fillItem.find('td:eq(6)').find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-			fillItem.find('td:eq(6)').find('.SubTotal').maskMoney('mask', '9894');
+			fillItem.find('td:eq(8)').find('.SubTotal').val(SubTotal);
+			fillItem.find('td:eq(8)').find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+			fillItem.find('td:eq(8)').find('.SubTotal').maskMoney('mask', '9894');
 			_BudgetRemaining();
 			FuncBudgetStatus();
 			var id_budget_left = fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left');
@@ -668,7 +695,7 @@
 				var ppn = $("#ppn").val();
 				$('.PostBudgetItem[id_budget_left="'+id_budget_left+'"]').each(function(){
 					var fillItem = $(this).closest('tr');
-					var SubTotal = fillItem.find('td:eq(6)').find('.SubTotal').val();
+					var SubTotal = fillItem.find('td:eq(8)').find('.SubTotal').val();
 					var SubTotal = findAndReplace(SubTotal, ".","");
 					PostBudgetItem = fillItem.find('td:eq(1)').find('.PostBudgetItem').val();
 					var Persent = (parseInt(ppn) / 100) * SubTotal;
@@ -795,14 +822,14 @@
 			   		fillItem.find('td:eq(2)').find('.Item').attr('savevalue',checked);
 			   		fillItem.find('td:eq(2)').find('.Item').attr('estvalue',estvalue);
 			   		fillItem.find('td:eq(3)').find('.Detail').attr('data',arr);
-			   		fillItem.find('td:eq(5)').find('.UnitCost').val(estvalue);
-			   		fillItem.find('td:eq(5)').find('.UnitCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-			   		fillItem.find('td:eq(5)').find('.UnitCost').maskMoney('mask', '9894');
+			   		fillItem.find('td:eq(7)').find('.UnitCost').val(estvalue);
+			   		fillItem.find('td:eq(7)').find('.UnitCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+			   		fillItem.find('td:eq(7)').find('.UnitCost').maskMoney('mask', '9894');
 
-			   		fillItem.find('td:eq(4)').find('.qty').prop('disabled', false);
-			   		fillItem.find('td:eq(5)').find('.UnitCost').prop('disabled', false);
+			   		fillItem.find('td:eq(6)').find('.qty').prop('disabled', false);
+			   		fillItem.find('td:eq(7)').find('.UnitCost').prop('disabled', false);
 
-			   		fillItem.find('td:eq(4)').find('.qty').trigger('change');
+			   		fillItem.find('td:eq(6)').find('.qty').trigger('change');
 			   		$('#GlobalModalLarge').modal('hide');
 			   })
 		})
@@ -942,7 +969,7 @@
 				}
 				html += '</select>';
 
-				fillItem.find('td:eq(8)').html(html);
+				fillItem.find('td:eq(10)').html(html);
 			})
 			
 		}
@@ -1011,7 +1038,7 @@
 				}
 
 				// find subtotal to check maxlimit
-					var SubTotal = fillItem.find('td:eq(6)').find('.SubTotal').val();
+					var SubTotal = fillItem.find('td:eq(8)').find('.SubTotal').val();
 					SubTotal = findAndReplace(SubTotal, ".","");
 					var Persent = (parseInt(ppn) / 100) * SubTotal;
 					SubTotal = parseInt(SubTotal) - parseInt(Persent);
@@ -1056,7 +1083,7 @@
 		       var no = parseInt(count) + 1;
 		       var name = files[count].name;
 		       var extension = name.split('.').pop().toLowerCase();
-		       if(jQuery.inArray(extension, ['jpg' ,'png','jpeg']) == -1)
+		       if(jQuery.inArray(extension, ['jpg' ,'png','jpeg','pdf','doc','docx']) == -1)
 		       {
 		        msgStr += 'File Number '+ no + ' Invalid Type File<br>';
 		        //toastr.error("Invalid Image File", 'Failed!!');
@@ -1103,14 +1130,16 @@
 				var ID_budget_left = $(this).attr('id_budget_left');
 				var fillItem = $(this).closest('tr');
 				var ID_m_catalog = fillItem.find('td:eq(2)').find('.Item').attr('savevalue');
-				var Qty = fillItem.find('td:eq(4)').find('.qty').val();
-				var UnitCost = fillItem.find('td:eq(5)').find('.UnitCost').val();
+				var Spec_add = fillItem.find('td:eq(4)').find('.SpecAdd').val();
+				var Need = fillItem.find('td:eq(5)').find('.Need').val();
+				var Qty = fillItem.find('td:eq(6)').find('.qty').val();
+				var UnitCost = fillItem.find('td:eq(7)').find('.UnitCost').val();
 				UnitCost = findAndReplace(UnitCost, ".","");
 				var No = fillItem.find('td:eq(0)').text();
-				var SubTotal = fillItem.find('td:eq(6)').find('.SubTotal').val();
+				var SubTotal = fillItem.find('td:eq(8)').find('.SubTotal').val();
 				SubTotal = findAndReplace(SubTotal, ".","");
-				var DateNeeded = fillItem.find('td:eq(7)').find('#tgl'+No).val();
-				var BudgetStatus = fillItem.find('td:eq(8)').find('.BudgetStatus').val();
+				var DateNeeded = fillItem.find('td:eq(9)').find('#tgl'+No).val();
+				var BudgetStatus = fillItem.find('td:eq(10)').find('.BudgetStatus').val();
 
 				if ( $( '#'+'BrowseFile'+No ).length ) {
 					var UploadFile = $('#'+'BrowseFile'+No)[0].files;
@@ -1123,6 +1152,8 @@
 				 var data = {
 				 	ID_budget_left : ID_budget_left,
 				 	ID_m_catalog : ID_m_catalog,
+				 	Spec_add : Spec_add,
+				 	Need : Need,
 				 	Qty : Qty,
 				 	UnitCost : UnitCost,
 				 	SubTotal : SubTotal,

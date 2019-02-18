@@ -614,7 +614,7 @@ class M_budgeting extends CI_Model {
     public function GetPR_DetailByPRCode($PRCode)
     {
         $sql = 'select a.ID,a.PRCode,a.ID_budget_left,b.ID_creator_budget,c.CodePostBudget,d.CodeSubPost,e.CodePost,
-                e.RealisasiPostName,f.PostName,a.ID_m_catalog,g.Item,g.Desc,g.DetailCatalog,
+                e.RealisasiPostName,f.PostName,a.ID_m_catalog,g.Item,g.Desc,g.DetailCatalog,a.Spec_add,a.Need,
                 a.Qty,a.UnitCost,a.SubTotal,a.DateNeeded,a.BudgetStatus,a.UploadFile,g.Photo
                 from db_budgeting.pr_detail as a
                 join db_budgeting.budget_left as b on a.ID_budget_left = b.ID
