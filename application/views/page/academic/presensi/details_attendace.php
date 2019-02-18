@@ -927,7 +927,8 @@
                         StartSessions : formExcStart,
                         EndSessions : formExcEnd,
                         ClassroomID : ClassroomID,
-                        Reason : formExcReason
+                        Reason : formExcReason,
+                        Status : '2'
                     }
                 };
 
