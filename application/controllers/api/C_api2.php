@@ -993,10 +993,12 @@ class C_api2 extends CI_Controller {
 
 
         $queryDefault = 'SELECT s.ID AS ScheduleID, attd.ID AS ID_Attd,sd.ID AS SDID,s.Coordinator , s.ClassGroup, s.TeamTeaching, mk.MKCode, mk.NameEng AS CourseEng,  
-                                        mk.Name AS Course, d.NameEng AS DayEng, cd.TotalSKS AS Credit, sd.StartSessions, sd.EndSessions, em.Name AS Lecturer
+                                        mk.Name AS Course, d.NameEng AS DayEng, cl.Room,
+                                        cd.TotalSKS AS Credit, sd.StartSessions, sd.EndSessions, em.Name AS Lecturer
                                         FROM db_academic.schedule_details sd 
                                         LEFT JOIN db_academic.schedule s ON (sd.ScheduleID = s.ID)  
-                                        LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)                               
+                                        LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)            
+                                        LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)                   
                                         LEFT JOIN db_academic.schedule_details_course sdc ON (s.ID = sdc.ScheduleID)
                                         LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                         LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
@@ -1114,7 +1116,7 @@ class C_api2 extends CI_Controller {
             $nestedData[] = '<div  style="text-align:center;">'.count($dataStd).'</div>';
             $nestedData[] = '<div  style="text-align:left;">'.$showLec.'<textarea class="hide" id="dateLec'.$row['ID_Attd'].'">'.json_encode($dataLec).'</textarea></div>';
             $nestedData[] = '<div  style="text-align:right;"><b>'.$row['DayEng'].'</b><br/>'.
-                substr($row['StartSessions'],0,5).' - '.substr($row['EndSessions'],0,5).'</div>';
+                substr($row['StartSessions'],0,5).' - '.substr($row['EndSessions'],0,5).' | '.$row['Room'].'</div>';
 
             for($l=0;$l<count($arrP);$l++){
                 $totalStd = $arrP[$l]+$arrA[$l];
@@ -1412,11 +1414,6 @@ class C_api2 extends CI_Controller {
                 $DateEnd = date("Y-m-d H:i:s", strtotime($dataUpdate['Date'].$dataUpdate['EndSessions']));
                 $Room = $dataGetRoom[0]['Room'];
 
-//                $sql2 = 'select count(*) as total from db_reservation.t_booking as a
-//                             join db_employees.employees as b on a.CreatedBy = b.NIP
-//                             where a.Status in(0,1) and ((a.`Start` >= "'.$DateStart.'" and a.`Start` < "'.$DateEnd.'" )
-//                             or (a.`End` > "'.$DateStart.'" and a.`End` <= "'.$DateEnd.'" ))
-//                             and a.Room = "'.$Room.'"'.' ';
 
                 $sql2 = 'select count(*) as Total from db_reservation.t_booking as a
                                  join db_employees.employees as b on a.CreatedBy = b.NIP
@@ -1429,7 +1426,6 @@ class C_api2 extends CI_Controller {
                                 ) and a.Room = "'.$Room.'"';
 
 
-//                $query3=$this->db->query($sql2)->result_array();
                 $query3=$this->db->query($sql2)->result_array();
 
                 if(count($dataConflict1)>0 ||
