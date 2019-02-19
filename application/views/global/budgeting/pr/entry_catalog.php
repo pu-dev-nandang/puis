@@ -465,7 +465,7 @@
 		}
 		else
 		{
-			arr = '';
+			arr = {};
 		}
 
 		return arr;

@@ -1488,6 +1488,9 @@ class C_budgeting extends Budgeting_Controler {
                        $ValueCode = $data_arr['ID_m_catalog'];
                        $this->m_budgeting->makeCanBeDelete($tbl,$fieldCode,$ValueCode);
                 }
+
+                // insert to pr_circulation_sheet
+                    $this->m_budgeting->pr_circulation_sheet($PRCode,'Created');
             }
             else
             {
@@ -1525,6 +1528,9 @@ class C_budgeting extends Budgeting_Controler {
                     $data_arr['PRCode'] = $PRCode;    
                     $this->db->insert('db_budgeting.pr_detail',$data_arr);
                 }
+
+                // insert to pr_circulation_sheet
+                    $this->m_budgeting->pr_circulation_sheet($PRCode,'Edited');
             }
             else
             {
@@ -1656,6 +1662,9 @@ class C_budgeting extends Budgeting_Controler {
                 $data_arr['PRCode'] = $PRCode;    
                 $this->db->insert('db_budgeting.pr_detail',$data_arr);
             }
+
+            // insert to pr_circulation_sheet
+                $this->m_budgeting->pr_circulation_sheet($PRCode,'Issued');
         }
         else
         {

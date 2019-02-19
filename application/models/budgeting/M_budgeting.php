@@ -691,5 +691,20 @@ class M_budgeting extends CI_Model {
         $EndMonth = $EndMonth->format('F').' '.$end[0]; // March
 
         return array('StartMonth' => $StartMonth,'EndMonth' => $EndMonth);
+    }
+
+    public function pr_circulation_sheet($PRCode,$Desc,$By = '')
+    {
+        if ($By ==  '') {
+            $By = $this->session->userdata('NIP');
+        }
+        $dataSave = array(
+            'PRCode' => $PRCode,
+            'Desc' => $Desc,
+            'Date' => date('Y-m-d'),
+            'By' => $By,
+        );
+
+        $this->db->insert('db_budgeting.pr_circulation_sheet',$dataSave);
     }  
 }

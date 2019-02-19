@@ -5381,7 +5381,7 @@ Phone: (021) 29200456';
           $pr_create = $this->m_budgeting->GetPR_CreateByPRCode($PRCode);
           $pr_detail = $this->m_budgeting->GetPR_DetailByPRCode($PRCode);
 
-          $fpdf = new pdf('L', 'mm', 'A4');
+          $fpdf = new Pdf_mc_table('L', 'mm', 'A4');
           $fpdf->SetMargins(10,10,10,10);
           $fpdf->AddPage();
 
@@ -5481,8 +5481,11 @@ Phone: (021) 29200456';
               $no = 1;
               $fpdf->SetFont('Arial','',$FontIsian);
               $total = 0;
+              $fpdf->SetWidths(array($w_no,$w_desc,$w_spec,$w_date_needed,$w_qty,$w_pricest,$w_totalammount));
+              $fpdf->SetLineHeight(5);
+              $fpdf->SetAligns(array('C','L','L','L','C','C','C'));
              for ($i=0; $i < count($pr_detail); $i++) {
-                $hModify = $h;
+
                 $DetailCatalog = (array) json_decode($pr_detail[$i]['DetailCatalog']);
                 $Spec = '';
                 $arr = array();
@@ -5490,64 +5493,30 @@ Phone: (021) 29200456';
                     $arr[] = $key.' : '.$value; 
                 }
 
-                $Spec0 = implode(',', $arr);
-                $Spec = $pr_detail[$i]['Spec_add']."\n".implode(',', $arr);
-                    $countnewline = substr_count( $Spec, "\n" );
-                    $lenSpec = strlen($Spec0);
-                    $MaxLength = 50;
-                    $cmulticell = $countnewline;
-                    
-                    $bagi = $lenSpec / $MaxLength;
-                    $bagi = (int) $bagi;
-                    $sisa = $lenSpec % $MaxLength;
-                    if ($sisa > 0) {
-                        $bagi++;
-                    }
-                    $cmulticell = $cmulticell + $bagi;
-                    // print_r($cmulticell);die();
-                    $newline_join = $countnewline * $h;
-                    // print_r($bagi);die();
-                    $hModify = ($bagi * $h)+$newline_join;
-                    // print_r($hModify);die();
-                    $onemulticell = $hModify / ($cmulticell+2); // one height multicell
-                    // print_r($onemulticell);die();
-
-                $fpdf->Cell($w_no,$hModify ,$no ,$border,0,'C',true);
-                $fpdf->Cell($w_desc,$hModify ,$pr_detail[$i]['Item'],$border,0,'C',true);
-
-                $fpdf->MultiCell($w_spec,$h,$Spec,$border,'L',true);
-                $x = $fpdf->GetX();
-                $y = $fpdf->GetY();
-                $fpdf->SetXY($x+$w_no+$w_desc+$w_spec,$y-$hModify);
-
-                $DateNeeded = 'Date : '.date("d M Y", strtotime($pr_detail[0]['DateNeeded']));
-                $DateNeeded .= "\n".'Need : '.$pr_detail[$i]['Need'];
-                    $countnewline = substr_count( $DateNeeded, "\n" );
-                    $len = strlen($pr_detail[$i]['Need']);
-                    $cmulticell = $countnewline;
-                    $bagi = $len / $MaxLength;
-                    $bagi = (int) $bagi;
-                    $sisa = $len % $MaxLength;
-                    if ($sisa > 0) {
-                        $bagi++;
-                    }
-                    $cmulticell = $cmulticell + $bagi;
-                    $h2multicell = $cmulticell * $onemulticell;
-                    $newline_join = $countnewline * $h;
-                    $hModify = ($bagi * $h)+$newline_join;
+                $Spec = implode(',', $arr);
+                if ($pr_detail[$i]['Spec_add'] != '' || $pr_detail[$i]['Spec_add'] != null) {
+                   $Spec = $pr_detail[$i]['Spec_add']."\n".implode(',', $arr);
+                }
                 
-
-                $fpdf->MultiCell($w_date_needed,$h2multicell,$DateNeeded,$border,'L',true);
-                $x = $fpdf->GetX();
-                $y = $fpdf->GetY();
-                $fpdf->SetXY($x+$w_no+$w_desc+$w_spec+$w_date_needed,$y-$hModify);
-
-                $fpdf->Cell($w_qty,$hModify ,$pr_detail[$i]['Qty'],$border,0,'C',true);
+                
+                $DateNeeded = 'Date : '.date("d M Y", strtotime($pr_detail[0]['DateNeeded']));
+                if ($pr_detail[$i]['Need'] != '' || $pr_detail[$i]['Need'] != null) {
+                    $DateNeeded .= "\n".'Need : '.$pr_detail[$i]['Need'];
+                }
+                
                 $UnitCost = 'Rp '.number_format($pr_detail[$i]['UnitCost'],2,',','.');
-                $fpdf->Cell($w_pricest,$hModify ,$UnitCost,$border,0,'C',true);
-
                 $Subtotal= 'Rp '.number_format($pr_detail[$i]['SubTotal'],2,',','.');
-                $fpdf->Cell($w_totalammount,$hModify ,$Subtotal,$border,1,'C',true);
+                $fpdf->Row(array(
+                   $no,
+                   $pr_detail[$i]['Item'],
+                   $Spec,
+                   $DateNeeded,
+                   $pr_detail[$i]['Qty'],
+                   $UnitCost,
+                   $Subtotal,
+
+                ));
+
                 $total = $total + $pr_detail[$i]['SubTotal'];
                 $no++;
                 $y += $h; 
