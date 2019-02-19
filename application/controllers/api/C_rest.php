@@ -2064,7 +2064,10 @@ class C_rest extends CI_Controller {
                         }
 
                         if ($boolReject) {
+                            $NoteDel = $dataToken['NoteDel'];
+                            $Notes = $G_data[0]['Notes']."\n".$NoteDel;
                             $datasave['Status'] = 3;
+                            $datasave['Notes'] = $Notes;
                         }
                     }
 
@@ -2076,6 +2079,12 @@ class C_rest extends CI_Controller {
                         if (array_key_exists('Status', $datasave)) {
                             if ($datasave['Status'] == 2) {
                                 $Desc = "All Approve and posting date at : ".$datasave['PostingDate'];
+                            }
+                        }
+
+                        if ($arr_upd['Status'] == 2) {
+                            if ($dataToken['NoteDel'] != '' || $dataToken['NoteDel'] != null) {
+                                $Desc .= ', '.$dataToken['NoteDel'];
                             }
                         }
                         

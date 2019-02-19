@@ -104,10 +104,11 @@
 				OPYear += '<option value ="'+arr_Year[i].Year+'" '+selected+'>'+arr_Year[i].Year+' - '+(parseInt(arr_Year[i].Year) + 1)+'</option>';
 			}
 			$("#Year").append(OPYear);
+			$( "#Year" ).prop( "disabled", true );
 			$('#Year').select2({
 			   //allowClear: true
 			});
-			$( "#Year" ).prop( "disabled", true );
+			
 		}
 
 		function getAllDepartementPU()
@@ -124,11 +125,10 @@
 		        var selected = (data_json[i]['Code']==Div) ? 'selected' : '';
 		        $('#DepartementPost').append('<option value="'+ data_json[i]['Code']  +'" '+selected+'>'+data_json[i]['Name2']+'</option>');
 		    }
-		   
+		   	$( "#DepartementPost" ).prop( "disabled", true );
 		    $('#DepartementPost').select2({
 		       //allowClear: true
 		    });
-		    $( "#DepartementPost" ).prop( "disabled", true );
 		    Load_input_PR();
 		  })
 		}
@@ -225,6 +225,15 @@
 				   					'</div>'+
 				   				'</div>';
 				   		break;
+				   	case "3":
+				   			var SaveBtn = '<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
+				   						'<div class = "col-md-12">'+
+				   							'<div class = "pull-right">'+
+				   								'<button class="btn btn-success" id="SaveBudget" action="0" PRCode = "'+PRCodeVal+'">Save to Draft</button>'+ '&nbsp&nbsp'+'<button class="btn btn-default" id="pdfprint" PRCode = "'+PRCodeVal+'"> <i class = "fa fa-file-pdf-o"></i> Print PDF</button>'+
+				   							'</div>'+
+				   						'</div>'+
+				   					'</div>';
+				   			break;	
 				   default:
 				   		var SaveBtn = '<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
 				   					'<div class = "col-md-12">'+
@@ -384,12 +393,15 @@
     				FuncBudgetStatus();
     				var Status = pr_create[0]['Status'];
     				if (Status >= 1) {
-    					$('button:not([id="pdfprint"]):not([id="excelprint"]):not([id="btnBackToHome"])').prop('disabled', true);
-    					$(".Detail").prop('disabled', false);
-    					$("input").prop('disabled', true);
-    					$("select").prop('disabled', true);
-    					$("textarea").prop('disabled', true);
-    					$(".input-group-addon").remove();
+    					// jika reject and user access = 1 maka dont disable
+    					if ( !(Status == 3 && UserAccess == 1) ) {
+    						$('button:not([id="pdfprint"]):not([id="excelprint"]):not([id="btnBackToHome"])').prop('disabled', true);
+    						$(".Detail").prop('disabled', false);
+    						$("input").prop('disabled', true);
+    						$("select").prop('disabled', true);
+    						$("textarea").prop('disabled', true);
+    						$(".input-group-addon").remove();
+    					}
     					if (UserAccess > 1) {
     						var NIP = "<?php echo $this->session->userdata('NIP') ?>";
     						var JsonStatus = jQuery.parseJSON(pr_create[0]['JsonStatus']);
@@ -975,6 +987,7 @@
 		}
 		
 		$(document).off('click', '#SaveBudget').on('click', '#SaveBudget',function(e) {
+			var htmltext = $(this).text();
 			loading_button('#SaveBudget');
 			// Budget Status
 				if ($('.BudgetStatus').length) {
@@ -989,7 +1002,7 @@
 
 						if (!bool) {
 							toastr.error('Budget Status having value is Exceed','!!!Error');
-							$('#SaveBudget').prop('disabled',false).html('Save to Draft');
+							$('#SaveBudget').prop('disabled',false).html(htmltext);
 						}
 						else
 						{
@@ -1003,7 +1016,7 @@
 							}
 							else
 							{
-								$('#SaveBudget').prop('disabled',false).html('Save to Draft');
+								$('#SaveBudget').prop('disabled',false).html(htmltext);
 							}
 							
 						}
@@ -1011,7 +1024,7 @@
 				else
 				{
 					toastr.error('Budget Status is required','!!!Error');
-					$('#SaveBudget').prop('disabled',false).html('Save to Draft');
+					$('#SaveBudget').prop('disabled',false).html(htmltext);
 				}
 		})
 
@@ -1383,37 +1396,63 @@
 
 		$(document).off('click', '#reject').on('click', '#reject',function(e) {
 			if (confirm('Are you sure ?')) {
-				loading_button('#approve');
+				// loading_button('#reject');
 				var PRCode = $(this).attr('prcode');
 				var useraccess = $(this).attr('useraccess');
 
-				var url = base_url_js + 'rest/__approve_pr';
-				var data = {
-					PRCode : PRCode,
-					useraccess : useraccess,
-					NIP : "<?php echo $this->session->userdata('NIP') ?>",
-					action : 'reject',
-					auth : 's3Cr3T-G4N',
-				}
+				// show modal insert reason
+				$('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Reason ! </b> <br>' +
+				    '<input type = "text" class = "form-group" id ="NoteDel" style="margin: 0px 0px 15px; height: 30px; width: 329px;" maxlength="30"><br>'+
+				    '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+				    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+				    '</div>');
+				$('#NotificationModal').modal('show');
 
-				var token = jwt_encode(data,"UAP)(*");
-				$.post(url,{ token:token },function (resultJson) {
-					if (resultJson == '') {
-						$(".menuEBudget li").removeClass('active');
-						$(".pageAnchor[page='data']").parent().addClass('active');
-						LoadPage('data');
-					}
-					else
-					{
-						$('#approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
-					}
-				}).fail(function() {
+				$("#confirmYes").click(function(){
+					var NoteDel = $("#NoteDel").val();
+					$('#NotificationModal .modal-header').addClass('hide');
+					$('#NotificationModal .modal-body').html('<center>' +
+					    '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+					    '                    <br/>' +
+					    '                    Loading Data . . .' +
+					    '                </center>');
+					$('#NotificationModal .modal-footer').addClass('hide');
+					$('#NotificationModal').modal({
+					    'backdrop' : 'static',
+					    'show' : true
+					});
 
-				  // toastr.info('No Result Data');
-				  toastr.error('The Database connection error, please try again', 'Failed!!');
-				}).always(function() {
-				    $('#approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
-				});
+					var url = base_url_js + 'rest/__approve_pr';
+					var data = {
+						PRCode : PRCode,
+						useraccess : useraccess,
+						NIP : "<?php echo $this->session->userdata('NIP') ?>",
+						action : 'reject',
+						auth : 's3Cr3T-G4N',
+						NoteDel : NoteDel,
+					}
+
+					var token = jwt_encode(data,"UAP)(*");
+					$.post(url,{ token:token },function (resultJson) {
+						if (resultJson == '') {
+							$(".menuEBudget li").removeClass('active');
+							$(".pageAnchor[page='data']").parent().addClass('active');
+							LoadPage('data');
+						}
+						else
+						{
+							// $('#reject').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+						}
+						$('#NotificationModal').modal('hide');
+					}).fail(function() {
+					  // toastr.info('No Result Data');
+					  toastr.error('The Database connection error, please try again', 'Failed!!');
+					  $('#NotificationModal').modal('hide');
+					}).always(function() {
+					    // $('#reject').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+					    $('#NotificationModal').modal('hide');
+					});
+				})	
 			}
 			
 

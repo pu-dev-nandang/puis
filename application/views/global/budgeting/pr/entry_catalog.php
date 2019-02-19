@@ -210,24 +210,22 @@
 	       //may want to use $.trim in here
 	       return $(this).val() == sessIDDepartementPUBudget; 
 	     }).prop("selected", true);
-
+	    $("#Departement").prop('disabled',true);
 	    $('#Departement').select2({
 	       //allowClear: true
 	    });
 
 	    <?php if ($action == 'edit'): ?>
+	    	$("#Departement").prop('disabled',false);
 	    	$("#Departement option").filter(function() {
 	    	   //may want to use $.trim in here
 	    	   return $(this).val() == '<?php echo $get[0]['Departement'] ?>'; 
 	    	 }).prop("selected", true);
-
+	    	$("#Departement").prop('disabled',true);
 	    	$('#Departement').select2({
 	    	   //allowClear: true
 	    	});
 	    <?php endif ?>
-
-	    $("#Departement").prop('disabled',true);
-
 
 	  })
 	}

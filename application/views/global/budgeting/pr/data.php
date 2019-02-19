@@ -76,8 +76,9 @@ $(document).ready(function() {
 		    },
 		    'createdRow': function( row, data, dataIndex ) {
 		    		 var endkey = (data.length) - 1;
+		    		 var keydepartment = (data.length) - 2;
 		    		 $( row ).find('td:eq(1)').html(
-		    		 		'<a href = "javascript:void(0)" class = "PRCode" fill = "'+data[1]+'" department = "'+data[endkey]+'">'+data[1]+'</a>'
+		    		 		'<a href = "javascript:void(0)" class = "PRCode" fill = "'+data[1]+'" department = "'+data[keydepartment]+'">'+data[1]+'</a><br>By : '+ data[endkey]
 		    		 	)
 		    },
 		} );
