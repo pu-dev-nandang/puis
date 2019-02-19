@@ -1507,6 +1507,20 @@ class C_budgeting extends Budgeting_Controler {
                 'Notes' => $Notes,
             );
 
+            // jika dari reject go back status ke 0
+                $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
+                if ($G_data[0]['Status'] ==  3 || $G_data[0]['Status'] ==  4) {
+                    $JsonStatus = $G_data[0]['JsonStatus'];
+                    $JsonStatus = (array) json_decode($JsonStatus,true);
+                    // update all 0 agar bisa di approve ulang
+                    for ($i=0; $i < count($JsonStatus); $i++) { 
+                        $JsonStatus[$i]['Status'] = 0;
+                        $JsonStatus[$i]['ApproveAt'] = '';
+                    }
+                    $dataSave['JsonStatus'] = json_encode($JsonStatus);
+                    $dataSave['Status'] = 0;
+                }
+
             $this->db->where('PRCode',$PRCode);
             $this->db->update('db_budgeting.pr_create',$dataSave);
             if ($this->db->affected_rows() > 0 )
@@ -1742,6 +1756,11 @@ class C_budgeting extends Budgeting_Controler {
 
             $nestedData = array_merge($nestedData,$arr);
             $nestedData[] = $row['Departement'];
+            // get name created by
+                $getName = $this->m_master->caribasedprimary('db_employees.employees','NIP',$row['CreatedBy']);
+                $nestedData[] = $getName[0]['Name'];
+
+
             $data[] = $nestedData;
             $No++;
         }
