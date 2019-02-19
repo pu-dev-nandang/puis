@@ -2071,6 +2071,16 @@ class C_rest extends CI_Controller {
                     $this->db->where('PRCode',$PRCode);
                     $this->db->update('db_budgeting.pr_create',$datasave);
 
+                    // insert to pr_circulation_sheet
+                        $Desc = ($arr_upd['Status'] == 1) ? 'Approve' : 'Reject';
+                        if (array_key_exists('Status', $datasave)) {
+                            if ($datasave['Status'] == 2) {
+                                $Desc = "All Approve and posting date at : ".$datasave['PostingDate'];
+                            }
+                        }
+                        
+                        $this->m_budgeting->pr_circulation_sheet($PRCode,$Desc,$NIP);
+
                 }
                 else
                 {

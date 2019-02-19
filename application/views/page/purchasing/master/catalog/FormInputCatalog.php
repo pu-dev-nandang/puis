@@ -55,7 +55,7 @@
 		<div class="form-group">
 			<div class="row">
 				<div class="col-xs-2">
-					<label class="control-label">Detail (Dynamic Input)</label>
+					<label class="control-label">Specification / Detail</label>
 				</div>
 				<div class="col-xs-2">
 					<button class="btn btn-default" id = "addDetail"><i class="icon-plus"></i> Add</button>
@@ -458,7 +458,7 @@
 		}
 		else
 		{
-			arr = '';
+			arr = {};
 		}
 
 		return arr;

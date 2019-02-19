@@ -5381,7 +5381,7 @@ Phone: (021) 29200456';
           $pr_create = $this->m_budgeting->GetPR_CreateByPRCode($PRCode);
           $pr_detail = $this->m_budgeting->GetPR_DetailByPRCode($PRCode);
 
-          $fpdf = new pdf('L', 'mm', 'A4');
+          $fpdf = new Pdf_mc_table('L', 'mm', 'A4');
           $fpdf->SetMargins(10,10,10,10);
           $fpdf->AddPage();
 
@@ -5459,20 +5459,20 @@ Phone: (021) 29200456';
             // header
             $w_no = 8;
             $w_smt = 8;
-            $w_desc = 65;
+            $w_desc = 55;
             $w_spec = 65;
-            $w_date_needed = 30;
+            $w_date_needed = 50;
             $w_qty = 22;
-            $w_pricest = 40;
-            $w_totalammount = 40;
-            $h=4.3;
+            $w_pricest = 35;
+            $w_totalammount = 35;
+            $h=4.4;
             $y += $rect_h+2;
             $fpdf->SetXY($x,$y);
             $fpdf->SetFillColor(255, 255, 255);
              $fpdf->Cell($w_no,$h,'No.',$border,0,'C',true);
              $fpdf->Cell($w_desc,$h,'Description',$border,0,'C',true);
              $fpdf->Cell($w_spec,$h,'Specification',$border,0,'C',true);
-             $fpdf->Cell($w_date_needed,$h,'Date Needed',$border,0,'C',true);
+             $fpdf->Cell($w_date_needed,$h,'Need',$border,0,'C',true);
              $fpdf->Cell($w_qty,$h,'Quantity',$border,0,'C',true);
              $fpdf->Cell($w_pricest,$h,'Price Estimated',$border,0,'C',true);
              $fpdf->Cell($w_totalammount,$h,'Total Amount',$border,1,'C',true);
@@ -5481,9 +5481,11 @@ Phone: (021) 29200456';
               $no = 1;
               $fpdf->SetFont('Arial','',$FontIsian);
               $total = 0;
-             for ($i=0; $i < count($pr_detail); $i++) { 
-                $fpdf->Cell($w_no,$h,$no ,$border,0,'C',true);
-                $fpdf->Cell($w_desc,$h,$pr_detail[$i]['Item'],$border,0,'C',true);
+              $fpdf->SetWidths(array($w_no,$w_desc,$w_spec,$w_date_needed,$w_qty,$w_pricest,$w_totalammount));
+              $fpdf->SetLineHeight(5);
+              $fpdf->SetAligns(array('C','L','L','L','C','C','C'));
+             for ($i=0; $i < count($pr_detail); $i++) {
+
                 $DetailCatalog = (array) json_decode($pr_detail[$i]['DetailCatalog']);
                 $Spec = '';
                 $arr = array();
@@ -5492,28 +5494,36 @@ Phone: (021) 29200456';
                 }
 
                 $Spec = implode(',', $arr);
-                $lenSpec = strlen($Spec);
-                // print_r($lenSpec);die();
-                if ($lenSpec > 25) {
-                    $Spec = substr($Spec, 0,50).'...';
+                if ($pr_detail[$i]['Spec_add'] != '' || $pr_detail[$i]['Spec_add'] != null) {
+                   $Spec = $pr_detail[$i]['Spec_add']."\n".implode(',', $arr);
                 }
-                $fpdf->Cell($w_spec,$h,$Spec,$border,0,'L',true);
-
-                $DateNeeded = date("d M Y", strtotime($pr_detail[0]['DateNeeded']));
-                $fpdf->Cell($w_date_needed,$h,$DateNeeded,$border,0,'C',true);
-                $fpdf->Cell($w_qty,$h,$pr_detail[$i]['Qty'],$border,0,'C',true);
-
+                
+                
+                $DateNeeded = 'Date : '.date("d M Y", strtotime($pr_detail[0]['DateNeeded']));
+                if ($pr_detail[$i]['Need'] != '' || $pr_detail[$i]['Need'] != null) {
+                    $DateNeeded .= "\n".'Need : '.$pr_detail[$i]['Need'];
+                }
+                
                 $UnitCost = 'Rp '.number_format($pr_detail[$i]['UnitCost'],2,',','.');
-                $fpdf->Cell($w_pricest,$h,$UnitCost,$border,0,'C',true);
-
                 $Subtotal= 'Rp '.number_format($pr_detail[$i]['SubTotal'],2,',','.');
-                $fpdf->Cell($w_totalammount,$h,$Subtotal,$border,1,'C',true);
+                $fpdf->Row(array(
+                   $no,
+                   $pr_detail[$i]['Item'],
+                   $Spec,
+                   $DateNeeded,
+                   $pr_detail[$i]['Qty'],
+                   $UnitCost,
+                   $Subtotal,
+
+                ));
+
                 $total = $total + $pr_detail[$i]['SubTotal'];
                 $no++;
                 $y += $h; 
              }
 
-             $Max = 20;
+             $Max = 10;
+             $h=4.4;
              for ($i=0; $i <$Max - count($pr_detail) ; $i++) { 
                  $fpdf->Cell($w_no,$h,'' ,$border,0,'C',true);
                  $fpdf->Cell($w_desc,$h,'',$border,0,'C',true);
@@ -5525,7 +5535,7 @@ Phone: (021) 29200456';
                  $y += $h;
              }
 
-             $y += $h;
+             $y = $fpdf->GetY();
              $x = $x +$w_no+$w_desc+$w_spec;
              $rsPPN = ($pr_create[0]['PPN'] / 100) * $total;
              $totAfterPPN = $total - $rsPPN;
@@ -5611,13 +5621,17 @@ Phone: (021) 29200456';
 
 
              // watermark
-                 // $fpdf->SetTextColor(255,192,203);
-                 // $fpdf->SetFont('Arial', '', 100);
-                 // $fpdf->Text(42, 70, 'C O P Y');
-
-                 // $fpdf->SetFont('Arial','B',50);
-                 // $fpdf->SetTextColor(255,192,203);
-                 // $fpdf->RotatedText(35,190,'Reject',35);  
+                if ($pr_create[0]['Status'] ==  2) {
+                    $fpdf->SetFont('Arial','B',50);
+                    $fpdf->SetTextColor(255,192,203);
+                    $fpdf->RotatedText(35,190,'Approve',35);  
+                }
+                elseif ($pr_create[0]['Status'] ==  3) {
+                    $fpdf->SetFont('Arial','B',50);
+                    $fpdf->SetTextColor(255,192,203);
+                    $fpdf->RotatedText(35,190,'Reject',35); 
+                }
+                 
                
 
              // show image in the next page
@@ -5672,11 +5686,11 @@ Phone: (021) 29200456';
                      }
                  }
                  // end show image in the next page
-            // print_r($arr_image);die();     
-            for ($i=0; $i < count($arr_image); $i++) { 
-                $fpdf->AddPage();
-                $fpdf->Image($arr_image[$i]['url'],100,40,100);
-            }
+               
+            // for ($i=0; $i < count($arr_image); $i++) { 
+            //     $fpdf->AddPage();
+            //     $fpdf->Image($arr_image[$i]['url'],100,40,100);
+            // }
 
           $fpdf->Output($filename,'I');  
 
