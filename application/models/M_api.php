@@ -3672,13 +3672,18 @@ class M_api extends CI_Model {
     }
 
     public function getInvigilatorSch($SemesterID,$Type,$NIP){
-        $data = $this->db->query('SELECT ex.*,cl.Room FROM db_academic.exam ex 
+        $data = $this->db->query('SELECT ex.*, cl.Room, mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup
+                                          FROM db_academic.exam ex
                                           LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
-                                          WHERE 
-                                          ex.SemesterID = "'.$SemesterID.'" AND
+                                          LEFT JOIN db_academic.exam_details exd ON (exd.ExamID = ex.ID)
+                                          LEFT JOIN db_academic.schedule s ON (s.ID = exd.ScheduleID)
+                                          LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                          LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                          WHERE ex.SemesterID = "'.$SemesterID.'" AND
                                           ex.Type = "'.$Type.'" AND 
                                           ( ex.Pengawas1 = "'.$NIP.'"
-                                           OR ex.Pengawas2 = "'.$NIP.'" ) 
+                                           OR ex.Pengawas2 = "'.$NIP.'" )
+                                           GROUP BY exd.ScheduleID
                                            ORDER BY ex.ExamDate, ex.ExamStart ASC')
                     ->result_array();
 

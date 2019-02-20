@@ -1228,6 +1228,44 @@ class C_api extends CI_Controller {
 
 
             }
+            else if($data_arr['action']=='addAttendanceFromTimetables'){
+                $dataForm = $data_arr['dataForm'];
+
+                if(count($dataForm)>0){
+                    for($i=0;$i<count($dataForm);$i++){
+                        $d = (array) $dataForm[$i];
+                        $check = $this->db->select('ID')
+                            ->get_where('db_academic.attendance_students',
+                                array(
+                                    'ID_Attd' => $d['ID_Attd'],
+                                    'NPM' => $d['NPM']
+                                ))->result_array();
+                        if(count($check)<=0){
+                            $this->db->insert('db_academic.attendance_students', $d);
+                        }
+                    }
+                }
+
+                return print_r(1);
+
+            }
+            else if($data_arr['action']=='removeAttendanceFromTimetables'){
+                $dataForm = $data_arr['dataForm'];
+
+                if(count($dataForm)>0){
+                    for($i=0;$i<count($dataForm);$i++){
+                        $d = (array) $dataForm[$i];
+
+                        $this->db->delete('db_academic.attendance_students', array(
+                            'ID_Attd' => $d['ID_Attd'],
+                            'NPM' => $d['NPM']
+                        ));
+
+                    }
+                }
+
+                return print_r(1);
+            }
             else if($data_arr['action']=='read'){
                 $dataWhere = (array) $data_arr['dataWhere'];
 
@@ -5561,7 +5599,6 @@ class C_api extends CI_Controller {
         if(count($data_arr)>0){
 
             if($data_arr['action']=='readScheduleInvigilator'){
-
                 $data = $this->m_api->getInvigilatorSch($data_arr['SemesterID'],
                     $data_arr['TypeExam'],$data_arr['NIP']);
                 return print_r(json_encode($data));
@@ -6675,10 +6712,12 @@ class C_api extends CI_Controller {
             $SubSesi = ($row['SubSesi']=='1') ? '<br/><span class="label label-warning">Sub-Sesi</span>' : '';
             $Attendance = ($row['Attendance']=='0') ? '<br/><span class="label label-danger"><i class="fa fa-filter margin-right"></i> No Attd</span>' : '';
 
-            $dataSchedule = $this->db->query('SELECT cl.Room, d.NameEng AS DayEng, sd.StartSessions, sd.EndSessions 
+            $dataSchedule = $this->db->query('SELECT cl.Room, d.NameEng AS DayEng, sd.StartSessions, sd.EndSessions, attd.ID AS ID_Attd 
                                                                       FROM db_academic.schedule_details sd
                                                                       LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
                                                                       LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
+                                                                      LEFT JOIN db_academic.attendance attd ON (attd.ScheduleID = sd.ScheduleID 
+                                                                      AND attd.SDID = sd.ID)
                                                                         WHERE sd.ScheduleID = "'.$row['ID'].'"
                                                                          ORDER BY sd.DayID ASC ')->result_array();
             $ScheduleDetails = '';
@@ -6733,7 +6772,39 @@ class C_api extends CI_Controller {
             }
 
             $Student = $this->m_api->__getStudentApprovedKRS($row['ID']);
+
             $Student_plan = $this->m_api->__getStudentNotYetApprovedKRS($row['ID']);
+
+            // Keadaan di attendance
+            for ($st=0;$st<count($Student_plan);$st++){
+                $dstd = $Student_plan[$st];
+                $attd_s = [];
+                $totalAttd = count($dataSchedule);
+                $temp_total = 0;
+                if(count($dataSchedule)>0){
+                    foreach ($dataSchedule AS $item2){
+                        $dataCheckAttd = $this->db->select('ID')->get_where('db_academic.attendance_students',array(
+                            'ID_Attd' => $item2['ID_Attd'],
+                            'NPM' => $dstd['NPM']
+                        ))->result_array();
+
+                        if(count($dataCheckAttd)>0){
+                            $temp_total += 1;
+                        }
+
+                        $atrt = array(
+                            'ID_Attd' => $item2['ID_Attd'],
+                            'ID_Attd_Student' => (count($dataCheckAttd)>0) ? $dataCheckAttd[0]['ID'] : ''
+                        );
+                        array_push($attd_s,$atrt);
+                    }
+                }
+
+                $Student_plan[$st]['Attendance'] = $attd_s;
+                $Student_plan[$st]['TotalAttd'] = $temp_total;
+            }
+
+
             $stdDetails_cuy = json_encode(array(
                 'Approve' => $Student,
                 'Planning' => $Student_plan
