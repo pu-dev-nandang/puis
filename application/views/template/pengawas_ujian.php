@@ -1,68 +1,67 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<!--    <meta http-equiv="X-UA-Compatible" content="ie=edge">-->
     <title>Invigilator Page | Podomoro University</title>
     <link rel="shortcut icon" type="image/x-icon" href="<?php echo base_url('images/icon/favicon.png'); ?>">
 
     <?php echo $include; ?>
 
+    <style>
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            background: #607d8b;
+        }
+        .tb-profile{
+            border-top: 7px solid #03a9f4;
+            border-radius: 0px;
+            padding: 15px;
+            /*padding-top: 30px;*/
+        }
+        .tb-sch {
+            border-top: 7px solid #ff5722;
+            border-radius: 0px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        .tb-sch h3{
+            font-weight: bold;
+            border-left: 9px solid #ff5722;
+            padding-left: 7px;
+        }
+
+        .tb-sch-list {
+            border-top: 7px solid #ffc107;
+            border-radius: 0px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tb-sch-list h3 {
+            font-weight: bold;
+            border-left: 9px solid #ffc107;
+            padding-left: 7px;
+        }
+
+        #table-sch-inv thead tr th, #table-sch-inv-today thead tr th {
+            text-align: center;
+            background: #437e88;
+            color: #ffffff;
+        }
+
+        #table-sch-inv tbody tr td,#table-sch-inv-today tbody tr td {
+            text-align: center;
+        }
+        .img-profile {
+            max-width: 100px;
+            border: 2px solid #CCCCCC;
+            padding: 3px;
+        }
+    </style>
+
 </head>
-
-<style>
-    body {
-        font-family: 'Noto Sans', sans-serif;
-        background: #607d8b;
-    }
-    .tb-profile{
-        border-top: 7px solid #03a9f4;
-        border-radius: 0px;
-        padding: 15px;
-        /*padding-top: 30px;*/
-    }
-    .tb-sch {
-        border-top: 7px solid #ff5722;
-        border-radius: 0px;
-        padding: 10px;
-        margin-bottom: 15px;
-    }
-    .tb-sch h3{
-        font-weight: bold;
-        border-left: 9px solid #ff5722;
-        padding-left: 7px;
-    }
-
-    .tb-sch-list {
-        border-top: 7px solid #ffc107;
-        border-radius: 0px;
-        padding: 10px;
-        margin-bottom: 15px;
-    }
-
-    .tb-sch-list h3 {
-        font-weight: bold;
-        border-left: 9px solid #ffc107;
-        padding-left: 7px;
-    }
-
-    #table-sch-inv thead tr th, #table-sch-inv-today thead tr th {
-        text-align: center;
-        background: #437e88;
-        color: #ffffff;
-    }
-
-    #table-sch-inv tbody tr td,#table-sch-inv-today tbody tr td {
-        text-align: center;
-    }
-    .img-profile {
-        max-width: 100px;
-        border: 3px dashed #03a9f4ad;
-        padding: 3px;
-    }
-</style>
 
 <body>
 
@@ -88,20 +87,7 @@
                     <h3 style="margin-bottom: 0px;"><b><?php echo $name; ?></b></h3>
                     <h5 style="margin-top: 3px;color: #009688;"><?php echo $this->session->userdata('NIP'); ?></h5>
 
-                    <hr/>
 
-                    <div style="text-align: left;">
-                        <div class="form-group">
-                            <select class="form-control form-filter-inv" id="filterTypeExam">
-                                <option value="uts">UTS</option>
-                                <option value="uas">UAS</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <select class="form-control form-filter-inv" id="filterSemester">
-                            </select>
-                        </div>
-                    </div>
 
                     <hr style="margin-bottom: 5px;"/>
                     <button id="btnLogOutInv" class="btn btn-danger">Sign Out Now</button>
@@ -115,7 +101,7 @@
                 Login at : <?php echo date('d M Y h:i:s',strtotime($this->session->userdata('LoginAt'))); ?>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-10">
             <div class="thumbnail tb-sch  animated flipInX" style="min-height: 100px;">
                 <div class="pull-right" style="color: #2196f3;">
                     <span id="dateToday"></span>
@@ -123,16 +109,42 @@
 
                 <h3>Invigilator Schedule</h3>
 
+                <hr/>
+
+                <div class="col-md-6 col-md-offset-3">
+                    <div class="well">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <select class="form-control form-filter-inv" id="filterSemester">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <select class="form-control form-filter-inv" id="filterTypeExam">
+                                        <option value="uts">UTS</option>
+                                        <option value="uas">UAS</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
                 <div style="margin-top: 20px;">
 
                     <table class="table table-bordered table-striped" id="table-sch-inv">
                         <thead>
                         <tr>
-                            <th style="width: 5%;">No</th>
-                            <th>Day, Date</th>
-                            <th style="width: 20%;">Time</th>
-                            <th style="width: 15%;">Room</th>
-                            <th style="width: 15%;">Action</th>
+                            <th style="width: 1%;">No</th>
+                            <th style="width: 7%;">Group</th>
+                            <th>Course</th>
+                            <th>Day, Date Time</th>
+                            <th style="width: 10%;">Room</th>
+                            <th style="width: 10%;">Attendance</th>
+                            <th style="width: 10%;">Layout</th>
                         </tr>
                         </thead>
                         <tbody id="dataInvSchedule"></tbody>
@@ -141,27 +153,28 @@
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="thumbnail tb-sch-list  animated flipInX" style="min-height: 100px;">
+<!--        <div class="col-md-4">-->
+<!--            <div class="thumbnail tb-sch-list  animated flipInX" style="min-height: 100px;">-->
+<!---->
+<!--                <h3>Today</h3>-->
+<!---->
+<!--                <div style="margin-top: 20px;">-->
+<!---->
+<!--                    <table class="table table-bordered" id="table-sch-inv-today">-->
+<!--                        <thead>-->
+<!--                        <tr>-->
+<!--                            <th style="width: 5%;">No</th>-->
+<!--                            <th>Time</th>-->
+<!--                            <th style="width: 20%;">Room</th>-->
+<!--                            <th style="width: 5%;">Action</th>-->
+<!--                        </tr>-->
+<!--                        </thead>-->
+<!--                        <tbody id="dataInvScheduleToday"></tbody>-->
+<!--                    </table>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
 
-                <h3>Today</h3>
-
-                <div style="margin-top: 20px;">
-
-                    <table class="table table-bordered" id="table-sch-inv-today">
-                        <thead>
-                        <tr>
-                            <th style="width: 5%;">No</th>
-                            <th>Time</th>
-                            <th style="width: 20%;">Room</th>
-                            <th style="width: 5%;">Action</th>
-                        </tr>
-                        </thead>
-                        <tbody id="dataInvScheduleToday"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -182,8 +195,8 @@
         var sessionLoginAt = "<?php echo $this->session->userdata('LoginAt'); ?>";
         var endSesi = sessionLoginAt.split(' ')[1];
 
-        countdw('#viewCD',endSesi);
-        timeOutCw(endSesi);
+        // countdw('#viewCD',endSesi);
+        // timeOutCw(endSesi);
     });
 
     $('.form-filter-inv').change(function () {
@@ -257,28 +270,151 @@
                         no+=1;
                         $('#dataInvSchedule').append('<tr>' +
                             '<td>'+no+'</td>' +
-                            '<td>'+ddt+'</td>' +
-                            '<td>'+time+'</td>' +
+                            '<td>'+d.ClassGroup+'</td>' +
+                            '<td style="text-align: left;">'+d.MKCode+' - '+d.CourseEng+'</td>' +
+                            '<td style="text-align: right">'+ddt+'<br/><b>'+time+'</b></td>' +
                             '<td>'+d.Room+'</td>' +
+                            '<td><button data-id="'+d.ID+'" class="btn btn-primary btnLoadAttendance">Attendance</button></td>' +
                             '<td><a href="'+base_url_js+'save2pdf/exam-layout/'+d.ID+'" target="_blank" class="btn btn-default btn-sm btn-default-success"><i class="fa fa-arrows-alt margin-right"></i> Layout</a></td>' +
                             '</tr>');
 
-                        if(today==d.ExamDate){
-                            noToday+=1;
-                            $('#dataInvScheduleToday').append('<tr>' +
-                                '<td>'+noToday+'</td>' +
-                                '<td>'+time+'</td>' +
-                                '<td>'+d.Room+'</td>' +
-                                '<td><a href="'+base_url_js+'save2pdf/exam-layout/'+d.ID+'" target="_blank" class="btn btn-default btn-sm btn-default-success"><i class="fa fa-arrows-alt margin-right"></i> Layout</a></td>' +
-                                '</tr>');
-                        }
+                        // if(today==d.ExamDate){
+                        //     noToday+=1;
+                        //     $('#dataInvScheduleToday').append('<tr>' +
+                        //         '<td>'+noToday+'</td>' +
+                        //         '<td>'+time+'</td>' +
+                        //         '<td>'+d.Room+'</td>' +
+                        //         '<td><a href="'+base_url_js+'save2pdf/exam-layout/'+d.ID+'" target="_blank" class="btn btn-default btn-sm btn-default-success"><i class="fa fa-arrows-alt margin-right"></i> Layout</a></td>' +
+                        //         '</tr>');
+                        // }
 
                     }
-                    if(noToday==0){
-                        $('#dataInvScheduleToday').append('<tr>' +
-                            '<td colspan="4" style="text-align: center;">--- Data Not Yet ---</td>' +
-                            '</tr>');
-                    }
+
+                    $('.btnLoadAttendance').click(function () {
+                        var ID = $(this).attr('data-id');
+                        
+                        var data = {
+                            action : 'readAttendanceExam',
+                            ID : ID
+                        };
+                        
+                        var token = jwt_encode(data,'UAP)(*');
+                        var url = base_url_js+'api2/__crudAttendance2';
+                        
+                        $.post(url,{token:token},function (jsonResult) {
+                            console.log(jsonResult);
+
+                            $('#GlobalModal .modal-header').html('<h4 class="modal-title">Students Attendance <input class="hide" id="totalStudents" value="'+jsonResult.length+'" ></h4>');
+                            $('#GlobalModal .modal-body').html('<div class="row">' +
+                                '    <div class="col-md-12">' +
+                                '       <div>' +
+                                '<table class="table">' +
+                                '    <thead>' +
+                                '    <tr>' +
+                                '        <th style="width: 1%;">No</th>' +
+                                '        <th>Student</th>' +
+                                '        <th style="width: 15%;">Attendace</th>' +
+                                '    </tr>' +
+                                '    </thead>' +
+                                '    <tbody id="dataStudent">' +
+                                '    </tbody>' +
+                                '</table>' +
+                                '</div>' +
+                                '        <hr>' +
+                                '        <div style="text-align: right;">' +
+                                '            <button type="button" class="btn btn-success" id="btnSubmitAttdStd" disabled>Submit</button> | ' +
+                                '            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
+                                '        </div>' +
+                                '    </div>' +
+                                '</div>');
+
+                            if(jsonResult.length>0){
+                                var no = 1;
+                                $.each(jsonResult,function (i, v) {
+
+                                    var ckcAttd = (v.Status==1 || v.Status=='1') ? 'checked' : '';
+
+                                    $('#dataStudent').append('<tr id="trAttd'+no+'">' +
+                                        '<td style="text-align: center;color: #333;">'+no+'</td>' +
+                                        '<td>' +
+                                        '   <span style="font-size: 17px;">'+v.Name+'</span><br/>'+v.NPM+'' +
+                                        '<input id="formID'+no+'" class="hide" value="'+v.ID+'"/>' +
+                                        '</td>' +
+                                        '<td>' +
+                                        '<div class="checkbox checbox-switch switch-success ">' +
+                                        '    <label>' +
+                                        '        <input type="checkbox" class="checkAttdStd" id="formAttd'+no+'" '+ckcAttd+'>' +
+                                        '        <span></span>' +
+                                        '    </label>' +
+                                        '</div>' +
+                                        '</td>' +
+                                        '</tr>');
+
+                                    no +=1;
+                                });
+                            }
+
+                            checkAttendance();
+
+                            $('.checkAttdStd').change(function () {
+                                checkAttendance();
+                            });
+
+                            $('#btnSubmitAttdStd').prop('disabled',false)
+
+                            $('#btnSubmitAttdStd').click(function () {
+
+                                loading_buttonSm('#btnSubmitAttdStd');
+                                $('button[data-dismiss=modal]').prop('disabled',true);
+
+                                var arrAttd = [];
+
+                                var totalStudents = $('#totalStudents').val();
+                                for(var i=1;i<=parseInt(totalStudents);i++){
+                                    var ExamDetailsID = $('#formID'+i).val();
+                                    var arr = {
+                                        ExamDetailsID : ExamDetailsID,
+                                        Status : ($('#formAttd'+i).is(':checked')) ? '1' : '-1'
+                                    };
+
+                                    arrAttd.push(arr);
+                                }
+
+                                var data2 = {
+                                    action : 'insertAttdExam',
+                                    arrAttd : arrAttd
+                                };
+
+                                var token2 = jwt_encode(data2,'UAP)(*');
+                                $.post(url,{token:token2},function (result) {
+                                    toastr.success('Attendance saved','Success');
+                                    setTimeout(function () {
+                                        $('#btnSubmitAttdStd').html('Submit');
+                                        $('button[data-dismiss=modal],#btnSubmitAttdStd').prop('disabled',false);
+                                    },500);
+                                })
+
+
+                            });
+
+
+                            $('#GlobalModal .modal-footer').addClass('hide');
+
+                            $('#GlobalModal').modal({
+                                'show' : true,
+                                'backdrop' : 'static'
+                            });
+
+                        })
+                        
+                        
+                    });
+
+                    // if(noToday==0){
+                    //     $('#dataInvScheduleToday').append('<tr>' +
+                    //         '<td colspan="4" style="text-align: center;">--- Data Not Yet ---</td>' +
+                    //         '</tr>');
+                    // }
                 } else {
                     $('#dataInvSchedule').append('<tr>' +
                         '<td colspan="5" style="text-align: center;">--- Data Not Yet ---</td>' +
@@ -294,6 +430,23 @@
         }
     }
 
+    function checkAttendance() {
+        var totalStudents = $('#totalStudents').val();
+        for(var i=1;i<=parseInt(totalStudents);i++){
+            if($('#formAttd'+i).is(':checked')){
+                $('#trAttd'+i).css({
+                    'color' : '#333',
+                    'background' : '#fff'
+                });
+            } else {
+                $('#trAttd'+i).css({
+                    'color':'red',
+                    'background' : '#ff00001c'
+                });
+            }
+        }
+    }
+
     function outInv() {
         loading_button('#btnLogOutInv');
         var url = base_url_js+"auth/logMeOut";
@@ -304,5 +457,24 @@
         });
     }
 </script>
+
+
+<div class="modal fade" id="GlobalModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Modal title</h4>
+            </div>
+            <div class="modal-body">
+                <p>One fine body&hellip;</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 </body>
 </html>

@@ -1551,6 +1551,40 @@ class C_api2 extends CI_Controller {
 
             }
 
+            // === Exam ===
+            else if($data_arr['action']=='readAttendanceExam'){
+                $ExamID = $data_arr['ID'];
+
+                $data = $this->db->query('SELECT ex.*, ats.Name FROM db_academic.exam_details ex 
+                                                    LEFT JOIN db_academic.auth_students ats 
+                                                    ON (ats.NPM = ex.NPM)
+                                                    WHERE ex.ExamID = "'.$ExamID.'" 
+                                                    ORDER BY ex.NPM ASC')->result_array();
+
+                return print_r(json_encode($data));
+
+            }
+
+            else if($data_arr['action']=='insertAttdExam'){
+
+                $arrAttd = $data_arr['arrAttd'];
+
+                if(count($arrAttd)>0){
+                    for($i=0;$i<count($arrAttd);$i++){
+                        $d = (array) $arrAttd[$i];
+                        $this->db->set('Status', $d['Status']);
+                        $this->db->where('ID', $d['ExamDetailsID']);
+                        $this->db->update('db_academic.exam_details');
+                    }
+                }
+
+
+
+                return print_r(1);
+            }
+
+            // === Penutup Exam ===
+
         }
     }
 
