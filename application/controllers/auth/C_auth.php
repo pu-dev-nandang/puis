@@ -49,24 +49,7 @@ class C_auth extends Globalclass {
 
 //        $this->load->view('md5');
 
-        if($table=='updateMKtransfer'){
-            $data = $this->db->get('db_academic.transfer_history_conversion')->result_array();
-
-            foreach ($data AS $item){
-
-                $db_ = 'ta_'.$item['TA_After'];
-
-                $dataUpdate = array(
-                    'TransferCourse' => '1'
-                );
-                $this->db->where('ID', $item['SPID_After']);
-                $this->db->update($db_.'.study_planning',$dataUpdate);
-                $this->db->reset_query();
-
-
-            }
-
-        }
+        
     }
 
     public function getReportEdom($ClassOf){
