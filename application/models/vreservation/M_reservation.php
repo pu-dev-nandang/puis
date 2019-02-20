@@ -1143,141 +1143,141 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
     }
 
-    public function getDataT_bookingByUser($Start = null,$Status = 0,$both = '')
-    {
-        $arr_result = array();
-        $this->load->model('master/m_master');
-        $Start = ($Start == null) ? ' and Start >= timestamp(DATE_SUB(NOW(), INTERVAL 30 MINUTE))' : ' and Start like "%'.$Start.'%"';
-        if ($both == '') {
-            $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP where a.Status = ?
-                     '.$Start.' and a.CreatedBy = ? ';
-            $query=$this->db->query($sql, array($Status,$this->session->userdata('NIP')))->result_array();         
-        }
-        else
-        {
-            $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP where a.Status like "%"
-                     '.$Start.' and a.CreatedBy = ? ';
-            $query=$this->db->query($sql, array($this->session->userdata('NIP')))->result_array();           
-        }
+    // public function getDataT_bookingByUser($Start = null,$Status = 0,$both = '')
+    // {
+    //     $arr_result = array();
+    //     $this->load->model('master/m_master');
+    //     $Start = ($Start == null) ? ' and Start >= timestamp(DATE_SUB(NOW(), INTERVAL 30 MINUTE))' : ' and Start like "%'.$Start.'%"';
+    //     if ($both == '') {
+    //         $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP where a.Status = ?
+    //                  '.$Start.' and a.CreatedBy = ? ';
+    //         $query=$this->db->query($sql, array($Status,$this->session->userdata('NIP')))->result_array();         
+    //     }
+    //     else
+    //     {
+    //         $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP where a.Status like "%"
+    //                  '.$Start.' and a.CreatedBy = ? ';
+    //         $query=$this->db->query($sql, array($this->session->userdata('NIP')))->result_array();           
+    //     }
         
         
-        // print_r($query);die();
-        for ($i=0; $i < count($query); $i++) { 
-            $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['Start']);
-            $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['End']);
-            $StartNameDay = $Startdatetime->format('l');
-            $EndNameDay = $Enddatetime->format('l');
-            $Time = $query[$i]['Time'].' Minutes';
-            $ID_equipment_add = '-';
-            $Name_equipment_add = '-';
-            if ($query[$i]['ID_equipment_add'] != '' || $query[$i]['ID_equipment_add'] != null) {
-                $ID_equipment_add = explode(',', $query[$i]['ID_equipment_add']);
-                $Name_equipment_add = '<ul>';
-                for ($j=0; $j < count($ID_equipment_add); $j++) { 
-                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add[$j]);
-                    // print_r($ID_equipment_add);die();
-                    $ID_m_equipment = $get[0]['ID_m_equipment'];
-                    $Owner = $get[0]['Owner'];
-                    $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$Owner);
-                    $Owner = $getX[0]['Division'];
+    //     // print_r($query);die();
+    //     for ($i=0; $i < count($query); $i++) { 
+    //         $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['Start']);
+    //         $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['End']);
+    //         $StartNameDay = $Startdatetime->format('l');
+    //         $EndNameDay = $Enddatetime->format('l');
+    //         $Time = $query[$i]['Time'].' Minutes';
+    //         $ID_equipment_add = '-';
+    //         $Name_equipment_add = '-';
+    //         if ($query[$i]['ID_equipment_add'] != '' || $query[$i]['ID_equipment_add'] != null) {
+    //             $ID_equipment_add = explode(',', $query[$i]['ID_equipment_add']);
+    //             $Name_equipment_add = '<ul>';
+    //             for ($j=0; $j < count($ID_equipment_add); $j++) { 
+    //                 $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add[$j]);
+    //                 // print_r($ID_equipment_add);die();
+    //                 $ID_m_equipment = $get[0]['ID_m_equipment'];
+    //                 $Owner = $get[0]['Owner'];
+    //                 $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$Owner);
+    //                 $Owner = $getX[0]['Division'];
 
-                    $Qty = $get[0]['Qty'];
-                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
-                    $Name_equipment_add .= '<li>'.$get[0]['Equipment'].' by '.$Owner.'['.$Qty.']</li>';
-                }
-                $Name_equipment_add .= '</ul>';
-            }
+    //                 $Qty = $get[0]['Qty'];
+    //                 $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
+    //                 $Name_equipment_add .= '<li>'.$get[0]['Equipment'].' by '.$Owner.'['.$Qty.']</li>';
+    //             }
+    //             $Name_equipment_add .= '</ul>';
+    //         }
 
-            $ID_add_personel = '-';
-            $Name_add_personel = '-';
-            if ($query[$i]['ID_add_personel'] != '' || $query[$i]['ID_add_personel'] != null) {
-                $ID_add_personel = explode(',', $query[$i]['ID_add_personel']);
-                $Name_add_personel = '<ul>';
-                for ($j=0; $j < count($ID_add_personel); $j++) { 
-                    $get = $this->m_master->caribasedprimary('db_employees.division','ID',$ID_add_personel[$j]);
-                    $Name_add_personel .= '<li>'.$get[0]['Division'].'</li>';
-                }
+    //         $ID_add_personel = '-';
+    //         $Name_add_personel = '-';
+    //         if ($query[$i]['ID_add_personel'] != '' || $query[$i]['ID_add_personel'] != null) {
+    //             $ID_add_personel = explode(',', $query[$i]['ID_add_personel']);
+    //             $Name_add_personel = '<ul>';
+    //             for ($j=0; $j < count($ID_add_personel); $j++) { 
+    //                 $get = $this->m_master->caribasedprimary('db_employees.division','ID',$ID_add_personel[$j]);
+    //                 $Name_add_personel .= '<li>'.$get[0]['Division'].'</li>';
+    //             }
 
-                $Name_add_personel .= '</ul>';
-            }
+    //             $Name_add_personel .= '</ul>';
+    //         }
 
-            $Reqdatetime = DateTime::createFromFormat('Y-m-d', $query[$i]['Req_date']);
-            $ReqdateNameDay = $Reqdatetime->format('l');
+    //         $Reqdatetime = DateTime::createFromFormat('Y-m-d', $query[$i]['Req_date']);
+    //         $ReqdateNameDay = $Reqdatetime->format('l');
 
-            $MarkomSupport = '<label>No</Label>';
-            if ($query[$i]['MarcommSupport'] != '') {
-                $MarkomSupport = '<ul>';
-                $dd = explode(',', $query[$i]['MarcommSupport']);
-                    $dzx = array();
-                // split for note
-                    for ($xz=0; $xz < count($dd); $xz++) { 
-                        $pos1 = stripos($dd[$xz], 'Note');
-                        $exitLoop = false;
-                        if ($pos1 !== false) {
-                            $temp = array();
-                            for ($ixx = $xz; $ixx < count($dd); $ixx++) { 
-                                $temp[] = $dd[$ixx];
-                            }
-                            $dzx[] = implode(',', $temp);
-                            $exitLoop = true;
-                        }
-                        else
-                        {
-                            $dzx[] = $dd[$xz];
-                        }
+    //         $MarkomSupport = '<label>No</Label>';
+    //         if ($query[$i]['MarcommSupport'] != '') {
+    //             $MarkomSupport = '<ul>';
+    //             $dd = explode(',', $query[$i]['MarcommSupport']);
+    //                 $dzx = array();
+    //             // split for note
+    //                 for ($xz=0; $xz < count($dd); $xz++) { 
+    //                     $pos1 = stripos($dd[$xz], 'Note');
+    //                     $exitLoop = false;
+    //                     if ($pos1 !== false) {
+    //                         $temp = array();
+    //                         for ($ixx = $xz; $ixx < count($dd); $ixx++) { 
+    //                             $temp[] = $dd[$ixx];
+    //                         }
+    //                         $dzx[] = implode(',', $temp);
+    //                         $exitLoop = true;
+    //                     }
+    //                     else
+    //                     {
+    //                         $dzx[] = $dd[$xz];
+    //                     }
 
-                        if ($exitLoop) {
-                            break;
-                        }
-                    }
+    //                     if ($exitLoop) {
+    //                         break;
+    //                     }
+    //                 }
 
-                    $dd = $dzx;
-                for ($zx=0; $zx < count($dd); $zx++) {
-                    $a = 'How are you?';
+    //                 $dd = $dzx;
+    //             for ($zx=0; $zx < count($dd); $zx++) {
+    //                 $a = 'How are you?';
 
-                    if (strpos($dd[$zx], 'Graphic Design') !== false) {
-                         $pos = strpos($dd[$zx],'[');
-                         $li = substr($dd[$zx], 0,$pos);
-                         $posE = strpos($dd[$zx],']');
-                         $ISIe = substr($dd[$zx], ($pos+1), $posE);
-                         $length = strlen($ISIe);
-                         $ISIe = substr($ISIe, 0, ($length - 1));
-                         // print_r($ISIe);die();
-                         $MarkomSupport .= '<li>'.$li;
-                         $FileMarkom = explode(';', $ISIe);
-                         $MarkomSupport .= '<ul>';
-                         for ($vc=0; $vc < count($FileMarkom); $vc++) { 
-                            $MarkomSupport .= '<li>'.'<a href="'.base_url("fileGetAny/vreservation-".$FileMarkom[$vc]).'" target="_blank"></i>'.$FileMarkom[$vc].'</a>';
-                         }
-                         $MarkomSupport .= '</ul></li>';
-                    } 
-                    else{
-                      $MarkomSupport .= '<li>'.$dd[$zx].'</li>';  
-                    }
+    //                 if (strpos($dd[$zx], 'Graphic Design') !== false) {
+    //                      $pos = strpos($dd[$zx],'[');
+    //                      $li = substr($dd[$zx], 0,$pos);
+    //                      $posE = strpos($dd[$zx],']');
+    //                      $ISIe = substr($dd[$zx], ($pos+1), $posE);
+    //                      $length = strlen($ISIe);
+    //                      $ISIe = substr($ISIe, 0, ($length - 1));
+    //                      // print_r($ISIe);die();
+    //                      $MarkomSupport .= '<li>'.$li;
+    //                      $FileMarkom = explode(';', $ISIe);
+    //                      $MarkomSupport .= '<ul>';
+    //                      for ($vc=0; $vc < count($FileMarkom); $vc++) { 
+    //                         $MarkomSupport .= '<li>'.'<a href="'.base_url("fileGetAny/vreservation-".$FileMarkom[$vc]).'" target="_blank"></i>'.$FileMarkom[$vc].'</a>';
+    //                      }
+    //                      $MarkomSupport .= '</ul></li>';
+    //                 } 
+    //                 else{
+    //                   $MarkomSupport .= '<li>'.$dd[$zx].'</li>';  
+    //                 }
                     
-                }
-                $MarkomSupport .= '</ul>';
+    //             }
+    //             $MarkomSupport .= '</ul>';
 
-            }
+    //         }
 
-            $arr_result[] = array(
-                    'Start' => $StartNameDay.', '.$query[$i]['Start'],
-                    'End' => $EndNameDay.', '.$query[$i]['End'],
-                    'Time' => $Time,
-                    'Agenda' => $query[$i]['Agenda'],
-                    'Room' => $query[$i]['Room'],
-                    'Equipment_add' => $Name_equipment_add,
-                    'Persone_add' => $Name_add_personel,
-                    'Req_date' => $query[$i]['Name'].'<br>'.$ReqdateNameDay.', '.$query[$i]['Req_date'],
-                    'Req_layout' => $query[$i]['Req_layout'],
-                    'ID' => $query[$i]['ID'],
-                    'Status' => $query[$i]['Status'],
-                    'MarkomSupport' => $MarkomSupport
-            );
-        }
+    //         $arr_result[] = array(
+    //                 'Start' => $StartNameDay.', '.$query[$i]['Start'],
+    //                 'End' => $EndNameDay.', '.$query[$i]['End'],
+    //                 'Time' => $Time,
+    //                 'Agenda' => $query[$i]['Agenda'],
+    //                 'Room' => $query[$i]['Room'],
+    //                 'Equipment_add' => $Name_equipment_add,
+    //                 'Persone_add' => $Name_add_personel,
+    //                 'Req_date' => $query[$i]['Name'].'<br>'.$ReqdateNameDay.', '.$query[$i]['Req_date'],
+    //                 'Req_layout' => $query[$i]['Req_layout'],
+    //                 'ID' => $query[$i]['ID'],
+    //                 'Status' => $query[$i]['Status'],
+    //                 'MarkomSupport' => $MarkomSupport
+    //         );
+    //     }
 
-        return $arr_result;         
-    }
+    //     return $arr_result;         
+    // }
 
     public function getForReturn_eq()
     {
@@ -1448,11 +1448,13 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                          break;
                     case 1:
                     case 2:
-                        $StatusBooking = 'Awaiting approval 1';
+                        $NameApprover = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        $StatusBooking = 'Awaiting approval 1 : '.$NameApprover;
                         break;
                     case 3:
                     case 4:
-                        $StatusBooking = 'Awaiting approval 2';
+                        $NameApprover = $this->Get_Approver(2,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        $StatusBooking = 'Awaiting approval 2 : '.$NameApprover;
                         break;
                     case 5:
                         $StatusBooking = 'Approved';
@@ -1782,6 +1784,21 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                                                            }
                                                                            
                                                                        }
+                                                                    }
+                                                                    elseif ($DivisionCreated[0] == 34) {
+                                                                        // find faculty
+                                                                        $gg = $this->m_master->caribasedprimary('db_academic.faculty','AdminID',$CreatedBy);
+                                                                        if (count($gg) > 0) {
+                                                                            for ($k=0; $k < count($gg); $k++) { 
+                                                                                $Kaprodi = $gg[$k]['NIP'];
+                                                                                if ($Kaprodi == $NIP) {
+                                                                                    $find++;
+                                                                                    $getLoop = false;     
+                                                                                    break;
+                                                                                }
+                                                                            }
+                                                                            
+                                                                        }
                                                                     }
                                                                     else
                                                                     {
@@ -2124,7 +2141,6 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     // if ($MarcommStatus == 1) {
                     //     return $find = 0;
                     // }
-
                     $PositionMain = $this->session->userdata('PositionMain');
                     $IDDivision = $PositionMain['IDDivision'];
                     $Position = $PositionMain['IDPosition'];
@@ -2180,6 +2196,51 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                                                            }
                                                                            
                                                                        }
+                                                                    }
+                                                                    elseif ($DivisionCreated[0] == 34) {
+                                                                        // find faculty
+                                                                        $gg = $this->m_master->caribasedprimary('db_academic.faculty','AdminID',$CreatedBy);
+                                                                        if (count($gg) > 0) {
+                                                                            for ($k=0; $k < count($gg); $k++) { 
+                                                                                $Kaprodi = $gg[$k]['NIP'];
+                                                                                if ($Kaprodi == $NIP) {
+                                                                                    $find++;
+                                                                                    $getLoop = false;     
+                                                                                    break;
+                                                                                }
+                                                                            }
+                                                                            
+                                                                        }
+                                                                    }
+                                                                    elseif ($DivisionCreated[0] == 33) {
+                                                                        // find faculty
+                                                                        $gg = $this->m_master->caribasedprimary('db_academic.faculty','Laboran',$CreatedBy);
+                                                                        if (count($gg) > 0) {
+                                                                            for ($k=0; $k < count($gg); $k++) { 
+                                                                                $Kaprodi = $gg[$k]['NIP'];
+                                                                                if ($Kaprodi == $NIP) {
+                                                                                    $find++;
+                                                                                    $getLoop = false;     
+                                                                                    break;
+                                                                                }
+                                                                            }
+                                                                            
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            $gg = $this->m_master->caribasedprimary('db_academic.program_study','Laboran',$CreatedBy);
+                                                                            if (count($gg) > 0) {
+                                                                                for ($k=0; $k < count($gg); $k++) { 
+                                                                                    $Kaprodi = $gg[$k]['KaprodiID'];
+                                                                                    if ($Kaprodi == $NIP) {
+                                                                                        $find++;
+                                                                                        $getLoop = false;     
+                                                                                        break;
+                                                                                    }
+                                                                                }
+                                                                                
+                                                                            }
+                                                                        }
                                                                     }
                                                                     else
                                                                     {
@@ -2313,11 +2374,14 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                          break;
                     case 1:
                     case 2:
-                        $StatusBooking = 'Awaiting approval 1';
+                        // find nama approval
+                        $NameApprover = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        $StatusBooking = 'Awaiting approval 1 : '.$NameApprover;
                         break;
                     case 3:
                     case 4:
-                        $StatusBooking = 'Awaiting approval 2';
+                        $NameApprover = $this->Get_Approver(2,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        $StatusBooking = 'Awaiting approval 2 : '.$NameApprover;
                         break;
                     case 5:
                         $StatusBooking = 'Approved';
@@ -3570,5 +3634,132 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         }
 
         return $arr_result;  
+    }
+
+
+    public function Get_Approver($ApprverNumber,$ID_CategoryRoom,$CreatedBy)
+    {
+        $Name = '';
+        $CategoryRoomByRoom = $ID_CategoryRoom;
+        $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
+        $Approver1 = $getDataCategoryRoom[0]['Approver1'];
+        $Approver1 = json_decode($Approver1);
+        $ID_group_user = $this->m_master->caribasedprimary('db_reservation.previleges_guser','NIP',$CreatedBy);
+        $ID_group_user = $ID_group_user[0]['G_user'];
+        $EM = $this->m_master->caribasedprimary('db_employees.employees','NIP',$CreatedBy);
+        if ($ApprverNumber == 1) {
+            for ($l=0; $l < count($Approver1); $l++) {
+                // find by ID_group_user
+                    if ($ID_group_user == $Approver1[$l]->UserType) {
+                        // get TypeApprover
+                        $TypeApprover = $Approver1[$l]->TypeApprover;
+                        switch ($TypeApprover) {
+                            case 'Position':
+                                // get Division to access position approval
+                                    $PositionMain = $EM[0]['PositionMain'];
+                                    $ex = explode('.', $PositionMain);
+                                    $IDDivision = $ex[0];
+                                    $IDPositionApprover = $Approver1[$l]->Approver; 
+                                    if ($IDDivision == 15 || $IDDivision == 33) { // if prodi
+                                        $sqlgg = 'select * from db_academic.program_study where AdminID = ? or KaprodiID = ? or Laboran = ?';
+                                        $gg=$this->db->query($sqlgg, array($CreatedBy,$CreatedBy,$CreatedBy))->result_array();
+                                        if (count($gg) > 0) {
+                                            for ($k=0; $k < count($gg); $k++) { 
+                                                $Kaprodi = $gg[$k]['KaprodiID'];
+                                                $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Kaprodi);
+                                                for ($m=0; $m < count($getApprover1); $m++) { 
+                                                    if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
+                                                        $Name =  $getApprover1[$k]['Name'];
+                                                    }
+                                                }
+                                            }
+                                            
+                                        }
+                                    }
+                                    elseif ($IDDivision == 34 || $IDDivision == 33) {
+                                        $sqlgg = 'select * from db_academic.faculty where AdminID = ? or NIP = ? or Laboran = ?';
+                                        $gg=$this->db->query($sqlgg, array($CreatedBy,$CreatedBy,$CreatedBy))->result_array();
+                                        if (count($gg) > 0) {
+                                            for ($k=0; $k < count($gg); $k++) { 
+                                                $Dekan = $gg[$k]['NIP'];
+                                                $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Dekan);
+                                                for ($m=0; $m < count($getApprover1); $m++) { 
+                                                    if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
+                                                         $Name =  $getApprover1[$k]['Name'];
+                                                    }
+                                                }
+                                            }
+                                            
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // find by division and position
+                                        $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionMain',$IDDivision.'.'.$IDPositionApprover);
+                                        if (count($getApprover1) == 0) {
+                                            $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionOther1',$IDDivision.'.'.$IDPositionApprover);
+                                            if (count($getApprover1) == 0) {
+                                                $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionOther2',$IDDivision.'.'.$IDPositionApprover);
+                                                if (count($getApprover1) == 0) {
+                                                    $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionOther3',$IDDivision.'.'.$IDPositionApprover);
+                                                }
+                                            }
+                                        }
+                                        for ($k=0; $k < count($getApprover1); $k++) {
+                                            if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
+                                                $Name =  $getApprover1[$k]['Name'];
+                                            } 
+                                           
+                                        }
+                                    }
+                                break;
+                            
+                            case 'Division':
+                                $getApprover1 = $this->m_master->caribasedprimary('db_employees.division','ID',$Approver1[$l]->Approver);
+                                for ($k=0; $k < count($getApprover1); $k++) {
+                                   $Name =  $getApprover1[$k]['Division']; 
+                                }
+                                break;
+
+                            case 'Employees':
+                                $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Approver1[$l]->Approver);
+                                for ($k=0; $k < count($getApprover1); $k++) {
+                                   $Name =  $getApprover1[$k]['Name'];  
+                                }
+                                break;    
+                        }
+                    }
+            } // end loop for
+        }
+        else
+        {
+            $Approver2Div = $getDataCategoryRoom[0]['Approver2'];
+            $Approver2Div = json_decode($Approver2Div);
+            for ($zz=0; $zz < count($Approver2Div); $zz++) { 
+                $rdata = $Approver2Div[$zz];
+                $TypeApprover = $rdata->TypeApprover;
+                $bool = false;
+                switch ($TypeApprover) {
+                    case 'Division':
+                        $DivisionApprove = $this->m_master->caribasedprimary('db_employees.division','ID',$rdata->Approver);
+                        $Name = $DivisionApprove[0]['Division'];
+                        $bool = true;
+                        break;
+                    case 'Employees':
+                        $NIPAPP2 = $rdata->Approver;
+                        $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIPAPP2);
+                        $Name = $G_emp[0]['Name'];
+                        $bool = true;
+                        break;
+
+                }
+
+                if ($bool) {
+                    break;
+                }
+            }
+        }
+        
+        return $Name;
     }
 }

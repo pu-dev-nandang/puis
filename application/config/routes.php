@@ -1267,6 +1267,7 @@ $route['testadi2'] = 'c_login/testadi2';
 
 // admin prodi
 $route['loginToAdminProdi'] = 'c_login/loginToAdminProdi';
+$route['loginToAdminFaculty'] = 'c_login/loginToAdminFaculty';
 
 
 // general affair

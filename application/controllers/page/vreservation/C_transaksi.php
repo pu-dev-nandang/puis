@@ -266,9 +266,9 @@ class C_transaksi extends Vreservation_Controler {
                                                 $PositionMain = $this->session->userdata('PositionMain');
                                                 $IDDivision = $PositionMain['IDDivision'];
                                                 $IDPositionApprover = $Approver1[$l]->Approver; 
-                                                if ($IDDivision == 15) { // if prodi
-                                                    $sqlgg = 'select * from db_academic.program_study where AdminID = ? or KaprodiID = ?';
-                                                    $gg=$this->db->query($sqlgg, array($this->session->userdata('NIP'),$this->session->userdata('NIP')))->result_array();
+                                                if ($IDDivision == 15 || $IDDivision == 33) { // if prodi
+                                                    $sqlgg = 'select * from db_academic.program_study where AdminID = ? or KaprodiID = ? or Laboran = ?';
+                                                    $gg=$this->db->query($sqlgg, array($this->session->userdata('NIP'),$this->session->userdata('NIP'),$this->session->userdata('NIP')))->result_array();
                                                     if (count($gg) > 0) {
                                                         for ($k=0; $k < count($gg); $k++) { 
                                                             $Kaprodi = $gg[$k]['KaprodiID'];
@@ -276,6 +276,22 @@ class C_transaksi extends Vreservation_Controler {
                                                             for ($m=0; $m < count($getApprover1); $m++) { 
                                                                 if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
                                                                      $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name'],'Code' => $Kaprodi,'TypeApprover' => $TypeApprover);
+                                                                }
+                                                            }
+                                                        }
+                                                        
+                                                    }
+                                                }
+                                                elseif ($IDDivision == 34 || $IDDivision == 33) {
+                                                    $sqlgg = 'select * from db_academic.faculty where AdminID = ? or NIP = ? or Laboran = ?';
+                                                    $gg=$this->db->query($sqlgg, array($this->session->userdata('NIP'),$this->session->userdata('NIP'),$this->session->userdata('NIP')))->result_array();
+                                                    if (count($gg) > 0) {
+                                                        for ($k=0; $k < count($gg); $k++) { 
+                                                            $Dekan = $gg[$k]['NIP'];
+                                                            $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Dekan);
+                                                            for ($m=0; $m < count($getApprover1); $m++) { 
+                                                                if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
+                                                                     $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name'],'Code' => $Dekan,'TypeApprover' => $TypeApprover);
                                                                 }
                                                             }
                                                         }
