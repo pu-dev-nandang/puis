@@ -2611,7 +2611,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     public function UserQNA($IDDivision = '')
     {
         $arr_result = array();
-        $Q_add = ($IDDivision == '') ? '' : ' where Division_ID = "'.$IDDivision.'" order by ID asc,Type asc';
+        $Q_add = ($IDDivision == '') ? '' : ' where Division_ID = "'.$IDDivision.'" order by Division_ID asc,Type asc';
         $sql = 'select * from db_employees.user_qna '.$Q_add;
         $query=$this->db->query($sql, array())->result_array();
         for ($i=0; $i < count($query); $i++) { 
