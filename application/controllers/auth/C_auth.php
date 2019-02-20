@@ -49,7 +49,7 @@ class C_auth extends Globalclass {
 
 //        $this->load->view('md5');
 
-        
+
     }
 
     public function getReportEdom($ClassOf){
