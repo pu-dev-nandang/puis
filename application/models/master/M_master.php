@@ -2638,6 +2638,8 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     $i = $j-1;
                     break;
                 }
+
+                 $i=$j;
             }
 
             $temp['data'] = $datatemp;
