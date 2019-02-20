@@ -327,6 +327,14 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $query->result_array();
     }
 
+    public function get_m_equipment_additional_check_date($available = '> 0')
+    {
+        $sql = 'select a.ID as ID_add,a.*,b.*,c.Division from db_reservation.m_equipment_additional as a join db_reservation.m_equipment as b
+        on a.ID_m_equipment = b.ID join db_employees.division as c on a.Owner = c.ID where a.Qty '.$available;
+        $query=$this->db->query($sql, array());
+        return $query->result_array();
+    }
+
     public function get_m_additional_personel()
     {
         $sql = 'select a.*,b.* from db_reservation.m_additional_personel as a join db_employees.division as b

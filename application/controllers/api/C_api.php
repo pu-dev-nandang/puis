@@ -5318,7 +5318,8 @@ class C_api extends CI_Controller {
 
     public function m_equipment_additional()
     {
-        $arr = $this->m_reservation->get_m_equipment_additional();
+        $data_arr = $this->getInputToken();
+        $arr = $this->m_reservation->get_m_equipment_additional_check_date();
         echo json_encode($arr);
     }
 

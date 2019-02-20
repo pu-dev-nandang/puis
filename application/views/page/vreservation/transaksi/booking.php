@@ -629,7 +629,16 @@
             $('#divE_additional').remove();
             // get data m_equipment_additional
             var url = base_url_js+"api/__m_equipment_additional";
-            $.post(url,function (data_json) {
+            var date = $('#datetime_deadline1').val();
+            var Start = $("#Start").val();
+            var End = $("#End").val();
+            var data = {
+                date : date,
+                Start : Start,
+                End : End,
+            };
+            var token = jwt_encode(data,"UAP)(*");
+            $.post(url,{token:token},function (data_json) {
               var response = data_json;
               console.log(response);
               var splitBagi = 2;
