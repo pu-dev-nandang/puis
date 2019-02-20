@@ -121,6 +121,14 @@
                     <span class="title">Library</span>
                 </a>
             </li>
+            <li class="departement <?php if($departement=='admin-fakultas'){echo 'current';} ?>"
+                division="34"
+                data-dpt="admin-fakultas">
+                <a href="javascript:void(0);">
+                    <span class="image"><img src="<?php echo base_url('assets/icon/admin.png'); ?>"></span>
+                    <span class="title">Faculty</span>
+                </a>
+            </li>
             <li class="departement <?php if($departement=='other-division'){echo 'current';} ?>"
                 division="36"
                 data-dpt="other-division">

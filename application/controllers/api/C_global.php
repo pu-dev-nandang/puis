@@ -249,7 +249,32 @@ class C_global extends CI_Controller {
     public function testInject()
     {
         ini_set('max_execution_time', 3600); //300 seconds = 5 minutes
-        ini_set('max_execution_time', 0); // for infinite time of execution 
+        ini_set('max_execution_time', 0); // for infinite time of execution
+
+        // $sql = 'SELECT a.NIP,a.Name,SPLIT_STR(a.PositionMain, ".", 1) as PositionMain1,
+        //        SPLIT_STR(a.PositionMain, ".", 2) as PositionMain2,
+        //              a.StatusEmployeeID
+        // FROM   db_employees.employees as a
+        // where SPLIT_STR(a.PositionMain, ".", 1) = 12 and a.StatusEmployeeID != -1';
+        // $query=$this->db->query($sql, array())->result_array();
+        // for ($i=0; $i < count($query); $i++) { 
+        //     $NIP = $query[$i]['NIP'];
+        //     $IDDivision = 34;
+        //     $sql1 = 'select count(*) as total from db_employees.rule_users where NIP = ? and IDDivision = ?';
+        //     $query1=$this->db->query($sql1, array($NIP,$IDDivision))->result_array();
+        //     $total = $query1[0]['total'];
+        //     if ($total == 0) {
+        //        $dataSave = array(
+        //             'NIP' => $NIP,
+        //             'IDDivision' => $IDDivision,
+        //             'privilege' => 1,
+        //        );
+
+        //        $this->db->insert('db_employees.rule_users',$dataSave);
+        //     }
+        // }
+
+
 
         // $datasave = array(
         //     'Approver2' => '[{"TypeApprover":"Division","Approver":"8"}]',
