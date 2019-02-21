@@ -36,7 +36,79 @@
         margin: 10px 0;
     }
 </style>
+<style type="text/css">
+    .imgtd {
+        position: relative;
+        text-align: center;
+        color: white;
+    }
+    /* Centered text */
+    .centeredimgtd {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
 
+    .imgtd img {
+        max-width: 80px;
+    }
+
+    .panel-red {
+        font-size: 10px;
+        color: #fff;
+        font-weight: bold;
+        text-align: center;
+        padding: 1px;
+        background: #e98180;
+        /*max-width: 100px;*/
+        height: 45px;
+        border: 1px dotted #333;
+    }
+
+    .panel-green {
+        font-size: 10px;
+        color: #fff;
+        font-weight: bold;
+        text-align: center;
+        padding: 1px;
+        background: #20c51b;
+        /*max-width: 100px;*/
+        height: 45px;
+        border: 1px dotted #333;
+    }
+    .panel-blue {
+        font-size: 10px;
+        color: #fff;
+        font-weight: bold;
+        text-align: center;
+        padding: 1px;
+        background: #6ba5c1;
+        /*max-width: 100px;*/
+        height: 45px;
+        border: 1px dotted #333;
+    }
+    .panel-orange {
+        font-size: 10px;
+        color: #fff;
+        font-weight: bold;
+        text-align: center;
+        padding: 1px;
+        background: #ffb848;
+        /*max-width: 100px;*/
+        height: 45px;
+        border: 1px dotted #333;
+    }
+
+    /*.table-responsive {
+      
+      height: auto !important;  
+      max-height: 450px;
+      overflow-y: auto;
+    }*/
+
+    .pointer {cursor: pointer;}
+</style>
 <div class="row btn-read" style="margin-top: 30px;">
     <div class="col-md-12">
         <div class="widget box">
@@ -47,8 +119,9 @@
                 <div class="row">
                     <div id="panel_web" class="" style="padding:30px;padding-top:0px;">
                          <ul class="nav nav-tabs">
-                            <li role="presentation" class="active"><a href="javascript:void(0)" class="tab-btn-submenu-page" data-page="set_return">Set Return</a></li>
-                            <li role="presentation"><a href="javascript:void(0)" class="tab-btn-submenu-page" data-page="eq_history">History</a></li>
+                            <!-- <li role="presentation"><a href="javascript:void(0)" class="tab-btn-submenu-page" data-page="set_return">Set Return</a></li> -->
+                            <li role="presentation" class="active"><a href="javascript:void(0)" class="tab-btn-submenu-page" data-page="eq_history">History</a></li>
+                            <li role="presentation"><a href="javascript:void(0)" class="tab-btn-submenu-page" data-page="eq_schedule">Schedule</a></li>
                          </ul>
                          <br>
                          <div id="PageNav" class="btn-read">
@@ -69,7 +142,7 @@
 <script type="text/javascript">
     $(document).ready(function () {
         //loadDataListApprove();
-        LoadPage('set_return');
+        LoadPage('eq_history');
     });
 
     $('.tab-btn-submenu-page').click(function () {

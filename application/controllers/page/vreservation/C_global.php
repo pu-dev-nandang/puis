@@ -434,4 +434,102 @@ class C_global extends Vreservation_Controler {
         echo json_encode($json_data);
     }
 
+    public function loadScheduleEquipment()
+    {
+        $input = $this->getInputToken();
+        $rs = array();
+        $date = $input['date'];
+        $dateNext = date('Y-m-d', strtotime($date . ' +1 day'));
+        $datePrev = date('Y-m-d', strtotime($date . ' -1 day'));
+        // get time hours
+            $arrHours = array();
+            $endTime = '20';
+            for ($i=7; $i < $endTime; $i++) { 
+                // check len
+                $a = $i;
+                for ($j=0; $j < 2 - strlen($i); $j++) { 
+                    $a = '0'.$a;
+                }
+                $d = $a.':30';
+                $a = $a.':00';
+                $arrHours[] = date("h:i a", strtotime($a));
+                //$arrHours[] = date("h:i a", strtotime($d));
+                if ($i != $endTime) {
+                    $arrHours[] = date("h:i a", strtotime($d));
+                }
+            }
+
+        // Get Data
+            $dt = array();
+            $sql = 'select a.ID as ID_add,a.*,b.*,c.Division from db_reservation.m_equipment_additional as a join db_reservation.m_equipment as b
+                    on a.ID_m_equipment = b.ID join db_employees.division as c on a.Owner = c.ID';
+            $G_eq = $this->db->query($sql, array())->result_array();
+            for ($i=0; $i < count($G_eq); $i++) { 
+                $ID = $G_eq[$i]['ID_add'];
+                $Name = $G_eq[$i]['Equipment'];
+                $Qty0 = $G_eq[$i]['Qty'];
+                for ($j=0; $j < count($arrHours); $j++) { 
+                    $st = $arrHours[$j]; 
+                    $Start = date("Y-m-d H:i:s", strtotime($date.$st));
+                    $k = $j+1;
+                    if ($k == count($arrHours)) {
+                        break;
+                    }
+                    $en = $arrHours[$k];
+                    $End = date("Y-m-d H:i:s", strtotime($date.$en)); 
+                    $Qty = $this->m_reservation->getQtyperDateTime($ID,$Qty0,$Start,$End,'c.Status = 1');
+                    $temp = array(
+                        'ID' => $ID,
+                        'Name' => $Name.'['.$Qty0.']',
+                        'Start' => date("h:i a", strtotime($Start)),
+                        'End' => date("h:i a", strtotime($End)),
+                        'Qty' => $Qty,
+                        'Qty0' => $Qty0,
+                    );
+                    $dt[] = $temp;
+                }
+            }
+        //    for ($i=0; $i < count($arrHours); $i= $i+2) {
+        //         $st = $arrHours[$i]; 
+        //         $Start = date("Y-m-d H:i:s", strtotime($date.$st));
+        //         $j = $i+1;
+        //         if ($j == count($arrHours)) {
+        //             break;
+        //         }
+        //         $en = $arrHours[$j]; 
+        //         $End = date("Y-m-d H:i:s", strtotime($date.$en));
+
+        //         // add equipment
+        //              $sql = 'select a.ID as ID_add,a.*,b.*,c.Division from db_reservation.m_equipment_additional as a join db_reservation.m_equipment as b
+        // on a.ID_m_equipment = b.ID join db_employees.division as c on a.Owner = c.ID';
+        //             $G_eq = $this->db->query($sql, array())->result_array();
+        //             for ($k=0; $k < count($G_eq); $k++) { 
+        //                 $ID = $G_eq[$k]['ID_add'];
+        //                 $Qty0 = $G_eq[0]['Qty'];
+        //                 $Qty = $this->m_reservation->getQtyperDateTime($ID,$Qty0,$Start,$End);
+        //                 $temp = array(
+        //                     'ID' => $ID,
+        //                     'Name' => $G_eq[$k]['Equipment'],
+        //                     'Start' => date("h:i a", strtotime($Start)),
+        //                     'End' => date("h:i a", strtotime($End)),
+        //                     'Qty' => $Qty,
+        //                 );
+
+        //                 $dt[] = $temp;
+
+        //             }
+        //    }
+
+           // usort($dt, function($a, $b) {
+           //     return $a['ID'] - $b['ID'];
+           // });
+
+        $rs['arrHours'] = $arrHours;
+        $rs['data'] = $dt;        
+        $rs['dateNext'] = $dateNext;        
+        $rs['datePrev'] = $datePrev;        
+        echo json_encode($rs);
+
+    }
+
 }
