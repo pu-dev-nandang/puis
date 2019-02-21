@@ -274,8 +274,8 @@ class C_transaksi extends Vreservation_Controler {
                                                             $Kaprodi = $gg[$k]['KaprodiID'];
                                                             $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Kaprodi);
                                                             for ($m=0; $m < count($getApprover1); $m++) { 
-                                                                if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
-                                                                     $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name'],'Code' => $Kaprodi,'TypeApprover' => $TypeApprover);
+                                                                if ($getApprover1[$m]['StatusEmployeeID'] > 0) {
+                                                                     $dataApprover[] = array('Email' => $getApprover1[$m]['EmailPU'],'Name' => $getApprover1[$m]['Name'],'Code' => $Kaprodi,'TypeApprover' => $TypeApprover);
                                                                 }
                                                             }
                                                         }
@@ -290,8 +290,8 @@ class C_transaksi extends Vreservation_Controler {
                                                             $Dekan = $gg[$k]['NIP'];
                                                             $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Dekan);
                                                             for ($m=0; $m < count($getApprover1); $m++) { 
-                                                                if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
-                                                                     $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name'],'Code' => $Dekan,'TypeApprover' => $TypeApprover);
+                                                                if ($getApprover1[$m]['StatusEmployeeID'] > 0) {
+                                                                     $dataApprover[] = array('Email' => $getApprover1[$m]['EmailPU'],'Name' => $getApprover1[$m]['Name'],'Code' => $Dekan,'TypeApprover' => $TypeApprover);
                                                                 }
                                                             }
                                                         }
@@ -1261,8 +1261,8 @@ class C_transaksi extends Vreservation_Controler {
                                                             $Kaprodi = $gg[$k]['KaprodiID'];
                                                             $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Kaprodi);
                                                             for ($m=0; $m < count($getApprover1); $m++) { 
-                                                                if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
-                                                                     $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name'],'Code' => $Kaprodi,'TypeApprover' => $TypeApprover);
+                                                                if ($getApprover1[$m]['StatusEmployeeID'] > 0) {
+                                                                     $dataApprover[] = array('Email' => $getApprover1[$m]['EmailPU'],'Name' => $getApprover1[$m]['Name'],'Code' => $Kaprodi,'TypeApprover' => $TypeApprover);
                                                                 }
                                                             }
                                                         }
