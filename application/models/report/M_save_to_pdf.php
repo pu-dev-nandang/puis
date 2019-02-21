@@ -368,7 +368,7 @@ class M_save_to_pdf extends CI_Model {
                                           LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sp.CDID)
                                           LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
                                           LEFT JOIN db_academic.semester s ON (s.ID = sp.SemesterID)
-                                          WHERE sp.NPM = "'.$NPM.'" AND s.Status != 1 ')->result_array();
+                                          WHERE sp.NPM = "'.$NPM.'" AND s.Status != 1 AND sp.ShowTranscript = "1" ')->result_array();
 
         $totalSKS = 0;
         $totalGradeValue = 0;
