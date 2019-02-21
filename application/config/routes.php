@@ -1041,6 +1041,7 @@ $route['vreservation/report/(:any)'] = 'page/vreservation/c_global/report/$1';
 $route['api/vreservation/summary_use_room'] = 'api/c_global/summary_use_room';
 $route['api/vreservation/detailroom'] = 'api/c_global/detailroom';
 $route['vreservation/datafeedback'] = 'page/vreservation/c_global/datafeedback';
+$route['vreservation/loadScheduleEquipment'] = 'page/vreservation/c_global/loadScheduleEquipment';
 
 
 // test

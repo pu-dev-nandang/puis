@@ -327,12 +327,44 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $query->result_array();
     }
 
-    public function get_m_equipment_additional_check_date($available = '> 0')
+    public function get_m_equipment_additional_check_date($Start,$End,$available = '> 0')
     {
+        $rs = array();
         $sql = 'select a.ID as ID_add,a.*,b.*,c.Division from db_reservation.m_equipment_additional as a join db_reservation.m_equipment as b
         on a.ID_m_equipment = b.ID join db_employees.division as c on a.Owner = c.ID where a.Qty '.$available;
-        $query=$this->db->query($sql, array());
-        return $query->result_array();
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) { 
+            // for Update Qty
+            $Qty0 = $query[$i]['Qty'];
+            $Qty = $this->getQtyperDateTime($query[$i]['ID_add'],$Qty0,$Start,$End);
+            $query[$i]['Qty'] = $Qty;
+            if ($Qty > 0) {
+                $rs[] = $query[$i];
+            }
+        }
+
+
+        return $rs;
+    }
+
+    public function getQtyperDateTime($ID_equipment_add,$Qty_stock,$Start,$End,$Status = 'c.Status != 2')
+    {
+        $Qty = $Qty_stock;
+        $sql = 'select a.*,c.Qty from db_reservation.t_booking as a
+                                 join db_employees.employees as b on a.CreatedBy = b.NIP
+                                 join db_reservation.t_booking_eq_additional as c on a.ID = c.ID_t_booking
+                                 where '.$Status.' and (
+                                    (a.`Start` >= "'.$Start.'" and a.`Start` < "'.$End.'" ) or (a.`End` > "'.$Start.'" and a.`End` <= "'.$End.'" )
+                                    or (
+                                            a.`Start` <= "'.$Start.'" and a.`End` >= "'.$End.'"
+                                        )
+                                ) and c.ID_equipment_additional = ?';
+        $query=$this->db->query($sql, array($ID_equipment_add))->result_array();
+        for ($i=0; $i < count($query); $i++) { 
+            $Qty = $Qty - $query[$i]['Qty'];
+        }
+
+        return $Qty;
     }
 
     public function get_m_additional_personel()
@@ -1743,7 +1775,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     $NIP = '@';
                     // get Category Room to approver
                         $ApproveAccess = 0;
-                        $ID_group_user = $this->session->userdata('ID_group_user');
+                        // $ID_group_user = $this->session->userdata('ID_group_user');
+                        $ID_group_user = $this->m_master->caribasedprimary('db_reservation.previleges_guser','NIP',$CreatedBy);
+                        $ID_group_user = $ID_group_user[0]['G_user'];
+
                         $getPolicy = $this->m_master->caribasedprimary('db_reservation.cfg_policy','ID_group_user',$ID_group_user);
                         $CategoryRoom = $getPolicy[0]['CategoryRoom'];
                         $CategoryRoom = json_decode($CategoryRoom);
@@ -3072,6 +3107,23 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $getM = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add);
         $QtyOri = $getM[0]['Qty'];
         $r = $QtyOri - $qty ;
+        if ($r >= 0) {
+            $bool = true;
+        }
+        return $bool;
+    }
+
+    public function chkQty_eq_additional2($ID,$ID_equipment_add)
+    {
+        $bool = false;
+        $this->load->model('master/m_master');
+        $getM = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add);
+        $G_data = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$ID);
+        $Start = date("Y-m-d H:i:s", strtotime($G_data[0]['Start'] ));
+        $End = date("Y-m-d H:i:s", strtotime($G_data[0]['End'] ));
+        $QtyOri = $getM[0]['Qty'];
+        $getQtyperDateTime = $this->getQtyperDateTime($ID_equipment_add,$QtyOri,$Start,$End);
+        $r = $getQtyperDateTime ;
         if ($r >= 0) {
             $bool = true;
         }

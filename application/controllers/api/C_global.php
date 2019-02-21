@@ -1272,7 +1272,8 @@ class C_global extends CI_Controller {
                 $arr_eq = (array)$dataToken['arr_eq'];
                 $this->load->model('vreservation/m_reservation');
                 for ($i=0; $i < count($arr_eq); $i++) {
-                    $chkQty = ($action == 'Reject') ? true : $this->m_reservation->chkQty_eq_additional($idtbooking,$arr_eq[$i]);
+                    $chkQty = ($action == 'Reject') ? true : $this->m_reservation->chkQty_eq_additional2($idtbooking,$arr_eq[$i]);
+                    // $chkQty = $this->m_reservation->chkQty_eq_additional2($idtbooking,$arr_eq[$i]);
                     if ($chkQty) {
                         $datasave = array(
                             'ApproveBy' => $this->session->userdata('NIP'),
