@@ -3676,8 +3676,8 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                                 $Kaprodi = $gg[$k]['KaprodiID'];
                                                 $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Kaprodi);
                                                 for ($m=0; $m < count($getApprover1); $m++) { 
-                                                    if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
-                                                        $Name =  $getApprover1[$k]['Name'];
+                                                    if ($getApprover1[$m]['StatusEmployeeID'] > 0) {
+                                                        $Name =  $getApprover1[$m]['Name'];
                                                     }
                                                 }
                                             }
@@ -3692,8 +3692,8 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                                 $Dekan = $gg[$k]['NIP'];
                                                 $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Dekan);
                                                 for ($m=0; $m < count($getApprover1); $m++) { 
-                                                    if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
-                                                         $Name =  $getApprover1[$k]['Name'];
+                                                    if ($getApprover1[$m]['StatusEmployeeID'] > 0) {
+                                                         $Name =  $getApprover1[$m]['Name'];
                                                     }
                                                 }
                                             }
