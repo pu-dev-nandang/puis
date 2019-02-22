@@ -62,7 +62,6 @@
 
 		function LoadFirstLoad()
 		{
-
 			// check Rule for Input
 				var url = base_url_js+"budgeting/checkruleinput";
 				var data = {
@@ -72,6 +71,7 @@
 					data = {
 						NIP : "<?php echo $this->session->userdata('NIP') ?>",
 						Departement : "<?php echo $Departement ?>",
+						PRCodeVal : PRCodeVal,
 					};
 				<?php endif ?>
 				var token = jwt_encode(data,"UAP)(*");
@@ -700,7 +700,10 @@
 										'</select>'+
 									'</div>'+
 								'</div>'+
-							'</div>';
+							'</div>'+
+							'<div class = "row" style = "margin-top : 10px" id = "pageContentModal">'+
+							'</div>'
+							;
 
 					$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Post Budget Item'+'</h4>');
 					$('#GlobalModalLarge .modal-body').html(html);
@@ -713,10 +716,103 @@
 
 					$('#DepartementPostModal').select2({
 					   //allowClear: true
-					});		
+					});
+
+					PostBudgetAnotherDepartment(ev);
 				}
 
 		})
+
+		function PostBudgetAnotherDepartment(ev)
+		{
+			var DepartementPostModal = $("#DepartementPostModal").val();
+			// get ajax post modal
+				var Year = $("#Year").val();
+				var url = base_url_js+"budgeting/detail_budgeting_remaining";
+				var data = {
+						    Year : Year,
+							Departement : DepartementPostModal,
+						};
+				var token = jwt_encode(data,'UAP)(*');
+				$.post(url,{token:token},function (resultJson) {
+					var response = jQuery.parseJSON(resultJson);
+					var PostBudgetDepartmentModal = response.data;
+					// PostBudgetDepartment
+					if (PostBudgetDepartmentModal.length > 0) {
+						PostBudgetDepartment = PostBudgetDepartment.concat(PostBudgetDepartmentModal); 
+					}
+					var html = htmlPostBudgetDepartmentModal(PostBudgetDepartmentModal);
+					$("#pageContentModal").html(html);
+					var table = $('#example').DataTable({
+				      "data" : PostBudgetDepartmentModal,
+				      'columnDefs': [
+					      {
+					         'targets': 0,
+					         'searchable': false,
+					         'orderable': false,
+					         'className': 'dt-body-center',
+					         'render': function (data, type, full, meta){
+					             return '<input type="checkbox" name="id[]" value="' + full.ID + '" estvalue="' + full.Value + '">';
+					         }
+					      },
+					      {
+					         'targets': 1,
+					         'render': function (data, type, full, meta){
+					             return full.PostName+'-'+full.RealisasiPostName;
+					         }
+					      },
+					      {
+					         'targets': 2,
+					         'render': function (data, type, full, meta){
+					             return formatRupiah(full.Value);
+					         }
+					      },
+				      ],
+				      // 'order': [[1, 'asc']]
+					});
+
+					$("#ModalbtnSaveForm").click(function(){
+						var chkbox = $('input[type="checkbox"]:checked:not(.uniform)');
+						var checked = chkbox.val();
+						var estvalue = chkbox.attr('estvalue');
+						var n = estvalue.indexOf(".");
+						estvalue = estvalue.substring(0, n);
+						var row = chkbox.closest('tr');
+						var PostBudgetItem = row.find('td:eq(1)').text();
+						var fillItem = ev.closest('tr');
+						fillItem.find('td:eq(2)').find('.PostBudgetItem').val(PostBudgetItem);
+						fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('id_budget_left',checked);
+						fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('remaining',estvalue);
+						fillItem.find('td:eq(7)').find('.qty').trigger('change');
+						$('#GlobalModalLarge').modal('hide');
+					})
+
+					$(document).off('change', '#DepartementPostModal').on('change', '#DepartementPostModal',function(e) {
+						PostBudgetAnotherDepartment(ev);
+					})
+				}).fail(function() {
+				  toastr.info('No Result Data'); 
+				}).always(function() {
+				                
+				});
+		}
+
+		function htmlPostBudgetDepartmentModal(PostBudgetDepartmentModal)
+		{
+			html ='<div class = "row">'+
+					'<div class = "col-md-12">'+
+						'<table id="example" class="table table-bordered display select" cellspacing="0" width="100%">'+
+               '<thead>'+
+                  '<tr>'+
+                     // '<th><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>'+
+                     '<th></th>'+
+                     '<th>Post Budget Item</th>'+
+                     '<th>Remaining</th>'+
+                  '</tr>'+
+               '</thead>'+
+          '</table></div></div>';
+          return html;
+		}
 
 		$(document).off('change', '.qty').on('change', '.qty',function(e) {
 			var qty = $(this).val();

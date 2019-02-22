@@ -590,6 +590,115 @@ class M_budgeting extends CI_Model {
         return $JsonStatus;              
     }
 
+    public function GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$PRCode)
+    {
+        $JsonStatus = array();
+        // check apakah cross atau IN
+            $checkCrossOrIN = $this->checkCrossOrIN($PRCode);
+            if ($checkCrossOrIN['check'] == 'Cross') {
+                $JsonStatus = $checkCrossOrIN['JsonStatus']; 
+            }
+
+        $sql = 'select * from db_budgeting.cfg_set_userrole where MaxLimit >= '.$Amount.' and Approved = 1 and Status = 1 and Active = 1
+                group by MaxLimit,ID_m_userrole order by MaxLimit,ID_m_userrole;
+                ';
+        $query=$this->db->query($sql, array())->result_array();
+        
+        // get data to filtering MaxLimit
+        // print_r($query);die();
+            $arr = array();
+            for ($i=0; $i < count($query); $i++) {
+                $MaxLimit = $query[$i]['MaxLimit'];
+                $arr[]= $query[$i]['ID_m_userrole'];
+                $bool = false;
+                for ($j=$i+1; $j < count($query); $j++) { 
+                    $MaxLimit2 = $query[$j]['MaxLimit'];
+                    if ($MaxLimit == $MaxLimit2) {
+                        $boolz = false;
+                        for ($z=0; $z < count($arr); $z++) { 
+                            if ($query[$j]['ID_m_userrole'] == $arr[$z]) {
+                                $boolz = true;
+                                break;
+                            }
+                        }
+
+                        if (!$boolz) {
+                            $arr[]= $query[$j]['ID_m_userrole'];
+                        }
+
+                        $i = $j;
+
+                    }
+                    else
+                    {
+                        $bool = true;
+                        break;
+                    }
+                }
+
+                if ($bool) {
+                    break;
+                }     
+
+            }
+
+        // find approver
+            for ($i=0; $i < count($arr); $i++) { 
+               $sql = 'select * from db_budgeting.cfg_set_roleuser where Departement = "'.$Departement.'" and ID_m_userrole = '.$arr[$i];
+               $query=$this->db->query($sql, array())->result_array();
+               $NIP = $query[0]['NIP'];
+
+               $JsonStatus[] = array(
+                    'ApprovedBy' => $NIP,
+                    'Status' => 0,
+                    'ApproveAt' => ''
+                );
+            } 
+
+        return $JsonStatus;              
+    }
+
+    public function checkCrossOrIN($PRCode)
+    {
+        $rs = array('JsonStatus'=>array(),'check' => 'IN');
+        $G_data = $this->GetPR_DetailByPRCode($PRCode);
+        $check = 'IN';
+        $JsonStatus = array();
+        for ($i=0; $i < count($G_data); $i++) { 
+            $BudgetStatus = $G_data[$i]['BudgetStatus'];
+            if ($BudgetStatus == 'Cross' && $check == 'IN') {
+                $check = 'Cross';
+            }
+
+            if ($BudgetStatus == 'Cross') {
+                // get approver 1 dari department tersebut
+                    $Departement = $G_data[$i]['Departement'];
+                    $sql = 'select * from db_budgeting.cfg_set_roleuser where Departement = "'.$Departement.'" and ID_m_userrole = 2';
+                    $query=$this->db->query($sql, array())->result_array();
+                    $NIP = $query[0]['NIP'];
+                    // check existing in array JsonStatus
+                        $bool = true;
+                        for ($j=0; $j < count($JsonStatus); $j++) { 
+                            if ($NIP == $JsonStatus[$j]['ApprovedBy']) {
+                               $bool = false;
+                               break;
+                            }
+                        }
+
+                        if ($bool) {
+                            $JsonStatus[] = array(
+                                 'ApprovedBy' => $NIP,
+                                 'Status' => 0,
+                                 'ApproveAt' => ''
+                             );
+                        }
+            }
+        }
+
+        $rs = array('JsonStatus'=>$JsonStatus,'check' => $check);
+        return $rs;
+    }
+
 
     public function GetPR_CreateByPRCode($PRCode)
     {
@@ -614,7 +723,7 @@ class M_budgeting extends CI_Model {
     public function GetPR_DetailByPRCode($PRCode)
     {
         $sql = 'select a.ID,a.PRCode,a.ID_budget_left,b.ID_creator_budget,c.CodePostBudget,d.CodeSubPost,e.CodePost,
-                e.RealisasiPostName,f.PostName,a.ID_m_catalog,g.Item,g.Desc,g.DetailCatalog,a.Spec_add,a.Need,
+                e.RealisasiPostName,e.Departement,f.PostName,a.ID_m_catalog,g.Item,g.Desc,g.DetailCatalog,a.Spec_add,a.Need,
                 a.Qty,a.UnitCost,a.SubTotal,a.DateNeeded,a.BudgetStatus,a.UploadFile,g.Photo
                 from db_budgeting.pr_detail as a
                 join db_budgeting.budget_left as b on a.ID_budget_left = b.ID
