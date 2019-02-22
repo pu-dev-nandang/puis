@@ -1461,6 +1461,22 @@
 
 
         return parseFloat(result);
-    }  
+    }
+
+
+    function setMenuSelected(classHeader,findTag,classActiveName,ArrayMenu,MenuActive) {
+
+        // ----
+        // classHeader = parent classnya (biasanya : .nav-tabs)
+        // findTag = tag yang akan di masukan class activenya (biasanya : li)
+        // classActiveName = nama class yang active (biasanya : active)
+        // ArrayMenu = nama menu2 yang ada (sesuai URI)
+        // MenuActive = nama menu yang active
+        // ----
+
+        var indexAct = $.inArray(MenuActive,ArrayMenu);
+        var elmChild = $(classHeader).children(findTag)[indexAct];
+        $(classHeader).find(elmChild).addClass(classActiveName);
+    }
 
 </script>

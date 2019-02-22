@@ -1,39 +1,40 @@
 
+<div class="tabbable tabbable-custom tabbable-full-width">
+    <ul class="nav nav-tabs">
+        <li>
+            <a href="<?php echo base_url('academic/exam-schedule/list-exam'); ?>">List Exam Schedule</a>
+        </li>
+        <li>
+            <a href="<?php echo base_url('academic/exam-schedule/list-waiting-approve'); ?>">List Waiting Approve</a>
+        </li>
+        <li>
+            <a href="<?php echo base_url('academic/exam-schedule/set-exam-schedule'); ?>">Set Exam Schedule</a>
+        </li>
+        <li>
+            <a href="<?php echo base_url('academic/exam-schedule/exam-setting'); ?>">Exam Setting</a>
+        </li>
+    </ul>
+    <div style="border-top: 1px solid #cccccc">
 
-<?php
+        <div class="row">
+            <div class="col-md-12">
+                <hr/>
+                <?php echo $page; ?>
+            </div>
+        </div>
 
-$btn_list = "btn-default btn-default-success";
-$btn_list_waiting = "btn-default btn-default-warning";
-$btn_set_exam = "btn-default btn-default-success";
-if($this->uri->segment(3)=='list-exam') {
-    $btn_list = "btn-success";
-} else if($this->uri->segment(3)=='list-waiting-approve') {
-    $btn_list_waiting = "btn-warning";
-} else if($this->uri->segment(3)=='set-exam-schedule') {
-    $btn_set_exam = "btn-success";
-}
-
-?>
-
-<div class="row" style="margin-top: 30px;">
-
-    <div class="col-md-8 col-md-offset-4" style="text-align: right;">
-        <a href="<?php echo base_url('academic/exam-schedule/list-exam'); ?>" class="btn <?php echo $btn_list; ?>">
-            <i class="fa fa-calendar right-margin" aria-hidden="true"></i> List Exam Schedule</a>
-        <a href="<?php echo base_url('academic/exam-schedule/list-waiting-approve'); ?>" class="btn <?php echo $btn_list_waiting; ?>">
-            <i class="fa fa-question-circle right-margin" aria-hidden="true"></i> List Waiting Approve</a>
-        |
-        <a href="<?php echo base_url('academic/exam-schedule/set-exam-schedule'); ?>" class="btn <?php echo $btn_set_exam; ?>">
-            <i class="fa fa-pencil right-margin" aria-hidden="true"></i> Set Exam Schedule
-        </a>
-    </div>
-
-</div>
-
-<div class="row">
-    <div class="col-md-12">
-        <hr/>
-        <?php echo $page; ?>
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+
+        var menu_active = "<?php echo $this->uri->segment(3); ?>";
+        var arrMenu = ['list-exam','list-waiting-approve','set-exam-schedule','exam-setting'];
+        setMenuSelected('.nav-tabs','li','active',arrMenu,menu_active);
+
+    });
+</script>
+
+
 

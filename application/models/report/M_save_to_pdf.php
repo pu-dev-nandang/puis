@@ -160,6 +160,7 @@ class M_save_to_pdf extends CI_Model {
                                             AND ex.ExamDate = "'.$ExamDate.'"
                                              ORDER BY ex.ExamDate, ex.ExamStart, ex.ExamEnd ')->result_array();
 
+
         if(count($data)>0){
             for($c=0;$c<count($data);$c++){
                 $dataC = $this->db->query('SELECT exg.*, s.ClassGroup, mk.NameEng AS Course, mk.MKCode, 
@@ -171,6 +172,7 @@ class M_save_to_pdf extends CI_Model {
                                                     LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                                     WHERE exg.ExamID = "'.$data[$c]['ID'].'"
                                                      GROUP BY exg.ScheduleID ORDER BY s.ClassGroup ASC ')->result_array();
+
 
                 if(count($dataC)>0){
 
@@ -195,7 +197,7 @@ class M_save_to_pdf extends CI_Model {
                     // Get Students
                     for($r=0;$r<count($dataC);$r++){
                         $dataStd = $this->db->query('SELECT NPM,DB_Students FROM db_academic.exam_details exd 
-                                                        WHERE exd.ExamID = "'.$data[$c]['ID'].'" 
+                                                        WHERE exd.ExamID = "'.$dataC[$r]['ExamID'].'" 
                                                         AND exd.ScheduleID = "'.$dataC[$r]['ScheduleID'].'"
                                                          ORDER BY exd.NPM ASC ')->result_array();
 
@@ -231,7 +233,8 @@ class M_save_to_pdf extends CI_Model {
                                         }
                                     }
 
-                                } else {
+                                } else{
+
                                   // Cek Pembayaran
                                     $dataPayment = $this->m_rest->checkPayment($dataStd[$st]['NPM'],$SemesterID);
                                     if($dataPayment['BPP']['Status']==1 && $dataPayment['Credit']['Status']==1){
@@ -241,7 +244,7 @@ class M_save_to_pdf extends CI_Model {
                                                 'Name' => $dataStdName[0]['Name'],
                                                 'DB_Students' => $dataStd[$st]['DB_Students'],
                                             );
-                                        } else {
+                                        } else if ($Type=='uas' || $Type=='UAS') {
                                             if(isset($dataAttendace['Percentage'])
                                                 && $dataAttendace['Percentage']!=null
                                                 && $dataAttendace['Percentage']!='' && round($dataAttendace['Percentage'])>=75){
@@ -253,6 +256,12 @@ class M_save_to_pdf extends CI_Model {
                                             }
                                         }
 
+                                    } else if ($Type=='re_uts') {
+                                        $arr = array(
+                                            'NPM' => $dataStd[$st]['NPM'],
+                                            'Name' => $dataStdName[0]['Name'],
+                                            'DB_Students' => $dataStd[$st]['DB_Students'],
+                                        );
                                     }
                                 }
 
@@ -262,6 +271,7 @@ class M_save_to_pdf extends CI_Model {
 
                             }
                         }
+
 
                         $dataC[$r]['DetailStudents'] = $arr_student;
 
