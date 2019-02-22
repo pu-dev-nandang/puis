@@ -239,15 +239,16 @@ class C_api extends CI_Controller {
         echo json_encode($json_data);
     }
 
+
     public function getEmployeesHR()
     {
 
         $status = $this->input->get('s');
-
         $requestData= $_REQUEST;
         // print_r($requestData);
 
         $whereStatus = ($status!='') ? ' AND StatusEmployeeID = "'.$status.'" ' : '';
+        print_r($status);
 
         $totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE StatusEmployeeID != -2 '.$whereStatus)->result_array();
 
@@ -310,11 +311,6 @@ class C_api extends CI_Controller {
 //            $nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
             $nestedData[] = $Division.'<br/>'.$Position;
             $nestedData[] = $row["Address"];
-
-
-
-
-
 
 //            $nestedData[] = $row['Description'];
             $status = '-';
@@ -539,6 +535,156 @@ class C_api extends CI_Controller {
         echo json_encode($json_data);
 
     }
+
+
+    // add bismar
+
+    public function getfileEmployees()
+    {
+
+        $status = $this->input->get('s');
+        $requestData= $_REQUEST;
+        // print_r($requestData);
+        $whereStatus = ($status!='') ? ' AND StatusEmployeeID = "'.$status.'" ' : '';
+        $totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE StatusEmployeeID != -2 '.$whereStatus)->result_array();
+
+        if( !empty($requestData['search']['value']) ) {
+            $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
+                        ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.StatusEmployeeID
+                        -- , fs.TypeFiles
+                        FROM db_employees.employees em 
+                        LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                        -- LEFT JOIN db_employees.files fs ON (fs.NIP = em.NIP)
+                        LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID) 
+                        WHERE em.StatusEmployeeID != -2 '.$whereStatus.' AND ( ';
+
+            $sql.= ' em.NIP LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR em.Name LIKE "%'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ') ORDER BY NIP,em.PositionMain  ASC';
+
+        }
+        else {
+            $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
+                        ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.StatusEmployeeID
+                        -- , fs.TypeFiles
+                        FROM db_employees.employees em 
+                        LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                        -- LEFT JOIN db_employees.files fs ON (fs.NIP = em.NIP)
+                        LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID) 
+                        WHERE em.StatusEmployeeID != -2 '.$whereStatus;
+            $sql.= 'ORDER BY NIP,em.PositionMain ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+        }
+        // print_r($sql);die();
+        $query = $this->db->query($sql)->result_array();
+        //$sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+        $no = $requestData['start']+1;
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $jb = explode('.',$row["PositionMain"]);
+            $Division = '';
+            $Position = '';
+            
+
+            if(count($jb)>1){
+                $dataDivision = $this->db->select('Division')->get_where('db_employees.division',array('ID'=>$jb[0]),1)->result_array()[0];
+                $dataPosition = $this->db->select('Position')->get_where('db_employees.position',array('ID'=>$jb[1]),1)->result_array()[0];
+                $Division = $dataDivision['Division'];
+                $Position = $dataPosition['Position'];
+            }
+
+             $photo = (file_exists('./uploads/employees/'.$row["Photo"]) && $row["Photo"]!='' && $row["Photo"]!=null)
+                ? base_url('uploads/employees/'.$row["Photo"])
+                : base_url('images/icon/userfalse.png');
+
+            $NIP = $row['NIP'];
+            // print_r($NIP);die();
+            
+            $StatusFiles = array();
+            $Get_MasterFiles = $this->m_master->showData_array('db_employees.master_files');
+            $StatusFiles = '';
+            for ($j=0; $j < count($Get_MasterFiles); $j++) { 
+                $stDefault =' <span class="label label-danger"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
+                $sql2 = 'select count(*) as total from db_employees.files where NIP = ? and TypeFiles = ?';
+                $query2=$this->db->query($sql2, array($NIP,$Get_MasterFiles[$j]['TypeFiles']))->result_array();
+                if ($query2[0]['total'] > 0 ) {
+                    $stDefault =' <span class="label label-success"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
+                } 
+                $StatusFiles .= $stDefault;
+                
+            }
+
+            // for ($j=0; $j < count($GetFile); $j++) {
+            //     $row2 = $GetFile[$j]; 
+            //     $KTP_status = ($row2['TypeFiles'] =='KTP' && $row2['TypeFiles']!=null) ? '<span class="label label-success">KTP</span>' : '<span class="label label-danger">KTP</span>';
+            //     $CV_status = ($row2['TypeFiles'] =='CV' && $row2['TypeFiles']!=null) ? '<span class="label label-success">CV</span>' : '<span class="label label-danger">CV</span>';
+            //     $IjazahS1_status = ($row2['TypeFiles'] =='IjazahS1' && $row2['TypeFiles']!=null) ? '<span class="label label-success">Ijazah S1</span>' : '<span class="label label-danger">Ijazah S1</span>';
+            //     $TranscriptS1 = ($row2['TypeFiles'] =='TranscriptS1' && $row2['TypeFiles']!=null) ? '<span class="label label-success">Transcript S1</span>' : '<span class="label label-danger">Transcript S1</span>';
+            //     $IjazahS2_status = ($row2['TypeFiles'] =='IjazahS2' && $row2['TypeFiles']!=null) ? '<span class="label label-success">Ijazah S2</span>' : '<span class="label label-danger">Ijazah S2</span>';
+            //     $TranscriptS2 = ($row2['TypeFiles'] == 'TranscriptS2' && $row2['TypeFiles']!=null) ? '<span class="label label-success">Transcript S2</span>' : '<span class="label label-danger">Transcript S2</span>';
+            //     $IjazahS3_status = ($row2['TypeFiles'] =='IjazahS3' && $row['TypeFiles']!=null) ? '<span class="label label-success">Ijazah S3</span>' : '<span class="label label-danger">Ijazah S3</span>';
+            //     $TranscriptS3 = ($row2['TypeFiles'] == 'TranscriptS3' && $row2['TypeFiles']!=null) ? '<span class="label label-success">Transcript S3</span>' : '<span class="label label-danger">Transcript S3</span>';
+            //     $SP_Dosen_status = ($row2['TypeFiles'] == 'SP_Dosen' && $row2['TypeFiles']!=null) ? '<span class="label label-success">SP Dosen</span>' : '<span class="label label-danger">SP Dosen</span>';
+            //     $SK_Dosen_status = ($row2['TypeFiles'] == 'SK_Dosen' && $row2['TypeFiles']!=null) ? '<span class="label label-success">SK Dosen</span>' : '<span class="label label-danger">SK Dosen</span>';
+            //     $SK_Pangkat_status = ($row2['TypeFiles']== 'SK_Pangkat' && $row2['TypeFiles']!=null) ? '<span class="label label-success">SK Pangkat</span>' : '<span class="label label-danger">SK Pangkat</span>';
+            //     $SK_JJA_status = ($row2['TypeFiles'] == 'SK_JJA' && $row2['TypeFiles']!=null) ? '<span class="label label-success">SK Jabatan Fungsional</span>' : '<span class="label label-danger">SK Jabatan Fungsional</span>';
+            // }
+            
+
+            $status = '-';
+            if($row['StatusEmployeeID']==1){
+                $status = '<i class="fa fa-circle" style="color: #4CAF50;"></i>';
+            } else if($row['StatusEmployeeID']==2){
+                $status = '<i class="fa fa-circle" style="color: #FF9800;"></i>';
+            } else if($row['StatusEmployeeID']==3){
+                $status = '<i class="fa fa-circle" style="color: #03A9F4;"></i>';
+            } else if($row['StatusEmployeeID']==4){
+                $status = '<i class="fa fa-circle" style="color: #9e9e9e;"></i>';
+            } else if($row['StatusEmployeeID']==-1){
+                $status = '<i class="fa fa-warning" style="color: #F44336;"></i>';
+            }
+
+            //$nestedData[] = $row["Name"].'|'.$row["NIP"];
+            // $nestedData[] = $row["NIDN"];
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div style="text-align: center;"><img src="'.$photo.'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
+            //$nestedData[] = $row["NIP"];
+            $nestedData[] = '<a href="'.base_url('human-resources/academic-details/'.$row["NIP"]).'" style="font-weight: bold;">'.$row["Name"].'</a>';
+            //$nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
+            $nestedData[] = $Division.' - '.$Position;
+            $nestedData[] = '<div style="text-align: center;">'.$status.'</div>';
+            $nestedData[] = $StatusFiles;
+            // if ($StatusFiles != '') {
+            //     // $nestedData[] = $KTP_status.' - '.$CV_status.' - '.$IjazahS1_status.' - '. $TranscriptS1.' - '. $IjazahS2_status .' - '. $TranscriptS2  .' - '. $IjazahS3_status  .' - '. $TranscriptS3.' - '.$SP_Dosen_status.' - '.$SK_Dosen_status.' - '.$SK_Pangkat_status.' - '.$SK_JJA_status;
+            //     $nestedData[] = $StatusFiles;
+            // } else {
+            //     $nestedData[] = '<center> No Files</center>';
+            // }
+            
+            
+            $nestedData[] = '<a class="btn btn-info" href="'.base_url('human-resources/academic-details/'.$row["NIP"]).'">
+  <i class="icon-list icon-large"></i> Detail</a>';
+
+             $no++;
+            $data[] = $nestedData;
+        }
+
+        // print_r($data);
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($totalData)),
+            "recordsFiltered" => intval( count($totalData) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+    }
+
 
     public function getAllMK(){
         $data = $this->m_api->__getAllMK();
@@ -2947,6 +3093,67 @@ class C_api extends CI_Controller {
 
     }
 
+    //add bismar
+    public function crudAcademic(){
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+
+        if(count($data_arr)>0){
+            if($data_arr['action']=='read'){
+                $NIP = $data_arr['NIP'];
+                $data = $this->m_api->__getLecturerDetail($NIP);
+                return print_r(json_encode($data));
+            }
+
+            else if($data_arr['action']=='readMini'){
+                $NIP = $data_arr['NIP'];
+                $data = $this->db->select('NIP,NIDN,Name,TitleAhead,TitleBehind,PositionMain,Phone,
+                                        HP,Email,EmailPU,Password,Address,Photo,Photo_new')
+                    ->get_where('db_employees.employees',array('NIP'=>$NIP),1)
+                    ->result_array();
+
+
+                if(count($data)>0){
+                    $sp = explode('.',$data[0]['PositionMain']);
+                    $DiviosionID = $sp[0];
+                    $PositionID = $sp[1];
+
+                    $div = $this->db->get_where('db_employees.division',array('ID'=>$DiviosionID),1)->result_array();
+                    $data[0]['Division'] = $div[0]['Division'];
+
+                    $pos = $this->db->get_where('db_employees.position',array('ID'=>$PositionID),1)->result_array();
+                    $data[0]['Position'] = $pos[0]['Position'];
+
+                    return print_r(json_encode($data[0]));
+                } else {
+                    return print_r(json_encode($data));
+                }
+
+            }
+        }
+    }
+
+
+    public function review_academicdetail(){
+        $NIP = $this->input->get('NIP');
+
+        $viewacademic = $this->m_api->views_academic($NIP);
+        
+        echo json_encode($viewacademic);     
+
+     }
+
+     public function review_otherfile(){
+        $NIP = $this->input->get('NIP');
+
+        $viewfiles = $this->m_api->views_otherfile($NIP);
+        
+        echo json_encode($viewfiles);     
+
+     }
+
+
     public function insertWilayahURLJson()
     {
         $data = $this->input->post('data');
@@ -4041,6 +4248,7 @@ class C_api extends CI_Controller {
 
     public function crudEmployees(){
         $data_arr = $this->getInputToken();
+        print_r($data_arr);
 
         if(count($data_arr)>0){
             if($data_arr['action']=='read'){
@@ -4215,6 +4423,188 @@ class C_api extends CI_Controller {
         }
 
     }
+
+
+     public function crudAcademicData(){
+
+        $data_arr = $this->getInputToken();
+       // print_r($data_arr);
+
+        if(count($data_arr)>0){
+
+            if($data_arr['action']=='addAcademicS1'){
+
+                $formInsert = (array) $data_arr['formInsert'];
+                $type = 'S1';
+                
+                $NIP = $formInsert['NIP'];
+                $NoIjazah = strtoupper($formInsert['NoIjazah']);
+                $NameUniversity = strtoupper($formInsert['NameUniversity']);
+                $DateIjazah = $formInsert['IjazahDate'];
+                $Major = strtoupper($formInsert['Major']);
+                $ProgramStudy = strtoupper($formInsert['ProgramStudy']);
+                $Grade = $formInsert['Grade'];
+                $TotalCredit = $formInsert['TotalCredit'];
+                $TotalSemester = $formInsert['TotalSemester'];
+                $fileName = $formInsert['fileName'];
+                $file_trans = $formInsert['file_trans'];
+                
+                $dataSave = array(
+                                'NIP' => $NIP,
+                                'TypeAcademic' => $type,
+                                'NoIjazah' => $NoIjazah,
+                                'DateIjazah' => $DateIjazah,
+                                'NameUniversity' => $NameUniversity,
+                                'Major' => $Major,
+                                'ProgramStudy' => $ProgramStudy,
+                                'Grade' => $Grade,
+                                'TotalCredit' => $TotalCredit,
+                                'TotalSemester' => $TotalSemester,
+                                'IjazahFile' => $fileName,
+                                'TranscriptFile' => $file_trans
+                            );
+                $this->db->insert('db_employees.employees_academic', $dataSave);
+                return print_r(1);
+            } 
+            else if($data_arr['action']=='addAcademicS2'){
+                $formInsert = (array) $data_arr['formInsert'];
+                $type = 'S2';
+                
+                $NIP = $formInsert['NIP'];
+                $NoIjazah = strtoupper($formInsert['NoIjazah']);
+                $NameUniversity = strtoupper($formInsert['NameUniversity']);
+                $DateIjazah = $formInsert['IjazahDate'];
+                $Major = strtoupper($formInsert['Major']);
+                $ProgramStudy = strtoupper($formInsert['ProgramStudy']);
+                $Grade = $formInsert['Grade'];
+                $TotalCredit = $formInsert['TotalCredit'];
+                $TotalSemester = $formInsert['TotalSemester'];
+                $fileName = $formInsert['fileName'];
+                $file_trans = $formInsert['file_trans'];
+
+                $dataSave = array(
+                               'NIP' => $NIP,
+                                'TypeAcademic' => $type,
+                                'NoIjazah' => $NoIjazah,
+                                'DateIjazah' => $DateIjazah,
+                                'NameUniversity' => $NameUniversity,
+                                'Major' => $Major,
+                                'ProgramStudy' => $ProgramStudy,
+                                'Grade' => $Grade,
+                                'TotalCredit' => $TotalCredit,
+                                'TotalSemester' => $TotalSemester,
+                                'IjazahFile' => $fileName,
+                                'TranscriptFile' => $file_trans
+                            );
+                $this->db->insert('db_employees.employees_academic', $dataSave);
+                return print_r(1);
+            }
+            else if($data_arr['action']=='addAcademicS3'){
+                $formInsert = (array) $data_arr['formInsert'];
+                $type = 'S3';
+                
+                $NIP = $formInsert['NIP'];
+                $NoIjazah = strtoupper($formInsert['NoIjazah']);
+                $NameUniversity = strtoupper($formInsert['NameUniversity']);
+                $DateIjazah = $formInsert['IjazahDate'];
+                $Major = strtoupper($formInsert['Major']);
+                $ProgramStudy = strtoupper($formInsert['ProgramStudy']);
+                $Grade = $formInsert['Grade'];
+                $TotalCredit = $formInsert['TotalCredit'];
+                $TotalSemester = $formInsert['TotalSemester'];
+                $fileName = $formInsert['fileName'];
+                $file_trans = $formInsert['file_trans'];
+
+                $dataSave = array(
+                               'NIP' => $NIP,
+                                'TypeAcademic' => $type,
+                                'NoIjazah' => $NoIjazah,
+                                'DateIjazah' => $DateIjazah,
+                                'NameUniversity' => $NameUniversity,
+                                'Major' => $Major,
+                                'ProgramStudy' => $ProgramStudy,
+                                'Grade' => $Grade,
+                                'TotalCredit' => $TotalCredit,
+                                'TotalSemester' => $TotalSemester,
+                                'IjazahFile' => $fileName,
+                                'TranscriptFile' => $file_trans
+                            );
+                $this->db->insert('db_employees.employees_academic', $dataSave);
+                return print_r(1);
+            }
+            else if($data_arr['action']=='AddFilesDocument'){
+                $formInsert = (array) $data_arr['formInsert'];
+
+                $NIP = $formInsert['NIP'];
+                $IDuser = $this->session->userdata('NIP');
+                $NoDocument = strtoupper($formInsert['NoDocument']);
+                $DateDocument = $formInsert['DateDocument'];
+                $type = $formInsert['type'];
+                $DescriptionFile = $formInsert['DescriptionFile'];
+                $fileName = $formInsert['fileName'];
+        
+                $dataSave = array(
+                                'NIP' => $NIP,
+                                'TypeFiles' => $type,
+                                'No_Document' => $NoDocument,
+                                'Date_Files' => $DateDocument,
+                                'Description_Files' => $DescriptionFile,
+                                'LinkFiles' => $fileName,
+                                'UserCreate' => $IDuser
+                            );
+                $this->db->insert('db_employees.files',$dataSave);
+                return print_r(1);
+
+            }
+
+        }
+
+     }
+
+
+     public function upload_fileAcademic($fileName, $formData){
+
+            //$fileName = $this->input->get('fileName');
+            $Colom = $this->input->get('c');
+            $User = $this->input->get('u');
+            print_r($fileName);
+            print_r($formData);
+            
+
+            $config['upload_path']          = './uploads/files/';
+            $config['allowed_types']        = '*';
+            $config['max_size']             = 8000; // 8 mb
+            $config['file_name']            = $fileName;
+
+            if(is_file('./uploads/files/'.$fileName)){
+                    unlink('./uploads/files/'.$fileName);
+            }
+            $this->load->library('upload', $config);
+            if ( ! $this->upload->do_upload('userfile')){
+                $error = array('error' => $this->upload->display_errors());
+                return print_r(json_encode($error));
+            }
+            else {
+                    
+                $success = array('success' => $this->upload->data());
+                $success['success']['formGrade'] = 0;
+                // Cek apakah di db sudah ada
+                $dataNIP = $this->db->get_where('db_employees.files',array('NIP'=>$User))->result_array();
+                $dataUpdate = array(
+                    $Colom => $fileName
+                );
+                if(count($dataNIP)>0){
+                    $this->db->where('NIP', $User);
+                    $this->db->update('db_employees.files',$dataUpdate);
+                } else {
+                    $dataUpdate['NIP'] = $User;
+                    $this->db->insert('db_employees.files',$dataUpdate);
+                }
+                return print_r(json_encode($success));
+            }
+
+     }
+    
 
     public function getProvinsi()
     {

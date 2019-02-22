@@ -34,6 +34,7 @@ class C_employees extends HR_Controler {
         $this->tab_menu($page);
     }
 
+    //add bismar
     public function employees_files(){
         $department = parent::__getDepartement();
 
@@ -42,14 +43,31 @@ class C_employees extends HR_Controler {
         $this->tab_menu($page);
     }
 
+    public function academicDetails($NIP){
+        $department = parent::__getDepartement();
+
+        $data['NIP']=$NIP;
+        $content = $this->load->view('page/'.$department.'/academic/academic_menu',$data,true);
+        $this->temp($content);
+    }
+
+    public function loadpageacademicDetails(){
+        $department = parent::__getDepartement();
+        $data_arr = $this->getInputToken();
+        $G_TypeFiles = $this->m_master->showData_array('db_employees.master_files');
+        $data_arr['G_TypeFiles'] =  $G_TypeFiles;
+        $this->load->view('page/'.$department.'/academic/'.$data_arr['page'],$data_arr);
+    }
+
+
     public function upload_files(){
         $fileName = $this->input->get('fileName');
         $Colom = $this->input->get('c');
         $User = $this->input->get('u');
-
+        //print_r($fileName);
 
         $config['upload_path']          = './uploads/files/';
-        $config['allowed_types']        = 'pdf';
+        $config['allowed_types']        = '*';
         $config['max_size']             = 8000; // 8 mb
         $config['file_name']            = $fileName;
 
@@ -62,10 +80,18 @@ class C_employees extends HR_Controler {
             return print_r(json_encode($error));
         }
         else {
-
+            
+            //$dataUpdate = array(
+            //    'type_file' => $Colom,
+            //    'NIP' => $User,
+             //   'name_file' => $fileName,
+             //   'user_create' =>$this->session->userdata('NIP') 
+            //);
+            //$this->db->insert('db_employees.temp_files',$dataUpdate);
+            // $this->m_master->save_images($fileName, $User);
+                            
             $success = array('success' => $this->upload->data());
             $success['success']['formGrade'] = 0;
-
             // Cek apakah di db sudah ada
             $dataNIP = $this->db->get_where('db_employees.files',array('NIP'=>$User))->result_array();
             $dataUpdate = array(
@@ -78,8 +104,8 @@ class C_employees extends HR_Controler {
                 $dataUpdate['NIP'] = $User;
                 $this->db->insert('db_employees.files',$dataUpdate);
             }
-
             return print_r(json_encode($success));
+
         }
 
     }
@@ -127,6 +153,7 @@ class C_employees extends HR_Controler {
     public function upload_photo(){
 
         $fileName = $this->input->get('fileName');
+        print_r(fileName);
 
         $config['upload_path']          = './uploads/employees/';
         $config['allowed_types']        = 'gif|jpg|png|jpeg';
@@ -150,9 +177,278 @@ class C_employees extends HR_Controler {
             return print_r(json_encode($success));
         }
 
-
-
     }
+
+
+    public function upload_fileAcademic(){
+
+        $action = $this->input->get('action');
+        $Colom = $this->input->get('c');
+        $IDuser = $this->session->userdata('NIP');
+        //print_r($action);
+
+        if ($Colom == 'IjazahS1') {
+                $fileName = $this->input->get('fileName');
+                $Colom = $this->input->get('c');
+                $NIP = $this->input->get('u');
+
+                $config['upload_path']          = './uploads/files/';
+                $config['allowed_types']        = '*';
+                $config['max_size']             = 8000; // 8 mb
+                $config['file_name']            = $fileName;
+
+                if(is_file('./uploads/files/'.$fileName)){
+                    unlink('./uploads/files/'.$fileName);
+                }
+                $this->load->library('upload', $config);
+
+                if ( ! $this->upload->do_upload('userfile')){
+                    $error = array('error' => $this->upload->display_errors());
+                    return print_r(json_encode($error));
+                }
+                else {
+                    
+                    $success = array('success' => $this->upload->data());
+                    $success['success']['formGrade'] = 0;
+                    //print_r($Colom);die();
+                    
+                    $Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
+                    
+                    
+                    $dataSave = array(
+                            'NIP' => $NIP,
+                            'TypeFiles' => $Get_MasterFiles[0]['ID'],
+                            'LinkFiles' => $fileName,
+                            'UserCreate' => $IDuser
+                    );
+
+                    $this->db->insert('db_employees.files',$dataSave);
+                    return print_r(json_encode($success));
+
+                }
+        }        
+
+        elseif ($Colom == 'TranscriptS1') {
+
+                $fileName = $this->input->get('fileName');
+                $Colom = $this->input->get('c');
+                $NIP = $this->input->get('u');
+                
+                $config['upload_path']          = './uploads/files/';
+                $config['allowed_types']        = '*';
+                $config['max_size']             = 8000; // 8 mb
+                $config['file_name']            = $fileName;
+
+                if(is_file('./uploads/files/'.$fileName)){
+                    unlink('./uploads/files/'.$fileName);
+                }
+                $this->load->library('upload', $config);
+                if ( ! $this->upload->do_upload('userfile')){
+                    $error = array('error' => $this->upload->display_errors());
+                    return print_r(json_encode($error));
+                }
+                else {
+                    
+                    $success = array('success' => $this->upload->data());
+                    $success['success']['formGrade'] = 0;
+                    //print_r($Colom);die();
+
+                    $Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
+                    
+                    
+                    $dataSave = array(
+                            'NIP' => $NIP,
+                            'TypeFiles' => $Get_MasterFiles[0]['ID'],
+                            'LinkFiles' => $fileName,
+                            'UserCreate' => $IDuser
+                    );
+
+                    $this->db->insert('db_employees.files',$dataSave);
+                    return print_r(json_encode($success));
+                }
+
+            } 
+            elseif ($Colom == 'IjazahS2') {
+
+                $fileName = $this->input->get('fileName');
+                $Colom = $this->input->get('c');
+                $User = $this->input->get('u');
+                //print_r($fileName);
+
+                $config['upload_path']          = './uploads/files/';
+                $config['allowed_types']        = '*';
+                $config['max_size']             = 8000; // 8 mb
+                $config['file_name']            = $fileName;
+
+                if(is_file('./uploads/files/'.$fileName)){
+                    unlink('./uploads/files/'.$fileName);
+                }
+                $this->load->library('upload', $config);
+                if ( ! $this->upload->do_upload('userfile')){
+                    $error = array('error' => $this->upload->display_errors());
+                    return print_r(json_encode($error));
+                }
+                else {
+                    
+                    $success = array('success' => $this->upload->data());
+                    $success['success']['formGrade'] = 0;
+                    $Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
+                    
+                    $dataSave = array(
+                            'NIP' => $NIP,
+                            'TypeFiles' => $Get_MasterFiles,
+                            'LinkFiles' => $fileName,
+                            'UserCreate' => $IDuser
+                    );
+
+                    $this->db->insert('db_employees.files',$dataSave);
+                    return print_r(json_encode($success));
+                }
+
+            }
+             elseif ($Colom == 'TranscriptS2') {
+
+                $fileName = $this->input->get('fileName');
+                $Colom = $this->input->get('c');
+                $User = $this->input->get('u');
+                //print_r($fileName);
+
+                $config['upload_path']          = './uploads/files/';
+                $config['allowed_types']        = '*';
+                $config['max_size']             = 8000; // 8 mb
+                $config['file_name']            = $fileName;
+
+                if(is_file('./uploads/files/'.$fileName)){
+                    unlink('./uploads/files/'.$fileName);
+                }
+                $this->load->library('upload', $config);
+                if ( ! $this->upload->do_upload('userfile')){
+                    $error = array('error' => $this->upload->display_errors());
+                    return print_r(json_encode($error));
+                }
+                else {
+                    
+                    $success = array('success' => $this->upload->data());
+                    $success['success']['formGrade'] = 0;
+                    $Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
+                    
+                    $dataSave = array(
+                            'NIP' => $NIP,
+                            'TypeFiles' => $Get_MasterFiles,
+                            'LinkFiles' => $fileName,
+                            'UserCreate' => $IDuser
+                    );
+
+                    $this->db->insert('db_employees.files',$dataSave);
+                    return print_r(json_encode($success));
+                }
+            }
+            elseif ($Colom == 'IjazahS3') {
+
+                $fileName = $this->input->get('fileName');
+                $Colom = $this->input->get('c');
+                $User = $this->input->get('u');
+                //print_r($fileName);
+
+                $config['upload_path']          = './uploads/files/';
+                $config['allowed_types']        = '*';
+                $config['max_size']             = 8000; // 8 mb
+                $config['file_name']            = $fileName;
+
+                if(is_file('./uploads/files/'.$fileName)){
+                    unlink('./uploads/files/'.$fileName);
+                }
+                $this->load->library('upload', $config);
+                if ( ! $this->upload->do_upload('userfile')){
+                    $error = array('error' => $this->upload->display_errors());
+                    return print_r(json_encode($error));
+                }
+                else {
+                    
+                    $success = array('success' => $this->upload->data());
+                    $success['success']['formGrade'] = 0;
+                    $Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
+                    // Cek apakah di db sudah ada
+                    $dataSave = array(
+                            'NIP' => $NIP,
+                            'TypeFiles' => $Get_MasterFiles,
+                            'LinkFiles' => $fileName,
+                            'UserCreate' => $IDuser
+                    );
+
+                    $this->db->insert('db_employees.files',$dataSave);
+                    return print_r(json_encode($success));
+                }
+            }
+            elseif ($Colom == 'TranscriptS3') {
+
+                $fileName = $this->input->get('fileName');
+                $Colom = $this->input->get('c');
+                $User = $this->input->get('u');
+
+                $config['upload_path']          = './uploads/files/';
+                $config['allowed_types']        = '*';
+                $config['max_size']             = 8000; // 8 mb
+                $config['file_name']            = $fileName;
+
+                if(is_file('./uploads/files/'.$fileName)){
+                    unlink('./uploads/files/'.$fileName);
+                }
+                $this->load->library('upload', $config);
+                if ( ! $this->upload->do_upload('userfile')){
+                    $error = array('error' => $this->upload->display_errors());
+                    return print_r(json_encode($error));
+                }
+                else {
+                    
+                    $success = array('success' => $this->upload->data());
+                    $success['success']['formGrade'] = 0;
+                    $Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
+                    // Cek apakah di db sudah ada
+                    $dataSave = array(
+                            'NIP' => $NIP,
+                            'TypeFiles' => $Get_MasterFiles,
+                            'LinkFiles' => $fileName,
+                            'UserCreate' => $IDuser
+                    );
+
+                    $this->db->insert('db_employees.files',$dataSave);
+                    return print_r(json_encode($success));
+                }
+            }
+            elseif ($action == 'OtherFiles') {
+
+                $fileName = $this->input->get('fileName');
+                $Colom = $this->input->get('c');
+                $User = $this->input->get('u');
+
+                $config['upload_path']          = './uploads/files/';
+                $config['allowed_types']        = '*';
+                $config['max_size']             = 8000; // 8 mb
+                $config['file_name']            = $fileName;
+
+                if(is_file('./uploads/files/'.$fileName)){
+                    unlink('./uploads/files/'.$fileName);
+                }
+                $this->load->library('upload', $config);
+                if ( ! $this->upload->do_upload('userfile')){
+                    $error = array('error' => $this->upload->display_errors());
+                    return print_r(json_encode($error));
+                }
+                else {
+                    
+                    $success = array('success' => $this->upload->data());
+                    $success['success']['formGrade'] = 0;
+
+                    $Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
+                   
+                    return print_r(json_encode($success));
+                }
+
+
+            }
+    } 
+
 
     public function upload_ijazah(){
 
@@ -185,6 +481,31 @@ class C_employees extends HR_Controler {
 
 
     }
+
+
+    // ==================Academic Employess Data===========================
+    
+     public function academic_employees(){
+        $department = parent::__getDepartement();
+        // get Prodi
+        $data['ProdiArr'] = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
+        $page = $this->load->view('page/'.$department.'/academic/academic_employees',$data,true);
+        $this->tab_menu($page);
+    }
+
+
+     public function files_employees(){
+      $department = parent::__getDepartement();
+
+        $logged_in = $this->session->userdata('NIP');
+
+        $data['filesview'] = $this->m_master->carifilestemp();
+        $page = $this->load->view('page/'.$department.'/employees/files_review',$data,true);
+
+        //$sender= $this->ms->getSenderMenu($kode);
+        //$this->load->view('confirm/form_acc_gm', $datas);
+
+     }
 
 
     // =============================================

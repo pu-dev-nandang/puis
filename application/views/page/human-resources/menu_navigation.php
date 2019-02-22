@@ -32,6 +32,12 @@
             </li>
 
 
+             <li class="<?php if($this->uri->segment(2)=='academic_employees'){echo"current";}?>">
+                <a href="<?php echo base_url('human-resources/academic_employees');?>">
+                    <i class="fa fa-id-card"></i>
+                    Master Academic
+                </a>
+            </li>
 
 
         </ul>

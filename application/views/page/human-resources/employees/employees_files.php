@@ -1,4 +1,26 @@
 
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title" id="myModalLabel">Modal title</h4> 
+      </div>
+      <div class="modal-body">
+        <div style="text-align: center;">
+<iframe src="" 
+style="width:500px; height:500px;" frameborder="0"></iframe>
+</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <style>
     .form-group {
@@ -64,7 +86,7 @@
                                 </div>
                             </form>
                         </td>
-                        <td id="viewKTP">-</td>
+                        <td id="viewKTP" data-toggle="modal" data-target="#myModal">-</td>
                         <td style="text-align: center;"><button id="btnDelete_KTP" class="btn btn-sm btn-danger btnDelete" disabled><i class="fa fa-trash"></i></button></td>
                     </tr>
                     <tr>

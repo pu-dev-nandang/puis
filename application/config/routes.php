@@ -130,6 +130,16 @@ $route['human-resources/employees/input-employees'] = 'page/hr/c_employees/input
 $route['human-resources/employees/edit-employees/(:num)'] = 'page/hr/c_employees/edit_employees/$1';
 $route['human-resources/upload_photo'] = 'page/hr/c_employees/upload_photo';
 $route['human-resources/upload_ijazah'] = 'page/hr/c_employees/upload_ijazah';
+$route['human-resources/upload_academic'] = 'page/hr/c_employees/upload_fileAcademic'; //add bismar
+
+// --- Modal Academic ---- ADD Bismar
+$route['human-resources/academic_employees'] = 'page/hr/c_employees/academic_employees';
+$route['human-resources/files_reviews'] = 'page/hr/c_employees/files_employees';
+
+//$route['database/lecturers'] = 'page/database/c_database/lecturers';
+$route['human-resources/academic-details/(:any)'] = 'page/hr/c_employees/academicDetails/$1';
+$route['human-resources/loadpageacademicDetails'] = 'page/hr/c_employees/loadpageacademicDetails';
+
 
 $route['human-resources/monitoring-attendance/with-range-date'] = 'page/hr/c_employees/with_range_date';
 
@@ -663,6 +673,7 @@ $route['api/__getEmployees'] = 'api/c_api/getEmployees';
 $route['api/employees/searchnip/(:any)'] = 'api/c_api/searchnip_employees/$1';
 
 $route['api/__getEmployeesHR'] = 'api/c_api/getEmployeesHR';
+$route['api/__getfileEmployeesHR'] = 'api/c_api/getfileEmployees'; //add bismar feb 2019
 
 $route['api/__setLecturersAvailability'] = 'api/c_api/setLecturersAvailability';
 $route['api/__setLecturersAvailabilityDetail/(:any)'] = 'api/c_api/setLecturersAvailabilityDetail/$1';
@@ -744,6 +755,9 @@ $route['api/__getClassGroupAutoComplete/(:num)'] = 'api/c_api/getClassGroupAutoC
 $route['api/__getScheduleIDByClassGroup/(:num)/(:any)'] = 'api/c_api/getScheduleIDByClassGroup/$1/$2';
 $route['api/__crudPartime'] = 'api/c_api/crudPartime';
 $route['api/__crudStudent'] = 'api/c_api/crudStudent';
+$route['api/__crudAcademic'] = 'api/c_api/crudAcademic'; //add bismar
+$route['api/__reviewacademic'] = 'api/c_api/review_academicdetail'; //add bismar
+$route['api/__reviewotherfile'] = 'api/c_api/review_otherfile'; //add bismar
 
 $route['api/__filterStudents'] = 'api/c_api/filterStudents';
 $route['api/__getFormulirOfflineAvailable/(:any)'] = 'api/c_api/getFormulirOfflineAvailable/$1';
@@ -777,6 +791,7 @@ $route['api/__crudScore'] = 'api/c_api/crudScore';
 $route['api/__crudAttendance'] = 'api/c_api/crudAttendance';
 $route['api/__crudScheduleExchange'] = 'api/c_api/crudScheduleExchange';
 $route['api/__crudLimitCredit'] = 'api/c_api/crudLimitCredit';
+$route['api/__crudAcademicData'] = 'api/c_api/crudAcademicData'; //add bismar
 
 $route['api/__crudLecturerEvaluation'] = 'api/c_api/crudLecturerEvaluation';
 $route['api/__getLecturerEvaluation'] = 'api/c_api/getLecturerEvaluation';
