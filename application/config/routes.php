@@ -105,6 +105,7 @@ $route['academic/exam-schedule/list-exam'] = 'page/academic/c_jadwal_ujian/list_
 $route['academic/exam-schedule/list-waiting-approve'] = 'page/academic/c_jadwal_ujian/list_waiting_approve';
 $route['academic/exam-schedule/set-exam-schedule'] = 'page/academic/c_jadwal_ujian/set_exam_schedule';
 $route['academic/exam-schedule/edit-exam-schedule/(:num)'] = 'page/academic/c_jadwal_ujian/edit_exam_schedule/$1';
+$route['academic/exam-schedule/exam-setting'] = 'page/academic/c_jadwal_ujian/exam_setting';
 
 // ---- Score ----
 $route['academic/score'] =  'page/academic/c_score';

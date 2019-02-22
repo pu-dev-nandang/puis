@@ -1025,6 +1025,8 @@ class C_save_to_pdf extends CI_Controller {
         }
         else if($data_arr['DocumentType']==3){
 
+//            print_r($data_arr);
+//            exit;
             // Get data exam
             $dataExam = $this->m_save_to_pdf->getExamScheduleWithStudent($data_arr['SemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
 

@@ -124,19 +124,20 @@
                     $('#divLoadAttd').html('<table class="table table-bordered table-striped" id="tableMonAttd">' +
                         '            <thead>' +
                         '            <tr>' +
-                        '                <th rowspan="2" style="width: 1%;">Sessions</th>' +
-                        '                <th rowspan="2" style="width: 15%;">Subject</th>' +
-                        '                <th rowspan="2" style="width: 15%;">Material</th>' +
-                        '                <th rowspan="2" style="width: 15%;">Description</th>' +
-                        '                <th colspan="2" style="width: 15%;">Attendance</th>' +
+                        '                <th rowspan="2" style="width: 1%;">Sesi</th>' +
+                        '                <th rowspan="2" style="width: 12%;">Subject</th>' +
+                        '                <th rowspan="2" style="width: 12%;">Material</th>' +
+                        '                <th rowspan="2" style="width: 12%;">Description</th>' +
+                        '                <th colspan="2" style="width: 6%;">Attendance</th>' +
                         '                <th colspan="2">Signature</th>' +
-                        '                <th rowspan="2" style="width: 15%;">Schedule Exchange</th>' +
+                        '                <th rowspan="2" style="width: 10%;">Schedule Exchange</th>' +
+                        '                <th rowspan="2" style="width: 15%;">Review</th>' +
                         '            </tr>' +
                         '            <tr>' +
-                        '                <th style="width: 5%;">P</th>' +
-                        '                <th style="width: 5%;">A</th>' +
+                        '                <th style="width: 3%;">P</th>' +
+                        '                <th style="width: 3%;">A</th>' +
                         '                <th style="width: 15%;">Lecturer</th>' +
-                        '                <th style="width: 15%;">Student</th>' +
+                        '                <th style="width: 10%;">Student</th>' +
                         '            </tr>' +
                         '            </thead>' +
                         '            <tbody id="dataRowBAB"></tbody>' +
@@ -179,6 +180,8 @@
                             : '-';
                         var ClassExc = (d.Exchange.length>0) ? '<br/><span class="label label-warning">Exchange</span>' : '';
 
+                        var Review = (dataBAP.length>0 && dataBAP[0].Review!='' && dataBAP[0].Review!=null) ? dataBAP[0].Review : '';
+
                         $('#dataRowBAB').append('<tr>' +
                             '<td>'+no+' '+ClassExc+'</td>' +
                             '<td style="text-align: left;"><span class="viewerBAP viewerBAP'+no+'" id="viewSubject'+no+'">'+Subject+'</span><textarea class="form-control hide formBAP formBAP'+no+'" rows="3" id="formSubject'+no+'">'+Subject+'</textarea></td>' +
@@ -189,6 +192,7 @@
                             '<td style="text-align: left;">'+lecturer+'</td>' +
                             '<td>'+btnSignStudent+'</td>' +
                             '<td>'+exchange+'</td>' +
+                            '<td style="text-align: left;">'+Review+'</td>' +
                             '</tr>');
                         no+=1;
                     }

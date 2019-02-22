@@ -125,6 +125,9 @@
                                     <select class="form-control form-filter-inv" id="filterTypeExam">
                                         <option value="uts">UTS</option>
                                         <option value="uas">UAS</option>
+                                        <option disabled>-- Make-up Exams --</option>
+                                        <option value="re_uts">UTS</option>
+                                        <option value="re_uas">UAS</option>
                                     </select>
                                 </div>
                             </div>

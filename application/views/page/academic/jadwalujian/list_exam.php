@@ -27,6 +27,9 @@
                     <select id="filterExam" class="form-control form-filter-list-exam">
                         <option value="uts">UTS</option>
                         <option value="uas">UAS</option>
+                        <option disabled>--- Make-up Exams ---</option>
+                        <option value="re_uts">UTS</option>
+                        <option value="re_uas">UAS</option>
                     </select>
                 </div>
                 <div class="col-xs-5">
@@ -80,7 +83,7 @@
                 <div class="col-xs-12">
                     <div class="checkbox checbox-switch switch-primary">
                         <label>
-                            <input type="checkbox"id="layoutExam" />
+                            <input type="checkbox" id="layoutExam" />
                             <span></span>
                             <b> | Random Layout</b>
                         </label>
@@ -145,6 +148,7 @@
                     '        <th rowspan="2">Name</th>' +
                     '        <th rowspan="2" style="width: 13%;">Attd</th>' +
                     '        <th colspan="2" style="width: 35">Payment</th>' +
+                    '        <th rowspan="2" style="width: 13%;">Exam Attd</th>' +
                     '    </tr>' +
                     '    <tr>' +
                     '       <th style="width: 17%">BPP</th>' +
@@ -152,6 +156,12 @@
                     '   </tr>' +
                     '    </thead>' +
                     '    <tbody id="dataMHSExam"></tbody>' +
+                    '    <tbody id="dataMHSExam2">' +
+                    '       <tr sty]e="backgroung : #CCC;">' +
+                    '           <td colspan="5">Total</td>' +
+                    '           <td id="viewTotalAttd" "></td>' +
+                    '       </tr>' +
+                    '   </tbody>' +
                     '</table>' +
                     '';
                 $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
@@ -160,6 +170,7 @@
                 $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
 
                 var no_std = 1;
+                var p = 0;
                 for(var i=0;i<jsonResult.length;i++){
                     var d = jsonResult[i];
 
@@ -180,14 +191,24 @@
 
                     var AttdPercentage = (typeof  d.DetailAttendance.Percentage !== undefined
                         && d.DetailAttendance.Percentage!=null && d.DetailAttendance.Percentage!='') ? d.DetailAttendance.Percentage : 0;
+
+                    var ExamAttd = (d.Status==1 || d.Status=='1') ? '<span class="label label-success">P</span>' : '<span class="label label-danger">A</span>';
+
+                   if(d.Status==1 || d.Status=='1'){
+                       p += 1;
+                   }
+
                     $('#dataMHSExam').append('<tr>' +
                         '<td>'+(no_std++)+'</td>' +
                         '<td style="text-align: left;"><b>'+d.Name+'</b><br/>'+d.NPM+'</td>' +
                         '<td>'+AttdPercentage.toFixed()+' %</td>' +
                         '<td>'+BPP+'</td>' +
                         '<td>'+Credit+'</td>' +
+                        '<td style="background: #f4f4f4">'+ExamAttd+'</td>' +
                         '</tr>');
                 }
+
+                $('#viewTotalAttd').html(p+' of '+jsonResult.length);
 
                 $('#GlobalModal').modal({
                     'show' : true,
@@ -332,26 +353,32 @@
 
     function load__DateExam() {
         var filterSemester = $('#filterSemester').val();
+        var filterExam = $('#filterExam').val();
         if(filterSemester!='' && filterSemester!=null){
             var url = base_url_js+'api/__crudJadwalUjian';
-            var token = jwt_encode({action:'checkDateExam',SemesterID : filterSemester.split('.')[0]},'UAP)(*');
+            var token = jwt_encode({action:'checkDateExam',SemesterID : filterSemester.split('.')[0],Type : filterExam},'UAP)(*');
             $.post(url,{token:token},function (jsonResult) {
 
                 $('#form2PDFDate').empty();
                 $('#form2PDFDate').append('<option value="">-- All Date --</option>');
-                if(jsonResult.utsStart!=null && jsonResult.utsStart!=''){
-                    var filterExam = $('#filterExam').val();
-                    var start = (filterExam=='UTS' || filterExam=='uts') ? jsonResult.utsStart : jsonResult.uasStart;
-                    var end = (filterExam=='UTS' || filterExam=='uts') ? jsonResult.utsEnd : jsonResult.uasEnd;
-                    var rangeDate = momentRange(start,end);
-                    if(typeof rangeDate.details !== undefined){
-                        for(var i=0;i<rangeDate.details.length;i++){
-                            var d = rangeDate.details[i];
-                            $('#form2PDFDate').append('<option value="'+moment(d).format('YYYY-MM-DD')+'">'+moment(d).format('dddd, DD MMM YYYY')+'</option>');
-                        }
-                    }
 
+                if(jsonResult.length>0){
+                    for(var i=0;i<jsonResult.length;i++){
+                        var d = jsonResult[i];
+                        $('#form2PDFDate').append('<option value="'+moment(d).format('YYYY-MM-DD')+'">'+moment(d).format('ddd, DD MMM YYYY')+'</option>');
+                    }
                 }
+
+                // if(jsonResult.utsStart!=null && jsonResult.utsStart!=''){
+                //     var filterExam = $('#filterExam').val();
+                //     var start = (filterExam=='UTS' || filterExam=='uts') ? jsonResult.utsStart : jsonResult.uasStart;
+                //     var end = (filterExam=='UTS' || filterExam=='uts') ? jsonResult.utsEnd : jsonResult.uasEnd;
+                //     var rangeDate = momentRange(start,end);
+                //     if(typeof rangeDate.details !== undefined){
+                //
+                //     }
+                //
+                // }
 
                 loadDataExam();
 

@@ -35,6 +35,12 @@ class C_jadwal_ujian extends Academic_Controler {
         $this->menu_jadwalUjian($page);
     }
 
+    public function exam_setting(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/jadwalujian/exam_setting',$data,true);
+        $this->menu_jadwalUjian($page);
+    }
+
     public function list_waiting_approve(){
         $data['department'] = parent::__getDepartement();
         $page = $this->load->view('page/'.$data['department'].'/jadwalujian/list_waiting_approve',$data,true);

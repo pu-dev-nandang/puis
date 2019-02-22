@@ -1930,12 +1930,11 @@ class M_api extends CI_Model {
                                                     WHERE sd.ScheduleID = "'.$d['ID'].'" ')->result_array();
 
                 for($s2=0;$s2<count($dataSesi);$s2++){
-                    $whereCheck = array(
+
+                    $querySeat = $this->db->get_where('db_academic.std_krs', array(
                         'SemesterID' => $d['SemesterID'],
-                        'ScheduleID' => $d['ID'],
-                        'CDID' => $CDID
-                    );
-                    $querySeat = $this->db->get_where('db_academic.std_krs', $whereCheck)->result_array();
+                        'ScheduleID' => $d['ID']
+                    ))->result_array();
                     $dataSesi[$s2]['CountSeat'] = count($querySeat);
                 }
 
@@ -2262,18 +2261,28 @@ class M_api extends CI_Model {
         return $data;
     }
 
-    public function getDateExam($SemesterID){
+    public function getDateExam($SemesterID,$Type){
 
 //        $SemesterActive = $this->_getSemesterActive();
 
-        $data = $this->db->query('SELECT * FROM db_academic.academic_years 
-                                          WHERE SemesterID = "'.$SemesterID.'" 
-                                          LIMIT 1')->result_array();
+        $data = $this->db->query('SELECT DISTINCT ex.ExamDate FROM db_academic.exam ex 
+                                            WHERE ex.SemesterID = "'.$SemesterID.'" 
+                                            AND ex.Type LIKE "'.$Type.'" ORDER BY ex.ExamDate ASC')->result_array();
 
 
+//        $data = $this->db->query('SELECT * FROM db_academic.academic_years
+//                                          WHERE SemesterID = "'.$SemesterID.'"
+//                                          LIMIT 1')->result_array();
+
+        $result = [];
+        if(count($data)>0){
+            foreach ($data as $item){
+                array_push($result,$item['ExamDate']);
+            }
+        }
 
 
-        return (count($data))? $data[0] : [];
+        return $result;
 
     }
 
@@ -2339,18 +2348,25 @@ class M_api extends CI_Model {
 
                 for($s=0;$s<count($dataSt);$s++){
 
+                    $TypeSearch = $Type;
                     // Cek Apakah ada Di Exam
+                    if($Type=='re_uts'){
+                        $TypeSearch = 'uts';
+                    } else if($Type=='re_uas'){
+                        $TypeSearch = 'uas';
+                    }
                     $dataStdExamCheck = $this->db->query('SELECT exd.* FROM db_academic.exam ex
                                                                     LEFT JOIN db_academic.exam_details exd ON (ex.ID = exd.ExamID)
                                                                     LEFT JOIN db_academic.exam_group exg ON (ex.ID = exg.ExamID)
                                                                     WHERE exg.ScheduleID = "'.$ScheduleID.'"
                                                                     AND exd.NPM = "'.$dataSt[$s]['NPM'].'"
-                                                                    AND ex.Type = "'.$Type.'" 
+                                                                    AND ex.Type = "'.$TypeSearch.'" 
                                                                     LIMIT 1')
                                             ->result_array();
 
                     $dataSt[$s]['IDEd'] = (count($dataStdExamCheck)>0) ? $dataStdExamCheck[0]['ID'] : '' ;
                     $dataSt[$s]['DB_Students'] = $db_;
+                    $dataSt[$s]['Status'] = (count($dataStdExamCheck)>0) ? $dataStdExamCheck[0]['Status'] : '' ;;
                     array_push($dataStudentsDetails,$dataSt[$s]);
                 }
 
@@ -3694,7 +3710,7 @@ class M_api extends CI_Model {
         $dataExamDetail = $this->db->query('SELECT exd.*,ex.SemesterID, aut.Name, aut.Year FROM db_academic.exam_details exd 
                                                       LEFT JOIN db_academic.exam ex ON (ex.ID = exd.ExamID)
                                                       LEFT JOIN db_academic.auth_students aut ON (aut.NPM = exd.NPM)
-                                                      WHERE exd.ExamID = "'.$ExamID.'" ')->result_array();
+                                                      WHERE exd.ExamID = "'.$ExamID.'" ORDER BY aut.NPM ASC')->result_array();
         if(count($dataExamDetail)>0){
             for($i=0;$i<count($dataExamDetail);$i++){
 
@@ -3898,12 +3914,11 @@ class M_api extends CI_Model {
                                                     WHERE sd.ScheduleID = "'.$d['ID'].'" ')->result_array();
 
                 for($s2=0;$s2<count($dataSesi);$s2++){
-                    $whereCheck = array(
+
+                    $querySeat = $this->db->get_where('db_academic.std_krs', array(
                         'SemesterID' => $d['SemesterID'],
-                        'ScheduleID' => $d['ID'],
-                        'CDID' => $CDID
-                    );
-                    $querySeat = $this->db->get_where('db_academic.std_krs', $whereCheck)->result_array();
+                        'ScheduleID' => $d['ID']
+                    ))->result_array();
                     $dataSesi[$s2]['CountSeat'] = count($querySeat);
                 }
 
