@@ -745,6 +745,12 @@
              var aa = $("#wrDepartment").text();
              $("#wrDepartment").html(aa + ' '+NameDiv);
          <?php endif ?>
+
+         <?php if ($this->session->userdata('IDdepartementNavigation') == 34): ?>
+             var NameDiv = "<?php echo $this->session->userdata('faculty_active') ?>";
+             var aa = $("#wrDepartment").text();
+             $("#wrDepartment").html(aa + ' '+NameDiv);
+         <?php endif ?>
     }
 
     function Global_CantAction(element){

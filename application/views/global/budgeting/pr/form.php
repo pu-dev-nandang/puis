@@ -53,6 +53,7 @@
 	var UserAccess = '';
 	var RuleAccess = [];
 	var MaxLimit =0;
+	var DepartementArr = [];
 	// document.addEventListener('contextmenu', function(e) {
 	//   e.preventDefault();
 	// });
@@ -121,6 +122,7 @@
 		  var url = base_url_js+"api/__getAllDepartementPU";
 		  $('#DepartementPost').empty();
 		  $.post(url,function (data_json) {
+		  	DepartementArr = data_json;
 		    for (var i = 0; i < data_json.length; i++) {
 		        var selected = (data_json[i]['Code']==Div) ? 'selected' : '';
 		        $('#DepartementPost').append('<option value="'+ data_json[i]['Code']  +'" '+selected+'>'+data_json[i]['Name2']+'</option>');
@@ -189,16 +191,17 @@
 									'<thead>'+
 									'<tr>'+
 										'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
+										'<th width = "100px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Budget Status</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Select Post Budget Item</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Item</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Desc</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Spesification Additional</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Need</th>'+
-			                            '<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">Qty</th>'+
+			                            '<th width = "4%" style = "text-align: center;background: #20485A;color: #FFFFFF;">Qty</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Unit Cost</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Sub Total</th>'+
 			                            '<th width = "150px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Date Needed</th>'+
-			                            '<th width = "100px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Budget Status</th>'+
+			                            // '<th width = "100px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Budget Status</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Upload Files</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Action</th>'+
 									'</tr></thead>'+
@@ -336,6 +339,7 @@
     					var action = '<td><button type="button" class="btn btn-danger btn-delete btn-delete-item"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button></td>';
     					var a = '<tr>'+
     								'<td>'+No+'</td>'+
+    								'<td></td>'+
     								'<td>'+
     									'<div class="input-group">'+
     										'<input type="text" class="form-control PostBudgetItem" readonly id_budget_left = "'+ID_budget_left+'" value = "'+PostBudgetItem+'">'+
@@ -370,7 +374,6 @@
     			                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
     	                        		'</div>'+
     	                        	'</td>'+
-    	                        	'<td></td>'+
     	                        	'<td><input type="file" data-style="fileinput" class = "BrowseFile" ID = "BrowseFile'+No+'" multiple accept="image/*">'+htmlUploadFile+'</td>'+action
     	                        '</tr>';	
 
@@ -390,7 +393,7 @@
     				$(".UnitCost").maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
     				$(".UnitCost").maskMoney('mask', '9894');
     				_BudgetRemaining();
-    				FuncBudgetStatus();
+    				FuncBudgetStatus(pr_detail[0]['BudgetStatus']);
     				var Status = pr_create[0]['Status'];
     				if (Status >= 1) {
     					// jika reject and user access = 1 maka dont disable
@@ -469,7 +472,7 @@
     				
 			    }); 
 		
-			}
+			} // end edit
 
 			// find auth entry
 				for (var i = 0; i < RuleAccess.length; i++) {
@@ -506,8 +509,40 @@
 				if (No > 1) {
 					action = '<td><button type="button" class="btn btn-danger btn-delete btn-delete-item"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button></td>';
 				}
+
+				var opBudgetStatus = function()
+				{
+					var html = '<select class = "form-control BudgetStatus">';
+					var OP = [
+							{
+								name  : 'IN',
+								color : 'green'
+							},
+							// {
+							// 	name  : 'Exceed',
+							// 	color : 'red'
+							// },
+							{
+								name  : 'Cross',
+								color : 'yellow'
+							},
+						];
+
+						var DefaultName = 'IN';
+						for (var i = 0; i < OP.length; i++) {
+							var selected = (DefaultName == OP[i].name) ? 'selected' : '';
+							html += '<option value = "'+OP[i].name+'"'+selected+'>'+OP[i].name+'</option>';
+						}
+						html += '</select>';
+						return html;
+				};
+
+
 				var a = '<tr>'+
 							'<td>'+No+'</td>'+
+							'<td>'+
+								opBudgetStatus()+
+							'</td>'+
 							'<td>'+
 								'<div class="input-group">'+
 									'<input type="text" class="form-control PostBudgetItem" readonly>'+
@@ -542,7 +577,6 @@
 		                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
                         		'</div>'+
                         	'</td>'+
-                        	'<td></td>'+
                         	'<td><input type="file" data-style="fileinput" class = "BrowseFile" ID = "BrowseFile'+No+'" multiple accept="image/*"></td>'+action
                         '</tr>';	
 
@@ -567,108 +601,149 @@
 		
 		$(document).off('click', '.SearchPostBudget').on('click', '.SearchPostBudget',function(e) {
 			var ev = $(this);
-			var html = '';
-			html ='<div class = "row">'+
-					'<div class = "col-md-12">'+
-						'<table id="example" class="table table-bordered display select" cellspacing="0" width="100%">'+
-               '<thead>'+
-                  '<tr>'+
-                     // '<th><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>'+
-                     '<th></th>'+
-                     '<th>Post Budget Item</th>'+
-                     '<th>Remaining</th>'+
-                  '</tr>'+
-               '</thead>'+
-          '</table></div></div>';
+			// check Budget Status apakah in atau cross
+				var BudgetStatus = ev.closest('tr').find('td:eq(1)').find('.BudgetStatus').val();
 
-				$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Post Budget Item'+'</h4>');
-				$('#GlobalModalLarge .modal-body').html(html);
-				$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
-              '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>');
-				$('#GlobalModalLarge').modal({
-				    'show' : true,
-				    'backdrop' : 'static'
-				});
+				if (BudgetStatus == 'IN') {
+					var html = '';
+					html ='<div class = "row">'+
+							'<div class = "col-md-12">'+
+								'<table id="example" class="table table-bordered display select" cellspacing="0" width="100%">'+
+		               '<thead>'+
+		                  '<tr>'+
+		                     // '<th><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>'+
+		                     '<th></th>'+
+		                     '<th>Post Budget Item</th>'+
+		                     '<th>Remaining</th>'+
+		                  '</tr>'+
+		               '</thead>'+
+		          '</table></div></div>';
 
-			var table = $('#example').DataTable({
-			      "data" : PostBudgetDepartment,
-			      'columnDefs': [
-				      {
-				         'targets': 0,
-				         'searchable': false,
-				         'orderable': false,
-				         'className': 'dt-body-center',
-				         'render': function (data, type, full, meta){
-				             return '<input type="checkbox" name="id[]" value="' + full.ID + '" estvalue="' + full.Value + '">';
-				         }
-				      },
-				      {
-				         'targets': 1,
-				         'render': function (data, type, full, meta){
-				             return full.PostName+'-'+full.RealisasiPostName;
-				         }
-				      },
-				      {
-				         'targets': 2,
-				         'render': function (data, type, full, meta){
-				             return formatRupiah(full.Value);
-				         }
-				      },
-			      ],
-			      // 'order': [[1, 'asc']]
-			});
+						$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Post Budget Item'+'</h4>');
+						$('#GlobalModalLarge .modal-body').html(html);
+						$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+		              '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>');
+						$('#GlobalModalLarge').modal({
+						    'show' : true,
+						    'backdrop' : 'static'
+						});
 
-			// Handle click on checkbox to set state of "Select all" control
-			$('#example tbody').on('change', 'input[type="checkbox"]', function(){
-				$('input[type="checkbox"]:not(.uniform)').prop('checked', false);
-				$(this).prop('checked',true);
-			   
-			});
+					var table = $('#example').DataTable({
+					      "data" : PostBudgetDepartment,
+					      'columnDefs': [
+						      {
+						         'targets': 0,
+						         'searchable': false,
+						         'orderable': false,
+						         'className': 'dt-body-center',
+						         'render': function (data, type, full, meta){
+						             return '<input type="checkbox" name="id[]" value="' + full.ID + '" estvalue="' + full.Value + '">';
+						         }
+						      },
+						      {
+						         'targets': 1,
+						         'render': function (data, type, full, meta){
+						             return full.PostName+'-'+full.RealisasiPostName;
+						         }
+						      },
+						      {
+						         'targets': 2,
+						         'render': function (data, type, full, meta){
+						             return formatRupiah(full.Value);
+						         }
+						      },
+					      ],
+					      // 'order': [[1, 'asc']]
+					});
 
-			$("#ModalbtnSaveForm").click(function(){
-				var chkbox = $('input[type="checkbox"]:checked:not(.uniform)');
-				var checked = chkbox.val();
-				var estvalue = chkbox.attr('estvalue');
-				var n = estvalue.indexOf(".");
-				estvalue = estvalue.substring(0, n);
-				var row = chkbox.closest('tr');
-				var PostBudgetItem = row.find('td:eq(1)').text();
-				var fillItem = ev.closest('tr');
-				fillItem.find('td:eq(1)').find('.PostBudgetItem').val(PostBudgetItem);
-				fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left',checked);
-				fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('remaining',estvalue);
-				fillItem.find('td:eq(6)').find('.qty').trigger('change');
-				$('#GlobalModalLarge').modal('hide');
-			})
+					// Handle click on checkbox to set state of "Select all" control
+					$('#example tbody').on('change', 'input[type="checkbox"]', function(){
+						$('input[type="checkbox"]:not(.uniform)').prop('checked', false);
+						$(this).prop('checked',true);
+					   
+					});
+
+					$("#ModalbtnSaveForm").click(function(){
+						var chkbox = $('input[type="checkbox"]:checked:not(.uniform)');
+						var checked = chkbox.val();
+						var estvalue = chkbox.attr('estvalue');
+						var n = estvalue.indexOf(".");
+						estvalue = estvalue.substring(0, n);
+						var row = chkbox.closest('tr');
+						var PostBudgetItem = row.find('td:eq(1)').text();
+						var fillItem = ev.closest('tr');
+						fillItem.find('td:eq(2)').find('.PostBudgetItem').val(PostBudgetItem);
+						fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('id_budget_left',checked);
+						fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('remaining',estvalue);
+						fillItem.find('td:eq(7)').find('.qty').trigger('change');
+						$('#GlobalModalLarge').modal('hide');
+					})
+				} // exit IN
+				else if(BudgetStatus == 'Cross')
+				{
+					// show department
+					var html = ''
+					var opDepartment = '';
+					var Div = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
+					for (var i = 0; i < DepartementArr.length; i++) {
+						if (DepartementArr[i]['Code'] != Div) {
+							opDepartment += '<option value="'+ DepartementArr[i]['Code']  +'" '+''+'>'+DepartementArr[i]['Name2']+'</option>';
+						}
+						
+					}
+					html = '<div class = "row">'+
+								'<div class = "col-md-4 col-md-offset-4">'+
+									'<div class="form-group">'+
+										'<label class="control-label">Department</label>'+
+										'<select class = "select2-select-00 full-width-fix" id = "DepartementPostModal">'+
+											opDepartment+
+										'</select>'+
+									'</div>'+
+								'</div>'+
+							'</div>';
+
+					$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Post Budget Item'+'</h4>');
+					$('#GlobalModalLarge .modal-body').html(html);
+					$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+	              '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>');
+					$('#GlobalModalLarge').modal({
+					    'show' : true,
+					    'backdrop' : 'static'
+					});
+
+					$('#DepartementPostModal').select2({
+					   //allowClear: true
+					});		
+				}
 
 		})
 
 		$(document).off('change', '.qty').on('change', '.qty',function(e) {
 			var qty = $(this).val();
 			var fillItem = $(this).closest('tr');
-			var estvalue = fillItem.find('td:eq(7)').find('.UnitCost').val();
+			var estvalue = fillItem.find('td:eq(8)').find('.UnitCost').val();
 			estvalue = findAndReplace(estvalue, ".","");
 			var SubTotal = parseInt(qty) * parseInt(estvalue);
-			fillItem.find('td:eq(8)').find('.SubTotal').val(SubTotal);
-			fillItem.find('td:eq(8)').find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-			fillItem.find('td:eq(8)').find('.SubTotal').maskMoney('mask', '9894');
+			fillItem.find('td:eq(9)').find('.SubTotal').val(SubTotal);
+			fillItem.find('td:eq(9)').find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+			fillItem.find('td:eq(9)').find('.SubTotal').maskMoney('mask', '9894');
 			_BudgetRemaining();
 			FuncBudgetStatus();
-			var id_budget_left = fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left');
+			var id_budget_left = fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('id_budget_left');
 		})
 
 		$(document).off('keyup', '.UnitCost').on('keyup', '.UnitCost',function(e) {
 			var fillItem = $(this).closest('tr');
-			var qty = fillItem.find('td:eq(6)').find('.qty').val();
+			var qty = fillItem.find('td:eq(7)').find('.qty').val();
 			var estvalue = $(this).val();
 			estvalue = findAndReplace(estvalue, ".","");
 			var SubTotal = parseInt(qty) * parseInt(estvalue);
-			fillItem.find('td:eq(8)').find('.SubTotal').val(SubTotal);
-			fillItem.find('td:eq(8)').find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-			fillItem.find('td:eq(8)').find('.SubTotal').maskMoney('mask', '9894');
+			fillItem.find('td:eq(9)').find('.SubTotal').val(SubTotal);
+			fillItem.find('td:eq(9)').find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+			fillItem.find('td:eq(9)').find('.SubTotal').maskMoney('mask', '9894');
 			_BudgetRemaining();
 			FuncBudgetStatus();
-			var id_budget_left = fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left');
+			var id_budget_left = fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('id_budget_left');
 			
 		})
 
@@ -707,9 +782,9 @@
 				var ppn = $("#ppn").val();
 				$('.PostBudgetItem[id_budget_left="'+id_budget_left+'"]').each(function(){
 					var fillItem = $(this).closest('tr');
-					var SubTotal = fillItem.find('td:eq(8)').find('.SubTotal').val();
+					var SubTotal = fillItem.find('td:eq(9)').find('.SubTotal').val();
 					var SubTotal = findAndReplace(SubTotal, ".","");
-					PostBudgetItem = fillItem.find('td:eq(1)').find('.PostBudgetItem').val();
+					PostBudgetItem = fillItem.find('td:eq(2)').find('.PostBudgetItem').val();
 					var Persent = (parseInt(ppn) / 100) * SubTotal;
 					SubTotal = parseInt(SubTotal) - parseInt(Persent);
 					total += parseInt(SubTotal);
@@ -830,18 +905,18 @@
 			   		var DetailCatalog =  row.find('td:eq(5)').html();
 			   		var arr = Item+'@@'+Desc+'@@'+Est+'@@'+Photo+'@@'+DetailCatalog;
 			   		var fillItem = ev.closest('tr');
-			   		fillItem.find('td:eq(2)').find('.Item').val(Item);
-			   		fillItem.find('td:eq(2)').find('.Item').attr('savevalue',checked);
-			   		fillItem.find('td:eq(2)').find('.Item').attr('estvalue',estvalue);
-			   		fillItem.find('td:eq(3)').find('.Detail').attr('data',arr);
-			   		fillItem.find('td:eq(7)').find('.UnitCost').val(estvalue);
-			   		fillItem.find('td:eq(7)').find('.UnitCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-			   		fillItem.find('td:eq(7)').find('.UnitCost').maskMoney('mask', '9894');
+			   		fillItem.find('td:eq(3)').find('.Item').val(Item);
+			   		fillItem.find('td:eq(3)').find('.Item').attr('savevalue',checked);
+			   		fillItem.find('td:eq(3)').find('.Item').attr('estvalue',estvalue);
+			   		fillItem.find('td:eq(4)').find('.Detail').attr('data',arr);
+			   		fillItem.find('td:eq(8)').find('.UnitCost').val(estvalue);
+			   		fillItem.find('td:eq(8)').find('.UnitCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+			   		fillItem.find('td:eq(8)').find('.UnitCost').maskMoney('mask', '9894');
 
-			   		fillItem.find('td:eq(6)').find('.qty').prop('disabled', false);
-			   		fillItem.find('td:eq(7)').find('.UnitCost').prop('disabled', false);
+			   		fillItem.find('td:eq(7)').find('.qty').prop('disabled', false);
+			   		fillItem.find('td:eq(8)').find('.UnitCost').prop('disabled', false);
 
-			   		fillItem.find('td:eq(6)').find('.qty').trigger('change');
+			   		fillItem.find('td:eq(7)').find('.qty').trigger('change');
 			   		$('#GlobalModalLarge').modal('hide');
 			   })
 		})
@@ -879,7 +954,7 @@
 
 		$(document).off('click', '.btn-delete-item').on('click', '.btn-delete-item',function(e) {
 			var fillItem = $(this).closest('tr');
-			var id_budget_left = fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left');
+			var id_budget_left = fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('id_budget_left');
 
 			$( this )
               .closest( 'tr')
@@ -932,7 +1007,7 @@
 			})
 		}
 
-		function FuncBudgetStatus()
+		function FuncBudgetStatus(BudgetStatus = null)
 		{
 			$('.PostBudgetItem').each(function(){
 				var fillItem = $( this ).closest( 'tr');
@@ -966,10 +1041,18 @@
 						},
 					];
 
-				var DefaultName = (Remaining >= 0) ? 'IN' : 'Exceed';
+				if (BudgetStatus == null) {
+					var DefaultName = (Remaining >= 0) ? 'IN' : 'Exceed';
+				}
+				else
+				{
+					var DefaultName = BudgetStatus;
+				}	
+				
 				var disabled = (DefaultName == 'Exceed') ? 'disabled' : '';
 				var html = '<select class = "form-control BudgetStatus"  '+disabled+'>';
 
+				
 				for (var i = 0; i < OP.length; i++) {
 					if (DefaultName == 'IN') {
 						if (OP[i].name == 'Exceed') {
@@ -980,8 +1063,15 @@
 					html += '<option value = "'+OP[i].name+'"'+selected+'>'+OP[i].name+'</option>';
 				}
 				html += '</select>';
-
-				fillItem.find('td:eq(10)').html(html);
+				if (BudgetStatus == null) {
+					if (DefaultName == 'Exceed') {
+						fillItem.find('td:eq(1)').html(html);
+					}
+				}
+				else{
+					fillItem.find('td:eq(1)').html(html);
+				}
+				
 			})
 			
 		}
@@ -1043,7 +1133,7 @@
 					return false;
 				}
 
-				var Item = fillItem.find('td:eq(2)').find('.Item').val();
+				var Item = fillItem.find('td:eq(3)').find('.Item').val();
 				if (Item == '') {
 					find = false;
 					toastr.error("Item is required",'!!!Error');
@@ -1051,7 +1141,7 @@
 				}
 
 				// find subtotal to check maxlimit
-					var SubTotal = fillItem.find('td:eq(8)').find('.SubTotal').val();
+					var SubTotal = fillItem.find('td:eq(9)').find('.SubTotal').val();
 					SubTotal = findAndReplace(SubTotal, ".","");
 					var Persent = (parseInt(ppn) / 100) * SubTotal;
 					SubTotal = parseInt(SubTotal) - parseInt(Persent);
@@ -1142,17 +1232,17 @@
 			$(".PostBudgetItem").each(function(){
 				var ID_budget_left = $(this).attr('id_budget_left');
 				var fillItem = $(this).closest('tr');
-				var ID_m_catalog = fillItem.find('td:eq(2)').find('.Item').attr('savevalue');
-				var Spec_add = fillItem.find('td:eq(4)').find('.SpecAdd').val();
-				var Need = fillItem.find('td:eq(5)').find('.Need').val();
-				var Qty = fillItem.find('td:eq(6)').find('.qty').val();
-				var UnitCost = fillItem.find('td:eq(7)').find('.UnitCost').val();
+				var ID_m_catalog = fillItem.find('td:eq(3)').find('.Item').attr('savevalue');
+				var Spec_add = fillItem.find('td:eq(5)').find('.SpecAdd').val();
+				var Need = fillItem.find('td:eq(6)').find('.Need').val();
+				var Qty = fillItem.find('td:eq(7)').find('.qty').val();
+				var UnitCost = fillItem.find('td:eq(8)').find('.UnitCost').val();
 				UnitCost = findAndReplace(UnitCost, ".","");
 				var No = fillItem.find('td:eq(0)').text();
-				var SubTotal = fillItem.find('td:eq(8)').find('.SubTotal').val();
+				var SubTotal = fillItem.find('td:eq(9)').find('.SubTotal').val();
 				SubTotal = findAndReplace(SubTotal, ".","");
-				var DateNeeded = fillItem.find('td:eq(9)').find('#tgl'+No).val();
-				var BudgetStatus = fillItem.find('td:eq(10)').find('.BudgetStatus').val();
+				var DateNeeded = fillItem.find('td:eq(10)').find('#tgl'+No).val();
+				var BudgetStatus = fillItem.find('td:eq(1)').find('.BudgetStatus').val();
 
 				if ( $( '#'+'BrowseFile'+No ).length ) {
 					var UploadFile = $('#'+'BrowseFile'+No)[0].files;
