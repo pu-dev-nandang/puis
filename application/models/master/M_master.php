@@ -44,6 +44,8 @@ class M_master extends CI_Model {
         return $query->result_array();
     }
 
+
+
     public function showDataActive_array($tabel,$Active)
     {
         $sql = "select * from ".$tabel." where Active = ?";
@@ -64,6 +66,41 @@ class M_master extends CI_Model {
         $query=$this->db->query($sql, array($valuePrimary));
         return $query->result_array();
     }
+
+    public function carifilestemp() {
+
+       $logged_in = $this->session->userdata('NIP');
+
+       $sql = "SELECT * FROM db_employees.temp_files AS a WHERE a.user_create = '.$logged_in.' ";
+       $query=$this->db->query($sql, array());
+        return $query->result_array();
+    
+       //$query=$this->db->query($sql, result_array());
+        
+       //$this->db->where("user_create", $logged_in);
+       //return $this->db->get("temp_files")->row_array();
+    }
+    
+   
+
+    public function save_image() {
+
+        //$id_survey = $this->input->post('id_survey');
+        //$dates = date("Y-m-d H:i:s");
+        $filePath = $upload_data['file_name'];
+    
+        $data = array(
+            'kode_survey_penyewa' => $id_survey,
+            'nama_file' => $filePath,
+            'user_upload' => $this->session->userdata('user_id'),
+            'date_upload' => $dates,
+            'ip_address' => $ipget,
+            'mac_address' => $mac_address   
+        );
+        
+        $this->db->insert('upload_foto_survey', $data);
+    }
+
 
     public function getColumnTable($table)
     {
@@ -2531,6 +2568,15 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $sql = 'select * from db_employees.employees where StatusEmployeeID in ('.$Status.')';
         $query=$this->db->query($sql, array())->result_array();
         return $query; 
+    }
+
+    public function MasterfileStatus($Colom)
+    {
+
+        $sql = 'SELECT ID FROM db_employees.master_files where TypeFiles = "'.$Colom.'" ';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;   
+                                      
     }
 
     public function AuthAPI($arr_content)

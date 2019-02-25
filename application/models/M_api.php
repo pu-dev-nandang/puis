@@ -763,6 +763,29 @@ class M_api extends CI_Model {
     }
 
 
+     // ====== Get Academic Employee =======
+
+     public function views_academic($NIP) {
+
+        $sql = "SELECT * FROM db_employees.employees_academic AS em WHERE em.NIP = '".$NIP."' ORDER BY em.TypeAcademic ASC ";
+
+        $query=$this->db->query($sql, array());
+        return $query->result_array();
+    
+    }
+
+    // ====== Get Academic Employee Files =======
+     public function views_otherfile($NIP) {
+        $sql = "SELECT f.*, m.NameFiles
+            FROM db_employees.files AS F
+            LEFT JOIN db_employees.master_files AS M ON (f.TypeFiles = m.ID)
+            WHERE F.NIP = '".$NIP."' AND M.Type = '1' ";
+
+        $query=$this->db->query($sql, array());
+        return $query->result_array();
+     }
+
+
     // ====== Get Jadwal Per Day =======
 
     public function getTotalPerDay($DayID,$dataWhere){
@@ -1309,8 +1332,10 @@ class M_api extends CI_Model {
     public function __getLecturerDetail($NIP){
 
 //        $data = $this->db->query('SELECT e.* FROM db_employees.employees e WHERE e.NIP="'.$NIP.'" AND e.PositionMain = "14.7"');
-        $data = $this->db->query('SELECT e.* FROM db_employees.employees e 
-                  WHERE e.NIP="'.$NIP.'" LIMIT 1 ')->result_array();
+        $data = $this->db->query('SELECT e.*, ag.nama AS Religion, dp.Name AS Nameprov
+                                    FROM db_employees.employees e
+                                    LEFT JOIN db_admission.agama ag ON (e.ReligionID = ag.ID) 
+                                    LEFT JOIN db_employees.data_province dp ON (e.ProvinceID = dp.IDProvince) WHERE e.NIP="'.$NIP.'" LIMIT 1')->result_array();
 
         if(count($data)>0){
             return $data[0];
