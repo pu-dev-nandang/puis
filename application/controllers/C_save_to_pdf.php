@@ -4181,9 +4181,9 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetX($x);
         $pdf->SetFont('Arial','I',$fn_e);
-        $pdf->Cell($fillFull,$h,'Had completed '.$Kelamin.' studies and qualification to earn Bachelor Degree in the Even Semeter of Academic Year',$border,1,'L');
+        $pdf->Cell($fillFull,$h,'Had completed '.$Kelamin.' studies and qualification to earn Bachelor Degree in the Odd Semeter of Academic Year',$border,1,'L');
         $pdf->SetX($x);
-        $pdf->Cell($fillFull,$h,'2017/2018 at Podomoro University.',$border,1,'L');
+        $pdf->Cell($fillFull,$h,'2018/2019 at Podomoro University.',$border,1,'L');
         $y = $pdf->GetY()+7;
         $pdf->Ln(4);
         // $pdf->Cell(10,5,'',0,1);//memberikan enter/jarak ke bawah
