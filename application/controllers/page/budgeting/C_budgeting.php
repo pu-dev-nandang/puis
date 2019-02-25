@@ -1644,7 +1644,8 @@ class C_budgeting extends Budgeting_Controler {
                     $Amount = $Amount + $SubTotal;
                 }
 
-            $JsonStatus = $this->m_budgeting->GetRuleApproval_PR_JsonStatus($Departement,$Amount);
+            // $JsonStatus = $this->m_budgeting->GetRuleApproval_PR_JsonStatus($Departement,$Amount);
+            $JsonStatus = $this->m_budgeting->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$PRCode);
 
         $dataSave = array(
             'CreatedBy' => $this->session->userdata('NIP'),
@@ -1719,7 +1720,16 @@ class C_budgeting extends Budgeting_Controler {
 
         $No = $requestData['start'] + 1;
         $data = array();
+
         $G_Approver = $this->m_budgeting->Get_m_Approver();
+        if (array_key_exists('length', $_POST)) {
+            $Count_G_Approver = $_POST['length'];
+        }
+        else
+        {
+            $Count_G_Approver = count($G_Approver);
+        }
+        
         for($i=0;$i<count($query);$i++){
             $nestedData=array();
             $row = $query[$i];
@@ -1749,7 +1759,7 @@ class C_budgeting extends Budgeting_Controler {
                 }
             }
 
-            $c = count($G_Approver) - count($arr);
+            $c = $Count_G_Approver - count($arr);
             for ($l=0; $l < $c; $l++) { 
                  $arr[] = '-';
             }
@@ -1821,6 +1831,28 @@ class C_budgeting extends Budgeting_Controler {
         else
         {
             $Departement = $input['Departement'];
+        }
+
+        if (array_key_exists('PRCodeVal', $input)) { // change department
+            $PRCodeVal = $input['PRCodeVal'];
+            $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCodeVal);
+            if (count($G_data) > 0) {
+                $JsonStatus = $G_data[0]['JsonStatus'];
+                $JsonStatus = (array) json_decode($JsonStatus,true);
+                $bool = true;
+                for ($i=0; $i < count($JsonStatus); $i++) { 
+                    $ApprovedBy = $JsonStatus[$i]['ApprovedBy'];
+                    if ($NIP == $ApprovedBy) {
+                        $bool = false;
+                        break;
+                    }
+                }
+
+                if (!$bool) {
+                    $Departement = $this->session->userdata('IDDepartementPUBudget');
+                }
+
+            }
         }
         
         $GetRuleAccess = $this->m_budgeting->GetRuleAccess($NIP,$Departement);
