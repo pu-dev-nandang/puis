@@ -996,7 +996,7 @@
 					var SubTotal = findAndReplace(SubTotal, ".","");
 					PostBudgetItem = fillItem.find('td:eq(2)').find('.PostBudgetItem').val();
 					var Persent = (parseInt(ppn) / 100) * SubTotal;
-					SubTotal = parseInt(SubTotal) - parseInt(Persent);
+					SubTotal = parseInt(SubTotal) + parseInt(Persent);
 					total += parseInt(SubTotal);
 				})
 				
