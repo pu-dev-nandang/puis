@@ -16,7 +16,7 @@
 </style>
 
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <div class="well" style="margin-bottom: 10px;">
             <div class="row">
                 <div class="col-xs-4" style="">
@@ -28,8 +28,8 @@
                         <option value="uts">UTS</option>
                         <option value="uas">UAS</option>
                         <option disabled>--- Make-up Exams ---</option>
-                        <option value="re_uts">UTS</option>
-                        <option value="re_uas">UAS</option>
+                        <option value="re_uts" style="color: orangered;">Make-up UTS</option>
+                        <option value="re_uas" style="color: orangered;">Make-up UAS</option>
                     </select>
                 </div>
                 <div class="col-xs-5">
@@ -77,7 +77,7 @@
         </div>
     </div>
 
-    <div class="col-md-2">
+    <div class="col-md-2 hide">
         <div class="thumbnail" style="padding: 15px;">
             <div class="row">
                 <div class="col-xs-12">

@@ -5588,6 +5588,31 @@ class C_api extends CI_Controller {
 
                 return print_r(1);
             }
+            else if($data_arr['action']=='updateExamSetting'){
+
+                $formData = $data_arr['formData'];
+
+                $ceckData = $this->db->select('ID')->get('db_academic.exam_setting')
+                    ->result_array();
+
+                if(count($ceckData)>0){
+                    // Update
+                    $ID = $ceckData[0]['ID'];
+                    $this->db->where('ID', $ID);
+                    $this->db->update('db_academic.exam_setting',$formData);
+                } else {
+                    // Insert
+                    $this->db->insert('db_academic.exam_setting',$formData);
+                }
+
+                return print_r(1);
+            }
+            else if($data_arr['action']=='readExamSetting'){
+                $data = $this->db->get('db_academic.exam_setting')
+                    ->result_array();
+
+                return print_r(json_encode($data));
+            }
 
         }
 
