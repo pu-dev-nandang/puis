@@ -160,8 +160,66 @@
 						var token = jwt_encode(data,"UAP)(*");
 						$.post(url,{ token:token },function (data_json) {
 							var response = jQuery.parseJSON(data_json);
-							ResponseAjaxEdit = response;
-							htmlPRDetail(response);
+							// Concat PostBudgetDepartment if Cross
+								var Div = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
+								var pr_detail = response['pr_detail'];
+								var CrossArr = [];
+								var urlInarray = [];
+								for (var i = 0; i < pr_detail.length; i++) {
+									if (pr_detail[i]['Departement'] != Div) {
+										CrossArr.push(pr_detail[i]['Departement']);
+										urlInarray.push(base_url_js+'budgeting/detail_budgeting_remaining');
+										var DepartementCross= pr_detail[i]['Departement'];
+										// get ajax post modal
+											var url = base_url_js+"budgeting/detail_budgeting_remaining";
+											var data = {
+													    Year : Year,
+														Departement : DepartementCross,
+													};
+											var token = jwt_encode(data,'UAP)(*');
+											$.post(url,{token:token},function (resultJson) {
+												var response = jQuery.parseJSON(resultJson);
+												var PostBudgetDepartmentModal = response.data;
+												// PostBudgetDepartment
+												if (PostBudgetDepartmentModal.length > 0) {
+													PostBudgetDepartment = PostBudgetDepartment.concat(PostBudgetDepartmentModal); 
+												}
+											}).fail(function() {
+											  toastr.info('No Result Data'); 
+											}).always(function() {
+											                
+											});	
+									} // end if
+								}
+
+								// ResponseAjaxEdit = response;
+								// htmlPRDetail(response);
+
+								if (CrossArr.length > 0) {
+									var bool = 0;
+									for (var i = 0; i < CrossArr.length; i++) {
+										$( document ).ajaxSuccess(function( event, xhr, settings ) {
+										   if (jQuery.inArray( settings.url, urlInarray )) {
+										       bool++;
+										       if (bool == CrossArr.length) {
+										           setTimeout(function(){ 
+										           	ResponseAjaxEdit = response;
+										           	htmlPRDetail(response);
+										           }, 500);
+										          
+										       }
+										   }
+										});
+									} // end for
+									
+								}
+								else
+								{
+									ResponseAjaxEdit = response;
+									htmlPRDetail(response);
+								}
+								
+							
 						}); 
 					}
 					else
@@ -335,11 +393,39 @@
     							}
     						}
     					}
+
+    					var OP = [
+    							{
+    								name  : 'IN',
+    								color : 'green'
+    							},
+    							{
+    								name  : 'Exceed',
+    								color : 'red'
+    							},
+    							{
+    								name  : 'Cross',
+    								color : 'yellow'
+    							},
+    						];
+
+    						var html = '<select class = "form-control BudgetStatus">';
+    						var DefaultName = response['BudgetStatus'];
+    						for (var i = 0; i < OP.length; i++) {
+    							if (DefaultName == 'IN') {
+    								if (OP[i].name == 'Exceed') {
+    									continue;
+    								}
+    							}
+    							var selected = (DefaultName == OP[i].name) ? 'selected' : '';
+    							html += '<option value = "'+OP[i].name+'"'+selected+'>'+OP[i].name+'</option>';
+    						}
+    						html += '</select>';
 		
     					var action = '<td><button type="button" class="btn btn-danger btn-delete btn-delete-item"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button></td>';
     					var a = '<tr>'+
     								'<td>'+No+'</td>'+
-    								'<td></td>'+
+    								'<td>'+html+'</td>'+
     								'<td>'+
     									'<div class="input-group">'+
     										'<input type="text" class="form-control PostBudgetItem" readonly id_budget_left = "'+ID_budget_left+'" value = "'+PostBudgetItem+'">'+
@@ -393,7 +479,9 @@
     				$(".UnitCost").maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
     				$(".UnitCost").maskMoney('mask', '9894');
     				_BudgetRemaining();
-    				FuncBudgetStatus(pr_detail[0]['BudgetStatus']);
+
+    				// FuncBudgetStatus();
+
     				var Status = pr_create[0]['Status'];
     				if (Status >= 1) {
     					// jika reject and user access = 1 maka dont disable
@@ -628,8 +716,17 @@
 						    'backdrop' : 'static'
 						});
 
+						// passing array Department These Division
+						var ArrBudgetDepartment = [];
+						var Div = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
+						for (var i = 0; i < PostBudgetDepartment.length; i++) {
+							if (PostBudgetDepartment[i]['Departement'] == Div) {
+								ArrBudgetDepartment.push(PostBudgetDepartment[i]);
+							}
+						}
+
 					var table = $('#example').DataTable({
-					      "data" : PostBudgetDepartment,
+					      "data" : ArrBudgetDepartment,
 					      'columnDefs': [
 						      {
 						         'targets': 0,
@@ -813,6 +910,23 @@
           '</table></div></div>';
           return html;
 		}
+
+		$(document).off('change', '.BudgetStatus').on('change', '.BudgetStatus',function(e) {
+			var ev = $(this).closest('tr');
+			var PostBudgetItem = ev.find('td:eq(2)').find('.PostBudgetItem').val();
+			var Item = ev.find('td:eq(3)').find('.Item').val();
+			if (PostBudgetItem != '' || Item != '') {
+				// delete
+				ev
+              .closest( 'tr')
+              .remove();
+              _BudgetRemaining();
+              SortByNumbering();
+
+              // add
+              AddingTable();
+			}
+		})
 
 		$(document).off('change', '.qty').on('change', '.qty',function(e) {
 			var qty = $(this).val();
@@ -1137,36 +1251,27 @@
 						},
 					];
 
-				if (BudgetStatus == null) {
-					var DefaultName = (Remaining >= 0) ? 'IN' : 'Exceed';
-				}
-				else
-				{
-					var DefaultName = BudgetStatus;
-				}	
-				
-				var disabled = (DefaultName == 'Exceed') ? 'disabled' : '';
-				var html = '<select class = "form-control BudgetStatus"  '+disabled+'>';
+				// check option value IF Cross maka jangan di rubah
+					var OPexist = fillItem.find('td:eq(1)').find('.BudgetStatus').val();
+					if (OPexist != 'Cross') {
+						var DefaultName = (Remaining >= 0) ? 'IN' : 'Exceed';
+						
+						var disabled = (DefaultName == 'Exceed') ? 'disabled' : '';
+						var html = '<select class = "form-control BudgetStatus"  '+disabled+'>';
 
-				
-				for (var i = 0; i < OP.length; i++) {
-					if (DefaultName == 'IN') {
-						if (OP[i].name == 'Exceed') {
-							continue;
+						
+						for (var i = 0; i < OP.length; i++) {
+							if (DefaultName == 'IN') {
+								if (OP[i].name == 'Exceed') {
+									continue;
+								}
+							}
+							var selected = (DefaultName == OP[i].name) ? 'selected' : '';
+							html += '<option value = "'+OP[i].name+'"'+selected+'>'+OP[i].name+'</option>';
 						}
-					}
-					var selected = (DefaultName == OP[i].name) ? 'selected' : '';
-					html += '<option value = "'+OP[i].name+'"'+selected+'>'+OP[i].name+'</option>';
-				}
-				html += '</select>';
-				if (BudgetStatus == null) {
-					if (DefaultName == 'Exceed') {
+						html += '</select>';
 						fillItem.find('td:eq(1)').html(html);
 					}
-				}
-				else{
-					fillItem.find('td:eq(1)').html(html);
-				}
 				
 			})
 			

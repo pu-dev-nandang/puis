@@ -7,6 +7,7 @@
 </div>
 <script type="text/javascript">
 	var G_Approver = <?php echo json_encode($G_Approver) ?>;
+	var G_ApproverLength = G_Approver.length + 4;
 
 $(document).ready(function() {
 		LoadFirstLoad()
@@ -20,7 +21,7 @@ $(document).ready(function() {
 	{
 		$("#DivTable").empty();
 		var LoopApprover = '';
-		for (var i = 0; i < G_Approver.length; i++) {
+		for (var i = 0; i < G_ApproverLength; i++) {
 			var ap = i +1;
 			LoopApprover += '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">'+ap+'</th>';
 		}
@@ -32,7 +33,7 @@ $(document).ready(function() {
 		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">PR Code</th>'+
 		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Department</th>'+
 		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</th>'+
-		                '<th colspan = "'+G_Approver.length+'" style = "text-align: center;background: #20485A;color: #FFFFFF;">Approver</th>'+
+		                '<th colspan = "'+G_ApproverLength+'" style = "text-align: center;background: #20485A;color: #FFFFFF;">Approver</th>'+
 		            '</tr>'+
 		            '<tr>'+
 		            	LoopApprover+
@@ -67,7 +68,7 @@ $(document).ready(function() {
 		        url : base_url_js+"budgeting/DataPR", // json datasource
 		        ordering : false,
 		        type: "post",  // method  , by default get
-		        // data : {length : $("select[name='tableData4_length']").val()},
+		        data : {length : G_ApproverLength},
 		        error: function(){  // error handling
 		            $(".employee-grid-error").html("");
 		            $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');

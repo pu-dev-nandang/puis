@@ -362,10 +362,13 @@ class M_budgeting extends CI_Model {
 
     public function get_budget_remaining($Year,$Departement)
     {
-        $sql = 'select dd.ID,cc.CodePostBudget,cc.Year,cc.RealisasiPostName,cc.PostName,dd.ID_creator_budget,dd.Value from
+        $sql = 'select dd.ID,cc.CodePostBudget,cc.Year,cc.RealisasiPostName,cc.PostName,dd.ID_creator_budget,dd.Value
+         ,cc.Departement
+         from
             (
                    select * from db_budgeting.creator_budget as a join (
-                   select a.CodePostBudget as CodePostBudget2,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
+                   select a.CodePostBudget as CodePostBudget2,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost,
+                   b.Departement
                    from db_budgeting.cfg_postrealisasi as b left join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
                    join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
                    where b.Departement = ?     
@@ -655,6 +658,7 @@ class M_budgeting extends CI_Model {
                 );
             } 
 
+        // print_r($JsonStatus);die();
         return $JsonStatus;              
     }
 

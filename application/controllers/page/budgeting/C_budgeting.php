@@ -1720,7 +1720,16 @@ class C_budgeting extends Budgeting_Controler {
 
         $No = $requestData['start'] + 1;
         $data = array();
+
         $G_Approver = $this->m_budgeting->Get_m_Approver();
+        if (array_key_exists('length', $_POST)) {
+            $Count_G_Approver = $_POST['length'];
+        }
+        else
+        {
+            $Count_G_Approver = count($G_Approver);
+        }
+        
         for($i=0;$i<count($query);$i++){
             $nestedData=array();
             $row = $query[$i];
@@ -1750,7 +1759,7 @@ class C_budgeting extends Budgeting_Controler {
                 }
             }
 
-            $c = count($G_Approver) - count($arr);
+            $c = $Count_G_Approver - count($arr);
             for ($l=0; $l < $c; $l++) { 
                  $arr[] = '-';
             }

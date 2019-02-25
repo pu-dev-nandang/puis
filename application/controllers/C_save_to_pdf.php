@@ -5576,8 +5576,8 @@ Phone: (021) 29200456';
 
              // signature
              $x = $Wrec + 20;
-             $w_requested = 30;
-             $w_approved = 40;
+             $w_requested = 20;
+             $w_approved = 35;
              $h_signature = 15;
              $fpdf->SetXY($x,$y);
              $fpdf->SetFont('Arial','',$FontIsian);
