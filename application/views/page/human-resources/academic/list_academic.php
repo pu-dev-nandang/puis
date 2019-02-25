@@ -37,13 +37,22 @@
             $('#NotificationModal .modal-header').addClass('hide');
             $('#NotificationModal .modal-body').html('<center> '+
             '<iframe src="'+base_url_js+'uploads/files/'+filesub+'" frameborder="0" style="width:745px; height:550px;"></iframe> '+
-            '<br/><br/><button type="button" id="btnRemoveNoEditSc" class="btn btn-primary" data-dismiss="modal">Close</button>' +
+            '<br/><br/><button type="button" id="btnRemoveNoEditSc" class="btn btn-primary" data-dismiss="modal">Close</button><button type="button" onclick="newtab();" id="btnRemoveNoEditSc" filesublix ="'+filesub+'" class="btn btn-primary pull-right filesublink" data-toggle="tooltip" data-placement="top" title="Full Review" data-dismiss="modal"><span class="fa fa-external-link"></span></button>' +
             '</center>');
             $('#NotificationModal .modal-footer').addClass('hide');
             $('#NotificationModal').modal({
                 'backdrop' : 'static',
                 'show' : true
             });
+
+    });
+
+    $(document).on('click','.filesublink', function () {
+
+        var filesubx = $(this).attr('filesublix');
+        var url = base_url_js+'uploads/files/'+filesubx;
+        window.open(url, '_blank',);
+        win.focus();
     });
 
     function loadAcademicDetails() {

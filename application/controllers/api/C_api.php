@@ -611,7 +611,7 @@ class C_api extends CI_Controller {
             for ($j=0; $j < count($Get_MasterFiles); $j++) { 
                 $stDefault =' <span class="label label-danger"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
                 $sql2 = 'select count(*) as total from db_employees.files where NIP = ? and TypeFiles = ?';
-                $query2=$this->db->query($sql2, array($NIP,$Get_MasterFiles[$j]['TypeFiles']))->result_array();
+                $query2=$this->db->query($sql2, array($NIP,$Get_MasterFiles[$j]['ID']))->result_array();
                 if ($query2[0]['total'] > 0 ) {
                     $stDefault =' <span class="label label-success"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
                 } 
@@ -4542,10 +4542,12 @@ class C_api extends CI_Controller {
                 $type = $formInsert['type'];
                 $DescriptionFile = $formInsert['DescriptionFile'];
                 $fileName = $formInsert['fileName'];
+
+                $Get_MasterFiles = $this->m_master->MasterfileStatus($type);
         
                 $dataSave = array(
                                 'NIP' => $NIP,
-                                'TypeFiles' => $type,
+                                'TypeFiles' => $Get_MasterFiles[0]['ID'],
                                 'No_Document' => $NoDocument,
                                 'Date_Files' => $DateDocument,
                                 'Description_Files' => $DescriptionFile,

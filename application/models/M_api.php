@@ -774,14 +774,16 @@ class M_api extends CI_Model {
     
     }
 
-    // ====== Get Academic Employee =======
+    // ====== Get Academic Employee Files =======
      public function views_otherfile($NIP) {
-        $sql = "SELECT * FROM db_employees.files AS f WHERE f.NIP = '".$NIP."' ";
+        $sql = "SELECT f.*, m.NameFiles
+            FROM db_employees.files AS F
+            LEFT JOIN db_employees.master_files AS M ON (f.TypeFiles = m.ID)
+            WHERE F.NIP = '".$NIP."' AND M.Type = '1' ";
 
         $query=$this->db->query($sql, array());
         return $query->result_array();
      }
-
 
 
     // ====== Get Jadwal Per Day =======

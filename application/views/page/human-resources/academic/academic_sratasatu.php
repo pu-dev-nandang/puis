@@ -278,7 +278,7 @@
                         }
                             setTimeout(function () {
                                 $('#NotificationModal').modal('hide');
-                                //window.location.href = '';
+                                window.location.href = '';
                             },1000);
 
                         });

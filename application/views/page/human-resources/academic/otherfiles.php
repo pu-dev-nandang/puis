@@ -34,13 +34,7 @@
                                                      <option id="<?php echo $G_TypeFiles[$i]['ID'] ?>"><?php echo $G_TypeFiles[$i]['TypeFiles'] ?></option>  
                                                     <?php endif ?>
                                                 <?php endfor ?>
-                                                <!-- <option id="KTP" selected="selected">KTP</option>
-                                                <option id="CV">Curriculum Vitae (CV)</option>
-                                                <option id="SP_Dosen">Surat Pernyataan Dosen</option>
-                                                <option id="SK_Dosen">SK Dosen</option>
-                                                <option id="SK_Pangkat">SK Pangkat</option>
-                                                <option id="SK_JJA">SK Jabatan Fungsional</option>
-                                                <option id="Other_Files">Other Document</option> -->
+                                                
                                             </select>
                                         </div>
                                         </div>
@@ -139,7 +133,7 @@ $('#fileOther').change(function (event) {
             $('#NotificationModal .modal-header').addClass('hide');
             $('#NotificationModal .modal-body').html('<center> '+
             '<iframe src="'+base_url_js+'uploads/files/'+filesub+'" frameborder="0" style="width:745px; height:550px;"></iframe> '+
-            '<br/><br/><button type="button" id="btnRemoveNoEditSc" class="btn btn-primary" data-dismiss="modal">Close</button><button type="button" onclick="newtab();" id="btnRemoveNoEditSc" filesublix ="'+filesub+'" class="btn btn-primary pull-right filesublink" data-dismiss="modal"><span class="fa fa-external-link"></span></button>' +
+            '<br/><br/><button type="button" id="btnRemoveNoEditSc" class="btn btn-primary" data-dismiss="modal">Close</button><button type="button" onclick="newtab();" id="btnRemoveNoEditSc" filesublix ="'+filesub+'" class="btn btn-primary pull-right filesublink" data-toggle="tooltip" data-placement="top" title="Full Review" data-dismiss="modal"><span class="fa fa-external-link"></span></button>' +
             '</center>');
             $('#NotificationModal .modal-footer').addClass('hide');
             $('#NotificationModal').modal({
@@ -152,7 +146,8 @@ $('#fileOther').change(function (event) {
 
         var filesubx = $(this).attr('filesublix');
         var url = base_url_js+'uploads/files/'+filesubx;
-        window.open(url, '_blank', 'scrollbars=1,height=650,width=900');
+        window.open(url, '_blank',);
+        win.focus();
     });
 
     function loadFilesDetails() {
@@ -197,7 +192,7 @@ $('#fileOther').change(function (event) {
                 for (var i = 0; i < response.length; i++) {                                                                                                                                    
 
                     $("#dataRow").append('<tr>                                                     '+
-                    '            <td>'+response[i]['TypeFiles']+'</td>                             '+       
+                    '            <td>'+response[i]['NameFiles']+'</td>                             '+       
                     '            <td>'+response[i]['No_Document']+'</td>                           '+    
                     '            <td>'+response[i]['Date_Files']+'</td>                            '+                                                        
                     '            <td>'+response[i]['Description_Files']+'</td>                     '+     

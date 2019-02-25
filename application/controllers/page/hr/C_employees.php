@@ -214,7 +214,6 @@ class C_employees extends HR_Controler {
                     
                     $Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
                     
-                    
                     $dataSave = array(
                             'NIP' => $NIP,
                             'TypeFiles' => $Get_MasterFiles[0]['ID'],
@@ -254,7 +253,6 @@ class C_employees extends HR_Controler {
                     //print_r($Colom);die();
 
                     $Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
-                    
                     
                     $dataSave = array(
                             'NIP' => $NIP,
@@ -296,7 +294,7 @@ class C_employees extends HR_Controler {
                     
                     $dataSave = array(
                             'NIP' => $NIP,
-                            'TypeFiles' => $Get_MasterFiles,
+                            'TypeFiles' => $Get_MasterFiles[0]['ID'],
                             'LinkFiles' => $fileName,
                             'UserCreate' => $IDuser
                     );
@@ -334,7 +332,7 @@ class C_employees extends HR_Controler {
                     
                     $dataSave = array(
                             'NIP' => $NIP,
-                            'TypeFiles' => $Get_MasterFiles,
+                            'TypeFiles' => $Get_MasterFiles[0]['ID'],
                             'LinkFiles' => $fileName,
                             'UserCreate' => $IDuser
                     );
@@ -368,10 +366,10 @@ class C_employees extends HR_Controler {
                     $success = array('success' => $this->upload->data());
                     $success['success']['formGrade'] = 0;
                     $Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
-                    // Cek apakah di db sudah ada
+                    
                     $dataSave = array(
                             'NIP' => $NIP,
-                            'TypeFiles' => $Get_MasterFiles,
+                            'TypeFiles' => $Get_MasterFiles[0]['ID'],
                             'LinkFiles' => $fileName,
                             'UserCreate' => $IDuser
                     );
@@ -404,10 +402,10 @@ class C_employees extends HR_Controler {
                     $success = array('success' => $this->upload->data());
                     $success['success']['formGrade'] = 0;
                     $Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
-                    // Cek apakah di db sudah ada
+                    
                     $dataSave = array(
                             'NIP' => $NIP,
-                            'TypeFiles' => $Get_MasterFiles,
+                            'TypeFiles' => $Get_MasterFiles[0]['ID'],
                             'LinkFiles' => $fileName,
                             'UserCreate' => $IDuser
                     );
@@ -440,7 +438,7 @@ class C_employees extends HR_Controler {
                     $success = array('success' => $this->upload->data());
                     $success['success']['formGrade'] = 0;
 
-                    $Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
+                    //$Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
                    
                     return print_r(json_encode($success));
                 }
