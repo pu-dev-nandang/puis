@@ -4167,7 +4167,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('Arial','',$fn_b);
         $pdf->Cell($fillFull,$h,'Adalah benar mahasiswa yang telah menempuh studi dan menyelesaikan seluruh persyaratan kelulusan',$border,1,'L');
         $pdf->SetX($x);
-        $pdf->Cell($fillFull,$h,'menjadi '.$Student['Degree'].' pada Semester Genap Tahun Akademik 2017/2018',$border,1,'L');
+        $pdf->Cell($fillFull,$h,'menjadi '.$Student['Degree'].' pada Semester Ganjil Tahun Akademik 2018/2019',$border,1,'L');
         $pdf->SetX($x);
         $pdf->Cell($fillFull,$h,'di Universitas Agung Podomoro.',$border,1,'L');
         $pdf->Ln(1);
