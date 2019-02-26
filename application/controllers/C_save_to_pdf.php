@@ -5538,7 +5538,7 @@ Phone: (021) 29200456';
              $y = $fpdf->GetY();
              $x = $x +$w_no+$w_desc+$w_spec;
              $rsPPN = ($pr_create[0]['PPN'] / 100) * $total;
-             $totAfterPPN = $total - $rsPPN;
+             $totAfterPPN = $total + $rsPPN;
              $totAfterPPN= 'Rp '.number_format($totAfterPPN,2,',','.');
              $rsPPN= 'Rp '.number_format($rsPPN,2,',','.');
              $total= 'Rp '.number_format($total,2,',','.');
