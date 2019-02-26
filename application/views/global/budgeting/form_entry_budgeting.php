@@ -527,6 +527,9 @@
 
 			for (var i = 0; i < arr_PostBudget.length; i++) {
 				var divBulan = '<div class = "row">'+'<div class = "col-md-12">';
+				if (creator_budget[i]['DetailMonth'] == undefined) { // jika total PostBudget lebih byk dari yang telah dibuat pada table creator_budget
+					break;
+				}
 				var DetailMonth = creator_budget[i]['DetailMonth'];
 				DetailMonth = jQuery.parseJSON(DetailMonth);
 
