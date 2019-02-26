@@ -2294,11 +2294,6 @@ class M_api extends CI_Model {
                                             WHERE ex.SemesterID = "'.$SemesterID.'" 
                                             AND ex.Type LIKE "'.$Type.'" ORDER BY ex.ExamDate ASC')->result_array();
 
-
-//        $data = $this->db->query('SELECT * FROM db_academic.academic_years
-//                                          WHERE SemesterID = "'.$SemesterID.'"
-//                                          LIMIT 1')->result_array();
-
         $result = [];
         if(count($data)>0){
             foreach ($data as $item){
@@ -2309,6 +2304,14 @@ class M_api extends CI_Model {
 
         return $result;
 
+    }
+
+    public function getDateExam4input($SemesterID){
+        $data = $this->db->query('SELECT * FROM db_academic.academic_years
+                                          WHERE SemesterID = "'.$SemesterID.'"
+                                          LIMIT 1')->result_array();
+
+        return $data[0];
     }
 
     public function __checkDataCourseForExam($ScheduleID,$Type){
