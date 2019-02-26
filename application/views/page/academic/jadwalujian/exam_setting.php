@@ -7,7 +7,7 @@
         text-align: left;
     }
 
-    .input-group {
+    #tableSetting .input-group {
         max-width: 100px;
     }
 </style>
