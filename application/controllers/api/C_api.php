@@ -3176,22 +3176,26 @@ class C_api extends CI_Controller {
 
     public function review_academicdetail(){
         $NIP = $this->input->get('NIP');
-
         $viewacademic = $this->m_api->views_academic($NIP);
-        
         echo json_encode($viewacademic);     
 
      }
 
      public function review_otherfile(){
         $NIP = $this->input->get('NIP');
-
         $viewfiles = $this->m_api->views_otherfile($NIP);
-        
         echo json_encode($viewfiles);     
 
      }
 
+     public function review_academics1(){
+
+        $NIP = $this->input->get('NIP');
+        $viewfiles1 = $this->m_api->views_files1($NIP);
+        echo json_encode($viewfiles1);   
+     }
+
+    
 
     public function insertWilayahURLJson()
     {
@@ -4528,8 +4532,7 @@ class C_api extends CI_Controller {
 
     public function crudEmployees(){
         $data_arr = $this->getInputToken();
-        print_r($data_arr);
-
+        
         if(count($data_arr)>0){
             if($data_arr['action']=='read'){
                 $data = $this->db->select('NIP,Name')->get_where('db_employees.employees',array('StatusEmployeeID !=' => -2))->result_array();
