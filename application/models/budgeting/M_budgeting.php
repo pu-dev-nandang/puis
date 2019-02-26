@@ -654,7 +654,8 @@ class M_budgeting extends CI_Model {
                $JsonStatus[] = array(
                     'ApprovedBy' => $NIP,
                     'Status' => 0,
-                    'ApproveAt' => ''
+                    'ApproveAt' => '',
+                    'Representedby' => '',
                 );
             } 
 
@@ -693,7 +694,8 @@ class M_budgeting extends CI_Model {
                             $JsonStatus[] = array(
                                  'ApprovedBy' => $NIP,
                                  'Status' => 0,
-                                 'ApproveAt' => ''
+                                 'ApproveAt' => '',
+                                 'Representedby' => '',
                              );
                         }
             }

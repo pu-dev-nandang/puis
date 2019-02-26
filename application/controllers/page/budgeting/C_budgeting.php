@@ -1659,6 +1659,14 @@ class C_budgeting extends Budgeting_Controler {
 
         $this->db->where('PRCode',$PRCode);
         $this->db->update('db_budgeting.pr_create',$dataSave);
+
+        // passing show name JsonStatus
+        for ($i=0; $i < count($JsonStatus); $i++) { 
+            $Name = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['ApprovedBy']);
+            $Name = $Name[0]['Name'];
+            $JsonStatus[$i]['ApprovedBy'] = $Name;
+         } 
+
         if ($this->db->affected_rows() > 0 )
         {
             // remove PRCode in pr_detail
@@ -1687,7 +1695,7 @@ class C_budgeting extends Budgeting_Controler {
             //return FALSE;
             $PRCode = '';
         }
-        echo json_encode($PRCode);
+        echo json_encode(array('PRCode' => $PRCode,'JsonStatus' => json_encode($JsonStatus)) );
         
     }
 
@@ -1738,6 +1746,8 @@ class C_budgeting extends Budgeting_Controler {
             $nestedData[] = $row['PRCode'];
             $nestedData[] = $row['NameDepartement'];
             $nestedData[] = $row['StatusName'];
+            // circulation sheet
+            $nestedData[] = '<a href="javascript:void(0)" class = "btn btn-default btn_circulation_sheet" prcode = "'.$row['PRCode'].'">See</a>';
             $JsonStatus = (array)json_decode($row['JsonStatus'],true);
             $arr = array();
             if (count($JsonStatus) > 0) {
