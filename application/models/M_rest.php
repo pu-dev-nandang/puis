@@ -10,6 +10,22 @@ class M_rest extends CI_Model {
     }
 
 
+    public function getDateTimeNow(){
+        $date = date('Y-m-d H:i:s');
+        return $date;
+    }
+
+    public function getDateNow(){
+        $date = date('Y-m-d');
+        return $date;
+    }
+
+    public function getTimeNow(){
+        $date = date('H:i:s');
+        return $date;
+    }
+
+
     private function _getSemesterActive(){
         $data = $this->db->query('SELECT ay.*
                                             FROM db_academic.semester s
@@ -166,8 +182,6 @@ class M_rest extends CI_Model {
                             $data[$sc]['TeamTeachingDetails'] = $dataTT ;
                         }
 
-
-
                     }
 
                 }
@@ -189,236 +203,194 @@ class M_rest extends CI_Model {
         return $result;
     }
 
-    public function __getExamScheduleForStudent($db,$ProdiID,$SemesterID,$NPM,$SemeaterYear,$ClassOf,$ExamType,$Date){
+    public function __getExamScheduleForStudent($db,$SemesterID,$NPM,$ClassOf,$ExamType){
         $dataSemester = $this->db->query('SELECT s.*, ay.utsStart, ay.utsEnd, ay.uasStart, ay.uasEnd FROM db_academic.semester s 
                                                         LEFT JOIN db_academic.academic_years ay ON (ay.SemesterID = s.ID)
                                                         WHERE s.ID = '.$SemesterID.' 
                                                         ORDER BY s.ID ASC')->result_array();
 
+        // Get setting exam
+        $dataExamSetting = $this->db->get('db_academic.exam_setting')->result_array();
+
         $result = [];
         for($i=0;$i<count($dataSemester);$i++){
 
-
             $Semester = $this->checkSemesterByClassOf($ClassOf,$SemesterID);
-
-            $ExamSchedule = [];
-            $ErrorOn = 'old_system';
-            $PaymentType = '';
-            $PaymentStatus = -5;
-            $Message = 'Old System';
 
             if($dataSemester[$i]['ID']>=13) {
 
+                $checkBPP = true;
+                $checkCredit = true;
 
-                if($Semester==1|| $Semester=='1'){
-                    $PaymentType = '';
-                    $PaymentStatus = -5;
-                    $ErrorOn = 'schedule';
-                    $Message = 'Exam Schedule Available On : ';
-                    // Cek apakah tanggal merupakan tanggal Exam
-                    $ExamSchStart = ($ExamType=='uts' || $ExamType=='UTS') ? $dataSemester[$i]['utsStart'] : $dataSemester[$i]['uasStart'] ;
-                    if($Date>=$ExamSchStart){
-                        $ErrorOn = "";
-                        $Message = 'Exam schedule Available';
+                // Cek attendance
+                $checkAttendance = false;
+                $checkAttendanceValue = 0;
 
-                        // Get data jadwal
-                        $ExamSchedule = $this->db->query('SELECT sc.ID AS ScheduleID, mk.MKCode, mk.Name AS Course, mk.NameEng AS CourseEng, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room,  
-                                                                    sc.ClassGroup
-                                                                    FROM '.$db.'.study_planning sp
-                                                                    LEFT JOIN db_academic.exam_details exd ON (exd.ScheduleID = sp.ScheduleID AND exd.NPM = sp.NPM)
-                                                                    LEFT JOIN db_academic.exam ex ON (ex.ID = exd.ExamID AND ex.Type LIKE "'.$ExamType.'")
-                                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
-                                                                    LEFT JOIN db_academic.schedule sc ON (sc.ID = sp.ScheduleID)
-                                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sp.MKID)
-                                                                    WHERE sp.SemesterID = "'.$dataSemester[$i]['ID'].'" 
-                                                                    AND sp.NPM = "'.$NPM.'"   AND ex.ExamDate IS NOT NULL
-                                                                    ORDER BY mk.MKCode ASC ')->result_array();
+                // Cek apakah sudah masuk pada periode ujian atau belum (UTS / UAS)
+                $checkDateExam = true;
+                $dateExamStart = ($ExamType=='uts' || $ExamType=='UTS')
+                    ? $dataSemester[$i]['utsStart']
+                    : $dataSemester[$i]['uasStart'];
 
 
-                        if(count($ExamSchedule)>0){
+                if($ExamType=='uts' || $ExamType=='UTS'){
+                    // Cek Setting
+                    if(count($dataExamSetting)>0){
+                        $ExamSetting = $dataExamSetting[0];
 
-                            for($g=0;$g<count($ExamSchedule);$g++){
-
-                                $examD = $ExamSchedule[$g];
-
-                                // Get Schedule Detail
-                                $dataSD = $this->db->select('ID')->get_where('db_academic.schedule_details',array('ScheduleID' => $examD['ScheduleID']))->result_array();
-
-                                $arrDataAttd = [];
-                                for($t=0;$t<count($dataSD);$t++){
-                                    // Get Attendance
-                                    $dataAttd = $this->db->query('SELECT attd_s.* FROM db_academic.attendance_students attd_s 
-                                                          LEFT JOIN db_academic.attendance attd ON (attd.ID = attd_s.ID_Attd)
-                                                          WHERE attd.SemesterID = "'.$dataSemester[$i]['ID'].'" 
-                                                          AND attd.ScheduleID = "'.$examD['ScheduleID'].'"
-                                                          AND attd.SDID = "'.$dataSD[$t]['ID'].'"
-                                                           AND attd_s.NPM = "'.$NPM.'" ')->result_array();
-                                    array_push($arrDataAttd,$dataAttd);
-                                }
-
-
-                                if(count($arrDataAttd)>0){
-                                    $meeting = 0;
-                                    $Totalpresen = 0;
-                                    for($a=0;$a<count($arrDataAttd);$a++){
-                                        $dataAttd = $arrDataAttd[$a];
-                                        for($m=1;$m<=14;$m++){
-                                            $meeting += 1;
-                                            if($dataAttd[0]['M'.$m]=='1'){
-                                                $Totalpresen += 1;
-                                            }
-                                        }
-
-                                    }
-
-                                    $PresensiArg = ($Totalpresen==0) ? 0 : ($Totalpresen/$meeting) * 100;
-                                    $ExamSchedule[$g]['AttendanceStudent'] = $PresensiArg;
-
-                                    // UAS
-                                    if($ExamType=='uas' || $ExamType=='UAS'){
-                                        if($PresensiArg<75){
-                                            $ExamSchedule[$g]['ExamDate'] = null;
-                                            $ExamSchedule[$g]['ExamEnd'] = null;
-                                            $ExamSchedule[$g]['ExamStart'] = null;
-                                            $ExamSchedule[$g]['Room'] = null;
-                                        }
-                                    }
+                        if($Semester>1|| $Semester>'1'){
+                            // Apakah ada setting pengecekan pembayaran BPP
+                            if($ExamSetting['UTSPaymentBPP']=='1' || $ExamSetting['UTSPaymentBPP']==1){
+                                $datacheckBPP = $this->checkBPPPayment($NPM,$dataSemester[$i]['ID']);
+                                if($datacheckBPP['Status']==1){
+                                    $checkBPP = true;
+                                } else {
+                                    $checkBPP = false;
                                 }
                             }
 
+                            // Apakah ada setting pengecekan pembayaran credit
+                            if($ExamSetting['UTSPaymentCredit']=='1' || $ExamSetting['UTSPaymentCredit']==1){
+                                $datacheckCredit = $this->checkCreditPayment($NPM,$dataSemester[$i]['ID']);
+                                if($datacheckCredit['Status']==1){
+                                    $checkCredit = true;
+                                } else {
+                                    $checkCredit = false;
+                                }
+                            }
+                        }
 
+
+                        if($ExamSetting['UTSAttd']==1 || $ExamSetting['UTSAttd']=='1'){
+                            $checkAttendance = true;
+                            $checkAttendanceValue = $ExamSetting['UTSAttdValue'];
                         }
 
                     }
                 }
-                else {
-                    // Cek apakah BPP dan SKS sudah terbayar
-                    $dataPayment = $this->checkPayment($NPM,$dataSemester[$i]['ID']);
-                    if($dataPayment['BPP']['Status']==1 && $dataPayment['Credit']['Status']==1){
 
-                        $PaymentType = '';
-                        $PaymentStatus = -5;
-                        $ErrorOn = 'schedule';
-                        $Message = 'Exam Schedule Available On : ';
-                        // Cek apakah tanggal merupakan tanggal Exam
-                        $ExamSchStart = ($ExamType=='uts' || $ExamType=='UTS') ? $dataSemester[$i]['utsStart'] : $dataSemester[$i]['uasStart'] ;
-                        if($Date>=$ExamSchStart){
-                            $ErrorOn = "";
-                            $Message = 'Exam schedule Available';
+                else if($ExamType=='uas' || $ExamType=='UAS'){
+                    if(count($dataExamSetting)>0){
+                        $ExamSetting = $dataExamSetting[0];
 
-                            // Get data jadwal
-                            $ExamSchedule = $this->db->query('SELECT sc.ID AS ScheduleID, mk.MKCode, mk.Name AS Course, mk.NameEng AS CourseEng, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room,  
-                                                                    sc.ClassGroup, sc.Attendance
-                                                                    FROM '.$db.'.study_planning sp
-                                                                    LEFT JOIN db_academic.exam_details exd ON (exd.ScheduleID = sp.ScheduleID AND exd.NPM = sp.NPM)
-                                                                    LEFT JOIN db_academic.exam ex ON (ex.ID = exd.ExamID AND ex.Type LIKE "'.$ExamType.'")
-                                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
-                                                                    LEFT JOIN db_academic.schedule sc ON (sc.ID = sp.ScheduleID)
-                                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sp.MKID)
-                                                                    WHERE sp.SemesterID = "'.$dataSemester[$i]['ID'].'" 
-                                                                    AND sp.NPM = "'.$NPM.'"  AND ex.ExamDate IS NOT NULL
-                                                                    ORDER BY mk.MKCode ASC ')->result_array();
-
-
-                            if(count($ExamSchedule)>0){
-
-                                for($g=0;$g<count($ExamSchedule);$g++){
-
-                                    $examD = $ExamSchedule[$g];
-
-                                    // Get Schedule Detail
-                                    $dataSD = $this->db->select('ID')->get_where('db_academic.schedule_details',array('ScheduleID' => $examD['ScheduleID']))->result_array();
-
-                                    $arrDataAttd = [];
-                                    for($t=0;$t<count($dataSD);$t++){
-                                        // Get Attendance
-                                        $dataAttd = $this->db->query('SELECT attd_s.* FROM db_academic.attendance_students attd_s 
-                                                          LEFT JOIN db_academic.attendance attd ON (attd.ID = attd_s.ID_Attd)
-                                                          WHERE attd.SemesterID = "'.$dataSemester[$i]['ID'].'" 
-                                                          AND attd.ScheduleID = "'.$examD['ScheduleID'].'"
-                                                          AND attd.SDID = "'.$dataSD[$t]['ID'].'"
-                                                           AND attd_s.NPM = "'.$NPM.'" ')->result_array();
-                                        array_push($arrDataAttd,$dataAttd);
-                                    }
-
-
-                                    if(count($arrDataAttd)>0){
-                                        $meeting = 0;
-                                        $Totalpresen = 0;
-                                        for($a=0;$a<count($arrDataAttd);$a++){
-                                            $dataAttd = $arrDataAttd[$a];
-                                            for($m=1;$m<=14;$m++){
-                                                $meeting += 1;
-                                                if($dataAttd[0]['M'.$m]=='1'){
-                                                    $Totalpresen += 1;
-                                                }
-                                            }
-
-                                        }
-
-                                        $PresensiArg = ($Totalpresen==0) ? 0 : ($Totalpresen/$meeting) * 100;
-                                        $ExamSchedule[$g]['AttendanceStudent'] = $PresensiArg;
-
-                                        // UAS
-                                        if($ExamType=='uas' || $ExamType=='UAS'){
-                                            if($PresensiArg<75 && $ExamSchedule[$g]['Attendance']=='1'){
-                                                $ExamSchedule[$g]['ExamDate'] = null;
-                                                $ExamSchedule[$g]['ExamEnd'] = null;
-                                                $ExamSchedule[$g]['ExamStart'] = null;
-                                                $ExamSchedule[$g]['Room'] = null;
-                                            }
-                                        }
-                                    }
+                        if($Semester>1|| $Semester>'1'){
+                            // Apakah ada setting pengecekan pembayaran BPP
+                            if($ExamSetting['UASPaymentBPP']=='1' || $ExamSetting['UASPaymentBPP']==1){
+                                $datacheckBPP = $this->checkBPPPayment($NPM,$dataSemester[$i]['ID']);
+                                if($datacheckBPP['Status']==1){
+                                    $checkBPP = true;
+                                } else {
+                                    $checkBPP = false;
                                 }
-
-
                             }
 
+                            // Apakah ada setting pengecekan pembayaran credit
+                            if($ExamSetting['UASPaymentCredit']=='1' || $ExamSetting['UASPaymentCredit']==1){
+                                $datacheckCredit = $this->checkCreditPayment($NPM,$dataSemester[$i]['ID']);
+                                if($datacheckCredit['Status']==1){
+                                    $checkCredit = true;
+                                } else {
+                                    $checkCredit = false;
+                                }
+                            }
                         }
 
+                        if($ExamSetting['UASAttd']==1 || $ExamSetting['UASAttd']=='1'){
+                            $checkAttendance = true;
+                            $checkAttendanceValue = $ExamSetting['UTSAttdValue'];
+                        }
+
+
                     }
-                    else if ($dataPayment['BPP']['Status']!=1) {
-                        $ErrorOn = 'payment';
-                        $PaymentType = 'BPP';
-                        $PaymentStatus = $dataPayment['BPP']['Status'];
-                        $Message = $dataPayment['BPP']['Message'];
+                }
+
+                if($ExamType=='uts' || $ExamType=='UTS' || $ExamType=='uas' || $ExamType=='UAS'){
+
+                    $day = 7;
+                    if(count($dataExamSetting)>0) {
+                        $ExamSetting = $dataExamSetting[0];
+                        $day = ($ExamType=='uts' || $ExamType=='UTS')
+                            ? $ExamSetting['UTSShown']
+                            : $ExamSetting['UASShown'];
                     }
-                    else {
-                        $ErrorOn = 'payment';
-                        $PaymentType = 'Credit';
-                        $PaymentStatus = $dataPayment['Credit']['Status'];
-                        $Message = $dataPayment['Credit']['Message'];
+
+                    $dateShow = date('Y-m-d',strtotime($this->getDateNow().'+ '.$day.' days'));
+                    $AvailableDate = date('Y-m-d',strtotime($dateExamStart.'- '.$day.' days'));
+
+                    if($dateExamStart > $dateShow){
+                        $checkDateExam = false;
                     }
+
+                }
+
+
+
+                if($checkBPP && $checkCredit && $checkDateExam){
+                    $ExamSchedule = $this->getDetailsScheduleExam($db,$NPM,$dataSemester[$i]['ID'],$ExamType);
+
+                    // Status (StatusExam)
+                    // 1 = tidak ada masalah
+                    // -1 = attendance tidak memenuhi
+
+                    $detailExam = [];
+
+                    if(count($ExamSchedule)>0){
+                        for ($i=0;$i<count($ExamSchedule);$i++){
+                            $ExamSchedule[$i]['StatusExam'] = 1;
+                            $dc = $ExamSchedule[$i];
+
+                            if($checkAttendance && ($dc['Attendance']==1 || $dc['Attendance']=='1')){
+                                if($dc['AttendancePercentage']<$checkAttendanceValue){
+                                    $ExamSchedule[$i]['ExamDate'] = '';
+                                    $ExamSchedule[$i]['ExamStart'] = '';
+                                    $ExamSchedule[$i]['ExamEnd'] = '';
+                                    $ExamSchedule[$i]['Room'] = '';
+                                    $ExamSchedule[$i]['StatusExam'] = -1;
+                                }
+                            }
+
+                            array_push($detailExam,$ExamSchedule[$i]);
+
+                        }
+                    }
+
+
+                    $result = array(
+                        'Status' => 1,
+                        'ExamSchedule' => $detailExam
+                    );
+
+                }
+                else if($checkBPP==false){
+                    $result = array(
+                        'Status' => -1,
+                        'Message' => 'BPP Payment Unpaid'
+                    );
+                }
+                else if($checkCredit==false){
+                    $result = array(
+                        'Status' => -2,
+                        'Message' => 'Credit Payment Unpaid'
+                    );
+                }
+                else if($checkDateExam==false){
+                    $result = array(
+                        'Status' => -3,
+                        'Message' => 'The exam is out of date',
+                        'AvailableDate' => $AvailableDate
+                    );
                 }
 
             }
-
-
-            // =======
-            $dataArr = array(
-                'SemesterID' => $dataSemester[$i]['ID'],
-                'Semester' => $Semester,
-                'SemesterName' => $dataSemester[$i]['Name'],
-                'UTS' => array('Start' => $dataSemester[$i]['utsStart'], 'End' => $dataSemester[$i]['utsEnd']),
-                'UAS' => array('Start' => $dataSemester[$i]['uasStart'], 'End' => $dataSemester[$i]['uasEnd']),
-                'ExamSchedule' => $ExamSchedule,
-                'ErrorOn' => $ErrorOn,
-                'DataPayment' => array(
-                    'PaymentType' => $PaymentType,
-                    'PaymentStatus' => $PaymentStatus
-                ),
-                'Message' => $Message
-
-
-            );
-            array_push($result,$dataArr);
-            // =======
-
-
+            else {
+                $result = array(
+                    'Status' => -4,
+                    'Message' => 'Schedule Exam Not Available'
+                );
+            }
 
         }
 
-//        print_r($result);
         return $result;
 
     }
@@ -477,6 +449,126 @@ class M_rest extends CI_Model {
         );
 
         return $result;
+    }
+
+    public function checkBPPPayment($NPM,$SemesterID){
+        // BPP
+        $dataBpp = $this->db->select('Status')->get_where('db_finance.payment',
+            array('NPM'=>$NPM,'PTID' => 2, 'SemesterID' => $SemesterID),1)->result_array();
+
+        if(count($dataBpp)>0){
+            if($dataBpp[0]['Status']=='1' || $dataBpp[0]['Status']==1){
+                $StatusBPP = 1;
+                $MessageBPP = 'BPP payment Paid';
+            } else {
+                $StatusBPP = 0;
+                $MessageBPP = 'BPP payment Unpaid';
+            }
+        } else {
+            $StatusBPP = -1;
+            $MessageBPP = 'BPP payment unset, please contact academic service';
+        }
+
+        return array('Status'=>$StatusBPP, 'Message' => $MessageBPP);
+    }
+
+    public function checkCreditPayment($NPM,$SemesterID){
+        // Credit
+        $dataSKS = $this->db->select('Status')->get_where('db_finance.payment',
+            array('NPM'=>$NPM,'PTID' => 3, 'SemesterID' => $SemesterID),1)->result_array();
+        if(count($dataSKS)>0){
+            if($dataSKS[0]['Status']=='1' || $dataSKS[0]['Status']==1){
+                $StatusCredit = 1;
+                $MessageCredit = 'Credit payment Paid';
+            }
+            else {
+                $StatusCredit = 0;
+                $MessageCredit = 'Credit payment Unpaid';
+            }
+        }
+        else {
+            $StatusCredit = -1;
+            $MessageCredit = 'Credit payment unset, please contact academic service';
+        }
+
+        return array('Status' => $StatusCredit, 'Message' => $MessageCredit);
+    }
+
+    public function checkPercentageAttendance($NPM,$SemesterID,$ScheduleID){
+
+    }
+
+    public function getDetailsScheduleExam($db,$NPM,$SemesterID,$ExamType){
+        // Get data jadwal
+
+        $q = 'SELECT sc.ID AS ScheduleID, mk.MKCode, mk.Name AS Course, mk.NameEng AS CourseEng, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room,  
+                                                                    sc.ClassGroup, sc.Attendance
+                                                                    FROM '.$db.'.study_planning sp
+                                                                    LEFT JOIN db_academic.exam_details exd ON (exd.ScheduleID = sp.ScheduleID AND exd.NPM = sp.NPM)
+                                                                    LEFT JOIN db_academic.exam ex ON (ex.ID = exd.ExamID)
+                                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
+                                                                    LEFT JOIN db_academic.schedule sc ON (sc.ID = sp.ScheduleID)
+                                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sp.MKID)
+                                                                    WHERE sp.SemesterID = "'.$SemesterID.'" 
+                                                                    AND ex.Type LIKE "'.$ExamType.'"
+                                                                    AND sp.NPM = "'.$NPM.'"
+                                                                    GROUP BY sc.ID
+                                                                    ORDER BY mk.MKCode ASC';
+
+        $ExamSchedule = $this->db->query($q)->result_array();
+
+        if(count($ExamSchedule)>0){
+            for($g=0;$g<count($ExamSchedule);$g++){
+
+                $examD = $ExamSchedule[$g];
+
+                // Get Schedule Detail
+                $dataSD = $this->db->select('ID')->get_where('db_academic.schedule_details',array('ScheduleID' => $examD['ScheduleID']))->result_array();
+
+                $arrDataAttd = [];
+                for($t=0;$t<count($dataSD);$t++){
+                    // Get Attendance
+                    $dataAttd = $this->db->query('SELECT attd_s.* FROM db_academic.attendance_students attd_s 
+                                                          LEFT JOIN db_academic.attendance attd ON (attd.ID = attd_s.ID_Attd)
+                                                          WHERE attd.SemesterID = "'.$SemesterID.'" 
+                                                          AND attd.ScheduleID = "'.$examD['ScheduleID'].'"
+                                                          AND attd.SDID = "'.$dataSD[$t]['ID'].'"
+                                                           AND attd_s.NPM = "'.$NPM.'" ')->result_array();
+                    array_push($arrDataAttd,$dataAttd);
+                }
+
+
+                if(count($arrDataAttd)>0){
+                    $meeting = 0;
+                    $Totalpresen = 0;
+                    for($a=0;$a<count($arrDataAttd);$a++){
+                        $dataAttd = $arrDataAttd[$a];
+                        for($m=1;$m<=14;$m++){
+                            $meeting += 1;
+                            if($dataAttd[0]['M'.$m]=='1'){
+                                $Totalpresen += 1;
+                            }
+                        }
+
+                    }
+
+                    $PresensiArg = ($Totalpresen==0) ? 0 : ($Totalpresen/$meeting) * 100;
+                    $ExamSchedule[$g]['AttendancePercentage'] = round($PresensiArg);
+
+                    // UAS
+//                    if($ExamType=='uas' || $ExamType=='UAS'){
+//                        if($PresensiArg<75 && $ExamSchedule[$g]['Attendance']=='1'){
+//                            $ExamSchedule[$g]['ExamDate'] = null;
+//                            $ExamSchedule[$g]['ExamEnd'] = null;
+//                            $ExamSchedule[$g]['ExamStart'] = null;
+//                            $ExamSchedule[$g]['Room'] = null;
+//                        }
+//                    }
+                }
+            }
+        }
+
+        return $ExamSchedule;
     }
 
     public function getAttendanceStudent($NPM,$ScheduleID){

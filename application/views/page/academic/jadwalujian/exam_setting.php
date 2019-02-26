@@ -6,6 +6,10 @@
     #tableSetting tr td:nth-child(2){
         text-align: left;
     }
+
+    .input-group {
+        max-width: 100px;
+    }
 </style>
 
 <div class="row">
@@ -66,7 +70,7 @@
                             <div class="col-md-4">
                                 <div class="checkbox checbox-switch switch-primary" style="margin: 0px;margin-top: 5px;">
                                     <label>
-                                        <input type="checkbox" id="UTSAttd" value="1" />
+                                        <input type="checkbox" id="UTSAttd" data-inpt="UTSAttdValue" value="1" />
                                         <span></span>
                                     </label>
                                 </div>
@@ -74,7 +78,7 @@
                             <div class="col-md-8">
                                 <div class="input-group">
                                     <input type="number" class="form-control" id="UTSAttdValue">
-                                    <span class="input-group-addon" id="basic-addon2"><i class="fa fa-percent" aria-hidden="true"></i></span>
+                                    <span class="input-group-addon"><i class="fa fa-percent"></i></span>
                                 </div>
                             </div>
                         </div>
@@ -83,6 +87,16 @@
 
                 <tr>
                     <td>4</td>
+                    <td>UTS Shown (show UTS H - ?)</td>
+                    <td>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="UTSShown" placeholder="">
+                            <span class="input-group-addon">days</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>5</td>
                     <td>UAS Filter Payment</td>
                     <td>
                         <div class="row">
@@ -106,14 +120,14 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>5</td>
+                    <td>6</td>
                     <td>UAS Filter Attendance</td>
                     <td>
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="checkbox checbox-switch switch-primary" style="margin: 0px;margin-top: 5px;">
                                     <label>
-                                        <input type="checkbox" id="UASAttd" value="1" />
+                                        <input type="checkbox" id="UASAttd" data-inpt="UASAttdValue" value="1" />
                                         <span></span>
                                     </label>
                                 </div>
@@ -128,6 +142,16 @@
                     </td>
                 </tr>
 
+                <tr>
+                    <td>7</td>
+                    <td>UAS Shown (show UTS H - ?)</td>
+                    <td>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="UASShown" placeholder="">
+                            <span class="input-group-addon">days</span>
+                        </div>
+                    </td>
+                </tr>
 
                 <tr>
                     <td colspan="3" style="text-align: right;">
@@ -182,7 +206,10 @@
             var d = jsonResult[0];
 
             $('#UTSAttdValue').val(d.UTSAttdValue);
+            $('#UTSShown').val(d.UTSShown);
+
             $('#UASAttdValue').val(d.UASAttdValue);
+            $('#UASShown').val(d.UASShown);
 
             var UTSPaymentBPP = (d.UTSPaymentBPP==1 || d.UTSPaymentBPP=='1') ? true : false;
             var UTSPaymentCredit = (d.UTSPaymentCredit==1 || d.UTSPaymentCredit=='1') ? true : false;
@@ -198,8 +225,15 @@
             $('#UASPaymentCredit').prop('checked',UASPaymentCredit);
             $('#UASAttd').prop('checked',UASAttd);
 
+            // Diabled
+            var d1 = (d.UTSAttd==0 || d.UTSAttd=='0') ? true : false;
+            var d2 = (d.UASAttd==0 || d.UASAttd=='0') ? true : false;
+            $('#UTSAttdValue').prop('disabled',d1);
+            $('#UASAttdValue').prop('disabled',d2);
+
         });
     }
+
     // Saving Exam Setting
     $('#btnSavedSetting').click(function () {
         loading_buttonSm('#btnSavedSetting');
@@ -213,6 +247,10 @@
         var UASAttd = ($('#UASAttd').is(':checked')) ? '1' : '0';
         var UASAttdValue = ($('#UASAttdValue').val()!='' && $('#UASAttdValue').val()!=null) ? $('#UASAttdValue').val() : 0;
 
+        var UTSShown = $('#UTSShown').val();
+        var UASShown = $('#UASShown').val();
+
+
         var data = {
             action : 'updateExamSetting',
             formData : {
@@ -223,7 +261,9 @@
                 UASPaymentBPP : UASPaymentBPP,
                 UASPaymentCredit : UASPaymentCredit,
                 UASAttd : UASAttd,
-                UASAttdValue : UASAttdValue
+                UASAttdValue : UASAttdValue,
+                UTSShown : UTSShown,
+                UASShown : UASShown
             }
         };
 
@@ -238,5 +278,13 @@
             },500);
         });
 
+    });
+
+    $('#UTSAttd,#UASAttd').change(function () {
+        var elm = $(this).attr('data-inpt');
+
+        var d = ($(this).is(':checked')) ? false : true;
+
+        $('#'+elm).prop('disabled',d);
     });
 </script>

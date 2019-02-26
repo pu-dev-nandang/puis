@@ -49,6 +49,66 @@ class C_auth extends Globalclass {
 
 //        $this->load->view('md5');
 
+        if($table=='parent'){
+            $ta = 2014;
+            $data = $this->db->query('SELECT * FROM '.$ta.'.students')->result_array();
+
+            foreach ($data AS $item){
+
+                if($item['DateOfBirth']!=null && $item['DateOfBirth']!=''){
+
+                    $dataInsert = array(
+                        'NPM' => $item['NPM'],
+                        'ProgramID' => $item['ProgramID'],
+                        'ProdiID' => $item['ProdiID'],
+                        'ProdiGroupID' => '',
+                        'Year' => $item['ClassOf'],
+                        'Password_Old' => md5(date('dmy',strtotime($item['DateOfBirth']))),
+                        'FatherName' => ucwords($item['Father']),
+                        'MotherName' => ucwords($item['Mother']),
+                        'Status' => '-1',
+                    );
+
+                    $this->db->insert('db_academic.auth_parents', $dataInsert);
+
+                }
+            }
+
+        }
+        else if($table=='test'){
+            echo date('dmy',strtotime('2001-09-30'));
+        }
+
+
+    }
+
+    public function parent($ta){
+        $max_execution_time = 360;
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', $max_execution_time); //60 seconds = 1 minutes
+
+        $data = $this->db->query('SELECT std.*, ats.ProdiGroupID FROM ta_'.$ta.'.students std LEFT JOIN db_academic.auth_students ats ON (ats.NPM = std.NPM)')->result_array();
+
+        foreach ($data AS $item){
+
+            if($item['DateOfBirth']!=null && $item['DateOfBirth']!=''){
+
+                $dataInsert = array(
+                    'NPM' => $item['NPM'],
+                    'ProgramID' => $item['ProgramID'],
+                    'ProdiID' => $item['ProdiID'],
+                    'ProdiGroupID' => $item['ProdiGroupID'],
+                    'Year' => $item['ClassOf'],
+                    'Password_Old' => md5(date('dmy',strtotime($item['DateOfBirth']))),
+                    'FatherName' => ucwords(strtolower($item['Father'])),
+                    'MotherName' => ucwords(strtolower($item['Mother'])),
+                    'Status' => '-1',
+                );
+
+                $this->db->insert('db_academic.auth_parents', $dataInsert);
+
+            }
+        }
 
     }
 

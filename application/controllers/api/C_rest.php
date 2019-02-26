@@ -116,15 +116,14 @@ class C_rest extends CI_Controller {
     public function getExamScheduleForStudent(){
         $dataToken = $this->getInputToken();
         $cekUser = $this->cekAuthAPI($dataToken['auth']);
-//
-//        print_r($dataToken);
-//        exit;
 
         if($cekUser){
             $data = $this->m_rest->__getExamScheduleForStudent($dataToken['DB_'],
-                $dataToken['ProdiID'],$dataToken['SemesterID'],$dataToken['NPM'],
-                $dataToken['SemeaterYear'],$dataToken['ClassOf'],
-                $dataToken['ExamType'],$dataToken['Date']);
+                $dataToken['SemesterID'],
+                $dataToken['NPM'],
+                $dataToken['ClassOf'],
+                $dataToken['ExamType']);
+
             return print_r(json_encode($data));
         } else {
             $msg = array(
