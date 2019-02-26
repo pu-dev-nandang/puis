@@ -1,3 +1,6 @@
+<div class="row" id = "dataselected">
+	
+</div>
 <div class="row">
 	<div class="col-md-12">
 		<div class="col-md-8 col-md-offset-2">
@@ -148,7 +151,6 @@
 			$.post(url,{token:token},function (resultJson) {
 				var response = jQuery.parseJSON(resultJson);
 				PostBudgetDepartment = response.data;
-
 				// check if edit
 					if (PRCodeVal != '') {
 						loading_page("#Page_Input_PR");
@@ -1538,16 +1540,16 @@
 			       		break;
 			       case "1":
 			       		if ($("#p_prcode").length) {
-			       			$("#p_prcode").html('PRCode : '+data);
+			       			$("#p_prcode").html('PRCode : '+data['PRCode']);
 			       		}
 			       		else
 			       		{
-			       			$(".thumbnail").find('.row:first').before('<p style = "color : red" id = "p_prcode">PRCode : '+data+'</p>');
+			       			$(".thumbnail").find('.row:first').before('<p style = "color : red" id = "p_prcode">PRCode : '+data['PRCode']+'</p>');
 			       		}
 			       		
 			       		var rowPullright = $(ID_element).closest('.pull-right');
 			       		rowPullright.empty();
-			       		rowPullright.append('<button class="btn btn-default" id="pdfprint" PRCode = "'+data+'"> <i class = "fa fa-file-pdf-o"></i> Print PDF</button>'+ '&nbsp&nbsp'+'<!--<button class="btn btn-default" id="excelprint" PRCode = "'+data+'"><i class = "fa fa-file-excel-o"></i> Print Excel</button>-->');
+			       		rowPullright.append('<button class="btn btn-default" id="pdfprint" PRCode = "'+data['PRCode']+'"> <i class = "fa fa-file-pdf-o"></i> Print PDF</button>'+ '&nbsp&nbsp'+'<!--<button class="btn btn-default" id="excelprint" PRCode = "'+data['PRCode']+'"><i class = "fa fa-file-excel-o"></i> Print Excel</button>-->');
 
 			       		$('button:not([id="pdfprint"]):not([id="excelprint"]):not([id="btnBackToHome"])').prop('disabled', true);
 			       		$(".Detail").prop('disabled', false);
@@ -1555,7 +1557,10 @@
 			       		$("select").prop('disabled', true);
 			       		$("textarea").prop('disabled', true);
 			       		$(".input-group-addon").remove();
-			       		
+
+			       		// update tableData_selected
+			       			Get_tableData_selected(data['JsonStatus']);
+
 			       		break;
 			       case "larry": 
 			           alert('Hey');
@@ -1578,6 +1583,39 @@
 			  }
 			})
 
+		}
+
+		function Get_tableData_selected(JsonStatus)
+		{
+			var TD0 = $("#tableData_selected tbody").find('tr:first').find('td:eq(0)').html();
+			var TD1 = $("#tableData_selected tbody").find('tr:first').find('td:eq(1)').html();
+			var TD2 = $("#tableData_selected tbody").find('tr:first').find('td:eq(2)').html();
+			var TD3 = 'Issued & Approval Process';
+			$("#tableData_selected tbody").find('tr:first').find('td:eq(3)').html(TD3);	
+			var stTd = 5; // start dari td ke 4 untuk approval
+			JsonStatus = jQuery.parseJSON(JsonStatus);
+			for (var i = 0; i < JsonStatus.length; i++) {
+				var html = '';
+				switch(JsonStatus[i]['Status']) {
+				  case 0:
+				  case '0':
+				   var stjson = '-';
+				    break;
+				  case 1:
+				  case '1':
+				    var stjson = '<i class="fa fa-check" style="color: green;"></i>';
+				    break;
+				  case 2:
+				  case '2':
+				    var stjson =  '<i class="fa fa-times" aria-hidden="true" style="color: red;"></i>';;
+				    break;  
+				  default:
+				    var stjson = '-';
+				}
+				html += stjson+'<br>'+'Approver : '+JsonStatus[i]['ApprovedBy']+'<br>'+'Approve At : '+JsonStatus[i]['ApproveAt'];
+				$("#tableData_selected tbody").find('tr:first').find('td:eq('+stTd+')').html(html);	
+				stTd++;
+			}
 		}
 
 		$(document).off('click', '#BtnIssued').on('click', '#BtnIssued',function(e) {

@@ -56,7 +56,7 @@
 		arr_bulan = <?php echo json_encode($arr_bulan) ?>;
 		// var Dom = '';
 			var OPFreq = '';
-			for (var i = 0; i <= 50; i++) {
+			for (var i = 0; i <= 1000; i++) {
 				var selected = (i == 0) ? 'selected' : '';
 				OPFreq += '<option value = "'+i+'" '+selected+'>'+i+'</option>';
 			}
@@ -222,6 +222,8 @@
 					var code = $(this).closest('div[class="row"]').attr('code');
 					funcCheck(code);
 				})
+
+				$("#UnitCost"+arr_PostBudget[i]['CodePostBudget']).trigger('keyup');
 			} // exkit looping
 
 		// pPageInput After
@@ -395,6 +397,21 @@
 			checkTot_Freq = parseInt(checkTot_Freq) + parseInt(arr[x]);
 		}
 
+		// hitung perbulan untuk satu post budget
+			var Month_Count = 0;
+			$(".InputBulan"+code).each(function(){
+				var a = $(this).val();
+				a = findAndReplace(a,".","");
+				Month_Count += parseInt(a);
+			})
+
+			var Month_Count_Sisa = Freq - Month_Count;
+			Month_Count_Sisa = (Month_Count_Sisa <= 0) ? 0 : '-'+Month_Count_Sisa; 
+
+			var ev = $('.InputBulan'+code+':last').closest('.col-md-1');
+			ev.find('.Month_Count').remove();
+			ev.append('<div class = "Month_Count" style = "margin-top:-48px;margin-left: 63px;color:green">'+Month_Count_Sisa+'</div>');
+
 		if (checkTot_Freq > Freq) {
 			$(".InputBulan"+code).each(function(){
 				$(this).val(0);
@@ -537,7 +554,7 @@
 				divBulan += '</div></div>';
 
 				var OPFreq = '';
-					for (var y = 0; y <= 50; y++) {
+					for (var y = 0; y <= 1000; y++) {
 						var selected = (y == creator_budget[i]['Freq']) ? 'selected' : '';
 						OPFreq += '<option value = "'+y+'" '+selected+'>'+y+'</option>';
 					}

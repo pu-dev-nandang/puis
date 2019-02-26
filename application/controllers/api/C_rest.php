@@ -2386,4 +2386,33 @@ class C_rest extends CI_Controller {
         }
 
     }
+
+    public function show_circulation_sheet()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $rs = array();
+                $PRCode = $dataToken['PRCode'];
+                $sql = 'select a.Desc,a.Date,b.NIP,b.Name from db_budgeting.pr_circulation_sheet as a 
+                        join db_employees.employees as b on a.By = b.NIP
+                        where a.PRCode = ?
+                        ';
+                $query=$this->db->query($sql, array($PRCode))->result_array();
+                $rs = $query;        
+                echo json_encode($rs);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
 }

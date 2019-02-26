@@ -871,7 +871,7 @@ $route['rest/ga/__show_schedule_exchange'] = 'api/c_rest/show_schedule_exchange'
 $route['rest/__approve_pr'] = 'api/c_rest/approve_pr';
 $route['rest/__budgeting_dashboard'] = 'api/c_rest/budgeting_dashboard';
 $route['rest/__InputCatalog_saveFormInput'] = 'api/c_rest/InputCatalog_saveFormInput';
-
+$route['rest/__show_circulation_sheet'] = 'api/c_rest/show_circulation_sheet';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
