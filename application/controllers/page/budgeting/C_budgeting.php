@@ -871,6 +871,7 @@ class C_budgeting extends Budgeting_Controler {
         $arr_result = array('html' => '','jsonPass' => '');
         // pass check data existing
         $this->data['dt'] = $this->m_master->showData_array('db_budgeting.cfg_set_userrole');
+        $this->data['cfg_m_userrole'] = $this->m_master->showData_array('db_budgeting.cfg_m_userrole');
         $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/configuration/setuserrole/LoadMasterUserRoleDepartement',$this->data,true);
         echo json_encode($arr_result);
     }

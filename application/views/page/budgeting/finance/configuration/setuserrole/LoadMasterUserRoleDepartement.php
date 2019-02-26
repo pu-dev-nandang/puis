@@ -24,6 +24,7 @@
 
 <script type="text/javascript">
 	var dt = <?php echo json_encode($dt) ?>;
+	var cfg_m_userrole = <?php echo json_encode($cfg_m_userrole) ?>;
 	$(document).ready(function() {
 		LoadFirstLoad();
 	}); // exit document Function
@@ -51,14 +52,11 @@
 											'<thead>'+
 											'<tr>'+
 												'<th width = "3%">Post</th>'+
-					                            '<th>Amount Limit</th>'+
-					                            '<th>Admin</th>'+
-					                            '<th>Approver 1</th>'+
-					                            '<th>Approver 2</th>'+
-					                            '<th>Approver 3</th>'+
-					                            '<th>Approver 4</th>'+
-					                            '<th>Action</th>'+
-											'</tr></thead>'	
+					                            '<th>Amount Limit</th>';
+	        for (var i = 0; i < cfg_m_userrole.length; i++) {
+	        	TableGenerate += '<th>'+cfg_m_userrole[i]['NameUserRole']+'</th>';
+	        }
+				TableGenerate += '</tr></thead>'	
 								;
 			TableGenerate += '<tbody></tbody></table></div></div></div>';
 			var ActionSave = '<div class = "row sdsadasd" style = "margin-top : 10px;margin-left : 0px ; margin-right : 0px">'+
@@ -87,15 +85,18 @@
 
 	function funcFillTbodyExisting(resultJson)
 	{
-		var UserType = ['Admin','Approver 1','Approver 2','Approver 3','Approver 4'];
+		// var UserType = ['Admin','Approver 1','Approver 2','Approver 3','Approver 4'];
+		var UserType = [];
+		for (var i = 0; i < cfg_m_userrole.length; i++) {
+			UserType.push(cfg_m_userrole[i]['NameUserRole']);
+		}
+
 			// grouping MaxLimit
 			var NextInc = parseInt(resultJson.length) * parseInt(UserType.length);
-			console.log(resultJson);
 			var MaxLimit = [];
 			for (var i = 0; i < dt.length; i=i+NextInc) {
 				MaxLimit.push(dt[i].MaxLimit)
 			}
-
 
 			var FieldType = ['Entry','Approved','Cancel'];
 			var zStart = 0;
@@ -140,6 +141,33 @@
 							}
 						}
 					} // end loop field type
+
+					if (chk == '') { // adding for sisa
+						chk = '<div class = "row">'+
+							'<div class = "col-md-12">'+
+								'<div class = "form-group">'+
+									'<label>Entry</label>'+
+									'<input type="checkbox" class = "form-control user" id_table ="'+ID_user+'" useraction = "'+'Entry'+'" style = "height : 15px">'+
+								'</div>'+	
+							'</div>'+
+						  '</div>';	
+						chk += '<div class = "row" '+'style = "margin-top : 10px"'+'>'+
+									'<div class = "col-md-12">'+
+										'<div class = "form-group">'+
+											'<label>Approve</label>'+
+											'<input type="checkbox" class = "form-control user" id_table ="'+ID_user+'" useraction = "'+'Approved'+'" style = "height : 15px">'+
+										'</div>'+	
+									'</div>'+
+								  '</div>';	
+						chk += '<div class = "row" '+'style = "margin-top : 10px"'+'>'+
+									'<div class = "col-md-12">'+
+										'<div class = "form-group">'+
+											'<label>Cancel</label>'+
+											'<input type="checkbox" class = "form-control user" id_table ="'+ID_user+'" useraction = "'+'Cancel'+'" style = "height : 15px">'+
+										'</div>'+	
+									'</div>'+
+								  '</div>';		  		  
+					}
 					fill += '<td align = "center">'+chk+'</td>';
 				} // end loop user type
 				var action = '<button type="button" class="btn btn-danger btn-delete"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
@@ -168,7 +196,7 @@
 			}
 			fill += '<td class = "post">'+fillPost+'</td>';
 			fill += '<td>'+'<input type = "text" class = "form-control AmountLimit" value = "0">'+'</td>';
-			for (var i = 0; i < 5; i++) {
+			for (var i = 0; i < cfg_m_userrole.length; i++) {
 				var ID = i + 1;
 				var chk = '<div class = "row">'+
 							'<div class = "col-md-12">'+
@@ -226,172 +254,59 @@
 				AmountLimit.push($(this).val());
 			})
 
-			var Admin = [];
-			$('input[id_table="1"]').each(function(){
-				if ($(this).is(':checked')) {
-					aa = 1;
-				}
-				else
-				{
-					aa = 0;
-				}
-				var temp = {};
-				temp[$(this).attr('useraction')] = aa;
-				Admin.push(temp);
-			})
-
-			var Approver1 = [];
-			$('input[id_table="2"]').each(function(){
-				if ($(this).is(':checked')) {
-					aa = 1;
-				}
-				else
-				{
-					aa = 0;
-				}
-				var temp = {};
-				temp[$(this).attr('useraction')] = aa;
-				Approver1.push(temp);
-			})
-
-			var Approver2 = [];
-			$('input[id_table="3"]').each(function(){
-				if ($(this).is(':checked')) {
-					aa = 1;
-				}
-				else
-				{
-					aa = 0;
-				}
-				var temp = {};
-				temp[$(this).attr('useraction')] = aa;
-				Approver2.push(temp);
-			})
-
-			var Approver3 = [];
-			$('input[id_table="4"]').each(function(){
-				if ($(this).is(':checked')) {
-					aa = 1;
-				}
-				else
-				{
-					aa = 0;
-				}
-				var temp = {};
-				temp[$(this).attr('useraction')] = aa;
-				Approver3.push(temp);
-			})
-
-			var Approver4 = [];
-			$('input[id_table="5"]').each(function(){
-				if ($(this).is(':checked')) {
-					aa = 1;
-				}
-				else
-				{
-					aa = 0;
-				}
-				var temp = {};
-				temp[$(this).attr('useraction')] = aa;
-				Approver4.push(temp);
-			})
-
-			var FormInsert = [];
-			for (var i = 0; i < AmountLimit.length; i++) {
-				var GroupPrivileges = ((i+1) * 3);
-				var Start = GroupPrivileges - 3;
-				for (var l = 0; l < resultJson.length; l++) {
-					var TempAdmin = {};
-					var TempApprover1 = {};
-					var TempApprover2 = {};
-					var TempApprover3 = {};
-					var TempApprover4 = {};
-					var MaxLimit = AmountLimit[i];
-					MaxLimit = findAndReplace(MaxLimit, ".","");
-					MaxLimit = parseInt(MaxLimit) * 1000; // for ribuan
-					var CodePost = resultJson[l].CodePost;
-					// admin 
-					TempAdmin = {
-						MaxLimit : MaxLimit,
-						CodePost : CodePost,
-						ID_m_userrole : 1,
-					};
-
-					// check entry existing
-					for (var j = Start; j < GroupPrivileges; j++) {
-						var getAdmin = Admin[j];
-						for(var key in getAdmin) {
-							TempAdmin[key] = getAdmin[key];
+			// dynamic
+				var arr = [];
+				for (var i = 0; i < cfg_m_userrole.length; i++) {
+					var id_table = i + 1;
+					var id_table_arr = []
+					$('input[id_table="'+id_table+'"]').each(function(){
+						if ($(this).is(':checked')) {
+							aa = 1;
 						}
-					}
-					FormInsert.push(TempAdmin);
-
-					// Approver 1
-					TempApprover1 = {
-						MaxLimit : MaxLimit,
-						CodePost : CodePost,
-						ID_m_userrole : 2,
-					};
-
-					// check entry existing
-					for (var j = Start; j < GroupPrivileges; j++) {
-						var getApprover1 = Approver1[j];
-						for(var key in getApprover1) {
-							TempApprover1[key] = getApprover1[key];
+						else
+						{
+							aa = 0;
 						}
-					}
-					
-					FormInsert.push(TempApprover1);
+						var temp = {};
+						temp[$(this).attr('useraction')] = aa;
+						id_table_arr.push(temp);
+					})
 
-					// Approver 2
-					TempApprover2 = {
-						MaxLimit : MaxLimit,
-						CodePost : CodePost,
-						ID_m_userrole : 3,
-					};
-
-					// check entry existing
-					for (var j = Start; j < GroupPrivileges; j++) {
-						var getApprover2 = Approver2[j];
-						for(var key in getApprover2) {
-							TempApprover2[key] = getApprover2[key];
-						}
-					}
-					FormInsert.push(TempApprover2);
-
-					// Approver 3
-					TempApprover3 = {
-						MaxLimit : MaxLimit,
-						CodePost : CodePost,
-						ID_m_userrole : 4,
-					};
-
-					// check entry existing
-					for (var j = Start; j < GroupPrivileges; j++) {
-						var getApprover3 = Approver3[j];
-						for(var key in getApprover3) {
-							TempApprover3[key] = getApprover3[key];
-						}
-					}
-					FormInsert.push(TempApprover3);
-
-					// Approver 4
-					TempApprover4 = {
-						MaxLimit : MaxLimit,
-						CodePost : CodePost,
-						ID_m_userrole : 5,
-					};
-
-					// check entry existing
-					for (var j = Start; j < GroupPrivileges; j++) {
-						var getApprover4 = Approver4[j];
-						for(var key in getApprover4) {
-							TempApprover4[key] = getApprover4[key];
-						}
-					}
-					FormInsert.push(TempApprover4);
+					var temp2 = {};
+					// temp2['A'+id_table] = id_table_arr;
+					arr['A'+id_table] = id_table_arr;
 				}
-			}
+
+				var FormInsert = [];
+				for (var i = 0; i < AmountLimit.length; i++) {
+					var GroupPrivileges = ((i+1) * 3);
+					var Start = GroupPrivileges - 3;
+					for (var l = 0; l < resultJson.length; l++) {
+						var MaxLimit = AmountLimit[i];
+						MaxLimit = findAndReplace(MaxLimit, ".","");
+						MaxLimit = parseInt(MaxLimit) * 1000; // for ribuan
+						var CodePost = resultJson[l].CodePost;
+						for (var m = 0; m < cfg_m_userrole.length; m++) {
+							ID_m_userrole = m+1;
+							Temp = {
+								MaxLimit : MaxLimit,
+								CodePost : CodePost,
+								ID_m_userrole : ID_m_userrole,
+							};
+
+							// check entry existing
+							for (var j = Start; j < GroupPrivileges; j++) {
+								var get = arr['A'+ID_m_userrole];
+								get = get[j];
+								for(var key in get) {
+									Temp[key] = get[key];
+								}
+							}
+							FormInsert.push(Temp);
+						}
+
+					}
+				}
 
 			loadingStart();
 			var url = base_url_js+'budgeting/configRule/userroledepart_submit';
