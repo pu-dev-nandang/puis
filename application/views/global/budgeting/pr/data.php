@@ -34,7 +34,7 @@ $(document).ready(function() {
 		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Department</th>'+
 		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</th>'+
 		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Circulation Sheet</th>'+
-		                '<th colspan = "'+G_ApproverLength+'" style = "text-align: center;background: #20485A;color: #FFFFFF;">Approver</th>'+
+		                '<th colspan = "'+G_ApproverLength+'" style = "text-align: center;background: #20485A;color: #FFFFFF;" id = "parent_th_approver">Approver</th>'+
 		            '</tr>'+
 		            '<tr>'+
 		            	LoopApprover+
@@ -109,7 +109,6 @@ $(document).ready(function() {
                $("#pageContent").empty();
                $("#pageContent").html(html);
                $("#dataselected").html(ShowHtmlSelected(thead,Htmlselected));
-
                $(".menuEBudget li").removeClass('active');
                $(".pageAnchor[page='form']").parent().addClass('active');
            },1000);
@@ -163,6 +162,118 @@ $(document).ready(function() {
    		});
 	})
 
+	$(document).off('click', '#add_approver').on('click', '#add_approver',function(e) {
+		var PRCode = $(this).attr('prcode');
+		// get JsonStatus
+		var Approver = JsonStatus;
+		var html = '<div class = "row"><div class="col-md-12">';
+			html += '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+              '<thead>'+
+                  '<tr>'+
+                      '<th style="width: 2%;">Approver</th>'+
+                      '<th style="width: 55px;">Name</th>'+
+                      '<th style="width: 55px;">Status</th>'+
+                      '<th style="width: 55px;">Action</th>';
+	        html += '</tr>' ;
+	        html += '</thead>' ;
+	        html += '<tbody>' ;
+	    var ke = 0;    
+		for (var i = 0; i < JsonStatus.length; i++) {
+			ke = i + 1;
+			switch(JsonStatus[i]['Status']) {
+			  case 0:
+			  case '0':
+			   var stjson = 'Not Approve';
+			    break;
+			  case 1:
+			  case '1':
+			    var stjson = 'Approve<br>'+JsonStatus[i]['ApproveAt'];
+			    break;
+			  case 2:
+			  case '2':
+			    var stjson =  'Reject';
+			    break;  
+			  default:
+			    var stjson = '-';
+			}
+			var action = '';
+			if (JsonStatus[i]['Status'] != 1 && JsonStatus[i]['ApprovedBy'] != '<?php echo $this->session->userdata('NIP') ?>') {
+				action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+i+'"><i class="fa fa-pencil" aria-hidden="true" prcode = "'+PRCode+'"></i></button>';
+				action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+i+'"><i class="fa fa-trash-o" aria-hidden="true" prcode = "'+PRCode+'"></i></button>';
+			}
+			html += '<tr>'+
+			      '<td>'+ ke + '</td>'+
+			      '<td>'+ JsonStatus[i]['ApprovedBy'] +' || '+JsonStatus[i]['NameAprrovedBy']+ '</td>'+
+			      '<td>'+ stjson + '</td>'+
+			      '<td>'+ action + '</td>'
+			    '<tr>';	
+		}
+
+		// add sisa
+		for (var i = 0; i < G_ApproverLength - JsonStatus.length; i++) {
+			var action = '<button class="btn btn-default btn-default-primary btn-classroom btn-edit-approver" data-action="add" indexjson="'+(ke-1)+'"><i class="fa fa-plus-circle fa-right" aria-hidden="true" prcode = "'+PRCode+'"></i></button>';
+			html += '<tr>'+
+			      '<td>'+ ke + '</td>'+
+			      '<td>'+ '-'+ '</td>'+
+			      '<td>'+ '-' + '</td>'+
+			      '<td>'+ action + '</td>'+
+			    '<tr>';
+			ke++;	    	
+		}
+
+		html += '</tbody>' ;
+		html += '</table></div></div>' ;
+
+		var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+		    '';
+		$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Custom Approval'+'</h4>');
+		$('#GlobalModalLarge .modal-body').html(html);
+		$('#GlobalModalLarge .modal-footer').html(footer);
+		$('#GlobalModalLarge').modal({
+		    'show' : true,
+		    'backdrop' : 'static'
+		});
+
+	})
+
+	$(document).off('click', '.btn-edit-approver').on('click', '.btn-edit-approver',function(e) {
+		var PRCode = $(this).attr('prcode');
+		var action = $(this).attr('data-action');
+		var evtd = $(this).closest('td');
+		// get json employees
+			var url = base_url_js + 'api/__crudEmployees';
+			var data = {
+				action : 'read',
+			}
+			var token = jwt_encode(data,"UAP)(*");
+			$.post(url,{ token:token },function (data_json) {
+				var OP = '';
+					for (var i = 0; i < data_json.length; i++) {
+						OP += '<option value="'+data_json[i].NIP+'" '+''+'>'+data_json[i].NIP+' | '+data_json[i].Name+'</option>';
+					}
+				var html = '<div class ="row" style = "margin-right : 5px;margin-left:5px;">'+
+								'<div class = "col-md-10">'+
+									'<select class=" form-control listemployees">'+
+										'   <option value = "0" selected>-- No Selected --</option>'+OP+
+									'</select>'+
+								'</div>'+
+								'<div class = "col-md-2"><button class = "btn btn-primary saveapprover" prcode = "'+PRCode+'">Save</button>'+
+								'</div>'+
+							'</div>';
+				evtd.html(html);
+				$('select[tabindex!="-1"]').select2({
+				    //allowClear: true
+				});
+
+			});
+	})
+
+	$(document).off('click', '.saveapprover').on('click', '.saveapprover',function(e) {
+		var evtd = $(this).closest('td');
+		var EM = evtd.find('.listemployees').val();
+		console.log(EM);
+	})	
+
 	function ShowHtmlSelected(thead,Htmlselected)
 	{
 		var html = '<div class = "col-md-10 col-md-offset-1"><div class="table-responsive"><table class="table table-bordered" id = "tableData_selected">'+
@@ -171,6 +282,7 @@ $(document).ready(function() {
 		   	html += '</thead><tbody>';
 		    html += '<tr>'+Htmlselected+'</tr>'; 
 		    html += '</tbody></table></div></div>';
+		    	
 		return html;    	
 	}
 	    

@@ -57,6 +57,7 @@
 	var RuleAccess = [];
 	var MaxLimit =0;
 	var DepartementArr = [];
+	var JsonStatus = [];
 	// document.addEventListener('contextmenu', function(e) {
 	//   e.preventDefault();
 	// });
@@ -277,6 +278,19 @@
 			if (response != '') { // for edit
 				var pr_create = response['pr_create'];
 				var Status = pr_create[0]['Status'];
+				if (Status != 3) { // Event sebelum approval all
+	              // if finance, add approver by kabag finance
+	              <?php if ($this->session->userdata('IDdepartementNavigation') == 9): ?>
+	              		<?php $PositionMain = $this->session->userdata('PositionMain');$Position=$PositionMain['IDPosition']; ?>
+	              		<?php if ($Position==11): ?>
+	              			var  parent_th_approver = 'Approver &nbsp'+
+								    				'<a href = "javascript:void(0)"  class="btn btn-default btn-default-success" type="button" id = "add_approver" prcode = "'+PRCodeVal+'">'+
+						                        			'<i class="fa fa-plus-circle" aria-hidden="true"></i>'+
+						                    		'</a>';
+	              		$("#parent_th_approver").html(parent_th_approver);
+	              		<?php endif ?>
+	              <?php endif ?>	
+				}
 				switch (Status)
 				{
 				   case "0":
@@ -497,7 +511,7 @@
     					}
     					if (UserAccess > 1) {
     						var NIP = "<?php echo $this->session->userdata('NIP') ?>";
-    						var JsonStatus = jQuery.parseJSON(pr_create[0]['JsonStatus']);
+    						JsonStatus = jQuery.parseJSON(pr_create[0]['JsonStatus']);
     						var bool = false;
     						var HierarkiApproval = 0; // for check hierarki approval;
     						var NumberOfApproval = 0; // for check hierarki approval;
@@ -530,7 +544,7 @@
 
     						// console.log(HierarkiApproval);
 
-    						if (bool && HierarkiApproval == NumberOfApproval) {
+    						if (bool && HierarkiApproval == NumberOfApproval) { // rule approval
 	    						var ApprovalBtn = '<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
 					   								'<div class = "col-md-12">'+
 					   									'<div class = "pull-right">'+
@@ -540,8 +554,8 @@
 					   									'</div>'+
 					   								'</div>'+
 					   							 '</div>';
-					   			$('#Page_Input_PR').append(ApprovalBtn);	
-    						}
+					   			$('#Page_Input_PR').append(ApprovalBtn);
+    						} // End rule approval
     										
     					}
     				}
@@ -1592,7 +1606,7 @@
 			var TD2 = $("#tableData_selected tbody").find('tr:first').find('td:eq(2)').html();
 			var TD3 = 'Issued & Approval Process';
 			$("#tableData_selected tbody").find('tr:first').find('td:eq(3)').html(TD3);	
-			var stTd = 5; // start dari td ke 4 untuk approval
+			var stTd = 5; // start dari td ke 5 untuk approval
 			JsonStatus = jQuery.parseJSON(JsonStatus);
 			for (var i = 0; i < JsonStatus.length; i++) {
 				var html = '';

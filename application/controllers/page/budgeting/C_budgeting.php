@@ -1860,7 +1860,8 @@ class C_budgeting extends Budgeting_Controler {
                 }
 
                 if (!$bool) {
-                    $Departement = $this->session->userdata('IDDepartementPUBudget');
+                    // $Departement = $this->session->userdata('IDDepartementPUBudget');
+                    $Departement = $G_data[0]['Departement'];
                 }
 
             }
