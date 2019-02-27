@@ -1890,6 +1890,7 @@ class C_budgeting extends Budgeting_Controler {
         }
         else
         {
+            // print_r($Departement);
             $GetRuleAccess = $this->m_budgeting->GetRuleAccess($NIP,$Departement);
         }
 
@@ -1941,6 +1942,35 @@ class C_budgeting extends Budgeting_Controler {
                         $rs['msg'] = 'Please fill Approver '.(count($JsonStatus)+1);
                     }
                 break;
+            case 'edit':
+                    $PRCode = $Input['PRCode'];
+                    $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
+                    $JsonStatus = $G_data[0]['JsonStatus'];
+                    $JsonStatus = (array)json_decode($JsonStatus,true);
+                    $Approver = $Input['Approver'];
+                    $indexjson = $Input['indexjson'];
+                    $JsonStatus[$indexjson] = array(
+                        'ApprovedBy' => $Approver,
+                        'Status' => 0,
+                        'ApproveAt' => '',
+                        'Representedby' => '',
+                    );
+                    $JsonStatusSave = json_encode($JsonStatus);
+                    $dataSave = array(
+                        'JsonStatus' => $JsonStatusSave,
+                    );    
+                    $this->db->where('PRCode',$PRCode);
+                    $this->db->update('db_budgeting.pr_create',$dataSave);
+                    for ($i=0; $i < count($JsonStatus); $i++) { 
+                        $Name = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['ApprovedBy']);
+                        $Name = $Name[0]['Name'];
+                        $JsonStatus[$i]['NameApprovedBy'] = $Name; 
+                    }
+                    
+                    $rs['data']= $JsonStatus;
+                    // insert to pr_circulation_sheet
+                        $this->m_budgeting->pr_circulation_sheet($PRCode,'Custom Approval');
+                break;    
             case 'delete':
                     $PRCode = $Input['PRCode'];
                     $indexjson = $Input['indexjson'];
@@ -1952,6 +1982,9 @@ class C_budgeting extends Budgeting_Controler {
                     if ($indexjson == $KeyJsonStatus) {
                         $t = array();
                         for ($i=0; $i < count($JsonStatus) - 1; $i++) { // add 0 until last key - 1
+                            $Name = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['ApprovedBy']);
+                            $Name = $Name[0]['Name'];
+                            $JsonStatus[$i]['NameApprovedBy'] = $Name;
                             $t[] = $JsonStatus[$i];
                         }
 
@@ -1964,6 +1997,10 @@ class C_budgeting extends Budgeting_Controler {
                         $this->db->update('db_budgeting.pr_create',$dataSave);
                         $rs['msg'] = '';
                         $rs['data']= $JsonStatus;
+                    }
+                    else
+                    {
+                        $rs['msg'] = 'Please delete last Approver first';
                     }
 
                 break;

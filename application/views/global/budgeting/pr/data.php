@@ -335,8 +335,8 @@ $(document).ready(function() {
 				Get_tableData_selected(JsonStatus);
 				evtr.find('td:eq(1)').html(dt[key]['ApprovedBy'] + ' || '+dt[key]['NameApprovedBy'] );
 				evtr.find('td:eq(2)').html('Not Approve');
-				action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+indexjson+'"><i class="fa fa-pencil" aria-hidden="true" prcode = "'+PRCode+'"></i></button>';
-				action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+indexjson+'"><i class="fa fa-trash-o" aria-hidden="true" prcode = "'+PRCode+'"></i></button>';
+				action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+indexjson+'" prcode = "'+PRCode+'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
+				action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+indexjson+'" prcode = "'+PRCode+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
 				evtr.find('td:eq(3)').html(action);
 			}
 			else
@@ -349,6 +349,7 @@ $(document).ready(function() {
 
 	function Get_tableData_selected(JsonStatus)
 	{
+		console.log(JsonStatus);
 		var TD0 = $("#tableData_selected tbody").find('tr:first').find('td:eq(0)').html();
 		var TD1 = $("#tableData_selected tbody").find('tr:first').find('td:eq(1)').html();
 		var TD2 = $("#tableData_selected tbody").find('tr:first').find('td:eq(2)').html();
