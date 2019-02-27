@@ -678,6 +678,19 @@
         $('#dataTotalStudent').html(0);
         $('#OfDataTotalStudent').html(0);
         $('#btnEditExamStudents').attr('data-classgroup','');
+
+        $('#formCourse').select2("val", null);
+        if(notr>0){
+            for(var i=1;i<=notr;i++){
+                $('#formCourse'+i).select2("val", null);
+                $('#formStudent'+i).val('');
+                $('#AllStudent'+i).val('');
+
+                $('#dataTotalStudent'+i).html(0);
+                $('#OfDataTotalStudent'+i).html(0);
+            }
+        }
+
         dateInputJadwal();
     });
 
@@ -736,6 +749,8 @@
                         }
                     }
                 }
+
+                arr_NPM_draf.sort();
 
 
 
@@ -812,6 +827,9 @@
             var totalDisabled = 0;
             var totalCk = 0;
             if(Arr_AllStudent.length>0){
+
+                sortByKeyAsc(Arr_AllStudent,'NPM');
+
                 var no = 1;
                 for(var i=0;i<Arr_AllStudent.length;i++){
                     var d = Arr_AllStudent[i];
@@ -1030,6 +1048,13 @@
         $('#formTotalStudent').val(JSON.stringify(data_npm_to_exam));
         $('#viewTotalStudent').html(data_npm_to_exam.length);
 
+    }
+
+    function sortByKeyAsc(array, key) {
+        return array.sort(function (a, b) {
+            var x = a[key]; var y = b[key];
+            return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+        });
     }
 
 </script>

@@ -4324,7 +4324,8 @@ class C_api extends CI_Controller {
 
         if(count($data_arr)>0){
             if($data_arr['action']=='read'){
-                $data = $this->db->select('NIP,Name')->get_where('db_employees.employees',array('StatusEmployeeID !=' => -2))->result_array();
+                $data = $this->db->select('NIP,Name')->get_where('db_employees.employees',
+                    array('StatusEmployeeID !=' => -2))->result_array();
                 return print_r(json_encode($data));
             }
 

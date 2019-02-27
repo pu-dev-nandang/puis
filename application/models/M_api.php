@@ -2353,19 +2353,36 @@ class M_api extends CI_Model {
 
                     $TypeSearch = $Type;
                     // Cek Apakah ada Di Exam
-                    if($Type=='re_uts'){
-                        $TypeSearch = 'uts';
-                    } else if($Type=='re_uas'){
-                        $TypeSearch = 'uas';
-                    }
                     $dataStdExamCheck = $this->db->query('SELECT exd.* FROM db_academic.exam ex
                                                                     LEFT JOIN db_academic.exam_details exd ON (ex.ID = exd.ExamID)
                                                                     LEFT JOIN db_academic.exam_group exg ON (ex.ID = exg.ExamID)
                                                                     WHERE exg.ScheduleID = "'.$ScheduleID.'"
                                                                     AND exd.NPM = "'.$dataSt[$s]['NPM'].'"
-                                                                    AND ex.Type = "'.$TypeSearch.'" 
-                                                                    LIMIT 1')
-                                            ->result_array();
+                                                                    AND ex.Type = "'.$TypeSearch.'"
+                                                                    ORDER BY ex.ID DESC LIMIT 1')
+                        ->result_array();
+
+                    if(count($dataStdExamCheck)<=0){
+
+                        if($Type=='re_uts'){
+                            $TypeSearch = 'uts';
+                        } else if($Type=='re_uas'){
+                            $TypeSearch = 'uas';
+                        }
+
+                        $dataStdExamCheck = $this->db->query('SELECT exd.* FROM db_academic.exam ex
+                                                                    LEFT JOIN db_academic.exam_details exd ON (ex.ID = exd.ExamID)
+                                                                    LEFT JOIN db_academic.exam_group exg ON (ex.ID = exg.ExamID)
+                                                                    WHERE exg.ScheduleID = "'.$ScheduleID.'"
+                                                                    AND exd.NPM = "'.$dataSt[$s]['NPM'].'"
+                                                                    AND ex.Type = "'.$TypeSearch.'"
+                                                                    ORDER BY ex.ID DESC LIMIT 1')
+                            ->result_array();
+
+                    }
+
+
+
 
                     $dataSt[$s]['IDEd'] = (count($dataStdExamCheck)>0) ? $dataStdExamCheck[0]['ID'] : '' ;
                     $dataSt[$s]['DB_Students'] = $db_;
@@ -3702,7 +3719,7 @@ class M_api extends CI_Model {
                                           ex.Type = "'.$Type.'" AND 
                                           ( ex.Pengawas1 = "'.$NIP.'"
                                            OR ex.Pengawas2 = "'.$NIP.'" )
-                                           GROUP BY exd.ScheduleID
+                                           GROUP BY ex.ID
                                            ORDER BY ex.ExamDate, ex.ExamStart ASC')
                     ->result_array();
 

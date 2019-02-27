@@ -1555,11 +1555,13 @@ class C_api2 extends CI_Controller {
             else if($data_arr['action']=='readAttendanceExam'){
                 $ExamID = $data_arr['ID'];
 
-                $data = $this->db->query('SELECT ex.*, ats.Name FROM db_academic.exam_details ex 
-                                                    LEFT JOIN db_academic.auth_students ats 
-                                                    ON (ats.NPM = ex.NPM)
-                                                    WHERE ex.ExamID = "'.$ExamID.'" 
-                                                    ORDER BY ex.NPM ASC')->result_array();
+//                $data = $this->db->query('SELECT ex.*, ats.Name FROM db_academic.exam_details ex
+//                                                    LEFT JOIN db_academic.auth_students ats
+//                                                    ON (ats.NPM = ex.NPM)
+//                                                    WHERE ex.ExamID = "'.$ExamID.'"
+//                                                    ORDER BY ex.NPM ASC')->result_array();
+
+                $data = $this->m_rest->getListStudentExam($ExamID);
 
                 return print_r(json_encode($data));
 
