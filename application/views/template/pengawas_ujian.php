@@ -126,8 +126,8 @@
                                         <option value="uts">UTS</option>
                                         <option value="uas">UAS</option>
                                         <option disabled>-- Make-up Exams --</option>
-                                        <option value="re_uts">UTS</option>
-                                        <option value="re_uas">UAS</option>
+                                        <option value="re_uts" style="color: orangered;">Make-up UTS</option>
+                                        <option value="re_uas" style="color: orangered;">Make-up UAS</option>
                                     </select>
                                 </div>
                             </div>
@@ -355,6 +355,9 @@
 
                                     no +=1;
                                 });
+                            } else {
+                                $('#dataStudent').append('<tr><td colspan="3" style="text-align: center;">-- Student Not Yet --</td></tr>');
+                                $('#btnSubmitAttdStd').remove();
                             }
 
                             checkAttendance();
@@ -392,8 +395,10 @@
                                 $.post(url,{token:token2},function (result) {
                                     toastr.success('Attendance saved','Success');
                                     setTimeout(function () {
-                                        $('#btnSubmitAttdStd').html('Submit');
-                                        $('button[data-dismiss=modal],#btnSubmitAttdStd').prop('disabled',false);
+                                        // $('#btnSubmitAttdStd').html('Submit');
+                                        // $('button[data-dismiss=modal],#btnSubmitAttdStd').prop('disabled',false);
+
+                                        $('#GlobalModal').modal('hide');
                                     },500);
                                 })
 

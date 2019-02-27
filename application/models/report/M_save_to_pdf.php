@@ -196,82 +196,88 @@ class M_save_to_pdf extends CI_Model {
 
                     // Get Students
                     for($r=0;$r<count($dataC);$r++){
-                        $dataStd = $this->db->query('SELECT NPM,DB_Students FROM db_academic.exam_details exd 
-                                                        WHERE exd.ExamID = "'.$dataC[$r]['ExamID'].'" 
-                                                        AND exd.ScheduleID = "'.$dataC[$r]['ScheduleID'].'"
-                                                         ORDER BY exd.NPM ASC ')->result_array();
+//                        $dataStd = $this->db->query('SELECT NPM,DB_Students FROM db_academic.exam_details exd
+//                                                        WHERE exd.ExamID = "'.$dataC[$r]['ExamID'].'"
+//                                                        AND exd.ScheduleID = "'.$dataC[$r]['ScheduleID'].'"
+//                                                         ORDER BY exd.NPM ASC ')->result_array();
+//
+//                        $arr_student = [];
+//                        if(count($dataStd)>0){
+//                            for($st=0;$st<count($dataStd);$st++){
+//                                $arr = [];
+//                                $dataStdName = $this->db->select('Name,ClassOf')->get_where($dataStd[$st]['DB_Students'].'.students',
+//                                    array('NPM' => $dataStd[$st]['NPM']),1)->result_array();
+//
+//                                // Cek Semester
+//                                $dataSemester = $this->m_rest->checkSemesterByClassOf($dataStdName[0]['ClassOf'],$SemesterID);
+//
+//                                // Cek Attendace
+//                                $dataAttendace = $this->m_rest->getAttendanceStudent($dataStd[$st]['NPM'],$dataC[$r]['ScheduleID']);
+//
+//                                if($dataSemester==1 || $dataSemester=='1'){
+//                                    if($Type=='uts' || $Type=='UTS'){
+//                                        $arr = array(
+//                                            'NPM' => $dataStd[$st]['NPM'],
+//                                            'Name' => $dataStdName[0]['Name'],
+//                                            'DB_Students' => $dataStd[$st]['DB_Students'],
+//                                        );
+//                                    } else {
+//                                        if(isset($dataAttendace['Percentage'])
+//                                            && $dataAttendace['Percentage']!=null
+//                                            && $dataAttendace['Percentage']!='' && round($dataAttendace['Percentage'])>=75){
+//                                            $arr = array(
+//                                                'NPM' => $dataStd[$st]['NPM'],
+//                                                'Name' => $dataStdName[0]['Name'],
+//                                                'DB_Students' => $dataStd[$st]['DB_Students'],
+//                                            );
+//                                        }
+//                                    }
+//
+//                                } else{
+//
+//                                  // Cek Pembayaran
+//                                    $dataPayment = $this->m_rest->checkPayment($dataStd[$st]['NPM'],$SemesterID);
+//                                    if($dataPayment['BPP']['Status']==1 && $dataPayment['Credit']['Status']==1){
+//                                        if($Type=='uts' || $Type=='UTS'){
+//                                            $arr = array(
+//                                                'NPM' => $dataStd[$st]['NPM'],
+//                                                'Name' => $dataStdName[0]['Name'],
+//                                                'DB_Students' => $dataStd[$st]['DB_Students'],
+//                                            );
+//                                        } else if ($Type=='uas' || $Type=='UAS') {
+//                                            if(isset($dataAttendace['Percentage'])
+//                                                && $dataAttendace['Percentage']!=null
+//                                                && $dataAttendace['Percentage']!='' && round($dataAttendace['Percentage'])>=75){
+//                                                $arr = array(
+//                                                    'NPM' => $dataStd[$st]['NPM'],
+//                                                    'Name' => $dataStdName[0]['Name'],
+//                                                    'DB_Students' => $dataStd[$st]['DB_Students'],
+//                                                );
+//                                            }
+//                                        }
+//
+//                                    } else if ($Type=='re_uts') {
+//                                        $arr = array(
+//                                            'NPM' => $dataStd[$st]['NPM'],
+//                                            'Name' => $dataStdName[0]['Name'],
+//                                            'DB_Students' => $dataStd[$st]['DB_Students'],
+//                                        );
+//                                    }
+//                                }
+//
+//                                if(isset($arr['NPM'])){
+//                                    array_push($arr_student,$arr);
+//                                }
+//
+//                            }
+//                        }
+
 
                         $arr_student = [];
-                        if(count($dataStd)>0){
-                            for($st=0;$st<count($dataStd);$st++){
-                                $arr = [];
-                                $dataStdName = $this->db->select('Name,ClassOf')->get_where($dataStd[$st]['DB_Students'].'.students',
-                                    array('NPM' => $dataStd[$st]['NPM']),1)->result_array();
-
-                                // Cek Semester
-                                $dataSemester = $this->m_rest->checkSemesterByClassOf($dataStdName[0]['ClassOf'],$SemesterID);
-
-                                // Cek Attendace
-                                $dataAttendace = $this->m_rest->getAttendanceStudent($dataStd[$st]['NPM'],$dataC[$r]['ScheduleID']);
-
-                                if($dataSemester==1 || $dataSemester=='1'){
-                                    if($Type=='uts' || $Type=='UTS'){
-                                        $arr = array(
-                                            'NPM' => $dataStd[$st]['NPM'],
-                                            'Name' => $dataStdName[0]['Name'],
-                                            'DB_Students' => $dataStd[$st]['DB_Students'],
-                                        );
-                                    } else {
-                                        if(isset($dataAttendace['Percentage'])
-                                            && $dataAttendace['Percentage']!=null
-                                            && $dataAttendace['Percentage']!='' && round($dataAttendace['Percentage'])>=75){
-                                            $arr = array(
-                                                'NPM' => $dataStd[$st]['NPM'],
-                                                'Name' => $dataStdName[0]['Name'],
-                                                'DB_Students' => $dataStd[$st]['DB_Students'],
-                                            );
-                                        }
-                                    }
-
-                                } else{
-
-                                  // Cek Pembayaran
-                                    $dataPayment = $this->m_rest->checkPayment($dataStd[$st]['NPM'],$SemesterID);
-                                    if($dataPayment['BPP']['Status']==1 && $dataPayment['Credit']['Status']==1){
-                                        if($Type=='uts' || $Type=='UTS'){
-                                            $arr = array(
-                                                'NPM' => $dataStd[$st]['NPM'],
-                                                'Name' => $dataStdName[0]['Name'],
-                                                'DB_Students' => $dataStd[$st]['DB_Students'],
-                                            );
-                                        } else if ($Type=='uas' || $Type=='UAS') {
-                                            if(isset($dataAttendace['Percentage'])
-                                                && $dataAttendace['Percentage']!=null
-                                                && $dataAttendace['Percentage']!='' && round($dataAttendace['Percentage'])>=75){
-                                                $arr = array(
-                                                    'NPM' => $dataStd[$st]['NPM'],
-                                                    'Name' => $dataStdName[0]['Name'],
-                                                    'DB_Students' => $dataStd[$st]['DB_Students'],
-                                                );
-                                            }
-                                        }
-
-                                    } else if ($Type=='re_uts') {
-                                        $arr = array(
-                                            'NPM' => $dataStd[$st]['NPM'],
-                                            'Name' => $dataStdName[0]['Name'],
-                                            'DB_Students' => $dataStd[$st]['DB_Students'],
-                                        );
-                                    }
-                                }
-
-                                if(isset($arr['NPM'])){
-                                    array_push($arr_student,$arr);
-                                }
-
-                            }
+                         $dataStdInExcam = $this->m_rest->getListStudentExam($dataC[$r]['ExamID']);
+                        if($dataStdInExcam['Status']=='1' || $dataStdInExcam['Status']==1){
+                            $arr_student = $dataStdInExcam['DetailStudents'];
                         }
-
 
                         $dataC[$r]['DetailStudents'] = $arr_student;
 
@@ -287,9 +293,6 @@ class M_save_to_pdf extends CI_Model {
                 $data[$c]['Course'] = $dataC;
             }
         }
-
-//        print_r($data);
-//        exit;
 
         return $data;
 

@@ -30,7 +30,7 @@
                     <td>
                         <div class="checkbox checbox-switch switch-primary" style="margin: 0px;">
                             <label>
-                                <input type="checkbox"id="layoutExam" />
+                                <input type="checkbox" id="layoutExam" />
                                 <span></span>
                             </label>
                         </div>
