@@ -1664,7 +1664,7 @@ class C_budgeting extends Budgeting_Controler {
         for ($i=0; $i < count($JsonStatus); $i++) { 
             $Name = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['ApprovedBy']);
             $Name = $Name[0]['Name'];
-            $JsonStatus[$i]['ApprovedBy'] = $Name;
+            $JsonStatus[$i]['NameApprovedBy'] = $Name;
          } 
 
         if ($this->db->affected_rows() > 0 )
@@ -1860,14 +1860,156 @@ class C_budgeting extends Budgeting_Controler {
                 }
 
                 if (!$bool) {
-                    $Departement = $this->session->userdata('IDDepartementPUBudget');
+                    // $Departement = $this->session->userdata('IDDepartementPUBudget');
+                    $Departement = $G_data[0]['Departement'];
+                    $GetRuleAccess = $this->m_budgeting->GetRuleAccess($NIP,$Departement);
+                    if (count($GetRuleAccess['access']) == 0) {
+                       $GetRuleAccess['rule'] = array();
+                       $access = array();
+                       $t = array(
+                        'Active' => 1,
+                        'DSG' => null,
+                        'Departement' => $this->session->userdata('IDDepartementPUBudget'),
+                        'ID' => 0,
+                        'ID_m_userrole' => ($i+2), //  berdasarkan ID karena ID 1 adalah admin dan hasil loop dimulai dari 0
+                        'NIP' => $NIP,
+                        'Status' => 1,
+                       );
+                       $access[] = $t;
+                       $GetRuleAccess['access'] = $access;
+                    }
+
+                    
+                }
+                else
+                {
+                     $GetRuleAccess = $this->m_budgeting->GetRuleAccess($NIP,$Departement);
                 }
 
             }
         }
-        
-        $GetRuleAccess = $this->m_budgeting->GetRuleAccess($NIP,$Departement);
+        else
+        {
+            // print_r($Departement);
+            $GetRuleAccess = $this->m_budgeting->GetRuleAccess($NIP,$Departement);
+        }
+
         echo json_encode($GetRuleAccess);
+    }
+
+    public function update_approver()
+    {
+        $this->auth_ajax();
+        $Input = $this->getInputToken();
+        $rs = array('msg' => '');
+        switch ($Input['action']) {
+            case 'add':
+                // validation urutan Approver
+                    $PRCode = $Input['PRCode'];
+                    $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
+                    $JsonStatus = $G_data[0]['JsonStatus'];
+                    $JsonStatus = (array)json_decode($JsonStatus,true);
+                    $Approver = $Input['Approver'];
+                    $indexjson = $Input['indexjson'];
+                    $indexjsonAdd = count($JsonStatus); // hitung index array
+                    if ($indexjson == $indexjsonAdd ) { // validation urutan Approver
+                        $JsonStatus[] = array(
+                             'ApprovedBy' => $Approver,
+                             'Status' => 0,
+                             'ApproveAt' => '',
+                             'Representedby' => '',
+                         );
+
+                        $JsonStatusSave = json_encode($JsonStatus);
+                        $dataSave = array(
+                            'JsonStatus' => $JsonStatusSave,
+                        );    
+                        $this->db->where('PRCode',$PRCode);
+                        $this->db->update('db_budgeting.pr_create',$dataSave);
+                        // get Name Approver for callback
+                            for ($i=0; $i < count($JsonStatus); $i++) { 
+                                $Name = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['ApprovedBy']);
+                                $Name = $Name[0]['Name'];
+                                $JsonStatus[$i]['NameApprovedBy'] = $Name; 
+                            }
+                            
+                            $rs['data']= $JsonStatus;
+                            // insert to pr_circulation_sheet
+                                $this->m_budgeting->pr_circulation_sheet($PRCode,'Custom Approval');
+                    }
+                    else
+                    {
+                        $rs['msg'] = 'Please fill Approver '.(count($JsonStatus)+1);
+                    }
+                break;
+            case 'edit':
+                    $PRCode = $Input['PRCode'];
+                    $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
+                    $JsonStatus = $G_data[0]['JsonStatus'];
+                    $JsonStatus = (array)json_decode($JsonStatus,true);
+                    $Approver = $Input['Approver'];
+                    $indexjson = $Input['indexjson'];
+                    $JsonStatus[$indexjson] = array(
+                        'ApprovedBy' => $Approver,
+                        'Status' => 0,
+                        'ApproveAt' => '',
+                        'Representedby' => '',
+                    );
+                    $JsonStatusSave = json_encode($JsonStatus);
+                    $dataSave = array(
+                        'JsonStatus' => $JsonStatusSave,
+                    );    
+                    $this->db->where('PRCode',$PRCode);
+                    $this->db->update('db_budgeting.pr_create',$dataSave);
+                    for ($i=0; $i < count($JsonStatus); $i++) { 
+                        $Name = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['ApprovedBy']);
+                        $Name = $Name[0]['Name'];
+                        $JsonStatus[$i]['NameApprovedBy'] = $Name; 
+                    }
+                    
+                    $rs['data']= $JsonStatus;
+                    // insert to pr_circulation_sheet
+                        $this->m_budgeting->pr_circulation_sheet($PRCode,'Custom Approval');
+                break;    
+            case 'delete':
+                    $PRCode = $Input['PRCode'];
+                    $indexjson = $Input['indexjson'];
+                    $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
+                    $JsonStatus = $G_data[0]['JsonStatus'];
+                    $JsonStatus = (array)json_decode($JsonStatus,true);
+                    // Data json yang boleh dihapus adalah yang terakhir
+                    $KeyJsonStatus = count($JsonStatus) - 1;
+                    if ($indexjson == $KeyJsonStatus) {
+                        $t = array();
+                        for ($i=0; $i < count($JsonStatus) - 1; $i++) { // add 0 until last key - 1
+                            $Name = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['ApprovedBy']);
+                            $Name = $Name[0]['Name'];
+                            $JsonStatus[$i]['NameApprovedBy'] = $Name;
+                            $t[] = $JsonStatus[$i];
+                        }
+
+                        $JsonStatus = $t;
+                        $JsonStatusSave = json_encode($JsonStatus);
+                        $dataSave = array(
+                            'JsonStatus' => $JsonStatusSave,
+                        );
+                        $this->db->where('PRCode',$PRCode);
+                        $this->db->update('db_budgeting.pr_create',$dataSave);
+                        $rs['msg'] = '';
+                        $rs['data']= $JsonStatus;
+                    }
+                    else
+                    {
+                        $rs['msg'] = 'Please delete last Approver first';
+                    }
+
+                break;
+            default:
+                # code...
+                break;
+        }
+
+        echo json_encode($rs);
     }
 
 }

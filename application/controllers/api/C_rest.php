@@ -2066,7 +2066,7 @@ class C_rest extends CI_Controller {
                             $NoteDel = $dataToken['NoteDel'];
                             $Notes = $G_data[0]['Notes']."\n".$NoteDel;
                             $datasave['Status'] = 3;
-                            $datasave['Notes'] = $Notes;
+                            // $datasave['Notes'] = $Notes;
                         }
                     }
 

@@ -723,6 +723,20 @@ class M_budgeting extends CI_Model {
                 where a.PRCode = ?
                 ';
         $query = $this->db->query($sql, array($PRCode))->result_array();
+        // show Name Json Status
+            for ($i=0; $i < count($query); $i++) { 
+                $JsonStatus = $query[$i]['JsonStatus'];
+                $JsonStatusDecode = (array)json_decode($JsonStatus,true);
+                for ($j=0; $j < count($JsonStatusDecode); $j++) { 
+                    $ApprovedBy = $JsonStatusDecode[$j]['ApprovedBy'];
+                    $NameAprrovedBy = $this->m_master->caribasedprimary('db_employees.employees','NIP',$ApprovedBy);
+                    $NameAprrovedBy = $NameAprrovedBy[0]['Name'];
+                    $JsonStatusDecode[$j]['NameAprrovedBy'] = $NameAprrovedBy;
+                }
+
+                $JsonStatus = json_encode($JsonStatusDecode);
+                $query[$i]['JsonStatus'] = $JsonStatus;
+            }
         return $query;
     }
 
