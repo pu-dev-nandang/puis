@@ -1561,9 +1561,14 @@ class C_api2 extends CI_Controller {
 //                                                    WHERE ex.ExamID = "'.$ExamID.'"
 //                                                    ORDER BY ex.NPM ASC')->result_array();
 
+                $result = [];
                 $data = $this->m_rest->getListStudentExam($ExamID);
 
-                return print_r(json_encode($data));
+                if($data['Status']==1 || $data['Status']=='1'){
+                    $result = $data['DetailStudents'];
+                }
+
+                return print_r(json_encode($result));
 
             }
 
