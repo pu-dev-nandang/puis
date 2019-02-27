@@ -57,7 +57,6 @@
 	var RuleAccess = [];
 	var MaxLimit =0;
 	var DepartementArr = [];
-	var JsonStatus = [];
 	// document.addEventListener('contextmenu', function(e) {
 	//   e.preventDefault();
 	// });
@@ -81,6 +80,7 @@
 				var token = jwt_encode(data,"UAP)(*");
 				$.post(url,{ token:token },function (resultJson) {
 					var response = jQuery.parseJSON(resultJson);
+					console.log(response);
 					var access = response['access'];
 					if (access.length > 0) {
 						UserAccess = access[0]['ID_m_userrole'];
@@ -1573,7 +1573,9 @@
 			       		$(".input-group-addon").remove();
 
 			       		// update tableData_selected
-			       			Get_tableData_selected(data['JsonStatus']);
+			       			var js = jQuery.parseJSON(data['JsonStatus']);
+			       			JsonStatus = js;
+			       			Get_tableData_selected(JsonStatus);
 
 			       		break;
 			       case "larry": 
@@ -1601,13 +1603,14 @@
 
 		function Get_tableData_selected(JsonStatus)
 		{
+			console.log(JsonStatus);
 			var TD0 = $("#tableData_selected tbody").find('tr:first').find('td:eq(0)').html();
 			var TD1 = $("#tableData_selected tbody").find('tr:first').find('td:eq(1)').html();
 			var TD2 = $("#tableData_selected tbody").find('tr:first').find('td:eq(2)').html();
 			var TD3 = 'Issued & Approval Process';
 			$("#tableData_selected tbody").find('tr:first').find('td:eq(3)').html(TD3);	
 			var stTd = 5; // start dari td ke 5 untuk approval
-			JsonStatus = jQuery.parseJSON(JsonStatus);
+			// JsonStatus = jQuery.parseJSON(JsonStatus);
 			for (var i = 0; i < JsonStatus.length; i++) {
 				var html = '';
 				switch(JsonStatus[i]['Status']) {
@@ -1626,8 +1629,13 @@
 				  default:
 				    var stjson = '-';
 				}
-				html += stjson+'<br>'+'Approver : '+JsonStatus[i]['ApprovedBy']+'<br>'+'Approve At : '+JsonStatus[i]['ApproveAt'];
+				html += stjson+'<br>'+'Approver : '+JsonStatus[i]['NameApprovedBy']+'<br>'+'Approve At : '+JsonStatus[i]['ApproveAt'];
 				$("#tableData_selected tbody").find('tr:first').find('td:eq('+stTd+')').html(html);	
+				stTd++;
+			}
+
+			for (var i = 0; i < G_ApproverLength-JsonStatus.length; i++) {
+				$("#tableData_selected tbody").find('tr:first').find('td:eq('+stTd+')').html('-');	
 				stTd++;
 			}
 		}
