@@ -326,19 +326,25 @@ class M_save_to_pdf extends CI_Model {
 
                     // Cek Status Random atau tidak
                     $dataRand = $this->db->get_where('db_academic.config',array('ConfigID' => 1),1)->result_array();
-                    $rand = ($dataRand[0]['Status']=='1' || $dataRand[0]['Status']==1) ? 'RAND()' : 'exd.NPM ASC' ;
+                    $rand = ($dataRand[0]['Status']=='1' || $dataRand[0]['Status']==1) ? 'RAND()' : '' ;
 
                     for($c=0;$c<count($dataC);$c++){
 
                         // Get Students
-                        $dataStd = $this->db->query('SELECT exd.NPM,exd.Name,exd.ScheduleID 
-                                                                  FROM db_academic.exam_details exd 
-                                                                  WHERE exd.ExamID = "'.$data[$i]['ID'].'"
-                                                                   AND exd.ScheduleID = "'.$dataC[$c]['ScheduleID'].'"
-                                                                    ORDER BY '.$rand.' ')
-                                                                    ->result_array();
+//                        $dataStd = $this->db->query('SELECT exd.NPM,exd.Name,exd.ScheduleID
+//                                                                  FROM db_academic.exam_details exd
+//                                                                  WHERE exd.ExamID = "'.$data[$i]['ID'].'"
+//                                                                   AND exd.ScheduleID = "'.$dataC[$c]['ScheduleID'].'"
+//                                                                    ORDER BY '.$rand.' ')
+//                                                                    ->result_array();
+//
+//                        $dataC[$c]['DetailStudent'] = $dataStd;
 
-                        $dataC[$c]['DetailStudent'] = $dataStd;
+                        $dataStd =  $this->m_rest->getListStudentExam($data[$i]['ID'],$rand);
+                        $resStd = ($dataStd['Status']==1 || $dataStd['Status']=='1')
+                            ? $dataStd['DetailStudents'] : [];
+
+                        $dataC[$c]['DetailStudent'] = $resStd;
                     }
                 }
 
