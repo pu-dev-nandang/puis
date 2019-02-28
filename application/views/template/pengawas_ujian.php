@@ -341,7 +341,7 @@
                                         '<td style="text-align: center;color: #333;">'+no+'</td>' +
                                         '<td>' +
                                         '   <span style="font-size: 17px;">'+v.Name+'</span><br/>'+v.NPM+'' +
-                                        '<input id="formID'+no+'" class="hide" value="'+v.ID+'"/>' +
+                                        '<input id="formID'+no+'" class="hide" value="'+v.EXDID+'"/>' +
                                         '</td>' +
                                         '<td>' +
                                         '<div class="checkbox checbox-switch switch-success ">' +
