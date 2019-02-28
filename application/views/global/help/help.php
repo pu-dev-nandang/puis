@@ -1,10 +1,10 @@
 
 <style>
-    .item-head:hover{
+    #viewHelp .item-head:hover{
         background: #f5f5f5;
 
     }
-    .numbering {
+    #viewHelp .numbering {
         width: 30px;
         height: 30px;
         border: 1px solid #3F51B5;
@@ -16,19 +16,19 @@
         font-size: 11px;
         font-weight: bold;
     }
-    .info {
+    #viewHelp .info {
         color: orangered;
         font-size: 15px;
     }
-    .detailQNA {
+    #viewHelp .detailQNA {
         margin-top: 15px;
     }
 
-    .detailQNA ul.list-group .list-group-item {
+    #viewHelp .detailQNA ul.list-group .list-group-item {
         border-radius: 15px !important;
     }
 
-    a {
+    #viewHelp a {
         text-decoration: none !important;
         display: block;
     }
@@ -48,7 +48,7 @@
 </div>
 
 <div class="row" style="margin-top: 10px">
-	<div class="col-md-8 col-md-offset-2">
+	<div id="viewHelp" class="col-md-8 col-md-offset-2">
 		    <ul class="list-group" id="headerlist">
 		    	<?php for($i = 0; $i < count($G_data); $i++): ?>
 		    		<?php $no = $i+1 ?>
