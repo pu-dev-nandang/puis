@@ -144,7 +144,7 @@
 
                 <tr>
                     <td>7</td>
-                    <td>UAS Shown (show UTS H - ?)</td>
+                    <td>UAS Shown (show UAS H - ?)</td>
                     <td>
                         <div class="input-group">
                             <input type="number" class="form-control" id="UASShown" placeholder="">
