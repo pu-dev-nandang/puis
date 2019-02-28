@@ -53,9 +53,6 @@
 		    	<?php for($i = 0; $i < count($G_data); $i++): ?>
 		    		<?php $no = $i+1 ?>
 			        <li class="list-group-item item-head">
-
-
-
                                 <a href="javascript:void(0)" data-toggle="collapse" data-target="#<?php echo $i ?>">
                                     <span class="numbering"><?php echo $no; ?></span>
                                     <span class="info"><?php echo $G_data[$i]['Type'] ?></span>
