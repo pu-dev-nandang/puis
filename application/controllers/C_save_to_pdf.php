@@ -5430,9 +5430,10 @@ Phone: (021) 29200456';
           $fpdf->SetFont('Arial','b',$FontIsianHeader);
           $fpdf->Cell(0, 0, 'Department : '.$Department, 0, 1, 'L', 0);
 
+          // print_r($pr_detail);die();
           $arr_postName = [];
           for ($i=0; $i < count($pr_detail); $i++) { 
-                $PostName = $pr_detail[$i]['PostName'];
+                $PostName = $pr_detail[$i]['PostName'].'['.$pr_detail[$i]['NameDepartement'].']';
                 $bool = true;
                 for ($j=0; $j < count($arr_postName); $j++) { 
                     if ($PostName == $arr_postName[$j]) {

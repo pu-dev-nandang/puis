@@ -1450,6 +1450,16 @@ class C_budgeting extends Budgeting_Controler {
         $key = "UAP)(*";
         $Notes = $this->jwt->decode($Notes,$key);
 
+        // adding Supporting_documents
+            $Supporting_documents = array();
+            $Supporting_documents = json_encode($Supporting_documents); 
+            if (array_key_exists('Supporting_documents', $_FILES)) {
+                // do upload file
+                $uploadFile = $this->uploadDokumenMultiple(uniqid(),'Supporting_documents');
+                $Supporting_documents = json_encode($uploadFile); 
+            }
+
+
         $PRCode = ($act == '') ? $this->m_budgeting->Get_PRCode2($Departement) : $PRCode;
         // print_r($PRCode);die();
         if ($act == '') {
@@ -1464,6 +1474,7 @@ class C_budgeting extends Budgeting_Controler {
                 'PPN' => $PPN,
                 'PRPrint_Approve' => '',
                 'Notes' => $Notes,
+                'Supporting_documents' => $Supporting_documents,
             );
 
             $this->db->insert('db_budgeting.pr_create',$dataSave);
@@ -1506,6 +1517,7 @@ class C_budgeting extends Budgeting_Controler {
                 'CreatedAt' => date('Y-m-d H:i:s'),
                 'PPN' => $PPN,
                 'Notes' => $Notes,
+                'Supporting_documents' => $Supporting_documents,
             );
 
             // jika dari reject go back status ke 0
@@ -1634,6 +1646,15 @@ class C_budgeting extends Budgeting_Controler {
         $key = "UAP)(*";
         $Notes = $this->jwt->decode($Notes,$key);
 
+        // adding Supporting_documents
+            $Supporting_documents = array();
+            $Supporting_documents = json_encode($Supporting_documents); 
+            if (array_key_exists('Supporting_documents', $_FILES)) {
+                // do upload file
+                $uploadFile = $this->uploadDokumenMultiple(uniqid(),'Supporting_documents');
+                $Supporting_documents = json_encode($uploadFile); 
+            }
+
         // RuleApproval
             // check Subtotal
                 $Amount = 0;
@@ -1655,6 +1676,7 @@ class C_budgeting extends Budgeting_Controler {
             'JsonStatus' => json_encode($JsonStatus),
             'PPN' => $PPN,
             'Notes' => $Notes,
+            'Supporting_documents' => $Supporting_documents,
         );
 
         $this->db->where('PRCode',$PRCode);
