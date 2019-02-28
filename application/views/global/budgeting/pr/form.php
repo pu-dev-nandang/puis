@@ -569,15 +569,63 @@
     							
     						}
 
-    						// console.log(HierarkiApproval);
+    						// if kabag finance, dapat approve setelah approvalnya
+    						var CustomAttr = '';
+    						<?php if ($this->session->userdata('IDdepartementNavigation') == 9): ?>
+    							<?php $PositionMain = $this->session->userdata('PositionMain');$Position=$PositionMain['IDPosition']; ?>
+    							<?php if ($Position==11): ?>
+		    						if (!bool) {
+		    							// find what this approver ? in indeks array
+			    							for (var ap = 0; ap < JsonStatus.length; ap++) {
+			    								if (NIP == JsonStatus[ap]['ApprovedBy']) {
+			    									break;
+			    								}
+			    							}
 
+			    							// hitung approver dari satu
+			    								ap = ap + 1;
+			    								if (HierarkiApproval > ap) {
+			    									if (Status == 1) {
+			    										bool = true;
+			    										NumberOfApproval = HierarkiApproval;
+			    									}
+			    									
+			    								}
+
+			    							// hitung UserAccess unt key indeks array pas save data
+			    								var RepresentedNIP = '';
+			    								var RepresentedName = '';
+			    								for (var ap = 0; ap < JsonStatus.length; ap++) {
+			    									if (JsonStatus[ap]['Status'] != 1) {
+			    										RepresentedNIP = JsonStatus[ap]['ApprovedBy'];
+			    										RepresentedName = JsonStatus[ap]['NameAprrovedBy'];
+			    										break;
+			    									}
+			    								}
+
+			    								ap = ap + 2; // array dimulai dari 0 maka tambah 1, user access 1 adalah admin karena itu ditambah satu lagi
+			    								UserAccess = ap;
+
+			    							// write custom attr untuk save deteksi represented approver
+			    								if (bool) {
+			    									CustomAttr = 'RepresentedNIP = "'+RepresentedNIP+'" RepresentedName="'+RepresentedName+'"';
+			    								}	
+
+		    						}
+		    					<?php endif ?>
+		    				<?php endif ?>
+		    				// end if kabag finance, dapat approve setelah approvalnya		
+
+		    				// console.log(HierarkiApproval);
+		    				// console.log(NumberOfApproval);
+		    				// console.log(bool);
     						if (bool && HierarkiApproval == NumberOfApproval) { // rule approval
 	    						var ApprovalBtn = '<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
 					   								'<div class = "col-md-12">'+
 					   									'<div class = "pull-right">'+
-					   										'<button class = "btn btn-primary" id = "approve" userAccess = "'+UserAccess+'" PRCode = "'+PRCodeVal+'"> <i class = "fa fa-handshake-o"> </i> Approve</button>'+
+					   										'<button class = "btn btn-primary" id = "approve" userAccess = "'+UserAccess+'" PRCode = "'+PRCodeVal+'" '+CustomAttr+'> <i class = "fa fa-handshake-o"> </i> Approve</button>'+
 					   										'&nbsp&nbsp'+
-					   										'<button class = "btn btn-inverse" id = "reject" userAccess = "'+UserAccess+'" PRCode = "'+PRCodeVal+'"> <i class = "fa fa-remove"> </i> Reject</button>'+
+					   										'<button class = "btn btn-inverse" id = "reject" userAccess = "'+UserAccess+'" PRCode = "'+PRCodeVal+'" '+CustomAttr+'> <i class = "fa fa-remove"> </i> Reject</button>'+
 					   									'</div>'+
 					   								'</div>'+
 					   							 '</div>';
@@ -1762,11 +1810,18 @@
 		})
 
 		$(document).off('click', '#approve').on('click', '#approve',function(e) {
-			if (confirm('Are you sure ?')) {
+			var representednip = $(this).attr('representednip');
+			var representedname = $(this).attr('representedname');
+			var confirmadd = '';
+			if ( !(representednip == undefined)  ) {
+				confirmadd = ' to represented : '+representednip + ' || '+ representedname;
+			}
+
+			if (confirm('Are you sure '+confirmadd+' ?')) {
 				loading_button('#approve');
 				var PRCode = $(this).attr('prcode');
 				var useraccess = $(this).attr('useraccess');
-
+				var represented = (confirmadd != '') ? representednip : '';
 				var url = base_url_js + 'rest/__approve_pr';
 				var data = {
 					PRCode : PRCode,
@@ -1774,6 +1829,7 @@
 					NIP : "<?php echo $this->session->userdata('NIP') ?>",
 					action : 'approve',
 					auth : 's3Cr3T-G4N',
+					represented : represented,
 				}
 
 				var token = jwt_encode(data,"UAP)(*");
@@ -1800,11 +1856,17 @@
 		})
 
 		$(document).off('click', '#reject').on('click', '#reject',function(e) {
-			if (confirm('Are you sure ?')) {
+			var representednip = $(this).attr('representednip');
+			var representedname = $(this).attr('representedname');
+			var confirmadd = '';
+			if ( !(representednip == undefined)  ) {
+				confirmadd = ' to represented : '+representednip + ' || '+ representedname;
+			}
+			if (confirm('Are you sure '+confirmadd+' ?')) {
 				// loading_button('#reject');
 				var PRCode = $(this).attr('prcode');
 				var useraccess = $(this).attr('useraccess');
-
+				var represented = (confirmadd != '') ? representednip : '';
 				// show modal insert reason
 				$('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Reason ! </b> <br>' +
 				    '<input type = "text" class = "form-group" id ="NoteDel" style="margin: 0px 0px 15px; height: 30px; width: 329px;" maxlength="30"><br>'+
@@ -1835,6 +1897,7 @@
 						action : 'reject',
 						auth : 's3Cr3T-G4N',
 						NoteDel : NoteDel,
+						represented : represented,
 					}
 
 					var token = jwt_encode(data,"UAP)(*");

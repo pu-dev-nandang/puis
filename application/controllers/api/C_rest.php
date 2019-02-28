@@ -2092,7 +2092,81 @@ class C_rest extends CI_Controller {
                 }
                 else
                 {
-                    $msg = 'Not Authorize';
+                    // detection is represented or not ?
+                        $represented = $dataToken['represented'];
+                        if ($represented != '') {
+                            if ($arr_upd['ApprovedBy'] == $represented) {
+                                $NameRepresented = $this->m_master->caribasedprimary('db_employees.employees','NIP',$represented);
+                                $NameRepresented = $NameRepresented[0]['Name'];
+                                $arr_upd['Status'] = ($action == 'approve') ? 1 : 2;
+                                $arr_upd['ApproveAt'] = ($action == 'approve') ? date('Y-m-d H:i:s') : '-';
+                                $arr_upd['Representedby'] = $NIP;
+                                $JsonStatus[$keyJson] = $arr_upd;
+                                $datasave = array(
+                                    'JsonStatus' => json_encode($JsonStatus),
+                                );
+
+                                // check all status for update data
+                                $boolApprove = true;
+                                for ($i=0; $i < count($JsonStatus); $i++) { 
+                                    $arr = $JsonStatus[$i];
+                                    $Status = $arr['Status'];
+                                    if ($Status == 2 || $Status == 0) {
+                                        $boolApprove = false;
+                                        break;
+                                    }
+                                }
+
+                                if ($boolApprove) {
+                                    $datasave['Status'] = 2;
+                                    $datasave['PostingDate'] = date('Y-m-d H:i:s');
+                                }
+                                else
+                                {
+                                    $boolReject = false;
+                                    for ($i=0; $i < count($JsonStatus); $i++) { 
+                                        $arr = $JsonStatus[$i];
+                                        $Status = $arr['Status'];
+                                        if ($Status == 2) {
+                                            $boolReject = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if ($boolReject) {
+                                        $NoteDel = $dataToken['NoteDel'];
+                                        $Notes = $G_data[0]['Notes']."\n".$NoteDel;
+                                        $datasave['Status'] = 3;
+                                        // $datasave['Notes'] = $Notes;
+                                    }
+                                }
+
+                                $this->db->where('PRCode',$PRCode);
+                                $this->db->update('db_budgeting.pr_create',$datasave);
+
+                                // insert to pr_circulation_sheet
+                                    $Desc = ($arr_upd['Status'] == 1) ? 'Approve, Represented from ['.$represented.' || '.$NameRepresented.']' : 'Reject, Represented from ['.$represented.' || '.$NameRepresented.']';
+                                    if (array_key_exists('Status', $datasave)) {
+                                        if ($datasave['Status'] == 2) {
+                                            $Desc = "All Approve and posting date at : ".$datasave['PostingDate'].'<br>, Represented from ['.$represented.' || '.$NameRepresented.']';
+                                        }
+                                    }
+
+                                    if ($arr_upd['Status'] == 2) {
+                                        if ($dataToken['NoteDel'] != '' || $dataToken['NoteDel'] != null) {
+                                            $Desc .= '<br> Reason : '.$dataToken['NoteDel'];
+                                        }
+                                    }
+                                    
+                                    $this->m_budgeting->pr_circulation_sheet($PRCode,$Desc,$NIP);
+
+                            }
+                        }
+                        else
+                        {
+                            $msg = 'Not Authorize';
+                        }
+                    
                 }
 
                 echo json_encode($msg);    
