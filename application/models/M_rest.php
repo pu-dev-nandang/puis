@@ -396,14 +396,20 @@ class M_rest extends CI_Model {
 
     }
 
-    public function getListStudentExam($ExamID){
+    public function getListStudentExam($ExamID,$order=''){
+
+        $orderby = 'ORDER BY exd.NPM ASC';
+
+        if($order!=''){
+            $orderby = 'ORDER BY '.$order;
+        }
 
         $dataStudents = $this->db->query('SELECT exd.ID AS EXDID, exd.ExamID, exd.ScheduleID, exd.DB_Students, exd.Status, exd.NPM, auts.Name, 
                                                     ex.Type AS ExamType, ex.SemesterID, auts.Year, s.Attendance FROM db_academic.exam_details exd
                                                     LEFT JOIN db_academic.exam ex ON (ex.ID = exd.ExamID)
                                                     LEFT JOIN db_academic.auth_students auts ON (exd.NPM = auts.NPM)
                                                     LEFT JOIN db_academic.schedule s ON (s.ID = exd.ScheduleID) 
-                                                    WHERE exd.ExamID = "'.$ExamID.'" ')->result_array();
+                                                    WHERE exd.ExamID = "'.$ExamID.'" '.$orderby)->result_array();
 
         // Get setting exam
         $dataExamSetting = $this->db->get('db_academic.exam_setting')->result_array();
