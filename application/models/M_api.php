@@ -786,15 +786,39 @@ class M_api extends CI_Model {
      }
 
      public function views_files1($NIP,$srata) {
-        $sql = "SELECT a.*, b.TypeFiles AS NamaFiles, c.NameUniversity
-        FROM db_employees.files AS a 
-        LEFT JOIN db_employees.master_files AS b ON (a.TypeFiles = b.ID)
-        LEFT JOIN db_employees.employees_academic AS c ON (a.NIP = c.NIP) AND (a.LinkFiles = c.IjazahFile) OR (a.LinkFiles = c.TranscriptFile)
-        WHERE a.NIP = '".$NIP."' AND c.TypeAcademic= '".$srata."' AND a.TypeFiles IN ('1','2') ";
+        
+        if($srata == "S1") {
+            $sql = "SELECT a.*, b.TypeFiles AS NamaFiles, c.NameUniversity
+            FROM db_employees.files AS a 
+            LEFT JOIN db_employees.master_files AS b ON (a.TypeFiles = b.ID)
+            LEFT JOIN db_employees.employees_academic AS c ON (a.NIP = c.NIP) AND (a.LinkFiles = c.IjazahFile) OR (a.LinkFiles = c.TranscriptFile)
+            WHERE a.NIP = '".$NIP."' AND a.TypeFiles IN ('1','2') ";
 
-        $query=$this->db->query($sql, array());
-        return $query->result_array();
-     }
+            $query=$this->db->query($sql, array());
+            return $query->result_array();
+
+        }else if($srata == "S2"){
+            $sql = "SELECT a.*, b.TypeFiles AS NamaFiles, c.NameUniversity
+            FROM db_employees.files AS a 
+            LEFT JOIN db_employees.master_files AS b ON (a.TypeFiles = b.ID)
+            LEFT JOIN db_employees.employees_academic AS c ON (a.NIP = c.NIP) AND (a.LinkFiles = c.IjazahFile) OR (a.LinkFiles = c.TranscriptFile)
+            WHERE a.NIP = '".$NIP."' AND a.TypeFiles IN ('3','4') ";
+
+            $query=$this->db->query($sql, array());
+            return $query->result_array();
+        } else {
+
+            $sql = "SELECT a.*, b.TypeFiles AS NamaFiles, c.NameUniversity
+            FROM db_employees.files AS a 
+            LEFT JOIN db_employees.master_files AS b ON (a.TypeFiles = b.ID)
+            LEFT JOIN db_employees.employees_academic AS c ON (a.NIP = c.NIP) AND (a.LinkFiles = c.IjazahFile) OR (a.LinkFiles = c.TranscriptFile)
+            WHERE a.NIP = '".$NIP."' AND a.TypeFiles IN ('5','6') ";
+
+            $query=$this->db->query($sql, array());
+            return $query->result_array();
+        }
+        
+    }
 
      public function views_editacademic($NIP,$fileijazahs1,$filetranscripts1) {
 
