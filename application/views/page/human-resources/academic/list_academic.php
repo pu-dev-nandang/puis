@@ -37,7 +37,7 @@
             $('#NotificationModal .modal-header').addClass('hide');
             $('#NotificationModal .modal-body').html('<center> '+
             '<iframe src="'+base_url_js+'uploads/files/'+filesub+'" frameborder="0" style="width:745px; height:550px;"></iframe> '+
-            '<br/><br/><button type="button" id="btnRemoveNoEditSc" class="btn btn-primary" data-dismiss="modal">Close</button><button type="button" onclick="newtab();" id="btnRemoveNoEditSc" filesublix ="'+filesub+'" class="btn btn-primary pull-right filesublink" data-toggle="tooltip" data-placement="top" title="Full Review" data-dismiss="modal"><span class="fa fa-external-link"></span></button>' +
+            '<br/><br/><button type="button" id="btnRemoveNoEditSc" class="btn btn-primary" data-dismiss="modal">Close</button><button type="button" id="btnRemoveNoEditSc" filesublix ="'+filesub+'" class="btn btn-primary pull-right filesublink" data-toggle="tooltip" data-placement="top" title="Full Review" data-dismiss="modal"><span class="fa fa-external-link"></span></button>' +
             '</center>');
             $('#NotificationModal .modal-footer').addClass('hide');
             $('#NotificationModal').modal({
@@ -52,7 +52,7 @@
         var filesubx = $(this).attr('filesublix');
         var url = base_url_js+'uploads/files/'+filesubx;
         window.open(url, '_blank',);
-        win.focus();
+        //win.focus();
     });
 
     function loadAcademicDetails() {
@@ -164,9 +164,9 @@
                             '</tr> '+
                             '<tr> '+
                             '    <td style="width: 25%;"> File Ijazah </td> '+
-                            '       <th style="width: 30%;"><div class="container"> '+filesx+' </th>'+
+                            '       <th style="width: 30%;"><div class="container"> <iframe src="'+base_url_js+'uploads/files/'+response[i]['IjazahFile']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button id="btnviewIjazahS1" class="btn btn-sm btn-primary" filesub ="'+response[i]['IjazahFile']+'"><i class="fa fa-eye"></i> View </button></center> </th>'+
                             '           <td style="width: 25%;"> File Transcript </td> '+
-                            '               <th style="width: 30%;"><div class="container"> '+filestrans+' </th>'+
+                            '               <th style="width: 30%;"><div class="container"> <iframe src="'+base_url_js+'uploads/files/'+response[i]['TranscriptFile']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button id="btnviewIjazahS1" class="btn btn-sm btn-primary" filesub ="'+response[i]['TranscriptFile']+'"><i class="fa fa-eye"></i> View </button></center> </th>'+
                             '</tr> ' +
                             '</table>'+
                             '</div> '+
