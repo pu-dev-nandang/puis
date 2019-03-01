@@ -785,6 +785,35 @@ class M_api extends CI_Model {
         return $query->result_array();
      }
 
+     public function views_files1($NIP,$srata) {
+        $sql = "SELECT a.*, b.TypeFiles AS NamaFiles, c.NameUniversity
+        FROM db_employees.files AS a 
+        LEFT JOIN db_employees.master_files AS b ON (a.TypeFiles = b.ID)
+        LEFT JOIN db_employees.employees_academic AS c ON (a.NIP = c.NIP) AND (a.LinkFiles = c.IjazahFile) OR (a.LinkFiles = c.TranscriptFile)
+        WHERE a.NIP = '".$NIP."' AND c.TypeAcademic= '".$srata."' AND a.TypeFiles IN ('1','2') ";
+
+        $query=$this->db->query($sql, array());
+        return $query->result_array();
+     }
+
+     public function views_editacademic($NIP,$fileijazahs1,$filetranscripts1) {
+
+        $sql = "SELECT *
+                FROM db_employees.employees_academic 
+                WHERE NIP= '".$NIP."' AND IjazahFile= '".$fileijazahs1."' AND TranscriptFile= '".$filetranscripts1."' ";
+
+        $query=$this->db->query($sql, array());
+        return $query->result_array();
+
+     }
+
+     public function edit_academicemployee()
+    {
+        $sql = "UPDATE db_employees.employees_academic SET NoIjazah='".$NIP."', DateIjazah='".$NIP."',NameUniversity='".$NIP."',Major='".$NIP."',ProgramStudy='".$NIP."', Grade='".$NIP."',TotalCredit='".$NIP."', TotalSemester='".$NIP."'
+            WHERE NIP ='".$NIP."' AND IjazahFile='".$NIP."' AND TranscriptFile='".$NIP."' ";
+        $query=$this->db->query($sql);
+    }
+
 
     // ====== Get Jadwal Per Day =======
 

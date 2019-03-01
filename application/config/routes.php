@@ -781,6 +781,8 @@ $route['api/__crudStudent'] = 'api/c_api/crudStudent';
 $route['api/__crudAcademic'] = 'api/c_api/crudAcademic'; //add bismar
 $route['api/__reviewacademic'] = 'api/c_api/review_academicdetail'; //add bismar
 $route['api/__reviewotherfile'] = 'api/c_api/review_otherfile'; //add bismar
+$route['api/__reviewacademics1'] = 'api/c_api/review_academics1'; //add bismar
+$route['api/__getdataedits1'] = 'api/c_api/getedit_datas1'; //add bismar
 
 $route['api/__filterStudents'] = 'api/c_api/filterStudents';
 $route['api/__getFormulirOfflineAvailable/(:any)'] = 'api/c_api/getFormulirOfflineAvailable/$1';
@@ -817,6 +819,7 @@ $route['api2/__crudAttendance2'] = 'api/c_api2/crudAttendance2';
 $route['api/__crudScheduleExchange'] = 'api/c_api/crudScheduleExchange';
 $route['api/__crudLimitCredit'] = 'api/c_api/crudLimitCredit';
 $route['api/__crudAcademicData'] = 'api/c_api/crudAcademicData'; //add bismar
+$route['api/__crudEditAcademicData'] = 'api/c_api/editAcademicData'; //add bismar
 
 $route['api/__crudLecturerEvaluation'] = 'api/c_api/crudLecturerEvaluation';
 $route['api/__getLecturerEvaluation'] = 'api/c_api/getLecturerEvaluation';
