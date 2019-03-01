@@ -807,7 +807,6 @@ class M_api extends CI_Model {
             $query=$this->db->query($sql, array());
             return $query->result_array();
         } else {
-
             $sql = "SELECT a.*, b.TypeFiles AS NamaFiles, c.NameUniversity
             FROM db_employees.files AS a 
             LEFT JOIN db_employees.master_files AS b ON (a.TypeFiles = b.ID)
