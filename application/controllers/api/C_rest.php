@@ -199,6 +199,12 @@ class C_rest extends CI_Controller {
                 $schedule = $this->m_rest->__getExamSchedule($NIP,strtolower($dataToken['Type']));
 
                 return print_r(json_encode($schedule));
+            } else if($dataToken['action']=='readExamSchedule2'){
+                $NIP = $dataToken['NIP'];
+                $SemesterID = $dataToken['SemesterID'];
+                $schedule = $this->m_rest->__getExamSchedule4Lecturer($SemesterID,$NIP,strtolower($dataToken['Type']));
+
+                return print_r(json_encode($schedule));
             }
 
 
