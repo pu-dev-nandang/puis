@@ -1192,6 +1192,138 @@ class M_rest extends CI_Model {
 
     }
 
+    public function __getExamSchedule4Lecturer($SemesterID,$NIP,$ExamType){
+
+        $dataSemester = $this->db->query('SELECT s.*, ay.utsStart, ay.utsEnd, ay.uasStart, ay.uasEnd FROM db_academic.semester s 
+                                                        LEFT JOIN db_academic.academic_years ay ON (ay.SemesterID = s.ID)
+                                                        WHERE s.ID = '.$SemesterID.' 
+                                                        ORDER BY s.ID ASC')->result_array();
+
+        // Get setting exam
+        $dataExamSetting = $this->db->get('db_academic.exam_setting')->result_array();
+
+        if($SemesterID>=13){
+
+            $i = 0;
+
+            // Cek apakah sudah masuk pada periode ujian atau belum (UTS / UAS)
+            $checkDateExam = true;
+            $dateExamStart = ($ExamType=='uts' || $ExamType=='UTS')
+                ? $dataSemester[$i]['utsStart']
+                : $dataSemester[$i]['uasStart'];
+
+            if($ExamType=='uts' || $ExamType=='UTS' || $ExamType=='uas' || $ExamType=='UAS')
+            {
+
+                $day = 7;
+                if(count($dataExamSetting)>0) {
+                    $ExamSetting = $dataExamSetting[0];
+                    $day = ($ExamType=='uts' || $ExamType=='UTS')
+                        ? $ExamSetting['UTSShown']
+                        : $ExamSetting['UASShown'];
+                }
+
+                $dateShow = date('Y-m-d',strtotime($this->getDateNow().'+ '.$day.' days'));
+                $AvailableDate = date('Y-m-d',strtotime($dateExamStart.'- '.$day.' days'));
+
+                if($dateExamStart > $dateShow){
+                    $checkDateExam = false;
+                }
+
+            }
+
+            if($checkDateExam){
+
+                $Coordinator = $this->db->query('SELECT s.ID AS ScheduleID, s.ClassGroup, mk.NameEng AS CourseEng, mk.MKCode
+                                              FROM db_academic.schedule s
+                                              LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                              LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                              LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                              WHERE s.SemesterID = "'.$SemesterID.'" 
+                                              AND s.Coordinator = "'.$NIP.'" AND s.IsSemesterAntara = "0"
+                                               GROUP BY s.ID')->result_array();
+
+                $TeamTheaching = $this->db->query('SELECT s.ID AS ScheduleID, s.ClassGroup, mk.NameEng AS CourseEng, mk.MKCode 
+                                                        FROM db_academic.schedule_team_teaching stt 
+                                                        LEFT JOIN db_academic.schedule s ON (s.ID=stt.ScheduleID)
+                                                        LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                                      LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                      LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                        WHERE s.SemesterID ="'.$SemesterID.'" 
+                                                        AND stt.NIP = "'.$NIP.'"
+                                                        AND s.IsSemesterAntara = "0" ')->result_array();
+
+                $dataCourse = $Coordinator;
+                if(count($TeamTheaching)>0){
+                    for($t=0;$t<count($TeamTheaching);$t++){
+                        array_push($dataCourse,$TeamTheaching[$t]);
+                    }
+                }
+
+                if(count($dataCourse)>0){
+                    $i=0;
+                    foreach ($dataCourse as $item){
+                        $dataExam = $this->db->query('SELECT ex.*, cl.Room, em1.Name AS Inv1, em2.Name AS Inv2  
+                                                                    FROM db_academic.exam ex
+                                                                    LEFT JOIN db_academic.exam_group eg ON (eg.ExamID = ex.ID)
+                                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
+                                                                    LEFT JOIN db_employees.employees em1 ON (em1.NIP = ex.Pengawas1)
+                                                                    LEFT JOIN db_employees.employees em2 ON (em2.NIP = ex.Pengawas2)
+                                                                    WHERE ex.SemesterID = "'.$SemesterID.'" 
+                                                                    AND ex.Type = "'.strtolower($ExamType).'" 
+                                                                    AND eg.ScheduleID = "'.$item['ScheduleID'].'"
+                                                                    GROUP BY ex.ID ')->result_array();
+
+                        if(count($dataExam)>0){
+                            for($s=0;$s<count($dataExam);$s++){
+                                $dataStd = $this->db->get_where('db_academic.exam_details'
+                                    ,array('ExamID' => $dataExam[$s]['ID']))->num_rows();
+
+                                $dataExam[$s]['TotalStudent'] = $dataStd;
+                            }
+                        }
+
+
+                        $dataCourse[$i]['ExamSchedule'] = $dataExam;
+                        $i+=1;
+                    }
+
+                    $result = array(
+                        'Status' => 1,
+                        'DetailExam' => $dataCourse
+                    );
+
+                } else {
+                    $result = array(
+                        'Status' => -5,
+                        'Message' => 'You don\'t have a teaching schedule'
+                    );
+                }
+
+
+
+            } else {
+                $result = array(
+                    'Status' => -3,
+                    'Message' => 'The exam is out of date',
+                    'AvailableDate' => $AvailableDate
+                );
+            }
+
+        } else {
+            $result = array(
+                'Status' => -4,
+                'Message' => 'Schedule Exam Not Available'
+            );
+        }
+
+
+
+
+        return $result;
+
+    }
+
     public function getDetailStudyResultByNPM($ClassOf,$NPM){
         $order = 'ASC';
 
