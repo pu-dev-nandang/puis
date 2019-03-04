@@ -1302,7 +1302,8 @@ class M_rest extends CI_Model {
 
 
 
-            } else {
+            }
+            else {
                 $result = array(
                     'Status' => -3,
                     'Message' => 'The exam is out of date',
