@@ -7374,9 +7374,9 @@ class C_api extends CI_Controller {
                 }
             }
 
-            $Student = $this->m_api->__getStudentApprovedKRS($row['ID']);
+            $Student = $this->m_api->__getStudentApprovedKRS($data_arr['SemesterID'],$row['ID']);
 
-            $Student_plan = $this->m_api->__getStudentNotYetApprovedKRS($row['ID']);
+            $Student_plan = $this->m_api->__getStudentNotYetApprovedKRS($data_arr['SemesterID'],$row['ID']);
 
             // Keadaan di attendance
             for ($st=0;$st<count($Student_plan);$st++){

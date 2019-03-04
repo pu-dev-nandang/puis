@@ -2965,7 +2965,7 @@ class M_api extends CI_Model {
     }
 
 
-    public function getStudentByScheduleID($SemesterID,$ScheduleID,$CDID){
+    public function getStudentByScheduleID($SemesterID,$ScheduleID){
 
         $dataCl = $this->getClassOf();
 
@@ -3417,10 +3417,8 @@ class M_api extends CI_Model {
 
     }
 
-    public function __getStudentApprovedKRS($ScheduleID){
+    public function __getStudentApprovedKRS($SemesterID,$ScheduleID){
         // Fungsi ini mengambil student dari yang sudah di approve dan dari yang masih planning
-
-        $getSmtAct = $this->_getSemesterActive();
 
         $dataCL = $this->getClassOf();
 
@@ -3430,7 +3428,7 @@ class M_api extends CI_Model {
             $db_ = 'ta_'.$d['Year'];
             $dataSP = $this->db->query('SELECT sp.NPM,s.Name FROM '.$db_.'.study_planning sp 
                                                     LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
-                                                    WHERE sp.SemesterID = "'.$getSmtAct['ID'].'" 
+                                                    WHERE sp.SemesterID = "'.$SemesterID.'" 
                                                     AND sp.ScheduleID = "'.$ScheduleID.'"
                                                     ORDER BY sp.NPM ASC ')->result_array();
 
@@ -3444,13 +3442,12 @@ class M_api extends CI_Model {
         return $res;
     }
 
-    public function __getStudentNotYetApprovedKRS($ScheduleID){
-        $getSmtAct = $this->_getSemesterActive();
+    public function __getStudentNotYetApprovedKRS($SemesterID,$ScheduleID){
 
         // Get From Std KRS
         $dataSTD = $this->db->query('SELECT sk.NPM,auts.Name FROM db_academic.std_krs sk
                                               LEFT JOIN db_academic.auth_students auts ON (auts.NPM = sk.NPM)
-                                              WHERE sk.SemesterID = "'.$getSmtAct['ID'].'" AND sk.ScheduleID = "'.$ScheduleID.'" 
+                                              WHERE sk.SemesterID = "'.$SemesterID.'" AND sk.ScheduleID = "'.$ScheduleID.'" 
                                               ORDER BY sk.NPM ASC ')
             ->result_array();
 
@@ -3670,7 +3667,7 @@ class M_api extends CI_Model {
                                                  LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                                  WHERE sdc.ScheduleID = "'.$ScheduleID.'" AND s.SemesterID = "'.$SemesterID.'" LIMIT 1')->result_array();
 
-        $dataStd = $this->getStudentByScheduleID($SemesterID,$ScheduleID,'');
+        $dataStd = $this->getStudentByScheduleID($SemesterID,$ScheduleID);
 
         if(count($dataStd)>0){
             for($i=0;$i<count($dataStd);$i++){
@@ -3684,9 +3681,13 @@ class M_api extends CI_Model {
                                                 WHERE attds.NPM = "'.$d['NPM'].'" AND attd.SemesterID = "'.$SemesterID.'" 
                                                 AND attd.ScheduleID = "'.$ScheduleID.'" ORDER BY sd.DayID ASC ')->result_array();
 
-                $d['Attendance'] = $dt;
 
-                $dataStd[$i] = $d;
+                if(count($dt)>0){
+                    $d['Attendance'] = $dt;
+
+                    $dataStd[$i] = $d;
+                }
+
             }
 
         }
