@@ -1550,6 +1550,13 @@ class C_api2 extends CI_Controller {
                 return print_r(1);
 
             }
+            else if($data_arr['action']=='readAttdSetting'){
+                $SemesterID = $data_arr['SemesterID'];
+                $data = $this->db
+                    ->get_where('db_academic.attendance_setting'
+                        ,array('SemesterID' => $SemesterID))->result_array();
+                return print_r(json_encode($data));
+            }
 
             // === Exam ===
             else if($data_arr['action']=='readAttendanceExam'){

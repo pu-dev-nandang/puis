@@ -2974,7 +2974,7 @@ class M_api extends CI_Model {
             for($i=0;$i<count($dataCl);$i++){
                 $db_ = 'ta_'.$dataCl[$i]['Year'];
 
-                $data = $this->db->query('SELECT sp.ID AS SPID, s.NPM,s.Name, sp.StatusResign FROM '.$db_.'.study_planning sp 
+                $data = $this->db->query('SELECT sp.ID AS SPID, sp.UTS, sp.UAS, s.NPM,s.Name, sp.StatusResign FROM '.$db_.'.study_planning sp 
                                                     LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
                                                     WHERE sp.SemesterID ="'.$SemesterID.'" 
                                                     AND sp.ScheduleID = "'.$ScheduleID.'"
@@ -3669,6 +3669,8 @@ class M_api extends CI_Model {
 
         $dataStd = $this->getStudentByScheduleID($SemesterID,$ScheduleID);
 
+        $resStd = [];
+
         if(count($dataStd)>0){
             for($i=0;$i<count($dataStd);$i++){
                 $d = $dataStd[$i];
@@ -3681,10 +3683,13 @@ class M_api extends CI_Model {
                                                 WHERE attds.NPM = "'.$d['NPM'].'" AND attd.SemesterID = "'.$SemesterID.'" 
                                                 AND attd.ScheduleID = "'.$ScheduleID.'" ORDER BY sd.DayID ASC ')->result_array();
 
+                if(count($dt)>0){
+                    $d['Attendance'] = $dt;
+                    $dataStd[$i] = $d;
+                    array_push($resStd,$dataStd[$i]);
+                }
 
-                $d['Attendance'] = $dt;
 
-                $dataStd[$i] = $d;
 
             }
 
@@ -3692,7 +3697,7 @@ class M_api extends CI_Model {
 
         $res = array(
             'Course' => $dataCourse,
-            'Student' => $dataStd
+            'Student' => $resStd
         );
 
         return $res;
@@ -3803,7 +3808,7 @@ class M_api extends CI_Model {
     }
 
     public function getExamStudent($ExamID){
-        $dataExamDetail = $this->db->query('SELECT exd.*,ex.SemesterID, aut.Name, aut.Year FROM db_academic.exam_details exd 
+        $dataExamDetail = $this->db->query('SELECT exd.*,ex.SemesterID, ex.Type, aut.Name, aut.Year FROM db_academic.exam_details exd 
                                                       LEFT JOIN db_academic.exam ex ON (ex.ID = exd.ExamID)
                                                       LEFT JOIN db_academic.auth_students aut ON (aut.NPM = exd.NPM)
                                                       WHERE exd.ExamID = "'.$ExamID.'" ORDER BY aut.NPM ASC')->result_array();
