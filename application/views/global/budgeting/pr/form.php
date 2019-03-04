@@ -185,7 +185,9 @@
 												var PostBudgetDepartmentModal = response.data;
 												// PostBudgetDepartment
 												if (PostBudgetDepartmentModal.length > 0) {
-													PostBudgetDepartment = PostBudgetDepartment.concat(PostBudgetDepartmentModal); 
+													// PostBudgetDepartment = PostBudgetDepartment.concat(PostBudgetDepartmentModal);
+													var P_result = Filtering_PostBudgetDepartment(PostBudgetDepartment,PostBudgetDepartmentModal);
+													PostBudgetDepartment = P_result; 
 												}
 
 											}).fail(function() {
@@ -825,7 +827,7 @@
 						         'orderable': false,
 						         'className': 'dt-body-center',
 						         'render': function (data, type, full, meta){
-						             return '<input type="checkbox" name="id[]" value="' + full.ID + '" estvalue="' + full.Value + '" namedepartement = "'+full.NameDepartement+'">';
+						             return '<input type="checkbox" name="id[]" value="' + full.ID + '" estvalue="' + full.Value + '" namedepartement = "'+full.NameDepartement+'" departement = "'+full.Departement+'">';
 						         }
 						      },
 						      {
@@ -856,6 +858,7 @@
 						var checked = chkbox.val();
 						var estvalue = chkbox.attr('estvalue');
 						var NameDepartement = chkbox.attr('namedepartement');
+						var Departement = chkbox.attr('departement');
 						var n = estvalue.indexOf(".");
 						estvalue = estvalue.substring(0, n);
 						var row = chkbox.closest('tr');
@@ -865,13 +868,14 @@
 						fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('id_budget_left',checked);
 						fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('remaining',estvalue);
 						fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('namedepartement',NameDepartement);
+						fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('departement',Departement);
 						fillItem.find('td:eq(7)').find('.qty').trigger('change');
 						$('#GlobalModalLarge').modal('hide');
 					})
 				} // exit IN
 				else if(BudgetStatus == 'Cross')
 				{
-					// show department
+					// show department except Department myself
 					var html = ''
 					var opDepartment = '';
 					var Div = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
@@ -929,7 +933,9 @@
 					var PostBudgetDepartmentModal = response.data;
 					// PostBudgetDepartment
 					if (PostBudgetDepartmentModal.length > 0) {
-						PostBudgetDepartment = PostBudgetDepartment.concat(PostBudgetDepartmentModal); 
+						// PostBudgetDepartment = PostBudgetDepartment.concat(PostBudgetDepartmentModal); 
+						var P_result = Filtering_PostBudgetDepartment(PostBudgetDepartment,PostBudgetDepartmentModal);
+						PostBudgetDepartment = P_result;
 					}
 					var html = htmlPostBudgetDepartmentModal(PostBudgetDepartmentModal);
 					$("#pageContentModal").html(html);
@@ -942,7 +948,7 @@
 					         'orderable': false,
 					         'className': 'dt-body-center',
 					         'render': function (data, type, full, meta){
-					             return '<input type="checkbox" name="id[]" value="' + full.ID + '" estvalue="' + full.Value + '" namedepartement = "'+full.NameDepartement+'">';
+					             return '<input type="checkbox" name="id[]" value="' + full.ID + '" estvalue="' + full.Value + '" namedepartement = "'+full.NameDepartement+'" departement = "'+full.Departement+'">';
 					         }
 					      },
 					      {
@@ -961,11 +967,19 @@
 				      // 'order': [[1, 'asc']]
 					});
 
+					// Handle click on checkbox to set state of "Select all" control
+					$('#example tbody').on('change', 'input[type="checkbox"]', function(){
+						$('input[type="checkbox"]:not(.uniform)').prop('checked', false);
+						$(this).prop('checked',true);
+					   
+					});
+
 					$("#ModalbtnSaveForm").click(function(){
 						var chkbox = $('input[type="checkbox"]:checked:not(.uniform)');
 						var checked = chkbox.val();
 						var estvalue = chkbox.attr('estvalue');
 						var NameDepartement = chkbox.attr('namedepartement');
+						var Departement = chkbox.attr('departement');
 						var n = estvalue.indexOf(".");
 						estvalue = estvalue.substring(0, n);
 						var row = chkbox.closest('tr');
@@ -975,6 +989,7 @@
 						fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('id_budget_left',checked);
 						fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('remaining',estvalue);
 						fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('namedepartement',NameDepartement);
+						fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('departement',Departement);
 						fillItem.find('td:eq(7)').find('.qty').trigger('change');
 						$('#GlobalModalLarge').modal('hide');
 					})
@@ -987,6 +1002,28 @@
 				}).always(function() {
 				                
 				});
+		}
+
+		function Filtering_PostBudgetDepartment(p1,p2)
+		{
+			var P_result = p1;
+			var DepartementPostModal = p2[0]['Departement'];
+			var bool = true;
+			for (var i = 0; i < p1.length; i++) {
+				var D = p1[i]['Departement'];
+				if (D == DepartementPostModal) {
+					bool = false;
+					break;
+				}
+			}
+
+			// tidak ada pada list
+				if (bool) {
+					P_result = P_result.concat(p2);
+				}
+
+			return P_result;	
+
 		}
 
 		function htmlPostBudgetDepartmentModal(PostBudgetDepartmentModal)
@@ -1081,6 +1118,7 @@
 				var total = 0;
 				var PostBudgetItem = '';
 				var NameDepartement = '';
+				var Departement = '';
 				var Remaining = 0;
 				var GetNO = i + 1;
 				var id_budget_left = arr_id_budget_left[i];
@@ -1092,6 +1130,7 @@
 					var SubTotal = findAndReplace(SubTotal, ".","");
 					PostBudgetItem = fillItem.find('td:eq(2)').find('.PostBudgetItem').val();
 					NameDepartement = fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('namedepartement');
+					Departement = fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('departement');
 					var Persent = (parseInt(ppn) / 100) * SubTotal;
 					SubTotal = parseInt(SubTotal) + parseInt(Persent);
 					total += parseInt(SubTotal);
@@ -1110,6 +1149,7 @@
 							id_budget_left : id_budget_left,
 							RemainingNoFormat : Remaining,
 							NameDepartement : NameDepartement,
+							Departement : Departement,
 						}
 
 						// check id_budget_left existing in BudgetRemaining
