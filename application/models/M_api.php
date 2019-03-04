@@ -3605,11 +3605,9 @@ class M_api extends CI_Model {
                                                 AND attd.ScheduleID = "'.$ScheduleID.'" ORDER BY sd.DayID ASC ')->result_array();
 
 
-                if(count($dt)>0){
-                    $d['Attendance'] = $dt;
+                $d['Attendance'] = $dt;
 
-                    $dataStd[$i] = $d;
-                }
+                $dataStd[$i] = $d;
 
             }
 

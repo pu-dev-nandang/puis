@@ -362,13 +362,12 @@ class C_save_to_pdf extends CI_Controller {
     public function monitoringStudent(){
 
         $token = $this->input->post('token');
+
         $data_arr = $this->getInputToken($token);
 
         $course = (array) $data_arr['Course'][0];
         $student = (array) $data_arr['Student'];
 
-//        print_r($data_arr);
-//        exit;
 
         $pdf = new FPDF('l','mm','A4');
 
@@ -446,255 +445,260 @@ class C_save_to_pdf extends CI_Controller {
             $d = (array) $student[$i];
 
             $attd = $d['Attendance'];
-            $hrowD = $hrow * count($attd);
 
-            $pdf->Cell(8,$hrowD,($no++),1,0,'C');
-            $pdf->Cell(18,$hrowD,$d['NPM'],1,0,'C');
-            $pdf->Cell(60,$hrowD,' '.$d['Name'],1,0,'L');
+            if(count($attd)>0){
+                $hrowD = $hrow * count($attd);
 
-            $pdf->Cell(13,$hrowD,$d['Target'],1,0,'C');
-            $pdf->SetFont('Times','B',8);
-            $pdf->Cell(13,$hrowD,$d['Total_Attd'],1,0,'C');
-            $pdf->Cell(18.5,$hrowD,$d['Percent'],1,0,'C');
-            $pdf->SetFont('Times','',8);
+                $pdf->Cell(8,$hrowD,($no++),1,0,'C');
+                $pdf->Cell(18,$hrowD,$d['NPM'],1,0,'C');
+                $pdf->Cell(60,$hrowD,' '.$d['Name'],1,0,'L');
+
+                $pdf->Cell(13,$hrowD,$d['Target'],1,0,'C');
+                $pdf->SetFont('Times','B',8);
+                $pdf->Cell(13,$hrowD,$d['Total_Attd'],1,0,'C');
+                $pdf->Cell(18.5,$hrowD,$d['Percent'],1,0,'C');
+                $pdf->SetFont('Times','',8);
 
 //            $pdf->SetTextColor(0,255,0);
 
-            for($t=0;$t<count($attd);$t++){
+                for($t=0;$t<count($attd);$t++){
 
-                if($t!=0){
-                    $pdf->Cell(130.5,$hrow,'',0,0,'C');
-                }
+                    if($t!=0){
+                        $pdf->Cell(130.5,$hrow,'',0,0,'C');
+                    }
 
-                $da = (array) $attd[$t];
+                    $da = (array) $attd[$t];
 
-                $pdf->Cell(30,$hrow,' '.$da['DayEng'],1,0,'L');
+                    $pdf->Cell(30,$hrow,' '.$da['DayEng'],1,0,'L');
 
-                if($da['M1']==1 || $da['M1']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M1']==2 || $da['M1']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M1']==1 || $da['M1']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M1']==2 || $da['M1']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M2']==1 || $da['M2']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M2']==2 || $da['M2']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M2']==1 || $da['M2']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M2']==2 || $da['M2']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M3']==1 || $da['M3']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M3']==2 || $da['M3']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M3']==1 || $da['M3']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M3']==2 || $da['M3']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M4']==1 || $da['M4']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M4']==2 || $da['M4']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M4']==1 || $da['M4']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M4']==2 || $da['M4']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M5']==1 || $da['M5']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M5']==2 || $da['M5']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M5']==1 || $da['M5']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M5']==2 || $da['M5']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M6']==1 || $da['M6']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M6']==2 || $da['M6']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M6']==1 || $da['M6']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M6']==2 || $da['M6']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M7']==1 || $da['M7']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M7']==2 || $da['M7']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M7']==1 || $da['M7']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M7']==2 || $da['M7']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M8']==1 || $da['M8']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M8']==2 || $da['M8']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M8']==1 || $da['M8']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M8']==2 || $da['M8']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M9']==1 || $da['M9']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M9']==2 || $da['M9']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M9']==1 || $da['M9']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M9']==2 || $da['M9']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M10']==1 || $da['M10']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M10']==2 || $da['M10']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M10']==1 || $da['M10']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M10']==2 || $da['M10']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M11']==1 || $da['M11']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M11']==2 || $da['M11']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M11']==1 || $da['M11']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M11']==2 || $da['M11']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M12']==1 || $da['M12']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M12']==2 || $da['M12']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M12']==1 || $da['M12']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M12']==2 || $da['M12']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M13']==1 || $da['M13']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M13']==2 || $da['M13']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M13']==1 || $da['M13']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M13']==2 || $da['M13']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M14']==1 || $da['M14']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,1,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M14']==2 || $da['M14']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,1,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M14']==1 || $da['M14']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,1,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M14']==2 || $da['M14']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,1,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,1,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,1,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
+                }
             }
+
+
 
         }
 
