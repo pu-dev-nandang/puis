@@ -196,6 +196,15 @@
     </tr>
 
     <tr>
+        <td>Maximum Input & Approval Modify Attendance</td>
+        <td>
+            <input type="text" id="ModifyAttendance" nextelement="" name="regular" class="form-control form-tahun-akademik">
+        </td>
+        <td></td>
+        <td></td>
+    </tr>
+
+    <tr>
         <td>Edom</td>
         <td>
             <input type="text" id="edom_start" nextelement="edom_end" name="regular" class="form-control form-tahun-akademik">
@@ -369,7 +378,8 @@
         $('.form-tahun-akademik').prop('readonly',true);
         $( "#bpp_start,#krs_start ,#bayar_start,#kuliah_start,#edom_start," +
             "#uts_start,#show_nilai_uts,#nilaiuts_start," +
-            "#uas_start,#nilaiuas_start,#nilaitugas_end,#show_nilai_uas,#show_nilai_h,#show_nilai_t,#updateTranscript" )
+            "#uas_start,#nilaiuas_start,#nilaitugas_end,#show_nilai_uas,#show_nilai_h,#show_nilai_t," +
+            "#updateTranscript,#ModifyAttendance" )
             .datepicker({
             showOtherMonths:true,
             autoSize: true,
@@ -446,6 +456,9 @@
                 Out_Time_Lec :( form_Out_Time_Lec!='' &&  form_Out_Time_Lec!=null &&  form_Out_Time_Lec!=0) ?  form_Out_Time_Lec : 0,
                 Out_User_Lec : JSON.stringify(Out_User_Lec),
                 DefaultAttendance : $("input[name=form_DefaultAttendance]:checked").val(),
+                ModifyAttendance : ($('#ModifyAttendance').datepicker("getDate")!=null)
+                    ? moment($('#ModifyAttendance').datepicker("getDate")).format('YYYY-MM-DD')
+                    : moment($('#kuliah_end').datepicker("getDate")).format('YYYY-MM-DD'),
                 UpdateBy : sessionNIP,
                 UpdateAt : dateTimeNow()
             }
@@ -534,6 +547,12 @@
             // Setting Attendace
             if(data.AttdSetting.length>0){
                 var d = data.AttdSetting[0];
+
+                (data.DetailTA.updateTranscript !=='0000-00-00' && d.ModifyAttendance!==null)
+                    ? $('#ModifyAttendance').datepicker('setDate',new Date(d.ModifyAttendance))
+                    : '';
+
+
 
                 $('#form_In_Session_Std').val(d.In_Session_Std);
                 $('#form_In_Type_Std').val(d.In_Type_Std);
