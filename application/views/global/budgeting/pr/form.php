@@ -57,6 +57,8 @@
 	var RuleAccess = [];
 	var MaxLimit =0;
 	var DepartementArr = [];
+	var PostBudgetDepartmentCombine = [];
+	var tbl_element = '';
 	// document.addEventListener('contextmenu', function(e) {
 	//   e.preventDefault();
 	// });
@@ -267,6 +269,7 @@
 			                            '<th width = "150px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Date Needed</th>'+
 			                            // '<th width = "100px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Budget Status</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Upload Files</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Combine Budget</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Action</th>'+
 									'</tr></thead>'+
 									'<tbody></tbody></table></div></div></div>';
@@ -758,7 +761,9 @@
 		                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
                         		'</div>'+
                         	'</td>'+
-                        	'<td><input type="file" data-style="fileinput" class = "BrowseFile" ID = "BrowseFile'+No+'" multiple accept="image/*,application/pdf"></td>'+action
+                        	'<td><input type="file" data-style="fileinput" class = "BrowseFile" ID = "BrowseFile'+No+'" multiple accept="image/*,application/pdf"></td>'+
+                        	'<td>No</td>'+
+                        	action
                         '</tr>';	
 
 				return a;				
@@ -812,6 +817,17 @@
 						// passing array Department These Division
 						var ArrBudgetDepartment = [];
 						var Div = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
+						// filtering PostBudgetDepartment
+						var arr = [];
+						for (var i = 0; i < PostBudgetDepartment.length; i++) {
+							if (PostBudgetDepartment[i]['Value'] > 0 ) {
+								arr.push(PostBudgetDepartment[i]);
+							}
+						}
+
+						PostBudgetDepartment = arr;
+						// console.log(PostBudgetDepartment);
+
 						for (var i = 0; i < PostBudgetDepartment.length; i++) {
 							if (PostBudgetDepartment[i]['Departement'] == Div) {
 								ArrBudgetDepartment.push(PostBudgetDepartment[i]);
@@ -854,6 +870,11 @@
 					});
 
 					$("#ModalbtnSaveForm").click(function(){
+						// clear  PostBudget Combine sesuai dengan no
+						var fillItem = ev.closest('tr');
+						var No = fillItem.find('td:eq(0)').text();
+						ClearPostBudgetDepartmentCombine(No);
+
 						var chkbox = $('input[type="checkbox"]:checked:not(.uniform)');
 						var checked = chkbox.val();
 						var estvalue = chkbox.attr('estvalue');
@@ -863,7 +884,6 @@
 						estvalue = estvalue.substring(0, n);
 						var row = chkbox.closest('tr');
 						var PostBudgetItem = row.find('td:eq(1)').text();
-						var fillItem = ev.closest('tr');
 						fillItem.find('td:eq(2)').find('.PostBudgetItem').val(PostBudgetItem);
 						fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('id_budget_left',checked);
 						fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('remaining',estvalue);
@@ -875,6 +895,7 @@
 				} // exit IN
 				else if(BudgetStatus == 'Cross')
 				{
+					// console.log(PostBudgetDepartment);
 					// show department except Department myself
 					var html = ''
 					var opDepartment = '';
@@ -975,6 +996,11 @@
 					});
 
 					$("#ModalbtnSaveForm").click(function(){
+						// clear  PostBudget Combine sesuai dengan no
+						var fillItem = ev.closest('tr');
+						var No = fillItem.find('td:eq(0)').text();
+						ClearPostBudgetDepartmentCombine(No);
+
 						var chkbox = $('input[type="checkbox"]:checked:not(.uniform)');
 						var checked = chkbox.val();
 						var estvalue = chkbox.attr('estvalue');
@@ -984,7 +1010,6 @@
 						estvalue = estvalue.substring(0, n);
 						var row = chkbox.closest('tr');
 						var PostBudgetItem = row.find('td:eq(1)').text();
-						var fillItem = ev.closest('tr');
 						fillItem.find('td:eq(2)').find('.PostBudgetItem').val(PostBudgetItem);
 						fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('id_budget_left',checked);
 						fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('remaining',estvalue);
@@ -1002,6 +1027,47 @@
 				}).always(function() {
 				                
 				});
+		}
+
+		function ClearPostBudgetDepartmentCombine(No)
+		{
+			console.log('ClearPostBudgetDepartmentCombine');
+			var arr = [];
+			var indextr = No - 1;
+			var arr_del = [];
+			for (var i = 0; i < PostBudgetDepartmentCombine.length; i++) {
+				if (PostBudgetDepartmentCombine[i]['No'] != No) {
+					arr.push(PostBudgetDepartmentCombine[i]);
+					var dt = PostBudgetDepartmentCombine[i]['dt'];
+					for (var j = 0; j < dt.length; j++) {
+						arr_del.push(dt[j]['id_budget_left']);
+					}
+				}
+			}
+
+			console.log(arr);
+
+			PostBudgetDepartmentCombine = arr;
+			// Update Budget Remaining
+				var arr2 = [];
+				for (var i = 0; i < BudgetRemaining.length; i++) {
+					var id_budget_left = BudgetRemaining[i]['id_budget_left'];
+					var bool = false;
+					for (var j = 0; j < arr_del.length; j++) {
+						if (id_budget_left == arr_del[j]) {
+							bool = true;
+							break;
+						}
+					}
+					
+					if (!bool) { // adding to arrays 
+						arr2 .push(BudgetRemaining[i]);
+					}
+				}
+
+			BudgetRemaining = arr2;	
+			console.log('End ClearPostBudgetDepartmentCombine');
+
 		}
 
 		function Filtering_PostBudgetDepartment(p1,p2)
@@ -1170,6 +1236,90 @@
 
 			$("#phtmltotal").html('Total : '+formatRupiah(htmltotal));
 			// console.log(BudgetRemaining);
+
+			// if combine budget
+				// console.log(PostBudgetDepartmentCombine);
+				if (PostBudgetDepartmentCombine.length > 0) {
+					for (var i = 0; i < PostBudgetDepartmentCombine.length; i++) {
+						var No = PostBudgetDepartmentCombine[i]['No'];
+						// get id_budget_left untuk pengurangan berdasarkan number
+							var indextr = No - 1;
+							var id_budget_left_by_number = $("#table_input_pr tbody").eq(indextr).find('td:eq(2)').find('.PostBudgetItem').attr('id_budget_left');
+						var dt =  PostBudgetDepartmentCombine[i]['dt'];
+						for (var j = 0; j < dt.length; j++) {
+							var id_budget_left_get = dt[j]['id_budget_left'];
+							// update Budget Reamining
+								for (var k = 0; k < BudgetRemaining.length; k++) {
+									// update id_budget_left dengan pencarian id_budget_left_by_number
+									var id_budget_left = BudgetRemaining[k]['id_budget_left'];
+									if (id_budget_left == id_budget_left_by_number) {
+										BudgetRemaining[k]['RemainingNoFormat'] = parseInt(dt[j]['cost'] ) - (parseInt(BudgetRemaining[k]['RemainingNoFormat']) * -1) ;
+										BudgetRemaining[k]['Remaining']  = formatRupiah(BudgetRemaining[k]['RemainingNoFormat']);
+									}
+								}
+
+							// add Budget Remaining with Post Budget Combine
+								// check existing 
+									// var bool = false;
+									// for (var k = 0; k < BudgetRemaining.length; k++) {
+									// 	var id_budget_left = BudgetRemaining[k]['id_budget_left'];
+									// 	if (id_budget_left == id_budget_left_get) {
+									// 		bool = true;
+									// 		// update
+									// 			BudgetRemaining[k]['RemainingNoFormat'] = parseInt(dt[j]['cost'] ) - parseInt(BudgetRemaining[k]['RemainingNoFormat']) ;
+									// 			BudgetRemaining[k]['Remaining']  = formatRupiah(BudgetRemaining[k]['RemainingNoFormat']);
+									// 		break;
+									// 	}
+									// }
+
+									// if (!bool) {
+									// 	var dataarr = {
+									// 		PostBudgetItem : dt[j]['value'],
+									// 		Remaining : formatRupiah( ( parseInt(dt[j]['estvalue']) - parseInt(dt[j]['cost'])  ) ),
+									// 		No : No,
+									// 		id_budget_left : id_budget_left_get,
+									// 		RemainingNoFormat : parseInt(dt[j]['estvalue']) - parseInt(dt[j]['cost']),
+									// 		NameDepartement : dt[j]['NameDepartement'],
+									// 		Departement : dt[j]['Departement'],
+									// 	}
+									// 	BudgetRemaining.push(dataarr);
+									// }
+
+									var dataarr = {
+										PostBudgetItem : dt[j]['value'],
+										Remaining : formatRupiah( ( parseInt(dt[j]['estvalue']) - parseInt(dt[j]['cost'])  ) ),
+										No : No,
+										id_budget_left : id_budget_left_get,
+										RemainingNoFormat : parseInt(dt[j]['estvalue']) - parseInt(dt[j]['cost']),
+										NameDepartement : dt[j]['NameDepartement'],
+										Departement : dt[j]['Departement'],
+									}
+									BudgetRemaining.push(dataarr);
+									
+						}
+					}
+				}
+			// endif combine budget	
+			console.log(PostBudgetDepartment);
+			console.log(BudgetRemaining);
+			// Update Post Budget
+				// for (var i = 0; i < PostBudgetDepartment.length; i++) {
+				// 	var id_budget_left = PostBudgetDepartment[i]['ID'];
+				// 	for (var j = 0; j < BudgetRemaining.length; j++) {
+				// 		var id_budget_left2 = BudgetRemaining[j]['id_budget_left'];
+				// 		// console.log(id_budget_left2+'||id_budget_left2');
+				// 		// console.log(id_budget_left+'||id_budget_left');
+				// 		if (id_budget_left == id_budget_left2) {
+				// 			console.log('asd');
+				// 			var RemainingNoFormat = BudgetRemaining[j]['RemainingNoFormat'];
+				// 			PostBudgetDepartment[i]['Value'] = RemainingNoFormat;
+				// 			break;
+				// 		}
+
+						
+				// 	}
+				// }
+
 			loadShowBUdgetRemaining(BudgetRemaining);
 			// loadingEnd(500)
 
@@ -1304,11 +1454,26 @@
 			var fillItem = $(this).closest('tr');
 			var id_budget_left = fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('id_budget_left');
 
+			// delete budget berdasarkan No
+				var No = fillItem.find('td:eq(0)').text();
+				var arr = [];
+				for (var i = 0; i < PostBudgetDepartmentCombine.length; i++) {
+					var No2 = PostBudgetDepartmentCombine[i]['No'];
+					if (No != No2) {
+						arr.push(PostBudgetDepartmentCombine[i]);
+					} 
+				}
+
+				PostBudgetDepartmentCombine = arr;
+
 			$( this )
               .closest( 'tr')
               .remove();
               _BudgetRemaining();
               SortByNumbering();
+
+
+
 		})
 
 		function loadShowBUdgetRemaining(BudgetRemaining)
@@ -1413,10 +1578,229 @@
 						html += '</select>';
 						fillItem.find('td:eq(1)').html(html);
 					}
-				
+
+					// detected exceed for combine budget
+						if ( !(Remaining >= 0) ) {
+							// show button combine budget
+								fillItem.find('td:eq(12)').html('<button class = "btn btn-default  ShowModalCombine">Combine</button>');
+								fillItem.find('td:eq(12)').attr('align','center');
+						}
+						else
+						{
+							var No = fillItem.find('td:eq(0)').text();
+							var bool = true;
+							for (var i = 0; i < PostBudgetDepartmentCombine.length; i++) {
+								var No2 = PostBudgetDepartmentCombine[i]['No'];
+								if (No2 == No) {
+									bool = false;
+									break;
+								}
+							}
+
+							if (bool) {
+								fillItem.find('td:eq(12)').html('No');
+								fillItem.find('td:eq(12)').attr('align','center');
+							}
+							
+						} 
+					    
+
 			})
 			
 		}
+
+		$(document).off('click', '.ShowModalCombine').on('click', '.ShowModalCombine',function(e) {
+			// show modal choice budget
+			var ev = $(this);
+				var html = ''
+				var opDepartment = '';
+				for (var i = 0; i < DepartementArr.length; i++) {
+					opDepartment += '<option value="'+ DepartementArr[i]['Code']  +'" '+''+'>'+DepartementArr[i]['Name2']+'</option>';
+				}
+
+				html = 	'<div class = "row" style = "margin-top : 10px" id = "pageContentModalCombine">'+
+						'</div>'
+						;
+
+				$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Post Budget Item'+'</h4>');
+				$('#GlobalModalLarge .modal-body').html(html);
+				$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+	          '<button type="button" id="ModalbtnSaveForm2" class="btn btn-success">Save</button>');
+				$('#GlobalModalLarge').modal({
+				    'show' : true,
+				    'backdrop' : 'static'
+				});
+
+				ShowPostBudgetCombine(ev);	
+
+		})
+
+		function ShowPostBudgetCombine(ev)
+		{
+			var Year = $("#Year").val();
+			var url = base_url_js+"budgeting/detail_budgeting_remaining_All";
+			var data = {
+					    Year : Year,
+					};
+			var token = jwt_encode(data,'UAP)(*');
+			$.post(url,{token:token},function (resultJson) {
+				var response = jQuery.parseJSON(resultJson);
+				var PostBudgetDepartmentModal = response.data;
+				// PostBudgetDepartment
+				if (PostBudgetDepartmentModal.length > 0) {
+					// PostBudgetDepartment = PostBudgetDepartment.concat(PostBudgetDepartmentModal); 
+					var P_result = Filtering_PostBudgetDepartment(PostBudgetDepartment,PostBudgetDepartmentModal);
+					PostBudgetDepartment = P_result;
+				}
+				// Filtering PostBudgetDepartmentModal Besar dari kekurangannya
+					var No = ev.closest('tr').find('td:eq(0)').text();
+					// check pada variable BudgetRemaining
+						var kekurangan = 0;
+						for (var i = 0; i < BudgetRemaining.length; i++) {
+							var No_1 = BudgetRemaining[i]['No'];
+							if (No == No_1) {
+								kekurangan = BudgetRemaining[i]['RemainingNoFormat'];
+								kekurangan = kekurangan * (-1); // to make positif
+								break;
+							}
+						}
+						// console.log(PostBudgetDepartmentModal);
+						// edit PostBudgetDepartmentModal
+							if (kekurangan > 0) {
+								var arr = [];
+								for (var i = 0; i < PostBudgetDepartmentModal.length; i++) {
+									var Cost = PostBudgetDepartmentModal[i]['Value'];
+									if (Cost >= kekurangan) {
+										// check data PostBudgetDepartmentModal dengan data BudgetRemaining untuk update value /cost datanya
+										var ID = PostBudgetDepartmentModal[i]['ID'] 
+										for (var j = 0; j < BudgetRemaining.length; j++) {
+											var id_budget_left = BudgetRemaining[j]['id_budget_left'];
+											if (ID == id_budget_left) {
+												PostBudgetDepartmentModal[i]['Value'] = BudgetRemaining[j]['RemainingNoFormat']
+											}
+										}
+
+										arr.push(PostBudgetDepartmentModal[i]);
+									}
+								}
+								PostBudgetDepartmentModal = arr;
+							}
+					$("#ModalbtnSaveForm2").attr('kekurangan',kekurangan);		
+					$("#ModalbtnSaveForm2").attr('no',No);	
+					$("#DepartementPostModalCombine").attr('no',No);		
+				var html = htmlPostBudgetDepartmentModal(PostBudgetDepartmentModal);
+				$("#pageContentModalCombine").html(html);
+				var table = $('#example').DataTable({
+			      "data" : PostBudgetDepartmentModal,
+			      'columnDefs': [
+				      {
+				         'targets': 0,
+				         'searchable': false,
+				         'orderable': false,
+				         'className': 'dt-body-center',
+				         'render': function (data, type, full, meta){
+				             return '<input type="checkbox" name="id[]" value="' + full.ID + '" estvalue="' + full.Value + '" namedepartement = "'+full.NameDepartement+'" departement = "'+full.Departement+'">';
+				         }
+				      },
+				      {
+				         'targets': 1,
+				         'render': function (data, type, full, meta){
+				             return full.PostName+'-'+full.RealisasiPostName+'['+full.NameDepartement+']';
+				         }
+				      },
+				      {
+				         'targets': 2,
+				         'render': function (data, type, full, meta){
+				             return formatRupiah(full.Value);
+				         }
+				      },
+			      ],
+			      // 'order': [[1, 'asc']]
+				});
+
+				tbl_element = table;
+
+			}).fail(function() {
+			  toastr.info('No Result Data'); 
+			}).always(function() {
+			                
+			});
+		}
+
+		$(document).off('click', '#ModalbtnSaveForm2').on('click', '#ModalbtnSaveForm2',function(e) {
+			// console.log('asd');
+			var  chkbox = [];
+			var kekurangan_temp = $(this).attr('kekurangan');
+			kekurangan_temp = parseInt(kekurangan_temp);
+			var No = $(this).attr('no');
+			var indextr = No - 1;
+			var ev = $("#table_input_pr tbody").eq(indextr).find('td:eq(12)').find('.ShowModalCombine');
+			var fillItem = $("#table_input_pr tbody").eq(indextr);
+
+			// $('input[type="checkbox"]').each(function(){ // multiple combine choice budgeting
+			// $('#example tbody').on('each', 'input[type="checkbox"]', function(){
+			tbl_element.$('input[type="checkbox"]').each(function(){	
+				if ($(this).is(':checked')) {
+					var id_budget_left = $(this).val();
+					var estvalue = $(this).attr('estvalue');
+					var NameDepartement = $(this).attr('namedepartement');
+					var Departement = $(this).attr('departement');
+					var n = estvalue.indexOf(".");
+					estvalue = estvalue.substring(0, n);
+					var row = $(this).closest('tr');
+					var PostBudgetItem = row.find('td:eq(1)').text();
+
+					if (estvalue >= kekurangan_temp) {
+						var temp = {
+							id_budget_left : id_budget_left,
+							cost : kekurangan_temp,
+							value : PostBudgetItem,
+							Departement : Departement,
+							NameDepartement : NameDepartement,
+							estvalue : estvalue,
+						}
+						chkbox.push(temp);
+						return false;
+					}
+					else{
+						var temp = {
+							id_budget_left : id_budget_left,
+							cost : estvalue,
+							value : PostBudgetItem,
+							Departement : Departement,
+							NameDepartement : NameDepartement,
+							estvalue : estvalue,
+						}
+						chkbox.push(temp);
+						kekurangan_temp = estvalue - kekurangan_temp;
+					}
+				}
+			})
+
+			if (tbl_element.$('input[type="checkbox"]:checked:not(.uniform)').length == chkbox.length) {
+				var temp = {
+					No : No,
+					dt : chkbox,
+				};
+				PostBudgetDepartmentCombine.push(temp);
+				fillItem.find('td:eq(7)').find('.qty').trigger('change');
+				// isi kolom Combine Budgeting
+				var htmlWr = '';
+				for (var i = 0; i < chkbox.length; i++) {
+					htmlWr += '<li>'+chkbox[i]['value']+' : '+formatRupiah(chkbox[i]['cost'])+'</li>';
+				}
+				fillItem.find('td:eq(12)').attr('align','left');
+				fillItem.find('td:eq(12)').html(htmlWr);
+					
+				$('#GlobalModalLarge').modal('hide');
+			}
+			else
+			{
+				toastr.error('Your Budget more than Sub Total','!!!Failed');
+			}
+
+			
+		})
 		
 		$(document).off('click', '#SaveBudget').on('click', '#SaveBudget',function(e) {
 			var htmltext = $(this).text();

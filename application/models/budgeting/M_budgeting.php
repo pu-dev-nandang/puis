@@ -386,6 +386,31 @@ class M_budgeting extends CI_Model {
         return $query;
     }
 
+    public function get_budget_remaining_all($Year)
+    {
+        $sql = 'select dd.ID,cc.CodePostBudget,cc.Year,cc.RealisasiPostName,cc.PostName,dd.ID_creator_budget,dd.Value
+         ,cc.Departement
+         from
+            (
+                   select * from db_budgeting.creator_budget as a join (
+                   select a.CodePostBudget as CodePostBudget2,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost,
+                   b.Departement
+                   from db_budgeting.cfg_postrealisasi as b left join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
+                   join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
+                ) as  b on a.CodePostBudget = b.CodePostBudget2 order by a.CodePostBudget asc
+            ) cc join db_budgeting.budget_left as dd on cc.ID = dd.ID_creator_budget
+            ';
+        $query=$this->db->query($sql, array($Year))->result_array();
+        // pass Name Department
+        for ($i=0; $i < count($query); $i++) { 
+            $NameDepartement = $this->SearchDepartementBudgeting($query[$i]['Departement']);
+            $NameDepartement = $NameDepartement[0]['NameDepartement'];
+            $query[$i]['NameDepartement'] = $NameDepartement;
+        }
+
+        return $query;
+    }
+
     public function Grouping_PostBudget($getData)
     {
         $arr_result = array();

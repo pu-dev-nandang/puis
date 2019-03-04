@@ -1283,6 +1283,17 @@ class C_budgeting extends Budgeting_Controler {
         echo json_encode($arr_result);
     }
 
+    public function detail_budgeting_remaining_All()
+    {
+        $this->auth_ajax();
+        $arr_result = array('data' =>'');
+        $Input = $this->getInputToken();
+        $Year = $Input['Year'];
+        $getData = $this->m_budgeting->get_budget_remaining_all($Year);
+        $arr_result = array('data' =>$getData);
+        echo json_encode($arr_result);
+    }
+
     public function userroledepart_submit()
     {
        $this->auth_ajax();
