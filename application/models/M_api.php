@@ -819,7 +819,7 @@ class M_api extends CI_Model {
         
     }
 
-     public function views_editacademic($NIP,$fileijazahs1,$filetranscripts1) {
+    public function views_editacademic($NIP,$fileijazahs1,$filetranscripts1) {
 
         $sql = "SELECT *
                 FROM db_employees.employees_academic 
@@ -827,10 +827,22 @@ class M_api extends CI_Model {
 
         $query=$this->db->query($sql, array());
         return $query->result_array();
+     }
+
+     public function views_editotfiles($NIP,$IDfiles) {
+
+        $sql = "SELECT *
+                FROM db_employees.files 
+                WHERE NIP= '".$NIP."' AND ID= '".$IDfiles."' ";
+
+        $query=$this->db->query($sql, array());
+        return $query->result_array();
 
      }
 
-     public function edit_academicemployee()
+
+
+    public function edit_academicemployee()
     {
         $sql = "UPDATE db_employees.employees_academic SET NoIjazah='".$NIP."', DateIjazah='".$NIP."',NameUniversity='".$NIP."',Major='".$NIP."',ProgramStudy='".$NIP."', Grade='".$NIP."',TotalCredit='".$NIP."', TotalSemester='".$NIP."'
             WHERE NIP ='".$NIP."' AND IjazahFile='".$NIP."' AND TranscriptFile='".$NIP."' ";

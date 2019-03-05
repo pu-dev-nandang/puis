@@ -602,10 +602,16 @@ class C_api extends CI_Controller {
             $StatusFiles = '';
             for ($j=0; $j < count($Get_MasterFiles); $j++) { 
                 $stDefault =' <span class="label label-danger"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
-                $sql2 = 'select count(*) as total from db_employees.files where NIP = ? and TypeFiles = ?';
+                $sql2 = 'select count(*) as total, LinkFiles from db_employees.files where NIP = ? and TypeFiles = ?';
                 $query2=$this->db->query($sql2, array($NIP,$Get_MasterFiles[$j]['ID']))->result_array();
                 if ($query2[0]['total'] > 0 ) {
-                    $stDefault =' <span class="label label-success"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
+
+                    if($query2[0]['LinkFiles'] != null){
+                        $stDefault =' <span class="label label-success"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
+                    } else {
+                        $stDefault =' <span class="label label-danger"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
+                    }
+                    
                 } 
                 $StatusFiles .= $stDefault;
             }
@@ -3147,6 +3153,14 @@ class C_api extends CI_Controller {
             $viewfiles1 = $this->m_api->views_editacademic($NIP,$fileijazahs1,$filetranscripts1);
             echo json_encode($viewfiles1);   
         }
+        else if ($academic == 'OTF') {
+            $NIP = $this->input->get('n');
+            $IDfiles = $this->input->get('t');
+            //$filetranscripts1 = $this->input->get('t');
+            
+            $viewfiles1 = $this->m_api->views_editotfiles($NIP,$IDfiles);
+            echo json_encode($viewfiles1);   
+        }
     }
      
 
@@ -4603,6 +4617,29 @@ class C_api extends CI_Controller {
                     $this->db->insert('db_employees.employees_academic', $dataSave);
                     return print_r(1);
             }
+        }
+        else if($data_arr['action']=='EditFilesDocument'){
+
+            $formInsert = (array) $data_arr['formInsert'];
+
+            $NIP = $formInsert['formNIP'];
+            $NoDocument = strtoupper($formInsert['NoDocument']);
+            $DescriptionFile = $formInsert['DescriptionFile'];
+            $DateDocument = $formInsert['DateDocument'];
+            $type = $formInsert['typeotherfiles'];
+            $idlinkfiles = $formInsert['idlinkfiles'];
+            $linkotherfile = $formInsert['linkotherfile'];
+            
+            $dataUpdate = array(
+                        'No_Document' => $NoDocument,
+                        'Date_Files' => $DateDocument,
+                        'Description_Files' => $DescriptionFile,
+                        'LinkFiles' => $linkotherfile
+                    );
+            $this->db->where('NIP', $NIP);
+            $this->db->where('ID', $idlinkfiles);
+            $this->db->update('db_employees.files', $dataUpdate);
+            return print_r(1);
         }
     }
 
