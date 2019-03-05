@@ -627,6 +627,12 @@
         });
     }
 
+    function testMobile() {
+        socket.emit('update_log', {
+            update_log: '1'
+        });
+    }
+
 
     function ReadNotifDivision(){
         var url = base_url_js+'readNotificationDivision';
