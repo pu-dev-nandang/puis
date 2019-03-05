@@ -48,7 +48,7 @@
                 <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="academic_sratasatu" data-toggle="tab"><i class="fa fa-university"></i>  Academic S1</a></li>
                 <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="academic_sratadua" data-toggle="tab"><i class="fa fa-university"></i> Academic S2</a></li>
                 <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="academic_sratatiga" data-toggle="tab"><i class="fa fa-university"></i> Academic S3</a></li>
-                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="otherFiles" data-toggle="tab"><i class="fa fa-files-o"></i> Other Files</a></li>
+                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="otherfiles" data-toggle="tab"><i class="fa fa-files-o"></i> Other Files</a></li>
                 
             </ul>
             <div class="tab-content">
