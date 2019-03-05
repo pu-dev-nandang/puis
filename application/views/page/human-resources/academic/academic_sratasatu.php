@@ -89,7 +89,6 @@
                                     <div class="form-group">
                                         <label>Ijazah</label>
                                             <form id="tagFM_IjazahS1" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
-                                                    
                                                         <div class="form-group">
                                                             <label class="btn btn-sm btn-default btn-default-warning btn-upload">
                                                                 <i class="fa fa-upload margin-right"></i> Upload File
@@ -396,13 +395,30 @@ $(document).ready(function () {
                         '           <div class="col-xs-6">                                              '+
                         '           <div class="form-group">                                            '+
                         '               <label>Ijazah</label>                                           '+
-                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['IjazahFile']+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button id="btnreviewfiles" class="btn btn-sm btn-primary" filesub ="'+response[i]['IjazahFile']+'"><i class="fa fa-eye"></i> Preview </button></center></div>                    '+
+                        '                <form id="tagFM_IjazahS1" enctype="multipart/form-data" accept-charset="utf-8" method="post" action=""> '+
+                        '                        <div class="form-group"> '+
+                        '                            <label class="btn btn-sm btn-default btn-default-warning btn-upload">  '+
+                         '                                   <i class="fa fa-upload margin-right"></i> Change File          '+
+                         '                                   <input type="file" id="fileIjazah" name="userfile" class="upload_files1" style="display: none;" data-fm="tagFM_IjazahS1" accept="application/pdf"> '+
+                        '                             </label> '+
+                        '                        <p style="font-size: 12px;color: #FF0000;">*) Only PDF Files Max Size 5 MB</p> '+
+                        '                    </div></form> '+
+                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['IjazahFile']+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button id="btnreviewfiles" class="btn btn-sm btn-primary" filesub ="'+response[i]['IjazahFile']+'"><i class="fa fa-eye"></i> Preview </button></center></div>                     '+
                         '               </div>                                                          '+
                         '           </div>                                                              '+
                         '           <div class="col-xs-6">                                              '+
                         '           <div class="form-group">                                            '+
                         '               <label>Transcript</label>                                       '+
-                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['TranscriptFile']+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button id="btnreviewfiles" class="btn btn-sm btn-primary" filesub ="'+response[i]['TranscriptFile']+'"><i class="fa fa-eye"></i> Preview </button></center></div>               '+
+                        '                    <form id="tagFM_TranscriptS1" enctype="multipart/form-data" accept-charset="utf-8" method="post" action=""> '+
+                        '                            <input id="formPhoto" class="hide" value="" hidden />  '+
+                        '                                <div class="form-group">                           '+
+                        '                                    <label class="btn btn-sm btn-default btn-default-warning btn-upload"> '+
+                        '                                        <i class="fa fa-upload margin-right"></i> Change File '+
+                        '                                        <input type="file" id="fileTranscript" name="userfile" class="upload_files2" style="display: none;" accept="application/pdf">                                                                     '+
+                        '                                </label>                                                                '+
+                        '                         <p style="font-size: 12px;color: #FF0000;">*) Only PDF Files Max Size 5 MB</p> '+
+                        '                    </div></form>                                                                       '+
+                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['TranscriptFile']+'" style="width:300px; height:150px;" frameborder="0"></iframe> </div> <br/><center><button id="btnreviewfiles" class="btn btn-sm btn-primary" filesub ="'+response[i]['TranscriptFile']+'"><i class="fa fa-eye"></i> Preview </button></center></div>                 '+
                         '                </div>                                                         '+
                         '            </div>                                                             '+
                         '        </div>                                                                 '+
@@ -410,7 +426,7 @@ $(document).ready(function () {
                         '           <div class="col-md-12" style="text-align: right;">                   '+
                         '                <hr/>                                                           '+
                         '    <div><input type="hidden" class="form-control" value="'+response[i]['IjazahFile']+'" id="linkijazahs1"> </div>                   '+
-                        '    <div><input type="hidden" class="form-control" value="'+response[i]['TranscriptFile']+' " id="linktranscripts1">    </div>       '+
+                        '    <div><input type="hidden" class="form-control" value="'+response[i]['TranscriptFile']+'" id="linktranscripts1">    </div>       '+
                         '               <button type="button" class="btn btn-danger" data-dismiss="modal"> Cancel</button> | <button type="button" class="btn btn-success" id="btnSavedits1" linkijazahs1="'+response[i]['IjazahFile']+'" linktranscripts1="'+response[i]['TranscriptFile']+'"> Save</button>                                                               '+
                         '           </div>                                                              '+
                         '       </div>                                                                  '+
@@ -446,8 +462,7 @@ $(document).ready(function () {
 
         $.post(url,{token:token},function (resultJson) {
 
-            console.log(resultJson);
-
+            //console.log(resultJson);
             var response = resultJson;
                 $("#loadtablefiles1").append(
                     ' <div class="table-responsive">                                                '+
@@ -497,13 +512,11 @@ $(document).ready(function () {
 
         });
     };
-
 </script>
 
  <script type="text/javascript">
     $('#fileIjazah').change(function (event) {
         var oFile = document.getElementById("fileIjazah").files[0]; 
-
         if (oFile.size > 5242880) {  // 5 mb for bytes.
                 toastr.error('File Max size 5 MB!','Error');
                 $('#NotificationModal').modal('hide');
@@ -526,6 +539,33 @@ $(document).ready(function () {
             $('#element2').append('<br/><iframe src="' + file + '" style="width:200px; height:100;" frameborder="0"></iframe>');
         }
     });
+
+    $('.upload_files1').change(function (event) {
+        var xFile = document.getElementById("fileIjazah").files[0]; 
+
+        if (xFile.size > 5242880) {  // 5 mb for bytes.
+            toastr.error('File Max size 5 MB!','Error');
+            return;
+        } else {
+            $('#element2').empty();
+            var file = URL.createObjectURL(event.target.files[0]);
+            $('#element2').append('<br/><iframe src="' + file + '" style="width:200px; height:100;" frameborder="0"></iframe>');
+        }
+    });
+    $('.upload_files2').change(function (event) {
+        var xFile = document.getElementById("fileTranscript").files[0]; 
+
+        if (xFile.size > 5242880) {  // 5 mb for bytes.
+            toastr.error('File Max size 5 MB!','Error');
+            return;
+        } else {
+            $('#element2').empty();
+            var file = URL.createObjectURL(event.target.files[0]);
+            $('#element2').append('<br/><iframe src="' + file + '" style="width:200px; height:100;" frameborder="0"></iframe>');
+        }
+    });
+
+    
  </script>
 
  <script>
@@ -548,9 +588,7 @@ $(document).ready(function () {
         var linkijazahs1 = $('#linkijazahs1').val();
         var linktranscripts1 = $('#linktranscripts1').val();
 
-        ///var oFile = document.getElementById("fileIjazah").files[0]; 
-        //var xFile = document.getElementById("fileTranscript").files[0]; 
-
+    
         if(formNIP!=null && formNIP!=''
                     && formNoIjazahS1!='' && formNoIjazahS1!=null
                     && formNameUnivS1!='' && formNameUnivS1!=null
@@ -655,14 +693,7 @@ $(document).ready(function () {
         var oFile = document.getElementById("fileIjazah").files[0]; 
         var xFile = document.getElementById("fileTranscript").files[0]; 
 
-        if (oFile.size > 5242880 || xFile.size > 5242880) {  // 5 mb for bytes.
-                toastr.error('File Maksimum size 5 Mb!','Error');
-                $('#NotificationModal').modal('hide');
-                //return;
-        } 
-            else {
-
-                if(formNIP!=null && formNIP!=''
+            if(formNIP!=null && formNIP!=''
                     && formNoIjazahS1!='' && formNoIjazahS1!=null
                     && formNameUnivS1!='' && formNameUnivS1!=null
                     && formIjazahDate!='' && formIjazahDate!=null
@@ -676,7 +707,6 @@ $(document).ready(function () {
                     $('#btnCloseEmployees').prop('disabled',true);
 
                     var data = {
-                        //action : 'addEmployees',
                         action : 'addAcademicS1',
                         formInsert : {
                                 NIP : formNIP,
@@ -718,22 +748,21 @@ $(document).ready(function () {
                                 uploadfile_transcripts(fileName_Transcript);
                                 toastr.success('File Document Saved','Success');
 
-                        }
-                            setTimeout(function () {
-                                $('#NotificationModal').modal('hide');
-                                window.location.href = '';
-                            },1000);
-
-                        });
-                 }
+                            }   
+                                setTimeout(function () {
+                                    $('#NotificationModal').modal('hide');
+                                    window.location.href = '';
+                                },1000);
+                    });
+                }
 
         else {
             toastr.error('Form Masih ada yang kosong','Error');
             $('#NotificationModal').modal('hide');
             return;
         }
+
     }
-}
 
 
 function uploadfile_transcripts(fileName_Transcript) {

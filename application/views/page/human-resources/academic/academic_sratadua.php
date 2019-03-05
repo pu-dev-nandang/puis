@@ -176,8 +176,7 @@ function loadAcademicS2Details() {
 
         $.post(url,{token:token},function (resultJson) {
 
-            console.log(resultJson);
-
+            //console.log(resultJson);
             var response = resultJson;
                 $("#loadtablefiles2").append(
                     ' <div class="table-responsive">                                                '+
@@ -621,14 +620,13 @@ function loadAcademicS2Details() {
         saveEmployeesS2();
     });
 
-
     function file_validation(ID_element)
     {
         var files = $('#'+ID_element)[0].files;
         var error = '';
         var msgStr = '';
        var name = files[0].name;
-        console.log(name);
+        //console.log(name);
         var extension = name.split('.').pop().toLowerCase();
         if(jQuery.inArray(extension, ['xlsx']) == -1)
         {
@@ -639,7 +637,7 @@ function loadAcademicS2Details() {
         oFReader.readAsDataURL(files[0]);
         var f = files[0];
         var fsize = f.size||f.fileSize;
-        console.log(fsize);
+        //console.log(fsize);
 
         if(fsize > 2000000) // 2mb
         {
@@ -656,7 +654,6 @@ function loadAcademicS2Details() {
         }
     }
 
-
     function saveEmployeesS2() {
 
         var formNIP = '<?php echo $NIP; ?>';
@@ -668,29 +665,19 @@ function loadAcademicS2Details() {
         var gradeS2 = $('#gradeS2').val();
         var totalCreditS2 = $('#totalCreditS2').val();
         var TotSemesterS2 = $('#TotSemesterS2').val();
-
         var min=100; 
         var max=999;  
         var random =Math.floor(Math.random() * (+max - +min)) + +min; 
-
         var type = 'IjazahS2';
         var ext = 'PDF';
         var fileName = type+'_'+NIP+'_'+random+'.'+ext;
-
         var TypeTrans = 'TranscriptS2';
         var fileName_Transcript = TypeTrans+'_'+NIP+'_'+random+'.'+ext;
 
-        var oFile = document.getElementById("fileIjazah").files[0]; 
-        var xFile = document.getElementById("fileTranscript").files[0]; 
+        //var oFile = document.getElementById("fileIjazah").files[0]; 
+        //var xFile = document.getElementById("fileTranscript").files[0]; 
 
-        if (oFile.size > 5242880 || xFile.size > 5242880) {  // 5 mb for bytes.
-                toastr.error('File Maksimum size 5 Mb!','Error');
-                $('#NotificationModal').modal('hide');
-                //return;
-        } 
-            else {
-
-                if(formNIP!=null && formNIP!=''
+         if(formNIP!=null && formNIP!=''
                     && formNoIjazahS2!='' && formNoIjazahS2!=null
                     && formNameUnivS2!='' && formNameUnivS2!=null
                     && formIjazahDate!='' && formIjazahDate!=null
@@ -729,8 +716,7 @@ function loadAcademicS2Details() {
                         } else {  //if success save data
                 
                                 var formData = new FormData( $("#tagFM_IjazahS2")[0]);
-                                var url = base_url_js+'human-resources/upload_academic?fileName='+fileName+'&c='+type+'&u='+NIP;
-                                            
+                                var url = base_url_js+'human-resources/upload_academic?fileName='+fileName+'&c='+type+'&u='+NIP;        
                                     $.ajax({
                                             url : url,  // Controller URL
                                             type : 'POST',
@@ -754,14 +740,12 @@ function loadAcademicS2Details() {
 
                         });
                  }
-
         else {
             toastr.error('Form Masih ada yang kosong','Error');
             $('#NotificationModal').modal('hide');
             return;
         }
     }
-}
 
 
 function uploadfile_transcripts(fileName_Transcript) {

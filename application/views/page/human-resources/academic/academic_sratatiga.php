@@ -174,8 +174,7 @@ function loadAcademicS3Details() {
 
         $.post(url,{token:token},function (resultJson) {
 
-            console.log(resultJson);
-
+            //console.log(resultJson);
             var response = resultJson;
                 $("#loadtablefiles3").append(
                     ' <div class="table-responsive">                                                '+
@@ -564,7 +563,7 @@ function loadAcademicS3Details() {
 
  <script type="text/javascript">
     $('#fileIjazah').change(function (event) {
-        ar oFile = document.getElementById("fileIjazah").files[0]; 
+        var oFile = document.getElementById("fileIjazah").files[0]; 
 
         if (oFile.size > 5242880) {  // 5 mb for bytes.
                 toastr.error('File Max size 5 MB!','Error');
@@ -610,42 +609,6 @@ function loadAcademicS3Details() {
         saveEmployeesS3();
     });
 
-
-    function file_validation(ID_element)
-    {
-        var files = $('#'+ID_element)[0].files;
-        var error = '';
-        var msgStr = '';
-       var name = files[0].name;
-        console.log(name);
-        var extension = name.split('.').pop().toLowerCase();
-        if(jQuery.inArray(extension, ['xlsx']) == -1)
-        {
-         msgStr += 'Invalid Type File<br>';
-        }
-
-        var oFReader = new FileReader();
-        oFReader.readAsDataURL(files[0]);
-        var f = files[0];
-        var fsize = f.size||f.fileSize;
-        console.log(fsize);
-
-        if(fsize > 2000000) // 2mb
-        {
-         msgStr += 'File Size is very big<br>';
-        }
-
-        if (msgStr != '') {
-          toastr.error(msgStr, 'Failed!!');
-          return false;
-        }
-        else
-        {
-          return true;
-        }
-    }
-
-
     function saveEmployeesS3() {
 
         var formNIP = '<?php echo $NIP; ?>';
@@ -669,28 +632,21 @@ function loadAcademicS3Details() {
         var TypeTrans = 'TranscriptS3';
         var fileName_Transcript = TypeTrans+'_'+NIP+'_'+random+'.'+ext;
 
-        var oFile = document.getElementById("fileIjazah").files[0]; 
-        var xFile = document.getElementById("fileTranscript").files[0]; 
+        //var oFile = document.getElementById("fileIjazah").files[0]; 
+        //var xFile = document.getElementById("fileTranscript").files[0]; 
 
-        if (oFile.size > 5242880 || xFile.size > 5242880) {  // 5 mb for bytes.
-                toastr.error('File Maksimum size 5 Mb!','Error');
-                $('#NotificationModal').modal('hide');
-                //return;
-        } 
-            else {
-
-                if(formNIP!=null && formNIP!=''
-                    && formNoIjazahS3!='' && formNoIjazahS3!=null
-                    && formNameUnivS3!='' && formNameUnivS3!=null
-                    && formIjazahDate!='' && formIjazahDate!=null
-                    && formMajorS3!='' && formMajorS3!=null
-                    && formStudyS3!='' && formStudyS3!=null
-                    && gradeS3!='' && gradeS3!=null
-                    && totalCreditS3!='' && totalCreditS3!=null
-                    && TotSemesterS3!='' && TotSemesterS3!=null 
-                    ){ 
-                    loading_button('#btnSubmitEmployees');
-                    $('#btnCloseEmployees').prop('disabled',true);
+        if(formNIP!=null && formNIP!=''
+            && formNoIjazahS3!='' && formNoIjazahS3!=null
+            && formNameUnivS3!='' && formNameUnivS3!=null
+            && formIjazahDate!='' && formIjazahDate!=null
+            && formMajorS3!='' && formMajorS3!=null
+            && formStudyS3!='' && formStudyS3!=null
+            && gradeS3!='' && gradeS3!=null
+            && totalCreditS3!='' && totalCreditS3!=null
+            && TotSemesterS3!='' && TotSemesterS3!=null 
+            ){ 
+                loading_button('#btnSubmitEmployees');
+            $('#btnCloseEmployees').prop('disabled',true);
 
                     var data = {
                         //action : 'addEmployees',
@@ -718,7 +674,6 @@ function loadAcademicS3Details() {
                         } else {  //if success save data
                 
                                 var formData = new FormData( $("#tagFM_IjazahS3")[0]);
-                                //alert(fileName);
                                 var url = base_url_js+'human-resources/upload_academic?fileName='+fileName+'&c='+type+'&u='+NIP;
                                             
                                     $.ajax({
@@ -735,27 +690,21 @@ function loadAcademicS3Details() {
 
                                 uploadfile_transcripts(fileName_Transcript);
                                 toastr.success('Academic Data Saved','Success');
-
                         }
                             setTimeout(function () {
                                 $('#NotificationModal').modal('hide');
                                 window.location.href = '';
                             },1000);
-
                         });
                  }
-
         else {
             toastr.error('Form Masih ada yang kosong','Error');
             $('#NotificationModal').modal('hide');
             return;
         }
-    }
 }
 
-
 function uploadfile_transcripts(fileName_Transcript) {
-
         var NIP = '<?php echo $NIP; ?>';                
         var type = 'TranscriptS3';
         var ext = 'PDF';
@@ -776,7 +725,6 @@ function uploadfile_transcripts(fileName_Transcript) {
                     }
                 });   
 }
-
 </script>
 
 <script>
@@ -866,8 +814,6 @@ function uploadfile_transcripts(fileName_Transcript) {
                 $('#btnDelete_SK_Dosen').prop('disabled',btnSK_Dosen).attr('data-file',d.SK_Dosen);
                 $('#btnDelete_SK_Pangkat').prop('disabled',btnSK_Pangkat).attr('data-file',d.SK_Pangkat);
                 $('#btnDelete_SK_JJA').prop('disabled',btnSK_JJA).attr('data-file',d.SK_JJA);
-
-
             });
         }
     }

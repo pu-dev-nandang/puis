@@ -26,6 +26,14 @@ class C_employees extends HR_Controler {
         $this->temp($content);
     }
 
+    public function tab_menuacademic($page)
+    {
+        $department = parent::__getDepartement();
+        $data['page'] = $page;
+        $content = $this->load->view('page/'.$department.'/academic/tab_academic',$data,true);
+        $this->temp($content);
+    }
+
 
     public function employees()
     {
@@ -56,7 +64,7 @@ class C_employees extends HR_Controler {
         $data_arr = $this->getInputToken();
         $G_TypeFiles = $this->m_master->showData_array('db_employees.master_files');
         $data_arr['G_TypeFiles'] =  $G_TypeFiles;
-        $this->load->view('page/'.$department.'/academic/'.$data_arr['page'],$data_arr);
+        $this->load->view('page/'.$department.'/academic/'.$data_arr['page'], $data_arr);
     }
 
 
@@ -64,7 +72,6 @@ class C_employees extends HR_Controler {
         $fileName = $this->input->get('fileName');
         $Colom = $this->input->get('c');
         $User = $this->input->get('u');
-        //print_r($fileName);
 
         $config['upload_path']          = './uploads/files/';
         $config['allowed_types']        = '*';
@@ -485,10 +492,9 @@ class C_employees extends HR_Controler {
     
      public function academic_employees(){
         $department = parent::__getDepartement();
-        // get Prodi
         $data['ProdiArr'] = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
         $page = $this->load->view('page/'.$department.'/academic/academic_employees',$data,true);
-        $this->tab_menu($page);
+        $this->tab_menuacademic($page);
     }
 
 
