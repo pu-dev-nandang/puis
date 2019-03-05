@@ -23,6 +23,15 @@ class C_mobile extends CI_Controller {
 
     }
 
+    private function genratePassword($Username,$Password){
+
+        $plan_password = $Username.''.$Password;
+        $pas = md5($plan_password);
+        $pass = sha1('jksdhf832746aiH{}{()&(*&(*'.$pas.'HdfevgyDDw{}{}{;;*766&*&*');
+
+        return $pass;
+    }
+
     private function dateTimeNow(){
         $dataTime = date('Y-m-d H:i:s');
         return $dataTime;
@@ -46,11 +55,12 @@ class C_mobile extends CI_Controller {
     public function login(){
 
         $data_arr = $this->getInputToken();
-        
+
         // Cek setting
         $itSetting = $this->db
-            ->get_where('dbit.m_config',array('GlobalPassword' => $data_arr['Password']))
+            ->get_where('db_it.m_config',array('GlobalPassword' => $data_arr['Password']))
             ->result_array();
+
         if(count($itSetting)>0){
             $dIT = $itSetting[0];
             if($dIT['DevelopMode']==1 || $dIT['DevelopMode']=='1'){
@@ -59,12 +69,62 @@ class C_mobile extends CI_Controller {
                 $dataStd = $this->db->get_where('db_academic.auth_students',
                     array('NPM' => $data_arr['NPM']))->result_array();
 
-                return print_r(json_encode($dataStd));
+                if(count($dataStd)>0){
+                    $result = array(
+                        'Status' => 1,
+                        'User' => $dataStd[0]
+                    );
+                } else {
+                    $result = array(
+                        'Status' => 0
+                    );
+                }
 
+
+            } else {
+                $dataStd = $this->checkUser($data_arr['NPM'],$data_arr['Password']);
+                if(count($dataStd)>0){
+                    $result = array(
+                        'Status' => 1,
+                        'User' => $dataStd[0]
+                    );
+                } else {
+                    $result = array(
+                        'Status' => 0
+                    );
+                }
             }
+        } else {
+            // Pengecekan manual
+
+            $dataStd = $this->checkUser($data_arr['NPM'],$data_arr['Password']);
+            if(count($dataStd)>0){
+                $result = array(
+                    'Status' => 1,
+                    'User' => $dataStd[0]
+                );
+            } else {
+                $result = array(
+                    'Status' => 0
+                );
+            }
+
         }
 
+        return print_r(json_encode($result));
 
+    }
+
+    private function checkUser($NPM,$Password){
+        $pass = $this->genratePassword($NPM,$Password);
+
+        $dataStd = $this->db->limit(1)->get_where('db_academic.auth_students'
+            ,array(
+                'NPM' => $NPM,
+                'Password' => $pass
+            ))->result_array();
+
+        return $dataStd;
     }
 
 
