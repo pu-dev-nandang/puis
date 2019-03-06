@@ -8646,12 +8646,12 @@ class C_api extends CI_Controller {
 
     public function test_data()
     {
-        $arr = array();
-        for ($i=0; $i < 15; $i++) { 
-            $arr[] = 'A'.$i;
-        }
+        // $arr = array();
+        // for ($i=0; $i < 15; $i++) { 
+        //     $arr[] = 'A'.$i;
+        // }
 
-        echo json_encode($arr);
+        echo json_encode('Alhadi Rahman');
     }
 
 }
