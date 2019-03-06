@@ -4931,6 +4931,7 @@ class C_api extends CI_Controller {
     public function crudAcademicData(){
 
         $data_arr = $this->getInputToken();
+        $IDuser = $this->session->userdata('NIP');
 
         if(count($data_arr)>0){
 
@@ -4938,7 +4939,6 @@ class C_api extends CI_Controller {
 
                 $formInsert = (array) $data_arr['formInsert'];
                 $type = 'S1';
-                
                 $NIP = $formInsert['NIP'];
                 $NoIjazah = strtoupper($formInsert['NoIjazah']);
                 $NameUniversity = strtoupper($formInsert['NameUniversity']);
@@ -4963,7 +4963,8 @@ class C_api extends CI_Controller {
                                 'TotalCredit' => $TotalCredit,
                                 'TotalSemester' => $TotalSemester,
                                 'IjazahFile' => $fileName,
-                                'TranscriptFile' => $file_trans
+                                'TranscriptFile' => $file_trans,
+                                'UserCreate' => $IDuser
                             );
                 $this->db->insert('db_employees.employees_academic', $dataSave);
                 return print_r(1);
@@ -4996,7 +4997,8 @@ class C_api extends CI_Controller {
                                 'TotalCredit' => $TotalCredit,
                                 'TotalSemester' => $TotalSemester,
                                 'IjazahFile' => $fileName,
-                                'TranscriptFile' => $file_trans
+                                'TranscriptFile' => $file_trans,
+                                'UserCreate' => $IDuser
                             );
                 $this->db->insert('db_employees.employees_academic', $dataSave);
                 return print_r(1);
@@ -5029,7 +5031,8 @@ class C_api extends CI_Controller {
                                 'TotalCredit' => $TotalCredit,
                                 'TotalSemester' => $TotalSemester,
                                 'IjazahFile' => $fileName,
-                                'TranscriptFile' => $file_trans
+                                'TranscriptFile' => $file_trans,
+                                'UserCreate' => $IDuser
                             );
                 $this->db->insert('db_employees.employees_academic', $dataSave);
                 return print_r(1);
@@ -5046,7 +5049,6 @@ class C_api extends CI_Controller {
                 $fileName = $formInsert['fileName'];
 
                 $Get_MasterFiles = $this->m_master->MasterfileStatus($type);
-        
                 $dataSave = array(
                                 'NIP' => $NIP,
                                 'TypeFiles' => $Get_MasterFiles[0]['ID'],

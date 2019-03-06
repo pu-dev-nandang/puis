@@ -133,17 +133,19 @@ $('#fileOther').change(function (event) {
     $(document).on('click','#btnreviewfiles', function () {
 
         var filesub = $(this).attr('filesub');
-       
-            $('#NotificationModal .modal-header').addClass('hide');
-            $('#NotificationModal .modal-body').html('<center> '+
-            '<iframe src="'+base_url_js+'uploads/files/'+filesub+'" frameborder="0" style="width:745px; height:550px;"></iframe> '+
-            '<br/><br/><button type="button" id="btnRemoveNoEditSc" class="btn btn-primary" data-dismiss="modal">Close</button><button type="button" id="btnRemoveNoEditSc" filesublix ="'+filesub+'" class="btn btn-primary pull-right filesublink" data-toggle="tooltip" data-placement="top" title="Full Review" data-dismiss="modal"><span class="fa fa-external-link"></span></button>' +
-            '</center>');
-            $('#NotificationModal .modal-footer').addClass('hide');
-            $('#NotificationModal').modal({
-                'backdrop' : 'static',
-                'show' : true
-            });
+        var url = ''+base_url_js+'uploads/files/'+filesub+' ';
+
+
+                $('#NotificationModal .modal-header').addClass('hide');
+                $('#NotificationModal .modal-body').html('<center> '+
+                '<iframe src="'+base_url_js+'uploads/files/'+filesub+'" frameborder="0" style="width:745px; height:550px;"></iframe> '+
+                '<br/><br/><button type="button" id="btnRemoveNoEditSc" class="btn btn-primary" data-dismiss="modal">Close</button><button type="button" id="btnRemoveNoEditSc" filesublix ="'+filesub+'" class="btn btn-primary pull-right filesublink" data-toggle="tooltip" data-placement="top" title="Full Review" data-dismiss="modal"><span class="fa fa-external-link"></span></button>' +
+                '</center>');
+                $('#NotificationModal .modal-footer').addClass('hide');
+                $('#NotificationModal').modal({
+                    'backdrop' : 'static',
+                    'show' : true
+                });
     });
 
     $(document).on('click','.filesublink', function () {
@@ -175,9 +177,9 @@ $('#fileOther').change(function (event) {
                     '         <tr style="background: #607d8b;color: #FFFFFF;">                      '+
                     '             <th style="width: 5%;text-align: center;">Type Files</th>         '+
                     '             <th style="width: 8%;text-align: center;">No.Document</th>        '+
-                    '             <th style="width: 8%;text-align: center;">Date Document</th>      '+
+                    '             <th style="width: 5%;text-align: center;">Date Document</th>      '+
                     '             <th style="width: 15%;text-align: center;">Description</th>       '+
-                    '             <th style="text-align: center;width: 5%;">Action</th>             '+
+                    '             <th style="text-align: center;width: 7%;">Action</th>             '+
                     '         </tr>                                                                  '+
                     '         </thead>                                                              '+
                     '         <tbody id="dataRow"></tbody>                                          '+
@@ -200,7 +202,8 @@ $('#fileOther').change(function (event) {
                     if (response[i]['Date_Files'] == null){
                          var datadate = '<center> - </center>';
                     } else {
-                         var datadate = ''+response[i]['Date_Files']+'';
+                         var dates = ''+response[i]['Date_Files']+'';
+                         var datadate = moment(dates).format('DD-MM-YYYY');
                     } 
 
                     if (response[i]['Description_Files'] == null){
@@ -212,9 +215,9 @@ $('#fileOther').change(function (event) {
                     $("#dataRow").append('<tr>                                                     '+
                     '            <td>'+response[i]['NameFiles']+'</td>                             '+       
                     '            <td>'+datadoc+'</td>                                               '+    
-                    '            <td>'+datadate+'</td>                                              '+                                                       
+                    '            <td><center>'+datadate+'</center></td>                                              '+                                                       
                     '             <td>'+datadesc+'</td>                                              '+    
-                    '            <td style="text-align: center;"><button class="btn btn-sm btn-primary testEdit3" data-toggle="tooltip" data-placement="top" title="Edit File" filesnametype="'+response[i]['NameFiles']+'" idtypex="'+response[i]['TypeFiles']+'" idfiles="'+response[i]['ID']+'" linkfileother="'+response[i]['LinkFiles']+'" namedoc ="'+response[i]['No_Document']+'"><i class="fa fa-edit"></i></button></td>      '+     
+                    '            <td style="text-align: center;"><button id="btnreviewfiles" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="top" title="Review Files" filesub="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i></button> | <button class="btn btn-sm btn-primary testEdit3" data-toggle="tooltip" data-placement="top" title="Edit File" filesnametype="'+response[i]['NameFiles']+'" idtypex="'+response[i]['TypeFiles']+'" idfiles="'+response[i]['ID']+'" linkfileother="'+response[i]['LinkFiles']+'" namedoc ="'+response[i]['No_Document']+'"><i class="fa fa-edit"></i></button> </td>      '+     
                     '         </tr>');
 
                 }
@@ -548,6 +551,7 @@ $('#btnSaveEditFiles').click(function () {
                     && DescriptionFile!='' && DescriptionFile!=null
                     && DateDocument!='' && DateDocument!=null
                     && type!='' && type!=null
+                    && oFile!='' && oFile!=null
                     ){ 
                     loading_button('#btnSubmitFiles');
                     $('#btnCloseEmployees').prop('disabled',true);
@@ -571,11 +575,13 @@ $('#btnSaveEditFiles').click(function () {
                             toastr.error('NIK / NIP is exist','Error');
                         } else {  //if success save data
                 
-                            var formData = new FormData( $("#tagFM_OtherFile")[0]);
-                            var action = 'OtherFiles';
-                            var url = base_url_js+'human-resources/upload_academic?fileName='+fileName+'&c='+type+'&action='+action+'&u='+NIP;
-                                 
-                                $.ajax({
+                            if ($('#fileOther').get(0).files.length === 0) {
+                                } else {
+                                    var formData = new FormData( $("#tagFM_OtherFile")[0]);
+                                    var action = 'OtherFiles';
+                                    var url = base_url_js+'human-resources/upload_academic?fileName='+fileName+'&c='+type+'&action='+action+'&u='+NIP;
+                                     
+                                    $.ajax({
                                         url : url,  // Controller URL
                                         type : 'POST',
                                         data : formData,
@@ -586,10 +592,8 @@ $('#btnSaveEditFiles').click(function () {
                                         success : function(data) {
                                     }
                                 });   
-
-                                //uploadfile_transcripts(fileName_Transcript);
-                                toastr.success('Academic Data Saved','Success');
-
+                            }
+                                toastr.success('Other Data Saved','Success');
                         }
                             setTimeout(function () {
                                 $('#NotificationModal').modal('hide');

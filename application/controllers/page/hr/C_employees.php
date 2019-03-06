@@ -353,8 +353,7 @@ class C_employees extends HR_Controler {
                 $fileName = $this->input->get('fileName');
                 $Colom = $this->input->get('c');
                 $User = $this->input->get('u');
-                //print_r($fileName);
-
+                
                 $config['upload_path']          = './uploads/files/';
                 $config['allowed_types']        = '*';
                 $config['max_size']             = 8000; // 8 mb
