@@ -310,6 +310,16 @@ class C_transaksi extends Vreservation_Controler {
                                                 {
                                                     // find by division and position
                                                     $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionMain',$IDDivision.'.'.$IDPositionApprover);
+                                                    $arr = array();
+                                                    for ($k=0; $k < count($getApprover1); $k++) {
+                                                        if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
+                                                            $arr[] =  $getApprover1[$k];
+                                                        } 
+                                                       
+                                                    }
+
+                                                    $getApprover1 = $arr;
+                                                    
                                                     if (count($getApprover1) == 0) {
                                                         $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionOther1',$IDDivision.'.'.$IDPositionApprover);
                                                         if (count($getApprover1) == 0) {
