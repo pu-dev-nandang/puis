@@ -997,7 +997,7 @@
             var formSemesterID = $('#formSemesterID').val();
 
             var url = base_url_js+'api/__crudJadwalUjian';
-            var token = jwt_encode({action:'checkDateExam',SemesterID:formSemesterID},'UAP)(*');
+            var token = jwt_encode({action:'checkDateExam',SemesterID:formSemesterID,Type:dataForm},'UAP)(*');
 
             $( "#formDate" ).val('');
             $( "#formDate" ).datepicker( "destroy" );
