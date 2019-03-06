@@ -60,13 +60,13 @@
                                     <div class="col-xs-6">
                                         <div class="form-group">
                                             <label>Grade/ IPK</label>
-                                            <input class="form-control" id="gradeS2" maxlength="4">
+                                            <input class="form-control" id="gradeS2" maxlength="4" oninput="this.value = this.value.replace(/[^0-9.]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');">
                                         </div>
                                     </div>
                                     <div class="col-xs-3">
                                         <div class="form-group">
                                             <label>Total Credit</label>
-                                            <input class="form-control" id="totalCreditS2" maxlength="3">
+                                            <input class="form-control" id="totalCreditS2" maxlength="3" oninput="this.value = this.value.replace(/[^0-9.]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');">
                                         </div>
                                     </div>
 
@@ -198,32 +198,18 @@ function loadAcademicS2Details() {
                 var no = 1;
                 var orbs=0;
                 for (var i = 0; i < response.length; i++) {
-                    var listdatas1 = response[i]['LinkFiles']; 
-
-                    for (var j = i+1; j < response.length; j++) {
-                        if (response[i]['NIP'] == response[j]['NIP'] && response[i]['NameUniversity'] == response[j]['NameUniversity']) {
-                            var listdatas2 = response[j]['LinkFiles'];
-                        }
-                        else
-                        {
-                            i = j-1;
-                            break;
-                        }
-                        
-                       i = j;
-                    }
+                    var listdatas1 = response[i]['IjazahFile']; 
+                    var listdatas2 = response[i]['TranscriptFile']; 
 
                     $("#dataRow").append('<tr>                                                          '+
-                    '            <td> '+srata+' </td>                                                          '+         
+                    '            <td> '+srata+' </td>                                                   '+         
                     '            <td> '+response[i]['NameUniversity']+' </td>                           '+                             
-                    '            <td><center><button id="btnreviewfiles1" class="btn btn-sm btn-default btn-default-primary" filesub="'+listdatas1+'"><i class="fa fa-eye margin-right"></i> Preview Ijazah</button></center></td>                                                '+    
-                    '            <td><center><button id="btnreviewfiles1" class="btn btn-sm btn-default btn-default-success" filesub="'+listdatas2+'"><i class="fa fa-eye margin-right"></i> Preview Transcript</button> </center></td>                                              '+                                                       
+                    '            <td><center><button id="btnreviewfiles1" class="btn btn-sm btn-default btn-default-primary" filesub="'+listdatas1+'"><i class="fa fa-eye margin-right"></i> Preview</button></center></td>                                                '+    
+                    '            <td><center><button id="btnreviewfiles1" class="btn btn-sm btn-default btn-default-success" filesub="'+listdatas2+'"><i class="fa fa-eye margin-right"></i> Preview</button> </center></td>                                              '+                                                       
                     '            <td style="text-align: center;"><button id="btnedits1" class="btn btn-sm btn-primary testEdit2" data-toggle="tooltip" data-placement="top" title="Edit" nameuniv= "'+response[i]['NameUniversity']+'" fileijazahs1 ="'+listdatas1+'" filetranscripts1 ="'+listdatas2+'"><i class="fa fa-edit"></i></button></td>      '+     
                     '         </tr> ');
-                }
-                
+                }   
              }
-
         });
     };
 
@@ -603,7 +589,7 @@ function loadAcademicS2Details() {
     $('#btnSave').click(function () {
         var NIP = $('#formNIP').val();
         $('#NotificationModal .modal-body').html('<div style="text-align: center;">' +
-            'Pastikan Data & File Academic S2 tidak salah! <br/>' +
+            'Pastikan data form & File Academic S2 tidak salah! <br/>' +
             'Periksa kembali data yang di input sebelum di Save. ' +
             '<hr/>' +
             '<button type="button" class="btn btn-default" id="btnCloseEmployees" data-dismiss="modal">Close</button> | ' +
@@ -619,40 +605,6 @@ function loadAcademicS2Details() {
     $(document).on('click','#btnSubmitEmployees',function () {
         saveEmployeesS2();
     });
-
-    function file_validation(ID_element)
-    {
-        var files = $('#'+ID_element)[0].files;
-        var error = '';
-        var msgStr = '';
-       var name = files[0].name;
-        //console.log(name);
-        var extension = name.split('.').pop().toLowerCase();
-        if(jQuery.inArray(extension, ['xlsx']) == -1)
-        {
-         msgStr += 'Invalid Type File<br>';
-        }
-
-        var oFReader = new FileReader();
-        oFReader.readAsDataURL(files[0]);
-        var f = files[0];
-        var fsize = f.size||f.fileSize;
-        //console.log(fsize);
-
-        if(fsize > 2000000) // 2mb
-        {
-         msgStr += 'File Size is very big<br>';
-        }
-
-        if (msgStr != '') {
-          toastr.error(msgStr, 'Failed!!');
-          return false;
-        }
-        else
-        {
-          return true;
-        }
-    }
 
     function saveEmployeesS2() {
 
@@ -674,8 +626,8 @@ function loadAcademicS2Details() {
         var TypeTrans = 'TranscriptS2';
         var fileName_Transcript = TypeTrans+'_'+NIP+'_'+random+'.'+ext;
 
-        //var oFile = document.getElementById("fileIjazah").files[0]; 
-        //var xFile = document.getElementById("fileTranscript").files[0]; 
+        var oFile = document.getElementById("fileIjazah").files[0]; 
+        var xFile = document.getElementById("fileTranscript").files[0]; 
 
          if(formNIP!=null && formNIP!=''
                     && formNoIjazahS2!='' && formNoIjazahS2!=null
@@ -686,12 +638,13 @@ function loadAcademicS2Details() {
                     && gradeS2!='' && gradeS2!=null
                     && totalCreditS2!='' && totalCreditS2!=null
                     && TotSemesterS2!='' && TotSemesterS2!=null 
+                    && oFile!='' && oFile!=null 
+                    && xFile!='' && xFile!=null 
                     ){ 
                     loading_button('#btnSubmitEmployees');
                     $('#btnCloseEmployees').prop('disabled',true);
 
                     var data = {
-                        //action : 'addEmployees',
                         action : 'addAcademicS2',
                         formInsert : {
                                 NIP : formNIP,
@@ -713,10 +666,12 @@ function loadAcademicS2Details() {
                     
                         if(result==0 || result=='0'){
                             toastr.error('NIK / NIP is exist','Error');
-                        } else {  //if success save data
-                
-                                var formData = new FormData( $("#tagFM_IjazahS2")[0]);
-                                var url = base_url_js+'human-resources/upload_academic?fileName='+fileName+'&c='+type+'&u='+NIP;        
+                        } else { 
+
+                            if ($('#fileIjazah').get(0).files.length === 0) {
+                                } else {
+                                    var formData = new FormData( $("#tagFM_IjazahS2")[0]);
+                                    var url = base_url_js+'human-resources/upload_academic?fileName='+fileName+'&c='+type+'&u='+NIP;        
                                     $.ajax({
                                             url : url,  // Controller URL
                                             type : 'POST',
@@ -727,11 +682,14 @@ function loadAcademicS2Details() {
                                             processData : false,
                                             success : function(data) {
                                             }
-                                    });   
+                                    });
 
-                                uploadfile_transcripts(fileName_Transcript);
-                                toastr.success('Academic Data Saved','Success');
-
+                                if ($('#fileTranscript').get(0).files.length === 0) {
+                                    } else {
+                                        uploadfile_transcripts(fileName_Transcript);
+                                    } 
+                                    toastr.success('Document Saved With File.','Success');    
+                                }
                         }
                             setTimeout(function () {
                                 $('#NotificationModal').modal('hide');
@@ -741,7 +699,7 @@ function loadAcademicS2Details() {
                         });
                  }
         else {
-            toastr.error('Form Masih ada yang kosong','Error');
+            toastr.error('Form or academic files are still empty!','Error');
             $('#NotificationModal').modal('hide');
             return;
         }

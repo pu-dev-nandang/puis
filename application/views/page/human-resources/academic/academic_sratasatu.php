@@ -60,13 +60,13 @@
                                 	<div class="col-xs-6">
                                     	<div class="form-group">
                                         	<label>Grade/ IPK</label>
-                                        	<input class="form-control" id="gradeS1" maxlength="4">
+                                        	<input class="form-control" oninput="this.value = this.value.replace(/[^0-9.]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');" id="gradeS1" maxlength="4">
                                     	</div>
                                 	</div>
                                 	<div class="col-xs-3">
                                     	<div class="form-group">
                                         	<label>Total Credit</label>
-                                        	<input class="form-control" id="totalCreditS1" maxlength="3">
+                                        	<input class="form-control" oninput="this.value = this.value.replace(/[^0-9.]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');" id="totalCreditS1" maxlength="3">
                                     	</div>
                                 	</div>
 
@@ -180,12 +180,12 @@ $(document).ready(function () {
         loadAcademicS1Details();
     });
 
-
     $(document).on('click','#btnreviewfiles', function () {
 
         var filesub = $(this).attr('filesub');
-       
-            $('#NotificationModal .modal-header').addClass('hide');
+        //var url = ''+base_url_js+'uploads/files/'+filesub+' ';
+
+           $('#NotificationModal .modal-header').addClass('hide');
             $('#NotificationModal .modal-body').html('<center> '+
             '<iframe src="'+base_url_js+'uploads/files/'+filesub+'" frameborder="0" style="width:745px; height:550px;"></iframe> '+
             '<br/><br/><button type="button" id="btnRemoveNoEditSc" class="btn btn-primary" data-dismiss="modal">Close</button><button type="button" id="btnRemoveNoEditSc" filesublix ="'+filesub+'" class="btn btn-primary pull-right filesublink" data-toggle="tooltip" data-placement="top" title="Full Review" data-dismiss="modal"><span class="fa fa-external-link"></span></button>' +
@@ -194,7 +194,7 @@ $(document).ready(function () {
             $('#NotificationModal').modal({
                 'backdrop' : 'static',
                 'show' : true
-            });
+            }); 
     });
 
     $(document).on('click','.filesublink', function () {
@@ -202,9 +202,6 @@ $(document).ready(function () {
         var url = base_url_js+'uploads/files/'+filesubx;
         window.open(url, '_blank',);
     });
-
-
-
 
     $(document).on('click','.testEdit', function () {
 
@@ -399,7 +396,7 @@ $(document).ready(function () {
                         '                        <div class="form-group"> '+
                         '                            <label class="btn btn-sm btn-default btn-default-warning btn-upload">  '+
                          '                                   <i class="fa fa-upload margin-right"></i> Change File          '+
-                         '                                   <input type="file" id="fileIjazah" name="userfile" class="upload_files1" style="display: none;" data-fm="tagFM_IjazahS1" accept="application/pdf"> '+
+                         '                                   <input type="file" id="fileIjazah" name="userfile" class="upload_files1" style="display: none;" data-fm="tagFM_IjazahS1" accept="application/pdf" disabled> '+
                         '                             </label> '+
                         '                        <p style="font-size: 12px;color: #FF0000;">*) Only PDF Files Max Size 5 MB</p> '+
                         '                    </div></form> '+
@@ -414,7 +411,7 @@ $(document).ready(function () {
                         '                                <div class="form-group">                           '+
                         '                                    <label class="btn btn-sm btn-default btn-default-warning btn-upload"> '+
                         '                                        <i class="fa fa-upload margin-right"></i> Change File '+
-                        '                                        <input type="file" id="fileTranscript" name="userfile" class="upload_files2" style="display: none;" accept="application/pdf">                                                                     '+
+                        '                                        <input type="file" id="fileTranscript" name="userfile" class="upload_files2" style="display: none;" accept="application/pdf" disabled>                                                                     '+
                         '                                </label>                                                                '+
                         '                         <p style="font-size: 12px;color: #FF0000;">*) Only PDF Files Max Size 5 MB</p> '+
                         '                    </div></form>                                                                       '+
@@ -455,14 +452,11 @@ $(document).ready(function () {
         var NIP = '<?php echo $NIP; ?>';
         var srata = 'S1';
         var url = base_url_js+'api/__reviewacademics1?NIP='+NIP+'&s='+srata;
-
         var token = jwt_encode({
             action:'read',
             NIP:NIP},'UAP)(*');
 
         $.post(url,{token:token},function (resultJson) {
-
-            //console.log(resultJson);
             var response = resultJson;
                 $("#loadtablefiles1").append(
                     ' <div class="table-responsive">                                                '+
@@ -484,26 +478,26 @@ $(document).ready(function () {
                 var no = 1;
                 var orbs=0;
                 for (var i = 0; i < response.length; i++) {
-                    var listdatas1 = response[i]['LinkFiles']; 
+                    var listdatas1 = response[i]['IjazahFile']; 
+                    var listdatas2 = response[i]['TranscriptFile']; 
 
-                    for (var j = i+1; j < response.length; j++) {
-                        if (response[i]['NIP'] == response[j]['NIP'] && response[i]['NameUniversity'] == response[j]['NameUniversity']) {
-                            var listdatas2 = response[j]['LinkFiles'];
-                        }
-                        else
-                        {
-                            i = j-1;
-                            break;
-                        }
-                        
-                       i = j;
-                    }
+                    //for (var j = i+1; j < response.length; j++) {
+                    //    if (response[i]['NIP'] == response[j]['NIP'] && response[i]['NameUniversity'] == response[j]['NameUniversity']) {
+                    //        var listdatas2 = response[j]['TranscriptFile'];
+                    //    }
+                    //    else
+                    //    {
+                    //        i = j-1;
+                    //        break;
+                    //    }  
+                    //   i = j;
+                    //}
 
                     $("#dataRow").append('<tr>                                                          '+
                     '            <td> S1 </td>                                                          '+         
                     '            <td> '+response[i]['NameUniversity']+' </td>                           '+                             
-                    '            <td><center><button id="btnreviewfiles" class="btn btn-sm btn-default btn-default-primary" filesub="'+listdatas1+'"><i class="fa fa-eye margin-right"></i> Preview Ijazah</button></center></td>                                                '+    
-                    '            <td><center><button id="btnreviewfiles" class="btn btn-sm btn-default btn-default-success" filesub="'+listdatas2+'"><i class="fa fa-eye margin-right"></i> Preview Transcript</button> </center></td>                                              '+                                                       
+                    '            <td><center><button id="btnreviewfiles" class="btn btn-sm btn-default btn-default-primary" filesub="'+listdatas1+'"><i class="fa fa-eye margin-right"></i> Preview</button></center></td>                                                '+    
+                    '            <td><center><button id="btnreviewfiles" class="btn btn-sm btn-default btn-default-success" filesub="'+listdatas2+'"><i class="fa fa-eye margin-right"></i> Preview</button> </center></td>                                              '+                                
                     '            <td style="text-align: center;"><button id="btnedits1" class="btn btn-sm btn-primary testEdit" data-toggle="tooltip" data-placement="top" title="Edit" nameuniv= "'+response[i]['NameUniversity']+'" fileijazahs1 ="'+listdatas1+'" filetranscripts1 ="'+listdatas2+'"><i class="fa fa-edit"></i></button></td>      '+     
                     '         </tr> ');
                 }
@@ -603,7 +597,6 @@ $(document).ready(function () {
                     $('#btnCloseEmployees').prop('disabled',true);
 
                     var data = {
-                        //action : 'addEmployees',
                         action : 'editAcademicS1',
                         formInsert : {
                                 NIP : formNIP,
@@ -651,7 +644,7 @@ $(document).ready(function () {
     $('#btnSave').click(function () {
         var NIP = $('#formNIP').val();
         $('#NotificationModal .modal-body').html('<div style="text-align: center;">' +
-            'Pastikan Data & File Academic S1 tidak salah! <br/>' +
+            'Pastikan data form & File Academic S1 tidak salah! <br/>' +
             'Periksa kembali data yang di input sebelum di Save. ' +
             '<hr/>' +
             '<button type="button" class="btn btn-default" id="btnCloseEmployees" data-dismiss="modal">Close</button> | ' +
@@ -702,6 +695,8 @@ $(document).ready(function () {
                     && gradeS1!='' && gradeS1!=null
                     && totalCreditS1!='' && totalCreditS1!=null
                     && TotSemesterS1!='' && TotSemesterS1!=null 
+                    && oFile!='' && oFile!=null 
+                    && xFile!='' && xFile!=null 
                     ){ 
                     loading_button('#btnSubmitEmployees');
                     $('#btnCloseEmployees').prop('disabled',true);
@@ -709,18 +704,18 @@ $(document).ready(function () {
                     var data = {
                         action : 'addAcademicS1',
                         formInsert : {
-                                NIP : formNIP,
-                                NoIjazah : formNoIjazahS1,
-                                NameUniversity : formNameUnivS1,
-                                IjazahDate : formIjazahDate,
-                                Major : formMajorS1,
-                                ProgramStudy : formStudyS1,
-                                Grade : gradeS1,
-                                TotalCredit : totalCreditS1,
-                                TotalSemester : TotSemesterS1,
-                                file_trans : fileName_Transcript,
-                                fileName : fileName }
-                            };
+                            NIP : formNIP,
+                            NoIjazah : formNoIjazahS1,
+                            NameUniversity : formNameUnivS1,
+                            IjazahDate : formIjazahDate,
+                            Major : formMajorS1,
+                            ProgramStudy : formStudyS1,
+                            Grade : gradeS1,
+                            TotalCredit : totalCreditS1,
+                            TotalSemester : TotSemesterS1,
+                            file_trans : fileName_Transcript,
+                            fileName : fileName }
+                    };
 
                     var token = jwt_encode(data,'UAP)(*');
                     var url = base_url_js+'api/__crudAcademicData';
@@ -729,10 +724,11 @@ $(document).ready(function () {
                         if(result==0 || result=='0'){
                             toastr.error('NIK / NIP is exist','Error');
                         } else {  //if success save data
-                
-                                var formData = new FormData( $("#tagFM_IjazahS1")[0]);
-                                var url = base_url_js+'human-resources/upload_academic?fileName='+fileName+'&c='+type+'&u='+NIP;
-                                            
+
+                            if ($('#fileIjazah').get(0).files.length === 0) {
+                                } else {
+                                    var formData = new FormData( $("#tagFM_IjazahS1")[0]);
+                                    var url = base_url_js+'human-resources/upload_academic?fileName='+fileName+'&c='+type+'&u='+NIP;
                                     $.ajax({
                                             url : url,  
                                             type : 'POST',
@@ -743,25 +739,26 @@ $(document).ready(function () {
                                             processData : false,
                                             success : function(data) {
                                             }
-                                    });   
-
-                                uploadfile_transcripts(fileName_Transcript);
-                                toastr.success('File Document Saved','Success');
-
-                            }   
-                                setTimeout(function () {
-                                    $('#NotificationModal').modal('hide');
-                                    window.location.href = '';
-                                },1000);
+                                    });
+                                    if ($('#fileTranscript').get(0).files.length === 0) {
+                                    } else {
+                                        uploadfile_transcripts(fileName_Transcript);
+                                    }    
+                                    toastr.success('Document Saved With File','Success'); 
+                                }
+                        }   
+                            setTimeout(function () {
+                                $('#NotificationModal').modal('hide');
+                                window.location.href = '';
+                            },1000);
                     });
                 }
 
         else {
-            toastr.error('Form Masih ada yang kosong','Error');
+            toastr.error('form or academic files are still empty!','Error');
             $('#NotificationModal').modal('hide');
             return;
         }
-
     }
 
 

@@ -777,9 +777,9 @@ class M_api extends CI_Model {
     // ====== Get Academic Employee Files =======
      public function views_otherfile($NIP) {
         $sql = "SELECT f.*, m.NameFiles
-            FROM db_employees.files AS F
-            LEFT JOIN db_employees.master_files AS M ON (f.TypeFiles = m.ID)
-            WHERE F.NIP = '".$NIP."' AND M.Type = '1' ";
+            FROM db_employees.files AS f
+            LEFT JOIN db_employees.master_files AS m ON (f.TypeFiles = m.ID)
+            WHERE f.NIP = '".$NIP."' AND m.Type ='1' ";
 
         $query=$this->db->query($sql, array());
         return $query->result_array();
@@ -787,35 +787,12 @@ class M_api extends CI_Model {
 
      public function views_files1($NIP,$srata) {
         
-        if($srata == "S1") {
-            $sql = "SELECT a.*, b.TypeFiles AS NamaFiles, c.NameUniversity
-            FROM db_employees.files AS a 
-            LEFT JOIN db_employees.master_files AS b ON (a.TypeFiles = b.ID)
-            LEFT JOIN db_employees.employees_academic AS c ON (a.NIP = c.NIP) AND (a.LinkFiles = c.IjazahFile) OR (a.LinkFiles = c.TranscriptFile)
-            WHERE a.NIP = '".$NIP."' AND a.TypeFiles IN ('1','2') ";
+        $sql = "SELECT *
+            FROM db_employees.employees_academic
+            WHERE NIP='".$NIP."' AND TypeAcademic='".$srata."' ";
 
             $query=$this->db->query($sql, array());
             return $query->result_array();
-
-        }else if($srata == "S2"){
-            $sql = "SELECT a.*, b.TypeFiles AS NamaFiles, c.NameUniversity
-            FROM db_employees.files AS a 
-            LEFT JOIN db_employees.master_files AS b ON (a.TypeFiles = b.ID)
-            LEFT JOIN db_employees.employees_academic AS c ON (a.NIP = c.NIP) AND (a.LinkFiles = c.IjazahFile) OR (a.LinkFiles = c.TranscriptFile)
-            WHERE a.NIP = '".$NIP."' AND a.TypeFiles IN ('3','4') ";
-
-            $query=$this->db->query($sql, array());
-            return $query->result_array();
-        } else {
-            $sql = "SELECT a.*, b.TypeFiles AS NamaFiles, c.NameUniversity
-            FROM db_employees.files AS a 
-            LEFT JOIN db_employees.master_files AS b ON (a.TypeFiles = b.ID)
-            LEFT JOIN db_employees.employees_academic AS c ON (a.NIP = c.NIP) AND (a.LinkFiles = c.IjazahFile) OR (a.LinkFiles = c.TranscriptFile)
-            WHERE a.NIP = '".$NIP."' AND a.TypeFiles IN ('5','6') ";
-
-            $query=$this->db->query($sql, array());
-            return $query->result_array();
-        }
         
     }
 
@@ -871,7 +848,6 @@ class M_api extends CI_Model {
                                            GROUP BY s.ID ')->result_array();
 
         $res = $dataDay;
-
         return $res;
 
     }
