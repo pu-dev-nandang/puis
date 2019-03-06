@@ -4240,6 +4240,10 @@ class C_api extends CI_Controller {
                 $data = $this->m_api->getDateExam($data_arr['SemesterID'],$data_arr['Type']);
                 return print_r(json_encode($data));
             }
+            else if($data_arr['action']=='checkDateExam4Edit'){
+                $data = $this->m_api->getDateExamInEdit($data_arr['SemesterID']);
+                return print_r(json_encode($data));
+            }
             else if($data_arr['action']=='checkDateExam4Input'){
                 $data = $this->m_api->getDateExam4input($data_arr['SemesterID']);
                 return print_r(json_encode($data));

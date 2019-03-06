@@ -2370,6 +2370,13 @@ class M_api extends CI_Model {
 
     }
 
+    public function getDateExamInEdit($SemesterID){
+        $data = $this->db->query('SELECT * FROM db_academic.academic_years 
+                                          WHERE SemesterID = "'.$SemesterID.'" 
+                                          LIMIT 1')->result_array();
+        return (count($data))? $data[0] : [];
+    }
+
     public function getDateExam4input($SemesterID){
         $data = $this->db->query('SELECT * FROM db_academic.academic_years
                                           WHERE SemesterID = "'.$SemesterID.'"
