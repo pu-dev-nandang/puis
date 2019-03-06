@@ -2285,6 +2285,17 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                                                             }
                                                                         }
                                                                     }
+                                                                    elseif ($DivisionCreated[0] == 14) { // Lecturer
+                                                                       $ProdiID = $dd[0]['ProdiID'];
+                                                                       $G_Prodi = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+                                                                       $Kaprodi = $G_Prodi[0]['KaprodiID'];
+                                                                       if ($Kaprodi == $NIP) {
+                                                                           $find++;
+                                                                           $getLoop = false;     
+                                                                           break;
+                                                                       }
+
+                                                                    }
                                                                     else
                                                                     {
                                                                         // find by division and position
@@ -3752,9 +3763,18 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                             
                                         }
                                     }
+                                    elseif ($IDDivision == 14) { // lecturer
+                                        $ProdiID = $EM[0]['ProdiID'];
+                                        $G_Prodi = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+                                        $Kaprodi = $G_Prodi[0]['KaprodiID'];
+                                        $G_Kaprodi = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Kaprodi);
+                                        $Name =  $G_Kaprodi[0]['Name'];
+                                    }
                                     else
                                     {
+
                                         // find by division and position
+                                        // print_r($IDPositionApprover);
                                         $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionMain',$IDDivision.'.'.$IDPositionApprover);
                                         if (count($getApprover1) == 0) {
                                             $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionOther1',$IDDivision.'.'.$IDPositionApprover);
@@ -3765,6 +3785,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                                 }
                                             }
                                         }
+
                                         for ($k=0; $k < count($getApprover1); $k++) {
                                             if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
                                                 $Name =  $getApprover1[$k]['Name'];
