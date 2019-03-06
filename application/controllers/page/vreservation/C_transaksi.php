@@ -298,6 +298,14 @@ class C_transaksi extends Vreservation_Controler {
                                                         
                                                     }
                                                 }
+                                                elseif ($IDDivision == 14) { // lecturer
+                                                    $EM = $this->m_master->caribasedprimary('db_employees.employees','NIP',$this->session->userdata('NIP'));
+                                                    $ProdiID = $EM[0]['ProdiID'];
+                                                    $G_Prodi = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+                                                    $Kaprodi = $G_Prodi[0]['KaprodiID'];
+                                                    $G_Kaprodi = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Kaprodi);
+                                                    $dataApprover[0] = array('Email' => $G_Kaprodi[0]['EmailPU'],'Name' => $G_Kaprodi[0]['Name'],'Code' => $G_Kaprodi[0]['NIP'],'TypeApprover' => $TypeApprover);
+                                                }
                                                 else
                                                 {
                                                     // find by division and position
