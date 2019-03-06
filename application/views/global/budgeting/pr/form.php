@@ -337,9 +337,6 @@
 										'<input type = "text" class = "form-control" id = "ppn"><b>%</b>'+
 									'</div>'+
 								'</div>'+
-								'<div class = "col-sm-6 col-md-offset-4">'+
-									'<h3 id = "phtmltotal" align = "right"> Total : '+formatRupiah(0)+'</h3>'+
-								'</div>'+
 							'</div>';
 			var Notes = 	'<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
 								'<div class = "col-md-6">'+
@@ -347,6 +344,9 @@
 										'<label>Note</label>'+
 										'<textarea id= "Notes" class = "form-control" rows = "4"></textarea>'+
 									'</div>'+
+								'</div>'+
+								'<div class = "col-md-6">'+
+									'<h3 id = "phtmltotal" align = "right"> Total : '+formatRupiah(0)+'</h3>'+
 								'</div>'+
 							'</div>';
 
@@ -359,7 +359,7 @@
 								'</div>'+
 							'</div>';			
 
-			$("#Page_Input_PR").html(html+InputTax+Notes+Supporting_documents+SaveBtn);
+			$("#Page_Input_PR").html(InputTax+html+Notes+Supporting_documents+SaveBtn);
 			$("#ppn").maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
 			$("#ppn").maskMoney('mask', '9894');
 			AddingTable();
@@ -683,8 +683,21 @@
 			AddingTable();
 		})
 
-		$(document).off('click', '#ppn').on('click', '#ppn',function(e) {
+		$(document).off('change', '#ppn').on('change', '#ppn',function(e) {
+			// delete row combine is exist 
+			var PostBudgetDepartmentCombine = [];
+			var tableRow = $('#table_input_pr td:eq(12)').filter(function() {
+			    return $(this).text() != 'No';
+			}).closest("tr");
+			if (tableRow.length) {
+							tableRow
+				              .remove();
+				toastr.info('Row data containing combine have been deleted');              
+			}
+
 			_BudgetRemaining();
+			SortByNumbering();
+			              
 		})
 
 		function AddingTable()
@@ -692,7 +705,7 @@
 			var fill = '';
 			var getfill = function(No){
 				var action = '<td></td>';
-				if (No > 1) {
+				if (No >= 1) {
 					action = '<td><button type="button" class="btn btn-danger btn-delete btn-delete-item"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button></td>';
 				}
 
@@ -770,6 +783,10 @@
 
 				return a;				
 			}
+
+			var rowCount = $('#table_input_pr tr').length;
+			No = rowCount;
+
 
 			if ($("#table_input_pr tbody").children().length == 0) {
 				fill = getfill(No);
@@ -1211,15 +1228,141 @@
 			
 		})
 
-		$(document).off('keyup', '#ppn').on('keyup', '#ppn',function(e) {
-			_BudgetRemaining();
-		})
+		// $(document).off('keyup', '#ppn').on('keyup', '#ppn',function(e) {
+		// 	// delete row combine is exist 
+		// 	var PostBudgetDepartmentCombine = [];
+		// 	var tableRow = $('#table_input_pr td:eq(12)').filter(function() {
+		// 	    return $(this).text() != 'No';
+		// 	}).closest("tr");
+		// 				tableRow
+		// 	              .remove();
+		// 	              _BudgetRemaining();
+		// 	              SortByNumbering();
+
+		// })
+
+		function _BudgetRemaining()
+		{
+			loading_page('#Page_Budget_Remaining');
+			BudgetRemaining = [];
+			var arr_temp = [];
+			$('.PostBudgetItem').each(function(){
+				var id_budget_left = $(this).attr('id_budget_left');
+				var fillItem = $(this).closest('tr');
+				var SubTotal = fillItem.find('td:eq(9)').find('.SubTotal').val();
+				var SubTotal = findAndReplace(SubTotal, ".","");
+				var Persent = (parseInt(ppn) / 100) * SubTotal;
+				SubTotal = parseInt(SubTotal) + parseInt(Persent);
+				PostBudgetItem = fillItem.find('td:eq(2)').find('.PostBudgetItem').val();
+				NameDepartement = fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('namedepartement');
+				Departement = fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('departement');
+				var No = fillItem.find('td:eq(0)').text();
+				// cek data di PostBudgetDepartmentCombine
+					var bool = false
+					var combine = [];	;
+					for (var i = 0; i < PostBudgetDepartmentCombine.length; i++) {
+						var NoDT = PostBudgetDepartmentCombine[i]['No'];
+						var dt = PostBudgetDepartmentCombine[i]['dt'];
+						if (NoDT == No) {
+							for (var j = 0; j < dt.length; j++) {
+								combine.push(dt[j]);
+							}
+							bool = true;
+							
+							break;
+						}
+					}
+
+				
+				var temp = {
+					id_budget_left : id_budget_left,
+					PostBudgetItem : PostBudgetItem,
+					No : No,
+					Departement : Departement,
+					NameDepartement : NameDepartement,
+					SubTotal : SubTotal,
+					combine : combine,
+				};
+
+				arr_temp.push(temp);
+			})
+
+			arr_temp.sort(function(a, b){
+			    var keyA = new Date(a.id_budget_left),
+			        keyB = new Date(b.id_budget_left);
+			    // Compare the 2 dates
+			    if(keyA < keyB) return -1;
+			    if(keyA > keyB) return 1;
+			    return 0;
+			});
+			PostBudgetDepartment = JSON.parse(localStorage.getItem("PostBudgetDepartment"));
+			for (var i = 0; i < arr_temp.length; i++) {
+				var id_budget_left = arr_temp[i]['id_budget_left'];
+				var Remaining = 0;
+				// process remaining
+				for (var j = 0; j < PostBudgetDepartment.length; j++) {
+					var B_id_budget_left = PostBudgetDepartment[j].ID;
+					if (B_id_budget_left == id_budget_left) {
+						Remaining = PostBudgetDepartment[l].Value;
+						break;
+					}
+				}
+
+				// cek bantuan combine
+				var Combine = arr_temp[i]['combine'];
+				if (Combine.length > 0) {
+					for (var j = 0; j < Combine.length; j++) {
+						cost = Combine[j]['cost'];
+						Remaining = parseInt(Remaining) + parseInt(cost);
+					}
+				}
+
+
+				Remaining = parseInt(Remaining) - parseInt(arr_temp[i]['SubTotal']);
+				// search id_budget_left yang sama
+				for (var j = i+1; j < arr_temp.length; j++) {
+					var id_budget_left2 = arr_temp[j]['id_budget_left'];
+					if (id_budget_left == id_budget_left2) {
+						// cek bantuan combine
+						var Combine = arr_temp[j]['combine'];
+						if (Combine.length > 0) {
+							for (var k = 0; k < Combine.length; k++) {
+								cost = Combine[k]['cost'];
+								Remaining = parseInt(Remaining) + parseInt(cost);
+							}
+						}
+
+						Remaining = Remaining - parseInt(arr_temp[j]['SubTotal']);
+						break;
+					}
+				}
+
+				// save arr budgeting
+				var dataarr = {
+					PostBudgetItem : arr_temp[i]['PostBudgetItem'],
+					Remaining : formatRupiah(Remaining),
+					id_budget_left : arr_temp[i]['id_budget_left'],
+					RemainingNoFormat : Remaining,
+					NameDepartement : arr_temp[i]['NameDepartement'],
+					Departement : arr_temp[i]['Departement'],
+				}
+
+				BudgetRemaining.push(dataarr);
+
+
+			}
+		}
 
 		function _BudgetRemaining()
 		{
 			// loadingStart();
 			loading_page('#Page_Budget_Remaining');
+			console.log('awal _BudgetRemaining');
+			console.log(BudgetRemaining);console.log('---');
+
+			console.log('clear');
 			BudgetRemaining = [];
+			console.log(BudgetRemaining);console.log('---');
 			PostBudgetDepartment = JSON.parse(localStorage.getItem("PostBudgetDepartment"));
 			var arr_id_budget_left = [];
 			$('.PostBudgetItem').each(function(){
@@ -1247,6 +1390,7 @@
 				var GetNO = i + 1;
 				var id_budget_left = arr_id_budget_left[i];
 				var RemainingNoFormat = 0;
+				var remainingTxt = 0;
 				$('.PostBudgetItem[id_budget_left="'+id_budget_left+'"]').each(function(){
 					var fillItem = $(this).closest('tr');
 					var SubTotal = fillItem.find('td:eq(9)').find('.SubTotal').val();
@@ -1254,6 +1398,7 @@
 					PostBudgetItem = fillItem.find('td:eq(2)').find('.PostBudgetItem').val();
 					NameDepartement = fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('namedepartement');
 					Departement = fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('departement');
+					remainingTxt = fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('remaining');
 					var Persent = (parseInt(ppn) / 100) * SubTotal;
 					SubTotal = parseInt(SubTotal) + parseInt(Persent);
 					total += parseInt(SubTotal);
@@ -1267,17 +1412,20 @@
 						// check data exist di PostBudgetDepartmentCombine
 							var boolCombine = false;
 							var ValuePostBudget = PostBudgetDepartment[l].Value;
+							console.log(PostBudgetDepartmentCombine);
 							for (var n = 0; n < PostBudgetDepartmentCombine.length; n++) {
 								var dt = PostBudgetDepartmentCombine[n]['dt'];
-								for (var o = 0; o < dt.length; o++) {
-									id_budget_left_combine = dt[o]['id_budget_left'];
-									if (id_budget_left == id_budget_left_combine) {
+								var NoDT = PostBudgetDepartmentCombine[n]['No'];
+								if (GetNO == NoDT) {
+									console.log(dt);
+									for (var o = 0; o < dt.length; o++) {
 										var estvalue = dt[o]['estvalue'];
 										var cost = dt[o]['cost'];
-										ValuePostBudget = parseInt(estvalue) - parseInt(cost);
+										ValuePostBudget += parseInt(cost);
 										break;
 									}
 								}
+								
 							}
 
 						Remaining = parseInt(ValuePostBudget) - parseInt(total);
@@ -1322,59 +1470,107 @@
 
 			$("#phtmltotal").html('Total : '+formatRupiah(htmltotal));
 			// if combine budget
-				// console.log(PostBudgetDepartmentCombine);
-				if (PostBudgetDepartmentCombine.length > 0) {
-					for (var i = 0; i < PostBudgetDepartmentCombine.length; i++) {
-						var No = PostBudgetDepartmentCombine[i]['No'];
-						// update Post Budget yang di combine
-							var tableRow = $("td").filter(function() {
-							    return $(this).text() == No;
-							}).closest("tr");
-							var id_budget_left_by_number = tableRow.find('td:eq(2)').find('.PostBudgetItem').attr('id_budget_left');
-							var value_budget = tableRow.find('td:eq(2)').find('.PostBudgetItem').attr('remaining');
-							var SubTotal = tableRow.find('td:eq(9)').find('.SubTotal').val();
-							SubTotal = findAndReplace(SubTotal, ".","");
+				console.log('PostBudgetDepartmentCombine');
+				console.log(PostBudgetDepartmentCombine);console.log('---');
+				// if (PostBudgetDepartmentCombine.length > 0) {
+				// 	for (var i = 0; i < PostBudgetDepartmentCombine.length; i++) {
+				// 		var No = PostBudgetDepartmentCombine[i]['No'];
+				// 		// update Post Budget yang di combine
+				// 			var tableRow = $("td").filter(function() {
+				// 			    return $(this).text() == No;
+				// 			}).closest("tr");
+				// 			var id_budget_left_by_number = tableRow.find('td:eq(2)').find('.PostBudgetItem').attr('id_budget_left');
+				// 			var value_budget = tableRow.find('td:eq(2)').find('.PostBudgetItem').attr('remaining');
+				// 			var SubTotal = tableRow.find('td:eq(9)').find('.SubTotal').val();
+				// 			SubTotal = findAndReplace(SubTotal, ".","");
+				// 			var Persent = (parseInt(ppn) / 100) * SubTotal;
+				// 			SubTotal = parseInt(SubTotal) + parseInt(Persent);
 
-						var dt =  PostBudgetDepartmentCombine[i]['dt'];
-						for (var j = 0; j < dt.length; j++) {
-							var id_budget_left_get = dt[j]['id_budget_left'];
-							// check in exist budget remaining
-								var bool = false;
-								for (var k = 0; k < BudgetRemaining.length; k++) {
-									var id_budget_left = BudgetRemaining[k]['id_budget_left'];
-									if (id_budget_left_get == id_budget_left) {
-										bool = true;
-										break;
-									}
-								}
+				// 		var dt =  PostBudgetDepartmentCombine[i]['dt'];
+				// 		for (var j = 0; j < dt.length; j++) {
+				// 			var id_budget_left_get = dt[j]['id_budget_left'];
+				// 			// check in exist budget remaining
+				// 				var bool = false;
+				// 				for (var k = 0; k < BudgetRemaining.length; k++) {
+				// 					var id_budget_left = BudgetRemaining[k]['id_budget_left'];
+				// 					if (id_budget_left_get == id_budget_left) {
+				// 						console.log('i : '+i);
+				// 						console.log('j : '+j);
+				// 						console.log('k : '+k);
+				// 						console.log('PostBudgetItem');console.log(BudgetRemaining[k]['PostBudgetItem']);console.log('---');
+				// 						bool = true;
+				// 						break;
+				// 					}
+				// 				}
 
-							if (!bool) {
-								var dataarr = {
-									PostBudgetItem : dt[j]['value'],
-									Remaining : formatRupiah( ( parseInt(dt[j]['estvalue']) - parseInt(dt[j]['cost'])  ) ),
-									No : No,
-									id_budget_left : id_budget_left_get,
-									RemainingNoFormat : parseInt(dt[j]['estvalue']) - parseInt(dt[j]['cost']),
-									NameDepartement : dt[j]['NameDepartement'],
-									Departement : dt[j]['Departement'],
-								}
-								BudgetRemaining.push(dataarr);
-							}
+				// 			if (!bool) {
+				// 				var dataarr = {
+				// 					PostBudgetItem : dt[j]['value'],
+				// 					Remaining : formatRupiah( ( parseInt(dt[j]['estvalue']) - parseInt(dt[j]['cost'])  ) ),
+				// 					No : No,
+				// 					id_budget_left : id_budget_left_get,
+				// 					RemainingNoFormat : parseInt(dt[j]['estvalue']) - parseInt(dt[j]['cost']),
+				// 					NameDepartement : dt[j]['NameDepartement'],
+				// 					Departement : dt[j]['Departement'],
+				// 				}
+				// 				BudgetRemaining.push(dataarr);
+				// 			}
 
-							for (var k = 0; k < BudgetRemaining.length; k++) {
-								var id_budget_left = BudgetRemaining[k]['id_budget_left'];
-								if (id_budget_left == id_budget_left_by_number) {
-									var Cost = parseInt(dt[j]['cost']) + parseInt(value_budget);
-									BudgetRemaining[k]['RemainingNoFormat'] = parseInt(Cost) - parseInt(SubTotal) ;
-									BudgetRemaining[k]['Remaining']  = formatRupiah(BudgetRemaining[k]['RemainingNoFormat']);
-									break;
-								}
-							}
-						}
+				// 			for (var k = 0; k < BudgetRemaining.length; k++) {
+				// 				var id_budget_left = BudgetRemaining[k]['id_budget_left'];
+				// 				if (id_budget_left == id_budget_left_by_number) {
+				// 					// console.log('PostBudgetItem');console.log(BudgetRemaining[k]['PostBudgetItem']);console.log('---');
+				// 					// console.log('dtjcost');
+				// 					// console.log(dt[j]['cost']);console.log('---');
+				// 					// console.log('value_budget');
+				// 					// console.log(value_budget);console.log('---');
+				// 					var Cost = parseInt(dt[j]['cost']) + parseInt(value_budget);
+				// 					// BudgetRemaining[k]['RemainingNoFormat'] = parseInt(Cost) - parseInt(SubTotal) ;
+				// 					// console.log('Cost');
+				// 					// console.log(Cost);console.log('---');
+				// 					// console.log('SubTotal');
+				// 					// console.log(SubTotal);console.log('---');
+				// 					BudgetRemaining[k]['RemainingNoFormat'] = parseInt(Cost) - parseInt(SubTotal) ;
+				// 					BudgetRemaining[k]['Remaining']  = formatRupiah(BudgetRemaining[k]['RemainingNoFormat']);
+				// 					break;
+				// 				}
+				// 			}
+				// 		}
 						
-					}
-				}
+				// 	}
+
+					// update Budget Remaining 
+						// for (var i = 0; i < PostBudgetDepartmentCombine.length; i++) {
+						// 	var dt =  PostBudgetDepartmentCombine[i]['dt'];
+						// 	var key1 = '';
+						// 	var key2 = '';
+						// 	for (var j = 0; j < dt.length; j++) {
+						// 		var id_budget_left_get = dt[j]['id_budget_left'];
+						// 		// get last to update dt
+						// 		for (var k = i+1; k < PostBudgetDepartmentCombine.length; k++) {
+						// 			var dt2 =  PostBudgetDepartmentCombine[k]['dt'];
+						// 			for (var l = 0; l < dt2.length; l++) {
+						// 				var id_budget_left_get2 = dt2[l]['id_budget_left'];
+						// 				if (id_budget_left_get == id_budget_left_get2) {
+						// 					// update
+						// 						for (var m = 0; m < BudgetRemaining.length; m++) {
+						// 							var id_budget_left_remaining = BudgetRemaining[m]['id_budget_left'];
+						// 							if (id_budget_left_remaining == id_budget_left_get) {
+						// 								BudgetRemaining[m]['RemainingNoFormat'] = parseInt(dt2[l]['estvalue'] ) - parseInt(dt2[l]['cost']) ;
+						// 								BudgetRemaining[m]['Remaining']  = formatRupiah(BudgetRemaining[m]['RemainingNoFormat']);
+						// 								break;
+						// 							}
+													
+						// 						}
+						// 				}
+						// 			}
+						// 		}
+						// 	}
+						// }
+
+				//}
 			// endif combine budget	
+			console.log(BudgetRemaining);
 			loadShowBUdgetRemaining(BudgetRemaining);
 			// loadingEnd(500)
 
@@ -1721,6 +1917,7 @@
 					// PostBudgetDepartment = PostBudgetDepartment.concat(PostBudgetDepartmentModal); 
 					var P_result = Filtering_PostBudgetDepartment(PostBudgetDepartment,PostBudgetDepartmentModal);
 					PostBudgetDepartment = P_result;
+					localStorage.setItem("PostBudgetDepartment", JSON.stringify(PostBudgetDepartment));
 				}
 				// Filtering PostBudgetDepartmentModal Besar dari kekurangannya
 					// check pada variable BudgetRemaining
@@ -1822,11 +2019,14 @@
 					var NameDepartement = $(this).attr('namedepartement');
 					var Departement = $(this).attr('departement');
 					var n = estvalue.indexOf(".");
-					estvalue = estvalue.substring(0, n);
+					if (n >= 0) {
+						estvalue = estvalue.substring(0, n);
+					}
+					// estvalue = estvalue.substring(0, n);
 					var row = $(this).closest('tr');
 					var PostBudgetItem = row.find('td:eq(1)').text();
-
 					if (estvalue >= kekurangan_temp) {
+
 						var temp = {
 							id_budget_left : id_budget_left,
 							cost : kekurangan_temp,
