@@ -1246,6 +1246,7 @@
 			loading_page('#Page_Budget_Remaining');
 			BudgetRemaining = [];
 			var arr_temp = [];
+			var htmltotal = 0;
 			$('.PostBudgetItem').each(function(){
 				var id_budget_left = $(this).attr('id_budget_left');
 				var fillItem = $(this).closest('tr');
@@ -1253,6 +1254,7 @@
 				var SubTotal = findAndReplace(SubTotal, ".","");
 				var Persent = (parseInt(ppn) / 100) * SubTotal;
 				SubTotal = parseInt(SubTotal) + parseInt(Persent);
+				htmltotal += parseInt(SubTotal);
 				PostBudgetItem = fillItem.find('td:eq(2)').find('.PostBudgetItem').val();
 				NameDepartement = fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('namedepartement');
 				Departement = fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('departement');
@@ -1349,8 +1351,26 @@
 
 				BudgetRemaining.push(dataarr);
 
+				// search budget combine
+					if (Combine.length > 0) {
+						var key = '';
+						for (var j = 0; j < Combine.length; j++) {
+							id_budget_left_combine1 = Combine[j]['id_budget_left'];
+							key = j;
+							var bool = true;
+							for (var k = j+1; k < Combine.length; k++) {
+								var id_budget_left_combine2 = Combine[k]['id_budget_left'];
+								if (id_budget_left_combine1 == id_budget_left_combine2) {
+
+								}
+							}
+						}
+					}
 
 			}
+
+			$("#phtmltotal").html('Total : '+formatRupiah(htmltotal));
+			loadShowBUdgetRemaining(BudgetRemaining);
 		}
 
 		function _BudgetRemaining()
