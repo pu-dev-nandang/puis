@@ -628,8 +628,8 @@
     }
 
     function testMobile() {
-        socket.emit('update_log', {
-            update_log: '1'
+        socket.emit('mobile_notif', {
+            mobile_notif: '1'
         });
     }
 
