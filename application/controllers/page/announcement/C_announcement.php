@@ -24,7 +24,6 @@ class C_announcement extends Globalclass {
         $this->temp($content);
     }
 
-
     public function list_announcement()
     {
         $page = $this->load->view('page/announcement/list_announcement','',true);
