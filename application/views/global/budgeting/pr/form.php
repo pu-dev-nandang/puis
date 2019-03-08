@@ -1247,6 +1247,7 @@
 			BudgetRemaining = [];
 			var arr_temp = [];
 			var htmltotal = 0;
+			var ppn = $("#ppn").val();
 			$('.PostBudgetItem').each(function(){
 				var id_budget_left = $(this).attr('id_budget_left');
 				var fillItem = $(this).closest('tr');
@@ -1275,6 +1276,14 @@
 						}
 					}
 
+					combine.sort(function(a, b){
+					    var keyA = new Date(a.id_budget_left),
+					        keyB = new Date(b.id_budget_left);
+					    // Compare the 2 dates
+					    if(keyA < keyB) return -1;
+					    if(keyA > keyB) return 1;
+					    return 0;
+					});
 				
 				var temp = {
 					id_budget_left : id_budget_left,
@@ -1297,6 +1306,8 @@
 			    if(keyA > keyB) return 1;
 			    return 0;
 			});
+
+
 			PostBudgetDepartment = JSON.parse(localStorage.getItem("PostBudgetDepartment"));
 			for (var i = 0; i < arr_temp.length; i++) {
 				var id_budget_left = arr_temp[i]['id_budget_left'];
@@ -1305,7 +1316,7 @@
 				for (var j = 0; j < PostBudgetDepartment.length; j++) {
 					var B_id_budget_left = PostBudgetDepartment[j].ID;
 					if (B_id_budget_left == id_budget_left) {
-						Remaining = PostBudgetDepartment[l].Value;
+						Remaining = PostBudgetDepartment[j].Value;
 						break;
 					}
 				}
@@ -1353,7 +1364,9 @@
 
 				// search budget combine
 					if (Combine.length > 0) {
+						// sort combine first
 						var key = '';
+						// get last key
 						for (var j = 0; j < Combine.length; j++) {
 							id_budget_left_combine1 = Combine[j]['id_budget_left'];
 							key = j;
@@ -1361,9 +1374,22 @@
 							for (var k = j+1; k < Combine.length; k++) {
 								var id_budget_left_combine2 = Combine[k]['id_budget_left'];
 								if (id_budget_left_combine1 == id_budget_left_combine2) {
-
+									key = k;
 								}
+
+								j = k;
 							}
+
+							var dataarr = {
+								PostBudgetItem : Combine[key]['value'],
+								Remaining : formatRupiah( parseInt(Combine[key]['estvalue']) - parseInt(Combine[key]['value']) ),
+								id_budget_left : Combine[key]['id_budget_left'],
+								RemainingNoFormat : parseInt(Combine[key]['estvalue']) - parseInt(Combine[key]['value']),
+								NameDepartement : Combine[key]['NameDepartement'],
+								Departement : Combine[key]['Departement'],
+							}
+
+							BudgetRemaining.push(dataarr);	
 						}
 					}
 
@@ -1373,228 +1399,228 @@
 			loadShowBUdgetRemaining(BudgetRemaining);
 		}
 
-		function _BudgetRemaining()
-		{
-			// loadingStart();
-			loading_page('#Page_Budget_Remaining');
-			console.log('awal _BudgetRemaining');
-			console.log(BudgetRemaining);console.log('---');
+		// function _BudgetRemaining()
+		// {
+		// 	// loadingStart();
+		// 	loading_page('#Page_Budget_Remaining');
+		// 	console.log('awal _BudgetRemaining');
+		// 	console.log(BudgetRemaining);console.log('---');
 
-			console.log('clear');
-			BudgetRemaining = [];
-			console.log(BudgetRemaining);console.log('---');
-			PostBudgetDepartment = JSON.parse(localStorage.getItem("PostBudgetDepartment"));
-			var arr_id_budget_left = [];
-			$('.PostBudgetItem').each(function(){
-				var id_budget_left = $(this).attr('id_budget_left');
-				arr_id_budget_left.push(id_budget_left);
-			})
+		// 	console.log('clear');
+		// 	BudgetRemaining = [];
+		// 	console.log(BudgetRemaining);console.log('---');
+		// 	PostBudgetDepartment = JSON.parse(localStorage.getItem("PostBudgetDepartment"));
+		// 	var arr_id_budget_left = [];
+		// 	$('.PostBudgetItem').each(function(){
+		// 		var id_budget_left = $(this).attr('id_budget_left');
+		// 		arr_id_budget_left.push(id_budget_left);
+		// 	})
 
-			var uniqueArray = function(arrArg) {
-			  return arrArg.filter(function(elem, pos,arr) {
-			    return arr.indexOf(elem) == pos;
-			  });
-			};
+		// 	var uniqueArray = function(arrArg) {
+		// 	  return arrArg.filter(function(elem, pos,arr) {
+		// 	    return arr.indexOf(elem) == pos;
+		// 	  });
+		// 	};
 
-			arr_id_budget_left = uniqueArray(arr_id_budget_left);
-			// console.log(arr_id_budget_left);
+		// 	arr_id_budget_left = uniqueArray(arr_id_budget_left);
+		// 	// console.log(arr_id_budget_left);
 
-			var htmltotal = 0;
-			var ppn = $("#ppn").val();
-			for (var i = 0; i < arr_id_budget_left.length; i++) {
-				var total = 0;
-				var PostBudgetItem = '';
-				var NameDepartement = '';
-				var Departement = '';
-				var Remaining = 0;
-				var GetNO = i + 1;
-				var id_budget_left = arr_id_budget_left[i];
-				var RemainingNoFormat = 0;
-				var remainingTxt = 0;
-				$('.PostBudgetItem[id_budget_left="'+id_budget_left+'"]').each(function(){
-					var fillItem = $(this).closest('tr');
-					var SubTotal = fillItem.find('td:eq(9)').find('.SubTotal').val();
-					var SubTotal = findAndReplace(SubTotal, ".","");
-					PostBudgetItem = fillItem.find('td:eq(2)').find('.PostBudgetItem').val();
-					NameDepartement = fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('namedepartement');
-					Departement = fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('departement');
-					remainingTxt = fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('remaining');
-					var Persent = (parseInt(ppn) / 100) * SubTotal;
-					SubTotal = parseInt(SubTotal) + parseInt(Persent);
-					total += parseInt(SubTotal);
-				})
+		// 	var htmltotal = 0;
+		// 	var ppn = $("#ppn").val();
+		// 	for (var i = 0; i < arr_id_budget_left.length; i++) {
+		// 		var total = 0;
+		// 		var PostBudgetItem = '';
+		// 		var NameDepartement = '';
+		// 		var Departement = '';
+		// 		var Remaining = 0;
+		// 		var GetNO = i + 1;
+		// 		var id_budget_left = arr_id_budget_left[i];
+		// 		var RemainingNoFormat = 0;
+		// 		var remainingTxt = 0;
+		// 		$('.PostBudgetItem[id_budget_left="'+id_budget_left+'"]').each(function(){
+		// 			var fillItem = $(this).closest('tr');
+		// 			var SubTotal = fillItem.find('td:eq(9)').find('.SubTotal').val();
+		// 			var SubTotal = findAndReplace(SubTotal, ".","");
+		// 			PostBudgetItem = fillItem.find('td:eq(2)').find('.PostBudgetItem').val();
+		// 			NameDepartement = fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('namedepartement');
+		// 			Departement = fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('departement');
+		// 			remainingTxt = fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('remaining');
+		// 			var Persent = (parseInt(ppn) / 100) * SubTotal;
+		// 			SubTotal = parseInt(SubTotal) + parseInt(Persent);
+		// 			total += parseInt(SubTotal);
+		// 		})
 				
-				htmltotal += parseInt(total);
-				// console.log(PostBudgetDepartment);
-				for (var l = 0; l < PostBudgetDepartment.length; l++) { // find Value awal
-					var B_id_budget_left = PostBudgetDepartment[l].ID;
-					if (B_id_budget_left == id_budget_left) {
-						// check data exist di PostBudgetDepartmentCombine
-							var boolCombine = false;
-							var ValuePostBudget = PostBudgetDepartment[l].Value;
-							console.log(PostBudgetDepartmentCombine);
-							for (var n = 0; n < PostBudgetDepartmentCombine.length; n++) {
-								var dt = PostBudgetDepartmentCombine[n]['dt'];
-								var NoDT = PostBudgetDepartmentCombine[n]['No'];
-								if (GetNO == NoDT) {
-									console.log(dt);
-									for (var o = 0; o < dt.length; o++) {
-										var estvalue = dt[o]['estvalue'];
-										var cost = dt[o]['cost'];
-										ValuePostBudget += parseInt(cost);
-										break;
-									}
-								}
+		// 		htmltotal += parseInt(total);
+		// 		// console.log(PostBudgetDepartment);
+		// 		for (var l = 0; l < PostBudgetDepartment.length; l++) { // find Value awal
+		// 			var B_id_budget_left = PostBudgetDepartment[l].ID;
+		// 			if (B_id_budget_left == id_budget_left) {
+		// 				// check data exist di PostBudgetDepartmentCombine
+		// 					var boolCombine = false;
+		// 					var ValuePostBudget = PostBudgetDepartment[l].Value;
+		// 					console.log(PostBudgetDepartmentCombine);
+		// 					for (var n = 0; n < PostBudgetDepartmentCombine.length; n++) {
+		// 						var dt = PostBudgetDepartmentCombine[n]['dt'];
+		// 						var NoDT = PostBudgetDepartmentCombine[n]['No'];
+		// 						if (GetNO == NoDT) {
+		// 							console.log(dt);
+		// 							for (var o = 0; o < dt.length; o++) {
+		// 								var estvalue = dt[o]['estvalue'];
+		// 								var cost = dt[o]['cost'];
+		// 								ValuePostBudget += parseInt(cost);
+		// 								break;
+		// 							}
+		// 						}
 								
-							}
+		// 					}
 
-						Remaining = parseInt(ValuePostBudget) - parseInt(total);
-						// console.log(Remaining);
-						var dataarr = {
-							PostBudgetItem : PostBudgetItem,
-							Remaining : formatRupiah(Remaining),
-							No : GetNO,
-							id_budget_left : id_budget_left,
-							RemainingNoFormat : Remaining,
-							NameDepartement : NameDepartement,
-							Departement : Departement,
-						}
+		// 				Remaining = parseInt(ValuePostBudget) - parseInt(total);
+		// 				// console.log(Remaining);
+		// 				var dataarr = {
+		// 					PostBudgetItem : PostBudgetItem,
+		// 					Remaining : formatRupiah(Remaining),
+		// 					No : GetNO,
+		// 					id_budget_left : id_budget_left,
+		// 					RemainingNoFormat : Remaining,
+		// 					NameDepartement : NameDepartement,
+		// 					Departement : Departement,
+		// 				}
 
-						// check id_budget_left existing in BudgetRemaining
-						// for (var k = 0; k < BudgetRemaining.length; k++) {
-						// 	if (BudgetRemaining[k].id_budget_left == id_budget_left) {
-						// 		var removeItem = k;
-						// 		BudgetRemaining = $.grep(BudgetRemaining, function(value,index) {
-						// 		  return index != removeItem;
-						// 		});
-						// 		break;
-						// 	}
-						// }
-						var bool = false;
-						for (var m = 0; m < BudgetRemaining.length; m++) {
-							var id_budget_left_remaining = BudgetRemaining[m]['id_budget_left'];
-							if (id_budget_left == id_budget_left_remaining) {
-								BudgetRemaining[m] = dataarr;
-								bool = true;
-								break;
-							}
-						}
-						if (!bool) {
-							BudgetRemaining.push(dataarr);
-						}
+		// 				// check id_budget_left existing in BudgetRemaining
+		// 				// for (var k = 0; k < BudgetRemaining.length; k++) {
+		// 				// 	if (BudgetRemaining[k].id_budget_left == id_budget_left) {
+		// 				// 		var removeItem = k;
+		// 				// 		BudgetRemaining = $.grep(BudgetRemaining, function(value,index) {
+		// 				// 		  return index != removeItem;
+		// 				// 		});
+		// 				// 		break;
+		// 				// 	}
+		// 				// }
+		// 				var bool = false;
+		// 				for (var m = 0; m < BudgetRemaining.length; m++) {
+		// 					var id_budget_left_remaining = BudgetRemaining[m]['id_budget_left'];
+		// 					if (id_budget_left == id_budget_left_remaining) {
+		// 						BudgetRemaining[m] = dataarr;
+		// 						bool = true;
+		// 						break;
+		// 					}
+		// 				}
+		// 				if (!bool) {
+		// 					BudgetRemaining.push(dataarr);
+		// 				}
 						
-						break;
-					}
-				}					
-			}
+		// 				break;
+		// 			}
+		// 		}					
+		// 	}
 
-			$("#phtmltotal").html('Total : '+formatRupiah(htmltotal));
-			// if combine budget
-				console.log('PostBudgetDepartmentCombine');
-				console.log(PostBudgetDepartmentCombine);console.log('---');
-				// if (PostBudgetDepartmentCombine.length > 0) {
-				// 	for (var i = 0; i < PostBudgetDepartmentCombine.length; i++) {
-				// 		var No = PostBudgetDepartmentCombine[i]['No'];
-				// 		// update Post Budget yang di combine
-				// 			var tableRow = $("td").filter(function() {
-				// 			    return $(this).text() == No;
-				// 			}).closest("tr");
-				// 			var id_budget_left_by_number = tableRow.find('td:eq(2)').find('.PostBudgetItem').attr('id_budget_left');
-				// 			var value_budget = tableRow.find('td:eq(2)').find('.PostBudgetItem').attr('remaining');
-				// 			var SubTotal = tableRow.find('td:eq(9)').find('.SubTotal').val();
-				// 			SubTotal = findAndReplace(SubTotal, ".","");
-				// 			var Persent = (parseInt(ppn) / 100) * SubTotal;
-				// 			SubTotal = parseInt(SubTotal) + parseInt(Persent);
+		// 	$("#phtmltotal").html('Total : '+formatRupiah(htmltotal));
+		// 	// if combine budget
+		// 		console.log('PostBudgetDepartmentCombine');
+		// 		console.log(PostBudgetDepartmentCombine);console.log('---');
+		// 		// if (PostBudgetDepartmentCombine.length > 0) {
+		// 		// 	for (var i = 0; i < PostBudgetDepartmentCombine.length; i++) {
+		// 		// 		var No = PostBudgetDepartmentCombine[i]['No'];
+		// 		// 		// update Post Budget yang di combine
+		// 		// 			var tableRow = $("td").filter(function() {
+		// 		// 			    return $(this).text() == No;
+		// 		// 			}).closest("tr");
+		// 		// 			var id_budget_left_by_number = tableRow.find('td:eq(2)').find('.PostBudgetItem').attr('id_budget_left');
+		// 		// 			var value_budget = tableRow.find('td:eq(2)').find('.PostBudgetItem').attr('remaining');
+		// 		// 			var SubTotal = tableRow.find('td:eq(9)').find('.SubTotal').val();
+		// 		// 			SubTotal = findAndReplace(SubTotal, ".","");
+		// 		// 			var Persent = (parseInt(ppn) / 100) * SubTotal;
+		// 		// 			SubTotal = parseInt(SubTotal) + parseInt(Persent);
 
-				// 		var dt =  PostBudgetDepartmentCombine[i]['dt'];
-				// 		for (var j = 0; j < dt.length; j++) {
-				// 			var id_budget_left_get = dt[j]['id_budget_left'];
-				// 			// check in exist budget remaining
-				// 				var bool = false;
-				// 				for (var k = 0; k < BudgetRemaining.length; k++) {
-				// 					var id_budget_left = BudgetRemaining[k]['id_budget_left'];
-				// 					if (id_budget_left_get == id_budget_left) {
-				// 						console.log('i : '+i);
-				// 						console.log('j : '+j);
-				// 						console.log('k : '+k);
-				// 						console.log('PostBudgetItem');console.log(BudgetRemaining[k]['PostBudgetItem']);console.log('---');
-				// 						bool = true;
-				// 						break;
-				// 					}
-				// 				}
+		// 		// 		var dt =  PostBudgetDepartmentCombine[i]['dt'];
+		// 		// 		for (var j = 0; j < dt.length; j++) {
+		// 		// 			var id_budget_left_get = dt[j]['id_budget_left'];
+		// 		// 			// check in exist budget remaining
+		// 		// 				var bool = false;
+		// 		// 				for (var k = 0; k < BudgetRemaining.length; k++) {
+		// 		// 					var id_budget_left = BudgetRemaining[k]['id_budget_left'];
+		// 		// 					if (id_budget_left_get == id_budget_left) {
+		// 		// 						console.log('i : '+i);
+		// 		// 						console.log('j : '+j);
+		// 		// 						console.log('k : '+k);
+		// 		// 						console.log('PostBudgetItem');console.log(BudgetRemaining[k]['PostBudgetItem']);console.log('---');
+		// 		// 						bool = true;
+		// 		// 						break;
+		// 		// 					}
+		// 		// 				}
 
-				// 			if (!bool) {
-				// 				var dataarr = {
-				// 					PostBudgetItem : dt[j]['value'],
-				// 					Remaining : formatRupiah( ( parseInt(dt[j]['estvalue']) - parseInt(dt[j]['cost'])  ) ),
-				// 					No : No,
-				// 					id_budget_left : id_budget_left_get,
-				// 					RemainingNoFormat : parseInt(dt[j]['estvalue']) - parseInt(dt[j]['cost']),
-				// 					NameDepartement : dt[j]['NameDepartement'],
-				// 					Departement : dt[j]['Departement'],
-				// 				}
-				// 				BudgetRemaining.push(dataarr);
-				// 			}
+		// 		// 			if (!bool) {
+		// 		// 				var dataarr = {
+		// 		// 					PostBudgetItem : dt[j]['value'],
+		// 		// 					Remaining : formatRupiah( ( parseInt(dt[j]['estvalue']) - parseInt(dt[j]['cost'])  ) ),
+		// 		// 					No : No,
+		// 		// 					id_budget_left : id_budget_left_get,
+		// 		// 					RemainingNoFormat : parseInt(dt[j]['estvalue']) - parseInt(dt[j]['cost']),
+		// 		// 					NameDepartement : dt[j]['NameDepartement'],
+		// 		// 					Departement : dt[j]['Departement'],
+		// 		// 				}
+		// 		// 				BudgetRemaining.push(dataarr);
+		// 		// 			}
 
-				// 			for (var k = 0; k < BudgetRemaining.length; k++) {
-				// 				var id_budget_left = BudgetRemaining[k]['id_budget_left'];
-				// 				if (id_budget_left == id_budget_left_by_number) {
-				// 					// console.log('PostBudgetItem');console.log(BudgetRemaining[k]['PostBudgetItem']);console.log('---');
-				// 					// console.log('dtjcost');
-				// 					// console.log(dt[j]['cost']);console.log('---');
-				// 					// console.log('value_budget');
-				// 					// console.log(value_budget);console.log('---');
-				// 					var Cost = parseInt(dt[j]['cost']) + parseInt(value_budget);
-				// 					// BudgetRemaining[k]['RemainingNoFormat'] = parseInt(Cost) - parseInt(SubTotal) ;
-				// 					// console.log('Cost');
-				// 					// console.log(Cost);console.log('---');
-				// 					// console.log('SubTotal');
-				// 					// console.log(SubTotal);console.log('---');
-				// 					BudgetRemaining[k]['RemainingNoFormat'] = parseInt(Cost) - parseInt(SubTotal) ;
-				// 					BudgetRemaining[k]['Remaining']  = formatRupiah(BudgetRemaining[k]['RemainingNoFormat']);
-				// 					break;
-				// 				}
-				// 			}
-				// 		}
+		// 		// 			for (var k = 0; k < BudgetRemaining.length; k++) {
+		// 		// 				var id_budget_left = BudgetRemaining[k]['id_budget_left'];
+		// 		// 				if (id_budget_left == id_budget_left_by_number) {
+		// 		// 					// console.log('PostBudgetItem');console.log(BudgetRemaining[k]['PostBudgetItem']);console.log('---');
+		// 		// 					// console.log('dtjcost');
+		// 		// 					// console.log(dt[j]['cost']);console.log('---');
+		// 		// 					// console.log('value_budget');
+		// 		// 					// console.log(value_budget);console.log('---');
+		// 		// 					var Cost = parseInt(dt[j]['cost']) + parseInt(value_budget);
+		// 		// 					// BudgetRemaining[k]['RemainingNoFormat'] = parseInt(Cost) - parseInt(SubTotal) ;
+		// 		// 					// console.log('Cost');
+		// 		// 					// console.log(Cost);console.log('---');
+		// 		// 					// console.log('SubTotal');
+		// 		// 					// console.log(SubTotal);console.log('---');
+		// 		// 					BudgetRemaining[k]['RemainingNoFormat'] = parseInt(Cost) - parseInt(SubTotal) ;
+		// 		// 					BudgetRemaining[k]['Remaining']  = formatRupiah(BudgetRemaining[k]['RemainingNoFormat']);
+		// 		// 					break;
+		// 		// 				}
+		// 		// 			}
+		// 		// 		}
 						
-				// 	}
+		// 		// 	}
 
-					// update Budget Remaining 
-						// for (var i = 0; i < PostBudgetDepartmentCombine.length; i++) {
-						// 	var dt =  PostBudgetDepartmentCombine[i]['dt'];
-						// 	var key1 = '';
-						// 	var key2 = '';
-						// 	for (var j = 0; j < dt.length; j++) {
-						// 		var id_budget_left_get = dt[j]['id_budget_left'];
-						// 		// get last to update dt
-						// 		for (var k = i+1; k < PostBudgetDepartmentCombine.length; k++) {
-						// 			var dt2 =  PostBudgetDepartmentCombine[k]['dt'];
-						// 			for (var l = 0; l < dt2.length; l++) {
-						// 				var id_budget_left_get2 = dt2[l]['id_budget_left'];
-						// 				if (id_budget_left_get == id_budget_left_get2) {
-						// 					// update
-						// 						for (var m = 0; m < BudgetRemaining.length; m++) {
-						// 							var id_budget_left_remaining = BudgetRemaining[m]['id_budget_left'];
-						// 							if (id_budget_left_remaining == id_budget_left_get) {
-						// 								BudgetRemaining[m]['RemainingNoFormat'] = parseInt(dt2[l]['estvalue'] ) - parseInt(dt2[l]['cost']) ;
-						// 								BudgetRemaining[m]['Remaining']  = formatRupiah(BudgetRemaining[m]['RemainingNoFormat']);
-						// 								break;
-						// 							}
+		// 			// update Budget Remaining 
+		// 				// for (var i = 0; i < PostBudgetDepartmentCombine.length; i++) {
+		// 				// 	var dt =  PostBudgetDepartmentCombine[i]['dt'];
+		// 				// 	var key1 = '';
+		// 				// 	var key2 = '';
+		// 				// 	for (var j = 0; j < dt.length; j++) {
+		// 				// 		var id_budget_left_get = dt[j]['id_budget_left'];
+		// 				// 		// get last to update dt
+		// 				// 		for (var k = i+1; k < PostBudgetDepartmentCombine.length; k++) {
+		// 				// 			var dt2 =  PostBudgetDepartmentCombine[k]['dt'];
+		// 				// 			for (var l = 0; l < dt2.length; l++) {
+		// 				// 				var id_budget_left_get2 = dt2[l]['id_budget_left'];
+		// 				// 				if (id_budget_left_get == id_budget_left_get2) {
+		// 				// 					// update
+		// 				// 						for (var m = 0; m < BudgetRemaining.length; m++) {
+		// 				// 							var id_budget_left_remaining = BudgetRemaining[m]['id_budget_left'];
+		// 				// 							if (id_budget_left_remaining == id_budget_left_get) {
+		// 				// 								BudgetRemaining[m]['RemainingNoFormat'] = parseInt(dt2[l]['estvalue'] ) - parseInt(dt2[l]['cost']) ;
+		// 				// 								BudgetRemaining[m]['Remaining']  = formatRupiah(BudgetRemaining[m]['RemainingNoFormat']);
+		// 				// 								break;
+		// 				// 							}
 													
-						// 						}
-						// 				}
-						// 			}
-						// 		}
-						// 	}
-						// }
+		// 				// 						}
+		// 				// 				}
+		// 				// 			}
+		// 				// 		}
+		// 				// 	}
+		// 				// }
 
-				//}
-			// endif combine budget	
-			console.log(BudgetRemaining);
-			loadShowBUdgetRemaining(BudgetRemaining);
-			// loadingEnd(500)
+		// 		//}
+		// 	// endif combine budget	
+		// 	console.log(BudgetRemaining);
+		// 	loadShowBUdgetRemaining(BudgetRemaining);
+		// 	// loadingEnd(500)
 
-		}
+		// }
 
 		$(document).off('click', '.SearchItem').on('click', '.SearchItem',function(e) {
 			$(".uniform").prop('disabled', true);
