@@ -182,8 +182,11 @@
 
                         var Review = (dataBAP.length>0 && dataBAP[0].Review!='' && dataBAP[0].Review!=null) ? dataBAP[0].Review : '';
 
+                        var needClearAll = (lecturer=='' && d.Present=='-' && d.Absent=='-' && (d.StatusSesi==1 || d.StatusSesi=='1'))
+                            ? '<span class="label label-danger">Need Clear</span>' : '';
+
                         $('#dataRowBAB').append('<tr>' +
-                            '<td>'+no+' '+ClassExc+'</td>' +
+                            '<td>'+no+' '+ClassExc+' '+needClearAll+'</td>' +
                             '<td style="text-align: left;"><span class="viewerBAP viewerBAP'+no+'" id="viewSubject'+no+'">'+Subject+'</span><textarea class="form-control hide formBAP formBAP'+no+'" rows="3" id="formSubject'+no+'">'+Subject+'</textarea></td>' +
                             '<td style="text-align: left;"><span class="viewerBAP viewerBAP'+no+'" id="viewMaterial'+no+'">'+Material+'</span><textarea class="form-control hide formBAP formBAP'+no+'" rows="3" id="formMaterial'+no+'">'+Material+'</textarea></td>' +
                             '<td style="text-align: left;"><span class="viewerBAP viewerBAP'+no+'" id="viewDescription'+no+'">'+Description+'</span><textarea class="form-control hide formBAP formBAP'+no+'" rows="3" id="formDescription'+no+'">'+Description+'</textarea></td>' +

@@ -1242,6 +1242,7 @@ class C_api2 extends CI_Controller {
 
 
                         $arrRes = array(
+                            'StatusSesi' => $dataAttd[0]['Meet'.$i],
                             'Present' => $countPresent,
                             'Absent' => $countAbsent,
                             'Lecturer' => $dataLect,
