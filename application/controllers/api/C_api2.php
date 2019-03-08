@@ -992,7 +992,8 @@ class C_api2 extends CI_Controller {
 
 
 
-        $queryDefault = 'SELECT s.ID AS ScheduleID, attd.ID AS ID_Attd,sd.ID AS SDID,s.Coordinator , s.ClassGroup, s.TeamTeaching, mk.MKCode, mk.NameEng AS CourseEng,  
+        $queryDefault = 'SELECT s.ID AS ScheduleID, attd.ID AS ID_Attd,sd.ID AS SDID,s.Coordinator , s.ClassGroup, s.TeamTeaching,   
+                                        mk.MKCode, mk.NameEng AS CourseEng,
                                         mk.Name AS Course, d.NameEng AS DayEng, cl.Room,
                                         cd.TotalSKS AS Credit, sd.StartSessions, sd.EndSessions, em.Name AS Lecturer
                                         FROM db_academic.schedule_details sd 
@@ -1047,7 +1048,7 @@ class C_api2 extends CI_Controller {
 
             $showLec = '';
             $dataLec = [];
-            // Load Data Teachir
+            // Load Data Teacher
             if(count($arrLec)>0){
                 for ($t=0;$t<count($arrLec);$t++){
                     // Get Attendance
@@ -1118,14 +1119,40 @@ class C_api2 extends CI_Controller {
             $nestedData[] = '<div  style="text-align:right;"><b>'.$row['DayEng'].'</b><br/>'.
                 substr($row['StartSessions'],0,5).' - '.substr($row['EndSessions'],0,5).' | '.$row['Room'].'</div>';
 
+            $meetTemp = 1;
             for($l=0;$l<count($arrP);$l++){
                 $totalStd = $arrP[$l]+$arrA[$l];
                 if($totalStd==0){
-                    $nestedData[] = '<div  style="text-align:center;">-</div>';
+
+
+
+                    $sw = '<div  style="text-align:center;">-</div>';
+
+                    if($meetTemp<=14){
+                        // Cek attd lecturer
+                        $dataMeetLec = $this->db->query('SELECT * FROM db_academic.attendance_lecturers 
+                                                                WHERE ID_Attd = "'.$row['ID_Attd'].'" 
+                                                                AND Meet = "'.$meetTemp.'" ')->result_array();
+
+                        if(count($dataMeetLec)<=0){
+                            // Cek apakah sesi sudah 0 / null
+                            $dataDSes = $this->db->select('Meet'.$meetTemp)
+                                ->get_where('db_academic.attendance',array('ID' => $row['ID_Attd']))->result_array();
+                            if($dataDSes[0]['Meet'.$meetTemp]=='1' || $dataDSes[0]['Meet'.$meetTemp]==1){
+                                $sw = '<div  style="text-align:center;"><i class="fa fa-exclamation-circle fa-2x" style="color: #ff9800;"></i></div>';
+                            }
+                        }
+
+                    }
+
+
+
+                    $nestedData[] = $sw;
+
                 } else {
                     $nestedData[] = '<div  style="text-align:center;"><span class="label label-success labelAttd">'.$arrP[$l].'</span><br/><span class="label label-danger labelAttd">'.$arrA[$l].'</span></div>';
                 }
-
+                $meetTemp+=1;
             }
 
 
