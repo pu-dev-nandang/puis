@@ -879,6 +879,7 @@ $route['rest/__show_circulation_sheet'] = 'api/c_rest/show_circulation_sheet';
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
 $route['api/__test_data'] = 'api/c_api/test_data';
+$route['api/__test_data2'] = 'api/c_api/test_data2';
 $route['api/__getRegionByProv'] = 'api/c_api/getRegionByProv';
 $route['api/__getDistrictByRegion'] = 'api/c_api/getDistrictByRegion';
 $route['api/__getTypeSekolah'] = 'api/c_api/getTypeSekolah';
