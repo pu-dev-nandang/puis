@@ -108,6 +108,10 @@
                       if (dt.Status == 1) {
                         act = dt.ID;
                         $(element).append('<option value="'+dt.ID+'.'+dt.Name+'" '+sc+'>'+dt.Name+'</option>');
+                        // get last semester - 1
+                        var last = i + 1;
+                        var dtl = jsonResult[last];
+                         $(element).append('<option value="'+dtl.ID+'.'+dtl.Name+'" '+''+'>'+dtl.Name+'</option>');
                         break;
                       }
                       else
@@ -115,13 +119,6 @@
                         $(element).append('<option value="'+dt.ID+'.'+dt.Name+'" '+sc+'>'+dt.Name+'</option>');
                       }
                     }
-
-                   // for(var i=0;i<jsonResult.length;i++){
-                   //     var dt = jsonResult[i];
-                   //     var sc = (selected==dt.Status) ? 'selected' : '';
-                   //     // var v = (option=="Name") ? dt.Name : dt.ID;
-                   //     $(element).append('<option value="'+dt.ID+'.'+dt.Name+'" '+sc+'>'+dt.Name+'</option>');
-                   // }
                }
                
             });
