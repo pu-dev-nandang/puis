@@ -1325,7 +1325,6 @@
 						continue;
 					}
 
-
 				var Remaining = 0;
 				// process remaining
 				for (var j = 0; j < PostBudgetDepartment.length; j++) {
@@ -1338,10 +1337,13 @@
 
 				// cek bantuan combine
 				var Combine = arr_temp[i]['combine'];
+				console.log(arr_temp[i]);
 				if (Combine.length > 0) {
 					for (var j = 0; j < Combine.length; j++) {
 						cost = Combine[j]['cost'];
+						// console.log(cost);
 						Remaining = parseInt(Remaining) + parseInt(cost);
+						// console.log(Remaining);
 					}
 				}
 
@@ -1419,13 +1421,67 @@
 							var estvalue = Combine[j]['estvalue'];
 							var cost = Combine[j]['cost'];
 							Remaining = parseInt(estvalue) - parseInt(cost);
+
 							// search id_budget_left yang sama di post budget
 							for (var k = i+1; k < arr_temp.length; k++) {
 								var id_budget_left_2 = arr_temp[k]['id_budget_left'];
 								if (id_budget_left_combine1 == id_budget_left_2) {
-									console.log(arr_temp[k]['SubTotal']);
-									console.log(arr_temp[k]);
-									console.log(Remaining);
+									// cek combine in combine
+									var CombineInCombine = arr_temp[k]['combine'];
+									for (var l = 0; l < CombineInCombine.length; l++) {
+										var costCombineInCombine = CombineInCombine[l]['cost'];
+										Remaining = parseInt(Remaining) + parseInt(costCombineInCombine);
+										var RemainingCombineInCombine = parseInt(CombineInCombine[l]['estvalue'] - parseInt(CombineInCombine[l]['cost']));
+										console.log(arr_temp);
+										console.log(k);
+										var getskip = 0;
+										for (var m = 0; m < arr_temp.length; m++) {
+											var id_budget_leftCombineIncombine = arr_temp[m]['id_budget_left'];
+											console.log(id_budget_leftCombineIncombine+'=='+CombineInCombine[l]['id_budget_left'])
+											if (id_budget_leftCombineIncombine == CombineInCombine[l]['id_budget_left']) {
+												RemainingCombineInCombine = parseInt(RemainingCombineInCombine) - parseInt(arr_temp[m]['SubTotal']);
+												getskip = arr_temp[m]['No'];
+											}
+
+										}
+
+										for (var m = 0; m < arr_temp.length; m++) {
+											// find data besar dari no
+												var ff = arr_temp[m]['No'];
+												if (ff <= getskip) {
+													continue;
+												}
+											var id_budget_left22 = arr_temp[m]['id_budget_left'];
+											if (CombineInCombine[l]['id_budget_left'] != id_budget_left22) {
+												var Combine22 = arr_temp[m]['combine'];
+												if (Combine22.length > 0) {
+													for (var n = 0; n < Combine22.length; n++) {
+														var id_budget_left_combine_in22 = Combine22[n]['id_budget_left'];
+														if (CombineInCombine[l]['id_budget_left'] == id_budget_left_combine_in22) {
+															cost = Combine22[n]['cost'];
+															estvalue = Combine22[n]['estvalue'];
+															// console.log(Remaining);
+															// console.log(cost);
+															RemainingCombineInCombine = parseInt(estvalue) - parseInt(cost);
+														}
+														
+													}
+												}
+											}
+										}
+
+
+										var dataarrCombineInCombine = {
+											PostBudgetItem : CombineInCombine[l]['value'],
+											Remaining : formatRupiah( RemainingCombineInCombine ),
+											id_budget_left : CombineInCombine[l]['id_budget_left'],
+											RemainingNoFormat : RemainingCombineInCombine,
+											NameDepartement : CombineInCombine[l]['NameDepartement'],
+											Departement : CombineInCombine[l]['Departement'],
+										}
+
+										BudgetRemaining.push(dataarrCombineInCombine);
+									}
 									Remaining = Remaining - parseInt(arr_temp[k]['SubTotal']);
 								}
 							}
@@ -1434,13 +1490,16 @@
 							for (var k = i+1; k < arr_temp.length; k++) {
 								var id_budget_left2 = arr_temp[k]['id_budget_left'];
 								if (id_budget_left_combine1 != id_budget_left_2) {
-									var Combine = arr_temp[j]['combine'];
-									if (Combine.length > 0) {
-										for (var l = 0; l < Combine.length; l++) {
-											var id_budget_left_combine_in = Combine[l]['id_budget_left'];
+									var Combinegg = arr_temp[j]['combine'];
+									if (Combinegg.length > 0) {
+										for (var l = 0; l < Combinegg.length; l++) {
+											var id_budget_left_combine_in = Combinegg[l]['id_budget_left'];
 											if (id_budget_left_combine1 == id_budget_left_combine_in) {
-												cost = Combine[l]['cost'];
-												Remaining = parseInt(Remaining) - parseInt(cost);
+												cost = Combinegg[l]['cost'];
+												estvalue = Combinegg[l]['estvalue'];
+												// console.log(Remaining);
+												// console.log(cost);
+												Remaining = parseInt(estvalue) - parseInt(cost);
 											}
 											
 										}
