@@ -70,11 +70,14 @@ class C_mobile extends CI_Controller {
                     array('NPM' => $data_arr['NPM']))->result_array();
 
                 if(count($dataStd)>0){
+                    $photo = $this->getPhoto($dataStd[0]['Year'],$data_arr['NPM']);
+                    $dataStd[0]['Photo'] = $photo;
                     $result = array(
                         'Status' => 1,
                         'User' => $dataStd[0]
                     );
-                } else {
+                }
+                else {
                     $result = array(
                         'Status' => 0
                     );
@@ -88,7 +91,8 @@ class C_mobile extends CI_Controller {
                         'Status' => 1,
                         'User' => $dataStd[0]
                     );
-                } else {
+                }
+                else {
                     $result = array(
                         'Status' => 0
                     );
@@ -99,6 +103,8 @@ class C_mobile extends CI_Controller {
 
             $dataStd = $this->checkUser($data_arr['NPM'],$data_arr['Password']);
             if(count($dataStd)>0){
+                $photo = $this->getPhoto($dataStd[0]['Year'],$data_arr['NPM']);
+                $dataStd[0]['Photo'] = $photo;
                 $result = array(
                     'Status' => 1,
                     'User' => $dataStd[0]
@@ -125,6 +131,20 @@ class C_mobile extends CI_Controller {
             ))->result_array();
 
         return $dataStd;
+    }
+
+    private function getPhoto($Year,$NPM){
+
+        $db_ = 'ta_'.$Year;
+        $dataDetailStd = $this->db->select('Photo,Gender')->get_where($db_.'.students',array('NPM' => $NPM),1)->result_array();
+
+        $srcImage = base_url('images/icon/userfalse.png');
+        if($dataDetailStd[0]["Photo"]!='' && $dataDetailStd[0]["Photo"]!=null){
+            $urlImg = './uploads/students/'.$db_.'/'.$dataDetailStd[0]["Photo"];
+            $srcImage = (file_exists($urlImg)) ? base_url('uploads/students/'.$db_.'/'.$dataDetailStd[0]["Photo"]) : base_url('images/icon/userfalse.png') ;
+        }
+
+        return $srcImage;
     }
 
 
