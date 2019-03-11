@@ -1175,6 +1175,7 @@ $route['budgeting/export_excel_budget_creator_all'] = 'C_save_to_excel/export_ex
 $route['budgeting/EntryBudget/BudgetLeft'] = 'page/budgeting/c_budgeting/BudgetLeft';
 $route['budgeting/getListBudgetingRemaining'] = 'page/budgeting/c_budgeting/getListBudgetingRemaining';
 $route['budgeting/detail_budgeting_remaining'] = 'page/budgeting/c_budgeting/detail_budgeting_remaining';
+$route['budgeting/detail_budgeting_remaining_All'] = 'page/budgeting/c_budgeting/detail_budgeting_remaining_All';
 $route['budgeting/configRule'] = 'page/budgeting/c_budgeting/configRule';
 $route['budgeting/configRule/userroledepart_submit'] = 'page/budgeting/c_budgeting/userroledepart_submit';
 $route['budgeting/page_pr/(:any)'] = 'page/budgeting/c_budgeting/page_pr/$1';
