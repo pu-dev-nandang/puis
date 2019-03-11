@@ -192,6 +192,7 @@
 													// PostBudgetDepartment = PostBudgetDepartment.concat(PostBudgetDepartmentModal);
 													var P_result = Filtering_PostBudgetDepartment(PostBudgetDepartment,PostBudgetDepartmentModal);
 													PostBudgetDepartment = P_result; 
+													localStorage.setItem("PostBudgetDepartment", JSON.stringify(PostBudgetDepartment));
 												}
 
 											}).fail(function() {
@@ -204,6 +205,7 @@
 
 								// ResponseAjaxEdit = response;
 								// htmlPRDetail(response);
+
 
 								if (CrossArr.length > 0) {
 									var bool = 0;
@@ -405,6 +407,7 @@
     					var ID_budget_left = response['ID_budget_left'];
     					var PostBudgetItem = response['PostName']+'-'+response['RealisasiPostName'];
     					var NameDepartement = response['NameDepartement'];
+    					var Departement = response['Departement'];
     					var ID_m_catalog = response['ID_m_catalog'];
     					var Desc = '';
     					var EstimaValue = '';
@@ -434,6 +437,30 @@
     					UnitCost = UnitCost.substring(0, n);
     					var DateNeeded = response['DateNeeded'];
     					var UploadFile = response['UploadFile'];
+    					var Combine = response['Combine'];
+    					// Isi PostBudgetDepartmentCombine
+    					var htmlCombine = '';
+    					var  chkbox = [];
+    					for (var xx = 0; xx < Combine.length; xx++) {
+    						var temp = {
+    							 id_budget_left : Combine[xx].ID_budget_left_Combine,
+    							 cost :  Combine[xx].Cost_Combine,
+    							 value : Combine[xx].PostName_Combine + ' ' + Combine[xx].RealisasiPostName_Combine,
+    							 Departement :  Combine[xx].Departement_Combine,
+    							 NameDepartement : Combine[xx].NameDepartement_Combine,	
+    							 estvalue : 	Combine[xx].Estvalue_Combine,						
+    						};
+    						chkbox.push(temp);
+    						htmlCombine += '<li id_budget_left= "'+Combine[xx].ID_budget_left_Combine+'" >'+Combine[xx].PostName_Combine + ' ' + Combine[xx].RealisasiPostName_Combine+'['+Combine[xx].NameDepartement_Combine+']'+' : '+ formatRupiah(Combine[xx].Cost_Combine)+'</li>';
+    					}
+
+    					var temp2 = {
+    						No : No,
+    						dt : chkbox,
+    					};
+
+    					PostBudgetDepartmentCombine.push(temp2);
+
     					UploadFile = jQuery.parseJSON(UploadFile);
     					var htmlUploadFile = '';
     					if (UploadFile != null) {
@@ -478,7 +505,7 @@
     								'<td>'+html+'</td>'+
     								'<td>'+
     									'<div class="input-group">'+
-    										'<input type="text" class="form-control PostBudgetItem" readonly id_budget_left = "'+ID_budget_left+'" value = "'+PostBudgetItem+'" namedepartement = "'+NameDepartement+'">'+
+    										'<input type="text" class="form-control PostBudgetItem" readonly id_budget_left = "'+ID_budget_left+'" value = "'+PostBudgetItem+'" namedepartement = "'+NameDepartement+'" departement = "'+Departement+'">'+
     										'<span class="input-group-btn">'+
     											'<button class="btn btn-default SearchPostBudget" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>'+
     										'</span>'+
@@ -510,7 +537,7 @@
     			                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
     	                        		'</div>'+
     	                        	'</td>'+
-    	                        	'<td><input type="file" data-style="fileinput" class = "BrowseFile" ID = "BrowseFile'+No+'" multiple accept="image/*,application/pdf">'+htmlUploadFile+'</td>'+action
+    	                        	'<td><input type="file" data-style="fileinput" class = "BrowseFile" ID = "BrowseFile'+No+'" multiple accept="image/*,application/pdf">'+htmlUploadFile+'</td>'+'<td>'+htmlCombine+'</td>'+action
     	                        '</tr>';	
 
     					return a;				
@@ -541,6 +568,7 @@
     						$("input").prop('disabled', true);
     						$("select").prop('disabled', true);
     						$("textarea").prop('disabled', true);
+    						$(".btn-delete-item").prop('disabled',false);
     						$(".input-group-addon").remove();
     					}
     					if (UserAccess > 1) {
@@ -680,6 +708,10 @@
 		}
 
 		$(document).off('click', '.btn-add-pr').on('click', '.btn-add-pr',function(e) {
+			// before adding row lock all input in last tr
+			var row = $('#table_input_pr tbody tr:last');
+			row.find('td').find('input,select,button,textarea').prop('disabled',true);
+			row.find('td:eq(13)').find('button').prop('disabled',false);
 			AddingTable();
 		})
 
@@ -1188,9 +1220,10 @@
 			var Item = ev.find('td:eq(3)').find('.Item').val();
 			if (PostBudgetItem != '' || Item != '') {
 				// delete
-				ev
-              .closest( 'tr')
-              .remove();
+				// ev
+    //           .closest( 'tr')
+    //           .remove();
+    			ev.closest('tr').find('td:eq(13)').find('.btn-delete-item').trigger('click');
               _BudgetRemaining();
               SortByNumbering();
 
@@ -1243,6 +1276,7 @@
 
 		function _BudgetRemaining()
 		{
+			// console.log(PostBudgetDepartmentCombine);
 			loading_page('#Page_Budget_Remaining');
 			BudgetRemaining = [];
 			var arr_temp = [];
@@ -1266,6 +1300,7 @@
 					for (var i = 0; i < PostBudgetDepartmentCombine.length; i++) {
 						var NoDT = PostBudgetDepartmentCombine[i]['No'];
 						var dt = PostBudgetDepartmentCombine[i]['dt'];
+						// console.log(NoDT+' == '+No);
 						if (NoDT == No) {
 							for (var j = 0; j < dt.length; j++) {
 								combine.push(dt[j]);
@@ -1307,6 +1342,7 @@
 			    return 0;
 			});
 
+			// console.log(arr_temp);
 
 			PostBudgetDepartment = JSON.parse(localStorage.getItem("PostBudgetDepartment"));
 			for (var i = 0; i < arr_temp.length; i++) {
@@ -1337,7 +1373,7 @@
 
 				// cek bantuan combine
 				var Combine = arr_temp[i]['combine'];
-				console.log(arr_temp[i]);
+				// console.log(arr_temp[i]);
 				if (Combine.length > 0) {
 					for (var j = 0; j < Combine.length; j++) {
 						cost = Combine[j]['cost'];
@@ -1876,27 +1912,90 @@
 
 		$(document).off('click', '.btn-delete-item').on('click', '.btn-delete-item',function(e) {
 			var fillItem = $(this).closest('tr');
-			var id_budget_left = fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('id_budget_left');
+			var id_budget_left_primary = fillItem.find('td:eq(2)').find('.PostBudgetItem').attr('id_budget_left');
+			var filtering = [];
+			fillItem.find('td:eq(12)').find('li').each(function(){
+				var v = $(this).attr('id_budget_left');
+				filtering.push(v);
+			});
 
-			// delete budget berdasarkan No
-				var No = fillItem.find('td:eq(0)').text();
-				var arr = [];
-				for (var i = 0; i < PostBudgetDepartmentCombine.length; i++) {
-					var No2 = PostBudgetDepartmentCombine[i]['No'];
-					if (No != No2) {
-						arr.push(PostBudgetDepartmentCombine[i]);
-					} 
+			filtering.push(id_budget_left_primary);
+			var arr = [];
+			for (var i = 0; i < PostBudgetDepartmentCombine.length; i++) {
+				var dt = PostBudgetDepartmentCombine[i]['dt'];
+				var b = false;
+				for (var j = 0; j < dt.length; j++) {
+					var tt = dt[j]['id_budget_left'];
+					for (var k = 0; k < filtering.length; k++) {
+						if (filtering[j] == tt) {
+							b = true;
+							break;
+						}
+					}
+
+					if (!b) {
+						// cj
+						var No = PostBudgetDepartmentCombine[i]['No'];
+						var ba = false;
+						for (var j = 0; j < arr.length; j++) {
+							if (No == arr[j]['No']) {
+								ba = true;
+								break;
+							}
+						}
+
+						if (!ba) {
+							arr.push(PostBudgetDepartmentCombine[i]);
+						}
+						
+					}
 				}
 
-				PostBudgetDepartmentCombine = arr;
+			}
 
-			$( this )
-              .closest( 'tr')
-              .remove();
+			PostBudgetDepartmentCombine = arr;
+
+			$(".PostBudgetItem").each(function(){
+				var id_budget_left = $(this).attr('id_budget_left');
+				var b = false;
+				for (var i = 0; i < filtering.length; i++) {
+					var t = filtering[i];
+					if (t == id_budget_left) {
+						b = true;
+						break;
+					}
+				}
+
+				if (b) {
+					var tr = $(this).closest('tr');
+					tr.remove();
+				}
+
+				
+			})
+
+			$('#table_input_pr td:eq(12)').find('li').each(function(){
+				var id_budget_left = $(this).attr('id_budget_left');
+				var b = false;
+				for (var i = 0; i < filtering.length; i++) {
+					var t = filtering[i];
+					if (t == id_budget_left) {
+						b = true;
+						break;
+					}
+				}
+
+				if (b) {
+					var tr = $(this).closest('tr');
+					tr.remove();
+				}
+			})
+
+			// $( this )
+   //            .closest( 'tr')
+   //            .remove();
               _BudgetRemaining();
               SortByNumbering();
-
-
 
 		})
 
@@ -2237,7 +2336,7 @@
 				// isi kolom Combine Budgeting
 				var htmlWr = '';
 				for (var i = 0; i < chkbox.length; i++) {
-					htmlWr += '<li>'+chkbox[i]['value']+' : '+formatRupiah(chkbox[i]['cost'])+'</li>';
+					htmlWr += '<li id_budget_left = "'+chkbox[i]['id_budget_left']+'">'+chkbox[i]['value']+' : '+formatRupiah(chkbox[i]['cost'])+'</li>';
 				}
 				fillItem.find('td:eq(12)').attr('align','left');
 				fillItem.find('td:eq(12)').html(htmlWr);
@@ -2413,7 +2512,9 @@
 			var FormInsertDetail = [];
 			var form_data = new FormData();
 			var PassNumber = 0;
+
 			$(".PostBudgetItem").each(function(){
+				var FormInsertCombine = [];
 				var ID_budget_left = $(this).attr('id_budget_left');
 				var fillItem = $(this).closest('tr');
 				var ID_m_catalog = fillItem.find('td:eq(3)').find('.Item').attr('savevalue');
@@ -2444,6 +2545,18 @@
 					}
 				}
 
+				// get combine
+					for (var i = 0; i < PostBudgetDepartmentCombine.length; i++) {
+						var GetNO = PostBudgetDepartmentCombine[i]['No'];
+						var dt = PostBudgetDepartmentCombine[i]['dt'];
+						if (No == GetNO) {
+							for (var j = 0; j < dt.length; j++) {
+								FormInsertCombine.push(dt[j]);
+							}
+						}
+					}
+					// console.log(FormInsertCombine);
+
 				 var data = {
 				 	ID_budget_left : ID_budget_left,
 				 	ID_m_catalog : ID_m_catalog,
@@ -2454,12 +2567,15 @@
 				 	SubTotal : SubTotal,
 				 	DateNeeded : DateNeeded,
 				 	BudgetStatus : BudgetStatus,
+				 	FormInsertCombine : FormInsertCombine,
 				 }
 				 var token = jwt_encode(data,"UAP)(*");
 				 FormInsertDetail.push(token);
 				 PassNumber++
 
 			})
+			// return;
+
 			var token = jwt_encode(FormInsertDetail,"UAP)(*");
 			form_data.append('token',token);
 

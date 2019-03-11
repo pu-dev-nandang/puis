@@ -794,6 +794,30 @@ class M_budgeting extends CI_Model {
                 where a.PRCode = ?
                ';
         $query = $this->db->query($sql, array($PRCode))->result_array();
+        // get combine 
+        for ($i=0; $i < count($query); $i++) { 
+            $arr = array();
+            $sql = 'select b.ID_budget_left as ID_budget_left_Combine,c.ID_creator_budget as ID_creator_budget_Combine,d.CodePostBudget as CodePostBudget_Combine,e.CodeSubPost as CodeSubPost_Combine,f.CodePost as CodePost_Combine,
+                f.RealisasiPostName as RealisasiPostName_Combine,f.Departement as Departement_Combine,g.PostName as PostName_Combine,
+                h.NameDepartement as NameDepartement_Combine,b.Cost as Cost_Combine,b.Estvalue as Estvalue_Combine from 
+                db_budgeting.pr_detail_combined as b
+                join db_budgeting.budget_left as c on b.ID_budget_left = c.ID
+               join db_budgeting.creator_budget as d on c.ID_creator_budget = d.ID
+               join db_budgeting.cfg_set_post as e on d.CodePostBudget = e.CodePostBudget
+               join db_budgeting.cfg_postrealisasi as f on e.CodeSubPost = f.CodePostRealisasi
+               join db_budgeting.cfg_post as g on f.CodePost = g.CodePost
+               join (
+                   select * from (
+                                   select CONCAT("AC.",ID) as ID, NameEng as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
+                                   UNION
+                                   select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                                   ) aa
+                   ) as h on f.Departement = h.ID
+                where b.ID_pr_detail = ?   
+                ';
+            $arr = $this->db->query($sql, array($query[$i]['ID']))->result_array();
+            $query[$i]['Combine'] = $arr;   
+        }
         return $query;       
     }
 
