@@ -1753,8 +1753,28 @@ class C_budgeting extends Budgeting_Controler {
                         $uploadFile = $this->uploadDokumenMultiple(mt_rand(),'UploadFile'.$i);
                         $data_arr['UploadFile'] = json_encode($uploadFile); 
                     }
-                $data_arr['PRCode'] = $PRCode;    
-                $this->db->insert('db_budgeting.pr_detail',$data_arr);
+
+                    // exclude 
+                        $Combine =  (array)  json_decode(json_encode($data_arr['FormInsertCombine']),true);
+                        unset($data_arr['FormInsertCombine']);
+
+                    $data_arr['PRCode'] = $PRCode;    
+                    $this->db->insert('db_budgeting.pr_detail',$data_arr);
+                    // insert combine budgeting
+                    $getID = $this->db->insert_id();
+                    if (count($Combine) > 0) {
+                        for ($j=0; $j <count($Combine) ; $j++) { 
+                            $dataSave_combine = array(
+                                'ID_pr_detail' => $getID,
+                                'ID_budget_left' => $Combine[$j]['id_budget_left'],
+                                'Cost' => $Combine[$j]['cost'],
+                                'Estvalue' => $Combine[$j]['estvalue'],
+                            );
+                            $this->db->insert('db_budgeting.pr_detail_combined',$dataSave_combine);
+                        }
+                        
+                    }
+
             }
 
             // insert to pr_circulation_sheet

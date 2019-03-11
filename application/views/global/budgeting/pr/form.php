@@ -336,7 +336,7 @@
 								'<div class = "col-sm-2">'+
 									'<div class = "form-group">'+
 										'<label>PPN</label>'+
-										'<input type = "text" class = "form-control" id = "ppn"><b>%</b>'+
+										'<input type = "text" class = "form-control" id = "ppn" value = "10"><b>%</b>'+
 									'</div>'+
 								'</div>'+
 							'</div>';
@@ -722,8 +722,7 @@
 			    return $(this).text() != 'No';
 			}).closest("tr");
 			if (tableRow.length) {
-							tableRow
-				              .remove();
+							tableRow.find('td:eq(13)').find('.btn-delete-item').trigger('click');
 				toastr.info('Row data containing combine have been deleted');              
 			}
 
@@ -2208,17 +2207,17 @@
 							if (kekurangan > 0) {
 								var arr = [];
 								for (var i = 0; i < PostBudgetDepartmentModal.length; i++) {
+									// check data PostBudgetDepartmentModal dengan data BudgetRemaining untuk update value /cost datanya
+									var ID = PostBudgetDepartmentModal[i]['ID'] 
+									for (var j = 0; j < BudgetRemaining.length; j++) {
+										var id_budget_left = BudgetRemaining[j]['id_budget_left'];
+										if (ID == id_budget_left) {
+											PostBudgetDepartmentModal[i]['Value'] = BudgetRemaining[j]['RemainingNoFormat']
+										}
+									}
+
 									var Cost = PostBudgetDepartmentModal[i]['Value'];
 									if (Cost >= kekurangan) {
-										// check data PostBudgetDepartmentModal dengan data BudgetRemaining untuk update value /cost datanya
-										var ID = PostBudgetDepartmentModal[i]['ID'] 
-										for (var j = 0; j < BudgetRemaining.length; j++) {
-											var id_budget_left = BudgetRemaining[j]['id_budget_left'];
-											if (ID == id_budget_left) {
-												PostBudgetDepartmentModal[i]['Value'] = BudgetRemaining[j]['RemainingNoFormat']
-											}
-										}
-
 										arr.push(PostBudgetDepartmentModal[i]);
 									}
 								}
