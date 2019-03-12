@@ -400,9 +400,6 @@ $route['admission/master/generate_formulir_global'] = 'page/admission/c_master/g
 $route['admission/master/import_sales_regional'] = 'page/admission/c_master/import_sales_regional';
 
 
-
-
-
 $route['admission/dashboard'] = 'page/admission/c_admission/dashboard';
 $route['readNotificationDivision'] = 'dashboard/c_dashboard/readNotificationDivision';
 

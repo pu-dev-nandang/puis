@@ -263,7 +263,6 @@ class C_admission extends Admission_Controler {
         $input =  $this->getInputToken();
         $Nama = $input['Nama'];
         $FormulirCode = $input['FormulirCode'];
-
         $this->load->library('pagination');
         $config = $this->config_pagination_default_ajax(1000,5,6);
         $this->pagination->initialize($config);
@@ -359,12 +358,13 @@ class C_admission extends Admission_Controler {
        $Nama = $input['Nama'];
        $selectProgramStudy = $input['selectProgramStudy'];
        $Sekolah = $input['Sekolah'];
+       $No_Formulir = $input['No_Formulir'];
        $this->load->library('pagination');
-       $config = $this->config_pagination_default_ajax($this->m_admission->count_loadData_calon_mahasiswa($Nama,$selectProgramStudy,$Sekolah),25,4);
+       $config = $this->config_pagination_default_ajax($this->m_admission->count_loadData_calon_mahasiswa($Nama,$selectProgramStudy,$Sekolah,$No_Formulir),25,4);
        $this->pagination->initialize($config);
        $page = $this->uri->segment(4);
        $start = ($page - 1) * $config["per_page"];
-       $this->data['datadb'] = $this->m_admission->loadData_calon_mahasiswa($config["per_page"], $start,$Nama,$selectProgramStudy,$Sekolah);
+       $this->data['datadb'] = $this->m_admission->loadData_calon_mahasiswa($config["per_page"], $start,$Nama,$selectProgramStudy,$Sekolah,$No_Formulir);
       $this->data['no'] = $start + 1;
       $this->data['chkActive'] = 1;
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/table_calon_mahasiswa',$this->data,true);

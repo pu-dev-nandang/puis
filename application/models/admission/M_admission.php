@@ -772,7 +772,7 @@ class M_admission extends CI_Model {
       $sql = 'select c.Name as prody,a.ID_ujian_perprody,DATE(a.DateTimeTest) as tanggal
         ,CONCAT((EXTRACT(HOUR FROM a.DateTimeTest)),":",(EXTRACT(MINUTE FROM a.DateTimeTest))) as jam,
         a.Lokasi,
-        h.Name as NameCandidate,h.Email,i.SchoolName,f.FormulirCode,e.ID as ID_register_formulir
+        h.Name as NameCandidate,h.Email,i.SchoolName,f.FormulirCode,e.ID as ID_register_formulir,if(h.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = f.FormulirCode limit 1) ,""  ) as No_Ref
         from db_admission.register_jadwal_ujian as a 
         join db_admission.ujian_perprody_m as b
         on a.ID_ujian_perprody = b.ID
@@ -802,12 +802,45 @@ class M_admission extends CI_Model {
       if ($Nama != '') {
         $where .= ' and h.Name like "%'.$Nama.'%" or i.SchoolName like "%'.$Nama.'%"';
         if ($FormulirCode != '') {
+            // Checking Formulir Code
+              $Q = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','No_Ref',$FormulirCode);
+              if (count($Q) == 0) {
+                $Q = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','FormulirCode',$FormulirCode);
+                if (count($Q) == 0) {
+                  $FormulirCode = $Q[0]['FormulirCode'];
+                }
+                else
+                {
+                  $FormulirCode = $No_Formulir;
+                }
+              }
+              else
+              {
+                $FormulirCode = $Q[0]['FormulirCode'];
+              }
+
            $where .= ' and f.FormulirCode like "%'.$FormulirCode.'%"';
          } 
       }
       else
       {
         if ($FormulirCode != '') {
+          // Checking Formulir Code
+            $Q = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','No_Ref',$FormulirCode);
+            if (count($Q) == 0) {
+              $Q = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','FormulirCode',$FormulirCode);
+              if (count($Q) == 0) {
+                $FormulirCode = $Q[0]['FormulirCode'];
+              }
+              else
+              {
+                $FormulirCode = $FormulirCode;
+              }
+            }
+            else
+            {
+              $FormulirCode = $Q[0]['FormulirCode'];
+            }
           $where .= ' and f.FormulirCode like "%'.$FormulirCode.'%"';
         }
       }
@@ -815,7 +848,8 @@ class M_admission extends CI_Model {
       $sql = 'select c.Name as prody,a.ID_ujian_perprody,DATE(a.DateTimeTest) as tanggal
         ,CONCAT((EXTRACT(HOUR FROM a.DateTimeTest)),":",(EXTRACT(MINUTE FROM a.DateTimeTest))) as jam,
         a.Lokasi,
-        h.Name as NameCandidate,h.Email,i.SchoolName,f.FormulirCode,e.ID as ID_register_formulir
+        h.Name as NameCandidate,h.Email,i.SchoolName,f.FormulirCode,e.ID as ID_register_formulir,
+        if(h.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = f.FormulirCode limit 1) ,""  ) as No_Ref
         from db_admission.register_jadwal_ujian as a 
         join db_admission.ujian_perprody_m as b
         on a.ID_ujian_perprody = b.ID
@@ -1134,7 +1168,7 @@ class M_admission extends CI_Model {
       $this->db->update('db_admission.formulir_number_offline_m', $dataSave);
     }
 
-    public function count_loadData_calon_mahasiswa($Nama,$selectProgramStudy,$Sekolah)
+    public function count_loadData_calon_mahasiswa($Nama,$selectProgramStudy,$Sekolah,$No_Formulir)
     {
       if($Nama != '%') {
           $Nama = '"%'.$Nama.'%"'; 
@@ -1158,6 +1192,31 @@ class M_admission extends CI_Model {
       else
       {
         $Sekolah = '"%"'; 
+      }
+
+      if($No_Formulir == '') {
+          $No_Formulir = ''; 
+      }
+      else
+      {
+        // Checking Formulir Code
+          $Q = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','No_Ref',$No_Formulir);
+          if (count($Q) == 0) {
+            $Q = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','FormulirCode',$No_Formulir);
+            if (count($Q) == 0) {
+              $No_Formulir = $Q[0]['FormulirCode'];
+            }
+            else
+            {
+              $No_Formulir = $No_Formulir;
+            }
+          }
+          else
+          {
+            $No_Formulir = $Q[0]['FormulirCode'];
+          }
+
+        $No_Formulir = ' and b.FormulirCode = "'.$No_Formulir.'"'; 
       }
 
         $sql = 'select count(*) as total from (
@@ -1191,13 +1250,13 @@ class M_admission extends CI_Model {
               ON n.ID = d.SchoolID
               left join db_academic.program_study as o
               on o.ID = a.ID_program_study
-              where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID not in (select ID_register_formulir from db_admission.register_butuh_ujian) and  a.ID not in (select ID_register_formulir from db_admission.register_nilai) 
+              where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID not in (select ID_register_formulir from db_admission.register_butuh_ujian) and  a.ID not in (select ID_register_formulir from db_admission.register_nilai) '.$No_Formulir.' 
             ) aa';
            $query=$this->db->query($sql, array())->result_array();
            return $query[0]['total'];
     }
 
-    public function loadData_calon_mahasiswa($limit, $start,$Nama,$selectProgramStudy,$Sekolah)
+    public function loadData_calon_mahasiswa($limit, $start,$Nama,$selectProgramStudy,$Sekolah,$No_Formulir)
     {
       $arr_temp = array('data' => array());
       if($Nama != '%') {
@@ -1222,6 +1281,31 @@ class M_admission extends CI_Model {
       else
       {
         $Sekolah = '"%"'; 
+      }
+
+      if($No_Formulir == '') {
+          $No_Formulir = ''; 
+      }
+      else
+      {
+        // Checking Formulir Code
+          $Q = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','No_Ref',$No_Formulir);
+          if (count($Q) == 0) {
+            $Q = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','FormulirCode',$No_Formulir);
+            if (count($Q) == 0) {
+              $No_Formulir = $Q[0]['FormulirCode'];
+            }
+            else
+            {
+              $No_Formulir = $No_Formulir;
+            }
+          }
+          else
+          {
+            $No_Formulir = $Q[0]['FormulirCode'];
+          }
+
+        $No_Formulir = ' and b.FormulirCode = "'.$No_Formulir.'"'; 
       }
 
         $sql = 'select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,g.JenisTempatTinggal,
@@ -1258,7 +1342,7 @@ class M_admission extends CI_Model {
             ON n.ID = d.SchoolID
             left join db_academic.program_study as o
             on o.ID = a.ID_program_study
-            where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID not in (select ID_register_formulir from db_admission.register_butuh_ujian) and  a.ID not in (select ID_register_formulir from db_admission.register_nilai) LIMIT '.$start. ', '.$limit;
+            where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID not in (select ID_register_formulir from db_admission.register_butuh_ujian) and  a.ID not in (select ID_register_formulir from db_admission.register_nilai) '.$No_Formulir.' LIMIT '.$start. ', '.$limit;
            $query=$this->db->query($sql, array())->result_array();
            return $query;
     }
