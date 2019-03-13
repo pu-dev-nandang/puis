@@ -2696,4 +2696,74 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
         return $arr_result;
     }
+
+    public function insert_m_tuition_fee($NPM,$PTID_Q,$ProdiID,$YearAuth,$Invoice_Q,$Discount_Q)
+    {
+        // untuk semester data diambil dari set tagihan awal, semester lainnya akan baca payment per prodi dan discount sama dengan = 0
+        $sql1 = 'select * from db_finance.tuition_fee where PTID = ? and ProdiID = ? and ClassOf = ?';
+        $query1=$this->db->query($sql1, array($PTID_Q,$ProdiID,$YearAuth))->result_array();
+        $PTID = $query1[0]['PTID'];
+        for ($k=1; $k <= 14; $k++) {
+                $st = $k; 
+                switch ($PTID) {
+                    case 1:
+                    case 4:
+                        if ($k == 1) {
+                            $Invoice = $Invoice_Q;
+                            $Discount = $Discount_Q;
+                            $st = 15;
+                        }
+                        break;
+                    case 2:
+                    case 3:
+                        $Invoice = $query1[0]['Cost'];
+                        $Discount = 0;
+                        if ($k == 1) {
+                           $Invoice = $Invoice_Q;
+                           $Discount = $Discount_Q;
+                           // if ($PTID == 3) { // karena hitung satu sks
+                           //     $Invoice = $query1[0]['Cost'];
+                           //     $Discount = $Discount_Q;
+                           // }
+                        }
+                        break;
+                    default:
+                        $Invoice = 0;
+                        $Discount = 0;
+                        break;
+                }
+               $Semester = $k;
+               $dataSave = array(
+                    'Semester' => $Semester,
+                    'PTID' => $PTID,
+                    'NPM' => $NPM,
+                    'Invoice' => $Invoice,
+                    'Discount' => $Discount,
+               );
+               $this->db->insert('db_finance.m_tuition_fee',$dataSave);
+               $k = $st;
+        }
+
+        // for ($k=1; $k <= 14; $k++) {
+        //     $Invoice = $query1[0]['Cost'];
+        //    $Semester = $k;
+        //    if ($Semester == 1) {
+        //        $Invoice = $Invoice_Q;
+        //        $Discount = $Discount_Q;
+        //    }
+        //    else
+        //    {
+        //     $Invoice= $Invoice;
+        //     $Discount = 0;
+        //    }
+        //    $dataSave = array(
+        //         'Semester' => $Semester,
+        //         'PTID' => $PTID,
+        //         'NPM' => $NPM,
+        //         'Invoice' => $Invoice,
+        //         'Discount' => $Discount,
+        //    );
+        //    $this->db->insert('db_finance.m_tuition_fee',$dataSave);
+        // }
+    }
 }

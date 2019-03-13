@@ -1237,7 +1237,7 @@ class C_admission extends Admission_Controler {
           $arrInputID = $input['checkboxArr'];
           $arr = array();
           $arr_insert_auth = array();
-          $arr_insert3 = array();
+          $arr_insert3 = array(); // for auth_parents
           $arr_insert4 = array();
           
           for ($i=0; $i < count($arrInputID); $i++) {
@@ -1448,6 +1448,21 @@ class C_admission extends Admission_Controler {
 
             $arr_insert_auth[] = $temp2;
 
+            $temp3 = array(
+                'NPM' => $NPM,
+                'ProgramID' => 1,
+                'ProdiID' => $ProdiID,
+                'Year' => $YearAuth,
+                'Password' => $pass,
+                'Password_Old' => md5($pasword_old),
+                'FatherName' => $Father,
+                'MotherName' => $Mother,
+                'StatusStudentID' => 3,
+                'Status' => '-1',
+            );
+
+            $arr_insert3[] = $temp3;
+
             $dataSave = array(  
                 'NPM' => $NPM,
                 'FormulirCode' => $data2[0]['FormulirCode'],
@@ -1529,6 +1544,10 @@ class C_admission extends Admission_Controler {
                      $this->db->insert('db_finance.payment', $dataSave);
                      $insert_id = $this->db->insert_id();
 
+                     // insert to m_tuition_fee
+                     $this->m_master->insert_m_tuition_fee($NPM,$getPaymentAdmisi[$z]['PTID'],$ProdiID,$YearAuth,$Invoice,$getPaymentAdmisi[$z]['Discount']);
+
+
                      // cek lunas atau tidak
                      if ($hitung >= $Invoice) {
                        $dataSave = array(
@@ -1597,7 +1616,10 @@ class C_admission extends Admission_Controler {
 
           // $this->db->insert_batch($ta.'.students', $arr);
           $this->db->insert_batch('db_academic.auth_students', $arr_insert_auth);
-          $this->m_admission->insert_to_Library($arr_insert_auth);
+          $this->db->insert_batch('db_academic.auth_parents', $arr_insert3);
+          if($_SERVER['SERVER_NAME']!='localhost') {
+            $this->m_admission->insert_to_Library($arr_insert_auth);
+          } 
           echo json_encode('');
 
     }
