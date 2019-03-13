@@ -2965,6 +2965,13 @@ class M_admission extends CI_Model {
         return $query;       
     }
 
+    public function getkelulusan($ID_register_formulir)
+    {
+        $sql = 'select * from db_admission.register_kelulusan_ujian where ID_register_formulir = ?';
+        $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
+        return $query;  
+    }
+
     public function getDataCalonMhsTuitionFee_approved_ALL($Year,$Prodi,$Status = 'p.Status = "Created" or p.Status = "Approved"')
     {
       $Prodi = ($Prodi == 0) ? '' : ' and a.ID_program_study = "'.$Prodi.'"';

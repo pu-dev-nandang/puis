@@ -151,7 +151,7 @@
 			var Rangking = (getDataCalonMhs[i]['RangkingRapor'] != 0) ? 'Rangking : '+getDataCalonMhs[i]['RangkingRapor'] : "";
 			$(".tableData tbody").append(
 					'<tr id = "id_formulir'+getDataCalonMhs[i]['ID_register_formulir']+'">'+
-						'<td align= "center">'+no+'&nbsp<input type="checkbox" nama ="'+getDataCalonMhs[i]['Name']+'" class="uniform" value ="'+getDataCalonMhs[i]['ID_register_formulir']+'"</td>'+
+						'<td align= "center">'+no+'&nbsp<input type="checkbox" nama ="'+getDataCalonMhs[i]['Name']+'" class="uniform" value ="'+getDataCalonMhs[i]['ID_register_formulir']+'" email ="'+getDataCalonMhs[i]['Email']+'">'+'</td>'+
 						'<td>'+getDataCalonMhs[i]['Name']+'<br>'+getDataCalonMhs[i]['NamePrody']+'<br>'+getDataCalonMhs[i]['SchoolName']+'</td>'+
 						'<td>'+Code+'</td>'+
 						'<td>'+selecTOption+'<br><br>'+selecTOption2+'<br><br>'+Rangking+'<br><br>'+showFile+'</td>'+

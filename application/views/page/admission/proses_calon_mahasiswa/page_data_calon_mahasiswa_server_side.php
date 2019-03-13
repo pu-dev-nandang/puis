@@ -414,14 +414,17 @@
         var ID_register_formulir = $(this).attr('id-register-formulir');
         var Email = $(this).attr('email');
         var Nama = $(this).attr('nama');
-        var url = base_url_js+"api/__getDocument";
+        var url = base_url_js+"api/__getDocument2";
         var data = {
             ID_register_formulir : ID_register_formulir,
             Email : Email,
         };
         var token = jwt_encode(data,"UAP)(*");
         $.post(url,{ token:token }, function (json) {
+            var doc = json['doc'];
             $('#GlobalModal .modal-header').html('<h4 class="modal-title">'+'Document '+Nama+'</h4>');
+            var html = '<div class = "row">'+
+                          '<div class ="col-md-12">';
             var table = '';
             table = '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
             '<thead>'+
@@ -435,23 +438,69 @@
             table += '</tr>' ;  
             table += '</thead>' ; 
             table += '<tbody>' ;
-            for (var i =0; i < json.length; i++) {
+            for (var i =0; i < doc.length; i++) {
               table += '<tr>'+
                           '<td>'+ (i+1)+'</td>'+
-                          '<td>'+json[i]['DocumentChecklist'] +'</td>'+
-                          '<td>'+json[i]['Required'] +'</td>'+
+                          '<td>'+doc[i]['DocumentChecklist'] +'</td>'+
+                          '<td>'+doc[i]['Required'] +'</td>'+
                           // '<td>'+'<a href = "<?php echo url_registration ?>document/'+Email+'/'+json[i]['Attachment']+'" target="_blank">File</a></td>'+
-                          '<td>'+'<a href="javascript:void(0)" class="show_a_href" id = "show'+Email+'" filee = "'+json[i]['Attachment']+'" Email = "'+Email+'">File</a></td>'+
-                          '<td>'+json[i]['Status'] +'</td>'
+                          '<td>'+'<a href="javascript:void(0)" class="show_a_href" id = "show'+Email+'" filee = "'+doc[i]['Attachment']+'" Email = "'+Email+'">File</a></td>'+
+                          '<td>'+doc[i]['Status'] +'</td>'
                           ; 
             }
              
             table += '</tbody>' ; 
             table += '</table>' ;
+            html += table;
+            html += '</div></div>'; // end document
+
+            var ujian = json['ujian'];
+            if (ujian.length > 0) {
+              var kelulusan = json['kelulusan'];
+              html += '<div class= "row" style = "margin-top ; 5px">'+
+                        '<div class = "col- md-12">'+
+                          '<h5>Exam Result</h5>'+
+                          '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+                                      '<thead>'+
+                                          '<tr>'+
+                                              '<th style="width: 5px;">No</th>'+
+                                              '<th style="width: 55px;">Exam Name</th>'+
+                                              '<th style="width: 55px;">Bobot</th>'+
+                                              '<th style="width: 55px;">Value</th>';
+              html += '</tr>' ;  
+              html += '</thead>' ; 
+              html += '<tbody>' ;
+              
+              var jmlbobot = 0;
+              var Nilai_bobot = 0;
+              var nilai = 0;
+              for (var i =0; i < ujian.length; i++) {
+                html += '<tr>'+
+                            '<td>'+ (i+1)+'</td>'+
+                            '<td>'+ujian[i]['NamaUjian'] +'</td>'+
+                            '<td>'+ujian[i]['Bobot'] +'</td>'+
+                            '<td>'+ujian[i]['Value'] +'</td>'; 
+
+                jmlbobot = parseInt(jmlbobot)  + parseInt(ujian[i]['Bobot']);
+                Nilai_bobot = parseInt(Nilai_bobot) + ( (parseInt(ujian[i]['Value']) * parseInt(ujian[i]['Bobot']) ) )
+              }
+              
+               nilai = parseInt(Nilai_bobot) / parseInt(jmlbobot); 
+
+              html += '</tbody>' ; 
+              html += '</table>' ;
+
+              html += '<p>Jumlah Bobot : '+jmlbobot+'</p>'+
+                      '<p>Nilai * Bobot : '+Nilai_bobot+'</p>'+
+                      '<p>Nilai Akhir : '+nilai+'</p>'+
+                      '<p>Status : '+kelulusan[0]['Kelulusan']+'</p>';
+
+            }
+
             var footer = '<div class="col-sm-12" id="BtnFooter">'+
                             '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
                           '</div>';
-            $('#GlobalModal .modal-body').html(table);
+            $('#GlobalModal .modal-body').html(html);
             $('#GlobalModal .modal-footer').html(footer);
             $('#GlobalModal').modal({
                 'show' : true,

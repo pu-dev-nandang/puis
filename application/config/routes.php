@@ -789,6 +789,7 @@ $route['api/__getSumberIklan'] = 'api/c_api/getSumberIklan';
 $route['api/__getPriceFormulirOffline'] = 'api/c_api/getPriceFormulirOffline';
 $route['api/__getEvent'] = 'api/c_api/getEvent';
 $route['api/__getDocument'] = 'api/c_api/getDocument';
+$route['api/__getDocument2'] = 'api/c_api/getDocument2';
 $route['api/__getDocumentAdmisiMHS'] = 'api/c_api/getDocumentAdmisiMHS';
 
 
