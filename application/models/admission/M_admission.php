@@ -1773,7 +1773,16 @@ class M_admission extends CI_Model {
             }
           $Attachment = '';
           // get All Files Uploaded
-             $Document = $this->getDataDokumentRegister($query[$i]['ID_register_formulir']);  
+             $Document = $this->getDataDokumentRegister($query[$i]['ID_register_formulir']); 
+             // get revision terakhir jika ada
+               $NoteRev = '';
+               $dataGet = $this->m_master->caribasedprimary('db_finance.register_admisi_rev','ID_register_formulir',$query[$i]['ID_register_formulir']);
+               $count = count($dataGet);
+               $arr_Count = $count - 1;
+               if (count($dataGet) != 0) {
+                $NoteRev = $dataGet[$arr_Count]['Note'];
+               }
+
         if ($query[$i]['status1'] == 'Rapor') {
           // check rangking
             $getRangking = $this->getRangking($query[$i]['ID_register_formulir']);
@@ -1787,15 +1796,6 @@ class M_admission extends CI_Model {
                 $DiskonSPP = $jpa[$j]['DiskonSPP'];
                 break;
               }
-            }
-
-          // get revision terakhir jika ada
-            $NoteRev = '';
-            $dataGet = $this->m_master->caribasedprimary('db_finance.register_admisi_rev','ID_register_formulir',$query[$i]['ID_register_formulir']);
-            $count = count($dataGet);
-            $arr_Count = $count - 1;
-            if (count($dataGet) != 0) {
-             $NoteRev = $dataGet[$arr_Count]['Note'];
             }
 
             $arr_temp[$i] = array(

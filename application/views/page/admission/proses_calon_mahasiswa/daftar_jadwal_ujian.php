@@ -112,7 +112,7 @@
 						'<td>'+response[i]['jam']+'</td>'+
 						'<td>'+response[i]['Lokasi']+'</td>'+
 					'</tr>'	
-					);
+				);
 				no++;
 			}
 		}).done(function() {

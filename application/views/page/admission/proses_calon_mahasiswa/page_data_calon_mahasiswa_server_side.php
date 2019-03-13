@@ -118,7 +118,7 @@
                                '<th>Sales</th>'+
                                '<th>Rangking</th>'+
                                '<th>Beasiswa</th>'+
-                               '<th>Document</th>'+
+                               '<th>Document & Exam</th>'+
                                '<th width = "13%">Tagihan</th>'+
                                '<th>Detail Payment</th>'+
                                '<th>Status</th>'+

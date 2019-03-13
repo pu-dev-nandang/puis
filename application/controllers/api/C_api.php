@@ -4219,6 +4219,8 @@ class C_api extends CI_Controller {
         $input = $this->getInputToken();
         $this->load->model('admission/m_admission');
         $getData = $this->m_admission->getDataDokumentRegister($input['ID_register_formulir']);
+        $getUjian = $this->m_admission->getHasilUjian($input['ID_register_formulir']);
+        // get nilai ujian jika ada
         echo json_encode($getData);
     }
 
