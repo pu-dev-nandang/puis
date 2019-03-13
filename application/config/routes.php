@@ -397,9 +397,7 @@ $route['admission/add_auth_user'] = 'page/admission/c_master/add_auth_user';
 $route['admission/delete_authUser'] = 'page/admission/c_master/delete_authUser';
 $route['admission/config/getAuthDataTables'] = 'page/admission/c_master/getAuthDataTables';
 $route['admission/master/generate_formulir_global'] = 'page/admission/c_master/generate_formulir_global';
-
-
-
+$route['admission/master/import_sales_regional'] = 'page/admission/c_master/import_sales_regional';
 
 
 $route['admission/dashboard'] = 'page/admission/c_admission/dashboard';
@@ -791,6 +789,7 @@ $route['api/__getSumberIklan'] = 'api/c_api/getSumberIklan';
 $route['api/__getPriceFormulirOffline'] = 'api/c_api/getPriceFormulirOffline';
 $route['api/__getEvent'] = 'api/c_api/getEvent';
 $route['api/__getDocument'] = 'api/c_api/getDocument';
+$route['api/__getDocument2'] = 'api/c_api/getDocument2';
 $route['api/__getDocumentAdmisiMHS'] = 'api/c_api/getDocumentAdmisiMHS';
 
 

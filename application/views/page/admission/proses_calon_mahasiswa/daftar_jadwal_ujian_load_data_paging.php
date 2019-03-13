@@ -41,7 +41,7 @@
 				 	<td><?php echo $datadb[$i]['NameCandidate'] ?></td>
 				 	<td><?php echo $datadb[$i]['Email'] ?></td>
 				 	<td><?php echo $datadb[$i]['SchoolName'] ?></td>
-				 	<td><?php echo $datadb[$i]['FormulirCode'] ?></td>
+				 	<td><?php echo $datadb[$i]['FormulirCode'].(($datadb[$i]['No_Ref']!= '')?' / '.$datadb[$i]['No_Ref'] : '') ?></td>
 				 	<td><?php echo $datadb[$i]['prody'] ?></td>
 				 	<td><?php echo $datadb[$i]['tanggal'] ?></td>
 				 	<td><?php echo $datadb[$i]['jam'] ?></td>

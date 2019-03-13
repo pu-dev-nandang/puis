@@ -1258,6 +1258,10 @@ class M_finance extends CI_Model {
     for ($i=0; $i < count($Data_mhs); $i++) { 
       $array = array('SemesterID' => $SemesterID[0]['ID'], 'SemesterName' => $SemesterID[0]['Name']);
       $Data_mhs[$i] = $Data_mhs[$i] + $array;
+
+      $array = array('GetSemester' => $GetSemester);
+      $Data_mhs[$i] = $Data_mhs[$i] + $array;
+      
       $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$Data_mhs[$i]['ProdiID']);
       $array = array('ProdiEng' => $ProdiEng[0]['NameEng']);
       $Data_mhs[$i] = $Data_mhs[$i] + $array;

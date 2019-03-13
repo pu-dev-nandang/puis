@@ -106,13 +106,13 @@
 						'<td>'+response[i]['NameCandidate']+'</td>'+
 						'<td>'+response[i]['Email']+'</td>'+
 						'<td>'+response[i]['SchoolName']+'</td>'+
-						'<td>'+response[i]['FormulirCode']+'</td>'+
+						'<td>'+response[i]['FormulirCode']+((response[i]['No_Ref']!='')? ' / '+ response[i]['No_Ref'] : '')+'</td>'+
 						'<td>'+response[i]['prody']+'</td>'+
 						'<td>'+response[i]['tanggal']+'</td>'+
 						'<td>'+response[i]['jam']+'</td>'+
 						'<td>'+response[i]['Lokasi']+'</td>'+
 					'</tr>'	
-					);
+				);
 				no++;
 			}
 		}).done(function() {

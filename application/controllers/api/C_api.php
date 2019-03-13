@@ -4222,6 +4222,24 @@ class C_api extends CI_Controller {
         echo json_encode($getData);
     }
 
+    public function getDocument2()
+    {
+        $input = $this->getInputToken();
+        $this->load->model('admission/m_admission');
+        $arr = array('doc'=> array(),'ujian' => array(),'kelulusan' => array());
+        $getData = $this->m_admission->getDataDokumentRegister($input['ID_register_formulir']);
+        // get nilai ujian jika ada
+        $getUjian = $this->m_admission->getHasilUjian($input['ID_register_formulir']);
+        $arr['doc'] = $getData;
+        if (count($getUjian) > 0) {
+            $arr['ujian'] = $getUjian;
+            $kelulusan = $this->m_admission->getkelulusan($input['ID_register_formulir']);
+            $arr['kelulusan'] = $kelulusan;
+        }
+        
+        echo json_encode($arr);
+    }
+
     public function getDocumentAdmisiMHS()
     {
         $input = $this->getInputToken();
