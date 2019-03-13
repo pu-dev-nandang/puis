@@ -3247,7 +3247,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell((3*$w_f)+$w_fv,$h,ucwords(strtolower($dataTempTr['Place'])).', '.$dateT,$border,1,'L');
 
 
-        $ttdb = ($lang=='ind')? 'Pjs. Wakil Rektor Bidang Akademik' : 'Vice Rector of Academic Affairs';
+        $ttdb = ($lang=='ind')? 'Pjs. Wakil Rektor Bidang Akademik' : 'Acting Vice Rector of Academic Affairs';
         $pdf->Cell($w_smt+$w_no+$w_kode+$w_mk,$h,'',$border,0,'R');
         $pdf->Cell((3*$w_f)+$w_fv,$h,$ttdb,$border,1,'L');
 
