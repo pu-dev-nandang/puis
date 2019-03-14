@@ -2506,16 +2506,19 @@ class C_rest extends CI_Controller {
                 'Value' => $data_json['test'],
             );
             $this->db->insert('test.test', $dataSave);
+            if ($this->db->affected_rows() > 0 )
+             {
+                 echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+             }
+             else
+             {
+                 echo json_encode(array('msg' => '000','status' => 0));
+             }
         }
-        
-        if ($this->db->affected_rows() > 0 )
-         {
-             echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
-         }
-         else
-         {
-             echo json_encode(array('msg' => '000','status' => 0));
-         }
+        else
+        {
+            echo json_encode(array('msg' => '000','status' => 0));
+        }
        
     }
 }
