@@ -631,6 +631,8 @@ $route['save2pdf/monitoringAttdLecturer'] =  'c_save_to_pdf/monitoringAttdLectur
 $route['save2pdf/scheduleExchange'] =  'c_save_to_pdf/scheduleExchange';
 $route['save2pdf/monitoringStudent'] =  'c_save_to_pdf/monitoringStudent';
 
+$route['save2pdf/create_idCard'] =  'c_save_to_pdf/create_idCard';
+
 $route['save2pdf/monitoringAttendanceByRangeDate'] =  'c_save_to_pdf/monitoringAttendanceByRangeDate';
 
 $route['save2pdf/filterDocument'] =  'c_save_to_pdf/filterDocument';
@@ -918,9 +920,9 @@ $route['api/__crudTransferStudent'] = 'api/c_api/crudTransferStudent';
 
 $route['api2/__crudScheduleExchage'] = 'api/c_api2/crudScheduleExchage';
 $route['api2/__crudModifyAttendance'] = 'api/c_api2/crudModifyAttendance';
-
-
 $route['api2/__getMonitoringAttendance'] = 'api/c_api2/getMonitoringAttendance';
+
+$route['api2/__crudAnnouncement'] = 'api/c_api2/crudAnnouncement';
 
 $route['api3/login'] = 'api/c_mobile/login';
 
@@ -1068,6 +1070,8 @@ $route['invigilator'] = 'c_pengawas_ujian';
 
 // Announcement
 $route['announcement/list-announcement'] = 'page/announcement/c_announcement/list_announcement';
+$route['announcement/create-announcement'] = 'page/announcement/c_announcement/create_announcement';
+$route['announcement/upload_files'] = 'page/announcement/c_announcement/upload_files';
 
 
 
