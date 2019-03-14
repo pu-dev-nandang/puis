@@ -2499,6 +2499,7 @@ class C_rest extends CI_Controller {
     public function TestpostdataFrom_PowerApps()
     {
         $Value = $this->input->post('test');
+        $data = file_get_contents('php://input');
         if ($Value != '' && $Value != null && !isset($_POST['Test'])) {
             $dataSave = array(
                 'Value' => $Value,
@@ -2512,7 +2513,7 @@ class C_rest extends CI_Controller {
          }
          else
          {
-             echo json_encode(array('msg' => '000 '.$Value,'status' => 0));
+             echo json_encode(array('msg' => '000 '.$Value,'status' => 0.$data));
          }
        
     }
