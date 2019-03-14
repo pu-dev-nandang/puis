@@ -2509,11 +2509,11 @@ class C_rest extends CI_Controller {
         
         if ($this->db->affected_rows() > 0 )
          {
-             echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+             echo json_encode(array('msg' => 'The file has been successfully uploaded'.$Value.$data,'status' => 1));
          }
          else
          {
-             echo json_encode(array('msg' => '000 '.$Value,'status' => 0.$data));
+             echo json_encode(array('msg' => '000 '.$Value.$data,'status' => 0));
          }
        
     }
