@@ -37,6 +37,8 @@
 <!-- Check Box -->
 <link rel="stylesheet" href="<?php echo base_url('assets/checkbox/checkbox.css'); ?>">
 
+<link rel="stylesheet" href="<?php echo base_url('assets/summernote/summernote.css'); ?>">
+
 <style media="screen">
 
     .project-switcher {
@@ -299,6 +301,8 @@
 
 <!-- BootBox -->
 <script type="text/javascript" src="<?php echo base_url('assets/'); ?>bootbox/bootbox.min.js"></script>
+
+<script type="text/javascript" src="<?php echo base_url('assets/summernote/summernote.js'); ?>"></script>
 
 <!-- Socket js -->
 <script type="text/javascript" src="<?php echo base_url('node_modules/socket.io/node_modules/socket.io-client/socket.io.js');?>"></script>

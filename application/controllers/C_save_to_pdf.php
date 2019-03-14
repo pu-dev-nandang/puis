@@ -5712,5 +5712,39 @@ Phone: (021) 29200456';
     /* End PR Budgeting */
 
 
+    public function create_idCard(){
+
+        $customlayout=array('53.98','85.60');
+
+        $pdf = new FPDF('P','mm',$customlayout);
+        $pdf->AddFont('dinproExpBold','','dinproExpBold.php');
+
+        $pdf->AddPage();
+
+        $pdf->SetAutoPageBreak(true, 0);
+
+
+        $pdf->Image(base_url('images/45.png'),10,26,34);
+        $pdf->Image(base_url('images/id_emp.png'),0,0,54);
+
+        $pdf->SetXY(10,63);
+        $pdf->SetFont('dinproExpBold','',14);
+        $pdf->SetTextColor(247, 194, 74);
+        $pdf->Cell(0,5,'Nandang Mulyadi',0,0,'C');
+
+        $pdf->SetXY(10,69);
+        $pdf->SetFont('dinpromedium','',12);
+        $pdf->SetTextColor(255,255,255);
+        $pdf->Cell(0,5,'2017090',0,0,'C');
+
+        $pdf->SetXY(10,73);
+        $pdf->SetFont('dinpromedium','',5);
+        $pdf->SetTextColor(255,255,255);
+        $pdf->Cell(0,5,'nandang.mulyadi@podomorouniversity.ac.id',0,0,'C');
+
+        $pdf->Output('I','Monitoring_Attendance_Lecturer.pdf');
+    }
+
+
 
 }

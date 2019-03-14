@@ -1630,4 +1630,89 @@ class C_api2 extends CI_Controller {
         }
     }
 
+    public function crudAnnouncement(){
+        $data_arr = $this->getInputToken();
+        if (count($data_arr) > 0) {
+
+            if($data_arr['action']=='readStudent2Annc'){
+
+                $selct = 'NPM,Name';
+
+                if($data_arr['Year']!=0 && $data_arr['ProdiID']!=0){
+                    $q = 'SELECT '.$selct.' FROM db_academic.auth_students WHERE Year = "'.$data_arr['Year'].'" 
+                    AND ProdiID = "'.$data_arr['ProdiID'].'"  ORDER BY NPM ASC';
+                }
+                else if($data_arr['Year']==0 && $data_arr['ProdiID']!=0){
+                    $q = 'SELECT '.$selct.' FROM db_academic.auth_students WHERE ProdiID = "'.$data_arr['ProdiID'].'"  ORDER BY NPM ASC';
+                }
+                else if($data_arr['Year']!=0 && $data_arr['ProdiID']==0){
+                    $q = 'SELECT '.$selct.' FROM db_academic.auth_students WHERE Year = "'.$data_arr['Year'].'" ORDER BY NPM ASC';
+                }
+                else {
+                    $q = 'SELECT '.$selct.' FROM db_academic.auth_students ORDER BY NPM ASC';
+                }
+
+                $dataStudent = $this->db->query($q)->result_array();
+
+                return print_r(json_encode($dataStudent));
+
+            }
+            else if($data_arr['action']=='getStudentServerSide'){
+                $Key = $data_arr['Key'];
+
+                $data = $this->db->query('SELECT NPM, Name FROM db_academic.auth_students 
+                                                            WHERE NPM LIKE "%'.$Key.'%" OR 
+                                                            Name LIKE "%'.$Key.'%" ORDER BY NPM ASC LIMIT 10 ')->result_array();
+
+                return print_r(json_encode($data));
+
+            }
+            else if($data_arr['action']=='getLecturerServerSide'){
+                $Key = $data_arr['Key'];
+                $data = $this->db->query('SELECT em.NIP,em.Name FROM db_employees.employees em 
+                                                    WHERE em.NIP LIKE "%'.$Key.'%" OR em.Name LIKE "%'.$Key.'%"
+                                                     ORDER BY em.NIP ASC LIMIT 10 ')->result_array();
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='createAnnouncement'){
+
+                $dataAnnc = (array) $data_arr['dataAnnc'];
+
+                $this->db->insert('db_notifikasi.announcement',$dataAnnc);
+                $insert_id = $this->db->insert_id();
+
+                // Student
+                $anncStd = (array) $data_arr['anncStd'];
+                if(count($anncStd)>0){
+                    for($i=0;$i<count($anncStd);$i++){
+                        $d = (array) $anncStd[$i];
+                        $insr = array(
+                            'IDAnnc' => $insert_id,
+                            'NPM' => $d['NPM']
+                        );
+                        $this->db->insert('db_notifikasi.announcement_student',$insr);
+                    }
+                }
+
+                // Employees
+                $anncLec = (array) $data_arr['anncLec'];
+                if(count($anncLec)>0){
+                    for($i=0;$i<count($anncLec);$i++){
+                        $d = (array) $anncLec[$i];
+                        $insr = array(
+                            'IDAnnc' => $insert_id,
+                            'NIP' => $d['NIP']
+                        );
+                        $this->db->insert('db_notifikasi.announcement_employees',$insr);
+                    }
+                }
+
+                return print_r($insert_id);
+
+
+            }
+
+        }
+    }
+
 }
