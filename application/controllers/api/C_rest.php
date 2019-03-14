@@ -2498,23 +2498,27 @@ class C_rest extends CI_Controller {
 
     public function TestpostdataFrom_PowerApps()
     {
-        $Value = $this->input->post('test');
+      
         $data = file_get_contents('php://input');
-        if ($Value != '' && $Value != null && !isset($_POST['Test'])) {
+        $data_json = (array) json_decode($data,true);
+        if ($data_json) {
             $dataSave = array(
-                'Value' => $Value,
+                'Value' => $data_json['test'],
             );
             $this->db->insert('test.test', $dataSave);
+            if ($this->db->affected_rows() > 0 )
+             {
+                 echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+             }
+             else
+             {
+                 echo json_encode(array('msg' => '000','status' => 0));
+             }
         }
-        
-        if ($this->db->affected_rows() > 0 )
-         {
-             echo json_encode(array('msg' => 'The file has been successfully uploaded'.$Value.$data,'status' => 1));
-         }
-         else
-         {
-             echo json_encode(array('msg' => '000 '.$Value.$data,'status' => 0));
-         }
+        else
+        {
+            echo json_encode(array('msg' => '000','status' => 0));
+        }
        
     }
 }
