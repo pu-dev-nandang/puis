@@ -475,7 +475,7 @@ class C_global extends CI_Controller {
        //catch exception
        catch(Exception $e) {
          // handling orang iseng
-         echo '{"status":"999","message":"jangan iseng :D"}';
+         echo '{"status":"999","message":"Not Authorize"}';
        }
     }
 
@@ -978,7 +978,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1071,7 +1071,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         } 
     }
 
@@ -1105,7 +1105,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1256,7 +1256,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1304,7 +1304,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1342,7 +1342,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1372,7 +1372,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1413,7 +1413,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
         
 
@@ -1443,7 +1443,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1499,7 +1499,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1532,7 +1532,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 

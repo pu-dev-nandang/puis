@@ -721,7 +721,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -745,7 +745,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -769,7 +769,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -867,7 +867,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
         
     }
@@ -893,7 +893,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -920,7 +920,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -945,7 +945,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -957,7 +957,7 @@ class C_rest extends CI_Controller {
 
         if (!$data_json) {
             // handling orang iseng
-            echo '{"status":"999","message":"jangan iseng :D"}';
+            echo '{"status":"999","message":"Not Authorize"}';
         }
         else {
             try {
@@ -987,7 +987,7 @@ class C_rest extends CI_Controller {
             }
             catch(Exception $e) {
               // handling orang iseng
-              echo '{"status":"999","message":"jangan iseng :D"}';
+              echo '{"status":"999","message":"Not Authorize"}';
             }
         }
     }
@@ -1017,7 +1017,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1029,7 +1029,7 @@ class C_rest extends CI_Controller {
 
         if (!$data_json) {
             // handling orang iseng
-            echo '{"status":"999","message":"jangan iseng :D"}';
+            echo '{"status":"999","message":"Not Authorize"}';
         }
         else {
             try {
@@ -1058,7 +1058,7 @@ class C_rest extends CI_Controller {
             }
             catch(Exception $e) {
               // handling orang iseng
-              echo '{"status":"999","message":"jangan iseng :D"}';
+              echo '{"status":"999","message":"Not Authorize"}';
             }
         }
     }
@@ -1092,7 +1092,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1125,7 +1125,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1156,7 +1156,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1209,7 +1209,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1240,7 +1240,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1265,7 +1265,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1352,7 +1352,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1480,7 +1480,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1502,7 +1502,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1524,7 +1524,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1592,7 +1592,7 @@ class C_rest extends CI_Controller {
             //catch exception
             catch(Exception $e) {
               // handling orang iseng
-              echo '{"status":"999","message":"jangan iseng :D"}';
+              echo '{"status":"999","message":"Not Authorize"}';
             }
             
         }
@@ -1651,7 +1651,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1693,7 +1693,7 @@ class C_rest extends CI_Controller {
        //catch exception
        catch(Exception $e) {
          // handling orang iseng
-         echo '{"status":"999","message":"jangan iseng :D"}';
+         echo '{"status":"999","message":"Not Authorize"}';
        }
     }
 
@@ -1813,7 +1813,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1846,7 +1846,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1885,7 +1885,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -2009,7 +2009,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -2186,7 +2186,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -2289,7 +2289,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -2462,7 +2462,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
 
     }
@@ -2492,7 +2492,28 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
+    }
+
+    public function TestpostdataFrom_PowerApps()
+    {
+        $Value = $this->input->post('test');
+        if ($Value != '' && $Value != null && !isset($_POST['Test'])) {
+            $dataSave = array(
+                'Value' => $Value,
+            );
+            $this->db->insert('test.test', $dataSave);
+        }
+        
+        if ($this->db->affected_rows() > 0 )
+         {
+             echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+         }
+         else
+         {
+             echo json_encode(array('msg' => '000 '.$Value,'status' => 0));
+         }
+       
     }
 }
