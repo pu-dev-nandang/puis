@@ -2709,7 +2709,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     case 1:
                     case 4:
                         if ($k == 1) {
-                            $Invoice = $Invoice_Q;
+                            $Invoice = $query1[0]['Cost'];
                             $Discount = $Discount_Q;
                             $st = 15;
                         }
@@ -2743,27 +2743,5 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                $this->db->insert('db_finance.m_tuition_fee',$dataSave);
                $k = $st;
         }
-
-        // for ($k=1; $k <= 14; $k++) {
-        //     $Invoice = $query1[0]['Cost'];
-        //    $Semester = $k;
-        //    if ($Semester == 1) {
-        //        $Invoice = $Invoice_Q;
-        //        $Discount = $Discount_Q;
-        //    }
-        //    else
-        //    {
-        //     $Invoice= $Invoice;
-        //     $Discount = 0;
-        //    }
-        //    $dataSave = array(
-        //         'Semester' => $Semester,
-        //         'PTID' => $PTID,
-        //         'NPM' => $NPM,
-        //         'Invoice' => $Invoice,
-        //         'Discount' => $Discount,
-        //    );
-        //    $this->db->insert('db_finance.m_tuition_fee',$dataSave);
-        // }
     }
 }

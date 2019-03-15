@@ -386,4 +386,22 @@
 
     });
 
+    $(document).on('click','.PrintIDCard',function () {
+        var type = $(this).attr('type');
+        var NPM = $(this).attr('data-npm');
+        var Name = $(this).attr('data-name');
+        var PathFoto = $(this).attr('path');
+        var url = base_url_js+'save2pdf/PrintIDCard';
+        data = {
+          type : type,
+          NPM : NPM,
+          Name : Name,
+          PathFoto : PathFoto,
+        }
+        var token = jwt_encode(data,"UAP)(*");
+        FormSubmitAuto(url, 'POST', [
+            { name: 'token', value: token },
+        ]);   
+    });
+
 </script>

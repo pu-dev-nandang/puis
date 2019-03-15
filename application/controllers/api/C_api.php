@@ -6935,6 +6935,7 @@ class C_api extends CI_Controller {
                             data-year="'.$row['Year'].'" data-npm="'.$row['NPM'].'" data-name="'.ucwords(strtolower($row['Name'])).'" 
                             data-statusid="'.$row['StatusStudentID'].'">Change Status</a>
                             </li>
+                            <li><a class = "PrintIDCard" href="javascript:void(0);" type = "student" data-npm="'.$row['NPM'].'" data-name="'.ucwords(strtolower($row['Name'])).'" path = "'.base_url('uploads/students/'.$db_.'/'.$dataDetailStd[0]["Photo"]).'">Print ID Card</a></li>
                           </ul>
                         </div>';
 
