@@ -7055,13 +7055,14 @@ class C_api extends CI_Controller {
                 $position = $dataPosition[0]['Position'];
             }
 
-
-
             $gender = ($row['Gender']=='L') ? 'Male' : 'Female' ;
 
             $url_image = './uploads/employees/'.$row['Photo'];
-            $srcImg = (file_exists($url_image)) ? base_url('uploads/employees/'.$row['Photo'])
-                : base_url('images/icon/userfalse.png') ;
+            $srcImg =  base_url('images/icon/userfalse.png');
+            if($row['Photo']!='' && $row['Photo']!=null){
+                $srcImg = (file_exists($url_image)) ? base_url('uploads/employees/'.$row['Photo'])
+                    : base_url('images/icon/userfalse.png') ;
+            }
 
 
             $EmailSelect = ($row['StatusEmployeeID']==4 || $row['StatusEmployeeID']=='4') ? $row['Email'] : $row['EmailPU'] ;
