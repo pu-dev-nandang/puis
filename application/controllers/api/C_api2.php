@@ -1749,6 +1749,42 @@ class C_api2 extends CI_Controller {
                 return print_r(json_encode($data));
 
             }
+            else if($data_arr['action']=='showAnnouncementSaved'){
+
+                $User = $data_arr['User'];
+                $UserID = $data_arr['UserID'];
+
+                $db = ($User=='Std') ? 'db_notifikasi.announcement_student' : 'db_notifikasi.announcement_employees';
+                $w = ($User=='Std') ? 'NPM' : 'NIP';
+
+                $data = $this->db->query('SELECT * FROM '.$db.' annu 
+                                                  LEFT JOIN db_notifikasi.announcement ann 
+                                                  ON (annu.IDAnnc = ann.ID)
+                                                  WHERE annu.'.$w.' = "'.$UserID.'" AND 
+                                                  annu.Read = "2"
+                                                  ')->result_array();
+
+                return print_r(json_encode($data));
+
+            }
+            else if($data_arr['action']=='showCountAnnouncementSaved'){
+
+                $User = $data_arr['User'];
+                $UserID = $data_arr['UserID'];
+
+                $db = ($User=='Std') ? 'db_notifikasi.announcement_student' : 'db_notifikasi.announcement_employees';
+                $w = ($User=='Std') ? 'NPM' : 'NIP';
+
+                $data = $this->db->query('SELECT COUNT(*) AS Total FROM '.$db.' annu 
+                                                  LEFT JOIN db_notifikasi.announcement ann 
+                                                  ON (annu.IDAnnc = ann.ID)
+                                                  WHERE annu.'.$w.' = "'.$UserID.'" AND 
+                                                  annu.Read = "2"
+                                                  ')->result_array();
+
+                return print_r(json_encode($data));
+
+            }
             else if($data_arr['action']=='readDetailAnnc'){
 
                 $IDAnnc = $data_arr['IDAnnc'];
