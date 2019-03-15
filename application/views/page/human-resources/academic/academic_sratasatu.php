@@ -17,7 +17,7 @@
 <div class="row">
             <div class="col-md-6" style="border-right: 1px solid #afafafb5;">
 
-                    <div class="col-xs-12 id="subsesi">
+                    <div class="col-xs-12" id="subsesi">
                         <div class="form-group">
                             <div class="thumbnail" style="padding: 10px;text-align: left;">
                                 <h4>Data Academic Transcript S1 </h4>
@@ -77,7 +77,7 @@
                                                 <span class="input-group-btn">
                                                     <button class="btn btn-default" data-dir="dwn"><span class="glyphicon glyphicon-minus"></span></button>
                                                 </span>
-                                                <input type="text" class="form-control text-center" id="TotSemesterS1" value="0" disabled>
+                                                <input type="text" class="form-control text-center" oninput="this.value = this.value.replace(/[^0-9.]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');" id="TotSemesterS1" value="0" maxlength="2">
                                                     <span class="input-group-btn">
                                                         <button class="btn btn-default" data-dir="up"><span class="glyphicon glyphicon-plus"></span></button>
                                                     </span>
@@ -277,7 +277,7 @@ $(document).ready(function () {
                         '                        <span class="input-group-btn">                         '+
                         '                            <button class="btn btn-default" data-dir="dwn"><span class="glyphicon glyphicon-minus"></span></button> '+
                         '                        </span>                                                '+
-                        '                        <input type="text" class="form-control text-center" id="TotSemesterS1" value="0" disabled> '+
+                        '                        <input type="text" class="form-control text-center" id="TotSemesterS1" value="0" pattern="[0-9.]+"> '+
                         '                           <span class="input-group-btn"> '+
                         '                               <button class="btn btn-default" data-dir="up"><span class="glyphicon glyphicon-plus"></span></button> '+
                         '                           </span>                                             '+
@@ -400,7 +400,7 @@ $(document).ready(function () {
                         '                        <span class="input-group-btn">                         '+
                         '                            <button class="btn btn-default" data-dir="dwn"><span class="glyphicon glyphicon-minus"></span></button> '+
                         '                        </span>                                                '+
-                        '                        <input type="text" class="form-control text-center" id="TotSemesterS1" value="'+response[i]['TotalSemester']+'" disabled> '+
+                        '                        <input type="text" class="form-control text-center" id="TotSemesterS1" value="'+response[i]['TotalSemester']+'" > '+
                         '                           <span class="input-group-btn"> '+
                         '                               <button class="btn btn-default" data-dir="up"><span class="glyphicon glyphicon-plus"></span></button> '+
                         '                           </span>                                             '+
@@ -410,7 +410,6 @@ $(document).ready(function () {
                         '           <div class="col-xs-6">                                              '+
                         '           <div class="form-group">                                            '+
                         '               <label>Ijazah</label>                                           '+
-                      
                         '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button id="btnreviewfiles" class="btn btn-sm btn-primary" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> Preview </button></center></div>                     '+
                         '               </div>                                                          '+
                         '           </div>                                                              '+

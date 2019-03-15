@@ -77,7 +77,7 @@
                                                 <span class="input-group-btn">
                                                     <button class="btn btn-default" data-dir="dwn"><span class="glyphicon glyphicon-minus"></span></button>
                                                 </span>
-                                                <input type="text" class="form-control text-center" id="TotSemesterS3" value="0" disabled>
+                                                <input type="text" class="form-control text-center" oninput="this.value = this.value.replace(/[^0-9.]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');" id="TotSemesterS3" value="0" maxlength="2">
                                                     <span class="input-group-btn">
                                                         <button class="btn btn-default" data-dir="up"><span class="glyphicon glyphicon-plus"></span></button>
                                                     </span>
