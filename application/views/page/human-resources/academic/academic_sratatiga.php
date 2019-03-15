@@ -13,10 +13,11 @@
         }
     }
 </style>
+
 <div class="row">
             <div class="col-md-6" style="border-right: 1px solid #afafafb5;">
 
-                    <div class="col-xs-12 id="subsesi">
+                    <div class="col-xs-12" id="subsesi">
                         <div class="form-group">
                             <div class="thumbnail" style="padding: 10px;text-align: left;">
                                 <h4>Data Academic Transcript S3 </h4>
@@ -59,13 +60,13 @@
                                     <div class="col-xs-6">
                                         <div class="form-group">
                                             <label>Grade/ IPK</label>
-                                            <input class="form-control" id="gradeS3" maxlength="4" oninput="this.value = this.value.replace(/[^0-9.]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');">
+                                            <input class="form-control" oninput="this.value = this.value.replace(/[^0-9.]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');" id="gradeS3" maxlength="4">
                                         </div>
                                     </div>
                                     <div class="col-xs-3">
                                         <div class="form-group">
                                             <label>Total Credit</label>
-                                            <input class="form-control" id="totalCreditS3" maxlength="3" oninput="this.value = this.value.replace(/[^0-9.]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');">
+                                            <input class="form-control" oninput="this.value = this.value.replace(/[^0-9.]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');" id="totalCreditS3" maxlength="3">
                                         </div>
                                     </div>
 
@@ -88,16 +89,14 @@
                                     <div class="form-group">
                                         <label>Ijazah</label>
                                             <form id="tagFM_IjazahS3" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
-                                                    
                                                         <div class="form-group">
                                                             <label class="btn btn-sm btn-default btn-default-warning btn-upload">
                                                                 <i class="fa fa-upload margin-right"></i> Upload File
-                                                                <input type="file" id="fileIjazah" name="userfile" class="upload_files" style="display: none;" data-fm="tagFM_IjazahS3" accept="application/pdf">
+                                                                <input type="file" id="fileIjazah" name="userfile" class="upload_files" style="display: none;" data-fm="tagFM_IjazahS1" accept="application/pdf">
                                                             </label>
                                                     <p style="font-size: 12px;color: #FF0000;">*) Only PDF Files Max Size 5 MB</p>
                                             </div></form>
                                             <div id="element1">Review Ijazah : </div>
-                                             
                                         </div>
                                     </div>
 
@@ -122,7 +121,7 @@
                                 <div class="row">
                                    <div class="col-md-12" style="text-align: right;">
                                             <hr/>
-                                            <button class="btn btn-success" id="btnSave">Save</button>
+                                            <button class="btn btn-success" id="btnSave3">Save</button>
                                         </div> 
                                 </div>
                             </div>
@@ -132,27 +131,69 @@
 
                     <!-- <span id="bodyAddSesi"></span> -->
             </div>
-         <span id="loadtablefiles3"></span> 
+
+            <span id="loadtablefiles3"></span> 
  </div>
 
 <script>
 $(document).ready(function () {
+    $('#formIjazahDate').datepicker({
+      dateFormat : 'yy-mm-dd',
+      changeMonth : true,
+      changeYear : true,
+      autoclose: true,
+      todayHighlight: true,
+      uiLibrary: 'bootstrap'
+    });
+});
+
+$(document).ready(function () {
+    $('.formEditIjazahDate').datepicker({
+      dateFormat : 'yy-mm-dd',
+      changeMonth : true,
+      changeYear : true,
+      autoclose: true,
+      todayHighlight: true,
+      uiLibrary: 'bootstrap'
+    });
+});
+
+    $(document).on('click', '.number-spinner button', function () {    
+        var btn = $(this),
+        oldValue = btn.closest('.number-spinner').find('input').val().trim(),
+        newVal = 0;
+    
+    if (btn.attr('data-dir') == 'up') {
+        newVal = parseInt(oldValue) + 1;
+        } else {
+            if (oldValue > 1) {
+            newVal = parseInt(oldValue) - 1;
+            } else {
+            newVal = 1;
+        }
+    }
+        btn.closest('.number-spinner').find('input').val(newVal);
+    });
+
+    $(document).ready(function () {
         loadAcademicS3Details();
     });
 
-$(document).on('click','#btnreviewfiles2', function () {
+    $(document).on('click','#btnreviewfiles', function () {
 
         var filesub = $(this).attr('filesub');
-        $('#NotificationModal .modal-header').addClass('hide');
-        $('#NotificationModal .modal-body').html('<center> '+
+        //var url = ''+base_url_js+'uploads/files/'+filesub+' ';
+
+           $('#NotificationModal .modal-header').addClass('hide');
+            $('#NotificationModal .modal-body').html('<center> '+
             '<iframe src="'+base_url_js+'uploads/files/'+filesub+'" frameborder="0" style="width:745px; height:550px;"></iframe> '+
             '<br/><br/><button type="button" id="btnRemoveNoEditSc" class="btn btn-primary" data-dismiss="modal">Close</button><button type="button" id="btnRemoveNoEditSc" filesublix ="'+filesub+'" class="btn btn-primary pull-right filesublink" data-toggle="tooltip" data-placement="top" title="Full Review" data-dismiss="modal"><span class="fa fa-external-link"></span></button>' +
             '</center>');
-        $('#NotificationModal .modal-footer').addClass('hide');
-        $('#NotificationModal').modal({
-            'backdrop' : 'static',
-            'show' : true
-        });
+            $('#NotificationModal .modal-footer').addClass('hide');
+            $('#NotificationModal').modal({
+                'backdrop' : 'static',
+                'show' : true
+            }); 
     });
 
     $(document).on('click','.filesublink', function () {
@@ -160,56 +201,8 @@ $(document).on('click','#btnreviewfiles2', function () {
         var url = base_url_js+'uploads/files/'+filesubx;
         window.open(url, '_blank',);
     });
-     
-function loadAcademicS3Details() {
-        
-        var NIP = '<?php echo $NIP; ?>';
-        var srata = 'S3';
-        var url = base_url_js+'api/__reviewacademics1?NIP='+NIP+'&s='+srata;
 
-        var token = jwt_encode({
-            action:'read',
-            NIP:NIP},'UAP)(*');
-
-        $.post(url,{token:token},function (resultJson) {
-
-            var response = resultJson;
-                $("#loadtablefiles3").append(
-                    ' <div class="table-responsive">                                                '+
-                    '     <table class="table table-striped table-bordered">                        '+
-                    '         <thead>                                                               '+
-                    '         <tr style="background: #607d8b;color: #FFFFFF;">                      '+
-                    '             <th style="width: 5%;text-align: center;">Academic</th>           '+
-                     '            <th style="width: 10%;text-align: center;">Name University</th>   '+
-                    '             <th style="width: 8%;text-align: center;">Ijazah</th>             '+
-                    '             <th style="width: 8%;text-align: center;">Transcript</th>         '+
-                    '             <th style="text-align: center;width: 5%;">Action</th>             '+
-                    '         </tr>                                                                 '+
-                    '         </thead>                                                              '+
-                    '         <tbody id="dataRow"></tbody>                                          '+
-                    '    </table>                                                                   '+
-                    '</div> ');  
-
-            if(response.length > 0){
-                var no = 1;
-                var orbs=0;
-                for (var i = 0; i < response.length; i++) {
-                    var listdatas1 = response[i]['IjazahFile']; 
-                    var listdatas2 = response[i]['TranscriptFile']; 
-                    $("#dataRow").append('<tr>                                                          '+
-                    '            <td> '+srata+' </td>                                                   '+         
-                    '            <td> '+response[i]['NameUniversity']+' </td>                           '+                             
-                    '            <td><center><button id="btnreviewfiles2" class="btn btn-sm btn-default btn-default-primary" filesub="'+listdatas1+'"><i class="fa fa-eye margin-right"></i> Preview</button></center></td>                                                '+    
-                    '            <td><center><button id="btnreviewfiles2" class="btn btn-sm btn-default btn-default-success" filesub="'+listdatas2+'"><i class="fa fa-eye margin-right"></i> Preview</button> </center></td>                                           '+                                                       
-                    '            <td style="text-align: center;"><button id="btnedits1" class="btn btn-sm btn-primary testEdit2" data-toggle="tooltip" data-placement="top" title="Edit" nameuniv= "'+response[i]['NameUniversity']+'" fileijazahs1 ="'+listdatas1+'" filetranscripts1 ="'+listdatas2+'"><i class="fa fa-edit"></i></button></td>      '+     
-                    '         </tr> ');
-                }  
-            }
-        });
-    };
-
-
-    $(document).on('click','.testEdit2', function () {
+    $(document).on('click','.testEdit3', function () {
 
         var NIP = '<?php echo $NIP; ?>';
         var acad = 'S3';
@@ -218,12 +211,12 @@ function loadAcademicS3Details() {
         var nameuniv = $(this).attr('nameuniv');
 
         if (fileijazahs1 != null) {
-            var filesx = '<iframe src="'+base_url_js+'uploads/files/'+fileijazahs1+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button id="btnreviewfiles2" class="btn btn-sm btn-primary" filesub ="'+fileijazahs1+'"><i class="fa fa-eye"></i> Preview </button></center>';
+            var filesx = '<iframe src="'+base_url_js+'uploads/files/'+fileijazahs1+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button id="btnreviewfiles" class="btn btn-sm btn-primary" filesub ="'+fileijazahs1+'"><i class="fa fa-eye"></i> Preview </button></center>';
             } else {
             var filesx = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px;">'
         }
         if (filetranscripts1 != null) {
-            var filestrans = '<iframe src="'+base_url_js+'uploads/files/'+filetranscripts1+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button id="btnreviewfiles2" class="btn btn-sm btn-primary" filesub ="'+filetranscripts1+'"><i class="fa fa-eye"></i> Preview </button></center>';
+            var filestrans = '<iframe src="'+base_url_js+'uploads/files/'+filetranscripts1+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button id="btnreviewfiles" class="btn btn-sm btn-primary" filesub ="'+filetranscripts1+'"><i class="fa fa-eye"></i> Preview </button></center>';
         } else {
             var filestrans = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px">'
         }
@@ -232,18 +225,18 @@ function loadAcademicS3Details() {
                 $('#NotificationModal .modal-body').html('<br/><div class="col-xs-12 id="subsesi">  '+
                         '<div class="form-group">                                                   '+
                         '    <div class="thumbnail" style="padding: 10px;text-align: left;">        '+
-                        '      <h4>Edit Academic Transcript '+acad+' </h4>                          '+
+                        '      <h4>Edit Academic Transcript S3 </h4>                           '+
                         '       <div class="row">                                                   '+
                         '          <div class="col-xs-12">                                          '+
                         '               <div class="form-group">                                    '+
                         '                   <label>Name Univesity</label>                           '+
-                        '                  <input class="form-control" id="formNameUnivS1">         '+
+                        '                  <input class="form-control" id="formNameUnivS3">         '+
                         '               </div>                                                      '+
                         '            </div>                                                         '+
                         '            <div class="col-xs-6">                                         '+
                         '                <div class="form-group">                                   '+
-                        '                    <label>No. Ijazah</label>                           '+
-                        '                    <input class="form-control" id="formNoIjazahS1">       '+
+                        '                    <label>No. Ijazah S3</label>                           '+
+                        '                    <input class="form-control" id="formNoIjazahS3">       '+
                         '                </div>                                                     '+
                         '            </div>                                                         '+
                         '            <div class="col-xs-6">                                         '+     
@@ -255,25 +248,25 @@ function loadAcademicS3Details() {
                         '            <div class="col-xs-6">                                         '+
                         '                <div class="form-group">                                   '+
                         '                    <label>Major</label>                                   '+
-                        '                    <input class="form-control" id="formMajorS1">          '+
+                        '                    <input class="form-control" id="formMajorS3">          '+
                         '                </div>                                                     '+
                         '            </div>                                                         '+
                         '            <div class="col-xs-6">                                         '+
                         '                <div class="form-group">                                   '+
                         '                    <label>Program Study </label>                          '+
-                        '                    <input class="form-control" id="formStudyS1">          '+
+                        '                    <input class="form-control" id="formStudyS3">          '+
                         '                </div>                                                     '+
                         '            </div>                                                         '+
                         '            <div class="col-xs-6">                                         '+
                         '                <div class="form-group">                                    '+
                         '                    <label>Grade/ IPK</label>                               '+
-                        '                    <input class="form-control" id="gradeS1" maxlength="4"> '+
+                        '                    <input class="form-control" id="gradeS3" maxlength="4"> '+
                         '                </div>                                                      '+
                         '            </div>                                                          '+
                         '            <div class="col-xs-3">                                          '+
                         '                <div class="form-group">                                    '+
                         '                    <label>Total Credit</label>                             '+
-                        '                    <input class="form-control" id="totalCreditS1" maxlength="3"> '+
+                        '                    <input class="form-control" id="totalCreditS3" maxlength="3"> '+
                         '                </div>                                                         '+
                         '            </div>                                                             '+
                         '            <div class="col-xs-3">                                             '+
@@ -322,7 +315,7 @@ function loadAcademicS3Details() {
         } 
         else {
 
-            var url = base_url_js+'api/__getdataedits1?n='+NIP+'&j='+fileijazahs1+'&t='+filetranscripts1+'&s='+acad;                          
+            var url = base_url_js+'api/__getdataedits1?n='+NIP+'&j='+fileijazahs1+'&t='+filetranscripts1+'&s='+acad+'&x='+nameuniv;                      
             var token = jwt_encode({
             action:'read',
             NIP:NIP},'UAP)(*');
@@ -334,21 +327,38 @@ function loadAcademicS3Details() {
                     var no = 1;
                     for (var i = 0; i < response.length; i++) {
 
-                    $('#NotificationModal .modal-body').html('<br/><div class="col-xs-12 id="subsesi">      '+
+                        var nameuniv1 = response[i]['NameUniversity'];
+
+
+                        for (var j = i+1; j < response.length; j++) {
+                            var nameuniv2 = response[j]['NameUniversity'];
+                            
+                            if (nameuniv1 == nameuniv2) {
+
+                                if (response[j]['LinkFiles'] != null) {
+                                        //var Transcriptx = '<iframe src="'+base_url_js+'uploads/files/'+response[j]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button id="btnviewIjazahS1" class="btn btn-sm btn-primary" filesub ="'+response[j]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
+                                        var Transcriptx = response[j]['LinkFiles'];
+                                    } else {
+                                        var Transcriptx = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px">'
+                                }
+
+                            }
+
+                            $('#NotificationModal .modal-body').html('<br/><div class="col-xs-12 id="subsesi">      '+
                         '<div class="form-group">                                                   '+
                         '    <div class="thumbnail" style="padding: 10px;text-align: left;">        '+
-                        '      <h4>Edit Academic Transcript '+acad+' </h4>                           '+
+                        '      <h4>Edit Academic Transcript S3 </h4>                           '+
                         '       <div class="row">                                                   '+
                         '          <div class="col-xs-12">                                          '+
                         '               <div class="form-group">                                    '+
                         '                   <label>Name Univesity</label>                           '+
-                        '                  <input class="form-control" id="formNameUnivS1" value="'+response[i]['NameUniversity']+'">         '+
+                        '                  <input class="form-control" id="formNameUnivS3" value="'+response[i]['NameUniversity']+'">         '+
                         '               </div>                                                      '+
                         '            </div>                                                         '+
                         '            <div class="col-xs-6">                                         '+
                         '                <div class="form-group">                                   '+
-                        '                    <label>No. Ijazah</label>                           '+
-                        '                    <input class="form-control" id="formNoIjazahS1" value="'+response[i]['NoIjazah']+'">       '+
+                        '                    <label>No. Ijazah S3</label>                           '+
+                        '                    <input class="form-control" id="formNoIjazahS3" value="'+response[i]['NoIjazah']+'">       '+
                         '                </div>                                                     '+
                         '            </div>                                                         '+
                         '            <div class="col-xs-6">                                         '+     
@@ -360,25 +370,25 @@ function loadAcademicS3Details() {
                         '            <div class="col-xs-6">                                         '+
                         '                <div class="form-group">                                   '+
                         '                    <label>Major</label>                                   '+
-                        '                    <input class="form-control" id="formMajorS1" value="'+response[i]['Major']+'">          '+
+                        '                    <input class="form-control" id="formMajorS3" value="'+response[i]['Major']+'">          '+
                         '                </div>                                                     '+
                         '            </div>                                                         '+
                         '            <div class="col-xs-6">                                         '+
                         '                <div class="form-group">                                   '+
                         '                    <label>Program Study </label>                          '+
-                        '                    <input class="form-control" id="formStudyS1" value="'+response[i]['ProgramStudy']+'">          '+
+                        '                    <input class="form-control" id="formStudyS3" value="'+response[i]['ProgramStudy']+'">          '+
                         '                </div>                                                     '+
                         '            </div>                                                         '+
                         '            <div class="col-xs-6">                                         '+
                         '                <div class="form-group">                                    '+
                         '                    <label>Grade/ IPK</label>                               '+
-                        '                    <input class="form-control" id="gradeS1" maxlength="4" value="'+response[i]['Grade']+'"> '+
+                        '                    <input class="form-control" id="gradeS3" maxlength="4" value="'+response[i]['Grade']+'"> '+
                         '                </div>                                                      '+
                         '            </div>                                                          '+
                         '            <div class="col-xs-3">                                          '+
                         '                <div class="form-group">                                    '+
                         '                    <label>Total Credit</label>                             '+
-                        '                    <input class="form-control" id="totalCreditS1" maxlength="3" value="'+response[i]['TotalCredit']+'"> '+
+                        '                    <input class="form-control" id="totalCreditS3" maxlength="3" value="'+response[i]['TotalCredit']+'"> '+
                         '                </div>                                                         '+
                         '            </div>                                                             '+
                         '            <div class="col-xs-3">                                             '+
@@ -398,22 +408,23 @@ function loadAcademicS3Details() {
                         '           <div class="col-xs-6">                                              '+
                         '           <div class="form-group">                                            '+
                         '               <label>Ijazah</label>                                           '+
-                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['IjazahFile']+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button id="btnreviewfiles" class="btn btn-sm btn-primary" filesub ="'+response[i]['IjazahFile']+'"><i class="fa fa-eye"></i> Preview </button></center></div>                    '+
+                      
+                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button id="btnreviewfiles" class="btn btn-sm btn-primary" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> Preview </button></center></div>                     '+
                         '               </div>                                                          '+
                         '           </div>                                                              '+
                         '           <div class="col-xs-6">                                              '+
                         '           <div class="form-group">                                            '+
                         '               <label>Transcript</label>                                       '+
-                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['TranscriptFile']+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button id="btnreviewfiles" class="btn btn-sm btn-primary" filesub ="'+response[i]['TranscriptFile']+'"><i class="fa fa-eye"></i> Preview </button></center></div>               '+
+                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+Transcriptx+'" style="width:300px; height:150px;" frameborder="0"></iframe> </div> <br/><center><button id="btnreviewfiles" class="btn btn-sm btn-primary" filesub ="'+Transcriptx+'"><i class="fa fa-eye"></i> Preview </button></center></div>                 '+
                         '                </div>                                                         '+
                         '            </div>                                                             '+
                         '        </div>                                                                 '+
                         '        <div class="row">                                                      '+
                         '           <div class="col-md-12" style="text-align: right;">                   '+
                         '                <hr/>                                                           '+
-                        '    <div><input type="hidden" class="form-control" value="'+response[i]['IjazahFile']+'" id="linkijazahs1"> </div>                   '+
-                        '    <div><input type="hidden" class="form-control" value="'+response[i]['TranscriptFile']+' " id="linktranscripts1">    </div>       '+
-                        '               <button type="button" class="btn btn-danger" data-dismiss="modal"> Cancel</button> | <button type="button" class="btn btn-success" id="btnSavedits3" linkijazahs1="'+response[i]['IjazahFile']+'" linktranscripts1="'+response[i]['TranscriptFile']+'"> Save</button>                                                               '+
+                        '    <div><input type="hidden" class="form-control" value="'+response[i]['LinkFiles']+'" id="linkijazahs1"> </div>                   '+
+                        '    <div><input type="hidden" class="form-control" value="'+Transcriptx+'" id="linktranscripts1">    </div>       '+
+                        '               <button type="button" class="btn btn-danger" data-dismiss="modal"> Cancel</button> | <button type="button" class="btn btn-success" id="btnSavedits3" linkijazahs1="'+response[i]['LinkFiles']+'" linktranscripts1="'+Transcriptx+'"> Save</button>                                                               '+
                         '           </div>                                                              '+
                         '       </div>                                                                  '+
                         '   </div>                                                                      '+
@@ -424,15 +435,138 @@ function loadAcademicS3Details() {
                     'backdrop' : 'static',
                     'show' : true
                     }); 
+                    i = j;
+                    break;
+                    }
+
                         
                     } //end for
+      
                 } //end if
-            }); //end json  
+
+            }); //end json
+             
         } //END IF
+
+        
     });
+
+    function loadAcademicS3Details() {
+        
+        var NIP = '<?php echo $NIP; ?>';
+        var srata = 'S3';
+        var url = base_url_js+'api/__reviewacademics1?NIP='+NIP+'&s='+srata;
+        var token = jwt_encode({
+            action:'read',
+            NIP:NIP},'UAP)(*');
+
+        $.post(url,{token:token},function (resultJson) {
+            var response = resultJson;
+            //console.log(response);
+                $("#loadtablefiles3").append(
+                    ' <div class="table-responsive">                                                '+
+                    '     <table class="table table-striped table-bordered">                        '+
+                    '         <thead>                                                               '+
+                    '         <tr style="background: #607d8b;color: #FFFFFF;">                      '+
+                    '             <th style="width: 5%;text-align: center;">Academic</th>           '+
+                     '            <th style="width: 10%;text-align: center;">Name University</th>   '+
+                    '             <th style="width: 8%;text-align: center;">Ijazah</th>             '+
+                    '             <th style="width: 8%;text-align: center;">Transcript</th>         '+
+                    '             <th style="text-align: center;width: 5%;">Action</th>             '+
+                    '         </tr>                                                                 '+
+                    '         </thead>                                                              '+
+                    '         <tbody id="dataRow"></tbody>                                          '+
+                    '    </table>                                                                   '+
+                    '</div> ');  
+
+            if(response.length > 0){
+                var no = 1;
+                var orbs=0;
+                for (var i = 0; i < response.length; i++) {
+                    var listdatas1 = response[i]['LinkFiles']; 
+
+                    for (var j = i+1; j < response.length; j++) {
+                        if (response[i]['NIP'] == response[j]['NIP'] && response[i]['NameUniversity'] == response[j]['NameUniversity']) {
+                            var listdatas2 = response[j]['LinkFiles'];
+                        }
+                        else
+                        {
+                            i = j-1;
+                            break;
+                        }  
+                       i = j;
+                    }
+
+                    $("#dataRow").append('<tr>                                                          '+
+                    '            <td> S3 </td>                                                          '+         
+                    '            <td> '+response[i]['NameUniversity']+' </td>                           '+                             
+                    '            <td><center><button id="btnreviewfiles" class="btn btn-sm btn-default btn-default-primary" filesub="'+listdatas1+'"><i class="fa fa-eye margin-right"></i> Preview</button></center></td>                                                '+    
+                    '            <td><center><button id="btnreviewfiles" class="btn btn-sm btn-default btn-default-success" filesub="'+listdatas2+'"><i class="fa fa-eye margin-right"></i> Preview</button> </center></td>                                              '+                                
+                    '            <td style="text-align: center;"><button id="btnedits1" class="btn btn-sm btn-primary testEdit3" data-toggle="tooltip" data-placement="top" title="Edit" nameuniv= "'+response[i]['NameUniversity']+'" fileijazahs1 ="'+listdatas1+'" filetranscripts1 ="'+listdatas2+'"><i class="fa fa-edit"></i></button></td>      '+     
+                    '         </tr> ');
+                }
+                
+             }
+
+        });
+    };
+</script>
+
+ <script type="text/javascript">
+    $('#fileIjazah').change(function (event) {
+        var oFile = document.getElementById("fileIjazah").files[0]; 
+        if (oFile.size > 5242880) {  // 5 mb for bytes.
+                toastr.error('File Max size 5 MB!','Error');
+                $('#NotificationModal').modal('hide');
+                //return;
+        } else {
+            $('#element1').empty();
+            var file = URL.createObjectURL(event.target.files[0]);
+            $('#element1').append('<br/><iframe src="' + file + '" style="width:200px; height:100;" frameborder="0"></iframe>' );
+        }
+    });
+    $('#fileTranscript').change(function (event) {
+        var xFile = document.getElementById("fileTranscript").files[0]; 
+
+        if (xFile.size > 5242880) {  // 5 mb for bytes.
+            toastr.error('File Max size 5 MB!','Error');
+            return;
+        } else {
+            $('#element2').empty();
+            var file = URL.createObjectURL(event.target.files[0]);
+            $('#element2').append('<br/><iframe src="' + file + '" style="width:200px; height:100;" frameborder="0"></iframe>');
+        }
+    });
+
+    $('.upload_files1').change(function (event) {
+        var xFile = document.getElementById("fileIjazah").files[0]; 
+
+        if (xFile.size > 5242880) {  // 5 mb for bytes.
+            toastr.error('File Max size 5 MB!','Error');
+            return;
+        } else {
+            $('#element2').empty();
+            var file = URL.createObjectURL(event.target.files[0]);
+            $('#element2').append('<br/><iframe src="' + file + '" style="width:200px; height:100;" frameborder="0"></iframe>');
+        }
+    });
+    $('.upload_files2').change(function (event) {
+        var xFile = document.getElementById("fileTranscript").files[0]; 
+
+        if (xFile.size > 5242880) {  // 5 mb for bytes.
+            toastr.error('File Max size 5 MB!','Error');
+            return;
+        } else {
+            $('#element2').empty();
+            var file = URL.createObjectURL(event.target.files[0]);
+            $('#element2').append('<br/><iframe src="' + file + '" style="width:200px; height:100;" frameborder="0"></iframe>');
+        }
+    });
+
+    
  </script>
 
-<script>
+ <script>
      $(document).on('click','#btnSavedits3',function () {
         saveditEmployees();
     });
@@ -440,21 +574,16 @@ function loadAcademicS3Details() {
     function saveditEmployees() {
 
         var formNIP = '<?php echo $NIP; ?>';
-        var formNoIjazahS1 = $('#formNoIjazahS1').val();
-        var formNameUnivS1 = $('#formNameUnivS1').val();
+        var formNoIjazahS1 = $('#formNoIjazahS3').val();
+        var formNameUnivS1 = $('#formNameUnivS3').val();
         var formIjazahDate = $('#formEditIjazahDate').val();
-        var formMajorS1 = $('#formMajorS1').val();
-        var formStudyS1 = $('#formStudyS1').val();
-        var gradeS1 = $('#gradeS1').val();
-        var totalCreditS1 = $('#totalCreditS1').val();
-        var TotSemesterS1 = $('#TotSemesterS1').val();
-
+        var formMajorS1 = $('#formMajorS3').val();
+        var formStudyS1 = $('#formStudyS3').val();
+        var gradeS1 = $('#gradeS3').val();
+        var totalCreditS1 = $('#totalCreditS3').val();
+        var TotSemesterS1 = $('#TotSemesterS3').val();
         var linkijazahs1 = $('#linkijazahs1').val();
         var linktranscripts1 = $('#linktranscripts1').val();
-
-        ///var oFile = document.getElementById("fileIjazah").files[0]; 
-        //var xFile = document.getElementById("fileTranscript").files[0]; 
-
         if(formNIP!=null && formNIP!=''
                     && formNoIjazahS1!='' && formNoIjazahS1!=null
                     && formNameUnivS1!='' && formNameUnivS1!=null
@@ -463,8 +592,6 @@ function loadAcademicS3Details() {
                     && formStudyS1!='' && formStudyS1!=null
                     && gradeS1!='' && gradeS1!=null
                     && totalCreditS1!='' && totalCreditS1!=null
-                    && TotSemesterS1!='' && TotSemesterS1!=null 
-                    && TotSemesterS1!='' && TotSemesterS1!=null 
                     && TotSemesterS1!='' && TotSemesterS1!=null 
                     ){ 
                     loading_button('#btnSubmitEmployees');
@@ -500,9 +627,8 @@ function loadAcademicS3Details() {
                         }
                             setTimeout(function () {
                                 $('#NotificationModal').modal('hide');
-                                window.location.href = '';
+                              window.location.href = '';
                             },1000);
-
                         });
                  }
 
@@ -515,68 +641,11 @@ function loadAcademicS3Details() {
 }
  </script>
 
-<script>
-    $(document).ready(function () {
-    $('#formIjazahDate').datepicker({
-      dateFormat : 'yy-mm-dd',
-      changeMonth : true,
-      changeYear : true,
-      autoclose: true,
-      todayHighlight: true,
-      uiLibrary: 'bootstrap'
-    });
-});
-
-    $(document).on('click', '.number-spinner button', function () {    
-        var btn = $(this),
-        oldValue = btn.closest('.number-spinner').find('input').val().trim(),
-        newVal = 0;
-    
-    if (btn.attr('data-dir') == 'up') {
-        newVal = parseInt(oldValue) + 1;
-    } else {
-        if (oldValue > 1) {
-            newVal = parseInt(oldValue) - 1;
-        } else {
-            newVal = 1;
-        }
-    }
-    btn.closest('.number-spinner').find('input').val(newVal);
-});
-</script>
-
- <script type="text/javascript">
-    $('#fileIjazah').change(function (event) {
-        var oFile = document.getElementById("fileIjazah").files[0]; 
-
-        if (oFile.size > 5242880) {  // 5 mb for bytes.
-                toastr.error('File Max size 5 MB!','Error');
-                $('#NotificationModal').modal('hide');
-                //return;
-        } else {
-            $('#element1').empty();
-            var file = URL.createObjectURL(event.target.files[0]);
-            $('#element1').append('<br/><iframe src="' + file + '" style="width:200px; height:100;" frameborder="0"></iframe>' );
-        }
-    });
-    $('#fileTranscript').change(function (event) {
-        var xFile = document.getElementById("fileTranscript").files[0]; 
-        if (xFile.size > 5242880) {  // 5 mb for bytes.
-                toastr.error('File Max size 5 MB!','Error');
-                return;
-        } else {
-            $('#element2').empty();
-            var file = URL.createObjectURL(event.target.files[0]);
-            $('#element2').append('<br/><iframe src="' + file + '" style="width:200px; height:100;" frameborder="0"></iframe>');
-        }
-    });
-
- </script>
  <script>
-    $('#btnSave').click(function () {
+    $('#btnSave3').click(function () {
         var NIP = $('#formNIP').val();
         $('#NotificationModal .modal-body').html('<div style="text-align: center;">' +
-            'Pastikan Data & File Academic S3 tidak salah! <br/>' +
+            'Pastikan data form & File Academic S3 tidak salah! <br/>' +
             'Periksa kembali data yang di input sebelum di Save. ' +
             '<hr/>' +
             '<button type="button" class="btn btn-default" id="btnCloseEmployees" data-dismiss="modal">Close</button> | ' +
@@ -590,25 +659,23 @@ function loadAcademicS3Details() {
     });
 
     $(document).on('click','#btnSubmitEmployees3',function () {
-        saveEmployeesS3();
+        saveEmployees3();
     });
 
-    function saveEmployeesS3() {
+    function saveEmployees3() {
 
         var formNIP = '<?php echo $NIP; ?>';
-        var formNoIjazahS3 = $('#formNoIjazahS3').val();
-        var formNameUnivS3 = $('#formNameUnivS3').val();
+        var formNoIjazahS1 = $('#formNoIjazahS3').val();
+        var formNameUnivS1 = $('#formNameUnivS3').val();
         var formIjazahDate = $('#formIjazahDate').val();
-        var formMajorS3 = $('#formMajorS3').val();
-        var formStudyS3 = $('#formStudyS3').val();
-        var gradeS3 = $('#gradeS3').val();
-        var totalCreditS3 = $('#totalCreditS3').val();
-        var TotSemesterS3 = $('#TotSemesterS3').val();
-
+        var formMajorS1 = $('#formMajorS3').val();
+        var formStudyS1 = $('#formStudyS3').val();
+        var gradeS1 = $('#gradeS3').val();
+        var totalCreditS1 = $('#totalCreditS3').val();
+        var TotSemesterS1 = $('#TotSemesterS3').val();
         var min=100; 
         var max=999;  
         var random =Math.floor(Math.random() * (+max - +min)) + +min; 
-
         var type = 'IjazahS3';
         var ext = 'PDF';
         var fileName = type+'_'+NIP+'_'+random+'.'+ext;
@@ -616,38 +683,37 @@ function loadAcademicS3Details() {
         var fileName_Transcript = TypeTrans+'_'+NIP+'_'+random+'.'+ext;
         var oFile = document.getElementById("fileIjazah").files[0]; 
         var xFile = document.getElementById("fileTranscript").files[0]; 
-
-        if(formNIP!=null && formNIP!=''
-            && formNoIjazahS3!='' && formNoIjazahS3!=null
-            && formNameUnivS3!='' && formNameUnivS3!=null
-            && formIjazahDate!='' && formIjazahDate!=null
-            && formMajorS3!='' && formMajorS3!=null
-            && formStudyS3!='' && formStudyS3!=null
-            && gradeS3!='' && gradeS3!=null
-            && totalCreditS3!='' && totalCreditS3!=null
-            && TotSemesterS3!='' && TotSemesterS3!=null 
-            && oFile!='' && oFile!=null 
-            && xFile!='' && xFile!=null 
-            ){ 
-                loading_button('#btnSubmitEmployees');
-            $('#btnCloseEmployees').prop('disabled',true);
+        
+            if(formNIP!=null && formNIP!=''
+                    && formNoIjazahS1!='' && formNoIjazahS1!=null
+                    && formNameUnivS1!='' && formNameUnivS1!=null
+                    && formIjazahDate!='' && formIjazahDate!=null
+                    && formMajorS1!='' && formMajorS1!=null
+                    && formStudyS1!='' && formStudyS1!=null
+                    && gradeS1!='' && gradeS1!=null
+                    && totalCreditS1!='' && totalCreditS1!=null
+                    && TotSemesterS1!='' && TotSemesterS1!=null 
+                    && oFile!='' && oFile!=null 
+                    && xFile!='' && xFile!=null 
+                    ){ 
+                    loading_button('#btnSubmitEmployees');
+                    $('#btnCloseEmployees').prop('disabled',true);
 
                     var data = {
-                        //action : 'addEmployees',
                         action : 'addAcademicS3',
                         formInsert : {
-                                NIP : formNIP,
-                                NoIjazah : formNoIjazahS3,
-                                NameUniversity : formNameUnivS3,
-                                IjazahDate : formIjazahDate,
-                                Major : formMajorS3,
-                                ProgramStudy : formStudyS3,
-                                Grade : gradeS3,
-                                TotalCredit : totalCreditS3,
-                                TotalSemester : TotSemesterS3,
-                                file_trans : fileName_Transcript,
-                                fileName : fileName }
-                            };
+                            NIP : formNIP,
+                            NoIjazah : formNoIjazahS1,
+                            NameUniversity : formNameUnivS1,
+                            IjazahDate : formIjazahDate,
+                            Major : formMajorS1,
+                            ProgramStudy : formStudyS1,
+                            Grade : gradeS1,
+                            TotalCredit : totalCreditS1,
+                            TotalSemester : TotSemesterS1,
+                            file_trans : fileName_Transcript,
+                            fileName : fileName }
+                    };
 
                     var token = jwt_encode(data,'UAP)(*');
                     var url = base_url_js+'api/__crudAcademicData';
@@ -656,14 +722,13 @@ function loadAcademicS3Details() {
                         if(result==0 || result=='0'){
                             toastr.error('NIK / NIP is exist','Error');
                         } else {  //if success save data
-                                
-                                if ($('#fileIjazah').get(0).files.length === 0) {
+
+                            if ($('#fileIjazah').get(0).files.length === 0) {
                                 } else {
                                     var formData = new FormData( $("#tagFM_IjazahS3")[0]);
                                     var url = base_url_js+'human-resources/upload_academic?fileName='+fileName+'&c='+type+'&u='+NIP;
-                                            
                                     $.ajax({
-                                            url : url,  // Controller URL
+                                            url : url,  
                                             type : 'POST',
                                             data : formData,
                                             async : false,
@@ -671,29 +736,34 @@ function loadAcademicS3Details() {
                                             contentType : false,
                                             processData : false,
                                             success : function(data) {
+
                                             }
                                     });
                                     if ($('#fileTranscript').get(0).files.length === 0) {
-                                    } else {
-                                        uploadfile_transcripts(fileName_Transcript);
-                                    } 
-                                    toastr.success('Academic Data Saved','Success');   
+                                        } 
+                                        else {
+                                            uploadfile_transcripts3(fileName_Transcript);
+                                        }    
+                                    toastr.success('Document Saved With File','Success'); 
                                 }
-                        }
+                        }   
                             setTimeout(function () {
                                 $('#NotificationModal').modal('hide');
-                                //window.location.href = '';
+                                window.location.href = '';
                             },1000);
-                        });
-                 }
+                    });
+                }
+
         else {
-            toastr.error('Form or academic files are still empty!','Error');
+            toastr.error('form or academic files are still empty!','Error');
             $('#NotificationModal').modal('hide');
             return;
         }
-}
+    }
 
-function uploadfile_transcripts(fileName_Transcript) {
+
+function uploadfile_transcripts3(fileName_Transcript) {
+
         var NIP = '<?php echo $NIP; ?>';                
         var type = 'TranscriptS3';
         var ext = 'PDF';
@@ -701,26 +771,23 @@ function uploadfile_transcripts(fileName_Transcript) {
         var formData = new FormData( $("#tagFM_TranscriptS3")[0]);
         var url = base_url_js+'human-resources/upload_academic?fileName='+fileName+'&c='+type+'&u='+NIP;
                                             
-        $.ajax({
-            url : url,  // Controller URL
-            type : 'POST',
-            data : formData,
-            async : false,
-            cache : false,
-            contentType : false,
-            processData : false,
-                success : function(data) {
-            }
-        });   
-}
+            $.ajax({
+                url : url,  // Controller URL
+                type : 'POST',
+                data : formData,
+                async : false,
+                cache : false,
+                contentType : false,
+                processData : false,
+                    success : function(data) {
+                        
+                    }
+            });   
+    }
 </script>
 
 <script>
-    $(document).ready(function () {
-        loadSelectOptionEmployeesSingle('#formEmployees','');
-        $('#formPengawaS3,#formPengawas2').select2({allowClear: true});
-    });
-
+    
     $('#formEmployees').change(function () {
         loadDataEmployees();
     });
@@ -745,12 +812,11 @@ function uploadfile_transcripts(fileName_Transcript) {
                 $('#viewName').html(d.Name);
                 $('#viewNIP').html(d.NIPLec);
 
-
                 // Load files
                 var KTP = (d.KTP!='' && d.KTP!=null) ? '<a target="_blank" href="'+base_url_js+'uploads/files/'+d.KTP+'">'+d.KTP+'</a>' : '-';
                 var CV = (d.CV!='' && d.CV!=null) ? '<a target="_blank" href="'+base_url_js+'uploads/files/'+d.CV+'">'+d.CV+'</a>' : '-';
-                var IjazahS3 = (d.IjazahS3!='' && d.IjazahS3!=null) ? '<a target="_blank" href="'+base_url_js+'uploads/files/'+d.IjazahS3+'">'+d.IjazahS3+'</a>' : '-';
-                var TranscriptS3 = (d.TranscriptS3!='' && d.TranscriptS3!=null) ? '<a target="_blank" href="'+base_url_js+'uploads/files/'+d.TranscriptS3+'">'+d.TranscriptS3+'</a>' : '-';
+                var IjazahS1 = (d.IjazahS1!='' && d.IjazahS1!=null) ? '<a target="_blank" href="'+base_url_js+'uploads/files/'+d.IjazahS1+'">'+d.IjazahS1+'</a>' : '-';
+                var TranscriptS1 = (d.TranscriptS1!='' && d.TranscriptS1!=null) ? '<a target="_blank" href="'+base_url_js+'uploads/files/'+d.TranscriptS1+'">'+d.TranscriptS1+'</a>' : '-';
                 var IjazahS2 = (d.IjazahS2!='' && d.IjazahS2!=null) ? '<a target="_blank" href="'+base_url_js+'uploads/files/'+d.IjazahS2+'">'+d.IjazahS2+'</a>' : '-';
                 var TranscriptS2 = (d.TranscriptS2!='' && d.TranscriptS2!=null) ? '<a target="_blank" href="'+base_url_js+'uploads/files/'+d.TranscriptS2+'">'+d.TranscriptS2+'</a>' : '-';
                 var IjazahS3 = (d.IjazahS3!='' && d.IjazahS3!=null) ? '<a target="_blank" href="'+base_url_js+'uploads/files/'+d.IjazahS3+'">'+d.IjazahS3+'</a>' : '-';
@@ -763,8 +829,8 @@ function uploadfile_transcripts(fileName_Transcript) {
 
                 $('#viewKTP').html(KTP);
                 $('#viewCV').html(CV);
-                $('#viewIjazahS3').html(IjazahS3);
-                $('#viewTranscriptS3').html(TranscriptS3);
+                $('#viewIjazahS1').html(IjazahS1);
+                $('#viewTranscriptS1').html(TranscriptS1);
                 $('#viewIjazahS2').html(IjazahS2);
                 $('#viewTranscriptS2').html(TranscriptS2);
                 $('#viewIjazahS3').html(IjazahS3);
@@ -778,8 +844,8 @@ function uploadfile_transcripts(fileName_Transcript) {
 
                 var btnKTP = (d.KTP!='' && d.KTP!=null) ? false : true;
                 var btnCV = (d.CV!='' && d.CV!=null) ? false : true;
-                var btnIjazahS3 = (d.IjazahS3!='' && d.IjazahS3!=null) ? false : true;
-                var btnTranscriptS3 = (d.TranscriptS3!='' && d.TranscriptS3!=null) ? false : true;
+                var btnIjazahS1 = (d.IjazahS1!='' && d.IjazahS1!=null) ? false : true;
+                var btnTranscriptS1 = (d.TranscriptS1!='' && d.TranscriptS1!=null) ? false : true;
                 var btnIjazahS2 = (d.IjazahS2!='' && d.IjazahS2!=null) ? false : true;
                 var btnTranscriptS2 = (d.TranscriptS2!='' && d.TranscriptS2!=null) ? false : true;
                 var btnIjazahS3 = (d.IjazahS3!='' && d.IjazahS3!=null) ? false : true;
@@ -792,8 +858,8 @@ function uploadfile_transcripts(fileName_Transcript) {
 
                 $('#btnDelete_KTP').prop('disabled',btnKTP).attr('data-file',d.KTP);
                 $('#btnDelete_CV').prop('disabled',btnCV).attr('data-file',d.CV);
-                //$('#btnDelete_IjazahS3').prop('disabled',btnIjazahS3).attr('data-file',d.IjazahS3);
-                $('#btnDelete_TranscriptS3').prop('disabled',btnTranscriptS3).attr('data-file',d.TranscriptS3);
+                //$('#btnDelete_IjazahS1').prop('disabled',btnIjazahS1).attr('data-file',d.IjazahS1);
+                $('#btnDelete_TranscriptS1').prop('disabled',btnTranscriptS1).attr('data-file',d.TranscriptS1);
                 $('#btnDelete_IjazahS2').prop('disabled',btnIjazahS2).attr('data-file',d.IjazahS2);
                 $('#btnDelete_TranscriptS2').prop('disabled',btnTranscriptS2).attr('data-file',d.TranscriptS2);
                 $('#btnDelete_IjazahS3').prop('disabled',btnIjazahS3).attr('data-file',d.IjazahS3);
@@ -802,6 +868,8 @@ function uploadfile_transcripts(fileName_Transcript) {
                 $('#btnDelete_SK_Dosen').prop('disabled',btnSK_Dosen).attr('data-file',d.SK_Dosen);
                 $('#btnDelete_SK_Pangkat').prop('disabled',btnSK_Pangkat).attr('data-file',d.SK_Pangkat);
                 $('#btnDelete_SK_JJA').prop('disabled',btnSK_JJA).attr('data-file',d.SK_JJA);
+
+
             });
         }
     }
@@ -817,7 +885,6 @@ function uploadfile_transcripts(fileName_Transcript) {
             var fm = $(this).attr('data-fm');
             var type = fm.split('tagFM_')[1];
             //var type = $("#typefiles option:selected").attr("id")
-            //alert(type);
 
             var sz = parseFloat(input.files[0].size) / 1000000; // ukuran MB
             var ext = input.files[0].type.split('/')[1];
@@ -827,10 +894,9 @@ function uploadfile_transcripts(fileName_Transcript) {
                 ds = false;
 
                 var fileName = type+'_'+NIP+'.'+ext;
-                var formData = new FormData( $("#tagFM_IjazahS3")[0]);
+                var formData = new FormData( $("#tagFM_IjazahS1")[0]);
                 //var formData = new FormData( $("#"+fm)[0]);
                 var url = base_url_js+'human-resources/upload_academic?fileName='+fileName+'&c='+type+'&u='+NIP;
-                //alert(url);
 
                 $.ajax({
                     url : url,  // Controller URL

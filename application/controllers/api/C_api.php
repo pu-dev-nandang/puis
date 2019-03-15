@@ -3100,7 +3100,6 @@ class C_api extends CI_Controller {
         }
     }
 
-
     public function review_academicdetail(){
         $NIP = $this->input->get('NIP');
         $viewacademic = $this->m_api->views_academic($NIP);
@@ -3132,16 +3131,18 @@ class C_api extends CI_Controller {
             $NIP = $this->input->get('n');
             $fileijazahs1 = $this->input->get('j');
             $filetranscripts1 = $this->input->get('t');
+            $nameuniv = $this->input->get('x');
             
-            $viewfiles1 = $this->m_api->views_editacademic($NIP,$fileijazahs1,$filetranscripts1);
+            $viewfiles1 = $this->m_api->views_editacademic($NIP,$fileijazahs1,$filetranscripts1,$nameuniv);
             echo json_encode($viewfiles1);   
         }  
         else if ($academic == 'S2') {
             $NIP = $this->input->get('n');
             $fileijazahs1 = $this->input->get('j');
             $filetranscripts1 = $this->input->get('t');
+            $nameuniv = $this->input->get('x');
             
-            $viewfiles1 = $this->m_api->views_editacademic($NIP,$fileijazahs1,$filetranscripts1);
+            $viewfiles1 = $this->m_api->views_editacademic($NIP,$fileijazahs1,$filetranscripts1,$nameuniv);
             echo json_encode($viewfiles1);   
 
         }
@@ -3149,8 +3150,9 @@ class C_api extends CI_Controller {
             $NIP = $this->input->get('n');
             $fileijazahs1 = $this->input->get('j');
             $filetranscripts1 = $this->input->get('t');
+            $nameuniv = $this->input->get('x');
             
-            $viewfiles1 = $this->m_api->views_editacademic($NIP,$fileijazahs1,$filetranscripts1);
+            $viewfiles1 = $this->m_api->views_editacademic($NIP,$fileijazahs1,$filetranscripts1,$nameuniv);
             echo json_encode($viewfiles1);   
         }
         else if ($academic == 'OTF') {
@@ -4454,48 +4456,38 @@ class C_api extends CI_Controller {
             $fileName = $formInsert['linkijazahs1'];
             $file_trans = $formInsert['linktranscripts1'];
 
-            $dataAcademic = $this->db->get_where('db_employees.employees_academic',array('NIP'=>$NIP,'IjazahFile'=>$fileName,'TranscriptFile'=>$file_trans))->result_array();
-
-            if(count($dataAcademic)>0){ // jika ada data di table files (update)
-
-                    $dataUpdate = array(
-                            'TypeAcademic' => $type,
-                            'NoIjazah' => $NoIjazah,
-                            'DateIjazah' => $DateIjazah,
-                            'NameUniversity' => $NameUniversity,
-                            'Major' => $Major,
-                            'ProgramStudy' => $ProgramStudy,
-                            'Grade' => $Grade,
-                            'TotalCredit' => $TotalCredit,
-                            'TotalSemester' => $TotalSemester,
-                            'IjazahFile' => $fileName,
-                            'TranscriptFile' => $file_trans
-                    );
-
-                    $this->db->where('NIP', $NIP);
-                    $this->db->where('IjazahFile', $fileName);
-                    $this->db->where('TranscriptFile', $file_trans);
-                    $this->db->update('db_employees.employees_academic', $dataUpdate);
-                    return print_r(1);
-                } else {
-
-                    $dataSave = array(
-                            'NIP' => $NIP,
-                            'TypeAcademic' => $type,
-                            'NoIjazah' => $NoIjazah,
-                            'DateIjazah' => $DateIjazah,
-                            'NameUniversity' => $NameUniversity,
-                            'Major' => $Major,
-                            'ProgramStudy' => $ProgramStudy,
-                            'Grade' => $Grade,
-                            'TotalCredit' => $TotalCredit,
-                            'TotalSemester' => $TotalSemester,
-                            'IjazahFile' => $fileName,
-                            'TranscriptFile' => $file_trans
-                    );
-                    $this->db->insert('db_employees.employees_academic', $dataSave);
-                    return print_r(1);
-            }
+            $dataUpdate = array(
+                    'TypeAcademic' => $type,
+                    'NoIjazah' => $NoIjazah,
+                    'DateIjazah' => $DateIjazah,
+                    'NameUniversity' => $NameUniversity,
+                    'Major' => $Major,
+                    'ProgramStudy' => $ProgramStudy,
+                    'Grade' => $Grade,
+                    'TotalCredit' => $TotalCredit,
+                    'TotalSemester' => $TotalSemester,
+                    'LinkFiles' => $fileName
+            );
+            $this->db->where('NIP', $NIP);
+            $this->db->where('LinkFiles', $fileName);
+            $this->db->update('db_employees.files', $dataUpdate);
+                    //------------------------------------------------\\
+            $dataUpdate2 = array(
+                    'TypeAcademic' => $type,
+                    'NoIjazah' => $NoIjazah,
+                    'DateIjazah' => $DateIjazah,
+                    'NameUniversity' => $NameUniversity,
+                    'Major' => $Major,
+                    'ProgramStudy' => $ProgramStudy,
+                    'Grade' => $Grade,
+                    'TotalCredit' => $TotalCredit,
+                    'TotalSemester' => $TotalSemester,
+                    'LinkFiles' => $file_trans
+            );
+            $this->db->where('NIP', $NIP);
+            $this->db->where('LinkFiles', $file_trans);
+            $this->db->update('db_employees.files', $dataUpdate2);
+            return print_r(1);  
         }
         else if($data_arr['action']=='editAcademicS2'){
             $formInsert = (array) $data_arr['formInsert'];
@@ -4513,50 +4505,38 @@ class C_api extends CI_Controller {
             $fileName = $formInsert['linkijazahs1'];
             $file_trans = $formInsert['linktranscripts1'];
 
-            $dataAcademic = $this->db->get_where('db_employees.employees_academic',array('NIP'=>$NIP,'IjazahFile'=>$fileName,'TranscriptFile'=>$file_trans))->result_array();
-
-            if(count($dataAcademic)>0){
-
-                    $dataUpdate = array(
-                            'TypeAcademic' => $type,
-                            'NoIjazah' => $NoIjazah,
-                            'DateIjazah' => $DateIjazah,
-                            'NameUniversity' => $NameUniversity,
-                            'Major' => $Major,
-                            'ProgramStudy' => $ProgramStudy,
-                            'Grade' => $Grade,
-                            'TotalCredit' => $TotalCredit,
-                            'TotalSemester' => $TotalSemester,
-                            'IjazahFile' => $fileName,
-                            'TranscriptFile' => $file_trans
-                    );
-
-                    $this->db->where('NIP', $NIP);
-                    $this->db->where('IjazahFile', $fileName);
-                    $this->db->where('TranscriptFile', $file_trans);
-                    $this->db->update('db_employees.employees_academic', $dataUpdate);
-                    return print_r(1);
-
-                } else {
-
-                    $dataSave = array(
-                            'NIP' => $NIP,
-                            'TypeAcademic' => $type,
-                            'NoIjazah' => $NoIjazah,
-                            'DateIjazah' => $DateIjazah,
-                            'NameUniversity' => $NameUniversity,
-                            'Major' => $Major,
-                            'ProgramStudy' => $ProgramStudy,
-                            'Grade' => $Grade,
-                            'TotalCredit' => $TotalCredit,
-                            'TotalSemester' => $TotalSemester,
-                            'IjazahFile' => $fileName,
-                            'TranscriptFile' => $file_trans
-                    );
-                    $this->db->insert('db_employees.employees_academic', $dataSave);
-                    return print_r(1);
-
-            }
+            $dataUpdate = array(
+                    'TypeAcademic' => $type,
+                    'NoIjazah' => $NoIjazah,
+                    'DateIjazah' => $DateIjazah,
+                    'NameUniversity' => $NameUniversity,
+                    'Major' => $Major,
+                    'ProgramStudy' => $ProgramStudy,
+                    'Grade' => $Grade,
+                    'TotalCredit' => $TotalCredit,
+                    'TotalSemester' => $TotalSemester,
+                    'LinkFiles' => $fileName
+            );
+            $this->db->where('NIP', $NIP);
+            $this->db->where('LinkFiles', $fileName);
+            $this->db->update('db_employees.files', $dataUpdate);
+                    //------------------------------------------------\\
+            $dataUpdate2 = array(
+                    'TypeAcademic' => $type,
+                    'NoIjazah' => $NoIjazah,
+                    'DateIjazah' => $DateIjazah,
+                    'NameUniversity' => $NameUniversity,
+                    'Major' => $Major,
+                    'ProgramStudy' => $ProgramStudy,
+                    'Grade' => $Grade,
+                    'TotalCredit' => $TotalCredit,
+                    'TotalSemester' => $TotalSemester,
+                    'LinkFiles' => $file_trans
+            );
+            $this->db->where('NIP', $NIP);
+            $this->db->where('LinkFiles', $file_trans);
+            $this->db->update('db_employees.files', $dataUpdate2);
+            return print_r(1);  
         }
         else if($data_arr['action']=='editAcademicS3'){
 
@@ -4575,48 +4555,38 @@ class C_api extends CI_Controller {
             $fileName = $formInsert['linkijazahs1'];
             $file_trans = $formInsert['linktranscripts1'];
 
-            $dataAcademic = $this->db->get_where('db_employees.employees_academic',array('NIP'=>$NIP,'IjazahFile'=>$fileName,'TranscriptFile'=>$file_trans))->result_array();
-
-            if(count($dataAcademic)>0){ // jika ada data di table files (update)
-
-                    $dataUpdate = array(
-                            'TypeAcademic' => $type,
-                            'NoIjazah' => $NoIjazah,
-                            'DateIjazah' => $DateIjazah,
-                            'NameUniversity' => $NameUniversity,
-                            'Major' => $Major,
-                            'ProgramStudy' => $ProgramStudy,
-                            'Grade' => $Grade,
-                            'TotalCredit' => $TotalCredit,
-                            'TotalSemester' => $TotalSemester,
-                            'IjazahFile' => $fileName,
-                            'TranscriptFile' => $file_trans
-                    );
-                    $this->db->where('NIP', $NIP);
-                    $this->db->where('IjazahFile', $fileName);
-                    $this->db->where('TranscriptFile', $file_trans);
-                    $this->db->update('db_employees.employees_academic', $dataUpdate);
-                    return print_r(1);
-
-                } else {
-
-                    $dataSave = array(
-                            'NIP' => $NIP,
-                            'TypeAcademic' => $type,
-                            'NoIjazah' => $NoIjazah,
-                            'DateIjazah' => $DateIjazah,
-                            'NameUniversity' => $NameUniversity,
-                            'Major' => $Major,
-                            'ProgramStudy' => $ProgramStudy,
-                            'Grade' => $Grade,
-                            'TotalCredit' => $TotalCredit,
-                            'TotalSemester' => $TotalSemester,
-                            'IjazahFile' => $fileName,
-                            'TranscriptFile' => $file_trans
-                    );
-                    $this->db->insert('db_employees.employees_academic', $dataSave);
-                    return print_r(1);
-            }
+            $dataUpdate = array(
+                    'TypeAcademic' => $type,
+                    'NoIjazah' => $NoIjazah,
+                    'DateIjazah' => $DateIjazah,
+                    'NameUniversity' => $NameUniversity,
+                    'Major' => $Major,
+                    'ProgramStudy' => $ProgramStudy,
+                    'Grade' => $Grade,
+                    'TotalCredit' => $TotalCredit,
+                    'TotalSemester' => $TotalSemester,
+                    'LinkFiles' => $fileName
+            );
+            $this->db->where('NIP', $NIP);
+            $this->db->where('LinkFiles', $fileName);
+            $this->db->update('db_employees.files', $dataUpdate);
+                    //------------------------------------------------\\
+            $dataUpdate2 = array(
+                    'TypeAcademic' => $type,
+                    'NoIjazah' => $NoIjazah,
+                    'DateIjazah' => $DateIjazah,
+                    'NameUniversity' => $NameUniversity,
+                    'Major' => $Major,
+                    'ProgramStudy' => $ProgramStudy,
+                    'Grade' => $Grade,
+                    'TotalCredit' => $TotalCredit,
+                    'TotalSemester' => $TotalSemester,
+                    'LinkFiles' => $file_trans
+            );
+            $this->db->where('NIP', $NIP);
+            $this->db->where('LinkFiles', $file_trans);
+            $this->db->update('db_employees.files', $dataUpdate2);
+            return print_r(1);  
         }
         else if($data_arr['action']=='EditFilesDocument'){
 
@@ -4654,6 +4624,8 @@ class C_api extends CI_Controller {
 
                 $formInsert = (array) $data_arr['formInsert'];
                 $type = 'S1';
+                $Colomija = 'IjazahS1';
+                $Colomtra = 'TranscriptS1';
                 $NIP = $formInsert['NIP'];
                 $NoIjazah = strtoupper($formInsert['NoIjazah']);
                 $NameUniversity = strtoupper($formInsert['NameUniversity']);
@@ -4665,29 +4637,50 @@ class C_api extends CI_Controller {
                 $TotalSemester = $formInsert['TotalSemester'];
                 $fileName = $formInsert['fileName'];
                 $file_trans = $formInsert['file_trans'];
-                
+
+                $Get_MasterFiles = $this->m_master->MasterfileStatus($Colomija);
+                $Get_MasterFiles2 = $this->m_master->MasterfileStatus($Colomtra);
                 $dataSave = array(
-                                'NIP' => $NIP,
-                                'TypeAcademic' => $type,
-                                'NoIjazah' => $NoIjazah,
-                                'DateIjazah' => $DateIjazah,
-                                'NameUniversity' => $NameUniversity,
-                                'Major' => $Major,
-                                'ProgramStudy' => $ProgramStudy,
-                                'Grade' => $Grade,
-                                'TotalCredit' => $TotalCredit,
-                                'TotalSemester' => $TotalSemester,
-                                'IjazahFile' => $fileName,
-                                'TranscriptFile' => $file_trans,
-                                'UserCreate' => $IDuser
-                            );
-                $this->db->insert('db_employees.employees_academic', $dataSave);
+                            'NIP' => $NIP,
+                            'TypeAcademic' => $type,
+                            'TypeFiles' => $Get_MasterFiles[0]['ID'],
+                            'NoIjazah' => $NoIjazah,
+                            'DateIjazah' => $DateIjazah,
+                            'NameUniversity' => $NameUniversity,
+                            'Major' => $Major,
+                            'ProgramStudy' => $ProgramStudy,
+                            'Grade' => $Grade,
+                            'TotalCredit' => $TotalCredit,
+                            'TotalSemester' => $TotalSemester,
+                            'LinkFiles' => $fileName,
+                            //'TranscriptFile' => $file_trans,
+                            'UserCreate' => $IDuser
+                );
+                $this->db->insert('db_employees.files', $dataSave);
+                $dataSave2 = array(
+                            'NIP' => $NIP,
+                            'TypeAcademic' => $type,
+                            'TypeFiles' => $Get_MasterFiles2[0]['ID'],
+                            'NoIjazah' => $NoIjazah,
+                            'DateIjazah' => $DateIjazah,
+                            'NameUniversity' => $NameUniversity,
+                            'Major' => $Major,
+                            'ProgramStudy' => $ProgramStudy,
+                            'Grade' => $Grade,
+                            'TotalCredit' => $TotalCredit,
+                            'TotalSemester' => $TotalSemester,
+                            'LinkFiles' => $file_trans,
+                            'UserCreate' => $IDuser
+                );
+                $this->db->insert('db_employees.files', $dataSave2);
                 return print_r(1);
             } 
             else if($data_arr['action']=='addAcademicS2'){
+
                 $formInsert = (array) $data_arr['formInsert'];
                 $type = 'S2';
-                
+                $Colomija = 'IjazahS2';
+                $Colomtra = 'TranscriptS2';
                 $NIP = $formInsert['NIP'];
                 $NoIjazah = strtoupper($formInsert['NoIjazah']);
                 $NameUniversity = strtoupper($formInsert['NameUniversity']);
@@ -4699,29 +4692,48 @@ class C_api extends CI_Controller {
                 $TotalSemester = $formInsert['TotalSemester'];
                 $fileName = $formInsert['fileName'];
                 $file_trans = $formInsert['file_trans'];
-
+                $Get_MasterFiles = $this->m_master->MasterfileStatus($Colomija);
+                $Get_MasterFiles2 = $this->m_master->MasterfileStatus($Colomtra);
                 $dataSave = array(
-                               'NIP' => $NIP,
-                                'TypeAcademic' => $type,
-                                'NoIjazah' => $NoIjazah,
-                                'DateIjazah' => $DateIjazah,
-                                'NameUniversity' => $NameUniversity,
-                                'Major' => $Major,
-                                'ProgramStudy' => $ProgramStudy,
-                                'Grade' => $Grade,
-                                'TotalCredit' => $TotalCredit,
-                                'TotalSemester' => $TotalSemester,
-                                'IjazahFile' => $fileName,
-                                'TranscriptFile' => $file_trans,
-                                'UserCreate' => $IDuser
-                            );
-                $this->db->insert('db_employees.employees_academic', $dataSave);
+                            'NIP' => $NIP,
+                            'TypeAcademic' => $type,
+                            'TypeFiles' => $Get_MasterFiles[0]['ID'],
+                            'NoIjazah' => $NoIjazah,
+                            'DateIjazah' => $DateIjazah,
+                            'NameUniversity' => $NameUniversity,
+                            'Major' => $Major,
+                            'ProgramStudy' => $ProgramStudy,
+                            'Grade' => $Grade,
+                            'TotalCredit' => $TotalCredit,
+                            'TotalSemester' => $TotalSemester,
+                            'LinkFiles' => $fileName,
+                            'UserCreate' => $IDuser
+                );
+                $this->db->insert('db_employees.files', $dataSave);
+                $dataSave2 = array(
+                            'NIP' => $NIP,
+                            'TypeAcademic' => $type,
+                            'TypeFiles' => $Get_MasterFiles2[0]['ID'],
+                            'NoIjazah' => $NoIjazah,
+                            'DateIjazah' => $DateIjazah,
+                            'NameUniversity' => $NameUniversity,
+                            'Major' => $Major,
+                            'ProgramStudy' => $ProgramStudy,
+                            'Grade' => $Grade,
+                            'TotalCredit' => $TotalCredit,
+                            'TotalSemester' => $TotalSemester,
+                            'LinkFiles' => $file_trans,
+                            'UserCreate' => $IDuser
+                );
+                $this->db->insert('db_employees.files', $dataSave2);
                 return print_r(1);
-            }
+            } 
             else if($data_arr['action']=='addAcademicS3'){
+
                 $formInsert = (array) $data_arr['formInsert'];
                 $type = 'S3';
-                
+                $Colomija = 'IjazahS3';
+                $Colomtra = 'TranscriptS3';
                 $NIP = $formInsert['NIP'];
                 $NoIjazah = strtoupper($formInsert['NoIjazah']);
                 $NameUniversity = strtoupper($formInsert['NameUniversity']);
@@ -4733,28 +4745,45 @@ class C_api extends CI_Controller {
                 $TotalSemester = $formInsert['TotalSemester'];
                 $fileName = $formInsert['fileName'];
                 $file_trans = $formInsert['file_trans'];
-
+                $Get_MasterFiles = $this->m_master->MasterfileStatus($Colomija);
+                $Get_MasterFiles2 = $this->m_master->MasterfileStatus($Colomtra);
                 $dataSave = array(
-                               'NIP' => $NIP,
-                                'TypeAcademic' => $type,
-                                'NoIjazah' => $NoIjazah,
-                                'DateIjazah' => $DateIjazah,
-                                'NameUniversity' => $NameUniversity,
-                                'Major' => $Major,
-                                'ProgramStudy' => $ProgramStudy,
-                                'Grade' => $Grade,
-                                'TotalCredit' => $TotalCredit,
-                                'TotalSemester' => $TotalSemester,
-                                'IjazahFile' => $fileName,
-                                'TranscriptFile' => $file_trans,
-                                'UserCreate' => $IDuser
-                            );
-                $this->db->insert('db_employees.employees_academic', $dataSave);
+                            'NIP' => $NIP,
+                            'TypeAcademic' => $type,
+                            'TypeFiles' => $Get_MasterFiles[0]['ID'],
+                            'NoIjazah' => $NoIjazah,
+                            'DateIjazah' => $DateIjazah,
+                            'NameUniversity' => $NameUniversity,
+                            'Major' => $Major,
+                            'ProgramStudy' => $ProgramStudy,
+                            'Grade' => $Grade,
+                            'TotalCredit' => $TotalCredit,
+                            'TotalSemester' => $TotalSemester,
+                            'LinkFiles' => $fileName,
+                            'UserCreate' => $IDuser
+                );
+                $this->db->insert('db_employees.files', $dataSave);
+                $dataSave2 = array(
+                            'NIP' => $NIP,
+                            'TypeAcademic' => $type,
+                            'TypeFiles' => $Get_MasterFiles2[0]['ID'],
+                            'NoIjazah' => $NoIjazah,
+                            'DateIjazah' => $DateIjazah,
+                            'NameUniversity' => $NameUniversity,
+                            'Major' => $Major,
+                            'ProgramStudy' => $ProgramStudy,
+                            'Grade' => $Grade,
+                            'TotalCredit' => $TotalCredit,
+                            'TotalSemester' => $TotalSemester,
+                            'LinkFiles' => $file_trans,
+                            'UserCreate' => $IDuser
+                );
+                $this->db->insert('db_employees.files', $dataSave2);
                 return print_r(1);
-            }
+            } 
             else if($data_arr['action']=='AddFilesDocument'){
+                
                 $formInsert = (array) $data_arr['formInsert'];
-
                 $NIP = $formInsert['NIP'];
                 $IDuser = $this->session->userdata('NIP');
                 $NoDocument = strtoupper($formInsert['NoDocument']);
@@ -4762,7 +4791,6 @@ class C_api extends CI_Controller {
                 $type = $formInsert['type'];
                 $DescriptionFile = $formInsert['DescriptionFile'];
                 $fileName = $formInsert['fileName'];
-
                 $Get_MasterFiles = $this->m_master->MasterfileStatus($type);
                 $dataSave = array(
                                 'NIP' => $NIP,
@@ -4775,10 +4803,9 @@ class C_api extends CI_Controller {
                             );
                 $this->db->insert('db_employees.files',$dataSave);
                 return print_r(1);
-
             }
-
-        }
+            
+        } //end count
 
      }
 

@@ -316,7 +316,8 @@ $(document).ready(function () {
         } 
         else {
 
-            var url = base_url_js+'api/__getdataedits1?n='+NIP+'&j='+fileijazahs1+'&t='+filetranscripts1+'&s='+acad;                          
+            var url = base_url_js+'api/__getdataedits1?n='+NIP+'&j='+fileijazahs1+'&t='+filetranscripts1+'&s='+acad+'&x='+nameuniv;   
+                                   
             var token = jwt_encode({
             action:'read',
             NIP:NIP},'UAP)(*');
@@ -328,7 +329,24 @@ $(document).ready(function () {
                     var no = 1;
                     for (var i = 0; i < response.length; i++) {
 
-                    $('#NotificationModal .modal-body').html('<br/><div class="col-xs-12 id="subsesi">      '+
+                        var nameuniv1 = response[i]['NameUniversity'];
+
+
+                        for (var j = i+1; j < response.length; j++) {
+                            var nameuniv2 = response[j]['NameUniversity'];
+                            
+                            if (nameuniv1 == nameuniv2) {
+
+                                if (response[j]['LinkFiles'] != null) {
+                                        //var Transcriptx = '<iframe src="'+base_url_js+'uploads/files/'+response[j]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button id="btnviewIjazahS1" class="btn btn-sm btn-primary" filesub ="'+response[j]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
+                                        var Transcriptx = response[j]['LinkFiles'];
+                                    } else {
+                                        var Transcriptx = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px">'
+                                }
+
+                            }
+
+                            $('#NotificationModal .modal-body').html('<br/><div class="col-xs-12 id="subsesi">      '+
                         '<div class="form-group">                                                   '+
                         '    <div class="thumbnail" style="padding: 10px;text-align: left;">        '+
                         '      <h4>Edit Academic Transcript S1 </h4>                           '+
@@ -392,39 +410,23 @@ $(document).ready(function () {
                         '           <div class="col-xs-6">                                              '+
                         '           <div class="form-group">                                            '+
                         '               <label>Ijazah</label>                                           '+
-                        '                <form id="tagFM_IjazahS1" enctype="multipart/form-data" accept-charset="utf-8" method="post" action=""> '+
-                        '                        <div class="form-group"> '+
-                        '                            <label class="btn btn-sm btn-default btn-default-warning btn-upload">  '+
-                         '                                   <i class="fa fa-upload margin-right"></i> Change File          '+
-                         '                                   <input type="file" id="fileIjazah" name="userfile" class="upload_files1" style="display: none;" data-fm="tagFM_IjazahS1" accept="application/pdf" disabled> '+
-                        '                             </label> '+
-                        '                        <p style="font-size: 12px;color: #FF0000;">*) Only PDF Files Max Size 5 MB</p> '+
-                        '                    </div></form> '+
-                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['IjazahFile']+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button id="btnreviewfiles" class="btn btn-sm btn-primary" filesub ="'+response[i]['IjazahFile']+'"><i class="fa fa-eye"></i> Preview </button></center></div>                     '+
+                      
+                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button id="btnreviewfiles" class="btn btn-sm btn-primary" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> Preview </button></center></div>                     '+
                         '               </div>                                                          '+
                         '           </div>                                                              '+
                         '           <div class="col-xs-6">                                              '+
                         '           <div class="form-group">                                            '+
                         '               <label>Transcript</label>                                       '+
-                        '                    <form id="tagFM_TranscriptS1" enctype="multipart/form-data" accept-charset="utf-8" method="post" action=""> '+
-                        '                            <input id="formPhoto" class="hide" value="" hidden />  '+
-                        '                                <div class="form-group">                           '+
-                        '                                    <label class="btn btn-sm btn-default btn-default-warning btn-upload"> '+
-                        '                                        <i class="fa fa-upload margin-right"></i> Change File '+
-                        '                                        <input type="file" id="fileTranscript" name="userfile" class="upload_files2" style="display: none;" accept="application/pdf" disabled>                                                                     '+
-                        '                                </label>                                                                '+
-                        '                         <p style="font-size: 12px;color: #FF0000;">*) Only PDF Files Max Size 5 MB</p> '+
-                        '                    </div></form>                                                                       '+
-                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['TranscriptFile']+'" style="width:300px; height:150px;" frameborder="0"></iframe> </div> <br/><center><button id="btnreviewfiles" class="btn btn-sm btn-primary" filesub ="'+response[i]['TranscriptFile']+'"><i class="fa fa-eye"></i> Preview </button></center></div>                 '+
+                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+Transcriptx+'" style="width:300px; height:150px;" frameborder="0"></iframe> </div> <br/><center><button id="btnreviewfiles" class="btn btn-sm btn-primary" filesub ="'+Transcriptx+'"><i class="fa fa-eye"></i> Preview </button></center></div>                 '+
                         '                </div>                                                         '+
                         '            </div>                                                             '+
                         '        </div>                                                                 '+
                         '        <div class="row">                                                      '+
                         '           <div class="col-md-12" style="text-align: right;">                   '+
                         '                <hr/>                                                           '+
-                        '    <div><input type="hidden" class="form-control" value="'+response[i]['IjazahFile']+'" id="linkijazahs1"> </div>                   '+
-                        '    <div><input type="hidden" class="form-control" value="'+response[i]['TranscriptFile']+'" id="linktranscripts1">    </div>       '+
-                        '               <button type="button" class="btn btn-danger" data-dismiss="modal"> Cancel</button> | <button type="button" class="btn btn-success" id="btnSavedits1" linkijazahs1="'+response[i]['IjazahFile']+'" linktranscripts1="'+response[i]['TranscriptFile']+'"> Save</button>                                                               '+
+                        '    <div><input type="hidden" class="form-control" value="'+response[i]['LinkFiles']+'" id="linkijazahs1"> </div>                   '+
+                        '    <div><input type="hidden" class="form-control" value="'+Transcriptx+'" id="linktranscripts1">    </div>       '+
+                        '               <button type="button" class="btn btn-danger" data-dismiss="modal"> Cancel</button> | <button type="button" class="btn btn-success" id="btnSavedits1" linkijazahs1="'+response[i]['LinkFiles']+'" linktranscripts1="'+Transcriptx+'"> Save</button>                                                               '+
                         '           </div>                                                              '+
                         '       </div>                                                                  '+
                         '   </div>                                                                      '+
@@ -435,6 +437,14 @@ $(document).ready(function () {
                     'backdrop' : 'static',
                     'show' : true
                     }); 
+                    i = j;
+                    break;
+
+
+                        }
+
+
+                    
                         
                     } //end for
       
@@ -458,6 +468,7 @@ $(document).ready(function () {
 
         $.post(url,{token:token},function (resultJson) {
             var response = resultJson;
+            console.log(response);
                 $("#loadtablefiles1").append(
                     ' <div class="table-responsive">                                                '+
                     '     <table class="table table-striped table-bordered">                        '+
@@ -478,20 +489,19 @@ $(document).ready(function () {
                 var no = 1;
                 var orbs=0;
                 for (var i = 0; i < response.length; i++) {
-                    var listdatas1 = response[i]['IjazahFile']; 
-                    var listdatas2 = response[i]['TranscriptFile']; 
+                    var listdatas1 = response[i]['LinkFiles']; 
 
-                    //for (var j = i+1; j < response.length; j++) {
-                    //    if (response[i]['NIP'] == response[j]['NIP'] && response[i]['NameUniversity'] == response[j]['NameUniversity']) {
-                    //        var listdatas2 = response[j]['TranscriptFile'];
-                    //    }
-                    //    else
-                    //    {
-                    //        i = j-1;
-                    //        break;
-                    //    }  
-                    //   i = j;
-                    //}
+                    for (var j = i+1; j < response.length; j++) {
+                        if (response[i]['NIP'] == response[j]['NIP'] && response[i]['NameUniversity'] == response[j]['NameUniversity']) {
+                            var listdatas2 = response[j]['LinkFiles'];
+                        }
+                        else
+                        {
+                            i = j-1;
+                            break;
+                        }  
+                       i = j;
+                    }
 
                     $("#dataRow").append('<tr>                                                          '+
                     '            <td> S1 </td>                                                          '+         
@@ -564,10 +574,10 @@ $(document).ready(function () {
 
  <script>
      $(document).on('click','#btnSavedits1',function () {
-        saveditEmployees();
+        saveditEmployees1();
     });
 
-    function saveditEmployees() {
+    function saveditEmployees1() {
 
         var formNIP = '<?php echo $NIP; ?>';
         var formNoIjazahS1 = $('#formNoIjazahS1').val();
@@ -578,11 +588,8 @@ $(document).ready(function () {
         var gradeS1 = $('#gradeS1').val();
         var totalCreditS1 = $('#totalCreditS1').val();
         var TotSemesterS1 = $('#TotSemesterS1').val();
-
         var linkijazahs1 = $('#linkijazahs1').val();
         var linktranscripts1 = $('#linktranscripts1').val();
-
-    
         if(formNIP!=null && formNIP!=''
                     && formNoIjazahS1!='' && formNoIjazahS1!=null
                     && formNameUnivS1!='' && formNameUnivS1!=null
@@ -648,7 +655,7 @@ $(document).ready(function () {
             'Periksa kembali data yang di input sebelum di Save. ' +
             '<hr/>' +
             '<button type="button" class="btn btn-default" id="btnCloseEmployees" data-dismiss="modal">Close</button> | ' +
-            '<button type="button" class="btn btn-success" id="btnSubmitEmployees">Submit</button>' +
+            '<button type="button" class="btn btn-success" id="btnSubmitEmployees1">Submit</button>' +
             '</div> ');
 
         $('#NotificationModal').modal({
@@ -657,7 +664,7 @@ $(document).ready(function () {
         });
     });
 
-    $(document).on('click','#btnSubmitEmployees',function () {
+    $(document).on('click','#btnSubmitEmployees1',function () {
         saveEmployees();
     });
 

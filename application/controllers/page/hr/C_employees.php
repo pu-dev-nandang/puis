@@ -196,7 +196,7 @@ class C_employees extends HR_Controler {
 
         if ($Colom == 'IjazahS1') {
                 $fileName = $this->input->get('fileName');
-                $Colom = $this->input->get('c');
+                //$Colom = $this->input->get('c');
                 $NIP = $this->input->get('u');
 
                 $config['upload_path']          = './uploads/files/';
@@ -217,18 +217,15 @@ class C_employees extends HR_Controler {
                     
                     $success = array('success' => $this->upload->data());
                     $success['success']['formGrade'] = 0;
-                    //print_r($Colom);die();
                     
-                    $Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
-                    
-                    $dataSave = array(
-                            'NIP' => $NIP,
-                            'TypeFiles' => $Get_MasterFiles[0]['ID'],
-                            'LinkFiles' => $fileName,
-                            'UserCreate' => $IDuser
-                    );
-
-                    $this->db->insert('db_employees.files',$dataSave);
+                    //$Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
+                    //$dataSave = array(
+                    //        'NIP' => $NIP,
+                    //        'TypeFiles' => $Get_MasterFiles[0]['ID'],
+                    //        'LinkFiles' => $fileName,
+                    //        'UserCreate' => $IDuser
+                    //);
+                    //$this->db->insert('db_employees.files',$dataSave);
                     return print_r(json_encode($success));
 
                 }
@@ -237,7 +234,7 @@ class C_employees extends HR_Controler {
         elseif ($Colom == 'TranscriptS1') {
 
                 $fileName = $this->input->get('fileName');
-                $Colom = $this->input->get('c');
+                //$Colom = $this->input->get('c');
                 $NIP = $this->input->get('u');
                 
                 $config['upload_path']          = './uploads/files/';
@@ -257,18 +254,15 @@ class C_employees extends HR_Controler {
                     
                     $success = array('success' => $this->upload->data());
                     $success['success']['formGrade'] = 0;
-                    //print_r($Colom);die();
+                    //$Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
+                    //$dataSave = array(
+                    ///        'NIP' => $NIP,
+                    //        'TypeFiles' => $Get_MasterFiles[0]['ID'],
+                    //        'LinkFiles' => $fileName,
+                    //        'UserCreate' => $IDuser
+                    //);
 
-                    $Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
-                    
-                    $dataSave = array(
-                            'NIP' => $NIP,
-                            'TypeFiles' => $Get_MasterFiles[0]['ID'],
-                            'LinkFiles' => $fileName,
-                            'UserCreate' => $IDuser
-                    );
-
-                    $this->db->insert('db_employees.files',$dataSave);
+                    //$this->db->insert('db_employees.files',$dataSave);
                     return print_r(json_encode($success));
                 }
 
@@ -297,16 +291,15 @@ class C_employees extends HR_Controler {
                     
                     $success = array('success' => $this->upload->data());
                     $success['success']['formGrade'] = 0;
-                    $Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
-                    
-                    $dataSave = array(
-                            'NIP' => $NIP,
-                            'TypeFiles' => $Get_MasterFiles[0]['ID'],
-                            'LinkFiles' => $fileName,
-                            'UserCreate' => $IDuser
-                    );
+                    //$Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
+                    //$dataSave = array(
+                    //        'NIP' => $NIP,
+                    //        'TypeFiles' => $Get_MasterFiles[0]['ID'],
+                    //        'LinkFiles' => $fileName,
+                    //        'UserCreate' => $IDuser
+                    //);
 
-                    $this->db->insert('db_employees.files',$dataSave);
+                    //$this->db->insert('db_employees.files',$dataSave);
                     return print_r(json_encode($success));
                 }
 
@@ -335,16 +328,15 @@ class C_employees extends HR_Controler {
                     
                     $success = array('success' => $this->upload->data());
                     $success['success']['formGrade'] = 0;
-                    $Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
-                    
-                    $dataSave = array(
-                            'NIP' => $NIP,
-                            'TypeFiles' => $Get_MasterFiles[0]['ID'],
-                            'LinkFiles' => $fileName,
-                            'UserCreate' => $IDuser
-                    );
-
-                    $this->db->insert('db_employees.files',$dataSave);
+                    //$Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
+                    //
+                    //$dataSave = array(
+                    //        'NIP' => $NIP,
+                    //        'TypeFiles' => $Get_MasterFiles[0]['ID'],
+                    //        'LinkFiles' => $fileName,
+                    //        'UserCreate' => $IDuser
+                    //);
+                    //$this->db->insert('db_employees.files',$dataSave);
                     return print_r(json_encode($success));
                 }
             }
@@ -371,16 +363,15 @@ class C_employees extends HR_Controler {
                     
                     $success = array('success' => $this->upload->data());
                     $success['success']['formGrade'] = 0;
-                    $Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
-                    
-                    $dataSave = array(
-                            'NIP' => $NIP,
-                            'TypeFiles' => $Get_MasterFiles[0]['ID'],
-                            'LinkFiles' => $fileName,
-                            'UserCreate' => $IDuser
-                    );
+                    //$Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
+                    //$dataSave = array(
+                    //        'NIP' => $NIP,
+                    //        'TypeFiles' => $Get_MasterFiles[0]['ID'],
+                     //       'LinkFiles' => $fileName,
+                     //       'UserCreate' => $IDuser
+                    //);
 
-                    $this->db->insert('db_employees.files',$dataSave);
+                    //$this->db->insert('db_employees.files',$dataSave);
                     return print_r(json_encode($success));
                 }
             }
@@ -407,16 +398,15 @@ class C_employees extends HR_Controler {
                     
                     $success = array('success' => $this->upload->data());
                     $success['success']['formGrade'] = 0;
-                    $Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
-                    
-                    $dataSave = array(
-                            'NIP' => $NIP,
-                            'TypeFiles' => $Get_MasterFiles[0]['ID'],
-                            'LinkFiles' => $fileName,
-                            'UserCreate' => $IDuser
-                    );
+                    //$Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
+                    //$dataSave = array(
+                    //        'NIP' => $NIP,
+                    //        'TypeFiles' => $Get_MasterFiles[0]['ID'],
+                    //        'LinkFiles' => $fileName,
+                    //        'UserCreate' => $IDuser
+                    //);
 
-                    $this->db->insert('db_employees.files',$dataSave);
+                    //$this->db->insert('db_employees.files',$dataSave);
                     return print_r(json_encode($success));
                 }
             }
