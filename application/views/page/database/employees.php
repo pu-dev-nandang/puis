@@ -410,6 +410,11 @@
 
     });
 
+    // Handle click on "Select all" control
+    $(document).on('click','#example-select-all2',function () {    
+      $('input.uniform2').not(this).prop('checked', this.checked);
+    });
+
     $(document).on('click','.pagination',function () {
         if ($('#example-select-all').length) {
             $('#example-select-all').remove();
