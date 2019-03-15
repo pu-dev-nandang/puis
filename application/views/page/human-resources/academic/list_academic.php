@@ -79,19 +79,28 @@
             });
             if (response.length > 0) {
                 for (var i = 0; i < response.length; i++) {
-                        var strdate = response[i]['DateIjazah'];
-                        var dates = moment(strdate).format('DD-MM-YYYY');
+                       
                     if (response[i]['TypeAcademic'] == 'S1' ) {
-                        var NameUniversity1 = response[i]['NameUniversity'].toLowerCase();
-                        //var Ijazah = response[i]['LinkFiles'];
+                        //var NameUniversity1 = response[i]['NameUniversity'].toLowerCase();
+                        var NameUniversity1 = response[i]['NameUniversity'];
+
                             if (response[i]['LinkFiles'] != null) {
                                 var Ijazah = '<iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button id="btnviewIjazahS1" class="btn btn-sm btn-primary" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
                             } else {
                                 var Ijazah = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px;">';
                             }
 
+                            if (response[i]['DateIjazah'] != null) {
+                                var strdate = response[i]['DateIjazah'];
+                                var dates = moment(strdate).format('DD-MM-YYYY');
+                            } else {
+                                var dates = '00-00-0000';
+
+                            }
+
                         for (var j = i+1; j < response.length; j++) {
-                            var NameUniversity2 = response[j]['NameUniversity'].toLowerCase();
+                            //var NameUniversity2 = response[j]['NameUniversity'].toLowerCase();
+                            var NameUniversity2 = response[i]['NameUniversity'];
                             if (NameUniversity1 == NameUniversity2) {
                                 //var Transcript = response[j]['LinkFiles'];
                                 if (response[j]['LinkFiles'] != null) {
@@ -145,16 +154,25 @@
                     }
                     else
                     {
-                        var NameUniversity1 = response[i]['NameUniversity'].toLowerCase();
-                        var strdate = response[i]['DateIjazah'];
-                        var dates = moment(strdate).format('DD-MM-YYYY');
+                        //var NameUniversity1 = response[i]['NameUniversity'].toLowerCase();
+                        var NameUniversity1 = response[i]['NameUniversity'];
+                        if (response[i]['DateIjazah'] != null) {
+                                var strdate = response[i]['DateIjazah'];
+                                var dates = moment(strdate).format('DD-MM-YYYY');
+                            } else {
+                                var dates = '00-00-0000';
+
+                        }
+                        //var strdate = response[i]['DateIjazah'];
+                        //var dates = moment(strdate).format('DD-MM-YYYY');
                         if (response[i]['LinkFiles'] != null) {
                             var Ijazah = '<iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button id="btnviewIjazahS1" class="btn btn-sm btn-primary" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
                         } else {
                             var Ijazah = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px;">';
                         }
                         for (var j = i+1; j < response.length; j++) {
-                            var NameUniversity2 = response[j]['NameUniversity'].toLowerCase();
+                            //var NameUniversity2 = response[j]['NameUniversity'].toLowerCase();
+                            var NameUniversity2 = response[j]['NameUniversity'];
                             if (NameUniversity1 == NameUniversity2) {
                                 //var Transcript = response[j]['LinkFiles'];
                                     if (response[j]['LinkFiles'] != null) {
