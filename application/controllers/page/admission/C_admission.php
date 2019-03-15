@@ -1377,6 +1377,66 @@ class C_admission extends Admission_Controler {
             $EmailMother = '';
             $StatusStudentID = 3;
 
+            // copy document
+            $Photo = ''; // id foto 5
+            if (!file_exists('./uploads/document/'.$NPM)) {
+                mkdir('./uploads/document/'.$NPM, 0777, true);
+                // copy("./document/index.html",'./document/'.$namaFolder.'/index.html');
+                // copy("./document/index.php",'./document/'.$namaFolder.'/index.php');
+            }
+
+            if (!file_exists('./uploads/students/'.$ta)) {
+                mkdir('./uploads/students/'.$ta, 0777, true);
+                // copy("./document/index.html",'./document/'.$namaFolder.'/index.html');
+                // copy("./document/index.php",'./document/'.$namaFolder.'/index.php');
+            }
+
+            $getDoc = $this->m_master->caribasedprimary('db_admission.register_document','ID_register_formulir',$arrInputID[$i]);
+            for ($z=0; $z < count($getDoc); $z++) {
+              if ($getDoc[$z]['Attachment'] != '' || !empty($getDoc[$z]['Attachment'])) {
+                $explode = explode(',', $getDoc[$z]['Attachment']);
+                // asign variable foto
+                  if ($getDoc[$z]['ID_reg_doc_checklist'] == 5 && $getDoc[$z]['Status']== 'Done') {
+                    if (count($explode) > 0) {
+                      $G_FileName = $explode[0];
+                      $ff = explode('.', $G_FileName);
+                      $Photo = $NPM.'.'.$ff[1];
+                      copy($this->path_upload_regOnline.$Email.'/'.$explode[0], './uploads/students/'.$ta.'/'.$Photo);
+                    }
+                  }
+
+                // if ($getDoc[$z]['Status'] == 'Done') {
+                  if (count($explode) > 0) {
+                    for ($ee=0; $ee < count($explode); $ee++) { 
+                      copy($this->path_upload_regOnline.$Email.'/'.$explode[$ee], './uploads/document/'.$NPM.'/'.$explode[$ee]);
+                      unlink($this->path_upload_regOnline.$Email.'/'.$explode[$ee]);
+                    }
+                  }
+                  else
+                  {
+                    copy($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'], './uploads/document/'.$NPM.'/'.$getDoc[$z]['Attachment']);
+                    unlink($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment']);
+                  }
+                  
+                  // if (file_exists($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'])) {
+                  //     unlink($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment']);
+                  // }
+                // }
+              } 
+
+              $dataSave = array(  
+                  'NPM' => $NPM,
+                  'ID_reg_doc_checklist' => $getDoc[$z]['ID_reg_doc_checklist'],
+                  'Status' => $getDoc[$z]['Status'],
+                  'Attachment' => $getDoc[$z]['Attachment'],
+                  'Description' => $getDoc[$z]['Description'],
+                  'VerificationBY' => $getDoc[$z]['VerificationBY'],
+                  'VerificationAT' => $getDoc[$z]['VerificationAT'],
+              );
+              $this->db->insert('db_admission.doc_mhs', $dataSave);
+            }
+
+
             $temp = array(
                         'ProdiID' => $ProdiID,
                         'ProgramID' => $ProgramID,
@@ -1419,6 +1479,7 @@ class C_admission extends Admission_Controler {
                         'EmailFather' => $EmailFather,
                         'EmailMother' => $EmailMother,
                         'StatusStudentID' => $StatusStudentID,
+                        'Photo' => $Photo
                       );
 
             $this->db->insert($ta.'.students', $temp);
@@ -1469,50 +1530,6 @@ class C_admission extends Admission_Controler {
                 'DateTime' => date('Y-m-d H:i:s'),
             );
             $this->db->insert('db_admission.to_be_mhs', $dataSave);
-
-
-            // copy document
-            if (!file_exists('./uploads/document/'.$NPM)) {
-                mkdir('./uploads/document/'.$NPM, 0777, true);
-                // copy("./document/index.html",'./document/'.$namaFolder.'/index.html');
-                // copy("./document/index.php",'./document/'.$namaFolder.'/index.php');
-            }
-
-            $getDoc = $this->m_master->caribasedprimary('db_admission.register_document','ID_register_formulir',$arrInputID[$i]);
-            for ($z=0; $z < count($getDoc); $z++) {
-              if ($getDoc[$z]['Attachment'] != '' || !empty($getDoc[$z]['Attachment'])) {
-                $explode = explode(',', $getDoc[$z]['Attachment']);
-                // if ($getDoc[$z]['Status'] == 'Done') {
-                  if (count($explode) > 0) {
-                    for ($ee=0; $ee < count($explode); $ee++) { 
-                      copy($this->path_upload_regOnline.$Email.'/'.$explode[$ee], './uploads/document/'.$NPM.'/'.$explode[$ee]);
-                      unlink($this->path_upload_regOnline.$Email.'/'.$explode[$ee]);
-                    }
-                  }
-                  else
-                  {
-                    copy($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'], './uploads/document/'.$NPM.'/'.$getDoc[$z]['Attachment']);
-                    unlink($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment']);
-                  }
-                  
-                  // if (file_exists($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'])) {
-                  //     unlink($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment']);
-                  // }
-                // }
-                
-              } 
-
-              $dataSave = array(  
-                  'NPM' => $NPM,
-                  'ID_reg_doc_checklist' => $getDoc[$z]['ID_reg_doc_checklist'],
-                  'Status' => $getDoc[$z]['Status'],
-                  'Attachment' => $getDoc[$z]['Attachment'],
-                  'Description' => $getDoc[$z]['Description'],
-                  'VerificationBY' => $getDoc[$z]['VerificationBY'],
-                  'VerificationAT' => $getDoc[$z]['VerificationAT'],
-              );
-              $this->db->insert('db_admission.doc_mhs', $dataSave);
-            }
 
             //move payment
               $Semester = $input['Semester'];

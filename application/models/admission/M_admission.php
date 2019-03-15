@@ -1426,7 +1426,14 @@ class M_admission extends CI_Model {
               LIMIT '.$start. ', '.$limit;
       // print_r($sql);die();        
       $query=$this->db->query($sql, array())->result_array();
-      $arr_temp = array('query' => $query,'Prodi' => ($FormulirCode == "") ? $ID_ProgramStudy : $query[0]['ID_program_study']  );
+      if (count($query) > 0) {
+        $arr_temp = array('query' => $query,'Prodi' => ($FormulirCode == "") ? $ID_ProgramStudy : $query[0]['ID_program_study']  );
+      }
+      else
+      {
+        $arr_temp = array('query' => $query,'Prodi' => ($FormulirCode == "") ? $ID_ProgramStudy : ''  );
+      }
+     
       return $arr_temp;
     }
 
