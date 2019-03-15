@@ -138,7 +138,7 @@ $('#fileOther').change(function (event) {
 
                 $('#NotificationModal .modal-header').addClass('hide');
                 $('#NotificationModal .modal-body').html('<center> '+
-                '<iframe src="'+base_url_js+'uploads/files/'+filesub+'" frameborder="0" style="width:745px; height:550px;"></iframe> '+
+                '<iframe src="'+base_url_js+'fileGetAny/files-'+filesub+'" frameborder="0" style="width:745px; height:550px;"></iframe> '+
                 '<br/><br/><button type="button" id="btnRemoveNoEditSc" class="btn btn-primary" data-dismiss="modal">Close</button><button type="button" id="btnRemoveNoEditSc" filesublix ="'+filesub+'" class="btn btn-primary pull-right filesublink" data-toggle="tooltip" data-placement="top" title="Full Review" data-dismiss="modal"><span class="fa fa-external-link"></span></button>' +
                 '</center>');
                 $('#NotificationModal .modal-footer').addClass('hide');
@@ -217,7 +217,7 @@ $('#fileOther').change(function (event) {
                     '            <td>'+datadoc+'</td>                                               '+    
                     '            <td><center>'+datadate+'</center></td>                                              '+                                                       
                     '             <td>'+datadesc+'</td>                                              '+    
-                    '            <td style="text-align: center;"><button id="btnreviewfiles" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="top" title="Review Files" filesub="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i></button> | <button class="btn btn-sm btn-primary testEdit3" data-toggle="tooltip" data-placement="top" title="Edit File" filesnametype="'+response[i]['NameFiles']+'" idtypex="'+response[i]['TypeFiles']+'" idfiles="'+response[i]['ID']+'" linkfileother="'+response[i]['LinkFiles']+'" namedoc ="'+response[i]['No_Document']+'"><i class="fa fa-edit"></i></button> </td>      '+     
+                    '            <td style="text-align: center;"><button id="btnreviewfiles" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="top" title="Review Files" filesub="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i></button> | <button class="btn btn-sm btn-primary testEditdocument" data-toggle="tooltip" data-placement="top" title="Edit File" filesnametype="'+response[i]['NameFiles']+'" idtypex="'+response[i]['TypeFiles']+'" idfiles="'+response[i]['ID']+'" linkfileother="'+response[i]['LinkFiles']+'" namedoc ="'+response[i]['No_Document']+'"><i class="fa fa-edit"></i></button> </td>      '+     
                     '         </tr>');
 
                 }
@@ -229,7 +229,7 @@ $('#fileOther').change(function (event) {
     };
 
 
-$(document).on('click','.testEdit3', function () {
+$(document).on('click','.testEditdocument', function () {
 
         var NIP = '<?php echo $NIP; ?>';
         var filesnametype = $(this).attr('filesnametype');
@@ -237,7 +237,6 @@ $(document).on('click','.testEdit3', function () {
         var namedoc = $(this).attr('namedoc');
         var linkfileother = $(this).attr('linkfileother');
         var idtypex = $(this).attr('idtypex');
-
 
         if (linkfileother != null) {
             var filesxx = '<iframe src="'+base_url_js+'uploads/files/'+linkfileother+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button id="btnreviewfiles" class="btn btn-sm btn-primary" filesub ="'+linkfileother+'"><i class="fa fa-eye"></i> Preview </button></center>';
@@ -367,21 +366,11 @@ $(document).on('click','.testEdit3', function () {
                         '                <textarea rows="3" cols="5" name="DescriptionFile" id="DescriptionFile" class="form-control" >'+response[i]['Description_Files']+' </textarea>'+
                         '            </div> '+
                         '        </div> '+
-                        '        <div class="col-xs-6"> '+
-                        '            <div class="form-group"> '+
-                        '                <label>Upload Document</label> '+
-                        '                    <form id="tagFM_OtherFile" enctype="multipart/form-data" accept-charset="utf-8" method="post" action=""> '+
-                        '                        <label class="btn btn-sm btn-default btn-default-warning btn-upload"> '+
-                        '                            <i class="fa fa-upload margin-right"></i> Upload File '+
-                        '                                <input type="file" id="fileOther" name="userfile" class="upload_files" style="display: none;" accept="application/pdf"> '+
-                        '                        </label> '+
-                        '                        <p style="font-size: 12px;color: #FF0000;">*) Only PDF Files Max Size 5 MB</p> '+
-                        '                    </form>  '+
-                        '            </div> '+
-                        '        </div> '+
+                     
                         '        <div class="col-xs-6"> '+
                         '            <div class="form-group"> '+
                         '                <div id="element1">Review File : </div> '+
+                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button id="btnreviewfiles" class="btn btn-sm btn-primary" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> Preview </button></center></div>                     '+
                         '            </div> '+
                         '       </div> '+
                         '        </div>'+ //
@@ -461,15 +450,12 @@ $('#btnSaveEditFiles').click(function () {
         var linkotherfile = $('#linkotherfile').val();
         var typeotherfiles = $('#typeotherfiles').val();
         var idlinkfiles = $('#idlinkfiles').val();
-
         var newdate = DateDocument.split("/").reverse().join("-");
-        alert(DateDocument);
-        alert(newdate);
 
         if(formNIP!=null && formNIP!=''
                     && NoDocument!='' && NoDocument!=null
                     && DescriptionFile!='' && DescriptionFile!=null
-                    && DateDocument!='' && DateDocument!=null
+                    //&& DateDocument!='' && DateDocument!=null
                     ){ 
                     loading_button('#btnSubmitEditFiles');
                     $('#btnCloseEmployees').prop('disabled',true);
@@ -495,23 +481,23 @@ $('#btnSaveEditFiles').click(function () {
                         } else {  //if success save data
                 
                             //var formData = new FormData( $("#tagFM_OtherFile")[0]);
-                            var action = 'OtherFiles';
-                            var url = base_url_js+'human-resources/upload_academic?c='+type+'&action='+action+'&u='+NIP;
+                            //var action = 'OtherFiles';
+                            //var url = base_url_js+'human-resources/upload_academic?c='+type+'&action='+action+'&u='+NIP;
                                  
-                                $.ajax({
-                                        url : url,  // Controller URL
-                                        type : 'POST',
-                                        data : formData,
-                                        async : false,
-                                        cache : false,
-                                        contentType : false,
-                                        processData : false,
-                                        success : function(data) {
-                                    }
-                                });   
+                            //    $.ajax({
+                            //            url : url,  // Controller URL
+                            //            type : 'POST',
+                            //            data : formData,
+                             //           async : false,
+                            //            cache : false,
+                             //           contentType : false,
+                            //            processData : false,
+                             //           success : function(data) {
+                            //        }
+                            //    });   
 
                                 //uploadfile_transcripts(fileName_Transcript);
-                                toastr.success('Academic Data Saved','Success');
+                                toastr.success('Document Data Saved','Success');
 
                         }
                             setTimeout(function () {
@@ -603,7 +589,7 @@ $('#btnSaveEditFiles').click(function () {
                         });
                 }
             else {
-                toastr.error('Form Masih ada yang kosong','Error');
+                toastr.error('form or file are still empty!','Error');
                 $('#NotificationModal').modal('hide');
                 return;
             }
