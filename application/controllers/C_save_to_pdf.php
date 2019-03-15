@@ -5711,6 +5711,44 @@ Phone: (021) 29200456';
 
     /* End PR Budgeting */
 
+    public function PrintIDCard()
+    {
+        try {
+          $token = $this->input->post('token');
+          $input = $this->getInputToken($token);
+          $input = (array) json_decode(json_encode($input),true);
+          $customlayout=array('53.98','85.60');
+          $pdf = new FPDF('P','mm',$customlayout);
+          for ($i=0; $i < count($input); $i++) { 
+             $pdf->AddFont('dinproExpBold','','dinproExpBold.php');
+             $pdf->AddPage();
+             $pdf->SetAutoPageBreak(true, 0);
+             $pdf->Image($input[$i]['PathFoto'],10,26,34);
+             $template_format = ($input[$i]['type'] == 'student') ? base_url('images/id_mhs.png') : base_url('images/id_emp.png');
+             $pdf->Image($template_format,0,0,54);
+             $pdf->SetXY(10,63);
+             $pdf->SetFont('dinproExpBold','',12);
+             $pdf->SetTextColor(247, 194, 74);
+             $pdf->Cell(0,5,$input[$i]['Name'],0,0,'C');
+             $pdf->SetXY(10,68.5);
+             $pdf->SetFont('dinpromedium','',10);
+             $pdf->SetTextColor(255,255,255);
+             $pdf->Cell(0,5,$input[$i]['NPM'],0,0,'C');
+             $pdf->SetXY(10,73);
+             $pdf->SetFont('dinpromedium','',5);
+             $pdf->SetTextColor(255,255,255);
+             $pdf->Cell(0,5,$input[$i]['email'],0,0,'C');
+          }
+         
+         $pdf->Output('I','ID_Card.pdf');
+
+            
+        } catch (Exception $e) {
+            // handling orang iseng
+            echo $e;
+            // echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
 
 
 }
