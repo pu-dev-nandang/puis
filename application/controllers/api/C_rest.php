@@ -2498,7 +2498,7 @@ class C_rest extends CI_Controller {
 
     public function TestpostdataFrom_PowerApps()
     {
-      
+
         $data = file_get_contents('php://input');
         $data_json = (array) json_decode($data,true);
         if ($data_json) {
