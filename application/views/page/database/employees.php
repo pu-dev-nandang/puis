@@ -235,7 +235,7 @@
                 var Name = G_attr.attr('data-name');
                 var PathFoto = G_attr.attr('path');
                 var email = G_attr.attr('email');
-                var checkbox = '<input type="checkbox" class="uniform" type2 = "student" data-npm="'+NPM+'" data-name="'+Name+'" path = "'+PathFoto+'" email = "'+email+'">';
+                var checkbox = '<input type="checkbox" class="uniform" type2 = "employees" data-npm="'+NPM+'" data-name="'+Name+'" path = "'+PathFoto+'" email = "'+email+'">';
                 a.find('td:eq(0)').html(No+'&nbsp'+checkbox);
 
             })
@@ -258,7 +258,7 @@
 
             html += '<tbody>';
             for (var i = 0; i < TempCheckBoxIDCard.length; i++) {
-                var checkbox = '<input type="checkbox" class="uniform2" type2 = "student" data-npm="'+TempCheckBoxIDCard[i]['NPM']+'" data-name="'+TempCheckBoxIDCard[i]['Name']+'" path = "'+TempCheckBoxIDCard[i]['PathFoto']+'" email = "'+TempCheckBoxIDCard[i]['email']+'" checked>';
+                var checkbox = '<input type="checkbox" class="uniform2" type2 = "employees" data-npm="'+TempCheckBoxIDCard[i]['NPM']+'" data-name="'+TempCheckBoxIDCard[i]['Name']+'" path = "'+TempCheckBoxIDCard[i]['PathFoto']+'" email = "'+TempCheckBoxIDCard[i]['email']+'" checked>';
                 html += '<tr>'+
                             '<td>'+(parseInt(i)+1)+'&nbsp'+checkbox+'</td>'+
                             '<td>'+TempCheckBoxIDCard[i]['NPM']+'</td>'+
