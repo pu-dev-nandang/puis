@@ -30,6 +30,11 @@ class C_api2 extends CI_Controller {
         return $dataTime;
     }
 
+    private function getDateNow(){
+        $dataTime = date('Y-m-d');
+        return $dataTime;
+    }
+
     private function getInputToken()
     {
         $token = $this->input->post('token');
@@ -1711,8 +1716,168 @@ class C_api2 extends CI_Controller {
 
 
             }
+            else if($data_arr['action']=='showAnnc_UnreadOnly'){
+                $User = $data_arr['User'];
+                $UserID = $data_arr['UserID'];
+
+                $db = ($User=='Std') ? 'announcement_student' : 'announcement_employees';
+                $w = ($User=='Std') ? 'NPM' : 'NIP';
+
+                $data = $this->db->query('SELECT * FROM db_notifikasi.'.$db.' u 
+                                                   LEFT JOIN db_notifikasi.announcement anc ON (anc.ID = u.IDAnnc) 
+                                                   WHERE u.Read = "0" AND u.'.$w.' = "'.$UserID.'" ')->result_array();
+
+                return print_r(json_encode($data));
+
+            }
+            else if($data_arr['action']=='showAnnouncementActive'){
+                $dateNow = $this->getDateNow();
+
+                $User = $data_arr['User'];
+                $UserID = $data_arr['UserID'];
+
+                $db = ($User=='Std') ? 'announcement_student' : 'announcement_employees';
+                $w = ($User=='Std') ? 'NPM' : 'NIP';
+
+                $data = $this->db->query('SELECT * FROM db_notifikasi.'.$db.' annu 
+                                                  LEFT JOIN db_notifikasi.announcement ann 
+                                                  ON (annu.IDAnnc = ann.ID)
+                                                  WHERE annu.'.$w.' = "'.$UserID.'" AND 
+                                                  ann.Start <= "'.$dateNow.'" AND 
+                                                  ann.End >= "'.$dateNow.'" ')->result_array();
+
+                return print_r(json_encode($data));
+
+            }
+            else if($data_arr['action']=='readDetailAnnc'){
+
+                $IDAnnc = $data_arr['IDAnnc'];
+                $User = $data_arr['User'];
+                $UserID = $data_arr['UserID'];
+
+                $db = ($User=='Std') ? 'db_notifikasi.announcement_student' : 'db_notifikasi.announcement_employees';
+                $w = ($User=='Std') ? 'NPM' : 'NIP';
+
+                $dataUsr = $this->db->get_where($db,array('IDAnnc' => $IDAnnc, $w => $UserID))->result_array();
+
+                if($dataUsr[0]['Read']==0 || $dataUsr[0]['Read']=='0'){
+                    // Update jadi read
+                    $this->db->set('Read', '1');
+                    $this->db->where(array('IDAnnc' => $IDAnnc, $w => $UserID));
+                    $this->db->update($db);
+                }
+
+
+
+                $data = $this->db->get_where('db_notifikasi.announcement',array(
+                    'ID' => $IDAnnc
+                ))->result_array();
+
+
+
+                $result = array(
+                    'Annc' => $data,
+                    'Status' =>$dataUsr
+                );
+
+                return print_r(json_encode($result));
+
+            }
+            else if($data_arr['action']=='saveDetailAnnc'){
+                $IDAnnc = $data_arr['IDAnnc'];
+                $User = $data_arr['User'];
+                $UserID = $data_arr['UserID'];
+
+                $db = ($User=='Std') ? 'db_notifikasi.announcement_student' : 'db_notifikasi.announcement_employees';
+                $w = ($User=='Std') ? 'NPM' : 'NIP';
+
+                // Update jadi read
+                $this->db->set('Read', '2');
+                $this->db->where(array('IDAnnc' => $IDAnnc, $w => $UserID));
+                $this->db->update($db);
+
+                return print_r(1);
+
+            }
 
         }
+    }
+
+    public function getAnnouncement(){
+        $requestData= $_REQUEST;
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+
+            $search = $requestData['search']['value'];
+            $dataSearch = ' AND
+                                 (d.NameEng LIKE "%'.$search.'%" OR cl.Room LIKE "%'.$search.'%" 
+                                 OR p1.Name LIKE "%'.$search.'%" OR p2.Name LIKE "%'.$search.'%"
+                                 OR p1.NIP LIKE "%'.$search.'%" OR p2.NIP LIKE "%'.$search.'%" 
+                                 ) ';
+        }
+
+        $queryDefault = 'SELECT annc.*, em.Name FROM db_notifikasi.announcement annc
+                                        LEFT JOIN db_employees.employees em ON (em.NIP = annc.CreatedBy)
+                                        ORDER BY annc.ID DESC ';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $file = ($row['File']!=null && $row['File']!='')
+                ? '<a class="btn btn-sm btn-default" target="_blank" href="'.base_url('uploads/announcement/'.$row['File']).'"><i class="fa fa-download"></i></a>' : '';
+
+            $dataStd = $this->db->query('SELECT ann.*, auts.Name FROM db_notifikasi.announcement_student ann 
+                                                  LEFT JOIN db_academic.auth_students auts ON (auts.NPM = ann.NPM)
+                                                  WHERE IDAnnc = "'.$row['ID'].'" ')->result_array();
+
+            $tkn_std = $this->jwt->encode($dataStd,'UAP)(*');
+            $swStd = (count($dataStd)>0)
+                ? '<a href="javascript:void(0);" class="showUser" data-token="'.$tkn_std.'" data-user="std">'.count($dataStd).' Students</a><br/>' : '';
+
+            $dataEmp = $this->db->query('SELECT ann.*, em.Name FROM db_notifikasi.announcement_employees ann 
+                                                  LEFT JOIN db_employees.employees em ON (em.NIP = ann.NIP)
+                                                  WHERE IDAnnc = "'.$row['ID'].'" ')->result_array();
+
+            $tkn_em = $this->jwt->encode($dataEmp,'UAP)(*');
+            $swEmp = (count($dataEmp)>0)
+                ? '<a href="javascript:void(0);" class="showUser" data-token="'.$tkn_em.'" data-user="emp">'.count($dataEmp).' Employees</a>' : '';
+
+
+            $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div style="font-weight: bold;">'.$row['Title'].'</div>';
+            $nestedData[] = '<div>'.$row['Message'].'</div>';
+            $nestedData[] = '<div style="text-align:right;">'.$swStd.''.$swEmp.'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$file.'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.date('d M Y',strtotime($row['Start'])).' - '.date('d M Y',strtotime($row['End'])).'</div>';
+            $nestedData[] = '<div style="text-align:center;"><button class="btn btn-sm btn-primary"><i class="fa fa-pencil"></i></button></div>';
+            $nestedData[] = '<div style="text-align:right;"><b>'.$row['Name'].'</b><br/>'.
+                date('d M Y H:i',strtotime($row['CreatedAt'])).'</div>';
+
+            $no++;
+            $data[] = $nestedData;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+
+
     }
 
 }

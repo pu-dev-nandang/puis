@@ -801,6 +801,7 @@ $route['api/__crudEmployees'] = 'api/c_api/crudEmployees';
 $route['api/__crudScore'] = 'api/c_api/crudScore';
 $route['api/__crudAttendance'] = 'api/c_api/crudAttendance';
 $route['api2/__crudAttendance2'] = 'api/c_api2/crudAttendance2';
+$route['api2/__getAnnouncement'] = 'api/c_api2/getAnnouncement';
 
 $route['api/__crudScheduleExchange'] = 'api/c_api/crudScheduleExchange';
 $route['api/__crudLimitCredit'] = 'api/c_api/crudLimitCredit';

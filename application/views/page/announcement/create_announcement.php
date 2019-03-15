@@ -3,7 +3,7 @@
     <div class="col-md-6">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h4 class="panel-title">Student</h4>
+                <h4 class="panel-title">Students</h4>
             </div>
             <div class="panel-body" style="min-height: 100px;">
 
@@ -36,17 +36,17 @@
     <div class="col-md-6">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h4 class="panel-title">Lecturer</h4>
+                <h4 class="panel-title">Employees</h4>
             </div>
             <div class="panel-body" style="min-height: 100px;">
                 <div class="row">
                     <div class="col-md-4 col-md-offset-4">
                         <div class="well">
                             <select class="form-control" id="fpLecturer">
-                                <option value="0">Not for lecturer</option>
+                                <option value="0">Not for Employees</option>
                                 <option disabled>---------</option>
-                                <option value="1">Status Lecturer</option>
-                                <option value="2">Any Lecturer</option>
+                                <option value="1">Status Employees</option>
+                                <option value="2">Any Employees</option>
                             </select>
                         </div>
                     </div>
@@ -71,7 +71,12 @@
 
             <div class="form-group">
                 <button class="btn btn-default btn-default-primary" id="btnViewToStd"><span id="viewToStd">0</span> Students</button>
-                <button class="btn btn-default btn-default-danger" id="btnViewToLec"><span id="viewToLec">0</span> Lecturers</button>
+                <button class="btn btn-default btn-default-danger" id="btnViewToLec"><span id="viewToLec">0</span> Employees</button>
+            </div>
+
+            <div class="form-group">
+                <label>Title</label>
+                <input class="form-control" id="formTitle" maxlength="200" placeholder="Maximum input is 200 characters">
             </div>
 
             <div class="form-group">
@@ -566,7 +571,7 @@
         var fpLecturer = $('#fpLecturer').val();
 
         var viewPanel = '<div class="row">' +
-            '                    <div class="col-md-12" style="background-color: #f5f5f5;text-align: center;padding: 15px;"><h3>--- Not For Lecturer ---</h3></div>' +
+            '                    <div class="col-md-12" style="background-color: #f5f5f5;text-align: center;padding: 15px;"><h3>--- Not For Employee ---</h3></div>' +
             '                </div>';
 
         $('#dataLecturer').val('');
@@ -576,7 +581,7 @@
             viewPanel = '<div class="row">' +
                 '                    <div class="col-md-6 col-md-offset-3">' +
                 '                        <div class="form-group">' +
-                '                            <label>Status Lecturer</label>' +
+                '                            <label>Status Employees</label>' +
                 '                            <select class="form-control"></select>' +
                 '                        </div>' +
                 '                    </div>' +
@@ -587,8 +592,8 @@
             viewPanel = '<div class="row">' +
                 '                    <div class="col-md-12">' +
                 '                        <div class="form-group">' +
-                '                            <label>Any Lecturer</label>' +
-                '                            <input id="getLecturer" placeholder="NIP, Lecturer Name" class="form-control">' +
+                '                            <label>Any Employees</label>' +
+                '                            <input id="getLecturer" placeholder="NIP, Employee Name" class="form-control">' +
                 '                        </div>' +
                 '                       <div id="viewListLecC"></div>' +
                 '                    </div>' +
@@ -728,13 +733,14 @@
         var dataLecturer = $('#dataLecturer').val();
         var dl = (dataLecturer!='' && dataLecturer!=null) ? JSON.parse(dataLecturer) : [];
 
+        var formTitle = $('#formTitle').val();
         var formMessage = $('#formMessage').val();
 
         var formStart = $('#formStart').datepicker("getDate");
         var formEnd = $('#formEnd').datepicker("getDate");
 
 
-        if(formMessage!=null && formMessage!='' && formStart!=null && formEnd!=null){
+        if(formTitle!=null && formTitle!='' && formMessage!=null && formMessage!='' && formStart!=null && formEnd!=null){
 
             if(ds.length>0 || dl.length>0){
 
@@ -749,6 +755,7 @@
                 var data = {
                     action : 'createAnnouncement',
                     dataAnnc : {
+                        Title : formTitle,
                         Message : formMessage,
                         Start : Start,
                         End : End,
