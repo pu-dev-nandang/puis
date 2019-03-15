@@ -50,7 +50,7 @@
         //     '<option disabled>------------------------------------------</option>');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
 
-        setTimeout(function () { loadPage(); },500);
+        setTimeout(function () { loadPage(); },1500);
 
         $('#filterStatus').append('<option value="">--- All Status ---</option>' +
             '<option disabled>------------------------------------------</option>');
