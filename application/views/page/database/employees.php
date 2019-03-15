@@ -203,6 +203,18 @@
         var type = $(this).attr('type');
         var NPM = $(this).attr('data-npm');
         var Name = $(this).attr('data-name');
+        var r = Name.split(" ");
+        var c = '';
+        for (var i = 0; i < r.length; i++) {
+            if (i <= 1) {
+              c+= r[i]+" ";
+            }
+            else
+            {
+              c+= r[i].substr(0,1)+" ";
+            }
+        }
+        Name = c;
         var PathFoto = $(this).attr('path');
         var email = $(this).attr('email');
         var url = base_url_js+'save2pdf/PrintIDCard';
