@@ -85,7 +85,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <form id="fileAnnouncement" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
                         <div class="form-group">
                             <label class="btn btn-sm btn-default btn-upload">
@@ -100,13 +100,13 @@
                     </form>
 
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 hide">
                     <div class="form-group">
                         <label>Start</label>
                         <input type="text" id="formStart" name="regular" class="form-control formcalendar">
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="form-group">
                         <label>End</label>
                         <input type="text" id="formEnd" name="regular" class="form-control formcalendar">
@@ -126,6 +126,9 @@
 <script>
 
     $(document).ready(function () {
+
+
+
         load2Student();
         load2Lecturer();
         $('#formMessage').summernote({
@@ -146,13 +149,15 @@
                 showOtherMonths:true,
                 autoSize: true,
                 dateFormat: 'dd MM yy',
-                // minDate: new Date(moment().year(),moment().month(),moment().date()),
+                minDate: new Date(moment().format('YYYY-MM-DD')),
                 onSelect : function () {
                     // var data_date = $(this).val().split(' ');
                     // var nextelement = $(this).attr('nextelement');
                     // nextDatePick(data_date,nextelement);
                 }
             });
+
+        $('#formStart').datepicker('setDate',new Date(moment().format('YYYY-MM-DD')));
     });
 
     // ===== STUDENT =====
@@ -778,7 +783,7 @@
                         });
                         socket.emit('mobile_notif', {
                             Title: formTitle,
-                            Message: formMessage,
+                            Message: $('#formMessage').val().replace(/<\/?[^>]+(>|$)/g, "").trim(),
                             dataUser : listNPM
                         });
                     }
