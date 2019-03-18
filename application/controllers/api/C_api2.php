@@ -1681,6 +1681,10 @@ class C_api2 extends CI_Controller {
             }
             else if($data_arr['action']=='createAnnouncement'){
 
+                $max_execution_time = 360*5;
+                ini_set('memory_limit', '-1');
+                ini_set('max_execution_time', $max_execution_time); //60 seconds = 1 minutes
+
                 $dataAnnc = (array) $data_arr['dataAnnc'];
 
                 $this->db->insert('db_notifikasi.announcement',$dataAnnc);
@@ -1823,12 +1827,13 @@ class C_api2 extends CI_Controller {
                 $IDAnnc = $data_arr['IDAnnc'];
                 $User = $data_arr['User'];
                 $UserID = $data_arr['UserID'];
+                $Status = $data_arr['Status'];
 
                 $db = ($User=='Std') ? 'db_notifikasi.announcement_student' : 'db_notifikasi.announcement_employees';
                 $w = ($User=='Std') ? 'NPM' : 'NIP';
 
                 // Update jadi read
-                $this->db->set('Read', '2');
+                $this->db->set('Read', $Status);
                 $this->db->where(array('IDAnnc' => $IDAnnc, $w => $UserID));
                 $this->db->update($db);
 

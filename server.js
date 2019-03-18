@@ -33,7 +33,7 @@ io.on('connection', function (socket) {
 
     socket.on( 'mobile_notif', function( data ) {
         io.sockets.emit( 'mobile_notif', {
-            mobile_notif: data.mobile_notif
+            dataNotification : data
         });
     });
 
