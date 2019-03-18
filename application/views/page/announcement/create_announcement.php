@@ -756,7 +756,7 @@
                     action : 'createAnnouncement',
                     dataAnnc : {
                         Title : formTitle,
-                        Message : formMessage,
+                        Message : formTitle,
                         Start : Start,
                         End : End,
                         CreatedBy : sessionNIP,
@@ -771,7 +771,20 @@
 
                 $.post(url,{token:token},function (result) {
 
+                    if(ds.length>0){
+                        var listNPM = [];
+                        $.each(ds,function (i,v) {
+                            listNPM.push(v.NPM);
+                        });
+                        socket.emit('mobile_notif', {
+                            Title: formTitle,
+                            Message: formTitle,
+                            dataUser : listNPM
+                        });
+                    }
+
                     // cek apakah file kosong atau tidak
+                    var IDAnnc = result;
 
                     var input = $('#formFileAnnc');
 
@@ -781,7 +794,7 @@
                         var fileNameOri = file.name;
                         var fileName = fileNameOri.split(' ').join('_');
 
-                        var IDAnnc = result;
+
                         var formData = new FormData( $("#fileAnnouncement")[0]);
 
                         var url = base_url_js+'announcement/upload_files?IDAnnc='+IDAnnc+'&f='+fileName;
@@ -801,12 +814,15 @@
                                 },500);
                             }
                         });
-                    } else {
+                    }
+                    else {
                         toastr.success('Announcement Created','Success');
                         setTimeout(function () {
                             window.location.href = '';
                         },500);
                     }
+
+
 
 
 

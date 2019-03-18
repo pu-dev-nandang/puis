@@ -629,7 +629,8 @@
 
     function testMobile() {
         socket.emit('mobile_notif', {
-            mobile_notif: '1'
+            mobile_notif: '1',
+            dataUser : [2019,2018,2019,21170001]
         });
     }
 
