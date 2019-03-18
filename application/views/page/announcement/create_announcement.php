@@ -756,7 +756,7 @@
                     action : 'createAnnouncement',
                     dataAnnc : {
                         Title : formTitle,
-                        Message : formTitle,
+                        Message : formMessage,
                         Start : Start,
                         End : End,
                         CreatedBy : sessionNIP,
@@ -778,7 +778,7 @@
                         });
                         socket.emit('mobile_notif', {
                             Title: formTitle,
-                            Message: formTitle,
+                            Message: formMessage,
                             dataUser : listNPM
                         });
                     }
