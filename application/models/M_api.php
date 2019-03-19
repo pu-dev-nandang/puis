@@ -803,7 +803,7 @@ class M_api extends CI_Model {
         $sql = "SELECT f.*, m.NameFiles
             FROM db_employees.files AS f
             LEFT JOIN db_employees.master_files AS m ON (f.TypeFiles = m.ID)
-            WHERE f.NIP = '".$NIP."' AND m.Type ='1' ";
+            WHERE f.NIP = '".$NIP."' AND m.Type ='1' AND LinkFiles IS NOT NULL";
 
         $query=$this->db->query($sql, array());
         return $query->result_array();
