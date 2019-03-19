@@ -9,10 +9,7 @@
             <div class="tabbable tabbable-custom tabbable-full-width btn-read setUserRoleDepartement">
                 <ul class="nav nav-tabs">
                     <li class="active">
-                        <a href="javascript:void(0)" class="pageAnchorUserRoleDepartement" page = "MasterUserRoleDepartement">Master</a>
-                    </li>
-                    <li class="">
-                        <a href="javascript:void(0)" class="pageAnchorUserRoleDepartement" page = "SetUserActionDepartement">Set User Action</a>
+                        <a href="javascript:void(0)" class="pageAnchorUserRoleDepartement" page = "SetUserActionDepartement">Set User Approval</a>
                     </li>
                 </ul>
                 <div style="padding-top: 30px;border-top: 1px solid #cccccc">
@@ -27,9 +24,7 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-    LoadMasterUserRoleDepartement();
-    // AddScriptJS("<?php echo base_url('assets/custom/xprototype.js');?>");
-    // replacejscssfile("newscript.js", "<?php echo base_url('assets/custom/xprototype.js');?>", "js");
+    LoadSetUserApprovalDepartement();
 
     $(".pageAnchorUserRoleDepartement").click(function(){
         var Page = $(this).attr('page');
@@ -37,11 +32,8 @@ $(document).ready(function() {
         $(this).parent().addClass('active');
         $("#pageSetPostMenu").empty();
         switch(Page) {
-            case "MasterUserRoleDepartement":
-                LoadMasterUserRoleDepartement();
-                break;
             case "SetUserActionDepartement":
-                LoadSetUserActionDepartement();
+                LoadSetUserApprovalDepartement();
                 break;
             default:
                 text = "I have never heard of that fruit...";
@@ -50,26 +42,10 @@ $(document).ready(function() {
 
 }); // exit document Function
 
-// $(document).on('click','.pageAnchorUserRoleDepartement', function () {
-    
-// });
-
-function LoadMasterUserRoleDepartement()
+function LoadSetUserApprovalDepartement()
 {
     loading_page("#pageUserRoleDepartement");
-    var url = base_url_js+'budgeting/page/LoadMasterUserRoleDepartement';
-    $.post(url,function (resultJson) {
-        var response = jQuery.parseJSON(resultJson);
-        var html = response.html;
-        var jsonPass = response.jsonPass;
-        $("#pageUserRoleDepartement").html(html);
-    }); // exit spost
-}
-
-function LoadSetUserActionDepartement()
-{
-    loading_page("#pageUserRoleDepartement");
-    var url = base_url_js+'budgeting/page/LoadSetUserActionDepartement';
+    var url = base_url_js+'budgeting/page/LoadSetUserApprovalDepartement';
     $.post(url,function (resultJson) {
         var response = jQuery.parseJSON(resultJson);
         var html = response.html;

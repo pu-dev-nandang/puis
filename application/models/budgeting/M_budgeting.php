@@ -61,9 +61,9 @@ class M_budgeting extends CI_Model {
 
     public function getData_cfg_postrealisasi($Active = null)
     {
-        $arr_result = array();
         $Active = ($Active == null) ? '' : ' where a.Active = "'.$Active.'"';
-        $sql = 'select a.CodePostRealisasi,a.CodePost,b.PostName,a.RealisasiPostName,a.Departement from db_budgeting.cfg_postrealisasi as a join db_budgeting.cfg_post as b on a.CodePost = b.CodePost
+        $sql = 'select a.CodePostRealisasi,a.CodeHeadAccount,b.Name as NameHeadAccount,a.RealisasiPostName,b.Departement,c.CodePost,c.PostName from db_budgeting.cfg_postrealisasi as a join db_budgeting.cfg_head_account as b on a.CodeHeadAccount = b.CodeHeadAccount
+            join db_budgeting.cfg_post as c on c.CodePost = b.CodePost
                 '.$Active.' order by a.CodePostRealisasi desc';
         $query=$this->db->query($sql, array())->result_array();
         for ($i=0; $i < count($query); $i++) { 
@@ -78,19 +78,33 @@ class M_budgeting extends CI_Model {
                 $Departement = $tget[0]['NameEng'];
             }
 
-            $temp = array(
-                        'CodePostRealisasi' => $query[$i]['CodePostRealisasi'],
-                        'CodePost' => $query[$i]['CodePost'],
-                        'PostName' => $query[$i]['PostName'],
-                        'RealisasiPostName' => $query[$i]['RealisasiPostName'],
-                        'Departement' => $Departement,
-                        'CodeDepartment' => $query[$i]['Departement'],
-                    );
-            $arr_result[] = $temp;
+            $query[$i]['DepartementName'] = $Departement;
         }
+        return $query;
+    }
 
-        return $arr_result;
-                
+    public function get_cfg_head_account($Active = null)
+    {
+        $Active = ($Active == null) ? '' : ' where a.Active = "'.$Active.'"';
+        $sql = 'select a.CodeHeadAccount,a.Name as NameHeadAccount,a.Departement,b.CodePost,b.PostName
+                from db_budgeting.cfg_head_account as a join db_budgeting.cfg_post as b on a.CodePost = b.CodePost
+                '.$Active.' order by a.CodeHeadAccount desc';
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) { 
+            $Departement = $query[$i]['Departement'];
+            $exp = explode('.', $Departement);
+            if ($exp[0] == 'NA') { // Non Academic
+                $tget = $this->m_master->caribasedprimary('db_employees.division','ID',$exp[1]);
+                $Departement = $tget[0]['Description'].' ('.$tget[0]['Division'].')';
+            }
+            elseif ($exp[0] == 'AC') {
+                $tget = $this->m_master->caribasedprimary('db_academic.program_study','ID',$exp[1]);
+                $Departement = $tget[0]['NameEng'];
+            }
+
+            $query[$i]['DepartementName'] = $Departement;
+        }
+        return $query;
     }
 
     public function getTheCode($tbl,$fieldCode,$PrefixCode,$length,$Year = null)
@@ -198,22 +212,22 @@ class M_budgeting extends CI_Model {
     public function getPostDepartementForDom($Year,$Departement)
     {
         $arr_result = array();
-        $get_Data = $this->m_master->caribasedprimary('db_budgeting.cfg_postrealisasi','Departement',$Departement);
-        $sql = 'select a.CodePostBudget,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
-                from db_budgeting.cfg_postrealisasi as b left join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
+        $get_Data = $this->m_master->caribasedprimary('db_budgeting.cfg_head_account','Departement',$Departement);
+        $sql = 'select a.CodePostBudget,b.CodeHeadAccount,b.Name as NameHeadAccount,a.Year,a.Budget,c.PostName,c.CodePost
+                from db_budgeting.cfg_head_account as b left join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeHeadAccount = b.CodeHeadAccount
                 join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
-                where b.Departement = ? and b.Active = 1 order by a.CodePostBudget asc
+                where b.Departement = ? and b.Active = 1 order by a.CodeHeadAccount asc
                 ';
+                // print_r($sql);die();
         $query=$this->db->query($sql, array($Year,$Departement))->result_array();
         $arr_result = array('data' => $query,'OpPostRealisasi' => $get_Data);
         return $arr_result;
-
     }
 
     public function getPostDepartementEx($Year,$Departement)
     {
-        $sql = 'select a.CodePostBudget,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
-                from db_budgeting.cfg_postrealisasi as b left join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
+        $sql = 'select a.CodePostBudget,b.CodeHeadAccount,a.Year,a.Budget,b.Name as NameHeadAccount,c.PostName,c.CodePost
+                from db_budgeting.cfg_head_account as b left join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeHeadAccount = b.CodeHeadAccount
                 join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
                 where b.Departement = ? and b.Active = 1 order by c.CodePost asc
                 ';
@@ -225,13 +239,12 @@ class M_budgeting extends CI_Model {
     public function getPostDepartementForDomApproval($Year,$Departement)
     {
         $arr_result = array();
-        $get_Data = $this->m_master->caribasedprimary('db_budgeting.cfg_postrealisasi','Departement',$Departement);
-        $sql = 'select a.CodePostBudget,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
-                from db_budgeting.cfg_postrealisasi as b join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
-                join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
-                where b.Departement = ? order by a.CodePostBudget asc
+        $get_Data = $this->m_master->caribasedprimary('db_budgeting.cfg_head_account','Departement',$Departement);
+        $sql = 'select a.CodePostRealisasi,a.CodeHeadAccount,b.Name as NameHeadAccount,a.RealisasiPostName,b.Departement,c.CodePost,c.PostName from db_budgeting.cfg_postrealisasi as a join db_budgeting.cfg_head_account as b on a.CodeHeadAccount = b.CodeHeadAccount
+            join db_budgeting.cfg_post as c on c.CodePost = b.CodePost
+                where a.Active = 1 and b.Departement = ? order by a.CodePostRealisasi desc
                 ';
-        $query=$this->db->query($sql, array($Year,$Departement))->result_array();
+        $query=$this->db->query($sql, array($Departement))->result_array();
         $arr_result = array('data' => $query,'OpPostRealisasi' => $get_Data);
         return $arr_result;
 
@@ -266,10 +279,10 @@ class M_budgeting extends CI_Model {
         return $query;
     }
 
-    public function get_cfg_set_roleuser($Departement)
+    public function get_cfg_set_roleuser_budgeting($Departement)
     {
-        $sql = 'select a.*,b.Name as NamaUser,b.NIP,c.Departement,c.ID as ID_set_roleuser
-                from db_budgeting.cfg_m_userrole as a left join (select * from db_budgeting.cfg_set_roleuser where Departement = ? and Active = 1) as c
+        $sql = 'select a.*,b.Name as NamaUser,b.NIP,c.Departement,c.ID as ID_set_roleuser,c.Visible,c.TypeDesc
+                from db_budgeting.cfg_m_userrole as a left join (select * from db_budgeting.cfg_approval_budget where Departement = ? ) as c
                 on a.ID = c.ID_m_userrole
                 left join db_employees.employees as b on b.NIP = c.NIP 
                 order by a.NameUserRole asc
@@ -289,7 +302,9 @@ class M_budgeting extends CI_Model {
     {
         $sql = 'select * from db_budgeting.creator_budget as a join (
            select a.CodePostBudget,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
-           from db_budgeting.cfg_postrealisasi as b left join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
+           from db_budgeting.cfg_postrealisasi as b left join db_budgeting.cfg_head_account as c_ha on c.CodeHeadAccount = b.CodeHeadAccount
+           left join 
+           (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
            join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
            where b.Departement = ?     
         ) as  b on a.CodePostBudget = b.CodePostBudget order by a.CodePostBudget asc';

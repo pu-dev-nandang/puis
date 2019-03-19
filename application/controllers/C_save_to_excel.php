@@ -3127,11 +3127,11 @@ class C_save_to_excel extends CI_Controller
                     $temp = array();
                     $temp['Post'] = $data[$j]['PostName'];
                     $temp2 = array();
-                    $temp2[] = array('RealisasiPostName' => $data[$j]['RealisasiPostName'],'Cost' => 'Rp. '.number_format($data[$j]['Budget'],2,',','.'),'j' => $j,'k' => 0);
+                    $temp2[] = array('NameHeadAccount' => $data[$j]['NameHeadAccount'],'Cost' => 'Rp. '.number_format($data[$j]['Budget'],2,',','.'),'j' => $j,'k' => 0);
                     for ($k=$j+1; $k < count($data); $k++) { 
                        $CodePost2 = $data[$k]['CodePost'];
                        if ($CodePost1 == $CodePost2  ) {
-                           $temp2[] = array('RealisasiPostName' => $data[$k]['RealisasiPostName'],'Cost' => 'Rp. '.number_format($data[$k]['Budget'],2,',','.'),'j' => $j,'k' => $k);
+                           $temp2[] = array('NameHeadAccount' => $data[$k]['NameHeadAccount'],'Cost' => 'Rp. '.number_format($data[$k]['Budget'],2,',','.'),'j' => $j,'k' => $k);
                        }
                        else
                        {
@@ -3155,7 +3155,7 @@ class C_save_to_excel extends CI_Controller
                       // add isi data
                       if ($l == 0) {
                           $exc->setCellValue('A'.$strow, 'No'); 
-                          $exc->setCellValue('B'.$strow, 'Post Name'); 
+                          $exc->setCellValue('B'.$strow, 'Head Account'); 
                           $exc->setCellValue('C'.$strow, 'Cost'); 
 
                           $exc->getStyle('A'.$strow)->applyFromArray($style_col);
@@ -3164,7 +3164,7 @@ class C_save_to_excel extends CI_Controller
                           $strow++;
                       }
                       $exc->setCellValue('A'.$strow, $no); 
-                      $exc->setCellValue('B'.$strow, $dt[$l]['RealisasiPostName'] ); 
+                      $exc->setCellValue('B'.$strow, $dt[$l]['NameHeadAccount'] ); 
                       $exc->setCellValue('C'.$strow, $dt[$l]['Cost']); 
 
                       $exc->getStyle('A'.$strow)->applyFromArray($style_row);
@@ -3181,7 +3181,7 @@ class C_save_to_excel extends CI_Controller
         }
         // die();
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename=PostBudget'.$YearPostDepartementText.'.xlsx'); // Set nama file excel nya
+        header('Content-Disposition: attachment; filename=Alocation_head_account'.$YearPostDepartementText.'.xlsx'); // Set nama file excel nya
         header('Cache-Control: max-age=0');
 
         $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');

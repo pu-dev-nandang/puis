@@ -38,7 +38,7 @@ class C_budgeting extends Budgeting_Controler {
         
     }
 
-    public function configfinance($Request = null)
+    public function configfinance_budgeting($Request = null)
     {
         $arr_menuConfig = array('CodePrefix',
                                 'TimePeriod',
@@ -350,6 +350,13 @@ class C_budgeting extends Budgeting_Controler {
         echo json_encode($getData);
     }
 
+    public function get_cfg_head_account()
+    {
+        $this->auth_ajax();
+        $getData = $this->m_budgeting->get_cfg_head_account(1);
+        echo json_encode($getData);
+    }
+
     public function modal_pageloadMasterPost()
     {
         $this->auth_ajax();
@@ -505,17 +512,16 @@ class C_budgeting extends Budgeting_Controler {
                 {
                    $dataSave = array(
                        'CodePostRealisasi' => $CodePostRealisasi,
-                       'CodePost' => $input['PostItem'],
+                       'CodeHeadAccount' => $input['HeadAccount'],
                        'RealisasiPostName' => trim(ucwords($input['RealisasiPostName'])),
-                       'Departement' => $input['Departement'],
                        'CreatedBy' => $this->session->userdata('NIP'),
                        'CreatedAt' => date('Y-m-d'),
                    );
                    $this->db->insert('db_budgeting.cfg_postrealisasi', $dataSave);
 
-                   $tbl = 'db_budgeting.cfg_post';
-                   $fieldCode = 'CodePost';
-                   $ValueCode = $input['PostItem'];
+                   $tbl = 'db_budgeting.cfg_head_account';
+                   $fieldCode = 'CodeHeadAccount';
+                   $ValueCode = $input['HeadAccount'];
                    $this->m_budgeting->makeCanBeDelete($tbl,$fieldCode,$ValueCode);
                 }
                 break;
@@ -540,8 +546,7 @@ class C_budgeting extends Budgeting_Controler {
                            $dataSave = array(
                                'CodePostRealisasi' => $CodePostRealisasi,
                                'RealisasiPostName' => trim(ucwords($input['RealisasiPostName'])),
-                               'CodePost' => $input['PostItem'],
-                               'Departement' => $input['Departement'],
+                               'CodeHeadAccount' => $input['HeadAccount'],
                            );
                            $this->db->where('CodePostRealisasi', $input['CDID']);
                            $this->db->where('Active', 1);
@@ -568,6 +573,160 @@ class C_budgeting extends Budgeting_Controler {
                        $this->db->where('CodePostRealisasi', $CodePostRealisasi);
                        $this->db->where('Active', 1);
                        $this->db->update('db_budgeting.cfg_postrealisasi', $dataSave);
+                   }
+                   else
+                   {
+                       $Msg = $this->Msg['NotAction'];
+                   }
+                break;
+            default:
+                # code...
+                break;
+        }
+
+        echo json_encode($Msg);
+
+    }
+
+    public function modal_headaccount()
+    {
+        $this->auth_ajax();
+        $input = $this->getInputToken();
+        $this->data['action'] = $input['Action'];
+        $this->data['id'] = $input['CDID'];
+        if ($input['Action'] == 'edit') {
+            $sql = 'select * from db_budgeting.cfg_head_account where CodeHeadAccount = ? and Active = 1';
+            $query=$this->db->query($sql, array($this->data['id']))->result_array();
+            $this->data['getData'] = $query;
+        }
+        echo $this->load->view('page/budgeting/'.'finance'.'/configuration/modal_headaccount',$this->data,true);
+    }
+
+    public function save_headaccount()
+    {
+        $this->auth_ajax();
+        $input = $this->getInputToken();
+        $Msg = '';
+
+        switch ($input['Action']) {
+            case 'add':
+                $NeedPrefix = $input['NeedPrefix'];
+                $CodeHeadAccount = $input['CodeHeadAccount'];
+                if ($NeedPrefix == 1) { // get the code
+                    $CfgCode = $this->m_master->showData_array('db_budgeting.cfg_codeprefix');
+                    $CodePostPrefix = $CfgCode[0]['HeadAccount'];
+                    $LengthCode = $CfgCode[0]['LengthHeadAccount'];
+                    $tbl = 'db_budgeting.cfg_head_account';
+                    $fieldCode = 'CodeHeadAccount';
+                    $CodeHeadAccount = $this->m_budgeting->getTheCode($tbl,$fieldCode,$CodePostPrefix,$LengthCode);
+                }
+
+                $sql = 'select * from db_budgeting.cfg_head_account where CodeHeadAccount = ? and Active = 1';
+                $query=$this->db->query($sql, array($CodeHeadAccount))->result_array();
+                if (count($query) > 0) {
+                   $Msg = $this->Msg['Duplicate'];
+                }
+                else
+                {
+                   $dataSave = array(
+                       'CodeHeadAccount' => $CodeHeadAccount,
+                       'CodePost' => $input['PostItem'],
+                       'Name' => trim(ucwords($input['HeadAccountName'])),
+                       'Departement' => $input['Departement'],
+                       'CreatedBy' => $this->session->userdata('NIP'),
+                       'CreatedAt' => date('Y-m-d'),
+                   );
+                   $this->db->insert('db_budgeting.cfg_head_account', $dataSave);
+
+                   $tbl = 'db_budgeting.cfg_post';
+                   $fieldCode = 'CodePost';
+                   $ValueCode = $input['PostItem'];
+                   $this->m_budgeting->makeCanBeDelete($tbl,$fieldCode,$ValueCode);
+
+                   // insert data to cfg_set_post with year activated now and fill budget is zero
+                   $YearActivated = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
+                   $Year = $YearActivated[0]['Year'];
+                   $sql = 'select count(*) as total from db_budgeting.cfg_set_post where Year = ? and CodeHeadAccount = ? ';
+                   $query=$this->db->query($sql, array($Year,$CodeHeadAccount))->result_array();
+                   if ($query[0]['total'] == 0) {
+                        // get the code 
+                        $tbl = 'db_budgeting.cfg_set_post';
+                        $fieldCode = 'CodePostBudget';
+                        $CfgCode = $this->m_master->showData_array('db_budgeting.cfg_codeprefix');
+                        $CodePostPrefix = $CfgCode[0]['CodePostBudget'];
+                        $LengthCode = $CfgCode[0]['LengthCodePostBudget'];
+                        $CodePostBudget = $this->m_budgeting->getTheCode($tbl,$fieldCode,$CodePostPrefix,$LengthCode,$Year);
+
+                       $dataSave = array(
+                           'CodePostBudget' => $CodePostBudget,
+                           'CodeHeadAccount' => $CodeHeadAccount,
+                           'Year' => $Year,
+                           'Budget' => 0,
+                           'CreatedBy' => $this->session->userdata('NIP'),
+                           'CreatedAt' => date('Y-m-d'),
+                       );
+                       $this->db->insert('db_budgeting.cfg_set_post', $dataSave);
+
+                       $dataSave = array(
+                           'CodePostBudget' => $CodePostBudget,
+                           'Time' => date('Y-m-d H:i:s'),
+                           'ActionBy' => $this->session->userdata('NIP'),
+                           'Detail' => json_encode(array('action' => 'Created')),
+                       );
+                       $this->db->insert('db_budgeting.log_cfg_set_post', $dataSave);
+                   }
+                   
+                }
+                break;
+            case 'edit':
+                $CodeHeadAccount = $input['CodeHeadAccount'];
+                $query = array();
+                if ($CodeHeadAccount != $input['CDID']) {
+                    $sql = 'select * from db_budgeting.cfg_head_account where CodeHeadAccount = ? and Active = 1';
+                    $query=$this->db->query($sql, array($CodeHeadAccount))->result_array();
+                }
+
+                if (count($query) > 0) {
+                   $Msg = $this->Msg['Duplicate'];
+                }
+                else
+                {
+                    $sql = 'select * from db_budgeting.cfg_head_account where CodeHeadAccount = ? and Active = 1';
+                    $query=$this->db->query($sql, array($input['CDID']))->result_array();
+                    $Status = $query[0]['Status'];
+                    if ($Status == 1) {
+                        try {
+                           $dataSave = array(
+                               'CodeHeadAccount' => $CodeHeadAccount,
+                               'Name' => trim(ucwords($input['HeadAccountName'])),
+                               'CodePost' => $input['PostItem'],
+                               'Departement' => $input['Departement'],
+                           );
+                           $this->db->where('CodeHeadAccount', $input['CDID']);
+                           $this->db->where('Active', 1);
+                           $this->db->update('db_budgeting.cfg_head_account', $dataSave);
+                        } catch (Exception $e) {
+                             $Msg = $this->Msg['Duplicate'];
+                        }   
+                    }
+                    else
+                    {
+                        $Msg = $this->Msg['NotAction'];
+                    }
+                }
+                break;
+            case 'delete':
+                $CodeHeadAccount = $input['CDID'];
+                $sql = 'select * from db_budgeting.cfg_head_account where CodeHeadAccount = ? and Active = 1';
+                $query=$this->db->query($sql, array($CodeHeadAccount))->result_array();
+                $Status = $query[0]['Status']; // check can be delete
+                   if ($Status == 1) {
+                       $dataSave = array(
+                           'Active' => 0
+                       );
+                       $this->db->where('CodeHeadAccount', $CodeHeadAccount);
+                       $this->db->where('Active', 1);
+                       $this->db->update('db_budgeting.cfg_head_account', $dataSave);
                    }
                    else
                    {
@@ -632,7 +791,7 @@ class C_budgeting extends Budgeting_Controler {
         switch ($input['Action']) {
             case 'add':
             // check data telah diapprove atau belum // data pass : Year & Departement
-                $Q_get = $this->m_master->caribasedprimary('db_budgeting.cfg_postrealisasi','CodePostRealisasi',$input['CodeSubPost']);
+                $Q_get = $this->m_master->caribasedprimary('db_budgeting.cfg_head_account','CodeHeadAccount',$input['CodeHeadAccount']);
                 $Departement = $Q_get[0]['Departement'];
                 $Q_get = $this->m_budgeting->get_creator_budget_approval($input['Year'],$Departement);
                 if (count($Q_get) > 0) {
@@ -647,8 +806,8 @@ class C_budgeting extends Budgeting_Controler {
                 $LengthCode = $CfgCode[0]['LengthCodePostBudget'];
                 $CodePostBudget = $this->m_budgeting->getTheCode($tbl,$fieldCode,$CodePostPrefix,$LengthCode,$input['Year']);
 
-                $sql = 'select * from db_budgeting.cfg_set_post where CodeSubPost = ? and Active = 1 and Year = ?';
-                $query=$this->db->query($sql, array($input['CodeSubPost'],$input['Year']))->result_array();
+                $sql = 'select * from db_budgeting.cfg_set_post where CodeHeadAccount = ? and Active = 1 and Year = ?';
+                $query=$this->db->query($sql, array($input['CodeHeadAccount'],$input['Year']))->result_array();
                 if (count($query) > 0) {
                    $Msg = $this->Msg['Duplicate'];
                 }
@@ -656,7 +815,7 @@ class C_budgeting extends Budgeting_Controler {
                 {
                    $dataSave = array(
                        'CodePostBudget' => $CodePostBudget,
-                       'CodeSubPost' => $input['CodeSubPost'],
+                       'CodeHeadAccount' => $input['CodeHeadAccount'],
                        'Year' => $input['Year'],
                        'Budget' => $input['Budget'],
                        'CreatedBy' => $this->session->userdata('NIP'),
@@ -672,10 +831,10 @@ class C_budgeting extends Budgeting_Controler {
                    );
                    $this->db->insert('db_budgeting.log_cfg_set_post', $dataSave);
 
-                   $tbl = 'db_budgeting.cfg_postrealisasi';
-                   $fieldCode = 'CodePostRealisasi';
-                   $ValueCode = $input['CodeSubPost'];
-                   $this->m_budgeting->makeCanBeDelete($tbl,$fieldCode,$ValueCode);
+                   // $tbl = 'db_budgeting.cfg_postrealisasi';
+                   // $fieldCode = 'CodePostRealisasi';
+                   // $ValueCode = $input['CodeSubPost'];
+                   // $this->m_budgeting->makeCanBeDelete($tbl,$fieldCode,$ValueCode);
                 }
                 break;
             case 'edit':
@@ -758,8 +917,8 @@ class C_budgeting extends Budgeting_Controler {
         $this->auth_ajax();
         $input = $this->getInputToken();
         $LastYear = $input['Year'] - 1;
-        $sql = 'select Budget from db_budgeting.cfg_set_post where CodeSubPost = ? and Year = ? and Active = 1 limit 1';
-        $query=$this->db->query($sql, array($input['CodePostRealisasi'],$LastYear))->result_array();
+        $sql = 'select Budget from db_budgeting.cfg_set_post where CodeHeadAccount = ? and Year = ? and Active = 1 limit 1';
+        $query=$this->db->query($sql, array($input['CodeHeadAccount'],$LastYear))->result_array();
         echo json_encode($query);
     }
 
@@ -778,14 +937,14 @@ class C_budgeting extends Budgeting_Controler {
         $querytotalData = $this->db->query($sqltotalData)->result_array();
         $totalData = $querytotalData[0]['total'];
 
-        $sql = 'select a.*,b.PostName,b.CodePost,c.CodePostRealisasi,c.RealisasiPostName,c.Departement,d.Year,e.Name as NameAction,e.NIP from db_budgeting.log_cfg_set_post as a
+        $sql = 'select a.*,b.PostName,b.CodePost,c.CodeHeadAccount,c.Name as NameHeadAccount,c.Departement,d.Year,e.Name as NameAction,e.NIP from db_budgeting.log_cfg_set_post as a
                 join db_budgeting.cfg_set_post as d on a.CodePostBudget = d.CodePostBudget
-                join db_budgeting.cfg_postrealisasi as c on d.CodeSubPost =  c.CodePostRealisasi
+                join db_budgeting.cfg_head_account as c on d.CodeHeadAccount =  c.CodeHeadAccount
                 join db_budgeting.cfg_post as b on c.CodePost = b.CodePost
                 join db_employees.employees as e on a.ActionBy = e.NIP   
                ';
 
-        $sql.= ' where e.NIP LIKE "'.$requestData['search']['value'].'%" or e.Name LIKE "'.$requestData['search']['value'].'%" or a.CodePostBudget LIKE "'.$requestData['search']['value'].'%" or b.PostName LIKE "'.$requestData['search']['value'].'%" or c.RealisasiPostName LIKE "'.$requestData['search']['value'].'%"
+        $sql.= ' where e.NIP LIKE "'.$requestData['search']['value'].'%" or e.Name LIKE "'.$requestData['search']['value'].'%" or a.CodePostBudget LIKE "'.$requestData['search']['value'].'%" or b.PostName LIKE "'.$requestData['search']['value'].'%" or c.Name LIKE "'.$requestData['search']['value'].'%"
                 ';
         $sql.= ' ORDER BY a.Time Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
         $query = $this->db->query($sql)->result_array();
@@ -839,7 +998,7 @@ class C_budgeting extends Budgeting_Controler {
             
 
             $nestedData[] = $row['CodePostBudget'];
-            $nestedData[] = $row['CodePostRealisasi'].'<br>'.$row['PostName'].'-'.$row['RealisasiPostName'].'<br>'.$Departement;
+            $nestedData[] = $row['CodeHeadAccount'].'<br>'.$row['PostName'].'-'.$row['NameHeadAccount'].'<br>'.$Departement;
             $nestedData[] = $row['NIP'].'<br>'.$row['NameAction'];
             $nestedData[] = $DayDateTime;
             $nestedData[] = $str;
@@ -922,25 +1081,27 @@ class C_budgeting extends Budgeting_Controler {
 
     }
 
-    public function LoadSetUserActionDepartement()
+    public function LoadSetUserApprovalDepartement()
     {
         $this->auth_ajax();
         $arr_result = array('html' => '','jsonPass' => '');
-        $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/configuration/setuserrole/LoadSetUserActionDepartement',$this->data,true);
+        $this->data['cfg_m_type_approval'] = $this->m_master->showData_array('db_budgeting.cfg_m_type_approval');
+        // $this->data['employees'] = $this->m_master->showData_array('db_budgeting.cfg_m_type_approval');
+        $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/configuration/setuserrole/LoadSetUserApprovalDepartement',$this->data,true);
         echo json_encode($arr_result);
     }
 
-    public function get_cfg_set_roleuser($Departement)
+    public function get_cfg_set_roleuser_budgeting($Departement)
     {
         $this->auth_ajax();
-        $getData = $this->m_budgeting->get_cfg_set_roleuser($Departement);
+        $getData = $this->m_budgeting->get_cfg_set_roleuser_budgeting($Departement);
         echo json_encode($getData);
     }
 
-    public function save_cfg_set_roleuser()
+    public function save_cfg_set_roleuser_budgeting()
     {
         $this->auth_ajax();
-        $msg = '';
+        $msg = array('status' => 0,'msg' => '');
         $Input = $this->getInputToken();
         $Action = $Input['Action'];
         switch ($Action) {
@@ -950,31 +1111,41 @@ class C_budgeting extends Budgeting_Controler {
                     $dataSave = array(
                         'ID_m_userrole' => $Input['ID_m_userrole'],
                         'NIP' => $Input['NIP'],
-                        'Departement' => $Input['Departement']
+                        'Departement' => $Input['Departement'],
+                        'Visible' => $Input['Visible'],
+                        'TypeDesc' => $Input['TypeDesc'],
                     );
-                    $this->db->insert('db_budgeting.cfg_set_roleuser', $dataSave);
+                    $this->db->insert('db_budgeting.cfg_approval_budget', $dataSave);
+                    $insert_id = $this->db->insert_id();
+                    $msg['status'] = 1;
+                    $msg['msg'] = $insert_id;
                 }
                 else
                 {
                     // find $Input['ID_set_roleuser'] == ""
-                    $get = $this->m_master->caribasedprimary('db_budgeting.cfg_set_roleuser','ID',$Input['ID_set_roleuser']);
+                    $get = $this->m_master->caribasedprimary('db_budgeting.cfg_approval_budget','ID',$Input['ID_set_roleuser']);
                     if (count($get) > 0) {
                         // update
                         $dataSave = array(
                             'NIP' => $Input['NIP'],
+                            'Departement' => $Input['Departement'],
+                            'Visible' => $Input['Visible'],
+                            'TypeDesc' => $Input['TypeDesc'],
                         );
                         $this->db->where('ID', $Input['ID_set_roleuser']);
-                        $this->db->update('db_budgeting.cfg_set_roleuser', $dataSave);
+                        $this->db->update('db_budgeting.cfg_approval_budget', $dataSave);
+                        $msg['status'] = 1;
                     }
                     else
                     {
-                        $msg = "The Data is not exist, Please check";
+                        $msg['msg'] = "The Data is not exist, Please check";
                     }
                 }
                 break;
             case "delete":
                 $ID = $Input['ID_set_roleuser'];
-                $this->m_master->delete_id_table_all_db($ID,'db_budgeting.cfg_set_roleuser');
+                $this->m_master->delete_id_table_all_db($ID,'db_budgeting.cfg_approval_budget');
+                $msg['status'] = 1;
                 break;
             default:
                 # code...
@@ -1029,6 +1200,8 @@ class C_budgeting extends Budgeting_Controler {
         $this->data['Departement'] = $Departement;
         $this->data['arr_PostBudget'] = $get['data'];
         $this->data['arr_bulan'] = $arr_bulan;
+        // get API Department PU
+        $this->data['arr_department_pu'] = $this->m_master->apiservertoserver(url_pas.'api/__getAllDepartementPU','');
         $arr_result['html'] = $this->load->view('global/budgeting/form_entry_budgeting',$this->data,true);
         echo json_encode($arr_result);
     }

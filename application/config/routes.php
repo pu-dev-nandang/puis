@@ -1145,6 +1145,12 @@ $route['budgeting/masterpost/modalform/save'] = 'page/budgeting/c_budgeting/moda
 $route['budgeting/postrealisasi/modalform'] = 'page/budgeting/c_budgeting/modal_postrealisasi';
 $route['budgeting/postrealisasi/modalform/save'] = 'page/budgeting/c_budgeting/save_postrealisasi';
 $route['budgeting/get_cfg_postrealisasi'] = 'page/budgeting/c_budgeting/get_cfg_postrealisasi';
+$route['budgeting/get_cfg_head_account'] = 'page/budgeting/c_budgeting/get_cfg_head_account';
+
+$route['budgeting/headaccount/modalform'] = 'page/budgeting/c_budgeting/modal_headaccount';
+$route['budgeting/headaccount/modalform/save'] = 'page/budgeting/c_budgeting/save_headaccount';
+
+
 $route['budgeting/page/loadCodePrefix'] = 'page/budgeting/c_budgeting/loadCodePrefix';
 $route['budgeting/save_codeprefix'] = 'page/budgeting/c_budgeting/save_codeprefix';
 $route['budgeting/page/LoadSetPostDepartement'] = 'page/budgeting/c_budgeting/LoadSetPostDepartement';
@@ -1162,9 +1168,9 @@ $route['budgeting/page/LoadSetUserRole'] = 'page/budgeting/c_budgeting/LoadSetUs
 $route['budgeting/page/LoadMasterUserRoleDepartement'] = 'page/budgeting/c_budgeting/LoadMasterUserRoleDepartement';
 $route['budgeting/AutoCompletePostDepartement'] = 'page/budgeting/c_budgeting/AutoCompletePostDepartement';
 $route['budgeting/save_cfg_set_userrole'] = 'page/budgeting/c_budgeting/save_cfg_set_userrole';
-$route['budgeting/page/LoadSetUserActionDepartement'] = 'page/budgeting/c_budgeting/LoadSetUserActionDepartement';
-$route['budgeting/get_cfg_set_roleuser/(:any)'] = 'page/budgeting/c_budgeting/get_cfg_set_roleuser/$1';
-$route['budgeting/save_cfg_set_roleuser'] = 'page/budgeting/c_budgeting/save_cfg_set_roleuser';
+$route['budgeting/page/LoadSetUserApprovalDepartement'] = 'page/budgeting/c_budgeting/LoadSetUserApprovalDepartement';
+$route['budgeting/get_cfg_set_roleuser_budgeting/(:any)'] = 'page/budgeting/c_budgeting/get_cfg_set_roleuser_budgeting/$1';
+$route['budgeting/save_cfg_set_roleuser_budgeting'] = 'page/budgeting/c_budgeting/save_cfg_set_roleuser_budgeting';
 $route['budgeting/EntryBudget/EntryBudget'] = 'page/budgeting/c_budgeting/EntryBudget';
 $route['budgeting/EntryBudget/EntryPostItemBudgeting'] = 'page/budgeting/c_budgeting/EntryPostItemBudgeting';
 
