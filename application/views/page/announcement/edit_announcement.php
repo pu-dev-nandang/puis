@@ -38,7 +38,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label>End</label>
+                        <label>Publish Until</label>
                         <input type="text" id="formEnd" name="regular" class="form-control formcalendar">
                     </div>
                 </div>
