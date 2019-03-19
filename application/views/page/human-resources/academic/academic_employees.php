@@ -31,9 +31,10 @@
             <th style="width: 1%;">No</th>
             <th style="width: 5%;">Foto</th>
             <th class="th-center" style="width: 12%;">Name</th>
-            <th style="width: 15%;">Position Main</th>
+            <th style="width: 12%;">Position Main</th>
             <th style="width: 5%;">Status</th>
-            <th >Status Files</th>
+            <th style="width: 49%;">Status Files</th>
+            <th>Total Files</th>
             <th style="width: 5%;">Action</th>
         </tr>
         </thead>

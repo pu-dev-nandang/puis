@@ -126,7 +126,7 @@ $('#fileOther').change(function (event) {
                     ' <div class="table-responsive">                                                '+
                     '     <table class="table table-striped table-bordered">                        '+
                     '         <thead>                                                               '+
-                    '         <tr style="background: #607d8b;color: #FFFFFF;">                      '+
+                    '         <tr style="background: #1E90FF;color: #FFFFFF;">                      '+
                     '             <th style="width: 5%;text-align: center;">Type Files</th>         '+
                     '             <th style="width: 8%;text-align: center;">No.Document</th>        '+
                     '             <th style="width: 5%;text-align: center;">Date Document</th>      '+

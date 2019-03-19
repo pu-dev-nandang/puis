@@ -142,7 +142,7 @@ function loadAcademicS1Details() {
                     ' <div class="table-responsive">                                                '+
                     '     <table class="table table-striped table-bordered">                        '+
                     '         <thead>                                                               '+
-                    '         <tr style="background: #607d8b;color: #FFFFFF;">                      '+
+                    '         <tr style="background: #1E90FF;color: #FFFFFF;">                      '+
                     '             <th style="width: 5%;text-align: center;">Academic</th>           '+
                      '            <th style="width: 10%;text-align: center;">Name University</th>   '+
                     '             <th style="width: 8%;text-align: center;">Ijazah</th>             '+
