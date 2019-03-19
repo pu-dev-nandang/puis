@@ -1,28 +1,8 @@
             
-<style type="text/css">
-    @media screen and (min-width: 768px) {
-        .modal-content {
-          width: 785px; /* New width for default modal */
-        }
-        .modal-sm {
-          width: 350px; /* New width for small modal */
-        }
-    }
-    @media screen and (min-width: 992px) {
-        .modal-lg {
-          width: 950px; /* New width for large modal */
-        }
-    }
-
-    .datepicker {
-         z-index: 1050px !important; /* has to be larger than 1050 */
-    }
-</style>
-
 <div class="row">
             <div class="col-md-6" style="border-right: 1px solid #afafafb5;">
 
-                    <div class="col-xs-12 id="subsesi">
+                    <div class="col-xs-12" id="subsesi">
                         <div class="form-group">
                             <div class="thumbnail" style="padding: 10px;text-align: left;">
                                 <h4>Data Other Files </h4>
@@ -90,18 +70,16 @@
                                 <div class="row">
                                    <div class="col-md-12" style="text-align: right;">
                                             <hr/>
-                                            <button class="btn btn-success" id="btnSaveFiles">Save</button>
+                                            <button class="btn btn-success btnSaveFiles">Save</button>
                                         </div> 
                                 </div>
                             </div>
 
                         </div>
                     </div>
-
                     <!-- <span id="bodyAddSesi"></span> -->
             </div>
-            
-            <span id="loadtablefiles"></span>  
+        <span id="loadtablefiles"></span>  
  </div>
 
 
@@ -129,32 +107,6 @@ $('#fileOther').change(function (event) {
         loadFilesDetails();
     });
     //$nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
-
-    $(document).on('click','#btnreviewfiles', function () {
-
-        var filesub = $(this).attr('filesub');
-        var url = ''+base_url_js+'uploads/files/'+filesub+' ';
-
-
-                $('#NotificationModal .modal-header').addClass('hide');
-                $('#NotificationModal .modal-body').html('<center> '+
-                '<iframe src="'+base_url_js+'fileGetAny/files-'+filesub+'" frameborder="0" style="width:745px; height:550px;"></iframe> '+
-                '<br/><br/><button type="button" id="btnRemoveNoEditSc" class="btn btn-primary" data-dismiss="modal">Close</button><button type="button" id="btnRemoveNoEditSc" filesublix ="'+filesub+'" class="btn btn-primary pull-right filesublink" data-toggle="tooltip" data-placement="top" title="Full Review" data-dismiss="modal"><span class="fa fa-external-link"></span></button>' +
-                '</center>');
-                $('#NotificationModal .modal-footer').addClass('hide');
-                $('#NotificationModal').modal({
-                    'backdrop' : 'static',
-                    'show' : true
-                });
-    });
-
-    $(document).on('click','.filesublink', function () {
-
-        var filesubx = $(this).attr('filesublix');
-        var url = base_url_js+'uploads/files/'+filesubx;
-        window.open(url, '_blank',);
-        //win.focus();
-    });
 
     function loadFilesDetails() {
         
@@ -189,7 +141,6 @@ $('#fileOther').change(function (event) {
             if(response.length > 0){
                 var no = 1;
                 var orbs=0;
-                
 
                 for (var i = 0; i < response.length; i++) {
 
@@ -212,24 +163,23 @@ $('#fileOther').change(function (event) {
                          var datadesc = ''+response[i]['Description_Files']+'';
                     }                                                                                                                               
 
-                    $("#dataRow").append('<tr>                                                     '+
-                    '            <td>'+response[i]['NameFiles']+'</td>                             '+       
-                    '            <td>'+datadoc+'</td>                                               '+    
-                    '            <td><center>'+datadate+'</center></td>                                              '+                                                       
+                    $("#dataRow").append('<tr>                                                       '+
+                    '            <td>'+response[i]['NameFiles']+'</td>                               '+       
+                    '            <td>'+datadoc+'</td>                                                '+    
+                    '            <td><center>'+datadate+'</center></td>                              '+                                                       
                     '             <td>'+datadesc+'</td>                                              '+    
-                    '            <td style="text-align: center;"><button id="btnreviewfiles" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="top" title="Review Files" filesub="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i></button> | <button class="btn btn-sm btn-primary testEditdocument" data-toggle="tooltip" data-placement="top" title="Edit File" filesnametype="'+response[i]['NameFiles']+'" idtypex="'+response[i]['TypeFiles']+'" idfiles="'+response[i]['ID']+'" linkfileother="'+response[i]['LinkFiles']+'" namedoc ="'+response[i]['No_Document']+'"><i class="fa fa-edit"></i></button> </td>      '+     
-                    '         </tr>');
-
-                }
-                
-             }
+                    '            <td style="text-align: center;"><button class="btn btn-sm btn-primary btnviewlistsrata" data-toggle="tooltip" data-placement="top" title="Review Files" filesub="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i></button> | <button class="btn btn-sm btn-primary testEditdocument" data-toggle="tooltip" data-placement="top" title="Edit File" filesnametype="'+response[i]['NameFiles']+'" idtypex="'+response[i]['TypeFiles']+'" idfiles="'+response[i]['ID']+'" linkfileother="'+response[i]['LinkFiles']+'" namedoc ="'+response[i]['No_Document']+'"><i class="fa fa-edit"></i></button> </td>      '+     
+                    '   </tr>');
+                } 
+            }
 
         }).done(function() {
         })
     };
 
-
-$(document).on('click','.testEditdocument', function () {
+</script>
+<script>
+    $(document).on('click','.testEditdocument', function () {
 
         var NIP = '<?php echo $NIP; ?>';
         var filesnametype = $(this).attr('filesnametype');
@@ -239,58 +189,58 @@ $(document).on('click','.testEditdocument', function () {
         var idtypex = $(this).attr('idtypex');
 
         if (linkfileother != null) {
-            var filesxx = '<iframe src="'+base_url_js+'uploads/files/'+linkfileother+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button id="btnreviewfiles" class="btn btn-sm btn-primary" filesub ="'+linkfileother+'"><i class="fa fa-eye"></i> Preview </button></center>';
+            var filesxx = '<iframe src="'+base_url_js+'uploads/files/'+linkfileother+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btnviewlistsrata" filesub ="'+linkfileother+'"><i class="fa fa-eye"></i> Preview </button></center>';
             } else {
             var filesxx = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px;">'
         }
         
         if(namedoc == "null") {
-               $('#NotificationModal .modal-body').html('<br/><div class="col-xs-12 id="subsesi">   '+
-                        '<div class="form-group">                                                   '+
-                        '    <div class="thumbnail" style="padding: 10px;text-align: left;">        '+
-                        '      <h4>Edit Other Files</h4>                                            '+
-                        '       <div class="row">                                                   '+
-                        '        <div class="col-xs-5">                                             '+
-                        '                <div class="form-group">                                   '+
-                        '                <label class="control-label">Type File </label>            '+
-                        '                <div>                                                      '+
-                        '                    <select class="form-control" id="typefiles">           '+
-                        '                        <option id="'+idtypex+'">'+filesnametype+'</option>  '+
-                        '                        <?php for ($i=0; $i < count($G_TypeFiles); $i++): ?>  '+
-                        '                            <?php if ($G_TypeFiles[$i]['Type'] == 1): ?>  '+
+               $('#NotificationModal .modal-body').html('<br/><div class="col-xs-12 id="subsesi">       '+
+                        '<div class="form-group">                                                       '+
+                        '    <div class="thumbnail" style="padding: 10px;text-align: left;">            '+
+                        '      <h4>Edit Other Files</h4>                                                '+
+                        '       <div class="row">                                                       '+
+                        '        <div class="col-xs-5">                                                 '+
+                        '                <div class="form-group">                                       '+
+                        '                <label class="control-label">Type File </label>                '+
+                        '                <div>                                                          '+
+                        '                    <select class="form-control" id="typefiles">               '+
+                        '                        <option id="'+idtypex+'">'+filesnametype+'</option>    '+
+                        '                        <?php for ($i=0; $i < count($G_TypeFiles); $i++): ?>   '+
+                        '                            <?php if ($G_TypeFiles[$i]['Type'] == 1): ?>       '+
                         '                             <option id="<?php echo $G_TypeFiles[$i]['ID'] ?>"><?php echo $G_TypeFiles[$i]['TypeFiles'] ?></option>   '+ 
                         '                            <?php endif ?>  '+
                         '                        <?php endfor ?>  '+
                         '                    </select>  '+
                         '                </div>  '+
-                         '               </div>  '+
-                         '           </div>  '+
-                         '   <div class="col-xs-6"> '+
-                         '                <div class="form-group"> '+ 
-                         '                    <label>No. Document</label> '+
-                          '                   <input class="form-control" id="NoDocument"> '+
-                          '               </div> '+
-                           '          </div> '+
-                          '           <div class="col-xs-5"> '+
-                           '              <div class="form-group"> '+
-                           '                  <label>Date Document</label> '+
-                          '                   <input type="date" class="form-control" id="DateDocument">   '+
-                           '              </div> '+
-                           '          </div> '+
-                            '        <div class="col-xs-11"> '+
-                            '            <div class="form-group"> '+
-                            '                <label>Description Files</label> '+
-                            '                <textarea rows="3" cols="5" name="DescriptionFile" id="DescriptionFile" class="form-control"></textarea>'+
-                            '            </div> '+
-                            '        </div> '+
-                          '           <div class="col-xs-6">                                              '+
+                        '               </div>  '+
+                        '           </div>  '+
+                        '   <div class="col-xs-6"> '+
+                        '                <div class="form-group"> '+ 
+                        '                    <label>No. Document</label> '+
+                        '                   <input class="form-control" id="NoDocument"> '+
+                        '               </div> '+
+                        '          </div> '+
+                        '           <div class="col-xs-5"> '+
+                        '             <div class="form-group"> '+
+                        '                  <label>Date Document</label> '+
+                        '                  <input type="date" class="form-control" id="DateDocument">   '+
+                        '              </div> '+
+                        '          </div> '+
+                        '        <div class="col-xs-11"> '+
+                        '            <div class="form-group"> '+
+                        '                <label>Description Files</label> '+
+                        '                <textarea rows="3" cols="5" name="DescriptionFile" id="DescriptionFile" class="form-control"></textarea>'+
+                        '            </div> '+
+                        '        </div> '+
+                        '           <div class="col-xs-6">                                              '+
                         '           <div class="form-group">                                            '+
                         '               <label>Ijazah</label>                                           '+
                         '                        <form id="tagFM_OtherFile" enctype="multipart/form-data" accept-charset="utf-8" method="post" action=""> '+
                         '                            <label class="btn btn-sm btn-default btn-default-warning btn-upload"> '+
                         '                                <i class="fa fa-upload margin-right"></i> Upload File '+
                         '                                    <input type="file" id="fileOther" name="userfile" class="upload_files" style="display: none;" accept="application/pdf"> '+
-                         '                           </label> '+
+                        '                           </label> '+
                         '                           <p style="font-size: 12px;color: #FF0000;">*) Only PDF Files Max Size 5 MB</p> '+
                         '                      </form>  '+
                         '                   <div> '+filesxx+'</div>                                      '+
@@ -303,7 +253,7 @@ $(document).on('click','.testEditdocument', function () {
                         '    <div><input type="hidden" class="form-control" value="'+filesnametype+'" id="typeotherfiles"> </div>              '+
                         '    <div><input type="hidden" class="form-control" value="'+linkfileother+'" id="linkotherfile">    </div>       '+
                         '    <div><input type="hidden" class="form-control" value="'+idfiles+'" id="idlinkfiles">    </div>       '+
-                        '               <button type="button" class="btn btn-danger" data-dismiss="modal"> <i class="fa fa-remove"></i> Cancel</button> | <button type="button" class="btn btn-success" id="btnSubmitEditFiles" linkothers="'+linkfileother+'" idfiles="'+idfiles+'"> <i class="fa fa-check"></i> Save</button> '+
+                        '               <button type="button" class="btn btn-danger" data-dismiss="modal"> <i class="fa fa-remove"></i> Cancel</button> | <button type="button" class="btn btn-success btnSubmitEditFiles" linkothers="'+linkfileother+'" idfiles="'+idfiles+'"> <i class="fa fa-check"></i> Save</button> '+
                         '           </div> '+
                         '       </div>'+
                         '   </div>'+
@@ -311,8 +261,8 @@ $(document).on('click','.testEditdocument', function () {
                     '</div>');
                 
                     $('#NotificationModal').modal({
-                    'backdrop' : 'static',
-                    'show' : true
+                        'backdrop' : 'static',
+                        'show' : true
                     }); 
         } 
         else {
@@ -357,7 +307,7 @@ $(document).on('click','.testEditdocument', function () {
                         '           <div class="col-xs-5"> '+
                         '              <div class="form-group"> '+
                         '                  <label>Date Document</label> '+
-                        '                   <input type="date" class="form-control" id="DateDocument" value="'+response[i]['DateDocument']+'"> '+
+                        '                   <input type="date" class="form-control" id="DateDocument" value="'+response[i]['Date_Files']+'"> '+
                         '              </div> '+
                         '          </div> '+
                         '        <div class="col-xs-11"> '+
@@ -370,7 +320,7 @@ $(document).on('click','.testEditdocument', function () {
                         '        <div class="col-xs-6"> '+
                         '            <div class="form-group"> '+
                         '                <div id="element1">Review File : </div> '+
-                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button id="btnreviewfiles" class="btn btn-sm btn-primary" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> Preview </button></center></div>                     '+
+                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btnviewlistsrata" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> Preview </button></center></div>                     '+
                         '            </div> '+
                         '       </div> '+
                         '        </div>'+ //
@@ -380,7 +330,7 @@ $(document).on('click','.testEditdocument', function () {
                         '    <div><input type="hidden" class="form-control" value="'+filesnametype+'" id="typeotherfiles"> </div>        '+
                         '    <div><input type="hidden" class="form-control" value="'+linkfileother+'" id="linkotherfile">   </div>       '+
                         '    <div><input type="hidden" class="form-control" value="'+idfiles+'" id="idlinkfiles">           </div>       '+
-                        '               <button type="button" class="btn btn-danger" data-dismiss="modal"> <i class="fa fa-remove"></i> Cancel </button> | <button type="button" class="btn btn-success" id="btnSubmitEditFiles" linkothers="'+linkfileother+'" idfiles="'+idfiles+'"> <i class="fa fa-check"></i> Save</button> '+
+                        '               <button type="button" class="btn btn-danger" data-dismiss="modal"> <i class="fa fa-remove"></i> Cancel </button> | <button type="button" class="btn btn-success btnSubmitEditFiles" linkothers="'+linkfileother+'" idfiles="'+idfiles+'"> <i class="fa fa-check"></i> Save</button> '+
                         '           </div> '+
                         '       </div>'+
                         '   </div>'+
@@ -400,14 +350,14 @@ $(document).on('click','.testEditdocument', function () {
 </script>
 
 <script>
-    $('#btnSaveFiles').click(function () {
+    $(document).on('click','.btnSaveFiles',function () {
         var NIP = $('#formNIP').val();
         $('#NotificationModal .modal-body').html('<div style="text-align: center;">     ' +
             'Pastikan Data Files tidak salah ! <br/>                                    ' +
             'Periksa kembali data yang di input sebelum di Save.                        ' +
             '<hr/>                                                                      ' +
             '<button type="button" class="btn btn-default" id="btnCloseEmployees" data-dismiss="modal">Close</button> | ' +
-            '<button type="button" class="btn btn-success" id="btnSubmitFiles">Submit</button>' +
+            '<button type="button" class="btn btn-success btnSubmitFiles">Submit</button>' +
             '</div> ');
 
         $('#NotificationModal').modal({
@@ -423,7 +373,7 @@ $('#btnSaveEditFiles').click(function () {
             'Periksa kembali data yang di input sebelum di Save.                        ' +
             '<hr/>                                                                      ' +
             '<button type="button" class="btn btn-default" id="btnCloseEmployees" data-dismiss="modal">Close</button> | ' +
-            '<button type="button" class="btn btn-success" id="btnSubmitEditFiles">Submit</button>' +
+            '<button type="button" class="btn btn-success btnSubmitEditFiles" >Submit</button>' +
             '</div> ');
 
         $('#NotificationModal').modal({
@@ -432,275 +382,5 @@ $('#btnSaveEditFiles').click(function () {
         });
     });
 
-
-    $(document).on('click','#btnSubmitEditFiles',function () {
-        saveEditFileDocument();
-    });
-
-    $(document).on('click','#btnSubmitFiles',function () {
-        saveFileDocument();
-    });
-
-    function saveEditFileDocument() {
-
-        var formNIP = '<?php echo $NIP; ?>';
-        var NoDocument = $('#NoDocument').val();
-        var DescriptionFile = $('#DescriptionFile').val();
-        var DateDocument = $('#DateDocument').val();
-        var linkotherfile = $('#linkotherfile').val();
-        var typeotherfiles = $('#typeotherfiles').val();
-        var idlinkfiles = $('#idlinkfiles').val();
-        var newdate = DateDocument.split("/").reverse().join("-");
-
-        if(formNIP!=null && formNIP!=''
-                    && NoDocument!='' && NoDocument!=null
-                    && DescriptionFile!='' && DescriptionFile!=null
-                    //&& DateDocument!='' && DateDocument!=null
-                    ){ 
-                    loading_button('#btnSubmitEditFiles');
-                    $('#btnCloseEmployees').prop('disabled',true);
-
-                    var data = {
-                        action : 'EditFilesDocument',
-                        formInsert : {
-                            formNIP : formNIP,
-                            NoDocument : NoDocument,
-                            DateDocument : DateDocument,
-                            typeotherfiles : typeotherfiles,
-                            DescriptionFile : DescriptionFile,
-                            linkotherfile : linkotherfile,
-                            idlinkfiles : idlinkfiles }
-                        };
-
-                    var token = jwt_encode(data,'UAP)(*');
-                    var url = base_url_js+'api/__crudEditAcademicData';
-                    $.post(url,{token:token},function (result) {
-                    
-                        if(result==0 || result=='0'){
-                            toastr.error('NIK / NIP is exist','Error');
-                        } else {  //if success save data
-                
-                            //var formData = new FormData( $("#tagFM_OtherFile")[0]);
-                            //var action = 'OtherFiles';
-                            //var url = base_url_js+'human-resources/upload_academic?c='+type+'&action='+action+'&u='+NIP;
-                                 
-                            //    $.ajax({
-                            //            url : url,  // Controller URL
-                            //            type : 'POST',
-                            //            data : formData,
-                             //           async : false,
-                            //            cache : false,
-                             //           contentType : false,
-                            //            processData : false,
-                             //           success : function(data) {
-                            //        }
-                            //    });   
-
-                                //uploadfile_transcripts(fileName_Transcript);
-                                toastr.success('Document Data Saved','Success');
-
-                        }
-                            setTimeout(function () {
-                                $('#NotificationModal').modal('hide');
-                                window.location.href = '';
-                            },1000);
-
-                        });
-        }
-
-    else {
-            toastr.error('Form Masih ada yang kosong','Error');
-            $('#NotificationModal').modal('hide');
-            return;
-        }
-
-    }
-
-
-    function saveFileDocument() {
-
-        var formNIP = '<?php echo $NIP; ?>';
-        var NoDocument = $('#NoDocument').val();
-        var DescriptionFile = $('#DescriptionFile').val();
-        var DateDocument = $('#DateDocument').val();
-        // var type = $("#typefiles option:selected").attr("id")
-        var type = $("#typefiles option:selected").text();
-        var min=100; 
-        var max=999;  
-        var random =Math.floor(Math.random() * (+max - +min)) + +min; 
-        var ext = 'PDF';
-        var fileName = type+'_'+NIP+'_'+random+'.'+ext;
-        var oFile = document.getElementById("fileOther").files[0]; 
-
-        if(formNIP!=null && formNIP!=''
-                    && NoDocument!='' && NoDocument!=null
-                    && DescriptionFile!='' && DescriptionFile!=null
-                    && DateDocument!='' && DateDocument!=null
-                    && type!='' && type!=null
-                    && oFile!='' && oFile!=null
-                    ){ 
-                    loading_button('#btnSubmitFiles');
-                    $('#btnCloseEmployees').prop('disabled',true);
-
-                    var data = {
-                        action : 'AddFilesDocument',
-                        formInsert : {
-                            NIP : formNIP,
-                            NoDocument : NoDocument,
-                            DateDocument : DateDocument,
-                            type : type,
-                            DescriptionFile : DescriptionFile,
-                            fileName : fileName }
-                    };
-
-                    var token = jwt_encode(data,'UAP)(*');
-                    var url = base_url_js+'api/__crudAcademicData';
-                    $.post(url,{token:token},function (result) {
-                    
-                        if(result==0 || result=='0'){
-                            toastr.error('NIK / NIP is exist','Error');
-                        } else {  //if success save data
-                
-                            if ($('#fileOther').get(0).files.length === 0) {
-                                } else {
-                                    var formData = new FormData( $("#tagFM_OtherFile")[0]);
-                                    var action = 'OtherFiles';
-                                    var url = base_url_js+'human-resources/upload_academic?fileName='+fileName+'&c='+type+'&action='+action+'&u='+NIP;
-                                     
-                                    $.ajax({
-                                        url : url,  // Controller URL
-                                        type : 'POST',
-                                        data : formData,
-                                        async : false,
-                                        cache : false,
-                                        contentType : false,
-                                        processData : false,
-                                        success : function(data) {
-                                    }
-                                });   
-                            }
-                                toastr.success('Other Data Saved','Success');
-                        }
-                            setTimeout(function () {
-                                $('#NotificationModal').modal('hide');
-                                window.location.href = '';
-                            },1000);
-
-                        });
-                }
-            else {
-                toastr.error('form or file are still empty!','Error');
-                $('#NotificationModal').modal('hide');
-                return;
-            }
-    }
-                                                                                                                                                                                                                                                                          
-    function saveFileDocumentold() {
-
-        var formNIP = '<?php echo $NIP; ?>';
-        var NoDocument = $('#NoDocument').val();
-        var DescriptionFile = $('#DescriptionFile').val();
-        var DateDocument = $('#DateDocument').val();
-        var type = $("#typefiles option:selected").attr("id")
-        var min=100; 
-        var max=999;  
-        var random =Math.floor(Math.random() * (+max - +min)) + +min; 
-        var ext = 'PDF';
-        var fileName = type+'_'+NIP+'_'+random+'.'+ext;
-        var oFile = document.getElementById("fileOther").files[0]; 
-
-        if (oFile.size > 5242880) {  // 5 mb for bytes.
-                toastr.error('File Maksimum size 5 Mb!','Error');
-                $('#NotificationModal').modal('hide');
-                //return;
-        } 
-            else {
-
-                if(formNIP!=null && formNIP!=''
-                    && NoDocument!='' && NoDocument!=null
-                    && DescriptionFile!='' && DescriptionFile!=null
-                    && DateDocument!='' && DateDocument!=null
-                    && type!='' && type!=null
-                    ){ 
-                    loading_button('#btnSubmitFiles');
-                    $('#btnCloseEmployees').prop('disabled',true);
-
-                    var data = {
-                        action : 'AddFilesDocument',
-                        formInsert : {
-                            NIP : formNIP,
-                            NoDocument : NoDocument,
-                            DateDocument : DateDocument,
-                            type : type,
-                            DescriptionFile : DescriptionFile,
-                            fileName : fileName }
-                        };
-
-                    var token = jwt_encode(data,'UAP)(*');
-                    var url = base_url_js+'api/__crudAcademicData';
-                    $.post(url,{token:token},function (result) {
-                    
-                        if(result==0 || result=='0'){
-                            toastr.error('NIK / NIP is exist','Error');
-                        } else {  //if success save data
-                
-                            var formData = new FormData( $("#tagFM_OtherFile")[0]);
-                            var action = 'OtherFiles';
-                            var url = base_url_js+'human-resources/upload_academic?fileName='+fileName+'&c='+type+'&action='+action+'&u='+NIP;
-                                 
-                                $.ajax({
-                                        url : url,  // Controller URL
-                                        type : 'POST',
-                                        data : formData,
-                                        async : false,
-                                        cache : false,
-                                        contentType : false,
-                                        processData : false,
-                                        success : function(data) {
-                                    }
-                                });   
-
-                                //uploadfile_transcripts(fileName_Transcript);
-                                toastr.success('Academic Data Saved','Success');
-
-                        }
-                            setTimeout(function () {
-                                $('#NotificationModal').modal('hide');
-                                window.location.href = '';
-                            },1000);
-
-                        });
-                 }
-
-        else {
-            toastr.error('Form Masih ada yang kosong','Error');
-            $('#NotificationModal').modal('hide');
-            return;
-        }
-    }
-}
-
-function uploadfile_transcripts(fileName_Transcript) {
-
-        var NIP = '<?php echo $NIP; ?>';                
-        var type = 'TranscriptS1';
-        var ext = 'PDF';
-        var fileName = fileName_Transcript;
-        var formData = new FormData( $("#tagFM_TranscriptS1")[0]);
-        var url = base_url_js+'human-resources/upload_academic?fileName='+fileName+'&c='+type+'&u='+NIP;
-                                            
-            $.ajax({
-                url : url,  // Controller URL
-                type : 'POST',
-                data : formData,
-                async : false,
-                cache : false,
-                contentType : false,
-                processData : false,
-                    success : function(data) {
-                        
-                    }
-                });   
-}
-
 </script>
+

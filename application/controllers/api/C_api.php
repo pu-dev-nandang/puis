@@ -556,7 +556,7 @@ class C_api extends CI_Controller {
             $sql.= ' em.NIP LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR em.Name LIKE "%'.$requestData['search']['value'].'%" ';
             $sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
-            $sql.= ') ORDER BY NIP,em.PositionMain  ASC';
+            $sql.= ') ORDER BY NIP,em.PositionMain ASC';
 
         }
         else {
@@ -637,7 +637,7 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div style="text-align: center;">'.$status.'</div>';
             $nestedData[] = $StatusFiles;
             
-            $nestedData[] = '<a class="btn btn-info" href="'.base_url('human-resources/academic-details/'.$row["NIP"]).'">
+            $nestedData[] = '<a class="btn btn-primary" href="'.base_url('human-resources/academic-details/'.$row["NIP"]).'">
   <i class="icon-list icon-large"></i> Detail</a>';
 
              $no++;

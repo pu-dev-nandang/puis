@@ -673,7 +673,7 @@ $route['api/__getEmployees'] = 'api/c_api/getEmployees';
 $route['api/employees/searchnip/(:any)'] = 'api/c_api/searchnip_employees/$1';
 
 $route['api/__getEmployeesHR'] = 'api/c_api/getEmployeesHR';
-$route['api/__getfileEmployeesHR'] = 'api/c_api/getfileEmployees'; //add bismar feb 2019
+$route['api/__getfileEmployeesHR'] = 'api/c_api/getfileEmployees'; //add bismar 
 
 $route['api/__setLecturersAvailability'] = 'api/c_api/setLecturersAvailability';
 $route['api/__setLecturersAvailabilityDetail/(:any)'] = 'api/c_api/setLecturersAvailabilityDetail/$1';
