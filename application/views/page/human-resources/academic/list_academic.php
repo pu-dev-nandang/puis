@@ -31,42 +31,14 @@
         loadAcademicDetails();
     });
 
-    $(document).on('click','#btnviewIjazahS1', function () {
-
-        var filesub = $(this).attr('filesub');
-       
-            $('#NotificationModal .modal-header').addClass('hide');
-            $('#NotificationModal .modal-body').html('<center> '+
-            '<iframe src="'+base_url_js+'uploads/files/'+filesub+'" frameborder="0" style="width:745px; height:550px;"></iframe> '+
-            '<br/><br/><button type="button" id="btnRemoveNoEditSc" class="btn btn-primary" data-dismiss="modal">Close</button><button type="button" id="btnRemoveNoEditSc" filesublix ="'+filesub+'" class="btn btn-primary pull-right filesublink" data-toggle="tooltip" data-placement="top" title="Full Review" data-dismiss="modal"><span class="fa fa-external-link"></span></button>' +
-            '</center>');
-            $('#NotificationModal .modal-footer').addClass('hide');
-            $('#NotificationModal').modal({
-                'backdrop' : 'static',
-                'show' : true
-            });
-
-    });
-
-    $(document).on('click','.filesublink', function () {
-
-        var filesubx = $(this).attr('filesublix');
-        var url = base_url_js+'uploads/files/'+filesubx;
-        window.open(url, '_blank',);
-        //win.focus();
-    });
-
     function loadAcademicDetails() {
-        
         var NIP = '<?php echo $NIP; ?>';
         var url = base_url_js+'api/__reviewacademic?NIP='+NIP;
-
         var token = jwt_encode({
             action:'read',
             NIP:NIP},'UAP)(*');
 
         $.post(url,{token:token},function (resultJson) {
-
             //console.log(resultJson);
             var response = resultJson;
             response.sort(function(a, b){
@@ -85,7 +57,7 @@
                         var NameUniversity1 = response[i]['NameUniversity'];
 
                             if (response[i]['LinkFiles'] != null) {
-                                var Ijazah = '<iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button id="btnviewIjazahS1" class="btn btn-sm btn-primary" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
+                                var Ijazah = '<iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btnviewlistsrata" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
                             } else {
                                 var Ijazah = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px;">';
                             }
@@ -104,7 +76,7 @@
                             if (NameUniversity1 == NameUniversity2) {
                                 //var Transcript = response[j]['LinkFiles'];
                                 if (response[j]['LinkFiles'] != null) {
-                                    var Transcript = '<iframe src="'+base_url_js+'uploads/files/'+response[j]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button id="btnviewIjazahS1" class="btn btn-sm btn-primary" filesub ="'+response[j]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
+                                    var Transcript = '<iframe src="'+base_url_js+'uploads/files/'+response[j]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btnviewlistsrata" filesub ="'+response[j]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
                                 } else {
                                     var Transcript = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px">';
                                 }
@@ -161,12 +133,10 @@
                                 var dates = moment(strdate).format('DD-MM-YYYY');
                             } else {
                                 var dates = '00-00-0000';
-
                         }
-                        //var strdate = response[i]['DateIjazah'];
-                        //var dates = moment(strdate).format('DD-MM-YYYY');
+            
                         if (response[i]['LinkFiles'] != null) {
-                            var Ijazah = '<iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button id="btnviewIjazahS1" class="btn btn-sm btn-primary" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
+                            var Ijazah = '<iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btnviewlistsrata" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
                         } else {
                             var Ijazah = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px;">';
                         }
@@ -176,7 +146,7 @@
                             if (NameUniversity1 == NameUniversity2) {
                                 //var Transcript = response[j]['LinkFiles'];
                                     if (response[j]['LinkFiles'] != null) {
-                                        var Transcript = '<iframe src="'+base_url_js+'uploads/files/'+response[j]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button id="btnviewIjazahS1" class="btn btn-sm btn-primary" filesub ="'+response[j]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
+                                        var Transcript = '<iframe src="'+base_url_js+'uploads/files/'+response[j]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btnviewlistsrata" filesub ="'+response[j]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
                                     } else {
                                         var Transcript = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px">';
                                     }
@@ -227,8 +197,14 @@
                 
             }
 
-
         }).done(function() {
         })
+    
+        setTimeout(function () {
+                //$('#loadtablefiles1').html(resultJson);
+            },500)
     };
 </script>
+
+
+
