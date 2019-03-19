@@ -33,7 +33,7 @@
             '                        <th>Message</th>' +
             '                        <th style="width: 10%;">To</th>' +
             '                        <th style="width: 5%;">File</th>' +
-            '                        <th style="width: 15%;">Range Date</th>' +
+            '                        <th style="width: 15%;">Publish Date</th>' +
             '                        <th style="width: 5%;"><i class="fa fa-cog"></i></th>' +
             '                        <th style="width: 11%;">Created By</th>' +
             '                    </tr>' +
@@ -49,7 +49,7 @@
             "iDisplayLength" : 10,
             "ordering" : false,
             "language": {
-                "searchPlaceholder": "Day, Room, Name / NIP Invigilator"
+                "searchPlaceholder": "Title, Message"
             },
             "ajax":{
                 url : base_url_js+"api2/__getAnnouncement", // json datasource
