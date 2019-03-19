@@ -36,10 +36,27 @@ class C_announcement extends Globalclass {
         $this->menu_announcement($page);
     }
 
+    public function edit_announcement($ID){
+
+        $data['ID'] = $ID;
+
+        $page = $this->load->view('page/announcement/edit_announcement',$data,true);
+        $this->menu_announcement($page);
+    }
+
 
     public function upload_files(){
         $IDAnnc = $this->input->get('IDAnnc');
         $fileName = $this->input->get('f');
+
+        $lf = $this->input->get('lf');
+
+        if(isset($lf) && $lf!='') {
+            // Delete last data dulu
+            if(is_file('./uploads/announcement/'.$lf)){
+                unlink('./uploads/announcement/'.$lf);
+            }
+        }
 
 
         $config['upload_path']          = './uploads/announcement/';

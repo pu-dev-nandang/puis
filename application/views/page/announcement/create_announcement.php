@@ -754,9 +754,6 @@
                 var Start = moment(formStart).format('YYYY-MM-DD');
                 var End = moment(formEnd).format('YYYY-MM-DD');
 
-                $('#bpp_start').datepicker("getDate");
-
-
                 var data = {
                     action : 'createAnnouncement',
                     dataAnnc : {
@@ -797,7 +794,7 @@
                         var file = input[0].files[0];
 
                         var fileNameOri = file.name;
-                        var fileName = fileNameOri.split(' ').join('_');
+                        var fileName = moment().unix()+'.pdf';
 
 
                         var formData = new FormData( $("#fileAnnouncement")[0]);
@@ -849,10 +846,18 @@
         var input = $('#formFileAnnc');
         var file = input[0].files[0];
 
-        var fileNameOri = file.name;
-        var fileName = fileNameOri.split(' ').join('_');
-        $('#viewNameFile').html(fileName);
-        $('#viewZise').html('Size : '+(parseFloat(file.size) / 1000000).toFixed(2)+' Mb');
+        $('#btnSubmitAnnouncement').prop('disabled',true);
+
+        if(file.type != 'application/pdf'){
+            alert('The file must be PDF');
+        } else {
+            var fileNameOri = file.name;
+            var fileName = fileNameOri.split(' ').join('_');
+            $('#viewNameFile').html(fileName);
+            $('#viewZise').html('Size : '+(parseFloat(file.size) / 1000000).toFixed(2)+' Mb');
+
+            $('#btnSubmitAnnouncement').prop('disabled',false);
+        }
 
     });
 

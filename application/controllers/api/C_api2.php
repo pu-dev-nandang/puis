@@ -1840,6 +1840,24 @@ class C_api2 extends CI_Controller {
                 return print_r(1);
 
             }
+            else if($data_arr['action']=='loadAnnouncement'){
+
+                $data = $this->db->get_where('db_notifikasi.announcement',array(
+                    'ID' => $data_arr['ID']
+                ))->result_array();
+
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='updateAnnouncement'){
+                $ID = $data_arr['ID'];
+                $dataUpdate = (array) $data_arr['dataUpdate'];
+
+                $this->db->where('ID', $ID);
+                $this->db->update('db_notifikasi.announcement',$dataUpdate);
+
+                return print_r($ID);
+
+            }
 
         }
     }
@@ -1851,15 +1869,14 @@ class C_api2 extends CI_Controller {
         if( !empty($requestData['search']['value']) ) {
 
             $search = $requestData['search']['value'];
-            $dataSearch = ' AND
-                                 (d.NameEng LIKE "%'.$search.'%" OR cl.Room LIKE "%'.$search.'%" 
-                                 OR p1.Name LIKE "%'.$search.'%" OR p2.Name LIKE "%'.$search.'%"
-                                 OR p1.NIP LIKE "%'.$search.'%" OR p2.NIP LIKE "%'.$search.'%" 
-                                 ) ';
+
+            $dataSearch = 'WHERE annc.Title LIKE "%'.$search.'%" OR annc.Message LIKE "%'.$search.'%" ';
+
         }
 
         $queryDefault = 'SELECT annc.*, em.Name FROM db_notifikasi.announcement annc
                                         LEFT JOIN db_employees.employees em ON (em.NIP = annc.CreatedBy)
+                                        '.$dataSearch.'
                                         ORDER BY annc.ID DESC ';
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
@@ -1902,7 +1919,7 @@ class C_api2 extends CI_Controller {
             $nestedData[] = '<div style="text-align:right;">'.$swStd.''.$swEmp.'</div>';
             $nestedData[] = '<div style="text-align:center;">'.$file.'</div>';
             $nestedData[] = '<div style="text-align:center;">'.date('d M Y',strtotime($row['Start'])).' - '.date('d M Y',strtotime($row['End'])).'</div>';
-            $nestedData[] = '<div style="text-align:center;"><button class="btn btn-sm btn-primary"><i class="fa fa-pencil"></i></button></div>';
+            $nestedData[] = '<div style="text-align:center;"><a href="'.base_url('announcement/edit-announcement/'.$row['ID']).'" class="btn btn-sm btn-primary"><i class="fa fa-pencil"></i></a></div>';
             $nestedData[] = '<div style="text-align:right;"><b>'.$row['Name'].'</b><br/>'.
                 date('d M Y H:i',strtotime($row['CreatedAt'])).'</div>';
 

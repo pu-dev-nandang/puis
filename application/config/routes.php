@@ -1097,6 +1097,8 @@ $route['announcement/list-announcement'] = 'page/announcement/c_announcement/lis
 $route['announcement/create-announcement'] = 'page/announcement/c_announcement/create_announcement';
 $route['announcement/upload_files'] = 'page/announcement/c_announcement/upload_files';
 
+$route['announcement/edit-announcement/(:num)'] = 'page/announcement/c_announcement/edit_announcement/$1';
+
 
 
 // budgeting & PR
