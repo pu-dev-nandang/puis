@@ -1765,7 +1765,7 @@ class C_api2 extends CI_Controller {
                                                   LEFT JOIN db_notifikasi.announcement ann 
                                                   ON (annu.IDAnnc = ann.ID)
                                                   WHERE annu.'.$w.' = "'.$UserID.'" AND 
-                                                  annu.Read = "2"
+                                                  annu.Read = "2"  ORDER BY ann.ID DESC
                                                   ')->result_array();
 
                 return print_r(json_encode($data));
