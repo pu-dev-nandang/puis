@@ -596,23 +596,25 @@ class C_api extends CI_Controller {
                 : base_url('images/icon/userfalse.png');
 
             $NIP = $row['NIP'];
+            $getotfiles = 0;
             
             $StatusFiles = array();
             $Get_MasterFiles = $this->m_master->showData_array('db_employees.master_files');
             $StatusFiles = '';
             for ($j=0; $j < count($Get_MasterFiles); $j++) { 
                 $stDefault =' <span class="label label-danger"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
-                $sql2 = 'select count(*) as total, LinkFiles from db_employees.files where NIP = ? and TypeFiles = ?';
+                $sql2 = 'select count(*) as total, LinkFiles from db_employees.files where NIP = ? and TypeFiles = ? and LinkFiles IS NOT NULL';
                 $query2=$this->db->query($sql2, array($NIP,$Get_MasterFiles[$j]['ID']))->result_array();
                 if ($query2[0]['total'] > 0 ) {
-
+                    $getotfiles = $getotfiles + ($query2[0]['total']);
+                    
                     if($query2[0]['LinkFiles'] != null){
                         $stDefault =' <span class="label label-success"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
                     } else {
                         $stDefault =' <span class="label label-danger"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
                     }
-                    
-                } 
+                    //$getotfiles = $query2[0]['total'];
+                }  
                 $StatusFiles .= $stDefault;
             }
 
@@ -636,6 +638,7 @@ class C_api extends CI_Controller {
             $nestedData[] = $Division.' - '.$Position;
             $nestedData[] = '<div style="text-align: center;">'.$status.'</div>';
             $nestedData[] = $StatusFiles;
+            $nestedData[] = '<div style="text-align: center;font-weight: bold;">'.$getotfiles.'</div>';
             
             $nestedData[] = '<a class="btn btn-primary" href="'.base_url('human-resources/academic-details/'.$row["NIP"]).'">
   <i class="icon-list icon-large"></i> Detail</a>';

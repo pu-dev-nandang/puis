@@ -791,7 +791,7 @@ class M_api extends CI_Model {
 
     public function views_academic($NIP) {
 
-        $sql = "SELECT * FROM db_employees.files AS em WHERE em.NIP = '".$NIP."' AND em.TypeFiles IN ('1','2','3','4','5','6') ORDER BY em.TypeAcademic ASC ";
+        $sql = "SELECT * FROM db_employees.files AS em WHERE em.NIP = '".$NIP."' AND em.TypeFiles IN ('1','2','3','4','5','6') AND LinkFiles IS NOT NULL ORDER BY em.TypeAcademic ASC ";
         $query=$this->db->query($sql, array());
         return $query->result_array();
 
@@ -813,7 +813,7 @@ class M_api extends CI_Model {
         
              $sql = "SELECT NIP, TypeAcademic, NameUniversity, TypeFiles, LinkFiles
                     FROM db_employees.files 
-                    WHERE NIP ='".$NIP."' AND TypeAcademic ='".$srata."' ";
+                    WHERE NIP ='".$NIP."' AND TypeAcademic ='".$srata."' AND LinkFiles IS NOT NULL";
              $query=$this->db->query($sql, array());
              return $query->result_array();
         
