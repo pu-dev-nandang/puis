@@ -791,12 +791,8 @@
                     var input = $('#formFileAnnc');
 
                     if(input[0].files.length>0){
-                        var file = input[0].files[0];
 
-                        var fileNameOri = file.name;
-                        var fileName = moment().unix()+'.pdf';
-
-
+                        var fileName = sessionNIP+'_'+moment().unix()+'.pdf';
                         var formData = new FormData( $("#fileAnnouncement")[0]);
 
                         var url = base_url_js+'announcement/upload_files?IDAnnc='+IDAnnc+'&f='+fileName;

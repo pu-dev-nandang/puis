@@ -1748,7 +1748,7 @@ class C_api2 extends CI_Controller {
                                                   ON (annu.IDAnnc = ann.ID)
                                                   WHERE annu.'.$w.' = "'.$UserID.'" AND 
                                                   ann.Start <= "'.$dateNow.'" AND 
-                                                  ann.End >= "'.$dateNow.'" ')->result_array();
+                                                  ann.End >= "'.$dateNow.'" ORDER BY ann.ID DESC ')->result_array();
 
                 return print_r(json_encode($data));
 
