@@ -23,12 +23,14 @@
                     <form id="fileAnnouncement" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
                         <div class="form-group">
                             <label class="btn btn-sm btn-default btn-upload">
-                                <i class="fa fa-upload margin-right"></i> File (.pdf)
+                                <i class="fa fa-upload margin-right"></i> File (.pdf | Max 2 Mb)
                                 <input type="file" id="formFileAnnc" name="userfile" class="upload_files"
                                        style="display: none;" accept="application/pdf">
                             </label>
                             <p class="help-block" id="viewNameFile"></p>
                             <p class="help-block" id="viewZise"></p>
+
+                            <div id="alertFile"></div>
 
                         </div>
                     </form>
@@ -137,6 +139,11 @@
             $('#viewNameFile').html(fileName);
             $('#viewZise').html('Size : '+(parseFloat(file.size) / 1000000).toFixed(2)+' Mb');
 
+            if(fileSize>2){
+                alert('File lebih dari 2 MB');
+                $('#alertFile').html('<div class="alert alert-danger" role="alert">File lebih dari 2 MB, jika di submit maka file <b>tidak akan diunggah</b></div>');
+            }
+
             $('#btnSubmitAnnouncement').prop('disabled',false);
         }
 
@@ -176,7 +183,11 @@
 
                 var IDAnnc = result;
                 var input = $('#formFileAnnc');
-                if(input[0].files.length>0){
+                var file = input[0].files[0];
+                // cek apakah file lebih dari 2 mb ?
+                var fileSize = (parseFloat(file.size) / 1000000).toFixed(2);
+
+                if(input[0].files.length>0 && fileSize<=2){
 
                     var fileName = sessionNIP+'_'+moment().unix()+'.pdf';
 
