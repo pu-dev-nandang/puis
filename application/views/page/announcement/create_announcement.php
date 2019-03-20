@@ -793,32 +793,38 @@
                     var IDAnnc = result;
 
                     var input = $('#formFileAnnc');
-                    var file = input[0].files[0];
-                    // cek apakah file lebih dari 2 mb ?
-                    var fileSize = (parseFloat(file.size) / 1000000).toFixed(2);
 
-                    if(input[0].files.length>0 && fileSize<=2){
 
-                        var fileName = sessionNIP+'_'+moment().unix()+'.pdf';
-                        var formData = new FormData( $("#fileAnnouncement")[0]);
+                    if(input[0].files.length>0){
 
-                        var url = base_url_js+'announcement/upload_files?IDAnnc='+IDAnnc+'&f='+fileName;
+                        var file = input[0].files[0];
+                        // cek apakah file lebih dari 2 mb ?
+                        var fileSize = (parseFloat(file.size) / 1000000).toFixed(2);
 
-                        $.ajax({
-                            url : url,  // Controller URL
-                            type : 'POST',
-                            data : formData,
-                            async : false,
-                            cache : false,
-                            contentType : false,
-                            processData : false,
-                            success : function(data) {
-                                toastr.success('Announcement Created','Success');
-                                setTimeout(function () {
-                                    window.location.href = '';
-                                },500);
-                            }
-                        });
+                        if(fileSize<=2){
+                            var fileName = sessionNIP+'_'+moment().unix()+'.pdf';
+                            var formData = new FormData( $("#fileAnnouncement")[0]);
+
+                            var url = base_url_js+'announcement/upload_files?IDAnnc='+IDAnnc+'&f='+fileName;
+
+                            $.ajax({
+                                url : url,  // Controller URL
+                                type : 'POST',
+                                data : formData,
+                                async : false,
+                                cache : false,
+                                contentType : false,
+                                processData : false,
+                                success : function(data) {
+                                    toastr.success('Announcement Created','Success');
+                                    setTimeout(function () {
+                                        window.location.href = '';
+                                    },500);
+                                }
+                            });
+                        }
+
+
                     }
                     else {
                         toastr.success('Announcement Created','Success');
