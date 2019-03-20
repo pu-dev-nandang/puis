@@ -360,7 +360,7 @@
         var filterSemester = $('#filterSemester').val();
         if(filterSemester!='' && filterSemester!=null){
             var SemesterID = filterSemester.split('.')[0];
-            loadSelectOptionClassGroupAttendance(SemesterID,'#filterClassGroup','');
+            loadSelectOptionClassGroupAttendance(SemesterID,'#filterClassGroup','','CourseEng');
             $('#filterClassGroup').select2({allowClear: true});
         }
     }

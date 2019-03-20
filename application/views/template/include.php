@@ -805,9 +805,8 @@
     }
 
 
-    function loadSelectOptionClassGroupAttendance(SemesterID,element,selected) {
+    function loadSelectOptionClassGroupAttendance(SemesterID,element,selected,showColom='') {
 
-        // var url = base_url_js+'academic/kurikulum/getClassGroup';
         var url = base_url_js+'api/__crudSchedule';
         var token = jwt_encode({action:'getClassGroup',SemesterID:SemesterID},'UAP)(*');
 
@@ -817,7 +816,11 @@
 
                 var d = jsonResult[i];
 
-                $(element).append('<option value="'+d.ScheduleID+'.'+d.ClassGroup+'">'+d.ClassGroup+' - '+d.Name+'</option>');
+                var textV = (typeof showColom !== 'undefined' && showColom!='')
+                    ? d[''+showColom]
+                    : d.Name;
+
+                $(element).append('<option value="'+d.ScheduleID+'.'+d.ClassGroup+'">'+d.ClassGroup+' - '+textV+'</option>');
             }
 
         });

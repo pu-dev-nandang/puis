@@ -1479,9 +1479,12 @@ class C_api extends CI_Controller {
             }
 
             else if($data_arr['action']=='getClassGroup'){
-                $data = $this->db->query('SELECT s.ID AS ScheduleID,s.ClassGroup, em.Name FROM db_academic.schedule s 
+                $data = $this->db->query('SELECT s.ID AS ScheduleID,s.ClassGroup, em.Name, mk.NameEng AS CourseEng FROM db_academic.schedule s 
                                                   LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                                  LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                  LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
                                                   WHERE s.SemesterID = "'.$data_arr['SemesterID'].'"
+                                                  GROUP BY s.ID
                                                    ORDER BY s.ClassGroup ASC ')->result_array();
 
                 return print_r(json_encode($data));
@@ -2624,9 +2627,7 @@ class C_api extends CI_Controller {
 
 
     public function getClassGroup(){
-//        $token = $this->input->post('token');
-//        $key = "UAP)(*";
-//        $data_arr = (array) $this->jwt->decode($token,$key);
+
         $data_arr = $this->getInputToken();
 
         $data = $this->m_api->__checkClassGroup(
