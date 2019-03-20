@@ -1187,21 +1187,11 @@ class C_budgeting extends Budgeting_Controler {
         $this->auth_ajax();
         $arr_result = array('html' => '','jsonPass' => '');
         $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
-        $arr_bulan = $this->m_master->getShowIntervalBulan($get[0]['StartPeriod'],$get[0]['EndPeriod']);
         $this->data['arr_Year'] = $this->m_master->showData_array('db_budgeting.cfg_dateperiod');
-        $Year = ($Year == null ) ? $get[0]['Year'] : $Year;
         $Departement = $this->session->userdata('IDDepartementPUBudget');
-        $get = $this->m_budgeting->getPostDepartementForDomApproval($Year,$Departement);
-        $this->data['fin'] = 0;
-        if ($Departement == 'NA.9') {
-            $this->data['fin'] = 1;
-        }
-        $this->data['Year'] = $Year;
-        $this->data['Departement'] = $Departement;
-        $this->data['arr_PostBudget'] = $get['data'];
-        $this->data['arr_bulan'] = $arr_bulan;
-        // get API Department PU
-        $this->data['arr_department_pu'] = $this->m_master->apiservertoserver(url_pas.'api/__getAllDepartementPU','');
+        // filtering auth department cfg_approval_budget
+        $arr_department_pu = $this->m_budgeting->Budget_department_auth($Departement);
+        $this->data['arr_department_pu'] = $arr_department_pu;
         $arr_result['html'] = $this->load->view('global/budgeting/form_entry_budgeting',$this->data,true);
         echo json_encode($arr_result);
     }
@@ -1251,7 +1241,10 @@ class C_budgeting extends Budgeting_Controler {
         $Input = $this->getInputToken();
         $Year = $Input['Year'];
         $Departement = $Input['Departement'];
+        $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Year',$Year);
         $arr_result = array('creator_budget_approval' => array(),'creator_budget' => array());
+        $arr_bulan = $this->m_master->getShowIntervalBulan($get[0]['StartPeriod'],$get[0]['EndPeriod']);
+        $arr_result['arr_bulan'] = $arr_bulan;
         $get = $this->m_budgeting->get_creator_budget_approval($Year,$Departement,'');
         if (count($get) > 0) {
             // get Creator Budget
@@ -1259,6 +1252,10 @@ class C_budgeting extends Budgeting_Controler {
             $arr_result['creator_budget_approval'] = $get;
             $arr_result['creator_budget'] = $get2;
         }
+        
+        $get = $this->m_budgeting->getPostDepartementForDomApproval($Year,$Departement);
+        $arr_result['PostBudget'] = $get;
+        $arr_result['Approval'] = $this->m_budgeting->get_cfg_set_roleuser_budgeting($Departement); 
 
         echo json_encode($arr_result);
     }

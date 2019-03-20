@@ -12,12 +12,12 @@
         </li>
         <?php endif ?>
         <li class="<?php if($request==null || $request=='EntryBudget'){echo "active";} ?>">
-            <a href="javascript:void(0)" class="pageAnchor" page = "EntryBudget">Entry Budget</a>
+            <a href="javascript:void(0)" class="pageAnchor" page = "EntryBudget">Set Budget</a>
         </li>
         <?php if ($this->session->userdata('IDDepartementPUBudget') == 'NA.9'): ?>
-        <li class="<?php if($request=='Approval'){echo "active";} ?>">
+        <!-- <li class="<?php if($request=='Approval'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "Approval">Request Approval</a>
-        </li>
+        </li> -->
         <li class="<?php if($request=='ListBudgetDepartement'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "ListBudgetDepartement">Budget Approved</a>
         </li>

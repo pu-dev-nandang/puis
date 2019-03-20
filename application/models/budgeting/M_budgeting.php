@@ -239,13 +239,17 @@ class M_budgeting extends CI_Model {
     public function getPostDepartementForDomApproval($Year,$Departement)
     {
         $arr_result = array();
-        $get_Data = $this->m_master->caribasedprimary('db_budgeting.cfg_head_account','Departement',$Departement);
+        $get_Data = $this->getPostDepartementEx($Year,$Departement);
+        // copy remaining = Budget
+        for ($i=0; $i < count($get_Data); $i++) { 
+            $get_Data[$i]['Remaining'] = $get_Data[$i]['Budget'];
+        }
         $sql = 'select a.CodePostRealisasi,a.CodeHeadAccount,b.Name as NameHeadAccount,a.RealisasiPostName,b.Departement,c.CodePost,c.PostName from db_budgeting.cfg_postrealisasi as a join db_budgeting.cfg_head_account as b on a.CodeHeadAccount = b.CodeHeadAccount
             join db_budgeting.cfg_post as c on c.CodePost = b.CodePost
                 where a.Active = 1 and b.Departement = ? order by a.CodePostRealisasi desc
                 ';
         $query=$this->db->query($sql, array($Departement))->result_array();
-        $arr_result = array('data' => $query,'OpPostRealisasi' => $get_Data);
+        $arr_result = array('data' => $query,'getPostDepartement' => $get_Data);
         return $arr_result;
 
     }
@@ -913,5 +917,69 @@ class M_budgeting extends CI_Model {
         );
 
         $this->db->insert('db_budgeting.pr_circulation_sheet',$dataSave);
+    }
+
+    public function Budget_department_auth($Departement)
+    {
+        $rs = array();
+        $NIP =$this->session->userdata('NIP');
+        // get all department
+        $arr = $this->m_master->apiservertoserver(url_pas.'api/__getAllDepartementPU','');
+        // get auth
+        $F = $this->m_master->caribasedprimary('db_budgeting.cfg_approval_budget','NIP',$NIP);
+        // filtering
+        if ($Departement == 'NA.9') {
+            // get setiap departement
+            for ($i=0; $i < count($arr); $i++) { 
+                // find di cfg_approval_budget
+                $bool = false;
+                for ($j=0; $j < count($F); $j++) { 
+                    $NIPDB = $F[$j]['NIP'];
+                    if ($NIP == $NIPDB) {
+                        $bool = true;
+                        $arr[$i] = $arr[$i] + array(
+                             'ID_m_userrole' => $F[$j]['ID_m_userrole'],
+                             'Visible' => $F[$j]['Visible'],
+                             'TypeDesc' => $F[$j]['TypeDesc'],
+                             'NIP' => $F[$j]['NIP'],
+                         ); 
+                        break;
+                    }
+                }
+
+                if (!$bool) {
+                   $arr[$i] = $arr[$i] + array(
+                        'ID_m_userrole' => 0,
+                        'Visible' => 'No',
+                        'TypeDesc' => '',
+                        'NIP' => $NIP
+                    ); 
+                }
+            }
+            $rs = $arr;
+        }
+        else
+        {
+            for ($i=0; $i < count($F); $i++) { 
+               $NIPDB = $F[$i]['NIP'];
+               $D = $F[$i]['Departement'];
+               if ($NIP == $NIPDB) {
+                   for ($j=0; $j < count($arr); $j++) { 
+                       $D2 = $arr[$j]['Code'];
+                       if ($D == $D2) {
+                           $rs[] = $arr[$j] + array(
+                            'ID_m_userrole' => $F[$i]['ID_m_userrole'],
+                            'Visible' => $F[$i]['Visible'],
+                            'TypeDesc' => $F[$i]['TypeDesc'],
+                            'NIP' => $F[$i]['NIP'],
+                           );
+                       }
+                   }
+               }
+            } 
+        }
+
+        return $rs;
+
     }  
 }
