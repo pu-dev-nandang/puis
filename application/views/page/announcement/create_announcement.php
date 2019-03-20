@@ -45,7 +45,7 @@
                             <select class="form-control" id="fpLecturer">
                                 <option value="0">Not for Employees</option>
                                 <option disabled>---------</option>
-                                <option value="1">Status Employees</option>
+<!--                                <option value="1">Status Employees</option>-->
                                 <option value="2">Any Employees</option>
                             </select>
                         </div>
@@ -89,12 +89,15 @@
                     <form id="fileAnnouncement" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
                         <div class="form-group">
                             <label class="btn btn-sm btn-default btn-upload">
-                                <i class="fa fa-upload margin-right"></i> File (.pdf)
+                                <i class="fa fa-upload margin-right"></i> File (.pdf | max 2 Mb)
                                 <input type="file" id="formFileAnnc" name="userfile" class="upload_files"
                                        style="display: none;" accept="application/pdf">
                             </label>
                             <p class="help-block" id="viewNameFile"></p>
                             <p class="help-block" id="viewZise"></p>
+
+                            <div id="alertFile"></div>
+
 
                         </div>
                     </form>
@@ -199,7 +202,7 @@
 
             $('#viewPanelStd').html(viewPanel);
 
-            $('#filterCurriculum').append('<option value="0">All Class Of</option>');
+            $('#filterCurriculum').append('<option disabled selected>Select Class Of</option><option disabled>--------</option>');
             $('#filterBaseProdi').append('<option value="0">All Programme Study</option>');
 
             loadSelectOptionClassOf_ASC('#filterCurriculum','');
@@ -369,9 +372,10 @@
     function loadStudent2Annc() {
 
         var fpStudent = $('#fpStudent').val();
-        if(fpStudent==1 || fpStudent=='1'){
+        var filterCurriculum = $('#filterCurriculum').val();
+        if((fpStudent==1 || fpStudent=='1') && (filterCurriculum!=null && filterCurriculum!='')){
 
-            var filterCurriculum = $('#filterCurriculum').val();
+
             var filterBaseProdi = $('#filterBaseProdi').val();
             // var Status = $('#filterStatus').val();
 
@@ -789,8 +793,11 @@
                     var IDAnnc = result;
 
                     var input = $('#formFileAnnc');
+                    var file = input[0].files[0];
+                    // cek apakah file lebih dari 2 mb ?
+                    var fileSize = (parseFloat(file.size) / 1000000).toFixed(2);
 
-                    if(input[0].files.length>0){
+                    if(input[0].files.length>0 && fileSize<=2){
 
                         var fileName = sessionNIP+'_'+moment().unix()+'.pdf';
                         var formData = new FormData( $("#fileAnnouncement")[0]);
@@ -849,10 +856,20 @@
         } else {
             var fileNameOri = file.name;
             var fileName = fileNameOri.split(' ').join('_');
+            var fileSize = (parseFloat(file.size) / 1000000).toFixed(2);
             $('#viewNameFile').html(fileName);
-            $('#viewZise').html('Size : '+(parseFloat(file.size) / 1000000).toFixed(2)+' Mb');
+            $('#viewZise').html('Size : '+fileSize+' Mb');
+
+            if(fileSize>2){
+                alert('File lebih dari 2 MB');
+                $('#alertFile').html('<div class="alert alert-danger" role="alert">File lebih dari 2 MB, jika di submit maka file <b>tidak akan diunggah</b></div>');
+            }
 
             $('#btnSubmitAnnouncement').prop('disabled',false);
+
+
+
+
         }
 
     });
