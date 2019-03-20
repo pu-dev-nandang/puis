@@ -859,7 +859,7 @@
             var fileSize = (parseFloat(file.size) / 1000000).toFixed(2);
             $('#viewNameFile').html(fileName);
             $('#viewZise').html('Size : '+fileSize+' Mb');
-
+            $('#alertFile').html('');
             if(fileSize>2){
                 alert('File lebih dari 2 MB');
                 $('#alertFile').html('<div class="alert alert-danger" role="alert">File lebih dari 2 MB, jika di submit maka file <b>tidak akan diunggah</b></div>');
