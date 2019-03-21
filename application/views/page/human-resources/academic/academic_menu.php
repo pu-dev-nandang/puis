@@ -85,10 +85,7 @@
             page : 'academic_details'
         };
         var token = jwt_encode(data,'UAP)(*');
-
         loadPage(token);
-
-
         window.Lecturer_NIP = 0;
 
         $('input[id$="endTime"]').datetimepicker({
@@ -104,7 +101,6 @@
             page : page
         };
         var token = jwt_encode(data,'UAP)(*');
-
         loadPage(token);
     });
 

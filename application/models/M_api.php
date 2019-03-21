@@ -791,7 +791,7 @@ class M_api extends CI_Model {
 
     public function views_academic($NIP) {
 
-        $sql = "SELECT * FROM db_employees.files AS em WHERE em.NIP = '".$NIP."' AND em.TypeFiles IN ('1','2','3','4','5','6') AND LinkFiles IS NOT NULL ORDER BY em.TypeAcademic ASC ";
+        $sql = "SELECT * FROM db_employees.files AS em WHERE em.NIP = '".$NIP."' AND em.TypeFiles IN ('1','2','3','4','5','6') AND Aktif = '1' AND LinkFiles IS NOT NULL ORDER BY em.TypeAcademic ASC ";
         $query=$this->db->query($sql, array());
         return $query->result_array();
 
@@ -803,7 +803,7 @@ class M_api extends CI_Model {
         $sql = "SELECT f.*, m.NameFiles
             FROM db_employees.files AS f
             LEFT JOIN db_employees.master_files AS m ON (f.TypeFiles = m.ID)
-            WHERE f.NIP = '".$NIP."' AND m.Type ='1' AND LinkFiles IS NOT NULL";
+            WHERE f.NIP = '".$NIP."' AND m.Type ='1' AND Aktif = '1' AND LinkFiles IS NOT NULL";
 
         $query=$this->db->query($sql, array());
         return $query->result_array();
@@ -813,7 +813,7 @@ class M_api extends CI_Model {
         
              $sql = "SELECT NIP, TypeAcademic, NameUniversity, TypeFiles, LinkFiles
                     FROM db_employees.files 
-                    WHERE NIP ='".$NIP."' AND TypeAcademic ='".$srata."' AND LinkFiles IS NOT NULL";
+                    WHERE NIP ='".$NIP."' AND TypeAcademic ='".$srata."' AND Aktif = '1' AND LinkFiles IS NOT NULL";
              $query=$this->db->query($sql, array());
              return $query->result_array();
         
@@ -849,6 +849,15 @@ class M_api extends CI_Model {
             WHERE NIP ='".$NIP."' AND IjazahFile='".$NIP."' AND TranscriptFile='".$NIP."' ";
         $query=$this->db->query($sql);
     }
+
+
+     public function delistacademicemployee($ID1, $ID2){
+
+        $sql = "UPDATE db_employees.files SET Aktif='0' WHERE ID IN ('".$ID1."', '".$ID2."') ";
+        $query=$this->db->query($sql);
+
+     }
+    
 
 
     // ====== Get Jadwal Per Day =======

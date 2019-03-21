@@ -55,6 +55,7 @@
                     if (response[i]['TypeAcademic'] == 'S1' ) {
                         //var NameUniversity1 = response[i]['NameUniversity'].toLowerCase();
                         var NameUniversity1 = response[i]['NameUniversity'];
+                        var Idlist1 = response[i]['ID'];
 
                             if (response[i]['LinkFiles'] != null) {
                                 var Ijazah = '<iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btnviewlistsrata" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
@@ -70,9 +71,11 @@
 
                             }
 
-                        for (var j = i+1; j < response.length; j++) {
-                            //var NameUniversity2 = response[j]['NameUniversity'].toLowerCase();
-                            var NameUniversity2 = response[i]['NameUniversity'];
+                    for (var j = i+1; j < response.length; j++) {
+    
+                        var NameUniversity2 = response[j]['NameUniversity'];
+                        var Idlist2 = response[j]['ID'];
+
                             if (NameUniversity1 == NameUniversity2) {
                                 //var Transcript = response[j]['LinkFiles'];
                                 if (response[j]['LinkFiles'] != null) {
@@ -81,9 +84,9 @@
                                     var Transcript = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px">';
                                 }
 
-                                $("#loadtableNow").append(  ' <div class="panel panel-default"> '+
+                                $("#loadtableNow").append('<div class="panel panel-default"> '+
                                 '<div class="panel-body" style="padding: 0px;"> '+
-                                '<h3 class="heading-small">Academic '+response[i]['TypeAcademic']+'</h3> '+
+                                '<h3 class="heading-small">Academic '+response[i]['TypeAcademic']+'  <div class="btn-group pull-right"><button class="btn btn-xs btn-danger btn-circle btndelist" data-toggle="tooltip" data-placement="top" title="Delete" listid1 ="'+Idlist1+'" listid2 ="'+Idlist2+'"><i class="fa fa-trash"></i></button></div></h3>'+
                                 '<table id="dataPersonal" class="table table-bordered table-striped table-data" style="margin-bottom: 0px;"> '+
                                 '<tr> '+
                                 '<td style="width: 25%;">Name University</td> '+
@@ -124,10 +127,10 @@
                         }
 
                     }
-                    else
-                    {
+                    else {
                         //var NameUniversity1 = response[i]['NameUniversity'].toLowerCase();
                         var NameUniversity1 = response[i]['NameUniversity'];
+                        var Idlist1 = response[i]['ID'];
                         if (response[i]['DateIjazah'] != null) {
                                 var strdate = response[i]['DateIjazah'];
                                 var dates = moment(strdate).format('DD-MM-YYYY');
@@ -143,6 +146,7 @@
                         for (var j = i+1; j < response.length; j++) {
                             //var NameUniversity2 = response[j]['NameUniversity'].toLowerCase();
                             var NameUniversity2 = response[j]['NameUniversity'];
+                            var Idlist2 = response[j]['ID'];
                             if (NameUniversity1 == NameUniversity2) {
                                 //var Transcript = response[j]['LinkFiles'];
                                     if (response[j]['LinkFiles'] != null) {
@@ -152,7 +156,7 @@
                                     }
                         $("#loadtableS2").append( '<div class="panel panel-default"> '+
                             '<div class="panel-body" style="padding: 0px;"> '+
-                                '<h3 class="heading-small">Academic '+response[i]['TypeAcademic']+'</h3> '+
+                                '<h3 class="heading-small">Academic '+response[i]['TypeAcademic']+'  <div class="btn-group pull-right"><button class="btn btn-xs btn-danger btn-circle btndelist" data-toggle="tooltip" data-placement="top" title="Delete" listid1 ="'+Idlist1+'" listid2 ="'+Idlist2+'"><i class="fa fa-trash"></i></button></div></h3>'+
                                 '<table id="dataPersonal" class="table table-bordered table-striped table-data" style="margin-bottom: 0px;"> '+
                                 '<tr> '+
                                 '<td style="width: 25%;">Name University</td> '+
@@ -206,5 +210,34 @@
     };
 </script>
 
+
+<script>
+     $(document).on('click','.btndelist',function () {
+        if (window.confirm('Are you sure to delete data?')) {
+            //loading_button('#btndelist');
+
+            var acaid1 = $(this).attr('listid1');
+            var acaid2 = $(this).attr('listid2');
+            var data = {
+                action : 'delete',
+                ID1 : acaid1,
+                ID2 : acaid2,
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+"api/__delistacaemploy";
+            $.post(url,{token:token},function (result) {
+                
+                setTimeout(function () {
+                    toastr.success('Success Delete Data!','Success'); 
+                    window.location.href = '';
+                },1000);
+                loadAcademicDetails();
+            });
+        }
+    });
+
+
+</script>
 
 
