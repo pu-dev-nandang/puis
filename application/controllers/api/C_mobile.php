@@ -141,11 +141,78 @@ class C_mobile extends CI_Controller {
 
     private function getdataStudent($NPM){
 
-        $dataStd = $this->db->query('SELECT ats.*, ps.Name AS Prodi , ps.NameEng AS ProdiEng  
-                                        FORM db_academic.auth_students ats
+        $dataStd = $this->db->query('SELECT ats.*, ps.Name AS Prodi , ps.NameEng AS ProdiEng, c.ID AS CurriculumID
+                                        FROM db_academic.auth_students ats
                                         LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
-                                        WHERE ats.NPM = "'.$NPM.'" ')
+                                        LEFT JOIN db_academic.curriculum c ON (c.Year = ats.Year)
+                                        WHERE ats.NPM = "'.$NPM.'" LIMIT 1')
             ->result_array();
+
+        if(count($dataStd)>0){
+            $d = $dataStd[0];
+            $dataTotalSmt = $this->db->query('SELECT s.* FROM db_academic.semester s 
+                                                    WHERE s.ID >= (SELECT ID FROM db_academic.semester s2 
+                                                    WHERE s2.Year="'.$d['Year'].'" 
+                                                    LIMIT 1)')->result_array();
+
+
+            $smt = 0;
+            $SemesterName ='';
+            $SemesterCode='';
+            $SemesterID = 0;
+            if(count($dataTotalSmt)>0){
+                for($s=0;$s<count($dataTotalSmt);$s++){
+                    if($dataTotalSmt[$s]['Status']=='1'){
+                        $smt += 1;
+                        $SemesterName = $dataTotalSmt[$s]['Name'];
+                        $SemesterCode=$dataTotalSmt[$s]['Code'];
+                        $SemesterID = $dataTotalSmt[$s]['ID'];
+                        break;
+                    } else {
+                        $smt += 1;
+                    }
+                }
+            }
+
+
+            $dataStd[0]['SemesterNow'] = $smt;
+            $dataStd[0]['SemesterID'] = $SemesterID;
+            $dataStd[0]['SemesterName'] = $SemesterName;
+            $dataStd[0]['SemesterCode'] = $SemesterCode;
+
+            // Get Total Credit
+            $db = 'ta_'.$d['Year'];
+
+            $dataSp = $this->db->query('SELECT sp.* FROM '.$db.'.study_planning sp WHERE sp.ShowTranscript ');
+
+            $TotalCredit = 0;
+
+
+            $TotalGradeValue = 0;
+            $TotalCredit_IPS = 0;
+            $TotalGradeValue_IPS = 0;
+            if(count($dataSp)>0){
+                foreach ($dataSp AS $itemSP){
+
+                    $TotalCredit = $TotalCredit + $itemSP['Credit'];
+                    $TotalGradeValue = $TotalGradeValue + ($itemSP['Credit'] * $itemSP['GradeValue']);
+
+                    if($SemesterID!=$itemSP['SemesterID']){
+                        $TotalCredit_IPS = $TotalCredit_IPS + $itemSP['Credit'];
+                        $TotalGradeValue_IPS = $TotalGradeValue_IPS + ($itemSP['Credit'] * $itemSP['GradeValue']);
+                    }
+
+                }
+            }
+
+            $IPK = ($TotalCredit>0) ? $TotalGradeValue / $TotalCredit : 0;
+            $LastIPS = ($TotalCredit_IPS>0) ? $TotalGradeValue_IPS / $TotalCredit_IPS : 0;
+
+            $dataStd[0]['IPK'] = $IPK;
+            $dataStd[0]['LastIPS'] = $LastIPS;
+            
+
+        }
 
         return $dataStd;
     }
