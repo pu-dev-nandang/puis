@@ -66,8 +66,7 @@ class C_mobile extends CI_Controller {
             if($dIT['DevelopMode']==1 || $dIT['DevelopMode']=='1'){
 
                 // Get data student
-                $dataStd = $this->db->get_where('db_academic.auth_students',
-                    array('NPM' => $data_arr['NPM']))->result_array();
+                $dataStd = $this->getdataStudent($data_arr['NPM']);
 
                 if(count($dataStd)>0){
                     $photo = $this->getPhoto($dataStd[0]['Year'],$data_arr['NPM']);
@@ -129,6 +128,24 @@ class C_mobile extends CI_Controller {
                 'NPM' => $NPM,
                 'Password' => $pass
             ))->result_array();
+
+        $rest = [];
+        if(count($dataStd)>0){
+            $rest = $this->getdataStudent($NPM);
+        }
+
+
+
+        return $rest;
+    }
+
+    private function getdataStudent($NPM){
+
+        $dataStd = $this->db->query('SELECT ats.*, ps.Name AS Prodi , ps.NameEng AS ProdiEng  
+                                        FORM db_academic.auth_students ats
+                                        LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
+                                        WHERE ats.NPM = "'.$NPM.'" ')
+            ->result_array();
 
         return $dataStd;
     }
