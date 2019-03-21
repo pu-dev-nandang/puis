@@ -948,6 +948,7 @@ $route['api2/__getMonitoringAttendance'] = 'api/c_api2/getMonitoringAttendance';
 $route['api2/__crudAnnouncement'] = 'api/c_api2/crudAnnouncement';
 
 $route['api3/login'] = 'api/c_mobile/login';
+$route['test_mobile'] = 'api/c_mobile/test_mobile';
 
 
 // Penutup API 2 ===

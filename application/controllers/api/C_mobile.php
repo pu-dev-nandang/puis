@@ -139,6 +139,11 @@ class C_mobile extends CI_Controller {
         return $rest;
     }
 
+    public function test_mobile(){
+        $data = $this->getdataStudent('21150001');
+        print_r($data);
+    }
+
     private function getdataStudent($NPM){
 
         $dataStd = $this->db->query('SELECT ats.*, ps.Name AS Prodi , ps.NameEng AS ProdiEng, c.ID AS CurriculumID
@@ -183,7 +188,7 @@ class C_mobile extends CI_Controller {
             // Get Total Credit
             $db = 'ta_'.$d['Year'];
 
-            $dataSp = $this->db->query('SELECT sp.* FROM '.$db.'.study_planning sp WHERE sp.ShowTranscript ');
+            $dataSp = $this->db->query('SELECT sp.* FROM '.$db.'.study_planning sp WHERE sp.ShowTranscript ')->result_array();
 
             $TotalCredit = 0;
 
@@ -208,9 +213,9 @@ class C_mobile extends CI_Controller {
             $IPK = ($TotalCredit>0) ? $TotalGradeValue / $TotalCredit : 0;
             $LastIPS = ($TotalCredit_IPS>0) ? $TotalGradeValue_IPS / $TotalCredit_IPS : 0;
 
-            $dataStd[0]['IPK'] = $IPK;
-            $dataStd[0]['LastIPS'] = $LastIPS;
-            
+            $dataStd[0]['IPK'] = round($IPK,2);
+            $dataStd[0]['LastIPS'] = round($LastIPS,2);
+
 
         }
 
