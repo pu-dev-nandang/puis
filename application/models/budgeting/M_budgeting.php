@@ -289,10 +289,39 @@ class M_budgeting extends CI_Model {
                 from db_budgeting.cfg_m_userrole as a left join (select * from db_budgeting.cfg_approval_budget where Departement = ? ) as c
                 on a.ID = c.ID_m_userrole
                 left join db_employees.employees as b on b.NIP = c.NIP 
-                order by a.NameUserRole asc
+                order by c.ID asc
                 ';
         $query=$this->db->query($sql, array($Departement))->result_array();
         return $query;
+    }
+
+    public function get_approval_budgeting($Departement)
+    {
+        $sql = 'select a.*,b.Name as NamaUser,b.NIP,c.Departement,c.ID as ID_set_roleuser,c.Visible,c.TypeDesc,d.Name as NameTypeDesc
+                from db_budgeting.cfg_m_userrole as a join (select * from db_budgeting.cfg_approval_budget where Departement = ? ) as c
+                on a.ID = c.ID_m_userrole
+                left join db_employees.employees as b on b.NIP = c.NIP 
+                join db_budgeting.cfg_m_type_approval as d on d.ID = c.TypeDesc
+                where a.ID > 1
+                order by c.ID asc
+                ';
+        $query=$this->db->query($sql, array($Departement))->result_array();
+        return $query;
+    }
+
+    public function log_budget($ID_creator_budget_approval,$Desc,$By = '')
+    {
+        if ($By ==  '') {
+            $By = $this->session->userdata('NIP');
+        }
+        $dataSave = array(
+            'ID_creator_budget_approval' => $ID_creator_budget_approval,
+            'Desc' => $Desc,
+            'Date' => date('Y-m-d'),
+            'By' => $By,
+        );
+
+        $this->db->insert('db_budgeting.log_budget',$dataSave);
     }
 
     public function get_creator_budget_approval($Year,$Departement,$Approval = 'and Approval = 1')

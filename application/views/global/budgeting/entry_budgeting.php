@@ -8,7 +8,7 @@
         </li>
         <?php if ($this->session->userdata('IDDepartementPUBudget') != 'NA.9'): ?>
         <li class="<?php if($request=='EntryPostItemBudgeting'){echo "active";} ?>">
-            <a href="javascript:void(0)" class="pageAnchor" page = "EntryPostItemBudgeting">Entry Master Post Item Budgeting</a>
+            <a href="javascript:void(0)" class="pageAnchor" page = "EntryPostItemBudgeting">Entry Sub Account</a>
         </li>
         <?php endif ?>
         <li class="<?php if($request==null || $request=='EntryBudget'){echo "active";} ?>">

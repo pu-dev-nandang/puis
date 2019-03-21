@@ -1263,14 +1263,46 @@ class C_budgeting extends Budgeting_Controler {
     public function saveCreatorbudget()
     {
         $this->auth_ajax();
-        $msg = '';
+        $msg = array('Status' => 0,'msg'=>'error');
         $Input = $this->getInputToken();
         $creator_budget = $Input['creator_budget'];
+         $creator_budget_approval = $Input['creator_budget_approval'];
         // save to creator_budget
         switch ($Input['action']) {
             case 'add':
+                // get rule approval
+                    $Approval = $this->m_budgeting->get_approval_budgeting($creator_budget_approval->Departement);
+                    $JsonStatus = array();
+                    for ($i=0; $i < count($Approval); $i++) { 
+                        $Status = 0;
+                        $NIP = $Approval[$i]['NIP'];
+                        $Visible = $Approval[$i]['Visible'];
+                        $NameTypeDesc = $Approval[$i]['NameTypeDesc'];
+                        $ApproveAt = '';
+                        $Representedby = '';
+                        $JsonStatus[] = array(
+                            'NIP' => $NIP,
+                            'Status' => $Status,
+                            'ApproveAt' => $ApproveAt,
+                            'Representedby' => $Representedby,
+                            'Visible' => $Visible,
+                            'NameTypeDesc' => $NameTypeDesc,
+                        );
+
+                    }
+
+                $dataSave = array(
+                    'Departement' => $creator_budget_approval->Departement,
+                    'Year' => $creator_budget_approval->Year,
+                    'Note' => $creator_budget_approval->Note,
+                    'Status' => $creator_budget_approval->Status,
+                    'JsonStatus' => json_encode($JsonStatus),
+                );
+                $this->db->insert('db_budgeting.creator_budget_approval', $dataSave);
+                $ID_creator_budget_approval = $this->db->insert_id();
+
                 for ($i=0; $i < count($creator_budget); $i++) { 
-                    $CodePostBudget = $creator_budget[$i]->CodePostBudget;
+                    $CodePostRealisasi = $creator_budget[$i]->CodePostRealisasi;
                     $UnitCost = $creator_budget[$i]->UnitCost;
                     $Freq = $creator_budget[$i]->Freq;
                     $DetailMonth = $creator_budget[$i]->DetailMonth;
@@ -1278,31 +1310,28 @@ class C_budgeting extends Budgeting_Controler {
                     $SubTotal = $creator_budget[$i]->SubTotal;
 
                     $dataSave = array(
-                        'CodePostBudget' => $CodePostBudget,
+                        'CodePostRealisasi' => $CodePostRealisasi,
                         'UnitCost' => $UnitCost,
                         'Freq' => $Freq,
                         'DetailMonth' => $DetailMonth,
                         'SubTotal' => $SubTotal,
                         'CreatedBy' => $this->session->userdata('NIP'),
                         'CreatedAt' => date('Y-m-d H:i:s'),
+                        'ID_creator_budget_approval' => $ID_creator_budget_approval
                     );
                     $this->db->insert('db_budgeting.creator_budget', $dataSave);
 
                 }
 
-                $creator_budget_approval = $Input['creator_budget_approval'];
-                $dataSave = array(
-                    'Departement' => $creator_budget_approval->Departement,
-                    'Year' => $creator_budget_approval->Year,
-                    'Note' => $creator_budget_approval->Note,
-                );
-                $this->db->insert('db_budgeting.creator_budget_approval', $dataSave);
-
-
                 // save date period
                     $update = array('Status' => 0);
                     $this->db->where('Year', $creator_budget_approval->Year);
                     $this->db->update('db_budgeting.cfg_dateperiod', $update);
+                
+                // save to log
+                    $this->m_budgeting->log_budget($ID_creator_budget_approval,'Create',$By = $this->session->userdata('NIP'));    
+
+                $msg = array('Status' => 1,'msg'=>$ID_creator_budget_approval );
                 break;
             case 'edit':
                 $ID = $Input['ID'];

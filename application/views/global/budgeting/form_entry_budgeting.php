@@ -1,6 +1,8 @@
 <div class="row" style="margin-left: 10px;margin-right: 10px">
 	<div class="col-md-3">
 		<button class = "btn btn-default" id = "ChooseSubAccount">Choose Sub Account</button>
+		</br></br>
+		<button class = "btn btn-warning" id = "Log" id_creator_budget_approval = "">Log</button>
 	</div>
 	<div class="col-md-6">
 		<div class="thumbnail" style="height: 100px">
@@ -65,6 +67,14 @@ $(document).ready(function() {
 	LoadFirstLoad();
 }); // exit document Function
 
+$(document).off('change', '#Departement').on('change', '#Departement',function(e) {
+    LoadFirstLoad();
+});
+
+$(document).off('change', '#Year').on('change', '#Year',function(e) {
+    LoadFirstLoad();
+});
+
 
 function LoadFirstLoad(){
 	// checkData pada table creator_budget_approval dan creator_budget
@@ -105,7 +115,7 @@ function makeDomAwal()
 
 	var htmlheader = makeHtmlHeader();
 	// write header
-	$("#G_Content").append(htmlheader);
+	$("#G_Content").html(htmlheader);
 
 }
 
@@ -315,7 +325,10 @@ function makeContent()
 	}	
 
 	html += '</div></div></div>';
-	$("#G_Content").append(html);			
+	$("#G_Content").append(html);
+	// $('select[tabindex!="-1"]').select2({ // get value tidak jalan
+	//     //allowClear: true
+	// });			
 }
 
 function makeFooter(){
@@ -353,8 +366,10 @@ function showButton()
 	if(arr1.length == 0)
 	{
 		// show button Submit
-		var html = '<div class = "row"><div class = "col-md-2 col-md-offset-10">'+
-						'<button class = "btn btn-success" id = "SaveBudget">Submit</button>'+
+		var html = '<div class = "row"><div class = "col-md-6 col-md-offset-6" align = "right">'+
+						'<button class = "btn btn-success" id = "SaveBudget" action = "add" id_creator_budget_approval = "">Save To Draft</button>'+
+						'&nbsp'+
+						'<button class = "btn btn-primary" id = "SaveSubmit" action = "add" id_creator_budget_approval = "">Submit</button>'+
 					'</div></div>';
 		$("#content_button").html(html);			
 	}	
@@ -371,12 +386,24 @@ $(document).off('keyup', '.UnitCost').on('keyup', '.UnitCost',function(e) {
 
 });
 
+$(document).off('change', '.Freq').on('change', '.Freq',function(e) {
+   var row = $(this).closest('.ContentDataPostBudget');
+   ProsesOneRow(row);
+});
+
+$(document).off('keyup', '.InputBulan').on('keyup', '.InputBulan',function(e) {
+   var row = $(this).closest('.ContentDataPostBudget');
+   ProsesOneRow(row);
+});
+
 function ProsesOneRow(row)
 {
 	var UnitCost = row.find('.col-md-1:eq(1)').find('.UnitCost').val();
 	UnitCost = findAndReplace(UnitCost,".","");
 	var Freq = row.find('.col-md-1:eq(2)').find('.Freq').val();
 	var Total = parseInt(UnitCost * Freq);
+	// Write subtotal per baris
+	row.find('.row').find('.col-md-9').find('.Subtotal').html(formatDigitNumber(Total));
 	// pengurangan remaining
 		var dt = ClassDt.BudgetAllocation;
 		for (var i = 0; i < dt.length; i++) {
@@ -390,21 +417,209 @@ function ProsesOneRow(row)
 					// get unit cost
 					var r = $(this).closest('.ContentDataPostBudget');
 					var U = r.find('.col-md-1:eq(1)').find('.UnitCost').val();
-					U = findAndReplace(UnitCost,".","");
+					U = findAndReplace(U,".","");
+					U = parseInt(U) * 1000; // for ribuan
 					var F = r.find('.col-md-1:eq(2)').find('.Freq').val();
 					var T = parseInt(U * F);
 					rr = rr - T;
+					// show Status Budget
+					if (rr < 0) {
+						if (r.find('.col-md-9').find('.Subtotal').find('i').length) {
+							r.find('.col-md-9').find('.Subtotal').find('i').remove();
+						}
+						r.find('.col-md-9').find('.Subtotal').append(' <i class="fa fa-minus-circle" style="color: red;"></i>');
+					}
+					else
+					{
+						if (r.find('.col-md-9').find('.Subtotal').find('i').length) {
+							r.find('.col-md-9').find('.Subtotal').find('i').remove();
+						}
+						r.find('.col-md-9').find('.Subtotal').append(' <i class="fa fa-check-circle" style="color: green;"></i>');
+					}
 				}
 			})
 
 			dt[i].Remaining = rr;
 		}
-		ClassDt.BudgetAllocation = dt;
-		makeHtmlBudgetAllocation();
-	row.find('.row').find('.col-md-9').find('.Subtotal').html(formatDigitNumber(Total));
+		ClassDt.BudgetAllocation = dt; // save data in variable
+		makeHtmlBudgetAllocation(); // show data after updates
+	// check freq dengan total inputan bulan
+		// get input bulan dalam satu baris
+			var count = 0;
+			row.find('.InputBulan').each(function(){
+				var v = $(this).val();
+				count = parseInt(count) + parseInt(v);
+			})
 
-	
+
+			if (count > Freq) {
+				row.find('.InputBulan').each(function(){
+					$(this).val(0);
+					$(this).maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+					$(this).maskMoney('mask', '9894');
+				})
+				row.find('.sisa').html('<i class="fa fa-check-circle" style="color: green;"></i> '+0);
+				toastr.info("Your Input Exceeded than Freq, The Input Was Reset");
+			}
+			else
+			{
+				var v = parseInt(Freq) - count;
+				if (v == 0) {
+					row.find('.sisa').html('<i class="fa fa-check-circle" style="color: green;"></i> '+0);
+				}
+				else
+				{
+					row.find('.sisa').html('<i class="fa fa-minus-circle" style="color: red;"></i> '+v);
+				}
+				
+			}
+	// proses subtotal per month
+		ProsesSubtotalPerMonth();
+	// proses Grand Total
+		ProsesGrandTotal();
 }
+
+function ProsesSubtotalPerMonth()
+{
+	var Month = ClassDt.arr_bulan;
+	for (var i = 0; i < Month.length; i++) {
+		var keyvalue = Month[i].keyValueFirst;
+		var total = 0;
+		$('.InputBulan[keyvalue="'+keyvalue+'"]').each(function(){
+			var row = $(this).closest('.ContentDataPostBudget');
+			var v = $(this).val();
+			var UnitCost = row.find('.col-md-1:eq(1)').find('.UnitCost').val();
+			UnitCost = findAndReplace(UnitCost,".","");
+			total = parseInt(total) + ( parseInt(UnitCost * v) );
+
+		})
+		total = formatDigitNumber(total);
+		// write html
+		$('.subTotalPermonth[keyvalue="'+keyvalue+'"]').html(total);
+	}
+}
+
+function ProsesGrandTotal()
+{
+	var total = 0;
+	$('.PostBudget').each(function(){
+		var r = $(this).closest('.ContentDataPostBudget');
+		var U = r.find('.col-md-1:eq(1)').find('.UnitCost').val();
+		U = findAndReplace(U,".","");
+		U = parseInt(U) * 1000; // for ribuan
+		var F = r.find('.col-md-1:eq(2)').find('.Freq').val();
+		var T = parseInt(U * F);
+		total = parseInt(total) + parseInt(T);
+	})
+	$("#GrandTotal").html('<p style = "color : green">'+'Grand Total : <br>'+formatRupiah(total)+'</p>');
+}
+
+$(document).off('click', '#SaveBudget').on('click', '#SaveBudget',function(e) {
+	var ID = $(this).attr('id_creator_budget_approval');
+	var action = $(this).attr('action');
+  if (confirm("Are you sure?") == true) {
+  	loadingStart();
+  	// check total input month harus sama dengan freq
+  		var arrBool = [];
+  		var arr_pass = [];
+  		$('.PostBudget').each(function(){
+  			var row = $(this).closest('.ContentDataPostBudget');
+  			var CodePostRealisasi = row.find('.col-md-1:eq(0)').find('.PostBudget').val();
+  			var UnitCost = row.find('.col-md-1:eq(1)').find('.UnitCost').val();
+  			UnitCost = findAndReplace(UnitCost,".","");
+  			UnitCost = parseInt(UnitCost) * 1000; // for ribuan
+  			var Freq = row.find('.col-md-1:eq(2)').find('.Freq').val();
+  			var Subtotal = parseInt(UnitCost * Freq)
+  			var count = 0;
+  			var arr = [];
+  			row.find('.InputBulan').each(function(){
+  				var v = $(this).val();
+  				v = findAndReplace(v,".","");
+  				var keyvalue = $(this).attr('keyvalue');
+  				count = parseInt(count) + parseInt(v);
+  				arr.push({month : keyvalue,value : v,});
+  			})
+
+  			if (Freq != count) {
+  				arrBool.push(0);
+  			}
+  			else
+  			{
+  				arrBool.push(1);
+  			}
+
+  			var creator_budget = {
+  				CodePostRealisasi : CodePostRealisasi,
+  				UnitCost : UnitCost,
+  				Freq : Freq,
+  				DetailMonth : arr,
+  				SubTotal : Subtotal,
+  			};
+
+  			arr_pass.push(creator_budget);
+
+  		})
+
+  		// arr creator_budget_approval
+  			var creator_budget_approval = {
+  				Departement : $('#Departement').val(),
+  				Year : $('#Year').val(),
+  				Note : $("#Note").val(),
+  				Status : 0,
+  			};
+
+  		var bool =true;
+  		for (var i = 0; i < arrBool.length; i++) {
+  			if (arrBool[i] == 0) {
+  				bool = false;
+  				break;
+  			}
+  		}
+
+  		if(!bool)
+  		{
+	  		toastr.info("Your Month Input is not same with Freq, Please check");
+	  		loadingEnd(1000);
+  		}
+  		else
+  		{
+  			var url = base_url_js+"budgeting/saveCreatorbudget";
+  			var data = {
+  				creator_budget :arr_pass,
+  				creator_budget_approval : creator_budget_approval,
+  				ID : ID,
+  				action : action,
+  				};
+  			// console.log(data);loadingEnd(1000);return;	
+  			var token = jwt_encode(data,'UAP)(*');
+  			$.post(url,{token:token},function (resultJson) {
+  				var response = jQuery.parseJSON(resultJson);
+  				if(response.Status == 1)
+  				{
+  					$("#SaveBudget").attr('action','edit');
+  					$("#SaveBudget").attr('id_creator_budget_approval',response.msg);
+
+  					$("#SaveSubmit").attr('action','edit');
+  					$("#SaveSubmit").attr('id_creator_budget_approval',response.msg);
+  					$("#Log").attr('id_creator_budget_approval',response.msg);
+  				}
+  				else
+  				{
+  					toastr.error(response.msg,'!Failed');
+  				}
+  				loadingEnd(2000);
+
+  			}).fail(function() {
+  			  $('.pageAnchor[page="EntryBudget"]').trigger('click');	
+  			  toastr.error('The Database connection error, please try again', 'Failed!!');
+  			  loadingEnd(3000);
+  			}).always(function() {
+  			    // $('#NotificationModal').modal('hide');
+  			}); 
+  		}	
+
+  }
+});	
 
 // existing
 function makeDomExisting(response)
