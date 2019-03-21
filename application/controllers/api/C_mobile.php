@@ -165,8 +165,10 @@ class C_mobile extends CI_Controller {
             $SemesterName ='';
             $SemesterCode='';
             $SemesterID = 0;
+            $SemesterID_Last = 0;
             if(count($dataTotalSmt)>0){
                 for($s=0;$s<count($dataTotalSmt);$s++){
+
                     if($dataTotalSmt[$s]['Status']=='1'){
                         $smt += 1;
                         $SemesterName = $dataTotalSmt[$s]['Name'];
@@ -175,6 +177,7 @@ class C_mobile extends CI_Controller {
                         break;
                     } else {
                         $smt += 1;
+                        $SemesterID_Last = $dataTotalSmt[$s]['ID'];
                     }
                 }
             }
@@ -186,34 +189,46 @@ class C_mobile extends CI_Controller {
             $dataStd[0]['SemesterCode'] = $SemesterCode;
 
             // Get Total Credit
-            $db = 'ta_'.$d['Year'];
 
-            $dataSp = $this->db->query('SELECT sp.* FROM '.$db.'.study_planning sp WHERE sp.ShowTranscript ')->result_array();
 
+            $dataSp = $this->m_rest->getTranscript($d['Year'],$NPM,'ASC');
             $TotalCredit = 0;
-
-
-            $TotalGradeValue = 0;
-            $TotalCredit_IPS = 0;
-            $TotalGradeValue_IPS = 0;
+            $TotalPoint = 0;
             if(count($dataSp)>0){
                 foreach ($dataSp AS $itemSP){
 
                     $TotalCredit = $TotalCredit + $itemSP['Credit'];
-                    $TotalGradeValue = $TotalGradeValue + ($itemSP['Credit'] * $itemSP['GradeValue']);
+                    $TotalPoint = $TotalPoint + $itemSP['Point'];
 
-                    if($SemesterID!=$itemSP['SemesterID']){
-                        $TotalCredit_IPS = $TotalCredit_IPS + $itemSP['Credit'];
-                        $TotalGradeValue_IPS = $TotalGradeValue_IPS + ($itemSP['Credit'] * $itemSP['GradeValue']);
-                    }
 
                 }
             }
 
-            $IPK = ($TotalCredit>0) ? $TotalGradeValue / $TotalCredit : 0;
-            $LastIPS = ($TotalCredit_IPS>0) ? $TotalGradeValue_IPS / $TotalCredit_IPS : 0;
-
+            $IPK = ($TotalCredit>0) ? $TotalPoint / $TotalCredit : 0;
+            $dataStd[0]['TotalCredit'] = $TotalCredit;
             $dataStd[0]['IPK'] = round($IPK,2);
+
+
+            // LAST IPS
+            $SemesterID_Last;
+
+            $dataIPS = $this->db->select('Credit, GradeValue')->get_where('ta_'.$d['Year'].'.study_planning', array(
+                'NPM' => $NPM,
+                'SemesterID' => $SemesterID_Last
+            ))->result_array();
+
+            $TotalCredit_IPS = 0;
+            $TotalGradeValue_IPS = 0;
+            if(count($dataIPS)>0){
+                foreach ($dataIPS AS $itemIPS){
+                    $TotalCredit_IPS = $TotalCredit_IPS + $itemIPS['Credit'];
+                    $TotalGradeValue_IPS = $TotalGradeValue_IPS + ($itemIPS['Credit'] * $itemIPS['GradeValue']);
+                }
+            }
+
+
+            $LastIPS = ($TotalCredit_IPS>0) ? $TotalGradeValue_IPS / $TotalCredit_IPS : 0;
+            
             $dataStd[0]['LastIPS'] = round($LastIPS,2);
 
 
