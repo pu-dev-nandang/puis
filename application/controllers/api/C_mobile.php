@@ -32,11 +32,6 @@ class C_mobile extends CI_Controller {
         return $pass;
     }
 
-    private function dateTimeNow(){
-        $dataTime = date('Y-m-d H:i:s');
-        return $dataTime;
-    }
-
     private function getInputToken()
     {
         $token = $this->input->post('token');
@@ -228,7 +223,7 @@ class C_mobile extends CI_Controller {
 
 
             $LastIPS = ($TotalCredit_IPS>0) ? $TotalGradeValue_IPS / $TotalCredit_IPS : 0;
-            
+
             $dataStd[0]['LastIPS'] = round($LastIPS,2);
 
 
@@ -249,6 +244,34 @@ class C_mobile extends CI_Controller {
         }
 
         return $srcImage;
+    }
+
+    public function readGlobalInfo(){
+
+        $data_arr = $this->getInputToken();
+        $dateNow = $this->m_rest->getDateNow();
+
+        if($data_arr['action']=='announcement'){
+
+            $db = 'db_notifikasi.announcement_employees';
+            $urr = 'ann.NIP = "'.$data_arr['UserID'].'" ';
+
+            if($data_arr['User']=='Std') {
+                $db = 'db_notifikasi.announcement_student';
+                $urr = 'ann.NPM = "'.$data_arr['UserID'].'" ';
+            }
+
+            $dataAnnc = $this->db->query('SELECT ann.*,annc.Title FROM '.$db.' ann 
+                                                LEFT JOIN db_notifikasi.announcement annc ON (annc.ID = ann.IDAnnc)
+                                                WHERE '.$urr.' AND annc.Start <= "'.$dateNow.'" 
+                                                AND annc.End >= "'.$dateNow.'" LIMIT '.$data_arr['Limit'])->result_array();
+
+            return print_r(json_encode($dataAnnc));
+        }
+
+
+
+
     }
 
 

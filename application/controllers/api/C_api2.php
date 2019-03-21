@@ -25,16 +25,6 @@ class C_api2 extends CI_Controller {
 
     }
 
-    private function dateTimeNow(){
-        $dataTime = date('Y-m-d H:i:s');
-        return $dataTime;
-    }
-
-    private function getDateNow(){
-        $dataTime = date('Y-m-d');
-        return $dataTime;
-    }
-
     private function getInputToken()
     {
         $token = $this->input->post('token');
@@ -1735,7 +1725,7 @@ class C_api2 extends CI_Controller {
 
             }
             else if($data_arr['action']=='showAnnouncementActive'){
-                $dateNow = $this->getDateNow();
+                $dateNow = $this->m_rest->getDateNow();
 
                 $User = $data_arr['User'];
                 $UserID = $data_arr['UserID'];
