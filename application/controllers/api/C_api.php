@@ -706,6 +706,22 @@ class C_api extends CI_Controller {
 
     }
 
+    public function delelelistacaemployee(){
+
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+
+        $ID1 = $data_arr['ID1'];
+        $ID2 = $data_arr['ID2'];
+        $dataCek = $this->m_api->delistacademicemployee($ID1, $ID2);
+
+        return print_r(1);
+
+    }
+
+    
+
     public function setLecturersAvailabilityDetail($action){
         $token = $this->input->post('token');
         $key = "UAP)(*";
