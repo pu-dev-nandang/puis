@@ -852,7 +852,7 @@ class C_rest extends CI_Controller {
                             LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID) 
                             ';
 
-                $sql.= $AddSql;
+                $sql.= $AddSql.' order by em.NIP asc';
                 $query=$this->db->query($sql, array())->result_array();
 
                 echo json_encode($query);

@@ -289,7 +289,7 @@ class M_budgeting extends CI_Model {
                 from db_budgeting.cfg_m_userrole as a left join (select * from db_budgeting.cfg_approval_budget where Departement = ? ) as c
                 on a.ID = c.ID_m_userrole
                 left join db_employees.employees as b on b.NIP = c.NIP 
-                order by c.ID asc
+                order by a.ID asc
                 ';
         $query=$this->db->query($sql, array($Departement))->result_array();
         return $query;
@@ -324,24 +324,33 @@ class M_budgeting extends CI_Model {
         $this->db->insert('db_budgeting.log_budget',$dataSave);
     }
 
-    public function get_creator_budget_approval($Year,$Departement,$Approval = 'and Approval = 1')
+    public function get_creator_budget_approval($Year,$Departement,$Approval = 'and a.Status = 2')
     {
-        $sql = 'select * from db_budgeting.creator_budget_approval where Year = ? and Departement = ? '.$Approval;
+        $sql = 'select a.*,b.NameDepartement from db_budgeting.creator_budget_approval as a 
+        join (
+        select * from (
+        select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
+        UNION
+        select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+        ) aa
+        ) as b on a.Departement = b.ID
+        where a.Year = ? and a.Departement = ? '.$Approval.' 
+        ';
         $query=$this->db->query($sql, array($Year,$Departement))->result_array();
         return $query;
     }
 
-    public function get_creator_budget($Year,$Departement)
+    public function get_creator_budget($ID_creator_budget_approval)
     {
-        $sql = 'select * from db_budgeting.creator_budget as a join (
-           select a.CodePostBudget,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
-           from db_budgeting.cfg_postrealisasi as b left join db_budgeting.cfg_head_account as c_ha on c.CodeHeadAccount = b.CodeHeadAccount
-           left join 
-           (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
-           join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
-           where b.Departement = ?     
-        ) as  b on a.CodePostBudget = b.CodePostBudget order by a.CodePostBudget asc';
-        $query=$this->db->query($sql, array($Year,$Departement))->result_array();
+        $sql = 'select a.ID_creator_budget_approval,a.CodePostRealisasi,a.UnitCost,a.Freq,a.DetailMonth,
+               a.SubTotal,a.CreatedBy,a.CreatedAt,a.LastUpdateBy,a.LastUpdateAt,b.CodeHeadAccount,
+                     b.RealisasiPostName,c.Name as NameHeadAccount,c.CodePost,d.PostName
+               from db_budgeting.creator_budget as a left join db_budgeting.cfg_postrealisasi as b on a.CodePostRealisasi = b.CodePostRealisasi
+               LEFT JOIN db_budgeting.cfg_head_account as c on b.CodeHeadAccount = c.CodeHeadAccount
+               LEFT JOIN db_budgeting.cfg_post as d on c.CodePost = d.CodePost
+               where a.ID_creator_budget_approval = ?
+       ';
+        $query=$this->db->query($sql, array($ID_creator_budget_approval))->result_array();
         return $query;
     }
 

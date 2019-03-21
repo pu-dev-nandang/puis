@@ -98,7 +98,8 @@ function LoadFirstLoad(){
 		var arr1 = ClassDt.creator_budget_approval;
 		if(arr1.length > 0)
 		{
-			makeDomExisting(response);
+			$("#Log").attr('id_creator_budget_approval',arr1[0].ID);
+			makeDomExisting();
 		}
 		else
 		{
@@ -191,6 +192,7 @@ function makeHtmlHeader()
 
 $(document).off('click', '#ChooseSubAccount').on('click', '#ChooseSubAccount',function(e) {
 	var dt = ClassDt.PostBudget;
+	var dt2 = ClassDt.creator_budget;
 		var html ='<div class = "row">'+
 					'<div class = "col-md-12">'+
 						'<table id="example" class="table table-bordered display select" cellspacing="0" width="100%">'+
@@ -203,8 +205,21 @@ $(document).off('click', '#ChooseSubAccount').on('click', '#ChooseSubAccount',fu
 		html += '<tbody>';
 	var data = dt['data'];
 	for (var i = 0; i < data.length; i++) {
+		// find if existing then checked
+		var d1 = data[i].CodePostRealisasi
+		var bool = false;
+		for (var j = 0; j < dt2.length; j++) {
+			var d2 = data[j].CodePostRealisasi
+			if (d1==d2) {
+				bool = true;
+				break;
+			}
+		}
+
+		var checked = (bool) ? 'checked' : '';
+
 		html += '<tr>'+
-					'<td><input type="checkbox" class="uniform" CodeHeadAccount="'+data[i].CodeHeadAccount+'" CodePost="'+data[i].CodePost+'" CodePostRealisasi="'+data[i].CodePostRealisasi+'" NameHeadAccount="'+data[i].NameHeadAccount+'" PostName="'+data[i].PostName+'" RealisasiPostName = "'+data[i].RealisasiPostName+'">'+
+					'<td><input type="checkbox" class="uniform" CodeHeadAccount="'+data[i].CodeHeadAccount+'" CodePost="'+data[i].CodePost+'" CodePostRealisasi="'+data[i].CodePostRealisasi+'" NameHeadAccount="'+data[i].NameHeadAccount+'" PostName="'+data[i].PostName+'" RealisasiPostName = "'+data[i].RealisasiPostName+'" '+checked+' >'+
 					'</td>'+
 					'<td>'+data[i].PostName+'-'+data[i].NameHeadAccount+'-'+data[i].RealisasiPostName+'</td>'+
 				'</tr>';	
@@ -245,18 +260,108 @@ $(document).off('click', '#ModalbtnSaveForm').on('click', '#ModalbtnSaveForm',fu
 
 		checkbox.push(temp);
 	})
-	ClassDt.SelectedPostBudget = checkbox;
-	$('#GlobalModalLarge').modal('hide');
-	// write html content
-	makeContent();
-	// write make footer(Note,Grand Total,button Approve,reject,excel,approver)
-	makeFooter();
-	// validation button
-	showButton();
+	var arr1 = ClassDt.creator_budget_approval;
+	if(arr1.length > 0)
+	{
+		// for edit
+		makeRowAdd_del(checkbox);
+		$('#GlobalModalLarge').modal('hide');		
+	}
+	else
+	{
+		ClassDt.SelectedPostBudget = checkbox;
+		$('#GlobalModalLarge').modal('hide');
+		// write html content
+		makeContent();
+		// write make footer(Note,Grand Total,button Approve,reject,excel,approver)
+		makeFooter();
+		// validation button
+		showButton();
+		
+	}
 
 	$('.UnitCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 	$('.InputBulan').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+	
 })
+
+function makeRowAdd_del(dt)
+{
+	var Month = ClassDt.arr_bulan;
+	for (var i = 0; i < dt.length; i++) {
+		var aa = $('.PostBudget').find('option[value="'+dt[i].CodePostRealisasi+'"]');
+		if (!aa.length) {
+			var html = '';
+			var OPFreq = '';
+			for (var ii = 0; ii <= 1000; ii++) {
+				var selected = (ii == 0) ? 'selected' : '';
+				OPFreq += '<option value = "'+ii+'" '+selected+'>'+ii+'</option>';
+			}
+
+			html += '<div class = "row ContentDataPostBudget" style = "margin-left : 10px;margin-right : 10px;margin-top : 10px">';
+			html += '<div class = "col-md-1">'+
+						'<select class="select2-select-00 full-width-fix PostBudget">'+
+							'<option value ="'+dt[i]['CodePostRealisasi']+'" selected CodePost = "'+dt[i]['CodePost']+'" CodeHeadAccount="'+dt[i]['CodeHeadAccount']+'">'+dt[i]['PostName']+'-'+dt[i]['NameHeadAccount']+'-'+dt[i]['RealisasiPostName']+'</option>'+
+						 '</select>'+
+					'</div>'+
+					'<div class = "col-md-1">'+
+						'<input type = "text" class = "form-control UnitCost" placeholder="Input Unit Cost..." value = "0">'+
+					'</div>'+
+					'<div class = "col-md-1">'+
+						'<select class="select2-select-00 full-width-fix Freq">'+
+							OPFreq+
+						'</select>'+
+					'</div>';
+
+			html += '<div class = "col-md-7">'+
+						'<div class = "row">';
+			for (var j = 0; j < Month.length; j++) {
+				html += '<div class = "col-md-1">'+
+							'<input type = "text" class = "form-control InputBulan" placeholder="Input Unit Cost..." value = "0" keyValue = "'+Month[j].keyValueFirst+'">'+
+						'</div>';	
+			}
+
+			html += '</div></div>';				
+			// add sisa dan subtotal
+			html += '<div class = "col-md-2">'+
+						'<div class = "row">'+
+							'<div class = "col-md-3 sisa">'+ // sisa
+							'</div>'+
+							'<div class = "col-md-9">'+
+								'<p class = "Subtotal">0</p>'+
+							'</div>'+
+						'</div>'+	
+					'</div>';
+			html += '</div>';	
+			$(".rowSubtotal").before(html);
+		}
+	}
+
+	// del post budget yang tidak ada pada dt
+	$(".PostBudget").each(function(){
+		var d1 = $(this).val();
+		var bool = true;
+		for (var i = 0; i < dt.length; i++) {
+			var d2 = dt[i]['CodePostRealisasi'];
+			if (d1 == d2) {
+				bool = false;
+				break;
+			}
+		}
+
+		if (bool) {
+			var row = $(this).closest('.ContentDataPostBudget');
+			row.remove();
+		}
+
+	})
+
+	var row = $('.ContentDataPostBudget:eq(0)');
+	if (row.length) {
+		ProsesOneRow(row);
+	}
+	
+}
 
 $(document).off('click', '#example-select-all').on('click', '#example-select-all',function(e) {
     $('input.uniform').not(this).prop('checked', this.checked);
@@ -355,7 +460,84 @@ function makeFooter(){
 					'</div>'+
 				'</div>'+
 				'</div>';		
-	$("#G_Content").append(html);				
+	$("#G_Content").append(html);
+
+	// for existing / edit
+	var arr1 = ClassDt.creator_budget_approval;
+	if (arr1.length > 0) {
+		// get all employee to get name
+		var url = base_url_js+'rest/__getEmployees/aktif';
+		var data = {
+				    auth : 's3Cr3T-G4N'
+				};
+		var token = jwt_encode(data,'UAP)(*');
+		$.post(url,{token:token},function (resultJson) {
+			var JsonStatus = jQuery.parseJSON(arr1[0].JsonStatus);
+			var html = '<div class = "col-md-4 col-md-offset-8">'+
+		    				'<a href = "javascript:void(0)"  class="btn btn-default btn-default-success" type="button" id = "add_approver" id_creator_budget_approval = "'+arr1[0].ID+'">'+
+                        			'<i class="fa fa-plus-circle" aria-hidden="true"></i>'+
+                    		'</a>'+
+							'<table class = "table table-striped table-bordered table-hover table-checkable tableData" style = "margin-top : 5px">'+
+								'<thead><tr>';
+
+			// get requested by dari Approval	dengan ID_m_userrole = 1				
+			   var u = ClassDt.Approval;
+			   var Requester = '';
+			   for (var i = 0; i < u.length; i++) {
+			   	if (u[i].ID_set_roleuser == 1) {
+			   		Requester = u[i].NamaUser;
+			   		break;
+			   	} 
+			   }
+
+			html += '<th>'+'Requested by'+'</th>';   
+			for (var i = 0; i < JsonStatus.length; i++) {
+				html += '<th>'+JsonStatus[i].NameTypeDesc+'</th>';
+			}
+
+			html +=	'</th></thead>'+'<tbody><tr style = "height : 51px">';
+			html += '<td>'+'<i class="fa fa-check" style="color: green;"></i>'+'</td>';
+			for (var i = 0; i < JsonStatus.length; i++) {
+				var v = '-';
+				if (JsonStatus[i].NameTypeDesc != 'Acknowledge by') {
+					if (JsonStatus[i].Status == '2') {
+						v = '<i class="fa fa-times" aria-hidden="true" style="color: red;"></i>';
+					}
+					else if(JsonStatus[i].Status == '1')
+					{
+						v = '<i class="fa fa-check" style="color: green;"></i>';
+					}
+					else
+					{
+						v = '-';
+					}
+				}
+				html += '<td>'+v+'</td>';		
+			}
+			html += '</tr><tr>';
+			html += '<td>'+Requester+'</td>';
+			for (var i = 0; i < JsonStatus.length; i++) {
+				// find Name in resultJson
+				var Name = '';
+				for (var j = 0; j < resultJson.length; j++) {
+					if (JsonStatus[i].NIP == resultJson[j].NIP) {
+						Name = resultJson[j].Name;
+						break;
+					}
+				}
+				html += '<td>'+Name+'</td>';		
+			}
+
+			html +=	'</tr></tbody>'+'</table></div>';
+			var aa = $('.rowApproval').find('.col-md-12');
+			if (aa.length) {
+				aa.remove();
+			}
+
+			$('.rowApproval').html(html);				
+		})				
+	}
+
 
 }
 
@@ -371,11 +553,99 @@ function showButton()
 						'&nbsp'+
 						'<button class = "btn btn-primary" id = "SaveSubmit" action = "add" id_creator_budget_approval = "">Submit</button>'+
 					'</div></div>';
-		$("#content_button").html(html);			
+		$("#content_button").html(html);
+
+		// only admin to create per department
+		var NIP = '<?php echo $this->session->userdata('NIP') ?>';
+		var bool = false;
+		for (var i = 0; i < dt.length; i++) {
+			if (NIP == dt[i].NIP && dt[i].ID_set_roleuser == 1) {
+				bool = true;
+				break;
+			}
+			
+		}
+
+		if (!bool) {
+			$('#SaveBudget,#SaveSubmit').prop('disabled',true);
+		}
 	}	
 	else
 	{
 		//existing
+		var Status = arr1[0]['Status'];
+		if (Status == '0' || Status == '3') { // only authorize Admin
+			// show button Submit
+			var html = '<div class = "row"><div class = "col-md-6 col-md-offset-6" align = "right">'+
+							'<button class = "btn btn-success" id = "SaveBudget" action = "edit" id_creator_budget_approval = "'+arr1[0].ID+'">Save To Draft</button>'+
+							'&nbsp'+
+							'<button class = "btn btn-primary" id = "SaveSubmit" action = "edit" id_creator_budget_approval = "'+arr1[0].ID+'">Submit</button>'+
+						'</div></div>';
+			$("#content_button").html(html);
+
+			// only admin to create per department
+			var NIP = '<?php echo $this->session->userdata('NIP') ?>';
+			var bool = false;
+			for (var i = 0; i < dt.length; i++) {
+				if (NIP == dt[i].NIP && dt[i].ID_set_roleuser == 1) {
+					bool = true;
+					break;
+				}
+				
+			}
+
+			if (!bool) {
+				$('#SaveBudget,#SaveSubmit').prop('disabled',true);
+			}
+		}
+
+		if (Status == 1) { // only auth approval berdasarkan tingkatan Approval
+			var NIP = '<?php echo $this->session->userdata('NIP') ?>';
+			var JsonStatus = jQuery.parseJSON(arr1[0]['JsonStatus']);
+			var bool = false;
+			var HierarkiApproval = 0; // for check hierarki approval;
+			var NumberOfApproval = 0; // for check hierarki approval;
+			for (var i = 0; i < JsonStatus.length; i++) {
+				NumberOfApproval++;
+				if (JsonStatus[i]['Status'] == 0) {
+					// check status before
+					if (i > 0) {
+						var ii = i - 1;
+						if (JsonStatus[ii]['Status'] == 1) {
+							HierarkiApproval++;
+						}
+
+						if (JsonStatus[ii]['NameTypeDesc'] != 'Approval by') {
+							HierarkiApproval++;
+						}
+					}
+					else
+					{
+						HierarkiApproval++;
+					}
+					
+					if (NIP == JsonStatus[i]['NIP'] && JsonStatus[i]['NameTypeDesc'] == 'Approval by') {
+						bool = true;
+						break;
+					}
+				}
+				else
+				{
+					HierarkiApproval++;
+				}
+			}
+
+			if (bool && HierarkiApproval == NumberOfApproval) { // rule approval
+				var html = '<div class = "row"><div class = "col-md-6 col-md-offset-6" align = "right">'+
+								'<button class = "btn btn-primary" id = "ApproveBudget" action = "approve" id_creator_budget_approval = "'+arr1[0].ID+'" approval_number = "'+NumberOfApproval+'">Approve</button>'+
+								'&nbsp'+
+								'<button class = "btn btn-inverse" id = "RejectBudget" action = "reject" id_creator_budget_approval = "'+arr1[0].ID+'" approval_number = "'+NumberOfApproval+'">Reject</button>'+
+							'</div></div>';
+				$("#content_button").html(html);
+			}
+
+		}
+
 	}
 	
 }
@@ -596,12 +866,13 @@ $(document).off('click', '#SaveBudget').on('click', '#SaveBudget',function(e) {
   				var response = jQuery.parseJSON(resultJson);
   				if(response.Status == 1)
   				{
-  					$("#SaveBudget").attr('action','edit');
-  					$("#SaveBudget").attr('id_creator_budget_approval',response.msg);
+  					// $("#SaveBudget").attr('action','edit');
+  					// $("#SaveBudget").attr('id_creator_budget_approval',response.msg);
 
-  					$("#SaveSubmit").attr('action','edit');
-  					$("#SaveSubmit").attr('id_creator_budget_approval',response.msg);
-  					$("#Log").attr('id_creator_budget_approval',response.msg);
+  					// $("#SaveSubmit").attr('action','edit');
+  					// $("#SaveSubmit").attr('id_creator_budget_approval',response.msg);
+  					LoadFirstLoad();
+  					// $("#Log").attr('id_creator_budget_approval',response.msg);
   				}
   				else
   				{
@@ -622,9 +893,102 @@ $(document).off('click', '#SaveBudget').on('click', '#SaveBudget',function(e) {
 });	
 
 // existing
-function makeDomExisting(response)
+function makeDomExisting()
 {
+	var htmlheader = makeHtmlHeader();
+	// write header
+	$("#G_Content").html(htmlheader);
 
+	// fill content
+	makeContent_existing();
+	// write make footer(Note,Grand Total,button Approve,reject,excel,approver)
+	makeFooter()
+
+	// validation button
+	showButton();
+
+	$('.UnitCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+	$('.UnitCost').maskMoney('mask', '9894');
+	$('.InputBulan').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+	$('.InputBulan').maskMoney('mask', '9894');
+
+	$('.PostBudget').each(function(){
+		var row = $(this).closest('.ContentDataPostBudget');
+		ProsesOneRow(row);
+	})	
+}
+
+
+function makeContent_existing()
+{
+	var dt = ClassDt.creator_budget;
+	var Month = ClassDt.arr_bulan;
+	var html = '';
+	for (var i = 0; i < dt.length; i++) {
+		var OPFreq = '';
+		var Cmb_freq = dt[i]['Freq'];
+		for (var ii = 0; ii <= 1000; ii++) {
+			var selected = (Cmb_freq == ii) ? 'selected' : '';
+			OPFreq += '<option value = "'+ii+'" '+selected+'>'+ii+'</option>';
+		}
+
+		var UnitCost = dt[i]['UnitCost'] / 1000;// ribuan
+
+		html += '<div class = "row ContentDataPostBudget" style = "margin-left : 10px;margin-right : 10px;margin-top : 10px">';
+		html += '<div class = "col-md-1">'+
+					'<select class="select2-select-00 full-width-fix PostBudget">'+
+						'<option value ="'+dt[i]['CodePostRealisasi']+'" selected CodePost = "'+dt[i]['CodePost']+'" CodeHeadAccount="'+dt[i]['CodeHeadAccount']+'">'+dt[i]['PostName']+'-'+dt[i]['NameHeadAccount']+'-'+dt[i]['RealisasiPostName']+'</option>'+
+					 '</select>'+
+				'</div>'+
+				'<div class = "col-md-1">'+
+					'<input type = "text" class = "form-control UnitCost" placeholder="Input Unit Cost..." value = "'+UnitCost+'">'+
+				'</div>'+
+				'<div class = "col-md-1">'+
+					'<select class="select2-select-00 full-width-fix Freq">'+
+						OPFreq+
+					'</select>'+
+				'</div>';
+
+		html += '<div class = "col-md-7">'+
+					'<div class = "row">';
+		var DetailMonth = dt[i]['DetailMonth'];
+		DetailMonth = jQuery.parseJSON(DetailMonth);		
+		for (var j = 0; j < DetailMonth.length; j++) {
+			html += '<div class = "col-md-1">'+
+						'<input type = "text" class = "form-control InputBulan" placeholder="Input Unit Cost..." value = "'+DetailMonth[j].value+'" keyValue = "'+DetailMonth[j].month+'">'+
+					'</div>';	
+		}
+
+		html += '</div></div>';	
+		// add sisa dan subtotal
+		html += '<div class = "col-md-2">'+
+					'<div class = "row">'+
+						'<div class = "col-md-3 sisa">'+ // sisa
+						'</div>'+
+						'<div class = "col-md-9">'+
+							'<p class = "Subtotal">0</p>'+
+						'</div>'+
+					'</div>'+	
+				'</div>';
+		html += '</div>';						
+	}
+
+	$(".ContentDataPostBudget").remove(); // hapus dahulu
+	$(".rowSubtotal").remove(); // hapus dahulu
+	$("#G_Content").append(html);
+	// write html total perbulan
+	html = '';
+	html += '<div class = "row rowSubtotal" style = "margin-left : 10px;margin-right : 10px;margin-top : 10px">'+
+				'<div class = "col-md-7 col-md-offset-3">'+
+				'<div class = "row">';
+	for (var j = 0; j < Month.length; j++) {
+		html += '<div class = "col-md-1">'+
+					'<div class="form-group subTotalPermonth" keyvalue="'+Month[j].keyValueFirst+'" style="font-size: 12px;"></div>'+
+				'</div>';	
+	}	
+
+	html += '</div></div></div>';
+	$("#G_Content").append(html);
 }
 </script>
 

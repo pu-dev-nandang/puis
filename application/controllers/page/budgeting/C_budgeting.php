@@ -1248,7 +1248,8 @@ class C_budgeting extends Budgeting_Controler {
         $get = $this->m_budgeting->get_creator_budget_approval($Year,$Departement,'');
         if (count($get) > 0) {
             // get Creator Budget
-            $get2 = $this->m_budgeting->get_creator_budget($Year,$Departement);
+            $ID_creator_budget_approval= $get[0]['ID'];
+            $get2 = $this->m_budgeting->get_creator_budget($ID_creator_budget_approval);
             $arr_result['creator_budget_approval'] = $get;
             $arr_result['creator_budget'] = $get2;
         }
