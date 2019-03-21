@@ -7,6 +7,10 @@
     #tableShowAnnc thead th {
         text-align: center;
     }
+    .detail-message {
+        max-height: 100px;
+        overflow: auto;
+    }
 </style>
 
 <div class="row">
@@ -79,9 +83,9 @@
             '        <table class="table table-striped">' +
             '            <thead>' +
             '            <tr>' +
-            '                <th>No</th>' +
-            '                <th>'+usr+'</th>' +
-            '                <th>Name</th>' +
+            '                <th style="width: 1%;">No</th>' +
+            '                <th>User</th>' +
+            '                <th style="width: 25%;">Status</th>' +
             '            </tr>' +
             '            </thead>' +
             '            <tbody id="showUsr">' +
@@ -96,10 +100,17 @@
 
             var usrID = (typeof v.NPM !== 'undefined') ? v.NPM : v.NIP ;
 
+            var Status = '<span style="color: orangered;">Unread</span>';
+            if(v.Read==1 || v.Read=='1'){
+                Status = '<span style="color: blue;"><i class="fa fa-check"></i> Read</span>';
+            } else if(v.Read==2 || v.Read=='2'){
+                Status = '<span style="color: green;"><i class="fa fa-bookmark"></i> Saved</span>';
+            }
+
             $('#showUsr').append('<tr>' +
-                '<td>'+no+'</td>' +
-                '<td>'+usrID+'</td>' +
-                '<td>'+v.Name+'</td>' +
+                '<td style="text-align: center;">'+no+'</td>' +
+                '<td>'+v.Name+'<br/><span style="font-size: 11px;">'+usrID+'</span></td>' +
+                '<td style="text-align: right;">'+Status+'</td>' +
                 '</tr>');
             no++;
         });
