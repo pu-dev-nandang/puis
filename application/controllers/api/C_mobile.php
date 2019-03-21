@@ -266,7 +266,62 @@ class C_mobile extends CI_Controller {
                                                 WHERE '.$urr.' AND annc.Start <= "'.$dateNow.'" 
                                                 AND annc.End >= "'.$dateNow.'" LIMIT '.$data_arr['Limit'])->result_array();
 
-            return print_r(json_encode($dataAnnc));
+            $dataSaved = $this->db->query('SELECT COUNT(*) AS TotalSaved FROM '.$db.' ann WHERE ann.Read = "2" AND '.$urr)->result_array();
+
+            $result = array(
+                'Announcement' => $dataAnnc,
+                'Saved' => $dataSaved[0]['TotalSaved']
+            );
+
+            return print_r(json_encode($result));
+        }
+
+        else if($data_arr['action']=='shceuleNow'){
+            $NPM = $data_arr['UserID'];
+            $db = 'ta_'.$data_arr['ClassOf'];
+
+            $day = $this->m_rest->getCustomeDateTimeNow('N');
+
+            $dataSmtActive = $this->m_rest->_getSemesterActive();
+
+
+            $data = $this->db->query('SELECT sd.ID AS SDID, sd.ScheduleID, attd.ID AS ID_Attd, sd.StartSessions,sd.EndSessions, cl.Room, mk.NameEng AS CourseEng
+                                                 FROM '.$db.'.study_planning sp
+                                                LEFT JOIN db_academic.schedule_details sd ON (sd.ScheduleID = sp.ScheduleID)
+                                                LEFT JOIN db_academic.classroom cl ON (sd.ClassroomID = cl.ID)
+                                                LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = sp.ScheduleID)
+                                                LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                LEFT JOIN db_academic.attendance attd ON (attd.ScheduleID = sd.ScheduleID AND attd.SDID = sd.ID)
+                                                WHERE sp.NPM = "'.$NPM.'" 
+                                                AND sp.SemesterID = "'.$dataSmtActive['SemesterID'].'"
+                                                 AND sd.DayID = "'.$day.'" 
+                                                 GROUP BY sp.ScheduleID
+                                                 ORDER BY sd.StartSessions ')
+                                ->result_array();
+
+            // Get Attendance
+            if(count($data)>0){
+                for($i=0;$i<count($data);$i++){
+                    $d = $data[$i];
+                    // Get Meet
+                    $Meet = $this->m_rest->getSessionByID_Attd($d['ID_Attd']);
+                    $data[$i]['Meet'] = $Meet;
+
+                    // Get Status Attendance
+
+                    $sc = 'attds.M'.$Meet.' AS Status';
+
+                    $dataStatus = $this->db->query('SELECT '.$sc.' FROM db_academic.attendance_students attds 
+                                                            WHERE attds.ID_Attd = "'.$d['ID_Attd'].'" 
+                                                            AND attds.NPM = "'.$NPM.'"
+                                                            LIMIT 1')->result_array();
+                    $data[$i]['StatusAttd'] = $dataStatus[0]['Status'];
+                }
+            }
+
+            return print_r(json_encode($data));
+
+
         }
 
 
