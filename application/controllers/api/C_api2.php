@@ -1729,7 +1729,7 @@ class C_api2 extends CI_Controller {
 
                 $data = $this->db->query('SELECT * FROM db_notifikasi.'.$db.' u 
                                                    LEFT JOIN db_notifikasi.announcement anc ON (anc.ID = u.IDAnnc) 
-                                                   WHERE u.Read = "0" AND u.'.$w.' = "'.$UserID.'" ')->result_array();
+                                                   WHERE u.Read = "0" AND u.'.$w.' = "'.$UserID.'" ORDER BY anc.ID DESC ')->result_array();
 
                 return print_r(json_encode($data));
 
@@ -1915,7 +1915,7 @@ class C_api2 extends CI_Controller {
 
             $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div style="font-weight: bold;">'.$row['Title'].'</div>';
-            $nestedData[] = '<div>'.$row['Message'].'</div>';
+            $nestedData[] = '<div class="detail-message">'.$row['Message'].'</div>';
             $nestedData[] = '<div style="text-align:right;">'.$swStd.''.$swEmp.'</div>';
             $nestedData[] = '<div style="text-align:center;">'.$file.'</div>';
             $nestedData[] = '<div style="text-align:center;">'.date('d M Y',strtotime($row['Start'])).' - '.date('d M Y',strtotime($row['End'])).'</div>';
