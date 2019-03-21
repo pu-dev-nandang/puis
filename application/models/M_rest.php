@@ -25,8 +25,13 @@ class M_rest extends CI_Model {
         return $date;
     }
 
+    public function getCustomeDateTimeNow($custom){
+        $date = date(''.$custom);
+        return $date;
+    }
 
-    private function _getSemesterActive(){
+
+    public function _getSemesterActive(){
         $data = $this->db->query('SELECT ay.*
                                             FROM db_academic.semester s
                                             LEFT JOIN db_academic.academic_years ay
@@ -1657,6 +1662,48 @@ class M_rest extends CI_Model {
                  '.$Status.$Semester;
         $query = $this->db->query($sql)->result_array();
         return $query[0]['total'];
+    }
+
+    public function getSessionByID_Attd($ID_Attd){
+
+        $dataAttendance = $this->db->limit(1)->get_where('db_academic.attendance'
+            ,array('ID' => $ID_Attd))->result_array();
+
+        $Meet = 1;
+        if(count($dataAttendance)>0){
+            $dAttd = $dataAttendance[0];
+
+            for($m=1;$m<=14;$m++){
+                $Meet = $m;
+                if($dAttd['Meet'.$m]==null || $dAttd['Meet'.$m]==0 || $dAttd['Meet'.$m]=='0'){
+
+                    // Cek apakah ada kelas pengganti atau tidak
+                    $dataExc = $this->db->limit(1)->get_where('db_academic.schedule_exchange'
+                        ,array('ID_Attd' => $ID_Attd, 'Meeting' => $Meet, 'Status' => '2'))->result_array();
+
+                    if(count($dataExc)<=0){
+                        break;
+                    }
+
+                } else if($dAttd['Meet'.$m]=='1' || $dAttd['Meet'.$m]==1){
+                    // cek apakah ada dosen yang sudah terlebih dahulu absen
+                    $dataLect = $this->db->get_where('db_academic.attendance_lecturers'
+                        , array(
+                            'ID_Attd' => $ID_Attd,
+                            'Meet' => $Meet,
+                            'Date' => $this->getDateNow()
+                        ))->result_array();
+
+                    if(count($dataLect)>0){
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $Meet;
+
+
     }
 
 }
