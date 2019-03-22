@@ -1,4 +1,5 @@
-            
+
+
 <div class="row">
             <div class="col-md-6" style="border-right: 1px solid #afafafb5;">
 
@@ -70,7 +71,7 @@
                                 <div class="row">
                                    <div class="col-md-12" style="text-align: right;">
                                             <hr/>
-                                            <button class="btn btn-success btnSaveFiles">Save</button>
+                                            <button class="btn btn-success btn-round btnSaveFiles"> <span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
                                         </div> 
                                 </div>
                             </div>
@@ -112,7 +113,6 @@ $('#fileOther').change(function (event) {
         
         var NIP = '<?php echo $NIP; ?>';
         var url = base_url_js+'api/__reviewotherfile?NIP='+NIP;
-
         var token = jwt_encode({
             action:'read',
             NIP:NIP},'UAP)(*');
@@ -131,7 +131,7 @@ $('#fileOther').change(function (event) {
                     '             <th style="width: 8%;text-align: center;">No.Document</th>        '+
                     '             <th style="width: 5%;text-align: center;">Date Document</th>      '+
                     '             <th style="width: 15%;text-align: center;">Description</th>       '+
-                    '             <th style="text-align: center;width: 7%;">Action</th>             '+
+                    '             <th style="text-align: center;width: 8%;">Action</th>             '+
                     '         </tr>                                                                  '+
                     '         </thead>                                                              '+
                     '         <tbody id="dataRow"></tbody>                                          '+
@@ -168,7 +168,7 @@ $('#fileOther').change(function (event) {
                     '            <td>'+datadoc+'</td>                                                '+    
                     '            <td><center>'+datadate+'</center></td>                              '+                                                       
                     '             <td>'+datadesc+'</td>                                              '+    
-                    '            <td style="text-align: center;"><button class="btn btn-sm btn-primary btnviewlistsrata" data-toggle="tooltip" data-placement="top" title="Review Files" filesub="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i></button> | <button class="btn btn-sm btn-primary testEditdocument" data-toggle="tooltip" data-placement="top" title="Edit File" filesnametype="'+response[i]['NameFiles']+'" idtypex="'+response[i]['TypeFiles']+'" idfiles="'+response[i]['ID']+'" linkfileother="'+response[i]['LinkFiles']+'" namedoc ="'+response[i]['No_Document']+'"><i class="fa fa-edit"></i></button> </td>      '+     
+                    '            <td style="text-align: center;"><button type="button" class="btn btn-sm btn-primary btn-circle btnviewlistsrata" data-toggle="tooltip" data-placement="top" title="Review Files" filesub="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i></button> <button class="btn btn-sm btn-circle btn-danger btndelotherfile" data-toggle="tooltip" data-placement="top" title="Delete File" Idotherfile="'+response[i]['ID']+'"><i class="fa fa-trash"></i> </button> <button class="btn btn-sm btn-success btn-circle testEditdocument" data-toggle="tooltip" data-placement="top" title="Edit File" filesnametype="'+response[i]['NameFiles']+'" idtypex="'+response[i]['TypeFiles']+'" idfiles="'+response[i]['ID']+'" linkfileother="'+response[i]['LinkFiles']+'" namedoc ="'+response[i]['No_Document']+'"><i class="fa fa-edit"></i></button> </td>      '+     
                     '   </tr>');
                 } 
             }
@@ -384,3 +384,26 @@ $('#btnSaveEditFiles').click(function () {
 
 </script>
 
+
+<script>
+     $(document).on('click','.btndelotherfile',function () {
+        if (window.confirm('Are you sure to delete file ?')) {
+            loading_button('.btndelotherfile');
+
+            var otfile1 = $(this).attr('Idotherfile');
+            var data = {
+                action : 'deleteother',
+                otfile1 : otfile1
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+"api/__delistacaemploy";
+            $.post(url,{token:token},function (result) {
+                toastr.success('Success Delete File!','Success'); 
+                setTimeout(function () {
+                    window.location.href = '';
+                },1000);
+            });
+        }
+    });
+</script>

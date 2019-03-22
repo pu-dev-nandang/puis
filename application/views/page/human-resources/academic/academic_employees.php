@@ -5,6 +5,31 @@
     }
 </style>
 
+<style>
+    .btn-circle.btn-xl {
+    width: 70px;
+    height: 70px;
+    padding: 10px 16px;
+    border-radius: 35px;
+    font-size: 24px;
+    line-height: 1.33;
+}
+
+.btn-circle {
+    width: 30px;
+    height: 30px;
+    padding: 6px 0px;
+    border-radius: 15px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.42857;
+}
+
+.btn-round{
+border-radius: 17px;
+}
+</style> 
+
 <div class="row">
     <div class="col-md-4 col-md-offset-4">
         <div class="thumbnail">
@@ -34,7 +59,7 @@
             <th style="width: 12%;">Position Main</th>
             <th style="width: 5%;">Status</th>
             <th style="width: 49%;">Status Files</th>
-            <th>Total Files</th>
+            <th>Total</th>
             <th style="width: 5%;">Action</th>
         </tr>
         </thead>

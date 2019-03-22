@@ -761,49 +761,20 @@ class M_api extends CI_Model {
 
      // ====== Get Academic Employee =======
 
-     public function views_academicOLD($NIP) {
-        // ID S1,S2,S3 = 1,3,5 && transcript S1,S2,S3 = 2,4,6
-        $arr = array(1,3,5);
-        $arr_name = array('S1','S2','S3');
-        $rs = array();
-        //for ($i=0; $i < count($arr); $i++) { 
-        //    $temp = array();
-        //    $sql = "SELECT * FROM db_employees.files AS em WHERE em.NIP = '".$NIP."' and TypeAcademic = ? ORDER BY em.TypeFiles,em.TypeAcademic ASC ";
-         //   $query=$this->db->query($sql, array($arr[$i]))->result_array();
-         //   for ($j=0; $j < count($query); $j++) { 
-         //       $k = $arr[$i] + 1;
-         //       $query[$j]['LinkFiles_Transcript'] => 
-         //   }
-            // find transcript
-        //    $j = $arr[$i] + 1;
-        //    $sql1 = "SELECT * FROM db_employees.files AS em WHERE em.NIP = '".$NIP."' and TypeAcademic = ? ORDER BY em.TypeFiles,em.TypeAcademic ASC ";
-        //    $query1=$this->db->query($sql1, array($j));
-        //    $query[] = array('LinkFiles_Transcript' => $query1[0]['LinkFiles']);
-        //    $temp = array(
-        //        $arr_name[$i] => 
-         //   );
-
-        //}
-        
-        //return $query->result_array();
-    
-    }
-
     public function views_academic($NIP) {
 
-        $sql = "SELECT * FROM db_employees.files AS em WHERE em.NIP = '".$NIP."' AND em.TypeFiles IN ('1','2','3','4','5','6') AND Aktif = '1' AND LinkFiles IS NOT NULL ORDER BY em.TypeAcademic ASC ";
+        $sql = "SELECT * FROM db_employees.files AS em WHERE em.NIP = '".$NIP."' AND em.TypeFiles IN ('1','2','3','4','5','6') AND Active = '1' AND LinkFiles NOT IN ('') AND LinkFiles IS NOT NULL ORDER BY em.TypeAcademic ASC ";
         $query=$this->db->query($sql, array());
         return $query->result_array();
 
     }
-
 
     // ====== Get Academic Employee Files =======
      public function views_otherfile($NIP) {
         $sql = "SELECT f.*, m.NameFiles
             FROM db_employees.files AS f
             LEFT JOIN db_employees.master_files AS m ON (f.TypeFiles = m.ID)
-            WHERE f.NIP = '".$NIP."' AND m.Type ='1' AND Aktif = '1' AND LinkFiles IS NOT NULL";
+            WHERE f.NIP = '".$NIP."' AND m.Type ='1' AND Active = '1' AND LinkFiles NOT IN ('') AND LinkFiles IS NOT NULL";
 
         $query=$this->db->query($sql, array());
         return $query->result_array();
@@ -813,7 +784,7 @@ class M_api extends CI_Model {
         
              $sql = "SELECT NIP, TypeAcademic, NameUniversity, TypeFiles, LinkFiles
                     FROM db_employees.files 
-                    WHERE NIP ='".$NIP."' AND TypeAcademic ='".$srata."' AND Aktif = '1' AND LinkFiles IS NOT NULL";
+                    WHERE NIP ='".$NIP."' AND TypeAcademic ='".$srata."' AND Active = '1' AND LinkFiles NOT IN ('') AND LinkFiles IS NOT NULL";
              $query=$this->db->query($sql, array());
              return $query->result_array();
         
@@ -834,13 +805,12 @@ class M_api extends CI_Model {
 
         $sql = "SELECT *
                 FROM db_employees.files 
-                WHERE NIP= '".$NIP."' AND ID= '".$IDfiles."' ";
+                WHERE NIP= '".$NIP."' AND ID= '".$IDfiles."' AND Active = '1' ";
 
         $query=$this->db->query($sql, array());
         return $query->result_array();
 
      }
-
 
 
     public function edit_academicemployee()
@@ -853,13 +823,18 @@ class M_api extends CI_Model {
 
      public function delistacademicemployee($ID1, $ID2){
 
-        $sql = "UPDATE db_employees.files SET Aktif='0' WHERE ID IN ('".$ID1."', '".$ID2."') ";
+        $sql = "UPDATE db_employees.files SET Active='0' WHERE ID IN ('".$ID1."', '".$ID2."') ";
+        $query=$this->db->query($sql);
+
+     }
+
+     public function delistotherfiles($ID1){
+
+        $sql = "UPDATE db_employees.files SET Active='0' WHERE ID = '".$ID1."' ";
         $query=$this->db->query($sql);
 
      }
     
-
-
     // ====== Get Jadwal Per Day =======
 
     public function getTotalPerDay($DayID,$dataWhere){
