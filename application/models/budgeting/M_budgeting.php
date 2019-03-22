@@ -968,32 +968,32 @@ class M_budgeting extends CI_Model {
         // filtering
         if ($Departement == 'NA.9') {
             // get setiap departement
-            for ($i=0; $i < count($arr); $i++) { 
-                // find di cfg_approval_budget
-                $bool = false;
-                for ($j=0; $j < count($F); $j++) { 
-                    $NIPDB = $F[$j]['NIP'];
-                    if ($NIP == $NIPDB) {
-                        $bool = true;
-                        $arr[$i] = $arr[$i] + array(
-                             'ID_m_userrole' => $F[$j]['ID_m_userrole'],
-                             'Visible' => $F[$j]['Visible'],
-                             'TypeDesc' => $F[$j]['TypeDesc'],
-                             'NIP' => $F[$j]['NIP'],
-                         ); 
-                        break;
-                    }
-                }
+            // for ($i=0; $i < count($arr); $i++) { 
+            //     // find di cfg_approval_budget
+            //     $bool = false;
+            //     for ($j=0; $j < count($F); $j++) { 
+            //         $NIPDB = $F[$j]['NIP'];
+            //         if ($NIP == $NIPDB) {
+            //             $bool = true;
+            //             $arr[$i] = $arr[$i] + array(
+            //                  'ID_m_userrole' => $F[$j]['ID_m_userrole'],
+            //                  'Visible' => $F[$j]['Visible'],
+            //                  'TypeDesc' => $F[$j]['TypeDesc'],
+            //                  'NIP' => $F[$j]['NIP'],
+            //              ); 
+            //             break;
+            //         }
+            //     }
 
-                if (!$bool) {
-                   $arr[$i] = $arr[$i] + array(
-                        'ID_m_userrole' => 0,
-                        'Visible' => 'No',
-                        'TypeDesc' => '',
-                        'NIP' => $NIP
-                    ); 
-                }
-            }
+            //     if (!$bool) {
+            //        $arr[$i] = $arr[$i] + array(
+            //             'ID_m_userrole' => 0,
+            //             'Visible' => 'No',
+            //             'TypeDesc' => '',
+            //             'NIP' => $NIP
+            //         ); 
+            //     }
+            // }
             $rs = $arr;
         }
         else
@@ -1005,19 +1005,54 @@ class M_budgeting extends CI_Model {
                    for ($j=0; $j < count($arr); $j++) { 
                        $D2 = $arr[$j]['Code'];
                        if ($D == $D2) {
-                           $rs[] = $arr[$j] + array(
-                            'ID_m_userrole' => $F[$i]['ID_m_userrole'],
-                            'Visible' => $F[$i]['Visible'],
-                            'TypeDesc' => $F[$i]['TypeDesc'],
-                            'NIP' => $F[$i]['NIP'],
-                           );
+                           $rs[] = $arr[$j];
                        }
                    }
                }
-            } 
+            }
+
         }
 
         return $rs;
+    }
 
+    public function Add_department_IFCustom_approval($Year)
+    {
+        $arr = array();
+        $NIP = $this->session->userdata('NIP');
+        $sql = 'select a.*,b.NameDepartement from db_budgeting.creator_budget_approval as a
+                join (
+                select * from (
+                select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
+                UNION
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                ) aa
+                ) as b on a.Departement = b.ID
+                where JsonStatus like "%'.$NIP.'%"  and Year = ? ';
+        $query=$this->db->query($sql, array($Year))->result_array();
+        if (count($query) > 0) {
+            for ($i=0; $i < count($query); $i++) { 
+               $JsonStatus = (array) json_decode($query[$i]['JsonStatus'],true);
+               // find NIP
+               $bool = false;
+               for ($j=0; $j < count($JsonStatus); $j++) { 
+                   $NIPDB = $JsonStatus[$j]['NIP'];
+                   if ($NIP == $NIPDB) {
+                       $bool = true;
+                       break;
+                   }
+               }
+
+               if ($bool) {
+                  $arr[] = array(
+                    'Code' => $query[$i]['Departement'],
+                    'Name2' => $query[$i]['NameDepartement'],
+                  ); 
+               }
+
+            }
+        }
+
+        return $arr;
     }  
 }

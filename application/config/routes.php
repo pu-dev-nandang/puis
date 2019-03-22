@@ -1177,6 +1177,10 @@ $route['budgeting/EntryBudget/EntryPostItemBudgeting'] = 'page/budgeting/c_budge
 $route['budgeting/EntryBudget/EntryBudget/(:any)'] = 'page/budgeting/c_budgeting/EntryBudget/$1';
 $route['budgeting/getCreatorBudget'] = 'page/budgeting/c_budgeting/getCreatorBudget';
 $route['budgeting/saveCreatorbudget'] = 'page/budgeting/c_budgeting/saveCreatorbudget';
+$route['budgeting/update_approval_budgeting'] = 'page/budgeting/c_budgeting/update_approval_budgeting';
+
+
+
 $route['budgeting/EntryBudget/Approval'] = 'page/budgeting/c_budgeting/EntryBudget_Approval';
 $route['budgeting/getLoadApprovalBudget'] = 'page/budgeting/c_budgeting/getLoadApprovalBudget';
 $route['budgeting/getLoadApprovalBudget/(:any)'] = 'page/budgeting/c_budgeting/getLoadApprovalBudget/$1';

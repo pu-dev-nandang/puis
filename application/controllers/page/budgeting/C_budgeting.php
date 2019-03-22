@@ -1258,7 +1258,120 @@ class C_budgeting extends Budgeting_Controler {
         $arr_result['PostBudget'] = $get;
         $arr_result['Approval'] = $this->m_budgeting->get_cfg_set_roleuser_budgeting($Departement); 
 
+        // adding department while the user have auth of custom approval was added by admin
+            $arr_result['Add_department_IFCustom_approval'] = $this->m_budgeting->Add_department_IFCustom_approval($Year);
+            $arr_result['m_type_user'] = $this->m_master->showData_array('db_budgeting.cfg_m_type_approval');
+
         echo json_encode($arr_result);
+    }
+
+    public function update_approval_budgeting()
+    {
+        $this->auth_ajax();
+        $Input = $this->getInputToken();
+        $rs = array('msg' => '');
+        switch ($Input['action']) {
+            case 'add':
+                // validation urutan Approver
+                    $id_creator_budget_approval = $Input['id_creator_budget_approval'];
+                    $G_data = $this->m_master->caribasedprimary('db_budgeting.creator_budget_approval','ID',$id_creator_budget_approval);
+                    $JsonStatus = $G_data[0]['JsonStatus'];
+                    $JsonStatus = (array)json_decode($JsonStatus,true);
+                    $Approver = $Input['NIP'];
+                    $indexjson = $Input['indexjson'];
+                    $Visible = $Input['Visible'];
+                    $NameTypeDesc = $Input['NameTypeDesc'];
+                    $indexjsonAdd = count($JsonStatus); // hitung index array
+                    if ($indexjson == $indexjsonAdd ) { // validation urutan Approver
+                        $JsonStatus[] = array(
+                            'NIP' => $Approver,
+                            'Status' => 0,
+                            'ApproveAt' => '',
+                            'Representedby' => '',
+                            'Visible' => $Visible,
+                            'NameTypeDesc' => $NameTypeDesc,
+                         );
+
+                        $JsonStatusSave = json_encode($JsonStatus);
+                        $dataSave = array(
+                            'JsonStatus' => $JsonStatusSave,
+                        );    
+                        $this->db->where('ID',$id_creator_budget_approval);
+                        $this->db->update('db_budgeting.creator_budget_approval',$dataSave);
+                        
+                        $rs['data']=  $JsonStatusSave;
+                            // save to log
+                                $this->m_budgeting->log_budget($id_creator_budget_approval,'Custom Approval',$By = $this->session->userdata('NIP')); 
+                    }
+                    else
+                    {
+                        $rs['msg'] = 'Please fill Approver '.(count($JsonStatus)+1);
+                    }
+                break;
+            case 'edit':
+                    $id_creator_budget_approval = $Input['id_creator_budget_approval'];
+                    $G_data = $this->m_master->caribasedprimary('db_budgeting.creator_budget_approval','ID',$id_creator_budget_approval);
+                    $JsonStatus = $G_data[0]['JsonStatus'];
+                    $JsonStatus = (array)json_decode($JsonStatus,true);
+                    $Approver = $Input['NIP'];
+                    $indexjson = $Input['indexjson'];
+                    $Visible = $Input['Visible'];
+                    $NameTypeDesc = $Input['NameTypeDesc'];
+                    $JsonStatus[$indexjson] = array(
+                        'NIP' => $Approver,
+                        'Status' => 0,
+                        'ApproveAt' => '',
+                        'Representedby' => '',
+                        'Visible' => $Visible,
+                        'NameTypeDesc' => $NameTypeDesc,
+                    );
+                    $JsonStatusSave = json_encode($JsonStatus);
+                    $dataSave = array(
+                        'JsonStatus' => $JsonStatusSave,
+                    );    
+                    $this->db->where('ID',$id_creator_budget_approval);
+                    $this->db->update('db_budgeting.creator_budget_approval',$dataSave);
+   
+                    $rs['data']= $JsonStatusSave;
+                    // save to log
+                        $this->m_budgeting->log_budget($id_creator_budget_approval,'Custom Approval',$By = $this->session->userdata('NIP')); 
+                break;    
+            case 'delete':
+                    $id_creator_budget_approval = $Input['id_creator_budget_approval'];
+                    $indexjson = $Input['indexjson'];
+                    $G_data = $this->m_master->caribasedprimary('db_budgeting.creator_budget_approval','ID',$id_creator_budget_approval);
+                    $JsonStatus = $G_data[0]['JsonStatus'];
+                    $JsonStatus = (array)json_decode($JsonStatus,true);
+                    // Data json yang boleh dihapus adalah yang terakhir
+                    $KeyJsonStatus = count($JsonStatus) - 1;
+                    if ($indexjson == $KeyJsonStatus) {
+                        $t = array();
+                        for ($i=0; $i < count($JsonStatus) - 1; $i++) { // add 0 until last key - 1
+                            $t[] = $JsonStatus[$i];
+                        }
+
+                        $JsonStatus = $t;
+                        $JsonStatusSave = json_encode($JsonStatus);
+                        $dataSave = array(
+                            'JsonStatus' => $JsonStatusSave,
+                        );
+                        $this->db->where('ID',$id_creator_budget_approval);
+                        $this->db->update('db_budgeting.creator_budget_approval',$dataSave);
+                        $rs['msg'] = '';
+                        $rs['data']= $JsonStatusSave;
+                    }
+                    else
+                    {
+                        $rs['msg'] = 'Please delete last Approval first';
+                    }
+
+                break;
+            default:
+                # code...
+                break;
+        }
+
+        echo json_encode($rs);
     }
 
     public function saveCreatorbudget()
