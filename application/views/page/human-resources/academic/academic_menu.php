@@ -1,4 +1,27 @@
+<style>
+    .btn-circle.btn-xl {
+    width: 70px;
+    height: 70px;
+    padding: 10px 16px;
+    border-radius: 35px;
+    font-size: 24px;
+    line-height: 1.33;
+}
 
+.btn-circle {
+    width: 30px;
+    height: 30px;
+    padding: 6px 0px;
+    border-radius: 15px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.42857;
+}
+
+.btn-round{
+border-radius: 17px;
+}
+</style> 
 <style>
     .form-attd[readonly] {
         cursor: cell;
@@ -26,7 +49,7 @@
 <div class="row" style="margin-top: 30px;">
 
     <div class="col-md-12" style="margin-bottom: 15px;">
-        <a href="<?php echo base_url('human-resources/academic_employees') ?>" class="btn btn-primary"><i class="fa fa-arrow-circle-left"></i> Back to list Academic Employee</a>
+        <a href="<?php echo base_url('human-resources/academic_employees') ?>" class="btn btn-primary btn-round "><i class="fa fa-arrow-circle-left"></i> Back to list Academic Employee</a>
     </div>
 
     <div class="col-md-12">
@@ -193,7 +216,7 @@
             $('#NotificationModal .modal-header').addClass('hide');
             $('#NotificationModal .modal-body').html('<center> '+
                 '<iframe src="'+base_url_js+'uploads/files/'+filesub+'" frameborder="0" style="width:745px; height:550px;"></iframe> '+
-                '<br/><br/><button type="button" id="btnRemoveNoEditSc" class="btn btn-primary" data-dismiss="modal">Close</button><button type="button" filesublix ="'+filesub+'" class="btn btn-primary pull-right filesublink" data-toggle="tooltip" data-placement="top" title="Full Review"><span class="fa fa-external-link"></span></button>' +
+                '<br/><br/><button type="button" id="btnRemoveNoEditSc" class="btn btn-primary btn-round" data-dismiss="modal"><span class="fa fa-remove"></span> Close</button><button type="button" filesublix ="'+filesub+'" class="btn btn-primary btn-circle pull-right filesublink" data-toggle="tooltip" data-placement="top" title="Full Review"><span class="fa fa-external-link"></span></button>' +
             '</center>');
             $('#NotificationModal .modal-footer').addClass('hide');
             $('#NotificationModal').modal({

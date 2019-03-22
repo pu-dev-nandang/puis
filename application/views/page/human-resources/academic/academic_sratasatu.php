@@ -108,7 +108,7 @@
                                 <div class="row">
                                    <div class="col-md-12" style="text-align: right;">
                                             <hr/>
-                                            <button class="btn btn-success btnSaveSrata1">Save</button>
+                                            <button class="btn btn-success btn-round btnSaveSrata1"><span class="glyphicon glyphicon-floppy-disk"></span> Save </button>
                                         </div> 
                                 </div>
                             </div>
@@ -175,9 +175,9 @@ function loadAcademicS1Details() {
                     $("#dataRow").append('<tr>                                                          '+
                     '            <td> S1 </td>                                                          '+         
                     '            <td> '+response[i]['NameUniversity']+' </td>                           '+                             
-                    '            <td><center><button class="btn btn-sm btn-default btn-default-primary btnviewlistsrata" filesub="'+listdatas1+'"><i class="fa fa-eye margin-right"></i> Preview</button></center></td>                                                '+    
-                    '            <td><center><button class="btn btn-sm btn-default btn-default-success btnviewlistsrata" filesub="'+listdatas2+'"><i class="fa fa-eye margin-right"></i> Preview</button> </center></td>                                              '+                                
-                    '            <td style="text-align: center;"><button id="btnedits1" class="btn btn-sm btn-primary testEdit" data-toggle="tooltip" data-placement="top" title="Edit" nameuniv= "'+response[i]['NameUniversity']+'" fileijazahs1 ="'+listdatas1+'" filetranscripts1 ="'+listdatas2+'"><i class="fa fa-edit"></i></button></td>      '+     
+                    '            <td><center><button class="btn btn-sm btn-default btn-default-primary btn-round btnviewlistsrata" filesub="'+listdatas1+'"><i class="fa fa-eye margin-right"></i> Preview</button></center></td>                                                '+    
+                    '            <td><center><button class="btn btn-sm btn-default btn-default-success btn-round btnviewlistsrata" filesub="'+listdatas2+'"><i class="fa fa-eye margin-right"></i> Preview</button> </center></td>                                              '+                                
+                    '            <td style="text-align: center;"><button id="btnedits1" class="btn btn-sm btn-primary btn-circle testEdit" data-toggle="tooltip" data-placement="top" title="Edit" nameuniv= "'+response[i]['NameUniversity']+'" fileijazahs1 ="'+listdatas1+'" filetranscripts1 ="'+listdatas2+'"><i class="fa fa-edit"></i></button></td>      '+     
                     '         </tr> ');
                 }
                 
@@ -199,12 +199,12 @@ function loadAcademicS1Details() {
         var nameuniv = $(this).attr('nameuniv');
 
         if (fileijazahs1 != null) {
-            var filesx = '<iframe src="'+base_url_js+'uploads/files/'+fileijazahs1+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btnviewlistsrata" filesub ="'+fileijazahs1+'"><i class="fa fa-eye"></i> Preview </button></center>';
+            var filesx = '<iframe src="'+base_url_js+'uploads/files/'+fileijazahs1+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+fileijazahs1+'"><i class="fa fa-eye"></i> Preview </button></center>';
             } else {
             var filesx = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px;">'
         }
         if (filetranscripts1 != null) {
-            var filestrans = '<iframe src="'+base_url_js+'uploads/files/'+filetranscripts1+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btnviewlistsrata" filesub ="'+filetranscripts1+'"><i class="fa fa-eye"></i> Preview </button></center>';
+            var filestrans = '<iframe src="'+base_url_js+'uploads/files/'+filetranscripts1+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+filetranscripts1+'"><i class="fa fa-eye"></i> Preview </button></center>';
         } else {
             var filestrans = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px">'
         }
@@ -289,7 +289,7 @@ function loadAcademicS1Details() {
                         '                <hr/> '+
                         '    <div><input type="hidden" class="form-control" value="'+fileijazahs1+'" id="linkijazahs1"> </div>              '+
                         '    <div><input type="hidden" class="form-control" value="'+filetranscripts1+'" id="linktranscripts1">    </div>       '+
-                        '               <button type="button" class="btn btn-danger" data-dismiss="modal"> Cancel</button> | <button type="button" class="btn btn-success" id="btnSavedits1" linkijazahs1="'+fileijazahs1+'" linktranscripts1="'+filetranscripts1+'"> Save</button> '+
+                        '               <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"> Cancel</button> | <button type="button" class="btn btn-success btn-round" id="btnSavedits1" linkijazahs1="'+fileijazahs1+'" linktranscripts1="'+filetranscripts1+'"> Save</button> '+
                         '           </div> '+
                         '       </div>'+
                         '   </div>'+
@@ -392,13 +392,13 @@ function loadAcademicS1Details() {
                         '           <div class="col-xs-6">                                              '+
                         '           <div class="form-group">                                            '+
                         '               <label>Ijazah</label>                                           '+
-                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btnviewlistsrata" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> Preview </button></center></div>                     '+
+                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> Preview </button></center></div>                     '+
                         '               </div>                                                          '+
                         '           </div>                                                              '+
                         '           <div class="col-xs-6">                                              '+
                         '           <div class="form-group">                                            '+
                         '               <label>Transcript</label>                                       '+
-                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+Transcriptx+'" style="width:300px; height:150px;" frameborder="0"></iframe> </div> <br/><center><button class="btn btn-sm btn-primary btnviewlistsrata" filesub ="'+Transcriptx+'"><i class="fa fa-eye"></i> Preview </button></center></div>                 '+
+                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+Transcriptx+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+Transcriptx+'"><i class="fa fa-eye"></i> Preview </button></center></div>                 '+
                         '                </div>                                                         '+
                         '            </div>                                                             '+
                         '        </div>                                                                 '+
@@ -407,7 +407,7 @@ function loadAcademicS1Details() {
                         '                <hr/>                                                           '+
                         '    <div><input type="hidden" class="form-control" value="'+response[i]['LinkFiles']+'" id="linkijazahs1"> </div>                   '+
                         '    <div><input type="hidden" class="form-control" value="'+Transcriptx+'" id="linktranscripts1">    </div>       '+
-                        '    <button type="button" class="btn btn-danger" data-dismiss="modal"> Cancel</button> | <button type="button" class="btn btn-success btnSavedits1" linkijazahs1="'+response[i]['LinkFiles']+'" linktranscripts1="'+Transcriptx+'"> Save</button>                                                               '+
+                        '    <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"> Cancel</button> | <button type="button" class="btn btn-success btn-round btnSavedits1" linkijazahs1="'+response[i]['LinkFiles']+'" linktranscripts1="'+Transcriptx+'"> Save</button>                                                               '+
                         '           </div>                                                              '+
                         '       </div>                                                                  '+
                         '   </div>                                                                      '+

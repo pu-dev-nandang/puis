@@ -603,7 +603,7 @@ class C_api extends CI_Controller {
             $StatusFiles = '';
             for ($j=0; $j < count($Get_MasterFiles); $j++) { 
                 $stDefault =' <span class="label label-danger"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
-                $sql2 = 'select count(*) as total, LinkFiles from db_employees.files where NIP = ? and TypeFiles = ? and LinkFiles IS NOT NULL';
+                $sql2 = 'select count(*) as total, LinkFiles from db_employees.files where NIP = ? and TypeFiles = ? and LinkFiles IS NOT NULL  ';
                 $query2=$this->db->query($sql2, array($NIP,$Get_MasterFiles[$j]['ID']))->result_array();
                 if ($query2[0]['total'] > 0 ) {
                     $getotfiles = $getotfiles + ($query2[0]['total']);
@@ -613,7 +613,7 @@ class C_api extends CI_Controller {
                     } else {
                         $stDefault =' <span class="label label-danger"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
                     }
-                    //$getotfiles = $query2[0]['total'];
+    
                 }  
                 $StatusFiles .= $stDefault;
             }
@@ -638,9 +638,9 @@ class C_api extends CI_Controller {
             $nestedData[] = $Division.' - '.$Position;
             $nestedData[] = '<div style="text-align: center;">'.$status.'</div>';
             $nestedData[] = $StatusFiles;
-            $nestedData[] = '<div style="text-align: center;font-weight: bold;">'.$getotfiles.'</div>';
+            $nestedData[] = '<center><button type="button" style="text-align: center;" class="btn btn-primary btn-round">Files <span class="badge progress-bar-danger"> '.$getotfiles.' </span></button> </center>';
             
-            $nestedData[] = '<a class="btn btn-primary" href="'.base_url('human-resources/academic-details/'.$row["NIP"]).'">
+            $nestedData[] = '<a class="btn btn-primary btn-round" href="'.base_url('human-resources/academic-details/'.$row["NIP"]).'">
   <i class="icon-list icon-large"></i> Detail</a>';
 
              $no++;
@@ -712,16 +712,21 @@ class C_api extends CI_Controller {
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
 
-        $ID1 = $data_arr['ID1'];
-        $ID2 = $data_arr['ID2'];
-        $dataCek = $this->m_api->delistacademicemployee($ID1, $ID2);
-
-        return print_r(1);
+        if($data_arr['action']=='deleteacademic'){
+            $ID1 = $data_arr['ID1'];
+            $ID2 = $data_arr['ID2'];
+            $dataCek = $this->m_api->delistacademicemployee($ID1, $ID2);
+            return print_r(1);
+        }
+        else if($data_arr['action']=='deleteother') {
+            $ID1 = $data_arr['otfile1'];
+            $dataCek = $this->m_api->delistotherfiles($ID1);
+            return print_r(1);
+        }
 
     }
 
     
-
     public function setLecturersAvailabilityDetail($action){
         $token = $this->input->post('token');
         $key = "UAP)(*";
