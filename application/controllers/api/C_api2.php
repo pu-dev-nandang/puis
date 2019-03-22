@@ -1803,6 +1803,7 @@ class C_api2 extends CI_Controller {
                     'ID' => $IDAnnc
                 ))->result_array();
 
+                $data[0]['FileURL'] = ($data[0]['File']!='' && $data[0]['File']!=null) ? base_url('uploads/announcement/'.$data[0]['File']) : '';
 
 
                 $result = array(
