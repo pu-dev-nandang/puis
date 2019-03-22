@@ -261,10 +261,18 @@ class C_mobile extends CI_Controller {
                 $urr = 'ann.NPM = "'.$data_arr['UserID'].'" ';
             }
 
-            $dataAnnc = $this->db->query('SELECT ann.*,annc.Title FROM '.$db.' ann 
+            $dataAnnc = $this->db->query('SELECT ann.Read, annc.* FROM '.$db.' ann 
                                                 LEFT JOIN db_notifikasi.announcement annc ON (annc.ID = ann.IDAnnc)
                                                 WHERE '.$urr.' AND annc.Start <= "'.$dateNow.'" 
                                                 AND annc.End >= "'.$dateNow.'" LIMIT '.$data_arr['Limit'])->result_array();
+
+            if(count($dataAnnc)>0){
+                for($i=0;$i<count($dataAnnc);$i++){
+                    if($dataAnnc[$i]['File']!=null && $dataAnnc[$i]['File']!=''){
+                        $dataAnnc[$i]['FileURL'] = base_url('uploads/announcement/'.$dataAnnc[$i]['File']);
+                    }
+                }
+            }
 
             $dataSaved = $this->db->query('SELECT COUNT(*) AS TotalSaved FROM '.$db.' ann WHERE ann.Read = "2" AND '.$urr)->result_array();
 
