@@ -99,9 +99,19 @@
       $('#HeadAccount').empty();
       $.post(url,function (data_json) {
         var response = jQuery.parseJSON(data_json);
+        var sessIDDepartementPUBudget = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
         for (var i = 0; i < response.length; i++) {
-            var selected = (i==0) ? 'selected' : '';
-            $('#HeadAccount').append('<option value="'+ response[i]['CodeHeadAccount']  +'" '+selected+'>'+response[i]['NameHeadAccount']+' {'+response[i]['DepartementName']+'}'+'</option>');
+            var CodeDepartment = response[i].Departement;
+            if (sessIDDepartementPUBudget != 'NA.9') {
+              if (CodeDepartment == sessIDDepartementPUBudget) {
+                var selected = (i==0) ? 'selected' : '';
+                $('#HeadAccount').append('<option value="'+ response[i]['CodeHeadAccount']  +'" '+selected+'>'+response[i]['NameHeadAccount']+' {'+response[i]['DepartementName']+'}'+'</option>');
+              } 
+            } else {
+              var selected = (i==0) ? 'selected' : '';
+              $('#HeadAccount').append('<option value="'+ response[i]['CodeHeadAccount']  +'" '+selected+'>'+response[i]['NameHeadAccount']+' {'+response[i]['DepartementName']+'}'+'</option>');
+            }
+             
         }
 
         <?php if ($action == 'edit'): ?>

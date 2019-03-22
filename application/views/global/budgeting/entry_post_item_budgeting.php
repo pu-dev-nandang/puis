@@ -18,7 +18,7 @@
 <div class="col-xs-12" >
     <div class="panel panel-primary">
         <div class="panel-heading clearfix">
-            <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Post Item</h4>
+            <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Sub Account</h4>
             <div class="toolbar no-padding pull-right">
                 <span data-smt="" class="btn btn-add btn-add-realization-Post">
                     <i class="icon-plus"></i> Add
@@ -44,6 +44,7 @@ $(document).ready(function() {
     $('script[src="<?php echo base_url('assets/custom/xprototype.js');?>"]').remove()
 
 
+    
     function modal_generate2(action,title,ID='') {
         var url = base_url_js+"budgeting/postrealisasi/modalform";
         var data = {
@@ -67,18 +68,16 @@ $(document).ready(function() {
 
                     var NeedPrefix = $('.NeedPrefix:checked').val();
                     var CodePostRealisasi = $("#CodePostRealisasi").val();
-                    var PostItem = $("#PostItem").val();
+                    var HeadAccount = $("#HeadAccount").val();
                     var RealisasiPostName = $("#RealisasiPostName").val();
-                    var Departement = $("#Departement").val();
-                    
+
                     var action = $(this).attr('action');
                     var id = $("#ModalbtnSaveForm2").attr('kodeuniq');
                     var data = {
                                 NeedPrefix : NeedPrefix,
                                 CodePostRealisasi : CodePostRealisasi,
-                                PostItem : PostItem,
+                                HeadAccount : HeadAccount,
                                 RealisasiPostName : RealisasiPostName,
-                                Departement : Departement,
                                 Action : action,
                                 CDID : id
                                 };
@@ -164,9 +163,9 @@ $(document).ready(function() {
                             '<thead>'+
                             '<tr>'+
                                 '<th width = "3%">No</th>'+
-                                '<th>Post Code Item</th>'+
-                                '<th>Post Code & Name</th>'+
-                                '<th>Item Name</th>'+
+                                '<th>Sub Account</th>'+
+                                '<th>Budget Category</th>'+
+                                '<th>HeadAccount</th>'+
                                 '<th>Department</th>'+
                                 '<th>Action</th>'+
                             '</tr></thead>' 
@@ -178,24 +177,23 @@ $(document).ready(function() {
         $.post(url,function (resultJson) {
             var response = jQuery.parseJSON(resultJson);
             dataForTable = response;
-            var no =1;
+            // console.log(dataForTable);
             for (var i = 0; i < dataForTable.length; i++) {
-                var CodeDepartment = dataForTable[i].CodeDepartment;
+                var CodeDepartment = dataForTable[i].Departement;
                 var sessIDDepartementPUBudget = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
                 if (CodeDepartment == sessIDDepartementPUBudget) {
-                    var btn_edit = '<button type="button" class="btn btn-warning btn-edit btn-edit-postrealization" code = "'+dataForTable[i].CodePostRealisasi+'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
-                    var btn_del = ' <button type="button" class="btn btn-danger btn-delete btn-delete-postrealization"  code = "'+dataForTable[i].CodePostRealisasi+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
-                    TableGenerate += '<tr>'+
-                                        '<td width = "3%">'+ no+'</td>'+
-                                        '<td>'+ dataForTable[i].CodePostRealisasi+'</td>'+
-                                        '<td>'+ dataForTable[i].CodePost+'<br>'+dataForTable[i].PostName+'</td>'+ // plus name
-                                        '<td>'+ dataForTable[i].PostName+'-'+dataForTable[i].RealisasiPostName+'</td>'+
-                                        '<td>'+ dataForTable[i].Departement+'</td>'+
-                                        '<td>'+ btn_edit + ' '+' &nbsp' + btn_del+'</td>'+
-                                     '</tr>';
-                    no++;    
+                  var btn_edit = '<button type="button" class="btn btn-warning btn-edit btn-edit-postrealization" code = "'+dataForTable[i].CodePostRealisasi+'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
+                  var btn_del = ' <button type="button" class="btn btn-danger btn-delete btn-delete-postrealization"  code = "'+dataForTable[i].CodePostRealisasi+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
+                  TableGenerate += '<tr>'+
+                                      '<td width = "3%">'+ (parseInt(i) + 1)+'</td>'+
+                                      '<td>'+ dataForTable[i].CodePostRealisasi+'<br>'+dataForTable[i].RealisasiPostName+'</td>'+
+                                      '<td>'+ dataForTable[i].CodePost+'<br>'+dataForTable[i].PostName+'</td>'+ // plus name
+                                      '<td>'+ dataForTable[i].CodeHeadAccount+'<br>'+dataForTable[i].NameHeadAccount+'</td>'+
+                                      '<td>'+ dataForTable[i].DepartementName+'</td>'+
+                                      '<td>'+ btn_edit + ' '+' &nbsp' + btn_del+'</td>'+
+                                   '</tr>'   
                 }
-                
+                 
             }
 
             TableGenerate += '</tbody></table>';
@@ -255,6 +253,6 @@ $(document).ready(function() {
         }); 
                         
     }
-    
+   
 }); // exit document Function
 </script>

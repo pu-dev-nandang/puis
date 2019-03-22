@@ -77,6 +77,10 @@ class M_budgeting extends CI_Model {
                 $tget = $this->m_master->caribasedprimary('db_academic.program_study','ID',$exp[1]);
                 $Departement = $tget[0]['NameEng'];
             }
+            elseif ($exp[0] == 'FT') {
+                $tget = $this->m_master->caribasedprimary('db_academic.faculty','ID',$exp[1]);
+                $Departement = $tget[0]['NameEng'];
+            }
 
             $query[$i]['DepartementName'] = $Departement;
         }
@@ -99,6 +103,10 @@ class M_budgeting extends CI_Model {
             }
             elseif ($exp[0] == 'AC') {
                 $tget = $this->m_master->caribasedprimary('db_academic.program_study','ID',$exp[1]);
+                $Departement = $tget[0]['NameEng'];
+            }
+            elseif ($exp[0] == 'FT') {
+                $tget = $this->m_master->caribasedprimary('db_academic.faculty','ID',$exp[1]);
                 $Departement = $tget[0]['NameEng'];
             }
 
@@ -183,6 +191,10 @@ class M_budgeting extends CI_Model {
         }
         elseif ($exp[0] == 'AC') {
             $tget = $this->m_master->caribasedprimary('db_academic.program_study','ID',$exp[1]);
+            $Departement = $tget[0]['NameEng'];
+        }
+        elseif ($exp[0] == 'FT') {
+            $tget = $this->m_master->caribasedprimary('db_academic.faculty','ID',$exp[1]);
             $Departement = $tget[0]['NameEng'];
         }
         $sql = 'select a.CodePostBudget,a.CodeSubPost,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
@@ -273,6 +285,8 @@ class M_budgeting extends CI_Model {
                 select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
                 UNION
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty
                 ) aa
                 ) as d on b.Departement = d.ID
                 where (b.RealisasiPostName like "%'.$PostDepartement.'%" or d.NameDepartement like "%'.$PostDepartement.'%" 
@@ -332,6 +346,8 @@ class M_budgeting extends CI_Model {
         select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
         UNION
         select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+        UNION
+        select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty
         ) aa
         ) as b on a.Departement = b.ID
         where a.Year = ? and a.Departement = ? '.$Approval.' 
@@ -375,6 +391,8 @@ class M_budgeting extends CI_Model {
                 select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
                 UNION
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty
                 ) aa left join (select * from db_budgeting.creator_budget_approval where Year = ?) as b on aa.ID = b.Departement
                 ';
         $query=$this->db->query($sql, array($Year))->result_array(); 
@@ -399,6 +417,8 @@ class M_budgeting extends CI_Model {
                 select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
                 UNION
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty
                 ) aa left join (select * from db_budgeting.creator_budget_approval where Year = ?) as b on aa.ID = b.Departement
                 ';
         $query=$this->db->query($sql, array($Year))->result_array(); 
@@ -607,10 +627,14 @@ class M_budgeting extends CI_Model {
                     $G_Div = $this->m_master->caribasedprimary('db_employees.division','ID',$ExpDepart[1]);
                     $abbreviation_Div = $G_Div[0]['Abbreviation'];
                 }
-                else
-                {
+                elseif ($ExpDepart[0] == 'AC') {
                     $G_Div = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ExpDepart[1]);
                     $abbreviation_Div = $G_Div[0]['Code'];
+                }
+                else
+                {
+                    $G_Div = $this->m_master->caribasedprimary('db_academic.faculty','ID',$ExpDepart[1]);
+                    $abbreviation_Div = $G_Div[0]['Abbr'];
                 }
 
             $PRCode = $strINC.'/'.'UAP-'.$abbreviation_Div.'/'.'PR'.'/'.$Month.'/'.$Year;
@@ -806,6 +830,8 @@ class M_budgeting extends CI_Model {
                 select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
                 UNION
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty
                 ) aa
                 ) as b on a.Departement = b.ID
                 join db_employees.employees as c on a.CreatedBy = c.NIP
@@ -846,6 +872,8 @@ class M_budgeting extends CI_Model {
                                     select CONCAT("AC.",ID) as ID, NameEng as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
                                     UNION
                                     select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                                    UNION
+                                    select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty
                                     ) aa
                     ) as h on e.Departement = h.ID 
                 where a.PRCode = ?
@@ -868,6 +896,8 @@ class M_budgeting extends CI_Model {
                                    select CONCAT("AC.",ID) as ID, NameEng as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
                                    UNION
                                    select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                                   UNION
+                                   select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty
                                    ) aa
                    ) as h on f.Departement = h.ID
                 where b.ID_pr_detail = ?   
@@ -902,6 +932,8 @@ class M_budgeting extends CI_Model {
                 select CONCAT("AC.",ID) as ID, NameEng as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
                 UNION
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty
                 ) aa
                 where ID = ?
                 ';
@@ -915,6 +947,8 @@ class M_budgeting extends CI_Model {
                 select CONCAT("AC.",ID) as ID, NameEng as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
                 UNION
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty
                 ) aa
                 where NameDepartement = ?
                 ';
@@ -1026,6 +1060,8 @@ class M_budgeting extends CI_Model {
                 select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
                 UNION
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty
                 ) aa
                 ) as b on a.Departement = b.ID
                 where JsonStatus like "%'.$NIP.'%"  and Year = ? ';
