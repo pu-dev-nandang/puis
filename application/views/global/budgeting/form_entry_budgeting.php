@@ -111,7 +111,6 @@ function LoadFirstLoad(){
 		else
 		{
 			makeDomAwal();
-			
 		}
 	});		
 }
@@ -119,14 +118,17 @@ function LoadFirstLoad(){
 function Add_Department_auth()
 {
 	var dt = ClassDt.Add_Department;
+	var act = [0];
 	for (var i = 0; i < dt.length; i++) {
 		var aa = $("#Departement").find('option[value="'+dt[i].Code+'"]');
 		if (aa.length) {
 			// console.log('exist');
+			act.push(0);// for action
 		} else {
 			$("#Departement").append(
 					'<option value = "'+dt[i].Code+'">'+dt[i].Name2+'</option>'
 				);
+			act.push(1);// for action
 		}
 
 		
@@ -135,6 +137,18 @@ function Add_Department_auth()
 	$('#Departement').select2({
 	   //allowClear: true
 	});
+
+	// if just one department added
+	var b = 0;
+	for (var i = 0; i < act.length; i++) {
+		if (act[i] == 1) {
+			b = 1;
+			break;
+		}
+	}
+	if (!$(".ContentDataPostBudget").length &&  $('#Departement').find('option').length == 1 && b == 1) {
+		LoadFirstLoad();
+	}
 	
 }
 
@@ -494,6 +508,12 @@ function makeFooter(){
 	// for existing / edit
 	makeApproval();
 
+	// show note if existing
+		var arr1 = ClassDt.creator_budget_approval;
+		if (arr1.length > 0) {
+			$('#Note').val(arr1[0].Note);
+		} 
+
 }
 
 function makeApproval()
@@ -695,7 +715,15 @@ function showButton()
 				$("#content_button").html(html);
 			}
 
+			// disabled ChooseSubAccount while approval process
+			$('#ChooseSubAccount').prop('disabled',true);
 		}
+
+		if (Status ==2) {
+			$('button:not(#Log):not(#btnBackToHome)').prop('disabled',true);
+			$('input').prop('disabled',true);
+			$('select:not(#Departement):not(#Year)').prop('disabled',true);
+		} 
 
 	}
 	
@@ -941,7 +969,114 @@ $(document).off('click', '#SaveBudget').on('click', '#SaveBudget',function(e) {
   		}	
 
   }
-});	
+});
+
+$(document).off('click', '#SaveSubmit').on('click', '#SaveSubmit',function(e) {
+	var ID = $(this).attr('id_creator_budget_approval');
+	var action = $(this).attr('action');
+  if (confirm("Are you sure?") == true) {
+  	loadingStart();
+  	// check total input month harus sama dengan freq
+  		var arrBool = [];
+  		var arr_pass = [];
+  		$('.PostBudget').each(function(){
+  			var row = $(this).closest('.ContentDataPostBudget');
+  			var CodePostRealisasi = row.find('.col-md-1:eq(0)').find('.PostBudget').val();
+  			var UnitCost = row.find('.col-md-1:eq(1)').find('.UnitCost').val();
+  			UnitCost = findAndReplace(UnitCost,".","");
+  			UnitCost = parseInt(UnitCost) * 1000; // for ribuan
+  			var Freq = row.find('.col-md-1:eq(2)').find('.Freq').val();
+  			var Subtotal = parseInt(UnitCost * Freq)
+  			var count = 0;
+  			var arr = [];
+  			row.find('.InputBulan').each(function(){
+  				var v = $(this).val();
+  				v = findAndReplace(v,".","");
+  				var keyvalue = $(this).attr('keyvalue');
+  				count = parseInt(count) + parseInt(v);
+  				arr.push({month : keyvalue,value : v,});
+  			})
+
+  			if (Freq != count) {
+  				arrBool.push(0);
+  			}
+  			else
+  			{
+  				arrBool.push(1);
+  			}
+
+  			var creator_budget = {
+  				CodePostRealisasi : CodePostRealisasi,
+  				UnitCost : UnitCost,
+  				Freq : Freq,
+  				DetailMonth : arr,
+  				SubTotal : Subtotal,
+  			};
+
+  			arr_pass.push(creator_budget);
+
+  		})
+
+  		// arr creator_budget_approval
+  			var creator_budget_approval = {
+  				Departement : $('#Departement').val(),
+  				Year : $('#Year').val(),
+  				Note : $("#Note").val(),
+  				Status : 1,
+  			};
+
+  		var bool =true;
+  		for (var i = 0; i < arrBool.length; i++) {
+  			if (arrBool[i] == 0) {
+  				bool = false;
+  				break;
+  			}
+  		}
+
+  		if(!bool)
+  		{
+	  		toastr.info("Your Month Input is not same with Freq, Please check");
+	  		loadingEnd(1000);
+  		}
+  		else
+  		{
+  			var url = base_url_js+"budgeting/saveCreatorbudget";
+  			var data = {
+  				creator_budget :arr_pass,
+  				creator_budget_approval : creator_budget_approval,
+  				ID : ID,
+  				action : action,
+  				};
+  			// console.log(data);loadingEnd(1000);return;	
+  			var token = jwt_encode(data,'UAP)(*');
+  			$.post(url,{token:token},function (resultJson) {
+  				var response = jQuery.parseJSON(resultJson);
+  				if(response.Status == 1)
+  				{
+  					// $("#SaveBudget").attr('action','edit');
+  					// $("#SaveBudget").attr('id_creator_budget_approval',response.msg);
+
+  					// $("#SaveSubmit").attr('action','edit');
+  					// $("#SaveSubmit").attr('id_creator_budget_approval',response.msg);
+  					LoadFirstLoad();
+  					// $("#Log").attr('id_creator_budget_approval',response.msg);
+  				}
+  				else
+  				{
+  					toastr.error(response.msg,'!Failed');
+  				}
+  				loadingEnd(2000);
+
+  			}).fail(function() {
+  			  $('.pageAnchor[page="EntryBudget"]').trigger('click');	
+  			  toastr.error('The Database connection error, please try again', 'Failed!!');
+  			  loadingEnd(3000);
+  			}).always(function() {
+  			    // $('#NotificationModal').modal('hide');
+  			}); 
+  		}	
+  }
+});		
 
 // existing
 function makeDomExisting()
@@ -1045,97 +1180,111 @@ function makeContent_existing()
 $(document).off('click', '#add_approver').on('click', '#add_approver',function(e) {
    var id_creator_budget_approval = $(this).attr('id_creator_budget_approval');
    var dt = ClassDt.creator_budget_approval;
-   var url = base_url_js+'rest/__getEmployees/aktif';
-   var data = {
-   		    auth : 's3Cr3T-G4N'
-   		};
-   var token = jwt_encode(data,'UAP)(*');
-   $.post(url,{token:token},function (resultJson) {
-		var html = '<div class = "row"><div class="col-md-12">';
-			html += '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
-	         '<thead>'+
-	             '<tr>'+
-	                 '<th style="width: 2%;">Approval</th>'+
-	                 '<th style="width: 55px;">Name</th>'+
-	                 '<th style="width: 55px;">Status</th>'+
-	                 '<th style="width: 55px;">Type User</th>'+
-	                 '<th style="width: 55px;">Visible</th>'+
-	                 '<th style="width: 55px;">Action</th>';
-	        html += '</tr>' ;
-	        html += '</thead>' ;
-	        html += '<tbody>' ;
+   // only process while status draft and reject
+   if (dt[0].Status == '0' || dt[0].Status == '3') {
+	   var url = base_url_js+'rest/__getEmployees/aktif';
+	   var data = {
+	   		    auth : 's3Cr3T-G4N'
+	   		};
+	   var token = jwt_encode(data,'UAP)(*');
+	   $.post(url,{token:token},function (resultJson) {
+			var html = '<div class = "row"><div class="col-md-12">';
+				html += '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+		         '<thead>'+
+		             '<tr>'+
+		                 '<th style="width: 2%;">Approval</th>'+
+		                 '<th style="width: 55px;">Name</th>'+
+		                 '<th style="width: 55px;">Status</th>'+
+		                 '<th style="width: 55px;">Type User</th>'+
+		                 '<th style="width: 55px;">Visible</th>'+
+		                 '<th style="width: 55px;">Action</th>';
+		        html += '</tr>' ;
+		        html += '</thead>' ;
+		        html += '<tbody>' ;
 
-	    var JsonStatus = jQuery.parseJSON(dt[0].JsonStatus);   
-	    var ke = 0; 
-	    for (var i = 0; i < JsonStatus.length; i++) {
-	    	ke = i + 1;
-	    	// search Name
-	    		var Name = '';
-		    	for (var j = 0; j < resultJson.length; j++) {
-		    		if (JsonStatus[i].NIP == resultJson[j].NIP) {
-		    			Name = resultJson[j].Name;
-		    			break;
-		    		}
+		    var JsonStatus = jQuery.parseJSON(dt[0].JsonStatus);   
+		    var ke = 0; 
+		    for (var i = 0; i < JsonStatus.length; i++) {
+		    	ke = i + 1;
+		    	// search Name
+		    		var Name = '';
+			    	for (var j = 0; j < resultJson.length; j++) {
+			    		if (JsonStatus[i].NIP == resultJson[j].NIP) {
+			    			Name = resultJson[j].Name;
+			    			break;
+			    		}
+			    	}
+		    	switch(JsonStatus[i]['Status']) {
+		    	  case 0:
+		    	  case '0':
+		    	   var stjson = 'Not Approve';
+		    	    break;
+		    	  case 1:
+		    	  case '1':
+		    	    var stjson = 'Approve<br>'+JsonStatus[i]['ApproveAt'];
+		    	    break;
+		    	  case 2:
+		    	  case '2':
+		    	    var stjson =  'Reject';
+		    	    break;  
+		    	  default:
+		    	    var stjson = '-';
 		    	}
-	    	switch(JsonStatus[i]['Status']) {
-	    	  case 0:
-	    	  case '0':
-	    	   var stjson = 'Not Approve';
-	    	    break;
-	    	  case 1:
-	    	  case '1':
-	    	    var stjson = 'Approve<br>'+JsonStatus[i]['ApproveAt'];
-	    	    break;
-	    	  case 2:
-	    	  case '2':
-	    	    var stjson =  'Reject';
-	    	    break;  
-	    	  default:
-	    	    var stjson = '-';
-	    	}
-	    	var action = '';
-	    	if (JsonStatus[i]['Status'] != 1) {
-	    		action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+i+'" id_creator_budget_approval = "'+id_creator_budget_approval+'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
-	    		action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+i+'" id_creator_budget_approval = "'+id_creator_budget_approval+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
-	    	}
-	    	html += '<tr>'+
-	    	      '<td>'+ ke + '</td>'+
-	    	      '<td>'+ JsonStatus[i]['NIP'] +' || '+Name+ '</td>'+
-	    	      '<td>'+ stjson + '</td>'+
-	    	      '<td>'+ JsonStatus[i]['NameTypeDesc'] + '</td>'+
-	    	      '<td>'+ JsonStatus[i]['Visible'] + '</td>'+
-	    	      '<td>'+ action + '</td>'
-	    	    '<tr>';	
-	    }
+		    	var action = '';
+		    	if (JsonStatus[i]['Status'] != 1) {
+		    		action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+i+'" id_creator_budget_approval = "'+id_creator_budget_approval+'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
+		    		action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+i+'" id_creator_budget_approval = "'+id_creator_budget_approval+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+		    	}
+		    	html += '<tr>'+
+		    	      '<td>'+ ke + '</td>'+
+		    	      '<td>'+ JsonStatus[i]['NIP'] +' || '+Name+ '</td>'+
+		    	      '<td>'+ stjson + '</td>'+
+		    	      '<td>'+ JsonStatus[i]['NameTypeDesc'] + '</td>'+
+		    	      '<td>'+ JsonStatus[i]['Visible'] + '</td>'+
+		    	      '<td>'+ action + '</td>'
+		    	    '<tr>';	
+		    }
 
-	    // add sisa
-	    ke = ke + 1;
-	    for (var i = 0; i < 10 - JsonStatus.length; i++) {
-	    	var action = '<button class="btn btn-default btn-default-primary btn-classroom btn-edit-approver" data-action="add" indexjson="'+(ke-1)+'" id_creator_budget_approval = "'+id_creator_budget_approval+'"><i class="fa fa-plus-circle fa-right" aria-hidden="true"></i></button>';
-	    	html += '<tr>'+
-	    	      '<td>'+ ke + '</td>'+
-	    	      '<td>'+ '-'+ '</td>'+
-	    	      '<td>'+ '-' + '</td>'+
-	    	      '<td>'+ '-' + '</td>'+
-	    	      '<td>'+ '-' + '</td>'+
-	    	      '<td>'+ action + '</td>'+
-	    	    '<tr>';
-	    	ke++;	    	
-	    }
+		    // add sisa
+		    ke = ke + 1;
+		    for (var i = 0; i < 10 - JsonStatus.length; i++) {
+		    	var action = '<button class="btn btn-default btn-default-primary btn-classroom btn-edit-approver" data-action="add" indexjson="'+(ke-1)+'" id_creator_budget_approval = "'+id_creator_budget_approval+'"><i class="fa fa-plus-circle fa-right" aria-hidden="true"></i></button>';
+		    	html += '<tr>'+
+		    	      '<td>'+ ke + '</td>'+
+		    	      '<td>'+ '-'+ '</td>'+
+		    	      '<td>'+ '-' + '</td>'+
+		    	      '<td>'+ '-' + '</td>'+
+		    	      '<td>'+ '-' + '</td>'+
+		    	      '<td>'+ action + '</td>'+
+		    	    '<tr>';
+		    	ke++;	    	
+		    }
 
-	    html += '</tbody>' ;
-	    html += '</table></div></div>' ;
+		    html += '</tbody>' ;
+		    html += '</table></div></div>' ;
 
-	    var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
-	        '';
-	    $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Custom Approval'+'</h4>');
-	    $('#GlobalModalLarge .modal-body').html(html);
-	    $('#GlobalModalLarge .modal-footer').html(footer);
-	    $('#GlobalModalLarge').modal({
-	        'show' : true,
-	        'backdrop' : 'static'
-	    });
-   })	
+		    var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+		        '';
+		    $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Custom Approval'+'</h4>');
+		    $('#GlobalModalLarge .modal-body').html(html);
+		    $('#GlobalModalLarge .modal-footer').html(footer);
+		    $('#GlobalModalLarge').modal({
+		        'show' : true,
+		        'backdrop' : 'static'
+		    });
+	   })	
+   } else {
+   		var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+   		    '';
+   		$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Custom Approval'+'</h4>');
+   		$('#GlobalModalLarge .modal-body').html('<p>Your are not available to do this action.</p>'+'<p style = "color : green">Only Draft status and Reject Status could be do the action.</p>');
+   		$('#GlobalModalLarge .modal-footer').html(footer);
+   		$('#GlobalModalLarge').modal({
+   		    'show' : true,
+   		    'backdrop' : 'static'
+   		});
+   }
+   
        
 });
 
@@ -1285,6 +1434,149 @@ $(document).off('click', '.saveapprover').on('click', '.saveapprover',function(e
 	}
 	
 })	
+$(document).off('click', '#Log').on('click', '#Log',function(e) {
+	var id_creator_budget_approval = $(this).attr('id_creator_budget_approval');
+	if (id_creator_budget_approval != '' && id_creator_budget_approval != undefined && id_creator_budget_approval != null) {
+    	var url = base_url_js+'rest/__log_budgeting';
+		var data = {
+		    id_creator_budget_approval : id_creator_budget_approval,
+		    auth : 's3Cr3T-G4N',
+		};
+		var token = jwt_encode(data,"UAP)(*");
+		$.post(url,{ token:token },function (data_json) {
+			var html = '<div class = "row"><div class="col-md-12">';
+				html += '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+                  '<thead>'+
+                      '<tr>'+
+                          '<th style="width: 5px;">No</th>'+
+                          '<th style="width: 55px;">Desc</th>'+
+                          '<th style="width: 55px;">Date</th>'+
+                          '<th style="width: 55px;">By</th>';
+	        html += '</tr>' ;
+	        html += '</thead>' ;
+	        html += '<tbody>' ;
 
+	        for (var i = 0; i < data_json.length; i++) {
+	        	var No = parseInt(i) + 1;
+	        	html += '<tr>'+
+	        	      '<td>'+ No + '</td>'+
+	        	      '<td>'+ data_json[i]['Desc'] + '</td>'+
+	        	      '<td>'+ data_json[i]['Date'] + '</td>'+
+	        	      '<td>'+ data_json[i]['Name'] + '</td>'+
+	        	    '<tr>';	
+	        }
+
+	        html += '</tbody>' ;
+	        html += '</table></div></div>' ;	
+
+			var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+			    '';
+			$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Circulation Sheet'+'</h4>');
+			$('#GlobalModalLarge .modal-body').html(html);
+			$('#GlobalModalLarge .modal-footer').html(footer);
+			$('#GlobalModalLarge').modal({
+			    'show' : true,
+			    'backdrop' : 'static'
+			});
+		});
+	} else {
+		toastr.info('The Budget has not create');
+	}
+    	
+})
+
+$(document).off('click', '#ApproveBudget').on('click', '#ApproveBudget',function(e) {
+	var id_creator_budget_approval = $(this).attr('id_creator_budget_approval');
+	var approval_number = $(this).attr('approval_number');
+	if (confirm('Are you sure ?')) {
+		loadingStart();
+		// var url = base_url_js + 'rest/__approve_pr';
+		var url = base_url_js + 'rest/__approve_budget';
+		var data = {
+			id_creator_budget_approval : id_creator_budget_approval,
+			NIP : "<?php echo $this->session->userdata('NIP') ?>",
+			action : 'approve',
+			approval_number : approval_number,
+			auth : 's3Cr3T-G4N',
+		}
+
+		var token = jwt_encode(data,"UAP)(*");
+		$.post(url,{ token:token },function (resultJson) {
+			if (resultJson == '') {
+				LoadFirstLoad();
+			}
+			else
+			{
+				
+			}
+			loadingEnd(2000);
+		}).fail(function() {
+		  // toastr.info('No Result Data');
+		  toastr.error('The Database connection error, please try again', 'Failed!!');
+		  loadingEnd(2000);
+		}).always(function() {
+		   loadingEnd(2000);
+		});
+	}
+
+})
+
+$(document).off('click', '#RejectBudget').on('click', '#RejectBudget',function(e) {
+	var id_creator_budget_approval = $(this).attr('id_creator_budget_approval');
+	var approval_number = $(this).attr('approval_number');
+	if (confirm('Are you sure ?')) {
+		// show modal insert reason
+		$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Input Reason'+'</h4>');
+		$('#GlobalModalLarge .modal-body').html('<div class = "row"><div class = "col-md-12" style="text-align: center;"><b>Please Input Reason ! </b> <br>' +
+		    '<textarea class = "form-group" id ="NoteDel" rows="4" cols="100"></textarea><br>'+
+		    '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+		    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+		    '</div></div>');
+		$('#GlobalModalLarge .modal-footer').html('');
+		$('#GlobalModalLarge').modal({
+		    'show' : true,
+		    'backdrop' : 'static'
+		});
+
+		$(document).off('click', '#confirmYes').on('click', '#confirmYes',function(e) {	
+			var NoteDel = $("#NoteDel").val();
+			if (NoteDel != '' && NoteDel != null && NoteDel != undefined) {
+				$('#GlobalModalLarge').modal('hide');
+				loadingStart();
+				var url = base_url_js + 'rest/__approve_budget';
+				var data = {
+					id_creator_budget_approval : id_creator_budget_approval,
+					NIP : "<?php echo $this->session->userdata('NIP') ?>",
+					action : 'reject',
+					auth : 's3Cr3T-G4N',
+					NoteDel : NoteDel,
+					approval_number : approval_number,
+				}
+
+				var token = jwt_encode(data,"UAP)(*");
+				$.post(url,{ token:token },function (resultJson) {
+					if (resultJson == '') {
+						LoadFirstLoad();
+					}
+					else
+					{
+						
+					}
+					loadingEnd(2000);
+				}).fail(function() {
+				  toastr.error('The Database connection error, please try again', 'Failed!!');
+				  loadingEnd(2000);
+				}).always(function() {
+				    loadingEnd(2000);
+				});
+			} else {
+				toastr.info('Plase input the reason');
+			}
+			
+		})	
+	}
+	
+
+})
 </script>
 

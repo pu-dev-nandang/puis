@@ -2190,6 +2190,101 @@ class C_rest extends CI_Controller {
         }
     }
 
+    public function approve_budget()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('budgeting/m_budgeting');
+                $id_creator_budget_approval = $dataToken['id_creator_budget_approval'];
+                $NIP = $dataToken['NIP'];
+                $action = $dataToken['action'];
+
+                // get data
+                $G_data = $this->m_master->caribasedprimary('db_budgeting.creator_budget_approval','ID',$id_creator_budget_approval);
+                $keyJson = $dataToken['approval_number'] - 1; // get array index json
+                $JsonStatus = (array)json_decode($G_data[0]['JsonStatus'],true);
+                // get data update to approval
+                $arr_upd = $JsonStatus[$keyJson];
+                $arr_upd['Status'] = ($action == 'approve') ? 1 : 2;
+                $arr_upd['ApproveAt'] = ($action == 'approve') ? date('Y-m-d H:i:s') : '-';
+                $JsonStatus[$keyJson] = $arr_upd;
+                $datasave = array(
+                    'JsonStatus' => json_encode($JsonStatus),
+                );
+
+                // check all status for update data
+                $boolApprove = true;
+                for ($i=0; $i < count($JsonStatus); $i++) {
+                    $arr = $JsonStatus[$i];
+                    // if Acknowledge by then skipp
+                        if ($arr['Status'] == 'Acknowledge by' || $arr['Status'] != 'Approval by') {
+                            continue;
+                        }
+                    $Status = $arr['Status'];
+                    if ($Status == 2 || $Status == 0) {
+                        $boolApprove = false;
+                        break;
+                    }
+                }
+
+                if ($boolApprove) {
+                    $datasave['Status'] = 2;
+                    $datasave['PostingDate'] = date('Y-m-d H:i:s');
+                }
+                else
+                {
+                    $boolReject = false;
+                    for ($i=0; $i < count($JsonStatus); $i++) { 
+                        $arr = $JsonStatus[$i];
+                        $Status = $arr['Status'];
+                        if ($Status == 2) {
+                            $boolReject = true;
+                            break;
+                        }
+                    }
+
+                    if ($boolReject) {
+                        $datasave['Status'] = 3;
+                    }
+                }
+
+                $this->db->where('ID',$id_creator_budget_approval);
+                $this->db->update('db_budgeting.creator_budget_approval',$datasave);
+
+                // insert to log
+                    $Desc = ($arr_upd['Status'] == 1) ? 'Approve' : 'Reject';
+                    if (array_key_exists('Status', $datasave)) {
+                        if ($datasave['Status'] == 2) {
+                            $Desc = "All Approve and posting date at : ".$datasave['PostingDate'];
+                        }
+                    }
+
+                    if ($arr_upd['Status'] == 2) {
+                        if ($dataToken['NoteDel'] != '' || $dataToken['NoteDel'] != null) {
+                            $Desc .= '</br> {</br>'.$dataToken['NoteDel'].'</br>}';
+                        }
+                    }
+                    // save to log
+                        $this->m_budgeting->log_budget($id_creator_budget_approval,$Desc,$NIP); 
+
+                echo json_encode($msg);    
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
     public function budgeting_dashboard()
     {
         try {
@@ -2480,6 +2575,38 @@ class C_rest extends CI_Controller {
                         where a.PRCode = ?
                         ';
                 $query=$this->db->query($sql, array($PRCode))->result_array();
+                $rs = $query;        
+                echo json_encode($rs);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+    public function log_budgeting()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $rs = array();
+                $id_creator_budget_approval = $dataToken['id_creator_budget_approval'];
+                $sql = 'select a.Desc,a.Date,b.NIP,b.Name from db_budgeting.log_budget as a 
+                        join db_employees.employees as b on a.By = b.NIP
+                        where a.ID_creator_budget_approval = ?
+                        ';
+                $query=$this->db->query($sql, array($id_creator_budget_approval))->result_array();
+                for ($i=0; $i < count($query); $i++) {  // update textarea fill to nl2br
+                    $query[$i]['Desc'] = nl2br($query[$i]['Desc']);
+                }
                 $rs = $query;        
                 echo json_encode($rs);
             }

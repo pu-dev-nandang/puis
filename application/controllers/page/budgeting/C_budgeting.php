@@ -1450,7 +1450,7 @@ class C_budgeting extends Budgeting_Controler {
             case 'edit':
                 $ID = $Input['ID'];
                 for ($i=0; $i < count($creator_budget); $i++) { 
-                    $CodePostBudget = $creator_budget[$i]->CodePostBudget;
+                    $CodePostRealisasi = $creator_budget[$i]->CodePostRealisasi;
                     $UnitCost = $creator_budget[$i]->UnitCost;
                     $Freq = $creator_budget[$i]->Freq;
                     $DetailMonth = $creator_budget[$i]->DetailMonth;
@@ -1465,7 +1465,7 @@ class C_budgeting extends Budgeting_Controler {
                         'LastUpdateBy' => $this->session->userdata('NIP'),
                         'LastUpdateAt' => date('Y-m-d H:i:s'),
                     );
-                    $this->db->where('CodePostBudget', $CodePostBudget);
+                    $this->db->where('CodePostRealisasi', $CodePostRealisasi);
                     $this->db->update('db_budgeting.creator_budget', $dataSave);
 
                 }
@@ -1473,47 +1473,17 @@ class C_budgeting extends Budgeting_Controler {
                 $creator_budget_approval = $Input['creator_budget_approval'];
                 $dataSave = array(
                     'Note' => $creator_budget_approval->Note,
+                    'Status' => $creator_budget_approval->Status,
                 );
                 $this->db->where('ID', $ID);
                 $this->db->update('db_budgeting.creator_budget_approval', $dataSave);
 
+                $st = ($creator_budget_approval->Status == 0 || $creator_budget_approval->Status == '0') ? 'Edited' : 'Issued / Submit';
+                // save to log
+                    $this->m_budgeting->log_budget($ID,$st,$By = $this->session->userdata('NIP')); 
+
+                $msg = array('Status' => 1,'msg'=>$ID );
                 break;
-            case 'approval':
-                $ID = $Input['ID'];
-                $dataSave = array(
-                    'Approval' =>1,
-                    'ApprovalBy' => $this->session->userdata('NIP'),
-                    'ApprovalAt' => date('Y-m-d'),
-                );
-                $this->db->where('ID', $ID);
-                $this->db->update('db_budgeting.creator_budget_approval', $dataSave);
-
-                // save to table budget_left
-                $creator_budget_approval = $Input['creator_budget_approval'];
-                $Year  = $creator_budget_approval->Year;
-                $Departement = $creator_budget_approval->Departement;
-                $get2 = $this->m_budgeting->get_creator_budget($Year,$Departement);
-                for ($i=0; $i < count($get2); $i++) { 
-                    $ID_creator_budget = $get2[$i]['ID'];
-                    $Value = $get2[$i]['SubTotal'];
-                    $dataSave = array(
-                            'ID_creator_budget' => $ID_creator_budget,
-                            'Value' => $Value,
-                        );
-
-                    $this->db->insert('db_budgeting.budget_left', $dataSave);
-
-                    $tbl = 'db_budgeting.cfg_set_post';
-                    $fieldCode = 'CodePostBudget';
-                    $ValueCode = $get2[$i]['CodePostBudget'];
-                    $this->m_budgeting->makeCanBeDelete($tbl,$fieldCode,$ValueCode);
-                }
-
-                // save date period
-                    $update = array('Status' => 0);
-                    $this->db->where('Year', $Year);
-                    $this->db->update('db_budgeting.cfg_dateperiod', $update);
-                break;    
             default:
                 # code...
                 break;
