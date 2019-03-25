@@ -72,6 +72,7 @@
 		var token = jwt_encode(data,'UAP)(*');
 		$.post(url,{token:token},function (resultJson) {
 			var response = jQuery.parseJSON(resultJson);
+			console.log(response);
 			var test = '<div class = "row"><div class="col-md-12"><div class="col-md-1 col-md-offset-11" align = "right"><button class = "btn btn-excel-all" Year = "'+data['Year']+'" ><i class="fa fa-download"></i> Excel</button></div></div></div>';
 			var TableGenerate = '<div class = "row"style = "margin-top : 10px"><div class="col-md-12" id = "pageForTable">'+
 									'<div class="table-responsive">'+
@@ -90,12 +91,12 @@
 			for (var i = 0; i < response.length; i++) {
 				var st = '';
 				Print = '';
-				if(response[i].Approval == 1)
+				if(response[i].Status == 2)
 				{
 					st = '<i class="fa fa-circle" style="color:#8ED6EA;"></i>';
-					Print = '<button class = "btn btn-excel" Year = "'+data['Year']+'" Departement = "'+response[i].ID+'"><i class="fa fa-file-excel-o"></i> Excel</button>';
+					Print = '<button class = "btn btn-excel" id_creator_budget = "'+response[i].ID_creator_budget+'"><i class="fa fa-file-excel-o"></i> Excel</button>';
 				}
-				else if(response[i].Approval == 0)
+				else if(response[i].Status == 0 || response[i].Status == 1 || response[i].Status == 3)
 				{
 					st = '<i class="fa fa-circle" style="color: #eade8e;"></i>';
 				}
@@ -133,13 +134,11 @@
 	{
 		$('#tableData3 tbody').on('click', '.btn-excel', function () {
 		// $(".btn-excel").click(function(){
-			var Year = $(this).attr('Year');
-			var Departement = $(this).attr('Departement');
+			var id_creator_budget_approval = $(this).attr('id_creator_budget');
 
 			var url = base_url_js+'budgeting/export_excel_budget_creator';
 			data = {
-			  Year : Year,
-			  Departement : Departement,
+			  id_creator_budget_approval : id_creator_budget_approval,
 			}
 			var token = jwt_encode(data,"UAP)(*");
 			FormSubmitAuto(url, 'POST', [
