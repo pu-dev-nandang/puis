@@ -1218,6 +1218,10 @@ $route['budgeting/checkruleinput'] = 'page/budgeting/c_budgeting/checkruleinput'
 
 $route['budgeting/export_excel_post_department'] = 'c_save_to_excel/export_excel_post_department';
 $route['budgeting/update_approver'] = 'page/budgeting/c_budgeting/update_approver';
+$route['budgeting/Upload_File_Creatorbudget'] = 'page/budgeting/c_budgeting/Upload_File_Creatorbudget';
+$route['budgeting/Upload_File_Creatorbudget_all'] = 'page/budgeting/c_budgeting/Upload_File_Creatorbudget_all';
+
+
 
 // Purchasing
 $query = $db->get('db_purchasing.cfg_sub_menu');

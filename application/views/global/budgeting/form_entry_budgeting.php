@@ -741,8 +741,9 @@ function showButton()
 			$('select:not(#Departement):not(#Year)').prop('disabled',true);
 
 			// show button export excel
+				var filee = (arr1[0].FileUpload != '' && arr1[0].FileUpload != null && arr1[0].FileUpload != undefined) ? '<a href = "'+base_url_js+'fileGetAny/budgeting-'+arr1[0].FileUpload+'" target="_blank" class = "Fileexist">File '+'</a>&nbsp' : '';
 				$('#content_button').attr('align','right');
-				$('#content_button').html('<button type="button" class="btn btn-default" id="ExportExcel" id_creator_budget_approval = "'+arr1[0].ID+'"> <i class="fa fa-file-excel-o"></i> Excel</button>');
+				$('#content_button').html(filee+'<label class="btn btn-primary" style="color: #ffff;">Upload Budget File <input id="file-upload" type="file" style="display: none;" id_creator_budget_approval = "'+arr1[0].ID+'" accept="image/*,application/pdf"></label>&nbsp<button type="button" class="btn btn-default" id="ExportExcel" id_creator_budget_approval = "'+arr1[0].ID+'"> <i class="fa fa-file-excel-o"></i> Excel</button>');
 		} 
 
 	}
@@ -1611,5 +1612,101 @@ $(document).off('click', '#ExportExcel').on('click', '#ExportExcel',function(e) 
 	    { name: 'token', value: token },
 	]);
 })
+
+$(document).off('change', '#file-upload').on('change', '#file-upload',function(e) {
+	var id_creator_budget_approval = $(this).attr('id_creator_budget_approval');
+	var ID_element = $(this).attr('id');
+	var attachName = 'FileBudgeting__'+id_creator_budget_approval;
+	if (file_validation(ID_element)) {
+	  UploadFile_approve(ID_element,id_creator_budget_approval,attachName);
+	}
+})
+
+function UploadFile_approve(ID_element,id_creator_budget_approval,attachName)
+{
+	var form_data = new FormData();
+	//var fileData = document.getElementById(ID_element).files[0];
+	var url = base_url_js + "budgeting/Upload_File_Creatorbudget";
+	var files = $('#'+ID_element)[0].files;
+	    var nm = files[0].name;
+		var extension = nm.split('.').pop().toLowerCase();
+	var DataArr = {
+	                id_creator_budget_approval : id_creator_budget_approval,
+	                attachName : attachName,
+	                extension : extension,
+	              };
+	var token = jwt_encode(DataArr,"UAP)(*");
+	form_data.append('token',token);
+
+	form_data.append("fileData", files[0]);
+	$.ajax({
+	  type:"POST",
+	  url:url,
+	  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+	  contentType: false,       // The content type used when sending data to the server.
+	  cache: false,             // To unable request pages to be cached
+	  processData:false,
+	  dataType: "json",
+	  success:function(data)
+	  {
+	    if(data.status == 1) {
+	      // show file in html before content_button find btn btn-primary
+	      $('.Fileexist').remove();
+	      var filee = '<a href = "'+base_url_js+'fileGetAny/budgeting-'+data.filename +'" target="_blank" class = "Fileexist">File '+'</a>';
+	      $('#content_button').find('.btn-primary').before(filee);
+	      toastr.options.fadeOut = 100000;
+	      toastr.success(data.msg, 'Success!');
+	    }
+	    else
+	    {
+	      toastr.options.fadeOut = 100000;
+	      toastr.error(data.msg, 'Failed!!');
+	    }
+	  setTimeout(function () {
+	      toastr.clear();
+	    },1000);
+
+	  },
+	  error: function (data) {
+	    toastr.error(data.msg, 'Connection error, please try again!!');
+	  }
+	})
+}
+
+function file_validation(ID_element)
+{
+    var files = $('#'+ID_element)[0].files;
+    var error = '';
+    var msgStr = '';
+    var name = files[0].name;
+	  // console.log(name);
+	  var extension = name.split('.').pop().toLowerCase();
+	  if(jQuery.inArray(extension, ['pdf','jpg','png','jpeg']) == -1)
+	  {
+	   msgStr += 'Invalid Type File<br>';
+	  }
+
+	  var oFReader = new FileReader();
+	  oFReader.readAsDataURL(files[0]);
+	  var f = files[0];
+	  var fsize = f.size||f.fileSize;
+	  // console.log(fsize);
+
+	  if(fsize > 5000000) // 5mb
+	  {
+	   msgStr += 'Image File Size is very big<br>';
+	   //toastr.error("Image File Size is very big", 'Failed!!');
+	   //return false;
+	  }
+
+    if (msgStr != '') {
+      toastr.error(msgStr, 'Failed!!');
+      return false;
+    }
+    else
+    {
+      return true;
+    }
+}
 </script>
 
