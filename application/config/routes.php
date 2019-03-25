@@ -923,6 +923,8 @@ $route['api2/__crudScheduleExchage'] = 'api/c_api2/crudScheduleExchage';
 $route['api2/__crudModifyAttendance'] = 'api/c_api2/crudModifyAttendance';
 $route['api2/__getMonitoringAttendance'] = 'api/c_api2/getMonitoringAttendance';
 
+$route['api2/__getSemesterOptionStudent/(:num)'] = 'api/c_api2/getSemesterOptionStudent/$1';
+
 $route['api2/__crudAnnouncement'] = 'api/c_api2/crudAnnouncement';
 
 $route['api3/login'] = 'api/c_mobile/login';
