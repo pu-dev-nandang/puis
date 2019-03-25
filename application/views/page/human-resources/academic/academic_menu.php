@@ -164,9 +164,11 @@ border-radius: 17px;
 
             $('#viewPhoto').html('<img class="img-rounded" src="'+base_url_img_employee+''+jsonResult.Photo+'" />');
 
+            var linkupdate = base_url_js+"human-resources/employees/edit-employees/"+jsonResult.NIP; 
+            var buttonlinkedit = ('<a href="'+linkupdate+'" class="btn btn-sm btn-success btn-round"><i class="fa fa-edit"></i> Edit Employee</a> ');
 
             $('#viewName').html(jsonResult.NIP+' - '+jsonResult.TitleAhead.trim()+' '+jsonResult.Name+' '+jsonResult.TitleBehind.trim()+' ' +
-                            '<span style="float:right;"> | '+jsonResult.Division+' <i class="fa fa-angle-right"></i> <b>'+jsonResult.Position+'</b></span>');
+                            '<span style="float:right;"> '+buttonlinkedit+' | '+jsonResult.Division+' <i class="fa fa-angle-right"></i> <b>'+jsonResult.Position+'</b></span>');
 
             Lecturer_NIP = jsonResult.NIP.trim();
 

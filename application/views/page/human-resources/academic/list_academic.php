@@ -88,7 +88,6 @@
                                 var dates = moment(strdate).format('DD-MM-YYYY');
                             } else {
                                 var dates = '00-00-0000';
-
                             }
 
                     for (var j = i+1; j < response.length; j++) {
@@ -96,7 +95,7 @@
                         var NameUniversity2 = response[j]['NameUniversity'];
                         var Idlist2 = response[j]['ID'];
 
-                            if (NameUniversity1 == NameUniversity2) {
+                        if (NameUniversity1 == NameUniversity2) {
                                 //var Transcript = response[j]['LinkFiles'];
                                 if (response[j]['LinkFiles'] != null) {
                                     var Transcript = '<iframe src="'+base_url_js+'uploads/files/'+response[j]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-round btn-primary btnviewlistsrata" filesub ="'+response[j]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
@@ -159,9 +158,9 @@
                         }
             
                         if (response[i]['LinkFiles'] != null) {
-                            var Ijazah = '<iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
+                            var Ijazah2 = '<iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
                         } else {
-                            var Ijazah = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px;">';
+                            var Ijazah2 = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px;">';
                         }
                         for (var j = i+1; j < response.length; j++) {
                             //var NameUniversity2 = response[j]['NameUniversity'].toLowerCase();
@@ -170,9 +169,9 @@
                             if (NameUniversity1 == NameUniversity2) {
                                 //var Transcript = response[j]['LinkFiles'];
                                     if (response[j]['LinkFiles'] != null) {
-                                        var Transcript = '<iframe src="'+base_url_js+'uploads/files/'+response[j]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+response[j]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
+                                        var Transcript2 = '<iframe src="'+base_url_js+'uploads/files/'+response[j]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+response[j]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
                                     } else {
-                                        var Transcript = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px">';
+                                        var Transcript2 = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px">';
                                     }
                         $("#loadtableS2").append( '<div class="panel panel-default"> '+
                             '<div class="panel-body" style="padding: 0px;"> '+
@@ -204,9 +203,9 @@
                                 '</tr> '+
                                 '<tr> '+
                                 '    <td style="width: 25%;"> File Ijazah </td> '+
-                                '       <th style="width: 30%;"><div class="container"> '+Ijazah+' </th>'+
+                                '       <th style="width: 30%;"><div class="container"> '+Ijazah2+' </th>'+
                                 '           <td style="width: 25%;"> File Transcript </td> '+
-                                '               <th style="width: 30%;"><div class="container"> '+Transcript+' </th>'+
+                                '               <th style="width: 30%;"><div class="container"> '+Transcript2+' </th>'+
                                 '</tr> ' +
                                 '</table>'+
                                 '</div> '+
