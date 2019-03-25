@@ -61,9 +61,9 @@ class M_budgeting extends CI_Model {
 
     public function getData_cfg_postrealisasi($Active = null)
     {
-        $arr_result = array();
         $Active = ($Active == null) ? '' : ' where a.Active = "'.$Active.'"';
-        $sql = 'select a.CodePostRealisasi,a.CodePost,b.PostName,a.RealisasiPostName,a.Departement from db_budgeting.cfg_postrealisasi as a join db_budgeting.cfg_post as b on a.CodePost = b.CodePost
+        $sql = 'select a.CodePostRealisasi,a.CodeHeadAccount,b.Name as NameHeadAccount,a.RealisasiPostName,b.Departement,c.CodePost,c.PostName from db_budgeting.cfg_postrealisasi as a join db_budgeting.cfg_head_account as b on a.CodeHeadAccount = b.CodeHeadAccount
+            join db_budgeting.cfg_post as c on c.CodePost = b.CodePost
                 '.$Active.' order by a.CodePostRealisasi desc';
         $query=$this->db->query($sql, array())->result_array();
         for ($i=0; $i < count($query); $i++) { 
@@ -77,20 +77,42 @@ class M_budgeting extends CI_Model {
                 $tget = $this->m_master->caribasedprimary('db_academic.program_study','ID',$exp[1]);
                 $Departement = $tget[0]['NameEng'];
             }
+            elseif ($exp[0] == 'FT') {
+                $tget = $this->m_master->caribasedprimary('db_academic.faculty','ID',$exp[1]);
+                $Departement = $tget[0]['NameEng'];
+            }
 
-            $temp = array(
-                        'CodePostRealisasi' => $query[$i]['CodePostRealisasi'],
-                        'CodePost' => $query[$i]['CodePost'],
-                        'PostName' => $query[$i]['PostName'],
-                        'RealisasiPostName' => $query[$i]['RealisasiPostName'],
-                        'Departement' => $Departement,
-                        'CodeDepartment' => $query[$i]['Departement'],
-                    );
-            $arr_result[] = $temp;
+            $query[$i]['DepartementName'] = $Departement;
         }
+        return $query;
+    }
 
-        return $arr_result;
-                
+    public function get_cfg_head_account($Active = null)
+    {
+        $Active = ($Active == null) ? '' : ' where a.Active = "'.$Active.'"';
+        $sql = 'select a.CodeHeadAccount,a.Name as NameHeadAccount,a.Departement,b.CodePost,b.PostName
+                from db_budgeting.cfg_head_account as a join db_budgeting.cfg_post as b on a.CodePost = b.CodePost
+                '.$Active.' order by a.CodeHeadAccount desc';
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) { 
+            $Departement = $query[$i]['Departement'];
+            $exp = explode('.', $Departement);
+            if ($exp[0] == 'NA') { // Non Academic
+                $tget = $this->m_master->caribasedprimary('db_employees.division','ID',$exp[1]);
+                $Departement = $tget[0]['Description'].' ('.$tget[0]['Division'].')';
+            }
+            elseif ($exp[0] == 'AC') {
+                $tget = $this->m_master->caribasedprimary('db_academic.program_study','ID',$exp[1]);
+                $Departement = $tget[0]['NameEng'];
+            }
+            elseif ($exp[0] == 'FT') {
+                $tget = $this->m_master->caribasedprimary('db_academic.faculty','ID',$exp[1]);
+                $Departement = $tget[0]['NameEng'];
+            }
+
+            $query[$i]['DepartementName'] = $Departement;
+        }
+        return $query;
     }
 
     public function getTheCode($tbl,$fieldCode,$PrefixCode,$length,$Year = null)
@@ -171,6 +193,10 @@ class M_budgeting extends CI_Model {
             $tget = $this->m_master->caribasedprimary('db_academic.program_study','ID',$exp[1]);
             $Departement = $tget[0]['NameEng'];
         }
+        elseif ($exp[0] == 'FT') {
+            $tget = $this->m_master->caribasedprimary('db_academic.faculty','ID',$exp[1]);
+            $Departement = $tget[0]['NameEng'];
+        }
         $sql = 'select a.CodePostBudget,a.CodeSubPost,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
                 from db_budgeting.cfg_set_post as a join db_budgeting.cfg_postrealisasi as b on a.CodeSubPost = b.CodePostRealisasi
                 join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
@@ -198,22 +224,22 @@ class M_budgeting extends CI_Model {
     public function getPostDepartementForDom($Year,$Departement)
     {
         $arr_result = array();
-        $get_Data = $this->m_master->caribasedprimary('db_budgeting.cfg_postrealisasi','Departement',$Departement);
-        $sql = 'select a.CodePostBudget,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
-                from db_budgeting.cfg_postrealisasi as b left join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
+        $get_Data = $this->m_master->caribasedprimary('db_budgeting.cfg_head_account','Departement',$Departement);
+        $sql = 'select a.CodePostBudget,b.CodeHeadAccount,b.Name as NameHeadAccount,a.Year,a.Budget,c.PostName,c.CodePost
+                from db_budgeting.cfg_head_account as b left join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeHeadAccount = b.CodeHeadAccount
                 join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
-                where b.Departement = ? and b.Active = 1 order by a.CodePostBudget asc
+                where b.Departement = ? and b.Active = 1 order by a.CodeHeadAccount asc
                 ';
+                // print_r($sql);die();
         $query=$this->db->query($sql, array($Year,$Departement))->result_array();
         $arr_result = array('data' => $query,'OpPostRealisasi' => $get_Data);
         return $arr_result;
-
     }
 
     public function getPostDepartementEx($Year,$Departement)
     {
-        $sql = 'select a.CodePostBudget,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
-                from db_budgeting.cfg_postrealisasi as b left join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
+        $sql = 'select a.CodePostBudget,b.CodeHeadAccount,a.Year,a.Budget,b.Name as NameHeadAccount,c.PostName,c.CodePost
+                from db_budgeting.cfg_head_account as b left join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeHeadAccount = b.CodeHeadAccount
                 join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
                 where b.Departement = ? and b.Active = 1 order by c.CodePost asc
                 ';
@@ -225,14 +251,17 @@ class M_budgeting extends CI_Model {
     public function getPostDepartementForDomApproval($Year,$Departement)
     {
         $arr_result = array();
-        $get_Data = $this->m_master->caribasedprimary('db_budgeting.cfg_postrealisasi','Departement',$Departement);
-        $sql = 'select a.CodePostBudget,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
-                from db_budgeting.cfg_postrealisasi as b join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
-                join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
-                where b.Departement = ? order by a.CodePostBudget asc
+        $get_Data = $this->getPostDepartementEx($Year,$Departement);
+        // copy remaining = Budget
+        for ($i=0; $i < count($get_Data); $i++) { 
+            $get_Data[$i]['Remaining'] = $get_Data[$i]['Budget'];
+        }
+        $sql = 'select a.CodePostRealisasi,a.CodeHeadAccount,b.Name as NameHeadAccount,a.RealisasiPostName,b.Departement,c.CodePost,c.PostName from db_budgeting.cfg_postrealisasi as a join db_budgeting.cfg_head_account as b on a.CodeHeadAccount = b.CodeHeadAccount
+            join db_budgeting.cfg_post as c on c.CodePost = b.CodePost
+                where a.Active = 1 and b.Departement = ? order by a.CodePostRealisasi desc
                 ';
-        $query=$this->db->query($sql, array($Year,$Departement))->result_array();
-        $arr_result = array('data' => $query,'OpPostRealisasi' => $get_Data);
+        $query=$this->db->query($sql, array($Departement))->result_array();
+        $arr_result = array('data' => $query,'getPostDepartement' => $get_Data);
         return $arr_result;
 
     }
@@ -256,6 +285,8 @@ class M_budgeting extends CI_Model {
                 select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
                 UNION
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty
                 ) aa
                 ) as d on b.Departement = d.ID
                 where (b.RealisasiPostName like "%'.$PostDepartement.'%" or d.NameDepartement like "%'.$PostDepartement.'%" 
@@ -266,34 +297,77 @@ class M_budgeting extends CI_Model {
         return $query;
     }
 
-    public function get_cfg_set_roleuser($Departement)
+    public function get_cfg_set_roleuser_budgeting($Departement)
     {
-        $sql = 'select a.*,b.Name as NamaUser,b.NIP,c.Departement,c.ID as ID_set_roleuser
-                from db_budgeting.cfg_m_userrole as a left join (select * from db_budgeting.cfg_set_roleuser where Departement = ? and Active = 1) as c
+        $sql = 'select a.*,b.Name as NamaUser,b.NIP,c.Departement,c.ID as ID_set_roleuser,c.Visible,c.TypeDesc
+                from db_budgeting.cfg_m_userrole as a left join (select * from db_budgeting.cfg_approval_budget where Departement = ? ) as c
                 on a.ID = c.ID_m_userrole
                 left join db_employees.employees as b on b.NIP = c.NIP 
-                order by a.NameUserRole asc
+                order by a.ID asc
                 ';
         $query=$this->db->query($sql, array($Departement))->result_array();
         return $query;
     }
 
-    public function get_creator_budget_approval($Year,$Departement,$Approval = 'and Approval = 1')
+    public function get_approval_budgeting($Departement)
     {
-        $sql = 'select * from db_budgeting.creator_budget_approval where Year = ? and Departement = ? '.$Approval;
+        $sql = 'select a.*,b.Name as NamaUser,b.NIP,c.Departement,c.ID as ID_set_roleuser,c.Visible,c.TypeDesc,d.Name as NameTypeDesc
+                from db_budgeting.cfg_m_userrole as a join (select * from db_budgeting.cfg_approval_budget where Departement = ? ) as c
+                on a.ID = c.ID_m_userrole
+                left join db_employees.employees as b on b.NIP = c.NIP 
+                join db_budgeting.cfg_m_type_approval as d on d.ID = c.TypeDesc
+                where a.ID > 1
+                order by c.ID asc
+                ';
+        $query=$this->db->query($sql, array($Departement))->result_array();
+        return $query;
+    }
+
+    public function log_budget($ID_creator_budget_approval,$Desc,$By = '')
+    {
+        if ($By ==  '') {
+            $By = $this->session->userdata('NIP');
+        }
+        $dataSave = array(
+            'ID_creator_budget_approval' => $ID_creator_budget_approval,
+            'Desc' => $Desc,
+            'Date' => date('Y-m-d'),
+            'By' => $By,
+        );
+
+        $this->db->insert('db_budgeting.log_budget',$dataSave);
+    }
+
+    public function get_creator_budget_approval($Year,$Departement,$Approval = 'and a.Status = 2')
+    {
+        $sql = 'select a.*,b.NameDepartement from db_budgeting.creator_budget_approval as a 
+        join (
+        select * from (
+        select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
+        UNION
+        select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+        UNION
+        select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty
+        ) aa
+        ) as b on a.Departement = b.ID
+        where a.Year = ? and a.Departement = ? '.$Approval.' 
+        ';
         $query=$this->db->query($sql, array($Year,$Departement))->result_array();
         return $query;
     }
 
-    public function get_creator_budget($Year,$Departement)
+    public function get_creator_budget($ID_creator_budget_approval)
     {
-        $sql = 'select * from db_budgeting.creator_budget as a join (
-           select a.CodePostBudget,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost
-           from db_budgeting.cfg_postrealisasi as b left join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
-           join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
-           where b.Departement = ?     
-        ) as  b on a.CodePostBudget = b.CodePostBudget order by a.CodePostBudget asc';
-        $query=$this->db->query($sql, array($Year,$Departement))->result_array();
+        $sql = 'select a.ID_creator_budget_approval,a.CodePostRealisasi,a.UnitCost,a.Freq,a.DetailMonth,
+               a.SubTotal,a.CreatedBy,a.CreatedAt,a.LastUpdateBy,a.LastUpdateAt,b.CodeHeadAccount,
+                     b.RealisasiPostName,c.Name as NameHeadAccount,c.CodePost,d.PostName
+               from db_budgeting.creator_budget as a left join db_budgeting.cfg_postrealisasi as b on a.CodePostRealisasi = b.CodePostRealisasi
+               LEFT JOIN db_budgeting.cfg_head_account as c on b.CodeHeadAccount = c.CodeHeadAccount
+               LEFT JOIN db_budgeting.cfg_post as d on c.CodePost = d.CodePost
+               where a.ID_creator_budget_approval = ?
+               order by b.CodeHeadAccount asc
+       ';
+        $query=$this->db->query($sql, array($ID_creator_budget_approval))->result_array();
         return $query;
     }
 
@@ -314,18 +388,21 @@ class M_budgeting extends CI_Model {
 
     public function getListBudgetingDepartement($Year)
     {
-        $sql = 'select aa.*,b.Approval from (
+        $sql = 'select aa.*,b.Status,b.ID as ID_creator_budget from (
                 select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
                 UNION
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty
                 ) aa left join (select * from db_budgeting.creator_budget_approval where Year = ?) as b on aa.ID = b.Departement
                 ';
         $query=$this->db->query($sql, array($Year))->result_array(); 
         for ($i=0; $i < count($query); $i++) { 
             // cari grand total
+            $ID_creator_budget = $query[$i]['ID_creator_budget'];
             $GrandTotal = 0;
-            if ($query[$i]['Approval'] == '1' || $query[$i]['Approval'] == '0') {
-                $get = $this->get_creator_budget($Year,$query[$i]['ID']);
+            if ($query[$i]['Status'] == '2') {
+                $get = $this->get_creator_budget($ID_creator_budget);
                 for ($j=0; $j < count($get); $j++) { 
                    $GrandTotal = $GrandTotal + $get[$j]['SubTotal'];
                 }
@@ -336,12 +413,28 @@ class M_budgeting extends CI_Model {
         return $query;       
     }
 
+    public function get_data_ListBudgetingDepartement($Year)
+    {
+        $sql = 'select aa.*,b.ID as ID_creator_budget,b.* from (
+                select CONCAT("AC.",ID) as ID,  CONCAT("Study ",NameEng) as NameDepartement from db_academic.program_study where Status = 1
+                UNION
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement from db_academic.faculty
+                ) aa left join (select * from db_budgeting.creator_budget_approval where Year = ?) as b on aa.ID = b.Departement
+                ';
+        $query=$this->db->query($sql, array($Year))->result_array(); 
+        return $query;       
+    }
+
     public function getListBudgetingRemaining($Year)
     {
         $sql = 'select aa.*,b.Approval from (
                 select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
                 UNION
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty
                 ) aa left join (select * from db_budgeting.creator_budget_approval where Year = ?) as b on aa.ID = b.Departement
                 ';
         $query=$this->db->query($sql, array($Year))->result_array(); 
@@ -550,10 +643,14 @@ class M_budgeting extends CI_Model {
                     $G_Div = $this->m_master->caribasedprimary('db_employees.division','ID',$ExpDepart[1]);
                     $abbreviation_Div = $G_Div[0]['Abbreviation'];
                 }
-                else
-                {
+                elseif ($ExpDepart[0] == 'AC') {
                     $G_Div = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ExpDepart[1]);
                     $abbreviation_Div = $G_Div[0]['Code'];
+                }
+                else
+                {
+                    $G_Div = $this->m_master->caribasedprimary('db_academic.faculty','ID',$ExpDepart[1]);
+                    $abbreviation_Div = $G_Div[0]['Abbr'];
                 }
 
             $PRCode = $strINC.'/'.'UAP-'.$abbreviation_Div.'/'.'PR'.'/'.$Month.'/'.$Year;
@@ -749,6 +846,8 @@ class M_budgeting extends CI_Model {
                 select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
                 UNION
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty
                 ) aa
                 ) as b on a.Departement = b.ID
                 join db_employees.employees as c on a.CreatedBy = c.NIP
@@ -789,6 +888,8 @@ class M_budgeting extends CI_Model {
                                     select CONCAT("AC.",ID) as ID, NameEng as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
                                     UNION
                                     select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                                    UNION
+                                    select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty
                                     ) aa
                     ) as h on e.Departement = h.ID 
                 where a.PRCode = ?
@@ -811,6 +912,8 @@ class M_budgeting extends CI_Model {
                                    select CONCAT("AC.",ID) as ID, NameEng as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
                                    UNION
                                    select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                                   UNION
+                                   select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty
                                    ) aa
                    ) as h on f.Departement = h.ID
                 where b.ID_pr_detail = ?   
@@ -845,6 +948,8 @@ class M_budgeting extends CI_Model {
                 select CONCAT("AC.",ID) as ID, NameEng as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
                 UNION
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr from db_academic.faculty
                 ) aa
                 where ID = ?
                 ';
@@ -858,6 +963,8 @@ class M_budgeting extends CI_Model {
                 select CONCAT("AC.",ID) as ID, NameEng as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
                 UNION
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr from db_academic.faculty
                 ) aa
                 where NameDepartement = ?
                 ';
@@ -898,5 +1005,106 @@ class M_budgeting extends CI_Model {
         );
 
         $this->db->insert('db_budgeting.pr_circulation_sheet',$dataSave);
+    }
+
+    public function Budget_department_auth($Departement)
+    {
+        $rs = array();
+        $NIP =$this->session->userdata('NIP');
+        // get all department
+        $arr = $this->m_master->apiservertoserver(url_pas.'api/__getAllDepartementPU','');
+        // get auth
+        $F = $this->m_master->caribasedprimary('db_budgeting.cfg_approval_budget','NIP',$NIP);
+        // filtering
+        if ($Departement == 'NA.9') {
+            // get setiap departement
+            // for ($i=0; $i < count($arr); $i++) { 
+            //     // find di cfg_approval_budget
+            //     $bool = false;
+            //     for ($j=0; $j < count($F); $j++) { 
+            //         $NIPDB = $F[$j]['NIP'];
+            //         if ($NIP == $NIPDB) {
+            //             $bool = true;
+            //             $arr[$i] = $arr[$i] + array(
+            //                  'ID_m_userrole' => $F[$j]['ID_m_userrole'],
+            //                  'Visible' => $F[$j]['Visible'],
+            //                  'TypeDesc' => $F[$j]['TypeDesc'],
+            //                  'NIP' => $F[$j]['NIP'],
+            //              ); 
+            //             break;
+            //         }
+            //     }
+
+            //     if (!$bool) {
+            //        $arr[$i] = $arr[$i] + array(
+            //             'ID_m_userrole' => 0,
+            //             'Visible' => 'No',
+            //             'TypeDesc' => '',
+            //             'NIP' => $NIP
+            //         ); 
+            //     }
+            // }
+            $rs = $arr;
+        }
+        else
+        {
+            for ($i=0; $i < count($F); $i++) { 
+               $NIPDB = $F[$i]['NIP'];
+               $D = $F[$i]['Departement'];
+               if ($NIP == $NIPDB) {
+                   for ($j=0; $j < count($arr); $j++) { 
+                       $D2 = $arr[$j]['Code'];
+                       if ($D == $D2) {
+                           $rs[] = $arr[$j];
+                       }
+                   }
+               }
+            }
+
+        }
+
+        return $rs;
+    }
+
+    public function Add_department_IFCustom_approval($Year)
+    {
+        $arr = array();
+        $NIP = $this->session->userdata('NIP');
+        $sql = 'select a.*,b.NameDepartement from db_budgeting.creator_budget_approval as a
+                join (
+                select * from (
+                select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
+                UNION
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty
+                ) aa
+                ) as b on a.Departement = b.ID
+                where JsonStatus like "%'.$NIP.'%"  and Year = ? ';
+        $query=$this->db->query($sql, array($Year))->result_array();
+        if (count($query) > 0) {
+            for ($i=0; $i < count($query); $i++) { 
+               $JsonStatus = (array) json_decode($query[$i]['JsonStatus'],true);
+               // find NIP
+               $bool = false;
+               for ($j=0; $j < count($JsonStatus); $j++) { 
+                   $NIPDB = $JsonStatus[$j]['NIP'];
+                   if ($NIP == $NIPDB) {
+                       $bool = true;
+                       break;
+                   }
+               }
+
+               if ($bool) {
+                  $arr[] = array(
+                    'Code' => $query[$i]['Departement'],
+                    'Name2' => $query[$i]['NameDepartement'],
+                  ); 
+               }
+
+            }
+        }
+
+        return $arr;
     }  
 }

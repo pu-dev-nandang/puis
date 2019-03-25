@@ -127,7 +127,7 @@
 										'<th width = "3%">No</th>'+
 			                            '<th>Department</th>'+
 			                            '<th>Code</th>'+
-										'<th>Post Item</th>'+
+										'<th>Head Account</th>'+
 										'<th>Year</th>'+
 										'<th>Budget</th>'+
 										'<th>Action</th>'+
@@ -149,12 +149,12 @@
 				// format ribuan to show
 				var Budget_value = parseInt(dataDB[i].Budget) / 1000 ;
 				var CodePostBudget = (dataDB[i].CodePostBudget == null) ? 'Unset' : dataDB[i].CodePostBudget;
-				var Budget = (dataDB[i].Budget == null) ? '<td class = "Budget'+dataDB[i].CodePostRealisasi+'">'+ 'Unset'+'</td>' : '<td class = "Budget'+CodePostBudget+'">'+ formatRupiah(Budget_value)+'</td>';
+				var Budget = (dataDB[i].Budget == null) ? '<td class = "Budget'+dataDB[i].CodeHeadAccount+'">'+ 'Unset'+'</td>' : '<td class = "Budget'+CodePostBudget+'">'+ formatRupiah(Budget_value)+'</td>';
 				var Action = '';
 				if(CodePostBudget == 'Unset')
 				{
-					Action = '<button class = "btn btn-success btn-default getBudgetLastYear" CodePostRealisasi = "'+dataDB[i].CodePostRealisasi+'" trno = "'+(parseInt(i) + 1)+'">Load Budget Last Year</button>&nbsp'+
-							 '<button class = "btn btn-default btn-add" CodePostRealisasi = "'+dataDB[i].CodePostRealisasi+'" trno = "'+(parseInt(i) + 1)+'"><i class="fa fa-plus" aria-hidden="true"></i> Add</button>';	
+					Action = '<button class = "btn btn-success btn-default getBudgetLastYear" CodeHeadAccount = "'+dataDB[i].CodeHeadAccount+'" trno = "'+(parseInt(i) + 1)+'">Load Budget Last Year</button>&nbsp'+
+							 '<button class = "btn btn-default btn-add" CodeHeadAccount = "'+dataDB[i].CodeHeadAccount+'" trno = "'+(parseInt(i) + 1)+'"><i class="fa fa-plus" aria-hidden="true"></i> Add</button>';	
 				}
 				else
 				{
@@ -167,7 +167,7 @@
 									'<td width = "3%">'+ (parseInt(i) + 1)+'</td>'+
 									'<td>'+ $("#DepartementPost").find(":selected").text()+'</td>'+
 									'<td>'+ CodePostBudget+'</td>'+
-									'<td>'+ dataDB[i].CodePostRealisasi+'<br>'+dataDB[i].PostName+'-'+dataDB[i].RealisasiPostName+'</td>'+
+									'<td>'+ dataDB[i].CodeHeadAccount+'<br>'+dataDB[i].NameHeadAccount+'</td>'+
 									'<td>'+ $("#YearPostDepartement").find(":selected").text()+'</td>'+
 									Budget+
 									'<td class = "No'+(parseInt(i) + 1)+'">'+ Action+'</td>'+
@@ -223,13 +223,13 @@
 	function EventButtonAction()
 	{
 		$('#tableData3 tbody').on('click', '.getBudgetLastYear', function () {
-			var CodePostRealisasi = $(this).attr('CodePostRealisasi');
+			var CodeHeadAccount = $(this).attr('CodeHeadAccount');
 			var trno = $(this).attr('trno');
 			if (confirm("Are you sure?") == true) {
 				loadingStart();
 				var url =base_url_js+'budgeting/getBudgetLastYearByCode';
 				var data = {
-				          CodePostRealisasi : CodePostRealisasi,
+				          CodeHeadAccount : CodeHeadAccount,
 				          Year : $("#YearPostDepartement").val(),
 				      };
 				var token = jwt_encode(data,'UAP)(*');
@@ -237,24 +237,24 @@
 					var response = jQuery.parseJSON(data_json);
 					if(response.length > 0)
 					{
-						var input = '<input type = "text" class = "form-control BudgetInput'+CodePostRealisasi+'">';
+						var input = '<input type = "text" class = "form-control BudgetInput'+CodeHeadAccount+'">';
 						var Cost = response[0]['Budget'];
 				         var n = Cost.indexOf(".");
 				         var Cost = Cost.substring(0, n);
 				         Cost = Cost / 1000; // (.000)
 
-						var input = '<input type = "text" class = "form-control BudgetInput'+CodePostRealisasi+'">';
-						$('.Budget'+CodePostRealisasi).html(input);
-						$('.BudgetInput'+CodePostRealisasi).val(Cost);
-						$('.BudgetInput'+CodePostRealisasi).maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-						$('.BudgetInput'+CodePostRealisasi).maskMoney('mask', '9894');
+						var input = '<input type = "text" class = "form-control BudgetInput'+CodeHeadAccount+'">';
+						$('.Budget'+CodeHeadAccount).html(input);
+						$('.BudgetInput'+CodeHeadAccount).val(Cost);
+						$('.BudgetInput'+CodeHeadAccount).maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+						$('.BudgetInput'+CodeHeadAccount).maskMoney('mask', '9894');
 
-						var ActionSave = '<button class="btn btn-primary btn-save'+CodePostRealisasi+'"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>';
+						var ActionSave = '<button class="btn btn-primary btn-save'+CodeHeadAccount+'"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>';
 						$(".No"+trno).html(ActionSave);
-						$('.BudgetInput'+CodePostRealisasi).focus(); 
+						$('.BudgetInput'+CodeHeadAccount).focus(); 
 
-						$(".btn-save"+CodePostRealisasi).click(function(){
-							var getBudget = $('.BudgetInput'+CodePostRealisasi).val();
+						$(".btn-save"+CodeHeadAccount).click(function(){
+							var getBudget = $('.BudgetInput'+CodeHeadAccount).val();
 							for(i = 0; i <getBudget.length; i++) {
 							 
 							 getBudget = getBudget.replace(".", "");
@@ -267,7 +267,7 @@
 								loadingStart();
 								var url =base_url_js+'budgeting/save-setpostdepartement';
 								var data = {
-								          CodeSubPost : CodePostRealisasi,
+								          CodeHeadAccount : CodeHeadAccount,
 								          Year : Year,
 								          Budget : getBudget,
 								          Action : 'add'

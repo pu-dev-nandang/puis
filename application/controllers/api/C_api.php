@@ -6839,6 +6839,7 @@ class C_api extends CI_Controller {
         // $NA = $this->m_master->showData_array('db_employees.division');
         $NA = $this->m_master->caribasedprimary('db_employees.division','StatusDiv',1);
         $AC = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
+        $FT = $this->m_master->showData_array('db_academic.faculty');
         for ($i=0; $i < count($NA); $i++) {
             $arr_result[] = array(
                 'Code'  => 'NA.'.$NA[$i]['ID'],
@@ -6850,8 +6851,16 @@ class C_api extends CI_Controller {
         for ($i=0; $i < count($AC); $i++) {
             $arr_result[] = array(
                 'Code'  => 'AC.'.$AC[$i]['ID'],
-                'Name1' => 'Prody '.$AC[$i]['Name'],
-                'Name2' => 'Prody '.$AC[$i]['NameEng']
+                'Name1' => 'Prodi '.$AC[$i]['Name'],
+                'Name2' => 'Study '.$AC[$i]['NameEng']
+            );
+        }
+
+        for ($i=0; $i < count($FT); $i++) {
+            $arr_result[] = array(
+                'Code'  => 'FT.'.$FT[$i]['ID'],
+                'Name1' => 'Facultas '.$FT[$i]['Name'],
+                'Name2' => 'Faculty '.$FT[$i]['NameEng']
             );
         }
 

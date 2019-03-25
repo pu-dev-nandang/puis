@@ -10,7 +10,7 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-sm-4">
-                    <label class="control-label">Post Code:</label>
+                    <label class="control-label">Budget Category Code:</label>
                 </div>
                 <?php if ($action == 'add'): ?>
                   <div class="col-sm-6">
@@ -37,7 +37,7 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-sm-4">
-                    <label class="control-label">Post Name:</label>
+                    <label class="control-label">Budget Category Name:</label>
                 </div>    
                 <div class="col-sm-6">
                    <input type="text" name="PostName" id= "PostName" placeholder="PostName" class="form-control">
