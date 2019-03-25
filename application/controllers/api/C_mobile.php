@@ -264,7 +264,7 @@ class C_mobile extends CI_Controller {
             $dataAnnc = $this->db->query('SELECT ann.ID AS IDAnncStudent ,ann.Read, annc.* FROM '.$db.' ann 
                                                 LEFT JOIN db_notifikasi.announcement annc ON (annc.ID = ann.IDAnnc)
                                                 WHERE '.$urr.' AND annc.Start <= "'.$dateNow.'" 
-                                                AND annc.End >= "'.$dateNow.'" LIMIT '.$data_arr['Limit'])->result_array();
+                                                AND annc.End >= "'.$dateNow.'" ORDER BY annc.ID DESC LIMIT '.$data_arr['Limit'])->result_array();
 
 
             $dataSaved = $this->db->query('SELECT COUNT(*) AS TotalSaved FROM '.$db.' ann WHERE ann.Read = "2" AND '.$urr)->result_array();
