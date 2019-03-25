@@ -758,12 +758,11 @@ class M_api extends CI_Model {
 
     }
 
-
      // ====== Get Academic Employee =======
 
     public function views_academic($NIP) {
 
-        $sql = "SELECT * FROM db_employees.files AS em WHERE em.NIP = '".$NIP."' AND em.TypeFiles IN ('1','2','3','4','5','6') AND Active = '1' AND LinkFiles NOT IN ('') AND LinkFiles IS NOT NULL ORDER BY em.TypeAcademic ASC ";
+        $sql = "SELECT * FROM db_employees.files AS em WHERE em.NIP = '".$NIP."' AND em.TypeFiles IN ('1','2','3','4','5','6') AND Active = '1' AND LinkFiles NOT IN ('') AND LinkFiles IS NOT NULL ORDER BY em.TypeFiles ASC ";
         $query=$this->db->query($sql, array());
         return $query->result_array();
 

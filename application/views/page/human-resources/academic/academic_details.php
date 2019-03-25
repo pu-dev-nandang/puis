@@ -1,6 +1,4 @@
 
-
-
 <div class="tab-pane active" id="tab_mata_kuliah">
 
     <table class="table table-bordered table-striped">
@@ -109,8 +107,14 @@
             $('#dataProvince').html(resultJson.Nameprov);
             // $('#dataDistricts').html(resultJson.ProvinceID);
             // $('#dataNationality').html(resultJson.ProvinceID);
+            
 
-        });
+            });
+
+
+            //alert(linkupdate);
+            
+
     }
 </script>
 

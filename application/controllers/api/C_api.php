@@ -245,7 +245,6 @@ class C_api extends CI_Controller {
 
         $status = $this->input->get('s');
         $requestData= $_REQUEST;
-        // print_r($requestData);
 
         $whereStatus = ($status!='') ? ' AND StatusEmployeeID = "'.$status.'" ' : '';
         print_r($status);
@@ -278,7 +277,6 @@ class C_api extends CI_Controller {
         }
 
         $query = $this->db->query($sql)->result_array();
-
         $data = array();
 
         for($i=0;$i<count($query);$i++){
@@ -547,26 +545,31 @@ class C_api extends CI_Controller {
 
         if( !empty($requestData['search']['value']) ) {
             $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
-                        ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.StatusEmployeeID
+                        ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.StatusEmployeeID, xx.Totalfiles
                         FROM db_employees.employees em 
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
-                        LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID) 
+                        LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID)
+                        LEFT JOIN (SELECT fs.NIP, COUNT(fs.LinkFiles) AS Totalfiles FROM db_employees.files fs INNER JOIN db_employees.master_files mf ON (fs.TypeFiles = mf.ID)
+            WHERE fs.LinkFiles IS NOT NULL GROUP BY fs.NIP) xx ON (em.NIP = xx.NIP) 
                         WHERE em.StatusEmployeeID != -2 '.$whereStatus.' AND ( ';
-
             $sql.= ' em.NIP LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR em.Name LIKE "%'.$requestData['search']['value'].'%" ';
             $sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
-            $sql.= ') ORDER BY NIP,em.PositionMain ASC';
+            //$sql.= ') ORDER BY NIP,em.PositionMain ASC';
+            $sql.= ') ORDER BY xx.Totalfiles DESC';
 
         }
         else {
             $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
-                        ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.StatusEmployeeID
+                        ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.StatusEmployeeID, xx.Totalfiles
                         FROM db_employees.employees em 
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                         LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID) 
+                        LEFT JOIN (SELECT fs.NIP, COUNT(fs.LinkFiles) AS Totalfiles FROM db_employees.files fs INNER JOIN db_employees.master_files mf ON (fs.TypeFiles = mf.ID)
+            WHERE fs.LinkFiles IS NOT NULL GROUP BY fs.NIP) xx ON (em.NIP = xx.NIP) 
                         WHERE em.StatusEmployeeID != -2 '.$whereStatus;
-            $sql.= 'ORDER BY NIP,em.PositionMain ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+            //$sql.= 'ORDER BY NIP,em.PositionMain ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+            $sql.= 'ORDER BY xx.Totalfiles DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
         }
         
@@ -602,18 +605,20 @@ class C_api extends CI_Controller {
             $Get_MasterFiles = $this->m_master->showData_array('db_employees.master_files');
             $StatusFiles = '';
             for ($j=0; $j < count($Get_MasterFiles); $j++) { 
-                $stDefault =' <span class="label label-danger"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
+                //$stDefault =' <span class="label label-danger"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
+                $stDefault =' <span class="badge progress-bar-danger btn-round">'.$Get_MasterFiles[$j]['TypeFiles'].'</span> ';
+                
                 $sql2 = 'select count(*) as total, LinkFiles from db_employees.files where NIP = ? and TypeFiles = ? and LinkFiles IS NOT NULL  ';
                 $query2=$this->db->query($sql2, array($NIP,$Get_MasterFiles[$j]['ID']))->result_array();
                 if ($query2[0]['total'] > 0 ) {
                     $getotfiles = $getotfiles + ($query2[0]['total']);
                     
                     if($query2[0]['LinkFiles'] != null){
-                        $stDefault =' <span class="label label-success"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
+                        $stDefault =' <span class="label label-success btn-round"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
                     } else {
-                        $stDefault =' <span class="label label-danger"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
+                        //$stDefault =' <span class="label label-danger btn-round"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
+                        $stDefault =' <span class="badge progress-bar-danger btn-round"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span> ';
                     }
-    
                 }  
                 $StatusFiles .= $stDefault;
             }
@@ -638,7 +643,7 @@ class C_api extends CI_Controller {
             $nestedData[] = $Division.' - '.$Position;
             $nestedData[] = '<div style="text-align: center;">'.$status.'</div>';
             $nestedData[] = $StatusFiles;
-            $nestedData[] = '<center><button type="button" style="text-align: center;" class="btn btn-primary btn-round">Files <span class="badge progress-bar-danger"> '.$getotfiles.' </span></button> </center>';
+            $nestedData[] = '<center><button type="button" style="text-align: center;" class="btn btn-primary btn-round">Files <span class="badge progress-bar-success btn-round"> '.$getotfiles.' </span></button> </center>';
             
             $nestedData[] = '<a class="btn btn-primary btn-round" href="'.base_url('human-resources/academic-details/'.$row["NIP"]).'">
   <i class="icon-list icon-large"></i> Detail</a>';

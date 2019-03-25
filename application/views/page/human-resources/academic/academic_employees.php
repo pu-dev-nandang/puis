@@ -39,7 +39,9 @@ border-radius: 17px;
         </div>
         <hr/>
     </div>
+    
 </div>
+
 
 <div class="thumbnail" style="padding: 10px; text-align: right;margin-bottom: 10px;">
     <span style="color: #4CAF50;margin-right: 5px;margin-left: 5px;"><i class="fa fa-circle" style="margin-right: 5px;"></i> Permanent Employees </span> |
