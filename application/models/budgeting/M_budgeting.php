@@ -365,6 +365,7 @@ class M_budgeting extends CI_Model {
                LEFT JOIN db_budgeting.cfg_head_account as c on b.CodeHeadAccount = c.CodeHeadAccount
                LEFT JOIN db_budgeting.cfg_post as d on c.CodePost = d.CodePost
                where a.ID_creator_budget_approval = ?
+               order by b.CodeHeadAccount asc
        ';
         $query=$this->db->query($sql, array($ID_creator_budget_approval))->result_array();
         return $query;
@@ -933,7 +934,7 @@ class M_budgeting extends CI_Model {
                 UNION
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
                 UNION
-                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty
+                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr from db_academic.faculty
                 ) aa
                 where ID = ?
                 ';
@@ -948,7 +949,7 @@ class M_budgeting extends CI_Model {
                 UNION
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
                 UNION
-                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty
+                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr from db_academic.faculty
                 ) aa
                 where NameDepartement = ?
                 ';

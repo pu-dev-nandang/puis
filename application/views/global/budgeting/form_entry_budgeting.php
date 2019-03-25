@@ -149,6 +149,9 @@ function Add_Department_auth()
 	if (!$(".ContentDataPostBudget").length &&  $('#Departement').find('option').length == 1 && b == 1) {
 		LoadFirstLoad();
 	}
+
+	// for auth	
+		showButton();
 	
 }
 
@@ -639,6 +642,9 @@ function showButton()
 
 		if (!bool) {
 			$('#SaveBudget,#SaveSubmit').prop('disabled',true);
+			$('button:not(#Log):not(#btnBackToHome)').prop('disabled',true);
+			$('input:not(.select2-input)').prop('disabled',true);
+			$('select:not(#Departement):not(#Year)').prop('disabled',true);
 		}
 	}	
 	else
@@ -667,10 +673,20 @@ function showButton()
 
 			if (!bool) {
 				$('#SaveBudget,#SaveSubmit').prop('disabled',true);
+				$('button:not(#Log):not(#btnBackToHome)').prop('disabled',true);
+				$('input:not(.select2-input)').prop('disabled',true);
+				$('select:not(#Departement):not(#Year)').prop('disabled',true);
 			}
+			
 		}
 
 		if (Status == 1) { // only auth approval berdasarkan tingkatan Approval
+			// lock input
+				$('button:not(#Log):not(#btnBackToHome)').prop('disabled',true);
+				$('input').prop('disabled',true);
+				$('select:not(#Departement):not(#Year)').prop('disabled',true);
+
+
 			var NIP = '<?php echo $this->session->userdata('NIP') ?>';
 			var JsonStatus = jQuery.parseJSON(arr1[0]['JsonStatus']);
 			var bool = false;
@@ -721,8 +737,12 @@ function showButton()
 
 		if (Status ==2) {
 			$('button:not(#Log):not(#btnBackToHome)').prop('disabled',true);
-			$('input').prop('disabled',true);
+			$('input:not(.select2-input)').prop('disabled',true);
 			$('select:not(#Departement):not(#Year)').prop('disabled',true);
+
+			// show button export excel
+				$('#content_button').attr('align','right');
+				$('#content_button').html('<button type="button" class="btn btn-default" id="ExportExcel" id_creator_budget_approval = "'+arr1[0].ID+'"> <i class="fa fa-file-excel-o"></i> Excel</button>');
 		} 
 
 	}
@@ -1577,6 +1597,19 @@ $(document).off('click', '#RejectBudget').on('click', '#RejectBudget',function(e
 	}
 	
 
+})
+
+$(document).off('click', '#ExportExcel').on('click', '#ExportExcel',function(e) {
+	var id_creator_budget_approval = $(this).attr('id_creator_budget_approval');
+
+	var url = base_url_js+'budgeting/export_excel_budget_creator';
+	data = {
+	  id_creator_budget_approval : id_creator_budget_approval,
+	}
+	var token = jwt_encode(data,"UAP)(*");
+	FormSubmitAuto(url, 'POST', [
+	    { name: 'token', value: token },
+	]);
 })
 </script>
 

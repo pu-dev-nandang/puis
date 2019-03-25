@@ -2220,7 +2220,7 @@ class C_rest extends CI_Controller {
                 for ($i=0; $i < count($JsonStatus); $i++) {
                     $arr = $JsonStatus[$i];
                     // if Acknowledge by then skipp
-                        if ($arr['Status'] == 'Acknowledge by' || $arr['Status'] != 'Approval by') {
+                        if ($arr['NameTypeDesc'] == 'Acknowledge by' || $arr['NameTypeDesc'] != 'Approval by') {
                             continue;
                         }
                     $Status = $arr['Status'];
