@@ -1489,7 +1489,71 @@ class C_budgeting extends Budgeting_Controler {
                 break;
         }
         echo json_encode($msg);
-    }   
+    }
+
+    public function Upload_File_Creatorbudget()
+    {
+        $input = $this->getInputToken();
+        // upload file
+        $filename = $input['attachName'].'.'.$input['extension'];
+        $config['upload_path']   = './uploads/budgeting';
+        $config['overwrite'] = TRUE; 
+        $config['allowed_types'] = '*'; 
+        $config['file_name'] = $filename;
+        //$config['max_size']      = 100; 
+        //$config['max_width']     = 300; 
+        //$config['max_height']    = 300;  
+        $this->load->library('upload', $config);
+           
+        if ( ! $this->upload->do_upload('fileData')) {
+           // return $error = $this->upload->display_errors(); 
+           echo json_encode(array('msg' => 'The file did not upload successfully','status' => 0));
+           //$this->load->view('upload_form', $error); 
+        }
+           
+        else { 
+          // return $data =  $this->upload->data(); 
+            // update data to save file
+                $dataSave['FileUpload'] = $filename;
+                $ID_creator_budget_approval = $input['id_creator_budget_approval'];
+                $this->db->where('ID', $ID_creator_budget_approval);
+                $this->db->update('db_budgeting.creator_budget_approval', $dataSave);
+
+          echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1,'filename' => $filename));
+        }
+    }
+
+    public function Upload_File_Creatorbudget_all()
+    {
+        $input = $this->getInputToken();
+        // upload file
+        $filename = $input['attachName'].'.'.$input['extension'];
+        $config['upload_path']   = './uploads/budgeting';
+        $config['overwrite'] = TRUE; 
+        $config['allowed_types'] = '*'; 
+        $config['file_name'] = $filename;
+        //$config['max_size']      = 100; 
+        //$config['max_width']     = 300; 
+        //$config['max_height']    = 300;  
+        $this->load->library('upload', $config);
+           
+        if ( ! $this->upload->do_upload('fileData')) {
+           // return $error = $this->upload->display_errors(); 
+           echo json_encode(array('msg' => 'The file did not upload successfully','status' => 0));
+           //$this->load->view('upload_form', $error); 
+        }
+           
+        else { 
+          // return $data =  $this->upload->data(); 
+            // update data to save file
+                $dataSave['BudgetApproveUpload'] = $filename;
+                $year = $input['year'];
+                $this->db->where('Year', $year);
+                $this->db->update('db_budgeting.cfg_dateperiod', $dataSave);
+
+          echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1,'filename' => $filename));
+        }
+    }    
 
     public function ListBudgetDepartement()
     {
@@ -1512,10 +1576,14 @@ class C_budgeting extends Budgeting_Controler {
     public function getListBudgetingDepartement()
     {
         $this->auth_ajax();
+        $rs = array('dt' => array(),'dt_Year' => array());
         $Input = $this->getInputToken();
         $Year = $Input['Year'];
-        $get = $this->m_budgeting->getListBudgetingDepartement($Year);
-        echo json_encode($get);
+        $dt = $this->m_budgeting->getListBudgetingDepartement($Year);
+        $dt_Year = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Year',$Year);
+        $rs['dt'] = $dt;
+        $rs['dt_Year'] = $dt_Year;
+        echo json_encode($rs);
     }
 
     public function BudgetLeft()
