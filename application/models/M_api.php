@@ -2581,7 +2581,7 @@ class M_api extends CI_Model {
     }
 
     public function __getGradeSchedule($ScheduleID){
-        
+
         $data = $this->db->get_where('db_academic.grade_course',array(
             'ScheduleID' => $ScheduleID
         ),1)->result_array();

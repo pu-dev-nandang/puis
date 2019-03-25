@@ -1929,4 +1929,13 @@ class C_api2 extends CI_Controller {
 
     }
 
+    public function getSemesterOptionStudent($ClassOf){
+
+        $dataSemester = $this->db->query('SELECT * FROM db_academic.semester s 
+                                                    WHERE s.Year >= "'.$ClassOf.'" ORDER BY  s.ID ASC ')->result_array();
+
+        return print_r(json_encode($dataSemester));
+
+    }
+
 }
