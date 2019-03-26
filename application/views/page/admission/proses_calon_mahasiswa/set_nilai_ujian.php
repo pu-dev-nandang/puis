@@ -4,7 +4,7 @@
 	    margin-left: 0px;
 	}
 </style>
-<div class="row" style="margin-top: 30px;">
+<!-- <div class="row" style="margin-top: 30px;">
 	<div class="col-md-12">
 		<div class="widget box">
 			<div class="widget-header">
@@ -18,8 +18,6 @@
 						    <option></option>
 						</select>
 					</div>
-					<!-- <div  class="col-md-4" align="right" id="pagination_link"></div>	 -->
-					<!-- <div class = "table-responsive" id= "register_document_table"></div> -->
 				</div>
 				<div class = 'row' style="margin-top: 10px">
 					<div  class="col-md-12" align="right" id="pagination_link"></div>
@@ -29,9 +27,9 @@
 				</div>
 			</div>
 		</div>
-	</div> <!-- /.col-md-6 -->
-</div>
-
+	</div>
+</div> -->
+<h4>Comming Soon</h4>
 <script type="text/javascript">
 	window.processs=[];
 	window.processs1=[];

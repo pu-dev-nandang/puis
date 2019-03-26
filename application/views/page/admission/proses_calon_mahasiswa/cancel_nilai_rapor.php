@@ -71,7 +71,7 @@
                 </div>
                 <div class="row" style="margin-top: 10px;margin-left: 0px;,margin-right: 0px">
                     <div class="col-md-12" align = "right">
-                       <button class="btn btn-inverse btn-notification btn-submit" id="btn-submit">Submit</button>
+                       <button class="btn btn-inverse btn-notification btn-submit" id="btn-submit">Cancel</button>
                     </div>
                 </div>    
             </div>

@@ -1460,6 +1460,7 @@ class M_admission extends CI_Model {
                     'ID_ujian_perprody' => $ID_ujian_perprody,
                     'ID_register_formulir' => $ID_register_formulir,
                     'Value' => $arr['processs1'][$i]->value,
+                    'Status' => 'Verified', // NOT VERIFY FROM KA PRODI
                     'CreateAT' => date('Y-m-d'),
                     'CreateBY' => $this->session->userdata('NIP'),
             );
@@ -1485,6 +1486,18 @@ class M_admission extends CI_Model {
             $this->db->insert('db_admission.register_rangking', $dataSave);
           }
       } 
+    }
+
+    public function saveDataRaporToFin($arr)
+    {
+      $arr = (array)json_decode(json_encode($arr),true);
+      for ($i=0; $i < count($arr); $i++) { 
+        $dt = $arr[$i];
+        // print_r($dt);
+        $dt['CreateAT'] = date('Y-m-d');
+        $dt['CreateBY'] = $this->session->userdata('NIP');
+        $this->db->insert('db_admission.register_nilai_fin', $dt);
+      }
     }
 
     public function count_loadData_calon_mahasiswa_created($Nama,$selectProgramStudy,$Sekolah,$FormulirCode)
@@ -1554,7 +1567,8 @@ class M_admission extends CI_Model {
                 on o.ID = a.ID_program_study
                 left join db_admission.formulir_number_offline_m as pq
                 on b.FormulirCode = pq.FormulirCode
-                where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID in (select ID_register_formulir from db_admission.register_nilai where Status != "Verified") 
+                where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID in (select ID_register_formulir from db_admission.register_nilai where Status = "Verified") 
+                 
                   and ( b.FormulirCode like '.$FormulirCode.' or pq.No_Ref like '.$FormulirCode.' )
               )aa';
            $query=$this->db->query($sql, array())->result_array();
@@ -1632,10 +1646,25 @@ class M_admission extends CI_Model {
             on o.ID = a.ID_program_study
             left join db_admission.formulir_number_offline_m as pq
             on b.FormulirCode = pq.FormulirCode
-            where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID in (select ID_register_formulir from db_admission.register_nilai where Status != "Verified") 
+            where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID in (select ID_register_formulir from db_admission.register_nilai where Status = "Verified") 
+
               and ( b.FormulirCode like '.$FormulirCode.' or pq.No_Ref like '.$FormulirCode.' )
             LIMIT '.$start. ', '.$limit;
            $query=$this->db->query($sql, array())->result_array();
+           for ($i=0; $i < count($query); $i++) { 
+             $dt = $this->m_master->caribasedprimary('db_finance.register_admisi','ID_register_formulir',$query[$i]['ID_register_formulir']);
+             if (count($dt) > 0) {
+               $query[$i]['fin'] = 0;
+             }
+             else
+             {
+               $query[$i]['fin'] = 1;
+             }
+
+             // get data nilai to finance
+             $dt = $this->m_master->caribasedprimary('db_admission.register_nilai_fin','ID_register_formulir',$query[$i]['ID_register_formulir']);
+             $query[$i]['Nilaifin'] = $dt;
+           }
            return $query;
     }
 

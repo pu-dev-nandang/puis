@@ -397,15 +397,20 @@ class C_admission extends Admission_Controler {
        $FormulirCode = $input['FormulirCode'];
 
        $this->load->library('pagination');
-       $config = $this->config_pagination_default_ajax($this->m_admission->count_daftar_set_nilai_rapor_load_data_paging($selectPrody,$FormulirCode),10,5);
+       $config = $this->config_pagination_default_ajax($this->m_admission->count_daftar_set_nilai_rapor_load_data_paging($selectPrody,$FormulirCode),3,5);
        $this->pagination->initialize($config);
        $page = $this->uri->segment(5);
        $start = ($page - 1) * $config["per_page"];
        $datadb = $this->m_admission->daftar_set_nilai_rapor_load_data_paging($config["per_page"], $start,$selectPrody,$FormulirCode);
        $this->data['datadb'] = $datadb['query'];
        $this->data['mataujian'] = $this->m_admission->select_mataUjian($datadb['Prodi']);
-       $this->data['grade'] = json_encode($this->m_admission->showData('db_academic.grade'));
+       $this->data['grade'] = json_encode($this->m_admission->showData('db_admission.grade'));
       $this->data['no'] = $start + 1;
+
+      // get data nilai to finance
+      $this->data['G_Jurusan'] = $this->m_master->showData_array('db_admission.m_criteria_rapor_fin');
+      $this->data['G_Jurusan_sub'] = $this->m_master->showData_array('db_admission.m_sub_criteria_rfin');
+
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/daftar_nilai_rapor_load_data_paging',$this->data,true);
 
        $output = array(
@@ -420,6 +425,7 @@ class C_admission extends Admission_Controler {
       $input = $this->getInputToken();
       $this->m_admission->saveDataNilaRapor($input);
       $this->m_admission->saveDataRangkingRapor($input);
+      $this->m_admission->saveDataRaporToFin($input['arr_fin']);
       echo json_encode( array('msg' => 'Data berhasil disimpan') );
     }
 
@@ -1220,6 +1226,7 @@ class C_admission extends Admission_Controler {
     public function generate_to_be_mhs()
     {
       $input = $this->getInputToken();
+      $msg = '';
       //check existing db
           // get setting ta
           $taDB = $this->m_master->showData_array('db_admission.set_ta');
@@ -1257,6 +1264,7 @@ class C_admission extends Admission_Controler {
                     // search NPM dengan 2 Pertama kode Prodi CodeID
                     // 2 kedua tahun angkatan ambil 2 digit terakhir
                     if (count($Q_Prodi) == 0) {
+                      $msg = 'Error';
                       echo json_encode('Error');
                       die();
                     }
@@ -1288,6 +1296,7 @@ class C_admission extends Admission_Controler {
             $HighSchoolID = $data2[0]['SchoolID'];
             $SchoolName = $this->m_master->caribasedprimary('db_admission.school','ID',$HighSchoolID);
             if (count($SchoolName) == 0) {
+               $msg = 'Error';
               echo json_encode('Error');
               die();
             }
@@ -1295,6 +1304,7 @@ class C_admission extends Admission_Controler {
             $HighSchool = $SchoolName[0]['SchoolName'];
             $MajorsHighSchool = $this->m_master->caribasedprimary('db_admission.register_major_school','ID',$data[0]['ID_register_major_school']);
             if (count($MajorsHighSchool) == 0) {
+               $msg = 'Error';
               echo json_encode('Error');
               die();
             }
@@ -1305,18 +1315,21 @@ class C_admission extends Admission_Controler {
             $DistrictID = $data[0]['ID_districts'];
             $DistrictID = $this->m_master->caribasedprimary('db_admission.district','DistrictID',$DistrictID);
             if (count($DistrictID) == 0) {
+               $msg = 'Error';
               echo json_encode('Error');
               die();
             }
             $DistrictID = ' Kecamatan : '.$DistrictID[0]['DistrictName'];
             $RegionID = $this->m_master->caribasedprimary('db_admission.region','RegionID',$data[0]['ID_region']);
             if (count($RegionID) == 0) {
+               $msg = 'Error';
               echo 'Error';
               die();
             }
             $RegionID = $RegionID[0]['RegionName'];
             $ID_province = $this->m_master->caribasedprimary('db_admission.province','ProvinceID',$data[0]['ID_province']);
             if (count($ID_province) == 0) {
+               $msg = 'Error';
               echo json_encode('Error');
               die();
             }
@@ -1632,13 +1645,14 @@ class C_admission extends Admission_Controler {
           // die();
 
           // $this->db->insert_batch($ta.'.students', $arr);
-          $this->db->insert_batch('db_academic.auth_students', $arr_insert_auth);
-          $this->db->insert_batch('db_academic.auth_parents', $arr_insert3);
-          if($_SERVER['SERVER_NAME']!='localhost') {
-            $this->m_admission->insert_to_Library($arr_insert_auth);
-          } 
+          if ($msg == '') {
+            $this->db->insert_batch('db_academic.auth_students', $arr_insert_auth);
+            $this->db->insert_batch('db_academic.auth_parents', $arr_insert3);
+            if($_SERVER['SERVER_NAME']!='localhost') {
+              $this->m_admission->insert_to_Library($arr_insert_auth);
+            } 
+          }
           echo json_encode('');
-
     }
 
     public function importFormulirManual()

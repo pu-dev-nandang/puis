@@ -34,7 +34,7 @@
     }
 </style>
 
-<div class="row" style="margin-top: 30px;">
+<!-- <div class="row" style="margin-top: 30px;">
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
@@ -75,7 +75,8 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
+<h4>Comming Soon</h4>
 
 
 <script type="text/javascript">

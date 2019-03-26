@@ -42,7 +42,7 @@
 				<?php for ($i = 0; $i < count($datadb); $i++): ?>
 					<?php $jml_bobot = 0 ?>
 						<tr class = 'ID_ujian_perprody<?php echo $datadb[$i]['ID_register_formulir'] ?>'>
-							<td><?php echo $no++ ?></td>
+							<td rowspan="2"><?php echo $no++ ?></td>
 							<td>
 								<?php echo $datadb[$i]['NameCandidate'] ?>
 								<br>
@@ -85,7 +85,27 @@
 								</select>
 								<a href="javascript:void(0)" class="show_a_href" id = "show<?php echo $datadb[$i]['ID_register_formulir'] ?>" filee = "" Email = "<?php echo $datadb[$i]['Email'] ?>">Show</a>		
 							</td>
-						</tr>	
+						</tr>
+						<!--  Input Nilai Finance-->
+						<tr register_formulir = "<?php echo $datadb[$i]['ID_register_formulir'] ?>">
+							<td>
+								<div class="row">
+									<div class="col-md-12" align="center">
+										Input Nilai to Finance
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12">
+										<select class="form-control PilihJurusan">
+											<option value="0">--Please Choose--</option>
+											<?php for ($m = 0; $m < count($G_Jurusan); $m++): ?>
+												<option value="<?php echo $G_Jurusan[$m]['ID'] ?>"><?php echo $G_Jurusan[$m]['Type'] ?></option>
+											<?php endfor; ?>
+										</select>
+									</div>
+								</div>
+							</td>
+						</tr>
 				<?php endfor; ?>
 			</tbody>
 		</table>
@@ -100,6 +120,7 @@
 
 <script type="text/javascript">
 	window.grade = <?php echo $grade ?>;
+	var G_Jurusan_sub = <?php echo json_encode($G_Jurusan_sub); ?>;
 	$(document).ready(function () {
 		$('.ID_ujian_perprody').select2({
 		   //allowClear: true
@@ -110,15 +131,46 @@
 		});
 		// console.log(grade);
 
-		$("#btn-Hitung").click(function(){
-			prosesData();
-		})
+		// $("#btn-Hitung").click(function(){
+		// 	prosesData();
+		// })
 
-		$("#btn-Save").click(function(){
+		// $("#btn-Save").click(function(){
+		//   loading_button('#btn-Save');
+		//   var data = {
+		//   					processs1 : processs,
+		//   					rangking : processs1,
+		//   					arr_fin : arr_fin,
+		//   			};
+		//   var token = jwt_encode(data,"UAP)(*");
+		//   var url = base_url_js+'admission/proses-calon-mahasiswa/set-nilai-rapor/save';
+		//   	$.post(url,{token:token},function (data_json) {
+		//         var response = jQuery.parseJSON(data_json);
+		//         toastr.success('Data berhasil disimpan', 'Success!');
+		//         // loadTableData(1);
+		//         $('#btn-Save').prop('disabled',false).html('Save');
+	 //      	}).done(function() {
+	 //      	      loadTableData(1);
+	 //      	      $('#btn-Save').prop('disabled',false).html('Save');
+	 //  	    }).fail(function() {
+	 //  	      toastr.error('The Database connection error, please try again', 'Failed!!');
+	 //  	    }).always(function() {
+	 //  	      $('#btn-Save').prop('disabled',false).html('Save');
+	 //  	    });
+		// })
+		
+	});
+
+$(document).off('click', '#btn-Hitung').on('click', '#btn-Hitung',function(e) {
+	prosesData();
+});	
+
+$(document).off('click', '#btn-Save').on('click', '#btn-Save',function(e) {
 		  loading_button('#btn-Save');
 		  var data = {
 		  					processs1 : processs,
-		  					rangking : processs1
+		  					rangking : processs1,
+		  					arr_fin : arr_fin,
 		  			};
 		  var token = jwt_encode(data,"UAP)(*");
 		  var url = base_url_js+'admission/proses-calon-mahasiswa/set-nilai-rapor/save';
@@ -135,10 +187,81 @@
 	  	    }).always(function() {
 	  	      $('#btn-Save').prop('disabled',false).html('Save');
 	  	    });
-		})
+});	
 
-		
-	});
+$(document).off('change', '.PilihJurusan').on('change', '.PilihJurusan',function(e) {
+    var row = $(this).closest('tr');
+    // clear all td except jurusan
+    for (var i = 0; i <= 11; i++) {
+    	var s = i+1;
+    	row.find('td:eq('+s+')').remove();
+    }
+
+    var v = $(this).val();
+    var arr_choice = [];
+    for (var i = 0; i < G_Jurusan_sub.length; i++) {
+    	if (G_Jurusan_sub[i].ID_m_criteria_rapor_fin == v) {
+    		arr_choice.push(G_Jurusan_sub[i].NmMtPel)
+    	}
+    }
+
+    for (var i = 0; i < arr_choice.length; i++) {
+    	var s = i+1;
+    	var op = '<select class = "form-control NilaiFin" mataujian = "'+arr_choice[i]+'">';
+    	for (var j = 0; j <= 100; j++) {
+    		op += '<option value = "'+j+'">'+j+'</option>';
+    	}
+
+    	op += '</select>';
+    	var btn_edit = '<button class = "btn btn-primary btn-xs edit_pelajaran"><i class="fa fa-pencil-square-o"></i></button>';
+    	var html = '<div align = "right">'+btn_edit+'</div><div class = "form-group"><label>'+arr_choice[i]+'</label>'+
+    						op+'</div>';
+    	var cc = row.find('td:eq('+s+')');
+    	if (cc.length) {
+    		cc.remove();
+    	}
+    	row.append('<td align = "center"></td>');					
+    	row.find('td:eq('+s+')').html(html);
+    }
+
+    var s = i+1;
+    // add td sisa
+    for (var i = s; i <= 9; i++) {
+    	var cc = row.find('td:eq('+i+')');
+    	if (cc.length) {
+    		cc.remove();
+    	}
+
+    	row.append('<td align = "center"></td>');
+    }
+
+    // console.log(row.find('td').length);
+    if (row.find('td').length < 10 ) {
+    	row.append('<td align = "center"></td>');
+    }	
+});
+
+$(document).off('click', '.edit_pelajaran').on('click', '.edit_pelajaran',function(e) {
+	// get Nama Mata Ujian
+	var r = $(this).closest('td');
+	var nm = r.find('.NilaiFin').attr('mataujian');
+	var input = '<div class = "diveditpelajaran" style = "margin-bottom : 5px;margin-top : 5px;"><input type = "text" class = "form-control inputmt_pelajaran" value = "'+nm+'"></div>';
+	r.find('label').remove();
+	r.find('.NilaiFin').before(input);
+	$(this).remove();
+	var btn_save = '<button class = "btn btn-primary btn-xs save_edit_pelajaran"><i class="fa fa-floppy-o" aria-hidden="true"></i></button>';
+	r.find('div[align= "right"]').html(btn_save);
+});
+
+$(document).off('click', '.save_edit_pelajaran').on('click', '.save_edit_pelajaran',function(e) {
+	var r = $(this).closest('td');
+	var inputmt_pelajaran = r.find('.inputmt_pelajaran').val();
+	r.find('.NilaiFin').attr('mataujian',inputmt_pelajaran);
+	var btn_edit = '<button class = "btn btn-primary btn-xs edit_pelajaran"><i class="fa fa-pencil-square-o"></i></button>';
+	r.find('.diveditpelajaran').remove();
+	r.find('.NilaiFin').before('<label>'+inputmt_pelajaran+'</label>');
+	r.find('div[align= "right"]').html(btn_edit);
+});
 
 </script>
 
