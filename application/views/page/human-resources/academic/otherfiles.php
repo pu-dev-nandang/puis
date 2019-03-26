@@ -189,7 +189,7 @@ $('#fileOther').change(function (event) {
         var idtypex = $(this).attr('idtypex');
 
         if (linkfileother != null) {
-            var filesxx = '<iframe src="'+base_url_js+'uploads/files/'+linkfileother+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btnviewlistsrata" filesub ="'+linkfileother+'"><i class="fa fa-eye"></i> Preview </button></center>';
+            var filesxx = '<iframe src="'+base_url_js+'uploads/files/'+linkfileother+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+linkfileother+'"><i class="fa fa-eye"></i> Preview </button></center>';
             } else {
             var filesxx = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px;">'
         }
@@ -235,14 +235,7 @@ $('#fileOther').change(function (event) {
                         '        </div> '+
                         '           <div class="col-xs-6">                                              '+
                         '           <div class="form-group">                                            '+
-                        '               <label>Ijazah</label>                                           '+
-                        '                        <form id="tagFM_OtherFile" enctype="multipart/form-data" accept-charset="utf-8" method="post" action=""> '+
-                        '                            <label class="btn btn-sm btn-default btn-default-warning btn-upload"> '+
-                        '                                <i class="fa fa-upload margin-right"></i> Upload File '+
-                        '                                    <input type="file" id="fileOther" name="userfile" class="upload_files" style="display: none;" accept="application/pdf"> '+
-                        '                           </label> '+
-                        '                           <p style="font-size: 12px;color: #FF0000;">*) Only PDF Files Max Size 5 MB</p> '+
-                        '                      </form>  '+
+                        '               <label>Preview File</label>                                      '+
                         '                   <div> '+filesxx+'</div>                                      '+
                         '               </div>                                                          '+
                         '           </div>     '+
@@ -253,7 +246,7 @@ $('#fileOther').change(function (event) {
                         '    <div><input type="hidden" class="form-control" value="'+filesnametype+'" id="typeotherfiles"> </div>              '+
                         '    <div><input type="hidden" class="form-control" value="'+linkfileother+'" id="linkotherfile">    </div>       '+
                         '    <div><input type="hidden" class="form-control" value="'+idfiles+'" id="idlinkfiles">    </div>       '+
-                        '               <button type="button" class="btn btn-danger" data-dismiss="modal"> <i class="fa fa-remove"></i> Cancel</button> | <button type="button" class="btn btn-success btnSubmitEditFiles" linkothers="'+linkfileother+'" idfiles="'+idfiles+'"> <i class="fa fa-check"></i> Save</button> '+
+                        '               <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"> <i class="fa fa-remove"></i> Cancel</button> | <button type="button" class="btn btn-success btn-round btnSubmitEditFiles" linkothers="'+linkfileother+'" idfiles="'+idfiles+'"> <i class="fa fa-check"></i> Save</button> '+
                         '           </div> '+
                         '       </div>'+
                         '   </div>'+
@@ -320,7 +313,7 @@ $('#fileOther').change(function (event) {
                         '        <div class="col-xs-6"> '+
                         '            <div class="form-group"> '+
                         '                <div id="element1">Review File : </div> '+
-                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btnviewlistsrata" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> Preview </button></center></div>                     '+
+                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> Preview </button></center></div>                     '+
                         '            </div> '+
                         '       </div> '+
                         '        </div>'+ //
@@ -330,7 +323,7 @@ $('#fileOther').change(function (event) {
                         '    <div><input type="hidden" class="form-control" value="'+filesnametype+'" id="typeotherfiles"> </div>        '+
                         '    <div><input type="hidden" class="form-control" value="'+linkfileother+'" id="linkotherfile">   </div>       '+
                         '    <div><input type="hidden" class="form-control" value="'+idfiles+'" id="idlinkfiles">           </div>       '+
-                        '               <button type="button" class="btn btn-danger" data-dismiss="modal"> <i class="fa fa-remove"></i> Cancel </button> | <button type="button" class="btn btn-success btnSubmitEditFiles" linkothers="'+linkfileother+'" idfiles="'+idfiles+'"> <i class="fa fa-check"></i> Save</button> '+
+                        '               <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"> <i class="fa fa-remove"></i> Cancel </button> | <button type="button" class="btn btn-success btn-round btnSubmitEditFiles" linkothers="'+linkfileother+'" idfiles="'+idfiles+'"> <i class="fa fa-check"></i> Save</button> '+
                         '           </div> '+
                         '       </div>'+
                         '   </div>'+
@@ -372,8 +365,8 @@ $('#btnSaveEditFiles').click(function () {
             'Pastikan Data Files tidak salah ! <br/>                                    ' +
             'Periksa kembali data yang di input sebelum di Save.                        ' +
             '<hr/>                                                                      ' +
-            '<button type="button" class="btn btn-default" id="btnCloseEmployees" data-dismiss="modal">Close</button> | ' +
-            '<button type="button" class="btn btn-success btnSubmitEditFiles" >Submit</button>' +
+            '<button type="button" class="btn btn-default" id="btnCloseEmployees" data-dismiss="modal"> Close</button> | ' +
+            '<button type="button" class="btn btn-success btnSubmitEditFiles"> Submit</button>' +
             '</div> ');
 
         $('#NotificationModal').modal({
