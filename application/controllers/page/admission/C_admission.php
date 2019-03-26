@@ -1266,8 +1266,7 @@ class C_admission extends Admission_Controler {
                     // 2 kedua tahun angkatan ambil 2 digit terakhir
                     if (count($Q_Prodi) == 0) {
                       $msg = 'Error';
-                      echo json_encode('Error');
-                      die();
+                      break;
                     }
                     $CodeID = $Q_Prodi[0]['CodeID'];
                     $strLenTA = strlen($ta) - 2; // last 2 digit
@@ -1298,16 +1297,14 @@ class C_admission extends Admission_Controler {
             $SchoolName = $this->m_master->caribasedprimary('db_admission.school','ID',$HighSchoolID);
             if (count($SchoolName) == 0) {
                $msg = 'Error';
-              echo json_encode('Error');
-              die();
+              break;
             }
 
             $HighSchool = $SchoolName[0]['SchoolName'];
             $MajorsHighSchool = $this->m_master->caribasedprimary('db_admission.register_major_school','ID',$data[0]['ID_register_major_school']);
             if (count($MajorsHighSchool) == 0) {
                $msg = 'Error';
-              echo json_encode('Error');
-              die();
+              break;
             }
             $MajorsHighSchool = $MajorsHighSchool[0]['SchoolMajor'];
             $Name = $data2[0]['Name'];
@@ -1317,22 +1314,19 @@ class C_admission extends Admission_Controler {
             $DistrictID = $this->m_master->caribasedprimary('db_admission.district','DistrictID',$DistrictID);
             if (count($DistrictID) == 0) {
                $msg = 'Error';
-              echo json_encode('Error');
-              die();
+              break;
             }
             $DistrictID = ' Kecamatan : '.$DistrictID[0]['DistrictName'];
             $RegionID = $this->m_master->caribasedprimary('db_admission.region','RegionID',$data[0]['ID_region']);
             if (count($RegionID) == 0) {
                $msg = 'Error';
-              echo 'Error';
-              die();
+              break;
             }
             $RegionID = $RegionID[0]['RegionName'];
             $ID_province = $this->m_master->caribasedprimary('db_admission.province','ProvinceID',$data[0]['ID_province']);
             if (count($ID_province) == 0) {
                $msg = 'Error';
-              echo json_encode('Error');
-              die();
+              break;
             }
             $ID_province = $ID_province[0]['ProvinceName'];
 
@@ -1646,14 +1640,12 @@ class C_admission extends Admission_Controler {
           // die();
 
           // $this->db->insert_batch($ta.'.students', $arr);
-          if ($msg == '') {
-            $this->db->insert_batch('db_academic.auth_students', $arr_insert_auth);
-            $this->db->insert_batch('db_academic.auth_parents', $arr_insert3);
-            if($_SERVER['SERVER_NAME']!='localhost') {
-              $this->m_admission->insert_to_Library($arr_insert_auth);
-            } 
+          $this->db->insert_batch('db_academic.auth_students', $arr_insert_auth);
+          $this->db->insert_batch('db_academic.auth_parents', $arr_insert3);
+          if($_SERVER['SERVER_NAME']!='localhost') {
+            $this->m_admission->insert_to_Library($arr_insert_auth);
           }
-          echo json_encode('');
+          echo json_encode($msg);
     }
 
     public function importFormulirManual()

@@ -323,6 +323,7 @@
                                toastr.error('Please check the completeness of the data', 'Failed!!');
                                $('#NotificationModal').modal('hide');
                              }).always(function() {
+                              loadPage('to-be-mhs/1');
                               $('#NotificationModal').modal('hide');
 
                              });
