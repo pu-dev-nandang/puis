@@ -51,9 +51,13 @@
 					<?php for ($i = 0; $i < count($datadb); $i++): ?>
 								 <tr>
 								 	<?php if (isset($chkActive)): ?>
-								 	<td><?php echo $no++ ?> <input type="checkbox" class="uniform" value ="<?php echo $datadb[$i]['ID_register_formulir'] ?>"></td>
+									 	<?php if ($datadb[$i]['fin'] == 1): ?>
+									 		<td rowspan="2"><?php echo $no++ ?> <input type="checkbox" class="uniform" value ="<?php echo $datadb[$i]['ID_register_formulir'] ?>"></td>	
+									 	<?php else: ?>
+									 		<td rowspan="2"><?php echo $no++ ?></td>	
+								 		<?php endif ?>	
 								 	<?php endif ?>
-								 	<td>
+								 	<td rowspan="2">
 								 		<?php echo $datadb[$i]['Name'] ?><br>
 								 		<?php echo $datadb[$i]['SchoolName'] ?><br>
 								 		<?php echo $datadb[$i]['SchoolRegion'] ?>
@@ -101,6 +105,16 @@
 								 	<?php else: ?>
 								 		<td><a href="<?php echo $url_registration ?>document/<?php echo $datadb[$i]['Email'] ?>/<?php echo $getData[0]['Attachment'] ?>" target="_blank">File</a></td>			
 								 	<?php endif ?>	
+								 </tr>
+								 <tr>
+								 	<td><label>Nilai to Finance</label></td>
+								 	<?php $dt = $datadb[$i]['Nilaifin'] ?>
+								 	<?php for ($m = 0; $m < count($dt); $m++): ?>
+								 		<td><?php echo '<label>'.$dt[$m]['NmMtPel'].'</label>' ?><br><?php echo $dt[$m]['Value'] ?></td>
+								 	<?php endfor; ?>
+								 	<?php for ($m = 0; $m < count($mataujian) - count($dt)+5; $m++): ?>
+								 		<td></td>
+								 	<?php endfor; ?>
 								 </tr>
 					<?php endfor; ?>
 				</tbody>

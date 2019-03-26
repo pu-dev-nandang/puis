@@ -212,22 +212,21 @@ class C_global extends CI_Controller {
         $input = $this->getInputToken();
         $ID_register_formulir = $input['ID_register_formulir'];
         $query = array();
-        // cek apakah ikut ujian atau tidak
-        $get = $this->m_master->caribasedprimary('db_admission.register_butuh_ujian','ID_register_formulir',$ID_register_formulir);
-        if (count($get) == 0) {
-            $get2 = $this->m_master->caribasedprimary('db_admission.register_nilai','ID_register_formulir',$ID_register_formulir);
-            for ($i=0; $i < count($get2); $i++) { 
-                $NamaUjian = $this->m_master->caribasedprimary('db_admission.ujian_perprody_m','ID',$get2[$i]['ID_ujian_perprody']);
-                $get2[$i] = $get2[$i] + array('NamaUjian' => $NamaUjian[0]['NamaUjian'],'Bobot' => $NamaUjian[0]['Bobot']);
-            }
-            $query = $get2;
-        }
-        else
-        {
-            $this->load->model('admission/m_admission');
-            $get2 = $this->m_admission->getHasilUjian($ID_register_formulir);
-            $query = $get2;
-        }
+        $query = $this->m_master->caribasedprimary('db_admission.register_nilai_fin','ID_register_formulir',$ID_register_formulir);
+        // if (count($get) == 0) {
+        //     $get2 = $this->m_master->caribasedprimary('db_admission.register_nilai','ID_register_formulir',$ID_register_formulir);
+        //     for ($i=0; $i < count($get2); $i++) { 
+        //         $NamaUjian = $this->m_master->caribasedprimary('db_admission.ujian_perprody_m','ID',$get2[$i]['ID_ujian_perprody']);
+        //         $get2[$i] = $get2[$i] + array('NamaUjian' => $NamaUjian[0]['NamaUjian'],'Bobot' => $NamaUjian[0]['Bobot']);
+        //     }
+        //     $query = $get2;
+        // }
+        // else
+        // {
+        //     $this->load->model('admission/m_admission');
+        //     $get2 = $this->m_admission->getHasilUjian($ID_register_formulir);
+        //     $query = $get2;
+        // }
         echo json_encode($query);
     }
 

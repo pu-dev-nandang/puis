@@ -3,7 +3,7 @@
 		background-color: #15a02c;
 	}
 </style>
-<div class="row" style="margin-top: 30px;">
+<!-- <div class="row" style="margin-top: 30px;">
 	<div class="col-md-12">
 		<div class="widget box">
 			<div class="widget-header">
@@ -21,7 +21,6 @@
 				<div class = "row">		
 					<div class="col-md-2" style="">
 						Waktu Ujian
-<!--						<input class="form-control" id="datetime_ujian" placeholder="All..." "="">-->
                         <div id="datetimepicker1" class="input-group input-append date">
                             <input data-format="yyyy-MM-dd hh:mm:ss" class="form-control" id="datetime_ujian" type="text"></input>
                             <span class="input-group-addon add-on">
@@ -48,8 +47,10 @@
 				<div id= "getTable"></div>
 			</div>
 		</div>
-	</div> <!-- /.col-md-6 -->
-</div>
+	</div>
+</div> -->
+
+<h4>Comming Soon</h4>
 
 <script type="text/javascript">
 	$(document).ready(function () {
