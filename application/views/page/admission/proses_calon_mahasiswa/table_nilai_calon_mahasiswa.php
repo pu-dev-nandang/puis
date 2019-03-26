@@ -42,7 +42,7 @@
 							<th style="width: 100px;"><?php echo $NamaUjian.'('.$mataujian[$i]['Bobot'].')' ?></th>
 						<?php endfor; ?>
 						<th>Bobot</th>
-						<th>Grade</th>
+						<th>IP & Grade</th>
 						<th>Rangking</th>
 						<th>File Rangking</th>
 					</tr>
@@ -91,7 +91,7 @@
 								 			<?php $Grade = $grade[$k]['Grade'] ?>
 								 		<?php endif ?>
 								 	<?php endfor; ?>
-								 	<td><?php echo $Grade ?></td>
+								 	<td><?php echo number_format($NilaiAkhir,2,'.',',').' & '.$Grade ?></td>
 								 	<?php $getData = $this->m_admission->getRangking($datadb[$i]['ID_register_formulir']) ?>
 								 	<td><?php echo $getData[0]['Rangking'] ?></td>
 								 	<?php $Attachment = $getData[0]['Attachment'] ?>

@@ -33,7 +33,7 @@
 					<?php endfor; ?>
 					<th style="width: 40px;">Jml Bobot</th>
 					<th style="width: 100px;">Jml Bobot * Nilai</th>
-					<th style="width: 40px;">Indeks</th>
+					<th style="width: 40px;">IP & Indeks</th>
 					<th style="width: 40px;">Rangking</th>
 					<th style="width: 40px;">File Rangking</th>
 				</tr>
@@ -56,8 +56,8 @@
 							<?php for ($j = 0; $j < count($mataujian); $j++): ?>
 								<td>
 									<select class="ID_ujian_perprody select2-select-00 col-md-4 full-width-fix" id-mataujian ='<?php echo $mataujian[$j]['ID'] ?>' bobot = '<?php echo $mataujian[$j]['Bobot'] ?>' id-formulir = '<?php echo $datadb[$i]['ID_register_formulir'] ?>'>
-										<?php for ($k = 0; $k <= 100; $k++): ?>
-										<?php $selected = ($k == 80) ? 'selected' : '' ?>	
+										<?php for ($k = 0; $k <= 5; $k++): ?>
+										<?php $selected = ($k == 3) ? 'selected' : '' ?>	
 									    <option value="<?php echo $k ?>" <?php echo $selected ?>><?php echo $k ?></option>
 									    <?php endfor; ?>
 									</select>

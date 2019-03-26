@@ -62,6 +62,18 @@
                         </div>
                 </div>
                 <div class="row" style="margin-top: 10px;margin-left: 0px;,margin-right: 0px">
+                    <div class="col-xs-1">
+                        <p><b>A = 4</b></p>
+                        <p><b>B = 3</b></p>
+                        <p><b>C = 2</b></p>
+                        <p><b>D = 1</b></p>
+                    </div>
+                    <div class="col-xs-1">
+                        <p><b>A = 86 - 100</b></p>
+                        <p><b>B = 71 - 85</b></p>
+                        <p><b>C = 56 - 70</b></p>
+                        <p><b>D < 55</b></p>
+                    </div>
                     <div  class="col-md-6" align="right" id="pagination_link"></div>
                 </div>
                 <div class="row" style="margin-top: 10px;margin-left: 0px;,margin-right: 0px">
