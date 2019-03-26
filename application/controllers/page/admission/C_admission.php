@@ -467,6 +467,7 @@ class C_admission extends Admission_Controler {
       $input = $this->getInputToken();
       $this->m_admission->submit_cancel_nilai_rapor($input['chkValue']);
       $this->m_admission->submit_cancel_nilai_rapor_rangking($input['chkValue']);
+      $this->m_admission->submit_cancel_nilai_rapor_finance($input['chkValue']);
       echo json_encode( array('msg' => 'Data berhasil disimpan') );
     }
 

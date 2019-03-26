@@ -1683,6 +1683,14 @@ class M_admission extends CI_Model {
       }
      }
 
+     public function submit_cancel_nilai_rapor_finance($input)
+     {
+      for ($i=0; $i < count($input); $i++) {
+        $sql = "delete from db_admission.register_nilai_fin where ID_register_formulir = ".$input[$i];
+        $query=$this->db->query($sql, array()); 
+      }
+     }
+
      public function getDataDokumentRegister($ID_register_formulir)
      {
          $sql = "select a.ID,a.ID_register_formulir,a.ID_reg_doc_checklist,a.Status,a.Attachment,b.DocumentChecklist,
