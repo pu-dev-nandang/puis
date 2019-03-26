@@ -952,6 +952,7 @@ $route['api2/__getMonitoringAttendance'] = 'api/c_api2/getMonitoringAttendance';
 $route['api2/__getSemesterOptionStudent/(:num)'] = 'api/c_api2/getSemesterOptionStudent/$1';
 
 $route['api2/__crudAnnouncement'] = 'api/c_api2/crudAnnouncement';
+$route['api2/__changePasswordStudent'] = 'api/c_api2/changePasswordStudent';
 
 $route['api3/login'] = 'api/c_mobile/login';
 $route['api3/__readGlobalInfo'] = 'api/c_mobile/readGlobalInfo';
