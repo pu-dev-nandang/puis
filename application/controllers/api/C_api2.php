@@ -1938,4 +1938,38 @@ class C_api2 extends CI_Controller {
 
     }
 
+    public function changePasswordStudent(){
+        $data_arr = $this->getInputToken();
+
+        $NPM = $data_arr['NPM'];
+
+        $Old = $this->genratePassword($NPM,$data_arr['Old']);
+
+        $check = $this->db->select('ID')->get_where('db-academic.auth_students',array(
+            'NPM' => $NPM,
+            'Password' => $Old
+        ))->result_array();
+
+        $result = 0;
+        if(count($check)>0){
+            $New = $this->genratePassword($NPM,$data_arr['New']);
+            $this->db->set('Password', $New);
+            $this->db->where('NPM', $NPM);
+            $this->db->update('db-academic.auth_students');
+            $result = 1;
+        }
+
+        return print_r(json_encode($result));
+
+    }
+
+    private function genratePassword($Username,$Password){
+
+        $plan_password = $Username.''.$Password;
+        $pas = md5($plan_password);
+        $pass = sha1('jksdhf832746aiH{}{()&(*&(*'.$pas.'HdfevgyDDw{}{}{;;*766&*&*');
+
+        return $pass;
+    }
+
 }
