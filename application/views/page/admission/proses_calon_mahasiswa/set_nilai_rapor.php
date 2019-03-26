@@ -265,7 +265,7 @@
 			       	}
 			       }
 			       Nilai_Indeks = parseFloat(Nilai_Indeks).toFixed(2);
-			       $("#indeks"+arr_pass[key].id_formulir).val(Nilai_Indeks+' & '+gradeIndeks);
+			       $("#indeks"+arr_pass[key].id_formulir).val(Nilai_Indeks+'('+gradeIndeks+')');
 
 			       var dataPush = {
 			       		value : arr_pass[key].value,
