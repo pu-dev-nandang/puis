@@ -56,7 +56,7 @@
 							<?php for ($j = 0; $j < count($mataujian); $j++): ?>
 								<td>
 									<select class="ID_ujian_perprody select2-select-00 col-md-4 full-width-fix" id-mataujian ='<?php echo $mataujian[$j]['ID'] ?>' bobot = '<?php echo $mataujian[$j]['Bobot'] ?>' id-formulir = '<?php echo $datadb[$i]['ID_register_formulir'] ?>'>
-										<?php for ($k = 0; $k <= 5; $k++): ?>
+										<?php for ($k = 0; $k <= 4; $k++): ?>
 										<?php $selected = ($k == 3) ? 'selected' : '' ?>	
 									    <option value="<?php echo $k ?>" <?php echo $selected ?>><?php echo $k ?></option>
 									    <?php endfor; ?>
