@@ -22,9 +22,20 @@
 					<!-- <div  class="col-md-4" align="right" id="pagination_link"></div>	 -->
 					<!-- <div class = "table-responsive" id= "register_document_table"></div> -->
 				</div>
-				<br>	
-				<div class = 'row'>
-					<div  class="col-md-12" align="right" id="pagination_link"></div>
+				<div class = 'row' style="margin-top: 10px">
+					<div class="col-xs-1">
+						<p><b>A = 4</b></p>
+						<p><b>B = 3</b></p>
+						<p><b>C = 2</b></p>
+						<p><b>D = 1</b></p>
+					</div>
+					<div class="col-xs-1">
+						<p><b>A = 86 - 100</b></p>
+						<p><b>B = 71 - 85</b></p>
+						<p><b>C = 56 - 70</b></p>
+						<p><b>D < 55</b></p>
+					</div>
+					<div  class="col-md-10" align="right" id="pagination_link"></div>
 				</div>
 				<div class = 'row'>
 					<div id='loadTableData' class="col-md-12"></div>
@@ -253,8 +264,8 @@
 			       		gradeIndeks = grade[b].Grade;
 			       	}
 			       }
-
-			       $("#indeks"+arr_pass[key].id_formulir).val(gradeIndeks);
+			       Nilai_Indeks = parseFloat(Nilai_Indeks).toFixed(2);
+			       $("#indeks"+arr_pass[key].id_formulir).val(Nilai_Indeks+' & '+gradeIndeks);
 
 			       var dataPush = {
 			       		value : arr_pass[key].value,
