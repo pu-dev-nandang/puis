@@ -550,7 +550,7 @@ class C_api extends CI_Controller {
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                         LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID)
                         LEFT JOIN (SELECT fs.NIP, COUNT(fs.LinkFiles) AS Totalfiles FROM db_employees.files fs INNER JOIN db_employees.master_files mf ON (fs.TypeFiles = mf.ID)
-            WHERE fs.LinkFiles IS NOT NULL GROUP BY fs.NIP) xx ON (em.NIP = xx.NIP) 
+            WHERE fs.Active = 1 AND fs.LinkFiles IS NOT NULL GROUP BY fs.NIP) xx ON (em.NIP = xx.NIP) 
                         WHERE em.StatusEmployeeID != -2 '.$whereStatus.' AND ( ';
             $sql.= ' em.NIP LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR em.Name LIKE "%'.$requestData['search']['value'].'%" ';
@@ -566,7 +566,7 @@ class C_api extends CI_Controller {
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                         LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID) 
                         LEFT JOIN (SELECT fs.NIP, COUNT(fs.LinkFiles) AS Totalfiles FROM db_employees.files fs INNER JOIN db_employees.master_files mf ON (fs.TypeFiles = mf.ID)
-            WHERE fs.LinkFiles IS NOT NULL GROUP BY fs.NIP) xx ON (em.NIP = xx.NIP) 
+            WHERE fs.Active = 1 AND fs.LinkFiles IS NOT NULL GROUP BY fs.NIP) xx ON (em.NIP = xx.NIP) 
                         WHERE em.StatusEmployeeID != -2 '.$whereStatus;
             //$sql.= 'ORDER BY NIP,em.PositionMain ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
             $sql.= 'ORDER BY xx.Totalfiles DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
@@ -608,7 +608,7 @@ class C_api extends CI_Controller {
                 //$stDefault =' <span class="label label-danger"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
                 $stDefault =' <span class="badge progress-bar-danger btn-round">'.$Get_MasterFiles[$j]['TypeFiles'].'</span> ';
                 
-                $sql2 = 'select count(*) as total, LinkFiles from db_employees.files where NIP = ? and TypeFiles = ? and LinkFiles IS NOT NULL  ';
+                $sql2 = 'select count(*) as total, LinkFiles from db_employees.files where NIP = ? and TypeFiles = ? and Active = 1 and LinkFiles IS NOT NULL  ';
                 $query2=$this->db->query($sql2, array($NIP,$Get_MasterFiles[$j]['ID']))->result_array();
                 if ($query2[0]['total'] > 0 ) {
                     $getotfiles = $getotfiles + ($query2[0]['total']);

@@ -289,7 +289,7 @@ function loadAcademicS1Details() {
                         '                <hr/> '+
                         '    <div><input type="hidden" class="form-control" value="'+fileijazahs1+'" id="linkijazahs1"> </div>              '+
                         '    <div><input type="hidden" class="form-control" value="'+filetranscripts1+'" id="linktranscripts1">    </div>       '+
-                        '               <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"> Cancel</button> | <button type="button" class="btn btn-success btn-round" id="btnSavedits1" linkijazahs1="'+fileijazahs1+'" linktranscripts1="'+filetranscripts1+'"> Save</button> '+
+                        '               <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"><i class="fa fa-remove"></i> Cancel</button> | <button type="button" class="btn btn-success btn-round" id="btnSavedits1" linkijazahs1="'+fileijazahs1+'" linktranscripts1="'+filetranscripts1+'"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button> '+
                         '           </div> '+
                         '       </div>'+
                         '   </div>'+
@@ -407,7 +407,7 @@ function loadAcademicS1Details() {
                         '                <hr/>                                                           '+
                         '    <div><input type="hidden" class="form-control" value="'+response[i]['LinkFiles']+'" id="linkijazahs1"> </div>                   '+
                         '    <div><input type="hidden" class="form-control" value="'+Transcriptx+'" id="linktranscripts1">    </div>       '+
-                        '    <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"> Cancel</button> | <button type="button" class="btn btn-success btn-round btnSavedits1" linkijazahs1="'+response[i]['LinkFiles']+'" linktranscripts1="'+Transcriptx+'"> Save</button>                                                               '+
+                        '    <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"><i class="fa fa-remove"></i> Cancel</button> | <button type="button" class="btn btn-success btn-round btnSavedits1" linkijazahs1="'+response[i]['LinkFiles']+'" linktranscripts1="'+Transcriptx+'"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>                                                               '+
                         '           </div>                                                              '+
                         '       </div>                                                                  '+
                         '   </div>                                                                      '+
