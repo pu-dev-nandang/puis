@@ -5636,8 +5636,11 @@ class C_api extends CI_Controller {
         if(count($data_arr)>0){
 
             if($data_arr['action']=='readScheduleInvigilator'){
+
+                $dateTimeNow = $this->m_rest->getDateTimeNow();
+
                 $data = $this->m_api->getInvigilatorSch($data_arr['SemesterID'],
-                    $data_arr['TypeExam'],$data_arr['NIP']);
+                    $data_arr['TypeExam'],$data_arr['NIP'],$dateTimeNow);
                 return print_r(json_encode($data));
             }
 

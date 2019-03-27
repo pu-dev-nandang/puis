@@ -1945,7 +1945,7 @@ class C_api2 extends CI_Controller {
 
         $Old = $this->genratePassword($NPM,$data_arr['Old']);
 
-        $check = $this->db->select('ID')->get_where('db-academic.auth_students',array(
+        $check = $this->db->select('ID')->get_where('db_academic.auth_students',array(
             'NPM' => $NPM,
             'Password' => $Old
         ))->result_array();
@@ -1955,7 +1955,7 @@ class C_api2 extends CI_Controller {
             $New = $this->genratePassword($NPM,$data_arr['New']);
             $this->db->set('Password', $New);
             $this->db->where('NPM', $NPM);
-            $this->db->update('db-academic.auth_students');
+            $this->db->update('db_academic.auth_students');
             $result = 1;
         }
 
@@ -1970,6 +1970,10 @@ class C_api2 extends CI_Controller {
         $pass = sha1('jksdhf832746aiH{}{()&(*&(*'.$pas.'HdfevgyDDw{}{}{;;*766&*&*');
 
         return $pass;
+    }
+
+    public function pass(){
+
     }
 
 }

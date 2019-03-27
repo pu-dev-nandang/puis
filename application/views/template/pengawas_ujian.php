@@ -156,27 +156,6 @@
             </div>
         </div>
 
-<!--        <div class="col-md-4">-->
-<!--            <div class="thumbnail tb-sch-list  animated flipInX" style="min-height: 100px;">-->
-<!---->
-<!--                <h3>Today</h3>-->
-<!---->
-<!--                <div style="margin-top: 20px;">-->
-<!---->
-<!--                    <table class="table table-bordered" id="table-sch-inv-today">-->
-<!--                        <thead>-->
-<!--                        <tr>-->
-<!--                            <th style="width: 5%;">No</th>-->
-<!--                            <th>Time</th>-->
-<!--                            <th style="width: 20%;">Room</th>-->
-<!--                            <th style="width: 5%;">Action</th>-->
-<!--                        </tr>-->
-<!--                        </thead>-->
-<!--                        <tbody id="dataInvScheduleToday"></tbody>-->
-<!--                    </table>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
 
     </div>
 </div>
@@ -271,14 +250,21 @@
                         var time = d.ExamStart.substr(0,5)+' - '+d.ExamEnd.substr(0,5);
 
                         no+=1;
+
+                        var btnAttd = (d.ButtonAttendance==1 || d.ButtonAttendance=='1')
+                            ? '<button data-id="'+d.ID+'" class="btn btn-primary btnLoadAttendance">Attendance</button>' : '-';
+
+                        var btnLayout = (d.ButtonAttendance==1 || d.ButtonAttendance=='1')
+                            ? '<a href="'+base_url_js+'save2pdf/exam-layout/'+d.ID+'" target="_blank" class="btn btn-default btn-sm btn-default-success"><i class="fa fa-arrows-alt margin-right"></i> Layout</a>' : '-';
+
                         $('#dataInvSchedule').append('<tr>' +
                             '<td>'+no+'</td>' +
                             '<td>'+d.ClassGroup+'</td>' +
                             '<td style="text-align: left;">'+d.MKCode+' - '+d.CourseEng+'</td>' +
                             '<td style="text-align: right">'+ddt+'<br/><b>'+time+'</b></td>' +
                             '<td>'+d.Room+'</td>' +
-                            '<td><button data-id="'+d.ID+'" class="btn btn-primary btnLoadAttendance">Attendance</button></td>' +
-                            '<td><a href="'+base_url_js+'save2pdf/exam-layout/'+d.ID+'" target="_blank" class="btn btn-default btn-sm btn-default-success"><i class="fa fa-arrows-alt margin-right"></i> Layout</a></td>' +
+                            '<td>'+btnAttd+'</td>' +
+                            '<td>'+btnLayout+'</td>' +
                             '</tr>');
 
                         // if(today==d.ExamDate){
