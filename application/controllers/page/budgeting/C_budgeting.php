@@ -40,6 +40,7 @@ class C_budgeting extends Budgeting_Controler {
 
     public function configfinance_budgeting($Request = null)
     {
+        $this->authFin();
         $arr_menuConfig = array('CodePrefix',
                                 'TimePeriod',
                                 'MasterPost',
@@ -1585,6 +1586,12 @@ class C_budgeting extends Budgeting_Controler {
         $rs['dt_Year'] = $dt_Year;
         echo json_encode($rs);
     }
+
+    /*
+        End Budgeting
+        27 March 2019
+        Alhadi Rahman
+    */
 
     public function BudgetLeft()
     {
