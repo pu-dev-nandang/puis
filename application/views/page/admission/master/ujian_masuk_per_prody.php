@@ -41,12 +41,12 @@
   }); // exit document Function
 
   $(document).on('click','.btn-add', function () {
-     modal_generate('add','Add Ujian Masuk Per Prody');
+     modal_generate('add','Add <?php echo $NameMenu ?> Prodi');
   });
 
   $(document).on('click','.btn-edit', function () {
     var ID = $(this).attr('data-smt');
-     modal_generate('edit','Edit Ujian Masuk Per Prody',ID);
+     modal_generate('edit','Edit <?php echo $NameMenu ?> Prodi',ID);
   });
 
   $(document).on('click','.btn-delete', function () {

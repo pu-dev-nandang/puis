@@ -43,7 +43,7 @@
             <div class="widget-content">
                 <div class = "row">
                         <div class="col-md-2" style="">
-                            Prody
+                            Prodi
                             <select class="select2-select-00 col-md-4 full-width-fix" id="selectProgramStudy">
                                 <option></option>
                             </select>
@@ -61,7 +61,7 @@
                             <input class="form-control" id="Sekolah" placeholder="All...">
                         </div>
                 </div>
-                <div class="row" style="margin-top: 10px;margin-left: 0px;,margin-right: 0px">
+                <div class="row" style="margin-top: 10px;margin-left: 5px;,margin-right: 5px">
                     <div class="col-xs-1">
                         <p><b>A = 4</b></p>
                         <p><b>B = 3</b></p>
@@ -74,9 +74,23 @@
                         <p><b>C = 56 - 70</b></p>
                         <p><b>D < 55</b></p>
                     </div>
-                    <div  class="col-md-6" align="right" id="pagination_link"></div>
                 </div>
-                <div class="row" style="margin-top: 10px;margin-left: 0px;,margin-right: 0px">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div align="center">
+                            <b>Status : </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Sudah Set Tagihan
+                        </div>
+                        <br>
+                        <div class="alert alert-info" role="alert">
+                            <p>Jika Sudah di set tagihan maka tidak bisa cancel nilai rapor</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6" align="right" id="pagination_link">
+                        
+                    </div>
+                </div>
+    
+                <div class="row" style="margin-top: 5px;margin-left: 0px;,margin-right: 0px">
                     <div id="pageData">
                         
                     </div>

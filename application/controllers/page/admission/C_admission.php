@@ -443,7 +443,7 @@ class C_admission extends Admission_Controler {
        $selectProgramStudy = $input['selectProgramStudy'];
        $Sekolah = $input['Sekolah'];
        $this->load->library('pagination');
-       $config = $this->config_pagination_default_ajax($this->m_admission->count_loadData_calon_mahasiswa_created($Nama,$selectProgramStudy,$Sekolah,$FormulirCode),25,4);
+       $config = $this->config_pagination_default_ajax($this->m_admission->count_loadData_calon_mahasiswa_created($Nama,$selectProgramStudy,$Sekolah,$FormulirCode),3,4);
        $this->pagination->initialize($config);
        $page = $this->uri->segment(4);
        $start = ($page - 1) * $config["per_page"];

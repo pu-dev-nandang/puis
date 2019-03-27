@@ -104,7 +104,10 @@
       $("#FormulirCode").keyup(function(){
         if( this.value.length < 5 && this.value.length != 0 ) return;
            /* code to run below */
-         loadPage(pageHtml+'/1'); 
+         // loadPage(pageHtml+'/1'); 
+         var ee = $('#panel_web').find('li[class="active"]');
+         var page = ee.find('a').attr('data-page');
+         loadPage(page)
       })
     }
 
