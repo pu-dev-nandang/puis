@@ -450,7 +450,7 @@ class C_admission extends Admission_Controler {
        $this->data['url_registration'] = url_registration;
        $this->data['datadb'] = $this->m_admission->loadData_calon_mahasiswa_created($config["per_page"], $start,$Nama,$selectProgramStudy,$Sekolah,$FormulirCode);
        $this->data['mataujian'] = $this->m_admission->select_mataUjian($selectProgramStudy);
-       $this->data['grade'] = $this->m_admission->showData('db_academic.grade');
+       $this->data['grade'] = $this->m_admission->showData('db_admission.grade');
       $this->data['no'] = $start + 1;
       $this->data['chkActive'] = 1;
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/table_nilai_calon_mahasiswa',$this->data,true);
