@@ -20,7 +20,7 @@
 <?php if (count($datadb) > 0 ): ?>
 	<div class="col-md-12">
 		<div id = "tblData" class="table-responsive">
-			<table class="table table-striped table-bordered table-hover table-checkable tableData">
+			<table class="table table-bordered table-checkable tableData">
 				<!-- <caption><strong>List Dokumen</strong></caption> -->
 				<thead>
 					<tr>
@@ -30,7 +30,7 @@
 							</th>
 						<?php endif ?>
 						<th>Name</th>
-						<th>Program Study</th>
+						<th>Program Studi</th>
 						<!-- <th>NIK KTP</th> -->
 						<th>Email</th>
 						<!-- <th>HP</th>
@@ -49,7 +49,11 @@
 				</thead>
 				<tbody> 
 					<?php for ($i = 0; $i < count($datadb); $i++): ?>
-								 <tr>
+								<?php if ($datadb[$i]['fin'] == 0): ?>	
+								 	<tr style="background-color: #8ED6EA; color: black;">
+								 <?php else: ?>
+								 	<tr>	
+								 <?php endif ?>		
 								 	<?php if (isset($chkActive)): ?>
 									 	<?php if ($datadb[$i]['fin'] == 1): ?>
 									 		<td rowspan="2"><?php echo $no++ ?> <input type="checkbox" class="uniform" value ="<?php echo $datadb[$i]['ID_register_formulir'] ?>"></td>	
@@ -106,7 +110,11 @@
 								 		<td><a href="<?php echo $url_registration ?>document/<?php echo $datadb[$i]['Email'] ?>/<?php echo $getData[0]['Attachment'] ?>" target="_blank">File</a></td>			
 								 	<?php endif ?>	
 								 </tr>
-								 <tr>
+								 <?php if ($datadb[$i]['fin'] == 0): ?>	
+								  	<tr style="background-color: #8ED6EA; color: black;">
+								  <?php else: ?>
+								  	<tr>	
+								  <?php endif ?>	
 								 	<td><label>Nilai to Finance</label></td>
 								 	<?php $dt = $datadb[$i]['Nilaifin'] ?>
 								 	<?php for ($m = 0; $m < count($dt); $m++): ?>
@@ -123,7 +131,7 @@
 	</div>
 			
 <?php else: ?>
-<div align = 'center'>No Result Data...</div>		
+<div align = 'center' style="margin-top: 20px;"><h4>No Result Data...</h4></div>		
 <?php endif ?>
 
 
