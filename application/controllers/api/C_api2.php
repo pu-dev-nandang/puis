@@ -1849,6 +1849,29 @@ class C_api2 extends CI_Controller {
                 return print_r($ID);
 
             }
+            else if($data_arr['action']=='deleteAnnouncement'){
+                $ID = $data_arr['ID'];
+
+                $lf = $data_arr['LastFile'];
+
+                // Cek apakah ada file atau tidak
+                if(isset($lf) && $lf!='' && $lf!=null) {
+                    // Delete last data dulu
+                    if(is_file('./uploads/announcement/'.$lf)){
+                        unlink('./uploads/announcement/'.$lf);
+                    }
+                }
+
+                $tables = array('db_notifikasi.announcement_employees', 'db_notifikasi.announcement_student');
+                $this->db->where('IDAnnc', $ID);
+                $this->db->delete($tables);
+
+                $this->db->reset_query();
+                $this->db->where('ID', $ID);
+                $this->db->delete('db_notifikasi.announcement');
+
+                return print_r(1);
+            }
 
         }
     }

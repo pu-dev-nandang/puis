@@ -48,6 +48,7 @@
 
 
             <div style="text-align: right;">
+                <button class="btn btn-danger" style="float: left;" id="btnDeleteAnnc">Remove</button>
                 <button class="btn btn-primary" id="btnSubmitAnnouncement">Update</button>
             </div>
 
@@ -162,6 +163,7 @@
             formMessage!=null && formMessage!='' && formEnd!=null && formEnd!=''){
 
             loading_button('#btnSubmitAnnouncement');
+            $('#btnDeleteAnnc').prop('disabled',true);
             var End = moment(formEnd).format('YYYY-MM-DD');
 
             var data = {
@@ -229,6 +231,33 @@
 
         }
 
+    });
+
+    $('#btnDeleteAnnc').click(function () {
+
+        if(confirm('Are you sure to remove?')){
+
+            loading_button('#btnDeleteAnnc');
+            $('#btnSubmitAnnouncement,.upload_files').prop('disabled',true);
+            var formLastFile = $('#formLastFile').val();
+            var data = {
+                action : 'deleteAnnouncement',
+                ID : "<?= $ID ?>",
+                LastFile : formLastFile
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api2/__crudAnnouncement';
+
+            $.post(url,{token:token},function (result) {
+                toastr.success('Announcement Removed','Success');
+                setTimeout(function () {
+                    window.location.replace(base_url_js+'announcement/list-announcement');
+                },500);
+            });
+        }
+
+
+        
     });
 
 

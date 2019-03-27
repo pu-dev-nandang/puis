@@ -177,8 +177,8 @@
         var sessionLoginAt = "<?php echo $this->session->userdata('LoginAt'); ?>";
         var endSesi = sessionLoginAt.split(' ')[1];
 
-        // countdw('#viewCD',endSesi);
-        // timeOutCw(endSesi);
+        countdw('#viewCD',endSesi);
+        timeOutCw(endSesi);
     });
 
     $('.form-filter-inv').change(function () {
