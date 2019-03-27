@@ -627,12 +627,13 @@
         });
     }
 
-    function testMobile() {
-        socket.emit('mobile_notif', {
-            mobile_notif: '1',
-            dataUser : [2019,2018,2019,21170001]
-        });
-    }
+     function testMobile() {
+         socket.emit('mobile_notif', {
+             Title: 'Judul Notif',
+             Message: 'Ini bagian isi',
+             dataUser : ['11140001']
+         });
+     }
 
 
     function ReadNotifDivision(){

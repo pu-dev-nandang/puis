@@ -3795,7 +3795,7 @@ class M_api extends CI_Model {
         return $res;
     }
 
-    public function getInvigilatorSch($SemesterID,$Type,$NIP){
+    public function getInvigilatorSch($SemesterID,$Type,$NIP,$dateTimeNow){
         $data = $this->db->query('SELECT ex.*, cl.Room, mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup
                                           FROM db_academic.exam ex
                                           LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
@@ -3810,6 +3810,26 @@ class M_api extends CI_Model {
                                            GROUP BY ex.ID
                                            ORDER BY ex.ExamDate, ex.ExamStart ASC')
                     ->result_array();
+
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+                $d = $data[$i];
+
+                $start = $d['ExamDate'].' '.$d['ExamStart'];
+                $end = $d['ExamDate'].' '.$d['ExamEnd'];
+
+                $n = strtotime($dateTimeNow);
+
+                if(strtotime($start) <= $n && strtotime($end) >= $n ){
+                    $data[$i]['ButtonAttendance'] = '1';
+                } else {
+                    $data[$i]['ButtonAttendance'] = '0';
+                }
+
+            }
+        }
+
+
 
         return $data;
     }
