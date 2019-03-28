@@ -198,7 +198,7 @@
 				for (var j = i+1; j < arr_fin.length; j++) {
 					var ID_register_formulir2 = arr_fin[j].ID_register_formulir;
 					if (ID_register_formulir == ID_register_formulir2) {
-						tot = parseInt(tot) + parseInt(arr_fin[i].Value);
+						tot = parseInt(tot) + parseInt(arr_fin[j].Value);
 						bg++;
 					} else {
 						i = j - 1;
@@ -210,6 +210,7 @@
 
 			var avg =0;
 			avg = tot / bg;
+			// console.log(tot);
 			avg = parseFloat(avg).toFixed(2);
 			var s = $('tr[register_formulir="'+ID_register_formulir+'"]').find('td:eq(9)');
 			s.html('<div class = "form-group"><label>Average</label><br>'+avg+'</div>');
