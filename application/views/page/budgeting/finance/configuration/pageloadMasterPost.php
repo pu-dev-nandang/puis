@@ -471,12 +471,14 @@ function loadTable1()
 	    $("#loadTable1").html(TableGenerate);
 	    LoaddataTable("#tableData1");
 
-        $(".btn-edit-post").click(function(){
+        // $(".btn-edit-post").click(function(){
+        $(document).off('click', '.btn-edit-post').on('click', '.btn-edit-post',function(e) {   
     	    var ID = $(this).attr('code');
     	     modal_generate('edit','Edit',ID);
         });
 
-        $(".btn-delete-post").click(function(){	
+        // $(".btn-delete-post").click(function(){ 
+        $(document).off('click', '.btn-delete-post').on('click', '.btn-delete-post',function(e) {  	
             var ID = $(this).attr('code');
              $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Are you sure ? </b> ' +
                  '<button type="button" id="confirmYesDelete" class="btn btn-primary" style="margin-right: 5px;" data-smt = "'+ID+'">Yes</button>' +
@@ -568,12 +570,14 @@ function loadTable2()
         $("#loadTable2").html(TableGenerate);
         LoaddataTable("#tableData2");
 
-        $(".btn-edit-postrealization").click(function(){
+        // $(".btn-edit-postrealization").click(function(){
+        $(document).off('click', '.btn-edit-postrealization').on('click', '.btn-edit-postrealization',function(e) {   
             var ID = $(this).attr('code');
              modal_generate2('edit','Edit',ID);
         });
 
-        $(".btn-delete-postrealization").click(function(){  
+        // $(".btn-delete-postrealization").click(function(){
+        $(document).off('click', '.btn-delete-postrealization').on('click', '.btn-delete-postrealization',function(e) {    
             var ID = $(this).attr('code');
              $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Are you sure ? </b> ' +
                  '<button type="button" id="confirmYesDelete" class="btn btn-primary" style="margin-right: 5px;" data-smt = "'+ID+'">Yes</button>' +
@@ -659,12 +663,14 @@ function loadTable3()
         $("#loadTable3").html(TableGenerate);
         LoaddataTable("#tableData3");
 
-        $(".btn-edit-ha").click(function(){
+        // $(".btn-edit-ha").click(function(){
+        $(document).off('click', '.btn-edit-ha').on('click', '.btn-edit-ha',function(e) {    
             var ID = $(this).attr('code');
              modal_generate3('edit','Edit',ID);
         });
 
-        $(".btn-delete-ha").click(function(){  
+        // $(".btn-delete-ha").click(function(){
+        $(document).off('click', '.btn-delete-ha').on('click', '.btn-delete-ha',function(e) {  
             var ID = $(this).attr('code');
              $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Are you sure ? </b> ' +
                  '<button type="button" id="confirmYesDelete" class="btn btn-primary" style="margin-right: 5px;" data-smt = "'+ID+'">Yes</button>' +
