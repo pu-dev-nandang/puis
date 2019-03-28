@@ -2259,6 +2259,16 @@ class C_rest extends CI_Controller {
                     if (array_key_exists('Status', $datasave)) {
                         if ($datasave['Status'] == 2) {
                             $Desc = "All Approve and posting date at : ".$datasave['PostingDate'];
+                            // lock can't be delete
+                            $Departement = $G_data[0]['Departement'];
+                            $Year = $G_data[0]['Year'];
+                            $sql = 'select a.CodePostBudget from db_budgeting.cfg_set_post as a join db_budgeting.cfg_head_account as b on a.CodeHeadAccount = b.CodeHeadAccount where b.Departement = ? and a.Year = ?
+                                ';
+                            $query=$this->db->query($sql, array($Departement,$Year))->result_array();
+                            for ($i=0; $i < count($query); $i++) { 
+                                    $this->m_budgeting->makeCanBeDelete('db_budgeting.cfg_set_post','CodePostBudget',$query[$i]['CodePostBudget']);
+                                }    
+                            
                         }
                     }
 

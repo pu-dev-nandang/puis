@@ -41,4 +41,16 @@ class C_pr_po extends Budgeting_Controler {
           }
     }
 
+    public function set_rad()
+    {
+        $this->auth_ajax();
+        // get data
+          $this->data['G_cfg_post'] = $this->m_master->caribasedprimary('db_budgeting.cfg_post','Active',1);
+          $this->data['G_cfg_m_userrole'] = $this->m_master->showData_array('db_budgeting.cfg_m_userrole');
+        $arr_result = array('html' => '','jsonPass' => '');
+        $content = $this->load->view('page/budgeting/'.$this->data['department'].'/config_pr/set_rad',$this->data,true);
+        $arr_result['html'] = $content;
+        echo json_encode($arr_result);
+    }
+
 }

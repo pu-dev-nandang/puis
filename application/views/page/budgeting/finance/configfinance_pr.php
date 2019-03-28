@@ -9,7 +9,7 @@
         </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
-        <div class="row" id = "pageContent">
+        <div id = "pageContent">
            
         </div>
     </div>
