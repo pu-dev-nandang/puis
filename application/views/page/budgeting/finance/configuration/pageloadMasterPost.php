@@ -113,6 +113,7 @@ function modal_generate2(action,title,ID='') {
                 var CodePostRealisasi = $("#CodePostRealisasi").val();
                 var HeadAccount = $("#HeadAccount").val();
                 var RealisasiPostName = $("#RealisasiPostName").val();
+                var Departement = $("#Departement").val();
 
                 var action = $(this).attr('action');
                 var id = $("#ModalbtnSaveForm2").attr('kodeuniq');
@@ -121,6 +122,7 @@ function modal_generate2(action,title,ID='') {
                             CodePostRealisasi : CodePostRealisasi,
                             HeadAccount : HeadAccount,
                             RealisasiPostName : RealisasiPostName,
+                            UnitDiv : Departement,
                             Action : action,
                             CDID : id
                             };
@@ -129,7 +131,7 @@ function modal_generate2(action,title,ID='') {
                     $.post(url,{token:token},function (data_json) {
                         var response = jQuery.parseJSON(data_json);
                         if (response == '') {
-                            toastr.success('Data berhasil disimpan', 'Success!');
+                            toastr.success('Saved', 'Success!');
                         }
                         else
                         {
@@ -199,7 +201,7 @@ function modal_generate(action,title,ID='') {
                     $.post(url,{token:token},function (data_json) {
                         var response = jQuery.parseJSON(data_json);
                         if (response == '') {
-                            toastr.success('Data berhasil disimpan', 'Success!');
+                            toastr.success('Saved', 'Success!');
                         }
                         else
                         {
@@ -270,11 +272,11 @@ function modal_generate3(action,title,ID='') {
                             CDID : id
                             };
                 var token = jwt_encode(data,"UAP)(*");
-                if (validationInput = validation2(data)) {
+                if (validationInput = validation3(data)) {
                     $.post(url,{token:token},function (data_json) {
                         var response = jQuery.parseJSON(data_json);
                         if (response == '') {
-                            toastr.success('Data berhasil disimpan', 'Success!');
+                            toastr.success('Saved', 'Success!');
                         }
                         else
                         {
@@ -316,13 +318,61 @@ function validation2(arr)
       case  "CDID" :
             break;
       case  "NeedPrefix" :
+            result = Validation_required(arr[key],key);
+              if (result['status'] == 0) {
+                toatString += 'The Code is Required' + "<br>";
+            }
+            break;
       case  "RealisasiPostName" :
+            result = Validation_required(arr[key],key);
+              if (result['status'] == 0) {
+                toatString += 'The SubAccountName is Required' + "<br>";
+            }
+            break;
+      case  "CodePostRealisasi" :
+            // console.log(arr['NeedPrefix']);
+            if(arr['NeedPrefix'] == 0)
+            {
+                result = Validation_required(arr[key],key);
+                  if (result['status'] == 0) {
+                    toatString += result['messages'] + "<br>";
+                }
+            }
+            break;      
+     }
+
+  }
+  if (toatString != "") {
+    toastr.error(toatString, 'Failed!!');
+    return false;
+  }
+
+  return true;
+}
+
+function validation3(arr)
+{
+  var toatString = "";
+  var result = "";
+  for(var key in arr) {
+     switch(key)
+     {
+      case  "Action" :
+      case  "CDID" :
+            break;
+      case  "NeedPrefix" :
+            result = Validation_required(arr[key],key);
+              if (result['status'] == 0) {
+                toatString += 'The Code is Required' + "<br>";
+            }
+            break;
+      case  "HeadAccountName" :
             result = Validation_required(arr[key],key);
               if (result['status'] == 0) {
                 toatString += result['messages'] + "<br>";
             }
             break;
-      case  "CodePostRealisasi" :
+      case  "CodeHeadAccount" :
             // console.log(arr['NeedPrefix']);
             if(arr['NeedPrefix'] == 0)
             {
@@ -354,6 +404,11 @@ function validation(arr)
       case  "CDID" :
             break;
       case  "NeedPrefix" :
+            result = Validation_required(arr[key],key);
+              if (result['status'] == 0) {
+                toatString += 'The Code is Required' + "<br>";
+            }
+            break;
       case  "PostName" :
             result = Validation_required(arr[key],key);
               if (result['status'] == 0) {
@@ -452,10 +507,10 @@ function loadTable1()
                  $.post(url,{token:token},function (data_json) {
                      setTimeout(function () {
                         // toastr.options.fadeOut = 10000;
-                        // toastr.success('Data berhasil disimpan', 'Success!');
+                        // toastr.success('Saved', 'Success!');
                         var response = jQuery.parseJSON(data_json);
                         if (response == '') {
-                            toastr.success('Data berhasil disimpan', 'Success!');
+                            toastr.success('Deleted', 'Success!');
                         }
                         else
                         {
@@ -483,6 +538,7 @@ function loadTable2()
                             '<th>Budget Category</th>'+
                             '<th>HeadAccount</th>'+
                             '<th>Department</th>'+
+                            '<th>For Who</th>'+
                             '<th>Action</th>'+
                         '</tr></thead>' 
                         ;
@@ -503,6 +559,7 @@ function loadTable2()
                                 '<td>'+ dataForTable[i].CodePost+'<br>'+dataForTable[i].PostName+'</td>'+ // plus name
                                 '<td>'+ dataForTable[i].CodeHeadAccount+'<br>'+dataForTable[i].NameHeadAccount+'</td>'+
                                 '<td>'+ dataForTable[i].DepartementName+'</td>'+
+                                '<td>'+ dataForTable[i].UnitDivName+'</td>'+
                                 '<td>'+ btn_edit + ' '+' &nbsp' + btn_del+'</td>'+
                              '</tr>'    
         }
@@ -548,7 +605,7 @@ function loadTable2()
                      setTimeout(function () {
                         var response = jQuery.parseJSON(data_json);
                         if (response == '') {
-                            toastr.success('Data berhasil disimpan', 'Success!');
+                            toastr.success('Deleted', 'Success!');
                         }
                         else
                         {
@@ -639,13 +696,13 @@ function loadTable3()
                      setTimeout(function () {
                         var response = jQuery.parseJSON(data_json);
                         if (response == '') {
-                            toastr.success('Data berhasil disimpan', 'Success!');
+                            toastr.success('Deleted', 'Success!');
                         }
                         else
                         {
                             toastr.error(response, 'Failed!!');
                         }
-                        loadTable2();
+                        loadTable3();
                         $('#NotificationModal').modal('hide');
                      },500);
                  });

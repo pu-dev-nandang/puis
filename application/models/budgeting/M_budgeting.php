@@ -62,7 +62,7 @@ class M_budgeting extends CI_Model {
     public function getData_cfg_postrealisasi($Active = null)
     {
         $Active = ($Active == null) ? '' : ' where a.Active = "'.$Active.'"';
-        $sql = 'select a.CodePostRealisasi,a.CodeHeadAccount,b.Name as NameHeadAccount,a.RealisasiPostName,b.Departement,c.CodePost,c.PostName from db_budgeting.cfg_postrealisasi as a join db_budgeting.cfg_head_account as b on a.CodeHeadAccount = b.CodeHeadAccount
+        $sql = 'select a.CodePostRealisasi,a.CodeHeadAccount,b.Name as NameHeadAccount,a.RealisasiPostName,a.UnitDiv,b.Departement,c.CodePost,c.PostName from db_budgeting.cfg_postrealisasi as a join db_budgeting.cfg_head_account as b on a.CodeHeadAccount = b.CodeHeadAccount
             join db_budgeting.cfg_post as c on c.CodePost = b.CodePost
                 '.$Active.' order by a.CodePostRealisasi desc';
         $query=$this->db->query($sql, array())->result_array();
@@ -75,14 +75,34 @@ class M_budgeting extends CI_Model {
             }
             elseif ($exp[0] == 'AC') {
                 $tget = $this->m_master->caribasedprimary('db_academic.program_study','ID',$exp[1]);
-                $Departement = $tget[0]['NameEng'];
+                $Departement = 'Study '.$tget[0]['NameEng'];
             }
             elseif ($exp[0] == 'FT') {
                 $tget = $this->m_master->caribasedprimary('db_academic.faculty','ID',$exp[1]);
-                $Departement = $tget[0]['NameEng'];
+                $Departement = 'Faculty '.$tget[0]['NameEng'];
             }
 
             $query[$i]['DepartementName'] = $Departement;
+
+            // for Unit Div
+            $UnitDiv = $query[$i]['UnitDiv'];
+            $exp = explode('.', $UnitDiv);
+            $Departement = '';
+            if ($exp[0] == 'NA') { // Non Academic
+                $tget = $this->m_master->caribasedprimary('db_employees.division','ID',$exp[1]);
+                $Departement = $tget[0]['Description'].' ('.$tget[0]['Division'].')';
+            }
+            elseif ($exp[0] == 'AC') {
+                $tget = $this->m_master->caribasedprimary('db_academic.program_study','ID',$exp[1]);
+                $Departement = 'Study '.$tget[0]['NameEng'];
+            }
+            elseif ($exp[0] == 'FT') {
+                $tget = $this->m_master->caribasedprimary('db_academic.faculty','ID',$exp[1]);
+                $Departement = 'Faculty '.$tget[0]['NameEng'];
+            }
+
+            $query[$i]['UnitDivName'] = $Departement;
+
         }
         return $query;
     }
@@ -103,11 +123,11 @@ class M_budgeting extends CI_Model {
             }
             elseif ($exp[0] == 'AC') {
                 $tget = $this->m_master->caribasedprimary('db_academic.program_study','ID',$exp[1]);
-                $Departement = $tget[0]['NameEng'];
+                $Departement = 'Study '.$tget[0]['NameEng'];
             }
             elseif ($exp[0] == 'FT') {
                 $tget = $this->m_master->caribasedprimary('db_academic.faculty','ID',$exp[1]);
-                $Departement = $tget[0]['NameEng'];
+                $Departement = 'Faculty '.$tget[0]['NameEng'];
             }
 
             $query[$i]['DepartementName'] = $Departement;

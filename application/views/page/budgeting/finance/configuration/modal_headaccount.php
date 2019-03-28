@@ -30,7 +30,7 @@
             </div>
             <div class="row <?php echo $a = ($action == 'add') ? 'hide' :'' ?>" id = "rowCodeHeadAccount">
               <div class="col-md-6 col-md-offset-4">
-                <input type="text" name="CodePost" id= "CodeHeadAccount" placeholder="Code" class="form-control">
+                <input type="text" name="CodePost" id= "CodeHeadAccount" placeholder="Code" class="form-control" maxlength="10">
               </div>
             </div>
         </div>
