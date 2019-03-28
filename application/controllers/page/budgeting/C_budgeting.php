@@ -464,12 +464,14 @@ class C_budgeting extends Budgeting_Controler {
                 $query=$this->db->query($sql, array($CodePost))->result_array();
                 $Status = $query[0]['Status']; // check can be delete
                    if ($Status == 1) {
-                       $dataSave = array(
-                           'Active' => 0
-                       );
-                       $this->db->where('CodePost', $CodePost);
-                       $this->db->where('Active', 1);
-                       $this->db->update('db_budgeting.cfg_post', $dataSave);
+                       // $dataSave = array(
+                       //     'Active' => 0
+                       // );
+                       // $this->db->where('CodePost', $CodePost);
+                       // $this->db->where('Active', 1);
+                       // $this->db->update('db_budgeting.cfg_post', $dataSave);
+                        $this ->db-> where('CodePost', $CodePost);
+                        $this ->db-> delete('db_budgeting.cfg_post');
                    }
                    else
                    {
@@ -480,12 +482,14 @@ class C_budgeting extends Budgeting_Controler {
                        }
                        else
                        {
-                        $dataSave = array(
-                            'Active' => 0
-                        );
-                        $this->db->where('CodePost', $CodePost);
-                        $this->db->where('Active', 1);
-                        $this->db->update('db_budgeting.cfg_post', $dataSave);
+                        // $dataSave = array(
+                        //     'Active' => 0
+                        // );
+                        // $this->db->where('CodePost', $CodePost);
+                        // $this->db->where('Active', 1);
+                        // $this->db->update('db_budgeting.cfg_post', $dataSave);
+                        $this ->db-> where('CodePost', $CodePost);
+                        $this ->db-> delete('db_budgeting.cfg_post');
                        }
                        
                    }
@@ -614,12 +618,14 @@ class C_budgeting extends Budgeting_Controler {
                 $query=$this->db->query($sql, array($CodePostRealisasi))->result_array();
                 $Status = $query[0]['Status']; // check can be delete
                    if ($Status == 1) {
-                       $dataSave = array(
-                           'Active' => 0
-                       );
-                       $this->db->where('CodePostRealisasi', $CodePostRealisasi);
-                       $this->db->where('Active', 1);
-                       $this->db->update('db_budgeting.cfg_postrealisasi', $dataSave);
+                       // $dataSave = array(
+                       //     'Active' => 0
+                       // );
+                       // $this->db->where('CodePostRealisasi', $CodePostRealisasi);
+                       // $this->db->where('Active', 1);
+                       // $this->db->update('db_budgeting.cfg_postrealisasi', $dataSave);
+                        $this ->db-> where('CodePostRealisasi', $CodePostRealisasi);
+                        $this ->db-> delete('db_budgeting.cfg_postrealisasi');
                    }
                    else
                    {
@@ -630,12 +636,14 @@ class C_budgeting extends Budgeting_Controler {
                           }
                           else
                           {
-                            $dataSave = array(
-                                'Active' => 0
-                            );
-                            $this->db->where('CodePostRealisasi', $CodePostRealisasi);
-                            $this->db->where('Active', 1);
-                            $this->db->update('db_budgeting.cfg_postrealisasi', $dataSave);
+                            // $dataSave = array(
+                            //     'Active' => 0
+                            // );
+                            // $this->db->where('CodePostRealisasi', $CodePostRealisasi);
+                            // $this->db->where('Active', 1);
+                            // $this->db->update('db_budgeting.cfg_postrealisasi', $dataSave);
+                            $this ->db-> where('CodePostRealisasi', $CodePostRealisasi);
+                            $this ->db-> delete('db_budgeting.cfg_postrealisasi');
                           }
 
                        
@@ -808,12 +816,14 @@ class C_budgeting extends Budgeting_Controler {
                 $query=$this->db->query($sql, array($CodeHeadAccount))->result_array();
                 $Status = $query[0]['Status']; // check can be delete
                    if ($Status == 1) {
-                       $dataSave = array(
-                           'Active' => 0
-                       );
-                       $this->db->where('CodeHeadAccount', $CodeHeadAccount);
-                       $this->db->where('Active', 1);
-                       $this->db->update('db_budgeting.cfg_head_account', $dataSave);
+                       // $dataSave = array(
+                       //     'Active' => 0
+                       // );
+                       // $this->db->where('CodeHeadAccount', $CodeHeadAccount);
+                       // $this->db->where('Active', 1);
+                       // $this->db->update('db_budgeting.cfg_head_account', $dataSave);
+                        $this ->db-> where('CodeHeadAccount', $CodeHeadAccount);
+                        $this ->db-> delete('db_budgeting.cfg_head_account');
                    }
                    else
                    {
@@ -832,12 +842,15 @@ class C_budgeting extends Budgeting_Controler {
                        }
 
                        if ($b) {
-                          $dataSave = array(
-                              'Active' => 0
-                          );
-                          $this->db->where('CodeHeadAccount', $CodeHeadAccount);
-                          $this->db->where('Active', 1);
-                          $this->db->update('db_budgeting.cfg_head_account', $dataSave); 
+                          // $dataSave = array(
+                          //     'Active' => 0
+                          // );
+                          // $this->db->where('CodeHeadAccount', $CodeHeadAccount);
+                          // $this->db->where('Active', 1);
+                          // $this->db->update('db_budgeting.cfg_head_account', $dataSave);
+
+                          $this ->db-> where('CodeHeadAccount', $CodeHeadAccount);
+                          $this ->db-> delete('db_budgeting.cfg_head_account'); 
                        }
                        
                    }
@@ -993,12 +1006,14 @@ class C_budgeting extends Budgeting_Controler {
                 $query=$this->db->query($sql, array($CodePostBudget))->result_array();
                 $Status = $query[0]['Status']; // check can be delete
                    if ($Status == 1) {
-                       $dataSave = array(
-                           'Active' => 0
-                       );
-                       $this->db->where('CodePostBudget', $CodePostBudget);
-                       $this->db->where('Active', 1);
-                       $this->db->update('db_budgeting.cfg_set_post', $dataSave);
+                       // $dataSave = array(
+                       //     'Active' => 0
+                       // );
+                       // $this->db->where('CodePostBudget', $CodePostBudget);
+                       // $this->db->where('Active', 1);
+                       // $this->db->update('db_budgeting.cfg_set_post', $dataSave);
+                        $this ->db-> where('CodePostBudget', $CodePostBudget);
+                        $this ->db-> delete('db_budgeting.cfg_set_post');
 
                        $dataSave = array(
                            'CodePostBudget' => $CodePostBudget,
