@@ -664,7 +664,7 @@ function showButton()
 			var NIP = '<?php echo $this->session->userdata('NIP') ?>';
 			var bool = false;
 			for (var i = 0; i < dt.length; i++) {
-				if (NIP == dt[i].NIP && dt[i].ID_set_roleuser == 1) {
+				if (NIP == dt[i].NIP && dt[i].ID == 1) {
 					bool = true;
 					break;
 				}

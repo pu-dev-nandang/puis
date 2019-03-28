@@ -123,8 +123,6 @@
 									visible += '<option value = "'+cc[j]+'" '+s+'>'+cc[j]+'</option>';
 								}
 					visible += '</select>';
-					
-					btn_save = '<button class = "btn btn-primary btn-save-approval">Save</button>';	
 
 					btnDelete = '<button type="button" class="btn btn-danger btn-delete btn-delete-setRoleUser" code="'+response[i]['ID_set_roleuser']+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
 				}
@@ -134,12 +132,17 @@
 									'<td id = "'+response[i]['ID']+'">'+ input+'</td>'+
 									'<td>'+cmb+'</td>'+
 									'<td>'+visible+'</td>'+
-									'<td>'+ btn_save+'&nbsp'+btnDelete+'</td>'+
+									'<td>'+btnDelete+'</td>'+
 								'</tr>';
 			}
 
 			TableGenerate += '</tbody></table></div></div></div>';
-			$("#loadPageTable").html(TableGenerate);
+			var divSave = '<div class = "row">'+
+								'<div class = "col-md-12" align = "right">'+
+									'<button class="btn btn-primary btn-save-approval">Save</button>'+
+								'</div>'+
+							'</div>';		
+			$("#loadPageTable").html(TableGenerate+divSave);
 
 			ClickFunctionButton();
 			KeypressFunctionInput();
@@ -150,7 +153,7 @@
 
 	function ClickFunctionButton()
 	{
-		$(".btnInput").click(function(){
+		$(document).off('click', '.btnInput').on('click', '.btnInput',function(e) {		
 			var ID_m_userrole = $(this).attr('ID_m_userrole');
 			var row = $(this).closest('tr');
 			// adding combo Type User
@@ -166,7 +169,7 @@
 								'<option value = "No">No</option>'+
 							  '</select>';
 				
-				var btn_save = '<button class = "btn btn-primary btn-save-approval">Save</button>';			  		
+				var btnDelete = '<button type="button" class="btn btn-danger btn-delete btn-delete-setRoleUser" code=""> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';		  		
 
 			input = '<div class = "row">'+
 						'<div class = "col-xs-6">'+
@@ -179,44 +182,61 @@
 			$("#"+ID_m_userrole).html(input);
 			row.find('td:eq(3)').html(cmb);
 			row.find('td:eq(4)').html(visible);
-			row.find('td:eq(5)').html(btn_save);
+			row.find('td:eq(5)').html(btnDelete);
 			KeypressFunctionInput();
 		})
 
 		$(document).off('click', '.btn-delete-setRoleUser').on('click', '.btn-delete-setRoleUser',function(e) {	
 			var ID = $(this).attr('code');
-			var Action = "delete";
-			if (confirm("Are you sure?") == true) {
-			  	var data = {
-		  	                   ID_set_roleuser : ID,
-		  	                   Action : Action
-	  	                   };
-			  	var token = jwt_encode(data,"UAP)(*");
-			  	var url = base_url_js+'budgeting/save_cfg_set_roleuser_budgeting';
-			  	$.post(url,{token:token},function (data_json) {
-  	               var obj = JSON.parse(data_json); 
-  	               if(obj['status'] == 1)
-  	               {
-  	               	loadPageTable();
-  	               	toastr.success("Done", 'Success!');
-  	               }
-  	               else
-  	               {
-  	               	toastr.error(obj,'Failed!!');
-  	               }
+			var tr = $(this).closest('tr');
+			var id_m_userrole = tr.find('.FormInputData').attr('id_m_userrole');
+			if (ID != '' && ID != null && ID != undefined) {
+				var Action = "delete";
+				if (confirm("Are you sure?") == true) {
+				  	var data = {
+			  	                   ID_set_roleuser : ID,
+			  	                   Action : Action
+		  	                   };
+				  	var token = jwt_encode(data,"UAP)(*");
+				  	var url = base_url_js+'budgeting/save_cfg_set_roleuser_budgeting';
+				  	$.post(url,{token:token},function (data_json) {
+	  	               var obj = JSON.parse(data_json); 
+	  	               if(obj['status'] == 1)
+	  	               {
+	  	               	//loadPageTable();
+	  	               	// Back normal to row
+	  	               		tr.find('td:eq(2)').html('<button class="btn btn-default btnInput" id_m_userrole="'+id_m_userrole+'">Set Input</button>');
+	  	               		tr.find('td:eq(3)').html('');
+	  	               		tr.find('td:eq(4)').html('');
+	  	               		tr.find('td:eq(5)').html('');
+	  	               	toastr.success("Done", 'Success!');
+	  	               }
+	  	               else
+	  	               {
+	  	               	toastr.error(obj,'Failed!!');
+	  	               }
 
-  	           }).done(function() {
-  	             
-  	           }).fail(function() {
-  	             toastr.error('The Database connection error, please try again', 'Failed!!');
-  	           }).always(function() {
-  	           		
+	  	           }).done(function() {
+	  	             
+	  	           }).fail(function() {
+	  	             toastr.error('The Database connection error, please try again', 'Failed!!');
+	  	           }).always(function() {
+	  	           		
 
-  	           });
-			}	
-			else {
-                return false;
-            }
+	  	           });
+				}	
+				else {
+	                return false;
+	            }
+			}
+			else
+			{
+				tr.find('td:eq(2)').html('<button class="btn btn-default btnInput" id_m_userrole="'+id_m_userrole+'">Set Input</button>');
+				tr.find('td:eq(3)').html('');
+				tr.find('td:eq(4)').html('');
+				tr.find('td:eq(5)').html('');
+			}
+			
 		})
 	}
 
@@ -229,52 +249,63 @@
 		})
 
 		$(document).off('click', '.btn-save-approval').on('click', '.btn-save-approval',function(e) {
-		  	var row = $(this).closest('tr');
+			// get all data
+			var dt = [];
+			loading_button('.btn-save-approval');
+			var Departement = $('#DepartementUserRole').val();
+			$('.FormInputData').each(function(){
+				var NIP = $(this).val();
+				var tr = $(this).closest('tr');
+				var id_set_roleuser = $(this).attr('id_set_roleuser');
+				var id_m_userrole = $(this).attr('id_m_userrole');
+				var TypeDesc = tr.find('.cmbTypeUser').val();
+				var Visible = tr.find('.cmbVisibel').val();
+				var subAction = (id_set_roleuser == '' || id_set_roleuser == null || id_set_roleuser == undefined) ? 'add' : 'edit';
 
-		  	row.find('td:eq(5)').find('.btn-save-approval').html('<i class="fa fa-refresh fa-spin fa-fw right-margin"></i> Loading...');
-		  	row.find('td:eq(5)').find('.btn-save-approval').prop('disabled',true);
+				var temp = {
+					FormInsert : {
+						NIP : NIP,
+						ID_m_userrole : id_m_userrole,
+						TypeDesc : TypeDesc,
+						Visible : Visible,
+						Departement : Departement,
+					},
+					Method : {
+						Action : subAction,
+						ID : id_set_roleuser,
+					}
 
-		  	var TypeDesc = row.find('td:eq(3)').find('.cmbTypeUser').val();
-		  	var Visible = row.find('td:eq(4)').find('.cmbVisibel').val();
-		  	var url = base_url_js+'budgeting/save_cfg_set_roleuser_budgeting';
-		  	var NIP = row.find('td:eq(2)').find('input').val();
-		  	var ID_set_roleuser = row.find('td:eq(2)').find('input').attr('id_set_roleuser');
-		  	var id_m_userrole = row.find('td:eq(2)').find('input').attr('id_m_userrole');
-		  	var Departement = $("#DepartementUserRole").val();
-		  	var data = {
-	  	       			   ID_m_userrole : id_m_userrole,
-	  	                   NIP : NIP,
-	  	                   Departement : Departement,
-	  	                   ID_set_roleuser : ID_set_roleuser,
-	  	                   TypeDesc : TypeDesc,
-	  	                   Visible : Visible,
+				}
+
+				dt.push(temp);
+			})
+
+			var url = base_url_js+'budgeting/save_cfg_set_roleuser_budgeting';
+			var data = {
+	  	       			   dt : dt,
 	  	                   Action : ""
   	                   };
-		  	var token = jwt_encode(data,"UAP)(*");
-		  	$.post(url,{token:token},function (data_json) {
-	               var obj = JSON.parse(data_json); 
-	               if(obj['status'] == 1)
-	               {
-	               	toastr.success("Done", 'Success!');
-	               	row.find('td:eq(5)').find('.btn-save-approval').prop('disabled',false).html('Save');
-	               	var cc = row.find('td:eq(5)').find('.btn-delete-setRoleUser');
-	               	if (!cc.length) {
-	               		row.find('td:eq(5)').append('&nbsp <button type="button" class="btn btn-danger btn-delete btn-delete-setRoleUser" code="'+obj['msg']+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>');
-	               	}
-	               }
-	               else
-	               {
-	               	toastr.error(obj,'Failed!!');
-	               }
+			var token = jwt_encode(data,"UAP)(*");
+			$.post(url,{token:token},function (data_json) {
+	           var obj = JSON.parse(data_json); 
+	           if(obj['status'] == 1)
+	           {
+	           	toastr.success("Done", 'Success!');
+	           	loadPageTable();
+	           }
+	           else
+	           {
+	           	toastr.error(obj,'Failed!!');
+	           }
+	           $('.btn-save-approval').prop('disabled',false).html('Save');
+	       }).done(function() {
+	         
+	       }).fail(function() {
+	         toastr.error('The Database connection error, please try again', 'Failed!!');
+	       }).always(function() {
+	       		
+	       });
 
-	           }).done(function() {
-	             
-	           }).fail(function() {
-	             toastr.error('The Database connection error, please try again', 'Failed!!');
-	           }).always(function() {
-	           		
-
-	           });
 		})
 	}
 
