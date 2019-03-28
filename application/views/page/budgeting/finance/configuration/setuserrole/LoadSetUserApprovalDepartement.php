@@ -123,8 +123,6 @@
 									visible += '<option value = "'+cc[j]+'" '+s+'>'+cc[j]+'</option>';
 								}
 					visible += '</select>';
-					
-					btn_save = '<button class = "btn btn-primary btn-save-approval">Save</button>';	
 
 					btnDelete = '<button type="button" class="btn btn-danger btn-delete btn-delete-setRoleUser" code="'+response[i]['ID_set_roleuser']+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
 				}
@@ -134,7 +132,7 @@
 									'<td id = "'+response[i]['ID']+'">'+ input+'</td>'+
 									'<td>'+cmb+'</td>'+
 									'<td>'+visible+'</td>'+
-									'<td>'+ btn_save+'&nbsp'+btnDelete+'</td>'+
+									'<td>'+btnDelete+'</td>'+
 								'</tr>';
 			}
 
@@ -207,7 +205,7 @@
 	  	               {
 	  	               	//loadPageTable();
 	  	               	// Back normal to row
-	  	               		td.html('<button class="btn btn-default btnInput" id_m_userrole="'+id_m_userrole+'">Set Input</button>');
+	  	               		tr.find('td:eq(2)').html('<button class="btn btn-default btnInput" id_m_userrole="'+id_m_userrole+'">Set Input</button>');
 	  	               		tr.find('td:eq(3)').html('');
 	  	               		tr.find('td:eq(4)').html('');
 	  	               		tr.find('td:eq(5)').html('');
@@ -252,14 +250,62 @@
 
 		$(document).off('click', '.btn-save-approval').on('click', '.btn-save-approval',function(e) {
 			// get all data
-			var action = '';
 			var dt = [];
+			loading_button('.btn-save-approval');
+			var Departement = $('#DepartementUserRole').val();
 			$('.FormInputData').each(function(){
 				var NIP = $(this).val();
 				var tr = $(this).closest('tr');
+				var id_set_roleuser = $(this).attr('id_set_roleuser');
+				var id_m_userrole = $(this).attr('id_m_userrole');
+				var TypeDesc = tr.find('.cmbTypeUser').val();
+				var Visible = tr.find('.cmbVisibel').val();
+				var subAction = (id_set_roleuser == '' || id_set_roleuser == null || id_set_roleuser == undefined) ? 'add' : 'edit';
+
+				var temp = {
+					FormInsert : {
+						NIP : NIP,
+						ID_m_userrole : id_m_userrole,
+						TypeDesc : TypeDesc,
+						Visible : Visible,
+						Departement : Departement,
+					},
+					Method : {
+						Action : subAction,
+						ID : id_set_roleuser,
+					}
+
+				}
+
+				dt.push(temp);
 			})
 
-		  	
+			var url = base_url_js+'budgeting/save_cfg_set_roleuser_budgeting';
+			var data = {
+	  	       			   dt : dt,
+	  	                   Action : ""
+  	                   };
+			var token = jwt_encode(data,"UAP)(*");
+			$.post(url,{token:token},function (data_json) {
+	           var obj = JSON.parse(data_json); 
+	           if(obj['status'] == 1)
+	           {
+	           	toastr.success("Done", 'Success!');
+	           	loadPageTable();
+	           }
+	           else
+	           {
+	           	toastr.error(obj,'Failed!!');
+	           }
+	           $('.btn-save-approval').prop('disabled',false).html('Save');
+	       }).done(function() {
+	         
+	       }).fail(function() {
+	         toastr.error('The Database connection error, please try again', 'Failed!!');
+	       }).always(function() {
+	       		
+	       });
+
 		})
 	}
 

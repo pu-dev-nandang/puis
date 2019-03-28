@@ -1107,40 +1107,31 @@ class C_budgeting extends Budgeting_Controler {
         $Action = $Input['Action'];
         switch ($Action) {
             case "":
-                if ($Input['ID_set_roleuser'] == "") {
-                    // insert data
-                    $dataSave = array(
-                        'ID_m_userrole' => $Input['ID_m_userrole'],
-                        'NIP' => $Input['NIP'],
-                        'Departement' => $Input['Departement'],
-                        'Visible' => $Input['Visible'],
-                        'TypeDesc' => $Input['TypeDesc'],
-                    );
-                    $this->db->insert('db_budgeting.cfg_approval_budget', $dataSave);
-                    $insert_id = $this->db->insert_id();
-                    $msg['status'] = 1;
-                    $msg['msg'] = $insert_id;
-                }
-                else
-                {
-                    // find $Input['ID_set_roleuser'] == ""
-                    $get = $this->m_master->caribasedprimary('db_budgeting.cfg_approval_budget','ID',$Input['ID_set_roleuser']);
-                    if (count($get) > 0) {
-                        // update
-                        $dataSave = array(
-                            'NIP' => $Input['NIP'],
-                            'Departement' => $Input['Departement'],
-                            'Visible' => $Input['Visible'],
-                            'TypeDesc' => $Input['TypeDesc'],
-                        );
-                        $this->db->where('ID', $Input['ID_set_roleuser']);
-                        $this->db->update('db_budgeting.cfg_approval_budget', $dataSave);
-                        $msg['status'] = 1;
+                $dt = $Input['dt'];
+                $dt = (array) json_decode(json_encode($dt),true);
+                for ($i=0; $i < count($dt); $i++) { 
+                    $FormInsert = $dt[$i]['FormInsert'];
+                    // check NIM already exist in employees
+                    $NIP = $FormInsert['NIP'];
+                    $G = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
+                    if (count($G) == 0) {
+                        $msg['msg'] = 'NIP : '.$NIP.' is not already exist';   
+                        break;
+                    }
+                    $Method = $dt[$i]['Method'];
+                    $subAction = $Method['Action'];
+                    if ($subAction == 'add') {
+                        $this->db->insert('db_budgeting.cfg_approval_budget',$FormInsert);
                     }
                     else
                     {
-                        $msg['msg'] = "The Data is not exist, Please check";
+                        $ID = $Method['ID'];
+                        $this->db->where('ID', $ID);
+                        $this->db->update('db_budgeting.cfg_approval_budget', $FormInsert);
                     }
+                }
+                if ($msg['msg'] == '') {
+                   $msg['status'] = 1;
                 }
                 break;
             case "delete":
@@ -1472,9 +1463,17 @@ class C_budgeting extends Budgeting_Controler {
                 }
 
                 $creator_budget_approval = $Input['creator_budget_approval'];
+                // get Json Status to set All Status to 0
+                    $G_data = $this->m_master->caribasedprimary('db_budgeting.creator_budget_approval','ID',$ID);
+                    $JsonStatus =(array) json_decode($G_data[0]['JsonStatus'],true);
+                    for ($i=0; $i < count($JsonStatus); $i++) { 
+                        $JsonStatus[$i]['Status'] = 0;
+                    }
+
                 $dataSave = array(
                     'Note' => $creator_budget_approval->Note,
                     'Status' => $creator_budget_approval->Status,
+                    'JsonStatus' => json_encode($JsonStatus),
                 );
                 $this->db->where('ID', $ID);
                 $this->db->update('db_budgeting.creator_budget_approval', $dataSave);
