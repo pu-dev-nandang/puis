@@ -13,6 +13,10 @@
         <li>
             <a href="<?php echo base_url('academic/exam-schedule/exam-setting'); ?>">Exam Setting</a>
         </li>
+
+<!--        <li style="float: right;">-->
+<!--            <a href="--><?php //echo base_url('academic/exam-schedule/exam-barcode'); ?><!--">Exam Barcode</a>-->
+<!--        </li>-->
     </ul>
     <div style="border-top: 1px solid #cccccc">
 
@@ -30,7 +34,7 @@
     $(document).ready(function () {
 
         var menu_active = "<?php echo $this->uri->segment(3); ?>";
-        var arrMenu = ['list-exam','list-waiting-approve','set-exam-schedule','exam-setting'];
+        var arrMenu = ['list-exam','list-waiting-approve','set-exam-schedule','exam-setting','exam-barcode'];
         setMenuSelected('.nav-tabs','li','active',arrMenu,menu_active);
 
     });

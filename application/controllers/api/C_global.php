@@ -1537,5 +1537,29 @@ class C_global extends CI_Controller {
         $this->template_blank($content);
     }
 
+    public function genrateBarcode($code)
+    {
+        //load library
+        $this->load->library('zend');
+        //load in folder Zend
+        $this->zend->load('Zend/Barcode');
+        //generate barcode
+        Zend_Barcode::render('code128', 'image', array('text'=>$code), array());
+    }
+
+    public function getBarcodeExam(){
+
+//        $data = $this->db->query('SELECT ex.*,em.Name AS Peng1, em2.Name AS Peng2 FROM db_academic.exam ex
+//                                            LEFT JOIN db_academic.exam_group exg ON (exg.ExamID = ex.ID)
+//                                            LEFT JOIN db_employees.employees em ON (em.NIP = ex.Pengawas1)
+//                                            LEFT JOIN db_employees.employees em2 ON (em2.NIP = ex.Pengawas2)
+//                                            GROUP BY ex.ID
+//                                            WHERE ex.SemesterID = 14 AND ex.UTS = "uts" ')->result_array();
+//
+//        print_r($data);
+//        exit;
+        $this->load->view('global/academic/exam');
+    }
+
 
 }

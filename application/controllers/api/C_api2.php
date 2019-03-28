@@ -1995,7 +1995,33 @@ class C_api2 extends CI_Controller {
         return $pass;
     }
 
-    public function pass(){
+    public function getDetailCurriculum(){
+
+        $data_arr = $this->getInputToken();
+
+//        $data_arr = array(
+//            'NPM' => 21150002,
+//            'ProdiID' => 1,
+//            'ClassOf' => 2015
+//        );
+
+        $NPM = $data_arr['NPM'];
+        $ProdiID = $data_arr['ProdiID'];
+        $ClassOf = $data_arr['ClassOf'];
+
+        $db_ = 'ta_'.$ClassOf;
+
+        $dataCID = $this->db->query('SELECT cd.Semester, mk.MKCode, mk.NameEng AS CoureEng, sp.ID AS SPID  FROM db_academic.curriculum_details cd 
+                                              LEFT JOIN db_academic.curriculum cur ON (cur.ID = cd.CurriculumID)
+                                              LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
+                                              LEFT JOIN '.$db_.'.study_planning sp ON (sp.CDID = cd.ID AND sp.NPM = "'.$NPM.'")
+                                              WHERE cur.Year = "'.$ClassOf.'" AND cd.ProdiID = "'.$ProdiID.'"
+                                              GROUP BY cd.ID
+                                              ORDER BY cd.Semester ASC, mk.MKCode ASC
+                                              ')->result_array();
+
+        return print_r(($dataCID));
+
 
     }
 

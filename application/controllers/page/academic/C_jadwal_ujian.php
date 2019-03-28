@@ -94,5 +94,14 @@ class C_jadwal_ujian extends Academic_Controler {
         return $data;
     }
 
+    // ==== Barcode ===
+
+    public function exam_barcode(){
+
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/jadwalujian/exam_barcode',$data,true);
+        $this->menu_jadwalUjian($page);
+    }
+
 
 }
