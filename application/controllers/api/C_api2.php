@@ -2014,7 +2014,7 @@ class C_api2 extends CI_Controller {
         $dataCID = $this->db->query('SELECT cd.Semester, mk.MKCode, mk.NameEng AS CoureEng, sp.ID AS SPID  FROM db_academic.curriculum_details cd 
                                               LEFT JOIN db_academic.curriculum cur ON (cur.ID = cd.CurriculumID)
                                               LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
-                                              LEFT JOIN '.$db_.'.study_planning sp ON (sp.CDID = cd.ID AND sp.NPM = "'.$NPM.'")
+                                              LEFT JOIN '.$db_.'.study_planning sp ON (sp.MKID = cd.MKID AND sp.NPM = "'.$NPM.'")
                                               WHERE cur.Year = "'.$ClassOf.'" AND cd.ProdiID = "'.$ProdiID.'"
                                               GROUP BY cd.ID
                                               ORDER BY cd.Semester ASC, mk.MKCode ASC
