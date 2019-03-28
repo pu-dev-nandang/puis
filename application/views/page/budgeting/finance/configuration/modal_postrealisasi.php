@@ -30,7 +30,7 @@
             </div>
             <div class="row <?php echo $a = ($action == 'add') ? 'hide' :'' ?>" id = "rowCodePostRealisasi">
               <div class="col-md-6 col-md-offset-4">
-                <input type="text" name="CodePost" id= "CodePostRealisasi" placeholder="Code" class="form-control">
+                <input type="text" name="CodePost" id= "CodePostRealisasi" placeholder="Code" class="form-control" maxlength="10">
               </div>
             </div>
         </div>
@@ -56,6 +56,18 @@
                 </div>
             </div>
         </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-4">
+                    <label class="control-label">For Who:</label>
+                </div>    
+                <div class="col-sm-6">
+                   <select class="select2-select-00 full-width-fix" id="Departement">
+                        <!-- <option></option> -->
+                    </select>
+                </div>
+            </div>
+        </div>
         <div style="text-align: center;">       
         <div class="col-sm-12" id="BtnFooter">
                 <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>
@@ -67,6 +79,7 @@
 <script type="text/javascript">
     $(document).ready(function () {
         getDataPostItem();
+        getAllDepartementPU();
         <?php if ($action == 'edit'): ?>
           $("#CodePostRealisasi").val('<?php echo $getData[0]['CodePostRealisasi'] ?>');
           $("#RealisasiPostName").val('<?php echo $getData[0]['RealisasiPostName'] ?>');
@@ -128,5 +141,30 @@
         //loadAlamatSekolah();
       });
 
+    }
+
+    function getAllDepartementPU()
+    {
+      var url = base_url_js+"api/__getAllDepartementPU";
+      $('#Departement').empty();
+      $.post(url,function (data_json) {
+        for (var i = 0; i < data_json.length; i++) {
+            var selected = (i==0) ? 'selected' : '';
+            $('#Departement').append('<option value="'+ data_json[i]['Code']  +'" '+selected+'>'+data_json[i]['Name2']+'</option>');
+        }
+
+        <?php if ($action == 'edit'): ?>
+            $("#Departement option").filter(function() {
+             //may want to use $.trim in here
+             return $(this).val() == "<?php echo $getData[0]['UnitDiv'] ?>"; 
+           }).prop("selected", true);
+        <?php endif ?>
+       
+        $('#Departement').select2({
+           //allowClear: true
+        });
+      }).done(function () {
+        //loadAlamatSekolah();
+      });
     }
 </script>

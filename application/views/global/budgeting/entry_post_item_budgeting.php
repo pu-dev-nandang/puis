@@ -70,6 +70,7 @@ $(document).ready(function() {
                     var CodePostRealisasi = $("#CodePostRealisasi").val();
                     var HeadAccount = $("#HeadAccount").val();
                     var RealisasiPostName = $("#RealisasiPostName").val();
+                    var Departement = $("#Departement").val();
 
                     var action = $(this).attr('action');
                     var id = $("#ModalbtnSaveForm2").attr('kodeuniq');
@@ -78,6 +79,7 @@ $(document).ready(function() {
                                 CodePostRealisasi : CodePostRealisasi,
                                 HeadAccount : HeadAccount,
                                 RealisasiPostName : RealisasiPostName,
+                                UnitDiv : Departement,
                                 Action : action,
                                 CDID : id
                                 };
@@ -129,11 +131,16 @@ $(document).ready(function() {
           case  "CDID" :
                 break;
           case  "NeedPrefix" :
-          case  "RealisasiPostName" :
                 result = Validation_required(arr[key],key);
                   if (result['status'] == 0) {
-                    toatString += result['messages'] + "<br>";
+                    toatString += 'The Code is Required' + "<br>";
                 }
+                break;
+          case  "RealisasiPostName" :
+                    result = Validation_required(arr[key],key);
+                      if (result['status'] == 0) {
+                        toatString += 'The SubAccountName is Required' + "<br>";
+                    }
                 break;
           case  "CodePostRealisasi" :
                 // console.log(arr['NeedPrefix']);
@@ -167,6 +174,7 @@ $(document).ready(function() {
                                 '<th>Budget Category</th>'+
                                 '<th>HeadAccount</th>'+
                                 '<th>Department</th>'+
+                                '<th>For Who</th>'+
                                 '<th>Action</th>'+
                             '</tr></thead>' 
                             ;
@@ -190,6 +198,7 @@ $(document).ready(function() {
                                       '<td>'+ dataForTable[i].CodePost+'<br>'+dataForTable[i].PostName+'</td>'+ // plus name
                                       '<td>'+ dataForTable[i].CodeHeadAccount+'<br>'+dataForTable[i].NameHeadAccount+'</td>'+
                                       '<td>'+ dataForTable[i].DepartementName+'</td>'+
+                                      '<td>'+ dataForTable[i].UnitDivName+'</td>'+
                                       '<td>'+ btn_edit + ' '+' &nbsp' + btn_del+'</td>'+
                                    '</tr>'   
                 }

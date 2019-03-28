@@ -440,7 +440,21 @@ class C_budgeting extends Budgeting_Controler {
                     }
                     else
                     {
-                        $Msg = $this->Msg['NotAction'];
+                        // check data already exist in cfg_head_account,
+                        $G = $this->m_master->caribasedprimary('db_budgeting.cfg_head_account','CodePost',$CodePost);
+                        if (count($G) > 0) {
+                            $Msg = $this->Msg['NotAction'];
+                        }
+                        else
+                        {
+                            $dataSave = array(
+                                'CodePost' => $CodePost,
+                                'PostName' => trim(ucwords($input['PostName'])),
+                            );
+                            $this->db->where('CodePost', $input['CDID']);
+                            $this->db->where('Active', 1);
+                            $this->db->update('db_budgeting.cfg_post', $dataSave);
+                        }
                     }
                 }
                 break;
@@ -459,7 +473,21 @@ class C_budgeting extends Budgeting_Controler {
                    }
                    else
                    {
-                       $Msg = $this->Msg['NotAction'];
+                       // check data already exist in cfg_head_account,
+                       $G = $this->m_master->caribasedprimary('db_budgeting.cfg_head_account','CodePost',$CodePost);
+                       if (count($G) > 0) {
+                           $Msg = $this->Msg['NotAction'];
+                       }
+                       else
+                       {
+                        $dataSave = array(
+                            'Active' => 0
+                        );
+                        $this->db->where('CodePost', $CodePost);
+                        $this->db->where('Active', 1);
+                        $this->db->update('db_budgeting.cfg_post', $dataSave);
+                       }
+                       
                    }
                 break;
             default:
@@ -515,6 +543,7 @@ class C_budgeting extends Budgeting_Controler {
                        'CodePostRealisasi' => $CodePostRealisasi,
                        'CodeHeadAccount' => $input['HeadAccount'],
                        'RealisasiPostName' => trim(ucwords($input['RealisasiPostName'])),
+                       'UnitDiv' => $input['UnitDiv'],
                        'CreatedBy' => $this->session->userdata('NIP'),
                        'CreatedAt' => date('Y-m-d'),
                    );
@@ -548,6 +577,7 @@ class C_budgeting extends Budgeting_Controler {
                                'CodePostRealisasi' => $CodePostRealisasi,
                                'RealisasiPostName' => trim(ucwords($input['RealisasiPostName'])),
                                'CodeHeadAccount' => $input['HeadAccount'],
+                               'UnitDiv' => $input['UnitDiv'],
                            );
                            $this->db->where('CodePostRealisasi', $input['CDID']);
                            $this->db->where('Active', 1);
@@ -558,7 +588,23 @@ class C_budgeting extends Budgeting_Controler {
                     }
                     else
                     {
-                        $Msg = $this->Msg['NotAction'];
+                        // cek data exist di  creator_budget
+                           $G = $this->m_master->caribasedprimary('db_budgeting.creator_budget','CodePostRealisasi',$CodePostRealisasi);
+                           if (count($G) > 0) {
+                               $Msg = $this->Msg['NotAction'];
+                           }
+                           else
+                           {
+                             $dataSave = array(
+                                 'CodePostRealisasi' => $CodePostRealisasi,
+                                 'RealisasiPostName' => trim(ucwords($input['RealisasiPostName'])),
+                                 'CodeHeadAccount' => $input['HeadAccount'],
+                                 'UnitDiv' => $input['UnitDiv'],
+                             );
+                             $this->db->where('CodePostRealisasi', $input['CDID']);
+                             $this->db->where('Active', 1);
+                             $this->db->update('db_budgeting.cfg_postrealisasi', $dataSave);
+                           }
                     }
                 }
                 break;
@@ -577,7 +623,22 @@ class C_budgeting extends Budgeting_Controler {
                    }
                    else
                    {
-                       $Msg = $this->Msg['NotAction'];
+                       // cek data exist di  creator_budget
+                          $G = $this->m_master->caribasedprimary('db_budgeting.creator_budget','CodePostRealisasi',$CodePostRealisasi);
+                          if (count($G) > 0) {
+                              $Msg = $this->Msg['NotAction'];
+                          }
+                          else
+                          {
+                            $dataSave = array(
+                                'Active' => 0
+                            );
+                            $this->db->where('CodePostRealisasi', $CodePostRealisasi);
+                            $this->db->where('Active', 1);
+                            $this->db->update('db_budgeting.cfg_postrealisasi', $dataSave);
+                          }
+
+                       
                    }
                 break;
             default:
@@ -712,7 +773,30 @@ class C_budgeting extends Budgeting_Controler {
                     }
                     else
                     {
-                        $Msg = $this->Msg['NotAction'];
+                        // check data in cfg_set_post,cfg_postrealisasi,
+                        $b = true;
+                        $arr_tbl = array('db_budgeting.cfg_set_post','db_budgeting.cfg_postrealisasi');
+                        for ($i=0; $i < count($arr_tbl); $i++) { 
+                            $G = $this->m_master->caribasedprimary($arr_tbl[$i],'CodeHeadAccount',$CodeHeadAccount);
+                            if (count($G) > 0) {
+                                $Msg = $this->Msg['NotAction'];
+                                $b = false;
+                                break;
+                            }
+                        }
+                        
+                        if ($b) {
+                           $dataSave = array(
+                               'CodeHeadAccount' => $CodeHeadAccount,
+                               'Name' => trim(ucwords($input['HeadAccountName'])),
+                               'CodePost' => $input['PostItem'],
+                               'Departement' => $input['Departement'],
+                           );
+                           $this->db->where('CodeHeadAccount', $input['CDID']);
+                           $this->db->where('Active', 1);
+                           $this->db->update('db_budgeting.cfg_head_account', $dataSave); 
+                        }
+
                     }
                 }
                 break;
@@ -731,7 +815,27 @@ class C_budgeting extends Budgeting_Controler {
                    }
                    else
                    {
-                       $Msg = $this->Msg['NotAction'];
+                       // check data in cfg_set_post,cfg_postrealisasi,
+                       $b = true;
+                       $arr_tbl = array('db_budgeting.cfg_set_post','db_budgeting.cfg_postrealisasi');
+                       for ($i=0; $i < count($arr_tbl); $i++) { 
+                           $G = $this->m_master->caribasedprimary($arr_tbl[$i],'CodeHeadAccount',$CodeHeadAccount);
+                           if (count($G) > 0) {
+                               $Msg = $this->Msg['NotAction'];
+                               $b = false;
+                               break;
+                           }
+                       }
+
+                       if ($b) {
+                          $dataSave = array(
+                              'Active' => 0
+                          );
+                          $this->db->where('CodeHeadAccount', $CodeHeadAccount);
+                          $this->db->where('Active', 1);
+                          $this->db->update('db_budgeting.cfg_head_account', $dataSave); 
+                       }
+                       
                    }
                 break;
             default:
