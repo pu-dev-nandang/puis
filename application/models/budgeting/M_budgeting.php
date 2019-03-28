@@ -379,11 +379,18 @@ class M_budgeting extends CI_Model {
     public function get_creator_budget($ID_creator_budget_approval)
     {
         $sql = 'select a.ID_creator_budget_approval,a.CodePostRealisasi,a.UnitCost,a.Freq,a.DetailMonth,
-               a.SubTotal,a.CreatedBy,a.CreatedAt,a.LastUpdateBy,a.LastUpdateAt,b.CodeHeadAccount,
-                     b.RealisasiPostName,c.Name as NameHeadAccount,c.CodePost,d.PostName
+               a.SubTotal,a.CreatedBy,a.CreatedAt,a.LastUpdateBy,a.LastUpdateAt,b.UnitDiv,b.CodeHeadAccount,
+                     b.RealisasiPostName,c.Name as NameHeadAccount,c.CodePost,d.PostName,dp.NameDepartement as NameUnitDiv
                from db_budgeting.creator_budget as a left join db_budgeting.cfg_postrealisasi as b on a.CodePostRealisasi = b.CodePostRealisasi
                LEFT JOIN db_budgeting.cfg_head_account as c on b.CodeHeadAccount = c.CodeHeadAccount
                LEFT JOIN db_budgeting.cfg_post as d on c.CodePost = d.CodePost
+               LEFT JOIN (
+                select CONCAT("AC.",ID) as ID,  CONCAT("Study ",NameEng) as NameDepartement from db_academic.program_study where Status = 1
+                UNION
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement from db_academic.faculty
+               ) as dp on b.UnitDiv = dp.ID
                where a.ID_creator_budget_approval = ?
                order by b.CodeHeadAccount asc
        ';

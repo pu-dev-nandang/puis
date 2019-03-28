@@ -1203,6 +1203,8 @@ $route['budgeting/EntryBudget/ListBudgetDepartement'] = 'page/budgeting/c_budget
 $route['budgeting/getListBudgetingDepartement'] = 'page/budgeting/c_budgeting/getListBudgetingDepartement';
 $route['budgeting/export_excel_budget_creator'] = 'C_save_to_excel/export_excel_budget_creator';
 $route['budgeting/export_excel_budget_creator_all'] = 'C_save_to_excel/export_excel_budget_creator_all';
+$route['budgeting/config_pr/Set_Rad']= 'page/budgeting/c_pr_po/set_rad';
+
 $route['budgeting/EntryBudget/BudgetLeft'] = 'page/budgeting/c_budgeting/BudgetLeft';
 $route['budgeting/getListBudgetingRemaining'] = 'page/budgeting/c_budgeting/getListBudgetingRemaining';
 $route['budgeting/detail_budgeting_remaining'] = 'page/budgeting/c_budgeting/detail_budgeting_remaining';

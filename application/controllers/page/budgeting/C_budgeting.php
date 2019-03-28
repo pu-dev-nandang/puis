@@ -777,7 +777,9 @@ class C_budgeting extends Budgeting_Controler {
                         $b = true;
                         $arr_tbl = array('db_budgeting.cfg_set_post','db_budgeting.cfg_postrealisasi');
                         for ($i=0; $i < count($arr_tbl); $i++) { 
-                            $G = $this->m_master->caribasedprimary($arr_tbl[$i],'CodeHeadAccount',$CodeHeadAccount);
+                            $sql = 'select * from '.$arr_tbl[$i].' where CodeHeadAccount = ? and Active = 1';
+                            $query=$this->db->query($sql, array($CodeHeadAccount))->result_array(); 
+                            $G = $query;
                             if (count($G) > 0) {
                                 $Msg = $this->Msg['NotAction'];
                                 $b = false;
@@ -818,8 +820,10 @@ class C_budgeting extends Budgeting_Controler {
                        // check data in cfg_set_post,cfg_postrealisasi,
                        $b = true;
                        $arr_tbl = array('db_budgeting.cfg_set_post','db_budgeting.cfg_postrealisasi');
-                       for ($i=0; $i < count($arr_tbl); $i++) { 
-                           $G = $this->m_master->caribasedprimary($arr_tbl[$i],'CodeHeadAccount',$CodeHeadAccount);
+                       for ($i=0; $i < count($arr_tbl); $i++) {
+                            $sql = 'select * from '.$arr_tbl[$i].' where CodeHeadAccount = ? and Active = 1';
+                            $query=$this->db->query($sql, array($CodeHeadAccount))->result_array(); 
+                           $G = $query;
                            if (count($G) > 0) {
                                $Msg = $this->Msg['NotAction'];
                                $b = false;

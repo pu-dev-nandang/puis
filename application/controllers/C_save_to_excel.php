@@ -943,6 +943,7 @@ class C_save_to_excel extends CI_Controller
                        $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row); 
 
                        $StH++;
+                       $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$i]['NameUnitDiv']);
                        $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
 
                        $StH++;
@@ -989,6 +990,7 @@ class C_save_to_excel extends CI_Controller
                                $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row); 
 
                                $StH++;
+                               $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$j]['NameUnitDiv']);
                                $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
 
                                $StH++;
@@ -1283,6 +1285,7 @@ class C_save_to_excel extends CI_Controller
                                $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row); 
 
                                $StH++;
+                               $excel->setCellValue($keyM[$StH].$St, $getData[$i]['NameUnitDiv']);
                                $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
 
                                $StH++;
@@ -1329,6 +1332,7 @@ class C_save_to_excel extends CI_Controller
                                        $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row); 
 
                                        $StH++;
+                                       $excel->setCellValue($keyM[$StH].$St, $getData[$j]['NameUnitDiv']);
                                        $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
 
                                        $StH++;
