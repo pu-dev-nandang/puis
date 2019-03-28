@@ -107,6 +107,7 @@ $route['academic/exam-schedule/list-waiting-approve'] = 'page/academic/c_jadwal_
 $route['academic/exam-schedule/set-exam-schedule'] = 'page/academic/c_jadwal_ujian/set_exam_schedule';
 $route['academic/exam-schedule/edit-exam-schedule/(:num)'] = 'page/academic/c_jadwal_ujian/edit_exam_schedule/$1';
 $route['academic/exam-schedule/exam-setting'] = 'page/academic/c_jadwal_ujian/exam_setting';
+$route['academic/exam-schedule/exam-barcode'] = 'page/academic/c_jadwal_ujian/exam_barcode';
 
 // ---- Score ----
 $route['academic/score'] =  'page/academic/c_score';
@@ -364,6 +365,8 @@ $route['download_template/(:any)'] = 'api/c_global/download_template/$1';
 $route['download_anypath'] = 'api/c_global/download_anypath';
 $route['fileGetAny/(:any)'] = 'api/c_global/fileGetAny/$1';
 $route['autocompleteAllUser'] = 'api/c_global/autocompleteAllUser';
+$route['genrateBarcode/(:any)'] = 'api/c_global/genrateBarcode/$1';
+$route['getBarcodeExam'] = 'api/c_global/getBarcodeExam';
 
 
 
@@ -820,7 +823,7 @@ $route['api/__crudScore'] = 'api/c_api/crudScore';
 $route['api/__crudAttendance'] = 'api/c_api/crudAttendance';
 $route['api2/__crudAttendance2'] = 'api/c_api2/crudAttendance2';
 $route['api2/__getAnnouncement'] = 'api/c_api2/getAnnouncement';
-$route['api2/pass'] = 'api/c_api2/pass';
+$route['api2/__getDetailCurriculum'] = 'api/c_api2/getDetailCurriculum';
 
 $route['api/__crudScheduleExchange'] = 'api/c_api/crudScheduleExchange';
 $route['api/__crudLimitCredit'] = 'api/c_api/crudLimitCredit';
