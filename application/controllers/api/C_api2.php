@@ -2020,7 +2020,7 @@ class C_api2 extends CI_Controller {
                                               ORDER BY cd.Semester ASC, mk.MKCode ASC
                                               ')->result_array();
 
-        return print_r(($dataCID));
+        return print_r(json_encode($dataCID));
 
 
     }
