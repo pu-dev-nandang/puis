@@ -92,10 +92,50 @@
 		}
 
 			// grouping MaxLimit
-			var NextInc = parseInt(resultJson.length) * parseInt(UserType.length);
+			// var NextInc = parseInt(resultJson.length) * parseInt(UserType.length);
+			// nextInc berdasarkan index
 			var MaxLimit = [];
-			for (var i = 0; i < dt.length; i=i+NextInc) {
-				MaxLimit.push(dt[i].MaxLimit)
+			console.log(dt);
+			for (var i = 0; i < dt.length; i++) {
+				var temp = {};
+				temp['MaxLimit'] = dt[i].MaxLimit;
+				temp['dt'] = [];
+				var cd = temp['dt'];
+				var CodePost = dt[i].CodePost
+				cd.push(CodePost);
+
+				var m = dt[i].MaxLimit;
+				var indexL = dt[i].Index;
+				for (var j = i+1; j < dt.length; j++) {
+					var m1 = dt[j].MaxLimit;
+					var indexL1 = dt[j].Index;
+					if (m1 == m && indexL == indexL1) {
+						// cek CodePost existing
+						var CodePost2 = dt[j].CodePost;
+						var bool = true;
+						for (var z = 0; z < cd.length; z++) {
+							CodePost3 = cd[z]
+							if (CodePost2 == CodePost3) {
+								bool = false;
+								break;
+							}
+						}
+
+						if (bool) {
+							cd.push(CodePost2);
+						}
+
+						i = j;
+					} else {
+						i = j - 1;
+						break;
+					}
+				}
+
+				temp['dt'] = cd;
+
+				MaxLimit.push(temp);
+				
 			}
 
 			var FieldType = ['Entry','Approved','Cancel'];
@@ -105,11 +145,22 @@
 				var fillPost = '';
 				for (var ii = 0; ii < resultJson.length; ii++) {
 					var Style = (ii != 0) ? 'style = "margin-top : 10px"' : '';
-					fillPost += '<div class = "row" '+Style+'><div class = "col-md-12">'+resultJson[ii]['PostName']+'</div></div>';
+					var df = resultJson[ii]['CodePost'];
+					var dtCodePost = MaxLimit[i].dt;
+					var checked = '';
+					for (var z = 0; z < dtCodePost.length; z++) {
+						var cd = dtCodePost[z];
+						if (df == cd) {
+							checked = 'checked';
+							break;
+						}
+					}
+					var inputPost = '<input type="checkbox" class="InputPost" codepost="'+df+'" style = "height : 15px" '+checked+'>';
+					fillPost += '<div class = "row" '+Style+'><div class = "col-md-12">'+inputPost+'&nbsp'+resultJson[ii]['PostName']+'</div></div>';
 				}
 				var Post = '<td class = "post">'+fillPost+'</td>';
 				fill += Post;
-				var Limit = parseInt(MaxLimit[i]) / 1000;
+				var Limit = parseInt(MaxLimit[i].MaxLimit) / 1000;
 				fill += '<td>'+'<input type = "text" class = "form-control AmountLimit" value = "'+Limit+'">'+'</td>';	
 				for (var j = 0; j < UserType.length; j++) {
 					var ID_user = j + 1;
@@ -117,7 +168,7 @@
 					var temp = {};
 					var chk = '';
 					for (var z = zStart; z < dt.length; z++) {
-						if (MaxLimit[i] == dt[z].MaxLimit && ID_user == dt[z].ID_m_userrole) 
+						if (MaxLimit[i].MaxLimit == dt[z].MaxLimit && ID_user == dt[z].ID_m_userrole) 
 						{
 							
 							temp = dt[z];
@@ -309,6 +360,7 @@
 								MaxLimit : MaxLimit,
 								CodePost : CodePost,
 								ID_m_userrole : ID_m_userrole,
+								index : indexL
 							};
 
 							// check entry existing

@@ -61,6 +61,7 @@
 
     function LoadPage(page)
     {
+        loadingStart();
         loading_page("#pageContent");
         if (jQuery("#pageInputApproval").length) {
           $("#pageInputApproval").remove();

@@ -2267,7 +2267,14 @@ class C_rest extends CI_Controller {
                             $query=$this->db->query($sql, array($Departement,$Year))->result_array();
                             for ($i=0; $i < count($query); $i++) { 
                                     $this->m_budgeting->makeCanBeDelete('db_budgeting.cfg_set_post','CodePostBudget',$query[$i]['CodePostBudget']);
-                            }    
+                            }
+
+                            // lock sub account
+                                $G = $this->m_master->caribasedprimary('db_budgeting.creator_budget','ID_creator_budget_approval',$id_creator_budget_approval);
+                                for ($i=0; $i < count($G); $i++) { 
+                                    $CodePostRealisasi = $G[$i]['CodePostRealisasi'];
+                                    $this->m_budgeting->makeCanBeDelete('db_budgeting.cfg_postrealisasi','CodePostRealisasi',$CodePostRealisasi);
+                                }    
                             
                         }
                     }
@@ -2336,7 +2343,14 @@ class C_rest extends CI_Controller {
                 for ($i=0; $i < count($Departement); $i++) { 
                     $Code = $Departement[$i]['Code'];
                     $DepartementName = $Departement[$i]['Name2'];
-                    $get = $this->m_budgeting->get_creator_budget($YearActivated[0]['Year'],$Code);
+                    // find ID_creator_budget_approval first
+                    $G = $this->m_budgeting->get_creator_budget_approval($YearActivated[0]['Year'],$Code);
+                    $ID_creator_budget_approval = 0;
+                    if (count($G) > 0) {
+                        $ID_creator_budget_approval= $G[0]['ID']; 
+                    }
+                    
+                    $get = $this->m_budgeting->get_creator_budget($ID_creator_budget_approval);
                     $arr_temp = array();
                     for ($j=0; $j < count($get); $j++) { 
                         // get data to show in dashboard'

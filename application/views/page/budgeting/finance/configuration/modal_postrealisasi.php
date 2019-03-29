@@ -62,7 +62,7 @@
                     <label class="control-label">For Who:</label>
                 </div>    
                 <div class="col-sm-6">
-                   <select class="select2-select-00 full-width-fix" id="Departement">
+                   <select class="select2-select-00 full-width-fix" id="Departement2">
                         <!-- <option></option> -->
                     </select>
                 </div>
@@ -146,21 +146,21 @@
     function getAllDepartementPU()
     {
       var url = base_url_js+"api/__getAllDepartementPU";
-      $('#Departement').empty();
+      $('#Departement2').empty();
       $.post(url,function (data_json) {
         for (var i = 0; i < data_json.length; i++) {
             var selected = (i==0) ? 'selected' : '';
-            $('#Departement').append('<option value="'+ data_json[i]['Code']  +'" '+selected+'>'+data_json[i]['Name2']+'</option>');
+            $('#Departement2').append('<option value="'+ data_json[i]['Code']  +'" '+selected+'>'+data_json[i]['Name2']+'</option>');
         }
 
         <?php if ($action == 'edit'): ?>
-            $("#Departement option").filter(function() {
+            $("#Departement2 option").filter(function() {
              //may want to use $.trim in here
              return $(this).val() == "<?php echo $getData[0]['UnitDiv'] ?>"; 
            }).prop("selected", true);
         <?php endif ?>
        
-        $('#Departement').select2({
+        $('#Departement2').select2({
            //allowClear: true
         });
       }).done(function () {
