@@ -1204,13 +1204,17 @@ $route['budgeting/getListBudgetingDepartement'] = 'page/budgeting/c_budgeting/ge
 $route['budgeting/export_excel_budget_creator'] = 'C_save_to_excel/export_excel_budget_creator';
 $route['budgeting/export_excel_budget_creator_all'] = 'C_save_to_excel/export_excel_budget_creator_all';
 $route['budgeting/config_pr/Set_Rad']= 'page/budgeting/c_pr_po/set_rad';
+$route['budgeting/config_pr/Set_Approval']= 'page/budgeting/c_pr_po/Set_Approval';
+$route['budgeting/get_cfg_set_roleuser_pr/(:any)'] = 'page/budgeting/c_pr_po/get_cfg_set_roleuser_pr/$1';
+$route['budgeting/save_cfg_set_roleuser_pr'] = 'page/budgeting/c_pr_po/save_cfg_set_roleuser_pr';
+
 
 $route['budgeting/EntryBudget/BudgetLeft'] = 'page/budgeting/c_budgeting/BudgetLeft';
 $route['budgeting/getListBudgetingRemaining'] = 'page/budgeting/c_budgeting/getListBudgetingRemaining';
 $route['budgeting/detail_budgeting_remaining'] = 'page/budgeting/c_budgeting/detail_budgeting_remaining';
 $route['budgeting/detail_budgeting_remaining_All'] = 'page/budgeting/c_budgeting/detail_budgeting_remaining_All';
 $route['budgeting/configRule'] = 'page/budgeting/c_budgeting/configRule';
-$route['budgeting/configRule/userroledepart_submit'] = 'page/budgeting/c_budgeting/userroledepart_submit';
+$route['budgeting/configRule/userroledepart_submit'] = 'page/budgeting/c_pr_po/userroledepart_submit';
 $route['budgeting/page_pr/(:any)'] = 'page/budgeting/c_budgeting/page_pr/$1';
 $route['budgeting/page_pr_catalog/(:any)'] = 'page/budgeting/c_budgeting/page_pr_catalog/$1';
 

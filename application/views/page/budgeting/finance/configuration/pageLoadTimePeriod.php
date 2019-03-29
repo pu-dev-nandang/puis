@@ -123,11 +123,12 @@ function loadTable()
 	    for (var i = 0; i < dataForTable.length; i++) {
 	    	var btn_edit = '<button type="button" class="btn btn-warning btn-edit" Year = "'+dataForTable[i].Year+'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
 	    	var btn_del = '<button type="button" class="btn btn-danger btn-delete"  Year = "'+dataForTable[i].Year+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
-            var Activated = '&nbsp<button type="button" class="btn btn-default btn-activated"  Year = "'+dataForTable[i].Year+'"> <i class="fa fa-check-circle" style="color: green;"></i> Activated</button>';
+            var Activated = '&nbsp<button type="button" class="btn btn-default btn-activated"  Year = "'+dataForTable[i].Year+'"> <i class="fa fa-minus-circle" style="color: red;"></i> Deactivated</button>';
             var StActivated = '<i class="fa fa-check-circle" style="color: green;"></i>';
             if(dataForTable[i].Activated == 0)
             {
                 StActivated = '<i class="fa fa-minus-circle" style="color: red;"></i>';
+                Activated = '&nbsp<button type="button" class="btn btn-default btn-activated"  Year = "'+dataForTable[i].Year+'"> <i class="fa fa-check-circle" style="color: green;"></i> Activated</button>';
             }
 	    	TableGenerate += '<tr>'+
 	    						'<td width = "3%">'+ (parseInt(i) + 1)+'</td>'+

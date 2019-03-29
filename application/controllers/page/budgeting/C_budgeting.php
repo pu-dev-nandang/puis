@@ -626,6 +626,10 @@ class C_budgeting extends Budgeting_Controler {
                        // $this->db->update('db_budgeting.cfg_postrealisasi', $dataSave);
                         $this ->db-> where('CodePostRealisasi', $CodePostRealisasi);
                         $this ->db-> delete('db_budgeting.cfg_postrealisasi');
+
+                        // delete data di creator_budget
+                        $this ->db-> where('CodePostRealisasi', $CodePostRealisasi);
+                        $this ->db-> delete('db_budgeting.creator_budget');
                    }
                    else
                    {
@@ -644,6 +648,10 @@ class C_budgeting extends Budgeting_Controler {
                             // $this->db->update('db_budgeting.cfg_postrealisasi', $dataSave);
                             $this ->db-> where('CodePostRealisasi', $CodePostRealisasi);
                             $this ->db-> delete('db_budgeting.cfg_postrealisasi');
+
+                            // delete data di creator_budget
+                            $this ->db-> where('CodePostRealisasi', $CodePostRealisasi);
+                            $this ->db-> delete('db_budgeting.creator_budget');
                           }
 
                        
@@ -1564,6 +1572,10 @@ class C_budgeting extends Budgeting_Controler {
                 break;
             case 'edit':
                 $ID = $Input['ID'];
+                // del first
+                $this ->db-> where('ID_creator_budget_approval', $ID);
+                $this ->db-> delete('db_budgeting.creator_budget');
+                // create again
                 for ($i=0; $i < count($creator_budget); $i++) { 
                     $CodePostRealisasi = $creator_budget[$i]->CodePostRealisasi;
                     $UnitCost = $creator_budget[$i]->UnitCost;
@@ -1572,16 +1584,28 @@ class C_budgeting extends Budgeting_Controler {
                     $DetailMonth = json_encode($DetailMonth);
                     $SubTotal = $creator_budget[$i]->SubTotal;
 
+                    // $dataSave = array(
+                    //     'UnitCost' => $UnitCost,
+                    //     'Freq' => $Freq,
+                    //     'DetailMonth' => $DetailMonth,
+                    //     'SubTotal' => $SubTotal,
+                    //     'LastUpdateBy' => $this->session->userdata('NIP'),
+                    //     'LastUpdateAt' => date('Y-m-d H:i:s'),
+                    // );
+                    // $this->db->where('CodePostRealisasi', $CodePostRealisasi);
+                    // $this->db->update('db_budgeting.creator_budget', $dataSave);
+
                     $dataSave = array(
+                        'CodePostRealisasi' => $CodePostRealisasi,
                         'UnitCost' => $UnitCost,
                         'Freq' => $Freq,
                         'DetailMonth' => $DetailMonth,
                         'SubTotal' => $SubTotal,
-                        'LastUpdateBy' => $this->session->userdata('NIP'),
-                        'LastUpdateAt' => date('Y-m-d H:i:s'),
+                        'CreatedBy' => $this->session->userdata('NIP'),
+                        'CreatedAt' => date('Y-m-d H:i:s'),
+                        'ID_creator_budget_approval' => $ID
                     );
-                    $this->db->where('CodePostRealisasi', $CodePostRealisasi);
-                    $this->db->update('db_budgeting.creator_budget', $dataSave);
+                    $this->db->insert('db_budgeting.creator_budget', $dataSave);
 
                 }
 
@@ -1774,38 +1798,7 @@ class C_budgeting extends Budgeting_Controler {
         echo json_encode($arr_result);
     }
 
-    public function userroledepart_submit()
-    {
-       $this->auth_ajax();
-       $Msg = '';
-       try {
-        $Input = $this->getInputToken();
-        $dataSave = array();
-        if (count($Input) > 0) {
-            $table = 'db_budgeting.cfg_set_userrole';
-            $sql = "TRUNCATE TABLE ".$table;
-            $query=$this->db->query($sql, array());
-            foreach ($Input as $key) {
-                $temp = array();
-                foreach ($key as $keya => $value) {
-                   $temp[$keya] = $value; 
-                }
-                $dataSave[] = $temp;
-            }
-            $this->db->insert_batch('db_budgeting.cfg_set_userrole', $dataSave);  
-        }
-        else
-        {
-            $Msg = 'No data action';
-        }
-
-       } catch (Exception $e) {
-            $Msg = $this->Msg['Error'];
-       }
-
-       echo json_encode($Msg);
-       
-    }
+    // PR Start
 
     public function pr()
     {

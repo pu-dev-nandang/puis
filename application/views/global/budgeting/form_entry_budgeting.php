@@ -112,6 +112,8 @@ function LoadFirstLoad(){
 		{
 			makeDomAwal();
 		}
+
+		loadingEnd(500);
 	});		
 }
 
@@ -168,7 +170,7 @@ function makeDomAwal()
 
 function makeHtmlBudgetAllocation()
 {
-	loading_page('#BudgetAllocation');
+	// loading_page('#BudgetAllocation');
 	var dt = ClassDt.BudgetAllocation;
 	setTimeout(function () {
 		var html = '<div class = "row">'+
@@ -379,7 +381,8 @@ function makeRowAdd_del(dt)
 						'</div>'+	
 					'</div>';
 			html += '</div>';	
-			$(".rowSubtotal").before(html);
+			// $(".rowSubtotal").before(html);
+			$("#PageSubAccount").append(html);
 		}
 	}
 
@@ -416,24 +419,26 @@ $(document).off('click', '#example-select-all').on('click', '#example-select-all
 function makeContent()
 {
 	var dt = ClassDt.SelectedPostBudget;
-	var html = '<div style = "overflow : auto;max-height : 500px;">';
+	var html = '<div style = "overflow : auto;max-height : 250px;" id = "PageSubAccount">';
 	var OPFreq = '';
 	for (var i = 0; i <= 1000; i++) {
 		var selected = (i == 0) ? 'selected' : '';
 		OPFreq += '<option value = "'+i+'" '+selected+'>'+i+'</option>';
 	}
 	for (var i = 0; i < dt.length; i++) {
-		html += '<div class = "row ContentDataPostBudget" style = "margin-left : 10px;margin-right : 10px;margin-top : 10px">';
+		// check genap & ganjil untuk berikan style warna
+		var c = ( (i % 2) == 0 ) ? 'background-color : #90c4e8;' : '';
+		html += '<div class = "row ContentDataPostBudget" style = "margin-left : 10px;margin-right : 10px;margin-top : 10px; '+c+'">';
 		html += '<div class = "col-md-1">'+
 					'<select class="select2-select-00 full-width-fix PostBudget">'+
-						'<option value ="'+dt[i]['CodePostRealisasi']+'" selected CodePost = "'+dt[i]['CodePost']+'" CodeHeadAccount="'+dt[i]['CodeHeadAccount']+'">'+dt[i]['PostName']+'-'+dt[i]['NameHeadAccount']+'-'+dt[i]['RealisasiPostName']+'</option>'+
+						'<option value ="'+dt[i]['CodePostRealisasi']+'" selected CodePost = "'+dt[i]['CodePost']+'" CodeHeadAccount="'+dt[i]['CodeHeadAccount']+'">'+dt[i]['NameHeadAccount']+'-'+dt[i]['RealisasiPostName']+'</option>'+
 					 '</select>'+
 				'</div>'+
 				'<div class = "col-md-1">'+
-					'<input type = "text" class = "form-control UnitCost" placeholder="Input Unit Cost..." value = "0">'+
+					'<input type = "text" class = "form-control UnitCost" placeholder="Input Unit Cost..." value = "0" style = "'+c+'">'+
 				'</div>'+
 				'<div class = "col-md-1">'+
-					'<select class="select2-select-00 full-width-fix Freq">'+
+					'<select class="select2-select-00 full-width-fix Freq" style = "'+c+'">'+
 						OPFreq+
 					'</select>'+
 				'</div>';
@@ -443,7 +448,7 @@ function makeContent()
 					'<div class = "row">';
 		for (var j = 0; j < Month.length; j++) {
 			html += '<div class = "col-md-1">'+
-						'<input type = "text" class = "form-control InputBulan" placeholder="Input Unit Cost..." value = "0" keyValue = "'+Month[j].keyValueFirst+'">'+
+						'<input type = "text" class = "form-control InputBulan" placeholder="Input Unit Cost..." value = "0" keyValue = "'+Month[j].keyValueFirst+'" style = "'+c+'">'+
 					'</div>';	
 		}
 
@@ -465,7 +470,9 @@ function makeContent()
 
 	$(".ContentDataPostBudget").remove(); // hapus dahulu
 	$(".rowSubtotal").remove(); // hapus dahulu
+	var c_PageSubAccount = $("#G_Content").find('#PageSubAccount');
 	$("#G_Content").append(html);
+	
 
 	// write html total perbulan
 	html = '';
@@ -647,7 +654,7 @@ function showButton()
 			$('#SaveBudget,#SaveSubmit').prop('disabled',true);
 			$('button:not(#Log):not(#btnBackToHome)').prop('disabled',true);
 			$('input:not(.select2-input)').prop('disabled',true);
-			$('select:not(#Departement):not(#Year)').prop('disabled',true);
+			$('select:not(#Departement):not(#Year):not(.PostBudget)').prop('disabled',true);
 		}
 	}	
 	else
@@ -678,7 +685,7 @@ function showButton()
 				$('#SaveBudget,#SaveSubmit').prop('disabled',true);
 				$('button:not(#Log):not(#btnBackToHome)').prop('disabled',true);
 				$('input:not(.select2-input)').prop('disabled',true);
-				$('select:not(#Departement):not(#Year)').prop('disabled',true);
+				$('select:not(#Departement):not(#Year):not(.PostBudget)').prop('disabled',true);
 			}
 			
 		}
@@ -687,7 +694,7 @@ function showButton()
 			// lock input
 				$('button:not(#Log):not(#btnBackToHome)').prop('disabled',true);
 				$('input').prop('disabled',true);
-				$('select:not(#Departement):not(#Year)').prop('disabled',true);
+				$('select:not(#Departement):not(#Year):not(.PostBudget)').prop('disabled',true);
 
 
 			var NIP = '<?php echo $this->session->userdata('NIP') ?>';
@@ -741,7 +748,7 @@ function showButton()
 		if (Status ==2) {
 			$('button:not(#Log):not(#btnBackToHome)').prop('disabled',true);
 			$('input:not(.select2-input)').prop('disabled',true);
-			$('select:not(#Departement):not(#Year)').prop('disabled',true);
+			$('select:not(#Departement):not(#Year):not(.PostBudget)').prop('disabled',true);
 
 			// show button export excel
 				var filee = (arr1[0].FileUpload != '' && arr1[0].FileUpload != null && arr1[0].FileUpload != undefined) ? '<a href = "'+base_url_js+'fileGetAny/budgeting-'+arr1[0].FileUpload+'" target="_blank" class = "Fileexist">File '+'</a>&nbsp' : '';
@@ -766,10 +773,11 @@ $(document).off('change', '.Freq').on('change', '.Freq',function(e) {
 
 $(document).off('keyup', '.InputBulan').on('keyup', '.InputBulan',function(e) {
    var row = $(this).closest('.ContentDataPostBudget');
-   ProsesOneRow(row);
+   var keyvalue = $(this).attr('keyvalue');
+   ProsesOneRow(row,keyvalue);
 });
 
-function ProsesOneRow(row)
+function ProsesOneRow(row,keyvalue = null)
 {
 	var UnitCost = row.find('.col-md-1:eq(1)').find('.UnitCost').val();
 	UnitCost = findAndReplace(UnitCost,".","");
@@ -826,11 +834,20 @@ function ProsesOneRow(row)
 
 
 			if (count > Freq) {
-				row.find('.InputBulan').each(function(){
-					$(this).val(0);
-					$(this).maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-					$(this).maskMoney('mask', '9894');
-				})
+				if (keyvalue == null) {
+					row.find('.InputBulan').each(function(){
+						$(this).val(0);
+						$(this).maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+						$(this).maskMoney('mask', '9894');
+					})
+				}
+				else
+				{
+					row.find('.InputBulan[keyvalue="'+keyvalue+'"]').val(0);
+					row.find('.InputBulan[keyvalue="'+keyvalue+'"]').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+					row.find('.InputBulan[keyvalue="'+keyvalue+'"]').maskMoney('mask', '9894');
+				}
+				
 				row.find('.sisa').html('<i class="fa fa-check-circle" style="color: green;"></i> '+0);
 				toastr.info("Your Input Exceeded than Freq, The Input Was Reset");
 			}
@@ -1133,7 +1150,7 @@ function makeContent_existing()
 {
 	var dt = ClassDt.creator_budget;
 	var Month = ClassDt.arr_bulan;
-	var html = '<div style = "overflow : auto;max-height : 500px;">';
+	var html = '<div style = "overflow : auto;max-height : 250px;" id = "PageSubAccount">';
 	for (var i = 0; i < dt.length; i++) {
 		var OPFreq = '';
 		var Cmb_freq = dt[i]['Freq'];
@@ -1143,18 +1160,18 @@ function makeContent_existing()
 		}
 
 		var UnitCost = dt[i]['UnitCost'] / 1000;// ribuan
-
-		html += '<div class = "row ContentDataPostBudget" style = "margin-left : 10px;margin-right : 10px;margin-top : 10px">';
+		var c = ( (i % 2) == 0 ) ? 'background-color : #90c4e8;' : '';
+		html += '<div class = "row ContentDataPostBudget" style = "margin-left : 10px;margin-right : 10px;margin-top : 10px; '+c+'">';
 		html += '<div class = "col-md-1">'+
 					'<select class="select2-select-00 full-width-fix PostBudget">'+
-						'<option value ="'+dt[i]['CodePostRealisasi']+'" selected CodePost = "'+dt[i]['CodePost']+'" CodeHeadAccount="'+dt[i]['CodeHeadAccount']+'">'+dt[i]['PostName']+'-'+dt[i]['NameHeadAccount']+'-'+dt[i]['RealisasiPostName']+'</option>'+
+						'<option value ="'+dt[i]['CodePostRealisasi']+'" selected CodePost = "'+dt[i]['CodePost']+'" CodeHeadAccount="'+dt[i]['CodeHeadAccount']+'">'+dt[i]['NameHeadAccount']+'-'+dt[i]['RealisasiPostName']+'</option>'+
 					 '</select>'+
 				'</div>'+
 				'<div class = "col-md-1">'+
-					'<input type = "text" class = "form-control UnitCost" placeholder="Input Unit Cost..." value = "'+UnitCost+'">'+
+					'<input type = "text" class = "form-control UnitCost" placeholder="Input Unit Cost..." value = "'+UnitCost+'" style = "'+c+'">'+
 				'</div>'+
 				'<div class = "col-md-1">'+
-					'<select class="select2-select-00 full-width-fix Freq">'+
+					'<select class="select2-select-00 full-width-fix Freq" style = "'+c+'">'+
 						OPFreq+
 					'</select>'+
 				'</div>';
@@ -1165,7 +1182,7 @@ function makeContent_existing()
 		DetailMonth = jQuery.parseJSON(DetailMonth);		
 		for (var j = 0; j < DetailMonth.length; j++) {
 			html += '<div class = "col-md-1">'+
-						'<input type = "text" class = "form-control InputBulan" placeholder="Input Unit Cost..." value = "'+DetailMonth[j].value+'" keyValue = "'+DetailMonth[j].month+'">'+
+						'<input type = "text" class = "form-control InputBulan" placeholder="Input Unit Cost..." value = "'+DetailMonth[j].value+'" keyValue = "'+DetailMonth[j].month+'" style = "'+c+'">'+
 					'</div>';	
 		}
 

@@ -70,7 +70,7 @@ $(document).ready(function() {
                     var CodePostRealisasi = $("#CodePostRealisasi").val();
                     var HeadAccount = $("#HeadAccount").val();
                     var RealisasiPostName = $("#RealisasiPostName").val();
-                    var Departement = $("#Departement").val();
+                    var Departement = $("#Departement2").val();
 
                     var action = $(this).attr('action');
                     var id = $("#ModalbtnSaveForm2").attr('kodeuniq');
@@ -261,6 +261,8 @@ $(document).ready(function() {
                 });
 
             });
+
+            loadingEnd(500);
         }); 
                         
     }
