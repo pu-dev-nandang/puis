@@ -88,7 +88,7 @@ $(document).ready(function() {
                         $.post(url,{token:token},function (data_json) {
                             var response = jQuery.parseJSON(data_json);
                             if (response == '') {
-                                toastr.success('Data berhasil disimpan', 'Success!');
+                                toastr.success('Saved', 'Success!');
                             }
                             else
                             {
@@ -209,12 +209,14 @@ $(document).ready(function() {
             $("#loadTable2").html(TableGenerate);
             LoaddataTable("#tableData2");
 
-            $(".btn-edit-postrealization").click(function(){
+            // $(".btn-edit-postrealization").click(function(){
+            $(document).off('click', '.btn-edit-postrealization').on('click', '.btn-edit-postrealization',function(e) {  
                 var ID = $(this).attr('code');
                  modal_generate2('edit','Edit',ID);
             });
 
-            $(".btn-delete-postrealization").click(function(){  
+            // $(".btn-delete-postrealization").click(function(){
+            $(document).off('click', '.btn-delete-postrealization').on('click', '.btn-delete-postrealization',function(e) {  
                 var ID = $(this).attr('code');
                  $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Are you sure ? </b> ' +
                      '<button type="button" id="confirmYesDelete" class="btn btn-primary" style="margin-right: 5px;" data-smt = "'+ID+'">Yes</button>' +
@@ -246,7 +248,7 @@ $(document).ready(function() {
                          setTimeout(function () {
                             var response = jQuery.parseJSON(data_json);
                             if (response == '') {
-                                toastr.success('Data berhasil disimpan', 'Success!');
+                                toastr.success('Deleted', 'Success!');
                             }
                             else
                             {
