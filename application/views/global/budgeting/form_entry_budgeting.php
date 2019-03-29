@@ -416,7 +416,7 @@ $(document).off('click', '#example-select-all').on('click', '#example-select-all
 function makeContent()
 {
 	var dt = ClassDt.SelectedPostBudget;
-	var html = '';
+	var html = '<div style = "overflow : auto;max-height : 500px;">';
 	var OPFreq = '';
 	for (var i = 0; i <= 1000; i++) {
 		var selected = (i == 0) ? 'selected' : '';
@@ -460,6 +460,9 @@ function makeContent()
 				'</div>';
 		html += '</div>';			
 	}
+
+	html += '</div>';
+
 	$(".ContentDataPostBudget").remove(); // hapus dahulu
 	$(".rowSubtotal").remove(); // hapus dahulu
 	$("#G_Content").append(html);
@@ -1130,7 +1133,7 @@ function makeContent_existing()
 {
 	var dt = ClassDt.creator_budget;
 	var Month = ClassDt.arr_bulan;
-	var html = '';
+	var html = '<div style = "overflow : auto;max-height : 500px;">';
 	for (var i = 0; i < dt.length; i++) {
 		var OPFreq = '';
 		var Cmb_freq = dt[i]['Freq'];
@@ -1179,6 +1182,8 @@ function makeContent_existing()
 				'</div>';
 		html += '</div>';						
 	}
+
+	html += '</div>';
 
 	$(".ContentDataPostBudget").remove(); // hapus dahulu
 	$(".rowSubtotal").remove(); // hapus dahulu
