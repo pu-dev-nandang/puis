@@ -430,15 +430,15 @@ function makeContent()
 		var c = ( (i % 2) == 0 ) ? 'background-color : #90c4e8;' : '';
 		html += '<div class = "row ContentDataPostBudget" style = "margin-left : 10px;margin-right : 10px;margin-top : 10px; '+c+'">';
 		html += '<div class = "col-md-1">'+
-					'<select class="select2-select-00 full-width-fix PostBudget">'+
+					'<select class="select2-select-00 full-width-fix PostBudget" style = "margin-top : 5px;">'+
 						'<option value ="'+dt[i]['CodePostRealisasi']+'" selected CodePost = "'+dt[i]['CodePost']+'" CodeHeadAccount="'+dt[i]['CodeHeadAccount']+'">'+dt[i]['NameHeadAccount']+'-'+dt[i]['RealisasiPostName']+'</option>'+
 					 '</select>'+
 				'</div>'+
 				'<div class = "col-md-1">'+
-					'<input type = "text" class = "form-control UnitCost" placeholder="Input Unit Cost..." value = "0" style = "'+c+'">'+
+					'<input type = "text" class = "form-control UnitCost" placeholder="Input Unit Cost..." value = "0" style = "'+c+' color : #333">'+
 				'</div>'+
 				'<div class = "col-md-1">'+
-					'<select class="select2-select-00 full-width-fix Freq" style = "'+c+'">'+
+					'<select class="select2-select-00 full-width-fix Freq" style = "'+c+' margin-top : 5px;color : #333">'+
 						OPFreq+
 					'</select>'+
 				'</div>';
@@ -448,7 +448,7 @@ function makeContent()
 					'<div class = "row">';
 		for (var j = 0; j < Month.length; j++) {
 			html += '<div class = "col-md-1">'+
-						'<input type = "text" class = "form-control InputBulan" placeholder="Input Unit Cost..." value = "0" keyValue = "'+Month[j].keyValueFirst+'" style = "'+c+'">'+
+						'<input type = "text" class = "form-control InputBulan" placeholder="Input Unit Cost..." value = "0" keyValue = "'+Month[j].keyValueFirst+'" style = "'+c+' color : #333">'+
 					'</div>';	
 		}
 
@@ -459,7 +459,7 @@ function makeContent()
 						'<div class = "col-md-3 sisa">'+ // sisa
 						'</div>'+
 						'<div class = "col-md-9">'+
-							'<p class = "Subtotal">0</p>'+
+							'<p class = "Subtotal" style = "margin-top : 5px;">0</p>'+
 						'</div>'+
 					'</div>'+	
 				'</div>';
@@ -848,18 +848,18 @@ function ProsesOneRow(row,keyvalue = null)
 					row.find('.InputBulan[keyvalue="'+keyvalue+'"]').maskMoney('mask', '9894');
 				}
 				
-				row.find('.sisa').html('<i class="fa fa-check-circle" style="color: green;"></i> '+0);
+				row.find('.sisa').html('<div style="margin-top : 5px;"><i class="fa fa-check-circle" style="color: green;"></i> '+0+'</div>');
 				toastr.info("Your Input Exceeded than Freq, The Input Was Reset");
 			}
 			else
 			{
 				var v = parseInt(Freq) - count;
 				if (v == 0) {
-					row.find('.sisa').html('<i class="fa fa-check-circle" style="color: green;"></i> '+0);
+					row.find('.sisa').html('<div style="margin-top : 5px;"><i class="fa fa-check-circle" style="color: green;"></i> '+0+'</div>');
 				}
 				else
 				{
-					row.find('.sisa').html('<i class="fa fa-minus-circle" style="color: red;"></i> '+v);
+					row.find('.sisa').html('<div style="margin-top : 5px;"><i class="fa fa-minus-circle" style="color: red;"></i> '+v+'</div>');
 				}
 				
 			}
@@ -1163,15 +1163,15 @@ function makeContent_existing()
 		var c = ( (i % 2) == 0 ) ? 'background-color : #90c4e8;' : '';
 		html += '<div class = "row ContentDataPostBudget" style = "margin-left : 10px;margin-right : 10px;margin-top : 10px; '+c+'">';
 		html += '<div class = "col-md-1">'+
-					'<select class="select2-select-00 full-width-fix PostBudget">'+
+					'<select class="select2-select-00 full-width-fix PostBudget" style = "margin-top : 5px;">'+
 						'<option value ="'+dt[i]['CodePostRealisasi']+'" selected CodePost = "'+dt[i]['CodePost']+'" CodeHeadAccount="'+dt[i]['CodeHeadAccount']+'">'+dt[i]['NameHeadAccount']+'-'+dt[i]['RealisasiPostName']+'</option>'+
 					 '</select>'+
 				'</div>'+
 				'<div class = "col-md-1">'+
-					'<input type = "text" class = "form-control UnitCost" placeholder="Input Unit Cost..." value = "'+UnitCost+'" style = "'+c+'">'+
+					'<input type = "text" class = "form-control UnitCost" placeholder="Input Unit Cost..." value = "'+UnitCost+'" style = "'+c+' color : #333">'+
 				'</div>'+
 				'<div class = "col-md-1">'+
-					'<select class="select2-select-00 full-width-fix Freq" style = "'+c+'">'+
+					'<select class="select2-select-00 full-width-fix Freq" style = "'+c+' margin-top : 5px;color : #333">'+
 						OPFreq+
 					'</select>'+
 				'</div>';
@@ -1182,7 +1182,7 @@ function makeContent_existing()
 		DetailMonth = jQuery.parseJSON(DetailMonth);		
 		for (var j = 0; j < DetailMonth.length; j++) {
 			html += '<div class = "col-md-1">'+
-						'<input type = "text" class = "form-control InputBulan" placeholder="Input Unit Cost..." value = "'+DetailMonth[j].value+'" keyValue = "'+DetailMonth[j].month+'" style = "'+c+'">'+
+						'<input type = "text" class = "form-control InputBulan" placeholder="Input Unit Cost..." value = "'+DetailMonth[j].value+'" keyValue = "'+DetailMonth[j].month+'" style = "'+c+' color : #333">'+
 					'</div>';	
 		}
 
@@ -1193,7 +1193,7 @@ function makeContent_existing()
 						'<div class = "col-md-3 sisa">'+ // sisa
 						'</div>'+
 						'<div class = "col-md-9">'+
-							'<p class = "Subtotal">0</p>'+
+							'<p class = "Subtotal" style = "margin-top : 5px;">0</p>'+
 						'</div>'+
 					'</div>'+	
 				'</div>';
