@@ -200,6 +200,74 @@ class M_budgeting extends CI_Model {
         return $Code;
     }
 
+    public function getTheCodeByDiv($tbl,$fieldCode,$PrefixCode,$length,$Departement,$Year = null)
+    {   
+        $Code = '';
+        // get abbr dari Departement
+        $G = $this->SearchDepartementBudgeting($Departement);
+        $Abbr =$G[0]['Code'];
+        $strLenPrefix = strlen($PrefixCode) + 1; // + 1 untuk -
+        if ($Year == null) {
+            $sql = 'select * from '.$tbl.' where '.$fieldCode.' like "'.$PrefixCode.'-'.$Abbr.'%" order by '.$fieldCode.' desc limit 1';
+            $query=$this->db->query($sql, array())->result_array();
+            if (count($query) == 1) {
+                $V = $query[0][$fieldCode];
+                $V = explode('-', $V);
+                $inc = $V[2];
+                $inc = (int)$inc;
+                $inc = $inc + 1;
+                $lenINC = strlen($inc);
+                $strINC = $inc;
+                for ($i=0; $i < $length-$lenINC-$strLenPrefix; $i++) { 
+                    $strINC = '0'.$strINC;
+                }
+
+                $Code = $PrefixCode.'-'.$Abbr.'-'.$strINC;
+            }
+            elseif(count($query) == 0)
+            {
+               $inc = 1;
+               $lenINC = strlen($inc);
+               $strINC = $inc;
+               for ($i=0; $i < $length-$lenINC-$strLenPrefix; $i++) { 
+                   $strINC = '0'.$strINC;
+               }
+               $Code = $PrefixCode.'-'.$Abbr.'-'.$strINC;
+            }
+        }
+        else
+        {
+            $Year = substr($Year, 2,2);
+            $sql = 'select * from '.$tbl.' where '.$fieldCode.' like "'.$PrefixCode.'-'.$Abbr.'-'.$Year.'%" order by '.$fieldCode.' desc limit 1';
+            $query=$this->db->query($sql, array())->result_array();
+            if (count($query) == 1) {
+                $V = $query[0][$fieldCode];
+                $V = explode('-', $V);
+                $inc = $V[2];
+                $inc = (int)$inc;
+                $inc = $inc + 1;
+                $lenINC = strlen($inc);
+                $strINC = $inc;
+                for ($i=0; $i < $length-$lenINC-$strLenPrefix-(strlen($Year)); $i++) { 
+                    $strINC = '0'.$strINC;
+                }
+                $Code = $PrefixCode.'-'.$Abbr.'-'.$strINC;
+            }
+            elseif(count($query) == 0)
+            {
+               $inc = 1;
+               $lenINC = strlen($inc);
+               $strINC = $inc;
+               for ($i=0; $i < $length-$lenINC-$strLenPrefix-(strlen($Year)); $i++) { 
+                   $strINC = '0'.$strINC;
+               }
+               $Code = $PrefixCode.'-'.$Abbr.'-'.$strINC;
+            }
+        }
+
+        return $Code;
+    }
+
     public function getPostDepartement($Year,$Departement)
     {
         $arr_result = array();
@@ -928,7 +996,7 @@ class M_budgeting extends CI_Model {
                                     UNION
                                     select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
                                     UNION
-                                    select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
+                                    select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
                                     ) aa
                     ) as h on e.Departement = h.ID 
                 where a.PRCode = ?
@@ -952,7 +1020,7 @@ class M_budgeting extends CI_Model {
                                    UNION
                                    select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
                                    UNION
-                                   select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
+                                   select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
                                    ) aa
                    ) as h on f.Departement = h.ID
                 where b.ID_pr_detail = ?   
@@ -988,7 +1056,7 @@ class M_budgeting extends CI_Model {
                 UNION
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
                 UNION
-                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr from db_academic.faculty where StBudgeting = 1
+                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
                 ) aa
                 where ID = ?
                 ';
@@ -1003,7 +1071,7 @@ class M_budgeting extends CI_Model {
                 UNION
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
                 UNION
-                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr from db_academic.faculty where StBudgeting = 1
+                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
                 ) aa
                 where NameDepartement = ?
                 ';

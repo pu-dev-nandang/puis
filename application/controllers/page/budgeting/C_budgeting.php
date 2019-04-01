@@ -527,12 +527,15 @@ class C_budgeting extends Budgeting_Controler {
                 $NeedPrefix = $input['NeedPrefix'];
                 $CodePostRealisasi = $input['CodePostRealisasi'];
                 if ($NeedPrefix == 1) { // get the code
+                    // Get Division from Head Account
+                    $G = $this->m_master->caribasedprimary('db_budgeting.cfg_head_account','CodeHeadAccount',$input['HeadAccount']);
+                    $Departement = $G[0]['Departement'];
                     $CfgCode = $this->m_master->showData_array('db_budgeting.cfg_codeprefix');
                     $CodePostPrefix = $CfgCode[0]['CodePostRealisasi'];
                     $LengthCode = $CfgCode[0]['LengthCodePostRealisasi'];
                     $tbl = 'db_budgeting.cfg_postrealisasi';
                     $fieldCode = 'CodePostRealisasi';
-                    $CodePostRealisasi = $this->m_budgeting->getTheCode($tbl,$fieldCode,$CodePostPrefix,$LengthCode);
+                    $CodePostRealisasi = $this->m_budgeting->getTheCodeByDiv($tbl,$fieldCode,$CodePostPrefix,$LengthCode,$Departement);
                 }
 
 
@@ -696,7 +699,7 @@ class C_budgeting extends Budgeting_Controler {
                     $LengthCode = $CfgCode[0]['LengthHeadAccount'];
                     $tbl = 'db_budgeting.cfg_head_account';
                     $fieldCode = 'CodeHeadAccount';
-                    $CodeHeadAccount = $this->m_budgeting->getTheCode($tbl,$fieldCode,$CodePostPrefix,$LengthCode);
+                    $CodeHeadAccount = $this->m_budgeting->getTheCodeByDiv($tbl,$fieldCode,$CodePostPrefix,$LengthCode,$input['Departement']);
                 }
 
                 $sql = 'select * from db_budgeting.cfg_head_account where CodeHeadAccount = ? and Active = 1';
@@ -1800,78 +1803,6 @@ class C_budgeting extends Budgeting_Controler {
 
     // PR Start
 
-    public function pr()
-    {
-        $content = $this->load->view('global/budgeting/pr/page',$this->data,true);
-        $this->temp($content);
-    }
-
-    public function page_pr()
-    {
-      $this->auth_ajax();
-      $arr_result = array('html' => '','jsonPass' => '');
-      $uri = $this->uri->segment(3);
-      switch ($uri) {
-          case 'Catalog':
-              // $this->data['action'] = 'add';
-              // if (empty($_POST) && count($_POST) > 0 ){
-              //     $Input = $this->getInputToken();
-              //     $this->data['action'] = $Input['action'];
-              //     if ($Input['action'] == 'edit') {
-              //         $this->data['get'] = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$Input['ID']);
-              //     }
-              // }
-              // $content = $this->load->view('global/budgeting/pr/'.$uri,$this->data,true);
-              // $arr_result['html'] = $content;
-              $content = $this->load->view('global/budgeting/pr/'.$uri,$this->data,true);
-              $arr_result['html'] = $content;
-              break;
-          
-          default:
-              $this->data['G_Approver'] = $this->m_budgeting->Get_m_Approver();
-              $this->data['arr_Year'] = $this->m_master->showData_array('db_budgeting.cfg_dateperiod');
-              $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
-              $Year = $get[0]['Year'];
-              $this->data['Year'] = $Year;
-              $this->data['PRCodeVal'] = '';
-              $content = $this->load->view('global/budgeting/pr/'.$uri,$this->data,true);
-              $arr_result['html'] = $content;
-              break;
-      }
-      
-      echo json_encode($arr_result);
-    }
-
-    public function page_pr_catalog()
-    {
-        $this->auth_ajax();
-        $arr_result = array('html' => '','jsonPass' => '');
-        $uri = $this->uri->segment(3);
-        switch ($uri) {
-            case 'entry_catalog':
-                $this->data['action'] = 'add';
-                if ( (!empty($_POST)) && count($_POST) > 0 ){
-                    $Input = $this->getInputToken();
-                    $this->data['action'] = $Input['action'];
-                    if ($Input['action'] == 'edit') {
-                        $this->data['get'] = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$Input['ID']);
-                    }
-                }
-                $content = $this->load->view('global/budgeting/pr/'.$uri,$this->data,true);
-                $arr_result['html'] = $content;
-                break;
-            case 'datacatalog':
-                $content = $this->load->view('global/budgeting/pr/'.$uri,$this->data,true);
-                $arr_result['html'] = $content;
-                break;
-            default:
-                # code...
-                break;
-        }
-        
-        echo json_encode($arr_result);
-    }
-
     public function PostBudgetThisMonth_Department()
     {
         $this->auth_ajax();
@@ -2260,104 +2191,6 @@ class C_budgeting extends Budgeting_Controler {
         }
         echo json_encode(array('PRCode' => $PRCode,'JsonStatus' => json_encode($JsonStatus)) );
         
-    }
-
-    public function DataPR()
-    {
-        $requestData= $_REQUEST;
-        $sqltotalData = 'select count(*) as total from db_budgeting.pr_create';
-        $querytotalData = $this->db->query($sqltotalData)->result_array();
-        $totalData = $querytotalData[0]['total'];
-
-        $sql = 'select * from 
-                (
-                    select a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,
-                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = 3,"Reject","Cancel") ) ))
-                                    as StatusName, a.JsonStatus,a.PostingDate 
-                                    from db_budgeting.pr_create as a 
-                    join (
-                    select * from (
-                    select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
-                    UNION
-                    select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
-                    UNION
-                    select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
-                    ) aa
-                    ) as b on a.Departement = b.ID
-                )aa
-               ';
-
-        $sql.= ' where PRCode LIKE "%'.$requestData['search']['value'].'%" or NameDepartement LIKE "'.$requestData['search']['value'].'%" or StatusName LIKE "'.$requestData['search']['value'].'%" 
-                ';
-        $sql.= ' ORDER BY PRCode Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
-        $query = $this->db->query($sql)->result_array();
-
-        $No = $requestData['start'] + 1;
-        $data = array();
-
-        $G_Approver = $this->m_budgeting->Get_m_Approver();
-        if (array_key_exists('length', $_POST)) {
-            $Count_G_Approver = $_POST['length'];
-        }
-        else
-        {
-            $Count_G_Approver = count($G_Approver);
-        }
-        
-        for($i=0;$i<count($query);$i++){
-            $nestedData=array();
-            $row = $query[$i];
-            $nestedData[] = $No;
-            $nestedData[] = $row['PRCode'];
-            $nestedData[] = $row['NameDepartement'];
-            $nestedData[] = $row['StatusName'];
-            // circulation sheet
-            $nestedData[] = '<a href="javascript:void(0)" class = "btn btn-default btn_circulation_sheet" prcode = "'.$row['PRCode'].'">See</a>';
-            $JsonStatus = (array)json_decode($row['JsonStatus'],true);
-            $arr = array();
-            if (count($JsonStatus) > 0) {
-                for ($j=0; $j < count($JsonStatus); $j++) {
-                    $getName = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$j]['ApprovedBy']);
-                    $Name = $getName[0]['Name'];
-                    $StatusInJson = $JsonStatus[$j]['Status'];
-                    switch ($StatusInJson) {
-                        case '1':
-                            $stjson = '<i class="fa fa-check" style="color: green;"></i>';
-                            break;
-                        case '2':
-                            $stjson = '<i class="fa fa-times" aria-hidden="true" style="color: red;"></i>';
-                            break;
-                        default:
-                            $stjson = "-";
-                            break;
-                    }
-                    $arr[] = $stjson.'<br>'.'Approver : '.$Name.'<br>'.'Approve At : '.$JsonStatus[$j]['ApproveAt'];
-                }
-            }
-
-            $c = $Count_G_Approver - count($arr);
-            for ($l=0; $l < $c; $l++) { 
-                 $arr[] = '-';
-            }
-
-            $nestedData = array_merge($nestedData,$arr);
-            $nestedData[] = $row['Departement'];
-            // get name created by
-                $getName = $this->m_master->caribasedprimary('db_employees.employees','NIP',$row['CreatedBy']);
-                $nestedData[] = $getName[0]['Name'];
-
-
-            $data[] = $nestedData;
-            $No++;
-        }
-
-        $json_data = array(
-            "draw"            => intval( $requestData['draw'] ),
-            "recordsTotal"    => intval($totalData),
-            "recordsFiltered" => intval($totalData ),
-            "data"            => $data
-        );
-        echo json_encode($json_data);
     }
 
     public function FormEditPR()
