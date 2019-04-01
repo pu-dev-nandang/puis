@@ -611,47 +611,55 @@ class M_api extends CI_Model {
 
     public function getSemesterCurriculum($SemesterID,$IsSemesterAntara){
 
-        $where = ($SemesterID!='' && $SemesterID!=0) ? 's.ID = '.$SemesterID : 's.Status = 1';
+        if($IsSemesterAntara==0 || $IsSemesterAntara=='0'){
+            $where = ($SemesterID!='' && $SemesterID!=0) ? 's.ID = '.$SemesterID : 's.Status = 1';
 
-        $dataCurriculum = $this->db->query('SELECT * FROM db_academic.curriculum c 
+            $dataCurriculum = $this->db->query('SELECT * FROM db_academic.curriculum c 
                                                     WHERE c.Year <= (
                                                       SELECT Year FROM db_academic.semester s WHERE '.$where.' LIMIT 1) 
                                                       ORDER BY c.Year DESC ')
-                                ->result_array();
+                ->result_array();
 
-        $result=[];
+            $result=[];
 
-        for($s=0;$s<count($dataCurriculum);$s++){
-            $data = $this->db->query('SELECT s.* FROM db_academic.semester s 
+            for($s=0;$s<count($dataCurriculum);$s++){
+                $data = $this->db->query('SELECT s.* FROM db_academic.semester s 
                                                     WHERE s.Year>="'.$dataCurriculum[$s]['Year'].'" ')
-                                ->result_array();
+                    ->result_array();
 
-            $smt=1;
+                $smt=1;
 
 
-            for($i=0;$i<count($data);$i++){
+                for($i=0;$i<count($data);$i++){
 
-                if($SemesterID!='' && $SemesterID!=0){
-                    if($data[$i]['ID']!=$SemesterID){
-                        $smt = $smt + 1;
+                    if($SemesterID!='' && $SemesterID!=0){
+                        if($data[$i]['ID']!=$SemesterID){
+                            $smt = $smt + 1;
+                        } else {
+                            break;
+                        }
                     } else {
-                        break;
-                    }
-                } else {
-                    if($data[$i]['Status']==0){
-                        $smt = $smt + 1;
-                    } else {
-                        break;
+                        if($data[$i]['Status']==0){
+                            $smt = $smt + 1;
+                        } else {
+                            break;
+                        }
                     }
                 }
-            }
 
-            $d = array(
-                'Curriculum' => $dataCurriculum[$s],
-                'Semester' => $smt
-            );
-            array_push($result,$d);
+                $d = array(
+                    'Curriculum' => $dataCurriculum[$s],
+                    'Semester' => $smt
+                );
+                array_push($result,$d);
+            }
         }
+        else {
+            $dataCurriculum = $this->db->query()->result_array();
+
+        }
+
+
         return $result;
     }
 

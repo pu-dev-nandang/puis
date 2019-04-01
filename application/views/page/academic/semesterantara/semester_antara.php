@@ -8,7 +8,7 @@
                 <div class="toolbar no-padding">
                     <div class="btn-group">
                         <span class="btn btn-xs btn-action" data-action="addSemesterAntara" id="btn_addTahunAkademik">
-                            <i class="icon-plus"></i> Add Semester Antara
+                            <i class="icon-plus"></i> Semester Antara
                         </span>
                     </div>
                 </div>
@@ -32,17 +32,15 @@
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<h4 class="modal-title">Semester Antara</h4>');
         $('#GlobalModal .modal-body').html('<table class="table">' +
-            // '<tr>' +
-            // '<td style="width: 25%;">Program</td>' +
-            // '<td><select class="form-control" id="formProgram"></select></td>' +
-            // '</tr>' +
             '<tr>' +
             '<td style="width: 25%;">Semester</td>' +
             '<td><select class="form-control" id="formSemester"></select></td>' +
             '</tr>' +
             '</table>');
         // loadSelectOptionProgramCampus('#formProgram','');
-        loadSelectOptionSemester('#formSemester','');
+        loSelectOptionSemester('#formSemester','');
+        // loadSelectOptionSemester('#formSemester','');
+
         $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
             '<button type="button" id="btnSave" data-id="0" data-action="'+action+'" class="btn btn-success">'+ucwords(btnSave)+'</button>');
 
@@ -62,7 +60,7 @@
         if(DataSemester!=''){
             var sp = DataSemester.split('.');
 
-            var Semester = sp[1];
+            var Semester = $('#formSemester option:selected').text().trim();
 
             var SemesterID = sp[0];
 
@@ -98,6 +96,7 @@
 
                 if(jsonResult!=0){
                     toastr.success('Saved','Success');
+                    loadDataSemesterAntara();
                 } else {
                     toastr.warning('Data Already Axist','Data Exist!');
                 }
@@ -120,8 +119,10 @@
             '                    <thead class="head-center">' +
             '                    <tr>' +
             '                        <th style="width: 1%;">No</th>' +
-            '                        <th style="width: 10%;">YearCode</th>' +
-            '                        <th>Name</th>' +
+            '                        <th style="width: 10%;">Year Code</th>' +
+            '                        <th>Semester Name</th>' +
+            '                        <th style="width: 10%;">Students</th>' +
+            '                        <th style="width: 10%;">Action</th>' +
             '                        <th style="width: 10%;">Status</th>' +
             '                    </tr>' +
             '                    </thead>' +
@@ -138,10 +139,23 @@
                 for(var i=0;i<jsonResult.length;i++){
                     var data = jsonResult[i];
                     var status = (data.Status==1) ? '<span class="label label-success">Publish</span>' : '<span class="label label-danger">Unpublish</span>';
+
+                    var btnAct = '<div class="btn-group">' +
+                        '    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+                        '        <i class="fa fa-edit"></i> <span class="caret"></span>' +
+                        '    </button>' +
+                        '    <ul class="dropdown-menu">' +
+                        '        <li><a href="#">Publish</a></li>' +
+                        '        <li><a href="#">Remove</a></li>' +
+                        '    </ul>' +
+                        '</div>';
+
                     $('#trSmtAntara').append('<tr>' +
                         '<td class="td-center">'+no+'</td>' +
                         '<td class="td-center">'+data.Year+''+data.Code+'</td>' +
                         '<td><a href="javascipt:void(0);" data-id="'+data.ID+'" class="btnDetails">'+data.Name+'</a></td>' +
+                        '<td class="td-center">10</td>' +
+                        '<td class="td-center">'+btnAct+'</td>' +
                         '<td class="td-center">'+status+'</td>' +
                         '</tr>');
                     no += 1;
@@ -162,15 +176,3 @@
     }
 
 </script>
-
-<!--<div class="tabbable tabbable-custom tabbable-full-width">-->
-<!--    <ul class="nav nav-tabs">-->
-<!--        <li class="active"><a href="#tab_mata_kuliah" data-toggle="tab">Kurikulum Semester Antara</a></li>-->
-<!--    </ul>-->
-<!--    <div class="tab-content row">-->
-
-<!--        <div class="tab-pane active" id="tab_mata_kulia">-->
-<!---->
-<!--        </div>-->
-<!--    </div>-->
-<!--</div>-->

@@ -1019,12 +1019,15 @@ class C_api extends CI_Controller {
                 }
             }
             else if($data_arr['action']=='readSemesterAntara'){
-                $data = $this->db
-                    ->select('semester_antara.*')
-                    ->join('db_academic.semester','semester.ID = semester_antara.SemesterID')
-                    ->order_by('semester_antara.Year', 'DESC')
-                    ->get('db_academic.semester_antara')
-                    ->result_array();
+
+                $data = $this->db->query('SELECT * FROM db_academic.semester_antara ORDER BY SemesterID DESC')->result_array();
+
+//                $data = $this->db
+//                    ->select('semester_antara.*')
+//                    ->join('db_academic.semester','semester.ID = semester_antara.SemesterID')
+//                    ->order_by('semester_antara.Year', 'DESC')
+//                    ->get('db_academic.semester_antara')
+//                    ->result_array();
 
                 return print_r(json_encode($data));
             }
@@ -1036,7 +1039,6 @@ class C_api extends CI_Controller {
             }
 
             else if($data_arr['action']=='DataSemester'){
-
 
                 $data = $this->m_api->getSemesterCurriculum($data_arr['SemesterID'],$data_arr['IsSemesterAntara']);
 
@@ -4382,6 +4384,16 @@ class C_api extends CI_Controller {
                 $ExamID = $data_arr['ExamID'];
                 $data = $this->m_api->getExamStudent($ExamID);
                 return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='updateAttendanceExamSAS'){
+                $ID = $data_arr['ID'];
+                $Status = $data_arr['Status'];
+
+                $this->db->set('Status', ''.$Status);
+                $this->db->where('ID', $ID);
+                $this->db->update('db_academic.exam_details');
+
+                return print_r(1);
             }
 
             // ===== Save 2 PDF Exam ======
