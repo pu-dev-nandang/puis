@@ -31,7 +31,7 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		LoadFirstLoad()
-	    
+	    loadingEnd(500);
 	}); // exit document Function
 
 	function LoadFirstLoad()
