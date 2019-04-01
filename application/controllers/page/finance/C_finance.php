@@ -762,7 +762,7 @@ class C_finance extends Finnance_Controler {
 
                 if ($fieldEND == 'bayarEnd' || $fieldEND == 'bayarBPPEnd')
                 {
-                    $getDeadlineTagihanDB = $this->m_finance->getDeadlineTagihanDB($fieldEND,$SemesterID[0]['ID']);
+                    $getDeadlineTagihanDB = $this->m_finance->getDeadlineTagihanDB($fieldEND,$Input[$i]->semester);
                     // check Deadline Tagihan telah melewati tanggal sekarang atau belum
                     if ($this->session->userdata('finance_auth_Policy_SYS') == 1) {
                         $chkTgl = $this->m_master->checkTglNow($getDeadlineTagihanDB);
@@ -879,16 +879,24 @@ class C_finance extends Finnance_Controler {
     {
         $input = $this->getInputToken();
         $this->load->library('pagination');
+        if (!array_key_exists('StatusPayment', $input)) {
+            $input['StatusPayment'] = '';
+        }
+
+        if (!array_key_exists('ChangeStatus', $input)) {
+            $input['ChangeStatus'] = '';
+        }
         // count
-        $count = $this->m_finance->count_get_created_tagihan_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NIM'],$input['Semester']);
-        $config = $this->config_pagination_default_ajax($count,5,3);
+        $count = $this->m_finance->count_get_created_tagihan_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NIM'],$input['Semester'],$input['StatusPayment'],$input['ChangeStatus']);
+        $config = $this->config_pagination_default_ajax($count,15,3);
         $this->pagination->initialize($config);
         $page = $this->uri->segment(3);
         $start = ($page - 1) * $config["per_page"];
-        $data = $this->m_finance->get_created_tagihan_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NIM'],$input['Semester'],$config["per_page"], $start);
+        $data = $this->m_finance->get_created_tagihan_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NIM'],$input['Semester'],$input['StatusPayment'],$input['ChangeStatus'],$config["per_page"], $start);
         $output = array(
         'pagination_link'  => $this->pagination->create_links(),
         'loadtable'   => $data,
+        'totaldata'   => $count,
         );
         echo json_encode($output);
     }
@@ -928,8 +936,23 @@ class C_finance extends Finnance_Controler {
     {
         $Input = $this->getInputToken();
         $Input = $Input['arrValueCHK'];
-        // print_r($Input);die();
         $proses = $this->m_finance->updatePaymentunApprove($Input);
+        echo json_encode($proses);
+    }
+
+    public function unapproved_created_tagihan_mhs_after_confirm()
+    {
+        $Input = $this->getInputToken();
+        $Input = $Input['arrValueCHK'];
+        $proses = $this->m_finance->updatePaymentunApprove_after_confirm($Input);
+        echo json_encode($proses);
+    }
+
+    public function assign_to_change_status_mhs()
+    {
+        $Input = $this->getInputToken();
+        $Input = $Input['arrValueCHK'];
+        $proses = $this->m_finance->assign_to_change_status_mhs($Input);
         echo json_encode($proses);
     }
 
@@ -1709,11 +1732,42 @@ class C_finance extends Finnance_Controler {
                     'Status' => 0,
                     'BilingID' => 0,
                     'UpdateAt' => date('Y-m-d H:i:s'),
+                    'DatePayment' => null,
                             );
             $this->db->where('ID',$IDStudent);
             $this->db->where('Status',1);
             $this->db->update('db_finance.payment_students', $dataSave);
         }
+
+        // cek lunas atau tidak
+            $GetDataPaymentSt = $this->m_master->caribasedprimary('db_finance.payment_students','ID',$IDStudent);
+            $ID_payment = $GetDataPaymentSt[0]['ID_payment'];
+            $GetDataPaymentSt = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$ID_payment);
+            $total = 0;
+            for ($i=0; $i < count($GetDataPaymentSt); $i++) { 
+                if ($GetDataPaymentSt[$i]['Status'] == 1) {
+                    $total = (int)$total + (int)$GetDataPaymentSt[$i]['Invoice'];
+                }
+            }
+
+            // print_r($total);die();
+            $GetDataPayment = $this->m_master->caribasedprimary('db_finance.payment','ID',$ID_payment);
+
+            // check ToChange
+                $ToChange = ($GetDataPayment[0]['ToChange'] == 1) ? 2 : 0; 
+
+            $Invoice = $GetDataPayment[0]['Invoice'];
+            if ($total >= $Invoice) {
+                $dataSave = array(
+                        'Status' =>"1",
+                        // 'ToChange' => 0,
+                        'ToChange' => $ToChange,
+                        'UpdateAt' => date('Y-m-d H:i:s'),
+                        'UpdatedBy' => $this->session->userdata('NIP'),
+                                );
+                $this->db->where('ID',$ID_payment);
+                $this->db->update('db_finance.payment', $dataSave);
+            }
         
     }
 
@@ -1734,12 +1788,9 @@ class C_finance extends Finnance_Controler {
           'RevAt' => date('Y-m-d H:i:s'),
       );
       $this->db->insert('db_finance.register_admisi_rev', $dataSave);
-
-
       $this->m_admission->set_tuition_fee_delete_data($input);
 
       // save di register_admisi_rev
-
 
       // send email to admission
       $getEmailDB = $this->m_master->caribasedprimary('db_admission.email_to','Function','Admisi');
@@ -2322,6 +2373,50 @@ class C_finance extends Finnance_Controler {
                 }
         }
             
+    }
+
+    public function verify_bukti_bayar()
+    {
+        $input = $this->getInputToken();
+        $ID = $input['idtable'];
+        $G_data = $this->m_master->caribasedprimary('db_finance.payment_proof','ID',$ID);
+        $FileUpload = (array) json_decode($G_data[0]['FileUpload'],true);
+        for ($i=0; $i < count($FileUpload); $i++) {
+             $FileUpload[$i]['VerifyFinance'] = 1; 
+        }
+
+        $dataSave = array(
+            'VerifyFinance' => 1,
+            'FileUpload' => json_encode($FileUpload),
+            'VerifyBy' => $this->session->userdata('NIP'),
+        );
+
+        $this->db->where('ID',$ID);
+        $this->db->update('db_finance.payment_proof',$dataSave);
+        echo json_encode('');
+    }
+
+    public function reject_bukti_bayar()
+    {
+        $input = $this->getInputToken();
+        $ID = $input['idtable'];
+        $ReasonCancel = $input['ReasonCancel'];
+        $G_data = $this->m_master->caribasedprimary('db_finance.payment_proof','ID',$ID);
+        $FileUpload = (array) json_decode($G_data[0]['FileUpload'],true);
+        for ($i=0; $i < count($FileUpload); $i++) {
+             $FileUpload[$i]['VerifyFinance'] = 2; 
+        }
+
+        $dataSave = array(
+            'VerifyFinance' => 2,
+            'ReasonCancel' => $ReasonCancel,
+            'FileUpload' => json_encode($FileUpload),
+            'VerifyBy' => $this->session->userdata('NIP'),
+        );
+
+        $this->db->where('ID',$ID);
+        $this->db->update('db_finance.payment_proof',$dataSave);
+        echo json_encode('');
     }
 
 }

@@ -30,6 +30,14 @@ class C_study_planning extends Academic_Controler {
         $this->menu_studyplan($page);
     }
 
+    public function outstanding()
+    {
+        $department = parent::__getDepartement();
+        $data[''] = '';
+        $page = $this->load->view('page/'.$department.'/studyplanning/outstanding',$data,true);
+        $this->menu_studyplan($page);
+    }
+
     public function course_offer($SemesterID,$ProdiGroupID,$NPM){
         $department = parent::__getDepartement();
         $data['NPM'] = $NPM;
@@ -37,7 +45,15 @@ class C_study_planning extends Academic_Controler {
         $data['ProdiGroupID'] = $ProdiGroupID;
         $page = $this->load->view('page/'.$department.'/studyplanning/course_offer',$data,true);
         $this->menu_studyplan($page);
+    }
 
+    public function batal_tambah($SemesterID,$ProdiGroupID,$NPM){
+        $department = parent::__getDepartement();
+        $data['NPM'] = $NPM;
+        $data['SemesterID'] = $SemesterID;
+        $data['ProdiGroupID'] = $ProdiGroupID;
+        $page = $this->load->view('page/'.$department.'/studyplanning/batal_tambah',$data,true);
+        $this->menu_studyplan($page);
     }
 
     public function index()

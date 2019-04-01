@@ -37,6 +37,8 @@
 <!-- Check Box -->
 <link rel="stylesheet" href="<?php echo base_url('assets/checkbox/checkbox.css'); ?>">
 
+<link rel="stylesheet" href="<?php echo base_url('assets/summernote/summernote.css'); ?>">
+
 <style media="screen">
 
     .project-switcher {
@@ -118,7 +120,7 @@
     /* Add by Adhi 20180702 */
     .btn-convert { background-color: hsl(145, 62%, 68%) !important;
         background-repeat: repeat-x; filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#cdf3dd", endColorstr="#7adfa4");
-        background-image: -khtml-gradient(linear, left top, left bottom, from(#cdf3dd), to(#7adfa4));
+        /*background-image: -khtml-gradient(linear, left top, left bottom, from(#cdf3dd), to(#7adfa4));*/
         background-image: -moz-linear-gradient(top, #cdf3dd, #7adfa4); background-image: -ms-linear-gradient(top, #cdf3dd, #7adfa4); background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #cdf3dd), color-stop(100%, #7adfa4)); background-image: -webkit-linear-gradient(top, #cdf3dd, #7adfa4); background-image: -o-linear-gradient(top, #cdf3dd, #7adfa4); background-image: linear-gradient(#cdf3dd, #7adfa4); border-color: #7adfa4 #7adfa4 hsl(145, 62%, 63%); color: #333 !important; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.33); -webkit-font-smoothing: antialiased; }
 
 
@@ -242,6 +244,9 @@
 <script type="text/javascript" src="<?php echo base_url('assets/template/'); ?>plugins/datatables/DT_bootstrap.js"></script>
 <!--<script type="text/javascript" src="--><?php //echo base_url('assets/template/'); ?><!--plugins/datatables/dataTables.rowReorder.js"></script>-->
 
+<!-- Plugin DataTbales -->
+<script type="text/javascript" src="<?php echo base_url('assets/datatables/dataTables.rowsGroup.js'); ?>"></script>
+
 <!-- Forms -->
 <script type="text/javascript" src="<?php echo base_url('assets/template/'); ?>plugins/uniform/jquery.uniform.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url('assets/template/'); ?>plugins/select2/select2.min.js"></script>
@@ -297,6 +302,8 @@
 <!-- BootBox -->
 <script type="text/javascript" src="<?php echo base_url('assets/'); ?>bootbox/bootbox.min.js"></script>
 
+<script type="text/javascript" src="<?php echo base_url('assets/summernote/summernote.js'); ?>"></script>
+
 <!-- Socket js -->
 <script type="text/javascript" src="<?php echo base_url('node_modules/socket.io/node_modules/socket.io-client/socket.io.js');?>"></script>
 <!-- Custom -->
@@ -321,6 +328,8 @@
 
     window.daysEng = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
     window.daysInd = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+
+    window.DummyEmail = 'nandang.mulyadi@podomorouniversity.ac.id';
 
     window.timeOption = {
         format : 'hh:ii',
@@ -796,9 +805,8 @@
     }
 
 
-    function loadSelectOptionClassGroupAttendance(SemesterID,element,selected) {
+    function loadSelectOptionClassGroupAttendance(SemesterID,element,selected,showColom='') {
 
-        // var url = base_url_js+'academic/kurikulum/getClassGroup';
         var url = base_url_js+'api/__crudSchedule';
         var token = jwt_encode({action:'getClassGroup',SemesterID:SemesterID},'UAP)(*');
 
@@ -808,7 +816,11 @@
 
                 var d = jsonResult[i];
 
-                $(element).append('<option value="'+d.ScheduleID+'.'+d.ClassGroup+'">'+d.ClassGroup+' - '+d.Name+'</option>');
+                var textV = (typeof showColom !== 'undefined' && showColom!='')
+                    ? d[''+showColom]
+                    : d.Name;
+
+                $(element).append('<option value="'+d.ScheduleID+'.'+d.ClassGroup+'">'+d.ClassGroup+' - '+textV+'</option>');
             }
 
         });
@@ -1429,6 +1441,49 @@
                 $(element).append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'" '+selected+'>'+data_json[i].NameEng+'</option>');
             }
         });
-    }  
+    }
+
+    function getCustomtoFixed(dataValue,digit) {
+        var exTitik = dataValue.toFixed(4).toString().split('.');
+        var exKoma = dataValue.toFixed(4).toString().split(',');
+
+        var s = 0;
+        var s2 = 0;
+        var after = 0;
+
+        var result = dataValue;
+        if(exTitik.length>1){
+            s = exTitik[1].substr(digit,1);
+            s2 = exTitik[1].substr(0,digit);
+            after = (parseInt(s)<5) ? parseInt(s2) : parseInt(s2) + 1;
+            result = exTitik[0]+'.'+after;
+
+
+        } else if(exKoma.length>1){
+            s = exKoma[1].substr(digit,1);
+            s2 = exKoma[1].substr(0,digit);
+            after = (parseInt(s)<5) ? parseInt(s2) : parseInt(s2) + 1;
+            result = exKoma[0]+'.'+after;
+        }
+
+
+        return parseFloat(result);
+    }
+
+
+    function setMenuSelected(classHeader,findTag,classActiveName,ArrayMenu,MenuActive) {
+
+        // ----
+        // classHeader = parent classnya (biasanya : .nav-tabs)
+        // findTag = tag yang akan di masukan class activenya (biasanya : li)
+        // classActiveName = nama class yang active (biasanya : active)
+        // ArrayMenu = nama menu2 yang ada (sesuai URI)
+        // MenuActive = nama menu yang active
+        // ----
+
+        var indexAct = $.inArray(MenuActive,ArrayMenu);
+        var elmChild = $(classHeader).children(findTag)[indexAct];
+        $(classHeader).find(elmChild).addClass(classActiveName);
+    }
 
 </script>

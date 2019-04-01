@@ -9,6 +9,7 @@
         overflow-y: auto;
     }
 </style>
+
     <form class="form-horizontal" id="formModal">
         <div class="form-group">
             <div class="row">

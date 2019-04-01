@@ -104,7 +104,10 @@
       $("#FormulirCode").keyup(function(){
         if( this.value.length < 5 && this.value.length != 0 ) return;
            /* code to run below */
-         loadPage(pageHtml+'/1'); 
+         // loadPage(pageHtml+'/1'); 
+         var ee = $('#panel_web').find('li[class="active"]');
+         var page = ee.find('a').attr('data-page');
+         loadPage(page)
       })
     }
 
@@ -285,75 +288,48 @@
                    var token2 = jwt_encode(data2,"UAP)(*");
                    $.post(url2,{token:token2},function (json) {
                         console.log(Grade);
-
                         var json2 = JSON.parse(json);
-                        // console.log(json2);
                         var bagi = 12 / json2.length;
                         var bagi = parseInt(bagi);
-                        // var sisa = 12 % json2.length;
-                        // if (sisa > 0) {
-                        //     bagi++;
-                        // }
-
                         var divNilai = '<div class = "row" style = "margin-top:10px;margin-left:0px;margin-right:0px">'+
                                             '<div class = "col-md-12">'+
                                                 '<h4>Nilai</h4>'+
                                                 '<div class = "row">';
                         var l = 0;
-                        var jml_bobot = 0;
-                        var Nilai_bobot = 0;
-                        var Indeks_Nilai = '';
+                        var jml_total = 0;
                         for (var i = 0; i < json2.length; i++) {
                                 // divNilai += '<li>'+json2[i]['NamaUjian']+ ' : '+json2[i]['Value']+'</li>';
                                 if (l > 12) {
                                     var ascdee = parseInt(l) - 12;
                                     divNilai += '<div class = "col-xs-'+ascdee+'">'+
-                                        '<label>'+json2[i]['NamaUjian']+'('+json2[i]['Bobot']+')'+ ' : '+json2[i]['Value']+'</label>'+
+                                        '<label>'+json2[i]['NmMtPel']+' : '+json2[i]['Value']+'</label>'+
                                         '</div>';
                                 }
                                 else
                                 {
                                     divNilai += '<div class = "col-xs-'+bagi+'">'+
-                                        '<label>'+json2[i]['NamaUjian']+'('+json2[i]['Bobot']+')'+ ' : '+json2[i]['Value']+'</label>'+
+                                        '<label>'+json2[i]['NmMtPel']+ ' : '+json2[i]['Value']+'</label>'+
                                         '</div>';
                                     l = parseInt(l) + parseInt(bagi);    
                                 }
 
                             l++; 
                             // get total
-                            jml_bobot = jml_bobot + parseInt(json2[i]['Bobot']);
-                            Nilai_bobot = Nilai_bobot + ( parseInt( json2[i]['Value'] )   *  parseInt( json2[i]['Bobot'] ) )
+                            jml_total = jml_total + parseInt(json2[i]['Value']);
                         }
-
-                        // find grade
-                            var nilai = Nilai_bobot / jml_bobot;
-                            nilai = nilai.toFixed(2);
-                            var Description = '';
-                            for (var k = 0; k < Grade.length; k++) {
-                                if (nilai >= Grade[k]['StartRange'] && nilai <= Grade[k]['EndRange'] ) {
-                                    Indeks_Nilai = Grade[k]['Grade'];
-                                    Description = Grade[k]['Description'];
-                                    break;
-                                }
-                            }
-
                         divNilai += '</div></div></div>';
 
+                        var rata_rata = jml_total / json2.length;
+                        rata_rata = parseFloat(rata_rata).toFixed(2);
                         divNilai += '<div class = "row" style = "margin-top:10px;margin-left:0px;margin-right:0px">'+
                                         '<div class = "col-md-12">'+
-                                            '<h4>Grade & Score</h4>'+
+                                            '<h4>Average</h4>'+
                                             '<div class = "row">'+
                                                 '<div class = "col-xs-2">'+
-                                                    '<label>Jumlah Bobot : '+jml_bobot+'</label>'+
+                                                    '<label>Jumlah Bobot : '+jml_total+'</label>'+
                                                 '</div>'+
                                                 '<div class = "col-xs-2">'+
-                                                    '<label>Nilai Bobot : '+Nilai_bobot+'</label>'+
-                                                '</div>'+
-                                                '<div class = "col-xs-2">'+
-                                                    '<label>Score & Grade : '+nilai+' & '+Indeks_Nilai+'</label>'+
-                                                '</div>'+
-                                                '<div class = "col-xs-2">'+
-                                                    '<label>Desc : '+Description+'</label>'+
+                                                    '<label>Rata-Rata : '+rata_rata+'</label>'+
                                                 '</div>'+
                                             '</div>'+
                                         '</div></div>';    

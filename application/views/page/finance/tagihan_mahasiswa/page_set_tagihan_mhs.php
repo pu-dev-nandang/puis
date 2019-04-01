@@ -108,6 +108,10 @@
                       if (dt.Status == 1) {
                         act = dt.ID;
                         $(element).append('<option value="'+dt.ID+'.'+dt.Name+'" '+sc+'>'+dt.Name+'</option>');
+                        // get last semester - 1
+                        var last = i + 1;
+                        var dtl = jsonResult[last];
+                         $(element).append('<option value="'+dtl.ID+'.'+dtl.Name+'" '+''+'>'+dtl.Name+'</option>');
                         break;
                       }
                       else
@@ -115,13 +119,6 @@
                         $(element).append('<option value="'+dt.ID+'.'+dt.Name+'" '+sc+'>'+dt.Name+'</option>');
                       }
                     }
-
-                   // for(var i=0;i<jsonResult.length;i++){
-                   //     var dt = jsonResult[i];
-                   //     var sc = (selected==dt.Status) ? 'selected' : '';
-                   //     // var v = (option=="Name") ? dt.Name : dt.ID;
-                   //     $(element).append('<option value="'+dt.ID+'.'+dt.Name+'" '+sc+'>'+dt.Name+'</option>');
-                   // }
                }
                
             });
@@ -157,7 +154,6 @@
 
     $(document).on('keypress','#NIM', function (event)
     {
-
         if (event.keyCode == 10 || event.keyCode == 13) {
           loadData(1);
         }
@@ -184,6 +180,7 @@
             var url1 = base_url_js+'api/__cek_deadlineBPPSKS';
             var data1 = {
                 fieldCek : fieldCek,
+                Semester : Semester,
             };
 
             var token1 = jwt_encode(data1,'UAP)(*');
@@ -228,27 +225,20 @@
 
                         var selecTOption = '<select class="selecTOption getDom" id="'+'discount_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" payment-type = "'+PTID+'" invoice = "'+Data_mhs[i]['Cost']+'">';
 
-                       var value_cost = Data_mhs[i]['Cost'] - ((Bea_BPP/100)*Data_mhs[i]['Cost']);
+                       var value_cost = Data_mhs[i]['Cost'] - ((Data_mhs[i]['Discount']/100)*Data_mhs[i]['Cost']);
                        var yy = (value_cost != '') ? formatRupiah(value_cost) : '-';
                        
                        if(PTID == 3)
                        {
                          var t = parseInt(Data_mhs[i]['Cost']) * parseInt(Data_mhs[i]['Credit']);
-                         var value_cost = t - ((Bea_Credit/100)*t);
+                         var value_cost = t - ((Data_mhs[i]['Discount']/100)*t);
                          yy = (value_cost != '') ? formatRupiah(value_cost) : '-';
                          selecTOption = '<select class="selecTOption getDom" id="'+'discount_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" payment-type = "'+PTID+'" invoice = "'+t+'">';
                        } 
                             for (var k = 0;k < xx['Discount'].length; k++)
                             {
                                 var O_discount = xx['Discount'];
-                                if(PTID == 2)
-                                {
-                                  var selected = (O_discount[k]['Discount'] == Bea_BPP) ? 'selected' : '';
-                                }
-                                else if(PTID == 3)
-                                {
-                                  var selected = (O_discount[k]['Discount'] == Bea_Credit) ? 'selected' : '';
-                                }
+                                var selected = (O_discount[k]['Discount'] == Data_mhs[i]['Discount']) ? 'selected' : '';
                                 selecTOption += '<option value="'+xx['Discount'][k]['Discount']+'" '+selected+'>'+xx['Discount'][k]['Discount']+'%'+'</option>';
                             }
                         selecTOption += '</select>';
@@ -267,14 +257,14 @@
                         var IPK = 0;
                         var IPS = 0;
                         try {
-                            IPK = Data_mhs[i]['IPK'].toFixed(2);
+                            IPK = getCustomtoFixed(Data_mhs[i]['IPK'],2);
                         }
                         catch(err) {
                             var IPK = 0;
                         }
 
                         try {
-                            IPS = Data_mhs[i]['IPS'].toFixed(2);
+                            IPS = getCustomtoFixed(Data_mhs[i]['IPS'],2);
                         }
                         catch(err) {
                             var IPS = 0;

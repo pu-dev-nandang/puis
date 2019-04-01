@@ -73,7 +73,7 @@
 
 
             <li class="departement <?php if($departement=='lpmi'){echo 'current';} ?>"
-                division="5"
+                division="3"
                 data-dpt="lpmi">
                 <a href="javascript:void(0);">
                     <span class="image"><img src="<?php echo base_url('assets/icon/lpmi.png'); ?>"></span>
@@ -103,6 +103,38 @@
                 <a href="javascript:void(0);">
                     <span class="image"><img src="<?php echo base_url('assets/icon/admin.png'); ?>"></span>
                     <span class="title">Prodi</span>
+                </a>
+            </li>
+            <li class="departement <?php if($departement=='rektorat'){echo 'current';} ?>"
+                division="2"
+                data-dpt="rektorat">
+                <a href="javascript:void(0);">
+                    <span class="image"><img src="<?php echo base_url('assets/icon/rector.png'); ?>"></span>
+                    <span class="title">Rektorat</span>
+                </a>
+            </li>
+            <li class="departement <?php if($departement=='library'){echo 'current';} ?>"
+                division="11"
+                data-dpt="library">
+                <a href="javascript:void(0);">
+                    <span class="image"><img src="<?php echo base_url('assets/icon/rector.png'); ?>"></span>
+                    <span class="title">Library</span>
+                </a>
+            </li>
+            <li class="departement <?php if($departement=='admin-fakultas'){echo 'current';} ?>"
+                division="34"
+                data-dpt="admin-fakultas">
+                <a href="javascript:void(0);">
+                    <span class="image"><img src="<?php echo base_url('assets/icon/admin.png'); ?>"></span>
+                    <span class="title">Faculty</span>
+                </a>
+            </li>
+            <li class="departement <?php if($departement=='other-division'){echo 'current';} ?>"
+                division="36"
+                data-dpt="other-division">
+                <a href="javascript:void(0);">
+                    <span class="image"><img src="<?php echo base_url('assets/icon/rector.png'); ?>"></span>
+                    <span class="title">Other</span>
                 </a>
             </li>
         </ul>

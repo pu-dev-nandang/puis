@@ -22,15 +22,21 @@
                 <td style="width: 1%;">:</td>
                 <td style="text-align: left;">
                     <div class="row">
-                        <div class="col-xs-3">
+                        <div class="col-xs-7">
                             <label class="radio-inline">
                                 <input type="radio" name="formExam" id="formUTS" value="uts" class="formExam form-exam" checked> UTS
                             </label>
                             <label class="radio-inline">
                                 <input type="radio" name="formExam" id="formUAS" value="uas" class="formExam form-exam"> UAS
                             </label>
+                            <label class="radio-inline" style="color: orangered;">
+                                <input type="radio" name="formExam" id="formReUTS" value="re_uts" class="formExam form-exam"> UTS (make-up exams)
+                            </label>
+                            <label class="radio-inline" style="color: orangered;">
+                                <input type="radio" name="formExam" id="formReUAS" value="re_uas" class="formExam form-exam"> UAS (make-up exams)
+                            </label>
                         </div>
-                        <div class="col-xs-6">
+                        <div class="col-xs-5">
                             <input type="text" id="formDate" readonly class="form-control form-exam form-datetime">
                             <input id="formInputDate" class="hide" hidden readonly>
                             <input id="formDayID" type="hidden" class="hide" hidden readonly>
@@ -307,20 +313,54 @@
                 if(Arr_formStudent.length>0){
                     for(var q=0;q<Arr_AllStudent.length;q++){
                         var d = Arr_AllStudent[q];
-                        if(d.IDEd == '' || d.IDEd == null){
 
-                            if($.inArray(d.NPM,Arr_formStudent)!=-1){
-                                var Name = (d.Name!='' && d.Name!=null) ? ucwords(d.Name) : '';
-                                var arr_s = {
-                                    ScheduleID : formCourse,
-                                    MhswID : d.MhswID,
-                                    NPM : d.NPM,
-                                    Name : Name,
-                                    DB_Students : d.DB_Students
-                                };
-                                insert_details.push(arr_s);
+                        if(Type=='uts' || Type=='uas'){
+                            if(d.IDEd == '' || d.IDEd == null){
+
+                                if($.inArray(d.NPM,Arr_formStudent)!=-1){
+                                    var Name = (d.Name!='' && d.Name!=null) ? ucwords(d.Name) : '';
+                                    var arr_s = {
+                                        ScheduleID : formCourse,
+                                        MhswID : d.MhswID,
+                                        NPM : d.NPM,
+                                        Name : Name,
+                                        DB_Students : d.DB_Students
+                                    };
+                                    insert_details.push(arr_s);
+                                }
                             }
                         }
+                        // Kelas Pengganti
+                        else {
+                            if(d.IDEd == '' || d.IDEd == null){
+
+                                if($.inArray(d.NPM,Arr_formStudent)!=-1){
+                                    var Name = (d.Name!='' && d.Name!=null) ? ucwords(d.Name) : '';
+                                    var arr_s = {
+                                        ScheduleID : formCourse,
+                                        MhswID : d.MhswID,
+                                        NPM : d.NPM,
+                                        Name : Name,
+                                        DB_Students : d.DB_Students
+                                    };
+                                    insert_details.push(arr_s);
+                                }
+                            } else if(d.Status == '-1' || d.Status == -1){
+                                if($.inArray(d.NPM,Arr_formStudent)!=-1){
+                                    var Name = (d.Name!='' && d.Name!=null) ? ucwords(d.Name) : '';
+                                    var arr_s = {
+                                        ScheduleID : formCourse,
+                                        MhswID : d.MhswID,
+                                        NPM : d.NPM,
+                                        Name : Name,
+                                        DB_Students : d.DB_Students
+                                    };
+                                    insert_details.push(arr_s);
+                                }
+                            }
+
+                        }
+
 
                     }
                 }
@@ -638,6 +678,19 @@
         $('#dataTotalStudent').html(0);
         $('#OfDataTotalStudent').html(0);
         $('#btnEditExamStudents').attr('data-classgroup','');
+
+        $('#formCourse').select2("val", null);
+        if(notr>0){
+            for(var i=1;i<=notr;i++){
+                $('#formCourse'+i).select2("val", null);
+                $('#formStudent'+i).val('');
+                $('#AllStudent'+i).val('');
+
+                $('#dataTotalStudent'+i).html(0);
+                $('#OfDataTotalStudent'+i).html(0);
+            }
+        }
+
         dateInputJadwal();
     });
 
@@ -661,25 +714,47 @@
                 var arr_NPM_draf = [];
                 var std = jsonResult.StudentsDetails;
 
-                // Cek jika apakah sudah di setting jadwal group ini
-                if(jsonResult.Exam.length>0){
+                if(ExamType=='uts' || ExamType=='uas'){
+                    // Cek jika apakah sudah di setting jadwal group ini
+                    if(jsonResult.Exam.length>0){
+                        if(std.length>0){
+                            for(var s=0;s<std.length;s++){
+                                if(std[s].IDEd!='' && std[s].IDEd!=null){
+
+                                } else {
+                                    arr_NPM_draf.push(std[s].NPM);
+                                }
+                            }
+                        }
+                    } else {
+                        if(std.length>0){
+
+                            for(var s=0;s<std.length;s++){
+                                arr_NPM_draf.push(std[s].NPM);
+                            }
+                        }
+                    }
+                }
+                // Ujian Susulan
+                else {
                     if(std.length>0){
                         for(var s=0;s<std.length;s++){
                             if(std[s].IDEd!='' && std[s].IDEd!=null){
-
+                                if(std[s].Status==-1 || std[s].Status=='-1'){
+                                    arr_NPM_draf.push(std[s].NPM);
+                                }
                             } else {
                                 arr_NPM_draf.push(std[s].NPM);
                             }
                         }
                     }
-                } else {
-                    if(std.length>0){
-
-                        for(var s=0;s<std.length;s++){
-                            arr_NPM_draf.push(std[s].NPM);
-                        }
-                    }
                 }
+
+                arr_NPM_draf.sort();
+
+
+
+                // console.log(arr_NPM_draf);
 
                 $('#formStudent'+tr_no).val(JSON.stringify(arr_NPM_draf));
                 $('#AllStudent'+tr_no).val(JSON.stringify(std));
@@ -710,6 +785,8 @@
         var Classgroup = $(this).attr('data-classgroup');
         var Student_In_Draf = $('#formStudent'+no_tr).val();
         var AllStudent = $('#AllStudent'+no_tr).val();
+
+        var ExamType = $('input[type=radio][name=formExam]:checked').val();
 
 
         if(Student_In_Draf!='' && Student_In_Draf!=null && AllStudent!='' && AllStudent!=null){
@@ -750,6 +827,9 @@
             var totalDisabled = 0;
             var totalCk = 0;
             if(Arr_AllStudent.length>0){
+
+                sortByKeyAsc(Arr_AllStudent,'NPM');
+
                 var no = 1;
                 for(var i=0;i<Arr_AllStudent.length;i++){
                     var d = Arr_AllStudent[i];
@@ -759,10 +839,19 @@
                         totalCk = totalCk+1;
                     }
 
-                    if(d.IDEd!='' && d.IDEd!=null){
-                        ck = '<i class="fa fa-check-circle" style="color: green;"></i>';
-                        totalDisabled = totalDisabled+1;
+                    if(ExamType=='uts' || ExamType=='uas'){
+                        if(d.IDEd!='' && d.IDEd!=null){
+                            ck = '<i class="fa fa-check-circle" style="color: green;"></i>';
+                            totalDisabled = totalDisabled+1;
+                        }
                     }
+                    else {
+                        if(d.Status!=-1 && d.Status!='-1'){
+                            ck = '<i class="fa fa-check-circle" style="color: green;"></i>';
+                            totalDisabled = totalDisabled+1;
+                        }
+                    }
+
 
                     $('#rwStdExam').append('<tr>' +
                         '<td>'+ck+'</td>' +
@@ -838,39 +927,59 @@
 
     function dateInputJadwal() {
         var dataForm = $('input[name=formExam]:checked').val();
-        var formSemesterID = $('#formSemesterID').val();;
-        var url = base_url_js+'api/__crudJadwalUjian';
-        var token = jwt_encode({action:'checkDateExam',SemesterID : formSemesterID},'UAP)(*');
-
         $( "#formDate" ).val('');
         $( "#formDate" ).datepicker( "destroy" );
 
-        $.post(url,{token:token},function (jsonResult) {
+        if(dataForm=='uts' || dataForm=='uas'){
+            var formSemesterID = $('#formSemesterID').val();;
+            var url = base_url_js+'api/__crudJadwalUjian';
+            var token = jwt_encode({action:'checkDateExam4Input',SemesterID : formSemesterID, Type:dataForm},'UAP)(*');
 
-            var dateStart = jsonResult.utsStart;
-            var dateEnd = jsonResult.utsEnd;
 
-            if(dataForm=='uas'){
-                dateStart = jsonResult.uasStart;
-                dateEnd = jsonResult.uasEnd;
-            }
 
-            var splitStart = dateStart.split('-');
-            var C_dateStart_Y = splitStart[0].trim();
-            var C_dateStart_M = parseInt(splitStart[1].trim())-1;
-            var C_dateStart_D = splitStart[2].trim();
+            $.post(url,{token:token},function (jsonResult) {
 
-            var splitEnd = dateEnd.split('-');
-            var C_dateEnd_Y = splitEnd[0].trim();
-            var C_dateEnd_M = parseInt(splitEnd[1].trim())-1;
-            var C_dateEnd_D = splitEnd[2].trim();
+                var dateStart = jsonResult.utsStart;
+                var dateEnd = jsonResult.utsEnd;
 
+                if(dataForm=='uas'){
+                    dateStart = jsonResult.uasStart;
+                    dateEnd = jsonResult.uasEnd;
+                }
+
+                var splitStart = dateStart.split('-');
+                var C_dateStart_Y = splitStart[0].trim();
+                var C_dateStart_M = parseInt(splitStart[1].trim())-1;
+                var C_dateStart_D = splitStart[2].trim();
+
+                var splitEnd = dateEnd.split('-');
+                var C_dateEnd_Y = splitEnd[0].trim();
+                var C_dateEnd_M = parseInt(splitEnd[1].trim())-1;
+                var C_dateEnd_D = splitEnd[2].trim();
+
+                $('#formDate').datepicker({
+                    showOtherMonths:true,
+                    autoSize: true,
+                    dateFormat: 'dd MM yy',
+                    minDate : new Date(C_dateStart_Y,C_dateStart_M,C_dateStart_D),
+                    maxDate : new Date(C_dateEnd_Y,C_dateEnd_M,C_dateEnd_D),
+                    onSelect : function () {
+                        var data_date = $(this).val().split(' ');
+                        var momentDate = moment(data_date[2]+'-'+(parseInt(convertDateMMtomm(data_date[1])) + 1)+'-'+data_date[0]);
+                        var CustomMoment = momentDate.day();
+                        var day = (CustomMoment==0) ? 7 : CustomMoment;
+                        $('#formDayID').val(day);
+                        $('#formInputDate').val(momentDate.format('YYYY-MM-DD'));
+                    }
+                });
+            });
+        }
+        else {
             $('#formDate').datepicker({
                 showOtherMonths:true,
                 autoSize: true,
                 dateFormat: 'dd MM yy',
-                minDate : new Date(C_dateStart_Y,C_dateStart_M,C_dateStart_D),
-                maxDate : new Date(C_dateEnd_Y,C_dateEnd_M,C_dateEnd_D),
+                minDate : new Date(),
                 onSelect : function () {
                     var data_date = $(this).val().split(' ');
                     var momentDate = moment(data_date[2]+'-'+(parseInt(convertDateMMtomm(data_date[1])) + 1)+'-'+data_date[0]);
@@ -880,7 +989,9 @@
                     $('#formInputDate').val(momentDate.format('YYYY-MM-DD'));
                 }
             });
-        });
+        }
+
+
     }
 
     function getDataCourse(element,notr) {
@@ -937,6 +1048,13 @@
         $('#formTotalStudent').val(JSON.stringify(data_npm_to_exam));
         $('#viewTotalStudent').html(data_npm_to_exam.length);
 
+    }
+
+    function sortByKeyAsc(array, key) {
+        return array.sort(function (a, b) {
+            var x = a[key]; var y = b[key];
+            return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+        });
     }
 
 </script>

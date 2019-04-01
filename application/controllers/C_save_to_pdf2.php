@@ -518,6 +518,4 @@ class C_save_to_pdf2 extends CI_Controller {
         $this->mypdf->Output($filename,'I');
     }
 
-
-
 }

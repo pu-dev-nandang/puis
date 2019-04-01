@@ -1,8 +1,17 @@
 
+<?php
+
+    $arr_menu = ['list-student','course-offer','batal-tambah'];
+
+?>
+
 <div class="tabbable tabbable-custom tabbable-full-width">
     <ul class="nav nav-tabs">
-        <li class="<?php if($this->uri->segment(3)=='list-student' || $this->uri->segment(3)=='course-offe') { echo 'active'; } ?>">
+        <li class="<?php if(in_array($this->uri->segment(3),$arr_menu)) { echo 'active'; } ?>">
             <a href="<?php echo base_url('academic/study-planning/list-student'); ?>">List Student</a>
+        </li>
+        <li class="<?php if($this->uri->segment(3) == 'outstanding') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('academic/study-planning/outstanding'); ?>">Monitoring Outstanding Payment</a>
         </li>
     </ul>
     <div style="border-top: 1px solid #cccccc">

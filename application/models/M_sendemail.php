@@ -150,7 +150,7 @@ class M_sendemail extends CI_Model {
                             <div style="font-family:Proxima Nova Reg,Helvetica,sans-serif">
                             <div style="max-width:600px;margin:30px 0;display:block;font-size:14px;text-align:left!important">
                             '.$text.'
-                            <br><br>Best Regard, <br> IT Podomoro University (it@podomorouniversity.ac.id)
+                            <br><br>Best Regard, <br> IT Podomoro University
                             <br><br><br>
                             <p style="color:#EB6936;"><i>*) Do not reply, this email is sent automatically</i> </p>
                             </div>
@@ -186,7 +186,7 @@ class M_sendemail extends CI_Model {
         $BilingID = mt_rand();// unique number
         $this->load->library('email', $config_email['setting']);
         $this->email->set_newline("\r\n");
-        $this->email->from('it@podomorouniversity.ac.id','IT Podomoro University');
+        $this->email->from('pu@podomorouniversity.ac.id','PU Notifications');
         $this->email->to($to);
         $this->email->subject($subject.' - '.$BilingID);
         $this->email->message($this->VariableClass['text']);
@@ -335,7 +335,7 @@ class M_sendemail extends CI_Model {
         // $mail->Port = $this->VariableClass['smtp_port'];    
         // $mail->IsHTML(false);
 
-        $mail->setFrom('ithelpdesk.notif@podomorouniversity.ac.id', 'IT Podomoro University');
+        $mail->setFrom('ithelpdesk.notif@podomorouniversity.ac.id', 'PU Notifications');
         // $mail->addReplyTo('alhadi.rahman@podomorouniversity.ac.id', 'IT');
         $to = explode(',', $to);
         // print_r($to);die(); 

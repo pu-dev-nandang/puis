@@ -81,7 +81,7 @@ function loadSelectOptionSemesterByload(element,selected) {
                $(element).append('<option value="'+dt.ID+'.'+dt.Name+'" '+sc+'>'+dt.Name+'</option>');
            }
        }
-       loadSelectOptionStatusStudent('#filterStatus','');
+       loadSelectOptionStatusStudent('#filterStatus','','');
     });
 
 }

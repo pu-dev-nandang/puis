@@ -196,6 +196,15 @@
     </tr>
 
     <tr>
+        <td>Maximum Input & Approval Modify Attendance</td>
+        <td>
+            <input type="text" id="ModifyAttendance" nextelement="" name="regular" class="form-control form-tahun-akademik">
+        </td>
+        <td></td>
+        <td></td>
+    </tr>
+
+    <tr>
         <td>Edom</td>
         <td>
             <input type="text" id="edom_start" nextelement="edom_end" name="regular" class="form-control form-tahun-akademik">
@@ -218,7 +227,7 @@
             <h3 style="margin-top: 0px;border-left: 7px solid #FF9800;padding-left: 7px;">Student Attendance</h3>
             <table>
                 <tr>
-                    <td style="width: 25%;">Attendaced In</td>
+                    <td style="width: 25%;">Open</td>
                     <td>:</td>
                     <td>
                         <select class="form-control" id="form_In_Session_Std">
@@ -240,7 +249,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Attendaced Out</td>
+                    <td>Close</td>
                     <td>:</td>
                     <td>
                         <select class="form-control" id="form_Out_Session_Std">
@@ -261,6 +270,18 @@
                         </div>
                     </td>
                 </tr>
+                <tr>
+                    <td>Default Attendance</td>
+                    <td>:</td>
+                    <td>
+                        <label class="radio-inline" style="color: red;">
+                            <input type="radio" name="form_DefaultAttendance" id="DefAbs" value="0"> Absent
+                        </label>
+                        <label class="radio-inline" style="color: green;">
+                            <input type="radio" name="form_DefaultAttendance" id="DefPres" value="1"> Present
+                        </label>
+                    </td>
+                </tr>
             </table>
         </div>
     </div>
@@ -272,7 +293,7 @@
             <h3 style="margin-top: 0px;border-left: 7px solid #FF9800;padding-left: 7px;">Lecturer Attendance</h3>
             <table>
                 <tr>
-                    <td style="width: 25%;">Attendaced In</td>
+                    <td style="width: 25%;">Open</td>
                     <td>:</td>
                     <td>
                         <select class="form-control" id="form_In_Session_Lec">
@@ -294,7 +315,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Attendaced Out</td>
+                    <td>Close</td>
                     <td>:</td>
                     <td>
                         <select class="form-control" id="form_Out_Session_Lec">
@@ -316,7 +337,17 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>User Attendance Out
+                    <td colspan="4">
+                        <hr/>
+                        <div style="background: lightyellow;border: 1px solid #CCCCCC;padding: 10px;">
+                            Button "Attendance Out" akan muncul pada status yg di checklist
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        User Need Attendance Out
+
                         <input id="totalStatus" class="hide">
                     </td>
                     <td>:</td>
@@ -347,7 +378,8 @@
         $('.form-tahun-akademik').prop('readonly',true);
         $( "#bpp_start,#krs_start ,#bayar_start,#kuliah_start,#edom_start," +
             "#uts_start,#show_nilai_uts,#nilaiuts_start," +
-            "#uas_start,#nilaiuas_start,#nilaitugas_end,#show_nilai_uas,#show_nilai_h,#show_nilai_t,#updateTranscript" )
+            "#uas_start,#nilaiuas_start,#nilaitugas_end,#show_nilai_uas,#show_nilai_h,#show_nilai_t," +
+            "#updateTranscript,#ModifyAttendance" )
             .datepicker({
             showOtherMonths:true,
             autoSize: true,
@@ -355,7 +387,7 @@
             // minDate: new Date(moment().year(),moment().month(),moment().date()),
             onSelect : function () {
                 var data_date = $(this).val().split(' ');
-                var nextelement = $(this).attr('nextelement')
+                var nextelement = $(this).attr('nextelement');
                 nextDatePick(data_date,nextelement);
             }
         });
@@ -423,6 +455,10 @@
                 Out_Type_Lec : $('#form_Out_Type_Lec').val(),
                 Out_Time_Lec :( form_Out_Time_Lec!='' &&  form_Out_Time_Lec!=null &&  form_Out_Time_Lec!=0) ?  form_Out_Time_Lec : 0,
                 Out_User_Lec : JSON.stringify(Out_User_Lec),
+                DefaultAttendance : $("input[name=form_DefaultAttendance]:checked").val(),
+                ModifyAttendance : ($('#ModifyAttendance').datepicker("getDate")!=null)
+                    ? moment($('#ModifyAttendance').datepicker("getDate")).format('YYYY-MM-DD')
+                    : moment($('#kuliah_end').datepicker("getDate")).format('YYYY-MM-DD'),
                 UpdateBy : sessionNIP,
                 UpdateAt : dateTimeNow()
             }
@@ -512,6 +548,12 @@
             if(data.AttdSetting.length>0){
                 var d = data.AttdSetting[0];
 
+                (data.DetailTA.updateTranscript !=='0000-00-00' && d.ModifyAttendance!==null)
+                    ? $('#ModifyAttendance').datepicker('setDate',new Date(d.ModifyAttendance))
+                    : '';
+
+
+
                 $('#form_In_Session_Std').val(d.In_Session_Std);
                 $('#form_In_Type_Std').val(d.In_Type_Std);
                 $('#form_In_Time_Std').val(d.In_Time_Std);
@@ -525,6 +567,12 @@
                 $('#form_Out_Session_Lec').val(d.Out_Session_Lec);
                 $('#form_Out_Type_Lec').val(d.Out_Type_Lec);
                 $('#form_Out_Time_Lec').val(d.Out_Time_Lec);
+
+                if(d.DefaultAttendance==1 || d.DefaultAttendance=='1'){
+                    $('#DefPres').prop('checked',true);
+                } else {
+                    $('#DefAbs').prop('checked',true);
+                }
 
                 Out_User_Lec = JSON.parse(d.Out_User_Lec);
 

@@ -150,60 +150,64 @@
                     for(var i=0;i<student.length;i++){
                         var d = student[i];
 
-                        var rwSpan = 1 + d.Attendance.length;
-
-                        tr.append('<tr>' +
-                            '<td rowspan="'+rwSpan+'">'+(no++)+'</td>' +
-                            '<td style="text-align: left;" rowspan="'+rwSpan+'">'+d.NPM+'</td>' +
-                            '<td style="text-align: left;" rowspan="'+rwSpan+'"><b>'+d.Name+'</b></td>' +
-                            '</tr>');
-
-                        var attCount = 0;
-                        var target = 14 * d.Attendance.length;
-                        for(var a=0;a<d.Attendance.length;a++){
-                            var da = d.Attendance[a];
-
-                            var trEnd = '</tr>';
-
-                            if(a==0){
-                                trEnd = '<td rowspan="'+rwSpan+'">'+target+'</td>' +
-                                    '<td rowspan="'+rwSpan+'" id="real'+i+'">7</td>' +
-                                    '<td rowspan="'+rwSpan+'" id="percent'+i+'">7</td>' +
-                                    '</tr>';
-                            }
-
-                            // Count Sesi
-                            for(var t=1;t<=14;t++){
-                                if(da['M'+t]==1 || da['M'+t]=='1'){
-                                    attCount += 1;
-                                }
-                            }
+                        if(d.Attendance.length>0){
+                            var rwSpan = 1 + d.Attendance.length;
 
                             tr.append('<tr>' +
-                                '<td style="text-align: left;">'+da.DayEng+'</td>' +
-                                '<td>'+checkSesi(da.M1)+'</td>' +
-                                '<td>'+checkSesi(da.M2)+'</td>' +
-                                '<td>'+checkSesi(da.M3)+'</td>' +
-                                '<td>'+checkSesi(da.M4)+'</td>' +
-                                '<td>'+checkSesi(da.M5)+'</td>' +
-                                '<td>'+checkSesi(da.M6)+'</td>' +
-                                '<td>'+checkSesi(da.M7)+'</td>' +
-                                '<td>'+checkSesi(da.M8)+'</td>' +
-                                '<td>'+checkSesi(da.M9)+'</td>' +
-                                '<td>'+checkSesi(da.M10)+'</td>' +
-                                '<td>'+checkSesi(da.M11)+'</td>' +
-                                '<td>'+checkSesi(da.M12)+'</td>' +
-                                '<td>'+checkSesi(da.M13)+'</td>' +
-                                '<td>'+checkSesi(da.M14)+'</td>' +
-                                ''+trEnd);
+                                '<td rowspan="'+rwSpan+'">'+(no++)+'</td>' +
+                                '<td style="text-align: left;" rowspan="'+rwSpan+'">'+d.NPM+'</td>' +
+                                '<td style="text-align: left;" rowspan="'+rwSpan+'"><b>'+d.Name+'</b></td>' +
+                                '</tr>');
+
+                            var attCount = 0;
+                            var target = 14 * d.Attendance.length;
+                            for(var a=0;a<d.Attendance.length;a++){
+                                var da = d.Attendance[a];
+
+                                var trEnd = '</tr>';
+
+                                if(a==0){
+                                    trEnd = '<td rowspan="'+rwSpan+'">'+target+'</td>' +
+                                        '<td rowspan="'+rwSpan+'" id="real'+i+'">7</td>' +
+                                        '<td rowspan="'+rwSpan+'" id="percent'+i+'">7</td>' +
+                                        '</tr>';
+                                }
+
+                                // Count Sesi
+                                for(var t=1;t<=14;t++){
+                                    if(da['M'+t]==1 || da['M'+t]=='1'){
+                                        attCount += 1;
+                                    }
+                                }
+
+                                tr.append('<tr>' +
+                                    '<td style="text-align: left;">'+da.DayEng+'</td>' +
+                                    '<td>'+checkSesi(da.M1)+'</td>' +
+                                    '<td>'+checkSesi(da.M2)+'</td>' +
+                                    '<td>'+checkSesi(da.M3)+'</td>' +
+                                    '<td>'+checkSesi(da.M4)+'</td>' +
+                                    '<td>'+checkSesi(da.M5)+'</td>' +
+                                    '<td>'+checkSesi(da.M6)+'</td>' +
+                                    '<td>'+checkSesi(da.M7)+'</td>' +
+                                    '<td>'+checkSesi(da.M8)+'</td>' +
+                                    '<td>'+checkSesi(da.M9)+'</td>' +
+                                    '<td>'+checkSesi(da.M10)+'</td>' +
+                                    '<td>'+checkSesi(da.M11)+'</td>' +
+                                    '<td>'+checkSesi(da.M12)+'</td>' +
+                                    '<td>'+checkSesi(da.M13)+'</td>' +
+                                    '<td>'+checkSesi(da.M14)+'</td>' +
+                                    ''+trEnd);
+                            }
+
+                            $('#real'+i).html(attCount);
+                            var percent = (attCount!=0) ? ((attCount/target) * 100).toFixed(0) : 0;
+                            $('#percent'+i).html(percent+' %');
+                            student[i].Target = target;
+                            student[i].Total_Attd = attCount;
+                            student[i].Percent = percent+' %';
                         }
 
-                        $('#real'+i).html(attCount);
-                        var percent = (attCount!=0) ? ((attCount/target) * 100).toFixed(0) : 0;
-                        $('#percent'+i).html(percent+' %');
-                        student[i].Target = target;
-                        student[i].Total_Attd = attCount;
-                        student[i].Percent = percent+' %';
+
 
 
                     }

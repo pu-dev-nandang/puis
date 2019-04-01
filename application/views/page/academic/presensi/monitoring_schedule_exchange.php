@@ -21,8 +21,13 @@
                 <div class="col-xs-5">
                     <select class="form-control" id="filterStatus">
                         <option value="">-- All Status --</option>
-                        <option value="1">Approved</option>
                         <option value="0">Not Yet Approved</option>
+                        <option value="1">Approved By Kapordi</option>
+                        <option value="2">Set Room By GA</option>
+
+                        <option value="-1">Rejected By Kapordi</option>
+                        <option value="-2">Rejected By GA</option>
+
                     </select>
                 </div>
             </div>
@@ -200,7 +205,14 @@
                     for(var i=0;i<jsonResult.length;i++){
                         var d = jsonResult[i];
 
-                        var s = (d.Status=='1' || d.Status==1) ? '<i class="fa fa-check-circle" style="color: #369c3a;"></i>' : '<i class="fa fa-circle" style="color:#d8d8d8;"></i>';
+                        var s = '<i class="fa fa-circle" style="color:#d8d8d8;"></i>';
+
+                        if(d.Status=='1' || d.Status==1){
+                            s = '<i class="fa fa-check-circle" style="color: #2196f3;"></i>'
+                        } else if(d.Status=='2' || d.Status==2){
+                            s = '<i class="fa fa-check-circle" style="color: #369c3a;"></i>'
+                        }
+
                         var troom = (d.T_Room!=null && d.T_Room!='') ? d.T_Room : '-';
 
                         var A_Date = moment(d.A_Date).format('dddd, D MMM YYYY');

@@ -22,9 +22,20 @@
 					<!-- <div  class="col-md-4" align="right" id="pagination_link"></div>	 -->
 					<!-- <div class = "table-responsive" id= "register_document_table"></div> -->
 				</div>
-				<br>	
-				<div class = 'row'>
-					<div  class="col-md-12" align="right" id="pagination_link"></div>
+				<div class = 'row' style="margin-top: 10px">
+					<div class="col-xs-1">
+						<p><b>A = 4</b></p>
+						<p><b>B = 3</b></p>
+						<p><b>C = 2</b></p>
+						<p><b>D = 1</b></p>
+					</div>
+					<div class="col-xs-1">
+						<p><b>A = 86 - 100</b></p>
+						<p><b>B = 71 - 85</b></p>
+						<p><b>C = 56 - 70</b></p>
+						<p><b>D < 55</b></p>
+					</div>
+					<div  class="col-md-10" align="right" id="pagination_link"></div>
 				</div>
 				<div class = 'row'>
 					<div id='loadTableData' class="col-md-12"></div>
@@ -37,6 +48,7 @@
 <script type="text/javascript">
 	window.processs=[];
 	window.processs1=[];
+	window.arr_fin=[];
 	$(document).ready(function () {
 		$('#NotificationModal .modal-header').addClass('hide');
 		$('#NotificationModal .modal-body').html('<center>' +
@@ -86,7 +98,7 @@
 	$(document).on("keyup", "#FormulirCode", function(event){
     	var FormulirCode = $('#FormulirCode').val();
     	var n = FormulirCode.length;
-    	console.log(n);
+    	// console.log(n);
     	if( this.value.length < 6 && this.value.length != 0 ) return;
     	   /* code to run below */
     	loadTableData(1);
@@ -122,164 +134,198 @@
 	    });
 	}
 
-	// $(document).on('click','#btn-Hitung', function () {
-	// 	prosesData();
-	// });
-
-	function prosesData()
+	function CheckNilaiFinance()
 	{
-			// processs = [];
-			processs = [];
-			processs1 = [];
-			var no = 0;
-			var arr = [];
-			var arr_pass = [];
-				$(".ID_ujian_perprody").each(function(index) {
-				    arr[index] = {
-				    	value : $(this).val(),
-				    	id_mataujian : $(this).attr('id-mataujian'),
-				    	id_formulir : $(this).attr('id-formulir'),
-				    	bobot :$(this).attr('bobot'),
-				    };
-				});
-			for(var key in arr) {
-		       if (arr[key].value != '') {
-		       		arr_pass[no] = arr[key]; 
-		       		no++;
-		       };
-		       // console.log(arr[key].value);
-			}
-			// console.log(processs);
-
-			for(var key in arr_pass) {
-				var bobot_nilai = 0;
-			   for(var a in arr_pass) {
-			   	 if (arr_pass[key].id_formulir == arr_pass[a].id_formulir) {
-			   	 	bobot_nilai += parseInt(arr_pass[a].value) * parseInt(arr_pass[a].bobot);
-			   	 }
-			   }
-		       $("#bobot_nilai"+arr_pass[key].id_formulir).val(bobot_nilai);
-		       var jml_bobot = $(".jml_bobot").val();
-		       var Nilai_Indeks = bobot_nilai / jml_bobot;
-		       // console.log(bobot_nilai);
-		       var gradeIndeks = '';	
-		       for(var b in grade) {
-		       	if (Nilai_Indeks >= grade[b].StartRange && Nilai_Indeks <= grade[b].EndRange) {
-		       		gradeIndeks = grade[b].Grade;
-		       	}
-		       }
-
-		       $("#indeks"+arr_pass[key].id_formulir).val(gradeIndeks);
-
-		       // get selected status 
-		       /*if (Nilai_Indeks < 60) {
-			       	$("#kelulusan"+arr_pass[key].id_formulir+" option").filter(function() {
-			       	   //may want to use $.trim in here
-			       	   return $(this).val() == "Tidak Lulus;"+arr_pass[key].id_formulir; 
-			       	}).prop("selected", true);
-			       	$('#kelulusan'+arr_pass[key].id_formulir).select2({
-			       	   //allowClear: true
-			       	});
-			       	console.log('#kelulusan'+arr_pass[key].id_formulir);
-		       }*/
-
-		       var dataPush = {
-		       		value : arr_pass[key].value,
-		       		id_mataujian : arr_pass[key].id_mataujian,
-		       		id_formulir : arr_pass[key].id_formulir,
-		       		bobot :arr_pass[key].bobot,
-		       		jml_bobot:jml_bobot,
-		       		Nilai_Indeks : Nilai_Indeks,
-		       		gradeIndeks : gradeIndeks,
-		       	}
-		       processs.push(dataPush);
-			}
-
-			arr = [];
-			$(".Rangking").each(function(index) {
-			    arr[index] = {
-			    	value : $(this).val(),
-			    	id_formulir : $(this).attr('id-formulir'),
-			    };
-			});
-			// console.log(arr);
-
-			var arr2 = [];
-			$(".FileRapor").each(function(index) {
-			    arr2[index] = {
-			    	value : $(this).val(),
-			    	id_formulir : $(this).attr('id-formulir'),
-			    };
-			});
-
-			var check = 1;
-			for (var i = 0; i < arr.length; i++) {
-				for (var j = 0; j < arr2.length; j++) {
-					if (arr[i].id_formulir == arr2[j].id_formulir) {
-						/*if (arr[i].value != 0) {
-							if (arr2[i].value == '') {
-								check = 0;
-								break;
-							}
-						}*/
-						var dataPush = {
-								rangking : arr[i].value,
-								id_doc : arr2[i].value,
-								id_formulir : arr[i].id_formulir,
-						}
-						processs1.push(dataPush);
-					}
-					
-				}
-			}
-			// console.log(processs.length);
-			/*for (var i = 0; i < processs.length; i++) {
-				processs1[i] ={
-						value : processs[i].value,
-			       		id_mataujian : processs[i].id_mataujian,
-			       		id_formulir : processs[i].id_formulir,
-			       		bobot :processs[i].bobot,
-			       		jml_bobot:processs[i].jml_bobot,
-			       		Nilai_Indeks : processs[i].Nilai_Indeks,
-			       		gradeIndeks : processs[i].gradeIndeks
-				}
-			}*/
-
-			if (check == 1) {
-				$("#btn-Save").removeClass("hide");
+		var c = true;
+		var bool = [];
+		$('.PilihJurusan').each(function(){
+			if ($(this).val() == 0) {
+				bool.push(0);
 			}
 			else
 			{
-				$("#btn-Save").addClass("hide");
-				toastr.error('File Rangking tidak boleh kosong jika calon memiliki rangking besar dari 0', 'Failed!!');
+				bool.push(1);
 			}
-			
-			// $(".autohide").removeClass("hide");
-		// console.log(bobot_nilai);
+		})
+
+		if ($('.inputmt_pelajaran').length) {
+			bool.push(0);
+		}
+
+		$(".NilaiFin").each(function(){
+			var v = $(this).val();
+			if (v == 0) {
+				bool.push(0);
+			} else {
+				bool.push(1);
+			}
+		})
+
+		for (var i = 0; i < bool.length; i++) {
+			if (bool[i] == 0) {
+				c = false;
+				break;
+			}
+		}
+
+		return c;
 	}
 
-	// $(document).on('click','#btn-Save', function () {
-	// 	loading_button('#btn-Save');
-	// 	  var data = {
-	// 	  					processs1 : processs,
-	// 	  					rangking : processs1
-	// 	  			};
-	// 	  var token = jwt_encode(data,"UAP)(*");
-	// 	  var url = base_url_js+'admission/proses-calon-mahasiswa/set-nilai-rapor/save';
-	// 	  	$.post(url,{token:token},function (data_json) {
-	// 	        var response = jQuery.parseJSON(data_json);
-	// 	        toastr.success('Data berhasil disimpan', 'Success!');
-	// 	        loadTableData(1);
-	// 	        $('#btn-Save').prop('disabled',false).html('Save');
-	//       	}).done(function() {
-	//       	      loadTableData(1);
-	//       	      $('#btn-Save').prop('disabled',false).html('Save');
-	//   	    }).fail(function() {
-	//   	      toastr.error('The Database connection error, please try again', 'Failed!!');
-	//   	    }).always(function() {
-	//   	      $('#btn-Save').prop('disabled',false).html('Save');
-	//   	    });
-	// });
+	function AverageNilaiFinance()
+	{
+		arr_fin =[];
+		$(".NilaiFin").each(function(){
+			var trrow = $(this).closest('tr');
+			var ID_register_formulir = trrow.attr('register_formulir');
+			var NmMtPel = $(this).attr('mataujian');
+			var Value = $(this).val();
+
+			var temp = {
+				ID_register_formulir : ID_register_formulir,
+				NmMtPel : NmMtPel,
+				Value : Value,
+			};
+
+			arr_fin.push(temp);
+		})
+
+		for (var i = 0; i < arr_fin.length; i++) {
+			var ID_register_formulir = arr_fin[i].ID_register_formulir;
+			var tot = 0;
+			var bg = 1;
+			tot = parseInt(tot) + parseInt(arr_fin[i].Value)
+			// count average
+				for (var j = i+1; j < arr_fin.length; j++) {
+					var ID_register_formulir2 = arr_fin[j].ID_register_formulir;
+					if (ID_register_formulir == ID_register_formulir2) {
+						tot = parseInt(tot) + parseInt(arr_fin[j].Value);
+						bg++;
+					} else {
+						i = j - 1;
+						break;
+					}
+
+					i = j;
+				}
+
+			var avg =0;
+			avg = tot / bg;
+			// console.log(tot);
+			avg = parseFloat(avg).toFixed(2);
+			var s = $('tr[register_formulir="'+ID_register_formulir+'"]').find('td:eq(9)');
+			s.html('<div class = "form-group"><label>Average</label><br>'+avg+'</div>');
+		}
+	}
+
+	function prosesData()
+	{
+		// check inputan Nilai finance ada atau tidak
+		var bool = CheckNilaiFinance();
+		if (bool) {
+				// hitung average nilai ke finance
+				AverageNilaiFinance();
+
+
+				processs = [];
+				processs1 = [];
+				var no = 0;
+				var arr = [];
+				var arr_pass = [];
+					$(".ID_ujian_perprody").each(function(index) {
+					    arr[index] = {
+					    	value : $(this).val(),
+					    	id_mataujian : $(this).attr('id-mataujian'),
+					    	id_formulir : $(this).attr('id-formulir'),
+					    	bobot :$(this).attr('bobot'),
+					    };
+					});
+				for(var key in arr) {
+			       if (arr[key].value != '') {
+			       		arr_pass[no] = arr[key]; 
+			       		no++;
+			       };
+			       // console.log(arr[key].value);
+				}
+				// console.log(processs);
+
+				for(var key in arr_pass) {
+					var bobot_nilai = 0;
+				   for(var a in arr_pass) {
+				   	 if (arr_pass[key].id_formulir == arr_pass[a].id_formulir) {
+				   	 	bobot_nilai += parseInt(arr_pass[a].value) * parseInt(arr_pass[a].bobot);
+				   	 }
+				   }
+			       $("#bobot_nilai"+arr_pass[key].id_formulir).val(bobot_nilai);
+			       var jml_bobot = $(".jml_bobot").val();
+			       var Nilai_Indeks = bobot_nilai / jml_bobot;
+			       // console.log(bobot_nilai);
+			       var gradeIndeks = '';	
+			       for(var b in grade) {
+			       	if (Nilai_Indeks >= grade[b].StartRange && Nilai_Indeks <= grade[b].EndRange) {
+			       		gradeIndeks = grade[b].Grade;
+			       	}
+			       }
+			       Nilai_Indeks = parseFloat(Nilai_Indeks).toFixed(2);
+			       $("#indeks"+arr_pass[key].id_formulir).val(Nilai_Indeks+'('+gradeIndeks+')');
+
+			       var dataPush = {
+			       		value : arr_pass[key].value,
+			       		id_mataujian : arr_pass[key].id_mataujian,
+			       		id_formulir : arr_pass[key].id_formulir,
+			       		bobot :arr_pass[key].bobot,
+			       		jml_bobot:jml_bobot,
+			       		Nilai_Indeks : Nilai_Indeks,
+			       		gradeIndeks : gradeIndeks,
+			       	}
+			       processs.push(dataPush);
+				}
+
+				arr = [];
+				$(".Rangking").each(function(index) {
+				    arr[index] = {
+				    	value : $(this).val(),
+				    	id_formulir : $(this).attr('id-formulir'),
+				    };
+				});
+				// console.log(arr);
+
+				var arr2 = [];
+				$(".FileRapor").each(function(index) {
+				    arr2[index] = {
+				    	value : $(this).val(),
+				    	id_formulir : $(this).attr('id-formulir'),
+				    };
+				});
+
+				var check = 1;
+				for (var i = 0; i < arr.length; i++) {
+					for (var j = 0; j < arr2.length; j++) {
+						if (arr[i].id_formulir == arr2[j].id_formulir) {
+							var dataPush = {
+									rangking : arr[i].value,
+									id_doc : arr2[i].value,
+									id_formulir : arr[i].id_formulir,
+							}
+							processs1.push(dataPush);
+						}
+						
+					}
+				}
+
+				if (check == 1) {
+					$("#btn-Save").removeClass("hide");
+				}
+				else
+				{
+					$("#btn-Save").addClass("hide");
+					toastr.error('File Rangking tidak boleh kosong jika calon memiliki rangking besar dari 0', 'Failed!!');
+				}
+		}
+		else
+		{
+			toastr.error('Mohon Check inputan Nilai ke Finance','!!!Failed');
+		}
+	}
 
 	$(document).on('change','.FileRapor', function () {
 		var id_formulir = $(this).attr('id-formulir');
@@ -303,7 +349,6 @@
 		}
 		
 	});
-
 </script>
 
 

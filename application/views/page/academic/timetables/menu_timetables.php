@@ -1,13 +1,13 @@
 
 <div class="tabbable tabbable-custom tabbable-full-width">
     <ul class="nav nav-tabs">
-        <li class="<?php if($this->uri->segment(3)=='list') { echo 'active'; } ?>">
+        <li>
             <a href="<?php echo base_url('academic/timetables/list'); ?>">Timetables</a>
         </li>
-        <li class="<?php if($this->uri->segment(3)=='course-offer') { echo 'active'; } ?>">
+        <li>
             <a href="<?php echo base_url('academic/timetables/course-offer'); ?>">Course Offer</a>
         </li>
-        <li class="<?php if($this->uri->segment(3)=='setting-timetable') { echo 'active'; } ?>">
+        <li>
             <a href="<?php echo base_url('academic/timetables/setting-timetable'); ?>">Set Timetable</a>
         </li>
     </ul>
@@ -21,3 +21,13 @@
 
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+
+        var menu_active = "<?php echo $this->uri->segment(3); ?>";
+        var arrMenu = ['list','course-offer','setting-timetable'];
+        setMenuSelected('.nav-tabs','li','active',arrMenu,menu_active);
+
+    });
+</script>

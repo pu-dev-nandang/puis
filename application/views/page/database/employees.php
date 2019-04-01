@@ -23,12 +23,27 @@
 </div>
 
 <div class="row">
+    <div class="col-md-6">
+        <div class="row">
+            <div class="col-md-6">
+                <button class="btn btn-block btn-default" id="btnSelect"><i class="fa fa-id-card"></i> Select Employees</button>
+            </div>
+            <div class="col-md-6">
+                <button class="btn btn-block btn-default" id="btnPrintIDCard"><i class="fa fa-id-card"></i> Print ID Card</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" style="margin-top: 10px">
     <div class="col-md-12">
         <div id="divDataEmployees"></div>
     </div>
 </div>
 
 <script>
+    var TableSess = '';
+    var TempCheckBoxIDCard = [];
     $(document).ready(function () {
         loadSelectOptionStatusEmployee('#filterStatusEmployees','');
         loadDataEmployees();
@@ -82,10 +97,8 @@
                     }
                 }
             } );
-
+            TableSess = dataTable;
         },500);
-
-
 
     }
 
@@ -182,6 +195,289 @@
             });
 
 
+        }
+
+    });
+
+    $(document).on('click','.PrintIDCard',function () {
+        var type = $(this).attr('type');
+        var NPM = $(this).attr('data-npm');
+        var Name = $(this).attr('data-name');
+        var r = Name.split(" ");
+        var c = '';
+        for (var i = 0; i < r.length; i++) {
+            if (i <= 1) {
+              c+= r[i]+" ";
+            }
+            else
+            {
+              c+= r[i].substr(0,1)+" ";
+            }
+        }
+        Name = c;
+        var PathFoto = $(this).attr('path');
+        var email = $(this).attr('email');
+        var url = base_url_js+'save2pdf/PrintIDCard';
+        var data = [];
+        temp = {
+          type : type,
+          NPM : NPM,
+          Name : Name,
+          PathFoto : PathFoto,
+          email : email,
+        }
+        data.push(temp);
+        var token = jwt_encode(data,"UAP)(*");
+        FormSubmitAuto(url, 'POST', [
+            { name: 'token', value: token },
+        ]);   
+    });
+
+    $(document).on('click','#btnSelect',function () {
+        if (!$('.uniform').length) {
+            var get_th = $("#tableEmployees thead").find('tr').find('th:eq(0)').text();
+            var checkbox = '<input type="checkbox" name="select_all" value="1" id="example-select-all">';
+            $("#tableEmployees thead").find('tr').find('th:eq(0)').html(get_th+'&nbsp'+checkbox);
+            $("#tableEmployees tr").each(function(){
+                var a = $(this);
+                var No = a.find('td:eq(0)').text();
+                var G_attr = a.find('td:eq(7)').find('.PrintIDCard');
+                var type = G_attr.attr('type');
+                var NPM = G_attr.attr('data-npm');
+                var Name = G_attr.attr('data-name');
+                var PathFoto = G_attr.attr('path');
+                var email = G_attr.attr('email');
+                var checkbox = '<input type="checkbox" class="uniform" type2 = "employees" data-npm="'+NPM+'" data-name="'+Name+'" path = "'+PathFoto+'" email = "'+email+'">';
+                a.find('td:eq(0)').html(No+'&nbsp'+checkbox);
+
+            })
+        }
+    });
+
+    $(document).on('click','#btnPrintIDCard',function () {
+        var html = '';
+            html += '<div class = "row">'+
+                        '<div class = "col-md-12">'+
+                            '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+                                  '<thead>'+
+                                      '<tr>'+
+                                          '<th style="width: 5px;">No &nbsp <input type="checkbox" name="select_all" value="1" id="example-select-all2"></th>'+
+                                          '<th style="width: 55px;">NIP</th>'+
+                                          '<th style="width: 55px;">Photo</th>'+
+                                          '<th style="width: 55px;">Nama</th>'+
+                                       '</tr>'+
+                                    '</thead>';
+
+            html += '<tbody>';
+            for (var i = 0; i < TempCheckBoxIDCard.length; i++) {
+                var checkbox = '<input type="checkbox" class="uniform2" type2 = "employees" data-npm="'+TempCheckBoxIDCard[i]['NPM']+'" data-name="'+TempCheckBoxIDCard[i]['Name']+'" path = "'+TempCheckBoxIDCard[i]['PathFoto']+'" email = "'+TempCheckBoxIDCard[i]['email']+'" checked>';
+                html += '<tr>'+
+                            '<td>'+(parseInt(i)+1)+'&nbsp'+checkbox+'</td>'+
+                            '<td>'+TempCheckBoxIDCard[i]['NPM']+'</td>'+
+                            '<td>'+'<img id="imgThum'+TempCheckBoxIDCard[i]['NPM']+'" src="'+TempCheckBoxIDCard[i]['PathFoto']+'" style="max-width: 35px;" class="img-rounded">'+'</td>'+
+                            '<td>'+TempCheckBoxIDCard[i]['Name']+'</td>'+
+                        '</tr>';    
+            }
+
+            html += '</tbody></table>';                        
+            html += '</div></div>';                        
+
+         var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+             '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Print</button>';
+
+        $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'List Checklist Data'+'</h4>');
+        $('#GlobalModalLarge .modal-body').html(html);
+        $('#GlobalModalLarge .modal-footer').html(footer);
+        $('#GlobalModalLarge').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+    });
+
+    $(document).on('click','input[type="checkbox"][class="uniform"]',function () {
+        var type = $(this).attr('type2');
+        var NPM = $(this).attr('data-npm');
+        var Name = $(this).attr('data-name');
+        var PathFoto = $(this).attr('path');
+        var email = $(this).attr('email');
+
+        temp = {
+          type : type,
+          NPM : NPM,
+          Name : Name,
+          PathFoto : PathFoto,
+          email : email,
+        }
+        if(this.checked){
+           // Search data
+           if (TempCheckBoxIDCard.length > 0) {
+               var bool = true;
+               for (var i = 0; i < TempCheckBoxIDCard.length; i++) {
+                   var NPM2 = TempCheckBoxIDCard[i]['NPM'];
+                   if (NPM == NPM2) {
+                       bool = false;
+                       break;
+                   }
+               }
+
+               if (bool) { // insert data
+                TempCheckBoxIDCard.push(temp);
+               }
+           }
+           else
+           {
+            TempCheckBoxIDCard.push(temp);
+           }
+        }
+        else
+        {
+            var bool = true;
+            for (var i = 0; i < TempCheckBoxIDCard.length; i++) {
+                var NPM2 = TempCheckBoxIDCard[i]['NPM'];
+                if (NPM == NPM2) {
+                    bool = false;
+                    break;
+                }
+            }
+
+            if (!bool) { // find data
+             var arr = [];
+             for (var i = 0; i < TempCheckBoxIDCard.length; i++) {
+                 var NPM2 = TempCheckBoxIDCard[i]['NPM'];
+                 if (NPM != NPM2) {
+                   arr.push(TempCheckBoxIDCard[i]) ; 
+                 }
+             }
+             TempCheckBoxIDCard = [];
+             TempCheckBoxIDCard = arr;
+            }
+        }
+    
+    });
+
+    $(document).on('click','#example-select-all',function () {    
+       // Get all rows with search applied
+       var rows = TableSess.rows({ 'search': 'applied' }).nodes();
+       // Check/uncheck checkboxes for all rows in the table
+       $('input[type="checkbox"]', rows).prop('checked', this.checked);
+       $('input[type="checkbox"][class="uniform"]').each(function(){
+            var type = $(this).attr('type');
+            var NPM = $(this).attr('data-npm');
+            var Name = $(this).attr('data-name');
+            var PathFoto = $(this).attr('path');
+            var email = $(this).attr('email');
+
+            temp = {
+              type : type,
+              NPM : NPM,
+              Name : Name,
+              PathFoto : PathFoto,
+              email : email,
+            }
+            if(this.checked){
+               // Search data
+               if (TempCheckBoxIDCard.length > 0) {
+                   var bool = true;
+                   for (var i = 0; i < TempCheckBoxIDCard.length; i++) {
+                       var NPM2 = TempCheckBoxIDCard[i]['NPM'];
+                       if (NPM == NPM2) {
+                           bool = false;
+                           break;
+                       }
+                   }
+
+                   if (bool) { // insert data
+                    TempCheckBoxIDCard.push(temp);
+                   }
+               }
+               else
+               {
+                TempCheckBoxIDCard.push(temp);
+               }
+            }
+            else
+            {
+                var bool = true;
+                for (var i = 0; i < TempCheckBoxIDCard.length; i++) {
+                    var NPM2 = TempCheckBoxIDCard[i]['NPM'];
+                    if (NPM == NPM2) {
+                        bool = false;
+                        break;
+                    }
+                }
+
+                if (!bool) { // find data
+                 var arr = [];
+                 for (var i = 0; i < TempCheckBoxIDCard.length; i++) {
+                     var NPM2 = TempCheckBoxIDCard[i]['NPM'];
+                     if (NPM != NPM2) {
+                       arr.push(TempCheckBoxIDCard[i]) ; 
+                     }
+                 }
+                 TempCheckBoxIDCard = [];
+                 TempCheckBoxIDCard = arr;
+                }
+            }
+       })
+
+    });
+
+    // Handle click on "Select all" control
+    $(document).on('click','#example-select-all2',function () {    
+      $('input.uniform2').not(this).prop('checked', this.checked);
+    });
+
+    $(document).on('click','.pagination',function () {
+        if ($('#example-select-all').length) {
+            $('#example-select-all').remove();
+        }   
+    });
+
+    $(document).on('keyup','input[type="search"]',function () {
+        if ($('#example-select-all').length) {
+            $('#example-select-all').remove();
+        }   
+    });
+
+    $(document).on('click','#ModalbtnSaveForm',function () {
+        var data = [];
+        $('input[type="checkbox"][class="uniform2"]:checked:not(#example-select-all2):not(#example-select-all)').each(function(){
+              var type = $(this).attr('type2');
+              var NPM = $(this).attr('data-npm');
+              var Name = $(this).attr('data-name');
+              var r = Name.split(" ");
+              var c = '';
+              for (var i = 0; i < r.length; i++) {
+                  if (i <= 1) {
+                    c+= r[i]+" ";
+                  }
+                  else
+                  {
+                    c+= r[i].substr(0,1)+" ";
+                  }
+              }
+              Name = c;
+              var PathFoto = $(this).attr('path');
+              var email = $(this).attr('email');
+              temp = {
+                type : type,
+                NPM : NPM,
+                Name : Name,
+                PathFoto : PathFoto,
+                email : email,
+              }
+              data.push(temp);  
+        });
+        if (data.length > 0) {
+            var url = base_url_js+'save2pdf/PrintIDCard';
+            var token = jwt_encode(data,"UAP)(*");
+            FormSubmitAuto(url, 'POST', [
+                { name: 'token', value: token },
+            ]); 
+        }
+        else
+        {
+            toastr.error('Please checklist the data','!!!Failed');
         }
 
     });

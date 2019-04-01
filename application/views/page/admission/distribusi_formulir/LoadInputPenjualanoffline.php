@@ -42,6 +42,17 @@
 	           			  					    <option></option>
 	           			  					</select>
            			  				</div>
+           			  				<div class="col-md-2">
+           			  					<label>From CRM</label>
+           			  					<input type="checkbox" class="FromCrm" name="FromCrm" value="0" checked>No
+           			  					<input type="checkbox" class="FromCrm" name="FromCrm" value="1"> Yes
+           			  					<div class="input-group hide" id = "SearchFromCrm">
+           			  					    <span class="input-group-addon" id = 'BtnSelectCRM'>
+           			  					    	<i class="fa fa-search" aria-hidden="true"></i>
+           			  					    </span>
+           			  					    <input type="text" class="form-control" id="ID_Crm" disabled="" value="null" idtable = "0">
+           			  					  </div>
+           			  				</div>
            			  			</div>
            			  		</div>
 	           			  </div>	
@@ -558,6 +569,16 @@
 			  $("#priceFormulir").val("<?php echo $get1[0]['Price_Form'] ?>");
 			  $('#priceFormulir').maskMoney('mask', '9894');
 			  $('input:radio[name="TypePay"][value ="<?php echo $get1[0]['TypePay'] ?>"]').prop("checked", true);
+			  var ID_Crm = "<?php echo $get1[0]['ID_Crm'] ?>";
+			  if (ID_Crm != 0) {
+			  	var a = 1;
+			  	$('input.FromCrm').prop('checked', false);
+				$('.FromCrm[value="'+a+'"]').prop('checked',true);
+				$(".FromCrm").trigger('click');
+
+			  	$("#ID_Crm").val("<?php echo $get1[0]['FullName'] ?>");
+			  	$("#ID_Crm").attr("idtable",ID_Crm);
+			  }
 			<?php endif ?>
 
 		});
@@ -616,8 +637,8 @@
 					 var selectSourceFrom = $("#selectSourceFrom").val();
 					 var selectGender = $("#selectGender").val();
 					 var telp_rmh = $("#telp_rmh").val().trim();
-					 var tipeChannel = $('input[name=tipeChannel]:checked').val(); ;
-					 var TypePay = $('input[name=TypePay]:checked').val(); ;
+					 var tipeChannel = $('input[name=tipeChannel]:checked').val(); 
+					 var TypePay = $('input[name=TypePay]:checked').val(); 
 					 var selectEvent = $("#selectEvent").val();
 					 // var autoCompleteSchoolChanel = $("#autoCompleteSchoolChanel").val();
 					 var autoCompleteSchoolChanel = temp2;
@@ -628,6 +649,11 @@
 					 var priceFormulir = $("#priceFormulir").val();
 				   var tanggal = $("#tanggal").val(); 
 				   var No_Ref = $("#No_Ref").val();
+				   var ChkFromCrm = $('.FromCrm:checked').val();
+				   var ID_Crm = 0;
+				   if (ChkFromCrm == 1) {
+				   	ID_Crm = $("#ID_Crm").attr('idtable');
+				   }
 				   // var output_ok = $('#output_ok').val();
 				    priceFormulir = priceFormulir.replace(".", "");
 					 var data = {
@@ -651,6 +677,8 @@
 				       tanggal : tanggal,
 				       No_Ref : No_Ref,
 				       TypePay : TypePay,
+				       ChkFromCrm : ChkFromCrm,
+				       ID_Crm : ID_Crm,
 					 };
 
 					 if (validationInput = validation2(data)) {
@@ -676,6 +704,125 @@
 			});
 
 
+			$("#BtnSelectCRM").click(function(){
+				var html = '<div class="row">'+
+		        	'<div class="col-md-12">'+
+		        		'<div class="table-responsive">'+
+		        			'<table class="table table-bordered tableData" id ="tableData3">'+
+		        				'<thead>'+
+		        					'<tr>'+
+		        						'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
+		        						'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">ID</th>'+
+		        						'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Candidate Name</th>'+
+		        						'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Regional</th>'+
+		        						'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">School</th>'+
+		        						'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Pathway</th>'+
+		        						'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">Gender</th>'+
+		        						'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Prospect Year</th>'+
+		        						'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Phone</th>'+
+		        						'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">MobilePhone</th>'+
+		        						'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Email</th>'+
+		        						'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">ParentName</th>'+
+		        					'</tr>'
+		        				'</thead>'
+		        				'<tbody>'
+		        				'</tbody>'
+		        			'</table>'
+		        		'</div>'
+		        	'</div>'
+		        '</div>';
+
+				$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Data CRM'+'</h4>');
+				$('#GlobalModalLarge .modal-body').html(html);
+				$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>');
+				$('#GlobalModalLarge').modal({
+				    'show' : true,
+				    'backdrop' : 'static'
+				});
+
+				$("#GlobalModalLarge").find(".modal-dialog").attr('style','width: 1200px');
+				$("#tableData3 tbody").empty();
+
+				$.fn.dataTable.ext.errMode = 'throw';
+				$.fn.dataTableExt.oApi.fnPagingInfo = function (oSettings)
+				{
+				    return {
+				        "iStart": oSettings._iDisplayStart,
+				        "iEnd": oSettings.fnDisplayEnd(),
+				        "iLength": oSettings._iDisplayLength,
+				        "iTotal": oSettings.fnRecordsTotal(),
+				        "iFilteredTotal": oSettings.fnRecordsDisplay(),
+				        "iPage": Math.ceil(oSettings._iDisplayStart / oSettings._iDisplayLength),
+				        "iTotalPages": Math.ceil(oSettings.fnRecordsDisplay() / oSettings._iDisplayLength)
+				    };
+				};
+
+				var table = $('#tableData3').DataTable( {
+				    "fixedHeader": true,
+				    "processing": true,
+				    "destroy": true,
+				    "serverSide": true,
+				    "iDisplayLength" : 10,
+				    "ordering" : false,
+				    "ajax":{
+				        url : base_url_js+"admission/crm/showdata", // json datasource
+				        ordering : false,
+				        type: "post",  // method  , by default get
+				        // data : {length : $("select[name='tableData4_length']").val()},
+				        error: function(){  // error handling
+				            $(".employee-grid-error").html("");
+				            $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+				            $("#employee-grid_processing").css("display","none");
+				        }
+				    },
+				    'createdRow': function( row, data, dataIndex ) {
+				          var btndel = '';
+				          $(row).attr('idtable',data[13]);
+				          //$( row ).find('td:eq(12)').remove();
+				    },
+				} );
+
+				table.on( 'click', 'tr', function (e) {
+				       var row = $(this);
+				       var idtable = row.attr('idtable');
+				       var Candidate_Name = row.find('td:eq(2)').html();
+				       var hp = row.find('td:eq(9)').html();
+				       var email = row.find('td:eq(10)').html();
+				       var autoCompleteSchool = row.find('td:eq(4)').html();
+				       var gender = row.find('td:eq(6)').html();
+				       var telp_rmh = row.find('td:eq(8)').html();
+
+				       $("#ID_Crm").attr('idtable',idtable);
+				       $("#ID_Crm").val(Candidate_Name);
+				       $("#Name").val(Candidate_Name);
+				       $("#hp").val(hp);
+				       $("#email").val(email);
+				       $("#autoCompleteSchool").val(autoCompleteSchool);
+				       $('#autoCompleteSchool').autocomplete("search");
+				       $("#selectGender option").filter(function() {
+				          //may want to use $.trim in here
+				          return $(this).val() == gender; 
+				        }).prop("selected", true);
+				       $("#telp_rmh").val(telp_rmh);
+				       $('#GlobalModalLarge').modal('hide');
+
+				} );
+
+			})
+
+			$(".FromCrm").click(function(){
+				$('input.FromCrm').prop('checked', false);
+				$(this).prop('checked',true);
+				var cf = $(this).val();
+				if (cf == 1) {
+					$("#SearchFromCrm").removeClass('hide');
+				}
+				else
+				{
+					$("#SearchFromCrm").addClass('hide');
+				}
+			})
+
 		}
 
 		function clearData()
@@ -693,6 +840,8 @@
 		  temp2 = ''
 		  $('#telp_rmh').val('');
 		  $('#priceFormulir').val('');
+		  $("#ID_Crm").attr('idtable',0);
+		  $("#ID_Crm").val('null');
 
 		}
 
@@ -722,6 +871,14 @@
 		              toatString += result['messages'] + "<br>";
 		            }
 		            break;
+		      case "ChkFromCrm" : 
+		      		if (arr[key] == 1) {
+		      			var a = $("#ID_Crm").val();
+		      			if (a == "null" || a == '') {
+		      				toatString += 'Please choose CRM Data' + "<br>";
+		      			}
+		      		}	
+		      		break;      
 		     }
 
 		  }

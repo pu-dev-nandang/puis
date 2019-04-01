@@ -1,17 +1,17 @@
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
 <div class="tabbable tabbable-custom tabbable-full-width btn-read menuConfig">
     <ul class="nav nav-tabs">
-        <li class="<?php if($request==null || $request=='CodePrefix'){echo "active";} ?>">
+       <!--  <li class="<?php if($request==null || $request=='CodePrefix'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "PrefixCode">Code Prefix</a>
-        </li>
-        <li class="<?php if($request=='TimePeriod'){echo "active";} ?>">
+        </li> -->
+        <li class="<?php if($request==null || $request=='TimePeriod'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "TimePeriod">Time Period</a>
         </li>
         <li class="<?php if($request=='MasterPost'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "MasterPost">Master Post</a>
         </li>
         <li class="<?php if($request=='SetPostDepartement'){echo "active";} ?>">
-            <a href="javascript:void(0)" class="pageAnchor" page = "SetPostDepartement">Set Post Department</a>
+            <a href="javascript:void(0)" class="pageAnchor" page = "SetPostDepartement">Allocation Head Account</a>
         </li>
         <li class="<?php if($request=='UserRole'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "SetUserRole">Set User Role Department</a>
@@ -28,7 +28,7 @@
 <script type="text/javascript">
     $(document).ready(function() {
         <?php if ($request == null): ?>
-            LoadCodePrefix();
+            LoadTimePeriod();
         <?php else: ?>
             Load<?php echo $request ?>();    
         <?php endif ?>

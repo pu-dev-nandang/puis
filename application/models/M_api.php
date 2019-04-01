@@ -1403,10 +1403,12 @@ class M_api extends CI_Model {
     public function __checkSchedule($dataFilter){
 
 
-        $jadwal = $this->db->query('SELECT s.ID AS ScheduleID,s.ClassGroup , sd.ID AS sdID, sd.DayID,sd.StartSessions, sd.EndSessions, cl.Room                                               
+        $jadwal = $this->db->query('SELECT s.ID AS ScheduleID,s.ClassGroup , sd.ID AS sdID,                                                
+                                              sd.DayID,sd.StartSessions, sd.EndSessions, cl.Room, d.NameEng AS DayEng
                                               FROM db_academic.schedule s
                                               RIGHT JOIN db_academic.schedule_details sd ON (s.ID=sd.ScheduleID)   
                                               LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+                                              LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
                                               WHERE s.SemesterID="'.$dataFilter['SemesterID'].'"
                                               AND s.IsSemesterAntara="'.$dataFilter['IsSemesterAntara'].'" 
                                               AND sd.ClassroomID="'.$dataFilter['ClassroomID'].'" 
@@ -2007,12 +2009,11 @@ class M_api extends CI_Model {
                                                     WHERE sd.ScheduleID = "'.$d['ID'].'" ')->result_array();
 
                 for($s2=0;$s2<count($dataSesi);$s2++){
-                    $whereCheck = array(
+
+                    $querySeat = $this->db->get_where('db_academic.std_krs', array(
                         'SemesterID' => $d['SemesterID'],
-                        'ScheduleID' => $d['ID'],
-                        'CDID' => $CDID
-                    );
-                    $querySeat = $this->db->get_where('db_academic.std_krs', $whereCheck)->result_array();
+                        'ScheduleID' => $d['ID']
+                    ))->result_array();
                     $dataSesi[$s2]['CountSeat'] = count($querySeat);
                 }
 
@@ -2129,48 +2130,48 @@ class M_api extends CI_Model {
             // Student
             $this->db->query('CREATE TABLE '.$db_new.'.students (
                               `ID` int(11) NOT NULL AUTO_INCREMENT,
-                              `ProdiID` int(11) DEFAULT NULL,
-                              `ProgramID` int(11) DEFAULT NULL,
-                              `LevelStudyID` int(11) DEFAULT NULL,
-                              `ReligionID` int(11) DEFAULT NULL,
-                              `NationalityID` int(11) DEFAULT NULL,
-                              `ProvinceID` int(11) DEFAULT NULL,
-                              `CityID` int(11) DEFAULT NULL,
-                              `HighSchoolID` int(11) DEFAULT NULL,
-                              `HighSchool` text,
-                              `MajorsHighSchool` varchar(45) DEFAULT NULL,
-                              `NPM` varchar(20) DEFAULT NULL,
-                              `Name` varchar(200) DEFAULT NULL,
-                              `Address` text,
-                              `Photo` text,
-                              `Gender` varchar(2) DEFAULT NULL,
-                              `PlaceOfBirth` varchar(100) DEFAULT NULL,
-                              `DateOfBirth` date DEFAULT NULL,
-                              `Phone` varchar(10) DEFAULT NULL,
-                              `HP` varchar(15) DEFAULT NULL,
-                              `ClassOf` varchar(30) DEFAULT NULL,
-                              `Email` varchar(100) DEFAULT NULL,
-                              `Jacket` varchar(2) DEFAULT NULL,
-                              `AnakKe` int(11) DEFAULT NULL,
-                              `JumlahSaudara` int(11) DEFAULT NULL,
-                              `NationExamValue` decimal(10,0) DEFAULT NULL,
-                              `GraduationYear` int(11) DEFAULT NULL,
-                              `IjazahNumber` varchar(50) DEFAULT NULL,
-                              `Father` varchar(45) DEFAULT NULL,
-                              `Mother` varchar(45) DEFAULT NULL,
-                              `StatusFather` varchar(2) DEFAULT NULL,
-                              `StatusMother` varchar(2) DEFAULT NULL,
-                              `PhoneFather` varchar(15) DEFAULT NULL,
-                              `PhoneMother` varchar(15) DEFAULT NULL,
-                              `OccupationFather` text,
-                              `OccupationMother` text,
-                              `EducationFather` varchar(45) DEFAULT NULL,
-                              `EducationMother` varchar(45) DEFAULT NULL,
-                              `AddressFather` text,
-                              `AddressMother` text,
-                              `EmailFather` varchar(100) DEFAULT NULL,
-                              `EmailMother` varchar(100) DEFAULT NULL,
-                              `StatusStudentID` int(11) DEFAULT NULL,
+                            `ProdiID` int(11) DEFAULT NULL,
+                            `ProgramID` int(11) DEFAULT NULL,
+                            `LevelStudyID` int(11) DEFAULT NULL,
+                            `ReligionID` int(11) DEFAULT NULL,
+                            `NationalityID` int(11) DEFAULT NULL,
+                            `ProvinceID` int(11) DEFAULT NULL,
+                            `CityID` int(11) DEFAULT NULL,
+                            `HighSchoolID` int(11) DEFAULT NULL,
+                            `HighSchool` text,
+                            `MajorsHighSchool` varchar(45) DEFAULT NULL,
+                            `NPM` varchar(20) DEFAULT NULL,
+                            `Name` varchar(200) DEFAULT NULL,
+                            `Address` text,
+                            `Photo` text,
+                            `Gender` varchar(2) DEFAULT NULL,
+                            `PlaceOfBirth` varchar(100) DEFAULT NULL,
+                            `DateOfBirth` date DEFAULT NULL,
+                            `Phone` varchar(10) DEFAULT NULL,
+                            `HP` varchar(15) DEFAULT NULL,
+                            `ClassOf` varchar(30) DEFAULT NULL,
+                            `Email` varchar(100) DEFAULT NULL,
+                            `Jacket` varchar(2) DEFAULT NULL,
+                            `AnakKe` int(11) DEFAULT NULL,
+                            `JumlahSaudara` int(11) DEFAULT NULL,
+                            `NationExamValue` decimal(10,0) DEFAULT NULL,
+                            `GraduationYear` int(11) DEFAULT NULL,
+                            `IjazahNumber` varchar(50) DEFAULT NULL,
+                            `Father` varchar(45) DEFAULT NULL,
+                            `Mother` varchar(45) DEFAULT NULL,
+                            `StatusFather` varchar(2) DEFAULT NULL,
+                            `StatusMother` varchar(2) DEFAULT NULL,
+                            `PhoneFather` varchar(15) DEFAULT NULL,
+                            `PhoneMother` varchar(15) DEFAULT NULL,
+                            `OccupationFather` text,
+                            `OccupationMother` text,
+                            `EducationFather` varchar(45) DEFAULT NULL,
+                            `EducationMother` varchar(45) DEFAULT NULL,
+                            `AddressFather` text,
+                            `AddressMother` text,
+                            `EmailFather` varchar(100) DEFAULT NULL,
+                            `EmailMother` varchar(100) DEFAULT NULL,
+                            `StatusStudentID` int(11) DEFAULT NULL,
                               PRIMARY KEY (`ID`),
                               UNIQUE KEY `NPM` (`NPM`)
                             ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1');
@@ -2178,29 +2179,37 @@ class M_api extends CI_Model {
             // study_planning
             $this->db->query('CREATE TABLE '.$db_new.'.study_planning (
                               `ID` int(11) NOT NULL AUTO_INCREMENT,
-                              `SemesterID` int(11) DEFAULT NULL,
-                              `MhswID` int(11) DEFAULT NULL,
-                              `NPM` varchar(30) NOT NULL,
-                              `ScheduleID` int(11) NOT NULL,
-                              `TypeSchedule` enum("Br","Ul") DEFAULT NULL,
-                              `CDID` int(11) DEFAULT NULL,
-                              `MKID` int(11) DEFAULT NULL,
-                              `Credit` int(11) DEFAULT NULL,
-                              `Evaluasi1` float DEFAULT NULL,
-                              `Evaluasi2` float DEFAULT NULL,
-                              `Evaluasi3` float DEFAULT NULL,
-                              `Evaluasi4` float DEFAULT NULL,
-                              `Evaluasi5` float DEFAULT NULL,
-                              `UTS` float DEFAULT NULL,
-                              `UAS` float DEFAULT NULL,
-                              `Score` float DEFAULT NULL,
-                              `Grade` varchar(3) DEFAULT NULL,
-                              `GradeValue` float DEFAULT NULL,
-                              `Approval` enum("0","1") DEFAULT NULL,
-                              `StatusSystem` enum("1","0") DEFAULT NULL COMMENT "0 = Siak Lama , 1 = Baru",
-                              `Glue` varchar(45) DEFAULT NULL,
-                              `Status` enum("0","1") DEFAULT NULL,
-                              PRIMARY KEY (`ID`)
+                                `SemesterID` int(11) DEFAULT NULL,
+                                `MhswID` int(11) DEFAULT NULL,
+                                `NPM` varchar(30) NOT NULL,
+                                `ScheduleID` int(11) NOT NULL,
+                                `TypeSchedule` enum("Br","Ul") DEFAULT NULL,
+                                `CDID` int(11) DEFAULT NULL,
+                                `MKID` int(11) DEFAULT NULL,
+                                `Credit` int(11) DEFAULT NULL,
+                                `Evaluasi1` float DEFAULT NULL,
+                                `Evaluasi2` float DEFAULT NULL,
+                                `Evaluasi3` float DEFAULT NULL,
+                                `Evaluasi4` float DEFAULT NULL,
+                                `Evaluasi5` float DEFAULT NULL,
+                                `UTS` float DEFAULT NULL,
+                                `UAS` float DEFAULT NULL,
+                                `Score` float DEFAULT NULL,
+                                `Grade` varchar(3) DEFAULT NULL,
+                                `GradeValue` float DEFAULT NULL,
+                                `Approval` enum("0","1","2") DEFAULT NULL COMMENT "0 = Blm Approve, 1 = UTS Approve, 2 = UAS Approve",
+                                `StatusResign` enum("0","1") DEFAULT "0",
+                                `ShowTranscript` enum("0","1") DEFAULT "1" COMMENT "0 = No Showing\n1 = Show",
+                                `StatusSystem` enum("1","0") DEFAULT NULL COMMENT "0 = Siak Lama , 1 = Baru",
+                                `Glue` varchar(45) DEFAULT NULL,
+                                `TransferCourse` enum("0","1") DEFAULT "0" COMMENT "0 = Bukan mata kuliah transfer\n1 = Mata kuliah transfer, maka tidak perlu membaca schedule",
+                                `Status` enum("0","1") DEFAULT NULL,
+                              PRIMARY KEY (`ID`),
+                              KEY `SemesterID` (`SemesterID`) USING BTREE,
+                                KEY `NPM` (`NPM`) USING BTREE,
+                                KEY `ScheduleID` (`ScheduleID`) USING BTREE,
+                                KEY `CDID` (`CDID`) USING BTREE,
+                                KEY `MKID` (`MKID`) USING BTREE
                             ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1');
 
         }
@@ -2339,19 +2348,39 @@ class M_api extends CI_Model {
         return $data;
     }
 
-    public function getDateExam($SemesterID){
+    public function getDateExam($SemesterID,$Type){
 
 //        $SemesterActive = $this->_getSemesterActive();
 
+        $data = $this->db->query('SELECT DISTINCT ex.ExamDate FROM db_academic.exam ex 
+                                            WHERE ex.SemesterID = "'.$SemesterID.'" 
+                                            AND ex.Type LIKE "'.$Type.'" ORDER BY ex.ExamDate ASC')->result_array();
+
+        $result = [];
+        if(count($data)>0){
+            foreach ($data as $item){
+                array_push($result,$item['ExamDate']);
+            }
+        }
+
+
+        return $result;
+
+    }
+
+    public function getDateExamInEdit($SemesterID){
         $data = $this->db->query('SELECT * FROM db_academic.academic_years 
                                           WHERE SemesterID = "'.$SemesterID.'" 
                                           LIMIT 1')->result_array();
-
-
-
-
         return (count($data))? $data[0] : [];
+    }
 
+    public function getDateExam4input($SemesterID){
+        $data = $this->db->query('SELECT * FROM db_academic.academic_years
+                                          WHERE SemesterID = "'.$SemesterID.'"
+                                          LIMIT 1')->result_array();
+
+        return $data[0];
     }
 
     public function __checkDataCourseForExam($ScheduleID,$Type){
@@ -2416,18 +2445,42 @@ class M_api extends CI_Model {
 
                 for($s=0;$s<count($dataSt);$s++){
 
+                    $TypeSearch = $Type;
                     // Cek Apakah ada Di Exam
                     $dataStdExamCheck = $this->db->query('SELECT exd.* FROM db_academic.exam ex
                                                                     LEFT JOIN db_academic.exam_details exd ON (ex.ID = exd.ExamID)
                                                                     LEFT JOIN db_academic.exam_group exg ON (ex.ID = exg.ExamID)
                                                                     WHERE exg.ScheduleID = "'.$ScheduleID.'"
                                                                     AND exd.NPM = "'.$dataSt[$s]['NPM'].'"
-                                                                    AND ex.Type = "'.$Type.'" 
-                                                                    LIMIT 1')
-                                            ->result_array();
+                                                                    AND ex.Type = "'.$TypeSearch.'"
+                                                                    ORDER BY ex.ID DESC LIMIT 1')
+                        ->result_array();
+
+                    if(count($dataStdExamCheck)<=0){
+
+                        if($Type=='re_uts'){
+                            $TypeSearch = 'uts';
+                        } else if($Type=='re_uas'){
+                            $TypeSearch = 'uas';
+                        }
+
+                        $dataStdExamCheck = $this->db->query('SELECT exd.* FROM db_academic.exam ex
+                                                                    LEFT JOIN db_academic.exam_details exd ON (ex.ID = exd.ExamID)
+                                                                    LEFT JOIN db_academic.exam_group exg ON (ex.ID = exg.ExamID)
+                                                                    WHERE exg.ScheduleID = "'.$ScheduleID.'"
+                                                                    AND exd.NPM = "'.$dataSt[$s]['NPM'].'"
+                                                                    AND ex.Type = "'.$TypeSearch.'"
+                                                                    ORDER BY ex.ID DESC LIMIT 1')
+                            ->result_array();
+
+                    }
+
+
+
 
                     $dataSt[$s]['IDEd'] = (count($dataStdExamCheck)>0) ? $dataStdExamCheck[0]['ID'] : '' ;
                     $dataSt[$s]['DB_Students'] = $db_;
+                    $dataSt[$s]['Status'] = (count($dataStdExamCheck)>0) ? $dataStdExamCheck[0]['Status'] : '' ;;
                     array_push($dataStudentsDetails,$dataSt[$s]);
                 }
 
@@ -2534,11 +2587,8 @@ class M_api extends CI_Model {
     }
 
     public function __getGradeSchedule($ScheduleID){
-        $SemesterActive = $this->_getSemesterActive();
-        $SemesterID = $SemesterActive['ID'];
 
         $data = $this->db->get_where('db_academic.grade_course',array(
-            'SemesterID' => $SemesterID,
             'ScheduleID' => $ScheduleID
         ),1)->result_array();
 
@@ -2929,7 +2979,7 @@ class M_api extends CI_Model {
     }
 
 
-    public function getStudentByScheduleID($SemesterID,$ScheduleID,$CDID){
+    public function getStudentByScheduleID($SemesterID,$ScheduleID){
 
         $dataCl = $this->getClassOf();
 
@@ -2938,7 +2988,7 @@ class M_api extends CI_Model {
             for($i=0;$i<count($dataCl);$i++){
                 $db_ = 'ta_'.$dataCl[$i]['Year'];
 
-                $data = $this->db->query('SELECT sp.ID AS SPID, s.NPM,s.Name, sp.StatusResign FROM '.$db_.'.study_planning sp 
+                $data = $this->db->query('SELECT sp.ID AS SPID, sp.UTS, sp.UAS, s.NPM,s.Name, sp.StatusResign FROM '.$db_.'.study_planning sp 
                                                     LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
                                                     WHERE sp.SemesterID ="'.$SemesterID.'" 
                                                     AND sp.ScheduleID = "'.$ScheduleID.'"
@@ -3381,6 +3431,44 @@ class M_api extends CI_Model {
 
     }
 
+    public function __getStudentApprovedKRS($SemesterID,$ScheduleID){
+        // Fungsi ini mengambil student dari yang sudah di approve dan dari yang masih planning
+
+        $dataCL = $this->getClassOf();
+
+        $res = [];
+        for($c=0;$c<count($dataCL);$c++){
+            $d = $dataCL[$c];
+            $db_ = 'ta_'.$d['Year'];
+            $dataSP = $this->db->query('SELECT sp.NPM,s.Name FROM '.$db_.'.study_planning sp 
+                                                    LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
+                                                    WHERE sp.SemesterID = "'.$SemesterID.'" 
+                                                    AND sp.ScheduleID = "'.$ScheduleID.'"
+                                                    ORDER BY sp.NPM ASC ')->result_array();
+
+            if(count($dataSP)>0){
+                for($s=0;$s<count($dataSP);$s++){
+                    array_push($res,$dataSP[$s]['NPM']);
+                }
+            }
+        }
+
+        return $res;
+    }
+
+    public function __getStudentNotYetApprovedKRS($SemesterID,$ScheduleID){
+
+        // Get From Std KRS
+        $dataSTD = $this->db->query('SELECT sk.NPM,auts.Name FROM db_academic.std_krs sk
+                                              LEFT JOIN db_academic.auth_students auts ON (auts.NPM = sk.NPM)
+                                              WHERE sk.SemesterID = "'.$SemesterID.'" AND sk.ScheduleID = "'.$ScheduleID.'" 
+                                              ORDER BY sk.NPM ASC ')
+            ->result_array();
+
+
+        return $dataSTD;
+    }
+
     public function __getStudentByScheduleIDApproved($SemesterID,$ScheduleID){
 
         $dataCL = $this->getClassOf();
@@ -3520,7 +3608,16 @@ class M_api extends CI_Model {
                             ->get_where('db_academic.attendance',
                             array('SemesterID'=>$SemesterID,'ScheduleID'=>$d['ScheduleID'],'SDID' => $dCourse['ID']),1)->result_array();
 
+                        // Get Total Attendance
+                        $dataAttdTotal = $this->db->query('SELECT COUNT(*) AS TotalPresent FROM db_academic.attendance_lecturers attdl
+                                                                      WHERE attdl.NIP = "'.$d['NIP'].'" AND attdl.ID_Attd = 
+                                                                      (SELECT ID FROM db_academic.attendance attd 
+                                                                      WHERE attd.SemesterID = "'.$SemesterID.'"
+                                                                       AND attd.ScheduleID = "'.$d['ScheduleID'].'"
+                                                                        AND attd.SDID = "'.$dCourse['ID'].'" ) ')->result_array();
+
                         $dCourse['Attendance'] = $dataAttd;
+                        $dCourse['TotalPresent'] = $dataAttdTotal[0]['TotalPresent'];
                         $dataSc[$s] = $dCourse;
 
                     }
@@ -3584,7 +3681,9 @@ class M_api extends CI_Model {
                                                  LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                                  WHERE sdc.ScheduleID = "'.$ScheduleID.'" AND s.SemesterID = "'.$SemesterID.'" LIMIT 1')->result_array();
 
-        $dataStd = $this->getStudentByScheduleID($SemesterID,$ScheduleID,'');
+        $dataStd = $this->getStudentByScheduleID($SemesterID,$ScheduleID);
+
+        $resStd = [];
 
         if(count($dataStd)>0){
             for($i=0;$i<count($dataStd);$i++){
@@ -3598,16 +3697,21 @@ class M_api extends CI_Model {
                                                 WHERE attds.NPM = "'.$d['NPM'].'" AND attd.SemesterID = "'.$SemesterID.'" 
                                                 AND attd.ScheduleID = "'.$ScheduleID.'" ORDER BY sd.DayID ASC ')->result_array();
 
-                $d['Attendance'] = $dt;
+                if(count($dt)>0){
+                    $d['Attendance'] = $dt;
+                    $dataStd[$i] = $d;
+                    array_push($resStd,$dataStd[$i]);
+                }
 
-                $dataStd[$i] = $d;
+
+
             }
 
         }
 
         $res = array(
             'Course' => $dataCourse,
-            'Student' => $dataStd
+            'Student' => $resStd
         );
 
         return $res;
@@ -3698,25 +3802,50 @@ class M_api extends CI_Model {
         return $res;
     }
 
-    public function getInvigilatorSch($SemesterID,$Type,$NIP){
-        $data = $this->db->query('SELECT ex.*,cl.Room FROM db_academic.exam ex 
+    public function getInvigilatorSch($SemesterID,$Type,$NIP,$dateTimeNow){
+        $data = $this->db->query('SELECT ex.*, cl.Room, mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup
+                                          FROM db_academic.exam ex
                                           LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
-                                          WHERE 
-                                          ex.SemesterID = "'.$SemesterID.'" AND
+                                          LEFT JOIN db_academic.exam_details exd ON (exd.ExamID = ex.ID)
+                                          LEFT JOIN db_academic.schedule s ON (s.ID = exd.ScheduleID)
+                                          LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                          LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                          WHERE ex.SemesterID = "'.$SemesterID.'" AND
                                           ex.Type = "'.$Type.'" AND 
                                           ( ex.Pengawas1 = "'.$NIP.'"
-                                           OR ex.Pengawas2 = "'.$NIP.'" ) 
+                                           OR ex.Pengawas2 = "'.$NIP.'" )
+                                           GROUP BY ex.ID
                                            ORDER BY ex.ExamDate, ex.ExamStart ASC')
                     ->result_array();
+
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+                $d = $data[$i];
+
+                $start = $d['ExamDate'].' '.$d['ExamStart'];
+                $end = $d['ExamDate'].' '.$d['ExamEnd'];
+
+                $n = strtotime($dateTimeNow);
+
+                if(strtotime($start) <= $n && strtotime($end) >= $n ){
+                    $data[$i]['ButtonAttendance'] = '1';
+                } else {
+                    $data[$i]['ButtonAttendance'] = '0';
+                }
+
+            }
+        }
+
+
 
         return $data;
     }
 
     public function getExamStudent($ExamID){
-        $dataExamDetail = $this->db->query('SELECT exd.*,ex.SemesterID, aut.Name, aut.Year FROM db_academic.exam_details exd 
+        $dataExamDetail = $this->db->query('SELECT exd.*,ex.SemesterID, ex.Type, aut.Name, aut.Year FROM db_academic.exam_details exd 
                                                       LEFT JOIN db_academic.exam ex ON (ex.ID = exd.ExamID)
                                                       LEFT JOIN db_academic.auth_students aut ON (aut.NPM = exd.NPM)
-                                                      WHERE exd.ExamID = "'.$ExamID.'" ')->result_array();
+                                                      WHERE exd.ExamID = "'.$ExamID.'" ORDER BY aut.NPM ASC')->result_array();
         if(count($dataExamDetail)>0){
             for($i=0;$i<count($dataExamDetail);$i++){
 
@@ -3815,8 +3944,34 @@ class M_api extends CI_Model {
                                                           ON (cd.ID = sk.CDID)
                                                           LEFT JOIN db_academic.std_krs_comment skc ON (skc.KRSID = sk.ID)
                                                           WHERE sk.SemesterID = "'.$SemesterID.'" 
+                                                          AND sk.NPM = "'.$NPM.'" ')->result_array();
+            $result['ScheduleDraf'] = $DetailDrafKRS;
+
+            $checkBatalTambah = $this->db->select('ID')->get_where('db_academic.std_krs_batal_tambah',array('SemesterID' => $SemesterID, 'NPM' => $NPM))->result_array();
+
+
+
+            if(count($checkBatalTambah)<=0 && count($DetailDrafKRS)>0){
+                for ($i=0;$i<count($DetailDrafKRS);$i++){
+
+                    $dataIns = $this->db->get_where('db_academic.std_krs',array('ID' => $DetailDrafKRS[$i]['SKID']))->result_array();
+
+                    unset($dataIns[0]['ID']);
+
+                    $this->db->insert('db_academic.std_krs_batal_tambah',$dataIns[0]);
+                }
+            }
+
+            $DetailBatalTambah = $this->db->query('SELECT sk.ID AS SKID, sk.ScheduleID, sk.CDID, sk.Status, sk.TypeSP, cd.TotalSKS AS Credit, 
+                                                          skc.ID AS ReasonID, skc.Reason
+                                                          FROM db_academic.std_krs_batal_tambah sk 
+                                                          LEFT JOIN db_academic.curriculum_details cd 
+                                                          ON (cd.ID = sk.CDID)
+                                                          LEFT JOIN db_academic.std_krs_comment skc ON (skc.KRSID = sk.ID)
+                                                          WHERE sk.SemesterID = "'.$SemesterID.'" 
                                                           AND sk.NPM = "'.$NPM.'" ');
-            $result['ScheduleDraf'] = $DetailDrafKRS->result_array();
+
+            $result['ScheduleBatalTambah'] = $DetailBatalTambah->result_array();
 
 
         }
@@ -3894,12 +4049,11 @@ class M_api extends CI_Model {
                                                     WHERE sd.ScheduleID = "'.$d['ID'].'" ')->result_array();
 
                 for($s2=0;$s2<count($dataSesi);$s2++){
-                    $whereCheck = array(
+
+                    $querySeat = $this->db->get_where('db_academic.std_krs', array(
                         'SemesterID' => $d['SemesterID'],
-                        'ScheduleID' => $d['ID'],
-                        'CDID' => $CDID
-                    );
-                    $querySeat = $this->db->get_where('db_academic.std_krs', $whereCheck)->result_array();
+                        'ScheduleID' => $d['ID']
+                    ))->result_array();
                     $dataSesi[$s2]['CountSeat'] = count($querySeat);
                 }
 

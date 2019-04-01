@@ -213,6 +213,9 @@
                             <span>Budgeting</span>
                         </a>
                     </li> -->
+                    <li><a href="<?php echo base_url('help'); ?>">
+                            <i class="fa fa-bookmark"></i>
+                            Help</a></li>
                     <li class="divider"></li>
                     <li><a href="javascript:void(0)" id="useLogOut"><i class="fa fa-power-off"></i> Log Out</a></li>
                 </ul>
@@ -551,13 +554,13 @@
 
         }); // exit socket
 
-        socket.on( 'update_log', function( data ) {
+        // socket.on( 'update_log', function( data ) {
 
-            if (data.update_log == 1) {
-                showUnreadLog();
-            }
+        //     if (data.update_log == 1) {
+        //         showUnreadLog();
+        //     }
 
-        }); // exit socket
+        // }); // exit socket
     }
 
     function showUnreadLog() {
@@ -623,6 +626,14 @@
 
         });
     }
+
+     function testMobile() {
+         socket.emit('mobile_notif', {
+             Title: 'Judul Notif',
+             Message: 'Ini bagian isi',
+             dataUser : ['11140001']
+         });
+     }
 
 
     function ReadNotifDivision(){
@@ -739,6 +750,12 @@
          ?>
          <?php if ($this->session->userdata('IDdepartementNavigation') == 15): ?>
              var NameDiv = "<?php echo $this->session->userdata('prodi_active') ?>";
+             var aa = $("#wrDepartment").text();
+             $("#wrDepartment").html(aa + ' '+NameDiv);
+         <?php endif ?>
+
+         <?php if ($this->session->userdata('IDdepartementNavigation') == 34): ?>
+             var NameDiv = "<?php echo $this->session->userdata('faculty_active') ?>";
              var aa = $("#wrDepartment").text();
              $("#wrDepartment").html(aa + ' '+NameDiv);
          <?php endif ?>

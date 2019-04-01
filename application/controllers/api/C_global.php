@@ -15,9 +15,22 @@ class C_global extends CI_Controller {
         $this->load->model('master/m_master');
     }
 
+    private function template_blank($content){
+
+        $data['content'] = $content;
+        $this->load->view('template/template_blank',$data);
+    }
+
     public function getInputToken()
     {
         $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+        return $data_arr;
+    }
+
+    public function getInputTokenGet($token)
+    {
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
         return $data_arr;
@@ -199,22 +212,21 @@ class C_global extends CI_Controller {
         $input = $this->getInputToken();
         $ID_register_formulir = $input['ID_register_formulir'];
         $query = array();
-        // cek apakah ikut ujian atau tidak
-        $get = $this->m_master->caribasedprimary('db_admission.register_butuh_ujian','ID_register_formulir',$ID_register_formulir);
-        if (count($get) == 0) {
-            $get2 = $this->m_master->caribasedprimary('db_admission.register_nilai','ID_register_formulir',$ID_register_formulir);
-            for ($i=0; $i < count($get2); $i++) { 
-                $NamaUjian = $this->m_master->caribasedprimary('db_admission.ujian_perprody_m','ID',$get2[$i]['ID_ujian_perprody']);
-                $get2[$i] = $get2[$i] + array('NamaUjian' => $NamaUjian[0]['NamaUjian'],'Bobot' => $NamaUjian[0]['Bobot']);
-            }
-            $query = $get2;
-        }
-        else
-        {
-            $this->load->model('admission/m_admission');
-            $get2 = $this->m_admission->getHasilUjian($ID_register_formulir);
-            $query = $get2;
-        }
+        $query = $this->m_master->caribasedprimary('db_admission.register_nilai_fin','ID_register_formulir',$ID_register_formulir);
+        // if (count($get) == 0) {
+        //     $get2 = $this->m_master->caribasedprimary('db_admission.register_nilai','ID_register_formulir',$ID_register_formulir);
+        //     for ($i=0; $i < count($get2); $i++) { 
+        //         $NamaUjian = $this->m_master->caribasedprimary('db_admission.ujian_perprody_m','ID',$get2[$i]['ID_ujian_perprody']);
+        //         $get2[$i] = $get2[$i] + array('NamaUjian' => $NamaUjian[0]['NamaUjian'],'Bobot' => $NamaUjian[0]['Bobot']);
+        //     }
+        //     $query = $get2;
+        // }
+        // else
+        // {
+        //     $this->load->model('admission/m_admission');
+        //     $get2 = $this->m_admission->getHasilUjian($ID_register_formulir);
+        //     $query = $get2;
+        // }
         echo json_encode($query);
     }
 
@@ -235,66 +247,73 @@ class C_global extends CI_Controller {
 
     public function testInject()
     {
-        $sql = 'select NIP,Name from db_employees.employees 
-                where SUBSTRING_INDEX(PositionMain,".",-1) = 6 and Status = "1" ';
-        $query=$this->db->query($sql, array())->result_array();
-        // 3 administrative
-        for ($i=0; $i < count($query); $i++) { 
-            $NIP = $query[$i]['NIP'];
-            // check NIP existing
-            $get = $this->m_master->caribasedprimary('db_reservation.previleges_guser','NIP',$NIP);
-            if (count($get) == 0) {
-                $dataSave = array(
-                    'NIP' => $NIP,
-                    'G_user' => 9,
-                );
-                $this->db->insert('db_reservation.previleges_guser', $dataSave);
-            }
-            else
-            {
-                $dataSave = array(
-                    'G_user' => 9,
-                );
-                $this->db->where('NIP',$NIP);
-                $this->db->update('db_reservation.previleges_guser', $dataSave);
-            }
+        ini_set('max_execution_time', 3600); //300 seconds = 5 minutes
+        ini_set('max_execution_time', 0); // for infinite time of execution
 
-        }
+        // $sql = 'SELECT a.NIP,a.Name,SPLIT_STR(a.PositionMain, ".", 1) as PositionMain1,
+        //        SPLIT_STR(a.PositionMain, ".", 2) as PositionMain2,
+        //              a.StatusEmployeeID
+        // FROM   db_employees.employees as a
+        // where SPLIT_STR(a.PositionMain, ".", 1) = 12 and a.StatusEmployeeID != -1';
+        // $query=$this->db->query($sql, array())->result_array();
+        // for ($i=0; $i < count($query); $i++) { 
+        //     $NIP = $query[$i]['NIP'];
+        //     $IDDivision = 34;
+        //     $sql1 = 'select count(*) as total from db_employees.rule_users where NIP = ? and IDDivision = ?';
+        //     $query1=$this->db->query($sql1, array($NIP,$IDDivision))->result_array();
+        //     $total = $query1[0]['total'];
+        //     if ($total == 0) {
+        //        $dataSave = array(
+        //             'NIP' => $NIP,
+        //             'IDDivision' => $IDDivision,
+        //             'privilege' => 1,
+        //        );
 
+        //        $this->db->insert('db_employees.rule_users',$dataSave);
+        //     }
+        // }
+
+
+
+        // $datasave = array(
+        //     'Approver2' => '[{"TypeApprover":"Division","Approver":"8"}]',
+        // );
+        // $this->db->where('Approver2','["8"]');
+        // $this->db->update('db_reservation.category_room',$datasave);
     }
 
     public function testInject2()
     {
-        $get = $this->m_master->showData_array('db_admission.sale_formulir_offline');
-        for ($i=0; $i < count($get); $i++) { 
-            $ID = $get[$i]['ID'];
-            $FullName = strtolower($get[$i]['FullName']);
-            $FullName = ucwords($FullName);
-            $dataSave = array(
-                    'FullName' => ucwords($FullName),
-                    'Email' => strtolower($get[$i]['Email'])
-                            );
-            $this->db->where('ID',$ID);
-            $this->db->update('db_admission.sale_formulir_offline', $dataSave);
-        }
+        // $get = $this->m_master->showData_array('db_admission.sale_formulir_offline');
+        // for ($i=0; $i < count($get); $i++) { 
+        //     $ID = $get[$i]['ID'];
+        //     $FullName = strtolower($get[$i]['FullName']);
+        //     $FullName = ucwords($FullName);
+        //     $dataSave = array(
+        //             'FullName' => ucwords($FullName),
+        //             'Email' => strtolower($get[$i]['Email'])
+        //                     );
+        //     $this->db->where('ID',$ID);
+        //     $this->db->update('db_admission.sale_formulir_offline', $dataSave);
+        // }
 
 
     }
 
     public function testInject3()
     {
-        $get = $this->m_master->showData_array('db_admission.register');
-        for ($i=0; $i < count($get); $i++) { 
-            $ID = $get[$i]['ID'];
-            $FullName = strtolower($get[$i]['Name']);
-            $FullName = ucwords($FullName);
-            $dataSave = array(
-                    'Name' => ucwords($FullName),
-                    'Email' => strtolower($get[$i]['Email'])
-                            );
-            $this->db->where('ID',$ID);
-            $this->db->update('db_admission.register', $dataSave);
-        }
+        // $get = $this->m_master->showData_array('db_admission.register');
+        // for ($i=0; $i < count($get); $i++) { 
+        //     $ID = $get[$i]['ID'];
+        //     $FullName = strtolower($get[$i]['Name']);
+        //     $FullName = ucwords($FullName);
+        //     $dataSave = array(
+        //             'Name' => ucwords($FullName),
+        //             'Email' => strtolower($get[$i]['Email'])
+        //                     );
+        //     $this->db->where('ID',$ID);
+        //     $this->db->update('db_admission.register', $dataSave);
+        // }
 
 
     }
@@ -312,20 +331,20 @@ class C_global extends CI_Controller {
         //     $this->db->update('db_admission.formulir_number_offline_m', $dataSave);
         // }
 
-        $sql = 'select ID from db_admission.register_formulir where ID not in (select ID_register_formulir from db_admission.register_document)';
-        $query=$this->db->query($sql, array())->result_array();
-        for ($i=0; $i < count($query); $i++) {
-            $ID_register_formulir = $query[$i]['ID']; 
-            $arrID_reg_doc_checklist = $this->m_master->caribasedprimary('db_admission.reg_doc_checklist','Active',1);
-            for ($xy=0; $xy < count($arrID_reg_doc_checklist); $xy++) { 
-                $dataSave = array(
-                        'ID_register_formulir' => $ID_register_formulir,
-                        'ID_reg_doc_checklist' => $arrID_reg_doc_checklist[$xy]['ID'],
-                                );
+        // $sql = 'select ID from db_admission.register_formulir where ID not in (select ID_register_formulir from db_admission.register_document)';
+        // $query=$this->db->query($sql, array())->result_array();
+        // for ($i=0; $i < count($query); $i++) {
+        //     $ID_register_formulir = $query[$i]['ID']; 
+        //     $arrID_reg_doc_checklist = $this->m_master->caribasedprimary('db_admission.reg_doc_checklist','Active',1);
+        //     for ($xy=0; $xy < count($arrID_reg_doc_checklist); $xy++) { 
+        //         $dataSave = array(
+        //                 'ID_register_formulir' => $ID_register_formulir,
+        //                 'ID_reg_doc_checklist' => $arrID_reg_doc_checklist[$xy]['ID'],
+        //                         );
 
-                $this->db->insert('db_admission.register_document', $dataSave);
-            }
-        }
+        //         $this->db->insert('db_admission.register_document', $dataSave);
+        //     }
+        // }
         
     }
 
@@ -455,7 +474,7 @@ class C_global extends CI_Controller {
        //catch exception
        catch(Exception $e) {
          // handling orang iseng
-         echo '{"status":"999","message":"jangan iseng :D"}';
+         echo '{"status":"999","message":"Not Authorize"}';
        }
     }
 
@@ -501,6 +520,31 @@ class C_global extends CI_Controller {
                 $MarkomEmail ='';
                 if (is_array($mks)) {
                     $xx = $mks;
+                    $dzx = array();
+                    for ($xz=0; $xz < count($xx); $xz++) { 
+                        $pos1 = stripos($xx[$xz], 'Note');
+                        $exitLoop = false;
+                        if ($pos1 !== false) {
+                            $temp = array();
+                            for ($ixx = $xz; $ixx < count($xx); $ixx++) { 
+                                $temp[] = $xx[$ixx];
+                            }
+                            $dzx[] = implode(',', $temp);
+                            $exitLoop = true;
+                        }
+                        else
+                        {
+                            $dzx[] = $xx[$xz];
+                        }
+
+                        if ($exitLoop) {
+                            break;
+                        }
+                    }
+
+                    $xx = $dzx;
+
+                    
                     $MarkomEmail ='<li>Documentation<ul>';
                     for ($i=0; $i < count($xx); $i++) { 
                         if(strpos($xx[$i], 'Note') === false) {
@@ -589,12 +633,41 @@ class C_global extends CI_Controller {
                                         $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
                                         $Approver2 = $getDataCategoryRoom[0]['Approver2'];
                                         $Approver2 = json_decode($Approver2);
-                                        $getApprover2 = $this->m_master->caribasedprimary('db_employees.division','ID',$Approver2[0]);
-                                        $EmailApprover2 = $getApprover2[0]['Email'];
+
+                                        $EmailPUAPP2 = '';
+                                        $CodeAPP2 = '';
+                                        $NameWR = '';
+                                        for ($zz=0; $zz < count($Approver2); $zz++) { 
+                                            $rdata = $Approver2[$zz];
+                                            $TypeApprover = $rdata->TypeApprover;
+                                            $bool = false;
+                                            switch ($TypeApprover) {
+                                                case 'Division':
+                                                    $DivisionApprove = $this->m_master->caribasedprimary('db_employees.division','ID',$rdata->Approver);
+                                                    $EmailPUAPP2 = $DivisionApprove[0]['Email'];
+                                                    $CodeAPP2 = $DivisionApprove[0]['ID'];
+                                                    $NameWR = $DivisionApprove[0]['Division'].' Team';
+                                                    $bool = true;
+                                                    break;
+                                                case 'Employees':
+                                                    $NIPAPP2 = $rdata->Approver;
+                                                    $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIPAPP2);
+                                                    $EmailPUAPP2 = $G_emp[0]['EmailPU'];
+                                                    $CodeAPP2 = $NIPAPP2;
+                                                    $NameWR = 'Mr/Mrs '.$G_emp[0]['Name'];
+                                                    $bool = true;
+                                                    break;
+
+                                            }
+
+                                            if ($bool) {
+                                                break;
+                                            }
+                                        }
 
                                         $token = array(
-                                            'EmailPU' => $EmailApprover2,
-                                            'Code' => $Approver2[0],
+                                            'EmailPU' => $EmailPUAPP2,
+                                            'Code' => $CodeAPP2,
                                             'ID_t_booking' => $data_arr['ID_t_booking'],
                                             'approvalNo' => 2,
                                             'Email_add_person' => $Email_add_person,
@@ -603,10 +676,25 @@ class C_global extends CI_Controller {
                                             'KetAdditional_eq' => $KetAdditional_eq,
                                         );
                                         $token = $this->jwt->encode($token,'UAP)(*');
+
+                                        $approver1 = $data_arr['Code'];
+                                        $nmapprover1 = '';
+                                        $strlenapprover1 = strlen($approver1);
+                                        if ($strlenapprover1 > 3) {
+                                            $G_app1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$approver1);
+                                            $nmapprover1 = $G_app1[0]['Name'];
+                                        }
+                                        else
+                                        {
+                                            $G_app1 = $this->m_master->caribasedprimary('db_employees.division','ID',$approver1);
+                                            $nmapprover1 = $G_app1[0]['Division'];
+                                        }
+
                                         if($_SERVER['SERVER_NAME']!='localhost') {
                                             // email to ga
-                                            $Email = $EmailApprover2;
-                                            $text = 'Dear Team,<br><br>
+                                            $Email = $EmailPUAPP2;
+                                            $text = 'Dear '.$NameWR.',<br><br>
+                                                        Venue Reservation has been approved by '.$nmapprover1.' as Approver 1,<br><br>
                                                         Please help to approve Venue Reservation,<br><br>
                                                         Details Schedule : <br><ul>
                                                         <li>Start  : '.$StartNameDay.', '.$t_booking[0]['Start'].'</li>
@@ -642,8 +730,9 @@ class C_global extends CI_Controller {
                                         }
                                         else
                                         {
-                                            $Email = 'alhadi.rahman@podomorouniversity.ac.id';
-                                            $text = 'Dear Team,<br><br>
+                                            $Email = $EmailPUAPP2;
+                                            $text = 'Dear '.$NameWR.',<br><br>
+                                                        Venue Reservation has been approved by '.$nmapprover1.' as Approver 1,<br><br>
                                                         Please help to approve Venue Reservation,<br><br>
                                                         Details Schedule : <br><ul>
                                                         <li>Start  : '.$StartNameDay.', '.$t_booking[0]['Start'].'</li>
@@ -661,6 +750,12 @@ class C_global extends CI_Controller {
                                                             <tr>
                                                                 <td bgcolor="#51a351" align="center">
                                                                     <a href="'.url_pas.'approve_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >Approve</a>
+                                                                </td>
+                                                                <td>
+                                                                   -
+                                                                </td>
+                                                                <td bgcolor="#de4341" align="center">
+                                                                    <a href="'.url_pas.'cancel_venue/'.$token.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #de4341;" target="_blank" >Reject</a>
                                                                 </td>
                                                             </tr>
                                                             </tbody>
@@ -882,7 +977,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -975,7 +1070,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         } 
     }
 
@@ -1009,7 +1104,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1038,9 +1133,9 @@ class C_global extends CI_Controller {
                 }
 
                 $Reason = 'Cancel by yourself';
-                if(array_key_exists("Reason",$input))
+                if(array_key_exists("Reason",$dataToken))
                 {
-                    $Reason = $input['Reason'];
+                    $Reason = $dataToken['Reason'];
                 }
 
                 for ($i=0; $i < count($getE_additional); $i++) { 
@@ -1160,7 +1255,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1176,7 +1271,8 @@ class C_global extends CI_Controller {
                 $arr_eq = (array)$dataToken['arr_eq'];
                 $this->load->model('vreservation/m_reservation');
                 for ($i=0; $i < count($arr_eq); $i++) {
-                    $chkQty = ($action == 'Reject') ? true : $this->m_reservation->chkQty_eq_additional($idtbooking,$arr_eq[$i]);
+                    $chkQty = ($action == 'Reject') ? true : $this->m_reservation->chkQty_eq_additional2($idtbooking,$arr_eq[$i]);
+                    // $chkQty = $this->m_reservation->chkQty_eq_additional2($idtbooking,$arr_eq[$i]);
                     if ($chkQty) {
                         $datasave = array(
                             'ApproveBy' => $this->session->userdata('NIP'),
@@ -1207,7 +1303,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1245,7 +1341,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1275,7 +1371,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1316,7 +1412,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
         
 
@@ -1346,7 +1442,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1402,7 +1498,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1435,8 +1531,60 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
+
+
+    // ==== Exchange Schedule =====
+
+    public function exchange_approved($token){
+
+        $data = $this->getInputTokenGet($token);
+        $content = $this->load->view('global/academic/attendance/schedule_exchange_approve',$data,true);
+        $this->template_blank($content);
+    }
+
+    public function exchange_rejected($token){
+
+        $data = $this->getInputTokenGet($token);
+        $content = $this->load->view('global/academic/attendance/schedule_exchange_rejecte',$data,true);
+        $this->template_blank($content);
+    }
+
+    public function modify_attendance($token,$action){
+
+        $data = $this->getInputTokenGet($token);
+        $data['token'] = $token;
+        $data['action'] = strtolower($action);
+
+        $content = $this->load->view('global/academic/attendance/modify_attendance',$data,true);
+        $this->template_blank($content);
+    }
+
+    public function genrateBarcode($code)
+    {
+        //load library
+        $this->load->library('zend');
+        //load in folder Zend
+        $this->zend->load('Zend/Barcode');
+        //generate barcode
+        Zend_Barcode::render('code128', 'image', array('text'=>$code), array());
+    }
+
+    public function getBarcodeExam(){
+
+//        $data = $this->db->query('SELECT ex.*,em.Name AS Peng1, em2.Name AS Peng2 FROM db_academic.exam ex
+//                                            LEFT JOIN db_academic.exam_group exg ON (exg.ExamID = ex.ID)
+//                                            LEFT JOIN db_employees.employees em ON (em.NIP = ex.Pengawas1)
+//                                            LEFT JOIN db_employees.employees em2 ON (em2.NIP = ex.Pengawas2)
+//                                            GROUP BY ex.ID
+//                                            WHERE ex.SemesterID = 14 AND ex.UTS = "uts" ')->result_array();
+//
+//        print_r($data);
+//        exit;
+        $this->load->view('global/academic/exam');
+    }
+
 
 }

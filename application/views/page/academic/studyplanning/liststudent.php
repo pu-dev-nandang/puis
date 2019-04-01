@@ -100,6 +100,7 @@
                 '                <th rowspan="2">Course</th>' +
                 '                <th rowspan="2" style="width: 7%;">Credit</th>' +
                 '                <th rowspan="2" style="width: 5%;">Action</th>' +
+                '                <th rowspan="2" style="width: 5%;">Batal Tambah</th>' +
                 '            </tr>' +
                 '            <tr>' +
                 '                <th style="width: 5%;">BPP</th>' +

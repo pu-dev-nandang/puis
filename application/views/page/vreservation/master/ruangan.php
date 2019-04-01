@@ -243,7 +243,7 @@
         var Name = (action=='edit' || action=='delete') ? classroom[1] : '';
         var NameEng = (action=='edit' || action=='delete') ? classroom[2] : '';
         var Approver1 = (action=='edit' || action=='delete') ? $(this).attr('approver1_ori') : '';
-        var Approver2 = (action=='edit' || action=='delete') ? classroom[4] : '';
+        var Approver2 = (action=='edit' || action=='delete') ? $(this).attr('approver2_ori') : '';
         if(action=='add' || action=='edit'){
             // option value selected for approver
             var JsonApprover1 = '';
@@ -260,7 +260,21 @@
                 
             }
 
-            var selected2 = (action=='add') ? '' :Approver2[0];
+            // option value selected for approver
+            var JsonApprover2 = '';
+            var UserType2Edit = '';
+            var TypeApprover2Edit = '';
+            var Approver2Edit = '';
+            if (action=='edit') {
+                JsonApprover2 = jQuery.parseJSON(findAndReplace(Approver2, "'", '"'));
+                if (JsonApprover2.length > 0) {
+                    TypeApprover2Edit = JsonApprover2[0].TypeApprover;
+                    Approver2Edit = JsonApprover2[0].Approver;
+                }
+                
+            }
+
+            
                 var getPositionUser = (function(selected1){
                     var aa = '';
                     for (var i = 0; i < PositionUser.length; i++) {
@@ -326,7 +340,7 @@
                 var getDivision1 = function(selected1){
                     var aa = '';
                     for(var i=0;i< division.length;i++){
-                        if (selected2 == '') {
+                        if (selected1 == '') {
                             aa+= '<option value="'+division[i].ID+'" '+''+'>'+division[i].Division+'</option>';
                         }
                         else
@@ -365,21 +379,30 @@
                     return aa;
                 }
 
-                var OPselectedTypeApprover1 = function(selected1){
+                var OPselectedTypeApprover1 = function(selected1,Hide = ''){
                     var OP =''; 
                     for (var k = 0; k < 3; k++) {
                         switch(k) {
                                     case 0:
                                         var selectedTypeApprover1 = (selected1 == 'Position') ? 'selected' : '';
-                                        OP +=  '<option value ="Position" '+selectedTypeApprover1+'>Position</option>';
+                                        if (Hide != 'Position') {
+                                           OP +=  '<option value ="Position" '+selectedTypeApprover1+'>Position</option>'; 
+                                        }
+                                        
                                         break;
                                     case 1:
                                         var selectedTypeApprover1 = (selected1 == 'Employees') ? 'selected' : '';
-                                        OP +=  '<option value ="Employees" '+selectedTypeApprover1+'>Employees</option>';
+                                        if (Hide != 'Employees') {
+                                           OP +=  '<option value ="Employees" '+selectedTypeApprover1+'>Employees</option>'; 
+                                        }
+                                        
                                         break;
                                     case 2:
                                        var selectedTypeApprover1 = (selected1 == 'Division') ? 'selected' : '';
-                                       OP +=  '<option value ="Division" '+selectedTypeApprover1+'>Division</option>';
+                                       if (Hide != 'Division') {
+                                        OP +=  '<option value ="Division" '+selectedTypeApprover1+'>Division</option>';
+                                       }
+                                       
                                         break;
                                 }
                     }
@@ -441,14 +464,18 @@
                 '                            </div>'+
                                             '<hr>'+
                 '                         <div class = "row" style="margin-top: 10px">'+
-                '                           <div class = "col-xs-8">'+
-                '                                <div class="form-group"><label>Approver 2</label>' +
-                '                               <select class=" form-control Approver2">'+
-                '                                   <option value = "0" selected>-- No Selected --</option>'+getDivision(selected2)+
+                '                           <div class = "col-xs-12">'+
+                '                               <label>Approver 2</label>' +
+                '                           </div>'+
+                '                           <div class = "col-xs-4 class_approver2">'+
+                '                                <div class="form-group"><label>Category Approver</label>' +
+                '                               <select class=" form-control TypeApprover2">'+
+                '                                   <option value = "0" selected>-- Choose Type Approver--</option>'+OPselectedTypeApprover1(TypeApprover2Edit,'Position')+
                 '                               </select></div>'+
                 '                           </div>'+
+                '<div id = "AddApprover2TypeApp" class = "col-xs-4"></div>'+
                 '                           <div class = "col-xs-4">'+
-                '                               <button class="btn btn-default" id = "addApprover2" style = "margin-top : 23px"><i class="icon-plus"></i> Add</button>'+
+                '                               <!--<button class="btn btn-default" id = "addApprover2" style = "margin-top : 23px"><i class="icon-plus"></i> Add</button>-->'+
                 '                           </div>'+
                 '                        </div>'+
                 '                         <div id = "AddApprover2"></div>'        
@@ -576,19 +603,75 @@
                 }
 
                 // approver 2
-                for (var i = 1; i < Approver2.length; i++) {
-                    var Input = '<div class = "row" style="margin-top: 5px">'+
+                var aa = TypeApprover2Edit;
+                switch(aa) {
+                    case 'Employees':
+                        Op = getEmployees(Approver2Edit);
+                        break;
+                    case 'Division':
+                       Op = getDivision1(Approver2Edit);
+                        break;
+                    default :
+                       Op = getDivision1(Approver2Edit);     
+                }
+                var Input = '<div class = "row" style="margin-top: 5px">'+
+                                '<div class="col-xs-12">'+
+                                    '<div class = "form-group">'+
+                                        '<label>Choose Approver 2</label>'+
+                                        '<select class=" form-control Approver2">'+
+                                        '   <option value = "0" selected>-- No Selected --</option>'+Op+
+                                        '</select>'+
+                                    '</div>'+    
+                                '</div>'+       
+                            '</div>';
+
+                $("#AddApprover2TypeApp").html(Input); 
+
+                $('select[tabindex!="-1"]').select2({
+                    //allowClear: true
+                });
+                selected1 = JsonApprover2;
+                for (var i = 1; i < selected1.length; i++) {
+                    var aa = selected1[i].TypeApprover;
+                    switch(aa) {
+                        case 'Position':
+                            Op = getPositionUser(selected1[i].Approver);
+                            break;
+                        case 'Employees':
+                            Op = getEmployees(selected1[i].Approver);
+                            break;
+                        case 'Division':
+                           Op = getDivision1(selected1[i].Approver);
+                            break;
+                    }
+                    var InputApprover1 = '<div class = "row" style="margin-left : 0px">'+
                                     '<div class="col-xs-12">'+
-                                        '<div class="col-xs-8" style = "margin-left : -15px">'+
-                                            '                               <select class=" form-control Approver2">'+
-                                            '                                   <option value = "0" selected>-- No Selected --</option>'+getDivision(Approver2[i])+
-                                            '                               </select>'+
-                                        '</div>'+
-                                        '<div class="col-xs-4">'+
-                                            '<button type="button" class="btn btn-danger btn-deleteAuto2"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>'+
-                                        '</div>'+
+                                        '<div class = "form-group">'+
+                                            '<label>Choose Approver 1</label>'+
+                                            '<select class=" form-control Approver2">'+
+                                            '   <option value = "0" selected>-- No Selected --</option>'+Op+
+                                            '</select>'+
+                                        '</div>'+    
                                     '</div>'+       
                                 '</div>';
+
+
+                    var Input = '<div class="thumbnail" style="height: 100px;margin-top : 10px"><div class = "row" style = "margin-top : 10px;margin-left : 0px">'+
+                                    '<div class = "col-xs-3">'+
+                                        '<div class = "form-group">'+
+                                            '<label>Category Approver</label>'+
+                                            '<select class=" form-control TypeApprover1">'+
+                                                '<option value = "0" selected>-- Choose Type Approver--</option>'+
+                                                OPselectedTypeApprover1(selected1[i].TypeApprover)+     
+                                            '</select>'+
+                                        '</div>'+    
+                                    '</div>'+
+                                    '<div class = "col-xs-4 AppendApprover1">'+InputApprover1+'</div>'+ // exit row
+                                    '<div class="col-xs-2">'+
+                                        '<button type="button" class="btn btn-danger btn-deleteAuto" style = "margin-top : 23px"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>';
 
                     $("#AddApprover2").append(Input); 
 
@@ -596,11 +679,16 @@
                         //allowClear: true
                     });
 
-                    $(".btn-deleteAuto2").click(function(){
-                        $(this)
-                          .parentsUntil( 'div[class="row"]' ).remove();
+                    $(".btn-deleteAuto").click(function(){
+                        $( this )
+                          .closest( 'div[class="thumbnail"]'  )
+                          .remove();
+                        // $(this)
+                        //   .parentsUntil( 'div[class="thumbnail"]' ).remove();
                     })
+
                 }
+                
             } // edit
 
 
@@ -685,14 +773,17 @@
             $("#addApprover2").click(function(){
                 var Input = '<div class = "row" style="margin-top: 5px">'+
                                 '<div class="col-xs-12">'+
-                                    '<div class="col-xs-8" style = "margin-left : -15px">'+
-                                        '                               <select class=" form-control Approver2">'+
-                                        '                                   <option value = "0" selected>-- No Selected --</option>'+getDivision('')+
+                                '<div class = "row" style = "margin-left : 0px;">'+    
+                                    '<div class="col-xs-4 class_approver2" style = "margin-left : -15px">'+
+                                        '                               <select class=" form-control TypeApprover2">'+
+                                        '                                   <option value = "0" selected>-- No Selected --</option>'+OPselectedTypeApprover1('','Position')+
                                         '                               </select>'+
                                     '</div>'+
+                                    '<div class = "col-xs-4 AddApprover2TypeApp"></div>'+
                                     '<div class="col-xs-4">'+
                                         '<button type="button" class="btn btn-danger btn-deleteAuto2"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>'+
                                     '</div>'+
+                                '</div>'+    
                                 '</div>'+       
                             '</div>';
 
@@ -701,6 +792,40 @@
                 $('select[tabindex!="-1"]').select2({
                     //allowClear: true
                 });
+
+                $(".TypeApprover2").change(function(){
+                    var aa = $(this).val();
+                    var Op = getDivision1('');
+                    switch(aa) {
+                        case 'Position':
+                            Op = getPositionUser('');
+                            break;
+                        case 'Employees':
+                            Op = getEmployees('');
+                            break;
+                        case 'Division':
+                           Op = getDivision1('');
+                            break;
+                    }
+                    var Input = '<div class = "row" style="margin-left : -10px">'+
+                                    '<div class="col-xs-12">'+
+                                        '<div class = "form-group">'+
+                                            // '<label>Choose Approver 2</label>'+
+                                            '<select class=" form-control Approver2">'+
+                                            '   <option value = "0" selected>-- No Selected --</option>'+Op+
+                                            '</select>'+
+                                        '</div>'+    
+                                    '</div>'+       
+                                '</div>';
+
+                    $( this )
+                      .closest( '.row'  ).find('.AddApprover2TypeApp').html(Input);          
+                    // $("#AddingApprover").append(Input); 
+
+                    $('select[tabindex!="-1"]').select2({
+                        //allowClear: true
+                    });
+                }) 
 
                 $(".btn-deleteAuto2").click(function(){
                     $( this )
@@ -743,6 +868,38 @@
                 });
             })  
              
+            $(".TypeApprover2:first").change(function(){
+                 var aa = $(this).val();
+                 console.log(aa);
+                 var Op = getDivision1('');
+                 switch(aa) {
+                     case 'Position':
+                         Op = getPositionUser('');
+                         break;
+                     case 'Employees':
+                         Op = getEmployees('');
+                         break;
+                     case 'Division':
+                        Op = getDivision1('');
+                         break;
+                 }
+                 var Input = '<div class = "row" style="margin-top: 0px">'+
+                                 '<div class="col-xs-12">'+
+                                     '<div class = "form-group">'+
+                                         '<label>Choose Approver 2</label>'+
+                                         '<select class=" form-control Approver2">'+
+                                         '   <option value = "0" selected>-- No Selected --</option>'+Op+
+                                         '</select>'+
+                                     '</div>'+    
+                                 '</div>'+       
+                             '</div>';
+
+                 $("#AddApprover2TypeApp").html(Input); 
+
+                 $('select[tabindex!="-1"]').select2({
+                     //allowClear: true
+                 });
+            })  
 
         }
         else {
@@ -838,12 +995,26 @@
         var Approver1 = getApprover1;     
 
         var Approver2 = [];
-        $(".Approver2").each(function(){
-            if ($(this).val() != 0) {
-                Approver2.push($(this).val());
+        $(".TypeApprover2").each(function(){
+            if (!$(this).closest('.row').find('.Approver2').length) {
+                var Approver = '';
             }
-            
+            else
+            {
+                var Approver = $(this).closest('.row').find('.Approver2').val();
+            }
+            var data = {
+                TypeApprover : $(this).val(),
+                Approver : Approver,
+            }
+            Approver2.push(data);
         })
+        // $(".Approver2").each(function(){
+        //     if ($(this).val() != 0) {
+        //         Approver2.push($(this).val());
+        //     }
+            
+        // })
         
         if(Name!='' && NameEng != '' && Approver1.length > 0 && Approver2.length > 0){
             $('#formName,#formNameEng').prop('disabled',true);
@@ -986,7 +1157,7 @@
                         '<td class="td-left">'+data.Approver1+'</td>' +
                         '<td class="td-left">'+data.Approver2+'</td>' +
                         '<td class="td-left">' +
-                        '<button class="btn btn-default btn-default-success btn-Categoryclassroom btn-edit" data-action="edit" data-form="'+data.ID+'|'+data.Name+'|'+data.NameEng+'|'+''+'|'+data.Approver2_ori+'" Approver1_ori = "'+data.Approver1_ori+'"><i class="fa fa-pencil" aria-hidden="true"></i></button> ' +
+                        '<button class="btn btn-default btn-default-success btn-Categoryclassroom btn-edit" data-action="edit" data-form="'+data.ID+'|'+data.Name+'|'+data.NameEng+'|'+''+'|'+''+'" Approver1_ori = "'+data.Approver1_ori+'" Approver2_ori = "'+data.Approver2_ori+'"><i class="fa fa-pencil" aria-hidden="true"></i></button> ' +
                         ' <button class="btn btn-default btn-default-danger btn-Categoryclassroom btn-delete" data-action="delete" data-form="'+data.ID+'|'+data.Name+'|'+data.NameEng+'|'+data.Approver1+'|'+data.Approver2+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>' +
                         '</td>' +
                         '</tr>');

@@ -164,7 +164,7 @@
         }
 
     });
-    
+
     function loadTimetables() {
         var filterProgramCampus = $('#filterProgramCampus').val();
         var filterSemester = $('#filterSemester').val();
@@ -255,7 +255,7 @@
 
         }
     }
-    
+
     $(document).on('click','.showStudent',function () {
 
         var url = base_url_js+'api/__crudSchedule';
@@ -326,9 +326,9 @@
             });
 
         });
-        
+
     });
-    
+
     $(document).on('click','.btnSetResign',function () {
 
         if(confirm('Are you sure to submit?')){
@@ -438,4 +438,171 @@
         }
 
     });
+
+
+
+    // Details Students
+    $(document).on('click','.showStudentCuy',function () {
+        var Course = $(this).attr('data-course');
+        var no = $(this).attr('data-no');
+
+        var detailsStudentCuy = $('#detailsStudentCuy'+no).val();
+
+        var dataStudent = JSON.parse(detailsStudentCuy);
+
+        var Planning = dataStudent.Planning;
+        var dataHtmlModal = '';
+
+        if(Planning.length>0){
+            dataHtmlModal = '<div class="row">' +
+                '    <div class="col-md-12">' +
+                '        <table class="table table-striped">' +
+                '            <thead>' +
+                '            <tr>' +
+                '                <th style="width: 1%;text-align: center;">No</th>' +
+                '                <th style="text-align: center;">Students</th>' +
+                '                <th style="width: 15%;text-align: center;">Status</th>' +
+                '                <th style="width: 15%;text-align: center;">Attendance</th>' +
+                '            </tr>' +
+                '            </thead>' +
+                '            <tbody id="loadDataStdCuy"></tbody>' +
+                '        </table>' +
+                '    </div>' +
+                '</div>';
+        }
+
+
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">'+Course+'</h4>');
+        $('#GlobalModal .modal-body').html(dataHtmlModal);
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+        if(Planning.length>0){
+            var noAsc =1;
+            $.each(Planning,function (i,v) {
+
+                var sts = ($.inArray(v.NPM,dataStudent.Approve)!=-1)
+                    ? '<span style="color: green;"><i class="fa fa-check-circle"></i></span>' : '-';
+                var stsClass = ($.inArray(v.NPM,dataStudent.Approve)!=-1)
+                    ? '' : 'style="color:red;"';
+
+                var arr_ID_Attd = [];
+                if(v.Attendance.length>0){
+                    $.each(v.Attendance,function (i2, v2) {
+                        arr_ID_Attd.push(v2.ID_Attd);
+                    });
+                }
+
+                var btnAttd = '<button class="btn btn-sm btn-default btn-default-danger btnRmvAttdStudent" data-no="'+noAsc+'" data-npm="'+v.NPM+'" data-attd="'+arr_ID_Attd.sort()+'">Dell</button>';
+                // Cek Attendance
+                if(v.TotalAttd < v.Attendance.length){
+                    btnAttd = '<button class="btn btn-sm btn-default btn-default-success btnAddAttdStudent" data-no="'+noAsc+'" data-npm="'+v.NPM+'" data-attd="'+arr_ID_Attd.sort()+'">Add</button>';
+                }
+
+                $('#loadDataStdCuy').append('<tr '+stsClass+'>' +
+                    '<td style="text-align: center;">'+noAsc+'</td>' +
+                    '<td><span style="font-size: 15px;">'+v.Name+'</span><br/>'+v.NPM+'</td>' +
+                    '<td style="text-align: center;">'+sts+'</td>' +
+                    '<td style="text-align: center;" id="td_s'+noAsc+'">'+btnAttd+'</td>' +
+                    '</tr>');
+
+                noAsc +=1 ;
+            });
+        }
+
+
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+        $('.btnAddAttdStudent').click(function () {
+
+            if(confirm('Are you sure?')){
+                $('.btnRmvAttdStudent,.btnAddAttdStudent').prop('disabled',true);
+
+                var No = $(this).attr('data-no');
+                var NPM = $(this).attr('data-npm');
+                var Arr_ID_Attd = $(this).attr('data-attd').split(',');
+
+                var dataForm = [];
+                if(Arr_ID_Attd.length>0){
+                    for (var o=0;o<Arr_ID_Attd.length;o++){
+                        var arr = {
+                            ID_Attd : Arr_ID_Attd[o],
+                            NPM : NPM,
+                            UpdateBy : sessionNIP,
+                            UpdateAt : dateTimeNow()
+                        };
+                        dataForm.push(arr);
+                    }
+                }
+                var data = {
+                    action : 'addAttendanceFromTimetables',
+                    dataForm : dataForm
+                };
+
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api/__crudSchedule';
+
+                $.post(url,{token:token},function (result) {
+                    toastr.success('Updated','Success');
+                    $('#td_s'+No).html('Added');
+                    loadTimetables();
+                    setTimeout(function () {
+                        $('.btnRmvAttdStudent,.btnAddAttdStudent').prop('disabled',false);
+                    },500);
+
+                });
+            }
+
+        });
+
+        $('.btnRmvAttdStudent').click(function () {
+
+            if(confirm('Are you sure?')){
+                $('.btnRmvAttdStudent,.btnAddAttdStudent').prop('disabled',true);
+
+                var No = $(this).attr('data-no');
+                var NPM = $(this).attr('data-npm');
+                var Arr_ID_Attd = $(this).attr('data-attd').split(',');
+
+                var dataForm = [];
+                if(Arr_ID_Attd.length>0){
+                    for (var o=0;o<Arr_ID_Attd.length;o++){
+                        var arr = {
+                            ID_Attd : Arr_ID_Attd[o],
+                            NPM : NPM,
+                            UpdateBy : sessionNIP,
+                            UpdateAt : dateTimeNow()
+                        };
+                        dataForm.push(arr);
+                    }
+                }
+                var data = {
+                    action : 'removeAttendanceFromTimetables',
+                    dataForm : dataForm
+                };
+
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api/__crudSchedule';
+
+                $.post(url,{token:token},function (result) {
+                    toastr.success('Updated','Success');
+                    $('#td_s'+No).html('Deleted');
+                    loadTimetables();
+                    setTimeout(function () {
+                        $('.btnRmvAttdStudent,.btnAddAttdStudent').prop('disabled',false);
+                    },500);
+
+                });
+            }
+
+        });
+
+
+    });
+
+
+
 </script>

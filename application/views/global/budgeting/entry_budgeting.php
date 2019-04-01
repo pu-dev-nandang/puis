@@ -6,20 +6,22 @@
                 <button class="btn btn-primary" id="btnBackToHome" name="button"><i class="fa fa-home" aria-hidden="true"></i></button>
             </a>
         </li>
-        <li class="<?php if($request==null || $request=='EntryBudget'){echo "active";} ?>">
-            <a href="javascript:void(0)" class="pageAnchor" page = "EntryBudget">Entry Budget</a>
-        </li>
-        <?php if ($this->session->userdata('IDDepartementPUBudget') == 'NA.9'): ?>
-        <li class="<?php if($request=='Approval'){echo "active";} ?>">
-            <a href="javascript:void(0)" class="pageAnchor" page = "Approval">Request Approval</a>
-        </li>
-        <li class="<?php if($request=='ListBudgetDepartement'){echo "active";} ?>">
-            <a href="javascript:void(0)" class="pageAnchor" page = "ListBudgetDepartement">Budget Approved</a>
+        <?php if ($this->session->userdata('IDDepartementPUBudget') != 'NA.9'): ?>
+        <li class="<?php if($request=='EntryPostItemBudgeting'){echo "active";} ?>">
+            <a href="javascript:void(0)" class="pageAnchor" page = "EntryPostItemBudgeting">Entry Sub Account</a>
         </li>
         <?php endif ?>
-        <li class="<?php if($request=='BudgetLeft'){echo "active";} ?>">
-            <a href="javascript:void(0)" class="pageAnchor" page = "BudgetLeft">Budget Remaining</a>
+        <li class="<?php if($request==null || $request=='EntryBudget'){echo "active";} ?>">
+            <a href="javascript:void(0)" class="pageAnchor" page = "EntryBudget">Set Budget</a>
         </li>
+        <?php if ($this->session->userdata('IDDepartementPUBudget') == 'NA.9'): ?>
+        <li class="<?php if($request=='ListBudgetDepartement'){echo "active";} ?>">
+            <a href="javascript:void(0)" class="pageAnchor" page = "ListBudgetDepartement">List Budget</a>
+        </li>
+        <?php endif ?>
+        <!-- <li class="<?php if($request=='BudgetLeft'){echo "active";} ?>">
+            <a href="javascript:void(0)" class="pageAnchor" page = "BudgetLeft">Budget Remaining</a>
+        </li> -->
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
         <div class="col-xs-12" >
@@ -59,6 +61,7 @@
 
     function LoadPage(page)
     {
+        loadingStart();
         loading_page("#pageContent");
         if (jQuery("#pageInputApproval").length) {
           $("#pageInputApproval").remove();

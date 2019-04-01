@@ -2610,4 +2610,138 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $query=$this->db->query($sql, array())->result_array();
         return $query;         
     }
+
+    public function GetSemester($Year,$SemesterSearch)
+    {
+        $get = $this->showData_array('db_academic.semester');
+        $Semester = 0;
+        for ($i=0; $i < count($get); $i++) { 
+            if ($Year == $get[$i]['Year'] && $get[$i]['Code'] == 1) {
+                $Semester++;
+            }
+            else
+            {
+                if ($Semester > 0) {
+                    if ($get[$i]['ID'] == $SemesterSearch) {
+                        $Semester++;
+                        break;
+                    }
+                    else
+                    {
+                        $Semester++;
+                    }
+                }
+            }
+        }
+
+        return $Semester;
+    }
+
+    public function apiservertoserver($url,$token = '')
+    {
+        $rs = array();
+        $Input = $token;
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS,
+                    "token=".$Input);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $pr = curl_exec($ch);
+        curl_close ($ch);
+        $rs = (array) json_decode($pr,true);
+        return $rs;
+    }
+
+    public function UserQNA($IDDivision = '')
+    {
+        $arr_result = array();
+        $Q_add = ($IDDivision == '') ? '' : ' where Division_ID = "'.$IDDivision.'" order by Division_ID asc,Type asc';
+        $sql = 'select * from db_employees.user_qna '.$Q_add;
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) { 
+            $Type1 = $query[$i]['Type'];
+            $temp = array('Type' => $Type1);
+            $datatemp = array();
+            $datatemp[] = array(
+                'Questions' => $query[$i]['Questions'],
+                'Answers' => $query[$i]['Answers'],
+                'File' => $query[$i]['File'],
+            );
+
+            for ($j=$i+1; $j < count($query); $j++) { 
+                $Type2 = $query[$j]['Type'];
+                if ($Type1 == $Type2) {
+                  $datatemp[] = array(
+                      'Questions' => $query[$j]['Questions'],
+                      'Answers' => $query[$j]['Answers'],
+                      'File' => $query[$j]['File'],
+                  );  
+                }
+                else
+                {
+                    $i = $j-1;
+                    break;
+                }
+
+                 $i=$j;
+            }
+
+            $temp['data'] = $datatemp;
+            $arr_result[] = $temp;
+
+        }
+
+
+        return $arr_result;
+    }
+
+    public function insert_m_tuition_fee($NPM,$PTID_Q,$ProdiID,$YearAuth,$Invoice_Q,$Discount_Q)
+    {
+        // untuk semester data diambil dari set tagihan awal, semester lainnya akan baca payment per prodi dan discount sama dengan = 0
+        $sql1 = 'select * from db_finance.tuition_fee where PTID = ? and ProdiID = ? and ClassOf = ?';
+        $query1=$this->db->query($sql1, array($PTID_Q,$ProdiID,$YearAuth))->result_array();
+        $PTID = $query1[0]['PTID'];
+        for ($k=1; $k <= 14; $k++) {
+                $st = $k; 
+                switch ($PTID) {
+                    case 1:
+                    case 4:
+                        if ($k == 1) {
+                            $Invoice = $query1[0]['Cost'];
+                            $Discount = $Discount_Q;
+                            $st = 15;
+                        }
+                        break;
+                    case 2:
+                    case 3:
+                        $Invoice = $query1[0]['Cost'];
+                        $Discount = 0;
+                        if ($k == 1) {
+                           $Invoice = $Invoice_Q;
+                           $Discount = $Discount_Q;
+                           // if ($PTID == 3) { // karena hitung satu sks
+                           //     $Invoice = $query1[0]['Cost'];
+                           //     $Discount = $Discount_Q;
+                           // }
+                        }
+                        break;
+                    default:
+                        $Invoice = 0;
+                        $Discount = 0;
+                        break;
+                }
+               $Semester = $k;
+               $dataSave = array(
+                    'Semester' => $Semester,
+                    'PTID' => $PTID,
+                    'NPM' => $NPM,
+                    'Invoice' => $Invoice,
+                    'Discount' => $Discount,
+               );
+               $this->db->insert('db_finance.m_tuition_fee',$dataSave);
+               $k = $st;
+        }
+    }
 }

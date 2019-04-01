@@ -10,6 +10,8 @@
     }
 </style>
 
+
+
 <div class="row">
     <div class="col-md-8 col-md-offset-2">
         <div class="well">
@@ -146,26 +148,28 @@
 
                         var arr_course_pdf = [];
                         for(var s=0;s<d.Schedule.length;s++){
+
                             var dt2 = d.Schedule[s];
                             var time = dt2.StartSessions.substr(0,5)+' - '+dt2.EndSessions.substr(0,5);
+
                             tr.append('<tr>' +
                                 '<td>'+dt2.DayEng+'</td>' +
                                 '<td>'+time+'</td>' +
                                 '<td>'+dt2.Room+'</td>' +
                                 '<td>14</td>' +
-                                '<td><span id="idAttd'+i+'_'+s+'">0</span></td>' +
+                                '<td style="background: #f5f5f5;"><span id="idAttd'+i+'_'+s+'">0</span></td>' +
                                 '<td><span id="idAttdPercent'+i+'_'+s+'"></span> %</td>' +
                                 '</tr>');
 
                             // Hitung Attd
-                            var Attd = 0;
-                            for(var a=1;a<=14;a++){
-                                if(dt2.Attendance[0]['Meet'+a] !=null
-                                    && dt2.Attendance[0]['Meet'+a]!='0'
-                                    && dt2.Attendance[0]['Meet'+a]!=0){
-                                    Attd = Attd + 1;
-                                }
-                            }
+                            var Attd = dt2.TotalPresent;
+                            // for(var a=1;a<=14;a++){
+                            //     if(dt2.Attendance[0]['Meet'+a] !=null
+                            //         && dt2.Attendance[0]['Meet'+a]!='0'
+                            //         && dt2.Attendance[0]['Meet'+a]!=0){
+                            //         Attd = Attd + 1;
+                            //     }
+                            // }
 
                             $('#idAttd'+i+'_'+s).html(Attd);
 

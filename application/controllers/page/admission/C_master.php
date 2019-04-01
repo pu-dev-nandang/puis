@@ -272,6 +272,11 @@ class C_master extends Admission_Controler {
     {
         $this->data['getColoumn'] = $this->m_master->getColumnTable('db_admission.'.$table);
         $this->data['getData'] = $this->m_master->showData('db_admission.'.$table);
+        if ($table == 'price_formulir' || $table == 'price_formulir_offline') {
+            $getData = $this->m_master->showData('db_admission.'.$table);
+            $getData[0]->PriceFormulir = 'Rp '.number_format($getData[0]->PriceFormulir,2,',','.');
+            $this->data['getData'] = $getData;
+        }
         echo $this->load->view('page/'.$this->data['department'].'/master/table_master_global',$this->data,true);
     }
 
@@ -1556,15 +1561,15 @@ class C_master extends Admission_Controler {
         if ($get[0]['G_user'] == 1) {
             if( !empty($requestData['search']['value']) ) {
                 $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_admission.previleges_guser as a join db_employees.employees as b
-                        on a.NIP = b.NIP ';
+                        on a.NIP = b.NIP  left join db_admission.cfg_group_user as cgu on a.G_user = cgu.ID';
 
-                $sql.= ' where a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%"';
+                $sql.= ' where a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%" or cgu.GroupAuth LIKE "%'.$requestData['search']['value'].'%"';
                 $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
             }
             else {
                  $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_admission.previleges_guser as a join db_employees.employees as b
-                         on a.NIP = b.NIP ';
+                         on a.NIP = b.NIP  left join db_admission.cfg_group_user as cgu on a.G_user = cgu.ID';
                  $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
             }
@@ -1573,15 +1578,15 @@ class C_master extends Admission_Controler {
         {
             if( !empty($requestData['search']['value']) ) {
                 $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_admission.previleges_guser as a join db_employees.employees as b
-                        on a.NIP = b.NIP ';
+                        on a.NIP = b.NIP  left join db_admission.cfg_group_user as cgu on a.G_user = cgu.ID';
 
-                $sql.= ' where a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%" and a.G_user != 1';
+                $sql.= ' where a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%" and a.G_user != 1 or cgu.GroupAuth LIKE "%'.$requestData['search']['value'].'%"';
                 $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
             }
             else {
                  $sql = 'SELECT a.NIP,b.Name,a.G_user FROM db_admission.previleges_guser as a join db_employees.employees as b
-                         on a.NIP = b.NIP and a.G_user != 1';
+                         on a.NIP = b.NIP and a.G_user != 1 left join db_admission.cfg_group_user as cgu on a.G_user = cgu.ID';
                  $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
             }
@@ -1790,6 +1795,45 @@ class C_master extends Admission_Controler {
 
         }
 
+    }
+
+    public function import_sales_regional()
+    {
+        if(isset($_FILES["fileData"]["name"]))
+        {
+          $path = $_FILES["fileData"]["tmp_name"];
+          $arr_insert = array();
+          $arr_insert_auth = array();
+          include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+          $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+          $excel2 = $excel2->load($path); // Empty Sheet
+          $objWorksheet = $excel2->setActiveSheetIndex(0);
+          $CountRow = $objWorksheet->getHighestRow();
+            
+           $arr_bulan = array(
+               'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Des'
+           ); 
+
+           $arr_temp = array();
+           $No_Ref = '';
+          for ($i=2; $i < ($CountRow + 1); $i++) {
+            $SalesNIP = $objWorksheet->getCellByColumnAndRow(0, $i)->getCalculatedValue();
+            $SchoolID = $objWorksheet->getCellByColumnAndRow(1, $i)->getCalculatedValue();
+            $dataSave = array(
+                    'SalesNIP' => $SalesNIP,
+                    'SchoolID' => $SchoolID,
+                    'CreateAT' => date('Y-m-d'),
+                            );
+            $this->db->insert('db_admission.sales_school_m', $dataSave);
+
+          }
+
+          echo json_encode(array('status'=> 1,'msg' => '','No_Ref' => $No_Ref));
+        }
+        else
+        {
+          exit('No direct script access allowed');
+        }
     }
 
 }

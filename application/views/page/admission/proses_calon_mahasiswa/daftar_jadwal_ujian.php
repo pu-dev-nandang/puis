@@ -1,12 +1,9 @@
-<div class="row" style="margin-top: 30px;">
+<!-- <div class="row" style="margin-top: 30px;">
 	<div class="col-md-12">
 		<div class="widget box">
 			<div class="widget-header">
 				<h4><i class="icon-reorder"></i><?php echo $NameMenu ?></h4>
 				<div class="toolbar no-padding">
-					<!--<div class="btn-group">
-						<span class="btn btn-xs widget-collapse"><i class="icon-angle-down"></i></span>
-					</div>-->
 				</div>
 			</div>
 			<div class="widget-content">
@@ -20,7 +17,7 @@
 				</div>
 				<br>
 		</div>
-	</div> <!-- /.col-md-6 -->
+	</div>
 </div>
 <div class="row" style="margin-top: 5px;">
     <div class="col-md-12">
@@ -39,17 +36,13 @@
 						<input class="form-control" id="FormulirCode" placeholder="All..." "="">
 					</div>
 					<div  class="col-md-6" align="right" id="pagination_link"></div>	
-					<!-- <div class = "table-responsive" id= "register_document_table"></div> -->
 				</div>
-                <!-- <div class = 'row'> -->
                 	<div id= "loadtable"></div>
-                <!-- </div> -->
-                <!-- -->
             </div>
         </div>
     </div>
-</div>
-
+</div> -->
+<h4>Comming Soon</h4>
 <script type="text/javascript">
 	$(document).ready(function () {
 		loadDataUjianNOW();
@@ -106,13 +99,13 @@
 						'<td>'+response[i]['NameCandidate']+'</td>'+
 						'<td>'+response[i]['Email']+'</td>'+
 						'<td>'+response[i]['SchoolName']+'</td>'+
-						'<td>'+response[i]['FormulirCode']+'</td>'+
+						'<td>'+response[i]['FormulirCode']+((response[i]['No_Ref']!='')? ' / '+ response[i]['No_Ref'] : '')+'</td>'+
 						'<td>'+response[i]['prody']+'</td>'+
 						'<td>'+response[i]['tanggal']+'</td>'+
 						'<td>'+response[i]['jam']+'</td>'+
 						'<td>'+response[i]['Lokasi']+'</td>'+
 					'</tr>'	
-					);
+				);
 				no++;
 			}
 		}).done(function() {

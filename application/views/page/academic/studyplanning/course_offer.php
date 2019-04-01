@@ -150,9 +150,8 @@
                 '            <tbody id="dataRowDraf"></tbody>' +
                 '        </table>');
 
-
             // Course Draf
-            if(CourseDraf.length>0){
+            if(typeof jsonResult.Course.ScheduleDraf !== 'undefined' && CourseDraf.length>0){
 
                 for(var t=0;t<Course.length;t++){
 
@@ -201,13 +200,13 @@
             }
             else {
                 $('#dataRowDraf').append('<tr>' +
-                    '<td colspan="7">--- Data not yrt ---</td>' +
+                    '<td colspan="7">--- Data not yet ---</td>' +
                     '</tr>');
             }
 
             $('#loadMyDraf').html(CreditInDraf);
 
-            if(Course.length>0){
+            if(typeof jsonResult.Course.Schedule !== 'undefined' &&  Course.length>0){
 
                 $('#divLoadCourse').html('<div class="panel panel-primary">' +
                     '            <div class="panel-heading" style="border-radius: 0px;">' +
@@ -325,8 +324,9 @@
                     }
                 }
             }
-
-
+            else {
+                $('#divLoadCourse').html('Courses not yet to offer');
+            }
 
         });
     }
@@ -352,7 +352,7 @@
         var url = base_url_js+'api/__crudStudyPlanning';
 
         $.post(url,{token:token},function (jsonResult) {
-            console.log(jsonResult);
+
             if(jsonResult.Status==1 || jsonResult.Status=='1'){
 
                 var Group = $('#viewGroup'+dataToken['ScheduleID']).text();

@@ -52,7 +52,7 @@
                             </div>
                             <div class="col-xs-4">
                                 <button class="btn btn-inverse btn-notification btn-add" id="generate">Generate VA</button>
-                                <button class="btn btn-default" id="resetva">Reset VA</button>
+                                <button class="btn btn-default btn-delete" id="resetva">Reset VA</button>
                             </div>
                         </div>
                     </div>

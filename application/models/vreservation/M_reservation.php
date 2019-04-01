@@ -327,6 +327,46 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $query->result_array();
     }
 
+    public function get_m_equipment_additional_check_date($Start,$End,$available = '> 0')
+    {
+        $rs = array();
+        $sql = 'select a.ID as ID_add,a.*,b.*,c.Division from db_reservation.m_equipment_additional as a join db_reservation.m_equipment as b
+        on a.ID_m_equipment = b.ID join db_employees.division as c on a.Owner = c.ID where a.Qty '.$available;
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) { 
+            // for Update Qty
+            $Qty0 = $query[$i]['Qty'];
+            $Qty = $this->getQtyperDateTime($query[$i]['ID_add'],$Qty0,$Start,$End);
+            $query[$i]['Qty'] = $Qty;
+            if ($Qty > 0) {
+                $rs[] = $query[$i];
+            }
+        }
+
+
+        return $rs;
+    }
+
+    public function getQtyperDateTime($ID_equipment_add,$Qty_stock,$Start,$End,$Status = 'c.Status != 2')
+    {
+        $Qty = $Qty_stock;
+        $sql = 'select a.*,c.Qty from db_reservation.t_booking as a
+                                 join db_employees.employees as b on a.CreatedBy = b.NIP
+                                 join db_reservation.t_booking_eq_additional as c on a.ID = c.ID_t_booking
+                                 where '.$Status.' and (
+                                    (a.`Start` >= "'.$Start.'" and a.`Start` < "'.$End.'" ) or (a.`End` > "'.$Start.'" and a.`End` <= "'.$End.'" )
+                                    or (
+                                            a.`Start` <= "'.$Start.'" and a.`End` >= "'.$End.'"
+                                        )
+                                ) and c.ID_equipment_additional = ?';
+        $query=$this->db->query($sql, array($ID_equipment_add))->result_array();
+        for ($i=0; $i < count($query); $i++) { 
+            $Qty = $Qty - $query[$i]['Qty'];
+        }
+
+        return $Qty;
+    }
+
     public function get_m_additional_personel()
     {
         $sql = 'select a.*,b.* from db_reservation.m_additional_personel as a join db_employees.division as b
@@ -389,10 +429,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                             left join db_academic.mata_kuliah as g on g.ID = f.MKID
                             where '".$date2."' >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
                             and '".$date2."' <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
-                            and b.NameEng = ?
+                            and b.NameEng = ? and d.SemesterID = '".$SemesterID."'
                             and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
-                            on a.ID = b.ID_Attd where b.Status = '1' and b.DateOriginal = '".$date2."')
-                            order by a.Room";  
+                            on a.ID = b.ID_Attd where b.Status = '2' and b.DateOriginal = '".$date2."')
+                            order by a.Room";
                 }
 
                 
@@ -443,7 +483,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                    left join db_employees.employees as f on e.Coordinator = f.NIP
                    left join (select * from db_academic.schedule_details_course group by ScheduleID) as g on g.ScheduleID = e.ID
                    left join db_academic.mata_kuliah as h on h.ID = g.MKID
-                   where c.Status = "1" and c.Date ="'.$date2.'"';
+                   where c.Status = "2" and c.Date ="'.$date2.'"';
             $query3=$this->db->query($sql3, array())->result_array();       
         }
         else
@@ -468,9 +508,11 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $start = $query[$i]['StartSessions'];
             $start = explode(':', $start);
             $start = $start[0].':'.$start[1];
+            $startWr = $start;
             $end = $query[$i]['EndSessions'];
             $end = explode(':', $end);
             $end = $end[0].':'.$end[1];
+            $endWr = $end;
 
             // get jumlah Mahasiswa
             $arrMhs = $this->m_api->__getStudentByScheduleID($query[$i]['ScheduleID']);
@@ -481,10 +523,51 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 $agenda = 'Exam';
             }
 
+                $varprocess = function($time)
+                {
+                    $t = explode(':', $time);
+                    $t2 = $t[1];
+                    $t1 = $t[0];
+                    $bool = 1;
+                    if ($t2 != '00' && $t2 != '30') {
+                        $t2 = (int) $t2;
+                        if ($t2 > 0 && $t2 < 30) {
+                            $t2 = '30';
+                            $bool = 0;
+                        }
+                        elseif ($t2 > 30) {
+                            $t2 = '00';
+                            $t1 = (int) $t1;
+                            $t1++;
+                            // make two digit
+                            $l = strlen($t1);
+                            for ($a=0; $a < 2-$l; $a++) { 
+                                $t1 = '0'.$t1;
+                            }
+                            $bool = 0;
+
+                        }
+                    }
+                    $arr = array('bool' => $bool,'time' => $t1.':'.$t2);
+                    return $arr;
+                };
+
+                $timeGet1 = $varprocess($start);
+                $start = $timeGet1['time'];
+                $timeGet2 = $varprocess($end);
+                $end = $timeGet2['time'];
+
+                $chkcolspan = $timeGet1['bool'] * $timeGet2['bool'];
+                if ($timeGet1['bool'] == 0) {
+                    $colspan = $colspan - 1;
+                }
+
             $dt = array(
                 'user'  => 'Academic TimeTables',
                 'start' => $start,
+                'startWr' => $startWr,
                 'end'   => $end,
+                'endWr'   => $endWr,
                 'time'  => $time,
                 'colspan' => $colspan,
                 'agenda' => $agenda,
@@ -503,7 +586,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $dt = array(
                 'user'  => $query2[$i]['Name'],
                 'start' => $query2[$i]['Start'],
+                'startWr' => $query2[$i]['Start'],
                 'end'   => $query2[$i]['End'],
+                'endWr'   => $query2[$i]['End'],
                 'time'  => $query2[$i]['Time'],
                 'colspan' => $query2[$i]['Colspan'],
                 'agenda' => $query2[$i]['Agenda'],
@@ -530,19 +615,62 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $start = $query3[$i]['StartSessions'];
             $start = explode(':', $start);
             $start = $start[0].':'.$start[1];
+            $startWr = $start;
             $end = $query3[$i]['EndSessions'];
             $end = explode(':', $end);
             $end = $end[0].':'.$end[1];
+            $endWr = $end;
 
             // get jumlah Mahasiswa
             // $this->load->model('m_api');
             $arrMhs = $this->m_api->__getStudentByScheduleID($query3[$i]['ScheduleID']);
             $jumlahMHS = count($arrMhs);
 
+            $varprocess = function($time)
+            {
+                $t = explode(':', $time);
+                $t2 = $t[1];
+                $t1 = $t[0];
+                $bool = 1;
+                if ($t2 != '00' && $t2 != '30') {
+                    $t2 = (int) $t2;
+                    if ($t2 > 0 && $t2 < 30) {
+                        $t2 = '30';
+                        $bool = 0;
+                    }
+                    elseif ($t2 > 30) {
+                        $t2 = '00';
+                        $t1 = (int) $t1;
+                        $t1++;
+                        // make two digit
+                        $l = strlen($t1);
+                        for ($a=0; $a < 2-$l; $a++) { 
+                            $t1 = '0'.$t1;
+                        }
+                        $bool = 0;
+
+                    }
+                }
+                $arr = array('bool' => $bool,'time' => $t1.':'.$t2);
+                return $arr;
+            };
+
+            $timeGet1 = $varprocess($start);
+            $start = $timeGet1['time'];
+            $timeGet2 = $varprocess($end);
+            $end = $timeGet2['time'];
+
+            $chkcolspan = $timeGet1['bool'] * $timeGet2['bool'];
+            if ($timeGet1['bool'] == 0) {
+                $colspan = $colspan - 1;
+            }
+
             $dt = array(
                 'user'  => 'Academic TimeTables EX',
                 'start' => $start,
+                'startWr' => $startWr,
                 'end'   => $end,
+                'endWr'   => $endWr,
                 'time'  => $time,
                 'colspan' => $colspan,
                 'agenda' => 'Study',
@@ -565,6 +693,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     {
         $bool = true;
         $NotIDMyself = ($NotIDMyself == '') ? '' : ' and a.ID != '.$NotIDMyself;
+
+        $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+        $SemesterID = $SemesterID[0]['ID'];
+
         for ($xx=0; $xx < 1; $xx++) {  // check twice
 
             $TimeStart = date("H:i:s", strtotime($Start));
@@ -586,8 +718,8 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     $sqlWaktu2 = 'select * from db_academic.academic_years where SemesterID = ? and (uasStart <="'.$date2.'" and uasEnd >= "'.$date2.'")';
                     $queryWaktu2=$this->db->query($sqlWaktu2, array($SemesterID))->result_array();
 
-                if (count($sqlWaktu) == 0) {
-                    if (count($sqlWaktu2) > 0) {
+                if (count($queryWaktu) == 0) {
+                    if (count($queryWaktu2) > 0) {
                         $sql = "select count(*) as total from
                                (select a.ExamClassroomID,a.ID as ID_exam
                                 from db_academic.exam as a
@@ -607,8 +739,12 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                 and a.ExamDate = '".$date2."'
                                 and a.`Status` = '1'
                                 and a.SemesterID = '".$SemesterID."'
-                                and ((a.ExamStart >= '".$TimeStart."'  and a.ExamStart < '".$TimeEnd."' ) 
+                                and (
+                                    (a.ExamStart >= '".$TimeStart."'  and a.ExamStart < '".$TimeEnd."' ) 
                                    or  (a.ExamEnd > '".$TimeStart."'  and a.ExamEnd <= '".$TimeEnd."' )
+                                   or (
+                                            a.ExamStart <= '".$TimeStart."' and a.ExamEnd >= '".$TimeEnd."'
+                                         )
                                 ) and e.Room  = '".$Room."' 
                                 group by c.ScheduleID
                                )
@@ -621,10 +757,16 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                 on a.ID = c.ClassroomID
                                 join db_academic.days as b
                                 on c.DayID = b.ID
+                                left join db_academic.schedule as zd on zd.ID = c.ScheduleID
                                 where "'.$date2.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
-                                and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
-                                and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
-                        on a.ID = b.ID_Attd where b.Status = "1" and b.DateOriginal = "'.$date2.'")';
+                                and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'"
+                                and b.NameEng = "'.$NameDay.'" and (
+                                    (c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )
+                                    or (
+                                            c.StartSessions <= "'.$TimeStart.'" and c.EndSessions >= "'.$TimeEnd.'"
+                                         )
+                                ) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                        on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
                     }
                 }
                 else
@@ -648,15 +790,18 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                 and a.ExamDate = '".$date2."'
                                 and a.`Status` = '1'
                                 and a.SemesterID = '".$SemesterID."'
-                                and ((a.ExamStart >= '".$TimeStart."'  and a.ExamStart < '".$TimeEnd."' ) 
+                                and (
+                                    (a.ExamStart >= '".$TimeStart."'  and a.ExamStart < '".$TimeEnd."' ) 
                                    or  (a.ExamEnd > '".$TimeStart."'  and a.ExamEnd <= '".$TimeEnd."' )
+                                    or (
+                                            a.ExamStart <= '".$TimeStart."' and a.ExamEnd >= '".$TimeEnd."'
+                                        )
                                 ) and e.Room  = '".$Room."' 
                                 group by c.ScheduleID
                                )
                                 aa
                         ";
                 } // exit cek date academic
-                // print_r($sql);die();
 
                 $query=$this->db->query($sql, array())->result_array();
 
@@ -670,7 +815,12 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                             from db_academic.classroom as a join db_academic.schedule_exchange as c
                             on a.ID = c.ClassroomID
                             join db_academic.days as b
-                            on c.DayID = b.ID where c.Status = "1" and c.Date ="'.$date2.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'"';
+                            on c.DayID = b.ID where c.Status = "2" and c.Date ="'.$date2.'" and (
+                                (c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )
+                                or (
+                                            c.StartSessions <= "'.$TimeStart.'" and c.EndSessions >= "'.$TimeEnd.'"
+                                        )
+                            ) and a.Room = "'.$Room.'"';
                     //print_r($sql3);die();
                     $query3=$this->db->query($sql3, array())->result_array();
                     if ($query3[0]['total'] > 0) {
@@ -680,10 +830,38 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     {
                         $sql2 = 'select count(*) as total from db_reservation.t_booking as a
                                  join db_employees.employees as b on a.CreatedBy = b.NIP
-                                 where a.Status in(0,1) and ((a.`Start` >= "'.$Start.'" and a.`Start` < "'.$End.'" ) or (a.`End` > "'.$Start.'" and a.`End` <= "'.$End.'" )) and a.Room = "'.$Room.'"'.' '.$NotIDMyself;
+                                 where a.Status in(0,1) and (
+                                    (a.`Start` >= "'.$Start.'" and a.`Start` < "'.$End.'" ) or (a.`End` > "'.$Start.'" and a.`End` <= "'.$End.'" )
+                                    or (
+                                            a.`Start` <= "'.$Start.'" and a.`End` >= "'.$End.'"
+                                        )
+                                ) and a.Room = "'.$Room.'"'.' '.$NotIDMyself;
                         $query2=$this->db->query($sql2, array())->result_array();
                          if ($query2[0]['total'] > 0) {
                             $bool = false;
+                         }
+                         else
+                         {
+                            if (count($queryWaktu) == 0 && count($queryWaktu2) == 0) {
+                                $sql = 'select count(*) as total from db_academic.classroom as a join db_academic.schedule_details as c
+                                        on a.ID = c.ClassroomID
+                                        join db_academic.days as b
+                                        on c.DayID = b.ID
+                                        left join db_academic.schedule as zd on zd.ID = c.ScheduleID
+                                        where "'.$date2.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
+                                        and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'" 
+                                        and b.NameEng = "'.$NameDay.'" and (
+                                            (c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )
+                                            or (
+                                                c.StartSessions <= "'.$TimeStart.'" and c.EndSessions >= "'.$TimeEnd.'"
+                                            )
+                                        ) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                                on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
+                                $query=$this->db->query($sql, array())->result_array();
+                                if ($query[0]['total'] > 0) {
+                                   $bool = false;
+                                }
+                            }
                          } 
                     }
                           
@@ -691,116 +869,313 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             }
             else
             {
-                // looping
-                // check academic timeline untuk data satu
-                $datetime = DateTime::createFromFormat('Y-m-d H:i:s', $Start);
-                $NameDay = $datetime->format('l');
-                $date2 = date("Y-m-d", strtotime($Start));
+                // // looping
+                // // check academic timeline untuk data satu
+                // $datetime = DateTime::createFromFormat('Y-m-d H:i:s', $Start);
+                // $NameDay = $datetime->format('l');
+                // $date2 = date("Y-m-d", strtotime($Start));
 
-                $sql = 'select count(*) as total from db_academic.classroom as a join db_academic.schedule_details as c
-                        on a.ID = c.ClassroomID
-                        join db_academic.days as b
-                        on c.DayID = b.ID
-                        where "'.$date2.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
-                        and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
-                        and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
-                on a.ID = b.ID_Attd where b.Status = "1" and b.DateOriginal = "'.$date2.'")';
-                $query=$this->db->query($sql, array())->result_array();
+                // $sql = 'select count(*) as total from db_academic.classroom as a join db_academic.schedule_details as c
+                //         on a.ID = c.ClassroomID
+                //         join db_academic.days as b
+                //         on c.DayID = b.ID
+                //         left join db_academic.schedule as zd on zd.ID = c.ScheduleID
+                //         where "'.$date2.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
+                //         and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'" 
+                //         and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                // on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
+                // $query=$this->db->query($sql, array())->result_array();
 
-                if ($query[0]['total'] > 0) {
-                    $bool = false;
+                // if ($query[0]['total'] > 0) {
+                //     $bool = false;
 
-                }
-                else
-                {
-                    // $sql3 = 'select count(*) as total
-                    //         from db_academic.classroom as a join db_academic.schedule_exchange as c
-                    //         on a.ID = c.ClassroomID
-                    //         join db_academic.days as b
-                    //         on c.DayID = b.ID where c.Status = "1" and c.Date ="'.$date2.'"';
-                    // $query3=$this->db->query($sql3, array())->result_array();
-                    $sql3 = 'select count(*) as total
-                            from db_academic.classroom as a join db_academic.schedule_exchange as c
-                            on a.ID = c.ClassroomID
-                            join db_academic.days as b
-                            on c.DayID = b.ID where c.Status = "1" and c.Date ="'.$date2.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'"';
-                    //print_r($sql3);die();
-                    $query3=$this->db->query($sql3, array())->result_array();
-                    if ($query3[0]['total'] > 0) {
-                        $bool = false;
-                    }
-                    else
-                    {
-                        $sql2 = 'select count(*) as total from db_reservation.t_booking as a
-                                 join db_employees.employees as b on a.CreatedBy = b.NIP
-                                 where a.Status = 1 and ((a.`Start` >= "'.$Start.'" and a.`Start` < "'.$End.'" ) or (a.`End` > "'.$Start.'" and a.`End` <= "'.$End.'" )) and a.Room = "'.$Room.'"'.' '.$NotIDMyself;
-                        $query2=$this->db->query($sql2, array())->result_array();
-                         if ($query2[0]['total'] > 0) {
-                            $bool = false;
-                         } 
-                    }
+                // }
+                // else
+                // {
+                //     // $sql3 = 'select count(*) as total
+                //     //         from db_academic.classroom as a join db_academic.schedule_exchange as c
+                //     //         on a.ID = c.ClassroomID
+                //     //         join db_academic.days as b
+                //     //         on c.DayID = b.ID where c.Status = "1" and c.Date ="'.$date2.'"';
+                //     // $query3=$this->db->query($sql3, array())->result_array();
+                //     $sql3 = 'select count(*) as total
+                //             from db_academic.classroom as a join db_academic.schedule_exchange as c
+                //             on a.ID = c.ClassroomID
+                //             join db_academic.days as b
+                //             on c.DayID = b.ID where c.Status = "2" and c.Date ="'.$date2.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'"';
+                //     //print_r($sql3);die();
+                //     $query3=$this->db->query($sql3, array())->result_array();
+                //     if ($query3[0]['total'] > 0) {
+                //         $bool = false;
+                //     }
+                //     else
+                //     {
+                //         $sql2 = 'select count(*) as total from db_reservation.t_booking as a
+                //                  join db_employees.employees as b on a.CreatedBy = b.NIP
+                //                  where a.Status = 1 and ((a.`Start` >= "'.$Start.'" and a.`Start` < "'.$End.'" ) or (a.`End` > "'.$Start.'" and a.`End` <= "'.$End.'" )) and a.Room = "'.$Room.'"'.' '.$NotIDMyself;
+                //         $query2=$this->db->query($sql2, array())->result_array();
+                //          if ($query2[0]['total'] > 0) {
+                //             $bool = false;
+                //          } 
+                //     }
                           
-                }
+                // }
 
-                for ($i=0; $i < count($chk_e_multiple) ; $i++) { 
-                    $getDate = $chk_e_multiple[$i];
-                    $Start = $chk_e_multiple[$i].' '.$TimeStart;
-                    $End = $chk_e_multiple[$i].' '.$TimeEnd;
-                    // check academic timeline
-                    $datetime = DateTime::createFromFormat('Y-m-d H:i:s', $Start);
-                    $NameDay = $datetime->format('l');
+                // for ($i=0; $i < count($chk_e_multiple) ; $i++) { 
+                //     $getDate = $chk_e_multiple[$i];
+                //     $Start = $chk_e_multiple[$i].' '.$TimeStart;
+                //     $End = $chk_e_multiple[$i].' '.$TimeEnd;
+                //     // check academic timeline
+                //     $datetime = DateTime::createFromFormat('Y-m-d H:i:s', $Start);
+                //     $NameDay = $datetime->format('l');
 
-                    $sql = 'select count(*) as total from db_academic.classroom as a join db_academic.schedule_details as c
-                            on a.ID = c.ClassroomID
-                            join db_academic.days as b
-                            on c.DayID = b.ID
-                            where "'.$getDate.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
-                            and "'.$getDate.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
-                            and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
-                             on a.ID = b.ID_Attd where b.Status = "1" and b.DateOriginal = "'.$getDate.'")';
-                    $query=$this->db->query($sql, array())->result_array();
-                    if ($query[0]['total'] > 0) {
-                        $bool = false;
-                        break;
+                //     $sql = 'select count(*) as total from db_academic.classroom as a join db_academic.schedule_details as c
+                //             on a.ID = c.ClassroomID
+                //             join db_academic.days as b
+                //             on c.DayID = b.ID
+                //             left join db_academic.schedule as zd on zd.ID = c.ScheduleID
+                //             where "'.$getDate.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
+                //             and "'.$getDate.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'"
+                //             and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                //              on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$getDate.'")';
+                //     $query=$this->db->query($sql, array())->result_array();
+                //     if ($query[0]['total'] > 0) {
+                //         $bool = false;
+                //         break;
 
-                    }
-                    else
-                    {
-                        // $sql3 = 'select count(*) as total
-                        //         from db_academic.classroom as a join db_academic.schedule_exchange as c
-                        //         on a.ID = c.ClassroomID
-                        //         join db_academic.days as b
-                        //         on c.DayID = b.ID where c.Status = "1" and c.Date ="'.$getDate.'"';
-                        // $query3=$this->db->query($sql3, array())->result_array();
-                        $sql3 = 'select count(*) as total
-                                from db_academic.classroom as a join db_academic.schedule_exchange as c
-                                on a.ID = c.ClassroomID
-                                join db_academic.days as b
-                                on c.DayID = b.ID where c.Status = "1" and c.Date ="'.$getDate.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'"';
-                        //print_r($sql3);die();
-                        $query3=$this->db->query($sql3, array())->result_array();
-                        if ($query3[0]['total'] > 0) {
-                            $bool = false;
-                        }
-                        else
-                        {
-                            $sql2 = 'select count(*) as total from db_reservation.t_booking as a
-                                     join db_employees.employees as b on a.CreatedBy = b.NIP
-                                     where a.Status in(0,1) and ((a.`Start` >= "'.$Start.'" and a.`Start` < "'.$End.'" ) or (a.`End` > "'.$Start.'" and a.`End` <= "'.$End.'" )) and a.Room = "'.$Room.'" '.$NotIDMyself;
-                            $query2=$this->db->query($sql2, array())->result_array();
-                             if ($query2[0]['total'] > 0) {
-                                $bool = false;
-                                break;
-                             } 
-                        }
+                //     }
+                //     else
+                //     {
+                //         // $sql3 = 'select count(*) as total
+                //         //         from db_academic.classroom as a join db_academic.schedule_exchange as c
+                //         //         on a.ID = c.ClassroomID
+                //         //         join db_academic.days as b
+                //         //         on c.DayID = b.ID where c.Status = "1" and c.Date ="'.$getDate.'"';
+                //         // $query3=$this->db->query($sql3, array())->result_array();
+                //         $sql3 = 'select count(*) as total
+                //                 from db_academic.classroom as a join db_academic.schedule_exchange as c
+                //                 on a.ID = c.ClassroomID
+                //                 join db_academic.days as b
+                //                 on c.DayID = b.ID where c.Status = "2" and c.Date ="'.$getDate.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'"';
+                //         //print_r($sql3);die();
+                //         $query3=$this->db->query($sql3, array())->result_array();
+                //         if ($query3[0]['total'] > 0) {
+                //             $bool = false;
+                //         }
+                //         else
+                //         {
+                //             $sql2 = 'select count(*) as total from db_reservation.t_booking as a
+                //                      join db_employees.employees as b on a.CreatedBy = b.NIP
+                //                      where a.Status in(0,1) and ((a.`Start` >= "'.$Start.'" and a.`Start` < "'.$End.'" ) or (a.`End` > "'.$Start.'" and a.`End` <= "'.$End.'" )) and a.Room = "'.$Room.'" '.$NotIDMyself;
+                //             $query2=$this->db->query($sql2, array())->result_array();
+                //              if ($query2[0]['total'] > 0) {
+                //                 $bool = false;
+                //                 break;
+                //              } 
+                //         }
                               
-                    }
-                }
+                //     }
+                // }
             }
             usleep( 500 );
         }
 
         return $bool;
+    }
+
+    public function checkBentrok2($Start,$End,$chk_e_multiple,$Room,$NotIDMyself = '')
+    {
+        $array_bool = array('bool' => true);
+        $NotIDMyself = ($NotIDMyself == '') ? '' : ' and a.ID != '.$NotIDMyself;
+
+        $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+        $SemesterID = $SemesterID[0]['ID'];
+
+        for ($xx=0; $xx < 1; $xx++) {  // check twice
+
+            $TimeStart = date("H:i:s", strtotime($Start));
+            $TimeEnd = date("H:i:s", strtotime($End));
+
+            // check academic timeline
+            $datetime = DateTime::createFromFormat('Y-m-d H:i:s', $Start);
+            $NameDay = $datetime->format('l');
+            $date2 = date("Y-m-d", strtotime($Start));
+
+            // cek academic years apakah periode ujian atau tidak
+                $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+                $SemesterID = $SemesterID[0]['ID'];
+
+                $sqlWaktu = 'select * from db_academic.academic_years where SemesterID = ? and (utsStart <="'.$date2.'" and utsEnd >= "'.$date2.'")';
+                $queryWaktu=$this->db->query($sqlWaktu, array($SemesterID))->result_array();
+
+                $sqlWaktu2 = 'select * from db_academic.academic_years where SemesterID = ? and (uasStart <="'.$date2.'" and uasEnd >= "'.$date2.'")';
+                $queryWaktu2=$this->db->query($sqlWaktu2, array($SemesterID))->result_array();
+
+            if (count($queryWaktu) == 0) {
+                if (count($queryWaktu2) > 0) {
+                    $sql = "select count(*) as total from
+                           (select a.ExamClassroomID,a.ID as ID_exam
+                            from db_academic.exam as a
+                            join db_employees.employees as b
+                            on a.Pengawas1 = b.NIP
+                            join db_academic.exam_details as c
+                            on a.ID = c.ExamID
+                            join db_academic.days as d
+                            on d.ID = a.DayID
+                            join db_academic.classroom as e
+                            on e.ID = a.ExamClassroomID
+                            join db_academic.schedule_details_course as f
+                            on f.ScheduleID = c.ScheduleID
+                            join db_academic.mata_kuliah as g
+                            on g.ID = f.MKID
+                            where d.NameEng = '".$NameDay."'
+                            and a.ExamDate = '".$date2."'
+                            and a.`Status` = '1'
+                            and a.SemesterID = '".$SemesterID."'
+                            and (
+                                (a.ExamStart >= '".$TimeStart."'  and a.ExamStart < '".$TimeEnd."' ) 
+                               or  (a.ExamEnd > '".$TimeStart."'  and a.ExamEnd <= '".$TimeEnd."' )
+                               or (
+                                            a.ExamStart <= '".$TimeStart."' and a.ExamEnd >= '".$TimeEnd."'
+                                  )
+                            ) and e.Room  = '".$Room."' 
+                            group by c.ScheduleID
+                           )
+                            aa
+                    ";
+                }
+                else
+                {
+                    $sql = 'select count(*) as total from db_academic.classroom as a join db_academic.schedule_details as c
+                            on a.ID = c.ClassroomID
+                            join db_academic.days as b
+                            on c.DayID = b.ID
+                            left join db_academic.schedule as zd on zd.ID = c.ScheduleID
+                            where "'.$date2.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
+                            and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'"
+                            and b.NameEng = "'.$NameDay.'" and (
+                                (c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )
+                                or (
+                                            c.StartSessions <= "'.$TimeStart.'" and c.EndSessions >= "'.$TimeEnd.'"
+                                  )
+                            ) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                    on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
+                }
+            }
+            else
+            {
+                $sql = "select count(*) as total from
+                           (select a.ExamClassroomID,a.ID as ID_exam
+                            from db_academic.exam as a
+                            join db_employees.employees as b
+                            on a.Pengawas1 = b.NIP
+                            join db_academic.exam_details as c
+                            on a.ID = c.ExamID
+                            join db_academic.days as d
+                            on d.ID = a.DayID
+                            join db_academic.classroom as e
+                            on e.ID = a.ExamClassroomID
+                            join db_academic.schedule_details_course as f
+                            on f.ScheduleID = c.ScheduleID
+                            join db_academic.mata_kuliah as g
+                            on g.ID = f.MKID
+                            where d.NameEng = '".$NameDay."'
+                            and a.ExamDate = '".$date2."'
+                            and a.`Status` = '1'
+                            and a.SemesterID = '".$SemesterID."'
+                            and (
+                                (a.ExamStart >= '".$TimeStart."'  and a.ExamStart < '".$TimeEnd."' ) 
+                               or  (a.ExamEnd > '".$TimeStart."'  and a.ExamEnd <= '".$TimeEnd."' )
+                               or (
+                                           a.ExamStart <= '".$TimeStart."' and a.ExamEnd >= '".$TimeEnd."'
+                                 )
+                            ) and e.Room  = '".$Room."' 
+                            group by c.ScheduleID
+                           )
+                            aa
+                    ";
+            } // exit cek date academic
+
+            $query=$this->db->query($sql, array())->result_array();
+
+            if ($query[0]['total'] > 0) {
+                $array_bool = array(
+                    'type' => 'academic',
+                    'bool' => false
+                );
+            }
+            else
+            {
+                $sql3 = 'select count(*) as total
+                        from db_academic.classroom as a join db_academic.schedule_exchange as c
+                        on a.ID = c.ClassroomID
+                        join db_academic.days as b
+                        on c.DayID = b.ID where c.Status = "2" and c.Date ="'.$date2.'" and (
+                            (c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )
+                            or (
+                                           c.StartSessions <= "'.$TimeStart.'" and c.EndSessions >= "'.$TimeEnd.'"
+                                 )
+                        ) and a.Room = "'.$Room.'"';
+                //print_r($sql3);die();
+                $query3=$this->db->query($sql3, array())->result_array();
+                if ($query3[0]['total'] > 0) {
+                    $array_bool = array(
+                        'type' => 'academic',
+                        'bool' => false
+                    );
+
+                }
+                else
+                {
+                    $sql2 = 'select count(*) as total from db_reservation.t_booking as a
+                             join db_employees.employees as b on a.CreatedBy = b.NIP
+                             where a.Status in(0,1) and (
+                                (a.`Start` >= "'.$Start.'" and a.`Start` < "'.$End.'" ) or (a.`End` > "'.$Start.'" and a.`End` <= "'.$End.'" ) or (
+                                            a.Start <= "'.$Start.'" and a.end >= "'.$End.'"
+                                         )
+                            ) and a.Room = "'.$Room.'"'.' '.$NotIDMyself;
+                    $query2=$this->db->query($sql2, array())->result_array();
+                     if ($query2[0]['total'] > 0) {
+                        $array_bool = array(
+                            'type' => 'venue',
+                            'bool' => false
+                        );
+                     }
+                     else
+                     {
+                        if (count($queryWaktu) == 0 && count($queryWaktu2) == 0) {
+                            $sql = 'select count(*) as total from db_academic.classroom as a join db_academic.schedule_details as c
+                                    on a.ID = c.ClassroomID
+                                    join db_academic.days as b
+                                    on c.DayID = b.ID
+                                    left join db_academic.schedule as zd on zd.ID = c.ScheduleID
+                                    where "'.$date2.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
+                                    and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'" 
+                                    and b.NameEng = "'.$NameDay.'" and (
+                                        (c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )
+                                        or (
+                                                c.StartSessions <= "'.$TimeStart.'" and c.EndSessions >= "'.$TimeEnd.'"
+                                             )
+                                    ) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                            on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
+                            // print_r($sql);die();
+                            $query=$this->db->query($sql, array())->result_array();
+                            if ($query[0]['total'] > 0) {
+                               $array_bool = array(
+                                   'type' => 'academic',
+                                   'bool' => false
+                               );
+                            }
+                        }
+                        
+                     } 
+                }
+                      
+            }
+            usleep( 500 );
+        }
+
+        return $array_bool;
     }
 
     public function getCountApprove()
@@ -811,117 +1186,141 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
     }
 
-    public function getDataT_bookingByUser($Start = null,$Status = 0,$both = '')
-    {
-        $arr_result = array();
-        $this->load->model('master/m_master');
-        $Start = ($Start == null) ? ' and Start >= timestamp(DATE_SUB(NOW(), INTERVAL 30 MINUTE))' : ' and Start like "%'.$Start.'%"';
-        if ($both == '') {
-            $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP where a.Status = ?
-                     '.$Start.' and a.CreatedBy = ? ';
-            $query=$this->db->query($sql, array($Status,$this->session->userdata('NIP')))->result_array();         
-        }
-        else
-        {
-            $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP where a.Status like "%"
-                     '.$Start.' and a.CreatedBy = ? ';
-            $query=$this->db->query($sql, array($this->session->userdata('NIP')))->result_array();           
-        }
+    // public function getDataT_bookingByUser($Start = null,$Status = 0,$both = '')
+    // {
+    //     $arr_result = array();
+    //     $this->load->model('master/m_master');
+    //     $Start = ($Start == null) ? ' and Start >= timestamp(DATE_SUB(NOW(), INTERVAL 30 MINUTE))' : ' and Start like "%'.$Start.'%"';
+    //     if ($both == '') {
+    //         $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP where a.Status = ?
+    //                  '.$Start.' and a.CreatedBy = ? ';
+    //         $query=$this->db->query($sql, array($Status,$this->session->userdata('NIP')))->result_array();         
+    //     }
+    //     else
+    //     {
+    //         $sql = 'select a.*,b.Name from db_reservation.t_booking as a join db_employees.employees as b on a.CreatedBy = b.NIP where a.Status like "%"
+    //                  '.$Start.' and a.CreatedBy = ? ';
+    //         $query=$this->db->query($sql, array($this->session->userdata('NIP')))->result_array();           
+    //     }
         
         
-        // print_r($query);die();
-        for ($i=0; $i < count($query); $i++) { 
-            $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['Start']);
-            $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['End']);
-            $StartNameDay = $Startdatetime->format('l');
-            $EndNameDay = $Enddatetime->format('l');
-            $Time = $query[$i]['Time'].' Minutes';
-            $ID_equipment_add = '-';
-            $Name_equipment_add = '-';
-            if ($query[$i]['ID_equipment_add'] != '' || $query[$i]['ID_equipment_add'] != null) {
-                $ID_equipment_add = explode(',', $query[$i]['ID_equipment_add']);
-                $Name_equipment_add = '<ul>';
-                for ($j=0; $j < count($ID_equipment_add); $j++) { 
-                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add[$j]);
-                    // print_r($ID_equipment_add);die();
-                    $ID_m_equipment = $get[0]['ID_m_equipment'];
-                    $Owner = $get[0]['Owner'];
-                    $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$Owner);
-                    $Owner = $getX[0]['Division'];
+    //     // print_r($query);die();
+    //     for ($i=0; $i < count($query); $i++) { 
+    //         $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['Start']);
+    //         $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $query[$i]['End']);
+    //         $StartNameDay = $Startdatetime->format('l');
+    //         $EndNameDay = $Enddatetime->format('l');
+    //         $Time = $query[$i]['Time'].' Minutes';
+    //         $ID_equipment_add = '-';
+    //         $Name_equipment_add = '-';
+    //         if ($query[$i]['ID_equipment_add'] != '' || $query[$i]['ID_equipment_add'] != null) {
+    //             $ID_equipment_add = explode(',', $query[$i]['ID_equipment_add']);
+    //             $Name_equipment_add = '<ul>';
+    //             for ($j=0; $j < count($ID_equipment_add); $j++) { 
+    //                 $get = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add[$j]);
+    //                 // print_r($ID_equipment_add);die();
+    //                 $ID_m_equipment = $get[0]['ID_m_equipment'];
+    //                 $Owner = $get[0]['Owner'];
+    //                 $getX = $this->m_master->caribasedprimary('db_employees.division','ID',$Owner);
+    //                 $Owner = $getX[0]['Division'];
 
-                    $Qty = $get[0]['Qty'];
-                    $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
-                    $Name_equipment_add .= '<li>'.$get[0]['Equipment'].' by '.$Owner.'['.$Qty.']</li>';
-                }
-                $Name_equipment_add .= '</ul>';
-            }
+    //                 $Qty = $get[0]['Qty'];
+    //                 $get = $this->m_master->caribasedprimary('db_reservation.m_equipment','ID',$ID_m_equipment);
+    //                 $Name_equipment_add .= '<li>'.$get[0]['Equipment'].' by '.$Owner.'['.$Qty.']</li>';
+    //             }
+    //             $Name_equipment_add .= '</ul>';
+    //         }
 
-            $ID_add_personel = '-';
-            $Name_add_personel = '-';
-            if ($query[$i]['ID_add_personel'] != '' || $query[$i]['ID_add_personel'] != null) {
-                $ID_add_personel = explode(',', $query[$i]['ID_add_personel']);
-                $Name_add_personel = '<ul>';
-                for ($j=0; $j < count($ID_add_personel); $j++) { 
-                    $get = $this->m_master->caribasedprimary('db_employees.division','ID',$ID_add_personel[$j]);
-                    $Name_add_personel .= '<li>'.$get[0]['Division'].'</li>';
-                }
+    //         $ID_add_personel = '-';
+    //         $Name_add_personel = '-';
+    //         if ($query[$i]['ID_add_personel'] != '' || $query[$i]['ID_add_personel'] != null) {
+    //             $ID_add_personel = explode(',', $query[$i]['ID_add_personel']);
+    //             $Name_add_personel = '<ul>';
+    //             for ($j=0; $j < count($ID_add_personel); $j++) { 
+    //                 $get = $this->m_master->caribasedprimary('db_employees.division','ID',$ID_add_personel[$j]);
+    //                 $Name_add_personel .= '<li>'.$get[0]['Division'].'</li>';
+    //             }
 
-                $Name_add_personel .= '</ul>';
-            }
+    //             $Name_add_personel .= '</ul>';
+    //         }
 
-            $Reqdatetime = DateTime::createFromFormat('Y-m-d', $query[$i]['Req_date']);
-            $ReqdateNameDay = $Reqdatetime->format('l');
+    //         $Reqdatetime = DateTime::createFromFormat('Y-m-d', $query[$i]['Req_date']);
+    //         $ReqdateNameDay = $Reqdatetime->format('l');
 
-            $MarkomSupport = '<label>No</Label>';
-            if ($query[$i]['MarcommSupport'] != '') {
-                $MarkomSupport = '<ul>';
-                $dd = explode(',', $query[$i]['MarcommSupport']);
-                for ($zx=0; $zx < count($dd); $zx++) {
-                    $a = 'How are you?';
+    //         $MarkomSupport = '<label>No</Label>';
+    //         if ($query[$i]['MarcommSupport'] != '') {
+    //             $MarkomSupport = '<ul>';
+    //             $dd = explode(',', $query[$i]['MarcommSupport']);
+    //                 $dzx = array();
+    //             // split for note
+    //                 for ($xz=0; $xz < count($dd); $xz++) { 
+    //                     $pos1 = stripos($dd[$xz], 'Note');
+    //                     $exitLoop = false;
+    //                     if ($pos1 !== false) {
+    //                         $temp = array();
+    //                         for ($ixx = $xz; $ixx < count($dd); $ixx++) { 
+    //                             $temp[] = $dd[$ixx];
+    //                         }
+    //                         $dzx[] = implode(',', $temp);
+    //                         $exitLoop = true;
+    //                     }
+    //                     else
+    //                     {
+    //                         $dzx[] = $dd[$xz];
+    //                     }
 
-                    if (strpos($dd[$zx], 'Graphic Design') !== false) {
-                         $pos = strpos($dd[$zx],'[');
-                         $li = substr($dd[$zx], 0,$pos);
-                         $posE = strpos($dd[$zx],']');
-                         $ISIe = substr($dd[$zx], ($pos+1), $posE);
-                         $length = strlen($ISIe);
-                         $ISIe = substr($ISIe, 0, ($length - 1));
-                         // print_r($ISIe);die();
-                         $MarkomSupport .= '<li>'.$li;
-                         $FileMarkom = explode(';', $ISIe);
-                         $MarkomSupport .= '<ul>';
-                         for ($vc=0; $vc < count($FileMarkom); $vc++) { 
-                            $MarkomSupport .= '<li>'.'<a href="'.base_url("fileGetAny/vreservation-".$FileMarkom[$vc]).'" target="_blank"></i>'.$FileMarkom[$vc].'</a>';
-                         }
-                         $MarkomSupport .= '</ul></li>';
-                    } 
-                    else{
-                      $MarkomSupport .= '<li>'.$dd[$zx].'</li>';  
-                    }
+    //                     if ($exitLoop) {
+    //                         break;
+    //                     }
+    //                 }
+
+    //                 $dd = $dzx;
+    //             for ($zx=0; $zx < count($dd); $zx++) {
+    //                 $a = 'How are you?';
+
+    //                 if (strpos($dd[$zx], 'Graphic Design') !== false) {
+    //                      $pos = strpos($dd[$zx],'[');
+    //                      $li = substr($dd[$zx], 0,$pos);
+    //                      $posE = strpos($dd[$zx],']');
+    //                      $ISIe = substr($dd[$zx], ($pos+1), $posE);
+    //                      $length = strlen($ISIe);
+    //                      $ISIe = substr($ISIe, 0, ($length - 1));
+    //                      // print_r($ISIe);die();
+    //                      $MarkomSupport .= '<li>'.$li;
+    //                      $FileMarkom = explode(';', $ISIe);
+    //                      $MarkomSupport .= '<ul>';
+    //                      for ($vc=0; $vc < count($FileMarkom); $vc++) { 
+    //                         $MarkomSupport .= '<li>'.'<a href="'.base_url("fileGetAny/vreservation-".$FileMarkom[$vc]).'" target="_blank"></i>'.$FileMarkom[$vc].'</a>';
+    //                      }
+    //                      $MarkomSupport .= '</ul></li>';
+    //                 } 
+    //                 else{
+    //                   $MarkomSupport .= '<li>'.$dd[$zx].'</li>';  
+    //                 }
                     
-                }
-                $MarkomSupport .= '</ul>';
+    //             }
+    //             $MarkomSupport .= '</ul>';
 
-            }
+    //         }
 
-            $arr_result[] = array(
-                    'Start' => $StartNameDay.', '.$query[$i]['Start'],
-                    'End' => $EndNameDay.', '.$query[$i]['End'],
-                    'Time' => $Time,
-                    'Agenda' => $query[$i]['Agenda'],
-                    'Room' => $query[$i]['Room'],
-                    'Equipment_add' => $Name_equipment_add,
-                    'Persone_add' => $Name_add_personel,
-                    'Req_date' => $query[$i]['Name'].'<br>'.$ReqdateNameDay.', '.$query[$i]['Req_date'],
-                    'Req_layout' => $query[$i]['Req_layout'],
-                    'ID' => $query[$i]['ID'],
-                    'Status' => $query[$i]['Status'],
-                    'MarkomSupport' => $MarkomSupport
-            );
-        }
+    //         $arr_result[] = array(
+    //                 'Start' => $StartNameDay.', '.$query[$i]['Start'],
+    //                 'End' => $EndNameDay.', '.$query[$i]['End'],
+    //                 'Time' => $Time,
+    //                 'Agenda' => $query[$i]['Agenda'],
+    //                 'Room' => $query[$i]['Room'],
+    //                 'Equipment_add' => $Name_equipment_add,
+    //                 'Persone_add' => $Name_add_personel,
+    //                 'Req_date' => $query[$i]['Name'].'<br>'.$ReqdateNameDay.', '.$query[$i]['Req_date'],
+    //                 'Req_layout' => $query[$i]['Req_layout'],
+    //                 'ID' => $query[$i]['ID'],
+    //                 'Status' => $query[$i]['Status'],
+    //                 'MarkomSupport' => $MarkomSupport
+    //         );
+    //     }
 
-        return $arr_result;         
-    }
+    //     return $arr_result;         
+    // }
 
     public function getForReturn_eq()
     {
@@ -1092,11 +1491,13 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                          break;
                     case 1:
                     case 2:
-                        $StatusBooking = 'Awaiting approval 1';
+                        $NameApprover = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        $StatusBooking = 'Awaiting approval 1 : '.$NameApprover;
                         break;
                     case 3:
                     case 4:
-                        $StatusBooking = 'Awaiting approval 2';
+                        $NameApprover = $this->Get_Approver(2,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        $StatusBooking = 'Awaiting approval 2 : '.$NameApprover;
                         break;
                     case 5:
                         $StatusBooking = 'Approved';
@@ -1201,6 +1602,31 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             if ($query[$i]['MarcommSupport'] != '') {
                 $MarkomSupport = '<ul style = "margin-left : -28px">';
                 $dd = explode(',', $query[$i]['MarcommSupport']);
+                $dzx = array();
+                // split for note
+                    for ($xz=0; $xz < count($dd); $xz++) { 
+                        $pos1 = stripos($dd[$xz], 'Note');
+                        $exitLoop = false;
+                        if ($pos1 !== false) {
+                            $temp = array();
+                            for ($ixx = $xz; $ixx < count($dd); $ixx++) { 
+                                $temp[] = $dd[$ixx];
+                            }
+                            $dzx[] = implode(',', $temp);
+                            $exitLoop = true;
+                        }
+                        else
+                        {
+                            $dzx[] = $dd[$xz];
+                        }
+
+                        if ($exitLoop) {
+                            break;
+                        }
+                    }
+
+                    $dd = $dzx;
+
                 $btnMarkomSupport = '';
                 for ($zx=0; $zx < count($dd); $zx++) {
                     $a = 'How are you?';
@@ -1352,7 +1778,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     $NIP = '@';
                     // get Category Room to approver
                         $ApproveAccess = 0;
-                        $ID_group_user = $this->session->userdata('ID_group_user');
+                        // $ID_group_user = $this->session->userdata('ID_group_user');
+                        $ID_group_user = $this->m_master->caribasedprimary('db_reservation.previleges_guser','NIP',$CreatedBy);
+                        $ID_group_user = $ID_group_user[0]['G_user'];
+
                         $getPolicy = $this->m_master->caribasedprimary('db_reservation.cfg_policy','ID_group_user',$ID_group_user);
                         $CategoryRoom = $getPolicy[0]['CategoryRoom'];
                         $CategoryRoom = json_decode($CategoryRoom);
@@ -1401,6 +1830,21 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                                                            }
                                                                            
                                                                        }
+                                                                    }
+                                                                    elseif ($DivisionCreated[0] == 34) {
+                                                                        // find faculty
+                                                                        $gg = $this->m_master->caribasedprimary('db_academic.faculty','AdminID',$CreatedBy);
+                                                                        if (count($gg) > 0) {
+                                                                            for ($k=0; $k < count($gg); $k++) { 
+                                                                                $Kaprodi = $gg[$k]['NIP'];
+                                                                                if ($Kaprodi == $NIP) {
+                                                                                    $find++;
+                                                                                    $getLoop = false;     
+                                                                                    break;
+                                                                                }
+                                                                            }
+                                                                            
+                                                                        }
                                                                     }
                                                                     else
                                                                     {
@@ -1453,10 +1897,24 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                        $DivisionID = $this->session->userdata('PositionMain');
                                        $DivisionID = $DivisionID['IDDivision'];
                                        if ($Status == 0) {
-                                            for ($l=0; $l < count($Approver2); $l++) { 
-                                                if ($DivisionID == $Approver2[$l]) {
-                                                    $find++;    
-                                                    break;
+                                            for ($zz=0; $zz < count($Approver2); $zz++) { 
+                                                $rdata = $Approver2[$zz];
+                                                $TypeApprover = $rdata->TypeApprover;
+                                                switch ($TypeApprover) {
+                                                    case 'Division':
+                                                        if ($DivisionID == $rdata->Approver) {
+                                                            $find++;    
+                                                            break;
+                                                        }
+                                                        break;
+                                                    case 'Employees':
+                                                        $NIP = $this->session->userdata('NIP');
+                                                        if ($NIP == $rdata->Approver) {
+                                                            $find++;    
+                                                            break;
+                                                        }
+                                                        break;
+
                                                 }
                                             }
                                        }
@@ -1569,6 +2027,30 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             if ($query[$i]['MarcommSupport'] != '') {
                 $MarkomSupport = '<ul style = "margin-left : -28px">';
                 $dd = explode(',', $query[$i]['MarcommSupport']);
+                $dzx = array();
+                // split for note
+                    for ($xz=0; $xz < count($dd); $xz++) { 
+                        $pos1 = stripos($dd[$xz], 'Note');
+                        $exitLoop = false;
+                        if ($pos1 !== false) {
+                            $temp = array();
+                            for ($ixx = $xz; $ixx < count($dd); $ixx++) { 
+                                $temp[] = $dd[$ixx];
+                            }
+                            $dzx[] = implode(',', $temp);
+                            $exitLoop = true;
+                        }
+                        else
+                        {
+                            $dzx[] = $dd[$xz];
+                        }
+
+                        if ($exitLoop) {
+                            break;
+                        }
+                    }
+
+                    $dd = $dzx;
                 for ($zx=0; $zx < count($dd); $zx++) {
                     // check status
                      $Status_markom = '';
@@ -1705,7 +2187,6 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     // if ($MarcommStatus == 1) {
                     //     return $find = 0;
                     // }
-
                     $PositionMain = $this->session->userdata('PositionMain');
                     $IDDivision = $PositionMain['IDDivision'];
                     $Position = $PositionMain['IDPosition'];
@@ -1762,6 +2243,62 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                                                            
                                                                        }
                                                                     }
+                                                                    elseif ($DivisionCreated[0] == 34) {
+                                                                        // find faculty
+                                                                        $gg = $this->m_master->caribasedprimary('db_academic.faculty','AdminID',$CreatedBy);
+                                                                        if (count($gg) > 0) {
+                                                                            for ($k=0; $k < count($gg); $k++) { 
+                                                                                $Kaprodi = $gg[$k]['NIP'];
+                                                                                if ($Kaprodi == $NIP) {
+                                                                                    $find++;
+                                                                                    $getLoop = false;     
+                                                                                    break;
+                                                                                }
+                                                                            }
+                                                                            
+                                                                        }
+                                                                    }
+                                                                    elseif ($DivisionCreated[0] == 33) {
+                                                                        // find faculty
+                                                                        $gg = $this->m_master->caribasedprimary('db_academic.faculty','Laboran',$CreatedBy);
+                                                                        if (count($gg) > 0) {
+                                                                            for ($k=0; $k < count($gg); $k++) { 
+                                                                                $Kaprodi = $gg[$k]['NIP'];
+                                                                                if ($Kaprodi == $NIP) {
+                                                                                    $find++;
+                                                                                    $getLoop = false;     
+                                                                                    break;
+                                                                                }
+                                                                            }
+                                                                            
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            $gg = $this->m_master->caribasedprimary('db_academic.program_study','Laboran',$CreatedBy);
+                                                                            if (count($gg) > 0) {
+                                                                                for ($k=0; $k < count($gg); $k++) { 
+                                                                                    $Kaprodi = $gg[$k]['KaprodiID'];
+                                                                                    if ($Kaprodi == $NIP) {
+                                                                                        $find++;
+                                                                                        $getLoop = false;     
+                                                                                        break;
+                                                                                    }
+                                                                                }
+                                                                                
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    elseif ($DivisionCreated[0] == 14) { // Lecturer
+                                                                       $ProdiID = $dd[0]['ProdiID'];
+                                                                       $G_Prodi = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+                                                                       $Kaprodi = $G_Prodi[0]['KaprodiID'];
+                                                                       if ($Kaprodi == $NIP) {
+                                                                           $find++;
+                                                                           $getLoop = false;     
+                                                                           break;
+                                                                       }
+
+                                                                    }
                                                                     else
                                                                     {
                                                                         // find by division and position
@@ -1772,6 +2309,48 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                                                                $getLoop = false;    
                                                                                break;
                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            $PositionOther = $this->session->userdata('PositionOther1');
+                                                                            $IDDivisionOther = $PositionOther['IDDivisionOther1'];
+                                                                            $PositionOther = $PositionOther['IDPositionOther1'];
+                                                                            if ($DivisionCreated[0] == $IDDivisionOther) {
+                                                                                // compare Position
+                                                                                if ($IDPositionApprover == $PositionOther) {
+                                                                                    $find++;
+                                                                                    $getLoop = false;    
+                                                                                    break;
+                                                                                }
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                $PositionOther = $this->session->userdata('PositionOther2');
+                                                                                $IDDivisionOther = $PositionOther['IDDivisionOther2'];
+                                                                                $PositionOther = $PositionOther['IDPositionOther2'];
+                                                                                if ($DivisionCreated[0] == $IDDivisionOther) {
+                                                                                    // compare Position
+                                                                                    if ($IDPositionApprover == $PositionOther) {
+                                                                                        $find++;
+                                                                                        $getLoop = false;    
+                                                                                        break;
+                                                                                    }
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    $PositionOther = $this->session->userdata('PositionOther3');
+                                                                                    $IDDivisionOther = $PositionOther['IDDivisionOther3'];
+                                                                                    $PositionOther = $PositionOther['IDPositionOther3'];
+                                                                                    if ($DivisionCreated[0] == $IDDivisionOther) {
+                                                                                        // compare Position
+                                                                                        if ($IDPositionApprover == $PositionOther) {
+                                                                                            $find++;
+                                                                                            $getLoop = false;    
+                                                                                            break;
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
                                                                         }
                                                                     }
                                                                break;
@@ -1813,10 +2392,24 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                        $DivisionID = $this->session->userdata('PositionMain');
                                        $DivisionID = $DivisionID['IDDivision'];
                                        if ($Status == 0) {
-                                            for ($l=0; $l < count($Approver2); $l++) { 
-                                                if ($DivisionID == $Approver2[$l]) {
-                                                    $find++;    
-                                                    break;
+                                            for ($zz=0; $zz < count($Approver2); $zz++) { 
+                                                $rdata = $Approver2[$zz];
+                                                $TypeApprover = $rdata->TypeApprover;
+                                                switch ($TypeApprover) {
+                                                    case 'Division':
+                                                        if ($DivisionID == $rdata->Approver) {
+                                                            $find++;    
+                                                            break;
+                                                        }
+                                                        break;
+                                                    case 'Employees':
+                                                        $NIP = $this->session->userdata('NIP');
+                                                        if ($NIP == $rdata->Approver) {
+                                                            $find++;    
+                                                            break;
+                                                        }
+                                                        break;
+
                                                 }
                                             }
                                        }
@@ -1838,11 +2431,14 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                          break;
                     case 1:
                     case 2:
-                        $StatusBooking = 'Awaiting approval 1';
+                        // find nama approval
+                        $NameApprover = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        $StatusBooking = 'Awaiting approval 1 : '.$NameApprover;
                         break;
                     case 3:
                     case 4:
-                        $StatusBooking = 'Awaiting approval 2';
+                        $NameApprover = $this->Get_Approver(2,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        $StatusBooking = 'Awaiting approval 2 : '.$NameApprover;
                         break;
                     case 5:
                         $StatusBooking = 'Approved';
@@ -1937,6 +2533,31 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             if ($query[$i]['MarcommSupport'] != '') {
                 $MarkomSupport = '<ul style = "margin-left : -28px">';
                 $dd = explode(',', $query[$i]['MarcommSupport']);
+                $dzx = array();
+                // split for note
+                    for ($xz=0; $xz < count($dd); $xz++) { 
+                        $pos1 = stripos($dd[$xz], 'Note');
+                        $exitLoop = false;
+                        if ($pos1 !== false) {
+                            $temp = array();
+                            for ($ixx = $xz; $ixx < count($dd); $ixx++) { 
+                                $temp[] = $dd[$ixx];
+                            }
+                            $dzx[] = implode(',', $temp);
+                            $exitLoop = true;
+                        }
+                        else
+                        {
+                            $dzx[] = $dd[$xz];
+                        }
+
+                        if ($exitLoop) {
+                            break;
+                        }
+                    }
+
+                    $dd = $dzx;
+
                 for ($zx=0; $zx < count($dd); $zx++) {
                     // check status
                      $Status_markom = '';
@@ -2136,6 +2757,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         // get data schedule details and compare with t_booking table
         $sql = 'select * from db_reservation.t_booking where Start >= timestamp(DATE_SUB(NOW(), INTERVAL 30 MINUTE))';
         $query=$this->db->query($sql, array())->result_array();
+
+        $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+        $SemesterID = $SemesterID[0]['ID'];
+
         for ($i=0; $i < count($query); $i++) {
              $Start = $query[$i]['Start'];
              $End = $query[$i]['End'];
@@ -2152,10 +2777,16 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                         on a.ID = c.ClassroomID
                         join db_academic.days as b
                         on c.DayID = b.ID
+                        left join db_academic.schedule as zd on zd.ID = c.ScheduleID
                         where "'.$date2.'" >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
-                        and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
-                        and b.NameEng = "'.$NameDay.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
-                on a.ID = b.ID_Attd where b.Status = "1" and b.DateOriginal = "'.$date2.'")';
+                        and "'.$date2.'" <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) and zd.SemesterID = "'.$SemesterID.'"
+                        and b.NameEng = "'.$NameDay.'" and (
+                            (c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )
+                            or (
+                                    c.StartSessions <= "'.$TimeStart.'" and c.EndSessions >= "'.$TimeEnd.'"
+                                )
+                        ) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
                 $query2=$this->db->query($sql2, array())->result_array();
                 if ($query2[0]['total'] > 0) {
                     // print_r('bentrok :'.$NameDay.', '.$TimeStart.'-'.$TimeEnd.' : '.$date2).'<br>';
@@ -2170,7 +2801,12 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                             from db_academic.classroom as a join db_academic.schedule_exchange as c
                             on a.ID = c.ClassroomID
                             join db_academic.days as b
-                            on c.DayID = b.ID where c.Status = "1" and c.Date ="'.$date2.'" and ((c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )) and a.Room = "'.$Room.'"';
+                            on c.DayID = b.ID where c.Status = "2" and c.Date ="'.$date2.'" and (
+                                (c.StartSessions >= "'.$TimeStart.'" and c.StartSessions < "'.$TimeEnd.'" ) or (c.EndSessions > "'.$TimeStart.'" and c.EndSessions <= "'.$TimeEnd.'" )
+                                or (
+                                        c.StartSessions <= "'.$TimeStart.'" and c.EndSessions >= "'.$TimeEnd.'"
+                                    )
+                            ) and a.Room = "'.$Room.'"';
                     //print_r($sql3);die();
                     $query3=$this->db->query($sql3, array())->result_array();
                     if ($query3[0]['total'] > 0) {
@@ -2484,6 +3120,23 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $getM = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add);
         $QtyOri = $getM[0]['Qty'];
         $r = $QtyOri - $qty ;
+        if ($r >= 0) {
+            $bool = true;
+        }
+        return $bool;
+    }
+
+    public function chkQty_eq_additional2($ID,$ID_equipment_add)
+    {
+        $bool = false;
+        $this->load->model('master/m_master');
+        $getM = $this->m_master->caribasedprimary('db_reservation.m_equipment_additional','ID',$ID_equipment_add);
+        $G_data = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$ID);
+        $Start = date("Y-m-d H:i:s", strtotime($G_data[0]['Start'] ));
+        $End = date("Y-m-d H:i:s", strtotime($G_data[0]['End'] ));
+        $QtyOri = $getM[0]['Qty'];
+        $getQtyperDateTime = $this->getQtyperDateTime($ID_equipment_add,$QtyOri,$Start,$End);
+        $r = $getQtyperDateTime ;
         if ($r >= 0) {
             $bool = true;
         }
@@ -3054,5 +3707,152 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         }
 
         return $arr_result;  
+    }
+
+
+    public function Get_Approver($ApprverNumber,$ID_CategoryRoom,$CreatedBy)
+    {
+        $Name = '';
+        $CategoryRoomByRoom = $ID_CategoryRoom;
+        $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
+        $Approver1 = $getDataCategoryRoom[0]['Approver1'];
+        $Approver1 = json_decode($Approver1);
+        $ID_group_user = $this->m_master->caribasedprimary('db_reservation.previleges_guser','NIP',$CreatedBy);
+        $ID_group_user = $ID_group_user[0]['G_user'];
+        $EM = $this->m_master->caribasedprimary('db_employees.employees','NIP',$CreatedBy);
+        if ($ApprverNumber == 1) {
+            for ($l=0; $l < count($Approver1); $l++) {
+                // find by ID_group_user
+                    if ($ID_group_user == $Approver1[$l]->UserType) {
+                        // get TypeApprover
+                        $TypeApprover = $Approver1[$l]->TypeApprover;
+                        switch ($TypeApprover) {
+                            case 'Position':
+                                // get Division to access position approval
+                                    $PositionMain = $EM[0]['PositionMain'];
+                                    $ex = explode('.', $PositionMain);
+                                    $IDDivision = $ex[0];
+                                    $IDPositionApprover = $Approver1[$l]->Approver; 
+                                    if ($IDDivision == 15 || $IDDivision == 33) { // if prodi
+                                        $sqlgg = 'select * from db_academic.program_study where AdminID = ? or KaprodiID = ? or Laboran = ?';
+                                        $gg=$this->db->query($sqlgg, array($CreatedBy,$CreatedBy,$CreatedBy))->result_array();
+                                        if (count($gg) > 0) {
+                                            for ($k=0; $k < count($gg); $k++) { 
+                                                $Kaprodi = $gg[$k]['KaprodiID'];
+                                                $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Kaprodi);
+                                                for ($m=0; $m < count($getApprover1); $m++) { 
+                                                    if ($getApprover1[$m]['StatusEmployeeID'] > 0) {
+                                                        $Name =  $getApprover1[$m]['Name'];
+                                                    }
+                                                }
+                                            }
+                                            
+                                        }
+                                    }
+                                    elseif ($IDDivision == 34 || $IDDivision == 33) {
+                                        $sqlgg = 'select * from db_academic.faculty where AdminID = ? or NIP = ? or Laboran = ?';
+                                        $gg=$this->db->query($sqlgg, array($CreatedBy,$CreatedBy,$CreatedBy))->result_array();
+                                        if (count($gg) > 0) {
+                                            for ($k=0; $k < count($gg); $k++) { 
+                                                $Dekan = $gg[$k]['NIP'];
+                                                $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Dekan);
+                                                for ($m=0; $m < count($getApprover1); $m++) { 
+                                                    if ($getApprover1[$m]['StatusEmployeeID'] > 0) {
+                                                         $Name =  $getApprover1[$m]['Name'];
+                                                    }
+                                                }
+                                            }
+                                            
+                                        }
+                                    }
+                                    elseif ($IDDivision == 14) { // lecturer
+                                        $ProdiID = $EM[0]['ProdiID'];
+                                        $G_Prodi = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+                                        $Kaprodi = $G_Prodi[0]['KaprodiID'];
+                                        $G_Kaprodi = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Kaprodi);
+                                        $Name =  $G_Kaprodi[0]['Name'];
+                                    }
+                                    else
+                                    {
+
+                                        // find by division and position
+                                        // print_r($IDPositionApprover);
+                                        $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionMain',$IDDivision.'.'.$IDPositionApprover);
+                                        $arr = array();
+                                        for ($k=0; $k < count($getApprover1); $k++) {
+                                            if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
+                                                $arr[] =  $getApprover1[$k];
+                                            } 
+                                           
+                                        }
+
+                                        $getApprover1 = $arr;
+
+                                        if (count($getApprover1) == 0) {
+                                            $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionOther1',$IDDivision.'.'.$IDPositionApprover);
+                                            if (count($getApprover1) == 0) {
+                                                $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionOther2',$IDDivision.'.'.$IDPositionApprover);
+                                                if (count($getApprover1) == 0) {
+                                                    $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionOther3',$IDDivision.'.'.$IDPositionApprover);
+                                                }
+                                            }
+                                        }
+
+                                        for ($k=0; $k < count($getApprover1); $k++) {
+                                            if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
+                                                $Name =  $getApprover1[$k]['Name'];
+                                            } 
+                                           
+                                        }
+                                    }
+                                break;
+                            
+                            case 'Division':
+                                $getApprover1 = $this->m_master->caribasedprimary('db_employees.division','ID',$Approver1[$l]->Approver);
+                                for ($k=0; $k < count($getApprover1); $k++) {
+                                   $Name =  $getApprover1[$k]['Division']; 
+                                }
+                                break;
+
+                            case 'Employees':
+                                $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Approver1[$l]->Approver);
+                                for ($k=0; $k < count($getApprover1); $k++) {
+                                   $Name =  $getApprover1[$k]['Name'];  
+                                }
+                                break;    
+                        }
+                    }
+            } // end loop for
+        }
+        else
+        {
+            $Approver2Div = $getDataCategoryRoom[0]['Approver2'];
+            $Approver2Div = json_decode($Approver2Div);
+            for ($zz=0; $zz < count($Approver2Div); $zz++) { 
+                $rdata = $Approver2Div[$zz];
+                $TypeApprover = $rdata->TypeApprover;
+                $bool = false;
+                switch ($TypeApprover) {
+                    case 'Division':
+                        $DivisionApprove = $this->m_master->caribasedprimary('db_employees.division','ID',$rdata->Approver);
+                        $Name = $DivisionApprove[0]['Division'];
+                        $bool = true;
+                        break;
+                    case 'Employees':
+                        $NIPAPP2 = $rdata->Approver;
+                        $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIPAPP2);
+                        $Name = $G_emp[0]['Name'];
+                        $bool = true;
+                        break;
+
+                }
+
+                if ($bool) {
+                    break;
+                }
+            }
+        }
+        
+        return $Name;
     }
 }

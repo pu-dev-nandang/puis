@@ -29,10 +29,15 @@
         <a href="<?php echo base_url('academic/transfer-student/programme-study'); ?>" class="btn btn-warning">
             <i class="fa fa-arrow-left margin-right"></i>
             Back to list</a>
-
         <hr/>
         <h3 style="margin-top: 0px;border-left: 7px solid #2196F3;
     padding-left: 10px;font-weight: bold;">Course Conversion</h3>
+    </div>
+
+    <div class="col-md-6 col-md-offset-3">
+        <div style="padding: 15px; background: lightyellow;border: 2px solid orange;margin-bottom: 10px;text-align: center;">
+            <h4 style="margin-top: 3px;"><b>IPS per semester dan Jumlah SKS</b> akan otomatis menyesuaikan dengan settingan pada saat konversi mata kuliah.</h4>
+        </div>
     </div>
 </div>
 
@@ -69,7 +74,7 @@
     });
 
     function loadDataTransferStudent() {
-
+        arrSemesterIDAfter = [];
         var token = jwt_encode({action : 'readDataTransferStudent', TSID : TSID},'UAP)(*');
         var url = base_url_js+'api/__crudTransferStudent';
         $.post(url,{token:token},function (jsonResult) {
@@ -92,6 +97,7 @@
             $('#viewProdi_B').html(jsonResult.DataTransfer[0].CodeProdi_B+' | '+jsonResult.DataTransfer[0].ClassOfBefore);
             $('#viewProdi_A').html(jsonResult.DataTransfer[0].CodeProdi_A+' | '+jsonResult.DataTransfer[0].ClassOfAfter);
 
+
             var dataBefore = jsonResult.Before;
             if(dataBefore.length>0){
                 $('#loadSemesterBefore').empty();
@@ -107,7 +113,7 @@
                         '                <th>Course</th>' +
                         '                <th style="width: 5%;">Credit</th>' +
                         '                <th style="width: 15%;">Final Score</th>' +
-                        '                <th style="width: 5%;"><i class="fa fa-cog"></i></th>' +
+                        '                <th style="width: 9%;"><i class="fa fa-cog"></i></th>' +
                         '            </tr>' +
                         '            </thead>' +
                         '            <tbody id="beforeRow'+d_B.Semester+'"></tbody>' +
@@ -118,20 +124,24 @@
                         var noB = 1;
                         for(var dc = 0;dc<d_B.Course.length;dc++){
                             var d_c_B = d_B.Course[dc];
+
+                            var btnAddConversion = (d_c_B.TransferToSemester.length>0)
+                                ? '<span class="label label-primary">Smt '+d_c_B.TransferToSemester[0].Semester+'</span>'
+                                : '<button class="btn btn-sm btn-success btnActToAdd" data-cdid="'+d_c_B.CDID+'" data-id="'+d_c_B.ID+'"><i class="fa fa-arrow-right"></i></button>';
+
                             $('#beforeRow'+d_B.Semester).append('<tr>' +
                                 '<td>'+(noB++)+'</td>' +
                                 '<td id="viewCode'+d_c_B.ID+'" >'+d_c_B.MKCode+'</td>' +
                                 '<td id="viewCourse'+d_c_B.ID+'"  style="text-align: left;"><b>'+d_c_B.NameEng+'</b><br/><i>'+d_c_B.Name+'</i></td>' +
                                 '<td id="viewCredit'+d_c_B.ID+'" >'+d_c_B.Credit+'</td>' +
                                 '<td id="viewScore'+d_c_B.ID+'" ><span style="color: blue;">'+d_c_B.Score+'</span> | '+d_c_B.Grade+'</td>' +
-                                '<td><button class="btn btn-sm btn-success btnActToAdd" data-id="'+d_c_B.ID+'"><i class="fa fa-arrow-right"></i></button></td>' +
+                                '<td>'+btnAddConversion+'</td>' +
                                 '</tr>');
                         }
                     }
 
                 }
             }
-
 
             var dataAfter = jsonResult.After;
             if(dataAfter.length>0){
@@ -170,6 +180,14 @@
                 }
             }
 
+
+
+
+
+
+
+
+
         });
     }
 
@@ -177,6 +195,7 @@
 
 
         var ID = $(this).attr('data-id');
+        var CDID_Before = $(this).attr('data-cdid');
 
         var viewCode = $('#viewCode'+ID).html();
         var viewCourse = $('#viewCourse'+ID).html();
@@ -240,7 +259,7 @@
 
 
         $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
-            '<button type="button" class="btn btn-success" id="btnSubmitConversion" data-id="'+ID+'">Submit</button>');
+            '<button type="button" class="btn btn-success" id="btnSubmitConversion" data-cdid="'+CDID_Before+'" data-id="'+ID+'">Submit</button>');
         $('#GlobalModal').modal({
             'show' : true,
             'backdrop' : 'static'
@@ -250,6 +269,7 @@
     $(document).on('click','#btnSubmitConversion',function () {
 
         var SPID = $(this).attr('data-id');
+        var CDID_Before = $(this).attr('data-cdid');
 
         var formConversionSemester = $('#formConversionSemester').val();
         var formConversionCourse = $('#formConversionCourse').val(); // Val = CDID.MKID.Credit.GradeValue
@@ -284,7 +304,9 @@
                     NPM_Before : NPM_B,
                     TA_Before : $('#dataTransferFromClassOf').val(),
                     SPID_Before : SPID,
+                    CDID_Before : CDID_Before,
                     NPM_After : NPM_A,
+                    CDID_After : CDID,
                     TA_After : $('#dataTransferToClassOf').val()
 
                 }
@@ -293,10 +315,13 @@
             var url = base_url_js+'api/__crudTransferStudent';
 
             $.post(url,{token:token},function (result) {
+                toastr.success('Course Conversion','Success');
                 loadDataTransferStudent();
                 $('#GlobalModal').modal('hide');
             });
 
+        } else {
+            toastr.error('FormRequired','Error');
         }
 
 
@@ -369,7 +394,27 @@
     $(document).on('click','.btnActToDelete',function () {
 
         var SPID = $(this).attr('data-id');
-        if(confirm('Are you sure?') && SPID!='' && SPID!=null){
+
+        $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Remove course ?</b><hr/> ' +
+            '<button type="button" class="btn btn-danger" id="btnActRemoveCourseTransferStd" data-id="'+SPID+'" style="margin-right: 5px;">Yes</button>' +
+            '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+            '</div>');
+        $('#NotificationModal').modal({
+            'backdrop' : 'static',
+            'show' : true
+        });
+
+
+
+
+    });
+
+    $(document).on('click','#btnActRemoveCourseTransferStd',function () {
+        var SPID = $(this).attr('data-id');
+        if(SPID!='' && SPID!=null){
+
+            loading_buttonSm('#btnActRemoveCourseTransferStd');
+            $('button[data-dismiss=modal]').prop('disabled',true);
 
             var ClassOf = $('#dataTransferToClassOf').val();
 
@@ -383,13 +428,14 @@
             var url = base_url_js+'api/__crudTransferStudent';
 
             $.post(url,{token:token},function (result) {
+                loadDataTransferStudent();
+                toastr.success('Remove Course Conversion','Success');
                 setTimeout(function () {
-                    loadDataTransferStudent();
+                    $('#NotificationModal').modal('hide');
                 },500);
             });
 
         }
-
     });
 
 </script>

@@ -11,6 +11,8 @@ $route['navigation/(:num)'] = 'c_departement/navigation/$1';
 $route['profile'] = 'c_dashboard/profile';
 $route['page404'] = 'dashboard/c_dashboard/page404';
 
+
+
 // FROM PORTAL
 $route['uath/__portal4SignIn'] = 'c_login/portal4SignIn';
 
@@ -24,6 +26,7 @@ $route['callback'] = 'c_login/callback';
 
 
 $route['db/(:any)'] = 'auth/c_auth/db/$1';
+$route['parent/(:num)'] = 'auth/c_auth/parent/$1';
 $route['getReportEdom/(:num)'] = 'auth/c_auth/getReportEdom/$1';
 
 $route['foto'] = 'auth/c_auth/foto';
@@ -82,7 +85,8 @@ $route['academic/study-planning'] = 'page/academic/c_study_planning';
 
 $route['academic/study-planning/list-student'] = 'page/academic/c_study_planning/liststudent';
 $route['academic/study-planning/course-offer/(:num)/(:any)/(:any)'] = 'page/academic/c_study_planning/course_offer/$1/$2/$3';
-
+$route['academic/study-planning/batal-tambah/(:num)/(:any)/(:any)'] = 'page/academic/c_study_planning/batal_tambah/$1/$2/$3';
+$route['academic/study-planning/outstanding'] = 'page/academic/c_study_planning/outstanding';
 $route['academic/references'] = 'page/academic/c_reference';
 
 
@@ -102,6 +106,8 @@ $route['academic/exam-schedule/list-exam'] = 'page/academic/c_jadwal_ujian/list_
 $route['academic/exam-schedule/list-waiting-approve'] = 'page/academic/c_jadwal_ujian/list_waiting_approve';
 $route['academic/exam-schedule/set-exam-schedule'] = 'page/academic/c_jadwal_ujian/set_exam_schedule';
 $route['academic/exam-schedule/edit-exam-schedule/(:num)'] = 'page/academic/c_jadwal_ujian/edit_exam_schedule/$1';
+$route['academic/exam-schedule/exam-setting'] = 'page/academic/c_jadwal_ujian/exam_setting';
+$route['academic/exam-schedule/exam-barcode'] = 'page/academic/c_jadwal_ujian/exam_barcode';
 
 // ---- Score ----
 $route['academic/score'] =  'page/academic/c_score';
@@ -169,6 +175,8 @@ $route['database/mentor-academic'] = 'page/database/c_database/mentor_academic';
 
 // --- Presensi ---
 $route['academic/attendance/input-attendace'] = 'page/academic/c_presensi';
+$route['academic/attendance/details-attendace/(:num)'] = 'page/academic/c_presensi/details_attendace/$1';
+
 $route['academic/loadPagePresensi'] = 'page/academic/c_presensi/loadPagePresensi';
 
 $route['academic/attendance/monitoring-attendace-lecturer'] = 'page/academic/c_presensi/monitoring_lecturer';
@@ -356,6 +364,8 @@ $route['download_template/(:any)'] = 'api/c_global/download_template/$1';
 $route['download_anypath'] = 'api/c_global/download_anypath';
 $route['fileGetAny/(:any)'] = 'api/c_global/fileGetAny/$1';
 $route['autocompleteAllUser'] = 'api/c_global/autocompleteAllUser';
+$route['genrateBarcode/(:any)'] = 'api/c_global/genrateBarcode/$1';
+$route['getBarcodeExam'] = 'api/c_global/getBarcodeExam';
 
 
 
@@ -389,9 +399,7 @@ $route['admission/add_auth_user'] = 'page/admission/c_master/add_auth_user';
 $route['admission/delete_authUser'] = 'page/admission/c_master/delete_authUser';
 $route['admission/config/getAuthDataTables'] = 'page/admission/c_master/getAuthDataTables';
 $route['admission/master/generate_formulir_global'] = 'page/admission/c_master/generate_formulir_global';
-
-
-
+$route['admission/master/import_sales_regional'] = 'page/admission/c_master/import_sales_regional';
 
 
 $route['admission/dashboard'] = 'page/admission/c_admission/dashboard';
@@ -468,6 +476,13 @@ $route['admission/export_PenjualanFormulirFinance'] = 'c_save_to_excel/export_Pe
 $route['finance/export_PenjualanFormulir'] = 'c_save_to_excel/v_Finance_export_PenjualanFormulir';
 $route['admission/export_PengembalianFormulirData'] = 'c_save_to_excel/export_PengembalianFormulirData';
 $route['admission/TuitionFee_Excel'] = 'c_save_to_excel/export_TuitionFee_Excel';
+$route['admisssion/crm/(:any)'] = 'page/admission/marketing/c_crm/crmpage/$1';
+$route['admission/crm/import'] = 'page/admission/marketing/c_crm/import_data_crm';
+$route['admission/crm/showdata'] = 'page/admission/marketing/c_crm/showdata_crm';
+$route['admission/crm/delete/byid'] = 'page/admission/marketing/c_crm/deletecrm_by_id';
+
+
+
 // ---Finance----
 
 $route['finance/dashboard_getoutstanding_today'] =  'dashboard/c_dashboard/dashboard_getoutstanding_today';
@@ -534,10 +549,16 @@ $route['finance/get_tagihan_mhs/(:num)'] =  'page/finance/c_finance/get_tagihan_
 $route['finance/submit_tagihan_mhs'] =  'page/finance/c_finance/submit_tagihan_mhs';
 $route['finance/tagihan-mhs/cek-tagihan-mhs/(:num)'] =  'page/finance/c_finance/page_cek_tagihan_mhs/$1';
 $route['finance/tagihan-mhs/cek-tagihan-mhs'] =  'page/finance/c_finance/page_cek_tagihan_mhs';
+
+
 $route['finance/get_created_tagihan_mhs/(:num)'] =  'page/finance/c_finance/get_created_tagihan_mhs/$1';
 $route['finance/get_created_tagihan_mhs_not_approved/(:num)'] =  'page/finance/c_finance/get_created_tagihan_mhs_not_approved/$1';
 $route['finance/approved_created_tagihan_mhs'] =  'page/finance/c_finance/approved_created_tagihan_mhs';
 $route['finance/unapproved_created_tagihan_mhs'] =  'page/finance/c_finance/unapproved_created_tagihan_mhs';
+$route['finance/unapproved_created_tagihan_mhs_after_confirm'] =  'page/finance/c_finance/unapproved_created_tagihan_mhs_after_confirm';
+$route['finance/assign_to_change_status_mhs'] =  'page/finance/c_finance/assign_to_change_status_mhs';
+
+
 $route['finance/tagihan-mhs/cancel-tagihan-mhs'] =  'page/finance/c_finance/cancel_tagihan_mhs';
 $route['finance/cancel_created_tagihan_mhs'] =  'page/finance/c_finance/cancel_created_tagihan_mhs';
 $route['finance/tagihan-mhs/set-cicilan-tagihan-mhs'] =  'page/finance/c_finance/set_cicilan_tagihan_mhs';
@@ -579,6 +600,8 @@ $route['finance/download-log-va'] =  'page/finance/c_finance/download_log_va';
 $route['finance/listfile_va'] =  'page/finance/c_finance/listfile_va';
 $route['finance/admission/dailypenerimaanBank'] =  'c_save_to_excel/dailypenerimaanBank_admission';
 $route['finance/admission/RekapIntake'] =  'c_save_to_excel/RekapIntake';
+$route['finance/verify_bukti_bayar'] =  'page/finance/c_finance/verify_bukti_bayar';
+$route['finance/reject_bukti_bayar'] =  'page/finance/c_finance/reject_bukti_bayar';
 
 
 // -- config --
@@ -617,6 +640,9 @@ $route['save2pdf/schedule-pdf'] =  'c_save_to_pdf/schedulePDF';
 $route['save2pdf/monitoringAttdLecturer'] =  'c_save_to_pdf/monitoringAttdLecturer';
 $route['save2pdf/scheduleExchange'] =  'c_save_to_pdf/scheduleExchange';
 $route['save2pdf/monitoringStudent'] =  'c_save_to_pdf/monitoringStudent';
+
+$route['save2pdf/create_idCard'] =  'c_save_to_pdf/create_idCard';
+
 $route['save2pdf/monitoringAttendanceByRangeDate'] =  'c_save_to_pdf/monitoringAttendanceByRangeDate';
 
 $route['save2pdf/filterDocument'] =  'c_save_to_pdf/filterDocument';
@@ -633,12 +659,17 @@ $route['save2pdf/attendance-list'] =  'c_save_to_pdf/attendance_list';
 $route['save2pdf/transcript'] =  'c_save_to_pdf/transcript';
 $route['save2pdf/temp_transcript'] =  'c_save_to_pdf/temp_transcript';
 $route['save2pdf/ijazah'] =  'c_save_to_pdf/ijazah';
+
+//========= tambahan SKL TGL 17-01-2019 =============================
+$route['save2pdf/skls'] =  'c_save_to_pdf/skls';
+//====================================================================
 $route['save2pdf/diploma_supplement'] =  'c_save_to_pdf/diploma_supplement';
 
 $route['save2pdf/report-uts'] =  'c_save_to_pdf/report_uts';
 
 $route['save2pdf/getpdfkwitansi/(:any)'] =  'c_save_to_pdf/getpdfkwitansi/$1';
 $route['save2pdf/print/tuitionFeeAdmission'] =  'C_save_to_pdf2/tuitionFeeAdmission';
+$route['save2pdf/PrintIDCard'] =  'c_save_to_pdf/PrintIDCard';
 
 // ---- Save to EXCEL
 $route['save2excel/test'] =  'c_save_to_excel/test2';
@@ -719,15 +750,11 @@ $route['api/__getListStudentKrsOnline'] = 'api/c_api/getListStudentKrsOnline';
 $route['api/__getListStudentKrsOnlineKaprodi'] = 'api/c_api/getListStudentKrsOnlineKaprodi';
 
 // === Timetables ====
-
 $route['api/__getTimetables'] = 'api/c_api/getTimetables';
-
 // === Penutup Timetables ====
 
 // === Monitoring All Student ===
-
 $route['api/__getMonitoringAllStudent'] = 'api/c_api/getMonitoringAllStudent';
-
 // ============================
 
 $route['api/__getListCourseInScore'] = 'api/c_api/getListCourseInScore';
@@ -769,6 +796,7 @@ $route['api/__getSumberIklan'] = 'api/c_api/getSumberIklan';
 $route['api/__getPriceFormulirOffline'] = 'api/c_api/getPriceFormulirOffline';
 $route['api/__getEvent'] = 'api/c_api/getEvent';
 $route['api/__getDocument'] = 'api/c_api/getDocument';
+$route['api/__getDocument2'] = 'api/c_api/getDocument2';
 $route['api/__getDocumentAdmisiMHS'] = 'api/c_api/getDocumentAdmisiMHS';
 
 
@@ -792,6 +820,10 @@ $route['api/__crudJadwalUjian'] = 'api/c_api/crudJadwalUjian';
 $route['api/__crudEmployees'] = 'api/c_api/crudEmployees';
 $route['api/__crudScore'] = 'api/c_api/crudScore';
 $route['api/__crudAttendance'] = 'api/c_api/crudAttendance';
+$route['api2/__crudAttendance2'] = 'api/c_api2/crudAttendance2';
+$route['api2/__getAnnouncement'] = 'api/c_api2/getAnnouncement';
+$route['api2/__getDetailCurriculum'] = 'api/c_api2/getDetailCurriculum';
+
 $route['api/__crudScheduleExchange'] = 'api/c_api/crudScheduleExchange';
 $route['api/__crudLimitCredit'] = 'api/c_api/crudLimitCredit';
 $route['api/__crudAcademicData'] = 'api/c_api/crudAcademicData'; //add bismar
@@ -840,9 +872,27 @@ $route['rest/__rekapmhspayment'] = 'api/c_rest/rekapmhspayment';
 $route['rest/__sendEmail'] = 'api/c_rest/sendEmail';
 $route['rest/venue/__fill_feedback'] = 'api/c_rest/venue__fill_feedback';
 $route['rest/Catalog/__Get_Item'] = 'api/c_rest/catalog__get_item';
+$route['rest/__Databank'] = 'api/c_rest/Databank';
+$route['rest/__GetpaymentByID'] = 'api/c_rest/GetpaymentByID';
+$route['rest/__save_upload_proof_payment'] = 'api/c_rest/save_upload_proof_payment';
+$route['rest/__delete_file_proof_payment'] = 'api/c_rest/delete_file_proof_payment';
+$route['rest/__delete_all_file_proof_payment_byID'] = 'api/c_rest/delete_all_file_proof_payment_byID';
+$route['rest/academic/__fill_list_mhs_tidak_bayar'] = 'api/c_rest/academic_fill_list_mhs_tidak_bayar';
+$route['rest/academic/__assign_by_finance_change_status'] = 'api/c_rest/assign_by_finance_change_status';
+$route['rest/academic/__change_status_mhs_multiple'] = 'api/c_rest/change_status_mhs_multiple';
+$route['rest/ga/__show_schedule_exchange'] = 'api/c_rest/show_schedule_exchange';
+$route['rest/__approve_pr'] = 'api/c_rest/approve_pr';
+$route['rest/__budgeting_dashboard'] = 'api/c_rest/budgeting_dashboard';
+$route['rest/__InputCatalog_saveFormInput'] = 'api/c_rest/InputCatalog_saveFormInput';
+$route['rest/__show_circulation_sheet'] = 'api/c_rest/show_circulation_sheet';
+$route['rest/__log_budgeting'] = 'api/c_rest/log_budgeting';
+$route['rest/__approve_budget'] = 'api/c_rest/approve_budget';
+$route['rest/__TestpostdataFrom_PowerApps'] = 'api/c_rest/TestpostdataFrom_PowerApps';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
+$route['api/__test_data'] = 'api/c_api/test_data';
+$route['api/__test_data2'] = 'api/c_api/test_data2';
 $route['api/__getRegionByProv'] = 'api/c_api/getRegionByProv';
 $route['api/__getDistrictByRegion'] = 'api/c_api/getDistrictByRegion';
 $route['api/__getTypeSekolah'] = 'api/c_api/getTypeSekolah';
@@ -899,6 +949,24 @@ $route['api/__crudLog'] = 'api/c_api/crudLog';
 
 
 $route['api/__crudTransferStudent'] = 'api/c_api/crudTransferStudent';
+
+// === API 2 ===
+
+$route['api2/__crudScheduleExchage'] = 'api/c_api2/crudScheduleExchage';
+$route['api2/__crudModifyAttendance'] = 'api/c_api2/crudModifyAttendance';
+$route['api2/__getMonitoringAttendance'] = 'api/c_api2/getMonitoringAttendance';
+
+$route['api2/__getSemesterOptionStudent/(:num)'] = 'api/c_api2/getSemesterOptionStudent/$1';
+
+$route['api2/__crudAnnouncement'] = 'api/c_api2/crudAnnouncement';
+$route['api2/__changePasswordStudent'] = 'api/c_api2/changePasswordStudent';
+
+$route['api3/login'] = 'api/c_mobile/login';
+$route['api3/__readGlobalInfo'] = 'api/c_mobile/readGlobalInfo';
+$route['test_mobile'] = 'api/c_mobile/test_mobile';
+
+
+// Penutup API 2 ===
 
 
 $route['__resetPasswordUser'] = 'c_login/resetPasswordUser';
@@ -1017,6 +1085,7 @@ $route['vreservation/report/(:any)'] = 'page/vreservation/c_global/report/$1';
 $route['api/vreservation/summary_use_room'] = 'api/c_global/summary_use_room';
 $route['api/vreservation/detailroom'] = 'api/c_global/detailroom';
 $route['vreservation/datafeedback'] = 'page/vreservation/c_global/datafeedback';
+$route['vreservation/loadScheduleEquipment'] = 'page/vreservation/c_global/loadScheduleEquipment';
 
 
 // test
@@ -1028,12 +1097,23 @@ $route['testInject4'] = 'api/c_global/testInject4';
 $route['testInject5'] = 'api/c_global/testInject5';
 
 
+// Action From Email
+$route['fmail/schedule-exchange/approved/(:any)'] = 'api/c_global/exchange_approved/$1';
+$route['fmail/schedule-exchange/rejected/(:any)'] = 'api/c_global/exchange_rejected/$1';
+
+$route['fmail/modify-attendance/(:any)/(:any)'] = 'api/c_global/modify_attendance/$1/$2';
+
+
 // Pengawas Ujian
 $route['invigilator'] = 'c_pengawas_ujian';
 
 
 // Announcement
 $route['announcement/list-announcement'] = 'page/announcement/c_announcement/list_announcement';
+$route['announcement/create-announcement'] = 'page/announcement/c_announcement/create_announcement';
+$route['announcement/upload_files'] = 'page/announcement/c_announcement/upload_files';
+
+$route['announcement/edit-announcement/(:num)'] = 'page/announcement/c_announcement/edit_announcement/$1';
 
 
 
@@ -1083,10 +1163,19 @@ $route['budgeting/masterpost/modalform/save'] = 'page/budgeting/c_budgeting/moda
 $route['budgeting/postrealisasi/modalform'] = 'page/budgeting/c_budgeting/modal_postrealisasi';
 $route['budgeting/postrealisasi/modalform/save'] = 'page/budgeting/c_budgeting/save_postrealisasi';
 $route['budgeting/get_cfg_postrealisasi'] = 'page/budgeting/c_budgeting/get_cfg_postrealisasi';
+$route['budgeting/get_cfg_head_account'] = 'page/budgeting/c_budgeting/get_cfg_head_account';
+
+$route['budgeting/headaccount/modalform'] = 'page/budgeting/c_budgeting/modal_headaccount';
+$route['budgeting/headaccount/modalform/save'] = 'page/budgeting/c_budgeting/save_headaccount';
+
+
 $route['budgeting/page/loadCodePrefix'] = 'page/budgeting/c_budgeting/loadCodePrefix';
 $route['budgeting/save_codeprefix'] = 'page/budgeting/c_budgeting/save_codeprefix';
 $route['budgeting/page/LoadSetPostDepartement'] = 'page/budgeting/c_budgeting/LoadSetPostDepartement';
 $route['budgeting/page/LoadInputsetPostDepartement'] = 'page/budgeting/c_budgeting/LoadInputsetPostDepartement';
+$route['budgeting/page/ExportPostDepartement'] = 'page/budgeting/c_budgeting/ExportPostDepartement';
+
+
 $route['budgeting/getPostDepartement'] = 'page/budgeting/c_budgeting/getPostDepartement';
 $route['budgeting/getDomPostDepartement'] = 'page/budgeting/c_budgeting/getDomPostDepartement';
 $route['budgeting/save-setpostdepartement'] = 'page/budgeting/c_budgeting/save_setpostdepartement';
@@ -1097,13 +1186,19 @@ $route['budgeting/page/LoadSetUserRole'] = 'page/budgeting/c_budgeting/LoadSetUs
 $route['budgeting/page/LoadMasterUserRoleDepartement'] = 'page/budgeting/c_budgeting/LoadMasterUserRoleDepartement';
 $route['budgeting/AutoCompletePostDepartement'] = 'page/budgeting/c_budgeting/AutoCompletePostDepartement';
 $route['budgeting/save_cfg_set_userrole'] = 'page/budgeting/c_budgeting/save_cfg_set_userrole';
-$route['budgeting/page/LoadSetUserActionDepartement'] = 'page/budgeting/c_budgeting/LoadSetUserActionDepartement';
-$route['budgeting/get_cfg_set_roleuser/(:any)'] = 'page/budgeting/c_budgeting/get_cfg_set_roleuser/$1';
-$route['budgeting/save_cfg_set_roleuser'] = 'page/budgeting/c_budgeting/save_cfg_set_roleuser';
+$route['budgeting/page/LoadSetUserApprovalDepartement'] = 'page/budgeting/c_budgeting/LoadSetUserApprovalDepartement';
+$route['budgeting/get_cfg_set_roleuser_budgeting/(:any)'] = 'page/budgeting/c_budgeting/get_cfg_set_roleuser_budgeting/$1';
+$route['budgeting/save_cfg_set_roleuser_budgeting'] = 'page/budgeting/c_budgeting/save_cfg_set_roleuser_budgeting';
 $route['budgeting/EntryBudget/EntryBudget'] = 'page/budgeting/c_budgeting/EntryBudget';
+$route['budgeting/EntryBudget/EntryPostItemBudgeting'] = 'page/budgeting/c_budgeting/EntryPostItemBudgeting';
+
 $route['budgeting/EntryBudget/EntryBudget/(:any)'] = 'page/budgeting/c_budgeting/EntryBudget/$1';
 $route['budgeting/getCreatorBudget'] = 'page/budgeting/c_budgeting/getCreatorBudget';
 $route['budgeting/saveCreatorbudget'] = 'page/budgeting/c_budgeting/saveCreatorbudget';
+$route['budgeting/update_approval_budgeting'] = 'page/budgeting/c_budgeting/update_approval_budgeting';
+
+
+
 $route['budgeting/EntryBudget/Approval'] = 'page/budgeting/c_budgeting/EntryBudget_Approval';
 $route['budgeting/getLoadApprovalBudget'] = 'page/budgeting/c_budgeting/getLoadApprovalBudget';
 $route['budgeting/getLoadApprovalBudget/(:any)'] = 'page/budgeting/c_budgeting/getLoadApprovalBudget/$1';
@@ -1111,12 +1206,22 @@ $route['budgeting/EntryBudget/ListBudgetDepartement'] = 'page/budgeting/c_budget
 $route['budgeting/getListBudgetingDepartement'] = 'page/budgeting/c_budgeting/getListBudgetingDepartement';
 $route['budgeting/export_excel_budget_creator'] = 'C_save_to_excel/export_excel_budget_creator';
 $route['budgeting/export_excel_budget_creator_all'] = 'C_save_to_excel/export_excel_budget_creator_all';
+$route['budgeting/config_pr/Set_Rad']= 'page/budgeting/c_pr_po/set_rad';
+$route['budgeting/config_pr/Set_Approval']= 'page/budgeting/c_pr_po/Set_Approval';
+$route['budgeting/get_cfg_set_roleuser_pr/(:any)'] = 'page/budgeting/c_pr_po/get_cfg_set_roleuser_pr/$1';
+$route['budgeting/save_cfg_set_roleuser_pr'] = 'page/budgeting/c_pr_po/save_cfg_set_roleuser_pr';
+
+
 $route['budgeting/EntryBudget/BudgetLeft'] = 'page/budgeting/c_budgeting/BudgetLeft';
 $route['budgeting/getListBudgetingRemaining'] = 'page/budgeting/c_budgeting/getListBudgetingRemaining';
 $route['budgeting/detail_budgeting_remaining'] = 'page/budgeting/c_budgeting/detail_budgeting_remaining';
+$route['budgeting/detail_budgeting_remaining_All'] = 'page/budgeting/c_budgeting/detail_budgeting_remaining_All';
 $route['budgeting/configRule'] = 'page/budgeting/c_budgeting/configRule';
-$route['budgeting/configRule/userroledepart_submit'] = 'page/budgeting/c_budgeting/userroledepart_submit';
+$route['budgeting/configRule/userroledepart_submit'] = 'page/budgeting/c_pr_po/userroledepart_submit';
 $route['budgeting/page_pr/(:any)'] = 'page/budgeting/c_budgeting/page_pr/$1';
+$route['budgeting/page_pr_catalog/(:any)'] = 'page/budgeting/c_budgeting/page_pr_catalog/$1';
+
+
 $route['budgeting/PostBudgetThisMonth_Department'] = 'page/budgeting/c_budgeting/PostBudgetThisMonth_Department';
 $route['budgeting/getPostBudgetDepartement'] = 'page/budgeting/c_budgeting/getPostBudgetDepartement';
 $route['budgeting/submitpr'] = 'page/budgeting/c_budgeting/submitpr';
@@ -1124,6 +1229,12 @@ $route['budgeting/DataPR'] = 'page/budgeting/c_budgeting/DataPR';
 $route['budgeting/FormEditPR'] = 'page/budgeting/c_budgeting/FormEditPR';
 $route['budgeting/GetDataPR'] = 'page/budgeting/c_budgeting/GetDataPR';
 $route['budgeting/checkruleinput'] = 'page/budgeting/c_budgeting/checkruleinput';
+
+$route['budgeting/export_excel_post_department'] = 'c_save_to_excel/export_excel_post_department';
+$route['budgeting/update_approver'] = 'page/budgeting/c_budgeting/update_approver';
+$route['budgeting/Upload_File_Creatorbudget'] = 'page/budgeting/c_budgeting/Upload_File_Creatorbudget';
+$route['budgeting/Upload_File_Creatorbudget_all'] = 'page/budgeting/c_budgeting/Upload_File_Creatorbudget_all';
+
 
 
 // Purchasing
@@ -1172,6 +1283,11 @@ $route['purchasing/page/supplier/DataIntable/server_side'] = 'page/purchasing/c_
 $route['purchasing/page/supplier/ApprovalSupplier'] = 'page/purchasing/c_master/ApprovalSupplier';
 $route['purchasing/table_all/(:any)'] = 'page/purchasing/c_purchasing/LoadTable_db_purchasing_all/$1/$2';
 $route['purchasing/table_all/(:any)/(:any)'] = 'page/purchasing/c_purchasing/LoadTable_db_purchasing_all/$1/$2';
+$route['purchasing/page/catalog/import_data'] = 'page/purchasing/c_master/import_data_catalog';
+$route['purchasing/page/catalog/allow_division'] = 'page/purchasing/c_master/allow_division_catalog';
+$route['purchasing/page/catalog/table_allow_div'] = 'page/purchasing/c_master/table_allow_div';
+$route['purchasing/page/catalog/submit-permission-division'] = 'page/purchasing/c_master/submit_permission_division';
+
 
 // IT
 $query = $db->get('db_it.cfg_sub_menu');
@@ -1223,6 +1339,13 @@ $route['testadi2'] = 'c_login/testadi2';
 
 // admin prodi
 $route['loginToAdminProdi'] = 'c_login/loginToAdminProdi';
+$route['loginToAdminFaculty'] = 'c_login/loginToAdminFaculty';
 
 
-// marketing
+// general affair
+$route['ga_schedule_exchange'] = 'page/ga/C_schedule_exchange/schedule_exchange_action';
+$route['ga/scheduleexchange/submit_change_status'] = 'page/ga/C_schedule_exchange/submit_change_status';
+$route['save2pdf/print/prdeparment'] =  'C_save_to_pdf/print_prdeparment';
+
+// help
+$route['help'] =  'dashboard/C_dashboard/Help';

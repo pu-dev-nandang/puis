@@ -746,11 +746,16 @@ class C_save_to_excel extends CI_Controller
         $token = $this->input->post('token');
         $key = "UAP)(*";
         $Input = (array) $this->jwt->decode($token,$key);
+        $getData = $this->m_budgeting->get_creator_budget($Input['id_creator_budget_approval']);
+        $dt = $this->m_master->caribasedprimary('db_budgeting.creator_budget_approval','ID',$Input['id_creator_budget_approval']);
+        $NameDepartement = $this->m_budgeting->SearchDepartementBudgeting($dt[0]['Departement']);
+        $NameDepartement = $NameDepartement[0]['NameDepartement'];
+        $Year = $dt[0]['Year'];
+        $YearWr = $dt[0]['Year'].'/'.($dt[0]['Year'] + 1);
+        $YearWr2 = ($dt[0]['Year'] - 1).'/'.$dt[0]['Year'];
         include APPPATH.'third_party/PHPExcel/PHPExcel.php';
         ini_set('memory_limit', '-1');
         ini_set('max_execution_time', 600); //600 seconds = 10 minutes
-        $NameDepartement = $this->m_master->getDepartementPu('ID',$Input['Departement']);
-        $NameDepartement = $NameDepartement[0]['NameDepartement'];
 
         // Panggil class PHPExcel nya
         $excel = new PHPExcel();
@@ -790,102 +795,273 @@ class C_save_to_excel extends CI_Controller
             )
         );
 
-        $excel->setActiveSheetIndex(0)->setCellValue('A1', "Podomoro University Budgeting"); // Set kolom A1 dengan tulisan "DATA KARYAWAN"
+        $excel->setActiveSheetIndex(0)->setCellValue('D1', "Anggaran Program Studi Tahun Akademik ".$YearWr.' Universitas Agung Podomoro');
+        $excel->getActiveSheet()->getStyle('D1')->getFont()->setBold(TRUE);
+        $excel->getActiveSheet()->getStyle('D1')->getFont()->setSize(15);
         // $excel->getActiveSheet()->mergeCells('A1:E1'); // Set Merge Cell pada kolom A1 sampai E1
         $excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(TRUE); // Set bold kolom A1
         $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(15); // Set font size 15 untuk kolom A1
         // $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER); // Set text center untuk kolom A1
 
-        $excel->setActiveSheetIndex(0)->setCellValue('B2', $NameDepartement);
-        $excel->getActiveSheet()->getStyle('B2')->getFont()->setBold(TRUE); // Set bold kolom A1
-        $excel->getActiveSheet()->getStyle('B2')->getFont()->setSize(15);
+        $excel->setActiveSheetIndex(0)->setCellValue('B3', 'Nama Bagian');
+        $excel->getActiveSheet()->getStyle('B3')->getFont()->setBold(TRUE);
+        $excel->getActiveSheet()->getStyle('B3')->getFont()->setSize(15);
 
-        $excel->setActiveSheetIndex(0)->setCellValue('A2', "Departement : ");
-        $excel->getActiveSheet()->getStyle('A2')->getFont()->setBold(TRUE); // Set bold kolom A1
-        $excel->getActiveSheet()->getStyle('A2')->getFont()->setSize(15);
+        $excel->setActiveSheetIndex(0)->setCellValue('G3', ':');
+        $excel->getActiveSheet()->getStyle('G3')->getFont()->setBold(TRUE);
+        $excel->getActiveSheet()->getStyle('G3')->getFont()->setSize(15);
 
+        $excel->setActiveSheetIndex(0)->setCellValue('H3', $NameDepartement);
+        $excel->getActiveSheet()->getStyle('H3')->getFont()->setBold(TRUE);
+        $excel->getActiveSheet()->getStyle('H3')->getFont()->setSize(15);
 
-
-        $getData = $this->m_budgeting->get_creator_budget($Input['Year'] , $Input['Departement'] );
         // get Month
         $month = $getData[0]['DetailMonth'];
         $month = json_decode($month);
 
+        // make header
+            $excel->setActiveSheetIndex(0)->setCellValue('B6', "No");
+            $excel->getActiveSheet()->mergeCells('B6:C7');
+            $excel->getActiveSheet()->getStyle('B6:C7')->applyFromArray($style_col);
+            
+            $excel->setActiveSheetIndex(0)->setCellValue('D6', "POS ANGGARAN");
+            $excel->getActiveSheet()->mergeCells('D6:D7');
+            $excel->getActiveSheet()->getStyle('D6:D7')->applyFromArray($style_col);
 
-        $St = 5;
-        $excel->setActiveSheetIndex(0)->setCellValue('A'.$St, "Post Budget Name");
-        $excel->getActiveSheet()->mergeCells('A'.$St.':A'.($St+1));
-        $excel->setActiveSheetIndex(0)->setCellValue('B'.$St, "Month");
-        $excel->getActiveSheet()->getStyle('A'.$St)->applyFromArray($style_col);
-        $excel->getActiveSheet()->getStyle('A'.($St+1))->applyFromArray($style_col);
-        $keyM = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
-        $excel->getActiveSheet()->mergeCells('B'.$St.':'.$keyM[count($month)].$St);
-        $excel->getActiveSheet()->getStyle('B'.$St.':'.$keyM[count($month)].$St)->applyFromArray($style_col);
-        $excel->setActiveSheetIndex(0)->setCellValue($keyM[(count($month) + 1)].$St, "Sub Total");
-        $excel->getActiveSheet()->mergeCells($keyM[(count($month) + 1)].$St.':'.$keyM[(count($month) + 1)].($St+1));
-        $excel->getActiveSheet()->getStyle($keyM[(count($month) + 1)].$St.':'.$keyM[(count($month) + 1)].($St+1))->applyFromArray($style_col);
-        $St = $St + 1;
-        $StH = 1;
-        for ($i=0; $i < count($month); $i++) {
-            $a = $month[$i]->month;
-            $a = explode('-', $a);
-            $NameBulan = $this->m_master->BulanInggris($a[1]);
-            $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $NameBulan);
-            $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_col);
-            $StH = $StH + 1;
-        }
-        $St = $St + 1;
-        $arr_subMonth = array();
-        $GrandTotal = 0;
-        for ($i=0; $i < count($getData); $i++) {
-            $StH = 1;
-            $excel->setActiveSheetIndex(0)->setCellValue('A'.$St, $getData[$i]['PostName'].'-'.$getData[$i]['RealisasiPostName']);
-            $excel->getActiveSheet()->getStyle('A'.$St)->applyFromArray($style_row);
-            $UnitCost = $getData[$i]['UnitCost'];
-            $month1 = $getData[$i]['DetailMonth'];
-            $month1 = json_decode($month1);
-            $sub_Total = 0;
-            for ($j=0; $j < count($month); $j++) {
-                $value = $UnitCost * $month1[$j]->value;
-                $value = (int)$value;
-                if ($i == 0) {
-                    $arr_subMonth[$j] = $value;
+            $excel->setActiveSheetIndex(0)->setCellValue('E6', "HARGA");
+            $excel->getActiveSheet()->getStyle('E6')->applyFromArray($style_col);
+            $excel->setActiveSheetIndex(0)->setCellValue('E7', "(,000)");
+            $excel->getActiveSheet()->getStyle('E7')->applyFromArray($style_col);
+
+            $excel->setActiveSheetIndex(0)->setCellValue('F6', "QTY");
+            $excel->getActiveSheet()->mergeCells('F6:F7');
+            $excel->getActiveSheet()->getStyle('F6:F7')->applyFromArray($style_col);
+
+            $excel->setActiveSheetIndex(0)->setCellValue('G6', "UNIT");
+            $excel->getActiveSheet()->mergeCells('G6:G7');
+            $excel->getActiveSheet()->getStyle('G6:G7')->applyFromArray($style_col);
+
+            $excel->setActiveSheetIndex(0)->setCellValue('H6', "TOTAL");
+            $excel->getActiveSheet()->mergeCells('H6:H7');
+            $excel->getActiveSheet()->getStyle('H6:H7')->applyFromArray($style_col);
+
+            // Month
+                $keyM = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+                $St = 6;
+                $excel->setActiveSheetIndex(0)->setCellValue('J'.$St, "ESTIMASI  PER-BULAN");
+                $StH = 9 + (count($month) - 1) ; // dimulai dari I
+
+                $excel->getActiveSheet()->mergeCells('J'.$St.':'.$keyM[$StH].$St);
+                $excel->getActiveSheet()->getStyle('J'.$St.':'.$keyM[$StH].$St)->applyFromArray($style_col);
+                $St++;
+                $StH = 9;
+                for ($i=0; $i < count($month); $i++) {
+                    $a = $month[$i]->month;
+                    $a = explode('-', $a);
+                    $NameBulan = $this->m_master->BulanInggris($a[1]);
+                    $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $NameBulan);
+                    $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_col);
+                    $StH = $StH + 1;
                 }
-                else
-                {
-                    $arr_subMonth[$j] = $arr_subMonth[$j] + $value;
+
+
+        // make isian
+           $St++;
+           $No = 0;
+           // Grouping per by Head Account
+            $total = 0;
+                for ($i=0; $i < count($getData); $i++) {
+                    // No
+                    $No++;
+                    $NoSub = 0;
+                    $StH = 1;
+                    $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, ($No) );
+                    $excel->getActiveSheet()->mergeCells($keyM[$StH].$St.':'.$keyM[($StH + 1)].$St);
+                    $excel->getActiveSheet()->getStyle($keyM[$StH].$St.':'.$keyM[($StH + 1)].$St)->applyFromArray($style_col);
+
+                    // Name Head Account
+                    $StH = $StH + 2;
+                    $CodeHeadAccount1 = $getData[$i]['CodeHeadAccount'];
+                    $NameHeadAccount = $getData[$i]['NameHeadAccount'];
+                    $excel->setActiveSheetIndex(0)->setCellValue($keyM[($StH)].$St, $NameHeadAccount );
+                    $excel->getActiveSheet()->getStyle($keyM[($StH)].$St)->applyFromArray($style_col);
+                    // buat border sampai total
+                    for ($j=0; $j < 4; $j++) { 
+                       $StH++;
+                       $excel->getActiveSheet()->getStyle($keyM[($StH)].$St)->applyFromArray($style_col);
+                    } 
+
+                    // month 
+                    $month = $getData[$i]['DetailMonth'];
+                    $month = json_decode($month);
+                        $StH = $StH + 2;
+                        for ($z=0; $z < count($month); $z++) {
+                            $a = '-';
+                            $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $a);
+                            $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+                            $StH = $StH + 1;
+                        }
+
+
+
+                    // set coloumn
+                        $st_arr1 = array(
+                            'borders' => array(
+                                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+                            )
+                        );
+
+                        $st_arr2 = array(
+                            'borders' => array(
+                                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), 
+                                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                                // 'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+                            )
+                        );
+
+                    // tulis data pertama
+                       $StH = 2;
+                       $St++;
+                       $No2 = strtolower($keyM[$NoSub]);
+                       $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, ($No2) );
+                       $excel->getActiveSheet()->getStyle($keyM[($StH -1) ].$St)->applyFromArray($st_arr1);
+                       $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($st_arr2);
+
+                       $StH++;
+                       $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$i]['RealisasiPostName']);
+                       $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+
+                       $StH++;
+                       $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$i]['UnitCost'] / 1000);
+                       $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+
+                       $StH++;
+                       $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$i]['Freq']);
+                       $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row); 
+
+                       $StH++;
+                       $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$i]['NameUnitDiv']);
+                       $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+
+                       $StH++;
+                       $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$i]['SubTotal'] / 1000);
+                       $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+
+                       $total = $total + ($getData[$i]['SubTotal'] / 1000);
+
+                    // month   
+                       $StH = $StH + 2;
+                       for ($z=0; $z < count($month); $z++) {
+                           $a = $month[$z]->value * ($getData[$i]['UnitCost'] / 1000);
+                           $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $a);
+                           $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+                           $StH = $StH + 1;
+                       }
+
+                    // Grpuping
+                    for ($j=$i+1; $j < count($getData); $j++) { 
+                       $CodeHeadAccount2 = $getData[$j]['CodeHeadAccount'];
+                        if ($CodeHeadAccount1 == $CodeHeadAccount2) {
+                            $NoSub++;
+                            $StH = 2;
+                            $St++;
+                            $No2 = strtolower($keyM[$NoSub]);
+                            // month 
+                            $month = $getData[$j]['DetailMonth'];
+                            $month = json_decode($month);
+
+                               $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, ($No2) );
+                               $excel->getActiveSheet()->getStyle($keyM[($StH -1) ].$St)->applyFromArray($st_arr1);
+                               $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($st_arr2);
+
+                               $StH++;
+                               $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$j]['RealisasiPostName']);
+                               $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+
+                               $StH++;
+                               $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$j]['UnitCost'] / 1000);
+                               $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+
+                               $StH++;
+                               $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$j]['Freq']);
+                               $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row); 
+
+                               $StH++;
+                               $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$j]['NameUnitDiv']);
+                               $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+
+                               $StH++;
+                               $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$j]['SubTotal'] / 1000);
+                               $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+
+                                $total = $total + ($getData[$j]['SubTotal'] / 1000);
+
+                            // month   
+                               $StH = $StH + 2;
+                               for ($z=0; $z < count($month); $z++) {
+                                   $a = $month[$z]->value * ($getData[$j]['UnitCost'] / 1000);
+                                   $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $a);
+                                   $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+                                   $StH = $StH + 1;
+                               }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                        $i = $j; 
+                    }
+
+                    $St++;
                 }
 
-                $sub_Total = $sub_Total + $value;
-                $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $value);
-                $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
-                $StH++;
-            }
-            $GrandTotal = $GrandTotal + $sub_Total;
-            $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $sub_Total);
-            $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
-            $St++;
-        }
+            //make total
+                $StH = 2;
+                $excel->setActiveSheetIndex(0)->setCellValue('B'.$St, "TOTAL");
+                $excel->getActiveSheet()->mergeCells('B'.$St.':'.'G'.$St);
+                $excel->getActiveSheet()->getStyle('B'.$St.':'.'G'.$St)->applyFromArray($style_col);
 
-        $StH = 1;
-        for ($i=0; $i < count($arr_subMonth); $i++) {
-            $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $arr_subMonth[$i]);
-            $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
-            $StH++;
-        }
-        $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $GrandTotal);
-        $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+                $excel->setActiveSheetIndex(0)->setCellValue('H'.$St, $total); 
+                $excel->getActiveSheet()->getStyle('H'.$St)->applyFromArray($style_col);
 
+            // Make Footer
+                $St = $St + 2;
+                $StTot = $St + 2;
+                $excel->setActiveSheetIndex(0)->setCellValue('D'.$St, "Anggaran TA ".$YearWr2);
+                $excel->setActiveSheetIndex(0)->setCellValue('D'.($St+1), "Anggaran TA ".$YearWr);
+                $excel->setActiveSheetIndex(0)->setCellValue('D'.$StTot, "Presentasi Deviasi");
+                $excel->getActiveSheet()->getStyle('D'.$St.':'.'H'.$StTot)->applyFromArray($style_row);
 
-        foreach(range('A','Z') as $columnID) {
-            $excel->getActiveSheet()->getColumnDimension($columnID)
-                ->setAutoSize(true);
-        }
-        // Set height semua kolom menjadi auto (mengikuti height isi dari kolommnya, jadi otomatis)
-        $excel->getActiveSheet()->getDefaultRowDimension()->setRowHeight(-1);
+            // Write Rule Approval
+               $St = $StTot + 2;     
+               $excel->setActiveSheetIndex(0)->setCellValue('D'.$St, "Jakarta,");
+
+               $St = $St + 2;
+               $StTot = $St + 6;
+               $StH = 1;
+               $StH2 = 3;
+
+               $JsonStatus = (array) json_decode($dt[0]['JsonStatus'],true);
+               for ($i=0; $i < count($JsonStatus); $i++) { 
+                   $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $JsonStatus[$i]['NameTypeDesc']);
+                   $N = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['NIP']);
+                   $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$StTot, $N[0]['Name']);
+                   $excel->getActiveSheet()->getStyle($keyM[$StH].$St.':'.$keyM[$StH2].$StTot)->applyFromArray($style_row);
+                   $StH = $StH2 + 2; 
+                   $StH2 = $StH + 2; 
+               }
+
+         $excel->getActiveSheet()->getColumnDimension('B')->setWidth(3);       
+         $excel->getActiveSheet()->getColumnDimension('C')->setWidth(3);       
+         $excel->getActiveSheet()->getColumnDimension('D')->setWidth(20);       
+         $excel->getActiveSheet()->getColumnDimension('E')->setWidth(25);       
+         $excel->getActiveSheet()->getColumnDimension('H')->setWidth(25);       
 
         // Set judul file excel nya
-        $excel->getActiveSheet()->setTitle("Podomoro University Budgeting");
+        $excel->getActiveSheet()->setTitle($NameDepartement);
         $excel->setActiveSheetIndex(0);
 
 
@@ -909,9 +1085,9 @@ class C_save_to_excel extends CI_Controller
         ini_set('max_execution_time', 600); //600 seconds = 10 minutes
 
         // Panggil class PHPExcel nya
-        $excel = new PHPExcel();
+        $excel2 = new PHPExcel();
         // Settingan awal fil excel
-        $excel->getProperties()->setCreator('Alhadi Rahman')
+        $excel2->getProperties()->setCreator('Alhadi Rahman')
             ->setLastModifiedBy('Alhadi Rahman')
             ->setTitle("Podomoro University Budgeting")
             ->setSubject("Budgeting ".'All')
@@ -946,133 +1122,296 @@ class C_save_to_excel extends CI_Controller
             )
         );
 
-        $excel->setActiveSheetIndex(0)->setCellValue('A1', "Podomoro University Budgeting"); // Set kolom A1 dengan tulisan "DATA KARYAWAN"
-        $excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(TRUE); // Set bold kolom A1
-        $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(15); // Set font size 15 untuk kolom A1
+        $dt = $this->m_budgeting->get_data_ListBudgetingDepartement($Input['Year']);
+        $sql = '';
+        for ($m=0; $m < count($dt); $m++) { 
+            $incsheet = $m;
+            $excel = $excel2->createSheet($incsheet); 
+            $NameDepartement = substr($dt[$m]['NameDepartement'], 0,20) ;
+            $excel->setTitle($NameDepartement);
+            $getData = $this->m_budgeting->get_creator_budget($dt[$m]['ID_creator_budget']);
 
-        $get = $this->m_budgeting->getListBudgetingDepartement($Input['Year']);
-        $getData = $this->m_budgeting->get_creator_budget($Input['Year'] , $get[0]['ID'] );
-        // get Month
-        $month = $getData[0]['DetailMonth'];
-        $month = json_decode($month);
-        $St = 4;
-        $excel->setActiveSheetIndex(0)->setCellValue('A'.$St, "Departement");
-        $excel->getActiveSheet()->mergeCells('A'.$St.':A'.($St+1));
-        $excel->setActiveSheetIndex(0)->setCellValue('B'.$St, "Month");
-        $excel->getActiveSheet()->getStyle('A'.$St)->applyFromArray($style_col);
-        $excel->getActiveSheet()->getStyle('A'.($St+1))->applyFromArray($style_col);
-        $keyM = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
-        $excel->getActiveSheet()->mergeCells('B'.$St.':'.$keyM[count($month)].$St);
-        $excel->getActiveSheet()->getStyle('B'.$St.':'.$keyM[count($month)].$St)->applyFromArray($style_col);
-        $excel->setActiveSheetIndex(0)->setCellValue($keyM[(count($month) + 1)].$St, "Sub Total");
-        $excel->getActiveSheet()->mergeCells($keyM[(count($month) + 1)].$St.':'.$keyM[(count($month) + 1)].($St+1));
-        $excel->getActiveSheet()->getStyle($keyM[(count($month) + 1)].$St.':'.$keyM[(count($month) + 1)].($St+1))->applyFromArray($style_col);
-        $St = $St + 1;
-        $StH = 1;
-        for ($i=0; $i < count($month); $i++) {
-            $a = $month[$i]->month;
-            $a = explode('-', $a);
-            $NameBulan = $this->m_master->BulanInggris($a[1]);
-            $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $NameBulan);
-            $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_col);
-            $StH = $StH + 1;
-        }
+            $Year = $Input['Year'];
+            $YearWr = $Input['Year'].'/'.($Input['Year'] + 1);
+            $YearWr2 = ($Input['Year'] - 1).'/'.$Input['Year'];
 
-        $arr_subMonth = array();
-        $GrandTotal = 0;
-        $St = $St + 1;
-        for ($i=0; $i < count($get); $i++) {
-            $getData = $this->m_budgeting->get_creator_budget($Input['Year'] , $get[$i]['ID'] );
-            $excel->setActiveSheetIndex(0)->setCellValue('A'.$St, $get[$i]['NameDepartement']);
-            $excel->getActiveSheet()->getStyle('A'.$St)->applyFromArray($style_row);
-            $arr_sub_sum_total = array();
-            for ($x=0; $x < count($getData); $x++) {
-                $UnitCost = $getData[$x]['UnitCost'];
-                $month1 = $getData[$x]['DetailMonth'];
-                $month1 = json_decode($month1);
-                for ($j=0; $j < count($month); $j++) {
-                    $value = $UnitCost * $month1[$j]->value;
-                    $value = (int)$value;
-                    if ($x == 0) {
-                        $arr_sub_sum_total[$j] = $value;
-                    }
-                    else
-                    {
-                        $arr_sub_sum_total[$j] = $arr_sub_sum_total[$j] + $value;
-                    }
-                }
+            $excel->setCellValue('D1', "Anggaran Program Studi Tahun Akademik ".$YearWr.' Universitas Agung Podomoro');
+            $excel->getStyle('D1')->getFont()->setBold(TRUE);
+            $excel->getStyle('D1')->getFont()->setSize(15);
+            // $excel->getActiveSheet()->mergeCells('A1:E1'); // Set Merge Cell pada kolom A1 sampai E1
+            $excel->getStyle('A1')->getFont()->setBold(TRUE); // Set bold kolom A1
+            $excel->getStyle('A1')->getFont()->setSize(15); // Set font size 15 untuk kolom A1
+            // $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER); // Set text center untuk kolom A1
+
+            $excel->setCellValue('B3', 'Nama Bagian');
+            $excel->getStyle('B3')->getFont()->setBold(TRUE);
+            $excel->getStyle('B3')->getFont()->setSize(15);
+
+            $excel->setCellValue('G3', ':');
+            $excel->getStyle('G3')->getFont()->setBold(TRUE);
+            $excel->getStyle('G3')->getFont()->setSize(15);
+
+            $excel->setCellValue('H3', $NameDepartement);
+            $excel->getStyle('H3')->getFont()->setBold(TRUE);
+            $excel->getStyle('H3')->getFont()->setSize(15);
+
+            // get Month
+            $month = array();
+            if (count($getData) > 0) {
+                $month = $getData[0]['DetailMonth'];
+                $month = json_decode($month);
+
+                // make header
+                    $excel->setCellValue('B6', "No");
+                    $excel->mergeCells('B6:C7');
+                    $excel->getStyle('B6:C7')->applyFromArray($style_col);
+                    
+                    $excel->setCellValue('D6', "POS ANGGARAN");
+                    $excel->mergeCells('D6:D7');
+                    $excel->getStyle('D6:D7')->applyFromArray($style_col);
+
+                    $excel->setCellValue('E6', "HARGA");
+                    $excel->getStyle('E6')->applyFromArray($style_col);
+                    $excel->setCellValue('E7', "(,000)");
+                    $excel->getStyle('E7')->applyFromArray($style_col);
+
+                    $excel->setCellValue('F6', "QTY");
+                    $excel->mergeCells('F6:F7');
+                    $excel->getStyle('F6:F7')->applyFromArray($style_col);
+
+                    $excel->setCellValue('G6', "UNIT");
+                    $excel->mergeCells('G6:G7');
+                    $excel->getStyle('G6:G7')->applyFromArray($style_col);
+
+                    $excel->setCellValue('H6', "TOTAL");
+                    $excel->mergeCells('H6:H7');
+                    $excel->getStyle('H6:H7')->applyFromArray($style_col);
+
+                    // Month
+                        $keyM = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+                        $St = 6;
+                        $excel->setCellValue('J'.$St, "ESTIMASI  PER-BULAN");
+                        $StH = 9 + (count($month) - 1) ; // dimulai dari I
+
+                        $excel->mergeCells('J'.$St.':'.$keyM[$StH].$St);
+                        $excel->getStyle('J'.$St.':'.$keyM[$StH].$St)->applyFromArray($style_col);
+                        $St++;
+                        $StH = 9;
+                        for ($i=0; $i < count($month); $i++) {
+                            $a = $month[$i]->month;
+                            $a = explode('-', $a);
+                            $NameBulan = $this->m_master->BulanInggris($a[1]);
+                            $excel->setCellValue($keyM[$StH].$St, $NameBulan);
+                            $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_col);
+                            $StH = $StH + 1;
+                        }
 
 
-            } // exit loop get data per Div
+                // make isian
+                   $St++;
+                   $No = 0;
+                   // Grouping per by Head Account
+                    $total = 0;
+                        for ($i=0; $i < count($getData); $i++) {
+                            // No
+                            $No++;
+                            $NoSub = 0;
+                            $StH = 1;
+                            $excel->setCellValue($keyM[$StH].$St, ($No) );
+                            $excel->mergeCells($keyM[$StH].$St.':'.$keyM[($StH + 1)].$St);
+                            $excel->getStyle($keyM[$StH].$St.':'.$keyM[($StH + 1)].$St)->applyFromArray($style_col);
 
-            $sub_Total = 0;
-            $StH = 1;
-            for ($y=0; $y < count($month); $y++) {
-                if (array_key_exists($y, $arr_sub_sum_total)) {
-                    $value = $arr_sub_sum_total[$y];
-                }
-                else
-                {
-                    $value = 0;
-                }
+                            // Name Head Account
+                            $StH = $StH + 2;
+                            $CodeHeadAccount1 = $getData[$i]['CodeHeadAccount'];
+                            $NameHeadAccount = $getData[$i]['NameHeadAccount'];
+                            $excel->setCellValue($keyM[($StH)].$St, $NameHeadAccount );
+                            $excel->getStyle($keyM[($StH)].$St)->applyFromArray($style_col);
+                            // buat border sampai total
+                            for ($j=0; $j < 4; $j++) { 
+                               $StH++;
+                               $excel->getStyle($keyM[($StH)].$St)->applyFromArray($style_col);
+                            } 
 
-                $sub_Total = $sub_Total + $value;
-                if ($i == 0) {
-                    $arr_subMonth[$y] = $value;
-                }
-                else
-                {
-                    if (array_key_exists($y, $arr_subMonth)) {
-                        $arr_subMonth[$y] = $arr_subMonth[$y] + $value;
+                            // month 
+                            $month = $getData[$i]['DetailMonth'];
+                            $month = json_decode($month);
+                                $StH = $StH + 2;
+                                for ($z=0; $z < count($month); $z++) {
+                                    $a = '-';
+                                    $excel->setCellValue($keyM[$StH].$St, $a);
+                                    $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+                                    $StH = $StH + 1;
+                                }
 
-                    }
-                    else
-                    {
-                        $arr_subMonth[$y] = 0;
-                    }
 
-                }
-                $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $value);
-                $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
-                $StH++;
-            } // loop for horizontal
 
-            // print_r($arr_sub_sum_total);
+                            // set coloumn
+                                $st_arr1 = array(
+                                    'borders' => array(
+                                        'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                                        'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                                        'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+                                    )
+                                );
 
-            $GrandTotal = $GrandTotal + $sub_Total;
-            $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $sub_Total);
-            $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
-            $St++;
-        } // exit loop per Div
+                                $st_arr2 = array(
+                                    'borders' => array(
+                                        'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                                        'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), 
+                                        'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                                        // 'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+                                    )
+                                );
 
-        $StH = 1;
-        for ($i=0; $i < count($arr_subMonth); $i++) {
-            $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $arr_subMonth[$i]);
-            $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
-            $StH++;
-        }
-        $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $GrandTotal);
-        $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+                            // tulis data pertama
+                               $StH = 2;
+                               $St++;
+                               $No2 = strtolower($keyM[$NoSub]);
+                               $excel->setCellValue($keyM[$StH].$St, ($No2) );
+                               $excel->getStyle($keyM[($StH -1) ].$St)->applyFromArray($st_arr1);
+                               $excel->getStyle($keyM[$StH].$St)->applyFromArray($st_arr2);
 
-        foreach(range('A','Z') as $columnID) {
-            $excel->getActiveSheet()->getColumnDimension($columnID)
-                ->setAutoSize(true);
-        }
+                               $StH++;
+                               $excel->setCellValue($keyM[$StH].$St, $getData[$i]['RealisasiPostName']);
+                               $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
 
-        // Set height semua kolom menjadi auto (mengikuti height isi dari kolommnya, jadi otomatis)
-        $excel->getActiveSheet()->getDefaultRowDimension()->setRowHeight(-1);
+                               $StH++;
+                               $excel->setCellValue($keyM[$StH].$St, $getData[$i]['UnitCost'] / 1000);
+                               $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
 
-        // Set judul file excel nya
-        $excel->getActiveSheet()->setTitle("Podomoro University Budgeting");
-        $excel->setActiveSheetIndex(0);
+                               $StH++;
+                               $excel->setCellValue($keyM[$StH].$St, $getData[$i]['Freq']);
+                               $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row); 
 
+                               $StH++;
+                               $excel->setCellValue($keyM[$StH].$St, $getData[$i]['NameUnitDiv']);
+                               $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+
+                               $StH++;
+                               $excel->setCellValue($keyM[$StH].$St, $getData[$i]['SubTotal'] / 1000);
+                               $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+
+                               $total = $total + ($getData[$i]['SubTotal'] / 1000);
+
+                            // month   
+                               $StH = $StH + 2;
+                               for ($z=0; $z < count($month); $z++) {
+                                   $a = $month[$z]->value * ($getData[$i]['UnitCost'] / 1000);
+                                   $excel->setCellValue($keyM[$StH].$St, $a);
+                                   $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+                                   $StH = $StH + 1;
+                               }
+
+                            // Grpuping
+                            for ($j=$i+1; $j < count($getData); $j++) { 
+                               $CodeHeadAccount2 = $getData[$j]['CodeHeadAccount'];
+                                if ($CodeHeadAccount1 == $CodeHeadAccount2) {
+                                    $NoSub++;
+                                    $StH = 2;
+                                    $St++;
+                                    $No2 = strtolower($keyM[$NoSub]);
+                                    // month 
+                                    $month = $getData[$j]['DetailMonth'];
+                                    $month = json_decode($month);
+
+                                       $excel->setCellValue($keyM[$StH].$St, ($No2) );
+                                       $excel->getStyle($keyM[($StH -1) ].$St)->applyFromArray($st_arr1);
+                                       $excel->getStyle($keyM[$StH].$St)->applyFromArray($st_arr2);
+
+                                       $StH++;
+                                       $excel->setCellValue($keyM[$StH].$St, $getData[$j]['RealisasiPostName']);
+                                       $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+
+                                       $StH++;
+                                       $excel->setCellValue($keyM[$StH].$St, $getData[$j]['UnitCost'] / 1000);
+                                       $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+
+                                       $StH++;
+                                       $excel->setCellValue($keyM[$StH].$St, $getData[$j]['Freq']);
+                                       $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row); 
+
+                                       $StH++;
+                                       $excel->setCellValue($keyM[$StH].$St, $getData[$j]['NameUnitDiv']);
+                                       $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+
+                                       $StH++;
+                                       $excel->setCellValue($keyM[$StH].$St, $getData[$j]['SubTotal'] / 1000);
+                                       $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+
+                                        $total = $total + ($getData[$j]['SubTotal'] / 1000);
+
+                                    // month   
+                                       $StH = $StH + 2;
+                                       for ($z=0; $z < count($month); $z++) {
+                                           $a = $month[$z]->value * ($getData[$j]['UnitCost'] / 1000);
+                                           $excel->setCellValue($keyM[$StH].$St, $a);
+                                           $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+                                           $StH = $StH + 1;
+                                       }
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                                $i = $j; 
+                            }
+
+                            $St++;
+                        }
+
+                    //make total
+                        $StH = 2;
+                        $excel->setCellValue('B'.$St, "TOTAL");
+                        $excel->mergeCells('B'.$St.':'.'G'.$St);
+                        $excel->getStyle('B'.$St.':'.'G'.$St)->applyFromArray($style_col);
+
+                        $excel->setCellValue('H'.$St, $total); 
+                        $excel->getStyle('H'.$St)->applyFromArray($style_col);
+
+                    // Make Footer
+                        $St = $St + 2;
+                        $StTot = $St + 2;
+                        $excel->setCellValue('D'.$St, "Anggaran TA ".$YearWr2);
+                        $excel->setCellValue('D'.($St+1), "Anggaran TA ".$YearWr);
+                        $excel->setCellValue('D'.$StTot, "Presentasi Deviasi");
+                        $excel->getStyle('D'.$St.':'.'H'.$StTot)->applyFromArray($style_row);
+
+                    // Write Rule Approval
+                       $St = $StTot + 2;     
+                       $excel->setCellValue('D'.$St, "Jakarta,");
+
+                       $St = $St + 2;
+                       $StTot = $St + 6;
+                       $StH = 1;
+                       $StH2 = 3;
+
+                       $JsonStatus = (array) json_decode($dt[0]['JsonStatus'],true);
+                       for ($i=0; $i < count($JsonStatus); $i++) { 
+                           $excel->setCellValue($keyM[$StH].$St, $JsonStatus[$i]['NameTypeDesc']);
+                           $N = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['NIP']);
+                           $excel->setCellValue($keyM[$StH].$StTot, $N[0]['Name']);
+                           $excel->getStyle($keyM[$StH].$St.':'.$keyM[$StH2].$StTot)->applyFromArray($style_row);
+                           $StH = $StH2 + 2; 
+                           $StH2 = $StH + 2; 
+                       }
+
+                 $excel->getColumnDimension('B')->setWidth(3);       
+                 $excel->getColumnDimension('C')->setWidth(3);       
+                 $excel->getColumnDimension('D')->setWidth(20);       
+                 $excel->getColumnDimension('E')->setWidth(25);       
+                 $excel->getColumnDimension('H')->setWidth(25);    
+            }
+
+        } // end loop per sheet
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename=PodomoroUniversityBudgeting_AllDepart.xlsx'); // Set nama file excel nya
+        header('Content-Disposition: attachment; filename=PodomoroUniversityBudgeting.xlsx'); // Set nama file excel nya
         header('Cache-Control: max-age=0');
 
-        $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $write = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
         $write->save('php://output');
+        
     }
 
     public function monitoring_score()
@@ -2742,7 +3081,7 @@ class C_save_to_excel extends CI_Controller
                 $Pembayaranke = 'ke'.$this->m_master->moneySay($data[$j]['Pembayaranke']);
                 $ket = 'Cicilan '.$Pembayaranke.' '.$data[$j]['Description'];
                 $excel3->setCellValue('F'.$a, $ket);
-                $excel3->setCellValue('G'.$a, $data[$j]['Invoice']);
+                $excel3->setCellValue('G'.$a, $data[$j]['PaymentMhs']);
 
                 $excel3->getStyle('A'.$a)->applyFromArray($style_row);
                 $excel3->getStyle('B'.$a)->applyFromArray($style_row);
@@ -3047,5 +3386,144 @@ class C_save_to_excel extends CI_Controller
         header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
         header('Content-Disposition: attachment; filename="'.$Filaname.'"'); // jalan ketika tidak menggunakan ajax
         $objWriter->save('php://output');
+    }
+
+    public function export_excel_post_department()
+    {
+        $this->load->model('master/m_master');
+        $this->load->model('budgeting/m_budgeting');
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $Input = (array) $this->jwt->decode($token,$key);
+
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+
+        // Panggil class PHPExcel nya
+        $excel = new PHPExcel();
+        // Settingan awal fil excel
+        $excel->getProperties()->setCreator('Alhadi Rahman')
+            ->setLastModifiedBy('Alhadi Rahman')
+            ->setTitle("Podomoro University Budgeting")
+            ->setSubject('Post Budgeting')
+            ->setDescription('Post Budgeting')
+            ->setKeywords('Post Budgeting');
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari header tabel
+        $style_col = array(
+            'font' => array('bold' => true), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+        $style_row = array(
+            'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        $DepartementPost = $Input['DepartementPost'];
+        $DepartementPostName = substr($Input['DepartementPostName'], 0,20);
+        $DepartementPost = ($DepartementPost != 'all') ? array(
+                                                                array('Code' => $DepartementPost,'Name2' => $DepartementPostName,
+                                                                ),
+                                                              ) : $this->m_master->apiservertoserver(serverRoot.'/api/__getAllDepartementPU');
+        $YearPostDepartement = $Input['YearPostDepartement'];
+        $YearPostDepartementText = $Input['YearPostDepartementText'];
+        $YearPostDepartementText = str_replace(' ', '', $YearPostDepartementText);
+        $incsheet = 0;
+        // $excel->getActiveSheet();
+        for ($i=0; $i < count($DepartementPost); $i++) {
+            $exc = $excel->createSheet($i);
+            $exc->setTitle(substr($DepartementPost[$i]['Name2'],0,20) );
+            $getDataForDom = $this->m_budgeting->getPostDepartementEx($YearPostDepartement,$DepartementPost[$i]['Code']);
+            $exc->setCellValue('A1', $DepartementPost[$i]['Name2']);
+
+            $data = $getDataForDom;
+            if (count($data) > 0) {
+                // group by codepost
+                $st = 3;
+                $strow = 4;
+                $arr_wr = array();
+                for ($j=0; $j < count($data); $j++) { 
+                    $CodePost1 = $data[$j]['CodePost'];
+                    $temp = array();
+                    $temp['Post'] = $data[$j]['PostName'];
+                    $temp2 = array();
+                    $temp2[] = array('NameHeadAccount' => $data[$j]['NameHeadAccount'],'Cost' => 'Rp. '.number_format($data[$j]['Budget'],2,',','.'),'j' => $j,'k' => 0);
+                    for ($k=$j+1; $k < count($data); $k++) { 
+                       $CodePost2 = $data[$k]['CodePost'];
+                       if ($CodePost1 == $CodePost2  ) {
+                           $temp2[] = array('NameHeadAccount' => $data[$k]['NameHeadAccount'],'Cost' => 'Rp. '.number_format($data[$k]['Budget'],2,',','.'),'j' => $j,'k' => $k);
+                       }
+                       else
+                       {
+                        $j = $k -1;
+                        break;
+                       }
+                       $j = $k;
+                    }
+
+                    $temp['data'] = $temp2;
+                    $arr_wr[] = $temp;
+                }
+
+                // print_r($arr_wr);
+                for ($k=0; $k < count($arr_wr); $k++) { 
+                  $Post = $arr_wr[$k]['Post'];
+                  $exc->setCellValue('A'.$st, $Post);
+                  $dt = $arr_wr[$k]['data'];
+                  $no = 1;
+                  for ($l=0; $l < count($dt); $l++) { 
+                      // add isi data
+                      if ($l == 0) {
+                          $exc->setCellValue('A'.$strow, 'No'); 
+                          $exc->setCellValue('B'.$strow, 'Head Account'); 
+                          $exc->setCellValue('C'.$strow, 'Cost'); 
+
+                          $exc->getStyle('A'.$strow)->applyFromArray($style_col);
+                          $exc->getStyle('B'.$strow)->applyFromArray($style_col);
+                          $exc->getStyle('C'.$strow)->applyFromArray($style_col);
+                          $strow++;
+                      }
+                      $exc->setCellValue('A'.$strow, $no); 
+                      $exc->setCellValue('B'.$strow, $dt[$l]['NameHeadAccount'] ); 
+                      $exc->setCellValue('C'.$strow, $dt[$l]['Cost']); 
+
+                      $exc->getStyle('A'.$strow)->applyFromArray($style_row);
+                      $exc->getStyle('B'.$strow)->applyFromArray($style_row);
+                      $exc->getStyle('C'.$strow)->applyFromArray($style_row);
+                      $strow++;
+                      $no++;
+                  }
+                  
+                  $st= $strow + 1;
+                  $strow = $st +1;
+                }
+            }
+        }
+        // die();
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename=Alocation_head_account'.$YearPostDepartementText.'.xlsx'); // Set nama file excel nya
+        header('Cache-Control: max-age=0');
+
+        $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $write->save('php://output');
     }
 }

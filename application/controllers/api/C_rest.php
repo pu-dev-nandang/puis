@@ -116,15 +116,14 @@ class C_rest extends CI_Controller {
     public function getExamScheduleForStudent(){
         $dataToken = $this->getInputToken();
         $cekUser = $this->cekAuthAPI($dataToken['auth']);
-//
-//        print_r($dataToken);
-//        exit;
 
         if($cekUser){
             $data = $this->m_rest->__getExamScheduleForStudent($dataToken['DB_'],
-                $dataToken['ProdiID'],$dataToken['SemesterID'],$dataToken['NPM'],
-                $dataToken['SemeaterYear'],$dataToken['ClassOf'],
-                $dataToken['ExamType'],$dataToken['Date']);
+                $dataToken['SemesterID'],
+                $dataToken['NPM'],
+                $dataToken['ClassOf'],
+                $dataToken['ExamType']);
+
             return print_r(json_encode($data));
         } else {
             $msg = array(
@@ -198,6 +197,12 @@ class C_rest extends CI_Controller {
                 $NIP = $dataToken['NIP'];
 //                $SemesterID = $dataToken['SemesterID'];
                 $schedule = $this->m_rest->__getExamSchedule($NIP,strtolower($dataToken['Type']));
+
+                return print_r(json_encode($schedule));
+            } else if($dataToken['action']=='readExamSchedule2'){
+                $NIP = $dataToken['NIP'];
+                $SemesterID = $dataToken['SemesterID'];
+                $schedule = $this->m_rest->__getExamSchedule4Lecturer($SemesterID,$NIP,strtolower($dataToken['Type']));
 
                 return print_r(json_encode($schedule));
             }
@@ -439,12 +444,10 @@ class C_rest extends CI_Controller {
                 $queryDefault = 'SELECT cu.ReadComment, ct.* 
                                               FROM db_academic.counseling_user cu
                                               LEFT JOIN db_academic.counseling_topic ct
-                                              
                                               ON (ct.ID = cu.TopicID)
                                               WHERE ( cu.UserID = "'.$UserID.'" ) '.$dataSearch.'
                                                ORDER BY cu.TopicID DESC';
 
-//    , em.Name AS Owner           LEFT JOIN db_employees.employees em ON (em.NIP = ct.CreateBy)
 
                 $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
@@ -493,7 +496,7 @@ class C_rest extends CI_Controller {
                     if($row['InviteTo']=='4'){
                         $dataOwner = $this->db->select('Name')->get_where('db_academic.auth_students',array('NPM' => $row['CreateBy']))->result_array()[0];
                     } else {
-                        $dataOwner = $this->db->select('Name')->get_where()->result_array('db_employees.employees',array('NIP' => $row['CreateBy']))[0];
+                        $dataOwner = $this->db->select('Name')->get_where('db_employees.employees',array('NIP' => $row['CreateBy']))->result_array()[0];
                     }
 
                     $topic = '<a href="'.$urlDetail.'counseling/detail-topic/'.$token.'">'.$row['Topic'].'</a>
@@ -672,13 +675,16 @@ class C_rest extends CI_Controller {
                     $dataSmt = $this->db->query('SELECT * FROM db_academic.semester WHERE Year >= "'.$dataToken['ClassOf'].'" 
                                                     AND ID <= "'.$data[$i]['SemesterID'].'" ')->result_array();
 
+                    //Cek Bukti Upload
+                        $payment_proof = $this->m_master->caribasedprimary('db_finance.payment_proof','ID_payment',$data[$i]['ID']);
+                        $data[$i]['payment_proof'] = $payment_proof;
+
                     if(count($dataSmt)>0){
                         $data[$i]['Semester'] = count($dataSmt);
                         $datapay = $this->db->query('SELECT Invoice, Status FROM db_finance.payment_students WHERE ID_payment = "'.$data[$i]['ID'].'" ')->result_array();
                         $data[$i]['DetailPay'] = $datapay;
                         array_push($result,$data[$i]);
                     }
-
                 }
             }
 
@@ -715,7 +721,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -739,7 +745,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -763,7 +769,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -846,7 +852,7 @@ class C_rest extends CI_Controller {
                             LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID) 
                             ';
 
-                $sql.= $AddSql;
+                $sql.= $AddSql.' order by em.NIP asc';
                 $query=$this->db->query($sql, array())->result_array();
 
                 echo json_encode($query);
@@ -861,7 +867,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
         
     }
@@ -887,7 +893,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -914,7 +920,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -939,7 +945,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -951,7 +957,7 @@ class C_rest extends CI_Controller {
 
         if (!$data_json) {
             // handling orang iseng
-            echo '{"status":"999","message":"jangan iseng :D"}';
+            echo '{"status":"999","message":"Not Authorize"}';
         }
         else {
             try {
@@ -981,7 +987,7 @@ class C_rest extends CI_Controller {
             }
             catch(Exception $e) {
               // handling orang iseng
-              echo '{"status":"999","message":"jangan iseng :D"}';
+              echo '{"status":"999","message":"Not Authorize"}';
             }
         }
     }
@@ -1011,7 +1017,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1023,7 +1029,7 @@ class C_rest extends CI_Controller {
 
         if (!$data_json) {
             // handling orang iseng
-            echo '{"status":"999","message":"jangan iseng :D"}';
+            echo '{"status":"999","message":"Not Authorize"}';
         }
         else {
             try {
@@ -1052,7 +1058,7 @@ class C_rest extends CI_Controller {
             }
             catch(Exception $e) {
               // handling orang iseng
-              echo '{"status":"999","message":"jangan iseng :D"}';
+              echo '{"status":"999","message":"Not Authorize"}';
             }
         }
     }
@@ -1086,7 +1092,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1119,7 +1125,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1150,7 +1156,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1177,7 +1183,7 @@ class C_rest extends CI_Controller {
 
                 if ($bool) {
                     $to = $dataToken['to'];
-                    $subject = $dataToken['to'];
+                    $subject = $dataToken['subject'];
                     $text = $dataToken['text'];
                     if (array_key_exists('attach',$dataToken)) {
                         $path = $dataToken['attach'];
@@ -1203,7 +1209,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1234,7 +1240,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1259,7 +1265,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1346,7 +1352,7 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1401,6 +1407,10 @@ class C_rest extends CI_Controller {
             $auth = $this->m_master->AuthAPI($dataToken);
             if ($auth) {
                 $condition = ($dataToken['department'] == 'all') ? '' : ' and a.Departement = "'.$dataToken['department'].'"';
+                $add_approval = '';    
+                if (array_key_exists('approval', $dataToken)) {
+                    $add_approval = ' and a.Approval ='.$dataToken['approval']; 
+                }
                 $sql = 'select a.*,b.Name as NameCreated,c.NameDepartement
                         from db_purchasing.m_catalog as a 
                         join db_employees.employees as b on a.CreatedBy = b.NIP
@@ -1413,7 +1423,7 @@ class C_rest extends CI_Controller {
                         ) as c on a.Departement = c.ID
                        ';
 
-                $sql.= ' where a.Active = 1 '.$condition;
+                $sql.= ' where a.Active = 1 '.$condition.$add_approval;
                 $query = $this->db->query($sql)->result_array();
                 $data = array();
                     for ($i=0; $i < count($query); $i++) { 
@@ -1453,6 +1463,7 @@ class C_rest extends CI_Controller {
                         $nestedData[] = $temp;
                         $nestedData[] = $row['ID'];
                         $nestedData[] = $row['EstimaValue'];
+                        $nestedData[] = $row['Approval'];
                         $data[] = $nestedData;
                     }
                    $json_data = array(
@@ -1469,9 +1480,1196 @@ class C_rest extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
+    public function Databank()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $getData = $this->m_master->caribasedprimary('db_finance.bank','Status',1);
+                echo json_encode($getData);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
 
+    public function GetpaymentByID()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $getData = $this->m_master->caribasedprimary('db_finance.payment_proof','ID_payment',$dataToken['idpayment']);
+                echo json_encode($getData);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+    public function save_upload_proof_payment()
+    {
+        $data['auth'] =$this->input->post('auth');
+        $auth = $this->m_master->AuthAPI($data);
+        if ($auth) {
+            try {
+                $msg = '';
+                $dataToken = $this->getInputToken2();
+                $action = $this->input->post('action');
+                // get nim and PTID
+                    $ID_payment = $dataToken['ID_payment'];
+                        $G_payment = $this->m_master->caribasedprimary('db_finance.payment','ID',$ID_payment);
+                        $G_PTID = $this->m_master->caribasedprimary('db_finance.payment_type','ID',$G_payment[0]['PTID']);
+                        $path = './uploads/document/'.$G_payment[0]['NPM'];
+                        if (!file_exists($path)) {
+                            mkdir($path, 0777, true);
+                        }
+
+                switch ($action) {
+                    case 'add':
+                       $uploadFile2 = $this->m_rest->uploadDokumenMultiple('BuktiBayar_'.$G_PTID[0]['Abbreviation'],'fileData',$path);
+                       $FileUpload = array();
+                       for ($i=0; $i < count($uploadFile2); $i++) { 
+                           $FileUpload[] = array(
+                            'Filename' => $uploadFile2[$i],
+                            'VerifyFinance' => 0,
+                           );
+                       }
+                       $dataToken['PTID'] = $G_payment[0]['PTID'];
+                       $dataToken['NPM'] = $G_payment[0]['NPM'];
+                       $dataToken['SemesterID'] = $G_payment[0]['SemesterID'];
+                       $dataToken['FileUpload'] = json_encode($FileUpload);
+                       $dataToken['Date_upload'] = date('Y-m-d H:i:s');
+                       $this->db->insert('db_finance.payment_proof',$dataToken);
+                        break;
+                    case 'edit':
+                        $uploadFile2 = $this->m_rest->uploadDokumenMultiple('BuktiBayar_'.$G_PTID[0]['Abbreviation'],'fileData',$path);
+                        $FileUpload = array();
+                        for ($i=0; $i < count($uploadFile2); $i++) { 
+                            $FileUpload[] = array(
+                             'Filename' => $uploadFile2[$i],
+                             'VerifyFinance' => 0,
+                            );
+                        }
+                        $G_payment_proof = $this->m_master->caribasedprimary('db_finance.payment_proof','ID_payment',$ID_payment);
+                        $G_FileUpload = (array)json_decode($G_payment_proof[0]['FileUpload']);
+                        for ($i=0; $i < count($FileUpload); $i++) { 
+                            $G_FileUpload[] =  $FileUpload[$i];
+                        }
+                           
+                        $dataToken['FileUpload'] = json_encode($G_FileUpload);
+                        $this->db->where('ID_payment',$ID_payment );
+                        $this->db->update('db_finance.payment_proof',$dataToken);
+                        break;    
+                    default:
+                        # code...
+                        break;
+                }        
+                
+                echo json_encode($msg);
+            }
+            //catch exception
+            catch(Exception $e) {
+              // handling orang iseng
+              echo '{"status":"999","message":"Not Authorize"}';
+            }
+            
+        }
+        else
+        {
+            // handling orang iseng
+            echo '{"status":"999","message":"Not Authorize"}';
+        }
+
+    }
+
+    public function delete_file_proof_payment()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $msg = '';
+                $getDataproof = $this->m_master->caribasedprimary('db_finance.payment_proof','ID',$dataToken['idtable']);
+                $getDatapayment = $this->m_master->caribasedprimary('db_finance.payment','ID',$dataToken['ID_payment']);
+                $NPM = $getDatapayment[0]['NPM'];
+                $FileUpload = (array) json_decode($getDataproof[0]['FileUpload'],true);
+                $index = $dataToken['index'];
+                $filename = $dataToken['Filename'];
+                // print_r(FCPATH);die();
+                for ($i=0; $i < count($FileUpload); $i++) { 
+                    if ($i == $index && $FileUpload[$i]['Filename'] == $filename) {
+                        $path = FCPATH.'uploads/document/'.$NPM.'/'.$filename;
+                        unlink($path);
+                        unset($FileUpload[$i]);
+                    }
+                }
+
+                if (count($FileUpload) == 0) {
+                    $this->db->where('ID', $dataToken['idtable']);
+                    $this->db->delete('db_finance.payment_proof'); 
+                }
+                else
+                {
+                    $FileUpload = array_values($FileUpload);
+                    $datasave = array(
+                        'FileUpload' => json_encode($FileUpload),
+                    );
+                    $this->db->where('ID',$dataToken['idtable']);
+                    $this->db->update('db_finance.payment_proof',$datasave);
+                }
+               
+                echo json_encode($msg);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+    public function delete_all_file_proof_payment_byID()
+    {
+       try {
+           $dataToken = $this->getInputToken2();
+           $auth = $this->m_master->AuthAPI($dataToken);
+           if ($auth) {
+               $msg = '';
+               $getDataproof = $this->m_master->caribasedprimary('db_finance.payment_proof','ID',$dataToken['idtable']);
+               $getDatapayment = $this->m_master->caribasedprimary('db_finance.payment','ID',$dataToken['ID_payment']);
+               $NPM = $getDatapayment[0]['NPM'];
+               $FileUpload = (array) json_decode($getDataproof[0]['FileUpload'],true);
+               for ($i=0; $i < count($FileUpload); $i++) {
+                    $path = FCPATH.'uploads/document/'.$NPM.'/'.$FileUpload[$i]['Filename'];
+                    unlink($path);
+                    unset($FileUpload[$i]); 
+               }
+
+               $FileUpload = array_values($FileUpload);
+               for ($i=0; $i < count($FileUpload); $i++) {
+                    $path = FCPATH.'uploads/document/'.$NPM.'/'.$FileUpload[$i]['Filename'];
+                    unlink($path);
+                    unset($FileUpload[$i]); 
+               }
+               if (count($FileUpload) == 0) {
+                   $this->db->where('ID', $dataToken['idtable']);
+                   $this->db->delete('db_finance.payment_proof'); 
+               }
+               echo json_encode($msg);
+           }
+           else
+           {
+               // handling orang iseng
+               echo '{"status":"999","message":"Not Authorize"}';
+           }
+       }
+       //catch exception
+       catch(Exception $e) {
+         // handling orang iseng
+         echo '{"status":"999","message":"Not Authorize"}';
+       }
+    }
+
+    public function academic_fill_list_mhs_tidak_bayar()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('m_sendemail');
+                $this->load->model('finance/m_finance');
+
+                $Semester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+                $SemesterActive = $Semester[0]['ID'];
+
+                // cek date bayar end
+                    $bool = false;
+                    $AcademicYears = $this->m_master->caribasedprimary('db_academic.academic_years','SemesterID',$SemesterActive);
+                    if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                        $bayarEnd = date("Y-m-d", strtotime($AcademicYears[0]['bayarEnd']));
+                        $NowDate = date('Y-m-d');
+                        if ($bayarEnd == $NowDate) {
+                            $bool = true;
+                        }
+                    }
+                    else
+                    {
+                        $bool = true;
+                        // $bayarEnd = date("Y-m-d", strtotime($AcademicYears[0]['bayarEnd']));
+                        // $NowDate = date('Y-m-d');
+                        // if ($bayarEnd == $NowDate) {
+                        //     $bool = true;
+                        // }
+                    }
+
+                if ($bool) {
+                    $G_data = $this->m_finance->PaymentTidakLunas($SemesterActive);
+
+                    if (count($G_data) > 0) {
+                        $html = 'Dear <span style="color: #333;">Finance & Academic</span>,
+                                    <br/>
+                                     Perihal : <b>List Mahasiswa Belum Lunas Semester '.$G_data[0]['NameSemester'].'</b>     
+                                     <div style="font-size: 12px;">
+                                     <br/>
+                                     <table  width="100%" cellspacing="0" cellpadding="4" border="0">
+                                        <thead>
+                                            <tr style="background: #607d8b;color: #ffffff;">
+                                                <th style="width: 3%;text-align: center;">No</th>
+                                                <th style="text-align: left;">NPM / Nama</th>
+                                                <th style="width: 10%;text-align: center;">Prodi</th>
+                                                <!--<th style="width: 10%;text-align: center;">Semester</th>-->
+                                                <th style="width: 10%;text-align: center;">Tipe Pembayaran</th>
+                                                <th style="width: 20%;text-align: left;">Invoice</th>
+                                                <th style="width: 20%;text-align: left;">Pembayaran</th>
+                                                <!--<th style="width: 10%;text-align: center;">Status</th>-->
+                                            </tr>
+                                        </thead>
+                                        <tbody>        
+                        ';
+                        for ($i=0; $i < count($G_data); $i++) { 
+                            $G_data[$i]['Payment'] = ($G_data[$i]['Payment'] == null || $G_data[$i]['Payment'] == 'null') ? 0 : $G_data[$i]['Payment'];
+                            $html .= '<tr style="background: #607d8b24;">
+                                        <td style="border-bottom: 1px solid #9e9e9e;text-align: center">
+                                            '.($i+1).
+                                        '</td>
+                                        <td style="border-bottom: 1px solid #9e9e9e;text-align: left">
+                                            '.$G_data[$i]['NPM'].' / '.$G_data[$i]['NameMHS'].
+                                        '</td>
+                                        <td style="border-bottom: 1px solid #9e9e9e;text-align: center">
+                                            '.$G_data[$i]['NameEng'].
+                                        '</td>
+                                        <!--<td style="border-bottom: 1px solid #9e9e9e;text-align: center">
+                                            '.$G_data[$i]['NameSemester'].
+                                        '</td>-->
+                                        <td style="border-bottom: 1px solid #9e9e9e;text-align: center">
+                                            '.$G_data[$i]['Description'].
+                                        '</td>
+                                        <td style="border-bottom: 1px solid #9e9e9e;text-align: left">
+                                            Rp '.number_format($G_data[$i]['Invoice'],2,',','.').
+                                        '</td>
+                                        <td style="border-bottom: 1px solid #9e9e9e;text-align: left">
+                                            Rp '.number_format($G_data[$i]['Payment'],2,',','.').
+                                        '</td>
+                                        <!--<td style="border-bottom: 1px solid #9e9e9e;text-align: center">
+                                            '.$G_data[$i]['StatusPay'].
+                                        '</td>-->
+                                    </tr>    
+                                    ';      
+                        }
+
+                        $html .= '</tbody></table></div>';
+
+                        $Email = 'alhadi.rahman@podomorouniversity.ac.id';
+                        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                            $G_fin = $this->m_master->caribasedprimary('db_employees.division','ID',9);
+                            $EmailFin = $G_fin[0]['Email'];
+                            $G_Academic = $this->m_master->caribasedprimary('db_employees.division','ID',6);
+                            $EmailAcademic = $G_Academic[0]['Email'];
+                            $Email =$EmailFin.','.$EmailAcademic.',it@podomorouniversity.ac.id';
+                        }
+                        $to = $Email;
+                        $subject = "Podomoro University Reminder";
+                        $text = $html;
+                        $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                    }
+                }     
+                
+                echo json_encode(1);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+    public function assign_by_finance_change_status()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('finance/m_finance');
+                if (array_key_exists('filterSemester', $dataToken)) {
+                    $SemesterActive = $dataToken['filterSemester'];
+                }
+                else
+                {
+                    $Semester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+                    $SemesterActive = $Semester[0]['ID'];
+                }
+                
+                $G_data = $this->m_finance->GetRequestChangeStatus_Mhs($SemesterActive);
+                echo json_encode($G_data);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+    public function change_status_mhs_multiple()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $Status = $dataToken['formChangeStatus'];
+                $arr = (array)$dataToken['checkboxArr'];
+                for ($i=0; $i < count($arr); $i++) { 
+                    $NPM = $arr[$i];
+                    $NPM = explode(';', $NPM);
+                    $NPM = $NPM[0];
+                    $datasave = array(
+                         'StatusStudentID' => $Status,   
+                    );
+                    $this->db->where('NPM',$NPM);
+                    $this->db->update('db_academic.auth_students',$datasave);
+
+                    // search ta
+                        $G_Std = $this->m_master->caribasedprimary('db_academic.auth_students','NPM',$NPM);
+                        $this->db->where('NPM',$NPM);
+                        $this->db->update('ta_'.$G_Std[0]['Year'].'.students',$datasave);
+                }
+                echo json_encode(1);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+    public function show_schedule_exchange()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $Status = (array_key_exists('Status', $dataToken)) ? $dataToken['Status'] : '';
+                $requestData= $_REQUEST;
+                $Semester0 = (array_key_exists('Semester', $dataToken)) ? $dataToken['Semester'] : '';    
+                $totalData = $this->m_rest->count_get_schedule_exchange_by_status($Status,$Semester0);
+
+                $Status = ($Status == '') ? '' : ' where a.Status ="'.$Status.'" ';
+                $where = ($Status == '') ? ' where' : ' and';
+                $sql = 'select a.ID as ScheduleExchangeID,a.NIP as NIPRequester,b.Name as NamaRequester,b.EmailPU as EmailRequster,a.Meeting,a.ClassroomID,a.Comment,c.Room,a.Status as StatusTbl,
+                        a.DateOriginal,a.Date,a.DayID,d.NameEng as NamaHari,a.StartSessions,a.EndSessions,a.Reason,a.Token,
+                        e.ProdiID,f.NameEng as NamaProdi,f.KaprodiID,g.Name as NameKaprodi,g.EmailPU as EmailKaprodi,h.ScheduleID as ScheduleIDAttedance,
+                        i.MKID,j.MKCode,j.NameEng as NamaMatakuliah,k.ID as ScheduleID,k.ClassGroup,(select count(*) as total from db_academic.std_krs where ScheduleID = k.ID and Status = "3" limit 1) as TotalStd,
+                        a.Updated1By as KaprodiChoice,l.EmailPU as EmailKaprodiChoice
+                        from db_academic.schedule_exchange as a
+                        left join db_employees.employees as b on a.NIP = b.NIP
+                        left join db_academic.classroom as c on a.ClassroomID = c.ID
+                        left join db_academic.days as d on a.DayID = d.ID
+                        left join (select * from db_academic.schedule_exchange_prodi group by EXID)  as e on a.ID = e.EXID
+                        left join db_academic.program_study as f on e.ProdiID = f.ID
+                        left join db_employees.employees as g on f.KaprodiID = g.NIP
+                        left join db_academic.attendance as h on a.ID_Attd = h.ID
+                        left join (select * from db_academic.schedule_details_course group by ScheduleID) as i on h.ScheduleID = i.ScheduleID
+                        left join db_academic.mata_kuliah as j on i.MKID = j.ID
+                        left join db_academic.schedule as k on k.ID = i.ScheduleID
+                        left join db_employees.employees as l on a.Updated1By = l.NIP
+                        '.$Status;
+
+                $Semester = (array_key_exists('Semester', $dataToken)) ? ' and h.SemesterID ="'.$dataToken['Semester'].'"' : '';     
+                $sql.= $where.' (f.KaprodiID LIKE "%'.$requestData['search']['value'].'%" or a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "'.$requestData['search']['value'].'%"  or g.Name LIKE "'.$requestData['search']['value'].'%" or c.Room LIKE "'.$requestData['search']['value'].'%" or a.DateOriginal LIKE "'.$requestData['search']['value'].'%" or a.Date LIKE "'.$requestData['search']['value'].'%" or f.NameEng LIKE "'.$requestData['search']['value'].'%"
+                    or j.NameEng LIKE "'.$requestData['search']['value'].'%" or k.ClassGroup LIKE "'.$requestData['search']['value'].'%"
+                        ) '.$Semester;
+
+                $sql.= ' ORDER BY a.Date Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                // print_r($sql);die();
+                $query = $this->db->query($sql)->result_array();
+
+                $No = $requestData['start'] + 1;
+                $data = array();
+                for($i=0;$i<count($query);$i++){
+                    $nestedData=array();
+                    $row = $query[$i];
+                    $token = $row['Token'];
+                    $ScheduleExist = $row['DateOriginal'];
+                    $ScheduleExchange = $row['Date'];
+                    if ($row['Token'] != '' || $row['Token'] != null) {
+                        $key = "s3Cr3T-G4N";
+                        $data_arr_token = (array) $this->jwt->decode($token,$key);
+                        $ScheduleExist = $data_arr_token['ScheduleExist'];
+                        $ScheduleExchange = $data_arr_token['ScheduleExchange'];
+                    }
+
+                    $StatusTbl = '';
+                    switch ($row['StatusTbl']) {
+                        case '1':
+                           $StatusTbl = 'Will be Set Room<br>'.$row['Comment'];
+                            break;
+                        case '2':
+                           $StatusTbl = 'Already Set Room<br>'.$row['Comment'];
+                            break;
+                        case '-2':
+                           $StatusTbl = 'Reject<br>'.$row['Comment'];
+                            break;    
+                        default:
+                            $StatusTbl = '';
+                            break;
+                    }
+                    $Room = '';
+                    if ($row['Room'] != null || $row['Room'] != '') {
+                        $Room = ' | '.$row['Room'];
+                    }
+                    $nestedData[] = $No;
+                    $nestedData[] = $row['NamaRequester'];
+                    // $nestedData[] = $row['NamaProdi'];
+                    $nestedData[] = $row['NamaMatakuliah'];
+                    $nestedData[] = $row['TotalStd'];
+                    $nestedData[] = $row['ClassGroup'];
+                    $nestedData[] = $row['Meeting'];
+                    $nestedData[] = $ScheduleExist;
+                    $nestedData[] = $ScheduleExchange.$Room;
+                    $nestedData[] = $row['Reason'];
+                    $nestedData[] = $StatusTbl;
+
+                    $btnApprove  = '';
+                    $btnreject = '';
+                    if ($row['StatusTbl'] == '1') {
+                        $btnApprove = '<button class = "btn btn-primary btnapprove" token = "'.$row['Token'].'" emailrequest = "'.$row['EmailRequster'].'" emailkaprodi = "'.$row['EmailKaprodiChoice'].'" ScheduleExchangeID = "'.$row['ScheduleExchangeID'].'"><i class="fa fa-check" aria-hidden="true"></i> Set Room </button>';
+                        $btnreject = '<button class = "btn btn-inverse btnreject" token = "'.$row['Token'].'" emailrequest = "'.$row['EmailRequster'].'" emailkaprodi = "'.$row['EmailKaprodiChoice'].'" ScheduleExchangeID = "'.$row['ScheduleExchangeID'].'"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Reject </button>';
+                    }
+                    
+
+                    $nestedData[] = '<div>'.$btnApprove.'</div>'.'<div style = "margin-top : 10px">'.$btnreject.'</div>';
+                    
+                    $data[] = $nestedData;
+                    $No++;
+                }
+
+                $json_data = array(
+                    "draw"            => intval( $requestData['draw'] ),
+                    "recordsTotal"    => intval($totalData),
+                    "recordsFiltered" => intval($totalData ),
+                    "data"            => $data
+                );
+                echo json_encode($json_data);    
+                
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+    public function approve_pr()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('budgeting/m_budgeting');
+                $PRCode = $dataToken['PRCode'];
+                $useraccess = $dataToken['useraccess'];
+                $NIP = $dataToken['NIP'];
+                $action = $dataToken['action'];
+
+                // get data
+                $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
+                $keyJson = $useraccess - 2; // get array index json
+                $JsonStatus = (array)json_decode($G_data[0]['JsonStatus'],true);
+                // get data update to approval
+                $arr_upd = $JsonStatus[$keyJson];
+                // print_r($keyJson);die();
+                if ($arr_upd['ApprovedBy'] == $NIP) {
+                    $arr_upd['Status'] = ($action == 'approve') ? 1 : 2;
+                    $arr_upd['ApproveAt'] = ($action == 'approve') ? date('Y-m-d H:i:s') : '-';
+                    $JsonStatus[$keyJson] = $arr_upd;
+                    $datasave = array(
+                        'JsonStatus' => json_encode($JsonStatus),
+                    );
+
+                    // check all status for update data
+                    $boolApprove = true;
+                    for ($i=0; $i < count($JsonStatus); $i++) { 
+                        $arr = $JsonStatus[$i];
+                        $Status = $arr['Status'];
+                        if ($Status == 2 || $Status == 0) {
+                            $boolApprove = false;
+                            break;
+                        }
+                    }
+
+                    if ($boolApprove) {
+                        $datasave['Status'] = 2;
+                        $datasave['PostingDate'] = date('Y-m-d H:i:s');
+                    }
+                    else
+                    {
+                        $boolReject = false;
+                        for ($i=0; $i < count($JsonStatus); $i++) { 
+                            $arr = $JsonStatus[$i];
+                            $Status = $arr['Status'];
+                            if ($Status == 2) {
+                                $boolReject = true;
+                                break;
+                            }
+                        }
+
+                        if ($boolReject) {
+                            $NoteDel = $dataToken['NoteDel'];
+                            $Notes = $G_data[0]['Notes']."\n".$NoteDel;
+                            $datasave['Status'] = 3;
+                            // $datasave['Notes'] = $Notes;
+                        }
+                    }
+
+                    $this->db->where('PRCode',$PRCode);
+                    $this->db->update('db_budgeting.pr_create',$datasave);
+
+                    // insert to pr_circulation_sheet
+                        $Desc = ($arr_upd['Status'] == 1) ? 'Approve' : 'Reject';
+                        if (array_key_exists('Status', $datasave)) {
+                            if ($datasave['Status'] == 2) {
+                                $Desc = "All Approve and posting date at : ".$datasave['PostingDate'];
+                            }
+                        }
+
+                        if ($arr_upd['Status'] == 2) {
+                            if ($dataToken['NoteDel'] != '' || $dataToken['NoteDel'] != null) {
+                                $Desc .= ', '.$dataToken['NoteDel'];
+                            }
+                        }
+                        
+                        $this->m_budgeting->pr_circulation_sheet($PRCode,$Desc,$NIP);
+
+                }
+                else
+                {
+                    // detection is represented or not ?
+                        $represented = $dataToken['represented'];
+                        if ($represented != '') {
+                            if ($arr_upd['ApprovedBy'] == $represented) {
+                                $NameRepresented = $this->m_master->caribasedprimary('db_employees.employees','NIP',$represented);
+                                $NameRepresented = $NameRepresented[0]['Name'];
+                                $arr_upd['Status'] = ($action == 'approve') ? 1 : 2;
+                                $arr_upd['ApproveAt'] = ($action == 'approve') ? date('Y-m-d H:i:s') : '-';
+                                $arr_upd['Representedby'] = $NIP;
+                                $JsonStatus[$keyJson] = $arr_upd;
+                                $datasave = array(
+                                    'JsonStatus' => json_encode($JsonStatus),
+                                );
+
+                                // check all status for update data
+                                $boolApprove = true;
+                                for ($i=0; $i < count($JsonStatus); $i++) { 
+                                    $arr = $JsonStatus[$i];
+                                    $Status = $arr['Status'];
+                                    if ($Status == 2 || $Status == 0) {
+                                        $boolApprove = false;
+                                        break;
+                                    }
+                                }
+
+                                if ($boolApprove) {
+                                    $datasave['Status'] = 2;
+                                    $datasave['PostingDate'] = date('Y-m-d H:i:s');
+                                }
+                                else
+                                {
+                                    $boolReject = false;
+                                    for ($i=0; $i < count($JsonStatus); $i++) { 
+                                        $arr = $JsonStatus[$i];
+                                        $Status = $arr['Status'];
+                                        if ($Status == 2) {
+                                            $boolReject = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if ($boolReject) {
+                                        $NoteDel = $dataToken['NoteDel'];
+                                        $Notes = $G_data[0]['Notes']."\n".$NoteDel;
+                                        $datasave['Status'] = 3;
+                                        // $datasave['Notes'] = $Notes;
+                                    }
+                                }
+
+                                $this->db->where('PRCode',$PRCode);
+                                $this->db->update('db_budgeting.pr_create',$datasave);
+
+                                // insert to pr_circulation_sheet
+                                    $Desc = ($arr_upd['Status'] == 1) ? 'Approve, Represented from ['.$represented.' || '.$NameRepresented.']' : 'Reject, Represented from ['.$represented.' || '.$NameRepresented.']';
+                                    if (array_key_exists('Status', $datasave)) {
+                                        if ($datasave['Status'] == 2) {
+                                            $Desc = "All Approve and posting date at : ".$datasave['PostingDate'].'<br>, Represented from ['.$represented.' || '.$NameRepresented.']';
+                                        }
+                                    }
+
+                                    if ($arr_upd['Status'] == 2) {
+                                        if ($dataToken['NoteDel'] != '' || $dataToken['NoteDel'] != null) {
+                                            $Desc .= '<br> Reason : '.$dataToken['NoteDel'];
+                                        }
+                                    }
+                                    
+                                    $this->m_budgeting->pr_circulation_sheet($PRCode,$Desc,$NIP);
+
+                            }
+                        }
+                        else
+                        {
+                            $msg = 'Not Authorize';
+                        }
+                    
+                }
+
+                echo json_encode($msg);    
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+    public function approve_budget()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('budgeting/m_budgeting');
+                $id_creator_budget_approval = $dataToken['id_creator_budget_approval'];
+                $NIP = $dataToken['NIP'];
+                $action = $dataToken['action'];
+
+                // get data
+                $G_data = $this->m_master->caribasedprimary('db_budgeting.creator_budget_approval','ID',$id_creator_budget_approval);
+                $keyJson = $dataToken['approval_number'] - 1; // get array index json
+                $JsonStatus = (array)json_decode($G_data[0]['JsonStatus'],true);
+                // get data update to approval
+                $arr_upd = $JsonStatus[$keyJson];
+                $arr_upd['Status'] = ($action == 'approve') ? 1 : 2;
+                $arr_upd['ApproveAt'] = ($action == 'approve') ? date('Y-m-d H:i:s') : '-';
+                $JsonStatus[$keyJson] = $arr_upd;
+                $datasave = array(
+                    'JsonStatus' => json_encode($JsonStatus),
+                );
+
+                // check all status for update data
+                $boolApprove = true;
+                for ($i=0; $i < count($JsonStatus); $i++) {
+                    $arr = $JsonStatus[$i];
+                    // if Acknowledge by then skipp
+                        if ($arr['NameTypeDesc'] == 'Acknowledge by' || $arr['NameTypeDesc'] != 'Approval by') {
+                            continue;
+                        }
+                    $Status = $arr['Status'];
+                    if ($Status == 2 || $Status == 0) {
+                        $boolApprove = false;
+                        break;
+                    }
+                }
+
+                if ($boolApprove) {
+                    $datasave['Status'] = 2;
+                    $datasave['PostingDate'] = date('Y-m-d H:i:s');
+                }
+                else
+                {
+                    $boolReject = false;
+                    for ($i=0; $i < count($JsonStatus); $i++) { 
+                        $arr = $JsonStatus[$i];
+                        $Status = $arr['Status'];
+                        if ($Status == 2) {
+                            $boolReject = true;
+                            break;
+                        }
+                    }
+
+                    if ($boolReject) {
+                        $datasave['Status'] = 3;
+                    }
+                }
+
+                $this->db->where('ID',$id_creator_budget_approval);
+                $this->db->update('db_budgeting.creator_budget_approval',$datasave);
+
+                // insert to log
+                    $Desc = ($arr_upd['Status'] == 1) ? 'Approve' : 'Reject';
+                    if (array_key_exists('Status', $datasave)) {
+                        if ($datasave['Status'] == 2) {
+                            $Desc = "All Approve and posting date at : ".$datasave['PostingDate'];
+                            // lock can't be delete
+                            $Departement = $G_data[0]['Departement'];
+                            $Year = $G_data[0]['Year'];
+                            $sql = 'select a.CodePostBudget from db_budgeting.cfg_set_post as a join db_budgeting.cfg_head_account as b on a.CodeHeadAccount = b.CodeHeadAccount where b.Departement = ? and a.Year = ?
+                                ';
+                            $query=$this->db->query($sql, array($Departement,$Year))->result_array();
+                            for ($i=0; $i < count($query); $i++) { 
+                                    $this->m_budgeting->makeCanBeDelete('db_budgeting.cfg_set_post','CodePostBudget',$query[$i]['CodePostBudget']);
+                            }
+
+                            // lock sub account
+                                $G = $this->m_master->caribasedprimary('db_budgeting.creator_budget','ID_creator_budget_approval',$id_creator_budget_approval);
+                                for ($i=0; $i < count($G); $i++) { 
+                                    $CodePostRealisasi = $G[$i]['CodePostRealisasi'];
+                                    $this->m_budgeting->makeCanBeDelete('db_budgeting.cfg_postrealisasi','CodePostRealisasi',$CodePostRealisasi);
+                                }    
+                            
+                        }
+                    }
+
+                    if ($arr_upd['Status'] == 2) {
+                        if ($dataToken['NoteDel'] != '' || $dataToken['NoteDel'] != null) {
+                            $Desc .= '</br> {</br>'.$dataToken['NoteDel'].'</br>}';
+                        }
+                    }
+                    // save to log
+                        $this->m_budgeting->log_budget($id_creator_budget_approval,$Desc,$NIP); 
+
+                echo json_encode($msg);    
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+    public function budgeting_dashboard()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                // do action
+                $this->load->model('budgeting/m_budgeting');
+                $month = array(
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'April',
+                    'Mei',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Okt',
+                    'Nov',
+                    'Des'
+                );
+
+                $YearActivated = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
+                
+                $StartMonth = 9;
+                $EndMonth = 8;
+
+                $st = $YearActivated[0]['StartPeriod'];
+                $st = explode('-', $st);
+                $StartMonth = (int) $st[1];
+
+                $end = $YearActivated[0]['EndPeriod'];
+                $end = explode('-', $end);
+                $EndMonth = (int) $end[1];
+
+                $Departement = $this->m_master->apiservertoserver(serverRoot.'/api/__getAllDepartementPU');
+                $data = array();
+                for ($i=0; $i < count($Departement); $i++) { 
+                    $Code = $Departement[$i]['Code'];
+                    $DepartementName = $Departement[$i]['Name2'];
+                    // find ID_creator_budget_approval first
+                    $G = $this->m_budgeting->get_creator_budget_approval($YearActivated[0]['Year'],$Code);
+                    $ID_creator_budget_approval = 0;
+                    if (count($G) > 0) {
+                        $ID_creator_budget_approval= $G[0]['ID']; 
+                    }
+                    
+                    $get = $this->m_budgeting->get_creator_budget($ID_creator_budget_approval);
+                    $arr_temp = array();
+                    for ($j=0; $j < count($get); $j++) { 
+                        // get data to show in dashboard'
+                        $DetailMonth = (array) json_decode($get[$j]['DetailMonth'],true);
+                        $UnitCost = $get[$j]['UnitCost']; 
+                        for ($l=0; $l < count($DetailMonth); $l++) { 
+                            $month_get = $DetailMonth[$l]['month'];
+                            $aa = explode('-', $month_get);
+                            $m1 = (int)$aa[1];
+                            $value = $DetailMonth[$l]['value'];
+                            $value = $value * $UnitCost;
+
+                            // find month exist
+                            $b = false;
+                            for ($k=0; $k < count($arr_temp); $k++) { 
+                                $m2 = $arr_temp[$k]['month'];
+                                if ($m1 == $m2) {
+                                    $b = true;
+                                    break;
+                                }
+                            }
+
+                            if ($b) {
+                               // exist
+                              $arr_temp[$k]['value'] = $arr_temp[$k]['value'] + $value;
+                            }
+                            else
+                            {
+                                $arr_temp[] = array(
+                                    'month' => $m1,
+                                    'value' => $value,
+                                );
+                            }
+
+                        }
+                    }
+                    $data[] = array(
+                        'Code' => $Code,
+                        'DepartementName' => $DepartementName,
+                        'data' => $arr_temp,
+                    );
+                }
+
+                echo json_encode(array(
+                    'month' => $month,'data' => $data,'StartMonth' => $StartMonth,'EndMonth' => $EndMonth
+                    )
+                );    
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+    public function InputCatalog_saveFormInput()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $Input = $dataToken;
+                $Item = $Input['Item'];
+                $Desc = $Input['Desc'];
+                $EstimaValue = $Input['EstimaValue'];
+                $Departement = $Input['Departement'];
+                $Detail = $Input['Detail'];
+                $user = $Input['user'];
+                $Detail = json_encode($Detail);
+
+                $filename = $Input['Item'].'_Uploaded';
+                $filename = str_replace(" ", '_', $filename);
+                $varchkApproval = function($Departement)
+                {
+                    $aa = $this->m_master->caribasedprimary('db_purchasing.catalog_permission','Departement',$Departement);
+                    if (count($aa) > 0) {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                };
+
+                $chk = $varchkApproval($Departement);
+                switch ($Input['Action']) {
+                    case 'add':
+                        if (array_key_exists('fileData',$_FILES)) {
+                           $path = './uploads/budgeting/catalog';
+                           $uploadFile = $this->m_rest->uploadDokumenMultiple($filename,'fileData',$path);
+                           if (is_array($uploadFile)) {
+                               $uploadFile = implode(',', $uploadFile);
+                               $dataSave = array(
+                                   'Item' => $Item,
+                                   'Desc' => $Desc,
+                                   'EstimaValue' => $EstimaValue,
+                                   'Photo' => $uploadFile,
+                                   'Departement' => $Departement,
+                                   'DetailCatalog' => $Detail,
+                                   'CreatedBy' => $user,
+                                   'CreatedAt' => date('Y-m-d'),
+                                   'Approval' => ($chk) ? 1 : 0,
+                                   'ApprovalBy' => ($chk) ? $user : '',
+                                   'ApprovalAt' => ($chk) ? date('Y-m-d H:i:s') : NULL,
+                               );
+                               $this->db->insert('db_purchasing.m_catalog', $dataSave);
+                               echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+                           }
+                           else
+                           {
+                               echo json_encode(array('msg' => $uploadFile,'status' => 0));
+                           }
+                        }
+                        else{
+                            $dataSave = array(
+                                'Item' => $Item,
+                                'Desc' => $Desc,
+                                'EstimaValue' => $EstimaValue,
+                                'Photo' => '',
+                                'Departement' => $Departement,
+                                'DetailCatalog' => $Detail,
+                                'CreatedBy' => $user,
+                               'CreatedAt' => date('Y-m-d'),
+                               'Approval' => ($chk) ? 1 : 0,
+                               'ApprovalBy' => ($chk) ? $user : '',
+                               'ApprovalAt' => ($chk) ? date('Y-m-d H:i:s') : NULL,
+                            );
+                            $this->db->insert('db_purchasing.m_catalog', $dataSave);
+                            echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+                        }
+
+                        break;
+                    case 'edit':
+                        $Get_Data = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$Input['ID']);
+                        $Status = $Get_Data[0]['Status'];
+                        if ($Status == 1) {
+                            if (array_key_exists('fileData',$_FILES)) {
+                               $path = './uploads/budgeting/catalog';
+                               $uploadFile = $this->m_rest->uploadDokumenMultiple($filename,'fileData',$path);
+                               if (is_array($uploadFile)) {
+                                   $uploadFile = implode(',', $uploadFile);
+                                   $dataSave = array(
+                                       'Item' => $Item,
+                                       'Desc' => $Desc,
+                                       'EstimaValue' => $EstimaValue,
+                                       'Photo' => $uploadFile,
+                                       'Departement' => $Departement,
+                                       'DetailCatalog' => $Detail,
+                                       'LastUpdateBy' => $user,
+                                       'LastUpdateAt' => date('Y-m-d H:i:s'),
+                                   );
+                                   $this->db->where('ID', $Input['ID']);
+                                   $this->db->update('db_purchasing.m_catalog', $dataSave);
+                                   echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+                               }
+                               else
+                               {
+                                   echo json_encode(array('msg' => $uploadFile,'status' => 0));
+                               }
+                            }
+                            else{
+                                $dataSave = array(
+                                    'Item' => $Item,
+                                    'Desc' => $Desc,
+                                    'EstimaValue' => $EstimaValue,
+                                    'Departement' => $Departement,
+                                    'DetailCatalog' => $Detail,
+                                    'LastUpdateBy' => $user,
+                                    'LastUpdateAt' => date('Y-m-d H:i:s'),
+                                );
+                                $this->db->where('ID', $Input['ID']);
+                                $this->db->update('db_purchasing.m_catalog', $dataSave);
+                                echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+                            }
+                        }
+                        else
+                        {
+                            echo json_encode(array('msg' => 'The data has been used for transaction, Cannot be action','status' => 0));
+                        }
+                        
+                        break;
+                    case 'delete':
+                        $Get_Data = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$Input['ID']);
+                        $Status = $Get_Data[0]['Status'];
+                        if ($Status == 1)
+                        {
+                            $dataSave = array(
+                                'Active' => 0,
+                                'LastUpdateBy' => $user,
+                                'LastUpdateAt' => date('Y-m-d H:i:s'),
+                            );
+                            $this->db->where('ID', $Input['ID']);
+                            $this->db->update('db_purchasing.m_catalog', $dataSave);
+                            echo json_encode(array(''));
+                        }
+                        else
+                        {
+                            echo json_encode(array('The data has been used for transaction, Cannot be action'));
+                        }
+                        break;
+                    case 'approve':
+                        $dataSave = array(
+                            'Approval' => 1,
+                            'ApprovalBy' => $user,
+                            'ApprovalAt' => date('Y-m-d H:i:s'),
+                        );
+                        $this->db->where('ID', $Input['ID']);
+                        $this->db->update('db_purchasing.m_catalog', $dataSave);
+                        echo json_encode(array(''));
+                        break;        
+                    default:
+                        # code...
+                        break;
+                }
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+
+    }
+
+    public function show_circulation_sheet()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $rs = array();
+                $PRCode = $dataToken['PRCode'];
+                $sql = 'select a.Desc,a.Date,b.NIP,b.Name from db_budgeting.pr_circulation_sheet as a 
+                        join db_employees.employees as b on a.By = b.NIP
+                        where a.PRCode = ?
+                        ';
+                $query=$this->db->query($sql, array($PRCode))->result_array();
+                $rs = $query;        
+                echo json_encode($rs);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+    public function log_budgeting()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $rs = array();
+                $id_creator_budget_approval = $dataToken['id_creator_budget_approval'];
+                $sql = 'select a.Desc,a.Date,b.NIP,b.Name from db_budgeting.log_budget as a 
+                        join db_employees.employees as b on a.By = b.NIP
+                        where a.ID_creator_budget_approval = ?
+                        ';
+                $query=$this->db->query($sql, array($id_creator_budget_approval))->result_array();
+                for ($i=0; $i < count($query); $i++) {  // update textarea fill to nl2br
+                    $query[$i]['Desc'] = nl2br($query[$i]['Desc']);
+                }
+                $rs = $query;        
+                echo json_encode($rs);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+    public function TestpostdataFrom_PowerApps()
+    {
+
+        $data = file_get_contents('php://input');
+        $data_json = (array) json_decode($data,true);
+        if ($data_json) {
+            $dataSave = array(
+                'Value' => $data_json['test'],
+            );
+            $this->db->insert('test.test', $dataSave);
+            if ($this->db->affected_rows() > 0 )
+             {
+                 echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+             }
+             else
+             {
+                 echo json_encode(array('msg' => '000','status' => 0));
+             }
+        }
+        else
+        {
+            echo json_encode(array('msg' => '000','status' => 0));
+        }
+       
+    }
 }

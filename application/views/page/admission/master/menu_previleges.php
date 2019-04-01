@@ -1,26 +1,33 @@
 <link href="<?php echo base_url('assets/custom/jquery-ui.css'); ?>" rel="stylesheet" type="text/css" />
-<div class="row" style="margin-top: 5px;">
-    <div class="col-md-12">
-        <div class="widget box">
-            <div class="widget-header">
-                <h4 class="header"><i class="icon-reorder"></i>Daftar Menu</h4>
-                <div class="toolbar no-padding">
-                    <div class="btn-group">
-                      <span data-smt="" class="btn btn-xs btn-add-menu">
-                        <i class="icon-plus"></i> Add Menu
-                       </span>
-                    </div>
-                </div>
-            </div>
-            <div class="widget-content">
-                <!-- <div class = 'row'> -->
-                	<div id= "loadtableMenu"></div>
-                <!-- </div> -->
-                <!-- -->
-            </div>
-        </div>
-    </div>
-</div>
+<?php 
+    $PositionMain = $this->session->userdata('PositionMain');
+    $IDDivision = $PositionMain['IDDivision'] ;
+ ?>
+<?php if ($IDDivision == 12): ?>
+     <div class="row" style="margin-top: 5px;">
+         <div class="col-md-12">
+             <div class="widget box">
+                 <div class="widget-header">
+                     <h4 class="header"><i class="icon-reorder"></i>Daftar Menu</h4>
+                     <div class="toolbar no-padding">
+                         <div class="btn-group">
+                           <span data-smt="" class="btn btn-xs btn-add-menu">
+                             <i class="icon-plus"></i> Add Menu
+                            </span>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="widget-content">
+                     <!-- <div class = 'row'> -->
+                        <div id= "loadtableMenu"></div>
+                     <!-- </div> -->
+                     <!-- -->
+                 </div>
+             </div>
+         </div>
+     </div>
+<?php endif ?> 
+
 <div class="row" style="margin-top: 5px;">
     <div class="col-md-12">
         <div class="widget box">
@@ -236,6 +243,7 @@
             // Some code
             // console.log('test');
             $("#loadtableGroupPrevileges").empty();
+            $("#loadtableGroupPrevileges").html('');
             var table = '<table class="table table-striped table-bordered table-hover table-checkable datatable2">'+
             '<thead>'+
                 '<tr>'+
@@ -656,6 +664,10 @@
         loadSubMenu();
     });
 
+    $(document).on('change','#selectGroupuUser', function () {
+        loadSubMenu();
+    });
+
     function loadSubMenu()
     {
         $("#LoadSubMenu").empty();
@@ -788,8 +800,10 @@
     {
             // Some code
             // console.log('test');
+            $("#MenuPrevilegesGroupUser").remove();
             $("#LoadTblGroupUserPrevileges").empty();
-            var table = '<table class="table table-striped table-bordered table-hover table-checkable datatable" id ="MenuPrevilegesGroupUser">'+
+            $("#LoadTblGroupUserPrevileges").html('');
+            var table = '<table class="table table-striped table-bordered table-hover table-checkable" id ="MenuPrevilegesGroupUser">'+
             '<thead>'+
                 '<tr>'+
                     '<th style="width: 106px;">Group Name</th>'+
@@ -871,6 +885,9 @@
                 // jsonData = data_json;
                 // var obj = JSON.parse(data_json); 
                 // console.log(obj);
+                loadSelectGroupUser();
+                // $("#selectGroupuUser").trigger('change');
+                // $("#selectGroupuUser2").trigger('change');
             }).done(function() {
               loadGroupPrevileges(loadDataGroupPrevileges);
               $('#GlobalModal').modal('hide');

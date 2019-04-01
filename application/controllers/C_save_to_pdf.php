@@ -321,7 +321,7 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Cell(10,$ch_atas,$d['A_Sesi'],'LRT',0,'C');
             $pdf->Cell(38,$ch_atas,$r1,'LRT',0,'L');
 
-            if($d['Status']=='1'){
+            if($d['Status']=='2'){
                 $pdf->SetFont('ZapfDingbats');
                 $pdf->Cell(10,$ch_atas,chr(52),'LRT',0,'C');
             } else {
@@ -362,13 +362,12 @@ class C_save_to_pdf extends CI_Controller {
     public function monitoringStudent(){
 
         $token = $this->input->post('token');
+
         $data_arr = $this->getInputToken($token);
 
         $course = (array) $data_arr['Course'][0];
         $student = (array) $data_arr['Student'];
 
-//        print_r($data_arr);
-//        exit;
 
         $pdf = new FPDF('l','mm','A4');
 
@@ -446,261 +445,262 @@ class C_save_to_pdf extends CI_Controller {
             $d = (array) $student[$i];
 
             $attd = $d['Attendance'];
-            $hrowD = $hrow * count($attd);
 
-            $pdf->Cell(8,$hrowD,($no++),1,0,'C');
-            $pdf->Cell(18,$hrowD,$d['NPM'],1,0,'C');
-            $pdf->Cell(60,$hrowD,' '.$d['Name'],1,0,'L');
+            if(count($attd)>0){
+                $hrowD = $hrow * count($attd);
 
-            $pdf->Cell(13,$hrowD,$d['Target'],1,0,'C');
-            $pdf->SetFont('Times','B',8);
-            $pdf->Cell(13,$hrowD,$d['Total_Attd'],1,0,'C');
-            $pdf->Cell(18.5,$hrowD,$d['Percent'],1,0,'C');
-            $pdf->SetFont('Times','',8);
+                $pdf->Cell(8,$hrowD,($no++),1,0,'C');
+                $pdf->Cell(18,$hrowD,$d['NPM'],1,0,'C');
+                $pdf->Cell(60,$hrowD,' '.$d['Name'],1,0,'L');
+
+                $pdf->Cell(13,$hrowD,$d['Target'],1,0,'C');
+                $pdf->SetFont('Times','B',8);
+                $pdf->Cell(13,$hrowD,$d['Total_Attd'],1,0,'C');
+                $pdf->Cell(18.5,$hrowD,$d['Percent'],1,0,'C');
+                $pdf->SetFont('Times','',8);
 
 //            $pdf->SetTextColor(0,255,0);
 
-            for($t=0;$t<count($attd);$t++){
+                for($t=0;$t<count($attd);$t++){
 
-                if($t!=0){
-                    $pdf->Cell(130.5,$hrow,'',0,0,'C');
-                }
+                    if($t!=0){
+                        $pdf->Cell(130.5,$hrow,'',0,0,'C');
+                    }
 
-                $da = (array) $attd[$t];
+                    $da = (array) $attd[$t];
 
-                $pdf->Cell(30,$hrow,' '.$da['DayEng'],1,0,'L');
+                    $pdf->Cell(30,$hrow,' '.$da['DayEng'],1,0,'L');
 
-                if($da['M1']==1 || $da['M1']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M1']==2 || $da['M1']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M1']==1 || $da['M1']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M1']==2 || $da['M1']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M2']==1 || $da['M2']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M2']==2 || $da['M2']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M2']==1 || $da['M2']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M2']==2 || $da['M2']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M3']==1 || $da['M3']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M3']==2 || $da['M3']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M3']==1 || $da['M3']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M3']==2 || $da['M3']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M4']==1 || $da['M4']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M4']==2 || $da['M4']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M4']==1 || $da['M4']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M4']==2 || $da['M4']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M5']==1 || $da['M5']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M5']==2 || $da['M5']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M5']==1 || $da['M5']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M5']==2 || $da['M5']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M6']==1 || $da['M6']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M6']==2 || $da['M6']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M6']==1 || $da['M6']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M6']==2 || $da['M6']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M7']==1 || $da['M7']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M7']==2 || $da['M7']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M7']==1 || $da['M7']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M7']==2 || $da['M7']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M8']==1 || $da['M8']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M8']==2 || $da['M8']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M8']==1 || $da['M8']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M8']==2 || $da['M8']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M9']==1 || $da['M9']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M9']==2 || $da['M9']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M9']==1 || $da['M9']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M9']==2 || $da['M9']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M10']==1 || $da['M10']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M10']==2 || $da['M10']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M10']==1 || $da['M10']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M10']==2 || $da['M10']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M11']==1 || $da['M11']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M11']==2 || $da['M11']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M11']==1 || $da['M11']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M11']==2 || $da['M11']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M12']==1 || $da['M12']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M12']==2 || $da['M12']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M12']==1 || $da['M12']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M12']==2 || $da['M12']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M13']==1 || $da['M13']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M13']==2 || $da['M13']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,0,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M13']==1 || $da['M13']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M13']==2 || $da['M13']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,0,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,0,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,0,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
-                if($da['M14']==1 || $da['M14']=='1'){
-                    $pdf->SetTextColor(0, 147, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(52),1,1,'C');
-                    $pdf->SetFont('Times','',8);
-                } else if($da['M14']==2 || $da['M14']=='2'){
-                    $pdf->SetTextColor(147, 0, 0);
-                    $pdf->SetFont('ZapfDingbats');
-                    $pdf->Cell(9,$hrow,chr(54),1,1,'C');
-                    $pdf->SetFont('Times','',8);
-                } else {
+                    if($da['M14']==1 || $da['M14']=='1'){
+                        $pdf->SetTextColor(0, 147, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(52),1,1,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else if($da['M14']==2 || $da['M14']=='2'){
+                        $pdf->SetTextColor(147, 0, 0);
+                        $pdf->SetFont('ZapfDingbats');
+                        $pdf->Cell(9,$hrow,chr(54),1,1,'C');
+                        $pdf->SetFont('Times','',8);
+                    } else {
+                        $pdf->SetTextColor(0, 0, 0);
+                        $pdf->Cell(9,$hrow,'-',1,1,'C');
+                    }
                     $pdf->SetTextColor(0, 0, 0);
-                    $pdf->Cell(9,$hrow,'-',1,1,'C');
-                }
-                $pdf->SetTextColor(0, 0, 0);
 
+                }
             }
 
 
 
         }
-
-
 
         $pdf->Output('I','Monitoring_Attendance_Students.pdf');
     }
@@ -1029,6 +1029,8 @@ class C_save_to_pdf extends CI_Controller {
         }
         else if($data_arr['DocumentType']==3){
 
+//            print_r($data_arr);
+//            exit;
             // Get data exam
             $dataExam = $this->m_save_to_pdf->getExamScheduleWithStudent($data_arr['SemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
 
@@ -3245,7 +3247,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell((3*$w_f)+$w_fv,$h,ucwords(strtolower($dataTempTr['Place'])).', '.$dateT,$border,1,'L');
 
 
-        $ttdb = ($lang=='ind')? 'Wakil Rektor Bidang Akademik' : 'Vice Rector of Academic Affairs';
+        $ttdb = ($lang=='ind')? 'Pjs. Wakil Rektor Bidang Akademik' : 'Acting Vice Rector of Academic Affairs';
         $pdf->Cell($w_smt+$w_no+$w_kode+$w_mk,$h,'',$border,0,'R');
         $pdf->Cell((3*$w_f)+$w_fv,$h,$ttdb,$border,1,'L');
 
@@ -3881,6 +3883,379 @@ class C_save_to_pdf extends CI_Controller {
         $nameF = str_replace(' ','_',strtoupper($Student['Name']));
         $pdf->Output('IJAZAH_'.$Student['NPM'].'_'.$nameF.'.pdf','I');
     }
+
+
+
+//====================== tambahan TGL 17-01-2019 SKLS ==========================
+//==============================================================================
+  public function skls(){
+        $token = $this->input->post('token');
+        $data_arr = $this->getInputToken($token);
+        $dataSkls = $this->m_save_to_pdf->getSkls($data_arr['DBStudent'],$data_arr['NPM']);
+        $pdf = new FPDF('P','mm','A4');
+        $pdf->SetMargins(20.5,10.5,10);
+        $pdf->AddPage();
+        $h = 0;
+        $Skls = $dataSkls['Skls'][0];
+        $Student = $dataSkls['Student'][0];
+        $border = 0;
+
+        // ========buat tanggal header yudisium ===================
+        // ========================================================
+        $pdf->Ln(15);
+        $fn_b = 10;
+        $fn_i = 9;
+        $x = 22;
+        $h = 4;
+        $border = 0;
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell(171.5,$h,$Skls['PlaceIssued'].', '.$this->getDateIndonesian($Skls['DateOfYudisium']),$border,1,'L');
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_i);
+        $pdf->Cell(171.5,$h,'No : '.$Student['SKLN'],$border,1,'L');
+        // $pdf->Cell($w_right,$h,'Nomor Seri Ijazah : '.$Student['CSN'],$border,1,'L');
+        $pdf->SetX($x);
+        // ========================================================
+
+
+        $pdf->Ln(29);
+        $fn_b = 10; //untuk ukuran huruf
+        $fn_i = 9;
+        $fn_e = 9; // untuk ukuran font
+        $x = 40;
+        $h = 4;
+
+        $full_width = 140;
+        $pdf->SetXY($x,45.5);//untuk jarak rata kanan dan jarak header
+        $pdf->SetFont('Arial','BU',$fn_b);
+        $pdf->Cell($full_width,$h,'SURAT KETERANGAN LULUS SEMENTARA',$border,1,'C');
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell($full_width,$h,'To Whom It May Concern',$border,1,'C');
+        $pdf->SetX($x);
+        $pdf->Cell(10,7,'',0,1);//memberikan enter/jarak ke bawah
+
+
+        // ======================= Keterangan 1 ============================
+        // ======================================================================================
+        $x = 22;
+        $ln = 1.5;
+        $pdf->Ln(4);
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell(135,$h,'Yang bertandatangan di bawah ini menerangkan bahwa : ',$border,0,'L');
+        $pdf->Cell(15,$h,'',$border,0,'L');
+        $pdf->Cell(10,4,'',0,1);//memberikan enter/jarak ke bawah
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell(135,$h,'This is  to certify that',$border,0,'L');
+        $pdf->Cell(15,$h,'',$border,0,'L');
+        $pdf->Cell(10,7,'',0,1);
+        $pdf->Ln(6);
+        //========================================================================================
+        //========================================================================================
+        $pdf->Ln(1.5);
+        $x = 22;
+        $ln = 1.5;
+        $label = 65; // memberikan jarak : dengan tulisan
+        $sp = 3.5;
+        $fill = 100;
+        $fillFull = $label + $sp + $fill;
+        $border = 0;
+        $Kelamin = '';
+
+        // ===== Name =====
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($label,$h,'Nama  ',$border,0,'L');
+        $pdf->Cell($sp,$h,':',$border,0,'C');
+        // $pdf->Cell($fill,$h,$Student['Name'],$border,0,'L');
+        // $pdf->SetX(65);
+        $pdf->Cell($fill,$h,ucwords(strtolower($Student['Name'])),$border,0,'L');
+
+        $pdf->SetX(5);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell(68,$h,'/ Name',$border,1,'C');
+
+        $pdf->Ln($ln);
+        // ===== TTL =====
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($label,$h,'Tempat, Tanggal Lahir',$border,0,'L');
+        $pdf->Cell($sp,$h,':',$border,0,'C');
+        $pdf->Cell($fill,$h,$Student['PlaceOfBirth'].', '.$this->getDateIndonesian($Student['DateOfBirth']),$border,0,'L');
+        $pdf->SetX(61);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell($label,$h,'/  Date of birth',$border,1,'L');
+        $pdf->Ln(1.5);
+        // ===== NIM =====
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($label,$h,'Nomor Induk Mahasiswa',$border,0,'L');
+        $pdf->Cell($sp,$h,':',$border,0,'C');
+        $pdf->Cell($fill,$h,$Student['NPM'],$border,0,'L');
+        $pdf->SetX(64);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell($label,$h,'/  Student ',$border,1,'L');
+        $pdf->SetX(22);
+        $pdf->Cell($label,$h,'ID Number',$border,0,'L');
+        $pdf->Ln(5);
+
+         // ===== Fakultas/Faculty =====
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($label,$h,'Fakultas',$border,0,'L');
+        $pdf->Cell($sp,$h,':',$border,0,'C');
+        $pdf->Cell($fill,$h,$Student['Faculty'],$border,0,'L');
+
+        if ($Student['Faculty'][0]=='T') 
+        {
+            $pdf->SetX(103);  
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['FacultyEng'],$border,0,'L');   
+        }else{
+            $pdf->SetX(102);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['FacultyEng'],$border,0,'L');
+        }
+
+        $pdf->SetX(5);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell(78,$h,'/  Faculty',$border,1,'C');
+        $pdf->Ln($ln);
+
+        // ===== Prodi =====
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($label,$h,'Program Studi',$border,0,'L');
+        $pdf->Cell($sp,$h,':',$border,0,'C');
+        $pdf->Cell($fill,$h,$Student['Prodi'],$border,0,'L');
+
+        // print_r($Student['Prodi']);exit();
+
+        if ($Student['Prodi'][0]=='A') 
+        {
+            $pdf->SetX(108);  
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');   
+        }
+        else if ($Student['Prodi'][0]=='K')
+        {
+            $pdf->SetX(118);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+        }
+        else if ($Student['Prodi'][0]=='B')
+        {
+            $pdf->SetX(119);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+        }
+        else if ($Student['Prodi'][0]=='H')
+        {
+            $pdf->SetX(115);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+        }
+        else if ($Student['Prodi'][0]=='P')
+        {
+            $pdf->SetX(143);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+        }
+        else if ($Student['Prodi'][0]=='D')
+        {
+            $pdf->SetX(116);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+        }
+        else if ($Student['Prodi']=='Teknik Lingkungan')
+        {
+            $pdf->SetX(123);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+        }
+         else if ($Student['Prodi']=='Teknik Konstruksi Bangunan')
+        {
+            $pdf->SetX(137);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+        }
+
+        $pdf->SetX(47);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell(67,$h,'/  Study Program',$border,0,'L');
+
+        if ($Student['Prodi'][0]=='M') 
+        {
+            $pdf->SetX(152);  
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,'/',$border,1,'L');
+
+            $pdf->SetX(90.5);
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
+            // $pdf->Ln(4);
+        }
+        $pdf->Ln(5.5);
+
+        // ===== Program Pendidikan =====
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($label,$h,'Program Pendidikan',$border,0,'L');
+        $pdf->Cell($sp,$h,':',$border,0,'C');
+        $pdf->Cell($fill,$h,$Student['GradeDesc'],$border,0,'L');
+
+        // print_r($Student['GradeDesc'][0]);exit();
+
+        if ($Student['GradeDesc'][0]=='S')
+        {
+            $pdf->SetX(112);// S1
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,' /',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['GradeDescEng'],$border,0,'L');
+        }else{
+            $pdf->SetX(117);// D4
+            $pdf->SetFont('Arial','I',$fn_e);
+            $pdf->Cell($sp,$h,' /',$border,0,'L');
+            $pdf->Cell($fill,$h,$Student['GradeDescEng'],$border,0,'L');
+        }
+
+        $pdf->SetX(56);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell($label,$h,'/  Educational',$border,1,'L');
+        $pdf->SetX(22.1);
+        $pdf->Cell($label,$h,'Program',$border,1,'L');
+        $pdf->Ln($ln);
+        // ===== Status =====
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($label,$h,'Status',$border,0,'L');
+        $pdf->Cell($sp,$h,':',$border,0,'C');
+        $pdf->Cell($fill,$h,'Terakreditasi',$border,0,'L');
+
+        $pdf->SetX(113);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell($sp,$h,'/  Accredited',$border,0,'L');
+
+        // $pdf->SetX(37);
+        // $pdf->SetFont('Arial','I',$fn_e);
+        // $pdf->Cell($label,$h,'/ Status',$border,1,'L');                                      
+        $pdf->Ln(5);
+        // ===== Tanggal Yudisium =====
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($label,$h,'Tanggal Yudisium',$border,0,'L');
+        $pdf->Cell($sp,$h,':',$border,0,'C');
+        $pdf->Cell($fill,$h,$this->getDateIndonesian($Skls['DateOfYudisium']),$border,0,'L');
+
+        $pdf->SetX(53);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell($label,$h,'/  Date of Conferral',$border,1,'L');
+        $pdf->Cell(10,5,'',0,1);//memberikan enter/jarak ke bawah
+
+        // ===== Ket 2 =====
+        // $pdf->SetX($x);
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($fillFull,$h,'Adalah benar mahasiswa yang telah menempuh studi dan menyelesaikan seluruh persyaratan kelulusan',$border,1,'L');
+        $pdf->SetX($x);
+        $pdf->Cell($fillFull,$h,'menjadi '.$Student['Degree'].' pada Semester Ganjil Tahun Akademik 2018/2019',$border,1,'L');
+        $pdf->SetX($x);
+        $pdf->Cell($fillFull,$h,'di Universitas Agung Podomoro.',$border,1,'L');
+        $pdf->Ln(1);
+
+        if ($Student['Gender'][0]=='P') 
+        {
+            $Kelamin='Her'; //kolom disesuaikan      
+        }else{
+            $Kelamin='His';
+        }
+
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','I',$fn_e);
+        $pdf->Cell($fillFull,$h,'Had completed '.$Kelamin.' studies and qualification to earn Bachelor Degree in the Odd Semester of Academic Year',$border,1,'L');
+        $pdf->SetX($x);
+        $pdf->Cell($fillFull,$h,'2018/2019 at Podomoro University.',$border,1,'L');
+        $y = $pdf->GetY()+7;
+        $pdf->Ln(4);
+        // $pdf->Cell(10,5,'',0,1);//memberikan enter/jarak ke bawah
+
+        // ===== Ket 2 =====
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($fillFull,$h,'Ijazah yang bersangkutan masih dalam proses.',$border,1,'L');
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','I',$fn_e);
+
+
+        if ($Student['Gender'][0]=='P') 
+        {
+            $Kelamin='Her'; //kolom disesuaikan      
+        }else{
+            $Kelamin='His';
+        }
+
+        // print_r($Kelamin);exit(); 
+        $pdf->Cell($fillFull,$h,$Kelamin. ' certificate is in process.',$border,1,'L');
+        $y = $pdf->GetY()+7;
+        $pdf->Ln(4);
+        // $pdf->Cell(10,5,'',0,1);//memberikan enter/jarak ke bawah
+
+        // ===== Ket 2 =====
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($fillFull,$h,'Demikian Surat Keterangan ini dibuat untuk dapat dipergunakan sebagaimana mestinya.',$border,1,'L');
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','I',$fn_e);
+
+        $pdf->Cell($fillFull,$h,'This letter is issued by the Academic Administration and should be used accordingly.',$border,1,'L');
+        $y = $pdf->GetY()+7;
+        $pdf->Ln(15);
+
+        //================ Tanda tangan =======================
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($fillFull,$h,'Hormat kami,',$border,1,'L');
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','I',$fn_i);
+        $pdf->Cell($fillFull,$h,'Best Regards,',$border,1,'L');
+        $y = $pdf->GetY()+7;
+        $pdf->Ln(35);
+
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','BU',$fn_b);
+        $pdf->Cell($fillFull,$h,'Johana Rosalina Kristyanti, Ph. D',$border,1,'L');
+        //================ hormat kami ========================
+        //================ Tanda tangan =======================
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','',$fn_b);
+        $pdf->Cell($fillFull,$h,'Wakil Rektor Akademik & Kemahasiswaan',$border,1,'L');
+        $pdf->SetX($x);
+        $pdf->SetFont('Arial','I',$fn_i);
+        $pdf->Cell($fillFull,$h,'Vice Rector of Academic & Student Affairs',$border,1,'L');
+        $y = $pdf->GetY()+7;
+        $pdf->Ln(15);
+        //================ hormat kami ========================
+        
+
+        $nameF = str_replace(' ','_',strtoupper($Student['Name']));
+        $pdf->Output('SKLS_'.$Student['NPM'].'_'.$nameF.'.pdf','I');
+    }
+//===================================================================
+//===================================================================
+
 
 
     function GenerateWord()
@@ -4996,6 +5371,417 @@ Phone: (021) 29200456';
         $fpdf->Output('receipt.pdf','I');
     }
 
+    /* PR Budgeting */
+    public function print_prdeparment()
+    {
+        try {
+          $token = $this->input->post('token');
+          $this->load->model('budgeting/m_budgeting');
+          $this->load->model('master/m_master');
+
+          $input = $this->getInputToken($token);
+          $PRCode = $input['PRCode'];
+          $PRCodeReplace = str_replace('/', '-', $PRCode);
+          $filename = '__'.$PRCodeReplace.'.pdf';  
+
+          $pr_create = $this->m_budgeting->GetPR_CreateByPRCode($PRCode);
+          $pr_detail = $this->m_budgeting->GetPR_DetailByPRCode($PRCode);
+
+          $fpdf = new Pdf_mc_table('L', 'mm', 'A4');
+          $fpdf->SetMargins(10,10,10,10);
+          $fpdf->AddPage();
+
+          $x = 10;
+          $y = 30;
+          $FontIsianHeader = 8;
+          $FontIsian = 7;
+          $rect_h = 20;
+
+          // Logo
+          $fpdf->Image('./images/logo_tr.png',10,10,50);
+
+          // note from finance
+          $fpdf->Rect($x,$y,130,$rect_h);
+          $fpdf->SetXY(($x+2),($y+2) );
+          $fpdf->SetFont('Arial','b',$FontIsianHeader);
+          $fpdf->Cell(0, 0, 'Notes From Finance : ', 0, 1, 'L', 0);
+
+          // Header Purchase Requisition(PR)
+          $hx = 180;
+          $hy = 15;
+          $fpdf->SetXY($hx,$hy);
+          $fpdf->SetFont('Arial','b',10);
+          $fpdf->Cell(0, 0, 'Purchase Requisition (PR)', 0, 1, 'L', 0);
+
+          $hy += 5;
+          $fpdf->SetXY($hx,$hy);
+          $fpdf->SetFont('Arial','b',$FontIsianHeader);
+          $fpdf->Cell(0, 0, 'No : '.$PRCode, 0, 1, 'L', 0);
+
+          $DatePR = date("d M Y", strtotime($pr_create[0]['CreatedAt']));
+          $hy += 5;
+          $fpdf->SetXY($hx,$hy);
+          $fpdf->SetFont('Arial','b',$FontIsianHeader);
+          $fpdf->Cell(0, 0, 'Date : '.$DatePR, 0, 1, 'L', 0);
+
+          // Department & Post Budget
+          $Department = $this->m_budgeting->SearchDepartementBudgeting($pr_create[0]['Departement']);
+          $Department = $Department[0]['Code'];
+          $hx = 150;
+          $hy = 30;
+          $fpdf->Rect($hx,$hy,130,$rect_h);
+          $hx = $hx + 2;
+          $hy = $hy + 2;
+          $fpdf->SetXY($hx,$hy);
+          $fpdf->SetFont('Arial','b',$FontIsianHeader);
+          $fpdf->Cell(0, 0, 'Department : '.$Department, 0, 1, 'L', 0);
+
+          // print_r($pr_detail);die();
+          $arr_postName = [];
+          for ($i=0; $i < count($pr_detail); $i++) { 
+                $PostName = $pr_detail[$i]['PostName'].'['.$pr_detail[$i]['NameDepartement'].']';
+                $bool = true;
+                for ($j=0; $j < count($arr_postName); $j++) { 
+                    if ($PostName == $arr_postName[$j]) {
+                        $bool = false;
+                        break;
+                    }
+                }
+
+                if ($bool) {
+                    $arr_postName[] = $PostName;
+                }
+
+          }
+
+          $strpostname = implode(',',$arr_postName);
+
+          $hy += 5;
+          $fpdf->SetXY($hx,$hy);
+          $fpdf->SetFont('Arial','b',$FontIsianHeader);
+          $fpdf->Cell(0, 0, 'Post Budget : '.$strpostname, 0, 1, 'L', 0);
+
+          // make table
+            $border = 1;
+            // header
+            $w_no = 8;
+            $w_smt = 8;
+            $w_desc = 55;
+            $w_spec = 65;
+            $w_date_needed = 50;
+            $w_qty = 22;
+            $w_pricest = 35;
+            $w_totalammount = 35;
+            $h=4.4;
+            $y += $rect_h+2;
+            $fpdf->SetXY($x,$y);
+            $fpdf->SetFillColor(255, 255, 255);
+             $fpdf->Cell($w_no,$h,'No.',$border,0,'C',true);
+             $fpdf->Cell($w_desc,$h,'Description',$border,0,'C',true);
+             $fpdf->Cell($w_spec,$h,'Specification',$border,0,'C',true);
+             $fpdf->Cell($w_date_needed,$h,'Need',$border,0,'C',true);
+             $fpdf->Cell($w_qty,$h,'Quantity',$border,0,'C',true);
+             $fpdf->Cell($w_pricest,$h,'Price Estimated',$border,0,'C',true);
+             $fpdf->Cell($w_totalammount,$h,'Total Amount',$border,1,'C',true);
+
+             // content
+              $no = 1;
+              $fpdf->SetFont('Arial','',$FontIsian);
+              $total = 0;
+              $fpdf->SetWidths(array($w_no,$w_desc,$w_spec,$w_date_needed,$w_qty,$w_pricest,$w_totalammount));
+              $fpdf->SetLineHeight(5);
+              $fpdf->SetAligns(array('C','L','L','L','C','C','C'));
+             for ($i=0; $i < count($pr_detail); $i++) {
+
+                $DetailCatalog = (array) json_decode($pr_detail[$i]['DetailCatalog']);
+                $Spec = '';
+                $arr = array();
+                foreach ($DetailCatalog as $key => $value) {
+                    $arr[] = $key.' : '.$value; 
+                }
+
+                $Spec = implode(',', $arr);
+                if ($pr_detail[$i]['Spec_add'] != '' || $pr_detail[$i]['Spec_add'] != null) {
+                   $Spec = $pr_detail[$i]['Spec_add']."\n".implode(',', $arr);
+                }
+                
+                
+                $DateNeeded = 'Date : '.date("d M Y", strtotime($pr_detail[0]['DateNeeded']));
+                if ($pr_detail[$i]['Need'] != '' || $pr_detail[$i]['Need'] != null) {
+                    $DateNeeded .= "\n".'Need : '.$pr_detail[$i]['Need'];
+                }
+                
+                $UnitCost = 'Rp '.number_format($pr_detail[$i]['UnitCost'],2,',','.');
+                $Subtotal= 'Rp '.number_format($pr_detail[$i]['SubTotal'],2,',','.');
+                $fpdf->Row(array(
+                   $no,
+                   $pr_detail[$i]['Item'],
+                   $Spec,
+                   $DateNeeded,
+                   $pr_detail[$i]['Qty'],
+                   $UnitCost,
+                   $Subtotal,
+
+                ));
+
+                $total = $total + $pr_detail[$i]['SubTotal'];
+                $no++;
+                $y += $h; 
+             }
+
+             $Max = 10;
+             $h=4.4;
+             for ($i=0; $i <$Max - count($pr_detail) ; $i++) { 
+                 $fpdf->Cell($w_no,$h,'' ,$border,0,'C',true);
+                 $fpdf->Cell($w_desc,$h,'',$border,0,'C',true);
+                 $fpdf->Cell($w_spec,$h,'',$border,0,'L',true);
+                 $fpdf->Cell($w_date_needed,$h,'',$border,0,'C',true);
+                 $fpdf->Cell($w_qty,$h,'',$border,0,'C',true);
+                 $fpdf->Cell($w_pricest,$h,'',$border,0,'C',true);
+                 $fpdf->Cell($w_totalammount,$h,'',$border,1,'C',true);
+                 $y += $h;
+             }
+
+             $y = $fpdf->GetY();
+             $x = $x +$w_no+$w_desc+$w_spec;
+             $rsPPN = ($pr_create[0]['PPN'] / 100) * $total;
+             $totAfterPPN = $total + $rsPPN;
+             $totAfterPPN= 'Rp '.number_format($totAfterPPN,2,',','.');
+             $rsPPN= 'Rp '.number_format($rsPPN,2,',','.');
+             $total= 'Rp '.number_format($total,2,',','.');
+             $fpdf->SetXY($x,$y);
+             $fpdf->Cell(($w_date_needed+$w_qty+$w_pricest),$h,'Total',$border,0,'C',true);
+             $fpdf->Cell($w_totalammount,$h,$total,$border,1,'C',true);
+             // PPN
+             $y += $h;
+             $fpdf->SetXY($x,$y);
+             $fpdf->SetFillColor(226, 226, 226);
+             $fpdf->Cell(($w_date_needed+$w_qty+$w_pricest),$h,'PPN '.(int)$pr_create[0]['PPN'].'%',$border,0,'C',true);
+             $fpdf->Cell($w_totalammount,$h,$rsPPN,$border,1,'C',true);
+             // total setelah ppn
+             $y += $h;
+             $fpdf->SetXY($x,$y);
+             $fpdf->SetFillColor(255, 255, 255);
+             $fpdf->Cell(($w_date_needed+$w_qty+$w_pricest),$h,'Total setelah PPN ',$border,0,'C',true);
+             $fpdf->Cell($w_totalammount,$h,$totAfterPPN,$border,1,'C',true);
+
+             // Notes
+             $y += 10;
+             $x = 10;
+             $JsonStatus = (array) json_decode($pr_create[0]['JsonStatus'],true);
+             $maxWrec = 130;
+             $Wrec = $maxWrec - ( (count($JsonStatus) - 1) * 20 );
+             $fpdf->Rect($x,$y,$Wrec,$rect_h);
+             $fpdf->SetXY(($x+2),($y+2) );
+             $fpdf->SetFont('Arial','b',$FontIsianHeader);
+             $fpdf->Cell(0, 0, 'Notes : ', 0, 0, 'L', 0);
+
+             $fpdf->SetXY(($x+2),($y+5) );
+             $fpdf->SetFont('Arial','',$FontIsian);
+             $fpdf->MultiCell(($Wrec - 10), 3, $pr_create[0]['Notes'], 0, 1, 'L', 0);
+
+
+             // signature
+             $x = $Wrec + 20;
+             $w_requested = 20;
+             $w_approved = 35;
+             $h_signature = 15;
+             $fpdf->SetXY($x,$y);
+             $fpdf->SetFont('Arial','',$FontIsian);
+             $fpdf->SetFillColor(226, 226, 226);
+             $fpdf->Cell($w_requested,$h,'Requested By',$border,0,'C',true);
+
+             for ($i=0; $i < count($JsonStatus); $i++) { 
+                 $fpdf->Cell($w_approved,$h,'Approved By',$border,0,'C',true);
+             }
+
+             $y += $h;
+             $fpdf->SetXY($x,$y);
+             $fpdf->SetFillColor(255, 255, 255);
+             $fpdf->Cell($w_requested,$h_signature,'',$border,0,'C',true);
+             for ($i=0; $i < count($JsonStatus); $i++) {    
+                 $fpdf->Cell($w_approved,$h_signature,'',$border,0,'C',true);
+             }
+
+             $CreatedBy = $pr_create[0]['CreatedBy'];
+             $G_CreatedBy = $this->m_master->caribasedprimary('db_employees.employees','NIP',$CreatedBy);
+             $NameRequester = $G_CreatedBy[0]['Name'];
+             $y += $h_signature;
+             $fpdf->SetXY($x,$y);
+             $fpdf->SetFillColor(255, 255, 255);
+             $fpdf->Cell($w_requested,$h,$NameRequester,$border,0,'C',true);
+             for ($i=0; $i < count($JsonStatus); $i++) {
+                 $Approver = $JsonStatus[$i]['ApprovedBy'];
+                 $G_CreatedBy = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Approver);
+                 $NameApprover = $G_CreatedBy[0]['Name'];    
+                 $fpdf->Cell($w_approved,$h,$NameApprover,$border,0,'C',true);
+             }
+
+             $y += $h;
+             $fpdf->SetXY($x,$y);
+             $fpdf->SetFont('Arial','b',$FontIsianHeader);
+             $fpdf->SetFillColor(255, 255, 255);
+             $fpdf->Cell($w_requested,$h,'Date : ',$border,0,'L',true);
+             for ($i=0; $i < count($JsonStatus); $i++) {
+                 $fpdf->Cell($w_approved,$h,'Date : ',$border,0,'L',true);
+             }
+
+
+             // watermark
+                if ($pr_create[0]['Status'] ==  2) {
+                    $fpdf->SetFont('Arial','B',50);
+                    $fpdf->SetTextColor(255,192,203);
+                    $fpdf->RotatedText(35,190,'Approve',35);  
+                }
+                elseif ($pr_create[0]['Status'] ==  3) {
+                    $fpdf->SetFont('Arial','B',50);
+                    $fpdf->SetTextColor(255,192,203);
+                    $fpdf->RotatedText(35,190,'Reject',35); 
+                }
+                 
+               
+
+             // show image in the next page
+                 $arr_image = array();
+                 for ($i=0; $i < count($pr_detail); $i++) { 
+                     if ($pr_detail[$i]['UploadFile'] == '' || $pr_detail[$i]['UploadFile'] == null) {
+                         $PhotoCatalog = $pr_detail[$i]['Photo'];
+                         if ($PhotoCatalog != '' && $PhotoCatalog != null) {
+                             $url_arr = array(
+                                'url' => './uploads/budgeting/catalog/'.$PhotoCatalog,
+                                'Name' => $PhotoCatalog,
+                             );
+                             // search name is exist
+                             $bool = false;
+                             for ($j=0; $j < count($arr_image); $j++) { 
+                                 $Name = $arr_image[$j]['Name'];
+                                 if ($Name == $url_arr['Name']) {
+                                     $bool = true;
+                                     break;
+                                 }
+                             }
+                             if (!$bool) {
+                                 $arr_image[] = $url_arr;
+                             }
+                             
+                         }
+                     }
+                     else
+                     {
+                        $Photo = $pr_detail[$i]['UploadFile'];
+                        $Photo = (array)json_decode($Photo,true);
+                        
+                        for ($ll=0; $ll < count($Photo); $ll++) { 
+                            $url_arr = array(
+                               'url' => './uploads/budgeting/pr/'.$Photo[$ll],
+                               'Name' => $Photo[$ll],
+                            );
+                            // search name is exist
+                            $bool = false;
+                            for ($j=0; $j < count($arr_image); $j++) { 
+                                $Name = $arr_image[$j]['Name'];
+                                if ($Name == $url_arr['Name']) {
+                                    $bool = true;
+                                    break;
+                                }
+                            }
+                            if (!$bool) {
+                                $arr_image[] = $url_arr;
+                            }
+                        }
+                       
+                     }
+                 }
+                 // end show image in the next page
+               
+            // for ($i=0; $i < count($arr_image); $i++) { 
+            //     $fpdf->AddPage();
+            //     $fpdf->Image($arr_image[$i]['url'],100,40,100);
+            // }
+
+          $fpdf->Output($filename,'I');  
+
+            
+        } catch (Exception $e) {
+            // handling orang iseng
+            echo $e;
+            // echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    /* End PR Budgeting */
+
+    public function PrintIDCard()
+    {
+        try {
+          $token = $this->input->post('token');
+          $input = $this->getInputToken($token);
+          $input = (array) json_decode(json_encode($input),true);
+          $customlayout=array('53.98','85.60');
+          $pdf = new FPDF('P','mm',$customlayout);
+          for ($i=0; $i < count($input); $i++) { 
+             $pdf->AddFont('dinproExpBold','','dinproExpBold.php');
+             $pdf->AddPage();
+             $pdf->SetAutoPageBreak(true, 0);
+             $pdf->Image($input[$i]['PathFoto'],10,26,34);
+             $template_format = ($input[$i]['type'] == 'student') ? base_url('images/id_mhs.png') : base_url('images/id_emp.png');
+             $pdf->Image($template_format,0,0,54);
+             $pdf->SetXY(10,63);
+             $pdf->SetFont('dinproExpBold','',12);
+             $pdf->SetTextColor(247, 194, 74);
+             $pdf->Cell(0,5,$input[$i]['Name'],0,0,'C');
+             $pdf->SetXY(10,68.5);
+             $pdf->SetFont('dinpromedium','',10);
+             $pdf->SetTextColor(255,255,255);
+             $pdf->Cell(0,5,$input[$i]['NPM'],0,0,'C');
+             $pdf->SetXY(10,73);
+             $pdf->SetFont('dinpromedium','',5);
+             $pdf->SetTextColor(255,255,255);
+             $pdf->Cell(0,5,$input[$i]['email'],0,0,'C');
+          }
+         
+         $pdf->Output('I','ID_Card.pdf');
+
+            
+        } catch (Exception $e) {
+            // handling orang iseng
+            echo $e;
+            // echo '{"status":"999","message":"jangan iseng :D"}';
+        }
+    }
+
+    public function create_idCard(){
+
+        $customlayout=array('53.98','85.60');
+
+        $pdf = new FPDF('P','mm',$customlayout);
+        $pdf->AddFont('dinproExpBold','','dinproExpBold.php');
+
+        $pdf->AddPage();
+
+        $pdf->SetAutoPageBreak(true, 0);
+
+
+        $pdf->Image(base_url('images/45.png'),10,26,34);
+        $pdf->Image(base_url('images/id_emp.png'),0,0,54);
+
+        $pdf->SetXY(10,63);
+        $pdf->SetFont('dinproExpBold','',14);
+        $pdf->SetTextColor(247, 194, 74);
+        $pdf->Cell(0,5,'Nandang Mulyadi',0,0,'C');
+
+        $pdf->SetXY(10,69);
+        $pdf->SetFont('dinpromedium','',12);
+        $pdf->SetTextColor(255,255,255);
+        $pdf->Cell(0,5,'2017090',0,0,'C');
+
+        $pdf->SetXY(10,73);
+        $pdf->SetFont('dinpromedium','',5);
+        $pdf->SetTextColor(255,255,255);
+        $pdf->Cell(0,5,'nandang.mulyadi@podomorouniversity.ac.id',0,0,'C');
+
+        $pdf->Output('I','Monitoring_Attendance_Lecturer.pdf');
+    }
 
 
 
