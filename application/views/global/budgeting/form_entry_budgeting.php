@@ -337,7 +337,7 @@ function makeRowAdd_del(dt)
 {
 	var Month = ClassDt.arr_bulan;
 	// get last NO 
-	var No = $(".numberNO:last").text();
+	// var No = $(".numberNO:last").text();
 	for (var i = 0; i < dt.length; i++) {
 		var aa = $('.PostBudget').find('option[value="'+dt[i].CodePostRealisasi+'"]');
 		if (!aa.length) {
@@ -349,9 +349,9 @@ function makeRowAdd_del(dt)
 			}
 
 			html += '<div class = "row ContentDataPostBudget" style = "margin-left : 10px;margin-right : 10px;margin-top : 10px">';
-			No = parseInt(No) +i + 1;
+			// No = parseInt(No) +i + 1;
 			html += '<div class = "col-md-1 Custom-PostBudget">'+
-						'<span class = "numberNO">'+No+'</span>&nbsp'+
+						'<span class = "numberNO">'+''+'</span>&nbsp'+
 						'<select class="select2-select-00 full-width-fix PostBudget Custom-select2">'+
 							'<option value ="'+dt[i]['CodePostRealisasi']+'" selected CodePost = "'+dt[i]['CodePost']+'" CodeHeadAccount="'+dt[i]['CodeHeadAccount']+'">'+dt[i]['RealisasiPostName']+'</option>'+
 						 '</select>'+
@@ -413,12 +413,24 @@ function makeRowAdd_del(dt)
 	if (row.length) {
 		ProsesOneRow(row);
 	}
+
+	// make number
+	MakeNumber();
 	
 }
 
 $(document).off('click', '#example-select-all').on('click', '#example-select-all',function(e) {
     $('input.uniform').not(this).prop('checked', this.checked);
 });
+
+function MakeNumber()
+{
+	var No = 0;
+	$('.numberNO').each(function(){
+		No++;
+		$(this).html(No);
+	})
+}
 
 function makeContent()
 {
