@@ -26,6 +26,21 @@ class C_it extends It_Controler {
       $this->temp($content);
     }
 
+    public function version_data(){
+      $department = parent::__getDepartement();
+      //print_r($department);
+      $data['ProdiArr'] = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
+      $page = $this->load->view('page/'.$department.'/version/version_data',$data,true);
+      $this->temp($page);
+      //$this->tab_menuacademic($page);
+      
+
+      //$data['department'] = parent::__getDepartement();
+      //$content = $this->load->view('dashboard/dashboard',$data,true);
+      //$this->temp($content);
+
+    }
+
     
 
 }

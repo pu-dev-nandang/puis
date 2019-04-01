@@ -833,6 +833,13 @@ class M_api extends CI_Model {
         $query=$this->db->query($sql);
 
      }
+
+      public function deletelistversion($versionid){
+
+        $sql = "UPDATE db_it.version SET Active='0' WHERE IDVersion = '".$versionid."' ";
+        $query=$this->db->query($sql);
+
+     }
     
     // ====== Get Jadwal Per Day =======
 

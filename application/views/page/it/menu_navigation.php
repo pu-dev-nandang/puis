@@ -178,6 +178,20 @@ if ($this->uri->segment(1) == 'dashboard') {
 
              ?>
         </ul>
+ 
+        <ul id="nav">
+
+        <li class="<?php if($this->uri->segment(2)=='version'){echo"current";}?>">
+                <a href="<?php echo base_url('it/version');?>">
+                    <i class="fa fa-copyright"></i>
+                    Master Version
+                </a>
+            </li>
+
+         </ul>
+
+
+
         <div class="sidebar-widget align-center">
             <div class="btn-group" data-toggle="buttons" id="theme-switcher">
                 <label class="btn active">
