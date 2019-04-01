@@ -932,6 +932,8 @@ $route['api2/__getSemesterOptionStudent/(:num)'] = 'api/c_api2/getSemesterOption
 $route['api2/__crudAnnouncement'] = 'api/c_api2/crudAnnouncement';
 $route['api2/__changePasswordStudent'] = 'api/c_api2/changePasswordStudent';
 
+$route['api2/__crudSemesterAntara'] = 'api/c_api2/crudSemesterAntara';
+
 $route['api3/login'] = 'api/c_mobile/login';
 $route['api3/__readGlobalInfo'] = 'api/c_mobile/readGlobalInfo';
 $route['test_mobile'] = 'api/c_mobile/test_mobile';

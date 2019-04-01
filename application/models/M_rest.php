@@ -41,6 +41,18 @@ class M_rest extends CI_Model {
         return $data->result_array()[0];
     }
 
+    public function _getSemesterAntaraActive(){
+
+        $data = $this->db->query('SELECT sa.*, say.MaxCredit, say.Start, say.End, say.StartUTS, say.EndUTS, say.StartUAS, say.EndUAS  
+                                              FROM db_academic.semester_antara sa
+                                              LEFT JOIN db_academic.sa_academic_years say ON (say.SASemesterID = sa.ID) 
+                                              WHERE sa.Status = "1" ')->result_array();
+
+//        $data = $this->db->limit(1)->get_where('db_academic.semester_antara',array('Status' => '1'))->result_array();
+
+        return $data;
+    }
+
     public function __getKSM($db,$ProdiID,$NPM,$ClassOf){
         $dataSemester = $this->db->query('SELECT s.* FROM db_academic.semester s WHERE s.Year >= '.$ClassOf.' ORDER BY s.ID ASC')->result_array();
 

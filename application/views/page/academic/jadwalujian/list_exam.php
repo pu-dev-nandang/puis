@@ -146,24 +146,28 @@
                     '    <tr>' +
                     '        <th rowspan="2" style="width: 2%;">N0</th>' +
                     '        <th rowspan="2">Name</th>' +
-                    '        <th rowspan="2" style="width: 13%;">Attd</th>' +
-                    '        <th colspan="2" style="width: 35">Payment</th>' +
-                    '        <th rowspan="2" style="width: 13%;">Exam Attd</th>' +
+                    '        <th rowspan="2" style="width: 7%;">Attd</th>' +
+                    '        <th colspan="2" style="width: 22">Payment</th>' +
+                    '        <th rowspan="2" style="width: 10%;">Exam Attd</th>' +
+                    '        <th rowspan="2" style="width: 10%;">Set. Attd</th>' +
                     '    </tr>' +
                     '    <tr>' +
-                    '       <th style="width: 17%">BPP</th>' +
-                    '       <th style="width: 17%">Credit</th>' +
+                    '       <th style="width: 11%">BPP</th>' +
+                    '       <th style="width: 11%">Credit</th>' +
                     '   </tr>' +
                     '    </thead>' +
                     '    <tbody id="dataMHSExam"></tbody>' +
                     '    <tbody id="dataMHSExam2">' +
                     '       <tr sty]e="backgroung : #CCC;">' +
                     '           <td colspan="5">Total</td>' +
-                    '           <td id="viewTotalAttd" "></td>' +
+                    '           <td id="viewTotalAttd"></td>' +
                     '       </tr>' +
                     '   </tbody>' +
                     '</table>' +
                     '';
+
+
+                $('#GlobalModal .modal-dialog').css('width','830px');
                 $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
                     '<h4 class="modal-title">Details Student</h4>');
                 $('#GlobalModal .modal-body').html(dataHtml);
@@ -198,13 +202,22 @@
                        p += 1;
                    }
 
+                   var valAttd = (d.Status==1 || d.Status=='1') ? 'checked' : '';
+
+                   var setAttd = '<div class="checkbox" style="margin: 0px;">' +
+                       '    <label>' +
+                       '      <input type="checkbox" class="checkAttd" data-id="'+d.ID+'" '+valAttd+'> Present' +
+                       '    </label>' +
+                       '  </div>'
+
                     $('#dataMHSExam').append('<tr>' +
                         '<td>'+(no_std++)+'</td>' +
                         '<td style="text-align: left;"><b>'+d.Name+'</b><br/>'+d.NPM+'</td>' +
                         '<td>'+AttdPercentage.toFixed()+' %</td>' +
                         '<td>'+BPP+'</td>' +
                         '<td>'+Credit+'</td>' +
-                        '<td style="background: #f4f4f4">'+ExamAttd+'</td>' +
+                        '<td style="background: #f4f4f4" id="td_attd'+d.ID+'" >'+ExamAttd+'</td>' +
+                        '<td>'+setAttd+'</td>' +
                         '</tr>');
                 }
 
@@ -218,6 +231,33 @@
             }
 
         });
+    });
+
+    $(document).on('click','.checkAttd',function () {
+
+        var ID = $(this).attr('data-id');
+
+        var Status = ($(this).is(':checked')) ? 1 : 0;
+
+        var ExamAttd = (Status==1 || Status=='1') ? '<span class="label label-success">P</span>'
+            : '<span class="label label-danger">A</span>';
+
+
+        var data = {
+            action : 'updateAttendanceExamSAS',
+            ID : ID,
+            Status : Status
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+
+        var url = base_url_js+'api/__crudJadwalUjian';
+
+        $.post(url,{token:token},function (result) {
+            toastr.success('Attendance updated','Success');
+            $('#td_attd'+ID).html(ExamAttd);
+        });
+
     });
 
     // ==========================

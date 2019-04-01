@@ -2025,4 +2025,220 @@ class C_api2 extends CI_Controller {
 
     }
 
+    public function crudSemesterAntara(){
+        $data_arr = $this->getInputToken();
+
+        if($data_arr['action']=='readCourse'){
+
+            $NPM = $data_arr['NPM'];
+            $ProdiID = $data_arr['ProdiID'];
+            $ClassOf = $data_arr['ClassOf'];
+            $Semester = $data_arr['Semester'];
+
+            $db_ = 'ta_'.$ClassOf;
+
+            $w_semester = ($Semester!='' && $Semester!=0)
+                ? ' AND cd.Semester = "'.$Semester.'" ' : ' ' ;
+
+            $dataCID = $this->db->query('SELECT cd.Semester, mk.MKCode, mk.NameEng AS CoureEng, cd.ID AS CDID, cd.MKID, cd.TotalSKS AS Credit  FROM db_academic.curriculum_details cd 
+                                              LEFT JOIN db_academic.curriculum cur ON (cur.ID = cd.CurriculumID)
+                                              LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
+                                              WHERE cur.Year = "'.$ClassOf.'" AND cd.ProdiID = "'.$ProdiID.'" '.$w_semester.'
+                                              GROUP BY cd.ID
+                                              ORDER BY cd.Semester ASC, mk.MKCode ASC
+                                              ')->result_array();
+
+            if(count($dataCID)>0){
+                for($i=0;$i<count($dataCID);$i++){
+                    $d = $dataCID[$i];
+
+                    $dataC = $this->db->query('SELECT ID AS SPID, Score, Grade, GradeValue, Credit FROM '.$db_.'.study_planning sp 
+                                                            WHERE sp.NPM = "'.$NPM.'" 
+                                                            AND sp.CDID = "'.$d['CDID'].'" 
+                                                            ORDER BY sp.Score DESC LIMIT 1 ')->result_array();
+
+                    // Cek apakah sudah di ambil atau belum
+                    $dataAmbil = $this->db->limit(1)->get_where('db_academic.sa_student_details',array(
+                        'NPM' => $NPM,
+                        'CDID' => $d['CDID']
+                    ))->result_array();
+
+                    $dataCID[$i]['DataGet'] = $dataAmbil;
+
+                    $dataCID[$i]['SP'] = $dataC;
+
+                }
+            }
+
+            return print_r(json_encode($dataCID));
+        }
+        else if($data_arr['action']=='readAcademicYearSA'){
+
+            $data = $this->m_rest->_getSemesterAntaraActive();
+
+            return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='enteredCourse'){
+
+            // Semester Antara Active
+            $dataSA = $this->m_rest->_getSemesterAntaraActive();
+
+            if(count($dataSA)>0){
+
+                $d_SA = $dataSA[0];
+
+                $NPM = $data_arr['NPM'];
+                $CDID = $data_arr['CDID'];
+                $MKID = $data_arr['MKID'];
+                $EntredAt = $data_arr['EntredAt'];
+
+                // Cek apakah sudah
+                $dataIns = array(
+                    'SASemesterID' => $d_SA['ID'],
+                    'NPM' => $NPM
+                );
+
+                $dataStd = $this->db->limit(1)->get_where('db_academic.sa_student',$dataIns)->result_array();
+
+
+                if(count($dataStd)>0){
+                    $IDSAStudent = $dataStd[0]['ID'];
+                } else {
+                    $dataIns['Mentor'] = $data_arr['Mentor'];
+                    $this->db->insert('db_academic.sa_student',$dataIns);
+                    $IDSAStudent = $this->db->insert_id();
+                }
+
+                // Insert Course
+                $dataCoursIns = array(
+                    'IDSAStudent' => $IDSAStudent,
+                    'NPM' => $NPM,
+                    'CDID' => $CDID,
+                    'MKID' => $MKID,
+                    'EntredAt' => $EntredAt
+                );
+                $this->db->insert('db_academic.sa_student_details',$dataCoursIns);
+            }
+
+            return print_r(1);
+
+
+        }
+        else if($data_arr['action']=='readSelectedCourse'){
+            // Semester Antara Active
+            $dataSA = $this->m_rest->_getSemesterAntaraActive();
+
+            $result = [];
+
+            if(count($dataSA)>0){
+
+
+                $NPM = $data_arr['NPM'];
+                $db_ = 'ta_'.$data_arr['ClassOf'];
+
+                $d_SA = $dataSA[0];
+                // Cek apakah sudah
+                $dataIns = array(
+                    'SASemesterID' => $d_SA['ID'],
+                    'NPM' => $NPM
+                );
+
+                $dataStd = $this->db->limit(1)->get_where('db_academic.sa_student',$dataIns)->result_array();
+
+                if(count($dataStd)>0){
+                    $IDSAStudent = $dataStd[0]['ID'];
+
+                    $dataCID = $this->db->query('SELECT cd.Semester, mk.MKCode, mk.NameEng AS CoureEng, cd.ID AS CDID, cd.MKID, cd.TotalSKS AS Credit,  
+                                                            ssd.Reson, ssd.ApprovedPAAt, ssd.ApprovedPABy, ssd.Status, ssd.ID SSDID
+                                                            FROM db_academic.sa_student_details ssd
+                                                            LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = ssd.CDID)
+                                                            LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssd.MKID)
+                                                            WHERE ssd.IDSAStudent = "'.$IDSAStudent.'" ')->result_array();
+
+                    if(count($dataCID)>0){
+                        for($i=0;$i<count($dataCID);$i++){
+                            $d = $dataCID[$i];
+
+                            $dataC = $this->db->query('SELECT ID AS SPID, Score, Grade, GradeValue, Credit FROM '.$db_.'.study_planning sp 
+                                                            WHERE sp.NPM = "'.$NPM.'" 
+                                                            AND sp.CDID = "'.$d['CDID'].'" 
+                                                            ORDER BY sp.Score DESC LIMIT 1 ')->result_array();
+
+                            $dataCID[$i]['SP'] = $dataC;
+
+                        }
+                    }
+
+                    $result = $dataCID;
+                }
+
+            }
+
+            return print_r(json_encode($result));
+        }
+        else if($data_arr['action']=='deleteCourseSA'){
+
+            $SSDID = $data_arr['SSDID'];
+
+            $this->db->where('ID', $SSDID);
+            $this->db->delete('db_academic.sa_student_details');
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='saSend2Mentor'){
+
+            $dataSA = $this->m_rest->_getSemesterAntaraActive();
+
+            if(count($dataSA)>0){
+
+                $d_SA = $dataSA[0];
+                $NPM = $data_arr['NPM'];
+
+
+                $dataIns = array(
+                    'SASemesterID' => $d_SA['ID'],
+                    'NPM' => $NPM
+                );
+
+                $dataStd = $this->db->limit(1)->get_where('db_academic.sa_student',$dataIns)->result_array();
+
+
+                if(count($dataStd)>0){
+                    $IDSAStudent = $dataStd[0]['ID'];
+
+                    $this->db->set('RequestedAt', $this->m_rest->getDateTimeNow());
+                    $this->db->where('ID', $IDSAStudent);
+                    $this->db->update('db_academic.sa_student');
+
+                    // Get dengan status == 0
+                    $dataSD = $this->db->get_where('db_academic.sa_student_details',array(
+                        'IDSAStudent' => $IDSAStudent,
+                        'Status' => '0'
+                    ))->result_array();
+
+                    if(count($dataSD)>0){
+                        foreach ($dataSD AS $item){
+
+                            $this->db->set('Status', '1');
+                            $this->db->where('ID', $item['ID']);
+                            $this->db->update('db_academic.sa_student_details');
+                            $this->db->reset_query();
+
+                        }
+                    }
+
+                }
+
+            }
+
+            return print_r(1);
+
+        }
+
+    }
+
+
+
 }
