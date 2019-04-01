@@ -4387,11 +4387,23 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action']=='updateAttendanceExamSAS'){
                 $ID = $data_arr['ID'];
+                $ExamID = $data_arr['ExamID'];
                 $Status = $data_arr['Status'];
 
                 $this->db->set('Status', ''.$Status);
                 $this->db->where('ID', $ID);
                 $this->db->update('db_academic.exam_details');
+                $this->db->reset_query();
+
+                // set -1
+                $this->db->set('Status', '-1');
+                $this->db->where(array(
+                    'ExamID' => $ExamID,
+                    'Status' => '0'
+                ));
+                $this->db->update('db_academic.exam_details');
+                $this->db->reset_query();
+
 
                 return print_r(1);
             }
