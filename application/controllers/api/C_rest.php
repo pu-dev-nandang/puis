@@ -2274,8 +2274,15 @@ class C_rest extends CI_Controller {
                                 for ($i=0; $i < count($G); $i++) { 
                                     $CodePostRealisasi = $G[$i]['CodePostRealisasi'];
                                     $this->m_budgeting->makeCanBeDelete('db_budgeting.cfg_postrealisasi','CodePostRealisasi',$CodePostRealisasi);
-                                }    
-                            
+                                    // insert to budget_left for using on PR
+                                        $ID_creator_budget = $G[$i]['ID'];
+                                        $Value = $G[$i]['SubTotal'];
+                                        $dtSave = array(
+                                            'ID_creator_budget' => $ID_creator_budget,
+                                            'Value' => $Value,
+                                        );
+                                        $this->db->insert('db_budgeting.budget_left',$dtSave);
+                                }
                         }
                     }
 

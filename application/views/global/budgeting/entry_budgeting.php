@@ -1,3 +1,21 @@
+<style type="text/css">
+    .Custom-UnitCost
+    {
+        width: 6.333% !important;
+    }
+
+    .Custom-PostBudget{
+        width: 13.333% !important;
+    }
+
+    .Custom-Freq{
+        width: 5.333% !important;
+    }
+
+    .Custom-select2 {
+        width: 85% !important;
+    }
+</style>
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
 <div class="tabbable tabbable-custom tabbable-full-width btn-read menuEBudget">
     <ul class="nav nav-tabs">
