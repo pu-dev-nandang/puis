@@ -2098,7 +2098,7 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div style="text-align: left;">'.$row["Description"].'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$row["UpdateAt"].'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$row["NamePIC"].'</div>';
-            $nestedData[] = '<div style="text-align: center;"><button type="button" class="btn btn-sm btn-primary btn-circle btnviewversion" versionid="'.$row["IDVersion"].'" data-toggle="tooltip" data-placement="top" title="Details"><i class="glyphicon glyphicon-th-list"></i></button> <button class="btn btn-sm btn-circle btn-danger btndeleteversion" data-toggle="tooltip" versionid="'.$row["IDVersion"].'" data-placement="top" title="Delete"><i class="fa fa-trash"></i> </button> <button class="btn btn-sm btn-success btn-circle testEditdocument" data-toggle="tooltip" versionid="'.$row["IDVersion"].'" data-placement="top" title="Edit"><i class="fa fa-edit"></i></button></div>';
+            $nestedData[] = '<div style="text-align: center;"><button type="button" class="btn btn-sm btn-primary btn-circle btnviewversion" versionid="'.$row["IDVersion"].'" data-toggle="tooltip" data-placement="top" title="Details"><i class="glyphicon glyphicon-th-list"></i></button> <button class="btn btn-sm btn-circle btn-danger btndeleteversion" data-toggle="tooltip" versionid="'.$row["IDVersion"].'" data-placement="top" title="Delete"><i class="fa fa-trash"></i> </button> <!--<button class="btn btn-sm btn-success btn-circle btneditversion" data-toggle="tooltip" versionid="'.$row["IDVersion"].'" data-placement="top" title="Edit"><i class="fa fa-edit"></i></button> --></div>';
             $no++;
             $data[] = $nestedData;
         }
@@ -2135,10 +2135,7 @@ class C_api extends CI_Controller {
             echo json_encode($details);   
 
         }
-
-
-
-     }
+    }
 
     public function getSchedulePerDay(){
         $requestData= $_REQUEST;

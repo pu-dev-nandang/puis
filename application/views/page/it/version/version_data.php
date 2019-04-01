@@ -54,10 +54,10 @@
 				        <thead>
 				        <tr style="background: #3968c6;color: #FFFFFF;">
 				            <th style="width: 1%;text-align: center;">No</th>
-				            <th style="width: 5%;text-align: center;">Version</th>
-				            <th style="width: 10%;text-align: center;">Name Division</th>
+				            <th style="width: 7%;text-align: center;">No. Version</th>
+				            <th style="width: 9%;text-align: center;">Name Division</th>
 				            <th style="width: 10%;text-align: center;">Name Module</th>
-				            <th style="width: 35%;text-align: center;">Description</th>
+				            <th style="width: 32%;text-align: center;">Description</th>
 				    		<th style="width: 8%;text-align: center;">Date Update </th>
 				    		<th style="width: 8%;text-align: center;">PIC Name</th>
 				            <th style="width: 8%;text-align: center;">Action</th>
@@ -97,6 +97,63 @@
     });
 </script>
 
+<script>
+    $(document).on('click','.btneditversion', function () {
+
+        var versionid = $(this).attr('versionid');
+        var url = base_url_js+'api/__getdetailversion?s='+versionid;                          
+        var token = jwt_encode({
+                action:'getdetail'
+            },'UAP)(*');
+
+        $.post(url,{token:token},function (resultJson) {
+            console.log(resultJson); 
+            var response = resultJson;
+                if(response.length>0){
+                    var no = 1;
+                    for (var i = 0; i < response.length; i++) {
+
+                    $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"> '+
+			        	' <span aria-hidden="true">&times;</span></button> '+
+			            ' <h4 class="modal-title">Detail Version</h4>');
+                    $('#GlobalModal .modal-body').html('<table class="table">' +
+			             '<tr>' +
+			            '	<td style="width: 25%;">No. Version</td>' +
+			            '	<td><input class="form-control" id="Namegroup" value="'+response[i]['Version']+'" disabled></td>' +
+			            '</tr>' +
+			            '<tr>' +
+			            '	<td style="width: 25%;">Name Division</td>' +
+			            '	<td><input class="form-control" id="Namegroup" value="'+response[i]['Division']+'" disabled></td>' +
+			            '</tr>' +
+			            '<tr>' +
+			            '	<td style="width: 25%;">Name Module</td>' +
+			            '	<td>'+response[i]['NameModule']+'</td>' +
+			            '</tr>' +
+			            '	<td style="width: 25%;">Date Update</td>' +
+			            '	<td>'+response[i]['UpdateAt']+'</td>' +
+			            '</tr>' +
+			            '	<td style="width: 25%;">Name PIC</td>' +
+			            '	<td>'+response[i]['NamePIC']+'</td>' +
+			            '</tr>' +
+			            '<tr>' +
+			            '<tr>' +
+			            '	<td style="width: 25%;">Description</td>' +
+			            '	<td>'+response[i]['Description']+'</td>' +
+			            '</tr>' +
+			            '</table>');
+                    $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-danger btn-round" data-dismiss="modal"><i class="fa fa-remove"></i> Close</button>');
+                
+                    $('#GlobalModal').modal({
+                        'backdrop' : 'static',
+                        'show' : true
+                    }); 
+                        
+                    } //end for
+                } //end if
+            }); //end json  
+         //END IF
+    });
+</script>
 
 
 <script>
@@ -115,58 +172,36 @@
                     var no = 1;
                     for (var i = 0; i < response.length; i++) {
 
-                    $('#NotificationModal .modal-body').html('<br/><div class="col-xs-12 id="subsesi">      '+
-                        '<div class="form-group">                                                           '+
-                        '    <div class="thumbnail" style="padding: 10px;text-align: left;">                '+
-                        '      <h4>Detail Version Data</h4>                                                    '+
-                        '       <div class="row">                                                           '+
-                        '        <div class="col-xs-5">                                                     '+
-                        '                <div class="form-group">                                           '+
-                        '                <label class="control-label">Type File </label>                    '+
-                        '                <div>                                                              '+
-                        '                    <select class="form-control" id="typefiles">                   '+
-                        '                                                                   '+
-                        '                    </select>                                                      '+
-                        '                </div>                                                             '+
-                        '               </div>                                                              '+
-                        '           </div>                                                                  '+
-                        '   <div class="col-xs-6"> '+
-                        '                <div class="form-group"> '+ 
-                        '                    <label>No. Document</label> '+
-                        '                   <input class="form-control" id="NoDocument" value=""> '+
-                        '               </div> '+
-                        '          </div> '+
-                        '           <div class="col-xs-5"> '+
-                        '              <div class="form-group"> '+
-                        '                  <label>Date Document</label> '+
-                        '                   <input type="date" class="form-control" id="DateDocument"> '+
-                        '              </div> '+
-                        '          </div> '+
-                        '        <div class="col-xs-11"> '+
-                        '            <div class="form-group"> '+
-                        '                <label>Description Files</label> '+
-                        '                <textarea rows="3" cols="5" name="DescriptionFile" id="DescriptionFile" class="form-control" ></textarea> '+
-                        '            </div> '+
-                        '        </div> '+
-                     
-                        '        <div class="col-xs-6"> '+
-                        '            <div class="form-group"> '+
-                        '                <div id="element1">Review File : </div> '+
-                        '                   <div></div>                     '+
-                        '            </div> '+
-                        '       </div> '+
-                        '        </div>'+ 
-                        '        <div class="row"> '+
-                        '           <div class="col-md-12" style="text-align: right;"> '+
-                        '                <hr/> '+
-                        '               <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"> <i class="fa fa-remove"></i> Cancel </button> | <button type="button" class="btn btn-success btn-round btnSubmitEditFiles"> <i class="fa fa-check"></i> Save</button> '+
-                        '           </div> '+
-                        '       </div>'+
-                        '   </div>'+
-                        '</div>'+
-                    '</div>');
+                    $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"> '+
+			        	' <span aria-hidden="true">&times;</span></button> '+
+			            ' <h4 class="modal-title">Detail Version</h4>');
+                    $('#GlobalModal .modal-body').html('<table class="table">' +
+			             '<tr>' +
+			            '	<td style="width: 25%;">No. Version</td>' +
+			            '	<td>'+response[i]['Version']+'</td>' +
+			            '</tr>' +
+			            '<tr>' +
+			            '	<td style="width: 25%;">Name Division</td>' +
+			            '	<td>'+response[i]['Division']+'</td>' +
+			            '</tr>' +
+			            '<tr>' +
+			            '	<td style="width: 25%;">Name Module</td>' +
+			            '	<td>'+response[i]['NameModule']+'</td>' +
+			            '</tr>' +
+			            '	<td style="width: 25%;">Date Update</td>' +
+			            '	<td>'+response[i]['UpdateAt']+'</td>' +
+			            '</tr>' +
+			            '	<td style="width: 25%;">Name PIC</td>' +
+			            '	<td>'+response[i]['NamePIC']+'</td>' +
+			            '</tr>' +
+			            '<tr>' +
+			            '	<td style="width: 25%;">Description</td>' +
+			            '	<td>'+response[i]['Description']+'</td>' +
+			            '</tr>' +
+			            '</table>');
+                    $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-danger btn-round" data-dismiss="modal"><i class="fa fa-remove"></i> Close</button>');
                 
-                    $('#NotificationModal').modal({
+                    $('#GlobalModal').modal({
                         'backdrop' : 'static',
                         'show' : true
                     }); 
@@ -245,15 +280,14 @@
             '</tr>' +
             '</table>');
         loadSelectModule();
-        //loadSelectPic();
-
+        
         loadSelectOptionEmployeesSingle('#filternamepic','');
         $('#filternamepic').select2({allowClear: true});
 
         $('#descriptionversion').summernote({
-            placeholder: 'Text your announcement',
+            placeholder: 'Text your Description Version',
             tabsize: 2,
-            height: 300,
+            height: 200,
             toolbar: [
                 // [groupName, [list of button]]
                 ['style', ['bold', 'italic', 'underline', 'clear']],
@@ -303,7 +337,6 @@
 <script>
     $(document).on('click','.btnSaveGroup',function () {
         savegroupmodule();
-        //alert('test save');
     });
 
     function savegroupmodule() {
