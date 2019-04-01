@@ -202,13 +202,13 @@ function makeHtmlBudgetAllocation()
 function makeHtmlHeader()
 {
 	var html = '<div class = "row" style = "margin-left : 10px;margin-right : 10px">'+
-					'<div class = "col-md-1">'+
+					'<div class = "col-md-1 Custom-PostBudget">'+
 						'<label>Post Budget</label>'+
 					'</div>'+
-					'<div class = "col-md-1">'+
+					'<div class = "col-md-1 Custom-UnitCost">'+
 						'<label>Unit Cost</label>'+
 					'</div>'+
-					'<div class = "col-md-1">'+
+					'<div class = "col-md-1 Custom-Freq">'+
 						'<label>Freq</label>'+
 					'</div>';
 
@@ -254,10 +254,10 @@ $(document).off('click', '#ChooseSubAccount').on('click', '#ChooseSubAccount',fu
 	var data = dt['data'];
 	for (var i = 0; i < data.length; i++) {
 		// find if existing then checked
-		var d1 = data[i].CodePostRealisasi
+		var d1 = data[i].CodePostRealisasi;
 		var bool = false;
 		for (var j = 0; j < dt2.length; j++) {
-			var d2 = data[j].CodePostRealisasi
+			var d2 = dt2[j].CodePostRealisasi;
 			if (d1==d2) {
 				bool = true;
 				break;
@@ -265,9 +265,9 @@ $(document).off('click', '#ChooseSubAccount').on('click', '#ChooseSubAccount',fu
 		}
 
 		var checked = (bool) ? 'checked' : '';
-
+		var No = i+1;
 		html += '<tr>'+
-					'<td><input type="checkbox" class="uniform" CodeHeadAccount="'+data[i].CodeHeadAccount+'" CodePost="'+data[i].CodePost+'" CodePostRealisasi="'+data[i].CodePostRealisasi+'" NameHeadAccount="'+data[i].NameHeadAccount+'" PostName="'+data[i].PostName+'" RealisasiPostName = "'+data[i].RealisasiPostName+'" '+checked+' >'+
+					'<td>'+No+'&nbsp<input type="checkbox" class="uniform" CodeHeadAccount="'+data[i].CodeHeadAccount+'" CodePost="'+data[i].CodePost+'" CodePostRealisasi="'+data[i].CodePostRealisasi+'" NameHeadAccount="'+data[i].NameHeadAccount+'" PostName="'+data[i].PostName+'" RealisasiPostName = "'+data[i].RealisasiPostName+'" '+checked+' >'+
 					'</td>'+
 					'<td>'+data[i].PostName+'-'+data[i].NameHeadAccount+'-'+data[i].RealisasiPostName+'</td>'+
 				'</tr>';	
@@ -336,6 +336,8 @@ $(document).off('click', '#ModalbtnSaveForm').on('click', '#ModalbtnSaveForm',fu
 function makeRowAdd_del(dt)
 {
 	var Month = ClassDt.arr_bulan;
+	// get last NO 
+	var No = $(".numberNO:last").text();
 	for (var i = 0; i < dt.length; i++) {
 		var aa = $('.PostBudget').find('option[value="'+dt[i].CodePostRealisasi+'"]');
 		if (!aa.length) {
@@ -347,15 +349,17 @@ function makeRowAdd_del(dt)
 			}
 
 			html += '<div class = "row ContentDataPostBudget" style = "margin-left : 10px;margin-right : 10px;margin-top : 10px">';
-			html += '<div class = "col-md-1">'+
-						'<select class="select2-select-00 full-width-fix PostBudget">'+
-							'<option value ="'+dt[i]['CodePostRealisasi']+'" selected CodePost = "'+dt[i]['CodePost']+'" CodeHeadAccount="'+dt[i]['CodeHeadAccount']+'">'+dt[i]['PostName']+'-'+dt[i]['NameHeadAccount']+'-'+dt[i]['RealisasiPostName']+'</option>'+
+			No = parseInt(No) +i + 1;
+			html += '<div class = "col-md-1 Custom-PostBudget">'+
+						'<span class = "numberNO">'+No+'</span>&nbsp'+
+						'<select class="select2-select-00 full-width-fix PostBudget Custom-select2">'+
+							'<option value ="'+dt[i]['CodePostRealisasi']+'" selected CodePost = "'+dt[i]['CodePost']+'" CodeHeadAccount="'+dt[i]['CodeHeadAccount']+'">'+dt[i]['RealisasiPostName']+'</option>'+
 						 '</select>'+
 					'</div>'+
-					'<div class = "col-md-1">'+
+					'<div class = "col-md-1 Custom-UnitCost">'+
 						'<input type = "text" class = "form-control UnitCost" placeholder="Input Unit Cost..." value = "0">'+
 					'</div>'+
-					'<div class = "col-md-1">'+
+					'<div class = "col-md-1 Custom-Freq">'+
 						'<select class="select2-select-00 full-width-fix Freq">'+
 							OPFreq+
 						'</select>'+
@@ -419,7 +423,7 @@ $(document).off('click', '#example-select-all').on('click', '#example-select-all
 function makeContent()
 {
 	var dt = ClassDt.SelectedPostBudget;
-	var html = '<div style = "overflow : auto;max-height : 250px;" id = "PageSubAccount">';
+	var html = '<div style = "overflow : auto;max-height : 430px;" id = "PageSubAccount">';
 	var OPFreq = '';
 	for (var i = 0; i <= 1000; i++) {
 		var selected = (i == 0) ? 'selected' : '';
@@ -429,15 +433,17 @@ function makeContent()
 		// check genap & ganjil untuk berikan style warna
 		var c = ( (i % 2) == 0 ) ? 'background-color : #90c4e8;' : '';
 		html += '<div class = "row ContentDataPostBudget" style = "margin-left : 10px;margin-right : 10px;margin-top : 10px; '+c+'">';
-		html += '<div class = "col-md-1">'+
-					'<select class="select2-select-00 full-width-fix PostBudget" style = "margin-top : 5px;">'+
-						'<option value ="'+dt[i]['CodePostRealisasi']+'" selected CodePost = "'+dt[i]['CodePost']+'" CodeHeadAccount="'+dt[i]['CodeHeadAccount']+'">'+dt[i]['NameHeadAccount']+'-'+dt[i]['RealisasiPostName']+'</option>'+
+		var No = i + 1;
+		html += '<div class = "col-md-1 Custom-PostBudget">'+
+					'<span class = "numberNO">'+No+'</span>&nbsp'+
+					'<select class="select2-select-00 full-width-fix PostBudget Custom-select2" style = "margin-top : 5px;">'+
+						'<option value ="'+dt[i]['CodePostRealisasi']+'" selected CodePost = "'+dt[i]['CodePost']+'" CodeHeadAccount="'+dt[i]['CodeHeadAccount']+'">'+dt[i]['RealisasiPostName']+'</option>'+
 					 '</select>'+
 				'</div>'+
-				'<div class = "col-md-1">'+
+				'<div class = "col-md-1 Custom-UnitCost">'+
 					'<input type = "text" class = "form-control UnitCost" placeholder="Input Unit Cost..." value = "0" style = "'+c+' color : #333">'+
 				'</div>'+
-				'<div class = "col-md-1">'+
+				'<div class = "col-md-1 Custom-Freq">'+
 					'<select class="select2-select-00 full-width-fix Freq" style = "'+c+' margin-top : 5px;color : #333">'+
 						OPFreq+
 					'</select>'+
@@ -511,7 +517,7 @@ function makeFooter(){
 					'<div class = "row rowApproval">'+
 					'</div>'+
 					'<div class = "row">'+
-						'<div class = "col-md-4 col-md-offset-8" id = "content_button">'+
+						'<div class = "col-md-6 col-md-offset-6" id = "content_button">'+
 						'</div>'+
 					'</div>'+
 				'</div>'+
@@ -1150,7 +1156,7 @@ function makeContent_existing()
 {
 	var dt = ClassDt.creator_budget;
 	var Month = ClassDt.arr_bulan;
-	var html = '<div style = "overflow : auto;max-height : 250px;" id = "PageSubAccount">';
+	var html = '<div style = "overflow : auto;max-height : 430px;" id = "PageSubAccount">';
 	for (var i = 0; i < dt.length; i++) {
 		var OPFreq = '';
 		var Cmb_freq = dt[i]['Freq'];
@@ -1162,15 +1168,17 @@ function makeContent_existing()
 		var UnitCost = dt[i]['UnitCost'] / 1000;// ribuan
 		var c = ( (i % 2) == 0 ) ? 'background-color : #90c4e8;' : '';
 		html += '<div class = "row ContentDataPostBudget" style = "margin-left : 10px;margin-right : 10px;margin-top : 10px; '+c+'">';
-		html += '<div class = "col-md-1">'+
-					'<select class="select2-select-00 full-width-fix PostBudget" style = "margin-top : 5px;">'+
-						'<option value ="'+dt[i]['CodePostRealisasi']+'" selected CodePost = "'+dt[i]['CodePost']+'" CodeHeadAccount="'+dt[i]['CodeHeadAccount']+'">'+dt[i]['NameHeadAccount']+'-'+dt[i]['RealisasiPostName']+'</option>'+
+		var No = i + 1;
+		html += '<div class = "col-md-1 Custom-PostBudget">'+
+					'<span class = "numberNO">'+No+'</span>&nbsp'+
+					'<select class="select2-select-00 full-width-fix PostBudget Custom-select2" style = "margin-top : 5px;">'+
+						'<option value ="'+dt[i]['CodePostRealisasi']+'" selected CodePost = "'+dt[i]['CodePost']+'" CodeHeadAccount="'+dt[i]['CodeHeadAccount']+'">'+dt[i]['RealisasiPostName']+'</option>'+
 					 '</select>'+
 				'</div>'+
-				'<div class = "col-md-1">'+
+				'<div class = "col-md-1 Custom-UnitCost">'+
 					'<input type = "text" class = "form-control UnitCost" placeholder="Input Unit Cost..." value = "'+UnitCost+'" style = "'+c+' color : #333">'+
 				'</div>'+
-				'<div class = "col-md-1">'+
+				'<div class = "col-md-1 Custom-Freq">'+
 					'<select class="select2-select-00 full-width-fix Freq" style = "'+c+' margin-top : 5px;color : #333">'+
 						OPFreq+
 					'</select>'+

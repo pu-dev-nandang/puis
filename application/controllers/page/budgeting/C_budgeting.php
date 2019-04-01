@@ -2280,6 +2280,8 @@ class C_budgeting extends Budgeting_Controler {
                     select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
                     UNION
                     select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                    UNION
+                    select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
                     ) aa
                     ) as b on a.Departement = b.ID
                 )aa
