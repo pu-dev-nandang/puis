@@ -206,7 +206,7 @@
 
                    var setAttd = '<div class="checkbox" style="margin: 0px;">' +
                        '    <label>' +
-                       '      <input type="checkbox" class="checkAttd" data-id="'+d.ID+'" '+valAttd+'> Present' +
+                       '      <input type="checkbox" class="checkAttd" data-examid="'+d.ExamID+'" data-id="'+d.ID+'" '+valAttd+'> Present' +
                        '    </label>' +
                        '  </div>'
 
@@ -236,8 +236,9 @@
     $(document).on('click','.checkAttd',function () {
 
         var ID = $(this).attr('data-id');
+        var ExamID = $(this).attr('data-examid');
 
-        var Status = ($(this).is(':checked')) ? 1 : 0;
+        var Status = ($(this).is(':checked')) ? 1 : -1;
 
         var ExamAttd = (Status==1 || Status=='1') ? '<span class="label label-success">P</span>'
             : '<span class="label label-danger">A</span>';
@@ -246,6 +247,7 @@
         var data = {
             action : 'updateAttendanceExamSAS',
             ID : ID,
+            ExamID : ExamID,
             Status : Status
         };
 
