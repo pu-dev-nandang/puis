@@ -1212,14 +1212,14 @@ $route['budgeting/detail_budgeting_remaining'] = 'page/budgeting/c_budgeting/det
 $route['budgeting/detail_budgeting_remaining_All'] = 'page/budgeting/c_budgeting/detail_budgeting_remaining_All';
 $route['budgeting/configRule'] = 'page/budgeting/c_budgeting/configRule';
 $route['budgeting/configRule/userroledepart_submit'] = 'page/budgeting/c_pr_po/userroledepart_submit';
-$route['budgeting/page_pr/(:any)'] = 'page/budgeting/c_budgeting/page_pr/$1';
-$route['budgeting/page_pr_catalog/(:any)'] = 'page/budgeting/c_budgeting/page_pr_catalog/$1';
+$route['budgeting/page_pr/(:any)'] = 'page/budgeting/c_pr_po/page_pr/$1';
+$route['budgeting/page_pr_catalog/(:any)'] = 'page/budgeting/c_pr_po/page_pr_catalog/$1';
 
 
 $route['budgeting/PostBudgetThisMonth_Department'] = 'page/budgeting/c_budgeting/PostBudgetThisMonth_Department';
 $route['budgeting/getPostBudgetDepartement'] = 'page/budgeting/c_budgeting/getPostBudgetDepartement';
 $route['budgeting/submitpr'] = 'page/budgeting/c_budgeting/submitpr';
-$route['budgeting/DataPR'] = 'page/budgeting/c_budgeting/DataPR';
+$route['budgeting/DataPR'] = 'page/budgeting/c_pr_po/DataPR';
 $route['budgeting/FormEditPR'] = 'page/budgeting/c_budgeting/FormEditPR';
 $route['budgeting/GetDataPR'] = 'page/budgeting/c_budgeting/GetDataPR';
 $route['budgeting/checkruleinput'] = 'page/budgeting/c_budgeting/checkruleinput';
