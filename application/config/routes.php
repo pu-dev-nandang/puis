@@ -142,6 +142,10 @@ $route['human-resources/upload_academic'] = 'page/hr/c_employees/upload_fileAcad
 $route['human-resources/academic_employees'] = 'page/hr/c_employees/academic_employees';
 $route['human-resources/files_reviews'] = 'page/hr/c_employees/files_employees';
 
+// --- IT Version ---- ADD Bismar
+$route['it/version'] = 'page/it/c_it/version_data';
+
+
 //$route['database/lecturers'] = 'page/database/c_database/lecturers';
 $route['human-resources/academic-details/(:any)'] = 'page/hr/c_employees/academicDetails/$1';
 $route['human-resources/loadpageacademicDetails'] = 'page/hr/c_employees/loadpageacademicDetails';
@@ -166,11 +170,6 @@ $route['database/employees/form_input_submit'] = 'page/database/c_database/form_
 $route['database/employees/changestatus'] = 'page/database/c_database/changestatus';
 
 $route['database/students/edit-students/(:any)/(:any)/(:any)'] = 'page/database/c_database/edit_students/$1/$2/$3';
-
-
-
-
-
 $route['database/mentor-academic'] = 'page/database/c_database/mentor_academic';
 
 
@@ -678,8 +677,6 @@ $route['save2excel/monitoring_score'] =  'c_save_to_excel/monitoring_score';
 $route['save2excel/cumulative-recap'] =  'c_save_to_excel/cumulative_recap';
 $route['save2excel/student-recap'] =  'c_save_to_excel/student_recap';
 
-
-
 // ====== API ======
 $route['api/__getKurikulumByYear'] = 'api/c_api/getKurikulumByYear';
 $route['api/__getBaseProdi'] = 'api/c_api/getProdi';
@@ -688,6 +685,8 @@ $route['api/__getBaseProdiSelectOptionAll'] = 'api/c_api/getProdiSelectOptionAll
 $route['api/__geteducationLevel'] = 'api/c_api/geteducationLevel';
 
 $route['api/__crudConfig'] = 'api/c_api/crudConfig';
+$route['api/__getdataversion'] = 'api/c_api/getlistversion';
+$route['api/__getdetailversion'] = 'api/c_api/getversiondetail';
 
 
 $route['api/__getMKByID'] = 'api/c_api/getMKByID';
@@ -829,6 +828,8 @@ $route['api/__crudScheduleExchange'] = 'api/c_api/crudScheduleExchange';
 $route['api/__crudLimitCredit'] = 'api/c_api/crudLimitCredit';
 $route['api/__crudAcademicData'] = 'api/c_api/crudAcademicData'; //add bismar
 $route['api/__crudEditAcademicData'] = 'api/c_api/editAcademicData'; //add bismar
+$route['api/__crudGroupModule'] = 'api/c_api/crudversion'; //add bismar
+$route['api/__deleteversion'] = 'api/c_api/delversiondata'; //add bismar
 
 $route['api/__crudLecturerEvaluation'] = 'api/c_api/crudLecturerEvaluation';
 $route['api/__getLecturerEvaluation'] = 'api/c_api/getLecturerEvaluation';
@@ -906,6 +907,8 @@ $route['api/__getAgama'] = 'api/c_api/getAgama';
 $route['api/__getDivision'] = 'api/c_api/getDivision';
 $route['api/__getPosition'] = 'api/c_api/getPosition';
 $route['api/__getStatusEmployee'] = 'api/c_api/getStatusEmployee';
+$route['api/__getStatusVersion'] = 'api/c_api/getstatusversion';
+$route['api/__getStatusModule'] = 'api/c_api/getstatusmodule';
 
 $route['api/__crudKRSOnline'] = 'api/c_api/crudKRSOnline';
 

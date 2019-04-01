@@ -711,6 +711,19 @@ class C_api extends CI_Controller {
 
     }
 
+    public function getstatusversion()
+    {
+        $generate = $this->db->query('SELECT ID, Division FROM db_employees.division ORDER BY division ASC ')->result_array();
+        echo json_encode($generate);
+    }
+
+    public function getstatusmodule()
+    {
+        $generate = $this->db->query('SELECT IDModule, NameModule FROM db_it.module ORDER BY NameModule ASC ')->result_array();
+        echo json_encode($generate);
+    }
+
+
     public function delelelistacaemployee(){
 
         $token = $this->input->post('token');
@@ -728,6 +741,21 @@ class C_api extends CI_Controller {
             $dataCek = $this->m_api->delistotherfiles($ID1);
             return print_r(1);
         }
+
+    }
+
+    public function delversiondata(){
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+
+        if($data_arr['action']=='deleteversion'){
+
+            $versionid = $data_arr['versionid'];
+            $dataCek = $this->m_api->deletelistversion($versionid);
+            return print_r(1);
+        }
+
 
     }
 
@@ -2004,6 +2032,110 @@ class C_api extends CI_Controller {
 
                 return print_r(1);
             }
+        }
+    }
+
+    public function getlistversion(){
+        //$formInsert = (array) $data_arr['formInsert'];
+
+        $status = $this->input->get('s');
+        $requestData= $_REQUEST;
+        
+        //$whereStatus = ($status!='') ? ' AND StatusEmployeeID = "'.$status.'" ' : '';
+        $totalData = $this->db->query('SELECT aa.IDVersion, aa.Version, dd.Division, dd.NameModule, bb.Description, aa.UpdateAt, cc.Name AS NamePIC
+                    FROM db_it.version AS aa
+                    INNER JOIN db_it.version_detail AS bb ON (aa.IDVersion = bb.IDVersion)
+                    LEFT JOIN db_employees.employees AS cc ON (aa.PIC = cc.NIP)
+                    LEFT JOIN (SELECT a.IDGroup, a.NameGroup, b.IDModule, b.NameModule, c.ID AS IDDivision,c.Division
+                    FROM db_it.group_module AS a
+                    LEFT JOIN db_it.module AS b ON (a.IDGroup = b.IDGroup)
+                    LEFT JOIN db_employees.division AS c ON a.IDDivision = c.ID) AS dd ON (bb.IDModule = dd.IDModule) WHERE aa.Active= 1')->result_array();
+
+        if( !empty($requestData['search']['value']) ) {
+            $sql = 'SELECT aa.IDVersion, aa.Version, dd.Division, dd.NameModule, bb.Description, aa.UpdateAt, cc.Name AS NamePIC
+                    FROM db_it.version AS aa
+                    INNER JOIN db_it.version_detail AS bb ON (aa.IDVersion = bb.IDVersion)
+                    LEFT JOIN db_employees.employees AS cc ON (aa.PIC = cc.NIP)
+                    LEFT JOIN (SELECT a.IDGroup, a.NameGroup, b.IDModule, b.NameModule, c.ID AS IDDivision,c.Division
+                    FROM db_it.group_module AS a
+                    LEFT JOIN db_it.module AS b ON (a.IDGroup = b.IDGroup)
+                    LEFT JOIN db_employees.division AS c ON a.IDDivision = c.ID) AS dd ON (bb.IDModule = dd.IDModule)';
+            $sql.= ' WHERE aa.Active= 1 AND cc.Name LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR dd.Division LIKE "%'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR dd.NameModule LIKE "'.$requestData['search']['value'].'%" ';
+            //$sql.= ') ORDER BY NIP,em.PositionMain ASC';
+            $sql.= 'ORDER BY aa.Version DESC';
+
+        }
+        else {
+            $sql = 'SELECT aa.IDVersion, aa.Version, dd.Division, dd.NameModule, bb.Description, aa.UpdateAt, cc.Name AS NamePIC
+                    FROM db_it.version AS aa
+                    INNER JOIN db_it.version_detail AS bb ON (aa.IDVersion = bb.IDVersion)
+                    LEFT JOIN db_employees.employees AS cc ON (aa.PIC = cc.NIP)
+                    LEFT JOIN (SELECT a.IDGroup, a.NameGroup, b.IDModule, b.NameModule, c.ID AS IDDivision,c.Division
+                    FROM db_it.group_module AS a
+                    LEFT JOIN db_it.module AS b ON (a.IDGroup = b.IDGroup)
+                    LEFT JOIN db_employees.division AS c ON a.IDDivision = c.ID) AS dd ON (bb.IDModule = dd.IDModule) WHERE aa.Active= 1 ';
+            //$sql.= 'ORDER BY NIP,em.PositionMain ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+            $sql.= 'ORDER BY aa.Version DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+        }
+        
+        $query = $this->db->query($sql)->result_array();
+        //$sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+        $no = $requestData['start']+1;
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            //$jb = explode('.',$row["PositionMain"]);
+            $Division = '';
+            $Position = '';
+            //$nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$row["Version"].'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$row["Division"].'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$row["NameModule"].'</div>';
+            $nestedData[] = '<div style="text-align: left;">'.$row["Description"].'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$row["UpdateAt"].'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$row["NamePIC"].'</div>';
+            $nestedData[] = '<div style="text-align: center;"><button type="button" class="btn btn-sm btn-primary btn-circle btnviewversion" versionid="'.$row["IDVersion"].'" data-toggle="tooltip" data-placement="top" title="Details"><i class="glyphicon glyphicon-th-list"></i></button> <button class="btn btn-sm btn-circle btn-danger btndeleteversion" data-toggle="tooltip" versionid="'.$row["IDVersion"].'" data-placement="top" title="Delete"><i class="fa fa-trash"></i> </button> <!--<button class="btn btn-sm btn-success btn-circle btneditversion" data-toggle="tooltip" versionid="'.$row["IDVersion"].'" data-placement="top" title="Edit"><i class="fa fa-edit"></i></button> --></div>';
+            $no++;
+            $data[] = $nestedData;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($totalData)),
+            "recordsFiltered" => intval( count($totalData) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+
+    }
+
+    
+    
+    public function getversiondetail(){
+
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+
+        if($data_arr['action']=='getdetail'){
+            $idversion = $this->input->get('s');
+            $details = $this->db->query('SELECT aa.IDVersion, aa.Version, dd.Division, dd.NameModule, bb.Description, aa.UpdateAt, cc.Name AS NamePIC
+                    FROM db_it.version AS aa
+                    INNER JOIN db_it.version_detail AS bb ON (aa.IDVersion = bb.IDVersion)
+                    LEFT JOIN db_employees.employees AS cc ON (aa.PIC = cc.NIP)
+                    LEFT JOIN (SELECT a.IDGroup, a.NameGroup, b.IDModule, b.NameModule, c.ID AS IDDivision,c.Division
+                    FROM db_it.group_module AS a
+                    LEFT JOIN db_it.module AS b ON (a.IDGroup = b.IDGroup)
+                    LEFT JOIN db_employees.division AS c ON a.IDDivision = c.ID) AS dd ON (bb.IDModule = dd.IDModule)
+                    WHERE aa.IDVersion = "'.$idversion.'" ')->result_array();
+            echo json_encode($details);   
+
         }
     }
 
@@ -5169,15 +5301,82 @@ class C_api extends CI_Controller {
      }
 
 
+    public function crudversion(){
+
+        $data_arr = $this->getInputToken();
+        $IDuser = $this->session->userdata('NIP');
+
+            if($data_arr['action']=='AddGroupModule'){
+                $formInsert = (array) $data_arr['formInsert'];
+
+                $Namegroup = strtoupper($formInsert['Namegroup']);
+                $division = $formInsert['division'];
+                $Namemodule = strtoupper($formInsert['Namemodule']);
+                $Description = $formInsert['Descriptiongroup'];
+                
+                $getgroupmodule = $this->db->get_where('db_it.group_module',array('NameGroup'=>$Namegroup, 'IDDivision'=>$division))->result_array();
+
+                if(count($getgroupmodule)>0){
+                    return print_r(0);
+                }else {
+                    $dataSave1 = array(
+                            'NameGroup' => $Namegroup,
+                            'IDDivision' => $division
+                    );
+                    $this->db->insert('db_it.group_module',$dataSave1);
+                    $insert_id_logging = $this->db->insert_id();
+
+                    $dataSave2 = array(
+                            'IDGroup' => $insert_id_logging,
+                            'NameModule' => $Namemodule,
+                            'Description' => $Description
+                    );
+                    $this->db->insert('db_it.module',$dataSave2);
+                    return print_r(1);
+                }
+            }
+            else if($data_arr['action']=='AddVersion') {
+
+                $formInsert = (array) $data_arr['formInsert'];
+
+                $filternamepic = $formInsert['filternamepic'];
+                $filterStatusModule = $formInsert['filterStatusModule'];
+                $Noversion = strtoupper($formInsert['Noversion']);
+                $Descriptionversion = $formInsert['Descriptionversion'];
+
+                $getdataversion = $this->db->get_where('db_it.version',array('Version'=>$Noversion))->result_array();
+                if(count($getdataversion)>0){
+                    return print_r(0);
+                }
+                else {
+                    $dataSave1 = array(
+                            'Version' => $Noversion,
+                            'PIC' => $filternamepic,
+                            'UpdateBy' => $IDuser
+                    );
+                    $this->db->insert('db_it.version',$dataSave1);
+                    $insert_id_logging = $this->db->insert_id();
+
+                    $dataSave2 = array(
+                            'IDVersion' => $insert_id_logging,
+                            'IDModule' => $filterStatusModule,
+                            'Description' => $Descriptionversion
+                    );
+                    $this->db->insert('db_it.version_detail',$dataSave2);
+                    return print_r(1);
+                }
+            }
+    }
+
+
      public function upload_fileAcademic($fileName, $formData){
 
             //$fileName = $this->input->get('fileName');
             $Colom = $this->input->get('c');
             $User = $this->input->get('u');
-            print_r($fileName);
-            print_r($formData);
+            //print_r($fileName);
+            //print_r($formData);
             
-
             $config['upload_path']          = './uploads/files/';
             $config['allowed_types']        = '*';
             $config['max_size']             = 8000; // 8 mb
