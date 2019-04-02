@@ -114,6 +114,7 @@ function modal_generate2(action,title,ID='') {
                 var HeadAccount = $("#HeadAccount").val();
                 var RealisasiPostName = $("#RealisasiPostName").val();
                 var Departement = $("#Departement2").val();
+                var Desc = $("#Desc").val();
 
                 var action = $(this).attr('action');
                 var id = $("#ModalbtnSaveForm2").attr('kodeuniq');
@@ -123,6 +124,7 @@ function modal_generate2(action,title,ID='') {
                             HeadAccount : HeadAccount,
                             RealisasiPostName : RealisasiPostName,
                             UnitDiv : Departement,
+                            Desc : Desc,
                             Action : action,
                             CDID : id
                             };
@@ -540,7 +542,8 @@ function loadTable2()
                             '<th>Budget Category</th>'+
                             '<th>HeadAccount</th>'+
                             '<th>Department</th>'+
-                            '<th>For Who</th>'+
+                            '<th>User</th>'+
+                            '<th>Desc</th>'+
                             '<th>Action</th>'+
                         '</tr></thead>' 
                         ;
@@ -562,6 +565,7 @@ function loadTable2()
                                 '<td>'+ dataForTable[i].CodeHeadAccount+'<br>'+dataForTable[i].NameHeadAccount+'</td>'+
                                 '<td>'+ dataForTable[i].DepartementName+'</td>'+
                                 '<td>'+ dataForTable[i].UnitDivName+'</td>'+
+                                '<td>'+ dataForTable[i].Desc+'</td>'+
                                 '<td>'+ btn_edit + ' '+' &nbsp' + btn_del+'</td>'+
                              '</tr>'    
         }

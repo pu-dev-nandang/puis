@@ -62,7 +62,7 @@ class M_budgeting extends CI_Model {
     public function getData_cfg_postrealisasi($Active = null)
     {
         $Active = ($Active == null) ? '' : ' where a.Active = "'.$Active.'"';
-        $sql = 'select a.CodePostRealisasi,a.CodeHeadAccount,b.Name as NameHeadAccount,a.RealisasiPostName,a.UnitDiv,b.Departement,c.CodePost,c.PostName from db_budgeting.cfg_postrealisasi as a join db_budgeting.cfg_head_account as b on a.CodeHeadAccount = b.CodeHeadAccount
+        $sql = 'select a.CodePostRealisasi,a.CodeHeadAccount,b.Name as NameHeadAccount,a.RealisasiPostName,a.UnitDiv,a.Desc,b.Departement,c.CodePost,c.PostName from db_budgeting.cfg_postrealisasi as a join db_budgeting.cfg_head_account as b on a.CodeHeadAccount = b.CodeHeadAccount
             join db_budgeting.cfg_post as c on c.CodePost = b.CodePost
                 '.$Active.' order by a.CodePostRealisasi desc';
         $query=$this->db->query($sql, array())->result_array();

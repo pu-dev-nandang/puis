@@ -1,5 +1,5 @@
 <div class="row" style="margin-left: 10px;margin-right: 10px">
-	<div class="col-md-3">
+	<div class="col-md-2">
 		<button class = "btn btn-default" id = "ChooseSubAccount">Choose Sub Account</button>
 		</br></br>
 		<button class = "btn btn-warning" id = "Log" id_creator_budget_approval = "">Log</button>
@@ -30,7 +30,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="col-md-3" id = "BudgetAllocation">
+	<div class="col-md-4" id = "BudgetAllocation">
 	</div>
 </div>
 
@@ -175,25 +175,28 @@ function makeHtmlBudgetAllocation()
 	setTimeout(function () {
 		var html = '<div class = "row">'+
 						'<div class = "col-md-12">'+
-							'<table class="table table-bordered tableData" id ="tableData3">'+
-							'<caption><b>Budget Allocation</b></caption>'+
-								'<thead>'+
-									'<tr>'+
-										'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Head Account</th>'+
-										'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Allocation</th>'+
-										'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Remaining</th>'+
-									'</tr>'+
-								'</thead><tbody>';
+							'<div style = "overflow : auto;max-height : 200px;">'+
+								'<div class ="table-responsive">'+
+									'<table class="table table-bordered tableData" id ="tableData3">'+
+									'<caption><b>Budget Allocation</b></caption>'+
+										'<thead>'+
+											'<tr>'+
+												'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Head Account</th>'+
+												'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Allocation</th>'+
+												'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Remaining</th>'+
+											'</tr>'+
+										'</thead><tbody>';
 		for (var i = 0; i < dt.length; i++) {
 			html += '<tr>'+
-						'<td>'+dt[i]['PostName']+'-'+dt[i]['NameHeadAccount']+'</td>'+
+						// '<td>'+dt[i]['PostName']+'-'+dt[i]['NameHeadAccount']+'</td>'+
+						'<td>'+dt[i]['NameHeadAccount']+'</td>'+
 						'<td>'+formatRupiah(dt[i]['Budget'])+'</td>'+
 						'<td>'+formatRupiah(dt[i]['Remaining'])+'</td>'+
 					'</tr>';	
 
 		}
 
-		html += '</tbody></table></div></div>';
+		html += '</tbody></table></div></div></div></div>';
 		$("#BudgetAllocation").html(html);
 	},1000);
 					
@@ -768,10 +771,26 @@ function showButton()
 			$('input:not(.select2-input)').prop('disabled',true);
 			$('select:not(#Departement):not(#Year):not(.PostBudget)').prop('disabled',true);
 
+			// only admin to create per department
+			var NIP = '<?php echo $this->session->userdata('NIP') ?>';
+			var bool = false;
+			for (var i = 0; i < dt.length; i++) {
+				if (NIP == dt[i].NIP && dt[i].ID == 1) {
+					bool = true;
+					break;
+				}
+				
+			}
+
+			var UploadFileTag = '';
+			if (bool) {
+				UploadFileTag = '<label class="btn btn-primary" style="color: #ffff;">Upload Budget File <input id="file-upload" type="file" style="display: none;" id_creator_budget_approval = "'+arr1[0].ID+'" accept="image/*,application/pdf"></label>&nbsp';
+			}
+
 			// show button export excel
 				var filee = (arr1[0].FileUpload != '' && arr1[0].FileUpload != null && arr1[0].FileUpload != undefined) ? '<a href = "'+base_url_js+'fileGetAny/budgeting-'+arr1[0].FileUpload+'" target="_blank" class = "Fileexist">File '+'</a>&nbsp' : '';
 				$('#content_button').attr('align','right');
-				$('#content_button').html(filee+'<label class="btn btn-primary" style="color: #ffff;">Upload Budget File <input id="file-upload" type="file" style="display: none;" id_creator_budget_approval = "'+arr1[0].ID+'" accept="image/*,application/pdf"></label>&nbsp<button type="button" class="btn btn-default" id="ExportExcel" id_creator_budget_approval = "'+arr1[0].ID+'"> <i class="fa fa-file-excel-o"></i> Excel</button>');
+				$('#content_button').html(filee+UploadFileTag+'<button type="button" class="btn btn-default" id="ExportExcel" id_creator_budget_approval = "'+arr1[0].ID+'"> <i class="fa fa-file-excel-o"></i> Excel</button>');
 		} 
 
 	}

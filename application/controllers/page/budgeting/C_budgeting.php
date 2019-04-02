@@ -152,15 +152,17 @@ class C_budgeting extends Budgeting_Controler {
                 $query=$this->db->query($sql, array($Year))->result_array();
                 $Status = $query[0]['Status']; // check can be delete
                    if ($Status == 1) {
-                       $dataSave = array(
-                           'Year' => $Year,
-                           'StartPeriod' => $query[0]['StartPeriod'],
-                           'EndPeriod' => $query[0]['EndPeriod'],
-                           'Active' => 0
-                       );
-                       $this->db->where('Year', $Year);
-                       $this->db->where('Active', 1);
-                       $this->db->update('db_budgeting.cfg_dateperiod', $dataSave);
+                       // $dataSave = array(
+                       //     'Year' => $Year,
+                       //     'StartPeriod' => $query[0]['StartPeriod'],
+                       //     'EndPeriod' => $query[0]['EndPeriod'],
+                       //     'Active' => 0
+                       // );
+                       // $this->db->where('Year', $Year);
+                       // $this->db->where('Active', 1);
+                       // $this->db->update('db_budgeting.cfg_dateperiod', $dataSave);
+                       $this->db->where(array('Year' => $Year));
+                       $this->db->delete('db_budgeting.cfg_dateperiod');
                    }
                    else
                    {
@@ -551,6 +553,7 @@ class C_budgeting extends Budgeting_Controler {
                        'CodeHeadAccount' => $input['HeadAccount'],
                        'RealisasiPostName' => trim(ucwords($input['RealisasiPostName'])),
                        'UnitDiv' => $input['UnitDiv'],
+                       'Desc' => $input['Desc'],
                        'CreatedBy' => $this->session->userdata('NIP'),
                        'CreatedAt' => date('Y-m-d'),
                    );
@@ -585,6 +588,7 @@ class C_budgeting extends Budgeting_Controler {
                                'RealisasiPostName' => trim(ucwords($input['RealisasiPostName'])),
                                'CodeHeadAccount' => $input['HeadAccount'],
                                'UnitDiv' => $input['UnitDiv'],
+                               'Desc' => $input['Desc'],
                            );
                            $this->db->where('CodePostRealisasi', $input['CDID']);
                            $this->db->where('Active', 1);

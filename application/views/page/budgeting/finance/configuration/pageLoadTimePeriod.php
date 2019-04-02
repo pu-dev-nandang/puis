@@ -144,12 +144,14 @@ function loadTable()
 	    $("#loadTable").html(TableGenerate);
 	    LoaddataTableStandard("#tableData");
 
-        $(".btn-edit").click(function(){
+        // $(".btn-edit").click(function(){
+        $(document).off('click', '.btn-edit').on('click', '.btn-edit',function(e) {       
     	    var ID = $(this).attr('year');
     	     modal_generate('edit','Edit',ID);
         });
 
-        $(".btn-delete").click(function(){	
+        // $(".btn-delete").click(function(){
+        $(document).off('click', '.btn-delete').on('click', '.btn-delete',function(e) {   	
             var ID = $(this).attr('year');
              $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Are you sure ? </b> ' +
                  '<button type="button" id="confirmYesDelete" class="btn btn-primary" style="margin-right: 5px;" data-smt = "'+ID+'">Yes</button>' +

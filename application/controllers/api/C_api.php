@@ -7075,7 +7075,8 @@ class C_api extends CI_Controller {
             $arr_result[] = array(
                 'Code'  => 'NA.'.$NA[$i]['ID'],
                 'Name1' => $NA[$i]['Description'],
-                'Name2' => $NA[$i]['Division']
+                'Name2' => $NA[$i]['Division'],
+                'Abbr' => $NA[$i]['Abbreviation'],
             );
         }
 
@@ -7083,7 +7084,8 @@ class C_api extends CI_Controller {
             $arr_result[] = array(
                 'Code'  => 'AC.'.$AC[$i]['ID'],
                 'Name1' => 'Prodi '.$AC[$i]['Name'],
-                'Name2' => 'Study '.$AC[$i]['NameEng']
+                'Name2' => 'Study '.$AC[$i]['NameEng'],
+                'Abbr' => $AC[$i]['Code'],
             );
         }
 
@@ -7091,7 +7093,8 @@ class C_api extends CI_Controller {
             $arr_result[] = array(
                 'Code'  => 'FT.'.$FT[$i]['ID'],
                 'Name1' => 'Facultas '.$FT[$i]['Name'],
-                'Name2' => 'Faculty '.$FT[$i]['NameEng']
+                'Name2' => 'Faculty '.$FT[$i]['NameEng'],
+                'Abbr' => $FT[$i]['Abbr'],
             );
         }
 
