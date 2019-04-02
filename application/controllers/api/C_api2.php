@@ -2236,6 +2236,25 @@ class C_api2 extends CI_Controller {
             return print_r(1);
 
         }
+        else if($data_arr['action']=='getListSemesterAntara'){
+
+            $data = $this->db->order_by('SemesterID', 'ASC')->get('db_academic.semester_antara')->result_array();
+
+            $result = [];
+            if(count($data)>0){
+                foreach ($data AS $item){
+
+                    array_push($result,$item);
+
+                    if($item['Status']==1 || $item['Status']=='1'){
+                        break;
+                    }
+                }
+            }
+
+            return print_r(json_encode($result));
+
+        }
 
     }
 

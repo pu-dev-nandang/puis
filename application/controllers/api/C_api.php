@@ -7611,11 +7611,13 @@ class C_api extends CI_Controller {
                 $dataUpdate = $data_arr['dataForm'];
                 $this->db->where('NPM', $NPM);
                 $this->db->update($DB_Student.'.students',$dataUpdate);
+                $this->db->reset_query();
 
 
-                $dataUpdtAuth = array('EmailPU' => $data_arr['EmailPU']);
+                $dataUpdtAuth = (array) $data_arr['dataAuth'];
                 $this->db->where('NPM', $NPM);
                 $this->db->update('db_academic.auth_students',$dataUpdtAuth);
+                $this->db->reset_query();
 
 
                 return print_r(1);
