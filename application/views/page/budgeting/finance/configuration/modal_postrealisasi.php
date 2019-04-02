@@ -59,7 +59,17 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-sm-4">
-                    <label class="control-label">For Who:</label>
+                    <label class="control-label">Desc:</label>
+                </div>    
+                <div class="col-sm-6">
+                   <textarea class="form-control" id = "Desc" maxlength="100"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-4">
+                    <label class="control-label">User :</label>
                 </div>    
                 <div class="col-sm-6">
                    <select class="select2-select-00 full-width-fix" id="Departement2">
@@ -83,6 +93,7 @@
         <?php if ($action == 'edit'): ?>
           $("#CodePostRealisasi").val('<?php echo $getData[0]['CodePostRealisasi'] ?>');
           $("#RealisasiPostName").val('<?php echo $getData[0]['RealisasiPostName'] ?>');
+          $("#Desc").val('<?php echo $getData[0]['Desc'] ?>');
         <?php endif ?>
 
         $(".NeedPrefix").change(function(){
@@ -147,9 +158,10 @@
     {
       var url = base_url_js+"api/__getAllDepartementPU";
       $('#Departement2').empty();
+      var Div = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
       $.post(url,function (data_json) {
         for (var i = 0; i < data_json.length; i++) {
-            var selected = (i==0) ? 'selected' : '';
+            var selected = (data_json[i]['Code']==Div) ? 'selected' : '';
             $('#Departement2').append('<option value="'+ data_json[i]['Code']  +'" '+selected+'>'+data_json[i]['Name2']+'</option>');
         }
 

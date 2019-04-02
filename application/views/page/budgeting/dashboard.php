@@ -89,7 +89,7 @@
 					var datamonth = data[i]['data'];
 					// find value month
 					if (j == 0) {
-						tbl += '<td style="width: 8%;">'+data[i]['DepartementName']+'</td>';
+						tbl += '<td style="width: 8%;">'+data[i]['Abbr']+'</td>';
 					}
 					else
 					{

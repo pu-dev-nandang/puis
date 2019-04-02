@@ -2398,6 +2398,7 @@ class C_rest extends CI_Controller {
                         'Code' => $Code,
                         'DepartementName' => $DepartementName,
                         'data' => $arr_temp,
+                        'Abbr'=>$Departement[$i]['Abbr'],
                     );
                 }
 
