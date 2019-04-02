@@ -18,12 +18,17 @@ class C_budgeting extends Budgeting_Controler {
         $this->session->unset_userdata('auth_budgeting_sess');
         $this->session->unset_userdata('menu_budgeting_sess');
         $this->session->unset_userdata('menu_budgeting_grouping');
-        $this->session->unset_userdata('role_user_budgeting');
+        // $this->session->unset_userdata('role_user_budgeting');
         $MenuDepartement= ($this->data['IDdepartment'] == 12) ? 'NA.'.$this->session->userdata('IDdepartementNavigation'):'NA.'.$this->data['IDdepartment']; 
 
         if ($this->data['IDdepartment'] == 15 || $this->data['IDdepartment'] == 14) {
             $MenuDepartement= 'AC.'.$this->session->userdata('prodi_active_id');
         }
+
+        if ($MenuDepartement == 'NA.34') {
+            $MenuDepartement = 'FT.'.$this->session->userdata('faculty_active_id');
+        }
+
         $this->getAuthSession($MenuDepartement);
         $this->data['GetPeriod'] = $this->m_budgeting->GetPeriod();
         if (file_exists(APPPATH.'view/page/budgeting'.$this->data['department'].'dashboard')) {
@@ -2225,79 +2230,7 @@ class C_budgeting extends Budgeting_Controler {
         echo json_encode($arr_result);
     }
 
-    public function checkruleinput()
-    {
-        $this->auth_ajax();
-        $bool = false;
-        $input = $this->getInputToken();
-        if (!array_key_exists('NIP', $input)) {
-             $NIP = $this->session->userdata('NIP');
-        }
-        else
-        {
-            $NIP = $input['NIP'];
-        }
-
-        if (!array_key_exists('Departement', $input)) {
-             $Departement = $this->session->userdata('IDDepartementPUBudget');
-        }
-        else
-        {
-            $Departement = $input['Departement'];
-        }
-
-        if (array_key_exists('PRCodeVal', $input)) { // change department
-            $PRCodeVal = $input['PRCodeVal'];
-            $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCodeVal);
-            if (count($G_data) > 0) {
-                $JsonStatus = $G_data[0]['JsonStatus'];
-                $JsonStatus = (array) json_decode($JsonStatus,true);
-                $bool = true;
-                for ($i=0; $i < count($JsonStatus); $i++) { 
-                    $ApprovedBy = $JsonStatus[$i]['ApprovedBy'];
-                    if ($NIP == $ApprovedBy) {
-                        $bool = false;
-                        break;
-                    }
-                }
-                
-                if (!$bool) {
-                    // $Departement = $this->session->userdata('IDDepartementPUBudget');
-                    $Departement = $G_data[0]['Departement'];
-                    $GetRuleAccess = $this->m_budgeting->GetRuleAccess($NIP,$Departement);
-                    if (count($GetRuleAccess['access']) == 0) {
-                       $GetRuleAccess['rule'] = array();
-                       $access = array();
-                       $t = array(
-                        'Active' => 1,
-                        'DSG' => null,
-                        'Departement' => $this->session->userdata('IDDepartementPUBudget'),
-                        'ID' => 0,
-                        'ID_m_userrole' => ($i+2), //  berdasarkan ID karena ID 1 adalah admin dan hasil loop dimulai dari 0
-                        'NIP' => $NIP,
-                        'Status' => 1,
-                       );
-                       $access[] = $t;
-                       $GetRuleAccess['access'] = $access;
-                    }
-
-                    
-                }
-                else
-                {
-                     $GetRuleAccess = $this->m_budgeting->GetRuleAccess($NIP,$Departement);
-                }
-
-            }
-        }
-        else
-        {
-            // print_r($Departement);
-            $GetRuleAccess = $this->m_budgeting->GetRuleAccess($NIP,$Departement);
-        }
-
-        echo json_encode($GetRuleAccess);
-    }
+   
 
     public function update_approver()
     {

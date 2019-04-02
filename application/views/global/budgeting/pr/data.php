@@ -109,7 +109,7 @@ $(document).ready(function() {
            setTimeout(function () {
                $("#pageContent").empty();
                $("#pageContent").html(html);
-               $("#dataselected").html(ShowHtmlSelected(thead,Htmlselected));
+               $("#PageDataExisting").html(ShowHtmlSelected(thead,Htmlselected));
                $(".menuEBudget li").removeClass('active');
                $(".pageAnchor[page='form']").parent().addClass('active');
            },1000);
