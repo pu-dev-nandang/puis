@@ -195,23 +195,12 @@ class C_pr_po extends Budgeting_Controler {
       $uri = $this->uri->segment(3);
       switch ($uri) {
           case 'Catalog':
-              // $this->data['action'] = 'add';
-              // if (empty($_POST) && count($_POST) > 0 ){
-              //     $Input = $this->getInputToken();
-              //     $this->data['action'] = $Input['action'];
-              //     if ($Input['action'] == 'edit') {
-              //         $this->data['get'] = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$Input['ID']);
-              //     }
-              // }
-              // $content = $this->load->view('global/budgeting/pr/'.$uri,$this->data,true);
-              // $arr_result['html'] = $content;
               $content = $this->load->view('global/budgeting/pr/'.$uri,$this->data,true);
               $arr_result['html'] = $content;
               break;
           
           default:
-              $this->data['G_Approver'] = $this->m_budgeting->Get_m_Approver();
-              $this->data['arr_Year'] = $this->m_master->showData_array('db_budgeting.cfg_dateperiod');
+              $this->data['G_Approver'] = $this->m_pr_po->Get_m_Approver();
               $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
               $Year = $get[0]['Year'];
               $this->data['Year'] = $Year;
@@ -257,7 +246,7 @@ class C_pr_po extends Budgeting_Controler {
         $No = $requestData['start'] + 1;
         $data = array();
 
-        $G_Approver = $this->m_budgeting->Get_m_Approver();
+        $G_Approver = $this->m_pr_po->Get_m_Approver();
         if (array_key_exists('length', $_POST)) {
             $Count_G_Approver = $_POST['length'];
         }
@@ -320,6 +309,80 @@ class C_pr_po extends Budgeting_Controler {
             "data"            => $data
         );
         echo json_encode($json_data);
+    }
+
+    public function checkruleinput()
+    {
+        $this->auth_ajax();
+        $bool = false;
+        $input = $this->getInputToken();
+        if (!array_key_exists('NIP', $input)) {
+             $NIP = $this->session->userdata('NIP');
+        }
+        else
+        {
+            $NIP = $input['NIP'];
+        }
+
+        if (!array_key_exists('Departement', $input)) {
+             $Departement = $this->session->userdata('IDDepartementPUBudget');
+        }
+        else
+        {
+            $Departement = $input['Departement'];
+        }
+
+        if (array_key_exists('PRCodeVal', $input)) { // change department
+            $PRCodeVal = $input['PRCodeVal'];
+            $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCodeVal);
+            if (count($G_data) > 0) {
+                $JsonStatus = $G_data[0]['JsonStatus'];
+                $JsonStatus = (array) json_decode($JsonStatus,true);
+                $bool = true;
+                for ($i=0; $i < count($JsonStatus); $i++) { 
+                    $ApprovedBy = $JsonStatus[$i]['ApprovedBy'];
+                    if ($NIP == $ApprovedBy) {
+                        $bool = false;
+                        break;
+                    }
+                }
+                
+                if (!$bool) {
+                    // $Departement = $this->session->userdata('IDDepartementPUBudget');
+                    $Departement = $G_data[0]['Departement'];
+                    $GetRuleAccess = $this->m_pr_po->GetRuleAccess($NIP,$Departement);
+                    if (count($GetRuleAccess['access']) == 0) {
+                       $GetRuleAccess['rule'] = array();
+                       $access = array();
+                       $t = array(
+                        'Active' => 1,
+                        'DSG' => null,
+                        'Departement' => $this->session->userdata('IDDepartementPUBudget'),
+                        'ID' => 0,
+                        'ID_m_userrole' => ($i+2), //  berdasarkan ID karena ID 1 adalah admin dan hasil loop dimulai dari 0
+                        'NIP' => $NIP,
+                        'Status' => 1,
+                       );
+                       $access[] = $t;
+                       $GetRuleAccess['access'] = $access;
+                    }
+
+                    
+                }
+                else
+                {
+                     $GetRuleAccess = $this->m_pr_po->GetRuleAccess($NIP,$Departement);
+                }
+
+            }
+        }
+        else
+        {
+            // print_r($Departement);
+            $GetRuleAccess = $this->m_pr_po->GetRuleAccess($NIP,$Departement);
+        }
+
+        echo json_encode($GetRuleAccess);
     }
 
 

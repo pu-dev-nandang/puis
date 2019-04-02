@@ -33,6 +33,23 @@
 </div>
 
 <script type="text/javascript">
+    var DivSession = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
+    var DivSessionName = '';
+    <?php 
+        $d = $this->session->userdata('IDDepartementPUBudget');
+        $d = explode('.', $d);
+     ?>
+    <?php if ($d == 'AC'): ?>
+         DivSessionName = '<?php echo $this->session->userdata('prodi_active') ?>';
+    <?php elseif($d == 'FT'): ?> 
+        DivSessionName = '<?php echo $this->session->userdata('faculty_active') ?>';   
+    <?php else: ?>
+         <?php $P = $this->session->userdata('PositionMain'); 
+                $P = $P['Division'];
+         ?>
+         DivSessionName = '<?php echo $P ?>'; 
+    <?php endif ?> 
+    var NIP = sessionNIP;
     $(document).ready(function() {
         $("#container").attr('class','fixed-header sidebar-closed');
         $("#sidebar").remove();

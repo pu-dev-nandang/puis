@@ -418,6 +418,7 @@ abstract class Budgeting_Controler extends Globalclass{
     {
         parent::__construct();
         $this->load->model('budgeting/m_budgeting');
+        $this->load->model('budgeting/m_pr_po');
         $this->load->model('master/m_master');
         $PositionMain = $this->session->userdata('PositionMain');
         $DivisionPage = $PositionMain['Division'];
@@ -473,6 +474,11 @@ abstract class Budgeting_Controler extends Globalclass{
         if ($MenuDepartement == 'NA.15' || $MenuDepartement == 'NA.14') {
             $MenuDepartement = 'AC.'.$this->session->userdata('prodi_active_id');
         }
+
+        if ($MenuDepartement == 'NA.34') {
+            $MenuDepartement = 'FT.'.$this->session->userdata('faculty_active_id');
+        }
+
         $getDataMenu = $this->m_budgeting->getMenuGroupUser($this->session->userdata('NIP'),$MenuDepartement);
         $this->session->set_userdata('IDDepartementPUBudget',$MenuDepartement);
         $data_sess = array();
@@ -480,7 +486,7 @@ abstract class Budgeting_Controler extends Globalclass{
             $this->session->set_userdata('auth_budgeting_sess',1);
             $this->session->set_userdata('menu_budgeting_sess',$getDataMenu);
             $this->session->set_userdata('menu_budgeting_grouping',$this->groupBYMenu_sess());
-            $this->session->set_userdata('role_user_budgeting',$this->m_budgeting->role_user_budgeting());
+            // $this->session->set_userdata('role_user_budgeting',$this->m_budgeting->role_user_budgeting());
         }
     }
 

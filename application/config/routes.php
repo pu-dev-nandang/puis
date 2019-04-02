@@ -1230,7 +1230,7 @@ $route['budgeting/submitpr'] = 'page/budgeting/c_budgeting/submitpr';
 $route['budgeting/DataPR'] = 'page/budgeting/c_pr_po/DataPR';
 $route['budgeting/FormEditPR'] = 'page/budgeting/c_budgeting/FormEditPR';
 $route['budgeting/GetDataPR'] = 'page/budgeting/c_budgeting/GetDataPR';
-$route['budgeting/checkruleinput'] = 'page/budgeting/c_budgeting/checkruleinput';
+$route['budgeting/checkruleinput'] = 'page/budgeting/c_pr_po/checkruleinput';
 
 $route['budgeting/export_excel_post_department'] = 'c_save_to_excel/export_excel_post_department';
 $route['budgeting/update_approver'] = 'page/budgeting/c_budgeting/update_approver';
