@@ -361,13 +361,17 @@
                     Email : formEmail,
                     Address : formAddress,
                     Jacket : formJacket
+                },
+                dataAuth : {
+                    Name : formName,
+                    EmailPU : formEmailPU
                 }
             };
 
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'api/__crudStudent';
             $.post(url,{token:token},function (result) {
-
+                toastr.success('Data saved','Success');
                 setTimeout(function () {
                     $('#btnSaveBiodata').html('Save');
                     $('.formBiodata,#btnSaveBiodata').prop('disabled',false);
