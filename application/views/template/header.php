@@ -751,12 +751,14 @@
          <?php if ($this->session->userdata('IDdepartementNavigation') == 15): ?>
              var NameDiv = "<?php echo $this->session->userdata('prodi_active') ?>";
              var aa = $("#wrDepartment").text();
+             aa = aa.replace('Admin','');
              $("#wrDepartment").html(aa + ' '+NameDiv);
          <?php endif ?>
 
          <?php if ($this->session->userdata('IDdepartementNavigation') == 34): ?>
              var NameDiv = "<?php echo $this->session->userdata('faculty_active') ?>";
              var aa = $("#wrDepartment").text();
+             aa = aa.replace('Admin','');
              $("#wrDepartment").html(aa + ' '+NameDiv);
          <?php endif ?>
     }
