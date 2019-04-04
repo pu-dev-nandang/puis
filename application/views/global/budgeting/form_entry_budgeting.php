@@ -886,7 +886,8 @@ function ProsesOneRow(row,keyvalue = null)
 					row.find('.InputBulan[keyvalue="'+keyvalue+'"]').maskMoney('mask', '9894');
 				}
 				
-				row.find('.sisa').html('<div style="margin-top : 5px;"><i class="fa fa-check-circle" style="color: green;"></i> '+0+'</div>');
+				// row.find('.sisa').html('<div style="margin-top : 5px;"><i class="fa fa-check-circle" style="color: green;"></i> '+0+'</div>');
+				row.find('.Freq').trigger('change');
 				toastr.info("Your Input Exceeded than Freq, The Input Was Reset");
 			}
 			else

@@ -1081,12 +1081,14 @@ class C_save_to_excel extends CI_Controller
 
                $JsonStatus = (array) json_decode($dt[0]['JsonStatus'],true);
                for ($i=0; $i < count($JsonStatus); $i++) { 
-                   $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $JsonStatus[$i]['NameTypeDesc']);
-                   $N = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['NIP']);
-                   $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$StTot, $N[0]['Name']);
-                   $excel->getActiveSheet()->getStyle($keyM[$StH].$St.':'.$keyM[$StH2].$StTot)->applyFromArray($style_row);
-                   $StH = $StH2 + 2; 
-                   $StH2 = $StH + 2; 
+                    if ($JsonStatus[$i]['Visible'] == 'Yes') {
+                        $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $JsonStatus[$i]['NameTypeDesc']);
+                        $N = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['NIP']);
+                        $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$StTot, $N[0]['Name']);
+                        $excel->getActiveSheet()->getStyle($keyM[$StH].$St.':'.$keyM[$StH2].$StTot)->applyFromArray($style_row);
+                        $StH = $StH2 + 2; 
+                        $StH2 = $StH + 2;
+                    }
                }
 
          $excel->getActiveSheet()->getColumnDimension('B')->setWidth(3);       
@@ -1458,12 +1460,15 @@ class C_save_to_excel extends CI_Controller
 
                        $JsonStatus = (array) json_decode($dt[$m]['JsonStatus'],true);
                        for ($i=0; $i < count($JsonStatus); $i++) { 
-                           $excel->setCellValue($keyM[$StH].$St, $JsonStatus[$i]['NameTypeDesc']);
-                           $N = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['NIP']);
-                           $excel->setCellValue($keyM[$StH].$StTot, $N[0]['Name']);
-                           $excel->getStyle($keyM[$StH].$St.':'.$keyM[$StH2].$StTot)->applyFromArray($style_row);
-                           $StH = $StH2 + 2; 
-                           $StH2 = $StH + 2; 
+                            if ($JsonStatus[$i]['Visible'] == 'Yes') {
+                                $excel->setCellValue($keyM[$StH].$St, $JsonStatus[$i]['NameTypeDesc']);
+                                $N = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['NIP']);
+                                $excel->setCellValue($keyM[$StH].$StTot, $N[0]['Name']);
+                                $excel->getStyle($keyM[$StH].$St.':'.$keyM[$StH2].$StTot)->applyFromArray($style_row);
+                                $StH = $StH2 + 2; 
+                                $StH2 = $StH + 2;
+                            }
+                            
                        }
 
                  $excel->getColumnDimension('B')->setWidth(3);       
