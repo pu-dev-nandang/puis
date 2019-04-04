@@ -748,8 +748,9 @@ class C_save_to_excel extends CI_Controller
         $Input = (array) $this->jwt->decode($token,$key);
         $getData = $this->m_budgeting->get_creator_budget($Input['id_creator_budget_approval']);
         $dt = $this->m_master->caribasedprimary('db_budgeting.creator_budget_approval','ID',$Input['id_creator_budget_approval']);
-        $NameDepartement = $this->m_budgeting->SearchDepartementBudgeting($dt[0]['Departement']);
-        $NameDepartement = $NameDepartement[0]['NameDepartement'];
+        $GDepartement = $this->m_budgeting->SearchDepartementBudgeting($dt[0]['Departement']);
+        $NameDepartement = $GDepartement[0]['NameDepartement'];
+        $CodeDepartement = $GDepartement[0]['Code'];
         $Year = $dt[0]['Year'];
         $YearWr = $dt[0]['Year'].'/'.($dt[0]['Year'] + 1);
         $YearWr2 = ($dt[0]['Year'] - 1).'/'.$dt[0]['Year'];
@@ -841,20 +842,24 @@ class C_save_to_excel extends CI_Controller
             $excel->getActiveSheet()->mergeCells('G6:G7');
             $excel->getActiveSheet()->getStyle('G6:G7')->applyFromArray($style_col);
 
-            $excel->setActiveSheetIndex(0)->setCellValue('H6', "TOTAL");
+            $excel->setActiveSheetIndex(0)->setCellValue('H6', "Desc");
             $excel->getActiveSheet()->mergeCells('H6:H7');
             $excel->getActiveSheet()->getStyle('H6:H7')->applyFromArray($style_col);
+
+            $excel->setActiveSheetIndex(0)->setCellValue('I6', "TOTAL");
+            $excel->getActiveSheet()->mergeCells('I6:I7');
+            $excel->getActiveSheet()->getStyle('I6:I7')->applyFromArray($style_col);
 
             // Month
                 $keyM = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
                 $St = 6;
-                $excel->setActiveSheetIndex(0)->setCellValue('J'.$St, "ESTIMASI  PER-BULAN");
-                $StH = 9 + (count($month) - 1) ; // dimulai dari I
+                $excel->setActiveSheetIndex(0)->setCellValue('K'.$St, "ESTIMASI  PER-BULAN");
+                $StH = 10 + (count($month) - 1) ; // dimulai dari K
 
-                $excel->getActiveSheet()->mergeCells('J'.$St.':'.$keyM[$StH].$St);
-                $excel->getActiveSheet()->getStyle('J'.$St.':'.$keyM[$StH].$St)->applyFromArray($style_col);
+                $excel->getActiveSheet()->mergeCells('K'.$St.':'.$keyM[$StH].$St);
+                $excel->getActiveSheet()->getStyle('K'.$St.':'.$keyM[$StH].$St)->applyFromArray($style_col);
                 $St++;
-                $StH = 9;
+                $StH = 10;
                 for ($i=0; $i < count($month); $i++) {
                     $a = $month[$i]->month;
                     $a = explode('-', $a);
@@ -868,6 +873,7 @@ class C_save_to_excel extends CI_Controller
         // make isian
            $St++;
            $No = 0;
+           $arr_total_perMonth= array();
            // Grouping per by Head Account
             $total = 0;
                 for ($i=0; $i < count($getData); $i++) {
@@ -886,7 +892,7 @@ class C_save_to_excel extends CI_Controller
                     $excel->setActiveSheetIndex(0)->setCellValue($keyM[($StH)].$St, $NameHeadAccount );
                     $excel->getActiveSheet()->getStyle($keyM[($StH)].$St)->applyFromArray($style_col);
                     // buat border sampai total
-                    for ($j=0; $j < 4; $j++) { 
+                    for ($j=0; $j < 5; $j++) { 
                        $StH++;
                        $excel->getActiveSheet()->getStyle($keyM[($StH)].$St)->applyFromArray($style_col);
                     } 
@@ -943,7 +949,11 @@ class C_save_to_excel extends CI_Controller
                        $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row); 
 
                        $StH++;
-                       $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$i]['NameUnitDiv']);
+                       $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$i]['CodeDiv']);
+                       $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+
+                       $StH++;
+                       $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$i]['Desc']);
                        $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
 
                        $StH++;
@@ -956,6 +966,13 @@ class C_save_to_excel extends CI_Controller
                        $StH = $StH + 2;
                        for ($z=0; $z < count($month); $z++) {
                            $a = $month[$z]->value * ($getData[$i]['UnitCost'] / 1000);
+                           if (array_key_exists($z, $arr_total_perMonth)) {
+                               $arr_total_perMonth[$z] = $arr_total_perMonth[$z] + $a;
+                           }
+                           else
+                           {
+                            $arr_total_perMonth[$z] = $a;
+                           }
                            $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $a);
                            $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
                            $StH = $StH + 1;
@@ -990,7 +1007,11 @@ class C_save_to_excel extends CI_Controller
                                $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row); 
 
                                $StH++;
-                               $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$j]['NameUnitDiv']);
+                               $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$j]['CodeDiv']);
+                               $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+
+                               $StH++;
+                               $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$j]['Desc']);
                                $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
 
                                $StH++;
@@ -1003,6 +1024,13 @@ class C_save_to_excel extends CI_Controller
                                $StH = $StH + 2;
                                for ($z=0; $z < count($month); $z++) {
                                    $a = $month[$z]->value * ($getData[$j]['UnitCost'] / 1000);
+                                   if (array_key_exists($z, $arr_total_perMonth)) {
+                                       $arr_total_perMonth[$z] = $arr_total_perMonth[$z] + $a;
+                                   }
+                                   else
+                                   {
+                                    $arr_total_perMonth[$z] = $a;
+                                   }
                                    $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $a);
                                    $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
                                    $StH = $StH + 1;
@@ -1021,11 +1049,18 @@ class C_save_to_excel extends CI_Controller
             //make total
                 $StH = 2;
                 $excel->setActiveSheetIndex(0)->setCellValue('B'.$St, "TOTAL");
-                $excel->getActiveSheet()->mergeCells('B'.$St.':'.'G'.$St);
-                $excel->getActiveSheet()->getStyle('B'.$St.':'.'G'.$St)->applyFromArray($style_col);
+                $excel->getActiveSheet()->mergeCells('B'.$St.':'.'H'.$St);
+                $excel->getActiveSheet()->getStyle('B'.$St.':'.'H'.$St)->applyFromArray($style_col);
 
-                $excel->setActiveSheetIndex(0)->setCellValue('H'.$St, $total); 
-                $excel->getActiveSheet()->getStyle('H'.$St)->applyFromArray($style_col);
+                $excel->setActiveSheetIndex(0)->setCellValue('I'.$St, $total); 
+                $excel->getActiveSheet()->getStyle('I'.$St)->applyFromArray($style_col);
+
+            // make SubTotal Per Bulan
+                $StHSubTot = 10 ;
+               for ($i=0; $i < count($arr_total_perMonth); $i++) { 
+                    $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StHSubTot].$St, $arr_total_perMonth[$i]); 
+                    $StHSubTot = $StHSubTot + 1;    
+                }     
 
             // Make Footer
                 $St = $St + 2;
@@ -1061,7 +1096,7 @@ class C_save_to_excel extends CI_Controller
          $excel->getActiveSheet()->getColumnDimension('H')->setWidth(25);       
 
         // Set judul file excel nya
-        $excel->getActiveSheet()->setTitle($NameDepartement);
+        $excel->getActiveSheet()->setTitle($CodeDepartement);
         $excel->setActiveSheetIndex(0);
 
 
@@ -1127,8 +1162,9 @@ class C_save_to_excel extends CI_Controller
         for ($m=0; $m < count($dt); $m++) { 
             $incsheet = $m;
             $excel = $excel2->createSheet($incsheet); 
-            $NameDepartement = substr($dt[$m]['NameDepartement'], 0,20) ;
-            $excel->setTitle($NameDepartement);
+            // $NameDepartement = substr($dt[$m]['NameDepartement'], 0,20) ;
+            $NameDepartement = $dt[$m]['NameDepartement'] ;
+            $excel->setTitle($dt[$m]['Code']);
             $getData = $this->m_budgeting->get_creator_budget($dt[$m]['ID_creator_budget']);
 
             $Year = $Input['Year'];
@@ -1183,20 +1219,24 @@ class C_save_to_excel extends CI_Controller
                     $excel->mergeCells('G6:G7');
                     $excel->getStyle('G6:G7')->applyFromArray($style_col);
 
-                    $excel->setCellValue('H6', "TOTAL");
+                    $excel->setCellValue('H6', "Desc");
                     $excel->mergeCells('H6:H7');
                     $excel->getStyle('H6:H7')->applyFromArray($style_col);
+
+                    $excel->setCellValue('I6', "TOTAL");
+                    $excel->mergeCells('I6:I7');
+                    $excel->getStyle('I6:I7')->applyFromArray($style_col);
 
                     // Month
                         $keyM = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
                         $St = 6;
-                        $excel->setCellValue('J'.$St, "ESTIMASI  PER-BULAN");
-                        $StH = 9 + (count($month) - 1) ; // dimulai dari I
+                        $excel->setCellValue('K'.$St, "ESTIMASI  PER-BULAN");
+                        $StH = 10 + (count($month) - 1) ; // dimulai dari K
 
-                        $excel->mergeCells('J'.$St.':'.$keyM[$StH].$St);
-                        $excel->getStyle('J'.$St.':'.$keyM[$StH].$St)->applyFromArray($style_col);
+                        $excel->mergeCells('K'.$St.':'.$keyM[$StH].$St);
+                        $excel->getStyle('K'.$St.':'.$keyM[$StH].$St)->applyFromArray($style_col);
                         $St++;
-                        $StH = 9;
+                        $StH = 10;
                         for ($i=0; $i < count($month); $i++) {
                             $a = $month[$i]->month;
                             $a = explode('-', $a);
@@ -1210,6 +1250,7 @@ class C_save_to_excel extends CI_Controller
                 // make isian
                    $St++;
                    $No = 0;
+                   $arr_total_perMonth= array();
                    // Grouping per by Head Account
                     $total = 0;
                         for ($i=0; $i < count($getData); $i++) {
@@ -1228,7 +1269,7 @@ class C_save_to_excel extends CI_Controller
                             $excel->setCellValue($keyM[($StH)].$St, $NameHeadAccount );
                             $excel->getStyle($keyM[($StH)].$St)->applyFromArray($style_col);
                             // buat border sampai total
-                            for ($j=0; $j < 4; $j++) { 
+                            for ($j=0; $j < 5; $j++) { 
                                $StH++;
                                $excel->getStyle($keyM[($StH)].$St)->applyFromArray($style_col);
                             } 
@@ -1285,7 +1326,11 @@ class C_save_to_excel extends CI_Controller
                                $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row); 
 
                                $StH++;
-                               $excel->setCellValue($keyM[$StH].$St, $getData[$i]['NameUnitDiv']);
+                               $excel->setCellValue($keyM[$StH].$St, $getData[$i]['CodeDiv']);
+                               $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+
+                               $StH++;
+                               $excel->setCellValue($keyM[$StH].$St, $getData[$i]['Desc']);
                                $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
 
                                $StH++;
@@ -1298,6 +1343,13 @@ class C_save_to_excel extends CI_Controller
                                $StH = $StH + 2;
                                for ($z=0; $z < count($month); $z++) {
                                    $a = $month[$z]->value * ($getData[$i]['UnitCost'] / 1000);
+                                   if (array_key_exists($z, $arr_total_perMonth)) {
+                                       $arr_total_perMonth[$z] = $arr_total_perMonth[$z] + $a;
+                                   }
+                                   else
+                                   {
+                                    $arr_total_perMonth[$z] = $a;
+                                   }
                                    $excel->setCellValue($keyM[$StH].$St, $a);
                                    $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
                                    $StH = $StH + 1;
@@ -1332,7 +1384,11 @@ class C_save_to_excel extends CI_Controller
                                        $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row); 
 
                                        $StH++;
-                                       $excel->setCellValue($keyM[$StH].$St, $getData[$j]['NameUnitDiv']);
+                                       $excel->setCellValue($keyM[$StH].$St, $getData[$j]['CodeDiv']);
+                                       $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
+
+                                       $StH++;
+                                       $excel->setCellValue($keyM[$StH].$St, $getData[$j]['Desc']);
                                        $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
 
                                        $StH++;
@@ -1345,6 +1401,13 @@ class C_save_to_excel extends CI_Controller
                                        $StH = $StH + 2;
                                        for ($z=0; $z < count($month); $z++) {
                                            $a = $month[$z]->value * ($getData[$j]['UnitCost'] / 1000);
+                                           if (array_key_exists($z, $arr_total_perMonth)) {
+                                               $arr_total_perMonth[$z] = $arr_total_perMonth[$z] + $a;
+                                           }
+                                           else
+                                           {
+                                            $arr_total_perMonth[$z] = $a;
+                                           }
                                            $excel->setCellValue($keyM[$StH].$St, $a);
                                            $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
                                            $StH = $StH + 1;
@@ -1363,11 +1426,18 @@ class C_save_to_excel extends CI_Controller
                     //make total
                         $StH = 2;
                         $excel->setCellValue('B'.$St, "TOTAL");
-                        $excel->mergeCells('B'.$St.':'.'G'.$St);
-                        $excel->getStyle('B'.$St.':'.'G'.$St)->applyFromArray($style_col);
+                        $excel->mergeCells('B'.$St.':'.'H'.$St);
+                        $excel->getStyle('B'.$St.':'.'H'.$St)->applyFromArray($style_col);
 
-                        $excel->setCellValue('H'.$St, $total); 
-                        $excel->getStyle('H'.$St)->applyFromArray($style_col);
+                        $excel->setCellValue('I'.$St, $total); 
+                        $excel->getStyle('I'.$St)->applyFromArray($style_col);
+
+                        // make SubTotal Per Bulan
+                            $StHSubTot = 10 ;
+                           for ($ii=0; $ii < count($arr_total_perMonth); $ii++) { 
+                                $excel->setCellValue($keyM[$StHSubTot].$St, $arr_total_perMonth[$ii]); 
+                                $StHSubTot = $StHSubTot + 1;    
+                            }  
 
                     // Make Footer
                         $St = $St + 2;
