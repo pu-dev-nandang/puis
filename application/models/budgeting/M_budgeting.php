@@ -460,16 +460,16 @@ class M_budgeting extends CI_Model {
     {
         $sql = 'select a.ID_creator_budget_approval,a.CodePostRealisasi,a.UnitCost,a.Freq,a.DetailMonth,
                a.SubTotal,a.CreatedBy,a.CreatedAt,a.LastUpdateBy,a.LastUpdateAt,b.UnitDiv,b.CodeHeadAccount,
-                     b.RealisasiPostName,c.Name as NameHeadAccount,c.CodePost,d.PostName,dp.NameDepartement as NameUnitDiv
+                     b.RealisasiPostName,b.Desc,c.Name as NameHeadAccount,c.CodePost,d.PostName,dp.NameDepartement as NameUnitDiv,dp.Code as CodeDiv
                from db_budgeting.creator_budget as a left join db_budgeting.cfg_postrealisasi as b on a.CodePostRealisasi = b.CodePostRealisasi
                LEFT JOIN db_budgeting.cfg_head_account as c on b.CodeHeadAccount = c.CodeHeadAccount
                LEFT JOIN db_budgeting.cfg_post as d on c.CodePost = d.CodePost
                LEFT JOIN (
-                select CONCAT("AC.",ID) as ID,  CONCAT("Study ",NameEng) as NameDepartement from db_academic.program_study where Status = 1
+                select CONCAT("AC.",ID) as ID,  CONCAT("Study ",NameEng) as NameDepartement,Code as Code from db_academic.program_study where Status = 1
                 UNION
-                select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
                 UNION
-                select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement from db_academic.faculty where StBudgeting = 1
+                select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
                ) as dp on b.UnitDiv = dp.ID
                where a.ID_creator_budget_approval = ?
                order by b.CodeHeadAccount asc
@@ -523,11 +523,11 @@ class M_budgeting extends CI_Model {
     public function get_data_ListBudgetingDepartement($Year)
     {
         $sql = 'select aa.*,b.ID as ID_creator_budget,b.* from (
-                select CONCAT("AC.",ID) as ID,  CONCAT("Study ",NameEng) as NameDepartement from db_academic.program_study where Status = 1
+                select CONCAT("AC.",ID) as ID,  CONCAT("Study ",NameEng) as NameDepartement,Code as Code from db_academic.program_study where Status = 1
                 UNION
-                select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
                 UNION
-                select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement from db_academic.faculty where StBudgeting = 1
+                select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
                 ) aa left join (select * from db_budgeting.creator_budget_approval where Year = ?) as b on aa.ID = b.Departement
                 ';
         $query=$this->db->query($sql, array($Year))->result_array(); 

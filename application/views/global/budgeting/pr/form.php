@@ -39,6 +39,7 @@
 		var token = jwt_encode(data,"UAP)(*");
 		$.post(url,{ token:token },function (resultJson) {
 			var response = jQuery.parseJSON(resultJson);
+
 			var access = response['access'];
 			if (access.length > 0) {
 				ClassDt.RuleAccess = response;
@@ -71,7 +72,7 @@
 		var html = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;">';
 			html += '<div class="col-md-4">'+
 						'<p id = "labelPeriod">Period : <label>'+ClassDt.Year+'/'+(parseInt(ClassDt.Year)+1 )+'</label></p>'+
-						'<p id = "labelDepartment">Department : </p>'+
+						'<p id = "labelDepartment">Department : '+DivSessionName+'</p>'+
 						'<p id = "labelPrcode"></p>'+
 					'</div>'+
 					'<div class="col-md-4">'+
