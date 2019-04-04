@@ -568,7 +568,7 @@ function makeApproval()
 				var NIP = '<?php echo $this->session->userdata('NIP') ?>';
 				var bool = false;
 				for (var i = 0; i < dt.length; i++) {
-					if (NIP == dt[i].NIP && dt[i].ID_set_roleuser == 1) {
+					if (NIP == dt[i].NIP && dt[i].ID == 1) {
 						bool = true;
 						break;
 					}
@@ -590,7 +590,7 @@ function makeApproval()
 			   var u = ClassDt.Approval;
 			   var Requester = '';
 			   for (var i = 0; i < u.length; i++) {
-			   	if (u[i].ID_set_roleuser == 1) {
+			   	if (u[i].ID == 1) {
 			   		Requester = u[i].NamaUser;
 			   		break;
 			   	} 
@@ -733,16 +733,18 @@ function showButton()
 							HierarkiApproval++;
 						}
 
-						if (JsonStatus[ii]['NameTypeDesc'] != 'Approval by') {
-							HierarkiApproval++;
-						}
+						// if (JsonStatus[ii]['NameTypeDesc'] != 'Approval by') {
+						// 	HierarkiApproval++;
+						// }
+						// HierarkiApproval++;
 					}
 					else
 					{
 						HierarkiApproval++;
 					}
 					
-					if (NIP == JsonStatus[i]['NIP'] && JsonStatus[i]['NameTypeDesc'] == 'Approval by') {
+					// if (NIP == JsonStatus[i]['NIP'] && JsonStatus[i]['NameTypeDesc'] == 'Approval by') {
+					if (NIP == JsonStatus[i]['NIP']) {
 						bool = true;
 						break;
 					}
