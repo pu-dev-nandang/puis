@@ -66,6 +66,14 @@ $route['academic/tahun-akademik-detail'] = 'page/academic/c_tahun_akademik/tahun
 $route['academic/tahun-akademik-detail-date'] = 'page/academic/c_tahun_akademik/tahun_akademik_detail_date';
 
 $route['academic/semester-antara'] = 'page/academic/c_semester_antara';
+$route['academic/semester-antara/timetable/(:num)'] = 'page/academic/c_semester_antara/timetable/$1';
+$route['academic/semester-antara/exam/(:num)'] = 'page/academic/c_semester_antara/exam/$1';
+$route['academic/semester-antara/score/(:num)'] = 'page/academic/c_semester_antara/score/$1';
+
+$route['academic/semester-antara/setting-timetable/(:num)'] = 'page/academic/c_semester_antara/setting_timetable/$1';
+$route['academic/semester-antara/setting-exam/(:num)'] = 'page/academic/c_semester_antara/setting_exam/$1';
+
+
 $route['academic/semester-antara/details/(:num)'] = 'page/academic/c_semester_antara/loadDetails/$1';
 
 

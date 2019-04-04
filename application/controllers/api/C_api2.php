@@ -2025,6 +2025,8 @@ class C_api2 extends CI_Controller {
 
     }
 
+
+
     public function crudSemesterAntara(){
         $data_arr = $this->getInputToken();
 
@@ -2088,10 +2090,11 @@ class C_api2 extends CI_Controller {
 
                 $d_SA = $dataSA[0];
 
-                $NPM = $data_arr['NPM'];
-                $CDID = $data_arr['CDID'];
-                $MKID = $data_arr['MKID'];
-                $EntredAt = $data_arr['EntredAt'];
+                $dataDetails = (array) $data_arr['dataDetails'];
+
+                $NPM = $dataDetails['NPM'];
+
+
 
                 // Cek apakah sudah
                 $dataIns = array(
@@ -2111,14 +2114,8 @@ class C_api2 extends CI_Controller {
                 }
 
                 // Insert Course
-                $dataCoursIns = array(
-                    'IDSAStudent' => $IDSAStudent,
-                    'NPM' => $NPM,
-                    'CDID' => $CDID,
-                    'MKID' => $MKID,
-                    'EntredAt' => $EntredAt
-                );
-                $this->db->insert('db_academic.sa_student_details',$dataCoursIns);
+                $dataDetails['IDSAStudent'] = $IDSAStudent;
+                $this->db->insert('db_academic.sa_student_details',$dataDetails);
             }
 
             return print_r(1);
@@ -2255,8 +2252,204 @@ class C_api2 extends CI_Controller {
             return print_r(json_encode($result));
 
         }
+        else if($data_arr['action']=='getListStudentSemesterAntara'){
+
+            $SASemesterID = $data_arr['SASemesterID'];
+            $NIP = $data_arr['NIP'];
+
+            $data = $this->db->query('SELECT sa.*, ats.Name, em.Name AS MentorName FROM db_academic.sa_student sa 
+                                                    LEFT JOIN db_academic.auth_students ats ON (ats.NPM = sa.NPM)
+                                                    LEFT JOIN db_employees.employees em ON (em.NIP = sa.Mentor)
+                                                    WHERE sa.SASemesterID = "'.$SASemesterID.'"
+                                                     AND sa.Mentor = "'.$NIP.'" ')->result_array();
+
+            if(count($data)>0){
+                for ($i=0;$i<count($data);$i++){
+                    $d = $data[$i];
+                    $dataDet = $this->db->query('SELECT ssd.*, mk.NameEng AS CourseEng,  mk.MKCode, cd.TotalSKS AS Credit FROM db_academic.sa_student_details ssd 
+                                                                LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssd.MKID)
+                                                                LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = ssd.CDID)
+                                                                WHERE ssd.IDSAStudent = "'.$d['ID'].'" 
+                                                                ORDER BY mk.MKCode ASC ')->result_array();
+
+                    $data[$i]['Details'] = $dataDet;
+                }
+            }
+
+            return print_r(json_encode($data));
+
+
+        }
+
+        else if($data_arr['action']=='getListStudentSemesterAntara_Kaprodi'){
+
+            $SASemesterID = $data_arr['SASemesterID'];
+            $ProdiID = $data_arr['ProdiID'];
+            $NIP = $data_arr['NIP'];
+
+
+            // Load data student yang
+            $data = $this->db->query('SELECT sa.*, ats.Name, em.Name AS MentorName FROM db_academic.sa_student sa 
+                                                    LEFT JOIN db_academic.auth_students ats ON (ats.NPM = sa.NPM)
+                                                    LEFT JOIN db_employees.employees em ON (em.NIP = sa.Mentor)
+                                                    WHERE sa.SASemesterID = "'.$SASemesterID.'" AND ats.ProdiID = "'.$ProdiID.'"
+                                                    ORDER BY sa.NPM ASC
+                                                    ')->result_array();
+
+
+            if(count($data)>0){
+                for ($i=0;$i<count($data);$i++){
+                    $d = $data[$i];
+                    $dataDet = $this->db->query('SELECT ssd.*, mk.NameEng AS CourseEng,  mk.MKCode, cd.TotalSKS AS Credit FROM db_academic.sa_student_details ssd 
+                                                                LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssd.MKID)
+                                                                LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = ssd.CDID)
+                                                                WHERE ssd.IDSAStudent = "'.$d['ID'].'" 
+                                                                ORDER BY mk.MKCode ASC ')->result_array();
+
+                    $data[$i]['Details'] = $dataDet;
+                }
+            }
+
+            return print_r(json_encode($data));
+
+        }
+
+        else if($data_arr['action']=='responSA'){
+
+            $dateTime = $this->m_rest->getDateTimeNow();
+
+            $ID = $data_arr['ID'];
+            $Status = $data_arr['Status'];
+
+            $col = ($Status==3 || $Status=='3' || $Status==-3 || $Status=='-3') ? 'Updated2At' : 'Updated1At';
+            $dataUp = array(
+                'Status' => $Status,
+                $col =>$dateTime
+            );
+
+            $this->db->set($dataUp);
+            $this->db->where('ID', $ID);
+            $this->db->update('db_academic.sa_student_details');
+            $this->db->reset_query();
+
+
+
+            // Jika status == 3 maka create tagihan
+            if($Status==3 || $Status=='3'){
+                // Get data sa
+                $data = $this->db->query('SELECT IDSAStudent FROM db_academic.sa_student_details WHERE ID = "'.$ID.'" ')->result_array();
+                $this->createTagihanSemesterAntara($data[0]['IDSAStudent']);
+            }
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='responSA_ApproveAll'){
+
+            $dateTime = $this->m_rest->getDateTimeNow();
+
+            $IDSAStudent = $data_arr['IDSAStudent'];
+            $Status = $data_arr['Status'];
+
+            $col = ($Status==3 || $Status=='3') ? 'Updated2At' : 'Updated1At';
+            $dataUp = array(
+                'Status' => $Status,
+                $col =>$dateTime
+            );
+
+            $this->db->set($dataUp);
+            $this->db->where('IDSAStudent', $IDSAStudent);
+            $this->db->update('db_academic.sa_student_details');
+
+            if($Status==3 || $Status=='3'){
+                $this->createTagihanSemesterAntara($IDSAStudent);
+            }
+
+            return print_r(1);
+        }
 
     }
+
+    function createTagihanSemesterAntara($IDSAStudent){
+
+        $dataStd = $this->db->get_where('db_academic.sa_student',array('ID' => $IDSAStudent))->result_array();
+
+        $SASemesterID = $dataStd[0]['SASemesterID'];
+
+        $dataConf = $this->db->get_where('db_academic.sa_academic_years',array('SASemesterID' => $SASemesterID))->result_array();
+
+        $NPM = $dataStd[0]['NPM'];
+        $DiscountBPP = $dataConf[0]['DiscountBPP'];
+
+        // Cek apakah BPP Sudah di set atau belim
+        $arrCheckBPP = array(
+            'PTID' => 5,
+            'SemesterID' => $SASemesterID,
+            'NPM' => $NPM
+        );
+        $dataCheckBPP = $this->db->get_where('db_finance.payment',$arrCheckBPP)->result_array();
+
+        if(count($dataCheckBPP)<=0){
+
+            // Get BPP
+            $dataTagihanBPP = $this->db->query('SELECT * FROM db_finance.m_tuition_fee WHERE PTID = 2 AND NPM = "'.$NPM.'" LIMIT 1')->result_array();
+            $InvoiceBPP = $DiscountBPP/100 * $dataTagihanBPP[0]['Invoice'];
+            $dataInsrtBPP = array(
+                'PTID' => 5,
+                'SemesterID' => $SASemesterID,
+                'NPM' => $NPM,
+                'Invoice' => $InvoiceBPP,
+                'Discount' => $DiscountBPP
+            );
+            $this->db->insert('db_finance.payment',$dataInsrtBPP);
+
+        }
+
+
+
+        // ===============
+
+        // Cek apakah Credit Sudah di set atau belim
+        $arrCheckCredit = array(
+            'PTID' => 6,
+            'SemesterID' => $SASemesterID,
+            'NPM' => $NPM
+        );
+        $dataCheckCredit = $this->db->get_where('db_finance.payment',$arrCheckCredit)->result_array();
+
+        // Invoice Credit
+        $dataTagihanCredit = $this->db->query('SELECT * FROM db_finance.m_tuition_fee WHERE PTID = 3 AND NPM = "'.$NPM.'" LIMIT 1')->result_array();
+
+        // Baca total credit
+        $dataC = $this->db->query('SELECT SUM(Credit) AS TotalCredit FROM db_academic.sa_student_details 
+                                      WHERE IDSAStudent = "'.$IDSAStudent.'" AND Status = "3" ')->result_array();
+        $dataInsrtCredit = array(
+            'PTID' => 6,
+            'SemesterID' => $SASemesterID,
+            'NPM' => $NPM,
+            'Invoice' => $dataC[0]['TotalCredit'] * $dataTagihanCredit[0]['Invoice']
+        );
+
+        if(count($dataCheckCredit)>0){
+
+            if($dataC[0]['TotalCredit']!=null && $dataC[0]['TotalCredit']>0){
+                $IDP = $dataCheckCredit[0]['ID'];
+                $this->db->set($dataInsrtCredit);
+                $this->db->where('ID', $IDP);
+                $this->db->update('db_finance.payment');
+            }
+
+
+        } else {
+            if($dataC[0]['TotalCredit']!=null && $dataC[0]['TotalCredit']>0){
+                $this->db->insert('db_finance.payment',$dataInsrtCredit);
+            }
+        }
+
+
+    }
+
+
 
 
 

@@ -108,10 +108,7 @@
         }
     });
     
-    $(document).on('click','.btnDetails',function () {
-        var SA_ID = $(this).attr('data-id');
-        loadDetails(SA_ID);
-    });
+
 
     function loadDataSemesterAntara() {
 
@@ -153,7 +150,8 @@
                     $('#trSmtAntara').append('<tr>' +
                         '<td class="td-center">'+no+'</td>' +
                         '<td class="td-center">'+data.Year+''+data.Code+'</td>' +
-                        '<td><a href="javascipt:void(0);" data-id="'+data.ID+'" class="btnDetails">'+data.Name+'</a></td>' +
+                        // '<td><a href="javascipt:void(0);" data-id="'+data.ID+'" class="btnDetails">'+data.Name+'</a></td>' +
+                        '<td><a href="'+base_url_js+'academic/semester-antara/timetable/'+data.ID+'">'+data.Name+'</a></td>' +
                         '<td class="td-center">10</td>' +
                         '<td class="td-center">'+btnAct+'</td>' +
                         '<td class="td-center">'+status+'</td>' +
@@ -167,6 +165,13 @@
             }
         });
     }
+
+
+    // ==============================
+    $(document).on('click','.btnDetails',function () {
+        var SA_ID = $(this).attr('data-id');
+        loadDetails(SA_ID);
+    });
 
     function loadDetails(SA_ID) {
         var url = base_url_js+'academic/semester-antara/details/'+SA_ID;
