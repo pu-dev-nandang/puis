@@ -596,7 +596,7 @@ function makeApproval()
 			   	} 
 			   }
 
-			html += '<th>'+'Requested by'+'</th>';   
+			// html += '<th>'+'Requested by'+'</th>';   
 			for (var i = 0; i < JsonStatus.length; i++) {
 				html += '<th>'+JsonStatus[i].NameTypeDesc+'</th>';
 			}
@@ -605,23 +605,21 @@ function makeApproval()
 			html += '<td>'+'<i class="fa fa-check" style="color: green;"></i>'+'</td>';
 			for (var i = 0; i < JsonStatus.length; i++) {
 				var v = '-';
-				if (JsonStatus[i].NameTypeDesc != 'Acknowledge by') {
-					if (JsonStatus[i].Status == '2') {
-						v = '<i class="fa fa-times" aria-hidden="true" style="color: red;"></i>';
-					}
-					else if(JsonStatus[i].Status == '1')
-					{
-						v = '<i class="fa fa-check" style="color: green;"></i>';
-					}
-					else
-					{
-						v = '-';
-					}
+				if (JsonStatus[i].Status == '2') {
+					v = '<i class="fa fa-times" aria-hidden="true" style="color: red;"></i>';
+				}
+				else if(JsonStatus[i].Status == '1')
+				{
+					v = '<i class="fa fa-check" style="color: green;"></i>';
+				}
+				else
+				{
+					v = '-';
 				}
 				html += '<td>'+v+'</td>';		
 			}
 			html += '</tr><tr>';
-			html += '<td>'+Requester+'</td>';
+			// html += '<td>'+Requester+'</td>';
 			for (var i = 0; i < JsonStatus.length; i++) {
 				// find Name in resultJson
 				var Name = '';
