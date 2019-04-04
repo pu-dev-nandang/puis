@@ -866,6 +866,7 @@ function ProsesOneRow(row,keyvalue = null)
 			var count = 0;
 			row.find('.InputBulan').each(function(){
 				var v = $(this).val();
+				v = findAndReplace(v,".","");
 				count = parseInt(count) + parseInt(v);
 			})
 
