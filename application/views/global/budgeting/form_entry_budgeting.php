@@ -602,7 +602,7 @@ function makeApproval()
 			}
 
 			html +=	'</th></thead>'+'<tbody><tr style = "height : 51px">';
-			html += '<td>'+'<i class="fa fa-check" style="color: green;"></i>'+'</td>';
+			// html += '<td>'+'<i class="fa fa-check" style="color: green;"></i>'+'</td>';
 			for (var i = 0; i < JsonStatus.length; i++) {
 				var v = '-';
 				if (JsonStatus[i].Status == '2') {
