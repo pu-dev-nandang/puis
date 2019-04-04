@@ -63,11 +63,11 @@
 		else
 		{
 			// new
-			makeContent();
+			makeDomAwal();
 		}
 	}
 
-	function makeContent()
+	function makeDomAwal()
 	{
 		var html = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;">';
 			html += '<div class="col-md-4">'+
@@ -86,7 +86,24 @@
 						'</div>'+
 					'</div>';
 			html += '</div>';		
-		$('#dtContent').html(html);
+
+		var htmlInputPR = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_PR">'+
+							'<div class = "col-md-12">'+
+								'<div class="table-responsive">'+
+								'</div>'+
+							'</div>'+
+						  '</div>';
+
+		var htmlInputFooter = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_Footer">'+
+						  '</div>';
+
+		var htmlApproval = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_Approval">'+
+						  '</div>';	
+
+		var htmlButton = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_Button">'+
+						  '</div>';
+
+		$('#dtContent').html(html+htmlInputPR+htmlInputFooter+htmlApproval+htmlButton);				  				  			  				  		
 
 	}
 </script>

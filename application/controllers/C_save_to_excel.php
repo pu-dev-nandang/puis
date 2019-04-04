@@ -1456,7 +1456,7 @@ class C_save_to_excel extends CI_Controller
                        $StH = 1;
                        $StH2 = 3;
 
-                       $JsonStatus = (array) json_decode($dt[0]['JsonStatus'],true);
+                       $JsonStatus = (array) json_decode($dt[$m]['JsonStatus'],true);
                        for ($i=0; $i < count($JsonStatus); $i++) { 
                            $excel->setCellValue($keyM[$StH].$St, $JsonStatus[$i]['NameTypeDesc']);
                            $N = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['NIP']);
