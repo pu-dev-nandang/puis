@@ -122,7 +122,7 @@ function loadTable()
 	    // console.log(dataForTable);
 	    for (var i = 0; i < dataForTable.length; i++) {
 	    	var btn_edit = '<button type="button" class="btn btn-warning btn-edit" Year = "'+dataForTable[i].Year+'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
-	    	var btn_del = '<button type="button" class="btn btn-danger btn-delete"  Year = "'+dataForTable[i].Year+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
+	    	var btn_del = '<button type="button" class="btn btn-danger btn-deleteTime"  Year = "'+dataForTable[i].Year+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
             var Activated = '&nbsp<button type="button" class="btn btn-default btn-activated"  Year = "'+dataForTable[i].Year+'"> <i class="fa fa-minus-circle" style="color: red;"></i> Deactivated</button>';
             var StActivated = '<i class="fa fa-check-circle" style="color: green;"></i>';
             if(dataForTable[i].Activated == 0)
@@ -151,7 +151,7 @@ function loadTable()
         });
 
         // $(".btn-delete").click(function(){
-        $(document).off('click', '.btn-delete').on('click', '.btn-delete',function(e) {   	
+        $(document).off('click', '.btn-deleteTime').on('click', '.btn-deleteTime',function(e) {   	
             var ID = $(this).attr('year');
              $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Are you sure ? </b> ' +
                  '<button type="button" id="confirmYesDelete" class="btn btn-primary" style="margin-right: 5px;" data-smt = "'+ID+'">Yes</button>' +
