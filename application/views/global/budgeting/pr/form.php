@@ -10,6 +10,9 @@
 		PostBudgetDepartment : [],
 	};
 
+	var S_Table_example_budget = '';
+	var S_Table_example_catalog = '';
+
 	$(document).ready(function() {
 		LoadFirstLoad();
 	})
@@ -65,7 +68,6 @@
 			var token = jwt_encode(data,'UAP)(*');
 			$.post(url,{token:token},function (resultJson) {
 				var response = jQuery.parseJSON(resultJson);
-				console.log(response);
 				ClassDt.PostBudgetDepartment = response.data;
 				// new
 				makeDomAwal();
@@ -175,7 +177,10 @@
 	$(document).off('click', '.btn-delete-item').on('click', '.btn-delete-item',function(e) {
 		var tr = $(this).closest('tr');
 		tr.remove();
-		MakeAutoNumbering(); 
+		MakeAutoNumbering();
+		var row = $('#table_input_pr tbody tr:last');
+		row.find('td').find('input,select,button,textarea').prop('disabled',false);
+		row.find('td:eq(13)').find('button').prop('disabled',false); 
 	})	
 
 	function AddingTable()
@@ -236,6 +241,190 @@
 	}
 
 	$(document).off('click', '.SearchPostBudget').on('click', '.SearchPostBudget',function(e) {
-			
+		var ev = $(this);
+		var dt = ClassDt.PostBudgetDepartment;
+		var html = '';
+		html ='<div class = "row">'+
+				'<div class = "col-md-12">'+
+					'<table id="example_budget" class="table table-bordered display select" cellspacing="0" width="100%">'+
+           '<thead>'+
+              '<tr>'+
+                 '<th>No</th>'+
+                 '<th>Post Budget Item</th>'+
+                 '<th>Remaining</th>'+
+              '</tr>'+
+           '</thead>'+
+      '</table></div></div>';
+
+		$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Budget'+'</h4>');
+		$('#GlobalModalLarge .modal-body').html(html);
+		$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>');
+		$('#GlobalModalLarge').modal({
+		    'show' : true,
+		    'backdrop' : 'static'
+		});
+
+		var table = $('#example_budget').DataTable({
+		      "data" : dt,
+		      'columnDefs': [
+			      {
+			         'targets': 0,
+			         'searchable': false,
+			         'orderable': false,
+			         'className': 'dt-body-center',
+			         'render': function (data, type, full, meta){
+			             return '';
+			         }
+			      },
+			      {
+			         'targets': 1,
+			         'render': function (data, type, full, meta){
+			             return full.NameHeadAccount+'-'+full.RealisasiPostName;
+			         }
+			      },
+			      {
+			         'targets': 2,
+			         'render': function (data, type, full, meta){
+			             return formatRupiah(full.Value-full.Using);
+			         }
+			      },
+		      ],
+		      'createdRow': function( row, data, dataIndex ) {
+		      		$(row).attr('CodePost', data.CodePost);
+		      		$(row).attr('CodeHeadAccount', data.CodeHeadAccount);
+		      		$(row).attr('CodePostRealisasi', data.CodePostRealisasi);
+		      		$(row).attr('money', (data.Value - data.Using) );
+		      		$(row).attr('id_budget_left', data.ID);
+		      		$(row).attr('NameHeadAccount', data.NameHeadAccount);
+		      		$(row).attr('RealisasiPostName', data.RealisasiPostName);
+		      },
+		      // 'order': [[1, 'asc']]
+		});
+
+		table.on( 'order.dt search.dt', function () {
+		        table.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+		            cell.innerHTML = i+1;
+		        } );
+		    } ).draw();
+
+		S_Table_example_budget = table;
+
+		S_Table_example_budget.on( 'click', 'tr', function (e) {
+			var row = $(this);
+			var CodePost = row.attr('CodePost');
+			var CodeHeadAccount = row.attr('CodeHeadAccount');
+			var CodePostRealisasi = row.attr('CodePostRealisasi');
+			var money = row.attr('money');
+			var id_budget_left = row.attr('id_budget_left');
+			var NameHeadAccount = row.attr('NameHeadAccount');
+			var RealisasiPostName = row.attr('RealisasiPostName');
+			var fillItem = ev.closest('tr');
+			fillItem.find('td:eq(1)').find('.PostBudgetItem').val(RealisasiPostName);
+			fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left',id_budget_left);
+			fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('remaining',money);
+			fillItem.find('td:eq(6)').find('.qty').trigger('change');
+			$('#GlobalModalLarge').modal('hide');
+		} );
 	})
+
+	$(document).off('click', '.SearchItem').on('click', '.SearchItem',function(e) {
+		var ev = $(this);
+		var html = '';
+			html ='<div class = "row">'+
+					'<div class = "col-md-12">'+
+						'<table id="example_catalog" class="table table-bordered display select" cellspacing="0" width="100%">'+
+               '<thead>'+
+                  '<tr>'+
+                     '<th>No</th>'+
+                     '<th>Item</th>'+
+                     '<th>Desc</th>'+
+                     '<th>Estimate Value</th>'+
+                     '<th>Photo</th>'+
+                     '<th>DetailCatalog</th>'+
+                  '</tr>'+
+               '</thead>'+
+          '</table></div></div>';
+			$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Catalog'+'</h4>');
+			$('#GlobalModalLarge .modal-body').html(html);
+			$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>');
+			$('#GlobalModalLarge').modal({
+			    'show' : true,
+			    'backdrop' : 'static'
+			});
+
+			var url = base_url_js+'rest/Catalog/__Get_Item';
+			var data = {
+				action : 'choices',
+				auth : 's3Cr3T-G4N',
+				department : DivSession,
+				approval : 1,
+			};
+		    var token = jwt_encode(data,"UAP)(*");
+			var table = $('#example_catalog').DataTable({
+			      'ajax': {
+			         'url': url,
+			         'type' : 'POST',
+			         'data'	: {
+			         	token : token,
+			         },
+			         dataType: 'json'
+			      },
+			      'columnDefs': [{
+			         'targets': 0,
+			         'searchable': false,
+			         'orderable': false,
+			         'className': 'dt-body-center',
+			         'render': function (data, type, full, meta){
+			             return '';
+			         }
+			      }],
+			      'createdRow': function( row, data, dataIndex ) {
+			      		$(row).attr('id_m_catalog', data[6]);
+			      		$(row).attr('estprice', data[7]);
+			      	
+			      },
+			      // 'order': [[1, 'asc']]
+			   });
+
+		table.on( 'order.dt search.dt', function () {
+		        table.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+		            cell.innerHTML = i+1;
+		        } );
+		    } ).draw();
+		S_Table_example_catalog = table;
+
+		S_Table_example_catalog.on( 'click', 'tr', function (e) {
+			var row = $(this);
+			var fillItem = ev.closest('tr');
+			var id_m_catalog = row.attr('id_m_catalog');
+			var estprice = row.attr('estprice');
+			var n = estprice.indexOf(".");
+			estprice = estprice.substring(0, n);
+
+			var Item = row.find('td:eq(1)').text();
+			var Desc = row.find('td:eq(2)').text();
+			var Est = row.find('td:eq(3)').text();
+			var Photo = row.find('td:eq(4)').html();
+			var DetailCatalog =  row.find('td:eq(5)').html();
+			var arr = Item+'@@'+Desc+'@@'+Est+'@@'+Photo+'@@'+DetailCatalog;
+			
+			fillItem.find('td:eq(2)').find('.Item').val(Item);
+			fillItem.find('td:eq(2)').find('.Item').attr('id_m_catalog',id_m_catalog);
+			fillItem.find('td:eq(2)').find('.Item').attr('estprice',estprice);
+			fillItem.find('td:eq(3)').find('.Detail').attr('data',arr);
+			fillItem.find('td:eq(7)').find('.UnitCost').val(estprice);
+			fillItem.find('td:eq(7)').find('.UnitCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+			fillItem.find('td:eq(7)').find('.UnitCost').maskMoney('mask', '9894');
+			fillItem.find('td:eq(6)').find('.qty').prop('disabled', false);
+			fillItem.find('td:eq(7)').find('.UnitCost').prop('disabled', false);
+
+			fillItem.find('td:eq(6)').find('.qty').trigger('change');
+			$('#GlobalModalLarge').modal('hide');
+		} );    	
+	})
+
+	function __BudgetRemaining()
+	{
+		
+	}
 </script>
