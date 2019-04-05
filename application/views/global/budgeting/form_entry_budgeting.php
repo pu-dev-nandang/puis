@@ -1287,6 +1287,7 @@ $(document).off('click', '#add_approver').on('click', '#add_approver',function(e
 		        html += '<tbody>' ;
 
 		    var JsonStatus = jQuery.parseJSON(dt[0].JsonStatus);   
+		    // console.log(JsonStatus);
 		    var ke = 0; 
 		    for (var i = 0; i < JsonStatus.length; i++) {
 		    	ke = i + 1;
@@ -1315,13 +1316,20 @@ $(document).off('click', '#add_approver').on('click', '#add_approver',function(e
 		    	    var stjson = '-';
 		    	}
 		    	var action = '';
-		    	if (JsonStatus[i]['Status'] != 1) {
+		    	if (i == 0) {
 		    		action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+i+'" id_creator_budget_approval = "'+id_creator_budget_approval+'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
-		    		action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+i+'" id_creator_budget_approval = "'+id_creator_budget_approval+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
 		    	}
+		    	else
+		    	{
+		    		if (JsonStatus[i]['Status'] != 1) {
+		    			action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+i+'" id_creator_budget_approval = "'+id_creator_budget_approval+'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
+		    			action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+i+'" id_creator_budget_approval = "'+id_creator_budget_approval+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+		    		}
+		    	}
+		    	
 		    	html += '<tr>'+
 		    	      '<td>'+ ke + '</td>'+
-		    	      '<td>'+ JsonStatus[i]['NIP'] +' || '+Name+ '</td>'+
+		    	      '<td NIP = "'+JsonStatus[i]['NIP']+'">'+ JsonStatus[i]['NIP'] +' || '+Name+ '</td>'+
 		    	      '<td>'+ stjson + '</td>'+
 		    	      '<td>'+ JsonStatus[i]['NameTypeDesc'] + '</td>'+
 		    	      '<td>'+ JsonStatus[i]['Visible'] + '</td>'+
@@ -1347,7 +1355,7 @@ $(document).off('click', '#add_approver').on('click', '#add_approver',function(e
 		    html += '</tbody>' ;
 		    html += '</table></div></div>' ;
 
-		    var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+		    var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>'+
 		        '';
 		    $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Custom Approval'+'</h4>');
 		    $('#GlobalModalLarge .modal-body').html(html);
@@ -1393,21 +1401,30 @@ $(document).off('click', '.btn-edit-approver').on('click', '.btn-edit-approver',
 	    			OP += '<option value="'+data_json[i].NIP+'" '+''+'>'+data_json[i].NIP+' | '+data_json[i].Name+'</option>';
 	    		}
 	    	var OP2 = '';
-	    		for (var i = 1; i < m_type_user.length; i++) {
+	    		for (var i = 0; i < m_type_user.length; i++) {
 	    			OP2 += '<option value="'+m_type_user[i].ID+'" '+''+'>'+m_type_user[i].Name+'</option>';
-	    		}	
-	    	evtr.find('td:eq(1)').attr('style','width : 30%');	
-	    	evtr.find('td:eq(1)').html('<select class=" form-control listemployees">'+
-	    							'   <option value = "0" selected>-- No Selected --</option>'+OP+
-	    						'</select>');
-	    	evtr.find('td:eq(3)').attr('style','width : 20%');	
-	    	evtr.find('td:eq(3)').html('<select class=" form-control listTypeUser">'+OP2+
-	    						'</select>');
-	    	evtr.find('td:eq(4)').attr('style','width : 10%');	
-	    	evtr.find('td:eq(4)').html('<select class=" form-control listVisible">'+
-	    							'<option value = "Yes" selected >Yes</option>'+
-	    							'<option value = "No" selected >No</option>'+
-	    						'</select>');
+	    		}
+	    	if (indexjson == 0) {
+	    		evtr.find('td:eq(4)').html('<select class=" form-control listVisible">'+
+	    								'<option value = "Yes" selected >Yes</option>'+
+	    								'<option value = "No" selected >No</option>'+
+	    							'</select>');
+	    	}
+	    	else
+	    	{
+	    		evtr.find('td:eq(1)').attr('style','width : 30%');	
+	    		evtr.find('td:eq(1)').html('<select class=" form-control listemployees">'+
+	    								'   <option value = "0" selected>-- No Selected --</option>'+OP+
+	    							'</select>');
+	    		evtr.find('td:eq(3)').attr('style','width : 20%');	
+	    		evtr.find('td:eq(3)').html('<select class=" form-control listTypeUser">'+OP2+
+	    							'</select>');
+	    		evtr.find('td:eq(4)').attr('style','width : 10%');	
+	    		evtr.find('td:eq(4)').html('<select class=" form-control listVisible">'+
+	    								'<option value = "Yes" selected >Yes</option>'+
+	    								'<option value = "No" selected >No</option>'+
+	    							'</select>');
+	    	}		
 
 	    	evtd.html('<button class = "btn btn-primary saveapprover" id_creator_budget_approval = "'+id_creator_budget_approval+'" indexjson = "'+indexjson+'" action = "'+action+'">Save</button>'+
 	    					'');
@@ -1471,16 +1488,17 @@ $(document).off('click', '.saveapprover').on('click', '.saveapprover',function(e
 	var NIP = evtr.find('td:eq(1)').find('.listemployees').val();
 	var NameTypeDesc = evtr.find('td:eq(3)').find('.listTypeUser option:selected').text();
 	var Visible = evtr.find('td:eq(4)').find('.listVisible').val();
+	var vt = evtr.find('td:eq(4)').find('.listVisible option:selected').text();
 	var id_creator_budget_approval = $(this).attr('id_creator_budget_approval');
 	var action = $(this).attr('action');
 	var indexjson = $(this).attr('indexjson');
-	if (NIP != '' && NIP != undefined && NIP != null && NIP != 0) {
+	if (indexjson == 0) {
+		NIP = evtr.find('td:eq(1)').attr('nip');
 		loading_button('.saveapprover[indexjson="'+indexjson+'"]');
 		var url = base_url_js + 'budgeting/update_approval_budgeting';
 		var data = {
 			NIP : NIP,
 			id_creator_budget_approval : id_creator_budget_approval,
-			NameTypeDesc : NameTypeDesc,
 			Visible : Visible,
 			action : action,
 			indexjson : indexjson,
@@ -1494,17 +1512,11 @@ $(document).off('click', '.saveapprover').on('click', '.saveapprover',function(e
 				cc[0].JsonStatus = dt;
 				ClassDt.creator_budget_approval = cc;
 				makeApproval();
-				var Nm = evtr.find('td:eq(1)').find('.listemployees option:selected').text();
-				var st = 'Not Approve';
-				var tu = NameTypeDesc;
-				var vt = evtr.find('td:eq(4)').find('.listVisible option:selected').text();
-				evtr.find('td:eq(1)').html(NIP + ' || '+Nm);
+				var st = 'Approve';
 				evtr.find('td:eq(2)').html(st);
-				evtr.find('td:eq(3)').html(tu);
 				evtr.find('td:eq(4)').html(vt);
 
 				action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+indexjson+'" id_creator_budget_approval = "'+id_creator_budget_approval+'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
-				action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+indexjson+'" id_creator_budget_approval = "'+id_creator_budget_approval+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
 				evtr.find('td:eq(5)').html(action);
 			}
 			else
@@ -1513,9 +1525,53 @@ $(document).off('click', '.saveapprover').on('click', '.saveapprover',function(e
 			}
 			$('.saveapprover[indexjson="'+indexjson+'"]').prop('disabled',false).html('Save');
 		});
-	} else {
-		toastr.error('Please choose employees','!!!Failed');
 	}
+	else
+	{
+		if (NIP != '' && NIP != undefined && NIP != null && NIP != 0) {
+			loading_button('.saveapprover[indexjson="'+indexjson+'"]');
+			var url = base_url_js + 'budgeting/update_approval_budgeting';
+			var data = {
+				NIP : NIP,
+				id_creator_budget_approval : id_creator_budget_approval,
+				NameTypeDesc : NameTypeDesc,
+				Visible : Visible,
+				action : action,
+				indexjson : indexjson,
+			}
+			var token = jwt_encode(data,"UAP)(*");
+			$.post(url,{ token:token },function (data_json) {
+				var response = jQuery.parseJSON(data_json);
+				if (response['msg'] == '') { // action success
+					var dt = response['data'];
+					var cc = ClassDt.creator_budget_approval;
+					cc[0].JsonStatus = dt;
+					ClassDt.creator_budget_approval = cc;
+					makeApproval();
+					var Nm = evtr.find('td:eq(1)').find('.listemployees option:selected').text();
+					var st = 'Not Approve';
+					var tu = NameTypeDesc;
+					var vt = evtr.find('td:eq(4)').find('.listVisible option:selected').text();
+					evtr.find('td:eq(1)').html(NIP + ' || '+Nm);
+					evtr.find('td:eq(2)').html(st);
+					evtr.find('td:eq(3)').html(tu);
+					evtr.find('td:eq(4)').html(vt);
+
+					action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+indexjson+'" id_creator_budget_approval = "'+id_creator_budget_approval+'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
+					action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+indexjson+'" id_creator_budget_approval = "'+id_creator_budget_approval+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+					evtr.find('td:eq(5)').html(action);
+				}
+				else
+				{
+					toastr.error(response['msg'],'!!!Failed');
+				}
+				$('.saveapprover[indexjson="'+indexjson+'"]').prop('disabled',false).html('Save');
+			});
+		} else {
+			toastr.error('Please choose employees','!!!Failed');
+		}
+	} // exit if indexjson
+	
 	
 })	
 $(document).off('click', '#Log').on('click', '#Log',function(e) {
