@@ -561,26 +561,29 @@ class M_budgeting extends CI_Model {
 
     public function get_budget_remaining($Year,$Departement)
     {
-        $sql = 'select dd.ID,cc.CodePostBudget,cc.Year,cc.RealisasiPostName,cc.PostName,dd.ID_creator_budget,dd.Value
-         ,cc.Departement
+        $sql = 'select dd.ID,dd.`Using`,cc.CodePostRealisasi,cc.Year,cc.RealisasiPostName,cc.PostName,dd.ID_creator_budget,dd.Value
+         ,cc.Departement,cc.CodeHeadAccount,cc.NameHeadAccount,cc.CodePost
          from
             (
-                   select * from db_budgeting.creator_budget as a join (
-                   select a.CodePostBudget as CodePostBudget2,b.CodePostRealisasi,a.Year,a.Budget,b.RealisasiPostName,c.PostName,c.CodePost,
-                   b.Departement
-                   from db_budgeting.cfg_postrealisasi as b left join (select * from db_budgeting.cfg_set_post where Year = ? and Active = 1) as a on a.CodeSubPost = b.CodePostRealisasi
-                   join db_budgeting.cfg_post as c on b.CodePost = c.CodePost
-                   where b.Departement = ?     
-                ) as  b on a.CodePostBudget = b.CodePostBudget2 order by a.CodePostBudget asc
+                   select a.ID,a.ID_creator_budget_approval,a.CodePostRealisasi,a.UnitCost,a.Freq,a.DetailMonth,
+               a.SubTotal,a.CreatedBy,a.CreatedAt,a.LastUpdateBy,a.LastUpdateAt,b.UnitDiv,b.CodeHeadAccount,
+                     b.RealisasiPostName,b.Desc,c.Name as NameHeadAccount,c.CodePost,d.PostName,dp.NameDepartement as NameUnitDiv,dp.Code as CodeDiv,
+                             cba.Departement,cba.`Year`
+               from db_budgeting.creator_budget as a left join db_budgeting.cfg_postrealisasi as b on a.CodePostRealisasi = b.CodePostRealisasi
+               LEFT JOIN db_budgeting.cfg_head_account as c on b.CodeHeadAccount = c.CodeHeadAccount
+               LEFT JOIN db_budgeting.cfg_post as d on c.CodePost = d.CodePost
+               LEFT JOIN (
+                select CONCAT("AC.",ID) as ID,  CONCAT("Study ",NameEng) as NameDepartement,Code as Code from db_academic.program_study where Status = 1
+                UNION
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
+               ) as dp on b.UnitDiv = dp.ID
+                             left join db_budgeting.creator_budget_approval as cba on cba.ID = a.ID_creator_budget_approval
+                             where cba.`Year` = ? and cba.Departement = ?
             ) cc join db_budgeting.budget_left as dd on cc.ID = dd.ID_creator_budget
             ';
         $query=$this->db->query($sql, array($Year,$Departement))->result_array();
-        // pass Name Department
-        for ($i=0; $i < count($query); $i++) { 
-            $NameDepartement = $this->SearchDepartementBudgeting($query[$i]['Departement']);
-            $NameDepartement = $NameDepartement[0]['NameDepartement'];
-            $query[$i]['NameDepartement'] = $NameDepartement;
-        }
         return $query;
     }
 

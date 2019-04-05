@@ -1,3 +1,14 @@
+<style type="text/css">
+    #example_budget.dataTable tbody tr:hover {
+       background-color:#71d1eb !important;
+       cursor: pointer;
+    }
+
+    #example_catalog.dataTable tbody tr:hover {
+       background-color:#71d1eb !important;
+       cursor: pointer;
+    }
+</style>
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
 <div class="tabbable tabbable-custom tabbable-full-width btn-read menuEBudget">
     <ul class="nav nav-tabs">
