@@ -2147,7 +2147,7 @@ class C_api2 extends CI_Controller {
                     $IDSAStudent = $dataStd[0]['ID'];
 
                     $dataCID = $this->db->query('SELECT cd.Semester, mk.MKCode, mk.NameEng AS CoureEng, cd.ID AS CDID, cd.MKID, cd.TotalSKS AS Credit,  
-                                                            ssd.Reson, ssd.ApprovedPAAt, ssd.ApprovedPABy, ssd.Status, ssd.ID SSDID
+                                                            ssd.Reson, ssd.Updated1At, ssd.Updated2At, ssd.Status, ssd.ID SSDID
                                                             FROM db_academic.sa_student_details ssd
                                                             LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = ssd.CDID)
                                                             LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssd.MKID)
@@ -2280,7 +2280,6 @@ class C_api2 extends CI_Controller {
 
 
         }
-
         else if($data_arr['action']=='getListStudentSemesterAntara_Kaprodi'){
 
             $SASemesterID = $data_arr['SASemesterID'];
@@ -2313,7 +2312,6 @@ class C_api2 extends CI_Controller {
             return print_r(json_encode($data));
 
         }
-
         else if($data_arr['action']=='responSA'){
 
             $dateTime = $this->m_rest->getDateTimeNow();
@@ -2366,6 +2364,110 @@ class C_api2 extends CI_Controller {
             }
 
             return print_r(1);
+        }
+        else if($data_arr['action']=='loadCourseSemesterAntara'){
+
+            $SASemesterID = $data_arr['SASemesterID'];
+
+            $data = $this->db->query('SELECT ssd.ID AS IDSSD, ssd.CDID, ssd.IDSAStudent, ssd.MKID, mk.NameEng AS CourseEng, ssd.Status,  
+                                                mk.MKCode
+                                                FROM db_academic.sa_student_details ssd
+                                                LEFT JOIN db_academic.sa_student ss ON (ss.ID = ssd.IDSAStudent)
+                                                LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssd.MKID)
+                                                WHERE ss.SASemesterID = "'.$SASemesterID.'" AND ssd.Status = "3"
+                                                 GROUP BY ssd.CDID ')->result_array();
+
+            if(count($data)>0){
+                for ($i=0;$i<count($data);$i++){
+                    $d = $data[$i];
+
+                    $dataStd = $this->db->query('SELECT ssd.NPM, ats.Name FROM db_academic.sa_student_details ssd
+                                                              LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssd.NPM)
+                                                              WHERE ssd.CDID = "'.$d['CDID'].'" ORDER BY ssd.NPM ASC')->result_array();
+
+                    $data[$i]['Students'] = $dataStd;
+
+                }
+            }
+
+            return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='actionSASchedule'){
+
+            $type = $data_arr['type'];
+
+            if($type=='insert'){
+
+                // Cek apakah group sudah ada atau blm
+                $dataSch = (array) $data_arr['dataSch'];
+
+                $IDSASemester = $dataSch['IDSASemester'];
+                $ClassGroup = $dataSch['ClassGroup'];
+
+                $dataCheck = $this->db->get_where('db_academic.sa_schedule',array(
+                    'IDSASemester' => $IDSASemester,
+                    'ClassGroup' => $ClassGroup
+                ))->result_array();
+
+                if(count($dataCheck)>0){
+                    $result = array(
+                        'Status' => -1,
+                        'Message' => 'Class Group Sama'
+                    );
+                    return print_r(json_encode($result));
+                } else {
+
+                    $this->db->insert('db_academic.sa_schedule',$dataSch);
+                    $ScheduleIDSA = $this->db->insert_id();
+
+                    $ArrIDSSD = (array) $data_arr['ArrIDSSD'];
+
+                    if(count($ArrIDSSD)>0){
+                        for($i=0;$i<count($ArrIDSSD);$i++){
+                            $dataSD = $this->db->select('ID,CDID,MKID')->get_where('db_academic.sa_student_details',
+                                array('ID' => $ArrIDSSD[$i]))->result_array();
+
+                            $arrIns = array(
+                                'ScheduleIDSA' => $ScheduleIDSA,
+                                'IDSSD' => $dataSD[0]['ID'],
+                                'CDID' => $dataSD[0]['CDID'],
+                                'MKID' => $dataSD[0]['MKID']
+                            );
+                            $this->db->insert('db_academic.sa_schedule_course',$arrIns);
+
+                        }
+                    }
+
+                    // Cek Team Teaching
+                    $TeamTeaching = $data_arr['TeamTeaching'];
+
+                    if(count($TeamTeaching)>0){
+                        for($i=0;$i<count($TeamTeaching);$i++){
+                            $arrTTM = array(
+                                'ScheduleIDSA' => $ScheduleIDSA,
+                                'NPM' => $TeamTeaching[$i]
+                            );
+                            $this->db->insert('db_academic.sa_schedule_team_teaching',$arrTTM);
+                        }
+                    }
+
+
+//                    print_r($dataSch);
+//                    print_r($ClassGroup);
+
+                    $result = array(
+                        'Status' => 1
+                    );
+                    return print_r(json_encode($result));
+
+                }
+
+
+
+
+            }
+
         }
 
     }

@@ -75,6 +75,13 @@ class C_semester_antara extends Academic_Controler {
         $this->menu_semester_antara($page,$IDSASemester);
     }
 
+    public function setting($IDSASemester){
+        $data['IDSASemester'] = $IDSASemester;
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/semesterantara/sa_setting',$data,true);
+        $this->menu_semester_antara($page,$IDSASemester);
+    }
+
 
 
     // ============================================
