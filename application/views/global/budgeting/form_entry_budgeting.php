@@ -341,7 +341,11 @@ function makeRowAdd_del(dt)
 	var Month = ClassDt.arr_bulan;
 	// get last NO 
 	// var No = $(".numberNO:last").text();
+	// get last ContentDataPostBudget // ganjil = warna, genap = white
+	var S = $('.PageSubAccount').find('.ContentDataPostBudget').length;
 	for (var i = 0; i < dt.length; i++) {
+		S++;
+		var style = (S%2==0) ? '' : 'background-color : #90c4e8;';
 		var aa = $('.PostBudget').find('option[value="'+dt[i].CodePostRealisasi+'"]');
 		if (!aa.length) {
 			var html = '';
@@ -351,7 +355,7 @@ function makeRowAdd_del(dt)
 				OPFreq += '<option value = "'+ii+'" '+selected+'>'+ii+'</option>';
 			}
 
-			html += '<div class = "row ContentDataPostBudget" style = "margin-left : 10px;margin-right : 10px;margin-top : 10px">';
+			html += '<div class = "row ContentDataPostBudget" style = "margin-left : 10px;margin-right : 10px;margin-top : 10px;'+style+'">';
 			// No = parseInt(No) +i + 1;
 			html += '<div class = "col-md-1 Custom-PostBudget">'+
 						'<span class = "numberNO">'+''+'</span>&nbsp'+
