@@ -12,6 +12,7 @@
 
 	var S_Table_example_budget = '';
 	var S_Table_example_catalog = '';
+	var S_Table_example_combine = '';
 
 	$(document).ready(function() {
 		LoadFirstLoad();
@@ -69,6 +70,7 @@
 			$.post(url,{token:token},function (resultJson) {
 				var response = jQuery.parseJSON(resultJson);
 				ClassDt.PostBudgetDepartment = response.data;
+				localStorage.setItem("PostBudgetDepartment", JSON.stringify(ClassDt.PostBudgetDepartment));
 				// new
 				makeDomAwal();
 			}).fail(function() {
@@ -180,7 +182,8 @@
 		MakeAutoNumbering();
 		var row = $('#table_input_pr tbody tr:last');
 		row.find('td').find('input,select,button,textarea').prop('disabled',false);
-		row.find('td:eq(13)').find('button').prop('disabled',false); 
+		row.find('td:eq(13)').find('button').prop('disabled',false);
+		__BudgetRemaining(); 
 	})	
 
 	function AddingTable()
@@ -213,7 +216,7 @@
 					'</td>'+
 					'<td><input type="number" min = "1" class="form-control qty"  value="1" disabled></td>'+
 					'<td><input type="text" class="form-control UnitCost" disabled></td>'+
-					'<td><input type="text" class="form-control PPH" value = "10"></td>'+
+					'<td><input type="number" class="form-control PPH" value = "10"></td>'+
 					'<td><input type="text" class="form-control SubTotal" disabled value = "0"></td>'+
 					'<td>'+
 						'<div class="input-group input-append date datetimepicker">'+
@@ -423,8 +426,260 @@
 		} );    	
 	})
 
+	$(document).off('click', '.Detail').on('click', '.Detail',function(e) {
+		var data = $(this).attr('data');
+		var arr = data.split('@@');
+		var html = '';
+			html ='<div class = "row">'+
+					'<div class = "col-md-12">'+
+						'<table id="example" class="table table-bordered display select" cellspacing="0" width="100%">'+
+               '<thead>'+
+                  '<tr>'+
+                     '<th>Item</th>'+
+                     '<th>Desc</th>'+
+                     '<th>Estimate Value</th>'+
+                     '<th>Photo</th>'+
+                     '<th>DetailCatalog</th>'+
+                  '</tr>'+
+               '</thead>'+
+               '<tbody><tr>';
+               		for (var i = 0; i < arr.length; i++) {
+               			html += '<td>'+arr[i]+'</td>';
+               		}
+               		html += '</tr></tbody>';
+         html += '</table></div></div>';
+		$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Catalog'+'</h4>');
+		$('#GlobalModalLarge .modal-body').html(html);
+		$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>');
+		$('#GlobalModalLarge').modal({
+		    'show' : true,
+		    'backdrop' : 'static'
+		});
+	})
+
+	$(document).off('change', '.qty').on('change', '.qty',function(e) {
+		var tr = $(this).closest('tr');
+		CountSubTotal_table(tr);
+	})
+
+	$(document).off('change', '.PPH').on('change', '.PPH',function(e) {
+		var tr = $(this).closest('tr');
+		CountSubTotal_table(tr);
+	})
+
+	function CountSubTotal_table(tr)
+	{
+		var qty = tr.find('.qty').val();
+		qty = findAndReplace(qty, ".","");
+		var UnitCost = tr.find('.UnitCost').val();
+		UnitCost = findAndReplace(UnitCost, ".","");
+		var hitung = qty * UnitCost;
+		var PPH = (tr.find('.PPH').val() / 100 ) * hitung;
+		hitung = hitung + PPH;
+		tr.find('.SubTotal').val(hitung);
+		tr.find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+		tr.find('.SubTotal').maskMoney('mask', '9894');
+		__BudgetRemaining(); 
+	}
+
 	function __BudgetRemaining()
 	{
+		ClassDt.BudgetRemaining = [];
+		var Budget = [];
+		var Budget =  JSON.parse(localStorage.getItem("PostBudgetDepartment"));
 		
+		var arr = [];
+		$('.PostBudgetItem').each(function(){
+			var tr = $(this).closest('tr');
+			var id_budget_left =  $(this).attr('id_budget_left');
+			var SubTotal = tr.find('.SubTotal').val();
+			SubTotal = findAndReplace(SubTotal, ".","");
+			var temp = {
+				id_budget_left : id_budget_left,
+				Using : SubTotal,
+			}
+
+			arr.push(temp);
+		})
+
+		var BudgetRemaining_arr = [];
+		for (var i = 0; i < Budget.length; i++) {
+			var v = Budget[i].Value;
+			var id_budget_left_ = Budget[i].ID;
+			var Using = Budget[i].Using;
+			var bool = false;
+			for (var j = 0; j < arr.length; j++) {
+				var id_budget_left = arr[j].id_budget_left;
+				if (id_budget_left == id_budget_left_) {
+					Using = parseInt(Using) + parseInt(arr[j].Using);
+					bool = true;
+				}
+			}
+
+			Budget[i].Using = Using;
+			if (bool) { // jika Post Budget selected
+				BudgetRemaining_arr.push(Budget[i]);
+			}
+		}
+
+		// show search combine seperti Post Budget Department
+		for (var i = 0; i < BudgetRemaining_arr.length; i++) {
+			var id_budget_left = BudgetRemaining_arr[i]['ID'];
+			var Remaining = BudgetRemaining_arr[i].Value - BudgetRemaining_arr[i].Using;
+			if (Remaining < 0) {
+				var tr = $('.PostBudgetItem:last').closest('tr');
+				var InputCombine = '<button class="btn btn-default SearchPostBudget_Combine" type="button" less = "'+Remaining+'"><i class="fa fa-search" aria-hidden="true"></i></button>';
+				tr.find('td:eq(12)').html(InputCombine);
+			}
+			else
+			{
+				var tr = $('.PostBudgetItem:last').closest('tr');
+				tr.find('td:eq(12)').html('No');
+			}
+		}
+
+		ClassDt.PostBudgetDepartment = Budget;
+		ClassDt.BudgetRemaining = BudgetRemaining_arr;
+		MakeTableRemaining();
+
+
 	}
+
+	function MakeTableRemaining()
+	{
+		$("#Page_Budget_Remaining").empty();
+		var BudgetRemaining = ClassDt.BudgetRemaining;
+		var html = '<div class = "row">'+
+						'<div class = "col-md-12">'+
+							'<table class="table table-bordered tableData" id ="tableData3">'+
+								'<thead>'+
+									'<tr>'+
+										'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
+										'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Budget</th>'+
+										'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Remaining</th>'+
+									'</tr>'+
+								'</thead><tbody>';
+									
+		for (var i = 0; i < BudgetRemaining.length; i++) {
+			var No = i + 1;
+			html += '<tr>'+
+						'<td>'+No+'</td>'+
+						'<td>'+BudgetRemaining[i].NameHeadAccount+'-'+BudgetRemaining[i].RealisasiPostName+'</td>'+
+						'<td>'+formatRupiah(BudgetRemaining[i].Value - BudgetRemaining[i].Using)+'</td>'+
+					'</tr>';	
+		}
+
+		html += '</tbody>'+
+				'</table>'+
+				'</div>'+
+				'</div>';		
+
+		$("#Page_Budget_Remaining").html(html);
+	}
+
+	$(document).off('click', '.SearchPostBudget_Combine').on('click', '.SearchPostBudget_Combine',function(e) {
+		var ev = $(this);
+		var dt = ClassDt.PostBudgetDepartment;
+		var html = '';
+		html ='<div class = "row">'+
+				'<div class = "col-md-12">'+
+					'<table id="example_budget_combine" class="table table-bordered display select" cellspacing="0" width="100%">'+
+           '<thead>'+
+              '<tr>'+
+                 '<th>No</th>'+
+                 '<th>Post Budget Item</th>'+
+                 '<th>Remaining</th>'+
+              '</tr>'+
+           '</thead>'+
+      '</table></div></div>';
+
+		$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Budget'+'</h4>');
+		$('#GlobalModalLarge .modal-body').html(html);
+		$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>'+
+		              '<button type="button" id="ModalbtnSaveForm_Combine" class="btn btn-success">Save</button>');
+		$('#GlobalModalLarge').modal({
+		    'show' : true,
+		    'backdrop' : 'static'
+		});
+
+		var table = $('#example_budget_combine').DataTable({
+		      "data" : dt,
+		      'columnDefs': [
+			      {
+			         'targets': 0,
+			         'searchable': false,
+			         'orderable': false,
+			         'className': 'dt-body-center',
+			         'render': function (data, type, full, meta){
+			             return '<input type="checkbox" name="id[]" value="' + full.ID + '" estvalue="' + (full.Value-full.Using)+'">';
+			         }
+			      },
+			      {
+			         'targets': 1,
+			         'render': function (data, type, full, meta){
+			             return full.NameHeadAccount+'-'+full.RealisasiPostName;
+			         }
+			      },
+			      {
+			         'targets': 2,
+			         'render': function (data, type, full, meta){
+			             return formatRupiah(full.Value-full.Using);
+			         }
+			      },
+		      ],
+		      'createdRow': function( row, data, dataIndex ) {
+		      		$(row).attr('CodePost', data.CodePost);
+		      		$(row).attr('CodeHeadAccount', data.CodeHeadAccount);
+		      		$(row).attr('CodePostRealisasi', data.CodePostRealisasi);
+		      		$(row).attr('money', (data.Value - data.Using) );
+		      		$(row).attr('id_budget_left', data.ID);
+		      		$(row).attr('NameHeadAccount', data.NameHeadAccount);
+		      		$(row).attr('RealisasiPostName', data.RealisasiPostName);
+		      },
+		      // 'order': [[1, 'asc']]
+		});
+
+		S_Table_example_combine = table;
+
+		$(document).off('click', '#ModalbtnSaveForm_Combine').on('click', '#ModalbtnSaveForm_Combine',function(e) {
+			var checkboxArr = [];
+			S_Table_example_combine.$('input[type="checkbox"]').each(function(){
+			  if(this.checked){
+			     var tr = $(this).closest('tr');
+			     var CodePost = tr.attr('CodePost');
+			     var CodeHeadAccount = tr.attr('CodeHeadAccount');
+			     var CodePostRealisasi = tr.attr('CodePostRealisasi');
+			     var money = tr.attr('money');
+			     var id_budget_left = tr.attr('id_budget_left');
+			     var NameHeadAccount = tr.attr('NameHeadAccount');
+			     var RealisasiPostName = tr.attr('RealisasiPostName');
+			     var temp = {
+			     	RealisasiPostName : RealisasiPostName,
+			     	id_budget_left : id_budget_left,
+			     	money : money,
+			     }
+
+			     checkboxArr.push(temp);
+			  }
+
+			}); // exit each function
+
+			  var td = ev.closest('td');
+			  // check div exist
+			  var aa = td.find('.liCombine');
+			  if (aa.length) {
+			  	aa.remove();
+			  }
+
+			 var InputLi = '<ul class = "liCombine">';
+			 for (var i = 0; i < checkboxArr.length; i++) {
+			 	InputLi += '<li id_budget_left = "'+checkboxArr[i].id_budget_left+'" money = "'+checkboxArr[i].money+'">'+checkboxArr[i].RealisasiPostName+'</li>';
+			  }
+				 InputLi += '</ul>';
+				 td.append(InputLi);
+				 td.attr('style','width : 250px;');
+
+			$('#GlobalModalLarge').modal('hide');	 
+		})
+	})
 </script>
