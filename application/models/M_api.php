@@ -840,6 +840,17 @@ class M_api extends CI_Model {
         $query=$this->db->query($sql);
 
      }
+
+
+    function getRowsmodule($keyword){
+        
+        $this->db->select('*')->from('db_it.group_module');
+        $this->db->like('NameGroup',$keyword);
+        $query = $this->db->get();    
+         
+        return $query->result();
+
+    }
     
     // ====== Get Jadwal Per Day =======
 

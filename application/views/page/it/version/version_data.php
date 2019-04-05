@@ -73,6 +73,49 @@
 
 <hr/>
 
+<script>
+    $(document).on('click','.btnsearchmodule',function () {
+        var action = $(this).attr('data-action');
+        var btnSave = (action=='addGroupModule') ? 'add' : 'edit';
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"> '+
+            ' <span aria-hidden="true">&times;</span></button> '+
+            ' <h4 class="modal-title">Seacrh Module </h4>');
+        $('#GlobalModal .modal-body').html('<table class="table">' +
+            '<tr>' +
+            '   <td style="width: 25%;">Name Module</td>' +
+            '   <td><select class="form-control filterStatusModule" value="" ><option value="" disabled> --- Select Name Module --- </option></select></td>' +
+            '</tr>' +
+            '</table>');
+        loadSelectModule();
+        
+        loadSelectOptionEmployeesSingle('#filternamepic','');
+        $('#filternamepic').select2({allowClear: true});
+
+        $('#descriptionversion').summernote({
+            placeholder: 'Text your Description Version',
+            tabsize: 2,
+            height: 200,
+            toolbar: [
+                // [groupName, [list of button]]
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['font', ['strikethrough', 'superscript', 'subscript']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['height', ['height']]
+            ]
+        });
+
+       
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-success btn-round btnSaveVersion"><span class="fa fa-check-square-o"></span> Select</button>');
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+    });
+
+</script>
 
 <script>
      $(document).on('click','.btndeleteversion',function () {
@@ -103,7 +146,7 @@
         var versionid = $(this).attr('versionid');
         var url = base_url_js+'api/__getdetailversion?s='+versionid;                          
         var token = jwt_encode({
-                action:'getdetail'
+                action:'getedit'
             },'UAP)(*');
 
         $.post(url,{token:token},function (resultJson) {
@@ -115,7 +158,7 @@
 
                     $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"> '+
 			        	' <span aria-hidden="true">&times;</span></button> '+
-			            ' <h4 class="modal-title">Detail Version</h4>');
+			            ' <h4 class="modal-title">Edit Version</h4>');
                     $('#GlobalModal .modal-body').html('<table class="table">' +
 			             '<tr>' +
 			            '	<td style="width: 25%;">No. Version</td>' +
@@ -127,21 +170,37 @@
 			            '</tr>' +
 			            '<tr>' +
 			            '	<td style="width: 25%;">Name Module</td>' +
-			            '	<td>'+response[i]['NameModule']+'</td>' +
+			            '	<td> <select class="form-control filterStatusModule"><option id="'+response[i]['IDModule']+'" disabled> '+response[i]['NameModule']+' </option></select></td>' +
 			            '</tr>' +
-			            '	<td style="width: 25%;">Date Update</td>' +
-			            '	<td>'+response[i]['UpdateAt']+'</td>' +
-			            '</tr>' +
+                        '</tr>' +
 			            '	<td style="width: 25%;">Name PIC</td>' +
-			            '	<td>'+response[i]['NamePIC']+'</td>' +
+			            '	<td><select class="select2-select-00 form-exam" id="filternamepic" style="max-width: 300px !important;" size="5"><option value="'+response[i]['NIP']+'" disabled> '+response[i]['NIP']+' - '+response[i]['NamePIC']+' </option> </select> </td>'+
 			            '</tr>' +
-			            '<tr>' +
 			            '<tr>' +
 			            '	<td style="width: 25%;">Description</td>' +
-			            '	<td>'+response[i]['Description']+'</td>' +
+			            '	<td><textarea id="descriptionversion">'+response[i]['Description']+'</textarea></td>' +
 			            '</tr>' +
 			            '</table>');
-                    $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-danger btn-round" data-dismiss="modal"><i class="fa fa-remove"></i> Close</button>');
+                    $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-danger btn-round" data-dismiss="modal"><i class="fa fa-remove"></i> Close</button> <button type="button" class="btn btn-success btn-round btnSaveGroup"><span class="glyphicon glyphicon-floppy-disk"></span>  Save</button>');
+
+                    loadSelectModule();
+                    loadSelectOptionEmployeesSingle('#filternamepic','');
+                    $('#filternamepic').select2({allowClear: true});
+
+                    $('#descriptionversion').summernote({
+                        placeholder: 'Text your Description Version',
+                        tabsize: 2,
+                        height: 200,
+                        toolbar: [
+                            // [groupName, [list of button]]
+                            ['style', ['bold', 'italic', 'underline', 'clear']],
+                            ['font', ['strikethrough', 'superscript', 'subscript']],
+                            ['fontsize', ['fontsize']],
+                            ['color', ['color']],
+                            ['para', ['ul', 'ol', 'paragraph']],
+                            ['height', ['height']]
+                        ]
+                    });
                 
                     $('#GlobalModal').modal({
                         'backdrop' : 'static',
@@ -250,7 +309,6 @@
     });
 
 </script>
-
 
 <script>
 	$('.btn-version').click(function () {
@@ -369,7 +427,7 @@
             $.post(url,{token:token},function (result) {
                     
                 if(result==0 || result=='0'){
-                    toastr.error('Name division or module already is exist!','Error');
+                    //toastr.error('Name division or module already is exist!','Error');
                 } else {  //if success save data
                 	toastr.success('Group Module Saved','Success');
                 	setTimeout(function () {
