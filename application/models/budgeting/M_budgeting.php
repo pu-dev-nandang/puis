@@ -762,7 +762,19 @@ class M_budgeting extends CI_Model {
                    for ($j=0; $j < count($arr); $j++) { 
                        $D2 = $arr[$j]['Code'];
                        if ($D == $D2) {
-                           $rs[] = $arr[$j];
+                           // check data exist 
+                            $bool = false;
+                            for ($k=0; $k < count($rs); $k++) { 
+                                if ($rs[$k]['Code'] == $D2) {
+                                    $bool = true;
+                                    break;
+                                }
+                            }
+
+                            if (!$bool) {
+                                $rs[] = $arr[$j];
+                            }
+                           
                        }
                    }
                }
