@@ -246,6 +246,8 @@
 	$(document).off('click', '.SearchPostBudget').on('click', '.SearchPostBudget',function(e) {
 		var ev = $(this);
 		var dt = ClassDt.PostBudgetDepartment;
+		// show all Budget yang memiliki nilai besar dari 0
+		dt = __Selection_BudgetDepartment(dt);	
 		var html = '';
 		html ='<div class = "row">'+
 				'<div class = "col-md-12">'+
@@ -329,6 +331,18 @@
 			$('#GlobalModalLarge').modal('hide');
 		} );
 	})
+
+	function __Selection_BudgetDepartment(dt,Min = 0)
+	{
+		var arr =[];
+		for (var i = 0; i < dt.length; i++) {
+			var v = parseInt(dt[i].Value) - parseInt(dt[i].Using);
+			if (v > Min) {
+				arr.push(dt[i]);
+			}
+		}
+		return arr;
+	}
 
 	$(document).off('click', '.SearchItem').on('click', '.SearchItem',function(e) {
 		var ev = $(this);
@@ -494,17 +508,76 @@
 			var id_budget_left =  $(this).attr('id_budget_left');
 			var SubTotal = tr.find('.SubTotal').val();
 			SubTotal = findAndReplace(SubTotal, ".","");
+			
+			// check Combine
+			var LiCombine = tr.find('.liCombine').find('li');
+			if (LiCombine.length) {
+				var less = tr.find('.SearchPostBudget_Combine').attr('less');
+				less = Math.abs(less);
+				LiCombine.each(function(){
+					var id_budget_left_com = $(this).attr('id_budget_left');
+					for (var i = 0; i < Budget.length; i++) {
+						var id_budget_left_ = Budget[i].ID;
+						if (id_budget_left_com == id_budget_left_) {
+							var Remaining = Budget[i].Value - Budget[i].Using;
+							if (less > Remaining) {
+								var Using = Remaining;
+							}
+							else
+							{
+								var Using = less;
+							}
+							less = parseInt(less) - parseInt(Remaining);
+							var temp = {
+								id_budget_left : id_budget_left_com,
+								Using : Using,
+							}
+							arr.push(temp);
+							break;
+						}
+						
+					}
+				})
+
+				for (var i = 0; i < Budget.length; i++) {
+					var id_budget_left_ = Budget[i].ID;
+					if (id_budget_left_ == id_budget_left) {
+						var Remaining = Budget[i].Value - Budget[i].Using;
+						SubTotal = Remaining;
+						break;
+					}
+				}
+			}
+			else
+			{
+				for (var i = 0; i < Budget.length; i++) {
+					var id_budget_left_ = Budget[i].ID;
+					if (id_budget_left_ == id_budget_left) {
+						var Remaining = Budget[i].Value - Budget[i].Using;
+						// show search combine seperti Post Budget Department
+						var less = parseInt(Remaining) - parseInt(SubTotal);
+						if (SubTotal > Remaining) {
+							var InputCombine = '<button class="btn btn-default SearchPostBudget_Combine" type="button" less = "'+less+'"><i class="fa fa-search" aria-hidden="true"></i></button>';
+							tr.find('td:eq(12)').html(InputCombine);
+						}
+						else
+						{
+							tr.find('td:eq(12)').html('No');
+						}
+						break;
+					}
+				}
+			}
+
+
 			var temp = {
 				id_budget_left : id_budget_left,
 				Using : SubTotal,
 			}
-
 			arr.push(temp);
 		})
-
 		var BudgetRemaining_arr = [];
 		for (var i = 0; i < Budget.length; i++) {
-			var v = Budget[i].Value;
 			var id_budget_left_ = Budget[i].ID;
 			var Using = Budget[i].Using;
 			var bool = false;
@@ -515,34 +588,16 @@
 					bool = true;
 				}
 			}
-
 			Budget[i].Using = Using;
 			if (bool) { // jika Post Budget selected
 				BudgetRemaining_arr.push(Budget[i]);
 			}
 		}
-
-		// show search combine seperti Post Budget Department
-		for (var i = 0; i < BudgetRemaining_arr.length; i++) {
-			var id_budget_left = BudgetRemaining_arr[i]['ID'];
-			var Remaining = BudgetRemaining_arr[i].Value - BudgetRemaining_arr[i].Using;
-			if (Remaining < 0) {
-				var tr = $('.PostBudgetItem:last').closest('tr');
-				var InputCombine = '<button class="btn btn-default SearchPostBudget_Combine" type="button" less = "'+Remaining+'"><i class="fa fa-search" aria-hidden="true"></i></button>';
-				tr.find('td:eq(12)').html(InputCombine);
-			}
-			else
-			{
-				var tr = $('.PostBudgetItem:last').closest('tr');
-				tr.find('td:eq(12)').html('No');
-			}
-		}
-
+		
 		ClassDt.PostBudgetDepartment = Budget;
+		// localStorage.setItem("PostBudgetDepartment", JSON.stringify(ClassDt.PostBudgetDepartment));
 		ClassDt.BudgetRemaining = BudgetRemaining_arr;
 		MakeTableRemaining();
-
-
 	}
 
 	function MakeTableRemaining()
@@ -580,6 +635,9 @@
 	$(document).off('click', '.SearchPostBudget_Combine').on('click', '.SearchPostBudget_Combine',function(e) {
 		var ev = $(this);
 		var dt = ClassDt.PostBudgetDepartment;
+		var less = $(this).attr('less');
+		less = Math.abs(less);
+		dt = __Selection_BudgetDepartment(dt);
 		var html = '';
 		html ='<div class = "row">'+
 				'<div class = "col-md-12">'+
@@ -643,6 +701,8 @@
 
 		$(document).off('click', '#ModalbtnSaveForm_Combine').on('click', '#ModalbtnSaveForm_Combine',function(e) {
 			var checkboxArr = [];
+			var tot_combine = 0;
+			var bool = true;
 			S_Table_example_combine.$('input[type="checkbox"]').each(function(){
 			  if(this.checked){
 			     var tr = $(this).closest('tr');
@@ -660,26 +720,50 @@
 			     }
 
 			     checkboxArr.push(temp);
+			     tot_combine = parseInt(tot_combine)+parseInt(money);
+			     if (tot_combine >= less && bool === true ) {
+			     	bool = false;
+			     }
+			     else
+			     {
+			     	bool = true;
+			     }
+
 			  }
 
 			}); // exit each function
+			
+			if (!bool) {
+				  var td = ev.closest('td');
+				  // check div exist
+				  var aa = td.find('.liCombine');
+				  if (aa.length) {
+				  	aa.remove();
+				  }
 
-			  var td = ev.closest('td');
-			  // check div exist
-			  var aa = td.find('.liCombine');
-			  if (aa.length) {
-			  	aa.remove();
-			  }
+				 var InputLi = '<ul class = "liCombine">';
+				 for (var i = 0; i < checkboxArr.length; i++) {
+				 	InputLi += '<li id_budget_left = "'+checkboxArr[i].id_budget_left+'" money = "'+checkboxArr[i].money+'">'+checkboxArr[i].RealisasiPostName+'</li>';
+				  }
+					 InputLi += '</ul>';
+					 td.append(InputLi);
+					 td.attr('style','width : 250px;');
 
-			 var InputLi = '<ul class = "liCombine">';
-			 for (var i = 0; i < checkboxArr.length; i++) {
-			 	InputLi += '<li id_budget_left = "'+checkboxArr[i].id_budget_left+'" money = "'+checkboxArr[i].money+'">'+checkboxArr[i].RealisasiPostName+'</li>';
-			  }
-				 InputLi += '</ul>';
-				 td.append(InputLi);
-				 td.attr('style','width : 250px;');
+				$('#GlobalModalLarge').modal('hide');
+				__BudgetRemaining();	
+			}
+			else
+			{
+				if (tot_combine > less) {
+					toastr.error('Excess Budget','!!!Failed');
+				}
+				else
+				{
+					toastr.error('Insufficient Budget','!!!Failed');
+				}
+				
+			}
 
-			$('#GlobalModalLarge').modal('hide');	 
 		})
 	})
 </script>
