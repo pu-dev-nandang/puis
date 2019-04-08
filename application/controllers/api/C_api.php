@@ -5336,20 +5336,20 @@ class C_api extends CI_Controller {
                 $Namemodule = strtoupper($formInsert['Namemodule']);
                 $Description = $formInsert['Descriptiongroup'];
                 //$getgroupmodule = $this->db->get_where('db_it.group_module',array('NameGroup'=>$Namegroup, 'IDDivision'=>$division))->result_array();
-                    $dataSave1 = array(
-                            'NameGroup' => $Namegroup,
-                            'IDDivision' => $division
-                    );
-                    $this->db->insert('db_it.group_module',$dataSave1);
-                    $insert_id_logging = $this->db->insert_id();
+                $dataSave1 = array(
+                        'NameGroup' => $Namegroup,
+                        'IDDivision' => $division
+                );
+                $this->db->insert('db_it.group_module',$dataSave1);
+                $insert_id_logging = $this->db->insert_id();
 
-                    $dataSave2 = array(
-                            'IDGroup' => $insert_id_logging,
-                            'NameModule' => $Namemodule,
-                            'Description' => $Description
-                    );
-                    $this->db->insert('db_it.module',$dataSave2);
-                    return print_r(1);
+                $dataSave2 = array(
+                        'IDGroup' => $insert_id_logging,
+                        'NameModule' => $Namemodule,
+                        'Description' => $Description
+                );
+                $this->db->insert('db_it.module',$dataSave2);
+                return print_r(1);
 
             }
             else if($data_arr['action']=='AddVersion') {
