@@ -687,6 +687,8 @@ $route['api/__geteducationLevel'] = 'api/c_api/geteducationLevel';
 $route['api/__crudConfig'] = 'api/c_api/crudConfig';
 $route['api/__getdataversion'] = 'api/c_api/getlistversion';
 $route['api/__getdetailversion'] = 'api/c_api/getversiondetail';
+$route['api/__searchmodule'] = 'api/c_api/search_module';
+
 
 
 $route['api/__getMKByID'] = 'api/c_api/getMKByID';
@@ -1088,6 +1090,9 @@ $route['api/vreservation/summary_use_room'] = 'api/c_global/summary_use_room';
 $route['api/vreservation/detailroom'] = 'api/c_global/detailroom';
 $route['vreservation/datafeedback'] = 'page/vreservation/c_global/datafeedback';
 $route['vreservation/loadScheduleEquipment'] = 'page/vreservation/c_global/loadScheduleEquipment';
+
+// Request Document
+$route['requestdocument'] = 'page/request-document/c_requestdocument/list_requestdocument/';
 
 
 // test

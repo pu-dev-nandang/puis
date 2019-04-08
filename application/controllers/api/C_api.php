@@ -2100,7 +2100,7 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div style="text-align: left;">'.$row["Description"].'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$row["UpdateAt"].'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$row["NamePIC"].'</div>';
-            $nestedData[] = '<div style="text-align: center;"><button type="button" class="btn btn-sm btn-primary btn-circle btnviewversion" versionid="'.$row["IDVersion"].'" data-toggle="tooltip" data-placement="top" title="Details"><i class="glyphicon glyphicon-th-list"></i></button> <button class="btn btn-sm btn-circle btn-danger btndeleteversion" data-toggle="tooltip" versionid="'.$row["IDVersion"].'" data-placement="top" title="Delete"><i class="fa fa-trash"></i> </button> <!--<button class="btn btn-sm btn-success btn-circle btneditversion" data-toggle="tooltip" versionid="'.$row["IDVersion"].'" data-placement="top" title="Edit"><i class="fa fa-edit"></i></button> --></div>';
+            $nestedData[] = '<div style="text-align: center;"><button type="button" class="btn btn-sm btn-primary btn-circle btnviewversion" versionid="'.$row["IDVersion"].'" data-toggle="tooltip" data-placement="top" title="Details"><i class="glyphicon glyphicon-th-list"></i></button> <button class="btn btn-sm btn-circle btn-danger btndeleteversion" data-toggle="tooltip" versionid="'.$row["IDVersion"].'" data-placement="top" title="Delete"><i class="fa fa-trash"></i> </button> <button class="btn btn-sm btn-success btn-circle btneditversion" data-toggle="tooltip" versionid="'.$row["IDVersion"].'" data-placement="top" title="Edit"><i class="fa fa-edit"></i></button> </div>';
             $no++;
             $data[] = $nestedData;
         }
@@ -2137,6 +2137,52 @@ class C_api extends CI_Controller {
             echo json_encode($details);   
 
         }
+        else if($data_arr['action']=='getedit') {
+
+            $idversion = $this->input->get('s');
+            $details = $this->db->query('SELECT aa.IDVersion, aa.Version, dd.Division, dd.NameModule, bb.Description, aa.UpdateAt, cc.Name AS NamePIC, cc.NIP
+                    FROM db_it.version AS aa
+                    INNER JOIN db_it.version_detail AS bb ON (aa.IDVersion = bb.IDVersion)
+                    LEFT JOIN db_employees.employees AS cc ON (aa.PIC = cc.NIP)
+                    LEFT JOIN (SELECT a.IDGroup, a.NameGroup, b.IDModule, b.NameModule, c.ID AS IDDivision,c.Division
+                    FROM db_it.group_module AS a
+                    LEFT JOIN db_it.module AS b ON (a.IDGroup = b.IDGroup)
+                    LEFT JOIN db_employees.division AS c ON a.IDDivision = c.ID) AS dd ON (bb.IDModule = dd.IDModule)
+                    WHERE aa.IDVersion = "'.$idversion.'" ')->result_array();
+            echo json_encode($details);  
+
+        }
+    }
+
+    function search_module() {
+       // if (isset($_REQUEST['q'])) {
+            
+        //    $results = $this->db->query('SELECT * FROM db_it.group_module WHERE NameGroup LIKE "%'.$_REQUEST['q'].'%" ')->result_array();
+
+            //$results = $this->data_model->get_data($_REQUEST['q']);
+        //    echo json_encode($results);
+        //}
+
+        $keyword = $this->input->post('term');
+        $data['response'] = 'false'; //Set default response
+        $query = $this->m_api->getRowsmodule($keyword); //Search DB
+        if( !empty($query) )
+        {
+            $data['response'] = 'true'; //Set response
+            $data['message'] = array(); //Create array
+            
+            foreach( $query as $row ) {
+                $data['message'][] = array( 
+                    'id'=>$row->id,
+                    'NameGroup' => $row->printable_name,
+                        ''
+                    );  //Add a row to array
+            }
+        }
+        
+            //echo json_encode($data); //echo json string if ajax request
+            echo json_encode($data);die;
+             
     }
 
     public function getSchedulePerDay(){
@@ -5313,27 +5359,22 @@ class C_api extends CI_Controller {
                 $division = $formInsert['division'];
                 $Namemodule = strtoupper($formInsert['Namemodule']);
                 $Description = $formInsert['Descriptiongroup'];
-                
-                $getgroupmodule = $this->db->get_where('db_it.group_module',array('NameGroup'=>$Namegroup, 'IDDivision'=>$division))->result_array();
+                //$getgroupmodule = $this->db->get_where('db_it.group_module',array('NameGroup'=>$Namegroup, 'IDDivision'=>$division))->result_array();
+                $dataSave1 = array(
+                        'NameGroup' => $Namegroup,
+                        'IDDivision' => $division
+                );
+                $this->db->insert('db_it.group_module',$dataSave1);
+                $insert_id_logging = $this->db->insert_id();
 
-                if(count($getgroupmodule)>0){
-                    return print_r(0);
-                }else {
-                    $dataSave1 = array(
-                            'NameGroup' => $Namegroup,
-                            'IDDivision' => $division
-                    );
-                    $this->db->insert('db_it.group_module',$dataSave1);
-                    $insert_id_logging = $this->db->insert_id();
+                $dataSave2 = array(
+                        'IDGroup' => $insert_id_logging,
+                        'NameModule' => $Namemodule,
+                        'Description' => $Description
+                );
+                $this->db->insert('db_it.module',$dataSave2);
+                return print_r(1);
 
-                    $dataSave2 = array(
-                            'IDGroup' => $insert_id_logging,
-                            'NameModule' => $Namemodule,
-                            'Description' => $Description
-                    );
-                    $this->db->insert('db_it.module',$dataSave2);
-                    return print_r(1);
-                }
             }
             else if($data_arr['action']=='AddVersion') {
 

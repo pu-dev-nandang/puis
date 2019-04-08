@@ -158,12 +158,21 @@
                             <li class=""><a href="<?php echo base_url('announcement/list-announcement'); ?>"><i class="fa fa-bullhorn"></i> Announcement</a></li>
                             <!--                            <li class="divider"></li>-->
                         <?php } ?>
+
                         <?php if(in_array(5,$rule_service)){ ?>
                             <li class="<?php if($this->uri->segment(1)=='vreservation'){echo 'active';} ?>">
                                 <a href="<?php echo base_url('vreservation'); ?>"><i class="fa fa-th-large" aria-hidden="true"></i> Venue Reservation</a>
                             </li>
 <!--                            <li class="divider"></li>-->
                         <?php } ?>
+
+                        <?php if(in_array(8,$rule_service)){ ?>
+                            <li class="<?php if($this->uri->segment(1)=='requestdocument'){echo 'active';} ?>">
+                                <a href="<?php echo base_url('requestdocument'); ?>"><i class="glyphicon glyphicon-transfer" aria-hidden="true"></i> Request Document</a>
+                            </li>
+<!--                            <li class="divider"></li>-->
+                        <?php } ?>
+
                         <?php if(in_array(6,$rule_service)){ ?>
                             <li class="<?php if($this->uri->segment(1)=='budgeting'){echo 'active';} ?>" id = "PageServiceBudgeting">
                                 <a href="<?php echo base_url('budgeting'); ?>"><i class="fa fa-money" aria-hidden="true"></i> Budgeting</a>
