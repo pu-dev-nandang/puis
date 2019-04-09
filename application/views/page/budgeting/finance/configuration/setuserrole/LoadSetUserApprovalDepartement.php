@@ -109,11 +109,21 @@
 					'</div>';
 
 					cmb = '<select class = "cmbTypeUser form-control" >';
+					if (response[i]['ID'] == 1) {
+						for (var j = 0; j < 1; j++) {
+							var selected = (cfg_m_type_approval[j].ID == response[i]['TypeDesc'])? 'selected' : '';
+							cmb += '<option value = "'+cfg_m_type_approval[j].ID+'" '+selected+' >'+cfg_m_type_approval[j].Name+'</option>';
+						}
+					}
+					else
+					{
 						for (var j = 0; j < cfg_m_type_approval.length; j++) {
 							var selected = (cfg_m_type_approval[j].ID == response[i]['TypeDesc'])? 'selected' : '';
 							cmb += '<option value = "'+cfg_m_type_approval[j].ID+'" '+selected+' >'+cfg_m_type_approval[j].Name+'</option>';
 						}
-						cmb += '</select>';
+					}
+	
+					cmb += '</select>';
 
 					
 					visible = '<select class = "cmbVisibel form-control" >';
@@ -158,11 +168,21 @@
 			var row = $(this).closest('tr');
 			// adding combo Type User
 				var cmb = '<select class = "cmbTypeUser form-control" >';
+				if (ID_m_userrole == 1) {
+					for (var i = 0; i < 1; i++) {
+						var selected = (i == 2)? 'selected' : '';
+						cmb += '<option value = "'+cfg_m_type_approval[i].ID+'" '+selected+' >'+cfg_m_type_approval[i].Name+'</option>';
+					}
+				}
+				else
+				{
 					for (var i = 0; i < cfg_m_type_approval.length; i++) {
 						var selected = (i == 2)? 'selected' : '';
 						cmb += '<option value = "'+cfg_m_type_approval[i].ID+'" '+selected+' >'+cfg_m_type_approval[i].Name+'</option>';
 					}
-					cmb += '</select>';
+				}
+					
+				cmb += '</select>';
 
 				var visible = '<select class = "cmbVisibel form-control" >'+
 								'<option value = "Yes" selected>Yes</option>'+

@@ -186,9 +186,16 @@
 			var bool = false;
 			for (var i = 0; i < r_access.length; i++) {
 				var ID_m_userrole = r_access[i].ID_m_userrole;
-				if (ID_m_userrole ==  1) {
-					bool = true;
-					break;
+				// search rule Entry = 1
+				for (var j = 0; j < rule.length; j++) {
+					var ID_m_userrole_ = rule[j].ID_m_userrole;
+					if (ID_m_userrole == ID_m_userrole_) {
+						var Entry = rule[j].Entry
+						if (Entry == 1) {
+							bool = true;
+							break;
+						}
+					}
 				}
 			}
 
@@ -197,6 +204,7 @@
 			}
 			else
 			{
+				// check rule entry
 				$('.btn-add-pr,input[type="file"]').prop('disabled',true);
 			}		   
 		}
