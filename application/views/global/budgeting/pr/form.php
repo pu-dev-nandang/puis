@@ -115,17 +115,17 @@
 									'<thead>'+
 									'<tr>'+
 										'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Budget</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Catalog</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Budget</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Catalog</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Desc</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Spec Add</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Spec+</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Need</th>'+
-			                            '<th width = "4%" style = "text-align: center;background: #20485A;color: #FFFFFF;">Qty</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Unit Cost</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">PPH(%)</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Sub Total</th>'+
+			                            '<th width = "4%" style = "text-align: center;background: #20485A;color: #FFFFFF;width : 78px;">Qty</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Cost</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 78px;">PPH(%)</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Sub Total</th>'+
 			                            '<th width = "150px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Date Needed</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Upload Files</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">File</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Combine Budget</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Action</th>'+
 									'</tr></thead>'+
@@ -165,13 +165,48 @@
 						  '</div>';
 
 		$('#dtContent').html(html+htmlBtnAdd+htmlInputPR+htmlInputFooter+htmlApproval+htmlButton);	
+		MakeButton();
+	}
 
+	function MakeButton()
+	{
+		var dt = ClassDt.RuleAccess;
+		console.log(dt);
+		if (ClassDt.PRCodeVal != '') { 
+			// edit
+		}
+		else
+		{
+			var html = '<div class = "col-md-6 col-md-offset-6" align = "right">'+
+						'<button class = "btn btn-success" id = "SaveSubmit" action = "add" id_pr_create = "" prcode = "">Submit</button>'+
+					   '</div>';
+			var r_access = dt['access'];
+			var rule = dt['rule'];
+			// allow access dengan ID_m_userrole: "1"
+			var bool = false;
+			for (var i = 0; i < r_access.length; i++) {
+				var ID_m_userrole = r_access[i].ID_m_userrole;
+				if (ID_m_userrole ==  1) {
+					bool = true;
+					break;
+				}
+			}
+
+			if (bool) {
+				$('#Page_Button').html(html);
+			}
+			else
+			{
+				$('.btn-add-pr,input[type="file"]').prop('disabled',true);
+			}		   
+		}
+		
 	}
 
 	$(document).off('click', '.btn-add-pr').on('click', '.btn-add-pr',function(e) {
 		// before adding row lock all input in last tr
 		var row = $('#table_input_pr tbody tr:last');
-		row.find('td').find('input,select,button,textarea').prop('disabled',true);
+		row.find('td').find('input,select,button:not(.Detail),textarea').prop('disabled',true);
 		row.find('td:eq(13)').find('button').prop('disabled',false);
 		AddingTable();
 	})
@@ -198,6 +233,7 @@
 								'<button class="btn btn-default SearchPostBudget" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>'+
 							'</span>'+
 						'</div>'+
+						'<label class = "lblBudget"></label>'+
 					'</td>'+
 					'<td>'+
 						'<div class="input-group">'+
@@ -206,6 +242,7 @@
 								'<button class="btn btn-default SearchItem" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>'+
 							'</span>'+
 						'</div>'+
+						'<label class = "lblCatalog"></label>'+
 					'</td>'+
 					'<td><button class = "btn btn-primary Detail">Detail</button></td>'+
 					'<td>'+
@@ -224,7 +261,7 @@
                             '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
                 		'</div>'+
                 	'</td>'+
-                	'<td><input type="file" data-style="fileinput" class = "BrowseFile" multiple accept="image/*,application/pdf"></td>'+
+                	'<td><input type="file" data-style="fileinput" class = "BrowseFile" multiple accept="image/*,application/pdf" style = "width : 97px;"></td>'+
                 	'<td>No</td>'+
                 	action
                 '</tr>';
@@ -325,6 +362,7 @@
 			var RealisasiPostName = row.attr('RealisasiPostName');
 			var fillItem = ev.closest('tr');
 			fillItem.find('td:eq(1)').find('.PostBudgetItem').val(RealisasiPostName);
+			fillItem.find('td:eq(1)').find('.lblBudget').html(RealisasiPostName);
 			fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left',id_budget_left);
 			fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('remaining',money);
 			fillItem.find('td:eq(6)').find('.qty').trigger('change');
@@ -341,6 +379,28 @@
 				arr.push(dt[i]);
 			}
 		}
+		return arr;
+	}
+
+	function __Selection_OneHeadAccount(dt,G_PostBudgetItem)
+	{
+
+		var arr =[];
+		var id_budget_left = G_PostBudgetItem;
+		for (var i = 0; i < dt.length; i++) {
+			var id_budget_left_ = dt[i].ID;
+			if (id_budget_left == id_budget_left_) {
+				var CodeHeadAccount = dt[i].CodeHeadAccount;
+				for (var j = 0; j < dt.length; j++) {
+					var CodeHeadAccount_ = dt[j].CodeHeadAccount;
+					if (CodeHeadAccount == CodeHeadAccount_) {
+						arr.push(dt[j]);
+					}
+				}
+				break;
+			}
+		}
+
 		return arr;
 	}
 
@@ -426,6 +486,7 @@
 			var arr = Item+'@@'+Desc+'@@'+Est+'@@'+Photo+'@@'+DetailCatalog;
 			
 			fillItem.find('td:eq(2)').find('.Item').val(Item);
+			fillItem.find('td:eq(2)').find('.lblCatalog').html(Item);
 			fillItem.find('td:eq(2)').find('.Item').attr('id_m_catalog',id_m_catalog);
 			fillItem.find('td:eq(2)').find('.Item').attr('estprice',estprice);
 			fillItem.find('td:eq(3)').find('.Detail').attr('data',arr);
@@ -433,7 +494,9 @@
 			fillItem.find('td:eq(7)').find('.UnitCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 			fillItem.find('td:eq(7)').find('.UnitCost').maskMoney('mask', '9894');
 			fillItem.find('td:eq(6)').find('.qty').prop('disabled', false);
-			fillItem.find('td:eq(7)').find('.UnitCost').prop('disabled', false);
+			if (estprice == 0) {
+				fillItem.find('td:eq(7)').find('.UnitCost').prop('disabled', false);
+			}
 
 			fillItem.find('td:eq(6)').find('.qty').trigger('change');
 			$('#GlobalModalLarge').modal('hide');
@@ -502,8 +565,10 @@
 		var Budget = [];
 		var Budget =  JSON.parse(localStorage.getItem("PostBudgetDepartment"));
 		
-		var arr = [];
+		
+		var BudgetRemaining_arr = [];
 		$('.PostBudgetItem').each(function(){
+			var arr = [];
 			var tr = $(this).closest('tr');
 			var id_budget_left =  $(this).attr('id_budget_left');
 			var SubTotal = tr.find('.SubTotal').val();
@@ -575,24 +640,39 @@
 				Using : SubTotal,
 			}
 			arr.push(temp);
-		})
-		var BudgetRemaining_arr = [];
-		for (var i = 0; i < Budget.length; i++) {
-			var id_budget_left_ = Budget[i].ID;
-			var Using = Budget[i].Using;
-			var bool = false;
-			for (var j = 0; j < arr.length; j++) {
-				var id_budget_left = arr[j].id_budget_left;
-				if (id_budget_left == id_budget_left_) {
-					Using = parseInt(Using) + parseInt(arr[j].Using);
-					bool = true;
+
+			for (var i = 0; i < Budget.length; i++) {
+				var id_budget_left_ = Budget[i].ID;
+				var Using = Budget[i].Using;
+				var bool = false;
+				for (var j = 0; j < arr.length; j++) {
+					var id_budget_left = arr[j].id_budget_left;
+					if (id_budget_left == id_budget_left_) {
+						Using = parseInt(Using) + parseInt(arr[j].Using);
+						bool = true;
+					}
+				}
+				Budget[i].Using = Using;
+				if (bool) { // jika Post Budget selected
+					// check Budget Remaining already exist
+					var bool2 = true;
+					for (var j = 0; j < BudgetRemaining_arr.length; j++) {
+						id_budget_left_re = BudgetRemaining_arr[j].ID;
+						if (id_budget_left_ == id_budget_left_re) {
+							// Update Using
+							BudgetRemaining_arr[j].Using = Budget[i].Using;
+							bool2 = false;
+							break;
+						}
+					}
+
+					if (bool2) {
+						BudgetRemaining_arr.push(Budget[i]);
+					}
+					
 				}
 			}
-			Budget[i].Using = Using;
-			if (bool) { // jika Post Budget selected
-				BudgetRemaining_arr.push(Budget[i]);
-			}
-		}
+		})
 		
 		ClassDt.PostBudgetDepartment = Budget;
 		// localStorage.setItem("PostBudgetDepartment", JSON.stringify(ClassDt.PostBudgetDepartment));
@@ -606,6 +686,7 @@
 		var BudgetRemaining = ClassDt.BudgetRemaining;
 		var html = '<div class = "row">'+
 						'<div class = "col-md-12">'+
+						'<div style="overflow : auto;max-height : 200px;">'+
 							'<table class="table table-bordered tableData" id ="tableData3">'+
 								'<thead>'+
 									'<tr>'+
@@ -627,7 +708,7 @@
 		html += '</tbody>'+
 				'</table>'+
 				'</div>'+
-				'</div>';		
+				'</div></div>';		
 
 		$("#Page_Budget_Remaining").html(html);
 	}
@@ -637,6 +718,12 @@
 		var dt = ClassDt.PostBudgetDepartment;
 		var less = $(this).attr('less');
 		less = Math.abs(less);
+
+		// combine in one head account
+			var tr = $(this).closest('tr');
+			var G_PostBudgetItem = tr.find('.PostBudgetItem').attr('id_budget_left');
+			dt = __Selection_OneHeadAccount(dt,G_PostBudgetItem);
+
 		dt = __Selection_BudgetDepartment(dt);
 		var html = '';
 		html ='<div class = "row">'+
@@ -741,13 +828,13 @@
 				  	aa.remove();
 				  }
 
-				 var InputLi = '<ul class = "liCombine">';
+				 var InputLi = '<ul class = "liCombine" style = "margin-left : -21px;">';
 				 for (var i = 0; i < checkboxArr.length; i++) {
 				 	InputLi += '<li id_budget_left = "'+checkboxArr[i].id_budget_left+'" money = "'+checkboxArr[i].money+'">'+checkboxArr[i].RealisasiPostName+'</li>';
 				  }
 					 InputLi += '</ul>';
 					 td.append(InputLi);
-					 td.attr('style','width : 250px;');
+					 td.attr('style','width : 150px;');
 
 				$('#GlobalModalLarge').modal('hide');
 				__BudgetRemaining();	
