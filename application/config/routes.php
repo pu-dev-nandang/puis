@@ -67,7 +67,7 @@ $route['academic/tahun-akademik-detail-date'] = 'page/academic/c_tahun_akademik/
 
 $route['academic/semester-antara'] = 'page/academic/c_semester_antara';
 $route['academic/semester-antara/timetable/(:num)'] = 'page/academic/c_semester_antara/timetable/$1';
-$route['academic/semester-antara/exam/(:num)'] = 'page/academic/c_semester_antara/exam/$1';
+$route['academic/semester-antara/students/(:num)'] = 'page/academic/c_semester_antara/students/$1';
 $route['academic/semester-antara/score/(:num)'] = 'page/academic/c_semester_antara/score/$1';
 
 $route['academic/semester-antara/setting-timetable/(:num)'] = 'page/academic/c_semester_antara/setting_timetable/$1';
@@ -942,6 +942,8 @@ $route['api2/__crudAnnouncement'] = 'api/c_api2/crudAnnouncement';
 $route['api2/__changePasswordStudent'] = 'api/c_api2/changePasswordStudent';
 
 $route['api2/__crudSemesterAntara'] = 'api/c_api2/crudSemesterAntara';
+$route['api2/__getTimetableSA'] = 'api/c_api2/getTimetableSA';
+$route['api2/__getStudentSA'] = 'api/c_api2/getStudentSA';
 
 $route['api3/login'] = 'api/c_mobile/login';
 $route['api3/__readGlobalInfo'] = 'api/c_mobile/readGlobalInfo';

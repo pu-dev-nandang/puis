@@ -24,13 +24,13 @@ class C_semester_antara extends Academic_Controler {
         $this->temp($content);
     }
 
-    private function menu_semester_antara($page,$IDSASemester){
+    private function menu_semester_antara($page,$SASemesterID){
         $data['department'] = parent::__getDepartement();
         $data['page']=$page;
 
         $dataSemesterAntara = $this->db->get_where('db_academic.semester_antara',
             array(
-                'ID' => $IDSASemester
+                'ID' => $SASemesterID
             ))->result_array();
 
         $data['DataSemesterAntara'] = json_encode($dataSemesterAntara);
@@ -39,47 +39,71 @@ class C_semester_antara extends Academic_Controler {
         $this->temp($content);
     }
 
-    public function timetable($IDSASemester){
-        $data['IDSASemester'] = $IDSASemester;
+    public function timetable($SASemesterID){
+        $data['SASemesterID'] = $SASemesterID;
         $data['department'] = parent::__getDepartement();
         $page = $this->load->view('page/'.$data['department'].'/semesterantara/sa_timetable',$data,true);
-        $this->menu_semester_antara($page,$IDSASemester);
+        $this->menu_semester_antara($page,$SASemesterID);
     }
 
-    public function exam($IDSASemester){
-        $data['IDSASemester'] = $IDSASemester;
+    public function students($SASemesterID){
+        $data['SASemesterID'] = $SASemesterID;
         $data['department'] = parent::__getDepartement();
-        $page = $this->load->view('page/'.$data['department'].'/semesterantara/sa_exam',$data,true);
-        $this->menu_semester_antara($page,$IDSASemester);
+        $page = $this->load->view('page/'.$data['department'].'/semesterantara/sa_students',$data,true);
+        $this->menu_semester_antara($page,$SASemesterID);
     }
 
-    public function score($IDSASemester){
-        $data['IDSASemester'] = $IDSASemester;
+    public function score($SASemesterID){
+        $data['SASemesterID'] = $SASemesterID;
         $data['department'] = parent::__getDepartement();
         $page = $this->load->view('page/'.$data['department'].'/semesterantara/sa_score',$data,true);
-        $this->menu_semester_antara($page,$IDSASemester);
+        $this->menu_semester_antara($page,$SASemesterID);
     }
 
 
-    public function setting_timetable($IDSASemester){
-        $data['IDSASemester'] = $IDSASemester;
+    public function setting_timetable($SASemesterID){
+        $data['SASemesterID'] = $SASemesterID;
         $data['department'] = parent::__getDepartement();
         $page = $this->load->view('page/'.$data['department'].'/semesterantara/sa_setting_timetable',$data,true);
-        $this->menu_semester_antara($page,$IDSASemester);
+        $this->menu_semester_antara($page,$SASemesterID);
     }
 
-    public function setting_exam($IDSASemester){
-        $data['IDSASemester'] = $IDSASemester;
+    public function setting_exam($SASemesterID){
+
+        $ExamIDSA = $this->input->get('edit');
+
+        $data['SASemesterID'] = $SASemesterID;
+        $dataExamSA = [];
+        if(isset($ExamIDSA) && $ExamIDSA!='' && $ExamIDSA!=null){
+
+            $dataExamSA = $this->db->query('SELECT se.*, cl.Seat, cl.SeatForExam FROM db_academic.sa_exam se 
+                                              LEFT JOIN db_academic.classroom cl ON (cl.ID = se.ClassroomID) 
+                                              WHERE se.ID = "'.$ExamIDSA.'" LIMIT 1')->result_array();
+
+
+            if(count($dataExamSA)>0){
+                $dataExamSA[0]['Course'] = $this->db->select('ScheduleIDSA')->get_where('db_academic.sa_exam_course',
+                    array('ExamIDSA' => $ExamIDSA))->result_array();
+            }
+
+        }
+
+
+
+        $data['ExamIDSA'] = $ExamIDSA;
+        $data['dataExamSA'] = json_encode($dataExamSA);
         $data['department'] = parent::__getDepartement();
+
+
         $page = $this->load->view('page/'.$data['department'].'/semesterantara/sa_setting_exam',$data,true);
-        $this->menu_semester_antara($page,$IDSASemester);
+        $this->menu_semester_antara($page,$SASemesterID);
     }
 
-    public function setting($IDSASemester){
-        $data['IDSASemester'] = $IDSASemester;
+    public function setting($SASemesterID){
+        $data['SASemesterID'] = $SASemesterID;
         $data['department'] = parent::__getDepartement();
         $page = $this->load->view('page/'.$data['department'].'/semesterantara/sa_setting',$data,true);
-        $this->menu_semester_antara($page,$IDSASemester);
+        $this->menu_semester_antara($page,$SASemesterID);
     }
 
 

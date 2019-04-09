@@ -38,8 +38,8 @@
                     <td style="width: 25%;">Group <span style="font-size: 10px;color: red;">*</span></td>
                     <td style="width: 1%;">:</td>
                     <td>
-                        <input id="formIDSASemester" value="<?= $IDSASemester; ?>" class="hide" />
-                        <input id="formType" value="<?= $IDSASemester; ?>" class="hide" />
+                        <input id="formSASemesterID" value="<?= $SASemesterID; ?>" class="hide" />
+<!--                        <input id="formType" value="--><?//= $IDSASemester; ?><!--" class="hide" />-->
                         <input class="form-control" id="formClassGroup" onkeyup="var start = this.selectionStart;
                                                                                 var end = this.selectionEnd;this.value = this.value.toUpperCase();this.setSelectionRange(start, end);" style="width: 170px;"/></td>
                 </tr>
@@ -147,7 +147,7 @@
 
     $('#submitSetTimetables').click(function () {
 
-        var formIDSASemester = $('#formIDSASemester').val();
+        var formSASemesterID = $('#formSASemesterID').val();
         var formClassGroup = $('#formClassGroup').val();
         var formCoordinator = $('#formCoordinator').val();
         var formTeamTeaching = $('#formTeamTeaching').val();
@@ -169,7 +169,7 @@
                 action : 'actionSASchedule',
                 type : 'insert',
                 dataSch : {
-                    IDSASemester : formIDSASemester,
+                    SASemesterID : formSASemesterID,
                     ClassGroup : formClassGroup.toUpperCase(),
                     Coordinator : formCoordinator,
                     DayID : formDay,

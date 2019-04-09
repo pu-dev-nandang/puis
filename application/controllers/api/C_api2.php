@@ -2446,7 +2446,7 @@ class C_api2 extends CI_Controller {
                         for($i=0;$i<count($TeamTeaching);$i++){
                             $arrTTM = array(
                                 'ScheduleIDSA' => $ScheduleIDSA,
-                                'NPM' => $TeamTeaching[$i]
+                                'NIP' => $TeamTeaching[$i]
                             );
                             $this->db->insert('db_academic.sa_schedule_team_teaching',$arrTTM);
                         }
@@ -2467,6 +2467,186 @@ class C_api2 extends CI_Controller {
 
 
             }
+
+        }
+        else if($data_arr['action']=='loadTimetableSA'){
+
+            $SASemesterID = $data_arr['SASemesterID'];
+
+            $queryDefault = 'SELECT s.*, d.NameEng AS DayEng, cl.Room, em.Name, mk.NameEng AS CourseEng FROM db_academic.sa_schedule s 
+                                      LEFT JOIN db_academic.days d ON (d.ID = s.DayID)
+                                      LEFT JOIN db_academic.classroom cl ON (cl.ID = s.ClassroomID)
+                                      LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                      LEFT JOIN db_academic.sa_schedule_course ssc ON (ssc.ScheduleIDSA = s.ID)
+                                      LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssc.MKID)
+                                      
+                                      WHERE s.SASemesterID = "'.$SASemesterID.'" 
+                                      GROUP BY s.ID
+                                      ORDER BY s.ClassGroup ASC ';
+
+
+            $data = $this->db->query($queryDefault)->result_array();
+            if(count($data)>0) {
+                for ($i = 0; $i < count($data); $i++) {
+                    $ScheduleIDSA = $data[$i]['ID'];
+                    $Course = $this->db->query('SELECT ssc.*
+                                              FROM db_academic.sa_schedule_course ssc
+                                              WHERE ssc.ScheduleIDSA = "'.$ScheduleIDSA.'" ')->result_array();
+
+                    $Student = [];
+                    if(count($Course)>0){
+                        foreach ($Course AS $item){
+                            // Student
+                            $dataStd = $this->db->query('SELECT ssd.NPM, ats.Name FROM db_academic.sa_student_details ssd
+                                                              LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssd.NPM)
+                                                              WHERE ssd.CDID = "'.$item['CDID'].'" 
+                                                              ORDER BY ssd.NPM ASC')->result_array();
+
+                            if(count($dataStd)>0){
+                                foreach ($dataStd AS $itm){
+                                    $arrp = array(
+                                        'NPM' => $itm['NPM'],
+                                        'ScheduleIDSA' => $ScheduleIDSA
+                                    );
+                                    array_push($Student,$arrp);
+                                }
+                            }
+                        }
+                    }
+
+                    usort($Student, function ($a, $b){return strcmp($a['NPM'], $b['NPM']);});
+
+                    $data[$i]['Students'] = $Student;
+
+                }
+
+            }
+
+            return print_r(json_encode($data));
+
+        }
+
+        else if($data_arr['action']=='academicYear'){
+
+            $Type = $data_arr['Type'];
+            $SASemesterID = $data_arr['SASemesterID'];
+
+            $dataS = $this->db->get_where('db_academic.sa_academic_years',array(
+                'SASemesterID' => $SASemesterID
+            ))->result_array();
+
+            $result = array(
+                'Start' => $dataS[0]['StartUAS'],
+                'End' => $dataS[0]['EndUAS']
+            );
+
+            if($Type=='uts'){
+                $result = array(
+                    'Start' => $dataS[0]['StartUTS'],
+                    'End' => $dataS[0]['EndUTS']
+                );
+            }
+
+            return print_r(json_encode($result));
+
+        }
+        else if($data_arr['action']=='addSAExam'){
+
+            $dataForm = (array) $data_arr['dataForm'];
+            $SASemesterID = $dataForm['SASemesterID'];
+
+            $this->db->insert('db_academic.sa_exam',$dataForm);
+            $ExamIDSA = $this->db->insert_id();
+
+            $dataCourse = (array) $data_arr['dataCourse'];
+
+            if(count($dataCourse)>0){
+                for($i=0;$i<count($dataCourse);$i++){
+                    $arrIns = array(
+                        'ExamIDSA' => $ExamIDSA,
+                        'ScheduleIDSA' => $dataCourse[$i]
+                    );
+                    $this->db->insert('db_academic.sa_exam_course',$arrIns);
+                }
+            }
+
+
+            $dataStudent = (array) $data_arr['dataStudent'];
+            if(count($dataStudent)>0){
+                for($s=0;$s<count($dataStudent);$s++){
+                    $d = (array) $dataStudent[$s];
+
+                    // Cek apakah sudah ada atau blm
+                    $arr = array(
+                        'SASemesterID' => $SASemesterID,
+                        'ExamIDSA' => $ExamIDSA,
+                        'ScheduleIDSA' => $d['ScheduleIDSA'],
+                        'NPM' => $d['NPM']
+                    );
+
+                    $dataSt = $this->db->select('ID')->get_where('db_academic.sa_exam_student',$arr)->result_array();
+
+                    if(count($dataSt)<=0){
+                        $this->db->insert('db_academic.sa_exam_student',$arr);
+                    }
+                }
+            }
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='editSAExam'){
+
+            $ExamIDSA = $data_arr['ExamIDSA'];
+            $dataForm = (array) $data_arr['dataForm'];
+            $SASemesterID = $dataForm['SASemesterID'];
+
+            $this->db->set($dataForm);
+            $this->db->where('ID', $ExamIDSA);
+            $this->db->update('db_academic.sa_exam');
+            $this->db->reset_query();
+
+
+            // Delete table
+            $tables = array('db_academic.sa_exam_course', 'db_academic.sa_exam_student');
+            $this->db->where('ExamIDSA', $ExamIDSA);
+            $this->db->delete($tables);
+            $this->db->reset_query();
+
+            $dataCourse = (array) $data_arr['dataCourse'];
+
+            if(count($dataCourse)>0){
+                for($i=0;$i<count($dataCourse);$i++){
+                    $arrIns = array(
+                        'ExamIDSA' => $ExamIDSA,
+                        'ScheduleIDSA' => $dataCourse[$i]
+                    );
+                    $this->db->insert('db_academic.sa_exam_course',$arrIns);
+                }
+            }
+
+            $dataStudent = (array) $data_arr['dataStudent'];
+            if(count($dataStudent)>0){
+                for($s=0;$s<count($dataStudent);$s++){
+                    $d = (array) $dataStudent[$s];
+
+                    // Cek apakah sudah ada atau blm
+                    $arr = array(
+                        'SASemesterID' => $SASemesterID,
+                        'ExamIDSA' => $ExamIDSA,
+                        'ScheduleIDSA' => $d['ScheduleIDSA'],
+                        'NPM' => $d['NPM']
+                    );
+
+                    $dataSt = $this->db->select('ID')->get_where('db_academic.sa_exam_student',$arr)->result_array();
+
+                    if(count($dataSt)<=0){
+                        $this->db->insert('db_academic.sa_exam_student',$arr);
+                    }
+                }
+            }
+
+            return print_r(1);
 
         }
 
@@ -2552,7 +2732,207 @@ class C_api2 extends CI_Controller {
     }
 
 
+    function getTimetableSA(){
+        $requestData= $_REQUEST;
 
+        $data_arr = $this->getInputToken();
+
+        $SASemesterID = $data_arr['SASemesterID'];
+
+        $queryDefault = 'SELECT s.*, d.NameEng AS DayEng, cl.Room, em.Name, mk.NameEng AS CourseEng FROM db_academic.sa_schedule s 
+                                      LEFT JOIN db_academic.days d ON (d.ID = s.DayID)
+                                      LEFT JOIN db_academic.classroom cl ON (cl.ID = s.ClassroomID)
+                                      LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                      LEFT JOIN db_academic.sa_schedule_course ssc ON (ssc.ScheduleIDSA = s.ID)
+                                      LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssc.MKID)
+                                      
+                                      WHERE s.SASemesterID = "'.$SASemesterID.'" 
+                                      GROUP BY s.ID
+                                      ORDER BY s.ClassGroup ASC ';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+        for($i=0;$i<count($query);$i++) {
+            $nestedData = array();
+
+            $row = $query[$i];
+
+            $ScheduleIDSA = $row['ID'];
+
+            // Get Team Teaching
+            $TeamTeaching = $this->db->query('SELECT em.Name, em.NIP FROM db_academic.sa_schedule_team_teaching sstt
+                                      LEFT JOIN db_employees.employees em ON (em.NIP = sstt.NIP)
+                                      WHERE sstt.ScheduleIDSA = "'.$ScheduleIDSA.'" ')->result_array();
+
+            $Lec = '<b>(Co) '.$row['Name'].'</b>';
+            if(count($TeamTeaching)>0){
+                foreach ($TeamTeaching AS $item){
+                    $Lec = $Lec.'<div>- '.$item['Name'].'</div>';
+                }
+            }
+
+            // Load Course
+            $Course = $this->db->query('SELECT ssc.*
+                                              FROM db_academic.sa_schedule_course ssc
+                                              WHERE ssc.ScheduleIDSA = "'.$ScheduleIDSA.'" ')->result_array();
+
+            $Student = [];
+            if(count($Course)>0){
+                foreach ($Course AS $item){
+                    // Student
+                    $dataStd = $this->db->query('SELECT ssd.NPM, ats.Name, p1.Status AS StatusBPP, p2.Status AS StatusCredit FROM db_academic.sa_student_details ssd
+                                                              LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssd.NPM)
+                                                              LEFT JOIN db_finance.payment p1 ON (p1.NPM = ssd.NPM AND p1.PTID = "5")
+                                                              LEFT JOIN db_finance.payment p2 ON (p2.NPM = ssd.NPM AND p2.PTID = "6")
+                                                              WHERE ssd.CDID = "'.$item['CDID'].'" 
+                                                              ORDER BY ssd.NPM ASC')->result_array();
+
+                    if(count($dataStd)>0){
+                        foreach ($dataStd AS $itm){
+                            array_push($Student,$itm);
+                        }
+                    }
+                }
+            }
+            usort($Student, function ($a, $b){return strcmp($a['NPM'], $b['NPM']);});
+
+            $tokenStd = $this->jwt->encode($Student,'UAP)(*');
+
+            $timeSc = substr($row['Start'],0,5).' - '.substr($row['End'],0,5);
+
+            // Get jadwal UTS
+            $dataUTS = $this->db->query('SELECT sec.ExamIDSA, se.ExamDate, se.Start, se.End, cl.Room FROM db_academic.sa_exam_course sec 
+                                                      LEFT JOIN db_academic.sa_exam se ON (se.ID = sec.ExamIDSA)
+                                                      LEFT JOIN db_academic.classroom cl ON (cl.ID = se.ClassroomID)
+                                                      WHERE sec.ScheduleIDSA = "'.$ScheduleIDSA.'" AND se.Type = "uts" ')->result_array();
+            $showUTS = '';
+            if(count($dataUTS)>0){
+                foreach ($dataUTS AS $item){
+                    $t = substr($item['Start'],0,5).' - '.substr($item['End'],0,5);
+                    $showUTS = $showUTS.'<div><a href="'.base_url('academic/semester-antara/setting-exam/'.$SASemesterID.'?edit='.$item['ExamIDSA']).'">'.date('l, d M Y',strtotime($item['ExamDate'])).'<br/>'.$t.'<br/>'.$item['Room'].'</a></div>';
+                }
+            }
+
+            $dataUAS = $this->db->query('SELECT sec.ExamIDSA, se.ExamDate, se.Start, se.End, cl.Room FROM db_academic.sa_exam_course sec 
+                                                      LEFT JOIN db_academic.sa_exam se ON (se.ID = sec.ExamIDSA)
+                                                      LEFT JOIN db_academic.classroom cl ON (cl.ID = se.ClassroomID)
+                                                      WHERE sec.ScheduleIDSA = "'.$ScheduleIDSA.'" AND se.Type = "uas" ')->result_array();
+            $showUAS = '';
+            if(count($dataUAS)>0){
+                foreach ($dataUAS AS $item){
+                    $t = substr($item['Start'],0,5).' - '.substr($item['End'],0,5);
+                    $showUAS = $showUAS.'<div><a href="'.base_url('academic/semester-antara/setting-exam/'.$SASemesterID.'?edit='.$item['ExamIDSA']).'">'.date('l, d M Y',strtotime($item['ExamDate'])).'<br/>'.$t.'<br/>'.$item['Room'].'</a></div>';
+                }
+            }
+
+            $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$row['ClassGroup'].'</div>';
+            $nestedData[] = '<div style="text-align:left;"><b><a>'.$row['CourseEng'].'</a></b></div>';
+            $nestedData[] = '<div style="text-align:right;">'.$row['DayEng'].', '.$timeSc.'<br/>'.$row['Room'].'</div>';
+            $nestedData[] = '<div style="text-align:left;">'.$Lec.'</div>';
+            $nestedData[] = '<div style="text-align:center;">
+                                <a href="javascript:void(0);" class="showStd" data-course="'.$row['ClassGroup'].' - '.$row['CourseEng'].'" 
+                                data-token="'.$tokenStd.'">'.count($Student).'</a></div>';
+            $nestedData[] = '<div style="text-align:right;">'.$showUTS.'</div>';
+            $nestedData[] = '<div style="text-align:right;">'.$showUAS.'</div>';
+            $nestedData[] = '<div style="text-align:center;"><button class="btn btn-default btn-sm"><i class="fa fa-edit"></i></button></div>';
+
+
+            $data[] = $nestedData;
+            $no++;
+
+        }
+
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+
+    }
+
+    function getStudentSA(){
+        $requestData= $_REQUEST;
+
+        $data_arr = $this->getInputToken();
+
+        $SASemesterID = $data_arr['SASemesterID'];
+
+        $queryDefault = 'SELECT ss.ID AS IDSAStudent, ats.NPM, ats.Name, ss.Mentor, em.Name AS MentorName FROM db_academic.sa_student ss 
+                                    LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ss.NPM)
+                                    LEFT JOIN db_employees.employees em ON (em.NIP = ss.Mentor)
+                                    WHERE ss.SASemesterID = "'.$SASemesterID.'" ';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++) {
+            $nestedData = array();
+
+            $row = $query[$i];
+
+            // Get Course
+            $IDSAStudent = $row['IDSAStudent'];
+
+            $dataCourse = $this->db->query('SELECT ssd.*, mk.Name AS CourseEng FROM db_academic.sa_student_details ssd
+                                                        LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssd.MKID)
+                                                        WHERE ssd.IDSAStudent = "'.$IDSAStudent.'" ')->result_array();
+
+            $viewCourse = '';
+            if(count($dataCourse)>0){
+                foreach ($dataCourse AS $item){
+                    $n = ($item['Grade']!='' && $item['Grade']!=null)
+                        ? ' <span class="label label-info">'.$item['Grade'].' | '.$item['Score'].'</span>' : '';
+
+                    // 0 = plan, 1 = Need approve pa, 2 = Approve PA -2 = Rejected PA, 3 = Approved Kaprodi, -3 = Rejected Kaprodi
+                    $Status = '<span class="sp-sts" style="color: #9e9e9e;">Plan</span>';
+                    if($item['Status']==1 || $item['Status']=='1'){
+                        $Status = '<span class="sp-sts" style="color: royalblue;">Need approve mentor</span>';
+                    } else if($item['Status']==2 || $item['Status']=='2'){
+                        $Status = '<span class="sp-sts" style="color: royalblue;">Need approve Kaprodi</span>';
+                    } else if($item['Status']==-2 || $item['Status']=='-2'){
+                        $Status = '<span class="sp-sts" style="color: #f44336;">Rejected by mentor</span>';
+                    } else if($item['Status']==-3 || $item['Status']=='-3'){
+                        $Status = '<span class="sp-sts" style="color: #f44336;">Rejected by Kaprodi</span>';
+                    } else if($item['Status']==3 || $item['Status']=='3'){
+                        $Status = '<span class="sp-sts" style="color: green;">Approved by Kaprodi</span>';
+                    }
+
+                    $viewCourse = $viewCourse.'<div style="margin-top: 5px;">- '.$item['CourseEng'].' <span class="label label-default">Credit : '.$item['Credit'].'</span>'.$n.' | '.$Status.'</div>';
+                }
+            }
+
+            $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div style="text-align:left;"><a>'.$row['Name'].'</a><br/>'.$row['NPM'].'<br/><span style="font-size: 12px;"><i class="fa fa-user-o"></i> '.$row['MentorName'].'</span></div>';
+            $nestedData[] = '<div style="text-align:left;">'.$viewCourse.'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
+
+            $data[] = $nestedData;
+            $no++;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+
+    }
 
 
 }

@@ -13,24 +13,25 @@
 <div class="tabbable tabbable-custom tabbable-full-width">
     <ul class="nav nav-tabs">
         <li>
-            <a href="<?php echo base_url('academic/semester-antara/timetable/'.$IDSASemester); ?>">Timetables</a>
+            <a href="<?php echo base_url('academic/semester-antara/timetable/'.$SASemesterID); ?>">Timetables</a>
         </li>
         <li>
-            <a href="<?php echo base_url('academic/semester-antara/exam/'.$IDSASemester); ?>">Exam</a>
+            <a href="<?php echo base_url('academic/semester-antara/students/'.$SASemesterID); ?>">Students</a>
         </li>
         <li>
-            <a href="<?php echo base_url('academic/semester-antara/score/'.$IDSASemester); ?>">Score</a>
+            <a href="<?php echo base_url('academic/semester-antara/score/'.$SASemesterID); ?>">Score</a>
         </li>
 
 
-        <li style="float: right;">
-            <a href="<?php echo base_url('academic/semester-antara/setting/'.$IDSASemester); ?>"><i class="fa fa-cog"></i></a>
+
+        <li>
+            <a href="<?php echo base_url('academic/semester-antara/setting-timetable/'.$SASemesterID); ?>">Set Timetables</a>
         </li>
-        <li style="float: right;">
-            <a href="<?php echo base_url('academic/semester-antara/setting-exam/'.$IDSASemester); ?>">Set Exam</a>
+        <li>
+            <a href="<?php echo base_url('academic/semester-antara/setting-exam/'.$SASemesterID); ?>">Set Exam</a>
         </li>
-        <li style="float: right;">
-            <a href="<?php echo base_url('academic/semester-antara/setting-timetable/'.$IDSASemester); ?>">Set Timetables</a>
+        <li>
+            <a href="<?php echo base_url('academic/semester-antara/setting/'.$SASemesterID); ?>"><i class="fa fa-cog"></i></a>
         </li>
     </ul>
     <div style="border-top: 1px solid #cccccc">
@@ -55,7 +56,7 @@
         $('#SemesterName').html(SemesterName);
 
         var menu_active = "<?php echo $this->uri->segment(3); ?>";
-        var arrMenu = ['timetable','exam','score','setting','setting-exam','setting-timetable'];
+        var arrMenu = ['timetable','students','score','setting-timetable','setting-exam','setting'];
         setMenuSelected('.nav-tabs','li','active',arrMenu,menu_active);
     });
 
