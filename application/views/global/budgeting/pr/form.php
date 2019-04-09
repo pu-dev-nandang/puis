@@ -6,6 +6,7 @@
 		BudgetRemaining : [],
 		PRCodeVal : "<?php echo $PRCodeVal ?>",
 		Year : "<?php echo $Year ?>",
+		Departement : "<?php echo $Departement ?>",
 		RuleAccess : [],
 		PostBudgetDepartment : [],
 	};
@@ -28,7 +29,7 @@
 		if (ClassDt.PRCodeVal != '') {
 			data = {
 				NIP : NIP,
-				Departement : DivSession,
+				Departement : ClassDt.Departement,
 				PRCodeVal : ClassDt.PRCodeVal,
 			};
 		}
@@ -60,7 +61,7 @@
 		{
 			// Load Budget Department
 			var Year = ClassDt.Year;
-			var Departement = DivSession;
+			var Departement = ClassDt.Departement;
 			var url = base_url_js+"budgeting/detail_budgeting_remaining";
 			var data = {
 					    Year : Year,
@@ -177,7 +178,7 @@
 		else
 		{
 			var html = '<div class = "col-md-6 col-md-offset-6" align = "right">'+
-						'<button class = "btn btn-success" id = "SaveSubmit" action = "add" id_pr_create = "" prcode = "" action = "1">Submit</button>'+
+						'<button class = "btn btn-success" id = "SaveSubmit" id_pr_create = "" prcode = "" action = "1">Submit</button>'+
 					   '</div>';
 			var r_access = dt['access'];
 			var rule = dt['rule'];
@@ -860,15 +861,403 @@
 
 		})
 	})
+	
+	function __CekBudgetRemaining()
+	{
+		var bool = true;
+		var dt = ClassDt.BudgetRemaining;
+		for (var i = 0; i < dt.length; i++) {
+			var v = parseInt(dt[i].Value) - parseInt(dt[i].Using);
+			if (v < 0) {
+				bool = false;
+				toastr.error("Budget Remaining cannot be less than 0",'!!!Error');
+				break;
+			}
+		}
 
-
+		return bool;
+	}
+	
 	$(document).off('click', '#SaveSubmit').on('click', '#SaveSubmit',function(e) {
-		loading_button('#SaveSubmit');
-		/*
-			1.Cek Budget Remaining tidak boleh ada yang kurang dari 0
-			2.Validation Inputan
-			3.Validation Auth Max Limit
-			4.Validation File Upload
-		*/
+		var htmltext = $(this).text();
+		if (confirm("Are you sure ?") == true) {
+			loading_button('#SaveSubmit');
+			/*
+				1.Cek Budget Remaining tidak boleh ada yang kurang dari 0
+				2.Validation Inputan
+				3.Validation Auth Max Limit
+				4.Validation File Upload
+			*/
+
+			var CekBudgetRemaining = __CekBudgetRemaining();
+			var validation = validation_input();
+			var PRCode = $(this).attr('prcode');
+			var id_pr_create = $(this).attr('id_pr_create');
+			var action = $(this).attr('action');
+			if (validation) {
+				SubmitPR(PRCode,id_pr_create,action,'#SaveSubmit');
+				// $('#SaveSubmit').prop('disabled',false).html(htmltext);
+			}
+			else
+			{
+				$('#SaveSubmit').prop('disabled',false).html(htmltext);
+			}
+		}
+
 	})
+
+	function __GetMaxLimit()
+	{
+		var MaxLimit = 0;
+		var dt = ClassDt.RuleAccess;
+		var access = dt.access;
+		var rule = dt.rule;
+		for (var i = 0; i < access.length; i++) {
+			var NIP_ = access[i].NIP;
+			if (NIP_ == NIP) {
+				var ID_m_userrole = access[i].ID_m_userrole;
+				// get BudgetRemaining
+				var dt2 = ClassDt.BudgetRemaining;
+				var temp = [];
+				for (var j = 0; j < dt2.length; j++) {
+					var CodePost = dt2[j].CodePost;
+					// hitung paling panjang approval jika ada 2 atau lebih dari Budget Category
+						var C_ = 0;
+						var IndexID = 0;
+						for (var k = 0; k < rule.length; k++) {
+							var CodePost_ = rule[k].CodePost;
+							var ID_m_userrole_ = rule[k].ID_m_userrole;
+							var Approved = rule[k].Approved;
+							if (CodePost == CodePost_ && ID_m_userrole == ID_m_userrole_) {
+								C_++;
+								IndexID = k;
+							}
+						}
+
+						var temp2 = {
+							CodePost : CodePost,
+							Count : C_,
+							MaxLimit : rule[IndexID].MaxLimit,
+						}
+
+						temp.push(temp2);
+				}
+
+				
+				// var temp = [
+				// 	{
+				// 		MaxLimit : 20000,
+				// 	},
+
+				// 	{
+				// 		MaxLimit : 100000,
+				// 	},
+				// ]
+				// console.log(temp);
+
+				// ambil nilai temp paling tinggi
+				MaxLimit = 0;
+				for (var j = 0; j < temp.length; j++) {
+					// var Count = temp[j].Count;
+					var MaxLimit_ = parseInt(temp[j].MaxLimit);
+					for (var k = j+1; k < temp.length; k++) {
+						// var Count_ = temp[k].Count;
+						var MaxLimit__ = parseInt(temp[k].MaxLimit);
+						if (MaxLimit__ >= MaxLimit_) {
+							// j = k-1;
+							break;
+						}
+						else
+						{
+							// j = k - 1;
+						}
+
+						j = k;
+					}
+
+					MaxLimit = MaxLimit_;
+				}
+				break;
+			}
+		}
+
+		return MaxLimit;
+	}
+
+	function validation_input()
+	{
+		var find = true;
+		var Total = 0
+		var aa = $(".PostBudgetItem").length;
+		if (aa == 0) {
+			toastr.error("Post Budget Item is required",'!!!Error');
+		}
+		else
+		{
+			$(".PostBudgetItem").each(function(){
+				var fillItem = $(this).closest('tr');
+				var PostBudgetItem = $(this).val();
+				if (PostBudgetItem == '') {
+					find = false;
+					toastr.error("Post Budget Item is required",'!!!Error');
+					return false;
+				}
+
+				var Item = fillItem.find('td:eq(2)').find('.Item').val();
+				if (Item == '') {
+					find = false;
+					toastr.error("Item is required",'!!!Error');
+					return false;
+				}
+
+				// find subtotal to check maxlimit
+					var SubTotal = fillItem.find('.SubTotal').val();
+					SubTotal = findAndReplace(SubTotal, ".","");
+					SubTotal = parseInt(SubTotal);
+					Total += parseInt(SubTotal);
+
+
+			})
+
+			var MaxLimit = __GetMaxLimit();
+
+			if (Total > MaxLimit) {
+				toastr.error("You have authorize Max Limit : "+ formatRupiah(MaxLimit),'!!!Error');
+				find = false;
+				return false;
+			}
+
+			$(".BrowseFile").each(function(){
+				var IDFile = $(this).attr('id');
+				var ev = $(this);
+				if (!file_validation2(ev) ) {
+				  $("#SaveSubmit").prop('disabled',true);
+				  find = false;
+				  return false;
+				}
+			})
+
+			$(".BrowseFileSD").each(function(){
+				var IDFile = $(this).attr('id');
+				var ev = $(this);
+				if (!file_validation2(ev) ) {
+				  $("#SaveSubmit").prop('disabled',true);
+				  find = false;
+				  return false;
+				}
+			})
+		}
+		return find;
+
+	}
+
+	function file_validation2(ev)
+	{
+	    var files = ev[0].files;
+	    var error = '';
+	    var msgStr = '';
+	    var max_upload_per_file = 4;
+	    if (files.length > max_upload_per_file) {
+	      msgStr += '1 Document should not be more than 4 Files<br>';
+
+	    }
+	    else
+	    {
+	      for(var count = 0; count<files.length; count++)
+	      {
+	       var no = parseInt(count) + 1;
+	       var name = files[count].name;
+	       var extension = name.split('.').pop().toLowerCase();
+	       if(jQuery.inArray(extension, ['jpg' ,'png','jpeg','pdf','doc','docx']) == -1)
+	       {
+	        msgStr += 'File Number '+ no + ' Invalid Type File<br>';
+	        //toastr.error("Invalid Image File", 'Failed!!');
+	        // return false;
+	       }
+
+	       var oFReader = new FileReader();
+	       oFReader.readAsDataURL(files[count]);
+	       var f = files[count];
+	       var fsize = f.size||f.fileSize;
+	       // console.log(fsize);
+
+	       if(fsize > 2000000) // 2mb
+	       {
+	        msgStr += 'File Number '+ no + ' Image File Size is very big<br>';
+	        //toastr.error("Image File Size is very big", 'Failed!!');
+	        //return false;
+	       }
+	       
+	      }
+	    }
+
+	    if (msgStr != '') {
+	      toastr.error(msgStr, 'Failed!!');
+	      return false;
+	    }
+	    else
+	    {
+	      return true;
+	    }
+	}
+
+	function SubmitPR(PRCode,id_pr_create,Action,ID_element)
+	{
+		var Year = ClassDt.Year;
+		var Departement = ClassDt.Departement;
+		var Notes = $("#Notes").val();
+		var FormInsertDetail = [];
+		var form_data = new FormData();
+		var PassNumber = 0;
+		$(".PostBudgetItem").each(function(){
+			var FormInsertCombine = [];
+			var ID_budget_left = $(this).attr('id_budget_left');
+				var fillItem = $(this).closest('tr');
+			var ID_m_catalog = fillItem.find('.Item').attr('id_m_catalog');
+			var Spec_add = fillItem.find('.SpecAdd').val();
+			var Need = fillItem.find('.Need').val();
+			var Qty = fillItem.find('.qty').val();
+			var UnitCost = fillItem.find('.UnitCost').val();
+			UnitCost = findAndReplace(UnitCost, ".","");
+			var UnitCost = fillItem.find('.UnitCost').val();
+			var PPH = fillItem.find('.PPH').val();
+			var SubTotal = fillItem.find('.SubTotal').val();
+			SubTotal = findAndReplace(SubTotal, ".","");
+			var DateNeeded = fillItem.find('.datetimepicker').find('input').val();
+
+			if ( $( '#'+'BrowseFileSD').length ) {
+				var UploadFile = $('#'+'BrowseFileSD')[0].files;
+				for(var count = 0; count<UploadFile.length; count++)
+				{
+				 form_data.append("Supporting_documents[]", UploadFile[count]);
+				}
+			}
+
+			if ( fillItem.find('.BrowseFile').length ) {
+				var UploadFile = fillItem.find('.BrowseFile')[0].files;
+				for(var count = 0; count<UploadFile.length; count++)
+				{
+				 form_data.append("UploadFile"+PassNumber+"[]", UploadFile[count]);
+				}
+			}
+
+			// get combine
+				fillItem.find('.liCombine').find('li').each(function(){
+					var ID_budget_left_com = $(this).attr('id_budget_left');
+					// Get Cost dari Arr BudgetRemaining field Using
+						var dt = ClassDt.BudgetRemaining;
+						var Cost = 0;
+						for (var i = 0; i < dt.length; i++) {
+							var ID_budget_left_com_ = dt[i].ID;
+							if (ID_budget_left_com == ID_budget_left_com_) {
+								Cost = dt[i].Using;
+								break;
+							}
+						}
+
+					var temp = {
+						ID_budget_left : ID_budget_left_com,
+						Cost : Cost,
+					};
+					FormInsertCombine.push(temp);	
+				})
+
+			 var data = {
+			 	ID_budget_left : ID_budget_left,
+			 	ID_m_catalog : ID_m_catalog,
+			 	Spec_add : Spec_add,
+			 	Need : Need,
+			 	Qty : Qty,
+			 	UnitCost : UnitCost,
+			 	PPH : PPH,
+			 	SubTotal : SubTotal,
+			 	DateNeeded : DateNeeded,
+			 	FormInsertCombine : FormInsertCombine,
+			 	PassNumber : PassNumber,
+			 }
+			 var token = jwt_encode(data,"UAP)(*");
+			 FormInsertDetail.push(token);
+			 PassNumber++
+		})
+
+		// return;
+
+		var token = jwt_encode(FormInsertDetail,"UAP)(*");
+		form_data.append('token',token);
+
+		form_data.append('Action',Action);
+
+		token = jwt_encode(PRCode,"UAP)(*");
+		form_data.append('PRCode',token);
+
+		token = jwt_encode(Year,"UAP)(*");
+		form_data.append('Year',token);
+
+		token = jwt_encode(Departement,"UAP)(*");
+		form_data.append('Departement',token);
+
+		token = jwt_encode(Notes,"UAP)(*");
+		form_data.append('Notes',token);
+
+		var url = base_url_js + "budgeting/submitpr"
+		$.ajax({
+		  type:"POST",
+		  url:url,
+		  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+		  contentType: false,       // The content type used when sending data to the server.
+		  cache: false,             // To unable request pages to be cached
+		  processData:false,
+		  dataType: "json",
+		  success:function(data)
+		  {
+		    switch (Action)
+		    {
+		       case "1":
+		       		// if ($("#p_prcode").length) {
+		       		// 	$("#p_prcode").html('PRCode : '+data['PRCode']);
+		       		// }
+		       		// else
+		       		// {
+		       		// 	$(".thumbnail").find('.row:first').before('<p style = "color : red" id = "p_prcode">PRCode : '+data['PRCode']+'</p>');
+		       		// }
+		       		
+		       		// var rowPullright = $(ID_element).closest('.pull-right');
+		       		// rowPullright.empty();
+		       		// rowPullright.append('<button class="btn btn-default" id="pdfprint" PRCode = "'+data['PRCode']+'"> <i class = "fa fa-file-pdf-o"></i> Print PDF</button>'+ '&nbsp&nbsp'+'<!--<button class="btn btn-default" id="excelprint" PRCode = "'+data['PRCode']+'"><i class = "fa fa-file-excel-o"></i> Print Excel</button>-->');
+
+		       		// $('button:not([id="pdfprint"]):not([id="excelprint"]):not([id="btnBackToHome"])').prop('disabled', true);
+		       		// $(".Detail").prop('disabled', false);
+		       		// $("input").prop('disabled', true);
+		       		// $("select").prop('disabled', true);
+		       		// $("textarea").prop('disabled', true);
+		       		// $(".input-group-addon").remove();
+
+		       		// update tableData_selected
+		       			// var js = jQuery.parseJSON(data['JsonStatus']);
+		       			// JsonStatus = js;
+		       			// Get_tableData_selected(JsonStatus);
+
+		       		break;
+		       case "larry": 
+		           alert('Hey');
+		       default: 
+		           alert('Default case');
+		    }
+
+		  },
+		  error: function (data) {
+		    toastr.error("Connection Error, Please try again", 'Error!!');
+		    var nmbtn = '';
+		    if (ID_element == '#SaveSubmit') {
+		    	nmbtn = 'Submit';
+		    }
+		    else if(ID_element == '#SaveSubmit')
+		    {
+		    	nmbtn = 'Submit';
+		    }
+		    $(ID_element).prop('disabled',false).html(nmbtn);
+		  }
+		})
+
+	} 
 </script>

@@ -1218,7 +1218,7 @@ $route['budgeting/page_pr_catalog/(:any)'] = 'page/budgeting/c_pr_po/page_pr_cat
 
 $route['budgeting/PostBudgetThisMonth_Department'] = 'page/budgeting/c_budgeting/PostBudgetThisMonth_Department';
 $route['budgeting/getPostBudgetDepartement'] = 'page/budgeting/c_budgeting/getPostBudgetDepartement';
-$route['budgeting/submitpr'] = 'page/budgeting/c_budgeting/submitpr';
+$route['budgeting/submitpr'] = 'page/budgeting/c_pr_po/submitpr';
 $route['budgeting/DataPR'] = 'page/budgeting/c_pr_po/DataPR';
 $route['budgeting/FormEditPR'] = 'page/budgeting/c_budgeting/FormEditPR';
 $route['budgeting/GetDataPR'] = 'page/budgeting/c_budgeting/GetDataPR';
