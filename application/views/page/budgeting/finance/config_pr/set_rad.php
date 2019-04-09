@@ -181,7 +181,8 @@
 						for(var key in temp) {
 							if (key == FieldType[k]) {
 								var checked = (temp[key] == 1) ? 'checked' : '';
-								chk += '<div class = "row">'+
+								var hidden = (ID_user == 1 && key != 'Entry')? 'hide' : '';
+								chk += '<div class = "row '+hidden+'">'+
 										'<div class = "col-md-12">'+
 											'<div class = "form-group">'+
 												'<label>'+FieldType[k]+'</label>'+
@@ -250,6 +251,7 @@
 			fill += '<td>'+'<input type = "text" class = "form-control AmountLimit" value = "0">'+'</td>';
 			for (var i = 0; i < cfg_m_userrole.length; i++) {
 				var ID = i + 1;
+				var hidden = (ID == 1)? 'hide' : '';
 				var chk = '<div class = "row">'+
 							'<div class = "col-md-12">'+
 								'<div class = "form-group">'+
@@ -258,7 +260,7 @@
 								'</div>'+	
 							'</div>'+
 						  '</div>';	
-				chk += '<div class = "row" '+'style = "margin-top : 10px"'+'>'+
+				chk += '<div class = "row '+hidden+'"'+'style = "margin-top : 10px"'+'>'+
 							'<div class = "col-md-12">'+
 								'<div class = "form-group">'+
 									'<label>Approve</label>'+
@@ -266,7 +268,7 @@
 								'</div>'+	
 							'</div>'+
 						  '</div>';	
-				chk += '<div class = "row" '+'style = "margin-top : 10px"'+'>'+
+				chk += '<div class = "row '+hidden+'"'+'style = "margin-top : 10px"'+'>'+
 							'<div class = "col-md-12">'+
 								'<div class = "form-group">'+
 									'<label>Cancel</label>'+

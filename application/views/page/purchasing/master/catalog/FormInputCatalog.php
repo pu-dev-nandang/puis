@@ -331,9 +331,9 @@
 	            }
 	            break; 
           case  "EstimaValue" :
-          	if (arr[key] == 0) {
-          		toatString += 'Estimate Value must be higher than 0' + "<br>";
-          	}
+          	// if (arr[key] == 0) {
+          	// 	toatString += 'Estimate Value must be higher than 0' + "<br>";
+          	// }
           	result = Validation_required(arr[key],key);
           	if (result['status'] == 0) {
           	  toatString += result['messages'] + "<br>";

@@ -554,7 +554,7 @@ function loadTable2()
     $.post(url,function (resultJson) {
         var response = jQuery.parseJSON(resultJson);
         dataForTable = response;
-        // console.log(dataForTable);
+        console.log(dataForTable);
         for (var i = 0; i < dataForTable.length; i++) {
             var btn_edit = '<button type="button" class="btn btn-warning btn-edit btn-edit-postrealization" code = "'+dataForTable[i].CodePostRealisasi+'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
             var btn_del = ' <button type="button" class="btn btn-danger btn-delete btn-delete-postrealization"  code = "'+dataForTable[i].CodePostRealisasi+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';

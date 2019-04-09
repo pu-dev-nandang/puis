@@ -124,7 +124,6 @@ function Add_Department_auth()
 	for (var i = 0; i < dt.length; i++) {
 		var aa = $("#Departement").find('option[value="'+dt[i].Code+'"]');
 		if (aa.length) {
-			// console.log('exist');
 			act.push(0);// for action
 		} else {
 			$("#Departement").append(
@@ -148,6 +147,7 @@ function Add_Department_auth()
 			break;
 		}
 	}
+
 	if (!$(".ContentDataPostBudget").length &&  $('#Departement').find('option').length == 1 && b == 1) {
 		LoadFirstLoad();
 	}
