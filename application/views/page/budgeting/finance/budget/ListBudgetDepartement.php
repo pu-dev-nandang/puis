@@ -75,7 +75,7 @@
 			var response = rs['dt'];
 			var arr1 = rs['dt_Year'];
 			// console.log(arr1);
-			var filee = (arr1[0].BudgetApproveUpload != '' && arr1[0].BudgetApproveUpload != null && arr1[0].BudgetApproveUpload != undefined) ? '<a href = "'+base_url_js+'fileGetAny/budgeting-'+arr1[0].BudgetApproveUpload+'" target="_blank" class = "Fileexist">File '+'</a>&nbsp' : '';
+			var filee = (arr1[0].BudgetApproveUpload != '' && arr1[0].BudgetApproveUpload != null && arr1[0].BudgetApproveUpload != undefined) ? '<a href = "'+base_url_js+'fileGetAny/budgeting-'+arr1[0].BudgetApproveUpload+'" target="_blank" class = "btn btn-warning Fileexist">File '+'</a>&nbsp' : '';
 			// console.log(response);
 			var test = '<div class = "row"><div class="col-md-12"><div class="col-md-2 col-md-offset-10" align = "right">'+filee+'<label class="btn btn-primary" style="color: #ffff;">Upload Budget File <input id="file-upload" type="file" style="display: none;" Year = "'+data['Year']+'" accept="image/*,application/pdf"></label>&nbsp<button class = "btn btn-excel-all" Year = "'+data['Year']+'" ><i class="fa fa-download"></i> Excel</button></div></div></div>';
 			var TableGenerate = '<div class = "row"style = "margin-top : 10px"><div class="col-md-12" id = "pageForTable">'+
@@ -203,7 +203,7 @@
 		    if(data.status == 1) {
 		      // show file in html before content_button find btn btn-primary
 		      $('.Fileexist').remove();
-		      var filee = '<a href = "'+base_url_js+'fileGetAny/budgeting-'+data.filename +'" target="_blank" class = "Fileexist">File '+'</a>';
+		      var filee = '<a href = "'+base_url_js+'fileGetAny/budgeting-'+data.filename +'" target="_blank" class = "btn btn-warning Fileexist">File '+'</a>&nbsp';
 		      var rr = $('.btn-excel-all').closest('.col-md-offset-10');
 		      rr.find('.btn-primary').before(filee);
 		      toastr.options.fadeOut = 100000;
