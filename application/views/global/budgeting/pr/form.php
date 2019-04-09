@@ -171,14 +171,13 @@
 	function MakeButton()
 	{
 		var dt = ClassDt.RuleAccess;
-		console.log(dt);
 		if (ClassDt.PRCodeVal != '') { 
 			// edit
 		}
 		else
 		{
 			var html = '<div class = "col-md-6 col-md-offset-6" align = "right">'+
-						'<button class = "btn btn-success" id = "SaveSubmit" action = "add" id_pr_create = "" prcode = "">Submit</button>'+
+						'<button class = "btn btn-success" id = "SaveSubmit" action = "add" id_pr_create = "" prcode = "" action = "1">Submit</button>'+
 					   '</div>';
 			var r_access = dt['access'];
 			var rule = dt['rule'];
@@ -224,7 +223,7 @@
 		tr.remove();
 		MakeAutoNumbering();
 		var row = $('#table_input_pr tbody tr:last');
-		row.find('td').find('input,select,button,textarea').prop('disabled',false);
+		row.find('td').find('input:not(.UnitCost):not(.SubTotal),select,button,textarea').prop('disabled',false);
 		row.find('td:eq(13)').find('button').prop('disabled',false);
 		__BudgetRemaining(); 
 	})	
@@ -860,5 +859,16 @@
 			}
 
 		})
+	})
+
+
+	$(document).off('click', '#SaveSubmit').on('click', '#SaveSubmit',function(e) {
+		loading_button('#SaveSubmit');
+		/*
+			1.Cek Budget Remaining tidak boleh ada yang kurang dari 0
+			2.Validation Inputan
+			3.Validation Auth Max Limit
+			4.Validation File Upload
+		*/
 	})
 </script>
