@@ -521,7 +521,7 @@ function makeFooter(){
 	$(".rowFooter").remove(); // hapus dahulu
 	var html = '<div class = "row rowFooter" style = "margin-left : 10px;margin-right : 10px;margin-top : 20px">'+
 				'<div class = "col-md-12">'+
-					'<div class = "row">'+
+					'<div class = "row hide">'+
 						'<div class = "col-md-4">'+
 							'<div class = "form-group">'+
 								'<label>Note</label>'+
@@ -792,7 +792,7 @@ function showButton()
 			}
 
 			// show button export excel
-				var filee = (arr1[0].FileUpload != '' && arr1[0].FileUpload != null && arr1[0].FileUpload != undefined) ? '<a href = "'+base_url_js+'fileGetAny/budgeting-'+arr1[0].FileUpload+'" target="_blank" class = "Fileexist">File '+'</a>&nbsp' : '';
+				var filee = (arr1[0].FileUpload != '' && arr1[0].FileUpload != null && arr1[0].FileUpload != undefined) ? '<a href = "'+base_url_js+'fileGetAny/budgeting-'+arr1[0].FileUpload+'" target="_blank" class = "btn btn-warning Fileexist">File '+'</a>&nbsp' : '';
 				$('#content_button').attr('align','right');
 				$('#content_button').html(filee+UploadFileTag+'<button type="button" class="btn btn-default" id="ExportExcel" id_creator_budget_approval = "'+arr1[0].ID+'"> <i class="fa fa-file-excel-o"></i> Excel</button>');
 		} 
@@ -1775,7 +1775,7 @@ function UploadFile_approve(ID_element,id_creator_budget_approval,attachName)
 	    if(data.status == 1) {
 	      // show file in html before content_button find btn btn-primary
 	      $('.Fileexist').remove();
-	      var filee = '<a href = "'+base_url_js+'fileGetAny/budgeting-'+data.filename +'" target="_blank" class = "Fileexist">File '+'</a>';
+	      var filee = '<a href = "'+base_url_js+'fileGetAny/budgeting-'+data.filename +'" target="_blank" class = "btn btn-warning Fileexist">File '+'</a>&nbsp';
 	      $('#content_button').find('.btn-primary').before(filee);
 	      toastr.options.fadeOut = 100000;
 	      toastr.success(data.msg, 'Success!');
