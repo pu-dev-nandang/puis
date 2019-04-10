@@ -1228,6 +1228,24 @@
 		    switch (Action)
 		    {
 		       case "1":
+		       		var St_error = data['St_error'];
+		       		var msg = data['msg'];
+		       		if (St_error == 0) {
+		       			toastr.error(msg,'!!!Failed');
+		       		}
+		       		else
+		       		{
+		       			if (data['BudgetChange'] == 1) { // alert Budget Remaining telah di update oleh transaksi lain
+		       				toastr.info('Budget Remaining already have by another');
+		       			}
+		       			// success
+		       			$('#labelPrcode').html('PR Code : '+data['PRCode']);
+		       			var Status = NameStatus(data['StatusPR']);
+		       			$('#Status').html('Status : '+data['StatusPR']);
+		       			// Update Variable ClassDt
+		       			ClassDt.PRCodeVal = data['PRCode'];
+		       		}
+		       		$('#SaveSubmit').prop('disabled',false).html('Submit');
 		       		// if ($("#p_prcode").length) {
 		       		// 	$("#p_prcode").html('PRCode : '+data['PRCode']);
 		       		// }
@@ -1274,5 +1292,25 @@
 		  }
 		})
 
+	}
+
+	function NameStatus(Status)
+	{
+		switch (Status)
+	    {
+	       case "1":
+	       	Status = 'Awaiting Approval';
+	       break;
+	       case "2":
+	       	Status = 'Done';
+	       break;
+	       case "3":
+	       	Status = 'Reject';
+	       break;
+	       default: 
+	           alert('No Status');
+	    }
+
+	    return Status;
 	} 
 </script>

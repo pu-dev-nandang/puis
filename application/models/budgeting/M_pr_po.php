@@ -180,7 +180,7 @@ class M_pr_po extends CI_Model {
                     $MaxLimit = $G1[$j]['MaxLimit'];
                     if ($CodePost == $CodePost_ && $MaxLimit >= $Amount) {
                        $sql = 'select count(*) as total from db_budgeting.cfg_set_userrole where MaxLimit = ? and CodePost = ? and Approved = 1'; 
-                       $query = $this->db->query($sql, array($CodePost,$MaxLimit))->result_array();
+                       $query = $this->db->query($sql, array($MaxLimit,$CodePost))->result_array();
                        if ($query[0]['total'] >= $C_) {
                            $C_ = $query[0]['total'];
                            $temp = array(
@@ -194,7 +194,7 @@ class M_pr_po extends CI_Model {
                     }
                 }
         }       
-       
+        
         $G = $this->get_approval_pr($Departement);
         $ID_m_userrole_limit = $arr['Count'] + 1;
         for ($i=0; $i < count($G); $i++) { 
@@ -412,6 +412,7 @@ class M_pr_po extends CI_Model {
 
     public function Update_budget_left_pr($BudgetLeft_awal,$BudgetRemaining,$dt_arr)
     {
+        $BudgetChange = 0;
         for ($i=0; $i < count($BudgetRemaining); $i++) { 
             $ID_budget_left = $BudgetRemaining[$i]['ID'];
             $bool = false; // true => update data langsung dari Budget Remaining ; false hitung dari Subtotal dan dt_arr
@@ -442,9 +443,13 @@ class M_pr_po extends CI_Model {
             }
             else{
                 // hitung dari subtotal riweh :)
-
+                if ($BudgetChange == 0) {
+                    $BudgetChange = 1;
+                }
             }        
         }
+
+        return $BudgetChange;
     }
 
 }
