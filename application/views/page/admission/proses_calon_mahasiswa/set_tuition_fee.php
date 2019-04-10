@@ -665,7 +665,7 @@
               $('#datetimepicker'+data[0]['id_formulir']+'_'+i).datetimepicker({
                // startDate: today,
                // startDate: '+2d',
-               startDate: date.addDays(i),
+               // startDate: date.addDays(i),
               });
 
               $('#datetime_deadline'+data[0]['id_formulir']+'_'+i).prop('readonly',true);
