@@ -133,180 +133,85 @@ class M_pr_po extends CI_Model {
 
     }
 
-    public function GetRuleApproval_PR_JsonStatus($Departement,$Amount)
+    public function Get_DataBudgeting_by_ID_budget_left($ID_budget_left)
     {
-        $JsonStatus = array();
-        $sql = 'select * from db_budgeting.cfg_set_userrole where MaxLimit >= '.$Amount.' and Approved = 1 and Status = 1 and Active = 1
-                group by MaxLimit,ID_m_userrole order by MaxLimit,ID_m_userrole;
-                ';
-        $query=$this->db->query($sql, array())->result_array();
-        
-        // get data to filtering MaxLimit
-        // print_r($query);die();
-            $arr = array();
-            for ($i=0; $i < count($query); $i++) {
-                $MaxLimit = $query[$i]['MaxLimit'];
-                $arr[]= $query[$i]['ID_m_userrole'];
-                $bool = false;
-                for ($j=$i+1; $j < count($query); $j++) { 
-                    $MaxLimit2 = $query[$j]['MaxLimit'];
-                    if ($MaxLimit == $MaxLimit2) {
-                        $boolz = false;
-                        for ($z=0; $z < count($arr); $z++) { 
-                            if ($query[$j]['ID_m_userrole'] == $arr[$z]) {
-                                $boolz = true;
-                                break;
-                            }
-                        }
+        $sql = 'select dd.ID,dd.`Using`,cc.CodePostRealisasi,cc.Year,cc.RealisasiPostName,cc.PostName,dd.ID_creator_budget,dd.Value
+         ,cc.Departement,cc.CodeHeadAccount,cc.NameHeadAccount,cc.CodePost
+         from
+            (
+                   select a.ID,a.ID_creator_budget_approval,a.CodePostRealisasi,a.UnitCost,a.Freq,a.DetailMonth,
+               a.SubTotal,a.CreatedBy,a.CreatedAt,a.LastUpdateBy,a.LastUpdateAt,b.UnitDiv,b.CodeHeadAccount,
+                     b.RealisasiPostName,b.Desc,c.Name as NameHeadAccount,c.CodePost,d.PostName,dp.NameDepartement as NameUnitDiv,dp.Code as CodeDiv,
+                             cba.Departement,cba.`Year`
+               from db_budgeting.creator_budget as a left join db_budgeting.cfg_postrealisasi as b on a.CodePostRealisasi = b.CodePostRealisasi
+               LEFT JOIN db_budgeting.cfg_head_account as c on b.CodeHeadAccount = c.CodeHeadAccount
+               LEFT JOIN db_budgeting.cfg_post as d on c.CodePost = d.CodePost
+               LEFT JOIN (
+                select CONCAT("AC.",ID) as ID,  CONCAT("Study ",NameEng) as NameDepartement,Code as Code from db_academic.program_study where Status = 1
+                UNION
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
+               ) as dp on b.UnitDiv = dp.ID
+                 left join db_budgeting.creator_budget_approval as cba on cba.ID = a.ID_creator_budget_approval
+            ) cc join db_budgeting.budget_left as dd on cc.ID = dd.ID_creator_budget
+                            where dd.ID = ?';
 
-                        if (!$boolz) {
-                            $arr[]= $query[$j]['ID_m_userrole'];
-                        }
-
-                        $i = $j;
-
-                    }
-                    else
-                    {
-                        $bool = true;
-                        break;
-                    }
-                }
-
-                if ($bool) {
-                    break;
-                }     
-
-            }
-
-        // find approver
-            for ($i=0; $i < count($arr); $i++) { 
-               $sql = 'select * from db_budgeting.cfg_set_roleuser where Departement = "'.$Departement.'" and ID_m_userrole = '.$arr[$i];
-               $query=$this->db->query($sql, array())->result_array();
-               $NIP = $query[0]['NIP'];
-
-               $JsonStatus[] = array(
-                    'ApprovedBy' => $NIP,
-                    'Status' => 0,
-                    'ApproveAt' => ''
-                );
-            } 
-
-        return $JsonStatus;              
+        $query=$this->db->query($sql, array($ID_budget_left))->result_array();
+        return $query;                    
     }
 
-    public function GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$PRCode)
+    public function GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$arr_dt)
     {
-        $JsonStatus = array();
-        // check apakah cross atau IN
-            $checkCrossOrIN = $this->checkCrossOrIN($PRCode);
-            if ($checkCrossOrIN['check'] == 'Cross') {
-                $JsonStatus = $checkCrossOrIN['JsonStatus']; 
-            }
-
-        $sql = 'select * from db_budgeting.cfg_set_userrole where MaxLimit >= '.$Amount.' and Approved = 1 and Status = 1 and Active = 1
-                group by MaxLimit,ID_m_userrole order by MaxLimit,ID_m_userrole;
-                ';
-        $query=$this->db->query($sql, array())->result_array();
-        
-        // get data to filtering MaxLimit
-        // print_r($query);die();
-            $arr = array();
-            for ($i=0; $i < count($query); $i++) {
-                $MaxLimit = $query[$i]['MaxLimit'];
-                $arr[]= $query[$i]['ID_m_userrole'];
-                $bool = false;
-                for ($j=$i+1; $j < count($query); $j++) { 
-                    $MaxLimit2 = $query[$j]['MaxLimit'];
-                    if ($MaxLimit == $MaxLimit2) {
-                        $boolz = false;
-                        for ($z=0; $z < count($arr); $z++) { 
-                            if ($query[$j]['ID_m_userrole'] == $arr[$z]) {
-                                $boolz = true;
-                                break;
-                            }
-                        }
-
-                        if (!$boolz) {
-                            $arr[]= $query[$j]['ID_m_userrole'];
-                        }
-
-                        $i = $j;
-
-                    }
-                    else
-                    {
-                        $bool = true;
-                        break;
+        $arr = array();
+        $C_ = 0;
+        $rs = array();
+        for ($i=0; $i < count($arr_dt); $i++) {
+            $data = $arr_dt[$i]; 
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data,$key);
+            $ID_budget_left = $data_arr['ID_budget_left'];
+            $G = $this->Get_DataBudgeting_by_ID_budget_left($ID_budget_left);
+            $CodePost = $G[0]['CodePost'];
+            // search in by CodePost and by Amount
+                $G1 = $this->m_master->caribasedprimary('db_budgeting.cfg_set_userrole','CodePost',$CodePost);
+                for ($j=0; $j < count($G1); $j++) { 
+                    $CodePost_ = $G1[$j]['CodePost'];
+                    $MaxLimit = $G1[$j]['MaxLimit'];
+                    if ($CodePost == $CodePost_ && $MaxLimit >= $Amount) {
+                       $sql = 'select count(*) as total from db_budgeting.cfg_set_userrole where MaxLimit = ? and CodePost = ? and Approved = 1'; 
+                       $query = $this->db->query($sql, array($CodePost,$MaxLimit))->result_array();
+                       if ($query[0]['total'] >= $C_) {
+                           $C_ = $query[0]['total'];
+                           $temp = array(
+                               'CodePost' => $CodePost,
+                               'MaxLimit' => $MaxLimit,
+                               'Count' => $C_, 
+                           );
+                           $arr = $temp;
+                       }
+                       break;
                     }
                 }
-
-                if ($bool) {
-                    break;
-                }     
-
-            }
-
-        // find approver
-            for ($i=0; $i < count($arr); $i++) { 
-               $sql = 'select * from db_budgeting.cfg_set_roleuser where Departement = "'.$Departement.'" and ID_m_userrole = '.$arr[$i];
-               $query=$this->db->query($sql, array())->result_array();
-               $NIP = $query[0]['NIP'];
-
-               $JsonStatus[] = array(
-                    'ApprovedBy' => $NIP,
+        }       
+       
+        $G = $this->get_approval_pr($Departement);
+        $ID_m_userrole_limit = $arr['Count'] + 1;
+        for ($i=0; $i < count($G); $i++) { 
+            $ID_m_userrole = $G[$i]['ID'];
+            if ($ID_m_userrole <= $ID_m_userrole_limit) {
+                $rs[] = array(
+                    'NIP' => $G[$i]['NIP'],
                     'Status' => 0,
                     'ApproveAt' => '',
                     'Representedby' => '',
+                    'Visible' => $G[$i]['Visible'],
+                    'NameTypeDesc' => $G[$i]['NameTypeDesc'],
                 );
-            } 
-
-        // print_r($JsonStatus);die();
-        return $JsonStatus;              
-    }
-
-    public function checkCrossOrIN($PRCode)
-    {
-        $rs = array('JsonStatus'=>array(),'check' => 'IN');
-        $G_data = $this->GetPR_DetailByPRCode($PRCode);
-        $check = 'IN';
-        $JsonStatus = array();
-        for ($i=0; $i < count($G_data); $i++) { 
-            $BudgetStatus = $G_data[$i]['BudgetStatus'];
-            if ($BudgetStatus == 'Cross' && $check == 'IN') {
-                $check = 'Cross';
-            }
-
-            if ($BudgetStatus == 'Cross') {
-                // get approver 1 dari department tersebut
-                    $Departement = $G_data[$i]['Departement'];
-                    $sql = 'select * from db_budgeting.cfg_set_roleuser where Departement = "'.$Departement.'" and ID_m_userrole = 2';
-                    $query=$this->db->query($sql, array())->result_array();
-                    $NIP = $query[0]['NIP'];
-                    // check existing in array JsonStatus
-                        $bool = true;
-                        for ($j=0; $j < count($JsonStatus); $j++) { 
-                            if ($NIP == $JsonStatus[$j]['ApprovedBy']) {
-                               $bool = false;
-                               break;
-                            }
-                        }
-
-                        if ($bool) {
-                            $JsonStatus[] = array(
-                                 'ApprovedBy' => $NIP,
-                                 'Status' => 0,
-                                 'ApproveAt' => '',
-                                 'Representedby' => '',
-                             );
-                        }
             }
         }
-
-        $rs = array('JsonStatus'=>$JsonStatus,'check' => $check);
-        return $rs;
+        return $rs;       
     }
-
 
     public function GetPR_CreateByPRCode($PRCode)
     {
@@ -490,6 +395,56 @@ class M_pr_po extends CI_Model {
         );
 
         $this->db->insert('db_budgeting.pr_circulation_sheet',$dataSave);
+    }
+
+    public function get_approval_pr($Departement)
+    {
+        $sql = 'select a.*,b.Name as NamaUser,b.NIP,c.Departement,c.ID as ID_set_roleuser,c.Visible,c.TypeDesc,d.Name as NameTypeDesc
+                from db_budgeting.cfg_m_userrole as a join (select * from db_budgeting.cfg_approval_pr where Departement = ? ) as c
+                on a.ID = c.ID_m_userrole
+                left join db_employees.employees as b on b.NIP = c.NIP 
+                join db_budgeting.cfg_m_type_approval as d on d.ID = c.TypeDesc
+                order by c.ID asc
+                ';
+        $query=$this->db->query($sql, array($Departement))->result_array();
+        return $query;
+    }
+
+    public function Update_budget_left_pr($BudgetLeft_awal,$BudgetRemaining,$dt_arr)
+    {
+        for ($i=0; $i < count($BudgetRemaining); $i++) { 
+            $ID_budget_left = $BudgetRemaining[$i]['ID'];
+            $bool = false; // true => update data langsung dari Budget Remaining ; false hitung dari Subtotal dan dt_arr
+            // search in db
+                $G = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$ID_budget_left);
+                $Value = $G[0]['Value'];
+                $Using = $G[0]['Using'];
+            // search in BudgetLeft_awal
+                for ($j=0; $j < count($BudgetLeft_awal); $j++) { 
+                    $ID_budget_left_ = $BudgetLeft_awal[$j]['ID'];
+                    if ($ID_budget_left == $ID_budget_left_) {
+                        $Value_ = $BudgetLeft_awal[$j]['Value'];
+                        $Using_ = $BudgetLeft_awal[$j]['Using'];
+                       if ($Value == $Value_ && $Using == $Using_) {
+                            $bool = true;
+                        } 
+                       break;
+                    }
+                }
+
+            if ($bool) {
+               $data_arr = array(
+                'Using' => $BudgetRemaining[$i]['Using'],
+               );
+
+               $this->db->where('ID',$ID_budget_left);
+               $this->db->update('db_budgeting.budget_left', $data_arr);
+            }
+            else{
+                // hitung dari subtotal riweh :)
+
+            }        
+        }
     }
 
 }

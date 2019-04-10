@@ -542,6 +542,11 @@
 		});
 	})
 
+	$(document).off('keyup', '.UnitCost').on('keyup', '.UnitCost',function(e) {
+		var tr = $(this).closest('tr');
+		CountSubTotal_table(tr);
+	})	
+
 	$(document).off('change', '.qty').on('change', '.qty',function(e) {
 		var tr = $(this).closest('tr');
 		CountSubTotal_table(tr);
@@ -572,7 +577,7 @@
 		ClassDt.BudgetRemaining = [];
 		var Budget = [];
 		var Budget =  JSON.parse(localStorage.getItem("PostBudgetDepartment"));
-		
+		var GrandTotal = 0;
 		
 		var BudgetRemaining_arr = [];
 		$('.PostBudgetItem').each(function(){
@@ -581,6 +586,7 @@
 			var id_budget_left =  $(this).attr('id_budget_left');
 			var SubTotal = tr.find('.SubTotal').val();
 			SubTotal = findAndReplace(SubTotal, ".","");
+			GrandTotal = parseInt(GrandTotal) + parseInt(SubTotal);
 			
 			// check Combine
 			var LiCombine = tr.find('.liCombine').find('li');
@@ -686,6 +692,9 @@
 		// localStorage.setItem("PostBudgetDepartment", JSON.stringify(ClassDt.PostBudgetDepartment));
 		ClassDt.BudgetRemaining = BudgetRemaining_arr;
 		MakeTableRemaining();
+
+		// write Grand total
+		$('#phtmltotal').html('Total : '+formatRupiah(GrandTotal));
 	}
 
 	function MakeTableRemaining()
@@ -1119,7 +1128,6 @@
 			var Qty = fillItem.find('.qty').val();
 			var UnitCost = fillItem.find('.UnitCost').val();
 			UnitCost = findAndReplace(UnitCost, ".","");
-			var UnitCost = fillItem.find('.UnitCost').val();
 			var PPH = fillItem.find('.PPH').val();
 			var SubTotal = fillItem.find('.SubTotal').val();
 			SubTotal = findAndReplace(SubTotal, ".","");
@@ -1198,6 +1206,13 @@
 
 		token = jwt_encode(Notes,"UAP)(*");
 		form_data.append('Notes',token);
+
+		token = jwt_encode(ClassDt.BudgetRemaining,"UAP)(*");
+		form_data.append('BudgetRemaining',token);
+
+		var BudgetLeft_awal = JSON.parse(localStorage.getItem("PostBudgetDepartment"));
+		token = jwt_encode(BudgetLeft_awal,"UAP)(*");
+		form_data.append('BudgetLeft_awal',token);
 
 		var url = base_url_js + "budgeting/submitpr"
 		$.ajax({
