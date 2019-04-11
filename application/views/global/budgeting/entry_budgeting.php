@@ -1,23 +1,27 @@
 <style type="text/css">
     .Custom-UnitCost
     {
-        width: 9.333% !important;
-    }
-
-    .Custom-PostBudget{
         width: 8.333% !important;
     }
 
+    .Custom-PostBudget{
+        width: 9.333% !important;
+    }
+
     .Custom-Freq{
-        width: 12.333% !important;
+        width: 10.333% !important;
     }
 
     .Custom-Total{
-        width: 11.666666666666664% !important;
+        width: 13.666666666666664% !important;
     }
 
     .Custom-select2 {
         width: 85% !important;
+    }
+
+    .CustomSubtotalFooter {
+        margin-left: 28%; !important;
     }
 </style>
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
