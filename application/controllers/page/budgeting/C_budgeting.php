@@ -1477,30 +1477,64 @@ class C_budgeting extends Budgeting_Controler {
                     {
                         $id_creator_budget_approval = $Input['id_creator_budget_approval'];
                         $G_data = $this->m_master->caribasedprimary('db_budgeting.creator_budget_approval','ID',$id_creator_budget_approval);
-                        $JsonStatus = $G_data[0]['JsonStatus'];
-                        $JsonStatus = (array)json_decode($JsonStatus,true);
-                        $Approver = $Input['NIP'];
-                        $indexjson = $Input['indexjson'];
-                        $Visible = $Input['Visible'];
-                        $NameTypeDesc = $Input['NameTypeDesc'];
-                        $JsonStatus[$indexjson] = array(
-                            'NIP' => $Approver,
-                            'Status' => 0,
-                            'ApproveAt' => '',
-                            'Representedby' => '',
-                            'Visible' => $Visible,
-                            'NameTypeDesc' => $NameTypeDesc,
-                        );
-                        $JsonStatusSave = json_encode($JsonStatus);
-                        $dataSave = array(
-                            'JsonStatus' => $JsonStatusSave,
-                        );    
-                        $this->db->where('ID',$id_creator_budget_approval);
-                        $this->db->update('db_budgeting.creator_budget_approval',$dataSave);
+                        if ($G_data[0]['Status'] == 0 || $G_data[0]['Status'] == 3) {
+                            $JsonStatus = $G_data[0]['JsonStatus'];
+                            $JsonStatus = (array)json_decode($JsonStatus,true);
+                            $Approver = $Input['NIP'];
+                            $indexjson = $Input['indexjson'];
+                            $Visible = $Input['Visible'];
+                            $NameTypeDesc = $Input['NameTypeDesc'];
+                            $JsonStatus[$indexjson] = array(
+                                'NIP' => $Approver,
+                                'Status' => 0,
+                                'ApproveAt' => '',
+                                'Representedby' => '',
+                                'Visible' => $Visible,
+                                'NameTypeDesc' => $NameTypeDesc,
+                            );
+                            $JsonStatusSave = json_encode($JsonStatus);
+                            $dataSave = array(
+                                'JsonStatus' => $JsonStatusSave,
+                            );    
+                            $this->db->where('ID',$id_creator_budget_approval);
+                            $this->db->update('db_budgeting.creator_budget_approval',$dataSave);
+                            
+                            $rs['data']= $JsonStatusSave;
+                            // save to log
+                                $this->m_budgeting->log_budget($id_creator_budget_approval,'Custom Approval',$By = $this->session->userdata('NIP')); 
+                        }
+                        else
+                        {
+                            $id_creator_budget_approval = $Input['id_creator_budget_approval'];
+                            $G_data = $this->m_master->caribasedprimary('db_budgeting.creator_budget_approval','ID',$id_creator_budget_approval);
+                            $JsonStatus = $G_data[0]['JsonStatus'];
+                            $JsonStatus = (array)json_decode($JsonStatus,true);
+                            $Approver = $Input['NIP'];
+                            $indexjson = $Input['indexjson'];
+                            $Visible = $Input['Visible'];
+                            $NameTypeDesc = $JsonStatus[$indexjson]['NameTypeDesc'];
+                            $Status = $JsonStatus[$indexjson]['Status'];
+
+                            $JsonStatus[$indexjson] = array(
+                                'NIP' => $Approver,
+                                'Status' => $Status,
+                                'ApproveAt' => '',
+                                'Representedby' => '',
+                                'Visible' => $Visible,
+                                'NameTypeDesc' => $NameTypeDesc,
+                            );
+                            $JsonStatusSave = json_encode($JsonStatus);
+                            $dataSave = array(
+                                'JsonStatus' => $JsonStatusSave,
+                            );    
+                            $this->db->where('ID',$id_creator_budget_approval);
+                            $this->db->update('db_budgeting.creator_budget_approval',$dataSave);
+                                
+                            $rs['data']= $JsonStatusSave;
+                            // save to log
+                                $this->m_budgeting->log_budget($id_creator_budget_approval,'Custom Approval',$By = $this->session->userdata('NIP')); 
+                        }
                         
-                        $rs['data']= $JsonStatusSave;
-                        // save to log
-                            $this->m_budgeting->log_budget($id_creator_budget_approval,'Custom Approval',$By = $this->session->userdata('NIP')); 
                     }
                     
                 break;    
@@ -2009,6 +2043,48 @@ class C_budgeting extends Budgeting_Controler {
         }
 
         echo json_encode($rs);
+    }
+
+    public function cancel_budget_department()
+    {
+        $this->auth_ajax();
+        $Input = $this->getInputToken();
+        $rs = array('msg' => '');
+        // cek data existing in PR
+            $id_creator_budget_approval = $Input['id_creator_budget_approval'];
+            $G = $this->m_master->caribasedprimary('db_budgeting.creator_budget_approval','ID',$id_creator_budget_approval);
+            $Departement = $G[0]['Departement'];
+            $Year = $G[0]['Year'];
+            $sql = 'select count(*) as total from db_budgeting.pr_create where Departement = ? and Year = ?';
+            $query=$this->db->query($sql, array($Departement,$Year))->result_array();
+             if ($query[0]['total'] > 0) {
+                 $rs['msg'] =  $this->Msg['NotAction'];
+             }
+             else
+             {
+                // delete creator_budget_approval,creator_budget,log_budget,budget_left
+                $this->db->where('ID',$id_creator_budget_approval);
+                $this->db->delete('db_budgeting.creator_budget_approval');
+
+                // delete budget_left
+                $G_ = $this->m_master->caribasedprimary('db_budgeting.creator_budget','ID_creator_budget_approval',$id_creator_budget_approval);
+
+                for ($i=0; $i < count($G_); $i++) { 
+                    $ID_creator_budget = $G_[$i]['ID'];
+                    $this->db->where('ID_creator_budget',$ID_creator_budget);
+                    $this->db->delete('db_budgeting.budget_left');
+                }
+                // die();
+                $this->db->where('ID_creator_budget_approval',$id_creator_budget_approval);
+                $this->db->delete('db_budgeting.creator_budget');
+
+                $this->db->where('ID_creator_budget_approval',$id_creator_budget_approval);
+                $this->db->delete('db_budgeting.log_budget');
+
+                $rs['msg'] =  'Success';
+             }
+
+        echo json_encode($rs);     
     }
 
 }

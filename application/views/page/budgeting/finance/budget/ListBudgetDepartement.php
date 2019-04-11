@@ -87,7 +87,7 @@
 				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Departement</th>'+
 				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Grand Total Budget</th>'+
 											'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</th>'+
-											'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Print</th>'+
+											'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Action</th>'+
 										'</tr></thead>'	
 								;
 			TableGenerate += '<tbody>';
@@ -95,10 +95,12 @@
 			for (var i = 0; i < response.length; i++) {
 				var st = '';
 				Print = '';
+				var btnCancel = '';
 				if(response[i].Status == 2)
 				{
 					st = '<i class="fa fa-circle" style="color:#8ED6EA;"></i>';
 					Print = '<button class = "btn btn-excel" id_creator_budget = "'+response[i].ID_creator_budget+'"><i class="fa fa-file-excel-o"></i> Excel</button>';
+					btnCancel = '&nbsp<button class = "btn btn-danger btn-cancel" id_creator_budget = "'+response[i].ID_creator_budget+'">Cancel</button>';
 				}
 				else if(response[i].Status == 0 || response[i].Status == 1 || response[i].Status == 3)
 				{
@@ -114,7 +116,7 @@
 									'<td>'+ response[i].NameDepartement+'</td>'+
 									'<td>'+ formatRupiah(GrandTotal) +'</td>'+
 									'<td>'+ st+'</td>'+
-									'<td>'+ Print+'</td>'+
+									'<td>'+ Print+btnCancel+'</td>'+
 								'</tr>';
 				total = parseInt(total) + parseInt(response[i].GrandTotal);				
 			}
@@ -161,6 +163,29 @@
 			FormSubmitAuto(url, 'POST', [
 			    { name: 'token', value: token },
 			]);
+		})
+
+		$('#tableData3 tbody').on('click', '.btn-cancel', function () {
+			var id_creator_budget_approval = $(this).attr('id_creator_budget');
+			var ev = $(this);
+			if (confirm('Are you sure ?')) {
+				ev.html('<i class="fa fa-refresh fa-spin fa-fw right-margin"></i> Loading...');
+				ev.prop('disabled',true);
+				var url = base_url_js+"budgeting/cancel_budget_department";
+				var data = {
+						    id_creator_budget_approval : id_creator_budget_approval,
+						};
+				var token = jwt_encode(data,'UAP)(*');
+				$.post(url,{token:token},function (resultJson) {
+					var rs = jQuery.parseJSON(resultJson);
+					toastr.info(rs['msg']);
+					loadPageData();
+				});
+			}
+			else
+			{
+
+			}
 		})
 	}
 
