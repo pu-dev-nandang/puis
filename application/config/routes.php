@@ -1243,7 +1243,7 @@ $route['budgeting/update_approver'] = 'page/budgeting/c_budgeting/update_approve
 $route['budgeting/Upload_File_Creatorbudget'] = 'page/budgeting/c_budgeting/Upload_File_Creatorbudget';
 $route['budgeting/Upload_File_Creatorbudget_all'] = 'page/budgeting/c_budgeting/Upload_File_Creatorbudget_all';
 $route['budgeting/cancel_budget_department'] = 'page/budgeting/c_budgeting/cancel_budget_department';
-
+$route['budgeting/EntryBudget/report_anggaran_per_years'] = 'page/budgeting/c_budgeting/report_anggaran_per_years';
 
 // Purchasing
 $query = $db->get('db_purchasing.cfg_sub_menu');
