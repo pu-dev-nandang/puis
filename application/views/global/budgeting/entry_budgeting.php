@@ -1,15 +1,19 @@
 <style type="text/css">
     .Custom-UnitCost
     {
-        width: 6.333% !important;
+        width: 9.333% !important;
     }
 
     .Custom-PostBudget{
-        width: 13.333% !important;
+        width: 8.333% !important;
     }
 
     .Custom-Freq{
-        width: 5.333% !important;
+        width: 12.333% !important;
+    }
+
+    .Custom-Total{
+        width: 11.666666666666664% !important;
     }
 
     .Custom-select2 {
