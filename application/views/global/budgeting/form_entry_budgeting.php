@@ -231,7 +231,7 @@ function makeHtmlHeader()
 				'<div class = "row">'+
 					'<div class = "col-md-5">'+ // sisa
 					'</div>'+
-					'<div class = "col-md-7">'+
+					'<div class = "col-md-7 clsSubtotal">'+
 						'<label>Subtotal</label>'+	
 					'</div>'+
 				'</div>'+	
@@ -387,7 +387,7 @@ function makeRowAdd_del(dt)
 						'<div class = "row">'+
 							'<div class = "col-md-5 sisa">'+ // sisa
 							'</div>'+
-							'<div class = "col-md-7">'+
+							'<div class = "col-md-7 clsSubtotal">'+
 								'<p class = "Subtotal">0</p>'+
 							'</div>'+
 						'</div>'+	
@@ -485,7 +485,7 @@ function makeContent()
 					'<div class = "row">'+
 						'<div class = "col-md-5 sisa">'+ // sisa
 						'</div>'+
-						'<div class = "col-md-7">'+
+						'<div class = "col-md-7 clsSubtotal">'+
 							'<p class = "Subtotal" style = "margin-top : 5px;">0</p>'+
 						'</div>'+
 					'</div>'+	
@@ -835,7 +835,7 @@ function ProsesOneRow(row,keyvalue = null)
 	var Freq = row.find('.col-md-1:eq(2)').find('.Freq').val();
 	var Total = parseInt(UnitCost * Freq);
 	// Write subtotal per baris
-	row.find('.row').find('.col-md-9').find('.Subtotal').html(formatDigitNumber(Total));
+	row.find('.row').find('.clsSubtotal').find('.Subtotal').html(formatDigitNumber(Total));
 	// pengurangan remaining
 		var dt = ClassDt.BudgetAllocation;
 		for (var i = 0; i < dt.length; i++) {
@@ -1248,7 +1248,7 @@ function makeContent_existing()
 					'<div class = "row">'+
 						'<div class = "col-md-5 sisa">'+ // sisa
 						'</div>'+
-						'<div class = "col-md-7">'+
+						'<div class = "col-md-7 clsSubtotal">'+
 							'<p class = "Subtotal" style = "margin-top : 5px;">0</p>'+
 						'</div>'+
 					'</div>'+	
