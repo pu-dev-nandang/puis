@@ -504,7 +504,7 @@ function makeContent()
 	// write html total perbulan
 	html = '';
 	html += '<div class = "row rowSubtotal" style = "margin-left : 10px;margin-right : 10px;margin-top : 10px">'+
-				'<div class = "col-md-7 col-md-offset-3">'+
+				'<div class = "col-md-7 col-md-offset-3 CustomSubtotalFooter">'+
 				'<div class = "row">';
 	for (var j = 0; j < Month.length; j++) {
 		html += '<div class = "col-md-1">'+
@@ -1264,7 +1264,7 @@ function makeContent_existing()
 	// write html total perbulan
 	html = '';
 	html += '<div class = "row rowSubtotal" style = "margin-left : 10px;margin-right : 10px;margin-top : 10px">'+
-				'<div class = "col-md-7 col-md-offset-3">'+
+				'<div class = "col-md-7 col-md-offset-3 CustomSubtotalFooter">'+
 				'<div class = "row">';
 	for (var j = 0; j < Month.length; j++) {
 		html += '<div class = "col-md-1">'+
