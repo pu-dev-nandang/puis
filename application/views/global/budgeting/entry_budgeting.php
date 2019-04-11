@@ -44,6 +44,9 @@
         <li class="<?php if($request=='ListBudgetDepartement'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "ListBudgetDepartement">List Budget</a>
         </li>
+        <li class="<?php if($request=='report_anggaran_per_years'){echo "active";} ?>">
+            <a href="javascript:void(0)" class="pageAnchor" page = "report_anggaran_per_years">Report Anggaran</a>
+        </li>
         <?php endif ?>
         <!-- <li class="<?php if($request=='BudgetLeft'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "BudgetLeft">Budget Remaining</a>

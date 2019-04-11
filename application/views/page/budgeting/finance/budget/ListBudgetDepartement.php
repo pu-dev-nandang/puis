@@ -30,7 +30,7 @@
 </div>
 <script type="text/javascript">
 	$(document).ready(function() {
-		LoadFirstLoad()
+		LoadFirstLoad();
 	    loadingEnd(500);
 	}); // exit document Function
 

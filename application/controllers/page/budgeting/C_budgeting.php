@@ -1302,6 +1302,7 @@ class C_budgeting extends Budgeting_Controler {
                     'EntryBudget',
                     'Approval',
                     'ListBudgetDepartement',
+                    'report_anggaran_per_years',
                     null
                 );
                 if (in_array($Request, $arr))
@@ -2085,6 +2086,16 @@ class C_budgeting extends Budgeting_Controler {
              }
 
         echo json_encode($rs);     
+    }
+
+    public function report_anggaran_per_years()
+    {
+        $this->auth_ajax();
+        $this->authFin();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $this->data['arr_Year'] = $this->m_master->showData_array('db_budgeting.cfg_dateperiod');
+        $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/budget/report_anggaran_per_years',$this->data,true);
+        echo json_encode($arr_result);
     }
 
 }

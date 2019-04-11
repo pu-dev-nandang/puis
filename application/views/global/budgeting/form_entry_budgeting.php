@@ -931,6 +931,7 @@ function ProsesSubtotalPerMonth()
 		$('.InputBulan[keyvalue="'+keyvalue+'"]').each(function(){
 			var row = $(this).closest('.ContentDataPostBudget');
 			var v = $(this).val();
+			v = findAndReplace(v,".","");
 			var UnitCost = row.find('.col-md-1:eq(1)').find('.UnitCost').val();
 			UnitCost = findAndReplace(UnitCost,".","");
 			total = parseInt(total) + ( parseInt(UnitCost * v) );
