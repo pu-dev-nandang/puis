@@ -1477,30 +1477,64 @@ class C_budgeting extends Budgeting_Controler {
                     {
                         $id_creator_budget_approval = $Input['id_creator_budget_approval'];
                         $G_data = $this->m_master->caribasedprimary('db_budgeting.creator_budget_approval','ID',$id_creator_budget_approval);
-                        $JsonStatus = $G_data[0]['JsonStatus'];
-                        $JsonStatus = (array)json_decode($JsonStatus,true);
-                        $Approver = $Input['NIP'];
-                        $indexjson = $Input['indexjson'];
-                        $Visible = $Input['Visible'];
-                        $NameTypeDesc = $Input['NameTypeDesc'];
-                        $JsonStatus[$indexjson] = array(
-                            'NIP' => $Approver,
-                            'Status' => 0,
-                            'ApproveAt' => '',
-                            'Representedby' => '',
-                            'Visible' => $Visible,
-                            'NameTypeDesc' => $NameTypeDesc,
-                        );
-                        $JsonStatusSave = json_encode($JsonStatus);
-                        $dataSave = array(
-                            'JsonStatus' => $JsonStatusSave,
-                        );    
-                        $this->db->where('ID',$id_creator_budget_approval);
-                        $this->db->update('db_budgeting.creator_budget_approval',$dataSave);
+                        if ($G_data[0]['Status'] == 0 || $G_data[0]['Status'] == 3) {
+                            $JsonStatus = $G_data[0]['JsonStatus'];
+                            $JsonStatus = (array)json_decode($JsonStatus,true);
+                            $Approver = $Input['NIP'];
+                            $indexjson = $Input['indexjson'];
+                            $Visible = $Input['Visible'];
+                            $NameTypeDesc = $Input['NameTypeDesc'];
+                            $JsonStatus[$indexjson] = array(
+                                'NIP' => $Approver,
+                                'Status' => 0,
+                                'ApproveAt' => '',
+                                'Representedby' => '',
+                                'Visible' => $Visible,
+                                'NameTypeDesc' => $NameTypeDesc,
+                            );
+                            $JsonStatusSave = json_encode($JsonStatus);
+                            $dataSave = array(
+                                'JsonStatus' => $JsonStatusSave,
+                            );    
+                            $this->db->where('ID',$id_creator_budget_approval);
+                            $this->db->update('db_budgeting.creator_budget_approval',$dataSave);
+                            
+                            $rs['data']= $JsonStatusSave;
+                            // save to log
+                                $this->m_budgeting->log_budget($id_creator_budget_approval,'Custom Approval',$By = $this->session->userdata('NIP')); 
+                        }
+                        else
+                        {
+                            $id_creator_budget_approval = $Input['id_creator_budget_approval'];
+                            $G_data = $this->m_master->caribasedprimary('db_budgeting.creator_budget_approval','ID',$id_creator_budget_approval);
+                            $JsonStatus = $G_data[0]['JsonStatus'];
+                            $JsonStatus = (array)json_decode($JsonStatus,true);
+                            $Approver = $Input['NIP'];
+                            $indexjson = $Input['indexjson'];
+                            $Visible = $Input['Visible'];
+                            $NameTypeDesc = $JsonStatus[$indexjson]['NameTypeDesc'];
+                            $Status = $JsonStatus[$indexjson]['Status'];
+
+                            $JsonStatus[$indexjson] = array(
+                                'NIP' => $Approver,
+                                'Status' => $Status,
+                                'ApproveAt' => '',
+                                'Representedby' => '',
+                                'Visible' => $Visible,
+                                'NameTypeDesc' => $NameTypeDesc,
+                            );
+                            $JsonStatusSave = json_encode($JsonStatus);
+                            $dataSave = array(
+                                'JsonStatus' => $JsonStatusSave,
+                            );    
+                            $this->db->where('ID',$id_creator_budget_approval);
+                            $this->db->update('db_budgeting.creator_budget_approval',$dataSave);
+                                
+                            $rs['data']= $JsonStatusSave;
+                            // save to log
+                                $this->m_budgeting->log_budget($id_creator_budget_approval,'Custom Approval',$By = $this->session->userdata('NIP')); 
+                        }
                         
-                        $rs['data']= $JsonStatusSave;
-                        // save to log
-                            $this->m_budgeting->log_budget($id_creator_budget_approval,'Custom Approval',$By = $this->session->userdata('NIP')); 
                     }
                     
                 break;    
@@ -1866,375 +1900,6 @@ class C_budgeting extends Budgeting_Controler {
         echo json_encode($get);
     }
 
-    public function submitpr()
-    {
-        $action = $this->input->post('Action');
-        switch ($action) {
-            case 0:
-                $this->AddPrToDraft();
-                break;
-            case 1:
-                $this->PRToIssued();
-                break;
-            default:
-                # code...
-                break;
-        }
-    }
-
-    private function AddPrToDraft()
-    {
-        $input = $this->getInputToken();
-
-        $Year = $this->input->post('Year');
-        $key = "UAP)(*";
-        $Year = $this->jwt->decode($Year,$key);
-
-        $Departement = $this->input->post('Departement');
-        $key = "UAP)(*";
-        $Departement = $this->jwt->decode($Departement,$key);
-
-        $PPN = $this->input->post('PPN');
-        $key = "UAP)(*";
-        $PPN = $this->jwt->decode($PPN,$key);
-
-        $PRCode = $this->input->post('PRCode');
-        $key = "UAP)(*";
-        $PRCode = $this->jwt->decode($PRCode,$key);
-        $act = $PRCode;
-
-        $Notes = $this->input->post('Notes');
-        $key = "UAP)(*";
-        $Notes = $this->jwt->decode($Notes,$key);
-
-        // adding Supporting_documents
-            $Supporting_documents = array();
-            $Supporting_documents = json_encode($Supporting_documents); 
-            if (array_key_exists('Supporting_documents', $_FILES)) {
-                // do upload file
-                $uploadFile = $this->uploadDokumenMultiple(uniqid(),'Supporting_documents');
-                $Supporting_documents = json_encode($uploadFile); 
-            }
-
-
-        $PRCode = ($act == '') ? $this->m_budgeting->Get_PRCode2($Departement) : $PRCode;
-        // print_r($PRCode);die();
-        if ($act == '') {
-            $dataSave = array(
-                'PRCode' => $PRCode,
-                'Year' => $Year,
-                'Departement' => $Departement,
-                'CreatedBy' => $this->session->userdata('NIP'),
-                'CreatedAt' => date('Y-m-d H:i:s'),
-                'JsonStatus' => json_encode(array()),
-                'Status' => 0,
-                'PPN' => $PPN,
-                'PRPrint_Approve' => '',
-                'Notes' => $Notes,
-                'Supporting_documents' => $Supporting_documents,
-            );
-
-            $this->db->insert('db_budgeting.pr_create',$dataSave);
-            if ($this->db->affected_rows() > 0 )
-            {
-                for ($i=0; $i < count($input); $i++) {
-                    $data = $input[$i]; 
-                    $key = "UAP)(*";
-                    $data_arr = (array) $this->jwt->decode($data,$key);
-
-                    // proses upload file
-                        if (array_key_exists('UploadFile'.$i, $_FILES)) {
-                            // do upload file
-                            $uploadFile = $this->uploadDokumenMultiple(mt_rand(),'UploadFile'.$i);
-                            $data_arr['UploadFile'] = json_encode($uploadFile); 
-                        }
-
-                        // exclude 
-                        $Combine =  (array)  json_decode(json_encode($data_arr['FormInsertCombine']),true);
-                        unset($data_arr['FormInsertCombine']);
-
-                    $data_arr['PRCode'] = $PRCode;    
-                    $this->db->insert('db_budgeting.pr_detail',$data_arr);
-                    // insert combine budgeting
-                    $getID = $this->db->insert_id();
-                    if (count($Combine) > 0) {
-                        for ($j=0; $j <count($Combine) ; $j++) { 
-                            $dataSave_combine = array(
-                                'ID_pr_detail' => $getID,
-                                'ID_budget_left' => $Combine[$j]['id_budget_left'],
-                                'Cost' => $Combine[$j]['cost'],
-                                'Estvalue' => $Combine[$j]['estvalue'],
-                            );
-                            $this->db->insert('db_budgeting.pr_detail_combined',$dataSave_combine);
-                        }
-                        
-                    }
-
-                    // make can be delete
-                       $tbl = 'db_purchasing.m_catalog';
-                       $fieldCode = 'ID';
-                       $ValueCode = $data_arr['ID_m_catalog'];
-                       $this->m_budgeting->makeCanBeDelete($tbl,$fieldCode,$ValueCode);
-                }
-
-                // insert to pr_circulation_sheet
-                    $this->m_budgeting->pr_circulation_sheet($PRCode,'Created');
-            }
-            else
-            {
-                //return FALSE;
-                $PRCode = '';
-            }
-        }
-        else
-        {
-            $dataSave = array(
-                'CreatedBy' => $this->session->userdata('NIP'),
-                'CreatedAt' => date('Y-m-d H:i:s'),
-                'PPN' => $PPN,
-                'Notes' => $Notes,
-                'Supporting_documents' => $Supporting_documents,
-            );
-
-            // jika dari reject go back status ke 0
-                $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
-                if ($G_data[0]['Status'] ==  3 || $G_data[0]['Status'] ==  4) {
-                    $JsonStatus = $G_data[0]['JsonStatus'];
-                    $JsonStatus = (array) json_decode($JsonStatus,true);
-                    // update all 0 agar bisa di approve ulang
-                    for ($i=0; $i < count($JsonStatus); $i++) { 
-                        $JsonStatus[$i]['Status'] = 0;
-                        $JsonStatus[$i]['ApproveAt'] = '';
-                    }
-                    $dataSave['JsonStatus'] = json_encode($JsonStatus);
-                    $dataSave['Status'] = 0;
-                }
-
-            $this->db->where('PRCode',$PRCode);
-            $this->db->update('db_budgeting.pr_create',$dataSave);
-            if ($this->db->affected_rows() > 0 )
-            {
-                // remove PRCode in pr_detail
-                    $this->db->where(array('PRCode' => $PRCode));
-                    $this->db->delete('db_budgeting.pr_detail');
-                for ($i=0; $i < count($input); $i++) {
-                    $data = $input[$i]; 
-                    $key = "UAP)(*";
-                    $data_arr = (array) $this->jwt->decode($data,$key);
-
-                    // proses upload file
-                        if (array_key_exists('UploadFile'.$i, $_FILES)) {
-                            // do upload file
-                            $uploadFile = $this->uploadDokumenMultiple(mt_rand(),'UploadFile'.$i);
-                            $data_arr['UploadFile'] = json_encode($uploadFile); 
-                        }
-                        // exclude 
-                        $Combine =  (array)  json_decode(json_encode($data_arr['FormInsertCombine']),true);
-                        unset($data_arr['FormInsertCombine']);
-
-                    $data_arr['PRCode'] = $PRCode;    
-                    $this->db->insert('db_budgeting.pr_detail',$data_arr);
-                    // insert combine budgeting
-                    $getID = $this->db->insert_id();
-                    if (count($Combine) > 0) {
-                        for ($j=0; $j <count($Combine) ; $j++) { 
-                            $dataSave_combine = array(
-                                'ID_pr_detail' => $getID,
-                                'ID_budget_left' => $Combine[$j]['id_budget_left'],
-                                'Cost' => $Combine[$j]['cost'],
-                            );
-                            $this->db->insert('db_budgeting.pr_detail_combined',$dataSave_combine);
-                        }
-                        
-                    }
-
-                }
-
-                // insert to pr_circulation_sheet
-                    $this->m_budgeting->pr_circulation_sheet($PRCode,'Edited');
-            }
-            else
-            {
-                //return FALSE;
-                $PRCode = '';
-            }
-        }
-        echo json_encode($PRCode);
-        
-    }
-
-    private function uploadDokumenMultiple($filename,$ggFiles = 'UploadFile')
-    {
-        $path = './uploads/budgeting/pr';
-        // Count total files
-        $countfiles = count($_FILES[$ggFiles ]['name']);
-      
-      $output = array();
-      // Looping all files
-      for($i=0;$i<$countfiles;$i++){
-            $config = array();
-            if(!empty($_FILES[$ggFiles ]['name'][$i])){
-     
-              // Define new $_FILES array - $_FILES['file']
-              $_FILES['file']['name'] = $_FILES[$ggFiles]['name'][$i];
-              $_FILES['file']['type'] = $_FILES[$ggFiles]['type'][$i];
-              $_FILES['file']['tmp_name'] = $_FILES[$ggFiles]['tmp_name'][$i];
-              $_FILES['file']['error'] = $_FILES[$ggFiles]['error'][$i];
-              $_FILES['file']['size'] = $_FILES[$ggFiles]['size'][$i];
-
-              // Set preference
-              $config['upload_path'] = $path.'/';
-              $config['allowed_types'] = '*';
-              $config['overwrite'] = TRUE; 
-              $no = $i + 1;
-              $config['file_name'] = $filename.'_'.$no;
-
-              $filenameUpload = $_FILES['file']['name'];
-              $ext = pathinfo($filenameUpload, PATHINFO_EXTENSION);
-              $filenameNew = $filename.'_'.$no.'_'.mt_rand().'.'.$ext;
-     
-              //Load upload library
-              $this->load->library('upload',$config); 
-              $this->upload->initialize($config);
-     
-              // File upload
-              if($this->upload->do_upload('file')){
-                // Get data about the file
-                $uploadData = $this->upload->data();
-                $filePath = $uploadData['file_path'];
-                $filename_uploaded = $uploadData['file_name'];
-                // rename file
-                $old = $filePath.'/'.$filename_uploaded;
-                $new = $filePath.'/'.$filenameNew;
-
-                rename($old, $new);
-
-                $output[] = $filenameNew;
-              }
-            }
-        }
-        return $output;
-    }
-
-    private function PRToIssued()
-    {
-        $input = $this->getInputToken();
-
-        $Year = $this->input->post('Year');
-        $key = "UAP)(*";
-        $Year = $this->jwt->decode($Year,$key);
-
-        $Departement = $this->input->post('Departement');
-        $key = "UAP)(*";
-        $Departement = $this->jwt->decode($Departement,$key);
-
-        $PPN = $this->input->post('PPN');
-        $key = "UAP)(*";
-        $PPN = $this->jwt->decode($PPN,$key);
-
-        $PRCode = $this->input->post('PRCode');
-        $key = "UAP)(*";
-        $PRCode = $this->jwt->decode($PRCode,$key);
-
-        $Notes = $this->input->post('Notes');
-        $key = "UAP)(*";
-        $Notes = $this->jwt->decode($Notes,$key);
-
-        // adding Supporting_documents
-            $Supporting_documents = array();
-            $Supporting_documents = json_encode($Supporting_documents); 
-            if (array_key_exists('Supporting_documents', $_FILES)) {
-                // do upload file
-                $uploadFile = $this->uploadDokumenMultiple(uniqid(),'Supporting_documents');
-                $Supporting_documents = json_encode($uploadFile); 
-            }
-
-        // RuleApproval
-            // check Subtotal
-                $Amount = 0;
-                for ($i=0; $i < count($input); $i++) {
-                    $data = $input[$i]; 
-                    $key = "UAP)(*";
-                    $data_arr = (array) $this->jwt->decode($data,$key);
-                    $SubTotal = $data_arr['SubTotal'];
-                    $Amount = $Amount + $SubTotal;
-                }
-
-            // $JsonStatus = $this->m_budgeting->GetRuleApproval_PR_JsonStatus($Departement,$Amount);
-            $JsonStatus = $this->m_budgeting->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$PRCode);
-
-        $dataSave = array(
-            'CreatedBy' => $this->session->userdata('NIP'),
-            'CreatedAt' => date('Y-m-d H:i:s'),
-            'Status' => 1,
-            'JsonStatus' => json_encode($JsonStatus),
-            'PPN' => $PPN,
-            'Notes' => $Notes,
-            'Supporting_documents' => $Supporting_documents,
-        );
-
-        $this->db->where('PRCode',$PRCode);
-        $this->db->update('db_budgeting.pr_create',$dataSave);
-
-        // passing show name JsonStatus
-        for ($i=0; $i < count($JsonStatus); $i++) { 
-            $Name = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['ApprovedBy']);
-            $Name = $Name[0]['Name'];
-            $JsonStatus[$i]['NameApprovedBy'] = $Name;
-         } 
-
-        if ($this->db->affected_rows() > 0 )
-        {
-            // remove PRCode in pr_detail
-                $this->db->where(array('PRCode' => $PRCode));
-                $this->db->delete('db_budgeting.pr_detail');
-            for ($i=0; $i < count($input); $i++) {
-                $data = $input[$i]; 
-                $key = "UAP)(*";
-                $data_arr = (array) $this->jwt->decode($data,$key);
-
-                // proses upload file
-                    if (array_key_exists('UploadFile'.$i, $_FILES)) {
-                        // do upload file
-                        $uploadFile = $this->uploadDokumenMultiple(mt_rand(),'UploadFile'.$i);
-                        $data_arr['UploadFile'] = json_encode($uploadFile); 
-                    }
-
-                    // exclude 
-                        $Combine =  (array)  json_decode(json_encode($data_arr['FormInsertCombine']),true);
-                        unset($data_arr['FormInsertCombine']);
-
-                    $data_arr['PRCode'] = $PRCode;    
-                    $this->db->insert('db_budgeting.pr_detail',$data_arr);
-                    // insert combine budgeting
-                    $getID = $this->db->insert_id();
-                    if (count($Combine) > 0) {
-                        for ($j=0; $j <count($Combine) ; $j++) { 
-                            $dataSave_combine = array(
-                                'ID_pr_detail' => $getID,
-                                'ID_budget_left' => $Combine[$j]['id_budget_left'],
-                                'Cost' => $Combine[$j]['cost'],
-                                'Estvalue' => $Combine[$j]['estvalue'],
-                            );
-                            $this->db->insert('db_budgeting.pr_detail_combined',$dataSave_combine);
-                        }
-                        
-                    }
-
-            }
-
-            // insert to pr_circulation_sheet
-                $this->m_budgeting->pr_circulation_sheet($PRCode,'Issued');
-        }
-        else
-        {
-            //return FALSE;
-            $PRCode = '';
-        }
-        echo json_encode(array('PRCode' => $PRCode,'JsonStatus' => json_encode($JsonStatus)) );
-        
-    }
-
     public function FormEditPR()
     {
         $this->auth_ajax();
@@ -2378,6 +2043,48 @@ class C_budgeting extends Budgeting_Controler {
         }
 
         echo json_encode($rs);
+    }
+
+    public function cancel_budget_department()
+    {
+        $this->auth_ajax();
+        $Input = $this->getInputToken();
+        $rs = array('msg' => '');
+        // cek data existing in PR
+            $id_creator_budget_approval = $Input['id_creator_budget_approval'];
+            $G = $this->m_master->caribasedprimary('db_budgeting.creator_budget_approval','ID',$id_creator_budget_approval);
+            $Departement = $G[0]['Departement'];
+            $Year = $G[0]['Year'];
+            $sql = 'select count(*) as total from db_budgeting.pr_create where Departement = ? and Year = ?';
+            $query=$this->db->query($sql, array($Departement,$Year))->result_array();
+             if ($query[0]['total'] > 0) {
+                 $rs['msg'] =  $this->Msg['NotAction'];
+             }
+             else
+             {
+                // delete creator_budget_approval,creator_budget,log_budget,budget_left
+                $this->db->where('ID',$id_creator_budget_approval);
+                $this->db->delete('db_budgeting.creator_budget_approval');
+
+                // delete budget_left
+                $G_ = $this->m_master->caribasedprimary('db_budgeting.creator_budget','ID_creator_budget_approval',$id_creator_budget_approval);
+
+                for ($i=0; $i < count($G_); $i++) { 
+                    $ID_creator_budget = $G_[$i]['ID'];
+                    $this->db->where('ID_creator_budget',$ID_creator_budget);
+                    $this->db->delete('db_budgeting.budget_left');
+                }
+                // die();
+                $this->db->where('ID_creator_budget_approval',$id_creator_budget_approval);
+                $this->db->delete('db_budgeting.creator_budget');
+
+                $this->db->where('ID_creator_budget_approval',$id_creator_budget_approval);
+                $this->db->delete('db_budgeting.log_budget');
+
+                $rs['msg'] =  'Success';
+             }
+
+        echo json_encode($rs);     
     }
 
 }

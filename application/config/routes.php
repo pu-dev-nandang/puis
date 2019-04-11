@@ -1213,6 +1213,7 @@ $route['budgeting/EntryBudget/ListBudgetDepartement'] = 'page/budgeting/c_budget
 $route['budgeting/getListBudgetingDepartement'] = 'page/budgeting/c_budgeting/getListBudgetingDepartement';
 $route['budgeting/export_excel_budget_creator'] = 'C_save_to_excel/export_excel_budget_creator';
 $route['budgeting/export_excel_budget_creator_all'] = 'C_save_to_excel/export_excel_budget_creator_all';
+
 $route['budgeting/config_pr/Set_Rad']= 'page/budgeting/c_pr_po/set_rad';
 $route['budgeting/config_pr/Set_Approval']= 'page/budgeting/c_pr_po/Set_Approval';
 $route['budgeting/get_cfg_set_roleuser_pr/(:any)'] = 'page/budgeting/c_pr_po/get_cfg_set_roleuser_pr/$1';
@@ -1231,7 +1232,7 @@ $route['budgeting/page_pr_catalog/(:any)'] = 'page/budgeting/c_pr_po/page_pr_cat
 
 $route['budgeting/PostBudgetThisMonth_Department'] = 'page/budgeting/c_budgeting/PostBudgetThisMonth_Department';
 $route['budgeting/getPostBudgetDepartement'] = 'page/budgeting/c_budgeting/getPostBudgetDepartement';
-$route['budgeting/submitpr'] = 'page/budgeting/c_budgeting/submitpr';
+$route['budgeting/submitpr'] = 'page/budgeting/c_pr_po/submitpr';
 $route['budgeting/DataPR'] = 'page/budgeting/c_pr_po/DataPR';
 $route['budgeting/FormEditPR'] = 'page/budgeting/c_budgeting/FormEditPR';
 $route['budgeting/GetDataPR'] = 'page/budgeting/c_budgeting/GetDataPR';
@@ -1241,7 +1242,7 @@ $route['budgeting/export_excel_post_department'] = 'c_save_to_excel/export_excel
 $route['budgeting/update_approver'] = 'page/budgeting/c_budgeting/update_approver';
 $route['budgeting/Upload_File_Creatorbudget'] = 'page/budgeting/c_budgeting/Upload_File_Creatorbudget';
 $route['budgeting/Upload_File_Creatorbudget_all'] = 'page/budgeting/c_budgeting/Upload_File_Creatorbudget_all';
-
+$route['budgeting/cancel_budget_department'] = 'page/budgeting/c_budgeting/cancel_budget_department';
 
 
 // Purchasing

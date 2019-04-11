@@ -495,11 +495,11 @@ class M_budgeting extends CI_Model {
     public function getListBudgetingDepartement($Year)
     {
         $sql = 'select aa.*,b.Status,b.ID as ID_creator_budget from (
-                select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
+                select CONCAT("AC.",ID) as ID, CONCAT("Study ",NameEng) as NameDepartement from db_academic.program_study where Status = 1
                 UNION
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
                 UNION
-                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
+                select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement from db_academic.faculty where StBudgeting = 1
                 ) aa left join (select * from db_budgeting.creator_budget_approval where Year = ?) as b on aa.ID = b.Departement
                 ';
         $query=$this->db->query($sql, array($Year))->result_array(); 

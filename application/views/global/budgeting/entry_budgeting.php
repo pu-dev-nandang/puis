@@ -58,6 +58,7 @@
 </div>
 
 <script type="text/javascript">
+    var DivSession = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
     $(document).ready(function() {
         $("#container").attr('class','fixed-header sidebar-closed');
         $("#sidebar").remove();
