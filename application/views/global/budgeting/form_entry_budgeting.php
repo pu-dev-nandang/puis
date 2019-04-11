@@ -229,9 +229,9 @@ function makeHtmlHeader()
 	// add sisa dan subtotal
 	html += '<div class = "col-md-2 Custom-Total">'+
 				'<div class = "row">'+
-					'<div class = "col-md-3">'+ // sisa
+					'<div class = "col-md-5">'+ // sisa
 					'</div>'+
-					'<div class = "col-md-9">'+
+					'<div class = "col-md-7">'+
 						'<label>Subtotal</label>'+	
 					'</div>'+
 				'</div>'+	
@@ -385,9 +385,9 @@ function makeRowAdd_del(dt)
 			// add sisa dan subtotal
 			html += '<div class = "col-md-2 Custom-Total">'+
 						'<div class = "row">'+
-							'<div class = "col-md-3 sisa">'+ // sisa
+							'<div class = "col-md-5 sisa">'+ // sisa
 							'</div>'+
-							'<div class = "col-md-9">'+
+							'<div class = "col-md-7">'+
 								'<p class = "Subtotal">0</p>'+
 							'</div>'+
 						'</div>'+	
@@ -483,9 +483,9 @@ function makeContent()
 		// add sisa dan subtotal
 		html += '<div class = "col-md-2 Custom-Total">'+
 					'<div class = "row">'+
-						'<div class = "col-md-3 sisa">'+ // sisa
+						'<div class = "col-md-5 sisa">'+ // sisa
 						'</div>'+
-						'<div class = "col-md-9">'+
+						'<div class = "col-md-7">'+
 							'<p class = "Subtotal" style = "margin-top : 5px;">0</p>'+
 						'</div>'+
 					'</div>'+	
@@ -1246,9 +1246,9 @@ function makeContent_existing()
 		// add sisa dan subtotal
 		html += '<div class = "col-md-2 Custom-Total">'+
 					'<div class = "row">'+
-						'<div class = "col-md-3 sisa">'+ // sisa
+						'<div class = "col-md-5 sisa">'+ // sisa
 						'</div>'+
-						'<div class = "col-md-9">'+
+						'<div class = "col-md-7">'+
 							'<p class = "Subtotal" style = "margin-top : 5px;">0</p>'+
 						'</div>'+
 					'</div>'+	
