@@ -62,6 +62,45 @@ class C_semester_antara extends Academic_Controler {
 
 
     public function setting_timetable($SASemesterID){
+
+        $ScheduleIDSA = $this->input->get('edit');
+
+        $data['ScheduleIDSA'] = $ScheduleIDSA;
+        $dataScheduleSA = [];
+        if(isset($ScheduleIDSA) && $ScheduleIDSA!='' && $ScheduleIDSA!=null){
+            $dataScheduleSA = $this->db->query('SELECT ss.*, cl.Seat, cl.SeatForExam FROM db_academic.sa_schedule ss 
+                                                          LEFT JOIN db_academic.classroom cl ON (cl.ID = ss.ClassroomID) 
+                                                          WHERE ss.ID = "'.$ScheduleIDSA.'" ')->result_array();
+
+            if(count($dataScheduleSA)>0){
+                $ScheduleIDSA = $dataScheduleSA[0]['ID'];
+                $dataTeam = $this->db->select('NIP')->get_where('db_academic.sa_schedule_team_teaching',array(
+                    'ScheduleIDSA' => $ScheduleIDSA
+                ))->result_array();
+                $team = [];
+                if(count($dataTeam)>0){
+                    foreach ($dataTeam AS $itm) {
+                        array_push($team,$itm['NIP']);
+                    }
+                }
+
+                $dataScheduleSA[0]['TeamTeaching'] = $team;
+
+                // Course
+                $dataCourse = $this->db->select('IDSSD')->get_where('db_academic.sa_schedule_course',array(
+                    'ScheduleIDSA' => $ScheduleIDSA
+                ))->result_array();
+                $course = [];
+                if(count($dataCourse)>0){
+                    foreach ($dataCourse AS $item){
+                        array_push($course,$item['IDSSD']);
+                    }
+                }
+                $dataScheduleSA[0]['DataCourse'] = $course;
+            }
+        }
+
+        $data['dataScheduleSA'] = json_encode($dataScheduleSA);
         $data['SASemesterID'] = $SASemesterID;
         $data['department'] = parent::__getDepartement();
         $page = $this->load->view('page/'.$data['department'].'/semesterantara/sa_setting_timetable',$data,true);

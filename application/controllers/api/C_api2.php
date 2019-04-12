@@ -2091,7 +2091,6 @@ class C_api2 extends CI_Controller {
                 $d_SA = $dataSA[0];
 
                 $dataDetails = (array) $data_arr['dataDetails'];
-
                 $NPM = $dataDetails['NPM'];
 
 
@@ -2122,54 +2121,69 @@ class C_api2 extends CI_Controller {
 
 
         }
+        else if($data_arr['action']=='enteredCourseByAcademic'){
+
+            $dataDetails = (array) $data_arr['dataDetails'];
+            $IDSAStudent = $dataDetails['IDSAStudent'];
+
+            // Insert in Student Details
+            $this->db->insert('db_academic.sa_student_details',$dataDetails);
+
+            // Create in tagihan
+            $this->createTagihanSemesterAntara($IDSAStudent);
+
+            return print_r(1);
+
+        }
         else if($data_arr['action']=='readSelectedCourse'){
-            // Semester Antara Active
-            $dataSA = $this->m_rest->_getSemesterAntaraActive();
 
-            $result = [];
+            if(isset($data_arr['SASemesterID']) && $data_arr['SASemesterID']!=''){
+                $SASemesterID = $data_arr['SASemesterID'];
+            } else {
+                $dataSA = $this->m_rest->_getSemesterAntaraActive();
+                $SASemesterID = $dataSA[0]['ID'];
+            }
 
-            if(count($dataSA)>0){
 
 
-                $NPM = $data_arr['NPM'];
-                $db_ = 'ta_'.$data_arr['ClassOf'];
 
-                $d_SA = $dataSA[0];
-                // Cek apakah sudah
-                $dataIns = array(
-                    'SASemesterID' => $d_SA['ID'],
-                    'NPM' => $NPM
-                );
+            $NPM = $data_arr['NPM'];
+            $db_ = 'ta_'.$data_arr['ClassOf'];
 
-                $dataStd = $this->db->limit(1)->get_where('db_academic.sa_student',$dataIns)->result_array();
 
-                if(count($dataStd)>0){
-                    $IDSAStudent = $dataStd[0]['ID'];
+            // Cek apakah sudah
+            $dataIns = array(
+                'SASemesterID' => $SASemesterID,
+                'NPM' => $NPM
+            );
 
-                    $dataCID = $this->db->query('SELECT cd.Semester, mk.MKCode, mk.NameEng AS CoureEng, cd.ID AS CDID, cd.MKID, cd.TotalSKS AS Credit,  
+            $dataStd = $this->db->limit(1)->get_where('db_academic.sa_student',$dataIns)->result_array();
+
+            if(count($dataStd)>0){
+                $IDSAStudent = $dataStd[0]['ID'];
+
+                $dataCID = $this->db->query('SELECT cd.Semester, mk.MKCode, mk.NameEng AS CoureEng, cd.ID AS CDID, cd.MKID, cd.TotalSKS AS Credit,  
                                                             ssd.Reson, ssd.Updated1At, ssd.Updated2At, ssd.Status, ssd.ID SSDID
                                                             FROM db_academic.sa_student_details ssd
                                                             LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = ssd.CDID)
                                                             LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssd.MKID)
                                                             WHERE ssd.IDSAStudent = "'.$IDSAStudent.'" ')->result_array();
 
-                    if(count($dataCID)>0){
-                        for($i=0;$i<count($dataCID);$i++){
-                            $d = $dataCID[$i];
+                if(count($dataCID)>0){
+                    for($i=0;$i<count($dataCID);$i++){
+                        $d = $dataCID[$i];
 
-                            $dataC = $this->db->query('SELECT ID AS SPID, Score, Grade, GradeValue, Credit FROM '.$db_.'.study_planning sp 
+                        $dataC = $this->db->query('SELECT ID AS SPID, Score, Grade, GradeValue, Credit FROM '.$db_.'.study_planning sp 
                                                             WHERE sp.NPM = "'.$NPM.'" 
                                                             AND sp.CDID = "'.$d['CDID'].'" 
                                                             ORDER BY sp.Score DESC LIMIT 1 ')->result_array();
 
-                            $dataCID[$i]['SP'] = $dataC;
+                        $dataCID[$i]['SP'] = $dataC;
 
-                        }
                     }
-
-                    $result = $dataCID;
                 }
 
+                $result = $dataCID;
             }
 
             return print_r(json_encode($result));
@@ -2183,6 +2197,24 @@ class C_api2 extends CI_Controller {
 
             return print_r(1);
 
+        }
+        else if($data_arr['action']=='deleteCourseSAByAcademic'){
+            $SSDID = $data_arr['SSDID'];
+
+            $this->db->where('ID', $SSDID);
+            $this->db->delete('db_academic.sa_student_details');
+            $this->db->reset_query();
+
+            $this->db->where('IDSSD', $SSDID);
+            $this->db->delete('db_academic.sa_study_planning');
+            $this->db->reset_query();
+
+
+            $IDSAStudent = $data_arr['IDSAStudent'];
+            // Create in tagihan
+            $this->createTagihanSemesterAntara($IDSAStudent);
+
+            return print_r(1);
         }
         else if($data_arr['action']=='saSend2Mentor'){
 
@@ -2402,11 +2434,11 @@ class C_api2 extends CI_Controller {
                 // Cek apakah group sudah ada atau blm
                 $dataSch = (array) $data_arr['dataSch'];
 
-                $IDSASemester = $dataSch['IDSASemester'];
+                $SASemesterID = $dataSch['SASemesterID'];
                 $ClassGroup = $dataSch['ClassGroup'];
 
                 $dataCheck = $this->db->get_where('db_academic.sa_schedule',array(
-                    'IDSASemester' => $IDSASemester,
+                    'SASemesterID' => $SASemesterID,
                     'ClassGroup' => $ClassGroup
                 ))->result_array();
 
@@ -2466,6 +2498,129 @@ class C_api2 extends CI_Controller {
 
 
 
+            }
+            else if ($type=='update'){
+
+                $ScheduleIDSA = $data_arr['ScheduleIDSA'];
+
+                // Cek apakah group sudah ada atau blm
+                $dataSch = (array) $data_arr['dataSch'];
+
+                $SASemesterID = $dataSch['SASemesterID'];
+                $ClassGroup = $dataSch['ClassGroup'];
+
+                $dataCheck = $this->db->select('ID')->get_where('db_academic.sa_schedule',array(
+                    'SASemesterID' => $SASemesterID,
+                    'ClassGroup' => $ClassGroup
+                ))->result_array();
+
+                $gr = false;
+                if(count($dataCheck)>0){
+                    if($dataCheck[0]['ID']==$ScheduleIDSA){
+                        $gr = true;
+                    }
+                } else {
+                    $gr = true;
+                }
+
+                // Jika TRUE
+                if($gr==true){
+
+                    // update schedule
+                    $this->db->where('ID', $ScheduleIDSA);
+                    $this->db->update('db_academic.sa_schedule',$dataSch);
+                    $this->db->reset_query();
+
+                    // Remove data schedule
+                    $tables = array('db_academic.sa_schedule_course', 'db_academic.sa_schedule_team_teaching');
+                    $this->db->where('ScheduleIDSA', $ScheduleIDSA);
+                    $this->db->delete($tables);
+                    $this->db->reset_query();
+
+                    // Insert ulang
+                    $ArrIDSSD = (array) $data_arr['ArrIDSSD'];
+                    if(count($ArrIDSSD)>0){
+                        for($i=0;$i<count($ArrIDSSD);$i++){
+                            $dataSD = $this->db->select('ID,CDID,MKID')->get_where('db_academic.sa_student_details',
+                                array('ID' => $ArrIDSSD[$i]))->result_array();
+
+                            if(count($dataSD)>0){
+                                $arrIns = array(
+                                    'ScheduleIDSA' => $ScheduleIDSA,
+                                    'IDSSD' => $dataSD[0]['ID'],
+                                    'CDID' => $dataSD[0]['CDID'],
+                                    'MKID' => $dataSD[0]['MKID']
+                                );
+                                $this->db->insert('db_academic.sa_schedule_course',$arrIns);
+                            }
+
+                        }
+                    }
+
+                    // Cek Team Teaching
+                    $TeamTeaching = $data_arr['TeamTeaching'];
+                    if(count($TeamTeaching)>0){
+                        for($i=0;$i<count($TeamTeaching);$i++){
+                            $arrTTM = array(
+                                'ScheduleIDSA' => $ScheduleIDSA,
+                                'NIP' => $TeamTeaching[$i]
+                            );
+                            $this->db->insert('db_academic.sa_schedule_team_teaching',$arrTTM);
+                        }
+                    }
+
+                    $result = array(
+                        'Status' => 1
+                    );
+                    return print_r(json_encode($result));
+
+                }
+                else {
+                    $result = array(
+                        'Status' => -1
+                    );
+                    return print_r(json_encode($result));
+                }
+
+            }
+            else if ($type=='remove'){
+                $ScheduleIDSA = $data_arr['ScheduleIDSA'];
+
+                // Cek in exam
+                $dataExamCourse = $this->db->select('ExamIDSA')->get_where('db_academic.sa_exam_course',array(
+                    'ScheduleIDSA' => $ScheduleIDSA
+                ))->result_array();
+                if(count($dataExamCourse)>0){
+                    for($i=0;$i<count($dataExamCourse);$i++){
+                        $d = $dataExamCourse[$i];
+                        // Cek ada berapa exam di exam course jika cuma satu maka exampun ikut di hapus
+                        $dataEx = $this->db->get_where('db_academic.sa_exam_course',array(
+                            'ExamIDSA' => $d['ExamIDSA']
+                        ))->result_array();
+
+                        if(count($dataEx)==1){
+                            $this->db->where('ID', $d['ExamIDSA']);
+                            $this->db->delete('db_academic.sa_exam');
+                            $this->db->reset_query();
+
+                            // Remove Student
+                            $this->db->where('ExamIDSA', $d['ExamIDSA']);
+                            $this->db->delete('db_academic.sa_exam_student');
+                            $this->db->reset_query();
+                        }
+                    }
+                }
+
+                $tables = array('db_academic.sa_schedule_course', 'db_academic.sa_schedule_team_teaching','db_academic.sa_exam_course');
+                $this->db->where('ScheduleIDSA', $ScheduleIDSA);
+                $this->db->delete($tables);
+                $this->db->reset_query();
+
+                $this->db->where('ID', $ScheduleIDSA);
+                $this->db->delete('db_academic.sa_schedule');
+
+
+                return print_r(1);
             }
 
         }
@@ -2650,6 +2805,80 @@ class C_api2 extends CI_Controller {
 
         }
 
+        else if($data_arr['action']=='addStudentSA'){
+            $dataForm = (array) $data_arr['dataForm'];
+            $this->db->insert('db_academic.sa_student',$dataForm);
+
+            return print_r(1);
+        }
+        else if($data_arr['action']=='rmStudentSA'){
+
+            $IDSAStudent = $data_arr['IDSAStudent'];
+
+            $dataStd = $this->db->limit(1)->get_where('db_academic.sa_student',array('ID' => $IDSAStudent))->result_array();
+
+            if(count($dataStd)>0){
+
+                $d = $dataStd[0];
+
+                // Remove tagihan
+                $this->db->where(array(
+                    'PTID' => 5,
+                    'SemesterID' => $d['SASemesterID'],
+                    'NPM' => $d['NPM']
+                ));
+                $this->db->delete('db_finance.payment');
+                $this->db->reset_query();
+
+                // Remove tagihan
+                $this->db->where(array(
+                    'PTID' => 6,
+                    'SemesterID' => $d['SASemesterID'],
+                    'NPM' => $d['NPM']
+                ));
+                $this->db->delete('db_finance.payment');
+                $this->db->reset_query();
+
+
+                $tables = array('db_academic.sa_student_details', 'db_academic.sa_study_planning');
+                $this->db->where('IDSAStudent', $IDSAStudent);
+                $this->db->delete($tables);
+                $this->db->reset_query();
+
+                $this->db->where('ID', $IDSAStudent);
+                $this->db->delete('db_academic.sa_student');
+                $this->db->reset_query();
+
+            }
+
+
+
+            return print_r(1);
+        }
+
+        else if($data_arr['action']=='RemoveExamSA'){
+            $ExamIDSA = $data_arr['ExamIDSA'];
+
+            $this->db->where('ID', $ExamIDSA);
+            $this->db->delete('db_academic.sa_exam');
+            $this->db->reset_query();
+
+            $tables = array('db_academic.sa_exam_course', 'db_academic.sa_exam_student');
+            $this->db->where('ExamIDSA', $ExamIDSA);
+            $this->db->delete($tables);
+
+            return print_r(1);
+        }
+        else if($data_arr['action']=='forseRemoveSSC'){
+
+            $dataForm = (array) $data_arr['dataForm'];
+
+            $this->db->where($dataForm);
+            $this->db->delete('db_academic.sa_schedule_course');
+
+            return print_r(1);
+        }
+
     }
 
     function createTagihanSemesterAntara($IDSAStudent){
@@ -2832,7 +3061,7 @@ class C_api2 extends CI_Controller {
 
             $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div style="text-align:center;">'.$row['ClassGroup'].'</div>';
-            $nestedData[] = '<div style="text-align:left;"><b><a>'.$row['CourseEng'].'</a></b></div>';
+            $nestedData[] = '<div style="text-align:left;"><b><a href="'.base_url('academic/semester-antara/setting-timetable/'.$SASemesterID.'?edit='.$row['ID']).'">'.$row['CourseEng'].'</a></b></div>';
             $nestedData[] = '<div style="text-align:right;">'.$row['DayEng'].', '.$timeSc.'<br/>'.$row['Room'].'</div>';
             $nestedData[] = '<div style="text-align:left;">'.$Lec.'</div>';
             $nestedData[] = '<div style="text-align:center;">
@@ -2866,7 +3095,7 @@ class C_api2 extends CI_Controller {
 
         $SASemesterID = $data_arr['SASemesterID'];
 
-        $queryDefault = 'SELECT ss.ID AS IDSAStudent, ats.NPM, ats.Name, ss.Mentor, em.Name AS MentorName FROM db_academic.sa_student ss 
+        $queryDefault = 'SELECT ss.ID AS IDSAStudent, ats.NPM, ats.Name, ats.Year AS ClassOf, ats.ProdiID, ss.Mentor, em.Name AS MentorName FROM db_academic.sa_student ss 
                                     LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ss.NPM)
                                     LEFT JOIN db_employees.employees em ON (em.NIP = ss.Mentor)
                                     WHERE ss.SASemesterID = "'.$SASemesterID.'" ';
@@ -2887,7 +3116,7 @@ class C_api2 extends CI_Controller {
             // Get Course
             $IDSAStudent = $row['IDSAStudent'];
 
-            $dataCourse = $this->db->query('SELECT ssd.*, mk.Name AS CourseEng FROM db_academic.sa_student_details ssd
+            $dataCourse = $this->db->query('SELECT ssd.*, mk.NameEng AS CourseEng FROM db_academic.sa_student_details ssd
                                                         LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssd.MKID)
                                                         WHERE ssd.IDSAStudent = "'.$IDSAStudent.'" ')->result_array();
 
@@ -2916,9 +3145,9 @@ class C_api2 extends CI_Controller {
             }
 
             $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
-            $nestedData[] = '<div style="text-align:left;"><a>'.$row['Name'].'</a><br/>'.$row['NPM'].'<br/><span style="font-size: 12px;"><i class="fa fa-user-o"></i> '.$row['MentorName'].'</span></div>';
+            $nestedData[] = '<div style="text-align:left;"><a href="javascript:void(0);" class="showSAStudent" data-idstd="'.$row['IDSAStudent'].'" data-mentor="'.$row['Mentor'].'" data-prodi="'.$row['ProdiID'].'" data-npm="'.$row['NPM'].'" data-classof="'.$row['ClassOf'].'">'.$row['Name'].'</a><br/>'.$row['NPM'].'<br/><span style="font-size: 12px;"><i class="fa fa-user-o"></i> '.$row['MentorName'].'</span></div>';
             $nestedData[] = '<div style="text-align:left;">'.$viewCourse.'</div>';
-            $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div style="text-align:center;"><button class="btn btn-default btn-default-danger btn-sm btn-removestd" data-npm="'.$row['NPM'].'" data-id="'.$IDSAStudent.'"><i class="fa fa-trash"></i></button></div>';
 
             $data[] = $nestedData;
             $no++;
@@ -2931,6 +3160,20 @@ class C_api2 extends CI_Controller {
             "data"            => $data
         );
         echo json_encode($json_data);
+
+    }
+
+    public function getStudentList(){
+        $Key = $this->input->get('Key');
+        $SASemesterID = $this->input->get('SASemesterID');
+
+        $dataStd = $this->db->query('SELECT ats.NPM, ats.Name, ma.NIP, ss.ID AS IDSAStudent FROM db_academic.auth_students ats 
+                                                            LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = ats.NPM)
+                                                            LEFT JOIN db_academic.sa_student ss ON (ss.NPM = ats.NPM AND ss.SASemesterID = "'.$SASemesterID.'")
+                                                            WHERE ats.NPM LIKE "%'.$Key.'%" OR ats.Name LIKE "%'.$Key.'%" LIMIT 7 ')->result_array();
+
+        return print_r(json_encode($dataStd));
+
 
     }
 

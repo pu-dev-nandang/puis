@@ -110,7 +110,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td colspan="3" style="text-align: right;">
+                    <td colspan="3" style="text-align: right;" id="viewAction">
                         <button class="btn btn-primary" id="btnSubmitExam" disabled>Submit</button>
                     </td>
                 </tr>
@@ -142,6 +142,7 @@
             $('#formStart').val(dx.Start.substr(0,5));
             $('#formEnd').val(dx.End.substr(0,5));
 
+            $('#viewAction').prepend('<button class="btn btn-danger" data-id="'+dx.ID+'" data-sasemesterid="'+dx.SASemesterID+'" id="btnRemoveExamSA">Remove</button>');
             $('#formInputDate').val(dx.ExamDate);
             $('#viewTgl').html('<i class="fa fa-arrow-right" style="margin-right: 5px;"></i> <b>'+moment(dx.ExamDate).format('dddd, DD MMM YYYY')+'</b>');
         }
@@ -173,6 +174,31 @@
             }
 
         },1000);
+
+    });
+
+    $(document).on('click','#btnRemoveExamSA',function () {
+
+        if(confirm('Are you sure?')){
+
+            loading_button('#btnRemoveExamSA');
+            $('#btnSubmitExam').prop('disabled',true);
+
+            var ExamIDSA = $(this).attr('data-id');
+            var SASemesterID = $(this).attr('data-sasemesterid');
+            var data = {
+                action : 'RemoveExamSA',
+                ExamIDSA : ExamIDSA
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api2/__crudSemesterAntara';
+
+            $.post(url,{token:token},function (result) {
+                setTimeout(function () {
+                    window.location.replace(base_url_js+'academic/semester-antara/setting-exam/'+SASemesterID);
+                },500);
+            });
+        }
 
     });
 

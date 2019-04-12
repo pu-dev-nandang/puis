@@ -11,7 +11,9 @@
     }
 </style>
 
-
+<input id="formSASemesterID" value="<?= $SASemesterID; ?>" class="hide" />
+<input id="formScheduleIDSA" class="hide" value="<?=$ScheduleIDSA;?>">
+<textarea id="dataScheduleSA" class="hide"><?=$dataScheduleSA;?></textarea>
 
 <div class="row">
     <div class="col-md-8">
@@ -29,6 +31,11 @@
             <textarea class="hide" id="formListCourse"></textarea>
             <hr/>
             <ul id="showSelectedCourse"></ul>
+
+            <div id="">
+                <hr/>
+                <ul id="showSelectedCoursePerluHapus"></ul>
+            </div>
         </div>
 
         <div class="thumbnail" style="min-height: 100px;padding: 15px;">
@@ -38,8 +45,6 @@
                     <td style="width: 25%;">Group <span style="font-size: 10px;color: red;">*</span></td>
                     <td style="width: 1%;">:</td>
                     <td>
-                        <input id="formSASemesterID" value="<?= $SASemesterID; ?>" class="hide" />
-<!--                        <input id="formType" value="--><?//= $IDSASemester; ?><!--" class="hide" />-->
                         <input class="form-control" id="formClassGroup" onkeyup="var start = this.selectionStart;
                                                                                 var end = this.selectionEnd;this.value = this.value.toUpperCase();this.setSelectionRange(start, end);" style="width: 170px;"/></td>
                 </tr>
@@ -108,7 +113,10 @@
                 <p style="text-align: left;padding-left: 15px;color: red;">*) Required</p>
                 <hr/>
 
-                <button class="btn btn-success" id="submitSetTimetables">Submit</button>
+                <div id="btnActSetTTM">
+                    <button class="btn btn-success" id="submitSetTimetables">Submit</button>
+                </div>
+
             </div>
         </div>
     </div>
@@ -119,10 +127,40 @@
     
     $(document).ready(function () {
 
-        loadSelectOptionLecturersSingle('#formCoordinator','');
-        loadSelectOptionLecturersSingle('#formTeamTeaching','');
-        fillDays('#formDay','Eng','');
-        loadSelect2OptionClassroom('#formClassroom','');
+        window.dataScheduleSA = $('#dataScheduleSA').val();
+        window.dataSSA = JSON.parse(dataScheduleSA);
+
+        var cor = '';
+        var ttc = '';
+        var dayS = '';
+        var cls = '';
+        if(dataSSA.length>0){
+            // console.log(dataSSA);
+            var da = dataSSA[0];
+            $('#formClassGroup').val(da.ClassGroup);
+
+            cor = da.Coordinator;
+            dayS = da.DayID;
+            cls = da.ClassroomID+'.'+da.Seat+'.'+da.SeatForExam;
+
+            $('#formStart').val(da.Start.substr(0,5));
+            $('#formEnd').val(da.End.substr(0,5));
+
+            if(da.TeamTeaching.length>0){
+                ttc = da.TeamTeaching;
+            }
+
+            if(da.DataCourse.length>0){
+                $('#formListCourse').val(JSON.stringify(da.DataCourse));
+            }
+
+            $('#btnActSetTTM').prepend('<button class="btn btn-danger" id="removeTimetablesSA" style="float: left;">Remove</button>');
+        }
+
+        loadSelectOptionLecturersSingle('#formCoordinator',cor);
+        loadSelectOptionLecturersSingle('#formTeamTeaching',ttc);
+        fillDays('#formDay','Eng',dayS);
+        loadSelect2OptionClassroom('#formClassroom',cls);
 
         loadCourse();
 
@@ -163,13 +201,24 @@
         if(formClassGroup != '' && formClassGroup!=null &&
             formClassroom != '' && formClassroom!=null && ArrIDSSD.length>0){
 
+            var formScheduleIDSA = $('#formScheduleIDSA').val();
+
             loading_button('#submitSetTimetables');
+
             var ClassroomID = formClassroom.split('.')[0];
-            var data = {
-                action : 'actionSASchedule',
-                type : 'insert',
-                dataSch : {
-                    SASemesterID : formSASemesterID,
+
+            var dataSch = (dataSSA.length>0) ?
+                { SASemesterID : formSASemesterID,
+                    ClassGroup : formClassGroup.toUpperCase(),
+                    Coordinator : formCoordinator,
+                    DayID : formDay,
+                    Start : formStart,
+                    End : formEnd,
+                    ClassroomID : ClassroomID,
+                    UpdatedBy : sessionNIP,
+                    UpdatedAt : dateTimeNow() }
+                :
+                { SASemesterID : formSASemesterID,
                     ClassGroup : formClassGroup.toUpperCase(),
                     Coordinator : formCoordinator,
                     DayID : formDay,
@@ -177,9 +226,14 @@
                     End : formEnd,
                     ClassroomID : ClassroomID,
                     EnteredBy : sessionNIP,
-                    EnteredAt : dateTimeNow()
-                },
+                    EnteredAt : dateTimeNow() };
 
+
+            var data = {
+                action : 'actionSASchedule',
+                type : (dataSSA.length>0) ? 'update' : 'insert',
+                ScheduleIDSA : (dataSSA.length>0) ? formScheduleIDSA : '',
+                dataSch : dataSch,
                 TeamTeaching : formTeamTeaching,
                 ArrIDSSD : ArrIDSSD
             };
@@ -191,7 +245,7 @@
 
                 console.log(jsonResult);
 
-                if(jsonResult.Status<0){
+                if(jsonResult.Status<=0){
                     $('#formClassGroup').css('border','1px solid red');
                     toastr.error('Class Group Exist','Error');
                     setTimeout(function () {
@@ -212,6 +266,31 @@
 
     });
 
+    $(document).on('click','#removeTimetablesSA',function () {
+
+        if(confirm('Are you sure to remove?')){
+            var formScheduleIDSA = $('#formScheduleIDSA').val();
+            var formSASemesterID = $('#formSASemesterID').val();
+            if(formScheduleIDSA!='' && formSASemesterID!=''){
+                var data = {
+                    action : 'actionSASchedule',
+                    type : 'remove',
+                    ScheduleIDSA : formScheduleIDSA
+                };
+
+                var url = base_url_js+'api2/__crudSemesterAntara';
+                var token = jwt_encode(data,'UAP)(*');
+
+                $.post(url,{token:token},function (result) {
+                    toastr.success('Timetable removed','Success');
+                    setTimeout(function () {
+                        window.location.replace(base_url_js+'academic/semester-antara/timetable/'+formSASemesterID);
+                    },500);
+                })
+            }
+        }
+
+    });
 
 
     // ====== Course ===========
@@ -244,15 +323,18 @@
                     '                </tr>' +
                     '                </thead>' +
                     '               <tbody id="listCourse"></tbody>' +
-                    '            </table><div id="listStudent" class="hide"></div>');
+                    '            </table>');
+
+                $('#showSelectedCourse,#showSelectedCoursePerluHapus').empty();
 
                 var no =1;
+                var fillListCourse = [];
+                var formListCourse = $('#formListCourse').val();
+                var arrIDSSD = (formListCourse!='') ? JSON.parse(formListCourse) : [];
+
                 $.each(jsonResult,function (i,v) {
 
                     var Students = v.Students;
-
-                    var formListCourse = $('#formListCourse').val();
-                    var arrIDSSD = (formListCourse!='') ? JSON.parse(formListCourse) : [];
 
                     var btn = ($.inArray(''+v.IDSSD,arrIDSSD)!=-1)
                         ? '-'
@@ -266,12 +348,29 @@
                         '<td style="border-left: 1px solid #CCCCCC;">'+btn+'</td>' +
                         '</tr>');
 
-                    $('#listStudent').append('<textarea id="showStd_'+v.IDSSD+'">'+JSON.stringify(Students)+'</textarea>' +
-                        '<textarea id="showCourse_'+v.IDSSD+'">'+JSON.stringify(v)+'</textarea>');
+                    // $('#listStudent').append('<textarea id="showStd_'+v.IDSSD+'">'+JSON.stringify(Students)+'</textarea>' +
+                    //     '<textarea id="showCourse_'+v.IDSSD+'">'+JSON.stringify(v)+'</textarea>');
+
+                    if($.inArray(''+v.IDSSD,arrIDSSD)!=-1){
+                        fillListCourse.push(v.IDSSD);
+                        $('#showSelectedCourse').append('<li style="margin-bottom:5px;" id="listSelc'+v.IDSSD+'">'+v.CourseEng+' ' +
+                            '| <a href="javascript:void(0);" class="btnShowStd" data-id="'+v.IDSSD+'">'+Students.length+' student</a> ' +
+                            '| <button class="btn btn-sm btn-danger btn-sm-round btn-act removeCourse" data-id="'+v.IDSSD+'"><i class="fa fa-trash"></i></button></li>');
+                    }
 
                     no++;
 
                 });
+
+                // Cek apakah ada yang perlu dihapus
+
+                if(fillListCourse.length!=arrIDSSD.length){
+                    for(var p=0;p<arrIDSSD.length;p++){
+                        if($.inArray(''+arrIDSSD[p],fillListCourse)==-1){
+                            $('#showSelectedCoursePerluHapus').append('<li style="margin-bottom:5px;color: red;">Please remove this ID : '+arrIDSSD[p]+' <button class="btn btn-sm btn-danger btn-sm-round btn-act forseRemoveCourse" data-id="'+arrIDSSD[p]+'"><i class="fa fa-trash"></i></button></li>');
+                        }
+                    }
+                }
 
                 $('#tableCourse').dataTable({
                     'ordering' : false,
@@ -330,16 +429,11 @@
         var arrIDSSD = (formListCourse!='') ? JSON.parse(formListCourse) : [];
 
         // Load Course
-        var Course = JSON.parse($('#showCourse_'+IDSSD).val());
+        // var Course = JSON.parse($('#showCourse_'+IDSSD).val());
 
         arrIDSSD.push(IDSSD);
 
         $('#formListCourse').val(JSON.stringify(arrIDSSD));
-
-
-        $('#showSelectedCourse').append('<li style="margin-bottom:5px;" id="listSelc'+Course.IDSSD+'">'+Course.CourseEng+' ' +
-            '| <a href="javascript:void(0);" class="btnShowStd" data-id="'+Course.IDSSD+'">'+Course.Students.length+' student</a> ' +
-            '| <button class="btn btn-sm btn-danger btn-sm-round btn-act removeCourse" data-id="'+Course.IDSSD+'"><i class="fa fa-trash"></i></button></li>');
 
 
         setTimeout(function () {
@@ -354,8 +448,6 @@
         $('.btn-act').prop('disabled',true);
         var IDSSD = $(this).attr('data-id');
 
-        $('#listSelc'+IDSSD).remove();
-
         var formListCourse = $('#formListCourse').val();
         var arrIDSSD = (formListCourse!='') ? JSON.parse(formListCourse) : [];
 
@@ -369,10 +461,48 @@
         $('#formListCourse').val(JSON.stringify(newArr));
 
         setTimeout(function () {
-            $('.btn-act').prop('disabled',false);
+            loadCourse();
         },500);
 
     });
+
+    $(document).on('click','.forseRemoveCourse',function () {
+        $('.forseRemoveCourse').prop('disabled',true);
+
+        var formScheduleIDSA = $('#formScheduleIDSA').val();
+        if(formScheduleIDSA!='' && formScheduleIDSA!=null){
+            var IDSSD = $(this).attr('data-id');
+
+            var data = {
+                action : 'forseRemoveSSC',
+                dataForm : {
+                    ScheduleIDSA : formScheduleIDSA,
+                    IDSSD : IDSSD
+                }
+
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api2/__crudSemesterAntara';
+            $.post(url,{token:token},function (result) {
+
+                var formListCourse = $('#formListCourse').val();
+                var arrIDSSD = (formListCourse!='') ? JSON.parse(formListCourse) : [];
+
+                var newArr = [];
+                for(var i=0;i<arrIDSSD.length;i++){
+                    if(parseInt(arrIDSSD[i])!= parseInt(IDSSD)){
+                        newArr.push(arrIDSSD[i]);
+                    }
+                }
+
+                $('#formListCourse').val(JSON.stringify(newArr));
+
+                setTimeout(function () {
+                    loadCourse();
+                },500);
+            })
+        }
+    })
 
     
 </script>

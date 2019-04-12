@@ -644,6 +644,7 @@ $route['save2pdf/scheduleExchange'] =  'c_save_to_pdf/scheduleExchange';
 $route['save2pdf/monitoringStudent'] =  'c_save_to_pdf/monitoringStudent';
 
 $route['save2pdf/create_idCard'] =  'c_save_to_pdf/create_idCard';
+$route['save2pdf/suratMengajar/(:any)'] =  'c_save_to_pdf/suratMengajar/$1';
 
 $route['save2pdf/monitoringAttendanceByRangeDate'] =  'c_save_to_pdf/monitoringAttendanceByRangeDate';
 
@@ -944,6 +945,7 @@ $route['api2/__changePasswordStudent'] = 'api/c_api2/changePasswordStudent';
 $route['api2/__crudSemesterAntara'] = 'api/c_api2/crudSemesterAntara';
 $route['api2/__getTimetableSA'] = 'api/c_api2/getTimetableSA';
 $route['api2/__getStudentSA'] = 'api/c_api2/getStudentSA';
+$route['api2/__getStudentList'] = 'api/c_api2/getStudentList';
 
 $route['api3/login'] = 'api/c_mobile/login';
 $route['api3/__readGlobalInfo'] = 'api/c_mobile/readGlobalInfo';
