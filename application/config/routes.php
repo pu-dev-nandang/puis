@@ -884,7 +884,7 @@ $route['rest/__show_circulation_sheet'] = 'api/c_rest/show_circulation_sheet';
 $route['rest/__log_budgeting'] = 'api/c_rest/log_budgeting';
 $route['rest/__approve_budget'] = 'api/c_rest/approve_budget';
 $route['rest/__TestpostdataFrom_PowerApps'] = 'api/c_rest/TestpostdataFrom_PowerApps';
-
+$route['rest/__budgeting/getAllBudget'] = 'api/c_rest/getAllBudget';
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
 $route['api/__test_data'] = 'api/c_api/test_data';
@@ -1231,6 +1231,7 @@ $route['budgeting/Upload_File_Creatorbudget'] = 'page/budgeting/c_budgeting/Uplo
 $route['budgeting/Upload_File_Creatorbudget_all'] = 'page/budgeting/c_budgeting/Upload_File_Creatorbudget_all';
 $route['budgeting/cancel_budget_department'] = 'page/budgeting/c_budgeting/cancel_budget_department';
 $route['budgeting/EntryBudget/report_anggaran_per_years'] = 'page/budgeting/c_budgeting/report_anggaran_per_years';
+
 
 // Purchasing
 $query = $db->get('db_purchasing.cfg_sub_menu');

@@ -23,6 +23,17 @@
     .CustomSubtotalFooter {
         margin-left: 28%; !important;
     }
+
+    /* Custom for Report Anggaran*/
+    #tableDataMapping tr {
+        cursor: pointer;
+    }
+    .hiddenRow {
+        padding: 0 4px !important;
+        background-color: #eeeeee;
+        font-size: 13px;
+        /*padding: 15px !important;*/
+    }
 </style>
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
 <div class="tabbable tabbable-custom tabbable-full-width btn-read menuEBudget">
