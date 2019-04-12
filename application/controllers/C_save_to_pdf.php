@@ -10,6 +10,7 @@ class C_save_to_pdf extends CI_Controller {
         $this->load->library('pdf');
         $this->load->library('pdf_mc_table');
 
+        $this->load->model('m_rest');
         $this->load->model('report/m_save_to_pdf');
 
         date_default_timezone_set("Asia/Jakarta");
@@ -5785,6 +5786,7 @@ Phone: (021) 29200456';
 
     public function suratMengajar($token){
 
+
         $data_arr = $this->getInputToken($token);
 
         $SemesterID = $data_arr['SemesterID'];
@@ -5880,7 +5882,8 @@ Phone: (021) 29200456';
             $pdf->Cell(0,5,'SURAT TUGAS',0,1,'C');
             $pdf->SetFont('Arial','',11);
             $pdf->Ln(1);
-            $pdf->Cell(0,5,'Nomor : '.$Queue.'/UAP/SKU/'.$bln.'/'.$thn,0,1,'C');
+            $dataNum = $this->m_rest->genrateNumberingString($Queue,4);
+            $pdf->Cell(0,5,'Nomor : '.$dataNum.'/UAP/SKU/'.$bln.'/'.$thn,0,1,'C');
 
             $pdf->Ln(17);
             $pdf->Cell(0,5,'Universitas Agung Podomoro menugaskan kepada :',0,1,'L');
@@ -5903,7 +5906,7 @@ Phone: (021) 29200456';
             $pdf->Cell(145,$h,$d['ProdiName'],0,1,'L');
 
             $pdf->Ln(7);
-            $pdf->Cell(0,5,'Sebagai oengajar pada Semester '.$dataSmt[0]['Name'].' untuk mata kuliah :',0,1,'L');
+            $pdf->Cell(0,5,'Sebagai pengajar pada Semester '.$dataSmt[0]['Name'].' untuk mata kuliah :',0,1,'L');
 
             $pdf->Ln(7);
             $h = 9;
