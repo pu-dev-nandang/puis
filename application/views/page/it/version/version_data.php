@@ -1,40 +1,5 @@
 
-<style>
-    #tableEmployees tr th{
-        text-align: center;
-    }
-</style>
-
-<style>
-    .btn-circle.btn-xl {
-    width: 70px;
-    height: 70px;
-    padding: 10px 16px;
-    border-radius: 35px;
-    font-size: 24px;
-    line-height: 1.33;
-}
-
-.btn-circle {
-    width: 30px;
-    height: 30px;
-    padding: 6px 0px;
-    border-radius: 15px;
-    text-align: center;
-    font-size: 12px;
-    line-height: 1.42857;
-}
-
-.btn-round{
-	border-radius: 17px;
-}
-
-</style> 
 <!-- class="th-center"  -->
-<div class="col-md-12" style="margin-bottom: 15px;">
-        <span class="btn btn-primary btn-round btn-action" data-action="addGroupModule"><i class="fa fa-plus-circle"></i> Group Module</span> 
-    </div>
-
 <div class="row" style="margin-top: 30px;">
     <div class="col-md-12">
         <div class="widget box">
@@ -56,9 +21,10 @@
 				            <th style="width: 1%;text-align: center;">No</th>
 				            <th style="width: 7%;text-align: center;">No. Version</th>
 				            <th style="width: 9%;text-align: center;">Name Division</th>
+                            <th style="width: 10%;text-align: center;">Name Group Module</th>
 				            <th style="width: 10%;text-align: center;">Name Module</th>
-				            <th style="width: 32%;text-align: center;">Description</th>
-				    		<th style="width: 8%;text-align: center;">Date Update </th>
+				            <th style="width: 28%;text-align: center;">Description</th>
+				    		<th style="width: 10%;text-align: center;">Date Update </th>
 				    		<th style="width: 8%;text-align: center;">PIC Name</th>
 				            <th style="width: 8%;text-align: center;">Action</th>
 				        </tr>
@@ -117,28 +83,7 @@
 
 </script>
 
-<script>
-     $(document).on('click','.btndeleteversion',function () {
-        if (window.confirm('Are you sure to delete version data ?')) {
-            loading_button('.btndeleteversion');
 
-            var versionid = $(this).attr('versionid');
-            var data = {
-                action : 'deleteversion',
-                versionid : versionid
-            };
-
-            var token = jwt_encode(data,'UAP)(*');
-            var url = base_url_js+"api/__deleteversion";
-            $.post(url,{token:token},function (result) {
-                toastr.success('Success Delete Version Data!','Success'); 
-                setTimeout(function () {
-                    window.location.href = '';
-                },1000);
-            });
-        }
-    });
-</script>
 
 <script>
     $(document).on('click','.btneditversion', function () {
@@ -156,57 +101,76 @@
                     var no = 1;
                     for (var i = 0; i < response.length; i++) {
 
-                    $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"> '+
-			        	' <span aria-hidden="true">&times;</span></button> '+
-			            ' <h4 class="modal-title">Edit Version</h4>');
-                    $('#GlobalModal .modal-body').html('<table class="table">' +
-			             '<tr>' +
-			            '	<td style="width: 25%;">No. Version</td>' +
-			            '	<td><input class="form-control" id="Namegroup" value="'+response[i]['Version']+'" disabled></td>' +
-			            '</tr>' +
-			            '<tr>' +
-			            '	<td style="width: 25%;">Name Division</td>' +
-			            '	<td><input class="form-control" id="Namegroup" value="'+response[i]['Division']+'" disabled></td>' +
-			            '</tr>' +
-			            '<tr>' +
-			            '	<td style="width: 25%;">Name Module</td>' +
-			            '	<td> <select class="form-control filterStatusModule"><option id="'+response[i]['IDModule']+'" disabled> '+response[i]['NameModule']+' </option></select></td>' +
-			            '</tr>' +
-                        '</tr>' +
-			            '	<td style="width: 25%;">Name PIC</td>' +
-			            '	<td><select class="select2-select-00 form-exam" id="filternamepic" style="max-width: 300px !important;" size="5"><option value="'+response[i]['NIP']+'" disabled> '+response[i]['NIP']+' - '+response[i]['NamePIC']+' </option> </select> </td>'+
-			            '</tr>' +
-			            '<tr>' +
-			            '	<td style="width: 25%;">Description</td>' +
-			            '	<td><textarea id="descriptionversion">'+response[i]['Description']+'</textarea></td>' +
-			            '</tr>' +
-			            '</table>');
-                    $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-danger btn-round" data-dismiss="modal"><i class="fa fa-remove"></i> Close</button> <button type="button" class="btn btn-success btn-round btnSaveGroup"><span class="glyphicon glyphicon-floppy-disk"></span>  Save</button>');
+                        var IDDivision = ''+response[i]['IDDivision']+'';
 
-                    loadSelectModule();
-                    loadSelectOptionEmployeesSingle('#filternamepic','');
-                    $('#filternamepic').select2({allowClear: true});
+                        var url = base_url_js+'api/__dropdowneditgroupmod';
+                        var token = jwt_encode({action : 'getLastdiversion', IDDivision : IDDivision},'UAP)(*');
 
-                    $('#descriptionversion').summernote({
-                        placeholder: 'Text your Description Version',
-                        tabsize: 2,
-                        height: 200,
-                        toolbar: [
-                            // [groupName, [list of button]]
-                            ['style', ['bold', 'italic', 'underline', 'clear']],
-                            ['font', ['strikethrough', 'superscript', 'subscript']],
-                            ['fontsize', ['fontsize']],
-                            ['color', ['color']],
-                            ['para', ['ul', 'ol', 'paragraph']],
-                            ['height', ['height']]
-                        ]
-                    });
-                
-                    $('#GlobalModal').modal({
-                        'backdrop' : 'static',
-                        'show' : true
-                    }); 
-                        
+                        $.post(url,{token:token},function (jsonResult) {
+                            $('#filtereditgroup').append('<option disabled selected></option>');
+                            for(var i=0;i<jsonResult.length;i++){
+                                    $('#filtereditgroup').append('<option id="'+jsonResult[i].IDGroup+'"> '+jsonResult[i].NameGroup+' </option>');
+                            }
+                        });
+
+                        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"> '+
+			        	    ' <span aria-hidden="true">&times;</span></button> '+
+			                 ' <h4 class="modal-title">Edit Version</h4>');
+                        $('#GlobalModal .modal-body').html('<table class="table">' +
+    			             '<tr>' +
+    			            '	<td style="width: 25%;">No. Version</td>' +
+    			            '	<td><input class="form-control" id="Noeditversion" value="'+response[i]['Version']+'" disabled></td>' +
+                             '  <td><input type="hidden" class="form-control" id="Idversion" value="'+response[i]['IDVersion']+'" disabled></td>' +
+    			            '</tr>' +
+    			            '<tr>' +
+    			            '	<td style="width: 25%;">Name Division</td>' +
+    			            '	<td><input class="form-control" id="nameeditdivisiversion" value="'+response[i]['Division']+'" disabled></td>' +
+    			            '</tr>' +
+                            '<tr>' +
+                            '   <td style="width: 25%;">Name Group Module</td>' +
+                            '   <td><select class="form-control filtergroupmodule" id="filtereditgroup"> </select></td>' +
+                            '</tr>' +
+    			            '<tr>' +
+    			            '	<td style="width: 25%;">Name Module</td>' +
+    			            '	<td> <select class="form-control" id="filtereditmodule"><option id="'+response[i]['IDModule']+'" disabled> '+response[i]['NameModule']+' </option></select></td>' +
+    			            '</tr>' +
+                            '</tr>' +
+    			            '	<td style="width: 25%;">Name PIC</td>' +
+    			            '    <td> <select class="form-control" id="selectpicversion"><option id="'+response[i]['NIP']+'" disabled> '+response[i]['NamePIC']+' </option></select></td>' +
+    			            '</tr>' +
+    			            '<tr>' +  //
+    			            '	<td style="width: 25%;">Description</td>' +
+    			            '	<td><textarea id="descriptionversion">'+response[i]['Description']+'</textarea></td>' +
+    			            '</tr>' +
+    			            '</table>');
+
+                            $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-danger btn-round" data-dismiss="modal"><i class="fa fa-remove"></i> Close</button> <button type="button" class="btn btn-success btn-round btneditSaveVersion" dataid="'+response[i]['IDVersion']+'"><span class="glyphicon glyphicon-floppy-disk"></span>  Save</button>');
+
+                            $('#GlobalModal').modal({
+                                'backdrop' : 'static',
+                                'show' : true
+                            }); 
+
+                            loadSelectModule();
+                            loadPicversion();
+                            loadSelectOptionEmployeesSingle('#filternamepic','');
+                            $('#filternamepic').select2({allowClear: true});
+
+                            $('#descriptionversion').summernote({
+                                placeholder: 'Text your Description Version',
+                                tabsize: 2,
+                                height: 200,
+                                toolbar: [
+                                    // [groupName, [list of button]]
+                                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                                    ['font', ['strikethrough', 'superscript', 'subscript']],
+                                    ['fontsize', ['fontsize']],
+                                    ['color', ['color']],
+                                    ['para', ['ul', 'ol', 'paragraph']],
+                                    ['height', ['height']]
+                                ]
+                            });
+                 
                     } //end for
                 } //end if
             }); //end json  
@@ -233,11 +197,11 @@
 
                     $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"> '+
 			        	' <span aria-hidden="true">&times;</span></button> '+
-			            ' <h4 class="modal-title">Detail Version</h4>');
+			            ' <h4 class="modal-title">Detail Version Data</h4>');
                     $('#GlobalModal .modal-body').html('<table class="table">' +
 			             '<tr>' +
 			            '	<td style="width: 25%;">No. Version</td>' +
-			            '	<td>'+response[i]['Version']+'</td>' +
+			            '	<td><b>'+response[i]['Version']+' </b></td>' +
 			            '</tr>' +
 			            '<tr>' +
 			            '	<td style="width: 25%;">Name Division</td>' +
@@ -272,6 +236,41 @@
     });
 </script>
 
+<script>
+    $('.btn-addgroup').click(function () {
+        var action = $(this).attr('data-action');
+        var btnSave = (action=='addGroupModule') ? 'add' : 'edit';
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"> '+
+            ' <span aria-hidden="true">&times;</span></button> '+
+            ' <h4 class="modal-title">Add Group Module</h4>');
+        $('#GlobalModal .modal-body').html('<table class="table">' +
+            '<tr>' +
+            '   <td style="width: 25%;">Name Division</td>' +
+            '   <td><select class="form-control filterStatusDivision" id="filaddivisi"><option id="" disabled> --- Select Name Division --- </option></select></td>' +
+            '</tr>' +
+            '<tr>' +
+            '   <td style="width: 25%;">Name Group</td>' +
+            '   <td><select class="form-control filaddnamegroup" id="filteraddgroup"></select></td>' +
+            '</tr>' +
+            '<tr>' +
+            '   <td style="width: 25%;">Name Module</td>' +
+            '   <td><input class="form-control" id="Namemodule"></td>' +
+            '</tr>' +
+            '<tr>' +
+            '   <td style="width: 25%;">Description</td>' +
+            '   <td><textarea rows="3" cols="5" name="DescriptionFile" id="Descriptiongroup" class="form-control"></textarea></td>' +
+            '</tr>' +
+            '</table>');
+        loadSelectOptionDivision();
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-danger btn-round" data-dismiss="modal"><i class="fa fa-remove"></i> Close</button>' +
+            '<button type="button" class="btn btn-success btn-round btnaddSaveGroup"><span class="glyphicon glyphicon-floppy-disk"></span>  Save</button>');
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+    });
+</script>
 
 <script>
 	$('.btn-action').click(function () {
@@ -279,11 +278,11 @@
         var btnSave = (action=='addGroupModule') ? 'add' : 'edit';
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"> '+
         	' <span aria-hidden="true">&times;</span></button> '+
-            ' <h4 class="modal-title">Add Group Module</h4>');
+            ' <h4 class="modal-title">New Group Module</h4>');
         $('#GlobalModal .modal-body').html('<table class="table">' +
             '<tr>' +
             '	<td style="width: 25%;">Name Division</td>' +
-            '	<td><select class="form-control filterStatusDivision" value="" ><option value="" disabled> --- Select Name Division --- </option></select></td>' +
+            '	<td><select class="form-control filterStatusDivision" value="" ><option id="" disabled> --- Select Name Division --- </option></select></td>' +
             '</tr>' +
             '<tr>' +
             '	<td style="width: 25%;">Name Group</td>' +
@@ -307,11 +306,12 @@
         });
 
     });
-
 </script>
 
 <script>
-	$('.btn-version').click(function () {
+
+    $('.btn-version').click(function () {
+
         var action = $(this).attr('data-action');
         var btnSave = (action=='addGroupModule') ? 'add' : 'edit';
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"> '+
@@ -323,22 +323,31 @@
             '	<td><input class="form-control" id="Noversion"></td>' +
             '</tr>' +
             '<tr>' +
+            '   <td style="width: 25%;">Name Division</td>' +
+            '   <td><select class="form-control filterDivision" id="filterDivisi"><option value="" disabled>-- Name Division --</option></select></td>' +
+            '</tr>' +
+            '<tr>' +
+            '   <td style="width: 25%;">Name Group Module</td>' +
+            '   <td><select class="form-control filtergroupmodule" id="filtergroup"></select></td>' +
+            '</tr>' +
+            '<tr>' +
+            '   <td style="width: 25%;">Name Module</td>' +
+            '   <td><select class="form-control filterStatusModule" id="filternamemodule"></select></td>' +
+            '</tr>' +
+            '<tr>' +
             '	<td style="width: 25%;">Name PIC</td>' +
-            '	<td><select class="select2-select-00 form-exam" id="filternamepic" style="max-width: 300px !important;" size="5"><option value=""></option>'+
+            '	<td><select class="select2-select-00 form-exam filternamepic" id="filternamepic" style="max-width: 300px !important;" size="5"><option value=""></option>'+
             '	</select></td>   ' +
             '</tr>' +
             
-            '<tr>' +
-            '	<td style="width: 25%;">Name Module</td>' +
-            '	<td><select class="form-control filterStatusModule" value="" ><option value="" disabled> --- Select Name Module --- </option></select></td>' +
-            '</tr>' +
             '<tr>' +
             '	<td style="width: 25%;">Description</td>' +
             '	<td><textarea id="descriptionversion"></textarea></td>' +
             '</tr>' +
             '</table>');
-        loadSelectModule();
-        
+
+        //loadSelectModule();
+        loadfilterDivision();
         loadSelectOptionEmployeesSingle('#filternamepic','');
         $('#filternamepic').select2({allowClear: true});
 
@@ -370,6 +379,122 @@
 </script>
 
 <script>
+    $(document).on('change','#filtergroup',function () {
+        var s = $(this).val();
+        loadselectmodules();
+    });
+
+    function loadselectmodules() {
+
+        var filterGroups = $('#filtergroup option:selected').attr('id');
+        
+        if(filterGroups!='' && filterGroups!=null){
+            var url = base_url_js+'api/__dropdownlistmodule';
+            var token = jwt_encode({action : 'getListgroupmodule', filterGroups : filterGroups},'UAP)(*');
+
+            $.post(url,{token:token},function (jsonResult) {
+                $("#filternamemodule").empty();
+                $('#filternamemodule').append('<option disabled selected></option>');
+
+                    for(var i=0;i<jsonResult.length;i++){
+                        $('#filternamemodule').append('<option id="'+jsonResult[i].IDModule+'"> '+jsonResult[i].NameModule+' </option>');
+                    }
+                });
+            
+            }
+        }
+</script>
+
+
+<script>
+    $(document).on('change','#filaddivisi',function () {
+        var s = $(this).val();
+        $("#filteraddgroup").empty();
+        //$("#filternamemodule").empty();
+        loadaddselectgroup();
+    });
+
+    function loadaddselectgroup() {
+
+        var filterDivisi = $('#filaddivisi option:selected').attr('id');
+        
+        if(filterDivisi!='' && filterDivisi!=null){
+            var url = base_url_js+'api/__dropdowngroupmod';
+            var token = jwt_encode({action : 'getLastgroupmodule', filterDivisi : filterDivisi},'UAP)(*');
+
+            $.post(url,{token:token},function (jsonResult) {
+                    $('#filteraddgroup').append('<option disabled selected></option>');
+                    for(var i=0;i<jsonResult.length;i++){
+                           $('#filteraddgroup').append('<option id="'+jsonResult[i].IDGroup+'"> '+jsonResult[i].NameGroup+' </option>');
+                    }
+                });
+            }
+        }
+</script>
+
+<script>
+    $(document).on('change','#filterDivisi',function () {
+        var s = $(this).val();
+        $("#filtergroup").empty();
+        $("#filternamemodule").empty();
+        loadselectgroup();
+    });
+
+    function loadselectgroup() {
+
+        var filterDivisi = $('#filterDivisi option:selected').attr('id');
+        
+        if(filterDivisi!='' && filterDivisi!=null){
+            var url = base_url_js+'api/__dropdowngroupmod';
+            var token = jwt_encode({action : 'getLastgroupmodule', filterDivisi : filterDivisi},'UAP)(*');
+
+            $.post(url,{token:token},function (jsonResult) {
+                    $('#filtergroup').append('<option disabled selected></option>');
+                    for(var i=0;i<jsonResult.length;i++){
+                           $('#filtergroup').append('<option id="'+jsonResult[i].IDGroup+'"> '+jsonResult[i].NameGroup+' </option>');
+                    }
+                });
+            }
+        }
+</script>
+
+<script>
+    $(document).on('change','#filtereditgroup',function () {
+        var s = $(this).val();
+        //$("#filtergroup").empty();
+        $("#filtereditmodule").empty();
+        loadeditselectmodule();
+    });
+
+    function loadeditselectmodule() {
+
+        var filtereditgroup = $('#filtereditgroup option:selected').attr('id');
+        
+        if(filtereditgroup!='' && filtereditgroup!=null){
+            var url = base_url_js+'api/__dropeditmodule';
+            var token = jwt_encode({action : 'geteditLastmodule', filtereditgroup : filtereditgroup},'UAP)(*');
+
+            $.post(url,{token:token},function (jsonResult) {
+                    $('#filtereditmodule').append('<option disabled selected></option>');
+                    for(var i=0;i<jsonResult.length;i++){
+                           $('#filtereditmodule').append('<option id="'+jsonResult[i].IDModule+'"> '+jsonResult[i].NameModule+' </option>');
+                    }
+                });
+            }
+        }
+</script>
+
+<script>
+    function loadfilterDivision() {
+        var url = base_url_js+'api/__getdivisiversion';
+        $.getJSON(url,function (jsonResult) {
+            for(var i=0;i<jsonResult.length;i++){
+               $('.filterDivision').append('<option id="'+jsonResult[i].IDDivision+'"> '+jsonResult[i].Division+' </option>');
+            }
+        });
+    }
+
+
     function loadSelectOptionDivision() {
         var url = base_url_js+'api/__getStatusVersion';
         $.getJSON(url,function (jsonResult) {
@@ -388,115 +513,18 @@
         });
     }
 
+
+    function loadPicversion() {
+        var url = base_url_js+'api/__getpicversion';
+        $.getJSON(url,function (jsonResult) {
+            for(var i=0;i<jsonResult.length;i++){
+               $('#selectpicversion').append('<option id="'+jsonResult[i].PIC+'"> '+jsonResult[i].Name+' </option>');
+            }
+        });
+    }
+
    
 
-</script>
-
-<script>
-    $(document).on('click','.btnSaveGroup',function () {
-        savegroupmodule();
-    });
-
-    function savegroupmodule() {
-
-        var selectdivision = $('.filterStatusDivision option:selected').attr('id');
-        var Namegroup = $('#Namegroup').val();
-        var Namemodule = $('#Namemodule').val();
-        var Descriptiongroup = $('#Descriptiongroup').val();
-        
-        if(selectdivision!=null && selectdivision!=''
-                    //&& selectdivision!='' && selectdivision!=null
-                    && Namegroup!='' && Namegroup!=null
-                    && Namemodule!='' && Namemodule!=null
-                    && Descriptiongroup!='' && Descriptiongroup!=null)
-        { 
-            //loading_button('#btnSubmitEmployees');
-            //$('#btnCloseEmployees').prop('disabled',true);
-            var data = {
-                action : 'AddGroupModule',
-                formInsert : {
-                	division : selectdivision,
-                	Namegroup : Namegroup,
-                	Namemodule : Namemodule,
-                	Descriptiongroup : Descriptiongroup
-                }
-            };
-
-            var token = jwt_encode(data,'UAP)(*');
-            var url = base_url_js+'api/__crudGroupModule';
-            $.post(url,{token:token},function (result) {
-                    
-                if(result==0 || result=='0'){
-                    //toastr.error('Name division or module already is exist!','Error');
-                } else {  //if success save data
-                	toastr.success('Group Module Saved','Success');
-                	setTimeout(function () {
-	                $('#GlobalModal').modal('hide');
-	                    window.location.href = '';
-	                },1000);
-                }
-            });
-        }
-        else {
-            toastr.error('The form is still empty!','Error');
-            $('#GlobalModal').modal('show');
-            return;
-        }
-     }
-</script>
-
-<script>
-    $(document).on('click','.btnSaveVersion',function () {
-        savedataversion();
-    });
-
-    function savedataversion() {
-
-        //var filternamepic = $('#filternamepic option:selected').attr('id');
-        var filternamepic = $('#filternamepic').val();
-        var filterStatusModule = $('.filterStatusModule option:selected').attr('id');
-        var Noversion = $('#Noversion').val();
-        var Descriptionversion = $('#descriptionversion').val();
-        
-        if(filternamepic!=null && filternamepic!=''
-                    //&& selectdivision!='' && selectdivision!=null
-                    && filterStatusModule!='' && filterStatusModule!=null
-                    && Noversion!='' && Noversion!=null
-                    && Descriptionversion!='' && Descriptionversion!=null)
-        { 
-            //loading_button('#btnSubmitEmployees');
-            //$('#btnCloseEmployees').prop('disabled',true);
-            var data = {
-                action : 'AddVersion',
-                formInsert : {
-                	filternamepic : filternamepic,
-                	filterStatusModule : filterStatusModule,
-                	Noversion : Noversion,
-                	Descriptionversion : Descriptionversion
-                }
-            };
-
-            var token = jwt_encode(data,'UAP)(*');
-            var url = base_url_js+'api/__crudGroupModule';
-            $.post(url,{token:token},function (result) {
-                    
-                if(result==0 || result=='0'){
-                    toastr.error('Version already is exist!','Error');
-                } else {  //if success save data
-                	toastr.success('Version Data Saved','Success');
-                	setTimeout(function () {
-                	$('#GlobalModal').modal('hide');
-                    	window.location.href = '';
-                  	},1000);
-                }
-            });
-        }
-        else {
-            toastr.error('The form is still empty!','Error');
-            $('#GlobalModal').modal('show');
-            return;
-        }
-     }
 </script>
 
 
@@ -505,12 +533,14 @@
     $(document).ready(function () {
         //loadSelectOptionDivision('#filterStatusDivision','');
         loadDataVersion('');
+        //loadselectgroup('');
     });
 
-    $('#filterStatusEmployees').change(function () {
-        var s = $(this).val();
-        //loadDataEmployees(s);
-    });
+    // $('').change(function () {
+        
+        
+    // });
+
 
     function loadDataVersion(status) {
         var dataTable = $('#tableversion').DataTable( {

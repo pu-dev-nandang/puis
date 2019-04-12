@@ -842,7 +842,7 @@ class M_api extends CI_Model {
 
      }
 
-      public function deletelistversion($versionid){
+    public function deletelistversion($versionid){
 
         $sql = "UPDATE db_it.version SET Active='0' WHERE IDVersion = '".$versionid."' ";
         $query=$this->db->query($sql);
