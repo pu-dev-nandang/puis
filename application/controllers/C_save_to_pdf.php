@@ -5783,6 +5783,171 @@ Phone: (021) 29200456';
         $pdf->Output('I','Monitoring_Attendance_Lecturer.pdf');
     }
 
+    public function suratMengajar($token){
+
+        $data_arr = $this->getInputToken($token);
+        $SemesterID = $data_arr['SemesterID'];
+        $NIP = $data_arr['NIP'];
+
+        $dataLect = $this->db->query('SELECT em.*, ps.Name AS ProdiName
+                                                  FROM db_employees.employees em 
+                                                  LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                                                  WHERE em.NIP = "'.$NIP.'" LIMIT 1')->result_array();
+
+        // Get Semester
+        $dataSmt = $this->db->query('SELECT s.Name, ay.kuliahStart FROM db_academic.semester s LEFT 
+                                            JOIN db_academic.academic_years ay ON (ay.SemesterID = s.ID) 
+                                            WHERE s.ID = "'.$SemesterID.'" ')->result_array();
+
+        if(count($dataLect)>0){
+
+            $d = $dataLect[0];
+
+            $dateGen = ($dataSmt[0]['kuliahStart']!='' && $dataSmt[0]['kuliahStart']!=null)
+                ? date('Y-m-d',strtotime('+14 day',strtotime($dataSmt[0]['kuliahStart'])))
+                : '';
+
+            $bln = ($dateGen!='') ? explode('-',$dateGen)[1] : '';
+            $thn = ($dateGen!='') ? explode('-',$dateGen)[0] : '';
+
+            // Get Mata kuliah
+            $dataMK = $this->db->query('SELECT mk.NameEng, cd.TotalSKS AS Credit FROM db_academic.schedule s 
+                                                  LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                  LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                  LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                                  WHERE s.SemesterID = "'.$SemesterID.'" AND s.Coordinator = "'.$NIP.'" GROUP BY s.ID 
+                                                  UNION ALL
+                                                  SELECT mk2.NameEng, cd.TotalSKS AS Credit FROM db_academic.schedule_details_course sdc2
+                                                  LEFT JOIN db_academic.schedule s2 ON (s2.ID = sdc2.ScheduleID) 
+                                                  LEFT JOIN db_academic.mata_kuliah mk2 ON (mk2.ID = sdc2.MKID)
+                                                  LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc2.CDID)
+                                                  LEFT JOIN db_academic.schedule_team_teaching stt ON (sdc2.ScheduleID = stt.ScheduleID)
+                                                  WHERE s2.SemesterID = "'.$SemesterID.'" AND stt.NIP = "'.$NIP.'" GROUP BY s2.ID ')->result_array();
+
+
+            // Cek rank
+            $q_rank = 'SELECT em2.ID, em2.NIP,em2.Name ,FIND_IN_SET( em2.ID, (SELECT GROUP_CONCAT( em.ID ORDER BY em.ID ASC ) FROM db_employees.employees em 
+                            WHERE 
+                            em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7" OR
+                            em.PositionOther1 = "14.5" OR em.PositionOther1 = "14.6" OR em.PositionOther1 = "14.7" OR
+                            em.PositionOther2 = "14.5" OR em.PositionOther2 = "14.6" OR em.PositionOther2 = "14.7" OR
+                            em.PositionOther3 = "14.5" OR em.PositionOther3 = "14.6" OR em.PositionOther3 = "14.7" 
+                            ) ) AS rank
+                            FROM db_employees.employees em2 WHERE 
+                            ( em2.PositionMain = "14.5" OR em2.PositionMain = "14.6" OR em2.PositionMain = "14.7" OR
+                            em2.PositionOther1 = "14.5" OR em2.PositionOther1 = "14.6" OR em2.PositionOther1 = "14.7" OR
+                            em2.PositionOther2 = "14.5" OR em2.PositionOther2 = "14.6" OR em2.PositionOther2 = "14.7" OR
+                            em2.PositionOther3 = "14.5" OR em2.PositionOther3 = "14.6" OR em2.PositionOther3 = "14.7" ) AND em2.NIP = "'.$NIP.'"';
+
+            // Get PHR -> 2.2
+            $dataPHR = $this->db->limit(1)->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees',array('PositionMain'=>'2.2', 'StatusEmployeeID' => 3))->result_array();
+
+            $NamePHR_a = (count($dataPHR)>0) ? trim($dataPHR[0]['TitleAhead']).' ' : '';
+            $NamePHR_b = (count($dataPHR)>0) ? ' '.trim($dataPHR[0]['TitleBehind']) : '';
+            $NamePHR = (count($dataPHR)>0) ? $NamePHR_a.''.trim($dataPHR[0]['Name']).''.$NamePHR_b : '';
+            $NIPPHR = (count($dataPHR)>0) ? $dataPHR[0]['NIP'] : '';
+
+
+            $dataRank = $this->db->query($q_rank)->result_array();
+            $rank = (count($dataRank)>0) ? $dataRank[0]['rank'] : 0;
+
+            $th = ($d['TitleAhead']!='' && $d['TitleAhead']!=null) ? trim($d['TitleAhead']).' ': '';
+            $Name = $th.''.trim($d['Name']).' '.trim($d['TitleBehind']);
+
+            $pdf = new FPDF('P','mm','A4');
+
+
+            $pdf->AddPage();
+
+            $pdf->SetAutoPageBreak(true, 0);
+
+            $pdf->Image(base_url('images/FA_letterhead_a4_r2.jpg'),0,0,210);
+
+
+            $pdf->Ln(30);
+            $pdf->SetFont('Arial','B',13);
+            $pdf->Cell(0,5,'SURAT TUGAS',0,1,'C');
+            $pdf->SetFont('Arial','',11);
+            $pdf->Ln(1);
+            $pdf->Cell(0,5,'Nomor : '.$rank.'/UAP/SKU/'.$bln.'/'.$thn,0,1,'C');
+
+            $pdf->Ln(17);
+            $pdf->Cell(0,5,'Universitas Agung Podomoro menugaskan kepada :',0,1,'L');
+
+            $pdf->Ln(7);
+            $h = 5;
+            $pdf->Cell(10,$h,'',0,0,'L');
+            $pdf->Cell(30,$h,'Nama',0,0,'L');
+            $pdf->Cell(5,$h,':',0,0,'C');
+            $pdf->Cell(145,$h,$Name,0,1,'L');
+
+            $pdf->Cell(10,$h,'',0,0,'L');
+            $pdf->Cell(30,$h,'NIP',0,0,'L');
+            $pdf->Cell(5,$h,':',0,0,'C');
+            $pdf->Cell(145,$h,$NIP,0,1,'L');
+
+            $pdf->Cell(10,$h,'',0,0,'L');
+            $pdf->Cell(30,$h,'Program Studi',0,0,'L');
+            $pdf->Cell(5,$h,':',0,0,'C');
+            $pdf->Cell(145,$h,$d['ProdiName'],0,1,'L');
+
+            $pdf->Ln(7);
+            $pdf->Cell(0,5,'Sebagai oengajar pada Semester '.$dataSmt[0]['Name'].' untuk mata kuliah :',0,1,'L');
+
+            $pdf->Ln(7);
+            $h = 9;
+            $pdf->SetFillColor(38, 75, 135);
+            $pdf->SetTextColor(255, 255, 255);
+            $pdf->Cell(10,$h,'No',1,0,'C',true);
+            $pdf->Cell(150,$h,'Nama Mata Kuliah',1,0,'C',true);
+            $pdf->Cell(15,$h,'SKS',1,0,'C',true);
+            $pdf->Cell(15,$h,'Sesi',1,1,'C',true);
+
+            //Living the Family Business/Social Entrepreneurship Experience
+            $pdf->SetTextColor(0, 0, 0);
+            $h = 7;
+            $pdf->SetFont('Arial','',9);
+
+            $no=1;
+            foreach ($dataMK AS $item){
+                $pdf->Cell(10,$h,$no,1,0,'C');
+                $pdf->Cell(150,$h,$item['NameEng'],1,0,'L');
+                $pdf->Cell(15,$h,$item['Credit'],1,0,'C');
+                $pdf->Cell(15,$h,'14',1,1,'C');
+
+                $no++;
+            }
+
+
+            $pdf->Ln(7);
+            $pdf->SetFont('Arial','',11);
+            $pdf->Cell(0,5,'Demikian Surat Tugas ini diberikan untuk dapat dilaksanakan sebagaimana mestinya.',0,1,'L');
+
+
+            $pdf->SetFont('Arial','',11);
+            $y = 223;
+            $pdf->SetXY(130,$y);
+            $pdf->Cell(60,5,'Jakarta, '.$this->getDateIndonesian($dateGen),0,1,'L');
+            $pdf->SetXY(130,$y+5);
+            $pdf->SetFont('Arial','B',11);
+            $pdf->Cell(60,5,'An Rektor',0,1,'L');
+
+            $pdf->SetXY(130,$y+25);
+            $pdf->Cell(60,5,$NamePHR,0,1,'L');
+            $pdf->SetXY(130,$y+30);
+            $pdf->Cell(60,5,'NIP : '.$NIPPHR,0,1,'L');
+
+
+            $pdf->Output('I','Tugas_Mengajar.pdf');
+        } else {
+            echo 'data not yet';
+        }
+
+
+
+
+    }
+
 
 
 }

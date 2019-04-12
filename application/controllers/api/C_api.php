@@ -7660,10 +7660,10 @@ class C_api extends CI_Controller {
                 $this->db->update('db_academic.auth_students',$dataUpdtAuth);
                 $this->db->reset_query();
 
-
                 return print_r(1);
 
             }
+
         }
     }
 

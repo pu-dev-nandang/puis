@@ -66,6 +66,15 @@ $route['academic/tahun-akademik-detail'] = 'page/academic/c_tahun_akademik/tahun
 $route['academic/tahun-akademik-detail-date'] = 'page/academic/c_tahun_akademik/tahun_akademik_detail_date';
 
 $route['academic/semester-antara'] = 'page/academic/c_semester_antara';
+$route['academic/semester-antara/timetable/(:num)'] = 'page/academic/c_semester_antara/timetable/$1';
+$route['academic/semester-antara/students/(:num)'] = 'page/academic/c_semester_antara/students/$1';
+$route['academic/semester-antara/score/(:num)'] = 'page/academic/c_semester_antara/score/$1';
+
+$route['academic/semester-antara/setting-timetable/(:num)'] = 'page/academic/c_semester_antara/setting_timetable/$1';
+$route['academic/semester-antara/setting-exam/(:num)'] = 'page/academic/c_semester_antara/setting_exam/$1';
+$route['academic/semester-antara/setting/(:num)'] = 'page/academic/c_semester_antara/setting/$1';
+
+
 $route['academic/semester-antara/details/(:num)'] = 'page/academic/c_semester_antara/loadDetails/$1';
 
 
@@ -642,6 +651,7 @@ $route['save2pdf/scheduleExchange'] =  'c_save_to_pdf/scheduleExchange';
 $route['save2pdf/monitoringStudent'] =  'c_save_to_pdf/monitoringStudent';
 
 $route['save2pdf/create_idCard'] =  'c_save_to_pdf/create_idCard';
+$route['save2pdf/suratMengajar/(:any)'] =  'c_save_to_pdf/suratMengajar/$1';
 
 $route['save2pdf/monitoringAttendanceByRangeDate'] =  'c_save_to_pdf/monitoringAttendanceByRangeDate';
 
@@ -964,6 +974,9 @@ $route['api2/__crudAnnouncement'] = 'api/c_api2/crudAnnouncement';
 $route['api2/__changePasswordStudent'] = 'api/c_api2/changePasswordStudent';
 
 $route['api2/__crudSemesterAntara'] = 'api/c_api2/crudSemesterAntara';
+$route['api2/__getTimetableSA'] = 'api/c_api2/getTimetableSA';
+$route['api2/__getStudentSA'] = 'api/c_api2/getStudentSA';
+$route['api2/__getStudentList'] = 'api/c_api2/getStudentList';
 
 $route['api3/login'] = 'api/c_mobile/login';
 $route['api3/__readGlobalInfo'] = 'api/c_mobile/readGlobalInfo';
