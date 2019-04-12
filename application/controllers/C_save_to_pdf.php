@@ -5952,6 +5952,11 @@ Phone: (021) 29200456';
             $pdf->Cell(60,5,'NIP : '.$NIPPHR,0,1,'L');
 
 
+            $pdf->SetFont('Arial','',11);
+            $pdf->SetXY(10,$y+25);
+            $pdf->Cell(60,5,'Tembusan Yth. Rektor',0,1,'L');
+
+
             $pdf->Output('I','Tugas_Mengajar.pdf');
         } else {
             echo 'data not yet';
