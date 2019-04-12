@@ -11,6 +11,7 @@ class C_save_to_pdf extends CI_Controller {
         $this->load->library('pdf_mc_table');
 
         $this->load->model('m_rest');
+        $this->load->model('master/m_master');
         $this->load->model('report/m_save_to_pdf');
 
         date_default_timezone_set("Asia/Jakarta");
@@ -5829,8 +5830,9 @@ Phone: (021) 29200456';
             $pdf->Cell(0,5,'SURAT TUGAS',0,1,'C');
             $pdf->SetFont('Arial','',11);
             $pdf->Ln(1);
-            $dataNum = $this->m_rest->genrateNumberingString($Queue,4);
-            $pdf->Cell(0,5,'Nomor : '.$dataNum.'/UAP/SKU/'.$bln.'/'.$thn,0,1,'C');
+            $dataNum = $this->m_rest->genrateNumberingString($Queue,3);
+            $blnRomawi = $this->m_master->romawiNumber($bln);
+            $pdf->Cell(0,5,'Nomor : '.$dataNum.'/UAP/SKU/'.$blnRomawi.'/'.$thn,0,1,'C');
 
             $pdf->Ln(17);
             $pdf->Cell(0,5,'Universitas Agung Podomoro menugaskan kepada :',0,1,'L');
@@ -5882,11 +5884,11 @@ Phone: (021) 29200456';
 
             $pdf->Ln(7);
             $pdf->SetFont('Arial','',11);
-            $pdf->Cell(0,5,'Demikian Surat Tugas ini diberikan untuk dapat dilaksanakan sebagaimana mestinya.',0,1,'L');
+            $pdf->Cell(0,5,'Demikian Surat Tugas ini diberikan untuk dapat dilaksanakan sebagaimana mestinya. ',0,1,'L');
 
 
             $pdf->SetFont('Arial','',11);
-            $y = 223;
+            $y = $pdf->GetY()+20;
             $pdf->SetXY(130,$y);
             $pdf->Cell(60,5,'Jakarta, '.$this->getDateIndonesian($dateGen),0,1,'L');
             $pdf->SetXY(130,$y+5);
@@ -5900,7 +5902,7 @@ Phone: (021) 29200456';
 
 
             $pdf->SetFont('Arial','',11);
-            $pdf->SetXY(10,$y+25);
+            $pdf->SetXY(10,$y+45);
             $pdf->Cell(60,5,'Tembusan Yth. Rektor',0,1,'L');
 
 
