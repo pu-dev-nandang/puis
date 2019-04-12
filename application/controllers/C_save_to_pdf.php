@@ -5786,8 +5786,35 @@ Phone: (021) 29200456';
     public function suratMengajar($token){
 
         $data_arr = $this->getInputToken($token);
+
         $SemesterID = $data_arr['SemesterID'];
         $NIP = $data_arr['NIP'];
+
+        // Cek urutan
+        $dataQue = $this->db->limit(1)->get_where('db_employees.surat_mengajar',array(
+            'SemesterID' => $SemesterID,
+            'NIP' => $NIP
+        ))->result_array();
+
+
+        if(count($dataQue)>0){
+            $Queue = $dataQue[0]['Queue'];
+        } else {
+            $dataTotalQue = $this->db->get_where('db_employees.surat_mengajar',array(
+                'SemesterID' => $SemesterID
+            ))->result_array();
+
+            $Queue = count($dataTotalQue) + 1;
+
+            $arrInsQue = array(
+                'Queue' => $Queue,
+                'SemesterID' => $SemesterID,
+                'NIP' => $NIP
+            );
+
+            $this->db->insert('db_employees.surat_mengajar',$arrInsQue);
+
+        }
 
         $dataLect = $this->db->query('SELECT em.*, ps.Name AS ProdiName
                                                   FROM db_employees.employees em 
@@ -5825,20 +5852,6 @@ Phone: (021) 29200456';
                                                   WHERE s2.SemesterID = "'.$SemesterID.'" AND stt.NIP = "'.$NIP.'" GROUP BY s2.ID ')->result_array();
 
 
-            // Cek rank
-            $q_rank = 'SELECT em2.ID, em2.NIP,em2.Name ,FIND_IN_SET( em2.ID, (SELECT GROUP_CONCAT( em.ID ORDER BY em.ID ASC ) FROM db_employees.employees em 
-                            WHERE 
-                            em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7" OR
-                            em.PositionOther1 = "14.5" OR em.PositionOther1 = "14.6" OR em.PositionOther1 = "14.7" OR
-                            em.PositionOther2 = "14.5" OR em.PositionOther2 = "14.6" OR em.PositionOther2 = "14.7" OR
-                            em.PositionOther3 = "14.5" OR em.PositionOther3 = "14.6" OR em.PositionOther3 = "14.7" 
-                            ) ) AS rank
-                            FROM db_employees.employees em2 WHERE 
-                            ( em2.PositionMain = "14.5" OR em2.PositionMain = "14.6" OR em2.PositionMain = "14.7" OR
-                            em2.PositionOther1 = "14.5" OR em2.PositionOther1 = "14.6" OR em2.PositionOther1 = "14.7" OR
-                            em2.PositionOther2 = "14.5" OR em2.PositionOther2 = "14.6" OR em2.PositionOther2 = "14.7" OR
-                            em2.PositionOther3 = "14.5" OR em2.PositionOther3 = "14.6" OR em2.PositionOther3 = "14.7" ) AND em2.NIP = "'.$NIP.'"';
-
             // Get PHR -> 2.2
             $dataPHR = $this->db->limit(1)->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees',array('PositionMain'=>'2.2', 'StatusEmployeeID' => 3))->result_array();
 
@@ -5848,8 +5861,6 @@ Phone: (021) 29200456';
             $NIPPHR = (count($dataPHR)>0) ? $dataPHR[0]['NIP'] : '';
 
 
-            $dataRank = $this->db->query($q_rank)->result_array();
-            $rank = (count($dataRank)>0) ? $dataRank[0]['rank'] : 0;
 
             $th = ($d['TitleAhead']!='' && $d['TitleAhead']!=null) ? trim($d['TitleAhead']).' ': '';
             $Name = $th.''.trim($d['Name']).' '.trim($d['TitleBehind']);
@@ -5869,7 +5880,7 @@ Phone: (021) 29200456';
             $pdf->Cell(0,5,'SURAT TUGAS',0,1,'C');
             $pdf->SetFont('Arial','',11);
             $pdf->Ln(1);
-            $pdf->Cell(0,5,'Nomor : '.$rank.'/UAP/SKU/'.$bln.'/'.$thn,0,1,'C');
+            $pdf->Cell(0,5,'Nomor : '.$Queue.'/UAP/SKU/'.$bln.'/'.$thn,0,1,'C');
 
             $pdf->Ln(17);
             $pdf->Cell(0,5,'Universitas Agung Podomoro menugaskan kepada :',0,1,'L');
