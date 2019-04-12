@@ -12,18 +12,26 @@ class C_requestdocument extends Globalclass {
     }
 
 
-    public function temp($content)
+     public function temp($content)
     {
         parent::template($content);
     }
 
-    public function menu_announcement($page){
+    public function menu_request($page){
         $data['page'] = $page;
-        $content = $this->load->view('page/announcement/menu_announcement',$data,true);
+        $content = $this->load->view('page/requestdocumet/menu_requestdocument',$data,true);
         $this->temp($content);
     }
 
+
     public function list_requestdocument()
+    {
+        $page = $this->load->view('page/requestdocumet/list_requestdocument','',true);
+        $this->menu_request($page);
+    }
+
+
+    public function list_requestdocumentxxx()
     {
         $content = $this->load->view('page/requestdocumet/list_requestdocument','',true);
         $this->temp($content);

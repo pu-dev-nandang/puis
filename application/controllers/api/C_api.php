@@ -160,6 +160,84 @@ class C_api extends CI_Controller {
             "data"            => $data
         );
         echo json_encode($json_data);
+    }
+
+
+    public function getrequestLecturer(){
+        $requestData= $_REQUEST;
+
+        $SemesterID = $this->input->get('s');
+        $totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE PositionMain = "14.7"')->result_array();
+
+        if(!empty($requestData['search']['value']) ) {
+            $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
+                        ps.NameEng AS ProdiNameEng
+                        FROM db_employees.employees em 
+                        LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                        WHERE (em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7")  AND ( ';
+
+            $sql.= ' em.NIP LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR em.Name LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ') ORDER BY em.PositionMain, NIP ASC';
+
+        }
+        else {
+            $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
+                        ps.NameEng AS ProdiNameEng
+                        FROM db_employees.employees em 
+                        LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                        WHERE (em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7")';
+            $sql.= 'ORDER BY em.PositionMain, NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+        }
+
+        $query = $this->db->query($sql)->result_array();
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $jb = explode('.',$row["PositionMain"]);
+            $Division = '';
+            $Position = '';
+
+            if(count($jb)>1){
+                $dataDivision = $this->db->select('Division')->get_where('db_employees.division',array('ID'=>$jb[0]),1)->result_array()[0];
+                $dataPosition = $this->db->select('Position')->get_where('db_employees.position',array('ID'=>$jb[1]),1)->result_array()[0];
+                $Division = $dataDivision['Division'];
+                $Position = $dataPosition['Position'];
+            }
+            $imgEmp = url_img_employees.''.$row["Photo"];
+
+            $dataToken = array(
+                'SemesterID' => $SemesterID,
+                'NIP' => $row["NIP"]
+            );
+
+            $tokenPrint = $this->jwt->encode($dataToken,'UAP)(*');
+
+            $nestedData[] = '<div style="text-align: center;"><img src="'.$imgEmp.'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
+            $nestedData[] = '<a href="'.base_url('database/lecturer-details/'.$row["NIP"]).'" style="font-weight: bold;">'.$row["Name"].'</a>';
+            $nestedData[] = $row["NIP"];
+            $nestedData[] = $row["NIDN"];
+            $nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
+            $nestedData[] = $Division.' - '.$Position;
+            $nestedData[] = $row["ProdiNameEng"];
+            $nestedData[] = '<a href="'.base_url('save2pdf/suratMengajar/'.$tokenPrint).'" target="_blank" class="btn btn-sm btn-primary"><i class="fa fa-download"></i> Download</a>';
+            //$nestedData[] = '<a href="http://pcam.podomorouniversity.ac.id/save2pdf/suratMengajar/'.$tokenPrint.'" target="_blank" class="btn btn-sm btn-primary "><i class="fa fa-download"></i> Download</a>';
+
+            $data[] = $nestedData;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($totalData)),
+            "recordsFiltered" => intval( count($totalData) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
 
     }
 
@@ -711,6 +789,14 @@ class C_api extends CI_Controller {
 
     }
 
+    public function getdivisiversion()
+    {
+        $generate = $this->db->query('SELECT DISTINCT X.IDDivision, Z.Division
+                FROM db_it.group_module AS X
+                LEFT JOIN db_employees.division Z ON (X.IDDivision = Z.ID)')->result_array();
+        echo json_encode($generate);
+    }
+
     public function getstatusversion()
     {
         $generate = $this->db->query('SELECT ID, Division FROM db_employees.division ORDER BY division ASC ')->result_array();
@@ -720,6 +806,14 @@ class C_api extends CI_Controller {
     public function getstatusmodule()
     {
         $generate = $this->db->query('SELECT IDModule, NameModule FROM db_it.module ORDER BY NameModule ASC ')->result_array();
+        echo json_encode($generate);
+    }
+
+    public function getversionpic()
+    {
+        $generate = $this->db->query('SELECT DISTINCT a.PIC, b.Name
+                    FROM db_it.version AS a
+                    LEFT JOIN db_employees.employees AS b ON (a.PIC = b.NIP) ')->result_array();
         echo json_encode($generate);
     }
 
@@ -754,9 +848,16 @@ class C_api extends CI_Controller {
             $versionid = $data_arr['versionid'];
             $dataCek = $this->m_api->deletelistversion($versionid);
             return print_r(1);
+
+        } else if($data_arr['action']=='deletegroupmod'){
+            $versionid = $data_arr['versionid'];
+            $value = "0";
+
+            $this->db->set('Active', $value);   
+            $this->db->where('IDGroup', $versionid);  
+            $this->db->update('db_it.group_module');  
+            return print_r(1);
         }
-
-
     }
 
     
@@ -765,7 +866,6 @@ class C_api extends CI_Controller {
         $key = "UAP)(*";
         $data_arr = $this->jwt->decode($token,$key);
 
-//        print_r($data_arr);
         if($action=='insert'){
             $this->db->insert('db_academic.lecturers_availability_detail',$data_arr);
             return $this->db->insert_id();
@@ -2040,7 +2140,7 @@ class C_api extends CI_Controller {
         $requestData= $_REQUEST;
         
         //$whereStatus = ($status!='') ? ' AND StatusEmployeeID = "'.$status.'" ' : '';
-        $totalData = $this->db->query('SELECT aa.IDVersion, aa.Version, dd.Division, dd.NameModule, bb.Description, aa.UpdateAt, cc.Name AS NamePIC
+        $totalData = $this->db->query('SELECT aa.IDVersion, aa.Version, dd.Division, dd.NameModule, bb.Description, aa.UpdateAt, cc.Name AS NamePIC, dd.NameGroup
                     FROM db_it.version AS aa
                     INNER JOIN db_it.version_detail AS bb ON (aa.IDVersion = bb.IDVersion)
                     LEFT JOIN db_employees.employees AS cc ON (aa.PIC = cc.NIP)
@@ -2050,7 +2150,7 @@ class C_api extends CI_Controller {
                     LEFT JOIN db_employees.division AS c ON a.IDDivision = c.ID) AS dd ON (bb.IDModule = dd.IDModule) WHERE aa.Active= 1')->result_array();
 
         if( !empty($requestData['search']['value']) ) {
-            $sql = 'SELECT aa.IDVersion, aa.Version, dd.Division, dd.NameModule, bb.Description, aa.UpdateAt, cc.Name AS NamePIC
+            $sql = 'SELECT aa.IDVersion, aa.Version, dd.Division, dd.NameModule, bb.Description, aa.UpdateAt, cc.Name AS NamePIC, dd.NameGroup
                     FROM db_it.version AS aa
                     INNER JOIN db_it.version_detail AS bb ON (aa.IDVersion = bb.IDVersion)
                     LEFT JOIN db_employees.employees AS cc ON (aa.PIC = cc.NIP)
@@ -2062,11 +2162,11 @@ class C_api extends CI_Controller {
             $sql.= ' OR dd.Division LIKE "%'.$requestData['search']['value'].'%" ';
             $sql.= ' OR dd.NameModule LIKE "'.$requestData['search']['value'].'%" ';
             //$sql.= ') ORDER BY NIP,em.PositionMain ASC';
-            $sql.= 'ORDER BY aa.Version DESC';
+            $sql.= 'ORDER BY aa.IDVersion DESC';
 
         }
         else {
-            $sql = 'SELECT aa.IDVersion, aa.Version, dd.Division, dd.NameModule, bb.Description, aa.UpdateAt, cc.Name AS NamePIC
+            $sql = 'SELECT aa.IDVersion, aa.Version, dd.Division, dd.NameModule, bb.Description, aa.UpdateAt, cc.Name AS NamePIC, dd.NameGroup
                     FROM db_it.version AS aa
                     INNER JOIN db_it.version_detail AS bb ON (aa.IDVersion = bb.IDVersion)
                     LEFT JOIN db_employees.employees AS cc ON (aa.PIC = cc.NIP)
@@ -2075,7 +2175,7 @@ class C_api extends CI_Controller {
                     LEFT JOIN db_it.module AS b ON (a.IDGroup = b.IDGroup)
                     LEFT JOIN db_employees.division AS c ON a.IDDivision = c.ID) AS dd ON (bb.IDModule = dd.IDModule) WHERE aa.Active= 1 ';
             //$sql.= 'ORDER BY NIP,em.PositionMain ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
-            $sql.= 'ORDER BY aa.Version DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+            $sql.= 'ORDER BY aa.IDVersion DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
         }
         
         $query = $this->db->query($sql)->result_array();
@@ -2094,6 +2194,7 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$row["Version"].'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$row["Division"].'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$row["NameGroup"].'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$row["NameModule"].'</div>';
             $nestedData[] = '<div style="text-align: left;">'.$row["Description"].'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$row["UpdateAt"].'</div>';
@@ -2113,7 +2214,66 @@ class C_api extends CI_Controller {
 
     }
 
-    
+    public function getlistgroupmodule(){
+        //$formInsert = (array) $data_arr['formInsert'];
+
+        $status = $this->input->get('s');
+        $requestData= $_REQUEST;
+        
+        $totalData = $this->db->query('SELECT X.IDGroup, X.NameGroup, Y.IDModule, Y.NameModule, Z.ID, Z.Division, Z.ID, Y.Description
+        FROM db_it.group_module AS X
+        LEFT JOIN db_employees.division Z ON (X.IDDivision = Z.ID)
+        LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup) WHERE X.Active = 1 ')->result_array();
+
+        if( !empty($requestData['search']['value']) ) {
+            $sql = 'SELECT X.IDGroup, X.NameGroup, Y.IDModule, Y.NameModule, Z.ID, Z.Division, Z.ID, Y.Description
+                    FROM db_it.group_module AS X
+                    LEFT JOIN db_employees.division Z ON (X.IDDivision = Z.ID)
+                    LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup) WHERE X.Active = 1';
+            $sql.= ' AND X.NameGroup LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR Z.Division LIKE "%'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR dd.NameModule LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' ORDER BY X.IDGroup DESC';
+
+        }
+        else {
+            $sql = 'SELECT X.IDGroup, X.NameGroup, Y.IDModule, Y.NameModule, Z.ID, Z.Division, Z.ID, Y.Description
+                    FROM db_it.group_module AS X
+                    LEFT JOIN db_employees.division Z ON (X.IDDivision = Z.ID)
+                    LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup) WHERE X.Active = 1 ';
+            $sql.= 'ORDER BY X.IDGroup DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+        }
+        
+        $query = $this->db->query($sql)->result_array();
+        $no = $requestData['start']+1;
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $Division = '';
+            $Position = '';
+            //$nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$row["Division"].'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$row["NameGroup"].'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$row["NameModule"].'</div>';
+            $nestedData[] = '<div style="text-align: left;">'.$row["Description"].'</div>';
+            $nestedData[] = '<div style="text-align: center;"><button type="button" class="btn btn-sm btn-primary btn-circle btnviewgroupmodule" versionid="'.$row["IDGroup"].'" data-toggle="tooltip" data-placement="top" title="Details"><i class="glyphicon glyphicon-th-list"></i></button> <button class="btn btn-sm btn-circle btn-danger btndeletegroup" data-toggle="tooltip" versionid="'.$row["IDGroup"].'" data-placement="top" title="Delete"><i class="fa fa-trash"></i> </button> <button class="btn btn-sm btn-success btn-circle btneditgroupmodule" data-toggle="tooltip" groupid="'.$row["IDGroup"].'" data-placement="top" title="Edit"><i class="fa fa-edit"></i></button> </div>';
+            $no++;
+            $data[] = $nestedData;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($totalData)),
+            "recordsFiltered" => intval( count($totalData) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+
+    }
     
     public function getversiondetail(){
 
@@ -2123,7 +2283,7 @@ class C_api extends CI_Controller {
 
         if($data_arr['action']=='getdetail'){
             $idversion = $this->input->get('s');
-            $details = $this->db->query('SELECT aa.IDVersion, aa.Version, dd.Division, dd.NameModule, bb.Description, aa.UpdateAt, cc.Name AS NamePIC
+            $details = $this->db->query('SELECT aa.IDVersion, aa.Version, dd.Division, dd.NameModule, bb.Description, aa.UpdateAt, cc.Name AS NamePIC, dd.IDDivision
                     FROM db_it.version AS aa
                     INNER JOIN db_it.version_detail AS bb ON (aa.IDVersion = bb.IDVersion)
                     LEFT JOIN db_employees.employees AS cc ON (aa.PIC = cc.NIP)
@@ -2138,7 +2298,7 @@ class C_api extends CI_Controller {
         else if($data_arr['action']=='getedit') {
 
             $idversion = $this->input->get('s');
-            $details = $this->db->query('SELECT aa.IDVersion, aa.Version, dd.Division, dd.NameModule, bb.Description, aa.UpdateAt, cc.Name AS NamePIC, cc.NIP
+            $details = $this->db->query('SELECT aa.IDVersion, aa.Version, dd.Division, dd.NameModule, bb.Description, aa.UpdateAt, cc.Name AS NamePIC, cc.NIP, dd.IDDivision
                     FROM db_it.version AS aa
                     INNER JOIN db_it.version_detail AS bb ON (aa.IDVersion = bb.IDVersion)
                     LEFT JOIN db_employees.employees AS cc ON (aa.PIC = cc.NIP)
@@ -2151,6 +2311,39 @@ class C_api extends CI_Controller {
 
         }
     }
+
+    public function getgroupmoddetail(){
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+
+        if($data_arr['action']=='getdetail'){
+            $idgroup = $this->input->get('s');
+            $details = $this->db->query('SELECT X.IDGroup, X.NameGroup, Y.IDModule, Y.NameModule, Z.ID, Z.Division, Z.ID, Y.Description
+                    FROM db_it.group_module AS X
+                    LEFT JOIN db_employees.division Z ON (X.IDDivision = Z.ID)
+                    LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup)
+                    WHERE X.IDGroup = "'.$idgroup.'" ')->result_array();
+            echo json_encode($details);   
+
+        }
+        else if($data_arr['action']=='getedit') {
+
+            $idgroup = $this->input->get('s');
+            $details = $this->db->query('SELECT X.IDGroup, X.NameGroup, Y.IDModule, Y.NameModule, Z.ID, Z.Division, Z.ID, Y.Description
+                    FROM db_it.group_module AS X
+                    LEFT JOIN db_employees.division Z ON (X.IDDivision = Z.ID)
+                    LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup)
+                    WHERE X.IDGroup = "'.$idgroup.'" ')->result_array();
+
+            echo json_encode($details);  
+
+        }
+
+    }
+
+
+    
 
     function search_module() {
        // if (isset($_REQUEST['q'])) {
@@ -5383,6 +5576,31 @@ class C_api extends CI_Controller {
                     return print_r(1);
                 }
             }
+            else if($data_arr['action']=='EditVersion') {
+
+                $formInsert = (array) $data_arr['formInsert'];
+
+                $selectmodule = $formInsert['selectmodule'];
+                $selectpic = $formInsert['selectpic'];
+                $VersionID = strtoupper($formInsert['VersionID']);
+                $Descriptionversion = $formInsert['Descriptionversion'];
+
+                $dataSave1 = array(
+                        'PIC' => $selectpic,
+                        'UpdateBy' => $IDuser
+                );
+                $this->db->where('IDVersion', $VersionID);
+                $this->db->update('db_it.version',$dataSave1);
+            
+                $dataSave2 = array(
+                        'IDModule' => $selectmodule,
+                        'Description' => $Descriptionversion
+                );
+                $this->db->where('IDVersion', $VersionID);
+                $this->db->update('db_it.version_detail',$dataSave2);
+                return print_r(1);
+            
+            }
     }
 
 
@@ -8481,6 +8699,73 @@ class C_api extends CI_Controller {
         }
 
     }
+
+    public function dropdowngroupmodule(){
+
+        $data_arr = $this->getInputToken();
+        
+        if (count($data_arr) > 0) {
+
+            if($data_arr['action']=='getLastgroupmodule'){
+                $filterDivisi = $data_arr['filterDivisi'];
+
+                //$data = $this->db->get_where('db_it.group_module',array('IDDivision' => $data_arr['filterDivisi']))->result_array();
+                $data = $this->db->query('SELECT DISTINCT NameGroup, IDGroup FROM db_it.group_module WHERE IDDivision = "'.$data_arr['filterDivisi'].'" ORDER BY IDDivision ASC ')->result_array();
+
+                return print_r(json_encode($data));
+            }
+        }
+    }
+
+
+    public function dropdownlistmodule(){
+
+        $data_arr = $this->getInputToken();
+        
+        if (count($data_arr) > 0) {
+            if($data_arr['action']=='getListgroupmodule'){
+                $filterGroups = $data_arr['filterGroups'];
+                $data = $this->db->query('SELECT IDModule, NameModule FROM db_it.module WHERE IDGroup = "'.$data_arr['filterGroups'].'" ')->result_array();
+                return print_r(json_encode($data));
+            }
+        }
+
+     }
+
+     public function dropeditgroupmodule(){
+        $data_arr = $this->getInputToken();
+
+        if (count($data_arr) > 0) {
+            if($data_arr['action']=='getLastdiversion'){
+                $filterGroups = $data_arr['IDDivision'];
+
+                $data = $this->db->query('SELECT DISTINCT a.NameGroup
+                FROM db_it.group_module AS a
+                LEFT JOIN db_it.module AS b ON (a.IDGroup = b.IDGroup)
+                WHERE a.IDDivision = "'.$data_arr['IDDivision'].'" ')->result_array();
+                return print_r(json_encode($data));
+            }
+        }
+     }
+
+     public function dropeditmodule(){
+        $data_arr = $this->getInputToken();
+
+        if (count($data_arr) > 0) {
+            if($data_arr['action']=='geteditLastmodule'){
+                $filterGroups = $data_arr['filtereditgroup'];
+                $data = $this->db->query('SELECT b.IDModule, b.NameModule
+                                        FROM db_it.group_module AS a
+                                        LEFT JOIN db_it.module AS b ON (a.IDGroup = b.IDGroup)
+                                        WHERE a.NameGroup = "'.$data_arr['filtereditgroup'].'" ')->result_array();
+                return print_r(json_encode($data));
+            }
+        }
+     }
+
+
+     
+     
 
     public function crudTransferStudent(){
 

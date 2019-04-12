@@ -1,63 +1,69 @@
-
-<style>
-    #tableShowAnnc thead tr {
-        background: #437e88;
-        color: #ffffff;
-    }
-    #tableShowAnnc thead th {
-        text-align: center;
-    }
-    .detail-message {
-        max-height: 100px;
-        overflow: auto;
-    }
-</style>
-
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-2 col-md-offset-4">
+        <div class="thumbnail">
+            <select class="form-control" id="filterSemester"></select>
+        </div>
         <hr/>
-        <div id="divAnnouncement"></div>
     </div>
 </div>
 
-<script>
 
+<div class="row">
+    <div class="col-md-12">
+        <div class="widget box">
+            <div class="widget-header">
+                <h4 class=""><i class="icon-reorder"></i> Data Lecturers</h4>
+                <div class="toolbar no-padding">
+                    <div class="btn-group"></div>
+                </div>
+            </div>
+            <div class="widget-content no-padding">
+
+                <div id="viewTbale"></div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
     $(document).ready(function () {
-       loadDataAnnouncement();
+        
+        loSelectOptionSemester('#filterSemester','');
+
+        var loadFisrt = setInterval(function () {
+                var filterSemester = $('#filterSemester').val();            
+                if(filterSemester!='' && filterSemester!=null) {
+                    load_lecturers();
+                    clearInterval(loadFisrt);
+                }
+        },1000);
+
     });
 
-    function loadDataAnnouncement() {
+    $('#filterSemester').change(function () {
+        load_lecturers();
+    });
 
-        $('#divAnnouncement').html('<div class="">' +
-            '                <table class="table table-bordered table-striped" id="tableShowAnnc">' +
-            '                    <thead>' +
-            '                    <tr>' +
-            '                        <th style="width: 1%;">No</th>' +
-            '                        <th style="width: 20%;">Title</th>' +
-            '                        <th>Message</th>' +
-            '                        <th style="width: 10%;">To</th>' +
-            '                        <th style="width: 5%;">File</th>' +
-            '                        <th style="width: 15%;">Publish Date</th>' +
-            '                        <th style="width: 5%;"><i class="fa fa-cog"></i></th>' +
-            '                        <th style="width: 11%;">Created By</th>' +
-            '                    </tr>' +
-            '                    </thead>' +
-            '                    <tbody id="trExam"></tbody>' +
-            '                </table>' +
-            '            </div>');
+    function load_lecturers() {
 
-        var  token ='';
-        var dataTable = $('#tableShowAnnc').DataTable( {
+
+
+        $('#viewTbale').html('<table id="tableLecturers" class="table table-striped table-bordered table-hover"><thead><tr class="tr-center" style="background: #3968c6;color: #ffffff;"><th class="th-center" style="width: 5%;">Photo</th><th class="th-center">Name</th><th class="th-center" style="width: 10%;">NIP</th><th class="th-center" style="width: 10%;">NIDN</th><th class="th-center" style="width: 5%;">Gender</th><th class="th-center">Position</th><th class="th-center">Program Study</th><th class="th-center" style="width: 5%;"> Action</th></tr></thead><tbody></tbody></table>');
+
+    
+
+        var filterSemester = $('#filterSemester').val();
+        var SemsterID = filterSemester.split('.')[0];
+
+        var dataTable = $('#tableLecturers').DataTable( {
             "processing": true,
             "serverSide": true,
             "iDisplayLength" : 10,
             "ordering" : false,
-            "language": {
-                "searchPlaceholder": "Title, Message"
-            },
             "ajax":{
-                //url : base_url_js+"api2/__getAnnouncement", // json datasource
-                data : {token:token},
+                url : base_url_js+"api/__getreqLecturer?s="+SemsterID, // json datasource
                 ordering : false,
                 type: "post",  // method  , by default get
                 error: function(){  // error handling
@@ -66,60 +72,23 @@
                     $("#employee-grid_processing").css("display","none");
                 }
             }
-        } );
-
+        });
     }
 
-    $(document).on('click','.showUser',function () {
 
-        var token = $(this).attr('data-token');
-        var usr = ($(this).attr('data-user')=='std') ? 'NIM' : 'NIP' ;
+    function loSelectOptionSemester() {
+        var url = base_url_js+'api/__crudSemester';
+        var token = jwt_encode({action:'read',order:'DESC'},'UAP)(*');
 
-        var dataUser = jwt_decode(token,'UAP)(*');
+        $.post(url,{token:token},function (data_json) {
 
-        $('#NotificationModal .modal-header').addClass('hide');
-        $('#NotificationModal .modal-body').html('<div class="row">' +
-            '    <div class="col-md-12">' +
-            '        <table class="table table-striped">' +
-            '            <thead>' +
-            '            <tr>' +
-            '                <th style="width: 1%;">No</th>' +
-            '                <th>User</th>' +
-            '                <th style="width: 25%;">Status</th>' +
-            '            </tr>' +
-            '            </thead>' +
-            '            <tbody id="showUsr">' +
-            '            </tbody>' +
-            '        </table>' +
-            '       <div style="text-align: right;"><button class="btn btn-default" data-dismiss="modal">Close</button></div>' +
-            '    </div>' +
-            '</div>');
-
-        var no = 1;
-        $.each(dataUser,function (i,v) {
-
-            var usrID = (typeof v.NPM !== 'undefined') ? v.NPM : v.NIP ;
-
-            var Status = '<span style="color: orangered;">Unread</span>';
-            if(v.Read==1 || v.Read=='1'){
-                Status = '<span style="color: blue;"><i class="fa fa-check"></i> Read</span>';
-            } else if(v.Read==2 || v.Read=='2'){
-                Status = '<span style="color: green;"><i class="fa fa-bookmark"></i> Saved</span>';
+            if(data_json.length>0){
+                for(var i=0;i<data_json.length;i++){
+                    $('#filterSemester').append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'.'+data_json[i].Code+'"> '+data_json[i].Name+' </option>');
+                }
             }
-
-            $('#showUsr').append('<tr>' +
-                '<td style="text-align: center;">'+no+'</td>' +
-                '<td>'+v.Name+'<br/><span style="font-size: 11px;">'+usrID+'</span></td>' +
-                '<td style="text-align: right;">'+Status+'</td>' +
-                '</tr>');
-            no++;
         });
+    }
 
-        $('#NotificationModal .modal-footer').addClass('hide');
-        $('#NotificationModal').modal({
-            'backdrop' : 'static',
-            'show' : true
-        });
-    })
 
 </script>
