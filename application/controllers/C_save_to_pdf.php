@@ -5901,9 +5901,15 @@ Phone: (021) 29200456';
             $pdf->Cell(60,5,'NIP : '.$NIPPHR,0,1,'L');
 
 
-            $pdf->SetFont('Arial','',11);
+            $pdf->SetFont('Arial','',10);
             $pdf->SetXY(10,$y+45);
-            $pdf->Cell(60,5,'Tembusan Yth. Rektor',0,1,'L');
+            $pdf->Cell(60,5,'Tembusan Yth.',0,1,'L');
+
+            $pdf->SetXY(17,$y+51);
+            $pdf->Cell(60,5,'1. Rektor',0,1,'L');
+
+            $pdf->SetXY(17,$y+56);
+            $pdf->Cell(60,5,'2. Kaprodi '.$d['ProdiName'],0,1,'L');
 
 
             $pdf->Output('I','Tugas_Mengajar.pdf');
