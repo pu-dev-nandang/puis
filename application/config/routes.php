@@ -153,6 +153,8 @@ $route['human-resources/files_reviews'] = 'page/hr/c_employees/files_employees';
 
 // --- IT Version ---- ADD Bismar
 $route['it/version'] = 'page/it/c_it/version_data';
+$route['it/loadpageversion'] = 'page/it/c_it/loadpageversiondetail';
+
 
 
 //$route['database/lecturers'] = 'page/database/c_database/lecturers';
@@ -697,8 +699,9 @@ $route['api/__geteducationLevel'] = 'api/c_api/geteducationLevel';
 $route['api/__crudConfig'] = 'api/c_api/crudConfig';
 $route['api/__getdataversion'] = 'api/c_api/getlistversion';
 $route['api/__getdetailversion'] = 'api/c_api/getversiondetail';
+$route['api/__getdetailgroupmod'] = 'api/c_api/getgroupmoddetail';
 $route['api/__searchmodule'] = 'api/c_api/search_module';
-
+$route['api/__getdatagroupmodule'] = 'api/c_api/getlistgroupmodule';
 
 
 $route['api/__getMKByID'] = 'api/c_api/getMKByID';
@@ -707,6 +710,7 @@ $route['api/__getSemester'] = 'api/c_api/getSemester';
 $route['api/__getLecturer'] = 'api/c_api/getLecturer';
 $route['api/__getStudents'] = 'api/c_api/getStudents';
 $route['api/__getStudentsAdmission'] = 'api/c_api/getStudentsAdmission';
+$route['api/__getreqLecturer'] = 'api/c_api/getrequestLecturer';
 
 
 $route['api/__getAllMK'] = 'api/c_api/getAllMK';
@@ -921,9 +925,15 @@ $route['api/__getPosition'] = 'api/c_api/getPosition';
 $route['api/__getStatusEmployee'] = 'api/c_api/getStatusEmployee';
 $route['api/__getStatusVersion'] = 'api/c_api/getstatusversion';
 $route['api/__getStatusModule'] = 'api/c_api/getstatusmodule';
+$route['api/__getdivisiversion'] = 'api/c_api/getdivisiversion';
+$route['api/__dropdowngroupmod'] = 'api/c_api/dropdowngroupmodule';
+$route['api/__dropdownlistmodule'] = 'api/c_api/dropdownlistmodule';
+$route['api/__getpicversion'] = 'api/c_api/getversionpic';
+$route['api/__dropdowneditgroupmod'] = 'api/c_api/dropeditgroupmodule';
+$route['api/__dropeditmodule'] = 'api/c_api/dropeditmodule';
+
 
 $route['api/__crudKRSOnline'] = 'api/c_api/crudKRSOnline';
-
 $route['api/__crudCombinedClass'] = 'api/c_api/crudCombinedClass';
 $route['api/__getSimpleSearch'] = 'api/c_api/getSimpleSearch';
 $route['api/__getSimpleSearchStudents'] = 'api/c_api/getSimpleSearchStudents';
@@ -1106,6 +1116,10 @@ $route['vreservation/loadScheduleEquipment'] = 'page/vreservation/c_global/loadS
 
 // Request Document
 $route['requestdocument'] = 'page/request-document/c_requestdocument/list_requestdocument/';
+$route['api2/__getRequestdoc'] = 'api/c_api2/getrequestdocument';
+$route['api2/__getypedocument'] = 'api/c_api/getlistypedocument';
+$route['api2/__getmasrequestdoc'] = 'api/c_api2/getmasterrequestdoc';
+$route['api2/__crudrequestdoc'] = 'api/c_api2/crudrequestdocument';
 
 
 // test
@@ -1352,16 +1366,13 @@ $route['ApiServerToServer'] = 'c_login/ApiServerToServer';
 $route['importFormulirManual'] = 'page/admission/c_admission/importFormulirManual';
 $route['ImportupdateNoKwitansi'] = 'page/admission/c_admission/ImportupdateNoKwitansi';
 
-
 // for inject //
 $route['testadi'] = 'dashboard/c_dashboard/testadi';
 $route['testadi2'] = 'c_login/testadi2';
 
-
 // admin prodi
 $route['loginToAdminProdi'] = 'c_login/loginToAdminProdi';
 $route['loginToAdminFaculty'] = 'c_login/loginToAdminFaculty';
-
 
 // general affair
 $route['ga_schedule_exchange'] = 'page/ga/C_schedule_exchange/schedule_exchange_action';
