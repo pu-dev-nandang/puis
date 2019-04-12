@@ -30,6 +30,30 @@ class M_rest extends CI_Model {
         return $date;
     }
 
+    public function genrateNumberingString($number,$length){
+
+        $lengthStr = strlen($number);
+
+        if((int)$length > (int) $lengthStr){
+
+            $m = ((int)$length - (int) $lengthStr);
+
+            $zero = '';
+            for ($i=1;$i<=$m;$i++){
+                $zero = $zero.'0';
+            }
+
+
+            return $zero.''.$number;
+
+        } else {
+            return $number;
+        }
+
+
+
+    }
+
 
     public function _getSemesterActive(){
         $data = $this->db->query('SELECT ay.*
