@@ -145,7 +145,7 @@
 			// loadingStart();
 			var rr = [];
 			var dt = ClassDt.arr_post;
-			console.log(dt);
+			//console.log(dt);
 			var tt = [];
 			var dd = [];
 			var bc = '';
@@ -159,26 +159,30 @@
 					merger : merger,
 				}
 				tt.push(temp);
-				bc = $(this).closest('.accordian-body').attr('id');
+				if (bc == '') {
+					bc = $(this).closest('.accordian-body').attr('id');
+				}
+				
 			})
-
+			//console.log(tt);
+			var bool_CodePost = true;
 			for (var i = 0; i < dt.length; i++) {
 				var CodePost = dt[i].CodePost;
 				if (CodePost == bc) {
 					var ha = dt[i].HeadAccount;
 					var TotMerge = 0;
 					var temp3 = [];
+
+					// add merge
+					var NameHeadAccount = '';
 					for (var j = 0; j < ha.length; j++) {
 						var CodeHeadAccount = ha[j].CodeHeadAccount;
-						var bool = false;
-						var NameHeadAccount = '';
 						for (var k = 0; k < tt.length; k++) {
 							var CodeHeadAccount_ = tt[k].codeheadaccount;
 							if (CodeHeadAccount_ != 'Merge') {
 								if (CodeHeadAccount_ == CodeHeadAccount) {
 									dd.push(CodeHeadAccount_);	
 									TotMerge = parseFloat(TotMerge) + parseFloat(tt[k].total);
-									bool = true;
 									if (NameHeadAccount == '') {
 										NameHeadAccount = ha[j].NameHeadAccount;
 									}
@@ -192,7 +196,6 @@
 									var mer = merger[m];
 									if (mer == CodeHeadAccount) {	
 										TotMerge = parseFloat(TotMerge) + parseFloat(ha[j].total);
-										bool = true;
 										if (NameHeadAccount == '') {
 											NameHeadAccount = ha[j].NameHeadAccount;
 										}
@@ -200,14 +203,7 @@
 									}
 								}
 							}
-							
-							
 						}
-
-						if (!bool) {
-							temp3.push(ha[j]);
-						}
-
 					}
 
 					var temp = {
@@ -222,6 +218,73 @@
 
 					temp3.push(temp);
 
+
+					// add sisa tidak merge
+					var MergeHA__ = []; // untuk  merge already exist
+					for (var j = 0; j < ha.length; j++) {
+						var CodeHeadAccount = ha[j].CodeHeadAccount;
+						var bool = true;
+						for (var k = 0; k < dd.length; k++) {
+							var ddcd = dd[k];
+							if (CodeHeadAccount == ddcd) {
+								bool = false;
+								break;
+							}
+						}
+
+						if (bool) {
+							//check data already exist di arr_pass
+							var dt2 = ClassDt.arr_pass;
+							var bool2 = true;
+							for (var k = 0; k < dt2.length; k++) {
+								var CodePost_ = dt2[k].CodePost;
+								if (CodePost == CodePost_) {
+									var ha2 = dt2[k].HeadAccount;
+									for (var l = 0; l < ha2.length; l++) {
+										var CodeHeadAccount_ = ha2[l].CodeHeadAccount;
+										if (CodeHeadAccount_ == 'Merge') {
+											var Merger2 = ha2[l].Merger;
+											for (var m = 0; m < Merger2.length; m++) {
+												var CodeHeadAccount__ = Merger2[m];
+												if (CodeHeadAccount == CodeHeadAccount__) {
+													bool2 = false;
+													if (MergeHA__.length == 0) {
+														temp3.push(ha2[l]);
+														MergeHA__ = Merger2; 
+													}
+													else
+													{
+														// var bool4 = true;
+														// for (var n = 0; n < MergeHA__.length; n++) {
+															
+														// }
+
+													}
+													
+													break;
+												}
+											}
+											// temp3.push(ha2[l]);
+											// bool2 = false;
+										}
+
+										if (!bool2) {
+											//temp3.push(ha2[l]);
+											//tempAddMerge = ha2[l];
+											break;
+										}
+									}
+									break;
+								}
+							}
+
+							if (bool2) {
+								temp3.push(ha[j]);
+							}
+							
+						}
+					}
+
 					var temp2 = {
 						CodePost : CodePost,
 						HeadAccount : temp3,
@@ -233,7 +296,21 @@
 				}
 				else
 				{
-					rr.push(dt[i]);
+					// search in ClassDt.arr_pass exist
+					var dt2 = ClassDt.arr_pass;
+					// console.log(dt2);
+					for (var j = 0; j < dt2.length; j++) {
+						var CodePost_ = dt2[j].CodePost;
+						if (CodePost == CodePost_) {
+							bool_CodePost = false;
+							rr.push(dt2[j]);
+							break;
+						}
+					}
+					if (bool_CodePost) {
+						rr.push(dt[i]);
+					}
+					
 				}
 			}
 			console.log(rr);
