@@ -1232,6 +1232,8 @@ $route['budgeting/Upload_File_Creatorbudget_all'] = 'page/budgeting/c_budgeting/
 $route['budgeting/cancel_budget_department'] = 'page/budgeting/c_budgeting/cancel_budget_department';
 $route['budgeting/EntryBudget/report_anggaran_per_years'] = 'page/budgeting/c_budgeting/report_anggaran_per_years';
 
+$route['budgeting/report_anggaran_per_years'] = 'c_save_to_excel/report_anggaran_per_years';
+
 
 // Purchasing
 $query = $db->get('db_purchasing.cfg_sub_menu');

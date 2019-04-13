@@ -2744,4 +2744,38 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                $k = $st;
         }
     }
+
+    public function HurufColExcelNumber($ColNumber)
+    {
+        $ColNumber = 5;
+        $string = '';
+        // $c = $this->Loop_HurufColExcelNumber($ColNumber)
+        $keyM = array('A','B','C');
+        $bool = true;
+        $WordTime = -1;
+        $inc = 0;
+        for ($i=0; $i < count($keyM); $i++) { 
+            if ($ColNumber == $inc) {
+                $string = $string.$keyM[$i];
+                break;
+            }
+            $WordTime++;
+            $inc++;
+            if (($i+1) == count($keyM) ) {
+                $i=-1;
+            }
+
+            
+        }
+       
+
+        return $string;
+    }
+
+    private function Loop_HurufColExcelNumber($ColNumber)
+    {
+        $str = '';
+        $keyM = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+        return $str;
+    }
 }
