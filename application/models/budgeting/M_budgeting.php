@@ -533,31 +533,31 @@ class M_budgeting extends CI_Model {
         return $query;       
     }
 
-    public function getListBudgetingRemaining($Year)
-    {
-        $sql = 'select aa.*,b.Approval from (
-                select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
-                UNION
-                select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
-                UNION
-                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
-                ) aa left join (select * from db_budgeting.creator_budget_approval where Year = ?) as b on aa.ID = b.Departement
-                ';
-        $query=$this->db->query($sql, array($Year))->result_array(); 
-        for ($i=0; $i < count($query); $i++) { 
-            // cari grand total
-            $GrandTotal = 0;
-            if ($query[$i]['Approval'] == '1' || $query[$i]['Approval'] == '0') {
-                $get = $this->get_budget_remaining($Year,$query[$i]['ID']);
-                for ($j=0; $j < count($get); $j++) { 
-                   $GrandTotal = $GrandTotal + $get[$j]['Value'];
-                }
-            }
+    // public function getListBudgetingRemaining($Year)
+    // {
+    //     $sql = 'select aa.*,b.Approval from (
+    //             select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
+    //             UNION
+    //             select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+    //             UNION
+    //             select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
+    //             ) aa left join (select * from db_budgeting.creator_budget_approval where Year = ?) as b on aa.ID = b.Departement
+    //             ';
+    //     $query=$this->db->query($sql, array($Year))->result_array(); 
+    //     for ($i=0; $i < count($query); $i++) { 
+    //         // cari grand total
+    //         $GrandTotal = 0;
+    //         if ($query[$i]['Approval'] == '1' || $query[$i]['Approval'] == '0') {
+    //             $get = $this->get_budget_remaining($Year,$query[$i]['ID']);
+    //             for ($j=0; $j < count($get); $j++) { 
+    //                $GrandTotal = $GrandTotal + $get[$j]['Value'];
+    //             }
+    //         }
             
-            $query[$i] = $query[$i] + array('GrandTotal' => $GrandTotal);
-        }
-        return $query;  
-    }
+    //         $query[$i] = $query[$i] + array('GrandTotal' => $GrandTotal);
+    //     }
+    //     return $query;  
+    // }
 
     public function get_budget_remaining($Year,$Departement)
     {
@@ -783,5 +783,66 @@ class M_budgeting extends CI_Model {
         }
 
         return $rs;
+    }
+
+    public function GetAllBudgetGrouping($Year)
+    {
+        $arr = array();
+        $sql = 'select CodePost,PostName,SUM(SubTotal) as total from (
+                select cba.Year,c.CodePost,d.PostName,a.ID_creator_budget_approval,a.CodePostRealisasi,a.UnitCost,a.Freq,a.DetailMonth,
+                   a.SubTotal,a.CreatedBy,a.CreatedAt,a.LastUpdateBy,a.LastUpdateAt,b.UnitDiv,b.CodeHeadAccount,
+                         b.RealisasiPostName,b.Desc,c.Name as NameHeadAccount,dp.NameDepartement as NameUnitDiv,dp.Code as CodeDiv
+                   from db_budgeting.creator_budget as a left join db_budgeting.cfg_postrealisasi as b on a.CodePostRealisasi = b.CodePostRealisasi
+                   LEFT JOIN db_budgeting.cfg_head_account as c on b.CodeHeadAccount = c.CodeHeadAccount
+                   LEFT JOIN db_budgeting.cfg_post as d on c.CodePost = d.CodePost
+                   LEFT JOIN (
+                    select CONCAT("AC.",ID) as ID,  CONCAT("Study ",NameEng) as NameDepartement,Code as Code from db_academic.program_study where Status = 1
+                    UNION
+                    select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                    UNION
+                    select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
+                   ) as dp on b.UnitDiv = dp.ID
+                   join db_budgeting.creator_budget_approval as cba on cba.ID = a.ID_creator_budget_approval
+                                 where cba.`Year` = ? and cba.Status = 2
+
+            ) as subquery
+               group by CodePost
+               order by CodePost asc';
+        $query=$this->db->query($sql, array($Year))->result_array();
+        $arr_ha = array();
+        $arr_bc = $query;
+        for ($i=0; $i < count($query); $i++) { 
+            $sql2 = '
+                    select CodeHeadAccount,NameHeadAccount,UnitDiv,NameUnitDiv,CodeDiv,SUM(SubTotal) as total from (
+                                    select cba.Year,c.CodePost,d.PostName,a.ID_creator_budget_approval,a.CodePostRealisasi,a.UnitCost,a.Freq,a.DetailMonth,
+                                       a.SubTotal,a.CreatedBy,a.CreatedAt,a.LastUpdateBy,a.LastUpdateAt,b.UnitDiv,b.CodeHeadAccount,
+                                             b.RealisasiPostName,b.Desc,c.Name as NameHeadAccount,dp.NameDepartement as NameUnitDiv,dp.Code as CodeDiv
+                                       from db_budgeting.creator_budget as a left join db_budgeting.cfg_postrealisasi as b on a.CodePostRealisasi = b.CodePostRealisasi
+                                       LEFT JOIN db_budgeting.cfg_head_account as c on b.CodeHeadAccount = c.CodeHeadAccount
+                                       LEFT JOIN db_budgeting.cfg_post as d on c.CodePost = d.CodePost
+                                       LEFT JOIN (
+                                        select CONCAT("AC.",ID) as ID,  CONCAT("Study ",NameEng) as NameDepartement,Code as Code from db_academic.program_study where Status = 1
+                                        UNION
+                                        select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                                        UNION
+                                        select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
+                                       ) as dp on b.UnitDiv = dp.ID
+                                       join db_budgeting.creator_budget_approval as cba on cba.ID = a.ID_creator_budget_approval
+                                                     where cba.`Year` = ? and cba.Status = 2 and c.CodePost = ?
+                                ) as subquery
+                                group by CodeHeadAccount
+                                order by CodeHeadAccount asc
+                    ';
+            $query2=$this->db->query($sql2, array($Year,$query[$i]['CodePost']))->result_array();
+            for ($j=0; $j < count($query2); $j++) { 
+                $arr_ha[] = $query2[$j];
+            }
+
+            $query[$i]['HeadAccount'] = $query2;    
+        }
+        $arr['post'] = $query;
+        $arr['BudgetCategory'] = $arr_bc;
+        $arr['HeadAccount'] = $arr_ha;
+        return $arr;   
     }  
 }

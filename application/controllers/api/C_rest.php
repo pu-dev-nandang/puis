@@ -2669,6 +2669,34 @@ class C_rest extends CI_Controller {
         }
     }
 
+    public function getAllBudget()
+    {
+        $msg = '';
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('budgeting/m_budgeting');
+                $dt = array();
+                $Year = $dataToken['Year'];
+                $Query = $this->m_budgeting->GetAllBudgetGrouping($Year);
+                $dt = $Query;
+                echo json_encode($dt);    
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+
     public function TestpostdataFrom_PowerApps()
     {
 
