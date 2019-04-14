@@ -2745,37 +2745,226 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         }
     }
 
-    public function HurufColExcelNumber($ColNumber)
+    public function exColExcelNumber($ColomNumber)
     {
-        $ColNumber = 5;
+        $ColNumber = 363;
         $string = '';
         // $c = $this->Loop_HurufColExcelNumber($ColNumber)
         $keyM = array('A','B','C');
         $bool = true;
-        $WordTime = -1;
+        $WordTime = 0;
         $inc = 0;
-        for ($i=0; $i < count($keyM); $i++) { 
-            if ($ColNumber == $inc) {
-                $string = $string.$keyM[$i];
-                break;
-            }
-            $WordTime++;
-            $inc++;
-            if (($i+1) == count($keyM) ) {
-                $i=-1;
-            }
+        // loop array pankat dari total key
+        // $arr_limit =array();
+        // $c = 1;
+        // $bool_limit = true;
+        // $totInc = 0;
+        // while ($bool_limit) {
+        //     $c = $c * 3;
+        //     $arr_limit[] = $c;
+        //     $totInc = $totInc + $c;
+        //     if ($totInc >= $ColNumber) {
+        //         $bool_limit = false;
+        //     }
+        // }
+        // print_r($arr_limit);
+        // print_r($totInc);die();
+        while ($bool) {
+            // $count = $arr_limit[$WordTime];
+            $str = '';
+            for ($i=0; $i < count($keyM) ; $i++) {
+                $string = $str.$keyM[$i];
+                print_r($string.'{}<br>');
+                // print_r($inc.'inc--<br>');
+                if ($inc == $ColNumber) {
+                    $bool = false;
+                    break;
+                }
+                $t = $i+1;
+                if ($t >= count($keyM)) {
+                    $i = -1;
+                    if ($str == '') {
+                        $str = $keyM[0];
+                    }
+                    else
+                    {
+                        $lengthString = strlen($str);
+                        // print_r($WordTime.'--WordTime<br>');
+                        $bool2 = true;
+                        for ($j=-1; $j < $lengthString; $j--) {
+                            $min = '-'.$lengthString;
+                            $min = (int) $min;
+                            $lastchars = substr($str, $j,1);
+                            // print_r($j.'--j<br>');
+                            // print_r($lastchars.'--lastchars<br>');
+                            // print_r($min.'--min<br>');
+                            for ($k=0; $k < count($keyM); $k++) { 
+                                $t = $keyM[$k];
+                                if ($lastchars ==  $t) {
+                                    if ( ($k+1) == count($keyM) ) {
+                                        // print_r($str.'--end from last<br>');
+                                        //cek lenght string yang diupdate bagian mana
+                                        $bool3 = true;
+                                        for ($l=0; $l < $lengthString; $l++) { 
+                                            if (substr($str, $l,1) != $keyM[$k]) {
+                                                $bool3 = false;
+                                                break;
+                                            }
+                                        }
+                                        
+                                        // $str = substr($str, 0,($lengthString+$j) ).$keyM[0];
 
-            
+                                        $upd = $keyM[0];
+                                        $str = substr($str, 0, ($lengthString+$j) ).$upd.substr($str, ($lengthString+$j+1),$lengthString);
+
+                                        $bool4 = true;
+                                        for ($l=0; $l < strlen($str); $l++) { 
+                                            if (substr($str, $l,1) != $keyM[0]) {
+                                                $bool4 = false;
+                                                break;
+                                            }
+                                        }
+
+                                        if ( ($bool3 || $bool4) && $j == $min) {
+                                            // print_r('--All Last<br>');
+                                           $str = $keyM[0].$str;
+                                        }
+                                        
+                                        // print_r($str.'-result<br>');
+                                        // print_r($str.'--Last End<br>');
+                                        //break;
+                                    }
+                                    else
+                                    {
+                                        $upd = $keyM[($k+1)];
+                                        // print_r(substr($str, ($lengthString+$j+1),$lengthString).'==str'); 
+                                        $str = substr($str, 0, ($lengthString+$j) ).$upd.substr($str, ($lengthString+$j+1),$lengthString);
+                                        $bool2 = false;
+                                        // print_r($str.'--loopNaikHruf<br>');
+                                    }
+                                    break;
+                                }
+                            }
+
+                            if ($min == $j || (!$bool2) ) {
+                                break;
+                            }
+                            
+                        }
+                    }
+                }
+                $inc++;
+            }
+            // $WordTime++;
         }
-       
+        
+        // while ($bool) {
+        //     for ($i=0; $i < count($keyM); $i++) { 
+        //         if ($inc == $ColNumber) {
+        //             $string = $keyM[$i];
+        //             $bool = false;
+        //             break;
+        //         }
+        //         $inc++;
+        //     }
+
+        //     if (!$bool) {
+        //         if ($WordTime == 0) {
+        //            $string = $keyM[$WordTime].$string;
+        //         }
+        //         else
+        //         {
+        //             if ($WordTime > 0) {
+                        
+        //             }
+        //         }
+        //     }
+        //     $WordTime++;
+        // }
+        
 
         return $string;
     }
 
-    private function Loop_HurufColExcelNumber($ColNumber)
+    public function HurufColExcelNumber($ColNumber)
     {
-        $str = '';
+        $string = '';
         $keyM = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
-        return $str;
+        $bool = true;
+        $inc = 0;
+        
+        while ($bool) {
+            $str = '';
+            for ($i=0; $i < count($keyM) ; $i++) {
+                if ($inc == $ColNumber) {
+                    $string = $str.$keyM[$i];
+                    $bool = false;
+                    break;
+                }
+                $t = $i+1;
+                if ($t >= count($keyM)) {
+                    $i = -1;
+                    if ($str == '') {
+                        $str = $keyM[0];
+                    }
+                    else
+                    {
+                        $lengthString = strlen($str);
+                        $bool2 = true;
+                        for ($j=-1; $j < $lengthString; $j--) {
+                            $min = '-'.$lengthString;
+                            $min = (int) $min;
+                            $lastchars = substr($str, $j,1);
+                            for ($k=0; $k < count($keyM); $k++) { 
+                                $t = $keyM[$k];
+                                if ($lastchars ==  $t) {
+                                    if ( ($k+1) == count($keyM) ) {
+                                        //cek lenght string yang diupdate bagian mana
+                                        $bool3 = true;
+                                        for ($l=0; $l < $lengthString; $l++) { 
+                                            if (substr($str, $l,1) != $keyM[$k]) {
+                                                $bool3 = false;
+                                                break;
+                                            }
+                                        }
+
+                                        $upd = $keyM[0];
+                                        $str = substr($str, 0, ($lengthString+$j) ).$upd.substr($str, ($lengthString+$j+1),$lengthString);
+
+                                        $bool4 = true;
+                                        for ($l=0; $l < strlen($str); $l++) { 
+                                            if (substr($str, $l,1) != $keyM[0]) {
+                                                $bool4 = false;
+                                                break;
+                                            }
+                                        }
+
+                                        if ( ($bool3 || $bool4) && $j == $min) {
+                                           $str = $keyM[0].$str;
+                                        }
+                                        
+                                    }
+                                    else
+                                    {
+                                        $upd = $keyM[($k+1)];
+                                        $str = substr($str, 0, ($lengthString+$j) ).$upd.substr($str, ($lengthString+$j+1),$lengthString);
+                                        $bool2 = false;
+                                    }
+                                    break;
+                                }
+                            }
+
+                            if ($min == $j || (!$bool2) ) {
+                                break;
+                            }
+                            
+                        }
+                    }
+                }
+                $inc++;
+            }
+        }
+ 
+        return $string;
     }
 }

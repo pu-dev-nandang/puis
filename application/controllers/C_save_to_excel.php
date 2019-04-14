@@ -3668,8 +3668,8 @@ class C_save_to_excel extends CI_Controller
             $excel->getActiveSheet()->getStyle('B2:B3')->applyFromArray($style_col);
 
             //loop month
-                $huruf = $this->m_master->HurufColExcelNumber(100);
-                print_r($huruf);die();
+                $huruf = $this->m_master->HurufColExcelNumber(30);
+                print_r($huruf.'--End');die();
 
                 $stMonth = 4;
                 for ($i=0; $i < count($arr_bulan); $i++) { 
