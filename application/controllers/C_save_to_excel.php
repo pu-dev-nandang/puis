@@ -3601,4 +3601,92 @@ class C_save_to_excel extends CI_Controller
         $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
         $write->save('php://output');
     }
+
+    public function report_anggaran_per_years()
+    {
+        $this->load->model('master/m_master');
+        $this->load->model('budgeting/m_budgeting');
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $Input = (array) $this->jwt->decode($token,$key);
+        $Year = $Input['Years'];
+        $wrYear = $Year.'-'.($Year + 1);
+        $dt = (array) json_decode(json_encode($Input['data']),true);
+        $arr_Department = $this->m_master->apiservertoserver(serverRoot.'/api/__getAllDepartementPU');
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+
+        // Panggil class PHPExcel nya
+        $excel = new PHPExcel();
+        // Settingan awal fil excel
+        $excel->getProperties()->setCreator('Alhadi Rahman')
+            ->setLastModifiedBy('Alhadi Rahman')
+            ->setTitle("Podomoro University Budgeting")
+            ->setSubject("Budgeting ")
+            ->setDescription("Budgeting ")
+            ->setKeywords("Budgeting ");
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari header tabel
+        $style_col = array(
+            'font' => array('bold' => true), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+        $style_row = array(
+            'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        // make header
+            $YearSelected = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Year',$Year);
+            $arr_bulan = $this->m_master->getShowIntervalBulan($YearSelected[0]['StartPeriod'],$YearSelected[0]['EndPeriod']);
+            
+            $excel->setActiveSheetIndex(0)->setCellValue('A2', "No");
+            $excel->getActiveSheet()->mergeCells('A2:A3');
+            $excel->getActiveSheet()->getStyle('A2:A3')->applyFromArray($style_col);
+
+            $excel->setActiveSheetIndex(0)->setCellValue('B2', "Pos Anggaran");
+            $excel->getActiveSheet()->mergeCells('B2:B3');
+            $excel->getActiveSheet()->getStyle('B2:B3')->applyFromArray($style_col);
+
+            //loop month
+                $huruf = $this->m_master->HurufColExcelNumber(30);
+                print_r($huruf.'--End');die();
+
+                $stMonth = 4;
+                for ($i=0; $i < count($arr_bulan); $i++) { 
+                    //$huruf = $this->
+                }
+
+
+        // Set judul file excel nya
+        $excel->getActiveSheet()->setTitle('Report-Anggaran '.$wrYear);
+        $excel->setActiveSheetIndex(0);
+
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename=Report-Anggaran-'.$wrYear.'.xlsx'); // Set nama file excel nya
+        header('Cache-Control: max-age=0');
+
+        $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $write->save('php://output');
+    }
 }

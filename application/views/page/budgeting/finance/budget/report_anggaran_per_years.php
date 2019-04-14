@@ -325,4 +325,18 @@
 			$('.pageAnchor[page="report_anggaran_per_years"]').trigger('click');
 		}
 	});
+
+	$(document).off('click', '#export_excel_mapping').on('click', '#export_excel_mapping',function(e) {
+		var dt = ClassDt.arr_pass;
+		var Years = $("#Years").val();
+		var url = base_url_js+'budgeting/report_anggaran_per_years';
+		data = {
+		  data : dt,
+		  Years : Years,
+		}
+		var token = jwt_encode(data,"UAP)(*");
+		FormSubmitAuto(url, 'POST', [
+		    { name: 'token', value: token },
+		]);
+	})
 </script>
