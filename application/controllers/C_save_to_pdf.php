@@ -5895,9 +5895,14 @@ Phone: (021) 29200456';
             $pdf->SetFont('Arial','B',11);
             $pdf->Cell(60,5,'An Rektor',0,1,'L');
 
-            $pdf->SetXY(130,$y+25);
-            $pdf->Cell(60,5,$NamePHR,0,1,'L');
+//            $logo = file_get_contents('uploads/signature/2617100.svg');
+//            $pdf->MemImage($logo, 50, 30);
+//            print_r($logo);die();
+            $pdf->Image(base_url('uploads/signature/2617100.png'),130,$y+6,40);
+
             $pdf->SetXY(130,$y+30);
+            $pdf->Cell(60,5,$NamePHR,0,1,'L');
+            $pdf->SetXY(130,$y+35);
             $pdf->Cell(60,5,'NIP : '.$NIPPHR,0,1,'L');
 
 
