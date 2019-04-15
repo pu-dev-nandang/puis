@@ -3668,19 +3668,229 @@ class C_save_to_excel extends CI_Controller
             $excel->getActiveSheet()->getStyle('B2:B3')->applyFromArray($style_col);
 
             //loop month
-                $huruf = $this->m_master->HurufColExcelNumber(30);
-                print_r($huruf.'--End');die();
-
-                $stMonth = 4;
+                $st = 2;
                 for ($i=0; $i < count($arr_bulan); $i++) { 
-                    //$huruf = $this->
+                    $MonthName = $arr_bulan[$i]['MonthName'];
+                    $keyValueFirst = $arr_bulan[$i]['keyValueFirst'];
+                    $Y = explode('-', $keyValueFirst);
+                    $Y = $Y[0];
+                    $MonthName = $MonthName.' '.$Y;
+                    $huruf = $this->m_master->HurufColExcelNumber($st);
+                    $excel->setActiveSheetIndex(0)->setCellValue($huruf.'2', $MonthName);
+                        // Sub Header
+                            $excel->setActiveSheetIndex(0)->setCellValue($huruf.'3', 'BUDGET');
+                            $excel->getActiveSheet()->getStyle($huruf.'3')->applyFromArray($style_col);
+                            $sb = $st+1;
+                            $huruf_ = $this->m_master->HurufColExcelNumber($sb);
+                            $excel->setActiveSheetIndex(0)->setCellValue($huruf_.'3', 'REALISASI');
+                            $excel->getActiveSheet()->getStyle($huruf_.'3')->applyFromArray($style_col);
+                            $sb++;
+                            $huruf_ = $this->m_master->HurufColExcelNumber($sb);
+                            $excel->setActiveSheetIndex(0)->setCellValue($huruf_.'3', 'VARIANCE');
+                            $excel->getActiveSheet()->getStyle($huruf_.'3')->applyFromArray($style_col);
+
+
+                    $st = $st + 2;
+                    $hurufMerge = $this->m_master->HurufColExcelNumber($st);
+                    $excel->getActiveSheet()->mergeCells($huruf.'2:'.$hurufMerge.'2');
+                    $excel->getActiveSheet()->getStyle($huruf.'2:'.$hurufMerge.'2')->applyFromArray($style_col);
+
+                    $st++;
                 }
 
+            // Col Total Realisasi
+                  $huruf = $this->m_master->HurufColExcelNumber($st);  
+                  $excel->setActiveSheetIndex(0)->setCellValue($huruf.'2','TOTAL REALISASI TA '.$wrYear);
+                  $excel->getActiveSheet()->mergeCells($huruf.'2:'.$huruf.'3');
+                  $excel->getActiveSheet()->getStyle($huruf.'2')->applyFromArray($style_col)->getAlignment()->setWrapText(true);
+                  $excel->getActiveSheet()->getStyle($huruf.'2:'.$huruf.'3')->applyFromArray($style_col);
+                  $excel->getActiveSheet()->getColumnDimension($huruf)->setWidth(20);
+
+            // Unit      
+                  $SortDeparByProdiFirst = function($arr)
+                  {
+                    $rs = [];
+                    $sortbyAc = array();
+                    $Code1 = 'AC';
+                    $Code2 = 'FT';
+                    $Code3 = 'NA';
+                    $temp = array();
+                    for ($i=0; $i < count($arr); $i++) { 
+                        if (substr($arr[$i]['Code'], 0,2) == $Code1 || substr($arr[$i]['Code'], 0,2) == $Code2) {
+                           $sortbyAc[] = $arr[$i];
+                           $temp[] = $arr[$i];
+                        }
+                    }
+                    $rs['Academic'] = $temp;
+                    $temp = array();
+                    for ($i=0; $i < count($arr); $i++) { 
+                        if (substr($arr[$i]['Code'], 0,2) == $Code3) {
+                           $sortbyAc[] = $arr[$i];
+                           $temp[] = $arr[$i];
+                        }
+                    }
+                    $rs['NonAcademic'] = $temp;
+                    $rs['All'] = $sortbyAc;
+
+                    return $rs;
+                  };
+
+                  $arr_Department_split = $SortDeparByProdiFirst($arr_Department);
+                  $arr_Department = $arr_Department_split['All'];
+                  $arr_Department_ac = $arr_Department_split['Academic'];
+                  $arr_Department_nac = $arr_Department_split['NonAcademic'];
+                  $st++;
+                  $huruf = $this->m_master->HurufColExcelNumber($st);
+                    // Sub Header Department
+                        $sb = $st;
+                        for ($i=0; $i < count($arr_Department_ac); $i++) { 
+                            $huruf_ = $this->m_master->HurufColExcelNumber($sb);
+                            $excel->setActiveSheetIndex(0)->setCellValue($huruf_.'3', $arr_Department_ac[$i]['Abbr']);
+                            $excel->getActiveSheet()->getStyle($huruf_.'3')->applyFromArray($style_col);
+                            $sb++;
+                        }
+
+                        // Total Prodi
+                            $huruf_ = $this->m_master->HurufColExcelNumber($sb);
+                            $excel->setActiveSheetIndex(0)->setCellValue($huruf_.'3', 'TOTAL PRODI');
+                            $excel->getActiveSheet()->getStyle($huruf_.'3')->applyFromArray($style_col);
+                            $sb++;
+
+                        for ($i=0; $i < count($arr_Department_nac); $i++) { 
+                            $huruf_ = $this->m_master->HurufColExcelNumber($sb);
+                            $excel->setActiveSheetIndex(0)->setCellValue($huruf_.'3', $arr_Department_nac[$i]['Abbr']);
+                            $excel->getActiveSheet()->getStyle($huruf_.'3')->applyFromArray($style_col);
+                            $sb++;
+                        }    
+
+
+                  $st = $st + count($arr_Department);
+                  $hurufMerge = $this->m_master->HurufColExcelNumber($st);
+                  $excel->setActiveSheetIndex(0)->setCellValue($huruf.'2','UNIT');
+                  $excel->getActiveSheet()->mergeCells($huruf.'2:'.$hurufMerge.'2');
+                  $excel->getActiveSheet()->getStyle($huruf.'2:'.$hurufMerge.'2')->applyFromArray($style_col);
+
+            // Col Total Anggaran
+                      $st++;
+                      $huruf = $this->m_master->HurufColExcelNumber($st);  
+                      $excel->setActiveSheetIndex(0)->setCellValue($huruf.'2','TOTAL Anggaran TA '.$wrYear);
+                      $excel->getActiveSheet()->mergeCells($huruf.'2:'.$huruf.'3');
+                      $excel->getActiveSheet()->getStyle($huruf.'2')->applyFromArray($style_col)->getAlignment()->setWrapText(true);
+                      $excel->getActiveSheet()->getStyle($huruf.'2:'.$huruf.'3')->applyFromArray($style_col);
+                      $excel->getActiveSheet()->getColumnDimension($huruf)->setWidth(20);
+
+            // Isian
+                $arr_isian = array(
+                    array(
+                        'NO' => 'A',
+                        'PosAnggaran' => 'PENERIMAAN',
+                        'dt' => array(),
+                    ),
+                    array(
+                        'NO' => '1',
+                        'PosAnggaran' => 'Existing',
+                        'dt' => array(),
+                    ),
+                    array(
+                        'NO' => '2',
+                        'PosAnggaran' => 'Forecast ',
+                        'dt' => array(),
+                    ),
+                    array(
+                        'NO' => '3',
+                        'PosAnggaran' => 'Beasiswa & Formulir',
+                        'dt' => array(),
+                    ),
+                );
+
+                $n = 4;
+                for ($i=0; $i < count($arr_isian); $i++) { 
+                    $excel->setActiveSheetIndex(0)->setCellValue('A'.$n, $arr_isian[$i]['NO']);
+                    $excel->getActiveSheet()->getStyle('A'.$n)->applyFromArray($style_row);
+                    $excel->setActiveSheetIndex(0)->setCellValue('B'.$n, $arr_isian[$i]['PosAnggaran']);
+                    $excel->getActiveSheet()->getStyle('B'.$n)->applyFromArray($style_row);
+                    // loop isian, isi dengan value = ''
+                    for ($j=2; $j <= $st ; $j++) { 
+                        $huruf_ = $this->m_master->HurufColExcelNumber($j);
+                        $excel->setActiveSheetIndex(0)->setCellValue($huruf_.$n, '');
+                        $excel->getActiveSheet()->getStyle($huruf_.$n)->applyFromArray($style_row);
+                    }
+                    $n++;
+                }
+
+                // total penerimaan
+                    $excel->setActiveSheetIndex(0)->setCellValue('A'.$n, 'TOTAL PENERIMAAN');
+                    $excel->getActiveSheet()->mergeCells('A'.$n.':'.'B'.$n);
+                    $excel->getActiveSheet()->getStyle('A'.$n.':'.'B'.$n)->applyFromArray($style_col);
+                    for ($j=2; $j <= $st ; $j++) { 
+                        $huruf_ = $this->m_master->HurufColExcelNumber($j);
+                        $excel->setActiveSheetIndex(0)->setCellValue($huruf_.$n, '');
+                        $excel->getActiveSheet()->getStyle($huruf_.$n)->applyFromArray($style_row);
+                    }
+
+        // Make isian         
+                $n++;
+            $excel->setActiveSheetIndex(0)->setCellValue('A'.$n, 'B');
+            $excel->getActiveSheet()->getStyle('A'.$n)->applyFromArray($style_row);
+            $excel->setActiveSheetIndex(0)->setCellValue('B'.$n, 'PENGELUARAN');
+            $excel->getActiveSheet()->getStyle('B'.$n)->applyFromArray($style_row);
+                for ($j=2; $j <= $st ; $j++) { 
+                    $huruf_ = $this->m_master->HurufColExcelNumber($j);
+                    $excel->setActiveSheetIndex(0)->setCellValue($huruf_.$n, '');
+                    $excel->getActiveSheet()->getStyle($huruf_.$n)->applyFromArray($style_row);
+                }
+
+            // isian
+                $n++;
+                for ($i=0; $i < count($dt); $i++) { 
+                    $PostName = $dt[$i]['PostName'];
+                    $excel->setActiveSheetIndex(0)->setCellValue('A'.$n, $PostName);
+                    $excel->getActiveSheet()->mergeCells('A'.$n.':'.'B'.$n);
+                    $excel->getActiveSheet()->getStyle('A'.$n.':'.'B'.$n)->applyFromArray($style_row);
+                    for ($j=2; $j <= $st ; $j++) { 
+                        $huruf_ = $this->m_master->HurufColExcelNumber($j);
+                        $excel->setActiveSheetIndex(0)->setCellValue($huruf_.$n, '');
+                        $excel->getActiveSheet()->getStyle($huruf_.$n)->applyFromArray($style_row);
+                    }
+
+                    $n++;
+                    // Head Account
+                        $arr_head_account = $dt[$i]['HeadAccount'];
+                        for ($j=0; $j <count($arr_head_account) ; $j++) { 
+                            $excel->setActiveSheetIndex(0)->setCellValue('A'.$n, ($j+1));
+                            $excel->getActiveSheet()->getStyle('A'.$n)->applyFromArray($style_row);
+                            $excel->setActiveSheetIndex(0)->setCellValue('B'.$n, $arr_head_account[$j]['NameHeadAccount']);
+                            $excel->getActiveSheet()->getStyle('B'.$n)->applyFromArray($style_row);
+                            // Search isian, cek merge
+                            $Merger = $arr_head_account[$j]['Merger'];
+                            $arr_code_ha = array();
+                            if (count($Merger) > 0) {
+                                $arr_code_ha = $Merger;
+                            }
+                            else
+                            {
+                                $arr_code_ha[] = $arr_head_account[$j]['CodeHeadAccount']; 
+                            }
+
+                            $G_dt = $this->m_budgeting->SearchDt_perHeadAccount($arr_code_ha,$arr_bulan,$arr_Department_split);
+                            // Loop Month
+                             $arr_month_val = $G_dt['arr_month_val'];
+                             $col_ = 2;
+                             for ($k=0; $k < count($arr_month_val); $k++) { 
+                                 $huruf = $this->m_master->HurufColExcelNumber($col_);
+                             }
+
+                        }
+
+                }         
+                                    
+        
+
+        $excel->getActiveSheet()->getColumnDimension('B')->setWidth(25);             
 
         // Set judul file excel nya
         $excel->getActiveSheet()->setTitle('Report-Anggaran '.$wrYear);
         $excel->setActiveSheetIndex(0);
-
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename=Report-Anggaran-'.$wrYear.'.xlsx'); // Set nama file excel nya

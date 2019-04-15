@@ -142,13 +142,14 @@
 
 	$(document).off('click', '#btnMerge').on('click', '#btnMerge',function(e) {
 		if (confirm('Are you sure ?')) {
-			// loadingStart();
+			//loadingStart();
 			var rr = [];
 			var dt = ClassDt.arr_post;
 			//console.log(dt);
 			var tt = [];
 			var dd = [];
 			var bc = '';
+			var Count_ = 0;
 			$('.HA_unifrom:checked').each(function(){
 				var codeheadaccount = $(this).attr('codeheadaccount');
 				var total = $(this).attr('total');
@@ -162,161 +163,172 @@
 				if (bc == '') {
 					bc = $(this).closest('.accordian-body').attr('id');
 				}
+
+				Count_++;
 				
 			})
-			//console.log(tt);
-			var bool_CodePost = true;
-			for (var i = 0; i < dt.length; i++) {
-				var CodePost = dt[i].CodePost;
-				if (CodePost == bc) {
-					var ha = dt[i].HeadAccount;
-					var TotMerge = 0;
-					var temp3 = [];
 
-					// add merge
-					var NameHeadAccount = '';
-					for (var j = 0; j < ha.length; j++) {
-						var CodeHeadAccount = ha[j].CodeHeadAccount;
-						for (var k = 0; k < tt.length; k++) {
-							var CodeHeadAccount_ = tt[k].codeheadaccount;
-							if (CodeHeadAccount_ != 'Merge') {
-								if (CodeHeadAccount_ == CodeHeadAccount) {
-									dd.push(CodeHeadAccount_);	
-									TotMerge = parseFloat(TotMerge) + parseFloat(tt[k].total);
-									if (NameHeadAccount == '') {
-										NameHeadAccount = ha[j].NameHeadAccount;
-									}
-								}
-							}
-							else
-							{
-								var merger = tt[k].merger;
-								merger = merger.split(',');
-								for (var m = 0; m < merger.length; m++) {
-									var mer = merger[m];
-									if (mer == CodeHeadAccount) {	
-										TotMerge = parseFloat(TotMerge) + parseFloat(ha[j].total);
+			if (Count_ > 1) {
+				//console.log(tt);
+				var bool_CodePost = true;
+				for (var i = 0; i < dt.length; i++) {
+					var CodePost = dt[i].CodePost;
+					if (CodePost == bc) {
+						var ha = dt[i].HeadAccount;
+						var TotMerge = 0;
+						var temp3 = [];
+
+						// add merge
+						var NameHeadAccount = '';
+						for (var j = 0; j < ha.length; j++) {
+							var CodeHeadAccount = ha[j].CodeHeadAccount;
+							for (var k = 0; k < tt.length; k++) {
+								var CodeHeadAccount_ = tt[k].codeheadaccount;
+								if (CodeHeadAccount_ != 'Merge') {
+									if (CodeHeadAccount_ == CodeHeadAccount) {
+										dd.push(CodeHeadAccount_);	
+										TotMerge = parseFloat(TotMerge) + parseFloat(tt[k].total);
 										if (NameHeadAccount == '') {
 											NameHeadAccount = ha[j].NameHeadAccount;
 										}
-										dd.push(mer);
+									}
+								}
+								else
+								{
+									var merger = tt[k].merger;
+									merger = merger.split(',');
+									for (var m = 0; m < merger.length; m++) {
+										var mer = merger[m];
+										if (mer == CodeHeadAccount) {	
+											TotMerge = parseFloat(TotMerge) + parseFloat(ha[j].total);
+											if (NameHeadAccount == '') {
+												NameHeadAccount = ha[j].NameHeadAccount;
+											}
+											dd.push(mer);
+										}
 									}
 								}
 							}
 						}
-					}
 
-					var temp = {
-						CodeDiv : 'Merge',
-						CodeHeadAccount : 'Merge',
-						NameHeadAccount : NameHeadAccount,
-						NameUnitDiv : 'Merge',
-						UnitDiv : 'Merge',
-						total : TotMerge,
-						Merger: dd,
-					};
+						var temp = {
+							CodeDiv : 'Merge',
+							CodeHeadAccount : 'Merge',
+							NameHeadAccount : NameHeadAccount,
+							NameUnitDiv : 'Merge',
+							UnitDiv : 'Merge',
+							total : TotMerge,
+							Merger: dd,
+						};
 
-					temp3.push(temp);
+						temp3.push(temp);
 
 
-					// add sisa tidak merge
-					var MergeHA__ = []; // untuk  merge already exist
-					for (var j = 0; j < ha.length; j++) {
-						var CodeHeadAccount = ha[j].CodeHeadAccount;
-						var bool = true;
-						for (var k = 0; k < dd.length; k++) {
-							var ddcd = dd[k];
-							if (CodeHeadAccount == ddcd) {
-								bool = false;
-								break;
-							}
-						}
-
-						if (bool) {
-							//check data already exist di arr_pass
-							var dt2 = ClassDt.arr_pass;
-							var bool2 = true;
-							for (var k = 0; k < dt2.length; k++) {
-								var CodePost_ = dt2[k].CodePost;
-								if (CodePost == CodePost_) {
-									var ha2 = dt2[k].HeadAccount;
-									for (var l = 0; l < ha2.length; l++) {
-										var CodeHeadAccount_ = ha2[l].CodeHeadAccount;
-										if (CodeHeadAccount_ == 'Merge') {
-											var Merger2 = ha2[l].Merger;
-											for (var m = 0; m < Merger2.length; m++) {
-												var CodeHeadAccount__ = Merger2[m];
-												if (CodeHeadAccount == CodeHeadAccount__) {
-													bool2 = false;
-													if (MergeHA__.length == 0) {
-														temp3.push(ha2[l]);
-														MergeHA__ = Merger2; 
-													}
-													else
-													{
-														// var bool4 = true;
-														// for (var n = 0; n < MergeHA__.length; n++) {
-															
-														// }
-
-													}
-													
-													break;
-												}
-											}
-											// temp3.push(ha2[l]);
-											// bool2 = false;
-										}
-
-										if (!bool2) {
-											//temp3.push(ha2[l]);
-											//tempAddMerge = ha2[l];
-											break;
-										}
-									}
+						// add sisa tidak merge
+						var MergeHA__ = []; // untuk  merge already exist
+						for (var j = 0; j < ha.length; j++) {
+							var CodeHeadAccount = ha[j].CodeHeadAccount;
+							var bool = true;
+							for (var k = 0; k < dd.length; k++) {
+								var ddcd = dd[k];
+								if (CodeHeadAccount == ddcd) {
+									bool = false;
 									break;
 								}
 							}
 
-							if (bool2) {
-								temp3.push(ha[j]);
+							if (bool) {
+								//check data already exist di arr_pass
+								var dt2 = ClassDt.arr_pass;
+								var bool2 = true;
+								for (var k = 0; k < dt2.length; k++) {
+									var CodePost_ = dt2[k].CodePost;
+									if (CodePost == CodePost_) {
+										var ha2 = dt2[k].HeadAccount;
+										for (var l = 0; l < ha2.length; l++) {
+											var CodeHeadAccount_ = ha2[l].CodeHeadAccount;
+											if (CodeHeadAccount_ == 'Merge') {
+												var Merger2 = ha2[l].Merger;
+												for (var m = 0; m < Merger2.length; m++) {
+													var CodeHeadAccount__ = Merger2[m];
+													if (CodeHeadAccount == CodeHeadAccount__) {
+														bool2 = false;
+														if (MergeHA__.length == 0) {
+															temp3.push(ha2[l]);
+															MergeHA__ = Merger2; 
+														}
+														else
+														{
+															// var bool4 = true;
+															// for (var n = 0; n < MergeHA__.length; n++) {
+																
+															// }
+
+														}
+														
+														break;
+													}
+												}
+												// temp3.push(ha2[l]);
+												// bool2 = false;
+											}
+
+											if (!bool2) {
+												//temp3.push(ha2[l]);
+												//tempAddMerge = ha2[l];
+												break;
+											}
+										}
+										break;
+									}
+								}
+
+								if (bool2) {
+									temp3.push(ha[j]);
+								}
+								
 							}
-							
 						}
+
+						var temp2 = {
+							CodePost : CodePost,
+							HeadAccount : temp3,
+							PostName : dt[i].PostName,
+							total : dt[i].total,
+						};
+
+						rr.push(temp2);
 					}
-
-					var temp2 = {
-						CodePost : CodePost,
-						HeadAccount : temp3,
-						PostName : dt[i].PostName,
-						total : dt[i].total,
-					};
-
-					rr.push(temp2);
-				}
-				else
-				{
-					// search in ClassDt.arr_pass exist
-					var dt2 = ClassDt.arr_pass;
-					// console.log(dt2);
-					for (var j = 0; j < dt2.length; j++) {
-						var CodePost_ = dt2[j].CodePost;
-						if (CodePost == CodePost_) {
-							bool_CodePost = false;
-							rr.push(dt2[j]);
-							break;
+					else
+					{
+						// search in ClassDt.arr_pass exist
+						var dt2 = ClassDt.arr_pass;
+						// console.log(dt2);
+						for (var j = 0; j < dt2.length; j++) {
+							var CodePost_ = dt2[j].CodePost;
+							if (CodePost == CodePost_) {
+								bool_CodePost = false;
+								rr.push(dt2[j]);
+								break;
+							}
 						}
+						if (bool_CodePost) {
+							rr.push(dt[i]);
+						}
+						
 					}
-					if (bool_CodePost) {
-						rr.push(dt[i]);
-					}
-					
 				}
+				console.log(rr);
+				ClassDt.arr_pass = rr;
+				MakeDOM();
+				//loadingEnd(50);
 			}
-			console.log(rr);
-			ClassDt.arr_pass = rr;
-			MakeDOM();
-			// loadingEnd(1000);
+			else
+			{
+				toastr.info('Minimal checked is two');
+			}
+
+			
 		}
 	});
 
