@@ -859,19 +859,20 @@ class M_budgeting extends CI_Model {
                     join db_budgeting.creator_budget as c on b.CodePostRealisasi = c.CodePostRealisasi
                     where a.CodeHeadAccount in ('.$CodeHeadAccountIn.');
                 ';
+        // print_r($sql);        
         $query=$this->db->query($sql, array())->result_array();
         $arr_month_val = array();
         for ($i=0; $i < count($arr_bulan); $i++) { // loop bulan dahulu
             $keyValueFirst = $arr_bulan[$i]['keyValueFirst'];
             for ($j=0; $j < count($query); $j++) { // cari data berdasarkan headaccount multiple where dan data bisa lebih dari satu karena merge
-                $DetailMonth = $query[$i]['DetailMonth'];
+                $DetailMonth = $query[$j]['DetailMonth'];
                 $DetailMonth = (array) json_decode($DetailMonth,true);
-                $UnitCost = $query[$i]['UnitCost']; // Unit cost untuk pengali value per bulan
+                $UnitCost = $query[$j]['UnitCost']; // Unit cost untuk pengali value per bulan
                 for ($k=0; $k < count($DetailMonth); $k++) { 
                     $month = $DetailMonth[$k]['month'];
                     if ($month == $keyValueFirst) {
                         $value = $DetailMonth[$k]['value'];
-                        $v = $value * $UnitCost;
+                        $v = $value * $UnitCost / 1000;
                         $v = (int)$v;
                         if (count($arr_month_val) == 0) {
                             $arr_month_val[] = array(
@@ -910,33 +911,74 @@ class M_budgeting extends CI_Model {
         $arr_unit_ac_val = array();
         for ($i=0; $i < count($arr_Department_ac); $i++) { 
             $Code = $arr_Department_ac[$i]['Code'];
+            $bool = true;
             for ($j=0; $j < count($query); $j++) { 
-                $UnitDiv = $query[$b]['UnitDiv'];
+                $UnitDiv = $query[$j]['UnitDiv'];
                 if ($Code == $UnitDiv) {
-                    $SubTotal = $query[$b]['SubTotal'];
-                    $arr_unit_ac_val[] = array(
-                        'Code' => $Code,
-                        'SubTotal' => $SubTotal,
-                    );
+                    $SubTotal = $query[$j]['SubTotal'] / 1000;
+                    // check array key exist
+                    $bool2 = true;
+                    for ($k=0; $k < count($arr_unit_ac_val); $k++) { 
+                        if ($arr_unit_ac_val[$k]['Code'] == $Code) { // exist
+                            $arr_unit_ac_val[$k]['SubTotal'] = $arr_unit_ac_val[$k]['SubTotal']  + $SubTotal;
+                            $bool2 = false;
+                        }
+                    }
+                    if ($bool2) {
+                        $arr_unit_ac_val[] = array(
+                            'Code' => $Code,
+                            'SubTotal' => $SubTotal,
+                        );
+                    }
+                    
+                    $bool = false;
                 }
                 break;
             }
+
+            if ($bool) {
+                $arr_unit_ac_val[] = array(
+                    'Code' => $Code,
+                    'SubTotal' => 0,
+                );
+            }
+
+
         }
 
         $arr_Department_nac = $arr_Department_split['NonAcademic'];
         $arr_unit_nac_val = array();
         for ($i=0; $i < count($arr_Department_nac); $i++) { 
             $Code = $arr_Department_nac[$i]['Code'];
+            $bool = true;
             for ($j=0; $j < count($query); $j++) { 
-                $UnitDiv = $query[$b]['UnitDiv'];
+                $UnitDiv = $query[$j]['UnitDiv'];
                 if ($Code == $UnitDiv) {
-                    $SubTotal = $query[$b]['SubTotal'];
-                    $arr_unit_nac_val[] = array(
-                        'Code' => $Code,
-                        'SubTotal' => $SubTotal,
-                    );
+                    $SubTotal = $query[$j]['SubTotal'] / 1000;
+                    // check array key exist
+                    $bool2 = true;
+                    for ($k=0; $k < count($arr_unit_nac_val); $k++) { 
+                        if ($arr_unit_nac_val[$k]['Code'] == $Code) { // exist
+                            $arr_unit_nac_val[$k]['SubTotal'] = $arr_unit_nac_val[$k]['SubTotal']  + $SubTotal;
+                            $bool2 = false;
+                        }
+                    }
+                    if ($bool2) {
+                        $arr_unit_nac_val[] = array(
+                            'Code' => $Code,
+                            'SubTotal' => $SubTotal,
+                        );
+                    }
+                    $bool = false;
                 }
                 break;
+            }
+
+            if ($bool) {
+                $arr_unit_nac_val[] = array(
+                    'Code' => $Code,
+                    'SubTotal' => 0,
+                );
             }
         }
 

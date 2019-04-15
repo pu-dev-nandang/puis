@@ -3853,8 +3853,8 @@ class C_save_to_excel extends CI_Controller
                         $excel->getActiveSheet()->getStyle($huruf_.$n)->applyFromArray($style_row);
                     }
 
-                    $n++;
                     // Head Account
+                        $n++;
                         $arr_head_account = $dt[$i]['HeadAccount'];
                         for ($j=0; $j <count($arr_head_account) ; $j++) { 
                             $excel->setActiveSheetIndex(0)->setCellValue('A'.$n, ($j+1));
@@ -3873,15 +3873,86 @@ class C_save_to_excel extends CI_Controller
                             }
 
                             $G_dt = $this->m_budgeting->SearchDt_perHeadAccount($arr_code_ha,$arr_bulan,$arr_Department_split);
+                            
                             // Loop Month
                              $arr_month_val = $G_dt['arr_month_val'];
                              $col_ = 2;
                              for ($k=0; $k < count($arr_month_val); $k++) { 
-                                 $huruf = $this->m_master->HurufColExcelNumber($col_);
+                                 // Budget
+                                     $huruf = $this->m_master->HurufColExcelNumber($col_);
+                                     $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, $arr_month_val[$k]['value']);
+                                     $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
+                                     $col_++;
+                                 // Realisasi 
+                                     $huruf = $this->m_master->HurufColExcelNumber($col_);
+                                     $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
+                                     $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
+                                     $col_++; 
+
+                                // Variance 
+                                    $huruf = $this->m_master->HurufColExcelNumber($col_);
+                                    $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
+                                    $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
+                                    $col_++;        
                              }
+
+                             // Total Realisasi 
+                                 $huruf = $this->m_master->HurufColExcelNumber($col_);
+                                 $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
+                                 $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
+                                 $col_++;
+
+                             // Unit Prodi
+                                $arr_unit_ac_val = $G_dt['arr_unit_ac_val'];
+                                $TotalProdi = 0;
+                                for ($k=0; $k < count($arr_unit_ac_val); $k++) { 
+                                   $huruf = $this->m_master->HurufColExcelNumber($col_);
+                                   $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, $arr_unit_ac_val[$k]['SubTotal']);
+                                   $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
+                                   $col_++;
+                                   $TotalProdi = $TotalProdi +  $arr_unit_ac_val[$k]['SubTotal'];
+                                }
+
+                                // add sisa
+                                // for ($k=0; $k < count($arr_Department_ac) - count($arr_unit_ac_val); $k++) { 
+                                //     $huruf = $this->m_master->HurufColExcelNumber($col_);
+                                //     $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
+                                //     $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
+                                //     $col_++;
+                                // }
+
+                                // Total Prodi
+                                    $huruf = $this->m_master->HurufColExcelNumber($col_);
+                                    $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, $TotalProdi);
+                                    $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
+                                    $col_++;
+
+                                $arr_unit_nac_val = $G_dt['arr_unit_nac_val'];
+                                for ($k=0; $k < count($arr_unit_nac_val); $k++) { 
+                                      $huruf = $this->m_master->HurufColExcelNumber($col_);
+                                      $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, $arr_unit_nac_val[$k]['SubTotal']);
+                                      $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
+                                      $col_++;
+                                }
+
+                                // add sisa
+                                // for ($k=0; $k < count($arr_Department_nac) - count($arr_unit_nac_val); $k++) { 
+                                //     $huruf = $this->m_master->HurufColExcelNumber($col_);
+                                //     $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
+                                //     $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
+                                //     $col_++;
+                                // }
+
+                                // total anggaran
+                                    $huruf = $this->m_master->HurufColExcelNumber($col_);
+                                    $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, $arr_head_account[$j]['total'] / 1000);
+                                    $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
+
+                            $n++;          
 
                         }
 
+                    // $n++;    
                 }         
                                     
         
