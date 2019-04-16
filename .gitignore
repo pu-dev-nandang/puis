@@ -34,6 +34,8 @@ index.php
 document/*
 /uploads/syllabus_sap/*.pdf
 /uploads/vreservation/*.pdf
+**/uploads/files/
+
 
 /uploads/budgeting/catalog/*.jpeg
 /uploads/budgeting/catalog/*.jpg

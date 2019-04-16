@@ -914,6 +914,7 @@ $route['api/__getDivision'] = 'api/c_api/getDivision';
 $route['api/__getPosition'] = 'api/c_api/getPosition';
 $route['api/__getStatusEmployee'] = 'api/c_api/getStatusEmployee';
 $route['api/__getStatusVersion'] = 'api/c_api/getstatusversion';
+$route['api/__getStatusVersion2'] = 'api/c_api/getstatusversion2';
 $route['api/__getStatusModule'] = 'api/c_api/getstatusmodule';
 $route['api/__getdivisiversion'] = 'api/c_api/getdivisiversion';
 $route['api/__dropdowngroupmod'] = 'api/c_api/dropdowngroupmodule';

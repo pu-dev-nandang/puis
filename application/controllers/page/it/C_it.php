@@ -53,6 +53,12 @@ class C_it extends It_Controler {
 
     }
 
+    public function loadupdategroup(){
+      $dataNIP = $this->db->get_where('db_employees.files',array('NIP'=>$User))->result_array();
+      
+    }
+
+
 
     public function loadpageversiondetail(){
         $department = parent::__getDepartement();
