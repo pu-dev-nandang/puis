@@ -1140,8 +1140,8 @@ class C_api extends CI_Controller {
                     $this->db->insert('db_academic.semester_antara',$dataForm);
                     $insert_id = $this->db->insert_id();
 
-//                    $this->db->insert('db_academic.academic_years',
-//                        array('SemesterID' => $insert_id));
+                    $this->db->insert('db_academic.sa_academic_years',
+                        array('SASemesterID' => $insert_id));
 
                     return print_r($insert_id);
                 }

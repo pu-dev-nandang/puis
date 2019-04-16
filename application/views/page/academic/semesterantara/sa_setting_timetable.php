@@ -323,7 +323,7 @@
                     '                </tr>' +
                     '                </thead>' +
                     '               <tbody id="listCourse"></tbody>' +
-                    '            </table>');
+                    '            </table><div class="hide" id="listStudent"></div>');
 
                 $('#showSelectedCourse,#showSelectedCoursePerluHapus').empty();
 
@@ -350,6 +350,8 @@
 
                     // $('#listStudent').append('<textarea id="showStd_'+v.IDSSD+'">'+JSON.stringify(Students)+'</textarea>' +
                     //     '<textarea id="showCourse_'+v.IDSSD+'">'+JSON.stringify(v)+'</textarea>');
+
+                    $('#listStudent').append('<textarea id="showStd_'+v.IDSSD+'">'+JSON.stringify(Students)+'</textarea>');
 
                     if($.inArray(''+v.IDSSD,arrIDSSD)!=-1){
                         fillListCourse.push(v.IDSSD);

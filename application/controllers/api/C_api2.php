@@ -2194,7 +2194,40 @@ class C_api2 extends CI_Controller {
 
             $data = $this->m_rest->_getSemesterAntaraActive();
 
+            if(count($data)>0){
+                $dataNow = $this->m_rest->getDateNow();
+                $d = $data[0];
+
+                $dataNow_str = strtotime($dataNow);
+                $dataStart_str = strtotime($d['StartKRS']);
+                $dataEnd_str = strtotime($d['EndKRS']);
+                $ShowCourse = ($dataNow_str >= $dataStart_str && $dataNow_str <= $dataEnd_str) ? 1 : 0;
+
+                $data[0]['ShowCourse'] = $ShowCourse;
+            }
+
             return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='loadSettingSAAcademicYear'){
+            $SASemesterID = $data_arr['SASemesterID'];
+
+            $dataSemester = $this->db->get_where('db_academic.sa_academic_years',array(
+                'SASemesterID' => $SASemesterID
+            ))->result_array();
+
+            return print_r(json_encode($dataSemester));
+
+        }
+        else if($data_arr['action']=='updateSAAcademicyear'){
+
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+
+            $this->db->where('ID', $ID);
+            $this->db->update('db_academic.sa_academic_years',$dataForm);
+
+            return print_r(1);
 
         }
         else if($data_arr['action']=='enteredCourse'){
@@ -2261,8 +2294,6 @@ class C_api2 extends CI_Controller {
             }
 
 
-
-
             $NPM = $data_arr['NPM'];
             $db_ = 'ta_'.$data_arr['ClassOf'];
 
@@ -2274,6 +2305,8 @@ class C_api2 extends CI_Controller {
             );
 
             $dataStd = $this->db->limit(1)->get_where('db_academic.sa_student',$dataIns)->result_array();
+
+
 
             if(count($dataStd)>0){
                 $IDSAStudent = $dataStd[0]['ID'];
@@ -2300,6 +2333,9 @@ class C_api2 extends CI_Controller {
                 }
 
                 $result = $dataCID;
+            }
+            else {
+                $result = [];
             }
 
             return print_r(json_encode($result));
@@ -2531,7 +2567,7 @@ class C_api2 extends CI_Controller {
 
                     $dataStd = $this->db->query('SELECT ssd.NPM, ats.Name FROM db_academic.sa_student_details ssd
                                                               LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssd.NPM)
-                                                              WHERE ssd.CDID = "'.$d['CDID'].'" ORDER BY ssd.NPM ASC')->result_array();
+                                                              WHERE ssd.CDID = "'.$d['CDID'].'" AND ssd.Status = "3" ORDER BY ssd.NPM ASC')->result_array();
 
                     $data[$i]['Students'] = $dataStd;
 
@@ -2995,6 +3031,57 @@ class C_api2 extends CI_Controller {
             return print_r(1);
         }
 
+        else if($data_arr['action']=='SATimetables'){
+
+
+            $NPM = $data_arr['NPM'];
+
+            $dataStd = $this->db->query('SELECT ss.NPM, ss.Mentor, sa.Name, ss.ID AS IDSAStudent, sa.*  FROM db_academic.sa_student ss 
+                                                    LEFT JOIN db_academic.semester_antara sa ON (sa.ID = ss.SASemesterID)
+                                                    WHERE ss.NPM = "'.$NPM.'" ORDER BY ss.SASemesterID ASC ')->result_array();
+
+            if(count($dataStd)>0){
+                for ($i=0;$i<count($dataStd);$i++){
+                    $d = $dataStd[$i];
+
+                    $dataDetails = $this->db->query('SELECT ssd.ID AS IDSSD, ssd.Type, ssd.Status, ssd.Credit, mk.NameEng AS CourseEng, mk.MKCode  
+                                                                FROM db_academic.sa_student_details ssd
+                                                                LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssd.MKID)
+                                                                WHERE ssd.IDSAStudent = "'.$d['IDSAStudent'].'" AND ssd.Status = "3" ')->result_array();
+
+                    if(count($dataDetails)>0){
+                        for ($s=0;$s<count($dataDetails);$s++){
+                            $ds = $dataDetails[$s];
+                            $dataSchedule = $this->db->query('SELECT ss.ID AS ScheduleIDSA,ss.ClassGroup, ss.Start, ss.End, em.NIP, em.Name AS CoordinatorName, d.NameEng AS DayEng, cl.Room  FROM db_academic.sa_schedule ss
+                                                                        LEFT JOIN db_academic.sa_schedule_course ssc ON (ss.ID = ssc.ScheduleIDSA)
+                                                                        LEFT JOIN db_academic.days d ON (d.ID = ss.DayID)
+                                                                        LEFT JOIN db_academic.classroom cl ON (cl.ID = ss.ClassroomID)
+                                                                        LEFT JOIN db_employees.employees em ON (em.NIP = ss.Coordinator)
+                                                                        WHERE ssc.IDSSD = "'.$ds['IDSSD'].'" ')
+                                ->result_array();
+
+                            if(count($dataSchedule)>0){
+                                for($t=0;$t<count($dataSchedule);$t++){
+                                    $dataSchedule[$t]['TeamTeaching'] = $this->db->query('SELECT em.NIP, em.Name FROM db_academic.sa_schedule_team_teaching sstt
+                                                                                                LEFT JOIN db_employees.employees em ON (em.NIP = sstt.NIP)
+                                                                                                WHERE sstt.ScheduleIDSA = "'.$dataSchedule[$t]['ScheduleIDSA'].'" ')->result_array();
+                                }
+                            }
+
+                            $dataDetails[$s]['Schedule'] = $dataSchedule;
+                        }
+                    }
+                    $dataStd[$i]['Course'] = $dataDetails;
+
+                }
+            }
+
+
+            return print_r(json_encode($dataStd));
+
+
+        }
+
     }
 
     function createTagihanSemesterAntara($IDSAStudent){
@@ -3134,7 +3221,7 @@ class C_api2 extends CI_Controller {
                                                               LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssd.NPM)
                                                               LEFT JOIN db_finance.payment p1 ON (p1.NPM = ssd.NPM AND p1.PTID = "5")
                                                               LEFT JOIN db_finance.payment p2 ON (p2.NPM = ssd.NPM AND p2.PTID = "6")
-                                                              WHERE ssd.CDID = "'.$item['CDID'].'" 
+                                                              WHERE ssd.CDID = "'.$item['CDID'].'" AND ssd.Status = "3"
                                                               ORDER BY ssd.NPM ASC')->result_array();
 
                     if(count($dataStd)>0){
@@ -3232,7 +3319,7 @@ class C_api2 extends CI_Controller {
             // Get Course
             $IDSAStudent = $row['IDSAStudent'];
 
-            $dataCourse = $this->db->query('SELECT ssd.*, mk.NameEng AS CourseEng FROM db_academic.sa_student_details ssd
+            $dataCourse = $this->db->query('SELECT ssd.*, mk.NameEng AS CourseEng, mk.MKCode FROM db_academic.sa_student_details ssd
                                                         LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssd.MKID)
                                                         WHERE ssd.IDSAStudent = "'.$IDSAStudent.'" ')->result_array();
 
@@ -3256,7 +3343,7 @@ class C_api2 extends CI_Controller {
                         $Status = '<span class="sp-sts" style="color: green;">Approved by Kaprodi</span>';
                     }
 
-                    $viewCourse = $viewCourse.'<div style="margin-top: 5px;">- '.$item['CourseEng'].' <span class="label label-default">Credit : '.$item['Credit'].'</span>'.$n.' | '.$Status.'</div>';
+                    $viewCourse = $viewCourse.'<div style="margin-top: 5px;">- '.$item['MKCode'].' | '.$item['CourseEng'].' <span class="label label-default">Credit : '.$item['Credit'].'</span>'.$n.' | '.$Status.'</div>';
                 }
             }
 

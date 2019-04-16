@@ -67,7 +67,7 @@ class M_rest extends CI_Model {
 
     public function _getSemesterAntaraActive(){
 
-        $data = $this->db->query('SELECT sa.*, say.MaxCredit, say.Start, say.End, say.StartUTS, say.EndUTS, say.StartUAS, say.EndUAS  
+        $data = $this->db->query('SELECT sa.*, say.MaxCredit, say.Start, say.End, say.StartUTS, say.EndUTS, say.StartKRS, say.EndKRS, say.StartUAS, say.EndUAS  
                                               FROM db_academic.semester_antara sa
                                               LEFT JOIN db_academic.sa_academic_years say ON (say.SASemesterID = sa.ID) 
                                               WHERE sa.Status = "1" ')->result_array();
