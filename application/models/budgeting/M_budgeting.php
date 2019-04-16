@@ -907,7 +907,11 @@ class M_budgeting extends CI_Model {
             }
         }
 
+
         $arr_Department_ac = $arr_Department_split['Academic'];
+        // print_r($query);
+        // print_r($arr_Department_ac);
+
         $arr_unit_ac_val = array();
         for ($i=0; $i < count($arr_Department_ac); $i++) { 
             $Code = $arr_Department_ac[$i]['Code'];
@@ -930,10 +934,9 @@ class M_budgeting extends CI_Model {
                             'SubTotal' => $SubTotal,
                         );
                     }
-                    
                     $bool = false;
                 }
-                break;
+                //break;
             }
 
             if ($bool) {
@@ -942,7 +945,6 @@ class M_budgeting extends CI_Model {
                     'SubTotal' => 0,
                 );
             }
-
 
         }
 
@@ -971,7 +973,7 @@ class M_budgeting extends CI_Model {
                     }
                     $bool = false;
                 }
-                break;
+                //break;
             }
 
             if ($bool) {

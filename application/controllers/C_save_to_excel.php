@@ -3785,30 +3785,35 @@ class C_save_to_excel extends CI_Controller
                         'NO' => 'A',
                         'PosAnggaran' => 'PENERIMAAN',
                         'dt' => array(),
+                        'bold' => 1,
                     ),
                     array(
                         'NO' => '1',
                         'PosAnggaran' => 'Existing',
                         'dt' => array(),
+                        'bold' => 0,
                     ),
                     array(
                         'NO' => '2',
                         'PosAnggaran' => 'Forecast ',
                         'dt' => array(),
+                        'bold' => 0,
                     ),
                     array(
                         'NO' => '3',
                         'PosAnggaran' => 'Beasiswa & Formulir',
                         'dt' => array(),
+                        'bold' => 0,
                     ),
                 );
 
                 $n = 4;
-                for ($i=0; $i < count($arr_isian); $i++) { 
+                for ($i=0; $i < count($arr_isian); $i++) {
+                    $style = ($arr_isian[$i]['bold'] == 0) ?  $style_row : $style_col;
                     $excel->setActiveSheetIndex(0)->setCellValue('A'.$n, $arr_isian[$i]['NO']);
-                    $excel->getActiveSheet()->getStyle('A'.$n)->applyFromArray($style_row);
+                    $excel->getActiveSheet()->getStyle('A'.$n)->applyFromArray($style);
                     $excel->setActiveSheetIndex(0)->setCellValue('B'.$n, $arr_isian[$i]['PosAnggaran']);
-                    $excel->getActiveSheet()->getStyle('B'.$n)->applyFromArray($style_row);
+                    $excel->getActiveSheet()->getStyle('B'.$n)->applyFromArray($style);
                     // loop isian, isi dengan value = ''
                     for ($j=2; $j <= $st ; $j++) { 
                         $huruf_ = $this->m_master->HurufColExcelNumber($j);
@@ -3831,9 +3836,9 @@ class C_save_to_excel extends CI_Controller
         // Make isian         
                 $n++;
             $excel->setActiveSheetIndex(0)->setCellValue('A'.$n, 'B');
-            $excel->getActiveSheet()->getStyle('A'.$n)->applyFromArray($style_row);
+            $excel->getActiveSheet()->getStyle('A'.$n)->applyFromArray($style_col);
             $excel->setActiveSheetIndex(0)->setCellValue('B'.$n, 'PENGELUARAN');
-            $excel->getActiveSheet()->getStyle('B'.$n)->applyFromArray($style_row);
+            $excel->getActiveSheet()->getStyle('B'.$n)->applyFromArray($style_col);
                 for ($j=2; $j <= $st ; $j++) { 
                     $huruf_ = $this->m_master->HurufColExcelNumber($j);
                     $excel->setActiveSheetIndex(0)->setCellValue($huruf_.$n, '');
@@ -3842,11 +3847,18 @@ class C_save_to_excel extends CI_Controller
 
             // isian
                 $n++;
+                $ALL_TotBudget_vertical_month = array();
+                $ALL_TotBudget_vertical_unit = array();
+                $ALL_TotBudget_vertical_ac = array();
+                $ALL_TotBudget_vertical_ac_tot= 0;
+                $ALL_TotBudget_vertical_anggaran= 0;
+                $ALL_PostName = [];
                 for ($i=0; $i < count($dt); $i++) { 
                     $PostName = $dt[$i]['PostName'];
+                    $ALL_PostName[] = $PostName;
                     $excel->setActiveSheetIndex(0)->setCellValue('A'.$n, $PostName);
                     $excel->getActiveSheet()->mergeCells('A'.$n.':'.'B'.$n);
-                    $excel->getActiveSheet()->getStyle('A'.$n.':'.'B'.$n)->applyFromArray($style_row);
+                    $excel->getActiveSheet()->getStyle('A'.$n.':'.'B'.$n)->applyFromArray($style_col);
                     for ($j=2; $j <= $st ; $j++) { 
                         $huruf_ = $this->m_master->HurufColExcelNumber($j);
                         $excel->setActiveSheetIndex(0)->setCellValue($huruf_.$n, '');
@@ -3856,6 +3868,11 @@ class C_save_to_excel extends CI_Controller
                     // Head Account
                         $n++;
                         $arr_head_account = $dt[$i]['HeadAccount'];
+                        $TotBudget_vertical_month = array();
+                        $TotBudget_vertical_unit = array();
+                        $TotBudget_vertical_ac = array();
+                        $TotBudget_vertical_ac_tot= 0;
+                        $TotBudget_vertical_anggaran= 0;
                         for ($j=0; $j <count($arr_head_account) ; $j++) { 
                             $excel->setActiveSheetIndex(0)->setCellValue('A'.$n, ($j+1));
                             $excel->getActiveSheet()->getStyle('A'.$n)->applyFromArray($style_row);
@@ -3872,7 +3889,11 @@ class C_save_to_excel extends CI_Controller
                                 $arr_code_ha[] = $arr_head_account[$j]['CodeHeadAccount']; 
                             }
 
+                            // if (count($Merger) == 0) {
+                            //     continue;
+                            // }
                             $G_dt = $this->m_budgeting->SearchDt_perHeadAccount($arr_code_ha,$arr_bulan,$arr_Department_split);
+                            // die();
                             
                             // Loop Month
                              $arr_month_val = $G_dt['arr_month_val'];
@@ -3880,9 +3901,17 @@ class C_save_to_excel extends CI_Controller
                              for ($k=0; $k < count($arr_month_val); $k++) { 
                                  // Budget
                                      $huruf = $this->m_master->HurufColExcelNumber($col_);
-                                     $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, $arr_month_val[$k]['value']);
+                                     $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $arr_month_val[$k]['value']);
                                      $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
                                      $col_++;
+                                     // TotBudget_vertical_month
+                                     if (array_key_exists($k, $TotBudget_vertical_month)) {
+                                         $TotBudget_vertical_month[$k] = $TotBudget_vertical_month[$k] + $arr_month_val[$k]['value'];
+                                     }
+                                     else
+                                     {
+                                        $TotBudget_vertical_month[] = $arr_month_val[$k]['value'];
+                                     }
                                  // Realisasi 
                                      $huruf = $this->m_master->HurufColExcelNumber($col_);
                                      $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
@@ -3907,53 +3936,238 @@ class C_save_to_excel extends CI_Controller
                                 $TotalProdi = 0;
                                 for ($k=0; $k < count($arr_unit_ac_val); $k++) { 
                                    $huruf = $this->m_master->HurufColExcelNumber($col_);
-                                   $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, $arr_unit_ac_val[$k]['SubTotal']);
+                                   $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $arr_unit_ac_val[$k]['SubTotal']);
                                    $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
                                    $col_++;
                                    $TotalProdi = $TotalProdi +  $arr_unit_ac_val[$k]['SubTotal'];
+                                   // TotBudget_vertical_ac
+                                   if (array_key_exists($k, $TotBudget_vertical_ac)) {
+                                       $TotBudget_vertical_ac[$k] = $TotBudget_vertical_ac[$k] + $arr_unit_ac_val[$k]['SubTotal'];
+                                   }
+                                   else
+                                   {
+                                      $TotBudget_vertical_ac[] = $arr_unit_ac_val[$k]['SubTotal'];
+                                   }
                                 }
-
-                                // add sisa
-                                // for ($k=0; $k < count($arr_Department_ac) - count($arr_unit_ac_val); $k++) { 
-                                //     $huruf = $this->m_master->HurufColExcelNumber($col_);
-                                //     $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
-                                //     $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
-                                //     $col_++;
-                                // }
 
                                 // Total Prodi
                                     $huruf = $this->m_master->HurufColExcelNumber($col_);
-                                    $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, $TotalProdi);
+                                    $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $TotalProdi);
                                     $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
                                     $col_++;
+                                    //TotBudget_vertical_ac_tot
+                                    $TotBudget_vertical_ac_tot = $TotBudget_vertical_ac_tot + $TotalProdi;
 
                                 $arr_unit_nac_val = $G_dt['arr_unit_nac_val'];
                                 for ($k=0; $k < count($arr_unit_nac_val); $k++) { 
                                       $huruf = $this->m_master->HurufColExcelNumber($col_);
-                                      $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, $arr_unit_nac_val[$k]['SubTotal']);
+                                      $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $arr_unit_nac_val[$k]['SubTotal']);
                                       $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
                                       $col_++;
+                                      // TotBudget_vertical_unit
+                                      if (array_key_exists($k, $TotBudget_vertical_unit)) {
+                                          $TotBudget_vertical_unit[$k] = $TotBudget_vertical_unit[$k] + $arr_unit_nac_val[$k]['SubTotal'];
+                                      }
+                                      else
+                                      {
+                                         $TotBudget_vertical_unit[] = $arr_unit_nac_val[$k]['SubTotal'];
+                                      }
                                 }
-
-                                // add sisa
-                                // for ($k=0; $k < count($arr_Department_nac) - count($arr_unit_nac_val); $k++) { 
-                                //     $huruf = $this->m_master->HurufColExcelNumber($col_);
-                                //     $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
-                                //     $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
-                                //     $col_++;
-                                // }
 
                                 // total anggaran
                                     $huruf = $this->m_master->HurufColExcelNumber($col_);
-                                    $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, $arr_head_account[$j]['total'] / 1000);
+                                    $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $arr_head_account[$j]['total'] / 1000);
                                     $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
+                                    $TotBudget_vertical_anggaran = $TotBudget_vertical_anggaran + ($arr_head_account[$j]['total'] / 1000);
 
                             $n++;          
 
                         }
 
-                    // $n++;    
-                }         
+                        //Total
+                           $excel->setActiveSheetIndex(0)->setCellValue('A'.$n, '');
+                           $excel->getActiveSheet()->getStyle('A'.$n)->applyFromArray($style_row);
+                           $excel->setActiveSheetIndex(0)->setCellValue('B'.$n, 'Total');
+                           $excel->getActiveSheet()->getStyle('B'.$n)->applyFromArray($style_row);
+                           $col__ = 2;
+                           for ($k=0; $k < count($TotBudget_vertical_month); $k++) {
+                              // Budget 
+                                $huruf = $this->m_master->HurufColExcelNumber($col__);
+                                $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $TotBudget_vertical_month[$k]);
+                                $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
+                                $col__++;
+
+                                if (array_key_exists($k, $ALL_TotBudget_vertical_month)) {
+                                    $ALL_TotBudget_vertical_month[$k] = $ALL_TotBudget_vertical_month[$k] + $TotBudget_vertical_month[$k];
+                                }
+                                else
+                                {
+                                   $ALL_TotBudget_vertical_month[] = $TotBudget_vertical_month[$k];
+                                }
+
+                                 // Realisasi 
+                                     $huruf = $this->m_master->HurufColExcelNumber($col__);
+                                     $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
+                                     $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
+                                     $col__++; 
+
+                                // Variance 
+                                    $huruf = $this->m_master->HurufColExcelNumber($col__);
+                                    $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
+                                    $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
+                                    $col__++; 
+                           }
+
+                           // Total Realisasi 
+                               $huruf = $this->m_master->HurufColExcelNumber($col__);
+                               $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
+                               $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
+                               $col__++;
+
+                               for ($k=0; $k < count($TotBudget_vertical_ac); $k++) { 
+                                  $huruf = $this->m_master->HurufColExcelNumber($col__);
+                                  $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $TotBudget_vertical_ac[$k]);
+                                  $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
+                                  $col__++;
+
+                                  if (array_key_exists($k, $ALL_TotBudget_vertical_ac)) {
+                                      $ALL_TotBudget_vertical_ac[$k] = $ALL_TotBudget_vertical_ac[$k] + $TotBudget_vertical_ac[$k];
+                                  }
+                                  else
+                                  {
+                                     $ALL_TotBudget_vertical_ac[] = $TotBudget_vertical_ac[$k];
+                                  }
+                               }
+
+                               $huruf = $this->m_master->HurufColExcelNumber($col__);
+                               $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $TotBudget_vertical_ac_tot);
+                               $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
+                               $col__++;
+                               $ALL_TotBudget_vertical_ac_tot = $ALL_TotBudget_vertical_ac_tot + $TotBudget_vertical_ac_tot;
+
+                               for ($k=0; $k < count($TotBudget_vertical_unit); $k++) { 
+                                  $huruf = $this->m_master->HurufColExcelNumber($col__);
+                                  $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $TotBudget_vertical_unit[$k]);
+                                  $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
+                                  $col__++;
+
+                                  if (array_key_exists($k, $ALL_TotBudget_vertical_unit)) {
+                                      $ALL_TotBudget_vertical_unit[$k] = $ALL_TotBudget_vertical_unit[$k] + $TotBudget_vertical_unit[$k];
+                                  }
+                                  else
+                                  {
+                                     $ALL_TotBudget_vertical_unit[] = $TotBudget_vertical_unit[$k];
+                                  }
+                               }
+
+                               // total anggaran
+                                   $huruf = $this->m_master->HurufColExcelNumber($col__);
+                                   $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $TotBudget_vertical_anggaran);
+                                   $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
+
+                                   $ALL_TotBudget_vertical_anggaran = $ALL_TotBudget_vertical_anggaran + $TotBudget_vertical_anggaran;
+                        $n++;            
+                        // Total Budget Category
+                            $col__ = 0;
+                            $huruf = $this->m_master->HurufColExcelNumber($col__);
+                            for ($k=0; $k < count($arr_month_val); $k++) { // untuk last merge
+                                $col__ = $col__ + 3;
+                            }
+                            $col__++;
+                            $hurufMerge = $this->m_master->HurufColExcelNumber($col__);
+                            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, 'Total '.$PostName);           
+                            $excel->getActiveSheet()->mergeCells($huruf.$n.':'.$hurufMerge.$n);
+                            $excel->getActiveSheet()->getStyle($huruf.$n.':'.$hurufMerge.$n)->applyFromArray($style_col);
+
+                            // Total Realisasi
+                                $col__++; 
+                                $huruf = $this->m_master->HurufColExcelNumber($col__);
+                                $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
+                                $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
+                                $col__++;
+
+                                $huruf = $this->m_master->HurufColExcelNumber($col__); 
+                                for ($k=0; $k < count($arr_unit_ac_val); $k++) {
+                                    $col__++;
+                                }
+                                $col__++;
+
+                                for ($k=0; $k < count($arr_unit_nac_val) - 1; $k++) { 
+                                    $col__++;
+                                }
+                                $hurufMerge = $this->m_master->HurufColExcelNumber($col__);
+                                $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n,'');           
+                                $excel->getActiveSheet()->mergeCells($huruf.$n.':'.$hurufMerge.$n);
+                                $excel->getActiveSheet()->getStyle($huruf.$n.':'.$hurufMerge.$n)->applyFromArray($style_col);
+
+                                $col__++;
+                                $huruf = $this->m_master->HurufColExcelNumber($col__);
+                                $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $TotBudget_vertical_anggaran);
+                                $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_col);
+
+                    $n++;
+                                
+                }
+
+                // ALL TOTAL
+                $n++;
+                    $excel->setActiveSheetIndex(0)->setCellValue('A'.$n, 'Total '.implode(',', $ALL_PostName));
+                    $excel->getActiveSheet()->mergeCells('A'.$n.':'.'B'.$n);
+                    $excel->getActiveSheet()->getStyle('A'.$n.':'.'B'.$n)->applyFromArray($style_col);
+                    $col__ = 2;
+                    for ($k=0; $k < count($ALL_TotBudget_vertical_month); $k++) {
+                       // Budget 
+                         $huruf = $this->m_master->HurufColExcelNumber($col__);
+                         $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $ALL_TotBudget_vertical_month[$k]);
+                         $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_col);
+                         $col__++;
+
+                          // Realisasi 
+                              $huruf = $this->m_master->HurufColExcelNumber($col__);
+                              $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
+                              $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_col);
+                              $col__++; 
+
+                         // Variance 
+                             $huruf = $this->m_master->HurufColExcelNumber($col__);
+                             $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
+                             $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_col);
+                             $col__++; 
+                    }
+
+                    // Total Realisasi 
+                        $huruf = $this->m_master->HurufColExcelNumber($col__);
+                        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
+                        $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_col);
+                        $col__++;
+
+                        for ($k=0; $k < count($ALL_TotBudget_vertical_ac); $k++) { 
+                           $huruf = $this->m_master->HurufColExcelNumber($col__);
+                           $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $ALL_TotBudget_vertical_ac[$k]);
+                           $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_col);
+                           $col__++;
+
+                        }
+
+                        $huruf = $this->m_master->HurufColExcelNumber($col__);
+                        $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $ALL_TotBudget_vertical_ac_tot);
+                        $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_col);
+                        $col__++;
+
+                        for ($k=0; $k < count($ALL_TotBudget_vertical_unit); $k++) { 
+                           $huruf = $this->m_master->HurufColExcelNumber($col__);
+                           $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $ALL_TotBudget_vertical_unit[$k]);
+                           $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_col);
+                           $col__++;
+
+                        }
+
+                        // total anggaran
+                            $huruf = $this->m_master->HurufColExcelNumber($col__);
+                            $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $ALL_TotBudget_vertical_anggaran);
+                            $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_col);
+
+
                                     
         
 
