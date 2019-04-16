@@ -136,9 +136,9 @@
                         var token = jwt_encode({action : 'getLastdiversion', IDDivision : ''+response[i]['ID']+'' },'UAP)(*');
 
                         $.post(url,{token:token},function (jsonResult) {
-                            $('#filtereditgroupmodule').append('<option disabled selected></option>');
+                            //$('#filtereditgroupmodule').append('<option value="'+response[i]['NameGroup']+'" disabled selected> '+response[i]['NameGroup']+' </option>');
                             for(var i=0;i<jsonResult.length;i++){
-                                    $('#filtereditgroupmodule').append('<option id="'+jsonResult[i].NameGroup+'"> '+jsonResult[i].NameGroup+' </option>');
+                                    $('#filtereditgroupmodule').append('<option id="'+jsonResult[i].IDGroup+'"> '+jsonResult[i].NameGroup+' </option>');
                             }
                         });
 
@@ -149,15 +149,15 @@
                                  '<tr>' +
                                 '   <td style="width: 25%;">Name Division</td>' +
                                 '   <td><input class="form-control" id="editidgroupmodule" value="'+response[i]['Division']+'" disabled></td>' +
-                                '  <td><input type="hidden" class="form-control" id="IDGroupedit" value="'+response[i]['IDGroup']+'"></td>' +
+                                '  <td><input type="hidden" class="form-control" id="IDModuledit" value="'+response[i]['IDModule']+'"></td>' +
                                 '</tr>' +
                                 '<tr>' +
                                 '   <td style="width: 25%;">Name Group Module</td>' +
-                                '   <td><select class="form-control filtergroupmodule" id="filtereditgroupmodule"> </select></td>' +
+                                '   <td><select class="form-control filtergroupmodule" id="filtereditgroupmodule"><option id="'+response[i]['IDGroup']+'" disabled selected> '+response[i]['NameGroup']+' </option> </select></td>' +
                                 '</tr>' +
                                 '<tr>' +
                                 '   <td style="width: 25%;">Name Module</td>' +
-                                '   <td> <select class="form-control" id="filtereditgroupname"><option id="'+response[i]['IDModule']+'" disabled> '+response[i]['NameModule']+' </option></select></td>' +
+                                '   <td> <select class="form-control" id="filtereditgroupname"><option id="'+response[i]['IDModule']+'" disabled selected> '+response[i]['NameModule']+' </option></select></td>' +
                                 '</tr>' +
                                 '<tr>' +  
                                 '   <td style="width: 25%;">Description</td>' +

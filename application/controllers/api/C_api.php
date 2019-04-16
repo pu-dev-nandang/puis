@@ -803,6 +803,16 @@ class C_api extends CI_Controller {
         echo json_encode($generate);
     }
 
+    public function getstatusversion2()
+    {
+        $generate = $this->db->query('SELECT DISTINCT a.IDDivision, b.Division
+                FROM db_it.group_module AS a
+                LEFT JOIN db_employees.division AS b ON (a.IDDivision = b.ID)
+                WHERE b.Division IS NOT NULL
+                ORDER BY a.IDDivision ASC ')->result_array();
+        echo json_encode($generate);
+    }
+
     public function getstatusmodule()
     {
         $generate = $this->db->query('SELECT IDModule, NameModule FROM db_it.module ORDER BY NameModule ASC ')->result_array();
@@ -849,13 +859,14 @@ class C_api extends CI_Controller {
             $dataCek = $this->m_api->deletelistversion($versionid);
             return print_r(1);
 
-        } else if($data_arr['action']=='deletegroupmod'){
+        } 
+        else if($data_arr['action']=='deletegroupmod'){
             $versionid = $data_arr['versionid'];
             $value = "0";
 
             $this->db->set('Active', $value);   
-            $this->db->where('IDGroup', $versionid);  
-            $this->db->update('db_it.group_module');  
+            $this->db->where('IDModule', $versionid);  
+            $this->db->update('db_it.module');  
             return print_r(1);
         }
     }
@@ -2225,13 +2236,13 @@ class C_api extends CI_Controller {
         $totalData = $this->db->query('SELECT X.IDGroup, X.NameGroup, Y.IDModule, Y.NameModule, Z.ID, Z.Division, Z.ID, Y.Description
         FROM db_it.group_module AS X
         LEFT JOIN db_employees.division Z ON (X.IDDivision = Z.ID)
-        LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup) WHERE X.Active = 1 ')->result_array();
+        LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup) WHERE Y.Active = 1 ')->result_array();
 
         if( !empty($requestData['search']['value']) ) {
             $sql = 'SELECT X.IDGroup, X.NameGroup, Y.IDModule, Y.NameModule, Z.ID, Z.Division, Z.ID, Y.Description
                     FROM db_it.group_module AS X
                     LEFT JOIN db_employees.division Z ON (X.IDDivision = Z.ID)
-                    LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup) WHERE X.Active = 1';
+                    LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup) WHERE Y.Active = 1';
             $sql.= ' AND X.NameGroup LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR Z.Division LIKE "%'.$requestData['search']['value'].'%" ';
             $sql.= ' OR dd.NameModule LIKE "'.$requestData['search']['value'].'%" ';
@@ -2242,7 +2253,7 @@ class C_api extends CI_Controller {
             $sql = 'SELECT X.IDGroup, X.NameGroup, Y.IDModule, Y.NameModule, Z.ID, Z.Division, Z.ID, Y.Description
                     FROM db_it.group_module AS X
                     LEFT JOIN db_employees.division Z ON (X.IDDivision = Z.ID)
-                    LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup) WHERE X.Active = 1 ';
+                    LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup) WHERE Y.Active = 1 ';
             $sql.= 'ORDER BY X.IDGroup DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
         }
         
@@ -2262,7 +2273,7 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div style="text-align: center;">'.$row["NameGroup"].'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$row["NameModule"].'</div>';
             $nestedData[] = '<div style="text-align: left;">'.$row["Description"].'</div>';
-            $nestedData[] = '<div style="text-align: center;"><button type="button" class="btn btn-sm btn-primary btn-circle btnviewgroupmodule" versionid="'.$row["IDGroup"].'" data-toggle="tooltip" data-placement="top" title="Details"><i class="glyphicon glyphicon-th-list"></i></button> <button class="btn btn-sm btn-circle btn-danger btndeletegroup" data-toggle="tooltip" versionid="'.$row["IDGroup"].'" data-placement="top" title="Delete"><i class="fa fa-trash"></i> </button> <button class="btn btn-sm btn-success btn-circle btneditgroupmodule" data-toggle="tooltip" groupid="'.$row["IDGroup"].'" data-placement="top" title="Edit"><i class="fa fa-edit"></i></button> </div>';
+            $nestedData[] = '<div style="text-align: center;"><button type="button" class="btn btn-sm btn-primary btn-circle btnviewgroupmodule" versionid="'.$row["IDGroup"].'" data-toggle="tooltip" data-placement="top" title="Details"><i class="glyphicon glyphicon-th-list"></i></button> <button class="btn btn-sm btn-circle btn-danger btndeletegroup" data-toggle="tooltip" versionid="'.$row["IDModule"].'" data-placement="top" title="Delete"><i class="fa fa-trash"></i> </button> <button class="btn btn-sm btn-success btn-circle btneditgroupmodule" data-toggle="tooltip" groupid="'.$row["IDGroup"].'" data-placement="top" title="Edit"><i class="fa fa-edit"></i></button> </div>';
             $no++;
             $data[] = $nestedData;
         }
@@ -2300,7 +2311,7 @@ class C_api extends CI_Controller {
         else if($data_arr['action']=='getedit') {
 
             $idversion = $this->input->get('s');
-            $details = $this->db->query('SELECT aa.IDVersion, aa.Version, dd.Division, dd.NameModule, bb.Description, aa.UpdateAt, cc.Name AS NamePIC, cc.NIP, dd.IDDivision
+            $details = $this->db->query('SELECT aa.IDVersion, aa.Version, dd.Division, dd.IDGroup, dd.Namegroup, dd.NameModule, bb.Description, aa.UpdateAt, cc.Name AS NamePIC, cc.NIP, dd.IDDivision
                     FROM db_it.version AS aa
                     INNER JOIN db_it.version_detail AS bb ON (aa.IDVersion = bb.IDVersion)
                     LEFT JOIN db_employees.employees AS cc ON (aa.PIC = cc.NIP)
@@ -5550,25 +5561,45 @@ class C_api extends CI_Controller {
 
                 $Namegroup = strtoupper($formInsert['Namegroup']);
                 $division = $formInsert['division'];
-                $Namemodule = strtoupper($formInsert['Namemodule']);
-                $Description = $formInsert['Descriptiongroup'];
-                //$getgroupmodule = $this->db->get_where('db_it.group_module',array('NameGroup'=>$Namegroup, 'IDDivision'=>$division))->result_array();
-                $dataSave1 = array(
+
+                $getgroupmodule = $this->db->get_where('db_it.group_module',array('NameGroup'=>$Namegroup, 'IDDivision'=>$division))->result_array();
+
+                if(count($getgroupmodule)>0){
+                    return print_r(0);
+                } else {
+                    $dataSave1 = array(
                         'NameGroup' => $Namegroup,
                         'IDDivision' => $division
-                );
-                $this->db->insert('db_it.group_module',$dataSave1);
-                $insert_id_logging = $this->db->insert_id();
-
-                $dataSave2 = array(
-                        'IDGroup' => $insert_id_logging,
-                        'NameModule' => $Namemodule,
-                        'Description' => $Description
-                );
-                $this->db->insert('db_it.module',$dataSave2);
-                return print_r(1);
+                    );
+                    $this->db->insert('db_it.group_module',$dataSave1);
+                    return print_r(1);
+                }
 
             }
+
+            else if($data_arr['action']=='AddModule') {
+
+                $formInsert = (array) $data_arr['formInsert'];
+
+                $IDGroups = $formInsert['IDGroups'];
+                $Namemodule = strtoupper($formInsert['Namemodule']);
+                $Description = $formInsert['Descriptiongroup'];
+
+                $getdatamodules = $this->db->get_where('db_it.module',array('NameModule'=>$Namemodule))->result_array();
+                if(count($getdatamodules)>0){
+                    return print_r(0);
+                }
+                else {
+                    $dataSave1 = array(
+                            'NameModule' => $Namemodule,
+                            'IDGroup' => $IDGroups,
+                            'Description' => $Description
+                    );
+                    $this->db->insert('db_it.module',$dataSave1);
+                    return print_r(1);
+                }
+            }
+
             else if($data_arr['action']=='AddVersion') {
 
                 $formInsert = (array) $data_arr['formInsert'];
@@ -5623,7 +5654,25 @@ class C_api extends CI_Controller {
                 $this->db->where('IDVersion', $VersionID);
                 $this->db->update('db_it.version_detail',$dataSave2);
                 return print_r(1);
-            
+            }
+            else if($data_arr['action']=='EditGroupModule') {
+
+                $formInsert = (array) $data_arr['formInsert'];
+
+                $idnamegroup = $formInsert['idnameegroup'];
+                $idmodule = $formInsert['idmodule'];  
+                $IDGroupedit = $formInsert['IDGroupedit'];
+                $Description = $formInsert['Descriptiongroup'];
+
+                $dataUpdate = array(
+                    'IDGroup' => $idnamegroup,
+                    'NameModule' => $idmodule,
+                    'Description' => $Description
+                    
+                );
+                $this->db->where('IDModule', $IDGroupedit);
+                $this->db->update('db_it.module', $dataUpdate);
+                return print_r(1);
             }
     }
 
@@ -8739,7 +8788,16 @@ class C_api extends CI_Controller {
                 $filterDivisi = $data_arr['filterDivisi'];
 
                 //$data = $this->db->get_where('db_it.group_module',array('IDDivision' => $data_arr['filterDivisi']))->result_array();
-                $data = $this->db->query('SELECT DISTINCT NameGroup, IDGroup FROM db_it.group_module WHERE IDDivision = "'.$data_arr['filterDivisi'].'" ORDER BY IDDivision ASC ')->result_array();
+                $data = $this->db->query('SELECT DISTINCT NameGroup FROM db_it.group_module WHERE IDDivision = "'.$data_arr['filterDivisi'].'" ORDER BY IDDivision ASC ')->result_array();
+
+                return print_r(json_encode($data));
+            } 
+            else if($data_arr['action']=='getLastmodule'){
+
+                $filterDivisi = $data_arr['filterDivisi'];
+
+                //$data = $this->db->get_where('db_it.group_module',array('IDDivision' => $data_arr['filterDivisi']))->result_array();
+                $data = $this->db->query('SELECT NameGroup, IDGroup FROM db_it.group_module WHERE IDDivision = "'.$data_arr['filterDivisi'].'" ORDER BY IDDivision ASC ')->result_array();
 
                 return print_r(json_encode($data));
             }
@@ -8768,7 +8826,7 @@ class C_api extends CI_Controller {
             if($data_arr['action']=='getLastdiversion'){
                 $filterGroups = $data_arr['IDDivision'];
 
-                $data = $this->db->query('SELECT DISTINCT a.NameGroup
+                $data = $this->db->query('SELECT DISTINCT a.NameGroup, b.IDGroup
                 FROM db_it.group_module AS a
                 LEFT JOIN db_it.module AS b ON (a.IDGroup = b.IDGroup)
                 WHERE a.IDDivision = "'.$data_arr['IDDivision'].'" ')->result_array();
@@ -8786,7 +8844,7 @@ class C_api extends CI_Controller {
                 $data = $this->db->query('SELECT b.IDModule, b.NameModule
                                         FROM db_it.group_module AS a
                                         LEFT JOIN db_it.module AS b ON (a.IDGroup = b.IDGroup)
-                                        WHERE a.NameGroup = "'.$data_arr['filtereditgroup'].'" ')->result_array();
+                                        WHERE a.IDGroup = "'.$data_arr['filtereditgroup'].'" ')->result_array();
                 return print_r(json_encode($data));
             }
         }

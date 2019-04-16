@@ -6,6 +6,9 @@
             <?php $activeMenu = $this->uri->segment(1); ?>
             <ul class="nav nav-tabs">
                 <li class="<?php if($activeMenu=='requestdocument') { echo 'active';} ?>"><a href="<?php echo base_url('requestdocument'); ?>"><i class="fa fa-th-list right-margin" aria-hidden="true"></i> Lecturers</a></li>
+                <li class="<?php if($this->uri->segment(2)=='settingsigndigital') { echo 'active'; } ?>">
+                    <a href="<?php echo base_url('requestsetting/settingsigndigital'); ?>">Setting Sign Digital</a>
+                </li>
 
                 
             </ul>

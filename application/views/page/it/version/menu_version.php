@@ -37,10 +37,9 @@
 
 <div class="col-md-12" style="margin-bottom: 15px;">
     <div class="btn-group">
-          <button type="button" class="btn btn-primary btn-round btn-action" data-action="addGroupModule"> <i class="fa fa-plus-circle"></i>New Group Module</button>
-          <button type="button" class="btn btn-success btn-round btn-addgroup"> <i class="fa fa-plus-circle"></i> Add Group Module</button>
+          <button type="button" class="btn btn-primary btn-round btn-action" data-action="addGroupModule"> <i class="fa fa-plus-circle"></i>Add Group</button>
+          <button type="button" class="btn btn-success btn-round btn-addgroup"> <i class="fa fa-plus-circle"></i> Add Module</button>
     </div>
-        <!-- <span class="btn btn-primary btn-round btn-action" data-action="addGroupModule"><i class="fa fa-plus-circle"></i> Group Module</span>  -->
 </div>
 
 <div class="col-md-12">
@@ -96,9 +95,10 @@
 
 <script>
      $(document).on('click','.btndeletegroup',function () {
-        if (window.confirm('Are you sure to delete group data ?')) {
+        if (window.confirm('Are you sure to delete module data ?')) {
             
             var versionid = $(this).attr('versionid');
+            alert(versionid);
             var data = {
                 action : 'deletegroupmod',
                 versionid : versionid
@@ -107,7 +107,7 @@
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+"api/__deleteversion";
             $.post(url,{token:token},function (result) {
-                toastr.success('Success Delete Group Module Data!','Success'); 
+                toastr.success('Success Delete Module Data!','Success'); 
                 setTimeout(function () {
                     window.location.href = '';
                 },1000);
@@ -145,41 +145,37 @@
 
     function saveeditgroupmodule() {
         
-        var GroupID = $(this).attr('dataidgroup');
-        var idnamemodule = $('#filtereditgroupname option:selected').attr('id');
-        var namemodule = $('#filtereditgroupname').val();
+        var idnameegroup = $('#filtereditgroupmodule option:selected').attr('id');
+        var idmodule = $('#filtereditgroupname option:selected').attr('id');
+        var idmodule = $('#filtereditgroupname').val();
         var Descriptiongroup = $('#editdescriptiongroup').val();
-        var IDGroupedit = $('#IDGroupedit').val();
-
-        alert(idgroupname);
-        alert(groupname);
-        alert(Descriptiongroup);
-        alert(IDGroupedit);
+        var IDGroupedit = $('#IDModuledit').val();
         
-        if(selectmodule!=null && selectmodule!=''
-            && selectpic!='' && selectpic!=null
-            && VersionID!='' && VersionID!=null
-            && Descriptionversion!='' && Descriptionversion!=null)
+        if(idnameegroup!=null && idnameegroup!=''
+            && idmodule!='' && idmodule!=null
+            && Descriptiongroup!='' && Descriptiongroup!=null
+            && IDGroupedit!='' && IDGroupedit!=null
+            )
         { 
     
             var data = {
-                action : 'EditVersion',
+                action : 'EditGroupModule',
                 formInsert : {
-                    selectmodule : selectmodule,
-                    selectpic : selectpic,
-                    Descriptionversion : Descriptionversion,
-                    VersionID : VersionID
+                    idnameegroup : idnameegroup,
+                    idmodule : idmodule,
+                    Descriptiongroup : Descriptiongroup,
+                    IDGroupedit : IDGroupedit
                 }
             };
 
             var token = jwt_encode(data,'UAP)(*');
-            //var url = base_url_js+'api/__crudGroupModule';
+            var url = base_url_js+'api/__crudGroupModule';
             $.post(url,{token:token},function (result) {
                     
                 if(result==0 || result=='0'){
             
                 } else { 
-                    toastr.success('Edit Version Saved','Success');
+                    toastr.success('Edit Group Module Saved','Success');
                     setTimeout(function () {
                     $('#GlobalModal').modal('hide');
                         window.location.href = '';
@@ -248,7 +244,7 @@
 </script>
 
 <script>
-    // New save Group module
+    // Add save Group
     $(document).on('click','.btnSaveGroup',function () {
         savegroupmodule();
     });
@@ -257,22 +253,16 @@
 
         var selectdivision = $('.filterStatusDivision option:selected').attr('id');
         var Namegroup = $('#Namegroup').val();
-        var Namemodule = $('#Namemodule').val();
-        var Descriptiongroup = $('#Descriptiongroup').val();
         
         if(selectdivision!=null && selectdivision!=''
-                    && Namegroup!='' && Namegroup!=null
-                    && Namemodule!='' && Namemodule!=null
-                    && Descriptiongroup!='' && Descriptiongroup!=null)
+                    && Namegroup!='' && Namegroup!=null)
         { 
         
             var data = {
                 action : 'AddGroupModule',
                 formInsert : {
                     division : selectdivision,
-                    Namegroup : Namegroup,
-                    Namemodule : Namemodule,
-                    Descriptiongroup : Descriptiongroup
+                    Namegroup : Namegroup
                 }
             };
 
@@ -281,7 +271,7 @@
             $.post(url,{token:token},function (result) {
                     
                 if(result==0 || result=='0'){
-                    //toastr.error('Name division or module already is exist!','Error');
+                    toastr.error('Name Division or Name Group already is exist!','Error');
                 } else {  
                     toastr.success('New Group Module Saved','Success');
                     setTimeout(function () {
@@ -300,30 +290,35 @@
 
      //-------------------------------------------------------
 
-    /// add save Group Module
+    /// add Module
     $(document).on('click','.btnaddSaveGroup',function () {
         saveaddgroupmodule();
     });
 
     function saveaddgroupmodule() {
 
-        var selectdivision = $('.filterStatusDivision option:selected').attr('id');
-        //var Namegroup = $('.filaddnamegroup option:selected').attr('id');
+        var selectdivision = $('.filterStatusDivision2 option:selected').attr('id');
+        var IDGroups = $('.filaddnamegroup option:selected').attr('id');
         var Namegroup = $('.filaddnamegroup').val();
         var Namemodule = $('#Namemodule').val();
         var Descriptiongroup = $('#Descriptiongroup').val();
-        
+        //alert(selectdivision);
+        ////alert(Namegroup);
+        //alert(Namemodule);
+        //alert(Descriptiongroup);
+
         if(selectdivision!=null && selectdivision!=''
+                && IDGroups!='' && IDGroups!=null
                 && Namegroup!='' && Namegroup!=null
                 && Namemodule!='' && Namemodule!=null
                 && Descriptiongroup!='' && Descriptiongroup!=null)
         { 
     
         var data = {
-            action : 'AddGroupModule',
+            action : 'AddModule',
             formInsert : {
                 division : selectdivision,
-                Namegroup : Namegroup,
+                IDGroups : IDGroups,
                 Namemodule : Namemodule,
                 Descriptiongroup : Descriptiongroup
             }
@@ -336,7 +331,7 @@
                 if(result==0 || result=='0'){
                     //toastr.error('Name division or module already is exist!','Error');
                 } else {  
-                    toastr.success('Add Group Module Saved','Success');
+                    toastr.success('Add Module Saved','Success');
                     setTimeout(function () {
                     $('#GlobalModal').modal('hide');
                         window.location.href = '';

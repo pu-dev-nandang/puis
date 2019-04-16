@@ -101,18 +101,6 @@
                     var no = 1;
                     for (var i = 0; i < response.length; i++) {
 
-                        var IDDivision = ''+response[i]['IDDivision']+'';
-
-                        var url = base_url_js+'api/__dropdowneditgroupmod';
-                        var token = jwt_encode({action : 'getLastdiversion', IDDivision : IDDivision},'UAP)(*');
-
-                        $.post(url,{token:token},function (jsonResult) {
-                            $('#filtereditgroup').append('<option disabled selected></option>');
-                            for(var i=0;i<jsonResult.length;i++){
-                                    $('#filtereditgroup').append('<option id="'+jsonResult[i].IDGroup+'"> '+jsonResult[i].NameGroup+' </option>');
-                            }
-                        });
-
                         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"> '+
 			        	    ' <span aria-hidden="true">&times;</span></button> '+
 			                 ' <h4 class="modal-title">Edit Version</h4>');
@@ -124,19 +112,19 @@
     			            '</tr>' +
     			            '<tr>' +
     			            '	<td style="width: 25%;">Name Division</td>' +
-    			            '	<td><input class="form-control" id="nameeditdivisiversion" value="'+response[i]['Division']+'" disabled></td>' +
+    			            '	<td> <select class="form-control filtereditdivisiversion" id="nameeditdivisiversion"> <option value="'+response[i]['ID']+'" disabled selected> '+response[i]['Division']+' </option></select></td>' +
     			            '</tr>' +
                             '<tr>' +
                             '   <td style="width: 25%;">Name Group Module</td>' +
-                            '   <td><select class="form-control filtergroupmodule" id="filtereditgroup"> </select></td>' +
+                            '   <td><select class="form-control filtergroupmodule" id="filtereditgroup"> <option value="'+response[i]['IDGroup']+'" disabled selected> '+response[i]['NameGroup']+' </option></select></td>' +
                             '</tr>' +
     			            '<tr>' +
     			            '	<td style="width: 25%;">Name Module</td>' +
-    			            '	<td> <select class="form-control" id="filtereditmodule"><option id="'+response[i]['IDModule']+'" disabled> '+response[i]['NameModule']+' </option></select></td>' +
+    			            '	<td> <select class="form-control" id="filtereditmodule"><option id="'+response[i]['IDModule']+'" disabled selected> '+response[i]['NameModule']+' </option></select></td>' +
     			            '</tr>' +
                             '</tr>' +
     			            '	<td style="width: 25%;">Name PIC</td>' +
-    			            '    <td> <select class="form-control" id="selectpicversion"><option id="'+response[i]['NIP']+'" disabled> '+response[i]['NamePIC']+' </option></select></td>' +
+    			            '    <td> <select class="form-control" id="selectpicversion"><option id="'+response[i]['NIP']+'" disabled selected> '+response[i]['NamePIC']+' </option></select></td>' +
     			            '</tr>' +
     			            '<tr>' +  //
     			            '	<td style="width: 25%;">Description</td>' +
@@ -153,6 +141,7 @@
 
                             loadSelectModule();
                             loadPicversion();
+                            loadfilterDivision2();
                             loadSelectOptionEmployeesSingle('#filternamepic','');
                             $('#filternamepic').select2({allowClear: true});
 
@@ -242,11 +231,11 @@
         var btnSave = (action=='addGroupModule') ? 'add' : 'edit';
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"> '+
             ' <span aria-hidden="true">&times;</span></button> '+
-            ' <h4 class="modal-title">Add Group Module</h4>');
+            ' <h4 class="modal-title">Add Module</h4>');
         $('#GlobalModal .modal-body').html('<table class="table">' +
             '<tr>' +
             '   <td style="width: 25%;">Name Division</td>' +
-            '   <td><select class="form-control filterStatusDivision" id="filaddivisi"><option id="" disabled> --- Select Name Division --- </option></select></td>' +
+            '   <td><select class="form-control filterStatusDivision2" id="filaddivisi"><option id="" disabled selected> --- Select Name Division --- </option></select></td>' +
             '</tr>' +
             '<tr>' +
             '   <td style="width: 25%;">Name Group</td>' +
@@ -261,7 +250,9 @@
             '   <td><textarea rows="3" cols="5" name="DescriptionFile" id="Descriptiongroup" class="form-control"></textarea></td>' +
             '</tr>' +
             '</table>');
-        loadSelectOptionDivision();
+
+        loadSelectOptionDivision2();
+
         $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-danger btn-round" data-dismiss="modal"><i class="fa fa-remove"></i> Close</button>' +
             '<button type="button" class="btn btn-success btn-round btnaddSaveGroup"><span class="glyphicon glyphicon-floppy-disk"></span>  Save</button>');
         $('#GlobalModal').modal({
@@ -278,7 +269,7 @@
         var btnSave = (action=='addGroupModule') ? 'add' : 'edit';
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"> '+
         	' <span aria-hidden="true">&times;</span></button> '+
-            ' <h4 class="modal-title">New Group Module</h4>');
+            ' <h4 class="modal-title">Add Group</h4>');
         $('#GlobalModal .modal-body').html('<table class="table">' +
             '<tr>' +
             '	<td style="width: 25%;">Name Division</td>' +
@@ -287,14 +278,6 @@
             '<tr>' +
             '	<td style="width: 25%;">Name Group</td>' +
             '	<td><input class="form-control" id="Namegroup"></td>' +
-            '</tr>' +
-            '<tr>' +
-            '	<td style="width: 25%;">Name Module</td>' +
-            '	<td><input class="form-control" id="Namemodule"></td>' +
-            '</tr>' +
-            '<tr>' +
-            '	<td style="width: 25%;">Description</td>' +
-            '	<td><textarea rows="3" cols="5" name="DescriptionFile" id="Descriptiongroup" class="form-control"></textarea></td>' +
             '</tr>' +
             '</table>');
         loadSelectOptionDivision();
@@ -378,6 +361,35 @@
 
 </script>
 
+
+<script>
+    $(document).on('change','#nameeditdivisiversion',function () {
+        var s = $(this).val();
+        $("#filtereditgroup").empty();
+        loadselectgroups();
+    });
+
+    function loadselectgroups() {
+
+        var IDDivision  = $('#nameeditdivisiversion option:selected').attr('id');
+        
+        if(IDDivision !='' && IDDivision !=null){
+            var url = base_url_js+'api/__dropdowneditgroupmod';
+            var token = jwt_encode({action : 'getLastdiversion', IDDivision  : IDDivision },'UAP)(*');
+
+            $.post(url,{token:token},function (jsonResult) {
+                //$("#filtereditgroup").empty();
+                $('#filtereditgroup').append('<option disabled selected></option>');
+
+                    for(var i=0;i<jsonResult.length;i++){
+                        $('#filtereditgroup').append('<option id="'+jsonResult[i].IDGroup+'"> '+jsonResult[i].NameGroup+' </option>');
+                    }
+                });
+            
+            }
+        }
+</script>
+
 <script>
     $(document).on('change','#filtergroup',function () {
         var s = $(this).val();
@@ -405,6 +417,9 @@
         }
 </script>
 
+nameeditdivisiversion
+
+
 
 <script>
     $(document).on('change','#filaddivisi',function () {
@@ -420,7 +435,7 @@
         
         if(filterDivisi!='' && filterDivisi!=null){
             var url = base_url_js+'api/__dropdowngroupmod';
-            var token = jwt_encode({action : 'getLastgroupmodule', filterDivisi : filterDivisi},'UAP)(*');
+            var token = jwt_encode({action : 'getLastmodule', filterDivisi : filterDivisi},'UAP)(*');
 
             $.post(url,{token:token},function (jsonResult) {
                     $('#filteraddgroup').append('<option disabled selected></option>');
@@ -447,11 +462,11 @@
         if(filterDivisi!='' && filterDivisi!=null){
             var url = base_url_js+'api/__dropdowngroupmod';
             var token = jwt_encode({action : 'getLastgroupmodule', filterDivisi : filterDivisi},'UAP)(*');
+            $('#filtergroup').append('<option disabled selected></option>');
 
             $.post(url,{token:token},function (jsonResult) {
-                    $('#filtergroup').append('<option disabled selected></option>');
                     for(var i=0;i<jsonResult.length;i++){
-                           $('#filtergroup').append('<option id="'+jsonResult[i].IDGroup+'"> '+jsonResult[i].NameGroup+' </option>');
+                           $('#filtergroup').append('<option id="'+jsonResult[i].NameGroup+'"> '+jsonResult[i].NameGroup+' </option>');
                     }
                 });
             }
@@ -494,12 +509,30 @@
         });
     }
 
+    function loadfilterDivision2() {
+        var url = base_url_js+'api/__getdivisiversion';
+        $.getJSON(url,function (jsonResult) {
+            for(var i=0;i<jsonResult.length;i++){
+               $('.filtereditdivisiversion').append('<option id="'+jsonResult[i].IDDivision+'"> '+jsonResult[i].Division+' </option>');
+            }
+        });
+    }
+
 
     function loadSelectOptionDivision() {
         var url = base_url_js+'api/__getStatusVersion';
         $.getJSON(url,function (jsonResult) {
             for(var i=0;i<jsonResult.length;i++){
                $('.filterStatusDivision').append('<option id="'+jsonResult[i].ID+'"> '+jsonResult[i].Division+' </option>');
+            }
+        });
+    }
+
+    function loadSelectOptionDivision2() {
+        var url = base_url_js+'api/__getStatusVersion2';
+        $.getJSON(url,function (jsonResult) {
+            for(var i=0;i<jsonResult.length;i++){
+               $('.filterStatusDivision2').append('<option id="'+jsonResult[i].IDDivision+'"> '+jsonResult[i].Division+' </option>');
             }
         });
     }
@@ -535,12 +568,6 @@
         loadDataVersion('');
         //loadselectgroup('');
     });
-
-    // $('').change(function () {
-        
-        
-    // });
-
 
     function loadDataVersion(status) {
         var dataTable = $('#tableversion').DataTable( {
