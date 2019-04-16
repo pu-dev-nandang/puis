@@ -1221,8 +1221,9 @@ $route['budgeting/PostBudgetThisMonth_Department'] = 'page/budgeting/c_budgeting
 $route['budgeting/getPostBudgetDepartement'] = 'page/budgeting/c_budgeting/getPostBudgetDepartement';
 $route['budgeting/submitpr'] = 'page/budgeting/c_pr_po/submitpr';
 $route['budgeting/DataPR'] = 'page/budgeting/c_pr_po/DataPR';
-$route['budgeting/FormEditPR'] = 'page/budgeting/c_budgeting/FormEditPR';
-$route['budgeting/GetDataPR'] = 'page/budgeting/c_budgeting/GetDataPR';
+$route['budgeting/GetDataPR'] = 'page/budgeting/c_pr_po/GetDataPR';
+$route['budgeting/FormEditPR'] = 'page/budgeting/c_pr_po/FormEditPR';
+
 $route['budgeting/checkruleinput'] = 'page/budgeting/c_pr_po/checkruleinput';
 
 $route['budgeting/export_excel_post_department'] = 'c_save_to_excel/export_excel_post_department';

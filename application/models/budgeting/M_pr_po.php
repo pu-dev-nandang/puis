@@ -199,16 +199,19 @@ class M_pr_po extends CI_Model {
         $ID_m_userrole_limit = $arr['Count'] + 1;
         for ($i=0; $i < count($G); $i++) { 
             $ID_m_userrole = $G[$i]['ID'];
-            if ($ID_m_userrole <= $ID_m_userrole_limit) {
-                $rs[] = array(
-                    'NIP' => $G[$i]['NIP'],
-                    'Status' => 0,
-                    'ApproveAt' => '',
-                    'Representedby' => '',
-                    'Visible' => $G[$i]['Visible'],
-                    'NameTypeDesc' => $G[$i]['NameTypeDesc'],
-                );
+            if ($ID_m_userrole > 1) { // Admin tidak di inputkan dalam approval
+                if ($ID_m_userrole <= $ID_m_userrole_limit) {
+                    $rs[] = array(
+                        'NIP' => $G[$i]['NIP'],
+                        'Status' => 0,
+                        'ApproveAt' => '',
+                        'Representedby' => '',
+                        'Visible' => $G[$i]['Visible'],
+                        'NameTypeDesc' => $G[$i]['NameTypeDesc'],
+                    );
+                }
             }
+            
         }
         return $rs;       
     }
@@ -217,7 +220,7 @@ class M_pr_po extends CI_Model {
     {
         $sql = 'select a.ID,a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,
                                     if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done","Reject") ))
-                                    as StatusName,a.Status, a.JsonStatus ,a.PPN,a.PRPrint_Approve,a.Notes,a.Supporting_documents,a.PostingDate
+                                    as StatusName,a.Status, a.JsonStatus ,a.PRPrint_Approve,a.Notes,a.Supporting_documents,a.PostingDate
                                     from db_budgeting.pr_create as a 
                 join (
                 select * from (
@@ -237,7 +240,7 @@ class M_pr_po extends CI_Model {
                 $JsonStatus = $query[$i]['JsonStatus'];
                 $JsonStatusDecode = (array)json_decode($JsonStatus,true);
                 for ($j=0; $j < count($JsonStatusDecode); $j++) { 
-                    $ApprovedBy = $JsonStatusDecode[$j]['ApprovedBy'];
+                    $ApprovedBy = $JsonStatusDecode[$j]['NIP'];
                     $NameAprrovedBy = $this->m_master->caribasedprimary('db_employees.employees','NIP',$ApprovedBy);
                     $NameAprrovedBy = $NameAprrovedBy[0]['Name'];
                     $JsonStatusDecode[$j]['NameAprrovedBy'] = $NameAprrovedBy;
@@ -304,7 +307,7 @@ class M_pr_po extends CI_Model {
 
     public function GetRuleAccess($NIP,$Departement)
     {
-        error_reporting(0);
+        // error_reporting(0);
         $arr_result = array('access' => array(),'rule' => array());
         $sql = 'select a.*,b.NameUserRole,c.Name as NameTypeDesc,d.NameDepartement from db_budgeting.cfg_approval_pr as a 
                 join db_budgeting.cfg_m_userrole as b on a.ID_m_userrole = b.ID
@@ -320,8 +323,11 @@ class M_pr_po extends CI_Model {
                 ) as d on a.Departement = d.ID
                 where a.NIP = "'.$NIP.'" and a.Departement = "'.$Departement.'" limit 1';
         $query = $this->db->query($sql, array())->result_array();
-        $arr_result['rule'] = $this->m_master->caribasedprimary('db_budgeting.cfg_set_userrole','ID_m_userrole',$query[0]['ID_m_userrole']);
-        $arr_result['access'] = $query;
+        if (count($query) > 0) {
+            $arr_result['rule'] = $this->m_master->caribasedprimary('db_budgeting.cfg_set_userrole','ID_m_userrole',$query[0]['ID_m_userrole']);
+            $arr_result['access'] = $query;
+        }
+        
         return $arr_result; 
     }
 
