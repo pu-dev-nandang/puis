@@ -846,7 +846,7 @@ class M_budgeting extends CI_Model {
         return $arr;   
     }
 
-    public function SearchDt_perHeadAccount($arr_code_ha,$arr_bulan,$arr_Department_split)
+    public function SearchDt_perHeadAccount($arr_code_ha,$arr_bulan,$arr_Department_split,$Year)
     {
         $rs = array();
         $arr_custom = $arr_code_ha;
@@ -857,10 +857,11 @@ class M_budgeting extends CI_Model {
         $sql = 'select a.CodeHeadAccount,a.Name,b.CodePostRealisasi,b.RealisasiPostName,b.UnitDiv,c.UnitCost,c.Freq,c.DetailMonth,c.SubTotal
                 from db_budgeting.cfg_head_account as a join db_budgeting.cfg_postrealisasi as b on a.CodeHeadAccount = b.CodeHeadAccount
                     join db_budgeting.creator_budget as c on b.CodePostRealisasi = c.CodePostRealisasi
-                    where a.CodeHeadAccount in ('.$CodeHeadAccountIn.');
+                    join db_budgeting.creator_budget_approval as d on c.ID_creator_budget_approval = d.ID
+                    where a.CodeHeadAccount in ('.$CodeHeadAccountIn.') and d.`Status` = 2 and d.`Year` = ?;
                 ';
         // print_r($sql);        
-        $query=$this->db->query($sql, array())->result_array();
+        $query=$this->db->query($sql, array($Year))->result_array();
         $arr_month_val = array();
         for ($i=0; $i < count($arr_bulan); $i++) { // loop bulan dahulu
             $keyValueFirst = $arr_bulan[$i]['keyValueFirst'];

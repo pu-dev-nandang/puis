@@ -3892,7 +3892,7 @@ class C_save_to_excel extends CI_Controller
                             // if (count($Merger) == 0) {
                             //     continue;
                             // }
-                            $G_dt = $this->m_budgeting->SearchDt_perHeadAccount($arr_code_ha,$arr_bulan,$arr_Department_split);
+                            $G_dt = $this->m_budgeting->SearchDt_perHeadAccount($arr_code_ha,$arr_bulan,$arr_Department_split,$Year);
                             // die();
                             
                             // Loop Month
