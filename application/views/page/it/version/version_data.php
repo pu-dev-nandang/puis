@@ -107,7 +107,7 @@
                         $('#GlobalModal .modal-body').html('<table class="table">' +
     			             '<tr>' +
     			            '	<td style="width: 25%;">No. Version</td>' +
-    			            '	<td><input class="form-control" id="Noeditversion" value="'+response[i]['Version']+'" disabled></td>' +
+    			            '	<td><input class="form-control" id="Noeditversion" value="'+response[i]['Version']+'"></td>' +
                              '  <td><input type="hidden" class="form-control" id="Idversion" value="'+response[i]['IDVersion']+'" disabled></td>' +
     			            '</tr>' +
     			            '<tr>' +
@@ -122,10 +122,13 @@
     			            '	<td style="width: 25%;">Name Module</td>' +
     			            '	<td> <select class="form-control" id="filtereditmodule"><option id="'+response[i]['IDModule']+'" disabled selected> '+response[i]['NameModule']+' </option></select></td>' +
     			            '</tr>' +
+
+                            '<tr>' +
+                            '   <td style="width: 25%;">Name PIC</td>' +
+                            '   <td><select class="select2-select-00 form-exam" id="selectpicversion" style="max-width: 300px !important;" size="5"><option id="'+response[i]['NIP']+'" disabled selected> '+response[i]['NIP']+' - '+response[i]['NamePIC']+' </option>'+
+                            '   </select></td>   ' +
                             '</tr>' +
-    			            '	<td style="width: 25%;">Name PIC</td>' +
-    			            '    <td> <select class="form-control" id="selectpicversion"><option id="'+response[i]['NIP']+'" disabled selected> '+response[i]['NamePIC']+' </option></select></td>' +
-    			            '</tr>' +
+
     			            '<tr>' +  //
     			            '	<td style="width: 25%;">Description</td>' +
     			            '	<td><textarea id="descriptionversion">'+response[i]['Description']+'</textarea></td>' +
@@ -140,10 +143,10 @@
                             }); 
 
                             loadSelectModule();
-                            loadPicversion();
+                            //loadPicversion();
                             loadfilterDivision2();
-                            loadSelectOptionEmployeesSingle('#filternamepic','');
-                            $('#filternamepic').select2({allowClear: true});
+                            loadSelectOptionEmployeesSingle('#selectpicversion','');
+                            $('#selectpicversion').select2({allowClear: true});
 
                             $('#descriptionversion').summernote({
                                 placeholder: 'Text your Description Version',
@@ -366,6 +369,7 @@
     $(document).on('change','#nameeditdivisiversion',function () {
         var s = $(this).val();
         $("#filtereditgroup").empty();
+        $("#filtereditmodule").empty();
         loadselectgroups();
     });
 
@@ -378,7 +382,6 @@
             var token = jwt_encode({action : 'getLastdiversion', IDDivision  : IDDivision },'UAP)(*');
 
             $.post(url,{token:token},function (jsonResult) {
-                //$("#filtereditgroup").empty();
                 $('#filtereditgroup').append('<option disabled selected></option>');
 
                     for(var i=0;i<jsonResult.length;i++){
@@ -555,8 +558,6 @@ nameeditdivisiversion
             }
         });
     }
-
-   
 
 </script>
 

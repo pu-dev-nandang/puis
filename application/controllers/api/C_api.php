@@ -5613,11 +5613,13 @@ class C_api extends CI_Controller {
 
                 $selectmodule = $formInsert['selectmodule'];
                 $selectpic = $formInsert['selectpic'];
+                $noversion = $formInsert['noversion'];
                 $VersionID = strtoupper($formInsert['VersionID']);
                 $Descriptionversion = $formInsert['Descriptionversion'];
 
                 $dataSave1 = array(
                         'PIC' => $selectpic,
+                        'Version' => $noversion,
                         'UpdateBy' => $IDuser
                 );
                 $this->db->where('IDVersion', $VersionID);

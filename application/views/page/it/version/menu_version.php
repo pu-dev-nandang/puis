@@ -98,7 +98,7 @@
         if (window.confirm('Are you sure to delete module data ?')) {
             
             var versionid = $(this).attr('versionid');
-            alert(versionid);
+            
             var data = {
                 action : 'deletegroupmod',
                 versionid : versionid
@@ -198,15 +198,16 @@
 
     function saveeditversion() {
 
-        //var selectdivision = $('#filtereditgroup option:selected').attr('id');
         var selectmodule = $('#filtereditmodule option:selected').attr('id');
-        var selectpic = $('#selectpicversion option:selected').attr('id');
+        var selectpic = $('#selectpicversion').val();
         var Descriptionversion = $('#descriptionversion').val();
         var VersionID = $('#Idversion').val();
+        var Noversion = $('#Noeditversion').val();
         
         if(selectmodule!=null && selectmodule!=''
             && selectpic!='' && selectpic!=null
             && VersionID!='' && VersionID!=null
+            && Noversion!='' && Noversion!=null
             && Descriptionversion!='' && Descriptionversion!=null)
         { 
     
@@ -214,6 +215,7 @@
                 action : 'EditVersion',
                 formInsert : {
                     selectmodule : selectmodule,
+                    noversion : Noversion,
                     selectpic : selectpic,
                     Descriptionversion : Descriptionversion,
                     VersionID : VersionID
@@ -302,10 +304,6 @@
         var Namegroup = $('.filaddnamegroup').val();
         var Namemodule = $('#Namemodule').val();
         var Descriptiongroup = $('#Descriptiongroup').val();
-        //alert(selectdivision);
-        ////alert(Namegroup);
-        //alert(Namemodule);
-        //alert(Descriptiongroup);
 
         if(selectdivision!=null && selectdivision!=''
                 && IDGroups!='' && IDGroups!=null
