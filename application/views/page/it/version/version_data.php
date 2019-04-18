@@ -466,7 +466,7 @@ nameeditdivisiversion
 
             $.post(url,{token:token},function (jsonResult) {
                     for(var i=0;i<jsonResult.length;i++){
-                           $('#filtergroup').append('<option id="'+jsonResult[i].NameGroup+'"> '+jsonResult[i].NameGroup+' </option>');
+                           $('#filtergroup').append('<option id="'+jsonResult[i].IDGroup+'"> '+jsonResult[i].NameGroup+' </option>');
                     }
                 });
             }
