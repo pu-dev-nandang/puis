@@ -2966,6 +2966,93 @@ class C_api2 extends CI_Controller {
 
         }
 
+        else if($data_arr['action']=='dataExamSA'){
+
+            $NPM = $data_arr['NPM'];
+
+            $dateNow = $this->m_rest->getDateNow();
+            $dataStd = $this->db->query('SELECT ss.NPM, ss.Mentor, sa.Name, ss.ID AS IDSAStudent, sa.*, say.ShowUTSSchedule, say.ShowUASSchedule  FROM db_academic.sa_student ss 
+                                                    LEFT JOIN db_academic.semester_antara sa ON (sa.ID = ss.SASemesterID)
+                                                    LEFT JOIN db_academic.sa_academic_years say ON (say.SASemesterID = sa.ID)
+                                                    WHERE ss.NPM = "'.$NPM.'" ORDER BY ss.SASemesterID ASC ')->result_array();
+
+            if(count($dataStd)>0){
+                for ($i=0;$i<count($dataStd);$i++){
+                    $d = $dataStd[$i];
+
+                    $dataDetails = $this->db->query('SELECT ssd.ID AS IDSSD, ssd.Type, ssd.Status, ssd.Credit, mk.NameEng AS CourseEng, mk.MKCode  
+                                                                FROM db_academic.sa_student_details ssd
+                                                                LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssd.MKID)
+                                                                WHERE ssd.IDSAStudent = "'.$d['IDSAStudent'].'" AND ssd.Status = "3" ')->result_array();
+
+                    if(count($dataDetails)>0){
+                        for ($s=0;$s<count($dataDetails);$s++){
+                            $ds = $dataDetails[$s];
+                            $dataSchedule = $this->db->query('SELECT ss.ID AS ScheduleIDSA,ss.ClassGroup, ss.Start, ss.End, em.NIP, em.Name AS CoordinatorName, d.NameEng AS DayEng, cl.Room  
+                                                                        FROM db_academic.sa_schedule ss
+                                                                        LEFT JOIN db_academic.sa_schedule_course ssc ON (ss.ID = ssc.ScheduleIDSA)
+                                                                        LEFT JOIN db_academic.days d ON (d.ID = ss.DayID)
+                                                                        LEFT JOIN db_academic.classroom cl ON (cl.ID = ss.ClassroomID)
+                                                                        LEFT JOIN db_employees.employees em ON (em.NIP = ss.Coordinator)
+                                                                        WHERE ssc.IDSSD = "'.$ds['IDSSD'].'" ')->result_array();
+
+                            if(count($dataSchedule)>0){
+                                for($t=0;$t<count($dataSchedule);$t++){
+
+                                    // Jadwal UTS
+                                    $uts = [];
+                                    $uas = [];
+                                    if($d['ShowUTSSchedule']<=$dateNow){
+                                        $uts = $this->db->query('SELECT se.ExamDate, se.Start, se.End, cl.Room FROM db_academic.sa_exam se 
+                                                                    LEFT JOIN db_academic.sa_exam_student ses ON (ses.ExamIDSA = se.ID)
+                                                                    LEFT JOIN  db_academic.classroom cl ON (cl.ID = se.ClassroomID)
+                                                                    WHERE ses.NPM = "'.$NPM.'" AND ses.ScheduleIDSA = "'.$dataSchedule[$t]['ScheduleIDSA'].'" 
+                                                                    AND se.Type = "uts" ')->result_array();
+                                    }
+                                    $dataSchedule[$t]['UTS'] = $uts;
+
+                                    // Jadwal UTS Susulan
+                                    $dataSchedule[$t]['UTS_RE'] = $this->db->query('SELECT se.ExamDate, se.Start, se.End, cl.Room FROM db_academic.sa_exam se 
+                                                                    LEFT JOIN db_academic.sa_exam_student ses ON (ses.ExamIDSA = se.ID)
+                                                                    LEFT JOIN  db_academic.classroom cl ON (cl.ID = se.ClassroomID)
+                                                                    WHERE ses.NPM = "'.$NPM.'" AND ses.ScheduleIDSA = "'.$dataSchedule[$t]['ScheduleIDSA'].'" 
+                                                                    AND se.Type = "re_uts" ')->result_array();
+
+
+                                    if($d['ShowUASSchedule']<=$dateNow){
+                                        $uas = $this->db->query('SELECT se.ExamDate, se.Start, se.End, cl.Room FROM db_academic.sa_exam se 
+                                                                    LEFT JOIN db_academic.sa_exam_student ses ON (ses.ExamIDSA = se.ID)
+                                                                    LEFT JOIN  db_academic.classroom cl ON (cl.ID = se.ClassroomID)
+                                                                    WHERE ses.NPM = "'.$NPM.'" AND ses.ScheduleIDSA = "'.$dataSchedule[$t]['ScheduleIDSA'].'" 
+                                                                    AND se.Type = "uas" ')->result_array();
+                                    }
+                                    // Jadwal UAS
+                                    $dataSchedule[$t]['UAS'] = $uas;
+
+                                    // Jadwal UAS Susulan
+                                    $dataSchedule[$t]['UAS_RE'] = $this->db->query('SELECT se.ExamDate, se.Start, se.End, cl.Room FROM db_academic.sa_exam se 
+                                                                    LEFT JOIN db_academic.sa_exam_student ses ON (ses.ExamIDSA = se.ID)
+                                                                    LEFT JOIN  db_academic.classroom cl ON (cl.ID = se.ClassroomID)
+                                                                    WHERE ses.NPM = "'.$NPM.'" AND ses.ScheduleIDSA = "'.$dataSchedule[$t]['ScheduleIDSA'].'" 
+                                                                    AND se.Type = "re_uas" ')->result_array();
+
+
+                                }
+                            }
+
+                            $dataDetails[$s]['Schedule'] = $dataSchedule;
+                        }
+                    }
+                    $dataStd[$i]['Course'] = $dataDetails;
+
+                }
+            }
+
+
+            return print_r(json_encode($dataStd));
+
+        }
+
     }
 
     function createTagihanSemesterAntara($IDSAStudent){
@@ -3134,6 +3221,20 @@ class C_api2 extends CI_Controller {
                 }
             }
 
+            // Get jadwal UTS Susulan
+            $dataUTS_RE = $this->db->query('SELECT sec.ExamIDSA, se.ExamDate, se.Start, se.End, cl.Room FROM db_academic.sa_exam_course sec 
+                                                      LEFT JOIN db_academic.sa_exam se ON (se.ID = sec.ExamIDSA)
+                                                      LEFT JOIN db_academic.classroom cl ON (cl.ID = se.ClassroomID)
+                                                      WHERE sec.ScheduleIDSA = "'.$ScheduleIDSA.'" AND se.Type = "re_uts" ')->result_array();
+            $showUTS_RE = '';
+            if(count($dataUTS_RE)>0){
+                foreach ($dataUTS_RE AS $item){
+                    $t = substr($item['Start'],0,5).' - '.substr($item['End'],0,5);
+                    $showUTS_RE = $showUTS_RE.'<div><a style="color: orangered;" href="'.base_url('academic/semester-antara/setting-exam/'.$SASemesterID.'?edit='.$item['ExamIDSA']).'">'.date('l, d M Y',strtotime($item['ExamDate'])).'<br/>'.$t.'<br/>'.$item['Room'].'</a></div>';
+                }
+            }
+
+            // Get jadwal UAS
             $dataUAS = $this->db->query('SELECT sec.ExamIDSA, se.ExamDate, se.Start, se.End, cl.Room FROM db_academic.sa_exam_course sec 
                                                       LEFT JOIN db_academic.sa_exam se ON (se.ID = sec.ExamIDSA)
                                                       LEFT JOIN db_academic.classroom cl ON (cl.ID = se.ClassroomID)
@@ -3146,6 +3247,19 @@ class C_api2 extends CI_Controller {
                 }
             }
 
+            // Get jadwal UAS Susulan
+            $dataUAS_RE = $this->db->query('SELECT sec.ExamIDSA, se.ExamDate, se.Start, se.End, cl.Room FROM db_academic.sa_exam_course sec 
+                                                      LEFT JOIN db_academic.sa_exam se ON (se.ID = sec.ExamIDSA)
+                                                      LEFT JOIN db_academic.classroom cl ON (cl.ID = se.ClassroomID)
+                                                      WHERE sec.ScheduleIDSA = "'.$ScheduleIDSA.'" AND se.Type = "re_uas" ')->result_array();
+            $showUAS_RE = '';
+            if(count($dataUAS_RE)>0){
+                foreach ($dataUAS_RE AS $item){
+                    $t = substr($item['Start'],0,5).' - '.substr($item['End'],0,5);
+                    $showUAS_RE = $showUAS_RE.'<div><a style="color: orangered;" href="'.base_url('academic/semester-antara/setting-exam/'.$SASemesterID.'?edit='.$item['ExamIDSA']).'">'.date('l, d M Y',strtotime($item['ExamDate'])).'<br/>'.$t.'<br/>'.$item['Room'].'</a></div>';
+                }
+            }
+
             $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div style="text-align:center;">'.$row['ClassGroup'].'</div>';
             $nestedData[] = '<div style="text-align:left;"><b><a href="'.base_url('academic/semester-antara/setting-timetable/'.$SASemesterID.'?edit='.$row['ID']).'">'.$row['CourseEng'].'</a></b></div>';
@@ -3154,8 +3268,8 @@ class C_api2 extends CI_Controller {
             $nestedData[] = '<div style="text-align:center;">
                                 <a href="javascript:void(0);" class="showStd" data-course="'.$row['ClassGroup'].' - '.$row['CourseEng'].'" 
                                 data-token="'.$tokenStd.'">'.count($Student).'</a></div>';
-            $nestedData[] = '<div style="text-align:right;">'.$showUTS.'</div>';
-            $nestedData[] = '<div style="text-align:right;">'.$showUAS.'</div>';
+            $nestedData[] = '<div style="text-align:right;">'.$showUTS.''.$showUTS_RE.'</div>';
+            $nestedData[] = '<div style="text-align:right;">'.$showUAS.''.$showUAS_RE.'</div>';
             $nestedData[] = '<div style="text-align:center;"><button class="btn btn-default btn-sm"><i class="fa fa-edit"></i></button></div>';
 
 
