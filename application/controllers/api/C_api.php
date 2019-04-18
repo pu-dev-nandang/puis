@@ -8788,7 +8788,7 @@ class C_api extends CI_Controller {
                 $filterDivisi = $data_arr['filterDivisi'];
 
                 //$data = $this->db->get_where('db_it.group_module',array('IDDivision' => $data_arr['filterDivisi']))->result_array();
-                $data = $this->db->query('SELECT DISTINCT NameGroup FROM db_it.group_module WHERE IDDivision = "'.$data_arr['filterDivisi'].'" ORDER BY IDDivision ASC ')->result_array();
+                $data = $this->db->query('SELECT NameGroup, IDGroup FROM db_it.group_module WHERE IDDivision = "'.$data_arr['filterDivisi'].'" ORDER BY IDDivision ASC ')->result_array();
 
                 return print_r(json_encode($data));
             } 
