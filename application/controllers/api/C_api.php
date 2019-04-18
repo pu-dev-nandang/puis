@@ -2242,11 +2242,11 @@ class C_api extends CI_Controller {
             $sql = 'SELECT X.IDGroup, X.NameGroup, Y.IDModule, Y.NameModule, Z.ID, Z.Division, Z.ID, Y.Description
                     FROM db_it.group_module AS X
                     LEFT JOIN db_employees.division Z ON (X.IDDivision = Z.ID)
-                    LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup) WHERE Y.Active = 1';
-            $sql.= ' AND X.NameGroup LIKE "'.$requestData['search']['value'].'%" ';
+                    LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup) WHERE Y.Active = 1 AND (';
+            $sql.= ' X.NameGroup LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR Z.Division LIKE "%'.$requestData['search']['value'].'%" ';
-            $sql.= ' OR dd.NameModule LIKE "'.$requestData['search']['value'].'%" ';
-            $sql.= ' ORDER BY X.IDGroup DESC';
+            $sql.= ' OR Y.NameModule LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' ) ORDER BY X.IDGroup DESC';
 
         }
         else {
