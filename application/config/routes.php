@@ -702,6 +702,7 @@ $route['api/__getdetailversion'] = 'api/c_api/getversiondetail';
 $route['api/__getdetailgroupmod'] = 'api/c_api/getgroupmoddetail';
 $route['api/__searchmodule'] = 'api/c_api/search_module';
 $route['api/__getdatagroupmodule'] = 'api/c_api/getlistgroupmodule';
+$route['api/__getdatamodule'] = 'api/c_api/getlistmodule';
 
 
 $route['api/__getMKByID'] = 'api/c_api/getMKByID';

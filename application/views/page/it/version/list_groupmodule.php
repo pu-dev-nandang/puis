@@ -2,7 +2,7 @@
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
-                <h4 class=""><i class="icon-reorder"></i> Data Group Module</h4>
+                <h4 class=""><i class="icon-reorder"></i> Data Module</h4>
                 <div class="toolbar no-padding">
                     <div class="btn-group">
                         
