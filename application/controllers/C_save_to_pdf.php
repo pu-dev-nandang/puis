@@ -5725,7 +5725,7 @@ Phone: (021) 29200456';
              $pdf->AddFont('dinproExpBold','','dinproExpBold.php');
              $pdf->AddPage();
              $pdf->SetAutoPageBreak(true, 0);
-             $pdf->Image($input[$i]['PathFoto'],10,26,34);
+             $pdf->Image($input[$i]['PathFoto'],14,27,28);
              $template_format = ($input[$i]['type'] == 'student') ? base_url('images/id_mhs.png') : base_url('images/id_emp.png');
              $pdf->Image($template_format,0,0,54);
              $pdf->SetXY(10,63);

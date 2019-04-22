@@ -56,6 +56,20 @@
 		// check data edit or new
 		if (ClassDt.PRCodeVal != '') {
 			// edit
+			var PRCode = ClassDt.PRCodeVal;
+			var url = base_url_js+'budgeting/GetDataPR';
+			var data = {
+			    PRCode : PRCode,
+			};
+			var token = jwt_encode(data,"UAP)(*");
+			$.post(url,{ token:token },function (data_json) {
+				var response = jQuery.parseJSON(resultJson);
+				console.log(response);
+			}).fail(function() {
+			  toastr.info('No Result Data'); 
+			}).always(function() {
+			                
+			});	
 		}
 		else
 		{
@@ -846,8 +860,19 @@
 				  }
 
 				 var InputLi = '<ul class = "liCombine" style = "margin-left : -21px;">';
+				 var less_ = less;
 				 for (var i = 0; i < checkboxArr.length; i++) {
-				 	InputLi += '<li id_budget_left = "'+checkboxArr[i].id_budget_left+'" money = "'+checkboxArr[i].money+'">'+checkboxArr[i].RealisasiPostName+'</li>';
+				 	var mon = checkboxArr[i].money;
+				 	var Remaining_ = mon;
+				 	if (less_ > Remaining_) {
+				 		var Subsidi = mon;
+				 	}
+				 	else
+				 	{
+				 		var Subsidi = less_;
+				 	}
+				 	less_ = parseInt(less_) - parseInt(Remaining_);
+				 	InputLi += '<li id_budget_left = "'+checkboxArr[i].id_budget_left+'" money = "'+checkboxArr[i].money+'" subsidi = "'+Subsidi+'">'+checkboxArr[i].RealisasiPostName+'</li>';
 				  }
 					 InputLi += '</ul>';
 					 td.append(InputLi);
@@ -1153,15 +1178,17 @@
 				fillItem.find('.liCombine').find('li').each(function(){
 					var ID_budget_left_com = $(this).attr('id_budget_left');
 					// Get Cost dari Arr BudgetRemaining field Using
-						var dt = ClassDt.BudgetRemaining;
-						var Cost = 0;
-						for (var i = 0; i < dt.length; i++) {
-							var ID_budget_left_com_ = dt[i].ID;
-							if (ID_budget_left_com == ID_budget_left_com_) {
-								Cost = dt[i].Using;
-								break;
-							}
-						}
+						// var dt = ClassDt.BudgetRemaining;
+						// var Cost = 0;
+						// for (var i = 0; i < dt.length; i++) {
+						// 	var ID_budget_left_com_ = dt[i].ID;
+						// 	if (ID_budget_left_com == ID_budget_left_com_) {
+						// 		Cost = dt[i].Using;
+						// 		break;
+						// 	}
+						// }
+
+						var Cost = $(this).attr('subsidi');
 
 					var temp = {
 						ID_budget_left : ID_budget_left_com,
@@ -1241,9 +1268,10 @@
 		       			// success
 		       			$('#labelPrcode').html('PR Code : '+data['PRCode']);
 		       			var Status = NameStatus(data['StatusPR']);
-		       			$('#Status').html('Status : '+data['StatusPR']);
+		       			$('#Status').html('Status : '+Status);
 		       			// Update Variable ClassDt
 		       			ClassDt.PRCodeVal = data['PRCode'];
+		       			LoadFirstLoad();
 		       		}
 		       		$('#SaveSubmit').prop('disabled',false).html('Submit');
 		       		// if ($("#p_prcode").length) {
@@ -1299,12 +1327,15 @@
 		switch (Status)
 	    {
 	       case "1":
+	       case 1:
 	       	Status = 'Awaiting Approval';
 	       break;
 	       case "2":
+	       case 2:
 	       	Status = 'Done';
 	       break;
 	       case "3":
+	       case 3:
 	       	Status = 'Reject';
 	       break;
 	       default: 

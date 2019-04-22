@@ -1901,33 +1901,7 @@ class C_budgeting extends Budgeting_Controler {
         echo json_encode($get);
     }
 
-    public function FormEditPR()
-    {
-        $this->auth_ajax();
-        $input = $this->getInputToken();
-        $PRCode = $input['PRCode'];
-        $Departement = $input['department'];
-        $this->data['arr_Year'] = $this->m_master->showData_array('db_budgeting.cfg_dateperiod');
-        $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
-        $Year = $get[0]['Year'];
-        $this->data['Year'] = $Year;
-        $this->data['PRCodeVal'] = $PRCode;
-        $this->data['Departement'] = $Departement;
-        $arr_result = array('html' => '','jsonPass' => '');
-        $content = $this->load->view('global/budgeting/pr/form',$this->data,true);
-        $arr_result['html'] = $content;
-        echo json_encode($arr_result);
-    }
-
-    public function GetDataPR()
-    {
-        $this->auth_ajax();
-        $input = $this->getInputToken();
-        $arr_result = array('pr_create' => array(),'pr_detail' => array());
-        $arr_result['pr_create'] = $this->m_budgeting->GetPR_CreateByPRCode($input['PRCode']);
-        $arr_result['pr_detail'] = $this->m_budgeting->GetPR_DetailByPRCode($input['PRCode']);
-        echo json_encode($arr_result);
-    }
+    
 
    
 
