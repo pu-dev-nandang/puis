@@ -2235,7 +2235,6 @@ class C_api extends CI_Controller {
     }
 
     public function getlistgroupmodule(){
-        //$formInsert = (array) $data_arr['formInsert'];
 
         $status = $this->input->get('s');
         $requestData= $_REQUEST;
@@ -2243,13 +2242,13 @@ class C_api extends CI_Controller {
         $totalData = $this->db->query('SELECT X.IDGroup, X.NameGroup, Y.IDModule, Y.NameModule, Z.ID, Z.Division, Z.ID, Y.Description
         FROM db_it.group_module AS X
         LEFT JOIN db_employees.division Z ON (X.IDDivision = Z.ID)
-        LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup) WHERE Y.Active = 1 ')->result_array();
+        LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup) WHERE Y.Active = 1 AND X.Active = 1')->result_array();
 
         if( !empty($requestData['search']['value']) ) {
             $sql = 'SELECT X.IDGroup, X.NameGroup, Y.IDModule, Y.NameModule, Z.ID, Z.Division, Z.ID, Y.Description
                     FROM db_it.group_module AS X
                     LEFT JOIN db_employees.division Z ON (X.IDDivision = Z.ID)
-                    LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup) WHERE Y.Active = 1 AND (';
+                    LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup) WHERE Y.Active = 1 AND X.Active = 1 AND (';
             $sql.= ' X.NameGroup LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR Z.Division LIKE "%'.$requestData['search']['value'].'%" ';
             $sql.= ' OR Y.NameModule LIKE "'.$requestData['search']['value'].'%" ';
@@ -2260,7 +2259,7 @@ class C_api extends CI_Controller {
             $sql = 'SELECT X.IDGroup, X.NameGroup, Y.IDModule, Y.NameModule, Z.ID, Z.Division, Z.ID, Y.Description
                     FROM db_it.group_module AS X
                     LEFT JOIN db_employees.division Z ON (X.IDDivision = Z.ID)
-                    LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup) WHERE Y.Active = 1 ';
+                    LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup) WHERE Y.Active = 1 AND X.Active = 1 ';
             $sql.= 'ORDER BY X.IDGroup DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
         }
         
