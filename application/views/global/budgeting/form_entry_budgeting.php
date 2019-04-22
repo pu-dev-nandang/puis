@@ -569,7 +569,7 @@ function makeApproval()
 		var token = jwt_encode(data,'UAP)(*');
 		$.post(url,{token:token},function (resultJson) {
 			var JsonStatus = jQuery.parseJSON(arr1[0].JsonStatus);
-			// only admin to custom approval
+			// only admin & Finance to custom approval
 				var html_add_approver = '';
 				var NIP = '<?php echo $this->session->userdata('NIP') ?>';
 				var bool = false;

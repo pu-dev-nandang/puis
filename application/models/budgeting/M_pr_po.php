@@ -199,17 +199,28 @@ class M_pr_po extends CI_Model {
         $ID_m_userrole_limit = $arr['Count'] + 1;
         for ($i=0; $i < count($G); $i++) { 
             $ID_m_userrole = $G[$i]['ID'];
-            if ($ID_m_userrole > 1) { // Admin tidak di inputkan dalam approval
-                if ($ID_m_userrole <= $ID_m_userrole_limit) {
-                    $rs[] = array(
-                        'NIP' => $G[$i]['NIP'],
-                        'Status' => 0,
-                        'ApproveAt' => '',
-                        'Representedby' => '',
-                        'Visible' => $G[$i]['Visible'],
-                        'NameTypeDesc' => $G[$i]['NameTypeDesc'],
-                    );
-                }
+            // if ($ID_m_userrole > 1) { // Admin tidak di inputkan dalam approval
+            //     if ($ID_m_userrole <= $ID_m_userrole_limit) {
+            //         $rs[] = array(
+            //             'NIP' => $G[$i]['NIP'],
+            //             'Status' => 0,
+            //             'ApproveAt' => '',
+            //             'Representedby' => '',
+            //             'Visible' => $G[$i]['Visible'],
+            //             'NameTypeDesc' => $G[$i]['NameTypeDesc'],
+            //         );
+            //     }
+            // }
+            if ($ID_m_userrole <= $ID_m_userrole_limit) {
+                $Status = ($ID_m_userrole == 1) ? 1 : 0;
+                $rs[] = array(
+                    'NIP' => $G[$i]['NIP'],
+                    'Status' => $Status,
+                    'ApproveAt' => '',
+                    'Representedby' => '',
+                    'Visible' => $G[$i]['Visible'],
+                    'NameTypeDesc' => $G[$i]['NameTypeDesc'],
+                );
             }
             
         }
@@ -218,7 +229,7 @@ class M_pr_po extends CI_Model {
 
     public function GetPR_CreateByPRCode($PRCode)
     {
-        $sql = 'select a.ID,a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,
+        $sql = 'select a.ID,a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,c.Name as NameCreatedBy,a.CreatedAt,
                                     if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done","Reject") ))
                                     as StatusName,a.Status, a.JsonStatus ,a.PRPrint_Approve,a.Notes,a.Supporting_documents,a.PostingDate
                                     from db_budgeting.pr_create as a 
@@ -254,15 +265,15 @@ class M_pr_po extends CI_Model {
 
     public function GetPR_DetailByPRCode($PRCode)
     {
-        $sql = 'select a.ID,a.PRCode,a.ID_budget_left,b.ID_creator_budget,c.CodePostBudget,d.CodeSubPost,e.CodePost,
-                e.RealisasiPostName,e.Departement,f.PostName,a.ID_m_catalog,g.Item,g.Desc,g.DetailCatalog,a.Spec_add,a.Need,
-                a.Qty,a.UnitCost,a.SubTotal,a.DateNeeded,a.BudgetStatus,a.UploadFile,g.Photo,h.NameDepartement
+        $sql = 'select a.ID,a.PRCode,a.ID_budget_left,b.ID_creator_budget,c.CodePostRealisasi,e.CodeHeadAccount,f.CodePost,
+                e.RealisasiPostName,d.Departement,f.PostName,a.ID_m_catalog,g.Item,g.Desc,g.DetailCatalog,a.Spec_add,a.Need,
+                a.Qty,a.UnitCost,a.SubTotal,a.DateNeeded,a.UploadFile,a.PPH,g.Photo,h.NameDepartement
                 from db_budgeting.pr_detail as a
                 join db_budgeting.budget_left as b on a.ID_budget_left = b.ID
                 join db_budgeting.creator_budget as c on b.ID_creator_budget = c.ID
-                join db_budgeting.cfg_set_post as d on c.CodePostBudget = d.CodePostBudget
-                join db_budgeting.cfg_postrealisasi as e on d.CodeSubPost = e.CodePostRealisasi
-                join db_budgeting.cfg_post as f on e.CodePost = f.CodePost
+                join db_budgeting.cfg_postrealisasi as e on c.CodePostRealisasi = e.CodePostRealisasi
+                                join db_budgeting.cfg_head_account as d on d.CodeHeadAccount = e.CodeHeadAccount
+                join db_budgeting.cfg_post as f on d.CodePost = f.CodePost
                 join db_purchasing.m_catalog as g on a.ID_m_catalog = g.ID
                 join (
                     select * from (
@@ -272,22 +283,22 @@ class M_pr_po extends CI_Model {
                                     UNION
                                     select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
                                     ) aa
-                    ) as h on e.Departement = h.ID 
+                    ) as h on d.Departement = h.ID 
                 where a.PRCode = ?
                ';
         $query = $this->db->query($sql, array($PRCode))->result_array();
         // get combine 
         for ($i=0; $i < count($query); $i++) { 
             $arr = array();
-            $sql = 'select b.ID_budget_left as ID_budget_left_Combine,c.ID_creator_budget as ID_creator_budget_Combine,d.CodePostBudget as CodePostBudget_Combine,e.CodeSubPost as CodeSubPost_Combine,f.CodePost as CodePost_Combine,
-                f.RealisasiPostName as RealisasiPostName_Combine,f.Departement as Departement_Combine,g.PostName as PostName_Combine,
-                h.NameDepartement as NameDepartement_Combine,b.Cost as Cost_Combine,b.Estvalue as Estvalue_Combine from 
+            $sql = 'select b.ID_budget_left as ID_budget_left_Combine,c.ID_creator_budget as ID_creator_budget_Combine,d.CodePostRealisasi as CodePostBudget_Combine,e.CodeHeadAccount as CodeHeadAccount_Combine,e.CodePost as CodePost_Combine,
+                f.RealisasiPostName as RealisasiPostName_Combine,e.Departement as Departement_Combine,g.PostName as PostName_Combine,
+                h.NameDepartement as NameDepartement_Combine,b.Cost as Cost_Combine from 
                 db_budgeting.pr_detail_combined as b
                 join db_budgeting.budget_left as c on b.ID_budget_left = c.ID
                join db_budgeting.creator_budget as d on c.ID_creator_budget = d.ID
-               join db_budgeting.cfg_set_post as e on d.CodePostBudget = e.CodePostBudget
-               join db_budgeting.cfg_postrealisasi as f on e.CodeSubPost = f.CodePostRealisasi
-               join db_budgeting.cfg_post as g on f.CodePost = g.CodePost
+               join db_budgeting.cfg_postrealisasi as f on d.CodePostRealisasi = f.CodePostRealisasi
+                             join db_budgeting.cfg_head_account as e on e.CodeHeadAccount = f.CodeHeadAccount
+               join db_budgeting.cfg_post as g on e.CodePost = g.CodePost
                join (
                    select * from (
                                    select CONCAT("AC.",ID) as ID, NameEng as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
@@ -296,7 +307,7 @@ class M_pr_po extends CI_Model {
                                    UNION
                                    select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
                                    ) aa
-                   ) as h on f.Departement = h.ID
+                   ) as h on e.Departement = h.ID
                 where b.ID_pr_detail = ?   
                 ';
             $arr = $this->db->query($sql, array($query[$i]['ID']))->result_array();
